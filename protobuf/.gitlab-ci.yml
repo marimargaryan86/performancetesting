@@ -1,0 +1,30 @@
+.protobuf:files: &files
+  - "protobuf/*"
+
+.protobuf:buf:
+  interruptible: true
+  image:
+    name: bufbuild/buf
+    entrypoint: [""]
+  variables:
+    BUF_BINARY: /usr/local/bin/buf
+  tags:
+    - docker
+
+.protobuf:buf-test:
+  extends: .protobuf:buf
+  stage: test
+  needs: []
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+      changes: *files
+
+protobuf:breaking:
+  extends: .protobuf:buf-test
+  script:
+    - "${BUF_BINARY} breaking --against ${CI_REPOSITORY_URL}#ref=${CI_MERGE_REQUEST_DIFF_BASE_SHA}"
+
+protobuf:lint:
+  extends: .protobuf:buf-test
+  script:
+    - "${BUF_BINARY} lint"

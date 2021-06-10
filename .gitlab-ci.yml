@@ -1,0 +1,11 @@
+stages:
+  - test
+
+variables:
+  ARTIFACT_COMPRESSION_LEVEL: fastest
+  CACHE_COMPRESSION_LEVEL: fastest
+  GIT_DEPTH: 1
+  GIT_STRATEGY: fetch
+
+include:
+  - local: protobuf/.gitlab-ci.yml
