@@ -1,5 +1,5 @@
 .protobuf:files: &files
-  - "protobuf/*"
+  - "protobuf/**/*"
 
 .protobuf:buf:
   interruptible: true
