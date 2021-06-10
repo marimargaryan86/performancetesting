@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package snowfall.junction.planner.v1;
+
+service PlannerService {
+  rpc SearchJourney (SearchJourneyRequest) returns (SearchJourneyResponse) {}
+}
+
+message SearchJourneyRequest {
+
+}
+
+message SearchJourneyResponse {
+
+}
