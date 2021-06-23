@@ -8,4 +8,5 @@ variables:
   GIT_STRATEGY: fetch
 
 include:
+  - local: .gitlab/pants.gitlab-ci.yml
   - local: protobuf/.gitlab-ci.yml

@@ -1,0 +1,20 @@
+[GLOBAL]
+colors = true
+pantsd = false
+local_store_dir = ".cache/lmdb_store"
+named_caches_dir = ".cache/named_caches"
+
+[coverage-py]
+global_report = true
+report = [
+    "xml",
+]
+
+[python-native-code]
+cpp_flags = ["-I/usr/local/include/python3.89/"]
+
+[python-setup]
+interpreter_search_paths = ["/usr/local/bin"]
+
+[test]
+use_coverage = true

@@ -1,0 +1,13 @@
+[tool.poetry]
+name = "Junction"
+version = "1.0.0"
+description = "Junction 3rd-pary dependencies."
+authors = [
+    "Snowfall Limited <info@snowfalltravel.com>",
+]
+
+[tool.poetry.dependencies]
+python = "3.9.5"
+grpcio = "^1.38.0"
+grpcio-reflection = "^1.38.0"
+protobuf = "^3.17.3"

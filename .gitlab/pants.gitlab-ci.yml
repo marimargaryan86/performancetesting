@@ -1,0 +1,35 @@
+.pants:
+  image: python:3.9.5
+  interruptible: true
+  before_script:
+    - ./pants --version
+  after_script:
+    - ./bash/nuke-if-too-big.sh .cache/lmdb_store 2048
+    - ./bash/nuke-if-too-big.sh .cache/setup 384
+    - ./bash/nuke-if-too-big.sh .cache/named_caches 1024
+  variables:
+    CACHE_FALLBACK_KEY: "${CI_DEFAULT_BRANCH}"
+    GIT_DEPTH: 0
+    PANTS_CONFIG_FILES: ./pants.ci.toml
+    PANTS_SETUP_CACHE: .cache/setup
+    PYTHON: /usr/local/bin/python
+  cache:
+    key: "${CI_COMMIT_REF_NAME}"
+    paths:
+      - .cache/
+  needs: []
+  tags:
+    - docker
+
+pants:test:
+  extends: .pants
+  stage: test
+  script:
+    - ./pants lint --changed-since=$CI_MERGE_REQUEST_DIFF_BASE_SHA
+    - ./pants test typecheck --changed-since=$CI_MERGE_REQUEST_DIFF_BASE_SHA --changed-dependees=transitive
+  artifacts:
+    reports:
+      junit: dist/pytest_results/*.xml
+      cobertura: dist/coverage/python/coverage.xml
+  rules:
+    - if: '$CI_MERGE_REQUEST_IID'
