@@ -1,13 +1,14 @@
 """Implementation of the Echo gRPC service."""
 import asyncio
 
-from grpc import aio  # type: ignore
+from grpc import aio
 from grpc_reflection.v1alpha import reflection
+
 from snowfall.junction.echo.v1 import echo_pb2, echo_pb2_grpc
 
 
 class EchoService(echo_pb2_grpc.EchoServiceServicer):
-    def Echo(
+    def Echo(  # noqa: N802
         self,
         request: echo_pb2.EchoRequest,
         context: aio.ServicerContext,

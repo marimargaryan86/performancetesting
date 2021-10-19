@@ -11,7 +11,7 @@ report = [
 ]
 
 [python-native-code]
-cpp_flags = ["-I/usr/local/include/python3.89/"]
+cpp_flags = ["-I/usr/local/include/python3.9/"]
 
 [python-setup]
 interpreter_search_paths = ["/usr/local/bin"]

@@ -1,13 +1,15 @@
+[tool.black]
+line-length = 88
+target-version = ["py39"]
+
 [tool.poetry]
 name = "Junction"
 version = "1.0.0"
 description = "Junction 3rd-pary dependencies."
-authors = [
-    "Snowfall Limited <info@snowfalltravel.com>",
-]
+authors = ["Snowfall Limited <info@snowfalltravel.com>"]
 
 [tool.poetry.dependencies]
-python = "3.9.5"
+python = "3.9.7"
 grpcio = "^1.38.0"
 grpcio-reflection = "^1.38.0"
 protobuf = "^3.17.3"

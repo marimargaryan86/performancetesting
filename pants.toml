@@ -1,5 +1,5 @@
 [GLOBAL]
-pants_version = "2.6.0.dev2"
+pants_version = "2.7.0"
 backend_packages = [
     "pants.backend.codegen.protobuf.python",
     "pants.backend.python",
@@ -10,46 +10,83 @@ backend_packages = [
     "pants.backend.python.lint.isort",
     "pants.backend.python.typecheck.mypy",
     "pants.backend.shell",
+    "pants.backend.shell.lint.shellcheck",
+    "pants.backend.shell.lint.shfmt",
 ]
 
 [anonymous-telemetry]
 enabled = false
 
+[bandit]
+version = "bandit==1.7.0"
+lockfile = "vendor/lock/bandit.txt"
+
+[black]
+version = "black==21.9b0"
+config = "vendor/pyproject.toml"
+lockfile = "vendor/lock/black.txt"
+interpreter_constraints = ["CPython==3.9.7"]
+
 [coverage-py]
-interpreter_constraints = [
-    "CPython==3.9.5",
-]
+interpreter_constraints = ["CPython==3.9.7"]
 
 [docformatter]
-args = [
-    "--wrap-summaries",
-    "88",
-    "--wrap-descriptions",
-    "81",
-]
-interpreter_constraints = [
-    "CPython==3.9.5",
+version = "docformatter==1.4"
+lockfile = "vendor/lock/docformatter.txt"
+args = ["--wrap-summaries", "87", "--wrap-descriptions", "80"]
+interpreter_constraints = ["CPython==3.9.7"]
+
+[flake8]
+version = "flake8==4.0.1"
+config = "vendor/setup.cfg"
+lockfile = "vendor/lock/flake8.txt"
+extra_requirements = [
+    "flake8-annotations",
+    "flake8-builtins",
+    "flake8-executable",
+    "flake8-if-expr",
+    "flake8-logging-format",
+    "flake8-pie",
+    "flake8-print",
+    "flake8-simplify",
+    "flake8-tidy-imports",
+    "setuptools",
+    "wemake-python-styleguide",
 ]
 
 [isort]
-config = ".isort.cfg"
+version = "isort==5.9.3"
+config = "vendor/setup.cfg"
+lockfile = "vendor/lock/isort.txt"
+interpreter_constraints = ["CPython==3.9.7"]
 
 [mypy]
-version = "mypy==0.902"
-extra_requirements = [
-    "grpc-stubs==1.24.6",
-    "types-protobuf==0.1.12",
-]
+version = "mypy==0.910"
+config = "vendor/setup.cfg"
+lockfile = "vendor/lock/mypy.txt"
+interpreter_constraints = ["CPython==3.9.7"]
+extra_requirements = ["grpc-stubs"]
+
+[poetry]
+version = "poetry==1.1.11"
+interpreter_constraints = ["CPython==3.9.7"]
 
 [protoc]
 version = "3.17.3"
 known_versions = [
-    "3.17.3|darwin|68901eb7ef5b55d7f2df3241ab0b8d97ee5192d3902c59e7adf461adc058e9f1|2617055",
-    "3.17.3|linux |d4246a5136cf9cd1abc851c521a1ad6b8884df4feded8b9cbd5e2a2226d4b357|1680819",
+    "3.17.3|linux_x86_64|d4246a5136cf9cd1abc851c521a1ad6b8884df4feded8b9cbd5e2a2226d4b357|1680819",
+    "3.17.3|macos_arm64 |68901eb7ef5b55d7f2df3241ab0b8d97ee5192d3902c59e7adf461adc058e9f1|2617055",
+    "3.17.3|macos_x86_64|68901eb7ef5b55d7f2df3241ab0b8d97ee5192d3902c59e7adf461adc058e9f1|2617055",
 ]
 
 [pytest]
+lockfile = "vendor/lock/pytest.txt"
 junit_xml_dir = "dist/pytest_results"
+extra_requirements = [
+    "pytest-cov",
+    "pytest-icdiff",
+    "pygments",
+]
 
 [python-protobuf]
 mypy_plugin = true
@@ -59,10 +96,8 @@ runtime_dependencies = [
 ]
 
 [python-setup]
-interpreter_constraints = [
-    "CPython==3.9.5",
-]
-requirement_constraints = "vendor/requirements.txt"
+interpreter_constraints = ["CPython==3.9.7"]
+requirement_constraints = "vendor/lock/constraints.txt"
 
 [source]
 root_patterns = [

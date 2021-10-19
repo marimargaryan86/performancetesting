@@ -1,5 +1,5 @@
 .pants:
-  image: python:3.9.5
+  image: python:3.9.7
   interruptible: true
   before_script:
     - ./pants --version
@@ -25,11 +25,12 @@ pants:test:
   extends: .pants
   stage: test
   script:
-    - ./pants lint --changed-since=$CI_MERGE_REQUEST_DIFF_BASE_SHA
-    - ./pants test typecheck --changed-since=$CI_MERGE_REQUEST_DIFF_BASE_SHA --changed-dependees=transitive
+    - ./bash/lint-pants.sh
   artifacts:
     reports:
       junit: dist/pytest_results/*.xml
       cobertura: dist/coverage/python/coverage.xml
   rules:
-    - if: '$CI_MERGE_REQUEST_IID'
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_MERGE_REQUEST_IID || $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'

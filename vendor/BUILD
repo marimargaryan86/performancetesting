@@ -1,4 +1,4 @@
-python_requirements(
+poetry_requirements(
     module_mapping={
         "grpcio": ["grpc"],
         "grpcio-reflection": ["grpc_reflection"],
