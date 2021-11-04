@@ -1,0 +1,37 @@
+.go:files: &files
+  - "golang/**/*"
+
+go:lint:
+  stage: test
+  interruptible: true
+  image: golangci/golangci-lint:v1.40.1
+  before_script:
+    - cd golang/
+  script:
+    - golangci-lint run --new-from-rev="${CI_MERGE_REQUEST_DIFF_BASE_SHA}"
+  needs: [ ]
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+      changes: *files
+  tags:
+    - docker
+
+go:test:
+  stage: test
+  interruptible: true
+  image: golang:1.16
+  before_script:
+    - cd golang/
+    - go get github.com/boumenot/gocover-cobertura
+  script:
+    - go test -bench . -coverprofile coverage.txt -covermode count ./...
+    - gocover-cobertura <coverage.txt >coverage.xml
+  artifacts:
+    reports:
+      cobertura: golang/coverage.xml
+  needs: [ ]
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+      changes: *files
+  tags:
+    - docker

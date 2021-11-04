@@ -10,11 +10,11 @@ report = [
     "xml",
 ]
 
+[python]
+interpreter_search_paths = ["/usr/local/bin"]
+
 [python-native-code]
 cpp_flags = ["-I/usr/local/include/python3.9/"]
-
-[python-setup]
-interpreter_search_paths = ["/usr/local/bin"]
 
 [test]
 use_coverage = true

@@ -1,7 +1,8 @@
 [GLOBAL]
-pants_version = "2.7.0"
+pants_version = "2.8.0rc2"
 backend_packages = [
     "pants.backend.codegen.protobuf.python",
+    "pants.backend.experimental.go",
     "pants.backend.python",
     "pants.backend.python.lint.bandit",
     "pants.backend.python.lint.black",
@@ -54,6 +55,9 @@ extra_requirements = [
     "wemake-python-styleguide",
 ]
 
+[golang]
+expected_version = "1.16"
+
 [isort]
 version = "isort==5.9.3"
 config = "vendor/setup.cfg"
@@ -81,12 +85,15 @@ known_versions = [
 
 [pytest]
 lockfile = "vendor/lock/pytest.txt"
-junit_xml_dir = "dist/pytest_results"
 extra_requirements = [
     "pytest-cov",
     "pytest-icdiff",
     "pygments",
 ]
+
+[python]
+interpreter_constraints = ["CPython==3.9.7"]
+requirement_constraints = "vendor/lock/constraints.txt"
 
 [python-protobuf]
 mypy_plugin = true
@@ -95,13 +102,12 @@ runtime_dependencies = [
     "vendor:protobuf",
 ]
 
-[python-setup]
-interpreter_constraints = ["CPython==3.9.7"]
-requirement_constraints = "vendor/lock/constraints.txt"
-
 [source]
 root_patterns = [
     "/bash",
     "/protobuf",
     "/python",
 ]
+
+[test]
+xml_dir = "dist/test_results"

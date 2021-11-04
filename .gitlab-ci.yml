@@ -1,4 +1,5 @@
 stages:
+  - setup
   - test
 
 variables:
@@ -9,4 +10,5 @@ variables:
 
 include:
   - local: .gitlab/pants.gitlab-ci.yml
+  - local: golang/.gitlab-ci.yml
   - local: protobuf/.gitlab-ci.yml
