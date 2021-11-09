@@ -1,5 +1,5 @@
 [GLOBAL]
-pants_version = "2.8.0rc2"
+pants_version = "2.8.0rc3"
 backend_packages = [
     "pants.backend.codegen.protobuf.python",
     "pants.backend.experimental.go",
@@ -38,7 +38,7 @@ args = ["--wrap-summaries", "87", "--wrap-descriptions", "80"]
 interpreter_constraints = ["CPython==3.9.7"]
 
 [flake8]
-version = "flake8==4.0.1"
+version = "flake8==3.9.2"
 config = "vendor/setup.cfg"
 lockfile = "vendor/lock/flake8.txt"
 extra_requirements = [
