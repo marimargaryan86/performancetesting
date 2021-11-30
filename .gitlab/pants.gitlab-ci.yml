@@ -26,6 +26,8 @@ pants:setup:
     GIT_DEPTH: 0
     GIT_STRATEGY: clone
     PANTS_CONFIG_FILES: ./pants.ci.toml
+    PANTS_DOCKER_DEFAULT_REPOSITORY: "${CI_PROJECT_PATH}/service/{directory}"
+    PANTS_DOCKER_REGISTRIES: "{'${CI_REGISTRY}': {'address': '${CI_REGISTRY}', 'default': True}}"
     PANTS_SETUP_CACHE: .cache/setup
     PYTHON: /usr/local/bin/python
   cache:
@@ -46,6 +48,25 @@ pants:test:
     reports:
       junit: dist/test_results/*.xml
       cobertura: dist/coverage/python/coverage.xml
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_MERGE_REQUEST_IID || $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+pants:package:
+  extends: .pants
+  stage: package
+  script:
+    - ./bash/package-pants.sh
+  variables:
+    DOCKER_HOST: tcp://dockerdaemon:2375/
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
+  services:
+    - name: docker:dind
+      alias: dockerdaemon
+  needs:
+    - "pants:test"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never

@@ -10,6 +10,11 @@ report = [
     "xml",
 ]
 
+[docker]
+env_vars = [
+    "DOCKER_HOST",
+]
+
 [python]
 interpreter_search_paths = ["/usr/local/bin"]
 

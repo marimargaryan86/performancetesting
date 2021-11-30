@@ -1,6 +1,7 @@
 stages:
   - setup
   - test
+  - package
 
 variables:
   ARTIFACT_COMPRESSION_LEVEL: fastest
