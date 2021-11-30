@@ -1,4 +1,4 @@
-protobuf_library(
+protobuf_sources(
     grpc=True,
-    python_source_root="python"
+    python_source_root="python",
 )

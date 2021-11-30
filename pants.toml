@@ -1,5 +1,5 @@
 [GLOBAL]
-pants_version = "2.8.0rc3"
+pants_version = "2.8.1rc0"
 backend_packages = [
     "pants.backend.codegen.protobuf.python",
     "pants.backend.experimental.go",
@@ -19,23 +19,23 @@ backend_packages = [
 enabled = false
 
 [bandit]
-version = "bandit==1.7.0"
+version = "bandit==1.7.1"
 lockfile = "vendor/lock/bandit.txt"
 
 [black]
-version = "black==21.9b0"
+version = "black==21.10b0"
 config = "vendor/pyproject.toml"
 lockfile = "vendor/lock/black.txt"
-interpreter_constraints = ["CPython==3.9.7"]
+interpreter_constraints = ["CPython==3.9.9"]
 
 [coverage-py]
-interpreter_constraints = ["CPython==3.9.7"]
+interpreter_constraints = ["CPython==3.9.9"]
 
 [docformatter]
 version = "docformatter==1.4"
 lockfile = "vendor/lock/docformatter.txt"
 args = ["--wrap-summaries", "87", "--wrap-descriptions", "80"]
-interpreter_constraints = ["CPython==3.9.7"]
+interpreter_constraints = ["CPython==3.9.9"]
 
 [flake8]
 version = "flake8==3.9.2"
@@ -52,28 +52,28 @@ extra_requirements = [
     "flake8-simplify",
     "flake8-tidy-imports",
     "setuptools",
-    "wemake-python-styleguide",
+    "wemake-python-styleguide==0.15.3",
 ]
 
 [golang]
-expected_version = "1.16"
+expected_version = "1.17"
 
 [isort]
-version = "isort==5.9.3"
+version = "isort==5.10.1"
 config = "vendor/setup.cfg"
 lockfile = "vendor/lock/isort.txt"
-interpreter_constraints = ["CPython==3.9.7"]
+interpreter_constraints = ["CPython==3.9.9"]
 
 [mypy]
 version = "mypy==0.910"
 config = "vendor/setup.cfg"
 lockfile = "vendor/lock/mypy.txt"
-interpreter_constraints = ["CPython==3.9.7"]
+interpreter_constraints = ["CPython==3.9.9"]
 extra_requirements = ["grpc-stubs"]
 
 [poetry]
-version = "poetry==1.1.11"
-interpreter_constraints = ["CPython==3.9.7"]
+version = "poetry==1.1.12"
+interpreter_constraints = ["CPython==3.9.9"]
 
 [protoc]
 version = "3.17.3"
@@ -84,6 +84,7 @@ known_versions = [
 ]
 
 [pytest]
+version = "pytest==6.2.5"
 lockfile = "vendor/lock/pytest.txt"
 extra_requirements = [
     "pytest-cov",
@@ -92,7 +93,7 @@ extra_requirements = [
 ]
 
 [python]
-interpreter_constraints = ["CPython==3.9.7"]
+interpreter_constraints = ["CPython==3.9.9"]
 requirement_constraints = "vendor/lock/constraints.txt"
 
 [python-protobuf]

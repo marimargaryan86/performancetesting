@@ -6,7 +6,7 @@
 # {
 #   "version": 2,
 #   "valid_for_interpreter_constraints": [
-#     "CPython==3.9.7"
+#     "CPython==3.9.9"
 #   ],
 #   "generated_with_requirements": [
 #     "docformatter==1.4"
