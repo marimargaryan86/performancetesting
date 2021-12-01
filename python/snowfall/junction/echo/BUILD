@@ -7,4 +7,5 @@ pex_binary(
 docker_image(
     name="docker",
     dependencies=[":main"],
+    image_tags=["{build_args.VERSION}"],
 )

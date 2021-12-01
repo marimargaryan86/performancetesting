@@ -1,8 +1,9 @@
 [GLOBAL]
-pants_version = "2.8.1rc0"
+pants_version = "2.8.1rc1"
 backend_packages = [
     "pants.backend.codegen.protobuf.python",
     "pants.backend.experimental.docker",
+    "pants.backend.experimental.docker.lint.hadolint",
     "pants.backend.experimental.go",
     "pants.backend.python",
     "pants.backend.python.lint.bandit",

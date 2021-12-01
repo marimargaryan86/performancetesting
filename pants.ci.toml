@@ -12,6 +12,7 @@ report = [
 
 [docker]
 env_vars = [
+    "DOCKER_CONFIG",
     "DOCKER_HOST",
 ]
 
