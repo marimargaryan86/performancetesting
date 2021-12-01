@@ -4,4 +4,7 @@ poetry_requirements(
         "grpcio-reflection": ["grpc_reflection"],
         "protobuf": ["google.protobuf"],
     },
+    overrides={
+        "starlette": {"dependencies": [":requests"]},
+    }
 )

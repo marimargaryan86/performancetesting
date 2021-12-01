@@ -21,7 +21,13 @@ enabled = false
 
 [bandit]
 version = "bandit==1.7.1"
+config = "vendor/pyproject.toml"
+args = ["--silent"]
 lockfile = "vendor/lock/bandit.txt"
+extra_requirements = [
+    "setuptools",
+    "toml",
+]
 
 [black]
 version = "black==21.10b0"

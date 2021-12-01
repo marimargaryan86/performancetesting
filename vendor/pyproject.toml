@@ -1,3 +1,7 @@
+[tool.bandit.assert_used]
+skips = ["*_test.py"]
+
+
 [tool.black]
 line-length = 88
 target-version = ["py39"]
@@ -13,3 +17,10 @@ python = "3.9.9"
 grpcio = "^1.38.0"
 grpcio-reflection = "^1.38.0"
 protobuf = "^3.17.3"
+starlette = "^0.17.1"
+uvicorn = {extras = ["standard"], version = "^0.15.0"}
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^6.2.5"
+requests = "^2.26.0"
+
