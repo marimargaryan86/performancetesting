@@ -24,7 +24,7 @@ if [ "${CI_COMMIT_REF_NAME}" == "${CI_DEFAULT_BRANCH}" ]; then
 	readarray -t <<<"$(jq -r '.[] | select(.publisher == "docker") | select(.published == true) | .names[]' <"${PANTS_PUBLISH_OUTPUT}")"
 
 	for i in "${MAPFILE[@]}"; do
-		if [ "${CI_COMMIT_SHA}" == "$(git rev-parse --verify main)" ]; then
+		if [ "${CI_COMMIT_SHA}" == "$(git log -n 1 --pretty=format:"%H" "${CI_DEFAULT_BRANCH}")" ]; then
 			docker tag "${i}" "${i%:*}:latest"
 			docker push "${i%:*}:latest"
 		fi
