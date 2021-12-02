@@ -20,11 +20,11 @@ else
 	"${pants_bin}" publish :: --docker-build-args=VERSION
 fi
 
-if [ "${CI_COMMIT_REF_NAME}" == "${CI_DEFAULT_BRANCH}" ]; then
+if [ "${CI_COMMIT_REF_NAME}" == "${CI_DEFAULT_BRANCH}" ] && [ -f "${PANTS_PUBLISH_OUTPUT}" ]; then
 	readarray -t <<<"$(jq -r '.[] | select(.publisher == "docker") | select(.published == true) | .names[]' <"${PANTS_PUBLISH_OUTPUT}")"
 
 	for i in "${MAPFILE[@]}"; do
-		if [ "${CI_COMMIT_SHA}" == "$(git log -n 1 --pretty=format:"%H" "${CI_DEFAULT_BRANCH}")" ]; then
+		if [ "${CI_COMMIT_SHA}" == "$(git log -n 1 --pretty=format:"%H" "origin/${CI_DEFAULT_BRANCH}")" ]; then
 			docker tag "${i}" "${i%:*}:latest"
 			docker push "${i%:*}:latest"
 		fi
