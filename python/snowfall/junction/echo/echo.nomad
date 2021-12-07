@@ -40,6 +40,10 @@ job "echo" {
           server_address = "${CI_REGISTRY}"
         }
       }
+
+      env {
+        GRPC_PORT = "${NOMAD_PORT_grpc}"
+      }
     }
   }
 }

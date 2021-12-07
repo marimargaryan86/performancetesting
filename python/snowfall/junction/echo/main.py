@@ -12,14 +12,6 @@ from snowfall.junction.echo.v1 import echo_pb2, echo_pb2_grpc
 class Settings(BaseSettings):
     grpc_port: int = 50051
 
-    class Config(object):  # noqa: WPS431
-        case_sensitive = False
-        fields = {
-            "grpc_port": {
-                "env": "NOMAD_PORT_GRPC",
-            },
-        }
-
 
 class EchoService(echo_pb2_grpc.EchoServiceServicer):
     def Echo(  # noqa: N802
