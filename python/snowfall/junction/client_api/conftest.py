@@ -8,8 +8,8 @@ from snowfall.junction.client_api import bootstrap, loaders, validation
 def app() -> applications.Starlette:
     return bootstrap.create_app(
         validator=validation.Validator(
-            "fixtures/test.json",
-            loaders.PkgLoader("snowfall.junction.client_api"),
+            "openapi.json",
+            loaders.PkgLoader("client_api"),
         ),
     )
 
@@ -20,5 +20,20 @@ def client(app: applications.Starlette) -> testclient.TestClient:
 
 
 @pytest.fixture()
-def error_client(app: applications.Starlette) -> testclient.TestClient:
-    return testclient.TestClient(app, raise_server_exceptions=False)
+def test_app() -> applications.Starlette:
+    return bootstrap.create_app(
+        validator=validation.Validator(
+            "fixtures/test.json",
+            loaders.PkgLoader("snowfall.junction.client_api"),
+        ),
+    )
+
+
+@pytest.fixture()
+def test_client(test_app: applications.Starlette) -> testclient.TestClient:
+    return testclient.TestClient(test_app)
+
+
+@pytest.fixture()
+def test_error_client(test_app: applications.Starlette) -> testclient.TestClient:
+    return testclient.TestClient(test_app, raise_server_exceptions=False)
