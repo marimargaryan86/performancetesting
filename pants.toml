@@ -115,6 +115,7 @@ runtime_dependencies = [
 [source]
 root_patterns = [
     "/bash",
+    "/openapi",
     "/protobuf",
     "/python",
 ]

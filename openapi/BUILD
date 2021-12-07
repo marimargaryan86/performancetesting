@@ -1,4 +1,4 @@
-files(
+resources(
     name="client_api",
     sources=["client_api/*"],
 )
