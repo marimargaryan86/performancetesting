@@ -1,0 +1,81 @@
+import http
+
+from starlette import applications, requests, responses, status, testclient
+
+from snowfall.junction.client_api import handlers
+
+_VALIDATION_PATH = "/validation"
+
+
+async def _failed_validation(request: requests.Request) -> responses.Response:
+    return handlers.JsonApiResponse({"failed": True})
+
+
+async def _success_validation(request: requests.Request) -> responses.Response:
+    return handlers.JsonApiResponse({"success": True})
+
+
+async def _request_validation(request: requests.Request) -> responses.Response:
+    return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+class TestResponseValidation(object):
+    def test_response_validation_failure_status_code(
+        self,
+        app: applications.Starlette,
+        error_client: testclient.TestClient,
+    ) -> None:
+        app.add_route(_VALIDATION_PATH, _failed_validation)
+        response = error_client.get(_VALIDATION_PATH)
+        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+
+    def test_response_validation_failure_response(
+        self,
+        app: applications.Starlette,
+        error_client: testclient.TestClient,
+    ) -> None:
+        app.add_route(_VALIDATION_PATH, _failed_validation)
+        response = error_client.get(_VALIDATION_PATH)
+        status_code = http.HTTPStatus(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        for error in response.json()["errors"]:
+            assert error["status"] == str(status.HTTP_500_INTERNAL_SERVER_ERROR)
+            assert error["title"] == status_code.phrase
+            assert error["detail"] == status_code.description
+
+    def test_response_validation_success_status_code(
+        self,
+        app: applications.Starlette,
+        error_client: testclient.TestClient,
+    ) -> None:
+        app.add_route(_VALIDATION_PATH, _success_validation)
+        response = error_client.get(_VALIDATION_PATH)
+        assert response.status_code == status.HTTP_200_OK
+
+
+class TestRequestValidation(object):
+    def test_request_validation_failure_status_code(
+        self,
+        app: applications.Starlette,
+        error_client: testclient.TestClient,
+    ) -> None:
+        app.add_route(_VALIDATION_PATH, _request_validation, methods=["POST"])
+        response = error_client.post(
+            _VALIDATION_PATH,
+            json={"failure": True},
+            headers={"Content-Type": "application/vnd.api+json"},
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_request_validation_success_status_code(
+        self,
+        app: applications.Starlette,
+        error_client: testclient.TestClient,
+    ) -> None:
+        app.add_route(_VALIDATION_PATH, _request_validation, methods=["POST"])
+        response = error_client.post(
+            _VALIDATION_PATH,
+            json={"success": True},
+            headers={"Content-Type": "application/vnd.api+json"},
+        )
+        assert response.status_code == status.HTTP_204_NO_CONTENT

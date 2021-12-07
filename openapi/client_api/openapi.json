@@ -1,0 +1,16 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "client_api",
+    "version": "1.0",
+    "description": "Junction Client API",
+    "contact": {
+      "name": "Snowfall",
+      "url": "https://www.snowfalltravel.com"
+    }
+  },
+  "paths": {},
+  "components": {
+    "schemas": {}
+  }
+}

@@ -1,6 +1,8 @@
-from starlette import applications, exceptions
+from snowfall.junction.client_api import bootstrap, loaders, validation
 
-from snowfall.junction.client_api import handlers
-
-app = applications.Starlette()
-app.add_exception_handler(exceptions.HTTPException, handlers.exception_handler)
+app = bootstrap.create_app(
+    validator=validation.Validator(
+        "openapi.json",
+        loaders.PkgLoader("client_api"),
+    ),
+)

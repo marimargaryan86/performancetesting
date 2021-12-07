@@ -6,6 +6,11 @@ skips = ["*_test.py"]
 line-length = 88
 target-version = ["py39"]
 
+[tool.coverage.run]
+branch = true
+omit = ["*/conftest.py", "*_test.py"]
+
+
 [tool.poetry]
 name = "Junction"
 version = "1.0.0"
@@ -16,7 +21,9 @@ authors = ["Snowfall Limited <info@snowfalltravel.com>"]
 python = "3.9.9"
 grpcio = "^1.38.0"
 grpcio-reflection = "^1.38.0"
+openapi-core = "^0.14.2"
 protobuf = "^3.17.3"
+setuptools = "^59.4.0"
 starlette = "^0.17.1"
 uvicorn = {extras = ["standard"], version = "^0.15.0"}
 

@@ -38,6 +38,7 @@ interpreter_constraints = ["CPython==3.9.9"]
 
 [coverage-py]
 interpreter_constraints = ["CPython==3.9.9"]
+config = "vendor/pyproject.toml"
 
 [docformatter]
 version = "docformatter==1.4"

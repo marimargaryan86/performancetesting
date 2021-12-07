@@ -1,6 +1,8 @@
 import dataclasses
 import http
+from typing import Optional
 
+from openapi_core.exceptions import OpenAPIError
 from starlette import exceptions, requests, responses
 
 
@@ -15,11 +17,12 @@ class JsonApiResponse(responses.JSONResponse):
     media_type = "application/vnd.api+json"
 
 
-async def exception_handler(
-    request: requests.Request,
-    exc: exceptions.HTTPException,
+async def _error_response_from_status(
+    status: http.HTTPStatus,
+    description: Optional[str] = None,
 ) -> responses.JSONResponse:
-    status = http.HTTPStatus(exc.status_code or http.HTTPStatus.INTERNAL_SERVER_ERROR)
+    if not description:
+        description = status.description
 
     return JsonApiResponse(
         {
@@ -28,10 +31,37 @@ async def exception_handler(
                     JsonApiError(
                         status=str(int(status)),
                         title=status.phrase,
-                        detail=status.description,
+                        detail=description,
                     ),
                 ),
             ],
         },
         status_code=status,
     )
+
+
+async def error_handler(
+    request: requests.Request,
+    exc: Exception,
+) -> responses.JSONResponse:
+    status = http.HTTPStatus(http.HTTPStatus.INTERNAL_SERVER_ERROR)
+
+    return await _error_response_from_status(status)
+
+
+async def exception_handler(
+    request: requests.Request,
+    exc: exceptions.HTTPException,
+) -> responses.JSONResponse:
+    status = http.HTTPStatus(exc.status_code or http.HTTPStatus.INTERNAL_SERVER_ERROR)
+
+    return await _error_response_from_status(status)
+
+
+async def validation_error_handler(
+    request: requests.Request,
+    exc: OpenAPIError,
+) -> responses.JSONResponse:
+    status = http.HTTPStatus(http.HTTPStatus.BAD_REQUEST)
+
+    return await _error_response_from_status(status, str(exc))
