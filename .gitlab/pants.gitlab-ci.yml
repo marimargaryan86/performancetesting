@@ -1,5 +1,6 @@
 pants:setup:
   stage: setup
+  interruptible: true
   script:
     - DOCKER_BUILDKIT=1 docker build --pull --compress -f ".gitlab/pants.Dockerfile" -t "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}" --build-arg BUILDKIT_INLINE_CACHE=1 .gitlab/
     - docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
@@ -42,6 +43,7 @@ pants:setup:
 pants:test:
   extends: .pants
   stage: test
+  interruptible: true
   script:
     - ./bash/lint-pants.sh
   artifacts:

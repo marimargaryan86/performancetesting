@@ -1,6 +1,7 @@
 poetry_requirements(
     module_mapping={
         "grpcio": ["grpc"],
+        "grpcio-health-checking": ["grpc_health"],
         "grpcio-reflection": ["grpc_reflection"],
         "protobuf": ["google.protobuf"],
         "setuptools": ["easy_install", "pkg_resources", "setuptools"],

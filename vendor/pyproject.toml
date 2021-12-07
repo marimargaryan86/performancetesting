@@ -20,9 +20,11 @@ authors = ["Snowfall Limited <info@snowfalltravel.com>"]
 [tool.poetry.dependencies]
 python = "3.9.9"
 grpcio = "^1.38.0"
+grpcio-health-checking = "^1.38.0"
 grpcio-reflection = "^1.38.0"
 openapi-core = "^0.14.2"
 protobuf = "^3.17.3"
+pydantic = "^1.8.2"
 setuptools = "^59.4.0"
 starlette = "^0.17.1"
 uvicorn = {extras = ["standard"], version = "^0.15.0"}
