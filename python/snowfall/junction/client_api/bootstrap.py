@@ -1,6 +1,19 @@
+from pydantic import BaseSettings
 from starlette import applications, exceptions, middleware, status
 
 from snowfall.junction.client_api import handlers, middlewares, validation
+
+
+class Settings(BaseSettings):
+    http_port: int = 80
+
+    class Config(object):  # noqa: WPS431
+        case_sensitive = False
+        fields = {
+            "http_port": {
+                "env": "NOMAD_PORT_HTTP",
+            },
+        }
 
 
 def create_app(validator: validation.Validator) -> applications.Starlette:

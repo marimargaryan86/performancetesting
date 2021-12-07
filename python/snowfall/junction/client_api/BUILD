@@ -3,10 +3,14 @@ python_tests(name="tests", dependencies=[":fixtures"])
 python_test_utils(name="test_utils")
 pex_binary(
     name="main",
-    dependencies=["./main.py", "vendor:uvicorn"],
-    entry_point="uvicorn",
+    entry_point="main.py",
 )
 files(
     name="fixtures",
     sources=["fixtures/*"],
+)
+docker_image(
+    name="docker",
+    dependencies=[":main"],
+    image_tags=["{build_args.VERSION}"],
 )

@@ -39,6 +39,10 @@ if [ "${CI_COMMIT_REF_NAME}" == "${CI_DEFAULT_BRANCH}" ] && [ -f "${PANTS_PUBLIS
 		job_file="${pants_target%:*}/${service_name}.nomad"
 		nomad_file="${nomad_dir}/${service_name}.nomad"
 
+		if ! [ -f "${job_file}" ]; then
+			continue
+		fi
+
 		# shellcheck disable=SC2016
 		envsubst '${DOCKER_IMAGE} ${CI_REGISTRY_USER} ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}' <"${job_file}" >"${nomad_file}"
 		nomad validate "${nomad_file}"
