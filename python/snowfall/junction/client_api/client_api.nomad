@@ -21,6 +21,7 @@ job "client-api" {
     service {
       name = "client-api"
       port = "http"
+      tags = ["http"]
 
       check {
         type     = "http"
@@ -45,7 +46,7 @@ job "client-api" {
       }
 
       env {
-        HTTP_ADDRESS = "${NOMAD_IP_http}"
+        HTTP_ADDRESS = "0.0.0.0"
         HTTP_PORT = "${NOMAD_PORT_http}"
       }
     }

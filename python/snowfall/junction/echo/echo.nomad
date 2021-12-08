@@ -21,6 +21,7 @@ job "echo" {
     service {
       name = "echo"
       port = "grpc"
+      tags = ["gprc"]
 
       check {
         type     = "grpc"
@@ -44,7 +45,7 @@ job "echo" {
       }
 
       env {
-        GRPC_ADDRESS = "${NOMAD_IP_grpc}"
+        GRPC_ADDRESS = "0.0.0.0"
         GRPC_PORT = "${NOMAD_PORT_grpc}"
       }
     }
