@@ -43,6 +43,7 @@ job "client-api" {
       }
 
       env {
+        HTTP_ADDRESS = "${NOMAD_IP_http}"
         HTTP_PORT = "${NOMAD_PORT_http}"
       }
     }

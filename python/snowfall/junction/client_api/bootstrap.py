@@ -5,6 +5,7 @@ from snowfall.junction.client_api import handlers, middlewares, routes, validati
 
 
 class Settings(BaseSettings):
+    http_address: str = "127.0.0.1"
     http_port: int = 8000
     reload: bool = False
 

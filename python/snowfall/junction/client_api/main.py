@@ -19,6 +19,7 @@ if __name__ == "__main__":
     uvicorn.run(
         app="snowfall.junction.client_api.main:_factory",
         factory=True,
+        host=settings.http_address,
         port=settings.http_port,
         access_log=False,
         reload=settings.reload,
