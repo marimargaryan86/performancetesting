@@ -78,7 +78,7 @@ version = "mypy==0.910"
 config = "vendor/setup.cfg"
 lockfile = "vendor/lock/mypy.txt"
 interpreter_constraints = ["CPython==3.9.9"]
-extra_requirements = ["grpc-stubs"]
+extra_requirements = ["grpc-stubs", "pydantic"]
 
 [poetry]
 version = "poetry==1.1.12"

@@ -1,16 +1,17 @@
 import abc
 import json
 import pkgutil
+from typing import Any
 
 
 class Loader(abc.ABC):
     @abc.abstractmethod
-    def load(self, ref: str) -> dict:
+    def load(self, ref: str) -> dict[str, Any]:
         """Load the file."""
 
 
 class FileLoader(Loader):
-    def load(self, ref: str) -> dict:
+    def load(self, ref: str) -> dict[str, Any]:
         try:
             with open(ref) as file_handle:
                 return json.load(file_handle)
@@ -24,7 +25,7 @@ class PkgLoader(Loader):
     def __init__(self, pkg: str):
         self._pkg = pkg
 
-    def load(self, ref: str) -> dict:
+    def load(self, ref: str) -> dict[str, Any]:
         try:
             file_content = pkgutil.get_data(self._pkg, ref)
         except (AttributeError, OSError) as err:

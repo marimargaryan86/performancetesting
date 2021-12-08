@@ -2,17 +2,21 @@ import http
 
 from starlette import applications, requests, responses, status, testclient
 
-from snowfall.junction.client_api import handlers
+from snowfall.junction.client_api import models
 
 _VALIDATION_PATH = "/validation"
 
 
 async def _failed_validation(request: requests.Request) -> responses.Response:
-    return handlers.JsonApiResponse({"failed": True})
+    return models.JsonApiResponse(
+        models.Body(data=models.ResourceIdentifier(id="1", type="failed")),
+    )
 
 
 async def _success_validation(request: requests.Request) -> responses.Response:
-    return handlers.JsonApiResponse({"success": True})
+    return models.JsonApiResponse(
+        models.Body(data=models.ResourceIdentifier(id="1", type="success")),
+    )
 
 
 async def _request_validation(request: requests.Request) -> responses.Response:
@@ -62,7 +66,7 @@ class TestRequestValidation(object):
         test_app.add_route(_VALIDATION_PATH, _request_validation, methods=["POST"])
         response = test_error_client.post(
             _VALIDATION_PATH,
-            json={"failure": True},
+            json={"data": {"type": "failure"}},
             headers={"Content-Type": "application/vnd.api+json"},
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -75,7 +79,7 @@ class TestRequestValidation(object):
         test_app.add_route(_VALIDATION_PATH, _request_validation, methods=["POST"])
         response = test_error_client.post(
             _VALIDATION_PATH,
-            json={"success": True},
+            json={"data": {"type": "success"}},
             headers={"Content-Type": "application/vnd.api+json"},
         )
         assert response.status_code == status.HTTP_204_NO_CONTENT

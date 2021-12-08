@@ -19,16 +19,36 @@
                   "type": "object",
                   "x-examples": {
                     "example-1": {
-                      "success": true
+                      "data": {
+                        "id": "1",
+                        "type": "success"
+                      }
                     }
                   },
                   "properties": {
-                    "success": {
-                      "type": "boolean"
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "type"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "type": {
+                          "type": "string",
+                          "minLength": 1,
+                          "enum": [
+                            "success"
+                          ]
+                        }
+                      }
                     }
                   },
                   "required": [
-                    "success"
+                    "data"
                   ]
                 }
               }
@@ -53,16 +73,30 @@
                 "type": "object",
                 "x-examples": {
                   "example-1": {
-                    "success": true
+                    "data": {
+                      "type": "success"
+                    }
                   }
                 },
                 "properties": {
-                  "success": {
-                    "type": "boolean"
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "minLength": 1,
+                        "enum": [
+                          "success"
+                        ]
+                      }
+                    }
                   }
                 },
                 "required": [
-                  "success"
+                  "data"
                 ]
               }
             }

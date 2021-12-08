@@ -1,20 +1,10 @@
-import dataclasses
 import http
 from typing import Optional
 
 from openapi_core.exceptions import OpenAPIError
 from starlette import exceptions, requests, responses
 
-
-@dataclasses.dataclass
-class JsonApiError(object):
-    status: str
-    title: str
-    detail: str
-
-
-class JsonApiResponse(responses.JSONResponse):
-    media_type = "application/vnd.api+json"
+from snowfall.junction.client_api import models
 
 
 async def _error_response_from_status(
@@ -24,18 +14,16 @@ async def _error_response_from_status(
     if not description:
         description = status.description
 
-    return JsonApiResponse(
-        {
-            "errors": [
-                dataclasses.asdict(
-                    JsonApiError(
-                        status=str(int(status)),
-                        title=status.phrase,
-                        detail=description,
-                    ),
+    return models.JsonApiResponse(
+        models.Body(
+            errors=[
+                models.Error(
+                    status=str(int(status)),
+                    title=status.phrase,
+                    detail=description,
                 ),
             ],
-        },
+        ),
         status_code=status,
     )
 
