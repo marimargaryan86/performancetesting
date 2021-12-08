@@ -44,7 +44,7 @@ if [ "${CI_COMMIT_REF_NAME}" == "${CI_DEFAULT_BRANCH}" ] && [ -f "${PANTS_PUBLIS
 		fi
 
 		# shellcheck disable=SC2016
-		envsubst '${DOCKER_IMAGE} ${CI_REGISTRY_USER} ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}' <"${job_file}" >"${nomad_file}"
+		envsubst '${DOCKER_IMAGE} ${NOMAD_REGISTRY_USERNAME} ${NOMAD_REGISTRY_PASSWORD} ${CI_REGISTRY}' <"${job_file}" >"${nomad_file}"
 		nomad validate "${nomad_file}"
 		nomad plan "${nomad_file}" | tee /dev/stderr | grep 'Job Modify Index:' | awk -F': ' '{ print $2 }' >check-index || if [ $? -eq 255 ]; then exit 255; else true; fi
 		nomad run -check-index="$(cat check-index)" "${nomad_file}"
