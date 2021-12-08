@@ -7,6 +7,8 @@ job "echo" {
     auto_revert = true
     auto_promote = true
     canary = 1
+    healthy_deadline = "30s"
+    progress_deadline = "2m"
   }
 
   group "echo" {
@@ -35,13 +37,14 @@ job "echo" {
         ports = ["grpc"]
 
         auth {
-          username = "${CI_REGISTRY_USER}"
-          password = "${CI_REGISTRY_PASSWORD}"
+          username = "${NOMAD_REGISTRY_USERNAME}"
+          password = "${NOMAD_REGISTRY_PASSWORD}"
           server_address = "${CI_REGISTRY}"
         }
       }
 
       env {
+        GRPC_ADDRESS = "${NOMAD_IP_grpc}"
         GRPC_PORT = "${NOMAD_PORT_grpc}"
       }
     }

@@ -10,6 +10,7 @@ from snowfall.junction.echo.v1 import echo_pb2, echo_pb2_grpc
 
 
 class Settings(BaseSettings):
+    grpc_address: str = "[::]"
     grpc_port: int = 50051
 
 
@@ -28,7 +29,12 @@ async def serve() -> None:
     settings = Settings()
     server = aio.server()
 
-    server.add_insecure_port("[::]:{port}".format(port=settings.grpc_port))
+    server.add_insecure_port(
+        "{address}:{port}".format(
+            address=settings.grpc_address,
+            port=settings.grpc_port,
+        ),
+    )
     echo_pb2_grpc.add_EchoServiceServicer_to_server(EchoService(), server)
     health_pb2_grpc.add_HealthServicer_to_server(health.HealthServicer(), server)
     reflection.enable_server_reflection(

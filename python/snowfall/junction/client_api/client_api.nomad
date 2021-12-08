@@ -7,6 +7,8 @@ job "client-api" {
     auto_revert = true
     auto_promote = true
     canary = 1
+    healthy_deadline = "30s"
+    progress_deadline = "2m"
   }
 
   group "client-api" {
@@ -36,8 +38,8 @@ job "client-api" {
         ports = ["http"]
 
         auth {
-          username = "${CI_REGISTRY_USER}"
-          password = "${CI_REGISTRY_PASSWORD}"
+          username = "${NOMAD_REGISTRY_USERNAME}"
+          password = "${NOMAD_REGISTRY_PASSWORD}"
           server_address = "${CI_REGISTRY}"
         }
       }
