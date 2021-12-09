@@ -2,11 +2,10 @@
 import asyncio
 
 from grpc import aio
-from grpc_health.v1 import health, health_pb2_grpc
-from grpc_reflection.v1alpha import reflection
 from pydantic import BaseSettings
 
 from snowfall.junction.echo.v1 import echo_pb2, echo_pb2_grpc
+from snowfall.transport.grpc import Service, create_server
 
 
 class Settings(BaseSettings):
@@ -14,8 +13,14 @@ class Settings(BaseSettings):
     grpc_port: int = 50051
 
 
-class EchoService(echo_pb2_grpc.EchoServiceServicer):
-    def Echo(  # noqa: N802
+class EchoService(Service, echo_pb2_grpc.EchoServiceServicer):
+    def get_name(self) -> str:
+        return echo_pb2.DESCRIPTOR.services_by_name["EchoService"].full_name
+
+    def register(self, server: aio.Server) -> None:
+        echo_pb2_grpc.add_EchoServiceServicer_to_server(self, server)
+
+    async def Echo(  # noqa: N802
         self,
         request: echo_pb2.EchoRequest,
         context: aio.ServicerContext,
@@ -27,23 +32,10 @@ class EchoService(echo_pb2_grpc.EchoServiceServicer):
 
 async def serve() -> None:
     settings = Settings()
-    server = aio.server()
-
-    server.add_insecure_port(
-        "{address}:{port}".format(
-            address=settings.grpc_address,
-            port=settings.grpc_port,
-        ),
-    )
-    echo_pb2_grpc.add_EchoServiceServicer_to_server(EchoService(), server)
-    health_pb2_grpc.add_HealthServicer_to_server(health.HealthServicer(), server)
-    reflection.enable_server_reflection(
-        [
-            echo_pb2.DESCRIPTOR.services_by_name["EchoService"].full_name,
-            health.SERVICE_NAME,
-            reflection.SERVICE_NAME,
-        ],
-        server,
+    server = create_server(
+        settings.grpc_address,
+        settings.grpc_port,
+        [EchoService()],
     )
 
     await server.start()
