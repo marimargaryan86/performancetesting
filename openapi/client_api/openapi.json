@@ -159,6 +159,25 @@
     "schemas": {
       "PlaceResource": {
         "title": "Place Resource",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PlaceResourceIdentifier"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "attributes": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "attributes"
+            ]
+          }
+        ]
+      },
+      "PlaceResourceIdentifier": {
+        "title": "Place Resource Identifier",
         "type": "object",
         "properties": {
           "id": {

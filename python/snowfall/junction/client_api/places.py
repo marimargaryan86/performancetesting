@@ -19,7 +19,7 @@ class Place(object):
 class PlaceResource(models.Resource):
     @classmethod
     async def from_data_class(cls, place: Place) -> PlaceResource:
-        return cls(id=str(place.identifier), type="places")
+        return cls(id=str(place.identifier), type="places", attributes={})
 
 
 def _create_db(places: Sequence[Mapping[str, Any]]) -> dict[str, Place]:
