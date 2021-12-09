@@ -10,6 +10,7 @@
 #   ],
 #   "generated_with_requirements": [
 #     "pygments",
+#     "pytest-asyncio",
 #     "pytest-cov",
 #     "pytest-icdiff",
 #     "pytest==6.2.5"
@@ -97,6 +98,9 @@ pygments==2.10.0; python_version >= "3.5" \
 pyparsing==3.0.6; python_version >= "3.6" \
     --hash=sha256:04ff808a5b90911829c55c4e26f75fa5ca8a2f5f36aa3a51f68e27033341d3e4 \
     --hash=sha256:d9bdec0013ef1eb5a84ab39a3b3868911598afa494f5faa038647101504e2b81
+pytest-asyncio==0.16.0; python_version >= "3.6" \
+    --hash=sha256:7496c5977ce88c34379df64a66459fe395cd05543f0a2f837016e7144391fcfb \
+    --hash=sha256:5f2a21273c47b331ae6aa5b36087047b4899e40f03f18397c0e65fa5cca54e9b
 pytest-cov==3.0.0; python_version >= "3.6" \
     --hash=sha256:e7f0f5b1617d2210a2cabc266dfe2f4c75a8d32fb89eafb7ad9d06f6d076d470 \
     --hash=sha256:578d5d15ac4a25e5f961c938b85a05b09fdaae9deef3bb6de9a6e766622ca7a6

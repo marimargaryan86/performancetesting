@@ -10,7 +10,6 @@ target-version = ["py39"]
 branch = true
 omit = ["*/conftest.py", "*_test.py"]
 
-
 [tool.poetry]
 name = "Junction"
 version = "1.0.0"
@@ -22,6 +21,7 @@ python = "3.9.9"
 grpcio = "^1.38.0"
 grpcio-health-checking = "^1.38.0"
 grpcio-reflection = "^1.38.0"
+lagom = "^1.7.0"
 openapi-core = "^0.14.2"
 protobuf = "^3.17.3"
 pydantic = "^1.8.2"

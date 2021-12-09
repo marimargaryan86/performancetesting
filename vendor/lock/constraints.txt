@@ -16,6 +16,7 @@ idna==3.3; python_version >= "3.5" and python_full_version < "3.0.0" or python_f
 iniconfig==1.1.1; python_version >= "3.6"
 isodate==0.6.0; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
 jsonschema==4.2.1; python_version >= "3.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.7"
+lagom==1.7.0; python_version >= "3.6" and python_version < "4.0"
 lazy-object-proxy==1.6.0; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0"
 more-itertools==8.12.0; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.5"
 openapi-core==0.14.2; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")

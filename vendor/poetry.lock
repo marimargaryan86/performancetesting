@@ -195,6 +195,17 @@ format = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-validat
 format_nongpl = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-validator", "rfc3986-validator (>0.1.0)", "uri-template", "webcolors (>=1.11)"]
 
 [[package]]
+name = "lagom"
+version = "1.7.0"
+description = "Lagom, a type based dependency injection container"
+category = "main"
+optional = false
+python-versions = "~=3.6"
+
+[package.extras]
+env = ["pydantic (>=1.0.0,<2.0.0)"]
+
+[[package]]
 name = "lazy-object-proxy"
 version = "1.6.0"
 description = "A fast and thorough lazy object proxy."
@@ -547,7 +558,7 @@ watchdog = ["watchdog"]
 [metadata]
 lock-version = "1.1"
 python-versions = "3.9.9"
-content-hash = "52a9af5ff195ae5c66f3a882612b7f3d9f14db01d1d6870c86e4927b9047eacf"
+content-hash = "6a1f064b93c5ca77c88a1c5fb44e49b049d8ac479f5bc20aa7b3687a5e280c6f"
 
 [metadata.files]
 anyio = [
@@ -677,6 +688,10 @@ isodate = [
 jsonschema = [
     {file = "jsonschema-4.2.1-py3-none-any.whl", hash = "sha256:2a0f162822a64d95287990481b45d82f096e99721c86534f48201b64ebca6e8c"},
     {file = "jsonschema-4.2.1.tar.gz", hash = "sha256:390713469ae64b8a58698bb3cbc3859abe6925b565a973f87323ef21b09a27a8"},
+]
+lagom = [
+    {file = "lagom-1.7.0-py2.py3-none-any.whl", hash = "sha256:1613656b0b305f9e5e14a8964f999bd66decee0346e0298b23c9ac27fcf65919"},
+    {file = "lagom-1.7.0.tar.gz", hash = "sha256:ea816b8ced71c2247a0fab2a82cd3093ff4605b38d0b166a1375cd314af1b416"},
 ]
 lazy-object-proxy = [
     {file = "lazy-object-proxy-1.6.0.tar.gz", hash = "sha256:489000d368377571c6f982fba6497f2aa13c6d1facc40660963da62f5c379726"},

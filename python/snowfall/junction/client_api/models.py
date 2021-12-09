@@ -1,9 +1,9 @@
-from typing import Any, Optional, Union
+from typing import Any, Mapping, Optional, Sequence, Union
 
 import pydantic
 from starlette import responses
 
-AnyDict = dict[str, Any]
+AnyMapping = Mapping[str, Any]
 
 
 class ResourceIdentifier(pydantic.BaseModel):
@@ -12,13 +12,13 @@ class ResourceIdentifier(pydantic.BaseModel):
 
 
 class Resource(ResourceIdentifier):
-    attributes: Optional[AnyDict] = None
-    relationships: Optional[AnyDict] = None
-    links: Optional[AnyDict] = None
-    meta: Optional[AnyDict] = None
+    attributes: Optional[AnyMapping] = None
+    relationships: Optional[AnyMapping] = None
+    links: Optional[AnyMapping] = None
+    meta: Optional[AnyMapping] = None
 
 
-ResourceType = Optional[Union[ResourceIdentifier, list[ResourceIdentifier]]]
+ResourceType = Union[ResourceIdentifier, Sequence[ResourceIdentifier]]
 
 
 class Error(pydantic.BaseModel):
@@ -28,10 +28,10 @@ class Error(pydantic.BaseModel):
 
 
 class Body(pydantic.BaseModel):
-    resource_data: ResourceType = pydantic.Field(None, alias="data")
-    errors: Optional[list[Error]] = None
-    meta: Optional[AnyDict] = None
-    links: Optional[AnyDict] = None
+    resource_data: Optional[ResourceType] = pydantic.Field(None, alias="data")
+    errors: Optional[Sequence[Error]] = None
+    meta: Optional[AnyMapping] = None
+    links: Optional[AnyMapping] = None
 
 
 class JsonApiResponse(responses.JSONResponse):
