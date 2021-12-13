@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+import "snowfall/junction/common/v1alpha/models.proto";
+
+package snowfall.junction.places.v1alpha;
+
+service PlacesService {
+  rpc GetPlace (GetPlaceRequest) returns (GetPlaceResponse) {}
+  rpc ListPlaces (ListPlacesRequest) returns (ListPlacesResponse) {}
+}
+
+message GetPlaceRequest {
+  string id = 1;
+}
+
+message GetPlaceResponse {
+  snowfall.junction.common.v1alpha.Place place = 1;
+}
+
+message ListPlacesRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+message ListPlacesResponse {
+  repeated snowfall.junction.common.v1alpha.Place places = 1;
+  string next_page_token = 2;
+}
+
