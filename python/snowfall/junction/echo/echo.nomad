@@ -21,7 +21,7 @@ job "echo" {
     service {
       name = "echo"
       port = "grpc"
-      tags = ["gprc"]
+      tags = ["grpc"]
 
       check {
         type     = "grpc"
