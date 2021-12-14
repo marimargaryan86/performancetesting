@@ -8,6 +8,7 @@ poetry_requirements(
     },
     overrides={
         "openapi-core": {"dependencies": [":setuptools"]},
+        "protobuf": {"dependencies": [":types-protobuf"]},
         "starlette": {"dependencies": [":requests"]},
     }
 )

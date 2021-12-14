@@ -33,4 +33,9 @@ uvicorn = {extras = ["standard"], version = "^0.15.0"}
 [tool.poetry.group.dev.dependencies]
 pytest = "^6.2.5"
 requests = "^2.26.0"
+types-certifi = "^2021.10.8.0"
+types-protobuf = "^3.18.2"
+types-requests = "^2.26.1"
+types-setuptools = "^57.4.4"
+types-toml = "^0.10.1"
 

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "snowfall/junction/common/v1alpha/models.proto";
+import "snowfall/common/v1alpha/models.proto";
 
 package snowfall.junction.places.v1alpha;
 
@@ -14,7 +14,7 @@ message GetPlaceRequest {
 }
 
 message GetPlaceResponse {
-  snowfall.junction.common.v1alpha.Place place = 1;
+  snowfall.common.v1alpha.Place place = 1;
 }
 
 message ListPlacesRequest {
@@ -23,7 +23,7 @@ message ListPlacesRequest {
 }
 
 message ListPlacesResponse {
-  repeated snowfall.junction.common.v1alpha.Place places = 1;
+  repeated snowfall.common.v1alpha.Place places = 1;
   string next_page_token = 2;
 }
 

@@ -96,6 +96,7 @@ known_versions = [
 [pytest]
 version = "pytest==6.2.5"
 lockfile = "vendor/lock/pytest.txt"
+args = ["--import-mode=importlib"]
 extra_requirements = [
     "pytest-asyncio",
     "pytest-cov",

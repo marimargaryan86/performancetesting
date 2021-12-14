@@ -49,8 +49,8 @@ def client(app: applications.Starlette) -> testclient.TestClient:
 def test_app(place_repository: places.PlaceRepository) -> applications.Starlette:
     return _create_app(
         validator=validation.Validator(
-            "fixtures/test.json",
-            loaders.PkgLoader("snowfall.junction.client_api"),
+            "python/snowfall/junction/client_api/fixtures/test.json",
+            loaders.FileLoader(),
         ),
         place_repository=place_repository,
     )

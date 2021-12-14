@@ -20,7 +20,7 @@ class EchoService(Service, echo_pb2_grpc.EchoServiceServicer):
     def register(self, server: aio.Server) -> None:
         echo_pb2_grpc.add_EchoServiceServicer_to_server(self, server)
 
-    async def Echo(  # noqa: N802
+    async def Echo(  # type: ignore[override] # noqa: N802
         self,
         request: echo_pb2.EchoRequest,
         context: aio.ServicerContext,

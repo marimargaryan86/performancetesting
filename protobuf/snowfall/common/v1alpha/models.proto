@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package snowfall.junction.common.v1alpha;
+package snowfall.common.v1alpha;
 
 message Place {
   string id = 1;
