@@ -10,5 +10,5 @@ poetry_requirements(
         "openapi-core": {"dependencies": [":setuptools"]},
         "protobuf": {"dependencies": [":types-protobuf"]},
         "starlette": {"dependencies": [":requests"]},
-    }
+    },
 )
