@@ -5,6 +5,7 @@ from starlette import applications, exceptions, middleware, status
 
 from snowfall.junction.client_api import (
     handlers,
+    journeys,
     middlewares,
     places,
     routes,
@@ -20,9 +21,11 @@ class Settings(pydantic.BaseSettings):
 
 def create_dependencies(
     place_repository: places.PlaceRepository,
+    journey_search_repository: journeys.JourneySearchRepository,
 ) -> starlette.StarletteIntegration:
     container = lagom.Container()
     container[places.PlaceRepository] = place_repository
+    container[journeys.JourneySearchRepository] = journey_search_repository
 
     return starlette.StarletteIntegration(container)
 
@@ -34,7 +37,17 @@ def create_app(
     app_routes = [
         dependencies.route("/health", routes.Health),
         dependencies.route("/places", routes.Places),
-        dependencies.route("/places/{placeId}", routes.Place),
+        dependencies.route(
+            "/places/{placeId}",
+            routes.Place,
+            name="ViewPlace",
+        ),
+        dependencies.route("/journeys/searches", routes.JourneySearches),
+        dependencies.route(
+            "/journeys/searches/{journeySearchId}",
+            routes.JourneySearch,
+            name="ViewJourneySearch",
+        ),
     ]
     custom_middlewares = [
         middleware.Middleware(middlewares.ValidationMiddleware, validator=validator),

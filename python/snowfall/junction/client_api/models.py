@@ -1,3 +1,5 @@
+import datetime
+import json
 from typing import Any, Mapping, Optional, Sequence, Union
 
 import pydantic
@@ -6,7 +8,16 @@ from starlette import responses
 AnyMapping = Mapping[str, Any]
 
 
-class ResourceIdentifier(pydantic.BaseModel):
+class BaseModel(pydantic.BaseModel):
+    class Config(object):  # noqa: WPS431
+        json_encoders = {
+            datetime.datetime: lambda datetime_object: datetime_object.strftime(
+                "%Y-%m-%dT%H:%M:%SZ",
+            ),
+        }
+
+
+class ResourceIdentifier(BaseModel):
     identifier: str = pydantic.Field(..., alias="id")
     data_type: str = pydantic.Field(..., alias="type")
 
@@ -21,13 +32,13 @@ class Resource(ResourceIdentifier):
 ResourceType = Union[ResourceIdentifier, Sequence[ResourceIdentifier]]
 
 
-class Error(pydantic.BaseModel):
+class Error(BaseModel):
     status: str
     title: str
     detail: str
 
 
-class Body(pydantic.BaseModel):
+class Body(BaseModel):
     resource_data: Optional[ResourceType] = pydantic.Field(None, alias="data")
     errors: Optional[Sequence[Error]] = None
     meta: Optional[AnyMapping] = None
@@ -44,7 +55,7 @@ class JsonApiResponse(responses.JSONResponse):
         headers: Optional[dict[str, Any]] = None,
     ) -> None:
         super().__init__(
-            content=body.dict(exclude_unset=True, by_alias=True),
-            status_code=status_code,
+            content=json.loads(body.json(exclude_unset=True, by_alias=True)),
+            status_code=int(status_code),
             headers=headers or {},
         )

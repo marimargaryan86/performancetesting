@@ -1,8 +1,6 @@
 import json
-from collections.abc import AsyncIterable
 
 import openapi_core
-from openapi_core.exceptions import OpenAPIError
 from openapi_core.validation.request.datatypes import OpenAPIRequest, RequestParameters
 from openapi_core.validation.request.validators import RequestValidator
 from openapi_core.validation.response.datatypes import OpenAPIResponse
@@ -10,32 +8,7 @@ from openapi_core.validation.response.validators import ResponseValidator
 from starlette import requests, responses
 from werkzeug.datastructures import Headers
 
-from snowfall.junction.client_api import handlers, loaders
-
-
-async def _read_bytes(generator: AsyncIterable[bytes]) -> bytes:
-    return b"".join([chunk async for chunk in generator])
-
-
-async def _resolve_streaming_response(
-    response: responses.StreamingResponse,
-) -> responses.Response:
-    body = await _read_bytes(response.body_iterator)
-
-    return responses.Response(
-        content=body,
-        status_code=response.status_code,
-        headers=dict(response.headers),
-        media_type=response.media_type or "application/vnd.api+json",
-        background=response.background,
-    )
-
-
-async def resolve_response(response: responses.Response) -> responses.Response:
-    if isinstance(response, responses.StreamingResponse):
-        return await _resolve_streaming_response(response)
-
-    return response
+from snowfall.junction.client_api import loaders
 
 
 async def request_to_openapi(request: requests.Request) -> OpenAPIRequest:
@@ -74,36 +47,14 @@ class Validator(object):
             custom_media_type_deserializers=deserializer,
         )
 
-    async def validate(
-        self,
-        request: requests.Request,
-        response: responses.Response,
-    ) -> responses.Response:
-        try:
-            openapi_request = await self._validate_request(request)
-        except OpenAPIError as err:
-            return await handlers.validation_error_handler(request, err)
-
-        return await self._validate_response(openapi_request, response)
-
-    async def _validate_request(self, request: requests.Request) -> OpenAPIRequest:
-        openapi_request = await request_to_openapi(request)
-        validation_result = self._request_validator.validate(openapi_request)
+    async def validate_request(self, request: OpenAPIRequest) -> None:
+        validation_result = self._request_validator.validate(request)
         validation_result.raise_for_errors()
 
-        return openapi_request
-
-    async def _validate_response(
+    async def validate_response(
         self,
-        openapi_request: OpenAPIRequest,
-        response: responses.Response,
-    ) -> responses.Response:
-        resolved_response = await resolve_response(response)
-        openapi_response = await response_to_openapi(resolved_response)
-        validation_result = self._response_validator.validate(
-            openapi_request,
-            openapi_response,
-        )
+        request: OpenAPIRequest,
+        response: OpenAPIResponse,
+    ) -> None:
+        validation_result = self._response_validator.validate(request, response)
         validation_result.raise_for_errors()
-
-        return resolved_response

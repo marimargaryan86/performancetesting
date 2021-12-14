@@ -19,7 +19,7 @@ async def test_missing_place_throws_error(
     place_repository: places.PlaceRepository,
 ) -> None:
     with pytest.raises(places.NotFoundError):
-        await place_repository.get(conftest.PLACE_NOT_FOUND)
+        await place_repository.get(uuid.UUID(conftest.PLACE_NOT_FOUND))
 
 
 @pytest.mark.asyncio

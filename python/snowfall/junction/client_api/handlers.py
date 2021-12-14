@@ -32,6 +32,9 @@ async def error_handler(
     request: requests.Request,
     exc: Exception,
 ) -> responses.JSONResponse:
+    if isinstance(exc, exceptions.HTTPException):
+        return await exception_handler(request, exc)
+
     status = http.HTTPStatus(http.HTTPStatus.INTERNAL_SERVER_ERROR)
 
     return await _error_response_from_status(status)

@@ -27,19 +27,19 @@ class TestResponseValidation(object):
     def test_response_validation_failure_status_code(
         self,
         test_app: applications.Starlette,
-        test_error_client: testclient.TestClient,
+        test_client: testclient.TestClient,
     ) -> None:
         test_app.add_route(_VALIDATION_PATH, _failed_validation)
-        response = test_error_client.get(_VALIDATION_PATH)
+        response = test_client.get(_VALIDATION_PATH)
         assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
 
     def test_response_validation_failure_response(
         self,
         test_app: applications.Starlette,
-        test_error_client: testclient.TestClient,
+        test_client: testclient.TestClient,
     ) -> None:
         test_app.add_route(_VALIDATION_PATH, _failed_validation)
-        response = test_error_client.get(_VALIDATION_PATH)
+        response = test_client.get(_VALIDATION_PATH)
         status_code = http.HTTPStatus(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         for error in response.json()["errors"]:
@@ -50,10 +50,10 @@ class TestResponseValidation(object):
     def test_response_validation_success_status_code(
         self,
         test_app: applications.Starlette,
-        test_error_client: testclient.TestClient,
+        test_client: testclient.TestClient,
     ) -> None:
         test_app.add_route(_VALIDATION_PATH, _success_validation)
-        response = test_error_client.get(_VALIDATION_PATH)
+        response = test_client.get(_VALIDATION_PATH)
         assert response.status_code == status.HTTP_200_OK
 
 
@@ -61,10 +61,10 @@ class TestRequestValidation(object):
     def test_request_validation_failure_status_code(
         self,
         test_app: applications.Starlette,
-        test_error_client: testclient.TestClient,
+        test_client: testclient.TestClient,
     ) -> None:
         test_app.add_route(_VALIDATION_PATH, _request_validation, methods=["POST"])
-        response = test_error_client.post(
+        response = test_client.post(
             _VALIDATION_PATH,
             json={"data": {"type": "failure"}},
             headers={"Content-Type": "application/vnd.api+json"},
@@ -74,10 +74,10 @@ class TestRequestValidation(object):
     def test_request_validation_success_status_code(
         self,
         test_app: applications.Starlette,
-        test_error_client: testclient.TestClient,
+        test_client: testclient.TestClient,
     ) -> None:
         test_app.add_route(_VALIDATION_PATH, _request_validation, methods=["POST"])
-        response = test_error_client.post(
+        response = test_client.post(
             _VALIDATION_PATH,
             json={"data": {"type": "success"}},
             headers={"Content-Type": "application/vnd.api+json"},

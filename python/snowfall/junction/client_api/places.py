@@ -4,6 +4,8 @@ import dataclasses
 import uuid
 from typing import Any, Mapping, Sequence
 
+from starlette import requests
+
 from snowfall.junction.client_api import models
 
 
@@ -18,8 +20,22 @@ class Place(object):
 
 class PlaceResource(models.Resource):
     @classmethod
-    async def from_data_class(cls, place: Place) -> PlaceResource:
-        return cls(id=str(place.identifier), type="places", attributes={})
+    async def from_data_class(
+        cls,
+        place: Place,
+        request: requests.Request,
+    ) -> PlaceResource:
+        return cls(
+            id=str(place.identifier),
+            type="places",
+            attributes={},
+            links={
+                "self": request.url_for(
+                    "ViewPlace",
+                    placeId=place.identifier,
+                ),
+            },
+        )
 
 
 def _create_db(places: Sequence[Mapping[str, Any]]) -> dict[str, Place]:

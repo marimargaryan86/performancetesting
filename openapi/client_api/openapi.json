@@ -36,18 +36,7 @@
                     "data"
                   ]
                 },
-                "examples": {
-                  "example-1": {
-                    "value": {
-                      "data": [
-                        {
-                          "id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
-                          "type": "places"
-                        }
-                      ]
-                    }
-                  }
-                }
+                "examples": {}
               }
             }
           }
@@ -87,13 +76,88 @@
                     "data"
                   ]
                 },
-                "examples": {
-                  "example-1": {
-                    "value": {
-                      "data": {
-                        "id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
-                        "type": "places"
-                      }
+                "examples": {}
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-places-placeId",
+        "description": "View a place."
+      }
+    },
+    "/journeys/searches": {
+      "post": {
+        "summary": "New Journey Search",
+        "tags": [],
+        "operationId": "post-journeys-searches",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/JourneySearchResource"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "description": "Make a new journey search.",
+        "requestBody": {
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/JourneySearchResource"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/journeys/searches/{journeySearchId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": "journeySearchId",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Your GET endpoint",
+        "tags": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/JourneySearchResource"
                     }
                   }
                 }
@@ -104,8 +168,8 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-places-placeId",
-        "description": "View a place."
+        "operationId": "get-journeys-searches-journeySearchId",
+        "description": "View a previously created journey search."
       }
     },
     "/health": {
@@ -137,7 +201,10 @@
                         "status": {
                           "type": "string",
                           "minLength": 1,
-                          "description": "Health status"
+                          "description": "Health status",
+                          "enum": [
+                            "ok"
+                          ]
                         }
                       }
                     }
@@ -173,6 +240,9 @@
             "required": [
               "attributes"
             ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
           }
         ]
       },
@@ -195,6 +265,88 @@
           "id",
           "type"
         ]
+      },
+      "JourneySearchResource": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/JourneySearchResourceIdentifier"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "expiresAt"
+                ],
+                "properties": {
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                  },
+                  "departureAfter": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "origin",
+                  "destination"
+                ],
+                "properties": {
+                  "origin": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/PlaceResourceIdentifier"
+                      }
+                    }
+                  },
+                  "destination": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/PlaceResourceIdentifier"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ]
+      },
+      "JourneySearchResourceIdentifier": {
+        "title": "Journey Search Resource Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "journey-searches"
+            ]
+          }
+        }
       },
       "Error": {
         "title": "Error",
@@ -223,6 +375,28 @@
           "detail"
         ],
         "description": "JSON:API error"
+      },
+      "SelfLink": {
+        "title": "SelfLink",
+        "type": "object",
+        "properties": {
+          "links": {
+            "required": [
+              "self"
+            ],
+            "type": "object",
+            "properties": {
+              "self": {
+                "type": "string",
+                "readOnly": true
+              }
+            },
+            "readOnly": true
+          }
+        },
+        "required": [
+          "links"
+        ]
       }
     },
     "responses": {
@@ -237,6 +411,29 @@
                   "type": "array",
                   "minItems": 1,
                   "uniqueItems": true,
+                  "items": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              },
+              "required": [
+                "errors"
+              ]
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "Bad Request",
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "errors": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "minItems": 1,
                   "items": {
                     "$ref": "#/components/schemas/Error"
                   }

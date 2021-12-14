@@ -1,10 +1,18 @@
 import uvicorn
 from starlette import applications
 
-from snowfall.junction.client_api import bootstrap, loaders, places, validation
+from snowfall.junction.client_api import (
+    bootstrap,
+    journeys,
+    loaders,
+    patch,
+    places,
+    validation,
+)
 
 
 def _factory() -> applications.Starlette:
+    patch.patch_open_api()
     places_db = [
         {"id": "f236a92c-4cfa-468e-85ef-431d25dcd925"},
         {"id": "488a836d-ec22-439b-a9d8-3c4c386a731e"},
@@ -17,6 +25,7 @@ def _factory() -> applications.Starlette:
         ),
         dependencies=bootstrap.create_dependencies(
             place_repository=places.PlaceRepository(places_db),
+            journey_search_repository=journeys.JourneySearchRepository(),
         ),
     )
 
