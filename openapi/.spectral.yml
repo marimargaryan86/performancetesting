@@ -1,3 +1,7 @@
-extends: [[spectral:oas, all]]
+extends:
+  - [spectral:oas, all]
+  - https://raw.githubusercontent.com/openapi-contrib/style-guides/master/apisyouwonthate.yml
+  - https://raw.githubusercontent.com/openapi-contrib/style-guides/master/openapi.yml
 rules:
   oas3-api-servers: info
+  api-home: info

@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "client_api",
-    "version": "1.0",
+    "version": "1.0.0",
     "description": "Junction Client API",
     "contact": {
       "name": "Snowfall",
@@ -112,7 +112,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-places-placeId",
+        "operationId": "get-places-place-id",
         "description": "View a place."
       }
     },
@@ -197,7 +197,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-journeys-searches-journeySearchId",
+        "operationId": "get-journeys-searches-journey-search-id",
         "description": "View a previously created journey search."
       }
     },
