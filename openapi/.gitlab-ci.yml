@@ -1,0 +1,14 @@
+openapi:test:
+  stage: test
+  image:
+    name: "stoplight/spectral:6"
+    entrypoint: [""]
+  interruptible: true
+  script:
+    - for f in openapi/**/*.json; do spectral lint --ruleset "openapi/.spectral.yml" --fail-severity warn "$f"; done
+  rules:
+    - if: '$CI_MERGE_REQUEST_IID'
+      changes:
+        - openapi/**/*
+  tags:
+    - docker

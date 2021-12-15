@@ -12,4 +12,5 @@ variables:
 include:
   - local: .gitlab/pants.gitlab-ci.yml
   - local: golang/.gitlab-ci.yml
+  - local: openapi/.gitlab-ci.yml
   - local: protobuf/.gitlab-ci.yml

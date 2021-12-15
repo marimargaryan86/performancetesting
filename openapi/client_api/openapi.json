@@ -6,14 +6,41 @@
     "description": "Junction Client API",
     "contact": {
       "name": "Snowfall",
+      "url": "https://www.snowfalltravel.com",
+      "email": "info@snowfalltravel.com"
+    },
+    "license": {
+      "name": "Junction",
       "url": "https://www.snowfalltravel.com"
     }
   },
+  "x-tagGroups": [
+    {
+      "name": "Journeys",
+      "tags": ["journeys"]
+    },
+    {
+      "name": "Places",
+      "tags": ["places"]
+    }
+  ],
+  "tags": [
+    {
+      "name": "journeys",
+      "description": "A journey is between two places.",
+      "x-displayName": "Journeys"
+    },
+    {
+      "name": "places",
+      "description": "Places are usualy stops that you can travel between.",
+      "x-displayName": "Places"
+    }
+  ],
   "paths": {
     "/places": {
       "get": {
         "summary": "List Places",
-        "tags": [],
+        "tags": ["places"],
         "responses": {
           "200": {
             "description": "OK",
@@ -53,13 +80,14 @@
             "type": "string"
           },
           "name": "placeId",
+          "description": "Place resource identifier",
           "in": "path",
           "required": true
         }
       ],
       "get": {
         "summary": "View Place",
-        "tags": [],
+        "tags": ["places"],
         "responses": {
           "200": {
             "description": "OK",
@@ -91,7 +119,7 @@
     "/journeys/searches": {
       "post": {
         "summary": "New Journey Search",
-        "tags": [],
+        "tags": ["journeys"],
         "operationId": "post-journeys-searches",
         "responses": {
           "201": {
@@ -141,13 +169,14 @@
             "format": "uuid"
           },
           "name": "journeySearchId",
+          "description": "JourneySearch resource identifier",
           "in": "path",
           "required": true
         }
       ],
       "get": {
         "summary": "Your GET endpoint",
-        "tags": [],
+        "tags": ["journeys"],
         "responses": {
           "200": {
             "description": "OK",
