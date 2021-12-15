@@ -3,14 +3,8 @@ from typing import AsyncIterator
 import pytest
 from starlette import applications, testclient
 
-from snowfall.junction.client_api import (
-    bootstrap,
-    journeys,
-    loaders,
-    patch,
-    places,
-    validation,
-)
+from snowfall.adapter import places
+from snowfall.junction.client_api import bootstrap, journeys, loaders, patch, validation
 
 PLACE_NOT_FOUND = "f55b0ec5-7c87-4c35-86f4-1417a5f50e89"
 PLACES = (
@@ -20,8 +14,8 @@ PLACES = (
 
 
 @pytest.fixture()
-def place_repository() -> places.PlaceRepository:
-    return places.PlaceRepository(PLACES)
+def places_client() -> places.Client:
+    return places.DictClient(PLACES)
 
 
 @pytest.fixture()
@@ -31,13 +25,13 @@ def journey_search_repository() -> journeys.JourneySearchRepository:
 
 def _create_app(
     validator: validation.Validator,
-    place_repository: places.PlaceRepository,
+    places_client: places.Client,
     journey_search_repository: journeys.JourneySearchRepository,
 ) -> applications.Starlette:
     return bootstrap.create_app(
         validator=validator,
         dependencies=bootstrap.create_dependencies(
-            place_repository=place_repository,
+            places_client=places_client,
             journey_search_repository=journey_search_repository,
         ),
     )
@@ -45,7 +39,7 @@ def _create_app(
 
 @pytest.fixture()
 def app(
-    place_repository: places.PlaceRepository,
+    places_client: places.Client,
     journey_search_repository: journeys.JourneySearchRepository,
 ) -> applications.Starlette:
     patch.patch_open_api()
@@ -55,7 +49,7 @@ def app(
             "openapi.json",
             loaders.PkgLoader("client_api"),
         ),
-        place_repository=place_repository,
+        places_client=places_client,
         journey_search_repository=journey_search_repository,
     )
 
@@ -67,7 +61,7 @@ def client(app: applications.Starlette) -> testclient.TestClient:
 
 @pytest.fixture()
 def test_app(
-    place_repository: places.PlaceRepository,
+    places_client: places.Client,
     journey_search_repository: journeys.JourneySearchRepository,
 ) -> applications.Starlette:
     patch.patch_open_api()
@@ -77,7 +71,7 @@ def test_app(
             "python/snowfall/junction/client_api/fixtures/test.json",
             loaders.FileLoader(),
         ),
-        place_repository=place_repository,
+        places_client=places_client,
         journey_search_repository=journey_search_repository,
     )
 

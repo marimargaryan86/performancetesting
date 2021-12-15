@@ -1,13 +1,15 @@
+from typing import Sequence
+
 import lagom
 import pydantic
 from lagom.integrations import starlette
 from starlette import applications, exceptions, middleware, status
 
+from snowfall.adapter import places
 from snowfall.junction.client_api import (
     handlers,
     journeys,
     middlewares,
-    places,
     routes,
     validation,
 )
@@ -16,15 +18,16 @@ from snowfall.junction.client_api import (
 class Settings(pydantic.BaseSettings):
     http_address: str = "127.0.0.1"
     http_port: int = 8000
+    places_address: Sequence[str]
     reload: bool = False
 
 
 def create_dependencies(
-    place_repository: places.PlaceRepository,
+    places_client: places.Client,
     journey_search_repository: journeys.JourneySearchRepository,
 ) -> starlette.StarletteIntegration:
     container = lagom.Container()
-    container[places.PlaceRepository] = place_repository
+    container[places.Client] = places_client  # type: ignore[misc]
     container[journeys.JourneySearchRepository] = journey_search_repository
 
     return starlette.StarletteIntegration(container)

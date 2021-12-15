@@ -4,7 +4,8 @@ from typing import Any
 import pytest
 from starlette import status, testclient
 
-from snowfall.junction.client_api import conftest, journeys, places
+from snowfall.adapter import places
+from snowfall.junction.client_api import conftest, journeys
 
 
 class TestHealth(object):
@@ -132,15 +133,15 @@ class TestJourneys(object):
     async def test_created_journey_search_can_be_retrieved(
         self,
         journey_search_repository: journeys.JourneySearchRepository,
-        place_repository: places.PlaceRepository,
+        places_client: places.Client,
         client: testclient.TestClient,
     ) -> None:
         journey_search = await journey_search_repository.create(
             journeys.JourneySearchRequest(
-                origin=await place_repository.get(
+                origin=await places_client.get(
                     uuid.UUID(conftest.PLACES[0]["id"]),
                 ),
-                destination=await place_repository.get(
+                destination=await places_client.get(
                     uuid.UUID(conftest.PLACES[1]["id"]),
                 ),
             ),

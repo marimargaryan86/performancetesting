@@ -7,7 +7,8 @@ import uuid
 import pydantic
 from starlette import requests
 
-from snowfall.junction.client_api import models, places
+from snowfall.adapter import places
+from snowfall.junction.client_api import models
 
 
 class NotFoundError(Exception):

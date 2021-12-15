@@ -34,6 +34,15 @@ job "client-api" {
     task "client-api" {
       driver = "docker"
 
+      template {
+        data = <<EOH
+PLACES_ADDRESS="[{{range $index, $service := service "consul"}}{{if ne $index 0}},{{end}}\"{{.Address}}:{{.Port}}\"{{end}}]"
+EOH
+        destination = "services.env"
+        env = true
+        change_mode = "restart"
+      }
+
       config {
         image = "${DOCKER_IMAGE}"
         ports = ["http"]

@@ -10,6 +10,7 @@ AnyMapping = Mapping[str, Any]
 
 class BaseModel(pydantic.BaseModel):
     class Config(object):  # noqa: WPS431
+        arbitrary_types_allowed = True
         json_encoders = {
             datetime.datetime: lambda datetime_object: datetime_object.strftime(
                 "%Y-%m-%dT%H:%M:%SZ",

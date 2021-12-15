@@ -2,7 +2,8 @@ import uuid
 
 import pytest
 
-from snowfall.junction.client_api import journeys, places
+from snowfall.adapter import places
+from snowfall.junction.client_api import journeys
 
 _TEST_JOURNEY = journeys.JourneySearchRequest(
     origin=places.Place(identifier=uuid.uuid4()),
