@@ -1,3 +1,4 @@
+aiofiles==0.8.0; python_version >= "3.6" and python_version < "4.0"
 anyio==3.4.0; python_full_version >= "3.6.2" and python_version >= "3.6"
 asgiref==3.4.1; python_version >= "3.6"
 atomicwrites==1.4.0; python_version >= "3.6" and python_full_version < "3.0.0" and sys_platform == "win32" or sys_platform == "win32" and python_version >= "3.6" and python_full_version >= "3.4.0"
@@ -20,9 +21,9 @@ hyperframe==6.0.1; python_version >= "3.6" and python_full_version >= "3.6.1"
 idna==3.3; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.5" or python_version >= "3.6" or python_full_version >= "3.6.2" and python_version >= "3.6"
 iniconfig==1.1.1; python_version >= "3.6"
 isodate==0.6.1; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
-jsonschema==4.2.1; python_version >= "3.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.7"
+jsonschema==4.3.0; python_version >= "3.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.7"
 lagom==1.7.0; python_version >= "3.6" and python_version < "4.0"
-lazy-object-proxy==1.6.0; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.6.0"
+lazy-object-proxy==1.7.1; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.6"
 more-itertools==8.12.0; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.5"
 openapi-core==0.14.2; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")
 openapi-schema-validator==0.1.5; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
@@ -45,6 +46,7 @@ six==1.16.0; python_version >= "3.6" and python_full_version < "3.0.0" or python
 sniffio==1.2.0; python_full_version >= "3.6.2" and python_version >= "3.6" or python_version >= "3.6"
 starlette==0.17.1; python_version >= "3.6"
 toml==0.10.2; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.3.0" and python_version >= "3.6"
+types-aiofiles==0.7.0
 types-certifi==2021.10.8.0
 types-futures==3.3.1
 types-protobuf==3.18.2

@@ -1,4 +1,4 @@
-job "gtfs_feed" {
+job "gtfs-feed" {
   datacenters = ["junction-dev-dc1"]
   type = "batch"
 
@@ -7,7 +7,7 @@ job "gtfs_feed" {
     prohibit_overlap = true
   }
 
-  group "gtfs_feed" {
+  group "gtfs-feed" {
     count = 1
 
     ephemeral_disk {
