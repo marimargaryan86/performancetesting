@@ -1,3 +1,4 @@
+aiocsv==1.2.1; python_version >= "3.6" and python_version < "4"
 aiofiles==0.8.0; python_version >= "3.6" and python_version < "4.0"
 anyio==3.4.0; python_full_version >= "3.6.2" and python_version >= "3.6"
 asgiref==3.4.1; python_version >= "3.6"
@@ -13,6 +14,7 @@ grpcio-reflection==1.42.0; python_version >= "3.6"
 grpcio==1.42.0; python_version >= "3.6"
 h11==0.12.0; python_version >= "3.6"
 h2==4.1.0; python_version >= "3.6" and python_full_version >= "3.6.1"
+h3==3.7.3
 hpack==4.0.0; python_version >= "3.6" and python_full_version >= "3.6.1"
 httpcore==0.14.3; python_version >= "3.6"
 httptools==0.2.0
