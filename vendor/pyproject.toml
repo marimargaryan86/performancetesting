@@ -32,6 +32,7 @@ pydantic = "^1.8.2"
 setuptools = "^59.4.0"
 starlette = "^0.17.1"
 uvicorn = {extras = ["standard"], version = "^0.15.0"}
+kombu = "^5.2.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^6.2.5"
