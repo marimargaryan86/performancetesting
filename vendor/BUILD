@@ -4,6 +4,7 @@ poetry_requirements(
         "grpcio-health-checking": ["grpc_health"],
         "grpcio-reflection": ["grpc_reflection"],
         "protobuf": ["google.protobuf"],
+        "python-rapidjson": ["rapidjson"],
         "setuptools": ["easy_install", "pkg_resources", "setuptools"],
     },
     overrides={
