@@ -2,7 +2,7 @@ from typing import Any, Callable, Sequence
 
 import structlog
 
-from snowfall.logging import filtering
+from snowfall.logging import filtering, sentry
 
 Processor = Callable[[Any, Any, structlog.types.EventDict], Any]
 
@@ -49,7 +49,7 @@ def _get_before_processors() -> list[Processor]:
     return [
         structlog.threadlocal.merge_threadlocal,
         structlog.contextvars.merge_contextvars,
-        # todo: Add sentry_trace_processor,
+        sentry.sentry_trace_processor,
         default_source_processor,
         filtering_processor,
         structlog.stdlib.add_logger_name,
@@ -61,7 +61,7 @@ def _get_before_processors() -> list[Processor]:
 
 def _get_after_processors() -> list[Processor]:
     return [
-        # todo: Add log_to_sentry_processor,
+        sentry.log_to_sentry_processor,
         structlog.processors.StackInfoRenderer(),
         structlog.processors.format_exc_info,
         structlog.processors.UnicodeDecoder(),

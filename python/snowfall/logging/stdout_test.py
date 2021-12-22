@@ -19,7 +19,7 @@ class TestStructlog(object):
     async def test_format_is_json(self, capsys: capture.CaptureFixture[str]) -> None:
         stdout.configure_logger()
         logger = structlog.get_logger("testing")
-        await logger.info("test")
+        logger.info("test")
         json_message = capsys.readouterr().out.strip()
         assert json.loads(json_message)
 
@@ -42,14 +42,14 @@ class TestStructlog(object):
     ) -> None:
         stdout.configure_logger()
         logger = structlog.get_logger("testing")
-        await logger.info("test")
+        logger.info("test")
         json_message = _decode_log(capsys)
         assert json_message.get(field) == expected
 
     async def test_kwargs(self, capsys: capture.CaptureFixture[str]) -> None:
         stdout.configure_logger()
         logger = structlog.get_logger("testing")
-        await logger.info("test", field="testing")
+        logger.info("test", field="testing")
         json_message = _decode_log(capsys)
         assert json_message.get("field") == "testing"
 
@@ -57,7 +57,7 @@ class TestStructlog(object):
         stdout.configure_logger()
         logger = structlog.get_logger("testing")
         logger = logger.bind(field="testing")
-        await logger.info("test")
+        logger.info("test")
         json_message = _decode_log(capsys)
         assert json_message.get("field") == "testing"
 
@@ -69,7 +69,7 @@ class TestStructlog(object):
     ) -> None:
         stdout.configure_logger()
         logger = structlog.get_logger("testing")
-        await logger.info("test", **{field: "testing"})
+        logger.info("test", **{field: "testing"})
         json_message = _decode_log(capsys)
         assert json_message.get(field) == filtering.FILTERED_WORD
 
@@ -81,7 +81,7 @@ class TestStructlog(object):
         logger = structlog.get_logger("testing")
 
         with stdout.context_binding(field="testing"):
-            await logger.info("test")
+            logger.info("test")
 
         json_message = _decode_log(capsys)
         assert json_message.get("field") == "testing"
@@ -94,13 +94,11 @@ class TestStructlog(object):
         logger = structlog.get_logger("testing")
 
         with stdout.context_binding(field="testing"):
-            await logger.info("test")
+            logger.info("test")
 
         json_message = _decode_log(capsys)
         assert json_message.get("field") == "testing"
-
-        await logger.info("test")
-
+        logger.info("test")
         json_message = _decode_log(capsys)
         assert json_message.get("field") is None
 
@@ -113,7 +111,7 @@ class TestStructlog(object):
 
         with stdout.context_binding() as context:
             context.bind(field="testing")
-            await logger.info("test")
+            logger.info("test")
 
         json_message = _decode_log(capsys)
         assert json_message.get("field") == "testing"
@@ -126,11 +124,11 @@ class TestStructlog(object):
         logger = structlog.get_logger("testing")
 
         with stdout.context_binding(first="testing"):
-            await logger.info("test")
+            logger.info("test")
             first_message = _decode_log(capsys)
 
             with stdout.context_binding(second="testing again"):
-                await logger.info("test")
+                logger.info("test")
 
         second_message = _decode_log(capsys)
         assert first_message.get("first") == "testing"

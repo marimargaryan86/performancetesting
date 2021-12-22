@@ -22,7 +22,7 @@ def configure_logger(
         additional_processors = []
 
     if not wrapper_class:
-        wrapper_class = structlog.stdlib.AsyncBoundLogger
+        wrapper_class = structlog.stdlib.BoundLogger
 
     common_processors = processors.get_common_processors(additional_processors)
     structlog.configure(
@@ -114,7 +114,7 @@ def _configure_standard_logger(
         handlers=[log_handler],
     )
     root_logger = logging.getLogger()
-    root_logger.addHandler(log_handler)
+    root_logger.handlers = [log_handler]
     root_logger.setLevel(level)
 
 
@@ -128,7 +128,6 @@ def _get_log_handler(
         ),
         foreign_pre_chain=common_processors,
     )
-
     log_handler.setFormatter(formatter)
 
     return log_handler
