@@ -1,23 +1,25 @@
+from __future__ import annotations
+
+import asyncio
+import functools
+from abc import ABC, abstractmethod
+from concurrent import futures
 from typing import List, Type, Union
 
-import kombu
-from google.protobuf import symbol_database
-from google.protobuf.any_pb2 import Any
+from google.protobuf import any_pb2, symbol_database
 from google.protobuf.message import Message as ProtobufMessage
-from kombu.mixins import ConsumerMixin
-from kombu.serialization import register
+from kombu import Connection
+from kombu import Consumer as KombuConsumer
+from kombu import Exchange, Message, Queue, connection, mixins, pools, serialization
 from kombu.transport.base import StdChannel
 
 
 class Serializer(object):
-    """Protobuf Serializer."""
-
     _db = symbol_database.Default()
 
     @classmethod
     def serialize(cls, message: ProtobufMessage) -> bytes:
-        """Serialize a message."""
-        any_message = Any()
+        any_message = any_pb2.Any()
 
         any_message.Pack(message)
 
@@ -25,8 +27,7 @@ class Serializer(object):
 
     @classmethod
     def deserialize(cls, blob: Union[bytes, memoryview]) -> ProtobufMessage:
-        """Deserialize a message."""
-        packed_message = Any()
+        packed_message = any_pb2.Any()
 
         if isinstance(blob, memoryview):
             blob = blob.tobytes()
@@ -43,7 +44,7 @@ class Serializer(object):
         return unpacked_message
 
 
-register(
+serialization.register(
     name="protobuf",
     encoder=Serializer.serialize,
     decoder=Serializer.deserialize,
@@ -52,78 +53,96 @@ register(
 )
 
 
-class Producer(kombu.Producer):
-    """Message Fanout Producer.
+class Producer(object):
+    def __init__(self, pool: pools.ProducerPool, exchange: Exchange):
+        self._exchange = exchange
+        self._pool = pool
 
-    Publishes protobuf messages to an exchange identified by `exchange_name` argument
-    over connection set by `connection_string` argument.
+    @classmethod
+    def from_dsn(cls, dsn: str, exchange_name: str) -> Producer:
+        return cls(
+            pool=pools.producers[Connection(dsn)],
+            exchange=Exchange(exchange_name, type="topic"),
+        )
 
-    Example:
-        .. code-block:: python
+    async def publish(self, message: ProtobufMessage, routing_key: str) -> None:
+        loop = asyncio.get_running_loop()
 
-            producer = Producer("amqp://localhost:5672/", "tasks")
-            task = Task(arg1=value1, arg2=value2)
-            producer.publish(task)
-    """
+        with futures.ThreadPoolExecutor() as pool:
+            await loop.run_in_executor(
+                pool,
+                functools.partial(self._publish, message, routing_key),
+            )
 
-    def __init__(self, connection_string: str, exchange_name: str):
-        connection = kombu.Connection(connection_string)
-        exchange = kombu.Exchange(exchange_name, "fanout")
-        super().__init__(connection, exchange=exchange, serializer="protobuf")
+    def _publish(self, message: ProtobufMessage, routing_key: str) -> None:
+        with self._pool.acquire(block=True) as producer:
+            producer.publish(
+                message,
+                exchange=self._exchange,
+                routing_key=routing_key,
+                declare=[self._exchange],
+                retry=True,
+                serializer="protobuf",
+            )
 
 
-class Consumer(ConsumerMixin):
-    """Base class for consuming messages in "fanout" mode.
+class Consumer(ABC, mixins.ConsumerMixin):
+    def __init__(self, pool: connection.ConnectionPool, queue: Queue):
+        self.connection = pool.acquire(block=True)
+        self._queue = queue
 
-    Consumes protobuf messages from an exchange identified by `exchange_name` argument
-    using a queue identified by `queue_name` argument over connection set by
-    `connection_string` argument. This class should be extended in order to implement
-    `process_message` method.
-
-    Example:
-        .. code-block:: python
-
-            class ConcreteConsumer(Consumer):
-
-                def process_message(
-                    self,
-                    body: google.protobuf.message.Message,
-                    message: kombu.Message
-                ):
-                    print('Got task: {0!r}'.format(body))
-                    message.ack()
-
-            consumer = ConcreteConsumer("amqp://localhost:5672/", "tasks", "tasks_queue")
-            consumer.run()
-    """
-
-    def __init__(
-        self,
-        connection_string: str,
+    @classmethod
+    def from_dsn(
+        cls,
+        dsn: str,
         exchange_name: str,
         queue_name: str,
-    ):
-        self.connection = kombu.Connection(connection_string)
-        self._exchange_name = exchange_name
-        self._queue_name = queue_name
+        routing_key: str,
+    ) -> Consumer:
+        return cls(
+            pool=pools.connections[Connection(dsn)],
+            queue=Queue(
+                name=queue_name,
+                exchange=Exchange(exchange_name, "topic"),
+                routing_key=routing_key,
+            ),
+        )
 
-    def process_message(self, body: ProtobufMessage, message: kombu.Message) -> None:
-        raise NotImplementedError
+    async def start(self) -> None:
+        loop = asyncio.get_running_loop()
+
+        with futures.ThreadPoolExecutor() as pool:
+            await loop.run_in_executor(pool, self.run)
+
+    async def stop(self) -> None:
+        self.should_stop = True
 
     def get_consumers(
         self,
-        consumer: Type[kombu.Consumer],
+        consumer: Type[KombuConsumer],
         channel: StdChannel,
-    ) -> List[kombu.Consumer]:
-        queue = kombu.Queue(
-            self._queue_name,
-            exchange=kombu.Exchange(self._exchange_name, "fanout"),
-        )
+    ) -> List[KombuConsumer]:
         return [
             consumer(
-                queues=[queue],
-                callbacks=[self.process_message],
-                no_ack=True,
+                queues=[self._queue],
+                callbacks=[self._handle_message],
+                no_ack=False,
                 accept=["protobuf"],
             ),
         ]
+
+    def _handle_message(self, body: ProtobufMessage, message: Message) -> None:
+        try:
+            self._process_message(body, message)
+        except Exception:  # noqa: PIE786
+            # todo: log
+
+            if not message.acknowledged:
+                message.reject()
+        else:
+            if not message.acknowledged:
+                message.ack()
+
+    @abstractmethod
+    def _process_message(self, body: ProtobufMessage, message: Message) -> None:
+        raise NotImplementedError

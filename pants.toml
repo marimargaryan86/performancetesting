@@ -80,7 +80,6 @@ config = "vendor/setup.cfg"
 lockfile = "vendor/lock/mypy.txt"
 interpreter_constraints = ["CPython==3.9.9"]
 extra_requirements = ["grpc-stubs", "pydantic"]
-extra_type_stubs = ["types-protobuf"]
 
 [poetry]
 version = "poetry==1.1.12"
