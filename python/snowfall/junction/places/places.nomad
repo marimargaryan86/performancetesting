@@ -32,13 +32,13 @@ job "places" {
 
     task "grpc" {
       driver = "docker"
-      args = [
-        "grpc",
-      ]
 
       config {
         image = "${DOCKER_IMAGE}"
         ports = ["grpc"]
+        args = [
+          "grpc",
+        ]
 
         auth {
           username       = "${NOMAD_REGISTRY_USERNAME}"
@@ -59,13 +59,10 @@ job "places" {
 
     task "import" {
       driver = "docker"
-      args = [
-        "import",
-      ]
 
       template {
         data        = <<EOH
-AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"{{.Address}}:{{.Port}}\"{{end}}]"
+AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"amqp://{{.Address}}:{{.Port}}//\"{{end}}]"
 EOH
         destination = "services.env"
         env         = true
@@ -74,6 +71,9 @@ EOH
 
       config {
         image = "${DOCKER_IMAGE}"
+        args = [
+          "import",
+        ]
 
         auth {
           username       = "${NOMAD_REGISTRY_USERNAME}"

@@ -1,3 +1,6 @@
+import random
+from typing import Sequence
+
 from pydantic import AnyUrl, BaseSettings
 
 from snowfall.junction.places.consumer import PlaceImportConsumer
@@ -13,13 +16,13 @@ class _GrpcSettings(BaseSettings):
 
 
 class _ImportSettings(BaseSettings):
-    amqp_dsn: AnyUrl
+    amqp_dsn: Sequence[AnyUrl]
 
 
 async def _import(_: Service) -> None:
     settings = _ImportSettings()
     consumer = PlaceImportConsumer.from_dsn(
-        dsn=settings.amqp_dsn,
+        dsn=random.choice(settings.amqp_dsn),  # nosec
         exchange_name="places",
         queue_name="importer",
         routing_key="place.import",

@@ -22,7 +22,7 @@ job "gtfs-feed" {
 
         template {
           data        = <<EOH
-AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"{{.Address}}:{{.Port}}\"{{end}}]"
+AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"amqp://{{.Address}}:{{.Port}}//\"{{end}}]"
 EOH
           destination = "services.env"
           env         = true
@@ -54,7 +54,7 @@ EOH
 
       template {
         data        = <<EOH
-AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"{{.Address}}:{{.Port}}\"{{end}}]"
+AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"amqp://{{.Address}}:{{.Port}}//\"{{end}}]"
 EOH
         destination = "services.env"
         env         = true
@@ -89,7 +89,7 @@ EOH
 
       template {
         data        = <<EOH
-AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"{{.Address}}:{{.Port}}\"{{end}}]"
+AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"amqp://{{.Address}}:{{.Port}}//\"{{end}}]"
 EOH
         destination = "services.env"
         env         = true
@@ -124,7 +124,7 @@ EOH
 
       template {
         data        = <<EOH
-AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"{{.Address}}:{{.Port}}\"{{end}}]"
+AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"amqp://{{.Address}}:{{.Port}}//\"{{end}}]"
 EOH
         destination = "services.env"
         env         = true

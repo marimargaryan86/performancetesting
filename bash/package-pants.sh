@@ -21,14 +21,14 @@ else
 	"${pants_bin}" publish :: --docker-build-args=VERSION
 fi
 
-if [ "${CI_COMMIT_REF_NAME}" == "${CI_DEFAULT_BRANCH}" ] && [ -f "${PANTS_PUBLISH_OUTPUT}" ]; then
+if [ -f "${PANTS_PUBLISH_OUTPUT}" ]; then
 	readarray -t <<<"$(jq -r '.[] | select(.publisher == "docker") | select(.published == true) | .names[0] + "|" + .target' <"${PANTS_PUBLISH_OUTPUT}")"
 
 	for i in "${MAPFILE[@]}"; do
 		export DOCKER_IMAGE="${i%|*}"
 		pants_target="${i#*|}"
 
-		if [ "${CI_COMMIT_SHA}" == "$(git log -n 1 --pretty=format:"%H" "origin/${CI_DEFAULT_BRANCH}")" ]; then
+		if [ "${CI_COMMIT_REF_NAME}" == "${CI_DEFAULT_BRANCH}" ] && [ "${CI_COMMIT_SHA}" == "$(git log -n 1 --pretty=format:"%H" "origin/${CI_DEFAULT_BRANCH}")" ]; then
 			docker tag "${DOCKER_IMAGE}" "${DOCKER_IMAGE%:*}:latest"
 			docker push "${DOCKER_IMAGE%:*}:latest"
 		fi
@@ -46,7 +46,10 @@ if [ "${CI_COMMIT_REF_NAME}" == "${CI_DEFAULT_BRANCH}" ] && [ -f "${PANTS_PUBLIS
 		# shellcheck disable=SC2016
 		envsubst '${DOCKER_IMAGE} ${NOMAD_REGISTRY_USERNAME} ${NOMAD_REGISTRY_PASSWORD} ${CI_REGISTRY}' <"${job_file}" >"${nomad_file}"
 		nomad validate "${nomad_file}"
-		nomad plan "${nomad_file}" | tee /dev/stderr | grep 'Job Modify Index:' | awk -F': ' '{ print $2 }' >check-index || if [ $? -eq 255 ]; then exit 255; else true; fi
-		nomad run -check-index="$(cat check-index)" "${nomad_file}"
+
+		if [ "${CI_COMMIT_REF_NAME}" == "${CI_DEFAULT_BRANCH}" ]; then
+			nomad plan "${nomad_file}" | tee /dev/stderr | grep 'Job Modify Index:' | awk -F': ' '{ print $2 }' >check-index || if [ $? -eq 255 ]; then exit 255; else true; fi
+			nomad run -check-index="$(cat check-index)" "${nomad_file}"
+		fi
 	done
 fi

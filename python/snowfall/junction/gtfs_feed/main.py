@@ -1,7 +1,9 @@
 import asyncio
 import os
+import random
 import uuid
 import zipfile
+from typing import Sequence
 
 import aiofiles
 from pydantic import AnyUrl, BaseSettings
@@ -13,13 +15,13 @@ _NAMESPACE = uuid.UUID("5190984e-4ab7-411e-96f6-2848cc5d63e1")
 
 
 class _Settings(BaseSettings):
-    amqp_dsn: AnyUrl
+    amqp_dsn: Sequence[AnyUrl]
     feed_url: AnyUrl
 
 
 async def _main() -> None:
     settings = _Settings()
-    producer = Producer.from_dsn(settings.amqp_dsn, "places")
+    producer = Producer.from_dsn(random.choice(settings.amqp_dsn), "places")  # nosec
     namespace = uuid.uuid5(_NAMESPACE, settings.feed_url)
 
     async with aiofiles.tempfile.TemporaryDirectory() as tempdir:  # type: ignore[attr-defined]
