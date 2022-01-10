@@ -11,7 +11,7 @@ job "echo" {
     progress_deadline = "2m"
   }
 
-  group "echo" {
+  group "grpc" {
     count = 1
 
     network {
@@ -30,12 +30,15 @@ job "echo" {
       }
     }
 
-    task "echo" {
+    task "grpc" {
       driver = "docker"
 
       config {
         image = "${DOCKER_IMAGE}"
         ports = ["grpc"]
+        args = [
+          "grpc",
+        ]
 
         auth {
           username = "${NOMAD_REGISTRY_USERNAME}"

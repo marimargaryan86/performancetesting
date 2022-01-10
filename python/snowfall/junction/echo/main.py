@@ -1,18 +1,17 @@
-import asyncio
-
 from grpc import aio
 from pydantic import BaseSettings
 
 from snowfall.junction.echo.v1 import echo_pb2, echo_pb2_grpc
-from snowfall.transport.grpc import Service, create_server
+from snowfall.service import Service, Task, make_service
+from snowfall.transport import grpc
 
 
-class Settings(BaseSettings):
+class _Settings(BaseSettings):
     grpc_address: str = "[::]"
     grpc_port: int = 50051
 
 
-class EchoService(Service, echo_pb2_grpc.EchoServiceServicer):
+class _EchoService(grpc.Service, echo_pb2_grpc.EchoServiceServicer):
     def get_name(self) -> str:
         return echo_pb2.DESCRIPTOR.services_by_name["EchoService"].full_name
 
@@ -29,12 +28,12 @@ class EchoService(Service, echo_pb2_grpc.EchoServiceServicer):
         )
 
 
-async def serve() -> None:
-    settings = Settings()
-    server = create_server(
+async def _serve(service: Service) -> None:
+    settings = _Settings()
+    server = grpc.create_server(
         settings.grpc_address,
         settings.grpc_port,
-        [EchoService()],
+        [_EchoService()],
     )
 
     await server.start()
@@ -42,4 +41,5 @@ async def serve() -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(serve())
+    _service = make_service(name="echo", tasks=(Task(command="grpc", method=_serve),))
+    _service.run()
