@@ -7,9 +7,11 @@ from starlette import applications
 from snowfall.adapter import places
 from snowfall.junction.client_api import bootstrap, journeys, loaders, patch, validation
 from snowfall.junction.places.v1alpha import places_pb2_grpc
+from snowfall.service import make_service
 
 
 def _factory() -> applications.Starlette:
+    make_service(name="client_api")
     patch.patch_open_api()
     settings = bootstrap.Settings()
 
@@ -41,4 +43,5 @@ if __name__ == "__main__":
         port=_settings.http_port,
         access_log=False,
         reload=_settings.reload,
+        log_config=None,
     )

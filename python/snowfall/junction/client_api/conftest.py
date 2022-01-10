@@ -5,7 +5,9 @@ from starlette import applications, testclient
 
 from snowfall.adapter import places
 from snowfall.junction.client_api import bootstrap, journeys, loaders, patch, validation
+from snowfall.logging import stdout
 
+stdout.configure_logger()
 PLACE_NOT_FOUND = "f55b0ec5-7c87-4c35-86f4-1417a5f50e89"
 PLACES = (
     {"id": "f236a92c-4cfa-468e-85ef-431d25dcd925"},
