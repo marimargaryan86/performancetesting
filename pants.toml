@@ -75,7 +75,7 @@ lockfile = "vendor/lock/isort.txt"
 interpreter_constraints = ["CPython==3.9.9"]
 
 [mypy]
-version = "mypy==0.910"
+version = "mypy==0.931"
 config = "vendor/setup.cfg"
 lockfile = "vendor/lock/mypy.txt"
 interpreter_constraints = ["CPython==3.9.9"]
