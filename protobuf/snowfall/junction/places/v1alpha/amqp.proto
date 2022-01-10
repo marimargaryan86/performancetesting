@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+import "snowfall/common/v1alpha/models.proto";
+
+package snowfall.junction.places.v1alpha;
+
+message ImportPlaceTask {
+  snowfall.common.v1alpha.Place place = 1;
+}

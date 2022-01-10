@@ -4,6 +4,6 @@ package snowfall.common.v1alpha;
 
 message Place {
   string id = 1;
-  string h3_index = 2;
+  uint64 h3_index = 2;
   string name = 3;
 }

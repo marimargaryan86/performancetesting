@@ -22,7 +22,7 @@ aiofiles = "^0.8.0"
 grpcio = "^1.38.0"
 grpcio-health-checking = "^1.38.0"
 grpcio-reflection = "^1.38.0"
-h3 = "^3.7.3"
+h3 = {extras = ["numpy"], version = "^3.7.3"}
 httpx = {extras = ["http2"], version = "^0.21.1"}
 kombu = "^5.2.2"
 lagom = "^1.7.0"

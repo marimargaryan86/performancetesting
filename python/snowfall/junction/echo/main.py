@@ -1,4 +1,3 @@
-"""Implementation of the Echo gRPC service."""
 import asyncio
 
 from grpc import aio

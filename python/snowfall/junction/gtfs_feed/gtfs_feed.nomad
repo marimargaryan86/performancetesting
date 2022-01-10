@@ -1,13 +1,13 @@
 job "gtfs-feed" {
   datacenters = ["junction-dev-dc1"]
-  type = "batch"
+  type        = "batch"
 
   periodic {
-    cron = "@daily"
+    cron             = "@daily"
     prohibit_overlap = true
   }
 
-  group "gtfs-feed" {
+  group "belgium" {
     count = 1
 
     ephemeral_disk {
@@ -20,9 +20,18 @@ job "gtfs-feed" {
       config {
         image = "${DOCKER_IMAGE}"
 
+        template {
+          data        = <<EOH
+AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"{{.Address}}:{{.Port}}\"{{end}}]"
+EOH
+          destination = "services.env"
+          env         = true
+          change_mode = "restart"
+        }
+
         auth {
-          username = "${NOMAD_REGISTRY_USERNAME}"
-          password = "${NOMAD_REGISTRY_PASSWORD}"
+          username       = "${NOMAD_REGISTRY_USERNAME}"
+          password       = "${NOMAD_REGISTRY_PASSWORD}"
           server_address = "${CI_REGISTRY}"
         }
       }
@@ -31,16 +40,33 @@ job "gtfs-feed" {
         FEED_URL = "https://gtfs.irail.be/nmbs/gtfs/latest.zip"
       }
     }
+  }
+
+  group "denmark" {
+    count = 1
+
+    ephemeral_disk {
+      size = 1000
+    }
 
     task "denmark" {
       driver = "docker"
+
+      template {
+        data        = <<EOH
+AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"{{.Address}}:{{.Port}}\"{{end}}]"
+EOH
+        destination = "services.env"
+        env         = true
+        change_mode = "restart"
+      }
 
       config {
         image = "${DOCKER_IMAGE}"
 
         auth {
-          username = "${NOMAD_REGISTRY_USERNAME}"
-          password = "${NOMAD_REGISTRY_PASSWORD}"
+          username       = "${NOMAD_REGISTRY_USERNAME}"
+          password       = "${NOMAD_REGISTRY_PASSWORD}"
           server_address = "${CI_REGISTRY}"
         }
       }
@@ -49,16 +75,33 @@ job "gtfs-feed" {
         FEED_URL = "http://www.rejseplanen.info/labs/GTFS.zip"
       }
     }
+  }
+
+  group "netherlands" {
+    count = 1
+
+    ephemeral_disk {
+      size = 1000
+    }
 
     task "netherlands" {
       driver = "docker"
+
+      template {
+        data        = <<EOH
+AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"{{.Address}}:{{.Port}}\"{{end}}]"
+EOH
+        destination = "services.env"
+        env         = true
+        change_mode = "restart"
+      }
 
       config {
         image = "${DOCKER_IMAGE}"
 
         auth {
-          username = "${NOMAD_REGISTRY_USERNAME}"
-          password = "${NOMAD_REGISTRY_PASSWORD}"
+          username       = "${NOMAD_REGISTRY_USERNAME}"
+          password       = "${NOMAD_REGISTRY_PASSWORD}"
           server_address = "${CI_REGISTRY}"
         }
       }
@@ -67,16 +110,33 @@ job "gtfs-feed" {
         FEED_URL = "http://gtfs.ovapi.nl/gtfs-nl.zip"
       }
     }
+  }
+
+  group "sweden" {
+    count = 1
+
+    ephemeral_disk {
+      size = 1000
+    }
 
     task "sweden" {
       driver = "docker"
+
+      template {
+        data        = <<EOH
+AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"{{.Address}}:{{.Port}}\"{{end}}]"
+EOH
+        destination = "services.env"
+        env         = true
+        change_mode = "restart"
+      }
 
       config {
         image = "${DOCKER_IMAGE}"
 
         auth {
-          username = "${NOMAD_REGISTRY_USERNAME}"
-          password = "${NOMAD_REGISTRY_PASSWORD}"
+          username       = "${NOMAD_REGISTRY_USERNAME}"
+          password       = "${NOMAD_REGISTRY_PASSWORD}"
           server_address = "${CI_REGISTRY}"
         }
       }
