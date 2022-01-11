@@ -17,11 +17,15 @@
   "x-tagGroups": [
     {
       "name": "Journeys",
-      "tags": ["journeys"]
+      "tags": [
+        "journeys"
+      ]
     },
     {
       "name": "Places",
-      "tags": ["places"]
+      "tags": [
+        "places"
+      ]
     }
   ],
   "tags": [
@@ -40,7 +44,9 @@
     "/places": {
       "get": {
         "summary": "List Places",
-        "tags": ["places"],
+        "tags": [
+          "places"
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -87,7 +93,9 @@
       ],
       "get": {
         "summary": "View Place",
-        "tags": ["places"],
+        "tags": [
+          "places"
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -119,7 +127,9 @@
     "/journeys/searches": {
       "post": {
         "summary": "New Journey Search",
-        "tags": ["journeys"],
+        "tags": [
+          "journeys"
+        ],
         "operationId": "post-journeys-searches",
         "responses": {
           "201": {
@@ -175,8 +185,10 @@
         }
       ],
       "get": {
-        "summary": "Your GET endpoint",
-        "tags": ["journeys"],
+        "summary": "View Journey Search",
+        "tags": [
+          "journeys"
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -199,6 +211,56 @@
         },
         "operationId": "get-journeys-searches-journey-search-id",
         "description": "View a previously created journey search."
+      }
+    },
+    "/journeys/searches/{journeySearchId}/journeys": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": "journeySearchId",
+          "in": "path",
+          "required": true,
+          "description": "JourneySearch resource identifier"
+        }
+      ],
+      "get": {
+        "summary": "List Journeys",
+        "tags": [
+          "journeys"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "minItems": 0,
+                      "items": {
+                        "$ref": "#/components/schemas/JourneyResource"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-journeys-searches-journey-search-id-journeys",
+        "description": "View journeys for a journey search."
       }
     },
     "/health": {
@@ -287,6 +349,42 @@
             "type": "string",
             "enum": [
               "places"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "JourneyResource": {
+        "title": "JourneyResource",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/JourneyResourceIdentifier"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "attributes": {
+                "type": "object"
+              }
+            }
+          }
+        ]
+      },
+      "JourneyResourceIdentifier": {
+        "title": "JourneyResourceIdentifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "journeys"
             ]
           }
         },

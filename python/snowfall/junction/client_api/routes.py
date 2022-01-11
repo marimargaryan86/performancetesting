@@ -106,6 +106,34 @@ class JourneySearches(endpoints.HTTPEndpoint):
         )
 
 
+class Journeys(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        journey_search_repository: journeys.JourneySearchRepository = lagom.injectable,
+    ) -> responses.Response:
+        journey_search_id = uuid.UUID(request.path_params["journeySearchId"])
+
+        try:
+            await journey_search_repository.get(journey_search_id)
+        except journeys.NotFoundError:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+        return models.JsonApiResponse(
+            models.Body(
+                data=[
+                    await journeys.JourneyResource.from_data_class(
+                        journey=journeys.Journey(
+                            identifier=uuid.UUID(
+                                "9ecd1767-3f8f-4dfe-8782-5880ff89df19",
+                            ),
+                        ),
+                    ),
+                ],
+            ),
+        )
+
+
 class Health(endpoints.HTTPEndpoint):
     async def get(self, request: requests.Request) -> responses.Response:
         return models.JsonApiResponse(models.Body(meta={"status": "ok"}))

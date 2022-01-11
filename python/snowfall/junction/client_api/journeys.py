@@ -16,6 +16,24 @@ class NotFoundError(Exception):
 
 
 @dataclasses.dataclass(frozen=True)
+class Journey(object):
+    identifier: uuid.UUID
+
+
+class JourneyResource(models.Resource):
+    @classmethod
+    async def from_data_class(
+        cls,
+        journey: Journey,
+    ) -> JourneyResource:
+        return cls(
+            id=str(journey.identifier),
+            type="journeys",
+            attributes={},
+        )
+
+
+@dataclasses.dataclass(frozen=True)
 class JourneySearch(object):
     identifier: uuid.UUID
     expires_at: datetime.datetime

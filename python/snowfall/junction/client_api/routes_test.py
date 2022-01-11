@@ -159,3 +159,44 @@ class TestJourneys(object):
             "/journeys/searches/{id}".format(id=str(uuid.uuid4())),
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    async def test_missing_journeys_by_search_returns_not_found(
+        self,
+        client: testclient.TestClient,
+    ) -> None:
+        response = client.get(
+            "/journeys/searches/{id}/journeys".format(id=str(uuid.uuid4())),
+        )
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    async def test_malformed_uuid_returns_bad_request(
+        self,
+        client: testclient.TestClient,
+    ) -> None:
+        response = client.get(
+            "/journeys/searches/{id}/journeys".format(id="foo"),
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    async def test_journeys_are_found(
+        self,
+        journey_search_repository: journeys.JourneySearchRepository,
+        places_client: places.Client,
+        client: testclient.TestClient,
+    ) -> None:
+        journey_search = await journey_search_repository.create(
+            journeys.JourneySearchRequest(
+                origin=await places_client.get(
+                    uuid.UUID(conftest.PLACES[0]["id"]),
+                ),
+                destination=await places_client.get(
+                    uuid.UUID(conftest.PLACES[1]["id"]),
+                ),
+            ),
+        )
+        identifier = "9ecd1767-3f8f-4dfe-8782-5880ff89df19"
+        response = client.get(
+            "/journeys/searches/{id}/journeys".format(id=journey_search.identifier),
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()["data"][0]["id"] == identifier

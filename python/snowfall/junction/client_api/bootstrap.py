@@ -51,6 +51,11 @@ def create_app(
             routes.JourneySearch,
             name="ViewJourneySearch",
         ),
+        dependencies.route(
+            "/journeys/searches/{journeySearchId}/journeys",
+            routes.Journeys,
+            name="ViewJourneys",
+        ),
     ]
     custom_middlewares = [
         middleware.Middleware(middlewares.ValidationMiddleware, validator=validator),
