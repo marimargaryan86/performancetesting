@@ -1,13 +1,13 @@
 job "client-api" {
   datacenters = ["junction-dev-dc1"]
-  type = "service"
+  type        = "service"
 
   update {
-    max_parallel = 1
-    auto_revert = true
-    auto_promote = true
-    canary = 1
-    healthy_deadline = "30s"
+    max_parallel      = 1
+    auto_revert       = true
+    auto_promote      = true
+    canary            = 1
+    healthy_deadline  = "30s"
     progress_deadline = "2m"
   }
 
@@ -21,7 +21,12 @@ job "client-api" {
     service {
       name = "client-api"
       port = "http"
-      tags = ["http"]
+      tags = [
+        "http",
+        "traefik.enable=true",
+        "traefik.http.routers.client-api.entrypoints=websecure",
+        "traefik.http.routers.client-api.rule=Host(`api.junction.dev`)",
+      ]
 
       check {
         type     = "http"
@@ -35,11 +40,11 @@ job "client-api" {
       driver = "docker"
 
       template {
-        data = <<EOH
+        data        = <<EOH
 PLACES_ADDRESS="[{{range $index, $service := service "grpc.places"}}{{if ne $index 0}},{{end}}\"{{.Address}}:{{.Port}}\"{{end}}]"
 EOH
         destination = "services.env"
-        env = true
+        env         = true
         change_mode = "restart"
       }
 
@@ -48,15 +53,15 @@ EOH
         ports = ["http"]
 
         auth {
-          username = "${NOMAD_REGISTRY_USERNAME}"
-          password = "${NOMAD_REGISTRY_PASSWORD}"
+          username       = "${NOMAD_REGISTRY_USERNAME}"
+          password       = "${NOMAD_REGISTRY_PASSWORD}"
           server_address = "${CI_REGISTRY}"
         }
       }
 
       env {
         HTTP_ADDRESS = "0.0.0.0"
-        HTTP_PORT = "${NOMAD_PORT_http}"
+        HTTP_PORT    = "${NOMAD_PORT_http}"
       }
     }
   }
