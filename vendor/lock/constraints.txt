@@ -1,7 +1,6 @@
 aiocsv==1.2.1; python_version >= "3.6" and python_version < "4"
 aiofiles==0.8.0; python_version >= "3.6" and python_version < "4.0"
 aiormq==6.1.1; python_version >= "3.6"
-amqp==5.0.9; python_version >= "3.7"
 anyio==3.5.0; python_full_version >= "3.6.2" and python_version >= "3.6"
 asgiref==3.4.1; python_version >= "3.6"
 atomicwrites==1.4.0; python_version >= "3.6" and python_full_version < "3.0.0" and sys_platform == "win32" or sys_platform == "win32" and python_version >= "3.6" and python_full_version >= "3.4.0"
@@ -27,7 +26,6 @@ idna==3.3; python_version >= "3.5" and python_full_version < "3.0.0" or python_f
 iniconfig==1.1.1; python_version >= "3.6"
 isodate==0.6.1; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
 jsonschema==4.4.0; python_version >= "3.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.7" or python_full_version >= "3.6.2" and python_full_version < "4.0.0" and (python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0") and python_version >= "3.7"
-kombu==5.2.3; python_version >= "3.7"
 lagom==1.7.0; python_version >= "3.6" and python_version < "4.0"
 lazy-object-proxy==1.7.1; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.6"
 more-itertools==8.12.0; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.5"
@@ -75,7 +73,6 @@ typing-extensions==4.0.1; python_version >= "3.6" and python_full_version >= "3.
 urllib3==1.26.8; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version < "4" or python_full_version >= "3.6.0" and python_version < "4"
 uvicorn==0.15.0
 uvloop==0.16.0; sys_platform != "win32" and sys_platform != "cygwin" and platform_python_implementation != "PyPy" and python_version >= "3.7"
-vine==5.0.0; python_version >= "3.7"
 watchgod==0.7; python_version >= "3.5"
 websockets==10.1; python_version >= "3.7"
 werkzeug==2.0.2; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.6"

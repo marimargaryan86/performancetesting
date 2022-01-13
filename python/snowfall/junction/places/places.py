@@ -1,35 +1,25 @@
-import dataclasses
-import uuid
+from typing import AsyncIterator
 
-_PLACES = (
-    "f236a92c-4cfa-468e-85ef-431d25dcd925",
-    "488a836d-ec22-439b-a9d8-3c4c386a731e",
-)
+from pymongo import results
 
-
-@dataclasses.dataclass(frozen=True)
-class Place(object):
-    identifier: uuid.UUID
+from snowfall.common.v1alpha.models_pb2 import Place
+from snowfall.persistence.mongo import ProtoRepository
 
 
-class NotFoundError(Exception):
-    """Raised when a place is not found."""
+class PlaceRepository(ProtoRepository[Place]):
+    async def find(self) -> AsyncIterator[Place]:
+        async for place in self._execute_cursor(self._collection.find):
+            yield self._unmarshal(place)
 
+    async def upsert(self, resource: Place) -> bool:
+        update_result: results.UpdateResult = await self._execute(
+            self._collection.update_one,
+            filter={"_id": resource.id},
+            update={"$set": self._marshal(resource)},
+            upsert=True,
+        )
 
-class PlaceRepository(object):
-    def __init__(self) -> None:
-        self._places = {
-            place: Place(
-                identifier=uuid.UUID(place),
-            )
-            for place in _PLACES
-        }
+        return update_result.acknowledged
 
-    async def get(self, place_id: uuid.UUID) -> Place:
-        try:
-            return self._places[str(place_id)]
-        except KeyError:
-            raise NotFoundError("Place with ID '{id}' not found.".format(id=place_id))
-
-    async def find(self) -> list[Place]:
-        return list(self._places.values())
+    def _new_model(self) -> Place:
+        return Place()

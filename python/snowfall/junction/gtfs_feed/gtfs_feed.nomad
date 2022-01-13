@@ -22,7 +22,7 @@ job "gtfs-feed" {
 
         template {
           data        = <<EOH
-AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"amqp://{{.Address}}:{{.Port}}//\"{{end}}]"
+AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}\"{{end}}]"
 EOH
           destination = "services.env"
           env         = true
@@ -37,7 +37,8 @@ EOH
       }
 
       env {
-        FEED_URL = "https://gtfs.irail.be/nmbs/gtfs/latest.zip"
+        FEED_URL   = "https://gtfs.irail.be/nmbs/gtfs/latest.zip"
+        SENTRY_DSN = "https://d86394991a184238865125d76e464d6d@sentry.snowfall.se/21"
       }
     }
   }
@@ -54,7 +55,7 @@ EOH
 
       template {
         data        = <<EOH
-AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"amqp://{{.Address}}:{{.Port}}//\"{{end}}]"
+AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}\"{{end}}]"
 EOH
         destination = "services.env"
         env         = true
@@ -72,7 +73,8 @@ EOH
       }
 
       env {
-        FEED_URL = "http://www.rejseplanen.info/labs/GTFS.zip"
+        FEED_URL   = "http://www.rejseplanen.info/labs/GTFS.zip"
+        SENTRY_DSN = "https://d86394991a184238865125d76e464d6d@sentry.snowfall.se/21"
       }
     }
   }
@@ -89,7 +91,7 @@ EOH
 
       template {
         data        = <<EOH
-AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"amqp://{{.Address}}:{{.Port}}//\"{{end}}]"
+AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}\"{{end}}]"
 EOH
         destination = "services.env"
         env         = true
@@ -107,7 +109,8 @@ EOH
       }
 
       env {
-        FEED_URL = "http://gtfs.ovapi.nl/gtfs-nl.zip"
+        FEED_URL   = "http://gtfs.ovapi.nl/gtfs-nl.zip"
+        SENTRY_DSN = "https://d86394991a184238865125d76e464d6d@sentry.snowfall.se/21"
       }
     }
   }
@@ -124,7 +127,7 @@ EOH
 
       template {
         data        = <<EOH
-AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"amqp://{{.Address}}:{{.Port}}//\"{{end}}]"
+AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}\"{{end}}]"
 EOH
         destination = "services.env"
         env         = true
@@ -142,7 +145,8 @@ EOH
       }
 
       env {
-        FEED_URL = "https://transitfeeds.com/p/trafiklab/50/latest/download"
+        FEED_URL   = "https://transitfeeds.com/p/trafiklab/50/latest/download"
+        SENTRY_DSN = "https://d86394991a184238865125d76e464d6d@sentry.snowfall.se/21"
       }
     }
   }

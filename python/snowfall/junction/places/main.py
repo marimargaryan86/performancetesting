@@ -2,6 +2,7 @@ import random
 from typing import Sequence
 
 import aiormq
+from motor import motor_asyncio
 from pydantic import AnyUrl, BaseSettings
 from yarl import URL
 
@@ -16,15 +17,19 @@ from snowfall.transport.grpc import create_server
 class _GrpcSettings(BaseSettings):
     grpc_address: str = "[::]"
     grpc_port: int = 50051
+    mongo_dsn: Sequence[AnyUrl]
 
 
 class _ImportSettings(BaseSettings):
     amqp_dsn: Sequence[AnyUrl]
+    mongo_dsn: Sequence[AnyUrl]
 
 
 async def _import(_: Service) -> None:
     settings = _ImportSettings()
+    mongo = motor_asyncio.AsyncIOMotorClient(random.choice(settings.mongo_dsn))  # nosec
     consumer = PlaceImportConsumer(
+        places=PlaceRepository(mongo.places.places),
         consumer=await create_consumer(
             connection=await aiormq.connect(
                 URL(random.choice(settings.amqp_dsn)),  # nosec
@@ -40,10 +45,11 @@ async def _import(_: Service) -> None:
 
 async def _serve(_: Service) -> None:
     settings = _GrpcSettings()
+    mongo = motor_asyncio.AsyncIOMotorClient(random.choice(settings.mongo_dsn))  # nosec
     server = create_server(
         settings.grpc_address,
         settings.grpc_port,
-        [PlacesService(PlaceRepository())],
+        [PlacesService(PlaceRepository(mongo.places.places))],
     )
 
     await server.start()
