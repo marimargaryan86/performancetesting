@@ -1,33 +1,13 @@
-import pytest
-from google.protobuf.message import Message as ProtobufMessage
 from google.protobuf.timestamp_pb2 import Timestamp
-from kombu import Message
 
-from snowfall.transport.amqp import Consumer, Producer, Serializer
+from snowfall.transport.amqp import Serializer
 
-seconds = 1639696695
-
-
-class _TestConsumer(Consumer):
-    def _process_message(self, body: ProtobufMessage, message: Message) -> None:
-        """Do nothing for now."""
-
-
-@pytest.mark.asyncio
-async def test_publish_consume_async() -> None:
-    producer = Producer.from_dsn("memory://", "foobar")
-    consumer = _TestConsumer.from_dsn("memory://", "foobar", "foobar", "foobar")
-    future = consumer.start()
-    message = Timestamp(seconds=seconds)
-
-    await producer.publish(message, "foobar")
-    await consumer.stop()
-    await future
+_seconds = 1639696695
 
 
 class TestSerializer(object):
     def test_serialize(self) -> None:
-        message = Timestamp(seconds=seconds)
+        message = Timestamp(seconds=_seconds)
         message_serialized = Serializer.serialize(message)
         assert isinstance(message_serialized, bytes)
 
@@ -38,4 +18,4 @@ class TestSerializer(object):
         )
         message = Serializer.deserialize(blob)
         assert isinstance(message, Timestamp)
-        assert message.seconds == seconds
+        assert message.seconds == _seconds

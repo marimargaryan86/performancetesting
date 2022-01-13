@@ -1,17 +1,13 @@
 from __future__ import annotations
 
-import asyncio
 import functools
-from abc import ABC, abstractmethod
-from concurrent import futures
-from typing import List, Type, Union
+from asyncio import Event
+from typing import Callable, Coroutine, Type, Union, cast
 
+from aiormq import abc
 from google.protobuf import any_pb2, symbol_database
 from google.protobuf.message import Message as ProtobufMessage
-from kombu import Connection
-from kombu import Consumer as KombuConsumer
-from kombu import Exchange, Message, Queue, connection, mixins, pools, serialization
-from kombu.transport.base import StdChannel
+from pamqp import commands
 
 
 class Serializer(object):
@@ -44,105 +40,140 @@ class Serializer(object):
         return unpacked_message
 
 
-serialization.register(
-    name="protobuf",
-    encoder=Serializer.serialize,
-    decoder=Serializer.deserialize,
-    content_type="application/x-protobuf",
-    content_encoding="binary",
-)
-
-
 class Producer(object):
-    def __init__(self, pool: pools.ProducerPool, exchange: Exchange):
-        self._exchange = exchange
-        self._pool = pool
-
-    @classmethod
-    def from_dsn(cls, dsn: str, exchange_name: str) -> Producer:
-        return cls(
-            pool=pools.producers[Connection(dsn)],
-            exchange=Exchange(exchange_name, type="topic"),
-        )
+    def __init__(
+        self,
+        channel: abc.AbstractChannel,
+        exchange_name: str,
+    ):
+        self._channel = channel
+        self._exchange_name = exchange_name
 
     async def publish(self, message: ProtobufMessage, routing_key: str) -> None:
-        loop = asyncio.get_running_loop()
-
-        with futures.ThreadPoolExecutor() as pool:
-            await loop.run_in_executor(
-                pool,
-                functools.partial(self._publish, message, routing_key),
-            )
-
-    def _publish(self, message: ProtobufMessage, routing_key: str) -> None:
-        with self._pool.acquire(block=True) as producer:
-            producer.publish(
-                message,
-                exchange=self._exchange,
-                routing_key=routing_key,
-                declare=[self._exchange],
-                retry=True,
-                serializer="protobuf",
-            )
-
-
-class Consumer(ABC, mixins.ConsumerMixin):
-    def __init__(self, pool: connection.ConnectionPool, queue: Queue):
-        self.connection = pool.acquire(block=True)
-        self._queue = queue
-
-    @classmethod
-    def from_dsn(
-        cls,
-        dsn: str,
-        exchange_name: str,
-        queue_name: str,
-        routing_key: str,
-    ) -> Consumer:
-        return cls(
-            pool=pools.connections[Connection(dsn)],
-            queue=Queue(
-                name=queue_name,
-                exchange=Exchange(exchange_name, "topic"),
-                routing_key=routing_key,
-            ),
+        await self._channel.basic_publish(
+            body=Serializer.serialize(message),
+            exchange=self._exchange_name,
+            routing_key=routing_key,
         )
 
-    async def start(self) -> None:
-        loop = asyncio.get_running_loop()
 
-        with futures.ThreadPoolExecutor() as pool:
-            await loop.run_in_executor(pool, self.run)
+async def create_producer(
+    connection: abc.AbstractConnection,
+    exchange_name: str,
+    exchange_type: str = "topic",
+) -> Producer:
+    channel = await connection.channel()
 
-    async def stop(self) -> None:
-        self.should_stop = True
+    await channel.exchange_declare(
+        exchange=exchange_name,
+        exchange_type=exchange_type,
+        durable=True,
+    )
 
-    def get_consumers(
+    return Producer(channel, exchange_name)
+
+
+class Message(object):
+    def __init__(self, message: abc.DeliveredMessage):
+        self._acknowledged = False
+        self._message = message
+
+    async def ack(self) -> None:
+        if self._acknowledged:
+            raise RuntimeError("message already acknowledged")
+
+        delivery = cast(commands.Basic.Deliver, self._message.delivery)
+
+        await self._message.channel.basic_ack(cast(int, delivery.delivery_tag))
+
+        self._acknowledged = True
+
+    @property
+    def acknowledged(self) -> bool:
+        return self._acknowledged
+
+    @property
+    def body(self) -> ProtobufMessage:
+        return Serializer.deserialize(self._message.body)
+
+    async def nack(self) -> None:
+        if self._acknowledged:
+            raise RuntimeError("message already acknowledged")
+
+        delivery = cast(commands.Basic.Deliver, self._message.delivery)
+
+        await self._message.channel.basic_nack(cast(int, delivery.delivery_tag))
+
+        self._acknowledged = True
+
+
+ConsumerCallback = Callable[[Message], Coroutine[None, None, None]]
+
+
+class Consumer(object):
+    def __init__(
         self,
-        consumer: Type[KombuConsumer],
-        channel: StdChannel,
-    ) -> List[KombuConsumer]:
-        return [
-            consumer(
-                queues=[self._queue],
-                callbacks=[self._handle_message],
-                no_ack=False,
-                accept=["protobuf"],
-            ),
-        ]
+        channel: abc.AbstractChannel,
+        queue_name: str,
+    ):
+        self._channel = channel
+        self._queue_name = queue_name
 
-    def _handle_message(self, body: ProtobufMessage, message: Message) -> None:
-        try:
-            self._process_message(body, message)
-        except Exception:  # noqa: PIE786
-            # todo: log
+    async def consume(self, callback: ConsumerCallback) -> None:
+        await self._channel.basic_consume(
+            self._queue_name,
+            self._decorate_callback(callback),
+        )
 
-            if not message.acknowledged:
-                message.reject()
-        else:
-            if not message.acknowledged:
-                message.ack()
+        # basic_consume() doesn't block while it consumes
+        await Event().wait()
 
-    @abstractmethod
-    def _process_message(self, body: ProtobufMessage, message: Message) -> None:
-        raise NotImplementedError
+    def _decorate_callback(
+        self,
+        callback: ConsumerCallback,
+    ) -> abc.ConsumerCallback:
+        @functools.wraps(callback)
+        async def decorator(message: abc.DeliveredMessage) -> None:
+            msg = Message(message)
+
+            try:
+                await callback(msg)
+            except Exception:  # noqa: PIE786
+                # todo: log
+
+                if not msg.acknowledged:
+                    await msg.nack()
+            else:
+                if not msg.acknowledged:
+                    await msg.ack()
+
+        return decorator
+
+
+async def create_consumer(
+    connection: abc.AbstractConnection,
+    exchange_name: str,
+    queue_name: str,
+    routing_key: str,
+    exchange_type: str = "topic",
+) -> Consumer:
+    channel = await connection.channel()
+
+    await channel.exchange_declare(
+        exchange=exchange_name,
+        exchange_type=exchange_type,
+        durable=True,
+    )
+
+    await channel.queue_declare(
+        queue=queue_name,
+        durable=True,
+    )
+
+    await channel.queue_bind(
+        queue=queue_name,
+        exchange=exchange_name,
+        routing_key=routing_key,
+    )
+
+    return Consumer(channel, queue_name)

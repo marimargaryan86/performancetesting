@@ -6,10 +6,12 @@ import zipfile
 from typing import Sequence
 
 import aiofiles
+import aiormq
 from pydantic import AnyUrl, BaseSettings
+from yarl import URL
 
 from snowfall.junction.gtfs_feed.gtfs import fetch, unzip_stops
-from snowfall.transport.amqp import Producer
+from snowfall.transport.amqp import Producer, create_producer
 
 _NAMESPACE = uuid.UUID("5190984e-4ab7-411e-96f6-2848cc5d63e1")
 
@@ -21,7 +23,10 @@ class _Settings(BaseSettings):
 
 async def _main() -> None:
     settings = _Settings()
-    producer = Producer.from_dsn(random.choice(settings.amqp_dsn), "places")  # nosec
+    producer = await create_producer(
+        connection=await aiormq.connect(URL(random.choice(settings.amqp_dsn))),  # nosec
+        exchange_name="places",
+    )
     namespace = uuid.uuid5(_NAMESPACE, settings.feed_url)
 
     async with aiofiles.tempfile.TemporaryDirectory() as tempdir:  # type: ignore[attr-defined]

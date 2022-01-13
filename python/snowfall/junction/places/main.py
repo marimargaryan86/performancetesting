@@ -1,12 +1,15 @@
 import random
 from typing import Sequence
 
+import aiormq
 from pydantic import AnyUrl, BaseSettings
+from yarl import URL
 
 from snowfall.junction.places.consumer import PlaceImportConsumer
 from snowfall.junction.places.grpc import PlacesService
 from snowfall.junction.places.places import PlaceRepository
 from snowfall.service import Service, Task, make_service
+from snowfall.transport.amqp import create_consumer
 from snowfall.transport.grpc import create_server
 
 
@@ -21,14 +24,18 @@ class _ImportSettings(BaseSettings):
 
 async def _import(_: Service) -> None:
     settings = _ImportSettings()
-    consumer = PlaceImportConsumer.from_dsn(
-        dsn=random.choice(settings.amqp_dsn),  # nosec
-        exchange_name="places",
-        queue_name="importer",
-        routing_key="place.import",
+    consumer = PlaceImportConsumer(
+        consumer=await create_consumer(
+            connection=await aiormq.connect(
+                URL(random.choice(settings.amqp_dsn)),  # nosec
+            ),
+            exchange_name="places",
+            queue_name="importer",
+            routing_key="place.import",
+        ),
     )
 
-    await consumer.start()
+    await consumer.consume()
 
 
 async def _serve(_: Service) -> None:

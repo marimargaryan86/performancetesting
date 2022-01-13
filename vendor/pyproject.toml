@@ -19,6 +19,7 @@ authors = ["Snowfall Limited <info@snowfalltravel.com>"]
 python = "3.9.9"
 aiocsv = "^1.2.1"
 aiofiles = "^0.8.0"
+aiormq = "^6.1.1"
 grpcio = "^1.38.0"
 grpcio-health-checking = "^1.38.0"
 grpcio-reflection = "^1.38.0"
