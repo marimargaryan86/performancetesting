@@ -2,7 +2,7 @@ aiocsv==1.2.1; python_version >= "3.6" and python_version < "4"
 aiofiles==0.8.0; python_version >= "3.6" and python_version < "4.0"
 aiormq==6.1.1; python_version >= "3.6"
 amqp==5.0.9; python_version >= "3.7"
-anyio==3.4.0; python_full_version >= "3.6.2" and python_version >= "3.6"
+anyio==3.5.0; python_full_version >= "3.6.2" and python_version >= "3.6"
 asgiref==3.4.1; python_version >= "3.6"
 atomicwrites==1.4.0; python_version >= "3.6" and python_full_version < "3.0.0" and sys_platform == "win32" or sys_platform == "win32" and python_version >= "3.6" and python_full_version >= "3.4.0"
 attrs==21.4.0; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" or python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.6" or python_full_version >= "3.6.2" and python_full_version < "4.0.0" and (python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0") or python_full_version >= "3.6.2" and python_full_version < "4.0.0" and (python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0") and python_version >= "3.7"
@@ -26,11 +26,12 @@ hyperframe==6.0.1; python_version >= "3.6" and python_full_version >= "3.6.1"
 idna==3.3; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version >= "3.5" or python_version >= "3.6" or python_version >= "3.6" or python_full_version >= "3.6.2" and python_version >= "3.6"
 iniconfig==1.1.1; python_version >= "3.6"
 isodate==0.6.1; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
-jsonschema==4.3.3; python_version >= "3.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.7" or python_full_version >= "3.6.2" and python_full_version < "4.0.0" and (python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0") and python_version >= "3.7"
+jsonschema==4.4.0; python_version >= "3.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.7" or python_full_version >= "3.6.2" and python_full_version < "4.0.0" and (python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0") and python_version >= "3.7"
 kombu==5.2.3; python_version >= "3.7"
 lagom==1.7.0; python_version >= "3.6" and python_version < "4.0"
 lazy-object-proxy==1.7.1; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.6"
 more-itertools==8.12.0; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.5"
+motor==2.5.1; python_full_version >= "3.5.2"
 multidict==5.2.0; python_version >= "3.6"
 numpy==1.22.0; python_version >= "3.8"
 openapi-core==0.14.2; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")
@@ -40,9 +41,10 @@ packaging==21.3; python_version >= "3.6"
 pamqp==3.0.1; python_version >= "3.6"
 parse==1.19.0; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
 pluggy==1.0.0; python_version >= "3.6"
-protobuf==3.19.1; python_version >= "3.5"
+protobuf==3.19.3; python_version >= "3.5"
 py==1.11.0; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.6"
 pydantic==1.9.0; python_full_version >= "3.6.1"
+pymongo==3.12.3; python_full_version >= "3.5.2"
 pyparsing==3.0.6; python_version >= "3.6"
 pyrsistent==0.18.0; python_full_version >= "3.6.2" and python_full_version < "4.0.0" and (python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0") and python_version >= "3.7"
 pytest==6.2.5; python_version >= "3.6"
@@ -65,10 +67,10 @@ types-freezegun==1.1.6
 types-futures==3.3.2
 types-protobuf==3.19.0
 types-python-dateutil==2.8.6
-types-requests==2.27.5
+types-requests==2.27.6
 types-setuptools==57.4.7
 types-toml==0.10.3
-types-urllib3==1.26.3
+types-urllib3==1.26.6
 typing-extensions==4.0.1; python_version >= "3.6" and python_full_version >= "3.6.1"
 urllib3==1.26.8; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version < "4" or python_full_version >= "3.6.0" and python_version < "4"
 uvicorn==0.15.0

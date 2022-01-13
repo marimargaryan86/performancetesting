@@ -27,6 +27,7 @@ h3 = {extras = ["numpy"], version = "^3.7.3"}
 httpx = {extras = ["http2"], version = "^0.21.1"}
 kombu = "^5.2.2"
 lagom = "^1.7.0"
+motor = "^2.5.1"
 openapi-core = "^0.14.2"
 protobuf = "^3.17.3"
 pydantic = "^1.8.2"
