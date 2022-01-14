@@ -8,6 +8,7 @@ from aiormq import abc
 from google.protobuf import any_pb2, symbol_database
 from google.protobuf.message import Message as ProtobufMessage
 from pamqp import commands
+from structlog import get_logger
 
 
 class Serializer(object):
@@ -48,12 +49,20 @@ class Producer(object):
     ):
         self._channel = channel
         self._exchange_name = exchange_name
+        self._logger = get_logger(name=__name__)
 
     async def publish(self, message: ProtobufMessage, routing_key: str) -> None:
         await self._channel.basic_publish(
             body=Serializer.serialize(message),
             exchange=self._exchange_name,
             routing_key=routing_key,
+        )
+
+        self._logger.info(
+            "Message published.",
+            exchange=self._exchange_name,
+            routing_key=routing_key,
+            type=message.DESCRIPTOR.full_name,
         )
 
 
@@ -76,6 +85,7 @@ async def create_producer(
 class Message(object):
     def __init__(self, message: abc.DeliveredMessage):
         self._acknowledged = False
+        self._body = Serializer.deserialize(message.body)
         self._message = message
 
     async def ack(self) -> None:
@@ -94,7 +104,7 @@ class Message(object):
 
     @property
     def body(self) -> ProtobufMessage:
-        return Serializer.deserialize(self._message.body)
+        return self._body
 
     async def nack(self) -> None:
         if self._acknowledged:
@@ -105,6 +115,12 @@ class Message(object):
         await self._message.channel.basic_nack(cast(int, delivery.delivery_tag))
 
         self._acknowledged = True
+
+    @property
+    def routing_key(self) -> str:
+        delivery = cast(commands.Basic.Deliver, self._message.delivery)
+
+        return str(delivery.routing_key)
 
 
 ConsumerCallback = Callable[[Message], Coroutine[None, None, None]]
@@ -117,6 +133,7 @@ class Consumer(object):
         queue_name: str,
     ):
         self._channel = channel
+        self._logger = get_logger(name=__name__)
         self._queue_name = queue_name
 
     async def consume(self, callback: ConsumerCallback) -> None:
@@ -128,9 +145,8 @@ class Consumer(object):
         # basic_consume() doesn't block while it consumes
         await Event().wait()
 
-    @classmethod
     def _decorate_callback(
-        cls,
+        self,
         callback: ConsumerCallback,
     ) -> abc.ConsumerCallback:
         @functools.wraps(callback)
@@ -140,13 +156,20 @@ class Consumer(object):
             try:
                 await callback(msg)
             except Exception:  # noqa: PIE786
-                # todo: log
+                self._logger.exception()
 
                 if not msg.acknowledged:
                     await msg.nack()
             else:
                 if not msg.acknowledged:
                     await msg.ack()
+
+            self._logger.info(
+                "Message consumed.",
+                exchange=self._queue_name,
+                routing_key=msg.routing_key,
+                type=msg.body.DESCRIPTOR.full_name,
+            )
 
         return decorator
 

@@ -17,20 +17,20 @@ job "gtfs-feed" {
     task "belgium" {
       driver = "docker"
 
-      config {
-        image = "${DOCKER_IMAGE}"
-        args = [
-          "import",
-        ]
-
-        template {
+      template {
           data        = <<EOH
 AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}//\"{{end}}]"
 EOH
           destination = "services.env"
           env         = true
           change_mode = "restart"
-        }
+      }
+
+      config {
+        image = "${DOCKER_IMAGE}"
+        args = [
+          "import",
+        ]
 
         auth {
           username       = "${NOMAD_REGISTRY_USERNAME}"
