@@ -9,7 +9,7 @@ from yarl import URL
 from snowfall.junction.places.consumer import PlaceImportConsumer
 from snowfall.junction.places.grpc import PlacesService
 from snowfall.junction.places.places import PlaceRepository
-from snowfall.service import Service, Task, make_service
+from snowfall.service import RunnableService, Task, make_runnable_service
 from snowfall.transport.amqp import create_consumer
 from snowfall.transport.grpc import create_server
 
@@ -25,7 +25,7 @@ class _ImportSettings(BaseSettings):
     mongo_dsn: Sequence[AnyUrl]
 
 
-async def _import(_: Service) -> None:
+async def _import(_: RunnableService) -> None:
     settings = _ImportSettings()
     mongo = motor_asyncio.AsyncIOMotorClient(random.choice(settings.mongo_dsn))  # nosec
     consumer = PlaceImportConsumer(
@@ -43,7 +43,7 @@ async def _import(_: Service) -> None:
     await consumer.consume()
 
 
-async def _serve(_: Service) -> None:
+async def _serve(service: RunnableService) -> None:
     settings = _GrpcSettings()
     mongo = motor_asyncio.AsyncIOMotorClient(random.choice(settings.mongo_dsn))  # nosec
     server = create_server(
@@ -53,16 +53,17 @@ async def _serve(_: Service) -> None:
     )
 
     await server.start()
+    service.add_cleanup_task(server.stop(5))
     await server.wait_for_termination()
 
 
 if __name__ == "__main__":
-    service = make_service(
-        "places",
-        (
+    _service = make_runnable_service(
+        name="places",
+        tasks=(
             Task(command="grpc", method=_serve),
             Task(command="import", method=_import),
         ),
     )
 
-    service.run()
+    _service.run()

@@ -2,7 +2,7 @@ from grpc import aio
 from pydantic import BaseSettings
 
 from snowfall.junction.echo.v1 import echo_pb2, echo_pb2_grpc
-from snowfall.service import Service, Task, make_service
+from snowfall.service import RunnableService, Task, make_runnable_service
 from snowfall.transport import grpc
 
 
@@ -28,7 +28,7 @@ class _EchoService(grpc.Service, echo_pb2_grpc.EchoServiceServicer):
         )
 
 
-async def _serve(service: Service) -> None:
+async def _serve(service: RunnableService) -> None:
     settings = _Settings()
     server = grpc.create_server(
         settings.grpc_address,
@@ -41,5 +41,8 @@ async def _serve(service: Service) -> None:
 
 
 if __name__ == "__main__":
-    _service = make_service(name="echo", tasks=(Task(command="grpc", method=_serve),))
+    _service = make_runnable_service(
+        name="echo",
+        tasks=(Task(command="grpc", method=_serve),),
+    )
     _service.run()
