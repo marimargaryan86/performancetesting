@@ -19,6 +19,9 @@ job "gtfs-feed" {
 
       config {
         image = "${DOCKER_IMAGE}"
+        args = [
+          "import",
+        ]
 
         template {
           data        = <<EOH
@@ -64,6 +67,9 @@ EOH
 
       config {
         image = "${DOCKER_IMAGE}"
+        args = [
+          "import",
+        ]
 
         auth {
           username       = "${NOMAD_REGISTRY_USERNAME}"
@@ -100,6 +106,9 @@ EOH
 
       config {
         image = "${DOCKER_IMAGE}"
+        args = [
+          "import",
+        ]
 
         auth {
           username       = "${NOMAD_REGISTRY_USERNAME}"
@@ -136,6 +145,9 @@ EOH
 
       config {
         image = "${DOCKER_IMAGE}"
+        args = [
+          "import",
+        ]
 
         auth {
           username       = "${NOMAD_REGISTRY_USERNAME}"

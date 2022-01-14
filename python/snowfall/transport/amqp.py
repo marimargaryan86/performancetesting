@@ -128,8 +128,9 @@ class Consumer(object):
         # basic_consume() doesn't block while it consumes
         await Event().wait()
 
+    @classmethod
     def _decorate_callback(
-        self,
+        cls,
         callback: ConsumerCallback,
     ) -> abc.ConsumerCallback:
         @functools.wraps(callback)

@@ -11,7 +11,7 @@ from snowfall.service import make_service
 
 
 def _factory() -> applications.Starlette:
-    make_service(name="client_api")
+    make_service(name="client-api")
     patch.patch_open_api()
     settings = bootstrap.Settings()
 

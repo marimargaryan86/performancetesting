@@ -1,4 +1,3 @@
-import asyncio
 import os
 import random
 import uuid
@@ -11,6 +10,7 @@ from pydantic import AnyUrl, BaseSettings
 from yarl import URL
 
 from snowfall.junction.gtfs_feed.gtfs import fetch, unzip_stops
+from snowfall.service import Service, Task, make_service
 from snowfall.transport.amqp import Producer, create_producer
 
 _NAMESPACE = uuid.UUID("5190984e-4ab7-411e-96f6-2848cc5d63e1")
@@ -21,7 +21,7 @@ class _Settings(BaseSettings):
     feed_url: AnyUrl
 
 
-async def _main() -> None:
+async def _main(_: Service) -> None:
     settings = _Settings()
     producer = await create_producer(
         connection=await aiormq.connect(URL(random.choice(settings.amqp_dsn))),  # nosec
@@ -53,4 +53,9 @@ async def _process_places(
 
 
 if __name__ == "__main__":
-    asyncio.run(_main())
+    service = make_service(
+        "gtfs-feed",
+        (Task(command="import", method=_main),),
+    )
+
+    service.run()
