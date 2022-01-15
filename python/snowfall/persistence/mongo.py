@@ -72,6 +72,8 @@ class Repository(abc.ABC):
 
         cursor = query(*args, **kwargs)
 
+        cursor.limit(100)  # todo: implement proper pagination
+
         async for row in cursor:
             yield row
 

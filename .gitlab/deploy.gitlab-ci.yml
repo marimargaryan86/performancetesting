@@ -1,0 +1,21 @@
+stages:
+  - deploy
+
+.deploy:
+  stage: deploy
+  resource_group: deploy
+  image: git.snowfall.se:4567/junction/junction/pants:main
+  script:
+    - ./${CI_ENVIRONMENT_NAME}/deploy.sh "${CI_ENVIRONMENT_NAME}"
+  needs: []
+  tags:
+    - docker
+
+deploy-to-dev:
+  extends: .deploy
+  environment:
+    name: junction.dev
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      changes:
+        - junction.dev/**/*

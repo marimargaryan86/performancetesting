@@ -2,6 +2,7 @@ stages:
   - setup
   - test
   - package
+  - deploy
 
 variables:
   ARTIFACT_COMPRESSION_LEVEL: fastest
@@ -10,6 +11,7 @@ variables:
   GIT_STRATEGY: fetch
 
 include:
+  - local: .gitlab/nomad.gitlab-ci.yml
   - local: .gitlab/pants.gitlab-ci.yml
   - local: golang/.gitlab-ci.yml
   - local: openapi/.gitlab-ci.yml

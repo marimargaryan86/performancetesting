@@ -112,7 +112,23 @@ class Message(object):
 
         delivery = cast(commands.Basic.Deliver, self._message.delivery)
 
-        await self._message.channel.basic_nack(cast(int, delivery.delivery_tag))
+        await self._message.channel.basic_nack(
+            cast(int, delivery.delivery_tag),
+            requeue=False,
+        )
+
+        self._acknowledged = True
+
+    async def requeue(self) -> None:
+        if self._acknowledged:
+            raise RuntimeError("message already acknowledged")
+
+        delivery = cast(commands.Basic.Deliver, self._message.delivery)
+
+        await self._message.channel.basic_nack(
+            cast(int, delivery.delivery_tag),
+            requeue=True,
+        )
 
         self._acknowledged = True
 

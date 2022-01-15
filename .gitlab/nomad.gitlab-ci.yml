@@ -1,0 +1,28 @@
+nomad:validate:
+  stage: test
+  interruptible: true
+  image: "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"
+  script:
+    - find . -name '*.nomad' -exec nomad validate {} \;
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+      changes:
+        - "**/*.nomad"
+  needs:
+    - "pants:setup"
+  tags:
+    - docker
+
+nomad:deploy:
+  stage: deploy
+  interruptible: false
+  script:
+    - ./bash/push-deployables.sh junction.dev
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  needs:
+    - "pants:package"
+  tags:
+    - shell
