@@ -27,7 +27,7 @@ async def test_request_is_flattened() -> None:
                     },
                 },
             },
-            "type": "journey-searches",
+            "type": "trip-searches",
         },
     }
     expected = {

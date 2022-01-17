@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "client_api",
+    "title": "Junction Client API",
     "version": "1.0.0",
     "description": "Junction Client API",
     "contact": {
@@ -16,9 +16,15 @@
   },
   "x-tagGroups": [
     {
-      "name": "Journeys",
+      "name": "Bookings",
       "tags": [
-        "journeys"
+        "bookings"
+      ]
+    },
+    {
+      "name": "Offers",
+      "tags": [
+        "offers"
       ]
     },
     {
@@ -26,18 +32,34 @@
       "tags": [
         "places"
       ]
+    },
+    {
+      "name": "Trips",
+      "tags": [
+        "trips"
+      ]
     }
   ],
   "tags": [
     {
-      "name": "journeys",
-      "description": "A journey is between two places.",
-      "x-displayName": "Journeys"
+      "name": "bookings",
+      "description": "A booking of an offer.",
+      "x-displayName": "Bookings"
+    },
+    {
+      "name": "offers",
+      "description": "Offers are bookable suggestions for a trip.",
+      "x-displayName": "Offers"
     },
     {
       "name": "places",
       "description": "Places are usualy stops that you can travel between.",
       "x-displayName": "Places"
+    },
+    {
+      "name": "trips",
+      "description": "A trip is series of segments between two places.",
+      "x-displayName": "Trips"
     }
   ],
   "paths": {
@@ -82,13 +104,7 @@
     "/places/{placeId}": {
       "parameters": [
         {
-          "schema": {
-            "type": "string"
-          },
-          "name": "placeId",
-          "description": "Place resource identifier",
-          "in": "path",
-          "required": true
+          "$ref": "#/components/parameters/placeId"
         }
       ],
       "get": {
@@ -124,13 +140,118 @@
         "description": "View a place."
       }
     },
-    "/journeys/searches": {
-      "post": {
-        "summary": "New Journey Search",
+    "/trips/{tripId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/tripId"
+        }
+      ],
+      "get": {
+        "summary": "View Trip",
         "tags": [
-          "journeys"
+          "trips"
         ],
-        "operationId": "post-journeys-searches",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TripResource"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-trips-trip-id",
+        "description": "View a Trip. Not yet implemented."
+      }
+    },
+    "/trips/{tripId}/segments": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/tripId"
+        }
+      ],
+      "get": {
+        "summary": "List Segments by Trip",
+        "tags": [
+          "trips"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SegmentResource"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-trips-trip-id-segments",
+        "description": "Get cached prices for a trip. Not yet implemented. Not in scope."
+      }
+    },
+    "/trips/{tripId}/prices": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/tripId"
+        }
+      ],
+      "get": {
+        "summary": "List Prices by Trip",
+        "tags": [
+          "trips"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PriceResource"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-trips-trip-id-prices",
+        "description": "Get cached prices for a trip. Not yet implemented. Not in scope."
+      }
+    },
+    "/trips/searches": {
+      "post": {
+        "summary": "New Trip Search",
+        "tags": [
+          "trips"
+        ],
+        "operationId": "post-trips-searches",
         "responses": {
           "201": {
             "description": "Created",
@@ -140,7 +261,7 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/JourneySearchResource"
+                      "$ref": "#/components/schemas/TripSearchResource"
                     }
                   }
                 }
@@ -154,7 +275,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "description": "Make a new journey search.",
+        "description": "Make a new trip search.",
         "requestBody": {
           "content": {
             "application/vnd.api+json": {
@@ -162,32 +283,26 @@
                 "type": "object",
                 "properties": {
                   "data": {
-                    "$ref": "#/components/schemas/JourneySearchResource"
+                    "$ref": "#/components/schemas/TripSearchResource"
                   }
                 }
               }
             }
           }
         }
-      }
+      },
+      "parameters": []
     },
-    "/journeys/searches/{journeySearchId}": {
+    "/trips/searches/{tripSearchId}": {
       "parameters": [
         {
-          "schema": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": "journeySearchId",
-          "description": "JourneySearch resource identifier",
-          "in": "path",
-          "required": true
+          "$ref": "#/components/parameters/tripSearchId"
         }
       ],
       "get": {
-        "summary": "View Journey Search",
+        "summary": "View Trip Search",
         "tags": [
-          "journeys"
+          "trips"
         ],
         "responses": {
           "200": {
@@ -198,7 +313,7 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/JourneySearchResource"
+                      "$ref": "#/components/schemas/TripSearchResource"
                     }
                   }
                 }
@@ -209,27 +324,20 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-journeys-searches-journey-search-id",
-        "description": "View a previously created journey search."
+        "operationId": "get-trips-searches-trip-search-id",
+        "description": "View a previously created trip search."
       }
     },
-    "/journeys/searches/{journeySearchId}/journeys": {
+    "/trips/searches/{tripSearchId}/trips": {
       "parameters": [
         {
-          "schema": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": "journeySearchId",
-          "in": "path",
-          "required": true,
-          "description": "JourneySearch resource identifier"
+          "$ref": "#/components/parameters/tripSearchId"
         }
       ],
       "get": {
-        "summary": "List Journeys",
+        "summary": "List Trips by Trip Search",
         "tags": [
-          "journeys"
+          "trips"
         ],
         "responses": {
           "200": {
@@ -244,7 +352,7 @@
                       "uniqueItems": true,
                       "minItems": 0,
                       "items": {
-                        "$ref": "#/components/schemas/JourneyResource"
+                        "$ref": "#/components/schemas/TripResource"
                       }
                     }
                   },
@@ -259,8 +367,244 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-journeys-searches-journey-search-id-journeys",
-        "description": "View journeys for a journey search."
+        "operationId": "get-trips-searches-trip-search-id-trips",
+        "description": "View trips for a trip search."
+      }
+    },
+    "/offers/searches": {
+      "post": {
+        "summary": "New Offer Search",
+        "tags": [
+          "offers"
+        ],
+        "operationId": "post-offers-searches",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OfferSearchResource"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "description": "Make a new offer search.",
+        "requestBody": {
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/OfferSearchResource"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": []
+    },
+    "/offers/searches/{offerSearchId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/offerSearchId"
+        }
+      ],
+      "get": {
+        "summary": "View Offer Search",
+        "tags": [
+          "offers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OfferSearchResource"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-offers-searches-offer-search-id",
+        "description": "View a previously created offer search."
+      }
+    },
+    "/offers/searches/{offerSearchId}/offers": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/offerSearchId"
+        }
+      ],
+      "get": {
+        "summary": "List Offers by Offer Search",
+        "tags": [
+          "offers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "minItems": 0,
+                      "items": {
+                        "$ref": "#/components/schemas/OfferResource"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-offers-searches-offer-search-id-offers",
+        "description": "View offers for an offer search."
+      }
+    },
+    "/bookings": {
+      "post": {
+        "summary": "New Booking",
+        "tags": [
+          "bookings"
+        ],
+        "operationId": "post-bookings",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/BookingResource"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "description": "Make a new booking.",
+        "requestBody": {
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/BookingResource"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "List bookings",
+        "tags": [
+          "bookings"
+        ],
+        "operationId": "get-bookings",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/BookingResource"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "List all bookings."
+      }
+    },
+    "/bookings/{bookingId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/bookingId"
+        }
+      ],
+      "get": {
+        "summary": "View Booking",
+        "tags": [
+          "bookings"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/BookingResource"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-bookings-booking-id",
+        "description": "View a previously created booking."
       }
     },
     "/health": {
@@ -319,16 +663,26 @@
         "title": "Place Resource",
         "allOf": [
           {
-            "$ref": "#/components/schemas/PlaceResourceIdentifier"
-          },
-          {
             "type": "object",
             "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "places"
+                ]
+              },
               "attributes": {
                 "type": "object"
               }
             },
             "required": [
+              "id",
+              "type",
               "attributes"
             ]
           },
@@ -357,66 +711,25 @@
           "type"
         ]
       },
-      "JourneyResource": {
-        "title": "JourneyResource",
+      "SegmentResource": {
+        "title": "Segment Resource",
         "allOf": [
-          {
-            "$ref": "#/components/schemas/JourneyResourceIdentifier"
-          },
           {
             "type": "object",
             "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "segments"
+                ]
+              },
               "attributes": {
                 "type": "object"
-              }
-            }
-          }
-        ]
-      },
-      "JourneyResourceIdentifier": {
-        "title": "JourneyResourceIdentifier",
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "journeys"
-            ]
-          }
-        },
-        "required": [
-          "id",
-          "type"
-        ]
-      },
-      "JourneySearchResource": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/JourneySearchResourceIdentifier"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "attributes": {
-                "type": "object",
-                "required": [
-                  "expiresAt"
-                ],
-                "properties": {
-                  "expiresAt": {
-                    "type": "string",
-                    "format": "date-time",
-                    "readOnly": true
-                  },
-                  "departureAfter": {
-                    "type": "string",
-                    "format": "date-time"
-                  }
-                }
               },
               "relationships": {
                 "type": "object",
@@ -451,6 +764,9 @@
               }
             },
             "required": [
+              "id",
+              "type",
+              "attributes",
               "relationships"
             ]
           },
@@ -459,8 +775,8 @@
           }
         ]
       },
-      "JourneySearchResourceIdentifier": {
-        "title": "Journey Search Resource Identifier",
+      "SegmentResourceIdentifier": {
+        "title": "Segment Resource Identifier",
         "type": "object",
         "properties": {
           "id": {
@@ -470,10 +786,434 @@
           "type": {
             "type": "string",
             "enum": [
-              "journey-searches"
+              "segments"
             ]
           }
-        }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "TripResource": {
+        "title": "Trip Resource",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "trips"
+                ]
+              },
+              "attributes": {
+                "type": "object"
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "origin",
+                  "destination",
+                  "segments"
+                ],
+                "properties": {
+                  "origin": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/PlaceResourceIdentifier"
+                      }
+                    }
+                  },
+                  "destination": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/PlaceResourceIdentifier"
+                      }
+                    }
+                  },
+                  "segments": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/SegmentResourceIdentifier"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ]
+      },
+      "TripResourceIdentifier": {
+        "title": "Trip Resource Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "trips"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "TripSearchResource": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "trip-searches"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                  },
+                  "departureAfter": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "expiresAt"
+                ]
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "origin",
+                  "destination"
+                ],
+                "properties": {
+                  "origin": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/PlaceResourceIdentifier"
+                      }
+                    }
+                  },
+                  "destination": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/PlaceResourceIdentifier"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "title": "Trip Search Resource"
+      },
+      "PriceResource": {
+        "title": "Price Resource",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "prices"
+                ]
+              },
+              "attributes": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ]
+      },
+      "OfferResource": {
+        "title": "Offer Resource",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "offers"
+                ]
+              },
+              "attributes": {
+                "type": "object"
+              },
+              "relationships": {
+                "oneOf": [
+                  {
+                    "properties": {
+                      "trip": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "$ref": "#/components/schemas/TripResourceIdentifier"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "place": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "$ref": "#/components/schemas/PlaceResourceIdentifier"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ]
+      },
+      "OfferResourceIdentifier": {
+        "title": "Offer Resource Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "offers"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "OfferSearchResource": {
+        "title": "Offer Search Resource",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "offer-searches"
+            ]
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "radius": {
+                "type": "number"
+              }
+            }
+          },
+          "relationships": {
+            "oneOf": [
+              {
+                "properties": {
+                  "trip": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/TripResourceIdentifier"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "trip"
+                ]
+              },
+              {
+                "properties": {
+                  "place": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/PlaceResourceIdentifier"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "place"
+                ]
+              }
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ]
+      },
+      "BookingResource": {
+        "title": "Booking Resource",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "bookings"
+            ]
+          },
+          "attributes": {
+            "type": "object"
+          },
+          "relationships": {
+            "type": "object",
+            "required": [
+              "offers"
+            ],
+            "properties": {
+              "offers": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/OfferResourceIdentifier"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes",
+          "relationships"
+        ]
+      },
+      "SelfLink": {
+        "title": "Self Link",
+        "type": "object",
+        "properties": {
+          "links": {
+            "required": [
+              "self"
+            ],
+            "type": "object",
+            "properties": {
+              "self": {
+                "type": "string",
+                "readOnly": true
+              }
+            },
+            "readOnly": true
+          }
+        },
+        "required": [
+          "links"
+        ]
       },
       "Error": {
         "title": "Error",
@@ -502,28 +1242,6 @@
           "detail"
         ],
         "description": "JSON:API error"
-      },
-      "SelfLink": {
-        "title": "SelfLink",
-        "type": "object",
-        "properties": {
-          "links": {
-            "required": [
-              "self"
-            ],
-            "type": "object",
-            "properties": {
-              "self": {
-                "type": "string",
-                "readOnly": true
-              }
-            },
-            "readOnly": true
-          }
-        },
-        "required": [
-          "links"
-        ]
       }
     },
     "responses": {
@@ -572,6 +1290,57 @@
             }
           }
         }
+      }
+    },
+    "parameters": {
+      "tripSearchId": {
+        "name": "tripSearchId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "description": "Trip Search resource identifier"
+      },
+      "placeId": {
+        "name": "placeId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "description": "Place resource identifier"
+      },
+      "tripId": {
+        "name": "tripId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "description": "Trip resource identifier"
+      },
+      "offerSearchId": {
+        "name": "offerSearchId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "description": "Offer Search resource identifier"
+      },
+      "bookingId": {
+        "name": "bookingId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "description": "Booking resource identifier"
       }
     }
   }

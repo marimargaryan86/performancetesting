@@ -5,7 +5,7 @@ import pytest
 from starlette import status, testclient
 
 from snowfall.adapter import places
-from snowfall.junction.client_api import conftest, journeys
+from snowfall.junction.client_api import conftest, trips
 
 
 class TestHealth(object):
@@ -33,12 +33,12 @@ class TestPlaces(object):
 
 
 @pytest.mark.asyncio
-class TestJourneys(object):
-    async def test_malformed_journey_search_post_returns_bad_request(
+class TestTrips(object):
+    async def test_malformed_trip_search_post_returns_bad_request(
         self,
         client: testclient.TestClient,
     ) -> None:
-        response = client.post("/journeys/searches", json={"foo": "bar"})
+        response = client.post("/trips/searches", json={"foo": "bar"})
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @pytest.mark.parametrize(
@@ -46,6 +46,8 @@ class TestJourneys(object):
         [
             {
                 "data": {
+                    "type": "trip-searches",
+                    "attributes": {},
                     "relationships": {
                         "origin": {
                             "data": {
@@ -60,11 +62,12 @@ class TestJourneys(object):
                             },
                         },
                     },
-                    "type": "journey-searches",
                 },
             },
             {
                 "data": {
+                    "type": "trip-searches",
+                    "attributes": {},
                     "relationships": {
                         "origin": {
                             "data": {
@@ -79,7 +82,6 @@ class TestJourneys(object):
                             },
                         },
                     },
-                    "type": "journey-searches",
                 },
             },
         ],
@@ -90,13 +92,13 @@ class TestJourneys(object):
         client: testclient.TestClient,
     ) -> None:
         response = client.post(
-            "/journeys/searches",
+            "/trips/searches",
             json=query,
             headers={"Content-Type": "application/vnd.api+json"},
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    async def test_journey_search_post_returns_resource(
+    async def test_trip_search_post_returns_resource(
         self,
         client: testclient.TestClient,
     ) -> None:
@@ -120,24 +122,24 @@ class TestJourneys(object):
                         },
                     },
                 },
-                "type": "journey-searches",
+                "type": "trip-searches",
             },
         }
         response = client.post(
-            "/journeys/searches",
+            "/trips/searches",
             json=request,
             headers={"Content-Type": "application/vnd.api+json"},
         )
         assert response.status_code == status.HTTP_201_CREATED
 
-    async def test_created_journey_search_can_be_retrieved(
+    async def test_created_trip_search_can_be_retrieved(
         self,
-        journey_search_repository: journeys.JourneySearchRepository,
+        trip_search_repository: trips.TripSearchRepository,
         places_client: places.Client,
         client: testclient.TestClient,
     ) -> None:
-        journey_search = await journey_search_repository.create(
-            journeys.JourneySearchRequest(
+        trip_search = await trip_search_repository.create(
+            trips.TripSearchRequest(
                 origin=await places_client.get(
                     uuid.UUID(conftest.PLACES[0]["id"]),
                 ),
@@ -147,25 +149,25 @@ class TestJourneys(object):
             ),
         )
         response = client.get(
-            "/journeys/searches/{id}".format(id=str(journey_search.identifier)),
+            "/trips/searches/{id}".format(id=str(trip_search.identifier)),
         )
         assert response.status_code == status.HTTP_200_OK
 
-    async def test_missing_journey_search_returns_not_found(
+    async def test_missing_trip_search_returns_not_found(
         self,
         client: testclient.TestClient,
     ) -> None:
         response = client.get(
-            "/journeys/searches/{id}".format(id=str(uuid.uuid4())),
+            "/trips/searches/{id}".format(id=str(uuid.uuid4())),
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    async def test_missing_journeys_by_search_returns_not_found(
+    async def test_missing_trips_by_search_returns_not_found(
         self,
         client: testclient.TestClient,
     ) -> None:
         response = client.get(
-            "/journeys/searches/{id}/journeys".format(id=str(uuid.uuid4())),
+            "/trips/searches/{id}/trips".format(id=str(uuid.uuid4())),
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -174,18 +176,18 @@ class TestJourneys(object):
         client: testclient.TestClient,
     ) -> None:
         response = client.get(
-            "/journeys/searches/{id}/journeys".format(id="foo"),
+            "/trips/searches/{id}/trips".format(id="foo"),
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    async def test_journeys_are_found(
+    async def test_trips_are_found(
         self,
-        journey_search_repository: journeys.JourneySearchRepository,
+        trip_search_repository: trips.TripSearchRepository,
         places_client: places.Client,
         client: testclient.TestClient,
     ) -> None:
-        journey_search = await journey_search_repository.create(
-            journeys.JourneySearchRequest(
+        trip_search = await trip_search_repository.create(
+            trips.TripSearchRequest(
                 origin=await places_client.get(
                     uuid.UUID(conftest.PLACES[0]["id"]),
                 ),
@@ -196,7 +198,7 @@ class TestJourneys(object):
         )
         identifier = "9ecd1767-3f8f-4dfe-8782-5880ff89df19"
         response = client.get(
-            "/journeys/searches/{id}/journeys".format(id=journey_search.identifier),
+            "/trips/searches/{id}/trips".format(id=trip_search.identifier),
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.json()["data"][0]["id"] == identifier

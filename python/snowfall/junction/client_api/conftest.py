@@ -4,7 +4,7 @@ import pytest
 from starlette import applications, testclient
 
 from snowfall.adapter import places
-from snowfall.junction.client_api import bootstrap, journeys, loaders, patch, validation
+from snowfall.junction.client_api import bootstrap, loaders, patch, trips, validation
 from snowfall.logging import stdout
 
 stdout.configure_logger()
@@ -21,20 +21,20 @@ def places_client() -> places.Client:
 
 
 @pytest.fixture()
-def journey_search_repository() -> journeys.JourneySearchRepository:
-    return journeys.JourneySearchRepository()
+def trip_search_repository() -> trips.TripSearchRepository:
+    return trips.TripSearchRepository()
 
 
 def _create_app(
     validator: validation.Validator,
     places_client: places.Client,
-    journey_search_repository: journeys.JourneySearchRepository,
+    trip_search_repository: trips.TripSearchRepository,
 ) -> applications.Starlette:
     return bootstrap.create_app(
         validator=validator,
         dependencies=bootstrap.create_dependencies(
             places_client=places_client,
-            journey_search_repository=journey_search_repository,
+            trip_search_repository=trip_search_repository,
         ),
     )
 
@@ -42,7 +42,7 @@ def _create_app(
 @pytest.fixture()
 def app(
     places_client: places.Client,
-    journey_search_repository: journeys.JourneySearchRepository,
+    trip_search_repository: trips.TripSearchRepository,
 ) -> applications.Starlette:
     patch.patch_open_api()
 
@@ -52,7 +52,7 @@ def app(
             loaders.PkgLoader("client_api"),
         ),
         places_client=places_client,
-        journey_search_repository=journey_search_repository,
+        trip_search_repository=trip_search_repository,
     )
 
 
@@ -64,7 +64,7 @@ def client(app: applications.Starlette) -> testclient.TestClient:
 @pytest.fixture()
 def test_app(
     places_client: places.Client,
-    journey_search_repository: journeys.JourneySearchRepository,
+    trip_search_repository: trips.TripSearchRepository,
 ) -> applications.Starlette:
     patch.patch_open_api()
 
@@ -74,7 +74,7 @@ def test_app(
             loaders.FileLoader(),
         ),
         places_client=places_client,
-        journey_search_repository=journey_search_repository,
+        trip_search_repository=trip_search_repository,
     )
 
 

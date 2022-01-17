@@ -5,7 +5,7 @@ import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.adapter import places
-from snowfall.junction.client_api import journeys, models, request_helpers, resources
+from snowfall.junction.client_api import models, request_helpers, resources, trips
 
 
 class Place(endpoints.HTTPEndpoint):
@@ -42,35 +42,35 @@ class Places(endpoints.HTTPEndpoint):
         return models.JsonApiResponse(models.Body(data=resource_list))
 
 
-class JourneySearch(endpoints.HTTPEndpoint):
+class TripSearch(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        journey_search_repository: journeys.JourneySearchRepository = lagom.injectable,
+        trip_search_repository: trips.TripSearchRepository = lagom.injectable,
     ) -> responses.Response:
-        journey_search_id = uuid.UUID(request.path_params["journeySearchId"])
+        trip_search_id = uuid.UUID(request.path_params["tripSearchId"])
 
         try:
-            journey_search = await journey_search_repository.get(journey_search_id)
-        except journeys.NotFoundError:
+            trip_search = await trip_search_repository.get(trip_search_id)
+        except trips.NotFoundError:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
         return models.JsonApiResponse(
             models.Body(
-                data=await journeys.JourneySearchResource.from_data_class(
-                    journey_search,
+                data=await trips.TripSearchResource.from_data_class(
+                    trip_search,
                     request,
                 ),
             ),
         )
 
 
-class JourneySearches(endpoints.HTTPEndpoint):
+class TripSearches(endpoints.HTTPEndpoint):
     async def post(
         self,
         request: requests.Request,
         places_client: places.Client = lagom.injectable,
-        journey_search_repository: journeys.JourneySearchRepository = lagom.injectable,
+        trip_search_repository: trips.TripSearchRepository = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
 
@@ -84,8 +84,8 @@ class JourneySearches(endpoints.HTTPEndpoint):
         except places.NotFoundError:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
-        journey_search = await journey_search_repository.create(
-            journeys.JourneySearchRequest(
+        trip_search = await trip_search_repository.create(
+            trips.TripSearchRequest(
                 origin=origin,
                 destination=destination,
                 departure_after=body.get("departureAfter")
@@ -97,8 +97,8 @@ class JourneySearches(endpoints.HTTPEndpoint):
 
         return models.JsonApiResponse(
             models.Body(
-                data=await journeys.JourneySearchResource.from_data_class(
-                    journey_search,
+                data=await trips.TripSearchResource.from_data_class(
+                    trip_search,
                     request,
                 ),
             ),
@@ -106,24 +106,24 @@ class JourneySearches(endpoints.HTTPEndpoint):
         )
 
 
-class Journeys(endpoints.HTTPEndpoint):
+class Trips(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        journey_search_repository: journeys.JourneySearchRepository = lagom.injectable,
+        trip_search_repository: trips.TripSearchRepository = lagom.injectable,
     ) -> responses.Response:
-        journey_search_id = uuid.UUID(request.path_params["journeySearchId"])
+        trip_search_id = uuid.UUID(request.path_params["tripSearchId"])
 
         try:
-            await journey_search_repository.get(journey_search_id)
-        except journeys.NotFoundError:
+            await trip_search_repository.get(trip_search_id)
+        except trips.NotFoundError:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
         return models.JsonApiResponse(
             models.Body(
                 data=[
-                    await journeys.JourneyResource.from_data_class(
-                        journey=journeys.Journey(
+                    await trips.TripResource.from_data_class(
+                        trip=trips.Trip(
                             identifier=uuid.UUID(
                                 "9ecd1767-3f8f-4dfe-8782-5880ff89df19",
                             ),

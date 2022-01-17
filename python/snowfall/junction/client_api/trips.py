@@ -12,29 +12,32 @@ from snowfall.junction.client_api import models
 
 
 class NotFoundError(Exception):
-    """Raised when a journey resource is not found."""
+    """Raised when a trip resource is not found."""
 
 
 @dataclasses.dataclass(frozen=True)
-class Journey(object):
+class Trip(object):
     identifier: uuid.UUID
 
 
-class JourneyResource(models.Resource):
+class TripResource(models.Resource):
     @classmethod
     async def from_data_class(
         cls,
-        journey: Journey,
-    ) -> JourneyResource:
+        trip: Trip,
+    ) -> TripResource:
         return cls(
-            id=str(journey.identifier),
-            type="journeys",
+            id=str(trip.identifier),
+            type="trips",
             attributes={},
+            links={
+                "self": "/trips/{id}".format(id=trip.identifier),
+            },
         )
 
 
 @dataclasses.dataclass(frozen=True)
-class JourneySearch(object):
+class TripSearch(object):
     identifier: uuid.UUID
     expires_at: datetime.datetime
     origin: places.Place
@@ -42,7 +45,7 @@ class JourneySearch(object):
     departure_after: datetime.datetime
 
 
-class JourneySearchRequest(models.BaseModel):
+class TripSearchRequest(models.BaseModel):
     origin: places.Place
     destination: places.Place
     departure_after: datetime.datetime = pydantic.Field(
@@ -50,66 +53,66 @@ class JourneySearchRequest(models.BaseModel):
     )
 
 
-class JourneySearchResource(models.Resource):
+class TripSearchResource(models.Resource):
     @classmethod
     async def from_data_class(
         cls,
-        journey_search: JourneySearch,
+        trip_search: TripSearch,
         request: requests.Request,
-    ) -> JourneySearchResource:
+    ) -> TripSearchResource:
         return cls(
-            id=str(journey_search.identifier),
-            type="journey-searches",
+            id=str(trip_search.identifier),
+            type="trip-searches",
             attributes={
-                "expiresAt": journey_search.expires_at,
-                "departureAfter": journey_search.departure_after,
+                "expiresAt": trip_search.expires_at,
+                "departureAfter": trip_search.departure_after,
             },
             relationships={
                 "origin": {
                     "data": {
-                        "id": str(journey_search.origin.identifier),
+                        "id": str(trip_search.origin.identifier),
                         "type": "places",
                     },
                 },
                 "destination": {
                     "data": {
-                        "id": str(journey_search.destination.identifier),
+                        "id": str(trip_search.destination.identifier),
                         "type": "places",
                     },
                 },
             },
             links={
                 "self": request.url_for(
-                    "ViewJourneySearch",
-                    journeySearchId=journey_search.identifier,
+                    "ViewTripSearch",
+                    tripSearchId=trip_search.identifier,
                 ),
             },
         )
 
 
-class JourneySearchRepository(object):
+class TripSearchRepository(object):
     def __init__(self) -> None:
-        self._searches: dict[uuid.UUID, JourneySearch] = {}
+        self._searches: dict[uuid.UUID, TripSearch] = {}
 
     async def create(
         self,
-        journey_search_request: JourneySearchRequest,
-    ) -> JourneySearch:
+        trip_search_request: TripSearchRequest,
+    ) -> TripSearch:
         expires_at = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
             days=1,
         )
-        journey_search = JourneySearch(
+        trip_search = TripSearch(
             identifier=uuid.uuid4(),
             expires_at=expires_at,
-            origin=journey_search_request.origin,
-            destination=journey_search_request.destination,
-            departure_after=journey_search_request.departure_after,
+            origin=trip_search_request.origin,
+            destination=trip_search_request.destination,
+            departure_after=trip_search_request.departure_after,
         )
-        self._searches[journey_search.identifier] = journey_search
+        self._searches[trip_search.identifier] = trip_search
 
-        return journey_search
+        return trip_search
 
-    async def get(self, identifier: uuid.UUID) -> JourneySearch:
+    async def get(self, identifier: uuid.UUID) -> TripSearch:
         try:
             return self._searches[identifier]
         except KeyError:

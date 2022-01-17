@@ -5,7 +5,7 @@ import uvicorn
 from starlette import applications
 
 from snowfall.adapter import places
-from snowfall.junction.client_api import bootstrap, journeys, loaders, patch, validation
+from snowfall.junction.client_api import bootstrap, loaders, patch, trips, validation
 from snowfall.junction.places.v1alpha import places_pb2_grpc
 from snowfall.service import make_service
 
@@ -28,7 +28,7 @@ def _factory() -> applications.Starlette:
                     ),
                 ),
             ),
-            journey_search_repository=journeys.JourneySearchRepository(),
+            trip_search_repository=trips.TripSearchRepository(),
         ),
     )
 

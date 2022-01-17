@@ -5,3 +5,4 @@ extends:
 rules:
   oas3-api-servers: info
   api-home: info
+  operation-short-summary: hint
