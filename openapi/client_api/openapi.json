@@ -76,19 +76,26 @@
               "application/vnd.api+json": {
                 "schema": {
                   "description": "",
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "uniqueItems": true,
-                      "minItems": 0,
-                      "items": {
-                        "$ref": "#/components/schemas/PlaceResource"
-                      }
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "items": {
+                            "$ref": "#/components/schemas/PlaceResource"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
                     }
-                  },
-                  "required": [
-                    "data"
                   ]
                 },
                 "examples": {}
@@ -97,7 +104,15 @@
           }
         },
         "operationId": "get-places",
-        "description": "Returns a list of places."
+        "description": "Returns a list of places.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page[cursor]"
+          },
+          {
+            "$ref": "#/components/parameters/page[limit]"
+          }
+        ]
       },
       "parameters": []
     },
@@ -207,7 +222,15 @@
           }
         },
         "operationId": "get-trips-trip-id-segments",
-        "description": "Get cached prices for a trip. Not yet implemented. Not in scope."
+        "description": "Get cached prices for a trip. Not yet implemented. Not in scope.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page[cursor]"
+          },
+          {
+            "$ref": "#/components/parameters/page[limit]"
+          }
+        ]
       }
     },
     "/trips/{tripId}/prices": {
@@ -242,7 +265,15 @@
           }
         },
         "operationId": "get-trips-trip-id-prices",
-        "description": "Get cached prices for a trip. Not yet implemented. Not in scope."
+        "description": "Get cached prices for a trip. Not yet implemented. Not in scope.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page[cursor]"
+          },
+          {
+            "$ref": "#/components/parameters/page[limit]"
+          }
+        ]
       }
     },
     "/trips/searches": {
@@ -368,7 +399,15 @@
           }
         },
         "operationId": "get-trips-searches-trip-search-id-trips",
-        "description": "View trips for a trip search."
+        "description": "View trips for a trip search.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page[cursor]"
+          },
+          {
+            "$ref": "#/components/parameters/page[limit]"
+          }
+        ]
       }
     },
     "/offers/searches": {
@@ -494,7 +533,15 @@
           }
         },
         "operationId": "get-offers-searches-offer-search-id-offers",
-        "description": "View offers for an offer search."
+        "description": "View offers for an offer search.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page[cursor]"
+          },
+          {
+            "$ref": "#/components/parameters/page[limit]"
+          }
+        ]
       }
     },
     "/bookings": {
@@ -569,7 +616,15 @@
             }
           }
         },
-        "description": "List all bookings."
+        "description": "List all bookings.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page[cursor]"
+          },
+          {
+            "$ref": "#/components/parameters/page[limit]"
+          }
+        ]
       }
     },
     "/bookings/{bookingId}": {
@@ -677,7 +732,16 @@
                 ]
               },
               "attributes": {
-                "type": "object"
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "readOnly": true
+                  }
+                }
               }
             },
             "required": [
@@ -1215,6 +1279,29 @@
           "links"
         ]
       },
+      "NextLink": {
+        "title": "NextLink",
+        "type": "object",
+        "properties": {
+          "links": {
+            "type": "object",
+            "required": [
+              "next"
+            ],
+            "properties": {
+              "next": {
+                "type": "string",
+                "format": "uri",
+                "readOnly": true
+              }
+            },
+            "readOnly": true
+          }
+        },
+        "required": [
+          "links"
+        ]
+      },
       "Error": {
         "title": "Error",
         "type": "object",
@@ -1341,6 +1428,27 @@
           "type": "string"
         },
         "description": "Booking resource identifier"
+      },
+      "page[cursor]": {
+        "name": "page[cursor]",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "description": "Pagination cursor that defines your place in the list."
+      },
+      "page[limit]": {
+        "name": "page[limit]",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        },
+        "description": "A limit on the number of objects to be returned, between 1 and 100."
       }
     }
   }

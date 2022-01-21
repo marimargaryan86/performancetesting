@@ -22,17 +22,22 @@ class UnknownError(Exception):
 @dataclasses.dataclass(frozen=True)
 class Place(object):
     identifier: uuid.UUID
+    name: str
     proto: Optional[models_pb2.Place] = None
 
     @classmethod
     async def from_proto(cls, grpc_place: models_pb2.Place) -> Place:
-        return cls(identifier=uuid.UUID(grpc_place.id), proto=grpc_place)
+        return cls(
+            identifier=uuid.UUID(grpc_place.id),
+            name=grpc_place.name,
+            proto=grpc_place,
+        )
 
 
 @dataclasses.dataclass(frozen=True)
 class PlacesPage(object):
     places: Sequence[Place]
-    next_page_token: str
+    next_page_token: Optional[str] = None
 
     @classmethod
     async def from_proto(cls, grpc_places: places_pb2.ListPlacesResponse) -> PlacesPage:
@@ -48,7 +53,7 @@ class Client(object):
         """Fetch a place resource."""
 
     @abc.abstractmethod
-    async def find(self) -> PlacesPage:
+    async def find(self, limit: int, cursor: Optional[str] = None) -> PlacesPage:
         """Fetch all place resources."""
 
 
@@ -57,6 +62,7 @@ class DictClient(Client):
         self._places = {
             place["id"]: Place(
                 identifier=uuid.UUID(place["id"]),
+                name="Foobar",
             )
             for place in places
         }
@@ -67,9 +73,8 @@ class DictClient(Client):
         except KeyError:
             raise NotFoundError("Place with ID '{id}' not found.".format(id=place_id))
 
-    async def find(self) -> PlacesPage:
-        next_page = "next_page"
-        return PlacesPage(places=list(self._places.values()), next_page_token=next_page)
+    async def find(self, limit: int, cursor: Optional[str] = None) -> PlacesPage:
+        return PlacesPage(places=list(self._places.values()))
 
 
 class GrpcClient(Client):
@@ -91,9 +96,13 @@ class GrpcClient(Client):
 
         return await Place.from_proto(response.place)
 
-    async def find(self) -> PlacesPage:
+    async def find(self, limit: int, cursor: Optional[str] = None) -> PlacesPage:
+        # todo: handle INVALID_ARGUMENT
         response = await self._places.ListPlaces(  # type: ignore[misc]
-            places_pb2.ListPlacesRequest(),
+            places_pb2.ListPlacesRequest(
+                page_size=limit,
+                page_token=cursor or "",
+            ),
         )
 
         return await PlacesPage.from_proto(response)

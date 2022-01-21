@@ -16,7 +16,9 @@ class PlaceResource(models.Resource):
         return cls(
             id=str(place.identifier),
             type="places",
-            attributes={},
+            attributes={
+                "name": place.name,
+            },
             links={
                 "self": request.url_for(
                     "ViewPlace",

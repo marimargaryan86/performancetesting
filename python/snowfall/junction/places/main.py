@@ -15,6 +15,7 @@ from snowfall.transport.grpc import create_server
 
 
 class _GrpcSettings(BaseSettings):
+    default_page_size: int = 100
     grpc_address: str = "[::]"
     grpc_port: int = 50051
     mongo_dsn: Sequence[AnyUrl]
@@ -49,7 +50,12 @@ async def _serve(service: RunnableService) -> None:
     server = create_server(
         settings.grpc_address,
         settings.grpc_port,
-        [PlacesService(PlaceRepository(mongo.places.places))],
+        [
+            PlacesService(
+                PlaceRepository(mongo.places.places),
+                settings.default_page_size,
+            ),
+        ],
     )
 
     await server.start()

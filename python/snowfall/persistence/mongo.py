@@ -1,18 +1,51 @@
 import abc
 from copy import deepcopy
-from typing import Any, Callable, Coroutine, Generic, TypeVar
+from typing import Any, AsyncIterator, Callable, Coroutine, Generic, Optional, TypeVar
 
 import pymongo
 from google.protobuf.json_format import MessageToDict, ParseDict
 from google.protobuf.message import Message
 from motor import core, motor_asyncio
 
+from snowfall.common.v1alpha import models_pb2
+from snowfall.persistence import cursor
+
 _proto_id_key = "id"
 _mongo_id_key = "_id"
 
 
+Proto = TypeVar("Proto", bound=Message)
+
+
 class NotFoundError(RuntimeError):
     """Raised when a resource is not found."""
+
+
+class ResultSet(Generic[Proto]):
+    def __init__(
+        self,
+        cur: motor_asyncio.AsyncIOMotorCursor,
+        unmarshal: Callable[[dict[str, Any]], Proto],
+    ):
+        self._cursor = cur
+        self._last: Optional[str] = None
+        self._unmarshal = unmarshal
+
+        self._cursor.sort(_mongo_id_key, pymongo.ASCENDING)
+
+    async def cursor(self) -> Optional[models_pb2.Cursor]:
+        if not self._last:
+            return None
+
+        return cursor.new(self._last, "$gt")
+
+    async def records(self, limit: int) -> AsyncIterator[Proto]:
+        self._cursor.limit(limit)
+
+        async for record in self._cursor:
+            self._last = record[_mongo_id_key]
+
+            yield self._unmarshal(record)
 
 
 class Repository(abc.ABC):
@@ -60,26 +93,6 @@ class Repository(abc.ABC):
 
         return await query(*args, **kwargs)
 
-    async def _execute_cursor(
-        self,
-        query: Callable[[Any], motor_asyncio.AsyncIOMotorCursor],
-        *args: Any,
-        **kwargs: Any,
-    ) -> motor_asyncio.AsyncIOMotorCursor:
-        # todo: can't run this in __init__, but this isn't pretty...
-        if not self._has_created_indexes:
-            await self._create_indexes()
-
-        cursor = query(*args, **kwargs)
-
-        cursor.limit(100)  # todo: implement proper pagination
-
-        async for row in cursor:
-            yield row
-
-
-Proto = TypeVar("Proto", bound=Message)
-
 
 class ProtoRepository(Generic[Proto], Repository, abc.ABC):
     async def get_by_id(
@@ -95,6 +108,28 @@ class ProtoRepository(Generic[Proto], Repository, abc.ABC):
             raise NotFoundError()
 
         return self._unmarshal(msg)
+
+    async def _execute_cursor(
+        self,
+        query: Callable[[Any], motor_asyncio.AsyncIOMotorCursor],
+        cur: Optional[models_pb2.Cursor],
+        *args: Any,
+        **kwargs: Any,
+    ) -> ResultSet[Proto]:
+        # todo: can't run this in __init__, but this isn't pretty...
+        if not self._has_created_indexes:
+            await self._create_indexes()
+
+        if cur:
+            if not args:
+                args = ({},)
+
+            if _mongo_id_key not in args[0]:
+                args[0][_mongo_id_key] = {}
+
+            args[0][_mongo_id_key][cur.clause] = cur.id
+
+        return ResultSet[Proto](query(*args, **kwargs), self._unmarshal)
 
     @abc.abstractmethod
     def _new_model(self) -> Proto:

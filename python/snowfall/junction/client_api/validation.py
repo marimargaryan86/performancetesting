@@ -1,6 +1,8 @@
 import json
+from typing import Any
 
 import openapi_core
+from furl import furl
 from openapi_core.validation.request.datatypes import OpenAPIRequest, RequestParameters
 from openapi_core.validation.request.validators import RequestValidator
 from openapi_core.validation.response.datatypes import OpenAPIResponse
@@ -13,7 +15,11 @@ from snowfall.junction.client_api import loaders
 
 async def request_to_openapi(request: requests.Request) -> OpenAPIRequest:
     return OpenAPIRequest(
-        full_url_pattern=str(request.url),
+        full_url_pattern="{scheme}://{hostname}{path}".format(
+            scheme=request.url.scheme,
+            hostname=request.url.hostname,
+            path=request.url.path,
+        ),
         method=request.method.lower(),
         parameters=RequestParameters(
             query=request.query_params,
@@ -33,17 +39,33 @@ async def response_to_openapi(response: responses.Response) -> OpenAPIResponse:
     )
 
 
+class UriFormatter(object):
+    def validate(self, potential_url: Any) -> bool:
+        try:
+            self.unmarshal(potential_url)
+        except ValueError:
+            return False
+
+        return True
+
+    def unmarshal(self, url: Any) -> furl:
+        return furl(url)
+
+
 class Validator(object):
     def __init__(self, spec_path: str, loader: loaders.Loader):
         spec_dict = loader.load(spec_path)
         spec = openapi_core.create_spec(spec_dict)
         deserializer = {"application/vnd.api+json": json.loads}
+        formatter = {"uri": UriFormatter()}
         self._request_validator = RequestValidator(
             spec,
+            custom_formatters=formatter,
             custom_media_type_deserializers=deserializer,
         )
         self._response_validator = ResponseValidator(
             spec,
+            custom_formatters=formatter,
             custom_media_type_deserializers=deserializer,
         )
 

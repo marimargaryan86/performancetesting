@@ -2,10 +2,13 @@ import datetime
 import uuid
 
 import lagom
+from furl import furl
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.adapter import places
 from snowfall.junction.client_api import models, request_helpers, resources, trips
+
+_DEFAULT_PAGE_LIMIT = 20
 
 
 class Place(endpoints.HTTPEndpoint):
@@ -34,12 +37,26 @@ class Places(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: places.Client = lagom.injectable,
     ) -> responses.Response:
+        cursor = request.query_params.get("page[cursor]")
+        limit = int(request.query_params.get("page[limit]", _DEFAULT_PAGE_LIMIT))
+        response = await client.find(limit=limit, cursor=cursor)
         resource_list = [
             await resources.PlaceResource.from_data_class(place, request)
-            for place in (await client.find()).places
+            for place in response.places
         ]
 
-        return models.JsonApiResponse(models.Body(data=resource_list))
+        next_url = furl(request.url_for("ListPlaces"))
+        next_url.args["page[cursor]"] = response.next_page_token
+        next_url.args["page[limit]"] = limit
+
+        return models.JsonApiResponse(
+            models.Body(
+                data=resource_list,
+                links={
+                    "next": next_url.url,
+                },
+            ),
+        )
 
 
 class TripSearch(endpoints.HTTPEndpoint):

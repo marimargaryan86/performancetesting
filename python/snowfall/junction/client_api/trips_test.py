@@ -6,8 +6,8 @@ from snowfall.adapter import places
 from snowfall.junction.client_api import trips
 
 _TEST_TRIP = trips.TripSearchRequest(
-    origin=places.Place(identifier=uuid.uuid4()),
-    destination=places.Place(identifier=uuid.uuid4()),
+    origin=places.Place(identifier=uuid.uuid4(), name="foobar"),
+    destination=places.Place(identifier=uuid.uuid4(), name="bazqux"),
 )
 
 

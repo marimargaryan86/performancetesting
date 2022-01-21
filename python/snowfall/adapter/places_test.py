@@ -31,7 +31,7 @@ class TestDictClient(object):
 
     async def test_multiple_places_are_retrievable(self) -> None:
         client = places.DictClient(_PLACES)
-        found_places = await client.find()
+        found_places = await client.find(limit=100)
         assert len(found_places.places) == 2
         assert str(found_places.places[0].identifier) == _PLACES[0]["id"]
         assert str(found_places.places[1].identifier) == _PLACES[1]["id"]
@@ -93,7 +93,7 @@ class TestGrpcClient(object):
         stub = mock.create_autospec(places_pb2_grpc.PlacesServiceStub)
         stub.ListPlaces = mock.AsyncMock(return_value=response)
         client = places.GrpcClient(stub)
-        found_places = await client.find()
+        found_places = await client.find(limit=100)
         assert len(found_places.places) == 2
         assert str(found_places.places[0].identifier) == _PLACES[0]["id"]
         assert str(found_places.places[1].identifier) == _PLACES[1]["id"]

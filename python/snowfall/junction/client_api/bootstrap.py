@@ -39,7 +39,11 @@ def create_app(
 ) -> applications.Starlette:
     app_routes = [
         dependencies.route("/health", routes.Health),
-        dependencies.route("/places", routes.Places),
+        dependencies.route(
+            "/places",
+            routes.Places,
+            name="ListPlaces",
+        ),
         dependencies.route(
             "/places/{placeId}",
             routes.Place,

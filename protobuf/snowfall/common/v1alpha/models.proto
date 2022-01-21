@@ -2,6 +2,12 @@ syntax = "proto3";
 
 package snowfall.common.v1alpha;
 
+message Cursor {
+  string id = 1;
+  string clause = 2;
+  string digest = 3;
+}
+
 message Place {
   string id = 1;
   uint64 h3_index = 2;
