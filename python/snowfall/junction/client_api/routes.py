@@ -144,6 +144,10 @@ class Trips(endpoints.HTTPEndpoint):
                             identifier=uuid.UUID(
                                 "9ecd1767-3f8f-4dfe-8782-5880ff89df19",
                             ),
+                            expires_at=datetime.datetime.now(
+                                datetime.timezone.utc,
+                            )
+                            + datetime.timedelta(days=1),
                         ),
                     ),
                 ],
@@ -153,4 +157,4 @@ class Trips(endpoints.HTTPEndpoint):
 
 class Health(endpoints.HTTPEndpoint):
     async def get(self, request: requests.Request) -> responses.Response:
-        return models.JsonApiResponse(models.Body(meta={"status": "ok"}))
+        return models.JsonApiResponse(models.Body(meta={"status": "pass"}))

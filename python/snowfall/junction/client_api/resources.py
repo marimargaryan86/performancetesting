@@ -18,6 +18,11 @@ class PlaceResource(models.Resource):
             type="places",
             attributes={
                 "name": place.name,
+                "type": "stop",
+                "longitude": 1.2,
+                "latitude": 3.4,
+                "timeZone": "Europe/London",
+                "iataCode": None,
             },
             links={
                 "self": request.url_for(

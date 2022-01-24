@@ -18,6 +18,7 @@ class NotFoundError(Exception):
 @dataclasses.dataclass(frozen=True)
 class Trip(object):
     identifier: uuid.UUID
+    expires_at: datetime.datetime
 
 
 class TripResource(models.Resource):
@@ -29,7 +30,14 @@ class TripResource(models.Resource):
         return cls(
             id=str(trip.identifier),
             type="trips",
-            attributes={},
+            attributes={
+                "expiresAt": trip.expires_at,
+            },
+            relationships={
+                "segments": {
+                    "data": [],
+                },
+            },
             links={
                 "self": "/trips/{id}".format(id=trip.identifier),
             },

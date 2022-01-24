@@ -16,9 +16,15 @@
   },
   "x-tagGroups": [
     {
-      "name": "Bookings",
+      "name": "Inventories",
       "tags": [
-        "bookings"
+        "inventories"
+      ]
+    },
+    {
+      "name": "Meta",
+      "tags": [
+        "meta"
       ]
     },
     {
@@ -34,17 +40,40 @@
       ]
     },
     {
+      "name": "Journeys",
+      "tags": [
+        "journeys"
+      ]
+    },
+    {
       "name": "Trips",
       "tags": [
+        "legs",
+        "segments",
         "trips"
       ]
     }
   ],
   "tags": [
     {
-      "name": "bookings",
-      "description": "A booking of an offer.",
-      "x-displayName": "Bookings"
+      "name": "inventories",
+      "description": "The result of a successful journey.",
+      "x-displayName": "Inventories"
+    },
+    {
+      "name": "journeys",
+      "description": "A journey.",
+      "x-displayName": "Journeys"
+    },
+    {
+      "name": "legs",
+      "description": "A single element of the trip carried by a provider. ",
+      "x-displayName": "Legs"
+    },
+    {
+      "name": "meta",
+      "description": "Meta information about the API.",
+      "x-displayName": "Meta"
     },
     {
       "name": "offers",
@@ -55,6 +84,11 @@
       "name": "places",
       "description": "Places are usualy stops that you can travel between.",
       "x-displayName": "Places"
+    },
+    {
+      "name": "segments",
+      "description": "One or more legs provided by the same provider.",
+      "x-displayName": "Segment"
     },
     {
       "name": "trips",
@@ -85,7 +119,7 @@
                           "uniqueItems": true,
                           "minItems": 0,
                           "items": {
-                            "$ref": "#/components/schemas/PlaceResource"
+                            "$ref": "#/components/schemas/Place"
                           }
                         }
                       },
@@ -107,10 +141,15 @@
         "description": "Returns a list of places.",
         "parameters": [
           {
-            "$ref": "#/components/parameters/page[cursor]"
+            "$ref": "#/components/parameters/page-cursor"
           },
           {
-            "$ref": "#/components/parameters/page[limit]"
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ],
+        "security": [
+          {
+            "oauth2": []
           }
         ]
       },
@@ -136,7 +175,7 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/PlaceResource"
+                      "$ref": "#/components/schemas/Place"
                     }
                   },
                   "required": [
@@ -152,7 +191,223 @@
           }
         },
         "operationId": "get-places-place-id",
-        "description": "View a place."
+        "description": "View a place.",
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/legs/{legId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/legId"
+        }
+      ],
+      "get": {
+        "summary": "View Leg",
+        "tags": [
+          "legs"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Leg"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-legs-leg-id",
+        "description": "View a Leg.",
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/legs/types": {
+      "parameters": [],
+      "get": {
+        "summary": "List Leg Types",
+        "tags": [
+          "legs"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/LegType"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-legs-types",
+        "description": "List Leg Types.",
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/legs/types/{legTypeId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/legTypeId"
+        }
+      ],
+      "get": {
+        "summary": "View Leg Type",
+        "tags": [
+          "legs"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/LegType"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-legs-types-leg-type-id",
+        "description": "View a Leg Type.",
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/segments/{segmentId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/segmentId"
+        }
+      ],
+      "get": {
+        "summary": "View Segment",
+        "tags": [
+          "segments"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Segment"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-segments-segment-id",
+        "description": "View a Segment.",
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/segment/{segmentId}/legs": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/segmentId"
+        }
+      ],
+      "get": {
+        "summary": "List Legs by Segment",
+        "tags": [
+          "segments"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Leg"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-segments-segment-id-legs",
+        "description": "Get legs for a segment.",
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
       }
     },
     "/trips/{tripId}": {
@@ -175,7 +430,7 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/TripResource"
+                      "$ref": "#/components/schemas/Trip"
                     }
                   },
                   "required": [
@@ -184,10 +439,18 @@
                 }
               }
             }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "operationId": "get-trips-trip-id",
-        "description": "View a Trip. Not yet implemented."
+        "description": "View a Trip.",
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
       }
     },
     "/trips/{tripId}/segments": {
@@ -212,23 +475,23 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/SegmentResource"
+                        "$ref": "#/components/schemas/Segment"
                       }
                     }
                   }
                 }
               }
             }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "operationId": "get-trips-trip-id-segments",
-        "description": "Get cached prices for a trip. Not yet implemented. Not in scope.",
-        "parameters": [
+        "description": "Get segments for a trip.",
+        "security": [
           {
-            "$ref": "#/components/parameters/page[cursor]"
-          },
-          {
-            "$ref": "#/components/parameters/page[limit]"
+            "oauth2": []
           }
         ]
       }
@@ -255,23 +518,23 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/PriceResource"
+                        "$ref": "#/components/schemas/Price"
                       }
                     }
                   }
                 }
               }
             }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "operationId": "get-trips-trip-id-prices",
-        "description": "Get cached prices for a trip. Not yet implemented. Not in scope.",
-        "parameters": [
+        "description": "Get cached prices for a trip.",
+        "security": [
           {
-            "$ref": "#/components/parameters/page[cursor]"
-          },
-          {
-            "$ref": "#/components/parameters/page[limit]"
+            "oauth2": []
           }
         ]
       }
@@ -292,7 +555,7 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/TripSearchResource"
+                      "$ref": "#/components/schemas/TripSearch"
                     }
                   }
                 }
@@ -314,13 +577,18 @@
                 "type": "object",
                 "properties": {
                   "data": {
-                    "$ref": "#/components/schemas/TripSearchResource"
+                    "$ref": "#/components/schemas/TripSearch"
                   }
                 }
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
       },
       "parameters": []
     },
@@ -344,7 +612,7 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/TripSearchResource"
+                      "$ref": "#/components/schemas/TripSearch"
                     }
                   }
                 }
@@ -356,7 +624,12 @@
           }
         },
         "operationId": "get-trips-searches-trip-search-id",
-        "description": "View a previously created trip search."
+        "description": "View a previously created trip search.",
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
       }
     },
     "/trips/searches/{tripSearchId}/trips": {
@@ -383,7 +656,7 @@
                       "uniqueItems": true,
                       "minItems": 0,
                       "items": {
-                        "$ref": "#/components/schemas/TripResource"
+                        "$ref": "#/components/schemas/Trip"
                       }
                     }
                   },
@@ -400,12 +673,9 @@
         },
         "operationId": "get-trips-searches-trip-search-id-trips",
         "description": "View trips for a trip search.",
-        "parameters": [
+        "security": [
           {
-            "$ref": "#/components/parameters/page[cursor]"
-          },
-          {
-            "$ref": "#/components/parameters/page[limit]"
+            "oauth2": []
           }
         ]
       }
@@ -426,7 +696,17 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/OfferSearchResource"
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/TripOfferSearch"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AccommodationOfferSearch"
+                        },
+                        {
+                          "$ref": "#/components/schemas/RentalOfferSearch"
+                        }
+                      ]
                     }
                   }
                 }
@@ -448,13 +728,28 @@
                 "type": "object",
                 "properties": {
                   "data": {
-                    "$ref": "#/components/schemas/OfferSearchResource"
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/TripOfferSearch"
+                      },
+                      {
+                        "$ref": "#/components/schemas/AccommodationOfferSearch"
+                      },
+                      {
+                        "$ref": "#/components/schemas/RentalOfferSearch"
+                      }
+                    ]
                   }
                 }
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
       },
       "parameters": []
     },
@@ -478,7 +773,17 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/OfferSearchResource"
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/TripOfferSearch"
+                        },
+                        {
+                          "$ref": "#/components/schemas/AccommodationOfferSearch"
+                        },
+                        {
+                          "$ref": "#/components/schemas/RentalOfferSearch"
+                        }
+                      ]
                     }
                   }
                 }
@@ -490,7 +795,12 @@
           }
         },
         "operationId": "get-offers-searches-offer-search-id",
-        "description": "View a previously created offer search."
+        "description": "View a previously created offer search.",
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
       }
     },
     "/offers/searches/{offerSearchId}/offers": {
@@ -517,7 +827,7 @@
                       "uniqueItems": true,
                       "minItems": 0,
                       "items": {
-                        "$ref": "#/components/schemas/OfferResource"
+                        "$ref": "#/components/schemas/Offer"
                       }
                     }
                   },
@@ -534,23 +844,75 @@
         },
         "operationId": "get-offers-searches-offer-search-id-offers",
         "description": "View offers for an offer search.",
-        "parameters": [
+        "security": [
           {
-            "$ref": "#/components/parameters/page[cursor]"
-          },
-          {
-            "$ref": "#/components/parameters/page[limit]"
+            "oauth2": []
           }
         ]
       }
     },
-    "/bookings": {
-      "post": {
-        "summary": "New Booking",
+    "/offers/searches/{offerSearchId}/related": {
+      "parameters": [
+        {
+          "name": "offerSearchId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "description": "Offer Search identifier"
+        }
+      ],
+      "get": {
+        "summary": "List Related Searches by Offer Search",
         "tags": [
-          "bookings"
+          "offers"
         ],
-        "operationId": "post-bookings",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "minItems": 0,
+                      "items": {
+                        "$ref": "#/components/schemas/RelatedSearch"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-offers-searches-offer-search-id-related",
+        "description": "View related searches for an offer search.",
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/journeys": {
+      "post": {
+        "summary": "New Journey",
+        "tags": [
+          "journeys"
+        ],
+        "operationId": "post-journey",
         "responses": {
           "201": {
             "description": "Created",
@@ -560,7 +922,7 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/BookingResource"
+                      "$ref": "#/components/schemas/Journey"
                     }
                   }
                 }
@@ -574,7 +936,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "description": "Make a new booking.",
+        "description": "Make a new journey.",
         "requestBody": {
           "content": {
             "application/vnd.api+json": {
@@ -582,7 +944,7 @@
                 "type": "object",
                 "properties": {
                   "data": {
-                    "$ref": "#/components/schemas/BookingResource"
+                    "$ref": "#/components/schemas/Journey"
                   }
                 }
               }
@@ -591,11 +953,11 @@
         }
       },
       "get": {
-        "summary": "List bookings",
+        "summary": "List Journeys",
         "tags": [
-          "bookings"
+          "journeys"
         ],
-        "operationId": "get-bookings",
+        "operationId": "get-journeys",
         "responses": {
           "200": {
             "description": "OK",
@@ -607,7 +969,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/BookingResource"
+                        "$ref": "#/components/schemas/Journey"
                       }
                     }
                   }
@@ -616,27 +978,25 @@
             }
           }
         },
-        "description": "List all bookings.",
-        "parameters": [
+        "description": "List all journeys.",
+        "security": [
           {
-            "$ref": "#/components/parameters/page[cursor]"
-          },
-          {
-            "$ref": "#/components/parameters/page[limit]"
+            "oauth2": []
           }
         ]
-      }
+      },
+      "parameters": []
     },
-    "/bookings/{bookingId}": {
+    "/journeys/{journeyId}": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/bookingId"
+          "$ref": "#/components/parameters/journeyId"
         }
       ],
       "get": {
-        "summary": "View Booking",
+        "summary": "View Journey",
         "tags": [
-          "bookings"
+          "journeys"
         ],
         "responses": {
           "200": {
@@ -647,7 +1007,7 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/BookingResource"
+                      "$ref": "#/components/schemas/Journey"
                     }
                   }
                 }
@@ -658,14 +1018,58 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-bookings-booking-id",
-        "description": "View a previously created booking."
+        "operationId": "get-journeys-journey-id",
+        "description": "View a previously created journey.",
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/journeys/{journeyId}/relationships/offers": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/journeyId"
+        }
+      ],
+      "post": {
+        "summary": "Add Offers to Journey",
+        "operationId": "post-journeys-journey-id-relationships-offers",
+        "responses": {
+          "202": {
+            "description": "Accepted"
+          }
+        },
+        "tags": [
+          "journeys"
+        ],
+        "description": "Add a new offer to an existing journey.",
+        "requestBody": {
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/OfferIdentifier"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/health": {
       "get": {
         "summary": "Health",
-        "tags": [],
+        "tags": [
+          "meta"
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -690,10 +1094,11 @@
                       "properties": {
                         "status": {
                           "type": "string",
-                          "minLength": 1,
                           "description": "Health status",
                           "enum": [
-                            "ok"
+                            "pass",
+                            "fail",
+                            "warn"
                           ]
                         }
                       }
@@ -708,14 +1113,15 @@
           }
         },
         "operationId": "get-health",
-        "description": "Check the application health."
+        "description": "Check the application health.",
+        "x-internal": true
       }
     }
   },
   "components": {
     "schemas": {
-      "PlaceResource": {
-        "title": "Place Resource",
+      "Place": {
+        "title": "Place",
         "allOf": [
           {
             "type": "object",
@@ -723,6 +1129,7 @@
               "id": {
                 "type": "string",
                 "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
                 "readOnly": true
               },
               "type": {
@@ -734,12 +1141,149 @@
               "attributes": {
                 "type": "object",
                 "required": [
-                  "name"
+                  "name",
+                  "type",
+                  "longitude",
+                  "latitude",
+                  "timeZone",
+                  "iataCode"
                 ],
                 "properties": {
                   "name": {
                     "type": "string",
+                    "example": "Stockholm Arlanda Airport",
                     "readOnly": true
+                  },
+                  "type": {
+                    "type": "string",
+                    "example": "stop",
+                    "readOnly": true
+                  },
+                  "longitude": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 59.651164062
+                  },
+                  "latitude": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 17.917829662
+                  },
+                  "timeZone": {
+                    "type": "string",
+                    "example": "Europe/Stockholm",
+                    "readOnly": true
+                  },
+                  "iataCode": {
+                    "type": "string",
+                    "example": "ARN",
+                    "pattern": "^[A-Z]{3}$",
+                    "minLength": 3,
+                    "maxLength": 3,
+                    "nullable": true,
+                    "readOnly": true
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "description": ""
+      },
+      "PlaceIdentifier": {
+        "title": "Place Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "places"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "Point": {
+        "title": "Point",
+        "description": "",
+        "type": "object",
+        "properties": {
+          "ref": {
+            "type": "string",
+            "example": "890880d9d63ffff",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "example": "Uppsala Central Station",
+            "readOnly": true
+          },
+          "latitude": {
+            "type": "number",
+            "example": 59.858611,
+            "readOnly": true
+          },
+          "longitude": {
+            "type": "number",
+            "example": 17.646111,
+            "readOnly": true
+          },
+          "timeZone": {
+            "type": "string",
+            "example": "Europe/Stockholm",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "ref",
+          "name",
+          "latitude",
+          "longitude",
+          "timeZone"
+        ]
+      },
+      "LegType": {
+        "title": "Leg Type",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "leg-types"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
                   }
                 }
               }
@@ -755,18 +1299,19 @@
           }
         ]
       },
-      "PlaceResourceIdentifier": {
-        "title": "Place Resource Identifier",
+      "LegTypeIdentifier": {
+        "title": "Leg Type Identifier",
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
           },
           "type": {
             "type": "string",
             "enum": [
-              "places"
+              "leg-types"
             ]
           }
         },
@@ -775,8 +1320,8 @@
           "type"
         ]
       },
-      "SegmentResource": {
-        "title": "Segment Resource",
+      "Leg": {
+        "title": "Leg",
         "allOf": [
           {
             "type": "object",
@@ -784,43 +1329,60 @@
               "id": {
                 "type": "string",
                 "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
                 "readOnly": true
               },
               "type": {
                 "type": "string",
                 "enum": [
-                  "segments"
+                  "legs"
                 ]
               },
               "attributes": {
-                "type": "object"
-              },
-              "relationships": {
                 "type": "object",
                 "required": [
+                  "departureAt",
+                  "arrivalAt",
+                  "operator",
                   "origin",
                   "destination"
                 ],
                 "properties": {
+                  "departureAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                  },
+                  "arrivalAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                  },
+                  "operator": {
+                    "type": "string"
+                  },
                   "origin": {
-                    "type": "object",
-                    "required": [
-                      "data"
-                    ],
-                    "properties": {
-                      "data": {
-                        "$ref": "#/components/schemas/PlaceResourceIdentifier"
-                      }
-                    }
+                    "$ref": "#/components/schemas/Point"
                   },
                   "destination": {
+                    "$ref": "#/components/schemas/Point"
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
                     "type": "object",
                     "required": [
                       "data"
                     ],
                     "properties": {
                       "data": {
-                        "$ref": "#/components/schemas/PlaceResourceIdentifier"
+                        "$ref": "#/components/schemas/LegTypeIdentifier"
                       }
                     }
                   }
@@ -839,13 +1401,91 @@
           }
         ]
       },
-      "SegmentResourceIdentifier": {
-        "title": "Segment Resource Identifier",
+      "LegIdentifier": {
+        "title": "Leg Identifier",
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "legs"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "Segment": {
+        "title": "Segment",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "segments"
+                ]
+              },
+              "attributes": {
+                "type": "object"
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "legs"
+                ],
+                "properties": {
+                  "legs": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/LegIdentifier"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ]
+      },
+      "SegmentIdentifier": {
+        "title": "Segment Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
           },
           "type": {
             "type": "string",
@@ -859,8 +1499,8 @@
           "type"
         ]
       },
-      "TripResource": {
-        "title": "Trip Resource",
+      "Trip": {
+        "title": "Trip",
         "allOf": [
           {
             "type": "object",
@@ -868,6 +1508,7 @@
               "id": {
                 "type": "string",
                 "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
                 "readOnly": true
               },
               "type": {
@@ -877,38 +1518,24 @@
                 ]
               },
               "attributes": {
-                "type": "object"
+                "type": "object",
+                "required": [
+                  "expiresAt"
+                ],
+                "properties": {
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                  }
+                }
               },
               "relationships": {
                 "type": "object",
                 "required": [
-                  "origin",
-                  "destination",
                   "segments"
                 ],
                 "properties": {
-                  "origin": {
-                    "type": "object",
-                    "required": [
-                      "data"
-                    ],
-                    "properties": {
-                      "data": {
-                        "$ref": "#/components/schemas/PlaceResourceIdentifier"
-                      }
-                    }
-                  },
-                  "destination": {
-                    "type": "object",
-                    "required": [
-                      "data"
-                    ],
-                    "properties": {
-                      "data": {
-                        "$ref": "#/components/schemas/PlaceResourceIdentifier"
-                      }
-                    }
-                  },
                   "segments": {
                     "type": "object",
                     "required": [
@@ -918,7 +1545,7 @@
                       "data": {
                         "type": "array",
                         "items": {
-                          "$ref": "#/components/schemas/SegmentResourceIdentifier"
+                          "$ref": "#/components/schemas/SegmentIdentifier"
                         }
                       }
                     }
@@ -929,7 +1556,8 @@
             "required": [
               "id",
               "type",
-              "attributes"
+              "attributes",
+              "relationships"
             ]
           },
           {
@@ -937,13 +1565,14 @@
           }
         ]
       },
-      "TripResourceIdentifier": {
-        "title": "Trip Resource Identifier",
+      "TripIdentifier": {
+        "title": "Trip Identifier",
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
           },
           "type": {
             "type": "string",
@@ -957,7 +1586,7 @@
           "type"
         ]
       },
-      "TripSearchResource": {
+      "TripSearch": {
         "allOf": [
           {
             "type": "object",
@@ -965,6 +1594,7 @@
               "id": {
                 "type": "string",
                 "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
                 "readOnly": true
               },
               "type": {
@@ -975,6 +1605,9 @@
               },
               "attributes": {
                 "type": "object",
+                "required": [
+                  "expiresAt"
+                ],
                 "properties": {
                   "expiresAt": {
                     "type": "string",
@@ -984,11 +1617,12 @@
                   "departureAfter": {
                     "type": "string",
                     "format": "date-time"
+                  },
+                  "arrivalBefore": {
+                    "type": "string",
+                    "format": "date-time"
                   }
-                },
-                "required": [
-                  "expiresAt"
-                ]
+                }
               },
               "relationships": {
                 "type": "object",
@@ -1004,7 +1638,7 @@
                     ],
                     "properties": {
                       "data": {
-                        "$ref": "#/components/schemas/PlaceResourceIdentifier"
+                        "$ref": "#/components/schemas/PlaceIdentifier"
                       }
                     }
                   },
@@ -1015,9 +1649,24 @@
                     ],
                     "properties": {
                       "data": {
-                        "$ref": "#/components/schemas/PlaceResourceIdentifier"
+                        "$ref": "#/components/schemas/PlaceIdentifier"
                       }
                     }
+                  },
+                  "legTypes": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                          "$ref": "#/components/schemas/LegTypeIdentifier"
+                        }
+                      }
+                    },
+                    "required": [
+                      "data"
+                    ]
                   }
                 }
               }
@@ -1025,6 +1674,7 @@
             "required": [
               "id",
               "type",
+              "attributes",
               "relationships"
             ]
           },
@@ -1032,10 +1682,10 @@
             "$ref": "#/components/schemas/SelfLink"
           }
         ],
-        "title": "Trip Search Resource"
+        "title": "Trip Search"
       },
-      "PriceResource": {
-        "title": "Price Resource",
+      "Price": {
+        "title": "Price",
         "allOf": [
           {
             "type": "object",
@@ -1043,6 +1693,7 @@
               "id": {
                 "type": "string",
                 "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
                 "readOnly": true
               },
               "type": {
@@ -1066,8 +1717,8 @@
           }
         ]
       },
-      "OfferResource": {
-        "title": "Offer Resource",
+      "Offer": {
+        "title": "Offer",
         "allOf": [
           {
             "type": "object",
@@ -1075,6 +1726,7 @@
               "id": {
                 "type": "string",
                 "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
                 "readOnly": true
               },
               "type": {
@@ -1084,7 +1736,28 @@
                 ]
               },
               "attributes": {
-                "type": "object"
+                "type": "object",
+                "required": [
+                  "expiresAt",
+                  "price",
+                  "currency"
+                ],
+                "properties": {
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                  },
+                  "price": {
+                    "type": "string",
+                    "example": "12.34"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{3}$",
+                    "example": "USD"
+                  }
+                }
               },
               "relationships": {
                 "oneOf": [
@@ -1094,7 +1767,7 @@
                         "type": "object",
                         "properties": {
                           "data": {
-                            "$ref": "#/components/schemas/TripResourceIdentifier"
+                            "$ref": "#/components/schemas/TripIdentifier"
                           }
                         }
                       }
@@ -1106,7 +1779,7 @@
                         "type": "object",
                         "properties": {
                           "data": {
-                            "$ref": "#/components/schemas/PlaceResourceIdentifier"
+                            "$ref": "#/components/schemas/PlaceIdentifier"
                           }
                         }
                       }
@@ -1127,13 +1800,14 @@
           }
         ]
       },
-      "OfferResourceIdentifier": {
-        "title": "Offer Resource Identifier",
+      "OfferIdentifier": {
+        "title": "Offer Identifier",
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
           },
           "type": {
             "type": "string",
@@ -1147,114 +1821,484 @@
           "type"
         ]
       },
-      "OfferSearchResource": {
-        "title": "Offer Search Resource",
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "readOnly": true
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "offer-searches"
-            ]
-          },
-          "attributes": {
+      "AccommodationOfferSearch": {
+        "title": "Accommodation Offer Search",
+        "allOf": [
+          {
             "type": "object",
             "properties": {
-              "radius": {
-                "type": "number"
-              }
-            }
-          },
-          "relationships": {
-            "oneOf": [
-              {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "accommodation-offer-searches"
+                ]
+              },
+              "attributes": {
+                "type": "object",
                 "properties": {
-                  "trip": {
-                    "type": "object",
-                    "properties": {
-                      "data": {
-                        "$ref": "#/components/schemas/TripResourceIdentifier"
-                      }
-                    }
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                  },
+                  "checkinAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "checkoutAt": {
+                    "type": "string",
+                    "format": "date-time"
                   }
                 },
                 "required": [
-                  "trip"
+                  "expiresAt",
+                  "checkinAt",
+                  "checkoutAt"
                 ]
               },
-              {
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "place"
+                ],
+                "properties": {
+                  "place": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/PlaceIdentifier"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ]
+      },
+      "RentalOfferSearch": {
+        "title": "Rental Offer Search",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "rental-offer-searches"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                  },
+                  "driverAge": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "pickupAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "dropoffAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "expiresAt",
+                  "driverAge",
+                  "pickupAt",
+                  "dropoffAt"
+                ]
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "pickupPlace"
+                ],
+                "properties": {
+                  "pickupPlace": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/PlaceIdentifier"
+                      }
+                    }
+                  },
+                  "dropoffPlace": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/PlaceIdentifier"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ]
+      },
+      "TripOfferSearch": {
+        "title": "Trip Offer Search",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "trip-offer-searches"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                  },
+                  "passengers": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "$ref": "#/components/schemas/Passenger"
+                    }
+                  },
+                  "loyalty": {
+                    "$ref": "#/components/schemas/LoyaltyCard"
+                  }
+                },
+                "required": [
+                  "expiresAt",
+                  "passengers"
+                ]
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "trips",
+                  "offers"
+                ],
+                "properties": {
+                  "trips": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/TripIdentifier"
+                        },
+                        "writeOnly": true
+                      }
+                    },
+                    "writeOnly": true
+                  },
+                  "offers": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/OfferIdentifier"
+                        },
+                        "readOnly": true
+                      }
+                    },
+                    "readOnly": true
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ]
+      },
+      "RelatedSearch": {
+        "title": "Related Search",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "related-searches"
+                ]
+              },
+              "attributes": {
+                "type": "object"
+              },
+              "relationships": {
+                "type": "object",
                 "properties": {
                   "place": {
                     "type": "object",
                     "properties": {
                       "data": {
-                        "$ref": "#/components/schemas/PlaceResourceIdentifier"
+                        "$ref": "#/components/schemas/PlaceIdentifier"
                       }
-                    }
-                  }
-                },
-                "required": [
-                  "place"
-                ]
-              }
-            ],
-            "type": "object"
-          }
-        },
-        "required": [
-          "id",
-          "type",
-          "attributes"
-        ]
-      },
-      "BookingResource": {
-        "title": "Booking Resource",
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "readOnly": true
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "bookings"
-            ]
-          },
-          "attributes": {
-            "type": "object"
-          },
-          "relationships": {
-            "type": "object",
-            "required": [
-              "offers"
-            ],
-            "properties": {
-              "offers": {
-                "type": "object",
-                "properties": {
-                  "data": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/OfferResourceIdentifier"
                     }
                   }
                 }
               }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ]
+      },
+      "Journey": {
+        "title": "Journey",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "journeys"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "trips": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/TripItem"
+                    }
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "offers"
+                ],
+                "properties": {
+                  "offers": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                          "$ref": "#/components/schemas/OfferIdentifier"
+                        },
+                        "writeOnly": true
+                      }
+                    },
+                    "writeOnly": true
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ]
+      },
+      "TripItem": {
+        "title": "Trip Item",
+        "type": "object",
+        "properties": {
+          "sequence": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "segments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SegmentItem"
             }
           }
         },
         "required": [
-          "id",
-          "type",
-          "attributes",
-          "relationships"
+          "sequence",
+          "segments"
+        ]
+      },
+      "SegmentItem": {
+        "title": "Segment Item",
+        "type": "object",
+        "properties": {
+          "sequence": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "legs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LegItem"
+            }
+          }
+        },
+        "required": [
+          "sequence",
+          "legs"
+        ]
+      },
+      "LegItem": {
+        "title": "Leg Item",
+        "type": "object",
+        "properties": {
+          "sequence": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "departureAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "arrivalAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "operator": {
+            "type": "string"
+          },
+          "origin": {
+            "$ref": "#/components/schemas/Point"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/Point"
+          }
+        },
+        "required": [
+          "sequence",
+          "departureAt",
+          "arrivalAt",
+          "operator",
+          "origin",
+          "destination"
+        ]
+      },
+      "LoyaltyCard": {
+        "title": "LoyaltyCard",
+        "type": "object",
+        "properties": {
+          "airlineIata": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2,
+            "pattern": "^[A-Z]{2}$"
+          },
+          "number": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "airlineIata",
+          "number",
+          "firstName",
+          "lastName"
+        ]
+      },
+      "Passenger": {
+        "title": "Passenger",
+        "type": "object",
+        "properties": {
+          "age": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "age"
         ]
       },
       "SelfLink": {
@@ -1262,13 +2306,15 @@
         "type": "object",
         "properties": {
           "links": {
+            "type": "object",
             "required": [
               "self"
             ],
-            "type": "object",
             "properties": {
               "self": {
                 "type": "string",
+                "format": "uri",
+                "example": "https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5",
                 "readOnly": true
               }
             },
@@ -1280,7 +2326,7 @@
         ]
       },
       "NextLink": {
-        "title": "NextLink",
+        "title": "Next Link",
         "type": "object",
         "properties": {
           "links": {
@@ -1388,7 +2434,7 @@
           "type": "string",
           "format": "uuid"
         },
-        "description": "Trip Search resource identifier"
+        "description": "Trip Search identifier"
       },
       "placeId": {
         "name": "placeId",
@@ -1398,7 +2444,7 @@
           "type": "string",
           "format": "uuid"
         },
-        "description": "Place resource identifier"
+        "description": "Place identifier"
       },
       "tripId": {
         "name": "tripId",
@@ -1408,7 +2454,7 @@
           "type": "string",
           "format": "uuid"
         },
-        "description": "Trip resource identifier"
+        "description": "Trip identifier"
       },
       "offerSearchId": {
         "name": "offerSearchId",
@@ -1418,18 +2464,18 @@
           "type": "string",
           "format": "uuid"
         },
-        "description": "Offer Search resource identifier"
+        "description": "Offer Search identifier"
       },
-      "bookingId": {
-        "name": "bookingId",
+      "journeyId": {
+        "name": "journeyId",
         "in": "path",
         "required": true,
         "schema": {
           "type": "string"
         },
-        "description": "Booking resource identifier"
+        "description": "Journey identifier"
       },
-      "page[cursor]": {
+      "page-cursor": {
         "name": "page[cursor]",
         "in": "query",
         "required": false,
@@ -1438,7 +2484,7 @@
         },
         "description": "Pagination cursor that defines your place in the list."
       },
-      "page[limit]": {
+      "page-limit": {
         "name": "page[limit]",
         "in": "query",
         "required": false,
@@ -1449,7 +2495,54 @@
           "default": 20
         },
         "description": "A limit on the number of objects to be returned, between 1 and 100."
+      },
+      "segmentId": {
+        "name": "segmentId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "description": "Segment identifier"
+      },
+      "legId": {
+        "name": "legId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "description": "Leg identifier"
+      },
+      "legTypeId": {
+        "name": "legTypeId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "description": "Leg Type identifier"
+      }
+    },
+    "securitySchemes": {
+      "oauth2": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "scopes": {},
+            "refreshUrl": "TBD",
+            "tokenUrl": "TBD"
+          }
+        }
       }
     }
-  }
+  },
+  "security": [
+    {
+      "oauth2": []
+    }
+  ]
 }
