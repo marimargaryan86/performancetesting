@@ -8,8 +8,11 @@ import geopy
 import httpx
 import timezonefinder
 from aiocsv import AsyncDictReader
+from asyncio_throttle import throttler
 
 from snowfall.common.v1alpha.models_pb2 import Place
+
+_THROTTLER = throttler.Throttler(rate_limit=1)
 
 
 async def fetch_feed(filename: pathlib.Path, feed_url: str, user_agent: str) -> None:
@@ -44,19 +47,20 @@ async def unzip_stops(
 
             coords = (float(row["stop_lat"]), float(row["stop_lon"]))
 
-            yield Place(
-                id=str(uuid.uuid5(namespace, row["stop_id"])),
-                name=row["stop_name"],
-                latitude=coords[0],
-                longitude=coords[1],
-                country_code=(
-                    await geocoder.reverse(
-                        "{0}, {1}".format(coords[0], coords[1]),
-                        exactly_one=True,
-                    )
-                ).raw["properties"]["countrycode"],
-                time_zone=tz_finder.timezone_at(lat=coords[0], lng=coords[1]),
-            )
+            async with _THROTTLER:
+                yield Place(
+                    id=str(uuid.uuid5(namespace, row["stop_id"])),
+                    name=row["stop_name"],
+                    latitude=coords[0],
+                    longitude=coords[1],
+                    country_code=(
+                        await geocoder.reverse(
+                            "{0}, {1}".format(coords[0], coords[1]),
+                            exactly_one=True,
+                        )
+                    ).raw["properties"]["countrycode"],
+                    time_zone=tz_finder.timezone_at(lat=coords[0], lng=coords[1]),
+                )
 
 
 async def is_valid_stop(stop: Dict[str, str]) -> bool:
