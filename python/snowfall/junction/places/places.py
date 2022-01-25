@@ -15,9 +15,9 @@ class PlaceRepository(ProtoRepository[models_pb2.Place]):
 
     async def upsert(self, resource: models_pb2.Place) -> bool:
         update_result: results.UpdateResult = await self._execute(
-            self._collection.update_one,
+            self._collection.replace_one,
             filter={"_id": resource.id},
-            update={"$set": self._marshal(resource)},
+            replacement=self._marshal(resource),
             upsert=True,
         )
 

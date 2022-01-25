@@ -17,12 +17,13 @@ class PlaceResource(models.Resource):
             id=str(place.identifier),
             type="places",
             attributes={
-                "name": place.name,
-                "type": "stop",
-                "longitude": 1.2,
-                "latitude": 3.4,
-                "timeZone": "Europe/London",
+                "countryCode": place.country_code,
                 "iataCode": None,
+                "latitude": place.latitude,
+                "longitude": place.longitude,
+                "name": place.name,
+                "timeZone": place.time_zone,
+                "type": "stop",
             },
             links={
                 "self": request.url_for(

@@ -9,7 +9,13 @@ message Cursor {
 }
 
 message Place {
+  reserved 2;
+  reserved "h3_index";
+
   string id = 1;
-  uint64 h3_index = 2;
   string name = 3;
+  float latitude = 4;
+  float longitude = 5;
+  string country_code = 6;
+  string time_zone = 7;
 }

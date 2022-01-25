@@ -148,7 +148,7 @@ class ProtoRepository(Generic[Proto], Repository, abc.ABC):
         as_dict = MessageToDict(msg)
 
         # MongoDB expects ID to be found in "_id".
-        if _proto_id_key in fields and _mongo_id_key in as_dict:
+        if _proto_id_key in fields and _proto_id_key in as_dict:
             as_dict[_mongo_id_key] = as_dict.pop(_proto_id_key)
 
         return as_dict

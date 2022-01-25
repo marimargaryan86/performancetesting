@@ -5,24 +5,35 @@ import pytest
 from snowfall.adapter import places
 from snowfall.junction.client_api import trips
 
-_TEST_TRIP = trips.TripSearchRequest(
-    origin=places.Place(identifier=uuid.uuid4(), name="foobar"),
-    destination=places.Place(identifier=uuid.uuid4(), name="bazqux"),
-)
+# todo: would be nice with some "well-known" test data for places etc. in a package.
+_PLACES_CLIENT = places.DictClient([{"id": "b212f375-5abf-4864-8ff8-b0b5bdf3e08a"}])
+
+
+async def _trip_search_request() -> trips.TripSearchRequest:
+    return trips.TripSearchRequest(
+        origin=await _PLACES_CLIENT.get(
+            uuid.UUID("b212f375-5abf-4864-8ff8-b0b5bdf3e08a"),
+        ),
+        destination=await _PLACES_CLIENT.get(
+            uuid.UUID("b212f375-5abf-4864-8ff8-b0b5bdf3e08a"),
+        ),
+    )
 
 
 @pytest.mark.asyncio
 async def test_trip_search_can_be_saved(
     trip_search_repository: trips.TripSearchRepository,
 ) -> None:
-    await trip_search_repository.create(_TEST_TRIP)
+    await trip_search_repository.create(await _trip_search_request())
 
 
 @pytest.mark.asyncio
 async def test_trip_search_can_be_retrieved(
     trip_search_repository: trips.TripSearchRepository,
 ) -> None:
-    trip_search_created = await trip_search_repository.create(_TEST_TRIP)
+    trip_search_created = await trip_search_repository.create(
+        await _trip_search_request(),
+    )
     trip_search = await trip_search_repository.get(
         trip_search_created.identifier,
     )

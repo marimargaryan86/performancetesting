@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import abc
 import dataclasses
+import random
 import uuid
 from typing import Any, Mapping, Optional, Sequence
 
@@ -23,14 +24,22 @@ class UnknownError(Exception):
 class Place(object):
     identifier: uuid.UUID
     name: str
+    latitude: float
+    longitude: float
+    country_code: str
+    time_zone: str
     proto: Optional[models_pb2.Place] = None
 
     @classmethod
     async def from_proto(cls, grpc_place: models_pb2.Place) -> Place:
         return cls(
+            country_code=grpc_place.country_code,
             identifier=uuid.UUID(grpc_place.id),
+            latitude=grpc_place.latitude,
+            longitude=grpc_place.longitude,
             name=grpc_place.name,
             proto=grpc_place,
+            time_zone=grpc_place.time_zone,
         )
 
 
@@ -57,12 +66,20 @@ class Client(object):
         """Fetch all place resources."""
 
 
+_LATITUDE_RANGE = (-90, 90)
+_LONGITUDE_RANGE = (-180, 180)
+
+
 class DictClient(Client):
     def __init__(self, places: Sequence[Mapping[str, Any]]):
         self._places = {
             place["id"]: Place(
                 identifier=uuid.UUID(place["id"]),
                 name="Foobar",
+                latitude=random.uniform(*_LATITUDE_RANGE),  # nosec
+                longitude=random.uniform(*_LONGITUDE_RANGE),  # nosec
+                country_code="SE",
+                time_zone="Europe/Stockholm",
             )
             for place in places
         }
