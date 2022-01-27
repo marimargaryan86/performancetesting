@@ -1,0 +1,8 @@
+import re
+
+COLOR_REGEX = "^[0-9A-F]{6}$"
+LANGUAGE_REGEX = re.compile("^[A-Z]{2}(-[A-Z]{2})?$", flags=re.IGNORECASE)
+LATITUDE_MIN = -90
+LATITUDE_MAX = 90
+LONGITUDE_MIN = -180
+LONGITUDE_MAX = 180

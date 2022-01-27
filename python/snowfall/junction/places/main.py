@@ -1,10 +1,9 @@
 import random
 from typing import Sequence
 
-import aiormq
+import amqp
 from motor import motor_asyncio
 from pydantic import AnyUrl, BaseSettings
-from yarl import URL
 
 from snowfall.junction.places.consumer import PlaceImportConsumer
 from snowfall.junction.places.grpc import PlacesService
@@ -29,19 +28,20 @@ class _ImportSettings(BaseSettings):
 async def _import(_: RunnableService) -> None:
     settings = _ImportSettings()
     mongo = motor_asyncio.AsyncIOMotorClient(random.choice(settings.mongo_dsn))  # nosec
-    consumer = PlaceImportConsumer(
-        places=PlaceRepository(mongo.places.places),
-        consumer=await create_consumer(
-            connection=await aiormq.connect(
-                URL(random.choice(settings.amqp_dsn)),  # nosec
-            ),
-            exchange_name="places",
-            queue_name="importer",
-            routing_key="place.import",
-        ),
-    )
+    connection = amqp.Connection(random.choice(settings.amqp_dsn))  # nosec
 
-    await consumer.consume()
+    async with connection:
+        consumer = PlaceImportConsumer(
+            places=PlaceRepository(mongo.places.places),
+            consumer=await create_consumer(
+                conn=connection,
+                exchange_name="places",
+                queue_name="importer",
+                routing_key="place.import",
+            ),
+        )
+
+        await consumer.consume()
 
 
 async def _serve(service: RunnableService) -> None:

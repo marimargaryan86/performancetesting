@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import functools
 from asyncio import Event
-from typing import Callable, Coroutine, Type, Union, cast
+from types import TracebackType
+from typing import Callable, Coroutine, Optional, Type, Union, cast
 
-from aiormq import abc
+from aiormq import abc, connection
 from google.protobuf import any_pb2, symbol_database
 from google.protobuf.message import Message as ProtobufMessage
 from pamqp import commands
@@ -41,6 +42,17 @@ class Serializer(object):
         return unpacked_message
 
 
+class Connection(connection.Connection):
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> bool:
+        await self.close(exc_val)
+        return False
+
+
 class Producer(object):
     def __init__(
         self,
@@ -67,11 +79,11 @@ class Producer(object):
 
 
 async def create_producer(
-    connection: abc.AbstractConnection,
+    conn: Connection,
     exchange_name: str,
     exchange_type: str = "topic",
 ) -> Producer:
-    channel = await connection.channel()
+    channel = await conn.channel()
 
     await channel.exchange_declare(
         exchange=exchange_name,
@@ -191,13 +203,13 @@ class Consumer(object):
 
 
 async def create_consumer(
-    connection: abc.AbstractConnection,
+    conn: Connection,
     exchange_name: str,
     queue_name: str,
     routing_key: str,
     exchange_type: str = "topic",
 ) -> Consumer:
-    channel = await connection.channel()
+    channel = await conn.channel()
 
     await channel.exchange_declare(
         exchange=exchange_name,

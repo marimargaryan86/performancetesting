@@ -35,6 +35,7 @@ pants:setup:
     key: "${CI_COMMIT_REF_NAME}"
     paths:
       - .cache/
+    when: always
   needs:
     - "pants:setup"
   tags:
