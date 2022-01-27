@@ -1,4 +1,4 @@
-from typing import Any, Iterable
+from typing import Any, Iterable, cast
 
 import openapi_schema_validator
 from jsonschema import exceptions as json_schema_exceptions
@@ -32,7 +32,10 @@ class _PatchedOAS30Validator(openapi_schema_validator.OAS30Validator):
         self.read = getattr(self.resolver, "patch_read", None)
         self.write = getattr(self.resolver, "patch_write", None)
 
-        return super().iter_errors(instance, _schema)
+        return cast(
+            Iterable[json_schema_exceptions.ValidationError],
+            super().iter_errors(instance, _schema),
+        )
 
 
 class _PatchedSecurityProviderFactory(factories.SecurityProviderFactory):
@@ -62,7 +65,7 @@ class OAuth2Provider(providers.BaseProvider):
 
         # todo: Implement OAuth2 validation logic.
 
-        return encoded_credentials
+        return cast(str, encoded_credentials)
 
 
 def patch_open_api() -> None:
