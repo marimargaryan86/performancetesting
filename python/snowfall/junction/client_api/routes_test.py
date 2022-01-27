@@ -4,8 +4,8 @@ from typing import Any
 import pytest
 from starlette import status, testclient
 
-from snowfall.adapter import places
-from snowfall.junction.client_api import conftest, trips
+from snowfall.adapter import trip_searches
+from snowfall.conftest import PLACE_NOT_FOUND, PLACES
 
 
 class TestHealth(object):
@@ -19,11 +19,11 @@ class TestPlaces(object):
         self,
         client: testclient.TestClient,
     ) -> None:
-        response = client.get("/places/{id}".format(id=conftest.PLACE_NOT_FOUND))
+        response = client.get("/places/{id}".format(id=PLACE_NOT_FOUND))
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_place_is_found(self, client: testclient.TestClient) -> None:
-        identifier = conftest.PLACES[0]["id"]
+        identifier = PLACES[0]["id"]
         response = client.get("/places/{id}".format(id=identifier))
         assert response.status_code == status.HTTP_200_OK
 
@@ -38,7 +38,11 @@ class TestTrips(object):
         self,
         client: testclient.TestClient,
     ) -> None:
-        response = client.post("/trips/searches", json={"foo": "bar"})
+        response = client.post(
+            "/trips/searches",
+            json={"foo": "bar"},
+            headers={"Content-Type": "application/vnd.api+json"},
+        )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @pytest.mark.parametrize(
@@ -51,13 +55,13 @@ class TestTrips(object):
                     "relationships": {
                         "origin": {
                             "data": {
-                                "id": conftest.PLACE_NOT_FOUND,
+                                "id": PLACE_NOT_FOUND,
                                 "type": "places",
                             },
                         },
                         "destination": {
                             "data": {
-                                "id": conftest.PLACES[1]["id"],
+                                "id": PLACES[1]["id"],
                                 "type": "places",
                             },
                         },
@@ -71,13 +75,13 @@ class TestTrips(object):
                     "relationships": {
                         "origin": {
                             "data": {
-                                "id": conftest.PLACES[0]["id"],
+                                "id": PLACES[0]["id"],
                                 "type": "places",
                             },
                         },
                         "destination": {
                             "data": {
-                                "id": conftest.PLACE_NOT_FOUND,
+                                "id": PLACE_NOT_FOUND,
                                 "type": "places",
                             },
                         },
@@ -111,13 +115,13 @@ class TestTrips(object):
                 "relationships": {
                     "origin": {
                         "data": {
-                            "id": conftest.PLACES[0]["id"],
+                            "id": PLACES[0]["id"],
                             "type": "places",
                         },
                     },
                     "destination": {
                         "data": {
-                            "id": conftest.PLACES[1]["id"],
+                            "id": PLACES[1]["id"],
                             "type": "places",
                         },
                     },
@@ -134,20 +138,11 @@ class TestTrips(object):
 
     async def test_created_trip_search_can_be_retrieved(
         self,
-        trip_search_repository: trips.TripSearchRepository,
-        places_client: places.Client,
+        trip_searches_client: trip_searches.Client,
+        trip_search_request: trip_searches.TripSearchRequest,
         client: testclient.TestClient,
     ) -> None:
-        trip_search = await trip_search_repository.create(
-            trips.TripSearchRequest(
-                origin=await places_client.get(
-                    uuid.UUID(conftest.PLACES[0]["id"]),
-                ),
-                destination=await places_client.get(
-                    uuid.UUID(conftest.PLACES[1]["id"]),
-                ),
-            ),
-        )
+        trip_search = await trip_searches_client.create(trip_search_request)
         response = client.get(
             "/trips/searches/{id}".format(id=str(trip_search.identifier)),
         )
@@ -182,20 +177,11 @@ class TestTrips(object):
 
     async def test_trips_are_found(
         self,
-        trip_search_repository: trips.TripSearchRepository,
-        places_client: places.Client,
+        trip_searches_client: trip_searches.Client,
+        trip_search_request: trip_searches.TripSearchRequest,
         client: testclient.TestClient,
     ) -> None:
-        trip_search = await trip_search_repository.create(
-            trips.TripSearchRequest(
-                origin=await places_client.get(
-                    uuid.UUID(conftest.PLACES[0]["id"]),
-                ),
-                destination=await places_client.get(
-                    uuid.UUID(conftest.PLACES[1]["id"]),
-                ),
-            ),
-        )
+        trip_search = await trip_searches_client.create(trip_search_request)
         identifier = "9ecd1767-3f8f-4dfe-8782-5880ff89df19"
         response = client.get(
             "/trips/searches/{id}/trips".format(id=trip_search.identifier),

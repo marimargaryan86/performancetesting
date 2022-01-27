@@ -146,11 +146,6 @@
           {
             "$ref": "#/components/parameters/page-limit"
           }
-        ],
-        "security": [
-          {
-            "oauth2": []
-          }
         ]
       },
       "parameters": []
@@ -191,12 +186,7 @@
           }
         },
         "operationId": "get-places-place-id",
-        "description": "View a place.",
-        "security": [
-          {
-            "oauth2": []
-          }
-        ]
+        "description": "View a place."
       }
     },
     "/legs/{legId}": {
@@ -234,12 +224,7 @@
           }
         },
         "operationId": "get-legs-leg-id",
-        "description": "View a Leg.",
-        "security": [
-          {
-            "oauth2": []
-          }
-        ]
+        "description": "View a Leg."
       }
     },
     "/legs/types": {
@@ -273,12 +258,7 @@
           }
         },
         "operationId": "get-legs-types",
-        "description": "List Leg Types.",
-        "security": [
-          {
-            "oauth2": []
-          }
-        ]
+        "description": "List Leg Types."
       }
     },
     "/legs/types/{legTypeId}": {
@@ -316,12 +296,7 @@
           }
         },
         "operationId": "get-legs-types-leg-type-id",
-        "description": "View a Leg Type.",
-        "security": [
-          {
-            "oauth2": []
-          }
-        ]
+        "description": "View a Leg Type."
       }
     },
     "/segments/{segmentId}": {
@@ -359,12 +334,7 @@
           }
         },
         "operationId": "get-segments-segment-id",
-        "description": "View a Segment.",
-        "security": [
-          {
-            "oauth2": []
-          }
-        ]
+        "description": "View a Segment."
       }
     },
     "/segment/{segmentId}/legs": {
@@ -392,7 +362,10 @@
                         "$ref": "#/components/schemas/Leg"
                       }
                     }
-                  }
+                  },
+                  "required": [
+                    "data"
+                  ]
                 }
               }
             }
@@ -402,12 +375,7 @@
           }
         },
         "operationId": "get-segments-segment-id-legs",
-        "description": "Get legs for a segment.",
-        "security": [
-          {
-            "oauth2": []
-          }
-        ]
+        "description": "Get legs for a segment."
       }
     },
     "/trips/{tripId}": {
@@ -445,12 +413,7 @@
           }
         },
         "operationId": "get-trips-trip-id",
-        "description": "View a Trip.",
-        "security": [
-          {
-            "oauth2": []
-          }
-        ]
+        "description": "View a Trip."
       }
     },
     "/trips/{tripId}/segments": {
@@ -478,7 +441,10 @@
                         "$ref": "#/components/schemas/Segment"
                       }
                     }
-                  }
+                  },
+                  "required": [
+                    "data"
+                  ]
                 }
               }
             }
@@ -488,12 +454,7 @@
           }
         },
         "operationId": "get-trips-trip-id-segments",
-        "description": "Get segments for a trip.",
-        "security": [
-          {
-            "oauth2": []
-          }
-        ]
+        "description": "Get segments for a trip."
       }
     },
     "/trips/{tripId}/prices": {
@@ -521,7 +482,10 @@
                         "$ref": "#/components/schemas/Price"
                       }
                     }
-                  }
+                  },
+                  "required": [
+                    "data"
+                  ]
                 }
               }
             }
@@ -531,12 +495,7 @@
           }
         },
         "operationId": "get-trips-trip-id-prices",
-        "description": "Get cached prices for a trip.",
-        "security": [
-          {
-            "oauth2": []
-          }
-        ]
+        "description": "Get cached prices for a trip."
       }
     },
     "/trips/searches": {
@@ -557,7 +516,10 @@
                     "data": {
                       "$ref": "#/components/schemas/TripSearch"
                     }
-                  }
+                  },
+                  "required": [
+                    "data"
+                  ]
                 }
               }
             }
@@ -579,16 +541,14 @@
                   "data": {
                     "$ref": "#/components/schemas/TripSearch"
                   }
-                }
+                },
+                "required": [
+                  "data"
+                ]
               }
             }
           }
-        },
-        "security": [
-          {
-            "oauth2": []
-          }
-        ]
+        }
       },
       "parameters": []
     },
@@ -614,7 +574,10 @@
                     "data": {
                       "$ref": "#/components/schemas/TripSearch"
                     }
-                  }
+                  },
+                  "required": [
+                    "data"
+                  ]
                 }
               }
             }
@@ -624,12 +587,7 @@
           }
         },
         "operationId": "get-trips-searches-trip-search-id",
-        "description": "View a previously created trip search.",
-        "security": [
-          {
-            "oauth2": []
-          }
-        ]
+        "description": "View a previously created trip search."
       }
     },
     "/trips/searches/{tripSearchId}/trips": {
@@ -672,12 +630,7 @@
           }
         },
         "operationId": "get-trips-searches-trip-search-id-trips",
-        "description": "View trips for a trip search.",
-        "security": [
-          {
-            "oauth2": []
-          }
-        ]
+        "description": "View trips for a trip search."
       }
     },
     "/offers/searches": {
@@ -708,7 +661,10 @@
                         }
                       ]
                     }
-                  }
+                  },
+                  "required": [
+                    "data"
+                  ]
                 }
               }
             }
@@ -740,16 +696,14 @@
                       }
                     ]
                   }
-                }
+                },
+                "required": [
+                  "data"
+                ]
               }
             }
           }
-        },
-        "security": [
-          {
-            "oauth2": []
-          }
-        ]
+        }
       },
       "parameters": []
     },
@@ -785,7 +739,10 @@
                         }
                       ]
                     }
-                  }
+                  },
+                  "required": [
+                    "data"
+                  ]
                 }
               }
             }
@@ -795,12 +752,7 @@
           }
         },
         "operationId": "get-offers-searches-offer-search-id",
-        "description": "View a previously created offer search.",
-        "security": [
-          {
-            "oauth2": []
-          }
-        ]
+        "description": "View a previously created offer search."
       }
     },
     "/offers/searches/{offerSearchId}/offers": {
@@ -843,12 +795,7 @@
           }
         },
         "operationId": "get-offers-searches-offer-search-id-offers",
-        "description": "View offers for an offer search.",
-        "security": [
-          {
-            "oauth2": []
-          }
-        ]
+        "description": "View offers for an offer search."
       }
     },
     "/offers/searches/{offerSearchId}/related": {
@@ -898,12 +845,7 @@
           }
         },
         "operationId": "get-offers-searches-offer-search-id-related",
-        "description": "View related searches for an offer search.",
-        "security": [
-          {
-            "oauth2": []
-          }
-        ]
+        "description": "View related searches for an offer search."
       }
     },
     "/journeys": {
@@ -924,7 +866,10 @@
                     "data": {
                       "$ref": "#/components/schemas/Journey"
                     }
-                  }
+                  },
+                  "required": [
+                    "data"
+                  ]
                 }
               }
             }
@@ -946,7 +891,10 @@
                   "data": {
                     "$ref": "#/components/schemas/Journey"
                   }
-                }
+                },
+                "required": [
+                  "data"
+                ]
               }
             }
           }
@@ -972,18 +920,16 @@
                         "$ref": "#/components/schemas/Journey"
                       }
                     }
-                  }
+                  },
+                  "required": [
+                    "data"
+                  ]
                 }
               }
             }
           }
         },
-        "description": "List all journeys.",
-        "security": [
-          {
-            "oauth2": []
-          }
-        ]
+        "description": "List all journeys."
       },
       "parameters": []
     },
@@ -1009,7 +955,10 @@
                     "data": {
                       "$ref": "#/components/schemas/Journey"
                     }
-                  }
+                  },
+                  "required": [
+                    "data"
+                  ]
                 }
               }
             }
@@ -1019,12 +968,7 @@
           }
         },
         "operationId": "get-journeys-journey-id",
-        "description": "View a previously created journey.",
-        "security": [
-          {
-            "oauth2": []
-          }
-        ]
+        "description": "View a previously created journey."
       }
     },
     "/journeys/{journeyId}/relationships/offers": {
@@ -1057,7 +1001,10 @@
                       "$ref": "#/components/schemas/OfferIdentifier"
                     }
                   }
-                }
+                },
+                "required": [
+                  "data"
+                ]
               }
             }
           }
@@ -1114,7 +1061,8 @@
         },
         "operationId": "get-health",
         "description": "Check the application health.",
-        "x-internal": true
+        "x-internal": true,
+        "security": []
       }
     }
   },
@@ -1143,8 +1091,9 @@
                 "required": [
                   "name",
                   "type",
-                  "longitude",
                   "latitude",
+                  "longitude",
+                  "countryCode",
                   "timeZone",
                   "iataCode"
                 ],
@@ -1175,10 +1124,10 @@
                   },
                   "countryCode": {
                     "type": "string",
-                    "example": "SE",
                     "pattern": "^[A-Z]{2}$",
                     "minLength": 2,
                     "maxLength": 2,
+                    "example": "SE",
                     "readOnly": true
                   },
                   "timeZone": {

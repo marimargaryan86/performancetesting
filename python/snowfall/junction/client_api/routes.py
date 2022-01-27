@@ -5,8 +5,8 @@ import lagom
 from furl import furl
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.adapter import places
-from snowfall.junction.client_api import models, request_helpers, resources, trips
+from snowfall.adapter import places, trip_searches, trips
+from snowfall.junction.client_api import models, request_helpers, resources
 
 _DEFAULT_PAGE_LIMIT = 20
 
@@ -63,18 +63,18 @@ class TripSearch(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        trip_search_repository: trips.TripSearchRepository = lagom.injectable,
+        client: trip_searches.Client = lagom.injectable,
     ) -> responses.Response:
         trip_search_id = uuid.UUID(request.path_params["tripSearchId"])
 
         try:
-            trip_search = await trip_search_repository.get(trip_search_id)
-        except trips.NotFoundError:
+            trip_search = await client.get(trip_search_id)
+        except trip_searches.NotFoundError:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
         return models.JsonApiResponse(
             models.Body(
-                data=await trips.TripSearchResource.from_data_class(
+                data=await resources.TripSearchResource.from_data_class(
                     trip_search,
                     request,
                 ),
@@ -87,7 +87,7 @@ class TripSearches(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         places_client: places.Client = lagom.injectable,
-        trip_search_repository: trips.TripSearchRepository = lagom.injectable,
+        client: trip_searches.Client = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
 
@@ -101,8 +101,8 @@ class TripSearches(endpoints.HTTPEndpoint):
         except places.NotFoundError:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
-        trip_search = await trip_search_repository.create(
-            trips.TripSearchRequest(
+        trip_search = await client.create(
+            trip_searches.TripSearchRequest(
                 origin=origin,
                 destination=destination,
                 departure_after=body.get("departureAfter")
@@ -114,7 +114,7 @@ class TripSearches(endpoints.HTTPEndpoint):
 
         return models.JsonApiResponse(
             models.Body(
-                data=await trips.TripSearchResource.from_data_class(
+                data=await resources.TripSearchResource.from_data_class(
                     trip_search,
                     request,
                 ),
@@ -127,19 +127,19 @@ class Trips(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        trip_search_repository: trips.TripSearchRepository = lagom.injectable,
+        client: trip_searches.Client = lagom.injectable,
     ) -> responses.Response:
         trip_search_id = uuid.UUID(request.path_params["tripSearchId"])
 
         try:
-            await trip_search_repository.get(trip_search_id)
-        except trips.NotFoundError:
+            await client.get(trip_search_id)
+        except trip_searches.NotFoundError:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
         return models.JsonApiResponse(
             models.Body(
                 data=[
-                    await trips.TripResource.from_data_class(
+                    await resources.TripResource.from_data_class(
                         trip=trips.Trip(
                             identifier=uuid.UUID(
                                 "9ecd1767-3f8f-4dfe-8782-5880ff89df19",

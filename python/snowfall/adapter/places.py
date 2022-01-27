@@ -56,7 +56,7 @@ class PlacesPage(object):
         )
 
 
-class Client(object):
+class Client(abc.ABC):
     @abc.abstractmethod
     async def get(self, identifier: uuid.UUID) -> Place:
         """Fetch a place resource."""

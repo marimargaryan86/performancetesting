@@ -3,46 +3,36 @@ from typing import AsyncIterator
 import pytest
 from starlette import applications, testclient
 
-from snowfall.adapter import places
-from snowfall.junction.client_api import bootstrap, loaders, patch, trips, validation
-from snowfall.logging import stdout
-
-stdout.configure_logger()
-PLACE_NOT_FOUND = "f55b0ec5-7c87-4c35-86f4-1417a5f50e89"
-PLACES = (
-    {"id": "f236a92c-4cfa-468e-85ef-431d25dcd925"},
-    {"id": "488a836d-ec22-439b-a9d8-3c4c386a731e"},
-)
-
-
-@pytest.fixture()
-def places_client() -> places.Client:
-    return places.DictClient(PLACES)
-
-
-@pytest.fixture()
-def trip_search_repository() -> trips.TripSearchRepository:
-    return trips.TripSearchRepository()
+from snowfall.adapter import places, trip_searches
+from snowfall.junction.client_api import bootstrap, loaders, patch, validation
 
 
 def _create_app(
     validator: validation.Validator,
     places_client: places.Client,
-    trip_search_repository: trips.TripSearchRepository,
+    trip_searches_client: trip_searches.Client,
 ) -> applications.Starlette:
     return bootstrap.create_app(
         validator=validator,
         dependencies=bootstrap.create_dependencies(
             places_client=places_client,
-            trip_search_repository=trip_search_repository,
+            trip_searches_client=trip_searches_client,
         ),
     )
 
 
 @pytest.fixture()
+def headers() -> dict[str, str]:
+    return {
+        "Accept": "application/vnd.api+json",
+        "Authorization": "Bearer foobar",
+    }
+
+
+@pytest.fixture()
 def app(
     places_client: places.Client,
-    trip_search_repository: trips.TripSearchRepository,
+    trip_searches_client: trip_searches.Client,
 ) -> applications.Starlette:
     patch.patch_open_api()
 
@@ -52,19 +42,25 @@ def app(
             loaders.PkgLoader("client_api"),
         ),
         places_client=places_client,
-        trip_search_repository=trip_search_repository,
+        trip_searches_client=trip_searches_client,
     )
 
 
 @pytest.fixture()
-def client(app: applications.Starlette) -> testclient.TestClient:
-    return testclient.TestClient(app)
+def client(
+    app: applications.Starlette,
+    headers: dict[str, str],
+) -> testclient.TestClient:
+    client = testclient.TestClient(app)
+    client.headers.update(headers)
+
+    return client
 
 
 @pytest.fixture()
 def test_app(
     places_client: places.Client,
-    trip_search_repository: trips.TripSearchRepository,
+    trip_searches_client: trip_searches.Client,
 ) -> applications.Starlette:
     patch.patch_open_api()
 
@@ -74,7 +70,7 @@ def test_app(
             loaders.FileLoader(),
         ),
         places_client=places_client,
-        trip_search_repository=trip_search_repository,
+        trip_searches_client=trip_searches_client,
     )
 
 
