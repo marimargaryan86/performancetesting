@@ -1,7 +1,6 @@
 import random
 from typing import Sequence
 
-import amqp
 from motor import motor_asyncio
 from pydantic import AnyUrl, BaseSettings
 
@@ -9,8 +8,7 @@ from snowfall.junction.places.consumer import PlaceImportConsumer
 from snowfall.junction.places.grpc import PlacesService
 from snowfall.junction.places.places import PlaceRepository
 from snowfall.service import RunnableService, Task, make_runnable_service
-from snowfall.transport.amqp import create_consumer
-from snowfall.transport.grpc import create_server
+from snowfall.transport import amqp, grpc
 
 
 class _GrpcSettings(BaseSettings):
@@ -33,7 +31,7 @@ async def _import(_: RunnableService) -> None:
     async with connection:
         consumer = PlaceImportConsumer(
             places=PlaceRepository(mongo.places.places),
-            consumer=await create_consumer(
+            consumer=await amqp.create_consumer(
                 conn=connection,
                 exchange_name="places",
                 queue_name="importer",
@@ -47,7 +45,7 @@ async def _import(_: RunnableService) -> None:
 async def _serve(service: RunnableService) -> None:
     settings = _GrpcSettings()
     mongo = motor_asyncio.AsyncIOMotorClient(random.choice(settings.mongo_dsn))  # nosec
-    server = create_server(
+    server = grpc.create_server(
         settings.grpc_address,
         settings.grpc_port,
         [
