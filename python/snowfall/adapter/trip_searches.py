@@ -4,8 +4,9 @@ import abc
 import dataclasses
 import datetime
 import uuid
+from typing import Sequence
 
-from snowfall.adapter import places
+from snowfall.adapter import places, trips
 
 
 class NotFoundError(Exception):
@@ -19,6 +20,7 @@ class TripSearch(object):
     origin: places.Place
     destination: places.Place
     departure_after: datetime.datetime
+    trips: Sequence[trips.Trip]
 
 
 @dataclasses.dataclass(frozen=True)
@@ -42,7 +44,8 @@ class Client(abc.ABC):
 
 
 class DictClient(Client):
-    def __init__(self) -> None:
+    def __init__(self, trips_client: trips.DictClient):
+        self._trips = trips_client
         self._searches: dict[uuid.UUID, TripSearch] = {}
 
     async def create(
@@ -58,6 +61,7 @@ class DictClient(Client):
             origin=trip_search_request.origin,
             destination=trip_search_request.destination,
             departure_after=trip_search_request.departure_after,
+            trips=await self._generate_trips(expires_at),
         )
         self._searches[trip_search.identifier] = trip_search
 
@@ -68,3 +72,13 @@ class DictClient(Client):
             return self._searches[identifier]
         except KeyError:
             raise NotFoundError()
+
+    async def _generate_trips(self, expires_at: datetime.datetime) -> list[trips.Trip]:
+        return [
+            await self._trips.add(
+                trips.Trip(
+                    identifier=uuid.uuid4(),
+                    expires_at=expires_at,
+                ),
+            ),
+        ]

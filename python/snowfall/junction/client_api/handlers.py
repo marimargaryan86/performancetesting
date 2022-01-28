@@ -35,9 +35,7 @@ async def error_handler(
     if isinstance(exc, exceptions.HTTPException):
         return await exception_handler(request, exc)
 
-    status = http.HTTPStatus(http.HTTPStatus.INTERNAL_SERVER_ERROR)
-
-    return await _error_response_from_status(status)
+    return await _error_response_from_status(http.HTTPStatus.INTERNAL_SERVER_ERROR)
 
 
 async def exception_handler(
@@ -53,6 +51,4 @@ async def validation_error_handler(
     request: requests.Request,
     exc: OpenAPIError,
 ) -> responses.JSONResponse:
-    status = http.HTTPStatus(http.HTTPStatus.BAD_REQUEST)
-
-    return await _error_response_from_status(status, str(exc))
+    return await _error_response_from_status(http.HTTPStatus.BAD_REQUEST, str(exc))

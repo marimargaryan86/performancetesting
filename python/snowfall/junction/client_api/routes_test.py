@@ -1,10 +1,11 @@
+import datetime
 import uuid
 from typing import Any
 
 import pytest
 from starlette import status, testclient
 
-from snowfall.adapter import trip_searches
+from snowfall.adapter import trip_searches, trips
 from snowfall.conftest import PLACE_NOT_FOUND, PLACES
 
 
@@ -34,6 +35,30 @@ class TestPlaces(object):
 
 @pytest.mark.asyncio
 class TestTrips(object):
+    async def test_missing_trip_returns_not_found(
+        self,
+        client: testclient.TestClient,
+    ) -> None:
+        response = client.get(
+            "/trips/{id}".format(id=str(uuid.uuid4())),
+        )
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    async def test_trip_is_found(
+        self,
+        client: testclient.TestClient,
+        trips_client: trips.DictClient,
+    ) -> None:
+        trip = trips.Trip(identifier=uuid.uuid4(), expires_at=datetime.datetime.now())
+        await trips_client.add(trip)
+        response = client.get(
+            "/trips/{id}".format(id=str(trip.identifier)),
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.asyncio
+class TestTripSearches(object):
     async def test_malformed_trip_search_post_returns_bad_request(
         self,
         client: testclient.TestClient,
@@ -182,9 +207,8 @@ class TestTrips(object):
         client: testclient.TestClient,
     ) -> None:
         trip_search = await trip_searches_client.create(trip_search_request)
-        identifier = "9ecd1767-3f8f-4dfe-8782-5880ff89df19"
         response = client.get(
             "/trips/searches/{id}/trips".format(id=trip_search.identifier),
         )
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()["data"][0]["id"] == identifier
+        assert response.json()["data"]

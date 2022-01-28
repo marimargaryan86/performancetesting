@@ -1,11 +1,12 @@
+import http
 from typing import Sequence
 
 import lagom
 import pydantic
 from lagom.integrations import starlette
-from starlette import applications, exceptions, middleware, status
+from starlette import applications, exceptions, middleware, routing, status
 
-from snowfall.adapter import places, trip_searches
+from snowfall.adapter import places, trip_searches, trips
 from snowfall.junction.client_api import handlers, middlewares, routes, validation
 
 
@@ -18,10 +19,12 @@ class Settings(pydantic.BaseSettings):
 
 def create_dependencies(
     places_client: places.Client,
+    trips_client: trips.Client,
     trip_searches_client: trip_searches.Client,
 ) -> starlette.StarletteIntegration:
     container = lagom.Container()
     container[places.Client] = places_client  # type: ignore[misc]
+    container[trips.Client] = trips_client  # type: ignore[misc]
     container[trip_searches.Client] = trip_searches_client  # type: ignore[misc]
 
     return starlette.StarletteIntegration(container)
@@ -31,7 +34,28 @@ def create_app(
     validator: validation.Validator,
     dependencies: starlette.StarletteIntegration,
 ) -> applications.Starlette:
-    app_routes = [
+    custom_middlewares = [
+        middleware.Middleware(
+            middlewares.ValidationMiddleware,
+            validator=validator,
+            excluded_status_codes={http.HTTPStatus.METHOD_NOT_ALLOWED},
+        ),
+    ]
+    app = applications.Starlette(
+        routes=_get_routes(dependencies),
+        middleware=custom_middlewares,
+    )
+    app.add_exception_handler(exceptions.HTTPException, handlers.exception_handler)
+    app.add_exception_handler(
+        status.HTTP_500_INTERNAL_SERVER_ERROR,
+        handlers.error_handler,
+    )
+
+    return app
+
+
+def _get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Route]:
+    return [
         dependencies.route("/health", routes.Health),
         dependencies.route(
             "/places",
@@ -45,24 +69,18 @@ def create_app(
         ),
         dependencies.route("/trips/searches", routes.TripSearches),
         dependencies.route(
+            "/trips/{tripId}",
+            routes.Trip,
+            name="ViewTrip",
+        ),
+        dependencies.route(
             "/trips/searches/{tripSearchId}",
             routes.TripSearch,
             name="ViewTripSearch",
         ),
         dependencies.route(
             "/trips/searches/{tripSearchId}/trips",
-            routes.Trips,
+            routes.TripsByTripSearch,
             name="ViewTrips",
         ),
     ]
-    custom_middlewares = [
-        middleware.Middleware(middlewares.ValidationMiddleware, validator=validator),
-    ]
-    app = applications.Starlette(routes=app_routes, middleware=custom_middlewares)
-    app.add_exception_handler(exceptions.HTTPException, handlers.exception_handler)
-    app.add_exception_handler(
-        status.HTTP_500_INTERNAL_SERVER_ERROR,
-        handlers.error_handler,
-    )
-
-    return app

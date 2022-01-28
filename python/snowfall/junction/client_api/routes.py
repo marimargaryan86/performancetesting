@@ -59,6 +59,29 @@ class Places(endpoints.HTTPEndpoint):
         )
 
 
+class Trip(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        client: trips.Client = lagom.injectable,
+    ) -> responses.Response:
+        trip_id = uuid.UUID(request.path_params["tripId"])
+
+        try:
+            trip = await client.get(trip_id)
+        except trips.NotFoundError:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+        return models.JsonApiResponse(
+            models.Body(
+                data=await resources.TripResource.from_data_class(
+                    trip=trip,
+                    request=request,
+                ),
+            ),
+        )
+
+
 class TripSearch(endpoints.HTTPEndpoint):
     async def get(
         self,
@@ -87,7 +110,7 @@ class TripSearches(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         places_client: places.Client = lagom.injectable,
-        client: trip_searches.Client = lagom.injectable,
+        trip_searches_client: trip_searches.Client = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
 
@@ -101,7 +124,7 @@ class TripSearches(endpoints.HTTPEndpoint):
         except places.NotFoundError:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
-        trip_search = await client.create(
+        trip_search = await trip_searches_client.create(
             trip_searches.TripSearchRequest(
                 origin=origin,
                 destination=destination,
@@ -123,7 +146,7 @@ class TripSearches(endpoints.HTTPEndpoint):
         )
 
 
-class Trips(endpoints.HTTPEndpoint):
+class TripsByTripSearch(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
@@ -132,7 +155,7 @@ class Trips(endpoints.HTTPEndpoint):
         trip_search_id = uuid.UUID(request.path_params["tripSearchId"])
 
         try:
-            await client.get(trip_search_id)
+            trip_search = await client.get(trip_search_id)
         except trip_searches.NotFoundError:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
@@ -140,16 +163,10 @@ class Trips(endpoints.HTTPEndpoint):
             models.Body(
                 data=[
                     await resources.TripResource.from_data_class(
-                        trip=trips.Trip(
-                            identifier=uuid.UUID(
-                                "9ecd1767-3f8f-4dfe-8782-5880ff89df19",
-                            ),
-                            expires_at=datetime.datetime.now(
-                                datetime.timezone.utc,
-                            )
-                            + datetime.timedelta(days=1),
-                        ),
-                    ),
+                        trip=trip,
+                        request=request,
+                    )
+                    for trip in trip_search.trips
                 ],
             ),
         )

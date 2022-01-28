@@ -3,19 +3,21 @@ from typing import AsyncIterator
 import pytest
 from starlette import applications, testclient
 
-from snowfall.adapter import places, trip_searches
+from snowfall.adapter import places, trip_searches, trips
 from snowfall.junction.client_api import bootstrap, loaders, patch, validation
 
 
 def _create_app(
     validator: validation.Validator,
     places_client: places.Client,
+    trips_client: trips.Client,
     trip_searches_client: trip_searches.Client,
 ) -> applications.Starlette:
     return bootstrap.create_app(
         validator=validator,
         dependencies=bootstrap.create_dependencies(
             places_client=places_client,
+            trips_client=trips_client,
             trip_searches_client=trip_searches_client,
         ),
     )
@@ -32,6 +34,7 @@ def headers() -> dict[str, str]:
 @pytest.fixture()
 def app(
     places_client: places.Client,
+    trips_client: trips.Client,
     trip_searches_client: trip_searches.Client,
 ) -> applications.Starlette:
     patch.patch_open_api()
@@ -42,6 +45,7 @@ def app(
             loaders.PkgLoader("client_api"),
         ),
         places_client=places_client,
+        trips_client=trips_client,
         trip_searches_client=trip_searches_client,
     )
 
@@ -60,6 +64,7 @@ def client(
 @pytest.fixture()
 def test_app(
     places_client: places.Client,
+    trips_client: trips.Client,
     trip_searches_client: trip_searches.Client,
 ) -> applications.Starlette:
     patch.patch_open_api()
@@ -70,6 +75,7 @@ def test_app(
             loaders.FileLoader(),
         ),
         places_client=places_client,
+        trips_client=trips_client,
         trip_searches_client=trip_searches_client,
     )
 

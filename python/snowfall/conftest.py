@@ -3,7 +3,7 @@ import uuid
 
 import pytest
 
-from snowfall.adapter import places, trip_searches
+from snowfall.adapter import places, trip_searches, trips
 from snowfall.logging import stdout
 
 # todo: would be nice with some "well-known" test data for places etc. in a package.
@@ -22,8 +22,13 @@ def places_client() -> places.Client:
 
 
 @pytest.fixture
-def trip_searches_client() -> trip_searches.Client:
-    return trip_searches.DictClient()
+def trips_client() -> trips.Client:
+    return trips.DictClient()
+
+
+@pytest.fixture
+def trip_searches_client(trips_client: trips.DictClient) -> trip_searches.Client:
+    return trip_searches.DictClient(trips_client=trips_client)
 
 
 @pytest.fixture

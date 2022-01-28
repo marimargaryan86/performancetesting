@@ -39,6 +39,7 @@ class TripResource(models.Resource):
     async def from_data_class(
         cls,
         trip: trips.Trip,
+        request: requests.Request,
     ) -> TripResource:
         return cls(
             id=str(trip.identifier),
@@ -52,7 +53,10 @@ class TripResource(models.Resource):
                 },
             },
             links={
-                "self": "/trips/{id}".format(id=trip.identifier),
+                "self": request.url_for(
+                    "ViewTrip",
+                    tripId=trip.identifier,
+                ),
             },
         )
 

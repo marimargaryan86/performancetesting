@@ -1,5 +1,6 @@
+import http
 from collections.abc import AsyncIterable
-from typing import Awaitable, Callable
+from typing import Awaitable, Callable, Container, Optional
 
 from openapi_core.exceptions import OpenAPIError
 from openapi_core.templating.paths.exceptions import PathNotFound
@@ -54,9 +55,15 @@ async def _read_bytes(generator: AsyncIterable[bytes]) -> bytes:
 
 
 class ValidationMiddleware(base.BaseHTTPMiddleware):
-    def __init__(self, app: applications.Starlette, validator: validation.Validator):
+    def __init__(
+        self,
+        app: applications.Starlette,
+        validator: validation.Validator,
+        excluded_status_codes: Optional[Container[http.HTTPStatus]] = None,
+    ):
         super().__init__(app)
         self._validator = validator
+        self._excluded_status_codes = excluded_status_codes or []
 
     async def dispatch(
         self,
@@ -83,6 +90,10 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
     ) -> responses.Response:
         response = await call_next(resolved_request)
         resolved_response = await resolve_response(response)
+
+        if resolved_response.status_code in self._excluded_status_codes:
+            return resolved_response
+
         openapi_response = await validation.response_to_openapi(resolved_response)
         await self._validator.validate_response(openapi_request, openapi_response)
 
