@@ -21,7 +21,6 @@ pants:setup:
   after_script:
     - ./bash/nuke-if-too-big.sh .cache 384
   variables:
-    CACHE_FALLBACK_KEY: "${CI_DEFAULT_BRANCH}"
     GIT_DEPTH: 0
     GIT_STRATEGY: clone
     PANTS_CONFIG_FILES: ./pants.ci.toml
@@ -30,7 +29,7 @@ pants:setup:
     PANTS_SETUP_CACHE: .cache
     PYTHON: /usr/local/bin/python
   cache:
-    key: "${CI_COMMIT_REF_NAME}"
+    key: "pants-setup"
     paths:
       - .cache/
     when: always
