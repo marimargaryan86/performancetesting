@@ -1,41 +1,7 @@
-from typing import Any, Iterable, cast
+from typing import Any, cast
 
-import openapi_schema_validator
-from jsonschema import exceptions as json_schema_exceptions
 from openapi_core.security import exceptions, factories, providers
 from openapi_core.validation.request.datatypes import OpenAPIRequest
-
-
-class _PatchedOAS30Validator(openapi_schema_validator.OAS30Validator):
-    """Patches the openapi-core's validator.
-
-    This solves the problem with `read` and `write` getting unset when the
-    `jsonschema` parent class is re-created with `attr.evolve`.
-    """
-
-    def __init__(self, *args: Any, **kwargs: Any):
-        super().__init__(*args, **kwargs)
-
-        if self.read:
-            self.resolver.patch_read = self.read
-            self.resolver.patch_write = None
-
-        if self.write:
-            self.resolver.patch_read = None
-            self.resolver.patch_write = self.write
-
-    def iter_errors(
-        self,
-        instance: Any,
-        _schema: Any = None,
-    ) -> Iterable[json_schema_exceptions.ValidationError]:
-        self.read = getattr(self.resolver, "patch_read", None)
-        self.write = getattr(self.resolver, "patch_write", None)
-
-        return cast(
-            Iterable[json_schema_exceptions.ValidationError],
-            super().iter_errors(instance, _schema),
-        )
 
 
 class _PatchedSecurityProviderFactory(factories.SecurityProviderFactory):
@@ -69,5 +35,4 @@ class OAuth2Provider(providers.BaseProvider):
 
 
 def patch_open_api() -> None:
-    openapi_schema_validator.OAS30Validator = _PatchedOAS30Validator
     factories.SecurityProviderFactory = _PatchedSecurityProviderFactory

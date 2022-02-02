@@ -1,8 +1,10 @@
 [GLOBAL]
 colors = true
 pantsd = false
-local_store_dir = ".cache/lmdb_store"
-named_caches_dir = ".cache/named_caches"
+remote_cache_read = true
+remote_cache_write = true
+remote_store_address = "grpc://bazel-remote-cache:9092"
+remote_instance_name = "main"
 
 [coverage-py]
 global_report = true
@@ -16,8 +18,8 @@ env_vars = [
     "DOCKER_HOST",
 ]
 
-[python]
-interpreter_search_paths = ["/usr/local/bin"]
+[python-bootstrap]
+search_path = ["/usr/local/bin"]
 
 [python-native-code]
 cpp_flags = ["-I/usr/local/include/python3.9/"]
