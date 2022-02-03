@@ -2,14 +2,32 @@ syntax = "proto3";
 
 package snowfall.junction.planner.v1;
 
+import "snowfall/common/v1alpha/models.proto";
+
 service PlannerService {
   rpc SearchJourney (SearchJourneyRequest) returns (SearchJourneyResponse) {}
 }
 
 message SearchJourneyRequest {
-
+  snowfall.common.v1alpha.Coordinates origin = 1;
+  snowfall.common.v1alpha.Coordinates destination = 2;
+  int64 departure_after = 3;
 }
 
 message SearchJourneyResponse {
+  repeated TripReference trips = 1;
+}
 
+message TripReference {
+  string id = 1;
+  repeated SegmentReference segments = 2;
+}
+
+message SegmentReference {
+  string id = 1;
+  repeated LegReference legs = 2;
+}
+
+message LegReference {
+  string id = 1;
 }

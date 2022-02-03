@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-import "snowfall/common/v1alpha/models.proto";
-
 package snowfall.junction.places.v1alpha;
+
+import "snowfall/common/v1alpha/models.proto";
 
 service PlacesService {
   rpc GetPlace (GetPlaceRequest) returns (GetPlaceResponse) {}

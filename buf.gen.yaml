@@ -1,0 +1,15 @@
+version: v1
+managed:
+  enabled: true
+  go_package_prefix:
+    default: git.snowfall.se/junction/junction/golang/protobuf
+plugins:
+  - name: go
+    out: golang/protobuf
+    opt:
+      - paths=source_relative
+  - name: go-grpc
+    out: golang/protobuf
+    opt:
+      - paths=source_relative
+      - require_unimplemented_servers=false

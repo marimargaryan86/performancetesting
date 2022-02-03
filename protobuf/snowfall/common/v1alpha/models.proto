@@ -2,6 +2,11 @@ syntax = "proto3";
 
 package snowfall.common.v1alpha;
 
+message Coordinates {
+  double latitude = 1;
+  double longitude = 2;
+}
+
 message Cursor {
   string id = 1;
   string clause = 2;

@@ -5,7 +5,6 @@ backend_packages = [
     "pants.backend.codegen.protobuf.python",
     "pants.backend.experimental.docker",
     "pants.backend.experimental.docker.lint.hadolint",
-    "pants.backend.experimental.go",
     "pants.backend.python",
     "pants.backend.python.lint.bandit",
     "pants.backend.python.lint.black",
@@ -66,9 +65,6 @@ extra_requirements = [
     "wemake-python-styleguide",
 ]
 
-[golang]
-expected_version = "1.17"
-
 [isort]
 version = "isort==5.10.1"
 config = "vendor/setup.cfg"
@@ -119,6 +115,7 @@ runtime_dependencies = [
 [source]
 root_patterns = [
     "/bash",
+    "/golang",
     "/openapi",
     "/protobuf",
     "/python",
