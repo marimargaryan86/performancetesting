@@ -3,11 +3,11 @@ import uuid
 
 import aiofiles
 import tenacity
-import timezonefinder
-from geopy import exc, geocoders
+from geopy import exc
 
 from snowfall.common.v1alpha import models_pb2
 from snowfall.format.gtfs import feed
+from snowfall.geodata import geocoding
 from snowfall.junction.gtfs_feed import gtfs
 from snowfall.transport import amqp
 
@@ -15,9 +15,8 @@ _NAMESPACE = uuid.UUID("5190984e-4ab7-411e-96f6-2848cc5d63e1")
 
 
 async def process_places(
-    geocoder: geocoders.Photon,
+    geocoder: geocoding.ReverseGeocoder,
     producer: amqp.Producer,
-    tz_finder: timezonefinder.TimezoneFinder,
     feed_url: str,
     user_agent: str,
 ) -> None:
@@ -44,14 +43,14 @@ async def process_places(
                             latitude=stop.stop_lat,
                             longitude=stop.stop_lon,
                             country_code=(
-                                await geocoder.reverse(
-                                    "{0}, {1}".format(stop.stop_lat, stop.stop_lon),
-                                    exactly_one=True,
+                                await geocoder.get_country_code(
+                                    latitude=stop.stop_lat,
+                                    longitude=stop.stop_lon,
                                 )
-                            ).raw["properties"]["countrycode"],
-                            time_zone=tz_finder.timezone_at(
-                                lat=stop.stop_lat,
-                                lng=stop.stop_lon,
+                            ),
+                            time_zone=await geocoder.get_time_zone(
+                                latitude=stop.stop_lat,
+                                longitude=stop.stop_lon,
                             ),
                         ),
                         "place.import",
