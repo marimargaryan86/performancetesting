@@ -1,6 +1,6 @@
 [GLOBAL]
 pants_version = "2.10.0.dev2"
-use_deprecated_python_macros = true
+use_deprecated_python_macros = false
 backend_packages = [
     "pants.backend.codegen.protobuf.python",
     "pants.backend.experimental.docker",
@@ -112,8 +112,8 @@ requirement_constraints = "vendor/lock/constraints.txt"
 [python-protobuf]
 mypy_plugin = true
 runtime_dependencies = [
-    "vendor:grpcio",
-    "vendor:protobuf",
+    "vendor#grpcio",
+    "vendor#protobuf",
 ]
 
 [source]

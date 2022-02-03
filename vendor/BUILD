@@ -9,8 +9,8 @@ poetry_requirements(
         "setuptools": ["easy_install", "pkg_resources", "setuptools"],
     },
     overrides={
-        "openapi-core": {"dependencies": [":setuptools"]},
-        "protobuf": {"dependencies": [":types-protobuf"]},
-        "starlette": {"dependencies": [":requests"]},
+        "openapi-core": {"dependencies": ["#setuptools"]},
+        "protobuf": {"dependencies": ["#types-protobuf"]},
+        "starlette": {"dependencies": ["#requests"]},
     },
 )
