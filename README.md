@@ -18,8 +18,8 @@ and building.
 
 1. Install the EnvFile plugin.
 2. In your project settings, add the interpreter path from Poetry as the project
-   interpreter.
-3. Mark the following paths as:
+   interpreter (e.g. ~/.cache/pypoetry/virtualenvs/junction-1234/bin/python).
+3. Mark the following paths as (right click on folder + mark directory as):
    1. Source Folders:
       1. `dist/codegen/python`
       2. `python`
@@ -42,10 +42,12 @@ and building.
 
 Setup your Run/Debug configurations:
 
-1. Set the Module Name to`snowfall.junction.{service}.main`.
-2. Set the Parameters to the task you want to run (like `serve`).
-3. Set the working directory to the Junction root folder.
-4. Add the respective service's `.env.dist` file to EnvFile configuration.
+1. Set the `Module Name` to `snowfall.junction.{service}.main`. (If there is no
+   `Module Name` option, change `Script Path` to `Module Name`)
+2. Set the `Parameters` to the task you want to run (like `serve`, `import`).
+3. Set the `Working directory` to the Junction root folder.
+4. Under `EnvFile` submenu `enable EnvFile` and add an env file path for each
+   services (e.g. `python/snowfall/junction/client_api/.env.dist`)
 
 Now you can just run the service you want to start, but remember that some
 services might depend on other services.
@@ -67,7 +69,8 @@ service's `.env.dist` file, just like if you were using an IDE.
 
 ## Code Style
 
-This project uses Black to format the code, Mypy for type checking and flake8 for linting.
+This project uses Black to format the code, Mypy for type checking and flake8
+for linting.
 
 We follow rules of [wemake-python-styleguide][wemake-python-styleguide],
 except in a few cases where it collides with Black or causes difficulties with
