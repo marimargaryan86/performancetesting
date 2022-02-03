@@ -13,6 +13,8 @@ if [ -f "dist/deliverables.json" ]; then
 		service_name="${service_name%:*}"
 		repo_path="repo/${1}/${service_name}"
 		docker_image="${i%|*}"
+		service_version="${docker_image##*:}"
+
 		mkdir -p "${repo_path}"
 		echo "${docker_image}" >"${repo_path}/image.txt"
 
@@ -21,6 +23,8 @@ if [ -f "dist/deliverables.json" ]; then
 		docker tag "${docker_image}" "${docker_image%:*}:latest"
 		docker push "${docker_image%:*}:latest"
 
+		sentry-cli releases new --finalize -p "${service_name}" "${service_name}@${service_version}"
+		sentry-cli releases set-commits --commit "Junction / Junction@${service_version}" "${service_name}@${service_version}"
 	done
 fi
 

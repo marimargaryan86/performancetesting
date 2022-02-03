@@ -21,8 +21,10 @@ for DIR in "${1}"/*; do
 	fi
 
 	DOCKER_IMAGE=$(cat "${DIR}/image.txt")
+	service_name=$(basename "${DOCKER_IMAGE%:*}" | sed s/_/-/g)
+	service_version="${DOCKER_IMAGE##*:}"
 
-	echo "deploy: ${DOCKER_IMAGE}"
+	echo "deploy: ${service_name}@${service_version}"
 
 	export DOCKER_IMAGE
 	# shellcheck disable=SC2016
@@ -30,4 +32,6 @@ for DIR in "${1}"/*; do
 
 	nomad plan "${job_file}" | tee /dev/stderr | grep 'Job Modify Index:' | awk -F': ' '{ print $2 }' >check-index || if [ $? -eq 255 ]; then exit 255; else true; fi
 	nomad run -check-index="$(cat check-index)" "${job_file}"
+
+	sentry-cli releases deploys "${service_name}@${service_version}" new -e "${CI_ENVIRONMENT_NAME}"
 done
