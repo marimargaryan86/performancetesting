@@ -2,9 +2,7 @@ from __future__ import annotations
 
 import abc
 import dataclasses
-import random
-import uuid
-from typing import Any, Mapping, Optional, Sequence
+from typing import Optional, Sequence
 
 import grpc
 
@@ -21,44 +19,21 @@ class UnknownError(Exception):
 
 
 @dataclasses.dataclass(frozen=True)
-class Place(object):
-    identifier: uuid.UUID
-    name: str
-    latitude: float
-    longitude: float
-    country_code: str
-    time_zone: str
-    proto: Optional[models_pb2.Place] = None
-
-    @classmethod
-    async def from_proto(cls, grpc_place: models_pb2.Place) -> Place:
-        return cls(
-            country_code=grpc_place.country_code,
-            identifier=uuid.UUID(grpc_place.id),
-            latitude=grpc_place.coordinates.latitude,
-            longitude=grpc_place.coordinates.longitude,
-            name=grpc_place.name,
-            proto=grpc_place,
-            time_zone=grpc_place.time_zone,
-        )
-
-
-@dataclasses.dataclass(frozen=True)
 class PlacesPage(object):
-    places: Sequence[Place]
+    places: Sequence[models_pb2.Place]
     next_page_token: Optional[str] = None
 
     @classmethod
     async def from_proto(cls, grpc_places: places_pb2.ListPlacesResponse) -> PlacesPage:
         return cls(
-            places=[await Place.from_proto(place) for place in grpc_places.places],
+            places=grpc_places.places,
             next_page_token=grpc_places.next_page_token,
         )
 
 
 class Client(abc.ABC):
     @abc.abstractmethod
-    async def get(self, identifier: uuid.UUID) -> Place:
+    async def get(self, identifier: str) -> models_pb2.Place:
         """Fetch a place resource."""
 
     @abc.abstractmethod
@@ -66,27 +41,13 @@ class Client(abc.ABC):
         """Fetch all place resources."""
 
 
-_LATITUDE_RANGE = (-90, 90)
-_LONGITUDE_RANGE = (-180, 180)
-
-
 class DictClient(Client):
-    def __init__(self, places: Sequence[Mapping[str, Any]]):
-        self._places = {
-            place["id"]: Place(
-                identifier=uuid.UUID(place["id"]),
-                name="Foobar",
-                latitude=random.uniform(*_LATITUDE_RANGE),  # nosec
-                longitude=random.uniform(*_LONGITUDE_RANGE),  # nosec
-                country_code="SE",
-                time_zone="Europe/Stockholm",
-            )
-            for place in places
-        }
+    def __init__(self, places: Sequence[models_pb2.Place]):
+        self._places = {place.id: place for place in places}
 
-    async def get(self, place_id: uuid.UUID) -> Place:
+    async def get(self, place_id: str) -> models_pb2.Place:
         try:
-            return self._places[str(place_id)]
+            return self._places[place_id]
         except KeyError:
             raise NotFoundError("Place with ID '{id}' not found.".format(id=place_id))
 
@@ -98,10 +59,10 @@ class GrpcClient(Client):
     def __init__(self, places: places_pb2_grpc.PlacesServiceStub):
         self._places = places
 
-    async def get(self, place_id: uuid.UUID) -> Place:
+    async def get(self, place_id: str) -> models_pb2.Place:
         try:
             response = await self._places.GetPlace(  # type: ignore[misc]
-                places_pb2.GetPlaceRequest(id=str(place_id)),
+                places_pb2.GetPlaceRequest(id=place_id),
             )
         except grpc.aio.AioRpcError as exc:
             if exc.code() == grpc.StatusCode.NOT_FOUND:
@@ -111,7 +72,7 @@ class GrpcClient(Client):
 
             raise UnknownError(exc.details()) from exc
 
-        return await Place.from_proto(response.place)
+        return response.place
 
     async def find(self, limit: int, cursor: Optional[str] = None) -> PlacesPage:
         # todo: handle INVALID_ARGUMENT

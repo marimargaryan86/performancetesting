@@ -4,9 +4,11 @@ import abc
 import dataclasses
 import datetime
 import uuid
-from typing import Sequence
 
-from snowfall.adapter import places, trips
+from snowfall.common.v1alpha import models_pb2
+from snowfall.format import protobuf
+from snowfall.junction.planner.v1 import planner_pb2
+from snowfall.junction.trips.v1alpha import trips_pb2
 
 
 class NotFoundError(Exception):
@@ -14,19 +16,9 @@ class NotFoundError(Exception):
 
 
 @dataclasses.dataclass(frozen=True)
-class TripSearch(object):
-    identifier: uuid.UUID
-    expires_at: datetime.datetime
-    origin: places.Place
-    destination: places.Place
-    departure_after: datetime.datetime
-    trips: Sequence[trips.Trip]
-
-
-@dataclasses.dataclass(frozen=True)
 class TripSearchRequest(object):
-    origin: places.Place
-    destination: places.Place
+    origin: models_pb2.Place
+    destination: models_pb2.Place
     departure_after: datetime.datetime
 
 
@@ -35,50 +27,73 @@ class Client(abc.ABC):
     async def create(
         self,
         trip_search_request: TripSearchRequest,
-    ) -> TripSearch:
+    ) -> trips_pb2.TripSearch:
         """Create a trip search."""
 
     @abc.abstractmethod
-    async def get(self, identifier: uuid.UUID) -> TripSearch:
+    async def get(self, identifier: str) -> trips_pb2.TripSearch:
         """Get a trip search."""
+
+    @abc.abstractmethod
+    async def list_trips_by_trip_search(
+        self,
+        identifier: str,
+    ) -> list[planner_pb2.TripReference]:
+        """List trips by trip search."""
 
 
 class DictClient(Client):
-    def __init__(self, trips_client: trips.DictClient):
-        self._trips = trips_client
-        self._searches: dict[uuid.UUID, TripSearch] = {}
+    def __init__(self) -> None:
+        self._searches: dict[str, trips_pb2.TripSearch] = {}
+        self._trips_cache: dict[str, list[planner_pb2.TripReference]] = {}
 
     async def create(
         self,
         trip_search_request: TripSearchRequest,
-    ) -> TripSearch:
+    ) -> trips_pb2.TripSearch:
         expires_at = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
             days=1,
         )
-        trip_search = TripSearch(
-            identifier=uuid.uuid4(),
-            expires_at=expires_at,
+        trip_search = trips_pb2.TripSearch(
+            id=str(uuid.uuid4()),
+            expires_at=await protobuf.datetime_to_protobuf(expires_at),
             origin=trip_search_request.origin,
             destination=trip_search_request.destination,
-            departure_after=trip_search_request.departure_after,
-            trips=await self._generate_trips(expires_at),
+            departure_after=await protobuf.datetime_to_protobuf(
+                trip_search_request.departure_after,
+            ),
         )
-        self._searches[trip_search.identifier] = trip_search
+        self._searches[trip_search.id] = trip_search
+        await self._generate_trips(trip_search)
 
         return trip_search
 
-    async def get(self, identifier: uuid.UUID) -> TripSearch:
+    async def get(self, identifier: str) -> trips_pb2.TripSearch:
         try:
             return self._searches[identifier]
         except KeyError:
             raise NotFoundError()
 
-    async def _generate_trips(self, expires_at: datetime.datetime) -> list[trips.Trip]:
-        return [
-            await self._trips.add(
-                trips.Trip(
-                    identifier=uuid.uuid4(),
-                    expires_at=expires_at,
-                ),
+    async def list_trips_by_trip_search(
+        self,
+        identifier: str,
+    ) -> list[planner_pb2.TripReference]:
+        try:
+            return self._trips_cache[identifier]
+        except KeyError:
+            raise NotFoundError()
+
+    async def _generate_trips(self, trip_search: trips_pb2.TripSearch) -> None:
+        self._trips_cache[trip_search.id] = [
+            planner_pb2.TripReference(
+                id=str(uuid.uuid4()),
+                segments=[
+                    planner_pb2.SegmentReference(
+                        id=str(uuid.uuid4()),
+                        legs=[
+                            planner_pb2.LegReference(id=str(uuid.uuid4())),
+                        ],
+                    ),
+                ],
             ),
         ]

@@ -19,8 +19,8 @@ class BaseModel(pydantic.BaseModel):
 
 
 class ResourceIdentifier(BaseModel):
-    identifier: str = pydantic.Field(..., alias="id")
-    data_type: str = pydantic.Field(..., alias="type")
+    identifier: str = pydantic.Field(alias="id")
+    data_type: str = pydantic.Field(alias="type")
 
 
 class Resource(ResourceIdentifier):

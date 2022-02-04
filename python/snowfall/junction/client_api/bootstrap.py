@@ -6,7 +6,7 @@ import pydantic
 from lagom.integrations import starlette
 from starlette import applications, exceptions, middleware, routing, status
 
-from snowfall.adapter import places, trip_searches, trips
+from snowfall.adapter import places, trip_searches
 from snowfall.junction.client_api import handlers, middlewares, routes, validation
 
 
@@ -19,12 +19,10 @@ class Settings(pydantic.BaseSettings):
 
 def create_dependencies(
     places_client: places.Client,
-    trips_client: trips.Client,
     trip_searches_client: trip_searches.Client,
 ) -> starlette.StarletteIntegration:
     container = lagom.Container()
     container[places.Client] = places_client  # type: ignore[misc]
-    container[trips.Client] = trips_client  # type: ignore[misc]
     container[trip_searches.Client] = trip_searches_client  # type: ignore[misc]
 
     return starlette.StarletteIntegration(container)

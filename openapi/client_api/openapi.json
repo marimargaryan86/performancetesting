@@ -1468,8 +1468,8 @@
             "properties": {
               "id": {
                 "type": "string",
-                "format": "uuid",
                 "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "format": "uuid",
                 "readOnly": true
               },
               "type": {
@@ -1479,17 +1479,7 @@
                 ]
               },
               "attributes": {
-                "type": "object",
-                "required": [
-                  "expiresAt"
-                ],
-                "properties": {
-                  "expiresAt": {
-                    "type": "string",
-                    "format": "date-time",
-                    "readOnly": true
-                  }
-                }
+                "type": "object"
               },
               "relationships": {
                 "type": "object",
@@ -1524,16 +1514,18 @@
           {
             "$ref": "#/components/schemas/SelfLink"
           }
-        ]
+        ],
+        "description": ""
       },
       "TripIdentifier": {
         "title": "Trip Identifier",
         "type": "object",
+        "description": "",
         "properties": {
           "id": {
             "type": "string",
-            "format": "uuid",
-            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "format": "uuid"
           },
           "type": {
             "type": "string",
@@ -2393,7 +2385,8 @@
         "required": true,
         "schema": {
           "type": "string",
-          "format": "uuid"
+          "format": "uuid",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
         },
         "description": "Trip Search identifier"
       },
@@ -2403,7 +2396,8 @@
         "required": true,
         "schema": {
           "type": "string",
-          "format": "uuid"
+          "format": "uuid",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
         },
         "description": "Place identifier"
       },
@@ -2413,7 +2407,8 @@
         "required": true,
         "schema": {
           "type": "string",
-          "format": "uuid"
+          "format": "uuid",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
         },
         "description": "Trip identifier"
       },
@@ -2423,7 +2418,8 @@
         "required": true,
         "schema": {
           "type": "string",
-          "format": "uuid"
+          "format": "uuid",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
         },
         "description": "Offer Search identifier"
       },
@@ -2432,7 +2428,9 @@
         "in": "path",
         "required": true,
         "schema": {
-          "type": "string"
+          "type": "string",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+          "format": "uuid"
         },
         "description": "Journey identifier"
       },
@@ -2463,6 +2461,7 @@
         "required": true,
         "schema": {
           "type": "string",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
           "format": "uuid"
         },
         "description": "Segment identifier"
@@ -2473,7 +2472,8 @@
         "required": true,
         "schema": {
           "type": "string",
-          "format": "uuid"
+          "format": "uuid",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
         },
         "description": "Leg identifier"
       },
@@ -2483,7 +2483,8 @@
         "required": true,
         "schema": {
           "type": "string",
-          "format": "uuid"
+          "format": "uuid",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
         },
         "description": "Leg Type identifier"
       }

@@ -53,5 +53,4 @@ message Stop {
   google.protobuf.Timestamp arrival_at = 3;
   Point point = 4;
   uint32 order = 5;
-
 }

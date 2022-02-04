@@ -1,13 +1,12 @@
-import uuid
 from typing import Type
 from unittest import mock
 
 import grpc
 import pytest
 
+from snowfall import fixtures
 from snowfall.adapter import places
 from snowfall.common.v1alpha import models_pb2
-from snowfall.conftest import PLACE_NOT_FOUND, PLACES
 from snowfall.junction.places.v1alpha import places_pb2, places_pb2_grpc
 
 
@@ -17,16 +16,15 @@ class TestDictClient(object):
         self,
         places_client: places.Client,
     ) -> None:
-        identifier = PLACES[0]["id"]
-        place = await places_client.get(uuid.UUID(identifier))
-        assert str(place.identifier) == identifier
+        place = await places_client.get(fixtures.PLACES[0])
+        assert place.id == fixtures.PLACES[0]
 
     async def test_missing_place_throws_error(
         self,
         places_client: places.Client,
     ) -> None:
         with pytest.raises(places.NotFoundError):
-            await places_client.get(uuid.UUID(PLACE_NOT_FOUND))
+            await places_client.get(fixtures.NOT_FOUND)
 
     async def test_multiple_places_are_retrievable(
         self,
@@ -68,25 +66,23 @@ class TestGrpcClient(object):
         stub.GetPlace = mock.AsyncMock(side_effect=error)
         client = places.GrpcClient(stub)
         with pytest.raises(expected):
-            await client.get(uuid.UUID(PLACE_NOT_FOUND))
+            await client.get(fixtures.NOT_FOUND)
 
     async def test_single_place_is_retrievable(self) -> None:
-        identifier = PLACES[0]["id"]
-        proto = models_pb2.Place(id=identifier)
+        proto = models_pb2.Place(id=fixtures.PLACES[0])
         stub = mock.create_autospec(places_pb2_grpc.PlacesServiceStub)
         stub.GetPlace = mock.AsyncMock(
             return_value=places_pb2.GetPlaceResponse(place=proto),
         )
         client = places.GrpcClient(stub)
-        place = await client.get(uuid.UUID(identifier))
-        assert str(place.identifier) == identifier
-        assert place.proto == proto
+        place = await client.get(fixtures.PLACES[0])
+        assert place.id == fixtures.PLACES[0]
 
     async def test_multiple_places_are_retrievable(self) -> None:
         response = places_pb2.ListPlacesResponse(
             places=[
-                models_pb2.Place(id=PLACES[0]["id"]),
-                models_pb2.Place(id=PLACES[1]["id"]),
+                models_pb2.Place(id=fixtures.PLACES[0]),
+                models_pb2.Place(id=fixtures.PLACES[1]),
             ],
         )
         stub = mock.create_autospec(places_pb2_grpc.PlacesServiceStub)

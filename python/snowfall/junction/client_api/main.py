@@ -4,8 +4,9 @@ import grpc
 import uvicorn
 from starlette import applications
 
-from snowfall.adapter import places, trip_searches, trips
-from snowfall.junction.client_api import bootstrap, loaders, patch, validation
+from snowfall.adapter import places, trip_searches
+from snowfall.filesystem import loaders
+from snowfall.junction.client_api import bootstrap, patch, validation
 from snowfall.junction.places.v1alpha import places_pb2_grpc
 from snowfall.service import make_service
 
@@ -14,7 +15,6 @@ def _factory() -> applications.Starlette:
     make_service(name="client-api")
     patch.patch_open_api()
     settings = bootstrap.Settings()
-    trips_client = trips.DictClient()
 
     return bootstrap.create_app(
         validator=validation.Validator(
@@ -29,10 +29,7 @@ def _factory() -> applications.Starlette:
                     ),
                 ),
             ),
-            trips_client=trips_client,
-            trip_searches_client=trip_searches.DictClient(
-                trips_client=trips_client,
-            ),
+            trip_searches_client=trip_searches.DictClient(),
         ),
     )
 

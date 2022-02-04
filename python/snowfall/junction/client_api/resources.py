@@ -2,25 +2,28 @@ from __future__ import annotations
 
 from starlette import requests
 
-from snowfall.adapter import places, trip_searches, trips
+from snowfall.common.v1alpha import models_pb2
+from snowfall.format import protobuf
 from snowfall.junction.client_api import models
+from snowfall.junction.planner.v1 import planner_pb2
+from snowfall.junction.trips.v1alpha import trips_pb2
 
 
 class PlaceResource(models.Resource):
     @classmethod
-    async def from_data_class(
+    async def from_proto(
         cls,
-        place: places.Place,
+        place: models_pb2.Place,
         request: requests.Request,
     ) -> PlaceResource:
         return cls(
-            id=str(place.identifier),
+            id=place.id,
             type="places",
             attributes={
                 "countryCode": place.country_code,
                 "iataCode": None,
-                "latitude": place.latitude,
-                "longitude": place.longitude,
+                "latitude": place.coordinates.latitude,
+                "longitude": place.coordinates.longitude,
                 "name": place.name,
                 "timeZone": place.time_zone,
                 "type": "stop",
@@ -28,7 +31,7 @@ class PlaceResource(models.Resource):
             links={
                 "self": request.url_for(
                     "ViewPlace",
-                    placeId=place.identifier,
+                    placeId=place.id,
                 ),
             },
         )
@@ -36,17 +39,15 @@ class PlaceResource(models.Resource):
 
 class TripResource(models.Resource):
     @classmethod
-    async def from_data_class(
+    async def from_proto(
         cls,
-        trip: trips.Trip,
+        trip: planner_pb2.TripReference,
         request: requests.Request,
     ) -> TripResource:
         return cls(
-            id=str(trip.identifier),
+            id=trip.id,
             type="trips",
-            attributes={
-                "expiresAt": trip.expires_at,
-            },
+            attributes={},
             relationships={
                 "segments": {
                     "data": [],
@@ -55,7 +56,7 @@ class TripResource(models.Resource):
             links={
                 "self": request.url_for(
                     "ViewTrip",
-                    tripId=trip.identifier,
+                    tripId=trip.id,
                 ),
             },
         )
@@ -63,28 +64,32 @@ class TripResource(models.Resource):
 
 class TripSearchResource(models.Resource):
     @classmethod
-    async def from_data_class(
+    async def from_proto(
         cls,
-        trip_search: trip_searches.TripSearch,
+        trip_search: trips_pb2.TripSearch,
         request: requests.Request,
     ) -> TripSearchResource:
         return cls(
-            id=str(trip_search.identifier),
+            id=trip_search.id,
             type="trip-searches",
             attributes={
-                "expiresAt": trip_search.expires_at,
-                "departureAfter": trip_search.departure_after,
+                "expiresAt": await protobuf.protobuf_to_datetime(
+                    trip_search.expires_at,
+                ),
+                "departureAfter": await protobuf.protobuf_to_datetime(
+                    trip_search.departure_after,
+                ),
             },
             relationships={
                 "origin": {
                     "data": {
-                        "id": str(trip_search.origin.identifier),
+                        "id": trip_search.origin.id,
                         "type": "places",
                     },
                 },
                 "destination": {
                     "data": {
-                        "id": str(trip_search.destination.identifier),
+                        "id": trip_search.destination.id,
                         "type": "places",
                     },
                 },
@@ -92,7 +97,7 @@ class TripSearchResource(models.Resource):
             links={
                 "self": request.url_for(
                     "ViewTripSearch",
-                    tripSearchId=trip_search.identifier,
+                    tripSearchId=trip_search.id,
                 ),
             },
         )

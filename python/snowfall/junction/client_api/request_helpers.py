@@ -1,4 +1,3 @@
-import uuid
 from typing import Any
 
 from starlette import requests
@@ -18,7 +17,7 @@ async def _flatten_relationships(relationships: dict[str, Any]) -> dict[str, Any
     flattened = {}
 
     for key, relationship in relationships.items():
-        flattened[key] = uuid.UUID(relationship["data"][_IDENTIFIER])
+        flattened[key] = relationship["data"][_IDENTIFIER]
 
     return flattened
 

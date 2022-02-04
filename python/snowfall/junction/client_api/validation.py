@@ -10,7 +10,7 @@ from openapi_core.validation.response.validators import ResponseValidator
 from starlette import requests, responses
 from werkzeug.datastructures import Headers
 
-from snowfall.junction.client_api import loaders
+from snowfall.filesystem import loaders
 
 
 async def request_to_openapi(request: requests.Request) -> OpenAPIRequest:
