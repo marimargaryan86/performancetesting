@@ -194,7 +194,7 @@ class Consumer(object):
 
             self._logger.info(
                 "Message consumed.",
-                exchange=self._queue_name,
+                queue=self._queue_name,
                 routing_key=msg.routing_key,
                 type=msg.body.DESCRIPTOR.full_name,
             )
