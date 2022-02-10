@@ -3,7 +3,7 @@ from typing import Optional
 from pymongo import results
 
 from snowfall.common.v1alpha import models_pb2
-from snowfall.persistence.mongo import ProtoRepository, ResultSet
+from snowfall.persistence.mongo.repository import ProtoRepository, ResultSet
 
 
 class PlaceRepository(ProtoRepository[models_pb2.Place]):

@@ -5,7 +5,7 @@ from grpc import StatusCode, aio
 from snowfall.junction.places.places import PlaceRepository
 from snowfall.junction.places.v1alpha import places_pb2, places_pb2_grpc
 from snowfall.persistence import cursor
-from snowfall.persistence.mongo import NotFoundError
+from snowfall.persistence.mongo.repository import NotFoundError
 from snowfall.transport.grpc import Service
 
 
