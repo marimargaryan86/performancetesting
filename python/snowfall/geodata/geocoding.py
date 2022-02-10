@@ -29,16 +29,21 @@ class ReverseGeocoder(object):
         ).alpha_2
 
     async def get_time_zone(self, latitude: float, longitude: float) -> str:
-        return self._tz_finder.timezone_at(
-            lat=latitude,
-            lng=longitude,
-        )
+        cache_key = await self._make_cache_key("time_zones", latitude, longitude)
+        time_zone = await self._redis.get(cache_key)
+
+        if not time_zone:
+            time_zone = self._tz_finder.timezone_at(
+                lat=latitude,
+                lng=longitude,
+            )
+
+            await self._redis.set(cache_key, time_zone)
+
+        return time_zone
 
     async def _cached_country_lookup(self, latitude: float, longitude: float) -> str:
-        cache_key = "country_codes.{lat}_{lng}".format(
-            lat=str(latitude).replace(".", "_"),
-            lng=str(longitude).replace(".", "_"),
-        )
+        cache_key = await self._make_cache_key("country_codes", latitude, longitude)
         country_code = await self._redis.get(cache_key)
 
         if country_code:
@@ -91,3 +96,15 @@ class ReverseGeocoder(object):
             return None
 
         return response.raw["address"]["country_code"].upper()
+
+    async def _make_cache_key(
+        self,
+        namespace: str,
+        latitude: float,
+        longitude: float,
+    ) -> str:
+        return "{namespace}.{lat}_{lng}".format(
+            namespace=namespace,
+            lat=str(latitude).replace(".", "_"),
+            lng=str(longitude).replace(".", "_"),
+        )
