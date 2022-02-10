@@ -16,6 +16,14 @@ nomad:validate:
 nomad:deploy:
   stage: deploy
   interruptible: false
+  image: "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"
+  before_script:
+    - mkdir -p ~/.ssh/
+    - mv "${NOMAD_SSH_KEY}" ~/.ssh/id_ed25519
+    - mv "${NOMAD_SSH_KNOWN_HOSTS}" ~/.ssh/known_hosts
+    - chmod 700 ~/.ssh/
+    - chmod 600 ~/.ssh/id_ed25519
+    - chmod 644 ~/.ssh/known_hosts
   script:
     - ./bash/push-deployables.sh junction.dev
   rules:
@@ -25,4 +33,4 @@ nomad:deploy:
   needs:
     - "pants:package"
   tags:
-    - shell
+    - docker
