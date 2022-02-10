@@ -17,6 +17,9 @@ nomad:deploy:
   stage: deploy
   interruptible: false
   image: "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"
+  services:
+    - name: docker:dind
+      alias: dockerdaemon
   before_script:
     - mkdir -p ~/.ssh/
     - mv "${NOMAD_SSH_KEY}" ~/.ssh/id_ed25519
@@ -26,6 +29,10 @@ nomad:deploy:
     - chmod 644 ~/.ssh/known_hosts
   script:
     - ./bash/push-deployables.sh junction.dev
+  variables:
+    DOCKER_HOST: tcp://dockerdaemon:2375/
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
