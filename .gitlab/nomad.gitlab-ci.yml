@@ -27,6 +27,8 @@ nomad:deploy:
     - chmod 700 ~/.ssh/
     - chmod 600 ~/.ssh/id_ed25519
     - chmod 644 ~/.ssh/known_hosts
+    - git config --global user.email "${NOMAD_GIT_EMAIL}"
+    - git config --global user.name "${NOMAD_GIT_NAME}"
   script:
     - ./bash/push-deployables.sh junction.dev
   variables:
