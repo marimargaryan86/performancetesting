@@ -41,7 +41,7 @@ EOH
       }
 
       env {
-        SENTRY_DSN = "https://4de05bbdaa1b4b58ab8401ad33ebac37@sentry.snowfall.se/20"
+        SENTRY_DSN = "https://8d94d1ca059f4dc9b4e1e91dfd3d7151@sentry.snowfall.se/25"
       }
     }
   }
