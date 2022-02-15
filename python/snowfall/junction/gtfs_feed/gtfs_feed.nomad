@@ -41,6 +41,7 @@ EOH
       }
 
       env {
+        FEED_REF   = "belgium"
         FEED_URL   = "https://gtfs.irail.be/nmbs/gtfs/latest.zip"
         SENTRY_DSN = "https://d86394991a184238865125d76e464d6d@sentry.snowfall.se/21"
       }
@@ -81,6 +82,7 @@ EOH
       }
 
       env {
+        FEED_REF   = "denmark"
         FEED_URL   = "http://www.rejseplanen.info/labs/GTFS.zip"
         SENTRY_DSN = "https://d86394991a184238865125d76e464d6d@sentry.snowfall.se/21"
       }
@@ -121,6 +123,7 @@ EOH
       }
 
       env {
+        FEED_REF   = "netherlands"
         FEED_URL   = "http://gtfs.ovapi.nl/gtfs-nl.zip"
         SENTRY_DSN = "https://d86394991a184238865125d76e464d6d@sentry.snowfall.se/21"
       }
@@ -161,6 +164,7 @@ EOH
       }
 
       env {
+        FEED_REF   = "sweden"
         FEED_URL   = "https://transitfeeds.com/p/trafiklab/50/latest/download"
         SENTRY_DSN = "https://d86394991a184238865125d76e464d6d@sentry.snowfall.se/21"
       }
