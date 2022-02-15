@@ -65,6 +65,22 @@ def normalize_phone_number(phone: Optional[str]) -> Optional[str]:
     return phone
 
 
+def normalize_time(time: Optional[str]) -> Optional[datetime.timedelta]:
+    if time is None:
+        return None
+
+    parts = [int(segment) for segment in time.split(":")]
+
+    if len(parts) != 3:
+        raise ValueError("{value} is not a valid time".format(value=time))
+
+    return datetime.timedelta(
+        hours=parts[0],
+        minutes=parts[1],
+        seconds=parts[2],
+    )
+
+
 def normalize_time_zone(tz: Optional[str]) -> Optional[str]:
     if tz is None:
         return None

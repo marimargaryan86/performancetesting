@@ -23,7 +23,7 @@ class _ImportSettings(BaseSettings):
     mongo_dsn: Sequence[AnyUrl]
 
 
-async def _import(_: RunnableService) -> None:
+async def _import(service: RunnableService) -> None:
     settings = _ImportSettings()
     mongo = motor_asyncio.AsyncIOMotorClient(random.choice(settings.mongo_dsn))  # nosec
     connection = amqp.Connection(random.choice(settings.amqp_dsn))  # nosec
@@ -34,7 +34,7 @@ async def _import(_: RunnableService) -> None:
             consumer=await amqp.create_consumer(
                 conn=connection,
                 exchange_name="places",
-                queue_name="importer",
+                queue_name="{0}_places_importer".format(service.name),
                 routing_key="place.import",
             ),
         )

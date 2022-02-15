@@ -1,17 +1,21 @@
 import dataclasses
 import datetime
-from typing import Annotated, AsyncIterable, Optional
+from typing import Annotated, Optional
 
 import pydantic
 
 from snowfall.format.gtfs import constants, normalizers
 
+_MODEL_SLOTS = ("__weakref__",)
+
 
 class Agency(pydantic.BaseModel):
+    __slots__ = _MODEL_SLOTS
+
     agency_id: Optional[str]
     agency_name: str
     agency_url: pydantic.HttpUrl
-    agency_timezone: Optional[str]
+    agency_timezone: str
     agency_lang: Optional[str]
     agency_phone: Optional[str]
     agency_fare_url: Optional[pydantic.HttpUrl]
@@ -85,23 +89,27 @@ class FeedInfo(pydantic.BaseModel):
 
 
 class Route(pydantic.BaseModel):
+    __slots__ = _MODEL_SLOTS
+
     route_id: str
     agency_id: Optional[str]
     route_short_name: Optional[str]
     route_long_name: Optional[str]
     route_desc: Optional[str]
-    route_type: int  # todo: validate against enums
+    route_type: pydantic.NonNegativeInt  # todo: validate against enums
     route_url: Optional[pydantic.HttpUrl]
     route_color: Optional[Annotated[str, pydantic.Field(regex=constants.COLOR_REGEX)]]
     route_text_color: Optional[
         Annotated[str, pydantic.Field(regex=constants.COLOR_REGEX)]
     ]
     route_sort_order: Optional[pydantic.NonNegativeInt]
-    continuous_pickup: Optional[int]
-    continuous_drop_off: Optional[int]
+    continuous_pickup: Optional[pydantic.NonNegativeInt]
+    continuous_drop_off: Optional[pydantic.NonNegativeInt]
 
 
 class Stop(pydantic.BaseModel):
+    __slots__ = _MODEL_SLOTS
+
     stop_id: str
     stop_code: Optional[str]
     stop_name: Optional[str]
@@ -120,10 +128,10 @@ class Stop(pydantic.BaseModel):
     ]
     zone_id: Optional[str]
     stop_url: Optional[pydantic.HttpUrl]
-    location_type: int = 0
+    location_type: pydantic.NonNegativeInt = 0
     parent_station: Optional[str]
     stop_timezone: Optional[str]
-    wheelchair_boarding: int = 0
+    wheelchair_boarding: pydantic.NonNegativeInt = 0
     level_id: Optional[str]
     platform_code: Optional[str]
 
@@ -133,25 +141,52 @@ class Stop(pydantic.BaseModel):
     )
 
 
+class StopTime(pydantic.BaseModel):
+    trip_id: str
+    arrival_time: Optional[datetime.timedelta]
+    departure_time: Optional[datetime.timedelta]
+    stop_id: str
+    stop_sequence: pydantic.NonNegativeInt
+    stop_headsign: Optional[str]
+    pickup_type: pydantic.NonNegativeInt = 0
+    drop_off_type: pydantic.NonNegativeInt = 0
+    continuous_pickup: pydantic.NonNegativeInt = 1
+    continuous_drop_off: pydantic.NonNegativeInt = 1
+    shape_dist_traveled: Optional[pydantic.NonNegativeFloat]
+    timepoint: pydantic.NonNegativeInt = 1
+
+    _normalize_time = normalizers.normalizer(
+        (
+            "arrival_time",
+            "departure_time",
+        ),
+        normalizers.normalize_time,
+    )
+
+
 class Trip(pydantic.BaseModel):
+    __slots__ = _MODEL_SLOTS
+
     route_id: str
     service_id: str
     trip_id: str
     trip_headsign: Optional[str]
     trip_short_name: Optional[str]
-    direction_id: Optional[int]
+    direction_id: Optional[pydantic.NonNegativeInt]
     block_id: Optional[str]
     shape_id: Optional[str]
-    wheelchair_accessible: int
-    bikes_allowed: int
+    wheelchair_accessible: pydantic.NonNegativeInt
+    bikes_allowed: pydantic.NonNegativeInt
 
 
 @dataclasses.dataclass(frozen=True)
 class Feed(object):
-    agencies: AsyncIterable[Agency]
-    calendars: Optional[AsyncIterable[Calendar]]
-    calendar_dates: Optional[AsyncIterable[CalendarDate]]
+    agencies: list[Agency]
+    calendars: list[Calendar]
+    calendar_dates: list[CalendarDate]
     feed_info: Optional[FeedInfo]
-    routes: AsyncIterable[Route]
-    stops: AsyncIterable[Stop]
-    trips: AsyncIterable[Trip]
+    ref: str
+    routes: list[Route]
+    stops: list[Stop]
+    stop_times: list[StopTime]
+    trips: list[Trip]

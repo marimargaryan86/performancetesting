@@ -35,8 +35,8 @@ class Place(object):
         return cls(
             country_code=grpc_place.country_code,
             identifier=uuid.UUID(grpc_place.id),
-            latitude=grpc_place.latitude,
-            longitude=grpc_place.longitude,
+            latitude=grpc_place.coordinates.latitude,
+            longitude=grpc_place.coordinates.longitude,
             name=grpc_place.name,
             proto=grpc_place,
             time_zone=grpc_place.time_zone,

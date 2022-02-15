@@ -26,6 +26,26 @@ def test_normalize_date_with_invalid_date(date: str) -> None:
         normalizers.normalize_date(date)
 
 
+@pytest.mark.parametrize(
+    "time,expected",
+    [
+        ("12:00:00", datetime.timedelta(hours=12)),  # noqa: WPS432
+        ("25:12:00", datetime.timedelta(hours=25, minutes=12)),  # noqa: WPS432
+    ],
+)
+def test_normalize_time_with_valid_time(
+    time: str,
+    expected: datetime.timedelta,
+) -> None:
+    assert expected == normalizers.normalize_time(time)
+
+
+@pytest.mark.parametrize("time", ["25:12"])
+def test_normalize_time_with_invalid_time(time: str) -> None:
+    with pytest.raises(ValueError):
+        normalizers.normalize_time(time)
+
+
 @pytest.mark.parametrize("language_code", ["sv-SE", "sv"])
 def test_normalize_language_code_with_valid_language_code(language_code: str) -> None:
     assert normalizers.normalize_language_code(language_code) == language_code

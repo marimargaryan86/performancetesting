@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package snowfall.common.v1alpha;
 
+import "google/protobuf/timestamp.proto";
+
 message Coordinates {
   double latitude = 1;
   double longitude = 2;
@@ -14,13 +16,42 @@ message Cursor {
 }
 
 message Place {
-  reserved 2;
-  reserved "h3_index";
-
   string id = 1;
-  string name = 3;
-  float latitude = 4;
-  float longitude = 5;
-  string country_code = 6;
-  string time_zone = 7;
+  string name = 2;
+  Coordinates coordinates = 3;
+  string time_zone = 4;
+  string country_code = 5;
+  google.protobuf.Timestamp updated_at = 6;
+  string source_ref = 7;
+}
+
+message Point {
+  string ref = 1;
+  string name = 2;
+  Coordinates coordinates = 3;
+  string time_zone = 4;
+}
+
+message Schedule {
+  string id = 1;
+  string name = 2;
+  repeated Stop stops = 3;
+  string agency_name = 4;
+  google.protobuf.Timestamp updated_at = 5;
+  string source_ref = 6;
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+    TYPE_AIR = 1;
+    TYPE_RAIL = 2;
+  }
+  Type type = 7;
+}
+
+message Stop {
+  string id = 1;
+  google.protobuf.Timestamp departure_at = 2;
+  google.protobuf.Timestamp arrival_at = 3;
+  Point point = 4;
+  uint32 order = 5;
+
 }

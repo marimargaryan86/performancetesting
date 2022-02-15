@@ -1,6 +1,15 @@
 import abc
 from copy import deepcopy
-from typing import Any, AsyncIterator, Callable, Coroutine, Generic, Optional, TypeVar
+from typing import (
+    Any,
+    AsyncIterator,
+    Awaitable,
+    Callable,
+    Coroutine,
+    Generic,
+    Optional,
+    TypeVar,
+)
 
 import pymongo
 from google.protobuf.json_format import MessageToDict, ParseDict
@@ -9,10 +18,10 @@ from motor import core, motor_asyncio
 
 from snowfall.common.v1alpha import models_pb2
 from snowfall.persistence import cursor
+from snowfall.persistence.mongo import normalizers
 
 _proto_id_key = "id"
 _mongo_id_key = "_id"
-
 
 Proto = TypeVar("Proto", bound=Message)
 
@@ -25,7 +34,7 @@ class ResultSet(Generic[Proto]):
     def __init__(
         self,
         cur: motor_asyncio.AsyncIOMotorCursor,
-        unmarshal: Callable[[dict[str, Any]], Proto],
+        unmarshal: Callable[[dict[str, Any]], Awaitable[Proto]],
     ):
         self._cursor = cur
         self._last: Optional[str] = None
@@ -45,7 +54,7 @@ class ResultSet(Generic[Proto]):
         async for record in self._cursor:
             self._last = record[_mongo_id_key]
 
-            yield self._unmarshal(record)
+            yield await self._unmarshal(record)
 
 
 class Repository(abc.ABC):
@@ -66,19 +75,19 @@ class Repository(abc.ABC):
             is not None
         )
 
-    @property
-    def _indexes(self) -> list[pymongo.IndexModel]:
+    async def _indexes(self) -> list[pymongo.IndexModel]:
         return []
 
     async def _create_indexes(self) -> None:
         self._has_created_indexes = True
+        indexes = await self._indexes()
 
-        if not self._indexes:
+        if not indexes:
             return
 
         await self._execute(
             self._collection.create_indexes,
-            self._indexes,
+            indexes,
         )
 
     async def _execute(
@@ -95,6 +104,12 @@ class Repository(abc.ABC):
 
 
 class ProtoRepository(Generic[Proto], Repository, abc.ABC):
+    _datetime_cache: dict[str, list[str]] = {}
+    _normalizers = (
+        normalizers.CoordinatesNormalizer(),
+        normalizers.TimestampNormalizer(),
+    )
+
     async def get_by_id(
         self,
         identifier: str,
@@ -107,7 +122,7 @@ class ProtoRepository(Generic[Proto], Repository, abc.ABC):
         if msg is None:
             raise NotFoundError()
 
-        return self._unmarshal(msg)
+        return await self._unmarshal(msg)
 
     async def _execute_cursor(
         self,
@@ -135,25 +150,28 @@ class ProtoRepository(Generic[Proto], Repository, abc.ABC):
     def _new_model(self) -> Proto:
         raise NotImplementedError()
 
-    def _marshal(self, msg: Proto) -> dict[str, Any]:
+    async def _marshal(self, msg: Proto) -> dict[str, Any]:
         fields = msg.DESCRIPTOR.fields_by_name.keys()
 
         # Only set created if it hasn't been set already.
-        if "created" in fields and msg.created.seconds == 0:  # type: ignore[attr-defined]
-            msg.created.GetCurrentTime()  # type: ignore[attr-defined]
+        if "created_at" in fields and msg.created.seconds == 0:  # type: ignore[attr-defined]
+            msg.created_at.GetCurrentTime()  # type: ignore[attr-defined]
 
-        if "updated" in fields:
-            msg.updated.GetCurrentTime()  # type: ignore[attr-defined]
+        if "updated_at" in fields:
+            msg.updated_at.GetCurrentTime()  # type: ignore[attr-defined]
 
-        as_dict = MessageToDict(msg)
+        as_dict = MessageToDict(msg, preserving_proto_field_name=True)
 
         # MongoDB expects ID to be found in "_id".
         if _proto_id_key in fields and _proto_id_key in as_dict:
             as_dict[_mongo_id_key] = as_dict.pop(_proto_id_key)
 
+        for normalizer in self._normalizers:
+            as_dict = await normalizer.normalize(msg.DESCRIPTOR, as_dict)
+
         return as_dict
 
-    def _unmarshal(self, as_dict: dict[str, Any]) -> Proto:
+    async def _unmarshal(self, as_dict: dict[str, Any]) -> Proto:
         msg = self._new_model()
         fields = msg.DESCRIPTOR.fields_by_name.keys()
         as_dict = deepcopy(as_dict)
@@ -161,5 +179,8 @@ class ProtoRepository(Generic[Proto], Repository, abc.ABC):
         # MongoDB stores ID in "_id".
         if _proto_id_key in fields and _mongo_id_key in as_dict:
             as_dict[_proto_id_key] = as_dict.pop(_mongo_id_key)
+
+        for normalizer in self._normalizers:
+            as_dict = await normalizer.denormalize(msg.DESCRIPTOR, as_dict)
 
         return ParseDict(as_dict, msg, ignore_unknown_fields=True)
