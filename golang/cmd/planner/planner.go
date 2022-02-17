@@ -84,7 +84,7 @@ func main() {
     grpcPort, ok := os.LookupEnv("GRPC_PORT")
 
     if !ok {
-        grpcPort = "50051"
+        grpcPort = "50053"
     }
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", grpcAddress, grpcPort))
