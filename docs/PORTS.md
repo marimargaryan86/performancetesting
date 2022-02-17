@@ -25,4 +25,5 @@ The following ports are configured in local environments by default:
 | 50051 | echo       | gRPC Server |
 | 50052 | places     | gRPC Server |
 | 50053 | planner    | gRPC Server |
+| 50054 | trips      | gRPC Server |
 

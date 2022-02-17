@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package snowfall.junction.trips.v1alpha;
+
+import "google/protobuf/timestamp.proto";
+import "snowfall/common/v1alpha/models.proto";
+
+service TripSearchService {
+  rpc EnqueueTripSearch(EnqueueTripSearchRequest) returns (EnqueueTripSearchResponse) {}
+}
+
+message TripSearch {
+  string id = 1; // read only
+  google.protobuf.Timestamp expires_at = 2; // read only
+  snowfall.common.v1alpha.Place origin = 3;
+  snowfall.common.v1alpha.Place destination = 4;
+  google.protobuf.Timestamp departure_after = 5;
+}
+
+message EnqueueTripSearchRequest {
+  TripSearch trip_search = 1;
+}
+
+message EnqueueTripSearchResponse {
+  TripSearch trip_search = 1;
+}

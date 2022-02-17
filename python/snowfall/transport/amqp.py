@@ -6,8 +6,7 @@ from types import TracebackType
 from typing import Callable, Coroutine, Optional, Type, Union, cast
 
 from aiormq import abc, connection
-from google.protobuf import any_pb2, symbol_database
-from google.protobuf.message import Message as ProtobufMessage
+from google.protobuf import any_pb2, message, symbol_database
 from pamqp import commands
 from structlog import get_logger
 
@@ -16,15 +15,15 @@ class Serializer(object):
     _db = symbol_database.Default()
 
     @classmethod
-    def serialize(cls, message: ProtobufMessage) -> bytes:
+    def serialize(cls, msg: message.Message) -> bytes:
         any_message = any_pb2.Any()
 
-        any_message.Pack(message)
+        any_message.Pack(msg)
 
         return any_message.SerializeToString()
 
     @classmethod
-    def deserialize(cls, blob: Union[bytes, memoryview]) -> ProtobufMessage:
+    def deserialize(cls, blob: Union[bytes, memoryview]) -> message.Message:
         packed_message = any_pb2.Any()
 
         if isinstance(blob, memoryview):
@@ -32,7 +31,7 @@ class Serializer(object):
 
         packed_message.ParseFromString(blob)
 
-        symbol: Type[ProtobufMessage] = cls._db.GetSymbol(
+        symbol: Type[message.Message] = cls._db.GetSymbol(
             packed_message.TypeName(),
         )
         unpacked_message = symbol()
@@ -63,9 +62,9 @@ class Producer(object):
         self._exchange_name = exchange_name
         self._logger = get_logger(name=__name__)
 
-    async def publish(self, message: ProtobufMessage, routing_key: str) -> None:
+    async def publish(self, msg: message.Message, routing_key: str) -> None:
         await self._channel.basic_publish(
-            body=Serializer.serialize(message),
+            body=Serializer.serialize(msg),
             exchange=self._exchange_name,
             routing_key=routing_key,
         )
@@ -74,7 +73,7 @@ class Producer(object):
             "Message published.",
             exchange=self._exchange_name,
             routing_key=routing_key,
-            type=message.DESCRIPTOR.full_name,
+            type=msg.DESCRIPTOR.full_name,
         )
 
 
@@ -95,10 +94,10 @@ async def create_producer(
 
 
 class Message(object):
-    def __init__(self, message: abc.DeliveredMessage):
+    def __init__(self, msg: abc.DeliveredMessage):
         self._acknowledged = False
-        self._body = Serializer.deserialize(message.body)
-        self._message = message
+        self._body = Serializer.deserialize(msg.body)
+        self._message = msg
 
     async def ack(self) -> None:
         if self._acknowledged:
@@ -115,7 +114,7 @@ class Message(object):
         return self._acknowledged
 
     @property
-    def body(self) -> ProtobufMessage:
+    def body(self) -> message.Message:
         return self._body
 
     async def nack(self) -> None:
@@ -178,8 +177,8 @@ class Consumer(object):
         callback: ConsumerCallback,
     ) -> abc.ConsumerCallback:
         @functools.wraps(callback)
-        async def decorator(message: abc.DeliveredMessage) -> None:
-            msg = Message(message)
+        async def decorator(incoming: abc.DeliveredMessage) -> None:
+            msg = Message(incoming)
 
             try:
                 await callback(msg)
