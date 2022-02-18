@@ -57,6 +57,10 @@ services might depend on other services.
 When running a service by command line, you have to make sure you load the
 service's `.env.dist` file, just like if you were using an IDE.
 
+Or use a bash script that loads the environment variables for you:
+
+1. run `bash bash/run.sh /python/snowfall/junction/{service} {task}`
+
 ### Pants
 
 1. Run `./pants run /python/snowfall/junction/{service}/: -- {task}`.
