@@ -1,11 +1,8 @@
-import uuid
-
 from grpc import StatusCode, aio
 
 from snowfall.junction.places.places import PlaceRepository
 from snowfall.junction.places.v1alpha import places_pb2, places_pb2_grpc
 from snowfall.persistence import cursor
-from snowfall.persistence.mongo.repository import NotFoundError
 from snowfall.transport.grpc import Service
 
 
@@ -25,19 +22,12 @@ class PlacesService(Service, places_pb2_grpc.PlacesServiceServicer):
         request: places_pb2.GetPlaceRequest,
         context: aio.ServicerContext,
     ) -> places_pb2.GetPlaceResponse:
-        try:
-            uuid.UUID(request.id)
-        except ValueError:
-            await context.abort(StatusCode.INVALID_ARGUMENT)
+        place = await self._places.find_by_id(request.id)
 
-        try:
-            place = await self._places.get_by_id(request.id)
-        except NotFoundError:
+        if not place:
             await context.abort(StatusCode.NOT_FOUND)
 
-        return places_pb2.GetPlaceResponse(
-            place=place,
-        )
+        return places_pb2.GetPlaceResponse(place=place)
 
     async def ListPlaces(  # type: ignore[override] # noqa: N802
         self,
@@ -52,13 +42,11 @@ class PlacesService(Service, places_pb2_grpc.PlacesServiceServicer):
             except cursor.CursorError:
                 await context.abort(StatusCode.INVALID_ARGUMENT)
 
-        places_result = await self._places.find(cur=cur)
-        limit = request.page_size
+        places_result = await self._places.find_with_cursor(cur=cur)
 
-        if not limit:
-            limit = self._default_page_size
+        places_result.limit(request.page_size or self._default_page_size)
 
-        places = [place async for place in places_result.records(limit=limit)]
+        places = [place async for place in places_result]
         cur = await places_result.cursor()
         page_token = None
 

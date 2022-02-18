@@ -5,11 +5,10 @@ import pytest
 from snowfall import dictionary
 
 
-async def _transform(dict_value: str) -> str:
+def _transform(dict_value: str) -> str:
     return dict_value.upper()
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize(
     "input_dict,path,expected",
     [
@@ -28,7 +27,7 @@ async def test_set_nested_value(
     path: str,
     expected: dict[str, Any],
 ) -> None:
-    await dictionary.set_nested_value(
+    dictionary.set_nested_value(
         input_dict,
         path.split("."),
         _transform,

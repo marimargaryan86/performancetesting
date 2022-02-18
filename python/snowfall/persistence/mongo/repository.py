@@ -1,46 +1,46 @@
 import abc
-from copy import deepcopy
-from typing import (
-    Any,
-    AsyncIterator,
-    Awaitable,
-    Callable,
-    Coroutine,
-    Generic,
-    Optional,
-    TypeVar,
-)
+import functools
+from collections.abc import AsyncIterator
+from typing import Any, Awaitable, Callable, Generic, Optional, Type, TypeVar, overload
 
 import pymongo
-from google.protobuf.json_format import MessageToDict, ParseDict
 from google.protobuf.message import Message
 from motor import core, motor_asyncio
+from pydantic import BaseModel
 
 from snowfall.common.v1alpha import models_pb2
 from snowfall.persistence import cursor
-from snowfall.persistence.mongo import normalizers
+from snowfall.persistence.mongo import coders
 
 _proto_id_key = "id"
 _mongo_id_key = "_id"
 
+Model = TypeVar("Model", bound=BaseModel)
 Proto = TypeVar("Proto", bound=Message)
+Record = TypeVar("Record")
+_MongoDict = dict[str, Any]
 
 
-class NotFoundError(RuntimeError):
-    """Raised when a resource is not found."""
-
-
-class ResultSet(Generic[Proto]):
+class ResultSet(Generic[Record], AsyncIterator[Record]):
     def __init__(
         self,
         cur: motor_asyncio.AsyncIOMotorCursor,
-        unmarshal: Callable[[dict[str, Any]], Awaitable[Proto]],
+        coder: coders.BaseCoder[Record],
     ):
+        self._coder = coder
         self._cursor = cur
         self._last: Optional[str] = None
-        self._unmarshal = unmarshal
 
         self._cursor.sort(_mongo_id_key, pymongo.ASCENDING)
+
+    def __aiter__(self) -> AsyncIterator[Record]:
+        return self
+
+    async def __anext__(self) -> Record:
+        document = await self._cursor.next()
+        self._last = document[_mongo_id_key]
+
+        return self._coder.decode(document)
 
     async def cursor(self) -> Optional[models_pb2.Cursor]:
         if not self._last:
@@ -48,16 +48,16 @@ class ResultSet(Generic[Proto]):
 
         return cursor.new(self._last, "$gt")
 
-    async def records(self, limit: int) -> AsyncIterator[Proto]:
+    def limit(self, limit: int) -> None:
         self._cursor.limit(limit)
 
-        async for record in self._cursor:
-            self._last = record[_mongo_id_key]
-
-            yield await self._unmarshal(record)
+    def sort(self, *sort: tuple[str, int]) -> None:
+        self._cursor.sort(list(sort))
 
 
-class Repository(abc.ABC):
+class _AbstractRepository(Generic[Record], abc.ABC):
+    _indexes: list[pymongo.IndexModel] = []
+
     def __init__(
         self,
         collection: motor_asyncio.AsyncIOMotorCollection,
@@ -75,24 +75,66 @@ class Repository(abc.ABC):
             is not None
         )
 
-    async def _indexes(self) -> list[pymongo.IndexModel]:
-        return []
+    async def find_with_cursor(
+        self,
+        cur: Optional[models_pb2.Cursor] = None,
+    ) -> ResultSet[Record]:
+        clause = {}
+
+        if cur:
+            clause = {
+                _mongo_id_key: {
+                    cur.clause: cur.id,
+                },
+            }
+
+        return await self._execute(self._collection.find, clause)
+
+    async def find_by_id(self, document_id: str) -> Optional[Record]:
+        return await self._execute(
+            self._collection.find_one,
+            {
+                "_id": document_id,
+            },
+        )
 
     async def _create_indexes(self) -> None:
         self._has_created_indexes = True
-        indexes = await self._indexes()
 
-        if not indexes:
+        if not self._indexes:
             return
 
         await self._execute(
             self._collection.create_indexes,
-            indexes,
+            self._indexes,
         )
+
+    @property
+    @abc.abstractmethod
+    def _coder(self) -> coders.BaseCoder[Record]:
+        raise NotImplementedError()
+
+    @overload
+    async def _execute(  # type: ignore[misc]
+        self,
+        query: Callable[[Any], Awaitable[_MongoDict]],
+        *args: Any,
+        **kwargs: Any,
+    ) -> Record:
+        """Return a ``Record`` if the query returns a dict."""
+
+    @overload
+    async def _execute(
+        self,
+        query: Callable[[Any], motor_asyncio.AsyncIOMotorCursor],
+        *args: Any,
+        **kwargs: Any,
+    ) -> ResultSet[Record]:
+        """Return a ``ResultSet[Record]`` if the query returns a cursor."""
 
     async def _execute(
         self,
-        query: Callable[[Any], Coroutine[Any, Any, Any]],
+        query: Callable[[Any], Any],
         *args: Any,
         **kwargs: Any,
     ) -> Any:
@@ -100,87 +142,45 @@ class Repository(abc.ABC):
         if not self._has_created_indexes:
             await self._create_indexes()
 
-        return await query(*args, **kwargs)
+        possible_cursor = query(*args, **kwargs)
+
+        if isinstance(possible_cursor, motor_asyncio.AsyncIOMotorCursor):
+            return ResultSet[Record](
+                possible_cursor,
+                self._coder,
+            )
+
+        possible_document = await possible_cursor
+
+        if isinstance(possible_document, dict):
+            return self._coder.decode(possible_document)
+
+        return possible_document
 
 
-class ProtoRepository(Generic[Proto], Repository, abc.ABC):
-    _datetime_cache: dict[str, list[str]] = {}
-    _normalizers = (
-        normalizers.CoordinatesNormalizer(),
-        normalizers.TimestampNormalizer(),
-    )
+class DefaultRepository(_AbstractRepository[dict[str, Any]]):
+    @functools.cached_property
+    def _coder(self) -> coders.NoopCoder:
+        return coders.NoopCoder()
 
-    async def get_by_id(
-        self,
-        identifier: str,
-    ) -> Proto:
-        msg = await self._execute(
-            self._collection.find_one,
-            {"_id": identifier},
-        )
 
-        if msg is None:
-            raise NotFoundError()
+class ProtoRepository(_AbstractRepository[Proto], abc.ABC):
+    @functools.cached_property
+    def _coder(self) -> coders.ProtoCoder[Proto]:
+        return coders.ProtoCoder[Proto](self._proto)
 
-        return await self._unmarshal(msg)
-
-    async def _execute_cursor(
-        self,
-        query: Callable[[Any], motor_asyncio.AsyncIOMotorCursor],
-        cur: Optional[models_pb2.Cursor],
-        *args: Any,
-        **kwargs: Any,
-    ) -> ResultSet[Proto]:
-        # todo: can't run this in __init__, but this isn't pretty...
-        if not self._has_created_indexes:
-            await self._create_indexes()
-
-        if cur:
-            if not args:
-                args = ({},)
-
-            if _mongo_id_key not in args[0]:
-                args[0][_mongo_id_key] = {}
-
-            args[0][_mongo_id_key][cur.clause] = cur.id
-
-        return ResultSet[Proto](query(*args, **kwargs), self._unmarshal)
-
+    @property
     @abc.abstractmethod
-    def _new_model(self) -> Proto:
+    def _proto(self) -> Type[Proto]:
         raise NotImplementedError()
 
-    async def _marshal(self, msg: Proto) -> dict[str, Any]:
-        fields = msg.DESCRIPTOR.fields_by_name.keys()
 
-        # Only set created if it hasn't been set already.
-        if "created_at" in fields and msg.created.seconds == 0:  # type: ignore[attr-defined]
-            msg.created_at.GetCurrentTime()  # type: ignore[attr-defined]
+class PydanticRepository(_AbstractRepository[Model], abc.ABC):
+    @functools.cached_property
+    def _coder(self) -> coders.PydanticCoder[Model]:
+        return coders.PydanticCoder[Model](self._model)
 
-        if "updated_at" in fields:
-            msg.updated_at.GetCurrentTime()  # type: ignore[attr-defined]
-
-        as_dict = MessageToDict(msg, preserving_proto_field_name=True)
-
-        # MongoDB expects ID to be found in "_id".
-        if _proto_id_key in fields and _proto_id_key in as_dict:
-            as_dict[_mongo_id_key] = as_dict.pop(_proto_id_key)
-
-        for normalizer in self._normalizers:
-            as_dict = await normalizer.normalize(msg.DESCRIPTOR, as_dict)
-
-        return as_dict
-
-    async def _unmarshal(self, as_dict: dict[str, Any]) -> Proto:
-        msg = self._new_model()
-        fields = msg.DESCRIPTOR.fields_by_name.keys()
-        as_dict = deepcopy(as_dict)
-
-        # MongoDB stores ID in "_id".
-        if _proto_id_key in fields and _mongo_id_key in as_dict:
-            as_dict[_proto_id_key] = as_dict.pop(_mongo_id_key)
-
-        for normalizer in self._normalizers:
-            as_dict = await normalizer.denormalize(msg.DESCRIPTOR, as_dict)
-
-        return ParseDict(as_dict, msg, ignore_unknown_fields=True)
+    @property
+    @abc.abstractmethod
+    def _model(self) -> Type[Model]:
+        raise NotImplementedError()
