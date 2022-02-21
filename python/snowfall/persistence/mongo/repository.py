@@ -55,7 +55,7 @@ class ResultSet(Generic[Record], AsyncIterator[Record]):
         self._cursor.sort(list(sort))
 
 
-class _AbstractRepository(abc.ABC, Generic[Record]):
+class _AbstractRepository(abc.ABC, Generic[Record]):  # noqa: WPS214
     _indexes: list[pymongo.IndexModel] = []
 
     def __init__(
@@ -97,6 +97,17 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
                 "_id": document_id,
             },
         )
+
+    async def insert(self, document: Record) -> Record:
+        insert = await self._execute(
+            self._collection.insert_one,
+            self._coder.encode(document),
+        )
+
+        if not insert.acknowledged:
+            raise RuntimeError()
+
+        return document
 
     async def _create_indexes(self) -> None:
         self._has_created_indexes = True

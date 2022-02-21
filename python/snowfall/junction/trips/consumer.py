@@ -1,16 +1,14 @@
 from typing import cast
 
-import amqp
-
 from snowfall.junction.planner.v1 import planner_pb2, planner_pb2_grpc
 from snowfall.junction.trips.v1alpha import amqp_pb2
-from snowfall.transport.amqp import Consumer
+from snowfall.transport import amqp
 
 
 class TripSearchConsumer(object):
     def __init__(
         self,
-        consumer: Consumer,
+        consumer: amqp.Consumer,
         planner: planner_pb2_grpc.PlannerServiceStub,
     ):
         self._consumer = consumer

@@ -1,9 +1,8 @@
 import datetime
-import uuid
 
-from google.protobuf import timestamp_pb2
 from grpc import aio
 
+from snowfall.junction.trips import trips
 from snowfall.junction.trips.v1alpha import amqp_pb2, trips_pb2, trips_pb2_grpc
 from snowfall.transport import amqp
 from snowfall.transport.grpc import Service
@@ -12,8 +11,13 @@ _TRIP_SEARCH_EXPIRY = datetime.timedelta(minutes=15)  # noqa: WPS432 - todo: con
 
 
 class TripSearchService(Service, trips_pb2_grpc.TripSearchServiceServicer):
-    def __init__(self, producer: amqp.Producer) -> None:
+    def __init__(
+        self,
+        repository: trips.TripSearchRepository,
+        producer: amqp.Producer,
+    ) -> None:
         self._producer = producer
+        self._repository = repository
 
     def get_name(self) -> str:
         return trips_pb2.DESCRIPTOR.services_by_name["TripSearchService"].full_name
@@ -26,21 +30,14 @@ class TripSearchService(Service, trips_pb2_grpc.TripSearchServiceServicer):
         request: trips_pb2.EnqueueTripSearchRequest,
         context: aio.ServicerContext,
     ) -> trips_pb2.EnqueueTripSearchResponse:
-        request.trip_search.id = str(uuid.uuid4())
-        expires_at = timestamp_pb2.Timestamp()
-
-        expires_at.FromDatetime(datetime.datetime.now() + _TRIP_SEARCH_EXPIRY)
-        request.trip_search.expires_at.CopyFrom(expires_at)
-
+        trip_search = await self._repository.insert(request.trip_search)
         await self._producer.publish(
             amqp_pb2.TripSearchTask(
-                trip_search=request.trip_search,
+                trip_search=trip_search,
             ),
             "trips.search",
         )
 
-        # todo: store trip search in database
-
         return trips_pb2.EnqueueTripSearchResponse(
-            trip_search=request.trip_search,
+            trip_search=trip_search,
         )
