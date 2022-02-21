@@ -3,7 +3,8 @@ import datetime
 import pytest
 
 from snowfall import fixtures
-from snowfall.adapter import places, trip_searches
+from snowfall.adapter import offer_searches, places, trip_searches
+from snowfall.junction.offers.v1alpha import offers_pb2
 from snowfall.logging import stdout
 
 stdout.configure_logger()
@@ -17,6 +18,18 @@ def places_client() -> places.Client:
 @pytest.fixture
 def trip_searches_client() -> trip_searches.Client:
     return trip_searches.DictClient()
+
+
+@pytest.fixture
+def offer_searches_client() -> offer_searches.Client:
+    return offer_searches.DictClient()
+
+
+@pytest.fixture
+def offer_search_request() -> offers_pb2.SearchTripOffersRequest:
+    return offers_pb2.SearchTripOffersRequest(
+        search=offers_pb2.TripOfferSearch(),
+    )
 
 
 @pytest.fixture

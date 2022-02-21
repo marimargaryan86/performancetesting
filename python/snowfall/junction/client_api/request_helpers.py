@@ -3,6 +3,7 @@ from typing import Any
 from starlette import requests
 
 _IDENTIFIER = "id"
+_DATA_KEY = "data"
 
 
 async def flatten_request(request: requests.Request) -> dict[str, Any]:
@@ -10,14 +11,19 @@ async def flatten_request(request: requests.Request) -> dict[str, Any]:
 
 
 async def flatten_request_body(body: dict[str, Any]) -> dict[str, Any]:
-    return await _flatten_data(body["data"])
+    return await _flatten_data(body[_DATA_KEY])
 
 
 async def _flatten_relationships(relationships: dict[str, Any]) -> dict[str, Any]:
     flattened = {}
 
     for key, relationship in relationships.items():
-        flattened[key] = relationship["data"][_IDENTIFIER]
+        if isinstance(relationship[_DATA_KEY], dict):
+            flattened[key] = relationship[_DATA_KEY][_IDENTIFIER]
+        else:
+            flattened[key] = []
+            for relationship_data in relationship[_DATA_KEY]:
+                flattened[key].append(relationship_data[_IDENTIFIER])
 
     return flattened
 

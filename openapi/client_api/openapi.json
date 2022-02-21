@@ -40,9 +40,9 @@
       ]
     },
     {
-      "name": "Journeys",
+      "name": "Orders",
       "tags": [
-        "journeys"
+        "orders"
       ]
     },
     {
@@ -57,13 +57,8 @@
   "tags": [
     {
       "name": "inventories",
-      "description": "The result of a successful journey.",
+      "description": "The result of a successful order.",
       "x-displayName": "Inventories"
-    },
-    {
-      "name": "journeys",
-      "description": "A journey.",
-      "x-displayName": "Journeys"
     },
     {
       "name": "legs",
@@ -79,6 +74,11 @@
       "name": "offers",
       "description": "Offers are bookable suggestions for a trip.",
       "x-displayName": "Offers"
+    },
+    {
+      "name": "orders",
+      "description": "A collection of bookings.",
+      "x-displayName": "Orders"
     },
     {
       "name": "places",
@@ -527,8 +527,8 @@
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
           }
         },
         "description": "Make a new trip search.",
@@ -672,8 +672,8 @@
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
           }
         },
         "description": "Make a new offer search.",
@@ -848,13 +848,13 @@
         "description": "View related searches for an offer search."
       }
     },
-    "/journeys": {
+    "/orders": {
       "post": {
-        "summary": "New Journey",
+        "summary": "New Order",
         "tags": [
-          "journeys"
+          "orders"
         ],
-        "operationId": "post-journey",
+        "operationId": "post-order",
         "responses": {
           "201": {
             "description": "Created",
@@ -864,7 +864,7 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/Journey"
+                      "$ref": "#/components/schemas/Order"
                     }
                   },
                   "required": [
@@ -877,11 +877,11 @@
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
           }
         },
-        "description": "Make a new journey.",
+        "description": "Make a new order.",
         "requestBody": {
           "content": {
             "application/vnd.api+json": {
@@ -889,7 +889,7 @@
                 "type": "object",
                 "properties": {
                   "data": {
-                    "$ref": "#/components/schemas/Journey"
+                    "$ref": "#/components/schemas/Order"
                   }
                 },
                 "required": [
@@ -901,11 +901,11 @@
         }
       },
       "get": {
-        "summary": "List Journeys",
+        "summary": "List Orders",
         "tags": [
-          "journeys"
+          "orders"
         ],
-        "operationId": "get-journeys",
+        "operationId": "get-orders",
         "responses": {
           "200": {
             "description": "OK",
@@ -917,7 +917,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/Journey"
+                        "$ref": "#/components/schemas/Order"
                       }
                     }
                   },
@@ -929,20 +929,20 @@
             }
           }
         },
-        "description": "List all journeys."
+        "description": "List all orders."
       },
       "parameters": []
     },
-    "/journeys/{journeyId}": {
+    "/orders/{orderId}": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/journeyId"
+          "$ref": "#/components/parameters/orderId"
         }
       ],
       "get": {
-        "summary": "View Journey",
+        "summary": "View Order",
         "tags": [
-          "journeys"
+          "orders"
         ],
         "responses": {
           "200": {
@@ -953,7 +953,7 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/Journey"
+                      "$ref": "#/components/schemas/Order"
                     }
                   },
                   "required": [
@@ -967,28 +967,37 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-journeys-journey-id",
-        "description": "View a previously created journey."
+        "operationId": "get-orders-order-id",
+        "description": "View a previously created order."
       }
     },
-    "/journeys/{journeyId}/relationships/offers": {
+    "/orders/{orderId}/relationships/offers": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/journeyId"
+          "$ref": "#/components/parameters/orderId"
         }
       ],
       "post": {
-        "summary": "Add Offers to Journey",
-        "operationId": "post-journeys-journey-id-relationships-offers",
+        "summary": "Add Offers to Order",
+        "operationId": "post-orders-order-id-relationships-offers",
         "responses": {
           "202": {
             "description": "Accepted"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
           }
         },
         "tags": [
-          "journeys"
+          "orders"
         ],
-        "description": "Add a new offer to an existing journey.",
+        "description": "Add a new offer to an existing order.",
         "requestBody": {
           "content": {
             "application/vnd.api+json": {
@@ -1720,7 +1729,10 @@
                         "type": "object",
                         "properties": {
                           "data": {
-                            "$ref": "#/components/schemas/TripIdentifier"
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/components/schemas/TripIdentifier"
+                            }
                           }
                         }
                       }
@@ -2072,8 +2084,8 @@
           }
         ]
       },
-      "Journey": {
-        "title": "Journey",
+      "Order": {
+        "title": "Order",
         "allOf": [
           {
             "type": "object",
@@ -2087,7 +2099,7 @@
               "type": {
                 "type": "string",
                 "enum": [
-                  "journeys"
+                  "orders"
                 ]
               },
               "attributes": {
@@ -2376,6 +2388,24 @@
             }
           }
         }
+      },
+      "UnprocessableEntity": {
+        "description": "Unprocessable Entity",
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "errors": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "parameters": {
@@ -2423,8 +2453,8 @@
         },
         "description": "Offer Search identifier"
       },
-      "journeyId": {
-        "name": "journeyId",
+      "orderId": {
+        "name": "orderId",
         "in": "path",
         "required": true,
         "schema": {
@@ -2432,7 +2462,7 @@
           "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
           "format": "uuid"
         },
-        "description": "Journey identifier"
+        "description": "Order identifier"
       },
       "page-cursor": {
         "name": "page[cursor]",

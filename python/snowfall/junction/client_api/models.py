@@ -6,11 +6,11 @@ import pydantic
 from starlette import responses
 
 AnyMapping = Mapping[str, Any]
+Relationship = Union[AnyMapping, Sequence[AnyMapping]]
 
 
 class BaseModel(pydantic.BaseModel):
     class Config(object):  # noqa: WPS431
-        arbitrary_types_allowed = True
         json_encoders = {
             datetime.datetime: lambda datetime_object: datetime_object.strftime(
                 "%Y-%m-%dT%H:%M:%SZ",
@@ -25,7 +25,7 @@ class ResourceIdentifier(BaseModel):
 
 class Resource(ResourceIdentifier):
     attributes: Optional[AnyMapping] = None
-    relationships: Optional[AnyMapping] = None
+    relationships: Optional[Relationship] = None
     links: Optional[AnyMapping] = None
     meta: Optional[AnyMapping] = None
 

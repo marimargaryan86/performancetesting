@@ -1,12 +1,18 @@
 from __future__ import annotations
 
+from typing import Any, Sequence
+
 from starlette import requests
 
 from snowfall.common.v1alpha import models_pb2
 from snowfall.format import protobuf
 from snowfall.junction.client_api import models
+from snowfall.junction.offers.v1alpha import offers_pb2
 from snowfall.junction.planner.v1 import planner_pb2
 from snowfall.junction.trips.v1alpha import trips_pb2
+
+_SELF_HREF = "self"
+_RELATIONSHIPS_FIELD = "data"
 
 
 class PlaceResource(models.Resource):
@@ -29,7 +35,7 @@ class PlaceResource(models.Resource):
                 "type": "stop",
             },
             links={
-                "self": request.url_for(
+                _SELF_HREF: request.url_for(
                     "ViewPlace",
                     placeId=place.id,
                 ),
@@ -50,11 +56,11 @@ class TripResource(models.Resource):
             attributes={},
             relationships={
                 "segments": {
-                    "data": [],
+                    _RELATIONSHIPS_FIELD: [],
                 },
             },
             links={
-                "self": request.url_for(
+                _SELF_HREF: request.url_for(
                     "ViewTrip",
                     tripId=trip.id,
                 ),
@@ -82,22 +88,75 @@ class TripSearchResource(models.Resource):
             },
             relationships={
                 "origin": {
-                    "data": {
-                        "id": trip_search.origin.id,
-                        "type": "places",
-                    },
+                    _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
+                        id=trip_search.origin.id,
+                        type="places",
+                    ),
                 },
                 "destination": {
-                    "data": {
-                        "id": trip_search.destination.id,
-                        "type": "places",
-                    },
+                    _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
+                        id=trip_search.destination.id,
+                        type="places",
+                    ),
                 },
             },
             links={
-                "self": request.url_for(
+                _SELF_HREF: request.url_for(
                     "ViewTripSearch",
                     tripSearchId=trip_search.id,
                 ),
             },
         )
+
+
+class TripOfferSearchResource(models.Resource):
+    @classmethod
+    async def from_proto(
+        cls,
+        offer_search: offers_pb2.OfferSearch,
+        offers: Sequence[offers_pb2.OfferAggregate],
+        request: requests.Request,
+    ) -> TripOfferSearchResource:
+        return cls(
+            id=offer_search.id,
+            type="trip-offer-searches",
+            attributes=await cls._get_attributes(offer_search),
+            relationships={
+                "offers": {
+                    _RELATIONSHIPS_FIELD: [
+                        models.ResourceIdentifier(
+                            id=offer.id,
+                            type="offers",
+                        )
+                        for offer in offers
+                    ],
+                },
+            },
+            links={
+                _SELF_HREF: "https://snowfall.se",
+            },
+        )
+
+    @classmethod
+    async def _get_attributes(
+        cls,
+        offer_search: offers_pb2.OfferSearch,
+    ) -> dict[str, Any]:
+        attributes = {
+            "expiresAt": await protobuf.protobuf_to_datetime(
+                offer_search.expires_at,
+            ),
+            "passengers": [
+                {"age": passenger.age} for passenger in offer_search.trip.passengers
+            ],
+        }
+
+        if offer_search.trip.HasField("loyalty_card"):
+            attributes["loyalty"] = {
+                "airlineIata": offer_search.trip.loyalty_card.airline_iata,
+                "number": offer_search.trip.loyalty_card.number,
+                "firstName": offer_search.trip.loyalty_card.first_name,
+                "lastName": offer_search.trip.loyalty_card.last_name,
+            }
+
+        return attributes

@@ -2,61 +2,12 @@ import datetime
 
 import lagom
 from dateutil import parser
-from furl import furl
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall import fixtures
 from snowfall.adapter import places, trip_searches
 from snowfall.junction.client_api import models, request_helpers, resources
 from snowfall.junction.planner.v1 import planner_pb2
-
-_DEFAULT_PAGE_LIMIT = 20
-
-
-class Place(endpoints.HTTPEndpoint):
-    async def get(
-        self,
-        request: requests.Request,
-        client: places.Client = lagom.injectable,
-    ) -> responses.Response:
-        try:
-            place = await client.get(request.path_params["placeId"])
-        except places.NotFoundError:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
-
-        return models.JsonApiResponse(
-            models.Body(
-                data=await resources.PlaceResource.from_proto(place, request),
-            ),
-        )
-
-
-class Places(endpoints.HTTPEndpoint):
-    async def get(
-        self,
-        request: requests.Request,
-        client: places.Client = lagom.injectable,
-    ) -> responses.Response:
-        cursor = request.query_params.get("page[cursor]")
-        limit = int(request.query_params.get("page[limit]", _DEFAULT_PAGE_LIMIT))
-        response = await client.find(limit=limit, cursor=cursor)
-        resource_list = [
-            await resources.PlaceResource.from_proto(place, request)
-            for place in response.places
-        ]
-
-        next_url = furl(request.url_for("ListPlaces"))
-        next_url.args["page[cursor]"] = response.next_page_token
-        next_url.args["page[limit]"] = limit
-
-        return models.JsonApiResponse(
-            models.Body(
-                data=resource_list,
-                links={
-                    "next": next_url.url,
-                },
-            ),
-        )
 
 
 class Trip(endpoints.HTTPEndpoint):
@@ -113,12 +64,12 @@ class TripSearches(endpoints.HTTPEndpoint):
         try:
             origin = await places_client.get(body["origin"])
         except places.NotFoundError:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+            raise exceptions.HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         try:
             destination = await places_client.get(body["destination"])
         except places.NotFoundError:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+            raise exceptions.HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         if body.get("departureAfter"):
             departure_after = parser.isoparse(body["departureAfter"])
@@ -168,8 +119,3 @@ class TripsByTripSearch(endpoints.HTTPEndpoint):
                 ],
             ),
         )
-
-
-class Health(endpoints.HTTPEndpoint):
-    async def get(self, request: requests.Request) -> responses.Response:
-        return models.JsonApiResponse(models.Body(meta={"status": "pass"}))

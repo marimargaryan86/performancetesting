@@ -8,29 +8,6 @@ from snowfall import fixtures
 from snowfall.adapter import trip_searches
 
 
-class TestHealth(object):
-    def test_health_status_code(self, client: testclient.TestClient) -> None:
-        response = client.get("/health")
-        assert response.status_code == status.HTTP_200_OK
-
-
-class TestPlaces(object):
-    def test_unknown_place_returns_not_found(
-        self,
-        client: testclient.TestClient,
-    ) -> None:
-        response = client.get("/places/{id}".format(id=fixtures.NOT_FOUND))
-        assert response.status_code == status.HTTP_404_NOT_FOUND
-
-    def test_place_is_found(self, client: testclient.TestClient) -> None:
-        response = client.get("/places/{id}".format(id=fixtures.PLACES[0]))
-        assert response.status_code == status.HTTP_200_OK
-
-    def test_multiple_places_are_found(self, client: testclient.TestClient) -> None:
-        response = client.get("/places")
-        assert response.status_code == status.HTTP_200_OK
-
-
 @pytest.mark.asyncio
 class TestTrips(object):
     async def test_missing_trip_returns_not_found(
@@ -120,7 +97,7 @@ class TestTripSearches(object):
             json=query,
             headers={"Content-Type": "application/vnd.api+json"},
         )
-        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
     async def test_trip_search_post_returns_resource(
         self,

@@ -1,37 +1,72 @@
+from typing import Any
+
 import pytest
 
 from snowfall.junction.client_api import request_helpers
 
 
 @pytest.mark.asyncio
-async def test_request_is_flattened() -> None:
-    request = {
-        "data": {
-            "attributes": {
+@pytest.mark.parametrize(
+    "request_data, expected",
+    [
+        (
+            {
+                "data": {
+                    "attributes": {
+                        "departureAfter": "1957-04-30T08:34:00.826Z",
+                        "arrivalBefore": "1947-08-17T08:12:02.822Z",
+                    },
+                    "relationships": {
+                        "origin": {
+                            "data": {
+                                "id": "8c3e06ac-1c17-986c-9510-c35229954f7c",
+                                "type": "places",
+                            },
+                        },
+                        "destination": {
+                            "data": {
+                                "id": "78a77e1e-cc51-b08b-1fe5-a75349cb73b1",
+                                "type": "places",
+                            },
+                        },
+                    },
+                    "type": "trip-searches",
+                },
+            },
+            {
                 "departureAfter": "1957-04-30T08:34:00.826Z",
                 "arrivalBefore": "1947-08-17T08:12:02.822Z",
+                "origin": "8c3e06ac-1c17-986c-9510-c35229954f7c",
+                "destination": "78a77e1e-cc51-b08b-1fe5-a75349cb73b1",
             },
-            "relationships": {
-                "origin": {
-                    "data": {
-                        "id": "8c3e06ac-1c17-986c-9510-c35229954f7c",
-                        "type": "places",
+        ),
+        (
+            {
+                "data": {
+                    "attributes": {},
+                    "relationships": {
+                        "trips": {
+                            "data": [
+                                {
+                                    "id": "8c3e06ac-1c17-986c-9510-c35229954f7c",
+                                    "type": "trips",
+                                },
+                            ],
+                        },
                     },
-                },
-                "destination": {
-                    "data": {
-                        "id": "78a77e1e-cc51-b08b-1fe5-a75349cb73b1",
-                        "type": "places",
-                    },
+                    "type": "offers-trip-searches",
                 },
             },
-            "type": "trip-searches",
-        },
-    }
-    expected = {
-        "departureAfter": "1957-04-30T08:34:00.826Z",
-        "arrivalBefore": "1947-08-17T08:12:02.822Z",
-        "origin": "8c3e06ac-1c17-986c-9510-c35229954f7c",
-        "destination": "78a77e1e-cc51-b08b-1fe5-a75349cb73b1",
-    }
-    assert await request_helpers.flatten_request_body(request) == expected
+            {
+                "trips": [
+                    "8c3e06ac-1c17-986c-9510-c35229954f7c",
+                ],
+            },
+        ),
+    ],
+)
+async def test_request_is_flattened(
+    request_data: dict[str, Any],
+    expected: dict[str, Any],
+) -> None:
+    assert await request_helpers.flatten_request_body(request_data) == expected

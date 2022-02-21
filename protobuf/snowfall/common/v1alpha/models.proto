@@ -54,3 +54,8 @@ message Stop {
   Point point = 4;
   uint32 order = 5;
 }
+
+message Segment {
+  string id = 1;
+  repeated Stop stops = 2;
+}

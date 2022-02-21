@@ -4,10 +4,11 @@ from typing import Sequence
 import lagom
 import pydantic
 from lagom.integrations import starlette
-from starlette import applications, exceptions, middleware, routing, status
+from starlette import applications, exceptions, middleware, status
 
-from snowfall.adapter import places, trip_searches
-from snowfall.junction.client_api import handlers, middlewares, routes, validation
+from snowfall.adapter import offer_searches, places, trip_searches
+from snowfall.junction.client_api import handlers, middlewares, validation
+from snowfall.junction.client_api.routes import router
 
 
 class Settings(pydantic.BaseSettings):
@@ -20,10 +21,12 @@ class Settings(pydantic.BaseSettings):
 def create_dependencies(
     places_client: places.Client,
     trip_searches_client: trip_searches.Client,
+    offer_searches_client: offer_searches.Client,
 ) -> starlette.StarletteIntegration:
     container = lagom.Container()
     container[places.Client] = places_client  # type: ignore[misc]
     container[trip_searches.Client] = trip_searches_client  # type: ignore[misc]
+    container[offer_searches.Client] = offer_searches_client  # type: ignore[misc]
 
     return starlette.StarletteIntegration(container)
 
@@ -40,7 +43,7 @@ def create_app(
         ),
     ]
     app = applications.Starlette(
-        routes=_get_routes(dependencies),
+        routes=router.get_routes(dependencies),
         middleware=custom_middlewares,
     )
     app.add_exception_handler(exceptions.HTTPException, handlers.exception_handler)
@@ -50,35 +53,3 @@ def create_app(
     )
 
     return app
-
-
-def _get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Route]:
-    return [
-        dependencies.route("/health", routes.Health),
-        dependencies.route(
-            "/places",
-            routes.Places,
-            name="ListPlaces",
-        ),
-        dependencies.route(
-            "/places/{placeId}",
-            routes.Place,
-            name="ViewPlace",
-        ),
-        dependencies.route("/trips/searches", routes.TripSearches),
-        dependencies.route(
-            "/trips/{tripId}",
-            routes.Trip,
-            name="ViewTrip",
-        ),
-        dependencies.route(
-            "/trips/searches/{tripSearchId}",
-            routes.TripSearch,
-            name="ViewTripSearch",
-        ),
-        dependencies.route(
-            "/trips/searches/{tripSearchId}/trips",
-            routes.TripsByTripSearch,
-            name="ViewTrips",
-        ),
-    ]

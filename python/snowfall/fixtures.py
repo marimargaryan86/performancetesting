@@ -10,6 +10,7 @@ PLACES = (
     "f236a92c-4cfa-468e-85ef-431d25dcd925",
     "488a836d-ec22-439b-a9d8-3c4c386a731e",
 )
+TRIP = "b3e45af0-f3ae-46e5-a94f-fd1c9d86fb7d"
 
 
 def get_places() -> list[models_pb2.Place]:

@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package snowfall.junction.offers.v1alpha;
+
+import "google/protobuf/timestamp.proto";
+import "snowfall/common/v1alpha/models.proto";
+
+service OfferService {
+  rpc SearchTripOffers (SearchTripOffersRequest) returns (SearchTripOffersResponse) {}
+  rpc GetOfferSearch (GetOfferSearchRequest) returns (GetOfferSearchResponse) {}
+  rpc GetOffers (GetOffersRequest) returns (GetOffersResponse) {}
+}
+
+message SearchTripOffersRequest {
+  TripOfferSearch search = 1;
+}
+
+message SearchTripOffersResponse {
+  OfferSearch search = 1;
+}
+
+message GetOfferSearchRequest {
+  string search_id = 1;
+}
+
+message GetOfferSearchResponse {
+  OfferSearch search = 1;
+}
+
+message GetOffersRequest {
+  string search_id = 1;
+}
+
+message GetOffersResponse {
+  repeated OfferAggregate offers = 1;
+}
+
+message OfferAggregate {
+  string id = 1;
+}
+
+message OfferSearch {
+  string id = 1;
+  google.protobuf.Timestamp expires_at = 2;
+  oneof search {
+    TripOfferSearch trip = 3;
+  }
+}
+
+message TripOfferSearch {
+  repeated snowfall.common.v1alpha.Segment segments = 1;
+  repeated Passenger passengers = 2;
+  LoyaltyCard loyalty_card = 3;
+}
+
+message Passenger {
+  int32 age = 1;
+}
+
+message LoyaltyCard {
+  string airline_iata = 1;
+  string number = 2;
+  string first_name = 3;
+  string last_name = 4;
+}
+
+message TripOfferSearchTask {
+  string offer_search_id = 1;
+  repeated snowfall.common.v1alpha.Segment segments = 2;
+  repeated Passenger passengers = 3;
+  LoyaltyCard loyalty_card = 4;
+}
