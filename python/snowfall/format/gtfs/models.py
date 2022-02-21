@@ -6,11 +6,8 @@ import pydantic
 
 from snowfall.format.gtfs import constants, normalizers
 
-_MODEL_SLOTS = ("__weakref__",)
-
 
 class Agency(pydantic.BaseModel):
-    __slots__ = _MODEL_SLOTS
 
     agency_id: Optional[str]
     agency_name: str
@@ -89,7 +86,6 @@ class FeedInfo(pydantic.BaseModel):
 
 
 class Route(pydantic.BaseModel):
-    __slots__ = _MODEL_SLOTS
 
     route_id: str
     agency_id: Optional[str]
@@ -108,7 +104,6 @@ class Route(pydantic.BaseModel):
 
 
 class Stop(pydantic.BaseModel):
-    __slots__ = _MODEL_SLOTS
 
     stop_id: str
     stop_code: Optional[str]
@@ -165,7 +160,6 @@ class StopTime(pydantic.BaseModel):
 
 
 class Trip(pydantic.BaseModel):
-    __slots__ = _MODEL_SLOTS
 
     route_id: str
     service_id: str

@@ -3,7 +3,7 @@ job "gtfs-feed" {
   type        = "batch"
 
   periodic {
-    cron             = "@daily"
+    cron             = "@weekly"
     prohibit_overlap = true
   }
 
@@ -20,6 +20,7 @@ job "gtfs-feed" {
       template {
           data        = <<EOH
 AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}//\"{{end}}]"
+MONGO_DSN="[{{range $index, $service := service "mongodb"}}{{if ne $index 0}},{{end}}\"mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}}\"{{end}}]"
 REDIS_DSN="[{{range $index, $service := service "redis"}}{{if ne $index 0}},{{end}}\"redis://{{.Address}}:{{.Port}}//\"{{end}}]"
 EOH
           destination = "services.env"
@@ -61,6 +62,7 @@ EOH
       template {
         data        = <<EOH
 AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}//\"{{end}}]"
+MONGO_DSN="[{{range $index, $service := service "mongodb"}}{{if ne $index 0}},{{end}}\"mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}}\"{{end}}]"
 REDIS_DSN="[{{range $index, $service := service "redis"}}{{if ne $index 0}},{{end}}\"redis://{{.Address}}:{{.Port}}//\"{{end}}]"
 EOH
         destination = "services.env"
@@ -102,6 +104,7 @@ EOH
       template {
         data        = <<EOH
 AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}//\"{{end}}]"
+MONGO_DSN="[{{range $index, $service := service "mongodb"}}{{if ne $index 0}},{{end}}\"mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}}\"{{end}}]"
 REDIS_DSN="[{{range $index, $service := service "redis"}}{{if ne $index 0}},{{end}}\"redis://{{.Address}}:{{.Port}}//\"{{end}}]"
 EOH
         destination = "services.env"
@@ -143,6 +146,7 @@ EOH
       template {
         data        = <<EOH
 AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}//\"{{end}}]"
+MONGO_DSN="[{{range $index, $service := service "mongodb"}}{{if ne $index 0}},{{end}}\"mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}}\"{{end}}]"
 REDIS_DSN="[{{range $index, $service := service "redis"}}{{if ne $index 0}},{{end}}\"redis://{{.Address}}:{{.Port}}//\"{{end}}]"
 EOH
         destination = "services.env"

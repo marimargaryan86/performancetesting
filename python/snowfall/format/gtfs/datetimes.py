@@ -1,4 +1,6 @@
+import contextlib
 import datetime
+from typing import AsyncIterable
 
 from snowfall.format.gtfs import models
 
@@ -14,61 +16,47 @@ def create_datetime(
     return return_value + delta
 
 
-def _append_calendars(
-    row: models.Calendar,
+async def _yield_calendars(
+    rows: AsyncIterable[models.Calendar],
     now_date: datetime.date,
-    service_dates: dict[str, list[datetime.date]],
-) -> None:
-    service_dates[row.service_id] = []
-    weekdays = [
-        row.monday,
-        row.tuesday,
-        row.wednesday,
-        row.thursday,
-        row.friday,
-        row.saturday,
-        row.sunday,
-    ]
+) -> AsyncIterable[datetime.date]:
+    async for row in rows:
+        weekdays = [
+            row.monday,
+            row.tuesday,
+            row.wednesday,
+            row.thursday,
+            row.friday,
+            row.saturday,
+            row.sunday,
+        ]
 
-    for days in range((row.end_date - row.start_date).days + 1):
-        current_date = row.start_date + datetime.timedelta(days=days)
+        for days in range((row.end_date - row.start_date).days + 1):
+            current_date = row.start_date + datetime.timedelta(days=days)
 
-        if current_date < now_date:
-            continue
+            if current_date < now_date or not weekdays[current_date.weekday()]:
+                continue
 
-        if not weekdays[current_date.weekday()]:
-            continue
-
-        service_dates[row.service_id].append(current_date)
+            yield current_date
 
 
-def _append_calendar_dates(
-    row: models.CalendarDate,
-    now_date: datetime.date,
-    service_dates: dict[str, list[datetime.date]],
-) -> None:
-    if row.service_id not in service_dates:
-        service_dates[row.service_id] = []
-
-    if row.date < now_date:
-        return
-
-    in_list = row.date in service_dates[row.service_id]
-
-    if row.exception_type == 1 and not in_list:
-        service_dates[row.service_id].append(row.date)
-    elif row.exception_type == 2 and in_list:
-        service_dates[row.service_id].remove(row.date)
-
-
-def create_service_dates_map(feed: models.Feed) -> dict[str, list[datetime.date]]:
+async def calculate_serviceable_dates(
+    calendars: AsyncIterable[models.Calendar],
+    calendar_dates: AsyncIterable[models.CalendarDate],
+) -> set[datetime.date]:
     now_date = datetime.date.today()
-    service_dates: dict[str, list[datetime.date]] = {}
+    service_dates: set[datetime.date] = {
+        date async for date in _yield_calendars(calendars, now_date)
+    }
 
-    for calendar in feed.calendars:
-        _append_calendars(calendar, now_date, service_dates)
+    async for row in calendar_dates:
+        if row.date < now_date:
+            continue
 
-    for calendar_date in feed.calendar_dates:
-        _append_calendar_dates(calendar_date, now_date, service_dates)
+        if row.exception_type == 1:
+            service_dates.add(row.date)
+        elif row.exception_type == 2:
+            with contextlib.suppress(KeyError):
+                service_dates.remove(row.date)
 
     return service_dates

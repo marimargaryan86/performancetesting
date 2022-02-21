@@ -55,7 +55,7 @@ class ResultSet(Generic[Record], AsyncIterator[Record]):
         self._cursor.sort(list(sort))
 
 
-class _AbstractRepository(Generic[Record], abc.ABC):
+class _AbstractRepository(abc.ABC, Generic[Record]):
     _indexes: list[pymongo.IndexModel] = []
 
     def __init__(
@@ -164,7 +164,7 @@ class DefaultRepository(_AbstractRepository[dict[str, Any]]):
         return coders.NoopCoder()
 
 
-class ProtoRepository(_AbstractRepository[Proto], abc.ABC):
+class ProtoRepository(_AbstractRepository[Proto]):
     @functools.cached_property
     def _coder(self) -> coders.ProtoCoder[Proto]:
         return coders.ProtoCoder[Proto](self._proto)
@@ -175,7 +175,7 @@ class ProtoRepository(_AbstractRepository[Proto], abc.ABC):
         raise NotImplementedError()
 
 
-class PydanticRepository(_AbstractRepository[Model], abc.ABC):
+class PydanticRepository(_AbstractRepository[Model]):
     @functools.cached_property
     def _coder(self) -> coders.PydanticCoder[Model]:
         return coders.PydanticCoder[Model](self._model)

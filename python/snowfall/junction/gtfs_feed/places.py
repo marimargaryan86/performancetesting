@@ -4,8 +4,8 @@ import tenacity
 from geopy import exc
 
 from snowfall.common.v1alpha import models_pb2
-from snowfall.format.gtfs import models
 from snowfall.geodata import geocoding
+from snowfall.junction.gtfs_feed import importer
 from snowfall.transport import amqp
 
 _NAMESPACE = uuid.UUID("5190984e-4ab7-411e-96f6-2848cc5d63e1")
@@ -14,11 +14,12 @@ _NAMESPACE = uuid.UUID("5190984e-4ab7-411e-96f6-2848cc5d63e1")
 async def process_places(
     geocoder: geocoding.ReverseGeocoder,
     producer: amqp.Producer,
-    feed: models.Feed,
+    collection: importer.RepositoryCollection,
+    ref: str,
 ) -> None:
-    namespace = uuid.uuid5(_NAMESPACE, feed.ref)
+    namespace = uuid.uuid5(_NAMESPACE, ref)
 
-    for stop in feed.stops:
+    async for stop in await collection.stops.find_with_cursor():
         if not stop.stop_lat or not stop.stop_lon or stop.parent_station:
             continue
 
@@ -52,7 +53,7 @@ async def process_places(
                             latitude=stop.stop_lat,
                             longitude=stop.stop_lon,
                         ),
-                        source_ref=feed.ref,
+                        source_ref=ref,
                     ),
                     "place.import",
                 )

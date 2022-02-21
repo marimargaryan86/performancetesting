@@ -1,53 +1,109 @@
+import dataclasses
 import datetime
-import itertools
 import uuid
-from typing import AsyncIterator, Iterator, Optional
+import zoneinfo
+from typing import AsyncIterator, Optional
 
+import pydantic
 from google.protobuf import timestamp_pb2
 
 from snowfall.common.v1alpha import models_pb2
-from snowfall.format.gtfs import datetimes, enums, feed, models
+from snowfall.format.gtfs import constants, datetimes, enums, models
 from snowfall.geodata import geocoding
+from snowfall.junction.gtfs_feed import importer
 from snowfall.transport import amqp
+
+
+@dataclasses.dataclass
+class _ScheduleContext(object):
+    agency: models.Agency
+    route: models.Route
+    route_type: "models_pb2.Schedule.Type.V"
+    trip: models.Trip
+    service_dates: set[datetime.date] = dataclasses.field(default_factory=set)
+    service_id: str = ""
+    stop_ids: set[str] = dataclasses.field(default_factory=set)
+    stops: dict[str, models.Stop] = dataclasses.field(default_factory=dict)
 
 
 class SchedulesGenerator(object):
     def __init__(
         self,
         geocoder: geocoding.ReverseGeocoder,
+        ref: str,
+        repository_collection: importer.RepositoryCollection,
     ):
+        self._collection = repository_collection
         self._geocoder = geocoder
+        self._namespace = uuid.uuid5(constants.NAMESPACE, ref)
+        self._ref = ref
+        self._time_zone = zoneinfo.ZoneInfo("UTC")
 
-    async def generate(
-        self,
-        gtfs_feed: feed.FeedDecorator,
-    ) -> AsyncIterator[models_pb2.Schedule]:
-        stop_times_by_trip = itertools.groupby(
-            gtfs_feed.feed.stop_times,
-            key=lambda st: st.trip_id,
+    async def generate(self) -> AsyncIterator[models_pb2.Schedule]:
+        self._time_zone = zoneinfo.ZoneInfo(
+            [
+                agency
+                async for agency in await self._collection.agencies.find_with_cursor()
+            ][0].agency_timezone,
         )
 
-        for trip_id, stop_times in stop_times_by_trip:
-            trip = gtfs_feed.get_trip_by_id(trip_id)
+        # todo: creating a context like this is fugly, should be improved.
+        context = _ScheduleContext(
+            agency=models.Agency.construct(
+                agency_name="",
+                agency_url=pydantic.HttpUrl("https://example.com/"),
+                agency_timezone="",
+            ),
+            route=models.Route.construct(route_id="", route_type=0),
+            route_type=models_pb2.Schedule.TYPE_UNSPECIFIED,
+            trip=models.Trip.construct(
+                route_id="",
+                service_id="",
+                trip_id="",
+                wheelchair_accessible=0,
+                bikes_allowed=0,
+            ),
+        )
+        trips = await self._collection.trips.find_with_cursor()
 
-            async for schedule in self._generate_for_trip(gtfs_feed, trip, stop_times):
+        trips.sort(("route_id", 1), ("service_id", 1))
+
+        async for trip in trips:
+            context.trip = trip
+
+            if not context.route or context.route.route_id != trip.route_id:
+                context.route = await self._collection.routes.get_by_id(trip.route_id)
+                context.route_type = enums.gtfs_type_to_schedule_type(
+                    context.route.route_type,
+                )
+
+            if context.route_type == models_pb2.Schedule.TYPE_UNSPECIFIED:
+                continue
+
+            async for schedule in self._generate_for_trip(context):
                 yield schedule
 
     async def _generate_for_trip(
         self,
-        gtfs_feed: feed.FeedDecorator,
-        trip: models.Trip,
-        stop_times: Iterator[models.StopTime],
+        context: _ScheduleContext,
     ) -> AsyncIterator[models_pb2.Schedule]:
-        service_dates = gtfs_feed.get_service_dates_by_service_id(trip.service_id)
-        sorted_stop_times = sorted(stop_times, key=lambda st: st.stop_sequence)
+        stop_times = sorted(
+            [
+                st
+                async for st in await self._collection.stop_times.find_by_trip_id(
+                    context.trip.trip_id,
+                )
+            ],
+            key=lambda st: st.stop_sequence,
+        )
 
-        for service_date in service_dates:
+        await self._set_trip_contexts(context, stop_times)
+
+        for service_date in context.service_dates:
             schedule = await self._generate_for_trip_on_service_date(
-                gtfs_feed,
-                trip,
+                context,
                 service_date,
-                sorted_stop_times,
+                stop_times,
             )
 
             if schedule:
@@ -55,14 +111,13 @@ class SchedulesGenerator(object):
 
     async def _generate_for_trip_on_service_date(
         self,
-        gtfs_feed: feed.FeedDecorator,
-        trip: models.Trip,
+        context: _ScheduleContext,
         service_date: datetime.date,
         stop_times: list[models.StopTime],
     ) -> Optional[models_pb2.Schedule]:
         stops = [
             await self._generate_stop(
-                gtfs_feed,
+                context,
                 service_date,
                 sequence,
                 stop_time,
@@ -74,28 +129,26 @@ class SchedulesGenerator(object):
         if not stops:
             return None
 
-        route = gtfs_feed.get_route_by_id(trip.route_id)
-        id_parts = (trip.trip_id, service_date.isoformat())
+        id_parts = (context.trip.trip_id, service_date.isoformat())
 
         return models_pb2.Schedule(
-            id=str(uuid.uuid5(gtfs_feed.namespace, "\x00".join(id_parts))),
-            name=route.route_short_name or route.route_long_name or "",
+            id=str(uuid.uuid5(self._namespace, "\x00".join(id_parts))),
+            name=context.route.route_short_name or context.route.route_long_name or "",
             stops=stops,
-            agency_name=gtfs_feed.get_agency_by_id(route.agency_id or "").agency_name,
-            source_ref=gtfs_feed.feed.ref,
-            type=enums.gtfs_type_to_schedule_type(route.route_type),
+            agency_name=context.agency.agency_name,
+            source_ref=self._ref,
+            type=context.route_type,
         )
 
     async def _generate_stop(
         self,
-        gtfs_feed: feed.FeedDecorator,
+        context: _ScheduleContext,
         service_date: datetime.date,
         sequence: int,
         stop_time: models.StopTime,
     ) -> models_pb2.Stop:
-        trip = gtfs_feed.get_trip_by_id(stop_time.trip_id)
-        stop = gtfs_feed.get_stop_by_id(stop_time.stop_id)
-        id_parts = (trip.trip_id, service_date.isoformat(), str(sequence))
+        stop = context.stops[stop_time.stop_id]
+        id_parts = (context.trip.trip_id, service_date.isoformat(), str(sequence))
         departure_at = None
         arrival_at = None
 
@@ -105,7 +158,7 @@ class SchedulesGenerator(object):
                 datetimes.create_datetime(
                     service_date,
                     stop_time.departure_time,
-                    gtfs_feed.time_zone,
+                    self._time_zone,
                 ),
             )
 
@@ -115,12 +168,12 @@ class SchedulesGenerator(object):
                 datetimes.create_datetime(
                     service_date,
                     stop_time.arrival_time,
-                    gtfs_feed.time_zone,
+                    self._time_zone,
                 ),
             )
 
         return models_pb2.Stop(
-            id=str(uuid.uuid5(gtfs_feed.namespace, "\x00".join(id_parts))),
+            id=str(uuid.uuid5(self._namespace, "\x00".join(id_parts))),
             departure_at=departure_at,
             arrival_at=arrival_at,
             point=models_pb2.Point(
@@ -138,15 +191,45 @@ class SchedulesGenerator(object):
             order=sequence,
         )
 
+    async def _set_trip_contexts(
+        self,
+        context: _ScheduleContext,
+        stop_times: list[models.StopTime],
+    ) -> None:
+        if context.trip.service_id != context.service_id:
+            context.service_dates = await datetimes.calculate_serviceable_dates(
+                await self._collection.calendars.find_by_service_id(
+                    context.trip.service_id,
+                ),
+                await self._collection.calendar_dates.find_by_service_id(
+                    context.trip.service_id,
+                ),
+            )
+            context.service_id = context.trip.service_id
+
+        if not context.agency or context.agency.agency_id != context.route.agency_id:
+            context.agency = await self._collection.agencies.get_by_id(
+                context.route.agency_id or "",
+            )
+
+        stop_ids = {st.stop_id for st in stop_times}
+
+        if context.stop_ids != stop_ids:
+            context.stop_ids = stop_ids
+            context.stops = {
+                stop.stop_id: stop
+                async for stop in await self._collection.stops.find_by_ids(*stop_ids)
+            }
+
 
 async def produce_schedules(
     connection: amqp.Connection,
-    generator: AsyncIterator[models_pb2.Schedule],
+    generator: SchedulesGenerator,
 ) -> None:
     producer = await amqp.create_producer(
         conn=connection,
         exchange_name="schedules",
     )
 
-    async for schedule in generator:
+    async for schedule in generator.generate():
         await producer.publish(schedule, "schedule.import")

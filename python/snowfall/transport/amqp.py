@@ -42,6 +42,10 @@ class Serializer(object):
 
 
 class Connection(connection.Connection):
+    async def __aenter__(self) -> "Connection":
+        await super().__aenter__()
+        return self
+
     async def __aexit__(
         self,
         exc_type: Optional[Type[BaseException]],
@@ -60,7 +64,7 @@ class Producer(object):
     ):
         self._channel = channel
         self._exchange_name = exchange_name
-        self._logger = get_logger(name=__name__)
+        self._logger = get_logger(__name__)
 
     async def publish(self, msg: message.Message, routing_key: str) -> None:
         await self._channel.basic_publish(
@@ -160,7 +164,7 @@ class Consumer(object):
         queue_name: str,
     ):
         self._channel = channel
-        self._logger = get_logger(name=__name__)
+        self._logger = get_logger(__name__)
         self._queue_name = queue_name
 
     async def consume(self, callback: ConsumerCallback) -> None:
