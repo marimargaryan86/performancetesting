@@ -4,7 +4,6 @@ import uuid
 import zoneinfo
 from typing import AsyncIterator, Optional
 
-import pydantic
 from google.protobuf import timestamp_pb2
 
 from snowfall.common.v1alpha import models_pb2
@@ -51,7 +50,7 @@ class SchedulesGenerator(object):
         context = _ScheduleContext(
             agency=models.Agency.construct(
                 agency_name="",
-                agency_url=pydantic.HttpUrl("https://example.com/"),
+                agency_url="https://example.com/",  # type: ignore[arg-type]
                 agency_timezone="",
             ),
             route=models.Route.construct(route_id="", route_type=0),
