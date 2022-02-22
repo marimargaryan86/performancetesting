@@ -19,11 +19,12 @@ class _Settings(BaseSettings):
     feed_url: AnyUrl
     mongo_dsn: Sequence[AnyUrl]
     redis_dsn: Sequence[AnyUrl]
+    skip_checksum_check: bool = False
 
 
 async def _main(service: RunnableService) -> None:
     settings = _Settings()
-    temp_db = temporary.database(
+    temp_db = temporary.TemporaryDatabase(
         motor_asyncio.AsyncIOMotorClient(random.choice(settings.mongo_dsn)),  # nosec
         prefix="gtfs_feed",
     )
@@ -61,6 +62,7 @@ async def _import(
         imported = await feed_importer.import_feed(
             settings.feed_ref,
             settings.feed_url,
+            settings.skip_checksum_check,
         )
 
     if not imported:

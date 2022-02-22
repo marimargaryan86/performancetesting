@@ -1,24 +1,36 @@
-import contextlib
+import asyncio
 import random
 import string
-from typing import AsyncIterator
+import types
+from typing import Optional, Type
 
 from motor import core
 
 
-@contextlib.asynccontextmanager
-async def database(
-    mongo: core.AgnosticClient,
-    prefix: str = "",
-) -> AsyncIterator[core.AgnosticDatabase]:
-    db_name = "{prefix}_{random}".format(
-        prefix=(prefix or "temp"),
-        random="".join(
-            random.choices(string.ascii_uppercase + string.digits, k=8),  # nosec
-        ),
-    )
+class TemporaryDatabase(object):
+    def __init__(
+        self,
+        mongo: core.AgnosticClient,
+        prefix: str = "",
+    ) -> None:
+        self._mongo = mongo
+        self._db_name = "{prefix}_{random}".format(
+            prefix=(prefix or "temp"),
+            random="".join(
+                random.choices(string.ascii_uppercase + string.digits, k=8),  # nosec
+            ),
+        )
 
-    try:
-        yield mongo[db_name]
-    finally:
-        mongo.drop_database(db_name)
+    async def __aenter__(self) -> core.AgnosticDatabase:
+        return self._mongo[self._db_name]
+
+    async def __aexit__(
+        self,
+        exctype: Optional[Type[BaseException]],
+        excinst: Optional[BaseException],
+        exctb: Optional[types.TracebackType],
+    ) -> None:
+        try:
+            await self._mongo.drop_database(self._db_name)
+        except asyncio.CancelledError:
+            await self._mongo.drop_database(self._db_name)

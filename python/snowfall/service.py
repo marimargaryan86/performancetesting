@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import contextlib
 import dataclasses
-from contextlib import contextmanager
-from typing import Awaitable, Callable, Iterator, List, Optional, Sequence
+from typing import Awaitable, Callable, List, Optional, Sequence
 
 import pydantic
 from sentry_sdk import integrations
@@ -104,21 +104,21 @@ class RunnableService(Service):
             raise RuntimeError("No tasks defined")
 
         parsed_args = self._parser.parse_args()
-
-        with self._run() as loop:
-            loop.run_until_complete(self._tasks[parsed_args.task](self))
-
-    @contextmanager
-    def _run(self) -> Iterator[asyncio.AbstractEventLoop]:
         loop = asyncio.get_event_loop()
 
-        try:
-            yield loop
-        finally:
-            if self._cleanup_tasks:
-                loop.run_until_complete(*self._cleanup_tasks)
+        with contextlib.suppress(KeyboardInterrupt):
+            loop.run_until_complete(self._tasks[parsed_args.task](self))
 
-            loop.close()
+        for task in asyncio.all_tasks(loop=loop):
+            task.cancel()
+
+            with contextlib.suppress(asyncio.CancelledError):
+                loop.run_until_complete(task)
+
+        for cleanup_task in self._cleanup_tasks:
+            loop.run_until_complete(cleanup_task)
+
+        loop.close()
 
 
 def make_runnable_service(

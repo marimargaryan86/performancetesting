@@ -70,7 +70,12 @@ class Importer(object):
     async def clear_cached_hash(self, feed_ref: str) -> None:
         await self._redis.delete(_CHECKSUM_KEY_FORMAT.format(ref=feed_ref))
 
-    async def import_feed(self, feed_ref: str, feed_url: str) -> bool:
+    async def import_feed(
+        self,
+        feed_ref: str,
+        feed_url: str,
+        skip_checksum_check: bool,
+    ) -> bool:
         zip_path = await self._download_feed(feed_url)
 
         self._logger.info("Feed downloaded successfully.")
@@ -80,7 +85,7 @@ class Importer(object):
             _CHECKSUM_KEY_FORMAT.format(ref=feed_ref),
         )
 
-        if cached_checksum == current_checksum:
+        if cached_checksum == current_checksum and not skip_checksum_check:
             self._logger.info("Downloaded feed has not changed since last import.")
             return False
 
