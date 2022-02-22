@@ -1,16 +1,16 @@
 import abc
+import datetime
 import functools
-from collections.abc import AsyncIterator
 from typing import Any, Awaitable, Callable, Generic, Optional, Type, TypeVar, overload
 
 import pymongo
+from bson import codec_options
 from google.protobuf.message import Message
 from motor import core, motor_asyncio
 from pydantic import BaseModel
 
 from snowfall.common.v1alpha import models_pb2
-from snowfall.persistence import cursor
-from snowfall.persistence.mongo import coders
+from snowfall.persistence.mongo import coders, resultset
 
 _proto_id_key = "id"
 _mongo_id_key = "_id"
@@ -21,40 +21,6 @@ Record = TypeVar("Record")
 _MongoDict = dict[str, Any]
 
 
-class ResultSet(Generic[Record], AsyncIterator[Record]):
-    def __init__(
-        self,
-        cur: motor_asyncio.AsyncIOMotorCursor,
-        coder: coders.BaseCoder[Record],
-    ):
-        self._coder = coder
-        self._cursor = cur
-        self._last: Optional[str] = None
-
-        self._cursor.sort(_mongo_id_key, pymongo.ASCENDING)
-
-    def __aiter__(self) -> AsyncIterator[Record]:
-        return self
-
-    async def __anext__(self) -> Record:
-        document = await self._cursor.next()
-        self._last = document[_mongo_id_key]
-
-        return self._coder.decode(document)
-
-    async def cursor(self) -> Optional[models_pb2.Cursor]:
-        if not self._last:
-            return None
-
-        return cursor.new(self._last, "$gt")
-
-    def limit(self, limit: int) -> None:
-        self._cursor.limit(limit)
-
-    def sort(self, *sort: tuple[str, int]) -> None:
-        self._cursor.sort(list(sort))
-
-
 class _AbstractRepository(abc.ABC, Generic[Record]):  # noqa: WPS214
     _indexes: list[pymongo.IndexModel] = []
 
@@ -62,8 +28,14 @@ class _AbstractRepository(abc.ABC, Generic[Record]):  # noqa: WPS214
         self,
         collection: motor_asyncio.AsyncIOMotorCollection,
     ) -> None:
-        self._collection: core.AgnosticCollection = collection
         self._has_created_indexes = False
+        self._collection: core.AgnosticCollection = collection.database.get_collection(
+            name=collection.name,
+            codec_options=codec_options.CodecOptions(
+                tz_aware=True,
+                tzinfo=datetime.timezone.utc,
+            ),
+        )
 
     async def exists(self, identifier: str) -> bool:
         return (
@@ -78,7 +50,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):  # noqa: WPS214
     async def find_with_cursor(
         self,
         cur: Optional[models_pb2.Cursor] = None,
-    ) -> ResultSet[Record]:
+    ) -> resultset.ResultSet[Record]:
         clause = {}
 
         if cur:
@@ -140,7 +112,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):  # noqa: WPS214
         query: Callable[[Any], motor_asyncio.AsyncIOMotorCursor],
         *args: Any,
         **kwargs: Any,
-    ) -> ResultSet[Record]:
+    ) -> resultset.ResultSet[Record]:
         """Return a ``ResultSet[Record]`` if the query returns a cursor."""
 
     async def _execute(
@@ -156,7 +128,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):  # noqa: WPS214
         possible_cursor = query(*args, **kwargs)
 
         if isinstance(possible_cursor, motor_asyncio.AsyncIOMotorCursor):
-            return ResultSet[Record](
+            return resultset.ResultSet[Record](
                 possible_cursor,
                 self._coder,
             )

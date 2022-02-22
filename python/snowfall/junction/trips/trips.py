@@ -5,6 +5,7 @@ import pymongo
 from google.protobuf import timestamp_pb2
 from motor import motor_asyncio
 
+from snowfall.junction.planner.v1 import planner_pb2
 from snowfall.junction.trips.v1alpha import trips_pb2
 from snowfall.persistence.mongo import repository
 
@@ -21,6 +22,30 @@ class TripSearchRepository(repository.ProtoRepository[trips_pb2.TripSearch]):
         super().__init__(collection)
 
         self._ttl = ttl
+
+    async def add_results_from_journey_search(
+        self,
+        trip_search: trips_pb2.TripSearch,
+        response: planner_pb2.SearchJourneyResponse,
+    ) -> trips_pb2.TripSearch:
+        new_trip_search = trips_pb2.TripSearch()
+
+        new_trip_search.CopyFrom(trip_search)
+        new_trip_search.ClearField("trip_ids")
+        new_trip_search.trip_ids.extend([trip.id for trip in response.trips])
+
+        update = await self._execute(
+            self._collection.update_one,
+            {"_id": new_trip_search.id},
+            {
+                "$set": {"trip_ids": list(new_trip_search.trip_ids)},
+            },
+        )
+
+        if not update.acknowledged:
+            raise RuntimeError()
+
+        return new_trip_search
 
     async def insert(self, message: trips_pb2.TripSearch) -> trips_pb2.TripSearch:
         document = trips_pb2.TripSearch()

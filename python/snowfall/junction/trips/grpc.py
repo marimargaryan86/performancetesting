@@ -1,6 +1,6 @@
 import datetime
 
-from grpc import aio
+from grpc import StatusCode, aio
 
 from snowfall.junction.trips import trips
 from snowfall.junction.trips.v1alpha import amqp_pb2, trips_pb2, trips_pb2_grpc
@@ -41,3 +41,15 @@ class TripSearchService(Service, trips_pb2_grpc.TripSearchServiceServicer):
         return trips_pb2.EnqueueTripSearchResponse(
             trip_search=trip_search,
         )
+
+    async def GetTripSearchDetails(  # type: ignore[override] # noqa: N802
+        self,
+        request: trips_pb2.GetTripSearchDetailsRequest,
+        context: aio.ServicerContext,
+    ) -> trips_pb2.GetTripSearchDetailsResponse:
+        trip_search = await self._repository.find_by_id(request.id)
+
+        if not trip_search:
+            await context.abort(StatusCode.NOT_FOUND)
+
+        return trips_pb2.GetTripSearchDetailsResponse(trip_search=trip_search)

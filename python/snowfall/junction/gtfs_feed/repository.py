@@ -7,7 +7,7 @@ import pymongo
 from asyncstdlib import itertools
 
 from snowfall.format.gtfs import models
-from snowfall.persistence.mongo import repository
+from snowfall.persistence.mongo import repository, resultset
 
 _SERVICE_ID = "service_id"
 _TUPLE_OF_CSV = tuple[dict[str, str], ...]
@@ -90,7 +90,7 @@ class CalendarRepository(Repository[models.Calendar]):
     async def find_by_service_id(
         self,
         service_id: str,
-    ) -> repository.ResultSet[models.Calendar]:
+    ) -> resultset.ResultSet[models.Calendar]:
         return await self._execute(
             self._collection.find,
             {
@@ -106,7 +106,7 @@ class CalendarDateRepository(Repository[models.CalendarDate]):
     async def find_by_service_id(
         self,
         service_id: str,
-    ) -> repository.ResultSet[models.CalendarDate]:
+    ) -> resultset.ResultSet[models.CalendarDate]:
         return await self._execute(
             self._collection.find,
             {
@@ -147,7 +147,7 @@ class StopRepository(Repository[models.Stop]):
     async def find_by_ids(
         self,
         *stop_id: str,
-    ) -> repository.ResultSet[models.Stop]:
+    ) -> resultset.ResultSet[models.Stop]:
         return await self._execute(
             self._collection.find,
             {
@@ -172,7 +172,7 @@ class StopTimeRepository(Repository[models.StopTime]):
     async def find_by_trip_id(
         self,
         trip_id: str,
-    ) -> repository.ResultSet[models.StopTime]:
+    ) -> resultset.ResultSet[models.StopTime]:
         return await self._execute(
             self._collection.find,
             {

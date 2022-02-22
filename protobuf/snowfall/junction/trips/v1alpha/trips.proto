@@ -7,6 +7,7 @@ import "snowfall/common/v1alpha/models.proto";
 
 service TripSearchService {
   rpc EnqueueTripSearch(EnqueueTripSearchRequest) returns (EnqueueTripSearchResponse) {}
+  rpc GetTripSearchDetails(GetTripSearchDetailsRequest) returns (GetTripSearchDetailsResponse) {}
 }
 
 message TripSearch {
@@ -15,6 +16,7 @@ message TripSearch {
   snowfall.common.v1alpha.Place origin = 3;
   snowfall.common.v1alpha.Place destination = 4;
   google.protobuf.Timestamp departure_after = 5;
+  repeated string trip_ids = 6; // read only
 }
 
 message EnqueueTripSearchRequest {
@@ -22,5 +24,13 @@ message EnqueueTripSearchRequest {
 }
 
 message EnqueueTripSearchResponse {
+  TripSearch trip_search = 1;
+}
+
+message GetTripSearchDetailsRequest {
+  string id = 1;
+}
+
+message GetTripSearchDetailsResponse {
   TripSearch trip_search = 1;
 }

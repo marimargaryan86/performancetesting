@@ -18,6 +18,7 @@ _TRIPS = "trips"
 class _ConsumeSettings(BaseSettings):
     amqp_dsn: Sequence[AnyUrl]
     planner_address: Sequence[str]
+    mongo_dsn: Sequence[AnyUrl]
 
 
 class _GrpcSettings(BaseSettings):
@@ -25,12 +26,13 @@ class _GrpcSettings(BaseSettings):
     grpc_address: str = "[::]"
     grpc_port: int = 50051
     mongo_dsn: Sequence[AnyUrl]
-    trip_search_ttl: datetime.timedelta = datetime.timedelta(minutes=15)  # noqa: WPS432
+    trip_search_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
 
 
 async def _consume(service: RunnableService) -> None:
     settings = _ConsumeSettings()
     connection = amqp.Connection(random.choice(settings.amqp_dsn))  # nosec
+    mongo = motor_asyncio.AsyncIOMotorClient(random.choice(settings.mongo_dsn))  # nosec
 
     async with connection:
         consumer = TripSearchConsumer(
@@ -44,6 +46,10 @@ async def _consume(service: RunnableService) -> None:
                 grpc.aio.insecure_channel(
                     random.choice(settings.planner_address),  # nosec
                 ),
+            ),
+            repository=trips.TripSearchRepository(
+                mongo[_TRIPS]["trip_searches"],
+                datetime.timedelta(minutes=15),
             ),
         )
 
