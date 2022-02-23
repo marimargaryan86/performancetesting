@@ -19,8 +19,8 @@ class OfferSearches(endpoints.HTTPEndpoint):
             raise exceptions.HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         offer_search = await client.create(
-            request=offers_pb2.SearchTripOffersRequest(
-                search=offers_pb2.TripOfferSearch(
+            request=offers_pb2.OfferSearch(
+                trip=offers_pb2.TripOfferSearch(
                     passengers=[
                         offers_pb2.Passenger(age=passenger["age"])
                         for passenger in body["passengers"]

@@ -6,33 +6,36 @@ import "google/protobuf/timestamp.proto";
 import "snowfall/common/v1alpha/models.proto";
 
 service OfferService {
-  rpc SearchTripOffers (SearchTripOffersRequest) returns (SearchTripOffersResponse) {}
+  rpc EnqueueOfferSearch (EnqueueOfferSearchRequest) returns (EnqueueOfferSearchResponse) {}
   rpc GetOfferSearch (GetOfferSearchRequest) returns (GetOfferSearchResponse) {}
-  rpc GetOffers (GetOffersRequest) returns (GetOffersResponse) {}
+  rpc ListOffers (ListOffersRequest) returns (ListOffersResponse) {}
 }
 
-message SearchTripOffersRequest {
-  TripOfferSearch search = 1;
+message EnqueueOfferSearchRequest {
+  OfferSearch search = 1;
 }
 
-message SearchTripOffersResponse {
+message EnqueueOfferSearchResponse {
   OfferSearch search = 1;
 }
 
 message GetOfferSearchRequest {
-  string search_id = 1;
+  string id = 1;
 }
 
 message GetOfferSearchResponse {
   OfferSearch search = 1;
 }
 
-message GetOffersRequest {
-  string search_id = 1;
+message ListOffersRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  string offer_search_id = 3;
 }
 
-message GetOffersResponse {
-  repeated OfferAggregate offers = 1;
+message ListOffersResponse {
+  string next_page_token = 1;
+  repeated OfferAggregate offers = 2;
 }
 
 message OfferAggregate {

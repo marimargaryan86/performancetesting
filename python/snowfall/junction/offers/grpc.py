@@ -16,35 +16,35 @@ class OfferService(Service, offers_pb2_grpc.OfferServiceServicer):
     def register(self, server: grpc.aio.Server) -> None:
         offers_pb2_grpc.add_OfferServiceServicer_to_server(self, server)
 
-    async def SearchTripOffers(  # type: ignore[override] # noqa: N802
+    async def EnqueueOfferSearch(  # type: ignore[override] # noqa: N802
         self,
-        request: offers_pb2.SearchTripOffersRequest,
+        request: offers_pb2.EnqueueOfferSearchRequest,
         context: grpc.aio.ServicerContext,
-    ) -> offers_pb2.SearchTripOffersResponse:
-        offer_search = await self._offers_searches.create_from_trip_offer_search(
+    ) -> offers_pb2.EnqueueOfferSearchResponse:
+        offer_search = await self._offers_searches.create(
             request.search,
         )
 
         # todo: publish search to queue
 
-        return offers_pb2.SearchTripOffersResponse(search=offer_search)
+        return offers_pb2.EnqueueOfferSearchResponse(search=offer_search)
 
     async def GetOfferSearch(  # type: ignore[override] # noqa: N802
         self,
         request: offers_pb2.GetOfferSearchRequest,
         context: grpc.aio.ServicerContext,
     ) -> offers_pb2.GetOfferSearchResponse:
-        offer_search = await self._offers_searches.find_by_id(request.search_id)
+        offer_search = await self._offers_searches.find_by_id(request.id)
 
         if not offer_search:
             await context.abort(grpc.StatusCode.NOT_FOUND)
 
         return offers_pb2.GetOfferSearchResponse(search=offer_search)
 
-    async def GetOffers(  # type: ignore[override] # noqa: N802
+    async def ListOffers(  # type: ignore[override] # noqa: N802
         self,
-        request: offers_pb2.GetOffersRequest,
+        request: offers_pb2.ListOffersRequest,
         context: grpc.aio.ServicerContext,
-    ) -> offers_pb2.GetOffersResponse:
+    ) -> offers_pb2.ListOffersResponse:
         # todo: get offer results from persistence
-        return offers_pb2.GetOffersResponse()
+        return offers_pb2.ListOffersResponse()

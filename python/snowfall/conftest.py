@@ -26,9 +26,9 @@ def offer_searches_client() -> offer_searches.Client:
 
 
 @pytest.fixture
-def offer_search_request() -> offers_pb2.SearchTripOffersRequest:
-    return offers_pb2.SearchTripOffersRequest(
-        search=offers_pb2.TripOfferSearch(),
+def offer_search() -> offers_pb2.OfferSearch:
+    return offers_pb2.OfferSearch(
+        trip=offers_pb2.TripOfferSearch(),
     )
 
 

@@ -19,9 +19,9 @@ class OfferSearchRepository(repository.ProtoRepository[offers_pb2.OfferSearch]):
         super().__init__(collection)
         self._ttl = ttl
 
-    async def create_from_trip_offer_search(
+    async def create(
         self,
-        document: offers_pb2.TripOfferSearch,
+        document: offers_pb2.OfferSearch,
     ) -> offers_pb2.OfferSearch:
         expires_at = timestamp_pb2.Timestamp()
         expires_at.FromDatetime(
@@ -30,7 +30,7 @@ class OfferSearchRepository(repository.ProtoRepository[offers_pb2.OfferSearch]):
         offer_search = offers_pb2.OfferSearch(
             id=str(uuid.uuid4()),
             expires_at=expires_at,
-            trip=document,
+            trip=document.trip,
         )
 
         return await self.insert(offer_search)
