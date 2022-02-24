@@ -1,10 +1,9 @@
 from collections.abc import AsyncIterator
-from typing import Generic, Optional, TypeVar
+from typing import Any, Generic, Optional, TypeVar
 
 import pymongo
 from motor import motor_asyncio
 
-from snowfall.common.v1alpha import models_pb2
 from snowfall.persistence import cursor
 from snowfall.persistence.mongo import coders
 
@@ -17,9 +16,12 @@ class ResultSet(Generic[_Record], AsyncIterator[_Record]):
         self,
         cur: motor_asyncio.AsyncIOMotorCursor,
         coder: coders.BaseCoder[_Record],
+        filter_: dict[str, Any],
     ):
         self._coder = coder
         self._cursor = cur
+        self._custom_sort = False
+        self._filter = filter_
         self._last: Optional[str] = None
 
         self._cursor.sort(_mongo_id_key, pymongo.ASCENDING)
@@ -33,14 +35,18 @@ class ResultSet(Generic[_Record], AsyncIterator[_Record]):
 
         return self._coder.decode(document)
 
-    async def cursor(self) -> Optional[models_pb2.Cursor]:
-        if not self._last:
-            return None
+    async def cursor(self) -> str:
+        if self._custom_sort:
+            raise RuntimeError("Cursors do not yet support sorted result sets.")
 
-        return cursor.new(self._last, "$gt")
+        if not self._last:
+            return ""
+
+        return cursor.marshal(cursor.new(self._last, self._filter))
 
     def limit(self, limit: int) -> None:
         self._cursor.limit(limit)
 
     def sort(self, *sort: tuple[str, int]) -> None:
         self._cursor.sort(list(sort))
+        self._custom_sort = True

@@ -1,24 +1,24 @@
 package main
 
 import (
-    "fmt"
-    "git.snowfall.se/junction/junction/golang/legacy"
-    plannerv1 "git.snowfall.se/junction/junction/golang/protobuf/snowfall/junction/planner/v1"
-    "git.snowfall.se/junction/junction/golang/raptor"
-    "github.com/uber/h3-go"
-    "go.uber.org/zap"
-    "google.golang.org/grpc"
-    "google.golang.org/grpc/health"
-    healthgrpc "google.golang.org/grpc/health/grpc_health_v1"
-    "google.golang.org/grpc/reflection"
-    "io"
-    "net"
-    "net/http"
-    "net/url"
-    "os"
-    "path"
-    "sync"
-    "time"
+	"fmt"
+	"git.snowfall.se/junction/junction/golang/legacy"
+	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/junction/planner/v1alpha"
+	"git.snowfall.se/junction/junction/golang/raptor"
+	"github.com/uber/h3-go"
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	healthgrpc "google.golang.org/grpc/health/grpc_health_v1"
+	"google.golang.org/grpc/reflection"
+	"io"
+	"net"
+	"net/http"
+	"net/url"
+	"os"
+	"path"
+	"sync"
+	"time"
 )
 
 func main() {
@@ -75,17 +75,17 @@ func main() {
 		sugar.Fatal(err)
 	}
 
-    grpcAddress, ok := os.LookupEnv("GRPC_ADDRESS")
+	grpcAddress, ok := os.LookupEnv("GRPC_ADDRESS")
 
-    if !ok {
-        grpcAddress = "0.0.0.0"
-    }
+	if !ok {
+		grpcAddress = "0.0.0.0"
+	}
 
-    grpcPort, ok := os.LookupEnv("GRPC_PORT")
+	grpcPort, ok := os.LookupEnv("GRPC_PORT")
 
-    if !ok {
-        grpcPort = "50053"
-    }
+	if !ok {
+		grpcPort = "50053"
+	}
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", grpcAddress, grpcPort))
 
@@ -109,8 +109,8 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-    healthgrpc.RegisterHealthServer(grpcServer, health.NewServer())
-	plannerv1.RegisterPlannerServiceServer(grpcServer, &PlannerServiceServer{
+	healthgrpc.RegisterHealthServer(grpcServer, health.NewServer())
+	planner.RegisterPlannerServiceServer(grpcServer, &PlannerServiceServer{
 		Planner: raptor.NewPlanner(legacy.NewRepository(routes, routeSegments, stops, transfers, trips, tripSegments), sugar),
 		Stops:   stopsMap,
 	})

@@ -2,44 +2,32 @@ import base64
 import binascii
 import hashlib
 import hmac
+from typing import Any
 
+import rapidjson
 from google.protobuf import text_format
 
 from snowfall.common.v1alpha.models_pb2 import Cursor
 
 _DIGEST_KEY = b"df8870b0-49d2-4777-994b-fa380b564df0"
-_DIGEST_SIZE = 16
+_DIGEST_SIZE = 8  # It doesn't need to be super secure, just tamper-proofed enough.
 
 
 class CursorError(ValueError):
     """Base error that all other errors extends."""
 
 
-class InvalidPayloadError(CursorError):
-    """Raised when an marshalled cursor can't be decoded."""
-
-
-class InvalidDigestError(CursorError):
-    """Raised when an marshalled cursor contains an invalid digest."""
-
-
-def unmarshal(encoded: str) -> Cursor:
-    try:
-        raw = base64.urlsafe_b64decode(encoded.encode()).decode()
-    except binascii.Error:
-        raise InvalidPayloadError()
-
-    cursor = Cursor()
-
-    try:
-        text_format.Parse(raw, cursor, allow_field_number=True)
-    except text_format.ParseError:
-        raise InvalidPayloadError()
-
-    expected_digest = _sign(Cursor(id=cursor.id, clause=cursor.clause))
+def unmarshal(encoded: str, filter_: Any = None) -> Cursor:
+    cursor = _parse(encoded)
+    expected_digest = _sign_cursor(Cursor(id=cursor.id, filter=cursor.filter))
 
     if not hmac.compare_digest(cursor.digest, expected_digest):
-        raise InvalidDigestError()
+        raise CursorError("Invalid digest.")
+
+    expected_hash = _hash_filter(cursor.id, filter_)
+
+    if not hmac.compare_digest(cursor.filter, expected_hash):
+        raise CursorError("Invalid filter.")
 
     return cursor
 
@@ -55,16 +43,40 @@ def marshal(cursor: Cursor) -> str:
     ).decode()
 
 
-def new(identifier: str, clause: str) -> Cursor:
-    cursor = Cursor(id=identifier, clause=clause)
-    cursor.digest = _sign(cursor)
+def new(identifier: str, filter_: Any) -> Cursor:
+    cursor = Cursor(id=identifier, filter=_hash_filter(identifier, filter_))
+    cursor.digest = _sign_cursor(cursor)
 
     return cursor
 
 
-def _sign(cursor: Cursor) -> str:
-    digest = hashlib.blake2b(key=_DIGEST_KEY, digest_size=_DIGEST_SIZE)
+def _hash_filter(identifier: str, filter_: Any) -> str:
+    digest = hashlib.blake2b(key=identifier.encode(), digest_size=_DIGEST_SIZE)
 
-    digest.update(text_format.MessageToBytes(cursor))
+    digest.update(rapidjson.dumps(filter_).encode())
 
     return digest.hexdigest()
+
+
+def _sign_cursor(cursor: Cursor) -> str:
+    digest = hashlib.blake2b(key=_DIGEST_KEY, digest_size=_DIGEST_SIZE)
+
+    digest.update(marshal(cursor).encode())
+
+    return digest.hexdigest()
+
+
+def _parse(encoded: str) -> Cursor:
+    try:
+        raw = base64.urlsafe_b64decode(encoded.encode()).decode()
+    except binascii.Error:
+        raise CursorError("Invalid payload.")
+
+    cursor = Cursor()
+
+    try:
+        text_format.Parse(raw, cursor, allow_field_number=True)
+    except text_format.ParseError:
+        raise CursorError("Invalid payload.")
+
+    return cursor

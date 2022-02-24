@@ -5,9 +5,65 @@ import pymongo
 from google.protobuf import timestamp_pb2
 from motor import motor_asyncio
 
-from snowfall.junction.planner.v1 import planner_pb2
+from snowfall.common.v1alpha import models_pb2
+from snowfall.junction.planner.v1alpha import planner_pb2
 from snowfall.junction.trips.v1alpha import trips_pb2
-from snowfall.persistence.mongo import repository
+from snowfall.persistence.mongo import repository, resultset
+
+
+class TripRepository(repository.ProtoRepository[models_pb2.TripReference]):
+    _proto = models_pb2.TripReference
+
+    async def add_from_journey_search(
+        self,
+        response: planner_pb2.SearchJourneyResponse,
+    ) -> None:
+        trips_ids = set({trip.id for trip in response.trips})
+        existing_trips = await self._execute(
+            self._collection.find,
+            filter={
+                repository.mongo_id_key: {
+                    "$in": list(trips_ids),
+                },
+            },
+            projection={
+                repository.mongo_id_key: True,
+            },
+        )
+
+        missing_ids = trips_ids - set(
+            {existing.id async for existing in existing_trips},
+        )
+
+        if missing_ids:
+            await self._execute(
+                self._collection.insert_many,
+                documents=[
+                    self._coder.encode(trip)
+                    for trip in response.trips
+                    if trip.id in missing_ids
+                ],
+            )
+
+    async def find(
+        self,
+        ids: list[str],
+        cursor: str,
+    ) -> resultset.ResultSet[models_pb2.TripReference]:
+        filter_ = (
+            {
+                repository.mongo_id_key: {
+                    "$in": ids,
+                },
+            }
+            if ids
+            else {}
+        )
+
+        return await self._find_with_cursor(
+            cur=cursor,
+            filter_=filter_,
+        )
 
 
 class TripSearchRepository(repository.ProtoRepository[trips_pb2.TripSearch]):

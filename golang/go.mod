@@ -6,7 +6,6 @@ require (
 	github.com/golang/geo v0.0.0-20210211234256-740aa86cb551
 	github.com/google/uuid v1.3.0
 	github.com/jszwec/csvutil v1.5.0
-	github.com/uber/h3-go v3.0.1+incompatible
 	go.uber.org/zap v1.20.0
 	google.golang.org/grpc v1.44.0
 	google.golang.org/protobuf v1.27.1
@@ -14,6 +13,7 @@ require (
 
 require (
 	github.com/golang/protobuf v1.5.0 // indirect
+	github.com/uber/h3-go v3.0.1+incompatible // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4 // indirect

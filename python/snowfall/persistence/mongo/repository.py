@@ -1,4 +1,5 @@
 import abc
+import copy
 import datetime
 import functools
 from typing import Any, Awaitable, Callable, Generic, Optional, Type, TypeVar, overload
@@ -9,11 +10,11 @@ from google.protobuf.message import Message
 from motor import core, motor_asyncio
 from pydantic import BaseModel
 
-from snowfall.common.v1alpha import models_pb2
+from snowfall.persistence import cursor
 from snowfall.persistence.mongo import coders, resultset
 
 _proto_id_key = "id"
-_mongo_id_key = "_id"
+mongo_id_key = "_id"
 
 Model = TypeVar("Model", bound=BaseModel)
 Proto = TypeVar("Proto", bound=Message)
@@ -37,30 +38,18 @@ class _AbstractRepository(abc.ABC, Generic[Record]):  # noqa: WPS214
             ),
         )
 
+    async def all_(self) -> resultset.ResultSet[Record]:
+        return await self._execute(self._collection.find)
+
     async def exists(self, identifier: str) -> bool:
         return (
             await self._execute(
                 self._collection.find_one,
-                {_mongo_id_key: identifier},
-                {_mongo_id_key: 1},
+                {mongo_id_key: identifier},
+                {mongo_id_key: 1},
             )
             is not None
         )
-
-    async def find_with_cursor(
-        self,
-        cur: Optional[models_pb2.Cursor] = None,
-    ) -> resultset.ResultSet[Record]:
-        clause = {}
-
-        if cur:
-            clause = {
-                _mongo_id_key: {
-                    cur.clause: cur.id,
-                },
-            }
-
-        return await self._execute(self._collection.find, clause)
 
     async def find_by_id(self, document_id: str) -> Optional[Record]:
         return await self._execute(
@@ -125,12 +114,15 @@ class _AbstractRepository(abc.ABC, Generic[Record]):  # noqa: WPS214
         if not self._has_created_indexes:
             await self._create_indexes()
 
+        # _find_with_cursor sends a special kwarg pymongo don't like
+        filter_pre_cursor = kwargs.pop("filter_pre_cursor", {})
         possible_cursor = query(*args, **kwargs)
 
         if isinstance(possible_cursor, motor_asyncio.AsyncIOMotorCursor):
             return resultset.ResultSet[Record](
-                possible_cursor,
-                self._coder,
+                cur=possible_cursor,
+                coder=self._coder,
+                filter_=filter_pre_cursor,
             )
 
         possible_document = await possible_cursor
@@ -139,6 +131,30 @@ class _AbstractRepository(abc.ABC, Generic[Record]):  # noqa: WPS214
             return self._coder.decode(possible_document)
 
         return possible_document
+
+    async def _find_with_cursor(
+        self,
+        cur: str,
+        filter_: Optional[dict[str, Any]] = None,
+    ) -> resultset.ResultSet[Record]:
+        if filter_ is None:
+            filter_ = {}
+
+        filter_pre_cursor = copy.deepcopy(filter_)
+
+        if cur:
+            cursor_obj = cursor.unmarshal(cur, filter_)
+
+            if mongo_id_key not in filter_:
+                filter_[mongo_id_key] = {}
+
+            filter_[mongo_id_key]["$gt"] = cursor_obj.id
+
+        return await self._execute(
+            query=self._collection.find,
+            filter=filter_,
+            filter_pre_cursor=filter_pre_cursor,
+        )
 
 
 class DefaultRepository(_AbstractRepository[dict[str, Any]]):

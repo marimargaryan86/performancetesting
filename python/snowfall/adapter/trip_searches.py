@@ -7,7 +7,6 @@ import uuid
 
 from snowfall.common.v1alpha import models_pb2
 from snowfall.format import protobuf
-from snowfall.junction.planner.v1 import planner_pb2
 from snowfall.junction.trips.v1alpha import trips_pb2
 
 
@@ -38,14 +37,14 @@ class Client(abc.ABC):
     async def list_trips_by_trip_search(
         self,
         identifier: str,
-    ) -> list[planner_pb2.TripReference]:
+    ) -> list[models_pb2.TripReference]:
         """List trips by trip search."""
 
 
 class DictClient(Client):
     def __init__(self) -> None:
         self._searches: dict[str, trips_pb2.TripSearch] = {}
-        self._trips_cache: dict[str, list[planner_pb2.TripReference]] = {}
+        self._trips_cache: dict[str, list[models_pb2.TripReference]] = {}
 
     async def create(
         self,
@@ -77,7 +76,7 @@ class DictClient(Client):
     async def list_trips_by_trip_search(
         self,
         identifier: str,
-    ) -> list[planner_pb2.TripReference]:
+    ) -> list[models_pb2.TripReference]:
         try:
             return self._trips_cache[identifier]
         except KeyError:
@@ -85,13 +84,13 @@ class DictClient(Client):
 
     async def _generate_trips(self, trip_search: trips_pb2.TripSearch) -> None:
         self._trips_cache[trip_search.id] = [
-            planner_pb2.TripReference(
+            models_pb2.TripReference(
                 id=str(uuid.uuid4()),
                 segments=[
-                    planner_pb2.SegmentReference(
+                    models_pb2.SegmentReference(
                         id=str(uuid.uuid4()),
-                        legs=[
-                            planner_pb2.LegReference(id=str(uuid.uuid4())),
+                        stops=[
+                            models_pb2.StopReference(id=str(uuid.uuid4())),
                         ],
                     ),
                 ],

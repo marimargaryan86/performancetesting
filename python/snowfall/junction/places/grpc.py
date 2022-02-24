@@ -2,7 +2,6 @@ from grpc import StatusCode, aio
 
 from snowfall.junction.places.places import PlaceRepository
 from snowfall.junction.places.v1alpha import places_pb2, places_pb2_grpc
-from snowfall.persistence import cursor
 from snowfall.transport.grpc import Service
 
 
@@ -34,26 +33,11 @@ class PlacesService(Service, places_pb2_grpc.PlacesServiceServicer):
         request: places_pb2.ListPlacesRequest,
         context: aio.ServicerContext,
     ) -> places_pb2.ListPlacesResponse:
-        cur = None
-
-        if request.page_token:
-            try:
-                cur = cursor.unmarshal(request.page_token)
-            except cursor.CursorError:
-                await context.abort(StatusCode.INVALID_ARGUMENT)
-
-        places_result = await self._places.find_with_cursor(cur=cur)
+        places_result = await self._places.find(request.page_token)
 
         places_result.limit(request.page_size or self._default_page_size)
 
-        places = [place async for place in places_result]
-        cur = await places_result.cursor()
-        page_token = None
-
-        if cur:
-            page_token = cursor.marshal(cur)
-
         return places_pb2.ListPlacesResponse(
-            places=places,
-            next_page_token=page_token or "",
+            places=[place async for place in places_result],
+            next_page_token=await places_result.cursor(),
         )

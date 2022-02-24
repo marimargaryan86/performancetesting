@@ -1,5 +1,3 @@
-import datetime
-
 from grpc import StatusCode, aio
 
 from snowfall.junction.trips import trips
@@ -7,7 +5,38 @@ from snowfall.junction.trips.v1alpha import amqp_pb2, trips_pb2, trips_pb2_grpc
 from snowfall.transport import amqp
 from snowfall.transport.grpc import Service
 
-_TRIP_SEARCH_EXPIRY = datetime.timedelta(minutes=15)  # noqa: WPS432 - todo: config
+
+class TripService(Service, trips_pb2_grpc.TripServiceServicer):
+    def __init__(
+        self,
+        repository: trips.TripRepository,
+        default_page_size: int,
+    ):
+        self._default_page_size = default_page_size
+        self._repository = repository
+
+    def get_name(self) -> str:
+        return trips_pb2.DESCRIPTOR.services_by_name["TripService"].full_name
+
+    def register(self, server: aio.Server) -> None:
+        trips_pb2_grpc.add_TripServiceServicer_to_server(self, server)
+
+    async def ListTrips(  # type: ignore[override] # noqa: N802
+        self,
+        request: trips_pb2.ListTripsRequest,
+        context: aio.ServicerContext,
+    ) -> trips_pb2.ListTripsResponse:
+        trips_result = await self._repository.find(
+            ids=list(request.ids),
+            cursor=request.page_token,
+        )
+
+        trips_result.limit(request.page_size or self._default_page_size)
+
+        return trips_pb2.ListTripsResponse(
+            trips=[trip async for trip in trips_result],
+            next_page_token=await trips_result.cursor(),
+        )
 
 
 class TripSearchService(Service, trips_pb2_grpc.TripSearchServiceServicer):

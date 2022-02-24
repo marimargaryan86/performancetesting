@@ -6,8 +6,8 @@ from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall import fixtures
 from snowfall.adapter import places, trip_searches
+from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.client_api import models, request_helpers, resources
-from snowfall.junction.planner.v1 import planner_pb2
 
 
 class Trip(endpoints.HTTPEndpoint):
@@ -22,7 +22,7 @@ class Trip(endpoints.HTTPEndpoint):
         return models.JsonApiResponse(
             models.Body(
                 data=await resources.TripResource.from_proto(
-                    trip=planner_pb2.TripReference(
+                    trip=models_pb2.TripReference(
                         id=request.path_params["tripId"],
                     ),
                     request=request,

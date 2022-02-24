@@ -10,13 +10,8 @@ service TripSearchService {
   rpc GetTripSearchDetails(GetTripSearchDetailsRequest) returns (GetTripSearchDetailsResponse) {}
 }
 
-message TripSearch {
-  string id = 1; // read only
-  google.protobuf.Timestamp expires_at = 2; // read only
-  snowfall.common.v1alpha.Place origin = 3;
-  snowfall.common.v1alpha.Place destination = 4;
-  google.protobuf.Timestamp departure_after = 5;
-  repeated string trip_ids = 6; // read only
+service TripService {
+  rpc ListTrips(ListTripsRequest) returns (ListTripsResponse) {}
 }
 
 message EnqueueTripSearchRequest {
@@ -33,4 +28,24 @@ message GetTripSearchDetailsRequest {
 
 message GetTripSearchDetailsResponse {
   TripSearch trip_search = 1;
+}
+
+message ListTripsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  repeated string ids = 3;
+}
+
+message ListTripsResponse {
+  repeated snowfall.common.v1alpha.TripReference trips = 1;
+  string next_page_token = 2;
+}
+
+message TripSearch {
+  string id = 1; // read only
+  google.protobuf.Timestamp expires_at = 2; // read only
+  snowfall.common.v1alpha.Place origin = 3;
+  snowfall.common.v1alpha.Place destination = 4;
+  google.protobuf.Timestamp departure_after = 5;
+  repeated string trip_ids = 6; // read only
 }

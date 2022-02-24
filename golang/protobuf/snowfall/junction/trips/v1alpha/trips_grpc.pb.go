@@ -19,6 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TripSearchServiceClient interface {
 	EnqueueTripSearch(ctx context.Context, in *EnqueueTripSearchRequest, opts ...grpc.CallOption) (*EnqueueTripSearchResponse, error)
+	GetTripSearchDetails(ctx context.Context, in *GetTripSearchDetailsRequest, opts ...grpc.CallOption) (*GetTripSearchDetailsResponse, error)
 }
 
 type tripSearchServiceClient struct {
@@ -38,11 +39,21 @@ func (c *tripSearchServiceClient) EnqueueTripSearch(ctx context.Context, in *Enq
 	return out, nil
 }
 
+func (c *tripSearchServiceClient) GetTripSearchDetails(ctx context.Context, in *GetTripSearchDetailsRequest, opts ...grpc.CallOption) (*GetTripSearchDetailsResponse, error) {
+	out := new(GetTripSearchDetailsResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.junction.trips.v1alpha.TripSearchService/GetTripSearchDetails", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TripSearchServiceServer is the server API for TripSearchService service.
 // All implementations should embed UnimplementedTripSearchServiceServer
 // for forward compatibility
 type TripSearchServiceServer interface {
 	EnqueueTripSearch(context.Context, *EnqueueTripSearchRequest) (*EnqueueTripSearchResponse, error)
+	GetTripSearchDetails(context.Context, *GetTripSearchDetailsRequest) (*GetTripSearchDetailsResponse, error)
 }
 
 // UnimplementedTripSearchServiceServer should be embedded to have forward compatible implementations.
@@ -51,6 +62,9 @@ type UnimplementedTripSearchServiceServer struct {
 
 func (UnimplementedTripSearchServiceServer) EnqueueTripSearch(context.Context, *EnqueueTripSearchRequest) (*EnqueueTripSearchResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EnqueueTripSearch not implemented")
+}
+func (UnimplementedTripSearchServiceServer) GetTripSearchDetails(context.Context, *GetTripSearchDetailsRequest) (*GetTripSearchDetailsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTripSearchDetails not implemented")
 }
 
 // UnsafeTripSearchServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -82,6 +96,24 @@ func _TripSearchService_EnqueueTripSearch_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TripSearchService_GetTripSearchDetails_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTripSearchDetailsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TripSearchServiceServer).GetTripSearchDetails(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.junction.trips.v1alpha.TripSearchService/GetTripSearchDetails",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TripSearchServiceServer).GetTripSearchDetails(ctx, req.(*GetTripSearchDetailsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TripSearchService_ServiceDesc is the grpc.ServiceDesc for TripSearchService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -92,6 +124,94 @@ var TripSearchService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "EnqueueTripSearch",
 			Handler:    _TripSearchService_EnqueueTripSearch_Handler,
+		},
+		{
+			MethodName: "GetTripSearchDetails",
+			Handler:    _TripSearchService_GetTripSearchDetails_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "snowfall/junction/trips/v1alpha/trips.proto",
+}
+
+// TripServiceClient is the client API for TripService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type TripServiceClient interface {
+	ListTrips(ctx context.Context, in *ListTripsRequest, opts ...grpc.CallOption) (*ListTripsResponse, error)
+}
+
+type tripServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewTripServiceClient(cc grpc.ClientConnInterface) TripServiceClient {
+	return &tripServiceClient{cc}
+}
+
+func (c *tripServiceClient) ListTrips(ctx context.Context, in *ListTripsRequest, opts ...grpc.CallOption) (*ListTripsResponse, error) {
+	out := new(ListTripsResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.junction.trips.v1alpha.TripService/ListTrips", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// TripServiceServer is the server API for TripService service.
+// All implementations should embed UnimplementedTripServiceServer
+// for forward compatibility
+type TripServiceServer interface {
+	ListTrips(context.Context, *ListTripsRequest) (*ListTripsResponse, error)
+}
+
+// UnimplementedTripServiceServer should be embedded to have forward compatible implementations.
+type UnimplementedTripServiceServer struct {
+}
+
+func (UnimplementedTripServiceServer) ListTrips(context.Context, *ListTripsRequest) (*ListTripsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListTrips not implemented")
+}
+
+// UnsafeTripServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to TripServiceServer will
+// result in compilation errors.
+type UnsafeTripServiceServer interface {
+	mustEmbedUnimplementedTripServiceServer()
+}
+
+func RegisterTripServiceServer(s grpc.ServiceRegistrar, srv TripServiceServer) {
+	s.RegisterService(&TripService_ServiceDesc, srv)
+}
+
+func _TripService_ListTrips_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListTripsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TripServiceServer).ListTrips(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.junction.trips.v1alpha.TripService/ListTrips",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TripServiceServer).ListTrips(ctx, req.(*ListTripsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// TripService_ServiceDesc is the grpc.ServiceDesc for TripService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var TripService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "snowfall.junction.trips.v1alpha.TripService",
+	HandlerType: (*TripServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "ListTrips",
+			Handler:    _TripService_ListTrips_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

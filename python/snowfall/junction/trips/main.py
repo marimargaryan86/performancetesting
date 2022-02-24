@@ -5,10 +5,10 @@ from typing import Sequence
 from motor import motor_asyncio
 from pydantic import AnyUrl, BaseSettings
 
-from snowfall.junction.planner.v1 import planner_pb2_grpc
+from snowfall.junction.planner.v1alpha import planner_pb2_grpc
 from snowfall.junction.trips import trips
 from snowfall.junction.trips.consumer import TripSearchConsumer
-from snowfall.junction.trips.grpc import TripSearchService
+from snowfall.junction.trips.grpc import TripSearchService, TripService
 from snowfall.service import RunnableService, Task, make_runnable_service
 from snowfall.transport import amqp, grpc
 
@@ -23,6 +23,7 @@ class _ConsumeSettings(BaseSettings):
 
 class _GrpcSettings(BaseSettings):
     amqp_dsn: Sequence[AnyUrl]
+    default_page_size: int = 100
     grpc_address: str = "[::]"
     grpc_port: int = 50051
     mongo_dsn: Sequence[AnyUrl]
@@ -47,10 +48,11 @@ async def _consume(service: RunnableService) -> None:
                     random.choice(settings.planner_address),  # nosec
                 ),
             ),
-            repository=trips.TripSearchRepository(
+            trip_search_repository=trips.TripSearchRepository(
                 mongo[_TRIPS]["trip_searches"],
                 datetime.timedelta(minutes=15),
             ),
+            trip_repository=trips.TripRepository(mongo[_TRIPS]["trips"]),
         )
 
         await consumer.consume()
@@ -70,12 +72,16 @@ async def _serve(service: RunnableService) -> None:
             settings.grpc_address,
             settings.grpc_port,
             [
+                TripService(
+                    repository=trips.TripRepository(mongo[_TRIPS]["trips"]),
+                    default_page_size=settings.default_page_size,
+                ),
                 TripSearchService(
-                    trips.TripSearchRepository(
+                    repository=trips.TripSearchRepository(
                         mongo[_TRIPS]["trip_searches"],
                         settings.trip_search_ttl,
                     ),
-                    producer,
+                    producer=producer,
                 ),
             ],
         )

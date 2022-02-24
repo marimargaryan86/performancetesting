@@ -19,7 +19,7 @@ async def process_places(
 ) -> None:
     namespace = uuid.uuid5(_NAMESPACE, ref)
 
-    async for stop in await collection.stops.find_with_cursor():
+    async for stop in await collection.stops.all_():
         if not stop.stop_lat or not stop.stop_lon or stop.parent_station:
             continue
 

@@ -8,7 +8,6 @@ from snowfall.common.v1alpha import models_pb2
 from snowfall.format import protobuf
 from snowfall.junction.client_api import models
 from snowfall.junction.offers.v1alpha import offers_pb2
-from snowfall.junction.planner.v1 import planner_pb2
 from snowfall.junction.trips.v1alpha import trips_pb2
 
 _SELF_HREF = "self"
@@ -47,7 +46,7 @@ class TripResource(models.Resource):
     @classmethod
     async def from_proto(
         cls,
-        trip: planner_pb2.TripReference,
+        trip: models_pb2.TripReference,
         request: requests.Request,
     ) -> TripResource:
         return cls(

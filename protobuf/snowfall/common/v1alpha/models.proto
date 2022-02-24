@@ -11,7 +11,7 @@ message Coordinates {
 
 message Cursor {
   string id = 1;
-  string clause = 2;
+  string filter = 2;
   string digest = 3;
 }
 
@@ -55,7 +55,21 @@ message Stop {
   uint32 order = 5;
 }
 
+message StopReference {
+  string id = 1;
+}
+
 message Segment {
   string id = 1;
   repeated Stop stops = 2;
+}
+
+message SegmentReference {
+  string id = 1;
+  repeated StopReference stops = 2;
+}
+
+message TripReference {
+  string id = 1;
+  repeated SegmentReference segments = 2;
 }

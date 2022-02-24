@@ -40,10 +40,9 @@ class SchedulesGenerator(object):
 
     async def generate(self) -> AsyncIterator[models_pb2.Schedule]:
         self._time_zone = zoneinfo.ZoneInfo(
-            [
-                agency
-                async for agency in await self._collection.agencies.find_with_cursor()
-            ][0].agency_timezone,
+            [agency async for agency in await self._collection.agencies.all_()][
+                0
+            ].agency_timezone,
         )
 
         # todo: creating a context like this is fugly, should be improved.
@@ -63,7 +62,7 @@ class SchedulesGenerator(object):
                 bikes_allowed=0,
             ),
         )
-        trips = await self._collection.trips.find_with_cursor()
+        trips = await self._collection.trips.all_()
 
         trips.sort(("route_id", 1), ("service_id", 1))
 
