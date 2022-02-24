@@ -1,3 +1,5 @@
+import ipaddress
+
 from grpc import aio
 from pydantic import BaseSettings
 
@@ -7,7 +9,7 @@ from snowfall.transport import grpc
 
 
 class _Settings(BaseSettings):
-    grpc_address: str = "[::]"
+    grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
 
 

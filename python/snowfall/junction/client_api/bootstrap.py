@@ -1,4 +1,5 @@
 import http
+import ipaddress
 from typing import Sequence
 
 import lagom
@@ -12,7 +13,10 @@ from snowfall.junction.client_api.routes import router
 
 
 class Settings(pydantic.BaseSettings):
-    http_address: str = "127.0.0.1"
+    forwarded_allowed_ips: Sequence[ipaddress.IPv4Address] = [
+        ipaddress.IPv4Address("127.0.0.1"),
+    ]
+    http_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     http_port: int = 8000
     places_address: Sequence[str]
     reload: bool = False

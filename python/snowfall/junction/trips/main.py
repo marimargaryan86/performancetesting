@@ -1,4 +1,5 @@
 import datetime
+import ipaddress
 import random
 from typing import Sequence
 
@@ -24,7 +25,7 @@ class _ConsumeSettings(BaseSettings):
 class _GrpcSettings(BaseSettings):
     amqp_dsn: Sequence[AnyUrl]
     default_page_size: int = 100
-    grpc_address: str = "[::]"
+    grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: Sequence[AnyUrl]
     trip_search_ttl: datetime.timedelta = datetime.timedelta(minutes=15)

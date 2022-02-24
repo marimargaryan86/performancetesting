@@ -60,6 +60,7 @@ EOH
       }
 
       env {
+        FORWARDED_ALLOWED_IPS = "[\"0.0.0.0\"]"
         HTTP_ADDRESS = "0.0.0.0"
         HTTP_PORT    = "${NOMAD_PORT_http}"
         SENTRY_DSN   = "https://c674550aaa124dd9b5f02bf6c49b1983@sentry.snowfall.se/19"

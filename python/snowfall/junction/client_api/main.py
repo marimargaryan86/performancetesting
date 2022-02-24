@@ -41,9 +41,13 @@ if __name__ == "__main__":
     uvicorn.run(
         app="snowfall.junction.client_api.main:_factory",
         factory=True,
-        host=_settings.http_address,
+        host=str(_settings.http_address),
         port=_settings.http_port,
         access_log=False,
         reload=_settings.reload,
         log_config=None,
+        proxy_headers=True,
+        forwarded_allowed_ips=[
+            str(address) for address in _settings.forwarded_allowed_ips
+        ],
     )

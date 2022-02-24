@@ -1,3 +1,4 @@
+import ipaddress
 from abc import abstractmethod
 from typing import Sequence
 
@@ -17,14 +18,14 @@ class Service(object):
 
 
 def create_server(
-    address: str,
+    address: ipaddress.IPv4Address,
     port: int,
     services: Sequence[Service],
 ) -> aio.Server:
     server = aio.server()
     names = {reflection.SERVICE_NAME}
 
-    server.add_insecure_port("{address}:{port}".format(address=address, port=port))
+    server.add_insecure_port("{address}:{port}".format(address=str(address), port=port))
 
     for service in (*services, _HealthService()):
         service.register(server)
