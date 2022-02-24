@@ -77,15 +77,20 @@ class DictClient(Client):
 
 
 class GrpcClient(Client):
-    def __init__(self, offers: offers_pb2_grpc.OfferServiceStub):
+    def __init__(
+        self,
+        offers: offers_pb2_grpc.OfferServiceStub,
+        offer_searches: offers_pb2_grpc.OfferSearchServiceStub,
+    ):
         self._offers = offers
+        self._offer_searches = offer_searches
 
     async def create(
         self,
         request: offers_pb2.OfferSearch,
     ) -> offers_pb2.OfferSearch:
         try:
-            response = await self._offers.EnqueueOfferSearch(  # type: ignore[misc]
+            response = await self._offer_searches.EnqueueOfferSearch(  # type: ignore[misc]
                 offers_pb2.EnqueueOfferSearchRequest(search=request),
             )
         except grpc.aio.AioRpcError as exc:
@@ -95,7 +100,7 @@ class GrpcClient(Client):
 
     async def get(self, offer_search_id: str) -> offers_pb2.OfferSearch:
         try:
-            response = await self._offers.GetOfferSearch(  # type: ignore[misc]
+            response = await self._offer_searches.GetOfferSearch(  # type: ignore[misc]
                 offers_pb2.GetOfferSearchRequest(id=offer_search_id),
             )
         except grpc.aio.AioRpcError as exc:

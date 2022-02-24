@@ -7,7 +7,7 @@ import pydantic
 from motor import motor_asyncio
 
 from snowfall.junction.offers import offers
-from snowfall.junction.offers.grpc import OfferService
+from snowfall.junction.offers.grpc import OfferSearchService, OfferService
 from snowfall.service import RunnableService, Task, make_runnable_service
 from snowfall.transport import grpc
 
@@ -27,13 +27,14 @@ async def _serve(service: RunnableService) -> None:
         settings.grpc_address,
         settings.grpc_port,
         [
-            OfferService(
+            OfferSearchService(
                 offers_searches=offers.OfferSearchRepository(
                     mongo.offers.offer_searches,
                     settings.default_ttl,
                 ),
                 default_page_size=settings.default_page_size,
             ),
+            OfferService(default_page_size=settings.default_page_size),
         ],
     )
 

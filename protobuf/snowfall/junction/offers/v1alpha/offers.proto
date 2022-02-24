@@ -5,9 +5,12 @@ package snowfall.junction.offers.v1alpha;
 import "google/protobuf/timestamp.proto";
 import "snowfall/common/v1alpha/models.proto";
 
-service OfferService {
+service OfferSearchService {
   rpc EnqueueOfferSearch (EnqueueOfferSearchRequest) returns (EnqueueOfferSearchResponse) {}
   rpc GetOfferSearch (GetOfferSearchRequest) returns (GetOfferSearchResponse) {}
+}
+
+service OfferService {
   rpc ListOffers (ListOffersRequest) returns (ListOffersResponse) {}
 }
 

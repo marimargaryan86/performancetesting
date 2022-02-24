@@ -5,16 +5,16 @@ from snowfall.junction.offers.v1alpha import offers_pb2, offers_pb2_grpc
 from snowfall.transport.grpc import Service
 
 
-class OfferService(Service, offers_pb2_grpc.OfferServiceServicer):
+class OfferSearchService(Service, offers_pb2_grpc.OfferSearchServiceServicer):
     def __init__(self, offers_searches: OfferSearchRepository, default_page_size: int):
         self._default_page_size = default_page_size
         self._offers_searches = offers_searches
 
     def get_name(self) -> str:
-        return offers_pb2.DESCRIPTOR.services_by_name["OfferService"].full_name
+        return offers_pb2.DESCRIPTOR.services_by_name["OfferSearchService"].full_name
 
     def register(self, server: grpc.aio.Server) -> None:
-        offers_pb2_grpc.add_OfferServiceServicer_to_server(self, server)
+        offers_pb2_grpc.add_OfferSearchServiceServicer_to_server(self, server)
 
     async def EnqueueOfferSearch(  # type: ignore[override] # noqa: N802
         self,
@@ -40,6 +40,17 @@ class OfferService(Service, offers_pb2_grpc.OfferServiceServicer):
             await context.abort(grpc.StatusCode.NOT_FOUND)
 
         return offers_pb2.GetOfferSearchResponse(search=offer_search)
+
+
+class OfferService(Service, offers_pb2_grpc.OfferServiceServicer):
+    def __init__(self, default_page_size: int):
+        self._default_page_size = default_page_size
+
+    def get_name(self) -> str:
+        return offers_pb2.DESCRIPTOR.services_by_name["OfferService"].full_name
+
+    def register(self, server: grpc.aio.Server) -> None:
+        offers_pb2_grpc.add_OfferServiceServicer_to_server(self, server)
 
     async def ListOffers(  # type: ignore[override] # noqa: N802
         self,
