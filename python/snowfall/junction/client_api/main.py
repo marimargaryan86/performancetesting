@@ -47,7 +47,7 @@ if __name__ == "__main__":
         reload=_settings.reload,
         log_config=None,
         proxy_headers=True,
-        forwarded_allowed_ips=[
+        forwarded_allow_ips=[
             str(address) for address in _settings.forwarded_allowed_ips
         ],
     )
