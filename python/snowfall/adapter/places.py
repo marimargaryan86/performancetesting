@@ -61,7 +61,7 @@ class GrpcClient(Client):
 
     async def get(self, place_id: str) -> models_pb2.Place:
         try:
-            response = await self._places.GetPlace(  # type: ignore[misc]
+            response = await self._places.GetPlace(
                 places_pb2.GetPlaceRequest(id=place_id),
             )
         except grpc.aio.AioRpcError as exc:
@@ -76,7 +76,7 @@ class GrpcClient(Client):
 
     async def find(self, limit: int, cursor: Optional[str] = None) -> PlacesPage:
         # todo: handle INVALID_ARGUMENT
-        response = await self._places.ListPlaces(  # type: ignore[misc]
+        response = await self._places.ListPlaces(
             places_pb2.ListPlacesRequest(
                 page_size=limit,
                 page_token=cursor or "",

@@ -30,7 +30,7 @@ class TripSearchConsumer(object):
         body = cast(amqp_pb2.TripSearchTask, message.body)
 
         try:
-            response = await self._planner.SearchJourney(  # type: ignore[misc]
+            response = await self._planner.SearchJourney(
                 request=planner_pb2.SearchJourneyRequest(
                     origin=body.trip_search.origin.coordinates,
                     destination=body.trip_search.destination.coordinates,

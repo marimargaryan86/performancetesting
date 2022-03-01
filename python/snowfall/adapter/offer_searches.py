@@ -90,7 +90,7 @@ class GrpcClient(Client):
         request: offers_pb2.OfferSearch,
     ) -> offers_pb2.OfferSearch:
         try:
-            response = await self._offer_searches.EnqueueOfferSearch(  # type: ignore[misc]
+            response = await self._offer_searches.EnqueueOfferSearch(
                 offers_pb2.EnqueueOfferSearchRequest(search=request),
             )
         except grpc.aio.AioRpcError as exc:
@@ -100,7 +100,7 @@ class GrpcClient(Client):
 
     async def get(self, offer_search_id: str) -> offers_pb2.OfferSearch:
         try:
-            response = await self._offer_searches.GetOfferSearch(  # type: ignore[misc]
+            response = await self._offer_searches.GetOfferSearch(
                 offers_pb2.GetOfferSearchRequest(id=offer_search_id),
             )
         except grpc.aio.AioRpcError as exc:
@@ -120,7 +120,7 @@ class GrpcClient(Client):
         cursor: Optional[str] = None,
     ) -> list[offers_pb2.OfferAggregate]:
         try:
-            response = await self._offers.ListOffers(  # type: ignore[misc]
+            response = await self._offers.ListOffers(
                 offers_pb2.ListOffersRequest(
                     page_size=limit,
                     page_token=cursor or "",
