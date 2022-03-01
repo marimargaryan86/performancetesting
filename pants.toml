@@ -1,10 +1,10 @@
 [GLOBAL]
-pants_version = "2.10.0.dev2"
+pants_version = "2.10.0rc2"
 use_deprecated_python_macros = false
 backend_packages = [
     "pants.backend.codegen.protobuf.python",
-    "pants.backend.experimental.docker",
-    "pants.backend.experimental.docker.lint.hadolint",
+    "pants.backend.docker",
+    "pants.backend.docker.lint.hadolint",
     "pants.backend.python",
     "pants.backend.python.lint.bandit",
     "pants.backend.python.lint.black",
@@ -52,6 +52,7 @@ version = "flake8==4.0.1"
 config = "vendor/setup.cfg"
 lockfile = "vendor/lock/flake8.txt"
 extra_requirements = [
+    "bandit==1.7.2", # 1.7.3 breaks flake8-bandit
     "flake8-annotations",
     "flake8-builtins",
     "flake8-executable",
@@ -79,7 +80,7 @@ interpreter_constraints = ["CPython==3.9.9"]
 extra_requirements = ["grpc-stubs", "pydantic"]
 
 [poetry]
-version = "poetry==1.1.12"
+version = "poetry==1.1.13"
 interpreter_constraints = ["CPython==3.9.9"]
 
 [protoc]
@@ -91,7 +92,7 @@ known_versions = [
 ]
 
 [pytest]
-version = "pytest==6.2.5"
+version = "pytest==7.0.1"
 lockfile = "vendor/lock/pytest.txt"
 args = ["--import-mode=importlib --asyncio-mode=auto"]
 extra_requirements = [
