@@ -17,33 +17,39 @@ def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Rou
             places.Place,
             name="ViewPlace",
         ),
-        # todo: add /legs/types
-        # todo: add /legs/{legId}
-        # todo: add /segments/{segmentId}/legs
-        # todo: add /segments/{segmentId}
+        # todo: add GET /legs/types
+        # todo: add GET /legs/types/{legTypeId}
+        # todo: add GET /legs/{legId}
+        # todo: add GET /segments/{segmentId}
+        # todo: add GET /segments/{segmentId}/legs
         dependencies.route("/trips/searches", trips.TripSearches),
         dependencies.route(
             "/trips/{tripId}",
             trips.Trip,
             name="ViewTrip",
         ),
-        # todo: add /trips/{tripId}/segments
-        # todo: add /trips/{tripId}/prices
+        # todo: add GET /trips/{tripId}/legs
+        # todo: add GET /trips/{tripId}/segments
+        # todo: add GET /trips/{tripId}/prices
         dependencies.route(
             "/trips/searches/{tripSearchId}",
             trips.TripSearch,
             name="ViewTripSearch",
         ),
+        # todo: add GET /trips/searches/{tripSearchId}/legs
+        # todo: add GET /trips/searches/{tripSearchId}/segments
         dependencies.route(
             "/trips/searches/{tripSearchId}/trips",
             trips.TripsByTripSearch,
             name="ViewTrips",
         ),
         dependencies.route("/offers/searches", offers.OfferSearches),
-        # todo: add /offers/searches/{offerSearchId}
-        # todo: add /offers/searches/{offerSearchId}/offers
-        # todo: add /offers/searches/{offerSearchId}/related
-        # todo: add /orders
-        # todo: add /orders/{orderId}
-        # todo: add /orders/{orderId}/relationships/offers
+        # todo: add GET /offers/searches/{offerSearchId}
+        # todo: add GET /offers/searches/{offerSearchId}/offers
+        # todo: add GET /offers/searches/{offerSearchId}/related
+        # todo: add GET /offers/{offerId}
+        # todo: add POST /orders
+        # todo: add GET /orders
+        # todo: add GET /orders/{orderId}
+        # todo: add POST /orders/{orderId}/relationships/offers
     ]
