@@ -1,14 +1,21 @@
 import grpc
 
+from snowfall.junction.offers import amqp
 from snowfall.junction.offers.offers import OfferSearchRepository
 from snowfall.junction.offers.v1alpha import offers_pb2, offers_pb2_grpc
 from snowfall.transport.grpc import Service
 
 
 class OfferSearchService(Service, offers_pb2_grpc.OfferSearchServiceServicer):
-    def __init__(self, offers_searches: OfferSearchRepository, default_page_size: int):
+    def __init__(
+        self,
+        offers_searches: OfferSearchRepository,
+        publisher: amqp.OfferSearchProducer,
+        default_page_size: int,
+    ):
         self._default_page_size = default_page_size
         self._offers_searches = offers_searches
+        self._publisher = publisher
 
     def get_name(self) -> str:
         return offers_pb2.DESCRIPTOR.services_by_name["OfferSearchService"].full_name
@@ -24,8 +31,7 @@ class OfferSearchService(Service, offers_pb2_grpc.OfferSearchServiceServicer):
         offer_search = await self._offers_searches.create(
             request.search,
         )
-
-        # todo: publish search to queue
+        await self._publisher.publish(offer_search)
 
         return offers_pb2.EnqueueOfferSearchResponse(search=offer_search)
 
