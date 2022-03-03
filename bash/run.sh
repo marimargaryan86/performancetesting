@@ -12,9 +12,9 @@ DIR=$(dirname "${1}")
 ENV_STR=""
 
 if [ -f "${DIR}/.env" ]; then
-	ENV_STR=$(grep -o '^[^#]*' "${DIR}/.env" | tr '\n' ' ')
+	ENV_STR=$(xargs -0 <"${DIR}/.env")
 elif [ -f "${DIR}/.env.dist" ]; then
-	ENV_STR=$(grep -o '^[^#]*' "${DIR}/.env.dist" | tr '\n' ' ')
+	ENV_STR=$(xargs -0 <"${DIR}/.env.dist")
 fi
 
 ENV_STR="${ENV_STR} PANTS_CONCURRENT=True"
