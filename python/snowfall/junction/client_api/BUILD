@@ -4,6 +4,7 @@ python_test_utils(name="test_utils", dependencies=[":fixtures", "openapi/client_
 pex_binary(
     name="main",
     entry_point="main.py",
+    restartable=True,
 )
 files(
     name="fixtures",
