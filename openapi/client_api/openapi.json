@@ -3,7 +3,7 @@
   "info": {
     "title": "Junction Client API",
     "version": "1.0.0",
-    "description": "Junction Client API",
+    "description": "This API follows the [JSON:API][jsonapi] specifation.\n\nA suggested booking flow example:\n\n1. Retrieve Places from `GET /places`.\n2. Initiate a Trip Search with `POST /trips/searches` by specifying one Place as origin and another as destination. This will start an asynchronous process to find suitable trips.\n3. Retrieve Trip results from `GET /trips/searches/{tripSearchId}/trips`.\n4. Intiate an Offer Search with `POST /offers/searches` by specifying one or more Trips. This will start an asynchronous process to find suitable trips.\n5. Retrieve Offer results from `GET /offers/searches/{offerSearchId}/offers`.\n6. Create an Order with `POST /orders` by specifyng one or more Offers.\n\n[jsonapi]: https://jsonapi.org/",
     "contact": {
       "name": "Snowfall",
       "url": "https://www.snowfalltravel.com",
@@ -138,7 +138,7 @@
           }
         },
         "operationId": "get-places",
-        "description": "Returns a list of places.",
+        "description": "Used to find Places that can be used when creating a Trip Search.",
         "parameters": [
           {
             "$ref": "#/components/parameters/page-cursor"
@@ -186,7 +186,7 @@
           }
         },
         "operationId": "get-places-place-id",
-        "description": "View a place."
+        "description": "Used to lookup data for a Place Identifier."
       }
     },
     "/legs/{legId}": {
@@ -224,7 +224,7 @@
           }
         },
         "operationId": "get-legs-leg-id",
-        "description": "View a Leg."
+        "description": "Used to lookup data for a Leg Identifier."
       }
     },
     "/legs/types": {
@@ -258,7 +258,7 @@
           }
         },
         "operationId": "get-legs-types",
-        "description": "List Leg Types."
+        "description": "Used to retrieve available Leg Types."
       }
     },
     "/legs/types/{legTypeId}": {
@@ -296,7 +296,7 @@
           }
         },
         "operationId": "get-legs-types-leg-type-id",
-        "description": "View a Leg Type."
+        "description": "Used to lookup data for a Let Type Identifier."
       }
     },
     "/segments/{segmentId}": {
@@ -334,7 +334,7 @@
           }
         },
         "operationId": "get-segments-segment-id",
-        "description": "View a Segment."
+        "description": "Used to lookup data for a Segment Identifier."
       }
     },
     "/segment/{segmentId}/legs": {
@@ -375,7 +375,7 @@
           }
         },
         "operationId": "get-segments-segment-id-legs",
-        "description": "Get legs for a segment."
+        "description": "Used to retrieve all Legs contained in a Segment."
       }
     },
     "/trips/{tripId}": {
@@ -413,7 +413,56 @@
           }
         },
         "operationId": "get-trips-trip-id",
-        "description": "View a Trip."
+        "description": "Used to lookup data for a Trip Identifier."
+      }
+    },
+    "/trips/{tripId}/legs": {
+      "parameters": [
+        {
+          "name": "tripId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "description": "Trip identifier"
+        }
+      ],
+      "get": {
+        "summary": "List Legs by Trip",
+        "tags": [
+          "trips"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Leg"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-trips-trip-id-legs",
+        "description": "Used to retrieve all Legs contained in a Trip."
       }
     },
     "/trips/{tripId}/segments": {
@@ -454,7 +503,7 @@
           }
         },
         "operationId": "get-trips-trip-id-segments",
-        "description": "Get segments for a trip."
+        "description": "Used to retrieve all Segments contained in a Trip."
       }
     },
     "/trips/{tripId}/prices": {
@@ -495,7 +544,7 @@
           }
         },
         "operationId": "get-trips-trip-id-prices",
-        "description": "Get cached prices for a trip."
+        "description": "Upcoming endpoint to retrieve cached offer prices for a particular trip. Not yet implemented."
       }
     },
     "/trips/searches": {
@@ -531,7 +580,7 @@
             "$ref": "#/components/responses/UnprocessableEntity"
           }
         },
-        "description": "Make a new trip search.",
+        "description": "Used to initiate a search for trips based on the provided Trip Search context.",
         "requestBody": {
           "content": {
             "application/vnd.api+json": {
@@ -587,7 +636,109 @@
           }
         },
         "operationId": "get-trips-searches-trip-search-id",
-        "description": "View a previously created trip search."
+        "description": "Used to lookup data for a Trip Search Identifier."
+      }
+    },
+    "/trips/searches/{tripSearchId}/legs": {
+      "parameters": [
+        {
+          "name": "tripSearchId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "description": "Trip Search identifier"
+        }
+      ],
+      "get": {
+        "summary": "List Legs by Trip Search",
+        "tags": [
+          "trips"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "minItems": 0,
+                      "items": {
+                        "$ref": "#/components/schemas/Leg"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-trips-searches-trip-search-id-legs",
+        "description": "Used to retrieve all Legs for all Trip results for a Trip Search."
+      }
+    },
+    "/trips/searches/{tripSearchId}/segments": {
+      "parameters": [
+        {
+          "name": "tripSearchId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "description": "Trip Search identifier"
+        }
+      ],
+      "get": {
+        "summary": "List Segments by Trip Search",
+        "tags": [
+          "trips"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "minItems": 0,
+                      "items": {
+                        "$ref": "#/components/schemas/Segment"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-trips-searches-trip-search-id-segments",
+        "description": "Used to retrieve all Segments for all Trip results for a Trip Search."
       }
     },
     "/trips/searches/{tripSearchId}/trips": {
@@ -630,7 +781,7 @@
           }
         },
         "operationId": "get-trips-searches-trip-search-id-trips",
-        "description": "View trips for a trip search."
+        "description": "Used to retrieve all Trip results for a Trip Search."
       }
     },
     "/offers/searches": {
@@ -676,7 +827,7 @@
             "$ref": "#/components/responses/UnprocessableEntity"
           }
         },
-        "description": "Make a new offer search.",
+        "description": "Used to initiate a search for offers based on the provided Offer Search context.",
         "requestBody": {
           "content": {
             "application/vnd.api+json": {
@@ -752,7 +903,7 @@
           }
         },
         "operationId": "get-offers-searches-offer-search-id",
-        "description": "View a previously created offer search."
+        "description": "Used to lookup data for an Offer Search Identifier."
       }
     },
     "/offers/searches/{offerSearchId}/offers": {
@@ -795,7 +946,7 @@
           }
         },
         "operationId": "get-offers-searches-offer-search-id-offers",
-        "description": "View offers for an offer search."
+        "description": "Used to retrieve all Offer results for an Offer Search."
       }
     },
     "/offers/searches/{offerSearchId}/related": {
@@ -845,7 +996,45 @@
           }
         },
         "operationId": "get-offers-searches-offer-search-id-related",
-        "description": "View related searches for an offer search."
+        "description": "Upcoming endpoint to retrieve related Offers that could be searched. Not yet implemented."
+      }
+    },
+    "/offers/{offerId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/offerId"
+        }
+      ],
+      "get": {
+        "summary": "View Offer Search",
+        "tags": [
+          "offers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Offer"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-offers-offer-id",
+        "description": "Used to lookup data for an Offer Identifier."
       }
     },
     "/orders": {
@@ -881,7 +1070,7 @@
             "$ref": "#/components/responses/UnprocessableEntity"
           }
         },
-        "description": "Make a new order.",
+        "description": "Used to create an Order and book the specified Offers.",
         "requestBody": {
           "content": {
             "application/vnd.api+json": {
@@ -929,7 +1118,7 @@
             }
           }
         },
-        "description": "List all orders."
+        "description": "Used to retrieve Orders made in Junction."
       },
       "parameters": []
     },
@@ -968,7 +1157,7 @@
           }
         },
         "operationId": "get-orders-order-id",
-        "description": "View a previously created order."
+        "description": "Used to lookup data for a Order Identifier."
       }
     },
     "/orders/{orderId}/relationships/offers": {
@@ -997,7 +1186,7 @@
         "tags": [
           "orders"
         ],
-        "description": "Add a new offer to an existing order.",
+        "description": "Used to add additional Offers to an existing Order and book them.",
         "requestBody": {
           "content": {
             "application/vnd.api+json": {
@@ -1166,7 +1355,7 @@
             "$ref": "#/components/schemas/SelfLink"
           }
         ],
-        "description": ""
+        "description": "Indexed reference to somewhere Junction might have content related to."
       },
       "PlaceIdentifier": {
         "title": "Place Identifier",
@@ -1187,11 +1376,12 @@
         "required": [
           "id",
           "type"
-        ]
+        ],
+        "description": ""
       },
       "Point": {
         "title": "Point",
-        "description": "",
+        "description": "Generalized data about a location.",
         "type": "object",
         "properties": {
           "ref": {
@@ -1267,7 +1457,8 @@
           {
             "$ref": "#/components/schemas/SelfLink"
           }
-        ]
+        ],
+        "description": "Indicates the type of the leg, such as \"air\" or \"rail\"."
       },
       "LegTypeIdentifier": {
         "title": "Leg Type Identifier",
@@ -1369,7 +1560,8 @@
           {
             "$ref": "#/components/schemas/SelfLink"
           }
-        ]
+        ],
+        "description": "Smallest part of a Trip; A scheduled departure from A and a scheduled arrival to B."
       },
       "LegIdentifier": {
         "title": "Leg Identifier",
@@ -1446,7 +1638,8 @@
           {
             "$ref": "#/components/schemas/SelfLink"
           }
-        ]
+        ],
+        "description": "Sequenced collection of Legs with a common equipment."
       },
       "SegmentIdentifier": {
         "title": "Segment Identifier",
@@ -1524,7 +1717,7 @@
             "$ref": "#/components/schemas/SelfLink"
           }
         ],
-        "description": ""
+        "description": "Sequenced container of Segments."
       },
       "TripIdentifier": {
         "title": "Trip Identifier",
@@ -1582,7 +1775,8 @@
                   },
                   "arrivalBefore": {
                     "type": "string",
-                    "format": "date-time"
+                    "format": "date-time",
+                    "description": "Not yet implemented."
                   }
                 }
               },
@@ -1644,7 +1838,8 @@
             "$ref": "#/components/schemas/SelfLink"
           }
         ],
-        "title": "Trip Search"
+        "title": "Trip Search",
+        "description": "Context for which Trips can be found."
       },
       "Price": {
         "title": "Price",
@@ -1677,7 +1872,8 @@
           {
             "$ref": "#/components/schemas/SelfLink"
           }
-        ]
+        ],
+        "description": "Description of an amount in a currency."
       },
       "Offer": {
         "title": "Offer",
@@ -1763,7 +1959,8 @@
           {
             "$ref": "#/components/schemas/SelfLink"
           }
-        ]
+        ],
+        "description": "Result of searching for offers. Used for creating an Order."
       },
       "OfferIdentifier": {
         "title": "Offer Identifier",
@@ -1856,7 +2053,8 @@
           {
             "$ref": "#/components/schemas/SelfLink"
           }
-        ]
+        ],
+        "description": "Not yet implemented."
       },
       "RentalOfferSearch": {
         "title": "Rental Offer Search",
@@ -1941,7 +2139,8 @@
           {
             "$ref": "#/components/schemas/SelfLink"
           }
-        ]
+        ],
+        "description": "Not yet implemented."
       },
       "TripOfferSearch": {
         "title": "Trip Offer Search",
@@ -2036,7 +2235,8 @@
           {
             "$ref": "#/components/schemas/SelfLink"
           }
-        ]
+        ],
+        "description": "Context for which Trip-related Offers can be found."
       },
       "RelatedSearch": {
         "title": "Related Search",
@@ -2082,7 +2282,8 @@
           {
             "$ref": "#/components/schemas/SelfLink"
           }
-        ]
+        ],
+        "description": "Not yet implemented."
       },
       "Order": {
         "title": "Order",
@@ -2149,7 +2350,8 @@
           {
             "$ref": "#/components/schemas/SelfLink"
           }
-        ]
+        ],
+        "description": "Collection of multiple booked Offers."
       },
       "TripItem": {
         "title": "Trip Item",
@@ -2517,18 +2719,23 @@
           "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
         },
         "description": "Leg Type identifier"
+      },
+      "offerId": {
+        "name": "offerId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+        },
+        "description": "Offer identifier"
       }
     },
     "securitySchemes": {
-      "oauth2": {
-        "type": "oauth2",
-        "flows": {
-          "clientCredentials": {
-            "scopes": {},
-            "refreshUrl": "TBD",
-            "tokenUrl": "TBD"
-          }
-        }
+      "jwt": {
+        "type": "http",
+        "scheme": "bearer"
       }
     }
   },

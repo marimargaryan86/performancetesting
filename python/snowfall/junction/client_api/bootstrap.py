@@ -1,14 +1,14 @@
-import http
 import ipaddress
 from typing import Sequence
 
 import lagom
 import pydantic
 from lagom.integrations import starlette
-from starlette import applications, exceptions, middleware, status
+from starlette import applications, exceptions, status
+from starlette.middleware import Middleware
 
 from snowfall.adapter import offer_searches, places, trip_searches
-from snowfall.junction.client_api import handlers, middlewares, validation
+from snowfall.junction.client_api import handlers
 from snowfall.junction.client_api.routes import router
 
 
@@ -36,16 +36,9 @@ def create_dependencies(
 
 
 def create_app(
-    validator: validation.Validator,
+    custom_middlewares: Sequence[Middleware],
     dependencies: starlette.StarletteIntegration,
 ) -> applications.Starlette:
-    custom_middlewares = [
-        middleware.Middleware(
-            middlewares.ValidationMiddleware,
-            validator=validator,
-            excluded_status_codes={http.HTTPStatus.METHOD_NOT_ALLOWED},
-        ),
-    ]
     app = applications.Starlette(
         routes=router.get_routes(dependencies),
         middleware=custom_middlewares,

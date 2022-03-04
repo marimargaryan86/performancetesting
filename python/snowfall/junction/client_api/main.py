@@ -1,26 +1,37 @@
+import http
 import random
 
 import grpc
 import uvicorn
-from starlette import applications
+from starlette import applications, middleware
+from starlette.middleware.authentication import AuthenticationMiddleware
 
 from snowfall.adapter import offer_searches, places, trip_searches
 from snowfall.filesystem import loaders
-from snowfall.junction.client_api import bootstrap, patch, validation
+from snowfall.junction.client_api import bootstrap, middlewares, patch, validation
 from snowfall.junction.places.v1alpha import places_pb2_grpc
 from snowfall.service import make_service
 
 
 def _factory() -> applications.Starlette:
     make_service(name="client-api")
-    patch.patch_open_api()
     settings = bootstrap.Settings()
 
     return bootstrap.create_app(
-        validator=validation.Validator(
-            "openapi.json",
-            loaders.PkgLoader("client_api"),
-        ),
+        custom_middlewares=[
+            middleware.Middleware(
+                middlewares.ValidationMiddleware,
+                validator=validation.Validator(
+                    "openapi.json",
+                    loaders.PkgLoader("client_api"),
+                ),
+                excluded_status_codes={http.HTTPStatus.METHOD_NOT_ALLOWED},
+            ),
+            middleware.Middleware(
+                AuthenticationMiddleware,
+                backend=patch.JWTAuthenticationBackend(patch.AuthSettings()),
+            ),
+        ],
         dependencies=bootstrap.create_dependencies(
             places_client=places.GrpcClient(
                 places_pb2_grpc.PlacesServiceStub(

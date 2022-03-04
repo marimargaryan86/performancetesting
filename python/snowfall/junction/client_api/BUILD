@@ -14,3 +14,7 @@ docker_image(
     dependencies=[":main"],
     image_tags=["{build_args.VERSION}"],
 )
+pex_binary(
+    name="jwt_generator",
+    entry_point="jwt_generator.py",
+)
