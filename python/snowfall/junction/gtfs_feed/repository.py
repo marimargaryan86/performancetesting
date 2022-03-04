@@ -34,14 +34,14 @@ class Repository(repository.PydanticRepository[repository.Model]):
 
                 await self._execute(
                     self._collection.insert_many,
-                    normalized_rows,
+                    [self._coder.encode(row) for row in normalized_rows],
                     ordered=False,
                 )
 
     def _normalize_rows(
         self,
         rows: _TUPLE_OF_CSV,
-    ) -> list[dict[str, Any]]:
+    ) -> list[repository.Model]:
         new_rows = []
 
         for row in rows:
@@ -54,7 +54,7 @@ class Repository(repository.PydanticRepository[repository.Model]):
             for item_k, item_v in (self._defaults or {}).items():
                 row[item_k] = row.get(item_k, item_v)
 
-            new_rows.append(row)
+            new_rows.append(self._model.parse_obj(row))
 
         return new_rows
 

@@ -3,6 +3,7 @@ import copy
 from typing import Any, Generic, Type, TypeVar
 
 import pydantic
+import rapidjson
 from google.protobuf import json_format, message
 
 from snowfall.persistence.mongo import normalizers
@@ -13,6 +14,7 @@ Record = TypeVar("Record")
 
 _mongo_id_key = "_id"
 _proto_id_key = "id"
+_pydantic_id_key = "id"
 
 
 class BaseCoder(Generic[Record], abc.ABC):
@@ -47,9 +49,12 @@ class ProtoCoder(Generic[Proto], BaseCoder[Proto]):
         fields = proto.DESCRIPTOR.fields_by_name.keys()
         as_dict = copy.deepcopy(as_dict)
 
-        # MongoDB stores ID in "_id".
-        if _proto_id_key in fields and _mongo_id_key in as_dict:
-            as_dict[_proto_id_key] = as_dict.pop(_mongo_id_key)
+        # MongoDB stores ID in "_id", so move it to "id" if it exists on the proto.
+        if _mongo_id_key in as_dict:
+            id_value = as_dict.pop(_mongo_id_key)
+
+            if _proto_id_key in fields:
+                as_dict[_proto_id_key] = id_value
 
         for normalizer in self._normalizers:
             as_dict = normalizer.denormalize(proto.DESCRIPTOR, as_dict)
@@ -87,10 +92,25 @@ class PydanticCoder(Generic[Model], BaseCoder[Model]):
         self._model = model
 
     def decode(self, as_dict: dict[str, Any]) -> Model:
-        return self._model.parse_obj(as_dict)
+        # MongoDB stores ID in "_id", so move it to "id" if it exists on the model.
+        if _mongo_id_key in as_dict:
+            id_value = as_dict.pop(_mongo_id_key)
+
+            if _pydantic_id_key in self._model.__fields__:
+                as_dict[_pydantic_id_key] = id_value
+
+        return self._model.parse_raw(rapidjson.dumps(as_dict))
 
     def encode(self, model: Model) -> dict[str, Any]:
-        return model.dict(
-            exclude_defaults=True,
-            exclude_none=True,
+        as_dict = rapidjson.loads(
+            model.json(
+                exclude_defaults=True,
+                exclude_none=True,
+            ),
         )
+
+        # MongoDB expects ID to be found in "_id".
+        if _pydantic_id_key in self._model.__fields__ and _pydantic_id_key in as_dict:
+            as_dict[_mongo_id_key] = as_dict.pop(_pydantic_id_key)
+
+        return as_dict

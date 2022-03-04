@@ -1,9 +1,8 @@
 import datetime
 
 import pydantic
-from dateutil import tz
-from google.protobuf import timestamp_pb2
 
+from snowfall.common.v1alpha import models_pb2
 from snowfall.persistence.mongo import coders
 
 
@@ -21,14 +20,11 @@ def test_noop_coder() -> None:
 
 
 def test_proto_coder() -> None:
-    coder = coders.ProtoCoder[timestamp_pb2.Timestamp](timestamp_pb2.Timestamp)
-    payload = timestamp_pb2.Timestamp()
+    coder = coders.ProtoCoder[models_pb2.Place](models_pb2.Place)
+    payload = models_pb2.Place()
     encoded = coder.encode(payload)
 
-    assert encoded == datetime.datetime.fromtimestamp(  # type: ignore[comparison-overlap]
-        0,
-        tz=tz.tzutc(),
-    )
+    assert isinstance(encoded["updated_at"], datetime.datetime)
     assert payload == coder.decode(encoded)
 
 

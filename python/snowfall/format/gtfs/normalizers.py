@@ -1,6 +1,6 @@
 import datetime
 import zoneinfo
-from typing import Any, Callable, Optional, Sequence
+from typing import Any, Callable, Optional, Sequence, Union
 
 import phonenumbers
 import pycountry
@@ -25,7 +25,11 @@ def normalize_date(date: Optional[str]) -> Optional[datetime.date]:
     if date is None:
         return None
 
-    return datetime.datetime.strptime(date, "%Y%m%d").date()
+    try:
+        return datetime.datetime.strptime(date, "%Y%m%d").date()
+    except ValueError:
+        # A JSON-serialized model will contain ISO.
+        return datetime.date.fromisoformat(date)
 
 
 def normalize_language_code(code: Optional[str]) -> Optional[str]:
@@ -56,18 +60,25 @@ def normalize_phone_number(phone: Optional[str]) -> Optional[str]:
         return None
 
     try:
-        phonenumbers.parse(phone)
-    except phonenumbers.NumberParseException as err:
-        raise ValueError(
-            "{value} is not a valid phone number".format(value=phone),
-        ) from err
+        parsed = phonenumbers.parse(phone)
+    except phonenumbers.NumberParseException:
+        return None
 
-    return phone
+    return phonenumbers.format_number(
+        parsed,
+        phonenumbers.PhoneNumberFormat.E164,
+    )
 
 
-def normalize_time(time: Optional[str]) -> Optional[datetime.timedelta]:
+def normalize_time(
+    time: Optional[Union[float, str]],
+) -> Optional[Union[float, datetime.timedelta]]:
     if time is None:
         return None
+
+    # A JSON-serialized model will contain float.
+    if isinstance(time, float):
+        return datetime.timedelta(seconds=time)
 
     parts = [int(segment) for segment in time.split(":")]
 
