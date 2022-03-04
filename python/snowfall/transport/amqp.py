@@ -51,9 +51,8 @@ class Connection(connection.Connection):
         exc_type: Optional[Type[BaseException]],
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
-    ) -> bool:
+    ) -> None:
         await self.close(exc_val)
-        return False
 
 
 class Producer(object):
