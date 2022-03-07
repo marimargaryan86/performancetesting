@@ -42,6 +42,7 @@ job "client-api" {
       template {
         data        = <<EOH
 PLACES_ADDRESS="[{{range $index, $service := service "grpc.places"}}{{if ne $index 0}},{{end}}\"{{.Address}}:{{.Port}}\"{{end}}]"
+OFFERS_ADDRESS="[{{range $index, $service := service "grpc.offers"}}{{if ne $index 0}},{{end}}\"{{.Address}}:{{.Port}}\"{{end}}]"
 EOH
         destination = "services.env"
         env         = true

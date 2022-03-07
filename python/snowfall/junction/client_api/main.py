@@ -9,6 +9,7 @@ from starlette.middleware.authentication import AuthenticationMiddleware
 from snowfall.adapter import offer_searches, places, trip_searches
 from snowfall.filesystem import loaders
 from snowfall.junction.client_api import bootstrap, middlewares, patch, validation
+from snowfall.junction.offers.v1alpha import offers_pb2_grpc
 from snowfall.junction.places.v1alpha import places_pb2_grpc
 from snowfall.service import make_service
 
@@ -16,6 +17,9 @@ from snowfall.service import make_service
 def _factory() -> applications.Starlette:
     make_service(name="client-api")
     settings = bootstrap.Settings()
+    offers_channel = grpc.aio.insecure_channel(
+        random.choice(settings.offers_address),  # nosec
+    )
 
     return bootstrap.create_app(
         custom_middlewares=[
@@ -41,7 +45,10 @@ def _factory() -> applications.Starlette:
                 ),
             ),
             trip_searches_client=trip_searches.DictClient(),
-            offer_searches_client=offer_searches.DictClient(),
+            offer_searches_client=offer_searches.GrpcClient(
+                offers=offers_pb2_grpc.OfferServiceStub(offers_channel),
+                offer_searches=offers_pb2_grpc.OfferSearchServiceStub(offers_channel),
+            ),
         ),
     )
 

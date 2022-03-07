@@ -19,6 +19,7 @@ class Settings(pydantic.BaseSettings):
     http_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     http_port: int = 8000
     places_address: Sequence[str]
+    offers_address: Sequence[str]
     reload: bool = False
 
 
