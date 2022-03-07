@@ -4,6 +4,14 @@ package snowfall.junction.places.v1alpha;
 
 import "snowfall/common/v1alpha/models.proto";
 
+service CuratedPlacesService {
+  rpc GetCuratedPlace (GetCuratedPlaceRequest) returns (GetCuratedPlaceResponse) {}
+  rpc ListCuratedPlaces (ListCuratedPlacesRequest) returns (ListCuratedPlacesResponse) {}
+  rpc CreateCuratedPlace (CreateCuratedPlaceRequest) returns (CreateCuratedPlaceResponse) {}
+  rpc DeleteCuratedPlace (DeleteCuratedPlaceRequest) returns (DeleteCuratedPlaceResponse) {}
+  rpc UpdateCuratedPlace (UpdateCuratedPlaceRequest) returns (UpdateCuratedPlaceResponse) {}
+}
+
 service PlacesService {
   rpc GetPlace (GetPlaceRequest) returns (GetPlaceResponse) {}
   rpc ListPlaces (ListPlacesRequest) returns (ListPlacesResponse) {}
@@ -24,6 +32,46 @@ message ListPlacesRequest {
 
 message ListPlacesResponse {
   repeated snowfall.common.v1alpha.Place places = 1;
+  string next_page_token = 2;
+}
+
+message CreateCuratedPlaceRequest {
+  snowfall.common.v1alpha.CuratedPlace place = 1;
+}
+
+message CreateCuratedPlaceResponse {
+}
+
+message DeleteCuratedPlaceRequest {
+  string id = 1;
+}
+
+message DeleteCuratedPlaceResponse {
+}
+
+message UpdateCuratedPlaceRequest {
+  string id = 1;
+  snowfall.common.v1alpha.CuratedPlace place = 2;
+}
+
+message UpdateCuratedPlaceResponse {
+}
+
+message GetCuratedPlaceRequest {
+  string id = 1;
+}
+
+message GetCuratedPlaceResponse {
+  snowfall.common.v1alpha.CuratedPlace place = 1;
+}
+
+message ListCuratedPlacesRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+message ListCuratedPlacesResponse {
+  repeated snowfall.common.v1alpha.CuratedPlace places = 1;
   string next_page_token = 2;
 }
 

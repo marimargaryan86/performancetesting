@@ -6,8 +6,8 @@ from motor import motor_asyncio
 from pydantic import AnyUrl, BaseSettings
 
 from snowfall.junction.places.consumer import PlaceImportConsumer
-from snowfall.junction.places.grpc import PlacesService
-from snowfall.junction.places.places import PlaceRepository
+from snowfall.junction.places.grpc import CuratedPlacesService, PlacesService
+from snowfall.junction.places.places import CuratedPlaceRepository, PlaceRepository
 from snowfall.service import RunnableService, Task, make_runnable_service
 from snowfall.transport import amqp, grpc
 
@@ -52,6 +52,10 @@ async def _serve(service: RunnableService) -> None:
         [
             PlacesService(
                 PlaceRepository(mongo.places.places),
+                settings.default_page_size,
+            ),
+            CuratedPlacesService(
+                CuratedPlaceRepository(mongo.places.curated_places),
                 settings.default_page_size,
             ),
         ],
