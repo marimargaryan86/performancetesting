@@ -74,3 +74,8 @@ message TripOfferSearchTask {
   string offer_search_id = 1;
   TripOfferSearch search = 2;
 }
+
+message TripOfferResult {
+  string id = 1;
+  string offer_search_id = 2;
+}
