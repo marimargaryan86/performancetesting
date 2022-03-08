@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package snowfall.junction.schedules.v1alpha;
+
+import "snowfall/common/v1alpha/models.proto";
+
+service ScheduleService {
+  rpc ListSchedules(ListSchedulesRequest) returns (ListSchedulesResponse) {}
+}
+
+message ListSchedulesRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  repeated string ids = 3;
+}
+
+message ListSchedulesResponse {
+  repeated snowfall.common.v1alpha.Schedule schedules = 1;
+  string next_page_token = 2;
+}
+

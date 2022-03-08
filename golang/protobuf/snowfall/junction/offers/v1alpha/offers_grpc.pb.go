@@ -14,13 +14,131 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
+// OfferSearchServiceClient is the client API for OfferSearchService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type OfferSearchServiceClient interface {
+	EnqueueOfferSearch(ctx context.Context, in *EnqueueOfferSearchRequest, opts ...grpc.CallOption) (*EnqueueOfferSearchResponse, error)
+	GetOfferSearch(ctx context.Context, in *GetOfferSearchRequest, opts ...grpc.CallOption) (*GetOfferSearchResponse, error)
+}
+
+type offerSearchServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewOfferSearchServiceClient(cc grpc.ClientConnInterface) OfferSearchServiceClient {
+	return &offerSearchServiceClient{cc}
+}
+
+func (c *offerSearchServiceClient) EnqueueOfferSearch(ctx context.Context, in *EnqueueOfferSearchRequest, opts ...grpc.CallOption) (*EnqueueOfferSearchResponse, error) {
+	out := new(EnqueueOfferSearchResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.junction.offers.v1alpha.OfferSearchService/EnqueueOfferSearch", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *offerSearchServiceClient) GetOfferSearch(ctx context.Context, in *GetOfferSearchRequest, opts ...grpc.CallOption) (*GetOfferSearchResponse, error) {
+	out := new(GetOfferSearchResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.junction.offers.v1alpha.OfferSearchService/GetOfferSearch", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// OfferSearchServiceServer is the server API for OfferSearchService service.
+// All implementations should embed UnimplementedOfferSearchServiceServer
+// for forward compatibility
+type OfferSearchServiceServer interface {
+	EnqueueOfferSearch(context.Context, *EnqueueOfferSearchRequest) (*EnqueueOfferSearchResponse, error)
+	GetOfferSearch(context.Context, *GetOfferSearchRequest) (*GetOfferSearchResponse, error)
+}
+
+// UnimplementedOfferSearchServiceServer should be embedded to have forward compatible implementations.
+type UnimplementedOfferSearchServiceServer struct {
+}
+
+func (UnimplementedOfferSearchServiceServer) EnqueueOfferSearch(context.Context, *EnqueueOfferSearchRequest) (*EnqueueOfferSearchResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EnqueueOfferSearch not implemented")
+}
+func (UnimplementedOfferSearchServiceServer) GetOfferSearch(context.Context, *GetOfferSearchRequest) (*GetOfferSearchResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOfferSearch not implemented")
+}
+
+// UnsafeOfferSearchServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to OfferSearchServiceServer will
+// result in compilation errors.
+type UnsafeOfferSearchServiceServer interface {
+	mustEmbedUnimplementedOfferSearchServiceServer()
+}
+
+func RegisterOfferSearchServiceServer(s grpc.ServiceRegistrar, srv OfferSearchServiceServer) {
+	s.RegisterService(&OfferSearchService_ServiceDesc, srv)
+}
+
+func _OfferSearchService_EnqueueOfferSearch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EnqueueOfferSearchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OfferSearchServiceServer).EnqueueOfferSearch(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.junction.offers.v1alpha.OfferSearchService/EnqueueOfferSearch",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OfferSearchServiceServer).EnqueueOfferSearch(ctx, req.(*EnqueueOfferSearchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _OfferSearchService_GetOfferSearch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetOfferSearchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OfferSearchServiceServer).GetOfferSearch(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.junction.offers.v1alpha.OfferSearchService/GetOfferSearch",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OfferSearchServiceServer).GetOfferSearch(ctx, req.(*GetOfferSearchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// OfferSearchService_ServiceDesc is the grpc.ServiceDesc for OfferSearchService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var OfferSearchService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "snowfall.junction.offers.v1alpha.OfferSearchService",
+	HandlerType: (*OfferSearchServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "EnqueueOfferSearch",
+			Handler:    _OfferSearchService_EnqueueOfferSearch_Handler,
+		},
+		{
+			MethodName: "GetOfferSearch",
+			Handler:    _OfferSearchService_GetOfferSearch_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "snowfall/junction/offers/v1alpha/offers.proto",
+}
+
 // OfferServiceClient is the client API for OfferService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OfferServiceClient interface {
-	SearchTripOffers(ctx context.Context, in *SearchTripOffersRequest, opts ...grpc.CallOption) (*SearchTripOffersResponse, error)
-	GetOfferSearch(ctx context.Context, in *GetOfferSearchRequest, opts ...grpc.CallOption) (*GetOfferSearchResponse, error)
-	GetOffers(ctx context.Context, in *GetOffersRequest, opts ...grpc.CallOption) (*GetOffersResponse, error)
+	ListOffers(ctx context.Context, in *ListOffersRequest, opts ...grpc.CallOption) (*ListOffersResponse, error)
 }
 
 type offerServiceClient struct {
@@ -31,27 +149,9 @@ func NewOfferServiceClient(cc grpc.ClientConnInterface) OfferServiceClient {
 	return &offerServiceClient{cc}
 }
 
-func (c *offerServiceClient) SearchTripOffers(ctx context.Context, in *SearchTripOffersRequest, opts ...grpc.CallOption) (*SearchTripOffersResponse, error) {
-	out := new(SearchTripOffersResponse)
-	err := c.cc.Invoke(ctx, "/snowfall.junction.offers.v1alpha.OfferService/SearchTripOffers", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *offerServiceClient) GetOfferSearch(ctx context.Context, in *GetOfferSearchRequest, opts ...grpc.CallOption) (*GetOfferSearchResponse, error) {
-	out := new(GetOfferSearchResponse)
-	err := c.cc.Invoke(ctx, "/snowfall.junction.offers.v1alpha.OfferService/GetOfferSearch", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *offerServiceClient) GetOffers(ctx context.Context, in *GetOffersRequest, opts ...grpc.CallOption) (*GetOffersResponse, error) {
-	out := new(GetOffersResponse)
-	err := c.cc.Invoke(ctx, "/snowfall.junction.offers.v1alpha.OfferService/GetOffers", in, out, opts...)
+func (c *offerServiceClient) ListOffers(ctx context.Context, in *ListOffersRequest, opts ...grpc.CallOption) (*ListOffersResponse, error) {
+	out := new(ListOffersResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.junction.offers.v1alpha.OfferService/ListOffers", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -62,23 +162,15 @@ func (c *offerServiceClient) GetOffers(ctx context.Context, in *GetOffersRequest
 // All implementations should embed UnimplementedOfferServiceServer
 // for forward compatibility
 type OfferServiceServer interface {
-	SearchTripOffers(context.Context, *SearchTripOffersRequest) (*SearchTripOffersResponse, error)
-	GetOfferSearch(context.Context, *GetOfferSearchRequest) (*GetOfferSearchResponse, error)
-	GetOffers(context.Context, *GetOffersRequest) (*GetOffersResponse, error)
+	ListOffers(context.Context, *ListOffersRequest) (*ListOffersResponse, error)
 }
 
 // UnimplementedOfferServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedOfferServiceServer struct {
 }
 
-func (UnimplementedOfferServiceServer) SearchTripOffers(context.Context, *SearchTripOffersRequest) (*SearchTripOffersResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SearchTripOffers not implemented")
-}
-func (UnimplementedOfferServiceServer) GetOfferSearch(context.Context, *GetOfferSearchRequest) (*GetOfferSearchResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetOfferSearch not implemented")
-}
-func (UnimplementedOfferServiceServer) GetOffers(context.Context, *GetOffersRequest) (*GetOffersResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetOffers not implemented")
+func (UnimplementedOfferServiceServer) ListOffers(context.Context, *ListOffersRequest) (*ListOffersResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListOffers not implemented")
 }
 
 // UnsafeOfferServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -92,56 +184,20 @@ func RegisterOfferServiceServer(s grpc.ServiceRegistrar, srv OfferServiceServer)
 	s.RegisterService(&OfferService_ServiceDesc, srv)
 }
 
-func _OfferService_SearchTripOffers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SearchTripOffersRequest)
+func _OfferService_ListOffers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListOffersRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OfferServiceServer).SearchTripOffers(ctx, in)
+		return srv.(OfferServiceServer).ListOffers(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/snowfall.junction.offers.v1alpha.OfferService/SearchTripOffers",
+		FullMethod: "/snowfall.junction.offers.v1alpha.OfferService/ListOffers",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OfferServiceServer).SearchTripOffers(ctx, req.(*SearchTripOffersRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _OfferService_GetOfferSearch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetOfferSearchRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(OfferServiceServer).GetOfferSearch(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/snowfall.junction.offers.v1alpha.OfferService/GetOfferSearch",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OfferServiceServer).GetOfferSearch(ctx, req.(*GetOfferSearchRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _OfferService_GetOffers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetOffersRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(OfferServiceServer).GetOffers(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/snowfall.junction.offers.v1alpha.OfferService/GetOffers",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OfferServiceServer).GetOffers(ctx, req.(*GetOffersRequest))
+		return srv.(OfferServiceServer).ListOffers(ctx, req.(*ListOffersRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -154,16 +210,8 @@ var OfferService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*OfferServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "SearchTripOffers",
-			Handler:    _OfferService_SearchTripOffers_Handler,
-		},
-		{
-			MethodName: "GetOfferSearch",
-			Handler:    _OfferService_GetOfferSearch_Handler,
-		},
-		{
-			MethodName: "GetOffers",
-			Handler:    _OfferService_GetOffers_Handler,
+			MethodName: "ListOffers",
+			Handler:    _OfferService_ListOffers_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
