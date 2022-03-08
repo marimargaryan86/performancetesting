@@ -2,6 +2,8 @@ package raptor
 
 import (
 	"git.snowfall.se/junction/junction/golang/legacy"
+	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/common/v1alpha"
+	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/junction/planner/v1alpha"
 	"github.com/google/uuid"
 	"runtime"
 	"sort"
@@ -25,13 +27,12 @@ func NewPlanner(
 	}
 }
 
-func (p *Planner) Search(froms []*legacy.Stop, tos []*legacy.Stop, departureAt time.Time, kindList []legacy.Trip_Kind) ([]*Trip, error) {
+func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAt time.Time, kindList []models.Schedule_Type) ([]*Trip, error) {
 	if len(kindList) == 0 {
-		kindList = []legacy.Trip_Kind{
-			legacy.Trip_KIND_UNSPECIFIED,
-			legacy.Trip_KIND_AIR,
-			legacy.Trip_KIND_RAIL,
-			legacy.Trip_KIND_WALK,
+		kindList = []models.Schedule_Type{
+			models.Schedule_TYPE_UNSPECIFIED,
+			models.Schedule_TYPE_AIR,
+			models.Schedule_TYPE_RAIL,
 		}
 	}
 

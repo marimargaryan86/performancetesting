@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package snowfall.junction.planner.v1alpha;
+
+import "snowfall/common/v1alpha/models.proto";
+
+
+message Route {
+  uint64 sequence = 1;
+  repeated uint64 schedules = 2;
+  repeated uint64 route_stops = 3;
+}
+
+message RouteStop {
+  uint64 sequence = 1;
+  uint64 route = 2;
+  uint64 stop = 3;
+  uint32 order = 4;
+}
+
+message Stop {
+  uint64 sequence = 1;
+  string id = 2;
+  uint32 transfer_time = 3;
+  repeated uint64 route_stops = 4;
+  repeated uint64 schedule_stops = 5;
+  repeated uint64 transfers = 6;
+}
+
+message Transfer {
+  uint64 sequence = 1;
+  uint64 from_stop = 2;
+  uint64 to_stop = 3;
+  uint32 transfer_time = 4;
+  snowfall.common.v1alpha.Schedule.Type type = 5;
+}
+
+message Schedule {
+  uint64 sequence = 1;
+  string id = 2;
+  snowfall.common.v1alpha.Schedule.Type type = 3;
+  uint64 route = 4;
+  repeated uint64 schedule_stops = 5;
+}
+
+message ScheduleStop {
+  uint64 sequence = 1;
+  uint64 schedule = 2;
+  uint64 stop = 3;
+  uint32 departure_at = 4;
+  uint32 arrival_at = 5;
+  uint32 order = 6;
+}

@@ -17,6 +17,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -36,14 +37,7 @@ func main() {
 
 	var wg sync.WaitGroup
 
-	for _, file := range []string{
-		"https://sf-junction-data.s3.eu-north-1.amazonaws.com/proto/route_segments.bin",
-		"https://sf-junction-data.s3.eu-north-1.amazonaws.com/proto/routes.bin",
-		"https://sf-junction-data.s3.eu-north-1.amazonaws.com/proto/stops.bin",
-		"https://sf-junction-data.s3.eu-north-1.amazonaws.com/proto/transfers.bin",
-		"https://sf-junction-data.s3.eu-north-1.amazonaws.com/proto/trip_segments.bin",
-		"https://sf-junction-data.s3.eu-north-1.amazonaws.com/proto/trips.bin",
-	} {
+	for _, file := range []string{} {
 		wg.Add(1)
 
 		go func(file string) {
@@ -93,16 +87,14 @@ func main() {
 		sugar.Fatal(err)
 	}
 
-	stopsMap := make(map[h3.H3Index][]*legacy.Stop, len(stops))
+	stopsMap := make(map[h3.H3Index][]*planner.Stop, len(stops))
 
 	for _, stop := range stops {
-		index := h3.FromGeo(h3.GeoCoord{
-			Latitude:  stop.Latitude,
-			Longitude: stop.Longitude,
-		}, 9)
+		intIndex, _ := strconv.Atoi(stop.Id)
+		index := h3.H3Index(intIndex)
 
 		if _, ok := stopsMap[index]; !ok {
-			stopsMap[index] = make([]*legacy.Stop, 0)
+			stopsMap[index] = make([]*planner.Stop, 0)
 		}
 
 		stopsMap[index] = append(stopsMap[index], stop)

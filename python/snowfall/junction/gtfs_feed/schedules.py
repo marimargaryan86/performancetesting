@@ -101,7 +101,11 @@ class SchedulesGenerator(object):
             schedule = await self._generate_for_trip_on_service_date(
                 context,
                 service_date,
-                stop_times,
+                [
+                    stop_time
+                    for stop_time in stop_times
+                    if stop_time.pickup_type == 0 or stop_time.drop_off_type == 0
+                ],
             )
 
             if schedule:
@@ -121,7 +125,6 @@ class SchedulesGenerator(object):
                 stop_time,
             )
             for sequence, stop_time in enumerate(stop_times)
-            if stop_time.pickup_type == 0 or stop_time.drop_off_type == 0
         ]
 
         if not stops:

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/junction/planner/v1alpha"
 	"git.snowfall.se/junction/junction/golang/protoio"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
@@ -14,98 +15,98 @@ import (
 )
 
 // Load loads a protobuf-based data structure from disk into memory.
-func Load(logger *zap.SugaredLogger, from string) ([]*Route, []*RouteSegment, []*Stop, []*Transfer, []*Trip, []*TripSegment, error) {
-	var routes []*Route
-	var routeSegments []*RouteSegment
-	var stops []*Stop
-	var transfers []*Transfer
-	var trips []*Trip
-	var tripSegments []*TripSegment
+func Load(logger *zap.SugaredLogger, from string) ([]*planner.Route, []*planner.RouteStop, []*planner.Stop, []*planner.Transfer, []*planner.Schedule, []*planner.ScheduleStop, error) {
+	var routes []*planner.Route
+	var routeStops []*planner.RouteStop
+	var stops []*planner.Stop
+	var transfers []*planner.Transfer
+	var schedules []*planner.Schedule
+	var scheduleStops []*planner.ScheduleStop
 
-	messages, err := load(filepath.Join(from, "routes.bin"), reflect.TypeOf(Route{}))
+	messages, err := load(filepath.Join(from, "routes.bin"), reflect.TypeOf(planner.Route{}))
 	if err != nil {
-		return routes, routeSegments, stops, transfers, trips, tripSegments, err
+		return routes, routeStops, stops, transfers, schedules, scheduleStops, err
 	}
 
-	routes = make([]*Route, len(messages))
+	routes = make([]*planner.Route, len(messages))
 
 	for i := 0; i < len(messages); i++ {
-		routes[i] = messages[i].(*Route)
+		routes[i] = messages[i].(*planner.Route)
 	}
 
 	logger.Infow("file loaded", "file", "routes.bin")
 
-	messages, err = load(filepath.Join(from, "route_segments.bin"), reflect.TypeOf(RouteSegment{}))
+	messages, err = load(filepath.Join(from, "route_stops.bin"), reflect.TypeOf(planner.RouteStop{}))
 
 	if err != nil {
-		return routes, routeSegments, stops, transfers, trips, tripSegments, err
+		return routes, routeStops, stops, transfers, schedules, scheduleStops, err
 	}
 
-	routeSegments = make([]*RouteSegment, len(messages))
+	routeStops = make([]*planner.RouteStop, len(messages))
 
 	for i := 0; i < len(messages); i++ {
-		routeSegments[i] = messages[i].(*RouteSegment)
+		routeStops[i] = messages[i].(*planner.RouteStop)
 	}
 
-	logger.Infow("file loaded", "file", "route_segments.bin")
+	logger.Infow("file loaded", "file", "route_stops.bin")
 
-	messages, err = load(filepath.Join(from, "stops.bin"), reflect.TypeOf(Stop{}))
+	messages, err = load(filepath.Join(from, "stops.bin"), reflect.TypeOf(planner.Stop{}))
 
 	if err != nil {
-		return routes, routeSegments, stops, transfers, trips, tripSegments, err
+		return routes, routeStops, stops, transfers, schedules, scheduleStops, err
 	}
 
-	stops = make([]*Stop, len(messages))
+	stops = make([]*planner.Stop, len(messages))
 
 	for i := 0; i < len(messages); i++ {
-		stops[i] = messages[i].(*Stop)
+		stops[i] = messages[i].(*planner.Stop)
 	}
 
 	logger.Infow("file loaded", "file", "stops.bin")
 
-	messages, err = load(filepath.Join(from, "transfers.bin"), reflect.TypeOf(Transfer{}))
+	messages, err = load(filepath.Join(from, "transfers.bin"), reflect.TypeOf(planner.Transfer{}))
 
 	if err != nil {
-		return routes, routeSegments, stops, transfers, trips, tripSegments, err
+		return routes, routeStops, stops, transfers, schedules, scheduleStops, err
 	}
 
-	transfers = make([]*Transfer, len(messages))
+	transfers = make([]*planner.Transfer, len(messages))
 
 	for i := 0; i < len(messages); i++ {
-		transfers[i] = messages[i].(*Transfer)
+		transfers[i] = messages[i].(*planner.Transfer)
 	}
 
 	logger.Infow("file loaded", "file", "transfers.bin")
 
-	messages, err = load(filepath.Join(from, "trips.bin"), reflect.TypeOf(Trip{}))
+	messages, err = load(filepath.Join(from, "schedules.bin"), reflect.TypeOf(planner.Schedule{}))
 
 	if err != nil {
-		return routes, routeSegments, stops, transfers, trips, tripSegments, err
+		return routes, routeStops, stops, transfers, schedules, scheduleStops, err
 	}
 
-	trips = make([]*Trip, len(messages))
+	schedules = make([]*planner.Schedule, len(messages))
 
 	for i := 0; i < len(messages); i++ {
-		trips[i] = messages[i].(*Trip)
+		schedules[i] = messages[i].(*planner.Schedule)
 	}
 
-	logger.Infow("file loaded", "file", "trips.bin")
+	logger.Infow("file loaded", "file", "schedules.bin")
 
-	messages, err = load(filepath.Join(from, "trip_segments.bin"), reflect.TypeOf(TripSegment{}))
+	messages, err = load(filepath.Join(from, "schedule_stops.bin"), reflect.TypeOf(planner.ScheduleStop{}))
 
 	if err != nil {
-		return routes, routeSegments, stops, transfers, trips, tripSegments, err
+		return routes, routeStops, stops, transfers, schedules, scheduleStops, err
 	}
 
-	tripSegments = make([]*TripSegment, len(messages))
+	scheduleStops = make([]*planner.ScheduleStop, len(messages))
 
 	for i := 0; i < len(messages); i++ {
-		tripSegments[i] = messages[i].(*TripSegment)
+		scheduleStops[i] = messages[i].(*planner.ScheduleStop)
 	}
 
-	logger.Infow("file loaded", "file", "trip_segments.bin")
+	logger.Infow("file loaded", "file", "schedule_stops.bin")
 
-	return routes, routeSegments, stops, transfers, trips, tripSegments, nil
+	return routes, routeStops, stops, transfers, schedules, scheduleStops, nil
 }
 
 func load(filepath string, t reflect.Type) (messages []proto.Message, err error) {

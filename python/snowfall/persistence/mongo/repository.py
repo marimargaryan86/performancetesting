@@ -41,6 +41,9 @@ class _AbstractRepository(abc.ABC, Generic[Record]):  # noqa: WPS214
     async def all_(self) -> resultset.ResultSet[Record]:
         return await self._execute(self._collection.find)
 
+    async def estimated_count(self) -> int:
+        return await self._execute(self._collection.estimated_document_count)
+
     async def exists(self, identifier: str) -> bool:
         return (
             await self._execute(

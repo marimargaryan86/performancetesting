@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"git.snowfall.se/junction/junction/golang/legacy"
 	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/common/v1alpha"
 	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/junction/planner/v1alpha"
 	"git.snowfall.se/junction/junction/golang/raptor"
@@ -15,12 +14,12 @@ import (
 type PlannerServiceServer struct {
 	planner.UnimplementedPlannerServiceServer
 	Planner *raptor.Planner
-	Stops   map[h3.H3Index][]*legacy.Stop
+	Stops   map[h3.H3Index][]*planner.Stop
 }
 
 func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *planner.SearchJourneyRequest) (*planner.SearchJourneyResponse, error) {
-	origins := make([]*legacy.Stop, 0)
-	destinations := make([]*legacy.Stop, 0)
+	origins := make([]*planner.Stop, 0)
+	destinations := make([]*planner.Stop, 0)
 	origin := h3.FromGeo(h3.GeoCoord{
 		Latitude:  req.Origin.Latitude,
 		Longitude: req.Origin.Longitude,
@@ -57,11 +56,10 @@ func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *plan
 		return &planner.SearchJourneyResponse{}, status.Errorf(codes.InvalidArgument, "invalid departure time")
 	}
 
-	results, err := ps.Planner.Search(origins, destinations, departureTime, []legacy.Trip_Kind{
-		legacy.Trip_KIND_UNSPECIFIED,
-		legacy.Trip_KIND_AIR,
-		legacy.Trip_KIND_RAIL,
-		legacy.Trip_KIND_WALK,
+	results, err := ps.Planner.Search(origins, destinations, departureTime, []models.Schedule_Type{
+		models.Schedule_TYPE_UNSPECIFIED,
+		models.Schedule_TYPE_AIR,
+		models.Schedule_TYPE_RAIL,
 	})
 
 	if err != nil {

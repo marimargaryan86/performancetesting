@@ -1,56 +1,58 @@
 package legacy
 
+import planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/junction/planner/v1alpha"
+
 type Repository struct {
-	routes        []*Route
-	routeSegments []*RouteSegment
-	stops         []*Stop
-	transfers     []*Transfer
-	trips         []*Trip
-	tripSegments  []*TripSegment
+	routes        []*planner.Route
+	routeStops    []*planner.RouteStop
+	stops         []*planner.Stop
+	transfers     []*planner.Transfer
+	schedules     []*planner.Schedule
+	scheduleStops []*planner.ScheduleStop
 }
 
 func NewRepository(
-	routes []*Route,
-	routeSegments []*RouteSegment,
-	stops []*Stop,
-	transfers []*Transfer,
-	trips []*Trip,
-	tripSegments []*TripSegment,
+	routes []*planner.Route,
+	routeStops []*planner.RouteStop,
+	stops []*planner.Stop,
+	transfers []*planner.Transfer,
+	schedules []*planner.Schedule,
+	scheduleStops []*planner.ScheduleStop,
 ) *Repository {
 	return &Repository{
 		routes:        routes,
-		routeSegments: routeSegments,
+		routeStops:    routeStops,
 		stops:         stops,
 		transfers:     transfers,
-		trips:         trips,
-		tripSegments:  tripSegments,
+		schedules:     schedules,
+		scheduleStops: scheduleStops,
 	}
 }
 
-func (r *Repository) RouteByRouteSegment(s *RouteSegment) *Route {
-	return r.RouteBySequence(s.RouteSequence)
+func (r *Repository) RouteByRouteStop(s *planner.RouteStop) *planner.Route {
+	return r.RouteBySequence(s.Route)
 }
 
-func (r *Repository) RouteBySequence(s uint64) *Route {
+func (r *Repository) RouteBySequence(s uint64) *planner.Route {
 	return r.routes[s]
 }
 
-func (r *Repository) RouteSegmentBySequence(s uint64) *RouteSegment {
-	return r.routeSegments[s]
+func (r *Repository) RouteStopBySequence(s uint64) *planner.RouteStop {
+	return r.routeStops[s]
 }
 
-func (r *Repository) StopBySequence(s uint64) *Stop {
+func (r *Repository) StopBySequence(s uint64) *planner.Stop {
 	return r.stops[s]
 }
 
-func (r *Repository) TransferBySequence(s uint64) *Transfer {
+func (r *Repository) TransferBySequence(s uint64) *planner.Transfer {
 	return r.transfers[s]
 }
 
-func (r *Repository) TripBySequence(s uint64) *Trip {
-	return r.trips[s]
+func (r *Repository) ScheduleBySequence(s uint64) *planner.Schedule {
+	return r.schedules[s]
 }
 
-func (r *Repository) TripSegmentBySequence(s uint64) *TripSegment {
-	return r.tripSegments[s]
+func (r *Repository) ScheduleStopBySequence(s uint64) *planner.ScheduleStop {
+	return r.scheduleStops[s]
 }

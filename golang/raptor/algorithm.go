@@ -2,6 +2,8 @@ package raptor
 
 import (
 	"git.snowfall.se/junction/junction/golang/legacy"
+	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/common/v1alpha"
+	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/junction/planner/v1alpha"
 	"math"
 	"runtime"
 	"sort"
@@ -13,43 +15,43 @@ type raptor struct {
 	best          *sync.Map
 	connections   map[uint64]map[uint8]interface{}
 	data          *legacy.Repository
-	destinations  []*legacy.Stop
+	destinations  []*planner.Stop
 	lastDeparture uint32
 	tripCutOff    uint32
 	marked        []uint64
 	round         uint8
 	rounds        []*sync.Map
 	trips         *sync.Map
-	kindList      []legacy.Trip_Kind
+	kindList      []models.Schedule_Type
 }
 
 type connection struct {
-	trip *legacy.Trip
-	from uint32
-	to   uint32
+	schedule *planner.Schedule
+	from     uint32
+	to       uint32
 }
 
 type transfer struct {
-	from      *legacy.Stop
-	to        *legacy.Stop
+	from      *planner.Stop
+	to        *planner.Stop
 	departure uint32
 	arrival   uint32
-	kind      legacy.Trip_Kind
+	kind      models.Schedule_Type
 }
 
 type workerResult struct {
-	segment  *legacy.TripSegment
+	stop     *planner.ScheduleStop
 	arrival  uint32
-	current  *legacy.Trip
+	current  *planner.Schedule
 	boarding uint32
 }
 
 func newRaptor(
 	data *legacy.Repository,
-	origins []*legacy.Stop,
-	destinations []*legacy.Stop,
+	origins []*planner.Stop,
+	destinations []*planner.Stop,
 	departureAt time.Time,
-	kindList []legacy.Trip_Kind,
+	kindList []models.Schedule_Type,
 ) *raptor {
 	y, m, d := departureAt.AddDate(0, 0, 1).Date()
 	best := &sync.Map{}
@@ -118,16 +120,16 @@ func (r *raptor) queue() []uint64 {
 		stop := r.data.StopBySequence(stopSequence)
 		arrival, _ := r.rounds[r.round-1].Load(stop.Sequence)
 
-		for _, routeSegmentSequence := range stop.RouteSegments {
-			routeSegment := r.data.RouteSegmentBySequence(routeSegmentSequence)
-			route := r.data.RouteBySequence(routeSegment.RouteSequence)
+		for _, routeSegmentSequence := range stop.RouteStops {
+			routeSegment := r.data.RouteStopBySequence(routeSegmentSequence)
+			route := r.data.RouteBySequence(routeSegment.Route)
 
-			if int(routeSegment.Order+1) == len(route.RouteSegments) {
+			if int(routeSegment.Order+1) == len(route.RouteStops) {
 				continue
 			}
 
-			trip := r.data.TripBySequence(route.Trips[len(route.Trips)-1])
-			tripSegment := r.data.TripSegmentBySequence(trip.TripSegments[routeSegment.Order])
+			trip := r.data.ScheduleBySequence(route.Schedules[len(route.Schedules)-1])
+			tripSegment := r.data.ScheduleStopBySequence(trip.ScheduleStops[routeSegment.Order])
 
 			if tripSegment.DepartureAt < arrival.(uint32) {
 				continue
@@ -171,23 +173,23 @@ func (r *raptor) scanRoutes() {
 	close(jobs)
 
 	for result := range results {
-		tripSegment := result.segment
+		tripSegment := result.stop
 		arrival := result.arrival
 		current := result.current
 		boarding := result.boarding
 
-		if r.isBetter(tripSegment.StopSequence, arrival) {
-			r.rounds[r.round].Store(tripSegment.StopSequence, arrival)
-			r.best.Store(tripSegment.StopSequence, arrival)
+		if r.isBetter(tripSegment.Stop, arrival) {
+			r.rounds[r.round].Store(tripSegment.Stop, arrival)
+			r.best.Store(tripSegment.Stop, arrival)
 
-			if _, ok := r.connections[tripSegment.StopSequence]; !ok {
-				r.connections[tripSegment.StopSequence] = make(map[uint8]interface{})
+			if _, ok := r.connections[tripSegment.Stop]; !ok {
+				r.connections[tripSegment.Stop] = make(map[uint8]interface{})
 			}
 
-			r.connections[tripSegment.StopSequence][r.round] = connection{
-				trip: current,
-				from: boarding,
-				to:   tripSegment.Order,
+			r.connections[tripSegment.Stop][r.round] = connection{
+				schedule: current,
+				from:     boarding,
+				to:       tripSegment.Order,
 			}
 		}
 	}
@@ -197,25 +199,25 @@ func (r *raptor) routeWorker(wg *sync.WaitGroup, jobs chan uint64, results chan 
 	defer wg.Done()
 
 	for qItem := range jobs {
-		qRouteSegment := r.data.RouteSegmentBySequence(qItem)
-		qRoute := r.data.RouteByRouteSegment(qRouteSegment)
+		qRouteSegment := r.data.RouteStopBySequence(qItem)
+		qRoute := r.data.RouteByRouteStop(qRouteSegment)
 
-		var current *legacy.Trip
+		var current *planner.Schedule
 		var boarding uint32
 
-		for _, p := range qRoute.RouteSegments[qRouteSegment.Order:] {
-			routeSegment := r.data.RouteSegmentBySequence(p)
-			transferTime := r.data.StopBySequence(routeSegment.StopSequence).TransferTime
+		for _, p := range qRoute.RouteStops[qRouteSegment.Order:] {
+			routeSegment := r.data.RouteStopBySequence(p)
+			transferTime := r.data.StopBySequence(routeSegment.Stop).TransferTime
 
-			var tripSegment *legacy.TripSegment
+			var tripSegment *planner.ScheduleStop
 
 			if current != nil {
-				tripSegment = r.data.TripSegmentBySequence(current.TripSegments[routeSegment.Order])
+				tripSegment = r.data.ScheduleStopBySequence(current.ScheduleStops[routeSegment.Order])
 				arrival := tripSegment.ArrivalAt + transferTime
 
-				if r.isBetter(tripSegment.StopSequence, arrival) {
+				if r.isBetter(tripSegment.Stop, arrival) {
 					results <- workerResult{
-						segment:  tripSegment,
+						stop:     tripSegment,
 						arrival:  arrival,
 						current:  current,
 						boarding: boarding,
@@ -223,27 +225,27 @@ func (r *raptor) routeWorker(wg *sync.WaitGroup, jobs chan uint64, results chan 
 				}
 			}
 
-			previousArrival, ok := r.rounds[r.round-1].Load(routeSegment.StopSequence)
+			previousArrival, ok := r.rounds[r.round-1].Load(routeSegment.Stop)
 
 			if ok && (current == nil || previousArrival.(uint32) < tripSegment.ArrivalAt+transferTime) {
 				current = nil
 				index, ok := r.trips.Load(qRoute.Sequence)
 
 				if !ok {
-					index = sort.Search(len(qRoute.Trips)-1, func(i int) bool {
-						trip := r.data.TripBySequence(qRoute.Trips[i])
-						tripSegment := r.data.TripSegmentBySequence(trip.TripSegments[routeSegment.Order])
+					index = sort.Search(len(qRoute.Schedules)-1, func(i int) bool {
+						trip := r.data.ScheduleBySequence(qRoute.Schedules[i])
+						tripSegment := r.data.ScheduleStopBySequence(trip.ScheduleStops[routeSegment.Order])
 						return tripSegment.DepartureAt > previousArrival.(uint32)
 					})
 					r.trips.Store(qRoute.Sequence, index)
 				}
 
 				for i := index.(int); i >= 0; i-- {
-					trip := r.data.TripBySequence(qRoute.Trips[i])
+					trip := r.data.ScheduleBySequence(qRoute.Schedules[i])
 					found := false
 
 					for _, tid := range r.kindList {
-						if tid == trip.Kind {
+						if tid == trip.Type {
 							found = true
 							break
 						}
@@ -253,7 +255,7 @@ func (r *raptor) routeWorker(wg *sync.WaitGroup, jobs chan uint64, results chan 
 						continue
 					}
 
-					tripSegment := r.data.TripSegmentBySequence(trip.TripSegments[routeSegment.Order])
+					tripSegment := r.data.ScheduleStopBySequence(trip.ScheduleStops[routeSegment.Order])
 					departure := tripSegment.DepartureAt
 
 					if r.round == 1 && departure > r.lastDeparture || departure > r.tripCutOff {
@@ -280,7 +282,7 @@ func (r *raptor) scanTransfers() {
 
 		for _, t := range fromStop.Transfers {
 			trans := r.data.TransferBySequence(t)
-			toStop := r.data.StopBySequence(trans.ToStopSequence)
+			toStop := r.data.StopBySequence(trans.ToStop)
 			arrival := departure.(uint32) + trans.TransferTime + toStop.TransferTime
 
 			if r.isBetter(toStop.Sequence, arrival) {
@@ -296,7 +298,7 @@ func (r *raptor) scanTransfers() {
 					to:        toStop,
 					departure: departure.(uint32),
 					arrival:   departure.(uint32) + trans.TransferTime,
-					kind:      trans.Kind,
+					kind:      trans.Type,
 				}
 			}
 		}
