@@ -6,7 +6,7 @@ from typing import Sequence
 import pydantic
 from motor import motor_asyncio
 
-from snowfall.junction.offers import offers
+from snowfall.junction.offers import importer, offers
 from snowfall.junction.offers.amqp import OfferSearchProducer
 from snowfall.junction.offers.grpc import OfferSearchService, OfferService
 from snowfall.service import RunnableService, Task, make_runnable_service
@@ -52,11 +52,31 @@ async def _serve(service: RunnableService) -> None:
         await server.wait_for_termination()
 
 
+async def _import(service: RunnableService) -> None:
+    settings = _GrpcSettings()
+    mongo = motor_asyncio.AsyncIOMotorClient(random.choice(settings.mongo_dsn))  # nosec
+    async with amqp.Connection(random.choice(settings.amqp_dsn)) as connection:  # nosec
+        offer_importer = importer.OfferImporter(
+            consumer=await amqp.create_consumer(
+                conn=connection,
+                exchange_name="offers",
+                queue_name="{0}_offers".format(service.name),
+                routing_key="offers.result.trip",
+            ),
+            trip_offers=offers.TripOfferRepository(
+                mongo.offers.trip_offers,
+            ),
+        )
+        await offer_importer.consume()
+
+
 if __name__ == "__main__":
     _service = make_runnable_service(
         name="offers",
-        tasks=(Task(command="grpc", method=_serve),),
-        # todo: add import task
+        tasks=(
+            Task(command="grpc", method=_serve),
+            Task(command="import", method=_import),
+        ),
     )
 
     _service.run()

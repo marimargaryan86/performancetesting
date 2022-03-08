@@ -8,6 +8,10 @@ from snowfall.junction.offers.v1alpha import offers_pb2
 from snowfall.persistence.mongo import repository
 
 
+class TripOfferRepository(repository.ProtoRepository[offers_pb2.TripOfferResult]):
+    _proto = offers_pb2.TripOfferResult
+
+
 class OfferSearchRepository(repository.ProtoRepository[offers_pb2.OfferSearch]):
     _proto = offers_pb2.OfferSearch
 

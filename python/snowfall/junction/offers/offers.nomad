@@ -64,4 +64,39 @@ EOH
       }
     }
   }
+
+  group "import" {
+    count = 1
+
+    task "import" {
+      driver = "docker"
+
+      template {
+        data        = <<EOH
+AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}//\"{{end}}]"
+MONGO_DSN="[{{range $index, $service := service "mongodb"}}{{if ne $index 0}},{{end}}\"mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}}\"{{end}}]"
+EOH
+        destination = "services.env"
+        env         = true
+        change_mode = "restart"
+      }
+
+      config {
+        image = "${DOCKER_IMAGE}"
+        args = [
+          "import",
+        ]
+
+        auth {
+          username       = "${NOMAD_REGISTRY_USERNAME}"
+          password       = "${NOMAD_REGISTRY_PASSWORD}"
+          server_address = "${CI_REGISTRY}"
+        }
+      }
+
+      env {
+        SENTRY_DSN = "https://7c600c1c458d403e8047091398239f20@sentry.snowfall.se/27"
+      }
+    }
+  }
 }
