@@ -1,3 +1,5 @@
+import json
+
 import pytest
 from starlette import status, testclient
 
@@ -69,3 +71,39 @@ class TestOfferSearches(object):
             headers={"Content-Type": "application/vnd.api+json"},
         )
         assert response.status_code == status.HTTP_201_CREATED
+
+    async def test_created_trip_offer_search_can_be_retrieved(
+        self,
+        client: testclient.TestClient,
+    ) -> None:
+        offer_search = client.post(
+            "/offers/searches",
+            json={
+                "data": {
+                    "type": "trip-offer-searches",
+                    "attributes": {
+                        "passengers": [
+                            {
+                                "age": 42,
+                            },
+                        ],
+                    },
+                    "relationships": {
+                        "trips": {
+                            "data": [
+                                {
+                                    "id": fixtures.TRIP,
+                                    "type": "trips",
+                                },
+                            ],
+                        },
+                    },
+                },
+            },
+            headers={"Content-Type": "application/vnd.api+json"},
+        )
+        offer_search_id = json.loads(offer_search.content.decode())["data"]["id"]
+        response = client.get(
+            "/offers/searches/{id}".format(id=offer_search_id),
+        )
+        assert response.status_code == status.HTTP_200_OK

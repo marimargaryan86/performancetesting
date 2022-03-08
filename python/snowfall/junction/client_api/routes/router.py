@@ -44,7 +44,11 @@ def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Rou
             name="ViewTrips",
         ),
         dependencies.route("/offers/searches", offers.OfferSearches),
-        # todo: add GET /offers/searches/{offerSearchId}
+        dependencies.route(
+            "/offers/searches/{offerSearchId}",
+            offers.OfferSearch,
+            name="ViewOfferSearch",
+        ),
         # todo: add GET /offers/searches/{offerSearchId}/offers
         # todo: add GET /offers/searches/{offerSearchId}/related
         # todo: add GET /offers/{offerId}

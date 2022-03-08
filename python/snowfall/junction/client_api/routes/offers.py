@@ -39,3 +39,25 @@ class OfferSearches(endpoints.HTTPEndpoint):
             ),
             status.HTTP_201_CREATED,
         )
+
+
+class OfferSearch(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        client: offer_searches.Client = lagom.injectable,
+    ) -> responses.Response:
+        try:
+            offer_search = await client.get(request.path_params["offerSearchId"])
+        except offer_searches.NotFoundError:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+        return models.JsonApiResponse(
+            models.Body(
+                data=await resources.TripOfferSearchResource.from_proto(
+                    offer_search=offer_search,
+                    offers=[],
+                    request=request,
+                ),
+            ),
+        )
