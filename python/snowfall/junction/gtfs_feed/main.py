@@ -38,7 +38,7 @@ async def _main(service: RunnableService) -> None:
             await _import(
                 service,
                 settings,
-                redis,
+                redis_conn,
                 importer.RepositoryCollection.create_for_database(database),
                 geocoding.ReverseGeocoder(redis_conn, service.user_agent),
             )
