@@ -1,9 +1,11 @@
+import datetime
 import hashlib
 import pathlib
 import pickle  # nosec
 from typing import Literal
 
 import aiofiles
+import structlog
 from aiofiles.threadpool import binary
 from h3.api import numpy_int as h3
 
@@ -18,10 +20,57 @@ _MIN_TRANSFER_TIME = 25 * 60  # noqa: WPS432 - todo: calculate somehow?
 _START_SEQUENCE = -1
 
 
+class State(object):
+    def __init__(self, client: redis.Client, repository: schedules.ScheduleRepository):
+        self._logger = structlog.get_logger(__name__)
+        self._repository = repository
+        self._redis = client
+
+    async def mark_as_completed(self) -> None:
+        await self._redis.set_(
+            "last_executed_at",
+            str(datetime.datetime.now().timestamp()),
+        )
+
+    async def should_run_export(self) -> bool:
+        actual = await self._repository.get_last_updated_at()
+        expected = await self._get_timestamp_from_redis("last_seen_update_at")
+
+        if actual != expected:
+            await self._redis.set_(
+                "last_seen_update_at",
+                str(actual.timestamp()),
+            )
+
+            self._logger.info("Data update seemingly in progress, skipping.")
+            return False
+
+        last_executed_at = await self._get_timestamp_from_redis("last_executed_at")
+
+        if last_executed_at > actual:
+            self._logger.info("No new data available for export, skipping.")
+            return False
+
+        self._logger.info("Export started.")
+        return True
+
+    async def _get_timestamp_from_redis(self, redis_key: str) -> datetime.datetime:
+        redis_value = await self._redis.get(redis_key)
+
+        if not redis_value:
+            return datetime.datetime.fromtimestamp(0, tz=datetime.timezone.utc)
+
+        return datetime.datetime.fromtimestamp(
+            float(redis_value.decode()),
+            tz=datetime.timezone.utc,
+        )
+
+
 class Exporter(object):  # noqa: WPS214
     def __init__(self, client: redis.Client, repository: schedules.ScheduleRepository):
         self._repository = repository
         self._redis = client
+        self._state = State(client, repository)
         self._route_sequence = _START_SEQUENCE
         self._route_stop_sequence = _START_SEQUENCE
         self._stop_sequence = _START_SEQUENCE
@@ -32,7 +81,10 @@ class Exporter(object):  # noqa: WPS214
         self._stops = client.hash_("stops")
         self._stop_sequences = client.hash_("stop_sequences")
 
-    async def export(self, path: pathlib.Path) -> None:
+    async def export(self, path: pathlib.Path) -> None:  # noqa: WPS217
+        if not await self._state.should_run_export():
+            return
+
         await self._redis.delete("*")
 
         self._route_sequence = _START_SEQUENCE
@@ -69,6 +121,7 @@ class Exporter(object):  # noqa: WPS214
             await transfers_f.write(b"")
 
         await self._redis.delete("*")
+        await self._state.mark_as_completed()
 
     async def _store_schedules(
         self,

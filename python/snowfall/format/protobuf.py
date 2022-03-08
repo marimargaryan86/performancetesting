@@ -41,4 +41,4 @@ async def datetime_to_protobuf(timestamp: datetime.datetime) -> timestamp_pb2.Ti
 
 
 async def protobuf_to_datetime(proto: timestamp_pb2.Timestamp) -> datetime.datetime:
-    return proto.ToDatetime().astimezone(datetime.timezone.utc)
+    return proto.ToDatetime().replace(tzinfo=datetime.timezone.utc)
