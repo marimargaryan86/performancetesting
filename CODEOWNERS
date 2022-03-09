@@ -1,0 +1,22 @@
+[CI/CD]
+/.gitlab/ @jyggen
+.editorconfig @jyggen @mb
+.gitignore @jyggen @mb
+.gitlab-ci.yml @jyggen
+.python-version @jyggen
+buf.gen.yaml @jyggen
+buf.yaml @jyggen
+BUILD @jyggen
+docker-compose.yml @jyggen
+pants @jyggen
+pants.ci.toml @jyggen
+pants.toml @jyggen
+*.nomad @jyggen
+
+[Go]
+/golang/ @jyggen
+
+[Specification]
+/openapi/ @jyggen @mb
+/protobuf/ @jyggen @mb
+/vendor/ @jyggen @mb
