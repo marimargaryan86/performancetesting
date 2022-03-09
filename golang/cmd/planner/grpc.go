@@ -72,17 +72,11 @@ func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *plan
 		segments := make([]*models.SegmentReference, 0, len(r.Segments))
 
 		for _, s := range r.Segments {
-			legs := make([]*models.StopReference, 0, len(s.Legs))
-
-			for _, l := range s.Legs {
-				legs = append(legs, &models.StopReference{
-					Id: l.Id.String(),
-				})
-			}
-
 			segments = append(segments, &models.SegmentReference{
-				Id:    s.Id.String(),
-				Stops: legs,
+				Id:                s.Id.String(),
+				ScheduleId:        s.ScheduleId.String(),
+				OriginStopId:      s.Legs[0].Id.String(),
+				DestinationStopId: s.Legs[len(s.Legs)-1].Id.String(),
 			})
 		}
 

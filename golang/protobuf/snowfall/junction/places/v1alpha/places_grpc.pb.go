@@ -14,6 +14,234 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
+// CuratedPlacesServiceClient is the client API for CuratedPlacesService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type CuratedPlacesServiceClient interface {
+	GetCuratedPlace(ctx context.Context, in *GetCuratedPlaceRequest, opts ...grpc.CallOption) (*GetCuratedPlaceResponse, error)
+	ListCuratedPlaces(ctx context.Context, in *ListCuratedPlacesRequest, opts ...grpc.CallOption) (*ListCuratedPlacesResponse, error)
+	CreateCuratedPlace(ctx context.Context, in *CreateCuratedPlaceRequest, opts ...grpc.CallOption) (*CreateCuratedPlaceResponse, error)
+	DeleteCuratedPlace(ctx context.Context, in *DeleteCuratedPlaceRequest, opts ...grpc.CallOption) (*DeleteCuratedPlaceResponse, error)
+	UpdateCuratedPlace(ctx context.Context, in *UpdateCuratedPlaceRequest, opts ...grpc.CallOption) (*UpdateCuratedPlaceResponse, error)
+}
+
+type curatedPlacesServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewCuratedPlacesServiceClient(cc grpc.ClientConnInterface) CuratedPlacesServiceClient {
+	return &curatedPlacesServiceClient{cc}
+}
+
+func (c *curatedPlacesServiceClient) GetCuratedPlace(ctx context.Context, in *GetCuratedPlaceRequest, opts ...grpc.CallOption) (*GetCuratedPlaceResponse, error) {
+	out := new(GetCuratedPlaceResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.junction.places.v1alpha.CuratedPlacesService/GetCuratedPlace", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *curatedPlacesServiceClient) ListCuratedPlaces(ctx context.Context, in *ListCuratedPlacesRequest, opts ...grpc.CallOption) (*ListCuratedPlacesResponse, error) {
+	out := new(ListCuratedPlacesResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.junction.places.v1alpha.CuratedPlacesService/ListCuratedPlaces", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *curatedPlacesServiceClient) CreateCuratedPlace(ctx context.Context, in *CreateCuratedPlaceRequest, opts ...grpc.CallOption) (*CreateCuratedPlaceResponse, error) {
+	out := new(CreateCuratedPlaceResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.junction.places.v1alpha.CuratedPlacesService/CreateCuratedPlace", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *curatedPlacesServiceClient) DeleteCuratedPlace(ctx context.Context, in *DeleteCuratedPlaceRequest, opts ...grpc.CallOption) (*DeleteCuratedPlaceResponse, error) {
+	out := new(DeleteCuratedPlaceResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.junction.places.v1alpha.CuratedPlacesService/DeleteCuratedPlace", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *curatedPlacesServiceClient) UpdateCuratedPlace(ctx context.Context, in *UpdateCuratedPlaceRequest, opts ...grpc.CallOption) (*UpdateCuratedPlaceResponse, error) {
+	out := new(UpdateCuratedPlaceResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.junction.places.v1alpha.CuratedPlacesService/UpdateCuratedPlace", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// CuratedPlacesServiceServer is the server API for CuratedPlacesService service.
+// All implementations should embed UnimplementedCuratedPlacesServiceServer
+// for forward compatibility
+type CuratedPlacesServiceServer interface {
+	GetCuratedPlace(context.Context, *GetCuratedPlaceRequest) (*GetCuratedPlaceResponse, error)
+	ListCuratedPlaces(context.Context, *ListCuratedPlacesRequest) (*ListCuratedPlacesResponse, error)
+	CreateCuratedPlace(context.Context, *CreateCuratedPlaceRequest) (*CreateCuratedPlaceResponse, error)
+	DeleteCuratedPlace(context.Context, *DeleteCuratedPlaceRequest) (*DeleteCuratedPlaceResponse, error)
+	UpdateCuratedPlace(context.Context, *UpdateCuratedPlaceRequest) (*UpdateCuratedPlaceResponse, error)
+}
+
+// UnimplementedCuratedPlacesServiceServer should be embedded to have forward compatible implementations.
+type UnimplementedCuratedPlacesServiceServer struct {
+}
+
+func (UnimplementedCuratedPlacesServiceServer) GetCuratedPlace(context.Context, *GetCuratedPlaceRequest) (*GetCuratedPlaceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCuratedPlace not implemented")
+}
+func (UnimplementedCuratedPlacesServiceServer) ListCuratedPlaces(context.Context, *ListCuratedPlacesRequest) (*ListCuratedPlacesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListCuratedPlaces not implemented")
+}
+func (UnimplementedCuratedPlacesServiceServer) CreateCuratedPlace(context.Context, *CreateCuratedPlaceRequest) (*CreateCuratedPlaceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateCuratedPlace not implemented")
+}
+func (UnimplementedCuratedPlacesServiceServer) DeleteCuratedPlace(context.Context, *DeleteCuratedPlaceRequest) (*DeleteCuratedPlaceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteCuratedPlace not implemented")
+}
+func (UnimplementedCuratedPlacesServiceServer) UpdateCuratedPlace(context.Context, *UpdateCuratedPlaceRequest) (*UpdateCuratedPlaceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateCuratedPlace not implemented")
+}
+
+// UnsafeCuratedPlacesServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to CuratedPlacesServiceServer will
+// result in compilation errors.
+type UnsafeCuratedPlacesServiceServer interface {
+	mustEmbedUnimplementedCuratedPlacesServiceServer()
+}
+
+func RegisterCuratedPlacesServiceServer(s grpc.ServiceRegistrar, srv CuratedPlacesServiceServer) {
+	s.RegisterService(&CuratedPlacesService_ServiceDesc, srv)
+}
+
+func _CuratedPlacesService_GetCuratedPlace_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCuratedPlaceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CuratedPlacesServiceServer).GetCuratedPlace(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.junction.places.v1alpha.CuratedPlacesService/GetCuratedPlace",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CuratedPlacesServiceServer).GetCuratedPlace(ctx, req.(*GetCuratedPlaceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CuratedPlacesService_ListCuratedPlaces_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListCuratedPlacesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CuratedPlacesServiceServer).ListCuratedPlaces(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.junction.places.v1alpha.CuratedPlacesService/ListCuratedPlaces",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CuratedPlacesServiceServer).ListCuratedPlaces(ctx, req.(*ListCuratedPlacesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CuratedPlacesService_CreateCuratedPlace_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateCuratedPlaceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CuratedPlacesServiceServer).CreateCuratedPlace(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.junction.places.v1alpha.CuratedPlacesService/CreateCuratedPlace",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CuratedPlacesServiceServer).CreateCuratedPlace(ctx, req.(*CreateCuratedPlaceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CuratedPlacesService_DeleteCuratedPlace_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteCuratedPlaceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CuratedPlacesServiceServer).DeleteCuratedPlace(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.junction.places.v1alpha.CuratedPlacesService/DeleteCuratedPlace",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CuratedPlacesServiceServer).DeleteCuratedPlace(ctx, req.(*DeleteCuratedPlaceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CuratedPlacesService_UpdateCuratedPlace_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateCuratedPlaceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CuratedPlacesServiceServer).UpdateCuratedPlace(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.junction.places.v1alpha.CuratedPlacesService/UpdateCuratedPlace",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CuratedPlacesServiceServer).UpdateCuratedPlace(ctx, req.(*UpdateCuratedPlaceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// CuratedPlacesService_ServiceDesc is the grpc.ServiceDesc for CuratedPlacesService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var CuratedPlacesService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "snowfall.junction.places.v1alpha.CuratedPlacesService",
+	HandlerType: (*CuratedPlacesServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetCuratedPlace",
+			Handler:    _CuratedPlacesService_GetCuratedPlace_Handler,
+		},
+		{
+			MethodName: "ListCuratedPlaces",
+			Handler:    _CuratedPlacesService_ListCuratedPlaces_Handler,
+		},
+		{
+			MethodName: "CreateCuratedPlace",
+			Handler:    _CuratedPlacesService_CreateCuratedPlace_Handler,
+		},
+		{
+			MethodName: "DeleteCuratedPlace",
+			Handler:    _CuratedPlacesService_DeleteCuratedPlace_Handler,
+		},
+		{
+			MethodName: "UpdateCuratedPlace",
+			Handler:    _CuratedPlacesService_UpdateCuratedPlace_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "snowfall/junction/places/v1alpha/places.proto",
+}
+
 // PlacesServiceClient is the client API for PlacesService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.

@@ -3,7 +3,6 @@ package raptor
 import (
 	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/junction/planner/v1alpha"
 	"github.com/google/uuid"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -18,10 +17,11 @@ type Trip struct {
 }
 
 type Segment struct {
-	Id     uuid.UUID
-	Depart time.Time
-	Arrive time.Time
-	Legs   []*Leg
+	Id         uuid.UUID
+	ScheduleId uuid.UUID
+	Depart     time.Time
+	Arrive     time.Time
+	Legs       []*Leg
 }
 
 type Leg struct {
@@ -50,10 +50,9 @@ func (p *Planner) toJourneySet(destination *planner.Stop, connections map[uint64
 				legs := make([]*Leg, 0)
 
 				for _, s := range v.schedule.ScheduleStops[v.from : v.to+1] {
-					sTripSegment := p.data.ScheduleStopBySequence(s)
-					legIdParts := []string{v.schedule.Id, strconv.Itoa(int(sTripSegment.Order))}
+					sScheduleStop := p.data.ScheduleStopBySequence(s)
 					legs = append(legs, &Leg{
-						Id: uuid.NewSHA1(namespace, []byte(strings.Join(legIdParts, "_"))),
+						Id: uuid.MustParse(p.data.StopBySequence(sScheduleStop.Stop).Id),
 					})
 				}
 
@@ -67,10 +66,11 @@ func (p *Planner) toJourneySet(destination *planner.Stop, connections map[uint64
 				}
 
 				segments = append(segments, &Segment{
-					Id:     uuid.NewSHA1(namespace, []byte(strings.Join(segmentIdParts, "_"))),
-					Legs:   legs,
-					Depart: time.Unix(int64(depart), 0),
-					Arrive: time.Unix(int64(arrive), 0),
+					Id:         uuid.NewSHA1(namespace, []byte(strings.Join(segmentIdParts, "_"))),
+					ScheduleId: uuid.MustParse(v.schedule.Id),
+					Legs:       legs,
+					Depart:     time.Unix(int64(depart), 0),
+					Arrive:     time.Unix(int64(arrive), 0),
 				})
 
 				dest = org

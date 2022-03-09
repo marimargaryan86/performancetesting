@@ -55,10 +55,6 @@ message Stop {
   uint32 order = 5;
 }
 
-message StopReference {
-  string id = 1;
-}
-
 message Segment {
   string id = 1;
   repeated Stop stops = 2;
@@ -66,7 +62,9 @@ message Segment {
 
 message SegmentReference {
   string id = 1;
-  repeated StopReference stops = 2;
+  string schedule_id = 2;
+  string origin_stop_id = 3;
+  string destination_stop_id = 4;
 }
 
 message TripReference {

@@ -85,13 +85,13 @@ class DictClient(Client):
     async def _generate_trips(self, trip_search: trips_pb2.TripSearch) -> None:
         self._trips_cache[trip_search.id] = [
             models_pb2.TripReference(
-                id=str(uuid.uuid4()),
+                id="b3e45af0-f3ae-46e5-a94f-fd1c9d86fb7d",
                 segments=[
                     models_pb2.SegmentReference(
                         id=str(uuid.uuid4()),
-                        stops=[
-                            models_pb2.StopReference(id=str(uuid.uuid4())),
-                        ],
+                        schedule_id=str(uuid.uuid4()),
+                        origin_stop_id="f236a92c-4cfa-468e-85ef-431d25dcd925",
+                        destination_stop_id="488a836d-ec22-439b-a9d8-3c4c386a731e",
                     ),
                 ],
             ),
