@@ -1,5 +1,5 @@
 import json
-from typing import Any
+from typing import Any, Optional
 
 import openapi_core
 from furl import furl
@@ -69,9 +69,11 @@ class Validator(object):
             custom_media_type_deserializers=deserializer,
         )
 
-    async def validate_request(self, request: OpenAPIRequest) -> None:
+    async def validate_request(self, request: OpenAPIRequest) -> Optional[str]:
         validation_result = self._request_validator.validate(request)
         validation_result.raise_for_errors()
+
+        return validation_result.security.get("jwt")
 
     async def validate_response(
         self,

@@ -18,7 +18,7 @@ brew install docker
 ```
 4. Install [Poetry][poetry].
 ```shell
-curl -sSL https://install.python-poetry.org | python - --version=1.2.0a2
+curl -sSL https://install.python-poetry.org | python3 - --version=1.2.0a2
 ```
 5. If you are on an M1 Macbook Pro, make sure you have Rosetta installed.
 

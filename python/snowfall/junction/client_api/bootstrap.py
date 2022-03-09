@@ -1,5 +1,6 @@
+import base64
 import ipaddress
-from typing import Sequence
+from typing import Any, Sequence
 
 import lagom
 import pydantic
@@ -18,9 +19,15 @@ class Settings(pydantic.BaseSettings):
     ]
     http_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     http_port: int = 8000
+    jwt_public_key: str
+    jwt_token_version: str
     places_address: Sequence[str]
     offers_address: Sequence[str]
     reload: bool = False
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.jwt_public_key = base64.b64decode(self.jwt_public_key.encode()).decode()
 
 
 def create_dependencies(

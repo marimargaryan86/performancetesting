@@ -7,7 +7,7 @@ from starlette import exceptions, requests, responses
 from snowfall.junction.client_api import models
 
 
-async def _error_response_from_status(
+def _error_response_from_status(
     status: http.HTTPStatus,
     description: Optional[str] = None,
 ) -> responses.JSONResponse:
@@ -28,6 +28,13 @@ async def _error_response_from_status(
     )
 
 
+def auth_error_handler(
+    request: requests.Request,
+    exc: Exception,
+) -> responses.JSONResponse:
+    return _error_response_from_status(http.HTTPStatus.UNAUTHORIZED)
+
+
 async def error_handler(
     request: requests.Request,
     exc: Exception,
@@ -35,7 +42,7 @@ async def error_handler(
     if isinstance(exc, exceptions.HTTPException):
         return await exception_handler(request, exc)
 
-    return await _error_response_from_status(http.HTTPStatus.INTERNAL_SERVER_ERROR)
+    return _error_response_from_status(http.HTTPStatus.INTERNAL_SERVER_ERROR)
 
 
 async def exception_handler(
@@ -44,11 +51,11 @@ async def exception_handler(
 ) -> responses.JSONResponse:
     status = http.HTTPStatus(exc.status_code or http.HTTPStatus.INTERNAL_SERVER_ERROR)
 
-    return await _error_response_from_status(status)
+    return _error_response_from_status(status)
 
 
 async def validation_error_handler(
     request: requests.Request,
     exc: OpenAPIError,
 ) -> responses.JSONResponse:
-    return await _error_response_from_status(http.HTTPStatus.BAD_REQUEST, str(exc))
+    return _error_response_from_status(http.HTTPStatus.BAD_REQUEST, str(exc))
