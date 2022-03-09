@@ -34,10 +34,10 @@ extra_requirements = [
 version = "black==22.1.0"
 config = "vendor/pyproject.toml"
 lockfile = "vendor/lock/black.txt"
-interpreter_constraints = ["CPython==3.9.9"]
+interpreter_constraints = ["CPython==3.9.10"]
 
 [coverage-py]
-interpreter_constraints = ["CPython==3.9.9"]
+interpreter_constraints = ["CPython==3.9.10"]
 config = "vendor/pyproject.toml"
 report = ["console", "html"]
 
@@ -45,7 +45,7 @@ report = ["console", "html"]
 version = "docformatter==1.4"
 lockfile = "vendor/lock/docformatter.txt"
 args = ["--wrap-summaries", "87", "--wrap-descriptions", "80"]
-interpreter_constraints = ["CPython==3.9.9"]
+interpreter_constraints = ["CPython==3.9.10"]
 
 [flake8]
 version = "flake8==4.0.1"
@@ -70,18 +70,18 @@ extra_requirements = [
 version = "isort==5.10.1"
 config = "vendor/setup.cfg"
 lockfile = "vendor/lock/isort.txt"
-interpreter_constraints = ["CPython==3.9.9"]
+interpreter_constraints = ["CPython==3.9.10"]
 
 [mypy]
 version = "mypy==0.931"
 config = "vendor/setup.cfg"
 lockfile = "vendor/lock/mypy.txt"
-interpreter_constraints = ["CPython==3.9.9"]
+interpreter_constraints = ["CPython==3.9.10"]
 extra_requirements = ["grpc-stubs", "pydantic"]
 
 [poetry]
 version = "poetry==1.1.13"
-interpreter_constraints = ["CPython==3.9.9"]
+interpreter_constraints = ["CPython==3.9.10"]
 
 [protoc]
 version = "3.19.4"
@@ -103,7 +103,7 @@ extra_requirements = [
 ]
 
 [python]
-interpreter_constraints = ["CPython==3.9.9"]
+interpreter_constraints = ["CPython==3.9.10"]
 requirement_constraints = "vendor/lock/constraints.txt"
 
 [python-protobuf]

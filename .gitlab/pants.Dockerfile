@@ -1,4 +1,4 @@
-FROM python:3.9.9
+FROM python@sha256:457bddb6ed15cbcee4948c1b2695611a82d075624534c6818175a4670523506b
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
