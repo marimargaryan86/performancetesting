@@ -33,6 +33,10 @@ job "planner" {
     task "grpc" {
       driver = "docker"
 
+      resources {
+        memory = 8192
+      }
+
       config {
         image = "${DOCKER_IMAGE}"
         ports = ["grpc"]
@@ -47,9 +51,34 @@ job "planner" {
         }
       }
 
+      artifact {
+        source = "s3::https://sf-junction-data.s3.eu-north-1.amazonaws.com/proto/route_segments.bin"
+      }
+
+      artifact {
+        source = "s3::https://sf-junction-data.s3.eu-north-1.amazonaws.com/proto/routes.bin"
+      }
+
+      artifact {
+        source = "s3::https://sf-junction-data.s3.eu-north-1.amazonaws.com/proto/stops.bin"
+      }
+
+      artifact {
+        source = "s3::https://sf-junction-data.s3.eu-north-1.amazonaws.com/proto/transfers.bin"
+      }
+
+      artifact {
+        source = "s3::https://sf-junction-data.s3.eu-north-1.amazonaws.com/proto/trip_segments.bin"
+      }
+
+      artifact {
+        source = "s3::https://sf-junction-data.s3.eu-north-1.amazonaws.com/proto/trips.bin"
+      }
+
       env {
         GRPC_ADDRESS = "0.0.0.0"
         GRPC_PORT    = "${NOMAD_PORT_grpc}"
+        PROTO_DIR    = "${NOMAD_TASK_DIR}"
         SENTRY_DSN   = "https://43837909119c4ce186975c300c4efe6e@sentry.snowfall.se/23"
       }
     }

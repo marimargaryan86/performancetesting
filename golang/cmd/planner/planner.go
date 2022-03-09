@@ -11,15 +11,9 @@ import (
 	"google.golang.org/grpc/health"
 	healthgrpc "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
-	"io"
 	"net"
-	"net/http"
-	"net/url"
 	"os"
-	"path"
 	"strconv"
-	"sync"
-	"time"
 )
 
 func main() {
@@ -35,35 +29,13 @@ func main() {
 
 	sugar := logger.Sugar()
 
-	var wg sync.WaitGroup
+	protoDir, ok := os.LookupEnv("PROTO_DIR")
 
-	for _, file := range []string{} {
-		wg.Add(1)
-
-		go func(file string) {
-			u, err := url.Parse(file)
-
-			if err != nil {
-				sugar.Fatal(err)
-			}
-
-			var code int
-
-			code, err = downloadFile(u, path.Base(file))
-
-			if err != nil {
-				sugar.Fatal(err)
-			}
-
-			sugar.Infow("file downloaded", "url", file, "code", code)
-
-			wg.Done()
-		}(file)
+	if !ok {
+		protoDir = "./"
 	}
 
-	wg.Wait()
-
-	routes, routeSegments, stops, transfers, trips, tripSegments, err := legacy.Load(sugar, "./")
+	routes, routeSegments, stops, transfers, trips, tripSegments, err := legacy.Load(sugar, protoDir)
 
 	if err != nil {
 		sugar.Fatal(err)
@@ -113,59 +85,4 @@ func main() {
 	if err != grpcServer.Serve(lis) {
 		sugar.Fatal(err)
 	}
-}
-
-func downloadFile(fileUrl *url.URL, filePath string) (int, error) {
-	fileInfo, err := os.Stat(filePath)
-	headers := map[string][]string{}
-
-	if err == nil {
-		gmt, err := time.LoadLocation("GMT")
-
-		if err != nil {
-			return 0, fmt.Errorf("unable to load GMT: %v", err)
-		}
-
-		headers["If-Modified-Since"] = []string{fileInfo.ModTime().In(gmt).Format(time.RFC1123)}
-	} else if !os.IsNotExist(err) {
-		return 0, fmt.Errorf("unable to open file: %v", err)
-	}
-
-	req := &http.Request{
-		Method: http.MethodGet,
-		URL:    fileUrl,
-		Header: headers,
-	}
-
-	res, err := http.DefaultClient.Do(req)
-
-	if err != nil {
-		return 0, fmt.Errorf("download failed: %v", err)
-	}
-
-	if res.StatusCode == 200 {
-		err = os.Remove(filePath)
-
-		if err != nil && !os.IsNotExist(err) {
-			return 0, fmt.Errorf("unable to delete file: %v", err)
-		}
-
-		file, err := os.Create(filePath)
-
-		if err != nil {
-			return 0, fmt.Errorf("unable to create file: %v", err)
-		}
-
-		defer file.Close()
-
-		_, err = io.Copy(file, res.Body)
-
-		if err != nil {
-			return 0, err
-		}
-	} else if res.StatusCode != 304 {
-		return 0, fmt.Errorf("unexpected status code: %v", res.StatusCode)
-	}
-
-	return res.StatusCode, nil
 }
