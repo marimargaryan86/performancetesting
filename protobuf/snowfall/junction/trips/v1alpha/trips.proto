@@ -11,7 +11,16 @@ service TripSearchService {
 }
 
 service TripService {
+  rpc GetTrip(GetTripRequest) returns (GetTripResponse) {}
   rpc ListTrips(ListTripsRequest) returns (ListTripsResponse) {}
+}
+
+message GetTripRequest {
+  string id = 1;
+}
+
+message GetTripResponse {
+  snowfall.common.v1alpha.TripReference trip = 1;
 }
 
 message EnqueueTripSearchRequest {

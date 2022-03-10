@@ -11,6 +11,7 @@ PLACES = (
     "488a836d-ec22-439b-a9d8-3c4c386a731e",
 )
 TRIP = "b3e45af0-f3ae-46e5-a94f-fd1c9d86fb7d"
+TRIPS = ("b3e45af0-f3ae-46e5-a94f-fd1c9d86fb7d",)
 
 
 def get_places() -> list[models_pb2.Place]:
@@ -27,4 +28,14 @@ def generate_place(identifier: str) -> models_pb2.Place:
         ),
         country_code="SE",
         time_zone="Europe/Stockholm",
+    )
+
+
+def get_trips() -> list[models_pb2.TripReference]:
+    return [generate_trip_reference(identifier) for identifier in TRIPS]
+
+
+def generate_trip_reference(identifier: str) -> models_pb2.TripReference:
+    return models_pb2.TripReference(
+        id=identifier,
     )

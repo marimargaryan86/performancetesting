@@ -21,6 +21,18 @@ class TripService(Service, trips_pb2_grpc.TripServiceServicer):
     def register(self, server: aio.Server) -> None:
         trips_pb2_grpc.add_TripServiceServicer_to_server(self, server)
 
+    async def GetTrip(  # type: ignore[override] # noqa: N802
+        self,
+        request: trips_pb2.GetTripRequest,
+        context: aio.ServicerContext,
+    ) -> trips_pb2.GetTripResponse:
+        trip = await self._repository.find_by_id(request.id)
+
+        if not trip:
+            await context.abort(StatusCode.NOT_FOUND)
+
+        return trips_pb2.GetTripResponse(trip=trip)
+
     async def ListTrips(  # type: ignore[override] # noqa: N802
         self,
         request: trips_pb2.ListTripsRequest,
