@@ -37,6 +37,10 @@ job "planner" {
         memory = 8192
       }
 
+      vault {
+        policies = ["planner-dev"]
+      }
+
       config {
         image = "${DOCKER_IMAGE}"
         ports = ["grpc"]
@@ -51,28 +55,52 @@ job "planner" {
         }
       }
 
-      artifact {
-        source = "s3::https://sf-junction-data.s3.eu-north-1.amazonaws.com/proto/route_segments.bin"
+      template {
+        destination = "services.env"
+        env         = true
+        change_mode = "restart"
+        data        = <<EOH
+{{ with secret "kv/dev/planner" }}
+{{ if .Data.data.aws_access_key_id }}AWS_ACCESS_KEY_ID="{{ .Data.data.aws_access_key_id }}"{{ end }}
+{{ if .Data.data.aws_secret_access_key }}AWS_SECRET_ACCESS_KEY="{{ .Data.data.aws_secret_access_key }}"{{ end }}
+{{ end }}
+EOH
       }
 
       artifact {
-        source = "s3::https://sf-junction-data.s3.eu-north-1.amazonaws.com/proto/routes.bin"
+        source                = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/route_stops.bin"
+        aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
+        aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
       }
 
       artifact {
-        source = "s3::https://sf-junction-data.s3.eu-north-1.amazonaws.com/proto/stops.bin"
+        source                = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/routes.bin"
+        aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
+        aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
       }
 
       artifact {
-        source = "s3::https://sf-junction-data.s3.eu-north-1.amazonaws.com/proto/transfers.bin"
+        source                = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/stops.bin"
+        aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
+        aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
       }
 
       artifact {
-        source = "s3::https://sf-junction-data.s3.eu-north-1.amazonaws.com/proto/trip_segments.bin"
+        source                = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/transfers.bin"
+        aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
+        aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
       }
 
       artifact {
-        source = "s3::https://sf-junction-data.s3.eu-north-1.amazonaws.com/proto/trips.bin"
+        source                = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/schedule_stops.bin"
+        aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
+        aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
+      }
+
+      artifact {
+        source                = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/schedules.bin"
+        aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
+        aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
       }
 
       env {

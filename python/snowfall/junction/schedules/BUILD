@@ -2,7 +2,6 @@ python_sources()
 pex_binary(
     name="main",
     entry_point="main.py",
-    restartable=True,
 )
 docker_image(
     name="docker",

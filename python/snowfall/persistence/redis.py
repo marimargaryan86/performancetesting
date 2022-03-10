@@ -11,8 +11,8 @@ class Hash(object):
     async def set_(self, hash_key: str, hash_value: Any) -> None:
         await self._redis.hset(self._hash, hash_key, hash_value)
 
-    async def delete(self, hash_value: str) -> None:
-        await self._redis.hdel(self._hash, hash_value)
+    async def delete(self, hash_key: str) -> None:
+        await self._redis.hdel(self._hash, hash_key)
 
     async def get(self, hash_key: str) -> Optional[bytes]:
         return await self._redis.hget(self._hash, hash_key)

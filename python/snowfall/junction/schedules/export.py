@@ -1,10 +1,10 @@
 import datetime
 import hashlib
 import pathlib
-import pickle  # nosec
 from typing import Literal
 
 import aiofiles
+import orjson
 import structlog
 from aiofiles.threadpool import binary
 from h3.api import numpy_int as h3
@@ -153,14 +153,12 @@ class Exporter(object):  # noqa: WPS214
                 schedule_stops=schedule_stops,
             )
 
-            first_departure = int(
-                schedule.stops[0].departure_at.ToDatetime().timestamp(),
-            )
+            first_departure = schedule.stops[0].departure_at.ToSeconds()
 
             await self._redis.list_(
                 "routes.{0}.schedules".format(export_schedule.route),
             ).push(
-                pickle.dumps(
+                orjson.dumps(
                     (export_schedule.sequence, first_departure),
                 ),
             )
@@ -263,7 +261,7 @@ class Exporter(object):  # noqa: WPS214
 
                 schedules_sorted = sorted(
                     [
-                        pickle.loads(pickled_schedule)  # nosec
+                        orjson.loads(pickled_schedule)  # nosec
                         async for pickled_schedule in self._redis.list_(
                             "routes.{0}.schedules".format(route.sequence),
                         ).to_iterable()
@@ -294,7 +292,7 @@ class Exporter(object):  # noqa: WPS214
 
                 schedule_stops = sorted(
                     [
-                        pickle.loads(pickled_s_stop)  # nosec
+                        orjson.loads(pickled_s_stop)  # nosec
                         async for pickled_s_stop in self._redis.list_(
                             "stops.{0}.schedule_stops".format(stop.sequence),
                         ).to_iterable()
@@ -333,7 +331,7 @@ class Exporter(object):  # noqa: WPS214
                 schedule_stop.stop,
             ),
         ).push(
-            pickle.dumps(
+            orjson.dumps(
                 (
                     schedule_stop.sequence,
                     schedule_stop.departure_at,

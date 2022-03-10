@@ -14,7 +14,7 @@ job "gtfs-feed" {
       size = 1000
     }
 
-    task "netherlands" {
+    task "france-intercity" {
       driver = "docker"
 
       template {
@@ -42,8 +42,8 @@ EOH
       }
 
       env {
-        FEED_REF   = "netherlands"
-        FEED_URL   = "http://gtfs.ovapi.nl/gtfs-nl.zip"
+        FEED_REF   = "france-intercity"
+        FEED_URL   = "https://eu.ftp.opendatasoft.com/sncf/gtfs/export-intercites-gtfs-last.zip"
         SENTRY_DSN = "https://d86394991a184238865125d76e464d6d@sentry.snowfall.se/21"
       }
     }
