@@ -3,7 +3,7 @@ nomad:validate:
   interruptible: true
   image: "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"
   script:
-    - find . -name '*.nomad' -exec nomad validate {} \;
+    - find . -name '*.nomad' -print0 | xargs -0 -n1 nomad validate
   rules:
     - if: $CI_MERGE_REQUEST_IID
       changes:

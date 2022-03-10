@@ -68,7 +68,7 @@ EOH
       }
 
       artifact {
-        source = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/route_stops.bin"¨
+        source = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/route_stops.bin"
         options {
           aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
           aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
