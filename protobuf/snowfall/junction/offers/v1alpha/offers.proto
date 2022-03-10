@@ -78,4 +78,6 @@ message TripOfferSearchTask {
 message TripOfferResult {
   string id = 1;
   string offer_search_id = 2;
+  repeated snowfall.common.v1alpha.Schedule schedules = 3;
+  snowfall.common.v1alpha.Price price = 4;
 }

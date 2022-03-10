@@ -9,6 +9,11 @@ message Coordinates {
   double longitude = 2;
 }
 
+message Price {
+  uint32 amount = 1;
+  string currency = 2;
+}
+
 message Cursor {
   string id = 1;
   string filter = 2;
