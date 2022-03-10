@@ -37,10 +37,6 @@ job "planner" {
         memory = 8192
       }
 
-      vault {
-        policies = ["planner-dev"]
-      }
-
       config {
         image = "${DOCKER_IMAGE}"
         ports = ["grpc"]
@@ -55,63 +51,51 @@ job "planner" {
         }
       }
 
-      template {
-        destination = "services.env"
-        env         = true
-        change_mode = "restart"
-        data        = <<EOH
-{{ with secret "kv/dev/planner" }}
-{{ if .Data.data.aws_access_key_id }}AWS_ACCESS_KEY_ID="{{ .Data.data.aws_access_key_id }}"{{ end }}
-{{ if .Data.data.aws_secret_access_key }}AWS_SECRET_ACCESS_KEY="{{ .Data.data.aws_secret_access_key }}"{{ end }}
-{{ end }}
-EOH
-      }
-
       artifact {
         source = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/route_stops.bin"
         options {
-          aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
-          aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
+          aws_access_key_id     = "AKIA6JO5TGEWEV7G2IHA"
+          aws_access_key_secret = "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"
         }
       }
 
       artifact {
         source = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/routes.bin"
         options {
-          aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
-          aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
+          aws_access_key_id     = "AKIA6JO5TGEWEV7G2IHA"
+          aws_access_key_secret = "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"
         }
       }
 
       artifact {
         source = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/stops.bin"
         options {
-          aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
-          aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
+          aws_access_key_id     = "AKIA6JO5TGEWEV7G2IHA"
+          aws_access_key_secret = "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"
         }
       }
 
       artifact {
         source = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/transfers.bin"
         options {
-          aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
-          aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
+          aws_access_key_id     = "AKIA6JO5TGEWEV7G2IHA"
+          aws_access_key_secret = "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"
         }
       }
 
       artifact {
         source = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/schedule_stops.bin"
         options {
-          aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
-          aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
+          aws_access_key_id     = "AKIA6JO5TGEWEV7G2IHA"
+          aws_access_key_secret = "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"
         }
       }
 
       artifact {
         source = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/schedules.bin"
         options {
-          aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
-          aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
+          aws_access_key_id     = "AKIA6JO5TGEWEV7G2IHA"
+          aws_access_key_secret = "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"
         }
       }
 
