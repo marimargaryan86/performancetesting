@@ -7,7 +7,7 @@ job "gtfs-feed" {
     prohibit_overlap = true
   }
 
-  group "netherlands" {
+  group "france-intercity" {
     count = 1
 
     ephemeral_disk {

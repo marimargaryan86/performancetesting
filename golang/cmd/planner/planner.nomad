@@ -68,39 +68,51 @@ EOH
       }
 
       artifact {
-        source                = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/route_stops.bin"
-        aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
-        aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
+        source = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/route_stops.bin"¨
+        options {
+          aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
+          aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
+        }
       }
 
       artifact {
-        source                = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/routes.bin"
-        aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
-        aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
+        source = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/routes.bin"
+        options {
+          aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
+          aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
+        }
       }
 
       artifact {
-        source                = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/stops.bin"
-        aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
-        aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
+        source = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/stops.bin"
+        options {
+          aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
+          aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
+        }
       }
 
       artifact {
-        source                = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/transfers.bin"
-        aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
-        aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
+        source = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/transfers.bin"
+        options {
+          aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
+          aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
+        }
       }
 
       artifact {
-        source                = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/schedule_stops.bin"
-        aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
-        aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
+        source = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/schedule_stops.bin"
+        options {
+          aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
+          aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
+        }
       }
 
       artifact {
-        source                = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/schedules.bin"
-        aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
-        aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
+        source = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/schedules.bin"
+        options {
+          aws_access_key_id     = "${AWS_ACCESS_KEY_ID}"
+          aws_access_key_secret = "${AWS_SECRET_ACCESS_KEY}"
+        }
       }
 
       env {
