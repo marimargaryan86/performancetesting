@@ -33,12 +33,12 @@ async def load(
         yield msg
 
 
-async def datetime_to_protobuf(timestamp: datetime.datetime) -> timestamp_pb2.Timestamp:
+def datetime_to_protobuf(timestamp: datetime.datetime) -> timestamp_pb2.Timestamp:
     proto = timestamp_pb2.Timestamp()
     proto.FromDatetime(timestamp)
 
     return proto
 
 
-async def protobuf_to_datetime(proto: timestamp_pb2.Timestamp) -> datetime.datetime:
+def protobuf_to_datetime(proto: timestamp_pb2.Timestamp) -> datetime.datetime:
     return proto.ToDatetime().replace(tzinfo=datetime.timezone.utc)

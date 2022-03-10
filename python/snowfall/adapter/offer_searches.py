@@ -54,7 +54,7 @@ class DictClient(Client):
         )
         offer_search = offers_pb2.OfferSearch(
             id=str(uuid.uuid4()),
-            expires_at=await protobuf.datetime_to_protobuf(expires_at),
+            expires_at=protobuf.datetime_to_protobuf(expires_at),
             trip=request.trip,
         )
         self._searches[offer_search.id] = offer_search

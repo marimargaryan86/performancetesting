@@ -47,7 +47,7 @@ class ScheduleRepository(repository.ProtoRepository[models_pb2.Schedule]):
         if not schedule:
             return datetime.datetime.fromtimestamp(0, tz=datetime.timezone.utc)
 
-        return await protobuf.protobuf_to_datetime(schedule.updated_at)
+        return protobuf.protobuf_to_datetime(schedule.updated_at)
 
     async def upsert(self, resource: models_pb2.Schedule) -> bool:
         update_result: results.UpdateResult = await self._execute(

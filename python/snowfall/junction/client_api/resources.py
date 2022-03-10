@@ -78,10 +78,10 @@ class TripSearchResource(models.Resource):
             id=trip_search.id,
             type="trip-searches",
             attributes={
-                "expiresAt": await protobuf.protobuf_to_datetime(
+                "expiresAt": protobuf.protobuf_to_datetime(
                     trip_search.expires_at,
                 ),
-                "departureAfter": await protobuf.protobuf_to_datetime(
+                "departureAfter": protobuf.protobuf_to_datetime(
                     trip_search.departure_after,
                 ),
             },
@@ -142,7 +142,7 @@ class TripOfferSearchResource(models.Resource):
         offer_search: offers_pb2.OfferSearch,
     ) -> dict[str, Any]:
         attributes = {
-            "expiresAt": await protobuf.protobuf_to_datetime(
+            "expiresAt": protobuf.protobuf_to_datetime(
                 offer_search.expires_at,
             ),
             "passengers": [

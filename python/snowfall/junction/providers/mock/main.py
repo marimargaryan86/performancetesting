@@ -32,7 +32,7 @@ class MockClient(object):
                     stops=[
                         models_pb2.Stop(
                             id="234",
-                            departure_at=await protobuf.datetime_to_protobuf(
+                            departure_at=protobuf.datetime_to_protobuf(
                                 datetime.datetime.now(tz=datetime.timezone.utc),
                             ),
                             point=models_pb2.Point(
@@ -44,7 +44,7 @@ class MockClient(object):
                         ),
                         models_pb2.Stop(
                             id="234",
-                            arrival_at=await protobuf.datetime_to_protobuf(
+                            arrival_at=protobuf.datetime_to_protobuf(
                                 datetime.datetime.now(tz=datetime.timezone.utc)
                                 + datetime.timedelta(hours=1),
                             ),

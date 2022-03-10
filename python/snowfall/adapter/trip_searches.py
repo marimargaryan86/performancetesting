@@ -55,10 +55,10 @@ class DictClient(Client):
         )
         trip_search = trips_pb2.TripSearch(
             id=str(uuid.uuid4()),
-            expires_at=await protobuf.datetime_to_protobuf(expires_at),
+            expires_at=protobuf.datetime_to_protobuf(expires_at),
             origin=trip_search_request.origin,
             destination=trip_search_request.destination,
-            departure_after=await protobuf.datetime_to_protobuf(
+            departure_after=protobuf.datetime_to_protobuf(
                 trip_search_request.departure_after,
             ),
         )
