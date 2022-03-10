@@ -1,4 +1,3 @@
-import uuid
 from typing import Any
 
 import pytest
@@ -24,7 +23,7 @@ class TestTrips(object):
         client: testclient.TestClient,
     ) -> None:
         response = client.get(
-            "/trips/{id}".format(id=str(uuid.uuid4())),
+            "/trips/{id}".format(id=fixtures.TRIP),
         )
         assert response.status_code == status.HTTP_200_OK
 

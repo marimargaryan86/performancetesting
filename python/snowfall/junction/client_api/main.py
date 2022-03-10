@@ -1,3 +1,4 @@
+# flake8: noqa: WPS201
 import http
 import random
 
@@ -6,7 +7,7 @@ import uvicorn
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
-from snowfall.adapter import offer_searches, places, trip_searches
+from snowfall.adapter import offer_searches, places, trip_searches, trips
 from snowfall.filesystem import loaders
 from snowfall.junction.client_api import (
     bootstrap,
@@ -17,6 +18,7 @@ from snowfall.junction.client_api import (
 )
 from snowfall.junction.offers.v1alpha import offers_pb2_grpc
 from snowfall.junction.places.v1alpha import places_pb2_grpc
+from snowfall.junction.trips.v1alpha import trips_pb2_grpc
 from snowfall.service import make_service
 
 
@@ -55,6 +57,13 @@ def _factory() -> applications.Starlette:
                 ),
             ),
             trip_searches_client=trip_searches.DictClient(),
+            trips_client=trips.GrpcClient(
+                trips_pb2_grpc.TripServiceStub(
+                    grpc.aio.insecure_channel(
+                        random.choice(settings.trips_address),  # nosec
+                    ),
+                ),
+            ),
             offer_searches_client=offer_searches.GrpcClient(
                 offers=offers_pb2_grpc.OfferServiceStub(offers_channel),
                 offer_searches=offers_pb2_grpc.OfferSearchServiceStub(offers_channel),

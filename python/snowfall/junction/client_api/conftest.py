@@ -9,7 +9,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from starlette import applications, testclient
 from starlette.middleware import Middleware, authentication
 
-from snowfall.adapter import offer_searches, places, trip_searches
+from snowfall.adapter import offer_searches, places, trip_searches, trips
 from snowfall.filesystem import loaders
 from snowfall.junction.client_api import (
     bootstrap,
@@ -44,6 +44,7 @@ def _create_app(
     custom_middlewares: Sequence[Middleware],
     places_client: places.Client,
     trip_searches_client: trip_searches.Client,
+    trips_client: trips.Client,
     offer_searches_client: offer_searches.Client,
 ) -> applications.Starlette:
     return bootstrap.create_app(
@@ -51,6 +52,7 @@ def _create_app(
         dependencies=bootstrap.create_dependencies(
             places_client=places_client,
             trip_searches_client=trip_searches_client,
+            trips_client=trips_client,
             offer_searches_client=offer_searches_client,
         ),
     )
@@ -68,6 +70,7 @@ def headers() -> dict[str, str]:
 def app(
     places_client: places.Client,
     trip_searches_client: trip_searches.Client,
+    trips_client: trips.Client,
     offer_searches_client: offer_searches.Client,
 ) -> applications.Starlette:
     return _create_app(
@@ -91,6 +94,7 @@ def app(
         ],
         places_client=places_client,
         trip_searches_client=trip_searches_client,
+        trips_client=trips_client,
         offer_searches_client=offer_searches_client,
     )
 
@@ -119,6 +123,7 @@ def unauthorized_client(
 def test_app(
     places_client: places.Client,
     trip_searches_client: trip_searches.Client,
+    trips_client: trips.Client,
     offer_searches_client: offer_searches.Client,
 ) -> applications.Starlette:
     return _create_app(
@@ -134,6 +139,7 @@ def test_app(
         ],
         places_client=places_client,
         trip_searches_client=trip_searches_client,
+        trips_client=trips_client,
         offer_searches_client=offer_searches_client,
     )
 

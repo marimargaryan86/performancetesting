@@ -8,7 +8,7 @@ from lagom.integrations import starlette
 from starlette import applications, exceptions, status
 from starlette.middleware import Middleware
 
-from snowfall.adapter import offer_searches, places, trip_searches
+from snowfall.adapter import offer_searches, places, trip_searches, trips
 from snowfall.junction.client_api import handlers
 from snowfall.junction.client_api.routes import router
 
@@ -22,6 +22,7 @@ class Settings(pydantic.BaseSettings):
     jwt_public_key: str
     jwt_token_version: str
     places_address: Sequence[str]
+    trips_address: Sequence[str]
     offers_address: Sequence[str]
     reload: bool = False
 
@@ -33,11 +34,13 @@ class Settings(pydantic.BaseSettings):
 def create_dependencies(
     places_client: places.Client,
     trip_searches_client: trip_searches.Client,
+    trips_client: trips.Client,
     offer_searches_client: offer_searches.Client,
 ) -> starlette.StarletteIntegration:
     container = lagom.Container()
     container[places.Client] = places_client  # type: ignore[misc]
     container[trip_searches.Client] = trip_searches_client  # type: ignore[misc]
+    container[trips.Client] = trips_client  # type: ignore[misc]
     container[offer_searches.Client] = offer_searches_client  # type: ignore[misc]
 
     return starlette.StarletteIntegration(container)

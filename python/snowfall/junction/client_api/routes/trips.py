@@ -4,9 +4,7 @@ import lagom
 from dateutil import parser
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall import fixtures
-from snowfall.adapter import places, trip_searches
-from snowfall.common.v1alpha import models_pb2
+from snowfall.adapter import places, trip_searches, trips
 from snowfall.junction.client_api import models, request_helpers, resources
 
 
@@ -14,17 +12,17 @@ class Trip(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
+        client: trips.Client = lagom.injectable,
     ) -> responses.Response:
-
-        if request.path_params["tripId"] == fixtures.NOT_FOUND:
+        try:
+            trip = await client.get(request.path_params["tripId"])
+        except trips.NotFoundError:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
         return models.JsonApiResponse(
             models.Body(
                 data=await resources.TripResource.from_proto(
-                    trip=models_pb2.TripReference(
-                        id=request.path_params["tripId"],
-                    ),
+                    trip=trip,
                     request=request,
                 ),
             ),
@@ -102,7 +100,7 @@ class TripsByTripSearch(endpoints.HTTPEndpoint):
         client: trip_searches.Client = lagom.injectable,
     ) -> responses.Response:
         try:
-            trips = await client.list_trips_by_trip_search(
+            trips_result = await client.list_trips_by_trip_search(
                 request.path_params["tripSearchId"],
             )
         except trip_searches.NotFoundError:
@@ -115,7 +113,7 @@ class TripsByTripSearch(endpoints.HTTPEndpoint):
                         trip=trip,
                         request=request,
                     )
-                    for trip in trips
+                    for trip in trips_result
                 ],
             ),
         )
