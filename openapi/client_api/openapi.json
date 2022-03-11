@@ -2759,7 +2759,8 @@
         "in": "query",
         "required": false,
         "schema": {
-          "type": "string"
+          "type": "string",
+          "default": ""
         },
         "description": "Pagination cursor that defines your place in the list."
       },

@@ -8,9 +8,6 @@ from starlette import endpoints, exceptions, requests, responses, status
 from snowfall.adapter import places, trip_searches, trips
 from snowfall.junction.client_api import models, request_helpers, resources
 
-_DEFAULT_PAGE_LIMIT = 20
-_MAX_PAGE_LIMIT = 100
-
 
 class Trip(endpoints.HTTPEndpoint):
     async def get(
@@ -103,14 +100,13 @@ class TripsByTripSearch(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: trip_searches.Client = lagom.injectable,
     ) -> responses.Response:
-        limit = min(
-            int(request.query_params.get("page[limit]", _DEFAULT_PAGE_LIMIT)),
-            _MAX_PAGE_LIMIT,
-        )
+        cursor = request.query_params["page[cursor]"]
+        limit = int(request.query_params["page[limit]"])
 
         try:
             response = await client.list_trips_by_trip_search(
                 request.path_params["tripSearchId"],
+                cursor=cursor,
                 limit=limit,
             )
         except trip_searches.NotFoundError:

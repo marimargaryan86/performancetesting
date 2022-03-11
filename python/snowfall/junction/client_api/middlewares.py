@@ -74,13 +74,14 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
         openapi_request = await validation.request_to_openapi(resolved_request)
 
         try:
-            auth_key = await self._validator.validate_request(openapi_request)
+            openapi_result = await self._validator.validate_request(openapi_request)
         except PathNotFound:
             raise exceptions.HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         except OpenAPIError as err:
             return await handlers.validation_error_handler(resolved_request, err)
 
-        resolved_request.scope["jwt"] = auth_key
+        resolved_request.scope["jwt"] = openapi_result.security.get("jwt")
+        resolved_request.scope["query_string"] = openapi_result.parameters.query
 
         return await self._dispatch(call_next, openapi_request, resolved_request)
 

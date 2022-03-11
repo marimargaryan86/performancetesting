@@ -1,9 +1,13 @@
 import json
-from typing import Any, Optional
+from typing import Any
 
 import openapi_core
 from furl import furl
-from openapi_core.validation.request.datatypes import OpenAPIRequest, RequestParameters
+from openapi_core.validation.request.datatypes import (
+    OpenAPIRequest,
+    RequestParameters,
+    RequestValidationResult,
+)
 from openapi_core.validation.request.validators import RequestValidator
 from openapi_core.validation.response.datatypes import OpenAPIResponse
 from openapi_core.validation.response.validators import ResponseValidator
@@ -69,11 +73,14 @@ class Validator(object):
             custom_media_type_deserializers=deserializer,
         )
 
-    async def validate_request(self, request: OpenAPIRequest) -> Optional[str]:
+    async def validate_request(
+        self,
+        request: OpenAPIRequest,
+    ) -> RequestValidationResult:
         validation_result = self._request_validator.validate(request)
         validation_result.raise_for_errors()
 
-        return validation_result.security.get("jwt")
+        return validation_result
 
     async def validate_response(
         self,
