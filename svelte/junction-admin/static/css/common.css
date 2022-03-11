@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;500;600;700;800;900&family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+	--color-black: #000000;
+	--color-white: #ffffff;
+	--color-gray-light: #eeeeee;
+	--color-gray-darker: #272727;
+	--color-teal-light: #c3ebe5;
+	--color-teal-dark: #286961;
+	--color-teal-darker: #082e29;
+}
+
+html {
+	box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: inherit;
+}
+
+body {
+	font-family: 'Open Sans', Helvetica, sans-serif;
+	font-size: 16px;
+}
+
+h1.main-header {
+	font-size: 2em;
+	margin-bottom: 0.5em;
+	color: var(--color-teal-dark);
+}
+
+input:not(.raw) {
+	font-family: inherit;
+	font-size: 16px;
+	padding: 8px 12px;
+	border: var(--color-teal-dark) 1px solid;
+	height: 40px;
+}
+
+button:not(.raw) {
+	font-family: inherit;
+	font-size: 16px;
+	padding: 8px 24px;
+	border: var(--color-gray-dark) 1px solid;
+	background-color: var(--color-teal-dark);
+	color: var(--color-white);
+	cursor: pointer;
+	height: 40px;
+}
