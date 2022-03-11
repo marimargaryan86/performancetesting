@@ -2,10 +2,14 @@ import datetime
 
 import lagom
 from dateutil import parser
+from furl import furl
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.adapter import places, trip_searches, trips
 from snowfall.junction.client_api import models, request_helpers, resources
+
+_DEFAULT_PAGE_LIMIT = 20
+_MAX_PAGE_LIMIT = 100
 
 
 class Trip(endpoints.HTTPEndpoint):
@@ -99,12 +103,27 @@ class TripsByTripSearch(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: trip_searches.Client = lagom.injectable,
     ) -> responses.Response:
+        limit = min(
+            int(request.query_params.get("page[limit]", _DEFAULT_PAGE_LIMIT)),
+            _MAX_PAGE_LIMIT,
+        )
+
         try:
-            trips_result = await client.list_trips_by_trip_search(
+            response = await client.list_trips_by_trip_search(
                 request.path_params["tripSearchId"],
+                limit=limit,
             )
         except trip_searches.NotFoundError:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+        next_url = furl(
+            request.url_for(
+                "ViewTripsByTripSearch",
+                tripSearchId=request.path_params["tripSearchId"],
+            ),
+        )
+        next_url.args["page[cursor]"] = response.next_page_token
+        next_url.args["page[limit]"] = limit
 
         return models.JsonApiResponse(
             models.Body(
@@ -113,7 +132,10 @@ class TripsByTripSearch(endpoints.HTTPEndpoint):
                         trip=trip,
                         request=request,
                     )
-                    for trip in trips_result
+                    for trip in response.trips
                 ],
+                links={
+                    "next": next_url.url,
+                },
             ),
         )

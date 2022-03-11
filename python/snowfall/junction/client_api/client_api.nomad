@@ -50,10 +50,11 @@ job "client-api" {
         data        = <<EOH
 PLACES_ADDRESS="[{{range $index, $service := service "grpc.places"}}{{if ne $index 0}},{{end}}\"{{.Address}}:{{.Port}}\"{{end}}]"
 OFFERS_ADDRESS="[{{range $index, $service := service "grpc.offers"}}{{if ne $index 0}},{{end}}\"{{.Address}}:{{.Port}}\"{{end}}]"
+TRIPS_ADDRESS="[{{range $index, $service := service "grpc.trips"}}{{if ne $index 0}},{{end}}\"{{.Address}}:{{.Port}}\"{{end}}]"
 {{ with secret "kv/dev/client-api" }}
 {{ if .Data.data.jwt_public_key }}JWT_PUBLIC_KEY="{{ .Data.data.jwt_public_key }}"{{ end }}
 {{ end }}
-EOH 
+EOH
       }
 
       config {

@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import abc
-from typing import Sequence
+import dataclasses
+from typing import Optional, Sequence
 
 import grpc
 
@@ -15,6 +16,19 @@ class NotFoundError(Exception):
 
 class UnknownError(Exception):
     """Raised when an unhandled error occurs."""
+
+
+@dataclasses.dataclass(frozen=True)
+class TripsPage(object):
+    trips: Sequence[models_pb2.TripReference]
+    next_page_token: Optional[str] = None
+
+    @classmethod
+    def from_proto(cls, grpc_trips: trips_pb2.ListTripsResponse) -> TripsPage:
+        return cls(
+            trips=grpc_trips.trips,
+            next_page_token=grpc_trips.next_page_token,
+        )
 
 
 class Client(abc.ABC):

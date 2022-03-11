@@ -4,14 +4,22 @@ import abc
 import dataclasses
 import datetime
 import uuid
+from typing import Optional
 
+import grpc
+
+from snowfall.adapter.trips import TripsPage
 from snowfall.common.v1alpha import models_pb2
 from snowfall.format import protobuf
-from snowfall.junction.trips.v1alpha import trips_pb2
+from snowfall.junction.trips.v1alpha import trips_pb2, trips_pb2_grpc
 
 
 class NotFoundError(Exception):
     """Raised when a trip search resource is not found."""
+
+
+class UnknownError(Exception):
+    """Raised when an unhandled error occurs."""
 
 
 @dataclasses.dataclass(frozen=True)
@@ -37,7 +45,9 @@ class Client(abc.ABC):
     async def list_trips_by_trip_search(
         self,
         identifier: str,
-    ) -> list[models_pb2.TripReference]:
+        limit: int,
+        cursor: Optional[str] = None,
+    ) -> TripsPage:
         """List trips by trip search."""
 
 
@@ -76,9 +86,15 @@ class DictClient(Client):
     async def list_trips_by_trip_search(
         self,
         identifier: str,
-    ) -> list[models_pb2.TripReference]:
+        limit: int,
+        cursor: Optional[str] = None,
+    ) -> TripsPage:
         try:
-            return self._trips_cache[identifier]
+            return TripsPage.from_proto(
+                trips_pb2.ListTripsResponse(
+                    trips=self._trips_cache[identifier],
+                ),
+            )
         except KeyError:
             raise NotFoundError()
 
@@ -96,3 +112,69 @@ class DictClient(Client):
                 ],
             ),
         ]
+
+
+class GrpcClient(Client):
+    def __init__(
+        self,
+        trips: trips_pb2_grpc.TripServiceStub,
+        trip_searches: trips_pb2_grpc.TripSearchServiceStub,
+    ):
+        self._trips = trips
+        self._trip_searches = trip_searches
+
+    async def create(
+        self,
+        trip_search_request: TripSearchRequest,
+    ) -> trips_pb2.TripSearch:
+        request = trips_pb2.EnqueueTripSearchRequest(
+            trip_search=trips_pb2.TripSearch(
+                origin=trip_search_request.origin,
+                destination=trip_search_request.destination,
+                departure_after=protobuf.datetime_to_protobuf(
+                    trip_search_request.departure_after,
+                ),
+            ),
+        )
+
+        response = await self._trip_searches.EnqueueTripSearch(request)
+
+        return response.trip_search
+
+    async def get(self, identifier: str) -> trips_pb2.TripSearch:
+        try:
+            response = await self._trip_searches.GetTripSearchDetails(
+                trips_pb2.GetTripSearchDetailsRequest(
+                    id=identifier,
+                ),
+            )
+        except grpc.aio.AioRpcError as exc:
+            if exc.code() == grpc.StatusCode.NOT_FOUND:
+                raise NotFoundError(
+                    "Trip Search with ID '{id}' not found.".format(id=identifier),
+                ) from exc
+
+            raise UnknownError(exc.details()) from exc
+
+        return response.trip_search
+
+    async def list_trips_by_trip_search(
+        self,
+        identifier: str,
+        limit: int,
+        cursor: Optional[str] = None,
+    ) -> TripsPage:
+        trip_search = await self.get(identifier)
+
+        if not trip_search.trip_ids:
+            return TripsPage.from_proto(trips_pb2.ListTripsResponse())
+
+        response = await self._trips.ListTrips(
+            trips_pb2.ListTripsRequest(
+                ids=trip_search.trip_ids,
+                page_size=limit,
+                page_token=cursor or "",
+            ),
+        )
+
+        return TripsPage.from_proto(response)

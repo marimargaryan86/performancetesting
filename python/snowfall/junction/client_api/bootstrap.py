@@ -22,8 +22,8 @@ class Settings(pydantic.BaseSettings):
     jwt_public_key: str
     jwt_token_version: str
     places_address: Sequence[str]
-    trips_address: Sequence[str]
     offers_address: Sequence[str]
+    trips_address: Sequence[str]
     reload: bool = False
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:

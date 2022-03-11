@@ -258,7 +258,15 @@
           }
         },
         "operationId": "get-legs-types",
-        "description": "Used to retrieve available Leg Types."
+        "description": "Used to retrieve available Leg Types.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
       }
     },
     "/legs/types/{legTypeId}": {
@@ -375,7 +383,15 @@
           }
         },
         "operationId": "get-segments-segment-id-legs",
-        "description": "Used to retrieve all Legs contained in a Segment."
+        "description": "Used to retrieve all Legs contained in a Segment.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
       }
     },
     "/trips/{tripId}": {
@@ -462,7 +478,15 @@
           }
         },
         "operationId": "get-trips-trip-id-legs",
-        "description": "Used to retrieve all Legs contained in a Trip."
+        "description": "Used to retrieve all Legs contained in a Trip.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
       }
     },
     "/trips/{tripId}/segments": {
@@ -503,7 +527,15 @@
           }
         },
         "operationId": "get-trips-trip-id-segments",
-        "description": "Used to retrieve all Segments contained in a Trip."
+        "description": "Used to retrieve all Segments contained in a Trip.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
       }
     },
     "/trips/{tripId}/prices": {
@@ -544,7 +576,15 @@
           }
         },
         "operationId": "get-trips-trip-id-prices",
-        "description": "Upcoming endpoint to retrieve cached offer prices for a particular trip. Not yet implemented."
+        "description": "Upcoming endpoint to retrieve cached offer prices for a particular trip. Not yet implemented.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
       }
     },
     "/trips/searches": {
@@ -687,7 +727,15 @@
           }
         },
         "operationId": "get-trips-searches-trip-search-id-legs",
-        "description": "Used to retrieve all Legs for all Trip results for a Trip Search."
+        "description": "Used to retrieve all Legs for all Trip results for a Trip Search.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
       }
     },
     "/trips/searches/{tripSearchId}/segments": {
@@ -738,7 +786,15 @@
           }
         },
         "operationId": "get-trips-searches-trip-search-id-segments",
-        "description": "Used to retrieve all Segments for all Trip results for a Trip Search."
+        "description": "Used to retrieve all Segments for all Trip results for a Trip Search.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
       }
     },
     "/trips/searches/{tripSearchId}/trips": {
@@ -781,7 +837,15 @@
           }
         },
         "operationId": "get-trips-searches-trip-search-id-trips",
-        "description": "Used to retrieve all Trip results for a Trip Search."
+        "description": "Used to retrieve all Trip results for a Trip Search.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
       }
     },
     "/offers/searches": {
@@ -946,7 +1010,15 @@
           }
         },
         "operationId": "get-offers-searches-offer-search-id-offers",
-        "description": "Used to retrieve all Offer results for an Offer Search."
+        "description": "Used to retrieve all Offer results for an Offer Search.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
       }
     },
     "/offers/searches/{offerSearchId}/related": {
@@ -996,7 +1068,15 @@
           }
         },
         "operationId": "get-offers-searches-offer-search-id-related",
-        "description": "Upcoming endpoint to retrieve related Offers that could be searched. Not yet implemented."
+        "description": "Upcoming endpoint to retrieve related Offers that could be searched. Not yet implemented.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
       }
     },
     "/offers/{offerId}": {
@@ -1118,7 +1198,15 @@
             }
           }
         },
-        "description": "Used to retrieve Orders made in Junction."
+        "description": "Used to retrieve Orders made in Junction.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
       },
       "parameters": []
     },

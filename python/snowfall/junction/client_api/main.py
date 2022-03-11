@@ -28,6 +28,9 @@ def _factory() -> applications.Starlette:
     offers_channel = grpc.aio.insecure_channel(
         random.choice(settings.offers_address),  # nosec
     )
+    trips_channel = grpc.aio.insecure_channel(
+        random.choice(settings.trips_address),  # nosec
+    )
 
     return bootstrap.create_app(
         custom_middlewares=[
@@ -56,13 +59,12 @@ def _factory() -> applications.Starlette:
                     ),
                 ),
             ),
-            trip_searches_client=trip_searches.DictClient(),
+            trip_searches_client=trip_searches.GrpcClient(
+                trips=trips_pb2_grpc.TripServiceStub(trips_channel),
+                trip_searches=trips_pb2_grpc.TripSearchServiceStub(trips_channel),
+            ),
             trips_client=trips.GrpcClient(
-                trips_pb2_grpc.TripServiceStub(
-                    grpc.aio.insecure_channel(
-                        random.choice(settings.trips_address),  # nosec
-                    ),
-                ),
+                trips_pb2_grpc.TripServiceStub(trips_channel),
             ),
             offer_searches_client=offer_searches.GrpcClient(
                 offers=offers_pb2_grpc.OfferServiceStub(offers_channel),
