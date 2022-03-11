@@ -18,6 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ScheduleServiceClient interface {
+	GetSchedule(ctx context.Context, in *GetScheduleRequest, opts ...grpc.CallOption) (*GetScheduleResponse, error)
 	ListSchedules(ctx context.Context, in *ListSchedulesRequest, opts ...grpc.CallOption) (*ListSchedulesResponse, error)
 }
 
@@ -27,6 +28,15 @@ type scheduleServiceClient struct {
 
 func NewScheduleServiceClient(cc grpc.ClientConnInterface) ScheduleServiceClient {
 	return &scheduleServiceClient{cc}
+}
+
+func (c *scheduleServiceClient) GetSchedule(ctx context.Context, in *GetScheduleRequest, opts ...grpc.CallOption) (*GetScheduleResponse, error) {
+	out := new(GetScheduleResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.junction.schedules.v1alpha.ScheduleService/GetSchedule", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *scheduleServiceClient) ListSchedules(ctx context.Context, in *ListSchedulesRequest, opts ...grpc.CallOption) (*ListSchedulesResponse, error) {
@@ -42,6 +52,7 @@ func (c *scheduleServiceClient) ListSchedules(ctx context.Context, in *ListSched
 // All implementations should embed UnimplementedScheduleServiceServer
 // for forward compatibility
 type ScheduleServiceServer interface {
+	GetSchedule(context.Context, *GetScheduleRequest) (*GetScheduleResponse, error)
 	ListSchedules(context.Context, *ListSchedulesRequest) (*ListSchedulesResponse, error)
 }
 
@@ -49,6 +60,9 @@ type ScheduleServiceServer interface {
 type UnimplementedScheduleServiceServer struct {
 }
 
+func (UnimplementedScheduleServiceServer) GetSchedule(context.Context, *GetScheduleRequest) (*GetScheduleResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSchedule not implemented")
+}
 func (UnimplementedScheduleServiceServer) ListSchedules(context.Context, *ListSchedulesRequest) (*ListSchedulesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListSchedules not implemented")
 }
@@ -62,6 +76,24 @@ type UnsafeScheduleServiceServer interface {
 
 func RegisterScheduleServiceServer(s grpc.ServiceRegistrar, srv ScheduleServiceServer) {
 	s.RegisterService(&ScheduleService_ServiceDesc, srv)
+}
+
+func _ScheduleService_GetSchedule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetScheduleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScheduleServiceServer).GetSchedule(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.junction.schedules.v1alpha.ScheduleService/GetSchedule",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScheduleServiceServer).GetSchedule(ctx, req.(*GetScheduleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _ScheduleService_ListSchedules_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -89,6 +121,10 @@ var ScheduleService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "snowfall.junction.schedules.v1alpha.ScheduleService",
 	HandlerType: (*ScheduleServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetSchedule",
+			Handler:    _ScheduleService_GetSchedule_Handler,
+		},
 		{
 			MethodName: "ListSchedules",
 			Handler:    _ScheduleService_ListSchedules_Handler,

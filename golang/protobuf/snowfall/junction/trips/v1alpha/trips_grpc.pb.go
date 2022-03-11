@@ -138,6 +138,7 @@ var TripSearchService_ServiceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TripServiceClient interface {
+	GetTrip(ctx context.Context, in *GetTripRequest, opts ...grpc.CallOption) (*GetTripResponse, error)
 	ListTrips(ctx context.Context, in *ListTripsRequest, opts ...grpc.CallOption) (*ListTripsResponse, error)
 }
 
@@ -147,6 +148,15 @@ type tripServiceClient struct {
 
 func NewTripServiceClient(cc grpc.ClientConnInterface) TripServiceClient {
 	return &tripServiceClient{cc}
+}
+
+func (c *tripServiceClient) GetTrip(ctx context.Context, in *GetTripRequest, opts ...grpc.CallOption) (*GetTripResponse, error) {
+	out := new(GetTripResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.junction.trips.v1alpha.TripService/GetTrip", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *tripServiceClient) ListTrips(ctx context.Context, in *ListTripsRequest, opts ...grpc.CallOption) (*ListTripsResponse, error) {
@@ -162,6 +172,7 @@ func (c *tripServiceClient) ListTrips(ctx context.Context, in *ListTripsRequest,
 // All implementations should embed UnimplementedTripServiceServer
 // for forward compatibility
 type TripServiceServer interface {
+	GetTrip(context.Context, *GetTripRequest) (*GetTripResponse, error)
 	ListTrips(context.Context, *ListTripsRequest) (*ListTripsResponse, error)
 }
 
@@ -169,6 +180,9 @@ type TripServiceServer interface {
 type UnimplementedTripServiceServer struct {
 }
 
+func (UnimplementedTripServiceServer) GetTrip(context.Context, *GetTripRequest) (*GetTripResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTrip not implemented")
+}
 func (UnimplementedTripServiceServer) ListTrips(context.Context, *ListTripsRequest) (*ListTripsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListTrips not implemented")
 }
@@ -182,6 +196,24 @@ type UnsafeTripServiceServer interface {
 
 func RegisterTripServiceServer(s grpc.ServiceRegistrar, srv TripServiceServer) {
 	s.RegisterService(&TripService_ServiceDesc, srv)
+}
+
+func _TripService_GetTrip_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTripRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TripServiceServer).GetTrip(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.junction.trips.v1alpha.TripService/GetTrip",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TripServiceServer).GetTrip(ctx, req.(*GetTripRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _TripService_ListTrips_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -209,6 +241,10 @@ var TripService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "snowfall.junction.trips.v1alpha.TripService",
 	HandlerType: (*TripServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetTrip",
+			Handler:    _TripService_GetTrip_Handler,
+		},
 		{
 			MethodName: "ListTrips",
 			Handler:    _TripService_ListTrips_Handler,

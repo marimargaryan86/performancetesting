@@ -75,8 +75,8 @@ func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *plan
 			segments = append(segments, &models.SegmentReference{
 				Id:                s.Id.String(),
 				ScheduleId:        s.ScheduleId.String(),
-				OriginStopId:      s.Legs[0].Id.String(),
-				DestinationStopId: s.Legs[len(s.Legs)-1].Id.String(),
+				OriginStopId:      s.Legs[0].Id,
+				DestinationStopId: s.Legs[len(s.Legs)-1].Id,
 			})
 		}
 
