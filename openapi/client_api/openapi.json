@@ -2547,13 +2547,13 @@
         "title": "Passenger",
         "type": "object",
         "properties": {
-          "age": {
-            "type": "integer",
-            "minimum": 0
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date"
           }
         },
         "required": [
-          "age"
+          "dateOfBirth"
         ]
       },
       "SelfLink": {

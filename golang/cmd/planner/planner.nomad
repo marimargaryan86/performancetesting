@@ -34,7 +34,7 @@ job "planner" {
       driver = "docker"
 
       resources {
-        memory = 8192
+        memory = 4096
       }
 
       config {

@@ -146,7 +146,8 @@ class TripOfferSearchResource(models.Resource):
                 offer_search.expires_at,
             ),
             "passengers": [
-                {"age": passenger.age} for passenger in offer_search.trip.passengers
+                {"dateOfBirth": protobuf.protobuf_to_date(passenger.date_of_birth)}
+                for passenger in offer_search.trip.passengers
             ],
         }
 

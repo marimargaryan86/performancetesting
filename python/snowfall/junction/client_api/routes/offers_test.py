@@ -20,7 +20,7 @@ class TestOfferSearches(object):
                     "attributes": {
                         "passengers": [
                             {
-                                "age": 42,
+                                "dateOfBirth": "1979-09-17",
                             },
                         ],
                     },
@@ -52,7 +52,7 @@ class TestOfferSearches(object):
                     "attributes": {
                         "passengers": [
                             {
-                                "age": 42,
+                                "dateOfBirth": "1979-09-17",
                             },
                         ],
                     },
@@ -84,7 +84,7 @@ class TestOfferSearches(object):
                     "attributes": {
                         "passengers": [
                             {
-                                "age": 42,
+                                "dateOfBirth": "1979-09-17",
                             },
                         ],
                     },

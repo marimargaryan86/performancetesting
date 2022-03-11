@@ -5,6 +5,8 @@ from typing import AsyncIterator, Type, TypeVar
 from aiofiles.threadpool import binary
 from google.protobuf import message, timestamp_pb2
 
+from snowfall.common.v1alpha import models_pb2
+
 _Proto = TypeVar("_Proto", bound=message.Message)
 
 
@@ -42,3 +44,15 @@ def datetime_to_protobuf(timestamp: datetime.datetime) -> timestamp_pb2.Timestam
 
 def protobuf_to_datetime(proto: timestamp_pb2.Timestamp) -> datetime.datetime:
     return proto.ToDatetime().replace(tzinfo=datetime.timezone.utc)
+
+
+def date_to_protobuf(date: datetime.date) -> models_pb2.Date:
+    return models_pb2.Date(
+        year=date.year,
+        month=date.month,
+        day=date.day,
+    )
+
+
+def protobuf_to_date(proto: models_pb2.Date) -> datetime.date:
+    return datetime.date(year=proto.year, month=proto.month, day=proto.day)

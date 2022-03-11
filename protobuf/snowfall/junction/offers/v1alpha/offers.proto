@@ -60,7 +60,7 @@ message TripOfferSearch {
 }
 
 message Passenger {
-  int32 age = 1;
+  snowfall.common.v1alpha.Date date_of_birth = 1;
 }
 
 message LoyaltyCard {
