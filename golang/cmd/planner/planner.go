@@ -5,6 +5,7 @@ import (
 	"git.snowfall.se/junction/junction/golang/legacy"
 	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/junction/planner/v1alpha"
 	"git.snowfall.se/junction/junction/golang/raptor"
+	"github.com/getsentry/sentry-go"
 	"github.com/uber/h3-go"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -14,6 +15,7 @@ import (
 	"net"
 	"os"
 	"strconv"
+	"time"
 )
 
 func main() {
@@ -28,6 +30,34 @@ func main() {
 	}()
 
 	sugar := logger.Sugar()
+	sentryDsn, ok := os.LookupEnv("SENTRY_DSN")
+
+	if ok {
+		environment, ok := os.LookupEnv("ENV_NAME")
+
+		if !ok {
+			environment = "local"
+		}
+
+		release, ok := os.LookupEnv("VERSION")
+
+		if !ok {
+			release = "dev"
+		}
+
+		err := sentry.Init(sentry.ClientOptions{
+			Dsn:         sentryDsn,
+			Environment: environment,
+			Release:     "planner@" + release,
+		})
+
+		if err != nil {
+			sugar.Fatal(err)
+		}
+
+		defer sentry.Flush(2 * time.Second)
+
+	}
 
 	protoDir, ok := os.LookupEnv("PROTO_DIR")
 

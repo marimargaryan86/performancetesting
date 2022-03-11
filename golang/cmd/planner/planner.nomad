@@ -100,6 +100,7 @@ job "planner" {
       }
 
       env {
+        ENV_NAME     = "junction.dev"
         GRPC_ADDRESS = "0.0.0.0"
         GRPC_PORT    = "${NOMAD_PORT_grpc}"
         PROTO_DIR    = "${NOMAD_TASK_DIR}"
