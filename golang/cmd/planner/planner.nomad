@@ -52,7 +52,7 @@ job "planner" {
       }
 
       artifact {
-        source = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/route_stops.bin"
+        source = "s3::https://s3-eu-west-2.amazonaws.com/junction-schedules-export/route_stops.bin"
         options {
           aws_access_key_id     = "AKIA6JO5TGEWEV7G2IHA"
           aws_access_key_secret = "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"
@@ -60,7 +60,7 @@ job "planner" {
       }
 
       artifact {
-        source = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/routes.bin"
+        source = "s3::https://s3-eu-west-2.amazonaws.com/junction-schedules-export/routes.bin"
         options {
           aws_access_key_id     = "AKIA6JO5TGEWEV7G2IHA"
           aws_access_key_secret = "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"
@@ -68,7 +68,7 @@ job "planner" {
       }
 
       artifact {
-        source = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/stops.bin"
+        source = "s3::https://s3-eu-west-2.amazonaws.com/junction-schedules-export/stops.bin"
         options {
           aws_access_key_id     = "AKIA6JO5TGEWEV7G2IHA"
           aws_access_key_secret = "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"
@@ -76,7 +76,7 @@ job "planner" {
       }
 
       artifact {
-        source = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/transfers.bin"
+        source = "s3::https://s3-eu-west-2.amazonaws.com/junction-schedules-export/transfers.bin"
         options {
           aws_access_key_id     = "AKIA6JO5TGEWEV7G2IHA"
           aws_access_key_secret = "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"
@@ -84,7 +84,7 @@ job "planner" {
       }
 
       artifact {
-        source = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/schedule_stops.bin"
+        source = "s3::https://s3-eu-west-2.amazonaws.com/junction-schedules-export/schedule_stops.bin"
         options {
           aws_access_key_id     = "AKIA6JO5TGEWEV7G2IHA"
           aws_access_key_secret = "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"
@@ -92,7 +92,7 @@ job "planner" {
       }
 
       artifact {
-        source = "s3::https://junction-schedules-export.s3.eu-west-2.amazonaws.com/schedules.bin"
+        source = "s3::https://s3-eu-west-2.amazonaws.com/junction-schedules-export/schedules.bin"
         options {
           aws_access_key_id     = "AKIA6JO5TGEWEV7G2IHA"
           aws_access_key_secret = "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"
