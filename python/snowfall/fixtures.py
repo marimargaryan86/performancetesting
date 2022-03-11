@@ -12,6 +12,8 @@ PLACES = (
 )
 TRIP = "b3e45af0-f3ae-46e5-a94f-fd1c9d86fb7d"
 TRIPS = ("b3e45af0-f3ae-46e5-a94f-fd1c9d86fb7d",)
+SCHEDULE = "as3bs02s-bask-awe4-sye2-sanpl5j1093h"
+SCHEDULES = ("as3bs02s-bask-awe4-sye2-sanpl5j1093h",)
 
 
 def get_places() -> list[models_pb2.Place]:
@@ -28,6 +30,16 @@ def generate_place(identifier: str) -> models_pb2.Place:
         ),
         country_code="SE",
         time_zone="Europe/Stockholm",
+    )
+
+
+def get_schedules() -> list[models_pb2.Schedule]:
+    return [generate_schedule(identifier) for identifier in SCHEDULES]
+
+
+def generate_schedule(identifier: str) -> models_pb2.Schedule:
+    return models_pb2.Schedule(
+        id=identifier,
     )
 
 

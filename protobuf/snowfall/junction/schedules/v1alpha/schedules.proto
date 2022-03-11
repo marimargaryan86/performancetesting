@@ -5,7 +5,16 @@ package snowfall.junction.schedules.v1alpha;
 import "snowfall/common/v1alpha/models.proto";
 
 service ScheduleService {
+  rpc GetSchedule(GetScheduleRequest) returns (GetScheduleResponse) {}
   rpc ListSchedules(ListSchedulesRequest) returns (ListSchedulesResponse) {}
+}
+
+message GetScheduleRequest {
+  string id = 1;
+}
+
+message GetScheduleResponse {
+  snowfall.common.v1alpha.Schedule schedule = 1;
 }
 
 message ListSchedulesRequest {
@@ -18,4 +27,3 @@ message ListSchedulesResponse {
   repeated snowfall.common.v1alpha.Schedule schedules = 1;
   string next_page_token = 2;
 }
-

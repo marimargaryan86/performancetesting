@@ -1,4 +1,4 @@
-from grpc import aio
+from grpc import StatusCode, aio
 
 from snowfall.junction.schedules.schedules import ScheduleRepository
 from snowfall.junction.schedules.v1alpha import schedules_pb2, schedules_pb2_grpc
@@ -15,6 +15,18 @@ class ScheduleService(Service, schedules_pb2_grpc.ScheduleServiceServicer):
 
     def register(self, server: aio.Server) -> None:
         schedules_pb2_grpc.add_ScheduleServiceServicer_to_server(self, server)
+
+    async def GetSchedule(  # type: ignore[override] # noqa: N802
+        self,
+        request: schedules_pb2.GetScheduleRequest,
+        context: aio.ServicerContext,
+    ) -> schedules_pb2.GetScheduleResponse:
+        schedule = await self._schedules.find_by_id(request.id)
+
+        if not schedule:
+            await context.abort(StatusCode.NOT_FOUND)
+
+        return schedules_pb2.GetScheduleResponse(schedule=schedule)
 
     async def ListSchedules(  # type: ignore[override] # noqa: N802
         self,

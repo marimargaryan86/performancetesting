@@ -10,7 +10,7 @@ from snowfall.junction.trips.v1alpha import trips_pb2, trips_pb2_grpc
 
 
 class NotFoundError(Exception):
-    """Raised when a place is not found."""
+    """Raised when a trip is not found."""
 
 
 class UnknownError(Exception):
