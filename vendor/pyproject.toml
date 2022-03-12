@@ -51,6 +51,7 @@ timezonefinder = "^5.2.0"
 uvicorn = {extras = ["standard"], version = "^0.17.0"}
 
 [tool.poetry.group.dev.dependencies]
+fakeredis = "^1.7.1"
 freezegun = "^1.1.0"
 pydevd-pycharm = "^221.4165.171"
 pytest = "7.0.1"

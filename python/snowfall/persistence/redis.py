@@ -20,7 +20,7 @@ class Hash(object):
     async def length(self) -> int:
         return await self._redis.hlen(self._hash)
 
-    async def to_iterable(self) -> AsyncIterable[tuple[str, bytes]]:
+    async def to_iterable(self) -> AsyncIterable[tuple[bytes, bytes]]:
         cursor = 0
 
         while True:
@@ -56,7 +56,7 @@ class List(object):
 
 
 class Client(object):
-    def __init__(self, redis: aioredis.Redis, prefix: str):
+    def __init__(self, redis: aioredis.Redis, prefix: str = ""):
         self._prefix = "{0}:".format(prefix) if prefix else ""
         self._redis = redis
 
@@ -80,7 +80,7 @@ class Client(object):
                 break
 
     async def get(self, name: str) -> Optional[bytes]:
-        return await self._redis.get(name)
+        return await self._redis.get(self._prefix + name)
 
     def hash_(self, name: str) -> Hash:
         return Hash(self._redis, self._prefix + name)
@@ -89,4 +89,4 @@ class Client(object):
         return List(self._redis, self._prefix + name)
 
     async def set_(self, name: str, raw_value: Any) -> None:
-        return await self._redis.set(name, raw_value)
+        return await self._redis.set(self._prefix + name, raw_value)

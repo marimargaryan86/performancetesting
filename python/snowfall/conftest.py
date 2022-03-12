@@ -1,13 +1,21 @@
 import datetime
 
+import aioredis
 import pytest
+from fakeredis import aioredis as fakeredis
 
 from snowfall import fixtures
 from snowfall.adapter import offer_searches, places, schedules, trip_searches, trips
 from snowfall.junction.offers.v1alpha import offers_pb2
 from snowfall.logging import stdout
 
+pytest.register_assert_rewrite("snowfall.testing.asserts")
 stdout.configure_logger()
+
+
+@pytest.fixture
+def redis_client() -> aioredis.Redis:
+    return fakeredis.FakeRedis()
 
 
 @pytest.fixture
