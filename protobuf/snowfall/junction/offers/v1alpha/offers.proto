@@ -11,7 +11,16 @@ service OfferSearchService {
 }
 
 service OfferService {
+  rpc GetOffer (GetOfferRequest) returns (GetOfferResponse) {}
   rpc ListOffers (ListOffersRequest) returns (ListOffersResponse) {}
+}
+
+message GetOfferRequest {
+  string id = 1;
+}
+
+message GetOfferResponse {
+  OfferAggregate offer = 1;
 }
 
 message EnqueueOfferSearchRequest {

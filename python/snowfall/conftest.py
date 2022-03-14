@@ -5,7 +5,14 @@ import pytest
 from fakeredis import aioredis as fakeredis
 
 from snowfall import fixtures
-from snowfall.adapter import offer_searches, places, schedules, trip_searches, trips
+from snowfall.adapter import (
+    offer_searches,
+    offers,
+    places,
+    schedules,
+    trip_searches,
+    trips,
+)
 from snowfall.junction.offers.v1alpha import offers_pb2
 from snowfall.logging import stdout
 
@@ -36,6 +43,11 @@ def trips_client() -> trips.Client:
 @pytest.fixture
 def trip_searches_client() -> trip_searches.Client:
     return trip_searches.DictClient()
+
+
+@pytest.fixture
+def offers_client() -> offers.Client:
+    return offers.DictClient(fixtures.get_offers())
 
 
 @pytest.fixture

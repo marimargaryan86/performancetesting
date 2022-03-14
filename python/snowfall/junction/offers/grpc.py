@@ -58,10 +58,18 @@ class OfferService(Service, offers_pb2_grpc.OfferServiceServicer):
     def register(self, server: grpc.aio.Server) -> None:
         offers_pb2_grpc.add_OfferServiceServicer_to_server(self, server)
 
+    async def GetOffer(  # type: ignore[override] # noqa: N802
+        self,
+        request: offers_pb2.GetOfferRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> offers_pb2.GetOfferResponse:
+        # TODO: get offer from persistence
+        return offers_pb2.GetOfferResponse()
+
     async def ListOffers(  # type: ignore[override] # noqa: N802
         self,
         request: offers_pb2.ListOffersRequest,
         context: grpc.aio.ServicerContext,
     ) -> offers_pb2.ListOffersResponse:
-        # todo: get offer results from persistence
+        # TODO: get offer results from persistence
         return offers_pb2.ListOffersResponse()
