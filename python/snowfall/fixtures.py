@@ -1,4 +1,3 @@
-# flake8: noqa: WPS202
 import random
 
 from snowfall.common.v1alpha import models_pb2
@@ -14,9 +13,9 @@ PLACES = (
 )
 TRIP = "b3e45af0-f3ae-46e5-a94f-fd1c9d86fb7d"
 TRIPS = ("b3e45af0-f3ae-46e5-a94f-fd1c9d86fb7d",)
-SCHEDULE = "as3bs02s-bask-awe4-sye2-sanpl5j1093h"
 SCHEDULES = ("as3bs02s-bask-awe4-sye2-sanpl5j1093h",)
 OFFERS = ("567890u7-asdf-asdf-7yhs-bn23eiuy083g",)
+SEGMENTS = ("s15s287s-1a4e-a4n9-7v0m-37249dsfh13j",)
 
 
 def get_places() -> list[models_pb2.Place]:
@@ -42,6 +41,16 @@ def get_schedules() -> list[models_pb2.Schedule]:
 
 def generate_schedule(identifier: str) -> models_pb2.Schedule:
     return models_pb2.Schedule(
+        id=identifier,
+    )
+
+
+def get_segments() -> list[models_pb2.SegmentReference]:
+    return [generate_segment_reference(identifier) for identifier in SEGMENTS]
+
+
+def generate_segment_reference(identifier: str) -> models_pb2.SegmentReference:
+    return models_pb2.SegmentReference(
         id=identifier,
     )
 

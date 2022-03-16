@@ -10,6 +10,7 @@ from snowfall.adapter import (
     offers,
     places,
     schedules,
+    segments,
     trip_searches,
     trips,
 )
@@ -33,6 +34,11 @@ def places_client() -> places.Client:
 @pytest.fixture
 def schedules_client() -> schedules.Client:
     return schedules.DictClient(fixtures.get_schedules())
+
+
+@pytest.fixture
+def segments_client() -> segments.Client:
+    return segments.DictClient(fixtures.get_segments())
 
 
 @pytest.fixture

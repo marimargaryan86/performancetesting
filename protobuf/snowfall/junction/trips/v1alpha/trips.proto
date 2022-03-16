@@ -13,6 +13,15 @@ service TripSearchService {
 service TripService {
   rpc GetTrip(GetTripRequest) returns (GetTripResponse) {}
   rpc ListTrips(ListTripsRequest) returns (ListTripsResponse) {}
+  rpc GetSegment(GetSegmentRequest) returns (GetSegmentResponse) {}
+}
+
+message GetSegmentRequest {
+  string id = 1;
+}
+
+message GetSegmentResponse {
+  snowfall.common.v1alpha.SegmentReference segment = 1;
 }
 
 message GetTripRequest {

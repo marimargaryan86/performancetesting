@@ -50,6 +50,14 @@ class TripService(Service, trips_pb2_grpc.TripServiceServicer):
             next_page_token=await trips_result.cursor(),
         )
 
+    async def GetSegment(  # type: ignore[override] # noqa: N802
+        self,
+        request: trips_pb2.GetSegmentRequest,
+        context: aio.ServicerContext,
+    ) -> trips_pb2.GetSegmentResponse:
+        # TODO: return real segment reference from mongo
+        return trips_pb2.GetSegmentResponse()
+
 
 class TripSearchService(Service, trips_pb2_grpc.TripSearchServiceServicer):
     def __init__(
