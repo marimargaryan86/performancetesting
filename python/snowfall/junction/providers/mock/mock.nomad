@@ -40,7 +40,7 @@ EOH
       }
 
       env {
-        ENV_NAME     = "junction.dev"
+        ENV_NAME     = "development"
         SENTRY_DSN   = "https://e319b016d1b149299757a338479d7de7@sentry.snowfall.se/28"
       }
     }

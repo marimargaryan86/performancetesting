@@ -69,7 +69,7 @@ EOH
       }
 
       env {
-        ENV_NAME              = "junction.dev"
+        ENV_NAME              = "development"
         FORWARDED_ALLOWED_IPS = "[\"0.0.0.0\"]"
         HTTP_ADDRESS          = "0.0.0.0"
         HTTP_PORT             = "${NOMAD_PORT_http}"

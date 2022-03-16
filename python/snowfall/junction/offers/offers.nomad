@@ -58,7 +58,7 @@ EOH
       }
 
       env {
-        ENV_NAME     = "junction.dev"
+        ENV_NAME     = "development"
         GRPC_ADDRESS = "0.0.0.0"
         GRPC_PORT    = "${NOMAD_PORT_grpc}"
         SENTRY_DSN   = "https://7c600c1c458d403e8047091398239f20@sentry.snowfall.se/27"
@@ -96,7 +96,7 @@ EOH
       }
 
       env {
-        ENV_NAME   = "junction.dev"
+        ENV_NAME   = "development"
         SENTRY_DSN = "https://7c600c1c458d403e8047091398239f20@sentry.snowfall.se/27"
       }
     }

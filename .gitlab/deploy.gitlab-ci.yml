@@ -14,7 +14,7 @@ stages:
 deploy-to-dev:
   extends: .deploy
   environment:
-    name: junction.dev
+    name: development
   rules:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
       changes:

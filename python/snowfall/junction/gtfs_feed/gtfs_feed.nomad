@@ -42,7 +42,7 @@ EOH
       }
 
       env {
-        ENV_NAME   = "junction.dev"
+        ENV_NAME   = "development"
         FEED_REF   = "france-intercity"
         FEED_URL   = "https://eu.ftp.opendatasoft.com/sncf/gtfs/export-intercites-gtfs-last.zip"
         SENTRY_DSN = "https://d86394991a184238865125d76e464d6d@sentry.snowfall.se/21"
