@@ -60,7 +60,7 @@ extra_requirements = [
     "flake8-logging-format",
     "flake8-pie",
     "flake8-print",
-    "flake8-simplify",
+    "flake8-simplify==0.18.0",
     "flake8-tidy-imports",
     "setuptools",
     "wemake-python-styleguide",

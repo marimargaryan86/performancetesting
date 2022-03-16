@@ -25,6 +25,13 @@ class MockClient(object):
         yield offers_pb2.TripOfferResult(
             id=str(uuid.uuid4()),
             offer_search_id=search.offer_search_id,
+            segment_ids=[segment.id for segment in search.search.segments],
+            expires_at=protobuf.datetime_to_protobuf(
+                datetime.datetime.now(
+                    tz=datetime.timezone.utc,
+                )
+                + datetime.timedelta(minutes=15),
+            ),
             schedules=[
                 models_pb2.Schedule(
                     id="123",

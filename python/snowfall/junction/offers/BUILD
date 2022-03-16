@@ -1,4 +1,6 @@
 python_sources()
+python_tests(name="tests")
+python_test_utils(name="test_utils")
 pex_binary(
     name="main",
     entry_point="main.py",

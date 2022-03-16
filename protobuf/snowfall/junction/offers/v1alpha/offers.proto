@@ -52,6 +52,7 @@ message ListOffersResponse {
 
 message OfferAggregate {
   string id = 1;
+  repeated string offer_result_ids = 2;
 }
 
 message OfferSearch {
@@ -87,6 +88,8 @@ message TripOfferSearchTask {
 message TripOfferResult {
   string id = 1;
   string offer_search_id = 2;
-  repeated snowfall.common.v1alpha.Schedule schedules = 3;
-  snowfall.common.v1alpha.Price price = 4;
+  repeated string segment_ids = 3;
+  repeated snowfall.common.v1alpha.Schedule schedules = 4;
+  snowfall.common.v1alpha.Price price = 5;
+  google.protobuf.Timestamp expires_at = 6;
 }

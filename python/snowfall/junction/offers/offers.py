@@ -1,6 +1,7 @@
 import datetime
 import uuid
 
+import pymongo
 from google.protobuf import timestamp_pb2
 from motor import motor_asyncio
 
@@ -10,6 +11,11 @@ from snowfall.stdlib.persistence.mongo import repository
 
 class TripOfferRepository(repository.ProtoRepository[offers_pb2.TripOfferResult]):
     _proto = offers_pb2.TripOfferResult
+    _indexes = [pymongo.IndexModel("offer_search_id", background=True)]
+
+
+class OfferAggregateRepository(repository.ProtoRepository[offers_pb2.OfferAggregate]):
+    _proto = offers_pb2.OfferAggregate
 
 
 class OfferSearchRepository(repository.ProtoRepository[offers_pb2.OfferSearch]):

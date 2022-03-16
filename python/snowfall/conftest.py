@@ -3,6 +3,7 @@ import datetime
 import aioredis
 import pytest
 from fakeredis import aioredis as fakeredis
+from motor import core, motor_asyncio
 
 from snowfall import fixtures
 from snowfall.adapter import (
@@ -16,14 +17,29 @@ from snowfall.adapter import (
 )
 from snowfall.junction.offers.v1alpha import offers_pb2
 from snowfall.stdlib.logging import stdout
+from snowfall.stdlib.persistence.mongo import repository
 
 pytest.register_assert_rewrite("snowfall.stdlib.testing.asserts")
 stdout.configure_logger()
 
 
+def _mongo_mock_configure(
+    collection: motor_asyncio.AsyncIOMotorCollection,
+) -> core.AgnosticCollection:
+    return collection
+
+
+repository._configure_collection = _mongo_mock_configure  # noqa: WPS437
+
+
 @pytest.fixture
 def redis_client() -> aioredis.Redis:
     return fakeredis.FakeRedis()
+
+
+@pytest.fixture
+def decoding_redis_client() -> aioredis.Redis:
+    return fakeredis.FakeRedis(decode_responses=True)
 
 
 @pytest.fixture

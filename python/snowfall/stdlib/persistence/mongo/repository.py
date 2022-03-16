@@ -22,6 +22,18 @@ Record = TypeVar("Record")
 _MongoDict = dict[str, Any]
 
 
+def _configure_collection(
+    collection: motor_asyncio.AsyncIOMotorCollection,
+) -> core.AgnosticCollection:
+    return collection.database.get_collection(
+        name=collection.name,
+        codec_options=codec_options.CodecOptions(
+            tz_aware=True,
+            tzinfo=datetime.timezone.utc,
+        ),
+    )
+
+
 class _AbstractRepository(abc.ABC, Generic[Record]):  # noqa: WPS214
     _indexes: list[pymongo.IndexModel] = []
 
@@ -30,13 +42,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):  # noqa: WPS214
         collection: motor_asyncio.AsyncIOMotorCollection,
     ) -> None:
         self._has_created_indexes = False
-        self._collection: core.AgnosticCollection = collection.database.get_collection(
-            name=collection.name,
-            codec_options=codec_options.CodecOptions(
-                tz_aware=True,
-                tzinfo=datetime.timezone.utc,
-            ),
-        )
+        self._collection = _configure_collection(collection)
 
     async def all_(self) -> resultset.ResultSet[Record]:
         return await self._execute(self._collection.find)

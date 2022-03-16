@@ -26,6 +26,7 @@
 #     "h3[numpy]==3.7.3",
 #     "httpx[http2]==0.22.0",
 #     "lagom==1.7.0",
+#     "mongomock-motor>=0.0.3",
 #     "motor==2.5.1",
 #     "openapi-core==0.14.2",
 #     "orjson==3.6.7",
@@ -584,6 +585,13 @@ lazy-object-proxy==1.7.1; python_version >= "3.6" and python_full_version < "3.0
     --hash=sha256:2130db8ed69a48a3440103d4a520b89d8a9405f1b06e2cc81640509e8bf6548f \
     --hash=sha256:677ea950bef409b47e51e733283544ac3d660b709cfce7b187f5ace137960d61 \
     --hash=sha256:d66906d5785da8e0be7360912e99c9188b70f52c422f9fc18223347235691a84
+mongomock-motor==0.0.3; python_version >= "3.6" \
+    --hash=sha256:32a0dc6c6d6c90c3c42b2e27fa77a100699c104bf0acc9f6b0ee1b357d4b2143 \
+    --hash=sha256:03ef3da219445abeafe6742c5ec0d733660ed92047f3cc1e3df6a19c2953f4c6 \
+    --hash=sha256:891d1b573c1ac29fbe23bb51acd99990cd151b882c680d907f5998b295974dd1
+mongomock==3.23.0; python_version >= "3.6" \
+    --hash=sha256:01ce0c4eb02b2eced0a30882412444eaf6de27a90f2502bee64e04e3b8ecdc90 \
+    --hash=sha256:d9945e7c87c221aed47c6c10708376351a5f5ee48060943c56ba195be425b0dd
 more-itertools==8.12.0; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.5" \
     --hash=sha256:7dc6ad46f05f545f900dd59e8dfb4e84a4827b97b3cfecb175ea0c7d247f6064 \
     --hash=sha256:43e6dd9942dffd72661a2c4ef383ad7da1e6a3e968a927ad7a6083ab410a688b
@@ -1032,6 +1040,8 @@ rfc3986==1.5.0; python_version >= "3.6" \
 s3transfer==0.5.2; python_version >= "3.6" \
     --hash=sha256:7a6f4c4d1fdb9a2b640244008e142cbc2cd3ae34b386584ef044dd0f27101971 \
     --hash=sha256:95c58c194ce657a5f4fb0b9e60a84968c808888aed628cd98ab8771fe1db98ed
+sentinels==1.0.0; python_version >= "3.6" \
+    --hash=sha256:7be0704d7fe1925e397e92d18669ace2f619c92b5d4eb21a89f31e026f9ff4b1
 sentry-sdk==1.5.6 \
     --hash=sha256:ac2a50128409d57655279817aedcb7800cace1f76b266f3dd62055d5afd6e098 \
     --hash=sha256:1ab34e3851a34aeb3d1af1a0f77cec73978c4e9698e5210d050e4932953cb241
@@ -1092,9 +1102,9 @@ types-urllib3==1.26.11 \
 typing-extensions==4.1.1; python_version >= "3.6" and python_full_version >= "3.6.1" and python_version < "3.10" \
     --hash=sha256:21c85e0fe4b9a155d0799430b0ad741cdce7e359660ccbd8b530613e8df88ce2 \
     --hash=sha256:1a9462dcc3347a79b1f1c0271fbe79e844580bb598bafa1ed208b94da3cdcd42
-urllib3==1.26.8; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version < "4" and python_version >= "3.6" \
-    --hash=sha256:000ca7f471a233c2251c6c7023ee85305721bfdf18621ebff4fd17a8653427ed \
-    --hash=sha256:0e7c33d9a63e7ddfcb86780aac87befc2fbddf46c58dbb487e0855f7ceec283c
+urllib3==1.26.9; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.6.0" and python_version < "4" and python_version >= "3.6" \
+    --hash=sha256:44ece4d53fb1706f667c9bd1c648f5469a2ec925fcf3a776667042d645472c14 \
+    --hash=sha256:aabaf16477806a5e1dd19aa41f8c2b7950dd3c746362d7e3223dbe6de6ac448e
 uvicorn==0.17.6; python_version >= "3.7" \
     --hash=sha256:19e2a0e96c9ac5581c01eb1a79a7d2f72bb479691acd2b8921fce48ed5b961a6 \
     --hash=sha256:5180f9d059611747d841a4a4c4ab675edf54c8489e97f96d0583ee90ac3bfc23

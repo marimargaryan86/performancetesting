@@ -17,7 +17,7 @@
 #     "flake8-logging-format",
 #     "flake8-pie",
 #     "flake8-print",
-#     "flake8-simplify",
+#     "flake8-simplify==0.18.0",
 #     "flake8-tidy-imports",
 #     "flake8==4.0.1",
 #     "setuptools",
@@ -103,9 +103,9 @@ flake8-quotes==3.3.1; python_version >= "3.6" and python_version < "4.0" \
 flake8-rst-docstrings==0.2.5; python_version >= "3.6" and python_version < "4.0" \
     --hash=sha256:4fe93f997dea45d9d3c8bd220f12f0b6c359948fb943b5b48021a3f927edd816 \
     --hash=sha256:b99d9041b769b857efe45a448dc8c71b1bb311f9cacbdac5de82f96498105082
-flake8-simplify==0.18.1; python_full_version >= "3.6.1" \
-    --hash=sha256:a4a0fcaad8fa0ad17634c6fa4ff62ebe4835bef48d78d3104eb528140cf0972b \
-    --hash=sha256:8344a6a77b214ad7b3559d06a42c97333b73b11034abb018ea02cebba9fdebf1
+flake8-simplify==0.18.0; python_full_version >= "3.6.1" \
+    --hash=sha256:051977c37f4b5e2e63409987749f4f53a591aa8cfbc95619dcbb826636fdd72c \
+    --hash=sha256:da05be5b90033b2eedb13f47af7c430be36a70d47659e8f9f069fcce12183d8e
 flake8-string-format==0.3.0; python_version >= "3.6" and python_version < "4.0" \
     --hash=sha256:65f3da786a1461ef77fca3780b314edb2853c377f2e35069723348c8917deaa2 \
     --hash=sha256:812ff431f10576a74c89be4e85b8e075a705be39bc40c4b4278b5b13e2afa9af
@@ -181,9 +181,9 @@ pyyaml==6.0; python_version >= "3.7" and python_version < "4.0" \
     --hash=sha256:68fb519c14306fec9720a2a5b45bc9f0c8d1b9c72adf45c37baedfcd949c35a2
 restructuredtext-lint==1.4.0; python_version >= "3.6" and python_version < "4.0" \
     --hash=sha256:1b235c0c922341ab6c530390892eb9e92f90b9b75046063e047cacfb0f050c45
-setuptools==60.9.3; python_version >= "3.7" \
-    --hash=sha256:e4f30b9f84e5ab3decf945113119649fec09c1fc3507c6ebffec75646c56e62b \
-    --hash=sha256:2347b2b432c891a863acadca2da9ac101eae6169b1d3dfee2ec605ecd50dbfe5
+setuptools==60.10.0; python_version >= "3.7" \
+    --hash=sha256:782ef48d58982ddb49920c11a0c5c9c0b02e7d7d1c2ad0aa44e1a1e133051c96 \
+    --hash=sha256:6599055eeb23bfef457d5605d33a4d68804266e6cb430b0fb12417c5efeae36c
 six==1.16.0; python_version >= "3.6" and python_full_version < "3.0.0" and python_version < "4.0" or python_full_version >= "3.3.0" and python_version >= "3.6" and python_version < "4.0" \
     --hash=sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254 \
     --hash=sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926
