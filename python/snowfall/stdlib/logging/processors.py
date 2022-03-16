@@ -2,7 +2,7 @@ from typing import Any, Callable, Sequence
 
 import structlog
 
-from snowfall.logging import filtering, sentry
+from snowfall.stdlib.logging import filtering, sentry
 
 Processor = Callable[[Any, Any, structlog.types.EventDict], Any]
 

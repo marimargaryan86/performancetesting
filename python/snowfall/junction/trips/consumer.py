@@ -6,7 +6,7 @@ from grpc import aio
 from snowfall.junction.planner.v1alpha import planner_pb2, planner_pb2_grpc
 from snowfall.junction.trips import trips
 from snowfall.junction.trips.v1alpha import amqp_pb2
-from snowfall.transport import amqp
+from snowfall.stdlib.transport import amqp
 
 
 class TripSearchConsumer(object):

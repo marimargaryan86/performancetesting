@@ -5,7 +5,7 @@ from google.protobuf import timestamp_pb2
 from motor import motor_asyncio
 
 from snowfall.junction.offers.v1alpha import offers_pb2
-from snowfall.persistence.mongo import repository
+from snowfall.stdlib.persistence.mongo import repository
 
 
 class TripOfferRepository(repository.ProtoRepository[offers_pb2.TripOfferResult]):

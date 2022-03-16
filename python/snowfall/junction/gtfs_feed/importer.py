@@ -9,7 +9,7 @@ import structlog
 from motor import core
 
 from snowfall.junction.gtfs_feed import repository
-from snowfall.persistence import filesystem
+from snowfall.stdlib.persistence import filesystem
 
 _CHECKSUM_KEY_FORMAT = "feeds.{ref}.checksum"
 

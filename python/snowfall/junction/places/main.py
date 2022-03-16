@@ -9,7 +9,7 @@ from snowfall.junction.places.consumer import PlaceImportConsumer
 from snowfall.junction.places.grpc import CuratedPlacesService, PlacesService
 from snowfall.junction.places.places import CuratedPlaceRepository, PlaceRepository
 from snowfall.service import RunnableService, Task, make_runnable_service
-from snowfall.transport import amqp, grpc
+from snowfall.stdlib.transport import amqp, grpc
 
 
 class _GrpcSettings(BaseSettings):

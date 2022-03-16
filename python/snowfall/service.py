@@ -9,7 +9,7 @@ from typing import Awaitable, Callable, List, Optional, Sequence
 import pydantic
 from sentry_sdk import integrations
 
-from snowfall.logging import sentry, stdout
+from snowfall.stdlib.logging import sentry, stdout
 
 
 class _SharedSettings(pydantic.BaseSettings):

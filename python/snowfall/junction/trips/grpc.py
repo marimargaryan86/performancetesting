@@ -2,8 +2,8 @@ from grpc import StatusCode, aio
 
 from snowfall.junction.trips import trips
 from snowfall.junction.trips.v1alpha import amqp_pb2, trips_pb2, trips_pb2_grpc
-from snowfall.transport import amqp
-from snowfall.transport.grpc import Service
+from snowfall.stdlib.transport import amqp
+from snowfall.stdlib.transport.grpc import Service
 
 
 class TripService(Service, trips_pb2_grpc.TripServiceServicer):

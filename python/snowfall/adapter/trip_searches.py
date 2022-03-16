@@ -10,8 +10,8 @@ import grpc
 
 from snowfall.adapter.trips import TripsPage
 from snowfall.common.v1alpha import models_pb2
-from snowfall.format import protobuf
 from snowfall.junction.trips.v1alpha import trips_pb2, trips_pb2_grpc
+from snowfall.stdlib.format import protobuf
 
 
 class NotFoundError(Exception):

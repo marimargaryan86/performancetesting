@@ -6,8 +6,8 @@ import aiofiles
 import pymongo
 from asyncstdlib import itertools
 
-from snowfall.format.gtfs import models
-from snowfall.persistence.mongo import repository, resultset
+from snowfall.stdlib.format.gtfs import models
+from snowfall.stdlib.persistence.mongo import repository, resultset
 
 _SERVICE_ID = "service_id"
 _TUPLE_OF_CSV = tuple[dict[str, str], ...]

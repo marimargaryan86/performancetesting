@@ -5,9 +5,9 @@ from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall import fixtures
 from snowfall.adapter import offer_searches
-from snowfall.format import protobuf
 from snowfall.junction.client_api import models, request_helpers, resources
 from snowfall.junction.offers.v1alpha import offers_pb2
+from snowfall.stdlib.format import protobuf
 
 
 class OfferSearches(endpoints.HTTPEndpoint):

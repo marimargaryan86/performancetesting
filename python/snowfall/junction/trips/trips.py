@@ -8,7 +8,7 @@ from motor import motor_asyncio
 from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.planner.v1alpha import planner_pb2
 from snowfall.junction.trips.v1alpha import trips_pb2
-from snowfall.persistence.mongo import repository, resultset
+from snowfall.stdlib.persistence.mongo import repository, resultset
 
 
 class TripRepository(repository.ProtoRepository[models_pb2.TripReference]):

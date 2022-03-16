@@ -6,7 +6,7 @@ from geopy import exc
 from snowfall.common.v1alpha import models_pb2
 from snowfall.geodata import geocoding
 from snowfall.junction.gtfs_feed import importer
-from snowfall.transport import amqp
+from snowfall.stdlib.transport import amqp
 
 _NAMESPACE = uuid.UUID("5190984e-4ab7-411e-96f6-2848cc5d63e1")
 

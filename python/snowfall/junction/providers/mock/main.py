@@ -7,10 +7,10 @@ from typing import Sequence, cast
 import pydantic
 
 from snowfall.common.v1alpha import models_pb2
-from snowfall.format import protobuf
 from snowfall.junction.offers.v1alpha import offers_pb2
 from snowfall.service import RunnableService, Task, make_runnable_service
-from snowfall.transport import amqp
+from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.transport import amqp
 
 
 class _GrpcSettings(pydantic.BaseSettings):

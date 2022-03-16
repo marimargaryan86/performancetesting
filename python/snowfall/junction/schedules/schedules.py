@@ -3,8 +3,8 @@ import datetime
 from pymongo import IndexModel, results
 
 from snowfall.common.v1alpha import models_pb2
-from snowfall.format import protobuf
-from snowfall.persistence.mongo import repository, resultset
+from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.persistence.mongo import repository, resultset
 
 
 class ScheduleRepository(repository.ProtoRepository[models_pb2.Schedule]):

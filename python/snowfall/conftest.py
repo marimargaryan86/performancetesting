@@ -15,7 +15,7 @@ from snowfall.adapter import (
     trips,
 )
 from snowfall.junction.offers.v1alpha import offers_pb2
-from snowfall.logging import stdout
+from snowfall.stdlib.logging import stdout
 
 pytest.register_assert_rewrite("snowfall.testing.asserts")
 stdout.configure_logger()

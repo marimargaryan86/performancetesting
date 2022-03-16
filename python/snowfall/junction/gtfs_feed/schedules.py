@@ -7,10 +7,10 @@ from typing import AsyncIterator, Optional
 from google.protobuf import timestamp_pb2
 
 from snowfall.common.v1alpha import models_pb2
-from snowfall.format.gtfs import constants, datetimes, enums, models
 from snowfall.geodata import geocoding
 from snowfall.junction.gtfs_feed import importer
-from snowfall.transport import amqp
+from snowfall.stdlib.format.gtfs import constants, datetimes, enums, models
+from snowfall.stdlib.transport import amqp
 
 
 @dataclasses.dataclass

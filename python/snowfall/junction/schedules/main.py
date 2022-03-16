@@ -10,10 +10,10 @@ from motor import motor_asyncio
 from pydantic import AnyUrl, BaseSettings
 
 from snowfall.junction.schedules import consumer, export, grpc, schedules
-from snowfall.persistence import redis
 from snowfall.service import RunnableService, Task, make_runnable_service
-from snowfall.transport import amqp
-from snowfall.transport import grpc as grpc_transport
+from snowfall.stdlib.persistence import redis
+from snowfall.stdlib.transport import amqp
+from snowfall.stdlib.transport import grpc as grpc_transport
 
 
 class _GrpcSettings(BaseSettings):

@@ -2,7 +2,7 @@ from typing import cast
 
 from snowfall.common.v1alpha.models_pb2 import Schedule
 from snowfall.junction.schedules.schedules import ScheduleRepository
-from snowfall.transport.amqp import Consumer, Message
+from snowfall.stdlib.transport.amqp import Consumer, Message
 
 
 class ScheduleImportConsumer(object):

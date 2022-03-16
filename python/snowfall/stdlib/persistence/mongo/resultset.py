@@ -4,8 +4,8 @@ from typing import Any, Generic, Optional, TypeVar
 import pymongo
 from motor import motor_asyncio
 
-from snowfall.persistence import cursor
-from snowfall.persistence.mongo import coders
+from snowfall.stdlib.persistence import cursor
+from snowfall.stdlib.persistence.mongo import coders
 
 _mongo_id_key = "_id"
 _Record = TypeVar("_Record")

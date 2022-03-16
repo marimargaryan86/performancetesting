@@ -2,7 +2,7 @@ import contextlib
 import datetime
 from typing import AsyncIterable
 
-from snowfall.format.gtfs import models
+from snowfall.stdlib.format.gtfs import models
 
 
 def create_datetime(

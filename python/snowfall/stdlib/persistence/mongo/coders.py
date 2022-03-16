@@ -6,7 +6,7 @@ import pydantic
 import rapidjson
 from google.protobuf import json_format, message
 
-from snowfall.persistence.mongo import normalizers
+from snowfall.stdlib.persistence.mongo import normalizers
 
 Model = TypeVar("Model", bound=pydantic.BaseModel)
 Proto = TypeVar("Proto", bound=message.Message)

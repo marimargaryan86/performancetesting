@@ -6,7 +6,7 @@ import phonenumbers
 import pycountry
 from pydantic import typing, validator
 
-from snowfall.format.gtfs import constants
+from snowfall.stdlib.format.gtfs import constants
 
 
 def normalize_currency(currency: Optional[str]) -> Optional[str]:

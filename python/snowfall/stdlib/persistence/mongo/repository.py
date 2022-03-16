@@ -10,8 +10,8 @@ from google.protobuf.message import Message
 from motor import core, motor_asyncio
 from pydantic import BaseModel
 
-from snowfall.persistence import cursor
-from snowfall.persistence.mongo import coders, resultset
+from snowfall.stdlib.persistence import cursor
+from snowfall.stdlib.persistence.mongo import coders, resultset
 
 _proto_id_key = "id"
 mongo_id_key = "_id"

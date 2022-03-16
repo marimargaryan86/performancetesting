@@ -2,7 +2,7 @@ from typing import cast
 
 from snowfall.junction.offers import offers
 from snowfall.junction.offers.v1alpha import offers_pb2
-from snowfall.transport import amqp
+from snowfall.stdlib.transport import amqp
 
 
 class OfferImporter(object):

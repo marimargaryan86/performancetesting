@@ -3,7 +3,7 @@ from typing import Any
 
 import pytest
 
-from snowfall.logging import filtering
+from snowfall.stdlib.logging import filtering
 
 
 def test_secret_keys_are_filtered() -> None:  # noqa: WPS218

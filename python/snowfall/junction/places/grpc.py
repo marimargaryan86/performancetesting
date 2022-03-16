@@ -4,7 +4,7 @@ from grpc import StatusCode, aio
 
 from snowfall.junction.places.places import CuratedPlaceRepository, PlaceRepository
 from snowfall.junction.places.v1alpha import places_pb2, places_pb2_grpc
-from snowfall.transport.grpc import Service
+from snowfall.stdlib.transport.grpc import Service
 
 
 class PlacesService(Service, places_pb2_grpc.PlacesServiceServicer):

@@ -7,8 +7,8 @@ from typing import Optional
 
 import grpc
 
-from snowfall.format import protobuf
 from snowfall.junction.offers.v1alpha import offers_pb2, offers_pb2_grpc
+from snowfall.stdlib.format import protobuf
 
 
 class NotFoundError(Exception):

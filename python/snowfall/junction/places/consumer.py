@@ -2,7 +2,7 @@ from typing import cast
 
 from snowfall.common.v1alpha.models_pb2 import Place
 from snowfall.junction.places.places import PlaceRepository
-from snowfall.transport.amqp import Consumer, Message
+from snowfall.stdlib.transport.amqp import Consumer, Message
 
 
 class PlaceImportConsumer(object):

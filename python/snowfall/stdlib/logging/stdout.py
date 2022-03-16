@@ -7,7 +7,7 @@ from typing import Any, Iterator, Optional, Sequence, Type, Union
 import rapidjson
 import structlog
 
-from snowfall.logging import processors
+from snowfall.stdlib.logging import processors
 
 
 def configure_logger(

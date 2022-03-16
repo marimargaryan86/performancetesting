@@ -5,7 +5,7 @@ from typing import Any
 from pymongo import GEOSPHERE, IndexModel, results
 
 from snowfall.common.v1alpha import models_pb2
-from snowfall.persistence.mongo import coders, repository, resultset
+from snowfall.stdlib.persistence.mongo import coders, repository, resultset
 
 _mongo_id_key = "_id"
 _proto_id_key = "id"

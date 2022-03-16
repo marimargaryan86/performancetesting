@@ -8,9 +8,9 @@ from pydantic import AnyUrl, BaseSettings
 
 from snowfall.geodata import geocoding
 from snowfall.junction.gtfs_feed import importer, places, schedules
-from snowfall.persistence.mongo import temporary
 from snowfall.service import RunnableService, Task, make_runnable_service
-from snowfall.transport import amqp
+from snowfall.stdlib.persistence.mongo import temporary
+from snowfall.stdlib.transport import amqp
 
 
 class _Settings(BaseSettings):

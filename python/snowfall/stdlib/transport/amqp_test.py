@@ -1,6 +1,6 @@
 from google.protobuf.timestamp_pb2 import Timestamp
 
-from snowfall.transport.amqp import Serializer
+from snowfall.stdlib.transport.amqp import Serializer
 
 _seconds = 1639696695
 

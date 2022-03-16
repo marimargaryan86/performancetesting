@@ -11,7 +11,7 @@ from snowfall.junction.trips import trips
 from snowfall.junction.trips.consumer import TripSearchConsumer
 from snowfall.junction.trips.grpc import TripSearchService, TripService
 from snowfall.service import RunnableService, Task, make_runnable_service
-from snowfall.transport import amqp, grpc
+from snowfall.stdlib.transport import amqp, grpc
 
 _TRIPS = "trips"
 

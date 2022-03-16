@@ -7,7 +7,7 @@ import pytest
 import structlog
 from _pytest import capture  # noqa: WPS436
 
-from snowfall.logging import filtering, stdout
+from snowfall.stdlib.logging import filtering, stdout
 
 
 def _decode_log(capsys: capture.CaptureFixture[str]) -> dict[str, Any]:

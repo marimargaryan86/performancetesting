@@ -3,7 +3,7 @@ from typing import Any
 import pytest
 import structlog
 
-from snowfall.logging import sentry, stdout
+from snowfall.stdlib.logging import sentry, stdout
 
 SentryEvents = list[dict[str, Any]]
 Breadcrumbs = list[dict[str, Any]]

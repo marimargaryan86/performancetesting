@@ -4,7 +4,7 @@ from typing import Annotated, Optional
 
 import pydantic
 
-from snowfall.format.gtfs import constants, normalizers
+from snowfall.stdlib.format.gtfs import constants, normalizers
 
 
 class Agency(pydantic.BaseModel):

@@ -2,7 +2,7 @@ import ipaddress
 
 from grpc import aio
 
-from snowfall.transport.grpc import create_server
+from snowfall.stdlib.transport.grpc import create_server
 
 
 def test_create_server() -> None:

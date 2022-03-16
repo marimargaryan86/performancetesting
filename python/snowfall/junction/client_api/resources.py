@@ -5,10 +5,10 @@ from typing import Any, Sequence
 from starlette import requests
 
 from snowfall.common.v1alpha import models_pb2
-from snowfall.format import protobuf
 from snowfall.junction.client_api import models
 from snowfall.junction.offers.v1alpha import offers_pb2
 from snowfall.junction.trips.v1alpha import trips_pb2
+from snowfall.stdlib.format import protobuf
 
 _SELF_HREF = "self"
 _RELATIONSHIPS_FIELD = "data"

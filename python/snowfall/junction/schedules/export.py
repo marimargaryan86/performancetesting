@@ -10,10 +10,10 @@ from aiofiles.threadpool import binary
 from h3.api import numpy_int as h3
 
 from snowfall.common.v1alpha import models_pb2
-from snowfall.format import protobuf
 from snowfall.junction.planner.v1alpha import schedules_pb2
 from snowfall.junction.schedules import schedules
-from snowfall.persistence import redis
+from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.persistence import redis
 
 _FILE_MODE: Literal["wb"] = "wb"
 _MIN_TRANSFER_TIME = 25 * 60  # noqa: WPS432 - todo: calculate somehow?

@@ -2,7 +2,7 @@ import datetime
 
 import pytest
 
-from snowfall.format.gtfs import normalizers
+from snowfall.stdlib.format.gtfs import normalizers
 
 
 def test_normalize_currency_with_valid_currency() -> None:

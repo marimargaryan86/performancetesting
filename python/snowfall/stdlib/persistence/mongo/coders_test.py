@@ -3,7 +3,7 @@ import datetime
 import pydantic
 
 from snowfall.common.v1alpha import models_pb2
-from snowfall.persistence.mongo import coders
+from snowfall.stdlib.persistence.mongo import coders
 
 
 class _TestModel(pydantic.BaseModel):

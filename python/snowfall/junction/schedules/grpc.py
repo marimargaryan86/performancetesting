@@ -2,7 +2,7 @@ from grpc import StatusCode, aio
 
 from snowfall.junction.schedules.schedules import ScheduleRepository
 from snowfall.junction.schedules.v1alpha import schedules_pb2, schedules_pb2_grpc
-from snowfall.transport.grpc import Service
+from snowfall.stdlib.transport.grpc import Service
 
 
 class ScheduleService(Service, schedules_pb2_grpc.ScheduleServiceServicer):

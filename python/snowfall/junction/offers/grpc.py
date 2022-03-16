@@ -3,7 +3,7 @@ import grpc
 from snowfall.junction.offers import amqp
 from snowfall.junction.offers.offers import OfferSearchRepository
 from snowfall.junction.offers.v1alpha import offers_pb2, offers_pb2_grpc
-from snowfall.transport.grpc import Service
+from snowfall.stdlib.transport.grpc import Service
 
 
 class OfferSearchService(Service, offers_pb2_grpc.OfferSearchServiceServicer):

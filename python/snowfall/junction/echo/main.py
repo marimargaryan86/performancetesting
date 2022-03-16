@@ -5,7 +5,7 @@ from pydantic import BaseSettings
 
 from snowfall.junction.echo.v1 import echo_pb2, echo_pb2_grpc
 from snowfall.service import RunnableService, Task, make_runnable_service
-from snowfall.transport import grpc
+from snowfall.stdlib.transport import grpc
 
 
 class _Settings(BaseSettings):

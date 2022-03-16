@@ -3,8 +3,8 @@ import asyncio
 import aioredis
 import pytest
 
-from snowfall.persistence import redis
-from snowfall.testing import asserts
+from snowfall.stdlib.persistence import redis
+from snowfall.stdlib.testing import asserts
 
 
 @pytest.mark.asyncio
