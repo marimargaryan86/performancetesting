@@ -21,7 +21,11 @@ _START_SEQUENCE = -1
 
 
 class State(object):
-    def __init__(self, client: redis.Client, repository: schedules.ScheduleRepository):
+    def __init__(
+        self,
+        client: redis.Client[bytes],
+        repository: schedules.ScheduleRepository,
+    ):
         self._logger = structlog.get_logger(__name__)
         self._repository = repository
         self._redis = client
@@ -67,7 +71,11 @@ class State(object):
 
 
 class Exporter(object):  # noqa: WPS214
-    def __init__(self, client: redis.Client, repository: schedules.ScheduleRepository):
+    def __init__(
+        self,
+        client: redis.Client[bytes],
+        repository: schedules.ScheduleRepository,
+    ):
         self._repository = repository
         self._redis = client
         self._state = State(client, repository)

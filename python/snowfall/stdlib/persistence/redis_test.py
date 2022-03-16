@@ -80,7 +80,7 @@ class TestClient(object):
 
     @pytest.fixture(autouse=True)
     def _setup(self, redis_client: aioredis.Redis) -> None:
-        self._client = redis.Client(redis_client)
+        self._client = redis.Client[bytes](redis_client)
 
 
 @pytest.mark.asyncio
@@ -209,5 +209,5 @@ class TestPrefixClient(object):
 
     @pytest.fixture(autouse=True)
     def _setup(self, redis_client: aioredis.Redis) -> None:
-        self._foo_client = redis.Client(redis_client, "foo")
-        self._bar_client = redis.Client(redis_client, "bar")
+        self._foo_client = redis.Client[bytes](redis_client, "foo")
+        self._bar_client = redis.Client[bytes](redis_client, "bar")

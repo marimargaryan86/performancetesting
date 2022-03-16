@@ -1,9 +1,9 @@
-from typing import Any, AsyncIterable, Optional
+from typing import Any, AnyStr, AsyncIterable, Generic, Optional
 
 import aioredis
 
 
-class Hash(object):
+class Hash(Generic[AnyStr]):
     def __init__(self, redis: aioredis.Redis, hash_: str):
         self._hash = hash_
         self._redis = redis
@@ -14,13 +14,13 @@ class Hash(object):
     async def delete(self, hash_key: str) -> None:
         await self._redis.hdel(self._hash, hash_key)
 
-    async def get(self, hash_key: str) -> Optional[bytes]:
+    async def get(self, hash_key: str) -> Optional[AnyStr]:
         return await self._redis.hget(self._hash, hash_key)
 
     async def length(self) -> int:
         return await self._redis.hlen(self._hash)
 
-    async def to_iterable(self) -> AsyncIterable[tuple[bytes, bytes]]:
+    async def to_iterable(self) -> AsyncIterable[tuple[AnyStr, AnyStr]]:
         cursor = 0
 
         while True:
@@ -33,7 +33,7 @@ class Hash(object):
                 return
 
 
-class List(object):
+class List(Generic[AnyStr]):
     def __init__(self, redis: aioredis.Redis, list_: str):
         self._list = list_
         self._redis = redis
@@ -41,7 +41,7 @@ class List(object):
     async def push(self, list_value: Any) -> None:
         await self._redis.rpush(self._list, list_value)
 
-    async def to_iterable(self, chunk: int = 100) -> AsyncIterable[bytes]:
+    async def to_iterable(self, chunk: int = 100) -> AsyncIterable[AnyStr]:
         length = await self._redis.llen(self._list)
         start = 0
 
@@ -55,7 +55,7 @@ class List(object):
             start = stop
 
 
-class Client(object):
+class Client(Generic[AnyStr]):
     def __init__(self, redis: aioredis.Redis, prefix: str = ""):
         self._prefix = "{0}:".format(prefix) if prefix else ""
         self._redis = redis
@@ -79,14 +79,14 @@ class Client(object):
             if cursor == 0:
                 break
 
-    async def get(self, name: str) -> Optional[bytes]:
+    async def get(self, name: str) -> Optional[AnyStr]:
         return await self._redis.get(self._prefix + name)
 
-    def hash_(self, name: str) -> Hash:
-        return Hash(self._redis, self._prefix + name)
+    def hash_(self, name: str) -> Hash[AnyStr]:
+        return Hash[AnyStr](self._redis, self._prefix + name)
 
-    def list_(self, name: str) -> List:
-        return List(self._redis, self._prefix + name)
+    def list_(self, name: str) -> List[AnyStr]:
+        return List[AnyStr](self._redis, self._prefix + name)
 
     async def set_(self, name: str, raw_value: Any) -> None:
         return await self._redis.set(self._prefix + name, raw_value)

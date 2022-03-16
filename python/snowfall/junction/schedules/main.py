@@ -45,7 +45,7 @@ async def _export(_: RunnableService) -> None:
     async with pool.client() as conn:  # nosec
         async with aiofiles.tempfile.TemporaryDirectory() as temp:  # type: ignore[attr-defined]
             await export.Exporter(
-                redis.Client(conn, "exporter"),
+                redis.Client[bytes](conn, "exporter"),
                 schedules.ScheduleRepository(mongo.schedules.schedules),
             ).export(pathlib.Path(temp))
 
