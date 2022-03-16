@@ -1,4 +1,4 @@
-poetry_requirements(
+python_requirements(
     module_mapping={
         "grpcio": ["grpc"],
         "grpcio-health-checking": ["grpc_health"],

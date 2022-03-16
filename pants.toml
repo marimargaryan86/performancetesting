@@ -1,5 +1,5 @@
 [GLOBAL]
-pants_version = "2.10.0rc2"
+pants_version = "2.10.0rc4"
 use_deprecated_python_macros = false
 backend_packages = [
     "pants.backend.codegen.protobuf.python",
@@ -80,7 +80,6 @@ interpreter_constraints = ["CPython==3.9.10"]
 extra_requirements = ["grpc-stubs", "pydantic"]
 
 [poetry]
-version = "poetry==1.1.13"
 interpreter_constraints = ["CPython==3.9.10"]
 
 [protoc]
@@ -104,14 +103,11 @@ extra_requirements = [
 
 [python]
 interpreter_constraints = ["CPython==3.9.10"]
-requirement_constraints = "vendor/lock/constraints.txt"
+enable_resolves = true
+resolves = {python-default = "vendor/lock/constraints.txt"}
 
 [python-protobuf]
 mypy_plugin = true
-runtime_dependencies = [
-    "vendor#grpcio",
-    "vendor#protobuf",
-]
 
 [source]
 root_patterns = [

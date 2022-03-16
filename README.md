@@ -1,12 +1,11 @@
 # Junction
 
-Junction is a mono-repository that is using [Poetry][poetry] for dependency
-management and [Pants][pants] for tooling, like linting, testing, type-checking
-and building.
+Junction is a mono-repository that uses [Pants][pants].
 
 ## Setup
 
 Check the [CONTRIBUTING.md](CONTRIBUTING.md) file for the setup instructions.
+
 
 ## Project Architecture
 Follow this image of the Junction [architecture][junction-architecture].
@@ -32,5 +31,4 @@ The `places grpc` service then reads the places from the `mongo` collection and 
 
 
 [junction-architecture]: https://miro.com/app/board/uXjVOIhsVCg=/
-[poetry]: https://python-poetry.org/
 [pants]: https://pantsbuild.github.io/

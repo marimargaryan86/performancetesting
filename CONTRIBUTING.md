@@ -16,11 +16,7 @@ export PATH="$(pyenv root)/shims:$PATH"
 ```shell
 brew install docker
 ```
-4. Install [Poetry][poetry].
-```shell
-curl -sSL https://install.python-poetry.org | python3 - --version=1.2.0a2
-```
-5. If you are on an M1 Macbook Pro, make sure you have Rosetta installed.
+4. If you are on a Mac with an arm64 processor, make sure you have Rosetta installed.
 
 ### Set up the Junction environment
 
@@ -29,31 +25,26 @@ curl -sSL https://install.python-poetry.org | python3 - --version=1.2.0a2
 git clone git@git.snowfall.se:junction/junction.git
 cd junction
 ```
-2. Install the Python version using pyenv. It will automatically install the version specified in the `.python-version` file.
+2. Install the correct Python interpreter using `pyenv`. It will automatically install the version specified in the `.python-version` file.
 ```shell
 pyenv install
-```
-3. Install Python dependencies from the `/vendor` folder.
-```shell
-cd vendor
-poetry install
-cd ..
-```
-4. Export generated code using Pants.
-```shell
-./pants export-codegen ::
 ```
 
 ### Set up your IDE (Optional)
 
+1. Export the virtual environment using Pants.
+```shell
+./pants export ::
+```
+2. Export generated code using Pants.
+```shell
+./pants export-codegen ::
+```
+
 #### PyCharm
 
-1. Check your path to the Poetry virtual environment.
-```shell
-poetry env info
-```
-2. In your project settings, add the interpreter path from Poetry as the project interpreter.
-3. Mark the following paths as (right click on folder + mark directory as):
+1. In your project settings, add `dist/export/python/virtualenvs/python-default/3.9.10/bin/python` as the project interpreter.
+2. Mark the following paths as (right click on folder + mark directory as):
    1. Source Folders:
       1. `dist/codegen/python`
       2. `python`
@@ -105,20 +96,23 @@ or check [the written summary][uncle-bob-summary].
 
 #### Adding Dependencies
 
-1. Navigate to `/vendor` and run `poetry add {package}`.
-2. Make sure the packages in `pyproject.toml` are in alphabetic order.
-3. Run `poetry export --without-hashes --dev -o lock/constraints.txt`.
+1. Add the dependency and its version to `vendor/requirements.txt`.
+2. Run `./pants --no-pantsd generate-lockfiles --resolve=python-default`.
+3. If the dependency's requirement name and the module name is different, or if
+   the requirement exposes additional modules, the dependency and its modules
+   needs to be added to `module_mapping` in `vendor/BUILD`.
 
 #### Updating Dependencies
 
-1. Navigate to `/vendor` and run `poetry update`.
-2. Run `poetry export --without-hashes --dev -o lock/constraints.txt`.
+1. Update the dependency's version in `vendor/requirements.txt`.
+2. Run `./pants --no-pantsd generate-lockfiles --resolve=python-default`.
 
 #### Removing Dependencies
 
-It's problematic to remove dependencies, because `poetry remove {package}`
-uninstalls more than just the package. Think about if you have to install a
-package before doing it.
+1. Remove the dependency from `vendor/requirements.txt`.
+2. Run `./pants --no-pantsd generate-lockfiles --resolve=python-default`
+3. If the dependency has been added to `module_mapping` in `vendor/BUILD`, make
+   sure to remove it.
 
 ### Creating A New Service
 
@@ -158,7 +152,7 @@ There are also various optional [scopes][junction-scopes] that can be added to t
 
 ## Running Services
 
-It's generally favorable to run services through Pants (either in your IDE or terminal of choice) to get a more production-like experience, but running them through Python in Poetry's virtual environment is also possible.
+It's generally favorable to run services through Pants (either in your IDE or terminal of choice) to get a more production-like experience, but running them through Python by exporting a virtual environment from Pants is also possible.
 
 Regardless of method, you need to run `docker compose up` to boot up all required third-party services. Also remember that some first-party services have dependencies on other first-party services.
 
@@ -173,7 +167,7 @@ bash bash/run.sh python/snowfall/junction/{service} {task}
 #### Python
 
 ```shell
-bash -c 'env PYTHONPATH=$(git rev-parse --show-toplevel)/python:$(git rev-parse --show-toplevel)/dist/codegen/python:$PYTHONPATH $(cat python/snowfall/junction/trips/.env.dist | xargs -0) bash -c \'cd vendor; poetry run python -m "snowfall.junction.{service}.main" {task}\''
+bash -c 'env PYTHONPATH=$(git rev-parse --show-toplevel)/python:$(git rev-parse --show-toplevel)/dist/codegen/python:$PYTHONPATH $(cat python/snowfall/junction/{service}/.env.dist | xargs -0) bash -c "source dist/export/python/virtualenvs/python-default/3.9.10/bin/activate && python -m \"snowfall.junction.{service}.main\" {task}"'
 ```
 
 ### PyCharm
@@ -218,7 +212,6 @@ and follow instructions for setting appropriate environment variables (in the ou
 Make sure to set the environment variables in `.env.dist` in every service folder.
 If you're using `fish shell` you must add `-x` option to the `set` command, otherwise the variables are only set locally.
 
-[poetry]: https://python-poetry.org/
 [pants]: https://pantsbuild.github.io/
 [docker]: https://www.docker.com/
 [pyenv]: https://github.com/pyenv/pyenv
