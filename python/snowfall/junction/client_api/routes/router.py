@@ -1,7 +1,7 @@
 from lagom.integrations import starlette
 from starlette import routing
 
-from snowfall.junction.client_api.routes import health, offers, places, trips
+from snowfall.junction.client_api.routes import health, offers, places, segments, trips
 
 
 def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Route]:
@@ -20,7 +20,11 @@ def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Rou
         # todo: add GET /legs/types
         # todo: add GET /legs/types/{legTypeId}
         # todo: add GET /legs/{legId}
-        # todo: add GET /segments/{segmentId}
+        dependencies.route(
+            "/segments/{segmentId}",
+            segments.Segment,
+            name="ViewSegment",
+        ),
         # todo: add GET /segments/{segmentId}/legs
         dependencies.route("/trips/searches", trips.TripSearches),
         dependencies.route(

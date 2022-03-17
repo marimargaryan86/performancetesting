@@ -15,7 +15,7 @@ TRIP = "b3e45af0-f3ae-46e5-a94f-fd1c9d86fb7d"
 TRIPS = ("b3e45af0-f3ae-46e5-a94f-fd1c9d86fb7d",)
 SCHEDULES = ("as3bs02s-bask-awe4-sye2-sanpl5j1093h",)
 OFFERS = ("567890u7-asdf-asdf-7yhs-bn23eiuy083g",)
-SEGMENTS = ("s15s287s-1a4e-a4n9-7v0m-37249dsfh13j",)
+SEGMENTS = ("f236a92c-4cfa-468e-85ef-431d25dcd925",)
 
 
 def get_places() -> list[models_pb2.Place]:

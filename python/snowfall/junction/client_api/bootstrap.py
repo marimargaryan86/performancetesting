@@ -8,7 +8,7 @@ from lagom.integrations import starlette
 from starlette import applications, exceptions, status
 from starlette.middleware import Middleware
 
-from snowfall.adapter import offer_searches, places, trip_searches, trips
+from snowfall.adapter import offer_searches, places, segments, trip_searches, trips
 from snowfall.junction.client_api import handlers
 from snowfall.junction.client_api.routes import router
 
@@ -36,12 +36,14 @@ def create_dependencies(
     trip_searches_client: trip_searches.Client,
     trips_client: trips.Client,
     offer_searches_client: offer_searches.Client,
+    segments_client: segments.Client,
 ) -> starlette.StarletteIntegration:
     container = lagom.Container()
     container[places.Client] = places_client  # type: ignore[misc]
     container[trip_searches.Client] = trip_searches_client  # type: ignore[misc]
     container[trips.Client] = trips_client  # type: ignore[misc]
     container[offer_searches.Client] = offer_searches_client  # type: ignore[misc]
+    container[segments.Client] = segments_client  # type: ignore[misc]
 
     return starlette.StarletteIntegration(container)
 

@@ -42,6 +42,33 @@ class PlaceResource(models.Resource):
         )
 
 
+class SegmentResource(models.Resource):
+    @classmethod
+    async def from_proto(
+        cls,
+        segment: models_pb2.SegmentReference,
+        request: requests.Request,
+    ) -> SegmentResource:
+        return cls(
+            id=segment.id,
+            type="segments",
+            attributes={
+                "segmentId": segment.id,
+            },
+            relationships={
+                "legs": {
+                    _RELATIONSHIPS_FIELD: [],
+                },
+            },
+            links={
+                _SELF_HREF: request.url_for(
+                    "ViewSegment",
+                    segmentId=segment.id,
+                ),
+            },
+        )
+
+
 class TripResource(models.Resource):
     @classmethod
     async def from_proto(

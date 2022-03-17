@@ -9,7 +9,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from starlette import applications, testclient
 from starlette.middleware import Middleware, authentication
 
-from snowfall.adapter import offer_searches, places, trip_searches, trips
+from snowfall.adapter import offer_searches, places, segments, trip_searches, trips
 from snowfall.filesystem import loaders
 from snowfall.junction.client_api import (
     bootstrap,
@@ -40,12 +40,13 @@ jwt_public_key_bytes = jwt_private_key.public_key().public_bytes(
 jwt_public_key = b64encode(jwt_public_key_bytes).decode()
 
 
-def _create_app(
+def _create_app(  # noqa: WPS211
     custom_middlewares: Sequence[Middleware],
     places_client: places.Client,
     trip_searches_client: trip_searches.Client,
     trips_client: trips.Client,
     offer_searches_client: offer_searches.Client,
+    segments_client: segments.Client,
 ) -> applications.Starlette:
     return bootstrap.create_app(
         custom_middlewares=custom_middlewares,
@@ -54,6 +55,7 @@ def _create_app(
             trip_searches_client=trip_searches_client,
             trips_client=trips_client,
             offer_searches_client=offer_searches_client,
+            segments_client=segments_client,
         ),
     )
 
@@ -72,6 +74,7 @@ def app(
     trip_searches_client: trip_searches.Client,
     trips_client: trips.Client,
     offer_searches_client: offer_searches.Client,
+    segments_client: segments.Client,
 ) -> applications.Starlette:
     return _create_app(
         custom_middlewares=[
@@ -96,6 +99,7 @@ def app(
         trip_searches_client=trip_searches_client,
         trips_client=trips_client,
         offer_searches_client=offer_searches_client,
+        segments_client=segments_client,
     )
 
 
@@ -125,6 +129,7 @@ def test_app(
     trip_searches_client: trip_searches.Client,
     trips_client: trips.Client,
     offer_searches_client: offer_searches.Client,
+    segments_client: segments.Client,
 ) -> applications.Starlette:
     return _create_app(
         custom_middlewares=[
@@ -141,6 +146,7 @@ def test_app(
         trip_searches_client=trip_searches_client,
         trips_client=trips_client,
         offer_searches_client=offer_searches_client,
+        segments_client=segments_client,
     )
 
 

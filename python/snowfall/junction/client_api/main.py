@@ -7,7 +7,7 @@ import uvicorn
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
-from snowfall.adapter import offer_searches, places, trip_searches, trips
+from snowfall.adapter import offer_searches, places, segments, trip_searches, trips
 from snowfall.filesystem import loaders
 from snowfall.junction.client_api import (
     bootstrap,
@@ -69,6 +69,9 @@ def _factory() -> applications.Starlette:
             offer_searches_client=offer_searches.GrpcClient(
                 offers=offers_pb2_grpc.OfferServiceStub(offers_channel),
                 offer_searches=offers_pb2_grpc.OfferSearchServiceStub(offers_channel),
+            ),
+            segments_client=segments.GrpcClient(
+                segments=trips_pb2_grpc.TripServiceStub(trips_channel),
             ),
         ),
     )
