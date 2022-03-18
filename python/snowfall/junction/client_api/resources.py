@@ -82,7 +82,13 @@ class TripResource(models.Resource):
             attributes={},
             relationships={
                 "segments": {
-                    _RELATIONSHIPS_FIELD: [],
+                    _RELATIONSHIPS_FIELD: [
+                        await SegmentResource.from_proto(
+                            segment=segment,
+                            request=request,
+                        )
+                        for segment in trip.segments
+                    ],
                 },
             },
             links={
