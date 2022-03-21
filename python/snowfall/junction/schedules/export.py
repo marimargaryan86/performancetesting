@@ -31,7 +31,7 @@ class State(object):
         self._redis = client
 
     async def mark_as_completed(self) -> None:
-        await self._redis.set_(
+        await self._redis.put(
             "last_executed_at",
             str(datetime.datetime.now().timestamp()),
         )
@@ -41,7 +41,7 @@ class State(object):
         expected = await self._get_timestamp_from_redis("last_seen_update_at")
 
         if actual != expected:
-            await self._redis.set_(
+            await self._redis.put(
                 "last_seen_update_at",
                 str(actual.timestamp()),
             )
@@ -200,7 +200,7 @@ class Exporter(object):  # noqa: WPS214
             route_stops=[r_stop.sequence for r_stop in route_stops],
         )
 
-        await self._routes.set_(str(route.sequence), route.SerializeToString())
+        await self._routes.put(str(route.sequence), route.SerializeToString())
 
         return route.sequence
 
@@ -228,7 +228,7 @@ class Exporter(object):  # noqa: WPS214
 
         route_sequence_int = await self._generate_route(schedule, route_stops_f)
 
-        await self._route_sequences.set_(identifier, route_sequence_int)
+        await self._route_sequences.put(identifier, route_sequence_int)
 
         return route_sequence_int
 
@@ -253,8 +253,8 @@ class Exporter(object):  # noqa: WPS214
             transfer_time=_MIN_TRANSFER_TIME,
         )
 
-        await self._stops.set_(str(stop.sequence), stop.SerializeToString())
-        await self._stop_sequences.set_(stop.id, stop.sequence)
+        await self._stops.put(str(stop.sequence), stop.SerializeToString())
+        await self._stop_sequences.put(stop.id, stop.sequence)
 
         return stop.sequence
 

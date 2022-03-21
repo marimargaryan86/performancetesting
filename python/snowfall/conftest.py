@@ -17,7 +17,7 @@ from snowfall.adapter import (
 from snowfall.junction.offers.v1alpha import offers_pb2
 from snowfall.stdlib.logging import stdout
 
-pytest.register_assert_rewrite("snowfall.testing.asserts")
+pytest.register_assert_rewrite("snowfall.stdlib.testing.asserts")
 stdout.configure_logger()
 
 

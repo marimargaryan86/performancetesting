@@ -1,6 +1,8 @@
 import asyncio
+import datetime
 
 import aioredis
+import freezegun
 import pytest
 
 from snowfall.stdlib.persistence import redis
@@ -8,87 +10,11 @@ from snowfall.stdlib.testing import asserts
 
 
 @pytest.mark.asyncio
-class TestClient(object):
-    async def test_set_get_delete(self) -> None:
-        await self._client.set_("foobar", "bazqux")
-
-        assert await self._client.get("foobar") == b"bazqux"
-
-        await self._client.delete("foobar")
-
-        assert await self._client.get("foobar") is None
-
-    async def test_wildcard_delete(self) -> None:
-        await asyncio.gather(
-            self._client.set_("foo.bar", "foobar"),
-            self._client.set_("foo.baz", "foobar"),
-            self._client.set_("bar.baz", "foobar"),
-        )
-
-        await self._client.delete("foo.*")
-
-        await asserts.assert_awaitables(
-            (self._client.get("foo.bar"), None),
-            (self._client.get("foo.baz"), None),
-            (self._client.get("bar.baz"), b"foobar"),
-        )
-
-    async def test_hash(self) -> None:
-        hash_ = self._client.hash_("foobar")
-
-        await asyncio.gather(
-            hash_.set_("foobar", "foobar"),
-            hash_.set_("bazqux", "bazqux"),
-        )
-
-        await asserts.assert_iterable(
-            hash_.to_iterable(),
-            [
-                (b"bazqux", b"bazqux"),
-                (b"foobar", b"foobar"),
-            ],
-        )
-
-        await asserts.assert_awaitables(
-            (hash_.length(), 2),
-            (hash_.get("foobar"), b"foobar"),
-        )
-
-        await hash_.delete("foobar")
-
-        await asserts.assert_awaitables(
-            (hash_.length(), 1),
-            (hash_.get("foobar"), None),
-            (hash_.get("bazqux"), b"bazqux"),
-        )
-
-    async def test_list(self) -> None:
-        list_ = self._client.list_("foobar")
-
-        await asyncio.gather(
-            list_.push("foobar"),
-            list_.push("bazqux"),
-        )
-
-        await asserts.assert_iterable(
-            list_.to_iterable(),
-            [
-                b"foobar",
-                b"bazqux",
-            ],
-        )
-
-    @pytest.fixture(autouse=True)
-    def _setup(self, redis_client: aioredis.Redis) -> None:
-        self._client = redis.Client[bytes](redis_client)
-
-
-@pytest.mark.asyncio
 class TestPrefixClient(object):
     async def test_set_get_delete(self, redis_client: aioredis.Redis) -> None:
         await asyncio.gather(
-            self._foo_client.set_("foobar", "foobar"),
-            self._bar_client.set_("foobar", "bazqux"),
+            self._foo_client.put("foobar", "foobar"),
+            self._bar_client.put("foobar", "bazqux"),
         )
 
         await asserts.assert_awaitables(
@@ -105,10 +31,10 @@ class TestPrefixClient(object):
 
     async def test_wildcard_delete(self, redis_client: aioredis.Redis) -> None:
         await asyncio.gather(
-            self._foo_client.set_("foo.bar", "foobar"),
-            self._foo_client.set_("foo.baz", "foobar"),
-            self._bar_client.set_("foo.bar", "bazqux"),
-            self._bar_client.set_("foo.baz", "bazqux"),
+            self._foo_client.put("foo.bar", "foobar"),
+            self._foo_client.put("foo.baz", "foobar"),
+            self._bar_client.put("foo.bar", "bazqux"),
+            self._bar_client.put("foo.baz", "bazqux"),
         )
 
         await asserts.assert_awaitables(
@@ -132,10 +58,10 @@ class TestPrefixClient(object):
         hash2 = self._bar_client.hash_("foobar")
 
         await asyncio.gather(
-            hash1.set_("foobar", "foobar"),
-            hash1.set_("bazqux", "foobar"),
-            hash2.set_("foobar", "bazqux"),
-            hash2.set_("bazqux", "bazqux"),
+            hash1.put("foobar", "foobar"),
+            hash1.put("bazqux", "foobar"),
+            hash2.put("foobar", "bazqux"),
+            hash2.put("bazqux", "bazqux"),
         )
 
         await asserts.assert_awaitables(
@@ -205,6 +131,100 @@ class TestPrefixClient(object):
                 b"foobar2",
                 b"bazqux2",
             ],
+        )
+
+    async def test_set(self) -> None:
+        set1 = self._foo_client.set_("foobar")
+        set2 = self._bar_client.set_("foobar")
+
+        await asyncio.gather(
+            set1.add("foo1"),
+            set1.add("baz1"),
+            set2.add("foo2"),
+            set2.add("baz2"),
+        )
+
+        await asserts.assert_iterable(
+            set1.to_iterable(),
+            [
+                b"foo1",
+                b"baz1",
+            ],
+        )
+
+        await asserts.assert_iterable(
+            set2.to_iterable(),
+            [
+                b"foo2",
+                b"baz2",
+            ],
+        )
+
+    @freezegun.freeze_time("2021-12-21 12:12:12.121212")
+    async def test_expire_in_set(self) -> None:
+        set1 = self._foo_client.set_("foobar")
+        set2 = self._bar_client.set_("foobar")
+
+        await asyncio.gather(
+            set1.add("foo"),
+            set2.add("foo"),
+        )
+
+        expiry = datetime.datetime.now(
+            tz=datetime.timezone.utc,
+        ) + datetime.timedelta(seconds=30)
+
+        await self._foo_client.put_expires_at(set1, expiry)
+
+        await asserts.assert_awaitables(
+            (self._foo_client.get_expires_at(set1), expiry),
+            (self._bar_client.get_expires_at(set2), None),
+        )
+
+    @freezegun.freeze_time("2021-12-21 12:12:12.121212")
+    async def test_put_expires_at_client(self) -> None:
+        await asyncio.gather(
+            self._foo_client.put("foo", "bar"),
+            self._bar_client.put("foo", "bar"),
+        )
+
+        expiry = datetime.datetime.now(
+            tz=datetime.timezone.utc,
+        ) + datetime.timedelta(seconds=30)
+
+        await self._foo_client.put_expires_at("foo", expiry)
+
+        await asserts.assert_awaitables(
+            (self._foo_client.get_expires_at("foo"), expiry),
+            (self._bar_client.get_expires_at("foo"), None),
+        )
+
+    @freezegun.freeze_time("2021-12-21 12:12:12.121212")
+    async def test_put_expires_at_if_greater(self) -> None:
+        set1 = self._foo_client.set_("foobar")
+        set2 = self._bar_client.set_("foobar")
+
+        expiry = datetime.datetime.now(
+            tz=datetime.timezone.utc,
+        ) + datetime.timedelta(seconds=30)
+
+        await asyncio.gather(
+            set1.add("foo"),
+            set2.add("foo"),
+            redis.put_expires_at_if_greater(self._foo_client, set1, expiry),
+            redis.put_expires_at_if_greater(
+                self._foo_client,
+                set1,
+                datetime.datetime.now(
+                    tz=datetime.timezone.utc,
+                )
+                + datetime.timedelta(seconds=10),
+            ),
+        )
+
+        await asserts.assert_awaitables(
+            (self._foo_client.get_expires_at(set1), expiry),
+            (self._bar_client.get_expires_at(set2), None),
         )
 
     @pytest.fixture(autouse=True)
