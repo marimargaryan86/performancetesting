@@ -12,19 +12,20 @@ from snowfall.junction.trips.v1alpha import trips_pb2, trips_pb2_grpc
 
 @pytest.mark.asyncio
 class TestDictClient(object):
-    async def test_single_trip_is_retrievable(
-        self,
-        trips_client: trips.Client,
-    ) -> None:
+    async def test_single_trip_is_retrievable(self, trips_client: trips.Client) -> None:
         trip = await trips_client.get(fixtures.TRIPS[0])
         assert trip.id == fixtures.TRIPS[0]
 
-    async def test_missing_trip_throws_error(
-        self,
-        trips_client: trips.Client,
-    ) -> None:
+    async def test_missing_trip_throws_error(self, trips_client: trips.Client) -> None:
         with pytest.raises(trips.NotFoundError):
             await trips_client.get(fixtures.NOT_FOUND)
+
+    async def test_trips_are_found_by_id(self, trips_client: trips.Client) -> None:
+        trips_page = await trips_client.find_by_ids(fixtures.TRIPS, limit=20)
+        assert len(trips_page.trips) == len(fixtures.TRIPS)
+
+        for trip in trips_page.trips:
+            assert trip.id in fixtures.TRIPS
 
 
 @pytest.mark.asyncio
@@ -70,3 +71,16 @@ class TestGrpcClient(object):
         client = trips.GrpcClient(stub)
         trip = await client.get(fixtures.TRIPS[0])
         assert trip.id == fixtures.TRIPS[0]
+
+    async def test_trips_are_found_by_id(self) -> None:
+        protos = [models_pb2.TripReference(id=trip_id) for trip_id in fixtures.TRIPS]
+        stub = mock.create_autospec(trips_pb2_grpc.TripServiceStub)
+        stub.ListTrips = mock.AsyncMock(
+            return_value=trips_pb2.ListTripsResponse(trips=protos),
+        )
+        client = trips.GrpcClient(stub)
+        trips_page = await client.find_by_ids(fixtures.TRIPS, limit=20)
+        assert len(trips_page.trips) == len(fixtures.TRIPS)
+
+        for trip in trips_page.trips:
+            assert trip.id in fixtures.TRIPS

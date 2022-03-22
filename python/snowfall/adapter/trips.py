@@ -36,6 +36,15 @@ class Client(abc.ABC):
     async def get(self, identifier: str) -> models_pb2.TripReference:
         """Fetch a trip resource."""
 
+    @abc.abstractmethod
+    async def find_by_ids(
+        self,
+        identifiers: Sequence[str],
+        limit: int,
+        cursor: Optional[str] = None,
+    ) -> TripsPage:
+        """Find trips by trip by ID."""
+
 
 class DictClient(Client):
     def __init__(self, trips: Sequence[models_pb2.TripReference]) -> None:
@@ -46,6 +55,14 @@ class DictClient(Client):
             raise NotFoundError()
 
         return models_pb2.TripReference(id=trip_id)
+
+    async def find_by_ids(
+        self,
+        identifiers: Sequence[str],
+        limit: int,
+        cursor: Optional[str] = None,
+    ) -> TripsPage:
+        return TripsPage(trips=list(self._trips.values()))
 
 
 class GrpcClient(Client):
@@ -64,3 +81,25 @@ class GrpcClient(Client):
             raise UnknownError() from exc
 
         return response.trip
+
+    async def find_by_ids(
+        self,
+        identifiers: Sequence[str],
+        limit: int,
+        cursor: Optional[str] = None,
+    ) -> TripsPage:
+        try:
+            response = await self._trips.ListTrips(
+                trips_pb2.ListTripsRequest(
+                    ids=list(identifiers),
+                    page_size=limit,
+                    page_token=cursor or "",
+                ),
+            )
+        except grpc.aio.AioRpcError as exc:
+            raise UnknownError() from exc
+
+        return TripsPage(
+            trips=list(response.trips),
+            next_page_token=response.next_page_token,
+        )
