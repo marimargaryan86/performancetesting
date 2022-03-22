@@ -26,6 +26,19 @@ class TestDictClient(object):
         with pytest.raises(schedules.NotFoundError):
             await schedules_client.get(fixtures.NOT_FOUND)
 
+    async def test_schedules_are_found_by_id(
+        self,
+        schedules_client: schedules.Client,
+    ) -> None:
+        schedules_page = await schedules_client.find_by_ids(
+            fixtures.SCHEDULES,
+            limit=20,
+        )
+        assert len(schedules_page.schedules) == len(fixtures.SCHEDULES)
+
+        for schedule in schedules_page.schedules:
+            assert schedule.id in fixtures.SCHEDULES
+
 
 @pytest.mark.asyncio
 class TestGrpcClient(object):
@@ -70,3 +83,18 @@ class TestGrpcClient(object):
         client = schedules.GrpcClient(stub)
         schedule = await client.get(fixtures.SCHEDULES[0])
         assert schedule.id == fixtures.SCHEDULES[0]
+
+    async def test_trips_are_found_by_id(self) -> None:
+        protos = [
+            models_pb2.Schedule(id=schedule_id) for schedule_id in fixtures.SCHEDULES
+        ]
+        stub = mock.create_autospec(schedules_pb2_grpc.ScheduleServiceStub)
+        stub.ListSchedules = mock.AsyncMock(
+            return_value=schedules_pb2.ListSchedulesResponse(schedules=protos),
+        )
+        client = schedules.GrpcClient(stub)
+        schedules_page = await client.find_by_ids(fixtures.SCHEDULES, limit=20)
+        assert len(schedules_page.schedules) == len(fixtures.SCHEDULES)
+
+        for schedule in schedules_page.schedules:
+            assert schedule.id in fixtures.SCHEDULES
