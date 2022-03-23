@@ -9,6 +9,7 @@ from snowfall import fixtures
 from snowfall.adapter import (
     offer_searches,
     offers,
+    orders,
     places,
     schedules,
     segments,
@@ -75,6 +76,11 @@ def offers_client() -> offers.Client:
 @pytest.fixture
 def offer_searches_client() -> offer_searches.Client:
     return offer_searches.DictClient()
+
+
+@pytest.fixture
+def orders_client() -> orders.Client:
+    return orders.DictClient(fixtures.get_orders())
 
 
 @pytest.fixture

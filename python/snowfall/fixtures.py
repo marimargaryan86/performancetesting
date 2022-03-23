@@ -2,6 +2,7 @@ import random
 
 from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.offers.v1alpha import offers_pb2
+from snowfall.junction.orders.v1alpha import orders_pb2
 
 _LATITUDE_RANGE = (-90, 90)
 _LONGITUDE_RANGE = (-180, 180)
@@ -16,6 +17,7 @@ TRIPS = ("b3e45af0-f3ae-46e5-a94f-fd1c9d86fb7d",)
 SCHEDULES = ("as3bs02s-bask-awe4-sye2-sanpl5j1093h",)
 OFFERS = ("567890u7-asdf-asdf-7yhs-bn23eiuy083g",)
 SEGMENTS = ("f236a92c-4cfa-468e-85ef-431d25dcd925",)
+ORDERS = ("f236a92c-4cfa-468e-85ef-431d25dcd925",)
 
 
 def get_places() -> list[models_pb2.Place]:
@@ -71,5 +73,15 @@ def get_offers() -> list[offers_pb2.OfferAggregate]:
 
 def generate_offer_reference(identifier: str) -> offers_pb2.OfferAggregate:
     return offers_pb2.OfferAggregate(
+        id=identifier,
+    )
+
+
+def get_orders() -> list[orders_pb2.Order]:
+    return [generate_order(identifier) for identifier in ORDERS]
+
+
+def generate_order(identifier: str) -> orders_pb2.Order:
+    return orders_pb2.Order(
         id=identifier,
     )
