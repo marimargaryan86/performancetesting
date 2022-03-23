@@ -1,3 +1,19 @@
+variable "docker_image" {
+  type = string
+}
+
+variable "registry_address" {
+  type = string
+}
+
+variable "registry_password" {
+  type = string
+}
+
+variable "registry_username" {
+  type = string
+}
+
 job "planner" {
   datacenters = ["junction-dev-dc1"]
   type = "service"
@@ -19,7 +35,7 @@ job "planner" {
     }
 
     service {
-      name = "planner"
+      name = "planner-${NOMAD_NAMESPACE}"
       port = "grpc"
       tags = ["grpc"]
 
@@ -38,16 +54,16 @@ job "planner" {
       }
 
       config {
-        image = "${DOCKER_IMAGE}"
+        image = var.docker_image
         ports = ["grpc"]
         args = [
           "grpc",
         ]
 
         auth {
-          username = "${NOMAD_REGISTRY_USERNAME}"
-          password = "${NOMAD_REGISTRY_PASSWORD}"
-          server_address = "${CI_REGISTRY}"
+          username       = var.registry_username
+          password       = var.registry_password
+          server_address = var.registry_address
         }
       }
 
@@ -100,7 +116,7 @@ job "planner" {
       }
 
       env {
-        ENV_NAME     = "development"
+        ENV_NAME     = "${NOMAD_NAMESPACE}"
         GRPC_ADDRESS = "0.0.0.0"
         GRPC_PORT    = "${NOMAD_PORT_grpc}"
         PROTO_DIR    = "${NOMAD_TASK_DIR}"

@@ -1,3 +1,19 @@
+variable "docker_image" {
+  type = string
+}
+
+variable "registry_address" {
+  type = string
+}
+
+variable "registry_password" {
+  type = string
+}
+
+variable "registry_username" {
+  type = string
+}
+
 job "client-api" {
   datacenters = ["junction-dev-dc1"]
   type        = "service"
@@ -19,7 +35,7 @@ job "client-api" {
     }
 
     service {
-      name = "client-api"
+      name = "client-api-${NOMAD_NAMESPACE}"
       port = "http"
       tags = [
         "http",
@@ -58,18 +74,18 @@ EOH
       }
 
       config {
-        image = "${DOCKER_IMAGE}"
+        image = var.docker_image
         ports = ["http"]
 
         auth {
-          username       = "${NOMAD_REGISTRY_USERNAME}"
-          password       = "${NOMAD_REGISTRY_PASSWORD}"
-          server_address = "${CI_REGISTRY}"
+          username       = var.registry_username
+          password       = var.registry_password
+          server_address = var.registry_address
         }
       }
 
       env {
-        ENV_NAME              = "development"
+        ENV_NAME              = "${NOMAD_NAMESPACE}"
         FORWARDED_ALLOWED_IPS = "[\"0.0.0.0\"]"
         HTTP_ADDRESS          = "0.0.0.0"
         HTTP_PORT             = "${NOMAD_PORT_http}"

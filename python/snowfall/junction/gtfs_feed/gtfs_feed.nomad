@@ -1,3 +1,19 @@
+variable "docker_image" {
+  type = string
+}
+
+variable "registry_address" {
+  type = string
+}
+
+variable "registry_password" {
+  type = string
+}
+
+variable "registry_username" {
+  type = string
+}
+
 job "gtfs-feed" {
   datacenters = ["junction-dev-dc1"]
   type        = "batch"
@@ -29,20 +45,20 @@ EOH
       }
 
       config {
-        image = "${DOCKER_IMAGE}"
+        image = var.docker_image
         args = [
           "import",
         ]
 
         auth {
-          username       = "${NOMAD_REGISTRY_USERNAME}"
-          password       = "${NOMAD_REGISTRY_PASSWORD}"
-          server_address = "${CI_REGISTRY}"
+          username       = var.registry_username
+          password       = var.registry_password
+          server_address = var.registry_address
         }
       }
 
       env {
-        ENV_NAME   = "development"
+        ENV_NAME   = "${NOMAD_NAMESPACE}"
         FEED_REF   = "france-intercity"
         FEED_URL   = "https://eu.ftp.opendatasoft.com/sncf/gtfs/export-intercites-gtfs-last.zip"
         SENTRY_DSN = "https://d86394991a184238865125d76e464d6d@sentry.snowfall.se/21"

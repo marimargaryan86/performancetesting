@@ -13,25 +13,22 @@ for DIR in "${1}"/*; do
 
 	image_file="${DIR}/image.txt"
 	template_file="${DIR}/template.nomad"
-	job_file="${DIR}/job.nomad"
 
 	if ! [ -f "${image_file}" ] || ! [ -f "${template_file}" ]; then
 		echo "skip: ${image_file} or ${template_file} is missing"
 		continue
 	fi
 
-	DOCKER_IMAGE=$(cat "${DIR}/image.txt")
-	service_name=$(basename "${DOCKER_IMAGE%:*}" | sed s/_/-/g)
-	service_version="${DOCKER_IMAGE##*:}"
+	NOMAD_VAR_docker_image=$(cat "${DIR}/image.txt")
+	service_name=$(basename "${NOMAD_VAR_docker_image%:*}" | sed s/_/-/g)
+	service_version="${NOMAD_VAR_docker_image##*:}"
 
 	echo "deploy: ${service_name}@${service_version}"
 
-	export DOCKER_IMAGE
-	# shellcheck disable=SC2016
-	envsubst '${DOCKER_IMAGE} ${NOMAD_REGISTRY_USERNAME} ${NOMAD_REGISTRY_PASSWORD} ${CI_REGISTRY}' <"${template_file}" >"${job_file}"
+	export NOMAD_VAR_docker_image
 
-	nomad plan "${job_file}" | tee /dev/stderr | grep 'Job Modify Index:' | awk -F': ' '{ print $2 }' >check-index || if [ $? -eq 255 ]; then exit 255; else true; fi
-	nomad run -check-index="$(cat check-index)" "${job_file}"
+	nomad plan "${template_file}" | tee /dev/stderr | grep 'Job Modify Index:' | awk -F': ' '{ print $2 }' >check-index || if [ $? -eq 255 ]; then exit 255; else true; fi
+	nomad run -check-index="$(cat check-index)" "${template_file}"
 
 	sentry-cli releases deploys "${service_name}@${service_version}" new -e "${CI_ENVIRONMENT_NAME}"
 done

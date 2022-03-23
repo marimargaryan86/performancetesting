@@ -1,3 +1,19 @@
+variable "docker_image" {
+  type = string
+}
+
+variable "registry_address" {
+  type = string
+}
+
+variable "registry_password" {
+  type = string
+}
+
+variable "registry_username" {
+  type = string
+}
+
 job "mock" {
   datacenters = ["junction-dev-dc1"]
   type        = "service"
@@ -27,20 +43,20 @@ EOH
       }
 
       config {
-        image = "${DOCKER_IMAGE}"
+        image = var.docker_image
         args = [
           "offers",
         ]
 
         auth {
-          username       = "${NOMAD_REGISTRY_USERNAME}"
-          password       = "${NOMAD_REGISTRY_PASSWORD}"
-          server_address = "${CI_REGISTRY}"
+          username       = var.registry_username
+          password       = var.registry_password
+          server_address = var.registry_address
         }
       }
 
       env {
-        ENV_NAME     = "development"
+        ENV_NAME     = "${NOMAD_NAMESPACE}"
         SENTRY_DSN   = "https://e319b016d1b149299757a338479d7de7@sentry.snowfall.se/28"
       }
     }

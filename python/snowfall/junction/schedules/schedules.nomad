@@ -1,3 +1,19 @@
+variable "docker_image" {
+  type = string
+}
+
+variable "registry_address" {
+  type = string
+}
+
+variable "registry_password" {
+  type = string
+}
+
+variable "registry_username" {
+  type = string
+}
+
 job "schedules" {
   datacenters = ["junction-dev-dc1"]
   type        = "service"
@@ -19,7 +35,7 @@ job "schedules" {
     }
 
     service {
-      name = "schedules"
+      name = "schedules-${NOMAD_NAMESPACE}"
       port = "grpc"
       tags = ["grpc"]
 
@@ -43,21 +59,21 @@ EOH
       }
 
       config {
-        image = "${DOCKER_IMAGE}"
+        image = var.docker_image
         ports = ["grpc"]
         args = [
           "grpc",
         ]
 
         auth {
-          username       = "${NOMAD_REGISTRY_USERNAME}"
-          password       = "${NOMAD_REGISTRY_PASSWORD}"
-          server_address = "${CI_REGISTRY}"
+          username       = var.registry_username
+          password       = var.registry_password
+          server_address = var.registry_address
         }
       }
 
       env {
-        ENV_NAME     = "development"
+        ENV_NAME     = "${NOMAD_NAMESPACE}"
         GRPC_ADDRESS = "0.0.0.0"
         GRPC_PORT    = "${NOMAD_PORT_grpc}"
         SENTRY_DSN   = "https://8d94d1ca059f4dc9b4e1e91dfd3d7151@sentry.snowfall.se/25"
@@ -90,20 +106,20 @@ EOH
       }
 
       config {
-        image = "${DOCKER_IMAGE}"
+        image = var.docker_image
         args = [
           "import",
         ]
 
         auth {
-          username       = "${NOMAD_REGISTRY_USERNAME}"
-          password       = "${NOMAD_REGISTRY_PASSWORD}"
-          server_address = "${CI_REGISTRY}"
+          username       = var.registry_username
+          password       = var.registry_password
+          server_address = var.registry_address
         }
       }
 
       env {
-        ENV_NAME     = "development"
+        ENV_NAME     = "${NOMAD_NAMESPACE}"
         SENTRY_DSN   = "https://8d94d1ca059f4dc9b4e1e91dfd3d7151@sentry.snowfall.se/25"
         UPLOAD_TO_S3 = "true"
       }

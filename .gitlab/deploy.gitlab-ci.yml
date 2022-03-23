@@ -8,6 +8,10 @@ stages:
   script:
     - ./${CI_ENVIRONMENT_NAME}/deploy.sh "${CI_ENVIRONMENT_NAME}"
   needs: []
+  variables:
+    NOMAD_VAR_registry_address: "${CI_REGISTRY}"
+    NOMAD_VAR_registry_password: "${NOMAD_REGISTRY_PASSWORD}"
+    NOMAD_VAR_registry_username: "${NOMAD_REGISTRY_USERNAME}"
   tags:
     - docker
 
@@ -19,3 +23,5 @@ deploy-to-dev:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
       changes:
         - junction.dev/**/*
+  variables:
+    NOMAD_NAMESPACE: "${CI_ENVIRONMENT_SLUG}"

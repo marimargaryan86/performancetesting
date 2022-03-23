@@ -10,6 +10,11 @@ nomad:validate:
         - "**/*.nomad"
   needs:
     - "pants:setup"
+  variables:
+    NOMAD_VAR_docker_image: "${CI_REGISTRY_IMAGE}"
+    NOMAD_VAR_registry_address: "${CI_REGISTRY}"
+    NOMAD_VAR_registry_password: "${CI_REGISTRY_PASSWORD}"
+    NOMAD_VAR_registry_username: "${CI_REGISTRY_USER}"
   tags:
     - docker
 
