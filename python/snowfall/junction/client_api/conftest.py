@@ -10,7 +10,6 @@ from starlette import applications, testclient
 from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import offer_searches, places, segments, trip_searches, trips
-from snowfall.filesystem import loaders
 from snowfall.junction.client_api import (
     bootstrap,
     handlers,
@@ -18,6 +17,7 @@ from snowfall.junction.client_api import (
     middlewares,
     validation,
 )
+from snowfall.stdlib.persistence import filesystem
 
 jwt_token_version = "1"  # nosec
 jwt_payload = {"version": jwt_token_version, "client_id": "test"}
@@ -82,7 +82,7 @@ def app(
                 middlewares.ValidationMiddleware,
                 validator=validation.Validator(
                     "openapi.json",
-                    loaders.PkgLoader("client_api"),
+                    filesystem.PkgLoader("client_api"),
                 ),
                 excluded_status_codes={http.HTTPStatus.METHOD_NOT_ALLOWED},
             ),
@@ -137,7 +137,7 @@ def test_app(
                 middlewares.ValidationMiddleware,
                 validator=validation.Validator(
                     "python/snowfall/junction/client_api/fixtures/test.json",
-                    loaders.FileLoader(),
+                    filesystem.FileLoader(),
                 ),
                 excluded_status_codes={http.HTTPStatus.METHOD_NOT_ALLOWED},
             ),

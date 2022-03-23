@@ -1,8 +1,49 @@
+import abc
 import hashlib
+import json
 import pathlib
+import pkgutil
 import zipfile
+from typing import Any
 
 import aiofiles
+
+
+class Loader(abc.ABC):
+    @abc.abstractmethod
+    def load(self, ref: str) -> dict[str, Any]:
+        """Load the file."""
+
+
+class FileLoader(Loader):
+    def load(self, ref: str) -> dict[str, Any]:
+        try:
+            with open(ref) as file_handle:
+                return json.load(file_handle)
+        except FileNotFoundError as err:
+            raise FileNotFoundError(
+                "Schema file '{ref}' not found.".format(ref=ref),
+            ) from err
+
+
+class PkgLoader(Loader):
+    def __init__(self, pkg: str):
+        self._pkg = pkg
+
+    def load(self, ref: str) -> dict[str, Any]:
+        try:
+            file_content = pkgutil.get_data(self._pkg, ref)
+        except (AttributeError, OSError) as err:
+            raise FileNotFoundError(
+                "Schema file '{ref}' not found.".format(ref=ref),
+            ) from err
+
+        if not file_content:
+            raise FileNotFoundError(
+                "Schema file '{ref}' not found.".format(ref=ref),
+            )
+
+        return json.loads(file_content)
 
 
 async def hash_file(filepath: pathlib.Path, chunk_size: int = 1024) -> str:

@@ -14,7 +14,7 @@ from openapi_core.validation.response.validators import ResponseValidator
 from starlette import requests, responses
 from werkzeug.datastructures import Headers
 
-from snowfall.filesystem import loaders
+from snowfall.stdlib.persistence import filesystem
 
 
 async def request_to_openapi(request: requests.Request) -> OpenAPIRequest:
@@ -57,7 +57,7 @@ class UriFormatter(object):
 
 
 class Validator(object):
-    def __init__(self, spec_path: str, loader: loaders.Loader):
+    def __init__(self, spec_path: str, loader: filesystem.Loader):
         spec_dict = loader.load(spec_path)
         spec = openapi_core.create_spec(spec_dict)
         deserializer = {"application/vnd.api+json": json.loads}

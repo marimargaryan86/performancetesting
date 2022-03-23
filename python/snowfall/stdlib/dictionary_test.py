@@ -2,7 +2,7 @@ from typing import Any
 
 import pytest
 
-from snowfall import dictionary
+from snowfall.stdlib import dictionary
 
 
 def _transform(dict_value: str) -> str:

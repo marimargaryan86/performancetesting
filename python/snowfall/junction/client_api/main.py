@@ -8,7 +8,6 @@ from starlette import applications
 from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import offer_searches, places, segments, trip_searches, trips
-from snowfall.filesystem import loaders
 from snowfall.junction.client_api import (
     bootstrap,
     handlers,
@@ -20,6 +19,7 @@ from snowfall.junction.offers.v1alpha import offers_pb2_grpc
 from snowfall.junction.places.v1alpha import places_pb2_grpc
 from snowfall.junction.trips.v1alpha import trips_pb2_grpc
 from snowfall.service import make_service
+from snowfall.stdlib.persistence import filesystem
 
 
 def _factory() -> applications.Starlette:
@@ -38,7 +38,7 @@ def _factory() -> applications.Starlette:
                 middlewares.ValidationMiddleware,
                 validator=validation.Validator(
                     "openapi.json",
-                    loaders.PkgLoader("client_api"),
+                    filesystem.PkgLoader("client_api"),
                 ),
                 excluded_status_codes={http.HTTPStatus.METHOD_NOT_ALLOWED},
             ),
