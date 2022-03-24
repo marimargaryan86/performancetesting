@@ -18,7 +18,8 @@ make-uninterruptible:
   stage: deploy
   image: git.snowfall.se:4567/junction/junction/pants:main
   script:
-    - ./\${CI_ENVIRONMENT_TIER}/deploy.sh "\${service}" "\${version}" "\${template_file}" "\${CI_ENVIRONMENT_TIER}"
+    - set -eu
+    - ./\${CI_ENVIRONMENT_TIER}/deploy.sh "\${service}" "\${version}" "\${template}" "\${CI_ENVIRONMENT_TIER}"
   environment:
     action: start
   variables:
@@ -56,7 +57,7 @@ for DIR in "${1}"/*; do
 		continue
 	fi
 
-	docker_image=$(cat "${DIR}/image.txt")
+	docker_image=$(cat "${image_file}")
 	service_name=$(basename "${docker_image%:*}" | sed s/_/-/g)
 	service_version="${docker_image##*:}"
 
