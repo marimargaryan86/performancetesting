@@ -1,11 +1,8 @@
 import ipaddress
 import pathlib
 import random
-from typing import Optional
 
-import aiofiles
 import aioredis
-import boto3
 from motor import motor_asyncio
 from pydantic import AnyUrl, BaseSettings
 
@@ -24,12 +21,9 @@ class _GrpcSettings(BaseSettings):
 
 
 class _ExportSettings(BaseSettings):
-    aws_access_key_id: Optional[str]  # automatically used by Boto3
-    aws_secret_access_key: Optional[str]  # automatically used by Boto3
     mongo_dsn: tuple[AnyUrl]
+    output_path: str
     redis_dsn: tuple[AnyUrl]
-    s3_bucket_name: str = "junction-schedules-export"
-    upload_to_s3: bool = False
 
 
 class _ImportSettings(BaseSettings):
@@ -41,32 +35,15 @@ async def _export(_: RunnableService) -> None:
     settings = _ExportSettings()
     mongo = motor_asyncio.AsyncIOMotorClient(random.choice(settings.mongo_dsn))  # nosec
     pool = aioredis.from_url(random.choice(settings.redis_dsn))  # nosec
+    output_path = pathlib.Path(settings.output_path)
+
+    output_path.mkdir(parents=True, exist_ok=True)
 
     async with pool.client() as conn:  # nosec
-        async with aiofiles.tempfile.TemporaryDirectory() as temp:  # type: ignore[attr-defined]
-            await export.Exporter(
-                redis.Client[bytes](conn, "exporter"),
-                schedules.ScheduleRepository(mongo.schedules.schedules),
-            ).export(pathlib.Path(temp))
-
-            if settings.upload_to_s3:
-                await _upload_files(pathlib.Path(temp), settings.s3_bucket_name)
-
-
-async def _upload_files(temp_path: pathlib.Path, bucket_name: str) -> None:
-    s3 = boto3.client("s3")
-    proto_files = (
-        "route_stops.bin",
-        "routes.bin",
-        "schedule_stops.bin",
-        "schedules.bin",
-        "stops.bin",
-        "transfers.bin",
-    )
-
-    for proto_file in proto_files:
-        with open(str(temp_path.joinpath(proto_file)), "rb") as proto_obj:
-            s3.upload_fileobj(Fileobj=proto_obj, Bucket=bucket_name, Key=proto_file)
+        await export.Exporter(
+            redis.Client[bytes](conn, "exporter"),
+            schedules.ScheduleRepository(mongo.schedules.schedules),
+        ).export(output_path)
 
 
 async def _import(service: RunnableService) -> None:
