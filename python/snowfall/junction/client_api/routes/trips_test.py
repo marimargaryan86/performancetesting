@@ -27,6 +27,15 @@ class TestTrips(object):
         )
         assert response.status_code == status.HTTP_200_OK
 
+    async def test_get_trip_segments(
+        self,
+        client: testclient.TestClient,
+    ) -> None:
+        response = client.get(
+            "/trips/{id}/segments".format(id=fixtures.TRIP),
+        )
+        assert response.status_code == status.HTTP_200_OK
+
 
 @pytest.mark.asyncio
 class TestTripSearches(object):

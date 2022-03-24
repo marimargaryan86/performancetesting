@@ -5,7 +5,7 @@ from dateutil import parser
 from furl import furl
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.adapter import places, trip_searches, trips
+from snowfall.adapter import places, segments, trip_searches, trips
 from snowfall.junction.client_api import models, request_helpers, resources
 
 
@@ -26,6 +26,31 @@ class Trip(endpoints.HTTPEndpoint):
                     trip=trip,
                     request=request,
                 ),
+            ),
+        )
+
+
+class TripSegments(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        trips_client: trips.Client = lagom.injectable,
+        segments_client: segments.Client = lagom.injectable,
+    ) -> responses.Response:
+        try:
+            trip = await trips_client.get(request.path_params["tripId"])
+        except trips.NotFoundError:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+        return models.JsonApiResponse(
+            models.Body(
+                data=[
+                    await resources.SegmentResource.from_proto(
+                        segment=segment,
+                        request=request,
+                    )
+                    for segment in trip.segments
+                ],
             ),
         )
 

@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from typing import Optional
 
 import pymongo
 from google.protobuf import timestamp_pb2
@@ -63,6 +64,23 @@ class TripRepository(repository.ProtoRepository[models_pb2.TripReference]):
         return await self._find_with_cursor(
             cur=cursor,
             filter_=filter_,
+        )
+
+    async def find_segment_by_id(
+        self,
+        document_id: str,
+    ) -> Optional[models_pb2.SegmentReference]:
+        trip = await self._execute(
+            self._collection.find_one,
+            {"segments.id": document_id},
+        )
+
+        if not trip:
+            return None
+
+        return next(
+            (segment for segment in trip.segments if segment.id == document_id),
+            None,
         )
 
 

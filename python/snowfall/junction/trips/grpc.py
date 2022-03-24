@@ -55,8 +55,12 @@ class TripService(Service, trips_pb2_grpc.TripServiceServicer):
         request: trips_pb2.GetSegmentRequest,
         context: aio.ServicerContext,
     ) -> trips_pb2.GetSegmentResponse:
-        # TODO: return real segment reference from mongo
-        return trips_pb2.GetSegmentResponse()
+        segment = await self._repository.find_segment_by_id(request.id)
+
+        if segment is None:
+            await context.abort(StatusCode.NOT_FOUND)
+
+        return trips_pb2.GetSegmentResponse(segment=segment)
 
 
 class TripSearchService(Service, trips_pb2_grpc.TripSearchServiceServicer):

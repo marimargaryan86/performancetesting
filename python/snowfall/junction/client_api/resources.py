@@ -52,9 +52,7 @@ class SegmentResource(models.Resource):
         return cls(
             id=segment.id,
             type="segments",
-            attributes={
-                "segmentId": segment.id,
-            },
+            attributes={},
             relationships={
                 "legs": {
                     _RELATIONSHIPS_FIELD: [],
