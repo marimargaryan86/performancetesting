@@ -16,13 +16,19 @@ from snowfall.stdlib.transport import amqp, grpc
 
 
 class _GrpcSettings(pydantic.BaseSettings):
+    amqp_dsn: Sequence[pydantic.AnyUrl]
     default_page_size: int = 100
+    default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: Sequence[pydantic.AnyUrl]
+
+
+class _ImportSettings(pydantic.BaseSettings):
     amqp_dsn: Sequence[pydantic.AnyUrl]
-    redis_dsn: Sequence[pydantic.AnyUrl]
     default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
+    mongo_dsn: Sequence[pydantic.AnyUrl]
+    redis_dsn: Sequence[pydantic.AnyUrl]
 
 
 async def _serve(service: RunnableService) -> None:
@@ -56,7 +62,7 @@ async def _serve(service: RunnableService) -> None:
 
 
 async def _import(service: RunnableService) -> None:
-    settings = _GrpcSettings()
+    settings = _ImportSettings()
     mongo = motor_asyncio.AsyncIOMotorClient(random.choice(settings.mongo_dsn))  # nosec
 
     async with amqp.Connection(random.choice(settings.amqp_dsn)) as connection:  # nosec
