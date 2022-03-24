@@ -1,27 +1,30 @@
 stages:
+  - generate
   - deploy
 
-.deploy:
-  stage: deploy
-  resource_group: deploy
-  image: git.snowfall.se:4567/junction/junction/pants:main
+.generate:
+  stage: generate
   script:
-    - ./${CI_ENVIRONMENT_NAME}/deploy.sh "${CI_ENVIRONMENT_NAME}"
+    - ./${ENVIRONMENT_NAME}/generate-deploy-pipeline.sh "${ENVIRONMENT_NAME}" > "${ENVIRONMENT_NAME}.yml"
   needs: []
-  variables:
-    NOMAD_VAR_registry_address: "${CI_REGISTRY}"
-    NOMAD_VAR_registry_password: "${NOMAD_REGISTRY_PASSWORD}"
-    NOMAD_VAR_registry_username: "${NOMAD_REGISTRY_USERNAME}"
   tags:
-    - docker
+    - shell
 
-deploy-to-dev:
-  extends: .deploy
-  environment:
-    name: development
+generate-dev:
+  extends: .generate
+  variables:
+    ENVIRONMENT_NAME: development
   rules:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
       changes:
         - development/**/*
-  variables:
-    NOMAD_NAMESPACE: "${CI_ENVIRONMENT_SLUG}"
+
+deploy-dev:
+  stage: deploy
+  needs:
+    - job: generate-dev
+      artifacts: true
+  trigger:
+    include:
+      - artifact: development.yml
+        job: generate-dev

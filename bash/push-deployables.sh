@@ -43,7 +43,9 @@ done
 
 cp ".gitlab/deploy.gitlab-ci.yml" "repo/.gitlab-ci.yml"
 cp "bash/deploy.sh" "repo/${1}/deploy.sh"
+cp "bash/generate-deploy-pipeline.sh" "repo/${1}/generate-deploy-pipeline.sh"
 chmod +x "repo/${1}/deploy.sh"
+chmod +x "repo/${1}/generate-deploy-pipeline.sh"
 cd repo
 git add --all .
 
