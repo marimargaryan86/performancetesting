@@ -92,7 +92,7 @@ EOH
         data        = <<EOH
 AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}//\"{{end}}]"
 MONGO_DSN="[{{range $index, $service := service "mongodb"}}{{if ne $index 0}},{{end}}\"mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}}\"{{end}}]"
-PLANNER_ADDRESS="[{{range $index, $service := service "grpc.planner"}}{{if ne $index 0}},{{end}}\"{{.Address}}:{{.Port}}\"{{end}}]"
+PLANNER_ADDRESS="[{{range $index, $service := service (printf "grpc.planner-%s" (env "NOMAD_NAMESPACE"))}}{{if ne $index 0}},{{end}}\"{{.Address}}:{{.Port}}\"{{end}}]"
 EOH
         destination = "services.env"
         env         = true
