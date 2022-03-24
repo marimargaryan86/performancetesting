@@ -4,7 +4,7 @@ set -eu
 echo "stages:"
 echo "  - deploy"
 echo ""
-echo ".deploy"
+echo ".deploy:"
 echo "  stage: deploy"
 echo "  resource_group: deploy"
 echo "  image: git.snowfall.se:4567/junction/junction/pants:main"
