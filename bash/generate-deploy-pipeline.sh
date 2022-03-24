@@ -12,7 +12,7 @@ make-uninterruptible:
     - echo "This job prevents pipelines from interrupting each other."
   needs: []
   tags:
-    - shell"
+    - shell
 
 .deploy:
   stage: deploy
