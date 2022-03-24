@@ -4,6 +4,16 @@ set -eu
 cat <<EOF
 stages:
   - deploy
+
+make-uninterruptible:
+  stage: deploy
+  interruptible: false
+  script:
+    - echo "This job prevents pipelines from interrupting each other."
+  needs: []
+  tags:
+    - shell"
+
 .deploy:
   stage: deploy
   image: git.snowfall.se:4567/junction/junction/pants:main
