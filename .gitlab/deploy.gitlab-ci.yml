@@ -5,8 +5,12 @@ stages:
 .generate:
   stage: generate
   script:
-    - ./${ENVIRONMENT_NAME}/generate-deploy-pipeline.sh "${ENVIRONMENT_NAME}" > "${ENVIRONMENT_NAME}.yml"
+    - mkdir dist
+    - ./${ENVIRONMENT_NAME}/generate-deploy-pipeline.sh "${ENVIRONMENT_NAME}" > "dist/${ENVIRONMENT_NAME}.yml"
   needs: []
+  artifacts:
+    paths:
+      - dist/
   tags:
     - shell
 
@@ -26,5 +30,5 @@ deploy-dev:
       artifacts: true
   trigger:
     include:
-      - artifact: development.yml
+      - artifact: dist/development.yml
         job: generate-dev
