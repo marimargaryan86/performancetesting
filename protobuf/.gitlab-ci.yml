@@ -23,8 +23,3 @@ protobuf:breaking:
   extends: .protobuf:buf-test
   script:
     - "${BUF_BINARY} breaking --against ${CI_REPOSITORY_URL}#ref=${CI_MERGE_REQUEST_DIFF_BASE_SHA}"
-
-protobuf:lint:
-  extends: .protobuf:buf-test
-  script:
-    - "${BUF_BINARY} lint"

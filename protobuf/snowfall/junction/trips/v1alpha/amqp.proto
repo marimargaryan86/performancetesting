@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package snowfall.junction.trips.v1alpha;
 
-import "google/protobuf/timestamp.proto";
-import "snowfall/common/v1alpha/models.proto";
 import "snowfall/junction/trips/v1alpha/trips.proto";
 
 message TripSearchTask {

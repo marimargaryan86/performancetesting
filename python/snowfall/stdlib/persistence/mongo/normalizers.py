@@ -88,7 +88,7 @@ class CoordinatesNormalizer(_Normalizer):
         }
 
     def _full_name(self) -> str:
-        return models_pb2.Coordinates().DESCRIPTOR.full_name
+        return str(models_pb2.Coordinates().DESCRIPTOR.full_name)
 
     def _normalize_value(
         self,
@@ -108,7 +108,7 @@ class TimestampNormalizer(_Normalizer):
         return normalized_value.isoformat()
 
     def _full_name(self) -> str:
-        return timestamp_pb2.Timestamp().DESCRIPTOR.full_name
+        return str(timestamp_pb2.Timestamp().DESCRIPTOR.full_name)
 
     def _normalize_value(self, denormalized_value: str) -> datetime.datetime:
         return parser.isoparse(denormalized_value)

@@ -102,10 +102,12 @@ class PydanticCoder(Generic[Model], BaseCoder[Model]):
         return self._model.parse_raw(rapidjson.dumps(as_dict))
 
     def encode(self, model: Model) -> dict[str, Any]:
-        as_dict = rapidjson.loads(
-            model.json(
-                exclude_defaults=True,
-                exclude_none=True,
+        as_dict = dict(
+            rapidjson.loads(
+                model.json(
+                    exclude_defaults=True,
+                    exclude_none=True,
+                ),
             ),
         )
 

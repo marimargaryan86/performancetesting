@@ -3,7 +3,7 @@ import datetime
 from motor import motor_asyncio
 
 from snowfall.junction.orders.v1alpha import orders_pb2
-from snowfall.persistence.mongo import repository
+from snowfall.stdlib.persistence.mongo import repository
 
 
 class OrderRepository(repository.ProtoRepository[orders_pb2.Order]):

@@ -1,7 +1,7 @@
 [GLOBAL]
-pants_version = "2.10.0rc4"
-use_deprecated_python_macros = false
+pants_version = "2.11.0rc0"
 backend_packages = [
+    "pants.backend.codegen.protobuf.lint.buf",
     "pants.backend.codegen.protobuf.python",
     "pants.backend.docker",
     "pants.backend.docker.lint.hadolint",
@@ -21,7 +21,7 @@ backend_packages = [
 enabled = false
 
 [bandit]
-version = "bandit==1.7.2"
+version = "bandit==1.7.4"
 config = "vendor/pyproject.toml"
 args = ["--silent"]
 lockfile = "vendor/lock/bandit.txt"
@@ -52,7 +52,6 @@ version = "flake8==4.0.1"
 config = "vendor/setup.cfg"
 lockfile = "vendor/lock/flake8.txt"
 extra_requirements = [
-    "bandit==1.7.2", # 1.7.3 breaks flake8-bandit
     "flake8-annotations",
     "flake8-builtins",
     "flake8-executable",
@@ -73,11 +72,11 @@ lockfile = "vendor/lock/isort.txt"
 interpreter_constraints = ["CPython==3.9.10"]
 
 [mypy]
-version = "mypy==0.931"
+version = "mypy==0.941"
 config = "vendor/setup.cfg"
 lockfile = "vendor/lock/mypy.txt"
 interpreter_constraints = ["CPython==3.9.10"]
-extra_requirements = ["grpc-stubs", "pydantic"]
+extra_requirements = ["pydantic"]
 
 [poetry]
 interpreter_constraints = ["CPython==3.9.10"]
@@ -91,7 +90,7 @@ known_versions = [
 ]
 
 [pytest]
-version = "pytest==7.0.1"
+version = "pytest==7.1.1"
 lockfile = "vendor/lock/pytest.txt"
 args = ["--import-mode=importlib --asyncio-mode=auto"]
 extra_requirements = [
@@ -102,6 +101,7 @@ extra_requirements = [
 ]
 
 [python]
+lockfile_generator = "poetry"
 interpreter_constraints = ["CPython==3.9.10"]
 enable_resolves = true
 resolves = {python-default = "vendor/lock/constraints.txt"}

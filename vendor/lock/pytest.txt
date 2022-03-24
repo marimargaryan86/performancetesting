@@ -13,7 +13,7 @@
 #     "pytest-asyncio",
 #     "pytest-cov",
 #     "pytest-icdiff",
-#     "pytest==7.0.1"
+#     "pytest==7.1.1"
 #   ]
 # }
 # --- END PANTS LOCKFILE METADATA ---
@@ -89,7 +89,7 @@ py==1.11.0; python_version >= "3.7" and python_full_version < "3.0.0" or python_
 pygments==2.11.2; python_version >= "3.5" \
     --hash=sha256:44238f1b60a76d78fc8ca0528ee429702aae011c265fe6a8dd8b63049ae41c65 \
     --hash=sha256:4e426f72023d88d03b2fa258de560726ce890ff3b630f88c21cbb8b2503b8c6a
-pyparsing==3.0.7; python_version >= "3.6" \
+pyparsing==3.0.7; python_version >= "3.7" \
     --hash=sha256:a6c06a88f252e6c322f65faf8f418b16213b51bdfaece0524c1c1bc30c63c484 \
     --hash=sha256:18ee9022775d270c55187733956460083db60b37d0d0fb357445f3094eed3eea
 pytest-asyncio==0.18.2; python_version >= "3.7" \
@@ -100,9 +100,9 @@ pytest-cov==3.0.0; python_version >= "3.6" \
     --hash=sha256:578d5d15ac4a25e5f961c938b85a05b09fdaae9deef3bb6de9a6e766622ca7a6
 pytest-icdiff==0.5; python_version >= "3.6" \
     --hash=sha256:3a14097f4385665cb04330e6ae09a3dd430375f717e94482af6944470ad5f100
-pytest==7.0.1; python_version >= "3.6" \
-    --hash=sha256:9ce3ff477af913ecf6321fe337b93a2c0dcf2a0a1439c43f5452112c1e4280db \
-    --hash=sha256:e30905a0c131d3d94b89624a1cc5afec3e0ba2fbdb151867d8e0ebd49850f171
+pytest==7.1.1; python_version >= "3.7" \
+    --hash=sha256:92f723789a8fdd7180b6b06483874feca4c48a5c76968e03bb3e7f806a1869ea \
+    --hash=sha256:841132caef6b1ad17a9afde46dc4f6cfa59a05f9555aae5151f73bdf2820ca63
 tomli==2.0.1; python_version >= "3.7" \
     --hash=sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc \
     --hash=sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f
