@@ -2,7 +2,7 @@ import grpc
 
 from snowfall.junction.orders.orders import OrderRepository
 from snowfall.junction.orders.v1alpha import orders_pb2, orders_pb2_grpc
-from snowfall.transport.grpc import Service
+from snowfall.stdlib.transport.grpc import Service
 
 
 class OrderService(

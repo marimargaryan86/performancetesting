@@ -9,7 +9,7 @@ from motor import motor_asyncio
 from snowfall.junction.orders import orders
 from snowfall.junction.orders.grpc import OrderService
 from snowfall.service import RunnableService, Task, make_runnable_service
-from snowfall.transport import grpc
+from snowfall.stdlib.transport import grpc
 
 
 class _GrpcSettings(pydantic.BaseSettings):
