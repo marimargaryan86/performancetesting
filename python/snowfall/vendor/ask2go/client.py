@@ -2,8 +2,8 @@ from typing import Any, Callable, Optional
 
 import httpx
 
-from snowfall.providers.ask2go import errors, parsers
-from snowfall.providers.ask2go.models import search
+from snowfall.vendor.ask2go import errors, parsers
+from snowfall.vendor.ask2go.models import search
 
 
 class Ask2GoClient(object):

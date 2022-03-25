@@ -3,8 +3,8 @@ from decimal import Decimal
 from typing import Optional
 from uuid import UUID
 
-from snowfall.providers.ask2go.enums import AirCabinClassType
-from snowfall.providers.ask2go.models.base import CamelCaseBaseModel
+from snowfall.vendor.ask2go.enums import AirCabinClassType
+from snowfall.vendor.ask2go.models.base import CamelCaseBaseModel
 
 
 class TripOriginDestination(CamelCaseBaseModel):

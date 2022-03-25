@@ -1,7 +1,7 @@
 import datetime
 from typing import Any
 
-from snowfall.providers.ask2go.models import search
+from snowfall.vendor.ask2go.models import search
 
 
 def parse_search_criteria(

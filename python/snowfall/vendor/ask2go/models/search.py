@@ -1,9 +1,9 @@
 import datetime
 from typing import Any, Optional
 
-from snowfall.providers.ask2go.enums import AirCabinClassType
-from snowfall.providers.ask2go.models import offers
-from snowfall.providers.ask2go.models.base import CamelCaseBaseModel
+from snowfall.vendor.ask2go.enums import AirCabinClassType
+from snowfall.vendor.ask2go.models import offers
+from snowfall.vendor.ask2go.models.base import CamelCaseBaseModel
 
 
 class CreateSearchResponse(CamelCaseBaseModel):
