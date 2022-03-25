@@ -20,7 +20,7 @@ message GetOfferRequest {
 }
 
 message GetOfferResponse {
-  OfferAggregate offer = 1;
+  Offer offer = 1;
 }
 
 message EnqueueOfferSearchRequest {
@@ -47,12 +47,18 @@ message ListOffersRequest {
 
 message ListOffersResponse {
   string next_page_token = 1;
-  repeated OfferAggregate offers = 2;
+  repeated Offer offers = 2;
+}
+
+message Offer {
+  string id = 1;
+  repeated TripOfferResult results = 2;
 }
 
 message OfferAggregate {
   string id = 1;
-  repeated string offer_result_ids = 2;
+  string offer_search_id = 2;
+  repeated string offer_result_ids = 3;
 }
 
 message OfferSearch {

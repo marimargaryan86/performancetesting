@@ -61,7 +61,7 @@ class TestGrpcClient(object):
             await client.get(fixtures.NOT_FOUND)
 
     async def test_single_offer_is_retrievable(self) -> None:
-        proto = offers_pb2.OfferAggregate(id=fixtures.OFFERS[0])
+        proto = offers_pb2.Offer(id=fixtures.OFFERS[0])
         stub = mock.create_autospec(offers_pb2_grpc.OfferServiceStub)
         stub.GetOffer = mock.AsyncMock(
             return_value=offers_pb2.GetOfferResponse(offer=proto),

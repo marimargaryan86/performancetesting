@@ -10,6 +10,10 @@ from snowfall.stdlib.persistence import redis
 OfferBuckets = dict[str, list[str]]
 
 
+class NotFoundError(Exception):
+    """Raised when an offer aggregate is not found."""
+
+
 def generate_offer_aggregates(
     offer_buckets: OfferBuckets,
 ) -> list[offers_pb2.OfferAggregate]:
@@ -86,6 +90,7 @@ class OfferAggregator(object):
                 return
 
         for aggregate in generate_offer_aggregates(buckets):
+            aggregate.offer_search_id = offer_search.id
             await self._aggregates.insert(aggregate)
 
     async def _get_buckets(self, offer: offers_pb2.TripOfferResult) -> OfferBuckets:

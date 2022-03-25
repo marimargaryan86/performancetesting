@@ -9,6 +9,7 @@ from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import (
     offer_searches,
+    offers,
     places,
     schedules,
     segments,
@@ -76,6 +77,9 @@ def _factory() -> applications.Starlette:
             ),
             trips_client=trips.GrpcClient(
                 trips_pb2_grpc.TripServiceStub(trips_channel),
+            ),
+            offers_client=offers.GrpcClient(
+                offers=offers_pb2_grpc.OfferServiceStub(offers_channel),
             ),
             offer_searches_client=offer_searches.GrpcClient(
                 offers=offers_pb2_grpc.OfferServiceStub(offers_channel),

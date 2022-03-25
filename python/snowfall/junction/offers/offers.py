@@ -6,12 +6,32 @@ from google.protobuf import timestamp_pb2
 from motor import motor_asyncio
 
 from snowfall.junction.offers.v1alpha import offers_pb2
-from snowfall.stdlib.persistence.mongo import repository
+from snowfall.stdlib.persistence.mongo import repository, resultset
 
 
 class TripOfferRepository(repository.ProtoRepository[offers_pb2.TripOfferResult]):
     _proto = offers_pb2.TripOfferResult
     _indexes = [pymongo.IndexModel("offer_search_id", background=True)]
+
+    async def find(
+        self,
+        ids: list[str],
+        cursor: str,
+    ) -> resultset.ResultSet[offers_pb2.TripOfferResult]:
+        filter_ = (
+            {
+                repository.mongo_id_key: {
+                    "$in": ids,
+                },
+            }
+            if ids
+            else {}
+        )
+
+        return await self._find_with_cursor(
+            cur=cursor,
+            filter_=filter_,
+        )
 
 
 class OfferAggregateRepository(repository.ProtoRepository[offers_pb2.OfferAggregate]):

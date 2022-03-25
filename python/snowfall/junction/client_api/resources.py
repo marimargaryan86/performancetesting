@@ -14,6 +14,44 @@ _SELF_HREF = "self"
 _RELATIONSHIPS_FIELD = "data"
 
 
+class OfferResource(models.Resource):
+    @classmethod
+    async def from_proto(
+        cls,
+        offer: offers_pb2.Offer,
+        request: requests.Request,
+    ) -> OfferResource:
+        return cls(
+            id=offer.id,
+            type="offers",
+            attributes=cls._get_attributes(offer),
+            links={
+                _SELF_HREF: request.url_for(
+                    "ViewOffer",
+                    offerId=offer.id,
+                ),
+            },
+        )
+
+    @classmethod
+    def _get_attributes(
+        cls,
+        offer: offers_pb2.Offer,
+    ) -> dict[str, Any]:
+        first_expiring_offer = min(
+            offer.results,
+            key=lambda offer_result: offer_result.expires_at.seconds,
+        )
+
+        return {
+            "expiresAt": protobuf.protobuf_to_datetime(first_expiring_offer.expires_at),
+            "price": str(
+                sum(offer_result.price.amount for offer_result in offer.results) / 100,
+            ),
+            "currency": first_expiring_offer.price.currency,
+        }
+
+
 class PlaceResource(models.Resource):
     @classmethod
     async def from_proto(

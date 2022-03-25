@@ -10,6 +10,7 @@ from starlette.middleware import Middleware
 
 from snowfall.adapter import (
     offer_searches,
+    offers,
     places,
     schedules,
     segments,
@@ -44,6 +45,7 @@ def create_dependencies(  # noqa: WPS211
     places_client: places.Client,
     trip_searches_client: trip_searches.Client,
     trips_client: trips.Client,
+    offers_client: offers.Client,
     offer_searches_client: offer_searches.Client,
     segments_client: segments.Client,
     schedules_client: schedules.Client,
@@ -52,6 +54,7 @@ def create_dependencies(  # noqa: WPS211
     container[places.Client] = places_client  # type: ignore[misc]
     container[trip_searches.Client] = trip_searches_client  # type: ignore[misc]
     container[trips.Client] = trips_client  # type: ignore[misc]
+    container[offers.Client] = offers_client  # type: ignore[misc]
     container[offer_searches.Client] = offer_searches_client  # type: ignore[misc]
     container[segments.Client] = segments_client  # type: ignore[misc]
     container[schedules.Client] = schedules_client  # type: ignore[misc]

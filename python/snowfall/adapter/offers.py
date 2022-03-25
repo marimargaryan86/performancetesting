@@ -10,7 +10,7 @@ from snowfall.junction.offers.v1alpha import offers_pb2, offers_pb2_grpc
 
 
 class NotFoundError(Exception):
-    """Raised when a offer is not found."""
+    """Raised when an offer is not found."""
 
 
 class UnknownError(Exception):
@@ -19,7 +19,7 @@ class UnknownError(Exception):
 
 @dataclasses.dataclass(frozen=True)
 class OffersPage(object):
-    offers: Sequence[offers_pb2.OfferAggregate]
+    offers: Sequence[offers_pb2.Offer]
     next_page_token: Optional[str] = None
 
     @classmethod
@@ -32,26 +32,26 @@ class OffersPage(object):
 
 class Client(abc.ABC):
     @abc.abstractmethod
-    async def get(self, identifier: str) -> offers_pb2.OfferAggregate:
-        """Fetch a offer resource."""
+    async def get(self, identifier: str) -> offers_pb2.Offer:
+        """Fetch an offer resource."""
 
 
 class DictClient(Client):
-    def __init__(self, offers: Sequence[offers_pb2.OfferAggregate]) -> None:
+    def __init__(self, offers: Sequence[offers_pb2.Offer]) -> None:
         self._offers = {offer.id: offer for offer in offers}
 
-    async def get(self, offer_id: str) -> offers_pb2.OfferAggregate:
+    async def get(self, offer_id: str) -> offers_pb2.Offer:
         if offer_id not in self._offers:
             raise NotFoundError()
 
-        return offers_pb2.OfferAggregate(id=offer_id)
+        return self._offers[offer_id]
 
 
 class GrpcClient(Client):
     def __init__(self, offers: offers_pb2_grpc.OfferServiceStub):
         self._offers = offers
 
-    async def get(self, offer_id: str) -> offers_pb2.OfferAggregate:
+    async def get(self, offer_id: str) -> offers_pb2.Offer:
         try:
             response = await self._offers.GetOffer(
                 offers_pb2.GetOfferRequest(id=offer_id),

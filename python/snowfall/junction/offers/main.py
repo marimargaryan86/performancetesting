@@ -52,7 +52,15 @@ async def _serve(service: RunnableService) -> None:
                     ),
                     default_page_size=settings.default_page_size,
                 ),
-                OfferService(default_page_size=settings.default_page_size),
+                OfferService(
+                    offer_aggregates=offers.OfferAggregateRepository(
+                        mongo.offers.offer_aggregates,
+                    ),
+                    offer_results=offers.TripOfferRepository(
+                        mongo.offers.trip_offers,
+                    ),
+                    default_page_size=settings.default_page_size,
+                ),
             ],
         )
 

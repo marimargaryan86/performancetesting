@@ -1,7 +1,6 @@
 import grpc
 
-from snowfall.junction.offers import amqp
-from snowfall.junction.offers.offers import OfferSearchRepository
+from snowfall.junction.offers import amqp, offers
 from snowfall.junction.offers.v1alpha import offers_pb2, offers_pb2_grpc
 from snowfall.stdlib.transport.grpc import Service
 
@@ -9,7 +8,7 @@ from snowfall.stdlib.transport.grpc import Service
 class OfferSearchService(Service, offers_pb2_grpc.OfferSearchServiceServicer):
     def __init__(
         self,
-        offers_searches: OfferSearchRepository,
+        offers_searches: offers.OfferSearchRepository,
         publisher: amqp.OfferSearchProducer,
         default_page_size: int,
     ):
@@ -49,7 +48,14 @@ class OfferSearchService(Service, offers_pb2_grpc.OfferSearchServiceServicer):
 
 
 class OfferService(Service, offers_pb2_grpc.OfferServiceServicer):
-    def __init__(self, default_page_size: int):
+    def __init__(
+        self,
+        offer_aggregates: offers.OfferAggregateRepository,
+        offer_results: offers.TripOfferRepository,
+        default_page_size: int,
+    ):
+        self._aggregates = offer_aggregates
+        self._offers_results = offer_results
         self._default_page_size = default_page_size
 
     def get_name(self) -> str:
@@ -63,8 +69,22 @@ class OfferService(Service, offers_pb2_grpc.OfferServiceServicer):
         request: offers_pb2.GetOfferRequest,
         context: grpc.aio.ServicerContext,
     ) -> offers_pb2.GetOfferResponse:
-        # TODO: get offer from persistence
-        return offers_pb2.GetOfferResponse()
+        offer_aggregate = await self._aggregates.find_by_id(request.id)
+
+        if not offer_aggregate:
+            await context.abort(grpc.StatusCode.NOT_FOUND)
+
+        offer_results = await self._offers_results.find(
+            ids=list(offer_aggregate.offer_result_ids),  # type: ignore[union-attr]
+            cursor="",
+        )
+
+        return offers_pb2.GetOfferResponse(
+            offer=offers_pb2.Offer(
+                id=offer_aggregate.id,  # type: ignore[union-attr]
+                results=[offer_result async for offer_result in offer_results],
+            ),
+        )
 
     async def ListOffers(  # type: ignore[override] # noqa: N802
         self,

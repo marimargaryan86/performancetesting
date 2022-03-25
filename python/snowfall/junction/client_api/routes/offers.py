@@ -3,11 +3,32 @@ import datetime
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.adapter import offer_searches
+from snowfall.adapter import offer_searches, offers
 from snowfall.junction.client_api import models, request_helpers, resources
 from snowfall.junction.client_api.transformers import trip_ids_to_segments
 from snowfall.junction.offers.v1alpha import offers_pb2
 from snowfall.stdlib.format import protobuf
+
+
+class Offer(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        client: offers.Client = lagom.injectable,
+    ) -> responses.Response:
+        try:
+            offer = await client.get(request.path_params["offerId"])
+        except offers.NotFoundError:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+        return models.JsonApiResponse(
+            models.Body(
+                data=await resources.OfferResource.from_proto(
+                    offer=offer,
+                    request=request,
+                ),
+            ),
+        )
 
 
 class OfferSearches(endpoints.HTTPEndpoint):

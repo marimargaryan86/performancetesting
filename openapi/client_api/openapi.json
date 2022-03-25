@@ -2004,38 +2004,6 @@
                     "example": "USD"
                   }
                 }
-              },
-              "relationships": {
-                "oneOf": [
-                  {
-                    "properties": {
-                      "trip": {
-                        "type": "object",
-                        "properties": {
-                          "data": {
-                            "type": "array",
-                            "items": {
-                              "$ref": "#/components/schemas/TripIdentifier"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  },
-                  {
-                    "properties": {
-                      "place": {
-                        "type": "object",
-                        "properties": {
-                          "data": {
-                            "$ref": "#/components/schemas/PlaceIdentifier"
-                          }
-                        }
-                      }
-                    }
-                  }
-                ],
-                "type": "object"
               }
             },
             "required": [
