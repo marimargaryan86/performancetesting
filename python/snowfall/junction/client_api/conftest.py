@@ -9,7 +9,14 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from starlette import applications, testclient
 from starlette.middleware import Middleware, authentication
 
-from snowfall.adapter import offer_searches, places, segments, trip_searches, trips
+from snowfall.adapter import (
+    offer_searches,
+    places,
+    schedules,
+    segments,
+    trip_searches,
+    trips,
+)
 from snowfall.junction.client_api import (
     bootstrap,
     handlers,
@@ -47,6 +54,7 @@ def _create_app(  # noqa: WPS211
     trips_client: trips.Client,
     offer_searches_client: offer_searches.Client,
     segments_client: segments.Client,
+    schedules_client: schedules.Client,
 ) -> applications.Starlette:
     return bootstrap.create_app(
         custom_middlewares=custom_middlewares,
@@ -56,6 +64,7 @@ def _create_app(  # noqa: WPS211
             trips_client=trips_client,
             offer_searches_client=offer_searches_client,
             segments_client=segments_client,
+            schedules_client=schedules_client,
         ),
     )
 
@@ -69,12 +78,13 @@ def headers() -> dict[str, str]:
 
 
 @pytest.fixture()
-def app(
+def app(  # noqa: WPS211
     places_client: places.Client,
     trip_searches_client: trip_searches.Client,
     trips_client: trips.Client,
     offer_searches_client: offer_searches.Client,
     segments_client: segments.Client,
+    schedules_client: schedules.Client,
 ) -> applications.Starlette:
     return _create_app(
         custom_middlewares=[
@@ -100,6 +110,7 @@ def app(
         trips_client=trips_client,
         offer_searches_client=offer_searches_client,
         segments_client=segments_client,
+        schedules_client=schedules_client,
     )
 
 
@@ -124,12 +135,13 @@ def unauthorized_client(
 
 
 @pytest.fixture()
-def test_app(
+def test_app(  # noqa: WPS211
     places_client: places.Client,
     trip_searches_client: trip_searches.Client,
     trips_client: trips.Client,
     offer_searches_client: offer_searches.Client,
     segments_client: segments.Client,
+    schedules_client: schedules.Client,
 ) -> applications.Starlette:
     return _create_app(
         custom_middlewares=[
@@ -147,6 +159,7 @@ def test_app(
         trips_client=trips_client,
         offer_searches_client=offer_searches_client,
         segments_client=segments_client,
+        schedules_client=schedules_client,
     )
 
 

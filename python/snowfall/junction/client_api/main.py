@@ -7,7 +7,14 @@ import uvicorn
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
-from snowfall.adapter import offer_searches, places, segments, trip_searches, trips
+from snowfall.adapter import (
+    offer_searches,
+    places,
+    schedules,
+    segments,
+    trip_searches,
+    trips,
+)
 from snowfall.junction.client_api import (
     bootstrap,
     handlers,
@@ -17,6 +24,7 @@ from snowfall.junction.client_api import (
 )
 from snowfall.junction.offers.v1alpha import offers_pb2_grpc
 from snowfall.junction.places.v1alpha import places_pb2_grpc
+from snowfall.junction.schedules.v1alpha import schedules_pb2_grpc
 from snowfall.junction.trips.v1alpha import trips_pb2_grpc
 from snowfall.service import make_service
 from snowfall.stdlib.persistence import filesystem
@@ -30,6 +38,9 @@ def _factory() -> applications.Starlette:
     )
     trips_channel = grpc.aio.insecure_channel(
         random.choice(settings.trips_address),  # nosec
+    )
+    schedules_channel = grpc.aio.insecure_channel(
+        random.choice(settings.schedules_address),  # nosec
     )
 
     return bootstrap.create_app(
@@ -72,6 +83,9 @@ def _factory() -> applications.Starlette:
             ),
             segments_client=segments.GrpcClient(
                 segments=trips_pb2_grpc.TripServiceStub(trips_channel),
+            ),
+            schedules_client=schedules.GrpcClient(
+                schedules=schedules_pb2_grpc.ScheduleServiceStub(schedules_channel),
             ),
         ),
     )

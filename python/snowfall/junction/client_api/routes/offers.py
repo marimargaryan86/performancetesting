@@ -1,13 +1,11 @@
 import datetime
-import uuid
 
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall import fixtures
 from snowfall.adapter import offer_searches
-from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.client_api import models, request_helpers, resources
+from snowfall.junction.client_api.transformers import trip_ids_to_segments
 from snowfall.junction.offers.v1alpha import offers_pb2
 from snowfall.stdlib.format import protobuf
 
@@ -16,19 +14,20 @@ class OfferSearches(endpoints.HTTPEndpoint):
     async def post(
         self,
         request: requests.Request,
+        trips_to_segments: trip_ids_to_segments.TripIdsToSegments = lagom.injectable,
         offer_search_client: offer_searches.Client = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
 
-        if fixtures.NOT_FOUND in body["trips"]:
+        try:
+            segments = await trips_to_segments.transform(trip_ids=body["trips"])
+        except trip_ids_to_segments.MissingTripsError:
             raise exceptions.HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         offer_search = await offer_search_client.create(
             request=offers_pb2.OfferSearch(
                 trip=offers_pb2.TripOfferSearch(
-                    segments=[
-                        models_pb2.Segment(id=str(uuid.uuid4())),
-                    ],
+                    segments=segments,
                     passengers=[
                         offers_pb2.Passenger(
                             date_of_birth=protobuf.date_to_protobuf(
