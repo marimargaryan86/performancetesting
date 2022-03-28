@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import uuid
 from typing import Any, Sequence
 
 from starlette import requests
@@ -100,6 +101,58 @@ class SegmentResource(models.Resource):
                 _SELF_HREF: request.url_for(
                     "ViewSegment",
                     segmentId=segment.id,
+                ),
+            },
+        )
+
+
+class LegResource(models.Resource):
+    @classmethod
+    async def from_proto(
+        cls,
+        origin: models_pb2.Stop,
+        destination: models_pb2.Stop,
+        request: requests.Request,
+    ) -> LegResource:
+        leg_id = origin.id
+        return cls(
+            id=leg_id,
+            type="legs",
+            attributes={
+                "departureAt": protobuf.protobuf_to_datetime(
+                    origin.departure_at,
+                ),
+                "arrivalAt": protobuf.protobuf_to_datetime(
+                    destination.arrival_at,
+                ),
+                "operator": "",
+                "origin": {
+                    "ref": origin.point.ref,
+                    "name": origin.point.name,
+                    "latitude": origin.point.coordinates.latitude,
+                    "longitude": origin.point.coordinates.longitude,
+                    "timeZone": origin.point.time_zone,
+                },
+                "destination": {
+                    "ref": destination.point.ref,
+                    "name": destination.point.name,
+                    "latitude": destination.point.coordinates.latitude,
+                    "longitude": destination.point.coordinates.longitude,
+                    "timeZone": destination.point.time_zone,
+                },
+            },
+            relationships={
+                "type": {
+                    _RELATIONSHIPS_FIELD: {
+                        "id": uuid.uuid4(),  # TODO: use schedule type
+                        "type": "leg-types",
+                    },
+                },
+            },
+            links={
+                _SELF_HREF: request.url_for(
+                    "ViewLeg",
+                    legId=leg_id,
                 ),
             },
         )

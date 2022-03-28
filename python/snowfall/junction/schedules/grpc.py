@@ -44,3 +44,27 @@ class ScheduleService(Service, schedules_pb2_grpc.ScheduleServiceServicer):
             schedules=[schedule async for schedule in schedules_result],
             next_page_token=await schedules_result.cursor(),
         )
+
+    async def GetStop(  # type: ignore[override] # noqa: N802
+        self,
+        request: schedules_pb2.GetStopRequest,
+        context: aio.ServicerContext,
+    ) -> schedules_pb2.GetStopResponse:
+        stop = await self._schedules.find_stop_by_id(request.id)
+
+        if not stop:
+            await context.abort(StatusCode.NOT_FOUND)
+
+        return schedules_pb2.GetStopResponse(stop=stop)
+
+    async def GetNextStop(  # type: ignore[override] # noqa: N802
+        self,
+        request: schedules_pb2.GetNextStopRequest,
+        context: aio.ServicerContext,
+    ) -> schedules_pb2.GetNextStopResponse:
+        stop = await self._schedules.find_stop_by_previous_stop_id(request.id)
+
+        if not stop:
+            await context.abort(StatusCode.NOT_FOUND)
+
+        return schedules_pb2.GetNextStopResponse(stop=stop)

@@ -74,7 +74,7 @@ class TestOfferSearches(object):
                         "trips": {
                             "data": [
                                 {
-                                    "id": fixtures.TRIP,
+                                    "id": fixtures.TRIPS[0],
                                     "type": "trips",
                                 },
                             ],
@@ -106,7 +106,7 @@ class TestOfferSearches(object):
                         "trips": {
                             "data": [
                                 {
-                                    "id": fixtures.TRIP,
+                                    "id": fixtures.TRIPS[0],
                                     "type": "trips",
                                 },
                             ],

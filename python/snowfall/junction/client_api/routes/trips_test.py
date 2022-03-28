@@ -23,7 +23,7 @@ class TestTrips(object):
         client: testclient.TestClient,
     ) -> None:
         response = client.get(
-            "/trips/{id}".format(id=fixtures.TRIP),
+            "/trips/{id}".format(id=fixtures.TRIPS[0]),
         )
         assert response.status_code == status.HTTP_200_OK
 
@@ -32,7 +32,7 @@ class TestTrips(object):
         client: testclient.TestClient,
     ) -> None:
         response = client.get(
-            "/trips/{id}/segments".format(id=fixtures.TRIP),
+            "/trips/{id}/segments".format(id=fixtures.TRIPS[0]),
         )
         assert response.status_code == status.HTTP_200_OK
 

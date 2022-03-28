@@ -11,14 +11,20 @@ _LONGITUDE_RANGE = (-180, 180)
 
 NOT_FOUND = "00000000-0000-0000-0000-000000000000"
 PLACES = (
-    "f236a92c-4cfa-468e-85ef-431d25dcd925",
-    "488a836d-ec22-439b-a9d8-3c4c386a731e",
+    "28a2ee10-d0a7-4a70-89f3-6d587f4dba70",
+    "f87c4a6d-fa48-4abb-927c-25447827f5a6",
 )
-TRIP = "b3e45af0-f3ae-46e5-a94f-fd1c9d86fb7d"
-TRIPS = ("b3e45af0-f3ae-46e5-a94f-fd1c9d86fb7d",)
-SCHEDULES = ("8b8d042c-d7e2-4735-9392-5b4f57539a97",)
-OFFERS = ("f3b6c6ee-8c3d-4ade-95c1-603d5e897a5e",)
-SEGMENTS = ("f236a92c-4cfa-468e-85ef-431d25dcd925",)
+TRIPS = ("9d672f0e-0934-4388-8568-03e40c0bf0e9",)
+SCHEDULES = ("d77e4acb-5aa1-47ad-9a15-126c0fa0e157",)
+OFFERS = ("5927b3ce-fbd7-4f8b-b456-b1b7fd44cdad",)
+SEGMENTS = ("9aeed7e9-fa69-4fd5-8590-e14e402e1346",)
+STOPS = (
+    "e1f85306-35b3-4892-9e21-a6a34c02459c",
+    "d105da8e-8943-4055-8df6-adf0947d9b02",
+    "776e5292-7314-4fbf-9a3a-ffb9e039430a",
+    "099639fb-ef8f-43f5-8200-423e09d356fd",
+)
+LEGS = STOPS[:-1]
 ORDERS = ("e61d5e73-bb7e-408f-861d-2be84218d1c4",)
 
 
@@ -46,6 +52,7 @@ def get_schedules() -> list[models_pb2.Schedule]:
 def generate_schedule(identifier: str) -> models_pb2.Schedule:
     return models_pb2.Schedule(
         id=identifier,
+        stops=[generate_stop(stop_id) for stop_id in STOPS],
     )
 
 
@@ -57,6 +64,10 @@ def generate_segment_reference(identifier: str) -> models_pb2.SegmentReference:
     return models_pb2.SegmentReference(
         id=identifier,
     )
+
+
+def generate_stop(stop_id: str) -> models_pb2.Stop:
+    return models_pb2.Stop(id=stop_id)
 
 
 def get_trips() -> list[models_pb2.TripReference]:
