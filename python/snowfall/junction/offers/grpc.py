@@ -91,5 +91,27 @@ class OfferService(Service, offers_pb2_grpc.OfferServiceServicer):
         request: offers_pb2.ListOffersRequest,
         context: grpc.aio.ServicerContext,
     ) -> offers_pb2.ListOffersResponse:
-        # TODO: get offer results from persistence
-        return offers_pb2.ListOffersResponse()
+        offer_aggregates = await self._aggregates.find_by_offer_search_id(
+            request.offer_search_id,
+            cursor=request.page_token,
+        )
+        offer_aggregates.limit(request.page_size or self._default_page_size)
+
+        offer_list = []
+
+        async for aggregate in offer_aggregates:
+            offer_results = await self._offers_results.find(
+                ids=list(aggregate.offer_result_ids),
+                cursor="",
+            )
+            offer_list.append(
+                offers_pb2.Offer(
+                    id=aggregate.id,
+                    results=[offer_result async for offer_result in offer_results],
+                ),
+            )
+
+        return offers_pb2.ListOffersResponse(
+            offers=offer_list,
+            next_page_token=await offer_aggregates.cursor(),
+        )

@@ -36,6 +36,17 @@ class TripOfferRepository(repository.ProtoRepository[offers_pb2.TripOfferResult]
 
 class OfferAggregateRepository(repository.ProtoRepository[offers_pb2.OfferAggregate]):
     _proto = offers_pb2.OfferAggregate
+    _indexes = [pymongo.IndexModel("offer_search_id", background=True)]
+
+    async def find_by_offer_search_id(
+        self,
+        offer_search_id: str,
+        cursor: str,
+    ) -> resultset.ResultSet[offers_pb2.OfferAggregate]:
+        return await self._find_with_cursor(
+            cur=cursor,
+            filter_={"offer_search_id": offer_search_id},
+        )
 
 
 class OfferSearchRepository(repository.ProtoRepository[offers_pb2.OfferSearch]):

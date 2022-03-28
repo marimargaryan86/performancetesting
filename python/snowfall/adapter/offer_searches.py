@@ -3,7 +3,6 @@ from __future__ import annotations
 import abc
 import datetime
 import uuid
-from typing import Optional
 
 import grpc
 
@@ -31,15 +30,6 @@ class Client(abc.ABC):
     async def get(self, identifier: str) -> offers_pb2.OfferSearch:
         """Get an offer search."""
 
-    @abc.abstractmethod
-    async def find_offers(
-        self,
-        identifier: str,
-        limit: int,
-        cursor: Optional[str] = None,
-    ) -> list[offers_pb2.OfferAggregate]:
-        """Get offer results for an offer search."""
-
 
 class DictClient(Client):
     def __init__(self) -> None:
@@ -66,14 +56,6 @@ class DictClient(Client):
             return self._searches[identifier]
         except KeyError:
             raise NotFoundError()
-
-    async def find_offers(
-        self,
-        identifier: str,
-        limit: int,
-        cursor: Optional[str] = None,
-    ) -> list[offers_pb2.OfferAggregate]:
-        return []
 
 
 class GrpcClient(Client):
@@ -112,22 +94,3 @@ class GrpcClient(Client):
             raise UnknownError(exc.details()) from exc
 
         return response.search
-
-    async def find_offers(
-        self,
-        identifier: str,
-        limit: int,
-        cursor: Optional[str] = None,
-    ) -> list[offers_pb2.OfferAggregate]:
-        try:
-            response = await self._offers.ListOffers(
-                offers_pb2.ListOffersRequest(
-                    page_size=limit,
-                    page_token=cursor or "",
-                    offer_search_id=identifier,
-                ),
-            )
-        except grpc.aio.AioRpcError as exc:
-            raise UnknownError(exc.details()) from exc
-
-        return response.offers

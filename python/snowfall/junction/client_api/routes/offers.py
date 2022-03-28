@@ -1,6 +1,7 @@
 import datetime
 
 import lagom
+from furl import furl
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.adapter import offer_searches, offers
@@ -91,5 +92,38 @@ class OfferSearch(endpoints.HTTPEndpoint):
                     offers=[],
                     request=request,
                 ),
+            ),
+        )
+
+
+class OffersByOfferSearch(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        client: offers.Client = lagom.injectable,
+    ) -> responses.Response:
+        cursor = request.query_params["page[cursor]"]
+        limit = int(request.query_params["page[limit]"])
+        offers_page = await client.find_offers_by_offer_search(
+            request.path_params["offerSearchId"],
+            cursor=cursor,
+            limit=limit,
+        )
+        next_url = furl(request.url_for("ListPlaces"))
+        next_url.args["page[cursor]"] = offers_page.next_page_token
+        next_url.args["page[limit]"] = limit
+
+        return models.JsonApiResponse(
+            models.Body(
+                data=[
+                    await resources.OfferResource.from_proto(
+                        offer=offer,
+                        request=request,
+                    )
+                    for offer in offers_page.offers
+                ],
+                links={
+                    "next": next_url.url,
+                },
             ),
         )
