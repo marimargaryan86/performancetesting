@@ -175,7 +175,7 @@ def _add_options_from_settings(
                 help=arg.field_info.description,
                 hidden=bool(arg.field_info.extra.get("hidden", False)),
                 is_flag=arg_type == bool,
-                multiple=arg_type in {Sequence, list, set},
+                multiple=arg_type in {Sequence, list, set, tuple},
                 required=arg.required,
                 show_default=True,
                 show_envvar=True,
