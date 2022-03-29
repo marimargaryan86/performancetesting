@@ -51,7 +51,7 @@ job "schedules" {
 
       template {
         data        = <<EOH
-MONGO_DSN="[{{range $index, $service := service "mongodb"}}{{if ne $index 0}},{{end}}\"mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}}\"{{end}}]"
+MONGO_DSN={{range $index, $service := service "mongodb"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 EOH
         destination = "services.env"
         env         = true
@@ -96,11 +96,11 @@ EOH
         env         = true
         change_mode = "restart"
         data        = <<EOH
-AMQP_DSN="[{{range $index, $service := service "amqp"}}{{if ne $index 0}},{{end}}\"amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}//\"{{end}}]"
-MONGO_DSN="[{{range $index, $service := service "mongodb"}}{{if ne $index 0}},{{end}}\"mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}}\"{{end}}]"
+AMQP_DSN={{range $index, $service := service "amqp"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
+MONGO_DSN={{range $index, $service := service "mongodb"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 {{ with secret "kv/dev/schedules" }}
-{{ if .Data.data.aws_access_key_id }}AWS_ACCESS_KEY_ID="{{ .Data.data.aws_access_key_id }}"{{ end }}
-{{ if .Data.data.aws_secret_access_key }}AWS_SECRET_ACCESS_KEY="{{ .Data.data.aws_secret_access_key }}"{{ end }}
+AWS_ACCESS_KEY_ID={{ .Data.data.aws_access_key_id }}
+AWS_SECRET_ACCESS_KEY={{ .Data.data.aws_secret_access_key }}
 {{ end }}
 EOH
       }

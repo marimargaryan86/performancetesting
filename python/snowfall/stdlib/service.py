@@ -134,6 +134,13 @@ def _validate_option(
         response = field.validate(param_value, {}, loc="")
 
         if response[1]:
+            if isinstance(response[1], list):
+                raise click.BadParameter(
+                    message=str(cast(ErrorWrapper, response[1][0][0]).exc),
+                    ctx=ctx,
+                    param=param_def,
+                )
+
             raise click.BadParameter(
                 message=str(cast(ErrorWrapper, response[1]).exc),
                 ctx=ctx,

@@ -9,15 +9,20 @@
 set -eu
 
 DIR=$(dirname "${1}")
-ENV_STR=""
+ENV_STR="PANTS_CONCURRENT=True"
 
 if [ -f "${DIR}/.env" ]; then
-	ENV_STR=$(xargs -0 <"${DIR}/.env")
+	ENV_FILE="${DIR}/.env"
 elif [ -f "${DIR}/.env.dist" ]; then
-	ENV_STR=$(xargs -0 <"${DIR}/.env.dist")
+	ENV_FILE="${DIR}/.env.dist"
 fi
 
-ENV_STR="${ENV_STR} PANTS_CONCURRENT=True"
+if [ -n "${ENV_FILE+x}" ]; then
+	while read -r line; do
+		key="${line%%=*}"
+		value="${line#*=}"
+		ENV_STR="${ENV_STR} ${key@Q}=${value@Q}"
+	done <"${DIR}/.env.dist"
+fi
 
-# shellcheck disable=SC2086
-env $ENV_STR ./pants run "${1}" -- "${@:2}"
+env -S "${ENV_STR}" ./pants run "${1}" -- "${@:2}"
