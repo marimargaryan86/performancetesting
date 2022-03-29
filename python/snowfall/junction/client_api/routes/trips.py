@@ -22,7 +22,7 @@ class Trip(endpoints.HTTPEndpoint):
 
         return models.JsonApiResponse(
             models.Body(
-                data=await resources.TripResource.from_proto(
+                data=resources.TripResource.from_proto(
                     trip=trip,
                     request=request,
                 ),
@@ -45,7 +45,7 @@ class TripSegments(endpoints.HTTPEndpoint):
         return models.JsonApiResponse(
             models.Body(
                 data=[
-                    await resources.SegmentResource.from_proto(
+                    resources.SegmentResource.from_proto(
                         segment=segment,
                         request=request,
                     )
@@ -68,7 +68,7 @@ class TripSearch(endpoints.HTTPEndpoint):
 
         return models.JsonApiResponse(
             models.Body(
-                data=await resources.TripSearchResource.from_proto(
+                data=resources.TripSearchResource.from_proto(
                     trip_search,
                     request,
                 ),
@@ -110,7 +110,7 @@ class TripSearches(endpoints.HTTPEndpoint):
 
         return models.JsonApiResponse(
             models.Body(
-                data=await resources.TripSearchResource.from_proto(
+                data=resources.TripSearchResource.from_proto(
                     trip_search,
                     request,
                 ),
@@ -149,7 +149,7 @@ class TripsByTripSearch(endpoints.HTTPEndpoint):
         return models.JsonApiResponse(
             models.Body(
                 data=[
-                    await resources.TripResource.from_proto(
+                    resources.TripResource.from_proto(
                         trip=trip,
                         request=request,
                     )

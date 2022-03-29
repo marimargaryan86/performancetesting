@@ -22,7 +22,7 @@ def _transform(dict_value: str) -> str:
         ),
     ],
 )
-async def test_set_nested_value(
+def test_set_nested_value(
     input_dict: dict[str, Any],
     path: str,
     expected: dict[str, Any],

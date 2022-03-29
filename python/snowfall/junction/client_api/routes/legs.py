@@ -25,7 +25,7 @@ class Leg(endpoints.HTTPEndpoint):
 
         return models.JsonApiResponse(
             models.Body(
-                data=await resources.LegResource.from_proto(
+                data=resources.LegResource.from_proto(
                     origin,
                     destination,
                     request,

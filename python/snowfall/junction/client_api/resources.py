@@ -17,7 +17,7 @@ _RELATIONSHIPS_FIELD = "data"
 
 class OfferResource(models.Resource):
     @classmethod
-    async def from_proto(
+    def from_proto(
         cls,
         offer: offers_pb2.Offer,
         request: requests.Request,
@@ -55,7 +55,7 @@ class OfferResource(models.Resource):
 
 class PlaceResource(models.Resource):
     @classmethod
-    async def from_proto(
+    def from_proto(
         cls,
         place: models_pb2.Place,
         request: requests.Request,
@@ -83,7 +83,7 @@ class PlaceResource(models.Resource):
 
 class SegmentResource(models.Resource):
     @classmethod
-    async def from_proto(
+    def from_proto(
         cls,
         segment: models_pb2.SegmentReference,
         request: requests.Request,
@@ -108,7 +108,7 @@ class SegmentResource(models.Resource):
 
 class LegResource(models.Resource):
     @classmethod
-    async def from_proto(
+    def from_proto(
         cls,
         origin: models_pb2.Stop,
         destination: models_pb2.Stop,
@@ -160,7 +160,7 @@ class LegResource(models.Resource):
 
 class TripResource(models.Resource):
     @classmethod
-    async def from_proto(
+    def from_proto(
         cls,
         trip: models_pb2.TripReference,
         request: requests.Request,
@@ -172,7 +172,7 @@ class TripResource(models.Resource):
             relationships={
                 "segments": {
                     _RELATIONSHIPS_FIELD: [
-                        await SegmentResource.from_proto(
+                        SegmentResource.from_proto(
                             segment=segment,
                             request=request,
                         )
@@ -191,7 +191,7 @@ class TripResource(models.Resource):
 
 class TripSearchResource(models.Resource):
     @classmethod
-    async def from_proto(
+    def from_proto(
         cls,
         trip_search: trips_pb2.TripSearch,
         request: requests.Request,
@@ -232,7 +232,7 @@ class TripSearchResource(models.Resource):
 
 class TripOfferSearchResource(models.Resource):
     @classmethod
-    async def from_proto(
+    def from_proto(
         cls,
         offer_search: offers_pb2.OfferSearch,
         offers: Sequence[offers_pb2.OfferAggregate],
@@ -241,7 +241,7 @@ class TripOfferSearchResource(models.Resource):
         return cls(
             id=offer_search.id,
             type="trip-offer-searches",
-            attributes=await cls._get_attributes(offer_search),
+            attributes=cls._get_attributes(offer_search),
             relationships={
                 "offers": {
                     _RELATIONSHIPS_FIELD: [
@@ -259,7 +259,7 @@ class TripOfferSearchResource(models.Resource):
         )
 
     @classmethod
-    async def _get_attributes(
+    def _get_attributes(
         cls,
         offer_search: offers_pb2.OfferSearch,
     ) -> dict[str, Any]:

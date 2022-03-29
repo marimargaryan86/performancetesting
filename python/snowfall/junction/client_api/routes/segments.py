@@ -18,6 +18,6 @@ class Segment(endpoints.HTTPEndpoint):
 
         return models.JsonApiResponse(
             models.Body(
-                data=await resources.SegmentResource.from_proto(segment, request),
+                data=resources.SegmentResource.from_proto(segment, request),
             ),
         )

@@ -24,7 +24,7 @@ class Offer(endpoints.HTTPEndpoint):
 
         return models.JsonApiResponse(
             models.Body(
-                data=await resources.OfferResource.from_proto(
+                data=resources.OfferResource.from_proto(
                     offer=offer,
                     request=request,
                 ),
@@ -64,7 +64,7 @@ class OfferSearches(endpoints.HTTPEndpoint):
 
         return models.JsonApiResponse(
             models.Body(
-                data=await resources.TripOfferSearchResource.from_proto(
+                data=resources.TripOfferSearchResource.from_proto(
                     offer_search=offer_search,
                     offers=[],
                     request=request,
@@ -87,7 +87,7 @@ class OfferSearch(endpoints.HTTPEndpoint):
 
         return models.JsonApiResponse(
             models.Body(
-                data=await resources.TripOfferSearchResource.from_proto(
+                data=resources.TripOfferSearchResource.from_proto(
                     offer_search=offer_search,
                     offers=[],
                     request=request,
@@ -116,7 +116,7 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
         return models.JsonApiResponse(
             models.Body(
                 data=[
-                    await resources.OfferResource.from_proto(
+                    resources.OfferResource.from_proto(
                         offer=offer,
                         request=request,
                     )

@@ -19,7 +19,7 @@ class Place(endpoints.HTTPEndpoint):
 
         return models.JsonApiResponse(
             models.Body(
-                data=await resources.PlaceResource.from_proto(place, request),
+                data=resources.PlaceResource.from_proto(place, request),
             ),
         )
 
@@ -34,7 +34,7 @@ class Places(endpoints.HTTPEndpoint):
         limit = int(request.query_params["page[limit]"])
         response = await client.find(limit=limit, cursor=cursor)
         resource_list = [
-            await resources.PlaceResource.from_proto(place, request)
+            resources.PlaceResource.from_proto(place, request)
             for place in response.places
         ]
 

@@ -33,8 +33,7 @@ def fixture_sentry_events() -> SentryEvents:
     return caught_events
 
 
-@pytest.mark.asyncio
-async def test_breadcrumb_is_added(breadcrumbs: Breadcrumbs) -> None:
+def test_breadcrumb_is_added(breadcrumbs: Breadcrumbs) -> None:
     stdout.configure_logger()
     logger = structlog.get_logger("testing")
     logger.info("test")
@@ -44,8 +43,7 @@ async def test_breadcrumb_is_added(breadcrumbs: Breadcrumbs) -> None:
     assert breadcrumb["level"] == "info"
 
 
-@pytest.mark.asyncio
-async def test_event_is_logged(sentry_events: SentryEvents) -> None:
+def test_event_is_logged(sentry_events: SentryEvents) -> None:
     stdout.configure_logger()
     logger = structlog.get_logger("testing")
     logger.error("test")

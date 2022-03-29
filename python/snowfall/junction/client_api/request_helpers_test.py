@@ -5,7 +5,6 @@ import pytest
 from snowfall.junction.client_api import request_helpers
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize(
     "request_data, expected",
     [
@@ -65,8 +64,8 @@ from snowfall.junction.client_api import request_helpers
         ),
     ],
 )
-async def test_request_is_flattened(
+def test_request_is_flattened(
     request_data: dict[str, Any],
     expected: dict[str, Any],
 ) -> None:
-    assert await request_helpers.flatten_request_body(request_data) == expected
+    assert request_helpers.flatten_request_body(request_data) == expected

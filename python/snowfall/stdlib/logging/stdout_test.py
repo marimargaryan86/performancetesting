@@ -14,9 +14,8 @@ def _decode_log(capsys: capture.CaptureFixture[str]) -> dict[str, Any]:
     return json.loads(capsys.readouterr().out.strip())
 
 
-@pytest.mark.asyncio
 class TestStructlog(object):
-    async def test_format_is_json(self, capsys: capture.CaptureFixture[str]) -> None:
+    def test_format_is_json(self, capsys: capture.CaptureFixture[str]) -> None:
         stdout.configure_logger()
         logger = structlog.get_logger("testing")
         logger.info("test")
@@ -34,7 +33,7 @@ class TestStructlog(object):
             ("timestamp", "2021-12-21T12:12:12.121212Z"),
         ],
     )
-    async def test_event_is_set(
+    def test_event_is_set(
         self,
         capsys: capture.CaptureFixture[str],
         field: str,
@@ -46,14 +45,14 @@ class TestStructlog(object):
         json_message = _decode_log(capsys)
         assert json_message.get(field) == expected
 
-    async def test_kwargs(self, capsys: capture.CaptureFixture[str]) -> None:
+    def test_kwargs(self, capsys: capture.CaptureFixture[str]) -> None:
         stdout.configure_logger()
         logger = structlog.get_logger("testing")
         logger.info("test", field="testing")
         json_message = _decode_log(capsys)
         assert json_message.get("field") == "testing"
 
-    async def test_bound_kwarg(self, capsys: capture.CaptureFixture[str]) -> None:
+    def test_bound_kwarg(self, capsys: capture.CaptureFixture[str]) -> None:
         stdout.configure_logger()
         logger = structlog.get_logger("testing")
         logger = logger.bind(field="testing")
@@ -62,7 +61,7 @@ class TestStructlog(object):
         assert json_message.get("field") == "testing"
 
     @pytest.mark.parametrize("field", filtering.SECRET_WORDS)
-    async def test_secrets_are_masked(
+    def test_secrets_are_masked(
         self,
         field: str,
         capsys: capture.CaptureFixture[str],
@@ -73,7 +72,7 @@ class TestStructlog(object):
         json_message = _decode_log(capsys)
         assert json_message.get(field) == filtering.FILTERED_WORD
 
-    async def test_context_binding_call(
+    def test_context_binding_call(
         self,
         capsys: capture.CaptureFixture[str],
     ) -> None:
@@ -86,7 +85,7 @@ class TestStructlog(object):
         json_message = _decode_log(capsys)
         assert json_message.get("field") == "testing"
 
-    async def test_context_binding_is_unset(
+    def test_context_binding_is_unset(
         self,
         capsys: capture.CaptureFixture[str],
     ) -> None:
@@ -102,7 +101,7 @@ class TestStructlog(object):
         json_message = _decode_log(capsys)
         assert json_message.get("field") is None
 
-    async def test_context_binding_manager(
+    def test_context_binding_manager(
         self,
         capsys: capture.CaptureFixture[str],
     ) -> None:
@@ -116,7 +115,7 @@ class TestStructlog(object):
         json_message = _decode_log(capsys)
         assert json_message.get("field") == "testing"
 
-    async def test_nested_context_binding_manager(
+    def test_nested_context_binding_manager(
         self,
         capsys: capture.CaptureFixture[str],
     ) -> None:
