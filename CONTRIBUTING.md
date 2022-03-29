@@ -119,17 +119,28 @@ or check [the written summary][uncle-bob-summary].
 The minimum code for a new service is:
 
 ```python
-from snowfall.service import RunnableService, Task, make_runnable_service
+from snowfall.stdlib import service
 
-async def _task_method(service: RunnableService) -> None:
+
+class _Settings(service.Settings):
+    foobar: str
+
+
+async def _method(app: service.Application[_Settings]) -> None:
     """Your code here."""
 
+
 if __name__ == "__main__":
-    _service = make_runnable_service(
+    entrypoint = service.new_entrypoint(
         name="service_name",
-        tasks=(Task(command="task_name", method=_task_method),),
+        commands=(
+            service.new_command(
+                name="command_name", callback=_method, settings_class=_Settings
+            ),
+        ),
     )
-    _service.run()
+
+    service.invoke(entrypoint)
 ```
 
 ### Making Commits

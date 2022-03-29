@@ -3,31 +3,32 @@ import random
 from typing import Sequence
 
 from motor import motor_asyncio
-from pydantic import AnyUrl, BaseSettings
+from pydantic import AnyUrl
 
 from snowfall.junction.places.consumer import PlaceImportConsumer
 from snowfall.junction.places.grpc import CuratedPlacesService, PlacesService
 from snowfall.junction.places.places import CuratedPlaceRepository, PlaceRepository
-from snowfall.service import RunnableService, Task, make_runnable_service
+from snowfall.stdlib import service
 from snowfall.stdlib.transport import amqp, grpc
 
 
-class _GrpcSettings(BaseSettings):
+class _GrpcSettings(service.Settings):
     default_page_size: int = 100
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: Sequence[AnyUrl]
 
 
-class _ImportSettings(BaseSettings):
+class _ImportSettings(service.Settings):
     amqp_dsn: Sequence[AnyUrl]
     mongo_dsn: Sequence[AnyUrl]
 
 
-async def _import(service: RunnableService) -> None:
-    settings = _ImportSettings()
-    mongo = motor_asyncio.AsyncIOMotorClient(random.choice(settings.mongo_dsn))  # nosec
-    connection = amqp.Connection(random.choice(settings.amqp_dsn))  # nosec
+async def _import(app: service.Application[_ImportSettings]) -> None:
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        random.choice(app.settings.mongo_dsn),  # nosec
+    )
+    connection = amqp.Connection(random.choice(app.settings.amqp_dsn))  # nosec
 
     async with connection:
         consumer = PlaceImportConsumer(
@@ -35,7 +36,7 @@ async def _import(service: RunnableService) -> None:
             consumer=await amqp.create_consumer(
                 conn=connection,
                 exchange_name="places",
-                queue_name="{0}_places_importer".format(service.name),
+                queue_name="{0}_places_importer".format(app.name),
                 routing_key="place.import",
             ),
         )
@@ -43,36 +44,41 @@ async def _import(service: RunnableService) -> None:
         await consumer.consume()
 
 
-async def _serve(service: RunnableService) -> None:
-    settings = _GrpcSettings()
-    mongo = motor_asyncio.AsyncIOMotorClient(random.choice(settings.mongo_dsn))  # nosec
-    server = grpc.create_server(
-        settings.grpc_address,
-        settings.grpc_port,
+async def _serve(app: service.Application[_GrpcSettings]) -> None:
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        random.choice(app.settings.mongo_dsn),  # nosec
+    )
+    grpc_server = grpc.create_server(
+        app.settings.grpc_address,
+        app.settings.grpc_port,
         [
             PlacesService(
                 PlaceRepository(mongo.places.places),
-                settings.default_page_size,
+                app.settings.default_page_size,
             ),
             CuratedPlacesService(
                 CuratedPlaceRepository(mongo.places.curated_places),
-                settings.default_page_size,
+                app.settings.default_page_size,
             ),
         ],
     )
 
-    await server.start()
-    service.add_cleanup_task(server.stop(5))
-    await server.wait_for_termination()
+    async with grpc_server.serve() as server:
+        await server.wait_for_termination()
 
 
 if __name__ == "__main__":
-    _service = make_runnable_service(
-        name="places",
-        tasks=(
-            Task(command="grpc", method=_serve),
-            Task(command="import", method=_import),
+    entrypoint = service.Entrypoint(name="places")
+
+    entrypoint.enter_with_commands(
+        service.Command(
+            name="grpc",
+            callback=_serve,
+            settings_class=_GrpcSettings,
+        ),
+        service.Command(
+            name="import",
+            callback=_import,
+            settings_class=_ImportSettings,
         ),
     )
-
-    _service.run()

@@ -1,10 +1,12 @@
 # flake8: noqa: WPS201
+import base64
 import http
 import random
+from typing import cast
 
 import grpc
 import uvicorn
-from starlette import applications
+from asgiref.typing import ASGIApplication
 from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import (
@@ -27,87 +29,99 @@ from snowfall.junction.offers.v1alpha import offers_pb2_grpc
 from snowfall.junction.places.v1alpha import places_pb2_grpc
 from snowfall.junction.schedules.v1alpha import schedules_pb2_grpc
 from snowfall.junction.trips.v1alpha import trips_pb2_grpc
-from snowfall.service import make_service
+from snowfall.stdlib import service
 from snowfall.stdlib.persistence import filesystem
 
 
-def _factory() -> applications.Starlette:
-    make_service(name="client-api")
-    settings = bootstrap.Settings()
+def _factory(app: service.Application[bootstrap.Settings]) -> ASGIApplication:
+    places_channel = grpc.aio.insecure_channel(
+        random.choice(app.settings.places_address),  # nosec
+    )
     offers_channel = grpc.aio.insecure_channel(
-        random.choice(settings.offers_address),  # nosec
+        random.choice(app.settings.offers_address),  # nosec
     )
     trips_channel = grpc.aio.insecure_channel(
-        random.choice(settings.trips_address),  # nosec
+        random.choice(app.settings.trips_address),  # nosec
     )
     schedules_channel = grpc.aio.insecure_channel(
-        random.choice(settings.schedules_address),  # nosec
+        random.choice(app.settings.schedules_address),  # nosec
     )
 
-    return bootstrap.create_app(
-        custom_middlewares=[
-            Middleware(
-                middlewares.ValidationMiddleware,
-                validator=validation.Validator(
-                    "openapi.json",
-                    filesystem.PkgLoader("client_api"),
+    return cast(
+        ASGIApplication,
+        bootstrap.create_app(
+            custom_middlewares=[
+                Middleware(
+                    middlewares.ValidationMiddleware,
+                    validator=validation.Validator(
+                        "openapi.json",
+                        filesystem.PkgLoader("client_api"),
+                    ),
+                    excluded_status_codes={http.HTTPStatus.METHOD_NOT_ALLOWED},
                 ),
-                excluded_status_codes={http.HTTPStatus.METHOD_NOT_ALLOWED},
-            ),
-            Middleware(
-                authentication.AuthenticationMiddleware,
-                backend=jwt.JWTAuthenticationBackend(
-                    public_key=settings.jwt_public_key,
-                    token_version=settings.jwt_token_version,
+                Middleware(
+                    authentication.AuthenticationMiddleware,
+                    backend=jwt.JWTAuthenticationBackend(
+                        token_version=app.settings.jwt_token_version,
+                        public_key=base64.b64decode(
+                            app.settings.jwt_public_key.encode(),
+                        ).decode(),
+                    ),
+                    on_error=handlers.auth_error_handler,
                 ),
-                on_error=handlers.auth_error_handler,
-            ),
-        ],
-        dependencies=bootstrap.create_dependencies(
-            places_client=places.GrpcClient(
-                places_pb2_grpc.PlacesServiceStub(
-                    grpc.aio.insecure_channel(
-                        random.choice(settings.places_address),  # nosec
+            ],
+            dependencies=bootstrap.create_dependencies(
+                places_client=places.GrpcClient(
+                    places_pb2_grpc.PlacesServiceStub(places_channel),
+                ),
+                trip_searches_client=trip_searches.GrpcClient(
+                    trips=trips_pb2_grpc.TripServiceStub(trips_channel),
+                    trip_searches=trips_pb2_grpc.TripSearchServiceStub(trips_channel),
+                ),
+                trips_client=trips.GrpcClient(
+                    trips_pb2_grpc.TripServiceStub(trips_channel),
+                ),
+                offers_client=offers.GrpcClient(
+                    offers=offers_pb2_grpc.OfferServiceStub(offers_channel),
+                ),
+                offer_searches_client=offer_searches.GrpcClient(
+                    offers=offers_pb2_grpc.OfferServiceStub(offers_channel),
+                    offer_searches=offers_pb2_grpc.OfferSearchServiceStub(
+                        offers_channel
                     ),
                 ),
-            ),
-            trip_searches_client=trip_searches.GrpcClient(
-                trips=trips_pb2_grpc.TripServiceStub(trips_channel),
-                trip_searches=trips_pb2_grpc.TripSearchServiceStub(trips_channel),
-            ),
-            trips_client=trips.GrpcClient(
-                trips_pb2_grpc.TripServiceStub(trips_channel),
-            ),
-            offers_client=offers.GrpcClient(
-                offers=offers_pb2_grpc.OfferServiceStub(offers_channel),
-            ),
-            offer_searches_client=offer_searches.GrpcClient(
-                offers=offers_pb2_grpc.OfferServiceStub(offers_channel),
-                offer_searches=offers_pb2_grpc.OfferSearchServiceStub(offers_channel),
-            ),
-            segments_client=segments.GrpcClient(
-                segments=trips_pb2_grpc.TripServiceStub(trips_channel),
-            ),
-            schedules_client=schedules.GrpcClient(
-                schedules=schedules_pb2_grpc.ScheduleServiceStub(schedules_channel),
+                segments_client=segments.GrpcClient(
+                    segments=trips_pb2_grpc.TripServiceStub(trips_channel),
+                ),
+                schedules_client=schedules.GrpcClient(
+                    schedules=schedules_pb2_grpc.ScheduleServiceStub(schedules_channel),
+                ),
             ),
         ),
     )
 
 
-if __name__ == "__main__":
-    _settings = bootstrap.Settings()
-
+def _serve(app: service.Application[bootstrap.Settings]) -> None:
     uvicorn.run(
-        app="snowfall.junction.client_api.main:_factory",
-        factory=True,
-        host=str(_settings.http_address),
-        port=_settings.http_port,
+        app=_factory(app),
+        host=str(app.settings.http_address),
+        port=app.settings.http_port,
         access_log=False,
-        reload=_settings.reload,
         log_config=None,
         proxy_headers=True,
         forwarded_allow_ips=[
-            str(address) for address in _settings.forwarded_allowed_ips
+            str(address) for address in app.settings.forwarded_allowed_ips
         ],
+    )
+
+
+if __name__ == "__main__":
+    entrypoint = service.Entrypoint(name="client-api")
+
+    entrypoint.enter_with_commands(
+        service.Command(
+            name="http",
+            callback=_serve,
+            settings_class=bootstrap.Settings,
+        ),
     )

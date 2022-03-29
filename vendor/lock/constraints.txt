@@ -14,6 +14,7 @@
 #     "aioredis[hiredis]==2.0.1",
 #     "aiormq==6.2.3",
 #     "asyncstdlib==3.10.3",
+#     "click==8.0.4",
 #     "cryptography==36.0.2",
 #     "fakeredis==1.7.1",
 #     "freezegun==1.2.1",
@@ -237,10 +238,10 @@ cffi==1.15.0; python_version >= "3.6" \
 charset-normalizer==2.0.12; python_full_version >= "3.6.0" and python_version >= "3.6" \
     --hash=sha256:2857e29ff0d34db842cd7ca3230549d1a697f96ee6d3fb071cfa6c7393832597 \
     --hash=sha256:6881edbebdb17b39b4eaaa821b438bf6eddffb4468cf344f09f89def34a8b1df
-click==8.0.4; python_version >= "3.7" \
+click==8.0.4; python_version >= "3.6" \
     --hash=sha256:6a7a62563bbfabfda3a38f3023a1db4a35978c0abd76f6c9605ecd6554d6d9b1 \
     --hash=sha256:8458d7b1287c5fb128c90e23381cf99dcde74beaf6c7ff6384ce84d6fe090adb
-colorama==0.4.4; python_version >= "3.7" and python_full_version < "3.0.0" and sys_platform == "win32" and platform_system == "Windows" or sys_platform == "win32" and python_version >= "3.7" and python_full_version >= "3.5.0" and platform_system == "Windows" \
+colorama==0.4.4; python_version >= "3.7" and python_full_version < "3.0.0" and platform_system == "Windows" and sys_platform == "win32" or platform_system == "Windows" and python_version >= "3.7" and python_full_version >= "3.5.0" and sys_platform == "win32" \
     --hash=sha256:9f47eda37229f68eee03b24b9748937c7dc3868f906e8ba69fbcbdd3bc5dc3e2 \
     --hash=sha256:5941b2b48a20143d2267e95b1c2a7603ce057ee39fd88e7329b0c292aa16869b
 cryptography==36.0.2; python_version >= "3.6" \

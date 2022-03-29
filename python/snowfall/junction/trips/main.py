@@ -4,25 +4,25 @@ import random
 from typing import Sequence
 
 from motor import motor_asyncio
-from pydantic import AnyUrl, BaseSettings
+from pydantic import AnyUrl
 
 from snowfall.junction.planner.v1alpha import planner_pb2_grpc
 from snowfall.junction.trips import trips
 from snowfall.junction.trips.consumer import TripSearchConsumer
 from snowfall.junction.trips.grpc import TripSearchService, TripService
-from snowfall.service import RunnableService, Task, make_runnable_service
+from snowfall.stdlib import service
 from snowfall.stdlib.transport import amqp, grpc
 
 _TRIPS = "trips"
 
 
-class _ConsumeSettings(BaseSettings):
+class _ConsumeSettings(service.Settings):
     amqp_dsn: Sequence[AnyUrl]
     planner_address: Sequence[str]
     mongo_dsn: Sequence[AnyUrl]
 
 
-class _GrpcSettings(BaseSettings):
+class _GrpcSettings(service.Settings):
     amqp_dsn: Sequence[AnyUrl]
     default_page_size: int = 100
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
@@ -31,22 +31,23 @@ class _GrpcSettings(BaseSettings):
     trip_search_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
 
 
-async def _consume(service: RunnableService) -> None:
-    settings = _ConsumeSettings()
-    connection = amqp.Connection(random.choice(settings.amqp_dsn))  # nosec
-    mongo = motor_asyncio.AsyncIOMotorClient(random.choice(settings.mongo_dsn))  # nosec
+async def _consume(app: service.Application[_ConsumeSettings]) -> None:
+    connection = amqp.Connection(random.choice(app.settings.amqp_dsn))  # nosec
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        random.choice(app.settings.mongo_dsn),  # nosec
+    )
 
     async with connection:
         consumer = TripSearchConsumer(
             consumer=await amqp.create_consumer(
                 conn=connection,
                 exchange_name=_TRIPS,
-                queue_name="{0}_trip_searches_consumer".format(service.name),
+                queue_name="{0}_trip_searches_consumer".format(app.name),
                 routing_key="trips.search",
             ),
             planner=planner_pb2_grpc.PlannerServiceStub(
                 grpc.aio.insecure_channel(
-                    random.choice(settings.planner_address),  # nosec
+                    random.choice(app.settings.planner_address),  # nosec
                 ),
             ),
             trip_search_repository=trips.TripSearchRepository(
@@ -59,46 +60,51 @@ async def _consume(service: RunnableService) -> None:
         await consumer.consume()
 
 
-async def _serve(service: RunnableService) -> None:
-    settings = _GrpcSettings()
-    connection = amqp.Connection(random.choice(settings.amqp_dsn))  # nosec
-    mongo = motor_asyncio.AsyncIOMotorClient(random.choice(settings.mongo_dsn))  # nosec
+async def _serve(app: service.Application[_GrpcSettings]) -> None:
+    connection = amqp.Connection(random.choice(app.settings.amqp_dsn))  # nosec
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        random.choice(app.settings.mongo_dsn),  # nosec
+    )
 
     async with connection:
         producer = await amqp.create_producer(
             conn=connection,
             exchange_name=_TRIPS,
         )
-        server = grpc.create_server(
-            settings.grpc_address,
-            settings.grpc_port,
+        grpc_server = grpc.create_server(
+            app.settings.grpc_address,
+            app.settings.grpc_port,
             [
                 TripService(
                     repository=trips.TripRepository(mongo[_TRIPS]["trips"]),
-                    default_page_size=settings.default_page_size,
+                    default_page_size=app.settings.default_page_size,
                 ),
                 TripSearchService(
                     repository=trips.TripSearchRepository(
                         mongo[_TRIPS]["trip_searches"],
-                        settings.trip_search_ttl,
+                        app.settings.trip_search_ttl,
                     ),
                     producer=producer,
                 ),
             ],
         )
 
-        await server.start()
-        service.add_cleanup_task(server.stop(5))
-        await server.wait_for_termination()
+        async with grpc_server.serve() as server:
+            await server.wait_for_termination()
 
 
 if __name__ == "__main__":
-    _service = make_runnable_service(
-        name=_TRIPS,
-        tasks=(
-            Task(command="consume", method=_consume),
-            Task(command="grpc", method=_serve),
+    entrypoint = service.Entrypoint(name=_TRIPS)
+
+    entrypoint.enter_with_commands(
+        service.Command(
+            name="consume",
+            callback=_consume,
+            settings_class=_ConsumeSettings,
+        ),
+        service.Command(
+            name="grpc",
+            callback=_serve,
+            settings_class=_GrpcSettings,
         ),
     )
-
-    _service.run()

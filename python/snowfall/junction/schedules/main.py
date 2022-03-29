@@ -4,38 +4,39 @@ import random
 
 import aioredis
 from motor import motor_asyncio
-from pydantic import AnyUrl, BaseSettings
+from pydantic import AnyUrl
 
 from snowfall.junction.schedules import consumer, export, grpc, schedules
-from snowfall.service import RunnableService, Task, make_runnable_service
+from snowfall.stdlib import service
 from snowfall.stdlib.persistence import redis
 from snowfall.stdlib.transport import amqp
 from snowfall.stdlib.transport import grpc as grpc_transport
 
 
-class _GrpcSettings(BaseSettings):
+class _GrpcSettings(service.Settings):
     default_page_size: int = 100
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: tuple[AnyUrl]
 
 
-class _ExportSettings(BaseSettings):
+class _ExportSettings(service.Settings):
     mongo_dsn: tuple[AnyUrl]
     output_path: str
     redis_dsn: tuple[AnyUrl]
 
 
-class _ImportSettings(BaseSettings):
+class _ImportSettings(service.Settings):
     amqp_dsn: tuple[AnyUrl]
     mongo_dsn: tuple[AnyUrl]
 
 
-async def _export(_: RunnableService) -> None:
-    settings = _ExportSettings()
-    mongo = motor_asyncio.AsyncIOMotorClient(random.choice(settings.mongo_dsn))  # nosec
-    pool = aioredis.from_url(random.choice(settings.redis_dsn))  # nosec
-    output_path = pathlib.Path(settings.output_path)
+async def _export(app: service.Application[_ExportSettings]) -> None:
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        random.choice(app.settings.mongo_dsn),  # nosec
+    )
+    pool = aioredis.from_url(random.choice(app.settings.redis_dsn))  # nosec
+    output_path = pathlib.Path(app.settings.output_path)
 
     output_path.mkdir(parents=True, exist_ok=True)
 
@@ -46,10 +47,11 @@ async def _export(_: RunnableService) -> None:
         ).export(output_path)
 
 
-async def _import(service: RunnableService) -> None:
-    settings = _ImportSettings()
-    mongo = motor_asyncio.AsyncIOMotorClient(random.choice(settings.mongo_dsn))  # nosec
-    connection = amqp.Connection(random.choice(settings.amqp_dsn))  # nosec
+async def _import(app: service.Application[_ImportSettings]) -> None:
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        random.choice(app.settings.mongo_dsn),  # nosec
+    )
+    connection = amqp.Connection(random.choice(app.settings.amqp_dsn))  # nosec
 
     async with connection:
         import_consumer = consumer.ScheduleImportConsumer(
@@ -57,7 +59,7 @@ async def _import(service: RunnableService) -> None:
             consumer=await amqp.create_consumer(
                 conn=connection,
                 exchange_name="schedules",
-                queue_name="{0}_schedules_importer".format(service.name),
+                queue_name="{0}_schedules_importer".format(app.name),
                 routing_key="schedule.import",
             ),
         )
@@ -65,33 +67,42 @@ async def _import(service: RunnableService) -> None:
         await import_consumer.consume()
 
 
-async def _serve(service: RunnableService) -> None:
-    settings = _GrpcSettings()
-    mongo = motor_asyncio.AsyncIOMotorClient(random.choice(settings.mongo_dsn))  # nosec
-    server = grpc_transport.create_server(
-        settings.grpc_address,
-        settings.grpc_port,
+async def _serve(app: service.Application[_GrpcSettings]) -> None:
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        random.choice(app.settings.mongo_dsn),  # nosec
+    )
+    grpc_server = grpc_transport.create_server(
+        app.settings.grpc_address,
+        app.settings.grpc_port,
         [
             grpc.ScheduleService(
                 schedules=schedules.ScheduleRepository(mongo.schedules.schedules),
-                default_page_size=settings.default_page_size,
+                default_page_size=app.settings.default_page_size,
             ),
         ],
     )
 
-    await server.start()
-    service.add_cleanup_task(server.stop(5))
-    await server.wait_for_termination()
+    async with grpc_server.serve() as server:
+        await server.wait_for_termination()
 
 
 if __name__ == "__main__":
-    _service = make_runnable_service(
-        name="schedules",
-        tasks=(
-            Task(command="export", method=_export),
-            Task(command="import", method=_import),
-            Task(command="grpc", method=_serve),
+    entrypoint = service.Entrypoint(name="schedules")
+
+    entrypoint.enter_with_commands(
+        service.Command(
+            name="export",
+            callback=_export,
+            settings_class=_ExportSettings,
+        ),
+        service.Command(
+            name="import",
+            callback=_import,
+            settings_class=_ImportSettings,
+        ),
+        service.Command(
+            name="grpc",
+            callback=_serve,
+            settings_class=_GrpcSettings,
         ),
     )
-
-    _service.run()

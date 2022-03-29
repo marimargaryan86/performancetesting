@@ -1,9 +1,7 @@
-import base64
 import ipaddress
-from typing import Any, Sequence
+from typing import Sequence
 
 import lagom
-import pydantic
 from lagom.integrations import starlette
 from starlette import applications, exceptions, status
 from starlette.middleware import Middleware
@@ -20,9 +18,10 @@ from snowfall.adapter import (
 from snowfall.junction.client_api import handlers
 from snowfall.junction.client_api.routes import router
 from snowfall.junction.client_api.transformers import trip_ids_to_segments
+from snowfall.stdlib import service
 
 
-class Settings(pydantic.BaseSettings):
+class Settings(service.Settings):
     forwarded_allowed_ips: Sequence[ipaddress.IPv4Address] = [
         ipaddress.IPv4Address("127.0.0.1"),
     ]
@@ -35,10 +34,6 @@ class Settings(pydantic.BaseSettings):
     trips_address: Sequence[str]
     schedules_address: Sequence[str]
     reload: bool = False
-
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super().__init__(*args, **kwargs)
-        self.jwt_public_key = base64.b64decode(self.jwt_public_key.encode()).decode()
 
 
 def create_dependencies(  # noqa: WPS211

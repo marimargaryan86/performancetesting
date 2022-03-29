@@ -8,12 +8,12 @@ import pydantic
 
 from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.offers.v1alpha import offers_pb2
-from snowfall.service import RunnableService, Task, make_runnable_service
+from snowfall.stdlib import service
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport import amqp
 
 
-class _GrpcSettings(pydantic.BaseSettings):
+class _OffersSettings(service.Settings):
     amqp_dsn: Sequence[pydantic.AnyUrl]
 
 
@@ -98,15 +98,15 @@ class TripSearchConsumer(object):
         await message.ack()
 
 
-async def _offers(service: RunnableService) -> None:
-    settings = _GrpcSettings()
-
-    async with amqp.Connection(random.choice(settings.amqp_dsn)) as connection:  # nosec
+async def _offers(app: service.Application[_OffersSettings]) -> None:
+    async with amqp.Connection(
+        random.choice(app.settings.amqp_dsn),  # nosec
+    ) as connection:
         consumer = TripSearchConsumer(
             consumer=await amqp.create_consumer(
                 conn=connection,
                 exchange_name="offers",
-                queue_name="{0}_offers".format(service.name),
+                queue_name="{0}_offers".format(app.name),
                 routing_key="offers.search.trip",
             ),
             producer=await amqp.create_producer(
@@ -120,8 +120,12 @@ async def _offers(service: RunnableService) -> None:
 
 
 if __name__ == "__main__":
-    _service = make_runnable_service(
-        name="mock",
-        tasks=(Task(command="offers", method=_offers),),
+    entrypoint = service.Entrypoint(name="mock")
+
+    entrypoint.enter_with_commands(
+        service.Command(
+            name="offers",
+            callback=_offers,
+            settings_class=_OffersSettings,
+        ),
     )
-    _service.run()

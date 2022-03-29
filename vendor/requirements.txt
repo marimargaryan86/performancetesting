@@ -3,6 +3,7 @@ aiofiles==0.8.0
 aioredis[hiredis]==2.0.1
 aiormq==6.2.3
 asyncstdlib==3.10.3
+click==8.0.4
 cryptography==36.0.2
 fakeredis==1.7.1
 freezegun==1.2.1
