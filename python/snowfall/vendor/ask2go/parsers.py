@@ -1,7 +1,7 @@
 import datetime
 from typing import Any
 
-from snowfall.vendor.ask2go.models import search
+from snowfall.vendor.ask2go.models import common, search
 
 
 def parse_search_criteria(
@@ -45,4 +45,65 @@ def parse_search_request(criteria: search.CreateSearchCriteria) -> dict[str, Any
         "cabinClass": criteria.cabin_class.value,
         "direction": direction,
         "searchCriteria": search_criteria,
+    }
+
+
+def parse_create_booking_request(
+    pricing_id: str,
+    transaction_id: str,
+    passenger: common.Passenger,
+    contact: common.Contact,
+) -> dict[str, Any]:
+    return {
+        "pricingId": pricing_id,
+        "transactionId": transaction_id,
+        "contactDetails": {
+            "firstName": passenger.first_name,
+            "lastName": passenger.last_name,
+            "title": passenger.name_title,
+            "address": {
+                "street": contact.address,
+                "city": contact.city,
+                "postalCode": contact.postal_code,
+                "countryCode": contact.country.code,
+            },
+            "phoneInternationalCode": contact.phone.country_code,
+            "mobilePhone": contact.phone.number,
+            "email": contact.email,
+        },
+        "travelerDetails": [
+            {
+                "travelerId": 0,
+                "firstName": passenger.first_name,
+                "lastName": passenger.last_name,
+                "title": passenger.name_title,
+                "dateOfBirth": passenger.birth_date.strftime("%d-%m-%Y"),
+                "gender": passenger.gender.value,
+                "passengerType": passenger.type.value,
+            },
+        ],
+        "isPriceChangeAccepted": False,
+        "isScheduleChangeAccepted": False,
+    }
+
+
+def parse_update_booking_request(
+    booking_ref_id: str,
+    transaction_id: str,
+) -> dict[str, Any]:
+    return {
+        "id": booking_ref_id,
+        "transactionId": transaction_id,
+        "billingDetails": {
+            "invoice": {
+                "companyName": "",
+                "vatNo": "",
+                "companyStreetAddress": "",
+                "companyCityAddress": "",
+                "companyCountry": "",
+                "companyPostCode": "",
+                "companyEmail": "",
+            },
+        },
+        "isInvoiceRequested": True,
     }

@@ -10,3 +10,15 @@ class AirCabinClassType(enum.Enum):
     premium_economy = "PremiumEconomy"
     business = "Business"
     first = "First"
+
+
+class PassengerType(enum.Enum):
+    adult = "ADT"
+    child = "CHD"
+    infant = "INF"
+
+
+class Gender(enum.Enum):
+    female = "Female"
+    male = "Male"
+    unknown = "Unknown"

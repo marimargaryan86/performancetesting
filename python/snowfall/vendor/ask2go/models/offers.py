@@ -3,7 +3,6 @@ from decimal import Decimal
 from typing import Optional
 from uuid import UUID
 
-from snowfall.vendor.ask2go.enums import AirCabinClassType
 from snowfall.vendor.ask2go.models.base import CamelCaseBaseModel
 
 
@@ -42,13 +41,13 @@ class TripSegmentCarrier(CamelCaseBaseModel):
 
 
 class TripSegment(CamelCaseBaseModel):
-    id: UUID  # noqa: A003
+    id: Optional[UUID]  # noqa: A003
     duration: time
     distance: float
-    cabin: AirCabinClassType
+    cabin: str
     is_technical_stop: bool
     aircraft: SegmentAircraft
-    availability: SegmentAvailability
+    availability: Optional[SegmentAvailability]
     origin: TripOriginDestination
     destination: TripOriginDestination
     departure: TripDepartureArrival
@@ -60,11 +59,11 @@ class TripSegment(CamelCaseBaseModel):
     on_time_performance: float
     meal: Optional[str]
     layover: str
-    change_of_plane: bool
+    change_of_plane: Optional[bool]
 
 
 class Trip(CamelCaseBaseModel):
-    id: UUID  # noqa: A003
+    id: Optional[UUID]  # noqa: A003
     duration: time
     direction: str
     is_red_eye: bool
@@ -100,7 +99,7 @@ class PassengerPricing(CamelCaseBaseModel):
 
 
 class Offer(CamelCaseBaseModel):
-    id: UUID  # noqa: A003
+    id: Optional[str]  # noqa: A003]
     is_refundable: bool
     docs_required: bool
     gds: str
