@@ -1,6 +1,6 @@
 # How to Contribute
 
-## MacOS development
+## MacOS Development
 
 ### Set up your local environment
 
@@ -173,12 +173,6 @@ Regardless of method, you need to run `docker compose up` to boot up all require
 
 ```shell
 bash bash/run.sh python/snowfall/junction/{service} {task}
-```
-
-#### Python
-
-```shell
-bash -c 'env PYTHONPATH=$(git rev-parse --show-toplevel)/python:$(git rev-parse --show-toplevel)/dist/codegen/python:$PYTHONPATH $(cat python/snowfall/junction/{service}/.env.dist | xargs -0) bash -c "source dist/export/python/virtualenvs/python-default/3.9.10/bin/activate && python -m \"snowfall.junction.{service}.main\" {task}"'
 ```
 
 ### PyCharm
