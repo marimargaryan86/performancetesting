@@ -1,6 +1,6 @@
 import asyncio
 import collections
-from collections.abc import AsyncIterable
+from collections.abc import AsyncIterable, Iterable
 from typing import Awaitable, TypeVar
 
 _DataType = TypeVar("_DataType")
@@ -19,7 +19,7 @@ async def assert_awaitables(
 
 async def assert_iterable(
     generator: AsyncIterable[_DataType],
-    expected: list[_DataType],
+    expected: Iterable[_DataType],
 ) -> None:
     assert collections.Counter(expected) == collections.Counter(  # nosec
         [gen_item async for gen_item in generator],

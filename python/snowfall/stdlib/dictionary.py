@@ -1,12 +1,13 @@
-from typing import Any, Awaitable, Callable, Sequence
+from typing import Any, Awaitable, Callable, MutableMapping, Sequence
 
 
 def set_nested_value(
-    input_dict: dict[str, Any],
+    input_dict: MutableMapping[str, Any],
     path: Sequence[str],
     function: Callable[[Any], Any],
 ) -> None:
-    path = list(path).copy()
+    # todo: This should probably return a new dict, not mutate the input dict
+    path = list(path)
     key = path.pop(0)
 
     try:

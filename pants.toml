@@ -64,6 +64,11 @@ extra_requirements = [
     "setuptools",
     "wemake-python-styleguide",
 ]
+source_plugins = [
+    "python/snowfall/plugin/flake8/immutability.py",
+    "python/snowfall/plugin/flake8/imports.py",
+    "python/snowfall/plugin/flake8/typing.py",
+]
 
 [isort]
 version = "isort==5.10.1"

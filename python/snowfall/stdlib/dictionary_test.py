@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, MutableMapping
 
 import pytest
 
@@ -23,9 +23,9 @@ def _transform(dict_value: str) -> str:
     ],
 )
 def test_set_nested_value(
-    input_dict: dict[str, Any],
+    input_dict: MutableMapping[str, Any],
     path: str,
-    expected: dict[str, Any],
+    expected: MutableMapping[str, Any],
 ) -> None:
     dictionary.set_nested_value(
         input_dict,

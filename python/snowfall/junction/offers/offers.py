@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from typing import Sequence
 
 import pymongo
 from google.protobuf import timestamp_pb2
@@ -15,7 +16,7 @@ class TripOfferRepository(repository.ProtoRepository[offers_pb2.TripOfferResult]
 
     async def find(
         self,
-        ids: list[str],
+        ids: Sequence[str],
         cursor: str,
     ) -> resultset.ResultSet[offers_pb2.TripOfferResult]:
         filter_ = (

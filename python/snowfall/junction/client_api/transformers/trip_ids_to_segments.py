@@ -19,7 +19,7 @@ class TripIdsToSegments(object):
         self._trips = trips_client
         self._schedules = schedules_client
 
-    async def transform(self, trip_ids: list[str]) -> list[models_pb2.Segment]:
+    async def transform(self, trip_ids: Sequence[str]) -> list[models_pb2.Segment]:
         trips_page = await self._trips.find_by_ids(
             trip_ids,
             limit=len(trip_ids),

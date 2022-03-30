@@ -1,5 +1,5 @@
 from collections.abc import AsyncIterator
-from typing import Any, Generic, Optional, TypeVar
+from typing import Any, Generic, Mapping, Optional, TypeVar
 
 import pymongo
 from motor import motor_asyncio
@@ -16,7 +16,7 @@ class ResultSet(Generic[_Record], AsyncIterator[_Record]):
         self,
         cur: motor_asyncio.AsyncIOMotorCursor,
         coder: coders.BaseCoder[_Record],
-        filter_: dict[str, Any],
+        filter_: Mapping[str, Any],
     ):
         self._coder = coder
         self._cursor = cur

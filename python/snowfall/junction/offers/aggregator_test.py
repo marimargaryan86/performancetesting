@@ -1,4 +1,5 @@
 import datetime
+from typing import Mapping, Sequence
 
 import pytest
 from motor import motor_asyncio
@@ -105,8 +106,8 @@ class TestOfferBuckets(object):
     async def test_offers_are_placed_in_buckets(
         self,
         offer_bucket_repository: aggregator.OfferBucketRepository,
-        offer_results: list[offers_pb2.TripOfferResult],
-        expected: dict[str, list[str]],
+        offer_results: Sequence[offers_pb2.TripOfferResult],
+        expected: Mapping[str, Sequence[str]],
     ) -> None:
         for offer in offer_results:
             await offer_bucket_repository.add_offer(offer)
@@ -136,7 +137,7 @@ class TestAggregator(object):
         offer_aggregator: aggregator.OfferAggregator,
         offer_aggregate_collection: motor_asyncio.AsyncIOMotorCollection,
         offer_search: offers_pb2.OfferSearch,
-        offer_results: list[offers_pb2.TripOfferResult],
+        offer_results: Sequence[offers_pb2.TripOfferResult],
         expected: int,
     ) -> None:
         await offer_searches_repository.insert(offer_search)
@@ -174,8 +175,8 @@ class TestAggregator(object):
         offer_aggregator: aggregator.OfferAggregator,
         offer_aggregate_collection: motor_asyncio.AsyncIOMotorCollection,
         offer_search: offers_pb2.OfferSearch,
-        offer_results: list[offers_pb2.TripOfferResult],
-        expected: list[list[str]],
+        offer_results: Sequence[offers_pb2.TripOfferResult],
+        expected: Sequence[Sequence[str]],
     ) -> None:
         await offer_searches_repository.insert(offer_search)
         for offer_result in offer_results:

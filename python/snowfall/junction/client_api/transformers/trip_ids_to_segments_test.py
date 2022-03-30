@@ -1,3 +1,5 @@
+from typing import Sequence
+
 import pytest
 
 from snowfall.common.v1alpha import models_pb2
@@ -40,8 +42,8 @@ from snowfall.junction.client_api.transformers import trip_ids_to_segments
 )
 def test_correct_stops_are_returned(
     segment: models_pb2.SegmentReference,
-    stops: list[models_pb2.Stop],
-    expected: list[str],
+    stops: Sequence[models_pb2.Stop],
+    expected: Sequence[str],
 ) -> None:
     filtered_stops = trip_ids_to_segments.filter_stops_in_segment_reference(
         segment=segment,

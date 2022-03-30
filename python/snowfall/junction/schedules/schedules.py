@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional
+from typing import Optional, Sequence
 
 from pymongo import IndexModel, results
 
@@ -17,7 +17,7 @@ class ScheduleRepository(repository.ProtoRepository[models_pb2.Schedule]):
 
     async def find(
         self,
-        ids: list[str],
+        ids: Sequence[str],
         cursor: str,
     ) -> resultset.ResultSet[models_pb2.Schedule]:
         filter_ = (

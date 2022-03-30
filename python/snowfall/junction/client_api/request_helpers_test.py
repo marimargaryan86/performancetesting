@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Mapping
 
 import pytest
 
@@ -65,7 +65,7 @@ from snowfall.junction.client_api import request_helpers
     ],
 )
 def test_request_is_flattened(
-    request_data: dict[str, Any],
-    expected: dict[str, Any],
+    request_data: Mapping[str, Any],
+    expected: Mapping[str, Any],
 ) -> None:
     assert request_helpers.flatten_request_body(request_data) == expected

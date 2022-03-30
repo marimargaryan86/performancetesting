@@ -53,10 +53,10 @@ class JsonApiResponse(responses.JSONResponse):
         self,
         body: Body,
         status_code: int = 200,
-        headers: Optional[dict[str, Any]] = None,
+        headers: Optional[Mapping[str, Any]] = None,
     ) -> None:
         super().__init__(
             content=json.loads(body.json(exclude_unset=True, by_alias=True)),
             status_code=int(status_code),
-            headers=headers or {},
+            headers=dict(headers or {}),
         )

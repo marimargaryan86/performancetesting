@@ -1,3 +1,5 @@
+from typing import Sequence
+
 from snowfall.adapter import offers as offers_adapter
 from snowfall.junction.offers.v1alpha import offers_pb2
 
@@ -13,7 +15,7 @@ class OfferIdsToOffers(object):
     ):
         self._offers = offers_client
 
-    async def transform(self, offer_ids: list[str]) -> list[offers_pb2.Offer]:
+    async def transform(self, offer_ids: Sequence[str]) -> list[offers_pb2.Offer]:
         offers = []
         for offer_id in offer_ids:
             try:

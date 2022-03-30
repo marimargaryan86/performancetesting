@@ -1,6 +1,6 @@
 import logging
 import sys
-from typing import Any, Optional, Tuple, Type, Union
+from typing import Any, Mapping, Optional, Sequence, Tuple, Type, Union
 
 import sentry_sdk
 import structlog
@@ -16,9 +16,9 @@ from sentry_sdk.integrations import (
     threading,
 )
 
-ClientOptions = dict[str, Any]
 Event = dict[str, Any]
 Hint = dict[str, Any]
+Integrations = Sequence[sentry_sdk.integrations.Integration]
 _DEFAULT_TRACE_SAMPLE_RATE = 0.2
 _LOGGER_KEY = "logger"
 _LEVEL_KEY = "level"
@@ -73,7 +73,7 @@ class SentryLogger(object):
     _tag_keys: list[str] = []
 
     @classmethod
-    def add_tag_keys(cls, tag_keys: list[str]) -> None:
+    def add_tag_keys(cls, tag_keys: Sequence[str]) -> None:
         cls._tag_keys.extend(tag_keys)
 
     @classmethod
@@ -136,7 +136,7 @@ class SentryLogger(object):
     @classmethod
     def _get_base_event_and_hint(
         cls,
-        client_options: ClientOptions,
+        client_options: Mapping[str, Any],
         event_dict: structlog.types.EventDict,
     ) -> Tuple[Event, Hint]:
         event: Event = {}
@@ -149,7 +149,7 @@ class SentryLogger(object):
         if exc_info is not None and exc_info[0] is not None:
             event, hint = sentry_utils.event_from_exception(
                 exc_info,
-                client_options=client_options,
+                client_options=dict(client_options),
                 mechanism={"type": "logging", "handled": True},
             )
         elif exc_info and exc_info[0] is None:
@@ -169,13 +169,13 @@ class SentryLogger(object):
 
 
 def before_send(
-    event: dict[str, Any],
-    hint: dict[str, Any],
+    event: Mapping[str, Any],
+    hint: Mapping[str, Any],
 ) -> Optional[dict[str, Any]]:
     exc_info = hint.get("exc_info")
 
     if not exc_info or not exc_info[0]:
-        return event
+        return dict(event)
 
     exception_type = _get_exception_type(exc_info[0])
     type_name = sentry_utils.get_type_name(exception_type)
@@ -187,7 +187,7 @@ def before_send(
     if full_name in _IGNORED_ERROR_CLASSES or type_name in _IGNORED_ERROR_CLASSES:
         return None
 
-    return event
+    return dict(event)
 
 
 def _get_exception_type(
@@ -200,8 +200,8 @@ def _get_exception_type(
 
 
 def configure_sentry(
-    additional_integrations: Optional[list[sentry_sdk.integrations.Integration]] = None,
-    tag_keys: Optional[list[str]] = None,
+    additional_integrations: Optional[Integrations] = None,
+    tag_keys: Optional[Sequence[str]] = None,
     **kwargs: Any,
 ) -> None:
     if not additional_integrations:

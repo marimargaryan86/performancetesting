@@ -2,7 +2,17 @@ import abc
 import copy
 import datetime
 import functools
-from typing import Any, Awaitable, Callable, Generic, Optional, Type, TypeVar, overload
+from typing import (  # noqa: WPS235
+    Any,
+    Awaitable,
+    Callable,
+    Generic,
+    Mapping,
+    Optional,
+    Type,
+    TypeVar,
+    overload,
+)
 
 import pymongo
 from bson import codec_options
@@ -144,29 +154,27 @@ class _AbstractRepository(abc.ABC, Generic[Record]):  # noqa: WPS214
     async def _find_with_cursor(
         self,
         cur: str,
-        filter_: Optional[dict[str, Any]] = None,
+        filter_: Optional[Mapping[str, Any]] = None,
     ) -> resultset.ResultSet[Record]:
-        if filter_ is None:
-            filter_ = {}
-
-        filter_pre_cursor = copy.deepcopy(filter_)
+        filter_pre_cursor = copy.deepcopy(filter_ or {})
+        cursor_filter = copy.deepcopy(dict(filter_pre_cursor))
 
         if cur:
-            cursor_obj = cursor.unmarshal(cur, filter_)
+            cursor_obj = cursor.unmarshal(cur, cursor_filter)
 
-            if mongo_id_key not in filter_:
-                filter_[mongo_id_key] = {}
+            if mongo_id_key not in cursor_filter:
+                cursor_filter[mongo_id_key] = {}
 
-            filter_[mongo_id_key]["$gt"] = cursor_obj.id
+            cursor_filter[mongo_id_key]["$gt"] = cursor_obj.id
 
         return await self._execute(
             query=self._collection.find,
-            filter=filter_,
+            filter=cursor_filter,
             filter_pre_cursor=filter_pre_cursor,
         )
 
 
-class DefaultRepository(_AbstractRepository[dict[str, Any]]):
+class DefaultRepository(_AbstractRepository[Mapping[str, Any]]):
     @functools.cached_property
     def _coder(self) -> coders.NoopCoder:
         return coders.NoopCoder()

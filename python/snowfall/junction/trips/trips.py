@@ -1,6 +1,6 @@
 import datetime
 import uuid
-from typing import Optional
+from typing import Optional, Sequence
 
 import pymongo
 from google.protobuf import timestamp_pb2
@@ -48,7 +48,7 @@ class TripRepository(repository.ProtoRepository[models_pb2.TripReference]):
 
     async def find(
         self,
-        ids: list[str],
+        ids: Sequence[str],
         cursor: str,
     ) -> resultset.ResultSet[models_pb2.TripReference]:
         filter_ = (

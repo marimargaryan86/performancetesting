@@ -2,7 +2,7 @@ import abc
 import datetime
 import functools
 from copy import deepcopy
-from typing import Any, Callable
+from typing import Any, Callable, Mapping
 
 from dateutil import parser
 from google.protobuf import descriptor, timestamp_pb2
@@ -80,7 +80,7 @@ class _Normalizer(abc.ABC):
 class CoordinatesNormalizer(_Normalizer):
     def _denormalize_value(
         self,
-        normalized_value: dict[str, Any],
+        normalized_value: Mapping[str, Any],
     ) -> dict[str, float]:
         return {
             "latitude": normalized_value["coordinates"][1],
@@ -92,7 +92,7 @@ class CoordinatesNormalizer(_Normalizer):
 
     def _normalize_value(
         self,
-        denormalized_value: dict[str, float],
+        denormalized_value: Mapping[str, float],
     ) -> dict[str, Any]:
         return {
             "type": "Point",

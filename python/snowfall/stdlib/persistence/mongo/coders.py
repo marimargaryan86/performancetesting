@@ -1,6 +1,6 @@
 import abc
 import copy
-from typing import Any, Generic, Type, TypeVar
+from typing import Any, Generic, Mapping, Type, TypeVar
 
 import pydantic
 import rapidjson
@@ -19,7 +19,7 @@ _pydantic_id_key = "id"
 
 class BaseCoder(Generic[Record], abc.ABC):
     @abc.abstractmethod
-    def decode(self, as_dict: dict[str, Any]) -> Record:
+    def decode(self, as_dict: Mapping[str, Any]) -> Record:
         raise NotImplementedError()
 
     @abc.abstractmethod
@@ -27,12 +27,12 @@ class BaseCoder(Generic[Record], abc.ABC):
         raise NotImplementedError()
 
 
-class NoopCoder(BaseCoder[dict[str, Any]]):
-    def decode(self, as_dict: dict[str, Any]) -> dict[str, Any]:
-        return as_dict
+class NoopCoder(BaseCoder[Mapping[str, Any]]):
+    def decode(self, as_dict: Mapping[str, Any]) -> dict[str, Any]:
+        return dict(as_dict)
 
-    def encode(self, record: dict[str, Any]) -> dict[str, Any]:
-        return record
+    def encode(self, record: Mapping[str, Any]) -> dict[str, Any]:
+        return dict(record)
 
 
 class ProtoCoder(Generic[Proto], BaseCoder[Proto]):
@@ -44,10 +44,10 @@ class ProtoCoder(Generic[Proto], BaseCoder[Proto]):
     def __init__(self, proto: Type[Proto]):
         self._proto = proto
 
-    def decode(self, as_dict: dict[str, Any]) -> Proto:
+    def decode(self, as_dict: Mapping[str, Any]) -> Proto:
         proto = self._proto()
         fields = proto.DESCRIPTOR.fields_by_name.keys()
-        as_dict = copy.deepcopy(as_dict)
+        as_dict = dict(copy.deepcopy(as_dict))
 
         # MongoDB stores ID in "_id", so move it to "id" if it exists on the proto.
         if _mongo_id_key in as_dict:
@@ -91,7 +91,9 @@ class PydanticCoder(Generic[Model], BaseCoder[Model]):
     def __init__(self, model: Type[Model]):
         self._model = model
 
-    def decode(self, as_dict: dict[str, Any]) -> Model:
+    def decode(self, as_dict: Mapping[str, Any]) -> Model:
+        as_dict = dict(copy.deepcopy(as_dict))
+
         # MongoDB stores ID in "_id", so move it to "id" if it exists on the model.
         if _mongo_id_key in as_dict:
             id_value = as_dict.pop(_mongo_id_key)

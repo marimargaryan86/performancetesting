@@ -2,7 +2,7 @@ import dataclasses
 import datetime
 import uuid
 import zoneinfo
-from typing import AsyncIterator, Optional
+from typing import AsyncIterator, Optional, Sequence
 
 from google.protobuf import timestamp_pb2
 
@@ -13,7 +13,7 @@ from snowfall.stdlib.format.gtfs import constants, datetimes, enums, models
 from snowfall.stdlib.transport import amqp
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass  # noqa: SF10
 class _ScheduleContext(object):
     agency: models.Agency
     route: models.Route
@@ -115,7 +115,7 @@ class SchedulesGenerator(object):
         self,
         context: _ScheduleContext,
         service_date: datetime.date,
-        stop_times: list[models.StopTime],
+        stop_times: Sequence[models.StopTime],
     ) -> Optional[models_pb2.Schedule]:
         stops = [
             await self._generate_stop(
@@ -195,7 +195,7 @@ class SchedulesGenerator(object):
     async def _set_trip_contexts(
         self,
         context: _ScheduleContext,
-        stop_times: list[models.StopTime],
+        stop_times: Sequence[models.StopTime],
     ) -> None:
         if context.trip.service_id != context.service_id:
             context.service_dates = await datetimes.calculate_serviceable_dates(

@@ -1,6 +1,7 @@
+import copy
 import functools
 import uuid
-from typing import Any
+from typing import Any, Mapping
 
 from pymongo import GEOSPHERE, IndexModel, results
 
@@ -43,10 +44,11 @@ class CuratedPlaceCoder(coders.ProtoCoder[models_pb2.CuratedPlace]):
     def __init__(self) -> None:
         super().__init__(models_pb2.CuratedPlace)
 
-    def decode(self, as_dict: dict[str, Any]) -> models_pb2.CuratedPlace:
-        as_dict[_place_key][_proto_id_key] = as_dict.pop(_mongo_id_key)
+    def decode(self, as_dict: Mapping[str, Any]) -> models_pb2.CuratedPlace:
+        new_dict = dict(copy.deepcopy(as_dict))
+        new_dict[_place_key][_proto_id_key] = new_dict.pop(_mongo_id_key)
 
-        return super().decode(as_dict)
+        return super().decode(new_dict)
 
     def encode(self, proto: models_pb2.CuratedPlace) -> dict[str, Any]:
         as_dict = super().encode(proto)

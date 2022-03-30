@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Mapping
 
 import pytest
 from starlette import status, testclient
@@ -97,7 +97,7 @@ class TestTripSearches(object):
     )
     async def test_missing_place_returns_not_found(
         self,
-        query: dict[str, Any],
+        query: Mapping[str, Any],
         client: testclient.TestClient,
     ) -> None:
         response = client.post(

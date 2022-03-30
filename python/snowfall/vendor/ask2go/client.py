@@ -1,4 +1,4 @@
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Mapping, Optional
 
 import httpx
 
@@ -165,8 +165,8 @@ class Ask2GoClient(object):  # noqa: WPS214
     async def _poll(
         self,
         request_url: str,
-        query_params: Optional[dict[str, Any]],
-        validator: Callable[[dict[str, Any]], bool],
+        query_params: Optional[Mapping[str, Any]],
+        validator: Callable[[Mapping[str, Any]], bool],
     ) -> dict[str, Any]:
         resp = self._http_client.get(request_url, params=query_params)
 

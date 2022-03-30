@@ -1,6 +1,6 @@
 import http
 from base64 import b64decode, b64encode
-from typing import AsyncIterator, Sequence
+from typing import AsyncIterator, Mapping, Sequence
 
 import jwt as jwtlib
 import pytest
@@ -122,7 +122,7 @@ def app(  # noqa: WPS211
 @pytest.fixture()
 def client(
     app: applications.Starlette,
-    headers: dict[str, str],
+    headers: Mapping[str, str],
 ) -> testclient.TestClient:
     client = testclient.TestClient(app)
     client.headers.update(headers)
