@@ -1,5 +1,3 @@
-from typing import Any, Callable, Mapping, Optional
-
 import httpx
 
 from snowfall.vendor.ask2go import errors, parsers
@@ -11,7 +9,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         self,
         api_base_url: str,
         api_booking_base_url: str,
-        http_client: httpx.Client,
+        http_client: httpx.AsyncClient,
     ) -> None:
         self._api_base_url = api_base_url
         self._api_booking_base_url = api_booking_base_url
@@ -30,7 +28,7 @@ class Ask2GoClient(object):  # noqa: WPS214
                 ),
             )
 
-        resp = self._http_client.post(
+        resp = await self._http_client.post(
             "{api_base_url}/search".format(api_base_url=self._api_base_url),
             json=parsers.parse_search_request(criteria),
         )
@@ -48,25 +46,28 @@ class Ask2GoClient(object):  # noqa: WPS214
         search_id: str,
         page_offset: int,
     ) -> search.SearchResultsResponse:
-        search_res = await self._poll(
+        resp = await self._http_client.get(
             "{api_base_url}/search/{search_id}/{transaction_id}/{page_offset}".format(
                 api_base_url=self._api_base_url,
                 search_id=search_id,
                 transaction_id=transaction_id,
                 page_offset=page_offset,
             ),
-            None,
-            lambda search_data: search_data["isFinished"],
         )
 
-        return search.SearchResultsResponse(**search_res)
+        try:
+            resp.raise_for_status()
+        except httpx.HTTPError as exc:
+            raise errors.ServiceError() from exc
+
+        return search.SearchResultsResponse(**resp.json())
 
     async def update_booking_billing_address(
         self,
         booking_ref_id: str,
         transaction_id: str,
     ) -> booking.Booking:
-        resp = self._http_client.put(
+        resp = await self._http_client.put(
             "{api_booking_base_url}/Booking".format(
                 api_booking_base_url=self._api_booking_base_url,
             ),
@@ -91,7 +92,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         contact: common.Contact,
     ) -> booking.Booking:
 
-        resp = self._http_client.post(
+        resp = await self._http_client.post(
             "{api_booking_base_url}/Booking".format(
                 api_booking_base_url=self._api_booking_base_url,
             ),
@@ -115,7 +116,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         booking_ref_id: str,
         transaction_id: str,
     ) -> booking.Booking:
-        resp = self._http_client.get(
+        resp = await self._http_client.get(
             "{api_booking_base_url}/Booking".format(
                 api_booking_base_url=self._api_booking_base_url,
             ),
@@ -133,7 +134,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         return booking.Booking(**resp.json())
 
     async def synchronize_booking(self, booking_id: int) -> None:
-        self._http_client.put(
+        await self._http_client.put(
             "{api_booking_base_url}/Sync".format(
                 api_booking_base_url=self._api_booking_base_url,
             ),
@@ -146,7 +147,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         transaction_id: str,
         offer_id: str,
     ) -> price.OfferPriceResponse:
-        resp = self._http_client.put(
+        resp = await self._http_client.put(
             "{api_base_url}/Itinerary/{search_id}/{offer_id}/Price".format(
                 api_base_url=self._api_base_url,
                 search_id=search_id,
@@ -161,23 +162,3 @@ class Ask2GoClient(object):  # noqa: WPS214
             raise errors.ServiceError() from exc
 
         return price.OfferPriceResponse(**resp.json())
-
-    async def _poll(
-        self,
-        request_url: str,
-        query_params: Optional[Mapping[str, Any]],
-        validator: Callable[[Mapping[str, Any]], bool],
-    ) -> dict[str, Any]:
-        resp = self._http_client.get(request_url, params=query_params)
-
-        try:
-            resp.raise_for_status()
-        except httpx.HTTPError as exc:
-            raise errors.ServiceError() from exc
-
-        json_data = resp.json()
-
-        if validator(json_data):
-            return json_data
-
-        raise errors.ServiceError()
