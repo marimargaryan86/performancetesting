@@ -4,6 +4,7 @@ from typing import AsyncIterator, Type, TypeVar
 
 from aiofiles.threadpool import binary
 from google.protobuf import message, timestamp_pb2
+from google.protobuf.descriptor import EnumDescriptor
 
 from snowfall.common.v1alpha import models_pb2
 
@@ -56,3 +57,17 @@ def date_to_protobuf(date: datetime.date) -> models_pb2.Date:
 
 def protobuf_to_date(proto: models_pb2.Date) -> datetime.date:
     return datetime.date(year=proto.year, month=proto.month, day=proto.day)
+
+
+def enum_value_to_slug(descriptor: EnumDescriptor, enum_value: int) -> str:
+    name = descriptor.values_by_number[enum_value].name.removeprefix(
+        "{0}_".format(descriptor.name.upper()),
+    )
+
+    return name.lower().replace("_", "-")
+
+
+def slug_to_enum_value(descriptor: EnumDescriptor, name: str) -> int:
+    enum_name = "{0}_{1}".format(descriptor.name.upper(), name.upper())
+
+    return descriptor.values_by_name[enum_name].number
