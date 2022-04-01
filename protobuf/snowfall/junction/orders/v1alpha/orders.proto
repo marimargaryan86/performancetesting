@@ -29,3 +29,8 @@ message GetOrderRequest {
 message GetOrderResponse {
   Order order = 1;
 }
+
+message OrderTask {
+  string order_id = 1;
+  repeated snowfall.junction.offers.v1alpha.Offer offers = 2;
+}

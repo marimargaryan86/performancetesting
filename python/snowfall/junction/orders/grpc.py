@@ -1,5 +1,6 @@
 import grpc
 
+from snowfall.junction.orders.amqp import OrderProducer
 from snowfall.junction.orders.orders import OrderRepository
 from snowfall.junction.orders.v1alpha import orders_pb2, orders_pb2_grpc
 from snowfall.stdlib.transport.grpc import Service
@@ -9,9 +10,15 @@ class OrderService(
     Service,
     orders_pb2_grpc.OrderServiceServicer,
 ):
-    def __init__(self, orders: OrderRepository, default_page_size: int):
+    def __init__(
+        self,
+        orders: OrderRepository,
+        publisher: OrderProducer,
+        default_page_size: int,
+    ):
         self._default_page_size = default_page_size
         self._orders = orders
+        self._publisher = publisher
 
     def get_name(self) -> str:
         return orders_pb2.DESCRIPTOR.services_by_name["OrderService"].full_name
@@ -39,5 +46,7 @@ class OrderService(
         order = await self._orders.create(
             list(request.order.offers),
         )
-        # TODO: publish order
+
+        await self._publisher.publish(order)
+
         return orders_pb2.EnqueueOrderResponse(order=order)
