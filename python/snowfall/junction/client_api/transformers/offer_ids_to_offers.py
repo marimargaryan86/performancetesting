@@ -5,7 +5,7 @@ from snowfall.junction.offers.v1alpha import offers_pb2
 
 
 class MissingOffersError(Exception):
-    """Raised when not all trips where found."""
+    """Raised when not all offers where found."""
 
 
 class OfferIdsToOffers(object):
@@ -16,13 +16,19 @@ class OfferIdsToOffers(object):
         self._offers = offers_client
 
     async def transform(self, offer_ids: Sequence[str]) -> list[offers_pb2.Offer]:
-        offers = []
-        for offer_id in offer_ids:
-            try:
-                offers.append(await self._offers.get(offer_id))
-            except offers_adapter.NotFoundError:
-                raise MissingOffersError(
-                    "Offer with id: '{0}' not found.".format(offer_id),
-                )
+        offers_page = await self._offers.find_by_ids(
+            offer_ids,
+            limit=len(offer_ids),
+        )
 
-        return offers
+        offer_ids_set = set(offer_ids)
+        found_offer_ids_set = {offer.id for offer in offers_page.offers}
+
+        if offer_ids_set != found_offer_ids_set:
+            raise MissingOffersError(
+                "Could not find offer ids: {0}".format(
+                    offer_ids_set - found_offer_ids_set,
+                ),
+            )
+
+        return list(offers_page.offers)

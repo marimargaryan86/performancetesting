@@ -8,11 +8,13 @@ from starlette import requests
 from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.client_api import models
 from snowfall.junction.offers.v1alpha import offers_pb2
+from snowfall.junction.orders.v1alpha import orders_pb2
 from snowfall.junction.trips.v1alpha import trips_pb2
 from snowfall.stdlib.format import protobuf
 
 _SELF_HREF = "self"
 _RELATIONSHIPS_FIELD = "data"
+_OFFERS_TYPE = "offers"
 
 
 class OfferResource(models.Resource):
@@ -24,7 +26,7 @@ class OfferResource(models.Resource):
     ) -> OfferResource:
         return cls(
             id=offer.id,
-            type="offers",
+            type=_OFFERS_TYPE,
             attributes=cls._get_attributes(offer),
             links={
                 _SELF_HREF: request.url_for(
@@ -51,6 +53,31 @@ class OfferResource(models.Resource):
             ),
             "currency": first_expiring_offer.price.currency,
         }
+
+
+class OrderResource(models.Resource):
+    @classmethod
+    def from_proto(
+        cls,
+        order: orders_pb2.Order,
+        request: requests.Request,
+    ) -> OrderResource:
+        return cls(
+            id=order.id,
+            type="orders",
+            attributes={
+                "offers": {
+                    _RELATIONSHIPS_FIELD: [
+                        OfferResource.from_proto(offer, request)
+                        for offer in order.offers
+                    ],
+                },
+            },
+            relationships={},
+            links={
+                _SELF_HREF: "https://snowfall.se",
+            },
+        )
 
 
 class PlaceResource(models.Resource):
@@ -245,7 +272,7 @@ class TripOfferSearchResource(models.Resource):
                     _RELATIONSHIPS_FIELD: [
                         models.ResourceIdentifier(
                             id=offer.id,
-                            type="offers",
+                            type=_OFFERS_TYPE,
                         )
                         for offer in offers
                     ],

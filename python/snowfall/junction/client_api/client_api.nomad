@@ -65,6 +65,7 @@ job "client-api" {
         change_mode = "restart"
         data        = <<EOH
 OFFERS_ADDRESS={{range $index, $service := service (printf "grpc.offers-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
+ORDERS_ADDRESS={{range $index, $service := service (printf "grpc.orders-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
 PLACES_ADDRESS={{range $index, $service := service (printf "grpc.places-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
 SCHEDULES_ADDRESS={{range $index, $service := service (printf "grpc.schedules-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
 TRIPS_ADDRESS={{range $index, $service := service (printf "grpc.trips-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}

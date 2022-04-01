@@ -13,6 +13,7 @@ from snowfall.adapter import (
     legs,
     offer_searches,
     offers,
+    orders,
     places,
     schedules,
     segments,
@@ -27,6 +28,7 @@ from snowfall.junction.client_api import (
     validation,
 )
 from snowfall.junction.offers.v1alpha import offers_pb2_grpc
+from snowfall.junction.orders.v1alpha import orders_pb2_grpc
 from snowfall.junction.places.v1alpha import places_pb2_grpc
 from snowfall.junction.schedules.v1alpha import schedules_pb2_grpc
 from snowfall.junction.trips.v1alpha import trips_pb2_grpc
@@ -37,6 +39,9 @@ from snowfall.stdlib.persistence import filesystem
 def _factory(app: service.Application[bootstrap.Settings]) -> ASGIApplication:
     places_channel = grpc.aio.insecure_channel(
         random.choice(app.settings.places_address),  # nosec
+    )
+    orders_channel = grpc.aio.insecure_channel(
+        random.choice(app.settings.orders_address),  # nosec
     )
     offers_channel = grpc.aio.insecure_channel(
         random.choice(app.settings.offers_address),  # nosec
@@ -93,6 +98,9 @@ def _factory(app: service.Application[bootstrap.Settings]) -> ASGIApplication:
                     offer_searches=offers_pb2_grpc.OfferSearchServiceStub(
                         offers_channel
                     ),
+                ),
+                orders_client=orders.GrpcClient(
+                    orders=orders_pb2_grpc.OrderServiceStub(orders_channel),
                 ),
                 segments_client=segments.GrpcClient(
                     segments=trips_pb2_grpc.TripServiceStub(trips_channel),

@@ -44,6 +44,14 @@ class Client(abc.ABC):
     ) -> OffersPage:
         """Get offer results for an offer search."""
 
+    async def find_by_ids(
+        self,
+        identifiers: Sequence[str],
+        limit: int,
+        cursor: Optional[str] = None,
+    ) -> OffersPage:
+        """Return offers by offer ids."""
+
 
 class DictClient(Client):
     def __init__(self, offers: Sequence[offers_pb2.Offer]) -> None:
@@ -66,6 +74,20 @@ class DictClient(Client):
                 offer
                 for offer in self._offers.values()
                 if offer.results and offer.results[0].offer_search_id == identifier
+            ],
+        )
+
+    async def find_by_ids(
+        self,
+        identifiers: Sequence[str],
+        limit: int,
+        cursor: Optional[str] = None,
+    ) -> OffersPage:
+        return OffersPage(
+            [
+                self._offers[identifier]
+                for identifier in identifiers
+                if identifier in self._offers
             ],
         )
 
@@ -108,5 +130,29 @@ class GrpcClient(Client):
 
         return OffersPage(
             offers=response.offers,
+            next_page_token=response.next_page_token,
+        )
+
+    async def find_by_ids(
+        self,
+        identifiers: Sequence[str],
+        limit: int,
+        cursor: Optional[str] = None,
+    ) -> OffersPage:
+        try:
+            response = await self._offers.ListOffers(
+                offers_pb2.ListOffersRequest(
+                    page_size=limit,
+                    page_token=cursor or "",
+                    offer_ids=offers_pb2.ListOfOfferIds(
+                        ids=list(identifiers),
+                    ),
+                ),
+            )
+        except grpc.aio.AioRpcError as exc:
+            raise UnknownError() from exc
+
+        return OffersPage(
+            offers=list(response.offers),
             next_page_token=response.next_page_token,
         )

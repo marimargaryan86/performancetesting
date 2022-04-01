@@ -25,6 +25,26 @@ class TestDictClient(object):
         with pytest.raises(offers.NotFoundError):
             await offers_client.get(fixtures.NOT_FOUND)
 
+    async def test_missing_offer_is_not_found_by_id(
+        self,
+        offers_client: offers.Client,
+    ) -> None:
+        offers_page = await offers_client.find_by_ids(
+            [fixtures.NOT_FOUND],
+            limit=1,
+        )
+        assert not offers_page.offers
+
+    async def test_single_offer_is_found_by_id(
+        self,
+        offers_client: offers.Client,
+    ) -> None:
+        offers_page = await offers_client.find_by_ids(
+            [fixtures.OFFERS[0]],
+            limit=1,
+        )
+        assert offers_page.offers[0].id == fixtures.OFFERS[0]
+
 
 @pytest.mark.asyncio
 class TestGrpcClient(object):

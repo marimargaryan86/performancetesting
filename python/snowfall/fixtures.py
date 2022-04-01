@@ -106,9 +106,7 @@ def get_orders() -> list[orders_pb2.Order]:
 
 
 def generate_order(identifier: str) -> orders_pb2.Order:
-    return orders_pb2.Order(
-        id=identifier,
-    )
+    return orders_pb2.Order(id=identifier, offers=get_offers())
 
 
 def get_legs() -> list[models_pb2.Leg]:

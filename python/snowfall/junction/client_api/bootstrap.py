@@ -6,10 +6,11 @@ from lagom.integrations import starlette
 from starlette import applications, exceptions, status
 from starlette.middleware import Middleware
 
-from snowfall.adapter import (
+from snowfall.adapter import (  # noqa: WPS235
     legs,
     offer_searches,
     offers,
+    orders,
     places,
     schedules,
     segments,
@@ -32,6 +33,7 @@ class Settings(service.Settings):
     jwt_token_version: str
     places_address: Sequence[str]
     offers_address: Sequence[str]
+    orders_address: Sequence[str]
     trips_address: Sequence[str]
     schedules_address: Sequence[str]
     reload: bool = False
@@ -42,6 +44,7 @@ def create_dependencies(  # noqa: WPS211
     places_client: places.Client,
     trip_searches_client: trip_searches.Client,
     trips_client: trips.Client,
+    orders_client: orders.Client,
     offers_client: offers.Client,
     offer_searches_client: offer_searches.Client,
     segments_client: segments.Client,
@@ -52,6 +55,7 @@ def create_dependencies(  # noqa: WPS211
     container[places.Client] = places_client  # type: ignore[misc]
     container[trip_searches.Client] = trip_searches_client  # type: ignore[misc]
     container[trips.Client] = trips_client  # type: ignore[misc]
+    container[orders.Client] = orders_client  # type: ignore[misc]
     container[offers.Client] = offers_client  # type: ignore[misc]
     container[offer_searches.Client] = offer_searches_client  # type: ignore[misc]
     container[segments.Client] = segments_client  # type: ignore[misc]

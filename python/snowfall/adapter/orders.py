@@ -6,6 +6,7 @@ from typing import Sequence
 
 import grpc
 
+from snowfall.junction.offers.v1alpha import offers_pb2
 from snowfall.junction.orders.v1alpha import orders_pb2, orders_pb2_grpc
 
 
@@ -19,7 +20,7 @@ class UnknownError(Exception):
 
 class Client(abc.ABC):
     @abc.abstractmethod
-    async def create(self, request: orders_pb2.Order) -> orders_pb2.Order:
+    async def create(self, offers: Sequence[offers_pb2.Offer]) -> orders_pb2.Order:
         """Create a new order resource."""
 
     async def get(self, identifier: str) -> orders_pb2.Order:
@@ -30,9 +31,10 @@ class DictClient(Client):
     def __init__(self, orders: Sequence[orders_pb2.Order]) -> None:
         self._orders = {order.id: order for order in orders}
 
-    async def create(self, request: orders_pb2.Order) -> orders_pb2.Order:
+    async def create(self, offers: Sequence[offers_pb2.Offer]) -> orders_pb2.Order:
         order = orders_pb2.Order(
             id=str(uuid.uuid4()),
+            offers=offers,
         )
         self._orders[order.id] = order
 
@@ -49,10 +51,12 @@ class GrpcClient(Client):
     def __init__(self, orders: orders_pb2_grpc.OrderServiceStub):
         self._orders = orders
 
-    async def create(self, order: orders_pb2.Order) -> orders_pb2.Order:
+    async def create(self, offers: Sequence[offers_pb2.Offer]) -> orders_pb2.Order:
         try:
             response = await self._orders.EnqueueOrder(
-                orders_pb2.EnqueueOrderRequest(order=order),
+                orders_pb2.EnqueueOrderRequest(
+                    offers=offers,
+                ),
             )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError(exc.details()) from exc

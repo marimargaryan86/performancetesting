@@ -5,6 +5,7 @@ from snowfall.junction.client_api.routes import (
     health,
     legs,
     offers,
+    orders,
     places,
     segments,
     trips,
@@ -79,7 +80,7 @@ def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Rou
             offers.Offer,
             name="ViewOffer",
         ),
-        # todo: add POST /orders
+        dependencies.route("/orders", orders.Orders),
         # todo: add GET /orders
         # todo: add GET /orders/{orderId}
         # todo: add POST /orders/{orderId}/relationships/offers

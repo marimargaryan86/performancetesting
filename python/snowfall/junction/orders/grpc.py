@@ -44,7 +44,7 @@ class OrderService(
         context: grpc.aio.ServicerContext,
     ) -> orders_pb2.EnqueueOrderResponse:
         order = await self._orders.create(
-            list(request.order.offers),
+            request.offers,
         )
 
         await self._publisher.publish(order)

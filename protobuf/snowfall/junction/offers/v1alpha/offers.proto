@@ -42,7 +42,14 @@ message GetOfferSearchResponse {
 message ListOffersRequest {
   int32 page_size = 1;
   string page_token = 2;
-  string offer_search_id = 3;
+  oneof payload {
+    string offer_search_id = 3;
+    ListOfOfferIds offer_ids = 4;
+  }
+}
+
+message ListOfOfferIds {
+  repeated string ids = 3;
 }
 
 message ListOffersResponse {
