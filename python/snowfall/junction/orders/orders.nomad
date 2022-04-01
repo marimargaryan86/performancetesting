@@ -101,7 +101,7 @@ EOH
       config {
         image = var.docker_image
         args = [
-          "import",
+          "grpc",
         ]
 
         auth {
@@ -113,7 +113,7 @@ EOH
 
       env {
         ENV_NAME   = "${NOMAD_NAMESPACE}"
-        SENTRY_DSN = "https://7c600c1c458d403e8047091398239f20@sentry.snowfall.se/27"
+        SENTRY_DSN = "https://7c600c1c458d403e8047091398239f20@sentry.snowfall.se/30"
       }
     }
   }

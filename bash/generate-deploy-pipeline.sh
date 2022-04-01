@@ -17,6 +17,7 @@ make-uninterruptible:
 .deploy:
   stage: deploy
   image: git.snowfall.se:4567/junction/junction/pants:main
+  resource_group: deploy
   script:
     - set -eu
     - ./\${CI_ENVIRONMENT_TIER}/deploy.sh "\${service}" "\${version}" "\${template}" "\${CI_ENVIRONMENT_TIER}"

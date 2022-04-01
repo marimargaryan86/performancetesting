@@ -77,6 +77,9 @@ EOH
       config {
         image = var.docker_image
         ports = ["http"]
+        args = [
+          "http",
+        ]
 
         auth {
           username       = var.registry_username
