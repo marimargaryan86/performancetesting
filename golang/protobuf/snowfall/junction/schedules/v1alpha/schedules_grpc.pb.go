@@ -20,6 +20,8 @@ const _ = grpc.SupportPackageIsVersion7
 type ScheduleServiceClient interface {
 	GetSchedule(ctx context.Context, in *GetScheduleRequest, opts ...grpc.CallOption) (*GetScheduleResponse, error)
 	ListSchedules(ctx context.Context, in *ListSchedulesRequest, opts ...grpc.CallOption) (*ListSchedulesResponse, error)
+	GetLeg(ctx context.Context, in *GetLegRequest, opts ...grpc.CallOption) (*GetLegResponse, error)
+	ListLegs(ctx context.Context, in *ListLegsRequest, opts ...grpc.CallOption) (*ListLegsResponse, error)
 }
 
 type scheduleServiceClient struct {
@@ -48,12 +50,32 @@ func (c *scheduleServiceClient) ListSchedules(ctx context.Context, in *ListSched
 	return out, nil
 }
 
+func (c *scheduleServiceClient) GetLeg(ctx context.Context, in *GetLegRequest, opts ...grpc.CallOption) (*GetLegResponse, error) {
+	out := new(GetLegResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.junction.schedules.v1alpha.ScheduleService/GetLeg", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *scheduleServiceClient) ListLegs(ctx context.Context, in *ListLegsRequest, opts ...grpc.CallOption) (*ListLegsResponse, error) {
+	out := new(ListLegsResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.junction.schedules.v1alpha.ScheduleService/ListLegs", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ScheduleServiceServer is the server API for ScheduleService service.
 // All implementations should embed UnimplementedScheduleServiceServer
 // for forward compatibility
 type ScheduleServiceServer interface {
 	GetSchedule(context.Context, *GetScheduleRequest) (*GetScheduleResponse, error)
 	ListSchedules(context.Context, *ListSchedulesRequest) (*ListSchedulesResponse, error)
+	GetLeg(context.Context, *GetLegRequest) (*GetLegResponse, error)
+	ListLegs(context.Context, *ListLegsRequest) (*ListLegsResponse, error)
 }
 
 // UnimplementedScheduleServiceServer should be embedded to have forward compatible implementations.
@@ -65,6 +87,12 @@ func (UnimplementedScheduleServiceServer) GetSchedule(context.Context, *GetSched
 }
 func (UnimplementedScheduleServiceServer) ListSchedules(context.Context, *ListSchedulesRequest) (*ListSchedulesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListSchedules not implemented")
+}
+func (UnimplementedScheduleServiceServer) GetLeg(context.Context, *GetLegRequest) (*GetLegResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLeg not implemented")
+}
+func (UnimplementedScheduleServiceServer) ListLegs(context.Context, *ListLegsRequest) (*ListLegsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListLegs not implemented")
 }
 
 // UnsafeScheduleServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -114,6 +142,42 @@ func _ScheduleService_ListSchedules_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ScheduleService_GetLeg_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLegRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScheduleServiceServer).GetLeg(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.junction.schedules.v1alpha.ScheduleService/GetLeg",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScheduleServiceServer).GetLeg(ctx, req.(*GetLegRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ScheduleService_ListLegs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListLegsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScheduleServiceServer).ListLegs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.junction.schedules.v1alpha.ScheduleService/ListLegs",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScheduleServiceServer).ListLegs(ctx, req.(*ListLegsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ScheduleService_ServiceDesc is the grpc.ServiceDesc for ScheduleService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -128,6 +192,14 @@ var ScheduleService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListSchedules",
 			Handler:    _ScheduleService_ListSchedules_Handler,
+		},
+		{
+			MethodName: "GetLeg",
+			Handler:    _ScheduleService_GetLeg_Handler,
+		},
+		{
+			MethodName: "ListLegs",
+			Handler:    _ScheduleService_ListLegs_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

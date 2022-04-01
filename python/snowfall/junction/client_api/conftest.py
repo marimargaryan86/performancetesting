@@ -10,6 +10,7 @@ from starlette import applications, testclient
 from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import (
+    legs,
     offer_searches,
     offers,
     places,
@@ -50,6 +51,7 @@ jwt_public_key = b64encode(jwt_public_key_bytes).decode()
 
 def _create_app(  # noqa: WPS211
     custom_middlewares: Sequence[Middleware],
+    legs_client: legs.Client,
     places_client: places.Client,
     trip_searches_client: trip_searches.Client,
     trips_client: trips.Client,
@@ -61,6 +63,7 @@ def _create_app(  # noqa: WPS211
     return bootstrap.create_app(
         custom_middlewares=custom_middlewares,
         dependencies=bootstrap.create_dependencies(
+            legs_client=legs_client,
             places_client=places_client,
             trip_searches_client=trip_searches_client,
             trips_client=trips_client,
@@ -82,6 +85,7 @@ def headers() -> dict[str, str]:
 
 @pytest.fixture()
 def app(  # noqa: WPS211
+    legs_client: legs.Client,
     places_client: places.Client,
     trip_searches_client: trip_searches.Client,
     trips_client: trips.Client,
@@ -109,6 +113,7 @@ def app(  # noqa: WPS211
                 on_error=handlers.auth_error_handler,
             ),
         ],
+        legs_client=legs_client,
         places_client=places_client,
         trip_searches_client=trip_searches_client,
         trips_client=trips_client,
@@ -141,6 +146,7 @@ def unauthorized_client(
 
 @pytest.fixture()
 def test_app(  # noqa: WPS211
+    legs_client: legs.Client,
     places_client: places.Client,
     trip_searches_client: trip_searches.Client,
     trips_client: trips.Client,
@@ -160,6 +166,7 @@ def test_app(  # noqa: WPS211
                 excluded_status_codes={http.HTTPStatus.METHOD_NOT_ALLOWED},
             ),
         ],
+        legs_client=legs_client,
         places_client=places_client,
         trip_searches_client=trip_searches_client,
         trips_client=trips_client,

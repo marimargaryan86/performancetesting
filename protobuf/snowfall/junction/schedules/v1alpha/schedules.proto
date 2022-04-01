@@ -7,8 +7,8 @@ import "snowfall/common/v1alpha/models.proto";
 service ScheduleService {
   rpc GetSchedule(GetScheduleRequest) returns (GetScheduleResponse) {}
   rpc ListSchedules(ListSchedulesRequest) returns (ListSchedulesResponse) {}
-  rpc GetStop(GetStopRequest) returns (GetStopResponse) {}
-  rpc GetNextStop(GetNextStopRequest) returns (GetNextStopResponse) {}
+  rpc GetLeg(GetLegRequest) returns (GetLegResponse) {}
+  rpc ListLegs(ListLegsRequest) returns (ListLegsResponse) {}
 }
 
 message GetScheduleRequest {
@@ -30,18 +30,21 @@ message ListSchedulesResponse {
   string next_page_token = 2;
 }
 
-message GetStopRequest {
+message GetLegRequest {
   string id = 1;
 }
 
-message GetStopResponse {
-  snowfall.common.v1alpha.Stop stop = 1;
+message GetLegResponse {
+  snowfall.common.v1alpha.Leg leg = 1;
 }
 
-message GetNextStopRequest {
-  string id = 1;
+message ListLegsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  repeated string ids = 3;
 }
 
-message GetNextStopResponse {
-  snowfall.common.v1alpha.Stop stop = 1;
+message ListLegsResponse {
+  repeated snowfall.common.v1alpha.Leg legs = 1;
+  string next_page_token = 2;
 }

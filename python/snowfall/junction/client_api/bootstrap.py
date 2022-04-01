@@ -7,6 +7,7 @@ from starlette import applications, exceptions, status
 from starlette.middleware import Middleware
 
 from snowfall.adapter import (
+    legs,
     offer_searches,
     offers,
     places,
@@ -37,6 +38,7 @@ class Settings(service.Settings):
 
 
 def create_dependencies(  # noqa: WPS211
+    legs_client: legs.Client,
     places_client: places.Client,
     trip_searches_client: trip_searches.Client,
     trips_client: trips.Client,
@@ -46,6 +48,7 @@ def create_dependencies(  # noqa: WPS211
     schedules_client: schedules.Client,
 ) -> starlette.StarletteIntegration:
     container = lagom.Container()
+    container[legs.Client] = legs_client  # type: ignore[misc]
     container[places.Client] = places_client  # type: ignore[misc]
     container[trip_searches.Client] = trip_searches_client  # type: ignore[misc]
     container[trips.Client] = trips_client  # type: ignore[misc]
@@ -56,8 +59,8 @@ def create_dependencies(  # noqa: WPS211
     container[
         trip_ids_to_segments.TripIdsToSegments
     ] = trip_ids_to_segments.TripIdsToSegments(
+        legs_client=legs_client,
         trips_client=trips_client,
-        schedules_client=schedules_client,
     )
 
     return starlette.StarletteIntegration(container)

@@ -9,11 +9,13 @@ from snowfall.stdlib.transport.grpc import Service
 class TripService(Service, trips_pb2_grpc.TripServiceServicer):
     def __init__(
         self,
-        repository: trips.TripRepository,
+        segments: trips.SegmentRepository,
+        trips_repository: trips.TripRepository,
         default_page_size: int,
     ):
         self._default_page_size = default_page_size
-        self._repository = repository
+        self._segments = segments
+        self._trips = trips_repository
 
     def get_name(self) -> str:
         return trips_pb2.DESCRIPTOR.services_by_name["TripService"].full_name
@@ -26,7 +28,7 @@ class TripService(Service, trips_pb2_grpc.TripServiceServicer):
         request: trips_pb2.GetTripRequest,
         context: aio.ServicerContext,
     ) -> trips_pb2.GetTripResponse:
-        trip = await self._repository.find_by_id(request.id)
+        trip = await self._trips.find_by_id(request.id)
 
         if not trip:
             await context.abort(StatusCode.NOT_FOUND)
@@ -38,7 +40,7 @@ class TripService(Service, trips_pb2_grpc.TripServiceServicer):
         request: trips_pb2.ListTripsRequest,
         context: aio.ServicerContext,
     ) -> trips_pb2.ListTripsResponse:
-        trips_result = await self._repository.find(
+        trips_result = await self._trips.find(
             ids=list(request.ids),
             cursor=request.page_token,
         )
@@ -55,7 +57,7 @@ class TripService(Service, trips_pb2_grpc.TripServiceServicer):
         request: trips_pb2.GetSegmentRequest,
         context: aio.ServicerContext,
     ) -> trips_pb2.GetSegmentResponse:
-        segment = await self._repository.find_segment_by_id(request.id)
+        segment = await self._segments.find_by_id(request.id)
 
         if segment is None:
             await context.abort(StatusCode.NOT_FOUND)

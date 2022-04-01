@@ -138,6 +138,7 @@ var OfferSearchService_ServiceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OfferServiceClient interface {
+	GetOffer(ctx context.Context, in *GetOfferRequest, opts ...grpc.CallOption) (*GetOfferResponse, error)
 	ListOffers(ctx context.Context, in *ListOffersRequest, opts ...grpc.CallOption) (*ListOffersResponse, error)
 }
 
@@ -147,6 +148,15 @@ type offerServiceClient struct {
 
 func NewOfferServiceClient(cc grpc.ClientConnInterface) OfferServiceClient {
 	return &offerServiceClient{cc}
+}
+
+func (c *offerServiceClient) GetOffer(ctx context.Context, in *GetOfferRequest, opts ...grpc.CallOption) (*GetOfferResponse, error) {
+	out := new(GetOfferResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.junction.offers.v1alpha.OfferService/GetOffer", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *offerServiceClient) ListOffers(ctx context.Context, in *ListOffersRequest, opts ...grpc.CallOption) (*ListOffersResponse, error) {
@@ -162,6 +172,7 @@ func (c *offerServiceClient) ListOffers(ctx context.Context, in *ListOffersReque
 // All implementations should embed UnimplementedOfferServiceServer
 // for forward compatibility
 type OfferServiceServer interface {
+	GetOffer(context.Context, *GetOfferRequest) (*GetOfferResponse, error)
 	ListOffers(context.Context, *ListOffersRequest) (*ListOffersResponse, error)
 }
 
@@ -169,6 +180,9 @@ type OfferServiceServer interface {
 type UnimplementedOfferServiceServer struct {
 }
 
+func (UnimplementedOfferServiceServer) GetOffer(context.Context, *GetOfferRequest) (*GetOfferResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOffer not implemented")
+}
 func (UnimplementedOfferServiceServer) ListOffers(context.Context, *ListOffersRequest) (*ListOffersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListOffers not implemented")
 }
@@ -182,6 +196,24 @@ type UnsafeOfferServiceServer interface {
 
 func RegisterOfferServiceServer(s grpc.ServiceRegistrar, srv OfferServiceServer) {
 	s.RegisterService(&OfferService_ServiceDesc, srv)
+}
+
+func _OfferService_GetOffer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetOfferRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OfferServiceServer).GetOffer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.junction.offers.v1alpha.OfferService/GetOffer",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OfferServiceServer).GetOffer(ctx, req.(*GetOfferRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _OfferService_ListOffers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -209,6 +241,10 @@ var OfferService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "snowfall.junction.offers.v1alpha.OfferService",
 	HandlerType: (*OfferServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetOffer",
+			Handler:    _OfferService_GetOffer_Handler,
+		},
 		{
 			MethodName: "ListOffers",
 			Handler:    _OfferService_ListOffers_Handler,

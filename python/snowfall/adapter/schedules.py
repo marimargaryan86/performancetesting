@@ -48,12 +48,6 @@ class Client(abc.ABC):
     ) -> SchedulesPage:
         """Find schedules by IDs."""
 
-    async def get_stop(self, identifier: str) -> models_pb2.Stop:
-        """Fetch a stop resource."""
-
-    async def get_next_stop(self, identifier: str) -> models_pb2.Stop:
-        """Fetch the next stop resource from the previous stop id."""
-
 
 class DictClient(Client):
     def __init__(self, schedules: Sequence[models_pb2.Schedule]) -> None:
@@ -72,23 +66,6 @@ class DictClient(Client):
         cursor: Optional[str] = None,
     ) -> SchedulesPage:
         return SchedulesPage(schedules=list(self._schedules.values()))
-
-    async def get_stop(self, stop_id: str) -> models_pb2.Stop:
-        stops = [
-            stop.id for schedule in self._schedules.values() for stop in schedule.stops
-        ]
-        if stop_id not in stops:
-            raise NotFoundError()
-
-        return models_pb2.Stop(id=stop_id)
-
-    async def get_next_stop(self, stop_id: str) -> models_pb2.Stop:
-        for schedule in self._schedules.values():
-            for index, stop in enumerate(schedule.stops):
-                if stop.id == stop_id and index < len(schedule.stops) - 1:
-                    return models_pb2.Stop(id=schedule.stops[index + 1].id)
-
-        raise NotFoundError()
 
 
 class GrpcClient(Client):
@@ -131,33 +108,3 @@ class GrpcClient(Client):
             schedules=list(response.schedules),
             next_page_token=response.next_page_token,
         )
-
-    async def get_stop(self, stop_id: str) -> models_pb2.Stop:
-        try:
-            response = await self._schedules.GetStop(
-                schedules_pb2.GetNextStopRequest(id=stop_id),
-            )
-        except grpc.aio.AioRpcError as exc:
-            if exc.code() == grpc.StatusCode.NOT_FOUND:
-                raise NotFoundError(
-                    "Stop with ID '{id}' not found.".format(id=stop_id),
-                ) from exc
-
-            raise UnknownError() from exc
-
-        return response.stop
-
-    async def get_next_stop(self, stop_id: str) -> models_pb2.Stop:
-        try:
-            response = await self._schedules.GetNextStop(
-                schedules_pb2.GetNextStopRequest(id=stop_id),
-            )
-        except grpc.aio.AioRpcError as exc:
-            if exc.code() == grpc.StatusCode.NOT_FOUND:
-                raise NotFoundError(
-                    "No Stop after stop with ID '{id}' found.".format(id=stop_id),
-                ) from exc
-
-            raise UnknownError() from exc
-
-        return response.stop

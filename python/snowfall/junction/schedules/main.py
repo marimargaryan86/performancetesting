@@ -21,6 +21,7 @@ class _GrpcSettings(service.Settings):
 
 
 class _ExportSettings(service.Settings):
+    always_run: bool = False
     mongo_dsn: tuple[AnyUrl]
     output_path: str
     redis_dsn: tuple[AnyUrl]
@@ -44,6 +45,7 @@ async def _export(app: service.Application[_ExportSettings]) -> None:
         await export.Exporter(
             redis.Client[bytes](conn, "exporter"),
             schedules.ScheduleRepository(mongo.schedules.schedules),
+            always_run=app.settings.always_run,
         ).export(output_path)
 
 
@@ -76,6 +78,7 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
         app.settings.grpc_port,
         [
             grpc.ScheduleService(
+                legs=schedules.LegRepository(mongo.schedules.schedules),
                 schedules=schedules.ScheduleRepository(mongo.schedules.schedules),
                 default_page_size=app.settings.default_page_size,
             ),

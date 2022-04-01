@@ -51,10 +51,10 @@ class DictClient(Client):
         self._trips = {trip.id: trip for trip in trips}
 
     async def get(self, trip_id: str) -> models_pb2.TripReference:
-        if trip_id not in self._trips:
+        try:
+            return self._trips[trip_id]
+        except KeyError:
             raise NotFoundError()
-
-        return models_pb2.TripReference(id=trip_id)
 
     async def find_by_ids(
         self,
@@ -62,7 +62,9 @@ class DictClient(Client):
         limit: int,
         cursor: Optional[str] = None,
     ) -> TripsPage:
-        return TripsPage(trips=list(self._trips.values()))
+        return TripsPage(
+            trips=[trip for trip in self._trips.values() if trip.id in identifiers],
+        )
 
 
 class GrpcClient(Client):

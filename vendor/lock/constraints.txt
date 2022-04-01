@@ -26,7 +26,8 @@
 #     "h3[numpy]==3.7.3",
 #     "httpx[http2]==0.22.0",
 #     "lagom==1.7.0",
-#     "mongomock-motor>=0.0.3",
+#     "mongomock-motor==0.0.3",
+#     "more-itertools==8.12.0",
 #     "motor==2.5.1",
 #     "openapi-core==0.14.2",
 #     "orjson==3.6.7",
@@ -583,7 +584,7 @@ mongomock-motor==0.0.3; python_version >= "3.6" \
 mongomock==3.23.0; python_version >= "3.6" \
     --hash=sha256:01ce0c4eb02b2eced0a30882412444eaf6de27a90f2502bee64e04e3b8ecdc90 \
     --hash=sha256:d9945e7c87c221aed47c6c10708376351a5f5ee48060943c56ba195be425b0dd
-more-itertools==8.12.0; python_version >= "3.5" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.5" \
+more-itertools==8.12.0; python_version >= "3.5" \
     --hash=sha256:7dc6ad46f05f545f900dd59e8dfb4e84a4827b97b3cfecb175ea0c7d247f6064 \
     --hash=sha256:43e6dd9942dffd72661a2c4ef383ad7da1e6a3e968a927ad7a6083ab410a688b
 motor==2.5.1; python_full_version >= "3.5.2" \
@@ -944,9 +945,9 @@ pytest==7.1.1; python_version >= "3.7" \
 python-dateutil==2.8.2; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.3.0") \
     --hash=sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86 \
     --hash=sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9
-python-dotenv==0.19.2; python_version >= "3.7" \
-    --hash=sha256:a5de49a31e953b45ff2d2fd434bbc2670e8db5273606c1e737cc6b93eff3655f \
-    --hash=sha256:32b2bdc1873fd3a3c346da1c6db83d0053c3c62f28f1f38516070c4c8971b1d3
+python-dotenv==0.20.0; python_version >= "3.7" \
+    --hash=sha256:b7e3b04a59693c42c36f9ab1cc2acc46fa5df8c78e178fc33a8d4cd05c8d498f \
+    --hash=sha256:d92a187be61fe482e4fd675b6d52200e7be63a12b724abbf931a40ce4fa92938
 python-rapidjson==1.6; python_version >= "3.6" \
     --hash=sha256:189cf1a96bf9fcd86d00360f15ad76a83ce0889b8ae8d1cb0fdb2b2995e5a1c8 \
     --hash=sha256:1a551fe1d4fc81981049f5ad75d03cbe2baf0f17510c1c1f8a33f64da711a2b6 \
@@ -1165,9 +1166,9 @@ websockets==10.2; python_version >= "3.7" \
     --hash=sha256:0cd02f36d37e503aca88ab23cc0a1a0e92a263d37acf6331521eb38040dcf77b \
     --hash=sha256:56d48eebe9e39ce0d68701bce3b21df923aa05dcc00f9fd8300de1df31a7c07c \
     --hash=sha256:8351c3c86b08156337b0e4ece0e3c5ec3e01fcd14e8950996832a23c99416098
-werkzeug==2.0.3; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.6" \
-    --hash=sha256:1421ebfc7648a39a5c58c601b154165d05cf47a3cd0ccb70857cbdacf6c8f2b8 \
-    --hash=sha256:b863f8ff057c522164b6067c9e28b041161b4be5ba4d0daceeaa50a163822d3c
+werkzeug==2.1.0; python_version >= "3.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.7" \
+    --hash=sha256:094ecfc981948f228b30ee09dbfe250e474823b69b9b1292658301b5894bbf08 \
+    --hash=sha256:9b55466a3e99e13b1f0686a66117d39bda85a992166e0a79aedfcf3586328f7a
 wrapt==1.14.0; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.6" \
     --hash=sha256:5a9a1889cc01ed2ed5f34574c90745fab1dd06ec2eee663e8ebeefe363e8efd7 \
     --hash=sha256:9a3ff5fb015f6feb78340143584d9f8a0b91b6293d6b5cf4295b3e95d179b88c \

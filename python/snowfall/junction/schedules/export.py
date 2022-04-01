@@ -25,7 +25,9 @@ class State(object):
         self,
         client: redis.Client[bytes],
         repository: schedules.ScheduleRepository,
+        always_run: bool = False,
     ):
+        self._always_run = always_run
         self._logger = structlog.get_logger(__name__)
         self._repository = repository
         self._redis = client
@@ -37,6 +39,10 @@ class State(object):
         )
 
     async def should_run_export(self) -> bool:
+        if self._always_run:
+            self._logger.info("Export started (forced).")
+            return True
+
         actual = await self._repository.get_last_updated_at()
         expected = await self._get_timestamp_from_redis("last_seen_update_at")
 
@@ -75,10 +81,11 @@ class Exporter(object):  # noqa: WPS214
         self,
         client: redis.Client[bytes],
         repository: schedules.ScheduleRepository,
+        always_run: bool = False,
     ):
         self._repository = repository
         self._redis = client
-        self._state = State(client, repository)
+        self._state = State(client, repository, always_run)
         self._route_sequence = _START_SEQUENCE
         self._route_stop_sequence = _START_SEQUENCE
         self._stop_sequence = _START_SEQUENCE
@@ -318,6 +325,7 @@ class Exporter(object):  # noqa: WPS214
         stop: models_pb2.Stop,
     ) -> int:
         schedule_stop = schedules_pb2.ScheduleStop(
+            id=stop.id,
             sequence=self._schedule_stop_sequence,
             schedule=self._schedule_sequence,
             stop=await self._get_stop_sequence(

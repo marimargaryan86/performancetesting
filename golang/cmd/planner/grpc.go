@@ -5,9 +5,11 @@ import (
 	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/common/v1alpha"
 	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/junction/planner/v1alpha"
 	"git.snowfall.se/junction/junction/golang/raptor"
+	"github.com/google/uuid"
 	"github.com/uber/h3-go"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"strings"
 	"time"
 )
 
@@ -72,11 +74,20 @@ func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *plan
 		segments := make([]*models.SegmentReference, 0, len(r.Segments))
 
 		for _, s := range r.Segments {
+			legs := make([]string, 0, len(s.Stops)-1)
+
+			for i := 0; i < len(s.Stops)-1; i++ {
+				legs = append(legs, uuid.NewSHA1(s.ScheduleId, []byte(strings.Join([]string{
+					s.Stops[i].Id,
+					s.Stops[i+1].Id,
+				}, "\x00"))).String(),
+				)
+			}
+
 			segments = append(segments, &models.SegmentReference{
-				Id:                s.Id.String(),
-				ScheduleId:        s.ScheduleId.String(),
-				OriginStopId:      s.Legs[0].Id,
-				DestinationStopId: s.Legs[len(s.Legs)-1].Id,
+				Id:         s.Id.String(),
+				ScheduleId: s.ScheduleId.String(),
+				LegIds:     legs,
 			})
 		}
 

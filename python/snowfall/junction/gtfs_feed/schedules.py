@@ -4,6 +4,7 @@ import uuid
 import zoneinfo
 from typing import AsyncIterator, Optional, Sequence
 
+import more_itertools
 from google.protobuf import timestamp_pb2
 
 from snowfall.common.v1alpha import models_pb2
@@ -130,16 +131,21 @@ class SchedulesGenerator(object):
         if not stops:
             return None
 
-        id_parts = (context.trip.trip_id, service_date.isoformat())
-
-        return models_pb2.Schedule(
-            id=str(uuid.uuid5(self._namespace, "\x00".join(id_parts))),
+        schedule = models_pb2.Schedule(
+            id=str(
+                uuid.uuid5(
+                    self._namespace,
+                    "\x00".join((context.trip.trip_id, service_date.isoformat())),
+                ),
+            ),
             name=context.route.route_short_name or context.route.route_long_name or "",
             stops=stops,
             agency_name=context.agency.agency_name,
             source_ref=self._ref,
             type=context.route_type,
         )
+
+        return _append_legs(schedule)
 
     async def _generate_stop(
         self,
@@ -221,6 +227,34 @@ class SchedulesGenerator(object):
                 stop.stop_id: stop
                 async for stop in await self._collection.stops.find_by_ids(*stop_ids)
             }
+
+
+def _append_legs(
+    schedule: models_pb2.Schedule,
+) -> models_pb2.Schedule:
+    schedule_id = uuid.UUID(schedule.id)
+
+    schedule.legs.extend(
+        [
+            models_pb2.Leg(
+                id=str(
+                    uuid.uuid5(
+                        schedule_id,
+                        "\x00".join((origin.id, destination.id)),
+                    ),
+                ),
+                origin=origin.point,
+                destination=destination.point,
+                departure_at=origin.departure_at,
+                arrival_at=destination.arrival_at,
+                type=schedule.type,
+                agency_name=schedule.agency_name,
+            )
+            for origin, destination in more_itertools.pairwise(schedule.stops)
+        ],
+    )
+
+    return schedule
 
 
 async def produce_schedules(

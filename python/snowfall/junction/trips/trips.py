@@ -11,6 +11,33 @@ from snowfall.junction.planner.v1alpha import planner_pb2
 from snowfall.junction.trips.v1alpha import trips_pb2
 from snowfall.stdlib.persistence.mongo import repository, resultset
 
+SEGMENTS_ID = "segments.id"
+
+
+class SegmentRepository(repository.ProtoRepository[models_pb2.SegmentReference]):
+    _proto = models_pb2.SegmentReference
+    _indexes = [
+        pymongo.IndexModel("segments.id", background=True),
+    ]
+
+    async def find_by_id(
+        self,
+        document_id: str,
+    ) -> Optional[models_pb2.SegmentReference]:
+        segments = await self._find_nested(
+            path="$segments",
+            filter_={
+                SEGMENTS_ID: {
+                    "$eq": document_id,
+                },
+            },
+        )
+
+        try:
+            return await segments.take()
+        except StopAsyncIteration:
+            return None
+
 
 class TripRepository(repository.ProtoRepository[models_pb2.TripReference]):
     _proto = models_pb2.TripReference
@@ -66,27 +93,10 @@ class TripRepository(repository.ProtoRepository[models_pb2.TripReference]):
             filter_=filter_,
         )
 
-    async def find_segment_by_id(
-        self,
-        document_id: str,
-    ) -> Optional[models_pb2.SegmentReference]:
-        trip = await self._execute(
-            self._collection.find_one,
-            {"segments.id": document_id},
-        )
-
-        if not trip:
-            return None
-
-        return next(
-            (segment for segment in trip.segments if segment.id == document_id),
-            None,
-        )
-
 
 class TripSearchRepository(repository.ProtoRepository[trips_pb2.TripSearch]):
     _proto = trips_pb2.TripSearch
-    _indexes = [pymongo.IndexModel("expires_at", expireAfterSeconds=1)]
+    _indexes = [pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True)]
 
     def __init__(
         self,

@@ -22,6 +22,100 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type GetSegmentRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *GetSegmentRequest) Reset() {
+	*x = GetSegmentRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetSegmentRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSegmentRequest) ProtoMessage() {}
+
+func (x *GetSegmentRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSegmentRequest.ProtoReflect.Descriptor instead.
+func (*GetSegmentRequest) Descriptor() ([]byte, []int) {
+	return file_snowfall_junction_trips_v1alpha_trips_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *GetSegmentRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type GetSegmentResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Segment *v1alpha.SegmentReference `protobuf:"bytes,1,opt,name=segment,proto3" json:"segment,omitempty"`
+}
+
+func (x *GetSegmentResponse) Reset() {
+	*x = GetSegmentResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetSegmentResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSegmentResponse) ProtoMessage() {}
+
+func (x *GetSegmentResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSegmentResponse.ProtoReflect.Descriptor instead.
+func (*GetSegmentResponse) Descriptor() ([]byte, []int) {
+	return file_snowfall_junction_trips_v1alpha_trips_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *GetSegmentResponse) GetSegment() *v1alpha.SegmentReference {
+	if x != nil {
+		return x.Segment
+	}
+	return nil
+}
+
 type GetTripRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -33,7 +127,7 @@ type GetTripRequest struct {
 func (x *GetTripRequest) Reset() {
 	*x = GetTripRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[0]
+		mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -46,7 +140,7 @@ func (x *GetTripRequest) String() string {
 func (*GetTripRequest) ProtoMessage() {}
 
 func (x *GetTripRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[0]
+	mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -59,7 +153,7 @@ func (x *GetTripRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTripRequest.ProtoReflect.Descriptor instead.
 func (*GetTripRequest) Descriptor() ([]byte, []int) {
-	return file_snowfall_junction_trips_v1alpha_trips_proto_rawDescGZIP(), []int{0}
+	return file_snowfall_junction_trips_v1alpha_trips_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *GetTripRequest) GetId() string {
@@ -80,7 +174,7 @@ type GetTripResponse struct {
 func (x *GetTripResponse) Reset() {
 	*x = GetTripResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[1]
+		mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -93,7 +187,7 @@ func (x *GetTripResponse) String() string {
 func (*GetTripResponse) ProtoMessage() {}
 
 func (x *GetTripResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[1]
+	mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -106,7 +200,7 @@ func (x *GetTripResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTripResponse.ProtoReflect.Descriptor instead.
 func (*GetTripResponse) Descriptor() ([]byte, []int) {
-	return file_snowfall_junction_trips_v1alpha_trips_proto_rawDescGZIP(), []int{1}
+	return file_snowfall_junction_trips_v1alpha_trips_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetTripResponse) GetTrip() *v1alpha.TripReference {
@@ -127,7 +221,7 @@ type EnqueueTripSearchRequest struct {
 func (x *EnqueueTripSearchRequest) Reset() {
 	*x = EnqueueTripSearchRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[2]
+		mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -140,7 +234,7 @@ func (x *EnqueueTripSearchRequest) String() string {
 func (*EnqueueTripSearchRequest) ProtoMessage() {}
 
 func (x *EnqueueTripSearchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[2]
+	mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -153,7 +247,7 @@ func (x *EnqueueTripSearchRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EnqueueTripSearchRequest.ProtoReflect.Descriptor instead.
 func (*EnqueueTripSearchRequest) Descriptor() ([]byte, []int) {
-	return file_snowfall_junction_trips_v1alpha_trips_proto_rawDescGZIP(), []int{2}
+	return file_snowfall_junction_trips_v1alpha_trips_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *EnqueueTripSearchRequest) GetTripSearch() *TripSearch {
@@ -174,7 +268,7 @@ type EnqueueTripSearchResponse struct {
 func (x *EnqueueTripSearchResponse) Reset() {
 	*x = EnqueueTripSearchResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[3]
+		mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -187,7 +281,7 @@ func (x *EnqueueTripSearchResponse) String() string {
 func (*EnqueueTripSearchResponse) ProtoMessage() {}
 
 func (x *EnqueueTripSearchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[3]
+	mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -200,7 +294,7 @@ func (x *EnqueueTripSearchResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EnqueueTripSearchResponse.ProtoReflect.Descriptor instead.
 func (*EnqueueTripSearchResponse) Descriptor() ([]byte, []int) {
-	return file_snowfall_junction_trips_v1alpha_trips_proto_rawDescGZIP(), []int{3}
+	return file_snowfall_junction_trips_v1alpha_trips_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *EnqueueTripSearchResponse) GetTripSearch() *TripSearch {
@@ -221,7 +315,7 @@ type GetTripSearchDetailsRequest struct {
 func (x *GetTripSearchDetailsRequest) Reset() {
 	*x = GetTripSearchDetailsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[4]
+		mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -234,7 +328,7 @@ func (x *GetTripSearchDetailsRequest) String() string {
 func (*GetTripSearchDetailsRequest) ProtoMessage() {}
 
 func (x *GetTripSearchDetailsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[4]
+	mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -247,7 +341,7 @@ func (x *GetTripSearchDetailsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTripSearchDetailsRequest.ProtoReflect.Descriptor instead.
 func (*GetTripSearchDetailsRequest) Descriptor() ([]byte, []int) {
-	return file_snowfall_junction_trips_v1alpha_trips_proto_rawDescGZIP(), []int{4}
+	return file_snowfall_junction_trips_v1alpha_trips_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *GetTripSearchDetailsRequest) GetId() string {
@@ -268,7 +362,7 @@ type GetTripSearchDetailsResponse struct {
 func (x *GetTripSearchDetailsResponse) Reset() {
 	*x = GetTripSearchDetailsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[5]
+		mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -281,7 +375,7 @@ func (x *GetTripSearchDetailsResponse) String() string {
 func (*GetTripSearchDetailsResponse) ProtoMessage() {}
 
 func (x *GetTripSearchDetailsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[5]
+	mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -294,7 +388,7 @@ func (x *GetTripSearchDetailsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTripSearchDetailsResponse.ProtoReflect.Descriptor instead.
 func (*GetTripSearchDetailsResponse) Descriptor() ([]byte, []int) {
-	return file_snowfall_junction_trips_v1alpha_trips_proto_rawDescGZIP(), []int{5}
+	return file_snowfall_junction_trips_v1alpha_trips_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *GetTripSearchDetailsResponse) GetTripSearch() *TripSearch {
@@ -317,7 +411,7 @@ type ListTripsRequest struct {
 func (x *ListTripsRequest) Reset() {
 	*x = ListTripsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[6]
+		mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -330,7 +424,7 @@ func (x *ListTripsRequest) String() string {
 func (*ListTripsRequest) ProtoMessage() {}
 
 func (x *ListTripsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[6]
+	mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -343,7 +437,7 @@ func (x *ListTripsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListTripsRequest.ProtoReflect.Descriptor instead.
 func (*ListTripsRequest) Descriptor() ([]byte, []int) {
-	return file_snowfall_junction_trips_v1alpha_trips_proto_rawDescGZIP(), []int{6}
+	return file_snowfall_junction_trips_v1alpha_trips_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ListTripsRequest) GetPageSize() int32 {
@@ -379,7 +473,7 @@ type ListTripsResponse struct {
 func (x *ListTripsResponse) Reset() {
 	*x = ListTripsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[7]
+		mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -392,7 +486,7 @@ func (x *ListTripsResponse) String() string {
 func (*ListTripsResponse) ProtoMessage() {}
 
 func (x *ListTripsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[7]
+	mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -405,7 +499,7 @@ func (x *ListTripsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListTripsResponse.ProtoReflect.Descriptor instead.
 func (*ListTripsResponse) Descriptor() ([]byte, []int) {
-	return file_snowfall_junction_trips_v1alpha_trips_proto_rawDescGZIP(), []int{7}
+	return file_snowfall_junction_trips_v1alpha_trips_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ListTripsResponse) GetTrips() []*v1alpha.TripReference {
@@ -438,7 +532,7 @@ type TripSearch struct {
 func (x *TripSearch) Reset() {
 	*x = TripSearch{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[8]
+		mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -451,7 +545,7 @@ func (x *TripSearch) String() string {
 func (*TripSearch) ProtoMessage() {}
 
 func (x *TripSearch) ProtoReflect() protoreflect.Message {
-	mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[8]
+	mi := &file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -464,7 +558,7 @@ func (x *TripSearch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TripSearch.ProtoReflect.Descriptor instead.
 func (*TripSearch) Descriptor() ([]byte, []int) {
-	return file_snowfall_junction_trips_v1alpha_trips_proto_rawDescGZIP(), []int{8}
+	return file_snowfall_junction_trips_v1alpha_trips_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *TripSearch) GetId() string {
@@ -521,7 +615,15 @@ var file_snowfall_junction_trips_v1alpha_trips_proto_rawDesc = []byte{
 	0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a,
 	0x24, 0x73, 0x6e, 0x6f, 0x77, 0x66, 0x61, 0x6c, 0x6c, 0x2f, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e,
 	0x2f, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x2f, 0x6d, 0x6f, 0x64, 0x65, 0x6c, 0x73, 0x2e,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x20, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x54, 0x72, 0x69, 0x70,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x23, 0x0a, 0x11, 0x47, 0x65, 0x74, 0x53, 0x65, 0x67, 0x6d,
+	0x65, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x59, 0x0a, 0x12, 0x47, 0x65,
+	0x74, 0x53, 0x65, 0x67, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x12, 0x43, 0x0a, 0x07, 0x73, 0x65, 0x67, 0x6d, 0x65, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x29, 0x2e, 0x73, 0x6e, 0x6f, 0x77, 0x66, 0x61, 0x6c, 0x6c, 0x2e, 0x63, 0x6f, 0x6d,
+	0x6d, 0x6f, 0x6e, 0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x2e, 0x53, 0x65, 0x67, 0x6d,
+	0x65, 0x6e, 0x74, 0x52, 0x65, 0x66, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x65, 0x52, 0x07, 0x73, 0x65,
+	0x67, 0x6d, 0x65, 0x6e, 0x74, 0x22, 0x20, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x54, 0x72, 0x69, 0x70,
 	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20,
 	0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x4d, 0x0a, 0x0f, 0x47, 0x65, 0x74, 0x54, 0x72,
 	0x69, 0x70, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3a, 0x0a, 0x04, 0x74, 0x72,
@@ -604,7 +706,7 @@ var file_snowfall_junction_trips_v1alpha_trips_proto_rawDesc = []byte{
 	0x2e, 0x6a, 0x75, 0x6e, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x74, 0x72, 0x69, 0x70, 0x73, 0x2e,
 	0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x2e, 0x47, 0x65, 0x74, 0x54, 0x72, 0x69, 0x70, 0x53,
 	0x65, 0x61, 0x72, 0x63, 0x68, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x73, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x32, 0xf3, 0x01, 0x0a, 0x0b, 0x54, 0x72, 0x69, 0x70, 0x53,
+	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x32, 0xec, 0x02, 0x0a, 0x0b, 0x54, 0x72, 0x69, 0x70, 0x53,
 	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x6e, 0x0a, 0x07, 0x47, 0x65, 0x74, 0x54, 0x72, 0x69,
 	0x70, 0x12, 0x2f, 0x2e, 0x73, 0x6e, 0x6f, 0x77, 0x66, 0x61, 0x6c, 0x6c, 0x2e, 0x6a, 0x75, 0x6e,
 	0x63, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x74, 0x72, 0x69, 0x70, 0x73, 0x2e, 0x76, 0x31, 0x61, 0x6c,
@@ -619,27 +721,34 @@ var file_snowfall_junction_trips_v1alpha_trips_proto_rawDesc = []byte{
 	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x32, 0x2e, 0x73, 0x6e, 0x6f, 0x77, 0x66, 0x61, 0x6c,
 	0x6c, 0x2e, 0x6a, 0x75, 0x6e, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x74, 0x72, 0x69, 0x70, 0x73,
 	0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x54, 0x72, 0x69,
-	0x70, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0xb0, 0x02, 0x0a,
-	0x23, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x6e, 0x6f, 0x77, 0x66, 0x61, 0x6c, 0x6c, 0x2e, 0x6a, 0x75,
-	0x6e, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x74, 0x72, 0x69, 0x70, 0x73, 0x2e, 0x76, 0x31, 0x61,
-	0x6c, 0x70, 0x68, 0x61, 0x42, 0x0a, 0x54, 0x72, 0x69, 0x70, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f,
-	0x50, 0x01, 0x5a, 0x5e, 0x67, 0x69, 0x74, 0x2e, 0x73, 0x6e, 0x6f, 0x77, 0x66, 0x61, 0x6c, 0x6c,
-	0x2e, 0x73, 0x65, 0x2f, 0x6a, 0x75, 0x6e, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x6a, 0x75, 0x6e,
-	0x63, 0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x67, 0x6f, 0x6c, 0x61, 0x6e, 0x67, 0x2f, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x73, 0x6e, 0x6f, 0x77, 0x66, 0x61, 0x6c, 0x6c, 0x2f, 0x6a,
-	0x75, 0x6e, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x74, 0x72, 0x69, 0x70, 0x73, 0x2f, 0x76, 0x31,
-	0x61, 0x6c, 0x70, 0x68, 0x61, 0x3b, 0x74, 0x72, 0x69, 0x70, 0x73, 0x76, 0x31, 0x61, 0x6c, 0x70,
-	0x68, 0x61, 0xa2, 0x02, 0x03, 0x53, 0x4a, 0x54, 0xaa, 0x02, 0x1f, 0x53, 0x6e, 0x6f, 0x77, 0x66,
-	0x61, 0x6c, 0x6c, 0x2e, 0x4a, 0x75, 0x6e, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x54, 0x72, 0x69,
-	0x70, 0x73, 0x2e, 0x56, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0xca, 0x02, 0x1f, 0x53, 0x6e, 0x6f,
-	0x77, 0x66, 0x61, 0x6c, 0x6c, 0x5c, 0x4a, 0x75, 0x6e, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5c, 0x54,
-	0x72, 0x69, 0x70, 0x73, 0x5c, 0x56, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0xe2, 0x02, 0x2b, 0x53,
-	0x6e, 0x6f, 0x77, 0x66, 0x61, 0x6c, 0x6c, 0x5c, 0x4a, 0x75, 0x6e, 0x63, 0x74, 0x69, 0x6f, 0x6e,
-	0x5c, 0x54, 0x72, 0x69, 0x70, 0x73, 0x5c, 0x56, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x5c, 0x47,
-	0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x22, 0x53, 0x6e, 0x6f,
-	0x77, 0x66, 0x61, 0x6c, 0x6c, 0x3a, 0x3a, 0x4a, 0x75, 0x6e, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x3a,
-	0x3a, 0x54, 0x72, 0x69, 0x70, 0x73, 0x3a, 0x3a, 0x56, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x70, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x77, 0x0a, 0x0a,
+	0x47, 0x65, 0x74, 0x53, 0x65, 0x67, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x32, 0x2e, 0x73, 0x6e, 0x6f,
+	0x77, 0x66, 0x61, 0x6c, 0x6c, 0x2e, 0x6a, 0x75, 0x6e, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x74,
+	0x72, 0x69, 0x70, 0x73, 0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x2e, 0x47, 0x65, 0x74,
+	0x53, 0x65, 0x67, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x33,
+	0x2e, 0x73, 0x6e, 0x6f, 0x77, 0x66, 0x61, 0x6c, 0x6c, 0x2e, 0x6a, 0x75, 0x6e, 0x63, 0x74, 0x69,
+	0x6f, 0x6e, 0x2e, 0x74, 0x72, 0x69, 0x70, 0x73, 0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61,
+	0x2e, 0x47, 0x65, 0x74, 0x53, 0x65, 0x67, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0xb0, 0x02, 0x0a, 0x23, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x6e,
+	0x6f, 0x77, 0x66, 0x61, 0x6c, 0x6c, 0x2e, 0x6a, 0x75, 0x6e, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x2e,
+	0x74, 0x72, 0x69, 0x70, 0x73, 0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x42, 0x0a, 0x54,
+	0x72, 0x69, 0x70, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x5e, 0x67, 0x69, 0x74,
+	0x2e, 0x73, 0x6e, 0x6f, 0x77, 0x66, 0x61, 0x6c, 0x6c, 0x2e, 0x73, 0x65, 0x2f, 0x6a, 0x75, 0x6e,
+	0x63, 0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x6a, 0x75, 0x6e, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x67,
+	0x6f, 0x6c, 0x61, 0x6e, 0x67, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x73,
+	0x6e, 0x6f, 0x77, 0x66, 0x61, 0x6c, 0x6c, 0x2f, 0x6a, 0x75, 0x6e, 0x63, 0x74, 0x69, 0x6f, 0x6e,
+	0x2f, 0x74, 0x72, 0x69, 0x70, 0x73, 0x2f, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x3b, 0x74,
+	0x72, 0x69, 0x70, 0x73, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0xa2, 0x02, 0x03, 0x53, 0x4a,
+	0x54, 0xaa, 0x02, 0x1f, 0x53, 0x6e, 0x6f, 0x77, 0x66, 0x61, 0x6c, 0x6c, 0x2e, 0x4a, 0x75, 0x6e,
+	0x63, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x54, 0x72, 0x69, 0x70, 0x73, 0x2e, 0x56, 0x31, 0x61, 0x6c,
+	0x70, 0x68, 0x61, 0xca, 0x02, 0x1f, 0x53, 0x6e, 0x6f, 0x77, 0x66, 0x61, 0x6c, 0x6c, 0x5c, 0x4a,
+	0x75, 0x6e, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5c, 0x54, 0x72, 0x69, 0x70, 0x73, 0x5c, 0x56, 0x31,
+	0x61, 0x6c, 0x70, 0x68, 0x61, 0xe2, 0x02, 0x2b, 0x53, 0x6e, 0x6f, 0x77, 0x66, 0x61, 0x6c, 0x6c,
+	0x5c, 0x4a, 0x75, 0x6e, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5c, 0x54, 0x72, 0x69, 0x70, 0x73, 0x5c,
+	0x56, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64,
+	0x61, 0x74, 0x61, 0xea, 0x02, 0x22, 0x53, 0x6e, 0x6f, 0x77, 0x66, 0x61, 0x6c, 0x6c, 0x3a, 0x3a,
+	0x4a, 0x75, 0x6e, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x3a, 0x3a, 0x54, 0x72, 0x69, 0x70, 0x73, 0x3a,
+	0x3a, 0x56, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -654,44 +763,50 @@ func file_snowfall_junction_trips_v1alpha_trips_proto_rawDescGZIP() []byte {
 	return file_snowfall_junction_trips_v1alpha_trips_proto_rawDescData
 }
 
-var file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_snowfall_junction_trips_v1alpha_trips_proto_goTypes = []interface{}{
-	(*GetTripRequest)(nil),               // 0: snowfall.junction.trips.v1alpha.GetTripRequest
-	(*GetTripResponse)(nil),              // 1: snowfall.junction.trips.v1alpha.GetTripResponse
-	(*EnqueueTripSearchRequest)(nil),     // 2: snowfall.junction.trips.v1alpha.EnqueueTripSearchRequest
-	(*EnqueueTripSearchResponse)(nil),    // 3: snowfall.junction.trips.v1alpha.EnqueueTripSearchResponse
-	(*GetTripSearchDetailsRequest)(nil),  // 4: snowfall.junction.trips.v1alpha.GetTripSearchDetailsRequest
-	(*GetTripSearchDetailsResponse)(nil), // 5: snowfall.junction.trips.v1alpha.GetTripSearchDetailsResponse
-	(*ListTripsRequest)(nil),             // 6: snowfall.junction.trips.v1alpha.ListTripsRequest
-	(*ListTripsResponse)(nil),            // 7: snowfall.junction.trips.v1alpha.ListTripsResponse
-	(*TripSearch)(nil),                   // 8: snowfall.junction.trips.v1alpha.TripSearch
-	(*v1alpha.TripReference)(nil),        // 9: snowfall.common.v1alpha.TripReference
-	(*timestamppb.Timestamp)(nil),        // 10: google.protobuf.Timestamp
-	(*v1alpha.Place)(nil),                // 11: snowfall.common.v1alpha.Place
+	(*GetSegmentRequest)(nil),            // 0: snowfall.junction.trips.v1alpha.GetSegmentRequest
+	(*GetSegmentResponse)(nil),           // 1: snowfall.junction.trips.v1alpha.GetSegmentResponse
+	(*GetTripRequest)(nil),               // 2: snowfall.junction.trips.v1alpha.GetTripRequest
+	(*GetTripResponse)(nil),              // 3: snowfall.junction.trips.v1alpha.GetTripResponse
+	(*EnqueueTripSearchRequest)(nil),     // 4: snowfall.junction.trips.v1alpha.EnqueueTripSearchRequest
+	(*EnqueueTripSearchResponse)(nil),    // 5: snowfall.junction.trips.v1alpha.EnqueueTripSearchResponse
+	(*GetTripSearchDetailsRequest)(nil),  // 6: snowfall.junction.trips.v1alpha.GetTripSearchDetailsRequest
+	(*GetTripSearchDetailsResponse)(nil), // 7: snowfall.junction.trips.v1alpha.GetTripSearchDetailsResponse
+	(*ListTripsRequest)(nil),             // 8: snowfall.junction.trips.v1alpha.ListTripsRequest
+	(*ListTripsResponse)(nil),            // 9: snowfall.junction.trips.v1alpha.ListTripsResponse
+	(*TripSearch)(nil),                   // 10: snowfall.junction.trips.v1alpha.TripSearch
+	(*v1alpha.SegmentReference)(nil),     // 11: snowfall.common.v1alpha.SegmentReference
+	(*v1alpha.TripReference)(nil),        // 12: snowfall.common.v1alpha.TripReference
+	(*timestamppb.Timestamp)(nil),        // 13: google.protobuf.Timestamp
+	(*v1alpha.Place)(nil),                // 14: snowfall.common.v1alpha.Place
 }
 var file_snowfall_junction_trips_v1alpha_trips_proto_depIdxs = []int32{
-	9,  // 0: snowfall.junction.trips.v1alpha.GetTripResponse.trip:type_name -> snowfall.common.v1alpha.TripReference
-	8,  // 1: snowfall.junction.trips.v1alpha.EnqueueTripSearchRequest.trip_search:type_name -> snowfall.junction.trips.v1alpha.TripSearch
-	8,  // 2: snowfall.junction.trips.v1alpha.EnqueueTripSearchResponse.trip_search:type_name -> snowfall.junction.trips.v1alpha.TripSearch
-	8,  // 3: snowfall.junction.trips.v1alpha.GetTripSearchDetailsResponse.trip_search:type_name -> snowfall.junction.trips.v1alpha.TripSearch
-	9,  // 4: snowfall.junction.trips.v1alpha.ListTripsResponse.trips:type_name -> snowfall.common.v1alpha.TripReference
-	10, // 5: snowfall.junction.trips.v1alpha.TripSearch.expires_at:type_name -> google.protobuf.Timestamp
-	11, // 6: snowfall.junction.trips.v1alpha.TripSearch.origin:type_name -> snowfall.common.v1alpha.Place
-	11, // 7: snowfall.junction.trips.v1alpha.TripSearch.destination:type_name -> snowfall.common.v1alpha.Place
-	10, // 8: snowfall.junction.trips.v1alpha.TripSearch.departure_after:type_name -> google.protobuf.Timestamp
-	2,  // 9: snowfall.junction.trips.v1alpha.TripSearchService.EnqueueTripSearch:input_type -> snowfall.junction.trips.v1alpha.EnqueueTripSearchRequest
-	4,  // 10: snowfall.junction.trips.v1alpha.TripSearchService.GetTripSearchDetails:input_type -> snowfall.junction.trips.v1alpha.GetTripSearchDetailsRequest
-	0,  // 11: snowfall.junction.trips.v1alpha.TripService.GetTrip:input_type -> snowfall.junction.trips.v1alpha.GetTripRequest
-	6,  // 12: snowfall.junction.trips.v1alpha.TripService.ListTrips:input_type -> snowfall.junction.trips.v1alpha.ListTripsRequest
-	3,  // 13: snowfall.junction.trips.v1alpha.TripSearchService.EnqueueTripSearch:output_type -> snowfall.junction.trips.v1alpha.EnqueueTripSearchResponse
-	5,  // 14: snowfall.junction.trips.v1alpha.TripSearchService.GetTripSearchDetails:output_type -> snowfall.junction.trips.v1alpha.GetTripSearchDetailsResponse
-	1,  // 15: snowfall.junction.trips.v1alpha.TripService.GetTrip:output_type -> snowfall.junction.trips.v1alpha.GetTripResponse
-	7,  // 16: snowfall.junction.trips.v1alpha.TripService.ListTrips:output_type -> snowfall.junction.trips.v1alpha.ListTripsResponse
-	13, // [13:17] is the sub-list for method output_type
-	9,  // [9:13] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	11, // 0: snowfall.junction.trips.v1alpha.GetSegmentResponse.segment:type_name -> snowfall.common.v1alpha.SegmentReference
+	12, // 1: snowfall.junction.trips.v1alpha.GetTripResponse.trip:type_name -> snowfall.common.v1alpha.TripReference
+	10, // 2: snowfall.junction.trips.v1alpha.EnqueueTripSearchRequest.trip_search:type_name -> snowfall.junction.trips.v1alpha.TripSearch
+	10, // 3: snowfall.junction.trips.v1alpha.EnqueueTripSearchResponse.trip_search:type_name -> snowfall.junction.trips.v1alpha.TripSearch
+	10, // 4: snowfall.junction.trips.v1alpha.GetTripSearchDetailsResponse.trip_search:type_name -> snowfall.junction.trips.v1alpha.TripSearch
+	12, // 5: snowfall.junction.trips.v1alpha.ListTripsResponse.trips:type_name -> snowfall.common.v1alpha.TripReference
+	13, // 6: snowfall.junction.trips.v1alpha.TripSearch.expires_at:type_name -> google.protobuf.Timestamp
+	14, // 7: snowfall.junction.trips.v1alpha.TripSearch.origin:type_name -> snowfall.common.v1alpha.Place
+	14, // 8: snowfall.junction.trips.v1alpha.TripSearch.destination:type_name -> snowfall.common.v1alpha.Place
+	13, // 9: snowfall.junction.trips.v1alpha.TripSearch.departure_after:type_name -> google.protobuf.Timestamp
+	4,  // 10: snowfall.junction.trips.v1alpha.TripSearchService.EnqueueTripSearch:input_type -> snowfall.junction.trips.v1alpha.EnqueueTripSearchRequest
+	6,  // 11: snowfall.junction.trips.v1alpha.TripSearchService.GetTripSearchDetails:input_type -> snowfall.junction.trips.v1alpha.GetTripSearchDetailsRequest
+	2,  // 12: snowfall.junction.trips.v1alpha.TripService.GetTrip:input_type -> snowfall.junction.trips.v1alpha.GetTripRequest
+	8,  // 13: snowfall.junction.trips.v1alpha.TripService.ListTrips:input_type -> snowfall.junction.trips.v1alpha.ListTripsRequest
+	0,  // 14: snowfall.junction.trips.v1alpha.TripService.GetSegment:input_type -> snowfall.junction.trips.v1alpha.GetSegmentRequest
+	5,  // 15: snowfall.junction.trips.v1alpha.TripSearchService.EnqueueTripSearch:output_type -> snowfall.junction.trips.v1alpha.EnqueueTripSearchResponse
+	7,  // 16: snowfall.junction.trips.v1alpha.TripSearchService.GetTripSearchDetails:output_type -> snowfall.junction.trips.v1alpha.GetTripSearchDetailsResponse
+	3,  // 17: snowfall.junction.trips.v1alpha.TripService.GetTrip:output_type -> snowfall.junction.trips.v1alpha.GetTripResponse
+	9,  // 18: snowfall.junction.trips.v1alpha.TripService.ListTrips:output_type -> snowfall.junction.trips.v1alpha.ListTripsResponse
+	1,  // 19: snowfall.junction.trips.v1alpha.TripService.GetSegment:output_type -> snowfall.junction.trips.v1alpha.GetSegmentResponse
+	15, // [15:20] is the sub-list for method output_type
+	10, // [10:15] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_snowfall_junction_trips_v1alpha_trips_proto_init() }
@@ -701,7 +816,7 @@ func file_snowfall_junction_trips_v1alpha_trips_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetTripRequest); i {
+			switch v := v.(*GetSegmentRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -713,7 +828,7 @@ func file_snowfall_junction_trips_v1alpha_trips_proto_init() {
 			}
 		}
 		file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetTripResponse); i {
+			switch v := v.(*GetSegmentResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -725,7 +840,7 @@ func file_snowfall_junction_trips_v1alpha_trips_proto_init() {
 			}
 		}
 		file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*EnqueueTripSearchRequest); i {
+			switch v := v.(*GetTripRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -737,7 +852,7 @@ func file_snowfall_junction_trips_v1alpha_trips_proto_init() {
 			}
 		}
 		file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*EnqueueTripSearchResponse); i {
+			switch v := v.(*GetTripResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -749,7 +864,7 @@ func file_snowfall_junction_trips_v1alpha_trips_proto_init() {
 			}
 		}
 		file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetTripSearchDetailsRequest); i {
+			switch v := v.(*EnqueueTripSearchRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -761,7 +876,7 @@ func file_snowfall_junction_trips_v1alpha_trips_proto_init() {
 			}
 		}
 		file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetTripSearchDetailsResponse); i {
+			switch v := v.(*EnqueueTripSearchResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -773,7 +888,7 @@ func file_snowfall_junction_trips_v1alpha_trips_proto_init() {
 			}
 		}
 		file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListTripsRequest); i {
+			switch v := v.(*GetTripSearchDetailsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -785,7 +900,7 @@ func file_snowfall_junction_trips_v1alpha_trips_proto_init() {
 			}
 		}
 		file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListTripsResponse); i {
+			switch v := v.(*GetTripSearchDetailsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -797,6 +912,30 @@ func file_snowfall_junction_trips_v1alpha_trips_proto_init() {
 			}
 		}
 		file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListTripsRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListTripsResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_snowfall_junction_trips_v1alpha_trips_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*TripSearch); i {
 			case 0:
 				return &v.state
@@ -815,7 +954,7 @@ func file_snowfall_junction_trips_v1alpha_trips_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_snowfall_junction_trips_v1alpha_trips_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   2,
 		},

@@ -56,6 +56,17 @@ message Schedule {
     TYPE_RAIL = 2;
   }
   Type type = 7;
+  repeated Leg legs = 8;
+}
+
+message Leg {
+  string id = 1;
+  Point origin = 2;
+  Point destination = 3;
+  google.protobuf.Timestamp departure_at = 4;
+  google.protobuf.Timestamp arrival_at = 5;
+  Schedule.Type type = 6;
+  string agency_name = 7;
 }
 
 message Stop {
@@ -68,14 +79,13 @@ message Stop {
 
 message Segment {
   string id = 1;
-  repeated Stop stops = 2;
+  repeated Leg legs = 2;
 }
 
 message SegmentReference {
   string id = 1;
   string schedule_id = 2;
-  string origin_stop_id = 3;
-  string destination_stop_id = 4;
+  repeated string leg_ids = 3;
 }
 
 message TripReference {

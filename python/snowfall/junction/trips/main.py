@@ -54,7 +54,7 @@ async def _consume(app: service.Application[_ConsumeSettings]) -> None:
                 mongo[_TRIPS]["trip_searches"],
                 datetime.timedelta(minutes=15),
             ),
-            trip_repository=trips.TripRepository(mongo[_TRIPS]["trips"]),
+            trip_repository=trips.TripRepository(mongo[_TRIPS][_TRIPS]),
         )
 
         await consumer.consume()
@@ -76,7 +76,8 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
             app.settings.grpc_port,
             [
                 TripService(
-                    repository=trips.TripRepository(mongo[_TRIPS]["trips"]),
+                    segments=trips.SegmentRepository(mongo[_TRIPS][_TRIPS]),
+                    trips_repository=trips.TripRepository(mongo[_TRIPS][_TRIPS]),
                     default_page_size=app.settings.default_page_size,
                 ),
                 TripSearchService(

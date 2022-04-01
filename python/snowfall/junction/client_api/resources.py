@@ -110,35 +110,33 @@ class LegResource(models.Resource):
     @classmethod
     def from_proto(
         cls,
-        origin: models_pb2.Stop,
-        destination: models_pb2.Stop,
+        leg: models_pb2.Leg,
         request: requests.Request,
     ) -> LegResource:
-        leg_id = origin.id
         return cls(
-            id=leg_id,
+            id=leg.id,
             type="legs",
             attributes={
                 "departureAt": protobuf.protobuf_to_datetime(
-                    origin.departure_at,
+                    leg.departure_at,
                 ),
                 "arrivalAt": protobuf.protobuf_to_datetime(
-                    destination.arrival_at,
+                    leg.arrival_at,
                 ),
-                "operator": "",
+                "operator": leg.agency_name,
                 "origin": {
-                    "ref": origin.point.ref,
-                    "name": origin.point.name,
-                    "latitude": origin.point.coordinates.latitude,
-                    "longitude": origin.point.coordinates.longitude,
-                    "timeZone": origin.point.time_zone,
+                    "ref": leg.origin.ref,
+                    "name": leg.origin.name,
+                    "latitude": leg.origin.coordinates.latitude,
+                    "longitude": leg.origin.coordinates.longitude,
+                    "timeZone": leg.origin.time_zone,
                 },
                 "destination": {
-                    "ref": destination.point.ref,
-                    "name": destination.point.name,
-                    "latitude": destination.point.coordinates.latitude,
-                    "longitude": destination.point.coordinates.longitude,
-                    "timeZone": destination.point.time_zone,
+                    "ref": leg.destination.ref,
+                    "name": leg.destination.name,
+                    "latitude": leg.destination.coordinates.latitude,
+                    "longitude": leg.destination.coordinates.longitude,
+                    "timeZone": leg.destination.time_zone,
                 },
             },
             relationships={
@@ -152,7 +150,7 @@ class LegResource(models.Resource):
             links={
                 _SELF_HREF: request.url_for(
                     "ViewLeg",
-                    legId=leg_id,
+                    legId=leg.id,
                 ),
             },
         )

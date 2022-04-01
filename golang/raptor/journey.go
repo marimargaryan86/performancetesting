@@ -22,10 +22,10 @@ type Segment struct {
 	ScheduleId uuid.UUID
 	Depart     time.Time
 	Arrive     time.Time
-	Legs       []*Leg
+	Stops      []*Stop
 }
 
-type Leg struct {
+type Stop struct {
 	Id       string
 	Sequence int64
 }
@@ -49,12 +49,12 @@ func (p *Planner) toJourneySet(destination *planner.Stop, connections map[uint64
 			case connection:
 				from := p.data.ScheduleStopBySequence(v.schedule.ScheduleStops[v.from])
 				to := p.data.ScheduleStopBySequence(v.schedule.ScheduleStops[v.to])
-				legs := make([]*Leg, 0)
+				stops := make([]*Stop, 0)
 
 				for _, s := range v.schedule.ScheduleStops[v.from : v.to+1] {
 					sScheduleStop := p.data.ScheduleStopBySequence(s)
-					legs = append(legs, &Leg{
-						Id:       p.data.StopBySequence(sScheduleStop.Stop).Id,
+					stops = append(stops, &Stop{
+						Id:       sScheduleStop.Id,
 						Sequence: int64(sScheduleStop.Sequence),
 					})
 				}
@@ -64,14 +64,14 @@ func (p *Planner) toJourneySet(destination *planner.Stop, connections map[uint64
 				arrive := to.ArrivalAt
 				segmentIdParts := make([]string, 0, len(segments))
 
-				for _, l := range legs {
-					segmentIdParts = append(segmentIdParts, strconv.FormatInt(l.Sequence, 10))
+				for _, s := range stops {
+					segmentIdParts = append(segmentIdParts, strconv.FormatInt(s.Sequence, 10))
 				}
 
 				segments = append(segments, &Segment{
 					Id:         uuid.NewSHA1(namespace, []byte(strings.Join(segmentIdParts, "_"))),
 					ScheduleId: uuid.MustParse(v.schedule.Id),
-					Legs:       legs,
+					Stops:      stops,
 					Depart:     time.Unix(int64(depart), 0),
 					Arrive:     time.Unix(int64(arrive), 0),
 				})

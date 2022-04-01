@@ -106,8 +106,9 @@ class DictClient(Client):
                     models_pb2.SegmentReference(
                         id=str(uuid.uuid4()),
                         schedule_id=str(uuid.uuid4()),
-                        origin_stop_id="f236a92c-4cfa-468e-85ef-431d25dcd925",
-                        destination_stop_id="488a836d-ec22-439b-a9d8-3c4c386a731e",
+                        leg_ids=[
+                            str(uuid.uuid4()),
+                        ],
                     ),
                 ],
             ),

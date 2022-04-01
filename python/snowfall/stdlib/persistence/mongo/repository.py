@@ -112,16 +112,16 @@ class _AbstractRepository(abc.ABC, Generic[Record]):  # noqa: WPS214
         *args: Any,
         **kwargs: Any,
     ) -> Record:
-        """Return a ``Record`` if the query returns a dict."""
+        """Return a `Record` if the query returns a dict."""
 
     @overload
     async def _execute(
         self,
-        query: Callable[[Any], motor_asyncio.AsyncIOMotorCursor],
+        query: Callable[[Any], core.AgnosticBaseCursor],
         *args: Any,
         **kwargs: Any,
     ) -> resultset.ResultSet[Record]:
-        """Return a ``ResultSet[Record]`` if the query returns a cursor."""
+        """Return a `ResultSet[Record]` if the query returns a cursor."""
 
     async def _execute(
         self,
@@ -138,7 +138,14 @@ class _AbstractRepository(abc.ABC, Generic[Record]):  # noqa: WPS214
         possible_cursor = query(*args, **kwargs)
 
         if isinstance(possible_cursor, motor_asyncio.AsyncIOMotorCursor):
-            return resultset.ResultSet[Record](
+            return resultset.DocumentResultSet[Record](
+                cur=possible_cursor,
+                coder=self._coder,
+                filter_=filter_pre_cursor,
+            )
+
+        if isinstance(possible_cursor, motor_asyncio.AsyncIOMotorLatentCommandCursor):
+            return resultset.AggregationResultSet[Record](
                 cur=possible_cursor,
                 coder=self._coder,
                 filter_=filter_pre_cursor,
@@ -150,6 +157,60 @@ class _AbstractRepository(abc.ABC, Generic[Record]):  # noqa: WPS214
             return self._coder.decode(possible_document)
 
         return possible_document
+
+    async def _find_nested(
+        self,
+        path: str,
+        filter_: Optional[Mapping[str, Any]] = None,
+        cur: Optional[str] = None,
+    ) -> resultset.ResultSet[Record]:
+        aggregate = []
+        filter_pre_cursor = copy.deepcopy(filter_ or {})
+        cursor_filter = copy.deepcopy(dict(filter_pre_cursor))
+
+        if cur:
+            cursor_obj = cursor.unmarshal(cur, cursor_filter)
+
+            if mongo_id_key not in cursor_filter:
+                cursor_filter[mongo_id_key] = {}
+
+            cursor_filter[mongo_id_key]["$gt"] = cursor_obj.id
+
+        if cursor_filter:
+            aggregate.append(
+                {
+                    "$match": cursor_filter,
+                },
+            )
+
+        aggregate.append(
+            {
+                "$unwind": {
+                    "path": path,
+                },
+            },
+        )
+
+        if cursor_filter:
+            aggregate.append(
+                {
+                    "$match": cursor_filter,
+                },
+            )
+
+        aggregate.append(
+            {
+                "$replaceRoot": {
+                    "newRoot": path,
+                },
+            },
+        )
+
+        return await self._execute(
+            query=self._collection.aggregate,
+            pipeline=aggregate,
+            filter_pre_cursor=filter_pre_cursor,
+        )
 
     async def _find_with_cursor(
         self,

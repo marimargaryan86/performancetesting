@@ -24,7 +24,7 @@ STOPS = (
     "776e5292-7314-4fbf-9a3a-ffb9e039430a",
     "099639fb-ef8f-43f5-8200-423e09d356fd",
 )
-LEGS = STOPS[:-1]
+LEGS = ("fe8f2db4-0913-4ece-a3fe-2b3ebecc72ff",)
 ORDERS = ("e61d5e73-bb7e-408f-861d-2be84218d1c4",)
 
 
@@ -63,6 +63,7 @@ def get_segments() -> list[models_pb2.SegmentReference]:
 def generate_segment_reference(identifier: str) -> models_pb2.SegmentReference:
     return models_pb2.SegmentReference(
         id=identifier,
+        leg_ids=[leg.id for leg in get_legs()],
     )
 
 
@@ -77,6 +78,7 @@ def get_trips() -> list[models_pb2.TripReference]:
 def generate_trip_reference(identifier: str) -> models_pb2.TripReference:
     return models_pb2.TripReference(
         id=identifier,
+        segments=get_segments(),
     )
 
 
@@ -105,5 +107,15 @@ def get_orders() -> list[orders_pb2.Order]:
 
 def generate_order(identifier: str) -> orders_pb2.Order:
     return orders_pb2.Order(
+        id=identifier,
+    )
+
+
+def get_legs() -> list[models_pb2.Leg]:
+    return [generate_leg(identifier) for identifier in LEGS]
+
+
+def generate_leg(identifier: str) -> models_pb2.Leg:
+    return models_pb2.Leg(
         id=identifier,
     )

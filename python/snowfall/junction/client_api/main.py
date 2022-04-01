@@ -10,6 +10,7 @@ from asgiref.typing import ASGIApplication
 from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import (
+    legs,
     offer_searches,
     offers,
     places,
@@ -71,6 +72,9 @@ def _factory(app: service.Application[bootstrap.Settings]) -> ASGIApplication:
                 ),
             ],
             dependencies=bootstrap.create_dependencies(
+                legs_client=legs.GrpcClient(
+                    schedules=schedules_pb2_grpc.ScheduleServiceStub(schedules_channel),
+                ),
                 places_client=places.GrpcClient(
                     places_pb2_grpc.PlacesServiceStub(places_channel),
                 ),
