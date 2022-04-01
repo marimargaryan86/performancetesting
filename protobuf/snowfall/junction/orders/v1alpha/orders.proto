@@ -2,11 +2,16 @@ syntax = "proto3";
 
 package snowfall.junction.orders.v1alpha;
 
-import "google/protobuf/timestamp.proto";
+import "snowfall/junction/offers/v1alpha/offers.proto";
 
 service OrderService {
   rpc EnqueueOrder (EnqueueOrderRequest) returns (EnqueueOrderResponse) {}
   rpc GetOrder (GetOrderRequest) returns (GetOrderResponse) {}
+}
+
+message Order {
+  string id = 1;
+  repeated snowfall.junction.offers.v1alpha.Offer offers = 2;
 }
 
 message EnqueueOrderRequest {
@@ -23,10 +28,4 @@ message GetOrderRequest {
 
 message GetOrderResponse {
   Order order = 1;
-}
-
-// TODO: remove expires_at attribute, add offer references
-message Order {
-  string id = 1;
-  google.protobuf.Timestamp expires_at = 2;
 }

@@ -9,9 +9,9 @@ class OrderService(
     Service,
     orders_pb2_grpc.OrderServiceServicer,
 ):
-    def __init__(self, orders_searches: OrderRepository, default_page_size: int):
+    def __init__(self, orders: OrderRepository, default_page_size: int):
         self._default_page_size = default_page_size
-        self._orders_searches = orders_searches
+        self._orders = orders
 
     def get_name(self) -> str:
         return orders_pb2.DESCRIPTOR.services_by_name["OrderService"].full_name
@@ -24,13 +24,20 @@ class OrderService(
         request: orders_pb2.GetOrderRequest,
         context: grpc.aio.ServicerContext,
     ) -> orders_pb2.GetOrderResponse:
-        # TODO: get order search from mongo
-        return orders_pb2.GetOrderResponse()
+        order = await self._orders.find_by_id(request.id)
+
+        if not order:
+            await context.abort(grpc.StatusCode.NOT_FOUND)
+
+        return orders_pb2.GetOrderResponse(order=order)
 
     async def EnqueueOrder(  # type: ignore[override] # noqa: N802
         self,
         request: orders_pb2.EnqueueOrderRequest,
         context: grpc.aio.ServicerContext,
     ) -> orders_pb2.EnqueueOrderResponse:
-        # TODO: enqueue order search from queue
-        return orders_pb2.EnqueueOrderResponse()
+        order = await self._orders.create(
+            list(request.order.offers),
+        )
+        # TODO: publish order
+        return orders_pb2.EnqueueOrderResponse(order=order)

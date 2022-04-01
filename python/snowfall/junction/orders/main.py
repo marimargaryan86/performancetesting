@@ -1,4 +1,3 @@
-import datetime
 import ipaddress
 import random
 from typing import Sequence
@@ -17,7 +16,6 @@ class _GrpcSettings(service.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50057
     mongo_dsn: Sequence[pydantic.AnyUrl]
-    default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
 
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
@@ -29,9 +27,8 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
         app.settings.grpc_port,
         [
             OrderService(
-                orders_searches=orders.OrderRepository(
-                    mongo.orders.order_searches,
-                    app.settings.default_ttl,
+                orders=orders.OrderRepository(
+                    mongo.orders.order,
                 ),
                 default_page_size=app.settings.default_page_size,
             ),
