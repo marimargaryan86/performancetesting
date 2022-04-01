@@ -90,7 +90,7 @@ EOH
 
       env {
         ENV_NAME              = "${NOMAD_NAMESPACE}"
-        FORWARDED_ALLOWED_IPS = "[\"0.0.0.0\"]"
+        FORWARDED_ALLOWED_IPS = "0.0.0.0"
         HTTP_ADDRESS          = "0.0.0.0"
         HTTP_PORT             = "${NOMAD_PORT_http}"
         JWT_TOKEN_VERSION     = "1.0.0"
