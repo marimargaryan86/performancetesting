@@ -5,7 +5,7 @@ from pymongo import IndexModel, results
 
 from snowfall.common.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.persistence.mongo import repository, resultset
+from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 LEGS_ID = "legs.id"
 
@@ -53,7 +53,11 @@ class LegRepository(repository.ProtoRepository[models_pb2.Leg]):
             return None
 
 
-class ScheduleRepository(repository.ProtoRepository[models_pb2.Schedule]):
+class ScheduleRepository(
+    mixins.AllMixin[models_pb2.Schedule],
+    mixins.FindByIdMixin[models_pb2.Schedule],
+    repository.ProtoRepository[models_pb2.Schedule],
+):
     _proto = models_pb2.Schedule
     _indexes: list[IndexModel] = [
         IndexModel("updated_at", background=True),

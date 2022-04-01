@@ -7,7 +7,7 @@ import pymongo
 from asyncstdlib import itertools
 
 from snowfall.stdlib.format.gtfs import models
-from snowfall.stdlib.persistence.mongo import repository, resultset
+from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 _SERVICE_ID = "service_id"
 _TUPLE_OF_CSV = tuple[dict[str, str], ...]
@@ -59,7 +59,7 @@ class Repository(repository.PydanticRepository[repository.Model]):
         return new_rows
 
 
-class AgencyRepository(Repository[models.Agency]):
+class AgencyRepository(mixins.AllMixin[models.Agency], Repository[models.Agency]):
     _indexes = [pymongo.IndexModel("agency_id", background=True, unique=True)]
     _defaults: dict[str, Any] = {}
     _model = models.Agency
@@ -136,7 +136,7 @@ class RouteRepository(Repository[models.Route]):
         return route
 
 
-class StopRepository(Repository[models.Stop]):
+class StopRepository(mixins.AllMixin[models.Stop], Repository[models.Stop]):
     _indexes = [pymongo.IndexModel("stop_id", background=True, unique=True)]
     _defaults = {
         "location_type": 0,
@@ -181,7 +181,7 @@ class StopTimeRepository(Repository[models.StopTime]):
         )
 
 
-class TripRepository(Repository[models.Trip]):
+class TripRepository(mixins.AllMixin[models.Trip], Repository[models.Trip]):
     _indexes = [
         pymongo.IndexModel("route_id", background=True),
         pymongo.IndexModel(_SERVICE_ID, background=True),

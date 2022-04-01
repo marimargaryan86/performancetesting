@@ -6,7 +6,7 @@ from typing import Any, Mapping
 from pymongo import GEOSPHERE, IndexModel, results
 
 from snowfall.common.v1alpha import models_pb2
-from snowfall.stdlib.persistence.mongo import coders, repository, resultset
+from snowfall.stdlib.persistence.mongo import coders, mixins, repository, resultset
 
 _mongo_id_key = "_id"
 _proto_id_key = "id"
@@ -15,7 +15,10 @@ _place_key = "place"
 _NAMESPACE = uuid.UUID("5190984e-4ab7-411e-96f6-2848cc5d63e1")
 
 
-class PlaceRepository(repository.ProtoRepository[models_pb2.Place]):
+class PlaceRepository(
+    mixins.FindByIdMixin[models_pb2.Place],
+    repository.ProtoRepository[models_pb2.Place],
+):
     _indexes = [
         IndexModel([("coordinates", GEOSPHERE)], background=True),
     ]
@@ -59,7 +62,11 @@ class CuratedPlaceCoder(coders.ProtoCoder[models_pb2.CuratedPlace]):
         return as_dict
 
 
-class CuratedPlaceRepository(repository.ProtoRepository[models_pb2.CuratedPlace]):
+class CuratedPlaceRepository(
+    mixins.FindByIdMixin[models_pb2.CuratedPlace],
+    mixins.InsertMixin[models_pb2.CuratedPlace],
+    repository.ProtoRepository[models_pb2.CuratedPlace],
+):
     _proto = models_pb2.CuratedPlace
 
     async def find(

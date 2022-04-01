@@ -43,7 +43,7 @@ class OrderService(
         request: orders_pb2.EnqueueOrderRequest,
         context: grpc.aio.ServicerContext,
     ) -> orders_pb2.EnqueueOrderResponse:
-        order = await self._orders.create(
+        order = await self._orders.create_from_offers(
             request.offers,
         )
 

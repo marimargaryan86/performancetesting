@@ -7,10 +7,13 @@ from google.protobuf import timestamp_pb2
 from motor import motor_asyncio
 
 from snowfall.junction.offers.v1alpha import offers_pb2
-from snowfall.stdlib.persistence.mongo import repository, resultset
+from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 
-class TripOfferRepository(repository.ProtoRepository[offers_pb2.TripOfferResult]):
+class TripOfferRepository(
+    mixins.InsertMixin[offers_pb2.TripOfferResult],
+    repository.ProtoRepository[offers_pb2.TripOfferResult],
+):
     _proto = offers_pb2.TripOfferResult
     _indexes = [pymongo.IndexModel("offer_search_id", background=True)]
 
@@ -35,7 +38,11 @@ class TripOfferRepository(repository.ProtoRepository[offers_pb2.TripOfferResult]
         )
 
 
-class OfferAggregateRepository(repository.ProtoRepository[offers_pb2.OfferAggregate]):
+class OfferAggregateRepository(
+    mixins.FindByIdMixin[offers_pb2.OfferAggregate],
+    mixins.InsertMixin[offers_pb2.OfferAggregate],
+    repository.ProtoRepository[offers_pb2.OfferAggregate],
+):
     _proto = offers_pb2.OfferAggregate
     _indexes = [pymongo.IndexModel("offer_search_id", background=True)]
 
@@ -50,7 +57,12 @@ class OfferAggregateRepository(repository.ProtoRepository[offers_pb2.OfferAggreg
         )
 
 
-class OfferSearchRepository(repository.ProtoRepository[offers_pb2.OfferSearch]):
+class OfferSearchRepository(  # noqa: WPS215
+    mixins.AllMixin[offers_pb2.OfferSearch],
+    mixins.FindByIdMixin[offers_pb2.OfferSearch],
+    mixins.InsertMixin[offers_pb2.OfferSearch],
+    repository.ProtoRepository[offers_pb2.OfferSearch],
+):
     _proto = offers_pb2.OfferSearch
 
     def __init__(

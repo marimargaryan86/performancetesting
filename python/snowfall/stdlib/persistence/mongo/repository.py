@@ -9,6 +9,7 @@ from typing import (  # noqa: WPS235
     Generic,
     Mapping,
     Optional,
+    Protocol,
     Type,
     TypeVar,
     overload,
@@ -44,6 +45,24 @@ def _configure_collection(
     )
 
 
+class RepositoryProtocol(Protocol[Record]):
+    @property
+    def _coder(self) -> coders.BaseCoder[Record]:
+        """Use to convert protobufs to BSON and back."""
+
+    @property
+    def _collection(self) -> core.AgnosticCollection:
+        """Use to perform Mongo queries again."""
+
+    async def _execute(
+        self,
+        query: Callable[[Any], Any],
+        *args: Any,
+        **kwargs: Any,
+    ) -> Any:
+        """Use for queries to add metrics and tracing."""
+
+
 class _AbstractRepository(abc.ABC, Generic[Record]):  # noqa: WPS214
     _indexes: list[pymongo.IndexModel] = []
 
@@ -53,41 +72,6 @@ class _AbstractRepository(abc.ABC, Generic[Record]):  # noqa: WPS214
     ) -> None:
         self._has_created_indexes = False
         self._collection = _configure_collection(collection)
-
-    async def all_(self) -> resultset.ResultSet[Record]:
-        return await self._execute(self._collection.find)
-
-    async def estimated_count(self) -> int:
-        return await self._execute(self._collection.estimated_document_count)
-
-    async def exists(self, identifier: str) -> bool:
-        return (
-            await self._execute(
-                self._collection.find_one,
-                {mongo_id_key: identifier},
-                {mongo_id_key: 1},
-            )
-            is not None
-        )
-
-    async def find_by_id(self, document_id: str) -> Optional[Record]:
-        return await self._execute(
-            self._collection.find_one,
-            {
-                "_id": document_id,
-            },
-        )
-
-    async def insert(self, document: Record) -> Record:
-        insert = await self._execute(
-            self._collection.insert_one,
-            self._coder.encode(document),
-        )
-
-        if not insert.acknowledged:
-            raise RuntimeError()
-
-        return document
 
     async def _create_indexes(self) -> None:
         self._has_created_indexes = True

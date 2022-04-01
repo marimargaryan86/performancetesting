@@ -9,7 +9,7 @@ from motor import motor_asyncio
 from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.planner.v1alpha import planner_pb2
 from snowfall.junction.trips.v1alpha import trips_pb2
-from snowfall.stdlib.persistence.mongo import repository, resultset
+from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 SEGMENTS_ID = "segments.id"
 
@@ -39,7 +39,11 @@ class SegmentRepository(repository.ProtoRepository[models_pb2.SegmentReference])
             return None
 
 
-class TripRepository(repository.ProtoRepository[models_pb2.TripReference]):
+class TripRepository(
+    mixins.FindByIdMixin[models_pb2.TripReference],
+    mixins.InsertMixin[models_pb2.TripReference],
+    repository.ProtoRepository[models_pb2.TripReference],
+):
     _proto = models_pb2.TripReference
 
     async def add_from_journey_search(
@@ -94,7 +98,11 @@ class TripRepository(repository.ProtoRepository[models_pb2.TripReference]):
         )
 
 
-class TripSearchRepository(repository.ProtoRepository[trips_pb2.TripSearch]):
+class TripSearchRepository(
+    mixins.FindByIdMixin[trips_pb2.TripSearch],
+    mixins.InsertMixin[trips_pb2.TripSearch],
+    repository.ProtoRepository[trips_pb2.TripSearch],
+):
     _proto = trips_pb2.TripSearch
     _indexes = [pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True)]
 
