@@ -14,7 +14,7 @@ variable "registry_username" {
   type = string
 }
 
-job "mock" {
+job "mock-provider-offers" {
   datacenters = ["junction-dev-dc1"]
   type        = "service"
 

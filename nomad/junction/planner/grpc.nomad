@@ -14,7 +14,7 @@ variable "registry_username" {
   type = string
 }
 
-job "planner" {
+job "planner-grpc" {
   datacenters = ["junction-dev-dc1"]
   type = "service"
 

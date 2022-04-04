@@ -14,7 +14,7 @@ variable "registry_username" {
   type = string
 }
 
-job "gtfs-feed" {
+job "gtfs-feed-import" {
   datacenters = ["junction-dev-dc1"]
   type        = "batch"
 

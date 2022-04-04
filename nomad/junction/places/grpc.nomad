@@ -14,7 +14,7 @@ variable "registry_username" {
   type = string
 }
 
-job "offers" {
+job "places-grpc" {
   datacenters = ["junction-dev-dc1"]
   type        = "service"
 
@@ -35,7 +35,7 @@ job "offers" {
     }
 
     service {
-      name = "offers-${NOMAD_NAMESPACE}"
+      name = "places-${NOMAD_NAMESPACE}"
       port = "grpc"
       tags = ["grpc"]
 
@@ -51,7 +51,6 @@ job "offers" {
 
       template {
         data        = <<EOH
-AMQP_DSN={{range $index, $service := service "amqp"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 MONGO_DSN={{range $index, $service := service "mongodb"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 EOH
         destination = "services.env"
@@ -77,44 +76,7 @@ EOH
         ENV_NAME     = "${NOMAD_NAMESPACE}"
         GRPC_ADDRESS = "0.0.0.0"
         GRPC_PORT    = "${NOMAD_PORT_grpc}"
-        SENTRY_DSN   = "https://7c600c1c458d403e8047091398239f20@sentry.snowfall.se/27"
-      }
-    }
-  }
-
-  group "import" {
-    count = 1
-
-    task "import" {
-      driver = "docker"
-
-      template {
-        data        = <<EOH
-AMQP_DSN={{range $index, $service := service "amqp"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
-MONGO_DSN={{range $index, $service := service "mongodb"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
-REDIS_DSN={{range $index, $service := service "redis"}}redis://{{.Address}}:{{.Port}}// {{end}}
-EOH
-        destination = "services.env"
-        env         = true
-        change_mode = "restart"
-      }
-
-      config {
-        image = var.docker_image
-        args = [
-          "import",
-        ]
-
-        auth {
-          username       = var.registry_username
-          password       = var.registry_password
-          server_address = var.registry_address
-        }
-      }
-
-      env {
-        ENV_NAME   = "${NOMAD_NAMESPACE}"
-        SENTRY_DSN = "https://7c600c1c458d403e8047091398239f20@sentry.snowfall.se/27"
+        SENTRY_DSN   = "https://4de05bbdaa1b4b58ab8401ad33ebac37@sentry.snowfall.se/20"
       }
     }
   }

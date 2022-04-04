@@ -14,7 +14,7 @@ variable "registry_username" {
   type = string
 }
 
-job "client-api" {
+job "client-api-http" {
   datacenters = ["junction-dev-dc1"]
   type        = "service"
 
@@ -27,7 +27,7 @@ job "client-api" {
     progress_deadline = "2m"
   }
 
-  group "client-api" {
+  group "http" {
     count = 1
 
     network {
@@ -52,7 +52,7 @@ job "client-api" {
       }
     }
 
-    task "client-api" {
+    task "http" {
       driver = "docker"
 
       vault {

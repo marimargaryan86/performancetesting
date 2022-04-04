@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -eu
+shopt -s nullglob
 
 cat <<EOF
 stages:
@@ -20,7 +21,7 @@ make-uninterruptible:
   resource_group: deploy
   script:
     - set -eu
-    - ./\${CI_ENVIRONMENT_TIER}/deploy.sh "\${service}" "\${version}" "\${template}" "\${CI_ENVIRONMENT_TIER}"
+    - ./\${CI_ENVIRONMENT_TIER}/deploy.sh "\${service}" "\${version}" "\${CI_ENVIRONMENT_TIER}" \${templates}
   environment:
     action: start
   variables:
@@ -38,29 +39,49 @@ for DIR in "${1}"/*; do
 		continue
 	fi
 
-	if [ -n "${CI_COMMIT_BEFORE_SHA+x}" ] && [ "${CI_COMMIT_BEFORE_SHA}" != "0000000000000000000000000000000000000000" ]; then
-		if ! git diff --name-only -r "${CI_COMMIT_BEFORE_SHA}" "${CI_COMMIT_SHA}" | grep -q "^${DIR}/"; then
-			echo >&2 "skip: \"${DIR}/\" has not changed since \"${CI_COMMIT_BEFORE_SHA}\""
-			continue
-		fi
-	fi
-
 	image_file="${DIR}/image.txt"
-	template_file="${DIR}/template.nomad"
 
 	if ! [ -f "${image_file}" ]; then
 		echo >&2 "skip: \"${image_file}\" is missing"
 		continue
 	fi
 
-	if ! [ -f "${template_file}" ]; then
-		echo >&2 "skip: \"${template_file}\" is missing"
-		continue
+	has_changed_image=1
+
+	if [ -n "${CI_COMMIT_BEFORE_SHA+x}" ] && [ "${CI_COMMIT_BEFORE_SHA}" != "0000000000000000000000000000000000000000" ]; then
+		if ! git diff --name-only -r "${CI_COMMIT_BEFORE_SHA}" "${CI_COMMIT_SHA}" | grep -q "^${image_file}"; then
+			has_changed_image=0
+		fi
 	fi
 
 	docker_image=$(cat "${image_file}")
 	service_name=$(basename "${docker_image%:*}" | sed s/_/-/g)
 	service_version="${docker_image##*:}"
+	has_changed_templates=0
+	templates=()
+
+	for TEMPLATE in "${DIR}"/*.nomad; do
+		if [ -n "${CI_COMMIT_BEFORE_SHA+x}" ] && [ "${CI_COMMIT_BEFORE_SHA}" != "0000000000000000000000000000000000000000" ]; then
+			if git diff --name-only -r "${CI_COMMIT_BEFORE_SHA}" "${CI_COMMIT_SHA}" | grep -q "^${TEMPLATE}"; then
+				has_changed_templates=1
+				continue
+			fi
+		else
+			has_changed_templates=1
+		fi
+
+		templates+=("${TEMPLATE}")
+	done
+
+	if [ "${has_changed_image}" -eq "0" ] && [ "${has_changed_templates}" -eq "0" ]; then
+		echo >&2 "skip: \"${DIR}\" has no changes"
+		continue
+	fi
+
+	if [ -z "${templates+x}" ]; then
+		echo >&2 "skip: \"${DIR}\" has no Nomad templates"
+		continue
+	fi
 
 	echo >&2 "generate: ${service_name}@${service_version}"
 
@@ -69,12 +90,12 @@ for DIR in "${1}"/*; do
 ${service_name}:
   extends: .deploy
   environment:
-    name: ${1}/${service_name}
-    deployment_tier: ${1}
+    name: $(basename "${1}")/${service_name}
+    deployment_tier: $(basename "${1}")
   variables:
     NOMAD_VAR_docker_image: ${docker_image}
     service: ${service_name}
-    template: ${template_file}
+    templates: ${templates[@]}
     version: ${service_version}
 EOF
 done

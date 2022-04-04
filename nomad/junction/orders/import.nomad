@@ -14,7 +14,7 @@ variable "registry_username" {
   type = string
 }
 
-job "places" {
+job "orders-import" {
   datacenters = ["junction-dev-dc1"]
   type        = "service"
 
@@ -25,60 +25,6 @@ job "places" {
     canary            = 1
     healthy_deadline  = "30s"
     progress_deadline = "2m"
-  }
-
-  group "grpc" {
-    count = 1
-
-    network {
-      port "grpc" {}
-    }
-
-    service {
-      name = "places-${NOMAD_NAMESPACE}"
-      port = "grpc"
-      tags = ["grpc"]
-
-      check {
-        type     = "grpc"
-        interval = "10s"
-        timeout  = "2s"
-      }
-    }
-
-    task "grpc" {
-      driver = "docker"
-
-      template {
-        data        = <<EOH
-MONGO_DSN={{range $index, $service := service "mongodb"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
-EOH
-        destination = "services.env"
-        env         = true
-        change_mode = "restart"
-      }
-
-      config {
-        image = var.docker_image
-        ports = ["grpc"]
-        args = [
-          "grpc",
-        ]
-
-        auth {
-          username       = var.registry_username
-          password       = var.registry_password
-          server_address = var.registry_address
-        }
-      }
-
-      env {
-        ENV_NAME     = "${NOMAD_NAMESPACE}"
-        GRPC_ADDRESS = "0.0.0.0"
-        GRPC_PORT    = "${NOMAD_PORT_grpc}"
-        SENTRY_DSN   = "https://4de05bbdaa1b4b58ab8401ad33ebac37@sentry.snowfall.se/20"
-      }
-    }
   }
 
   group "import" {
@@ -100,7 +46,7 @@ EOH
       config {
         image = var.docker_image
         args = [
-          "import",
+          "grpc",
         ]
 
         auth {
@@ -112,7 +58,7 @@ EOH
 
       env {
         ENV_NAME   = "${NOMAD_NAMESPACE}"
-        SENTRY_DSN = "https://4de05bbdaa1b4b58ab8401ad33ebac37@sentry.snowfall.se/20"
+        SENTRY_DSN = "https://7c600c1c458d403e8047091398239f20@sentry.snowfall.se/30"
       }
     }
   }

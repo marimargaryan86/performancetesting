@@ -28,19 +28,15 @@ if [ -f "dist/deliverables.json" ]; then
 	done
 fi
 
-for i in **/*.nomad; do
-	root=$(echo "${i}" | cut -d "/" -f1)
-
-	if [ "${root}" == "repo" ]; then
-		continue
-	fi
-
-	service_name=$(basename "$(dirname "$i")" | sed s/_/-/g)
+for i in nomad/**/*.nomad; do
+	filename=$(basename "${i}")
+	service_name=$(basename "$(dirname "${i}")" | sed s/_/-/g)
 	repo_path="repo/${1}/${service_name}"
 	mkdir -p "${repo_path}"
-	cp "${i}" "${repo_path}/template.nomad"
+	cp "${i}" "${repo_path}/${filename}"
 done
 
+rm repo/"${1}"/**/*/template.nomad # remove files using old naming
 cp ".gitlab/deploy.gitlab-ci.yml" "repo/.gitlab-ci.yml"
 cp "bash/deploy.sh" "repo/${1}/deploy.sh"
 cp "bash/generate-deploy-pipeline.sh" "repo/${1}/generate-deploy-pipeline.sh"
