@@ -6,6 +6,17 @@ from snowfall import fixtures
 
 @pytest.mark.asyncio
 class TestOrders(object):
+    async def test_unknown_order_returns_not_found(
+        self,
+        client: testclient.TestClient,
+    ) -> None:
+        response = client.get("/orders/{id}".format(id=fixtures.NOT_FOUND))
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    async def test_order_is_found(self, client: testclient.TestClient) -> None:
+        response = client.get("/orders/{id}".format(id=fixtures.ORDERS[0]))
+        assert response.status_code == status.HTTP_200_OK
+
     async def test_offer_search_unknown_trip_returns_error(
         self,
         client: testclient.TestClient,
