@@ -36,7 +36,6 @@ for i in nomad/**/*.nomad; do
 	cp "${i}" "${repo_path}/${filename}"
 done
 
-rm repo/"${1}"/**/*/template.nomad # remove files using old naming
 cp ".gitlab/deploy.gitlab-ci.yml" "repo/.gitlab-ci.yml"
 cp "bash/deploy.sh" "repo/${1}/deploy.sh"
 cp "bash/generate-deploy-pipeline.sh" "repo/${1}/generate-deploy-pipeline.sh"

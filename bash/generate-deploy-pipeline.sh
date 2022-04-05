@@ -64,13 +64,14 @@ for DIR in "${1}"/*; do
 		if [ -n "${CI_COMMIT_BEFORE_SHA+x}" ] && [ "${CI_COMMIT_BEFORE_SHA}" != "0000000000000000000000000000000000000000" ]; then
 			if git diff --name-only -r "${CI_COMMIT_BEFORE_SHA}" "${CI_COMMIT_SHA}" | grep -q "^${TEMPLATE}"; then
 				has_changed_templates=1
-				continue
 			fi
 		else
 			has_changed_templates=1
 		fi
 
-		templates+=("${TEMPLATE}")
+		if [ "${has_changed_image}" -eq "1" ] || [ "${has_changed_templates}" -eq "1" ]; then
+			templates+=("${TEMPLATE}")
+		fi
 	done
 
 	if [ "${has_changed_image}" -eq "0" ] && [ "${has_changed_templates}" -eq "0" ]; then
