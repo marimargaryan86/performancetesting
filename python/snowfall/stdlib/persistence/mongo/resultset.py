@@ -30,8 +30,8 @@ class ResultSet(abc.ABC, Generic[_Record], AsyncIterator[_Record]):
         return self
 
     async def __anext__(self) -> _Record:
-        document = await self._cursor.next()
-        self._last = document.get(_mongo_id_key, document[_proto_id_key])
+        document = await self._cursor.__anext__()  # noqa: WPS609
+        self._last = document.get(_mongo_id_key, document.get(_proto_id_key))
 
         return self._coder.decode(document)
 
