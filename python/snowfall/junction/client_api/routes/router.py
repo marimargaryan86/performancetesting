@@ -85,7 +85,11 @@ def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Rou
             name="ViewOffer",
         ),
         dependencies.route("/orders", orders.Orders),
-        # todo: add GET /orders
+        dependencies.route(
+            "/orders",
+            orders.Orders,
+            name="ListOrders",
+        ),
         dependencies.route(
             "/orders/{orderId}",
             orders.Order,

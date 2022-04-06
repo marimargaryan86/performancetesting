@@ -50,3 +50,17 @@ class OrderService(
         await self._publisher.publish(order)
 
         return orders_pb2.EnqueueOrderResponse(order=order)
+
+    async def ListOrders(  # type: ignore[override] # noqa: N802
+        self,
+        request: orders_pb2.ListOrdersRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> orders_pb2.ListOrdersResponse:
+        orders_result = await self._orders.find(request.page_token)
+
+        orders_result.limit(request.page_size or self._default_page_size)
+
+        return orders_pb2.ListOrdersResponse(
+            orders=[order async for order in orders_result],
+            next_page_token=await orders_result.cursor(),
+        )

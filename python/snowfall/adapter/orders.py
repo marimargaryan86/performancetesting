@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import abc
+import dataclasses
 import uuid
-from typing import Sequence
+from typing import Optional, Sequence
 
 import grpc
 
@@ -18,11 +19,29 @@ class UnknownError(Exception):
     """Raised when an unhandled error occurs."""
 
 
+@dataclasses.dataclass(frozen=True)
+class OrdersPage(object):
+    orders: Sequence[orders_pb2.Order]
+    next_page_token: Optional[str] = None
+
+    @classmethod
+    async def from_proto(cls, grpc_orders: orders_pb2.ListOrdersResponse) -> OrdersPage:
+        return cls(
+            orders=grpc_orders.orders,
+            next_page_token=grpc_orders.next_page_token,
+        )
+
+
 class Client(abc.ABC):
     @abc.abstractmethod
     async def create(self, offers: Sequence[offers_pb2.Offer]) -> orders_pb2.Order:
         """Create a new order resource."""
 
+    @abc.abstractmethod
+    async def find(self, limit: int, cursor: Optional[str] = None) -> OrdersPage:
+        """Fetch all order resources."""
+
+    @abc.abstractmethod
     async def get(self, identifier: str) -> orders_pb2.Order:
         """Fetch a order resource."""
 
@@ -39,6 +58,9 @@ class DictClient(Client):
         self._orders[order.id] = order
 
         return order
+
+    async def find(self, limit: int, cursor: Optional[str] = None) -> OrdersPage:
+        return OrdersPage(orders=list(self._orders.values()))
 
     async def get(self, order_id: str) -> orders_pb2.Order:
         if order_id not in self._orders:
@@ -62,6 +84,17 @@ class GrpcClient(Client):
             raise UnknownError(exc.details()) from exc
 
         return response.order
+
+    async def find(self, limit: int, cursor: Optional[str] = None) -> OrdersPage:
+        # TODO: handle INVALID_ARGUMENT
+        response = await self._orders.ListOrders(
+            orders_pb2.ListOrdersRequest(
+                page_size=limit,
+                page_token=cursor or "",
+            ),
+        )
+
+        return await OrdersPage.from_proto(response)
 
     async def get(self, order_id: str) -> orders_pb2.Order:
         try:

@@ -1,4 +1,5 @@
 import lagom
+from furl import furl
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.adapter import orders
@@ -31,6 +32,32 @@ class Order(endpoints.HTTPEndpoint):
 
 
 class Orders(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        client: orders.Client = lagom.injectable,
+    ) -> responses.Response:
+        cursor = request.query_params["page[cursor]"]
+        limit = int(request.query_params["page[limit]"])
+        response = await client.find(limit=limit, cursor=cursor)
+        resource_list = [
+            resources.OrderResource.from_proto(order, request)
+            for order in response.orders
+        ]
+
+        next_url = furl(request.url_for("ListOrders"))
+        next_url.args["page[cursor]"] = response.next_page_token
+        next_url.args["page[limit]"] = limit
+
+        return models.JsonApiResponse(
+            models.Body(
+                data=resource_list,
+                links={
+                    "next": next_url.url,
+                },
+            ),
+        )
+
     async def post(
         self,
         request: requests.Request,

@@ -25,7 +25,10 @@ STOPS = (
     "099639fb-ef8f-43f5-8200-423e09d356fd",
 )
 LEGS = ("fe8f2db4-0913-4ece-a3fe-2b3ebecc72ff",)
-ORDERS = ("e61d5e73-bb7e-408f-861d-2be84218d1c4",)
+ORDERS = (
+    "e61d5e73-bb7e-408f-861d-2be84218d1c4",
+    "d1c4dec6-be70-4823-bb4c-bff6164de1a7",
+)
 
 
 def get_places() -> list[models_pb2.Place]:

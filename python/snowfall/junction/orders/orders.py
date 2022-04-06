@@ -3,7 +3,7 @@ from typing import Sequence
 
 from snowfall.junction.offers.v1alpha import offers_pb2
 from snowfall.junction.orders.v1alpha import orders_pb2
-from snowfall.stdlib.persistence.mongo import mixins, repository
+from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 
 class OrderRepository(
@@ -31,3 +31,11 @@ class OrderRepository(
             raise RuntimeError()
 
         return order
+
+    async def find(
+        self,
+        cursor: str,
+    ) -> resultset.ResultSet[orders_pb2.Order]:
+        return await self._find_with_cursor(
+            cur=cursor,
+        )

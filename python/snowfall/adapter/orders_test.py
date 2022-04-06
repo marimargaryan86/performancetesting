@@ -69,3 +69,10 @@ class TestGrpcClient(object):
         client = orders.GrpcClient(stub)
         order = await client.get(fixtures.ORDERS[0])
         assert order.id == fixtures.ORDERS[0]
+
+    async def test_multiple_orders_are_retrievable(
+        self,
+        orders_client: orders.Client,
+    ) -> None:
+        found_orders = await orders_client.find(limit=100)
+        assert len(found_orders.orders) == 2
