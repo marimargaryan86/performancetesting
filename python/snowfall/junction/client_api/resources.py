@@ -183,6 +183,32 @@ class LegResource(models.Resource):
         )
 
 
+class LegTypeResource(models.Resource):
+    @classmethod
+    def from_proto(
+        cls,
+        schedule_type: models_pb2.Schedule.Type.V,
+        request: requests.Request,
+    ) -> LegTypeResource:
+        schedule_type_id = protobuf.enum_value_to_slug(
+            models_pb2.Schedule.Type.DESCRIPTOR,
+            schedule_type,
+        )
+        return cls(
+            id=schedule_type_id,
+            type="leg-types",
+            attributes={
+                "name": schedule_type_id,
+            },
+            links={
+                _SELF_HREF: request.url_for(
+                    "ViewLegType",
+                    legTypeId=schedule_type_id,
+                ),
+            },
+        )
+
+
 class TripResource(models.Resource):
     @classmethod
     def from_proto(

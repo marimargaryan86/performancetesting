@@ -1514,8 +1514,7 @@
             "properties": {
               "id": {
                 "type": "string",
-                "format": "uuid",
-                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "example": "air",
                 "readOnly": true
               },
               "type": {
@@ -1554,8 +1553,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "uuid",
-            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+            "example": "air"
           },
           "type": {
             "type": "string",
@@ -2772,8 +2770,7 @@
         "required": true,
         "schema": {
           "type": "string",
-          "format": "uuid",
-          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          "example": "air"
         },
         "description": "Leg Type identifier"
       },
