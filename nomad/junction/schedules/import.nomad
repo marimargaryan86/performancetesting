@@ -33,10 +33,6 @@ job "schedules-import" {
     task "import" {
       driver = "docker"
 
-      vault {
-        policies = ["schedules-dev"]
-      }
-
       template {
         destination = "services.env"
         env         = true
@@ -44,10 +40,6 @@ job "schedules-import" {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 MONGO_DSN={{range $index, $service := service "mongodb"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
-{{ with secret "kv/dev/schedules" }}
-AWS_ACCESS_KEY_ID={{ .Data.data.aws_access_key_id }}
-AWS_SECRET_ACCESS_KEY={{ .Data.data.aws_secret_access_key }}
-{{ end }}
 EOH
       }
 
@@ -67,7 +59,6 @@ EOH
       env {
         ENV_NAME     = "${NOMAD_NAMESPACE}"
         SENTRY_DSN   = "https://8d94d1ca059f4dc9b4e1e91dfd3d7151@sentry.snowfall.se/25"
-        UPLOAD_TO_S3 = "true"
       }
     }
   }
