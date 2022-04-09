@@ -97,4 +97,3 @@ message CuratedPlace {
   Place place = 1;
   repeated string merged_ids = 2;
 }
-

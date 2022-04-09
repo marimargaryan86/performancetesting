@@ -4,7 +4,6 @@ package snowfall.junction.planner.v1alpha;
 
 import "snowfall/common/v1alpha/models.proto";
 
-
 message Route {
   uint64 sequence = 1;
   repeated uint64 schedules = 2;

@@ -5,7 +5,7 @@ package snowfall.junction.planner.v1alpha;
 import "snowfall/common/v1alpha/models.proto";
 
 service PlannerService {
-  rpc SearchJourney (SearchJourneyRequest) returns (SearchJourneyResponse) {}
+  rpc SearchJourney(SearchJourneyRequest) returns (SearchJourneyResponse) {}
 }
 
 message SearchJourneyRequest {
@@ -17,4 +17,3 @@ message SearchJourneyRequest {
 message SearchJourneyResponse {
   repeated snowfall.common.v1alpha.TripReference trips = 1;
 }
-

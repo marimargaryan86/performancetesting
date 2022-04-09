@@ -6,13 +6,13 @@ import "google/protobuf/timestamp.proto";
 import "snowfall/common/v1alpha/models.proto";
 
 service OfferSearchService {
-  rpc EnqueueOfferSearch (EnqueueOfferSearchRequest) returns (EnqueueOfferSearchResponse) {}
-  rpc GetOfferSearch (GetOfferSearchRequest) returns (GetOfferSearchResponse) {}
+  rpc EnqueueOfferSearch(EnqueueOfferSearchRequest) returns (EnqueueOfferSearchResponse) {}
+  rpc GetOfferSearch(GetOfferSearchRequest) returns (GetOfferSearchResponse) {}
 }
 
 service OfferService {
-  rpc GetOffer (GetOfferRequest) returns (GetOfferResponse) {}
-  rpc ListOffers (ListOffersRequest) returns (ListOffersResponse) {}
+  rpc GetOffer(GetOfferRequest) returns (GetOfferResponse) {}
+  rpc ListOffers(ListOffersRequest) returns (ListOffersResponse) {}
 }
 
 message GetOfferRequest {

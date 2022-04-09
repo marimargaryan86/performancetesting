@@ -5,9 +5,9 @@ package snowfall.junction.orders.v1alpha;
 import "snowfall/junction/offers/v1alpha/offers.proto";
 
 service OrderService {
-  rpc EnqueueOrder (EnqueueOrderRequest) returns (EnqueueOrderResponse) {}
-  rpc GetOrder (GetOrderRequest) returns (GetOrderResponse) {}
-  rpc ListOrders (ListOrdersRequest) returns (ListOrdersResponse) {}
+  rpc EnqueueOrder(EnqueueOrderRequest) returns (EnqueueOrderResponse) {}
+  rpc GetOrder(GetOrderRequest) returns (GetOrderResponse) {}
+  rpc ListOrders(ListOrdersRequest) returns (ListOrdersResponse) {}
 }
 
 message Order {
