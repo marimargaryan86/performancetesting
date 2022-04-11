@@ -25,7 +25,11 @@ def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Rou
             places.Place,
             name="ViewPlace",
         ),
-        # todo: add GET /legs/types
+        dependencies.route(
+            "/legs/types",
+            legs.LegTypes,
+            name="ListLegTypes",
+        ),
         dependencies.route(
             "/legs/types/{legTypeId}",
             legs.LegType,

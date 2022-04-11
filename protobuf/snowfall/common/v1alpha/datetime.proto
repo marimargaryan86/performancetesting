@@ -21,7 +21,6 @@ package snowfall.common.v1alpha;
 
 import "google/protobuf/duration.proto";
 
-
 // Represents civil time (or occasionally physical time).
 //
 // This type can represent a civil time in one of a few possible ways:

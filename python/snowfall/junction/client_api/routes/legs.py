@@ -47,3 +47,21 @@ class LegType(endpoints.HTTPEndpoint):
                 ),
             ),
         )
+
+
+class LegTypes(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+    ) -> responses.Response:
+        return models.JsonApiResponse(
+            models.Body(
+                data=[
+                    resources.LegTypeResource.from_proto(
+                        leg_type,
+                        request,
+                    )
+                    for leg_type in models_pb2.Schedule.Type.values()
+                ],
+            ),
+        )

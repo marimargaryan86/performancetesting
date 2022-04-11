@@ -6,22 +6,22 @@ import "snowfall/common/v1alpha/datetime.proto";
 import "snowfall/common/v1alpha/latlng.proto";
 
 service GeocodingService {
-  rpc CountryCodeLookup (CountryCodeLookupRequest) returns (CountryCodeLookupResponse) {}
-  rpc TimeZoneLookup (TimeZoneLookupRequest) returns (TimeZoneLookupResponse) {}
+  rpc CountryCodeLookup(CountryCodeLookupRequest) returns (CountryCodeLookupResponse) {}
+  rpc TimeZoneLookup(TimeZoneLookupRequest) returns (TimeZoneLookupResponse) {}
 }
 
 message CountryCodeLookupRequest {
-    snowfall.common.v1alpha.LatLng coordinates = 1;
+  snowfall.common.v1alpha.LatLng coordinates = 1;
 }
 
 message CountryCodeLookupResponse {
-    string country_code = 1;
+  string country_code = 1;
 }
 
 message TimeZoneLookupRequest {
-    snowfall.common.v1alpha.LatLng coordinates = 1;
+  snowfall.common.v1alpha.LatLng coordinates = 1;
 }
 
 message TimeZoneLookupResponse {
-    snowfall.common.v1alpha.TimeZone time_zone = 1;
+  snowfall.common.v1alpha.TimeZone time_zone = 1;
 }
