@@ -1,12 +1,13 @@
 import datetime
 import struct
-from typing import AsyncIterator, Type, TypeVar
+import zoneinfo
+from typing import AsyncIterator, Type, TypeVar, Union
 
 from aiofiles.threadpool import binary
 from google.protobuf import message, timestamp_pb2
 from google.protobuf.descriptor import EnumDescriptor
 
-from snowfall.common.v1alpha import models_pb2
+from snowfall.common.v1alpha import datetime_pb2, models_pb2
 
 _Proto = TypeVar("_Proto", bound=message.Message)
 
@@ -43,8 +44,39 @@ def datetime_to_protobuf(timestamp: datetime.datetime) -> timestamp_pb2.Timestam
     return proto
 
 
-def protobuf_to_datetime(proto: timestamp_pb2.Timestamp) -> datetime.datetime:
-    return proto.ToDatetime().replace(tzinfo=datetime.timezone.utc)
+def datetime_to_protobuf_datetime(
+    timestamp: datetime.datetime,
+) -> datetime_pb2.DateTime:
+    return datetime_pb2.DateTime(
+        year=timestamp.year,
+        month=timestamp.month,
+        day=timestamp.day,
+        hours=timestamp.hour,
+        minutes=timestamp.minute,
+        seconds=timestamp.second,
+        nanos=timestamp.microsecond * 1000,
+        time_zone=datetime_pb2.TimeZone(
+            id=str(timestamp.tzinfo),
+        ),
+    )
+
+
+def protobuf_to_datetime(
+    proto: Union[timestamp_pb2.Timestamp, datetime_pb2.DateTime],
+) -> datetime.datetime:
+    if isinstance(proto, timestamp_pb2.Timestamp):
+        return proto.ToDatetime().replace(tzinfo=datetime.timezone.utc)
+
+    return datetime.datetime(
+        year=proto.year,
+        month=proto.month,
+        day=proto.day,
+        hour=proto.hours,
+        minute=proto.minutes,
+        second=proto.seconds,
+        microsecond=proto.nanos // 1000,
+        tzinfo=zoneinfo.ZoneInfo(proto.time_zone.id),
+    )
 
 
 def date_to_protobuf(date: datetime.date) -> models_pb2.Date:
