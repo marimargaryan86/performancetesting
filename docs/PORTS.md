@@ -29,3 +29,4 @@ The following ports are configured in local environments by default:
 | 50055 | offers     | gRPC Server |
 | 50056 | schedules  | gRPC Server |
 | 50057 | orders     | gRPC Server |
+| 50058 | geodata    | gRPC Server |

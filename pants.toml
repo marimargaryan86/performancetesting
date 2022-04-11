@@ -36,6 +36,9 @@ config = "vendor/pyproject.toml"
 lockfile = "vendor/lock/black.txt"
 interpreter_constraints = ["CPython==3.9.10"]
 
+[cli.alias]
+all-changed = "--changed-since=HEAD --changed-dependees=transitive"
+
 [coverage-py]
 interpreter_constraints = ["CPython==3.9.10"]
 config = "vendor/pyproject.toml"

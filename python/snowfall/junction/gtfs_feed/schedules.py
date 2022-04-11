@@ -7,9 +7,9 @@ from typing import AsyncIterator, Optional, Sequence
 import more_itertools
 from google.protobuf import timestamp_pb2
 
-from snowfall.common.v1alpha import models_pb2
-from snowfall.geodata import geocoding
+from snowfall.common.v1alpha import latlng_pb2, models_pb2
 from snowfall.junction.gtfs_feed import importer
+from snowfall.service.geodata.v1 import geocoding_pb2, geocoding_pb2_grpc
 from snowfall.stdlib.format.gtfs import constants, datetimes, enums, models
 from snowfall.stdlib.transport import amqp
 
@@ -29,7 +29,7 @@ class _ScheduleContext(object):
 class SchedulesGenerator(object):
     def __init__(
         self,
-        geocoder: geocoding.ReverseGeocoder,
+        geocoder: geocoding_pb2_grpc.GeocodingServiceStub,
         ref: str,
         repository_collection: importer.RepositoryCollection,
     ):
@@ -190,10 +190,16 @@ class SchedulesGenerator(object):
                     latitude=stop.stop_lat or 0,
                     longitude=stop.stop_lon or 0,
                 ),
-                time_zone=await self._geocoder.get_time_zone(
-                    stop.stop_lat or 0,
-                    stop.stop_lon or 0,
-                ),
+                time_zone=(
+                    await self._geocoder.TimeZoneLookup(
+                        geocoding_pb2.TimeZoneLookupRequest(
+                            coordinates=latlng_pb2.LatLng(
+                                latitude=stop.stop_lat or 0,
+                                longitude=stop.stop_lon or 0,
+                            ),
+                        ),
+                    )
+                ).time_zone.id,
             ),
             order=sequence,
         )

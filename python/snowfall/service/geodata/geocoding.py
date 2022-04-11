@@ -1,6 +1,5 @@
 from typing import Awaitable, Callable, Optional
 
-import aioredis
 import timezonefinder
 from geopy import adapters, geocoders
 from pycountry import countries
@@ -9,8 +8,7 @@ _LookupFunc = Callable[[float, float], Awaitable[Optional[str]]]
 
 
 class ReverseGeocoder(object):
-    def __init__(self, redis: aioredis.Redis, user_agent: str):
-        self._redis = redis
+    def __init__(self, user_agent: str):
         self._tz_finder = timezonefinder.TimezoneFinder()
         self._user_agent = user_agent
         self._country_lookup_funcs: list[_LookupFunc] = [
@@ -21,7 +19,7 @@ class ReverseGeocoder(object):
     async def get_country_code(self, latitude: float, longitude: float) -> str:
         return countries.get(
             alpha_2=(
-                await self._cached_country_lookup(
+                await self._country_lookup(
                     latitude=latitude,
                     longitude=longitude,
                 )
@@ -29,32 +27,16 @@ class ReverseGeocoder(object):
         ).alpha_2
 
     async def get_time_zone(self, latitude: float, longitude: float) -> str:
-        cache_key = await self._make_cache_key("time_zones", latitude, longitude)
-        time_zone = await self._redis.get(cache_key)
+        return self._tz_finder.timezone_at(
+            lat=latitude,
+            lng=longitude,
+        )
 
-        if not time_zone:
-            time_zone = self._tz_finder.timezone_at(
-                lat=latitude,
-                lng=longitude,
-            )
-
-            await self._redis.set(cache_key, time_zone)
-
-        return time_zone
-
-    async def _cached_country_lookup(self, latitude: float, longitude: float) -> str:
-        cache_key = await self._make_cache_key("country_codes", latitude, longitude)
-        country_code = await self._redis.get(cache_key)
-
-        if country_code:
-            return country_code
-
+    async def _country_lookup(self, latitude: float, longitude: float) -> str:
         for lookup in self._country_lookup_funcs:
             country_code = await lookup(latitude, longitude)
 
             if country_code:
-                await self._redis.set(cache_key, country_code)
-
                 return country_code
 
         raise RuntimeError("Unable to find country for coordinates.")
@@ -96,15 +78,3 @@ class ReverseGeocoder(object):
             return None
 
         return response.raw["address"]["country_code"].upper()
-
-    async def _make_cache_key(
-        self,
-        namespace: str,
-        latitude: float,
-        longitude: float,
-    ) -> str:
-        return "{namespace}.{lat}_{lng}".format(
-            namespace=namespace,
-            lat=str(latitude).replace(".", "_"),
-            lng=str(longitude).replace(".", "_"),
-        )
