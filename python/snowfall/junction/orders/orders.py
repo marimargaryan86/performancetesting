@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import uuid
 from typing import Sequence
 
@@ -39,3 +41,12 @@ class OrderRepository(
         return await self._find_with_cursor(
             cur=cursor,
         )
+
+    async def update_offer_status(
+        self,
+        order_id: str,
+        offer_id: str,
+        status: offers_pb2.Offer.Status.V,
+    ) -> orders_pb2.Order:
+        # TODO: edit offer status in order with the given status
+        return orders_pb2.Order()

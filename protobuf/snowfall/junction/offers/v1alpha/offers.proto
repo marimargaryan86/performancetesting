@@ -60,6 +60,13 @@ message ListOffersResponse {
 message Offer {
   string id = 1;
   repeated TripOfferResult results = 2;
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_PENDING = 1;
+    STATUS_CONFIRMED = 2;
+    STATUS_REJECTED = 3;
+  }
+  Status status = 3;
 }
 
 message OfferAggregate {
