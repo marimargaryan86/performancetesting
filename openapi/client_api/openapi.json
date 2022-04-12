@@ -345,7 +345,7 @@
         "description": "Used to lookup data for a Segment Identifier."
       }
     },
-    "/segment/{segmentId}/legs": {
+    "/segments/{segmentId}/legs": {
       "parameters": [
         {
           "$ref": "#/components/parameters/segmentId"

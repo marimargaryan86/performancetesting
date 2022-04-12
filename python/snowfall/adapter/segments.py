@@ -31,7 +31,7 @@ class DictClient(Client):
         if segment_id not in self._segments:
             raise NotFoundError()
 
-        return models_pb2.SegmentReference(id=segment_id)
+        return self._segments[segment_id]
 
 
 class GrpcClient(Client):

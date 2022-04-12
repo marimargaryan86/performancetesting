@@ -1,7 +1,8 @@
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.adapter import legs
+from snowfall.adapter import legs as legs_adapter
+from snowfall.adapter import segments as segments_adapter
 from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.client_api import models, resources
 from snowfall.stdlib.format import protobuf
@@ -11,11 +12,11 @@ class Leg(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        client: legs.Client = lagom.injectable,
+        client: legs_adapter.Client = lagom.injectable,
     ) -> responses.Response:
         try:
             leg = await client.get(request.path_params["legId"])
-        except legs.NotFoundError:
+        except legs_adapter.NotFoundError:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
         return models.JsonApiResponse(
@@ -62,6 +63,40 @@ class LegTypes(endpoints.HTTPEndpoint):
                         request,
                     )
                     for leg_type in models_pb2.Schedule.Type.values()
+                ],
+            ),
+        )
+
+
+class LegsBySegmentId(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        legs_client: legs_adapter.Client = lagom.injectable,
+        segments_client: segments_adapter.Client = lagom.injectable,
+    ) -> responses.Response:
+        segment_id = request.path_params["segmentId"]
+        try:
+            segment = await segments_client.get(segment_id)
+        except segments_adapter.NotFoundError:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+        try:
+            legs_page = await legs_client.find_by_ids(
+                segment.leg_ids,
+                limit=len(segment.leg_ids),
+            )
+        except legs_adapter.NotFoundError:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+        return models.JsonApiResponse(
+            models.Body(
+                data=[
+                    resources.LegResource.from_proto(
+                        leg=leg,
+                        request=request,
+                    )
+                    for leg in legs_page.legs
                 ],
             ),
         )

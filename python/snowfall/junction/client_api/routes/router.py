@@ -45,7 +45,11 @@ def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Rou
             segments.Segment,
             name="ViewSegment",
         ),
-        # todo: add GET /segments/{segmentId}/legs
+        dependencies.route(
+            "/segments/{segmentId}/legs",
+            legs.LegsBySegmentId,
+            name="ListLegsBySegmentId",
+        ),
         dependencies.route("/trips/searches", trips.TripSearches),
         dependencies.route(
             "/trips/{tripId}",
