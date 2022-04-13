@@ -2,7 +2,6 @@ package ssim
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -16,107 +15,165 @@ const blockSize = 200
 type block [blockSize]byte
 type blockGroup [blockCount]block
 
+type Result struct {
+	Record interface{}
+	Error  error
+}
+
 type Parser struct{}
 
 func NewParser() *Parser {
 	return &Parser{}
 }
 
-func (p *Parser) Parse(r io.Reader) (*Schedule, error) {
-	scanner := bufio.NewScanner(r)
-	bg, err := p.nextBlock(scanner)
+func (p *Parser) Parse(r io.Reader) chan Result {
+	ch := make(chan Result)
 
-	if err != nil {
-		return &Schedule{}, err
-	}
+	go func() {
+		var s Schedule
+		var c Carrier
+		var fl FlightLeg
+		var sd SegmentData
+		var t Trailer
 
-	s, err := p.parseSchedule(bg[0])
+		defer close(ch)
 
-	if err != nil {
-		return s, err
-	}
+		lastSerialNumber := uint32(0)
+		scanner := bufio.NewScanner(r)
 
-	var c *Carrier
-	var fl *FlightLeg
-	var sd *SegmentData
-	var t *Trailer
+	OuterLoop:
+		for {
+			bg, err := p.nextBlock(scanner)
 
-	lastSerialNumber := s.RecordSerialNumber
-
-OuterLoop:
-	for {
-		bg, err = p.nextBlock(scanner)
-
-		if err != nil {
-			return s, err
-		}
-	InnerLoop:
-		for _, b := range bg {
-			switch b[0] {
-			case carrierRecord:
-				c, err = p.parseCarrier(b)
-
-				if err != nil {
-					return s, err
+			if err != nil {
+				ch <- Result{s, err}
+				break
+			}
+		InnerLoop:
+			for _, b := range bg {
+				if lastSerialNumber == 999999 {
+					lastSerialNumber = 1
 				}
 
-				if lastSerialNumber+1 != c.RecordSerialNumber {
-					return s, errors.New("invalid serial number sequence")
-				}
+				switch b[0] {
+				case headerRecord:
+					s, err = p.parseSchedule(bg[0])
 
-				s.Carriers = append(s.Carriers, c)
-				lastSerialNumber = c.RecordSerialNumber
+					if err != nil {
+						ch <- Result{s, err}
+						break OuterLoop
+					}
 
-				break InnerLoop
-			case flightLegRecord:
-				fl, err = p.parseFlightLeg(b)
+					if lastSerialNumber+1 != s.RecordSerialNumber {
+						ch <- Result{s, fmt.Errorf("invalid serial number sequence, expected %d got %d", lastSerialNumber+1, s.RecordSerialNumber)}
+						break OuterLoop
+					}
 
-				if err != nil {
-					return s, err
-				}
+					lastSerialNumber = s.RecordSerialNumber
 
-				if lastSerialNumber+1 != fl.RecordSerialNumber {
-					return s, errors.New("invalid serial number sequence")
-				}
+					ch <- Result{s, nil}
 
-				c.FlightLegs = append(c.FlightLegs, fl) // todo: records are not necessarily in order
-				lastSerialNumber = fl.RecordSerialNumber
-			case segmentDataRecord:
-				sd, err = p.parseSegmentData(b)
-
-				if err != nil {
-					return s, err
-				}
-
-				if lastSerialNumber+1 != sd.RecordSerialNumber {
-					return s, errors.New("invalid serial number sequence")
-				}
-
-				fl.SegmentData = append(fl.SegmentData, sd) // todo: records are not necessarily in order
-				lastSerialNumber = sd.RecordSerialNumber
-			case trailerRecord:
-				t, err = p.parseTrailer(b)
-
-				if err != nil {
-					return s, err
-				}
-
-				if lastSerialNumber+1 != t.RecordSerialNumber || lastSerialNumber != t.SerialNumberCheckReference {
-					return s, errors.New("invalid serial number sequence")
-				}
-
-				lastSerialNumber = t.RecordSerialNumber
-
-				if t.ContinuationEndCode == Continuation {
 					break InnerLoop
-				}
+				case carrierRecord:
+					c, err = p.parseCarrier(b)
 
-				break OuterLoop
+					if err != nil {
+						ch <- Result{c, err}
+						break OuterLoop
+					}
+
+					if lastSerialNumber+1 != c.RecordSerialNumber {
+						ch <- Result{c, fmt.Errorf("invalid serial number sequence, expected %d got %d", lastSerialNumber+1, c.RecordSerialNumber)}
+						break OuterLoop
+					}
+
+					lastSerialNumber = c.RecordSerialNumber
+
+					ch <- Result{c, nil}
+
+					break InnerLoop
+				case flightLegRecord:
+					fl, err = p.parseFlightLeg(b)
+
+					if err != nil {
+						ch <- Result{fl, err}
+						break OuterLoop
+					}
+
+					if lastSerialNumber+1 != fl.RecordSerialNumber {
+						ch <- Result{fl, fmt.Errorf("invalid serial number sequence, expected %d got %d", lastSerialNumber+1, fl.RecordSerialNumber)}
+						break OuterLoop
+					}
+
+					lastSerialNumber = fl.RecordSerialNumber
+
+					if fl.PeriodOfOperationTo.IsZero() {
+						if c.ScheduleValidTo.IsZero() {
+							fl.PeriodOfOperationTo = time.Date(
+								c.ScheduleValidFrom.Year()+1,
+								c.ScheduleValidFrom.Month(),
+								c.ScheduleValidFrom.Day()-1,
+								c.ScheduleValidFrom.Hour(),
+								c.ScheduleValidFrom.Minute(),
+								c.ScheduleValidFrom.Second(),
+								c.ScheduleValidFrom.Nanosecond(),
+								c.ScheduleValidFrom.Location(),
+							)
+						} else {
+							fl.PeriodOfOperationTo = c.ScheduleValidTo
+						}
+					}
+
+					ch <- Result{fl, nil}
+				case segmentDataRecord:
+					sd, err = p.parseSegmentData(b)
+
+					if err != nil {
+						ch <- Result{sd, err}
+						break OuterLoop
+					}
+
+					if lastSerialNumber+1 != sd.RecordSerialNumber {
+						ch <- Result{sd, fmt.Errorf("invalid serial number sequence, expected %d got %d", lastSerialNumber+1, sd.RecordSerialNumber)}
+						break OuterLoop
+					}
+
+					lastSerialNumber = sd.RecordSerialNumber
+
+					ch <- Result{sd, nil}
+				case trailerRecord:
+					t, err = p.parseTrailer(b)
+
+					if err != nil {
+						ch <- Result{t, err}
+						break OuterLoop
+					}
+
+					if lastSerialNumber+1 != t.RecordSerialNumber {
+						ch <- Result{t, fmt.Errorf("invalid serial number sequence, expected %d got %d", lastSerialNumber+1, t.RecordSerialNumber)}
+						break OuterLoop
+					}
+
+					if lastSerialNumber != t.SerialNumberCheckReference {
+						ch <- Result{t, fmt.Errorf("invalid serial number check reference, expected %d got %d", lastSerialNumber, t.SerialNumberCheckReference)}
+						break OuterLoop
+					}
+
+					lastSerialNumber = t.RecordSerialNumber
+
+					ch <- Result{t, nil}
+
+					if t.ContinuationEndCode == Continuation {
+						break InnerLoop
+					}
+
+					break OuterLoop
+				}
 			}
 		}
-	}
+	}()
 
-	return s, nil
+	return ch
 }
 
 func (p *Parser) nextBlock(s *bufio.Scanner) (blockGroup, error) {
@@ -132,16 +189,8 @@ func (p *Parser) nextBlock(s *bufio.Scanner) (blockGroup, error) {
 }
 
 // parseSchedule parses a block of record type 1 (header record).
-//
-// 1:1		Record Type				Mandatory	numeric, always 1
-// 2:35		Title of Contents		Mandatory	always reads AIRLINE STANDARD SCHEDULE DATA SET
-// 36:40	(Spare)					Mandatory	blank fill
-// 41:41	Number of Seasons		Optional	numeric, blank fill
-// 42:191	(Spare)					Mandatory	blank fill
-// 192:194	Data Set Serial Number	Mandatory	numeric
-// 195:200	Record Serial Number	Mandatory	numeric, always 000001
-func (p *Parser) parseSchedule(b block) (*Schedule, error) {
-	s := &Schedule{}
+func (p *Parser) parseSchedule(b block) (Schedule, error) {
+	s := Schedule{}
 
 	if b[0] != headerRecord {
 		return s, fmt.Errorf("record type must be '%c', '%c' parsed", headerRecord, b[0])
@@ -188,35 +237,14 @@ func (p *Parser) parseSchedule(b block) (*Schedule, error) {
 		s.NumberOfSeasons = uint8(numOfSeasonsInt)
 	}
 
-	s.Carriers = make([]*Carrier, 0)
-
 	return s, nil
 }
 
 // parseCarrier parses a block of record type 2 (carrier record).
-//
-// 1:1		Record Type							Mandatory	numeric, always 2
-// 2:2		Time Mode							Mandatory 	either U (UTC) or L (Local Time)
-// 3:5		Airline Designator					Mandatory	IATA or ICAO code, left justify
-// 6:10		(Spare)								Mandatory	blank fill
-// 11:13	Season								Optional	Syy or Wyy, blank fill
-// 14:14	(Spare)								Mandatory
-// 15:28	Period of Schedule Validity			Mandatory	e.g. 28MAR0130OCT01
-// 29:35	Creation Date						Mandatory	e.g. 01APR90
-// 36:64	Title of Data						Optional	free format, blank fill
-// 65:71	Release (Sell) Date					Optional	e.g. 14MAR01, or blank fill
-// 72:72	Schedule Status						Mandatory	either P (Provisional) or C (Confirmed)
-// 73:107	Creator Reference					Optional	free format, blank fill
-// 108:108	Duplicate Airline Designator Marker	Conditional	blank fill
-// 109:169	General Information					Optional	free format, blank fill
-// 170:188	In-Flight Service Information		Optional	right justified, blank fill
-// 189:190	Electronic Ticketing Information	Optional	either EN (Not Electronic Ticketing Candidate) or ET (Electronic Ticketing Candidate)
-// 191:194	Creation Time						Mandatory	e.g. 1346
-// 195:200	Record Serial Number				Mandatory	numeric, zero fill, right justified
-func (p *Parser) parseCarrier(b block) (*Carrier, error) {
+func (p *Parser) parseCarrier(b block) (Carrier, error) {
 	var err error
 
-	c := &Carrier{}
+	c := Carrier{}
 
 	if b[0] != carrierRecord {
 		return c, fmt.Errorf("record type must be '%c', '%c' parsed", carrierRecord, b[0])
@@ -306,61 +334,12 @@ func (p *Parser) parseCarrier(b block) (*Carrier, error) {
 
 	c.RecordSerialNumber = uint32(recordSerialNumber)
 
-	c.FlightLegs = make([]*FlightLeg, 0)
-
 	return c, err
 }
 
 // parseFlightLeg parses a block of record type 3 (flight leg record).
-//
-// 1:1		Record Type										Mandatory	numeric, always 3
-// 2:2		Operational Suffix								Conditional	blank fill
-// 3:5		Airline Designator								Mandatory	IATA or ICAO code, left justified
-// 6:9		Flight Number									Mandatory	right justified, blank fill
-// 10:11	Itinerary Variation Identifier					Mandatory	number between 01 and 99
-// 12:13	Leg Sequence Number								Mandatory   number between 01 and 99
-// 14:14	Service Type									Mandatory	alpha
-// 15:28	Period of Operation								Mandatory	e.g. 28MAR0130OCT01
-// 29:35	Day(s) of Operation								Mandatory	blank filled for non-operational days
-// 36:36	Frequency Rate									Conditional	blank fill
-// 37:39	Departure Station								Mandatory	3-character IATA code
-// 40:43	Scheduled Time of Passenger Departure			Mandatory
-// 44:47	Scheduled Time of Aircraft Departure			Mandatory
-// 48:52	UTC/Local Time Variation (Departure)			Mandatory	hours and minutes variation from UTC
-// 53:54	Passenger Terminal (Departure)					Conditional	alphanumeric, left justify, blank fill
-// 55:57	Arrival Station									Mandatory	3-character IATA code
-// 58:61	Scheduled Time of Aircraft Arrival				Mandatory
-// 62:65	Scheduled Time of Passenger Arrival				Mandatory
-// 66:70	UTC/Local Time Variation (Arrival)				Mandatory	hours and minutes variation from UTC
-// 71:72	Passenger Terminal (Arrival)					Conditional	alphanumeric, left justify, blank fill
-// 73:75	Aircraft Type									Mandatory	ATA/IATA aircraft type
-// 76:95	Passenger Reservations Booking Designator		Conditional	blank fill
-// 96:100	Passenger Reservations Booking Modifier			Conditional	blank fill by passenger reservations booking designator class
-// 101:110 	Meal Service Note								Optional	blank fill by passenger reservations booking designator class
-// 111:119	Joint Operation Airline Designators				Conditional	left justify and blank fill if fewer than three carriers
-// 120:121	Minimum Connection Time Status					Optional	blank fill, two character combination of D and/or I
-// 122:122	Secure Flight Indicator							Optional	blank fill, S if subject to regulations
-// 123:127	(Spare)											Mandatory	blank fill
-// 128:128	Itinerary Variation Identifier Overflow			Conditional	blank fill
-// 129:131	Aircraft Owner									Conditional left justify, blank fill
-// 132:134	Cockpit Crew Employer							Conditional	left justify, blank fill
-// 135:137	Cabin Crew Employer								Conditional left justify, blank fill
-// 138:146	Onward Flight									Optional	blank fill
-// 138:140	- Airline Designator							Mandatory	left justify, blank fill
-// 141:144	- Flight Number									Mandatory	right justify, blank fill
-// 145:145	- Aircraft Rotation Layover						Conditional	blank fill
-// 146:146	- Operational Suffix							Conditional	blank fill
-// 147:147	(Spare)											Mandatory	blank fill
-// 148:148	Flight Transit Layover							Conditional	blank fill
-// 149:149	Operating Airline Disclosure					Conditional	blank fill
-// 150:160	Traffic Restriction Code						Conditional blank fill
-// 161:161	Traffic Restriction Code Leg Overflow Indicator	Conditional	blank fill
-// 162:172	(Spare)											Mandatory	blank fill
-// 173:192	Aircraft Configuration/Version					Conditional	blank fill
-// 193:194	Date Variation									Optional	blank fill
-// 195:200	Record Serial Number							Mandatory	numeric, zero fill, right justified
-func (p *Parser) parseFlightLeg(b block) (*FlightLeg, error) {
-	fl := &FlightLeg{}
+func (p *Parser) parseFlightLeg(b block) (FlightLeg, error) {
+	fl := FlightLeg{}
 
 	if b[0] != flightLegRecord {
 		return fl, fmt.Errorf("record type must be '%c', '%c' parsed", flightLegRecord, b[0])
@@ -455,7 +434,17 @@ func (p *Parser) parseFlightLeg(b block) (*FlightLeg, error) {
 	fl.JointOperationAirlineDesignators = string(b[110:119])
 	fl.MinimumConnectingTimeStatus = string(b[119:121])
 	fl.SecureFlightIndicator = string(b[121])
-	fl.ItineraryVariationIdentifierOverflow = string(b[127])
+
+	if string(b[127]) == " " {
+		fl.ItineraryVariationIdentifierOverflow = 0
+	} else {
+		fl.ItineraryVariationIdentifierOverflow, err = strconv.Atoi(string(b[127]))
+
+		if err != nil {
+			return fl, fmt.Errorf("unable to convert itinerary variation identifier overflow: %w", err)
+		}
+	}
+
 	fl.AircraftOwner = string(b[128:131])
 	fl.CockpitCrewEmployer = string(b[131:134])
 	fl.CabinCrewEmployer = string(b[134:137])
@@ -485,13 +474,12 @@ func (p *Parser) parseFlightLeg(b block) (*FlightLeg, error) {
 	}
 
 	fl.RecordSerialNumber = uint32(recordSerialNumber)
-	fl.SegmentData = make([]*SegmentData, 0)
 
 	return fl, nil
 }
 
-func (p *Parser) parseSegmentData(b block) (*SegmentData, error) {
-	sd := &SegmentData{}
+func (p *Parser) parseSegmentData(b block) (SegmentData, error) {
+	sd := SegmentData{}
 
 	if b[0] != segmentDataRecord {
 		return sd, fmt.Errorf("record type must be '%c', '%c' parsed", segmentDataRecord, b[0])
@@ -538,8 +526,8 @@ func (p *Parser) parseSegmentData(b block) (*SegmentData, error) {
 	return sd, nil
 }
 
-func (p *Parser) parseTrailer(b block) (*Trailer, error) {
-	t := &Trailer{}
+func (p *Parser) parseTrailer(b block) (Trailer, error) {
+	t := Trailer{}
 
 	if b[0] != trailerRecord {
 		return t, fmt.Errorf("record type must be '%c', '%c' parsed", trailerRecord, b[0])

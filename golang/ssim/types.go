@@ -32,7 +32,6 @@ type Schedule struct {
 	NumberOfSeasons     uint8
 	DataSetSerialNumber uint16
 	RecordSerialNumber  uint32
-	Carriers            []*Carrier
 }
 
 type Carrier struct {
@@ -51,7 +50,6 @@ type Carrier struct {
 	CreationDate                   time.Time
 	ReleaseSellDate                time.Time
 	DuplicateAirlineDesignator     bool
-	FlightLegs                     []*FlightLeg
 }
 
 type FlightLeg struct {
@@ -82,7 +80,7 @@ type FlightLeg struct {
 	JointOperationAirlineDesignators           string
 	MinimumConnectingTimeStatus                string
 	SecureFlightIndicator                      string
-	ItineraryVariationIdentifierOverflow       string
+	ItineraryVariationIdentifierOverflow       int
 	AircraftOwner                              string
 	CockpitCrewEmployer                        string
 	CabinCrewEmployer                          string
@@ -97,7 +95,6 @@ type FlightLeg struct {
 	AircraftConfigurationVersion               string
 	DateVariation                              string
 	RecordSerialNumber                         uint32
-	SegmentData                                []*SegmentData
 }
 
 type SegmentData struct {

@@ -4,7 +4,7 @@
 go:lint:
   stage: test
   interruptible: true
-  image: golangci/golangci-lint:v1.40.1
+  image: golangci/golangci-lint:v1.45.2
   before_script:
     - cd golang/
   script:
@@ -19,10 +19,10 @@ go:lint:
 go:test:
   stage: test
   interruptible: true
-  image: golang:1.16
+  image: golang:1.18
   before_script:
+    - go install github.com/boumenot/gocover-cobertura@latest
     - cd golang/
-    - go get github.com/boumenot/gocover-cobertura
   script:
     - go test -bench . -coverprofile coverage.txt -covermode count ./...
     - gocover-cobertura <coverage.txt >coverage.xml
