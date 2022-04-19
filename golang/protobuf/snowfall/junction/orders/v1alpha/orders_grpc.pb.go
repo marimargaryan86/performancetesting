@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 type OrderServiceClient interface {
 	EnqueueOrder(ctx context.Context, in *EnqueueOrderRequest, opts ...grpc.CallOption) (*EnqueueOrderResponse, error)
 	GetOrder(ctx context.Context, in *GetOrderRequest, opts ...grpc.CallOption) (*GetOrderResponse, error)
+	ListOrders(ctx context.Context, in *ListOrdersRequest, opts ...grpc.CallOption) (*ListOrdersResponse, error)
 }
 
 type orderServiceClient struct {
@@ -48,12 +49,22 @@ func (c *orderServiceClient) GetOrder(ctx context.Context, in *GetOrderRequest, 
 	return out, nil
 }
 
+func (c *orderServiceClient) ListOrders(ctx context.Context, in *ListOrdersRequest, opts ...grpc.CallOption) (*ListOrdersResponse, error) {
+	out := new(ListOrdersResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.junction.orders.v1alpha.OrderService/ListOrders", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OrderServiceServer is the server API for OrderService service.
 // All implementations should embed UnimplementedOrderServiceServer
 // for forward compatibility
 type OrderServiceServer interface {
 	EnqueueOrder(context.Context, *EnqueueOrderRequest) (*EnqueueOrderResponse, error)
 	GetOrder(context.Context, *GetOrderRequest) (*GetOrderResponse, error)
+	ListOrders(context.Context, *ListOrdersRequest) (*ListOrdersResponse, error)
 }
 
 // UnimplementedOrderServiceServer should be embedded to have forward compatible implementations.
@@ -65,6 +76,9 @@ func (UnimplementedOrderServiceServer) EnqueueOrder(context.Context, *EnqueueOrd
 }
 func (UnimplementedOrderServiceServer) GetOrder(context.Context, *GetOrderRequest) (*GetOrderResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOrder not implemented")
+}
+func (UnimplementedOrderServiceServer) ListOrders(context.Context, *ListOrdersRequest) (*ListOrdersResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListOrders not implemented")
 }
 
 // UnsafeOrderServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -114,6 +128,24 @@ func _OrderService_GetOrder_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _OrderService_ListOrders_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListOrdersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderServiceServer).ListOrders(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.junction.orders.v1alpha.OrderService/ListOrders",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderServiceServer).ListOrders(ctx, req.(*ListOrdersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // OrderService_ServiceDesc is the grpc.ServiceDesc for OrderService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -128,6 +160,10 @@ var OrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetOrder",
 			Handler:    _OrderService_GetOrder_Handler,
+		},
+		{
+			MethodName: "ListOrders",
+			Handler:    _OrderService_ListOrders_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

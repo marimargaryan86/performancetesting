@@ -11,6 +11,11 @@ import (
 	"time"
 )
 
+const airPrefixSeconds = 5400
+const airSuffixSeconds = 3600
+const railPrefixSeconds = 1800
+const railSuffixSeconds = 900
+
 type raptor struct {
 	best          *sync.Map
 	connections   map[uint64]map[uint8]interface{}
@@ -207,13 +212,20 @@ func (r *raptor) routeWorker(wg *sync.WaitGroup, jobs chan uint64, results chan 
 
 		for _, p := range qRoute.RouteStops[qRouteSegment.Order:] {
 			routeSegment := r.data.RouteStopBySequence(p)
-			transferTime := r.data.StopBySequence(routeSegment.Stop).TransferTime
 
-			var tripSegment *planner.ScheduleStop
+			var arrival uint32
 
 			if current != nil {
-				tripSegment = r.data.ScheduleStopBySequence(current.ScheduleStops[routeSegment.Order])
-				arrival := tripSegment.ArrivalAt + transferTime
+				tripSegment := r.data.ScheduleStopBySequence(current.ScheduleStops[routeSegment.Order])
+				arrival = tripSegment.ArrivalAt
+
+				// adds additional transfer time based on origin type
+				switch r.data.ScheduleBySequence(tripSegment.Schedule).Type {
+				case models.Schedule_TYPE_AIR:
+					arrival += airSuffixSeconds
+				case models.Schedule_TYPE_RAIL:
+					arrival += railSuffixSeconds
+				}
 
 				if r.isBetter(tripSegment.Stop, arrival) {
 					results <- workerResult{
@@ -227,7 +239,7 @@ func (r *raptor) routeWorker(wg *sync.WaitGroup, jobs chan uint64, results chan 
 
 			previousArrival, ok := r.rounds[r.round-1].Load(routeSegment.Stop)
 
-			if ok && (current == nil || previousArrival.(uint32) < tripSegment.ArrivalAt+transferTime) {
+			if ok && (current == nil || previousArrival.(uint32) < arrival) {
 				current = nil
 				index, ok := r.trips.Load(qRoute.Sequence)
 
@@ -235,7 +247,7 @@ func (r *raptor) routeWorker(wg *sync.WaitGroup, jobs chan uint64, results chan 
 					index = sort.Search(len(qRoute.Schedules)-1, func(i int) bool {
 						trip := r.data.ScheduleBySequence(qRoute.Schedules[i])
 						tripSegment := r.data.ScheduleStopBySequence(trip.ScheduleStops[routeSegment.Order])
-						return tripSegment.DepartureAt > previousArrival.(uint32)
+						return tripSegment.DepartureAt > r.earliestPossibleDeparture(tripSegment, previousArrival.(uint32))
 					})
 					r.trips.Store(qRoute.Sequence, index)
 				}
@@ -262,7 +274,7 @@ func (r *raptor) routeWorker(wg *sync.WaitGroup, jobs chan uint64, results chan 
 						continue
 					}
 
-					if departure < previousArrival.(uint32) {
+					if departure < r.earliestPossibleDeparture(tripSegment, previousArrival.(uint32)) {
 						break
 					}
 
@@ -273,6 +285,22 @@ func (r *raptor) routeWorker(wg *sync.WaitGroup, jobs chan uint64, results chan 
 			}
 		}
 	}
+}
+
+// adds additional transfer time based on destination type
+func (r *raptor) earliestPossibleDeparture(target *planner.ScheduleStop, previousArrival uint32) uint32 {
+	if r.round == 1 {
+		return previousArrival
+	}
+
+	switch r.data.ScheduleBySequence(target.Schedule).Type {
+	case models.Schedule_TYPE_AIR:
+		previousArrival += airPrefixSeconds
+	case models.Schedule_TYPE_RAIL:
+		previousArrival += railPrefixSeconds
+	}
+
+	return previousArrival
 }
 
 func (r *raptor) scanTransfers() {
