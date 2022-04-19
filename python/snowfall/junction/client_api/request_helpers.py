@@ -1,4 +1,5 @@
-from typing import Any, Mapping
+import dataclasses
+from typing import Any, Mapping, Optional, Sequence
 
 from starlette import requests
 
@@ -38,3 +39,23 @@ def _flatten_data(resource_data: Mapping[str, Any]) -> dict[str, Any]:
         flattened.update(_flatten_relationships(resource_data["relationships"]))
 
     return flattened
+
+
+@dataclasses.dataclass(frozen=True)
+class SequencePage(object):
+    sequence: Sequence[Any]
+    next_page_token: Optional[int] = None
+
+
+async def sequence_paginator(
+    sequence: Sequence[Any],
+    limit: int,
+    cursor: int = 0,
+) -> SequencePage:
+    start_index = cursor
+    end_index = cursor + limit
+
+    return SequencePage(
+        sequence=sequence[start_index:end_index],
+        next_page_token=end_index,  # TODO: what if index exceeds length?
+    )

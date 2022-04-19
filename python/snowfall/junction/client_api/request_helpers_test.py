@@ -69,3 +69,21 @@ def test_request_is_flattened(
     expected: Mapping[str, Any],
 ) -> None:
     assert request_helpers.flatten_request_body(request_data) == expected
+
+
+async def test_sequence_paginator_empty() -> None:
+    page = await request_helpers.sequence_paginator(
+        sequence=[],
+        limit=1,
+    )
+
+    assert not page.sequence
+
+
+async def test_sequence_paginator_limit_over_length() -> None:
+    page = await request_helpers.sequence_paginator(
+        sequence=[1, 2, 3, 4],
+        limit=3,
+        cursor=2,
+    )
+    assert page.sequence == [3, 4]
