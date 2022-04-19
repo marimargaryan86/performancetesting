@@ -1,8 +1,10 @@
 import lagom
+from furl import furl
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.adapter import legs as legs_adapter
 from snowfall.adapter import segments as segments_adapter
+from snowfall.adapter import trips as trips_adapter
 from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.client_api import models, resources
 from snowfall.stdlib.format import protobuf
@@ -88,6 +90,52 @@ class LegsBySegmentId(endpoints.HTTPEndpoint):
             )
         except legs_adapter.NotFoundError:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+        return models.JsonApiResponse(
+            models.Body(
+                data=[
+                    resources.LegResource.from_proto(
+                        leg=leg,
+                        request=request,
+                    )
+                    for leg in legs_page.legs
+                ],
+            ),
+        )
+
+
+class LegsByTripId(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        legs_client: legs_adapter.Client = lagom.injectable,
+        trips_client: trips_adapter.Client = lagom.injectable,
+    ) -> responses.Response:
+        cursor = request.query_params["page[cursor]"]
+        limit = int(request.query_params["page[limit]"])
+
+        try:
+            trip = await trips_client.get(request.path_params["tripId"])
+        except trips_adapter.NotFoundError:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+        try:
+            legs_page = await legs_client.find_by_ids(
+                [leg_id for segment in trip.segments for leg_id in segment.leg_ids],
+                limit=limit,
+                cursor=cursor,
+            )
+        except legs_adapter.NotFoundError:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+        next_url = furl(
+            request.url_for(
+                "ListLegsByTripId",
+                tripId=request.path_params["tripId"],
+            ),
+        )
+        next_url.args["page[cursor]"] = legs_page.next_page_token
+        next_url.args["page[limit]"] = limit
 
         return models.JsonApiResponse(
             models.Body(

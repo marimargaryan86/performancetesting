@@ -36,3 +36,11 @@ class TestLegs(object):
     def test_segment_legs_are_found(self, client: testclient.TestClient) -> None:
         response = client.get("/segments/{id}/legs".format(id=fixtures.SEGMENTS[0]))
         assert response.status_code == status.HTTP_200_OK
+
+    def test_trip_legs_are_not_found(self, client: testclient.TestClient) -> None:
+        response = client.get("/trips/{id}/legs".format(id=fixtures.NOT_FOUND))
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_trip_legs_are_found(self, client: testclient.TestClient) -> None:
+        response = client.get("/trips/{id}/legs".format(id=fixtures.TRIPS[0]))
+        assert response.status_code == status.HTTP_200_OK
