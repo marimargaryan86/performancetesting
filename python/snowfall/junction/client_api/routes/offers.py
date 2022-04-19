@@ -109,7 +109,7 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
             cursor=cursor,
             limit=limit,
         )
-        next_url = furl(request.url_for("ListPlaces"))
+        next_url = furl(request.url_for("ViewOffersByOfferSearch"))
         next_url.args["page[cursor]"] = offers_page.next_page_token
         next_url.args["page[limit]"] = limit
 
