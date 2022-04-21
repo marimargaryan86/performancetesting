@@ -11,6 +11,7 @@ from snowfall.adapter import (
     offer_searches,
     offers,
     orders,
+    passenger_name_records,
     places,
     schedules,
     segments,
@@ -52,6 +53,11 @@ def legs_client() -> legs.Client:
 @pytest.fixture
 def places_client() -> places.Client:
     return places.DictClient(fixtures.get_places())
+
+
+@pytest.fixture
+def passenger_name_records_client() -> passenger_name_records.Client:
+    return passenger_name_records.DictClient(fixtures.get_passenger_name_records())
 
 
 @pytest.fixture
