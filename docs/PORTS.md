@@ -30,3 +30,4 @@ The following ports are configured in local environments by default:
 | 50056 | schedules  | gRPC Server |
 | 50057 | orders     | gRPC Server |
 | 50058 | geodata    | gRPC Server |
+| 50059 | passenger-name-records       | gRPC Server |
