@@ -8,6 +8,9 @@ from starlette import endpoints, exceptions, requests, responses, status
 from snowfall.adapter import places, segments, trip_searches, trips
 from snowfall.junction.client_api import models, request_helpers, resources
 
+_PAGE_LIMIT = "page[limit]"
+_PAGE_CURSOR = "page[cursor]"
+
 
 class Trip(endpoints.HTTPEndpoint):
     async def get(
@@ -42,6 +45,24 @@ class TripSegments(endpoints.HTTPEndpoint):
         except trips.NotFoundError:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
+        cursor = request.query_params[_PAGE_CURSOR]
+        limit = int(request.query_params[_PAGE_LIMIT])
+
+        sequence_page = await request_helpers.sequence_paginator(
+            sequence=trip.segments,
+            limit=limit,
+            cursor=int(cursor) if cursor else 0,
+        )
+
+        next_url = furl(
+            request.url_for(
+                "ListTripSegments",
+                tripId=request.path_params["tripId"],
+            ),
+        )
+        next_url.args[_PAGE_CURSOR] = sequence_page.next_page_token
+        next_url.args[_PAGE_LIMIT] = limit
+
         return models.JsonApiResponse(
             models.Body(
                 data=[
@@ -49,8 +70,11 @@ class TripSegments(endpoints.HTTPEndpoint):
                         segment=segment,
                         request=request,
                     )
-                    for segment in trip.segments
+                    for segment in sequence_page.sequence
                 ],
+                links={
+                    "next": next_url.url,
+                },
             ),
         )
 
@@ -125,8 +149,8 @@ class TripsByTripSearch(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: trip_searches.Client = lagom.injectable,
     ) -> responses.Response:
-        cursor = request.query_params["page[cursor]"]
-        limit = int(request.query_params["page[limit]"])
+        cursor = request.query_params[_PAGE_CURSOR]
+        limit = int(request.query_params[_PAGE_LIMIT])
 
         try:
             response = await client.list_trips_by_trip_search(
@@ -143,8 +167,8 @@ class TripsByTripSearch(endpoints.HTTPEndpoint):
                 tripSearchId=request.path_params["tripSearchId"],
             ),
         )
-        next_url.args["page[cursor]"] = response.next_page_token
-        next_url.args["page[limit]"] = limit
+        next_url.args[_PAGE_CURSOR] = response.next_page_token
+        next_url.args[_PAGE_LIMIT] = limit
 
         return models.JsonApiResponse(
             models.Body(

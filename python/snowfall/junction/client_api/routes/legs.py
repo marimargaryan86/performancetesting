@@ -7,7 +7,6 @@ from snowfall.adapter import segments as segments_adapter
 from snowfall.adapter import trips as trips_adapter
 from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.client_api import models, resources
-from snowfall.junction.client_api.request_helpers import sequence_paginator
 from snowfall.stdlib.format import protobuf
 
 _PAGE_LIMIT = "page[limit]"
@@ -61,19 +60,6 @@ class LegTypes(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
     ) -> responses.Response:
-        cursor = request.query_params[_PAGE_CURSOR]
-        limit = int(request.query_params[_PAGE_LIMIT])
-
-        sequence_page = await sequence_paginator(
-            sequence=models_pb2.Schedule.Type.values(),
-            limit=limit,
-            cursor=int(cursor) if cursor else 0,
-        )
-
-        next_url = furl(request.url_for("ListLegTypes"))
-        next_url.args[_PAGE_CURSOR] = sequence_page.next_page_token
-        next_url.args[_PAGE_LIMIT] = limit
-
         return models.JsonApiResponse(
             models.Body(
                 data=[
@@ -81,11 +67,8 @@ class LegTypes(endpoints.HTTPEndpoint):
                         leg_type,
                         request,
                     )
-                    for leg_type in sequence_page.sequence
+                    for leg_type in models_pb2.Schedule.Type.values()
                 ],
-                links={
-                    "next": next_url.url,
-                },
             ),
         )
 
@@ -131,8 +114,8 @@ class LegsByTripId(endpoints.HTTPEndpoint):
         legs_client: legs_adapter.Client = lagom.injectable,
         trips_client: trips_adapter.Client = lagom.injectable,
     ) -> responses.Response:
-        cursor = request.query_params["page[cursor]"]
-        limit = int(request.query_params["page[limit]"])
+        cursor = request.query_params[_PAGE_CURSOR]
+        limit = int(request.query_params[_PAGE_LIMIT])
 
         try:
             trip = await trips_client.get(request.path_params["tripId"])
@@ -154,8 +137,8 @@ class LegsByTripId(endpoints.HTTPEndpoint):
                 tripId=request.path_params["tripId"],
             ),
         )
-        next_url.args["page[cursor]"] = legs_page.next_page_token
-        next_url.args["page[limit]"] = limit
+        next_url.args[_PAGE_CURSOR] = legs_page.next_page_token
+        next_url.args[_PAGE_LIMIT] = limit
 
         return models.JsonApiResponse(
             models.Body(

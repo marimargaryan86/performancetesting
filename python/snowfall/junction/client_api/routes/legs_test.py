@@ -1,5 +1,3 @@
-from urllib.parse import parse_qs, urlparse
-
 from starlette import status, testclient
 
 from snowfall import fixtures
@@ -46,21 +44,3 @@ class TestLegs(object):
     def test_trip_legs_are_found(self, client: testclient.TestClient) -> None:
         response = client.get("/trips/{id}/legs".format(id=fixtures.TRIPS[0]))
         assert response.status_code == status.HTTP_200_OK
-
-    def test_all_leg_types_are_found(self, client: testclient.TestClient) -> None:
-        response = client.get("/legs/types")
-        assert response.status_code == status.HTTP_200_OK
-
-    def test_all_leg_types_pagination(self, client: testclient.TestClient) -> None:
-        limit = 2
-        cursor = 1
-        response = client.get(
-            "/legs/types",
-            params={"page[cursor]": cursor, "page[limit]": limit},
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        body = response.json()
-        assert len(body["data"]) == 2
-        next_url = urlparse(body["links"]["next"]).query
-        assert int(parse_qs(next_url)["page[cursor]"][0]) == cursor + limit
