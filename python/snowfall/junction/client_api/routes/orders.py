@@ -84,3 +84,34 @@ class Orders(endpoints.HTTPEndpoint):
             ),
             status.HTTP_201_CREATED,
         )
+
+
+class AddOffersToOrder(endpoints.HTTPEndpoint):
+    async def post(
+        self,
+        request: requests.Request,
+        orders_client: orders.Client = lagom.injectable,
+        offer_ids_to_offers: OfferIdsToOffers = lagom.injectable,
+    ) -> responses.Response:
+        body = await request.json()
+        try:
+            offers = await offer_ids_to_offers.transform(
+                [offer["id"] for offer in body["data"]],
+            )
+        except MissingOffersError:
+            raise exceptions.HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+        order = await orders_client.add_offers(
+            order_id=request.path_params["orderId"],
+            offers=offers,
+        )
+
+        return models.JsonApiResponse(
+            models.Body(
+                data=resources.OrderResource.from_proto(
+                    order=order,
+                    request=request,
+                ),
+            ),
+            status.HTTP_202_ACCEPTED,
+        )

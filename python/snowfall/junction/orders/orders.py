@@ -63,3 +63,11 @@ class OrderRepository(
     ) -> orders_pb2.Order:
         # TODO: edit offer status in order with the given status
         return orders_pb2.Order()
+
+    async def amend_order(
+        self,
+        order_id: str,
+        offers: Sequence[offers_pb2.Offer],
+    ) -> orders_pb2.Order:
+        # TODO: amend offers to the order, check for duplicates
+        return orders_pb2.Order()

@@ -107,5 +107,9 @@ def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Rou
             orders.Order,
             name="ViewOrder",
         ),
-        # todo: add POST /orders/{orderId}/relationships/offers
+        dependencies.route(
+            "/orders/{orderId}/relationships/offers",
+            orders.AddOffersToOrder,
+            name="AddOffersToOrder",
+        ),
     ]

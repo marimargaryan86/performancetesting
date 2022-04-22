@@ -68,3 +68,43 @@ class TestOrders(object):
             headers={"Content-Type": "application/vnd.api+json"},
         )
         assert response.status_code == status.HTTP_201_CREATED
+
+    async def test_order_cant_be_amended_with_unexisting_offer(
+        self,
+        client: testclient.TestClient,
+    ) -> None:
+        response = client.post(
+            "/orders/{orderId}/relationships/offers".format(
+                orderId=fixtures.ORDERS[0],
+            ),
+            json={
+                "data": [
+                    {
+                        "id": fixtures.NOT_FOUND,
+                        "type": "offers",
+                    },
+                ],
+            },
+            headers={"Content-Type": "application/vnd.api+json"},
+        )
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    async def test_order_can_be_amended_with_existing_offer(
+        self,
+        client: testclient.TestClient,
+    ) -> None:
+        response = client.post(
+            "/orders/{orderId}/relationships/offers".format(
+                orderId=fixtures.ORDERS[0],
+            ),
+            json={
+                "data": [
+                    {
+                        "id": fixtures.OFFERS[0],
+                        "type": "offers",
+                    },
+                ],
+            },
+            headers={"Content-Type": "application/vnd.api+json"},
+        )
+        assert response.status_code == status.HTTP_202_ACCEPTED

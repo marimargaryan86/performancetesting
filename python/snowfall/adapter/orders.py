@@ -45,6 +45,14 @@ class Client(abc.ABC):
     async def get(self, identifier: str) -> orders_pb2.Order:
         """Fetch a order resource."""
 
+    @abc.abstractmethod
+    async def add_offers(
+        self,
+        order_id: str,
+        offers: Sequence[offers_pb2.Offer],
+    ) -> orders_pb2.Order:
+        """Add offers to an order resource."""
+
 
 class DictClient(Client):
     def __init__(self, orders: Sequence[orders_pb2.Order]) -> None:
@@ -66,7 +74,19 @@ class DictClient(Client):
         if order_id not in self._orders:
             raise NotFoundError()
 
-        return orders_pb2.Order(id=order_id)
+        return self._orders[order_id]
+
+    async def add_offers(
+        self,
+        order_id: str,
+        offers: Sequence[offers_pb2.Offer],
+    ) -> orders_pb2.Order:
+        if order_id not in self._orders:
+            raise NotFoundError()
+
+        self._orders[order_id].offers.extend(offers)
+
+        return self._orders[order_id]
 
 
 class GrpcClient(Client):
@@ -108,5 +128,21 @@ class GrpcClient(Client):
                 ) from exc
 
             raise UnknownError() from exc
+
+        return response.order
+
+    async def add_offers(
+        self,
+        order_id: str,
+        offers: Sequence[offers_pb2.Offer],
+    ) -> orders_pb2.Order:
+        try:
+            response = await self._orders.AddOffersToOrder(
+                orders_pb2.AddOffersToOrderRequest(
+                    offers=offers,
+                ),
+            )
+        except grpc.aio.AioRpcError as exc:
+            raise UnknownError(exc.details()) from exc
 
         return response.order

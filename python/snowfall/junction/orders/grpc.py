@@ -38,6 +38,22 @@ class OrderService(
 
         return orders_pb2.GetOrderResponse(order=order)
 
+    async def AddOffersToOrder(  # type: ignore[override] # noqa: N802
+        self,
+        request: orders_pb2.AddOffersToOrderRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> orders_pb2.AddOffersToOrderResponse:
+        order = await self._orders.amend_order(
+            order_id=request.order_id,
+            offers=request.offers,
+        )
+
+        # TODO: maybe it would be better to publish offers instead of orders
+        # because some orders might have already been booked at this point
+        await self._publisher.publish(order)
+
+        return orders_pb2.AddOffersToOrderResponse(order=order)
+
     async def EnqueueOrder(  # type: ignore[override] # noqa: N802
         self,
         request: orders_pb2.EnqueueOrderRequest,
