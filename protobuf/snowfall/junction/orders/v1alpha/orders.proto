@@ -13,6 +13,7 @@ service OrderService {
 message Order {
   string id = 1;
   repeated snowfall.junction.offers.v1alpha.Offer offers = 2;
+  string passenger_name_record = 3;
 }
 
 message EnqueueOrderRequest {

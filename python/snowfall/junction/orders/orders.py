@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import uuid
-from typing import Sequence
+from typing import Any, Sequence
 
+from snowfall.adapter import passenger_name_records as passenger_name_records_adapter
 from snowfall.junction.offers.v1alpha import offers_pb2
 from snowfall.junction.orders.v1alpha import orders_pb2
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
@@ -14,13 +15,25 @@ class OrderRepository(
 ):
     _proto = orders_pb2.Order
 
+    def __init__(
+        self,
+        *args: Any,
+        passenger_name_records: passenger_name_records_adapter.Client,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(*args, **kwargs)
+        self._passenger_name_records = passenger_name_records
+
     async def create_from_offers(
         self,
         offers: Sequence[offers_pb2.Offer],
     ) -> orders_pb2.Order:
 
+        passenger_name_record = await self._passenger_name_records.create()
+
         order = orders_pb2.Order(
             id=str(uuid.uuid4()),
+            passenger_name_record=passenger_name_record.id,
             offers=offers,
         )
 

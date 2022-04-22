@@ -5,9 +5,13 @@ from typing import Sequence
 import pydantic
 from motor import motor_asyncio
 
+from snowfall.adapter import passenger_name_records
 from snowfall.junction.orders import importer, orders
 from snowfall.junction.orders.amqp import OrderProducer
 from snowfall.junction.orders.grpc import OrderService
+from snowfall.junction.passenger_name_records.v1alpha import (
+    passenger_name_records_pb2_grpc,
+)
 from snowfall.stdlib import service
 from snowfall.stdlib.transport import amqp, grpc
 
@@ -18,17 +22,28 @@ class _GrpcSettings(service.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50057
     mongo_dsn: Sequence[pydantic.AnyUrl]
+    passenger_name_records_address: Sequence[str]
 
 
 class _ImportSettings(service.Settings):
     amqp_dsn: Sequence[pydantic.AnyUrl]
     mongo_dsn: Sequence[pydantic.AnyUrl]
+    passenger_name_records_address: Sequence[str]
 
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
+
+    passenger_name_records_client = passenger_name_records.GrpcClient(
+        passenger_name_records=passenger_name_records_pb2_grpc.PassengerNameRecordServiceStub(
+            grpc.aio.insecure_channel(
+                random.choice(app.settings.passenger_name_records_address),  # nosec
+            ),
+        ),
+    )
+
     async with amqp.Connection(
         random.choice(app.settings.amqp_dsn),  # nosec
     ) as connection:
@@ -39,6 +54,7 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
                 OrderService(
                     orders=orders.OrderRepository(
                         mongo.orders.order,
+                        passenger_name_records=passenger_name_records_client,
                     ),
                     publisher=OrderProducer(
                         producer=await amqp.create_producer(
@@ -60,6 +76,14 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
         random.choice(app.settings.mongo_dsn),  # nosec
     )
 
+    passenger_name_records_client = passenger_name_records.GrpcClient(
+        passenger_name_records=passenger_name_records_pb2_grpc.PassengerNameRecordServiceStub(
+            grpc.aio.insecure_channel(
+                random.choice(app.settings.passenger_name_records_address),  # nosec
+            ),
+        ),
+    )
+
     async with amqp.Connection(
         random.choice(app.settings.amqp_dsn),  # nosec
     ) as connection:
@@ -72,6 +96,7 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
             ),
             order_repository=orders.OrderRepository(
                 mongo.orders.order,
+                passenger_name_records=passenger_name_records_client,
             ),
         )
         await order_importer.consume()
