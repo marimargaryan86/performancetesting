@@ -1,0 +1,1597 @@
+{
+  "id": "6e3276c69a7f4fa59f106f242c453d4c",
+  "availableFlights": 10,
+  "flight": [
+    {
+      "id": "32a940332843452ba011cfdd92dc5d98",
+      "isRefundable": false,
+      "docsRequired": false,
+      "gds": "Sabre",
+      "direction": "Outbound",
+      "trips": [
+        {
+          "id": "a9c6c6e622ad470baf3fcc342af4336e",
+          "duration": "03:20:00",
+          "direction": "Outbound",
+          "isRedEye": false,
+          "hasLongConnectionDuration": false,
+          "numberOfStops": 1,
+          "origin": {
+            "airportCode": "ARN"
+          },
+          "destination": {
+            "airportCode": "LHR"
+          },
+          "departure": {
+            "dateTime": "2022-05-24T11:05:00"
+          },
+          "arrival": {
+            "dateTime": "2022-05-24T21:35:00"
+          },
+          "plattingCarrier": {
+            "code": "SK"
+          },
+          "segments": [
+            {
+              "id": "e23a23f0d0194aedb11cdc1bad07a049",
+              "duration": "01:00:00",
+              "distance": 255.0,
+              "cabin": "Economy",
+              "isTechnicalStop": false,
+              "aircraft": {
+                "flightNumber": "849",
+                "equipment": "32N"
+              },
+              "availability": {
+                "bookingCode": "Y",
+                "count": 9
+              },
+              "origin": {
+                "airportCode": "ARN"
+              },
+              "destination": {
+                "airportCode": "OSL"
+              },
+              "departure": {
+                "dateTime": "2022-05-24T11:05:00"
+              },
+              "arrival": {
+                "dateTime": "2022-05-24T12:05:00"
+              },
+              "marketingCarrier": {
+                "code": "SK"
+              },
+              "operatingCarrier": {
+                "code": "SK"
+              },
+              "originTerminal": "5",
+              "onTimePerformance": -1.0,
+              "meal": "V",
+              "layover": "08:10:00",
+              "changeOfPlane": false
+            },
+            {
+              "id": "1c9434909d1a40cf9fc20ad0d3218cec",
+              "duration": "02:20:00",
+              "distance": 724.0,
+              "cabin": "Economy",
+              "isTechnicalStop": false,
+              "aircraft": {
+                "flightNumber": "815",
+                "equipment": "32N"
+              },
+              "availability": {
+                "bookingCode": "Y",
+                "count": 9
+              },
+              "origin": {
+                "airportCode": "OSL"
+              },
+              "destination": {
+                "airportCode": "LHR"
+              },
+              "departure": {
+                "dateTime": "2022-05-24T20:15:00"
+              },
+              "arrival": {
+                "dateTime": "2022-05-24T21:35:00"
+              },
+              "marketingCarrier": {
+                "code": "SK"
+              },
+              "operatingCarrier": {
+                "code": "SK"
+              },
+              "destinationTerminal": "2",
+              "onTimePerformance": -1.0,
+              "meal": "V",
+              "layover": "00:00:00",
+              "changeOfPlane": false
+            }
+          ],
+          "baggageAllowance": [
+            {
+              "weight": 0.0,
+              "unit": "",
+              "pieces": 0,
+              "hasFreeBaggage": false,
+              "passengerType": "ADT"
+            }
+          ],
+          "gds": "Sabre"
+        }
+      ],
+      "pricingInformation": {
+        "base": {
+          "baseFare": 45.0,
+          "totalTax": 58.33,
+          "totalCost": 111.83,
+          "originalCost": 103.33,
+          "serviceFee": 8.5,
+          "currency": "EUR"
+        }
+      },
+      "passengerPricing": [
+        {
+          "passengerType": "ADT",
+          "quantity": 1,
+          "priceInformation": {
+            "baseFare": 45.0,
+            "totalTax": 58.33,
+            "totalCost": 111.83,
+            "originalCost": 103.33,
+            "serviceFee": 8.5,
+            "currency": "EUR"
+          }
+        }
+      ],
+      "outboundTripKey": "ARN_OSL_2022.05.24.11.05_2022.05.24.12.05_SK_SK_849_T_OSL_LHR_2022.05.24.20.15_2022.05.24.21.35_SK_SK_815_T_(111.83, SK)",
+      "inboundTripKey": "_(111.83, SK)"
+    },
+    {
+      "id": "1f04f6cce85d4971be45f4b620a0cc5f",
+      "isRefundable": false,
+      "docsRequired": false,
+      "gds": "Sabre",
+      "direction": "Outbound",
+      "trips": [
+        {
+          "id": "52c9464db8b3495f89b9c87d8138dc5c",
+          "duration": "03:20:00",
+          "direction": "Outbound",
+          "isRedEye": false,
+          "hasLongConnectionDuration": false,
+          "numberOfStops": 1,
+          "origin": {
+            "airportCode": "ARN"
+          },
+          "destination": {
+            "airportCode": "LHR"
+          },
+          "departure": {
+            "dateTime": "2022-05-24T14:25:00"
+          },
+          "arrival": {
+            "dateTime": "2022-05-24T18:30:00"
+          },
+          "plattingCarrier": {
+            "code": "SK"
+          },
+          "segments": [
+            {
+              "id": "6de4e1f6e4994d1083cf7dd7f26df491",
+              "duration": "01:00:00",
+              "distance": 255.0,
+              "cabin": "Economy",
+              "isTechnicalStop": false,
+              "aircraft": {
+                "flightNumber": "867",
+                "equipment": "32N"
+              },
+              "availability": {
+                "bookingCode": "Y",
+                "count": 9
+              },
+              "origin": {
+                "airportCode": "ARN"
+              },
+              "destination": {
+                "airportCode": "OSL"
+              },
+              "departure": {
+                "dateTime": "2022-05-24T14:25:00"
+              },
+              "arrival": {
+                "dateTime": "2022-05-24T15:25:00"
+              },
+              "marketingCarrier": {
+                "code": "SK"
+              },
+              "operatingCarrier": {
+                "code": "SK"
+              },
+              "originTerminal": "5",
+              "onTimePerformance": -1.0,
+              "meal": "V",
+              "layover": "01:45:00",
+              "changeOfPlane": false
+            },
+            {
+              "id": "c3cbfe87607449a6a443db947e2139d1",
+              "duration": "02:20:00",
+              "distance": 724.0,
+              "cabin": "Economy",
+              "isTechnicalStop": false,
+              "aircraft": {
+                "flightNumber": "811",
+                "equipment": "32N"
+              },
+              "availability": {
+                "bookingCode": "Y",
+                "count": 9
+              },
+              "origin": {
+                "airportCode": "OSL"
+              },
+              "destination": {
+                "airportCode": "LHR"
+              },
+              "departure": {
+                "dateTime": "2022-05-24T17:10:00"
+              },
+              "arrival": {
+                "dateTime": "2022-05-24T18:30:00"
+              },
+              "marketingCarrier": {
+                "code": "SK"
+              },
+              "operatingCarrier": {
+                "code": "SK"
+              },
+              "destinationTerminal": "2",
+              "onTimePerformance": -1.0,
+              "meal": "V",
+              "layover": "00:00:00",
+              "changeOfPlane": false
+            }
+          ],
+          "baggageAllowance": [
+            {
+              "weight": 0.0,
+              "unit": "",
+              "pieces": 0,
+              "hasFreeBaggage": false,
+              "passengerType": "ADT"
+            }
+          ],
+          "gds": "Sabre"
+        }
+      ],
+      "pricingInformation": {
+        "base": {
+          "baseFare": 45.0,
+          "totalTax": 58.33,
+          "totalCost": 111.83,
+          "originalCost": 103.33,
+          "serviceFee": 8.5,
+          "currency": "EUR"
+        }
+      },
+      "passengerPricing": [
+        {
+          "passengerType": "ADT",
+          "quantity": 1,
+          "priceInformation": {
+            "baseFare": 45.0,
+            "totalTax": 58.33,
+            "totalCost": 111.83,
+            "originalCost": 103.33,
+            "serviceFee": 8.5,
+            "currency": "EUR"
+          }
+        }
+      ],
+      "outboundTripKey": "ARN_OSL_2022.05.24.14.25_2022.05.24.15.25_SK_SK_867_T_OSL_LHR_2022.05.24.17.10_2022.05.24.18.30_SK_SK_811_T_(111.83, SK)",
+      "inboundTripKey": "_(111.83, SK)"
+    },
+    {
+      "id": "f9ce8e074c3d40aaa7d321714016094e",
+      "isRefundable": false,
+      "docsRequired": false,
+      "gds": "Sabre",
+      "direction": "Outbound",
+      "trips": [
+        {
+          "id": "6c3d7f5cd6ba4152a492db6a2d5d5f56",
+          "duration": "03:20:00",
+          "direction": "Outbound",
+          "isRedEye": false,
+          "hasLongConnectionDuration": false,
+          "numberOfStops": 1,
+          "origin": {
+            "airportCode": "ARN"
+          },
+          "destination": {
+            "airportCode": "LHR"
+          },
+          "departure": {
+            "dateTime": "2022-05-24T14:25:00"
+          },
+          "arrival": {
+            "dateTime": "2022-05-24T21:35:00"
+          },
+          "plattingCarrier": {
+            "code": "SK"
+          },
+          "segments": [
+            {
+              "id": "ee520b6dc10e4f2eaa7962dce30f53cb",
+              "duration": "01:00:00",
+              "distance": 255.0,
+              "cabin": "Economy",
+              "isTechnicalStop": false,
+              "aircraft": {
+                "flightNumber": "867",
+                "equipment": "32N"
+              },
+              "availability": {
+                "bookingCode": "Y",
+                "count": 9
+              },
+              "origin": {
+                "airportCode": "ARN"
+              },
+              "destination": {
+                "airportCode": "OSL"
+              },
+              "departure": {
+                "dateTime": "2022-05-24T14:25:00"
+              },
+              "arrival": {
+                "dateTime": "2022-05-24T15:25:00"
+              },
+              "marketingCarrier": {
+                "code": "SK"
+              },
+              "operatingCarrier": {
+                "code": "SK"
+              },
+              "originTerminal": "5",
+              "onTimePerformance": -1.0,
+              "meal": "V",
+              "layover": "04:50:00",
+              "changeOfPlane": false
+            },
+            {
+              "id": "027ca9e553d04447bade25a817430821",
+              "duration": "02:20:00",
+              "distance": 724.0,
+              "cabin": "Economy",
+              "isTechnicalStop": false,
+              "aircraft": {
+                "flightNumber": "815",
+                "equipment": "32N"
+              },
+              "availability": {
+                "bookingCode": "Y",
+                "count": 9
+              },
+              "origin": {
+                "airportCode": "OSL"
+              },
+              "destination": {
+                "airportCode": "LHR"
+              },
+              "departure": {
+                "dateTime": "2022-05-24T20:15:00"
+              },
+              "arrival": {
+                "dateTime": "2022-05-24T21:35:00"
+              },
+              "marketingCarrier": {
+                "code": "SK"
+              },
+              "operatingCarrier": {
+                "code": "SK"
+              },
+              "destinationTerminal": "2",
+              "onTimePerformance": -1.0,
+              "meal": "V",
+              "layover": "00:00:00",
+              "changeOfPlane": false
+            }
+          ],
+          "baggageAllowance": [
+            {
+              "weight": 0.0,
+              "unit": "",
+              "pieces": 0,
+              "hasFreeBaggage": false,
+              "passengerType": "ADT"
+            }
+          ],
+          "gds": "Sabre"
+        }
+      ],
+      "pricingInformation": {
+        "base": {
+          "baseFare": 45.0,
+          "totalTax": 58.33,
+          "totalCost": 111.83,
+          "originalCost": 103.33,
+          "serviceFee": 8.5,
+          "currency": "EUR"
+        }
+      },
+      "passengerPricing": [
+        {
+          "passengerType": "ADT",
+          "quantity": 1,
+          "priceInformation": {
+            "baseFare": 45.0,
+            "totalTax": 58.33,
+            "totalCost": 111.83,
+            "originalCost": 103.33,
+            "serviceFee": 8.5,
+            "currency": "EUR"
+          }
+        }
+      ],
+      "outboundTripKey": "ARN_OSL_2022.05.24.14.25_2022.05.24.15.25_SK_SK_867_T_OSL_LHR_2022.05.24.20.15_2022.05.24.21.35_SK_SK_815_T_(111.83, SK)",
+      "inboundTripKey": "_(111.83, SK)"
+    },
+    {
+      "id": "c726f8b12ef04e8e81a607b1c33d74bf",
+      "isRefundable": false,
+      "docsRequired": false,
+      "gds": "Sabre",
+      "direction": "Outbound",
+      "trips": [
+        {
+          "id": "e9874e54ab414f119190c278ff409b32",
+          "duration": "04:05:00",
+          "direction": "Outbound",
+          "isRedEye": false,
+          "hasLongConnectionDuration": true,
+          "numberOfStops": 1,
+          "origin": {
+            "airportCode": "ARN"
+          },
+          "destination": {
+            "airportCode": "LHR"
+          },
+          "departure": {
+            "dateTime": "2022-05-24T06:30:00"
+          },
+          "arrival": {
+            "dateTime": "2022-05-24T17:05:00"
+          },
+          "plattingCarrier": {
+            "code": "AY"
+          },
+          "segments": [
+            {
+              "id": "4d2ff1d09b4044b996bfcf4405d09455",
+              "duration": "01:00:00",
+              "distance": 248.0,
+              "cabin": "Economy",
+              "isTechnicalStop": false,
+              "aircraft": {
+                "flightNumber": "826",
+                "equipment": "E90"
+              },
+              "availability": {
+                "bookingCode": "Y",
+                "count": 9
+              },
+              "origin": {
+                "airportCode": "ARN"
+              },
+              "destination": {
+                "airportCode": "HEL"
+              },
+              "departure": {
+                "dateTime": "2022-05-24T06:30:00"
+              },
+              "arrival": {
+                "dateTime": "2022-05-24T08:30:00"
+              },
+              "marketingCarrier": {
+                "code": "AY"
+              },
+              "operatingCarrier": {
+                "code": "N7"
+              },
+              "originTerminal": "5",
+              "destinationTerminal": "2",
+              "onTimePerformance": -1.0,
+              "meal": "N",
+              "layover": "07:30:00",
+              "changeOfPlane": false
+            },
+            {
+              "id": "586b39e8c7e74ecfb7f70e03bfd8f36a",
+              "duration": "03:05:00",
+              "distance": 1151.0,
+              "cabin": "Economy",
+              "isTechnicalStop": false,
+              "aircraft": {
+                "flightNumber": "1337",
+                "equipment": "359"
+              },
+              "availability": {
+                "bookingCode": "Y",
+                "count": 9
+              },
+              "origin": {
+                "airportCode": "HEL"
+              },
+              "destination": {
+                "airportCode": "LHR"
+              },
+              "departure": {
+                "dateTime": "2022-05-24T16:00:00"
+              },
+              "arrival": {
+                "dateTime": "2022-05-24T17:05:00"
+              },
+              "marketingCarrier": {
+                "code": "AY"
+              },
+              "operatingCarrier": {
+                "code": "AY"
+              },
+              "originTerminal": "2",
+              "destinationTerminal": "3",
+              "onTimePerformance": -1.0,
+              "meal": "G",
+              "layover": "00:00:00",
+              "changeOfPlane": false
+            }
+          ],
+          "baggageAllowance": [
+            {
+              "weight": 0.0,
+              "unit": "",
+              "pieces": 0,
+              "hasFreeBaggage": false,
+              "passengerType": "ADT"
+            }
+          ],
+          "gds": "Sabre"
+        }
+      ],
+      "pricingInformation": {
+        "base": {
+          "baseFare": 84.0,
+          "totalTax": 27.54,
+          "totalCost": 120.04,
+          "originalCost": 111.54,
+          "serviceFee": 8.5,
+          "currency": "EUR"
+        }
+      },
+      "passengerPricing": [
+        {
+          "passengerType": "ADT",
+          "quantity": 1,
+          "priceInformation": {
+            "baseFare": 84.0,
+            "totalTax": 27.54,
+            "totalCost": 120.04,
+            "originalCost": 111.54,
+            "serviceFee": 8.5,
+            "currency": "EUR"
+          }
+        }
+      ],
+      "outboundTripKey": "ARN_HEL_2022.05.24.06.30_2022.05.24.08.30_AY_N7_826_O_HEL_LHR_2022.05.24.16.00_2022.05.24.17.05_AY_AY_1337_O_(120.04, AY)",
+      "inboundTripKey": "_(120.04, AY)"
+    },
+    {
+      "id": "3aa4f05c057b4e03a2d29b376d14186a",
+      "isRefundable": false,
+      "docsRequired": false,
+      "gds": "Sabre",
+      "direction": "Outbound",
+      "trips": [
+        {
+          "id": "57044e5d77324667a907c10e7889cf6c",
+          "duration": "04:05:00",
+          "direction": "Outbound",
+          "isRedEye": false,
+          "hasLongConnectionDuration": true,
+          "numberOfStops": 1,
+          "origin": {
+            "airportCode": "ARN"
+          },
+          "destination": {
+            "airportCode": "LHR"
+          },
+          "departure": {
+            "dateTime": "2022-05-24T08:25:00"
+          },
+          "arrival": {
+            "dateTime": "2022-05-24T17:05:00"
+          },
+          "plattingCarrier": {
+            "code": "AY"
+          },
+          "segments": [
+            {
+              "id": "295b88c6f8304958a55e730679e8561a",
+              "duration": "01:00:00",
+              "distance": 248.0,
+              "cabin": "Economy",
+              "isTechnicalStop": false,
+              "aircraft": {
+                "flightNumber": "802",
+                "equipment": "32B"
+              },
+              "availability": {
+                "bookingCode": "Y",
+                "count": 9
+              },
+              "origin": {
+                "airportCode": "ARN"
+              },
+              "destination": {
+                "airportCode": "HEL"
+              },
+              "departure": {
+                "dateTime": "2022-05-24T08:25:00"
+              },
+              "arrival": {
+                "dateTime": "2022-05-24T10:25:00"
+              },
+              "marketingCarrier": {
+                "code": "AY"
+              },
+              "operatingCarrier": {
+                "code": "AY"
+              },
+              "originTerminal": "5",
+              "destinationTerminal": "2",
+              "onTimePerformance": -1.0,
+              "meal": "N",
+              "layover": "05:35:00",
+              "changeOfPlane": false
+            },
+            {
+              "id": "2a4cfb9cefa44d018bdb5a5710a4a007",
+              "duration": "03:05:00",
+              "distance": 1151.0,
+              "cabin": "Economy",
+              "isTechnicalStop": false,
+              "aircraft": {
+                "flightNumber": "1337",
+                "equipment": "359"
+              },
+              "availability": {
+                "bookingCode": "Y",
+                "count": 9
+              },
+              "origin": {
+                "airportCode": "HEL"
+              },
+              "destination": {
+                "airportCode": "LHR"
+              },
+              "departure": {
+                "dateTime": "2022-05-24T16:00:00"
+              },
+              "arrival": {
+                "dateTime": "2022-05-24T17:05:00"
+              },
+              "marketingCarrier": {
+                "code": "AY"
+              },
+              "operatingCarrier": {
+                "code": "AY"
+              },
+              "originTerminal": "2",
+              "destinationTerminal": "3",
+              "onTimePerformance": -1.0,
+              "meal": "G",
+              "layover": "00:00:00",
+              "changeOfPlane": false
+            }
+          ],
+          "baggageAllowance": [
+            {
+              "weight": 0.0,
+              "unit": "",
+              "pieces": 0,
+              "hasFreeBaggage": false,
+              "passengerType": "ADT"
+            }
+          ],
+          "gds": "Sabre"
+        }
+      ],
+      "pricingInformation": {
+        "base": {
+          "baseFare": 84.0,
+          "totalTax": 27.54,
+          "totalCost": 120.04,
+          "originalCost": 111.54,
+          "serviceFee": 8.5,
+          "currency": "EUR"
+        }
+      },
+      "passengerPricing": [
+        {
+          "passengerType": "ADT",
+          "quantity": 1,
+          "priceInformation": {
+            "baseFare": 84.0,
+            "totalTax": 27.54,
+            "totalCost": 120.04,
+            "originalCost": 111.54,
+            "serviceFee": 8.5,
+            "currency": "EUR"
+          }
+        }
+      ],
+      "outboundTripKey": "ARN_HEL_2022.05.24.08.25_2022.05.24.10.25_AY_AY_802_O_HEL_LHR_2022.05.24.16.00_2022.05.24.17.05_AY_AY_1337_O_(120.04, AY)",
+      "inboundTripKey": "_(120.04, AY)"
+    },
+    {
+      "id": "21918609fe154428a94db59c4b0656b6",
+      "isRefundable": false,
+      "docsRequired": false,
+      "gds": "Sabre",
+      "direction": "Outbound",
+      "trips": [
+        {
+          "id": "8594cc56da60419d834a2794332093f6",
+          "duration": "03:15:00",
+          "direction": "Outbound",
+          "isRedEye": false,
+          "hasLongConnectionDuration": false,
+          "numberOfStops": 1,
+          "origin": {
+            "airportCode": "ARN"
+          },
+          "destination": {
+            "airportCode": "LHR"
+          },
+          "departure": {
+            "dateTime": "2022-05-24T07:05:00"
+          },
+          "arrival": {
+            "dateTime": "2022-05-24T16:00:00"
+          },
+          "plattingCarrier": {
+            "code": "SK"
+          },
+          "segments": [
+            {
+              "id": "cd3b2999e8494951aa0b96a54e369a0b",
+              "duration": "01:15:00",
+              "distance": 341.0,
+              "cabin": "Economy",
+              "isTechnicalStop": false,
+              "aircraft": {
+                "flightNumber": "1417",
+                "equipment": "321"
+              },
+              "availability": {
+                "bookingCode": "Y",
+                "count": 9
+              },
+              "origin": {
+                "airportCode": "ARN"
+              },
+              "destination": {
+                "airportCode": "CPH"
+              },
+              "departure": {
+                "dateTime": "2022-05-24T07:05:00"
+              },
+              "arrival": {
+                "dateTime": "2022-05-24T08:20:00"
+              },
+              "marketingCarrier": {
+                "code": "SK"
+              },
+              "operatingCarrier": {
+                "code": "SK"
+              },
+              "originTerminal": "5",
+              "destinationTerminal": "3",
+              "onTimePerformance": -1.0,
+              "meal": "V",
+              "layover": "06:40:00",
+              "changeOfPlane": false
+            },
+            {
+              "id": "6ba7245e6d5842dca2787208be6b72ab",
+              "duration": "02:00:00",
+              "distance": 610.0,
+              "cabin": "Economy",
+              "isTechnicalStop": false,
+              "aircraft": {
+                "flightNumber": "505",
+                "equipment": "32N"
+              },
+              "availability": {
+                "bookingCode": "Y",
+                "count": 9
+              },
+              "origin": {
+                "airportCode": "CPH"
+              },
+              "destination": {
+                "airportCode": "LHR"
+              },
+              "departure": {
+                "dateTime": "2022-05-24T15:00:00"
+              },
+              "arrival": {
+                "dateTime": "2022-05-24T16:00:00"
+              },
+              "marketingCarrier": {
+                "code": "SK"
+              },
+              "operatingCarrier": {
+                "code": "SK"
+              },
+              "originTerminal": "3",
+              "destinationTerminal": "2",
+              "onTimePerformance": -1.0,
+              "meal": "V",
+              "layover": "00:00:00",
+              "changeOfPlane": false
+            }
+          ],
+          "baggageAllowance": [
+            {
+              "weight": 0.0,
+              "unit": "",
+              "pieces": 0,
+              "hasFreeBaggage": false,
+              "passengerType": "ADT"
+            }
+          ],
+          "gds": "Sabre"
+        }
+      ],
+      "pricingInformation": {
+        "base": {
+          "baseFare": 47.0,
+          "totalTax": 67.7,
+          "totalCost": 123.2,
+          "originalCost": 114.7,
+          "serviceFee": 8.5,
+          "currency": "EUR"
+        }
+      },
+      "passengerPricing": [
+        {
+          "passengerType": "ADT",
+          "quantity": 1,
+          "priceInformation": {
+            "baseFare": 47.0,
+            "totalTax": 67.7,
+            "totalCost": 123.2,
+            "originalCost": 114.7,
+            "serviceFee": 8.5,
+            "currency": "EUR"
+          }
+        }
+      ],
+      "outboundTripKey": "ARN_CPH_2022.05.24.07.05_2022.05.24.08.20_SK_SK_1417_T_CPH_LHR_2022.05.24.15.00_2022.05.24.16.00_SK_SK_505_T_(123.2, SK)",
+      "inboundTripKey": "_(123.2, SK)"
+    },
+    {
+      "id": "752967ebbebf472f9f885faf3d122c49",
+      "isRefundable": false,
+      "docsRequired": false,
+      "gds": "Sabre",
+      "direction": "Outbound",
+      "trips": [
+        {
+          "id": "91a701a64a334bf1b3a4140d51d94589",
+          "duration": "03:10:00",
+          "direction": "Outbound",
+          "isRedEye": false,
+          "hasLongConnectionDuration": false,
+          "numberOfStops": 1,
+          "origin": {
+            "airportCode": "ARN"
+          },
+          "destination": {
+            "airportCode": "LHR"
+          },
+          "departure": {
+            "dateTime": "2022-05-24T09:10:00"
+          },
+          "arrival": {
+            "dateTime": "2022-05-24T17:40:00"
+          },
+          "plattingCarrier": {
+            "code": "SK"
+          },
+          "segments": [
+            {
+              "id": "bdad29acee6d4a8cb18efda040cb2ec8",
+              "duration": "01:10:00",
+              "distance": 341.0,
+              "cabin": "Economy",
+              "isTechnicalStop": false,
+              "aircraft": {
+                "flightNumber": "403",
+                "equipment": "32N"
+              },
+              "availability": {
+                "bookingCode": "Y",
+                "count": 5
+              },
+              "origin": {
+                "airportCode": "ARN"
+              },
+              "destination": {
+                "airportCode": "CPH"
+              },
+              "departure": {
+                "dateTime": "2022-05-24T09:10:00"
+              },
+              "arrival": {
+                "dateTime": "2022-05-24T10:20:00"
+              },
+              "marketingCarrier": {
+                "code": "SK"
+              },
+              "operatingCarrier": {
+                "code": "SK"
+              },
+              "originTerminal": "5",
+              "destinationTerminal": "3",
+              "onTimePerformance": -1.0,
+              "meal": "V",
+              "layover": "06:20:00",
+              "changeOfPlane": false
+            },
+            {
+              "id": "01600e52c9a54b50af778455b92172dd",
+              "duration": "02:00:00",
+              "distance": 610.0,
+              "cabin": "Economy",
+              "isTechnicalStop": false,
+              "aircraft": {
+                "flightNumber": "1517",
+                "equipment": "32N"
+              },
+              "availability": {
+                "bookingCode": "Y",
+                "count": 9
+              },
+              "origin": {
+                "airportCode": "CPH"
+              },
+              "destination": {
+                "airportCode": "LHR"
+              },
+              "departure": {
+                "dateTime": "2022-05-24T16:40:00"
+              },
+              "arrival": {
+                "dateTime": "2022-05-24T17:40:00"
+              },
+              "marketingCarrier": {
+                "code": "SK"
+              },
+              "operatingCarrier": {
+                "code": "SK"
+              },
+              "originTerminal": "3",
+              "destinationTerminal": "2",
+              "onTimePerformance": -1.0,
+              "meal": "V",
+              "layover": "00:00:00",
+              "changeOfPlane": false
+            }
+          ],
+          "baggageAllowance": [
+            {
+              "weight": 0.0,
+              "unit": "",
+              "pieces": 0,
+              "hasFreeBaggage": false,
+              "passengerType": "ADT"
+            }
+          ],
+          "gds": "Sabre"
+        }
+      ],
+      "pricingInformation": {
+        "base": {
+          "baseFare": 47.0,
+          "totalTax": 67.7,
+          "totalCost": 123.2,
+          "originalCost": 114.7,
+          "serviceFee": 8.5,
+          "currency": "EUR"
+        }
+      },
+      "passengerPricing": [
+        {
+          "passengerType": "ADT",
+          "quantity": 1,
+          "priceInformation": {
+            "baseFare": 47.0,
+            "totalTax": 67.7,
+            "totalCost": 123.2,
+            "originalCost": 114.7,
+            "serviceFee": 8.5,
+            "currency": "EUR"
+          }
+        }
+      ],
+      "outboundTripKey": "ARN_CPH_2022.05.24.09.10_2022.05.24.10.20_SK_SK_403_T_CPH_LHR_2022.05.24.16.40_2022.05.24.17.40_SK_SK_1517_T_(123.2, SK)",
+      "inboundTripKey": "_(123.2, SK)"
+    },
+    {
+      "id": "c18a4a61db3047b39935ff1bcc7bcb3a",
+      "isRefundable": false,
+      "docsRequired": false,
+      "gds": "Sabre",
+      "direction": "Outbound",
+      "trips": [
+        {
+          "id": "88ac5c8d6a1b43e9ab0d7bfcb53dc107",
+          "duration": "03:10:00",
+          "direction": "Outbound",
+          "isRedEye": false,
+          "hasLongConnectionDuration": false,
+          "numberOfStops": 1,
+          "origin": {
+            "airportCode": "ARN"
+          },
+          "destination": {
+            "airportCode": "LHR"
+          },
+          "departure": {
+            "dateTime": "2022-05-24T09:10:00"
+          },
+          "arrival": {
+            "dateTime": "2022-05-24T19:30:00"
+          },
+          "plattingCarrier": {
+            "code": "SK"
+          },
+          "segments": [
+            {
+              "id": "6c55cbf862ef4d64a90701859393e2e7",
+              "duration": "01:10:00",
+              "distance": 341.0,
+              "cabin": "Economy",
+              "isTechnicalStop": false,
+              "aircraft": {
+                "flightNumber": "403",
+                "equipment": "32N"
+              },
+              "availability": {
+                "bookingCode": "Y",
+                "count": 5
+              },
+              "origin": {
+                "airportCode": "ARN"
+              },
+              "destination": {
+                "airportCode": "CPH"
+              },
+              "departure": {
+                "dateTime": "2022-05-24T09:10:00"
+              },
+              "arrival": {
+                "dateTime": "2022-05-24T10:20:00"
+              },
+              "marketingCarrier": {
+                "code": "SK"
+              },
+              "operatingCarrier": {
+                "code": "SK"
+              },
+              "originTerminal": "5",
+              "destinationTerminal": "3",
+              "onTimePerformance": -1.0,
+              "meal": "V",
+              "layover": "08:10:00",
+              "changeOfPlane": false
+            },
+            {
+              "id": "4226023540de4f6c8bdf9fcd8009379e",
+              "duration": "02:00:00",
+              "distance": 610.0,
+              "cabin": "Economy",
+              "isTechnicalStop": false,
+              "aircraft": {
+                "flightNumber": "1507",
+                "equipment": "32N"
+              },
+              "availability": {
+                "bookingCode": "Y",
+                "count": 9
+              },
+              "origin": {
+                "airportCode": "CPH"
+              },
+              "destination": {
+                "airportCode": "LHR"
+              },
+              "departure": {
+                "dateTime": "2022-05-24T18:30:00"
+              },
+              "arrival": {
+                "dateTime": "2022-05-24T19:30:00"
+              },
+              "marketingCarrier": {
+                "code": "SK"
+              },
+              "operatingCarrier": {
+                "code": "SK"
+              },
+              "originTerminal": "3",
+              "destinationTerminal": "2",
+              "onTimePerformance": -1.0,
+              "meal": "V",
+              "layover": "00:00:00",
+              "changeOfPlane": false
+            }
+          ],
+          "baggageAllowance": [
+            {
+              "weight": 0.0,
+              "unit": "",
+              "pieces": 0,
+              "hasFreeBaggage": false,
+              "passengerType": "ADT"
+            }
+          ],
+          "gds": "Sabre"
+        }
+      ],
+      "pricingInformation": {
+        "base": {
+          "baseFare": 47.0,
+          "totalTax": 67.7,
+          "totalCost": 123.2,
+          "originalCost": 114.7,
+          "serviceFee": 8.5,
+          "currency": "EUR"
+        }
+      },
+      "passengerPricing": [
+        {
+          "passengerType": "ADT",
+          "quantity": 1,
+          "priceInformation": {
+            "baseFare": 47.0,
+            "totalTax": 67.7,
+            "totalCost": 123.2,
+            "originalCost": 114.7,
+            "serviceFee": 8.5,
+            "currency": "EUR"
+          }
+        }
+      ],
+      "outboundTripKey": "ARN_CPH_2022.05.24.09.10_2022.05.24.10.20_SK_SK_403_T_CPH_LHR_2022.05.24.18.30_2022.05.24.19.30_SK_SK_1507_T_(123.2, SK)",
+      "inboundTripKey": "_(123.2, SK)"
+    },
+    {
+      "id": "f1c0c125175c4e8d904a4508ddcd3655",
+      "isRefundable": false,
+      "docsRequired": false,
+      "gds": "Sabre",
+      "direction": "Outbound",
+      "trips": [
+        {
+          "id": "e1d1cac802154ee6ad71d6e076d314bb",
+          "duration": "03:10:00",
+          "direction": "Outbound",
+          "isRedEye": false,
+          "hasLongConnectionDuration": false,
+          "numberOfStops": 1,
+          "origin": {
+            "airportCode": "ARN"
+          },
+          "destination": {
+            "airportCode": "LHR"
+          },
+          "departure": {
+            "dateTime": "2022-05-24T09:55:00"
+          },
+          "arrival": {
+            "dateTime": "2022-05-24T21:35:00"
+          },
+          "plattingCarrier": {
+            "code": "SK"
+          },
+          "segments": [
+            {
+              "id": "7377f924cb374c7c8bb2ed6043a70f9b",
+              "duration": "01:10:00",
+              "distance": 341.0,
+              "cabin": "Economy",
+              "isTechnicalStop": false,
+              "aircraft": {
+                "flightNumber": "1419",
+                "equipment": "32N"
+              },
+              "availability": {
+                "bookingCode": "Y",
+                "count": 9
+              },
+              "origin": {
+                "airportCode": "ARN"
+              },
+              "destination": {
+                "airportCode": "CPH"
+              },
+              "departure": {
+                "dateTime": "2022-05-24T09:55:00"
+              },
+              "arrival": {
+                "dateTime": "2022-05-24T11:05:00"
+              },
+              "marketingCarrier": {
+                "code": "SK"
+              },
+              "operatingCarrier": {
+                "code": "SK"
+              },
+              "originTerminal": "5",
+              "destinationTerminal": "3",
+              "onTimePerformance": -1.0,
+              "meal": "V",
+              "layover": "09:30:00",
+              "changeOfPlane": false
+            },
+            {
+              "id": "7063de521e30485f8e941fcbdcbdb48f",
+              "duration": "02:00:00",
+              "distance": 610.0,
+              "cabin": "Economy",
+              "isTechnicalStop": false,
+              "aircraft": {
+                "flightNumber": "1501",
+                "equipment": "32N"
+              },
+              "availability": {
+                "bookingCode": "Y",
+                "count": 9
+              },
+              "origin": {
+                "airportCode": "CPH"
+              },
+              "destination": {
+                "airportCode": "LHR"
+              },
+              "departure": {
+                "dateTime": "2022-05-24T20:35:00"
+              },
+              "arrival": {
+                "dateTime": "2022-05-24T21:35:00"
+              },
+              "marketingCarrier": {
+                "code": "SK"
+              },
+              "operatingCarrier": {
+                "code": "SK"
+              },
+              "originTerminal": "3",
+              "destinationTerminal": "2",
+              "onTimePerformance": -1.0,
+              "meal": "V",
+              "layover": "00:00:00",
+              "changeOfPlane": false
+            }
+          ],
+          "baggageAllowance": [
+            {
+              "weight": 0.0,
+              "unit": "",
+              "pieces": 0,
+              "hasFreeBaggage": false,
+              "passengerType": "ADT"
+            }
+          ],
+          "gds": "Sabre"
+        }
+      ],
+      "pricingInformation": {
+        "base": {
+          "baseFare": 47.0,
+          "totalTax": 67.7,
+          "totalCost": 123.2,
+          "originalCost": 114.7,
+          "serviceFee": 8.5,
+          "currency": "EUR"
+        }
+      },
+      "passengerPricing": [
+        {
+          "passengerType": "ADT",
+          "quantity": 1,
+          "priceInformation": {
+            "baseFare": 47.0,
+            "totalTax": 67.7,
+            "totalCost": 123.2,
+            "originalCost": 114.7,
+            "serviceFee": 8.5,
+            "currency": "EUR"
+          }
+        }
+      ],
+      "outboundTripKey": "ARN_CPH_2022.05.24.09.55_2022.05.24.11.05_SK_SK_1419_T_CPH_LHR_2022.05.24.20.35_2022.05.24.21.35_SK_SK_1501_T_(123.2, SK)",
+      "inboundTripKey": "_(123.2, SK)"
+    },
+    {
+      "id": "7aadc217ced444738ce8409a267650c7",
+      "isRefundable": false,
+      "docsRequired": false,
+      "gds": "Sabre",
+      "direction": "Outbound",
+      "trips": [
+        {
+          "id": "ec550175cb4c41b0891f41d9e058bca9",
+          "duration": "03:10:00",
+          "direction": "Outbound",
+          "isRedEye": false,
+          "hasLongConnectionDuration": false,
+          "numberOfStops": 1,
+          "origin": {
+            "airportCode": "ARN"
+          },
+          "destination": {
+            "airportCode": "LHR"
+          },
+          "departure": {
+            "dateTime": "2022-05-24T09:55:00"
+          },
+          "arrival": {
+            "dateTime": "2022-05-24T19:30:00"
+          },
+          "plattingCarrier": {
+            "code": "SK"
+          },
+          "segments": [
+            {
+              "id": "28d6d61830734ac09745b68bf971b224",
+              "duration": "01:10:00",
+              "distance": 341.0,
+              "cabin": "Economy",
+              "isTechnicalStop": false,
+              "aircraft": {
+                "flightNumber": "1419",
+                "equipment": "32N"
+              },
+              "availability": {
+                "bookingCode": "Y",
+                "count": 9
+              },
+              "origin": {
+                "airportCode": "ARN"
+              },
+              "destination": {
+                "airportCode": "CPH"
+              },
+              "departure": {
+                "dateTime": "2022-05-24T09:55:00"
+              },
+              "arrival": {
+                "dateTime": "2022-05-24T11:05:00"
+              },
+              "marketingCarrier": {
+                "code": "SK"
+              },
+              "operatingCarrier": {
+                "code": "SK"
+              },
+              "originTerminal": "5",
+              "destinationTerminal": "3",
+              "onTimePerformance": -1.0,
+              "meal": "V",
+              "layover": "07:25:00",
+              "changeOfPlane": false
+            },
+            {
+              "id": "4486d5bb737b4751967e5ad52affa936",
+              "duration": "02:00:00",
+              "distance": 610.0,
+              "cabin": "Economy",
+              "isTechnicalStop": false,
+              "aircraft": {
+                "flightNumber": "1507",
+                "equipment": "32N"
+              },
+              "availability": {
+                "bookingCode": "Y",
+                "count": 9
+              },
+              "origin": {
+                "airportCode": "CPH"
+              },
+              "destination": {
+                "airportCode": "LHR"
+              },
+              "departure": {
+                "dateTime": "2022-05-24T18:30:00"
+              },
+              "arrival": {
+                "dateTime": "2022-05-24T19:30:00"
+              },
+              "marketingCarrier": {
+                "code": "SK"
+              },
+              "operatingCarrier": {
+                "code": "SK"
+              },
+              "originTerminal": "3",
+              "destinationTerminal": "2",
+              "onTimePerformance": -1.0,
+              "meal": "V",
+              "layover": "00:00:00",
+              "changeOfPlane": false
+            }
+          ],
+          "baggageAllowance": [
+            {
+              "weight": 0.0,
+              "unit": "",
+              "pieces": 0,
+              "hasFreeBaggage": false,
+              "passengerType": "ADT"
+            }
+          ],
+          "gds": "Sabre"
+        }
+      ],
+      "pricingInformation": {
+        "base": {
+          "baseFare": 47.0,
+          "totalTax": 67.7,
+          "totalCost": 123.2,
+          "originalCost": 114.7,
+          "serviceFee": 8.5,
+          "currency": "EUR"
+        }
+      },
+      "passengerPricing": [
+        {
+          "passengerType": "ADT",
+          "quantity": 1,
+          "priceInformation": {
+            "baseFare": 47.0,
+            "totalTax": 67.7,
+            "totalCost": 123.2,
+            "originalCost": 114.7,
+            "serviceFee": 8.5,
+            "currency": "EUR"
+          }
+        }
+      ],
+      "outboundTripKey": "ARN_CPH_2022.05.24.09.55_2022.05.24.11.05_SK_SK_1419_T_CPH_LHR_2022.05.24.18.30_2022.05.24.19.30_SK_SK_1507_T_(123.2, SK)",
+      "inboundTripKey": "_(123.2, SK)"
+    }
+  ],
+  "isFinished": true,
+  "transactionId": "762073ba5a7e48a39662332b4df6d220",
+  "filterInformation": {
+    "carriers": [
+      {
+        "carrier": "SK",
+        "numberOfFlights": 81
+      },
+      {
+        "carrier": "BA",
+        "numberOfFlights": 4
+      },
+      {
+        "carrier": "AY",
+        "numberOfFlights": 5
+      },
+      {
+        "carrier": "LH",
+        "numberOfFlights": 2
+      },
+      {
+        "carrier": "LO",
+        "numberOfFlights": 2
+      },
+      {
+        "carrier": "IB",
+        "numberOfFlights": 1
+      },
+      {
+        "carrier": "EW",
+        "numberOfFlights": 1
+      },
+      {
+        "carrier": "AF",
+        "numberOfFlights": 1
+      },
+      {
+        "carrier": "KL",
+        "numberOfFlights": 3
+      }
+    ],
+    "priceRanges": [
+      {
+        "start": 63.0,
+        "end": 125.5,
+        "numberOfFlights": 38
+      },
+      {
+        "start": 125.5,
+        "end": 188.0,
+        "numberOfFlights": 38
+      },
+      {
+        "start": 188.0,
+        "end": 250.5,
+        "numberOfFlights": 23
+      },
+      {
+        "start": 250.5,
+        "end": 313.0,
+        "numberOfFlights": 0
+      },
+      {
+        "start": 313.0,
+        "end": 375.5,
+        "numberOfFlights": 1
+      }
+    ],
+    "numberOfStops": [
+      {
+        "stops": 0,
+        "numberOfFlights": 23
+      },
+      {
+        "stops": 1,
+        "numberOfFlights": 77
+      }
+    ],
+    "bestAvailableItineraries": {
+      "overall": {
+        "duration": "02:35:00",
+        "price": 63.74
+      },
+      "cheapest": {
+        "duration": "02:45:00",
+        "price": 63.74,
+        "itineraryId": "07ee4c876b114113ba5dc8296a61ed93"
+      },
+      "fastest": {
+        "duration": "02:30:00",
+        "price": 90.26,
+        "itineraryId": "93a0f237ce414eb3ad75a4c245314935"
+      }
+    },
+    "outboundDepartureDate": {
+      "start": "2022-05-24T06:00:00",
+      "end": "2022-05-24T21:05:00"
+    },
+    "outboundArrivalDate": {
+      "start": "2022-05-24T09:35:00",
+      "end": "2022-05-25T09:30:00"
+    },
+    "inboundDepartureDate": {
+      "start": "2022-05-24T06:00:00",
+      "end": "2022-05-24T21:05:00"
+    },
+    "inboundArrivalDate": {
+      "start": "2022-05-24T06:00:00",
+      "end": "2022-05-24T21:05:00"
+    }
+  },
+  "pageInformation": {
+    "currentPage": 2,
+    "totalPages": 10,
+    "numberOfAvailableFlights": 100
+  },
+  "itineraryGroupInformation": []
+}

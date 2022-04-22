@@ -1,0 +1,403 @@
+{
+  "id": "58267f6df18f4f708e8701ad5dbbc993",
+  "information": {
+    "bookingId": 0,
+    "status": "PricingSuccedded"
+  },
+  "itinerary": {
+    "id": "8ff781d4c5b64694b9fefeb512678e72",
+    "isRefundable": false,
+    "docsRequired": false,
+    "gds": "Sabre",
+    "direction": "Outbound",
+    "trips": [
+      {
+        "id": "bfc78540dc64439d813134dd7f4a54e1",
+        "duration": "03:15:00",
+        "direction": "Outbound",
+        "isRedEye": false,
+        "hasLongConnectionDuration": false,
+        "numberOfStops": 1,
+        "origin": {
+          "airportCode": "ARN"
+        },
+        "destination": {
+          "airportCode": "LHR"
+        },
+        "departure": {
+          "dateTime": "2022-05-24T07:05:00"
+        },
+        "arrival": {
+          "dateTime": "2022-05-24T16:00:00"
+        },
+        "plattingCarrier": {
+          "code": "SK"
+        },
+        "segments": [
+          {
+            "id": "446392982c7344c1af7d9be501f7f0c2",
+            "duration": "01:15:00",
+            "distance": 341.0,
+            "cabin": "Economy",
+            "isTechnicalStop": false,
+            "aircraft": {
+              "flightNumber": "1417",
+              "equipment": "321"
+            },
+            "availability": {
+              "bookingCode": "Y",
+              "count": 9
+            },
+            "origin": {
+              "airportCode": "ARN"
+            },
+            "destination": {
+              "airportCode": "CPH"
+            },
+            "departure": {
+              "dateTime": "2022-05-24T07:05:00"
+            },
+            "arrival": {
+              "dateTime": "2022-05-24T08:20:00"
+            },
+            "marketingCarrier": {
+              "code": "SK"
+            },
+            "operatingCarrier": {
+              "code": "SK"
+            },
+            "originTerminal": "5",
+            "destinationTerminal": "3",
+            "onTimePerformance": -1.0,
+            "meal": "V",
+            "layover": "06:40:00",
+            "changeOfPlane": false
+          },
+          {
+            "id": "2173446aa7f94a0fb981384ecd101fc2",
+            "duration": "02:00:00",
+            "distance": 610.0,
+            "cabin": "Economy",
+            "isTechnicalStop": false,
+            "aircraft": {
+              "flightNumber": "505",
+              "equipment": "32N"
+            },
+            "availability": {
+              "bookingCode": "Y",
+              "count": 9
+            },
+            "origin": {
+              "airportCode": "CPH"
+            },
+            "destination": {
+              "airportCode": "LHR"
+            },
+            "departure": {
+              "dateTime": "2022-05-24T15:00:00"
+            },
+            "arrival": {
+              "dateTime": "2022-05-24T16:00:00"
+            },
+            "marketingCarrier": {
+              "code": "SK"
+            },
+            "operatingCarrier": {
+              "code": "SK"
+            },
+            "originTerminal": "3",
+            "destinationTerminal": "2",
+            "onTimePerformance": -1.0,
+            "meal": "V",
+            "layover": "00:00:00",
+            "changeOfPlane": false
+          }
+        ],
+        "baggageAllowance": [
+          {
+            "weight": 0.0,
+            "unit": "",
+            "pieces": 0,
+            "hasFreeBaggage": false,
+            "passengerType": "ADT"
+          }
+        ],
+        "gds": "Sabre"
+      },
+      {
+        "id": "264bfbc7bee34535bd7ca7995cbabb89",
+        "duration": "02:30:00",
+        "direction": "Outbound",
+        "isRedEye": false,
+        "hasLongConnectionDuration": false,
+        "numberOfStops": 0,
+        "origin": {
+          "airportCode": "LHR"
+        },
+        "destination": {
+          "airportCode": "ARN"
+        },
+        "departure": {
+          "dateTime": "2022-05-24T18:05:00"
+        },
+        "arrival": {
+          "dateTime": "2022-05-24T21:35:00"
+        },
+        "plattingCarrier": {
+          "code": "SK"
+        },
+        "segments": [
+          {
+            "id": "27dc9426d26b49418cb227b028a8ab30",
+            "duration": "02:30:00",
+            "distance": 911.0,
+            "cabin": "Economy",
+            "isTechnicalStop": false,
+            "aircraft": {
+              "flightNumber": "528",
+              "equipment": "32N"
+            },
+            "availability": {
+              "bookingCode": "Y",
+              "count": 9
+            },
+            "origin": {
+              "airportCode": "LHR"
+            },
+            "destination": {
+              "airportCode": "ARN"
+            },
+            "departure": {
+              "dateTime": "2022-05-24T18:05:00"
+            },
+            "arrival": {
+              "dateTime": "2022-05-24T21:35:00"
+            },
+            "marketingCarrier": {
+              "code": "SK"
+            },
+            "operatingCarrier": {
+              "code": "SK"
+            },
+            "originTerminal": "2",
+            "destinationTerminal": "5",
+            "onTimePerformance": -1.0,
+            "meal": "V",
+            "layover": "00:00:00",
+            "changeOfPlane": false
+          }
+        ],
+        "baggageAllowance": [
+          {
+            "weight": 0.0,
+            "unit": "",
+            "pieces": 0,
+            "hasFreeBaggage": false,
+            "passengerType": "ADT"
+          }
+        ],
+        "gds": "Sabre"
+      }
+    ],
+    "pricingInformation": {
+      "base": {
+        "baseFare": 68.0,
+        "totalTax": 122.51,
+        "totalCost": 199.01,
+        "originalCost": 190.51,
+        "serviceFee": 8.5,
+        "currency": "EUR"
+      }
+    },
+    "passengerPricing": [
+      {
+        "passengerType": "ADT",
+        "quantity": 1,
+        "priceInformation": {
+          "baseFare": 68.0,
+          "totalTax": 122.51,
+          "totalCost": 199.01,
+          "originalCost": 190.51,
+          "serviceFee": 8.5,
+          "currency": "EUR"
+        }
+      }
+    ],
+    "outboundTripKey": "ARN_CPH_2022.05.24.07.05_2022.05.24.08.20_SK_SK_1417_T_CPH_LHR_2022.05.24.15.00_2022.05.24.16.00_SK_SK_505_T_(199.01, SKSK)",
+    "inboundTripKey": "_(199.01, SKSK)"
+  },
+  "docs": [
+    {
+      "docType": "None",
+      "requiredDateOfBirth": false,
+      "requiredNationality": false,
+      "requiredExpirationDate": false,
+      "requiredIssuingCountry": false,
+      "requiredPassportNumber": false
+    }
+  ],
+  "fareRules": [
+    {
+      "origin": "ARN",
+      "destination": "LHR",
+      "fareBasis": "TKSRGHT",
+      "fareRule": [
+        {
+          "text": "NOTE - THE FOLLOWING TEXT IS INFORMATIONAL AND NOT\nVALIDATED FOR AUTOPRICING.\nSAS GO LIGHT\nAPPLICATION\nAREA\nTHESE FARES APPLY WITHIN EUROPE.\nCLASS OF SERVICE\nTHESE FARES APPLY FOR ECONOMY CLASS SERVICE.\nTYPES OF TRANSPORTATION\nFARES GOVERNED BY THIS RULE CAN BE USED TO CREATE\nONE-WAY/ROUND-TRIP/OPEN-JAW JOURNEYS.\nFARES ONLY APPLY IF PURCHASED BEFORE DEPARTURE.\nEXCEPTION -\nFARES MAY BE USED FOR ENROUTE UPGRADING FROM A\nLOWER SK GO LIGHT FARE PROVIDED THAT ALL\nCONDITIONS OF THE NEW FARE ARE MET.\nCAPACITY LIMITATIONS\nTHE CARRIER SHALL LIMIT THE NUMBER OF PASSENGERS\nCARRIED ON ANY ONE FLIGHT AT FARES GOVERNED BY\nTHIS RULE AND SUCH FARES WILL NOT NECESSARILY BE\nAVAILABLE ON ALL FLIGHTS. THE NUMBER OF SEATS,\nWHICH THE CARRIER SHALL MAKE AVAILABLE ON A GIVEN\nFLIGHT, WILL BE DETERMINED BY THE CARRIER'S BEST\nJUDGEMENT.\nOTHER CONDITIONS\nNO BAGGAGE ALLOWANCE.",
+          "title": "RULE APPLICATION AND OTHER CONDITIONS"
+        },
+        {
+          "text": "NOTE - TEXT BELOW NOT VALIDATED FOR AUTOPRICING.\nTHIS FARE IS VALID FOR PASSENGERS TRAVELLING\nWITHOUT BAGGAGE.",
+          "title": "ELIGIBILITY"
+        },
+        {
+          "text": "NO DAY/TIME TRAVEL RESTRICTIONS APPLY.",
+          "title": "DAY/TIME"
+        },
+        {
+          "text": "PERMITTED 07APR22 THROUGH 17JUN22 OR 15AUG22 THROUGH\n08NOV22 OR 16DEC22 THROUGH 08JAN23 OR 01APR23 THROUGH\n16JUN23 OR 14AUG23 THROUGH 07NOV23 OR 15DEC23 THROUGH\n07JAN24 OR 23MAR24 THROUGH 14JUN24 OR 12AUG24 THROUGH\n05NOV24 FOR EACH TRIP. SEASON IS BASED ON TRIP DATE.",
+          "title": "SEASONALITY"
+        },
+        {
+          "text": "THE FARE COMPONENT MUST NOT INCLUDE TRAVEL FROM/TO/VIA\nSTN AIRPORT.\nAND\nTHE FARE COMPONENT MUST NOT BE ON\nONE OR MORE OF THE FOLLOWING\nSK FLIGHTS 9600 THROUGH 9699\nANY SK FLIGHT OPERATED BY LH\nANY SK FLIGHT OPERATED BY LX\nANY SK FLIGHT OPERATED BY OS\nANY SK FLIGHT OPERATED BY SN.",
+          "title": "FLIGHT APPLICATION"
+        },
+        {
+          "text": "CONFIRMED RESERVATIONS ARE REQUIRED FOR ALL SECTORS.\nWAITLIST NOT PERMITTED.\nTICKETING MUST BE COMPLETED WITHIN 1 DAY AFTER\nRESERVATIONS ARE MADE OR AT LEAST 2 DAYS BEFORE\nDEPARTURE WHICHEVER IS EARLIER.\nOR - CONFIRMED RESERVATIONS FOR ALL SECTORS AND\nTICKETING MUST BE COMPLETED AT THE SAME TIME.\nWAITLIST NOT PERMITTED.\nNOTE - TEXT BELOW NOT VALIDATED FOR AUTOPRICING.\nWARNING-\nALL RESERVATIONS MADE WITHOUT TICKET NUMBER\nWILL BE CANCELLED AUTOMATICALLY AFTER TICKETING\nDEADLINE.",
+          "title": "ADVANCE RESERVATIONS/TICKETING"
+        },
+        {
+          "text": "NO MINIMUM STAY REQUIREMENTS APPLY.",
+          "title": "MINIMUM STAY"
+        },
+        {
+          "text": "NO MAXIMUM STAY REQUIREMENTS APPLY.",
+          "title": "MAXIMUM STAY"
+        },
+        {
+          "text": "STOPOVERS ARE NOT PERMITTED AT INTERMEDIATE POINTS.",
+          "title": "STOPOVERS"
+        },
+        {
+          "text": "ORIGINATING SWEDEN -\nUNLIMITED TRANSFERS PERMITTED ON THE PRICING UNIT.\nUNLIMITED IN EUROPE EXCEPT CPH.\nAND - UNLIMITED TRANSFERS PERMITTED ON THE PRICING\nUNIT AT SEK 17 - PER PASSENGER. CHILD DISCOUNTS\nAPPLY. INFANT IS FREE.\nUNLIMITED IN CPH IN EACH DIRECTION AT SEK\n17\nEACH.\nFARE BREAK AND EMBEDDED SURFACE SECTORS NOT\nPERMITTED ON THE FARE COMPONENT.\nORIGINATING EUROPE -\nUNLIMITED TRANSFERS PERMITTED ON THE PRICING UNIT.\nUNLIMITED IN EUROPE EXCEPT CPH.\nAND - UNLIMITED TRANSFERS PERMITTED ON THE PRICING\nUNIT AT EUR 2.00 - PER PASSENGER. CHILD\nDISCOUNTS APPLY. INFANT IS FREE.\nUNLIMITED IN CPH IN EACH DIRECTION AT EUR\n2.00 EACH.\nFARE BREAK AND EMBEDDED SURFACE SECTORS NOT\nPERMITTED ON THE FARE COMPONENT.",
+          "title": "TRANSFERS"
+        },
+        {
+          "text": "CIRCLE TRIPS NOT PERMITTED.\nEND-ON-END NOT PERMITTED. SIDE TRIPS NOT PERMITTED.\nOPEN JAWS/ROUND TRIPS\nFARES MAY BE COMBINED ON A HALF ROUND TRIP BASIS\n-TO FORM SINGLE OR DOUBLE OPEN JAWS WHICH CONSISTS\nOF NO MORE THAN 2 INTERNATIONAL FARE COMPONENTS AND\nTHE OPEN SEGMENT AT ORIGIN MUST BE IN ONE COUNTRY.\nTHE OPEN SEGMENT AT DESTINATION HAS NO RESTRICTIONS\nMILEAGE OF THE INTERNATIONAL OPEN SEGMENT MUST BE\nEQUAL/LESS THAN MILEAGE OF THE LONGEST FLOWN FARE\nCOMPONENT. THERE IS NO MILEAGE RESTRICTION ON AN\nOPEN SEGMENT WITHIN ONE COUNTRY.\n-TO FORM ROUND TRIPS.\nPROVIDED -\nCOMBINATIONS ARE WITH ANY FARE FOR CARRIER SK IN\nRULE DKE1/DKE2/EMEC/EMNO/EMO1/EMO2/EMO3/FIEC/FIFX/\nGPRO/OBAG/PRO1/SAV1/SEE1/SEE2 IN TARIFF\nIPREURP - WITHIN EUROPE-INTERNATIONAL.",
+          "title": "COMBINATIONS"
+        },
+        {
+          "text": "NO BLACKOUT DATES APPLY.",
+          "title": "BLACKOUT DATES"
+        },
+        {
+          "text": "IF UNACCOMPANIED CHILD PSGR 5-11.\nMISCELLANEOUS/OTHER SURCHARGE OF SEK 450 PER\nDIRECTION WILL BE ADDED TO THE APPLICABLE FARE PER\nCHILD/INFANT.\nNOTE - TEXT BELOW NOT VALIDATED FOR AUTOPRICING.\nIF YOUNG PSGR 12-15 REQUESTING ASSISTANCE\nA SURCHARGE OF SEK 450 PER YOUNG PSGR AND PER\nDIRECTION SHALL BE ADDED TO THE APPLICABLE FARE\nPER YOUNG PSGR.\n------\nSURCHARGE FOR YOUNG PSGR 12-15 SHALL BE ADDED\nAS Q IN FARE CONSTRUCTION LINE.",
+          "title": "SURCHARGES"
+        },
+        {
+          "text": "ACCOMPANIED TRAVEL NOT REQUIRED.",
+          "title": "ACCOMPANIED TRAVEL"
+        },
+        {
+          "text": "NO TRAVEL DATE RESTRICTIONS APPLY.",
+          "title": "TRAVEL RESTRICTIONS"
+        },
+        {
+          "text": "TICKETS MUST BE ISSUED ON THE STOCK OF SK OR WF AND\nMAY NOT BE SOLD IN VENEZUELA/ANGOLA/SOUTH SUDAN/SUDAN/\nNIGERIA/EGYPT/ZIMBABWE. AND MAY ONLY BE SOLD IN AREA 1/\nAREA 2/AREA 3.",
+          "title": "SALES RESTRICTIONS"
+        },
+        {
+          "text": "CANCELLATIONS\nANY TIME\nTICKET IS NON-REFUNDABLE.\nNOTE - TEXT BELOW NOT VALIDATED FOR AUTOPRICING.\nWHEN COMBINING ON A HALF ROUNDTRIP BASIS THE\nPENALTY CONDITIONS FOR EACH FARE COMPONENT APPLY.\n--------------------------------------------------\nFOR NON REFUNDABLE TICKETS YQ/YR DOMESTIC/\nINTERNATIONAL FEES WILL NOT BE REFUNDED.\n--------------------------------------------------\nREFUND OF UNUSED TAXES/FEES/CHARGES PERMITTED\n--------------------------------------------------\nFULL REFUND PERMITTED BEFORE DEPARTURE IN CASE OF\nREJECTIONS OF VISA. EMBASSY STATEMENT REQUIRED\nCHANGES\nANY TIME\nCHANGES PERMITTED.\nNOTE - TEXT BELOW NOT VALIDATED FOR AUTOPRICING.\nNO CHILD DISCOUNT. INFANTS FREE OF CHARGE.\n--------------------------------------------------\nORIGIN/DESTINATION OF THE FARE COMPONENT MAY NOT\nBE CHANGED.\n--------------------------------------------------\nNO CHANGE FEE FOR ALL CHANGES MADE UP TO 72\nHOURS BEFORE DEPARTURE OF ORIGININALLY BOOKED\nFLIGHT.\n--------------------------------------------------\nCHANGES MADE LESS THAN 72 HOURS BEFORE DEPARTURE\nREBOOKING IN SAME BOOKING CLASS AS TICKETED\nCHARGE SEK 700 PER TRANSACTION\n--------------------------------------------------\nCHANGE FEE WILL BE THE HIGHEST OF ALL CHANGED FARE\nCOMPONENTS PER TICKET\n--------------------------------------------------\nCHANGE FEE APPLIES FOR EVERY SINGLE CLOSED\nTRANSACTION\n--------------------------------------------------\nFOR AUTOMATIC REISSUE PENALTY FEE MUST BE\nCOLLECTED ON AN EMD. FOR MANUAL REISSUE ON AN EMD\nOR AS DU TAX. PENALTY FEE MUST REMAIN NON\nREFUNDABLE.\n--------------------------------------------------\nFARES MAY BE UPGRADED TO ANY HIGHER SK GO LIGHT /\nSK GO SMART / SK PLUS SMART / SK PLUS PRO FARE UP\nTO AND INCLUDING C-CLASS. IN CASE OF UPGRADING TO\nHIGHER FARE CHARGE SEK 700 PER TRANSACTION AND\nCHARGE DIFFERENCE BETWEEN FARE PAID AND HIGHER\nUPGRADED SECTOR.\n--------------------------------------------------\nIN CASE OF TICKET UPGRADE ORIGINAL NON-REFUNDABLE\nAMOUNT REMAINS NON-REFUNDABLE. REISSUED TICKET\nMUST BE ANNOTATED -\nORIGINAL FARE PAID REMAINS NON-REFUNDABLE.\n--------------------------------------------------\nDOWNGRADING TO A LOWER BOOKING CLASS OR A LOWER\nSERVICE CLASS NOT PERMITTED.\n--------------------------------------------------\nREBOOKING/REISSUE/PAYMENT MUST BE MADE IN ONE\nTRANSACTION NOT LATER THAN 1 HOUR BEFORE\nDEPARTURE OF EITHER FLIGHT BEING CHANGED OR NEW\nFLIGHT WHICHEVER IS EARLIER",
+          "title": "PENALTIES"
+        },
+        {
+          "text": "NO HIP OR MILEAGE EXCEPTIONS APPLY.",
+          "title": "HIP/MILEAGE EXCEPTIONS"
+        },
+        {
+          "text": "THE ORIGINAL AND THE REISSUED TICKET MUST BE ANNOTATED\n- RESTR APPLY PER FARE COMP/ - AND - NONREF - IN THE\nENDORSEMENT BOX.",
+          "title": "TICKET ENDORSEMENTS"
+        },
+        {
+          "text": "CNN/ACCOMPANIED CHILD PSGR 2-11 - CHARGE 75 PERCENT OF\nTHE FARE.\nTICKET DESIGNATOR - CH.\nMUST BE ACCOMPANIED ON ALL FLIGHTS IN THE SAME\nCOMPARTMENT BY ADULT PSGR 16 OR OLDER.\nOR - 1ST INF/INFANT WITHOUT A SEAT PSGR UNDER 2 -\nCHARGE 10 PERCENT OF THE FARE.\nTICKET DESIGNATOR - IN.\nMUST BE ACCOMPANIED ON ALL FLIGHTS IN THE SAME\nCOMPARTMENT BY ADULT PSGR 16 OR OLDER.\nOR - INS/INFANT WITH A SEAT PSGR UNDER 2 - CHARGE 75\nPERCENT OF THE FARE.\nTICKET DESIGNATOR - CH.\nMUST BE ACCOMPANIED ON ALL FLIGHTS IN THE SAME\nCOMPARTMENT BY ADULT PSGR 16 OR OLDER.\nOR - UNN/UNACCOMPANIED CHILD PSGR 5-11 - CHARGE 75\nPERCENT OF THE FARE.\nTICKET DESIGNATOR - UNN.\nNOTE - TEXT BELOW NOT VALIDATED FOR AUTOPRICING.\n1. UNACCOMPANIED MINOR UNDER 5 WILL NOT BE\nACCEPTED FOR CARRIAGE.\n2. YOUNG PASSENGER 12-15 PAYING 100 PCT OF THE\nFARE MAY REQUEST ASSISTANCE AT A CHARGE - SEE\nSURCHARGE IN SU CATEGORY.",
+          "title": "CHILDREN DISCOUNTS"
+        },
+        {
+          "text": "NO DISCOUNTS FOR TOUR CONDUCTORS.",
+          "title": "TOUR CONDUCTOR DISCOUNTS"
+        },
+        {
+          "text": "NO DISCOUNTS FOR SALE AGENTS.",
+          "title": "AGENT DISCOUNTS"
+        },
+        {
+          "text": "NO DISCOUNTS FOR OTHERS.",
+          "title": "ALL OTHER DISCOUNTS"
+        },
+        {
+          "text": "NO PROVISIONS APPLY.",
+          "title": "MISCELLANEOUS PROVISIONS"
+        },
+        {
+          "text": "NOT APPLICABLE.",
+          "title": "FARE BY RULE"
+        },
+        {
+          "text": "NO GROUP PROVISIONS APPLY.",
+          "title": "GROUPS"
+        },
+        {
+          "text": "NO TOUR PROVISIONS APPLY.",
+          "title": "TOURS"
+        },
+        {
+          "text": "NO VISIT ANOTHER COUNTRY PROVISIONS APPLY.",
+          "title": "VISIT ANOTHER COUNTRY"
+        },
+        {
+          "text": "NO DEPOSIT PROVISIONS APPLY.",
+          "title": "DEPOSITS"
+        },
+        {
+          "text": "ENTER RD*31 OR RD\u0087LINE NUM\u0087*31 FOR VOLUNTARY CHGS.",
+          "title": "VOLUNTARY CHANGES"
+        },
+        {
+          "text": "CHECK CATEGORY 16 OR CONTACT CARRIER FOR DETAILS.",
+          "title": "VOLUNTARY REFUNDS"
+        },
+        {
+          "text": "NOT APPLICABLE.",
+          "title": "NEGOTIATED FARES"
+        },
+        {
+          "text": "NOT A CONSTRUCTED FARE\n.",
+          "title": "INTERNATIONAL CONSTRUCTION"
+        }
+      ]
+    },
+    {
+      "origin": "LHR",
+      "destination": "ARN",
+      "fareBasis": "OKSRGHT",
+      "fareRule": []
+    }
+  ],
+  "extras": {
+    "available": [],
+    "id": "c267c6364e8645a1a309546815593166",
+    "selected": []
+  },
+  "pricingResponseInformation": {
+    "oldPrice": {
+      "price": 199.01,
+      "currency": "EUR"
+    },
+    "newPrice": {
+      "price": 199.01,
+      "currency": "EUR"
+    }
+  },
+  "hasFinished": true,
+  "transactionId": "762073ba5a7e48a39662332b4df6d220"
+}

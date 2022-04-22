@@ -87,7 +87,9 @@ def date_to_protobuf(date: datetime.date) -> models_pb2.Date:
     )
 
 
-def protobuf_to_date(proto: models_pb2.Date) -> datetime.date:
+def protobuf_to_date(
+    proto: Union[models_pb2.Date, datetime_pb2.DateTime],
+) -> datetime.date:
     return datetime.date(year=proto.year, month=proto.month, day=proto.day)
 
 

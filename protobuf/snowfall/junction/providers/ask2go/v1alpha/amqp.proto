@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package snowfall.junction.providers.ask2go.v1alpha;
+
+import "snowfall/common/v1alpha/datetime.proto";
+import "snowfall/common/v1alpha/models.proto";
+
+message SearchCriteriaTask {
+  string offer_search_id = 1;
+  repeated snowfall.common.v1alpha.Segment segments = 2;
+  Criteria criteria = 3;
+}
+
+message Criteria {
+  string origin_iata = 1;
+  string destination_iata = 2;
+  snowfall.common.v1alpha.DateTime outbound = 3;
+  snowfall.common.v1alpha.DateTime inbound = 4;
+  string cabin_class = 5;
+  uint32 adults = 6;
+  uint32 children = 7;
+  uint32 infants = 8;
+}

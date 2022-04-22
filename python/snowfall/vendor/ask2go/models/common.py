@@ -1,8 +1,31 @@
 import datetime
-from typing import Any
+from typing import Any, Optional
 
 from snowfall.vendor.ask2go.enums import Gender, PassengerType
 from snowfall.vendor.ask2go.models.base import CamelCaseBaseModel
+
+
+class AirportChildren(CamelCaseBaseModel):
+    iata: str
+    airport_name: Optional[str]
+    city: Optional[str]
+    country: Optional[str]
+
+
+class Airport(CamelCaseBaseModel):
+    airport_name: Optional[str]
+    city: Optional[str]
+    country: Optional[str]
+    iata: str
+    city_code: Optional[str]
+    is_parent: bool = False
+    is_child: bool = False
+    language: Optional[str]
+    fts_code: Optional[str]
+    fts_composite: Optional[str]
+    fts_full: Optional[str]
+    popularity: int = 0
+    airport_children: list[AirportChildren] = []
 
 
 class Phone(CamelCaseBaseModel):

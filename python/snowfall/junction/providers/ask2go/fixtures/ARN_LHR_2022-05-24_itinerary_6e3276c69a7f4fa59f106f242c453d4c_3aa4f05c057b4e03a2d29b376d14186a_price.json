@@ -1,0 +1,323 @@
+{
+  "id": "3fdc5f893bb6468ebea9848ea388b9f1",
+  "information": {
+    "bookingId": 0,
+    "status": "PricingSuccedded"
+  },
+  "itinerary": {
+    "id": "3aa4f05c057b4e03a2d29b376d14186a",
+    "isRefundable": false,
+    "docsRequired": false,
+    "gds": "Sabre",
+    "direction": "Outbound",
+    "trips": [
+      {
+        "id": "57044e5d77324667a907c10e7889cf6c",
+        "duration": "04:05:00",
+        "direction": "Outbound",
+        "isRedEye": false,
+        "hasLongConnectionDuration": true,
+        "numberOfStops": 1,
+        "origin": {
+          "airportCode": "ARN"
+        },
+        "destination": {
+          "airportCode": "LHR"
+        },
+        "departure": {
+          "dateTime": "2022-05-24T08:25:00"
+        },
+        "arrival": {
+          "dateTime": "2022-05-24T17:05:00"
+        },
+        "plattingCarrier": {
+          "code": "AY"
+        },
+        "segments": [
+          {
+            "id": "295b88c6f8304958a55e730679e8561a",
+            "duration": "01:00:00",
+            "distance": 248.0,
+            "cabin": "Economy",
+            "isTechnicalStop": false,
+            "aircraft": {
+              "flightNumber": "802",
+              "equipment": "32B"
+            },
+            "availability": {
+              "bookingCode": "Y",
+              "count": 9
+            },
+            "origin": {
+              "airportCode": "ARN"
+            },
+            "destination": {
+              "airportCode": "HEL"
+            },
+            "departure": {
+              "dateTime": "2022-05-24T08:25:00"
+            },
+            "arrival": {
+              "dateTime": "2022-05-24T10:25:00"
+            },
+            "marketingCarrier": {
+              "code": "AY"
+            },
+            "operatingCarrier": {
+              "code": "AY"
+            },
+            "originTerminal": "5",
+            "destinationTerminal": "2",
+            "onTimePerformance": -1.0,
+            "meal": "N",
+            "layover": "05:35:00",
+            "changeOfPlane": false
+          },
+          {
+            "id": "2a4cfb9cefa44d018bdb5a5710a4a007",
+            "duration": "03:05:00",
+            "distance": 1151.0,
+            "cabin": "Economy",
+            "isTechnicalStop": false,
+            "aircraft": {
+              "flightNumber": "1337",
+              "equipment": "359"
+            },
+            "availability": {
+              "bookingCode": "Y",
+              "count": 9
+            },
+            "origin": {
+              "airportCode": "HEL"
+            },
+            "destination": {
+              "airportCode": "LHR"
+            },
+            "departure": {
+              "dateTime": "2022-05-24T16:00:00"
+            },
+            "arrival": {
+              "dateTime": "2022-05-24T17:05:00"
+            },
+            "marketingCarrier": {
+              "code": "AY"
+            },
+            "operatingCarrier": {
+              "code": "AY"
+            },
+            "originTerminal": "2",
+            "destinationTerminal": "3",
+            "onTimePerformance": -1.0,
+            "meal": "G",
+            "layover": "00:00:00",
+            "changeOfPlane": false
+          }
+        ],
+        "baggageAllowance": [
+          {
+            "weight": 0.0,
+            "unit": "",
+            "pieces": 0,
+            "hasFreeBaggage": false,
+            "passengerType": "ADT"
+          }
+        ],
+        "gds": "Sabre"
+      }
+    ],
+    "pricingInformation": {
+      "base": {
+        "baseFare": 84.0,
+        "totalTax": 27.54,
+        "totalCost": 120.04,
+        "originalCost": 111.54,
+        "serviceFee": 8.5,
+        "currency": "EUR"
+      }
+    },
+    "passengerPricing": [
+      {
+        "passengerType": "ADT",
+        "quantity": 1,
+        "priceInformation": {
+          "baseFare": 84.0,
+          "totalTax": 27.54,
+          "totalCost": 120.04,
+          "originalCost": 111.54,
+          "serviceFee": 8.5,
+          "currency": "EUR"
+        }
+      }
+    ],
+    "outboundTripKey": "ARN_HEL_2022.05.24.08.25_2022.05.24.10.25_AY_AY_802_O_HEL_LHR_2022.05.24.16.00_2022.05.24.17.05_AY_AY_1337_O_(120.04, AY)",
+    "inboundTripKey": "_(120.04, AY)"
+  },
+  "docs": [
+    {
+      "docType": "None",
+      "requiredDateOfBirth": false,
+      "requiredNationality": false,
+      "requiredExpirationDate": false,
+      "requiredIssuingCountry": false,
+      "requiredPassportNumber": false
+    }
+  ],
+  "fareRules": [
+    {
+      "origin": "ARN",
+      "destination": "LHR",
+      "fareBasis": "ONN0S9BZ",
+      "fareRule": [
+        {
+          "text": "NOTE - THE FOLLOWING TEXT IS INFORMATIONAL AND NOT\nVALIDATED FOR AUTOPRICING.\nFINNAIR LIGHT FARES\nAPPLICATION\nCLASS OF SERVICE\nTHESE FARES APPLY FOR ECONOMY CLASS SERVICE.",
+          "title": "RULE APPLICATION AND OTHER CONDITIONS"
+        },
+        {
+          "text": "NO ELIGIBILITY REQUIREMENTS APPLY.",
+          "title": "ELIGIBILITY"
+        },
+        {
+          "text": "NO DAY/TIME TRAVEL RESTRICTIONS APPLY.",
+          "title": "DAY/TIME"
+        },
+        {
+          "text": "NO SEASONAL TRAVEL RESTRICTIONS APPLY.",
+          "title": "SEASONALITY"
+        },
+        {
+          "text": "IF THE FARE COMPONENT INCLUDES TRAVEL WITHIN AREA 2\nTHEN THAT TRAVEL MUST BE ON\nONE OR MORE OF THE FOLLOWING\nANY AY FLIGHT\nANY TF FLIGHT OPERATED BY TF\nANY WF FLIGHT OPERATED BY WF\nANY BA FLIGHT OPERATED BY BA\nANY BE FLIGHT OPERATED BY BE\nANY LM FLIGHT OPERATED BY LM.",
+          "title": "FLIGHT APPLICATION"
+        },
+        {
+          "text": "CONFIRMED RESERVATIONS ARE REQUIRED FOR ALL SECTORS.\nWAITLIST NOT PERMITTED.\nWHEN RESERVATIONS ARE MADE AT LEAST 4 DAYS BEFORE\nDEPARTURE, TICKETING MUST BE COMPLETED WITHIN 72 HOURS\nAFTER RESERVATIONS ARE MADE OR AT LEAST 72 HOURS\nBEFORE DEPARTURE WHICHEVER IS EARLIER.\nOR - CONFIRMED RESERVATIONS FOR ALL SECTORS AND\nTICKETING MUST BE COMPLETED AT THE SAME TIME.\nNOTE - TEXT BELOW NOT VALIDATED FOR AUTOPRICING.\nWAITLIST NOT PERMITTED AT TIME OF TICKETING.\nTIME OF TICKETING IS DEFINED ACCORDING TO TICKET\nTIME LIMIT. IF TTL IS NOT RESPECTED ALL SEGMENTS\nWILL BE CANCELLED.\n----\nDUE TO AUTOMATED TICKETING DEADLINE CONTROL\nDIFFERENCE COULD EXIST BETWEEN THE FARE RULE\nLAST TICKETING DATE AND THE SYSTEM GENERATED\nTICKETING DEADLINE MESSAGE.\nTHE MORE RESTRICTIVE TICKETING DEADLINE APPLIES.\n----\nANY RESERVATION NOT TICKETED AT LEAST 26 HOURS\nBEFORE DEPARTURE WILL BE CANCELLED. THIS APPLIES\nIRRESPECTIVE OF THE ABOVE MENTIONED DEADLINES.\nRESERVATIONS MADE WITHIN 26 HOURS BEFORE DEPARTURE\nREQUIRE TICKETING AT THE SAME TIME.",
+          "title": "ADVANCE RESERVATIONS/TICKETING"
+        },
+        {
+          "text": "NO MINIMUM STAY REQUIREMENTS APPLY.",
+          "title": "MINIMUM STAY"
+        },
+        {
+          "text": "NO MAXIMUM STAY REQUIREMENTS APPLY.",
+          "title": "MAXIMUM STAY"
+        },
+        {
+          "text": "STOPOVERS NOT PERMITTED ON THE FARE COMPONENT.",
+          "title": "STOPOVERS"
+        },
+        {
+          "text": "FOR TRAVEL ON/BEFORE 15JAN22\nUNLIMITED TRANSFERS PERMITTED ON THE PRICING UNIT.\nFARE BREAK AND EMBEDDED SURFACE SECTORS NOT\nPERMITTED ON THE FARE COMPONENT.\nNOTE - TEXT BELOW NOT VALIDATED FOR AUTOPRICING.\n- ACCORDING TO ROUTING.\nFOR TRAVEL ON/AFTER 16JAN22 AND ON/BEFORE 15FEB22\nUNLIMITED TRANSFERS PERMITTED ON THE PRICING UNIT.\nNONE PERMITTED IN HKG IN EACH DIRECTION.\nFARE BREAK AND EMBEDDED SURFACE SECTORS NOT\nPERMITTED ON THE FARE COMPONENT.\nNOTE - TEXT BELOW NOT VALIDATED FOR AUTOPRICING.\n- ACCORDING TO ROUTING.\nFOR TRAVEL ON/AFTER 16FEB22 AND ON/BEFORE 15NOV22\nUNLIMITED TRANSFERS PERMITTED ON THE PRICING UNIT\nFARE BREAK AND EMBEDDED SURFACE SECTORS NOT\nPERMITTED ON THE FARE COMPONENT.\nNOTE - TEXT BELOW NOT VALIDATED FOR AUTOPRICING.\n- ACCORDING TO ROUTING.\nFOR TRAVEL ON/AFTER 16NOV22 AND ON/BEFORE 20DEC22\nUNLIMITED TRANSFERS PERMITTED ON THE PRICING UNIT.\nNONE PERMITTED IN DOH IN EACH DIRECTION.\nFARE BREAK AND EMBEDDED SURFACE SECTORS NOT\nPERMITTED ON THE FARE COMPONENT.\nNOTE - TEXT BELOW NOT VALIDATED FOR AUTOPRICING.\n- ACCORDING TO ROUTING.\nFOR TRAVEL ON/AFTER 21DEC22\nUNLIMITED TRANSFERS PERMITTED ON THE PRICING UNIT\nFARE BREAK AND EMBEDDED SURFACE SECTORS NOT\nPERMITTED ON THE FARE COMPONENT.\nNOTE - TEXT BELOW NOT VALIDATED FOR AUTOPRICING.\n- ACCORDING TO ROUTING.",
+          "title": "TRANSFERS"
+        },
+        {
+          "text": "END-ON-END NOT PERMITTED. SIDE TRIPS NOT PERMITTED.\nOPEN JAWS/ROUND TRIPS/CIRCLE TRIPS\nFARES MAY BE COMBINED ON A HALF ROUND TRIP BASIS\n-TO FORM SINGLE OR DOUBLE OPEN JAWS\nMILEAGE OF THE OPEN SEGMENT MUST BE EQUAL/LESS THAN\nMILEAGE OF THE SHORTEST FLOWN FARE COMPONENT.\n-TO FORM ROUND TRIPS\n-TO FORM CIRCLE TRIPS\nA MAXIMUM OF TWO INTERNATIONAL FARE COMPONENTS\nPERMITTED.\nOPEN JAWS/ROUND TRIPS/CIRCLE TRIPS NOTE -\nTHE MOST RESTRICTIVE CONDITIONS APPLY WHEN\nCOMBINING FARES ON THE HALF ROUND TRIP BASIS.\nPROVIDED -\nCOMBINATIONS ARE WITH ANY FARE FOR CARRIER AY IN\nANY RULE AND TARIFF.",
+          "title": "COMBINATIONS"
+        },
+        {
+          "text": "NO BLACKOUT DATES APPLY.",
+          "title": "BLACKOUT DATES"
+        },
+        {
+          "text": "NO SURCHARGE REQUIREMENTS APPLY.",
+          "title": "SURCHARGES"
+        },
+        {
+          "text": "ACCOMPANIED TRAVEL NOT REQUIRED.",
+          "title": "ACCOMPANIED TRAVEL"
+        },
+        {
+          "text": "NO TRAVEL DATE RESTRICTIONS APPLY.",
+          "title": "TRAVEL RESTRICTIONS"
+        },
+        {
+          "text": "TICKETS MUST BE ISSUED ON THE STOCK OF AY AND MAY NOT\nBE SOLD IN VENEZUELA/NIGERIA/ANGOLA/EGYPT. AND MAY\nONLY BE SOLD IN AREA 1/AREA 2/AREA 3.",
+          "title": "SALES RESTRICTIONS"
+        },
+        {
+          "text": "CHANGES\nANY TIME\nCHANGES NOT PERMITTED.\nNOTE - TEXT BELOW NOT VALIDATED FOR AUTOPRICING.\nCHANGES MADE TILL 31 MAY 22-\nCHANGES PERMITTED WITHOUT A CHARGE OF ANY CHANGE\nFEE FOR CHANGES MADE UP TO 48 HOURS PRIOR TO\nFLIGHT DEPARTURE.\nCHANGES MADE ON/AFTER 01 JUN 22\nFIRST CHANGE PERMITTED WITHOUT A CHARGE OF ANY\nCHANGE FEE FOR CHANGE MADE UP TO 48 HOURS PRIOR\nTO FLIGHT DEPARTURE.\nBELOW PROVISIONS FURTHER APPLY\n----------\nNO SHOW - NOT PERMITTED.\n----------\nIF PASSENGER IS NO SHOW FINNAIR HAS A RIGHT\nTO CANCEL ONWARD OR RETURN RESERVATION.\nCANCELLATIONS\nANY TIME\nTICKET IS NON-REFUNDABLE.\nNOTE - TEXT BELOW NOT VALIDATED FOR AUTOPRICING.\nFARE COMPONENT IS NON-REFUNDABLE.\n----------\nUNUSED YR/YQ FEES ARE NON-REFUNDABLE.\n----------\nWHEN COMBINING NON-REFUNDABLE FARES WITH\nREFUNDABLE FARES\n1. THE AMOUNT PAID ON EACH REFUNDABLE FARE\nCOMPONENT IS REFUNDED.\n2. THE AMOUNT PAID ON EACH NON-REFUNDABLE FARE\nCOMPONENT WILL NOT BE REFUNDED.\n3. WHEN COMBINING FARES CHARGE THE SUM OF THE\nCANCELLATION FEES OF ALL CANCELLED FARE\nCOMPONENTS.\n----------\nFULL REFUND PERMITTED IN CASE OF-\n- REJECTION OF VISA. EMBASSY STATEMENT REQUIRED.\n- DEATH OF PASSENGER OR FAMILY MEMBER.\nWAIVERS MUST BE EVIDENCED BY DEATH CERTIFICATE.\n----------\nNO SHOW - NOT PERMITTED.",
+          "title": "PENALTIES"
+        },
+        {
+          "text": "THE HIGHER INTERMEDIATE POINT RULE DOES NOT APPLY FOR\nCONNECTIONS.\nAND - THE HIGHER INTERMEDIATE POINT RULE DOES NOT APPLY\nFOR STOPOVERS.",
+          "title": "HIP/MILEAGE EXCEPTIONS"
+        },
+        {
+          "text": "THE ORIGINAL TICKET MUST BE ANNOTATED - NO BAG INCL/\nNONREF-NO CHNG - IN THE ENDORSEMENT BOX.",
+          "title": "TICKET ENDORSEMENTS"
+        },
+        {
+          "text": "CNN/ACCOMPANIED CHILD PSGR 2-11 - CHARGE 75 PERCENT OF\nTHE FARE.\nTICKET DESIGNATOR - CH.\nMUST BE ACCOMPANIED ON ALL FLIGHTS IN THE SAME\nCOMPARTMENT BY ADULT PSGR 12 OR OLDER.\nOR - 1ST INF/INFANT WITHOUT A SEAT PSGR UNDER 2 -\nCHARGE 10 PERCENT OF THE FARE.\nTICKET DESIGNATOR - IN.\nMUST BE ACCOMPANIED ON ALL FLIGHTS IN THE SAME\nCOMPARTMENT BY ADULT PSGR 12 OR OLDER.\nOR - INS/INFANT WITH A SEAT PSGR UNDER 2 - CHARGE 75\nPERCENT OF THE FARE.\nTICKET DESIGNATOR - CH.\nMUST BE ACCOMPANIED ON ALL FLIGHTS IN THE SAME\nCOMPARTMENT BY ADULT PSGR 12 OR OLDER.\nOR - UNN/UNACCOMPANIED CHILD PSGR 5-11 - CHARGE 100\nPERCENT OF THE FARE.\nTICKET DESIGNATOR - UM.\nNOTE - TEXT BELOW NOT VALIDATED FOR AUTOPRICING.\nBELOW UM FEE WILL BE APPLICABLE PER DIRECTION\nWITHIN FINLAND SCANDINAVIA AND BALTICS - EUR40.00\nREST OF EUROPE AND MIDDLE EAST - EUR60.00\nLONG HAULS - EUR120.00\nUM ALLOWED ONLY ON AY MARKETED AND OPERATED\nFLIGHTS",
+          "title": "CHILDREN DISCOUNTS"
+        },
+        {
+          "text": "NOTE - TEXT BELOW NOT VALIDATED FOR AUTOPRICING.\nCONTACT CARRIER FOR MORE DETAILS",
+          "title": "TOUR CONDUCTOR DISCOUNTS"
+        },
+        {
+          "text": "NOTE - TEXT BELOW NOT VALIDATED FOR AUTOPRICING.\nCONTACT CARRIER FOR MORE DETAILS",
+          "title": "AGENT DISCOUNTS"
+        },
+        {
+          "text": "NOTE - TEXT BELOW NOT VALIDATED FOR AUTOPRICING.\nCONTACT CARRIER FOR MORE DETAILS",
+          "title": "ALL OTHER DISCOUNTS"
+        },
+        {
+          "text": "THIS FARE MUST NOT BE USED AS THROUGH FARE WITH A\nDIFFERENTIAL AND/OR TO CALCULATE DIFFERENTIAL.",
+          "title": "MISCELLANEOUS PROVISIONS"
+        },
+        {
+          "text": "NOT APPLICABLE.",
+          "title": "FARE BY RULE"
+        },
+        {
+          "text": "NO GROUP PROVISIONS APPLY.",
+          "title": "GROUPS"
+        },
+        {
+          "text": "NO TOUR PROVISIONS APPLY.",
+          "title": "TOURS"
+        },
+        {
+          "text": "NO VISIT ANOTHER COUNTRY PROVISIONS APPLY.",
+          "title": "VISIT ANOTHER COUNTRY"
+        },
+        {
+          "text": "NO DEPOSIT PROVISIONS APPLY.",
+          "title": "DEPOSITS"
+        },
+        {
+          "text": "ENTER RD*31 OR RD\u0087LINE NUM\u0087*31 FOR VOLUNTARY CHGS.",
+          "title": "VOLUNTARY CHANGES"
+        },
+        {
+          "text": "CHECK CATEGORY 16 OR CONTACT CARRIER FOR DETAILS.",
+          "title": "VOLUNTARY REFUNDS"
+        },
+        {
+          "text": "NOT APPLICABLE.",
+          "title": "NEGOTIATED FARES"
+        },
+        {
+          "text": "NOT A CONSTRUCTED FARE\n.",
+          "title": "INTERNATIONAL CONSTRUCTION"
+        }
+      ]
+    }
+  ],
+  "extras": {
+    "available": [],
+    "id": "f4b705075178429881ec8fadcc1a0935",
+    "selected": []
+  },
+  "pricingResponseInformation": {
+    "oldPrice": {
+      "price": 120.04,
+      "currency": "EUR"
+    },
+    "newPrice": {
+      "price": 120.04,
+      "currency": "EUR"
+    }
+  },
+  "hasFinished": true,
+  "transactionId": "762073ba5a7e48a39662332b4df6d220"
+}

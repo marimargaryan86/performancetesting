@@ -15,6 +15,18 @@ class Ask2GoClient(object):  # noqa: WPS214
         self._api_booking_base_url = api_booking_base_url
         self._http_client = http_client
 
+    async def get_airports(self) -> list[common.Airport]:
+        resp = await self._http_client.get(
+            "{api_base_url}/Airports".format(api_base_url=self._api_base_url),
+        )
+
+        try:
+            resp.raise_for_status()
+        except httpx.HTTPError as exc:
+            raise errors.ServiceError() from exc
+
+        return [common.Airport(**airport) for airport in resp.json()["airport"]]
+
     async def create_search(
         self,
         criteria: search.CreateSearchCriteria,

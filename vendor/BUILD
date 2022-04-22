@@ -5,6 +5,7 @@ python_requirements(
         "grpcio-reflection": ["grpc_reflection"],
         "protobuf": ["google.protobuf"],
         "pyjwt": ["jwt"],
+        "pytest-httpx": ["pytest_httpx"],
         "python-dateutil": ["dateutil"],
         "python-rapidjson": ["rapidjson"],
         "setuptools": ["easy_install", "pkg_resources", "setuptools"],
