@@ -1,5 +1,4 @@
 import grpc
-from google.protobuf import timestamp_pb2
 
 from snowfall.junction.passenger_name_records.passenger_name_records import (
     PassengerNameRecordRepository,
@@ -37,11 +36,6 @@ class PassengerNameRecordService(
         request: passenger_name_records_pb2.CreatePassengerNameRecordRequest,
         context: grpc.aio.ServicerContext,
     ) -> passenger_name_records_pb2.CreatePassengerNameRecordResponse:
-        passenger_name_record = passenger_name_records_pb2.PassengerNameRecord(
-            id="",
-            created_at=timestamp_pb2.Timestamp(),
-        )
-
         return passenger_name_records_pb2.CreatePassengerNameRecordResponse(
-            passenger_name_record=passenger_name_record,
+            passenger_name_record=await self._passenger_name_records.create(),
         )

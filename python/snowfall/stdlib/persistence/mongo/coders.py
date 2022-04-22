@@ -65,7 +65,9 @@ class ProtoCoder(Generic[Proto], BaseCoder[Proto]):
         fields = proto.DESCRIPTOR.fields_by_name.keys()
 
         # Only set created if it hasn't been set already.
-        if "created_at" in fields and proto.created.seconds == 0:  # type: ignore[attr-defined]
+        if (  # noqa: WPS337
+            "created_at" in fields and proto.created_at.seconds == 0  # type: ignore[attr-defined]  # noqa: B950
+        ):
             proto.created_at.GetCurrentTime()  # type: ignore[attr-defined]
 
         if "updated_at" in fields:
