@@ -45,7 +45,7 @@ class Client(abc.ABC):
     async def list_trips_by_trip_search(
         self,
         identifier: str,
-        limit: int,
+        limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> TripsPage:
         """List trips by trip search."""
@@ -86,7 +86,7 @@ class DictClient(Client):
     async def list_trips_by_trip_search(
         self,
         identifier: str,
-        limit: int,
+        limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> TripsPage:
         try:
@@ -162,7 +162,7 @@ class GrpcClient(Client):
     async def list_trips_by_trip_search(
         self,
         identifier: str,
-        limit: int,
+        limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> TripsPage:
         trip_search = await self.get(identifier)
@@ -173,7 +173,7 @@ class GrpcClient(Client):
         response = await self._trips.ListTrips(
             trips_pb2.ListTripsRequest(
                 ids=trip_search.trip_ids,
-                page_size=limit,
+                page_size=limit or 0,
                 page_token=cursor or "",
             ),
         )

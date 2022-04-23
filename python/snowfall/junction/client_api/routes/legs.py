@@ -4,6 +4,7 @@ from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.adapter import legs as legs_adapter
 from snowfall.adapter import segments as segments_adapter
+from snowfall.adapter import trip_searches as trip_searches_adapter
 from snowfall.adapter import trips as trips_adapter
 from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.client_api import models, resources
@@ -11,6 +12,7 @@ from snowfall.stdlib.format import protobuf
 
 _PAGE_LIMIT = "page[limit]"
 _PAGE_CURSOR = "page[cursor]"
+_NOT_FOUND_STATUS = status.HTTP_404_NOT_FOUND
 
 
 class Leg(endpoints.HTTPEndpoint):
@@ -151,3 +153,69 @@ class LegsByTripId(endpoints.HTTPEndpoint):
                 ],
             ),
         )
+
+
+class LegsByTripSearchId(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        trip_searches_client: trip_searches_adapter.Client = lagom.injectable,
+        legs_client: legs_adapter.Client = lagom.injectable,
+    ) -> responses.Response:
+        trips = await self._get_all_trips(request, trip_searches_client)
+        segments = [segment for trip in trips for segment in trip.segments]
+        leg_ids = [leg_id for segment in segments for leg_id in segment.leg_ids]
+        try:
+            legs_page = await legs_client.find_by_ids(
+                leg_ids,
+                limit=len(leg_ids),
+            )
+        except legs_adapter.NotFoundError:
+            raise exceptions.HTTPException(_NOT_FOUND_STATUS)
+
+        next_url = furl(
+            request.url_for(
+                "ListLegsByTripSearchId",
+                tripSearchId=request.path_params["tripSearchId"],
+            ),
+        )
+        next_url.args[_PAGE_CURSOR] = legs_page.next_page_token
+        next_url.args[_PAGE_LIMIT] = int(request.query_params[_PAGE_LIMIT])
+        return models.JsonApiResponse(
+            models.Body(
+                data=[
+                    resources.LegResource.from_proto(
+                        leg=leg,
+                        request=request,
+                    )
+                    for leg in legs_page.legs
+                ],
+                links={
+                    "next": next_url.url,
+                },
+            ),
+        )
+
+    async def _get_all_trips(
+        self,
+        request: requests.Request,
+        trip_searches_client: trip_searches_adapter.Client = lagom.injectable,
+    ) -> list[models_pb2.TripReference]:
+        trips: list[models_pb2.TripReference] = []
+        trips_cursor = None
+        while True:
+            try:
+                trips_page = await trip_searches_client.list_trips_by_trip_search(
+                    request.path_params["tripSearchId"],
+                    cursor=trips_cursor,
+                )
+            except trip_searches_adapter.NotFoundError:
+                raise exceptions.HTTPException(_NOT_FOUND_STATUS)
+
+            trips.extend(trips_page.trips)
+            trips_cursor = trips_page.next_page_token
+
+            if not trips_page.next_page_token:
+                break
+
+        return trips
