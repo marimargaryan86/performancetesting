@@ -8,6 +8,7 @@ import pydantic
 
 from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.offers.v1alpha import offers_pb2
+from snowfall.junction.providers.v1alpha import offers_pb2 as provider_offers_pb2
 from snowfall.stdlib import service
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport import amqp
@@ -21,56 +22,53 @@ class OffersMockClient(object):
     async def search(
         self,
         search: offers_pb2.TripOfferSearchTask,
-    ) -> AsyncIterator[offers_pb2.TripOfferResult]:
-        yield offers_pb2.TripOfferResult(
+    ) -> AsyncIterator[provider_offers_pb2.GroupedOffer]:
+        yield provider_offers_pb2.GroupedOffer(
             id=str(uuid.uuid4()),
             offer_search_id=search.offer_search_id,
-            segment_ids=[segment.id for segment in search.search.segments],
+            offers=[
+                provider_offers_pb2.Offer(
+                    id="FOO",
+                    segments=[
+                        provider_offers_pb2.OfferSegment(
+                            id=segment.id,
+                        )
+                        for segment in search.search.segments
+                    ],
+                    price=models_pb2.Price(
+                        amount=1337,
+                        currency="EUR",
+                    ),
+                ),
+            ],
+            segments=[
+                provider_offers_pb2.Segment(
+                    id=segment.id,
+                    legs=[
+                        provider_offers_pb2.Leg(
+                            id=leg.id,
+                            origin=leg.origin,
+                            destination=leg.destination,
+                            departure_at=leg.departure_at,
+                            arrival_at=leg.arrival_at,
+                        ),
+                    ],
+                    vehicle=provider_offers_pb2.Vehicle(
+                        number="123",
+                        equipment="B52",
+                    ),
+                    operator="SK",
+                    vendor="BA",
+                    terminal="5",
+                )
+                for segment in search.search.segments
+                for leg in segment.legs
+            ],
             expires_at=protobuf.datetime_to_protobuf(
                 datetime.datetime.now(
                     tz=datetime.timezone.utc,
                 )
                 + datetime.timedelta(minutes=15),
-            ),
-            schedules=[
-                models_pb2.Schedule(
-                    id="123",
-                    name="Uppsala - Stockholm",
-                    stops=[
-                        models_pb2.Stop(
-                            id="234",
-                            departure_at=protobuf.datetime_to_protobuf(
-                                datetime.datetime.now(tz=datetime.timezone.utc),
-                            ),
-                            point=models_pb2.Point(
-                                ref="foobar",
-                                name="Uppsala",
-                                time_zone="Europe/Stockholm",
-                            ),
-                            order=1,
-                        ),
-                        models_pb2.Stop(
-                            id="234",
-                            arrival_at=protobuf.datetime_to_protobuf(
-                                datetime.datetime.now(tz=datetime.timezone.utc)
-                                + datetime.timedelta(hours=1),
-                            ),
-                            point=models_pb2.Point(
-                                ref="foobar",
-                                name="Stockholm",
-                                time_zone="Europe/Stockholm",
-                            ),
-                            order=1,
-                        ),
-                    ],
-                    agency_name="Trips Delight",
-                    source_ref="456",
-                    type=models_pb2.Schedule.Type.TYPE_AIR,
-                ),
-            ],
-            price=models_pb2.Price(
-                amount=123,
-                currency="EUR",
             ),
         )
 

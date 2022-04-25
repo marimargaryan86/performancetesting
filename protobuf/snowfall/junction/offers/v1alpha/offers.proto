@@ -4,6 +4,7 @@ package snowfall.junction.offers.v1alpha;
 
 import "google/protobuf/timestamp.proto";
 import "snowfall/common/v1alpha/models.proto";
+import "snowfall/junction/providers/v1alpha/offers.proto";
 
 service OfferSearchService {
   rpc EnqueueOfferSearch(EnqueueOfferSearchRequest) returns (EnqueueOfferSearchResponse) {}
@@ -59,7 +60,7 @@ message ListOffersResponse {
 
 message Offer {
   string id = 1;
-  repeated TripOfferResult results = 2;
+  repeated snowfall.junction.providers.v1alpha.GroupedOffer results = 2;
   enum Status {
     STATUS_UNSPECIFIED = 0;
     STATUS_PENDING = 1;
@@ -103,13 +104,4 @@ message LoyaltyCard {
 message TripOfferSearchTask {
   string offer_search_id = 1;
   TripOfferSearch search = 2;
-}
-
-message TripOfferResult {
-  string id = 1;
-  string offer_search_id = 2;
-  repeated string segment_ids = 3;
-  repeated snowfall.common.v1alpha.Schedule schedules = 4;
-  snowfall.common.v1alpha.Price price = 5;
-  google.protobuf.Timestamp expires_at = 6;
 }

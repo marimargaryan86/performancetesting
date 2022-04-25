@@ -49,9 +49,13 @@ class OfferResource(models.Resource):
         return {
             "expiresAt": protobuf.protobuf_to_datetime(first_expiring_offer.expires_at),
             "price": str(
-                sum(offer_result.price.amount for offer_result in offer.results) / 100,
+                sum(
+                    offer_result.offers[0].price.amount
+                    for offer_result in offer.results
+                )
+                / 100,
             ),
-            "currency": first_expiring_offer.price.currency,
+            "currency": first_expiring_offer.offers[0].price.currency,
         }
 
 

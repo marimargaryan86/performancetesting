@@ -5,6 +5,7 @@ from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.offers.v1alpha import offers_pb2
 from snowfall.junction.orders.v1alpha import orders_pb2
 from snowfall.junction.passenger_name_records.v1alpha import passenger_name_records_pb2
+from snowfall.junction.providers.v1alpha import offers_pb2 as provider_offers_pb2
 from snowfall.stdlib.format import protobuf
 
 _LATITUDE_RANGE = (-90, 90)
@@ -95,11 +96,15 @@ def generate_offer(identifier: str) -> offers_pb2.Offer:
     return offers_pb2.Offer(
         id=identifier,
         results=[
-            offers_pb2.TripOfferResult(
-                price=models_pb2.Price(
-                    amount=1337,
-                    currency="SEK",
-                ),
+            provider_offers_pb2.GroupedOffer(
+                offers=[
+                    provider_offers_pb2.Offer(
+                        price=models_pb2.Price(
+                            amount=1337,
+                            currency="SEK",
+                        ),
+                    ),
+                ],
                 expires_at=protobuf.datetime_to_protobuf(datetime.datetime.now()),
             ),
         ],

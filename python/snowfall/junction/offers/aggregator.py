@@ -4,6 +4,7 @@ import uuid
 
 from snowfall.junction.offers import offers
 from snowfall.junction.offers.v1alpha import offers_pb2
+from snowfall.junction.providers.v1alpha import offers_pb2 as provider_offers_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence import redis
 
@@ -33,8 +34,8 @@ class OfferBucketRepository(object):
     ):
         self._redis = redis_client
 
-    async def add_offer(self, offer: offers_pb2.TripOfferResult) -> None:
-        key = ":".join([offer.offer_search_id, offer.segment_ids[0]])
+    async def add_offer(self, offer: provider_offers_pb2.GroupedOffer) -> None:
+        key = ":".join([offer.offer_search_id, offer.segments[0].id])
         bucket = self._redis.list_(key)
         await bucket.push(offer.id)
         await redis.put_expires_at_if_greater(
@@ -75,7 +76,7 @@ class OfferAggregator(object):
         self._buckets = offer_buckets
         self._aggregates = offer_aggregates
 
-    async def aggregate(self, offer: offers_pb2.TripOfferResult) -> None:
+    async def aggregate(self, offer: provider_offers_pb2.GroupedOffer) -> None:
         offer_search = await self._searches.find_by_id(offer.offer_search_id)
 
         if not offer_search:
@@ -93,8 +94,11 @@ class OfferAggregator(object):
             aggregate.offer_search_id = offer_search.id
             await self._aggregates.insert(aggregate)
 
-    async def _get_buckets(self, offer: offers_pb2.TripOfferResult) -> OfferBuckets:
+    async def _get_buckets(
+        self,
+        offer: provider_offers_pb2.GroupedOffer,
+    ) -> OfferBuckets:
         buckets = await self._buckets.get_offer_buckets(offer.offer_search_id)
-        buckets[offer.segment_ids[0]] = [offer.id]
+        buckets[offer.segments[0].id] = [offer.id]
 
         return buckets

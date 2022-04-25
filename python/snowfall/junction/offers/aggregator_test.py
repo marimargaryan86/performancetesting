@@ -7,6 +7,7 @@ from motor import motor_asyncio
 from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.offers import aggregator, offers
 from snowfall.junction.offers.v1alpha import offers_pb2
+from snowfall.junction.providers.v1alpha import offers_pb2 as provider_offers_pb2
 from snowfall.stdlib.format import protobuf
 
 _OFFER_SEARCHES = (
@@ -56,34 +57,54 @@ _OFFER_RESULT_EXPIRY = protobuf.datetime_to_protobuf(
 )
 
 _OFFER_RESULTS = (
-    offers_pb2.TripOfferResult(
+    provider_offers_pb2.GroupedOffer(
         id="1",
         offer_search_id="foo",
-        segment_ids=["a"],
+        segments=[
+            provider_offers_pb2.Segment(
+                id="a",
+            ),
+        ],
         expires_at=_OFFER_RESULT_EXPIRY,
     ),
-    offers_pb2.TripOfferResult(
+    provider_offers_pb2.GroupedOffer(
         id="2",
         offer_search_id="foo",
-        segment_ids=["b"],
+        segments=[
+            provider_offers_pb2.Segment(
+                id="b",
+            ),
+        ],
         expires_at=_OFFER_RESULT_EXPIRY,
     ),
-    offers_pb2.TripOfferResult(
+    provider_offers_pb2.GroupedOffer(
         id="3",
         offer_search_id="foo",
-        segment_ids=["b"],
+        segments=[
+            provider_offers_pb2.Segment(
+                id="b",
+            ),
+        ],
         expires_at=_OFFER_RESULT_EXPIRY,
     ),
-    offers_pb2.TripOfferResult(
+    provider_offers_pb2.GroupedOffer(
         id="4",
         offer_search_id="foo",
-        segment_ids=["c"],
+        segments=[
+            provider_offers_pb2.Segment(
+                id="c",
+            ),
+        ],
         expires_at=_OFFER_RESULT_EXPIRY,
     ),
-    offers_pb2.TripOfferResult(
+    provider_offers_pb2.GroupedOffer(
         id="5",
         offer_search_id="foo",
-        segment_ids=["c"],
+        segments=[
+            provider_offers_pb2.Segment(
+                id="c",
+            ),
+        ],
         expires_at=_OFFER_RESULT_EXPIRY,
     ),
 )
@@ -106,7 +127,7 @@ class TestOfferBuckets(object):
     async def test_offers_are_placed_in_buckets(
         self,
         offer_bucket_repository: aggregator.OfferBucketRepository,
-        offer_results: Sequence[offers_pb2.TripOfferResult],
+        offer_results: Sequence[provider_offers_pb2.GroupedOffer],
         expected: Mapping[str, Sequence[str]],
     ) -> None:
         for offer in offer_results:
@@ -137,7 +158,7 @@ class TestAggregator(object):
         offer_aggregator: aggregator.OfferAggregator,
         offer_aggregate_collection: motor_asyncio.AsyncIOMotorCollection,
         offer_search: offers_pb2.OfferSearch,
-        offer_results: Sequence[offers_pb2.TripOfferResult],
+        offer_results: Sequence[provider_offers_pb2.GroupedOffer],
         expected: int,
     ) -> None:
         await offer_searches_repository.insert(offer_search)
@@ -175,7 +196,7 @@ class TestAggregator(object):
         offer_aggregator: aggregator.OfferAggregator,
         offer_aggregate_collection: motor_asyncio.AsyncIOMotorCollection,
         offer_search: offers_pb2.OfferSearch,
-        offer_results: Sequence[offers_pb2.TripOfferResult],
+        offer_results: Sequence[provider_offers_pb2.GroupedOffer],
         expected: Sequence[Sequence[str]],
     ) -> None:
         await offer_searches_repository.insert(offer_search)
