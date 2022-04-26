@@ -19,15 +19,16 @@ variables.
 
 The following ports are configured in local environments by default:
 
-| Port  | Service    | Description |
-|:-----:|:-----------|:------------|
-| 8000  | client-api | HTTP Server |
-| 50051 | echo       | gRPC Server |
-| 50052 | places     | gRPC Server |
-| 50053 | planner    | gRPC Server |
-| 50054 | trips      | gRPC Server |
-| 50055 | offers     | gRPC Server |
-| 50056 | schedules  | gRPC Server |
-| 50057 | orders     | gRPC Server |
-| 50058 | geodata    | gRPC Server |
-| 50059 | passenger-name-records       | gRPC Server |
+| Port  | Service                     | Description |
+|:-----:|:----------------------------|:------------|
+| 8000  | client-api                  | HTTP Server |
+| 50051 | echo                        | gRPC Server |
+| 50052 | places                      | gRPC Server |
+| 50053 | planner                     | gRPC Server |
+| 50054 | trips                       | gRPC Server |
+| 50055 | offers                      | gRPC Server |
+| 50056 | schedules                   | gRPC Server |
+| 50057 | orders                      | gRPC Server |
+| 50058 | geodata                     | gRPC Server |
+| 50059 | passenger-name-records      | gRPC Server |
+| 50060 | currencies                  | gRPC Server |
