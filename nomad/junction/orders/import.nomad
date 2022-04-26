@@ -37,6 +37,7 @@ job "orders-import" {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 MONGO_DSN={{range $index, $service := service "mongodb"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
+PASSENGER_NAME_RECORDS_ADDRESS={{range $index, $service := service (printf "grpc.passenger-name-records-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
 EOH
         destination = "services.env"
         env         = true
