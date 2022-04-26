@@ -4,8 +4,7 @@ from typing import Sequence, cast
 
 import pydantic
 
-from snowfall.junction.offers.v1alpha import offers_pb2
-from snowfall.junction.orders.v1alpha import orders_pb2
+from snowfall.junction.orders.v1alpha import amqp_pb2, models_pb2
 from snowfall.stdlib import service
 from snowfall.stdlib.transport import amqp
 
@@ -17,14 +16,13 @@ class OrdersSettings(service.Settings):
 class OrdersMockClient(object):
     async def search(
         self,
-        order: orders_pb2.OrderTask,
-    ) -> AsyncIterator[orders_pb2.OrderResult]:
-        for offer in order.offers:
-            yield orders_pb2.OrderResult(
-                order_id=order.order_id,
-                offer_id=offer.id,
-                status=offers_pb2.Offer.Status.STATUS_CONFIRMED,
-            )
+        order: amqp_pb2.PlaceOrderTask,
+    ) -> AsyncIterator[models_pb2.OrderResult]:
+        yield models_pb2.OrderResult(
+            order_id=order.order.id,
+            offer_id=order.offer_id,
+            status=models_pb2.OrderResult.Status.STATUS_CONFIRMED,
+        )
 
 
 class OrdersConsumer(object):
@@ -42,7 +40,7 @@ class OrdersConsumer(object):
         await self._consumer.consume(self._process_message)
 
     async def _process_message(self, message: amqp.Message) -> None:
-        search = cast(orders_pb2.OrderTask, message.body)
+        search = cast(amqp_pb2.PlaceOrderTask, message.body)
 
         async for order_result in self._client.search(search):
             await self._producer.publish(

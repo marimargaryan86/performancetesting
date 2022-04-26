@@ -2,11 +2,12 @@ import datetime
 from collections.abc import AsyncIterator
 from typing import Any, Mapping, Sequence
 
+import aioredis
 import httpx
 import pytest
 
-from snowfall.junction.providers.ask2go import adapter, airports, criteria, h3
-from snowfall.stdlib.persistence import filesystem
+from snowfall.junction.providers.ask2go import adapter, airports, cache, criteria, h3
+from snowfall.stdlib.persistence import filesystem, redis
 from snowfall.vendor.ask2go import client
 from snowfall.vendor.ask2go.models import common
 
@@ -46,10 +47,14 @@ def ask2go_client(http_client: httpx.AsyncClient) -> client.Ask2GoClient:
 def ask2go_adapter(
     ask2go_client: client.Ask2GoClient,
     airport_repository: airports.AirportRepository,
+    decoding_redis_client: aioredis.Redis,
 ) -> adapter.Ask2GoAdapter:
     return adapter.Ask2GoAdapter(
         ask2go_client=ask2go_client,
         airport_repository=airport_repository,
+        offer_cache=cache.OfferCache(
+            client=redis.Client[str](decoding_redis_client),
+        ),
         ttl=datetime.timedelta(days=1),
     )
 

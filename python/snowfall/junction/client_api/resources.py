@@ -8,7 +8,7 @@ from starlette import requests
 from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.client_api import models
 from snowfall.junction.offers.v1alpha import offers_pb2
-from snowfall.junction.orders.v1alpha import orders_pb2
+from snowfall.junction.orders.v1alpha import models_pb2 as orders_models_pb2
 from snowfall.junction.trips.v1alpha import trips_pb2
 from snowfall.stdlib.format import protobuf
 
@@ -63,7 +63,7 @@ class OrderResource(models.Resource):
     @classmethod
     def from_proto(
         cls,
-        order: orders_pb2.Order,
+        order: orders_models_pb2.Order,
         request: requests.Request,
     ) -> OrderResource:
         return cls(

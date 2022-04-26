@@ -3,18 +3,13 @@ syntax = "proto3";
 package snowfall.junction.orders.v1alpha;
 
 import "snowfall/junction/offers/v1alpha/offers.proto";
+import "snowfall/junction/orders/v1alpha/models.proto";
 
 service OrderService {
   rpc AddOffersToOrder(AddOffersToOrderRequest) returns (AddOffersToOrderResponse) {}
   rpc EnqueueOrder(EnqueueOrderRequest) returns (EnqueueOrderResponse) {}
   rpc GetOrder(GetOrderRequest) returns (GetOrderResponse) {}
   rpc ListOrders(ListOrdersRequest) returns (ListOrdersResponse) {}
-}
-
-message Order {
-  string id = 1;
-  repeated snowfall.junction.offers.v1alpha.Offer offers = 2;
-  string passenger_name_record = 3;
 }
 
 message AddOffersToOrderRequest {
@@ -51,15 +46,4 @@ message ListOrdersRequest {
 message ListOrdersResponse {
   repeated Order orders = 1;
   string next_page_token = 2;
-}
-
-message OrderTask {
-  string order_id = 1;
-  repeated snowfall.junction.offers.v1alpha.Offer offers = 2;
-}
-
-message OrderResult {
-  string order_id = 1;
-  string offer_id = 2;
-  snowfall.junction.offers.v1alpha.Offer.Status status = 3;
 }

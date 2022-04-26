@@ -6,7 +6,7 @@ import pytest
 
 from snowfall import fixtures
 from snowfall.adapter import orders
-from snowfall.junction.orders.v1alpha import orders_pb2, orders_pb2_grpc
+from snowfall.junction.orders.v1alpha import models_pb2, orders_pb2, orders_pb2_grpc
 
 
 @pytest.mark.asyncio
@@ -61,7 +61,7 @@ class TestGrpcClient(object):
             await client.get(fixtures.NOT_FOUND)
 
     async def test_single_order_is_retrievable(self) -> None:
-        proto = orders_pb2.Order(id=fixtures.ORDERS[0])
+        proto = models_pb2.Order(id=fixtures.ORDERS[0])
         stub = mock.create_autospec(orders_pb2_grpc.OrderServiceStub)
         stub.GetOrder = mock.AsyncMock(
             return_value=orders_pb2.GetOrderResponse(order=proto),

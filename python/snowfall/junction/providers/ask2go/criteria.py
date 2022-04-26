@@ -11,8 +11,8 @@ from snowfall.junction.providers.ask2go import airports, h3
 from snowfall.junction.providers.ask2go.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.vendor.ask2go import enums
+from snowfall.vendor.ask2go.models import common
 
-_DAYS_IN_YEAR = 365
 _ADULT_YEARS = 12
 _CHILD_YEARS = 2
 
@@ -25,7 +25,7 @@ class CriteriaGenerator(object):
         self,
         search_task: offers_pb2.TripOfferSearchTask,
     ) -> Iterator[amqp_pb2.SearchCriteriaTask]:
-        number_of_types = get_passenger_types(
+        number_of_types = get_num_of_passenger_types(
             passengers=search_task.search.passengers,
             date=_get_last_travel_date(search_task),
         )
@@ -76,7 +76,22 @@ def _get_last_travel_date(search_task: offers_pb2.TripOfferSearchTask) -> dateti
     )
 
 
-def get_passenger_types(
+def get_passenger_type(
+    date_of_birth: datetime.date,
+    date_of_travel: datetime.date,
+) -> common.PassengerType:
+    age = _get_age_at_date(date_of_birth, date_of_travel)
+
+    if age >= _ADULT_YEARS:
+        return common.PassengerType.adult
+
+    if age >= _CHILD_YEARS:
+        return common.PassengerType.child
+
+    return common.PassengerType.infant
+
+
+def get_num_of_passenger_types(
     passengers: Sequence[offers_pb2.Passenger],
     date: datetime.date,
 ) -> tuple[int, int, int]:
@@ -85,11 +100,14 @@ def get_passenger_types(
     infants = 0
 
     for passenger in passengers:
-        age = get_age_at_date(passenger, date)
+        pax_type = get_passenger_type(
+            protobuf.protobuf_to_date(passenger.date_of_birth),
+            date,
+        )
 
-        if age >= _ADULT_YEARS:
+        if pax_type == common.PassengerType.adult:
             adults += 1
-        elif age >= _CHILD_YEARS:
+        elif pax_type == common.PassengerType.child:
             children += 1
         else:
             infants += 1
@@ -97,7 +115,9 @@ def get_passenger_types(
     return adults, children, infants
 
 
-def get_age_at_date(passenger: offers_pb2.Passenger, date: datetime.date) -> int:
-    age = date - protobuf.protobuf_to_date(passenger.date_of_birth)
+def _get_age_at_date(birth_date: datetime.date, travel_date: datetime.date) -> int:
+    year_difference = travel_date.year - birth_date.year
 
-    return age.days // _DAYS_IN_YEAR
+    return year_difference - (
+        (travel_date.month, travel_date.day) < (birth_date.month, birth_date.day)
+    )

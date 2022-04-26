@@ -3,7 +3,7 @@ import random
 
 from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.offers.v1alpha import offers_pb2
-from snowfall.junction.orders.v1alpha import orders_pb2
+from snowfall.junction.orders.v1alpha import models_pb2 as order_models_pb2
 from snowfall.junction.passenger_name_records.v1alpha import passenger_name_records_pb2
 from snowfall.junction.providers.v1alpha import offers_pb2 as provider_offers_pb2
 from snowfall.stdlib.format import protobuf
@@ -111,12 +111,12 @@ def generate_offer(identifier: str) -> offers_pb2.Offer:
     )
 
 
-def get_orders() -> list[orders_pb2.Order]:
+def get_orders() -> list[order_models_pb2.Order]:
     return [generate_order(identifier) for identifier in ORDERS]
 
 
-def generate_order(identifier: str) -> orders_pb2.Order:
-    return orders_pb2.Order(id=identifier, offers=get_offers())
+def generate_order(identifier: str) -> order_models_pb2.Order:
+    return order_models_pb2.Order(id=identifier, offers=get_offers())
 
 
 def get_passenger_name_records() -> list[  # noqa: WPS320

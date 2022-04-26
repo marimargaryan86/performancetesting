@@ -8,7 +8,7 @@ from typing import Optional, Sequence
 import grpc
 
 from snowfall.junction.offers.v1alpha import offers_pb2
-from snowfall.junction.orders.v1alpha import orders_pb2, orders_pb2_grpc
+from snowfall.junction.orders.v1alpha import models_pb2, orders_pb2, orders_pb2_grpc
 
 
 class NotFoundError(Exception):
@@ -21,7 +21,7 @@ class UnknownError(Exception):
 
 @dataclasses.dataclass(frozen=True)
 class OrdersPage(object):
-    orders: Sequence[orders_pb2.Order]
+    orders: Sequence[models_pb2.Order]
     next_page_token: Optional[str] = None
 
     @classmethod
@@ -34,7 +34,7 @@ class OrdersPage(object):
 
 class Client(abc.ABC):
     @abc.abstractmethod
-    async def create(self, offers: Sequence[offers_pb2.Offer]) -> orders_pb2.Order:
+    async def create(self, offers: Sequence[offers_pb2.Offer]) -> models_pb2.Order:
         """Create a new order resource."""
 
     @abc.abstractmethod
@@ -42,7 +42,7 @@ class Client(abc.ABC):
         """Fetch all order resources."""
 
     @abc.abstractmethod
-    async def get(self, identifier: str) -> orders_pb2.Order:
+    async def get(self, identifier: str) -> models_pb2.Order:
         """Fetch a order resource."""
 
     @abc.abstractmethod
@@ -50,16 +50,16 @@ class Client(abc.ABC):
         self,
         order_id: str,
         offers: Sequence[offers_pb2.Offer],
-    ) -> orders_pb2.Order:
+    ) -> models_pb2.Order:
         """Add offers to an order resource."""
 
 
 class DictClient(Client):
-    def __init__(self, orders: Sequence[orders_pb2.Order]) -> None:
+    def __init__(self, orders: Sequence[models_pb2.Order]) -> None:
         self._orders = {order.id: order for order in orders}
 
-    async def create(self, offers: Sequence[offers_pb2.Offer]) -> orders_pb2.Order:
-        order = orders_pb2.Order(
+    async def create(self, offers: Sequence[offers_pb2.Offer]) -> models_pb2.Order:
+        order = models_pb2.Order(
             id=str(uuid.uuid4()),
             offers=offers,
         )
@@ -70,7 +70,7 @@ class DictClient(Client):
     async def find(self, limit: int, cursor: Optional[str] = None) -> OrdersPage:
         return OrdersPage(orders=list(self._orders.values()))
 
-    async def get(self, order_id: str) -> orders_pb2.Order:
+    async def get(self, order_id: str) -> models_pb2.Order:
         if order_id not in self._orders:
             raise NotFoundError()
 
@@ -80,7 +80,7 @@ class DictClient(Client):
         self,
         order_id: str,
         offers: Sequence[offers_pb2.Offer],
-    ) -> orders_pb2.Order:
+    ) -> models_pb2.Order:
         if order_id not in self._orders:
             raise NotFoundError()
 
@@ -93,7 +93,7 @@ class GrpcClient(Client):
     def __init__(self, orders: orders_pb2_grpc.OrderServiceStub):
         self._orders = orders
 
-    async def create(self, offers: Sequence[offers_pb2.Offer]) -> orders_pb2.Order:
+    async def create(self, offers: Sequence[offers_pb2.Offer]) -> models_pb2.Order:
         try:
             response = await self._orders.EnqueueOrder(
                 orders_pb2.EnqueueOrderRequest(
@@ -116,7 +116,7 @@ class GrpcClient(Client):
 
         return await OrdersPage.from_proto(response)
 
-    async def get(self, order_id: str) -> orders_pb2.Order:
+    async def get(self, order_id: str) -> models_pb2.Order:
         try:
             response = await self._orders.GetOrder(
                 orders_pb2.GetOrderRequest(id=order_id),
@@ -135,7 +135,7 @@ class GrpcClient(Client):
         self,
         order_id: str,
         offers: Sequence[offers_pb2.Offer],
-    ) -> orders_pb2.Order:
+    ) -> models_pb2.Order:
         try:
             response = await self._orders.AddOffersToOrder(
                 orders_pb2.AddOffersToOrderRequest(

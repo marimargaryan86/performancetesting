@@ -1,7 +1,7 @@
 from typing import cast
 
 from snowfall.junction.orders import orders
-from snowfall.junction.orders.v1alpha import orders_pb2
+from snowfall.junction.orders.v1alpha import models_pb2
 from snowfall.stdlib.transport import amqp
 
 
@@ -18,7 +18,7 @@ class OrderImporter(object):
         await self._consumer.consume(self._process_message)
 
     async def _process_message(self, message: amqp.Message) -> None:
-        order_result = cast(orders_pb2.OrderResult, message.body)
+        order_result = cast(models_pb2.OrderResult, message.body)
         await self._orders.update_offer_status(
             order_id=order_result.order_id,
             offer_id=order_result.offer_id,

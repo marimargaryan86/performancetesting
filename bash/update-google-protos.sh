@@ -2,7 +2,7 @@
 set -eu
 
 root_dir="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
-filenames=("datetime.proto" "latlng.proto")
+filenames=("datetime.proto" "latlng.proto" "phone_number.proto" "postal_address.proto")
 base_path="${root_dir}/protobuf/snowfall/common/v1alpha"
 
 mkdir -p "${base_path}"
