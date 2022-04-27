@@ -117,7 +117,7 @@ class SATClient(object):  # noqa: WPS214
     ) -> GeneralSearchResponse:
         """Perform a search through Search API."""
         request_params = httpx.QueryParams(
-            triptype=request.trip_type,
+            triptype=request.trip_type.value,
             passengers=request.number_of_passengers,
             ddate=request.departure_date,
             rdate=request.return_date,
@@ -127,7 +127,7 @@ class SATClient(object):  # noqa: WPS214
 
         async with self._semaphore:
             response = await self._session.get(
-                "{0}/search/{1}/{2}".format(
+                "{0}/{1}/{2}".format(
                     self._api_search_url,
                     request.origin_id,
                     request.destination_id,
