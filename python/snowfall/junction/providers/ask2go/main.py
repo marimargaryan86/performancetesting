@@ -3,12 +3,14 @@ import random
 from typing import Sequence
 
 import aioredis
+import aiosmtplib
 import httpx
 import pydantic
 
 from snowfall.junction.providers.ask2go import (
     adapter,
     airports,
+    booking,
     cache,
     consumer,
     criteria,
@@ -31,6 +33,7 @@ class _OrdersSettings(service.Settings):
     api_base_url: pydantic.AnyUrl
     api_booking_base_url: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
+    smtp_dsn: pydantic.AnyUrl
 
 
 class _SearchSettings(service.Settings):
@@ -89,7 +92,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
             async with amqp.Connection(
                 random.choice(app.settings.amqp_dsn),  # nosec
             ) as connection:
-                trip_search_consumer = consumer.OrderConsumer(
+                await consumer.OrderConsumer(
                     consumer=await amqp.create_consumer(
                         conn=connection,
                         exchange_name="orders",
@@ -100,13 +103,19 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
                         conn=connection,
                         exchange_name="orders",
                     ),
-                    a2g_client=ask2go_client,
+                    booking_handler=booking.BookingHandler(
+                        a2g_client=ask2go_client,
+                        smtp_client=aiosmtplib.SMTP(
+                            hostname=app.settings.smtp_dsn.host,
+                            port=app.settings.smtp_dsn.port,
+                            username=app.settings.smtp_dsn.user,
+                            password=app.settings.smtp_dsn.password,
+                        ),
+                    ),
                     offer_cache=cache.OfferCache(
                         client=redis.Client[str](redis_conn),
                     ),
-                )
-
-                await trip_search_consumer.consume()
+                ).consume()
 
 
 async def _searches(app: service.Application[_SearchSettings]) -> None:

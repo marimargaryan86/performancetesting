@@ -2,6 +2,7 @@ aiocsv==1.2.2
 aiofiles==0.8.0
 aioredis[hiredis]==2.0.1
 aiormq==6.2.3
+aiosmtplib==1.1.6
 asyncstdlib==3.10.4
 click==8.1.2
 cryptography==36.0.2
