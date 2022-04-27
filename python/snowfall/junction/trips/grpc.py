@@ -45,7 +45,11 @@ class TripService(Service, trips_pb2_grpc.TripServiceServicer):
             cursor=request.page_token,
         )
 
-        trips_result.limit(request.page_size or self._default_page_size)
+        trips_result.limit(
+            request.page_size
+            if request.page_size is not None
+            else self._default_page_size,
+        )
 
         return trips_pb2.ListTripsResponse(
             trips=[trip async for trip in trips_result],

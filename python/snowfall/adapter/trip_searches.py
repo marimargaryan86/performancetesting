@@ -170,12 +170,14 @@ class GrpcClient(Client):
         if not trip_search.trip_ids:
             return TripsPage.from_proto(trips_pb2.ListTripsResponse())
 
-        response = await self._trips.ListTrips(
-            trips_pb2.ListTripsRequest(
-                ids=trip_search.trip_ids,
-                page_size=limit or 0,
-                page_token=cursor or "",
-            ),
+        request = trips_pb2.ListTripsRequest(
+            ids=trip_search.trip_ids,
+            page_token=cursor or "",
         )
+
+        if limit is not None:
+            request.page_size = limit
+
+        response = await self._trips.ListTrips(request)
 
         return TripsPage.from_proto(response)

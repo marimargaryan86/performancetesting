@@ -26,7 +26,7 @@ message GetPlaceResponse {
 }
 
 message ListPlacesRequest {
-  int32 page_size = 1;
+  optional int32 page_size = 1;
   string page_token = 2;
 }
 
@@ -63,7 +63,7 @@ message GetCuratedPlaceResponse {
 }
 
 message ListCuratedPlacesRequest {
-  int32 page_size = 1;
+  optional int32 page_size = 1;
   string page_token = 2;
 }
 

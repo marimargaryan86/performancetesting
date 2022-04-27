@@ -43,7 +43,7 @@ class Client(abc.ABC):
     async def find_by_ids(
         self,
         identifiers: Sequence[str],
-        limit: int,
+        limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> LegsPage:
         """Find legs by IDs."""
@@ -62,7 +62,7 @@ class DictClient(Client):
     async def find_by_ids(
         self,
         identifiers: Sequence[str],
-        limit: int,
+        limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> LegsPage:
         return LegsPage(legs=list(self._legs.values()))
@@ -90,17 +90,18 @@ class GrpcClient(Client):
     async def find_by_ids(
         self,
         identifiers: Sequence[str],
-        limit: int,
+        limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> LegsPage:
+        request = schedules_pb2.ListLegsRequest(
+            ids=list(identifiers),
+            page_token=cursor or "",
+        )
+        if limit is not None:
+            request.page_size = limit
+
         try:
-            response = await self._schedules.ListLegs(
-                schedules_pb2.ListLegsRequest(
-                    ids=list(identifiers),
-                    page_size=limit,
-                    page_token=cursor or "",
-                ),
-            )
+            response = await self._schedules.ListLegs(request)
         except grpc.aio.AioRpcError as exc:
             raise UnknownError() from exc
 

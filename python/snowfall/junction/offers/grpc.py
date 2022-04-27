@@ -99,7 +99,12 @@ class OfferService(Service, offers_pb2_grpc.OfferServiceServicer):
             request.offer_search_id,
             cursor=request.page_token,
         )
-        offer_aggregates.limit(request.page_size or self._default_page_size)
+
+        offer_aggregates.limit(
+            request.page_size
+            if request.page_size is not None
+            else self._default_page_size,
+        )
 
         offer_list = []
 

@@ -20,7 +20,7 @@ message GetScheduleResponse {
 }
 
 message ListSchedulesRequest {
-  int32 page_size = 1;
+  optional int32 page_size = 1;
   string page_token = 2;
   repeated string ids = 3;
 }
@@ -39,7 +39,7 @@ message GetLegResponse {
 }
 
 message ListLegsRequest {
-  int32 page_size = 1;
+  optional int32 page_size = 1;
   string page_token = 2;
   repeated string ids = 3;
 }

@@ -39,7 +39,7 @@ class Client(abc.ABC):
     async def find_offers_by_offer_search(
         self,
         identifier: str,
-        limit: int,
+        limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> OffersPage:
         """Get offer results for an offer search."""
@@ -47,7 +47,7 @@ class Client(abc.ABC):
     async def find_by_ids(
         self,
         identifiers: Sequence[str],
-        limit: int,
+        limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> OffersPage:
         """Return offers by offer ids."""
@@ -66,7 +66,7 @@ class DictClient(Client):
     async def find_offers_by_offer_search(
         self,
         identifier: str,
-        limit: int,
+        limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> OffersPage:
         return OffersPage(
@@ -80,7 +80,7 @@ class DictClient(Client):
     async def find_by_ids(
         self,
         identifiers: Sequence[str],
-        limit: int,
+        limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> OffersPage:
         return OffersPage(
@@ -114,17 +114,18 @@ class GrpcClient(Client):
     async def find_offers_by_offer_search(
         self,
         identifier: str,
-        limit: int,
+        limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> OffersPage:
+        request = offers_pb2.ListOffersRequest(
+            page_token=cursor or "",
+            offer_search_id=identifier,
+        )
+        if limit is not None:
+            request.page_size = limit
+
         try:
-            response = await self._offers.ListOffers(
-                offers_pb2.ListOffersRequest(
-                    page_size=limit,
-                    page_token=cursor or "",
-                    offer_search_id=identifier,
-                ),
-            )
+            response = await self._offers.ListOffers(request)
         except grpc.aio.AioRpcError as exc:
             raise UnknownError(exc.details()) from exc
 
@@ -136,19 +137,20 @@ class GrpcClient(Client):
     async def find_by_ids(
         self,
         identifiers: Sequence[str],
-        limit: int,
+        limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> OffersPage:
+        request = offers_pb2.ListOffersRequest(
+            page_token=cursor or "",
+            offer_ids=offers_pb2.ListOfOfferIds(
+                ids=list(identifiers),
+            ),
+        )
+        if limit is not None:
+            request.page_size = limit
+
         try:
-            response = await self._offers.ListOffers(
-                offers_pb2.ListOffersRequest(
-                    page_size=limit,
-                    page_token=cursor or "",
-                    offer_ids=offers_pb2.ListOfOfferIds(
-                        ids=list(identifiers),
-                    ),
-                ),
-            )
+            response = await self._offers.ListOffers(request)
         except grpc.aio.AioRpcError as exc:
             raise UnknownError() from exc
 

@@ -37,7 +37,11 @@ class PlacesService(Service, places_pb2_grpc.PlacesServiceServicer):
     ) -> places_pb2.ListPlacesResponse:
         places_result = await self._places.find(request.page_token)
 
-        places_result.limit(request.page_size or self._default_page_size)
+        places_result.limit(
+            request.page_size
+            if request.page_size is not None
+            else self._default_page_size,
+        )
 
         return places_pb2.ListPlacesResponse(
             places=[place async for place in places_result],
@@ -80,7 +84,11 @@ class CuratedPlacesService(  # noqa: WPS214
     ) -> places_pb2.ListCuratedPlacesResponse:
         places_result = await self._places.find(request.page_token)
 
-        places_result.limit(request.page_size or self._default_page_size)
+        places_result.limit(
+            request.page_size
+            if request.page_size is not None
+            else self._default_page_size,
+        )
 
         return places_pb2.ListCuratedPlacesResponse(
             places=[place async for place in places_result],

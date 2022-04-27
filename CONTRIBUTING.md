@@ -167,6 +167,8 @@ It's generally favorable to run services through Pants (either in your IDE or te
 
 Regardless of method, you need to run `docker compose up` to boot up all required third-party services. Also remember that some first-party services have dependencies on other first-party services.
 
+Bash version should be `>= 4`
+
 ### Command Line
 
 #### Pants
@@ -174,6 +176,11 @@ Regardless of method, you need to run `docker compose up` to boot up all require
 ```shell
 bash bash/run.sh python/snowfall/junction/{service} {task}
 ```
+OR
+```shell
+. bash/run.sh python/snowfall/junction/{service} {task}
+```
+In case if you will have some problems with `bash` version
 
 ### PyCharm
 

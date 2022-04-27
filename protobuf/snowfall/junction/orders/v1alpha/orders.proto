@@ -38,7 +38,7 @@ message GetOrderResponse {
 }
 
 message ListOrdersRequest {
-  int32 page_size = 1;
+  optional int32 page_size = 1;
   string page_token = 2;
   repeated string ids = 3;
 }

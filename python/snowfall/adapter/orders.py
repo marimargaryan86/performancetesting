@@ -38,7 +38,11 @@ class Client(abc.ABC):
         """Create a new order resource."""
 
     @abc.abstractmethod
-    async def find(self, limit: int, cursor: Optional[str] = None) -> OrdersPage:
+    async def find(
+        self,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> OrdersPage:
         """Fetch all order resources."""
 
     @abc.abstractmethod
@@ -67,7 +71,11 @@ class DictClient(Client):
 
         return order
 
-    async def find(self, limit: int, cursor: Optional[str] = None) -> OrdersPage:
+    async def find(
+        self,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> OrdersPage:
         return OrdersPage(orders=list(self._orders.values()))
 
     async def get(self, order_id: str) -> models_pb2.Order:
@@ -105,14 +113,19 @@ class GrpcClient(Client):
 
         return response.order
 
-    async def find(self, limit: int, cursor: Optional[str] = None) -> OrdersPage:
+    async def find(
+        self,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> OrdersPage:
         # TODO: handle INVALID_ARGUMENT
-        response = await self._orders.ListOrders(
-            orders_pb2.ListOrdersRequest(
-                page_size=limit,
-                page_token=cursor or "",
-            ),
+        request = orders_pb2.ListOrdersRequest(
+            page_token=cursor or "",
         )
+        if limit is not None:
+            request.page_size = limit
+
+        response = await self._orders.ListOrders(request)
 
         return await OrdersPage.from_proto(response)
 

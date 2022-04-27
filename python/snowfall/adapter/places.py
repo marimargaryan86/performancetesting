@@ -37,7 +37,11 @@ class Client(abc.ABC):
         """Fetch a place resource."""
 
     @abc.abstractmethod
-    async def find(self, limit: int, cursor: Optional[str] = None) -> PlacesPage:
+    async def find(
+        self,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> PlacesPage:
         """Fetch all place resources."""
 
 
@@ -51,7 +55,11 @@ class DictClient(Client):
         except KeyError:
             raise NotFoundError("Place with ID '{id}' not found.".format(id=place_id))
 
-    async def find(self, limit: int, cursor: Optional[str] = None) -> PlacesPage:
+    async def find(
+        self,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> PlacesPage:
         return PlacesPage(places=list(self._places.values()))
 
 
@@ -74,13 +82,18 @@ class GrpcClient(Client):
 
         return response.place
 
-    async def find(self, limit: int, cursor: Optional[str] = None) -> PlacesPage:
+    async def find(
+        self,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> PlacesPage:
         # todo: handle INVALID_ARGUMENT
-        response = await self._places.ListPlaces(
-            places_pb2.ListPlacesRequest(
-                page_size=limit,
-                page_token=cursor or "",
-            ),
+        request = places_pb2.ListPlacesRequest(
+            page_token=cursor or "",
         )
+        if limit is not None:
+            request.page_size = limit
+
+        response = await self._places.ListPlaces(request)
 
         return await PlacesPage.from_proto(response)

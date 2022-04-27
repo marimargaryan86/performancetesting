@@ -41,7 +41,7 @@ message GetOfferSearchResponse {
 }
 
 message ListOffersRequest {
-  int32 page_size = 1;
+  optional int32 page_size = 1;
   string page_token = 2;
   oneof payload {
     string offer_search_id = 3;
