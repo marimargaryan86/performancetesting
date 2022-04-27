@@ -17,7 +17,7 @@ class OfferSearchService(Service, grpc_pb2_grpc.OfferSearchServiceServicer):
         self._publisher = publisher
 
     def get_name(self) -> str:
-        return models_pb2.DESCRIPTOR.services_by_name["OfferSearchService"].full_name
+        return grpc_pb2.DESCRIPTOR.services_by_name["OfferSearchService"].full_name
 
     def register(self, server: grpc.aio.Server) -> None:
         grpc_pb2_grpc.add_OfferSearchServiceServicer_to_server(self, server)
@@ -59,7 +59,7 @@ class OfferService(Service, grpc_pb2_grpc.OfferServiceServicer):
         self._default_page_size = default_page_size
 
     def get_name(self) -> str:
-        return models_pb2.DESCRIPTOR.services_by_name["OfferService"].full_name
+        return grpc_pb2.DESCRIPTOR.services_by_name["OfferService"].full_name
 
     def register(self, server: grpc.aio.Server) -> None:
         grpc_pb2_grpc.add_OfferServiceServicer_to_server(self, server)
