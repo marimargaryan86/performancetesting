@@ -2,9 +2,7 @@ syntax = "proto3";
 
 package snowfall.junction.offers.v1alpha;
 
-import "google/protobuf/timestamp.proto";
-import "snowfall/common/v1alpha/models.proto";
-import "snowfall/junction/providers/v1alpha/offers.proto";
+import "snowfall/junction/offers/v1alpha/models.proto";
 
 service OfferSearchService {
   rpc EnqueueOfferSearch(EnqueueOfferSearchRequest) returns (EnqueueOfferSearchResponse) {}
@@ -21,7 +19,7 @@ message GetOfferRequest {
 }
 
 message GetOfferResponse {
-  Offer offer = 1;
+  OfferAggregate offer = 1;
 }
 
 message EnqueueOfferSearchRequest {
@@ -55,46 +53,5 @@ message ListOfOfferIds {
 
 message ListOffersResponse {
   string next_page_token = 1;
-  repeated Offer offers = 2;
-}
-
-message Offer {
-  string id = 1;
-  repeated snowfall.junction.providers.v1alpha.GroupedOffer results = 2;
-}
-
-message OfferAggregate {
-  string id = 1;
-  string offer_search_id = 2;
-  repeated string offer_result_ids = 3;
-}
-
-message OfferSearch {
-  string id = 1;
-  google.protobuf.Timestamp expires_at = 2;
-  oneof search {
-    TripOfferSearch trip = 3;
-  }
-}
-
-message TripOfferSearch {
-  repeated snowfall.common.v1alpha.Segment segments = 1;
-  repeated Passenger passengers = 2;
-  LoyaltyCard loyalty_card = 3;
-}
-
-message Passenger {
-  snowfall.common.v1alpha.Date date_of_birth = 1;
-}
-
-message LoyaltyCard {
-  string airline_iata = 1;
-  string number = 2;
-  string first_name = 3;
-  string last_name = 4;
-}
-
-message TripOfferSearchTask {
-  string offer_search_id = 1;
-  TripOfferSearch search = 2;
+  repeated OfferAggregate offers = 2;
 }

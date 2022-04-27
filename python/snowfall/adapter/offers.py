@@ -6,7 +6,7 @@ from typing import Optional, Sequence
 
 import grpc
 
-from snowfall.junction.offers.v1alpha import offers_pb2, offers_pb2_grpc
+from snowfall.junction.offers.v1alpha import grpc_pb2, grpc_pb2_grpc, models_pb2
 
 
 class NotFoundError(Exception):
@@ -19,11 +19,11 @@ class UnknownError(Exception):
 
 @dataclasses.dataclass(frozen=True)
 class OffersPage(object):
-    offers: Sequence[offers_pb2.Offer]
+    offers: Sequence[models_pb2.OfferAggregate]
     next_page_token: Optional[str] = None
 
     @classmethod
-    def from_proto(cls, grpc_offers: offers_pb2.ListOffersResponse) -> OffersPage:
+    def from_proto(cls, grpc_offers: grpc_pb2.ListOffersResponse) -> OffersPage:
         return cls(
             offers=grpc_offers.offers,
             next_page_token=grpc_offers.next_page_token,
@@ -32,7 +32,7 @@ class OffersPage(object):
 
 class Client(abc.ABC):
     @abc.abstractmethod
-    async def get(self, identifier: str) -> offers_pb2.Offer:
+    async def get(self, identifier: str) -> models_pb2.OfferAggregate:
         """Fetch an offer resource."""
 
     @abc.abstractmethod
@@ -54,10 +54,10 @@ class Client(abc.ABC):
 
 
 class DictClient(Client):
-    def __init__(self, offers: Sequence[offers_pb2.Offer]) -> None:
+    def __init__(self, offers: Sequence[models_pb2.OfferAggregate]) -> None:
         self._offers = {offer.id: offer for offer in offers}
 
-    async def get(self, offer_id: str) -> offers_pb2.Offer:
+    async def get(self, offer_id: str) -> models_pb2.OfferAggregate:
         if offer_id not in self._offers:
             raise NotFoundError()
 
@@ -73,7 +73,7 @@ class DictClient(Client):
             offers=[
                 offer
                 for offer in self._offers.values()
-                if offer.results and offer.results[0].offer_search_id == identifier
+                if offer.groups and offer.groups[0].offer_search_id == identifier
             ],
         )
 
@@ -93,13 +93,13 @@ class DictClient(Client):
 
 
 class GrpcClient(Client):
-    def __init__(self, offers: offers_pb2_grpc.OfferServiceStub):
+    def __init__(self, offers: grpc_pb2_grpc.OfferServiceStub):
         self._offers = offers
 
-    async def get(self, offer_id: str) -> offers_pb2.Offer:
+    async def get(self, offer_id: str) -> models_pb2.OfferAggregate:
         try:
             response = await self._offers.GetOffer(
-                offers_pb2.GetOfferRequest(id=offer_id),
+                grpc_pb2.GetOfferRequest(id=offer_id),
             )
         except grpc.aio.AioRpcError as exc:
             if exc.code() == grpc.StatusCode.NOT_FOUND:
@@ -117,7 +117,7 @@ class GrpcClient(Client):
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> OffersPage:
-        request = offers_pb2.ListOffersRequest(
+        request = grpc_pb2.ListOffersRequest(
             page_token=cursor or "",
             offer_search_id=identifier,
         )
@@ -140,9 +140,9 @@ class GrpcClient(Client):
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> OffersPage:
-        request = offers_pb2.ListOffersRequest(
+        request = grpc_pb2.ListOffersRequest(
             page_token=cursor or "",
-            offer_ids=offers_pb2.ListOfOfferIds(
+            offer_ids=grpc_pb2.ListOfOfferIds(
                 ids=list(identifiers),
             ),
         )

@@ -1,3 +1,5 @@
+import itertools
+
 import lagom
 from furl import furl
 from starlette import endpoints, exceptions, requests, responses, status
@@ -72,7 +74,11 @@ class Orders(endpoints.HTTPEndpoint):
             raise exceptions.HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         order = await orders_client.create(
-            offers=offers,
+            offers=list(
+                itertools.chain.from_iterable(
+                    group.offers for aggregate in offers for group in aggregate.groups
+                ),
+            ),
         )
 
         return models.JsonApiResponse(
@@ -103,7 +109,11 @@ class AddOffersToOrder(endpoints.HTTPEndpoint):
 
         order = await orders_client.add_offers(
             order_id=request.path_params["orderId"],
-            offers=offers,
+            offers=list(
+                itertools.chain.from_iterable(
+                    group.offers for aggregate in offers for group in aggregate.groups
+                ),
+            ),
         )
 
         return models.JsonApiResponse(

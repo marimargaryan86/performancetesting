@@ -5,7 +5,7 @@ package snowfall.junction.orders.v1alpha;
 import "snowfall/common/v1alpha/models.proto";
 import "snowfall/common/v1alpha/phone_number.proto";
 import "snowfall/common/v1alpha/postal_address.proto";
-import "snowfall/junction/offers/v1alpha/offers.proto";
+import "snowfall/junction/offers/v1alpha/models.proto";
 
 message Order {
   string id = 1;

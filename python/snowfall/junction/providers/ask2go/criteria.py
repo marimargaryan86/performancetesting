@@ -5,10 +5,10 @@ from typing import Sequence
 
 import more_itertools
 
-from snowfall.common.v1alpha import models_pb2
-from snowfall.junction.offers.v1alpha import offers_pb2
+from snowfall.common.v1alpha import models_pb2 as common_models_pb2
+from snowfall.junction.offers.v1alpha import amqp_pb2, models_pb2
 from snowfall.junction.providers.ask2go import airports, h3
-from snowfall.junction.providers.ask2go.v1alpha import amqp_pb2
+from snowfall.junction.providers.ask2go.v1alpha import amqp_pb2 as provider_amqp_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.vendor.ask2go import enums
 from snowfall.vendor.ask2go.models import common
@@ -23,8 +23,8 @@ class CriteriaGenerator(object):
 
     def from_search_task(
         self,
-        search_task: offers_pb2.TripOfferSearchTask,
-    ) -> Iterator[amqp_pb2.SearchCriteriaTask]:
+        search_task: amqp_pb2.TripOfferSearchTask,
+    ) -> Iterator[provider_amqp_pb2.SearchCriteriaTask]:
         number_of_types = get_num_of_passenger_types(
             passengers=search_task.search.passengers,
             date=_get_last_travel_date(search_task),
@@ -33,7 +33,7 @@ class CriteriaGenerator(object):
         for segment in search_task.search.segments:
             first_leg = more_itertools.first(segment.legs)
 
-            if first_leg.type != models_pb2.Schedule.TYPE_AIR:
+            if first_leg.type != common_models_pb2.Schedule.TYPE_AIR:
                 continue
 
             origins = self._mapping.find_mapped_values(
@@ -46,10 +46,10 @@ class CriteriaGenerator(object):
             )
 
             yield from (
-                amqp_pb2.SearchCriteriaTask(
+                provider_amqp_pb2.SearchCriteriaTask(
                     offer_search_id=search_task.offer_search_id,
                     segments=[segment],
-                    criteria=amqp_pb2.Criteria(
+                    criteria=provider_amqp_pb2.Criteria(
                         origin_iata=pair[0].iata,
                         destination_iata=pair[1].iata,
                         outbound=protobuf.datetime_to_protobuf_datetime(
@@ -67,7 +67,9 @@ class CriteriaGenerator(object):
             )
 
 
-def _get_last_travel_date(search_task: offers_pb2.TripOfferSearchTask) -> datetime.date:
+def _get_last_travel_date(
+    search_task: amqp_pb2.TripOfferSearchTask,
+) -> datetime.date:
     return max(
         protobuf.protobuf_to_datetime(
             more_itertools.last(segment.legs).departure_at,
@@ -92,7 +94,7 @@ def get_passenger_type(
 
 
 def get_num_of_passenger_types(
-    passengers: Sequence[offers_pb2.Passenger],
+    passengers: Sequence[models_pb2.Passenger],
     date: datetime.date,
 ) -> tuple[int, int, int]:
     adults = 0

@@ -2,10 +2,9 @@ import datetime
 import random
 
 from snowfall.common.v1alpha import models_pb2
-from snowfall.junction.offers.v1alpha import offers_pb2
+from snowfall.junction.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.junction.orders.v1alpha import models_pb2 as order_models_pb2
 from snowfall.junction.passenger_name_records.v1alpha import passenger_name_records_pb2
-from snowfall.junction.providers.v1alpha import offers_pb2 as provider_offers_pb2
 from snowfall.stdlib.format import protobuf
 
 _LATITUDE_RANGE = (-90, 90)
@@ -88,17 +87,17 @@ def generate_trip_reference(identifier: str) -> models_pb2.TripReference:
     )
 
 
-def get_offers() -> list[offers_pb2.Offer]:
+def get_offers() -> list[offers_pb2.OfferAggregate]:
     return [generate_offer(identifier) for identifier in OFFERS]
 
 
-def generate_offer(identifier: str) -> offers_pb2.Offer:
-    return offers_pb2.Offer(
+def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
+    return offers_pb2.OfferAggregate(
         id=identifier,
-        results=[
-            provider_offers_pb2.GroupedOffer(
+        groups=[
+            offers_pb2.OfferGroup(
                 offers=[
-                    provider_offers_pb2.Offer(
+                    offers_pb2.Offer(
                         price=models_pb2.Price(
                             amount=1337,
                             currency="SEK",
@@ -116,7 +115,10 @@ def get_orders() -> list[order_models_pb2.Order]:
 
 
 def generate_order(identifier: str) -> order_models_pb2.Order:
-    return order_models_pb2.Order(id=identifier, offers=get_offers())
+    return order_models_pb2.Order(
+        id=identifier,
+        offers=get_offers()[0].groups[0].offers,
+    )
 
 
 def get_passenger_name_records() -> list[  # noqa: WPS320

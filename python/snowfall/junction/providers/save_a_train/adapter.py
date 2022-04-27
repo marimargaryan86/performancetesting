@@ -5,9 +5,9 @@ from typing import AsyncIterator
 import more_itertools
 
 from snowfall.common.v1alpha import models_pb2
+from snowfall.junction.offers.v1alpha import models_pb2 as offer_models_pb2
 from snowfall.junction.providers.save_a_train import train_stations
 from snowfall.junction.providers.save_a_train.v1alpha import amqp_pb2
-from snowfall.junction.providers.v1alpha import offers_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.vendor.sat import client
 from snowfall.vendor.sat.enums import TripType
@@ -36,7 +36,7 @@ class SaveATrainAdapter(object):
     async def gather_search_results(
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
-    ) -> AsyncIterator[offers_pb2.GroupedOffer]:
+    ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
         origin = self._train_stations.get_by_id(search_task.criteria.origin_id)
         destination = self._train_stations.get_by_id(
             search_task.criteria.destination_id,
@@ -62,17 +62,17 @@ class SaveATrainAdapter(object):
 
         for offer in list_of_offers:
             if offer_matches_requirements(offer):
-                yield offers_pb2.GroupedOffer(
+                yield offer_models_pb2.OfferGroup(
                     id=str(uuid.uuid4()),  # todo: persist so it can be booked
                     offer_search_id=search_task.offer_search_id,
                     expires_at=protobuf.datetime_to_protobuf(
                         datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
                     ),
                     offers=[
-                        offers_pb2.Offer(
+                        offer_models_pb2.Offer(
                             id=str(uuid.uuid4()),  # todo: persist so it can be booked
-                            segments=[
-                                offers_pb2.OfferSegment(
+                            segment_details=[
+                                offer_models_pb2.OfferSegmentDetails(
                                     id=search_task.segments[0].id,
                                 ),
                             ],
@@ -86,9 +86,9 @@ class SaveATrainAdapter(object):
                         ),
                     ],
                     segments=[
-                        offers_pb2.Segment(
+                        offer_models_pb2.OfferSegment(
                             id=search_task.segments[0].id,
-                            vehicle=offers_pb2.Vehicle(
+                            vehicle=offer_models_pb2.Vehicle(
                                 equipment="train",  # TODO: add something useful
                                 number=offer.train_numbers,
                             ),
@@ -96,7 +96,7 @@ class SaveATrainAdapter(object):
                             vendor=offer.operator,
                             terminal="foobar",  # TODO: add something useful
                             legs=[
-                                offers_pb2.Leg(
+                                offer_models_pb2.OfferSegmentLeg(
                                     id=more_itertools.first(
                                         more_itertools.first(search_task.segments).legs,
                                     ).id,

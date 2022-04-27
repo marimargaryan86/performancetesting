@@ -6,7 +6,7 @@ import pytest
 
 from snowfall import fixtures
 from snowfall.adapter import offers
-from snowfall.junction.offers.v1alpha import offers_pb2, offers_pb2_grpc
+from snowfall.junction.offers.v1alpha import grpc_pb2, grpc_pb2_grpc, models_pb2
 
 
 @pytest.mark.asyncio
@@ -74,17 +74,17 @@ class TestGrpcClient(object):
         error: grpc.aio.AioRpcError,
         expected: Type[Exception],
     ) -> None:
-        stub = mock.create_autospec(offers_pb2_grpc.OfferServiceStub)
+        stub = mock.create_autospec(grpc_pb2_grpc.OfferServiceStub)
         stub.GetOffer = mock.AsyncMock(side_effect=error)
         client = offers.GrpcClient(stub)
         with pytest.raises(expected):
             await client.get(fixtures.NOT_FOUND)
 
     async def test_single_offer_is_retrievable(self) -> None:
-        proto = offers_pb2.Offer(id=fixtures.OFFERS[0])
-        stub = mock.create_autospec(offers_pb2_grpc.OfferServiceStub)
+        proto = models_pb2.OfferAggregate(id=fixtures.OFFERS[0])
+        stub = mock.create_autospec(grpc_pb2_grpc.OfferServiceStub)
         stub.GetOffer = mock.AsyncMock(
-            return_value=offers_pb2.GetOfferResponse(offer=proto),
+            return_value=grpc_pb2.GetOfferResponse(offer=proto),
         )
         client = offers.GrpcClient(stub)
         offer = await client.get(fixtures.OFFERS[0])

@@ -2,7 +2,7 @@ from typing import cast
 
 import phonenumbers
 
-from snowfall.junction.offers.v1alpha import offers_pb2
+from snowfall.junction.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
 from snowfall.junction.orders.v1alpha import amqp_pb2 as orders_amqp_pb2
 from snowfall.junction.orders.v1alpha import models_pb2
 from snowfall.junction.providers.ask2go import adapter, booking, cache, criteria
@@ -73,7 +73,7 @@ class TripSearchConsumer(object):
         await self._consumer.consume(self._process_message)
 
     async def _process_message(self, message: amqp.Message) -> None:
-        search = cast(offers_pb2.TripOfferSearchTask, message.body)
+        search = cast(offers_amqp_pb2.TripOfferSearchTask, message.body)
 
         for task in self._generator.from_search_task(search):
             await self._producer.publish(task, routing_key="offers.search.trip")

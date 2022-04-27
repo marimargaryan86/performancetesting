@@ -6,9 +6,9 @@ from collections.abc import AsyncIterator
 import more_itertools
 
 from snowfall.common.v1alpha import models_pb2
+from snowfall.junction.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.junction.providers.ask2go import airports, cache, models
 from snowfall.junction.providers.ask2go.v1alpha import amqp_pb2
-from snowfall.junction.providers.v1alpha import offers_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.vendor.ask2go import client, enums
 from snowfall.vendor.ask2go.models import offers, price, search
@@ -70,7 +70,7 @@ class Ask2GoAdapter(object):
     async def gather_search_results(
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
-    ) -> AsyncIterator[offers_pb2.GroupedOffer]:
+    ) -> AsyncIterator[offers_pb2.OfferGroup]:
         identifiers = await self._make_search(search_task.criteria)
         offer_prices = self._offer_prices_to_offers(
             search_task=search_task,
@@ -103,7 +103,7 @@ class Ask2GoAdapter(object):
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
         offer_prices: AsyncIterator[price.OfferPriceResponse],
-    ) -> AsyncIterator[offers_pb2.GroupedOffer]:
+    ) -> AsyncIterator[offers_pb2.OfferGroup]:
         async for offer_price in offer_prices:
             segment = more_itertools.first(
                 more_itertools.first(offer_price.itinerary.trips).segments,
@@ -112,7 +112,7 @@ class Ask2GoAdapter(object):
             origin = self._airports.get_by_iata(segment.origin.airport_code)
             destination = self._airports.get_by_iata(segment.destination.airport_code)
 
-            yield offers_pb2.GroupedOffer(
+            yield offers_pb2.OfferGroup(
                 id=str(uuid.uuid4()),
                 offer_search_id=search_task.offer_search_id,
                 expires_at=protobuf.datetime_to_protobuf(
@@ -124,8 +124,8 @@ class Ask2GoAdapter(object):
                             pricing_id=offer_price.id,
                             transaction_id=offer_price.transaction_id,
                         ),
-                        segments=[
-                            offers_pb2.OfferSegment(
+                        segment_details=[
+                            offers_pb2.OfferSegmentDetails(
                                 id=search_segment.id,
                             ),
                         ],
@@ -139,10 +139,10 @@ class Ask2GoAdapter(object):
                     ),
                 ],
                 segments=[
-                    offers_pb2.Segment(
+                    offers_pb2.OfferSegment(
                         id=search_segment.id,
                         legs=[
-                            offers_pb2.Leg(
+                            offers_pb2.OfferSegmentLeg(
                                 id=search_segment.legs[0].id,
                                 origin=models_pb2.Point(
                                     ref=origin.iata,

@@ -7,7 +7,7 @@ from typing import Optional, Sequence
 
 import grpc
 
-from snowfall.junction.offers.v1alpha import offers_pb2
+from snowfall.junction.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.junction.orders.v1alpha import models_pb2, orders_pb2, orders_pb2_grpc
 
 

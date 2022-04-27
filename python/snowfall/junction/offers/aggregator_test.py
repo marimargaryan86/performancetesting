@@ -6,14 +6,13 @@ from motor import motor_asyncio
 
 from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.offers import aggregator, offers
-from snowfall.junction.offers.v1alpha import offers_pb2
-from snowfall.junction.providers.v1alpha import offers_pb2 as provider_offers_pb2
+from snowfall.junction.offers.v1alpha import models_pb2 as offer_protos
 from snowfall.stdlib.format import protobuf
 
 _OFFER_SEARCHES = (
-    offers_pb2.OfferSearch(
+    offer_protos.OfferSearch(
         id="foo",
-        trip=offers_pb2.TripOfferSearch(
+        trip=offer_protos.TripOfferSearch(
             segments=[
                 models_pb2.Segment(
                     id="a",
@@ -21,9 +20,9 @@ _OFFER_SEARCHES = (
             ],
         ),
     ),
-    offers_pb2.OfferSearch(
+    offer_protos.OfferSearch(
         id="foo",
-        trip=offers_pb2.TripOfferSearch(
+        trip=offer_protos.TripOfferSearch(
             segments=[
                 models_pb2.Segment(
                     id="a",
@@ -34,9 +33,9 @@ _OFFER_SEARCHES = (
             ],
         ),
     ),
-    offers_pb2.OfferSearch(
+    offer_protos.OfferSearch(
         id="foo",
-        trip=offers_pb2.TripOfferSearch(
+        trip=offer_protos.TripOfferSearch(
             segments=[
                 models_pb2.Segment(
                     id="a",
@@ -57,51 +56,51 @@ _OFFER_RESULT_EXPIRY = protobuf.datetime_to_protobuf(
 )
 
 _OFFER_RESULTS = (
-    provider_offers_pb2.GroupedOffer(
+    offer_protos.OfferGroup(
         id="1",
         offer_search_id="foo",
         segments=[
-            provider_offers_pb2.Segment(
+            offer_protos.OfferSegment(
                 id="a",
             ),
         ],
         expires_at=_OFFER_RESULT_EXPIRY,
     ),
-    provider_offers_pb2.GroupedOffer(
+    offer_protos.OfferGroup(
         id="2",
         offer_search_id="foo",
         segments=[
-            provider_offers_pb2.Segment(
+            offer_protos.OfferSegment(
                 id="b",
             ),
         ],
         expires_at=_OFFER_RESULT_EXPIRY,
     ),
-    provider_offers_pb2.GroupedOffer(
+    offer_protos.OfferGroup(
         id="3",
         offer_search_id="foo",
         segments=[
-            provider_offers_pb2.Segment(
+            offer_protos.OfferSegment(
                 id="b",
             ),
         ],
         expires_at=_OFFER_RESULT_EXPIRY,
     ),
-    provider_offers_pb2.GroupedOffer(
+    offer_protos.OfferGroup(
         id="4",
         offer_search_id="foo",
         segments=[
-            provider_offers_pb2.Segment(
+            offer_protos.OfferSegment(
                 id="c",
             ),
         ],
         expires_at=_OFFER_RESULT_EXPIRY,
     ),
-    provider_offers_pb2.GroupedOffer(
+    offer_protos.OfferGroup(
         id="5",
         offer_search_id="foo",
         segments=[
-            provider_offers_pb2.Segment(
+            offer_protos.OfferSegment(
                 id="c",
             ),
         ],
@@ -127,7 +126,7 @@ class TestOfferBuckets(object):
     async def test_offers_are_placed_in_buckets(
         self,
         offer_bucket_repository: aggregator.OfferBucketRepository,
-        offer_results: Sequence[provider_offers_pb2.GroupedOffer],
+        offer_results: Sequence[offer_protos.OfferGroup],
         expected: Mapping[str, Sequence[str]],
     ) -> None:
         for offer in offer_results:
@@ -157,8 +156,8 @@ class TestAggregator(object):
         offer_searches_repository: offers.OfferSearchRepository,
         offer_aggregator: aggregator.OfferAggregator,
         offer_aggregate_collection: motor_asyncio.AsyncIOMotorCollection,
-        offer_search: offers_pb2.OfferSearch,
-        offer_results: Sequence[provider_offers_pb2.GroupedOffer],
+        offer_search: offer_protos.OfferSearch,
+        offer_results: Sequence[offer_protos.OfferGroup],
         expected: int,
     ) -> None:
         await offer_searches_repository.insert(offer_search)
@@ -195,8 +194,8 @@ class TestAggregator(object):
         offer_searches_repository: offers.OfferSearchRepository,
         offer_aggregator: aggregator.OfferAggregator,
         offer_aggregate_collection: motor_asyncio.AsyncIOMotorCollection,
-        offer_search: offers_pb2.OfferSearch,
-        offer_results: Sequence[provider_offers_pb2.GroupedOffer],
+        offer_search: offer_protos.OfferSearch,
+        offer_results: Sequence[offer_protos.OfferGroup],
         expected: Sequence[Sequence[str]],
     ) -> None:
         await offer_searches_repository.insert(offer_search)

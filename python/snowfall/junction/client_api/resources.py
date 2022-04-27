@@ -7,7 +7,7 @@ from starlette import requests
 
 from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.client_api import models
-from snowfall.junction.offers.v1alpha import offers_pb2
+from snowfall.junction.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.junction.orders.v1alpha import models_pb2 as orders_models_pb2
 from snowfall.junction.trips.v1alpha import trips_pb2
 from snowfall.stdlib.format import protobuf
@@ -21,7 +21,7 @@ class OfferResource(models.Resource):
     @classmethod
     def from_proto(
         cls,
-        offer: offers_pb2.Offer,
+        offer: offers_pb2.OfferAggregate,
         request: requests.Request,
     ) -> OfferResource:
         return cls(
@@ -39,10 +39,10 @@ class OfferResource(models.Resource):
     @classmethod
     def _get_attributes(
         cls,
-        offer: offers_pb2.Offer,
+        offer: offers_pb2.OfferAggregate,
     ) -> dict[str, Any]:
         first_expiring_offer = min(
-            offer.results,
+            offer.groups,
             key=lambda offer_result: offer_result.expires_at.seconds,
         )
 
@@ -50,8 +50,7 @@ class OfferResource(models.Resource):
             "expiresAt": protobuf.protobuf_to_datetime(first_expiring_offer.expires_at),
             "price": str(
                 sum(
-                    offer_result.offers[0].price.amount
-                    for offer_result in offer.results
+                    offer_result.offers[0].price.amount for offer_result in offer.groups
                 )
                 / 100,
             ),
@@ -69,14 +68,7 @@ class OrderResource(models.Resource):
         return cls(
             id=order.id,
             type="orders",
-            attributes={
-                "offers": {
-                    _RELATIONSHIPS_FIELD: [
-                        OfferResource.from_proto(offer, request)
-                        for offer in order.offers
-                    ],
-                },
-            },
+            attributes={},
             relationships={},
             links={
                 _SELF_HREF: "https://snowfall.se",
@@ -290,7 +282,7 @@ class TripOfferSearchResource(models.Resource):
     def from_proto(
         cls,
         offer_search: offers_pb2.OfferSearch,
-        offers: Sequence[offers_pb2.OfferAggregate],
+        offers: Sequence[offers_pb2.OfferAggregateMapping],
         request: requests.Request,
     ) -> TripOfferSearchResource:
         return cls(

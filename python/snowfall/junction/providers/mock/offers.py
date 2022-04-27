@@ -7,8 +7,8 @@ from typing import Sequence, cast
 import pydantic
 
 from snowfall.common.v1alpha import models_pb2
-from snowfall.junction.offers.v1alpha import offers_pb2
-from snowfall.junction.providers.v1alpha import offers_pb2 as provider_offers_pb2
+from snowfall.junction.offers.v1alpha import amqp_pb2
+from snowfall.junction.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.stdlib import service
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport import amqp
@@ -21,16 +21,16 @@ class OffersSettings(service.Settings):
 class OffersMockClient(object):
     async def search(
         self,
-        search: offers_pb2.TripOfferSearchTask,
-    ) -> AsyncIterator[provider_offers_pb2.GroupedOffer]:
-        yield provider_offers_pb2.GroupedOffer(
+        search: amqp_pb2.TripOfferSearchTask,
+    ) -> AsyncIterator[offers_pb2.OfferGroup]:
+        yield offers_pb2.OfferGroup(
             id=str(uuid.uuid4()),
             offer_search_id=search.offer_search_id,
             offers=[
-                provider_offers_pb2.Offer(
+                offers_pb2.Offer(
                     id="FOO",
-                    segments=[
-                        provider_offers_pb2.OfferSegment(
+                    segment_details=[
+                        offers_pb2.OfferSegmentDetails(
                             id=segment.id,
                         )
                         for segment in search.search.segments
@@ -42,10 +42,10 @@ class OffersMockClient(object):
                 ),
             ],
             segments=[
-                provider_offers_pb2.Segment(
+                offers_pb2.OfferSegment(
                     id=segment.id,
                     legs=[
-                        provider_offers_pb2.Leg(
+                        offers_pb2.OfferSegmentLeg(
                             id=leg.id,
                             origin=leg.origin,
                             destination=leg.destination,
@@ -53,7 +53,7 @@ class OffersMockClient(object):
                             arrival_at=leg.arrival_at,
                         ),
                     ],
-                    vehicle=provider_offers_pb2.Vehicle(
+                    vehicle=offers_pb2.Vehicle(
                         number="123",
                         equipment="B52",
                     ),
@@ -88,7 +88,7 @@ class TripSearchConsumer(object):
         await self._consumer.consume(self._process_message)
 
     async def _process_message(self, message: amqp.Message) -> None:
-        search = cast(offers_pb2.TripOfferSearchTask, message.body)
+        search = cast(amqp_pb2.TripOfferSearchTask, message.body)
 
         async for offer_result in self._client.search(search):
             await self._producer.publish(offer_result, routing_key="offers.result.trip")

@@ -3,8 +3,7 @@ import itertools
 import uuid
 
 from snowfall.junction.offers import offers
-from snowfall.junction.offers.v1alpha import offers_pb2
-from snowfall.junction.providers.v1alpha import offers_pb2 as provider_offers_pb2
+from snowfall.junction.offers.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence import redis
 
@@ -17,9 +16,9 @@ class NotFoundError(Exception):
 
 def generate_offer_aggregates(
     offer_buckets: OfferBuckets,
-) -> list[offers_pb2.OfferAggregate]:
+) -> list[models_pb2.OfferAggregateMapping]:
     return [
-        offers_pb2.OfferAggregate(
+        models_pb2.OfferAggregateMapping(
             id=str(uuid.uuid4()),
             offer_result_ids=aggregate,
         )
@@ -34,7 +33,7 @@ class OfferBucketRepository(object):
     ):
         self._redis = redis_client
 
-    async def add_offer(self, offer: provider_offers_pb2.GroupedOffer) -> None:
+    async def add_offer(self, offer: models_pb2.OfferGroup) -> None:
         key = ":".join([offer.offer_search_id, offer.segments[0].id])
         bucket = self._redis.list_(key)
         await bucket.push(offer.id)
@@ -70,13 +69,13 @@ class OfferAggregator(object):
         self,
         offer_searches: offers.OfferSearchRepository,
         offer_buckets: OfferBucketRepository,
-        offer_aggregates: offers.OfferAggregateRepository,
+        offer_aggregates: offers.OfferAggregateMappingRepository,
     ):
         self._searches = offer_searches
         self._buckets = offer_buckets
         self._aggregates = offer_aggregates
 
-    async def aggregate(self, offer: provider_offers_pb2.GroupedOffer) -> None:
+    async def aggregate(self, offer: models_pb2.OfferGroup) -> None:
         offer_search = await self._searches.find_by_id(offer.offer_search_id)
 
         if not offer_search:
@@ -96,7 +95,7 @@ class OfferAggregator(object):
 
     async def _get_buckets(
         self,
-        offer: provider_offers_pb2.GroupedOffer,
+        offer: models_pb2.OfferGroup,
     ) -> OfferBuckets:
         buckets = await self._buckets.get_offer_buckets(offer.offer_search_id)
         buckets[offer.segments[0].id] = [offer.id]

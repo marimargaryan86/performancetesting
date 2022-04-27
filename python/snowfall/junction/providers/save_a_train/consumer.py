@@ -1,6 +1,6 @@
 from typing import cast
 
-from snowfall.junction.offers.v1alpha import offers_pb2
+from snowfall.junction.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
 from snowfall.junction.providers.save_a_train import adapter as sat_adapter
 from snowfall.junction.providers.save_a_train import criteria
 from snowfall.junction.providers.save_a_train.v1alpha import amqp_pb2
@@ -22,7 +22,7 @@ class TripSearchConsumer(object):
         await self._consumer.consume(self._process_message)
 
     async def _process_message(self, message: amqp.Message) -> None:
-        search = cast(offers_pb2.TripOfferSearchTask, message.body)
+        search = cast(offers_amqp_pb2.TripOfferSearchTask, message.body)
 
         for task in self._generator.from_search_task(search):
             await self._producer.publish(task, routing_key="offers.search.trip")

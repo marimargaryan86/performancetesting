@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package snowfall.junction.offers.v1alpha;
+
+import "google/protobuf/timestamp.proto";
+import "snowfall/common/v1alpha/models.proto";
+
+message OfferSearch {
+  string id = 1;
+  google.protobuf.Timestamp expires_at = 2;
+  oneof search {
+    TripOfferSearch trip = 3;
+  }
+}
+
+message TripOfferSearch {
+  repeated snowfall.common.v1alpha.Segment segments = 1;
+  repeated Passenger passengers = 2;
+  LoyaltyCard loyalty_card = 3;
+}
+
+message Passenger {
+  snowfall.common.v1alpha.Date date_of_birth = 1;
+}
+
+message LoyaltyCard {
+  string airline_iata = 1;
+  string number = 2;
+  string first_name = 3;
+  string last_name = 4;
+}
+
+message OfferAggregateMapping {
+  string id = 1;
+  string offer_search_id = 2;
+  repeated string offer_result_ids = 3;
+}
+
+message OfferAggregate {
+  string id = 1;
+  repeated OfferGroup groups = 2;
+}
+
+message OfferGroup {
+  string id = 1;
+  string offer_search_id = 2;
+  google.protobuf.Timestamp expires_at = 3;
+  // provider info?
+  // min/max prices?
+  repeated Offer offers = 4;
+  repeated OfferSegment segments = 5;
+}
+
+message Offer {
+  string id = 1;
+  repeated OfferSegmentDetails segment_details = 2;
+  snowfall.common.v1alpha.Price price = 3;
+  // isRefundable
+}
+
+message OfferSegmentDetails {
+  string id = 1;
+  // baggageAllowance
+  // cabin
+  // meal
+}
+
+message OfferSegment {
+  string id = 1;
+  repeated OfferSegmentLeg legs = 2;
+  // todo: this needs to be broken down, since operator and vendor will have different numbers
+  Vehicle vehicle = 3;
+  string operator = 4;
+  string vendor = 5;
+  string terminal = 6;
+  // direction?
+  // docsRequired?
+}
+
+message Vehicle {
+  string number = 1;
+  string equipment = 2;
+}
+
+message OfferSegmentLeg {
+  string id = 1;
+  snowfall.common.v1alpha.Point origin = 2;
+  snowfall.common.v1alpha.Point destination = 3;
+  google.protobuf.Timestamp departure_at = 4;
+  google.protobuf.Timestamp arrival_at = 5;
+}

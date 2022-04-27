@@ -1,4 +1,4 @@
 protobuf_sources(
-    grpc=True,
+    overrides={"grpc.proto": {"grpc": True}},
     python_source_root="python",
 )

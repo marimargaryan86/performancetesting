@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package snowfall.junction.orders.v1alpha;
 
-import "snowfall/junction/offers/v1alpha/offers.proto";
+import "snowfall/junction/offers/v1alpha/models.proto";
 import "snowfall/junction/orders/v1alpha/models.proto";
 
 service OrderService {

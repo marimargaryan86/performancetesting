@@ -7,7 +7,7 @@ from starlette import endpoints, exceptions, requests, responses, status
 from snowfall.adapter import offer_searches, offers
 from snowfall.junction.client_api import models, request_helpers, resources
 from snowfall.junction.client_api.transformers import trip_ids_to_segments
-from snowfall.junction.offers.v1alpha import offers_pb2
+from snowfall.junction.offers.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
 
 
@@ -47,11 +47,11 @@ class OfferSearches(endpoints.HTTPEndpoint):
             raise exceptions.HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         offer_search = await offer_search_client.create(
-            request=offers_pb2.OfferSearch(
-                trip=offers_pb2.TripOfferSearch(
+            request=models_pb2.OfferSearch(
+                trip=models_pb2.TripOfferSearch(
                     segments=segments,
                     passengers=[
-                        offers_pb2.Passenger(
+                        models_pb2.Passenger(
                             date_of_birth=protobuf.date_to_protobuf(
                                 datetime.date.fromisoformat(passenger["dateOfBirth"]),
                             ),

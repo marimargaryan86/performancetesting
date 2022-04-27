@@ -56,7 +56,7 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
                     default_page_size=app.settings.default_page_size,
                 ),
                 OfferService(
-                    offer_aggregates=offers.OfferAggregateRepository(
+                    offer_aggregates=offers.OfferAggregateMappingRepository(
                         mongo.offers.offer_aggregates,
                     ),
                     offer_results=offers.TripOfferRepository(
@@ -94,7 +94,7 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
                     mongo.offers.trip_offers,
                 ),
                 offer_aggregator=aggregator.OfferAggregator(
-                    offer_aggregates=offers.OfferAggregateRepository(
+                    offer_aggregates=offers.OfferAggregateMappingRepository(
                         mongo.offers.offer_aggregates,
                     ),
                     offer_buckets=aggregator.OfferBucketRepository(

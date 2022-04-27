@@ -4,7 +4,7 @@ from collections.abc import Iterator
 import more_itertools
 
 from snowfall.common.v1alpha import models_pb2
-from snowfall.junction.offers.v1alpha import offers_pb2
+from snowfall.junction.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
 from snowfall.junction.providers.save_a_train import h3, train_stations
 from snowfall.junction.providers.save_a_train.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
@@ -16,7 +16,7 @@ class CriteriaGenerator(object):
 
     def from_search_task(  # noqa: WPS210
         self,
-        search_task: offers_pb2.TripOfferSearchTask,
+        search_task: offers_amqp_pb2.TripOfferSearchTask,
     ) -> Iterator[amqp_pb2.SearchCriteriaTask]:
         for segment in search_task.search.segments:
             first_leg = more_itertools.first(segment.legs)

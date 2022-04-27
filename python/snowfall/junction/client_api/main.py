@@ -27,7 +27,7 @@ from snowfall.junction.client_api import (
     middlewares,
     validation,
 )
-from snowfall.junction.offers.v1alpha import offers_pb2_grpc
+from snowfall.junction.offers.v1alpha import grpc_pb2_grpc
 from snowfall.junction.orders.v1alpha import orders_pb2_grpc
 from snowfall.junction.places.v1alpha import places_pb2_grpc
 from snowfall.junction.schedules.v1alpha import schedules_pb2_grpc
@@ -98,11 +98,11 @@ def _factory(
                         trips_pb2_grpc.TripServiceStub(trips_channel),
                     ),
                     offers_client=offers.GrpcClient(
-                        offers=offers_pb2_grpc.OfferServiceStub(offers_channel),
+                        offers=grpc_pb2_grpc.OfferServiceStub(offers_channel),
                     ),
                     offer_searches_client=offer_searches.GrpcClient(
-                        offers=offers_pb2_grpc.OfferServiceStub(offers_channel),
-                        offer_searches=offers_pb2_grpc.OfferSearchServiceStub(
+                        offers=grpc_pb2_grpc.OfferServiceStub(offers_channel),
+                        offer_searches=grpc_pb2_grpc.OfferSearchServiceStub(
                             offers_channel,
                         ),
                     ),

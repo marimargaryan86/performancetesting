@@ -1,7 +1,7 @@
 from typing import Sequence
 
 from snowfall.adapter import offers as offers_adapter
-from snowfall.junction.offers.v1alpha import offers_pb2
+from snowfall.junction.offers.v1alpha import models_pb2
 
 
 class MissingOffersError(Exception):
@@ -15,7 +15,10 @@ class OfferIdsToOffers(object):
     ):
         self._offers = offers_client
 
-    async def transform(self, offer_ids: Sequence[str]) -> list[offers_pb2.Offer]:
+    async def transform(
+        self,
+        offer_ids: Sequence[str],
+    ) -> list[models_pb2.OfferAggregate]:
         offers_page = await self._offers.find_by_ids(
             offer_ids,
             limit=len(offer_ids),

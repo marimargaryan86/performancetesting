@@ -53,15 +53,15 @@ def offer_aggregate_collection(
 @pytest.fixture
 def offer_aggregate_repository(
     offer_aggregate_collection: motor_asyncio.AsyncIOMotorCollection,
-) -> offers.OfferAggregateRepository:
-    return offers.OfferAggregateRepository(collection=offer_aggregate_collection)
+) -> offers.OfferAggregateMappingRepository:
+    return offers.OfferAggregateMappingRepository(collection=offer_aggregate_collection)
 
 
 @pytest.fixture
 def offer_aggregator(
     offer_searches_repository: offers.OfferSearchRepository,
     offer_bucket_repository: aggregator.OfferBucketRepository,
-    offer_aggregate_repository: offers.OfferAggregateRepository,
+    offer_aggregate_repository: offers.OfferAggregateMappingRepository,
 ) -> aggregator.OfferAggregator:
     return aggregator.OfferAggregator(
         offer_searches=offer_searches_repository,

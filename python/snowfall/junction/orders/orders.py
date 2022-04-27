@@ -4,7 +4,7 @@ import uuid
 from typing import Any, Sequence
 
 from snowfall.adapter import passenger_name_records as passenger_name_records_adapter
-from snowfall.junction.offers.v1alpha import offers_pb2
+from snowfall.junction.offers.v1alpha import models_pb2 as offer_models_pb2
 from snowfall.junction.orders.v1alpha import models_pb2
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
@@ -26,7 +26,7 @@ class OrderRepository(
 
     async def create_from_offers(
         self,
-        offers: Sequence[offers_pb2.Offer],
+        offers: Sequence[offer_models_pb2.Offer],
     ) -> models_pb2.Order:
 
         passenger_name_record = await self._passenger_name_records.create()
@@ -67,7 +67,7 @@ class OrderRepository(
     async def amend_order(
         self,
         order_id: str,
-        offers: Sequence[offers_pb2.Offer],
+        offers: Sequence[offer_models_pb2.Offer],
     ) -> models_pb2.Order:
         # TODO: amend offers to the order, check for duplicates
         return models_pb2.Order()

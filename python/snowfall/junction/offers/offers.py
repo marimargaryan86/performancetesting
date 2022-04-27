@@ -6,23 +6,22 @@ import pymongo
 from google.protobuf import timestamp_pb2
 from motor import motor_asyncio
 
-from snowfall.junction.offers.v1alpha import offers_pb2
-from snowfall.junction.providers.v1alpha import offers_pb2 as provider_offers_pb2
+from snowfall.junction.offers.v1alpha import models_pb2
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 
 class TripOfferRepository(
-    mixins.InsertMixin[provider_offers_pb2.GroupedOffer],
-    repository.ProtoRepository[provider_offers_pb2.GroupedOffer],
+    mixins.InsertMixin[models_pb2.OfferGroup],
+    repository.ProtoRepository[models_pb2.OfferGroup],
 ):
-    _proto = provider_offers_pb2.GroupedOffer
+    _proto = models_pb2.OfferGroup
     _indexes = [pymongo.IndexModel("offer_search_id", background=True)]
 
     async def find(
         self,
         ids: Sequence[str],
         cursor: str,
-    ) -> resultset.ResultSet[provider_offers_pb2.GroupedOffer]:
+    ) -> resultset.ResultSet[models_pb2.OfferGroup]:
         filter_ = (
             {
                 repository.mongo_id_key: {
@@ -39,19 +38,19 @@ class TripOfferRepository(
         )
 
 
-class OfferAggregateRepository(
-    mixins.FindByIdMixin[offers_pb2.OfferAggregate],
-    mixins.InsertMixin[offers_pb2.OfferAggregate],
-    repository.ProtoRepository[offers_pb2.OfferAggregate],
+class OfferAggregateMappingRepository(
+    mixins.FindByIdMixin[models_pb2.OfferAggregateMapping],
+    mixins.InsertMixin[models_pb2.OfferAggregateMapping],
+    repository.ProtoRepository[models_pb2.OfferAggregateMapping],
 ):
-    _proto = offers_pb2.OfferAggregate
+    _proto = models_pb2.OfferAggregateMapping
     _indexes = [pymongo.IndexModel("offer_search_id", background=True)]
 
     async def find_by_offer_search_id(
         self,
         offer_search_id: str,
         cursor: str,
-    ) -> resultset.ResultSet[offers_pb2.OfferAggregate]:
+    ) -> resultset.ResultSet[models_pb2.OfferAggregateMapping]:
         return await self._find_with_cursor(
             cur=cursor,
             filter_={"offer_search_id": offer_search_id},
@@ -59,12 +58,12 @@ class OfferAggregateRepository(
 
 
 class OfferSearchRepository(  # noqa: WPS215
-    mixins.AllMixin[offers_pb2.OfferSearch],
-    mixins.FindByIdMixin[offers_pb2.OfferSearch],
-    mixins.InsertMixin[offers_pb2.OfferSearch],
-    repository.ProtoRepository[offers_pb2.OfferSearch],
+    mixins.AllMixin[models_pb2.OfferSearch],
+    mixins.FindByIdMixin[models_pb2.OfferSearch],
+    mixins.InsertMixin[models_pb2.OfferSearch],
+    repository.ProtoRepository[models_pb2.OfferSearch],
 ):
-    _proto = offers_pb2.OfferSearch
+    _proto = models_pb2.OfferSearch
 
     def __init__(
         self,
@@ -76,13 +75,13 @@ class OfferSearchRepository(  # noqa: WPS215
 
     async def create(
         self,
-        document: offers_pb2.OfferSearch,
-    ) -> offers_pb2.OfferSearch:
+        document: models_pb2.OfferSearch,
+    ) -> models_pb2.OfferSearch:
         expires_at = timestamp_pb2.Timestamp()
         expires_at.FromDatetime(
             datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
         )
-        offer_search = offers_pb2.OfferSearch(
+        offer_search = models_pb2.OfferSearch(
             id=str(uuid.uuid4()),
             expires_at=expires_at,
             trip=document.trip,

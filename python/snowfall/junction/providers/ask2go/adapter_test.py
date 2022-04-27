@@ -204,7 +204,7 @@ async def test_search_result_data(  # noqa: WPS218
     async for search_result in ask2go_adapter.gather_search_results(_ARN_LHR):
         assert search_result.offer_search_id == _ARN_LHR.offer_search_id
         offer = search_result.offers[0]
-        assert offer.segments[0].id == "segment_id"
+        assert offer.segment_details[0].id == "segment_id"
         assert offer.price.amount == 6374
         assert offer.price.currency == "EUR"
         segment = search_result.segments[0]

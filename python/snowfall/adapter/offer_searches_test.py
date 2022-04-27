@@ -2,13 +2,13 @@ import pytest
 
 from snowfall import fixtures
 from snowfall.adapter import offer_searches
-from snowfall.junction.offers.v1alpha import offers_pb2
+from snowfall.junction.offers.v1alpha import models_pb2
 
 
 @pytest.mark.asyncio
 async def test_offer_search_can_be_saved(
     offer_searches_client: offer_searches.Client,
-    offer_search: offers_pb2.OfferSearch,
+    offer_search: models_pb2.OfferSearch,
 ) -> None:
     await offer_searches_client.create(offer_search)
 
@@ -16,7 +16,7 @@ async def test_offer_search_can_be_saved(
 @pytest.mark.asyncio
 async def test_offer_search_can_be_retrieved(
     offer_searches_client: offer_searches.Client,
-    offer_search: offers_pb2.OfferSearch,
+    offer_search: models_pb2.OfferSearch,
 ) -> None:
     offer_search = await offer_searches_client.create(offer_search)
     assert await offer_searches_client.get(offer_search.id)

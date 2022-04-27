@@ -18,7 +18,7 @@ from snowfall.adapter import (
     trip_searches,
     trips,
 )
-from snowfall.junction.offers.v1alpha import offers_pb2
+from snowfall.junction.offers.v1alpha import models_pb2
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.mongo import repository
 
@@ -96,9 +96,9 @@ def orders_client() -> orders.Client:
 
 
 @pytest.fixture
-def offer_search() -> offers_pb2.OfferSearch:
-    return offers_pb2.OfferSearch(
-        trip=offers_pb2.TripOfferSearch(),
+def offer_search() -> models_pb2.OfferSearch:
+    return models_pb2.OfferSearch(
+        trip=models_pb2.TripOfferSearch(),
     )
 
 

@@ -1,11 +1,11 @@
 import grpc
 
 from snowfall.junction.offers import amqp, offers
-from snowfall.junction.offers.v1alpha import offers_pb2, offers_pb2_grpc
+from snowfall.junction.offers.v1alpha import grpc_pb2, grpc_pb2_grpc, models_pb2
 from snowfall.stdlib.transport.grpc import Service
 
 
-class OfferSearchService(Service, offers_pb2_grpc.OfferSearchServiceServicer):
+class OfferSearchService(Service, grpc_pb2_grpc.OfferSearchServiceServicer):
     def __init__(
         self,
         offers_searches: offers.OfferSearchRepository,
@@ -17,40 +17,40 @@ class OfferSearchService(Service, offers_pb2_grpc.OfferSearchServiceServicer):
         self._publisher = publisher
 
     def get_name(self) -> str:
-        return offers_pb2.DESCRIPTOR.services_by_name["OfferSearchService"].full_name
+        return models_pb2.DESCRIPTOR.services_by_name["OfferSearchService"].full_name
 
     def register(self, server: grpc.aio.Server) -> None:
-        offers_pb2_grpc.add_OfferSearchServiceServicer_to_server(self, server)
+        grpc_pb2_grpc.add_OfferSearchServiceServicer_to_server(self, server)
 
     async def EnqueueOfferSearch(  # type: ignore[override] # noqa: N802
         self,
-        request: offers_pb2.EnqueueOfferSearchRequest,
+        request: grpc_pb2.EnqueueOfferSearchRequest,
         context: grpc.aio.ServicerContext,
-    ) -> offers_pb2.EnqueueOfferSearchResponse:
+    ) -> grpc_pb2.EnqueueOfferSearchResponse:
         offer_search = await self._offers_searches.create(
             request.search,
         )
         await self._publisher.publish(offer_search)
 
-        return offers_pb2.EnqueueOfferSearchResponse(search=offer_search)
+        return grpc_pb2.EnqueueOfferSearchResponse(search=offer_search)
 
     async def GetOfferSearch(  # type: ignore[override] # noqa: N802
         self,
-        request: offers_pb2.GetOfferSearchRequest,
+        request: grpc_pb2.GetOfferSearchRequest,
         context: grpc.aio.ServicerContext,
-    ) -> offers_pb2.GetOfferSearchResponse:
+    ) -> grpc_pb2.GetOfferSearchResponse:
         offer_search = await self._offers_searches.find_by_id(request.id)
 
         if not offer_search:
             await context.abort(grpc.StatusCode.NOT_FOUND)
 
-        return offers_pb2.GetOfferSearchResponse(search=offer_search)
+        return grpc_pb2.GetOfferSearchResponse(search=offer_search)
 
 
-class OfferService(Service, offers_pb2_grpc.OfferServiceServicer):
+class OfferService(Service, grpc_pb2_grpc.OfferServiceServicer):
     def __init__(
         self,
-        offer_aggregates: offers.OfferAggregateRepository,
+        offer_aggregates: offers.OfferAggregateMappingRepository,
         offer_results: offers.TripOfferRepository,
         default_page_size: int,
     ):
@@ -59,16 +59,16 @@ class OfferService(Service, offers_pb2_grpc.OfferServiceServicer):
         self._default_page_size = default_page_size
 
     def get_name(self) -> str:
-        return offers_pb2.DESCRIPTOR.services_by_name["OfferService"].full_name
+        return models_pb2.DESCRIPTOR.services_by_name["OfferService"].full_name
 
     def register(self, server: grpc.aio.Server) -> None:
-        offers_pb2_grpc.add_OfferServiceServicer_to_server(self, server)
+        grpc_pb2_grpc.add_OfferServiceServicer_to_server(self, server)
 
     async def GetOffer(  # type: ignore[override] # noqa: N802
         self,
-        request: offers_pb2.GetOfferRequest,
+        request: grpc_pb2.GetOfferRequest,
         context: grpc.aio.ServicerContext,
-    ) -> offers_pb2.GetOfferResponse:
+    ) -> grpc_pb2.GetOfferResponse:
         offer_aggregate = await self._aggregates.find_by_id(request.id)
 
         if not offer_aggregate:
@@ -79,21 +79,21 @@ class OfferService(Service, offers_pb2_grpc.OfferServiceServicer):
             cursor="",
         )
 
-        return offers_pb2.GetOfferResponse(
-            offer=offers_pb2.Offer(
+        return grpc_pb2.GetOfferResponse(
+            offer=models_pb2.OfferAggregate(
                 id=offer_aggregate.id,  # type: ignore[union-attr]
-                results=[offer_result async for offer_result in offer_results],
+                groups=[offer_result async for offer_result in offer_results],
             ),
         )
 
     async def ListOffers(  # type: ignore[override] # noqa: N802
         self,
-        request: offers_pb2.ListOffersRequest,
+        request: grpc_pb2.ListOffersRequest,
         context: grpc.aio.ServicerContext,
-    ) -> offers_pb2.ListOffersResponse:
+    ) -> grpc_pb2.ListOffersResponse:
         if not request.offer_search_id:
             # TODO: if request.payload.offer_ids.ids:
-            return offers_pb2.ListOffersResponse()
+            return grpc_pb2.ListOffersResponse()
 
         offer_aggregates = await self._aggregates.find_by_offer_search_id(
             request.offer_search_id,
@@ -114,13 +114,13 @@ class OfferService(Service, offers_pb2_grpc.OfferServiceServicer):
                 cursor="",
             )
             offer_list.append(
-                offers_pb2.Offer(
+                models_pb2.OfferAggregate(
                     id=aggregate.id,
-                    results=[offer_result async for offer_result in offer_results],
+                    groups=[offer_result async for offer_result in offer_results],
                 ),
             )
 
-        return offers_pb2.ListOffersResponse(
+        return grpc_pb2.ListOffersResponse(
             offers=offer_list,
             next_page_token=await offer_aggregates.cursor(),
         )
