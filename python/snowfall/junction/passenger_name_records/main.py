@@ -38,7 +38,7 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="passenger_name_records")
+    entrypoint = service.Entrypoint(name="passenger-name-records")
 
     entrypoint.enter_with_commands(
         service.Command(
