@@ -86,8 +86,9 @@ EOH
         args = [
           "s3",
           "mv",
-          "${NOMAD_ALLOC_DIR}/feeds/*",
-          "s3://junction-gtfs-feeds/"
+          "${NOMAD_ALLOC_DIR}/feeds",
+          "s3://junction-gtfs-feeds/",
+          "--recursive"
         ]
       }
 

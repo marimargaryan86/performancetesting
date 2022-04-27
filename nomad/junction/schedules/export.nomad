@@ -91,8 +91,9 @@ EOH
         args = [
           "s3",
           "mv",
-          "${NOMAD_ALLOC_DIR}/protos/*",
-          "s3://junction-schedules-export/"
+          "${NOMAD_ALLOC_DIR}/protos",
+          "s3://junction-schedules-export/",
+          "--recursive"
         ]
       }
 
