@@ -51,9 +51,7 @@ class Importer(object):
         redis: aioredis.Redis,
         repositories: RepositoryCollection,
         path: pathlib.Path,
-        user_agent: str,
     ):
-        self._client = httpx.AsyncClient(headers={"User-Agent": user_agent})
         self._logger = structlog.get_logger(__name__)
         self._path = path
         self._redis = redis
@@ -72,21 +70,17 @@ class Importer(object):
 
     async def import_feed(
         self,
+        zip_path: pathlib.Path,
         feed_ref: str,
-        feed_url: str,
         skip_checksum_check: bool,
     ) -> bool:
-        zip_path = await self._download_feed(feed_url)
-
-        self._logger.info("Feed downloaded successfully.")
-
         current_checksum = await filesystem.hash_file(zip_path)
         cached_checksum = await self._redis.get(
             _CHECKSUM_KEY_FORMAT.format(ref=feed_ref),
         )
 
         if cached_checksum == current_checksum and not skip_checksum_check:
-            self._logger.info("Downloaded feed has not changed since last import.")
+            self._logger.info("Feed has not changed since last import.")
             return False
 
         for zip_file in filesystem.unzip_file(zip_path):
@@ -105,23 +99,6 @@ class Importer(object):
         )
 
         return True
-
-    async def _download_feed(
-        self,
-        feed_url: str,
-    ) -> pathlib.Path:
-        filename = pathlib.Path(self._path, "feed.zip")
-
-        async with self._client as client:
-            async with client.stream(
-                "GET",
-                feed_url,
-                follow_redirects=True,
-            ) as response:
-                response.raise_for_status()
-                await self._write_file(response, filename)
-
-        return filename
 
     async def _write_file(
         self,

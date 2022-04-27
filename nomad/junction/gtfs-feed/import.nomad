@@ -70,10 +70,15 @@ job "gtfs-feed-import" {
           }
         }
 
+        artifact {
+          source = group.value.url
+          destination = "${NOMAD_TASK_DIR}/${group.value.ref}.zip"
+          mode = "file"
+        }
+
         env {
           ENV_NAME   = "${NOMAD_NAMESPACE}"
-          FEED_REF   = group.value.ref
-          FEED_URL   = group.value.url
+          FEEDS_DIR  = "${NOMAD_TASK_DIR}"
           SENTRY_DSN = "https://d86394991a184238865125d76e464d6d@sentry.snowfall.se/21"
         }
       }
