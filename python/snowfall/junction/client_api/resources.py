@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import datetime
 import uuid
 from typing import Any, Sequence
 
+import pydantic
 from starlette import requests
 
 from snowfall.common.v1alpha import models_pb2
@@ -14,7 +16,25 @@ from snowfall.stdlib.format import protobuf
 
 _SELF_HREF = "self"
 _RELATIONSHIPS_FIELD = "data"
-_OFFERS_TYPE = "offers"
+_OFFERS_TYPE = "offer-aggregates"
+
+
+class Point(models.BaseModel):
+    ref: str
+    name: str
+    latitude: float
+    longitude: float
+    time_zone: str = pydantic.Field(alias="timeZone")
+
+    @classmethod
+    def from_proto(cls, point: models_pb2.Point) -> Point:
+        return cls(
+            ref=point.ref,
+            name=point.name,
+            latitude=point.coordinates.latitude,
+            longitude=point.coordinates.longitude,
+            timeZone=point.time_zone,
+        )
 
 
 class OfferResource(models.Resource):
@@ -47,15 +67,92 @@ class OfferResource(models.Resource):
         )
 
         return {
+            "groups": [
+                OfferGroup.from_proto(offer_group) for offer_group in offer.groups
+            ],
             "expiresAt": protobuf.protobuf_to_datetime(first_expiring_offer.expires_at),
-            "price": str(
-                sum(
-                    offer_result.offers[0].price.amount for offer_result in offer.groups
-                )
-                / 100,
-            ),
-            "currency": first_expiring_offer.offers[0].price.currency,
         }
+
+
+class Price(models.BaseModel):
+    currency: str
+    amount: str
+
+    @classmethod
+    def from_proto(cls, price: models_pb2.Price) -> Price:
+        return cls(
+            currency=price.currency,
+            amount=str(price.amount / 100),
+        )
+
+
+class OfferSegmentDetails(models.BaseModel):
+    ref: str
+
+    @classmethod
+    def from_proto(cls, details: offers_pb2.OfferSegmentDetails) -> OfferSegmentDetails:
+        return cls(ref=details.id)
+
+
+class Offer(models.BaseModel):
+    identifier: str = pydantic.Field(alias="id")
+    price: Price
+    segment_details: Sequence[OfferSegmentDetails] = pydantic.Field(
+        alias="segmentDetails",
+    )
+
+    @classmethod
+    def from_proto(cls, offer: offers_pb2.Offer) -> Offer:
+        return cls(
+            id=offer.id,
+            price=Price.from_proto(offer.price),
+            segmentDetails=[
+                OfferSegmentDetails.from_proto(segment_details)
+                for segment_details in offer.segment_details
+            ],
+        )
+
+
+class OfferSegmentLeg(models.BaseModel):
+    origin: Point
+    destination: Point
+    departure_at: datetime.datetime = pydantic.Field(alias="departureAt")
+    arrival_at: datetime.datetime = pydantic.Field(alias="arrivalAt")
+
+    @classmethod
+    def from_proto(cls, leg: offers_pb2.OfferSegmentLeg) -> OfferSegmentLeg:
+        return cls(
+            origin=Point.from_proto(leg.origin),
+            destination=Point.from_proto(leg.destination),
+            departureAt=protobuf.protobuf_to_datetime(leg.departure_at),
+            arrivalAt=protobuf.protobuf_to_datetime(leg.arrival_at),
+        )
+
+
+class OfferSegment(models.BaseModel):
+    ref: str
+    legs: Sequence[OfferSegmentLeg]
+
+    @classmethod
+    def from_proto(cls, segment: offers_pb2.OfferSegment) -> OfferSegment:
+        return cls(
+            ref=segment.id,
+            legs=[OfferSegmentLeg.from_proto(leg) for leg in segment.legs],
+        )
+
+
+class OfferGroup(models.BaseModel):
+    offers: Sequence[Offer]
+    segments: Sequence[OfferSegment]
+
+    @classmethod
+    def from_proto(cls, offer_group: offers_pb2.OfferGroup) -> OfferGroup:
+        return cls(
+            offers=[Offer.from_proto(offer) for offer in offer_group.offers],
+            segments=[
+                OfferSegment.from_proto(segment) for segment in offer_group.segments
+            ],
+        )
 
 
 class OrderResource(models.Resource):
@@ -147,20 +244,8 @@ class LegResource(models.Resource):
                     leg.arrival_at,
                 ),
                 "operator": leg.agency_name,
-                "origin": {
-                    "ref": leg.origin.ref,
-                    "name": leg.origin.name,
-                    "latitude": leg.origin.coordinates.latitude,
-                    "longitude": leg.origin.coordinates.longitude,
-                    "timeZone": leg.origin.time_zone,
-                },
-                "destination": {
-                    "ref": leg.destination.ref,
-                    "name": leg.destination.name,
-                    "latitude": leg.destination.coordinates.latitude,
-                    "longitude": leg.destination.coordinates.longitude,
-                    "timeZone": leg.destination.time_zone,
-                },
+                "origin": Point.from_proto(leg.origin),
+                "destination": Point.from_proto(leg.destination),
             },
             relationships={
                 "type": {

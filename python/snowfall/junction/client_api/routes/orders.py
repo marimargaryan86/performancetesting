@@ -32,6 +32,39 @@ class Order(endpoints.HTTPEndpoint):
             ),
         )
 
+    async def patch(
+        self,
+        request: requests.Request,
+        orders_client: orders.Client = lagom.injectable,
+        offer_ids_to_offers: OfferIdsToOffers = lagom.injectable,
+    ) -> responses.Response:
+        body = await request_helpers.flatten_request(request)
+        try:
+            offers = await offer_ids_to_offers.transform(
+                [offer["offerAggregateId"] for offer in body["offers"]],
+            )
+        except MissingOffersError:
+            raise exceptions.HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+        order = await orders_client.add_offers(
+            order_id=request.path_params["orderId"],
+            offers=list(
+                itertools.chain.from_iterable(
+                    group.offers for aggregate in offers for group in aggregate.groups
+                ),
+            ),
+        )
+
+        return models.JsonApiResponse(
+            models.Body(
+                data=resources.OrderResource.from_proto(
+                    order=order,
+                    request=request,
+                ),
+            ),
+            status.HTTP_202_ACCEPTED,
+        )
+
 
 class Orders(endpoints.HTTPEndpoint):
     async def get(
@@ -69,7 +102,9 @@ class Orders(endpoints.HTTPEndpoint):
         body = await request_helpers.flatten_request(request)
 
         try:
-            offers = await offer_ids_to_offers.transform(body["offers"])
+            offers = await offer_ids_to_offers.transform(
+                [offer["offerAggregateId"] for offer in body["offers"]],
+            )
         except MissingOffersError:
             raise exceptions.HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY)
 
@@ -89,39 +124,4 @@ class Orders(endpoints.HTTPEndpoint):
                 ),
             ),
             status.HTTP_201_CREATED,
-        )
-
-
-class AddOffersToOrder(endpoints.HTTPEndpoint):
-    async def post(
-        self,
-        request: requests.Request,
-        orders_client: orders.Client = lagom.injectable,
-        offer_ids_to_offers: OfferIdsToOffers = lagom.injectable,
-    ) -> responses.Response:
-        body = await request.json()
-        try:
-            offers = await offer_ids_to_offers.transform(
-                [offer["id"] for offer in body["data"]],
-            )
-        except MissingOffersError:
-            raise exceptions.HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY)
-
-        order = await orders_client.add_offers(
-            order_id=request.path_params["orderId"],
-            offers=list(
-                itertools.chain.from_iterable(
-                    group.offers for aggregate in offers for group in aggregate.groups
-                ),
-            ),
-        )
-
-        return models.JsonApiResponse(
-            models.Body(
-                data=resources.OrderResource.from_proto(
-                    order=order,
-                    request=request,
-                ),
-            ),
-            status.HTTP_202_ACCEPTED,
         )

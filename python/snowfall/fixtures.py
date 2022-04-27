@@ -1,5 +1,6 @@
 import datetime
 import random
+import uuid
 
 from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.offers.v1alpha import models_pb2 as offers_pb2
@@ -92,16 +93,42 @@ def get_offers() -> list[offers_pb2.OfferAggregate]:
 
 
 def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
+    segment_id = uuid.uuid4()
+
     return offers_pb2.OfferAggregate(
         id=identifier,
         groups=[
             offers_pb2.OfferGroup(
                 offers=[
                     offers_pb2.Offer(
+                        id=str(uuid.uuid4()),
+                        segment_details=[
+                            offers_pb2.OfferSegmentDetails(
+                                id=str(segment_id),
+                            ),
+                        ],
                         price=models_pb2.Price(
                             amount=1337,
                             currency="SEK",
                         ),
+                    ),
+                ],
+                segments=[
+                    offers_pb2.OfferSegment(
+                        id=str(segment_id),
+                        legs=[
+                            offers_pb2.OfferSegmentLeg(
+                                id=str(uuid.uuid4()),
+                                origin=generate_point(str(uuid.uuid4())),
+                                destination=generate_point(str(uuid.uuid4())),
+                                departure_at=protobuf.datetime_to_protobuf(
+                                    datetime.datetime.now(),
+                                ),
+                                arrival_at=protobuf.datetime_to_protobuf(
+                                    datetime.datetime.now(),
+                                ),
+                            ),
+                        ],
                     ),
                 ],
                 expires_at=protobuf.datetime_to_protobuf(datetime.datetime.now()),
@@ -143,4 +170,13 @@ def get_legs() -> list[models_pb2.Leg]:
 def generate_leg(identifier: str) -> models_pb2.Leg:
     return models_pb2.Leg(
         id=identifier,
+    )
+
+
+def generate_point(identifier: str) -> models_pb2.Point:
+    return models_pb2.Point(
+        ref=identifier,
+        name="Point name",
+        coordinates=models_pb2.Coordinates(),
+        time_zone="Europe/Stockholm",
     )

@@ -560,7 +560,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/Price"
+                        "$ref": "#/components/schemas/PriceResource"
                       }
                     }
                   },
@@ -994,7 +994,7 @@
                       "uniqueItems": true,
                       "minItems": 0,
                       "items": {
-                        "$ref": "#/components/schemas/Offer"
+                        "$ref": "#/components/schemas/OfferAggregate"
                       }
                     }
                   },
@@ -1099,7 +1099,7 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/Offer"
+                      "$ref": "#/components/schemas/OfferAggregate"
                     }
                   },
                   "required": [
@@ -1246,23 +1246,16 @@
         },
         "operationId": "get-orders-order-id",
         "description": "Used to lookup data for a Order Identifier."
-      }
-    },
-    "/orders/{orderId}/relationships/offers": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/orderId"
-        }
-      ],
-      "post": {
-        "summary": "Add Offers to Order",
-        "operationId": "post-orders-order-id-relationships-offers",
+      },
+      "patch": {
+        "summary": "",
+        "tags": [
+          "orders"
+        ],
+        "operationId": "patch-orders-order-id",
         "responses": {
           "202": {
             "description": "Accepted"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -1271,10 +1264,7 @@
             "$ref": "#/components/responses/UnprocessableEntity"
           }
         },
-        "tags": [
-          "orders"
-        ],
-        "description": "Used to add additional Offers to an existing Order and book them.",
+        "description": "Used to add offers to an existing booking.",
         "requestBody": {
           "content": {
             "application/vnd.api+json": {
@@ -1282,15 +1272,9 @@
                 "type": "object",
                 "properties": {
                   "data": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/OfferIdentifier"
-                    }
+                    "$ref": "#/components/schemas/Order"
                   }
-                },
-                "required": [
-                  "data"
-                ]
+                }
               }
             }
           }
@@ -1927,8 +1911,8 @@
         "title": "Trip Search",
         "description": "Context for which Trips can be found."
       },
-      "Price": {
-        "title": "Price",
+      "PriceResource": {
+        "title": "PriceResource",
         "allOf": [
           {
             "type": "object",
@@ -1946,7 +1930,11 @@
                 ]
               },
               "attributes": {
-                "type": "object"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Price"
+                  }
+                ]
               }
             },
             "required": [
@@ -1961,8 +1949,8 @@
         ],
         "description": "Description of an amount in a currency."
       },
-      "Offer": {
-        "title": "Offer",
+      "OfferAggregate": {
+        "title": "OfferAggregate",
         "allOf": [
           {
             "type": "object",
@@ -1976,30 +1964,26 @@
               "type": {
                 "type": "string",
                 "enum": [
-                  "offers"
+                  "offer-aggregates"
                 ]
               },
               "attributes": {
                 "type": "object",
                 "required": [
-                  "expiresAt",
-                  "price",
-                  "currency"
+                  "groups",
+                  "expiresAt"
                 ],
                 "properties": {
+                  "groups": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "$ref": "#/components/schemas/OfferGroup"
+                    }
+                  },
                   "expiresAt": {
                     "type": "string",
-                    "format": "date-time",
-                    "readOnly": true
-                  },
-                  "price": {
-                    "type": "string",
-                    "example": "12.34"
-                  },
-                  "currency": {
-                    "type": "string",
-                    "pattern": "^[A-Z]{3}$",
-                    "example": "USD"
+                    "format": "date-time"
                   }
                 }
               }
@@ -2014,10 +1998,10 @@
             "$ref": "#/components/schemas/SelfLink"
           }
         ],
-        "description": "Result of searching for offers. Used for creating an Order."
+        "description": "Result of searching for offers. Used for creating an Order. Chose one offer from each group when creating an order."
       },
-      "OfferIdentifier": {
-        "title": "Offer Identifier",
+      "OfferAggregateIdentifier": {
+        "title": "Offer Aggregate Identifier",
         "type": "object",
         "properties": {
           "id": {
@@ -2028,7 +2012,7 @@
           "type": {
             "type": "string",
             "enum": [
-              "offers"
+              "offer-aggregates"
             ]
           }
         },
@@ -2037,78 +2021,138 @@
           "type"
         ]
       },
-      "AccommodationOfferSearch": {
-        "title": "Accommodation Offer Search",
-        "allOf": [
-          {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "format": "uuid",
-                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-                "readOnly": true
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "accommodation-offer-searches"
-                ]
-              },
-              "attributes": {
-                "type": "object",
-                "properties": {
-                  "expiresAt": {
-                    "type": "string",
-                    "format": "date-time",
-                    "readOnly": true
-                  },
-                  "checkinAt": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "checkoutAt": {
-                    "type": "string",
-                    "format": "date-time"
-                  }
-                },
-                "required": [
-                  "expiresAt",
-                  "checkinAt",
-                  "checkoutAt"
-                ]
-              },
-              "relationships": {
-                "type": "object",
-                "required": [
-                  "place"
-                ],
-                "properties": {
-                  "place": {
-                    "type": "object",
-                    "required": [
-                      "data"
-                    ],
-                    "properties": {
-                      "data": {
-                        "$ref": "#/components/schemas/PlaceIdentifier"
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "required": [
-              "id",
-              "type",
-              "relationships"
-            ]
+      "OfferGroup": {
+        "title": "Offer Group",
+        "description": "Result of searching for offers. Used for creating an Order. Chose one offer when creating an order.",
+        "type": "object",
+        "properties": {
+          "offers": {
+            "type": "array",
+            "uniqueItems": true,
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/Offer"
+            }
           },
-          {
-            "$ref": "#/components/schemas/SelfLink"
+          "segments": {
+            "type": "array",
+            "uniqueItems": true,
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/OfferSegment"
+            }
           }
-        ],
-        "description": "Not yet implemented."
+        },
+        "required": [
+          "offers",
+          "segments"
+        ]
+      },
+      "Offer": {
+        "title": "Offer",
+        "description": "Offer for one or more segments. Used for creating an Order.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "price": {
+            "$ref": "#/components/schemas/Price"
+          },
+          "segmentDetails": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OfferSegmentDetails"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "price",
+          "segmentDetails"
+        ]
+      },
+      "OfferSegmentDetails": {
+        "title": "Offer Segment Details",
+        "description": "Specific details for an offer on a specific segment.",
+        "type": "object",
+        "properties": {
+          "ref": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "ref"
+        ]
+      },
+      "Price": {
+        "title": "Price",
+        "description": "Amount and currency.",
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "currency",
+          "amount"
+        ]
+      },
+      "OfferSegment": {
+        "title": "Offer Segment",
+        "description": "Segment related to a grouped offer.",
+        "type": "object",
+        "properties": {
+          "ref": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "legs": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/components/schemas/OfferSegmentLeg"
+            }
+          }
+        },
+        "required": [
+          "ref",
+          "legs"
+        ]
+      },
+      "OfferSegmentLeg": {
+        "title": "Offer Segment Leg",
+        "description": "Leg related to a grouped offers segments.",
+        "type": "object",
+        "properties": {
+          "origin": {
+            "$ref": "#/components/schemas/Point"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/Point"
+          },
+          "departureAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "arrivalAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "origin",
+          "destination",
+          "departureAt",
+          "arrivalAt"
+        ]
       },
       "RentalOfferSearch": {
         "title": "Rental Offer Search",
@@ -2175,6 +2219,79 @@
                   },
                   "dropoffPlace": {
                     "type": "object",
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/PlaceIdentifier"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "description": "Not yet implemented."
+      },
+      "AccommodationOfferSearch": {
+        "title": "Accommodation Offer Search",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "accommodation-offer-searches"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                  },
+                  "checkinAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "checkoutAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "expiresAt",
+                  "checkinAt",
+                  "checkoutAt"
+                ]
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "place"
+                ],
+                "properties": {
+                  "place": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
                     "properties": {
                       "data": {
                         "$ref": "#/components/schemas/PlaceIdentifier"
@@ -2270,7 +2387,7 @@
                       "data": {
                         "type": "array",
                         "items": {
-                          "$ref": "#/components/schemas/OfferIdentifier"
+                          "$ref": "#/components/schemas/OfferAggregateIdentifier"
                         },
                         "readOnly": true
                       }
@@ -2359,35 +2476,41 @@
               },
               "attributes": {
                 "type": "object",
+                "required": [
+                  "offers"
+                ],
                 "properties": {
                   "trips": {
                     "type": "array",
                     "items": {
                       "$ref": "#/components/schemas/TripItem"
                     }
-                  }
-                }
-              },
-              "relationships": {
-                "type": "object",
-                "required": [
-                  "offers"
-                ],
-                "properties": {
+                  },
                   "offers": {
-                    "type": "object",
-                    "required": [
-                      "data"
-                    ],
-                    "properties": {
-                      "data": {
-                        "type": "array",
-                        "minItems": 1,
-                        "items": {
-                          "$ref": "#/components/schemas/OfferIdentifier"
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "object",
+                      "minProperties": 1,
+                      "properties": {
+                        "offerAggregateId": {
+                          "type": "string",
+                          "format": "uuid"
                         },
-                        "writeOnly": true
-                      }
+                        "offerIds": {
+                          "type": "array",
+                          "minItems": 1,
+                          "uniqueItems": true,
+                          "items": {
+                            "type": "string",
+                            "format": "uuid"
+                          }
+                        }
+                      },
+                      "required": [
+                        "offerAggregateId",
+                        "offerIds"
+                      ]
                     },
                     "writeOnly": true
                   }
@@ -2397,8 +2520,7 @@
             "required": [
               "id",
               "type",
-              "attributes",
-              "relationships"
+              "attributes"
             ]
           },
           {

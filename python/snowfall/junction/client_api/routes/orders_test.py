@@ -17,7 +17,7 @@ class TestOrders(object):
         response = client.get("/orders/{id}".format(id=fixtures.ORDERS[0]))
         assert response.status_code == status.HTTP_200_OK
 
-    async def test_offer_search_unknown_trip_returns_error(
+    async def test_order_unknown_offer_returns_error(
         self,
         client: testclient.TestClient,
     ) -> None:
@@ -26,16 +26,15 @@ class TestOrders(object):
             json={
                 "data": {
                     "type": "orders",
-                    "attributes": {},
-                    "relationships": {
-                        "offers": {
-                            "data": [
-                                {
-                                    "id": fixtures.NOT_FOUND,
-                                    "type": "offers",
-                                },
-                            ],
-                        },
+                    "attributes": {
+                        "offers": [
+                            {
+                                "offerAggregateId": fixtures.NOT_FOUND,
+                                "offerIds": [
+                                    fixtures.OFFERS[0],
+                                ],
+                            },
+                        ],
                     },
                 },
             },
@@ -43,7 +42,7 @@ class TestOrders(object):
         )
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
-    async def test_offer_search_can_be_created(
+    async def test_order_can_be_created(
         self,
         client: testclient.TestClient,
     ) -> None:
@@ -52,16 +51,15 @@ class TestOrders(object):
             json={
                 "data": {
                     "type": "orders",
-                    "attributes": {},
-                    "relationships": {
-                        "offers": {
-                            "data": [
-                                {
-                                    "id": fixtures.OFFERS[0],
-                                    "type": "offers",
-                                },
-                            ],
-                        },
+                    "attributes": {
+                        "offers": [
+                            {
+                                "offerAggregateId": fixtures.OFFERS[0],
+                                "offerIds": [
+                                    fixtures.OFFERS[0],
+                                ],
+                            },
+                        ],
                     },
                 },
             },
@@ -73,17 +71,24 @@ class TestOrders(object):
         self,
         client: testclient.TestClient,
     ) -> None:
-        response = client.post(
-            "/orders/{orderId}/relationships/offers".format(
+        response = client.patch(
+            "/orders/{orderId}".format(
                 orderId=fixtures.ORDERS[0],
             ),
             json={
-                "data": [
-                    {
-                        "id": fixtures.NOT_FOUND,
-                        "type": "offers",
+                "data": {
+                    "type": "orders",
+                    "attributes": {
+                        "offers": [
+                            {
+                                "offerAggregateId": fixtures.NOT_FOUND,
+                                "offerIds": [
+                                    fixtures.OFFERS[0],
+                                ],
+                            },
+                        ],
                     },
-                ],
+                },
             },
             headers={"Content-Type": "application/vnd.api+json"},
         )
@@ -93,17 +98,24 @@ class TestOrders(object):
         self,
         client: testclient.TestClient,
     ) -> None:
-        response = client.post(
-            "/orders/{orderId}/relationships/offers".format(
+        response = client.patch(
+            "/orders/{orderId}".format(
                 orderId=fixtures.ORDERS[0],
             ),
             json={
-                "data": [
-                    {
-                        "id": fixtures.OFFERS[0],
-                        "type": "offers",
+                "data": {
+                    "type": "orders",
+                    "attributes": {
+                        "offers": [
+                            {
+                                "offerAggregateId": fixtures.OFFERS[0],
+                                "offerIds": [
+                                    fixtures.OFFERS[0],
+                                ],
+                            },
+                        ],
                     },
-                ],
+                },
             },
             headers={"Content-Type": "application/vnd.api+json"},
         )
