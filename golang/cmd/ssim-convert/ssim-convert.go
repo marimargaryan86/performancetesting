@@ -81,7 +81,7 @@ func convert(cmd *cobra.Command, args []string) error {
 		err := logger.Sync()
 
 		if err != nil {
-			panic(err)
+			return
 		}
 	}()
 

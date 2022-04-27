@@ -34,7 +34,7 @@ job "ssim-convert-convert" {
         args = [
           "convert",
           "${NOMAD_TASK_DIR}/SIMSFL.DAT",
-          "${NOMAD_TASK_DIR}/feeds"
+          "${NOMAD_ALLOC_DIR}/feeds"
         ]
 
         auth {
@@ -55,6 +55,44 @@ job "ssim-convert-convert" {
       env {
         ENV_NAME     = "${NOMAD_NAMESPACE}"
         SENTRY_DSN   = "https://43837909119c4ce186975c300c4efe6e@sentry.snowfall.se/23"
+      }
+    }
+
+    task "upload" {
+      lifecycle {
+        hook = "poststop"
+      }
+
+      driver = "docker"
+
+      vault {
+        policies = ["ssim-convert-dev"]
+      }
+
+      template {
+        data        = <<EOH
+{{ with secret "kv/dev/ssim-convert" }}
+AWS_ACCESS_KEY_ID={{ .Data.data.aws_access_key_id }}
+AWS_SECRET_ACCESS_KEY={{ .Data.data.aws_secret_access_key }}
+{{ end }}
+EOH
+        destination = "services.env"
+        env         = true
+        change_mode = "restart"
+      }
+
+      config {
+        image = "amazon/aws-cli"
+        args = [
+          "s3",
+          "mv",
+          "${NOMAD_ALLOC_DIR}/feeds/*",
+          "s3://junction-gtfs-feeds/"
+        ]
+      }
+
+      env {
+        AWS_DEFAULT_REGION = "eu-west-2"
       }
     }
   }
