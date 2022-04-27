@@ -58,9 +58,48 @@ EOH
 
       env {
         ENV_NAME     = "${NOMAD_NAMESPACE}"
-        OUTPUT_PATH  = "${NOMAD_ALLOC_DIR}"
+        OUTPUT_PATH  = "${NOMAD_ALLOC_DIR}/protos"
         SENTRY_DSN   = "https://8d94d1ca059f4dc9b4e1e91dfd3d7151@sentry.snowfall.se/25"
       }
     }
+
+    task "upload" {
+      lifecycle {
+        hook = "poststop"
+      }
+
+      driver = "docker"
+
+      vault {
+        policies = ["schedules-dev"]
+      }
+
+      template {
+        data        = <<EOH
+{{ with secret "kv/dev/schedules" }}
+AWS_ACCESS_KEY_ID={{ .Data.data.aws_access_key_id }}
+AWS_SECRET_ACCESS_KEY={{ .Data.data.aws_secret_access_key }}
+{{ end }}
+EOH
+        destination = "services.env"
+        env         = true
+        change_mode = "restart"
+      }
+
+      config {
+        image = "amazon/aws-cli"
+        args = [
+          "s3",
+          "mv",
+          "${NOMAD_ALLOC_DIR}/protos/*",
+          "s3://junction-schedules-export/"
+        ]
+      }
+
+      env {
+        AWS_DEFAULT_REGION = "eu-west-2"
+      }
+    }
+
   }
 }
