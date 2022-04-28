@@ -2,11 +2,31 @@ from __future__ import annotations
 
 import dataclasses
 import datetime
+import types
 import zoneinfo
 from typing import Sequence
 
 from snowfall.common.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
+
+_CABIN_MAPPING = types.MappingProxyType(
+    {
+        "Economy": models_pb2.CabinClass.TYPE_ECONOMY,
+        "EconomyWithRestrictions": models_pb2.CabinClass.TYPE_ECONOMY,
+        "EconomyWithoutRestrictions": models_pb2.CabinClass.TYPE_ECONOMY,
+        "PremiumEconomy": models_pb2.CabinClass.TYPE_PREMIUM,
+        "Business": models_pb2.CabinClass.TYPE_BUSINESS,
+        "PremiumBusiness": models_pb2.CabinClass.TYPE_BUSINESS,
+        "First": models_pb2.CabinClass.TYPE_FIRST,
+    },
+)
+
+
+def cabin_to_proto(cabin: str) -> models_pb2.CabinClass.Type.V:
+    try:
+        return _CABIN_MAPPING[cabin]
+    except KeyError:
+        return models_pb2.CabinClass.TYPE_UNSPECIFIED
 
 
 @dataclasses.dataclass(frozen=True)
@@ -36,5 +56,5 @@ class Requirement(object):
 Requirements = Sequence[Requirement]
 
 
-def from_segments(segments: Sequence[models_pb2.Segment]) -> Requirements:
+def requirements_from_segments(segments: Sequence[models_pb2.Segment]) -> Requirements:
     return [Requirement.from_leg(leg) for segment in segments for leg in segment.legs]

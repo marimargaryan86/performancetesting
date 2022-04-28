@@ -105,6 +105,10 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
                         segment_details=[
                             offers_pb2.OfferSegmentDetails(
                                 id=str(segment_id),
+                                cabin_class=models_pb2.CabinClass(
+                                    type=models_pb2.CabinClass.TYPE_ECONOMY,
+                                    marketing_name="Economy",
+                                ),
                             ),
                         ],
                         price=models_pb2.Price(

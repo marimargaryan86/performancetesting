@@ -11,7 +11,7 @@ from snowfall.junction.providers.ask2go import airports, cache, models
 from snowfall.junction.providers.ask2go.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.vendor.ask2go import client, enums
-from snowfall.vendor.ask2go.models import offers, price, search
+from snowfall.vendor.ask2go import models as ask2go_models
 
 
 class NoResultsError(Exception):
@@ -19,7 +19,7 @@ class NoResultsError(Exception):
 
 
 def offer_matches_requirements(
-    offer: offers.Offer,
+    offer: ask2go_models.offers.Offer,
     requirements: models.Requirements,
 ) -> bool:
     last_index = 0
@@ -38,7 +38,7 @@ def offer_matches_requirements(
 
 
 def segment_in_requirements(
-    segment: offers.TripSegment,
+    segment: ask2go_models.offers.TripSegment,
     requirement: models.Requirement,
 ) -> bool:
     departure_at = segment.departure.date_time.replace(tzinfo=requirement.departure_tz)
@@ -76,7 +76,7 @@ class Ask2GoAdapter(object):
             search_task=search_task,
             offer_prices=self._gather_offer_prices(
                 identifiers,
-                models.from_segments(search_task.segments),
+                models.requirements_from_segments(search_task.segments),
             ),
         )
 
@@ -86,8 +86,8 @@ class Ask2GoAdapter(object):
     async def _make_search(
         self,
         criteria: amqp_pb2.Criteria,
-    ) -> search.CreateSearchResponse:
-        search_criteria = search.CreateSearchCriteria(
+    ) -> ask2go_models.search.CreateSearchResponse:
+        search_criteria = ask2go_models.search.CreateSearchCriteria(
             origin_iata=criteria.origin_iata,
             destination_iata=criteria.destination_iata,
             outbound_date=protobuf.protobuf_to_date(criteria.outbound),
@@ -102,7 +102,7 @@ class Ask2GoAdapter(object):
     async def _offer_prices_to_offers(
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
-        offer_prices: AsyncIterator[price.OfferPriceResponse],
+        offer_prices: AsyncIterator[ask2go_models.price.OfferPriceResponse],
     ) -> AsyncIterator[offers_pb2.OfferGroup]:
         async for offer_price in offer_prices:
             segment = more_itertools.first(
@@ -127,6 +127,10 @@ class Ask2GoAdapter(object):
                         segment_details=[
                             offers_pb2.OfferSegmentDetails(
                                 id=search_segment.id,
+                                cabin_class=models_pb2.CabinClass(
+                                    type=models.cabin_to_proto(segment.cabin),
+                                    marketing_name=segment.cabin,
+                                ),
                             ),
                         ],
                         price=models_pb2.Price(
@@ -187,9 +191,9 @@ class Ask2GoAdapter(object):
 
     async def _gather_offer_prices(
         self,
-        identifiers: search.CreateSearchResponse,
+        identifiers: ask2go_models.search.CreateSearchResponse,
         requirements: models.Requirements,
-    ) -> AsyncIterator[price.OfferPriceResponse]:
+    ) -> AsyncIterator[ask2go_models.price.OfferPriceResponse]:
         async for result_page in self._yield_pages(identifiers=identifiers):
             for offer in result_page.flight:
                 if offer.id and offer_matches_requirements(offer, requirements):
@@ -201,8 +205,8 @@ class Ask2GoAdapter(object):
 
     async def _yield_pages(
         self,
-        identifiers: search.CreateSearchResponse,
-    ) -> AsyncIterator[search.SearchResultsResponse]:
+        identifiers: ask2go_models.search.CreateSearchResponse,
+    ) -> AsyncIterator[ask2go_models.search.SearchResultsResponse]:
         page = 0
         total_pages = 1
 
@@ -214,9 +218,9 @@ class Ask2GoAdapter(object):
 
     async def _get_page(
         self,
-        identifiers: search.CreateSearchResponse,
+        identifiers: ask2go_models.search.CreateSearchResponse,
         page: int,
-    ) -> search.SearchResultsResponse:
+    ) -> ask2go_models.search.SearchResultsResponse:
         for _ in range(self._poll_retries_limit):
             search_result = await self._client.get_search_results(
                 search_id=identifiers.id,

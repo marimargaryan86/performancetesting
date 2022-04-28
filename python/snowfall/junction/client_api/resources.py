@@ -86,12 +86,31 @@ class Price(models.BaseModel):
         )
 
 
+class CabinClass(models.BaseModel):
+    name: str
+    marketing_name: str = pydantic.Field(alias="marketingName")
+
+    @classmethod
+    def from_proto(cls, cabin_class: models_pb2.CabinClass) -> CabinClass:
+        return cls(
+            name=protobuf.enum_value_to_slug(
+                models_pb2.CabinClass.Type.DESCRIPTOR,
+                cabin_class.type,
+            ),
+            marketingName=cabin_class.marketing_name,
+        )
+
+
 class OfferSegmentDetails(models.BaseModel):
     ref: str
+    cabin_class: CabinClass = pydantic.Field(alias="cabinClass")
 
     @classmethod
     def from_proto(cls, details: offers_pb2.OfferSegmentDetails) -> OfferSegmentDetails:
-        return cls(ref=details.id)
+        return cls(
+            ref=details.id,
+            cabinClass=CabinClass.from_proto(details.cabin_class),
+        )
 
 
 class Offer(models.BaseModel):

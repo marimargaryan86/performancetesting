@@ -60,8 +60,8 @@ message Offer {
 
 message OfferSegmentDetails {
   string id = 1;
+  snowfall.common.v1alpha.CabinClass cabin_class = 2;
   // baggageAllowance
-  // cabin
   // meal
 }
 

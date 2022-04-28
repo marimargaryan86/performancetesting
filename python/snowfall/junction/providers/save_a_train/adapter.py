@@ -1,4 +1,5 @@
 import datetime
+import types
 import uuid
 from typing import AsyncIterator
 
@@ -13,6 +14,14 @@ from snowfall.vendor.sat import client
 from snowfall.vendor.sat.enums import TripType
 from snowfall.vendor.sat.exceptions import SATValidationError
 from snowfall.vendor.sat.models import general_search, request
+
+_CABIN_MAPPING = types.MappingProxyType(
+    {
+        "second_class": models_pb2.CabinClass.TYPE_ECONOMY,
+        "first_class": models_pb2.CabinClass.TYPE_BUSINESS,
+        "business_class": models_pb2.CabinClass.TYPE_FIRST,
+    },
+)
 
 
 class NoResultsError(Exception):
@@ -68,23 +77,7 @@ class SaveATrainAdapter(object):
                     expires_at=protobuf.datetime_to_protobuf(
                         datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
                     ),
-                    offers=[
-                        offer_models_pb2.Offer(
-                            id=str(uuid.uuid4()),  # todo: persist so it can be booked
-                            segment_details=[
-                                offer_models_pb2.OfferSegmentDetails(
-                                    id=search_task.segments[0].id,
-                                ),
-                            ],
-                            price=models_pb2.Price(
-                                amount=int(
-                                    min(offer.price.values())
-                                    * 100,  # TODO: add cabin fare
-                                ),
-                                currency="USD",  # TODO: read currency from settings
-                            ),
-                        ),
-                    ],
+                    offers=await self._offer_proto_from_sat_offer(offer, search_task),
                     segments=[
                         offer_models_pb2.OfferSegment(
                             id=search_task.segments[0].id,
@@ -124,6 +117,38 @@ class SaveATrainAdapter(object):
                     ],
                 )
 
+    async def _offer_proto_from_sat_offer(
+        self,
+        offer: general_search.GeneralTrip,
+        search_task: amqp_pb2.SearchCriteriaTask,
+    ) -> list[offer_models_pb2.Offer]:
+        return [
+            offer_models_pb2.Offer(
+                id=str(uuid.uuid4()),  # todo: persist so it can be booked
+                segment_details=[
+                    offer_models_pb2.OfferSegmentDetails(
+                        id=search_task.segments[0].id,
+                        cabin_class=models_pb2.CabinClass(
+                            type=_cabin_to_proto(cabin),
+                            marketing_name=cabin.replace("_", " ").capitalize(),
+                        ),
+                    ),
+                ],
+                price=models_pb2.Price(
+                    amount=int(price * 100),
+                    currency="EUR",
+                ),
+            )
+            for cabin, price in offer.price.items()
+        ]
+
 
 def offer_matches_requirements(offer: general_search.GeneralTrip) -> bool:
     return True  # TODO: check departure and arrival datetime for a match
+
+
+def _cabin_to_proto(cabin: str) -> models_pb2.CabinClass.Type.V:
+    try:
+        return _CABIN_MAPPING[cabin]
+    except KeyError:
+        return models_pb2.CabinClass.TYPE_UNSPECIFIED

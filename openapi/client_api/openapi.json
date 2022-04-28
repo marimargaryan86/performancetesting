@@ -1248,7 +1248,7 @@
         "description": "Used to lookup data for a Order Identifier."
       },
       "patch": {
-        "summary": "",
+        "summary": "Patch Order",
         "tags": [
           "orders"
         ],
@@ -2081,10 +2081,31 @@
           "ref": {
             "type": "string",
             "format": "uuid"
+          },
+          "cabinClass": {
+            "$ref": "#/components/schemas/CabinClass"
           }
         },
         "required": [
-          "ref"
+          "ref",
+          "cabinClass"
+        ]
+      },
+      "CabinClass": {
+        "title": "Cabin Class",
+        "description": "Internal and marketing name of a cabin class.",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "marketingName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "marketingName"
         ]
       },
       "Price": {
