@@ -1,5 +1,6 @@
 import datetime
 import random
+import types
 import uuid
 
 from snowfall.common.v1alpha import models_pb2
@@ -32,6 +33,17 @@ ORDERS = (
     "d1c4dec6-be70-4823-bb4c-bff6164de1a7",
 )
 PASSENGER_NAME_RECORDS = ("4567H3LG",)
+CURRENCIES_CONVERSIONS = types.MappingProxyType(
+    {
+        ("USD", "EUR"): 0.95,
+        ("EUR", "USD"): 1.05,
+    },
+)
+CURRENCIES = ("USD", "EUR")
+
+
+def get_currencies() -> types.MappingProxyType[tuple[str, str], float]:
+    return CURRENCIES_CONVERSIONS
 
 
 def get_places() -> list[models_pb2.Place]:

@@ -7,6 +7,7 @@ from motor import core, motor_asyncio
 
 from snowfall import fixtures
 from snowfall.adapter import (
+    currencies,
     legs,
     offer_searches,
     offers,
@@ -43,6 +44,11 @@ def redis_client() -> aioredis.Redis:
 @pytest.fixture
 def decoding_redis_client() -> aioredis.Redis:
     return fakeredis.FakeRedis(decode_responses=True)
+
+
+@pytest.fixture
+def currencies_client() -> currencies.Client:
+    return currencies.DictClient(fixtures.get_currencies())
 
 
 @pytest.fixture
