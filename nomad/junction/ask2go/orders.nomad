@@ -14,7 +14,7 @@ variable "registry_username" {
   type = string
 }
 
-job "mock-provider-offers" {
+job "ask2go-orders" {
   datacenters = ["junction-dev-dc1"]
   type        = "service"
 
@@ -27,15 +27,17 @@ job "mock-provider-offers" {
     progress_deadline = "2m"
   }
 
-  group "offers" {
+  group "orders" {
     count = 1
 
-    task "offers" {
+    task "orders" {
       driver = "docker"
 
       template {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
+REDIS_DSN={{range $index, $service := service "redis"}}redis://{{.Address}}:{{.Port}}// {{end}}
+REDIS_DSN={{range $index, $service := service "redis"}}redis://{{.Address}}:{{.Port}}// {{end}}
 EOH
         destination = "services.env"
         env         = true
@@ -45,7 +47,7 @@ EOH
       config {
         image = var.docker_image
         args = [
-          "offers",
+          "orders",
         ]
 
         auth {
@@ -56,8 +58,10 @@ EOH
       }
 
       env {
-        ENV_NAME     = "${NOMAD_NAMESPACE}"
-        SENTRY_DSN   = "https://e319b016d1b149299757a338479d7de7@sentry.snowfall.se/28"
+        API_BASE_URL         = "http://ec2-18-194-173-6.eu-central-1.compute.amazonaws.com/api"
+        API_BOOKING_BASE_URL = "http://ec2-3-68-186-171.eu-central-1.compute.amazonaws.com/api"
+        ENV_NAME             = "${NOMAD_NAMESPACE}"
+        SENTRY_DSN           = "https://c299617e39d446ccb1053a04d9ac12b8@sentry.snowfall.se/34"
       }
     }
   }

@@ -5,7 +5,7 @@ ENV PYTHONFAULTHANDLER 1
 ENV PYTHONHASHSEED "random"
 ENV PYTHONUNBUFFERED 1
 
-COPY python.snowfall.junction.providers.mock/main.pex /bin/mock
+COPY python.snowfall.junction.providers.ask2go/main.pex /bin/ask2go
 
 ARG VERSION "dev"
 ENV VERSION $VERSION
@@ -13,4 +13,4 @@ ENV VERSION $VERSION
 LABEL vendor="Snowfall Limited"
 LABEL com.snowfalltravel.version=$VERSION
 
-ENTRYPOINT ["/bin/mock"]
+ENTRYPOINT ["/bin/ask2go"]
