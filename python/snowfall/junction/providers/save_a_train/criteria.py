@@ -7,6 +7,7 @@ from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
 from snowfall.junction.providers.save_a_train import h3, train_stations
 from snowfall.junction.providers.save_a_train.v1alpha import amqp_pb2
+from snowfall.stdlib.dates import calculate_age_by_date_of_birth
 from snowfall.stdlib.format import protobuf
 
 
@@ -40,8 +41,15 @@ class CriteriaGenerator(object):
                     criteria=amqp_pb2.Criteria(
                         origin_id=start.id,
                         destination_id=end.id,
-                        number_of_passengers=len(search_task.search.passengers),
-                        departure_date=protobuf.datetime_to_protobuf_datetime(
+                        passengers_ages=[
+                            calculate_age_by_date_of_birth(
+                                protobuf.protobuf_to_date(
+                                    passenger.date_of_birth,
+                                ),
+                            )
+                            for passenger in search_task.search.passengers
+                        ],
+                        departure_datetime=protobuf.datetime_to_protobuf_datetime(
                             protobuf.protobuf_to_datetime(
                                 first_leg.departure_at,
                             ).astimezone(start.timezone),

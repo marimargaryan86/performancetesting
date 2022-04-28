@@ -1,3 +1,4 @@
+import contextlib
 import csv
 import datetime
 import pkgutil
@@ -5,12 +6,14 @@ import random
 from io import StringIO
 from typing import Sequence
 
+import aioredis
 import grpc
 import httpx
 import pydantic
 
 from snowfall.junction.providers.save_a_train import (
     adapter,
+    cache,
     consumer,
     criteria,
     h3,
@@ -18,6 +21,7 @@ from snowfall.junction.providers.save_a_train import (
 )
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import service
+from snowfall.stdlib.persistence import redis
 from snowfall.stdlib.transport import amqp
 from snowfall.vendor.sat import client
 
@@ -39,6 +43,22 @@ class _SearchSettings(service.Settings):
     api_search_requests_limit: int
     api_search_password: str
     api_booking_token: str
+    redis_dsn: Sequence[pydantic.AnyUrl]
+
+
+class _OrdersSettings(service.Settings):
+    amqp_dsn: Sequence[pydantic.AnyUrl]
+    api_base_url: pydantic.AnyUrl
+    api_email: str
+    api_password: str
+    api_search_base_url: pydantic.AnyUrl
+    api_search_timeout: int
+    api_search_requests_limit: int
+    api_search_password: str
+    api_booking_token: str
+    geodata_address: Sequence[str]
+    redis_dsn: Sequence[pydantic.AnyUrl]
+    ttl: datetime.timedelta = datetime.timedelta(minutes=45)
 
 
 async def _offers(app: service.Application[_OffersSettings]) -> None:
@@ -72,7 +92,21 @@ async def _offers(app: service.Application[_OffersSettings]) -> None:
 
 
 async def _searches(app: service.Application[_SearchSettings]) -> None:
-    async with httpx.AsyncClient() as http_client:
+    async with contextlib.AsyncExitStack() as stack:
+        # https://github.com/encode/httpx/issues/2092
+        http_client = await stack.enter_async_context(  # type: ignore[var-annotated]
+            httpx.AsyncClient(),  # type: ignore[arg-type]
+        )
+        amqp_connection = await stack.enter_async_context(
+            amqp.Connection(random.choice(app.settings.amqp_dsn)),  # nosec
+        )
+        redis_connection = await stack.enter_async_context(
+            aioredis.from_url(
+                random.choice(app.settings.redis_dsn),  # nosec
+                decode_responses=True,
+            ).client(),
+        )
+
         save_a_train_client = client.SATClient(
             email=app.settings.api_email,
             password=app.settings.api_password,
@@ -84,34 +118,91 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
             api_search_requests_limit=app.settings.api_search_requests_limit,
             client=http_client,
         )
+        # TODO: do we need to call get_token on the save_a_train_client?
 
-        async with amqp.Connection(
-            random.choice(app.settings.amqp_dsn),  # nosec
-        ) as connection:
-
-            trip_search_consumer = consumer.SearchCriteriaConsumer(
-                consumer=await amqp.create_consumer(
-                    conn=connection,
-                    exchange_name="save_a_train",
-                    queue_name="{0}_search".format(app.name),
-                    routing_key="offers.search.trip",
-                ),
-                producer=await amqp.create_producer(
-                    conn=connection,
-                    exchange_name="offers",
-                ),
-                adapter=adapter.SaveATrainAdapter(
-                    save_a_train_client=save_a_train_client,
-                    train_station_repository=train_stations.TrainStationRepository(
-                        train_stations=await _load_train_stations(
-                            app.settings.geodata_address,
-                        ),
+        search_consumer = consumer.SearchCriteriaConsumer(
+            consumer=await amqp.create_consumer(
+                conn=amqp_connection,
+                exchange_name="save_a_train",
+                queue_name="{0}_search".format(app.name),
+                routing_key="offers.search.trip",
+            ),
+            producer=await amqp.create_producer(
+                conn=amqp_connection,
+                exchange_name="offers",
+            ),
+            adapter=adapter.SaveATrainAdapter(
+                save_a_train_client=save_a_train_client,
+                train_station_repository=train_stations.TrainStationRepository(
+                    train_stations=await _load_train_stations(
+                        app.settings.geodata_address,
                     ),
-                    ttl=app.settings.ttl,
                 ),
-            )
+                offers_cache=cache.OffersCache(
+                    redis_client=redis.Client[str](redis_connection),
+                ),
+                ttl=app.settings.ttl,
+            ),
+        )
 
-            await trip_search_consumer.consume()
+        await search_consumer.consume()
+
+
+async def _orders(app: service.Application[_OrdersSettings]) -> None:
+    async with contextlib.AsyncExitStack() as stack:
+        # https://github.com/encode/httpx/issues/2092
+        http_client = await stack.enter_async_context(  # type: ignore[var-annotated]
+            httpx.AsyncClient(),  # type: ignore[arg-type]
+        )
+        amqp_connection = await stack.enter_async_context(
+            amqp.Connection(random.choice(app.settings.amqp_dsn)),  # nosec
+        )
+        redis_connection = await stack.enter_async_context(
+            aioredis.from_url(
+                random.choice(app.settings.redis_dsn),  # nosec
+                decode_responses=True,
+            ).client(),
+        )
+
+        save_a_train_client = client.SATClient(
+            email=app.settings.api_email,
+            password=app.settings.api_password,
+            password_search=app.settings.api_search_password,
+            token=app.settings.api_booking_token,
+            api_url=app.settings.api_base_url,
+            api_search_url=app.settings.api_search_base_url,
+            api_search_timeout=app.settings.api_search_timeout,
+            api_search_requests_limit=app.settings.api_search_requests_limit,
+            client=http_client,
+        )
+        # TODO: do we need to call get_token on the save_a_train_client?
+
+        orders_consumer = consumer.OrdersConsumer(
+            consumer=await amqp.create_consumer(
+                conn=amqp_connection,
+                exchange_name="orders",
+                queue_name="{0}_offers".format(app.name),
+                routing_key="orders.offers",
+            ),
+            producer=await amqp.create_producer(
+                conn=amqp_connection,
+                exchange_name="orders",
+            ),
+            save_a_train_adapter=adapter.SaveATrainAdapter(
+                save_a_train_client=save_a_train_client,
+                train_station_repository=train_stations.TrainStationRepository(
+                    train_stations=await _load_train_stations(
+                        app.settings.geodata_address,
+                    ),
+                ),
+                offers_cache=cache.OffersCache(
+                    redis_client=redis.Client[str](redis_connection),
+                ),
+                ttl=app.settings.ttl,
+            ),
+        )
+
+        await orders_consumer.consume()
 
 
 async def _load_train_stations(
@@ -151,5 +242,10 @@ if __name__ == "__main__":
             name="searches",
             callback=_searches,
             settings_class=_SearchSettings,
+        ),
+        service.Command(
+            name="orders",
+            callback=_orders,
+            settings_class=_OrdersSettings,
         ),
     )

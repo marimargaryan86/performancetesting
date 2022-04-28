@@ -1,6 +1,10 @@
 from typing import cast
 
+import phonenumbers
+
 from snowfall.junction.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
+from snowfall.junction.orders.v1alpha import amqp_pb2 as orders_amqp_pb2
+from snowfall.junction.orders.v1alpha import models_pb2
 from snowfall.junction.providers.save_a_train import adapter as sat_adapter
 from snowfall.junction.providers.save_a_train import criteria
 from snowfall.junction.providers.save_a_train.v1alpha import amqp_pb2
@@ -47,3 +51,47 @@ class SearchCriteriaConsumer(object):
 
         async for offer_result in self._adapter.gather_search_results(search):
             await self._producer.publish(offer_result, routing_key="offers.result.trip")
+
+
+class OrdersConsumer(object):
+    def __init__(
+        self,
+        consumer: amqp.Consumer,
+        producer: amqp.Producer,
+        save_a_train_adapter: sat_adapter.SaveATrainAdapter,
+    ):
+        self._consumer = consumer
+        self._producer = producer
+        self._adapter = save_a_train_adapter
+
+    async def consume(self) -> None:
+        await self._consumer.consume(self._process_message)
+
+    async def _process_message(self, message: amqp.Message) -> None:
+        task = cast(orders_amqp_pb2.PlaceOrderTask, message.body)
+
+        try:
+            raw_data = await self._adapter.create_booking(
+                task.offer_id,
+                task.order,
+            )
+        except (phonenumbers.NumberParseException, sat_adapter.BookingError):
+            await self._producer.publish(
+                models_pb2.OrderResult(
+                    order_id=task.order.id,
+                    offer_id=task.offer_id,
+                    status=models_pb2.OrderResult.STATUS_ERROR,
+                    raw_data="",
+                ),
+                routing_key="orders.result.offer",
+            )
+        else:
+            await self._producer.publish(
+                models_pb2.OrderResult(
+                    order_id=task.order.id,
+                    offer_id=task.offer_id,
+                    status=models_pb2.OrderResult.STATUS_NOT_TICKETED,
+                    raw_data=raw_data,
+                ),
+                routing_key="orders.result.offer",
+            )

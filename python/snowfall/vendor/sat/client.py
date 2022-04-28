@@ -4,6 +4,7 @@ from typing import Any, Dict, Optional, Union
 
 import httpx
 
+from snowfall.stdlib.dates import calculate_age_by_date_of_birth
 from snowfall.vendor.sat.enums import PassengerType
 from snowfall.vendor.sat.exceptions import SATValidationError, SATValueError
 from snowfall.vendor.sat.models.booking import (
@@ -26,16 +27,12 @@ from snowfall.vendor.sat.models.search_result_selection import (
 )
 
 
-def _get_age_by_date_of_birth(date_of_birth: date) -> int:
-    today = date.today()
-    return (
-        today.year
-        - date_of_birth.year
-        - ((today.month, today.day) < (date_of_birth.month, date_of_birth.day))
-    )
-
-
 def _get_passenger_type_by_age(age: int) -> str:
+    passenger_max_age = 0
+    passenger_min_age = 150
+    if passenger_min_age < 0 or age > passenger_max_age:
+        raise SATValueError("Invalid passenger age: {0}.".format(age))
+
     passenger_senior_min_age = 60
     passenger_youth_max_age = 25
 
@@ -53,7 +50,7 @@ def _get_passenger_type_by_age(age: int) -> str:
 def _generate_passenger_type_attributes(
     date_of_birth: date,
 ) -> Dict[str, Union[str, int]]:
-    age = _get_age_by_date_of_birth(date_of_birth)
+    age = calculate_age_by_date_of_birth(date_of_birth)
     return {
         "type": _get_passenger_type_by_age(age),
         "age": age,
@@ -173,7 +170,9 @@ class SATClient(object):  # noqa: WPS214
         """Create a search."""
         body = {
             "search": {
-                "departure_datetime": request.departure_datetime,
+                "departure_datetime": request.departure_datetime.strftime(
+                    "%Y-%m-%d %H:%M",
+                ),
                 "route_attributes": {
                     "origin_station_attributes": {
                         "uid": request.origin_id,

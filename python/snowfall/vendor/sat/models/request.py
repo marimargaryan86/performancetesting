@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from typing import Optional, Sequence
 
 from pydantic import BaseModel
@@ -19,8 +19,8 @@ class GeneralSearchResultsRequest(BaseModel):
 class CreateSearchRequest(BaseModel):
     origin_id: str
     destination_id: str
-    departure_datetime: str
-    passengers_ages: Sequence[int]
+    departure_datetime: datetime
+    passengers_ages: list[int]
 
 
 class SearchResultRequest(BaseModel):

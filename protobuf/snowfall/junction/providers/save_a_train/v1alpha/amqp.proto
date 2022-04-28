@@ -14,7 +14,7 @@ message SearchCriteriaTask {
 message Criteria {
   string origin_id = 1;
   string destination_id = 2;
-  uint32 number_of_passengers = 3;
-  snowfall.common.v1alpha.DateTime departure_date = 4;
+  repeated uint32 passengers_ages = 3;
+  snowfall.common.v1alpha.DateTime departure_datetime = 4;
   string cabin_class = 5;
 }
