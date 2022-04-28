@@ -77,23 +77,22 @@ async def _import(  # noqa: WPS210
                 temp,
             )
 
-            imported = await feed_importer.import_feed(
+            async with feed_importer.cache_hash(
                 new_path,
                 feed_ref,
-                app.settings.skip_checksum_check,
-            )
+            ) as checksum_matches:
+                if checksum_matches and not app.settings.skip_checksum_check:
+                    return
 
-            if not imported:
-                return
+                imported = await feed_importer.import_feed(new_path)
 
-            async with amqp.Connection(
-                random.choice(app.settings.amqp_dsn),  # nosec
-            ) as connection:
-                try:
+                if not imported:
+                    return
+
+                async with amqp.Connection(
+                    random.choice(app.settings.amqp_dsn),  # nosec
+                ) as connection:
                     await _process(connection, geocoder, repositories, feed_ref)
-                except Exception:
-                    await feed_importer.clear_cached_hash(feed_ref)
-                    raise
 
 
 async def _process(

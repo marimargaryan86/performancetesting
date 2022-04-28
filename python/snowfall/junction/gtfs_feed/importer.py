@@ -1,9 +1,10 @@
 import dataclasses
 import pathlib
-from typing import Protocol
+from typing import AsyncGenerator, Protocol
 
 import aiofiles
 import aioredis
+import asyncstdlib
 import httpx
 import structlog
 from motor import core
@@ -65,24 +66,28 @@ class Importer(object):
             "trips.txt": repositories.trips,
         }
 
-    async def clear_cached_hash(self, feed_ref: str) -> None:
-        await self._redis.delete(_CHECKSUM_KEY_FORMAT.format(ref=feed_ref))
-
-    async def import_feed(
+    @asyncstdlib.contextmanager
+    async def cache_hash(
         self,
         zip_path: pathlib.Path,
         feed_ref: str,
-        skip_checksum_check: bool,
-    ) -> bool:
+    ) -> AsyncGenerator[bool, None]:
         current_checksum = await filesystem.hash_file(zip_path)
         cached_checksum = await self._redis.get(
             _CHECKSUM_KEY_FORMAT.format(ref=feed_ref),
         )
 
-        if cached_checksum == current_checksum and not skip_checksum_check:
-            self._logger.info("Feed has not changed since last import.")
-            return False
+        yield cached_checksum == current_checksum
 
+        await self._redis.set(
+            _CHECKSUM_KEY_FORMAT.format(ref=feed_ref),
+            current_checksum,
+        )
+
+    async def import_feed(
+        self,
+        zip_path: pathlib.Path,
+    ) -> bool:
         for zip_file in filesystem.unzip_file(zip_path):
             repo = self._repo_mapping.get(zip_file.name)
 
@@ -92,11 +97,6 @@ class Importer(object):
                     "File imported successfully.",
                     filename=zip_file.name,
                 )
-
-        await self._redis.set(
-            _CHECKSUM_KEY_FORMAT.format(ref=feed_ref),
-            current_checksum,
-        )
 
         return True
 
