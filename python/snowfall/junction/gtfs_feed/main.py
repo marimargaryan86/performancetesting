@@ -1,5 +1,6 @@
 import pathlib
 import random
+import shutil
 from typing import Sequence
 
 import aioredis
@@ -66,7 +67,9 @@ async def _import(  # noqa: WPS210
         feed_ref = new_path.with_suffix("").name
 
         with context_binding(feed_ref=feed_ref):
-            await os.rename(str(feed_file), str(new_path))
+            move = os.wrap(shutil.move)  # type: ignore[attr-defined]
+
+            await move(str(feed_file), str(new_path))
 
             feed_importer = importer.Importer(
                 redis,
