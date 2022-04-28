@@ -65,7 +65,7 @@ EOH
         image = "amazon/aws-cli"
         args = [
           "s3",
-          "mv",
+          "cp",
           "s3://junction-gtfs-feeds",
           "${NOMAD_ALLOC_DIR}/",
           "--recursive"
