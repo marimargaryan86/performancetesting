@@ -133,6 +133,12 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
                                 ),
                             ),
                         ],
+                        vehicle=offers_pb2.Vehicle(
+                            number="123",
+                            equipment="FOO",
+                        ),
+                        operator="SK",
+                        vendor="LH",
                     ),
                 ],
                 expires_at=protobuf.datetime_to_protobuf(datetime.datetime.now()),

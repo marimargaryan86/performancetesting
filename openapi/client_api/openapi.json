@@ -2141,11 +2141,41 @@
             "items": {
               "$ref": "#/components/schemas/OfferSegmentLeg"
             }
+          },
+          "vendor": {
+            "type": "string"
+          },
+          "operator": {
+            "type": "string",
+            "nullable": true
+          },
+          "routeIdentifiers": {
+            "$ref": "#/components/schemas/RouteIdentifiers"
           }
         },
         "required": [
           "ref",
-          "legs"
+          "legs",
+          "vendor",
+          "operator"
+        ]
+      },
+      "RouteIdentifiers": {
+        "title": "Route Identifiers",
+        "description": "Route identifiers that the operator (operating) and vendor (marketing) uses, i.e. operating flight number and marketing flight number or vice versa for train or buss line numbers.",
+        "type": "object",
+        "properties": {
+          "vendor": {
+            "type": "string"
+          },
+          "operator": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "vendor",
+          "operator"
         ]
       },
       "OfferSegmentLeg": {

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import uuid
-from typing import Any, Sequence
+from typing import Any, Optional, Sequence
 
 import pydantic
 from starlette import requests
@@ -148,15 +148,29 @@ class OfferSegmentLeg(models.BaseModel):
         )
 
 
+class RouteIdentifiers(models.BaseModel):
+    vendor: str
+    operator: Optional[str] = None
+
+
 class OfferSegment(models.BaseModel):
     ref: str
     legs: Sequence[OfferSegmentLeg]
+    vendor: str
+    operator: Optional[str] = None
+    route_identifiers: RouteIdentifiers = pydantic.Field(alias="routeIdentifiers")
 
     @classmethod
     def from_proto(cls, segment: offers_pb2.OfferSegment) -> OfferSegment:
         return cls(
             ref=segment.id,
             legs=[OfferSegmentLeg.from_proto(leg) for leg in segment.legs],
+            vendor=segment.vendor,
+            operator=segment.operator or None,
+            routeIdentifiers=RouteIdentifiers(
+                vendor=segment.vehicle.number,
+                operator=None,
+            ),
         )
 
 
