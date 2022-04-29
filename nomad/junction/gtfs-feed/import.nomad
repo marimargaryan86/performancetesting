@@ -16,13 +16,10 @@ variable "registry_username" {
 
 locals {
   feeds = [
-    {ref = "belgium", url = "https://gtfs.irail.be/nmbs/gtfs/latest.zip?archive=false"},
     {ref = "france-intercity", url = "https://eu.ftp.opendatasoft.com/sncf/gtfs/export-intercites-gtfs-last.zip?archive=false"},
     {ref = "france-ter", url = "https://eu.ftp.opendatasoft.com/sncf/gtfs/export-ter-gtfs-last.zip?archive=false"},
     {ref = "france-transilien", url = "https://eu.ftp.opendatasoft.com/sncf/gtfs/gtfs-nouveau-format.zip?archive=false"},
     {ref = "france-voyages", url = "https://eu.ftp.opendatasoft.com/sncf/gtfs/export_gtfs_voyages.zip?archive=false"},
-    {ref = "luxembourg", url = "http://openov.lu/data/gtfs/gtfs-openov-lu.zip?archive=false"},
-    {ref = "netherlands", url = "http://gtfs.ovapi.nl/gtfs-nl.zip?archive=false"},
   ]
 }
 
@@ -66,8 +63,8 @@ EOH
         args = [
           "s3",
           "cp",
-          "s3://junction-gtfs-feeds",
-          "${NOMAD_ALLOC_DIR}/",
+          "s3://junction-gtfs-feeds/ssim-af.zip",
+          "${NOMAD_ALLOC_DIR}/ssim-af.zip",
           "--recursive"
         ]
       }
