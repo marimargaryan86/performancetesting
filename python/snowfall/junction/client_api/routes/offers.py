@@ -102,16 +102,13 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: offers.Client = lagom.injectable,
     ) -> responses.Response:
-        cursor = request.query_params["page[cursor]"]
-        limit = int(request.query_params["page[limit]"])
+        cursor = request.query_params[request_helpers.PAGE_CURSOR_KEY]
+        limit = int(request.query_params[request_helpers.PAGE_LIMIT_KEY])
         offers_page = await client.find_offers_by_offer_search(
             request.path_params["offerSearchId"],
             cursor=cursor,
             limit=limit,
         )
-        next_url = furl(request.url_for("ViewOffersByOfferSearch"))
-        next_url.args["page[cursor]"] = offers_page.next_page_token
-        next_url.args["page[limit]"] = limit
 
         return models.JsonApiResponse(
             models.Body(
@@ -123,7 +120,11 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
                     for offer in offers_page.offers
                 ],
                 links={
-                    "next": next_url.url,
+                    "next": request_helpers.get_next_url(
+                        furl(request.url_for("ViewOffersByOfferSearch")),
+                        offers_page.next_page_token,
+                        limit,
+                    ),
                 },
             ),
         )

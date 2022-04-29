@@ -7,11 +7,9 @@ from snowfall.adapter import segments as segments_adapter
 from snowfall.adapter import trip_searches as trip_searches_adapter
 from snowfall.adapter import trips as trips_adapter
 from snowfall.common.v1alpha import models_pb2
-from snowfall.junction.client_api import models, resources
+from snowfall.junction.client_api import models, request_helpers, resources
 from snowfall.stdlib.format import protobuf
 
-_PAGE_LIMIT = "page[limit]"
-_PAGE_CURSOR = "page[cursor]"
 _NOT_FOUND_STATUS = status.HTTP_404_NOT_FOUND
 
 
@@ -116,8 +114,8 @@ class LegsByTripId(endpoints.HTTPEndpoint):
         legs_client: legs_adapter.Client = lagom.injectable,
         trips_client: trips_adapter.Client = lagom.injectable,
     ) -> responses.Response:
-        cursor = request.query_params[_PAGE_CURSOR]
-        limit = int(request.query_params[_PAGE_LIMIT])
+        cursor = request.query_params[request_helpers.PAGE_CURSOR_KEY]
+        limit = int(request.query_params[request_helpers.PAGE_LIMIT_KEY])
 
         try:
             trip = await trips_client.get(request.path_params["tripId"])
@@ -139,8 +137,8 @@ class LegsByTripId(endpoints.HTTPEndpoint):
                 tripId=request.path_params["tripId"],
             ),
         )
-        next_url.args[_PAGE_CURSOR] = legs_page.next_page_token
-        next_url.args[_PAGE_LIMIT] = limit
+        next_url.args[request_helpers.PAGE_CURSOR_KEY] = legs_page.next_page_token
+        next_url.args[request_helpers.PAGE_LIMIT_KEY] = limit
 
         return models.JsonApiResponse(
             models.Body(
@@ -173,14 +171,6 @@ class LegsByTripSearchId(endpoints.HTTPEndpoint):
         except legs_adapter.NotFoundError:
             raise exceptions.HTTPException(_NOT_FOUND_STATUS)
 
-        next_url = furl(
-            request.url_for(
-                "ListLegsByTripSearchId",
-                tripSearchId=request.path_params["tripSearchId"],
-            ),
-        )
-        next_url.args[_PAGE_CURSOR] = legs_page.next_page_token
-        next_url.args[_PAGE_LIMIT] = int(request.query_params[_PAGE_LIMIT])
         return models.JsonApiResponse(
             models.Body(
                 data=[
@@ -191,7 +181,14 @@ class LegsByTripSearchId(endpoints.HTTPEndpoint):
                     for leg in legs_page.legs
                 ],
                 links={
-                    "next": next_url.url,
+                    "next": request_helpers.get_next_url(
+                        request.url_for(
+                            "ListLegsByTripSearchId",
+                            tripSearchId=request.path_params["tripSearchId"],
+                        ),
+                        legs_page.next_page_token,
+                        int(request.query_params[request_helpers.PAGE_LIMIT_KEY]),
+                    ),
                 },
             ),
         )

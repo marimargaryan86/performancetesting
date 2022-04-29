@@ -3,7 +3,7 @@ from furl import furl
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.adapter import places
-from snowfall.junction.client_api import models, resources
+from snowfall.junction.client_api import models, request_helpers, resources
 
 
 class Place(endpoints.HTTPEndpoint):
@@ -30,23 +30,22 @@ class Places(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: places.Client = lagom.injectable,
     ) -> responses.Response:
-        cursor = request.query_params["page[cursor]"]
-        limit = int(request.query_params["page[limit]"])
+        cursor = request.query_params[request_helpers.PAGE_CURSOR_KEY]
+        limit = int(request.query_params[request_helpers.PAGE_LIMIT_KEY])
         response = await client.find(limit=limit, cursor=cursor)
-        resource_list = [
-            resources.PlaceResource.from_proto(place, request)
-            for place in response.places
-        ]
-
-        next_url = furl(request.url_for("ListPlaces"))
-        next_url.args["page[cursor]"] = response.next_page_token
-        next_url.args["page[limit]"] = limit
 
         return models.JsonApiResponse(
             models.Body(
-                data=resource_list,
+                data=[
+                    resources.PlaceResource.from_proto(place, request)
+                    for place in response.places
+                ],
                 links={
-                    "next": next_url.url,
+                    "next": request_helpers.get_next_url(
+                        furl(request.url_for("ListPlaces")),
+                        response.next_page_token,
+                        limit,
+                    ),
                 },
             ),
         )

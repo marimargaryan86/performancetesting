@@ -2731,6 +2731,7 @@
             "properties": {
               "next": {
                 "type": "string",
+                "nullable": true,
                 "format": "uri",
                 "readOnly": true
               }

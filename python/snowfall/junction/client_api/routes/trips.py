@@ -2,14 +2,10 @@ import datetime
 
 import lagom
 from dateutil import parser
-from furl import furl
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.adapter import places, segments, trip_searches, trips
+from snowfall.adapter import places, trip_searches, trips
 from snowfall.junction.client_api import models, request_helpers, resources
-
-_PAGE_LIMIT = "page[limit]"
-_PAGE_CURSOR = "page[cursor]"
 
 
 class Trip(endpoints.HTTPEndpoint):
@@ -38,30 +34,20 @@ class TripSegments(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         trips_client: trips.Client = lagom.injectable,
-        segments_client: segments.Client = lagom.injectable,
     ) -> responses.Response:
         try:
             trip = await trips_client.get(request.path_params["tripId"])
         except trips.NotFoundError:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
-        cursor = request.query_params[_PAGE_CURSOR]
-        limit = int(request.query_params[_PAGE_LIMIT])
+        cursor = request.query_params[request_helpers.PAGE_CURSOR_KEY]
+        limit = int(request.query_params[request_helpers.PAGE_LIMIT_KEY])
 
         sequence_page = await request_helpers.sequence_paginator(
             sequence=trip.segments,
             limit=limit,
             cursor=int(cursor) if cursor else 0,
         )
-
-        next_url = furl(
-            request.url_for(
-                "ListTripSegments",
-                tripId=request.path_params["tripId"],
-            ),
-        )
-        next_url.args[_PAGE_CURSOR] = sequence_page.next_page_token
-        next_url.args[_PAGE_LIMIT] = limit
 
         return models.JsonApiResponse(
             models.Body(
@@ -73,7 +59,14 @@ class TripSegments(endpoints.HTTPEndpoint):
                     for segment in sequence_page.sequence
                 ],
                 links={
-                    "next": next_url.url,
+                    "next": request_helpers.get_next_url(
+                        request.url_for(
+                            "ListTripSegments",
+                            tripId=request.path_params["tripId"],
+                        ),
+                        str(sequence_page.next_page_token),
+                        limit,
+                    ),
                 },
             ),
         )
@@ -149,8 +142,8 @@ class TripsByTripSearch(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: trip_searches.Client = lagom.injectable,
     ) -> responses.Response:
-        cursor = request.query_params[_PAGE_CURSOR]
-        limit = int(request.query_params[_PAGE_LIMIT])
+        cursor = request.query_params[request_helpers.PAGE_CURSOR_KEY]
+        limit = int(request.query_params[request_helpers.PAGE_LIMIT_KEY])
 
         try:
             response = await client.list_trips_by_trip_search(
@@ -160,15 +153,6 @@ class TripsByTripSearch(endpoints.HTTPEndpoint):
             )
         except trip_searches.NotFoundError:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
-
-        next_url = furl(
-            request.url_for(
-                "ViewTripsByTripSearch",
-                tripSearchId=request.path_params["tripSearchId"],
-            ),
-        )
-        next_url.args[_PAGE_CURSOR] = response.next_page_token
-        next_url.args[_PAGE_LIMIT] = limit
 
         return models.JsonApiResponse(
             models.Body(
@@ -180,7 +164,14 @@ class TripsByTripSearch(endpoints.HTTPEndpoint):
                     for trip in response.trips
                 ],
                 links={
-                    "next": next_url.url,
+                    "next": request_helpers.get_next_url(
+                        request.url_for(
+                            "ViewTripsByTripSearch",
+                            tripSearchId=request.path_params["tripSearchId"],
+                        ),
+                        response.next_page_token,
+                        limit,
+                    ),
                 },
             ),
         )

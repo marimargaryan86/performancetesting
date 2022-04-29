@@ -192,3 +192,4 @@ class TestTripSearches(object):
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.json()["data"]
+        assert response.json()["links"]["next"] is None

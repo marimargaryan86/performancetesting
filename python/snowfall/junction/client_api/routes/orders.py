@@ -72,23 +72,22 @@ class Orders(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders.Client = lagom.injectable,
     ) -> responses.Response:
-        cursor = request.query_params["page[cursor]"]
-        limit = int(request.query_params["page[limit]"])
+        cursor = request.query_params[request_helpers.PAGE_CURSOR_KEY]
+        limit = int(request.query_params[request_helpers.PAGE_LIMIT_KEY])
         response = await client.find(limit=limit, cursor=cursor)
-        resource_list = [
-            resources.OrderResource.from_proto(order, request)
-            for order in response.orders
-        ]
-
-        next_url = furl(request.url_for("ListOrders"))
-        next_url.args["page[cursor]"] = response.next_page_token
-        next_url.args["page[limit]"] = limit
 
         return models.JsonApiResponse(
             models.Body(
-                data=resource_list,
+                data=[
+                    resources.OrderResource.from_proto(order, request)
+                    for order in response.orders
+                ],
                 links={
-                    "next": next_url.url,
+                    "next": request_helpers.get_next_url(
+                        furl(request.url_for("ListOrders")),
+                        response.next_page_token,
+                        limit,
+                    ),
                 },
             ),
         )
