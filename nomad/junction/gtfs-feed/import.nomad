@@ -64,8 +64,7 @@ EOH
           "s3",
           "cp",
           "s3://junction-gtfs-feeds/ssim-af.zip",
-          "${NOMAD_ALLOC_DIR}/ssim-af.zip",
-          "--recursive"
+          "${NOMAD_ALLOC_DIR}/"
         ]
       }
 
