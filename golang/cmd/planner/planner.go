@@ -71,6 +71,12 @@ func main() {
 		sugar.Fatal(err)
 	}
 
+	repository, err := legacy.NewRepository(routes, routeSegments, stops, transfers, trips, tripSegments)
+
+	if err != nil {
+		sugar.Fatal(err)
+	}
+
 	grpcAddress, ok := os.LookupEnv("GRPC_ADDRESS")
 
 	if !ok {
@@ -105,7 +111,7 @@ func main() {
 	grpcServer := grpc.NewServer()
 	healthgrpc.RegisterHealthServer(grpcServer, health.NewServer())
 	planner.RegisterPlannerServiceServer(grpcServer, &PlannerServiceServer{
-		Planner: raptor.NewPlanner(legacy.NewRepository(routes, routeSegments, stops, transfers, trips, tripSegments), sugar),
+		Planner: raptor.NewPlanner(repository, sugar),
 		Stops:   stopsMap,
 	})
 	reflection.Register(grpcServer)

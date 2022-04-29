@@ -23,6 +23,9 @@ start_third_party() {
 generate_dataset() {
 	trap 'kill 0' EXIT
 
+	mkdir -p "${root_dir}/dist/import/gtfs-feed"
+	curl --silent https://eu.ftp.opendatasoft.com/sncf/gtfs/export-intercites-gtfs-last.zip >"${root_dir}/dist/import/gtfs-feed/france-intercity.zip"
+
 	"${root_dir}/bash/run.sh" "${root_dir}/python/snowfall/service/geodata/main.py" grpc 1>/dev/null 2>/dev/null &
 
 	wait_for_port localhost 50058
