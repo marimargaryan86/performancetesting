@@ -75,6 +75,7 @@ class ProtoCoder(Generic[Proto], BaseCoder[Proto]):
 
         as_dict = json_format.MessageToDict(
             proto,
+            including_default_value_fields=True,
             preserving_proto_field_name=True,
             use_integers_for_enums=True,
         )
