@@ -40,6 +40,7 @@ job "save-a-train-searches" {
       template {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
+GEODATA_ADDRESS={{range $index, $service := service (printf "grpc.geodata-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis"}}redis://{{.Address}}:{{.Port}}// {{end}}
 {{ with secret "kv/dev/save-a-train" }}
 API_EMAIL={{ .Data.data.api_email }}
