@@ -111,7 +111,7 @@ func main() {
 	grpcServer := grpc.NewServer()
 	healthgrpc.RegisterHealthServer(grpcServer, health.NewServer())
 	planner.RegisterPlannerServiceServer(grpcServer, &PlannerServiceServer{
-		Planner: raptor.NewPlanner(repository, sugar),
+		Planner: raptor.NewPlanner(repository, stopsMap, sugar),
 		Stops:   stopsMap,
 	})
 	reflection.Register(grpcServer)

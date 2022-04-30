@@ -4,9 +4,11 @@ import (
 	"git.snowfall.se/junction/junction/golang/legacy"
 	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/common/v1alpha"
 	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/junction/planner/v1alpha"
+	"github.com/uber/h3-go"
 	"math"
 	"runtime"
 	"sort"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -28,6 +30,7 @@ type raptor struct {
 	rounds        []*sync.Map
 	trips         *sync.Map
 	kindList      []models.Schedule_Type
+	stopsMap      map[h3.H3Index][]*planner.Stop
 }
 
 type connection struct {
@@ -57,6 +60,7 @@ func newRaptor(
 	destinations []*planner.Stop,
 	departureAt time.Time,
 	kindList []models.Schedule_Type,
+	stopsMap map[h3.H3Index][]*planner.Stop,
 ) *raptor {
 	y, m, d := departureAt.AddDate(0, 0, 1).Date()
 	best := &sync.Map{}
@@ -82,6 +86,7 @@ func newRaptor(
 		rounds:        rounds,
 		trips:         &sync.Map{},
 		kindList:      kindList,
+		stopsMap:      stopsMap,
 	}
 }
 
@@ -307,6 +312,38 @@ func (r *raptor) scanTransfers() {
 	for _, p := range r.marked {
 		fromStop := r.data.StopBySequence(p)
 		departure, _ := r.rounds[r.round].Load(fromStop.Sequence)
+		idInt, _ := strconv.ParseUint(fromStop.Id, 10, 0)
+		hex := h3.H3Index(idInt)
+		neighbours := h3.KRing(hex, 2)
+
+		for _, n := range neighbours {
+			toStops, ok := r.stopsMap[n]
+
+			if !ok {
+				continue
+			}
+
+			for _, toStop := range toStops {
+				arrival := departure.(uint32) + (60 * 10) + toStop.TransferTime
+
+				if r.isBetter(toStop.Sequence, arrival) {
+					r.rounds[r.round].Store(toStop.Sequence, arrival)
+					r.best.Store(toStop.Sequence, arrival)
+
+					if _, ok := r.connections[toStop.Sequence]; !ok {
+						r.connections[toStop.Sequence] = make(map[uint8]interface{})
+					}
+
+					r.connections[toStop.Sequence][r.round] = transfer{
+						from:      fromStop,
+						to:        toStop,
+						departure: departure.(uint32),
+						arrival:   departure.(uint32) + (60 * 10),
+						kind:      models.Schedule_TYPE_UNSPECIFIED,
+					}
+				}
+			}
+		}
 
 		for _, t := range fromStop.Transfers {
 			trans := r.data.TransferBySequence(t)

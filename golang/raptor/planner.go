@@ -5,6 +5,7 @@ import (
 	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/common/v1alpha"
 	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/junction/planner/v1alpha"
 	"github.com/google/uuid"
+	"github.com/uber/h3-go"
 	"runtime"
 	"sort"
 	"time"
@@ -13,17 +14,20 @@ import (
 )
 
 type Planner struct {
-	data   *legacy.Repository
-	logger *zap.SugaredLogger
+	data     *legacy.Repository
+	logger   *zap.SugaredLogger
+	stopsMap map[h3.H3Index][]*planner.Stop
 }
 
 func NewPlanner(
 	data *legacy.Repository,
+	stopsMap map[h3.H3Index][]*planner.Stop,
 	logger *zap.SugaredLogger,
 ) *Planner {
 	return &Planner{
-		data:   data,
-		logger: logger,
+		data:     data,
+		logger:   logger,
+		stopsMap: stopsMap,
 	}
 }
 
@@ -47,7 +51,7 @@ func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAt
 	for sTime.Before(eTime) {
 		iterations++
 
-		r := newRaptor(p.data, froms, tos, sTime, kindList)
+		r := newRaptor(p.data, froms, tos, sTime, kindList, p.stopsMap)
 		results := r.run()
 		min := eTime
 		found := false
