@@ -96,7 +96,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
                     consumer=await amqp.create_consumer(
                         conn=connection,
                         exchange_name="orders",
-                        queue_name="{0}_offers".format(app.name),
+                        queue_name="{0}_orders".format(app.name),
                         routing_key="orders.offers",
                     ),
                     producer=await amqp.create_producer(
@@ -136,7 +136,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                     consumer=await amqp.create_consumer(
                         conn=connection,
                         exchange_name="ask2go",
-                        queue_name="{0}_search".format(app.name),
+                        queue_name="{0}_searches".format(app.name),
                         routing_key="offers.search.trip",
                     ),
                     producer=await amqp.create_producer(
