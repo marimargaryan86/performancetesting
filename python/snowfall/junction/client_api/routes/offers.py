@@ -1,7 +1,6 @@
 import datetime
 
 import lagom
-from furl import furl
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.adapter import offer_searches, offers
@@ -121,7 +120,10 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
                 ],
                 links={
                     "next": request_helpers.get_next_url(
-                        furl(request.url_for("ViewOffersByOfferSearch")),
+                        request.url_for(
+                            "ViewOffersByOfferSearch",
+                            offerSearchId=request.path_params["offerSearchId"],
+                        ),
                         offers_page.next_page_token,
                         limit,
                     ),
