@@ -26,6 +26,7 @@ class _OffersSettings(service.Settings):
     amqp_dsn: Sequence[pydantic.AnyUrl]
     api_base_url: pydantic.AnyUrl
     api_booking_base_url: pydantic.AnyUrl
+    http_timeout: float = 20.0
 
 
 class _OrdersSettings(service.Settings):
@@ -34,6 +35,7 @@ class _OrdersSettings(service.Settings):
     api_booking_base_url: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
     smtp_dsn: pydantic.AnyUrl
+    http_timeout: float = 20.0
 
 
 class _SearchSettings(service.Settings):
@@ -42,10 +44,11 @@ class _SearchSettings(service.Settings):
     api_booking_base_url: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
+    http_timeout: float = 20.0
 
 
 async def _offers(app: service.Application[_OffersSettings]) -> None:
-    async with httpx.AsyncClient() as http_client:
+    async with httpx.AsyncClient(timeout=app.settings.http_timeout) as http_client:
         async with amqp.Connection(
             random.choice(app.settings.amqp_dsn),  # nosec
         ) as connection:
@@ -82,7 +85,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
         random.choice(app.settings.redis_dsn),  # nosec
         decode_responses=True,
     ).client() as redis_conn:
-        async with httpx.AsyncClient() as http_client:
+        async with httpx.AsyncClient(timeout=app.settings.http_timeout) as http_client:
             ask2go_client = client.Ask2GoClient(
                 api_base_url=app.settings.api_base_url,
                 api_booking_base_url=app.settings.api_booking_base_url,
@@ -123,7 +126,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
         random.choice(app.settings.redis_dsn),  # nosec
         decode_responses=True,
     ).client() as redis_conn:
-        async with httpx.AsyncClient() as http_client:
+        async with httpx.AsyncClient(timeout=app.settings.http_timeout) as http_client:
             ask2go_client = client.Ask2GoClient(
                 api_base_url=app.settings.api_base_url,
                 api_booking_base_url=app.settings.api_booking_base_url,
