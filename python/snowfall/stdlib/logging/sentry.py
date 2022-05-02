@@ -1,3 +1,4 @@
+import contextlib
 import logging
 import sys
 from importlib import import_module, util
@@ -197,22 +198,25 @@ def configure_sentry(
     tag_keys: Optional[Sequence[str]] = None,
     **kwargs: Any,
 ) -> None:
-    if not additional_integrations:
-        additional_integrations = []
+    integrations: Integrations = []
 
-    integrations: list[sentry_sdk.integrations.Integration] = [
-        integration_type()
-        for integration_type in sentry_sdk.integrations.iter_default_integrations(True)
-        if integration_type != sentry_logging.LoggingIntegration
-    ]
+    if additional_integrations:
+        integrations = [*integrations, *additional_integrations]
+
+    for integration_type in sentry_sdk.integrations.iter_default_integrations(True):
+        if integration_type == sentry_logging.LoggingIntegration:
+            continue
+
+        with contextlib.suppress(sentry_sdk.integrations.DidNotEnable):
+            integrations = [*integrations, integration_type()]
 
     if util.find_spec("httpx"):
         httpx_module = import_module("sentry_sdk.integrations.httpx")
-        integrations.append(httpx_module.HttpxIntegration())
+        integrations = [*integrations, httpx_module.HttpxIntegration()]
 
     sentry_sdk.init(
         default_integrations=False,
-        integrations=[*integrations, *additional_integrations],
+        integrations=integrations,
         traces_sample_rate=kwargs.get("trace_sample_rate", _DEFAULT_TRACE_SAMPLE_RATE),
         before_send=before_send,
         in_app_include=["snowfall"],
