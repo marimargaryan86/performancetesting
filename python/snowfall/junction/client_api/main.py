@@ -7,6 +7,7 @@ from typing import Callable, cast
 import grpc
 import uvicorn
 from asgiref.typing import ASGIApplication
+from sentry_sdk.integrations import asgi
 from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import (
@@ -60,6 +61,9 @@ def _factory(
             ASGIApplication,
             bootstrap.create_app(
                 custom_middlewares=[
+                    Middleware(
+                        asgi.SentryAsgiMiddleware,
+                    ),
                     Middleware(
                         middlewares.ValidationMiddleware,
                         validator=validation.Validator(

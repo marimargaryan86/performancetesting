@@ -1,20 +1,13 @@
 import logging
 import sys
+from importlib import import_module, util
 from typing import Any, Mapping, Optional, Sequence, Tuple, Type, Union
 
 import sentry_sdk
 import structlog
 from dateutil import parser
 from sentry_sdk import utils as sentry_utils
-from sentry_sdk.integrations import (
-    argv,
-    atexit,
-    dedupe,
-    excepthook,
-    modules,
-    stdlib,
-    threading,
-)
+from sentry_sdk.integrations import logging as sentry_logging
 
 Event = dict[str, Any]
 Hint = dict[str, Any]
@@ -207,19 +200,19 @@ def configure_sentry(
     if not additional_integrations:
         additional_integrations = []
 
-    default_integrations = [
-        stdlib.StdlibIntegration(),
-        excepthook.ExcepthookIntegration(),
-        dedupe.DedupeIntegration(),
-        atexit.AtexitIntegration(),
-        modules.ModulesIntegration(),
-        argv.ArgvIntegration(),
-        threading.ThreadingIntegration(propagate_hub=True),
+    integrations: list[sentry_sdk.integrations.Integration] = [
+        integration_type()
+        for integration_type in sentry_sdk.integrations.iter_default_integrations(True)
+        if integration_type != sentry_logging.LoggingIntegration
     ]
-    integrations = [*additional_integrations, *default_integrations]
+
+    if util.find_spec("httpx"):
+        httpx_module = import_module("sentry_sdk.integrations.httpx")
+        integrations.append(httpx_module.HttpxIntegration())
+
     sentry_sdk.init(
         default_integrations=False,
-        integrations=integrations,
+        integrations=[*integrations, *additional_integrations],
         traces_sample_rate=kwargs.get("trace_sample_rate", _DEFAULT_TRACE_SAMPLE_RATE),
         before_send=before_send,
         in_app_include=["snowfall"],

@@ -22,7 +22,6 @@ from typing import (  # noqa: WPS235
 import click
 import pydantic
 from pydantic.error_wrappers import ErrorWrapper
-from sentry_sdk import integrations
 
 from snowfall.stdlib.logging import sentry, stdout
 
@@ -40,7 +39,7 @@ _Settings2 = TypeVar("_Settings2", bound=Settings)
 
 @dataclasses.dataclass(frozen=True)
 class SentrySettings(object):
-    additional_integrations: Optional[list[integrations.Integration]] = None
+    additional_integrations: Optional[sentry.Integrations] = None
     tag_keys: Optional[list[str]] = None
 
 
