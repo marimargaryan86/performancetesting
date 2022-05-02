@@ -28,6 +28,10 @@ if [ -f "dist/deliverables.json" ]; then
 	done
 fi
 
+for i in "repo/${1}/"**/*.nomad; do
+	rm "${i}"
+done
+
 for i in nomad/**/*.nomad; do
 	filename=$(basename "${i}")
 	service_name=$(basename "$(dirname "${i}")" | sed s/_/-/g)

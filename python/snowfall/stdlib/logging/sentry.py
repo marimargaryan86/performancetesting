@@ -203,7 +203,7 @@ def configure_sentry(
     if additional_integrations:
         integrations = [*integrations, *additional_integrations]
 
-    for integration_type in sentry_sdk.integrations.iter_default_integrations(True):
+    for integration_type in sentry_sdk.integrations.iter_default_integrations(False):
         if integration_type == sentry_logging.LoggingIntegration:
             continue
 
