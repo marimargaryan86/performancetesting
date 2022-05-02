@@ -1,10 +1,12 @@
 import asyncio
 from datetime import date
+from json import dumps as json_dumps
 from typing import Any, Dict, Optional, Union
 
 import httpx
 
 from snowfall.stdlib.dates import calculate_age_by_date_of_birth
+from snowfall.stdlib.instrumentation import sentry
 from snowfall.vendor.sat.enums import PassengerType
 from snowfall.vendor.sat.exceptions import SATValidationError, SATValueError
 from snowfall.vendor.sat.models.booking import (
@@ -25,6 +27,9 @@ from snowfall.vendor.sat.models.search_result_details import SearchResultDetails
 from snowfall.vendor.sat.models.search_result_selection import (
     SearchResultSelectionResponse,
 )
+
+_METHOD_GET = "GET"
+_METHOD_POST = "POST"
 
 
 def _get_passenger_type_by_age(age: int) -> str:
@@ -102,8 +107,8 @@ class SATClient(object):  # noqa: WPS214
         self._password = password
         self._password_search = password_search or password
         self._token = token or ""
-        self._api_url = api_url
-        self._api_search_url = api_search_url
+        self._api_url = httpx.URL(api_url)
+        self._api_search_url = httpx.URL(api_search_url)
         self._api_search_timeout = api_search_timeout
         self._session = client
         self._semaphore = asyncio.BoundedSemaphore(api_search_requests_limit)
@@ -113,24 +118,23 @@ class SATClient(object):  # noqa: WPS214
         request: GeneralSearchResultsRequest,
     ) -> GeneralSearchResponse:
         """Perform a search through Search API."""
-        request_params = httpx.QueryParams(
-            triptype=request.trip_type.value,
-            passengers=request.number_of_passengers,
-            ddate=request.departure_date,
-            rdate=request.return_date,
-            email=self._email,
-            password=self._password_search,
-        )
-
         async with self._semaphore:
-            response = await self._session.get(
-                "{0}/{1}/{2}".format(
-                    self._api_search_url,
-                    request.origin_id,
-                    request.destination_id,
+            response = await self._make_request(
+                method=_METHOD_GET,
+                url=self._api_search_url.copy_with(
+                    path="/{0}/{1}".format(
+                        request.origin_id,
+                        request.destination_id,
+                    ),
+                    params=httpx.QueryParams(
+                        triptype=request.trip_type.value,
+                        passengers=request.number_of_passengers,
+                        ddate=request.departure_date,
+                        rdate=request.return_date,
+                        email=self._email,
+                        password=self._password_search,
+                    ),
                 ),
-                params=request_params,
-                timeout=self._api_search_timeout,
             )
 
         response.raise_for_status()
@@ -150,14 +154,15 @@ class SATClient(object):  # noqa: WPS214
         :raises httpx.TimeoutException: If request times out
         :raises httpx.HTTPStatusError: If request fails
         """
-        request_params = {
-            "email": self._email,
-            "password": self._password,
-        }
-
-        response = await self._session.post(
-            "{0}/sales_agent_sessions".format(self._api_url),
-            params=request_params,
+        response = await self._make_request(
+            method=_METHOD_POST,
+            url=self._api_url.copy_with(
+                path="/sales_agent_sessions",
+                params=httpx.QueryParams(
+                    email=self._email,
+                    password=self._password,
+                ),
+            ),
         )
 
         response.raise_for_status()
@@ -193,8 +198,11 @@ class SATClient(object):  # noqa: WPS214
             },
         }
 
-        response = await self._session.post(
-            "{0}/searches".format(self._api_url),
+        response = await self._make_request(
+            method=_METHOD_POST,
+            url=self._api_url.copy_with(
+                path="/searches",
+            ),
             json=body,
             headers=self._auth_headers,
         )
@@ -213,11 +221,13 @@ class SATClient(object):  # noqa: WPS214
         request: SearchResultRequest,
     ) -> SearchResultDetails:
         """Get search result's details: transfers and fares."""
-        response = await self._session.get(
-            "{0}/searches/{1}/results/{2}/sub_routes".format(
-                self._api_url,
-                request.search_id,
-                request.search_result_id,
+        response = await self._make_request(
+            method=_METHOD_GET,
+            url=self._api_url.copy_with(
+                path="/searches/{0}/results/{1}/sub_routes".format(
+                    request.search_id,
+                    request.search_result_id,
+                ),
             ),
             headers=self._auth_headers,
         )
@@ -249,10 +259,12 @@ class SATClient(object):  # noqa: WPS214
             },
         }
 
-        response = await self._session.post(
-            "{0}/searches/{1}/confirm_selection".format(
-                self._api_url,
-                request.search_id,
+        response = await self._make_request(
+            method=_METHOD_POST,
+            url=self._api_url.copy_with(
+                path="/searches/{0}/confirm_selection".format(
+                    request.search_id,
+                ),
             ),
             json=body,
             headers=self._auth_headers,
@@ -300,8 +312,11 @@ class SATClient(object):  # noqa: WPS214
             },
         }
 
-        response = await self._session.post(
-            "{0}/bookings".format(self._api_url),
+        response = await self._make_request(
+            method=_METHOD_POST,
+            url=self._api_url.copy_with(
+                path="/bookings",
+            ),
             json=body,
             headers=self._auth_headers,
         )
@@ -326,8 +341,11 @@ class SATClient(object):  # noqa: WPS214
             },
         }
 
-        response = await self._session.post(
-            "{0}/bookings/confirm".format(self._api_url),
+        response = await self._make_request(
+            method=_METHOD_POST,
+            url=self._api_url.copy_with(
+                path="/bookings/confirm",
+            ),
             json=body,
             headers=self._auth_headers,
         )
@@ -348,8 +366,11 @@ class SATClient(object):  # noqa: WPS214
         :raises httpx.TimeoutException: If request times out
         :raises httpx.HTTPStatusError: If request fails
         """
-        response = await self._session.get(
-            "{0}/order_images/{1}".format(self._api_url, search_id),
+        response = await self._make_request(
+            method=_METHOD_GET,
+            url=self._api_url.copy_with(
+                path="/order_images/{0}".format(search_id),
+            ),
             headers=self._auth_headers,
         )
 
@@ -362,10 +383,42 @@ class SATClient(object):  # noqa: WPS214
 
         return TicketInfo(**response_data)
 
+    async def _make_request(
+        self,
+        method: str,
+        url: httpx.URL,
+        headers: Optional[httpx.Headers] = None,
+        json: Optional[Any] = None,
+    ) -> httpx.Response:
+        with sentry.get_span("http.client", url.path) as span:
+            span.set_data("request.url", str(url))
+
+            if headers:
+                span.set_data("request.headers", headers)
+
+            if json:
+                span.set_data("request.body", json_dumps(json))
+
+            response = await self._session.request(
+                headers=headers or httpx.Headers(),
+                method=method,
+                url=url,
+                timeout=self._api_search_timeout,
+            )
+
+            span.set_data("response.body", response.content)
+            span.set_data("response.headers", response.headers)
+            span.set_data("response.url", response.url)
+            span.set_http_status(response.status_code)
+
+            return response
+
     @property
-    def _auth_headers(self) -> Dict[str, str]:
+    def _auth_headers(self) -> httpx.Headers:
         """Generate auth header for API requests."""
-        return {
-            "X-Agent-Email": self._email,
-            "X-Agent-Token": self._token,
-        }
+        return httpx.Headers(
+            {
+                "X-Agent-Email": self._email,
+                "X-Agent-Token": self._token,
+            },
+        )
