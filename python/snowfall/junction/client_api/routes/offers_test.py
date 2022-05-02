@@ -19,9 +19,47 @@ class TestOffers(object):
         response = client.get("/offers/{id}".format(id=fixtures.OFFERS[0]))
         assert response.status_code == status.HTTP_200_OK
 
+    async def test_offer_unauthorized(self, client: testclient.TestClient) -> None:
+        client.headers["Authorization"] = "{0}f".format(client.headers["Authorization"])
+        response = client.get("/offers/{id}".format(id=fixtures.OFFERS[0]))
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
 
 @pytest.mark.asyncio
 class TestOfferSearches(object):
+    async def test_offer_search_unauthorized(
+        self,
+        client: testclient.TestClient,
+    ) -> None:
+        client.headers["Authorization"] = "{0}f".format(client.headers["Authorization"])
+        response = client.post(
+            "/offers/searches",
+            json={
+                "data": {
+                    "type": "trip-offer-searches",
+                    "attributes": {
+                        "passengers": [
+                            {
+                                "dateOfBirth": "1979-09-17",
+                            },
+                        ],
+                    },
+                    "relationships": {
+                        "trips": {
+                            "data": [
+                                {
+                                    "id": fixtures.TRIPS[0],
+                                    "type": "trips",
+                                },
+                            ],
+                        },
+                    },
+                },
+            },
+            headers={"Content-Type": "application/vnd.api+json"},
+        )
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
     async def test_offer_search_unknown_trip_returns_error(
         self,
         client: testclient.TestClient,
@@ -121,3 +159,40 @@ class TestOfferSearches(object):
             "/offers/searches/{id}".format(id=offer_search_id),
         )
         assert response.status_code == status.HTTP_200_OK
+
+    async def test_created_trip_offer_search_unauthorized(
+        self,
+        client: testclient.TestClient,
+    ) -> None:
+        offer_search = client.post(
+            "/offers/searches",
+            json={
+                "data": {
+                    "type": "trip-offer-searches",
+                    "attributes": {
+                        "passengers": [
+                            {
+                                "dateOfBirth": "1979-09-17",
+                            },
+                        ],
+                    },
+                    "relationships": {
+                        "trips": {
+                            "data": [
+                                {
+                                    "id": fixtures.TRIPS[0],
+                                    "type": "trips",
+                                },
+                            ],
+                        },
+                    },
+                },
+            },
+            headers={"Content-Type": "application/vnd.api+json"},
+        )
+        offer_search_id = json.loads(offer_search.content.decode())["data"]["id"]
+        client.headers["Authorization"] = "{0}f".format(client.headers["Authorization"])
+        response = client.get(
+            "/offers/searches/{id}".format(id=offer_search_id),
+        )
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED

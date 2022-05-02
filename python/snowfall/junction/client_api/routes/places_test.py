@@ -18,3 +18,8 @@ class TestPlaces(object):
     def test_multiple_places_are_found(self, client: testclient.TestClient) -> None:
         response = client.get("/places")
         assert response.status_code == status.HTTP_200_OK
+
+    def test_multiple_places_unauthorized(self, client: testclient.TestClient) -> None:
+        client.headers["Authorization"] = "{0}f".format(client.headers["Authorization"])
+        response = client.get("/places")
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED

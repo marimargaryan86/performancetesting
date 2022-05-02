@@ -50,6 +50,41 @@ class TestTripSearches(object):
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    async def test_trip_search_post_unauthorized(
+        self,
+        client: testclient.TestClient,
+    ) -> None:
+        client.headers["Authorization"] = "{0}f".format(client.headers["Authorization"])
+        request = {
+            "data": {
+                "attributes": {
+                    "departureAfter": "1957-04-30T08:34:00.826Z",
+                    "arrivalBefore": "1947-08-17T08:12:02.822Z",
+                },
+                "relationships": {
+                    "origin": {
+                        "data": {
+                            "id": fixtures.PLACES[0],
+                            "type": "places",
+                        },
+                    },
+                    "destination": {
+                        "data": {
+                            "id": fixtures.PLACES[1],
+                            "type": "places",
+                        },
+                    },
+                },
+                "type": "trip-searches",
+            },
+        }
+        response = client.post(
+            "/trips/searches",
+            json=request,
+            headers={"Content-Type": "application/vnd.api+json"},
+        )
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
     @pytest.mark.parametrize(
         "query",
         [
@@ -153,6 +188,19 @@ class TestTripSearches(object):
         )
         assert response.status_code == status.HTTP_200_OK
 
+    async def test_created_trip_search_unauthorized(
+        self,
+        trip_searches_client: trip_searches.Client,
+        trip_search_request: trip_searches.TripSearchRequest,
+        client: testclient.TestClient,
+    ) -> None:
+        client.headers["Authorization"] = "{0}f".format(client.headers["Authorization"])
+        trip_search = await trip_searches_client.create(trip_search_request)
+        response = client.get(
+            "/trips/searches/{id}".format(id=trip_search.id),
+        )
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
     async def test_missing_trip_search_returns_not_found(
         self,
         client: testclient.TestClient,
@@ -161,6 +209,19 @@ class TestTripSearches(object):
             "/trips/searches/{id}".format(id=fixtures.NOT_FOUND),
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    async def test_trips_unauthorized(
+        self,
+        trip_searches_client: trip_searches.Client,
+        trip_search_request: trip_searches.TripSearchRequest,
+        client: testclient.TestClient,
+    ) -> None:
+        client.headers["Authorization"] = "{0}f".format(client.headers["Authorization"])
+        trip_search = await trip_searches_client.create(trip_search_request)
+        response = client.get(
+            "/trips/searches/{id}/trips".format(id=trip_search.id),
+        )
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     async def test_missing_trips_by_search_returns_not_found(
         self,
