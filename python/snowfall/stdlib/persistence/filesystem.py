@@ -1,12 +1,12 @@
 import abc
 import hashlib
-import json
 import pathlib
 import pkgutil
 import zipfile
 from typing import Any
 
 import aiofiles
+import rapidjson
 
 
 class Loader(abc.ABC):
@@ -19,7 +19,7 @@ class FileLoader(Loader):
     def load(self, ref: str) -> dict[str, Any]:
         try:
             with open(ref) as file_handle:
-                return json.load(file_handle)
+                return rapidjson.load(file_handle)
         except FileNotFoundError as err:
             raise FileNotFoundError(
                 "Schema file '{ref}' not found.".format(ref=ref),
@@ -43,7 +43,7 @@ class PkgLoader(Loader):
                 "Schema file '{ref}' not found.".format(ref=ref),
             )
 
-        return json.loads(file_content)
+        return rapidjson.loads(file_content)
 
 
 async def hash_file(filepath: pathlib.Path, chunk_size: int = 1024) -> str:

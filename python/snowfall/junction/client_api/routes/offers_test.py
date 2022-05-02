@@ -1,6 +1,5 @@
-import json
-
 import pytest
+import rapidjson
 from starlette import status, testclient
 
 from snowfall import fixtures
@@ -154,7 +153,7 @@ class TestOfferSearches(object):
             },
             headers={"Content-Type": "application/vnd.api+json"},
         )
-        offer_search_id = json.loads(offer_search.content.decode())["data"]["id"]
+        offer_search_id = rapidjson.loads(offer_search.content.decode())["data"]["id"]
         response = client.get(
             "/offers/searches/{id}".format(id=offer_search_id),
         )
@@ -190,7 +189,7 @@ class TestOfferSearches(object):
             },
             headers={"Content-Type": "application/vnd.api+json"},
         )
-        offer_search_id = json.loads(offer_search.content.decode())["data"]["id"]
+        offer_search_id = rapidjson.loads(offer_search.content.decode())["data"]["id"]
         client.headers["Authorization"] = "{0}f".format(client.headers["Authorization"])
         response = client.get(
             "/offers/searches/{id}".format(id=offer_search_id),

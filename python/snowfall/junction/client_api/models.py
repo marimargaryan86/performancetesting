@@ -1,8 +1,8 @@
 import datetime
-import json
 from typing import Any, Mapping, Optional, Sequence, Union
 
 import pydantic
+import rapidjson
 from starlette import responses
 
 AnyMapping = Mapping[str, Any]
@@ -56,7 +56,7 @@ class JsonApiResponse(responses.JSONResponse):
         headers: Optional[Mapping[str, Any]] = None,
     ) -> None:
         super().__init__(
-            content=json.loads(body.json(exclude_unset=True, by_alias=True)),
+            content=rapidjson.loads(body.json(exclude_unset=True, by_alias=True)),
             status_code=int(status_code),
             headers=dict(headers or {}),
         )

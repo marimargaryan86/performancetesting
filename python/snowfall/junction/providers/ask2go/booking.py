@@ -1,10 +1,10 @@
 import datetime
-import json
 from email import message
 
 import aiosmtplib
 import phonenumbers
 import pycountry
+import rapidjson
 
 from snowfall.junction.orders.v1alpha import models_pb2
 from snowfall.junction.providers.ask2go import criteria
@@ -92,7 +92,7 @@ class BookingHandler(object):
                 order=order.id,
                 spnr=order.passenger_name_record,
                 offer=offer_id,
-                json=json.dumps(raw_data.dict(), indent=2, sort_keys=True),
+                json=rapidjson.dumps(raw_data.dict(), indent=2, sort_keys=True),
             ),
         )
 

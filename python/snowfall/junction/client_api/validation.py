@@ -1,7 +1,7 @@
-import json
 from typing import Any
 
 import openapi_core
+import rapidjson
 from furl import furl
 from openapi_core.validation.request.datatypes import (
     OpenAPIRequest,
@@ -60,7 +60,7 @@ class Validator(object):
     def __init__(self, spec_path: str, loader: filesystem.Loader):
         spec_dict = loader.load(spec_path)
         spec = openapi_core.create_spec(spec_dict)
-        deserializer = {"application/vnd.api+json": json.loads}
+        deserializer = {"application/vnd.api+json": rapidjson.loads}
         formatter = {"uri": UriFormatter()}
         self._request_validator = RequestValidator(
             spec,

@@ -1,9 +1,9 @@
-import json
 import logging
 from typing import Any
 
 import freezegun
 import pytest
+import rapidjson
 import structlog
 from _pytest import capture  # noqa: WPS436
 
@@ -11,7 +11,7 @@ from snowfall.stdlib.logging import filtering, stdout
 
 
 def _decode_log(capsys: capture.CaptureFixture[str]) -> dict[str, Any]:
-    return json.loads(capsys.readouterr().out.strip())
+    return rapidjson.loads(capsys.readouterr().out.strip())
 
 
 class TestStructlog(object):
@@ -20,7 +20,7 @@ class TestStructlog(object):
         logger = structlog.get_logger("testing")
         logger.info("test")
         json_message = capsys.readouterr().out.strip()
-        assert json.loads(json_message)
+        assert rapidjson.loads(json_message)
 
     @freezegun.freeze_time("2021-12-21 12:12:12.121212")
     @pytest.mark.parametrize(
@@ -155,7 +155,7 @@ class TestStandardLogger(object):
         logger = logging.getLogger("testing")
         logger.info("test")
         json_message = capsys.readouterr().out.strip()
-        assert json.loads(json_message)
+        assert rapidjson.loads(json_message)
 
     @freezegun.freeze_time("2021-12-21 12:12:12.121212")
     @pytest.mark.parametrize(
