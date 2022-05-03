@@ -49,6 +49,6 @@ cd repo
 git add --all .
 
 if [ -n "$(git status --porcelain)" ]; then
-	git commit -m "${CI_COMMIT_MESSAGE}" -m "Ref: ${CI_PROJECT_PATH}@${CI_COMMIT_SHORT_SHA}"
+	git commit -m "${CI_COMMIT_TITLE}" -m "Refs: ${CI_PROJECT_PATH}@${CI_COMMIT_SHORT_SHA}"
 	git push
 fi
