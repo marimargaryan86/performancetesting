@@ -6,7 +6,7 @@ from pydantic import typing, validator
 
 
 def normalize_time(
-    time: Optional[Union[float, str]],
+    time: Optional[Union[int, float, str]],
 ) -> Optional[Union[float, datetime.timedelta]]:
     if time is None:
         return None
@@ -15,6 +15,9 @@ def normalize_time(
         # duration: str, e.g. 2h22m
         hours, minutes = date_parser(time).hour, date_parser(time).minute
         return datetime.timedelta(hours=hours, minutes=minutes)
+
+    if isinstance(time, int):
+        return datetime.timedelta(seconds=time)
 
     # A JSON-serialized model will contain float.
     if isinstance(time, float):

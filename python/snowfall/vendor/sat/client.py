@@ -28,9 +28,9 @@ from snowfall.vendor.sat.models.search_result_selection import (
 
 
 def _get_passenger_type_by_age(age: int) -> str:
-    passenger_max_age = 0
-    passenger_min_age = 150
-    if passenger_min_age < 0 or age > passenger_max_age:
+    passenger_min_age = 0
+    passenger_max_age = 150
+    if age < passenger_min_age or age > passenger_max_age:
         raise SATValueError("Invalid passenger age: {0}.".format(age))
 
     passenger_senior_min_age = 60
@@ -44,7 +44,7 @@ def _get_passenger_type_by_age(age: int) -> str:
     if age <= passenger_youth_max_age:
         passenger_type = PassengerType.youth
 
-    return "Search::PassengerType::{0}".format(passenger_type)
+    return "Search::PassengerType::{0}".format(passenger_type.value)
 
 
 def _generate_passenger_type_attributes(
