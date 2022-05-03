@@ -10,11 +10,9 @@ Relationship = Union[AnyMapping, Sequence[AnyMapping]]
 
 
 class BaseModel(pydantic.BaseModel):
-    class Config(object):  # noqa: WPS431
+    class Config(object):
         json_encoders = {
-            datetime.datetime: lambda datetime_object: datetime_object.strftime(
-                "%Y-%m-%dT%H:%M:%SZ",
-            ),
+            datetime.datetime: lambda datetime_object: datetime_object.isoformat(),
         }
 
 
