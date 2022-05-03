@@ -1,6 +1,6 @@
 import ipaddress
 
-from snowfall.stdlib.transport.grpc import Server, create_server
+from snowfall.stdlib.transport.grpc.server import Server, create_server
 
 
 def test_create_server() -> None:

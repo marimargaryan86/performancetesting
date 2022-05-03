@@ -7,11 +7,11 @@ from snowfall.junction.passenger_name_records.v1alpha import (
     passenger_name_records_pb2,
     passenger_name_records_pb2_grpc,
 )
-from snowfall.stdlib.transport.grpc import Service
+from snowfall.stdlib.transport.grpc import service
 
 
 class PassengerNameRecordService(
-    Service,
+    service.Service,
     passenger_name_records_pb2_grpc.PassengerNameRecordServiceServicer,
 ):
     def __init__(

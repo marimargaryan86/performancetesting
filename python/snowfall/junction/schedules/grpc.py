@@ -2,10 +2,10 @@ from grpc import StatusCode, aio
 
 from snowfall.junction.schedules.schedules import LegRepository, ScheduleRepository
 from snowfall.junction.schedules.v1alpha import schedules_pb2, schedules_pb2_grpc
-from snowfall.stdlib.transport.grpc import Service
+from snowfall.stdlib.transport.grpc import service
 
 
-class ScheduleService(Service, schedules_pb2_grpc.ScheduleServiceServicer):
+class ScheduleService(service.Service, schedules_pb2_grpc.ScheduleServiceServicer):
     def __init__(
         self,
         legs: LegRepository,

@@ -4,7 +4,8 @@ from grpc import aio
 
 from snowfall.junction.echo.v1 import echo_pb2, echo_pb2_grpc
 from snowfall.stdlib import service
-from snowfall.stdlib.transport import grpc
+from snowfall.stdlib.transport.grpc import server as grpc_server
+from snowfall.stdlib.transport.grpc import service as grpc_service
 
 
 class _Settings(service.Settings):
@@ -12,7 +13,7 @@ class _Settings(service.Settings):
     grpc_port: int = 50051
 
 
-class _EchoService(grpc.Service, echo_pb2_grpc.EchoServiceServicer):
+class _EchoService(grpc_service.Service, echo_pb2_grpc.EchoServiceServicer):
     def get_name(self) -> str:
         return echo_pb2.DESCRIPTOR.services_by_name["EchoService"].full_name
 
@@ -30,14 +31,14 @@ class _EchoService(grpc.Service, echo_pb2_grpc.EchoServiceServicer):
 
 
 async def _serve(app: service.Application[_Settings]) -> None:
-    grpc_server = grpc.create_server(
+    server = grpc_server.create_server(
         app.settings.grpc_address,
         app.settings.grpc_port,
         [_EchoService()],
     )
 
-    async with grpc_server.serve() as server:
-        await server.wait_for_termination()
+    async with server.serve() as running:
+        await running.wait_for_termination()
 
 
 if __name__ == "__main__":

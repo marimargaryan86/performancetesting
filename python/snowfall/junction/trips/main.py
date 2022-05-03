@@ -11,7 +11,9 @@ from snowfall.junction.trips import trips
 from snowfall.junction.trips.consumer import TripSearchConsumer
 from snowfall.junction.trips.grpc import TripSearchService, TripService
 from snowfall.stdlib import service
-from snowfall.stdlib.transport import amqp, grpc
+from snowfall.stdlib.transport import amqp
+from snowfall.stdlib.transport.grpc import server
+from snowfall.stdlib.transport.grpc.client import create_channel
 
 _TRIPS = "trips"
 
@@ -46,7 +48,7 @@ async def _consume(app: service.Application[_ConsumeSettings]) -> None:
                 routing_key="trips.search",
             ),
             planner=planner_pb2_grpc.PlannerServiceStub(
-                grpc.aio.insecure_channel(
+                create_channel(
                     random.choice(app.settings.planner_address),  # nosec
                 ),
             ),
@@ -71,7 +73,7 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
             conn=connection,
             exchange_name=_TRIPS,
         )
-        grpc_server = grpc.create_server(
+        grpc_server = server.create_server(
             app.settings.grpc_address,
             app.settings.grpc_port,
             [
@@ -90,8 +92,8 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
             ],
         )
 
-        async with grpc_server.serve() as server:
-            await server.wait_for_termination()
+        async with grpc_server.serve() as running:
+            await running.wait_for_termination()
 
 
 if __name__ == "__main__":

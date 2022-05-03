@@ -12,7 +12,8 @@ from snowfall.junction.offers.amqp import OfferSearchProducer
 from snowfall.junction.offers.grpc import OfferSearchService, OfferService
 from snowfall.stdlib import service
 from snowfall.stdlib.persistence import redis
-from snowfall.stdlib.transport import amqp, grpc
+from snowfall.stdlib.transport import amqp
+from snowfall.stdlib.transport.grpc import server
 
 
 class _GrpcSettings(service.Settings):
@@ -38,7 +39,7 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
     async with amqp.Connection(
         random.choice(app.settings.amqp_dsn),  # nosec
     ) as connection:
-        grpc_server = grpc.create_server(
+        grpc_server = server.create_server(
             app.settings.grpc_address,
             app.settings.grpc_port,
             [
@@ -67,8 +68,8 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
             ],
         )
 
-        async with grpc_server.serve() as server:
-            await server.wait_for_termination()
+        async with grpc_server.serve() as running:
+            await running.wait_for_termination()
 
 
 async def _import(app: service.Application[_ImportSettings]) -> None:

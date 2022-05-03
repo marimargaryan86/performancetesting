@@ -2,10 +2,10 @@ import grpc
 
 from snowfall.junction.offers import amqp, offers
 from snowfall.junction.offers.v1alpha import grpc_pb2, grpc_pb2_grpc, models_pb2
-from snowfall.stdlib.transport.grpc import Service
+from snowfall.stdlib.transport.grpc import service
 
 
-class OfferSearchService(Service, grpc_pb2_grpc.OfferSearchServiceServicer):
+class OfferSearchService(service.Service, grpc_pb2_grpc.OfferSearchServiceServicer):
     def __init__(
         self,
         offers_searches: offers.OfferSearchRepository,
@@ -47,7 +47,7 @@ class OfferSearchService(Service, grpc_pb2_grpc.OfferSearchServiceServicer):
         return grpc_pb2.GetOfferSearchResponse(search=offer_search)
 
 
-class OfferService(Service, grpc_pb2_grpc.OfferServiceServicer):
+class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):
     def __init__(
         self,
         offer_aggregates: offers.OfferAggregateMappingRepository,

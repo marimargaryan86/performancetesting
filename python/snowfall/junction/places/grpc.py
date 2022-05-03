@@ -4,10 +4,10 @@ from grpc import StatusCode, aio
 
 from snowfall.junction.places.places import CuratedPlaceRepository, PlaceRepository
 from snowfall.junction.places.v1alpha import places_pb2, places_pb2_grpc
-from snowfall.stdlib.transport.grpc import Service
+from snowfall.stdlib.transport.grpc import service
 
 
-class PlacesService(Service, places_pb2_grpc.PlacesServiceServicer):
+class PlacesService(service.Service, places_pb2_grpc.PlacesServiceServicer):
     def __init__(self, places: PlaceRepository, default_page_size: int):
         self._default_page_size = default_page_size
         self._places = places
@@ -50,7 +50,7 @@ class PlacesService(Service, places_pb2_grpc.PlacesServiceServicer):
 
 
 class CuratedPlacesService(  # noqa: WPS214
-    Service,
+    service.Service,
     places_pb2_grpc.CuratedPlacesServiceServicer,
 ):
     def __init__(self, places: CuratedPlaceRepository, default_page_size: int):

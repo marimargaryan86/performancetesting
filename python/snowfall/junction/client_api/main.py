@@ -4,7 +4,6 @@ import http
 import random
 from typing import Callable, cast
 
-import grpc
 import uvicorn
 from asgiref.typing import ASGIApplication
 from sentry_sdk.integrations import asgi
@@ -35,25 +34,26 @@ from snowfall.junction.schedules.v1alpha import schedules_pb2_grpc
 from snowfall.junction.trips.v1alpha import trips_pb2_grpc
 from snowfall.stdlib import service
 from snowfall.stdlib.persistence import filesystem
+from snowfall.stdlib.transport.grpc.client import create_channel
 
 
 def _factory(
     app: service.Application[bootstrap.Settings],
 ) -> Callable[[], ASGIApplication]:
     def decorator() -> ASGIApplication:
-        places_channel = grpc.aio.insecure_channel(
+        places_channel = create_channel(
             random.choice(app.settings.places_address),  # nosec
         )
-        orders_channel = grpc.aio.insecure_channel(
+        orders_channel = create_channel(
             random.choice(app.settings.orders_address),  # nosec
         )
-        offers_channel = grpc.aio.insecure_channel(
+        offers_channel = create_channel(
             random.choice(app.settings.offers_address),  # nosec
         )
-        trips_channel = grpc.aio.insecure_channel(
+        trips_channel = create_channel(
             random.choice(app.settings.trips_address),  # nosec
         )
-        schedules_channel = grpc.aio.insecure_channel(
+        schedules_channel = create_channel(
             random.choice(app.settings.schedules_address),  # nosec
         )
 

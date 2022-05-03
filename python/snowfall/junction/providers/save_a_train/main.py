@@ -7,7 +7,6 @@ from io import StringIO
 from typing import Sequence
 
 import aioredis
-import grpc
 import httpx
 import pydantic
 
@@ -23,6 +22,7 @@ from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import service
 from snowfall.stdlib.persistence import redis
 from snowfall.stdlib.transport import amqp
+from snowfall.stdlib.transport.grpc import client as grpc_client
 from snowfall.vendor.sat import client
 
 
@@ -209,7 +209,7 @@ async def _load_train_stations(
     geodata_address: Sequence[str],
 ) -> list[train_stations.TrainStation]:
     geocoder = geocoding_pb2_grpc.GeocodingServiceStub(
-        grpc.aio.insecure_channel(
+        grpc_client.create_channel(
             random.choice(geodata_address),  # nosec
         ),
     )

@@ -9,7 +9,7 @@ from snowfall.service.geodata import geocoding
 from snowfall.service.geodata.grpc import GeocodingService
 from snowfall.stdlib import service
 from snowfall.stdlib.persistence import redis
-from snowfall.stdlib.transport import grpc
+from snowfall.stdlib.transport.grpc import server
 
 
 class _Settings(service.Settings):
@@ -23,7 +23,7 @@ async def _main(app: service.Application[_Settings]) -> None:
         random.choice(app.settings.redis_dsn),  # nosec
         decode_responses=True,
     ).client() as redis_conn:
-        grpc_server = grpc.create_server(
+        grpc_server = server.create_server(
             app.settings.grpc_address,
             app.settings.grpc_port,
             [
@@ -34,8 +34,8 @@ async def _main(app: service.Application[_Settings]) -> None:
             ],
         )
 
-        async with grpc_server.serve() as server:
-            await server.wait_for_termination()
+        async with grpc_server.serve() as running:
+            await running.wait_for_termination()
 
 
 if __name__ == "__main__":

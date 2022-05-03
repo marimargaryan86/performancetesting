@@ -3,10 +3,10 @@ from grpc import StatusCode, aio
 from snowfall.junction.trips import trips
 from snowfall.junction.trips.v1alpha import amqp_pb2, trips_pb2, trips_pb2_grpc
 from snowfall.stdlib.transport import amqp
-from snowfall.stdlib.transport.grpc import Service
+from snowfall.stdlib.transport.grpc import service
 
 
-class TripService(Service, trips_pb2_grpc.TripServiceServicer):
+class TripService(service.Service, trips_pb2_grpc.TripServiceServicer):
     def __init__(
         self,
         segments: trips.SegmentRepository,
@@ -69,7 +69,7 @@ class TripService(Service, trips_pb2_grpc.TripServiceServicer):
         return trips_pb2.GetSegmentResponse(segment=segment)
 
 
-class TripSearchService(Service, trips_pb2_grpc.TripSearchServiceServicer):
+class TripSearchService(service.Service, trips_pb2_grpc.TripSearchServiceServicer):
     def __init__(
         self,
         repository: trips.TripSearchRepository,

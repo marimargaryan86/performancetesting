@@ -1,9 +1,11 @@
+import grpc
+
 from snowfall.junction.currencies.v1alpha import currencies_pb2, currencies_pb2_grpc
-from snowfall.stdlib.transport import grpc
+from snowfall.stdlib.transport.grpc import service
 from snowfall.vendor.bound.client import Bound
 
 
-class CurrencyService(grpc.Service, currencies_pb2_grpc.CurrencyServiceServicer):
+class CurrencyService(service.Service, currencies_pb2_grpc.CurrencyServiceServicer):
     def __init__(self, client: Bound):
         self.client = client
 

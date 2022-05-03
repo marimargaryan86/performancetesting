@@ -1,11 +1,13 @@
+from grpc import aio
+
 from snowfall.common.v1alpha import datetime_pb2
 from snowfall.service.geodata import geocoding
 from snowfall.service.geodata.v1 import geocoding_pb2, geocoding_pb2_grpc
 from snowfall.stdlib.persistence import redis
-from snowfall.stdlib.transport import grpc
+from snowfall.stdlib.transport.grpc import service
 
 
-class GeocodingService(grpc.Service, geocoding_pb2_grpc.GeocodingServiceServicer):
+class GeocodingService(service.Service, geocoding_pb2_grpc.GeocodingServiceServicer):
     def __init__(self, cache: redis.Client[str], geocoder: geocoding.ReverseGeocoder):
         self._cache = cache
         self._geocoder = geocoder
@@ -13,13 +15,13 @@ class GeocodingService(grpc.Service, geocoding_pb2_grpc.GeocodingServiceServicer
     def get_name(self) -> str:
         return geocoding_pb2.DESCRIPTOR.services_by_name["GeocodingService"].full_name
 
-    def register(self, server: grpc.aio.Server) -> None:
+    def register(self, server: aio.Server) -> None:
         geocoding_pb2_grpc.add_GeocodingServiceServicer_to_server(self, server)
 
     async def CountryCodeLookup(  # type: ignore[override] # noqa: N802
         self,
         request: geocoding_pb2.CountryCodeLookupRequest,
-        context: grpc.aio.ServicerContext,
+        context: aio.ServicerContext,
     ) -> geocoding_pb2.CountryCodeLookupResponse:
         cache_key = _make_cache_key(
             "country_codes",
@@ -50,7 +52,7 @@ class GeocodingService(grpc.Service, geocoding_pb2_grpc.GeocodingServiceServicer
     async def TimeZoneLookup(  # type: ignore[override] # noqa: N802
         self,
         request: geocoding_pb2.TimeZoneLookupRequest,
-        context: grpc.aio.ServicerContext,
+        context: aio.ServicerContext,
     ) -> geocoding_pb2.TimeZoneLookupResponse:
         cache_key = _make_cache_key(
             "timezones",

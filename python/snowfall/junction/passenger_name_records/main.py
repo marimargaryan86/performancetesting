@@ -8,7 +8,7 @@ from motor import motor_asyncio
 from snowfall.junction.passenger_name_records import passenger_name_records
 from snowfall.junction.passenger_name_records.grpc import PassengerNameRecordService
 from snowfall.stdlib import service
-from snowfall.stdlib.transport import grpc
+from snowfall.stdlib.transport.grpc import server
 
 
 class _GrpcSettings(service.Settings):
@@ -21,7 +21,7 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
-    grpc_server = grpc.create_server(
+    grpc_server = server.create_server(
         app.settings.grpc_address,
         app.settings.grpc_port,
         [
@@ -33,8 +33,8 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
         ],
     )
 
-    async with grpc_server.serve() as server:
-        await server.wait_for_termination()
+    async with grpc_server.serve() as running:
+        await running.wait_for_termination()
 
 
 if __name__ == "__main__":

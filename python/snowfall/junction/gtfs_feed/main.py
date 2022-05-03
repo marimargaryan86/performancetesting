@@ -4,7 +4,6 @@ import shutil
 from typing import Sequence
 
 import aioredis
-import grpc
 from aiofiles import os, tempfile  # type: ignore[attr-defined]
 from motor import motor_asyncio
 from pydantic import AnyUrl, DirectoryPath
@@ -15,6 +14,7 @@ from snowfall.stdlib import service
 from snowfall.stdlib.logging.stdout import context_binding
 from snowfall.stdlib.persistence.mongo import temporary
 from snowfall.stdlib.transport import amqp
+from snowfall.stdlib.transport.grpc.client import create_channel
 
 
 class _Settings(service.Settings):
@@ -48,7 +48,7 @@ async def _main(app: service.Application[_Settings]) -> None:
                     redis_conn,
                     importer.RepositoryCollection.create_for_database(database),
                     geocoding_pb2_grpc.GeocodingServiceStub(
-                        grpc.aio.insecure_channel(
+                        create_channel(
                             random.choice(app.settings.geodata_address),  # nosec
                         ),
                     ),

@@ -4,7 +4,7 @@ from pydantic import HttpUrl
 
 from snowfall.junction.currencies.grpc import CurrencyService
 from snowfall.stdlib import service
-from snowfall.stdlib.transport import grpc
+from snowfall.stdlib.transport.grpc import server
 from snowfall.vendor.bound.client import Bound
 
 
@@ -22,7 +22,7 @@ async def _main(app: service.Application[_Settings]) -> None:
         app.settings.email,
         app.settings.password,
     )
-    grpc_server = grpc.create_server(
+    grpc_server = server.create_server(
         app.settings.grpc_address,
         app.settings.grpc_port,
         [
@@ -32,8 +32,8 @@ async def _main(app: service.Application[_Settings]) -> None:
         ],
     )
 
-    async with grpc_server.serve() as server:
-        await server.wait_for_termination()
+    async with grpc_server.serve() as running:
+        await running.wait_for_termination()
 
 
 if __name__ == "__main__":
