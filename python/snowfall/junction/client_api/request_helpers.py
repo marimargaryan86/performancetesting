@@ -1,13 +1,9 @@
-import dataclasses
-from typing import Any, Mapping, Optional, Sequence
+from typing import Any, Mapping
 
-from furl import furl
 from starlette import requests
 
 _IDENTIFIER = "id"
 _DATA_KEY = "data"
-PAGE_CURSOR_KEY = "page[cursor]"
-PAGE_LIMIT_KEY = "page[limit]"
 
 
 async def flatten_request(request: requests.Request) -> dict[str, Any]:
@@ -42,38 +38,3 @@ def _flatten_data(resource_data: Mapping[str, Any]) -> dict[str, Any]:
         flattened.update(_flatten_relationships(resource_data["relationships"]))
 
     return flattened
-
-
-@dataclasses.dataclass(frozen=True)
-class SequencePage(object):
-    sequence: Sequence[Any]
-    next_page_token: Optional[int] = None
-
-
-async def sequence_paginator(
-    sequence: Sequence[Any],
-    limit: int,
-    cursor: int = 0,
-) -> SequencePage:
-    start_index = cursor
-    end_index = cursor + limit
-
-    return SequencePage(
-        sequence=sequence[start_index:end_index],
-        next_page_token=end_index,  # TODO: what if index exceeds length?
-    )
-
-
-def get_next_url(
-    url: str,
-    next_page_token: Optional[str],
-    limit: int,
-) -> Optional[str]:
-    if not next_page_token:
-        return None
-
-    next_url = furl(url)
-    next_url.args[PAGE_CURSOR_KEY] = next_page_token
-    next_url.args[PAGE_LIMIT_KEY] = limit
-
-    return next_url.url

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-import uuid
 from typing import Any, Optional, Sequence
 
 import pydantic
@@ -247,7 +246,13 @@ class SegmentResource(models.Resource):
             attributes={},
             relationships={
                 "legs": {
-                    _RELATIONSHIPS_FIELD: [],
+                    _RELATIONSHIPS_FIELD: [
+                        models.ResourceIdentifier(
+                            id=leg_id,
+                            type="legs",
+                        )
+                        for leg_id in segment.leg_ids
+                    ],
                 },
             },
             links={
@@ -282,10 +287,13 @@ class LegResource(models.Resource):
             },
             relationships={
                 "type": {
-                    _RELATIONSHIPS_FIELD: {
-                        "id": uuid.uuid4(),  # TODO: use schedule type
-                        "type": "leg-types",
-                    },
+                    _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
+                        id=protobuf.enum_value_to_slug(
+                            descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
+                            enum_value=leg.type,
+                        ),
+                        type="leg-types",
+                    ),
                 },
             },
             links={
@@ -337,9 +345,9 @@ class TripResource(models.Resource):
             relationships={
                 "segments": {
                     _RELATIONSHIPS_FIELD: [
-                        SegmentResource.from_proto(
-                            segment=segment,
-                            request=request,
+                        models.ResourceIdentifier(
+                            id=segment.id,
+                            type="segments",
                         )
                         for segment in trip.segments
                     ],

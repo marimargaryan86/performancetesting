@@ -1,11 +1,15 @@
 import itertools
 
 import lagom
-from furl import furl
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.adapter import orders
-from snowfall.junction.client_api import models, request_helpers, resources
+from snowfall.junction.client_api import (
+    models,
+    pagination_helpers,
+    request_helpers,
+    resources,
+)
 from snowfall.junction.client_api.transformers.offer_ids_to_offers import (
     MissingOffersError,
     OfferIdsToOffers,
@@ -72,9 +76,8 @@ class Orders(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders.Client = lagom.injectable,
     ) -> responses.Response:
-        cursor = request.query_params[request_helpers.PAGE_CURSOR_KEY]
-        limit = int(request.query_params[request_helpers.PAGE_LIMIT_KEY])
-        response = await client.find(limit=limit, cursor=cursor)
+        pagination = pagination_helpers.get_pagination(request)
+        response = await client.find(limit=pagination.limit, cursor=pagination.cursor)
 
         return models.JsonApiResponse(
             models.Body(
@@ -82,13 +85,11 @@ class Orders(endpoints.HTTPEndpoint):
                     resources.OrderResource.from_proto(order, request)
                     for order in response.orders
                 ],
-                links={
-                    "next": request_helpers.get_next_url(
-                        furl(request.url_for("ListOrders")),
-                        response.next_page_token,
-                        limit,
-                    ),
-                },
+                links=pagination_helpers.get_next_url(
+                    request.url_for("ListOrders"),
+                    response.next_page_token,
+                    pagination,
+                ),
             ),
         )
 

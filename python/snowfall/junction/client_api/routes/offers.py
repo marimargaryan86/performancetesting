@@ -4,7 +4,12 @@ import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.adapter import offer_searches, offers
-from snowfall.junction.client_api import models, request_helpers, resources
+from snowfall.junction.client_api import (
+    models,
+    pagination_helpers,
+    request_helpers,
+    resources,
+)
 from snowfall.junction.client_api.transformers import trip_ids_to_segments
 from snowfall.junction.offers.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
@@ -101,12 +106,11 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: offers.Client = lagom.injectable,
     ) -> responses.Response:
-        cursor = request.query_params[request_helpers.PAGE_CURSOR_KEY]
-        limit = int(request.query_params[request_helpers.PAGE_LIMIT_KEY])
+        pagination = pagination_helpers.get_pagination(request)
         offers_page = await client.find_offers_by_offer_search(
             request.path_params["offerSearchId"],
-            cursor=cursor,
-            limit=limit,
+            cursor=pagination.cursor,
+            limit=pagination.limit,
         )
 
         return models.JsonApiResponse(
@@ -118,15 +122,13 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
                     )
                     for offer in offers_page.offers
                 ],
-                links={
-                    "next": request_helpers.get_next_url(
-                        request.url_for(
-                            "ViewOffersByOfferSearch",
-                            offerSearchId=request.path_params["offerSearchId"],
-                        ),
-                        offers_page.next_page_token,
-                        limit,
+                links=pagination_helpers.get_next_url(
+                    request.url_for(
+                        "ViewOffersByOfferSearch",
+                        offerSearchId=request.path_params["offerSearchId"],
                     ),
-                },
+                    offers_page.next_page_token,
+                    pagination,
+                ),
             ),
         )

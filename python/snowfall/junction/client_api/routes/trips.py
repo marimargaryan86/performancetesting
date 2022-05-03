@@ -5,7 +5,12 @@ from dateutil import parser
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.adapter import places, trip_searches, trips
-from snowfall.junction.client_api import models, request_helpers, resources
+from snowfall.junction.client_api import (
+    models,
+    pagination_helpers,
+    request_helpers,
+    resources,
+)
 
 
 class Trip(endpoints.HTTPEndpoint):
@@ -40,13 +45,10 @@ class TripSegments(endpoints.HTTPEndpoint):
         except trips.NotFoundError:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
-        cursor = request.query_params[request_helpers.PAGE_CURSOR_KEY]
-        limit = int(request.query_params[request_helpers.PAGE_LIMIT_KEY])
-
-        sequence_page = await request_helpers.sequence_paginator(
+        pagination = pagination_helpers.get_pagination(request)
+        sequence_page = pagination_helpers.sequence_paginator(
             sequence=trip.segments,
-            limit=limit,
-            cursor=int(cursor) if cursor else 0,
+            pagination=pagination,
         )
 
         return models.JsonApiResponse(
@@ -58,16 +60,14 @@ class TripSegments(endpoints.HTTPEndpoint):
                     )
                     for segment in sequence_page.sequence
                 ],
-                links={
-                    "next": request_helpers.get_next_url(
-                        request.url_for(
-                            "ListTripSegments",
-                            tripId=request.path_params["tripId"],
-                        ),
-                        str(sequence_page.next_page_token),
-                        limit,
+                links=pagination_helpers.get_next_url(
+                    request.url_for(
+                        "ListTripSegments",
+                        tripId=request.path_params["tripId"],
                     ),
-                },
+                    str(sequence_page.next_page_token),
+                    pagination,
+                ),
             ),
         )
 
@@ -142,14 +142,13 @@ class TripsByTripSearch(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: trip_searches.Client = lagom.injectable,
     ) -> responses.Response:
-        cursor = request.query_params[request_helpers.PAGE_CURSOR_KEY]
-        limit = int(request.query_params[request_helpers.PAGE_LIMIT_KEY])
+        pagination = pagination_helpers.get_pagination(request)
 
         try:
             response = await client.list_trips_by_trip_search(
                 request.path_params["tripSearchId"],
-                cursor=cursor,
-                limit=limit,
+                cursor=pagination.cursor,
+                limit=pagination.limit,
             )
         except trip_searches.NotFoundError:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
@@ -163,15 +162,13 @@ class TripsByTripSearch(endpoints.HTTPEndpoint):
                     )
                     for trip in response.trips
                 ],
-                links={
-                    "next": request_helpers.get_next_url(
-                        request.url_for(
-                            "ViewTripsByTripSearch",
-                            tripSearchId=request.path_params["tripSearchId"],
-                        ),
-                        response.next_page_token,
-                        limit,
+                links=pagination_helpers.get_next_url(
+                    request.url_for(
+                        "ViewTripsByTripSearch",
+                        tripSearchId=request.path_params["tripSearchId"],
                     ),
-                },
+                    response.next_page_token,
+                    pagination,
+                ),
             ),
         )
