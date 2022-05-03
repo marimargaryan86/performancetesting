@@ -63,6 +63,9 @@ def _factory(
                 bootstrap.create_app(
                     custom_middlewares=[
                         Middleware(
+                            middlewares.RequestIdMiddleware,
+                        ),
+                        Middleware(
                             middlewares.ValidationMiddleware,
                             validator=validation.Validator(
                                 "openapi.json",

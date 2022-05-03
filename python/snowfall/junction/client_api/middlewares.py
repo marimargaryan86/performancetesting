@@ -2,6 +2,7 @@ import http
 from collections.abc import AsyncIterable
 from typing import Awaitable, Callable, Container, Optional
 
+import sentry_sdk
 from openapi_core.exceptions import OpenAPIError
 from openapi_core.templating.paths.exceptions import PathNotFound
 from openapi_core.validation.request.datatypes import OpenAPIRequest
@@ -52,6 +53,21 @@ async def _resolve_streaming_response(
 
 async def _read_bytes(generator: AsyncIterable[bytes]) -> bytes:
     return b"".join([chunk async for chunk in generator])
+
+
+class RequestIdMiddleware(base.BaseHTTPMiddleware):
+    async def dispatch(
+        self,
+        request: requests.Request,
+        call_next: Callable[[requests.Request], Awaitable[responses.Response]],
+    ) -> responses.Response:
+        response = await call_next(request)
+        transaction = sentry_sdk.Hub.current.scope.transaction
+
+        if transaction:
+            response.headers["X-Request-Id"] = transaction.trace_id
+
+        return response
 
 
 class ValidationMiddleware(base.BaseHTTPMiddleware):
