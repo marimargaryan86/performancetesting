@@ -3,12 +3,18 @@ from __future__ import annotations
 import functools
 from asyncio import Event
 from types import TracebackType
-from typing import Callable, Coroutine, Optional, Type, Union, cast
+from typing import Any, Callable, Coroutine, Optional, Type, Union, cast
 
 from aiormq import abc, connection
 from google.protobuf import any_pb2, message, symbol_database
 from pamqp import commands
+from sentry_sdk import Hub, tracing
 from structlog import get_logger
+
+from snowfall.stdlib.instrumentation.sentry import get_span
+
+_SPAN_PRODUCER_OP = "amqp.produce"
+_SPAN_CONSUMER_OP = "amqp.message"
 
 
 class Serializer(object):
@@ -66,11 +72,21 @@ class Producer(object):
         self._logger = get_logger(__name__)
 
     async def publish(self, msg: message.Message, routing_key: str) -> None:
-        await self._channel.basic_publish(
-            body=Serializer.serialize(msg),
-            exchange=self._exchange_name,
-            routing_key=routing_key,
-        )
+        with get_span(
+            _SPAN_PRODUCER_OP,
+            "{0}/{1}".format(self._exchange_name, routing_key),
+        ) as span:
+            await self._channel.basic_publish(
+                body=Serializer.serialize(msg),
+                exchange=self._exchange_name,
+                properties=commands.Basic.Properties(
+                    headers={
+                        header_key: header_value
+                        for header_key, header_value in span.iter_headers()
+                    },
+                ),
+                routing_key=routing_key,
+            )
 
         self._logger.info(
             "Message published.",
@@ -99,7 +115,8 @@ async def create_producer(
 class Message(object):
     def __init__(self, msg: abc.DeliveredMessage):
         self._acknowledged = False
-        self._body = Serializer.deserialize(msg.body)
+        self.body = Serializer.deserialize(msg.body)
+        self.headers: dict[str, Any] = msg.header.properties.headers or {}
         self._message = msg
 
     async def ack(self) -> None:
@@ -115,10 +132,6 @@ class Message(object):
     @property
     def acknowledged(self) -> bool:
         return self._acknowledged
-
-    @property
-    def body(self) -> message.Message:
-        return self._body
 
     async def nack(self) -> None:
         if self._acknowledged:
@@ -182,16 +195,27 @@ class Consumer(object):
         @functools.wraps(callback)
         async def decorator(incoming: abc.DeliveredMessage) -> None:
             msg = Message(incoming)
+            transaction = tracing.Transaction.continue_from_headers(
+                {
+                    metadata_key: metadata_value
+                    for metadata_key, metadata_value in msg.headers.values()
+                },
+                op=_SPAN_CONSUMER_OP,
+                name="{0}/{1}".format(self._queue_name, msg.routing_key),
+            )
 
-            try:
-                await callback(msg)
-            except Exception:  # noqa: PIE786
-                self._logger.exception()
+            with Hub(Hub.current).start_transaction(transaction) as span:
+                span.set_status("ok")
 
-                if not msg.acknowledged:
+                try:
+                    await callback(msg)
+                except Exception:  # noqa: PIE786
+                    self._logger.exception()
+                    span.set_status("nok")
+
+                if span.status != "ok" and not msg.acknowledged:
                     await msg.nack()
-            else:
-                if not msg.acknowledged:
+                elif not msg.acknowledged:
                     await msg.ack()
 
             self._logger.info(
