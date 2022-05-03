@@ -63,9 +63,11 @@ class GrpcClient(Client):
         self,
         offers: grpc_pb2_grpc.OfferServiceStub,
         offer_searches: grpc_pb2_grpc.OfferSearchServiceStub,
+        timeout: int = 10,
     ):
         self._offers = offers
         self._offer_searches = offer_searches
+        self._timeout = timeout
 
     async def create(
         self,
@@ -74,6 +76,7 @@ class GrpcClient(Client):
         try:
             response = await self._offer_searches.EnqueueOfferSearch(
                 grpc_pb2.EnqueueOfferSearchRequest(search=request),
+                timeout=self._timeout,
             )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError(exc.details()) from exc
@@ -84,6 +87,7 @@ class GrpcClient(Client):
         try:
             response = await self._offer_searches.GetOfferSearch(
                 grpc_pb2.GetOfferSearchRequest(id=offer_search_id),
+                timeout=self._timeout,
             )
         except grpc.aio.AioRpcError as exc:
             if exc.code() == grpc.StatusCode.NOT_FOUND:

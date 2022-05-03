@@ -120,7 +120,9 @@ class GrpcClient(Client):
         self,
         trips: trips_pb2_grpc.TripServiceStub,
         trip_searches: trips_pb2_grpc.TripSearchServiceStub,
+        timeout: int = 10,
     ):
+        self._timeout = timeout
         self._trips = trips
         self._trip_searches = trip_searches
 
@@ -138,7 +140,10 @@ class GrpcClient(Client):
             ),
         )
 
-        response = await self._trip_searches.EnqueueTripSearch(request)
+        response = await self._trip_searches.EnqueueTripSearch(
+            request,
+            timeout=self._timeout,
+        )
 
         return response.trip_search
 
@@ -148,6 +153,7 @@ class GrpcClient(Client):
                 trips_pb2.GetTripSearchDetailsRequest(
                     id=identifier,
                 ),
+                timeout=self._timeout,
             )
         except grpc.aio.AioRpcError as exc:
             if exc.code() == grpc.StatusCode.NOT_FOUND:
@@ -178,6 +184,6 @@ class GrpcClient(Client):
         if limit is not None:
             request.page_size = limit
 
-        response = await self._trips.ListTrips(request)
+        response = await self._trips.ListTrips(request, timeout=self._timeout)
 
         return TripsPage.from_proto(response)

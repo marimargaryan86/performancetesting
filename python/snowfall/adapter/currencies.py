@@ -45,8 +45,13 @@ class DictClient(Client):
 
 
 class GrpcClient(Client):
-    def __init__(self, currencies: currencies_pb2_grpc.CurrencyServiceStub):
+    def __init__(
+        self,
+        currencies: currencies_pb2_grpc.CurrencyServiceStub,
+        timeout: int = 10,
+    ):
         self._currencies = currencies
+        self._timeout = timeout
 
     async def convert(
         self,
@@ -61,6 +66,7 @@ class GrpcClient(Client):
                     from_currency=from_currency,
                     amount=amount,
                 ),
+                timeout=self._timeout,
             )
         except grpc.aio.AioRpcError as exc:
             if exc.code() == grpc.StatusCode.NOT_FOUND:

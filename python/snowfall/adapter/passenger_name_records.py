@@ -51,13 +51,16 @@ class GrpcClient(Client):
     def __init__(
         self,
         passenger_name_records: passenger_name_records_pb2_grpc.PassengerNameRecordServiceStub,
+        timeout: int = 10,
     ):
         self._passenger_name_records = passenger_name_records
+        self._timeout = timeout
 
     async def create(self) -> passenger_name_records_pb2.PassengerNameRecord:
         try:
             response = await self._passenger_name_records.CreatePassengerNameRecord(
                 passenger_name_records_pb2.CreatePassengerNameRecordRequest(),
+                timeout=self._timeout,
             )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError(exc.details()) from exc

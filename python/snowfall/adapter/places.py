@@ -64,13 +64,15 @@ class DictClient(Client):
 
 
 class GrpcClient(Client):
-    def __init__(self, places: places_pb2_grpc.PlacesServiceStub):
+    def __init__(self, places: places_pb2_grpc.PlacesServiceStub, timeout: int = 10):
         self._places = places
+        self._timeout = timeout
 
     async def get(self, place_id: str) -> models_pb2.Place:
         try:
             response = await self._places.GetPlace(
                 places_pb2.GetPlaceRequest(id=place_id),
+                timeout=self._timeout,
             )
         except grpc.aio.AioRpcError as exc:
             if exc.code() == grpc.StatusCode.NOT_FOUND:
@@ -94,6 +96,6 @@ class GrpcClient(Client):
         if limit is not None:
             request.page_size = limit
 
-        response = await self._places.ListPlaces(request)
+        response = await self._places.ListPlaces(request, timeout=self._timeout)
 
         return await PlacesPage.from_proto(response)

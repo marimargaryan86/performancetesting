@@ -69,13 +69,19 @@ class DictClient(Client):
 
 
 class GrpcClient(Client):
-    def __init__(self, schedules: schedules_pb2_grpc.ScheduleServiceStub):
+    def __init__(
+        self,
+        schedules: schedules_pb2_grpc.ScheduleServiceStub,
+        timeout: int = 10,
+    ):
         self._schedules = schedules
+        self._timeout = timeout
 
     async def get(self, schedule_id: str) -> models_pb2.Schedule:
         try:
             response = await self._schedules.GetSchedule(
                 schedules_pb2.GetScheduleRequest(id=schedule_id),
+                timeout=self._timeout,
             )
         except grpc.aio.AioRpcError as exc:
             if exc.code() == grpc.StatusCode.NOT_FOUND:
@@ -101,7 +107,10 @@ class GrpcClient(Client):
             request.page_size = limit
 
         try:
-            response = await self._schedules.ListSchedules(request)
+            response = await self._schedules.ListSchedules(
+                request,
+                timeout=self._timeout,
+            )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError() from exc
 

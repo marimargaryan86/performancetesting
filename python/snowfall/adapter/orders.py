@@ -98,8 +98,9 @@ class DictClient(Client):
 
 
 class GrpcClient(Client):
-    def __init__(self, orders: orders_pb2_grpc.OrderServiceStub):
+    def __init__(self, orders: orders_pb2_grpc.OrderServiceStub, timeout: int = 10):
         self._orders = orders
+        self._timeout = timeout
 
     async def create(self, offers: Sequence[offers_pb2.Offer]) -> models_pb2.Order:
         try:
@@ -107,6 +108,7 @@ class GrpcClient(Client):
                 orders_pb2.EnqueueOrderRequest(
                     offers=offers,
                 ),
+                timeout=self._timeout,
             )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError(exc.details()) from exc
@@ -125,7 +127,7 @@ class GrpcClient(Client):
         if limit is not None:
             request.page_size = limit
 
-        response = await self._orders.ListOrders(request)
+        response = await self._orders.ListOrders(request, timeout=self._timeout)
 
         return await OrdersPage.from_proto(response)
 
@@ -133,6 +135,7 @@ class GrpcClient(Client):
         try:
             response = await self._orders.GetOrder(
                 orders_pb2.GetOrderRequest(id=order_id),
+                timeout=self._timeout,
             )
         except grpc.aio.AioRpcError as exc:
             if exc.code() == grpc.StatusCode.NOT_FOUND:
@@ -154,6 +157,7 @@ class GrpcClient(Client):
                 orders_pb2.AddOffersToOrderRequest(
                     offers=offers,
                 ),
+                timeout=self._timeout,
             )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError(exc.details()) from exc

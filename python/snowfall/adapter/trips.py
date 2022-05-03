@@ -68,12 +68,16 @@ class DictClient(Client):
 
 
 class GrpcClient(Client):
-    def __init__(self, trips: trips_pb2_grpc.TripServiceStub):
+    def __init__(self, trips: trips_pb2_grpc.TripServiceStub, timeout: int = 10):
+        self._timeout = timeout
         self._trips = trips
 
     async def get(self, trip_id: str) -> models_pb2.TripReference:
         try:
-            response = await self._trips.GetTrip(trips_pb2.GetTripRequest(id=trip_id))
+            response = await self._trips.GetTrip(
+                trips_pb2.GetTripRequest(id=trip_id),
+                timeout=self._timeout,
+            )
         except grpc.aio.AioRpcError as exc:
             if exc.code() == grpc.StatusCode.NOT_FOUND:
                 raise NotFoundError(
@@ -98,7 +102,7 @@ class GrpcClient(Client):
             request.page_size = limit
 
         try:
-            response = await self._trips.ListTrips(request)
+            response = await self._trips.ListTrips(request, timeout=self._timeout)
         except grpc.aio.AioRpcError as exc:
             raise UnknownError() from exc
 

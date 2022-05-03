@@ -93,13 +93,15 @@ class DictClient(Client):
 
 
 class GrpcClient(Client):
-    def __init__(self, offers: grpc_pb2_grpc.OfferServiceStub):
+    def __init__(self, offers: grpc_pb2_grpc.OfferServiceStub, timeout: int = 10):
         self._offers = offers
+        self._timeout = timeout
 
     async def get(self, offer_id: str) -> models_pb2.OfferAggregate:
         try:
             response = await self._offers.GetOffer(
                 grpc_pb2.GetOfferRequest(id=offer_id),
+                timeout=self._timeout,
             )
         except grpc.aio.AioRpcError as exc:
             if exc.code() == grpc.StatusCode.NOT_FOUND:
@@ -125,7 +127,7 @@ class GrpcClient(Client):
             request.page_size = limit
 
         try:
-            response = await self._offers.ListOffers(request)
+            response = await self._offers.ListOffers(request, timeout=self._timeout)
         except grpc.aio.AioRpcError as exc:
             raise UnknownError(exc.details()) from exc
 
@@ -150,7 +152,7 @@ class GrpcClient(Client):
             request.page_size = limit
 
         try:
-            response = await self._offers.ListOffers(request)
+            response = await self._offers.ListOffers(request, timeout=self._timeout)
         except grpc.aio.AioRpcError as exc:
             raise UnknownError() from exc
 

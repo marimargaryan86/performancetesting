@@ -35,13 +35,15 @@ class DictClient(Client):
 
 
 class GrpcClient(Client):
-    def __init__(self, segments: trips_pb2_grpc.TripServiceStub):
+    def __init__(self, segments: trips_pb2_grpc.TripServiceStub, timeout: int = 10):
         self._segments = segments
+        self._timeout = timeout
 
     async def get(self, segment_id: str) -> models_pb2.SegmentReference:
         try:
             response = await self._segments.GetSegment(
                 trips_pb2.GetSegmentRequest(id=segment_id),
+                timeout=self._timeout,
             )
         except grpc.aio.AioRpcError as exc:
             if exc.code() == grpc.StatusCode.NOT_FOUND:
