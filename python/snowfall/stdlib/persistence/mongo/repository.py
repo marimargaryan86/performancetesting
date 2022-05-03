@@ -32,6 +32,11 @@ Proto = TypeVar("Proto", bound=Message)
 Record = TypeVar("Record")
 _MongoDict = dict[str, Any]
 
+_DEFAULT_TIMEOUT = datetime.timedelta(seconds=10)
+_MILLISECONDS_MULTIPLIER = 1000
+_MAX_TIME_MS_CAMEL = "maxTimeMS"
+_MAX_TIME_MS_SNAKE = "max_time_ms"
+
 
 def _configure_collection(
     collection: motor_asyncio.AsyncIOMotorCollection,
@@ -65,13 +70,31 @@ class RepositoryProtocol(Protocol[Record]):
 
 class _AbstractRepository(abc.ABC, Generic[Record]):  # noqa: WPS214
     _indexes: list[pymongo.IndexModel] = []
+    _timeout_kwargs = {
+        core.AgnosticCollection.aggregate: _MAX_TIME_MS_CAMEL,
+        core.AgnosticCollection.count_documents: _MAX_TIME_MS_CAMEL,
+        core.AgnosticCollection.create_index: _MAX_TIME_MS_CAMEL,
+        core.AgnosticCollection.create_indexes: _MAX_TIME_MS_CAMEL,
+        core.AgnosticCollection.distinct: _MAX_TIME_MS_CAMEL,
+        core.AgnosticCollection.drop_index: _MAX_TIME_MS_CAMEL,
+        core.AgnosticCollection.drop_indexes: _MAX_TIME_MS_CAMEL,
+        core.AgnosticCollection.estimated_document_count: _MAX_TIME_MS_CAMEL,
+        core.AgnosticCollection.find: _MAX_TIME_MS_SNAKE,
+        core.AgnosticCollection.find_one: _MAX_TIME_MS_SNAKE,
+        core.AgnosticCollection.find_one_and_delete: _MAX_TIME_MS_CAMEL,
+        core.AgnosticCollection.find_one_and_replace: _MAX_TIME_MS_CAMEL,
+        core.AgnosticCollection.find_one_and_update: _MAX_TIME_MS_CAMEL,
+        core.AgnosticCollection.find_raw_batches: _MAX_TIME_MS_SNAKE,
+    }
 
     def __init__(
         self,
         collection: motor_asyncio.AsyncIOMotorCollection,
+        timeout: datetime.timedelta = _DEFAULT_TIMEOUT,
     ) -> None:
-        self._has_created_indexes = False
         self._collection = _configure_collection(collection)
+        self._has_created_indexes = False
+        self._timeout = timeout.total_seconds() * _MILLISECONDS_MULTIPLIER
 
     async def _create_indexes(self) -> None:
         self._has_created_indexes = True
@@ -116,6 +139,11 @@ class _AbstractRepository(abc.ABC, Generic[Record]):  # noqa: WPS214
         # todo: can't run this in __init__, but this isn't pretty...
         if not self._has_created_indexes:
             await self._create_indexes()
+
+        timeout_kwarg = self._timeout_kwargs.get(query)
+
+        if timeout_kwarg and timeout_kwarg not in kwargs:
+            kwargs[timeout_kwarg] = self._timeout
 
         # _find_with_cursor sends a special kwarg pymongo don't like
         filter_pre_cursor = kwargs.pop("filter_pre_cursor", {})
