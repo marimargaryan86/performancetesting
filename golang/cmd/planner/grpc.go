@@ -50,13 +50,7 @@ func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *plan
 	}
 
 	destinations = append(destinations, ps.Stops[destination]...)
-	minDeparture := time.Now()
-	maxDeparture := minDeparture.Add(24 * 90 * time.Hour)
 	departureTime := time.Unix(req.DepartureAfter, 0)
-
-	if departureTime.Before(minDeparture) || departureTime.After(maxDeparture) {
-		return &planner.SearchJourneyResponse{}, status.Errorf(codes.InvalidArgument, "invalid departure time")
-	}
 
 	results, err := ps.Planner.Search(origins, destinations, departureTime, []models.Schedule_Type{
 		models.Schedule_TYPE_UNSPECIFIED,
