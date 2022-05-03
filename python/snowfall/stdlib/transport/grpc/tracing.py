@@ -3,6 +3,7 @@ from typing import AsyncIterable, Callable, Iterator, Union
 
 from google.protobuf.message import Message
 from grpc import aio
+from grpc_status import rpc_status
 from sentry_sdk import Hub, tracing
 
 from snowfall.stdlib.instrumentation.sentry import get_span
@@ -99,7 +100,6 @@ class TracingServerInterceptor(interceptor.ServerInterceptor):
         name: str,
         context: aio.ServicerContext,
     ) -> Iterator[tracing.Span]:
-        hub = Hub(Hub.current)
         transaction = tracing.Transaction.continue_from_headers(
             {
                 metadata_key: metadata_value
@@ -109,11 +109,12 @@ class TracingServerInterceptor(interceptor.ServerInterceptor):
             name=name,
         )
 
-        with hub.start_transaction(transaction) as span:
+        with Hub(Hub.current).start_transaction(transaction) as span:
             span.set_status("ok")
 
             try:
                 yield span
             finally:
                 if context.code():
-                    span.set_status(context.code().value[1].replace(" ", "_"))
+                    status = rpc_status.code_to_grpc_status_code(context.code())
+                    span.set_status(status.value[1].replace(" ", "_"))

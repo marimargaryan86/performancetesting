@@ -3,6 +3,7 @@ python_requirements(
         "grpcio": ["grpc"],
         "grpcio-health-checking": ["grpc_health"],
         "grpcio-reflection": ["grpc_reflection"],
+        "grpcio-status": ["grpc_status"],
         "protobuf": ["google.protobuf"],
         "pyjwt": ["jwt"],
         "pytest-httpx": ["pytest_httpx"],

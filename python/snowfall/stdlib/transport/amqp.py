@@ -198,7 +198,7 @@ class Consumer(object):
             transaction = tracing.Transaction.continue_from_headers(
                 {
                     metadata_key: metadata_value
-                    for metadata_key, metadata_value in msg.headers.values()
+                    for metadata_key, metadata_value in msg.headers.items()
                 },
                 op=_SPAN_CONSUMER_OP,
                 name="{0}/{1}".format(self._queue_name, msg.routing_key),
