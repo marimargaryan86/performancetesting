@@ -1,4 +1,5 @@
 import asyncio
+import types
 from datetime import date
 from typing import Any, Dict, Optional, Union
 
@@ -24,6 +25,247 @@ from snowfall.vendor.sat.models.search import SearchResponse
 from snowfall.vendor.sat.models.search_result_details import SearchResultDetails
 from snowfall.vendor.sat.models.search_result_selection import (
     SearchResultSelectionResponse,
+)
+
+_ALL_STATIONS = types.MappingProxyType(
+    {
+        # Milan
+        "SAT_IT_MI_CORPK": [
+            "SAT_IT_MI_QEFCI",
+            "SAT_IT_MI_SBFZC",
+            "SAT_IT_MI_PFLRJ",
+            "SAT_IT_MI_CJUPA",
+            "SAT_IT_MI_APRMW",
+            "SAT_IT_MI_BOUFZ",
+            "SAT_IT_MI_GKBYM",
+            "SAT_IT_FE_XJSDM",
+            "SAT_IT_SO_CFPKX",
+            "SAT_IT_MI_CMILH",
+            "SAT_IT_MI_FGWKM",
+            "SAT_IT_MI_SEGCW",
+            "SAT_IT_MI_PABZX",
+            "SAT_IT_MI_OXCEQ",
+            "SAT_IT_MI_DAOIK",
+            "SAT_IT_MI_YWSPI",
+            "SAT_IT_MI_WYLVA",
+            "SAT_IT_MI_BWSYJ",
+            "SAT_IT_MI_LWBYR",
+            "SAT_IT_MI_CIRFV",
+            "SAT_IT_MI_QCTJI",
+            "SAT_IT_MI_FGVIJ",
+            "SAT_IT_MI_IKCMH",
+            "SAT_IT_MI_CMLWP",
+            "SAT_IT_MI_KUJFN",
+            "SAT_IT_MI_UDESI",
+            "SAT_IT_MI_WEZUL",
+        ],
+        # Paris
+        "SAT_FR_PA_WXNGQ": [
+            "SAT_FR_PA_JUAYV",
+            "SAT_FR_PA_FQZRE",
+            "SAT_FR_PA_SJPTG",
+            "SAT_FR_PA_NQAHE",
+            "SAT_FR_PA_CDJGK",
+            "SAT_FR_PA_IEURS",
+            "SAT_FR_PA_KDIEJ",
+            "SAT_FR_PA_LQYTV",
+            "SAT_FR_PA_UZYNA",
+            "SAT_FR_PA_FHTKG",
+            "SAT_FR_PA_OGFZW",
+            "SAT_FR_PA_XBLMP",
+            "SAT_FR_PA_ZBKAL",
+            "SAT_FR_PA_CPFNI",
+            "SAT_FR_PA_UERLX",
+            "SAT_FR_PA_JCLTK",
+            "SAT_FR_LE_PGOKY",
+            "SAT_FR_LE_QJIAL",
+        ],
+        # Genoa
+        "SAT_IT_GE_JMAZN": [
+            "SAT_IT_GE_ATUJP",
+            "SAT_IT_GE_IBCZH",
+            "SAT_IT_GE_AOJNL",
+            "SAT_IT_GE_ZRAXE",
+            "SAT_IT_GE_UFRBD",
+            "SAT_IT_GE_RFSUQ",
+            "SAT_IT_GE_FXPRG",
+            "SAT_IT_GE_CXJBO",
+            "SAT_IT_GE_VFNQI",
+            "SAT_IT_GE_QTPJD",
+            "SAT_IT_GE_GSPFT",
+            "SAT_IT_GE_MHYRU",
+            "SAT_IT_GE_FQRVH",
+            "SAT_IT_GE_MIKEX",
+            "SAT_IT_GE_WYOSU",
+            "SAT_IT_GE_WMUCZ",
+            "SAT_IT_GE_GZBEL",
+            "SAT_IT_GE_HCRZW",
+            "SAT_IT_GE_QMXSW",
+            "SAT_IT_VE_UZVTD",
+            "SAT_IT_GE_ROQNT",
+            "SAT_IT_GE_BSOMQ",
+        ],
+        # Rimini
+        "SAT_IT_RI_RNQMC": [
+            "SAT_IT_RI_WJCXV",
+            "SAT_IT_RI_LXECM",
+            "SAT_IT_RI_WFSUK",
+            "SAT_IT_RI_QSMOU",
+            "SAT_IT_RI_WUIKB",
+        ],
+        # Reggio Di Calabria
+        "SAT_IT_RE_YQWXH": [
+            "SAT_IT_RE_HWFVT",
+            "SAT_IT_RE_NFGMS",
+            "SAT_IT_RE_HVSTO",
+            "SAT_IT_RE_SZDXQ",
+            "SAT_IT_RE_JHKAS",
+            "SAT_IT_RE_PDRCV",
+            "SAT_IT_RE_XLHBE",
+            "SAT_IT_RE_HDUNZ",
+            "SAT_IT_RE_RCLWB",
+            "SAT_IT_RE_VACRW",
+            "SAT_IT_RE_ZPRKE",
+            "SAT_IT_RE_XQKGV",
+            "SAT_IT_RE_XGBVE",
+        ],
+        # Bologna
+        "SAT_IT_BO_KXSZB": [
+            "SAT_IT_BO_SOVAI",
+            "SAT_IT_BO_RZUJO",
+            "SAT_IT_BO_KHGSY",
+            "SAT_IT_BO_LPSQJ",
+            "SAT_IT_BO_SNPFI",
+            "SAT_IT_BO_KMABS",
+            "SAT_IT_BO_NEUVG",
+            "SAT_IT_BO_KGCNL",
+            "SAT_IT_BO_BIWMX",
+            "SAT_IT_BO_XGMBS",
+        ],
+        # Catania
+        "SAT_IT_CA_LNKYP": [
+            "SAT_IT_CA_LNOEB",
+            "SAT_IT_CA_VFDAQ",
+            "SAT_IT_CA_JMCZK",
+            "SAT_IT_CA_VFOLP",
+        ],
+        # Florence
+        "SAT_IT_FI_QFKWG": [
+            "SAT_IT_FI_OGDEY",
+            "SAT_IT_FI_BOHWK",
+            "SAT_IT_FI_NMJVX",
+            "SAT_IT_FI_VJCOH",
+            "SAT_IT_FI_HSZYB",
+            "SAT_IT_FI_PRBID",
+            "SAT_IT_FI_WKJIP",
+            "SAT_IT_FI_JLVPD",
+            "SAT_IT_FI_SZOBJ",
+            "SAT_IT_FI_JADHU",
+        ],
+        # Benevento
+        "SAT_IT_BE_XFSRC": [
+            "SAT_IT_BE_IOAGL",
+            "SAT_IT_BE_XBLDQ",
+            "SAT_IT_BE_RJMGE",
+            "SAT_IT_BE_NJAHE",
+        ],
+        # Bari
+        "SAT_IT_BA_KHRVG": [
+            "SAT_IT_BA_DVSUO",
+            "SAT_IT_BA_OLUGM",
+            "SAT_IT_BA_SRUAW",
+            "SAT_IT_BA_IFSWG",
+            "SAT_IT_PA_JPNDA",
+            "SAT_IT_BA_GVDHX",
+            "SAT_IT_BA_IWLOZ",
+            "SAT_IT_BA_GUYCD",
+            "SAT_IT_BA_STUHL",
+            "SAT_IT_BA_AVOJI",
+            "SAT_IT_ZO_SRGZL",
+        ],
+        # Turin
+        "SAT_IT_TO_LIPOA": [
+            "SAT_IT_TO_ZAMWU",
+            "SAT_IT_TO_ZHXDJ",
+            "SAT_IT_TU_ZTDFW",
+            "SAT_IT_TO_GNMEQ",
+            "SAT_IT_CI_IVTXD",
+            "SAT_IT_TO_PRXOT",
+            "SAT_IT_TO_NIAMH",
+            "SAT_IT_TO_LRWXU",
+        ],
+        # Venice
+        "SAT_IT_VE_ANEMH": [
+            "SAT_IT_VE_DQSJV",
+            "SAT_IT_VE_PDCSE",
+            "SAT_IT_VE_IACBO",
+            "SAT_IT_VE_THPRZ",
+            "SAT_IT_VE_FQYNO",
+        ],
+        # Pisa
+        "SAT_IT_PI_SYKMI": [
+            "SAT_IT_PI_AEJXG",
+            "SAT_IT_PI_LFYZU",
+            "SAT_IT_PI_CPGSN",
+        ],
+        # Rome
+        "SAT_IT_RO_VJWUO": [
+            "SAT_IT_RO_UFWPE",
+            "SAT_IT_RO_JXWUR",
+            "SAT_IT_RO_NWKZD",
+            "SAT_IT_RO_JDHFT",
+            "SAT_IT_RO_YBMAF",
+            "SAT_IT_RO_KALQU",
+            "SAT_IT_RO_PJNOY",
+            "SAT_IT_RO_BIDEX",
+            "SAT_IT_RO_JKHAL",
+            "SAT_IT_RO_HBRKA",
+            "SAT_IT_RO_ENTBH",
+            "SAT_IT_RO_DREOM",
+            "SAT_IT_RO_HWCUR",
+            "SAT_IT_RO_TLECK",
+        ],
+        # Civitavecchia
+        "SAT_IT_CI_DOEQL": [
+            "SAT_IT_CI_MWVHO",
+            "SAT_IT_CI_BZXYH",
+            "SAT_IT_CI_BNKVA",
+        ],
+        # Naples
+        "SAT_IT_NA_ZSNVP": [
+            "SAT_IT_NA_JUEIB",
+            "SAT_IT_AF_WVXOP",
+            "SAT_IT_NA_BZHOP",
+            "SAT_IT_NA_ODUYR",
+            "SAT_IT_NA_NQMHA",
+            "SAT_IT_NA_VJMAT",
+            "SAT_IT_NA_XVNEY",
+            "SAT_IT_NA_LZRAC",
+            "SAT_IT_NA_QHBLC",
+            "SAT_IT_NA_UJFME",
+            "SAT_IT_NA_WHSEV",
+            "SAT_IT_NA_FGOAN",
+            "SAT_IT_NA_EZTRC",
+        ],
+        # Palermo
+        "SAT_IT_PA_WYQEI": [
+            "SAT_IT_PA_FMTAG",
+            "SAT_IT_PA_BJSWP",
+            "SAT_IT_PA_UVSYI",
+            "SAT_IT_LO_VQSRC",
+            "SAT_IT_PU_KRYZH",
+            "SAT_IT_GU_MGFYR",
+        ],
+        # Ancona
+        "SAT_IT_AN_LBQVT": [
+            "SAT_IT_AN_AHQSE",
+            "SAT_IT_VI_CUMTL",
+            "SAT_IT_AN_GSYUZ",
+            "SAT_IT_AN_FNGMR",
+            "SAT_IT_AN_DRSIZ",
+            "SAT_IT_AN_LCWZF",
+        ],
+    },
 )
 
 
@@ -107,6 +349,11 @@ class SATClient(object):  # noqa: WPS214
         self._api_search_timeout = api_search_timeout
         self._session = client
         self._semaphore = asyncio.BoundedSemaphore(api_search_requests_limit)
+        self._all_stations = {
+            station_id: global_station_id
+            for global_station_id, station_ids in _ALL_STATIONS.items()
+            for station_id in station_ids
+        }
 
     async def get_general_search_results(
         self,
@@ -123,11 +370,15 @@ class SATClient(object):  # noqa: WPS214
         )
 
         async with self._semaphore:
+            # As per SAT docs it is preferable to use city's "all stations" variant
             response = await self._session.get(
                 "{0}/{1}/{2}".format(
                     self._api_search_url,
-                    request.origin_id,
-                    request.destination_id,
+                    self._all_stations.get(request.origin_id, request.origin_id),
+                    self._all_stations.get(
+                        request.destination_id,
+                        request.destination_id,
+                    ),
                 ),
                 params=request_params,
                 timeout=self._api_search_timeout,
