@@ -202,16 +202,14 @@ class LegsByTripSearchId(endpoints.HTTPEndpoint):
                     )
                     for leg in legs_page.legs
                 ],
-                links={
-                    "next": pagination_helpers.get_next_url(
-                        request.url_for(
-                            "ListLegsByTripSearchId",
-                            tripSearchId=request.path_params["tripSearchId"],
-                        ),
-                        legs_page.next_page_token,
-                        pagination,
+                links=pagination_helpers.get_next_url(
+                    request.url_for(
+                        "ListLegsByTripSearchId",
+                        tripSearchId=request.path_params["tripSearchId"],
                     ),
-                },
+                    legs_page.next_page_token,
+                    pagination,
+                ),
             ),
         )
 
