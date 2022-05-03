@@ -54,10 +54,12 @@ class DictClient(Client):
         self._legs = {leg.id: leg for leg in legs}
 
     async def get(self, leg_id: str) -> models_pb2.Leg:
-        if leg_id not in self._legs:
+        leg = self._legs.get(leg_id)
+
+        if not leg:
             raise NotFoundError()
 
-        return models_pb2.Leg(id=leg_id)
+        return leg
 
     async def find_by_ids(
         self,

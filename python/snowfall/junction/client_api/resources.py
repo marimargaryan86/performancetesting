@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import zoneinfo
 from typing import Any, Optional, Sequence
 
 import pydantic
@@ -142,8 +143,12 @@ class OfferSegmentLeg(models.BaseModel):
         return cls(
             origin=Point.from_proto(leg.origin),
             destination=Point.from_proto(leg.destination),
-            departureAt=protobuf.protobuf_to_datetime(leg.departure_at),
-            arrivalAt=protobuf.protobuf_to_datetime(leg.arrival_at),
+            departureAt=protobuf.protobuf_to_datetime(leg.departure_at).astimezone(
+                zoneinfo.ZoneInfo(leg.origin.time_zone),
+            ),
+            arrivalAt=protobuf.protobuf_to_datetime(leg.arrival_at).astimezone(
+                zoneinfo.ZoneInfo(leg.destination.time_zone),
+            ),
         )
 
 
@@ -277,10 +282,10 @@ class LegResource(models.Resource):
             attributes={
                 "departureAt": protobuf.protobuf_to_datetime(
                     leg.departure_at,
-                ),
+                ).astimezone(zoneinfo.ZoneInfo(leg.origin.time_zone)),
                 "arrivalAt": protobuf.protobuf_to_datetime(
                     leg.arrival_at,
-                ),
+                ).astimezone(zoneinfo.ZoneInfo(leg.destination.time_zone)),
                 "operator": leg.agency_name,
                 "origin": Point.from_proto(leg.origin),
                 "destination": Point.from_proto(leg.destination),

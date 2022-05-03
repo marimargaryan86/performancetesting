@@ -192,6 +192,14 @@ def get_legs() -> list[models_pb2.Leg]:
 def generate_leg(identifier: str) -> models_pb2.Leg:
     return models_pb2.Leg(
         id=identifier,
+        origin=generate_point(str(uuid.uuid4())),
+        destination=generate_point(str(uuid.uuid4())),
+        departure_at=protobuf.datetime_to_protobuf(
+            datetime.datetime.now(),
+        ),
+        arrival_at=protobuf.datetime_to_protobuf(
+            datetime.datetime.now(),
+        ),
     )
 
 
