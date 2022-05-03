@@ -25,7 +25,7 @@ while IFS="" read -r line || [ -n "${line}" ]; do
 
 		if [ "${is_likely_compatible}" -eq "1" ]; then
 			echo -e "${COLOR_GREEN}${package}==${current_version} -> ${package}==${latest_version}${COLOR_RESET}"
-			sed "s/^${package}==${current_version}$/${package}==${latest_version}/g" "${requirements_file}" | sponge "${requirements_file}"
+			sed "s/^${package/[/\\[}==${current_version}$/${package/[/\\[}==${latest_version}/g" "${requirements_file}" | sponge "${requirements_file}"
 			has_changes=1
 		else
 			echo -e "${COLOR_RED}${package}==${current_version} -> ${package}==${latest_version}${COLOR_RESET}"
