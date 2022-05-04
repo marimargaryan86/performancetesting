@@ -33,10 +33,16 @@ class Resource(ResourceIdentifier):
 ResourceType = Union[ResourceIdentifier, Sequence[ResourceIdentifier]]
 
 
+class ErrorSource(BaseModel):
+    pointer: str
+
+
 class Error(BaseModel):
-    status: str
-    title: str
-    detail: str
+    status: Optional[str]
+    code: Optional[str]
+    title: Optional[str]
+    detail: Optional[str]
+    source: Optional[ErrorSource]
 
 
 class Body(BaseModel):

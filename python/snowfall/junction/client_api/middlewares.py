@@ -5,6 +5,7 @@ from typing import Awaitable, Callable, Container, Optional
 import sentry_sdk
 from openapi_core.exceptions import OpenAPIError
 from openapi_core.templating.paths.exceptions import PathNotFound
+from openapi_core.unmarshalling.schemas.exceptions import InvalidSchemaValue
 from openapi_core.validation.request.datatypes import OpenAPIRequest
 from starlette import applications, exceptions, requests, responses, status, types
 from starlette.middleware import base
@@ -93,8 +94,10 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
             openapi_result = await self._validator.validate_request(openapi_request)
         except PathNotFound:
             raise exceptions.HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-        except OpenAPIError as err:
+        except InvalidSchemaValue as err:
             return await handlers.validation_error_handler(resolved_request, err)
+        except OpenAPIError:
+            raise exceptions.HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
         resolved_request.scope["jwt"] = openapi_result.security.get("jwt")
         resolved_request.scope["query_string"] = openapi_result.parameters.query
