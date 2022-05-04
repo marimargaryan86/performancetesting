@@ -27,7 +27,10 @@ STOPS = (
     "776e5292-7314-4fbf-9a3a-ffb9e039430a",
     "099639fb-ef8f-43f5-8200-423e09d356fd",
 )
-LEGS = ("fe8f2db4-0913-4ece-a3fe-2b3ebecc72ff",)
+LEGS = (
+    "fe8f2db4-0913-4ece-a3fe-2b3ebecc72ff",
+    "71d3750c-d5d4-47aa-9680-e575c34a2979",
+)
 ORDERS = (
     "e61d5e73-bb7e-408f-861d-2be84218d1c4",
     "d1c4dec6-be70-4823-bb4c-bff6164de1a7",
