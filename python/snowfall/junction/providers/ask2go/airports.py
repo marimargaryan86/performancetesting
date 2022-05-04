@@ -23,8 +23,7 @@ class AirportRepository(object):
     ):
         self._airports = {
             airport.iata: _make_airport(airport, coordinates[airport.iata])
-            for airport in airports
-            if airport.iata in coordinates
+            for airport in _filter_airports(airports, coordinates)
         }
 
     def get_by_iata(self, iata: str) -> Airport:
@@ -41,8 +40,20 @@ def create_airports_mapping(
             longitude=coordinates[airport.iata]["lon"],
             mapped_value=_make_airport(airport, coordinates[airport.iata]),
         )
+        for airport in _filter_airports(airports, coordinates)
+    ]
+
+
+def _filter_airports(
+    airports: Sequence[common.Airport],
+    coordinates: Mapping[str, Mapping[str, Any]],
+) -> list[common.Airport]:
+    return [
+        airport
         for airport in airports
         if airport.iata in coordinates
+        and airport.language == "en"
+        and airport.is_parent is False
     ]
 
 

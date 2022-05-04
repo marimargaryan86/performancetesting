@@ -62,13 +62,21 @@ def ask2go_adapter(
 @pytest.fixture
 def ask2go_airports() -> list[common.Airport]:
     return [
-        common.Airport(iata="ARN", airport_name="Arlanda"),
-        common.Airport(iata="LHR", airport_name="Heathrow"),
-        common.Airport(iata="DMM", airport_name="King Fahad International"),
-        common.Airport(iata="PBM", airport_name="Zanderij International"),
-        common.Airport(iata="ORG"),
-        common.Airport(iata="WRY", airport_name="Westray"),
-        common.Airport(iata="PPW", airport_name="Papa Westray"),
+        common.Airport(iata="ARN", language="en", airport_name="Arlanda"),
+        common.Airport(iata="LHR", language="en", airport_name="Heathrow"),
+        common.Airport(
+            iata="DMM",
+            language="en",
+            airport_name="King Fahad International",
+        ),
+        common.Airport(
+            iata="PBM",
+            language="en",
+            airport_name="Zanderij International",
+        ),
+        common.Airport(iata="ORG", language="en"),
+        common.Airport(iata="WRY", language="en", airport_name="Westray"),
+        common.Airport(iata="PPW", language="en", airport_name="Papa Westray"),
     ]
 
 
