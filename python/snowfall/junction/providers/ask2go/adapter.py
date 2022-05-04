@@ -129,7 +129,7 @@ class Ask2GoAdapter(object):
                                 id=search_segment.id,
                                 cabin_class=models_pb2.CabinClass(
                                     type=models.cabin_to_proto(segment.cabin),
-                                    marketing_name=segment.cabin,
+                                    marketing_name=str(segment.cabin),
                                 ),
                             ),
                         ],

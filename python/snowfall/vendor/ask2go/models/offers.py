@@ -44,7 +44,7 @@ class TripSegment(CamelCaseBaseModel):
     id: Optional[UUID]  # noqa: A003
     duration: time
     distance: float
-    cabin: str
+    cabin: Optional[str]
     is_technical_stop: bool
     aircraft: SegmentAircraft
     availability: Optional[SegmentAvailability]
