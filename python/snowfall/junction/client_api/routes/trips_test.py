@@ -176,6 +176,40 @@ class TestTripSearches(object):
         )
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
+    @freezegun.freeze_time("2022-04-30T08:30:30.826Z")
+    async def test_departure_date_without_tz_returns_unprocessable_entity(
+        self,
+        client: testclient.TestClient,
+    ) -> None:
+        request = {
+            "data": {
+                "attributes": {
+                    "departureAfter": "2022-04-30T08:34:00.985933",
+                },
+                "relationships": {
+                    "origin": {
+                        "data": {
+                            "id": fixtures.PLACES[0],
+                            "type": "places",
+                        },
+                    },
+                    "destination": {
+                        "data": {
+                            "id": fixtures.PLACES[1],
+                            "type": "places",
+                        },
+                    },
+                },
+                "type": "trip-searches",
+            },
+        }
+        response = client.post(
+            "/trips/searches",
+            json=request,
+            headers={"Content-Type": "application/vnd.api+json"},
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
     @freezegun.freeze_time("2022-04-30T08:34:30.826Z")
     async def test_trip_search_post_returns_resource(
         self,

@@ -12,7 +12,9 @@ Relationship = Union[AnyMapping, Sequence[AnyMapping]]
 class BaseModel(pydantic.BaseModel):
     class Config(object):
         json_encoders = {
-            datetime.datetime: lambda datetime_object: datetime_object.isoformat(),
+            datetime.datetime: lambda datetime_object: datetime_object.isoformat(
+                timespec="seconds",
+            ),
         }
 
 

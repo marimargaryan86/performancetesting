@@ -9,11 +9,12 @@ python_requirements(
         "pytest-httpx": ["pytest_httpx"],
         "python-dateutil": ["dateutil"],
         "python-rapidjson": ["rapidjson"],
+        "rfc3339-validator": ["rfc3339_validator"],
         "setuptools": ["easy_install", "pkg_resources", "setuptools"],
     },
     overrides={
         "mongomock-motor": {"dependencies": ["#setuptools"]},
-        "openapi-core": {"dependencies": ["#setuptools"]},
+        "openapi-core": {"dependencies": ["#setuptools", "#rfc3339-validator"]},
         "protobuf": {"dependencies": ["#types-protobuf"]},
         "starlette": {"dependencies": ["#requests"]},
     },
