@@ -363,8 +363,8 @@ class SATClient(object):  # noqa: WPS214
         request_params = httpx.QueryParams(
             triptype=request.trip_type.value,
             passengers=request.number_of_passengers,
-            ddate=request.departure_date,
-            rdate=request.return_date,
+            ddate=request.departure_date.isoformat(),
+            rdate=request.return_date.isoformat() if request.return_date else "",
             email=self._email,
             password=self._password_search,
         )
