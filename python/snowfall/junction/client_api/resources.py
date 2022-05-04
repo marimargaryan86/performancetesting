@@ -9,8 +9,8 @@ from starlette import requests
 
 from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.client_api import models
-from snowfall.junction.offers.v1alpha import models_pb2 as offers_pb2
-from snowfall.junction.orders.v1alpha import models_pb2 as orders_models_pb2
+from snowfall.junction.offers.v1alpha import models_pb2 as offer_models_pb2
+from snowfall.junction.orders.v1alpha import models_pb2 as order_models_pb2
 from snowfall.junction.trips.v1alpha import trips_pb2
 from snowfall.stdlib.format import protobuf
 
@@ -41,7 +41,7 @@ class OfferResource(models.Resource):
     @classmethod
     def from_proto(
         cls,
-        offer: offers_pb2.OfferAggregate,
+        offer: offer_models_pb2.OfferAggregate,
         request: requests.Request,
     ) -> OfferResource:
         return cls(
@@ -59,7 +59,7 @@ class OfferResource(models.Resource):
     @classmethod
     def _get_attributes(
         cls,
-        offer: offers_pb2.OfferAggregate,
+        offer: offer_models_pb2.OfferAggregate,
     ) -> dict[str, Any]:
         first_expiring_offer = min(
             offer.groups,
@@ -94,8 +94,8 @@ class CabinClass(models.BaseModel):
     def from_proto(cls, cabin_class: models_pb2.CabinClass) -> CabinClass:
         return cls(
             name=protobuf.enum_value_to_slug(
-                models_pb2.CabinClass.Type.DESCRIPTOR,
-                cabin_class.type,
+                descriptor=models_pb2.CabinClass.Type.DESCRIPTOR,
+                enum_value=cabin_class.type,
             ),
             marketingName=cabin_class.marketing_name,
         )
@@ -106,7 +106,10 @@ class OfferSegmentDetails(models.BaseModel):
     cabin_class: CabinClass = pydantic.Field(alias="cabinClass")
 
     @classmethod
-    def from_proto(cls, details: offers_pb2.OfferSegmentDetails) -> OfferSegmentDetails:
+    def from_proto(
+        cls,
+        details: offer_models_pb2.OfferSegmentDetails,
+    ) -> OfferSegmentDetails:
         return cls(
             ref=details.id,
             cabinClass=CabinClass.from_proto(details.cabin_class),
@@ -121,7 +124,7 @@ class Offer(models.BaseModel):
     )
 
     @classmethod
-    def from_proto(cls, offer: offers_pb2.Offer) -> Offer:
+    def from_proto(cls, offer: offer_models_pb2.Offer) -> Offer:
         return cls(
             id=offer.id,
             price=Price.from_proto(offer.price),
@@ -139,7 +142,7 @@ class OfferSegmentLeg(models.BaseModel):
     arrival_at: datetime.datetime = pydantic.Field(alias="arrivalAt")
 
     @classmethod
-    def from_proto(cls, leg: offers_pb2.OfferSegmentLeg) -> OfferSegmentLeg:
+    def from_proto(cls, leg: offer_models_pb2.OfferSegmentLeg) -> OfferSegmentLeg:
         return cls(
             origin=Point.from_proto(leg.origin),
             destination=Point.from_proto(leg.destination),
@@ -165,7 +168,7 @@ class OfferSegment(models.BaseModel):
     route_identifiers: RouteIdentifiers = pydantic.Field(alias="routeIdentifiers")
 
     @classmethod
-    def from_proto(cls, segment: offers_pb2.OfferSegment) -> OfferSegment:
+    def from_proto(cls, segment: offer_models_pb2.OfferSegment) -> OfferSegment:
         return cls(
             ref=segment.id,
             legs=[OfferSegmentLeg.from_proto(leg) for leg in segment.legs],
@@ -183,7 +186,7 @@ class OfferGroup(models.BaseModel):
     segments: Sequence[OfferSegment]
 
     @classmethod
-    def from_proto(cls, offer_group: offers_pb2.OfferGroup) -> OfferGroup:
+    def from_proto(cls, offer_group: offer_models_pb2.OfferGroup) -> OfferGroup:
         return cls(
             offers=[Offer.from_proto(offer) for offer in offer_group.offers],
             segments=[
@@ -196,13 +199,58 @@ class OrderResource(models.Resource):
     @classmethod
     def from_proto(
         cls,
-        order: orders_models_pb2.Order,
+        order: order_models_pb2.Order,
         request: requests.Request,
     ) -> OrderResource:
         return cls(
             id=order.id,
             type="orders",
-            attributes={},
+            attributes={
+                "order_results": [
+                    {
+                        "offer_id": order_result.offer_id,
+                        "status": protobuf.enum_value_to_slug(
+                            descriptor=order_models_pb2.OrderResult.Status.DESCRIPTOR,
+                            enum_value=order_result.status,
+                        ),
+                    }
+                    for order_result in order.order_results
+                ],
+                "passengers": [
+                    {
+                        "first_name": passenger.first_name,
+                        "date_of_birth": {
+                            "year": passenger.date_of_birth.year,
+                            "month": passenger.date_of_birth.month,
+                            "day": passenger.date_of_birth.day,
+                        },
+                        "title": protobuf.enum_value_to_slug(
+                            descriptor=order_models_pb2.Passenger.Title.DESCRIPTOR,
+                            enum_value=passenger.title,
+                        ),
+                        "last_name": passenger.last_name,
+                        "gender": protobuf.enum_value_to_slug(
+                            descriptor=order_models_pb2.Passenger.Gender.DESCRIPTOR,
+                            enum_value=passenger.gender,
+                        ),
+                    }
+                    for passenger in order.passengers
+                ],
+                "contact_details": {
+                    "address": {
+                        "address_lines": list(
+                            order.contact_details.address.address_lines,
+                        ),
+                        "region_code": order.contact_details.address.region_code,
+                        "revision": order.contact_details.address.revision,
+                    },
+                    "email": order.contact_details.email,
+                    "phone": {
+                        "e164_number": order.contact_details.phone.e164_number,
+                        "extension": order.contact_details.phone.extension,
+                    },
+                },
+            },
             relationships={},
             links={
                 _SELF_HREF: "https://snowfall.se",
@@ -318,8 +366,8 @@ class LegTypeResource(models.Resource):
         request: requests.Request,
     ) -> LegTypeResource:
         schedule_type_id = protobuf.enum_value_to_slug(
-            models_pb2.Schedule.Type.DESCRIPTOR,
-            schedule_type,
+            descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
+            enum_value=schedule_type,
         )
         return cls(
             id=schedule_type_id,
@@ -412,8 +460,8 @@ class TripOfferSearchResource(models.Resource):
     @classmethod
     def from_proto(
         cls,
-        offer_search: offers_pb2.OfferSearch,
-        offers: Sequence[offers_pb2.OfferAggregateMapping],
+        offer_search: offer_models_pb2.OfferSearch,
+        offers: Sequence[offer_models_pb2.OfferAggregateMapping],
         request: requests.Request,
     ) -> TripOfferSearchResource:
         return cls(
@@ -439,7 +487,7 @@ class TripOfferSearchResource(models.Resource):
     @classmethod
     def _get_attributes(
         cls,
-        offer_search: offers_pb2.OfferSearch,
+        offer_search: offer_models_pb2.OfferSearch,
     ) -> dict[str, Any]:
         attributes = {
             "expiresAt": protobuf.protobuf_to_datetime(

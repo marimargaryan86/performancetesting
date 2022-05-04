@@ -48,31 +48,6 @@ class TestOrders(object):
         )
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    async def test_order_unknown_offer_returns_error(
-        self,
-        client: testclient.TestClient,
-    ) -> None:
-        response = client.post(
-            "/orders",
-            json={
-                "data": {
-                    "type": "orders",
-                    "attributes": {
-                        "offers": [
-                            {
-                                "offerAggregateId": fixtures.NOT_FOUND,
-                                "offerIds": [
-                                    fixtures.OFFERS[0],
-                                ],
-                            },
-                        ],
-                    },
-                },
-            },
-            headers={"Content-Type": "application/vnd.api+json"},
-        )
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-
     async def test_order_can_be_created(
         self,
         client: testclient.TestClient,
@@ -125,33 +100,6 @@ class TestOrders(object):
             headers={"Content-Type": "application/vnd.api+json"},
         )
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
-    async def test_order_cant_be_amended_with_unexisting_offer(
-        self,
-        client: testclient.TestClient,
-    ) -> None:
-        response = client.patch(
-            "/orders/{orderId}".format(
-                orderId=fixtures.ORDERS[0],
-            ),
-            json={
-                "data": {
-                    "type": "orders",
-                    "attributes": {
-                        "offers": [
-                            {
-                                "offerAggregateId": fixtures.NOT_FOUND,
-                                "offerIds": [
-                                    fixtures.OFFERS[0],
-                                ],
-                            },
-                        ],
-                    },
-                },
-            },
-            headers={"Content-Type": "application/vnd.api+json"},
-        )
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
     async def test_order_can_be_amended_with_existing_offer(
         self,

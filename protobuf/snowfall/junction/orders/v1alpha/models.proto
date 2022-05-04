@@ -5,11 +5,10 @@ package snowfall.junction.orders.v1alpha;
 import "snowfall/common/v1alpha/models.proto";
 import "snowfall/common/v1alpha/phone_number.proto";
 import "snowfall/common/v1alpha/postal_address.proto";
-import "snowfall/junction/offers/v1alpha/models.proto";
 
 message Order {
   string id = 1;
-  repeated snowfall.junction.offers.v1alpha.Offer offers = 2;
+  repeated OrderResult order_results = 2;
   string passenger_name_record = 3;
   repeated Passenger passengers = 4;
   ContactDetails contact_details = 5;
@@ -41,6 +40,10 @@ message Passenger {
   string last_name = 2;
   enum Title {
     TITLE_UNSPECIFIED = 0;
+    TITLE_MR = 1;
+    TITLE_MRS = 2;
+    TITLE_MISS = 3;
+    TITLE_MS = 4;
   }
   Title title = 3;
   enum Gender {

@@ -528,17 +528,17 @@ class SATClient(object):  # noqa: WPS214
                     "email": order_passenger.email,
                     "fname": order_passenger.first_name,
                     "lname": order_passenger.last_name,
-                    "gender": order_passenger.gender,
+                    "gender": order_passenger.gender.value,
                     "mobile": order_passenger.phone_number,
                 },
                 "passengers_attributes": {
                     str(number): {
-                        "title": passenger.title,
+                        "title": passenger.title.value,
                         "fname": passenger.first_name,
                         "lname": passenger.last_name,
                         "birthdate": passenger.date_of_birth.isoformat(),
                         "country": passenger.country,
-                        "gender": passenger.gender,
+                        "gender": passenger.gender.value,
                         "passenger_type_attributes": _generate_passenger_type_attributes(
                             passenger.date_of_birth,
                         ),

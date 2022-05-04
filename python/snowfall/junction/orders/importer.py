@@ -23,4 +23,5 @@ class OrderImporter(object):
             order_id=order_result.order_id,
             offer_id=order_result.offer_id,
             status=order_result.status,
+            raw_data=order_result.raw_data,
         )

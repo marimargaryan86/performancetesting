@@ -1,5 +1,3 @@
-import asyncio
-
 from snowfall.junction.orders.v1alpha import amqp_pb2, models_pb2
 from snowfall.stdlib.transport import amqp
 
@@ -9,13 +7,11 @@ class OrderProducer(object):
         self._producer = producer
 
     async def publish(self, order: models_pb2.Order) -> None:
-        await asyncio.gather(
-            self._producer.publish(
+        for order_result in order.order_results:
+            await self._producer.publish(
                 amqp_pb2.PlaceOrderTask(
                     order=order,
-                    offer_id=offer.id,
+                    offer_id=order_result.offer_id,
                 ),
                 "orders.offers",
             )
-            for offer in order.offers
-        )

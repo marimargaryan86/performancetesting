@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package snowfall.junction.orders.v1alpha;
 
-import "snowfall/junction/offers/v1alpha/models.proto";
 import "snowfall/junction/orders/v1alpha/models.proto";
 
 service OrderService {
@@ -14,7 +13,7 @@ service OrderService {
 
 message AddOffersToOrderRequest {
   string order_id = 1;
-  repeated snowfall.junction.offers.v1alpha.Offer offers = 2;
+  repeated string offer_ids = 2;
 }
 
 message AddOffersToOrderResponse {
@@ -22,7 +21,9 @@ message AddOffersToOrderResponse {
 }
 
 message EnqueueOrderRequest {
-  repeated snowfall.junction.offers.v1alpha.Offer offers = 1;
+  repeated string offer_ids = 1;
+  repeated Passenger passengers = 2;
+  ContactDetails contact_details = 3;
 }
 
 message EnqueueOrderResponse {

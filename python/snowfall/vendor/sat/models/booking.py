@@ -1,25 +1,20 @@
 from datetime import date, datetime, timedelta
 from decimal import Decimal
-from enum import Enum
 from typing import Optional
 
 from pydantic import AnyUrl, BaseModel
 
+from snowfall.vendor.sat import enums
 from snowfall.vendor.sat import normalizers as sat_normalizers
 from snowfall.vendor.sat.models.search import StationName
 
 
-class Gender(Enum):
-    male = "M"
-    female = "F"
-
-
 class Passenger(BaseModel):
-    title: str
+    title: enums.PassengerTitle
     first_name: str
     last_name: str
     date_of_birth: date
-    gender: Gender
+    gender: enums.PassengerGender
     email: str
     phone_number: str  # with country code, e.g. +442080160509
     country: str

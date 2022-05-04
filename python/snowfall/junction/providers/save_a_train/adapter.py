@@ -195,6 +195,13 @@ class SaveATrainAdapter(object):
         select_search_result = await self._select_search_result(offer_id, order)
 
         passenger = order.passengers[0]  # TODO: handle multiple passengers
+        title_map = {  # TODO: map unspecified to something else?
+            order_models_pb2.Passenger.Title.TITLE_UNSPECIFIED: enums.PassengerTitle.mr,
+            order_models_pb2.Passenger.Title.TITLE_MR: enums.PassengerTitle.mr,
+            order_models_pb2.Passenger.Title.TITLE_MRS: enums.PassengerTitle.mrs,
+            order_models_pb2.Passenger.Title.TITLE_MISS: enums.PassengerTitle.miss,
+            order_models_pb2.Passenger.Title.TITLE_MS: enums.PassengerTitle.ms,
+        }
 
         try:
             booking_result = await self._client.create_booking(
@@ -202,30 +209,27 @@ class SaveATrainAdapter(object):
                     search_id=select_search_result.search_identifier,
                     passengers=[
                         models.booking.Passenger(
-                            title=protobuf.enum_value_to_slug(
-                                descriptor=order_models_pb2.Passenger.Title.DESCRIPTOR,
-                                enum_value=passenger.title,
-                            ),
+                            title=title_map[passenger.title],
                             first_name=passenger.first_name,
                             last_name=passenger.last_name,
                             date_of_birth=protobuf.protobuf_to_date(
                                 passenger.date_of_birth,
                             ),
                             gender=(  # TODO: gender unspecified?
-                                models.booking.Gender.male
+                                enums.PassengerGender.male
                                 if passenger.gender
                                 == order_models_pb2.Passenger.GENDER_MALE
-                                else models.booking.Gender.female
+                                else enums.PassengerGender.female
                             ),
                             email=order.contact_details.email,
                             phone_number=str(
                                 phonenumbers.parse(
                                     order.contact_details.phone.e164_number,
-                                ),
+                                ).national_number,
                             ),
                             country=pycountry.countries.get(
                                 alpha_2=order.contact_details.address.region_code,
-                            ),
+                            ).name,
                         ),
                     ],
                 ),

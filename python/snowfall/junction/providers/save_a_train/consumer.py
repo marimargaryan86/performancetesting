@@ -75,13 +75,13 @@ class OrdersConsumer(object):
                 task.offer_id,
                 task.order,
             )
-        except (phonenumbers.NumberParseException, sat_adapter.BookingError):
+        except (phonenumbers.NumberParseException, sat_adapter.BookingError) as error:
             await self._producer.publish(
                 models_pb2.OrderResult(
                     order_id=task.order.id,
                     offer_id=task.offer_id,
                     status=models_pb2.OrderResult.STATUS_ERROR,
-                    raw_data="",
+                    raw_data=repr(error),
                 ),
                 routing_key="orders.result.offer",
             )

@@ -33,7 +33,7 @@ class OrderService(
     ) -> orders_pb2.GetOrderResponse:
         order = await self._orders.find_by_id(request.id)
 
-        if not order:
+        if order is None:
             await context.abort(StatusCode.NOT_FOUND)
 
         return orders_pb2.GetOrderResponse(order=order)
@@ -45,7 +45,7 @@ class OrderService(
     ) -> orders_pb2.AddOffersToOrderResponse:
         order = await self._orders.amend_order(
             order_id=request.order_id,
-            offers=request.offers,
+            offer_ids=request.offer_ids,
         )
 
         # TODO: maybe it would be better to publish offers instead of orders
@@ -60,7 +60,9 @@ class OrderService(
         context: aio.ServicerContext,
     ) -> orders_pb2.EnqueueOrderResponse:
         order = await self._orders.create_from_offers(
-            request.offers,
+            offer_ids=request.offer_ids,
+            contact_details=request.contact_details,
+            passengers=request.passengers,
         )
 
         await self._publisher.publish(order)

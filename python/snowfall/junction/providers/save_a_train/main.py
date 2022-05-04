@@ -39,7 +39,7 @@ class _SearchSettings(service.Settings):
     api_email: str
     api_password: str
     api_search_base_url: pydantic.AnyUrl
-    api_search_timeout: int = 180
+    api_search_timeout: int = 40
     api_search_requests_limit: int = 40
     api_search_password: str
     api_booking_token: str
@@ -95,7 +95,9 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
     async with contextlib.AsyncExitStack() as stack:
         # https://github.com/encode/httpx/issues/2092
         http_client = await stack.enter_async_context(  # type: ignore[var-annotated]
-            httpx.AsyncClient(),  # type: ignore[arg-type]
+            httpx.AsyncClient(  # type: ignore[arg-type]
+                timeout=app.settings.api_search_timeout,
+            ),
         )
         amqp_connection = await stack.enter_async_context(
             amqp.Connection(random.choice(app.settings.amqp_dsn)),  # nosec
@@ -152,7 +154,9 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
     async with contextlib.AsyncExitStack() as stack:
         # https://github.com/encode/httpx/issues/2092
         http_client = await stack.enter_async_context(  # type: ignore[var-annotated]
-            httpx.AsyncClient(),  # type: ignore[arg-type]
+            httpx.AsyncClient(  # type: ignore[arg-type]
+                timeout=app.settings.api_search_timeout,
+            ),
         )
         amqp_connection = await stack.enter_async_context(
             amqp.Connection(random.choice(app.settings.amqp_dsn)),  # nosec

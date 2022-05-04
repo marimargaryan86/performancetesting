@@ -3,7 +3,7 @@
   "info": {
     "title": "Junction Client API",
     "version": "1.0.0",
-    "description": "This API follows the [JSON:API][jsonapi] specifation.\n\nA suggested booking flow example:\n\n1. Retrieve Places from `GET /places`.\n2. Initiate a Trip Search with `POST /trips/searches` by specifying one Place as origin and another as destination. This will start an asynchronous process to find suitable trips.\n3. Retrieve Trip results from `GET /trips/searches/{tripSearchId}/trips`.\n4. Intiate an Offer Search with `POST /offers/searches` by specifying one or more Trips. This will start an asynchronous process to find suitable trips.\n5. Retrieve Offer results from `GET /offers/searches/{offerSearchId}/offers`.\n6. Create an Order with `POST /orders` by specifyng one or more Offers.\n\n[jsonapi]: https://jsonapi.org/",
+    "description": "This API follows the [JSON:API][jsonapi] specifation.\n\nA suggested booking flow example:\n\n1. Retrieve Places from `GET /places`.\n2. Initiate a Trip Search with `POST /trips/searches` by specifying one Place as origin and another as destination. This will start an asynchronous process to find suitable trips.\n3. Retrieve Trip results from `GET /trips/searches/{tripSearchId}/trips`.\n4. Intiate an Offer Search with `POST /offers/searches` by specifying one or more Trips. This will start an asynchronous process to find suitable trips.\n5. Retrieve Offer results from `GET /offers/searches/{offerSearchId}/offers`.\n6. Create an Order wit `POST /orders` by specifyng one or more Offers.\n\n[jsonapi]: https://jsonapi.org/",
     "contact": {
       "name": "Snowfall",
       "url": "https://www.snowfalltravel.com",
@@ -2683,12 +2683,6 @@
                   "offers"
                 ],
                 "properties": {
-                  "trips": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/TripItem"
-                    }
-                  },
                   "offers": {
                     "type": "array",
                     "uniqueItems": true,
@@ -2731,81 +2725,6 @@
           }
         ],
         "description": "Collection of multiple booked Offers."
-      },
-      "TripItem": {
-        "title": "Trip Item",
-        "type": "object",
-        "properties": {
-          "sequence": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "segments": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SegmentItem"
-            }
-          }
-        },
-        "required": [
-          "sequence",
-          "segments"
-        ]
-      },
-      "SegmentItem": {
-        "title": "Segment Item",
-        "type": "object",
-        "properties": {
-          "sequence": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "legs": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LegItem"
-            }
-          }
-        },
-        "required": [
-          "sequence",
-          "legs"
-        ]
-      },
-      "LegItem": {
-        "title": "Leg Item",
-        "type": "object",
-        "properties": {
-          "sequence": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "departureAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "arrivalAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "operator": {
-            "type": "string"
-          },
-          "origin": {
-            "$ref": "#/components/schemas/Point"
-          },
-          "destination": {
-            "$ref": "#/components/schemas/Point"
-          }
-        },
-        "required": [
-          "sequence",
-          "departureAt",
-          "arrivalAt",
-          "operator",
-          "origin",
-          "destination"
-        ]
       },
       "LoyaltyCard": {
         "title": "LoyaltyCard",

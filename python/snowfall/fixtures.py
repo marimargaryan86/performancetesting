@@ -169,7 +169,12 @@ def get_orders() -> list[order_models_pb2.Order]:
 def generate_order(identifier: str) -> order_models_pb2.Order:
     return order_models_pb2.Order(
         id=identifier,
-        offers=get_offers()[0].groups[0].offers,
+        order_results=[
+            order_models_pb2.OrderResult(
+                offer_id=offer.id,
+            )
+            for offer in get_offers()[0].groups[0].offers
+        ],
     )
 
 
