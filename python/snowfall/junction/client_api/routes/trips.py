@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 
 import lagom
@@ -103,32 +104,34 @@ class TripSearches(endpoints.HTTPEndpoint):
         body = await request_helpers.flatten_request(request)
 
         try:
-            origin = await places_client.get(body["origin"])
-        except places.NotFoundError:
-            raise exceptions.HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY)
-
-        try:
-            destination = await places_client.get(body["destination"])
+            (origin, destination) = await asyncio.gather(
+                places_client.get(body["origin"]),
+                places_client.get(body["destination"]),
+            )
         except places.NotFoundError:
             raise exceptions.HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         if body.get("departureAfter"):
             departure_after = parser.isoparse(body["departureAfter"])
+            current_time = datetime.datetime.now(
+                datetime.timezone.utc,
+            ) - datetime.timedelta(minutes=1)
+
+            if departure_after < current_time:
+                raise exceptions.HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY)
         else:
             departure_after = datetime.datetime.now(datetime.timezone.utc)
-
-        trip_search = await trip_searches_client.create(
-            trip_searches.TripSearchRequest(
-                origin=origin,
-                destination=destination,
-                departure_after=departure_after,
-            ),
-        )
 
         return models.JsonApiResponse(
             models.Body(
                 data=resources.TripSearchResource.from_proto(
-                    trip_search,
+                    await trip_searches_client.create(
+                        trip_searches.TripSearchRequest(
+                            origin=origin,
+                            destination=destination,
+                            departure_after=departure_after,
+                        ),
+                    ),
                     request,
                 ),
             ),

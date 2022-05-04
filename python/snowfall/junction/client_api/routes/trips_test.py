@@ -1,5 +1,6 @@
 from typing import Any, Mapping
 
+import freezegun
 import pytest
 from starlette import status, testclient
 
@@ -142,7 +143,7 @@ class TestTripSearches(object):
         )
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
-    async def test_trip_search_post_returns_resource(
+    async def test_past_departure_date_returns_unprocessable_entity(
         self,
         client: testclient.TestClient,
     ) -> None:
@@ -150,7 +151,41 @@ class TestTripSearches(object):
             "data": {
                 "attributes": {
                     "departureAfter": "1957-04-30T08:34:00.826Z",
-                    "arrivalBefore": "1947-08-17T08:12:02.822Z",
+                },
+                "relationships": {
+                    "origin": {
+                        "data": {
+                            "id": fixtures.PLACES[0],
+                            "type": "places",
+                        },
+                    },
+                    "destination": {
+                        "data": {
+                            "id": fixtures.PLACES[1],
+                            "type": "places",
+                        },
+                    },
+                },
+                "type": "trip-searches",
+            },
+        }
+        response = client.post(
+            "/trips/searches",
+            json=request,
+            headers={"Content-Type": "application/vnd.api+json"},
+        )
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    @freezegun.freeze_time("2022-04-30T08:34:30.826Z")
+    async def test_trip_search_post_returns_resource(
+        self,
+        client: testclient.TestClient,
+    ) -> None:
+        request = {
+            "data": {
+                "attributes": {
+                    "departureAfter": "2022-04-30T08:34:00.826Z",
+                    "arrivalBefore": "2022-08-17T08:12:02.822Z",
                 },
                 "relationships": {
                     "origin": {
