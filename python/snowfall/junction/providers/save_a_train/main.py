@@ -141,7 +141,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                     ),
                 ),
                 offers_cache=cache.OffersCache(
-                    redis_client=redis.Client[str](redis_connection),
+                    redis_client=redis.Client[str](redis_connection, prefix=app.name),
                 ),
                 ttl=app.settings.ttl,
             ),
@@ -200,7 +200,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
                     ),
                 ),
                 offers_cache=cache.OffersCache(
-                    redis_client=redis.Client[str](redis_connection),
+                    redis_client=redis.Client[str](redis_connection, prefix=app.name),
                 ),
                 ttl=app.settings.ttl,
             ),

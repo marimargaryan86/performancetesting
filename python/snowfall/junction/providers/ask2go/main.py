@@ -116,7 +116,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
                         ),
                     ),
                     offer_cache=cache.OfferCache(
-                        client=redis.Client[str](redis_conn),
+                        client=redis.Client[str](redis_conn, prefix=app.name),
                     ),
                 ).consume()
 
@@ -155,7 +155,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                             ).load("airport_coordinates.json"),
                         ),
                         offer_cache=cache.OfferCache(
-                            client=redis.Client[str](redis_conn),
+                            client=redis.Client[str](redis_conn, prefix=app.name),
                         ),
                         ttl=app.settings.ttl,
                     ),
