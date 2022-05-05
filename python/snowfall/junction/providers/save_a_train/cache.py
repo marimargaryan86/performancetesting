@@ -7,7 +7,7 @@ from snowfall.stdlib.persistence import redis
 
 
 class OffersCache(object):
-    def __init__(self, redis_client: redis.Client[str]):
+    def __init__(self, redis_client: redis.Client[bytes]):
         self._redis = redis_client
 
     async def store(

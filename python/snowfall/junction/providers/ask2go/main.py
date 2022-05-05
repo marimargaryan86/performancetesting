@@ -83,7 +83,7 @@ async def _offers(app: service.Application[_OffersSettings]) -> None:
 async def _orders(app: service.Application[_OrdersSettings]) -> None:
     async with aioredis.from_url(
         random.choice(app.settings.redis_dsn),  # nosec
-        decode_responses=True,
+        decode_responses=False,
     ).client() as redis_conn:
         async with httpx.AsyncClient(timeout=app.settings.http_timeout) as http_client:
             ask2go_client = client.Ask2GoClient(
@@ -116,7 +116,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
                         ),
                     ),
                     offer_cache=cache.OfferCache(
-                        client=redis.Client[str](redis_conn, prefix=app.name),
+                        client=redis.Client[bytes](redis_conn, prefix=app.name),
                     ),
                 ).consume()
 
@@ -124,7 +124,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
 async def _searches(app: service.Application[_SearchSettings]) -> None:
     async with aioredis.from_url(
         random.choice(app.settings.redis_dsn),  # nosec
-        decode_responses=True,
+        decode_responses=False,
     ).client() as redis_conn:
         async with httpx.AsyncClient(timeout=app.settings.http_timeout) as http_client:
             ask2go_client = client.Ask2GoClient(
@@ -155,7 +155,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                             ).load("airport_coordinates.json"),
                         ),
                         offer_cache=cache.OfferCache(
-                            client=redis.Client[str](redis_conn, prefix=app.name),
+                            client=redis.Client[bytes](redis_conn, prefix=app.name),
                         ),
                         ttl=app.settings.ttl,
                     ),

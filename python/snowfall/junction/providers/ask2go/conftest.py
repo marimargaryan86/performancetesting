@@ -47,13 +47,13 @@ def ask2go_client(http_client: httpx.AsyncClient) -> client.Ask2GoClient:
 def ask2go_adapter(
     ask2go_client: client.Ask2GoClient,
     airport_repository: airports.AirportRepository,
-    decoding_redis_client: aioredis.Redis,
+    redis_client: aioredis.Redis,
 ) -> adapter.Ask2GoAdapter:
     return adapter.Ask2GoAdapter(
         ask2go_client=ask2go_client,
         airport_repository=airport_repository,
         offer_cache=cache.OfferCache(
-            client=redis.Client[str](decoding_redis_client),
+            client=redis.Client[bytes](redis_client),
         ),
         ttl=datetime.timedelta(days=1),
     )

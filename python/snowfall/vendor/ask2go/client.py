@@ -2,26 +2,12 @@ import contextlib
 import http
 import inspect
 import json
-from typing import Awaitable
+from typing import Any, Optional
 
 import httpx
 
 from snowfall.vendor.ask2go import errors, parsers
 from snowfall.vendor.ask2go.models import booking, common, price, search
-
-
-async def _make_request(promise: Awaitable[httpx.Response]) -> httpx.Response:
-    try:
-        response = await promise
-    except httpx.HTTPError as raw_exc:
-        raise errors.ServiceError(inspect.getdoc(raw_exc)) from raw_exc
-
-    try:
-        response.raise_for_status()
-    except httpx.HTTPError as exc:
-        raise errors.ServiceError(_get_response_error_message(response)) from exc
-
-    return response
 
 
 def _get_response_error_message(response: httpx.Response) -> str:
@@ -41,14 +27,15 @@ class Ask2GoClient(object):  # noqa: WPS214
         api_booking_base_url: str,
         http_client: httpx.AsyncClient,
     ) -> None:
-        self._api_base_url = api_base_url
-        self._api_booking_base_url = api_booking_base_url
+        self._api_base_url = httpx.URL(api_base_url)
+        self._api_booking_base_url = httpx.URL(api_booking_base_url)
         self._http_client = http_client
 
     async def get_airports(self) -> list[common.Airport]:
-        response = await _make_request(
-            self._http_client.get(
-                "{api_base_url}/Airports".format(api_base_url=self._api_base_url),
+        response = await self._make_request(
+            "GET",
+            self._api_base_url.copy_with(
+                path="/Airports",
             ),
         )
 
@@ -67,11 +54,12 @@ class Ask2GoClient(object):  # noqa: WPS214
                 ),
             )
 
-        response = await _make_request(
-            self._http_client.post(
-                "{api_base_url}/search".format(api_base_url=self._api_base_url),
-                json=parsers.parse_search_request(criteria),
+        response = await self._make_request(
+            "POST",
+            self._api_base_url.copy_with(
+                path="/search",
             ),
+            payload=parsers.parse_search_request(criteria),
         )
 
         return search.CreateSearchResponse(**response.json())
@@ -82,10 +70,10 @@ class Ask2GoClient(object):  # noqa: WPS214
         search_id: str,
         page_offset: int,
     ) -> search.SearchResultsResponse:
-        response = await _make_request(
-            self._http_client.get(
-                "{api_base_url}/search/{search_id}/{transaction_id}/{page_offset}".format(
-                    api_base_url=self._api_base_url,
+        response = await self._make_request(
+            "GET",
+            self._api_base_url.copy_with(
+                path="/search/{search_id}/{transaction_id}/{page_offset}".format(
                     search_id=search_id,
                     transaction_id=transaction_id,
                     page_offset=page_offset,
@@ -100,15 +88,14 @@ class Ask2GoClient(object):  # noqa: WPS214
         booking_ref_id: str,
         transaction_id: str,
     ) -> booking.Booking:
-        response = await _make_request(
-            self._http_client.put(
-                "{api_booking_base_url}/Booking".format(
-                    api_booking_base_url=self._api_booking_base_url,
-                ),
-                json=parsers.parse_update_booking_request(
-                    booking_ref_id,
-                    transaction_id,
-                ),
+        response = await self._make_request(
+            "PUT",
+            self._api_booking_base_url.copy_with(
+                path="/Booking",
+            ),
+            payload=parsers.parse_update_booking_request(
+                booking_ref_id,
+                transaction_id,
             ),
         )
 
@@ -121,18 +108,16 @@ class Ask2GoClient(object):  # noqa: WPS214
         passenger: common.Passenger,
         contact: common.Contact,
     ) -> booking.Booking:
-
-        response = await _make_request(
-            self._http_client.post(
-                "{api_booking_base_url}/Booking".format(
-                    api_booking_base_url=self._api_booking_base_url,
-                ),
-                json=parsers.parse_create_booking_request(
-                    pricing_id,
-                    transaction_id,
-                    passenger,
-                    contact,
-                ),
+        response = await self._make_request(
+            "POST",
+            self._api_booking_base_url.copy_with(
+                path="/Booking",
+            ),
+            payload=parsers.parse_create_booking_request(
+                pricing_id,
+                transaction_id,
+                passenger,
+                contact,
             ),
         )
 
@@ -143,11 +128,10 @@ class Ask2GoClient(object):  # noqa: WPS214
         booking_ref_id: str,
         transaction_id: str,
     ) -> booking.Booking:
-        response = await _make_request(
-            self._http_client.get(
-                "{api_booking_base_url}/Booking".format(
-                    api_booking_base_url=self._api_booking_base_url,
-                ),
+        response = await self._make_request(
+            "GET",
+            self._api_booking_base_url.copy_with(
+                path="/Booking",
                 params={
                     "id": booking_ref_id,
                     "transactionId": transaction_id,
@@ -158,11 +142,12 @@ class Ask2GoClient(object):  # noqa: WPS214
         return booking.Booking(**response.json())
 
     async def synchronize_booking(self, booking_id: int) -> None:
-        await self._http_client.put(
-            "{api_booking_base_url}/Sync".format(
-                api_booking_base_url=self._api_booking_base_url,
+        await self._make_request(
+            "PUT",
+            self._api_booking_base_url.copy_with(
+                path="/Sync",
+                params={"bookingId": booking_id},
             ),
-            params={"bookingId": booking_id},
         )
 
     async def create_air_offer(
@@ -171,10 +156,10 @@ class Ask2GoClient(object):  # noqa: WPS214
         transaction_id: str,
         offer_id: str,
     ) -> price.OfferPriceResponse:
-        response = await _make_request(
-            self._http_client.put(
-                "{api_base_url}/Itinerary/{search_id}/{offer_id}/Price".format(
-                    api_base_url=self._api_base_url,
+        response = await self._make_request(
+            "PUT",
+            self._api_base_url.copy_with(
+                path="/Itinerary/{search_id}/{offer_id}/Price".format(
                     search_id=search_id,
                     offer_id=offer_id,
                 ),
@@ -183,3 +168,25 @@ class Ask2GoClient(object):  # noqa: WPS214
         )
 
         return price.OfferPriceResponse(**response.json())
+
+    async def _make_request(
+        self,
+        method: str,
+        url: httpx.URL,
+        payload: Optional[Any] = None,
+    ) -> httpx.Response:
+        try:
+            response = await self._http_client.request(
+                method=method,
+                url=url,
+                json=payload,
+            )
+        except httpx.HTTPError as raw_exc:
+            raise errors.ServiceError(inspect.getdoc(raw_exc)) from raw_exc
+
+        try:
+            response.raise_for_status()
+        except httpx.HTTPError as exc:
+            raise errors.ServiceError(_get_response_error_message(response)) from exc
+
+        return response

@@ -105,7 +105,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
         redis_connection = await stack.enter_async_context(
             aioredis.from_url(
                 random.choice(app.settings.redis_dsn),  # nosec
-                decode_responses=True,
+                decode_responses=False,
             ).client(),
         )
 
@@ -141,7 +141,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                     ),
                 ),
                 offers_cache=cache.OffersCache(
-                    redis_client=redis.Client[str](redis_connection, prefix=app.name),
+                    redis_client=redis.Client[bytes](redis_connection, prefix=app.name),
                 ),
                 ttl=app.settings.ttl,
             ),
@@ -164,7 +164,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
         redis_connection = await stack.enter_async_context(
             aioredis.from_url(
                 random.choice(app.settings.redis_dsn),  # nosec
-                decode_responses=True,
+                decode_responses=False,
             ).client(),
         )
 
@@ -200,7 +200,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
                     ),
                 ),
                 offers_cache=cache.OffersCache(
-                    redis_client=redis.Client[str](redis_connection, prefix=app.name),
+                    redis_client=redis.Client[bytes](redis_connection, prefix=app.name),
                 ),
                 ttl=app.settings.ttl,
             ),
