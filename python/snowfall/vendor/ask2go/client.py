@@ -35,7 +35,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         response = await self._make_request(
             "GET",
             self._api_base_url.copy_with(
-                path="/Airports",
+                path="/api/Airports",
             ),
         )
 
@@ -57,7 +57,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         response = await self._make_request(
             "POST",
             self._api_base_url.copy_with(
-                path="/search",
+                path="/api/search",
             ),
             payload=parsers.parse_search_request(criteria),
         )
@@ -73,7 +73,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         response = await self._make_request(
             "GET",
             self._api_base_url.copy_with(
-                path="/search/{search_id}/{transaction_id}/{page_offset}".format(
+                path="/api/search/{search_id}/{transaction_id}/{page_offset}".format(
                     search_id=search_id,
                     transaction_id=transaction_id,
                     page_offset=page_offset,
@@ -91,7 +91,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         response = await self._make_request(
             "PUT",
             self._api_booking_base_url.copy_with(
-                path="/Booking",
+                path="/api/Booking",
             ),
             payload=parsers.parse_update_booking_request(
                 booking_ref_id,
@@ -111,7 +111,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         response = await self._make_request(
             "POST",
             self._api_booking_base_url.copy_with(
-                path="/Booking",
+                path="/api/Booking",
             ),
             payload=parsers.parse_create_booking_request(
                 pricing_id,
@@ -131,7 +131,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         response = await self._make_request(
             "GET",
             self._api_booking_base_url.copy_with(
-                path="/Booking",
+                path="/api/Booking",
                 params={
                     "id": booking_ref_id,
                     "transactionId": transaction_id,
@@ -145,7 +145,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         await self._make_request(
             "PUT",
             self._api_booking_base_url.copy_with(
-                path="/Sync",
+                path="/api/Sync",
                 params={"bookingId": booking_id},
             ),
         )
@@ -159,7 +159,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         response = await self._make_request(
             "PUT",
             self._api_base_url.copy_with(
-                path="/Itinerary/{search_id}/{offer_id}/Price".format(
+                path="/api/Itinerary/{search_id}/{offer_id}/Price".format(
                     search_id=search_id,
                     offer_id=offer_id,
                 ),

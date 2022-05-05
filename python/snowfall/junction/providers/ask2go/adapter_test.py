@@ -14,8 +14,10 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence import filesystem
 
 _FIXTURE_PATH = "python/snowfall/junction/providers/ask2go/fixtures/{path}"
-_OFFER_URL = "https://test_url/search/{id}/{transaction}/{page}"
-_PRICE_URL = "https://test_url/Itinerary/{id}/{offer}/Price?transactionId={transaction}"
+_OFFER_URL = "https://test_url/api/search/{id}/{transaction}/{page}"
+_PRICE_URL = (
+    "https://test_url/api/Itinerary/{id}/{offer}/Price?transactionId={transaction}"
+)
 
 _ARN_LHR_CRITERIA = amqp_pb2.Criteria(
     origin_iata="ARN",
@@ -107,7 +109,7 @@ def _mock_responses(
     httpx_mock.add_response(
         method="POST",
         json=search_response,
-        url="https://test_url/search",
+        url="https://test_url/api/search",
     )
 
     _mock_search_responses(httpx_mock, prefix, search_response, loader)
