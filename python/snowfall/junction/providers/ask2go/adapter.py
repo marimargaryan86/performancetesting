@@ -90,7 +90,7 @@ class Ask2GoAdapter(object):
         search_criteria = ask2go_models.search.CreateSearchCriteria(
             origin_iata=criteria.origin_iata,
             destination_iata=criteria.destination_iata,
-            outbound_date=protobuf.protobuf_to_date(criteria.outbound),
+            outbound_date=protobuf.protobuf_to_datetime(criteria.outbound),
             cabin_class=enums.AirCabinClassType(criteria.cabin_class),
             adults=criteria.adults,
             children=criteria.children,

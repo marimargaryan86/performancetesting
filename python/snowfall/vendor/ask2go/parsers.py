@@ -1,5 +1,5 @@
 import datetime
-from typing import Any
+from typing import Any, Union
 
 from snowfall.vendor.ask2go.models import common, search
 
@@ -7,12 +7,12 @@ from snowfall.vendor.ask2go.models import common, search
 def parse_search_criteria(
     origin_iata: str,
     destination_iata: str,
-    date: datetime.date,
+    date: Union[datetime.date, datetime.datetime],
 ) -> dict[str, Any]:
     return {
         "origin": origin_iata,
         "destination": destination_iata,
-        "departure": date.strftime("%Y-%m-%d"),
+        "departure": date.isoformat(),
     }
 
 
@@ -77,7 +77,7 @@ def parse_create_booking_request(
                 "firstName": passenger.first_name,
                 "lastName": passenger.last_name,
                 "title": passenger.name_title,
-                "dateOfBirth": passenger.birth_date.strftime("%d-%m-%Y"),
+                "dateOfBirth": passenger.birth_date.isoformat(),
                 "gender": passenger.gender.value,
                 "passengerType": passenger.type.value,
             },
