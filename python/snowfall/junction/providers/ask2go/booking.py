@@ -61,7 +61,7 @@ class BookingHandler(object):
                 city=order.contact_details.address.locality,
                 postal_code=order.contact_details.address.postal_code,
                 country=common.Country(
-                    code=country.code,
+                    code=country.alpha_2,
                     name=country.name,
                 ),
                 phone=common.Phone(
