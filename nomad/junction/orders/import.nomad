@@ -47,7 +47,7 @@ EOH
       config {
         image = var.docker_image
         args = [
-          "grpc",
+          "import",
         ]
 
         auth {
