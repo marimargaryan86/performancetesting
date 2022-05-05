@@ -6,8 +6,16 @@ import structlog
 from snowfall.junction.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
 from snowfall.junction.orders.v1alpha import amqp_pb2 as orders_amqp_pb2
 from snowfall.junction.orders.v1alpha import models_pb2
-from snowfall.junction.providers.ask2go import adapter, booking, cache, criteria
+from snowfall.junction.providers.ask2go import (
+    adapter,
+    booking,
+    cache,
+    criteria,
+    transformer,
+)
 from snowfall.junction.providers.ask2go.v1alpha import amqp_pb2
+from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport import amqp
 from snowfall.vendor.ask2go import errors
 
@@ -92,16 +100,31 @@ class SearchCriteriaConsumer(object):
         consumer: amqp.Consumer,
         producer: amqp.Producer,
         a2g_client: adapter.Ask2GoAdapter,
+        offer_transformer: transformer.OfferTransformer,
     ):
         self._consumer = consumer
         self._producer = producer
         self._client = a2g_client
+        self._transformer = offer_transformer
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
 
     async def _process_message(self, amqp_message: amqp.Message) -> None:
-        search = cast(amqp_pb2.SearchCriteriaTask, amqp_message.body)
+        search_task = cast(amqp_pb2.SearchCriteriaTask, amqp_message.body)
 
-        async for offer_result in self._client.gather_search_results(search):
-            await self._producer.publish(offer_result, routing_key="offers.result.trip")
+        with stdout.context_binding(
+            origin=search_task.criteria.origin_iata,
+            destination=search_task.criteria.destination_iata,
+            departure_at=protobuf.protobuf_to_datetime(search_task.criteria.outbound),
+        ):
+            offer_groups = self._transformer.offer_prices_to_offer_groups(
+                search_task,
+                self._client.gather_search_results(search_task),
+            )
+
+            async for offer_group in offer_groups:
+                await self._producer.publish(
+                    msg=offer_group,
+                    routing_key="offers.result.trip",
+                )

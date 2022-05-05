@@ -15,6 +15,8 @@ from snowfall.junction.providers.ask2go import (
     consumer,
     criteria,
     h3,
+    transformer,
+    validator,
 )
 from snowfall.stdlib import service
 from snowfall.stdlib.persistence import filesystem, redis
@@ -148,6 +150,9 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                     ),
                     a2g_client=adapter.Ask2GoAdapter(
                         ask2go_client=ask2go_client,
+                        offer_validator=validator.OfferValidator(),
+                    ),
+                    offer_transformer=transformer.OfferTransformer(
                         airport_repository=airports.AirportRepository(
                             airports=await ask2go_client.get_airports(),
                             coordinates=filesystem.PkgLoader(
@@ -157,7 +162,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                         offer_cache=cache.OfferCache(
                             client=redis.Client[bytes](redis_conn, prefix=app.name),
                         ),
-                        ttl=app.settings.ttl,
+                        offer_ttl=app.settings.ttl,
                     ),
                 )
 

@@ -8,7 +8,7 @@ import pytest_httpx
 
 from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.offers.v1alpha import models_pb2 as offers_pb2
-from snowfall.junction.providers.ask2go import adapter
+from snowfall.junction.providers.ask2go import adapter, transformer
 from snowfall.junction.providers.ask2go.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence import filesystem
@@ -195,6 +195,7 @@ async def test_number_of_results(
 @pytest.mark.asyncio
 async def test_search_result_data(  # noqa: WPS218
     ask2go_adapter: adapter.Ask2GoAdapter,
+    offer_transformer: transformer.OfferTransformer,
     httpx_mock: pytest_httpx.HTTPXMock,
 ) -> None:
     _mock_responses(
@@ -204,10 +205,15 @@ async def test_search_result_data(  # noqa: WPS218
         str(protobuf.protobuf_to_date(_ARN_LHR.criteria.outbound)),
     )
 
-    async for search_result in ask2go_adapter.gather_search_results(_ARN_LHR):
-        assert search_result.offer_search_id == _ARN_LHR.offer_search_id
-        _assert_offer(search_result.offers[0])
-        segment = search_result.segments[0]
+    offer_groups = offer_transformer.offer_prices_to_offer_groups(
+        _ARN_LHR,
+        ask2go_adapter.gather_search_results(_ARN_LHR),
+    )
+
+    async for offer_group in offer_groups:
+        assert offer_group.offer_search_id == _ARN_LHR.offer_search_id
+        _assert_offer(offer_group.offers[0])
+        segment = offer_group.segments[0]
         assert segment.id == "segment_id"
         assert segment.operator == "SK"
         assert segment.vendor == "SK"
