@@ -54,6 +54,11 @@ class CriteriaGenerator(object):
                                 first_leg.departure_at,
                             ).astimezone(start.timezone),
                         ),
+                        arrival_datetime=protobuf.datetime_to_protobuf_datetime(
+                            protobuf.protobuf_to_datetime(
+                                last_leg.arrival_at,
+                            ).astimezone(end.timezone),
+                        ),
                     ),
                 )
                 for start, end in itertools.product(origins, destinations)

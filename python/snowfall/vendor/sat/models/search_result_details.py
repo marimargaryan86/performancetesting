@@ -1,5 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
+from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -7,8 +8,8 @@ from snowfall.vendor.sat.models.search import StationName
 
 
 class Train(BaseModel):
-    category: str
-    number: str
+    category: Optional[str]
+    number: Optional[str]
 
 
 class SearchResultTransferChange(BaseModel):

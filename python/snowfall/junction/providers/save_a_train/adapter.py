@@ -9,14 +9,16 @@ import httpx
 import more_itertools
 import phonenumbers
 import pycountry
+import structlog
 
 from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.offers.v1alpha import models_pb2 as offer_models_pb2
 from snowfall.junction.orders.v1alpha import models_pb2 as order_models_pb2
-from snowfall.junction.providers.save_a_train import cache, train_stations
+from snowfall.junction.providers.save_a_train import cache, models, train_stations
 from snowfall.junction.providers.save_a_train.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
-from snowfall.vendor.sat import client, enums, exceptions, models
+from snowfall.vendor.sat import client, enums, exceptions
+from snowfall.vendor.sat import models as sat_models
 
 _CABIN_MAPPING = types.MappingProxyType(
     {
@@ -50,6 +52,7 @@ class SaveATrainAdapter(object):
         self._client = save_a_train_client
         self._offers_cache = offers_cache
         self._ttl = ttl
+        self._logger = structlog.get_logger(__name__)
 
     async def gather_search_results(  # noqa: C901,WPS210,WPS231
         self,
@@ -61,8 +64,8 @@ class SaveATrainAdapter(object):
         )
 
         try:
-            await self._client.get_general_search_results(
-                models.request.GeneralSearchResultsRequest(
+            general_search_response = await self._client.get_general_search_results(
+                sat_models.request.GeneralSearchResultsRequest(
                     origin_id=origin.id,
                     destination_id=destination.id,
                     trip_type=enums.TripType.one_way,
@@ -74,12 +77,34 @@ class SaveATrainAdapter(object):
             )
         except exceptions.SATValidationError as general_search_error:
             raise NoResultsError(general_search_error)
-        except (httpx.HTTPStatusError, httpx.ReadTimeout, httpx.TimeoutException):
-            pass  # noqa: WPS420
+        except httpx.TimeoutException as timeout_error:
+            self._logger.info("SAT timeout error occurred.", error=timeout_error)
+        else:
+            error_message = None
+            if general_search_response.general_search_result.outbound:
+                requirement = models.GeneralSearchResultRequirement(
+                    departure_datetime=protobuf.protobuf_to_datetime(
+                        search_task.criteria.departure_datetime,
+                    ),
+                    arrival_datetime=protobuf.protobuf_to_datetime(
+                        search_task.criteria.arrival_datetime,
+                    ),
+                )
+                result_matches = any(
+                    general_search_result_matches_requirement(trip, requirement)
+                    for trip in general_search_response.general_search_result.outbound
+                )
+                if not result_matches:
+                    error_message = "No results matching search criteria"
+            else:
+                error_message = "No results"
+
+            if error_message:
+                raise NoResultsError(error_message)
 
         try:
             search_response = await self._client.create_search(
-                models.request.CreateSearchRequest(
+                sat_models.request.CreateSearchRequest(
                     origin_id=origin.id,
                     destination_id=destination.id,
                     passengers_ages=list(search_task.criteria.passengers_ages),
@@ -95,7 +120,7 @@ class SaveATrainAdapter(object):
             if search_result_matches_requirements(search_result):
                 try:
                     search_details = await self._client.get_search_result_details(
-                        models.request.SearchResultRequest(
+                        sat_models.request.SearchResultRequest(
                             search_id=search_response.identifier,
                             search_result_id=search_result.identifier,
                         ),
@@ -143,8 +168,8 @@ class SaveATrainAdapter(object):
                         offer_models_pb2.OfferSegment(
                             id=search_task.segments[0].id,
                             vehicle=offer_models_pb2.Vehicle(
-                                equipment=transfer_change.train.category,
-                                number=transfer_change.train.number,
+                                equipment=transfer_change.train.category or "",
+                                number=transfer_change.train.number or "",
                             ),
                             operator="foobar",  # TODO: add something useful
                             vendor="foobar",  # TODO: add something useful
@@ -187,6 +212,7 @@ class SaveATrainAdapter(object):
                         )
                         for transfer in search_details.transfers
                         for transfer_change in transfer.changes
+                        if transfer_change.transport_type == "train"
                     ],
                 )
 
@@ -208,10 +234,10 @@ class SaveATrainAdapter(object):
 
         try:
             booking_result = await self._client.create_booking(
-                models.request.CreateBookingRequest(
+                sat_models.request.CreateBookingRequest(
                     search_id=select_search_result.search_identifier,
                     passengers=[
-                        models.booking.Passenger(
+                        sat_models.booking.Passenger(
                             title=title_map[passenger.title],
                             first_name=passenger.first_name,
                             last_name=passenger.last_name,
@@ -247,7 +273,7 @@ class SaveATrainAdapter(object):
         self,
         offer_id: str,
         order: order_models_pb2.Order,
-    ) -> models.search_result_selection.SearchResultSelectionResponse:
+    ) -> sat_models.search_result_selection.SearchResultSelectionResponse:
         offer_details = await self._offers_cache.fetch(offer_id)
 
         if not offer_details:
@@ -257,7 +283,7 @@ class SaveATrainAdapter(object):
 
         try:
             return await self._client.select_search_result(
-                models.request.SelectSearchResultRequest(
+                sat_models.request.SelectSearchResultRequest(
                     search_id=search_id,
                     search_result_id=search_result_id,
                     transfer_id=transfer_id,
@@ -268,7 +294,27 @@ class SaveATrainAdapter(object):
             raise BookingError(search_error)
 
 
-def search_result_matches_requirements(search: models.search.SearchResult) -> bool:
+def general_search_result_matches_requirement(
+    general_search_result: sat_models.general_search.GeneralTrip,
+    requirement: models.GeneralSearchResultRequirement,
+) -> bool:
+    departure_datetime = datetime.datetime.combine(
+        general_search_result.departure_date,
+        general_search_result.departure_time,
+        tzinfo=requirement.departure_datetime.tzinfo,
+    )
+    arrival_datetime = datetime.datetime.combine(
+        general_search_result.departure_date,
+        general_search_result.departure_time,
+        tzinfo=requirement.arrival_datetime.tzinfo,
+    )
+    return (
+        departure_datetime == requirement.departure_datetime
+        and arrival_datetime == requirement.arrival_datetime
+    )
+
+
+def search_result_matches_requirements(search: sat_models.search.SearchResult) -> bool:
     return True  # TODO: check departure and arrival datetime for a match
 
 

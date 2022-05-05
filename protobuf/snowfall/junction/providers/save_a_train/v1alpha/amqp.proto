@@ -16,5 +16,6 @@ message Criteria {
   string destination_id = 2;
   repeated uint32 passengers_ages = 3;
   snowfall.common.v1alpha.DateTime departure_datetime = 4;
+  snowfall.common.v1alpha.DateTime arrival_datetime = 6;
   string cabin_class = 5;
 }
