@@ -1,10 +1,9 @@
 class Ask2GoError(Exception):
-    """Raised when an Ask2Go is unhealthy."""
+    """Raised when there is an Ask2Go-related issue."""
 
 
 class ServiceError(Ask2GoError):
-    def __init__(self) -> None:
-        super().__init__("Service unavailable")
+    """Raised when the Ask2Go service is unhealthy."""
 
 
 class DateError(Ask2GoError):
