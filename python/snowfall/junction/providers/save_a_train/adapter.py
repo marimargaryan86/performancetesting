@@ -5,6 +5,7 @@ import types
 import uuid
 from typing import AsyncIterator
 
+import httpx
 import more_itertools
 import phonenumbers
 import pycountry
@@ -73,6 +74,8 @@ class SaveATrainAdapter(object):
             )
         except exceptions.SATValidationError as general_search_error:
             raise NoResultsError(general_search_error)
+        except (httpx.HTTPStatusError, httpx.ReadTimeout, httpx.TimeoutException):
+            pass  # noqa: WPS420
 
         try:
             search_response = await self._client.create_search(
