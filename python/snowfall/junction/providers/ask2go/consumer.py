@@ -1,6 +1,7 @@
 from typing import cast
 
 import phonenumbers
+import structlog
 
 from snowfall.junction.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
 from snowfall.junction.orders.v1alpha import amqp_pb2 as orders_amqp_pb2
@@ -22,6 +23,7 @@ class OrderConsumer(object):
         self._booking = booking_handler
         self._cache = offer_cache
         self._consumer = consumer
+        self._logger = structlog.get_logger(__name__)
         self._producer = producer
 
     async def consume(self) -> None:
@@ -41,6 +43,7 @@ class OrderConsumer(object):
                 offer_details,
             )
         except (errors.ServiceError, phonenumbers.NumberParseException):
+            self._logger.exception()
             await self._producer.publish(
                 models_pb2.OrderResult(
                     order_id=task.order.id,

@@ -54,7 +54,7 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:  # noqa: WPS2
             [
                 OrderService(
                     orders=orders.OrderRepository(
-                        mongo.orders.order,
+                        mongo.orders.orders,
                         passenger_name_records=passenger_name_records_client,
                     ),
                     publisher=OrderProducer(
@@ -96,7 +96,7 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
                 routing_key="orders.result.offer",
             ),
             order_repository=orders.OrderRepository(
-                mongo.orders.order,
+                mongo.orders.orders,
                 passenger_name_records=passenger_name_records_client,
             ),
         )
