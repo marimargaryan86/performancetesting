@@ -48,7 +48,7 @@ class BookingHandler(object):
             passenger=common.Passenger(
                 first_name=passenger.first_name,
                 last_name=passenger.last_name,
-                name_title=None,
+                name_title=models_pb2.Passenger.Title.Name(passenger.title),
                 gender=gender,
                 type=criteria.get_passenger_type(
                     protobuf.protobuf_to_date(passenger.date_of_birth),
@@ -69,6 +69,9 @@ class BookingHandler(object):
                     number=str(number.national_number),
                 ),
                 email=order.contact_details.email,
+                first_name=passenger.first_name,
+                last_name=passenger.last_name,
+                title=models_pb2.Passenger.Title.Name(passenger.title),
             ),
         )
 

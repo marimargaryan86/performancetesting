@@ -111,6 +111,8 @@ class Orders(endpoints.HTTPEndpoint):
                         "Austin, TX",
                     ],
                     region_code="CH",
+                    postal_code="XX",
+                    locality="XX",
                     revision=0,
                 ),
                 phone=phone_number_pb2.PhoneNumber(
