@@ -233,6 +233,7 @@ class SaveATrainAdapter(object):
             booking_result = await self._client.create_booking(
                 sat_models.request.CreateBookingRequest(
                     search_id=select_search_result.search_identifier,
+                    seat_preference_code="ALLOWED_SEAT_LOCATION.C",
                     passengers=[
                         sat_models.booking.Passenger(
                             title=title_map[passenger.title],
@@ -255,7 +256,7 @@ class SaveATrainAdapter(object):
                             ),
                             country=pycountry.countries.get(
                                 alpha_2=order.contact_details.address.region_code,
-                            ).name,
+                            ).alpha_3,
                         )
                         for passenger in order.passengers
                     ],
