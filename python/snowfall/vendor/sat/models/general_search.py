@@ -15,7 +15,7 @@ class GeneralTrip(BaseModel):
     duration: timedelta
     arrival_date: date
     arrival_time: time
-    changes: int
+    changes: Optional[int]
     operator: str
     connections: Optional[str]
     price: dict[str, Decimal]  # fare class: price
