@@ -43,7 +43,7 @@ job "client-api-http" {
         "traefik.http.middlewares.forwarded-proto.headers.sslProxyHeaders.X-Forwarded-Proto=https",
         "traefik.http.routers.client-api.entrypoints=websecure",
         "traefik.http.routers.client-api.rule=Host(`api.junction.dev`)",
-        "traefik.http.routers.client-api.middlewares=forwarded-proto@docker",
+        "traefik.http.routers.client-api.middlewares=forwarded-proto",
       ]
 
       check {
