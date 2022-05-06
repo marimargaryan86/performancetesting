@@ -58,7 +58,7 @@ class SaveATrainAdapter(object):
         self._ttl = ttl
         self._logger = structlog.get_logger(__name__)
 
-    async def gather_search_results(  # noqa: C901,WPS210,WPS231
+    async def gather_search_results(  # noqa: C901,WPS210,WPS231,WPS238
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
     ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
@@ -81,6 +81,10 @@ class SaveATrainAdapter(object):
             )
         except httpx.TimeoutException as timeout_error:
             self._logger.info("SAT timeout error occurred.", error=timeout_error)
+        except httpx.HTTPStatusError as http_status_error:
+            if http_status_error.response.text:
+                raise_http_error_with_text(http_status_error)
+            raise http_status_error
         else:
             requirement = models.GeneralSearchResultRequirement(
                 departure_datetime=protobuf.protobuf_to_datetime(
