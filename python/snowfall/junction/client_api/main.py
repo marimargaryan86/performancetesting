@@ -141,7 +141,8 @@ def _serve(app: service.Application[bootstrap.Settings]) -> None:
         log_config=None,
         proxy_headers=True,
         forwarded_allow_ips=[
-            str(address) for address in app.settings.forwarded_allowed_ips
+            "*" if str(address) == "0.0.0.0" else str(address)  # nosec
+            for address in app.settings.forwarded_allowed_ips
         ],
     )
 
