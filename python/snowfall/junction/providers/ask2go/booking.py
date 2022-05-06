@@ -71,9 +71,6 @@ class BookingHandler(object):
                     number=str(number.national_number),
                 ),
                 email=order.contact_details.email,
-                first_name=passenger.first_name,
-                last_name=passenger.last_name,
-                title=models_pb2.Passenger.Title.Name(passenger.title),
             ),
         )
 
