@@ -29,11 +29,15 @@ _CABIN_MAPPING = types.MappingProxyType(
 )
 
 
-class NoResultsError(Exception):
+class SaveATrainAdapterError(Exception):
+    """Raised when there is an exception in the Save a Train adapter."""
+
+
+class NoResultsError(SaveATrainAdapterError):
     """Raised when a result page has not results."""
 
 
-class BookingError(Exception):
+class BookingError(SaveATrainAdapterError):
     """Raised when a booking error is encountered."""
 
 
@@ -75,32 +79,23 @@ class SaveATrainAdapter(object):
                     ),
                 ),
             )
-        except exceptions.SATValidationError as general_search_error:
-            raise NoResultsError(general_search_error)
         except httpx.TimeoutException as timeout_error:
             self._logger.info("SAT timeout error occurred.", error=timeout_error)
         else:
-            error_message = None
-            if general_search_response.general_search_result.outbound:
-                requirement = models.GeneralSearchResultRequirement(
-                    departure_datetime=protobuf.protobuf_to_datetime(
-                        search_task.criteria.departure_datetime,
-                    ),
-                    arrival_datetime=protobuf.protobuf_to_datetime(
-                        search_task.criteria.arrival_datetime,
-                    ),
-                )
-                result_matches = any(
-                    general_search_result_matches_requirement(trip, requirement)
-                    for trip in general_search_response.general_search_result.outbound
-                )
-                if not result_matches:
-                    error_message = "No results matching search criteria"
-            else:
-                error_message = "No results"
-
-            if error_message:
-                raise NoResultsError(error_message)
+            requirement = models.GeneralSearchResultRequirement(
+                departure_datetime=protobuf.protobuf_to_datetime(
+                    search_task.criteria.departure_datetime,
+                ),
+                arrival_datetime=protobuf.protobuf_to_datetime(
+                    search_task.criteria.arrival_datetime,
+                ),
+            )
+            result_matches = any(
+                self._general_search_result_matches_requirement(trip, requirement)
+                for trip in general_search_response.general_search_result.outbound
+            )
+            if not result_matches:
+                raise NoResultsError("No results matching search criteria")
 
         try:
             search_response = await self._client.create_search(
@@ -115,9 +110,13 @@ class SaveATrainAdapter(object):
             )
         except exceptions.SATValidationError as search_error:
             raise NoResultsError(search_error)
+        except httpx.HTTPStatusError as http_error:
+            if http_error.response.text:
+                raise_http_error_with_text(http_error)
+            raise http_error
 
         for search_result in search_response.search_results:
-            if search_result_matches_requirements(search_result):
+            if self._search_result_matches_requirements(search_result):
                 try:
                     search_details = await self._client.get_search_result_details(
                         sat_models.request.SearchResultRequest(
@@ -126,6 +125,8 @@ class SaveATrainAdapter(object):
                         ),
                     )
                 except exceptions.SATValidationError:
+                    continue
+                except httpx.HTTPStatusError:
                     continue
 
                 yield offer_models_pb2.OfferGroup(
@@ -265,6 +266,10 @@ class SaveATrainAdapter(object):
             )
         except exceptions.SATValidationError as booking_error:
             raise BookingError(booking_error)
+        except httpx.HTTPStatusError as http_error:
+            if http_error.response.text:
+                raise_http_error_with_text(http_error)
+            raise http_error
 
         # TODO: do we need to confirm the booking + get the ticket?
         return booking_result.json()
@@ -292,30 +297,36 @@ class SaveATrainAdapter(object):
             )
         except exceptions.SATValidationError as search_error:
             raise BookingError(search_error)
+        except httpx.HTTPStatusError as http_error:
+            if http_error.response.text:
+                raise_http_error_with_text(http_error)
+            raise http_error
 
+    def _general_search_result_matches_requirement(
+        self,
+        general_search_result: sat_models.general_search.GeneralTrip,
+        requirement: models.GeneralSearchResultRequirement,
+    ) -> bool:
+        departure_datetime = datetime.datetime.combine(
+            general_search_result.departure_date,
+            general_search_result.departure_time,
+            tzinfo=requirement.departure_datetime.tzinfo,
+        )
+        arrival_datetime = datetime.datetime.combine(
+            general_search_result.departure_date,
+            general_search_result.departure_time,
+            tzinfo=requirement.arrival_datetime.tzinfo,
+        )
+        return (
+            departure_datetime == requirement.departure_datetime
+            and arrival_datetime == requirement.arrival_datetime
+        )
 
-def general_search_result_matches_requirement(
-    general_search_result: sat_models.general_search.GeneralTrip,
-    requirement: models.GeneralSearchResultRequirement,
-) -> bool:
-    departure_datetime = datetime.datetime.combine(
-        general_search_result.departure_date,
-        general_search_result.departure_time,
-        tzinfo=requirement.departure_datetime.tzinfo,
-    )
-    arrival_datetime = datetime.datetime.combine(
-        general_search_result.departure_date,
-        general_search_result.departure_time,
-        tzinfo=requirement.arrival_datetime.tzinfo,
-    )
-    return (
-        departure_datetime == requirement.departure_datetime
-        and arrival_datetime == requirement.arrival_datetime
-    )
-
-
-def search_result_matches_requirements(search: sat_models.search.SearchResult) -> bool:
-    return True  # TODO: check departure and arrival datetime for a match
+    def _search_result_matches_requirements(
+        self,
+        search: sat_models.search.SearchResult,
+    ) -> bool:
+        return True  # TODO: check departure and arrival datetime for a match
 
 
 def _cabin_to_proto(cabin: str) -> models_pb2.CabinClass.Type.V:
@@ -323,3 +334,11 @@ def _cabin_to_proto(cabin: str) -> models_pb2.CabinClass.Type.V:
         return _CABIN_MAPPING[cabin]
     except KeyError:
         return models_pb2.CabinClass.TYPE_UNSPECIFIED
+
+
+def raise_http_error_with_text(http_error: httpx.HTTPStatusError) -> None:
+    raise SaveATrainAdapterError(
+        "HTTPStatusError text: {0}".format(
+            http_error.response.text,
+        ),
+    ) from http_error

@@ -388,11 +388,6 @@ class SATClient(object):  # noqa: WPS214
 
         response_data = response.json()
 
-        errors = response_data.get("errors")
-        if errors:
-            message = "; ".join(errors)
-            raise SATValidationError(message)
-
         return GeneralSearchResponse(**response_data)
 
     async def create_token(self) -> str:
