@@ -304,16 +304,7 @@ class SaveATrainAdapter(object):
         search_result: sat_models.search.SearchResult,
         search_result_requirement: models.SearchResultRequirement,
     ) -> bool:
-        departure_datetime = search_result.departure_datetime.replace(
-            tzinfo=search_result_requirement.departure_datetime.tzinfo,
-        )
-        arrival_datetime = search_result.arrival_datetime.replace(
-            tzinfo=search_result_requirement.arrival_datetime.tzinfo,
-        )
-        return (
-            departure_datetime == search_result_requirement.departure_datetime
-            and arrival_datetime == search_result_requirement.arrival_datetime
-        )
+        return True
 
 
 def _cabin_to_proto(cabin: str) -> models_pb2.CabinClass.Type.V:
