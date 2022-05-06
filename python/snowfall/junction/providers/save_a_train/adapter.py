@@ -58,7 +58,7 @@ class SaveATrainAdapter(object):
         self._ttl = ttl
         self._logger = structlog.get_logger(__name__)
 
-    async def gather_search_results(  # noqa: C901,WPS210,WPS231,WPS238
+    async def gather_search_results(  # noqa: C901,WPS210,WPS231
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
     ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
@@ -68,7 +68,7 @@ class SaveATrainAdapter(object):
         )
 
         try:
-            general_search_response = await self._client.get_general_search_results(
+            await self._client.get_general_search_results(
                 sat_models.request.GeneralSearchResultsRequest(
                     origin_id=origin.id,
                     destination_id=destination.id,
@@ -85,21 +85,6 @@ class SaveATrainAdapter(object):
             if http_status_error.response.text:
                 raise_http_error_with_text(http_status_error)
             raise http_status_error
-        else:
-            requirement = models.GeneralSearchResultRequirement(
-                departure_datetime=protobuf.protobuf_to_datetime(
-                    search_task.criteria.departure_datetime,
-                ),
-                arrival_datetime=protobuf.protobuf_to_datetime(
-                    search_task.criteria.arrival_datetime,
-                ),
-            )
-            result_matches = any(
-                self._general_search_result_matches_requirement(trip, requirement)
-                for trip in general_search_response.general_search_result.outbound
-            )
-            if not result_matches:
-                raise NoResultsError("No results matching search criteria")
 
         try:
             search_response = await self._client.create_search(
@@ -119,8 +104,16 @@ class SaveATrainAdapter(object):
                 raise_http_error_with_text(http_error)
             raise http_error
 
+        requirement = models.SearchResultRequirement(
+            departure_datetime=protobuf.protobuf_to_datetime(
+                search_task.criteria.departure_datetime,
+            ),
+            arrival_datetime=protobuf.protobuf_to_datetime(
+                search_task.criteria.arrival_datetime,
+            ),
+        )
         for search_result in search_response.search_results:
-            if self._search_result_matches_requirements(search_result):
+            if self._search_result_matches_requirements(search_result, requirement):
                 try:
                     search_details = await self._client.get_search_result_details(
                         sat_models.request.SearchResultRequest(
@@ -306,31 +299,21 @@ class SaveATrainAdapter(object):
                 raise_http_error_with_text(http_error)
             raise http_error
 
-    def _general_search_result_matches_requirement(
-        self,
-        general_search_result: sat_models.general_search.GeneralTrip,
-        requirement: models.GeneralSearchResultRequirement,
-    ) -> bool:
-        departure_datetime = datetime.datetime.combine(
-            general_search_result.departure_date,
-            general_search_result.departure_time,
-            tzinfo=requirement.departure_datetime.tzinfo,
-        )
-        arrival_datetime = datetime.datetime.combine(
-            general_search_result.departure_date,
-            general_search_result.departure_time,
-            tzinfo=requirement.arrival_datetime.tzinfo,
-        )
-        return (
-            departure_datetime == requirement.departure_datetime
-            and arrival_datetime == requirement.arrival_datetime
-        )
-
     def _search_result_matches_requirements(
         self,
-        search: sat_models.search.SearchResult,
+        search_result: sat_models.search.SearchResult,
+        search_result_requirement: models.SearchResultRequirement,
     ) -> bool:
-        return True  # TODO: check departure and arrival datetime for a match
+        departure_datetime = search_result.departure_datetime.replace(
+            tzinfo=search_result_requirement.departure_datetime.tzinfo,
+        )
+        arrival_datetime = search_result.arrival_datetime.replace(
+            tzinfo=search_result_requirement.arrival_datetime.tzinfo,
+        )
+        return (
+            departure_datetime == search_result_requirement.departure_datetime
+            and arrival_datetime == search_result_requirement.arrival_datetime
+        )
 
 
 def _cabin_to_proto(cabin: str) -> models_pb2.CabinClass.Type.V:

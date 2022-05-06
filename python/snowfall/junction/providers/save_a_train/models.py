@@ -3,6 +3,6 @@ import datetime
 
 
 @dataclasses.dataclass(frozen=True)
-class GeneralSearchResultRequirement(object):
+class SearchResultRequirement(object):
     departure_datetime: datetime.datetime
     arrival_datetime: datetime.datetime
