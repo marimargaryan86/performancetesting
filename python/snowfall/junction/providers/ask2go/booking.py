@@ -107,6 +107,7 @@ class BookingHandler(object):
                     number_mode=rapidjson.NM_NATIVE
                     | rapidjson.NM_DECIMAL
                     | rapidjson.NM_NAN,
+                    datetime_mode=rapidjson.DM_ISO8601,
                 ),
             ),
         )
