@@ -66,7 +66,7 @@ class TripSegments(endpoints.HTTPEndpoint):
                         "ListTripSegments",
                         tripId=request.path_params["tripId"],
                     ),
-                    str(sequence_page.next_page_token),
+                    sequence_page.next_page_token,
                     pagination,
                 ),
             ),

@@ -39,7 +39,7 @@ class ResultSet(abc.ABC, Generic[_Record], AsyncIterator[_Record]):
         if self._custom_sort:
             raise RuntimeError("Cursors do not yet support sorted result sets.")
 
-        if not self._last:
+        if not self._last or not self._cursor.alive:
             return ""
 
         return cursor.marshal(cursor.new(self._last, self._filter))

@@ -8,8 +8,9 @@ Record = TypeVar("Record")
 class AllMixin(Generic[Record]):
     async def all_(
         self: repository.RepositoryProtocol[Record],
+        cursor: Optional[str] = None,
     ) -> resultset.ResultSet[Record]:
-        return await self._execute(self._collection.find)
+        return await self._find_with_cursor(cur=cursor or "")
 
 
 class EstimatedCountMixin(Generic[Record]):

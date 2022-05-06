@@ -67,6 +67,13 @@ class RepositoryProtocol(Protocol[Record]):
     ) -> Any:
         """Use for queries to add metrics and tracing."""
 
+    async def _find_with_cursor(
+        self,
+        cur: str,
+        filter_: Optional[Mapping[str, Any]] = None,
+    ) -> resultset.ResultSet[Record]:
+        """Use for find queries with a filter."""
+
 
 class _AbstractRepository(abc.ABC, Generic[Record]):  # noqa: WPS214
     _indexes: list[pymongo.IndexModel] = []

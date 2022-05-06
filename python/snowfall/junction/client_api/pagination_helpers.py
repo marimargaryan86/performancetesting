@@ -4,6 +4,8 @@ from typing import Any, Optional, Sequence
 from furl import furl
 from starlette import requests
 
+from snowfall.stdlib.persistence import cursor
+
 _DEFAULT_PAGE_LIMIT = 20
 PAGE_CURSOR_KEY = "page[cursor]"
 PAGE_LIMIT_KEY = "page[limit]"
@@ -18,20 +20,24 @@ class Pagination(object):
 @dataclasses.dataclass(frozen=True)
 class SequencePage(object):
     sequence: Sequence[Any]
-    next_page_token: Optional[str] = None
+    next_page_token: str
 
 
 def sequence_paginator(
     sequence: Sequence[Any],
     pagination: Pagination,
 ) -> SequencePage:
-    start_index = int(pagination.cursor or 0)
+    start_index = 0
+
+    if pagination.cursor:
+        start_index = int(cursor.unmarshal(pagination.cursor, None).id)
+
     end_index = start_index + (pagination.limit or _DEFAULT_PAGE_LIMIT)
 
     if len(sequence) <= end_index:
-        next_page_token = None
+        next_page_token = ""  # nosec
     else:
-        next_page_token = str(end_index)
+        next_page_token = cursor.marshal(cursor.new(str(end_index), None))
 
     return SequencePage(
         sequence=sequence[start_index:end_index],

@@ -1,3 +1,4 @@
+import asyncio
 from typing import Any
 
 import mongomock_motor
@@ -18,15 +19,28 @@ class MockRepository(
 async def test_result_set() -> None:
     repo = MockRepository(mongomock_motor.AsyncMongoMockClient()["tests"]["test"])
 
-    await repo.insert({"_id": "foobar"})
-    await repo.insert({"_id": "bazqux"})
+    await asyncio.gather(
+        repo.insert({"_id": "foobar_foobar"}),
+        repo.insert({"_id": "bazqux_foobar"}),
+        repo.insert({"_id": "foobar_bazqux"}),
+        repo.insert({"_id": "bazqux_bazqux"}),
+    )
 
     documents = await repo.all_()
 
+    documents.limit(3)
+
+    assert len([document async for document in documents]) == 3
+
+    cursor = await documents.cursor()
+
+    assert cursor != ""
+
+    documents = await repo.all_(cursor=cursor)
+
     assert isinstance(documents, resultset.ResultSet)
+
+    documents.limit(3)
+
+    assert len([document async for document in documents]) == 1
     assert await documents.cursor() == ""
-
-    async for document in documents:
-        assert document["_id"] in {"bazqux", "foobar"}
-
-    assert await documents.cursor() != ""
