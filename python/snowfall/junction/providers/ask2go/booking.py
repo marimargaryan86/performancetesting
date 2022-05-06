@@ -5,6 +5,7 @@ import aiosmtplib
 import phonenumbers
 import pycountry
 import rapidjson
+import structlog
 
 from snowfall.junction.orders.v1alpha import models_pb2
 from snowfall.junction.providers.ask2go import criteria
@@ -20,6 +21,7 @@ class BookingHandler(object):
         smtp_client: aiosmtplib.SMTP,
     ):
         self._client = a2g_client
+        self._logger = structlog.get_logger(__name__)
         self._smtp = smtp_client
 
     async def book(
@@ -75,7 +77,10 @@ class BookingHandler(object):
             ),
         )
 
-        await self._send_email_notification(order, offer_id, booking_result)
+        try:
+            await self._send_email_notification(order, offer_id, booking_result)
+        except Exception:  # noqa: PIE786
+            self._logger.exception()
 
         return booking_result
 
@@ -95,7 +100,14 @@ class BookingHandler(object):
                 order=order.id,
                 spnr=order.passenger_name_record,
                 offer=offer_id,
-                json=rapidjson.dumps(raw_data.dict(), indent=2, sort_keys=True),
+                json=rapidjson.dumps(
+                    raw_data.dict(),
+                    indent=2,
+                    sort_keys=True,
+                    number_mode=rapidjson.NM_NATIVE
+                    | rapidjson.NM_DECIMAL
+                    | rapidjson.NM_NAN,
+                ),
             ),
         )
 
