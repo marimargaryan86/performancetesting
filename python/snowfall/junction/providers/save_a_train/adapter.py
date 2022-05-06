@@ -224,7 +224,6 @@ class SaveATrainAdapter(object):
     ) -> str:
         select_search_result = await self._select_search_result(offer_id, order)
 
-        passenger = order.passengers[0]  # TODO: handle multiple passengers
         title_map = {  # TODO: map unspecified to something else?
             order_models_pb2.Passenger.Title.TITLE_UNSPECIFIED: enums.PassengerTitle.mr,
             order_models_pb2.Passenger.Title.TITLE_MR: enums.PassengerTitle.mr,
@@ -260,7 +259,8 @@ class SaveATrainAdapter(object):
                             country=pycountry.countries.get(
                                 alpha_2=order.contact_details.address.region_code,
                             ).name,
-                        ),
+                        )
+                        for passenger in order.passengers
                     ],
                 ),
             )
