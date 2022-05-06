@@ -77,7 +77,7 @@ def parse_create_booking_request(
                 "firstName": passenger.first_name,
                 "lastName": passenger.last_name,
                 "title": passenger.name_title,
-                "dateOfBirth": passenger.birth_date.isoformat(),
+                "dateOfBirth": passenger.birth_date.strftime("%d-%m-%Y"),
                 "gender": passenger.gender.value,
                 "passengerType": passenger.type.value,
             },
