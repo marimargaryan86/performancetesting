@@ -222,22 +222,27 @@ func (r *raptor) routeWorker(wg *sync.WaitGroup, jobs chan uint64, results chan 
 
 			if current != nil {
 				tripSegment := r.data.ScheduleStopBySequence(current.ScheduleStops[routeSegment.Order])
-				arrival = tripSegment.ArrivalAt
 
-				// adds additional transfer time based on origin type
-				switch r.data.ScheduleBySequence(tripSegment.Schedule).Type {
-				case models.Schedule_TYPE_AIR:
-					arrival += airSuffixSeconds
-				case models.Schedule_TYPE_RAIL:
-					arrival += railSuffixSeconds
-				}
+				if tripSegment.ArrivalAt == 0 {
+					current = nil
+				} else {
+					arrival = tripSegment.ArrivalAt
 
-				if r.isBetter(tripSegment.Stop, arrival) {
-					results <- workerResult{
-						stop:     tripSegment,
-						arrival:  arrival,
-						current:  current,
-						boarding: boarding,
+					// adds additional transfer time based on origin type
+					switch r.data.ScheduleBySequence(tripSegment.Schedule).Type {
+					case models.Schedule_TYPE_AIR:
+						arrival += airSuffixSeconds
+					case models.Schedule_TYPE_RAIL:
+						arrival += railSuffixSeconds
+					}
+
+					if r.isBetter(tripSegment.Stop, arrival) {
+						results <- workerResult{
+							stop:     tripSegment,
+							arrival:  arrival,
+							current:  current,
+							boarding: boarding,
+						}
 					}
 				}
 			}
