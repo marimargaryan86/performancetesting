@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import types
 import uuid
-from typing import AsyncIterator
+from typing import AsyncIterator, Optional
 
 import httpx
 import more_itertools
@@ -219,7 +219,9 @@ class SaveATrainAdapter(object):
         offer_id: str,
         order: order_models_pb2.Order,
     ) -> str:
-        select_search_result = await self._select_search_result(offer_id, order)
+        search_id, seat = self._extract_search_id_and_seat(
+            await self._select_search_result(offer_id, order),
+        )
 
         title_map = {  # TODO: map unspecified to something else?
             order_models_pb2.Passenger.Title.TITLE_UNSPECIFIED: enums.PassengerTitle.mr,
@@ -232,8 +234,8 @@ class SaveATrainAdapter(object):
         try:
             booking_result = await self._client.create_booking(
                 sat_models.request.CreateBookingRequest(
-                    search_id=select_search_result.search_identifier,
-                    seat_preference_code="ALLOWED_SEAT_LOCATION.C",
+                    search_id=search_id,
+                    seat_preference_code=seat or "",
                     passengers=[
                         sat_models.booking.Passenger(
                             title=title_map[passenger.title],
@@ -299,6 +301,16 @@ class SaveATrainAdapter(object):
             if http_error.response.text:
                 raise_http_error_with_text(http_error)
             raise http_error
+
+    def _extract_search_id_and_seat(
+        self,
+        response: sat_models.search_result_selection.SearchResultSelectionResponse,
+    ) -> tuple[str, Optional[str]]:
+        seat_preference = response.outbound_selected_result.seat_preference
+        if seat_preference is None or seat_preference.status != "included":
+            return response.search_identifier, None
+
+        return response.search_identifier, seat_preference.options[0].code
 
     def _search_result_matches_requirements(
         self,
