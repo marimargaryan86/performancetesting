@@ -219,7 +219,7 @@ class SaveATrainAdapter(object):
         offer_id: str,
         order: order_models_pb2.Order,
     ) -> str:
-        search_id, seat = self._extract_search_id_and_seat(
+        search_id, seat_code = self._extract_search_id_and_seat_preference_code(
             await self._select_search_result(offer_id, order),
         )
 
@@ -231,11 +231,15 @@ class SaveATrainAdapter(object):
             order_models_pb2.Passenger.Title.TITLE_MS: enums.PassengerTitle.ms,
         }
 
+        country = pycountry.countries.get(
+            alpha_2=order.contact_details.address.region_code,
+        )
+
         try:
             booking_result = await self._client.create_booking(
                 sat_models.request.CreateBookingRequest(
                     search_id=search_id,
-                    seat_preference_code=seat or "",
+                    seat_preference_code=seat_code or "",
                     passengers=[
                         sat_models.booking.Passenger(
                             title=title_map[passenger.title],
@@ -256,9 +260,7 @@ class SaveATrainAdapter(object):
                                     order.contact_details.phone.e164_number,
                                 ).national_number,
                             ),
-                            country=pycountry.countries.get(
-                                alpha_2=order.contact_details.address.region_code,
-                            ).alpha_3,
+                            country=getattr(country, "common_name", country.name),
                         )
                         for passenger in order.passengers
                     ],
@@ -302,15 +304,17 @@ class SaveATrainAdapter(object):
                 raise_http_error_with_text(http_error)
             raise http_error
 
-    def _extract_search_id_and_seat(
+    def _extract_search_id_and_seat_preference_code(
         self,
         response: sat_models.search_result_selection.SearchResultSelectionResponse,
     ) -> tuple[str, Optional[str]]:
-        seat_preference = response.outbound_selected_result.seat_preference
-        if seat_preference is None or seat_preference.status != "included":
-            return response.search_identifier, None
+        seat_preference_code = None
 
-        return response.search_identifier, seat_preference.options[0].code
+        seat_preference = response.outbound_selected_result.seat_preference
+        if seat_preference is not None and seat_preference.status == "included":
+            seat_preference_code = seat_preference.options[0].code
+
+        return response.search_identifier, seat_preference_code
 
     def _search_result_matches_requirements(
         self,

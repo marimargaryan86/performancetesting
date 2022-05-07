@@ -17,7 +17,7 @@ class Passenger(BaseModel):
     gender: enums.PassengerGender
     email: str
     phone_number: str  # with country code, e.g. +442080160509
-    country: str
+    country: str  # full country name, e.g. France
 
 
 class TripInfo(BaseModel):
