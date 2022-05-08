@@ -68,7 +68,7 @@ class DictClient(Client):
             expires_at=protobuf.datetime_to_protobuf(expires_at),
             origin=trip_search_request.origin,
             destination=trip_search_request.destination,
-            departure_after=protobuf.datetime_to_protobuf(
+            departure_after=protobuf.datetime_to_protobuf_datetime(
                 trip_search_request.departure_after,
             ),
         )
@@ -134,7 +134,7 @@ class GrpcClient(Client):
             trip_search=trips_pb2.TripSearch(
                 origin=trip_search_request.origin,
                 destination=trip_search_request.destination,
-                departure_after=protobuf.datetime_to_protobuf(
+                departure_after=protobuf.datetime_to_protobuf_datetime(
                     trip_search_request.departure_after,
                 ),
             ),

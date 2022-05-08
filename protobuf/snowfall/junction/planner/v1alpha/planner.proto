@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package snowfall.junction.planner.v1alpha;
 
+import "snowfall/common/v1alpha/datetime.proto";
+import "snowfall/common/v1alpha/latlng.proto";
 import "snowfall/common/v1alpha/models.proto";
 
 service PlannerService {
@@ -9,9 +11,9 @@ service PlannerService {
 }
 
 message SearchJourneyRequest {
-  snowfall.common.v1alpha.Coordinates origin = 1;
-  snowfall.common.v1alpha.Coordinates destination = 2;
-  int64 departure_after = 3;
+  snowfall.common.v1alpha.LatLng origin = 1;
+  snowfall.common.v1alpha.LatLng destination = 2;
+  snowfall.common.v1alpha.DateTime departure_after = 3;
 }
 
 message SearchJourneyResponse {

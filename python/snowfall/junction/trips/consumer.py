@@ -1,11 +1,14 @@
+import zoneinfo
 from typing import cast
 
 import structlog
 from grpc import aio
 
+from snowfall.common.v1alpha import latlng_pb2
 from snowfall.junction.planner.v1alpha import planner_pb2, planner_pb2_grpc
 from snowfall.junction.trips import trips
 from snowfall.junction.trips.v1alpha import amqp_pb2
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport import amqp
 
 
@@ -32,10 +35,20 @@ class TripSearchConsumer(object):
         try:
             response = await self._planner.SearchJourney(
                 request=planner_pb2.SearchJourneyRequest(
-                    origin=body.trip_search.origin.coordinates,
-                    destination=body.trip_search.destination.coordinates,
-                    departure_after=int(
-                        body.trip_search.departure_after.ToDatetime().timestamp(),
+                    origin=latlng_pb2.LatLng(
+                        latitude=body.trip_search.origin.coordinates.latitude,
+                        longitude=body.trip_search.origin.coordinates.longitude,
+                    ),
+                    destination=latlng_pb2.LatLng(
+                        latitude=body.trip_search.destination.coordinates.latitude,
+                        longitude=body.trip_search.destination.coordinates.longitude,
+                    ),
+                    departure_after=protobuf.datetime_to_protobuf_datetime(
+                        protobuf.protobuf_to_datetime(
+                            body.trip_search.departure_after,
+                        ).astimezone(
+                            zoneinfo.ZoneInfo(body.trip_search.origin.time_zone),
+                        ),
                     ),
                 ),
             )

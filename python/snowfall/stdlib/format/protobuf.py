@@ -4,6 +4,7 @@ import zoneinfo
 from typing import AsyncIterator, Type, TypeVar, Union
 
 from aiofiles.threadpool import binary
+from dateutil import tz
 from google.protobuf import message, timestamp_pb2
 from google.protobuf.descriptor import EnumDescriptor
 
@@ -56,7 +57,7 @@ def datetime_to_protobuf_datetime(
         seconds=timestamp.second,
         nanos=timestamp.microsecond * 1000,
         time_zone=datetime_pb2.TimeZone(
-            id=str(timestamp.tzinfo),
+            id="UTC" if timestamp.tzinfo == tz.tzutc() else str(timestamp.tzinfo),
         ),
     )
 

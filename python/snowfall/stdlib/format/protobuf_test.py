@@ -3,6 +3,7 @@ import zoneinfo
 from typing import Union
 
 import pytest
+from dateutil import tz
 from google.protobuf import timestamp_pb2
 
 from snowfall.common.v1alpha import datetime_pb2, models_pb2
@@ -90,6 +91,50 @@ def test_protobuf_to_datetime(
                 seconds=6,
                 nanos=7000,
                 time_zone=datetime_pb2.TimeZone(id="Europe/Berlin"),
+            ),
+        ),
+        (
+            datetime.datetime(
+                year=1984,
+                month=2,
+                day=3,
+                hour=4,
+                minute=5,
+                second=6,
+                microsecond=7,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime_pb2.DateTime(
+                year=1984,
+                month=2,
+                day=3,
+                hours=4,
+                minutes=5,
+                seconds=6,
+                nanos=7000,
+                time_zone=datetime_pb2.TimeZone(id="UTC"),
+            ),
+        ),
+        (
+            datetime.datetime(
+                year=1984,
+                month=2,
+                day=3,
+                hour=4,
+                minute=5,
+                second=6,
+                microsecond=7,
+                tzinfo=tz.UTC,
+            ),
+            datetime_pb2.DateTime(
+                year=1984,
+                month=2,
+                day=3,
+                hours=4,
+                minutes=5,
+                seconds=6,
+                nanos=7000,
+                time_zone=datetime_pb2.TimeZone(id="UTC"),
             ),
         ),
     ],

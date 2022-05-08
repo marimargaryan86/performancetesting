@@ -22,6 +22,11 @@ type PlannerServiceServer struct {
 func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *planner.SearchJourneyRequest) (*planner.SearchJourneyResponse, error) {
 	origins := make([]*planner.Stop, 0)
 	destinations := make([]*planner.Stop, 0)
+
+	if req.Origin == nil || req.Destination == nil {
+		return &planner.SearchJourneyResponse{}, status.Errorf(codes.InvalidArgument, "origin or destination missing")
+	}
+
 	origin := h3.FromGeo(h3.GeoCoord{
 		Latitude:  req.Origin.Latitude,
 		Longitude: req.Origin.Longitude,
@@ -49,8 +54,37 @@ func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *plan
 		origins = append(origins, org)
 	}
 
-	destinations = append(destinations, ps.Stops[destination]...)
-	departureTime := time.Unix(req.DepartureAfter, 0)
+	var departureTime time.Time
+
+	if req.DepartureAfter == nil {
+		departureTime = time.Now()
+	} else {
+		var err error
+		var originTz *time.Location
+
+		switch v := req.DepartureAfter.TimeOffset.(type) {
+		case *models.DateTime_TimeZone:
+			originTz, err = time.LoadLocation(v.TimeZone.Id)
+
+			if err != nil {
+				return &planner.SearchJourneyResponse{}, status.Errorf(codes.Internal, "unknown time zone")
+			}
+		case *models.DateTime_UtcOffset:
+			originTz = time.FixedZone("custom", int(v.UtcOffset.Seconds))
+		}
+
+		destinations = append(destinations, ps.Stops[destination]...)
+		departureTime = time.Date(
+			int(req.DepartureAfter.Year),
+			time.Month(req.DepartureAfter.Month),
+			int(req.DepartureAfter.Day),
+			int(req.DepartureAfter.Hours),
+			int(req.DepartureAfter.Minutes),
+			int(req.DepartureAfter.Seconds),
+			int(req.DepartureAfter.Nanos),
+			originTz,
+		)
+	}
 
 	results, err := ps.Planner.Search(origins, destinations, departureTime, []models.Schedule_Type{
 		models.Schedule_TYPE_UNSPECIFIED,

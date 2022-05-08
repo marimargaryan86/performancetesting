@@ -3,6 +3,7 @@ syntax = "proto3";
 package snowfall.junction.trips.v1alpha;
 
 import "google/protobuf/timestamp.proto";
+import "snowfall/common/v1alpha/datetime.proto";
 import "snowfall/common/v1alpha/models.proto";
 
 service TripSearchService {
@@ -64,6 +65,6 @@ message TripSearch {
   google.protobuf.Timestamp expires_at = 2; // read only
   snowfall.common.v1alpha.Place origin = 3;
   snowfall.common.v1alpha.Place destination = 4;
-  google.protobuf.Timestamp departure_after = 5;
+  snowfall.common.v1alpha.DateTime departure_after = 5;
   repeated string trip_ids = 6; // read only
 }

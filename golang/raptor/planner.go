@@ -45,8 +45,8 @@ func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAt
 	iterations := 0
 	start := time.Now()
 	sTime := departureAt
-	eTime := sTime.Add(24 * time.Hour)
-	eTime = time.Date(eTime.Year(), eTime.Month(), eTime.Day(), 0, 0, 0, 0, eTime.Location())
+	eTime := sTime.AddDate(0, 0, 1)
+	eTime = time.Date(eTime.Year(), eTime.Month(), eTime.Day(), 4, 0, 0, 0, eTime.Location())
 
 	for sTime.Before(eTime) {
 		iterations++
@@ -71,7 +71,7 @@ func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAt
 
 			for _, s := range result.Trips {
 				if s.Segments[0].Depart.Before(min) {
-					min = s.Segments[0].Depart
+					min = s.Segments[0].Depart.In(sTime.Location())
 				}
 
 				if _, ok := seen[s.Id]; ok {
@@ -134,7 +134,7 @@ func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAt
 		"search performed",
 		"origins", fromIds,
 		"destinations", toIds,
-		"departure", departureAt,
+		"departure", departureAt.Format(time.RFC3339),
 		"iterations", iterations,
 		"results", len(trips),
 		"workers", runtime.NumCPU(),
