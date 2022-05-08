@@ -239,7 +239,7 @@ class SaveATrainAdapter(object):
             booking_result = await self._client.create_booking(
                 sat_models.request.CreateBookingRequest(
                     search_id=search_id,
-                    seat_preference_code=seat_code or "",
+                    seat_preference_code=seat_code or "ALLOWED_SEAT_LOCATION.W",
                     passengers=[
                         sat_models.booking.Passenger(
                             title=title_map[passenger.title],
