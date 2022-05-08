@@ -1,9 +1,11 @@
 import asyncio
+import json
 import types
 from datetime import date
 from typing import Any, Dict, Optional, Union
 
 import httpx
+import structlog
 
 from snowfall.stdlib.dates import calculate_age_by_date_of_birth
 from snowfall.vendor.sat.enums import PassengerType
@@ -354,6 +356,7 @@ class SATClient(object):  # noqa: WPS214
             for global_station_id, station_ids in _ALL_STATIONS.items()
             for station_id in station_ids
         }
+        self._logger = structlog.get_logger(__name__)
 
     async def get_general_search_results(
         self,
@@ -439,6 +442,8 @@ class SATClient(object):  # noqa: WPS214
             },
         }
 
+        self._logger.info("SAT book search request", request=json.dumps(body))
+
         response = await self._session.post(
             "{0}/searches".format(self._api_url),
             json=body,
@@ -495,6 +500,8 @@ class SATClient(object):  # noqa: WPS214
             },
         }
 
+        self._logger.info("SAT select search request", request=json.dumps(body))
+
         response = await self._session.post(
             "{0}/searches/{1}/confirm_selection".format(
                 self._api_url,
@@ -545,6 +552,8 @@ class SATClient(object):  # noqa: WPS214
                 },
             },
         }
+
+        self._logger.info("SAT booking request", request=json.dumps(body))
 
         response = await self._session.post(
             "{0}/bookings".format(self._api_url),
