@@ -41,7 +41,7 @@ class BookingError(SaveATrainAdapterError):
     """Raised when a booking error is encountered."""
 
 
-class SaveATrainAdapter(object):
+class SaveATrainAdapter(object):  # noqa: WPS214
     _poll_retries_limit = 10
     _wait_time_between_polling = 1
 
@@ -62,7 +62,9 @@ class SaveATrainAdapter(object):
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
     ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
-        origin = self._train_stations.get_by_id(search_task.criteria.origin_id)
+        origin = self._train_stations.get_by_id(
+            search_task.criteria.origin_id,
+        )
         destination = self._train_stations.get_by_id(
             search_task.criteria.destination_id,
         )
@@ -222,59 +224,22 @@ class SaveATrainAdapter(object):
         search_id, seat_code = self._extract_search_id_and_seat_preference_code(
             await self._select_search_result(offer_id, order),
         )
-
-        title_map = {  # TODO: map unspecified to something else?
-            order_models_pb2.Passenger.Title.TITLE_UNSPECIFIED: enums.PassengerTitle.mr,
-            order_models_pb2.Passenger.Title.TITLE_MR: enums.PassengerTitle.mr,
-            order_models_pb2.Passenger.Title.TITLE_MRS: enums.PassengerTitle.mrs,
-            order_models_pb2.Passenger.Title.TITLE_MISS: enums.PassengerTitle.miss,
-            order_models_pb2.Passenger.Title.TITLE_MS: enums.PassengerTitle.ms,
-        }
-
-        country = pycountry.countries.get(
-            alpha_2=order.contact_details.address.region_code,
+        booking_result = await self._make_booking(
+            order=order,
+            search_id=search_id,
+            seat_code=seat_code,
         )
-
-        try:
-            booking_result = await self._client.create_booking(
-                sat_models.request.CreateBookingRequest(
-                    search_id=search_id,
-                    seat_preference_code=seat_code or "ALLOWED_SEAT_LOCATION.W",
-                    passengers=[
-                        sat_models.booking.Passenger(
-                            title=title_map[passenger.title],
-                            first_name=passenger.first_name,
-                            last_name=passenger.last_name,
-                            date_of_birth=protobuf.protobuf_to_date(
-                                passenger.date_of_birth,
-                            ),
-                            gender=(  # TODO: gender unspecified?
-                                enums.PassengerGender.male
-                                if passenger.gender
-                                == order_models_pb2.Passenger.GENDER_MALE
-                                else enums.PassengerGender.female
-                            ),
-                            email=order.contact_details.email,
-                            phone_number=str(
-                                phonenumbers.parse(
-                                    order.contact_details.phone.e164_number,
-                                ).national_number,
-                            ),
-                            country=getattr(country, "common_name", country.name),
-                        )
-                        for passenger in order.passengers
-                    ],
-                ),
-            )
-        except exceptions.SATValidationError as booking_error:
-            raise BookingError(booking_error)
-        except httpx.HTTPStatusError as http_error:
-            if http_error.response.text:
-                raise_http_error_with_text(http_error)
-            raise http_error
-
-        # TODO: do we need to confirm the booking + get the ticket?
-        return booking_result.json()
+        confirm_booking_result = await self._confirm_booking(
+            search_id=search_id,
+        )
+        get_ticket_result = await self._get_ticket(
+            search_id=search_id,
+        )
+        return "{{makeBooking: {0}, confirmBooking: {1}, getTicket: {2}}}".format(
+            booking_result.json(),
+            confirm_booking_result.json(),
+            get_ticket_result.json(),
+        )
 
     async def _select_search_result(
         self,
@@ -322,6 +287,88 @@ class SaveATrainAdapter(object):
         search_result_requirement: models.SearchResultRequirement,
     ) -> bool:
         return True
+
+    async def _make_booking(
+        self,
+        order: order_models_pb2.Order,
+        search_id: str,
+        seat_code: Optional[str],
+    ) -> sat_models.booking.BookingResult:
+        title_map = {  # TODO: map unspecified to something else?
+            order_models_pb2.Passenger.Title.TITLE_UNSPECIFIED: enums.PassengerTitle.mr,
+            order_models_pb2.Passenger.Title.TITLE_MR: enums.PassengerTitle.mr,
+            order_models_pb2.Passenger.Title.TITLE_MRS: enums.PassengerTitle.mrs,
+            order_models_pb2.Passenger.Title.TITLE_MISS: enums.PassengerTitle.miss,
+            order_models_pb2.Passenger.Title.TITLE_MS: enums.PassengerTitle.ms,
+        }
+
+        country = pycountry.countries.get(
+            alpha_2=order.contact_details.address.region_code,
+        )
+
+        try:
+            return await self._client.create_booking(
+                sat_models.request.CreateBookingRequest(
+                    search_id=search_id,
+                    seat_preference_code=seat_code or "ALLOWED_SEAT_LOCATION.W",
+                    passengers=[
+                        sat_models.booking.Passenger(
+                            title=title_map[passenger.title],
+                            first_name=passenger.first_name,
+                            last_name=passenger.last_name,
+                            date_of_birth=protobuf.protobuf_to_date(
+                                passenger.date_of_birth,
+                            ),
+                            gender=(  # TODO: gender unspecified?
+                                enums.PassengerGender.male
+                                if passenger.gender
+                                == order_models_pb2.Passenger.GENDER_MALE
+                                else enums.PassengerGender.female
+                            ),
+                            email=order.contact_details.email,
+                            phone_number=str(
+                                phonenumbers.parse(
+                                    order.contact_details.phone.e164_number,
+                                ).national_number,
+                            ),
+                            country=getattr(country, "common_name", country.name),
+                        )
+                        for passenger in order.passengers
+                    ],
+                ),
+            )
+        except exceptions.SATValidationError as booking_error:
+            raise BookingError(booking_error)
+        except httpx.HTTPStatusError as http_error:
+            if http_error.response.text:
+                raise_http_error_with_text(http_error)
+            raise http_error
+
+    async def _confirm_booking(
+        self,
+        search_id: str,
+    ) -> sat_models.booking.BookingConfirmationResult:
+        try:
+            return await self._client.confirm_booking(search_id)
+        except exceptions.SATValidationError as booking_error:
+            raise BookingError(booking_error)
+        except httpx.HTTPStatusError as http_error:
+            if http_error.response.text:
+                raise_http_error_with_text(http_error)
+            raise http_error
+
+    async def _get_ticket(
+        self,
+        search_id: str,
+    ) -> sat_models.booking.TicketInfo:
+        try:
+            return await self._client.get_ticket(search_id)
+        except exceptions.SATValidationError as booking_error:
+            raise BookingError(booking_error)
+        except httpx.HTTPStatusError as http_error:
+            if http_error.response.text:
+                raise_http_error_with_text(http_error)
+            raise http_error
 
 
 def _cabin_to_proto(cabin: str) -> models_pb2.CabinClass.Type.V:

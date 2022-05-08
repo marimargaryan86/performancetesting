@@ -90,7 +90,7 @@ class OrdersConsumer(object):
                 models_pb2.OrderResult(
                     order_id=task.order.id,
                     offer_id=task.offer_id,
-                    status=models_pb2.OrderResult.STATUS_NOT_TICKETED,
+                    status=models_pb2.OrderResult.STATUS_CONFIRMED,
                     raw_data=raw_data,
                 ),
                 routing_key="orders.result.offer",

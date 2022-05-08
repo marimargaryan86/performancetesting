@@ -2,7 +2,7 @@ from datetime import date, datetime, timedelta
 from decimal import Decimal
 from typing import Optional
 
-from pydantic import AnyUrl, BaseModel
+from pydantic import BaseModel
 
 from snowfall.vendor.sat import enums
 from snowfall.vendor.sat import normalizers as sat_normalizers
@@ -50,6 +50,6 @@ class BookingConfirmationResult(BaseModel):
 
 
 class TicketInfo(BaseModel):
-    url: AnyUrl
+    url: str
     confirmation_code: str
     status: str
