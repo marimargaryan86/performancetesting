@@ -115,7 +115,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
                             port=app.settings.smtp_dsn.port,
                             username=app.settings.smtp_dsn.user,
                             password=app.settings.smtp_dsn.password,
-                            starttls=True,
+                            start_tls=True,
                         ),
                     ),
                     offer_cache=cache.OfferCache(
