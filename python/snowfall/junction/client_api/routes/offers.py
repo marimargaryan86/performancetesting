@@ -104,11 +104,20 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
+        search_client: offer_searches.Client = lagom.injectable,
         client: offers.Client = lagom.injectable,
     ) -> responses.Response:
+        offer_search_id = request.path_params["offerSearchId"]
+
+        # todo: Check should probably be done in the RPC, but that requires refactoring.
+        try:
+            await search_client.get(offer_search_id)
+        except offer_searches.NotFoundError:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
         pagination = pagination_helpers.get_pagination(request)
         offers_page = await client.find_offers_by_offer_search(
-            request.path_params["offerSearchId"],
+            identifier=offer_search_id,
             cursor=pagination.cursor,
             limit=pagination.limit,
         )
