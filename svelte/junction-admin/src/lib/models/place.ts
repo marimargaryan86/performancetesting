@@ -1,11 +1,24 @@
-import type { CoordinatesModel } from './common';
+export type PlaceSearchData = {
+  name?: string;
+  coordinates?: Partial<CoordinatesModel>;
+  proximity?: number;
+};
+
+export type CoordinatesModel = {
+  latitude: number;
+  longitude: number;
+};
 
 export type PlaceModel = {
-	id: string;
-	name: string;
-	coordinates: CoordinatesModel;
-	timeZone: string;
-	countryCode: string;
-	updatedAt: Date;
-	sourceRef: string;
+  id: string;
+  name: string;
+  coordinates: CoordinatesModel;
+  countryCode: string;
+  timeZone: string;
+  sourceRef: string;
+  updatedAt: Date;
+};
+
+export type CuratedPlaceModel = PlaceModel & {
+  mergedPlaces: PlaceModel[];
 };

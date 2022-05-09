@@ -1,4 +1,9 @@
+const placesRoot = "/places";
+
 export default {
-	start: '/',
-	places: '/places'
+  places: {
+    root: placesRoot,
+    curated: `${placesRoot}/curated`,
+  },
+  orders: "/orders",
 };

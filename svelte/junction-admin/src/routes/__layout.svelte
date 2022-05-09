@@ -1,23 +1,21 @@
-<script>
-	import MainMenu from '$lib/components/partials/main-menu.svelte';
+<script lang="ts">
+  import Overlay from "$lib/components/overlay.svelte";
+
+  import MainMenu from "$lib/partials/main-menu.svelte";
 </script>
 
 <main>
-	<MainMenu />
+  <MainMenu />
 
-	<section class="work-space">
-		<slot />
-	</section>
+  <slot />
 </main>
 
-<style>
-	main {
-		height: 100vh;
-		display: grid;
-		grid-template-columns: 240px 1fr;
-	}
+<Overlay />
 
-	.work-space {
-		overflow: auto;
-	}
+<style>
+  main {
+    display: grid;
+    grid-template-rows: 32px 1fr;
+    height: 100vh;
+  }
 </style>

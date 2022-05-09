@@ -1,7 +1,7 @@
-import PlaceClient from './services/places/client';
+import PlaceService from "./services/place-service";
 
-const placeClient = new PlaceClient('/');
+const placeService = new PlaceService("hullabaloo");
 
 export default {
-	placeClient
+  placeService,
 };
