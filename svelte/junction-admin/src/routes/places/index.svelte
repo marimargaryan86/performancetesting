@@ -25,9 +25,7 @@
     if (!searchData && $curatedPlaceStore) {
       searchData = {
         name: $curatedPlaceStore.name,
-        coordinates: {
-          ...$curatedPlaceStore.coordinates,
-        },
+        coordinates: { ...$curatedPlaceStore.coordinates },
         proximity: 1000,
       };
     }

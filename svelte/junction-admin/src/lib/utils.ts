@@ -1,3 +1,5 @@
+import type { PriceModel } from "./models/common";
+
 function sleep(timeMs: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, timeMs));
 }
@@ -78,19 +80,37 @@ const storage = {
   },
 };
 
-const fullDateTime: Intl.DateTimeFormatOptions = {
-  year: "numeric",
-  month: "numeric",
-  day: "numeric",
-  hour: "2-digit",
-  minute: "2-digit",
-  second: "2-digit",
-};
+function formatPrice(price: PriceModel): string {
+  return `${price.currency} ${price.total.toFixed(2)}`;
+}
+
+const fullDateTime: ["sv-SE", Intl.DateTimeFormatOptions] = [
+  "sv-SE",
+  {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  },
+];
+
+const fullDate: ["sv-SE", Intl.DateTimeFormatOptions] = [
+  "sv-SE",
+  {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  },
+];
 
 export default {
   sleep,
+  formatPrice,
   getPixelValue,
   scrollIntoView,
   storage,
   fullDateTime,
+  fullDate,
 };

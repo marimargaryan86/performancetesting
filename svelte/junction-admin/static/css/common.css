@@ -35,3 +35,7 @@ body {
   font-family: "Open Sans", Helvetica, sans-serif;
   font-size: 16px;
 }
+
+a {
+  color: var(--color-teal-dark);
+}

@@ -23,7 +23,7 @@
   $: proximity = searchData?.proximity;
 
   async function deleteSelected_(): Promise<void> {
-    selectedPlaceIds.map((placeId) => dependencies.placeService.deleteCuratedPlace(placeId));
+    selectedPlaceIds.map((placeId) => dependencies.placeService.deleteCurated(placeId));
 
     excludedPlaceIds = [...selectedPlaceIds, ...excludedPlaceIds];
     selectedPlaceIds = [];

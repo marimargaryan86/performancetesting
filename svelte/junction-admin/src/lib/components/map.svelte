@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { CoordinatesModel } from "$lib/models/place";
+  import type { CoordinatesModel } from "$lib/models/common";
   import type {
     Map,
     MapOptions,

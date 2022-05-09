@@ -10,12 +10,14 @@
     height: 32px;
     box-shadow: var(--drop-shadow);
     user-select: none;
+    font-weight: 400;
+    color: var(--color-white);
   }
 
   .sub-menu > :global(a) {
+    color: inherit;
     text-decoration: none;
-    color: var(--color-white);
-    font-weight: 600;
+    font-weight: inherit;
     font-size: 12px;
     margin: 0 8px;
   }

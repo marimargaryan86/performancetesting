@@ -41,8 +41,6 @@
         e.preventDefault();
 
         windowContainer.querySelector("button").focus();
-
-        return;
       }
     }
 
@@ -56,9 +54,8 @@
 </script>
 
 <div
-  style="--max-width: {maxWidth === undefined ? 'none' : maxWidth}; --width: {maxWidth === undefined
-    ? 'auto'
-    : '100%'}"
+  style:--max-width={maxWidth === undefined ? "none" : maxWidth}
+  style:--width={maxWidth === undefined ? "auto" : "100%"}
   class="window"
   class:no-pointer-events={!focused}
   class:resizable

@@ -14,9 +14,17 @@
   import { conditional } from "$lib/transitions";
   import utils from "$lib/utils";
   import { fade, slide } from "svelte/transition";
+  import { writable } from "svelte/store";
+  import { checkboxGroup } from "$lib/checkbox-group";
+  import { onMount } from "svelte";
+  import Checkbox from "$lib/components/ui/checkbox.svelte";
+  import { flip } from "svelte/animate";
+  import EditButton from "$lib/components/buttons/edit-button.svelte";
+  import DeleteButton from "$lib/components/buttons/delete-button.svelte";
 
   export let searchData: PlaceSearchData;
-  export let places: CuratedPlaceModel[] = [];
+  let _places: CuratedPlaceModel[] = [];
+  export { _places as places };
   export let selectedPlaceIds: string[] = [];
   export let excludedPlaceIds: string[] = [];
 
@@ -24,20 +32,26 @@
 
   const pageLimit = 15;
   const transitionTimeMs = 150;
-  const { store, infiniteScroll, reset } = create(load, pageLimit);
+  const placeIds = writable<string[]>([]);
+  const { items: places, depleted, pending, infiniteScroll, reset } = create(load, pageLimit);
+  const { allChecked, group, multiSelect, toggleAll, unsubscriber } = checkboxGroup(placeIds);
 
-  $: places = $store.items;
+  $: $placeIds = $places
+    .filter((place) => excludedPlaceIds.indexOf(place.id) === -1)
+    .map((place) => place.id);
+  $: selectedPlaceIds = $group;
+  $: _places = $places;
   $: searchDataJson = JSON.stringify(searchData);
   $: {
     // Reset places when search data changes.
     searchDataJson;
     reset();
-    selectedPlaceIds = [];
+    $group = [];
   }
 
   async function load(pageOffset: number, pageLimit: number): Promise<CuratedPlaceModel[]> {
     try {
-      return await dependencies.placeService.findCuratedPlaces(searchData, pageOffset, pageLimit);
+      return await dependencies.placeService.findCurated(searchData, pageOffset, pageLimit);
     } catch {
       return [];
     }
@@ -54,65 +68,101 @@
       title: "Delete curated place",
       message: "Are you sure you want to delete this curated place?",
       onConfirm: () => {
-        dependencies.placeService.deleteCuratedPlace(place.id);
+        dependencies.placeService.deleteCurated(place.id);
         excludedPlaceIds = [...excludedPlaceIds, place.id];
         selectedPlaceIds = selectedPlaceIds.filter((placeId) => placeId !== place.id);
       },
     });
   }
+
+  onMount(() => unsubscriber);
 </script>
 
 <section class="curated-place-result" use:infiniteScroll={{ threshold: 300 }}>
-  {#if !spinnerVisible}
-    {#if $store.items.length}
-      <Table
-        headers={[
-          { title: "ID" },
-          { title: "Name" },
-          { title: "Place count" },
-          { title: "Coordinates" },
-          { title: "Country code" },
-          { title: "Time zone" },
-          { title: "Source ref." },
-          { title: "Last modified" },
-        ]}
-        selectable
-        bind:selectedIds={selectedPlaceIds}
-        actions={{ edit, delete: del }}
-        {pageLimit}
-        values={$store.items.filter((place) => excludedPlaceIds.indexOf(place.id) === -1)}
-        formatter={(place) => [
-          `${place.id.substring(0, 8)}...`,
-          place.name,
-          place.mergedPlaces.length,
-          `${place.coordinates.latitude}°, ${place.coordinates.longitude}°`,
-          place.countryCode,
-          place.timeZone,
-          `${place.sourceRef.substring(0, 8)}...`,
-          place.updatedAt.toLocaleDateString("sv-SE", utils.fullDateTime),
-        ]}
-        on:outroend={() => (spinnerVisible = $store.pending)}
-      />
-    {:else if $store.depleted && !$store.items.length}
-      <div
-        class="empty"
-        transition:fade|local={{ duration: transitionTimeMs }}
-        on:outroend={() => (spinnerVisible = $store.pending)}
-      >
-        <DocumentNotFoundIcon />
-        <span>No curated places found, try broadening your search</span>
-      </div>
-    {/if}
+  {#if !spinnerVisible && $places.length}
+    <Table
+      on:outroend={() => (spinnerVisible = $pending)}
+      stickyHeader
+      transition={{ func: fade, params: { duration: transitionTimeMs } }}
+    >
+      <tr slot="head">
+        <td class="select">
+          <Checkbox
+            checked={$allChecked}
+            on:input={toggleAll}
+            title="{$allChecked ? 'Deselect' : 'Select'} all"
+          />
+        </td>
+        <td>ID</td>
+        <td>Name</td>
+        <td>Place count</td>
+        <td>Coordinates</td>
+        <td>Country code</td>
+        <td>Time zone</td>
+        <td>Source ref.</td>
+        <td>Modified</td>
+        <td />
+      </tr>
+
+      <svelte:fragment slot="body">
+        {#each $places.filter((place) => excludedPlaceIds.indexOf(place.id) === -1) as place, idx (place.id)}
+          <tr
+            in:fade={{ duration: 150, delay: (idx % pageLimit) * 15 }}
+            animate:flip={{ duration: 250 }}
+          >
+            <td class="select">
+              <Checkbox value={place.id} bind:group={$group} on:input={() => multiSelect(idx)} />
+            </td>
+            <td>{place.id.substring(0, 8)}...</td>
+            <td>{place.name}</td>
+            <td>{place.mergedPlaces.length}</td>
+            <td>{place.coordinates.latitude}°, {place.coordinates.longitude}°</td>
+            <td>{place.countryCode}</td>
+            <td>{place.timeZone}</td>
+            <td>{place.sourceRef.substring(0, 8)}...</td>
+            <td>{place.updatedAt.toLocaleDateString(...utils.fullDateTime)}</td>
+            <td class="actions">
+              <EditButton
+                tabindex={-1}
+                on:click={(e) => {
+                  e.stopPropagation();
+                  edit(place);
+                }}
+                title="Edit"
+              />
+
+              <DeleteButton
+                tabindex={-1}
+                on:click={(e) => {
+                  e.stopPropagation();
+                  del(place);
+                }}
+                title="Delete"
+              />
+            </td>
+          </tr>
+        {/each}
+      </svelte:fragment>
+    </Table>
+  {:else if !spinnerVisible && $depleted && !$places.length}
+    <div
+      class="empty"
+      transition:fade|local={{ duration: transitionTimeMs }}
+      on:outroend={() => (spinnerVisible = $pending)}
+    >
+      <DocumentNotFoundIcon />
+      <span>No curated places found, try broadening your search</span>
+    </div>
   {/if}
 
-  {#if $store.pending && (spinnerVisible || $store.items.length)}
+  {#if $pending && (spinnerVisible || $places.length)}
     <div
       class="pending"
       transition:conditional|local={{
         params: { duration: transitionTimeMs },
-        transition: $store.items.length ? slide : fade,
+        transition: $places.length ? slide : fade,
       }}
-      on:outroend={() => (spinnerVisible = $store.pending)}
+      on:outroend={() => (spinnerVisible = $pending)}
     >
       <SpinnerIcon />
     </div>

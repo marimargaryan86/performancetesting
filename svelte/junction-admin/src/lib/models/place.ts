@@ -1,12 +1,9 @@
+import type { CoordinatesModel } from "./common";
+
 export type PlaceSearchData = {
   name?: string;
   coordinates?: Partial<CoordinatesModel>;
   proximity?: number;
-};
-
-export type CoordinatesModel = {
-  latitude: number;
-  longitude: number;
 };
 
 export type PlaceModel = {

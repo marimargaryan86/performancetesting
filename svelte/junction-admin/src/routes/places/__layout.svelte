@@ -11,8 +11,8 @@
     </a>
 
     <a
-      href={routeConfig.places.curated}
-      class:active={$page.url.pathname === routeConfig.places.curated}
+      href={routeConfig.places.curatedPlaces}
+      class:active={$page.url.pathname === routeConfig.places.curatedPlaces}
     >
       Curated places
     </a>

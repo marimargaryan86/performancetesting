@@ -29,22 +29,25 @@ export default function create<T = unknown>(
   load: (pageOffset: number, pageLimit: number) => Promise<T[]>,
   pageLimit: number,
 ): {
-  store: Readable<{ pending: boolean; items: T[]; depleted: boolean }>;
+  items: Readable<T[]>;
+  pending: Readable<boolean>;
+  depleted: Readable<boolean>;
   infiniteScroll: (node: Element, params?: InfiniteScrollParams) => SvelteActionReturnType;
   reset: () => void;
 } {
-  type Store = { pending: boolean; items: T[]; depleted: boolean };
-  const store = writable<Store>({ pending: false, items: [], depleted: false });
+  const items = writable<T[]>([]);
+  const pending = writable(false);
+  const depleted = writable(false);
 
-  let items: T[] = [];
   let pageOffset = 0;
   let currTask: Promise<T[]>;
 
   function reset(): void {
-    items = [];
     pageOffset = 0;
     currTask = undefined;
-    store.update(() => ({ pending: true, items, depleted: false }));
+    pending.set(true);
+    depleted.set(false);
+    items.set([]);
     load_();
   }
 
@@ -54,7 +57,8 @@ export default function create<T = unknown>(
       return;
     }
 
-    store.update(() => ({ pending: true, items, depleted: false }));
+    pending.set(true);
+    depleted.set(false);
 
     const task = (currTask = load(pageOffset, pageLimit));
     const nextItems = await task;
@@ -63,14 +67,15 @@ export default function create<T = unknown>(
       return;
     }
 
-    items = [...items, ...nextItems];
     pageOffset += 1;
 
     if (!nextItems.length) {
       pageOffset = -1;
     }
 
-    store.update(() => ({ pending: false, items, depleted: pageOffset === -1 }));
+    pending.set(false);
+    depleted.set(pageOffset === -1);
+    items.update((state) => [...state, ...nextItems]);
 
     currTask = undefined;
   }
@@ -101,5 +106,5 @@ export default function create<T = unknown>(
     };
   }
 
-  return { store, infiniteScroll, reset };
+  return { items, pending, depleted, infiniteScroll, reset };
 }

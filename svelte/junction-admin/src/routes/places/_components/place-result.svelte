@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { checkboxGroup } from "$lib/checkbox-group";
+  import Checkbox from "$lib/components/ui/checkbox.svelte";
   import Table from "$lib/components/ui/table.svelte";
   import dependencies from "$lib/dependencies";
   import DocumentNotFoundIcon from "$lib/icons/document-not-found-icon.svelte";
@@ -7,10 +9,14 @@
   import type { PlaceModel, PlaceSearchData } from "$lib/models/place";
   import { conditional } from "$lib/transitions";
   import utils from "$lib/utils";
+  import { onMount } from "svelte";
+  import { flip } from "svelte/animate";
+  import { writable } from "svelte/store";
   import { fade, slide } from "svelte/transition";
 
   export let searchData: PlaceSearchData;
-  export let places: PlaceModel[] = [];
+  let _places: PlaceModel[] = [];
+  export { _places as places };
   export let selectedPlaceIds: string[] = [];
   export let excludedPlaceIds: string[] = [];
 
@@ -18,75 +24,97 @@
 
   const pageLimit = 15;
   const transitionTimeMs = 150;
-  const { store, infiniteScroll, reset } = create(load, pageLimit);
+  const placeIds = writable<string[]>([]);
+  const { items: places, pending, depleted, infiniteScroll, reset } = create(load, pageLimit);
+  const { allChecked, group, multiSelect, toggleAll, unsubscriber } = checkboxGroup(placeIds);
 
-  $: places = $store.items;
+  $: $placeIds = $places
+    .filter((place) => excludedPlaceIds.indexOf(place.id) === -1)
+    .map((place) => place.id);
+  $: selectedPlaceIds = $group;
+  $: _places = $places;
   $: searchDataJson = JSON.stringify(searchData);
   $: {
     // Reset places when search data changes.
     searchDataJson;
     reset();
-    selectedPlaceIds = [];
+    $group = [];
   }
 
   async function load(pageOffset: number, pageLimit: number): Promise<PlaceModel[]> {
     try {
-      return await dependencies.placeService.findPlaces(searchData, pageOffset, pageLimit);
+      return await dependencies.placeService.find(searchData, pageOffset, pageLimit);
     } catch {
       return [];
     }
   }
+
+  onMount(() => unsubscriber);
 </script>
 
 <section class="place-result" use:infiniteScroll={{ threshold: 300 }}>
-  {#if !spinnerVisible}
-    {#if $store.items.length}
-      <Table
-        headers={[
-          { title: "ID" },
-          { title: "Name" },
-          { title: "Coordinates" },
-          { title: "Country code" },
-          { title: "Time zone" },
-          { title: "Source ref." },
-          { title: "Last modified" },
-        ]}
-        selectable
-        {pageLimit}
-        {transitionTimeMs}
-        bind:selectedIds={selectedPlaceIds}
-        values={$store.items.filter((place) => excludedPlaceIds.indexOf(place.id) === -1)}
-        formatter={(place) => [
-          `${place.id.substring(0, 8)}...`,
-          place.name,
-          `${place.coordinates.latitude}°, ${place.coordinates.longitude}°`,
-          place.countryCode,
-          place.timeZone,
-          `${place.sourceRef.substring(0, 8)}...`,
-          place.updatedAt.toLocaleDateString("sv-SE", utils.fullDateTime),
-        ]}
-        on:outroend={() => (spinnerVisible = $store.pending)}
-      />
-    {:else if $store.depleted && !$store.items.length}
-      <div
-        class="empty"
-        transition:fade|local={{ duration: transitionTimeMs }}
-        on:outroend={() => (spinnerVisible = $store.pending)}
-      >
-        <DocumentNotFoundIcon />
-        <span>No places found, try broadening your search</span>
-      </div>
-    {/if}
+  {#if !spinnerVisible && $places.length}
+    <Table
+      stickyHeader
+      on:outroend={() => (spinnerVisible = $pending)}
+      transition={{ func: fade, params: { duration: transitionTimeMs } }}
+    >
+      <tr slot="head">
+        <td class="select">
+          <Checkbox
+            checked={$allChecked}
+            on:input={toggleAll}
+            title="{$allChecked ? 'Deselect' : 'Select'} all"
+          />
+        </td>
+        <td>ID</td>
+        <td>Name</td>
+        <td>Coordinates</td>
+        <td>Country code</td>
+        <td>Time zone</td>
+        <td>Source ref.</td>
+        <td>Modified</td>
+      </tr>
+
+      <svelte:fragment slot="body">
+        {#each $places.filter((place) => excludedPlaceIds.indexOf(place.id) === -1) as place, idx (place.id)}
+          <tr
+            in:fade={{ duration: 150, delay: (idx % pageLimit) * 15 }}
+            animate:flip={{ duration: 250 }}
+          >
+            <td class="select">
+              <Checkbox value={place.id} bind:group={$group} on:input={() => multiSelect(idx)} />
+            </td>
+            <td>{place.id.substring(0, 8)}...</td>
+            <td>{place.name}</td>
+            <td>{place.coordinates.latitude}°, {place.coordinates.longitude}°</td>
+            <td>{place.countryCode}</td>
+            <td>{place.timeZone}</td>
+            <td>{place.sourceRef.substring(0, 8)}...</td>
+            <td>{place.updatedAt.toLocaleDateString(...utils.fullDateTime)}</td>
+          </tr>
+        {/each}
+      </svelte:fragment>
+    </Table>
+  {:else if !spinnerVisible && $depleted && !$places.length}
+    <div
+      class="empty"
+      transition:fade|local={{ duration: transitionTimeMs }}
+      on:outroend={() => (spinnerVisible = $pending)}
+    >
+      <DocumentNotFoundIcon />
+      <span>No places found, try broadening your search</span>
+    </div>
   {/if}
 
-  {#if $store.pending && (spinnerVisible || $store.items.length)}
+  {#if $pending && (spinnerVisible || $places.length)}
     <div
       class="pending"
       transition:conditional|local={{
         params: { duration: transitionTimeMs },
-        transition: $store.items.length ? slide : fade,
+        transition: $places.length ? slide : fade,
       }}
-      on:outroend={() => (spinnerVisible = $store.pending)}
+      on:outroend={() => (spinnerVisible = $pending)}
     >
       <SpinnerIcon />
     </div>

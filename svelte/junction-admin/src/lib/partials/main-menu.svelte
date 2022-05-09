@@ -1,5 +1,7 @@
 <script lang="ts">
   import { page } from "$app/stores";
+  import OverviewIcon from "$lib/icons/overview-icon.svelte";
+  import PlaceIcon from "$lib/icons/place-icon.svelte";
 
   import SnowfallLogo from "$lib/icons/snowfall-logo.svelte";
   import routeConfig from "$lib/route-config";
@@ -13,14 +15,16 @@
     class:active={$page.url.pathname.startsWith(routeConfig.places.root)}
     class="link"
   >
-    Places
+    <PlaceIcon />
+    <span>Places</span>
   </a>
 
   <a
-    href={routeConfig.orders}
-    class:active={$page.url.pathname.startsWith(routeConfig.orders)}
+    href={routeConfig.orders.root}
+    class:active={$page.url.pathname.startsWith(routeConfig.orders.root)}
     class="link"
   >
+    <OverviewIcon />
     Orders
   </a>
 </header>
@@ -50,5 +54,16 @@
 
   .link.active {
     color: var(--color-teal-light);
+  }
+
+  .link > :global(svg) {
+    fill: var(--color-white);
+    height: 12px;
+    width: 12px;
+    vertical-align: middle;
+  }
+
+  .link.active > :global(svg) {
+    fill: var(--color-teal-light);
   }
 </style>

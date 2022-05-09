@@ -84,7 +84,7 @@
     try {
       pending = true;
 
-      dispatch("save", await dependencies.placeService.putCuratedPlace({ ...curatedPlace_ }));
+      dispatch("save", await dependencies.placeService.putCurated({ ...curatedPlace_ }));
     } catch {
       // TODO: Handle errors.
     } finally {

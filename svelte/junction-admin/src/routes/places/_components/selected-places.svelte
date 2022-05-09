@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { checkboxGroup } from "$lib/checkbox-group";
   import Button from "$lib/components/ui/button.svelte";
   import Checkbox from "$lib/components/ui/checkbox.svelte";
   import DocumentNotFoundIcon from "$lib/icons/document-not-found-icon.svelte";
@@ -7,30 +8,21 @@
   import utils from "$lib/utils";
   import { onMount } from "svelte";
   import { flip } from "svelte/animate";
+  import { writable } from "svelte/store";
   import { fade } from "svelte/transition";
 
   export let places: PlaceModel[] = [];
 
-  let selectedPlaceIds: string[] = [];
   let flashingPlaceIds: string[] = [];
-  let lastSelectedIndex: number = undefined;
-  let shiftDown = false;
 
-  $: places, (lastSelectedIndex = undefined);
-  $: allSelected = places.reduce(
-    (prev, curr) => prev && selectedPlaceIds.indexOf(curr.id) !== -1,
-    true,
-  );
+  const placeIds = writable<string[]>([]);
+  const { allChecked, group, multiSelect, toggleAll, unsubscriber } = checkboxGroup(placeIds);
 
-  function selectAll(e: InputEvent): void {
-    selectedPlaceIds = (e.currentTarget as HTMLInputElement).checked
-      ? places.map((value) => value.id)
-      : [];
-  }
+  $: $placeIds = places.map((place) => place.id);
 
   function remove(): void {
-    places = places.filter((place) => selectedPlaceIds.indexOf(place.id) === -1);
-    selectedPlaceIds = [];
+    places = places.filter((place) => $group.indexOf(place.id) === -1);
+    $group = [];
   }
 
   async function flashPlace(place: PlaceModel): Promise<void> {
@@ -43,46 +35,7 @@
     flashingPlaceIds = flashingPlaceIds.filter((placeId) => placeId !== place.id);
   }
 
-  function multiSelect(index: number): void {
-    if (isNaN(lastSelectedIndex)) {
-      lastSelectedIndex = index;
-    }
-
-    if (!shiftDown) {
-      lastSelectedIndex = index;
-
-      return;
-    }
-
-    const mode = selectedPlaceIds.indexOf(places[index].id) === -1 ? "select" : "deselect";
-    const start = Math.min(index, lastSelectedIndex);
-    const end = Math.max(index, lastSelectedIndex) + 1;
-    const nextSelectedPlaceIds = places.slice(start, end).map((value) => value.id);
-
-    if (mode === "select") {
-      selectedPlaceIds = Array.from(new Set([...selectedPlaceIds, ...nextSelectedPlaceIds]));
-    } else {
-      selectedPlaceIds = selectedPlaceIds.filter(
-        (placeId) => nextSelectedPlaceIds.indexOf(placeId) === -1,
-      );
-    }
-  }
-
-  onMount(() => {
-    function toggle(e: KeyboardEvent) {
-      shiftDown = e.shiftKey || false;
-    }
-
-    window.addEventListener("focus", toggle);
-    window.addEventListener("keydown", toggle);
-    window.addEventListener("keyup", toggle);
-
-    return () => {
-      window.removeEventListener("focus", toggle);
-      window.removeEventListener("keydown", toggle);
-      window.removeEventListener("keyup", toggle);
-    };
-  });
+  onMount(() => unsubscriber);
 </script>
 
 <div class="selected-places">
@@ -94,14 +47,14 @@
   {:else}
     <ol class="places">
       <li class="remove">
-        <Button type="delete" on:click={remove} disabled={!selectedPlaceIds.length}>
+        <Button type="delete" on:click={remove} disabled={!$group.length}>
           <RemoveIcon />
           Remove selected
         </Button>
       </li>
 
       <li class="header">
-        <Checkbox checked={allSelected} on:input={selectAll} label="Selected places" />
+        <Checkbox checked={$allChecked} on:input={toggleAll} label="Selected places" />
       </li>
 
       {#each places as place, idx (place.id)}
@@ -113,11 +66,7 @@
           class:alerting={flashingPlaceIds.indexOf(place.id) !== -1}
         >
           <div>
-            <Checkbox
-              value={place.id}
-              bind:group={selectedPlaceIds}
-              on:input={() => multiSelect(idx)}
-            />
+            <Checkbox value={place.id} bind:group={$group} on:input={() => multiSelect(idx)} />
           </div>
 
           <div class="info">
