@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 from email import message
 
@@ -10,11 +11,14 @@ import structlog
 from snowfall.junction.orders.v1alpha import models_pb2
 from snowfall.junction.providers.ask2go import criteria
 from snowfall.stdlib.format import protobuf
-from snowfall.vendor.ask2go import client
+from snowfall.vendor.ask2go import client, errors
 from snowfall.vendor.ask2go.models import booking, common
 
 
 class BookingHandler(object):
+    _poll_retries_limit = 10
+    _wait_time_between_polling = 1
+
     def __init__(
         self,
         a2g_client: client.Ask2GoClient,
@@ -74,12 +78,33 @@ class BookingHandler(object):
             ),
         )
 
+        await self._client.update_booking_billing_address(
+            booking_ref_id=booking_result.id,
+            transaction_id=booking_result.transaction_id,
+        )
+
+        booking_result = await self._poll_booking(booking_result)
+
         try:
             await self._send_email_notification(order, offer_id, booking_result)
         except Exception:  # noqa: PIE786
             self._logger.exception()
 
         return booking_result
+
+    async def _poll_booking(self, model: booking.Booking) -> booking.Booking:
+        for _ in range(self._poll_retries_limit):
+            model = await self._client.get_booking(
+                booking_ref_id=model.id,
+                transaction_id=model.transaction_id,
+            )
+
+            if model.contact_details:
+                return model
+
+            await asyncio.sleep(self._wait_time_between_polling)
+
+        raise errors.ServiceError("Unable to get booking details in time")
 
     # todo: this should be handled in a separate service
     async def _send_email_notification(
