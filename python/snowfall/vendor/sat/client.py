@@ -1,7 +1,7 @@
 import asyncio
 import json
 import types
-from datetime import date
+from datetime import date, timedelta
 from typing import Any, Dict, Optional, Union
 
 import httpx
@@ -366,8 +366,10 @@ class SATClient(object):  # noqa: WPS214
         request_params = httpx.QueryParams(
             triptype=request.trip_type.value,
             passengers=request.number_of_passengers,
-            ddate=request.departure_date.isoformat(),
-            rdate=request.return_date.isoformat() if request.return_date else "",
+            ddate=(request.departure_date - timedelta(hours=1)).isoformat(),
+            rdate=(request.return_date - timedelta(hours=1)).isoformat()
+            if request.return_date
+            else "",
             email=self._email,
             password=self._password_search,
         )
