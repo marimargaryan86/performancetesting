@@ -41,8 +41,8 @@ class OfferValidator(object):
         if departure_at != requirement.departure_at:
             self._logger.info(
                 "Departure times do not match",
-                requirement_departure_at=requirement.departure_at,
-                offer_departure_at=departure_at,
+                requirement_departure_at=requirement.departure_at.isoformat(),
+                offer_departure_at=departure_at.isoformat(),
             )
 
             return False
@@ -52,8 +52,8 @@ class OfferValidator(object):
         if arrival_at != requirement.arrival_at:
             self._logger.info(
                 "Arrival times do not match",
-                requirement_arrival_at=requirement.arrival_at,
-                offer_arrival_at=arrival_at,
+                requirement_arrival_at=requirement.arrival_at.isoformat(),
+                offer_arrival_at=arrival_at.isoformat(),
             )
 
             return False

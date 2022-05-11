@@ -218,11 +218,11 @@ class SaveATrainAdapter(object):  # noqa: WPS214
 
     async def create_booking(
         self,
-        offer_id: str,
         order: order_models_pb2.Order,
+        offer_details: tuple[str, int, int, int],
     ) -> str:
         search_id, seat_code = self._extract_search_id_and_seat_preference_code(
-            await self._select_search_result(offer_id, order),
+            await self._select_search_result(offer_details),
         )
         booking_result = await self._make_booking(
             order=order,
@@ -243,14 +243,8 @@ class SaveATrainAdapter(object):  # noqa: WPS214
 
     async def _select_search_result(
         self,
-        offer_id: str,
-        order: order_models_pb2.Order,
+        offer_details: tuple[str, int, int, int],
     ) -> sat_models.search_result_selection.SearchResultSelectionResponse:
-        offer_details = await self._offers_cache.fetch(offer_id)
-
-        if not offer_details:
-            raise BookingError("No offer with id: '{0}' found.".format(offer_id))
-
         search_id, search_result_id, transfer_id, fare_id = offer_details
 
         try:
@@ -293,8 +287,8 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         if abs((departure_at - requirement.departure_datetime).seconds // 60) > 10:
             self._logger.info(
                 "Departure times do not match",
-                requirement_departure_datetime=requirement.departure_datetime,
-                offer_departure_datetime=departure_at,
+                requirement_departure_datetime=requirement.departure_datetime.isoformat(),
+                offer_departure_datetime=departure_at.isoformat(),
             )
             return False
 
@@ -304,8 +298,8 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         if abs((arrival_datetime - requirement.arrival_datetime).seconds // 60) > 10:
             self._logger.info(
                 "Arrival times do not match but we still approved the offer.",
-                requirement_arrival_datetime=requirement.arrival_datetime,
-                offer_arrival_datetime=arrival_datetime,
+                requirement_arrival_datetime=requirement.arrival_datetime.isoformat(),
+                offer_arrival_datetime=arrival_datetime.isoformat(),
             )
 
         return True

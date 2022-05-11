@@ -6,7 +6,7 @@ from snowfall.junction.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
 from snowfall.junction.orders.v1alpha import amqp_pb2 as orders_amqp_pb2
 from snowfall.junction.orders.v1alpha import models_pb2
 from snowfall.junction.providers.save_a_train import adapter as sat_adapter
-from snowfall.junction.providers.save_a_train import criteria
+from snowfall.junction.providers.save_a_train import cache, criteria
 from snowfall.junction.providers.save_a_train.v1alpha import amqp_pb2
 from snowfall.stdlib.transport import amqp
 
@@ -57,9 +57,11 @@ class OrdersConsumer(object):
     def __init__(
         self,
         consumer: amqp.Consumer,
+        offers_cache: cache.OffersCache,
         producer: amqp.Producer,
         save_a_train_adapter: sat_adapter.SaveATrainAdapter,
     ):
+        self._cache = offers_cache
         self._consumer = consumer
         self._producer = producer
         self._adapter = save_a_train_adapter
@@ -70,10 +72,15 @@ class OrdersConsumer(object):
     async def _process_message(self, message: amqp.Message) -> None:
         task = cast(orders_amqp_pb2.PlaceOrderTask, message.body)
 
+        offer_details = await self._cache.fetch(task.offer_id)
+
+        if not offer_details:
+            return
+
         try:
             raw_data = await self._adapter.create_booking(
-                task.offer_id,
                 task.order,
+                offer_details,
             )
         except (phonenumbers.NumberParseException, sat_adapter.BookingError) as error:
             await self._producer.publish(

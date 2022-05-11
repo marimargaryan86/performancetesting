@@ -182,7 +182,9 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
             client=http_client,
         )
         # TODO: do we need to call get_token on the save_a_train_client?
-
+        offer_cache = cache.OffersCache(
+            redis_client=redis.Client[bytes](redis_connection, prefix=app.name),
+        )
         orders_consumer = consumer.OrdersConsumer(
             consumer=await amqp.create_consumer(
                 conn=amqp_connection,
@@ -201,11 +203,10 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
                         app.settings.geodata_address,
                     ),
                 ),
-                offers_cache=cache.OffersCache(
-                    redis_client=redis.Client[bytes](redis_connection, prefix=app.name),
-                ),
+                offers_cache=offer_cache,
                 ttl=app.settings.ttl,
             ),
+            offers_cache=offer_cache,
         )
 
         await orders_consumer.consume()
