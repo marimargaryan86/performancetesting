@@ -39,8 +39,27 @@ class TestOrders(object):
                                 "offerIds": [
                                     fixtures.OFFERS[0],
                                 ],
+                                "passengers": [
+                                    {
+                                        "firstName": "First",
+                                        "lastName": "Last",
+                                        "title": "Mr",
+                                        "gender": "male",
+                                        "dateOfBirth": "1970-12-23",
+                                    },
+                                ],
                             },
                         ],
+                        "contactDetails": {
+                            "email": "example@example.com",
+                            "phone": "+385996666666",
+                            "address": {
+                                "addressLines": [],
+                                "countryCode": "HR",
+                                "postalCode": "10000",
+                                "city": "Zagreb",
+                            },
+                        },
                     },
                 },
             },
@@ -64,8 +83,27 @@ class TestOrders(object):
                                 "offerIds": [
                                     fixtures.OFFERS[0],
                                 ],
+                                "passengers": [
+                                    {
+                                        "firstName": "First",
+                                        "lastName": "Last",
+                                        "title": "mr",
+                                        "gender": "male",
+                                        "dateOfBirth": "1970-12-23",
+                                    },
+                                ],
                             },
                         ],
+                        "contactDetails": {
+                            "email": "example@example.com",
+                            "phone": "+385996666666",
+                            "address": {
+                                "addressLines": [],
+                                "countryCode": "HR",
+                                "postalCode": "10000",
+                                "city": "Zagreb",
+                            },
+                        },
                     },
                 },
             },
@@ -92,8 +130,27 @@ class TestOrders(object):
                                 "offerIds": [
                                     fixtures.OFFERS[0],
                                 ],
+                                "passengers": [
+                                    {
+                                        "firstName": "First",
+                                        "lastName": "Last",
+                                        "title": "Mr",
+                                        "gender": "male",
+                                        "dateOfBirth": "1970-12-23",
+                                    },
+                                ],
                             },
                         ],
+                        "contactDetails": {
+                            "email": "example@example.com",
+                            "phone": "+385996666666",
+                            "address": {
+                                "addressLines": [],
+                                "countryCode": "HR",
+                                "postalCode": "10000",
+                                "city": "Zagreb",
+                            },
+                        },
                     },
                 },
             },
@@ -119,8 +176,27 @@ class TestOrders(object):
                                 "offerIds": [
                                     fixtures.OFFERS[0],
                                 ],
+                                "passengers": [
+                                    {
+                                        "firstName": "First",
+                                        "lastName": "Last",
+                                        "title": "Mr",
+                                        "gender": "male",
+                                        "dateOfBirth": "1970-12-23",
+                                    },
+                                ],
                             },
                         ],
+                        "contactDetails": {
+                            "email": "example@example.com",
+                            "phone": "+385996666666",
+                            "address": {
+                                "addressLines": [],
+                                "countryCode": "HR",
+                                "postalCode": "10000",
+                                "city": "Zagreb",
+                            },
+                        },
                     },
                 },
             },

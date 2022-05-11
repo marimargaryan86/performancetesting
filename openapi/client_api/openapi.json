@@ -2680,7 +2680,8 @@
               "attributes": {
                 "type": "object",
                 "required": [
-                  "offers"
+                  "offers",
+                  "contactDetails"
                 ],
                 "properties": {
                   "offers": {
@@ -2702,14 +2703,28 @@
                             "type": "string",
                             "format": "uuid"
                           }
+                        },
+                        "passengers": {
+                          "type": "array",
+                          "minItems": 1,
+                          "uniqueItems": true,
+                          "items": {
+                            "$ref": "#/components/schemas/OrderPassenger"
+                          }
                         }
                       },
                       "required": [
                         "offerAggregateId",
-                        "offerIds"
+                        "offerIds",
+                        "passengers"
                       ]
                     },
                     "writeOnly": true
+                  },
+                  "contactDetails": {
+                    "items": {
+                      "$ref": "#/components/schemas/ContactDetails"
+                    }
                   }
                 }
               }
@@ -2725,6 +2740,57 @@
           }
         ],
         "description": "Collection of multiple booked Offers."
+      },
+      "OrderPassenger": {
+        "title": "OrderPassenger",
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "ContactDetails": {
+        "title": "ContactDetails",
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "addressLines": {
+                "type": "array"
+              },
+              "countryCode": {
+                "type": "string"
+              },
+              "postalCode": {
+                "type": "string"
+              },
+              "city": {
+                "type": "string"
+              }
+            }
+          },
+          "phoneNumber": {
+            "type": "string"
+          }
+        }
       },
       "LoyaltyCard": {
         "title": "LoyaltyCard",

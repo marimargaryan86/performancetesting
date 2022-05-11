@@ -1,8 +1,10 @@
+import datetime
+
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.adapter import orders
-from snowfall.common.v1alpha import models_pb2, phone_number_pb2, postal_address_pb2
+from snowfall.common.v1alpha import phone_number_pb2, postal_address_pb2
 from snowfall.junction.client_api import (
     models,
     pagination_helpers,
@@ -10,6 +12,9 @@ from snowfall.junction.client_api import (
     resources,
 )
 from snowfall.junction.orders.v1alpha import models_pb2 as order_models_pb2
+from snowfall.stdlib.format.protobuf import date_to_protobuf, slug_to_enum_value
+
+_ADDRESS = "address"
 
 
 class Order(endpoints.HTTPEndpoint):
@@ -87,37 +92,40 @@ class Orders(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
 
+        contact_details = body["contactDetails"]
         order = await orders_client.create(
             offer_ids=[
                 offer_id for offer in body["offers"] for offer_id in offer["offerIds"]
             ],
             passengers=[
                 order_models_pb2.Passenger(
-                    first_name="First",
-                    last_name="Last",
-                    title=order_models_pb2.Passenger.Title.TITLE_MR,
-                    gender=order_models_pb2.Passenger.Gender.GENDER_MALE,
-                    date_of_birth=models_pb2.Date(
-                        year=1967,  # noqa: WPS432
-                        month=3,
-                        day=23,  # noqa: WPS432
+                    first_name=passenger["firstName"],
+                    last_name=passenger["lastName"],
+                    title=slug_to_enum_value(  # type: ignore[arg-type]
+                        descriptor=order_models_pb2.Passenger.Title.DESCRIPTOR,
+                        name=passenger["title"],
                     ),
-                ),
+                    gender=slug_to_enum_value(  # type: ignore[arg-type]
+                        descriptor=order_models_pb2.Passenger.Gender.DESCRIPTOR,
+                        name=passenger["gender"],
+                    ),
+                    date_of_birth=date_to_protobuf(
+                        datetime.date.fromisoformat(passenger["dateOfBirth"]),
+                    ),
+                )
+                for passenger in body["offers"][0]["passengers"]
             ],
             contact_details=order_models_pb2.ContactDetails(
-                email="example@example.com",
+                email=contact_details["email"],
                 address=postal_address_pb2.PostalAddress(
-                    address_lines=[
-                        "Austin, TX",
-                    ],
-                    region_code="CH",
-                    postal_code="XX",
-                    locality="XX",
+                    address_lines=contact_details[_ADDRESS]["addressLines"],
+                    region_code=contact_details[_ADDRESS]["countryCode"],
+                    postal_code=contact_details[_ADDRESS]["postalCode"],
+                    locality=contact_details[_ADDRESS]["city"],
                     revision=0,
                 ),
                 phone=phone_number_pb2.PhoneNumber(
-                    e164_number="+15552220123",
-                    extension="",
+                    e164_number=contact_details["phone"],
                 ),
             ),
         )

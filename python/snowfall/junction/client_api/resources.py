@@ -206,9 +206,9 @@ class OrderResource(models.Resource):
             id=order.id,
             type="orders",
             attributes={
-                "order_results": [
+                "orderResults": [
                     {
-                        "offer_id": order_result.offer_id,
+                        "offerId": order_result.offer_id,
                         "status": protobuf.enum_value_to_slug(
                             descriptor=order_models_pb2.OrderResult.Status.DESCRIPTOR,
                             enum_value=order_result.status,
@@ -218,17 +218,15 @@ class OrderResource(models.Resource):
                 ],
                 "passengers": [
                     {
-                        "first_name": passenger.first_name,
-                        "date_of_birth": {
-                            "year": passenger.date_of_birth.year,
-                            "month": passenger.date_of_birth.month,
-                            "day": passenger.date_of_birth.day,
-                        },
+                        "firstName": passenger.first_name,
+                        "dateOfBirth": protobuf.protobuf_to_date(
+                            passenger.date_of_birth,
+                        ),
                         "title": protobuf.enum_value_to_slug(
                             descriptor=order_models_pb2.Passenger.Title.DESCRIPTOR,
                             enum_value=passenger.title,
                         ),
-                        "last_name": passenger.last_name,
+                        "lastName": passenger.last_name,
                         "gender": protobuf.enum_value_to_slug(
                             descriptor=order_models_pb2.Passenger.Gender.DESCRIPTOR,
                             enum_value=passenger.gender,
@@ -236,19 +234,16 @@ class OrderResource(models.Resource):
                     }
                     for passenger in order.passengers
                 ],
-                "contact_details": {
+                "contactDetails": {
                     "address": {
-                        "address_lines": list(
+                        "addressLines": list(
                             order.contact_details.address.address_lines,
                         ),
-                        "region_code": order.contact_details.address.region_code,
+                        "regionCode": order.contact_details.address.region_code,
                         "revision": order.contact_details.address.revision,
                     },
                     "email": order.contact_details.email,
-                    "phone": {
-                        "e164_number": order.contact_details.phone.e164_number,
-                        "extension": order.contact_details.phone.extension,
-                    },
+                    "phone": order.contact_details.phone.e164_number,
                 },
             },
             relationships={},
