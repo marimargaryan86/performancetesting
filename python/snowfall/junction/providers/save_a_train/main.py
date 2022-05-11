@@ -39,7 +39,7 @@ class _SearchSettings(service.Settings):
     api_email: str
     api_password: str
     api_search_base_url: pydantic.AnyUrl
-    api_search_timeout: int = 10
+    api_search_timeout: int = 1
     api_timeout: int = 40
     api_search_requests_limit: int = 40
     api_search_password: str
@@ -54,7 +54,7 @@ class _OrdersSettings(service.Settings):
     api_password: str
     api_timeout: int = 40
     api_search_base_url: pydantic.AnyUrl
-    api_search_timeout: int = 10
+    api_search_timeout: int = 1
     api_search_requests_limit: int = 40
     api_search_password: str
     api_booking_token: str

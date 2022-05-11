@@ -284,18 +284,31 @@ class SaveATrainAdapter(object):  # noqa: WPS214
     def _search_result_matches_requirements(
         self,
         search_result: sat_models.search.SearchResult,
-        search_result_requirement: models.SearchResultRequirement,
+        requirement: models.SearchResultRequirement,
     ) -> bool:
-        departure_datetime = search_result.departure_datetime.replace(
-            tzinfo=search_result_requirement.departure_datetime.tzinfo,
+        departure_at = search_result.departure_datetime.replace(
+            tzinfo=requirement.departure_datetime.tzinfo,
         )
+
+        if abs((departure_at - requirement.departure_datetime).seconds // 60) > 10:
+            self._logger.info(
+                "Departure times do not match",
+                requirement_departure_datetime=requirement.departure_datetime,
+                offer_departure_datetime=departure_at,
+            )
+            return False
+
         arrival_datetime = search_result.arrival_datetime.replace(
-            tzinfo=search_result_requirement.arrival_datetime.tzinfo,
+            tzinfo=requirement.arrival_datetime.tzinfo,
         )
-        return (
-            departure_datetime == search_result_requirement.departure_datetime
-            and arrival_datetime == search_result_requirement.arrival_datetime
-        )
+        if abs((arrival_datetime - requirement.arrival_datetime).seconds // 60) > 10:
+            self._logger.info(
+                "Arrival times do not match but we still approved the offer.",
+                requirement_arrival_datetime=requirement.arrival_datetime,
+                offer_arrival_datetime=arrival_datetime,
+            )
+
+        return True
 
     async def _make_booking(
         self,
