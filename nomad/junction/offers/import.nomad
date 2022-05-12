@@ -28,7 +28,7 @@ job "offers-import" {
   }
 
   group "import" {
-    count = 1
+    count = 2
 
     task "import" {
       driver = "docker"

@@ -28,7 +28,7 @@ job "save-a-train-offers" {
   }
 
   group "offers" {
-    count = 1
+    count = 5
 
     task "offers" {
       driver = "docker"

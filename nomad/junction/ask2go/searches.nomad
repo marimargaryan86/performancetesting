@@ -28,7 +28,7 @@ job "ask2go-searches" {
   }
 
   group "searches" {
-    count = 1
+    count = 5
 
     task "searches" {
       driver = "docker"

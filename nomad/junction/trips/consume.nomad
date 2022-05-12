@@ -28,7 +28,7 @@ job "trips-consume" {
   }
 
   group "consume" {
-    count = 1
+    count = 5
 
     task "consume" {
       driver = "docker"
