@@ -16,12 +16,6 @@
   },
   "x-tagGroups": [
     {
-      "name": "Inventories",
-      "tags": [
-        "inventories"
-      ]
-    },
-    {
       "name": "Meta",
       "tags": [
         "meta"
@@ -55,11 +49,6 @@
     }
   ],
   "tags": [
-    {
-      "name": "inventories",
-      "description": "The result of a successful order.",
-      "x-displayName": "Inventories"
-    },
     {
       "name": "legs",
       "description": "A single element of the trip carried by a provider. ",
@@ -141,7 +130,7 @@
           }
         },
         "operationId": "get-places",
-        "description": "Used to find Places that can be used when creating a Trip Search.",
+        "description": "The List places endpoint is used to find the origin and destination locations for the Trip Search endpoint.\n\nA place is an indexed reference to a location that Junction might have related content for. It is specified in a trip search to state where a passenger wishes to travel from/to. Each place is allocated a unique identifier.\nA place can be a Rail station or an Airport.\n\nThe List places endpoint purposefully doesn't support filtering and sorting. The API client should fetch the places once, and store them on their side, so that multiple calls to this endpoint are avoided.",
         "parameters": [
           {
             "$ref": "#/components/parameters/page-cursor"
@@ -192,7 +181,7 @@
           }
         },
         "operationId": "get-places-place-id",
-        "description": "Used to lookup data for a Place Identifier."
+        "description": "Used to lookup information about a place using its Place Identifier."
       }
     },
     "/legs/{legId}": {
@@ -268,6 +257,47 @@
                       "$ref": "#/components/schemas/NextLink"
                     }
                   ]
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "data": [
+                        {
+                          "id": "unspecified",
+                          "type": "leg-types",
+                          "attributes": {
+                            "name": "unspecified"
+                          },
+                          "links": {
+                            "self": "https://example.com/legs/types/unspecified"
+                          }
+                        },
+                        {
+                          "id": "air",
+                          "type": "leg-types",
+                          "attributes": {
+                            "name": "air"
+                          },
+                          "links": {
+                            "self": "https://example.com/legs/types/air"
+                          }
+                        },
+                        {
+                          "id": "rail",
+                          "type": "leg-types",
+                          "attributes": {
+                            "name": "rail"
+                          },
+                          "links": {
+                            "self": "https://example.com/legs/types/rail"
+                          }
+                        }
+                      ],
+                      "links": {
+                        "next": null
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -314,6 +344,22 @@
                   "required": [
                     "data"
                   ]
+                },
+                "examples": {
+                  "example-1": {
+                    "value": {
+                      "data": {
+                        "id": "air",
+                        "type": "leg-types",
+                        "attributes": {
+                          "name": "string"
+                        },
+                        "links": {
+                          "self": "https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -1492,6 +1538,7 @@
     "schemas": {
       "Place": {
         "title": "Place",
+        "description": "A place is an indexed reference to a location that Junction might have related content for. It is specified in a trip search to state where a passenger wishes to travel from/to. Each place is allocated a unique identifier.\n\nPlaces are curated by feeds from GTFS sources.  A place can be a rail station, Airport...",
         "allOf": [
           {
             "type": "object",
@@ -1579,7 +1626,26 @@
             "$ref": "#/components/schemas/SelfLink"
           }
         ],
-        "description": "Indexed reference to somewhere Junction might have content related to."
+        "x-examples": {
+          "example": {
+            "data": {
+              "id": "0010b869-653d-5494-a637-28a84adfcda9",
+              "type": "places",
+              "attributes": {
+                "countryCode": "US",
+                "iataCode": null,
+                "latitude": 42.940102,
+                "longitude": -78.730853,
+                "name": "Buffalo Niagara International Airport",
+                "timeZone": "America/New_York",
+                "type": "stop"
+              },
+              "links": {
+                "self": "https://example.com/places/0010b869-653d-5494-a637-28a84adfcda9"
+              }
+            }
+          }
+        }
       },
       "PlaceIdentifier": {
         "title": "Place Identifier",
@@ -2774,7 +2840,10 @@
             "type": "object",
             "properties": {
               "addressLines": {
-                "type": "array"
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
               },
               "countryCode": {
                 "type": "string"
