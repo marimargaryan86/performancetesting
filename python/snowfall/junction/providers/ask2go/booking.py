@@ -83,7 +83,7 @@ class BookingHandler(object):
             transaction_id=booking_result.transaction_id,
         )
 
-        booking_result = await self._poll_booking(booking_result)
+        # TODO: update booking_result with a call to poll_booking
 
         try:
             await self._send_email_notification(order, offer_id, booking_result)
