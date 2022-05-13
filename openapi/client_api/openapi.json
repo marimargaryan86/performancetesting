@@ -1627,22 +1627,20 @@
           }
         ],
         "x-examples": {
-          "example": {
-            "data": {
-              "id": "0010b869-653d-5494-a637-28a84adfcda9",
-              "type": "places",
-              "attributes": {
-                "countryCode": "US",
-                "iataCode": null,
-                "latitude": 42.940102,
-                "longitude": -78.730853,
-                "name": "Buffalo Niagara International Airport",
-                "timeZone": "America/New_York",
-                "type": "stop"
-              },
-              "links": {
-                "self": "https://example.com/places/0010b869-653d-5494-a637-28a84adfcda9"
-              }
+          "example-1": {
+            "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "type": "places",
+            "attributes": {
+              "name": "Stockholm Arlanda Airport",
+              "type": "stop",
+              "latitude": 59.651164062,
+              "longitude": 17.917829662,
+              "countryCode": "SE",
+              "timeZone": "Europe/Stockholm",
+              "iataCode": "ARN"
+            },
+            "links": {
+              "self": "https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5"
             }
           }
         }
@@ -2788,9 +2786,7 @@
                     "writeOnly": true
                   },
                   "contactDetails": {
-                    "items": {
-                      "$ref": "#/components/schemas/ContactDetails"
-                    }
+                    "$ref": "#/components/schemas/ContactDetails"
                   }
                 }
               }

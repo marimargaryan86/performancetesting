@@ -125,7 +125,7 @@ class Orders(endpoints.HTTPEndpoint):
                     revision=0,
                 ),
                 phone=phone_number_pb2.PhoneNumber(
-                    e164_number=contact_details["phone"],
+                    e164_number=contact_details["phoneNumber"],
                 ),
             ),
         )

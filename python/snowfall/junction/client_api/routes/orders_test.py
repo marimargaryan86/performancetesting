@@ -52,7 +52,7 @@ class TestOrders(object):
                         ],
                         "contactDetails": {
                             "email": "example@example.com",
-                            "phone": "+385996666666",
+                            "phoneNumber": "+385996666666",
                             "address": {
                                 "addressLines": [],
                                 "countryCode": "HR",
@@ -96,7 +96,7 @@ class TestOrders(object):
                         ],
                         "contactDetails": {
                             "email": "example@example.com",
-                            "phone": "+385996666666",
+                            "phoneNumber": "+385996666666",
                             "address": {
                                 "addressLines": [],
                                 "countryCode": "HR",
@@ -143,7 +143,7 @@ class TestOrders(object):
                         ],
                         "contactDetails": {
                             "email": "example@example.com",
-                            "phone": "+385996666666",
+                            "phoneNumber": "+385996666666",
                             "address": {
                                 "addressLines": [],
                                 "countryCode": "HR",
@@ -189,7 +189,7 @@ class TestOrders(object):
                         ],
                         "contactDetails": {
                             "email": "example@example.com",
-                            "phone": "+385996666666",
+                            "phoneNumber": "+385996666666",
                             "address": {
                                 "addressLines": [],
                                 "countryCode": "HR",
