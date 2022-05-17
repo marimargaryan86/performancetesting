@@ -1,7 +1,7 @@
 from datetime import date
 
 
-def calculate_age_by_date_of_birth(date_of_birth: date) -> int:
+def date_to_age(date_of_birth: date) -> int:
     today = date.today()
     return (
         today.year

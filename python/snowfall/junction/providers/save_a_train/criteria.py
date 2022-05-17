@@ -7,8 +7,8 @@ from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
 from snowfall.junction.providers.save_a_train import h3, train_stations
 from snowfall.junction.providers.save_a_train.v1alpha import amqp_pb2
-from snowfall.stdlib.dates import calculate_age_by_date_of_birth
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.time import date_to_age
 
 
 class CriteriaGenerator(object):
@@ -42,7 +42,7 @@ class CriteriaGenerator(object):
                         origin_id=start.id,
                         destination_id=end.id,
                         passengers_ages=[
-                            calculate_age_by_date_of_birth(
+                            date_to_age(
                                 protobuf.protobuf_to_date(
                                     passenger.date_of_birth,
                                 ),

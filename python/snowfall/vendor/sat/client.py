@@ -7,7 +7,7 @@ from typing import Any, Dict, Optional, Union
 import httpx
 import structlog
 
-from snowfall.stdlib.dates import calculate_age_by_date_of_birth
+from snowfall.stdlib.time import date_to_age
 from snowfall.vendor.sat.enums import PassengerType
 from snowfall.vendor.sat.exceptions import SATValidationError, SATValueError
 from snowfall.vendor.sat.models.booking import (
@@ -294,7 +294,7 @@ def _get_passenger_type_by_age(age: int) -> str:
 def _generate_passenger_type_attributes(
     date_of_birth: date,
 ) -> Dict[str, Union[str, int]]:
-    age = calculate_age_by_date_of_birth(date_of_birth)
+    age = date_to_age(date_of_birth)
     return {
         "type": _get_passenger_type_by_age(age),
         "age": age,
