@@ -223,7 +223,7 @@ ResultParser:
 			err = zipWriter.Agency().Write(gtfs.Agency{
 				Name:     "Snowfall",
 				Url:      "https://snowfalltravel.com/",
-				Timezone: "UTC",
+				Timezone: time.UTC,
 			})
 
 			if err != nil {

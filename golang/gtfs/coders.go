@@ -1,7 +1,9 @@
 package gtfs
 
 import (
+	"errors"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -35,7 +37,25 @@ func durationEncoder(v time.Duration) ([]byte, error) {
 func durationDecoder(data []byte, v *time.Duration) error {
 	var err error
 
-	*v, err = time.ParseDuration(string(data))
+	split := strings.SplitN(string(data), ":", 3)
+
+	if len(split) != 3 {
+		return errors.New("unable to parse duration: " + string(data))
+	}
+
+	*v, err = time.ParseDuration(fmt.Sprintf("%sh%sm%ss", split[0], split[1], split[2]))
+
+	return err
+}
+
+func locationEncoder(v *time.Location) ([]byte, error) {
+	return []byte(v.String()), nil
+}
+
+func locationDecoder(data []byte, v **time.Location) error {
+	var err error
+
+	*v, err = time.LoadLocation(string(data))
 
 	return err
 }

@@ -19,7 +19,16 @@ func NewReader[T FileType](r io.Reader) (*Reader[T], error) {
 
 	dec.Register(boolDecoder)
 	dec.Register(durationDecoder)
+	dec.Register(locationDecoder)
 	dec.Register(timeDecoder)
+
+	dec.Map = func(field, column string, v interface{}) string {
+		if _, ok := v.(uint); ok && field == "" {
+			return "0"
+		}
+
+		return field
+	}
 
 	return &Reader[T]{
 		decoder: dec,

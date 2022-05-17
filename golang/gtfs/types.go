@@ -3,7 +3,7 @@ package gtfs
 import "time"
 
 type FileType interface {
-	Agency | Calendar | Route | Stop | StopTime | Transfer | Trip
+	Agency | Calendar | CalendarDate | Route | Stop | StopTime | Transfer | Trip
 }
 
 type TransferType uint
@@ -17,23 +17,23 @@ const (
 )
 
 const (
-	Added ExceptionType = iota
+	Added ExceptionType = iota + 1
 	Removed
 )
 
 type Agency struct {
-	Id       string `csv:"agency_id,omitempty"`
-	Name     string `csv:"agency_name"`
-	Url      string `csv:"agency_url"`
-	Timezone string `csv:"agency_timezone"`
-	Language string `csv:"agency_lang,omitempty"`
-	Phone    string `csv:"agency_phone,omitempty"`
-	FareUrl  string `csv:"agency_fare_url,omitempty"`
-	Email    string `csv:"agency_email,omitempty"`
+	Id       string         `csv:"agency_id,omitempty"`
+	Name     string         `csv:"agency_name"`
+	Url      string         `csv:"agency_url"`
+	Timezone *time.Location `csv:"agency_timezone"`
+	Language string         `csv:"agency_lang,omitempty"`
+	Phone    string         `csv:"agency_phone,omitempty"`
+	FareUrl  string         `csv:"agency_fare_url,omitempty"`
+	Email    string         `csv:"agency_email,omitempty"`
 }
 
 type Calendar struct {
-	ServiceId string    `csv:"service_id"`
+	ServiceId string    `csv:"service_id" gorm:"index"`
 	Monday    bool      `csv:"monday"`
 	Tuesday   bool      `csv:"tuesday"`
 	Wednesday bool      `csv:"wednesday"`
@@ -46,14 +46,14 @@ type Calendar struct {
 }
 
 type CalendarDate struct {
-	ServiceId     string        `csv:"service_id"`
+	ServiceId     string        `csv:"service_id" gorm:"index"`
 	Date          time.Time     `csv:"date"`
 	ExceptionType ExceptionType `csv:"exception_type"`
 }
 
 type Route struct {
 	Id                string `csv:"route_id"`
-	AgencyId          string `csv:"agency_id,omitempty"`
+	AgencyId          string `csv:"agency_id,omitempty" gorm:"index"`
 	ShortName         string `csv:"route_short_name,omitempty"`
 	LongName          string `csv:"route_long_name,omitempty"`
 	Description       string `csv:"route_desc,omitempty"`
@@ -67,7 +67,7 @@ type Route struct {
 }
 
 type Stop struct {
-	Id                 string  `csv:"stop_id"`
+	Id                 string  `csv:"stop_id" gorm:"index"`
 	Code               string  `csv:"stop_code,omitempty"`
 	Name               string  `csv:"stop_name,omitempty"`
 	Description        string  `csv:"stop_desc,omitempty"`
@@ -84,11 +84,11 @@ type Stop struct {
 }
 
 type StopTime struct {
-	TripId            string        `csv:"trip_id"`
+	TripId            string        `csv:"trip_id" gorm:"index"`
 	ArrivalTime       time.Duration `csv:"arrival_time,omitempty"`
 	DepartureTime     time.Duration `csv:"departure_time,omitempty"`
 	StopId            string        `csv:"stop_id"`
-	StopSequence      uint          `csv:"stop_sequence"`
+	StopSequence      uint          `csv:"stop_sequence" gorm:"index"`
 	StopHeadsign      string        `csv:"stop_headsign,omitempty"`
 	PickupType        uint          `csv:"pickup_type"`
 	DropOffType       uint          `csv:"drop_off_type"`
@@ -106,7 +106,7 @@ type Transfer struct {
 }
 
 type Trip struct {
-	RouteId              string `csv:"route_id"`
+	RouteId              string `csv:"route_id" gorm:"index"`
 	ServiceId            string `csv:"service_id"`
 	Id                   string `csv:"trip_id"`
 	Headsign             string `csv:"trip_headsign,omitempty"`

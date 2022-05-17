@@ -26,6 +26,7 @@ func NewWriter[T FileType](w io.Writer) *Writer[T] {
 
 	enc.Register(boolEncoder)
 	enc.Register(durationEncoder)
+	enc.Register(locationEncoder)
 	enc.Register(timeEncoder)
 
 	return &Writer[T]{

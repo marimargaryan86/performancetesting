@@ -8,7 +8,7 @@ go:lint:
   before_script:
     - cd golang/
   script:
-    - golangci-lint run --new-from-rev="${CI_MERGE_REQUEST_DIFF_BASE_SHA}"
+    - golangci-lint run --new-from-rev="${CI_MERGE_REQUEST_DIFF_BASE_SHA}" --timeout 5m
   needs: [ ]
   rules:
     - if: $CI_MERGE_REQUEST_IID
