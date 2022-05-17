@@ -3,7 +3,7 @@
   "info": {
     "title": "Junction Client API",
     "version": "1.0.0",
-    "description": "This API follows the [JSON:API][jsonapi] specifation.\n\nA suggested booking flow example:\n\n1. Retrieve Places from `GET /places`.\n2. Initiate a Trip Search with `POST /trips/searches` by specifying one Place as origin and another as destination. This will start an asynchronous process to find suitable trips.\n3. Retrieve Trip results from `GET /trips/searches/{tripSearchId}/trips`.\n4. Intiate an Offer Search with `POST /offers/searches` by specifying one or more Trips. This will start an asynchronous process to find suitable trips.\n5. Retrieve Offer results from `GET /offers/searches/{offerSearchId}/offers`.\n6. Create an Order with `POST /orders` by specifyng one or more Offers.\n\n[jsonapi]: https://jsonapi.org/",
+    "description": "This API follows the [JSON:API][jsonapi] specification.\n\nA suggested booking flow example:\n\n1. Retrieve Places from `GET /places`.\n2. Initiate a Trip Search with `POST /trips/searches` by specifying one Place as origin and another as destination. This will start an asynchronous process to find suitable trips.\n3. Retrieve Trip results from `GET /trips/searches/{tripSearchId}/trips`.\n4. Intiate an Offer Search with `POST /offers/searches` by specifying one or more Trips. This will start an asynchronous process to find suitable trips.\n5. Retrieve Offer results from `GET /offers/searches/{offerSearchId}/offers`.\n6. Create an Order with `POST /orders` by specifyng one or more Offers.\n\n[jsonapi]: https://jsonapi.org/",
     "contact": {
       "name": "Snowfall",
       "url": "https://www.snowfalltravel.com",
@@ -16,9 +16,15 @@
   },
   "x-tagGroups": [
     {
-      "name": "Meta",
+      "name": "Draft",
       "tags": [
-        "meta"
+        "draft"
+      ]
+    },
+    {
+      "name": "Internal",
+      "tags": [
+        "internal"
       ]
     },
     {
@@ -50,14 +56,19 @@
   ],
   "tags": [
     {
+      "name": "draft",
+      "description": "Endpoints still being drafted.",
+      "x-displayName": "Draft"
+    },
+    {
+      "name": "internal",
+      "description": "Endpoints not for public use.",
+      "x-displayName": "Internal"
+    },
+    {
       "name": "legs",
       "description": "A single element of the trip carried by a provider. ",
       "x-displayName": "Legs"
-    },
-    {
-      "name": "meta",
-      "description": "Meta information about the API.",
-      "x-displayName": "Meta"
     },
     {
       "name": "offers",
@@ -372,7 +383,7 @@
           }
         },
         "operationId": "get-legs-types-leg-type-id",
-        "description": "Used to lookup data for a Let Type Identifier."
+        "description": "Used to lookup data for a Leg Type Identifier."
       }
     },
     "/segments/{segmentId}": {
@@ -425,7 +436,7 @@
       "get": {
         "summary": "List Legs by Segment",
         "tags": [
-          "segments"
+          "legs"
         ],
         "responses": {
           "200": {
@@ -533,7 +544,7 @@
       "get": {
         "summary": "List Legs by Trip",
         "tags": [
-          "trips"
+          "legs"
         ],
         "responses": {
           "200": {
@@ -592,7 +603,7 @@
       "get": {
         "summary": "List Segments by Trip",
         "tags": [
-          "trips"
+          "segments"
         ],
         "responses": {
           "200": {
@@ -651,7 +662,7 @@
       "get": {
         "summary": "List Prices by Trip",
         "tags": [
-          "trips"
+          "draft"
         ],
         "responses": {
           "200": {
@@ -698,7 +709,8 @@
           {
             "$ref": "#/components/parameters/page-limit"
           }
-        ]
+        ],
+        "x-internal": true
       }
     },
     "/trips/searches": {
@@ -816,7 +828,7 @@
       "get": {
         "summary": "List Legs by Trip Search",
         "tags": [
-          "trips"
+          "legs"
         ],
         "responses": {
           "200": {
@@ -885,7 +897,7 @@
       "get": {
         "summary": "List Segments by Trip Search",
         "tags": [
-          "trips"
+          "segments"
         ],
         "responses": {
           "200": {
@@ -1203,7 +1215,7 @@
       "get": {
         "summary": "List Related Searches by Offer Search",
         "tags": [
-          "offers"
+          "draft"
         ],
         "responses": {
           "200": {
@@ -1252,7 +1264,8 @@
           {
             "$ref": "#/components/parameters/page-limit"
           }
-        ]
+        ],
+        "x-internal": true
       }
     },
     "/offers/{offerId}": {
@@ -1483,7 +1496,7 @@
       "get": {
         "summary": "Health",
         "tags": [
-          "meta"
+          "internal"
         ],
         "responses": {
           "200": {
@@ -1538,7 +1551,6 @@
     "schemas": {
       "Place": {
         "title": "Place",
-        "description": "A place is an indexed reference to a location that Junction might have related content for. It is specified in a trip search to state where a passenger wishes to travel from/to. Each place is allocated a unique identifier.\n\nPlaces are curated by feeds from GTFS sources.  A place can be a rail station, Airport...",
         "allOf": [
           {
             "type": "object",
@@ -1626,6 +1638,7 @@
             "$ref": "#/components/schemas/SelfLink"
           }
         ],
+        "description": "A place is an indexed reference to a location that Junction might have related content for. It is specified in a trip search to state where a passenger wishes to travel from/to. Each place is allocated a unique identifier.\n\nPlaces are curated by feeds from GTFS sources.  A place can be a rail station, Airport...",
         "x-examples": {
           "example-1": {
             "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
@@ -2823,7 +2836,14 @@
             "type": "string",
             "format": "date"
           }
-        }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "title",
+          "gender",
+          "dateOfBirth"
+        ]
       },
       "ContactDetails": {
         "title": "ContactDetails",

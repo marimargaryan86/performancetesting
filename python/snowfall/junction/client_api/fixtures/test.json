@@ -55,7 +55,8 @@
             }
           }
         },
-        "operationId": "get-validation"
+        "operationId": "get-validation",
+        "x-internal": true
       },
       "post": {
         "summary": "",
@@ -101,7 +102,8 @@
               }
             }
           }
-        }
+        },
+        "x-internal": true
       }
     }
   },
