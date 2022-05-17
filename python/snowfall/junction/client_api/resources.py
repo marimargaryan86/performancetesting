@@ -270,7 +270,7 @@ class PlaceResource(models.Resource):
                 "longitude": place.coordinates.longitude,
                 "name": place.name,
                 "timeZone": place.time_zone,
-                "type": "stop",
+                "kind": "stop",
             },
             links={
                 _SELF_HREF: request.url_for(
