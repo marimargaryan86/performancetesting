@@ -37,7 +37,7 @@ class _OrdersSettings(service.Settings):
     api_booking_base_url: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
     smtp_dsn: pydantic.AnyUrl
-    http_timeout: float = 20.0
+    http_timeout: float = 60.0
 
 
 class _SearchSettings(service.Settings):
