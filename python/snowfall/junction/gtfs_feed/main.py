@@ -4,6 +4,7 @@ import shutil
 from typing import Sequence
 
 import aioredis
+from aio_pika import abc
 from aiofiles import os, tempfile  # type: ignore[attr-defined]
 from motor import motor_asyncio
 from pydantic import AnyUrl, DirectoryPath
@@ -89,14 +90,14 @@ async def _import(  # noqa: WPS210
                 if not imported:
                     return
 
-                async with amqp.Connection(
+                async with await amqp.create_connection(
                     random.choice(app.settings.amqp_dsn),  # nosec
                 ) as connection:
                     await _process(connection, geocoder, repositories, feed_ref)
 
 
 async def _process(
-    connection: amqp.Connection,
+    connection: abc.AbstractConnection,
     geocoder: geocoding_pb2_grpc.GeocodingServiceStub,
     repositories: importer.RepositoryCollection,
     feed_ref: str,
@@ -110,9 +111,9 @@ async def _process(
     await schedules.produce_schedules(connection, generator)
     await places.process_places(
         geocoder,
-        await amqp.create_producer(
-            conn=connection,
-            exchange_name="places",
+        amqp.Producer(
+            connection=connection,
+            exchange=amqp.Exchange("places"),
         ),
         repositories,
         feed_ref,

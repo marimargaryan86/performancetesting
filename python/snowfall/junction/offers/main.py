@@ -36,7 +36,7 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
-    async with amqp.Connection(
+    async with await amqp.create_connection(
         random.choice(app.settings.amqp_dsn),  # nosec
     ) as connection:
         grpc_server = server.create_server(
@@ -49,9 +49,9 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
                         app.settings.default_ttl,
                     ),
                     publisher=OfferSearchProducer(
-                        producer=await amqp.create_producer(
-                            conn=connection,
-                            exchange_name="offers",
+                        producer=amqp.Producer(
+                            connection=connection,
+                            exchange=amqp.Exchange("offers"),
                         ),
                     ),
                     default_page_size=app.settings.default_page_size,
@@ -77,7 +77,7 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
         random.choice(app.settings.mongo_dsn),  # nosec
     )
 
-    async with amqp.Connection(
+    async with await amqp.create_connection(
         random.choice(app.settings.amqp_dsn),  # nosec
     ) as connection:
         async with aioredis.from_url(
@@ -85,9 +85,9 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
             decode_responses=True,
         ).client() as redis_conn:
             offer_importer = importer.OfferImporter(
-                consumer=await amqp.create_consumer(
-                    conn=connection,
-                    exchange_name="offers",
+                consumer=amqp.Consumer(
+                    connection=connection,
+                    exchange=amqp.Exchange("offers"),
                     queue_name="{0}_offers".format(app.name),
                     routing_key="offers.result.trip",
                 ),

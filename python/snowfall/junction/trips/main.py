@@ -34,16 +34,18 @@ class _GrpcSettings(service.Settings):
 
 
 async def _consume(app: service.Application[_ConsumeSettings]) -> None:
-    connection = amqp.Connection(random.choice(app.settings.amqp_dsn))  # nosec
+    connection = await amqp.create_connection(
+        random.choice(app.settings.amqp_dsn),  # nosec
+    )
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
 
     async with connection:
         consumer = TripSearchConsumer(
-            consumer=await amqp.create_consumer(
-                conn=connection,
-                exchange_name=_TRIPS,
+            consumer=amqp.Consumer(
+                connection=connection,
+                exchange=amqp.Exchange(_TRIPS),
                 queue_name="{0}_trip_searches_consumer".format(app.name),
                 routing_key="trips.search",
             ),
@@ -63,15 +65,17 @@ async def _consume(app: service.Application[_ConsumeSettings]) -> None:
 
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
-    connection = amqp.Connection(random.choice(app.settings.amqp_dsn))  # nosec
+    connection = await amqp.create_connection(
+        random.choice(app.settings.amqp_dsn),  # nosec
+    )
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
 
     async with connection:
-        producer = await amqp.create_producer(
-            conn=connection,
-            exchange_name=_TRIPS,
+        producer = amqp.Producer(
+            connection=connection,
+            exchange=amqp.Exchange(_TRIPS),
         )
         grpc_server = server.create_server(
             app.settings.grpc_address,

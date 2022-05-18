@@ -45,7 +45,7 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:  # noqa: WPS2
         ),
     )
 
-    async with amqp.Connection(
+    async with await amqp.create_connection(
         random.choice(app.settings.amqp_dsn),  # nosec
     ) as connection:
         grpc_server = server.create_server(
@@ -58,9 +58,9 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:  # noqa: WPS2
                         passenger_name_records=passenger_name_records_client,
                     ),
                     publisher=OrderProducer(
-                        producer=await amqp.create_producer(
-                            conn=connection,
-                            exchange_name="orders",
+                        producer=amqp.Producer(
+                            connection=connection,
+                            exchange=amqp.Exchange("orders"),
                         ),
                     ),
                     default_page_size=app.settings.default_page_size,
@@ -85,13 +85,13 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
         ),
     )
 
-    async with amqp.Connection(
+    async with await amqp.create_connection(
         random.choice(app.settings.amqp_dsn),  # nosec
     ) as connection:
         order_importer = importer.OrderImporter(
-            consumer=await amqp.create_consumer(
-                conn=connection,
-                exchange_name="orders",
+            consumer=amqp.Consumer(
+                connection=connection,
+                exchange=amqp.Exchange("orders"),
                 queue_name="{0}_orders".format(app.name),
                 routing_key="orders.result.offer",
             ),

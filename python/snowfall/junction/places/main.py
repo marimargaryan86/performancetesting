@@ -29,14 +29,16 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
-    connection = amqp.Connection(random.choice(app.settings.amqp_dsn))  # nosec
+    connection = await amqp.create_connection(
+        random.choice(app.settings.amqp_dsn),  # nosec
+    )
 
     async with connection:
         consumer = PlaceImportConsumer(
             places=PlaceRepository(mongo.places.places),
-            consumer=await amqp.create_consumer(
-                conn=connection,
-                exchange_name="places",
+            consumer=amqp.Consumer(
+                connection=connection,
+                exchange=amqp.Exchange("places"),
                 queue_name="{0}_places_importer".format(app.name),
                 routing_key="place.import",
             ),

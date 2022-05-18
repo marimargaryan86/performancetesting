@@ -5,6 +5,7 @@ import zoneinfo
 from typing import AsyncIterator, Optional, Sequence
 
 import more_itertools
+from aio_pika import abc
 from google.protobuf import timestamp_pb2
 
 from snowfall.common.v1alpha import latlng_pb2, models_pb2
@@ -264,12 +265,12 @@ def _append_legs(
 
 
 async def produce_schedules(
-    connection: amqp.Connection,
+    connection: abc.AbstractConnection,
     generator: SchedulesGenerator,
 ) -> None:
-    producer = await amqp.create_producer(
-        conn=connection,
-        exchange_name="schedules",
+    producer = amqp.Producer(
+        connection=connection,
+        exchange=amqp.Exchange("schedules"),
     )
 
     async for schedule in generator.generate():

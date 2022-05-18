@@ -51,19 +51,19 @@ class _SearchSettings(service.Settings):
 
 async def _offers(app: service.Application[_OffersSettings]) -> None:
     async with httpx.AsyncClient(timeout=app.settings.http_timeout) as http_client:
-        async with amqp.Connection(
+        async with await amqp.create_connection(
             random.choice(app.settings.amqp_dsn),  # nosec
         ) as connection:
             trip_search_consumer = consumer.TripSearchConsumer(
-                consumer=await amqp.create_consumer(
-                    conn=connection,
-                    exchange_name="offers",
+                consumer=amqp.Consumer(
+                    connection=connection,
+                    exchange=amqp.Exchange("offers"),
                     queue_name="{0}_offers".format(app.name),
                     routing_key="offers.search.trip",
                 ),
-                producer=await amqp.create_producer(
-                    conn=connection,
-                    exchange_name="ask2go",
+                producer=amqp.Producer(
+                    connection=connection,
+                    exchange=amqp.Exchange("ask2go"),
                 ),
                 generator=criteria.CriteriaGenerator(
                     h3_mapping=h3.H3MappingRepository[airports.Airport](
@@ -94,19 +94,19 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
                 http_client=http_client,
             )
 
-            async with amqp.Connection(
+            async with await amqp.create_connection(
                 random.choice(app.settings.amqp_dsn),  # nosec
             ) as connection:
                 await consumer.OrderConsumer(
-                    consumer=await amqp.create_consumer(
-                        conn=connection,
-                        exchange_name="orders",
+                    consumer=amqp.Consumer(
+                        connection=connection,
+                        exchange=amqp.Exchange("orders"),
                         queue_name="{0}_orders".format(app.name),
                         routing_key="orders.offers",
                     ),
-                    producer=await amqp.create_producer(
-                        conn=connection,
-                        exchange_name="orders",
+                    producer=amqp.Producer(
+                        connection=connection,
+                        exchange=amqp.Exchange("orders"),
                     ),
                     booking_handler=booking.BookingHandler(
                         a2g_client=ask2go_client,
@@ -135,19 +135,19 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                 api_booking_base_url=app.settings.api_booking_base_url,
                 http_client=http_client,
             )
-            async with amqp.Connection(
+            async with await amqp.create_connection(
                 random.choice(app.settings.amqp_dsn),  # nosec
             ) as connection:
                 trip_search_consumer = consumer.SearchCriteriaConsumer(
-                    consumer=await amqp.create_consumer(
-                        conn=connection,
-                        exchange_name="ask2go",
+                    consumer=amqp.Consumer(
+                        connection=connection,
+                        exchange=amqp.Exchange("ask2go"),
                         queue_name="{0}_searches".format(app.name),
                         routing_key="offers.search.trip",
                     ),
-                    producer=await amqp.create_producer(
-                        conn=connection,
-                        exchange_name="offers",
+                    producer=amqp.Producer(
+                        connection=connection,
+                        exchange=amqp.Exchange("offers"),
                     ),
                     a2g_client=adapter.Ask2GoAdapter(
                         ask2go_client=ask2go_client,

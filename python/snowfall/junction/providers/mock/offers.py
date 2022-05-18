@@ -97,19 +97,19 @@ class TripSearchConsumer(object):
 
 
 async def offers(app: service.Application[OffersSettings]) -> None:
-    async with amqp.Connection(
+    async with await amqp.create_connection(
         random.choice(app.settings.amqp_dsn),  # nosec
     ) as connection:
         consumer = TripSearchConsumer(
-            consumer=await amqp.create_consumer(
-                conn=connection,
-                exchange_name="offers",
+            consumer=amqp.Consumer(
+                connection=connection,
+                exchange=amqp.Exchange("offers"),
                 queue_name="{0}_offers".format(app.name),
                 routing_key="offers.search.trip",
             ),
-            producer=await amqp.create_producer(
-                conn=connection,
-                exchange_name="offers",
+            producer=amqp.Producer(
+                connection=connection,
+                exchange=amqp.Exchange("offers"),
             ),
             client=OffersMockClient(),
         )

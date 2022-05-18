@@ -53,14 +53,16 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
-    connection = amqp.Connection(random.choice(app.settings.amqp_dsn))  # nosec
+    connection = await amqp.create_connection(
+        random.choice(app.settings.amqp_dsn),  # nosec
+    )
 
     async with connection:
         import_consumer = consumer.ScheduleImportConsumer(
             schedules=schedules.ScheduleRepository(mongo.schedules.schedules),
-            consumer=await amqp.create_consumer(
-                conn=connection,
-                exchange_name="schedules",
+            consumer=amqp.Consumer(
+                connection=connection,
+                exchange=amqp.Exchange("schedules"),
                 queue_name="{0}_schedules_importer".format(app.name),
                 routing_key="schedule.import",
             ),

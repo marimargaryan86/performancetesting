@@ -52,19 +52,19 @@ class OrdersConsumer(object):
 
 
 async def orders(app: service.Application[OrdersSettings]) -> None:
-    async with amqp.Connection(
+    async with await amqp.create_connection(
         random.choice(app.settings.amqp_dsn),  # nosec
     ) as connection:
         consumer = OrdersConsumer(
-            consumer=await amqp.create_consumer(
-                conn=connection,
-                exchange_name="orders",
+            consumer=amqp.Consumer(
+                connection=connection,
+                exchange=amqp.Exchange("orders"),
                 queue_name="{0}_orders".format(app.name),
                 routing_key="orders.offers",
             ),
-            producer=await amqp.create_producer(
-                conn=connection,
-                exchange_name="orders",
+            producer=amqp.Producer(
+                connection=connection,
+                exchange=amqp.Exchange("orders"),
             ),
             client=OrdersMockClient(),
         )

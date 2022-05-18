@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-import functools
-from asyncio import Event
-from types import TracebackType
-from typing import Any, Callable, Coroutine, Optional, Type, Union, cast
+import dataclasses
+from typing import Any, Callable, Coroutine, Mapping, Type, Union
 
-from aiormq import abc, connection
+from aio_pika import Message as PikeMessage
+from aio_pika import abc, connect_robust
 from google.protobuf import any_pb2, message, symbol_database
-from pamqp import commands
 from sentry_sdk import Hub, tracing
 from structlog import get_logger
 
@@ -47,211 +45,157 @@ class Serializer(object):
         return unpacked_message
 
 
-class Connection(connection.Connection):
-    async def __aenter__(self) -> "Connection":
-        await super().__aenter__()
-        return self
-
-    async def __aexit__(
-        self,
-        exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
-    ) -> None:
-        await self.close(exc_val)
+async def create_connection(dsn: str) -> abc.AbstractRobustConnection:
+    return await connect_robust(url=dsn)
 
 
 class Producer(object):
     def __init__(
         self,
-        channel: abc.AbstractChannel,
-        exchange_name: str,
+        connection: abc.AbstractConnection,
+        exchange: Exchange,
     ):
-        self._channel = channel
-        self._exchange_name = exchange_name
+        self._connection = connection
+        self._exchange = exchange
         self._logger = get_logger(__name__)
 
     async def publish(self, msg: message.Message, routing_key: str) -> None:
         with get_span(
             _SPAN_PRODUCER_OP,
-            "{0}/{1}".format(self._exchange_name, routing_key),
+            "{0}/{1}".format(self._exchange.name, routing_key),
         ) as span:
-            await self._channel.basic_publish(
-                body=Serializer.serialize(msg),
-                exchange=self._exchange_name,
-                properties=commands.Basic.Properties(
-                    headers={
-                        header_key: header_value
-                        for header_key, header_value in span.iter_headers()
-                    },
-                ),
-                routing_key=routing_key,
-            )
+            async with self._connection.channel() as channel:
+                exchange = await channel.declare_exchange(
+                    name=self._exchange.name,
+                    type=self._exchange.type_,
+                    durable=True,
+                )
+
+                await exchange.publish(
+                    message=PikeMessage(
+                        body=Serializer.serialize(msg),
+                        headers={
+                            header_key: header_value
+                            for header_key, header_value in span.iter_headers()
+                        },
+                        content_type="application/x-protobuf",
+                    ),
+                    routing_key=routing_key,
+                )
 
         self._logger.info(
             "Message published.",
-            exchange=self._exchange_name,
+            exchange=self._exchange.name,
             routing_key=routing_key,
             type=msg.DESCRIPTOR.full_name,
         )
 
 
-async def create_producer(
-    conn: Connection,
-    exchange_name: str,
-    exchange_type: str = "topic",
-) -> Producer:
-    channel = await conn.channel()
-
-    await channel.exchange_declare(
-        exchange=exchange_name,
-        exchange_type=exchange_type,
-        durable=True,
-    )
-
-    return Producer(channel, exchange_name)
-
-
 class Message(object):
-    def __init__(self, msg: abc.DeliveredMessage):
-        self._acknowledged = False
+    def __init__(self, msg: abc.AbstractIncomingMessage):
         self.body = Serializer.deserialize(msg.body)
-        self.headers: dict[str, Any] = msg.header.properties.headers or {}
+        self.headers: Mapping[str, Any] = msg.headers
         self._message = msg
 
     async def ack(self) -> None:
-        if self._acknowledged:
-            raise RuntimeError("message already acknowledged")
-
-        delivery = cast(commands.Basic.Deliver, self._message.delivery)
-
-        await self._message.channel.basic_ack(cast(int, delivery.delivery_tag))
-
-        self._acknowledged = True
+        await self._message.ack()
 
     @property
     def acknowledged(self) -> bool:
-        return self._acknowledged
+        return self._message.processed
 
     async def nack(self) -> None:
-        if self._acknowledged:
-            raise RuntimeError("message already acknowledged")
-
-        delivery = cast(commands.Basic.Deliver, self._message.delivery)
-
-        await self._message.channel.basic_nack(
-            cast(int, delivery.delivery_tag),
-            requeue=False,
-        )
-
-        self._acknowledged = True
+        await self._message.nack(requeue=False)
 
     async def requeue(self) -> None:
-        if self._acknowledged:
-            raise RuntimeError("message already acknowledged")
-
-        delivery = cast(commands.Basic.Deliver, self._message.delivery)
-
-        await self._message.channel.basic_nack(
-            cast(int, delivery.delivery_tag),
-            requeue=True,
-        )
-
-        self._acknowledged = True
+        await self._message.nack(requeue=True)
 
     @property
     def routing_key(self) -> str:
-        delivery = cast(commands.Basic.Deliver, self._message.delivery)
-
-        return str(delivery.routing_key)
+        return self._message.routing_key or ""
 
 
 ConsumerCallback = Callable[[Message], Coroutine[None, None, None]]
 
 
+@dataclasses.dataclass(frozen=True)
+class Exchange(object):
+    name: str
+    type_: abc.ExchangeType = abc.ExchangeType.TOPIC
+
+
 class Consumer(object):
     def __init__(
         self,
-        channel: abc.AbstractChannel,
+        connection: abc.AbstractConnection,
+        exchange: Exchange,
         queue_name: str,
+        routing_key: str,
     ):
-        self._channel = channel
+        self._connection = connection
+        self._exchange = exchange
         self._logger = get_logger(__name__)
         self._queue_name = queue_name
+        self._routing_key = routing_key
 
     async def consume(self, callback: ConsumerCallback) -> None:
-        await self._channel.basic_consume(
-            self._queue_name,
-            self._decorate_callback(callback),
+        # @todo: if we like it then we should put put a thread it!
+        async with self._connection.channel() as channel:
+            await self._consume(channel, callback)
+
+    async def _consume(
+        self,
+        channel: abc.AbstractChannel,
+        callback: ConsumerCallback,
+    ) -> None:
+        exchange = await channel.declare_exchange(
+            name=self._exchange.name,
+            type=self._exchange.type_,
+            durable=True,
         )
 
-        # basic_consume() doesn't block while it consumes
-        await Event().wait()
+        queue = await channel.declare_queue(
+            name=self._queue_name,
+        )
 
-    def _decorate_callback(
+        await queue.bind(exchange, self._routing_key)
+
+        incoming: abc.AbstractIncomingMessage
+
+        async with queue.iterator() as queue_iter:
+            async for incoming in queue_iter:
+                async with incoming.process():
+                    await self._process(incoming, callback)
+
+    async def _process(
         self,
+        incoming: abc.AbstractIncomingMessage,
         callback: ConsumerCallback,
-    ) -> abc.ConsumerCallback:
-        @functools.wraps(callback)
-        async def decorator(incoming: abc.DeliveredMessage) -> None:
-            msg = Message(incoming)
-            transaction = tracing.Transaction.continue_from_headers(
-                {
-                    metadata_key: metadata_value
-                    for metadata_key, metadata_value in msg.headers.items()
-                },
-                op=_SPAN_CONSUMER_OP,
-                name="{0}/{1}".format(self._queue_name, msg.routing_key),
-            )
+    ) -> None:
+        msg = Message(incoming)
+        transaction = tracing.Transaction.continue_from_headers(
+            {
+                metadata_key: metadata_value
+                for metadata_key, metadata_value in msg.headers.items()
+            },
+            op=_SPAN_CONSUMER_OP,
+            name="{0}/{1}".format(self._queue_name, msg.routing_key),
+        )
 
-            with Hub(Hub.current).start_transaction(transaction) as span:
-                span.set_status("ok")
+        with Hub(Hub.current).start_transaction(transaction) as span:
+            span.set_status("ok")
 
-                try:
-                    await callback(msg)
-                except Exception:  # noqa: PIE786
-                    self._logger.exception()
-                    span.set_status("nok")
+            try:
+                await callback(msg)
+            except Exception:  # noqa: PIE786
+                self._logger.exception()
+                span.set_status("nok")
 
-                if span.status != "ok" and not msg.acknowledged:
-                    await msg.nack()
-                elif not msg.acknowledged:
-                    await msg.ack()
-
-            self._logger.info(
-                "Message consumed.",
-                queue=self._queue_name,
-                routing_key=msg.routing_key,
-                type=msg.body.DESCRIPTOR.full_name,
-            )
-
-        return decorator
-
-
-async def create_consumer(
-    conn: Connection,
-    exchange_name: str,
-    queue_name: str,
-    routing_key: str,
-    exchange_type: str = "topic",
-) -> Consumer:
-    channel = await conn.channel()
-
-    await channel.exchange_declare(
-        exchange=exchange_name,
-        exchange_type=exchange_type,
-        durable=True,
-    )
-
-    await channel.queue_declare(
-        queue=queue_name,
-        durable=True,
-    )
-
-    await channel.queue_bind(
-        queue=queue_name,
-        exchange=exchange_name,
-        routing_key=routing_key,
-    )
-
-    return Consumer(channel, queue_name)
+                raise
+            finally:
+                self._logger.info(
+                    "Message consumed.",
+                    queue=self._queue_name,
+                    routing_key=msg.routing_key,
+                    type=msg.body.DESCRIPTOR.full_name,
+                )
