@@ -109,7 +109,7 @@ extra_requirements = [
 ]
 
 [python]
-lockfile_generator = "poetry"
+lockfile_generator = "pex"
 interpreter_constraints = ["CPython==3.9.10"]
 enable_resolves = true
 resolves = {python-default = "vendor/lock/constraints.txt"}
