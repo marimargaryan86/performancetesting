@@ -156,6 +156,7 @@ class Consumer(object):
 
         queue = await channel.declare_queue(
             name=self._queue_name,
+            durable=True,
         )
 
         await queue.bind(exchange, self._routing_key)
