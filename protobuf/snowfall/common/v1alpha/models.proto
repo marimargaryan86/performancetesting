@@ -34,6 +34,10 @@ message Place {
   string country_code = 5;
   google.protobuf.Timestamp updated_at = 6;
   string source_ref = 7;
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+  }
+  repeated Type types = 8;
 }
 
 message Point {

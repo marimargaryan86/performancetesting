@@ -270,12 +270,51 @@ class PlaceResource(models.Resource):
                 "longitude": place.coordinates.longitude,
                 "name": place.name,
                 "timeZone": place.time_zone,
-                "kind": "stop",
+            },
+            relationships={
+                "types": {
+                    _RELATIONSHIPS_FIELD: [
+                        models.ResourceIdentifier(
+                            id=protobuf.enum_value_to_slug(
+                                descriptor=models_pb2.Place.Type.DESCRIPTOR,
+                                enum_value=place_type,
+                            ),
+                            type="place-types",
+                        )
+                        for place_type in place.types
+                    ],
+                },
             },
             links={
                 _SELF_HREF: request.url_for(
                     "ViewPlace",
                     placeId=place.id,
+                ),
+            },
+        )
+
+
+class PlaceTypeResource(models.Resource):
+    @classmethod
+    def from_proto(
+        cls,
+        place_type: models_pb2.Place.Type.V,
+        request: requests.Request,
+    ) -> PlaceTypeResource:
+        place_type_id = protobuf.enum_value_to_slug(
+            descriptor=models_pb2.Place.Type.DESCRIPTOR,
+            enum_value=place_type,
+        )
+        return cls(
+            id=place_type_id,
+            type="place-types",
+            attributes={
+                "name": place_type_id,
+            },
+            links={
+                _SELF_HREF: request.url_for(
+                    "ViewPlaceType",
+                    placeTypeId=place_type_id,
                 ),
             },
         )

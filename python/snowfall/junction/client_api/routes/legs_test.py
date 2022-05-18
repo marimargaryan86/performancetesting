@@ -22,6 +22,10 @@ class TestLegs(object):
         response = client.get("/legs/{id}".format(id=fixtures.LEGS[0]))
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
+    def test_leg_types_are_found(self, client: testclient.TestClient) -> None:
+        response = client.get("/legs/types")
+        assert response.status_code == status.HTTP_200_OK
+
     def test_leg_type_is_found(self, client: testclient.TestClient) -> None:
         schedule_type_id = enum_value_to_slug(
             models_pb2.Schedule.Type.DESCRIPTOR,

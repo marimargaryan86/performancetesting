@@ -16,6 +16,16 @@ def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Rou
     return [
         dependencies.route("/health", health.Health, name="Health"),
         dependencies.route(
+            "/places/types",
+            places.PlaceTypes,
+            name="ListPlaceTypes",
+        ),
+        dependencies.route(
+            "/places/types/{placeTypeId}",
+            places.PlaceType,
+            name="ViewPlaceType",
+        ),
+        dependencies.route(
             "/places",
             places.Places,
             name="ListPlaces",

@@ -195,6 +195,156 @@
         "description": "Used to lookup information about a place using its Place Identifier."
       }
     },
+    "/places/types": {
+      "parameters": [],
+      "get": {
+        "summary": "List Place Types",
+        "tags": [
+          "places"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/PlaceType"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "data": [
+                        {
+                          "id": "unspecified",
+                          "type": "place-types",
+                          "attributes": {
+                            "name": "unspecified"
+                          },
+                          "links": {
+                            "self": "https://example.com/places/types/unspecified"
+                          }
+                        },
+                        {
+                          "id": "air",
+                          "type": "place-types",
+                          "attributes": {
+                            "name": "air"
+                          },
+                          "links": {
+                            "self": "https://example.com/places/types/air"
+                          }
+                        },
+                        {
+                          "id": "rail",
+                          "type": "place-types",
+                          "attributes": {
+                            "name": "rail"
+                          },
+                          "links": {
+                            "self": "https://example.com/places/types/rail"
+                          }
+                        }
+                      ],
+                      "links": {
+                        "next": null
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "operationId": "get-places-types",
+        "description": "Used to retrieve available Place Types.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
+      }
+    },
+    "/places/types/{placeTypeId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/placeTypeId"
+        }
+      ],
+      "get": {
+        "summary": "View Place Type",
+        "tags": [
+          "places"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PlaceType"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                },
+                "examples": {
+                  "example-1": {
+                    "value": {
+                      "data": {
+                        "id": "air",
+                        "type": "place-types",
+                        "attributes": {
+                          "name": "string"
+                        },
+                        "links": {
+                          "self": "https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-places-types-place-type-id",
+        "description": "Used to lookup data for a Place Type Identifier."
+      }
+    },
     "/legs/{legId}": {
       "parameters": [
         {
@@ -1549,6 +1699,67 @@
   },
   "components": {
     "schemas": {
+      "PlaceType": {
+        "title": "Place Type",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "airport",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "place-types"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "description": "Indicates the type of the place, such as \"airport\" or \"train-station\"."
+      },
+      "PlaceTypeIdentifier": {
+        "title": "Place Type Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "airport"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "place-types"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
       "Place": {
         "title": "Place",
         "allOf": [
@@ -1571,7 +1782,6 @@
                 "type": "object",
                 "required": [
                   "name",
-                  "kind",
                   "latitude",
                   "longitude",
                   "countryCode",
@@ -1582,11 +1792,6 @@
                   "name": {
                     "type": "string",
                     "example": "Stockholm Arlanda Airport",
-                    "readOnly": true
-                  },
-                  "kind": {
-                    "type": "string",
-                    "example": "stop",
                     "readOnly": true
                   },
                   "latitude": {
@@ -1626,12 +1831,35 @@
                     "readOnly": true
                   }
                 }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "types"
+                ],
+                "properties": {
+                  "types": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/PlaceTypeIdentifier"
+                        }
+                      }
+                    }
+                  }
+                }
               }
             },
             "required": [
               "id",
               "type",
-              "attributes"
+              "attributes",
+              "relationships"
             ]
           },
           {
@@ -1645,12 +1873,21 @@
             "type": "places",
             "attributes": {
               "name": "Stockholm Arlanda Airport",
-              "type": "stop",
               "latitude": 59.651164062,
               "longitude": 17.917829662,
               "countryCode": "SE",
               "timeZone": "Europe/Stockholm",
               "iataCode": "ARN"
+            },
+            "relationships": {
+              "types": {
+                "data": [
+                  {
+                    "id": "airport",
+                    "type": "place-types"
+                  }
+                ]
+              }
             },
             "links": {
               "self": "https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5"
@@ -3123,6 +3360,16 @@
           "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
         },
         "description": "Place identifier"
+      },
+      "placeTypeId": {
+        "name": "placeTypeId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "example": "airport"
+        },
+        "description": "Place Type identifier"
       },
       "tripId": {
         "name": "tripId",
