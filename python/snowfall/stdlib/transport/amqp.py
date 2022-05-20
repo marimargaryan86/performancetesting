@@ -98,6 +98,9 @@ class Message(object):
         self._message = msg
 
     async def ack(self) -> None:
+        if self.acknowledged:
+            return
+
         await self._message.ack()
 
     @property
@@ -105,9 +108,15 @@ class Message(object):
         return self._message.processed
 
     async def nack(self) -> None:
+        if self.acknowledged:
+            return
+
         await self._message.nack(requeue=False)
 
     async def requeue(self) -> None:
+        if self.acknowledged:
+            return
+
         await self._message.nack(requeue=True)
 
     @property
@@ -165,7 +174,7 @@ class Consumer(object):
 
         async with queue.iterator() as queue_iter:
             async for incoming in queue_iter:
-                async with incoming.process():
+                async with incoming.process(ignore_processed=True):
                     await self._process(incoming, callback)
 
     async def _process(
