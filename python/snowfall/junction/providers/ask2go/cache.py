@@ -1,3 +1,4 @@
+import datetime
 import uuid
 from typing import Optional
 
@@ -10,13 +11,20 @@ class OfferCache(object):
     def __init__(self, client: redis.Client[bytes]):
         self._redis = client
 
-    async def store(self, pricing_id: str, transaction_id: str) -> str:
+    async def store(
+        self,
+        pricing_id: str,
+        transaction_id: str,
+        expires_at: datetime.datetime,
+    ) -> str:
         offer_id = str(uuid.uuid4())
+        key = "offers.{0}".format(offer_id)
 
         await self._redis.put(
-            "offers.{0}".format(offer_id),
+            key,
             orjson.dumps((pricing_id, transaction_id)),
         )
+        await self._redis.put_expires_at(key, expires_at)
 
         return offer_id
 

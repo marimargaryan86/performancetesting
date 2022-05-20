@@ -128,19 +128,22 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                 except httpx.HTTPStatusError:
                     continue
 
+                expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
+
                 yield offer_models_pb2.OfferGroup(
                     id=str(uuid.uuid4()),
                     offer_search_id=search_task.offer_search_id,
-                    expires_at=protobuf.datetime_to_protobuf(
-                        datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
-                    ),
+                    expires_at=protobuf.datetime_to_protobuf(expires_at),
                     offers=[
                         offer_models_pb2.Offer(
                             id=await self._offers_cache.store(
-                                search_id=search_response.identifier,
-                                search_result_id=search_result.identifier,
-                                transfer_id=transfer.identifier,
-                                fare_id=transfer_fare.identifier,
+                                identifiers=cache.OfferIdentifiers(
+                                    search_id=search_response.identifier,
+                                    search_result_id=search_result.identifier,
+                                    transfer_id=transfer.identifier,
+                                    fare_id=transfer_fare.identifier,
+                                ),
+                                expires_at=expires_at,
                             ),
                             segment_details=[
                                 offer_models_pb2.OfferSegmentDetails(

@@ -1,3 +1,5 @@
+import dataclasses
+import datetime
 import uuid
 from typing import Optional
 
@@ -6,23 +8,38 @@ import orjson
 from snowfall.stdlib.persistence import redis
 
 
+@dataclasses.dataclass(frozen=True)
+class OfferIdentifiers(object):
+    search_id: str
+    search_result_id: int
+    transfer_id: int
+    fare_id: int
+
+
 class OffersCache(object):
     def __init__(self, redis_client: redis.Client[bytes]):
         self._redis = redis_client
 
     async def store(
         self,
-        search_id: str,
-        search_result_id: int,
-        transfer_id: int,
-        fare_id: int,
+        identifiers: OfferIdentifiers,
+        expires_at: datetime.datetime,
     ) -> str:
         offer_id = str(uuid.uuid4())
+        key = "offers.{0}".format(offer_id)
 
         await self._redis.put(
-            "offers.{0}".format(offer_id),
-            orjson.dumps((search_id, search_result_id, transfer_id, fare_id)),
+            key,
+            orjson.dumps(
+                (
+                    identifiers.search_id,
+                    identifiers.search_result_id,
+                    identifiers.transfer_id,
+                    identifiers.fare_id,
+                ),
+            ),
         )
+        await self._redis.put_expires_at(key, expires_at)
 
         return offer_id
 
