@@ -15,7 +15,10 @@ class TripOfferRepository(
     repository.ProtoRepository[models_pb2.OfferGroup],
 ):
     _proto = models_pb2.OfferGroup
-    _indexes = [pymongo.IndexModel("offer_search_id", background=True)]
+    _indexes = [
+        pymongo.IndexModel("offer_search_id", background=True),
+        pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True),
+    ]
 
     async def find(
         self,
@@ -44,7 +47,10 @@ class OfferAggregateMappingRepository(
     repository.ProtoRepository[models_pb2.OfferAggregateMapping],
 ):
     _proto = models_pb2.OfferAggregateMapping
-    _indexes = [pymongo.IndexModel("offer_search_id", background=True)]
+    _indexes = [
+        pymongo.IndexModel("offer_search_id", background=True),
+        pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True),
+    ]
 
     async def find_by_offer_search_id(
         self,
@@ -64,6 +70,7 @@ class OfferSearchRepository(  # noqa: WPS215
     repository.ProtoRepository[models_pb2.OfferSearch],
 ):
     _proto = models_pb2.OfferSearch
+    _indexes = [pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True)]
 
     def __init__(
         self,

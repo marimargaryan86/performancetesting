@@ -146,7 +146,7 @@ class Client(Generic[AnyStr]):  # noqa: WPS214
         return str(name)
 
 
-async def put_expires_at_if_greater(
+async def put_expires_at_if_less_than_current(
     client: Client[AnyStr],
     name: object,
     expiry: datetime.datetime,

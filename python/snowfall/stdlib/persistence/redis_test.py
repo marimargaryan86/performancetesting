@@ -211,8 +211,8 @@ class TestPrefixClient(object):
         await asyncio.gather(
             set1.add("foo"),
             set2.add("foo"),
-            redis.put_expires_at_if_greater(self._foo_client, set1, expiry),
-            redis.put_expires_at_if_greater(
+            redis.put_expires_at_if_less_than_current(self._foo_client, set1, expiry),
+            redis.put_expires_at_if_less_than_current(
                 self._foo_client,
                 set1,
                 datetime.datetime.now(

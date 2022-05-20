@@ -61,16 +61,11 @@ class OfferResource(models.Resource):
         cls,
         offer: offer_models_pb2.OfferAggregate,
     ) -> dict[str, Any]:
-        first_expiring_offer = min(
-            offer.groups,
-            key=lambda offer_result: offer_result.expires_at.seconds,
-        )
-
         return {
             "groups": [
                 OfferGroup.from_proto(offer_group) for offer_group in offer.groups
             ],
-            "expiresAt": protobuf.protobuf_to_datetime(first_expiring_offer.expires_at),
+            "expiresAt": protobuf.protobuf_to_datetime(offer.expires_at),
         }
 
 

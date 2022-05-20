@@ -1,4 +1,5 @@
 import collections
+import datetime
 import itertools
 import uuid
 
@@ -14,12 +15,18 @@ class NotFoundError(Exception):
     """Raised when an offer aggregate is not found."""
 
 
+class NoExpiryError(Exception):
+    """Raised when an offer bucket list has no expiry."""
+
+
 def generate_offer_aggregates(
     offer_buckets: OfferBuckets,
+    expires_at: datetime.datetime,
 ) -> list[models_pb2.OfferAggregateMapping]:
     return [
         models_pb2.OfferAggregateMapping(
             id=str(uuid.uuid4()),
+            expires_at=protobuf.datetime_to_protobuf(expires_at),
             offer_result_ids=aggregate,
         )
         for aggregate in itertools.product(*offer_buckets.values())
@@ -37,7 +44,7 @@ class OfferBucketRepository(object):
         key = ":".join([offer.offer_search_id, offer.segments[0].id])
         bucket = self._redis.list_(key)
         await bucket.push(offer.id)
-        await redis.put_expires_at_if_greater(
+        await redis.put_expires_at_if_less_than_current(
             self._redis,
             bucket,
             protobuf.protobuf_to_datetime(offer.expires_at),
@@ -45,7 +52,7 @@ class OfferBucketRepository(object):
 
         bucket_list = self._redis.set_(offer.offer_search_id)
         await bucket_list.add(key)
-        await redis.put_expires_at_if_greater(
+        await redis.put_expires_at_if_less_than_current(
             self._redis,
             bucket_list,
             protobuf.protobuf_to_datetime(offer.expires_at),
@@ -62,6 +69,21 @@ class OfferBucketRepository(object):
                 buckets[bucket_name.split(":")[1]].append(offer_id)
 
         return buckets
+
+    async def get_bucket_list_expiry(
+        self,
+        offer_search: models_pb2.OfferSearch,
+    ) -> datetime.datetime:
+        expires_at = await self._redis.get_expires_at(offer_search.id)
+
+        if not expires_at:
+            raise NoExpiryError(
+                "Offer bucket list {id} is missing an expiry.".format(
+                    id=offer_search.id,
+                ),
+            )
+
+        return expires_at
 
 
 class OfferAggregator(object):
@@ -89,7 +111,9 @@ class OfferAggregator(object):
             if segment.id not in buckets:
                 return
 
-        for aggregate in generate_offer_aggregates(buckets):
+        aggregate_expires_at = await self._buckets.get_bucket_list_expiry(offer_search)
+
+        for aggregate in generate_offer_aggregates(buckets, aggregate_expires_at):
             aggregate.offer_search_id = offer_search.id
             await self._aggregates.insert(aggregate)
 

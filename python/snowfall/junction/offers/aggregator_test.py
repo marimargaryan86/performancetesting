@@ -1,6 +1,7 @@
 import datetime
 from typing import Mapping, Sequence
 
+import freezegun
 import pytest
 from motor import motor_asyncio
 
@@ -51,9 +52,9 @@ _OFFER_SEARCHES = (
     ),
 )
 
-_OFFER_RESULT_EXPIRY = protobuf.datetime_to_protobuf(
-    datetime.datetime.now() + datetime.timedelta(days=1),
-)
+_OFFER_RESULT_DATE = datetime.datetime(2000, 1, 1)
+_OFFER_RESULT_EXPIRY = _OFFER_RESULT_DATE + datetime.timedelta(days=1)
+_OFFER_RESULT_EXPIRY_PROTO = protobuf.datetime_to_protobuf(_OFFER_RESULT_EXPIRY)
 
 _OFFER_RESULTS = (
     offer_protos.OfferGroup(
@@ -64,7 +65,7 @@ _OFFER_RESULTS = (
                 id="a",
             ),
         ],
-        expires_at=_OFFER_RESULT_EXPIRY,
+        expires_at=_OFFER_RESULT_EXPIRY_PROTO,
     ),
     offer_protos.OfferGroup(
         id="2",
@@ -74,7 +75,7 @@ _OFFER_RESULTS = (
                 id="b",
             ),
         ],
-        expires_at=_OFFER_RESULT_EXPIRY,
+        expires_at=_OFFER_RESULT_EXPIRY_PROTO,
     ),
     offer_protos.OfferGroup(
         id="3",
@@ -84,7 +85,7 @@ _OFFER_RESULTS = (
                 id="b",
             ),
         ],
-        expires_at=_OFFER_RESULT_EXPIRY,
+        expires_at=_OFFER_RESULT_EXPIRY_PROTO,
     ),
     offer_protos.OfferGroup(
         id="4",
@@ -94,7 +95,7 @@ _OFFER_RESULTS = (
                 id="c",
             ),
         ],
-        expires_at=_OFFER_RESULT_EXPIRY,
+        expires_at=_OFFER_RESULT_EXPIRY_PROTO,
     ),
     offer_protos.OfferGroup(
         id="5",
@@ -104,12 +105,13 @@ _OFFER_RESULTS = (
                 id="c",
             ),
         ],
-        expires_at=_OFFER_RESULT_EXPIRY,
+        expires_at=_OFFER_RESULT_EXPIRY_PROTO,
     ),
 )
 
 
 @pytest.mark.asyncio
+@freezegun.freeze_time(_OFFER_RESULT_DATE)
 class TestOfferBuckets(object):
     @pytest.mark.parametrize(
         ["offer_results", "expected"],
@@ -141,6 +143,7 @@ class TestOfferBuckets(object):
 
 
 @pytest.mark.asyncio
+@freezegun.freeze_time(_OFFER_RESULT_DATE)
 class TestAggregator(object):
     @pytest.mark.parametrize(
         ["offer_search", "offer_results", "expected"],
@@ -204,3 +207,4 @@ class TestAggregator(object):
 
         async for aggregate in offer_aggregate_collection.find():
             assert aggregate["offer_result_ids"] in expected
+            assert aggregate["expires_at"] == _OFFER_RESULT_EXPIRY

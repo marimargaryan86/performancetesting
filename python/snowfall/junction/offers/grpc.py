@@ -82,6 +82,7 @@ class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):
         return grpc_pb2.GetOfferResponse(
             offer=models_pb2.OfferAggregate(
                 id=offer_aggregate.id,  # type: ignore[union-attr]
+                expires_at=offer_aggregate.expires_at,  # type: ignore[union-attr]
                 groups=[offer_result async for offer_result in offer_results],
             ),
         )
@@ -116,6 +117,7 @@ class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):
             offer_list.append(
                 models_pb2.OfferAggregate(
                     id=aggregate.id,
+                    expires_at=aggregate.expires_at,
                     groups=[offer_result async for offer_result in offer_results],
                 ),
             )
