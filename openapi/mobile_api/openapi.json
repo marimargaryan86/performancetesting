@@ -1,0 +1,88 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Junction Mobile API",
+    "version": "1.0.0",
+    "description": "This API follows the [JSON:API][jsonapi] specification.\n\n[jsonapi]: https://jsonapi.org/",
+    "contact": {
+      "name": "Snowfall",
+      "url": "https://www.snowfalltravel.com",
+      "email": "info@snowfalltravel.com"
+    },
+    "license": {
+      "name": "Junction",
+      "url": "https://www.snowfalltravel.com"
+    }
+  },
+  "x-tagGroups": [
+    {
+      "name": "Internal",
+      "tags": [
+        "internal"
+      ]
+    }
+  ],
+  "tags": [
+    {
+      "name": "internal",
+      "description": "Endpoints not for public use.",
+      "x-displayName": "Internal"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "tags": [
+          "internal"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "description": "",
+                  "type": "object",
+                  "x-examples": {
+                    "example-1": {
+                      "meta": {
+                        "status": "ok"
+                      }
+                    }
+                  },
+                  "properties": {
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "status"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "description": "Health status",
+                          "enum": [
+                            "pass",
+                            "fail",
+                            "warn"
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "meta"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-health",
+        "description": "Check the application health.",
+        "x-internal": true,
+        "security": []
+      }
+    }
+  }
+}
