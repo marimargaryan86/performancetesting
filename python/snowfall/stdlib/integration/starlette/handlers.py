@@ -4,7 +4,7 @@ from typing import Optional
 from openapi_core.unmarshalling.schemas.exceptions import InvalidSchemaValue
 from starlette import exceptions, requests, responses
 
-from snowfall.junction.client_api import models
+from snowfall.stdlib.integration.starlette import models
 
 
 def _error_response_from_status(

@@ -20,19 +20,14 @@ from snowfall.adapter import (
     trip_searches,
     trips,
 )
-from snowfall.junction.client_api import (
-    bootstrap,
-    handlers,
-    jwt,
-    middlewares,
-    validation,
-)
+from snowfall.junction.client_api import bootstrap, jwt
 from snowfall.junction.offers.v1alpha import grpc_pb2_grpc
 from snowfall.junction.orders.v1alpha import orders_pb2_grpc
 from snowfall.junction.places.v1alpha import places_pb2_grpc
 from snowfall.junction.schedules.v1alpha import schedules_pb2_grpc
 from snowfall.junction.trips.v1alpha import trips_pb2_grpc
 from snowfall.stdlib import service
+from snowfall.stdlib.integration.starlette import handlers, middlewares, validation
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.transport.grpc.client import create_channel
 

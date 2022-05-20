@@ -1,6 +1,6 @@
 from starlette import endpoints, requests, responses
 
-from snowfall.junction.client_api import models
+from snowfall.stdlib.integration.starlette import models
 
 
 class Health(endpoints.HTTPEndpoint):

@@ -20,13 +20,8 @@ from snowfall.adapter import (
     trip_searches,
     trips,
 )
-from snowfall.junction.client_api import (
-    bootstrap,
-    handlers,
-    jwt,
-    middlewares,
-    validation,
-)
+from snowfall.junction.client_api import bootstrap, jwt
+from snowfall.stdlib.integration.starlette import handlers, middlewares, validation
 from snowfall.stdlib.persistence import filesystem
 
 jwt_token_version = "1"  # nosec

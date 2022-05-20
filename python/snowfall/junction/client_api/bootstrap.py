@@ -17,10 +17,10 @@ from snowfall.adapter import (  # noqa: WPS235
     trip_searches,
     trips,
 )
-from snowfall.junction.client_api import handlers
 from snowfall.junction.client_api.routes import router
 from snowfall.junction.client_api.transformers import trip_ids_to_segments
 from snowfall.stdlib import service
+from snowfall.stdlib.integration.starlette import handlers
 
 
 class Settings(service.Settings):

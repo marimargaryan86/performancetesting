@@ -1,14 +1,10 @@
 python_sources(dependencies=["openapi/client_api"])
 python_tests(name="tests")
-python_test_utils(name="test_utils", dependencies=[":fixtures", "openapi/client_api"])
+python_test_utils(name="test_utils", dependencies=["openapi/client_api"])
 pex_binary(
     name="main",
     entry_point="main.py",
     restartable=True,
-)
-files(
-    name="fixtures",
-    sources=["fixtures/*"],
 )
 docker_image(
     name="docker",

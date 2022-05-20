@@ -10,7 +10,7 @@ from openapi_core.validation.request.datatypes import OpenAPIRequest
 from starlette import applications, exceptions, requests, responses, status, types
 from starlette.middleware import base
 
-from snowfall.junction.client_api import handlers, validation
+from snowfall.stdlib.integration.starlette import handlers, validation
 
 
 class RequestWithBody(requests.Request):

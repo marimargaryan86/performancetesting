@@ -5,14 +5,10 @@ from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.adapter import orders
 from snowfall.common.v1alpha import phone_number_pb2, postal_address_pb2
-from snowfall.junction.client_api import (
-    models,
-    pagination_helpers,
-    request_helpers,
-    resources,
-)
+from snowfall.junction.client_api import pagination_helpers, request_helpers, resources
 from snowfall.junction.orders.v1alpha import models_pb2 as order_models_pb2
 from snowfall.stdlib.format.protobuf import date_to_protobuf, slug_to_enum_value
+from snowfall.stdlib.integration.starlette import models
 
 _ADDRESS = "address"
 

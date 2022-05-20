@@ -2,7 +2,7 @@ import http
 
 from starlette import applications, requests, responses, status, testclient
 
-from snowfall.junction.client_api import models
+from snowfall.stdlib.integration.starlette import models
 
 _VALIDATION_PATH = "/validation"
 

@@ -2,7 +2,8 @@ import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.adapter import segments
-from snowfall.junction.client_api import models, resources
+from snowfall.junction.client_api import resources
+from snowfall.stdlib.integration.starlette import models
 
 
 class Segment(endpoints.HTTPEndpoint):

@@ -8,11 +8,11 @@ import pydantic
 from starlette import requests
 
 from snowfall.common.v1alpha import models_pb2
-from snowfall.junction.client_api import models
 from snowfall.junction.offers.v1alpha import models_pb2 as offer_models_pb2
 from snowfall.junction.orders.v1alpha import models_pb2 as order_models_pb2
 from snowfall.junction.trips.v1alpha import trips_pb2
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.integration.starlette import models
 
 _SELF_HREF = "self"
 _RELATIONSHIPS_FIELD = "data"

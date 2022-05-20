@@ -6,12 +6,8 @@ from dateutil import parser
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.adapter import places, trip_searches, trips
-from snowfall.junction.client_api import (
-    models,
-    pagination_helpers,
-    request_helpers,
-    resources,
-)
+from snowfall.junction.client_api import pagination_helpers, request_helpers, resources
+from snowfall.stdlib.integration.starlette import models
 
 
 class Trip(endpoints.HTTPEndpoint):
