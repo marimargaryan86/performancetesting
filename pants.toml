@@ -40,6 +40,7 @@ interpreter_constraints = ["CPython==3.9.10"]
 all-changed = "--changed-since=HEAD --changed-dependees=transitive"
 
 [coverage-py]
+global_report = true
 interpreter_constraints = ["CPython==3.9.10"]
 config = "vendor/pyproject.toml"
 report = ["console", "html"]
