@@ -2,7 +2,8 @@ from starlette import status, testclient
 
 from snowfall import fixtures
 from snowfall.common.v1alpha import models_pb2
-from snowfall.stdlib.format.protobuf import enum_value_to_slug
+from snowfall.junction.client_api.routes import conftest
+from snowfall.stdlib.format import protobuf
 
 
 class TestLegs(object):
@@ -22,30 +23,18 @@ class TestLegs(object):
         response = client.get("/legs/{id}".format(id=fixtures.LEGS[0]))
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_leg_types_are_found(self, client: testclient.TestClient) -> None:
-        response = client.get("/legs/types")
-        assert response.status_code == status.HTTP_200_OK
-
-    def test_leg_type_is_found(self, client: testclient.TestClient) -> None:
-        schedule_type_id = enum_value_to_slug(
-            models_pb2.Schedule.Type.DESCRIPTOR,
-            models_pb2.Schedule.TYPE_AIR,
+    def test_leg_types(self, client: testclient.TestClient) -> None:
+        conftest.test_list_and_view_endpoints(
+            client=client,
+            url="/legs/types",
+            expected_ids=[
+                protobuf.enum_value_to_slug(
+                    descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
+                    enum_value=leg_type,
+                )
+                for leg_type in models_pb2.Schedule.Type.values()
+            ],
         )
-        response = client.get("/legs/types/{id}".format(id=schedule_type_id))
-        assert response.status_code == status.HTTP_200_OK
-
-    def test_leg_type_unauthorized(self, client: testclient.TestClient) -> None:
-        client.headers["Authorization"] = "{0}f".format(client.headers["Authorization"])
-        schedule_type_id = enum_value_to_slug(
-            models_pb2.Schedule.Type.DESCRIPTOR,
-            models_pb2.Schedule.TYPE_AIR,
-        )
-        response = client.get("/legs/types/{id}".format(id=schedule_type_id))
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
-    def test_unknown_leg_type_is_not_found(self, client: testclient.TestClient) -> None:
-        response = client.get("/legs/types/{id}".format(id=fixtures.NOT_FOUND))
-        assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_segment_legs_are_not_found(self, client: testclient.TestClient) -> None:
         response = client.get("/segments/{id}/legs".format(id=fixtures.NOT_FOUND))

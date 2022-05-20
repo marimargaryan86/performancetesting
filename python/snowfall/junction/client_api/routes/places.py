@@ -4,6 +4,7 @@ from starlette import endpoints, exceptions, requests, responses, status
 from snowfall.adapter import places
 from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.client_api import pagination_helpers, resources
+from snowfall.stdlib import sequence
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
 
@@ -80,10 +81,10 @@ class PlaceTypes(endpoints.HTTPEndpoint):
         request: requests.Request,
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
-
-        sequence_page = pagination_helpers.sequence_paginator(
+        sequence_page = sequence.paginate(
             sequence=models_pb2.Place.Type.values(),
-            pagination=pagination,
+            cursor=pagination.cursor,
+            limit=pagination.limit,
         )
 
         return models.JsonApiResponse(
@@ -97,7 +98,7 @@ class PlaceTypes(endpoints.HTTPEndpoint):
                 ],
                 links=pagination_helpers.get_next_url(
                     request.url_for("ListPlaceTypes"),
-                    sequence_page.next_page_token,
+                    sequence_page.cursor,
                     pagination,
                 ),
             ),

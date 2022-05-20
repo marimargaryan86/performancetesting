@@ -7,6 +7,7 @@ from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.adapter import places, trip_searches, trips
 from snowfall.junction.client_api import pagination_helpers, request_helpers, resources
+from snowfall.stdlib import sequence
 from snowfall.stdlib.integration.starlette import models
 
 
@@ -43,9 +44,10 @@ class TripSegments(endpoints.HTTPEndpoint):
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
         pagination = pagination_helpers.get_pagination(request)
-        sequence_page = pagination_helpers.sequence_paginator(
+        sequence_page = sequence.paginate(
             sequence=trip.segments,
-            pagination=pagination,
+            cursor=pagination.cursor,
+            limit=pagination.limit,
         )
 
         return models.JsonApiResponse(
@@ -62,7 +64,7 @@ class TripSegments(endpoints.HTTPEndpoint):
                         "ListTripSegments",
                         tripId=request.path_params["tripId"],
                     ),
-                    sequence_page.next_page_token,
+                    sequence_page.cursor,
                     pagination,
                 ),
             ),

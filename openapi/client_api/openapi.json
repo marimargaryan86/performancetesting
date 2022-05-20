@@ -34,6 +34,12 @@
       ]
     },
     {
+      "name": "Passengers",
+      "tags": [
+        "passengers"
+      ]
+    },
+    {
       "name": "Places",
       "tags": [
         "places"
@@ -79,6 +85,11 @@
       "name": "orders",
       "description": "A collection of bookings.",
       "x-displayName": "Orders"
+    },
+    {
+      "name": "passengers",
+      "description": "A trip has one or more passengers.",
+      "x-displayName": "Passengers"
     },
     {
       "name": "places",
@@ -343,6 +354,306 @@
         },
         "operationId": "get-places-types-place-type-id",
         "description": "Used to lookup data for a Place Type Identifier."
+      }
+    },
+    "/passengers/genders": {
+      "parameters": [],
+      "get": {
+        "summary": "List Passenger Genders",
+        "tags": [
+          "passengers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/PassengerGender"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "data": [
+                        {
+                          "id": "unspecified",
+                          "type": "passenger-genders",
+                          "attributes": {
+                            "name": "unspecified"
+                          },
+                          "links": {
+                            "self": "https://example.com/passengers/genders/unspecified"
+                          }
+                        },
+                        {
+                          "id": "male",
+                          "type": "passenger-genders",
+                          "attributes": {
+                            "name": "male"
+                          },
+                          "links": {
+                            "self": "https://example.com/passengers/genders/male"
+                          }
+                        },
+                        {
+                          "id": "female",
+                          "type": "passenger-genders",
+                          "attributes": {
+                            "name": "female"
+                          },
+                          "links": {
+                            "self": "https://example.com/passengers/genders/female"
+                          }
+                        }
+                      ],
+                      "links": {
+                        "next": null
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "operationId": "get-passengers-genders",
+        "description": "Used to retrieve available Passenger Genders.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
+      }
+    },
+    "/passengers/genders/{passengerGenderId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/passengerGenderId"
+        }
+      ],
+      "get": {
+        "summary": "View Passenger Gender",
+        "tags": [
+          "passengers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PassengerGender"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                },
+                "examples": {
+                  "example-1": {
+                    "value": {
+                      "data": {
+                        "id": "male",
+                        "type": "passenger-genders",
+                        "attributes": {
+                          "name": "string"
+                        },
+                        "links": {
+                          "self": "https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-passengers-genders-passenger-gender-id",
+        "description": "Used to lookup data for a Passenger Gender Identifier."
+      }
+    },
+    "/passengers/titles": {
+      "parameters": [],
+      "get": {
+        "summary": "List Passenger Titles",
+        "tags": [
+          "passengers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/PassengerTitle"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "data": [
+                        {
+                          "id": "unspecified",
+                          "type": "passenger-titles",
+                          "attributes": {
+                            "name": "unspecified"
+                          },
+                          "links": {
+                            "self": "https://example.com/passengers/titles/unspecified"
+                          }
+                        },
+                        {
+                          "id": "mr",
+                          "type": "passenger-titles",
+                          "attributes": {
+                            "name": "mr"
+                          },
+                          "links": {
+                            "self": "https://example.com/passengers/titles/mr"
+                          }
+                        },
+                        {
+                          "id": "mrs",
+                          "type": "passenger-titles",
+                          "attributes": {
+                            "name": "mrs"
+                          },
+                          "links": {
+                            "self": "https://example.com/passengers/titles/mrs"
+                          }
+                        }
+                      ],
+                      "links": {
+                        "next": null
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "operationId": "get-passengers-titles",
+        "description": "Used to retrieve available Passenger TItles.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
+      }
+    },
+    "/passengers/titles/{passengerTitleId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/passengerTitleId"
+        }
+      ],
+      "get": {
+        "summary": "View Passenger Title",
+        "tags": [
+          "passengers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PassengerTitle"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                },
+                "examples": {
+                  "example-1": {
+                    "value": {
+                      "data": {
+                        "id": "mr",
+                        "type": "passenger-titles",
+                        "attributes": {
+                          "name": "string"
+                        },
+                        "links": {
+                          "self": "https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-passengers-titles-passenger-title-id",
+        "description": "Used to lookup data for a Passenger Title Identifier."
       }
     },
     "/legs/{legId}": {
@@ -1699,6 +2010,88 @@
   },
   "components": {
     "schemas": {
+      "PassengerGender": {
+        "title": "Passenger Gender",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "male",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "passenger-genders"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "description": "Indicates the passenger's gender, such as \"male\" or \"female\"."
+      },
+      "PassengerTitle": {
+        "title": "Passenger Title",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "mr",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "passenger-titles"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "description": "Indicates the passenger's title, such as \"mr\" or \"mrs\"."
+      },
       "PlaceType": {
         "title": "Place Type",
         "allOf": [
@@ -3370,6 +3763,26 @@
           "example": "airport"
         },
         "description": "Place Type identifier"
+      },
+      "passengerGenderId": {
+        "name": "passengerGenderId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "example": "male"
+        },
+        "description": "Passenger Gender identifier"
+      },
+      "passengerTitleId": {
+        "name": "passengerTitleId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "example": "mr"
+        },
+        "description": "Passenger Title identifier"
       },
       "tripId": {
         "name": "tripId",

@@ -6,38 +6,6 @@ import pytest
 from snowfall.junction.client_api import pagination_helpers
 
 
-def test_sequence_paginator() -> None:
-    sequence = [1, 2, 3, 4]
-    pagination = pagination_helpers.Pagination(limit=2)
-    page = pagination_helpers.sequence_paginator(
-        sequence=sequence,
-        pagination=pagination,
-    )
-
-    assert page.sequence == [1, 2]
-    assert page.next_page_token != ""  # nosec
-
-    pagination = pagination_helpers.Pagination(cursor=page.next_page_token, limit=2)
-    page = pagination_helpers.sequence_paginator(
-        sequence=sequence,
-        pagination=pagination,
-    )
-
-    assert page.sequence == [3, 4]
-    assert page.next_page_token == ""  # nosec
-
-
-def test_sequence_paginator_empty() -> None:
-    pagination = pagination_helpers.Pagination(limit=1)
-    page = pagination_helpers.sequence_paginator(
-        sequence=[],
-        pagination=pagination,
-    )
-
-    assert not page.sequence
-    assert page.next_page_token == ""  # nosec
-
-
 @pytest.mark.parametrize(
     "url, next_page_token, limit, expected",
     (

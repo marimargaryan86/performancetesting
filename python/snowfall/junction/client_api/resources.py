@@ -315,6 +315,58 @@ class PlaceTypeResource(models.Resource):
         )
 
 
+class PassengerGenderResource(models.Resource):
+    @classmethod
+    def from_proto(
+        cls,
+        passenger_gender: order_models_pb2.Passenger.Gender.V,
+        request: requests.Request,
+    ) -> PassengerGenderResource:
+        passenger_gender_id = protobuf.enum_value_to_slug(
+            descriptor=order_models_pb2.Passenger.Gender.DESCRIPTOR,
+            enum_value=passenger_gender,
+        )
+        return cls(
+            id=passenger_gender_id,
+            type="passenger-genders",
+            attributes={
+                "name": passenger_gender_id,
+            },
+            links={
+                _SELF_HREF: request.url_for(
+                    "ViewPassengerGender",
+                    passengerGenderId=passenger_gender_id,
+                ),
+            },
+        )
+
+
+class PassengerTitleResource(models.Resource):
+    @classmethod
+    def from_proto(
+        cls,
+        passenger_title: order_models_pb2.Passenger.Title.V,
+        request: requests.Request,
+    ) -> PassengerTitleResource:
+        passenger_title_id = protobuf.enum_value_to_slug(
+            descriptor=order_models_pb2.Passenger.Title.DESCRIPTOR,
+            enum_value=passenger_title,
+        )
+        return cls(
+            id=passenger_title_id,
+            type="passenger-titles",
+            attributes={
+                "name": passenger_title_id,
+            },
+            links={
+                _SELF_HREF: request.url_for(
+                    "ViewPassengerTitle",
+                    passengerTitleId=passenger_title_id,
+                ),
+            },
+        )
+
+
 class SegmentResource(models.Resource):
     @classmethod
     def from_proto(

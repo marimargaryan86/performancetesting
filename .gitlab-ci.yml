@@ -16,3 +16,16 @@ include:
   - local: golang/.gitlab-ci.yml
   - local: openapi/.gitlab-ci.yml
   - local: protobuf/.gitlab-ci.yml
+
+make-uninterruptible:
+  stage: setup
+  interruptible: false
+  script:
+    - echo "This job prevents main pipelines from interrupting each other."
+  needs: []
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  tags:
+    - shell

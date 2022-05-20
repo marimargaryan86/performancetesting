@@ -7,6 +7,7 @@ from snowfall.adapter import trip_searches as trip_searches_adapter
 from snowfall.adapter import trips as trips_adapter
 from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.client_api import pagination_helpers, resources
+from snowfall.stdlib import sequence
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
 
@@ -61,10 +62,10 @@ class LegTypes(endpoints.HTTPEndpoint):
         request: requests.Request,
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
-
-        sequence_page = pagination_helpers.sequence_paginator(
+        sequence_page = sequence.paginate(
             sequence=models_pb2.Schedule.Type.values(),
-            pagination=pagination,
+            cursor=pagination.cursor,
+            limit=pagination.limit,
         )
 
         return models.JsonApiResponse(
@@ -78,7 +79,7 @@ class LegTypes(endpoints.HTTPEndpoint):
                 ],
                 links=pagination_helpers.get_next_url(
                     request.url_for("ListLegTypes"),
-                    sequence_page.next_page_token,
+                    sequence_page.cursor,
                     pagination,
                 ),
             ),
