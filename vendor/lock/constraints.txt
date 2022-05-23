@@ -51,7 +51,7 @@
 //     "starlette==0.20.0",
 //     "structlog==21.5.0",
 //     "tenacity==8.0.1",
-//     "timezonefinder[numba]==6.0.0",
+//     "timezonefinder==6.0.0",
 //     "types-aiofiles==0.8.8",
 //     "types-certifi==2021.10.8.2",
 //     "types-freezegun==1.1.9",
@@ -535,19 +535,19 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "d62a0163eb4c2344ac042ab2bdf75399a71a2d8c7d47eac2e2ee91b9d6339569",
-              "url": "https://files.pythonhosted.org/packages/37/45/946c02767aabb873146011e665728b680884cd8fe70dde973c640e45b775/certifi-2021.10.8-py2.py3-none-any.whl"
+              "hash": "f1d53542ee8cbedbe2118b5686372fb33c297fcd6379b050cca0ef13a597382a",
+              "url": "https://files.pythonhosted.org/packages/11/dd/e015f3780f42dd9af62cf0107b44ea1298926627ecd70c17b0e484e95bcd/certifi-2022.5.18.1-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "78884e7c1d4b00ce3cea67b44566851c4343c120abd683433ce934a68ea58872",
-              "url": "https://files.pythonhosted.org/packages/6c/ae/d26450834f0acc9e3d1f74508da6df1551ceab6c2ce0766a593362d6d57f/certifi-2021.10.8.tar.gz"
+              "hash": "9c5705e395cd70084351dd8ad5c41e65655e08ce46f2ec9cf6c2c08390f71eb7",
+              "url": "https://files.pythonhosted.org/packages/07/10/75277f313d13a2b74fc56e29239d5c840c2bf09f17bf25c02b35558812c6/certifi-2022.5.18.1.tar.gz"
             }
           ],
           "project_name": "certifi",
           "requires_dists": [],
-          "requires_python": null,
-          "version": "2021.10.8"
+          "requires_python": ">=3.6",
+          "version": "2022.5.18.1"
         },
         {
           "artifacts": [
@@ -1711,49 +1711,6 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "70734d46c2611f3fe765985fe356aaec393dc79bbd735f7f4d23f910b5148dc3",
-              "url": "https://files.pythonhosted.org/packages/8e/0a/e4fa7d25a51959d0ce1584f1a2e7e1d85c0367456ac816ffe36e026c742d/llvmlite-0.38.0-cp39-cp39-win_amd64.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "3f7b2838898c80557e959f83fb28d260e5e2301396f34830f3ec6811ae53f6be",
-              "url": "https://files.pythonhosted.org/packages/0a/ce/5ceabed00a13b8517ff1fa29b0f5f67638ed18566323721b4e4ed444c5dd/llvmlite-0.38.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "f43861f382b954fbf2ff88db5f13b00ac11ec4353445d3ba80e1eadcdd06c149",
-              "url": "https://files.pythonhosted.org/packages/0f/38/05dcc16ecf2207fe35fb0728ea5291926ca16feef4872cd94e661a6a1e1c/llvmlite-0.38.0-cp39-cp39-macosx_10_9_x86_64.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "0fb7cb2907814dd03a152549d1c4dfee4854881d9cc7da85414b77903a681aa6",
-              "url": "https://files.pythonhosted.org/packages/4f/75/d26fafbe4078e810a40c7b646a7a4380823cce7f779de25a6a55d30dd163/llvmlite-0.38.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "a99d166ccf3b116f3b9ed23b9b70ba2415640a9c978f3aaa13fad49c58f4965c",
-              "url": "https://files.pythonhosted.org/packages/d8/e3/bd329a96549809598acd5daaccd35fd9d0883185cfe7f681a9e3e54beaa0/llvmlite-0.38.0.tar.gz"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "c967b96d708556597e003217fd99f0c20e73d09c91d6d5054c538becc396ba79",
-              "url": "https://files.pythonhosted.org/packages/ea/19/c66fcc77ea3f95d1a382c056077a17d5fa6563153c04723efed7f9258c7b/llvmlite-0.38.0-cp39-cp39-manylinux_2_17_i686.manylinux2014_i686.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "de321a680690d1ce040f34294d215ed0ac5fdcf7c98f044d11ac9b9d9ebc969f",
-              "url": "https://files.pythonhosted.org/packages/ed/82/b5f4ef216f8fd24f5f6b271e0c9f5ac37a815b769bddbe7c9d4a1f711266/llvmlite-0.38.0-cp39-cp39-win32.whl"
-            }
-          ],
-          "project_name": "llvmlite",
-          "requires_dists": [],
-          "requires_python": "<3.11,>=3.7",
-          "version": "0.38"
-        },
-        {
-          "artifacts": [
-            {
-              "algorithm": "sha256",
               "hash": "cac9c68dd7715b4ab6ae510c20b4676e5ce751f0a5434d5ad8236d974e2a2b69",
               "url": "https://files.pythonhosted.org/packages/47/f0/acaaf7d4864928ee9d0018432aabf926a664fb574fdc4a58e23f9923f292/mongomock-4.0.0-py2.py3-none-any.whl"
             },
@@ -1929,101 +1886,49 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "230e542649c7087454bc851d2e22b5e15694b6cf0549a27234d1baea6c2e0a87",
-              "url": "https://files.pythonhosted.org/packages/f9/01/195ca1c808297e98458a946a357bf457e91d4fd92847fba0bedba1d171e1/numba-0.55.1-1-cp39-cp39-manylinux2014_x86_64.manylinux_2_17_x86_64.whl"
+              "hash": "f0725df166cf4785c0bc4cbfb320203182b1ecd30fee6e541c8752a92df6aa32",
+              "url": "https://files.pythonhosted.org/packages/99/2e/de8dcdbe1579b96f202685d8811d864291c374ea5fce13c63c70fdaf905d/numpy-1.22.4-cp39-cp39-win_amd64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "4a5cb8930e729aeed96809524ca4df41b6f2432b379f220014ef4fdff21dbfe6",
-              "url": "https://files.pythonhosted.org/packages/34/f0/8540fb1565f5b2b56707cc725ebd91b4ba38a68253a46c090f9325a9b48a/numba-0.55.1-1-cp39-cp39-manylinux2014_aarch64.manylinux_2_17_aarch64.whl"
+              "hash": "4c6036521f11a731ce0648f10c18ae66d7143865f19f7299943c985cdc95afb5",
+              "url": "https://files.pythonhosted.org/packages/04/8f/03589323b01a0f99fe083a198f54d79ab9f66183c1d30c6bf92f4d162dc8/numpy-1.22.4-cp39-cp39-macosx_10_14_x86_64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "03e9069a2666d1c84f93b00dbd716fb8fedde8bb2c6efafa2f04842a46442ea3",
-              "url": "https://files.pythonhosted.org/packages/69/df/bd36068b2c1d0d34794f8ac0c222f9c4ad88dc710b400e65dbb3b59ea57e/numba-0.55.1.tar.gz"
+              "hash": "37431a77ceb9307c28382c9773da9f306435135fae6b80b62a11c53cfedd8802",
+              "url": "https://files.pythonhosted.org/packages/32/82/0a28e3a04411a1a4c1d099bb94349f97050579f90a0290432f09d9a58148/numpy-1.22.4-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "d5ee721ce884f8313802295633fdd3e7c83541e0917bafea2bdfed6aabab93bf",
-              "url": "https://files.pythonhosted.org/packages/7c/ba/fc37282fb9822186c3e50de0d9db4a9003e7b11e122c5b048eed4c798fb1/numba-0.55.1-cp39-cp39-win32.whl"
+              "hash": "b89bf9b94b3d624e7bb480344e91f68c1c6c75f026ed6755955117de00917a7c",
+              "url": "https://files.pythonhosted.org/packages/49/4a/a0d5e8b6c4c81dff3afe4d13e36c7863ba1a9118a1ad170e4123fbaad8b4/numpy-1.22.4-cp39-cp39-macosx_10_15_x86_64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "fee529ddc9c0584b932f7885735162e52344eded8c01c78c17e2768aa6787780",
-              "url": "https://files.pythonhosted.org/packages/96/c3/525bf02b62337cc77600ceffacbb83d4fffc3d9e508344f9e9287ff30f88/numba-0.55.1-1-cp39-cp39-manylinux2014_i686.manylinux_2_17_i686.whl"
+              "hash": "f3eb268dbd5cfaffd9448113539e44e2dd1c5ca9ce25576f7c04a5453edc26fa",
+              "url": "https://files.pythonhosted.org/packages/78/d3/5131cface1344cdc63c21e19837008f5df8f5cfcc126a4cdcb62ab28775b/numpy-1.22.4-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "6aa8f18a003a0e4876826fe080e6038fc6da083899873b77172ec29c32e49b56",
-              "url": "https://files.pythonhosted.org/packages/db/b8/da1c23b09411fa4ae0d8fce6bce8dcc609fa9d9efcf9bb61a47f172b5482/numba-0.55.1-cp39-cp39-macosx_10_14_x86_64.whl"
+              "hash": "2d487e06ecbf1dc2f18e7efce82ded4f705f4bd0cd02677ffccfb39e5c284c7e",
+              "url": "https://files.pythonhosted.org/packages/a7/32/4c9cdeb7ff318ee2eae497afb12070c6c62876e4505bb2ea1011efc672bb/numpy-1.22.4-cp39-cp39-macosx_11_0_arm64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "b72350160eb9a73a36aa17d808f954353a263a0295d495497c87439d79bdaec7",
-              "url": "https://files.pythonhosted.org/packages/ea/06/b1c693ecdc5562162e7d64cd67af7200f514a92190957a5d439344e9b860/numba-0.55.1-cp39-cp39-win_amd64.whl"
-            }
-          ],
-          "project_name": "numba",
-          "requires_dists": [
-            "llvmlite<0.39,>=0.38.0rc1",
-            "numpy<1.22,>=1.18",
-            "setuptools"
-          ],
-          "requires_python": "<3.11,>=3.7",
-          "version": "0.55.1"
-        },
-        {
-          "artifacts": [
-            {
-              "algorithm": "sha256",
-              "hash": "e31f0bb5928b793169b87e3d1e070f2342b22d5245c755e2b81caa29756246c3",
-              "url": "https://files.pythonhosted.org/packages/4d/04/bcd62448f2e772bc90a73ba21bacaa19817ae9905ae639969462862bd071/numpy-1.21.6-cp39-cp39-win_amd64.whl"
+              "hash": "cc7f00008eb7d3f2489fca6f334ec19ca63e31371be28fd5dad955b16ec285bd",
+              "url": "https://files.pythonhosted.org/packages/f2/d7/1003dd479f3396bcbe508fdc565918380e27bf619a2b1dd8947f46a0d555/numpy-1.22.4-cp39-cp39-win32.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "7f5ae4f304257569ef3b948810816bc87c9146e8c446053539947eedeaa32786",
-              "url": "https://files.pythonhosted.org/packages/1b/b5/7178d5a22427a9195ac69d6ec150415734f7a7a19d1142f82b89ead1dac4/numpy-1.21.6-cp39-cp39-win32.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "ee5ec40fdd06d62fe5d4084bef4fd50fd4bb6bfd2bf519365f569dc470163ab0",
-              "url": "https://files.pythonhosted.org/packages/44/56/041e886b4a8da813b7ec297c270fb3582d2ae8b7f33e106eb5c7a5e9184c/numpy-1.21.6-cp39-cp39-macosx_11_0_arm64.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "ecb55251139706669fdec2ff073c98ef8e9a84473e51e716211b41aa0f18e656",
-              "url": "https://files.pythonhosted.org/packages/45/b7/de7b8e67f2232c26af57c205aaad29fe17754f793404f59c8a730c7a191a/numpy-1.21.6.zip"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "67f21981ba2f9d7ba9ade60c9e8cbaa8cf8e9ae51673934480e45cf55e953673",
-              "url": "https://files.pythonhosted.org/packages/4c/62/07402945bd5d5cf515a5f0cbc7263abf02ec0ddf3b19fbdc4af7537cd4d0/numpy-1.21.6-cp39-cp39-macosx_10_9_x86_64.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "1dbe1c91269f880e364526649a52eff93ac30035507ae980d2fed33aaee633ac",
-              "url": "https://files.pythonhosted.org/packages/61/f4/f01a8989e53a437ad660ab86c91514bec3d5067393e4a844b259f5a103de/numpy-1.21.6-cp39-cp39-manylinux_2_12_i686.manylinux2010_i686.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "58459d3bad03343ac4b1b42ed14d571b8743dc80ccbf27444f266729df1d6f5b",
-              "url": "https://files.pythonhosted.org/packages/76/7f/830cf169eede1b855538f962e3a70c31755db6423652695b813ed04ff54e/numpy-1.21.6-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "4391bd07606be175aafd267ef9bea87cf1b8210c787666ce82073b05f202add1",
-              "url": "https://files.pythonhosted.org/packages/83/eb/a6a0d7fc8e718776c5c710692ea027607104710cba813c4b869182179334/numpy-1.21.6-cp39-cp39-macosx_10_9_universal2.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "d9caa9d5e682102453d96a0ee10c7241b72859b01a941a397fd965f23b3e016b",
-              "url": "https://files.pythonhosted.org/packages/e7/f2/0bdcf2c40ef144cbbc9e0947eea831a145a98b0e5f8438fc09cf7fda0b35/numpy-1.21.6-cp39-cp39-manylinux_2_12_x86_64.manylinux2010_x86_64.whl"
+              "hash": "425b390e4619f58d8526b3dcf656dde069133ae5c240229821f01b5f44ea07af",
+              "url": "https://files.pythonhosted.org/packages/f6/d8/ab692a75f584d13c6542c3994f75def5bce52ded9399f52e230fe402819d/numpy-1.22.4.zip"
             }
           ],
           "project_name": "numpy",
           "requires_dists": [],
-          "requires_python": "<3.11,>=3.7",
-          "version": "1.21.6"
+          "requires_python": ">=3.8",
+          "version": "1.22.4"
         },
         {
           "artifacts": [
@@ -3862,7 +3767,7 @@
     "starlette==0.20.0",
     "structlog==21.5.0",
     "tenacity==8.0.1",
-    "timezonefinder[numba]==6.0.0",
+    "timezonefinder==6.0.0",
     "types-aiofiles==0.8.8",
     "types-certifi==2021.10.8.2",
     "types-freezegun==1.1.9",
