@@ -10,7 +10,7 @@ from snowfall.vendor.bound.client import Bound
 
 class _Settings(service.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
-    grpc_port: int = 50060
+    grpc_port: int = 50051
     base_url: HttpUrl
     email: str
     password: str

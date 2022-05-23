@@ -13,7 +13,7 @@ from snowfall.stdlib.transport.grpc import server
 
 class _GrpcSettings(service.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
-    grpc_port: int = 50059
+    grpc_port: int = 50051
     mongo_dsn: Sequence[pydantic.AnyUrl]
 
 

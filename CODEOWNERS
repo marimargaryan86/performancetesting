@@ -6,15 +6,11 @@
 .python-version @jyggen
 buf.gen.yaml @jyggen
 buf.yaml @jyggen
-BUILD @jyggen
 docker-compose.yml @jyggen
 pants @jyggen
 pants.ci.toml @jyggen
 pants.toml @jyggen
 *.nomad @jyggen
-
-[Go]
-/golang/ @jyggen
 
 [Specification]
 /openapi/ @jyggen @mb

@@ -3613,7 +3613,7 @@
           },
           "detail": {
             "type": "string",
-            "description": "A human-readable explanation specific to this occurrence of the problem. Like `title``, this field’s value can be localized.",
+            "description": "A human-readable explanation specific to this occurrence of the problem. Like `title`, this field’s value can be localized.",
             "example": "Nothing matches the given URI"
           },
           "code": {

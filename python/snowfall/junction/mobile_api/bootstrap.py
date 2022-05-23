@@ -16,8 +16,7 @@ class Settings(service.Settings):
         ipaddress.IPv4Address("127.0.0.1"),
     ]
     http_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
-    http_port: int = 8000
-    reload: bool = False
+    http_port: int = 80
 
 
 def create_dependencies() -> starlette.StarletteIntegration:

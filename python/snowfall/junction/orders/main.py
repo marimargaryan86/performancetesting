@@ -21,7 +21,7 @@ class _GrpcSettings(service.Settings):
     amqp_dsn: Sequence[pydantic.AnyUrl]
     default_page_size: int = 100
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
-    grpc_port: int = 50057
+    grpc_port: int = 50051
     mongo_dsn: Sequence[pydantic.AnyUrl]
     passenger_name_records_address: Sequence[str]
 

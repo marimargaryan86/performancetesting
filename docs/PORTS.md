@@ -26,6 +26,7 @@ The following ports are configured in local environments by default:
 | Port  | Service                | Description |
 |:-----:|:-----------------------|:------------|
 | 8000  | client-api             | HTTP Server |
+| 8001  | mobile-api             | HTTP Server |
 | 50051 | echo                   | gRPC Server |
 | 50052 | places                 | gRPC Server |
 | 50053 | planner                | gRPC Server |

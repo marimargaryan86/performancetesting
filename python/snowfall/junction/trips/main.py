@@ -16,12 +16,14 @@ from snowfall.stdlib.transport.grpc import server
 from snowfall.stdlib.transport.grpc.client import create_channel
 
 _TRIPS = "trips"
+_DEFAULT_TTL = datetime.timedelta(minutes=15)
 
 
 class _ConsumeSettings(service.Settings):
     amqp_dsn: Sequence[AnyUrl]
     planner_address: Sequence[str]
     mongo_dsn: Sequence[AnyUrl]
+    trip_search_ttl: datetime.timedelta = _DEFAULT_TTL
 
 
 class _GrpcSettings(service.Settings):
@@ -30,7 +32,7 @@ class _GrpcSettings(service.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: Sequence[AnyUrl]
-    trip_search_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
+    trip_search_ttl: datetime.timedelta = _DEFAULT_TTL
 
 
 async def _consume(app: service.Application[_ConsumeSettings]) -> None:
@@ -56,7 +58,7 @@ async def _consume(app: service.Application[_ConsumeSettings]) -> None:
             ),
             trip_search_repository=trips.TripSearchRepository(
                 mongo[_TRIPS]["trip_searches"],
-                datetime.timedelta(minutes=15),
+                app.settings.trip_search_ttl,
             ),
             trip_repository=trips.TripRepository(mongo[_TRIPS][_TRIPS]),
         )
