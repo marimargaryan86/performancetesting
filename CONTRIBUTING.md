@@ -1,3 +1,7 @@
+---
+internal: true
+---
+
 # How to Contribute
 
 ## MacOS Development

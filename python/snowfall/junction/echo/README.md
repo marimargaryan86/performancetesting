@@ -1,3 +1,6 @@
+---
+internal: true
+---
 
 # Echo Service
 This is an example service that uses grpc.

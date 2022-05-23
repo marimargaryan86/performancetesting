@@ -1,3 +1,7 @@
+---
+internal: false
+---
+
 # Reference
 
 | Attribute    | Format                                                                 | Example                    |
