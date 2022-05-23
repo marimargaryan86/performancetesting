@@ -21,10 +21,10 @@ class BookingHandler(object):
 
     def __init__(
         self,
-        a2g_client: client.Ask2GoClient,
+        ask2go_client: client.Ask2GoClient,
         smtp_client: aiosmtplib.SMTP,
     ):
-        self._client = a2g_client
+        self._client = ask2go_client
         self._logger = structlog.get_logger(__name__)
         self._smtp = smtp_client
 

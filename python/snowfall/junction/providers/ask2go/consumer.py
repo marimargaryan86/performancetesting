@@ -99,12 +99,12 @@ class SearchCriteriaConsumer(object):
         self,
         consumer: amqp.Consumer,
         producer: amqp.Producer,
-        a2g_client: adapter.Ask2GoAdapter,
+        ask2go_adapter: adapter.Ask2GoAdapter,
         offer_transformer: transformer.OfferTransformer,
     ):
         self._consumer = consumer
         self._producer = producer
-        self._client = a2g_client
+        self._adapter = ask2go_adapter
         self._transformer = offer_transformer
 
     async def consume(self) -> None:
@@ -120,7 +120,7 @@ class SearchCriteriaConsumer(object):
         ):
             offer_groups = self._transformer.offer_prices_to_offer_groups(
                 search_task,
-                self._client.gather_search_results(search_task),
+                self._adapter.gather_search_results(search_task),
             )
 
             async for offer_group in offer_groups:

@@ -109,7 +109,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
                         exchange=amqp.Exchange("orders"),
                     ),
                     booking_handler=booking.BookingHandler(
-                        a2g_client=ask2go_client,
+                        ask2go_client=ask2go_client,
                         smtp_client=aiosmtplib.SMTP(
                             hostname=app.settings.smtp_dsn.host,
                             port=app.settings.smtp_dsn.port,
@@ -149,7 +149,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                         connection=connection,
                         exchange=amqp.Exchange("offers"),
                     ),
-                    a2g_client=adapter.Ask2GoAdapter(
+                    ask2go_adapter=adapter.Ask2GoAdapter(
                         ask2go_client=ask2go_client,
                         offer_validator=validator.OfferValidator(),
                     ),
