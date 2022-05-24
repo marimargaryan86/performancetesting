@@ -111,7 +111,6 @@ def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Rou
             offers.Offer,
             name="ViewOffer",
         ),
-        dependencies.route("/orders", orders.Orders),
         dependencies.route(
             "/orders",
             orders.Orders,
