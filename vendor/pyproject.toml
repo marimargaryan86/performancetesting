@@ -4,6 +4,7 @@ skips = ["*_test.py", "*/conftest.py"]
 [tool.black]
 line-length = 88
 target-version = ["py39"]
+preview = true
 
 [tool.coverage.run]
 branch = true
