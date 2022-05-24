@@ -15,6 +15,7 @@ from snowfall.junction.providers.ask2go import (
     consumer,
     criteria,
     h3,
+    notifications,
     transformer,
     validator,
 )
@@ -37,6 +38,8 @@ class _OrdersSettings(service.Settings):
     api_booking_base_url: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
     smtp_dsn: pydantic.AnyUrl
+    smtp_sender: pydantic.EmailStr
+    smtp_recipient: pydantic.EmailStr
     http_timeout: float = 60.0
 
 
@@ -110,12 +113,16 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
                     ),
                     booking_handler=booking.BookingHandler(
                         ask2go_client=ask2go_client,
-                        smtp_client=aiosmtplib.SMTP(
-                            hostname=app.settings.smtp_dsn.host,
-                            port=app.settings.smtp_dsn.port,
-                            username=app.settings.smtp_dsn.user,
-                            password=app.settings.smtp_dsn.password,
-                            start_tls=True,
+                        notifier=notifications.SmtpNotifier(
+                            smtp_client=aiosmtplib.SMTP(
+                                hostname=app.settings.smtp_dsn.host,
+                                port=app.settings.smtp_dsn.port,
+                                username=app.settings.smtp_dsn.user,
+                                password=app.settings.smtp_dsn.password,
+                                start_tls=True,
+                            ),
+                            sender=app.settings.smtp_sender,
+                            recipient=app.settings.smtp_recipient,
                         ),
                     ),
                     offer_cache=cache.OfferCache(

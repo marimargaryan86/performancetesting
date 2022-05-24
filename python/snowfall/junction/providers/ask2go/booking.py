@@ -1,15 +1,12 @@
 import asyncio
 import datetime
-from email import message
 
-import aiosmtplib
 import phonenumbers
 import pycountry
-import rapidjson
 import structlog
 
 from snowfall.junction.orders.v1alpha import models_pb2
-from snowfall.junction.providers.ask2go import criteria
+from snowfall.junction.providers.ask2go import criteria, notifications
 from snowfall.stdlib.format import protobuf
 from snowfall.vendor.ask2go import client, errors
 from snowfall.vendor.ask2go.models import booking, common
@@ -22,11 +19,11 @@ class BookingHandler(object):
     def __init__(
         self,
         ask2go_client: client.Ask2GoClient,
-        smtp_client: aiosmtplib.SMTP,
+        notifier: notifications.Notifier,
     ):
         self._client = ask2go_client
         self._logger = structlog.get_logger(__name__)
-        self._smtp = smtp_client
+        self._notifier = notifier
 
     async def book(
         self,
@@ -78,12 +75,18 @@ class BookingHandler(object):
             ),
         )
 
-        # TODO: call the update_booking_billing_address
-        # TODO: update booking_result with a call to poll_booking
+        await self._client.update_booking_billing_address(
+            booking_ref_id=booking_result.id,
+            transaction_id=booking_result.transaction_id,
+        )
+        booking_result = await self._poll_booking(booking_result)
 
         try:
-            await self._send_email_notification(order, offer_id, booking_result)
-        except Exception:  # noqa: PIE786
+            # todo: this should be handled in a separate service
+            await self._notifier.send(
+                notifications.BookingNotification(order, booking_result),
+            )
+        except notifications.NotificationError:
             self._logger.exception()
 
         return booking_result
@@ -101,34 +104,3 @@ class BookingHandler(object):
             await asyncio.sleep(self._wait_time_between_polling)
 
         raise errors.ServiceError("Unable to get booking details in time")
-
-    # todo: this should be handled in a separate service
-    async def _send_email_notification(
-        self,
-        order: models_pb2.Order,
-        offer_id: str,
-        raw_data: booking.Booking,
-    ) -> None:
-        email = message.EmailMessage()
-        email["From"] = "noreply@junction.travel"
-        email["To"] = "A2GBooking@snowfalltravel.com"
-        email["Subject"] = "A2G Booking in Junction needs ticketing!"
-        email.set_content(
-            "Order ID: {order} ({spnr}) Offer ID: {offer} Booking:\n{json}".format(
-                order=order.id,
-                spnr=order.passenger_name_record,
-                offer=offer_id,
-                json=rapidjson.dumps(
-                    raw_data.dict(),
-                    indent=2,
-                    sort_keys=True,
-                    number_mode=rapidjson.NM_NATIVE
-                    | rapidjson.NM_DECIMAL
-                    | rapidjson.NM_NAN,
-                    datetime_mode=rapidjson.DM_ISO8601,
-                ),
-            ),
-        )
-
-        async with self._smtp:
-            await self._smtp.send_message(email)

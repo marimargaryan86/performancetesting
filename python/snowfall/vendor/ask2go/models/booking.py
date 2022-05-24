@@ -6,6 +6,7 @@ from snowfall.vendor.ask2go.models.base import CamelCaseBaseModel
 
 class Information(CamelCaseBaseModel):
     record_locators: Optional[list[str]]
+    check_in_locators: Optional[list[str]]
     booking_id: int
     display_booking_id: Optional[str]
     status: str

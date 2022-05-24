@@ -62,6 +62,8 @@ EOH
         API_BOOKING_BASE_URL = "http://ec2-3-68-186-171.eu-central-1.compute.amazonaws.com"
         ENV_NAME             = "${NOMAD_NAMESPACE}"
         SENTRY_DSN           = "https://c299617e39d446ccb1053a04d9ac12b8@sentry.snowfall.se/34"
+        SMTP_SENDER          = "noreply@junction.travel"
+        SMTP_RECIPIENT       = "A2GBooking@snowfalltravel.com"
       }
     }
   }
