@@ -39,7 +39,7 @@ Reservation created by Junction
 Order ID : {order_id}
 SPNR : {spnr}
 Record locator (sabre) : {sabre_pnr}
-Checkin locator (other) : {other_pnr}
+Checkin locator (other) : {checkin_pnr}
 First name : {first_name}
 Last name : {last_name}
 Booking date : {created_at}
@@ -69,12 +69,8 @@ Travel departure date : {departure_at}
         return {
             "order_id": self._order.id,
             "spnr": self._order.passenger_name_record,
-            "sabre_pnr": more_itertools.first(
-                self._booking.information.check_in_locators or [],
-            ),
-            "other_pnr": more_itertools.first(
-                self._booking.information.record_locators or [],
-            ),
+            "sabre_pnr": ", ".join(self._booking.information.record_locators or []),
+            "checkin_pnr": ", ".join(self._booking.information.check_in_locators or []),
             "first_name": first_passenger.get("firstName", ""),
             "last_name": first_passenger.get("lastName", ""),
             "created_at": datetime.datetime.now(
