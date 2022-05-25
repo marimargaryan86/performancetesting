@@ -28,7 +28,9 @@ go:test:
     - gocover-cobertura <coverage.txt >coverage.xml
   artifacts:
     reports:
-      cobertura: golang/coverage.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: golang/coverage.xml
   needs: [ ]
   rules:
     - if: $CI_MERGE_REQUEST_IID

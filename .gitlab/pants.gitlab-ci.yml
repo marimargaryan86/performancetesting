@@ -47,7 +47,9 @@ pants:test:
   artifacts:
     reports:
       junit: dist/test_results/*.xml
-      cobertura: dist/coverage/python/coverage.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: dist/coverage/python/coverage.xml
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
