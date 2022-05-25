@@ -16,6 +16,12 @@
   },
   "x-tagGroups": [
     {
+      "name": "Cabins",
+      "tags": [
+        "cabins"
+      ]
+    },
+    {
       "name": "Draft",
       "tags": [
         "draft"
@@ -61,6 +67,11 @@
     }
   ],
   "tags": [
+    {
+      "name": "cabins",
+      "description": "Cabin class information.",
+      "x-displayName": "Cabins"
+    },
     {
       "name": "draft",
       "description": "Endpoints still being drafted.",
@@ -654,6 +665,156 @@
         },
         "operationId": "get-passengers-titles-passenger-title-id",
         "description": "Used to lookup data for a Passenger Title Identifier."
+      }
+    },
+    "/cabin-classes": {
+      "parameters": [],
+      "get": {
+        "summary": "List Cabin Classes",
+        "tags": [
+          "cabins"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/CabinClass"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "data": [
+                        {
+                          "id": "unspecified",
+                          "type": "cabin-classes",
+                          "attributes": {
+                            "name": "unspecified"
+                          },
+                          "links": {
+                            "self": "https://example.com/cabin-classes/unspecified"
+                          }
+                        },
+                        {
+                          "id": "economy",
+                          "type": "cabin-classes",
+                          "attributes": {
+                            "name": "economy"
+                          },
+                          "links": {
+                            "self": "https://example.com/cabin-classes/economy"
+                          }
+                        },
+                        {
+                          "id": "business",
+                          "type": "cabin-classes",
+                          "attributes": {
+                            "name": "business"
+                          },
+                          "links": {
+                            "self": "https://example.com/cabin-classes/business"
+                          }
+                        }
+                      ],
+                      "links": {
+                        "next": null
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "operationId": "get-cabin-classes",
+        "description": "Used to retrieve available Cabin Classes.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
+      }
+    },
+    "/cabin-classes/{cabinClassId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/cabinClassId"
+        }
+      ],
+      "get": {
+        "summary": "View Cabin Class",
+        "tags": [
+          "cabins"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CabinClass"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                },
+                "examples": {
+                  "example-1": {
+                    "value": {
+                      "data": {
+                        "id": "economy",
+                        "type": "cabin-classes",
+                        "attributes": {
+                          "name": "string"
+                        },
+                        "links": {
+                          "self": "https://example.com/cabin-classes/economy"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-cabin-classes-cabin-class-id",
+        "description": "Used to lookup data for a Cabin Class Identifier."
       }
     },
     "/legs/{legId}": {
@@ -2092,6 +2253,67 @@
         ],
         "description": "Indicates the passenger's title, such as \"mr\" or \"mrs\"."
       },
+      "CabinClass": {
+        "title": "Cabin Class",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "airport",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "cabin-classes"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "description": "Indicates the cabins class, such as \"economy\" or \"business\"."
+      },
+      "CabinClassIdentifier": {
+        "title": "Cabin Class Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "economy"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "cabin-classes"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
       "PlaceType": {
         "title": "Place Type",
         "allOf": [
@@ -2942,7 +3164,7 @@
             "format": "uuid"
           },
           "cabinClass": {
-            "$ref": "#/components/schemas/CabinClass"
+            "$ref": "#/components/schemas/CabinClassDetails"
           }
         },
         "required": [
@@ -2950,8 +3172,8 @@
           "cabinClass"
         ]
       },
-      "CabinClass": {
-        "title": "Cabin Class",
+      "CabinClassDetails": {
+        "title": "Cabin Class Details",
         "description": "Internal and marketing name of a cabin class.",
         "type": "object",
         "properties": {
@@ -3303,6 +3525,21 @@
                       }
                     },
                     "readOnly": true
+                  },
+                  "cabinClasses": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/CabinClassIdentifier"
+                        }
+                      }
+                    },
+                    "required": [
+                      "data"
+                    ],
+                    "writeOnly": true
                   }
                 }
               }
@@ -3881,6 +4118,15 @@
           "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
         },
         "description": "Offer identifier"
+      },
+      "cabinClassId": {
+        "name": "cabinClassId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "description": "Cabin Class identifier"
       }
     },
     "securitySchemes": {

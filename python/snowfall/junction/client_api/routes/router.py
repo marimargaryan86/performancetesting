@@ -2,6 +2,7 @@ from lagom.integrations import starlette
 from starlette import routing
 
 from snowfall.junction.client_api.routes import (
+    cabins,
     health,
     legs,
     offers,
@@ -140,5 +141,15 @@ def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Rou
             "/passengers/titles/{passengerTitleId}",
             passengers.PassengerTitle,
             name="ViewPassengerTitle",
+        ),
+        dependencies.route(
+            "/cabin-classes",
+            cabins.Cabins,
+            name="ListCabinClasses",
+        ),
+        dependencies.route(
+            "/cabin-classes/{cabinClassId}",
+            cabins.Cabin,
+            name="ViewCabinClass",
         ),
     ]

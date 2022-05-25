@@ -341,6 +341,32 @@ class PassengerGenderResource(models.Resource):
         )
 
 
+class CabinClassResource(models.Resource):
+    @classmethod
+    def from_proto(
+        cls,
+        cabin_class: models_pb2.CabinClass.Type.V,
+        request: requests.Request,
+    ) -> CabinClassResource:
+        cabin_class_id = protobuf.enum_value_to_slug(
+            descriptor=models_pb2.CabinClass.Type.DESCRIPTOR,
+            enum_value=cabin_class,
+        )
+        return cls(
+            id=cabin_class_id,
+            type="cabin-classes",
+            attributes={
+                "name": cabin_class_id,
+            },
+            links={
+                _SELF_HREF: request.url_for(
+                    "ViewCabinClass",
+                    cabinClassId=cabin_class_id,
+                ),
+            },
+        )
+
+
 class PassengerTitleResource(models.Resource):
     @classmethod
     def from_proto(
