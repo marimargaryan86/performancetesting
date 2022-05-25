@@ -16,6 +16,7 @@ import (
 
 var gitlabBaseUrl string
 var gitlabToken string
+var gitlabWebhookSecret string
 var httpPort int
 var cmd = &cobra.Command{
 	Use:   "serve",
@@ -29,6 +30,7 @@ func init() {
 
 	cmd.PersistentFlags().StringVar(&gitlabBaseUrl, "gitlab-base-url", "", "")
 	cmd.PersistentFlags().StringVar(&gitlabToken, "gitlab-token", "", "")
+	cmd.PersistentFlags().StringVar(&gitlabWebhookSecret, "gitlab-webhook-secret", "", "")
 	cmd.PersistentFlags().IntVar(&httpPort, "http-port", 80, "")
 
 	if err := viper.BindPFlag("gitlab_base_url", cmd.PersistentFlags().Lookup("gitlab-base-url")); err != nil {
@@ -36,6 +38,10 @@ func init() {
 	}
 
 	if err := viper.BindPFlag("gitlab_token", cmd.PersistentFlags().Lookup("gitlab-token")); err != nil {
+		panic(err)
+	}
+
+	if err := viper.BindPFlag("gitlab_webhook_secret", cmd.PersistentFlags().Lookup("gitlab-webhook-secret")); err != nil {
 		panic(err)
 	}
 
@@ -82,7 +88,7 @@ func snowman(cmd *cobra.Command, args []string) error {
 		defer sentry.Flush(2 * time.Second)
 	}
 
-	client, err := gitlab.NewClient(viper.GetString("gitlab-token"), gitlab.WithBaseURL(viper.GetString("gitlab-base-url")))
+	client, err := gitlab.NewClient(viper.GetString("gitlab_token"), gitlab.WithBaseURL(viper.GetString("gitlab_base_url")))
 
 	if err != nil {
 		return err
@@ -98,11 +104,11 @@ func snowman(cmd *cobra.Command, args []string) error {
 		Plugins: []plugin{
 			mr.OnEvent,
 		},
-		Secret: "",
+		Secret: viper.GetString("gitlab_webhook_secret"),
 	}
 
 	mux := http.NewServeMux()
 	mux.Handle("/", wh)
 
-	return http.ListenAndServe(fmt.Sprintf("0.0.0.0:%d", viper.GetInt("http-port")), mux)
+	return http.ListenAndServe(fmt.Sprintf("0.0.0.0:%d", viper.GetInt("http_port")), mux)
 }
