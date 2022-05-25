@@ -2,12 +2,19 @@
   import type { SvelteComponent } from "svelte/internal";
   import { writable } from "svelte/store";
 
-  type DialogueProps<T> = { component: unknown; close: () => void; id: number; props: T };
+  type Component = { prototype: SvelteComponent };
+  type DialogueProps<T extends Component> = {
+    component: T;
+    close: () => void;
+    id: number;
+    props: T["prototype"]["$set"];
+  };
 
   let id = 0;
-  const windows = writable<DialogueProps<unknown>[]>([]);
+  // eslint-disable-next-line
+  const windows = writable<DialogueProps<any>[]>([]);
 
-  export function showDialogue<T extends { prototype: SvelteComponent }>(
+  export function showDialogue<T extends Component>(
     component: T,
     props: Parameters<T["prototype"]["$set"]>[0],
   ): void {

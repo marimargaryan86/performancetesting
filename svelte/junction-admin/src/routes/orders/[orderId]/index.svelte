@@ -1,21 +1,25 @@
 <script lang="ts">
   import { page } from "$app/stores";
+  import Crossfader from "$lib/components/ui/crossfader.svelte";
   import dependencies from "$lib/dependencies";
   import DocumentNotFoundIcon from "$lib/icons/document-not-found-icon.svelte";
   import SpinnerIcon from "$lib/icons/spinner-icon.svelte";
   import type { OrderDetailedModel } from "$lib/models/order";
-  import { fade } from "svelte/transition";
   import Order from "../_components/order.svelte";
 
   const transitionTimeMs = 150;
 
-  let order: Promise<OrderDetailedModel> = undefined;
+  let order: OrderDetailedModel;
   let pending = false;
 
   $: ({ orderId } = $page.params);
   $: if (orderId) {
     pending = true;
-    order = dependencies.orderService.getDetailed(orderId);
+    dependencies.orderService
+      .getDetailed(orderId)
+      .then((value) => (order = value))
+      .catch(() => (order = undefined))
+      .finally(() => (pending = false));
   }
 </script>
 
@@ -24,36 +28,24 @@
 </svelte:head>
 
 <div class="order">
-  {#await order}
-    <div
-      class="pending"
-      transition:fade|local={{ duration: transitionTimeMs }}
-      on:outroend={() => (pending = false)}
-    >
+  <Crossfader active={pending ? "first" : "second"} {transitionTimeMs}>
+    <div class="pending" slot="first">
       <SpinnerIcon />
     </div>
-  {:then order}
-    {#if !pending}
-      <div
-        class="main"
-        transition:fade|local={{ duration: transitionTimeMs }}
-        on:outroend={() => (pending = true)}
-      >
-        <Order {order} />
-      </div>
-    {/if}
-  {:catch}
-    {#if !pending}
-      <div
-        class="empty"
-        transition:fade|local={{ duration: transitionTimeMs }}
-        on:outroend={() => (pending = true)}
-      >
-        <DocumentNotFoundIcon />
-        <span>Order not found</span>
-      </div>
-    {/if}
-  {/await}
+
+    <svelte:fragment slot="second">
+      {#if order}
+        <div class="main">
+          <Order {order} />
+        </div>
+      {:else}
+        <div class="empty">
+          <DocumentNotFoundIcon />
+          <span>Order not found</span>
+        </div>
+      {/if}
+    </svelte:fragment>
+  </Crossfader>
 </div>
 
 <style>

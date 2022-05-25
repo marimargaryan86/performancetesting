@@ -24,11 +24,7 @@
 
   $: _orders = $orders;
   $: searchDataJson = JSON.stringify(searchData);
-  $: {
-    // Reset orders when search data changes.
-    searchDataJson;
-    reset();
-  }
+  $: searchDataJson, reset();
 
   async function load(pageOffset: number, pageLimit: number): Promise<OrderModel[]> {
     try {
@@ -72,7 +68,9 @@
           >
             <td>{order.id.substring(0, 8)}...</td>
             <td>{order.spnr}</td>
-            <td>{order.reseller.name}</td>
+            <td>
+              <a href={routeConfig.resellers.reseller(order.reseller.id)}>{order.reseller.name}</a>
+            </td>
             <td>{order.itemIds.length}</td>
             <td>{utils.formatPrice(order.price)}</td>
             <td>{order.createdAt.toLocaleDateString(...utils.fullDateTime)}</td>

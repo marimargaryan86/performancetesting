@@ -1,5 +1,7 @@
 import type { PriceModel } from "./common";
 import type { CuratedPlaceModel } from "./place";
+import type { ProviderModel } from "./provider";
+import type { ResellerModel } from "./reseller";
 
 export type OrderStatus = "pending" | "awaiting-payment" | "completed";
 
@@ -9,16 +11,6 @@ export type OrderSearchData = {
   spnr?: string;
   reseller?: string;
   status?: OrderStatus;
-};
-
-export type ResellerModel = {
-  id: string;
-  name: string;
-};
-
-export type ProviderModel = {
-  id: string;
-  name: string;
 };
 
 export type SegmentModel = {

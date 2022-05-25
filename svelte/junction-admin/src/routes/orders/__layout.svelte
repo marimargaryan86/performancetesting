@@ -2,43 +2,26 @@
   import SubMenu from "$lib/partials/sub-menu.svelte";
   import routeConfig from "$lib/route-config";
   import { page } from "$app/stores";
+  import activeLink from "$lib/directives/active-link";
 
   $: ({ orderId, orderItemId, orderTripId } = $page.params);
 </script>
 
 <div class="orders">
   <SubMenu>
-    <a href={routeConfig.orders.root} class:active={$page.url.pathname === routeConfig.orders.root}>
-      Orders
-    </a>
+    <a href={routeConfig.orders.root} use:activeLink>List</a>
 
     {#if orderId}
-      »
-      <a
-        href={routeConfig.orders.order(orderId)}
-        class:active={$page.url.pathname === routeConfig.orders.order(orderId)}
-      >
-        Order details
-      </a>
+      » <a href={routeConfig.orders.order(orderId)} use:activeLink>Order details</a>
     {/if}
 
     {#if orderItemId}
-      »
-      <a
-        href={routeConfig.orders.item(orderId, orderItemId)}
-        class:active={$page.url.pathname === routeConfig.orders.item(orderId, orderItemId)}
-      >
-        Item details
-      </a>
+      » <a href={routeConfig.orders.item(orderId, orderItemId)} use:activeLink>Item details</a>
     {/if}
 
     {#if orderTripId}
       »
-      <a
-        href={routeConfig.orders.trip(orderId, orderItemId, orderTripId)}
-        class:active={$page.url.pathname ===
-          routeConfig.orders.trip(orderId, orderItemId, orderTripId)}
-      >
+      <a href={routeConfig.orders.trip(orderId, orderItemId, orderTripId)} use:activeLink>
         Trip details
       </a>
     {/if}
@@ -54,10 +37,6 @@
     display: grid;
     grid-template-rows: 32px 1fr;
     height: 100%;
-  }
-
-  .orders .active {
-    color: var(--color-teal-light);
   }
 
   .workspace {

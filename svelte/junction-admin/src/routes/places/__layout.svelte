@@ -1,21 +1,14 @@
 <script lang="ts">
   import SubMenu from "$lib/partials/sub-menu.svelte";
   import routeConfig from "$lib/route-config";
-  import { page } from "$app/stores";
+  import activeLink from "$lib/directives/active-link";
 </script>
 
 <div class="places">
   <SubMenu>
-    <a href={routeConfig.places.root} class:active={$page.url.pathname === routeConfig.places.root}>
-      Places
-    </a>
+    <a href={routeConfig.places.root} use:activeLink>Places</a>
 
-    <a
-      href={routeConfig.places.curatedPlaces}
-      class:active={$page.url.pathname === routeConfig.places.curatedPlaces}
-    >
-      Curated places
-    </a>
+    <a href={routeConfig.places.curatedPlaces} use:activeLink>Curated places</a>
   </SubMenu>
 
   <main class="workspace">
@@ -28,10 +21,6 @@
     display: grid;
     grid-template-rows: 32px 1fr;
     height: 100%;
-  }
-
-  .places .active {
-    color: var(--color-teal-light);
   }
 
   .workspace {

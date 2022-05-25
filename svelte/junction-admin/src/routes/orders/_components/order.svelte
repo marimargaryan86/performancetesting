@@ -34,7 +34,9 @@
       <tr slot="body">
         <td>{order.id.substring(0, 8)}...</td>
         <td>{order.spnr}</td>
-        <td>{order.reseller.name}</td>
+        <td>
+          <a href={routeConfig.resellers.reseller(order.reseller.id)}>{order.reseller.name}</a>
+        </td>
         <td>{order.price.currency} {order.price.total}</td>
         <td>{order.createdAt.toLocaleDateString(...utils.fullDate)}</td>
         <td>{order.modifiedAt.toLocaleDateString(...utils.fullDate)}</td>

@@ -11,12 +11,12 @@ import type {
   OrderModel,
   OrderStatus,
   PassengerModel,
-  ProviderModel,
-  ResellerModel,
   SegmentModel,
   TripModel,
 } from "$lib/models/order";
 import type { CuratedPlaceModel, PlaceModel } from "$lib/models/place";
+import type { ResellerModel } from "$lib/models/reseller";
+import type { ProviderModel } from "$lib/models/provider";
 import faker from "@faker-js/faker";
 
 function generateCoordinates(): CoordinatesModel {
@@ -49,6 +49,7 @@ function generateReseller(): ResellerModel {
   return {
     id: faker.datatype.uuid(),
     name: faker.company.companyName(),
+    orderCount: faker.datatype.number({ min: 3, max: 400 }),
   };
 }
 
@@ -56,6 +57,7 @@ function generateProvider(): ProviderModel {
   return {
     id: faker.datatype.uuid(),
     name: faker.company.companyName(),
+    orderCount: faker.datatype.number({ min: 4, max: 400 }),
   };
 }
 
@@ -79,12 +81,12 @@ function generatePassenger(): PassengerModel {
     dateOfBirth: faker.date.past(),
     firstName: faker.name.firstName(),
     lastName: faker.name.lastName(),
-    gender: faker.random.arrayElement<Gender>([
+    gender: faker.helpers.arrayElement<Gender>([
       "GENDER_FEMALE",
       "GENDER_MALE",
       "GENDER_UNSPECIFIED",
     ]),
-    title: faker.random.arrayElement<NameTitle>(["TITLE_UNSPECIFIED"]),
+    title: faker.helpers.arrayElement<NameTitle>(["TITLE_UNSPECIFIED"]),
   };
 }
 
@@ -97,7 +99,7 @@ function generateOrder(): OrderModel {
     createdAt: faker.date.past(),
     modifiedAt: faker.date.past(),
     reseller: generateReseller(),
-    status: faker.random.arrayElement<OrderStatus>(["completed", "awaiting-payment", "pending"]),
+    status: faker.helpers.arrayElement<OrderStatus>(["completed", "awaiting-payment", "pending"]),
     itemIds: [...Array(faker.datatype.number({ min: 1, max: 5 }))].map(() => faker.datatype.uuid()),
     price: generatePrice(),
     contactDetails: generateContactDetails(),
@@ -137,8 +139,8 @@ function generateTrip(): TripModel {
 function generateOrderItem(): OrderItemModel {
   const base: OrderItemBase = {
     id: faker.datatype.uuid(),
-    type: faker.random.arrayElement<OrderItemType>(["air", "rail"]),
-    status: faker.random.arrayElement<OrderItemStatus>([
+    type: faker.helpers.arrayElement<OrderItemType>(["air", "rail"]),
+    status: faker.helpers.arrayElement<OrderItemStatus>([
       "awaiting-payment",
       "completed",
       "failed",

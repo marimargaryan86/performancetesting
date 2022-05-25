@@ -21,4 +21,8 @@
     font-size: 12px;
     margin: 0 8px;
   }
+
+  .sub-menu > :global(a.active) {
+    color: var(--color-teal-light);
+  }
 </style>

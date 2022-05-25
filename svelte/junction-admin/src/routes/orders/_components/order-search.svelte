@@ -9,8 +9,8 @@
 
   const dispatch = createEventDispatcher<{ search: OrderSearchData }>();
 
-  export let spnr: string = "";
-  export let reseller: string = "";
+  export let spnr = "";
+  export let reseller = "";
   export let status: OrderStatus = undefined;
 
   const orderStatuses: OrderStatus[] = ["awaiting-payment", "completed", "pending"];
