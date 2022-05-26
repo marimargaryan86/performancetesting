@@ -2,7 +2,7 @@ from typing import Any, Mapping
 
 import pytest
 
-from snowfall.junction.client_api import request_helpers
+from snowfall.stdlib.integration.starlette import request_helpers
 
 
 @pytest.mark.parametrize(

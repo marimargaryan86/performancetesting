@@ -6,10 +6,10 @@ from snowfall.adapter import segments as segments_adapter
 from snowfall.adapter import trip_searches as trip_searches_adapter
 from snowfall.adapter import trips as trips_adapter
 from snowfall.common.v1alpha import models_pb2
-from snowfall.junction.client_api import pagination_helpers, resources
+from snowfall.junction.client_api import resources
 from snowfall.stdlib import sequence
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.integration.starlette import models
+from snowfall.stdlib.integration.starlette import models, pagination_helpers
 
 _NOT_FOUND_STATUS = status.HTTP_404_NOT_FOUND
 

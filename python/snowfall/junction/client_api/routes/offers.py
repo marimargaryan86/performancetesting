@@ -4,11 +4,15 @@ import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.adapter import offer_searches, offers
-from snowfall.junction.client_api import pagination_helpers, request_helpers, resources
+from snowfall.junction.client_api import resources
 from snowfall.junction.client_api.transformers import trip_ids_to_segments
 from snowfall.junction.offers.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.integration.starlette import models
+from snowfall.stdlib.integration.starlette import (
+    models,
+    pagination_helpers,
+    request_helpers,
+)
 
 
 class Offer(endpoints.HTTPEndpoint):

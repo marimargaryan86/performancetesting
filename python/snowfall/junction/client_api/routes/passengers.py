@@ -1,10 +1,10 @@
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.junction.client_api import pagination_helpers, resources
+from snowfall.junction.client_api import resources
 from snowfall.junction.orders.v1alpha import models_pb2
 from snowfall.stdlib import sequence
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.integration.starlette import models
+from snowfall.stdlib.integration.starlette import models, pagination_helpers
 
 
 class PassengerGender(endpoints.HTTPEndpoint):

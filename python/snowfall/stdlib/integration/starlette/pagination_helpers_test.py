@@ -3,7 +3,7 @@ from typing import Optional
 
 import pytest
 
-from snowfall.junction.client_api import pagination_helpers
+from snowfall.stdlib.integration.starlette import pagination_helpers
 
 
 @pytest.mark.parametrize(
