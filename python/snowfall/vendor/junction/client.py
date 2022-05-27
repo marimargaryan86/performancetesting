@@ -2,7 +2,7 @@ import dataclasses
 import datetime
 from typing import Any, Dict, Optional, Sequence
 
-import requests
+import httpx
 
 from snowfall.vendor.junction import models
 
@@ -20,14 +20,14 @@ class JunctionClient(object):  # noqa: WPS214
         self,
         api_url: str,
         token: str,
-        client: Optional[requests.sessions.Session] = None,
+        client: Optional[httpx.AsyncClient] = None,
     ) -> None:
         self._api_url = api_url
         self._token = token
-        self._client = client or requests.session()
+        self._client = client or httpx.AsyncClient()
 
-    def health(self) -> Dict[str, Any]:
-        response = self._client.get(
+    async def health(self) -> Dict[str, Any]:
+        response = await self._client.get(
             "{0}/health".format(self._api_url),
         )
 
@@ -35,7 +35,7 @@ class JunctionClient(object):  # noqa: WPS214
 
         return response.json()
 
-    def list_places(
+    async def list_places(
         self,
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
@@ -43,7 +43,7 @@ class JunctionClient(object):  # noqa: WPS214
         request_parameters = {
             key: vl for key, vl in (("limit", limit), ("cursor", cursor)) if vl
         }
-        response = self._client.get(
+        response = await self._client.get(
             "{0}/places".format(self._api_url),
             headers=self._auth_headers,
             params=request_parameters,
@@ -53,8 +53,8 @@ class JunctionClient(object):  # noqa: WPS214
 
         return response.json()
 
-    def get_place_by_id(self, place_id: str) -> Dict[str, Any]:
-        response = self._client.get(
+    async def get_place_by_id(self, place_id: str) -> Dict[str, Any]:
+        response = await self._client.get(
             "{0}/places/{1}".format(self._api_url, place_id),
             headers=self._auth_headers,
         )
@@ -63,8 +63,8 @@ class JunctionClient(object):  # noqa: WPS214
 
         return response.json()
 
-    def get_leg_by_id(self, leg_id: str) -> Dict[str, Any]:
-        response = self._client.get(
+    async def get_leg_by_id(self, leg_id: str) -> Dict[str, Any]:
+        response = await self._client.get(
             "{0}/legs/{1}".format(self._api_url, leg_id),
             headers=self._auth_headers,
         )
@@ -73,8 +73,8 @@ class JunctionClient(object):  # noqa: WPS214
 
         return response.json()
 
-    def get_segment_by_id(self, segment_id: str) -> Dict[str, Any]:
-        response = self._client.get(
+    async def get_segment_by_id(self, segment_id: str) -> Dict[str, Any]:
+        response = await self._client.get(
             "{0}/segments/{1}".format(self._api_url, segment_id),
             headers=self._auth_headers,
         )
@@ -83,8 +83,8 @@ class JunctionClient(object):  # noqa: WPS214
 
         return response.json()
 
-    def get_trip_by_id(self, trip_id: str) -> Dict[str, Any]:
-        response = self._client.get(
+    async def get_trip_by_id(self, trip_id: str) -> Dict[str, Any]:
+        response = await self._client.get(
             "{0}/trips/{1}".format(self._api_url, trip_id),
             headers=self._auth_headers,
         )
@@ -93,7 +93,7 @@ class JunctionClient(object):  # noqa: WPS214
 
         return response.json()
 
-    def create_trip_search(
+    async def create_trip_search(
         self,
         origin_id: str,
         destination_id: str,
@@ -113,7 +113,7 @@ class JunctionClient(object):  # noqa: WPS214
                 _TYPE_KEY: "trip-searches",
             },
         }
-        response = self._client.post(
+        response = await self._client.post(
             "{0}/trips/searches".format(self._api_url),
             headers=dict(self._auth_headers, **self._post_headers),
             json=body,
@@ -123,8 +123,8 @@ class JunctionClient(object):  # noqa: WPS214
 
         return response.json()
 
-    def get_trip_search_by_id(self, trips_search_id: str) -> Dict[str, Any]:
-        response = self._client.get(
+    async def get_trip_search_by_id(self, trips_search_id: str) -> Dict[str, Any]:
+        response = await self._client.get(
             "{0}/trips/searches/{1}".format(self._api_url, trips_search_id),
             headers=self._auth_headers,
         )
@@ -133,8 +133,8 @@ class JunctionClient(object):  # noqa: WPS214
 
         return response.json()
 
-    def get_trips_by_trip_search_id(self, trips_search_id: str) -> Dict[str, Any]:
-        response = self._client.get(
+    async def get_trips_by_trip_search_id(self, trips_search_id: str) -> Dict[str, Any]:
+        response = await self._client.get(
             "{0}/trips/searches/{1}/trips".format(self._api_url, trips_search_id),
             headers=self._auth_headers,
         )
@@ -143,7 +143,7 @@ class JunctionClient(object):  # noqa: WPS214
 
         return response.json()
 
-    def create_offer_search(
+    async def create_offer_search(
         self,
         trip_ids: Sequence[str],
         passengers_dates_of_birth: Sequence[datetime.date],
@@ -166,7 +166,7 @@ class JunctionClient(object):  # noqa: WPS214
                 _TYPE_KEY: "trip-offer-searches",
             },
         }
-        response = self._client.post(
+        response = await self._client.post(
             "{0}/offers/searches".format(self._api_url),
             headers=dict(self._auth_headers, **self._post_headers),
             json=body,
@@ -176,8 +176,11 @@ class JunctionClient(object):  # noqa: WPS214
 
         return response.json()
 
-    def get_offers_by_offer_search_id(self, offers_search_id: str) -> Dict[str, Any]:
-        response = self._client.get(
+    async def get_offers_by_offer_search_id(
+        self,
+        offers_search_id: str,
+    ) -> Dict[str, Any]:
+        response = await self._client.get(
             "{0}/offers/searches/{1}/offers".format(self._api_url, offers_search_id),
             headers=self._auth_headers,
         )
@@ -186,7 +189,7 @@ class JunctionClient(object):  # noqa: WPS214
 
         return response.json()
 
-    def create_order(
+    async def create_order(
         self,
         offer_aggregate_id: str,
         offer_ids: Sequence[str],
@@ -217,7 +220,7 @@ class JunctionClient(object):  # noqa: WPS214
                 _TYPE_KEY: "orders",
             },
         }
-        response = self._client.post(
+        response = await self._client.post(
             "{0}/orders".format(self._api_url),
             headers=dict(self._auth_headers, **self._post_headers),
             json=body,
@@ -227,8 +230,8 @@ class JunctionClient(object):  # noqa: WPS214
 
         return response.json()
 
-    def get_order_by_id(self, order_id: str) -> Dict[str, Any]:
-        response = self._client.get(
+    async def get_order_by_id(self, order_id: str) -> Dict[str, Any]:
+        response = await self._client.get(
             "{0}/orders/{1}".format(self._api_url, order_id),
             headers=self._auth_headers,
         )
