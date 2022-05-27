@@ -1,0 +1,93 @@
+variable "docker_image" {
+  type = string
+}
+
+variable "registry_address" {
+  type = string
+}
+
+variable "registry_password" {
+  type = string
+}
+
+variable "registry_username" {
+  type = string
+}
+
+job "mobile-api-http" {
+  datacenters = ["junction-dev-dc1"]
+  type        = "service"
+
+  update {
+    max_parallel      = 1
+    auto_revert       = true
+    auto_promote      = true
+    canary            = 1
+    healthy_deadline  = "30s"
+    progress_deadline = "2m"
+  }
+
+  group "http" {
+    count = 1
+
+    network {
+      port "http" {}
+    }
+
+    service {
+      name = "mobile-api-${NOMAD_NAMESPACE}"
+      port = "http"
+      tags = [
+        "http",
+        "traefik.enable=true",
+        "traefik.http.routers.mobile-api.entrypoints=websecure",
+        "traefik.http.routers.mobile-api.rule=Host(`superapp.junction.dev`)",
+      ]
+
+      check {
+        type     = "http"
+        path     = "/health"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+
+    task "http" {
+      driver = "docker"
+
+      template {
+        destination = "services.env"
+        env         = true
+        change_mode = "restart"
+        data        = <<EOH
+MONGO_DSN={{range $index, $service := service (printf "mongodb-%s" (env "NOMAD_NAMESPACE"))}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
+EOH
+
+      }
+
+      config {
+        image = var.docker_image
+        ports = ["http"]
+        args = [
+          "http",
+        ]
+
+        auth {
+          username       = var.registry_username
+          password       = var.registry_password
+          server_address = var.registry_address
+        }
+      }
+
+      env {
+        ENV_NAME              = "${NOMAD_NAMESPACE}"
+        FORWARDED_ALLOWED_IPS = "0.0.0.0"
+        HTTP_ADDRESS          = "0.0.0.0"
+        HTTP_PORT             = "${NOMAD_PORT_http}"
+        JWT_TOKEN_VERSION     = "1.0.0"
+        SENTRY_DSN            = "https://6166193e2bc24153b87e9bfca3d510d4@sentry.snowfall.se/38"
+      }
+    }
+  }
+}
+
