@@ -5,7 +5,7 @@ import phonenumbers
 from snowfall.junction.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
 from snowfall.junction.orders.v1alpha import amqp_pb2 as orders_amqp_pb2
 from snowfall.junction.orders.v1alpha import models_pb2
-from snowfall.junction.providers.save_a_train import adapter as sat_adapter
+from snowfall.junction.providers.save_a_train import adapter as save_a_train_adapter
 from snowfall.junction.providers.save_a_train import cache, criteria
 from snowfall.junction.providers.save_a_train.v1alpha import amqp_pb2
 from snowfall.stdlib.transport import amqp
@@ -37,7 +37,7 @@ class SearchCriteriaConsumer(object):
         self,
         consumer: amqp.Consumer,
         producer: amqp.Producer,
-        adapter: sat_adapter.SaveATrainAdapter,
+        adapter: save_a_train_adapter.SaveATrainAdapter,
     ):
         self._consumer = consumer
         self._producer = producer
@@ -59,12 +59,12 @@ class OrdersConsumer(object):
         consumer: amqp.Consumer,
         offers_cache: cache.OffersCache,
         producer: amqp.Producer,
-        save_a_train_adapter: sat_adapter.SaveATrainAdapter,
+        adapter: save_a_train_adapter.SaveATrainAdapter,
     ):
         self._cache = offers_cache
         self._consumer = consumer
         self._producer = producer
-        self._adapter = save_a_train_adapter
+        self._adapter = adapter
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -82,7 +82,10 @@ class OrdersConsumer(object):
                 task.order,
                 offer_details,
             )
-        except (phonenumbers.NumberParseException, sat_adapter.BookingError) as error:
+        except (
+            phonenumbers.NumberParseException,
+            save_a_train_adapter.BookingError,
+        ) as error:
             await self._producer.publish(
                 models_pb2.OrderResult(
                     order_id=task.order.id,

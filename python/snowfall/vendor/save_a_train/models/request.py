@@ -3,8 +3,8 @@ from typing import Optional, Sequence
 
 from pydantic import BaseModel
 
-from snowfall.vendor.sat.enums import TripType
-from snowfall.vendor.sat.models.booking import Passenger
+from snowfall.vendor.save_a_train.enums import TripType
+from snowfall.vendor.save_a_train.models.booking import Passenger
 
 
 class GeneralSearchResultsRequest(BaseModel):

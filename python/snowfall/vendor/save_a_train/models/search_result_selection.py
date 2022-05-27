@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from snowfall.vendor.sat.models.search import SearchResult
+from snowfall.vendor.save_a_train.models.search import SearchResult
 
 
 class SearchResultSeatPreferenceOption(BaseModel):

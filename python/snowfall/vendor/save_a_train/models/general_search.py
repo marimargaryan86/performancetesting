@@ -4,7 +4,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from snowfall.vendor.sat import normalizers as sat_normalizers
+from snowfall.vendor.save_a_train import normalizers as save_a_train_normalizers
 
 
 class GeneralTrip(BaseModel):
@@ -24,19 +24,19 @@ class GeneralTrip(BaseModel):
     arrival_connections: Optional[str]
     layover_connections: Optional[str]
 
-    _normalize_nullable_fields = sat_normalizers.normalizer(
+    _normalize_nullable_fields = save_a_train_normalizers.normalizer(
         (
             "connections",
             "departure_connections",
             "arrival_connections",
             "layover_connections",
         ),
-        sat_normalizers.normalize_nullable_fields,
+        save_a_train_normalizers.normalize_nullable_fields,
     )
 
-    _normalize_time = sat_normalizers.normalizer(
+    _normalize_time = save_a_train_normalizers.normalizer(
         ("duration",),
-        sat_normalizers.normalize_time,
+        save_a_train_normalizers.normalize_time,
     )
 
 

@@ -17,8 +17,8 @@ from snowfall.junction.orders.v1alpha import models_pb2 as order_models_pb2
 from snowfall.junction.providers.save_a_train import cache, models, train_stations
 from snowfall.junction.providers.save_a_train.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
-from snowfall.vendor.sat import client, enums, exceptions
-from snowfall.vendor.sat import models as sat_models
+from snowfall.vendor.save_a_train import client, enums, exceptions
+from snowfall.vendor.save_a_train import models as save_a_train_models
 
 _CABIN_MAPPING = types.MappingProxyType(
     {
@@ -71,7 +71,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
 
         try:
             await self._client.get_general_search_results(
-                sat_models.request.GeneralSearchResultsRequest(
+                save_a_train_models.request.GeneralSearchResultsRequest(
                     origin_id=origin.id,
                     destination_id=destination.id,
                     trip_type=enums.TripType.one_way,
@@ -90,7 +90,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
 
         try:
             search_response = await self._client.create_search(
-                sat_models.request.CreateSearchRequest(
+                save_a_train_models.request.CreateSearchRequest(
                     origin_id=origin.id,
                     destination_id=destination.id,
                     passengers_ages=list(search_task.criteria.passengers_ages),
@@ -118,7 +118,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
             if self._search_result_matches_requirements(search_result, requirement):
                 try:
                     search_details = await self._client.get_search_result_details(
-                        sat_models.request.SearchResultRequest(
+                        save_a_train_models.request.SearchResultRequest(
                             search_id=search_response.identifier,
                             search_result_id=search_result.identifier,
                         ),
@@ -247,12 +247,12 @@ class SaveATrainAdapter(object):  # noqa: WPS214
     async def _select_search_result(
         self,
         offer_details: tuple[str, int, int, int],
-    ) -> sat_models.search_result_selection.SearchResultSelectionResponse:
+    ) -> save_a_train_models.search_result_selection.SearchResultSelectionResponse:
         search_id, search_result_id, transfer_id, fare_id = offer_details
 
         try:
             return await self._client.select_search_result(
-                sat_models.request.SelectSearchResultRequest(
+                save_a_train_models.request.SelectSearchResultRequest(
                     search_id=search_id,
                     search_result_id=search_result_id,
                     transfer_id=transfer_id,
@@ -268,7 +268,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
 
     def _extract_search_id_and_seat_preference_code(
         self,
-        response: sat_models.search_result_selection.SearchResultSelectionResponse,
+        response: save_a_train_models.search_result_selection.SearchResultSelectionResponse,
     ) -> tuple[str, Optional[str]]:
         seat_preference_code = None
 
@@ -280,7 +280,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
 
     def _search_result_matches_requirements(
         self,
-        search_result: sat_models.search.SearchResult,
+        search_result: save_a_train_models.search.SearchResult,
         requirement: models.SearchResultRequirement,
     ) -> bool:
         departure_at = search_result.departure_datetime.replace(
@@ -312,7 +312,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         order: order_models_pb2.Order,
         search_id: str,
         seat_code: Optional[str],
-    ) -> sat_models.booking.BookingResult:
+    ) -> save_a_train_models.booking.BookingResult:
         title_map = {  # TODO: map unspecified to something else?
             order_models_pb2.Passenger.Title.TITLE_UNSPECIFIED: enums.PassengerTitle.mr,
             order_models_pb2.Passenger.Title.TITLE_MR: enums.PassengerTitle.mr,
@@ -327,11 +327,11 @@ class SaveATrainAdapter(object):  # noqa: WPS214
 
         try:
             return await self._client.create_booking(
-                sat_models.request.CreateBookingRequest(
+                save_a_train_models.request.CreateBookingRequest(
                     search_id=search_id,
                     seat_preference_code=seat_code or "ALLOWED_SEAT_LOCATION.W",
                     passengers=[
-                        sat_models.booking.Passenger(
+                        save_a_train_models.booking.Passenger(
                             title=title_map[passenger.title],
                             first_name=passenger.first_name,
                             last_name=passenger.last_name,
@@ -366,7 +366,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
     async def _confirm_booking(
         self,
         search_id: str,
-    ) -> sat_models.booking.BookingConfirmationResult:
+    ) -> save_a_train_models.booking.BookingConfirmationResult:
         try:
             return await self._client.confirm_booking(search_id)
         except exceptions.SATValidationError as booking_error:
@@ -379,7 +379,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
     async def _get_ticket(
         self,
         search_id: str,
-    ) -> sat_models.booking.TicketInfo:
+    ) -> save_a_train_models.booking.TicketInfo:
         try:
             return await self._client.get_ticket(search_id)
         except exceptions.SATValidationError as booking_error:

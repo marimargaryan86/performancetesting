@@ -4,7 +4,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from snowfall.vendor.sat import normalizers as sat_normalizers
+from snowfall.vendor.save_a_train import normalizers as save_a_train_normalizers
 
 
 class Language(BaseModel):
@@ -37,9 +37,9 @@ class SearchResult(BaseModel):
     kind_of: str
     changes_count: int
 
-    _normalize_time = sat_normalizers.normalizer(
+    _normalize_time = save_a_train_normalizers.normalizer(
         ("duration",),
-        sat_normalizers.normalize_time,
+        save_a_train_normalizers.normalize_time,
     )
 
 
@@ -52,7 +52,7 @@ class SearchResponse(BaseModel):
     expiration_time_left: timedelta
     search_results: list[SearchResult] = Field(..., alias="results")
 
-    _normalize_time = sat_normalizers.normalizer(
+    _normalize_time = save_a_train_normalizers.normalizer(
         ("expiration_time_left",),
-        sat_normalizers.normalize_time,
+        save_a_train_normalizers.normalize_time,
     )

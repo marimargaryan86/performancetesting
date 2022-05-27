@@ -23,7 +23,7 @@ from snowfall.stdlib import service
 from snowfall.stdlib.persistence import redis
 from snowfall.stdlib.transport import amqp
 from snowfall.stdlib.transport.grpc import client as grpc_client
-from snowfall.vendor.sat import client
+from snowfall.vendor.save_a_train import client
 
 
 class _OffersSettings(service.Settings):
@@ -196,7 +196,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
                 connection=amqp_connection,
                 exchange=amqp.Exchange("orders"),
             ),
-            save_a_train_adapter=adapter.SaveATrainAdapter(
+            adapter=adapter.SaveATrainAdapter(
                 save_a_train_client=save_a_train_client,
                 train_station_repository=train_stations.TrainStationRepository(
                     train_stations=await _load_train_stations(

@@ -4,7 +4,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from snowfall.vendor.sat.models.search import StationName
+from snowfall.vendor.save_a_train.models.search import StationName
 
 
 class Train(BaseModel):
@@ -15,8 +15,8 @@ class Train(BaseModel):
 class SearchResultTransferChange(BaseModel):
     origin_station_names: list[StationName]
     destination_station_names: list[StationName]
-    origin_station_sat_uid: str
-    destination_station_sat_uid: str
+    origin_station_save_a_train_uid: str
+    destination_station_save_a_train_uid: str
     departure_datetime: datetime
     arrival_datetime: datetime
     train: Train

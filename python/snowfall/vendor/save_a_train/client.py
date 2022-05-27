@@ -8,24 +8,26 @@ import httpx
 import structlog
 
 from snowfall.stdlib.time import date_to_age
-from snowfall.vendor.sat.enums import PassengerType
-from snowfall.vendor.sat.exceptions import SATValidationError, SATValueError
-from snowfall.vendor.sat.models.booking import (
+from snowfall.vendor.save_a_train.enums import PassengerType
+from snowfall.vendor.save_a_train.exceptions import SATValidationError, SATValueError
+from snowfall.vendor.save_a_train.models.booking import (
     BookingConfirmationResult,
     BookingResult,
     TicketInfo,
 )
-from snowfall.vendor.sat.models.general_search import GeneralSearchResponse
-from snowfall.vendor.sat.models.request import (
+from snowfall.vendor.save_a_train.models.general_search import GeneralSearchResponse
+from snowfall.vendor.save_a_train.models.request import (
     CreateBookingRequest,
     CreateSearchRequest,
     GeneralSearchResultsRequest,
     SearchResultRequest,
     SelectSearchResultRequest,
 )
-from snowfall.vendor.sat.models.search import SearchResponse
-from snowfall.vendor.sat.models.search_result_details import SearchResultDetails
-from snowfall.vendor.sat.models.search_result_selection import (
+from snowfall.vendor.save_a_train.models.search import SearchResponse
+from snowfall.vendor.save_a_train.models.search_result_details import (
+    SearchResultDetails,
+)
+from snowfall.vendor.save_a_train.models.search_result_selection import (
     SearchResultSelectionResponse,
 )
 

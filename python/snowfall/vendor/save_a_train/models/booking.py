@@ -4,9 +4,9 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from snowfall.vendor.sat import enums
-from snowfall.vendor.sat import normalizers as sat_normalizers
-from snowfall.vendor.sat.models.search import StationName
+from snowfall.vendor.save_a_train import enums
+from snowfall.vendor.save_a_train import normalizers as save_a_train_normalizers
+from snowfall.vendor.save_a_train.models.search import StationName
 
 
 class Passenger(BaseModel):
@@ -28,9 +28,9 @@ class TripInfo(BaseModel):
     trip_duration: timedelta
     fare: str
 
-    _normalize_time = sat_normalizers.normalizer(
+    _normalize_time = save_a_train_normalizers.normalizer(
         ("trip_duration",),
-        sat_normalizers.normalize_time,
+        save_a_train_normalizers.normalize_time,
     )
 
 
