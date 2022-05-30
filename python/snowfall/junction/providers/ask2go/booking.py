@@ -6,7 +6,7 @@ import pycountry
 import structlog
 
 from snowfall.junction.orders.v1alpha import models_pb2
-from snowfall.junction.providers.ask2go import criteria, notifications
+from snowfall.junction.providers.ask2go import criteria, models, notifications
 from snowfall.stdlib.format import protobuf
 from snowfall.vendor.ask2go import client, errors
 from snowfall.vendor.ask2go.models import booking, common
@@ -31,15 +31,6 @@ class BookingHandler(object):
         offer_id: str,
         details: tuple[str, str],
     ) -> booking.Booking:
-        # todo: handle multiple passengers when client does
-        passenger = order.passengers[0]
-        gender = common.Gender.unknown
-
-        if passenger.gender == models_pb2.Passenger.GENDER_MALE:
-            gender = common.Gender.male
-        elif passenger.gender == models_pb2.Passenger.GENDER_FEMALE:
-            gender = common.Gender.female
-
         number = phonenumbers.parse(order.contact_details.phone.e164_number)
         country = pycountry.countries.get(
             alpha_2=order.contact_details.address.region_code,
@@ -48,17 +39,20 @@ class BookingHandler(object):
         booking_result = await self._client.create_booking(
             pricing_id=details[0],
             transaction_id=details[1],
-            passenger=common.Passenger(
-                first_name=passenger.first_name,
-                last_name=passenger.last_name,
-                name_title=models_pb2.Passenger.Title.Name(passenger.title),
-                gender=gender,
-                type=criteria.get_passenger_type(
-                    protobuf.protobuf_to_date(passenger.date_of_birth),
-                    datetime.date.today(),  # todo: date of travel
-                ),
-                birth_date=protobuf.protobuf_to_date(passenger.date_of_birth),
-            ),
+            passengers=[
+                common.Passenger(
+                    first_name=passenger.first_name,
+                    last_name=passenger.last_name,
+                    name_title=models_pb2.Passenger.Title.Name(passenger.title),
+                    gender=models.gender_from_proto(passenger.gender),
+                    type=criteria.get_passenger_type(
+                        protobuf.protobuf_to_date(passenger.date_of_birth),
+                        datetime.date.today(),  # todo: date of travel
+                    ),
+                    birth_date=protobuf.protobuf_to_date(passenger.date_of_birth),
+                )
+                for passenger in order.passengers
+            ],
             contact=common.Contact(
                 address="\n".join(order.contact_details.address.address_lines),
                 city=order.contact_details.address.locality,

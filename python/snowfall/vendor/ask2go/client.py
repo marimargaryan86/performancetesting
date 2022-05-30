@@ -2,7 +2,7 @@ import contextlib
 import http
 import inspect
 import json
-from typing import Any, Optional
+from typing import Any, Optional, Sequence
 
 import httpx
 
@@ -105,7 +105,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         self,
         pricing_id: str,
         transaction_id: str,
-        passenger: common.Passenger,
+        passengers: Sequence[common.Passenger],
         contact: common.Contact,
     ) -> booking.Booking:
         response = await self._make_request(
@@ -116,7 +116,7 @@ class Ask2GoClient(object):  # noqa: WPS214
             payload=parsers.parse_create_booking_request(
                 pricing_id,
                 transaction_id,
-                passenger,
+                passengers,
                 contact,
             ),
         )

@@ -1,5 +1,7 @@
 import datetime
-from typing import Any, Union
+from typing import Any, Sequence, Union
+
+import more_itertools
 
 from snowfall.vendor.ask2go.models import common, search
 
@@ -51,16 +53,17 @@ def parse_search_request(criteria: search.CreateSearchCriteria) -> dict[str, Any
 def parse_create_booking_request(
     pricing_id: str,
     transaction_id: str,
-    passenger: common.Passenger,
+    passengers: Sequence[common.Passenger],
     contact: common.Contact,
 ) -> dict[str, Any]:
+    first_passenger = more_itertools.first(passengers)
     return {
         "pricingId": pricing_id,
         "transactionId": transaction_id,
         "contactDetails": {
-            "firstName": passenger.first_name,
-            "lastName": passenger.last_name,
-            "title": passenger.name_title,
+            "firstName": first_passenger.first_name,
+            "lastName": first_passenger.last_name,
+            "title": first_passenger.name_title,
             "address": {
                 "street": contact.address,
                 "city": contact.city,
@@ -80,7 +83,8 @@ def parse_create_booking_request(
                 "dateOfBirth": passenger.birth_date.strftime("%d-%m-%Y"),
                 "gender": passenger.gender.value,
                 "passengerType": passenger.type.value,
-            },
+            }
+            for passenger in passengers
         ],
         "isPriceChangeAccepted": False,
         "isScheduleChangeAccepted": False,

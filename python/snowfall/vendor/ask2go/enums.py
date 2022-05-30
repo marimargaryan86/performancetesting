@@ -14,7 +14,7 @@ class AirCabinClassType(enum.Enum):
 
 class PassengerType(enum.Enum):
     adult = "ADT"
-    child = "CHD"
+    child = "CNN"
     infant = "INF"
 
 

@@ -7,7 +7,9 @@ import zoneinfo
 from typing import Optional, Sequence
 
 from snowfall.common.v1alpha import models_pb2
+from snowfall.junction.orders.v1alpha import models_pb2 as orders_models
 from snowfall.stdlib.format import protobuf
+from snowfall.vendor.ask2go.models import common
 
 _CABIN_MAPPING = types.MappingProxyType(
     {
@@ -30,6 +32,14 @@ def cabin_to_proto(cabin: Optional[str]) -> models_pb2.CabinClass.Type.V:
         return _CABIN_MAPPING[cabin]
     except KeyError:
         return models_pb2.CabinClass.TYPE_UNSPECIFIED
+
+
+def gender_from_proto(gender: orders_models.Passenger.Gender.V) -> common.Gender:
+    if gender == orders_models.Passenger.GENDER_MALE:
+        return common.Gender.male
+    elif gender == orders_models.Passenger.GENDER_FEMALE:
+        return common.Gender.female
+    return common.Gender.unknown
 
 
 @dataclasses.dataclass(frozen=True)
