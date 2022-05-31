@@ -92,12 +92,16 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
 
         try:
             openapi_result = await self._validator.validate_request(openapi_request)
-        except PathNotFound:
-            raise exceptions.HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        except PathNotFound as err:
+            raise exceptions.HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+            ) from err
         except InvalidSchemaValue as err:
             return await handlers.validation_error_handler(resolved_request, err)
-        except OpenAPIError:
-            raise exceptions.HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+        except OpenAPIError as err:
+            raise exceptions.HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+            ) from err
 
         resolved_request.scope["jwt"] = openapi_result.security.get("jwt")
         resolved_request.scope["query_string"] = openapi_result.parameters.query

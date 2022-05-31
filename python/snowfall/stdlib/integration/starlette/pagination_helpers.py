@@ -15,10 +15,11 @@ class Pagination(object):
 
 
 def get_pagination(request: requests.Request) -> Pagination:
-    limit = request.query_params.get(PAGE_LIMIT_KEY)
+    limit_str = request.query_params.get(PAGE_LIMIT_KEY)
+    limit: Optional[int] = None
 
-    if limit is not None:
-        limit = int(limit)
+    if limit_str is not None:
+        limit = int(limit_str)
 
     return Pagination(
         cursor=request.query_params.get(PAGE_CURSOR_KEY),

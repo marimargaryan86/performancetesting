@@ -54,8 +54,8 @@ class DictClient(Client):
     async def get(self, identifier: str) -> models_pb2.OfferSearch:
         try:
             return self._searches[identifier]
-        except KeyError:
-            raise NotFoundError()
+        except KeyError as err:
+            raise NotFoundError() from err
 
 
 class GrpcClient(Client):

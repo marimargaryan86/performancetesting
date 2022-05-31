@@ -117,5 +117,5 @@ class SmtpNotifier(Notifier):
         async with self._client:
             try:
                 await self._client.send_message(email)
-            except Exception as error:  # noqa: PIE786
+            except Exception as error:
                 raise NotificationError("Error sending notification") from error

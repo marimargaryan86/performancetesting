@@ -23,8 +23,8 @@ class Trip(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         try:
             trip = await client.get(request.path_params["tripId"])
-        except trips.NotFoundError:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        except trips.NotFoundError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
         return models.JsonApiResponse(
             models.Body(
@@ -44,8 +44,8 @@ class TripSegments(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         try:
             trip = await trips_client.get(request.path_params["tripId"])
-        except trips.NotFoundError:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        except trips.NotFoundError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
         pagination = pagination_helpers.get_pagination(request)
         sequence_page = sequence.paginate(
@@ -83,8 +83,8 @@ class TripSearch(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         try:
             trip_search = await client.get(request.path_params["tripSearchId"])
-        except trip_searches.NotFoundError:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        except trip_searches.NotFoundError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
         return models.JsonApiResponse(
             models.Body(
@@ -110,8 +110,10 @@ class TripSearches(endpoints.HTTPEndpoint):
                 places_client.get(body["origin"]),
                 places_client.get(body["destination"]),
             )
-        except places.NotFoundError:
-            raise exceptions.HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY)
+        except places.NotFoundError as err:
+            raise exceptions.HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY,
+            ) from err
 
         if body.get("departureAfter"):
             departure_after = parser.isoparse(body["departureAfter"])
@@ -155,8 +157,8 @@ class TripsByTripSearch(endpoints.HTTPEndpoint):
                 cursor=pagination.cursor,
                 limit=pagination.limit,
             )
-        except trip_searches.NotFoundError:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        except trip_searches.NotFoundError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
         return models.JsonApiResponse(
             models.Body(

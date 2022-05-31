@@ -75,7 +75,7 @@ class RepositoryProtocol(Protocol[Record]):
         """Use for find queries with a filter."""
 
 
-class _AbstractRepository(abc.ABC, Generic[Record]):  # noqa: WPS214
+class _AbstractRepository(abc.ABC, Generic[Record]):
     _indexes: list[pymongo.IndexModel] = []
     _timeout_kwargs = {
         core.AgnosticCollection.aggregate: _MAX_TIME_MS_CAMEL,

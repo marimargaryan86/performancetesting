@@ -48,119 +48,79 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "adfc6cf69c7f8c50fd24c793964eef18f0ac321315439d94945820612849c388",
-              "url": "https://files.pythonhosted.org/packages/ef/c8/2e7f7feaf804b7206e6cc8fa3f0f49834a78f7cb127813d2c45e42d5f7bf/protobuf-3.20.1-py2.py3-none-any.whl"
+              "hash": "79cd8d0a269b714f6b32641f86928c718e8d234466919b3f552bfb069dbb159b",
+              "url": "https://files.pythonhosted.org/packages/5d/28/23501a64edec2cea74d5ecf35cf94f6149abf5c3698b18c825d75f25c31c/protobuf-4.21.1-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "7e371f10abe57cee5021797126c93479f59fccc9693dafd6bd5633ab67808a91",
-              "url": "https://files.pythonhosted.org/packages/00/f6/061b2d6ae57c458dbd37df4edb667872f65001a124a7023cd7bced76c09a/protobuf-3.20.1-cp39-cp39-win_amd64.whl"
+              "hash": "5d9b5c8270461706973c3871c6fbdd236b51dfe9dab652f1fb6a36aa88287e47",
+              "url": "https://files.pythonhosted.org/packages/06/86/643f14a2ef25774fdcada5762b61ffbe1678bbf428748d0c9e0ad7576960/protobuf-4.21.1.tar.gz"
             },
             {
               "algorithm": "sha256",
-              "hash": "6f50601512a3d23625d8a85b1638d914a0970f17920ff39cec63aaef80a93fb7",
-              "url": "https://files.pythonhosted.org/packages/0b/db/2b07ad1542511b0b2b2c1796c316c5063f9724b86240f5e6accc1fde5e5f/protobuf-3.20.1-cp39-cp39-macosx_10_9_x86_64.whl"
+              "hash": "b3d7d4b4945fe3c001403b6c24442901a5e58c0a3059290f5a63523ed4435f82",
+              "url": "https://files.pythonhosted.org/packages/23/1b/750072ca46d1ee9601d294e9a35b1f5843c6d2afcf26ac82ba17ada0e72a/protobuf-4.21.1-cp37-cp37m-win_amd64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "adc31566d027f45efe3f44eeb5b1f329da43891634d61c75a5944e9be6dd42c9",
-              "url": "https://files.pythonhosted.org/packages/19/96/1283259c25bc48a6df98fa096f66fc568b40137b93806ef5ff66a2d166b1/protobuf-3.20.1.tar.gz"
+              "hash": "72d357cc4d834cc85bd957e8b8e1f4b64c2eac9ca1a942efeb8eb2e723fca852",
+              "url": "https://files.pythonhosted.org/packages/3a/f6/b8eb3209e52caa5fab9ee9d9c717e840210a69fb5080ab71f4117c33d538/protobuf-4.21.1-cp310-abi3-win_amd64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "af0ebadc74e281a517141daad9d0f2c5d93ab78e9d455113719a45a49da9db4e",
-              "url": "https://files.pythonhosted.org/packages/21/9b/258771d72fd2cf27eed3cfea1fc957a12666ccde394b294ac563fca23f2d/protobuf-3.20.1-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.whl"
+              "hash": "52c1e44e25f2949be7ffa7c66acbfea940b0945dd416920231f7cb30ea5ac6db",
+              "url": "https://files.pythonhosted.org/packages/3d/8b/a368f8d229c07c6d249dc814523325aac0a450dab4cdc3bf94dc658c3462/protobuf-4.21.1-cp310-abi3-win32.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "62f1b5c4cd6c5402b4e2d63804ba49a327e0c386c99b1675c8a0fefda23b2067",
-              "url": "https://files.pythonhosted.org/packages/36/16/cfba8fcd817df923827233115df35dc048af12d0afa13df79b303865855a/protobuf-3.20.1-cp37-cp37m-win_amd64.whl"
+              "hash": "3767c64593a49c7ac0accd08ed39ce42744405f0989d468f0097a17496fdbe84",
+              "url": "https://files.pythonhosted.org/packages/6f/57/2e196a92de469085cb28a614c14ef8abfd165362a1ab915851abe452a35c/protobuf-4.21.1-cp37-abi3-macosx_10_9_universal2.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "dd5789b2948ca702c17027c84c2accb552fc30f4622a98ab5c51fcfe8c50d3e7",
-              "url": "https://files.pythonhosted.org/packages/3c/59/b0ac614cdb5e73d3a7171e3de8d9cf933cc76068305b13ac9351c9985835/protobuf-3.20.1-cp38-cp38-win32.whl"
+              "hash": "a4c0c6f2f95a559e59a0258d3e4b186f340cbdc5adec5ce1bc06d01972527c88",
+              "url": "https://files.pythonhosted.org/packages/7c/af/d26c01b7f6ae33ff7175943b79b9c1294ed989104df9f263e0d404a43147/protobuf-4.21.1-cp37-abi3-manylinux2014_x86_64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "cd68be2559e2a3b84f517fb029ee611546f7812b1fdd0aa2ecc9bc6ec0e4fdde",
-              "url": "https://files.pythonhosted.org/packages/4c/be/bdd22d86d24e5b8b08673d80be70d1a72c255f85152ff09b28490904092a/protobuf-3.20.1-cp310-cp310-manylinux_2_12_x86_64.manylinux2010_x86_64.whl"
+              "hash": "0d4719e724472e296062ba8e82a36d64693fcfdb550d9dff98af70ca79eafe3d",
+              "url": "https://files.pythonhosted.org/packages/8a/ef/c96162e4cf78832cc076f2fe56cc48f73f0152c015eee36019273ff721a4/protobuf-4.21.1-cp37-abi3-manylinux2014_aarch64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "755f3aee41354ae395e104d62119cb223339a8f3276a0cd009ffabfcdd46bb0c",
-              "url": "https://files.pythonhosted.org/packages/65/ea/8acd2032abe0b573893f28f7409b95695c650ce55f3e2a08c02b0d94b08c/protobuf-3.20.1-cp37-cp37m-win32.whl"
+              "hash": "b309fda192850ac4184ca1777aab9655564bc8d10a9cc98f10e1c8bf11295c22",
+              "url": "https://files.pythonhosted.org/packages/92/a3/b9b2714f079d0ab25cfcdc286c9c15b5462c7426bd6fc2938591e99edc2c/protobuf-4.21.1-py2.py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "ff8d8fa42675249bb456f5db06c00de6c2f4c27a065955917b28c4f15978b9c3",
-              "url": "https://files.pythonhosted.org/packages/70/75/df318e565cf126a9464b9220ef6adfecb44fb7c68df140bc5680d0ed05c3/protobuf-3.20.1-cp310-cp310-manylinux2014_aarch64.whl"
+              "hash": "34400fd76f85bdae9a2e9c1444ea4699c0280962423eff4418765deceebd81b5",
+              "url": "https://files.pythonhosted.org/packages/95/98/bf0bf07bc60a3e5cb00b27f665b1936be4dbcdea7178389fcae0972d57c5/protobuf-4.21.1-cp38-cp38-win32.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "cb29edb9eab15742d791e1025dd7b6a8f6fcb53802ad2f6e3adcb102051063ab",
-              "url": "https://files.pythonhosted.org/packages/7b/4b/12c4959e2065a567acb6c632cfbf97cd12e0e5a48d3d267cb034249588bb/protobuf-3.20.1-cp38-cp38-manylinux2014_aarch64.whl"
+              "hash": "c8829092c5aeb61619161269b2f8a2e36fd7cb26abbd9282d3bc453f02769146",
+              "url": "https://files.pythonhosted.org/packages/bf/35/9d0e43b45a9e45809aa4f4d4d5c147ef2c2d2cfbfc773636820d8051a0bd/protobuf-4.21.1-cp38-cp38-win_amd64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "9016d01c91e8e625141d24ec1b20fed584703e527d28512aa8c8707f105a683c",
-              "url": "https://files.pythonhosted.org/packages/89/1a/b4d72e1d7134ffac2156d1dfc3b9ddb21d1664ff392e1e5fe2882a117f81/protobuf-3.20.1-cp310-cp310-win32.whl"
+              "hash": "32fff501b6df3050936d1839b80ea5899bf34db24792d223d7640611f67de15a",
+              "url": "https://files.pythonhosted.org/packages/c8/74/86c8e258ffe6d6a9d6c10bc6a5fb61acf89b4b841d43a6c6b7c106a54848/protobuf-4.21.1-cp37-cp37m-win32.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "db977c4ca738dd9ce508557d4fce0f5aebd105e158c725beec86feb1f6bc20d8",
-              "url": "https://files.pythonhosted.org/packages/8f/cd/d2a90e55397acae08363e26db3a1bbd6674c16a891ab8ee033b44e59af09/protobuf-3.20.1-cp39-cp39-win32.whl"
+              "hash": "3f2ed842e8ca43b790cb4a101bcf577226e0ded98a6a6ba2d5e12095a08dc4da",
+              "url": "https://files.pythonhosted.org/packages/d2/54/b22d7c991be15135ca91a0770b2f957b5f6afa4a878b2ee7b343c9a20047/protobuf-4.21.1-cp39-cp39-win_amd64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "e250a42f15bf9d5b09fe1b293bdba2801cd520a9f5ea2d7fb7536d4441811d20",
-              "url": "https://files.pythonhosted.org/packages/92/0e/b8a60441178c8725fb3afa648e80c312a77feab31e7831d69c672b3c18cc/protobuf-3.20.1-cp37-cp37m-macosx_10_9_x86_64.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "7403941f6d0992d40161aa8bb23e12575637008a5a02283a930addc0508982f9",
-              "url": "https://files.pythonhosted.org/packages/98/d9/63b47f719d3cc0f29b36e870ad1d9447b8eef398c2a7b548e67298d9f652/protobuf-3.20.1-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "284f86a6207c897542d7e956eb243a36bb8f9564c1742b253462386e96c6b78f",
-              "url": "https://files.pythonhosted.org/packages/9f/b0/bf25cdbab8841d9111f0f13578150d232339a6483383589648592fe84f4b/protobuf-3.20.1-cp39-cp39-manylinux2014_aarch64.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "3cc797c9d15d7689ed507b165cd05913acb992d78b379f6014e013f9ecb20996",
-              "url": "https://files.pythonhosted.org/packages/bd/ca/0d522203bedd17a8c53cb869e1dfd7ac9140c66b76b3cbca25bf601448b2/protobuf-3.20.1-cp310-cp310-macosx_10_9_universal2.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "06059eb6953ff01e56a25cd02cca1a9649a75a7e65397b5b9b4e929ed71d10cf",
-              "url": "https://files.pythonhosted.org/packages/bf/2a/8924d1fbdf6cec34e9e58ee84b2a8bbdb2b58730c4cfab5a29934977ea6d/protobuf-3.20.1-cp38-cp38-macosx_10_9_x86_64.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "32ca378605b41fd180dfe4e14d3226386d8d1b002ab31c969c366549e66a2bb7",
-              "url": "https://files.pythonhosted.org/packages/c0/9c/bb88091287418ae1cf8af2bb9ed9710748a562b9abc227e4884d687a8650/protobuf-3.20.1-cp310-cp310-win_amd64.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "69ccfdf3657ba59569c64295b7d51325f91af586f8d5793b734260dfe2e94e2c",
-              "url": "https://files.pythonhosted.org/packages/c1/4d/1d46234fbdff4ee05cb7ec6cb6ea9282769fa9fefd72d93de4b85fd3d8c4/protobuf-3.20.1-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "77053d28427a29987ca9caf7b72ccafee011257561259faba8dd308fda9a8739",
-              "url": "https://files.pythonhosted.org/packages/e4/5e/381d134b6c9484d6d80dcace24dd3e0cc165d89b800b162fc52b4ac6941a/protobuf-3.20.1-cp38-cp38-win_amd64.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "cdee09140e1cd184ba9324ec1df410e7147242b94b5f8b0c64fc89e38a8ba531",
-              "url": "https://files.pythonhosted.org/packages/e5/49/dea4f62f8bc299a53732327c6e823711bce0edf3dd036f3102fe0f6a4198/protobuf-3.20.1-cp37-cp37m-manylinux2014_aarch64.whl"
+              "hash": "2b35602cb65d53c168c104469e714bf68670335044c38eee3c899d6a8af03ffc",
+              "url": "https://files.pythonhosted.org/packages/f0/c5/27489a5111708721159386e4fc4922abc7e19ca00123785d076bb27202c0/protobuf-4.21.1-cp39-cp39-win32.whl"
             }
           ],
           "project_name": "protobuf",
           "requires_dists": [],
           "requires_python": ">=3.7",
-          "version": "3.20.1"
+          "version": "4.21.1"
         },
         {
           "artifacts": [

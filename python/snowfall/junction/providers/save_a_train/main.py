@@ -95,9 +95,8 @@ async def _offers(app: service.Application[_OffersSettings]) -> None:
 
 async def _searches(app: service.Application[_SearchSettings]) -> None:
     async with contextlib.AsyncExitStack() as stack:
-        # https://github.com/encode/httpx/issues/2092
-        http_client = await stack.enter_async_context(  # type: ignore[var-annotated]
-            httpx.AsyncClient(  # type: ignore[arg-type]
+        http_client = await stack.enter_async_context(
+            httpx.AsyncClient(
                 timeout=app.settings.api_timeout,
             ),
         )
@@ -154,9 +153,8 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
 
 async def _orders(app: service.Application[_OrdersSettings]) -> None:
     async with contextlib.AsyncExitStack() as stack:
-        # https://github.com/encode/httpx/issues/2092
-        http_client = await stack.enter_async_context(  # type: ignore[var-annotated]
-            httpx.AsyncClient(  # type: ignore[arg-type]
+        http_client = await stack.enter_async_context(
+            httpx.AsyncClient(
                 timeout=app.settings.api_timeout,
             ),
         )

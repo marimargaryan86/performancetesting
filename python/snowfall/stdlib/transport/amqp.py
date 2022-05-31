@@ -197,7 +197,7 @@ class Consumer(object):
 
             try:
                 await callback(msg)
-            except Exception:  # noqa: PIE786
+            except Exception:
                 self._logger.exception()
                 span.set_status("nok")
 

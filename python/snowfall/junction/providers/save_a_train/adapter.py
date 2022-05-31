@@ -100,7 +100,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                 ),
             )
         except exceptions.SATValidationError as search_error:
-            raise NoResultsError(search_error)
+            raise NoResultsError(search_error) from search_error
         except httpx.HTTPStatusError as http_error:
             if http_error.response.text:
                 raise_http_error_with_text(http_error)
@@ -260,7 +260,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                 ),
             )
         except exceptions.SATValidationError as search_error:
-            raise BookingError(search_error)
+            raise BookingError(search_error) from search_error
         except httpx.HTTPStatusError as http_error:
             if http_error.response.text:
                 raise_http_error_with_text(http_error)
@@ -357,7 +357,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                 ),
             )
         except exceptions.SATValidationError as booking_error:
-            raise BookingError(booking_error)
+            raise BookingError(booking_error) from booking_error
         except httpx.HTTPStatusError as http_error:
             if http_error.response.text:
                 raise_http_error_with_text(http_error)
@@ -370,7 +370,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         try:
             return await self._client.confirm_booking(search_id)
         except exceptions.SATValidationError as booking_error:
-            raise BookingError(booking_error)
+            raise BookingError(booking_error) from booking_error
         except httpx.HTTPStatusError as http_error:
             if http_error.response.text:
                 raise_http_error_with_text(http_error)
@@ -383,7 +383,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         try:
             return await self._client.get_ticket(search_id)
         except exceptions.SATValidationError as booking_error:
-            raise BookingError(booking_error)
+            raise BookingError(booking_error) from booking_error
         except httpx.HTTPStatusError as http_error:
             if http_error.response.text:
                 raise_http_error_with_text(http_error)

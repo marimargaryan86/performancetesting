@@ -32,8 +32,8 @@ class JWTAuthenticationBackend(authentication.AuthenticationBackend):
     def _get_client_id_from_jwt_token(self, jwt_token: str) -> str:
         try:
             payload = self._get_payload_from_jwt_token(jwt_token)
-        except jwt.exceptions.PyJWTError:
-            raise authentication.AuthenticationError("Invalid jwt token.")
+        except jwt.exceptions.PyJWTError as err:
+            raise authentication.AuthenticationError("Invalid jwt token.") from err
 
         if payload.get("version") != self._token_version:
             raise authentication.AuthenticationError(

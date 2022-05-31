@@ -23,8 +23,8 @@ class Offer(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         try:
             offer = await client.get(request.path_params["offerId"])
-        except offers.NotFoundError:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        except offers.NotFoundError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
         return models.JsonApiResponse(
             models.Body(
@@ -47,8 +47,10 @@ class OfferSearches(endpoints.HTTPEndpoint):
 
         try:
             segments = await trips_to_segments.transform(trip_ids=body["trips"])
-        except trip_ids_to_segments.MissingTripsError:
-            raise exceptions.HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY)
+        except trip_ids_to_segments.MissingTripsError as err:
+            raise exceptions.HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY,
+            ) from err
 
         offer_search = await offer_search_client.create(
             request=models_pb2.OfferSearch(
@@ -86,8 +88,8 @@ class OfferSearch(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         try:
             offer_search = await client.get(request.path_params["offerSearchId"])
-        except offer_searches.NotFoundError:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        except offer_searches.NotFoundError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
         return models.JsonApiResponse(
             models.Body(
@@ -112,8 +114,8 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
         # todo: Check should probably be done in the RPC, but that requires refactoring.
         try:
             await search_client.get(offer_search_id)
-        except offer_searches.NotFoundError:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        except offer_searches.NotFoundError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
         pagination = pagination_helpers.get_pagination(request)
         offers_page = await client.find_offers_by_offer_search(

@@ -25,8 +25,8 @@ class Order(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         try:
             order = await client.get(request.path_params["orderId"])
-        except orders.NotFoundError:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        except orders.NotFoundError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
         return models.JsonApiResponse(
             models.Body(

@@ -32,7 +32,7 @@ class _ImportSettings(service.Settings):
     passenger_name_records_address: Sequence[str]
 
 
-async def _serve(app: service.Application[_GrpcSettings]) -> None:  # noqa: WPS210
+async def _serve(app: service.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
     )

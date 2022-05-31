@@ -69,14 +69,14 @@ def _sign_cursor(cursor: Cursor) -> str:
 def _parse(encoded: str) -> Cursor:
     try:
         raw = base64.urlsafe_b64decode(encoded.encode()).decode()
-    except binascii.Error:
-        raise CursorError("Invalid payload.")
+    except binascii.Error as err:
+        raise CursorError("Invalid payload.") from err
 
     cursor = Cursor()
 
     try:
         text_format.Parse(raw, cursor, allow_field_number=True)
-    except text_format.ParseError:
-        raise CursorError("Invalid payload.")
+    except text_format.ParseError as parse_err:
+        raise CursorError("Invalid payload.") from parse_err
 
     return cursor

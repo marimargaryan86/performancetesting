@@ -19,8 +19,8 @@ class Cabin(endpoints.HTTPEndpoint):
                 models_pb2.CabinClass.Type.DESCRIPTOR,
                 cabin_class_id,
             )
-        except KeyError:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        except KeyError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
         return models.JsonApiResponse(
             models.Body(

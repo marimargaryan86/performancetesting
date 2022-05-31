@@ -52,8 +52,10 @@ class DictClient(Client):
     async def get(self, place_id: str) -> models_pb2.Place:
         try:
             return self._places[place_id]
-        except KeyError:
-            raise NotFoundError("Place with ID '{id}' not found.".format(id=place_id))
+        except KeyError as err:
+            raise NotFoundError(
+                "Place with ID '{id}' not found.".format(id=place_id),
+            ) from err
 
     async def find(
         self,

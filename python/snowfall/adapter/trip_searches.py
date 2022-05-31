@@ -80,8 +80,8 @@ class DictClient(Client):
     async def get(self, identifier: str) -> trips_pb2.TripSearch:
         try:
             return self._searches[identifier]
-        except KeyError:
-            raise NotFoundError()
+        except KeyError as err:
+            raise NotFoundError() from err
 
     async def list_trips_by_trip_search(
         self,
@@ -95,8 +95,8 @@ class DictClient(Client):
                     trips=self._trips_cache[identifier],
                 ),
             )
-        except KeyError:
-            raise NotFoundError()
+        except KeyError as err:
+            raise NotFoundError() from err
 
     async def _generate_trips(self, trip_search: trips_pb2.TripSearch) -> None:
         self._trips_cache[trip_search.id] = [

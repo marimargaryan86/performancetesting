@@ -27,7 +27,7 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
         [
             PassengerNameRecordService(
                 passenger_name_records=passenger_name_records.PassengerNameRecordRepository(
-                    mongo.passenger_name_records.passenger_name_record,
+                    mongo.passenger_name_records.passenger_name_records,
                 ),
             ),
         ],

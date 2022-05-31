@@ -53,8 +53,8 @@ class DictClient(Client):
     async def get(self, trip_id: str) -> models_pb2.TripReference:
         try:
             return self._trips[trip_id]
-        except KeyError:
-            raise NotFoundError()
+        except KeyError as err:
+            raise NotFoundError() from err
 
     async def find_by_ids(
         self,

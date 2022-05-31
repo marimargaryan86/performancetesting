@@ -14,8 +14,8 @@ class Segment(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         try:
             segment = await client.get(request.path_params["segmentId"])
-        except segments.NotFoundError:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        except segments.NotFoundError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
         return models.JsonApiResponse(
             models.Body(

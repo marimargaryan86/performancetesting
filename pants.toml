@@ -61,6 +61,7 @@ extra_requirements = [
     "flake8-executable",
     "flake8-if-expr",
     "flake8-logging-format",
+    "flake8-noqa",
     "flake8-pie",
     "flake8-print",
     "flake8-simplify",

@@ -24,4 +24,4 @@ key = serialization.load_pem_private_key(
 )
 
 token = jwt.encode(payload=payload, key=key, algorithm="RS256")  # type: ignore[arg-type]
-print(token)  # noqa: T001, WPS421
+print(token)  # noqa: T201, WPS421

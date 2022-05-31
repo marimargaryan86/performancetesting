@@ -22,8 +22,8 @@ class Leg(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         try:
             leg = await client.get(request.path_params["legId"])
-        except legs_adapter.NotFoundError:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        except legs_adapter.NotFoundError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
         return models.JsonApiResponse(
             models.Body(
@@ -43,8 +43,8 @@ class LegType(endpoints.HTTPEndpoint):
                 models_pb2.Schedule.Type.DESCRIPTOR,
                 leg_type_id,
             )
-        except KeyError:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        except KeyError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
         return models.JsonApiResponse(
             models.Body(
@@ -98,8 +98,8 @@ class LegsBySegmentId(endpoints.HTTPEndpoint):
 
         try:
             segment = await segments_client.get(segment_id)
-        except segments_adapter.NotFoundError:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        except segments_adapter.NotFoundError as segments_err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from segments_err
 
         try:
             legs_page = await legs_client.find_by_ids(
@@ -107,8 +107,8 @@ class LegsBySegmentId(endpoints.HTTPEndpoint):
                 limit=pagination.limit,
                 cursor=pagination.cursor,
             )
-        except legs_adapter.NotFoundError:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        except legs_adapter.NotFoundError as legs_err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from legs_err
 
         return models.JsonApiResponse(
             models.Body(
@@ -142,8 +142,8 @@ class LegsByTripId(endpoints.HTTPEndpoint):
 
         try:
             trip = await trips_client.get(request.path_params["tripId"])
-        except trips_adapter.NotFoundError:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        except trips_adapter.NotFoundError as trips_err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from trips_err
 
         try:
             legs_page = await legs_client.find_by_ids(
@@ -151,8 +151,8 @@ class LegsByTripId(endpoints.HTTPEndpoint):
                 limit=pagination.limit,
                 cursor=pagination.cursor,
             )
-        except legs_adapter.NotFoundError:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        except legs_adapter.NotFoundError as legs_err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from legs_err
 
         return models.JsonApiResponse(
             models.Body(
@@ -192,8 +192,8 @@ class LegsByTripSearchId(endpoints.HTTPEndpoint):
                 limit=pagination.limit,
                 cursor=pagination.cursor,
             )
-        except legs_adapter.NotFoundError:
-            raise exceptions.HTTPException(_NOT_FOUND_STATUS)
+        except legs_adapter.NotFoundError as err:
+            raise exceptions.HTTPException(_NOT_FOUND_STATUS) from err
 
         return models.JsonApiResponse(
             models.Body(
@@ -218,7 +218,7 @@ class LegsByTripSearchId(endpoints.HTTPEndpoint):
     async def _get_all_trips(
         self,
         request: requests.Request,
-        trip_searches_client: trip_searches_adapter.Client = lagom.injectable,
+        trip_searches_client: trip_searches_adapter.Client,
     ) -> list[models_pb2.TripReference]:
         trips: list[models_pb2.TripReference] = []
         trips_cursor = None
@@ -228,8 +228,8 @@ class LegsByTripSearchId(endpoints.HTTPEndpoint):
                     request.path_params["tripSearchId"],
                     cursor=trips_cursor,
                 )
-            except trip_searches_adapter.NotFoundError:
-                raise exceptions.HTTPException(_NOT_FOUND_STATUS)
+            except trip_searches_adapter.NotFoundError as err:
+                raise exceptions.HTTPException(_NOT_FOUND_STATUS) from err
 
             trips.extend(trips_page.trips)
             trips_cursor = trips_page.next_page_token

@@ -27,7 +27,7 @@ from snowfall.stdlib.logging import sentry, stdout
 
 
 class Settings(pydantic.BaseModel):
-    class Config(object):  # noqa: WPS431
+    class Config(object):
         allow_mutation = False
 
 

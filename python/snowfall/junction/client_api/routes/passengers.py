@@ -18,8 +18,8 @@ class PassengerGender(endpoints.HTTPEndpoint):
                 models_pb2.Passenger.Gender.DESCRIPTOR,
                 passenger_gender_id,
             )
-        except KeyError:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        except KeyError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
         return models.JsonApiResponse(
             models.Body(
@@ -72,8 +72,8 @@ class PassengerTitle(endpoints.HTTPEndpoint):
                 models_pb2.Passenger.Title.DESCRIPTOR,
                 passenger_title_id,
             )
-        except KeyError:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        except KeyError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
         return models.JsonApiResponse(
             models.Body(

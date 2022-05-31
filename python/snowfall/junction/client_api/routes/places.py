@@ -17,8 +17,8 @@ class Place(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         try:
             place = await client.get(request.path_params["placeId"])
-        except places.NotFoundError:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        except places.NotFoundError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
         return models.JsonApiResponse(
             models.Body(
@@ -62,8 +62,8 @@ class PlaceType(endpoints.HTTPEndpoint):
                 models_pb2.Place.Type.DESCRIPTOR,
                 place_type_id,
             )
-        except KeyError:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        except KeyError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
         return models.JsonApiResponse(
             models.Body(
