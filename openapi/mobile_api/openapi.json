@@ -20,6 +20,12 @@
       "tags": [
         "internal"
       ]
+    },
+    {
+      "name": "Places",
+      "tags": [
+        "places"
+      ]
     }
   ],
   "tags": [
@@ -27,6 +33,11 @@
       "name": "internal",
       "description": "Endpoints not for public use.",
       "x-displayName": "Internal"
+    },
+    {
+      "name": "places",
+      "description": "Endpoints providing information about places.",
+      "x-displayName": "Places"
     }
   ],
   "paths": {
@@ -82,6 +93,192 @@
         "description": "Check the application health.",
         "x-internal": true,
         "security": []
+      }
+    },
+    "/places": {
+      "get": {
+        "summary": "Places",
+        "tags": [
+          "places"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "description": "Places list.",
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Place"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-places",
+        "description": "Get places.",
+        "security": []
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Place": {
+        "title": "Place",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "places"
+            ]
+          },
+          "attributes": {
+            "type": "object",
+            "required": [
+              "name",
+              "latitude",
+              "longitude",
+              "countryCode",
+              "countryName",
+              "timeZone",
+              "iataCode"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "example": "Stockholm Arlanda Airport",
+                "readOnly": true
+              },
+              "latitude": {
+                "type": "number",
+                "format": "float",
+                "example": 59.651164062,
+                "minimum": -90,
+                "maximum": 90
+              },
+              "longitude": {
+                "type": "number",
+                "format": "float",
+                "example": 17.917829662,
+                "minimum": -180,
+                "maximum": 180
+              },
+              "countryCode": {
+                "type": "string",
+                "pattern": "^[A-Z]{2}$",
+                "minLength": 2,
+                "maxLength": 2,
+                "example": "SE",
+                "readOnly": true
+              },
+              "countryName": {
+                "type": "string",
+                "example": "Sweden",
+                "readOnly": true,
+                "nullable": true
+              },
+              "timeZone": {
+                "type": "string",
+                "example": "Europe/Stockholm",
+                "readOnly": true
+              },
+              "iataCode": {
+                "type": "string",
+                "example": "ARN",
+                "pattern": "^[A-Z]{3}$",
+                "minLength": 3,
+                "maxLength": 3,
+                "nullable": true,
+                "readOnly": true
+              }
+            }
+          },
+          "relationships": {
+            "type": "object",
+            "required": [
+              "types"
+            ],
+            "properties": {
+              "types": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/PlaceTypeIdentifier"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "A place is an indexed reference to a location that Junction might have related content for. It is specified in a trip search to state where a passenger wishes to travel from/to. Each place is allocated a unique identifier.\n\nPlaces are curated by feeds from GTFS sources.  A place can be a rail station, Airport...",
+        "x-examples": {
+          "example-1": {
+            "id": "cb327cb5-9228-5413-a6e4-e220e01496dc",
+            "type": "places",
+            "attributes": {
+              "countryCode": "ES",
+              "countryName": "Spain",
+              "iataCode": null,
+              "latitude": 42.424701,
+              "longitude": 3.158034,
+              "name": "Portbou",
+              "timeZone": "Europe/Madrid"
+            },
+            "relationships": {
+              "types": {
+                "data": [
+                  {
+                    "id": "airport",
+                    "type": "place-types"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "PlaceTypeIdentifier": {
+        "title": "Place Type Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "airport"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "place-types"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
       }
     }
   }
