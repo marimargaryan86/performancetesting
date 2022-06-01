@@ -33,9 +33,14 @@ class PlacesRepository(object):
         places_response = await self._junction_client.list_places()
 
         for place in places_response["data"]:
-            place["attributes"]["countryName"] = pycountry.countries.get(
+            country = pycountry.countries.get(
                 alpha_2=place["attributes"]["countryCode"],
-            ).name
+            )
+
+            if country:
+                place["attributes"]["countryName"] = country.name
+            else:
+                place["attributes"]["countryName"] = None
 
         await self._put_to_cache(rapidjson.dumps(places_response))
 
