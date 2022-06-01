@@ -41,7 +41,9 @@ class JunctionClient(object):  # noqa: WPS214
         cursor: Optional[str] = None,
     ) -> Dict[str, Any]:
         request_parameters = {
-            key: vl for key, vl in (("limit", limit), ("cursor", cursor)) if vl
+            key: vl
+            for key, vl in (("page[limit]", limit), ("page[cursor]", cursor))
+            if vl
         }
         response = await self._client.get(
             "{0}/places".format(self._api_url),
