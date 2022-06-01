@@ -6,7 +6,7 @@ import pycountry
 import structlog
 
 from snowfall.junction.orders.v1alpha import models_pb2
-from snowfall.junction.providers.ask2go import criteria, models, notifications
+from snowfall.junction.providers.ask2go import models, notifications, passengers
 from snowfall.stdlib.format import protobuf
 from snowfall.vendor.ask2go import client, errors
 from snowfall.vendor.ask2go.models import booking, common
@@ -45,7 +45,7 @@ class BookingHandler(object):
                     last_name=passenger.last_name,
                     name_title=models_pb2.Passenger.Title.Name(passenger.title),
                     gender=models.gender_from_proto(passenger.gender),
-                    type=criteria.get_passenger_type(
+                    type=passengers.get_passenger_type(
                         protobuf.protobuf_to_date(passenger.date_of_birth),
                         datetime.date.today(),  # todo: date of travel
                     ),
