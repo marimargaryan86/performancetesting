@@ -15,8 +15,11 @@ class Train(BaseModel):
 class SearchResultTransferChange(BaseModel):
     origin_station_names: list[StationName]
     destination_station_names: list[StationName]
-    origin_station_save_a_train_uid: str
-    destination_station_save_a_train_uid: str
+    origin_station_save_a_train_uid: str = Field(..., alias="origin_station_sat_uid")
+    destination_station_save_a_train_uid: str = Field(
+        ...,
+        alias="destination_station_sat_uid",
+    )
     departure_datetime: datetime
     arrival_datetime: datetime
     train: Train
