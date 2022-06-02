@@ -394,6 +394,8 @@ class SATClient(object):  # noqa: WPS214
         response.raise_for_status()
 
         response_data = response.json()
+        if "errors" in response_data:
+            raise SATValidationError(response_data)
 
         return GeneralSearchResponse(**response_data)
 

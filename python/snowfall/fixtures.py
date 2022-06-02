@@ -19,6 +19,7 @@ PLACES = (
 )
 TRIPS = ("9d672f0e-0934-4388-8568-03e40c0bf0e9",)
 SCHEDULES = ("d77e4acb-5aa1-47ad-9a15-126c0fa0e157",)
+PROVIDER_OFFERS = ("88a8dcc9-deff-4a0e-bd96-b0faea5ea90f",)
 OFFERS = ("5927b3ce-fbd7-4f8b-b456-b1b7fd44cdad",)
 SEGMENTS = ("9aeed7e9-fa69-4fd5-8590-e14e402e1346",)
 STOPS = (
@@ -116,7 +117,7 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
             offers_pb2.OfferGroup(
                 offers=[
                     offers_pb2.Offer(
-                        id=str(uuid.uuid4()),
+                        id=PROVIDER_OFFERS[0],
                         segment_details=[
                             offers_pb2.OfferSegmentDetails(
                                 id=str(segment_id),

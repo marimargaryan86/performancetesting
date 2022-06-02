@@ -3,9 +3,10 @@ import datetime
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.adapter import orders
+from snowfall.adapter import orders as orders_adapter
 from snowfall.common.v1alpha import phone_number_pb2, postal_address_pb2
 from snowfall.junction.client_api import resources
+from snowfall.junction.client_api.validators import order_request_validator
 from snowfall.junction.orders.v1alpha import models_pb2 as order_models_pb2
 from snowfall.stdlib.format.protobuf import date_to_protobuf, slug_to_enum_value
 from snowfall.stdlib.integration.starlette import (
@@ -15,17 +16,19 @@ from snowfall.stdlib.integration.starlette import (
 )
 
 _ADDRESS = "address"
+_OFFERS = "offers"
+_OFFER_AGGREGATE_ID = "offerAggregateId"
 
 
 class Order(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        client: orders.Client = lagom.injectable,
+        client: orders_adapter.Client = lagom.injectable,
     ) -> responses.Response:
         try:
             order = await client.get(request.path_params["orderId"])
-        except orders.NotFoundError as err:
+        except orders_adapter.NotFoundError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
         return models.JsonApiResponse(
@@ -40,15 +43,14 @@ class Order(endpoints.HTTPEndpoint):
     async def patch(
         self,
         request: requests.Request,
-        orders_client: orders.Client = lagom.injectable,
+        orders_client: orders_adapter.Client = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
 
+        offers = body[_OFFERS]
         order = await orders_client.add_offers(
             order_id=request.path_params["orderId"],
-            offer_ids=[
-                offer_id for offer in body["offers"] for offer_id in offer["offerIds"]
-            ],
+            offer_ids=[offer_id for offer in offers for offer_id in offer["offerIds"]],
         )
 
         return models.JsonApiResponse(
@@ -66,7 +68,7 @@ class Orders(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        client: orders.Client = lagom.injectable,
+        client: orders_adapter.Client = lagom.injectable,
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
         response = await client.find(limit=pagination.limit, cursor=pagination.cursor)
@@ -85,18 +87,18 @@ class Orders(endpoints.HTTPEndpoint):
             ),
         )
 
+    @order_request_validator
     async def post(
         self,
         request: requests.Request,
-        orders_client: orders.Client = lagom.injectable,
+        orders_client: orders_adapter.Client,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
+        offers = body[_OFFERS]
 
         contact_details = body["contactDetails"]
         order = await orders_client.create(
-            offer_ids=[
-                offer_id for offer in body["offers"] for offer_id in offer["offerIds"]
-            ],
+            offer_ids=[offer_id for offer in offers for offer_id in offer["offerIds"]],
             passengers=[
                 order_models_pb2.Passenger(
                     first_name=passenger["firstName"],
@@ -113,7 +115,7 @@ class Orders(endpoints.HTTPEndpoint):
                         datetime.date.fromisoformat(passenger["dateOfBirth"]),
                     ),
                 )
-                for passenger in body["offers"][0]["passengers"]
+                for passenger in offers[0]["passengers"]
             ],
             contact_details=order_models_pb2.ContactDetails(
                 email=contact_details["email"],
