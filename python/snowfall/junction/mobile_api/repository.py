@@ -63,6 +63,49 @@ class PlacesRepository(object):
         )
 
 
+class UsersRepository(
+    mixins.FindByIdMixin[dict[str, Any]],
+    mixins.InsertMixin[dict[str, Any]],
+    repository.DefaultRepository,
+):
+    """"""
+
+    async def create(self, document: Any) -> None:
+        await self._execute(self._collection.insert_one, document)
+
+
+class OtpRepository(object):
+    def __init__(
+        self,
+        redis_client: redis.Client[str],
+        cache_ttl: datetime.timedelta,
+    ) -> None:
+        self._redis = redis_client
+        self._ttl = cache_ttl
+
+    async def create(self, email: str, verification_code: str) -> None:
+        await self._redis.put(email, verification_code)
+        await self._redis.put_expires_at(
+            email,
+            datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
+        )
+
+    async def check(self, email: str, verification_code: str) -> bool:
+        otp = await self._redis.get(email)
+        if otp == verification_code:
+            await self._redis.delete(email)
+            return True
+        return False
+
+
+class MockRepository(
+    mixins.AllMixin[dict[str, Any]],
+    mixins.InsertMixin[dict[str, Any]],
+    repository.DefaultRepository,
+):
+    """Used for tests with various mixins."""
+
+
 class OrdersRepository(
     mixins.FindByIdMixin[dict[str, Any]],
     mixins.InsertMixin[dict[str, Any]],

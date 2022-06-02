@@ -3,15 +3,16 @@ import random
 from typing import Callable, cast
 
 import aioredis
+import aiosmtplib
 import uvicorn
 from asgiref.typing import ASGIApplication
 from motor import motor_asyncio
 from sentry_sdk.integrations import asgi
-from starlette.middleware import Middleware
+from starlette.middleware import Middleware, authentication
 
-from snowfall.junction.mobile_api import bootstrap, repository
+from snowfall.junction.mobile_api import bootstrap, otp_middleware, repository, smtp
 from snowfall.stdlib import service
-from snowfall.stdlib.integration.starlette import middlewares, validation
+from snowfall.stdlib.integration.starlette import handlers, middlewares, validation
 from snowfall.stdlib.persistence import filesystem, redis
 from snowfall.vendor.junction import client
 
@@ -24,8 +25,8 @@ def _factory(
 ) -> Callable[[], ASGIApplication]:
     def decorator() -> ASGIApplication:
         junction_client = client.JunctionClient(
-            api_url=random.choice(app.settings.junction_url),  # nosec
-            token=app.settings.junction_token,
+            api_url=random.choice(app.settings.junction_api_address),  # nosec
+            token=app.settings.junction_api_token,
         )
 
         places_repository = repository.PlacesRepository(
@@ -39,9 +40,27 @@ def _factory(
             ),
             cache_ttl=app.settings.places_cache_ttl,
         )
-
+        otp_repository = repository.OtpRepository(
+            redis_client=redis.Client[str](
+                aioredis.from_url(
+                    random.choice(app.settings.redis_dsn),  # nosec
+                    decode_responses=True,
+                ).client(),
+                prefix=app.name,
+            ),
+            cache_ttl=app.settings.otp_cache_ttl,
+        )
         mongo = motor_asyncio.AsyncIOMotorClient(
             app.settings.mongo_dsn,  # nosec
+        )
+        smtp_cl = smtp.EmailClient(
+            aiosmtplib.SMTP(
+                hostname=app.settings.smtp_dsn.host,
+                port=app.settings.smtp_dsn.port,
+                username=app.settings.smtp_dsn.user,
+                password=app.settings.smtp_dsn.password,
+                start_tls=True,
+            ),
         )
         return cast(
             ASGIApplication,
@@ -49,6 +68,11 @@ def _factory(
                 bootstrap.create_app(
                     dependencies=bootstrap.create_dependencies(
                         places_repository=places_repository,
+                        users_repository=repository.UsersRepository(
+                            mongo[app.settings.database]["users"],
+                        ),
+                        otp_repository=otp_repository,
+                        smtp_client=smtp_cl,
                         orders_repository=repository.OrdersRepository(
                             mongo[_SERVICE_NAME][_ORDERS_COLLECTION],
                         ),
@@ -62,6 +86,11 @@ def _factory(
                                 filesystem.PkgLoader("mobile_api"),
                             ),
                             excluded_status_codes={http.HTTPStatus.METHOD_NOT_ALLOWED},
+                        ),
+                        Middleware(
+                            authentication.AuthenticationMiddleware,
+                            backend=otp_middleware.OTPAuthenticationBackend(),
+                            on_error=handlers.auth_error_handler,
                         ),
                     ],
                 ),

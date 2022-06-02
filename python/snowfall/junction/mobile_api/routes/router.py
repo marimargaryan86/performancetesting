@@ -1,7 +1,7 @@
 from lagom.integrations import starlette
 from starlette import routing
 
-from snowfall.junction.mobile_api.routes import health, orders, places
+from snowfall.junction.mobile_api.routes import health, orders, places, users
 
 
 def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Route]:
@@ -14,4 +14,6 @@ def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Rou
             orders.Order,
             name="ViewOrder",
         ),
+        dependencies.route("/verification-code", users.OTPGenerate),
+        dependencies.route("/users", users.User),
     ]

@@ -104,6 +104,7 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
             ) from err
 
         resolved_request.scope["jwt"] = openapi_result.security.get("jwt")
+        resolved_request.scope["otp"] = openapi_result.security.get("otp")
         resolved_request.scope["query_string"] = openapi_result.parameters.query
 
         return await self._dispatch(call_next, openapi_request, resolved_request)

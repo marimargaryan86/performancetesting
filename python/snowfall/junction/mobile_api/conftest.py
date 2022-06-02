@@ -1,29 +1,24 @@
 import datetime
 import http
-from typing import Mapping, Sequence
+from typing import Mapping, Optional, Sequence
 
 import pytest
+from lagom.integrations import starlette
 from starlette import applications, testclient
 from starlette.middleware import Middleware
 
-from snowfall.junction.mobile_api import bootstrap, repository
+from snowfall.junction.mobile_api import bootstrap, repository, smtp
 from snowfall.stdlib.integration.starlette import middlewares, validation
 from snowfall.stdlib.persistence import filesystem, redis
 from snowfall.vendor.junction import client
 
 
 def _create_app(
-    custom_middlewares: Sequence[Middleware],
-    orders_repository: repository.OrdersRepository,
-    junction_client: client.JunctionClient,
-    places_repository: repository.PlacesRepository,
+    dependencies: starlette.StarletteIntegration,
+    custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
     return bootstrap.create_app(
-        dependencies=bootstrap.create_dependencies(
-            orders_repository=orders_repository,
-            junction_client=junction_client,
-            places_repository=places_repository,
-        ),
+        dependencies=dependencies,
         custom_middlewares=custom_middlewares,
     )
 
@@ -69,12 +64,23 @@ def places_repository(
 
 
 @pytest.fixture()
-def app(
+def app(  # noqa: WPS211
     places_repository: repository.PlacesRepository,
+    users_repository: repository.UsersRepository,
+    otp_repository: repository.OtpRepository,
+    smtp_client: smtp.EmailClient,
     orders_repository: repository.OrdersRepository,
     junction_client: client.JunctionClient,
 ) -> applications.Starlette:
     return _create_app(
+        bootstrap.create_dependencies(
+            orders_repository,
+            junction_client,
+            places_repository,
+            users_repository,
+            otp_repository,
+            smtp_client,
+        ),
         [
             Middleware(
                 middlewares.ValidationMiddleware,
@@ -85,9 +91,6 @@ def app(
                 excluded_status_codes={http.HTTPStatus.METHOD_NOT_ALLOWED},
             ),
         ],
-        orders_repository=orders_repository,
-        junction_client=junction_client,
-        places_repository=places_repository,
     )
 
 

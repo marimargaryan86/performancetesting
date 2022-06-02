@@ -1,6 +1,7 @@
 import datetime
 
 import aioredis
+import aiosmtplib
 import pytest
 from fakeredis import aioredis as fakeredis
 from motor import core, motor_asyncio
@@ -20,6 +21,7 @@ from snowfall.adapter import (
     trips,
 )
 from snowfall.junction.mobile_api import repository as mobile_repo
+from snowfall.junction.mobile_api import smtp
 from snowfall.junction.offers.v1alpha import models_pb2
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.mongo import repository
@@ -36,6 +38,23 @@ def _mongo_mock_configure(
 
 
 repository._configure_collection = _mongo_mock_configure  # noqa: WPS437
+
+
+@pytest.fixture
+def users_repository() -> mobile_repo.UsersRepository:
+    mongo = motor_asyncio.AsyncIOMotorClient()
+    return mongo["test"]["users"]
+
+
+@pytest.fixture
+def otp_repository() -> mobile_repo.OtpRepository:
+    mongo = motor_asyncio.AsyncIOMotorClient()
+    return mongo["test"]["otp"]
+
+
+@pytest.fixture
+def smtp_client() -> smtp.EmailClient:
+    return smtp.EmailClient(aiosmtplib.SMTP())
 
 
 @pytest.fixture
