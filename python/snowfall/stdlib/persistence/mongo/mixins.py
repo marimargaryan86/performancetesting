@@ -37,11 +37,12 @@ class FindByIdMixin(Generic[Record]):
     async def find_by_id(
         self: repository.RepositoryProtocol[Record],
         document_id: str,
+        selector: str = "_id",
     ) -> Optional[Record]:
         return await self._execute(
             self._collection.find_one,
             {
-                "_id": document_id,
+                selector: document_id,
             },
         )
 

@@ -1,13 +1,19 @@
 import datetime
+import uuid
+from typing import Any, Mapping
 
 import pycountry
 import rapidjson
+from pymongo import results
 
 from snowfall.junction.mobile_api import resources
 from snowfall.stdlib.persistence import redis
+from snowfall.stdlib.persistence.mongo import mixins, repository
 from snowfall.vendor.junction import client
 
 _PLACES_REDIS_KEY = "places"
+_DATA_ACCESSOR = "data"
+_ATTRIBUTES_ACCESSOR = "attributes"
 
 
 class PlacesRepository(object):
@@ -27,26 +33,26 @@ class PlacesRepository(object):
         if places_response_json:
             return [
                 resources.PlaceResource(**place)
-                for place in rapidjson.loads(places_response_json)["data"]
+                for place in rapidjson.loads(places_response_json)[_DATA_ACCESSOR]
             ]
 
         places_response = await self._junction_client.list_places()
 
-        for place in places_response["data"]:
+        for place in places_response[_DATA_ACCESSOR]:
             country = pycountry.countries.get(
-                alpha_2=place["attributes"]["countryCode"],
+                alpha_2=place[_ATTRIBUTES_ACCESSOR]["countryCode"],
             )
 
             if country:
-                place["attributes"]["countryName"] = country.name
+                place[_ATTRIBUTES_ACCESSOR]["countryName"] = country.name
             else:
-                place["attributes"]["countryName"] = None
+                place[_ATTRIBUTES_ACCESSOR]["countryName"] = None
 
         await self._put_to_cache(rapidjson.dumps(places_response))
 
         return [
             resources.PlaceResource(**place_enhanced)
-            for place_enhanced in places_response["data"]
+            for place_enhanced in places_response[_DATA_ACCESSOR]
         ]
 
     async def _put_to_cache(self, places_json: str) -> None:
@@ -54,4 +60,45 @@ class PlacesRepository(object):
         await self._redis.put_expires_at(
             _PLACES_REDIS_KEY,
             datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
+        )
+
+
+class OrdersRepository(
+    mixins.FindByIdMixin[dict[str, Any]],
+    mixins.InsertMixin[dict[str, Any]],
+    repository.DefaultRepository,
+):
+    async def create_order(
+        self,
+        request_body: Mapping[str, Any],
+        junction_order: Mapping[str, Any],
+    ) -> dict[str, Any]:
+        order_id = str(uuid.uuid4())
+        document = request_body[_DATA_ACCESSOR]
+        document["id"] = order_id
+        attributes = document[_ATTRIBUTES_ACCESSOR]
+        attributes["orderResults"] = junction_order[_DATA_ACCESSOR][
+            _ATTRIBUTES_ACCESSOR
+        ]["orderResults"]
+        attributes["junctionOrderId"] = junction_order[_DATA_ACCESSOR]["id"]
+        attributes["createdAt"] = datetime.datetime.utcnow()
+        document["links"] = {"self": "https://snowfall.se"}
+        await self.insert(document)
+        return document
+
+    async def update_order_results(
+        self,
+        order_id: str,
+        junction_order: Mapping[str, Any],
+    ) -> results.UpdateResult:
+        return await self._execute(
+            self._collection.update_one,
+            {"id": order_id},
+            {
+                "$set": {
+                    "attributes.orderResults": junction_order[_DATA_ACCESSOR][
+                        _ATTRIBUTES_ACCESSOR
+                    ]["orderResults"],
+                },
+            },
         )

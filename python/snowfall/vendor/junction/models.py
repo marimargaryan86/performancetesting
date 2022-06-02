@@ -1,5 +1,5 @@
 import dataclasses
-from typing import Any, Sequence
+from typing import Any, Mapping, Sequence
 
 from snowfall.stdlib import string
 
@@ -7,6 +7,13 @@ from snowfall.stdlib import string
 def dict_factory_to_camel(dict_items: Sequence[tuple[str, Any]]) -> dict[str, Any]:
     return {
         string.to_camel(dict_key): dict_value for dict_key, dict_value in dict_items
+    }
+
+
+def dict_factory_to_snake(input_dict: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        string.to_snake(dict_key): dict_value
+        for dict_key, dict_value in input_dict.items()
     }
 
 

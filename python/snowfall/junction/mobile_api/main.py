@@ -5,6 +5,7 @@ from typing import Callable, cast
 import aioredis
 import uvicorn
 from asgiref.typing import ASGIApplication
+from motor import motor_asyncio
 from sentry_sdk.integrations import asgi
 from starlette.middleware import Middleware
 
@@ -14,16 +15,21 @@ from snowfall.stdlib.integration.starlette import middlewares, validation
 from snowfall.stdlib.persistence import filesystem, redis
 from snowfall.vendor.junction import client
 
+_SERVICE_NAME = "mobile-api"
+_ORDERS_COLLECTION = "orders"
+
 
 def _factory(
     app: service.Application[bootstrap.Settings],
 ) -> Callable[[], ASGIApplication]:
     def decorator() -> ASGIApplication:
+        junction_client = client.JunctionClient(
+            api_url=random.choice(app.settings.junction_url),  # nosec
+            token=app.settings.junction_token,
+        )
+
         places_repository = repository.PlacesRepository(
-            junction_client=client.JunctionClient(
-                api_url=random.choice(app.settings.junction_api_address),  # nosec
-                token=app.settings.junction_api_token,
-            ),
+            junction_client=junction_client,
             redis_client=redis.Client[str](
                 aioredis.from_url(
                     random.choice(app.settings.redis_dsn),  # nosec
@@ -34,12 +40,19 @@ def _factory(
             cache_ttl=app.settings.places_cache_ttl,
         )
 
+        mongo = motor_asyncio.AsyncIOMotorClient(
+            app.settings.mongo_dsn,  # nosec
+        )
         return cast(
             ASGIApplication,
             asgi.SentryAsgiMiddleware(
                 bootstrap.create_app(
                     dependencies=bootstrap.create_dependencies(
                         places_repository=places_repository,
+                        orders_repository=repository.OrdersRepository(
+                            mongo[_SERVICE_NAME][_ORDERS_COLLECTION],
+                        ),
+                        junction_client=junction_client,
                     ),
                     custom_middlewares=[
                         Middleware(
@@ -76,7 +89,7 @@ def _serve(app: service.Application[bootstrap.Settings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="mobile-api")
+    entrypoint = service.Entrypoint(name=_SERVICE_NAME)
 
     entrypoint.enter_with_commands(
         service.Command(

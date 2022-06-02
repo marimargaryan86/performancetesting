@@ -1,9 +1,8 @@
 import datetime
 import http
-from typing import Mapping, Optional, Sequence
+from typing import Mapping, Sequence
 
 import pytest
-from lagom.integrations import starlette
 from starlette import applications, testclient
 from starlette.middleware import Middleware
 
@@ -14,11 +13,17 @@ from snowfall.vendor.junction import client
 
 
 def _create_app(
-    dependencies: starlette.StarletteIntegration,
-    custom_middlewares: Optional[Sequence[Middleware]] = None,
+    custom_middlewares: Sequence[Middleware],
+    orders_repository: repository.OrdersRepository,
+    junction_client: client.JunctionClient,
+    places_repository: repository.PlacesRepository,
 ) -> applications.Starlette:
     return bootstrap.create_app(
-        dependencies=dependencies,
+        dependencies=bootstrap.create_dependencies(
+            orders_repository=orders_repository,
+            junction_client=junction_client,
+            places_repository=places_repository,
+        ),
         custom_middlewares=custom_middlewares,
     )
 
@@ -66,9 +71,10 @@ def places_repository(
 @pytest.fixture()
 def app(
     places_repository: repository.PlacesRepository,
+    orders_repository: repository.OrdersRepository,
+    junction_client: client.JunctionClient,
 ) -> applications.Starlette:
     return _create_app(
-        bootstrap.create_dependencies(places_repository),
         [
             Middleware(
                 middlewares.ValidationMiddleware,
@@ -79,6 +85,9 @@ def app(
                 excluded_status_codes={http.HTTPStatus.METHOD_NOT_ALLOWED},
             ),
         ],
+        orders_repository=orders_repository,
+        junction_client=junction_client,
+        places_repository=places_repository,
     )
 
 

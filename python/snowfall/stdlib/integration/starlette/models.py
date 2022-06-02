@@ -3,6 +3,7 @@ from typing import Any, Mapping, Optional, Sequence, Union
 
 import pydantic
 import rapidjson
+from starlette import background as starlette_background
 from starlette import responses
 
 AnyMapping = Mapping[str, Any]
@@ -60,9 +61,11 @@ class JsonApiResponse(responses.JSONResponse):
         body: Body,
         status_code: int = 200,
         headers: Optional[Mapping[str, Any]] = None,
+        background: Optional[starlette_background.BackgroundTask] = None,
     ) -> None:
         super().__init__(
             content=rapidjson.loads(body.json(exclude_unset=True, by_alias=True)),
             status_code=int(status_code),
             headers=dict(headers or {}),
+            background=background,
         )
