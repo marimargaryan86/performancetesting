@@ -55,14 +55,20 @@ job "mobile-api-http" {
     task "http" {
       driver = "docker"
 
+      vault {
+        policies = ["mobile-api-development"]
+      }
       template {
         destination = "services.env"
         env         = true
         change_mode = "restart"
         data        = <<EOH
 MONGO_DSN={{range $index, $service := service (printf "mongodb-%s" (env "NOMAD_NAMESPACE"))}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
+REDIS_DSN={{range $index, $service := service (printf "redis-%s" (env "NOMAD_NAMESPACE"))}}redis://{{.Address}}:{{.Port}}// {{end}}
+{{ with secret (printf "kv/%s/mobile-api" (env "NOMAD_NAMESPACE")) }}
+JUNCTION_API_TOKEN={{ .Data.data.junction_api_token }}
+{{ end }}
 EOH
-
       }
 
       config {
@@ -85,6 +91,7 @@ EOH
         HTTP_ADDRESS          = "0.0.0.0"
         HTTP_PORT             = "${NOMAD_PORT_http}"
         JWT_TOKEN_VERSION     = "1.0.0"
+        JUNCTION_API_ADDRESS  = "https://api.junction.dev"
         SENTRY_DSN            = "https://6166193e2bc24153b87e9bfca3d510d4@sentry.snowfall.se/38"
       }
     }
