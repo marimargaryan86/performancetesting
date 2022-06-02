@@ -1,4 +1,3 @@
-import collections
 import datetime
 from typing import Mapping, Sequence
 
@@ -10,7 +9,6 @@ from snowfall.common.v1alpha import models_pb2 as common_models_pb2
 from snowfall.junction.offers.v1alpha import amqp_pb2, models_pb2
 from snowfall.junction.providers.ask2go import criteria
 from snowfall.stdlib.format import protobuf
-from snowfall.vendor.ask2go import enums
 
 _SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
     offer_search_id="SEARCH1",
@@ -121,33 +119,3 @@ def test_criteria_with_expected_passengers_are_generated(
     assert first_search_task.criteria.adults == expected["adults"]
     assert first_search_task.criteria.children == expected["children"]
     assert first_search_task.criteria.infants == expected["infants"]
-
-
-@pytest.mark.parametrize(
-    "cabin_classes, expected",
-    [
-        ([], [enums.AirCabinClassType.any_]),
-        (
-            [common_models_pb2.CabinClass.TYPE_UNSPECIFIED],
-            [enums.AirCabinClassType.any_],
-        ),
-        (
-            [common_models_pb2.CabinClass.TYPE_ECONOMY],
-            [enums.AirCabinClassType.economy],
-        ),
-        (
-            [
-                common_models_pb2.CabinClass.TYPE_BUSINESS,
-                common_models_pb2.CabinClass.TYPE_FIRST,
-            ],
-            [enums.AirCabinClassType.business, enums.AirCabinClassType.first],
-        ),
-    ],
-)
-def test_cabin_class_mapping(
-    cabin_classes: Sequence[common_models_pb2.CabinClass.Type.ValueType],
-    expected: Sequence[enums.AirCabinClassType],
-) -> None:
-    assert collections.Counter(
-        criteria.get_cabin_classes(cabin_classes),
-    ) == collections.Counter(expected)

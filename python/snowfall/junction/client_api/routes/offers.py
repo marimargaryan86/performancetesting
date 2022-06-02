@@ -4,7 +4,6 @@ import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.adapter import offer_searches, offers
-from snowfall.common.v1alpha import models_pb2 as common_pb2
 from snowfall.junction.client_api import resources
 from snowfall.junction.client_api.transformers import trip_ids_to_segments
 from snowfall.junction.offers.v1alpha import models_pb2
@@ -53,11 +52,6 @@ class OfferSearches(endpoints.HTTPEndpoint):
                 status.HTTP_422_UNPROCESSABLE_ENTITY,
             ) from err
 
-        try:
-            cabin_classes = body["cabinClasses"]["data"]
-        except KeyError:
-            cabin_classes = []
-
         offer_search = await offer_search_client.create(
             request=models_pb2.OfferSearch(
                 trip=models_pb2.TripOfferSearch(
@@ -69,13 +63,6 @@ class OfferSearches(endpoints.HTTPEndpoint):
                             ),
                         )
                         for passenger in body["passengers"]
-                    ],
-                    cabin_classes=[
-                        protobuf.slug_to_enum_value(  # type: ignore[misc]
-                            descriptor=common_pb2.CabinClass.Type.DESCRIPTOR,
-                            name=cabin_class,
-                        )
-                        for cabin_class in cabin_classes
                     ],
                 ),
             ),

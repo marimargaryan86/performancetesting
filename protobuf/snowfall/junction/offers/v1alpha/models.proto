@@ -16,7 +16,6 @@ message OfferSearch {
 message TripOfferSearch {
   repeated snowfall.common.v1alpha.Segment segments = 1;
   repeated Passenger passengers = 2;
-  repeated snowfall.common.v1alpha.CabinClass.Type cabin_classes = 4;
   LoyaltyCard loyalty_card = 3;
 }
 
