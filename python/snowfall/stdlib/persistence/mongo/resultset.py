@@ -42,10 +42,7 @@ class ResultSet(abc.ABC, Generic[_Record], AsyncIterator[_Record]):
         if self._custom_sort:
             raise RuntimeError("Cursors do not yet support sorted result sets.")
 
-        if not self._last or self._fetched < self._limit:
-            return ""
-
-        return cursor.marshal(cursor.new(self._last, self._filter))
+        return cursor.marshal(cursor.new(self._last or "", self._filter))
 
     async def take(self) -> _Record:
         return await self.__anext__()

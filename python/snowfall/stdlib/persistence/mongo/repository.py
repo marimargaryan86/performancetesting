@@ -185,15 +185,10 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
     ) -> resultset.ResultSet[Record]:
         aggregate = []
         filter_pre_cursor = copy.deepcopy(filter_ or {})
-        cursor_filter = copy.deepcopy(dict(filter_pre_cursor))
+        cursor_filter = {}
 
         if cur:
-            cursor_obj = cursor.unmarshal(cur, cursor_filter)
-
-            if mongo_id_key not in cursor_filter:
-                cursor_filter[mongo_id_key] = {}
-
-            cursor_filter[mongo_id_key]["$gt"] = cursor_obj.id
+            cursor_filter = self._with_cursor_filters(cur, filter_pre_cursor)
 
         if cursor_filter:
             aggregate.append(
@@ -237,21 +232,34 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
         filter_: Optional[Mapping[str, Any]] = None,
     ) -> resultset.ResultSet[Record]:
         filter_pre_cursor = copy.deepcopy(filter_ or {})
-        cursor_filter = copy.deepcopy(dict(filter_pre_cursor))
+        cursor_filter = {}
 
         if cur:
-            cursor_obj = cursor.unmarshal(cur, cursor_filter)
-
-            if mongo_id_key not in cursor_filter:
-                cursor_filter[mongo_id_key] = {}
-
-            cursor_filter[mongo_id_key]["$gt"] = cursor_obj.id
+            cursor_filter = self._with_cursor_filters(cur, filter_pre_cursor)
 
         return await self._execute(
             query=self._collection.find,
             filter=cursor_filter,
             filter_pre_cursor=filter_pre_cursor,
         )
+
+    def _with_cursor_filters(
+        self,
+        cur: str,
+        filter_: Mapping[str, Any],
+    ) -> dict[str, Any]:
+        cursor_filter = copy.deepcopy(dict(filter_))
+        cursor_obj = cursor.unmarshal(cur, filter_)
+
+        if cursor_obj.id == "":
+            return cursor_filter
+
+        if mongo_id_key not in filter_:
+            cursor_filter[mongo_id_key] = {}
+
+            cursor_filter[mongo_id_key]["$gt"] = cursor_obj.id
+
+        return cursor_filter
 
 
 class DefaultRepository(_AbstractRepository[Mapping[str, Any]]):

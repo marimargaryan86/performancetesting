@@ -20,7 +20,7 @@ class UnknownError(Exception):
 @dataclasses.dataclass(frozen=True)
 class OffersPage(object):
     offers: Sequence[models_pb2.OfferAggregate]
-    next_page_token: Optional[str] = None
+    next_page_token: str = ""
 
     @classmethod
     def from_proto(cls, grpc_offers: grpc_pb2.ListOffersResponse) -> OffersPage:

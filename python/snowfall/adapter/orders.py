@@ -22,7 +22,7 @@ class UnknownError(Exception):
 @dataclasses.dataclass(frozen=True)
 class OrdersPage(object):
     orders: Sequence[order_models_pb2.Order]
-    next_page_token: Optional[str] = None
+    next_page_token: str = ""
 
     @classmethod
     async def from_proto(cls, grpc_orders: orders_pb2.ListOrdersResponse) -> OrdersPage:

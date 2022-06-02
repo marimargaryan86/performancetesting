@@ -286,7 +286,7 @@
                         }
                       ],
                       "links": {
-                        "next": null
+                        "next": "https://example.com/places/types"
                       }
                     }
                   }
@@ -436,7 +436,7 @@
                         }
                       ],
                       "links": {
-                        "next": null
+                        "next": "https://example.com/passengers/genders"
                       }
                     }
                   }
@@ -586,7 +586,7 @@
                         }
                       ],
                       "links": {
-                        "next": null
+                        "next": "https://example.com/passengers/titles"
                       }
                     }
                   }
@@ -736,7 +736,7 @@
                         }
                       ],
                       "links": {
-                        "next": null
+                        "next": "https://example.com/cabin-classes"
                       }
                     }
                   }
@@ -927,7 +927,7 @@
                         }
                       ],
                       "links": {
-                        "next": null
+                        "next": "https://example.com/legs/types"
                       }
                     }
                   }
@@ -3820,7 +3820,6 @@
             "properties": {
               "next": {
                 "type": "string",
-                "nullable": true,
                 "format": "uri",
                 "readOnly": true
               }

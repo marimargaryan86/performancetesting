@@ -43,4 +43,4 @@ async def test_result_set() -> None:
     documents.limit(3)
 
     assert len([document async for document in documents]) == 1
-    assert await documents.cursor() == ""
+    assert await documents.cursor() != ""

@@ -21,7 +21,7 @@ class UnknownError(Exception):
 @dataclasses.dataclass(frozen=True)
 class TripsPage(object):
     trips: Sequence[models_pb2.TripReference]
-    next_page_token: Optional[str] = None
+    next_page_token: str = ""
 
     @classmethod
     def from_proto(cls, grpc_trips: trips_pb2.ListTripsResponse) -> TripsPage:

@@ -1,5 +1,4 @@
 import operator
-from typing import Optional
 
 import pytest
 
@@ -25,25 +24,18 @@ from snowfall.stdlib.integration.starlette import pagination_helpers
             "http://localhost:8000/trips/searches/53df9a43-1052-46e6-a9d5-83f7768a4377/trips",
             "",
             10,
-            None,
-        ),
-        (
-            "http://localhost:8000/trips/searches/53df9a43-1052-46e6-a9d5-83f7768a4377/trips",
-            None,
-            10,
-            None,
+            "http://localhost:8000/trips/searches/53df9a43-1052-46e6-a9d5-83f7768a4377/trips?page%5Bcursor%5D=&page%5Blimit%5D=10",
         ),
     ),
 )
 def test_get_next_url(
     url: str,
-    next_page_token: Optional[str],
+    next_page_token: str,
     limit: int,
-    expected: Optional[str],
+    expected: str,
 ) -> None:
-    op = operator.is_ if expected is None else operator.eq
     pagination = pagination_helpers.Pagination(limit=limit)
-    assert op(
+    assert operator.eq(
         pagination_helpers.get_next_url(url, next_page_token, pagination)["next"],
         expected,
     )

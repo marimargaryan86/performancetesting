@@ -21,7 +21,7 @@ class UnknownError(Exception):
 @dataclasses.dataclass(frozen=True)
 class PlacesPage(object):
     places: Sequence[models_pb2.Place]
-    next_page_token: Optional[str] = None
+    next_page_token: str = ""
 
     @classmethod
     async def from_proto(cls, grpc_places: places_pb2.ListPlacesResponse) -> PlacesPage:

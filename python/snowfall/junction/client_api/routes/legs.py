@@ -234,7 +234,7 @@ class LegsByTripSearchId(endpoints.HTTPEndpoint):
             trips.extend(trips_page.trips)
             trips_cursor = trips_page.next_page_token
 
-            if not trips_page.next_page_token:
+            if not trips_page.trips:
                 break
 
         return trips

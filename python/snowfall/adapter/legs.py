@@ -21,7 +21,7 @@ class UnknownError(Exception):
 @dataclasses.dataclass(frozen=True)
 class LegsPage(object):
     legs: Sequence[models_pb2.Leg]
-    next_page_token: Optional[str] = None
+    next_page_token: str = ""
 
     @classmethod
     def from_proto(

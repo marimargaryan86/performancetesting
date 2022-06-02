@@ -29,12 +29,9 @@ def get_pagination(request: requests.Request) -> Pagination:
 
 def get_next_url(
     url: str,
-    next_page_token: Optional[str],
+    next_page_token: str,
     pagination: Pagination,
-) -> dict[str, Optional[str]]:
-    if not next_page_token:
-        return {"next": None}
-
+) -> dict[str, str]:
     next_url = furl(url)
     next_url.args[PAGE_CURSOR_KEY] = next_page_token
     next_url.args[PAGE_LIMIT_KEY] = pagination.limit
