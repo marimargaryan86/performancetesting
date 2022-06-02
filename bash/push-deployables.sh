@@ -11,6 +11,9 @@ if [ -f "dist/deliverables.json" ]; then
 	for i in "${MAPFILE[@]}"; do
 		service_name=$(basename "${i#*|}" | sed s/_/-/g)
 		service_name="${service_name%:*}"
+
+		echo "--- ${service_name} ---"
+
 		repo_path="repo/${1}/${service_name}"
 		docker_image="${i%|*}"
 		service_version="${docker_image##*:}"
@@ -18,13 +21,20 @@ if [ -f "dist/deliverables.json" ]; then
 		mkdir -p "${repo_path}"
 		echo "${docker_image}" >"${repo_path}/image.txt"
 
+		echo "docker: logging in to ${CI_REGISTRY}..."
 		docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
+		echo "docker: pulling \"${docker_image}\"..."
 		docker pull "${docker_image}"
+		echo "docker: tagging \"${docker_image}\" as \"${docker_image%:*}:latest\"..."
 		docker tag "${docker_image}" "${docker_image%:*}:latest"
+		echo "docker: pushing \"${docker_image%:*}:latest\"..."
 		docker push "${docker_image%:*}:latest"
 
+		echo "sentry: creating release \"${service_name}@${service_version}\" for \"${service_name}\"..."
 		sentry-cli releases new --finalize -p "${service_name}" "${service_name}@${service_version}"
+		echo "sentry: setting commits to \"Junction / Junction@${service_version}\" for \"${service_name}@${service_version}\"..."
 		sentry-cli releases set-commits --commit "Junction / Junction@${service_version}" "${service_name}@${service_version}"
+		echo
 	done
 fi
 
