@@ -17,7 +17,6 @@ from snowfall.stdlib.persistence import filesystem, redis
 from snowfall.vendor.junction import client
 
 _SERVICE_NAME = "mobile-api"
-_ORDERS_COLLECTION = "orders"
 
 
 def _factory(
@@ -52,7 +51,7 @@ def _factory(
         )
         mongo = motor_asyncio.AsyncIOMotorClient(
             app.settings.mongo_dsn,  # nosec
-        )
+        )[_SERVICE_NAME]
         smtp_cl = smtp.EmailClient(
             aiosmtplib.SMTP(
                 hostname=app.settings.smtp_dsn.host,
@@ -69,12 +68,12 @@ def _factory(
                     dependencies=bootstrap.create_dependencies(
                         places_repository=places_repository,
                         users_repository=repository.UsersRepository(
-                            mongo[app.settings.database]["users"],
+                            mongo["users"],
                         ),
                         otp_repository=otp_repository,
                         smtp_client=smtp_cl,
                         orders_repository=repository.OrdersRepository(
-                            mongo[_SERVICE_NAME][_ORDERS_COLLECTION],
+                            mongo["orders"],
                         ),
                         junction_client=junction_client,
                     ),

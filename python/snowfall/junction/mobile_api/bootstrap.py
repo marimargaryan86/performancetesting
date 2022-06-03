@@ -28,11 +28,8 @@ class Settings(service.Settings):
     http_port: int = 80
     places_cache_ttl: datetime.timedelta = datetime.timedelta(hours=1)
     otp_cache_ttl: datetime.timedelta = datetime.timedelta(minutes=2)
-
     smtp_dsn: AnyUrl
-
     mongo_dsn: Sequence[AnyUrl]
-    database: str
 
 
 def create_dependencies(  # noqa: WPS211
