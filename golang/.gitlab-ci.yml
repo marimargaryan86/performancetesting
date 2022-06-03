@@ -1,6 +1,21 @@
 .go:files: &files
   - "golang/**/*"
 
+
+go:fmt:
+  stage: test
+  interruptible: true
+  image: golang:1.18
+  script:
+    - gofmt -l -d golang/
+  needs: [ ]
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+      changes: *files
+  tags:
+    - docker
+
+
 go:lint:
   stage: test
   interruptible: true
