@@ -10,7 +10,13 @@ from motor import motor_asyncio
 from sentry_sdk.integrations import asgi
 from starlette.middleware import Middleware, authentication
 
-from snowfall.junction.mobile_api import bootstrap, otp_middleware, repository, smtp
+from snowfall.junction.mobile_api import (
+    bootstrap,
+    jwt_generator,
+    otp_middleware,
+    repository,
+    smtp,
+)
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import handlers, middlewares, validation
 from snowfall.stdlib.persistence import filesystem, redis
@@ -27,27 +33,12 @@ def _factory(
             api_url=random.choice(app.settings.junction_api_address),  # nosec
             token=app.settings.junction_api_token,
         )
-
-        places_repository = repository.PlacesRepository(
-            junction_client=junction_client,
-            redis_client=redis.Client[str](
-                aioredis.from_url(
-                    random.choice(app.settings.redis_dsn),  # nosec
-                    decode_responses=True,
-                ).client(),
-                prefix=app.name,
-            ),
-            cache_ttl=app.settings.places_cache_ttl,
-        )
-        otp_repository = repository.OtpRepository(
-            redis_client=redis.Client[str](
-                aioredis.from_url(
-                    random.choice(app.settings.redis_dsn),  # nosec
-                    decode_responses=True,
-                ).client(),
-                prefix=app.name,
-            ),
-            cache_ttl=app.settings.otp_cache_ttl,
+        redis_client = redis.Client[str](
+            aioredis.from_url(
+                random.choice(app.settings.redis_dsn),  # nosec
+                decode_responses=True,
+            ).client(),
+            prefix=app.name,
         )
         mongo = motor_asyncio.AsyncIOMotorClient(
             app.settings.mongo_dsn,  # nosec
@@ -61,21 +52,33 @@ def _factory(
                 start_tls=True,
             ),
         )
+        jwt_gen = jwt_generator.JwtGenerator(
+            jwt_private_key=app.settings.jwt_private_key,
+            jwt_token_version=app.settings.jwt_token_version,
+        )
         return cast(
             ASGIApplication,
             asgi.SentryAsgiMiddleware(
                 bootstrap.create_app(
                     dependencies=bootstrap.create_dependencies(
-                        places_repository=places_repository,
+                        places_repository=repository.PlacesRepository(
+                            junction_client=junction_client,
+                            redis_client=redis_client,
+                            cache_ttl=app.settings.places_cache_ttl,
+                        ),
                         users_repository=repository.UsersRepository(
                             mongo["users"],
                         ),
-                        otp_repository=otp_repository,
+                        otp_repository=repository.OtpRepository(
+                            redis_client=redis_client,
+                            cache_ttl=app.settings.otp_cache_ttl,
+                        ),
                         smtp_client=smtp_cl,
                         orders_repository=repository.OrdersRepository(
                             mongo["orders"],
                         ),
                         junction_client=junction_client,
+                        jwt_gen=jwt_gen,
                     ),
                     custom_middlewares=[
                         Middleware(

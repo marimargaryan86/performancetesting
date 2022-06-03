@@ -1,12 +1,13 @@
-import hashlib
+import datetime
 import random
 import uuid
 from string import digits
 
+import bcrypt
 import lagom
-from starlette import endpoints, requests, responses, status
+from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.junction.mobile_api import repository, smtp
+from snowfall.junction.mobile_api import jwt_generator, repository, smtp
 from snowfall.stdlib.integration.starlette import models, request_helpers
 
 _id_key = "_id"
@@ -14,7 +15,7 @@ _email_key = "email"
 _password_key = str("password")
 
 
-class User(endpoints.HTTPEndpoint):
+class Users(endpoints.HTTPEndpoint):
     async def post(
         self,
         request: requests.Request,
@@ -31,13 +32,84 @@ class User(endpoints.HTTPEndpoint):
             verification_code,
         )
         if not authorized:
-            return get_unauthorized_response()
+            raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
         body[_id_key] = str(uuid.uuid4())
-        body[_password_key] = hashlib.sha256(body[_password_key].encode()).hexdigest()
+        body[_password_key] = bcrypt.hashpw(
+            body[_password_key].encode(),
+            bcrypt.gensalt(),
+        ).decode()
+        body["created"] = datetime.datetime.utcnow()
         # TODO: handle duplicate key error
-        await users_repository.create(body)
+        await users_repository.insert(body)
 
         return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+class User(endpoints.HTTPEndpoint):
+    async def patch(
+        self,
+        request: requests.Request,
+        otp_repository: repository.OtpRepository = lagom.injectable,
+        users_repository: repository.UsersRepository = lagom.injectable,
+    ) -> responses.Response:
+        user_mail = request.path_params["userId"]
+        body = await request_helpers.flatten_request(request)
+
+        verification_code = request.user.username
+
+        authorized = await otp_repository.check(
+            user_mail,
+            verification_code,
+        )
+
+        if not authorized:
+            raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+        await users_repository.update_password(
+            {_email_key: user_mail},
+            {
+                "$set": {
+                    _password_key: bcrypt.hashpw(
+                        body[_password_key].encode(),
+                        bcrypt.gensalt(),
+                    ).decode(),
+                    "updated": datetime.datetime.utcnow(),
+                },
+            },
+        )
+        return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+class Session(endpoints.HTTPEndpoint):
+    async def post(
+        self,
+        request: requests.Request,
+        users_repository: repository.UsersRepository = lagom.injectable,
+        jwt_gen: jwt_generator.JwtGenerator = lagom.injectable,
+    ) -> responses.Response:
+        body = await request_helpers.flatten_request(request)
+        user = await users_repository.find_user(
+            {
+                _email_key: body[_email_key],
+            },
+        )
+        if not user:
+            raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
+        password_match = bcrypt.checkpw(
+            body[_password_key].encode(),
+            user[_password_key].encode(),
+        )
+        if not password_match:
+            raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
+        token = jwt_gen.encode(user[_id_key])
+        return models.JsonApiResponse(
+            models.Body(
+                data=models.Resource(
+                    id=token,
+                    type="jwt",
+                ),
+            ),
+        )
 
 
 class OTPGenerate(endpoints.HTTPEndpoint):
@@ -69,21 +141,3 @@ class OTPGenerate(endpoints.HTTPEndpoint):
 async def otp_generation() -> str:
     sys_ran = random.SystemRandom()
     return "".join(sys_ran.choice(digits) for _ in range(4))
-
-
-def get_unauthorized_response() -> responses.Response:
-    return models.JsonApiResponse(
-        models.Body(
-            errors=[
-                models.Error(
-                    status="401",
-                    title="Unauthorized",
-                    source=models.ErrorSource(
-                        pointer="/data/attributes/verificationCode",
-                    ),
-                    detail="Client not authenticated",
-                ),
-            ],
-        ),
-        status_code=status.HTTP_401_UNAUTHORIZED,
-    )

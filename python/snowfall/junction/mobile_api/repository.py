@@ -68,10 +68,11 @@ class UsersRepository(
     mixins.InsertMixin[dict[str, Any]],
     repository.DefaultRepository,
 ):
-    """"""
+    async def update_password(self, query: Any, document: Any) -> None:
+        await self._execute(self._collection.update_one, query, document, upsert=False)
 
-    async def create(self, document: Any) -> None:
-        await self._execute(self._collection.insert_one, document)
+    async def find_user(self, query: Any) -> Any:
+        return await self._execute(self._collection.find_one, filter=query)
 
 
 class OtpRepository(object):

@@ -9,7 +9,7 @@ from pydantic import AnyUrl
 from starlette import applications, exceptions, status
 from starlette.middleware import Middleware
 
-from snowfall.junction.mobile_api import repository, smtp
+from snowfall.junction.mobile_api import jwt_generator, repository, smtp
 from snowfall.junction.mobile_api.routes import router
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import handlers
@@ -30,6 +30,8 @@ class Settings(service.Settings):
     otp_cache_ttl: datetime.timedelta = datetime.timedelta(minutes=2)
     smtp_dsn: AnyUrl
     mongo_dsn: Sequence[AnyUrl]
+    jwt_private_key: str
+    jwt_token_version: str
 
 
 def create_dependencies(  # noqa: WPS211
@@ -39,6 +41,7 @@ def create_dependencies(  # noqa: WPS211
     users_repository: repository.UsersRepository,
     otp_repository: repository.OtpRepository,
     smtp_client: smtp.EmailClient,
+    jwt_gen: jwt_generator.JwtGenerator,
 ) -> starlette.StarletteIntegration:
     container = lagom.Container()
     container[repository.OrdersRepository] = orders_repository
@@ -47,6 +50,7 @@ def create_dependencies(  # noqa: WPS211
     container[repository.UsersRepository] = users_repository
     container[repository.OtpRepository] = otp_repository
     container[smtp.EmailClient] = smtp_client
+    container[jwt_generator.JwtGenerator] = jwt_gen
     return starlette.StarletteIntegration(container)
 
 

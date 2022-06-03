@@ -358,6 +358,128 @@
         "description": "User signup",
         "security": [{"otp": []}]
       }
+    },
+    "/users/sessions":{
+      "post":{
+        "tags": [
+          "user"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "type": {"type": "string"},
+                        "id": {"type": "string"}
+                      },
+                      "required": ["type", "id"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401":{
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "type": {"type": "string"},
+                      "attributes": {
+                        "type": "object",
+                        "properties":{
+                          "password": {"type": "string"},
+                          "email": {
+                            "type": "string",
+                            "pattern": "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$",
+                            "example": "user@example.com"
+                          }
+                        },
+                        "required": ["password", "email"]
+                      }
+                    },
+                    "required": ["type", "attributes"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post-login",
+        "description": "User login",
+        "security": []
+      }
+    },
+    "/users/{userId}":{
+      "parameters": [{
+        "name": "userId",
+        "in": "path",
+        "required": true,
+        "schema": {"type": "string"},
+        "description": "Target userId you want to change the password"
+      }],
+      "patch":{
+        "tags": [
+          "user"
+        ],
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401":{
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "type": {"type": "string"},
+                      "id": {"type": "string"},
+                      "attributes": {
+                        "type": "object",
+                        "properties":{
+                          "password": {"type": "string"}
+                        },
+                        "required": ["password"]
+                      }
+                    },
+                    "required": ["type", "id", "attributes"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "patch-change-password",
+        "description": "User change password",
+        "security": [{"otp": []}]
+      }
     }
   },
   "components": {
