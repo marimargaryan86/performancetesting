@@ -18,6 +18,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -199,6 +200,10 @@ func serviceDates(serviceId string, calendarDates []*gtfs.CalendarDate, calendar
 	}
 
 	serviceDateCache[serviceId] = actualDates
+
+	sort.SliceStable(actualDates, func(i, j int) bool {
+		return actualDates[i].Before(actualDates[j])
+	})
 
 	return actualDates
 }
@@ -424,7 +429,7 @@ func main() {
 
 				routes := make([]*gtfs.Route, 0)
 
-				db.Where("agency_id = ?", agency.Id).Find(&routes)
+				db.Where("agency_id = ?", agency.Id).Order("id ASC").Find(&routes)
 
 				for _, route := range routes {
 					routeName := route.ShortName
@@ -435,7 +440,7 @@ func main() {
 
 					trips := make([]*gtfs.Trip, 0)
 
-					db.Where("route_id = ?", route.Id).Find(&trips)
+					db.Where("route_id = ?", route.Id).Order("id ASC").Find(&trips)
 
 					for _, trip := range trips {
 						stopTimes := make([]*gtfs.StopTime, 0)
@@ -466,74 +471,72 @@ func main() {
 						}
 
 						for _, serviceDate := range serviceDates(trip.ServiceId, calendarDates, calendars, agency.Timezone) {
-							stops := make([]*v1alpha.Stop, 0)
-							i := uint32(0)
-
-							for _, stopTime := range stopTimes {
-								var departureAt *timestamppb.Timestamp
-								var arrivalAt *timestamppb.Timestamp
-
-								if stopTime.PickupType == 0 {
-									departureAt = timestamppb.New(serviceDate.Add(stopTime.DepartureTime))
-								}
-
-								if stopTime.DropOffType == 0 {
-									arrivalAt = timestamppb.New(serviceDate.Add(stopTime.ArrivalTime))
-								}
-
-								stop := tripStops[stopTime.StopId]
-								stops = append(stops, &v1alpha.Stop{
-									Id: uuid.NewSHA1(fileNamespace, []byte(strings.Join([]string{
-										trip.Id,
-										serviceDate.Format("2006-01-02"),
-										strconv.Itoa(int(i)),
-									}, "\x00"))).String(),
-									DepartureAt: departureAt,
-									ArrivalAt:   arrivalAt,
-									Point: &v1alpha.Point{
-										Ref:  stop.Id,
-										Name: stop.Name,
-										Coordinates: &v1alpha.Coordinates{
-											Latitude:  stop.Latitude,
-											Longitude: stop.Longitude,
-										},
-										TimeZone: stopTz[stop.Id],
-									},
-									Order: i,
-								})
-								i++
-							}
-
-							if len(stops) < 2 {
-								break
-							}
-
+							legs := make([]*v1alpha.Leg, 0, len(stopTimes))
 							scheduleId := uuid.NewSHA1(fileNamespace, []byte(strings.Join([]string{
 								trip.Id,
 								serviceDate.Format("2006-01-02"),
 							}, "\x00")))
 
-							legs := make([]*v1alpha.Leg, 0, len(stops))
+							for j := 0; j+1 < len(stopTimes); j++ {
+								var departureAt *timestamppb.Timestamp
+								var arrivalAt *timestamppb.Timestamp
 
-							for j := 0; j+1 < len(stops); j++ {
+								if stopTimes[j].PickupType == 0 {
+									departureAt = timestamppb.New(serviceDate.Add(stopTimes[j].DepartureTime))
+								}
+
+								if stopTimes[j+1].DropOffType == 0 {
+									arrivalAt = timestamppb.New(serviceDate.Add(stopTimes[j+1].ArrivalTime))
+								}
+
+								origin := tripStops[stopTimes[j].StopId]
+								destination := tripStops[stopTimes[j+1].StopId]
+
 								legs = append(legs, &v1alpha.Leg{
 									Id: uuid.NewSHA1(scheduleId, []byte(strings.Join([]string{
-										stops[j].Id,
-										stops[j+1].Id,
+										uuid.NewSHA1(fileNamespace, []byte(strings.Join([]string{
+											trip.Id,
+											serviceDate.Format("2006-01-02"),
+											strconv.Itoa(j),
+										}, "\x00"))).String(),
+										uuid.NewSHA1(fileNamespace, []byte(strings.Join([]string{
+											trip.Id,
+											serviceDate.Format("2006-01-02"),
+											strconv.Itoa(j + 1),
+										}, "\x00"))).String(),
 									}, "\x00"))).String(),
-									Origin:      stops[j].Point,
-									Destination: stops[j+1].Point,
-									DepartureAt: stops[j].DepartureAt,
-									ArrivalAt:   stops[j+1].ArrivalAt,
+									Origin: &v1alpha.Point{
+										Ref:  origin.Id,
+										Name: origin.Name,
+										Coordinates: &v1alpha.Coordinates{
+											Latitude:  origin.Latitude,
+											Longitude: origin.Longitude,
+										},
+										TimeZone: stopTz[origin.Id],
+									},
+									Destination: &v1alpha.Point{
+										Ref:  destination.Id,
+										Name: destination.Name,
+										Coordinates: &v1alpha.Coordinates{
+											Latitude:  destination.Latitude,
+											Longitude: destination.Longitude,
+										},
+										TimeZone: stopTz[destination.Id],
+									},
+									DepartureAt: departureAt,
+									ArrivalAt:   arrivalAt,
 									Type:        gtfsTypeMapping[route.Type],
 									AgencyName:  agency.Name,
 								})
 							}
 
+							if len(legs) < 1 {
+								break
+							}
+
 							check(scheduleWriter.Write(&v1alpha.Schedule{
 								Id:         scheduleId.String(),
 								Name:       routeName,
-								Stops:      stops,
 								AgencyName: agency.Name,
 								SourceRef:  sourceRef,
 								Type:       gtfsTypeMapping[route.Type],
