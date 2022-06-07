@@ -1,5 +1,5 @@
 import asyncio
-from typing import Any
+from typing import Any, Mapping, Sequence
 
 import mongomock_motor
 import pytest
@@ -13,6 +13,19 @@ class MockRepository(
     repository.DefaultRepository,
 ):
     """Used for tests with various mixins."""
+
+    async def find_subset(
+        self,
+        identifiers: Sequence[str],
+    ) -> resultset.ResultSet[Mapping[str, Any]]:
+        return await self._find_with_cursor(
+            "",
+            {
+                "_id": {
+                    "$in": identifiers,
+                },
+            },
+        )
 
 
 @pytest.mark.asyncio
@@ -44,3 +57,18 @@ async def test_result_set() -> None:
 
     assert len([document async for document in documents]) == 1
     assert await documents.cursor() != ""
+
+
+@pytest.mark.asyncio
+async def test_cursor_filters() -> None:
+    repo = MockRepository(mongomock_motor.AsyncMongoMockClient()["tests"]["test"])
+
+    await asyncio.gather(
+        repo.insert({"_id": "foobar_foobar"}),
+    )
+
+    documents = await repo.find_subset(["bazqux_foobar"])
+    assert "foobar_foobar" not in {document["_id"] async for document in documents}
+
+    documents = await repo.find_subset(["foobar_foobar"])
+    assert "foobar_foobar" in {document["_id"] async for document in documents}

@@ -1,5 +1,5 @@
 [GLOBAL]
-pants_version = "2.11.0"
+pants_version = "2.11.1rc2"
 backend_packages = [
     "pants.backend.codegen.protobuf.lint.buf",
     "pants.backend.codegen.protobuf.python",

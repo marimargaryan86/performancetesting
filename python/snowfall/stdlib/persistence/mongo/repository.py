@@ -185,10 +185,10 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
     ) -> resultset.ResultSet[Record]:
         aggregate = []
         filter_pre_cursor = copy.deepcopy(filter_ or {})
-        cursor_filter = {}
+        cursor_filter = copy.deepcopy(dict(filter_pre_cursor))
 
         if cur:
-            cursor_filter = self._with_cursor_filters(cur, filter_pre_cursor)
+            cursor_filter = self._with_cursor_filters(cur, cursor_filter)
 
         if cursor_filter:
             aggregate.append(
@@ -232,10 +232,10 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
         filter_: Optional[Mapping[str, Any]] = None,
     ) -> resultset.ResultSet[Record]:
         filter_pre_cursor = copy.deepcopy(filter_ or {})
-        cursor_filter = {}
+        cursor_filter = copy.deepcopy(dict(filter_pre_cursor))
 
         if cur:
-            cursor_filter = self._with_cursor_filters(cur, filter_pre_cursor)
+            cursor_filter = self._with_cursor_filters(cur, cursor_filter)
 
         return await self._execute(
             query=self._collection.find,
