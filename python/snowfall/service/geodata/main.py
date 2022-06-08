@@ -8,7 +8,7 @@ from pydantic import AnyUrl
 from snowfall.service.geodata import geocoding
 from snowfall.service.geodata.grpc import GeocodingService
 from snowfall.stdlib import service
-from snowfall.stdlib.persistence import redis
+from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.grpc import server
 
 

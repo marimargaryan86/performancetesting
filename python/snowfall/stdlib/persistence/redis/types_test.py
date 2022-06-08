@@ -5,7 +5,7 @@ import aioredis
 import freezegun
 import pytest
 
-from snowfall.stdlib.persistence import redis
+from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.testing import asserts
 
 

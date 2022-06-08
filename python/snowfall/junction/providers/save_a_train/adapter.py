@@ -137,7 +137,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                     offers=[
                         offer_models_pb2.Offer(
                             id=await self._offers_cache.store(
-                                identifiers=cache.OfferIdentifiers(
+                                cache.OfferDetails(
                                     search_id=search_response.identifier,
                                     search_result_id=search_result.identifier,
                                     transfer_id=transfer.identifier,
@@ -222,7 +222,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
     async def create_booking(
         self,
         order: order_models_pb2.Order,
-        offer_details: tuple[str, int, int, int],
+        offer_details: cache.OfferDetails,
     ) -> str:
         search_id, seat_code = self._extract_search_id_and_seat_preference_code(
             await self._select_search_result(offer_details),
@@ -246,17 +246,16 @@ class SaveATrainAdapter(object):  # noqa: WPS214
 
     async def _select_search_result(
         self,
-        offer_details: tuple[str, int, int, int],
+        offer_details: cache.OfferDetails,
     ) -> save_a_train_models.search_result_selection.SearchResultSelectionResponse:
-        search_id, search_result_id, transfer_id, fare_id = offer_details
 
         try:
             return await self._client.select_search_result(
                 save_a_train_models.request.SelectSearchResultRequest(
-                    search_id=search_id,
-                    search_result_id=search_result_id,
-                    transfer_id=transfer_id,
-                    fare_id=fare_id,
+                    search_id=offer_details.search_id,
+                    search_result_id=offer_details.search_result_id,
+                    transfer_id=offer_details.transfer_id,
+                    fare_id=offer_details.fare_id,
                 ),
             )
         except exceptions.SATValidationError as search_error:

@@ -51,8 +51,10 @@ class OfferTransformer(object):
             offers=[
                 offers_pb2.Offer(
                     id=await self._cache.store(
-                        pricing_id=offer_price.id,
-                        transaction_id=offer_price.transaction_id,
+                        cache.OfferDetails(
+                            pricing_id=offer_price.id,
+                            transaction_id=offer_price.transaction_id,
+                        ),
                         expires_at=expires_at,
                     ),
                     segment_details=[

@@ -23,7 +23,8 @@ from snowfall.junction.mobile_api import (
 )
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import handlers, middlewares, validation
-from snowfall.stdlib.persistence import filesystem, redis
+from snowfall.stdlib.persistence import filesystem
+from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.vendor.junction import client
 
 _SERVICE_NAME = "mobile-api"

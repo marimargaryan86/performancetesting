@@ -11,7 +11,7 @@ from snowfall.junction.offers import aggregator, importer, offers
 from snowfall.junction.offers.amqp import OfferSearchProducer
 from snowfall.junction.offers.grpc import OfferSearchService, OfferService
 from snowfall.stdlib import service
-from snowfall.stdlib.persistence import redis
+from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport import amqp
 from snowfall.stdlib.transport.grpc import server
 

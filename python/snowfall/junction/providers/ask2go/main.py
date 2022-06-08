@@ -19,9 +19,12 @@ from snowfall.junction.providers.ask2go import (
     validator,
 )
 from snowfall.stdlib import h3, service
-from snowfall.stdlib.persistence import filesystem, redis
+from snowfall.stdlib.persistence import filesystem
+from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport import amqp
 from snowfall.vendor.ask2go import client
+
+_OFFERS = "offers"
 
 
 class _OffersSettings(service.Settings):
@@ -59,7 +62,7 @@ async def _offers(app: service.Application[_OffersSettings]) -> None:
             trip_search_consumer = consumer.TripSearchConsumer(
                 consumer=amqp.Consumer(
                     connection=connection,
-                    exchange=amqp.Exchange("offers"),
+                    exchange=amqp.Exchange(_OFFERS),
                     queue_name="{0}_offers".format(app.name),
                     routing_key="offers.search.trip",
                 ),
@@ -153,7 +156,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                     ),
                     producer=amqp.Producer(
                         connection=connection,
-                        exchange=amqp.Exchange("offers"),
+                        exchange=amqp.Exchange(_OFFERS),
                     ),
                     ask2go_adapter=adapter.Ask2GoAdapter(
                         ask2go_client=ask2go_client,
@@ -192,7 +195,7 @@ if __name__ == "__main__":
 
     entrypoint.enter_with_commands(
         service.Command(
-            name="offers",
+            name=_OFFERS,
             callback=_offers,
             settings_class=_OffersSettings,
         ),

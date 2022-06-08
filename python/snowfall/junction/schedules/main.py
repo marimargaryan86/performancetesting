@@ -8,7 +8,7 @@ from pydantic import AnyUrl
 
 from snowfall.junction.schedules import consumer, export, grpc, schedules
 from snowfall.stdlib import service
-from snowfall.stdlib.persistence import redis
+from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport import amqp
 from snowfall.stdlib.transport.grpc import server
 

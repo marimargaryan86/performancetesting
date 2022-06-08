@@ -4,7 +4,7 @@ from snowfall.plugin.flake8 import imports
 
 
 def test_imports_ok() -> None:
-    visitor = imports.Visitor("snowfall.stdlib.persistence.redis")
+    visitor = imports.Visitor("snowfall.stdlib.persistence.redis.types")
     tree = ast.parse("import aioredis")
 
     visitor.visit(tree)

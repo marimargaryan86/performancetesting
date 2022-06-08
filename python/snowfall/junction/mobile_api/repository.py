@@ -9,8 +9,8 @@ from dateutil import parser
 from pymongo import results as pymongo_results
 
 from snowfall.junction.mobile_api import resources
-from snowfall.stdlib.persistence import redis
 from snowfall.stdlib.persistence.mongo import mixins, repository
+from snowfall.stdlib.persistence.redis import types as redis
 
 _DATA_ACCESSOR = "data"
 _ID_ACCESSOR = "id"

@@ -6,7 +6,7 @@ import uuid
 from snowfall.junction.offers import offers
 from snowfall.junction.offers.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.persistence import redis
+from snowfall.stdlib.persistence.redis import types as redis
 
 OfferBuckets = dict[str, list[str]]
 

@@ -19,10 +19,12 @@ from snowfall.junction.providers.save_a_train import (
 )
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import h3, service
-from snowfall.stdlib.persistence import redis
+from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport import amqp
 from snowfall.stdlib.transport.grpc import client as grpc_client
 from snowfall.vendor.save_a_train import client
+
+_OFFERS = "offers"
 
 
 class _OffersSettings(service.Settings):
@@ -69,7 +71,7 @@ async def _offers(app: service.Application[_OffersSettings]) -> None:
         trip_search_consumer = consumer.TripSearchConsumer(
             consumer=amqp.Consumer(
                 connection=connection,
-                exchange=amqp.Exchange("offers"),
+                exchange=amqp.Exchange(_OFFERS),
                 queue_name="{0}_offers".format(app.name),
                 routing_key="offers.search.trip",
             ),
@@ -131,7 +133,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
             ),
             producer=amqp.Producer(
                 connection=amqp_connection,
-                exchange=amqp.Exchange("offers"),
+                exchange=amqp.Exchange(_OFFERS),
             ),
             adapter=adapter.SaveATrainAdapter(
                 save_a_train_client=save_a_train_client,
@@ -141,7 +143,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                     ),
                 ),
                 offers_cache=cache.OffersCache(
-                    redis_client=redis.Client[bytes](redis_connection, prefix=app.name),
+                    client=redis.Client[bytes](redis_connection, prefix=app.name),
                 ),
                 ttl=app.settings.ttl,
             ),
@@ -180,7 +182,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
         )
         # TODO: do we need to call get_token on the save_a_train_client?
         offer_cache = cache.OffersCache(
-            redis_client=redis.Client[bytes](redis_connection, prefix=app.name),
+            client=redis.Client[bytes](redis_connection, prefix=app.name),
         )
         orders_consumer = consumer.OrdersConsumer(
             consumer=amqp.Consumer(
@@ -238,7 +240,7 @@ if __name__ == "__main__":
 
     entrypoint.enter_with_commands(
         service.Command(
-            name="offers",
+            name=_OFFERS,
             callback=_offers,
             settings_class=_OffersSettings,
         ),

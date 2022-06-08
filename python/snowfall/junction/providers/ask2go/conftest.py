@@ -15,7 +15,8 @@ from snowfall.junction.providers.ask2go import (
     validator,
 )
 from snowfall.stdlib import h3
-from snowfall.stdlib.persistence import filesystem, redis
+from snowfall.stdlib.persistence import filesystem
+from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.vendor.ask2go import client
 from snowfall.vendor.ask2go.models import common
 

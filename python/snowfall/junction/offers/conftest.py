@@ -6,7 +6,7 @@ import pytest
 from motor import motor_asyncio
 
 from snowfall.junction.offers import aggregator, offers
-from snowfall.stdlib.persistence import redis
+from snowfall.stdlib.persistence.redis import types as redis
 
 
 @pytest.fixture

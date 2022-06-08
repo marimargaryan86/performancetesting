@@ -7,6 +7,7 @@ import structlog
 
 from snowfall.junction.orders.v1alpha import models_pb2
 from snowfall.junction.providers.ask2go import criteria, models, notifications
+from snowfall.junction.providers.ask2go.cache import OfferDetails
 from snowfall.stdlib.format import protobuf
 from snowfall.vendor.ask2go import client, errors
 from snowfall.vendor.ask2go.models import booking, common
@@ -29,7 +30,7 @@ class BookingHandler(object):
         self,
         order: models_pb2.Order,
         offer_id: str,
-        details: tuple[str, str],
+        details: OfferDetails,
     ) -> booking.Booking:
         number = phonenumbers.parse(order.contact_details.phone.e164_number)
         country = pycountry.countries.get(
@@ -37,8 +38,8 @@ class BookingHandler(object):
         )
 
         booking_result = await self._client.create_booking(
-            pricing_id=details[0],
-            transaction_id=details[1],
+            pricing_id=details.pricing_id,
+            transaction_id=details.transaction_id,
             passengers=[
                 common.Passenger(
                     first_name=passenger.first_name,

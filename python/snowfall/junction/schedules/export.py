@@ -13,7 +13,7 @@ from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.planner.v1alpha import schedules_pb2
 from snowfall.junction.schedules import schedules
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.persistence import redis
+from snowfall.stdlib.persistence.redis import types as redis
 
 _FILE_MODE: Literal["wb"] = "wb"
 _MIN_TRANSFER_TIME = 25 * 60  # noqa: WPS432 - todo: calculate somehow?
