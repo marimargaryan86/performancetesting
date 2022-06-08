@@ -1,9 +1,10 @@
 import datetime
 import re
 import uuid
-from typing import Any, Mapping, Optional
+from typing import Any, Mapping, MutableMapping, Optional, Sequence
 
 import pymongo
+from dateutil import parser
 from pymongo import results as pymongo_results
 
 from snowfall.junction.mobile_api import resources
@@ -11,7 +12,10 @@ from snowfall.stdlib.persistence import redis
 from snowfall.stdlib.persistence.mongo import mixins, repository
 
 _DATA_ACCESSOR = "data"
+_ID_ACCESSOR = "id"
 _ATTRIBUTES_ACCESSOR = "attributes"
+
+_DICT_SEQUENCE = Sequence[dict[str, Any]]
 
 
 class PlacesRepository(
@@ -105,12 +109,12 @@ class OrdersRepository(
     ) -> dict[str, Any]:
         order_id = str(uuid.uuid4())
         document = request_body[_DATA_ACCESSOR]
-        document["id"] = order_id
+        document[_ID_ACCESSOR] = order_id
         attributes = document[_ATTRIBUTES_ACCESSOR]
         attributes["orderResults"] = junction_order[_DATA_ACCESSOR][
             _ATTRIBUTES_ACCESSOR
         ]["orderResults"]
-        attributes["junctionOrderId"] = junction_order[_DATA_ACCESSOR]["id"]
+        attributes["junctionOrderId"] = junction_order[_DATA_ACCESSOR][_ID_ACCESSOR]
         attributes["createdAt"] = datetime.datetime.utcnow()
         attributes["userId"] = user_id
         document["links"] = {"self": "https://snowfall.se"}
@@ -133,7 +137,7 @@ class OrdersRepository(
     ) -> pymongo_results.UpdateResult:
         return await self._execute(
             self._collection.update_one,
-            {"id": order_id},
+            {_ID_ACCESSOR: order_id},
             {
                 "$set": {
                     "attributes.orderResults": junction_order[_DATA_ACCESSOR][
@@ -142,3 +146,120 @@ class OrdersRepository(
                 },
             },
         )
+
+
+class TripSearchesRepository(
+    mixins.InsertMixin[dict[str, Any]],
+    mixins.FindByIdMixin[dict[str, Any]],
+    repository.DefaultRepository,
+):
+    async def create_trip_search(
+        self,
+        junction_trip_search: Mapping[str, Any],
+        request_body: Mapping[str, Any],
+    ) -> dict[str, Any]:
+        request_body = request_body[_DATA_ACCESSOR]
+        document = junction_trip_search[_DATA_ACCESSOR]
+
+        attributes_to_save = [
+            "arrivalBefore",
+            "passengers",
+            "cabinClass",
+            "roundTrip",
+        ]
+        relationships_to_save = [
+            "legTypes",
+        ]
+        date_attributes = ["expiresAt", "departureAfter", "arrivalBefore"]
+
+        self._copy_keys(
+            document,
+            request_body,
+            attributes_to_save,
+            _ATTRIBUTES_ACCESSOR,
+        )
+        self._copy_keys(
+            document,
+            request_body,
+            relationships_to_save,
+            "relationships",
+        )
+        self._convert_to_datetime(
+            document[_ATTRIBUTES_ACCESSOR],
+            date_attributes,
+        )
+
+        await self.insert(document)
+        return document
+
+    async def update_trip(
+        self,
+        trip_search_id: str,
+        trip: Mapping[str, Any],
+    ) -> pymongo_results.UpdateResult:
+        return await self._execute(
+            self._collection.update_one,
+            {_ID_ACCESSOR: trip_search_id},
+            {
+                "$push": {"relationships.trips": trip},
+            },
+        )
+
+    async def get_trip_ids(
+        self,
+        trip_search_id: str,
+    ) -> Sequence[str]:
+        trip_search = await self.find_by_id(trip_search_id, _ID_ACCESSOR)
+        if not trip_search:
+            raise ValueError
+
+        trips = trip_search["relationships"].get("trips")
+        if trips:
+            return [trip[_ID_ACCESSOR] for trip in trips]
+        return []
+
+    async def get_trips(
+        self,
+        trip_search_id: str,
+    ) -> Optional[_DICT_SEQUENCE]:
+        trip_search = await self.find_by_id(trip_search_id, _ID_ACCESSOR)
+        if not trip_search:
+            return None
+
+        return trip_search["relationships"].get("trips")
+
+    def _copy_keys(
+        self,
+        destination: Mapping[str, Any],
+        source: Mapping[str, Any],
+        keys: Sequence[str],
+        accessor: str,
+    ) -> None:
+        for key in keys:
+            destination[accessor][key] = source[accessor][key]
+
+    def _convert_to_datetime(
+        self,
+        document: MutableMapping[str, Any],
+        keys: Sequence[str],
+    ) -> None:
+        for key in keys:
+            document[key] = parser.parse(document[key])
+
+
+class TripsRepository(
+    mixins.InsertMixin[dict[str, Any]],
+    mixins.FindByIdMixin[dict[str, Any]],
+    repository.DefaultRepository,
+):
+    async def create_trip(
+        self,
+        trip: Mapping[str, Any],
+    ) -> dict[str, Any]:
+        return await self.insert(dict(trip))
+
+    async def get_trip(
+        self,
+        trip_id: str,
+    ) -> Optional[dict[str, Any]]:
+        return await self.find_by_id(trip_id, _ID_ACCESSOR)

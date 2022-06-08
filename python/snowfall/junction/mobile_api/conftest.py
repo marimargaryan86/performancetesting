@@ -13,6 +13,18 @@ from snowfall.stdlib.persistence import filesystem
 from snowfall.vendor.junction import client
 
 
+@pytest.fixture
+def trip_searches_repository() -> repository.TripSearchesRepository:
+    mongo = motor_asyncio.AsyncIOMotorClient()
+    return mongo["test"]["trip-searches"]
+
+
+@pytest.fixture
+def trips_repository() -> repository.TripsRepository:
+    mongo = motor_asyncio.AsyncIOMotorClient()
+    return mongo["test"]["trips"]
+
+
 def _create_app(
     dependencies: starlette.StarletteIntegration,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
@@ -76,6 +88,8 @@ def app(  # noqa: WPS211
     otp_repository: repository.OtpRepository,
     smtp_client: smtp.EmailClient,
     orders_repository: repository.OrdersRepository,
+    trip_searches_repository: repository.TripSearchesRepository,
+    trips_repository: repository.TripsRepository,
     junction_client: client.JunctionClient,
     jwt_gen: jwt_generator.JwtGenerator,
 ) -> applications.Starlette:
@@ -86,6 +100,8 @@ def app(  # noqa: WPS211
             places_repository,
             users_repository,
             otp_repository,
+            trip_searches_repository,
+            trips_repository,
             smtp_client,
             jwt_gen,
         ),

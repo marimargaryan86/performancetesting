@@ -34,6 +34,12 @@
       ]
     },
     {
+      "name": "Trips",
+      "tags": [
+        "trips"
+      ]
+    },
+    {
       "name": "User",
       "tags": [
         "user"
@@ -57,12 +63,125 @@
       "x-displayName": "Places"
     },
     {
+      "name": "trips",
+      "description": "Endpoints related to trips.",
+      "x-displayName": "Trips"
+    },
+    {
       "name": "user",
       "description": "Endpoints for user resource management.",
       "x-displayName": "Authorization"
     }
   ],
   "paths": {
+    "/trips/searches": {
+      "post": {
+        "summary": "Trip search",
+        "tags": [
+          "trips"
+        ],
+        "requestBody": {
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/TripSearch"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TripSearch"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "operationId": "trip-search",
+        "description": "Search trips.",
+        "x-internal": true,
+        "security": []
+      }
+    },
+    "/trips/searches/{tripSearchId}/trips": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/tripSearchId"
+        }
+      ],
+      "get": {
+        "summary": "List Trips by Trip Search",
+        "tags": [
+          "trips"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "items": {
+                            "$ref": "#/components/schemas/Trip"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-trips-searches-trip-search-id-trips",
+        "description": "Used to retrieve all Trip results for a Trip Search."
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -612,6 +731,17 @@
   },
   "components": {
     "parameters": {
+      "tripSearchId": {
+        "name": "tripSearchId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+        },
+        "description": "Trip Search identifier"
+      },
       "orderId": {
         "name": "orderId",
         "in": "path",
@@ -634,6 +764,240 @@
       }
     },
     "schemas": {
+      "SegmentIdentifier": {
+        "title": "Segment Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "legs": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/components/schemas/Leg"
+            }
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "Trip": {
+        "title": "Trip",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "format": "uuid",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "trips"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "segments"
+                ],
+                "properties": {
+                  "segments": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/SegmentIdentifier"
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "description": "Sequenced container of Segments."
+      },
+      "TripSearch": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "trip-searches"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "expiresAt"
+                ],
+                "properties": {
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                  },
+                  "departureAfter": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "arrivalBefore": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Not yet implemented."
+                  },
+                  "passengers": {
+                    "type": "object",
+                    "properties": {
+                      "adults": {
+                        "type": "integer"
+                      },
+                      "children": {
+                        "type": "integer"
+                      },
+                      "infants": {
+                        "type": "integer"
+                      }
+                    }
+                  },
+                  "cabinClass": {
+                    "enum": [
+                      "economy",
+                      "business",
+                      "firstClass"
+                    ],
+                    "type": "string"
+                  },
+                  "roundTrip": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "origin",
+                  "destination"
+                ],
+                "properties": {
+                  "origin": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/PlaceIdentifier"
+                      }
+                    }
+                  },
+                  "destination": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/PlaceIdentifier"
+                      }
+                    }
+                  },
+                  "legTypes": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                          "$ref": "#/components/schemas/LegTypeIdentifier"
+                        }
+                      }
+                    },
+                    "required": [
+                      "data"
+                    ]
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "title": "Trip Search",
+        "description": "Context for which Trips can be found."
+      },
+      "PlaceIdentifier": {
+        "title": "Place Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "places"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ],
+        "description": ""
+      },
+      "LegTypeIdentifier": {
+        "title": "Leg Type Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "air"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "leg-types"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
       "Place": {
         "title": "Place",
         "type": "object",
@@ -1044,6 +1408,78 @@
           "vendor",
           "operator"
         ]
+      },
+      "Leg": {
+        "title": "Leg",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "departureAt",
+                  "arrivalAt",
+                  "operator",
+                  "origin",
+                  "destination"
+                ],
+                "properties": {
+                  "departureAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                  },
+                  "arrivalAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                  },
+                  "operator": {
+                    "type": "string"
+                  },
+                  "origin": {
+                    "$ref": "#/components/schemas/Point"
+                  },
+                  "destination": {
+                    "$ref": "#/components/schemas/Point"
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/LegTypeIdentifier"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "attributes",
+              "relationships"
+            ]
+          }
+        ],
+        "description": "Smallest part of a Trip; A scheduled departure from A and a scheduled arrival to B."
       },
       "OfferSegmentLeg": {
         "title": "Offer Segment Leg",

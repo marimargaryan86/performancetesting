@@ -1,5 +1,6 @@
 import dataclasses
 import datetime
+import enum
 from typing import Any, Dict, Optional, Sequence
 
 import httpx
@@ -7,7 +8,13 @@ import httpx
 from snowfall.vendor.junction import models
 
 _DATA_KEY = "data"
+_ID_KEY = "id"
 _TYPE_KEY = "type"
+
+
+class LegType(enum.Enum):
+    air = "air"
+    rail = "rail"
 
 
 class JunctionClient(object):  # noqa: WPS214
@@ -75,6 +82,27 @@ class JunctionClient(object):  # noqa: WPS214
 
         return response.json()
 
+    async def get_legs_by_segment_id(
+        self,
+        segment_id: str,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        request_parameters = {
+            key: vl
+            for key, vl in (("page[limit]", limit), ("page[cursor]", cursor))
+            if vl
+        }
+        response = await self._client.get(
+            "{0}/segments/{1}/legs".format(self._api_url, segment_id),
+            headers=self._auth_headers,
+            params=request_parameters,
+        )
+
+        response.raise_for_status()
+
+        return response.json()
+
     async def get_segment_by_id(self, segment_id: str) -> Dict[str, Any]:
         response = await self._client.get(
             "{0}/segments/{1}".format(self._api_url, segment_id),
@@ -100,6 +128,7 @@ class JunctionClient(object):  # noqa: WPS214
         origin_id: str,
         destination_id: str,
         departure_after: datetime.datetime,
+        leg_types: Sequence[LegType],
     ) -> Dict[str, Any]:
         body = {
             _DATA_KEY: {
@@ -107,9 +136,15 @@ class JunctionClient(object):  # noqa: WPS214
                     "departureAfter": departure_after.isoformat(),
                 },
                 "relationships": {
-                    "origin": {_DATA_KEY: {"id": origin_id, _TYPE_KEY: "places"}},
+                    "origin": {_DATA_KEY: {_ID_KEY: origin_id, _TYPE_KEY: "places"}},
                     "destination": {
-                        _DATA_KEY: {"id": destination_id, _TYPE_KEY: "places"},
+                        _DATA_KEY: {_ID_KEY: destination_id, _TYPE_KEY: "places"},
+                    },
+                    "legTypes": {
+                        _DATA_KEY: [
+                            {_ID_KEY: leg_type.value, "type": "leg-types"}
+                            for leg_type in leg_types
+                        ],
                     },
                 },
                 _TYPE_KEY: "trip-searches",
@@ -135,10 +170,21 @@ class JunctionClient(object):  # noqa: WPS214
 
         return response.json()
 
-    async def get_trips_by_trip_search_id(self, trips_search_id: str) -> Dict[str, Any]:
+    async def get_trips_by_trip_search_id(
+        self,
+        trips_search_id: str,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        request_parameters = {
+            key: vl
+            for key, vl in (("page[limit]", limit), ("page[cursor]", cursor))
+            if vl
+        }
         response = await self._client.get(
             "{0}/trips/searches/{1}/trips".format(self._api_url, trips_search_id),
             headers=self._auth_headers,
+            params=request_parameters,
         )
 
         response.raise_for_status()
@@ -161,7 +207,8 @@ class JunctionClient(object):  # noqa: WPS214
                 "relationships": {
                     "trips": {
                         _DATA_KEY: [
-                            {"id": trip_id, _TYPE_KEY: "trips"} for trip_id in trip_ids
+                            {_ID_KEY: trip_id, _TYPE_KEY: "trips"}
+                            for trip_id in trip_ids
                         ],
                     },
                 },

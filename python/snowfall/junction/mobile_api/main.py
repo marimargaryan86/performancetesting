@@ -57,6 +57,7 @@ def _factory(
             jwt_private_key=app.settings.jwt_private_key,
             jwt_token_version=app.settings.jwt_token_version,
         )
+
         return cast(
             ASGIApplication,
             asgi.SentryAsgiMiddleware(
@@ -76,6 +77,10 @@ def _factory(
                         orders_repository=repository.OrdersRepository(
                             mongo["orders"],
                         ),
+                        trip_searches_repository=repository.TripSearchesRepository(
+                            mongo["trip-searches"],
+                        ),
+                        trips_repository=repository.TripsRepository(mongo["trips"]),
                         junction_client=junction_client,
                         jwt_gen=jwt_gen,
                     ),

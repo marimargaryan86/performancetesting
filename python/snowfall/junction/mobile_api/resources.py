@@ -16,3 +16,21 @@ class OrderResource(models.Resource):
         order: Mapping[str, Any],
     ) -> OrderResource:
         return cls(**order)
+
+
+class TripSearchResource(models.Resource):
+    @classmethod
+    def from_mongo(
+        cls,
+        trip_search: Mapping[str, Any],
+    ) -> TripSearchResource:
+        return cls(**trip_search)
+
+
+class TripSearchTripsResource(models.Resource):
+    @classmethod
+    def from_mongo(
+        cls,
+        trip_search_trip: Mapping[str, Any],
+    ) -> TripSearchTripsResource:
+        return cls(**trip_search_trip)
