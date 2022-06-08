@@ -15,6 +15,7 @@ nomad:validate:
     NOMAD_VAR_registry_address: "${CI_REGISTRY}"
     NOMAD_VAR_registry_password: "${CI_REGISTRY_PASSWORD}"
     NOMAD_VAR_registry_username: "${CI_REGISTRY_USER}"
+    NOMAD_VAR_environment: "development"
   tags:
     - docker
 

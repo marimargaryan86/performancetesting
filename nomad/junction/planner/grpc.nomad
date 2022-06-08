@@ -14,17 +14,21 @@ variable "registry_username" {
   type = string
 }
 
+variable "environment" {
+  type = string
+}
+
 job "planner-grpc" {
   datacenters = ["junction-dev-dc1"]
-  type = "service"
+  type        = "service"
 
   update {
-    max_parallel = 1
-    auto_revert = true
-    auto_promote = true
+    max_parallel      = 1
+    auto_revert       = true
+    auto_promote      = true
     healthy_deadline  = "10m"
     progress_deadline = "15m"
-    canary = 1
+    canary            = 1
   }
 
   group "grpc" {
@@ -32,12 +36,17 @@ job "planner-grpc" {
 
     network {
       port "grpc" {}
+      mode = "bridge"
     }
 
     service {
-      name = "planner-${NOMAD_NAMESPACE}"
+      name = "planner-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
+
+      connect {
+        sidecar_service {}
+      }
 
       check {
         type     = "grpc"
@@ -50,7 +59,7 @@ job "planner-grpc" {
       driver = "docker"
 
       resources {
-        memory = 62464
+        memory = 61440
       }
 
       config {
@@ -116,7 +125,7 @@ job "planner-grpc" {
       }
 
       env {
-        ENV_NAME     = "${NOMAD_NAMESPACE}"
+        ENV_NAME     = "${var.environment}"
         GRPC_ADDRESS = "0.0.0.0"
         GRPC_PORT    = "${NOMAD_PORT_grpc}"
         PROTO_DIR    = "${NOMAD_TASK_DIR}"

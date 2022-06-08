@@ -14,6 +14,10 @@ variable "registry_username" {
   type = string
 }
 
+variable "environment" {
+  type = string
+}
+
 job "trips-consume" {
   datacenters = ["junction-dev-dc1"]
   type        = "service"
@@ -29,15 +33,32 @@ job "trips-consume" {
 
   group "consume" {
     count = 5
+    network {
+      mode = "bridge"
+    }
+    service {
+      name = "trips-consume-${var.environment}"
+      connect {
+        sidecar_service {
+          proxy {
+            upstreams {
+              local_bind_port  = 7070
+              destination_name = "planner-${var.environment}"
+            }
+          }
+        }
+      }
+    }
 
     task "consume" {
       driver = "docker"
 
       template {
         data        = <<EOH
-AMQP_DSN={{range $index, $service := service "amqp"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
-MONGO_DSN={{range $index, $service := service "mongodb"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
-PLANNER_ADDRESS={{range $index, $service := service (printf "grpc.planner-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
+AMQP_DSN={{range $index, $service := service (printf "amqp-${var.environment}")}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
+MONGO_DSN={{range $index, $service := service (printf "mongodb-${var.environment}")}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
+
+PLANNER_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_planner_${var.environment}"))}}
 EOH
         destination = "services.env"
         env         = true
@@ -58,7 +79,7 @@ EOH
       }
 
       env {
-        ENV_NAME   = "${NOMAD_NAMESPACE}"
+        ENV_NAME   = "${var.environment}"
         SENTRY_DSN = "https://9f6821dca30141bd8f3dc919b7806f6c@sentry.snowfall.se/26"
       }
     }

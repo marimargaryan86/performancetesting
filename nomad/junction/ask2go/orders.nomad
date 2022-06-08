@@ -13,6 +13,9 @@ variable "registry_password" {
 variable "registry_username" {
   type = string
 }
+variable "environment" {
+  type = string
+}
 
 job "ask2go-orders" {
   datacenters = ["junction-dev-dc1"]
@@ -35,8 +38,8 @@ job "ask2go-orders" {
 
       template {
         data        = <<EOH
-AMQP_DSN={{range $index, $service := service "amqp"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
-REDIS_DSN={{range $index, $service := service "redis"}}redis://{{.Address}}:{{.Port}}// {{end}}
+AMQP_DSN={{range $index, $service := service (printf "amqp-${var.environment}")}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
+REDIS_DSN={{range $index, $service := service (printf "redis-${var.environment}")}}redis://{{.Address}}:{{.Port}}// {{end}}
 SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
 EOH
         destination = "services.env"
@@ -60,7 +63,7 @@ EOH
       env {
         API_BASE_URL         = "http://ec2-18-194-173-6.eu-central-1.compute.amazonaws.com"
         API_BOOKING_BASE_URL = "http://ec2-3-68-186-171.eu-central-1.compute.amazonaws.com"
-        ENV_NAME             = "${NOMAD_NAMESPACE}"
+        ENV_NAME             = "${var.environment}"
         SENTRY_DSN           = "https://c299617e39d446ccb1053a04d9ac12b8@sentry.snowfall.se/34"
         SMTP_SENDER          = "noreply@junction.travel"
         SMTP_RECIPIENT       = "A2GBooking@snowfalltravel.com"

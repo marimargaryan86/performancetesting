@@ -14,6 +14,10 @@ variable "registry_username" {
   type = string
 }
 
+variable "environment" {
+  type = string
+}
+
 job "client-api-http" {
   datacenters = ["junction-dev-dc1"]
   type        = "service"
@@ -32,18 +36,46 @@ job "client-api-http" {
 
     network {
       port "http" {}
+      mode = "bridge"
     }
 
     service {
-      name = "client-api-${NOMAD_NAMESPACE}"
+      name = "client-api-${var.environment}"
       port = "http"
       tags = [
         "http",
+        "traefik.consulcatalog.connect=true",
         "traefik.enable=true",
-        "traefik.http.routers.client-api.entrypoints=websecure",
-        "traefik.http.routers.client-api.rule=Host(`api.junction.dev`)",
+        "traefik.http.routers.client-api-${var.environment}.entrypoints=websecure",
+        "traefik.http.routers.client-api-${var.environment}.rule=Host(`api.junction.dev`)",
       ]
 
+      connect {
+        sidecar_service {
+          proxy {
+            upstreams {
+              local_bind_port  = 8070
+              destination_name = "offers-${var.environment}"
+            }
+            upstreams {
+              local_bind_port  = 8060
+              destination_name = "orders-${var.environment}"
+            }
+            upstreams {
+              local_bind_port  = 8050
+              destination_name = "places-${var.environment}"
+            }
+            upstreams {
+              local_bind_port  = 8040
+              destination_name = "schedules-${var.environment}"
+            }
+            upstreams {
+              local_bind_port  = 8020
+              destination_name = "trips-${var.environment}"
+            }
+          }
+        }
+      }
       check {
         type     = "http"
         path     = "/health"
@@ -51,12 +83,11 @@ job "client-api-http" {
         timeout  = "2s"
       }
     }
-
     task "http" {
       driver = "docker"
 
       vault {
-        policies = ["client-api-dev"]
+        policies = ["client-api-${var.environment}"]
       }
 
       template {
@@ -64,12 +95,13 @@ job "client-api-http" {
         env         = true
         change_mode = "restart"
         data        = <<EOH
-OFFERS_ADDRESS={{range $index, $service := service (printf "grpc.offers-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
-ORDERS_ADDRESS={{range $index, $service := service (printf "grpc.orders-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
-PLACES_ADDRESS={{range $index, $service := service (printf "grpc.places-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
-SCHEDULES_ADDRESS={{range $index, $service := service (printf "grpc.schedules-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
-TRIPS_ADDRESS={{range $index, $service := service (printf "grpc.trips-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
-{{ with secret "kv/dev/client-api" }}
+
+OFFERS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_offers_${var.environment}"))}}
+ORDERS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_orders_${var.environment}"))}}
+PLACES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_places_${var.environment}"))}}
+SCHEDULES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_schedules_${var.environment}"))}}
+TRIPS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_trips_${var.environment}"))}}
+{{ with secret (printf "kv/${var.environment}/client-api") }}
 JWT_PUBLIC_KEY={{ .Data.data.jwt_public_key }}
 {{ end }}
 EOH
@@ -90,7 +122,7 @@ EOH
       }
 
       env {
-        ENV_NAME              = "${NOMAD_NAMESPACE}"
+        ENV_NAME              = "${var.environment}"
         FORWARDED_ALLOWED_IPS = "0.0.0.0"
         HTTP_ADDRESS          = "0.0.0.0"
         HTTP_PORT             = "${NOMAD_PORT_http}"

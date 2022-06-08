@@ -14,6 +14,10 @@ variable "registry_username" {
   type = string
 }
 
+variable "environment" {
+  type = string
+}
+
 job "offers-grpc" {
   datacenters = ["junction-dev-dc1"]
   type        = "service"
@@ -32,12 +36,17 @@ job "offers-grpc" {
 
     network {
       port "grpc" {}
+      mode = "bridge"
     }
 
     service {
-      name = "offers-${NOMAD_NAMESPACE}"
+      name = "offers-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
+
+      connect {
+        sidecar_service {}
+      }
 
       check {
         type     = "grpc"
@@ -51,8 +60,9 @@ job "offers-grpc" {
 
       template {
         data        = <<EOH
-AMQP_DSN={{range $index, $service := service "amqp"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
-MONGO_DSN={{range $index, $service := service "mongodb"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
+AMQP_DSN={{range $index, $service := service (printf "amqp-${var.environment}")}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
+MONGO_DSN={{range $index, $service := service (printf "mongodb-${var.environment}")}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
+
 EOH
         destination = "services.env"
         env         = true
@@ -74,7 +84,7 @@ EOH
       }
 
       env {
-        ENV_NAME     = "${NOMAD_NAMESPACE}"
+        ENV_NAME   = "${var.environment}"
         GRPC_ADDRESS = "0.0.0.0"
         GRPC_PORT    = "${NOMAD_PORT_grpc}"
         SENTRY_DSN   = "https://7c600c1c458d403e8047091398239f20@sentry.snowfall.se/27"

@@ -14,6 +14,10 @@ variable "registry_username" {
   type = string
 }
 
+variable "environment" {
+  type = string
+}
+
 job "save-a-train-orders" {
   datacenters = ["junction-dev-dc1"]
   type        = "service"
@@ -30,19 +34,40 @@ job "save-a-train-orders" {
   group "orders" {
     count = 2
 
+    network {
+      port "grpc" {}
+      mode ="bridge"
+
+    }
+    service {
+      name = "save-a-train-orders-production"
+      port = "grpc"
+      tags = ["grpc"]
+      connect {
+        sidecar_service {
+          proxy {
+            upstreams {
+              local_bind_port = 7070
+              destination_name = "geodata-production"
+            }
+          }
+        }
+      }
+    }
+
     task "orders" {
       driver = "docker"
 
       vault {
-        policies = ["save-a-train-dev"]
+        policies = ["save-a-train-${var.environment}"]
       }
 
       template {
         data        = <<EOH
-AMQP_DSN={{range $index, $service := service "amqp"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
-GEODATA_ADDRESS={{range $index, $service := service (printf "grpc.geodata-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
-REDIS_DSN={{range $index, $service := service "redis"}}redis://{{.Address}}:{{.Port}}// {{end}}
-{{ with secret "kv/dev/save-a-train" }}
+AMQP_DSN={{range $index, $service := service (printf "amqp-${var.environment}")}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
+GEODATA_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_geodata_${var.environment}"))}}
+REDIS_DSN={{range $index, $service := service (printf "redis-${var.environment}")}}redis://{{.Address}}:{{.Port}}// {{end}}
+{{ with secret (printf "kv/${var.environment}/save-a-train") }}
 API_EMAIL={{ .Data.data.api_email }}
 API_PASSWORD={{ .Data.data.api_password }}
 API_SEARCH_PASSWORD={{ .Data.data.api_search_password }}
@@ -68,10 +93,10 @@ EOH
       }
 
       env {
-        API_BASE_URL         = "https://satvendorstest.saveatrain.com/api/"
-        API_SEARCH_BASE_URL  = "https://apisearch.saveatrain.com/search"
-        ENV_NAME             = "${NOMAD_NAMESPACE}"
-        SENTRY_DSN           = "https://f01c7c8bf4d04a709a65b4be8b11ba69@sentry.snowfall.se/36"
+        API_BASE_URL        = "https://satvendorstest.saveatrain.com/api/"
+        API_SEARCH_BASE_URL = "https://apisearch.saveatrain.com/search"
+        ENV_NAME            = "${var.environment}"
+        SENTRY_DSN          = "https://f01c7c8bf4d04a709a65b4be8b11ba69@sentry.snowfall.se/36"
       }
     }
   }
