@@ -20,7 +20,8 @@ def _auth_required(func: Any) -> Any:
 
         if not self._auth_cookies or _is_valid_token(self._auth_cookies["jwt"]):
             await self._authenticate()
-        await func(self, *args, **kwargs)
+
+        return await func(self, *args, **kwargs)
 
     return wrapper
 
@@ -31,6 +32,7 @@ class Bound(object):
         self._email = email
         self._password = password
         self._http_client = httpx.AsyncClient(verify=False)
+        self._auth_cookies: dict[str, Any] = {}
 
     @_auth_required
     async def quote(
@@ -58,9 +60,9 @@ class Bound(object):
         response_data = response.json()
 
         return exchange.Quote(
-            amount=response_data["convertedAmount"]["amount"],
-            buy_currency=response_data["convertedAmount"]["currency"],
-            sell_currency=response_data["send"]["currency"],
+            amount=response_data["sell"]["amount"],
+            buy_currency=response_data["buy"]["currency"],
+            sell_currency=response_data["sell"]["currency"],
         )
 
     @_auth_required
@@ -89,7 +91,7 @@ class Bound(object):
 
         return response.json()
 
-    async def _authenticate(self) -> Bound:
+    async def _authenticate(self) -> None:
         credentials = {
             "email": self._email,
             "password": self._password,
@@ -102,8 +104,6 @@ class Bound(object):
         response.raise_for_status()
 
         self._auth_cookies = self._get_jwt_from_cookie(response.headers["Set-Cookie"])
-
-        return self
 
     def _get_jwt_from_cookie(self, cookie: str) -> dict[str, Any]:
         jwt_part = cookie.split(";")[0]
