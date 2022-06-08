@@ -68,6 +68,8 @@ REDIS_DSN={{range $index, $service := service (printf "redis-%s" (env "NOMAD_NAM
 SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
 {{ with secret (printf "kv/%s/mobile-api" (env "NOMAD_NAMESPACE")) }}
 JUNCTION_API_TOKEN={{ .Data.data.junction_api_token }}
+JWT_TOKEN_VERSION={{ .Data.data.jwt_token_version }}
+JWT_PRIVATE_KEY={{ .Data.data.jwt_private_key }}
 {{ end }}
 EOH
       }
