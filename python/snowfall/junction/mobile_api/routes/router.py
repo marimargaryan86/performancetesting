@@ -18,4 +18,5 @@ def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Rou
         dependencies.route("/users/sessions", users.Session),
         dependencies.route("/users", users.Users),
         dependencies.route("/users/{userId}", users.User),
+        dependencies.route("/users/{userId}/orders", users.UserOrders),
     ]

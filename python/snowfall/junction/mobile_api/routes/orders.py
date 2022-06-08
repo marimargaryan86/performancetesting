@@ -24,6 +24,9 @@ class Order(endpoints.HTTPEndpoint):
         if not order:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
+        if order["attributes"]["userId"] != request.user.username:
+            raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
+
         return stdlib_models.JsonApiResponse(
             stdlib_models.Body(data=resources.OrderResource.from_mongo(order)),
         )
@@ -91,4 +94,5 @@ class Orders(endpoints.HTTPEndpoint):
         return await orders_repository.create_order(
             await request.json(),
             await junction_client.get_order_by_id(junction_order["data"][_ID]),
+            request.user.username,
         )

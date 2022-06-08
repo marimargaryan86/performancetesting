@@ -3,13 +3,13 @@ import re
 import uuid
 from typing import Any, Mapping, Optional
 
-from pymongo import results
+import pymongo
+from pymongo import results as pymongo_results
 
 from snowfall.junction.mobile_api import resources
 from snowfall.stdlib.persistence import redis
 from snowfall.stdlib.persistence.mongo import mixins, repository
 
-_PLACES_REDIS_KEY = "places"
 _DATA_ACCESSOR = "data"
 _ATTRIBUTES_ACCESSOR = "attributes"
 
@@ -92,10 +92,16 @@ class OrdersRepository(
     mixins.InsertMixin[dict[str, Any]],
     repository.DefaultRepository,
 ):
+    _indexes = [
+        pymongo.IndexModel("attributes.userId", background=True),
+        pymongo.IndexModel("attributes.createdAt", background=True),
+    ]
+
     async def create_order(
         self,
         request_body: Mapping[str, Any],
         junction_order: Mapping[str, Any],
+        user_id: str,
     ) -> dict[str, Any]:
         order_id = str(uuid.uuid4())
         document = request_body[_DATA_ACCESSOR]
@@ -106,15 +112,25 @@ class OrdersRepository(
         ]["orderResults"]
         attributes["junctionOrderId"] = junction_order[_DATA_ACCESSOR]["id"]
         attributes["createdAt"] = datetime.datetime.utcnow()
+        attributes["userId"] = user_id
         document["links"] = {"self": "https://snowfall.se"}
         await self.insert(document)
         return document
+
+    async def get_user_orders(
+        self,
+        user_id: str,
+    ) -> Any:
+        orders = await self._execute(
+            self._collection.find({"attributes.userId": user_id}),
+        )
+        return orders.sort("attributes.createdAt", -1)
 
     async def update_order_results(
         self,
         order_id: str,
         junction_order: Mapping[str, Any],
-    ) -> results.UpdateResult:
+    ) -> pymongo_results.UpdateResult:
         return await self._execute(
             self._collection.update_one,
             {"id": order_id},

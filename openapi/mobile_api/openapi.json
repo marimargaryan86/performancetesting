@@ -217,6 +217,52 @@
         }
       }
     },
+    "/users/{userId}/orders": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/userId"
+        }
+      ],
+      "get": {
+        "summary": "Retrieve orders created by a user",
+        "tags": [
+          "user"
+        ],
+        "description": "Used to retrieve orders created by a user.",
+        "operationId": "get-orders",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/Order"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
     "/places": {
       "get": {
         "summary": "Places",
@@ -266,8 +312,8 @@
         "security": []
       }
     },
-    "/verification-code":{
-      "post":{
+    "/verification-code": {
+      "post": {
         "tags": [
           "user"
         ],
@@ -288,21 +334,31 @@
                   "data": {
                     "type": "object",
                     "properties": {
-                      "type": {"type": "string"},
-                      "id": {"type": "string"},
+                      "type": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string"
+                      },
                       "attributes": {
                         "type": "object",
-                        "properties":{
+                        "properties": {
                           "email": {
                             "type": "string",
                             "pattern": "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$",
                             "example": "user@example.com"
                           }
                         },
-                        "required": ["email"]
+                        "required": [
+                          "email"
+                        ]
                       }
                     },
-                    "required": ["type", "id", "attributes"]
+                    "required": [
+                      "type",
+                      "id",
+                      "attributes"
+                    ]
                   }
                 },
                 "required": [
@@ -316,8 +372,8 @@
         "description": "Otp generation"
       }
     },
-    "/users":{
-      "post":{
+    "/users": {
+      "post": {
         "tags": [
           "user"
         ],
@@ -328,7 +384,7 @@
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
-          "401":{
+          "401": {
             "$ref": "#/components/responses/Unauthorized"
           }
         },
@@ -341,12 +397,18 @@
                   "data": {
                     "type": "object",
                     "properties": {
-                      "type": {"type": "string"},
-                      "id": {"type": "string"},
+                      "type": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string"
+                      },
                       "attributes": {
                         "type": "object",
-                        "properties":{
-                          "name": {"type": "string"},
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
                           "password": {
                             "type": "string",
                             "format": "password"
@@ -356,12 +418,23 @@
                             "pattern": "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$",
                             "example": "user@example.com"
                           },
-                          "phone": {"type": "string"}
+                          "phone": {
+                            "type": "string"
+                          }
                         },
-                        "required": ["name", "password", "email", "phone"]
+                        "required": [
+                          "name",
+                          "password",
+                          "email",
+                          "phone"
+                        ]
                       }
                     },
-                    "required": ["type", "id", "attributes"]
+                    "required": [
+                      "type",
+                      "id",
+                      "attributes"
+                    ]
                   }
                 }
               }
@@ -370,11 +443,15 @@
         },
         "operationId": "post-signup",
         "description": "User signup",
-        "security": [{"otp": []}]
+        "security": [
+          {
+            "otp": []
+          }
+        ]
       }
     },
-    "/users/sessions":{
-      "post":{
+    "/users/sessions": {
+      "post": {
         "tags": [
           "user"
         ],
@@ -389,10 +466,17 @@
                     "data": {
                       "type": "object",
                       "properties": {
-                        "type": {"type": "string"},
-                        "id": {"type": "string"}
+                        "type": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "type": "string"
+                        }
                       },
-                      "required": ["type", "id"]
+                      "required": [
+                        "type",
+                        "id"
+                      ]
                     }
                   }
                 }
@@ -402,7 +486,7 @@
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
-          "401":{
+          "401": {
             "$ref": "#/components/responses/Unauthorized"
           }
         },
@@ -415,21 +499,31 @@
                   "data": {
                     "type": "object",
                     "properties": {
-                      "type": {"type": "string"},
+                      "type": {
+                        "type": "string"
+                      },
                       "attributes": {
                         "type": "object",
-                        "properties":{
-                          "password": {"type": "string"},
+                        "properties": {
+                          "password": {
+                            "type": "string"
+                          },
                           "email": {
                             "type": "string",
                             "pattern": "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$",
                             "example": "user@example.com"
                           }
                         },
-                        "required": ["password", "email"]
+                        "required": [
+                          "password",
+                          "email"
+                        ]
                       }
                     },
-                    "required": ["type", "attributes"]
+                    "required": [
+                      "type",
+                      "attributes"
+                    ]
                   }
                 }
               }
@@ -441,15 +535,19 @@
         "security": []
       }
     },
-    "/users/{userId}":{
-      "parameters": [{
-        "name": "userId",
-        "in": "path",
-        "required": true,
-        "schema": {"type": "string"},
-        "description": "Target userId you want to change the password"
-      }],
-      "patch":{
+    "/users/{userId}": {
+      "parameters": [
+        {
+          "name": "userId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "description": "Target userId you want to change the password"
+        }
+      ],
+      "patch": {
         "tags": [
           "user"
         ],
@@ -460,7 +558,7 @@
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
-          "401":{
+          "401": {
             "$ref": "#/components/responses/Unauthorized"
           }
         },
@@ -473,17 +571,29 @@
                   "data": {
                     "type": "object",
                     "properties": {
-                      "type": {"type": "string"},
-                      "id": {"type": "string"},
+                      "type": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string"
+                      },
                       "attributes": {
                         "type": "object",
-                        "properties":{
-                          "password": {"type": "string"}
+                        "properties": {
+                          "password": {
+                            "type": "string"
+                          }
                         },
-                        "required": ["password"]
+                        "required": [
+                          "password"
+                        ]
                       }
                     },
-                    "required": ["type", "id", "attributes"]
+                    "required": [
+                      "type",
+                      "id",
+                      "attributes"
+                    ]
                   }
                 }
               }
@@ -492,7 +602,11 @@
         },
         "operationId": "patch-change-password",
         "description": "User change password",
-        "security": [{"otp": []}]
+        "security": [
+          {
+            "otp": []
+          }
+        ]
       }
     }
   },
@@ -508,6 +622,15 @@
           "format": "uuid"
         },
         "description": "Order identifier"
+      },
+      "userId": {
+        "name": "userId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "description": "User identifier"
       }
     },
     "schemas": {
@@ -1125,7 +1248,7 @@
         ]
       }
     },
-    "responses":{
+    "responses": {
       "BadRequest": {
         "description": "Bad Request",
         "content": {
@@ -1214,7 +1337,7 @@
         }
       }
     },
-    "securitySchemes":{
+    "securitySchemes": {
       "otp": {
         "type": "http",
         "scheme": "bearer"

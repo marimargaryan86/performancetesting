@@ -7,7 +7,7 @@ import bcrypt
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.junction.mobile_api import jwt_generator, repository, smtp
+from snowfall.junction.mobile_api import jwt_generator, repository, resources, smtp
 from snowfall.stdlib.integration.starlette import models, request_helpers
 
 _id_key = "_id"
@@ -78,6 +78,28 @@ class User(endpoints.HTTPEndpoint):
             },
         )
         return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+class UserOrders(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        orders_repository: repository.OrdersRepository = lagom.injectable,
+    ) -> responses.Response:
+        user_id = request.path_params["userId"]
+        if user_id != request.user.username:
+            raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+        user_orders = await orders_repository.get_user_orders(user_id)
+
+        return models.JsonApiResponse(
+            models.Body(
+                data=[
+                    resources.OrderResource.from_mongo(order)
+                    async for order in user_orders
+                ],
+            ),
+        )
 
 
 class Session(endpoints.HTTPEndpoint):
