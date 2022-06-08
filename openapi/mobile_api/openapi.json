@@ -223,7 +223,21 @@
         "tags": [
           "places"
         ],
+        "parameters":[
+          {
+            "name": "query[name]",
+            "in": "query",
+            "schema":{
+              "type": "string",
+              "minLength": 3
+            },
+            "description": "Used as a key to search relevant places. Ex. key: 'lon' should match London"
+          }
+        ],
         "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
           "200": {
             "description": "OK",
             "content": {
@@ -520,7 +534,6 @@
               "latitude",
               "longitude",
               "countryCode",
-              "countryName",
               "timeZone",
               "iataCode"
             ],

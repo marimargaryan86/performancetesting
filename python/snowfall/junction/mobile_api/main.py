@@ -14,6 +14,7 @@ from snowfall.junction.mobile_api import (
     bootstrap,
     jwt_generator,
     otp_middleware,
+    places_migration,
     repository,
     smtp,
 )
@@ -62,9 +63,7 @@ def _factory(
                 bootstrap.create_app(
                     dependencies=bootstrap.create_dependencies(
                         places_repository=repository.PlacesRepository(
-                            junction_client=junction_client,
-                            redis_client=redis_client,
-                            cache_ttl=app.settings.places_cache_ttl,
+                            mongo["places"],
                         ),
                         users_repository=repository.UsersRepository(
                             mongo["users"],
@@ -119,6 +118,10 @@ def _serve(app: service.Application[bootstrap.Settings]) -> None:
     )
 
 
+async def _migrate(app: service.Application[bootstrap.Settings]) -> None:
+    await places_migration.migrate(app.settings)
+
+
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(name=_SERVICE_NAME)
 
@@ -126,6 +129,11 @@ if __name__ == "__main__":
         service.Command(
             name="http",
             callback=_serve,
+            settings_class=bootstrap.Settings,
+        ),
+        service.Command(
+            name="migrate",
+            callback=_migrate,
             settings_class=bootstrap.Settings,
         ),
     )

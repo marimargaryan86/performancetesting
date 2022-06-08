@@ -1,66 +1,46 @@
 import datetime
+import re
 import uuid
-from typing import Any, Mapping
+from typing import Any, Mapping, Optional
 
-import pycountry
-import rapidjson
 from pymongo import results
 
 from snowfall.junction.mobile_api import resources
 from snowfall.stdlib.persistence import redis
 from snowfall.stdlib.persistence.mongo import mixins, repository
-from snowfall.vendor.junction import client
 
 _PLACES_REDIS_KEY = "places"
 _DATA_ACCESSOR = "data"
 _ATTRIBUTES_ACCESSOR = "attributes"
 
 
-class PlacesRepository(object):
-    def __init__(
-        self,
-        junction_client: client.JunctionClient,
-        redis_client: redis.Client[str],
-        cache_ttl: datetime.timedelta,
-    ) -> None:
-        self._junction_client = junction_client
-        self._redis = redis_client
-        self._ttl = cache_ttl
+class PlacesRepository(
+    mixins.FindByIdMixin[dict[str, Any]],
+    mixins.InsertMixin[dict[str, Any]],
+    repository.DefaultRepository,
+):
+    async def match(self, search_key: Optional[str]) -> Any:
+        # TODO: Add a resultScore so can return more relevant.
+        #  $text does not work with substrings
+        regex = re.compile(search_key, re.IGNORECASE)  # type: ignore[type-var]
+        query = {
+            "$or": [
+                {"attributes.name": regex},
+                {"attributes.countryName": regex},
+                {"attributes.iataCode": regex},
+            ],
+        }
+        places_response = await self._execute(self._collection.find, query, {"_id": 0})
+        places_response.limit(30)  # noqa: WPS432
+        return [resources.PlaceResource(**place) async for place in places_response]
 
-    async def get(self) -> list[resources.PlaceResource]:
-        places_response_json = await self._redis.get(_PLACES_REDIS_KEY)
+    async def find(self) -> Any:
+        places_response = await self._execute(self._collection.find, {}, {"_id": 0})
+        places_response.limit(30)  # noqa: WPS432
+        return [resources.PlaceResource(**place) async for place in places_response]
 
-        if places_response_json:
-            return [
-                resources.PlaceResource(**place)
-                for place in rapidjson.loads(places_response_json)[_DATA_ACCESSOR]
-            ]
-
-        places_response = await self._junction_client.list_places()
-
-        for place in places_response[_DATA_ACCESSOR]:
-            country = pycountry.countries.get(
-                alpha_2=place[_ATTRIBUTES_ACCESSOR]["countryCode"],
-            )
-
-            if country:
-                place[_ATTRIBUTES_ACCESSOR]["countryName"] = country.name
-            else:
-                place[_ATTRIBUTES_ACCESSOR]["countryName"] = None
-
-        await self._put_to_cache(rapidjson.dumps(places_response))
-
-        return [
-            resources.PlaceResource(**place_enhanced)
-            for place_enhanced in places_response[_DATA_ACCESSOR]
-        ]
-
-    async def _put_to_cache(self, places_json: str) -> None:
-        await self._redis.put(_PLACES_REDIS_KEY, places_json)
-        await self._redis.put_expires_at(
-            _PLACES_REDIS_KEY,
-            datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
-        )
+    async def insert_documents(self, documents: Any) -> Any:
+        await self._execute(self._collection.insert_many, documents)
 
 
 class UsersRepository(

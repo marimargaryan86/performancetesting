@@ -1,15 +1,15 @@
-import datetime
 import http
 from typing import Mapping, Optional, Sequence
 
 import pytest
 from lagom.integrations import starlette
+from motor import motor_asyncio
 from starlette import applications, testclient
 from starlette.middleware import Middleware
 
 from snowfall.junction.mobile_api import bootstrap, jwt_generator, repository, smtp
 from snowfall.stdlib.integration.starlette import middlewares, validation
-from snowfall.stdlib.persistence import filesystem, redis
+from snowfall.stdlib.persistence import filesystem
 from snowfall.vendor.junction import client
 
 
@@ -59,15 +59,13 @@ def junction_client(
     )
 
 
-@pytest.fixture()
-def places_repository(
-    junction_client: client.JunctionClient,
-    redis_client: redis.Client[str],
-) -> repository.PlacesRepository:
+@pytest.fixture
+def places_repository() -> repository.PlacesRepository:
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        "mongodb://localhost:27017",  # nosec
+    )["test"]
     return repository.PlacesRepository(
-        junction_client=junction_client,
-        redis_client=redis_client,
-        cache_ttl=datetime.timedelta(seconds=10),
+        mongo["places"],
     )
 
 
