@@ -15,11 +15,10 @@ from snowfall.junction.providers.save_a_train import (
     cache,
     consumer,
     criteria,
-    h3,
     train_stations,
 )
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
-from snowfall.stdlib import service
+from snowfall.stdlib import h3, service
 from snowfall.stdlib.persistence import redis
 from snowfall.stdlib.transport import amqp
 from snowfall.stdlib.transport.grpc import client as grpc_client

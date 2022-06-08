@@ -3,7 +3,8 @@ from typing import Collection
 import pytest
 
 from snowfall.common.v1alpha import models_pb2
-from snowfall.junction.providers.save_a_train import h3, train_stations
+from snowfall.fixtures import H3LocationTestModel
+from snowfall.stdlib import h3
 
 
 @pytest.mark.parametrize(
@@ -52,14 +53,14 @@ from snowfall.junction.providers.save_a_train import h3, train_stations
     ],
 )
 def test_coordinates_to_id(
-    h3_mapping_repository: h3.H3MappingRepository[train_stations.TrainStation],
+    h3_mapping_repository: h3.H3MappingRepository[H3LocationTestModel],
     coordinates: models_pb2.Coordinates,
     radius: int,
     expected_station_ids: Collection[str],
 ) -> None:
     assert expected_station_ids == {
-        train_station.id
-        for train_station in h3_mapping_repository.find_mapped_values(
+        location.id_
+        for location in h3_mapping_repository.find_mapped_values(
             coordinates=coordinates,
             neighbour_search_radius=radius,
         )

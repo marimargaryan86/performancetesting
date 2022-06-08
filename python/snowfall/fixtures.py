@@ -1,3 +1,4 @@
+import dataclasses
 import datetime
 import random
 import types
@@ -44,6 +45,37 @@ CURRENCIES_CONVERSIONS = types.MappingProxyType(
     },
 )
 CURRENCIES = ("USD", "EUR")
+
+
+@dataclasses.dataclass(frozen=True)
+class H3LocationTestModel(object):
+    id_: str
+    longitude: float
+    latitude: float
+
+
+H3_LOCATIONS = [
+    H3LocationTestModel(
+        latitude=46.287961,
+        longitude=11.232652,
+        id_="SAT_IT_MA_XZWAD",
+    ),
+    H3LocationTestModel(
+        latitude=49.2556226,
+        longitude=6.8588948,
+        id_="SAT_DE_VO_XSTMO",
+    ),
+    H3LocationTestModel(
+        latitude=48.861496,
+        longitude=2.33368,
+        id_="SAT_FR_PA_WXNGQ",
+    ),
+    H3LocationTestModel(
+        latitude=48.103175,
+        longitude=-1.672335,
+        id_="SAT_FR_RE_VDQTY",
+    ),
+]
 
 
 def get_currencies() -> types.MappingProxyType[tuple[str, str], float]:

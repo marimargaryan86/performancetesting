@@ -3,8 +3,8 @@ import zoneinfo
 from typing import Mapping, Optional, Sequence
 
 from snowfall.common.v1alpha import latlng_pb2
-from snowfall.junction.providers.save_a_train import h3
 from snowfall.service.geodata.v1 import geocoding_pb2, geocoding_pb2_grpc
+from snowfall.stdlib import h3
 
 
 @dataclasses.dataclass(frozen=True)

@@ -7,8 +7,9 @@ import more_itertools
 
 from snowfall.common.v1alpha import models_pb2 as common_models_pb2
 from snowfall.junction.offers.v1alpha import amqp_pb2, models_pb2
-from snowfall.junction.providers.ask2go import airports, h3
+from snowfall.junction.providers.ask2go import airports
 from snowfall.junction.providers.ask2go.v1alpha import amqp_pb2 as provider_amqp_pb2
+from snowfall.stdlib import h3
 from snowfall.stdlib.format import protobuf
 from snowfall.vendor.ask2go import enums
 from snowfall.vendor.ask2go.models import common

@@ -1,4 +1,5 @@
 import datetime
+from typing import Sequence
 
 import aioredis
 import aiosmtplib
@@ -22,6 +23,7 @@ from snowfall.adapter import (
 )
 from snowfall.junction.mobile_api import smtp
 from snowfall.junction.offers.v1alpha import models_pb2
+from snowfall.stdlib import h3
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.mongo import repository
 from snowfall.vendor.junction import client
@@ -134,3 +136,25 @@ async def trip_search_request(
         ),
         departure_after=datetime.datetime.now(datetime.timezone.utc),
     )
+
+
+@pytest.fixture
+def h3_mapping_repository(
+    h3_mapping: Sequence[h3.CoordinatesItem[fixtures.H3LocationTestModel]],
+) -> h3.H3MappingRepository[fixtures.H3LocationTestModel]:
+    return h3.H3MappingRepository(
+        mapping=h3_mapping,
+        resolution=8,
+    )
+
+
+@pytest.fixture
+def h3_mapping() -> list[h3.CoordinatesItem[fixtures.H3LocationTestModel]]:
+    return [
+        h3.CoordinatesItem[fixtures.H3LocationTestModel](
+            latitude=location.latitude,
+            longitude=location.longitude,
+            mapped_value=location,
+        )
+        for location in fixtures.H3_LOCATIONS
+    ]

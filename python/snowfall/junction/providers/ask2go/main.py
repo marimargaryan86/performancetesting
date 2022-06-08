@@ -14,12 +14,11 @@ from snowfall.junction.providers.ask2go import (
     cache,
     consumer,
     criteria,
-    h3,
     notifications,
     transformer,
     validator,
 )
-from snowfall.stdlib import service
+from snowfall.stdlib import h3, service
 from snowfall.stdlib.persistence import filesystem, redis
 from snowfall.stdlib.transport import amqp
 from snowfall.vendor.ask2go import client

@@ -5,8 +5,9 @@ import more_itertools
 
 from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
-from snowfall.junction.providers.save_a_train import h3, train_stations
+from snowfall.junction.providers.save_a_train import train_stations
 from snowfall.junction.providers.save_a_train.v1alpha import amqp_pb2
+from snowfall.stdlib import h3
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.time import date_to_age
 

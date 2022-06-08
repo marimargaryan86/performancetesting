@@ -2,7 +2,7 @@ import dataclasses
 import zoneinfo
 from typing import Any, Mapping, Optional, Sequence
 
-from snowfall.junction.providers.ask2go import h3
+from snowfall.stdlib import h3
 from snowfall.vendor.ask2go.models import common
 
 
