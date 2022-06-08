@@ -20,7 +20,6 @@ from snowfall.adapter import (
     trip_searches,
     trips,
 )
-from snowfall.junction.mobile_api import repository as mobile_repo
 from snowfall.junction.mobile_api import smtp
 from snowfall.junction.offers.v1alpha import models_pb2
 from snowfall.stdlib.logging import stdout
@@ -38,18 +37,6 @@ def _mongo_mock_configure(
 
 
 repository._configure_collection = _mongo_mock_configure  # noqa: WPS437
-
-
-@pytest.fixture
-def users_repository() -> mobile_repo.UsersRepository:
-    mongo = motor_asyncio.AsyncIOMotorClient()
-    return mongo["test"]["users"]
-
-
-@pytest.fixture
-def otp_repository() -> mobile_repo.OtpRepository:
-    mongo = motor_asyncio.AsyncIOMotorClient()
-    return mongo["test"]["otp"]
 
 
 @pytest.fixture
@@ -127,12 +114,6 @@ def offer_search() -> models_pb2.OfferSearch:
     return models_pb2.OfferSearch(
         trip=models_pb2.TripOfferSearch(),
     )
-
-
-@pytest.fixture
-def orders_repository() -> mobile_repo.OrdersRepository:
-    mongo = motor_asyncio.AsyncIOMotorClient()
-    return mongo["test"]["orders"]
 
 
 @pytest.fixture

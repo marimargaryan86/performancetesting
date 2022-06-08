@@ -28,6 +28,12 @@
       ]
     },
     {
+      "name": "Payment",
+      "tags": [
+        "payment"
+      ]
+    },
+    {
       "name": "Places",
       "tags": [
         "places"
@@ -56,6 +62,11 @@
       "name": "orders",
       "description": "A collection of bookings.",
       "x-displayName": "Orders"
+    },
+    {
+      "name": "payment",
+      "description": "Endpoints for payment.",
+      "x-displayName": "Payment"
     },
     {
       "name": "places",
@@ -334,6 +345,86 @@
             }
           }
         }
+      }
+    },
+    "/payments": {
+      "post": {
+        "summary": "Creates a paymentIntent",
+        "tags": [
+          "payment"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "type": {"type": "string"},
+                        "id": {"type": "string"},
+                        "attributes": {
+                          "type": "object",
+                          "properties":{
+                            "clientSecret": {"type": "string"},
+                            "ephemeralKey": {"type": "string"},
+                            "customerId": {"type": "string"}
+                          },
+                          "required": ["clientSecret", "ephemeralKey", "customerId"]
+                        }
+                      },
+                      "required": ["type", "id", "attributes"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401":{
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "type": {"type": "string"},
+                      "id": {"type": "string"},
+                      "attributes": {
+                        "type": "object",
+                        "properties":{
+                          "amount": {"type": "number"},
+                          "currency": {"type": "string"},
+                          "offerId": {"type": "string"}
+                        },
+                        "required": ["amount", "currency", "offerId"]
+                      }
+                    },
+                    "required": ["type", "id", "attributes"]
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "operationId": "post-payment",
+        "description": "Creates a paymentIntent and a stripe customer if there isn't any for this particular user",
+        "x-internal": true,
+        "security": [{"jwt": []}]
       }
     },
     "/users/{userId}/orders": {
@@ -1775,6 +1866,10 @@
     },
     "securitySchemes": {
       "otp": {
+        "type": "http",
+        "scheme": "bearer"
+      },
+      "jwt": {
         "type": "http",
         "scheme": "bearer"
       }

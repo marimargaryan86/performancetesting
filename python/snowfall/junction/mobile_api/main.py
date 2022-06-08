@@ -1,15 +1,18 @@
+import base64
 import http
 import random
 from typing import Callable, cast
 
 import aioredis
 import aiosmtplib
+import stripe
 import uvicorn
 from asgiref.typing import ASGIApplication
 from motor import motor_asyncio
 from sentry_sdk.integrations import asgi
 from starlette.middleware import Middleware, authentication
 
+from snowfall.junction.client_api import jwt
 from snowfall.junction.mobile_api import (
     bootstrap,
     jwt_generator,
@@ -30,6 +33,7 @@ def _factory(
     app: service.Application[bootstrap.Settings],
 ) -> Callable[[], ASGIApplication]:
     def decorator() -> ASGIApplication:
+        stripe.api_key = app.settings.stripe_api_key
         junction_client = client.JunctionClient(
             api_url=random.choice(app.settings.junction_api_address),  # nosec
             token=app.settings.junction_api_token,
@@ -73,6 +77,12 @@ def _factory(
                             redis_client=redis_client,
                             cache_ttl=app.settings.otp_cache_ttl,
                         ),
+                        stripe_users_repository=repository.StripeUsersRepository(
+                            mongo["stripe_users"],
+                        ),
+                        payment_intent_repository=repository.PaymentIntentRepository(
+                            mongo["stripe_payment_intent"],
+                        ),
                         smtp_client=smtp_cl,
                         orders_repository=repository.OrdersRepository(
                             mongo["orders"],
@@ -96,6 +106,16 @@ def _factory(
                         Middleware(
                             authentication.AuthenticationMiddleware,
                             backend=otp_middleware.OTPAuthenticationBackend(),
+                            on_error=handlers.auth_error_handler,
+                        ),
+                        Middleware(
+                            authentication.AuthenticationMiddleware,
+                            backend=jwt.JWTAuthenticationBackend(
+                                token_version=app.settings.jwt_token_version,
+                                public_key=base64.b64decode(
+                                    app.settings.jwt_public_key.encode(),
+                                ).decode(),
+                            ),
                             on_error=handlers.auth_error_handler,
                         ),
                     ],

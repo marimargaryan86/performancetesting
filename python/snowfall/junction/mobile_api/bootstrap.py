@@ -32,6 +32,8 @@ class Settings(service.Settings):
     mongo_dsn: Sequence[AnyUrl]
     jwt_private_key: str
     jwt_token_version: str
+    jwt_public_key: str
+    stripe_api_key: str
 
 
 def create_dependencies(  # noqa: WPS211
@@ -44,6 +46,8 @@ def create_dependencies(  # noqa: WPS211
     trips_repository: repository.TripsRepository,
     smtp_client: smtp.EmailClient,
     jwt_gen: jwt_generator.JwtGenerator,
+    stripe_users_repository: repository.StripeUsersRepository,
+    payment_intent_repository: repository.PaymentIntentRepository,
 ) -> starlette.StarletteIntegration:
     container = lagom.Container()
     container[repository.OrdersRepository] = orders_repository
@@ -55,6 +59,8 @@ def create_dependencies(  # noqa: WPS211
     container[repository.TripsRepository] = trips_repository
     container[smtp.EmailClient] = smtp_client
     container[jwt_generator.JwtGenerator] = jwt_gen
+    container[repository.StripeUsersRepository] = stripe_users_repository
+    container[repository.PaymentIntentRepository] = payment_intent_repository
     return starlette.StarletteIntegration(container)
 
 

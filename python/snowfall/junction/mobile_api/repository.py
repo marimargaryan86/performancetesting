@@ -1,3 +1,4 @@
+# flake8: noqa: WPS202
 import datetime
 import re
 import uuid
@@ -58,6 +59,9 @@ class UsersRepository(
     async def find_user(self, query: Any) -> Any:
         return await self._execute(self._collection.find_one, filter=query)
 
+    async def get(self, query: Any) -> Any:
+        return await self._execute(self._collection.find_one, filter=query)
+
 
 class OtpRepository(object):
     def __init__(
@@ -81,6 +85,24 @@ class OtpRepository(object):
             await self._redis.delete(email)
             return True
         return False
+
+
+class StripeUsersRepository(
+    mixins.FindByIdMixin[dict[str, Any]],
+    mixins.InsertMixin[dict[str, Any]],
+    repository.DefaultRepository,
+):
+    async def get(self, search: Any) -> Any:
+        return await self._execute(self._collection.find_one, filter=search)
+
+
+class PaymentIntentRepository(
+    mixins.FindByIdMixin[dict[str, Any]],
+    mixins.InsertMixin[dict[str, Any]],
+    repository.DefaultRepository,
+):
+    async def append_api_response(self, query: Any, document: Any) -> None:
+        await self._execute(self._collection.update_one, query, document, upsert=False)
 
 
 class MockRepository(

@@ -43,6 +43,36 @@ def jwt_gen() -> jwt_generator.JwtGenerator:
     )
 
 
+@pytest.fixture
+def orders_repository() -> repository.OrdersRepository:
+    mongo = motor_asyncio.AsyncIOMotorClient()
+    return mongo["test"]["orders"]
+
+
+@pytest.fixture
+def stripe_users_repository() -> repository.UsersRepository:
+    mongo = motor_asyncio.AsyncIOMotorClient()
+    return mongo["test"]["stripe_users"]
+
+
+@pytest.fixture
+def payment_intent_repository() -> repository.UsersRepository:
+    mongo = motor_asyncio.AsyncIOMotorClient()
+    return mongo["test"]["stripe_payment_intent"]
+
+
+@pytest.fixture
+def users_repository() -> repository.UsersRepository:
+    mongo = motor_asyncio.AsyncIOMotorClient()
+    return mongo["test"]["users"]
+
+
+@pytest.fixture
+def otp_repository() -> repository.OtpRepository:
+    mongo = motor_asyncio.AsyncIOMotorClient()
+    return mongo["test"]["otp"]
+
+
 @pytest.fixture()
 def headers() -> dict[str, str]:
     return {
@@ -92,6 +122,8 @@ def app(  # noqa: WPS211
     trips_repository: repository.TripsRepository,
     junction_client: client.JunctionClient,
     jwt_gen: jwt_generator.JwtGenerator,
+    stripe_users_repository: repository.StripeUsersRepository,
+    payment_intent_repository: repository.PaymentIntentRepository,
 ) -> applications.Starlette:
     return _create_app(
         bootstrap.create_dependencies(
@@ -104,6 +136,8 @@ def app(  # noqa: WPS211
             trips_repository,
             smtp_client,
             jwt_gen,
+            stripe_users_repository,
+            payment_intent_repository,
         ),
         [
             Middleware(

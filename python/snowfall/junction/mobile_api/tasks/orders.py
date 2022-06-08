@@ -25,11 +25,11 @@ async def poll_order_status(
             for order_result in order["orderResults"]
         )
         if all(orders_confirmed_generator):
-            payments.capture(payment_intent)
+            await payments.capture(payment_intent)
             return True
 
         await asyncio.sleep(_ORDER_STATUS_POLLING_INTERVAL)
         time_spent += _ORDER_STATUS_POLLING_INTERVAL
 
-    payments.cancel(payment_intent)
+    await payments.cancel(payment_intent)
     return False
