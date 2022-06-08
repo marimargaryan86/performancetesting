@@ -65,7 +65,7 @@ job "save-a-train-orders" {
       template {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service (printf "amqp-${var.environment}")}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
-GEODATA_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_geodata_${var.environment}"))}}
+GEODATA_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_geodata-${var.environment}"))}}
 REDIS_DSN={{range $index, $service := service (printf "redis-${var.environment}")}}redis://{{.Address}}:{{.Port}}// {{end}}
 {{ with secret (printf "kv/${var.environment}/save-a-train") }}
 API_EMAIL={{ .Data.data.api_email }}
