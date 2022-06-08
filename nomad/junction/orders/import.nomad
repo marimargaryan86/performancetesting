@@ -45,7 +45,7 @@ job "orders-import" {
           proxy {
             upstreams {
               local_bind_port  = 9090
-              destination_name = "passenger-name-records"
+              destination_name = "passenger-name-records-${var.environment}"
             }
           }
         }

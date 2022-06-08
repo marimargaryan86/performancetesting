@@ -48,7 +48,7 @@ job "save-a-train-orders" {
           proxy {
             upstreams {
               local_bind_port = 7070
-              destination_name = "geodata-production"
+              destination_name = "geodata-${var.environment}"
             }
           }
         }
