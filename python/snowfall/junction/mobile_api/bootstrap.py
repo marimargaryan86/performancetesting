@@ -37,6 +37,7 @@ class Settings(service.Settings):
 
 
 def create_dependencies(  # noqa: WPS211
+    offers_repository: repository.OffersRepository,
     orders_repository: repository.OrdersRepository,
     junction_client: client.JunctionClient,
     places_repository: repository.PlacesRepository,
@@ -50,6 +51,7 @@ def create_dependencies(  # noqa: WPS211
     payment_intent_repository: repository.PaymentIntentRepository,
 ) -> starlette.StarletteIntegration:
     container = lagom.Container()
+    container[repository.OffersRepository] = offers_repository
     container[repository.OrdersRepository] = orders_repository
     container[client.JunctionClient] = junction_client
     container[repository.PlacesRepository] = places_repository

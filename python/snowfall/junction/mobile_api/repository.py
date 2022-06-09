@@ -105,6 +105,29 @@ class PaymentIntentRepository(
         await self._execute(self._collection.update_one, query, document, upsert=False)
 
 
+class OffersRepository(
+    mixins.FindByIdMixin[dict[str, Any]],
+    mixins.InsertMixin[dict[str, Any]],
+    repository.DefaultRepository,
+):
+    async def append_offer_search(self, user_id: str, offer_search_id: str) -> None:
+        await self._execute(
+            self._collection.update_one,
+            {"user_id": user_id},
+            {
+                "$push": {
+                    "offer_search_history": {
+                        {
+                            "offer_search_id": offer_search_id,
+                            "created": datetime.datetime.utcnow(),
+                        }
+                    }
+                }
+            },
+            upsert=True,
+        )
+
+
 class MockRepository(
     mixins.AllMixin[dict[str, Any]],
     mixins.InsertMixin[dict[str, Any]],

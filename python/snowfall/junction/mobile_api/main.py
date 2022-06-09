@@ -68,6 +68,9 @@ def _factory(
             asgi.SentryAsgiMiddleware(
                 bootstrap.create_app(
                     dependencies=bootstrap.create_dependencies(
+                        offers_repository=repository.OffersRepository(
+                            mongo["offers"],
+                        ),
                         places_repository=repository.PlacesRepository(
                             mongo["places"],
                         ),

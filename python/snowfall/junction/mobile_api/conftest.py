@@ -12,17 +12,22 @@ from snowfall.stdlib.integration.starlette import middlewares, validation
 from snowfall.stdlib.persistence import filesystem
 from snowfall.vendor.junction import client
 
+mongo_test_repo = motor_asyncio.AsyncIOMotorClient()["test"]
+
+
+@pytest.fixture
+def offers_repository() -> repository.OffersRepository:
+    return mongo_test_repo["offers"]
+
 
 @pytest.fixture
 def trip_searches_repository() -> repository.TripSearchesRepository:
-    mongo = motor_asyncio.AsyncIOMotorClient()
-    return mongo["test"]["trip-searches"]
+    return mongo_test_repo["trip-searches"]
 
 
 @pytest.fixture
 def trips_repository() -> repository.TripsRepository:
-    mongo = motor_asyncio.AsyncIOMotorClient()
-    return mongo["test"]["trips"]
+    return mongo_test_repo["trips"]
 
 
 def _create_app(
@@ -45,26 +50,22 @@ def jwt_gen() -> jwt_generator.JwtGenerator:
 
 @pytest.fixture
 def orders_repository() -> repository.OrdersRepository:
-    mongo = motor_asyncio.AsyncIOMotorClient()
-    return mongo["test"]["orders"]
+    return mongo_test_repo["orders"]
 
 
 @pytest.fixture
 def stripe_users_repository() -> repository.UsersRepository:
-    mongo = motor_asyncio.AsyncIOMotorClient()
-    return mongo["test"]["stripe_users"]
+    return mongo_test_repo["stripe_users"]
 
 
 @pytest.fixture
 def payment_intent_repository() -> repository.UsersRepository:
-    mongo = motor_asyncio.AsyncIOMotorClient()
-    return mongo["test"]["stripe_payment_intent"]
+    return mongo_test_repo["stripe_payment_intent"]
 
 
 @pytest.fixture
 def users_repository() -> repository.UsersRepository:
-    mongo = motor_asyncio.AsyncIOMotorClient()
-    return mongo["test"]["users"]
+    return mongo_test_repo["users"]
 
 
 @pytest.fixture
@@ -113,6 +114,7 @@ def places_repository() -> repository.PlacesRepository:
 
 @pytest.fixture()
 def app(  # noqa: WPS211
+    offers_repository: repository.OffersRepository,
     places_repository: repository.PlacesRepository,
     users_repository: repository.UsersRepository,
     otp_repository: repository.OtpRepository,
@@ -127,6 +129,7 @@ def app(  # noqa: WPS211
 ) -> applications.Starlette:
     return _create_app(
         bootstrap.create_dependencies(
+            offers_repository,
             orders_repository,
             junction_client,
             places_repository,

@@ -10,6 +10,8 @@ from snowfall.vendor.junction import models
 _DATA_KEY = "data"
 _ID_KEY = "id"
 _TYPE_KEY = "type"
+_LIMIT_KEY = "page[limit]"
+_CURSOR_KEY = "page[cursor]"
 
 
 class LegType(enum.Enum):
@@ -48,9 +50,7 @@ class JunctionClient(object):  # noqa: WPS214
         cursor: Optional[str] = None,
     ) -> Dict[str, Any]:
         request_parameters = {
-            key: vl
-            for key, vl in (("page[limit]", limit), ("page[cursor]", cursor))
-            if vl
+            key: vl for key, vl in ((_LIMIT_KEY, limit), (_CURSOR_KEY, cursor)) if vl
         }
         response = await self._client.get(
             "{0}/places".format(self._api_url),
@@ -89,9 +89,7 @@ class JunctionClient(object):  # noqa: WPS214
         cursor: Optional[str] = None,
     ) -> Dict[str, Any]:
         request_parameters = {
-            key: vl
-            for key, vl in (("page[limit]", limit), ("page[cursor]", cursor))
-            if vl
+            key: vl for key, vl in ((_LIMIT_KEY, limit), (_CURSOR_KEY, cursor)) if vl
         }
         response = await self._client.get(
             "{0}/segments/{1}/legs".format(self._api_url, segment_id),
@@ -228,10 +226,18 @@ class JunctionClient(object):  # noqa: WPS214
     async def get_offers_by_offer_search_id(
         self,
         offers_search_id: str,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
     ) -> Dict[str, Any]:
+        request_parameters = {
+            key: vl
+            for key, vl in (("page[limit]", limit), ("page[cursor]", cursor))
+            if vl
+        }
         response = await self._client.get(
             "{0}/offers/searches/{1}/offers".format(self._api_url, offers_search_id),
             headers=self._auth_headers,
+            params=request_parameters,
         )
 
         response.raise_for_status()

@@ -3,6 +3,7 @@ from starlette import routing
 
 from snowfall.junction.mobile_api.routes import (
     health,
+    offers,
     orders,
     payments,
     places,
@@ -20,6 +21,11 @@ def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Rou
             "/orders/{orderId}",
             orders.Order,
             name="ViewOrder",
+        ),
+        dependencies.route("/offers/searches", offers.OfferSearches),
+        dependencies.route(
+            "/offers/searches/{offerSearchId}/offers",
+            offers.OffersByOfferSearch,
         ),
         dependencies.route("/verification-code", users.OTPGenerate),
         dependencies.route("/users/sessions", users.Session),
