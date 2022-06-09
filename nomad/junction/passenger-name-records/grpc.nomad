@@ -14,10 +14,6 @@ variable "registry_username" {
   type = string
 }
 
-variable "environment" {
-  type = string
-}
-
 job "passenger-name-records-grpc" {
   datacenters = ["junction-dev-dc1"]
   type        = "service"
@@ -36,17 +32,12 @@ job "passenger-name-records-grpc" {
 
     network {
       port "grpc" {}
-      mode = "bridge"
     }
 
     service {
-      name = "passenger-name-records-${var.environment}"
+      name = "passenger-name-records-${NOMAD_NAMESPACE}"
       port = "grpc"
       tags = ["grpc"]
-
-      connect {
-        sidecar_service {}
-      }
 
       check {
         type     = "grpc"
@@ -60,7 +51,7 @@ job "passenger-name-records-grpc" {
 
       template {
         data        = <<EOH
-MONGO_DSN={{range $index, $service := service (printf "mongodb-${var.environment}")}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
+MONGO_DSN={{range $index, $service := service "mongodb"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 EOH
         destination = "services.env"
         env         = true
@@ -82,7 +73,7 @@ EOH
       }
 
       env {
-        ENV_NAME     = "${var.environment}"
+        ENV_NAME     = "${NOMAD_NAMESPACE}"
         GRPC_ADDRESS = "0.0.0.0"
         GRPC_PORT    = "${NOMAD_PORT_grpc}"
         SENTRY_DSN   = "https://602f3e0c605a42528db36cc4e82adb47@sentry.snowfall.se/32"

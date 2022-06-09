@@ -14,10 +14,6 @@ variable "registry_username" {
   type = string
 }
 
-variable "environment" {
-  type = string
-}
-
 job "geodata-grpc" {
   datacenters = ["junction-dev-dc1"]
   type        = "service"
@@ -36,17 +32,12 @@ job "geodata-grpc" {
 
     network {
       port "grpc" {}
-      mode = "bridge"
     }
 
     service {
-      name = "geodata-${var.environment}"
+      name = "geodata-${NOMAD_NAMESPACE}"
       port = "grpc"
       tags = ["grpc"]
-
-      connect {
-        sidecar_service {}
-      }
 
       check {
         type     = "grpc"
@@ -63,9 +54,10 @@ job "geodata-grpc" {
         env         = true
         change_mode = "restart"
         data        = <<EOH
-REDIS_DSN={{range $index, $service := service (printf "redis-${var.environment}")}}redis://{{.Address}}:{{.Port}}// {{end}}
+REDIS_DSN={{range $index, $service := service "redis"}}redis://{{.Address}}:{{.Port}}// {{end}}
 EOH
       }
+
       config {
         image = var.docker_image
         ports = ["grpc"]
@@ -81,7 +73,7 @@ EOH
       }
 
       env {
-        ENV_NAME     = "${var.environment}"
+        ENV_NAME     = "${NOMAD_NAMESPACE}"
         GRPC_ADDRESS = "0.0.0.0"
         GRPC_PORT    = "${NOMAD_PORT_grpc}"
         SENTRY_DSN   = "https://dd680235569f43ce97b7e91d839900a0@sentry.snowfall.se/31"

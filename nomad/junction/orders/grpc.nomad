@@ -14,10 +14,6 @@ variable "registry_username" {
   type = string
 }
 
-variable "environment" {
-  type = string
-}
-
 job "orders-grpc" {
   datacenters = ["junction-dev-dc1"]
   type        = "service"
@@ -36,23 +32,13 @@ job "orders-grpc" {
 
     network {
       port "grpc" {}
-      mode = "bridge"
     }
 
     service {
-      name = "orders-${var.environment}"
+      name = "orders-${NOMAD_NAMESPACE}"
       port = "grpc"
       tags = ["grpc"]
-      connect {
-        sidecar_service {
-          proxy {
-            upstreams {
-              local_bind_port  = 9090
-              destination_name = "passenger-name-records-${var.environment}"
-            }
-          }
-        }
-      }
+
       check {
         type     = "grpc"
         interval = "10s"
@@ -65,9 +51,9 @@ job "orders-grpc" {
 
       template {
         data        = <<EOH
-AMQP_DSN={{range $index, $service := service (printf "amqp-${var.environment}")}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
-MONGO_DSN={{range $index, $service := service (printf "mongodb-${var.environment}")}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
-PASSENGER_NAME_RECORDS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_passenger-name-records-${var.environment}"))}}
+AMQP_DSN={{range $index, $service := service "amqp"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
+MONGO_DSN={{range $index, $service := service "mongodb"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
+PASSENGER_NAME_RECORDS_ADDRESS={{range $index, $service := service (printf "grpc.passenger-name-records-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
 EOH
         destination = "services.env"
         env         = true
@@ -89,7 +75,7 @@ EOH
       }
 
       env {
-        ENV_NAME     = "${var.environment}"
+        ENV_NAME     = "${NOMAD_NAMESPACE}"
         GRPC_ADDRESS = "0.0.0.0"
         GRPC_PORT    = "${NOMAD_PORT_grpc}"
         SENTRY_DSN   = "https://7c600c1c458d403e8047091398239f20@sentry.snowfall.se/27"

@@ -14,10 +14,6 @@ variable "registry_username" {
   type = string
 }
 
-variable "environment" {
-  type = string
-}
-
 job "save-a-train-offers" {
   datacenters = ["junction-dev-dc1"]
   type        = "service"
@@ -34,30 +30,13 @@ job "save-a-train-offers" {
   group "offers" {
     count = 5
 
-    network {
-      mode = "bridge"
-    }
-    service {
-      name = "save-a-train-offers-${var.environment}"
-      connect {
-        sidecar_service {
-          proxy {
-            upstreams {
-              local_bind_port  = 7070
-              destination_name = "geodata-${var.environment}"
-            }
-          }
-        }
-      }
-    }
-
     task "offers" {
       driver = "docker"
 
       template {
         data        = <<EOH
-AMQP_DSN={{range $index, $service := service (printf "amqp-${var.environment}")}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
-GEODATA_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_geodata-${var.environment}"))}}
+AMQP_DSN={{range $index, $service := service "amqp"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
+GEODATA_ADDRESS={{range $index, $service := service (printf "grpc.geodata-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
 EOH
         destination = "services.env"
         env         = true
@@ -78,8 +57,8 @@ EOH
       }
 
       env {
-        ENV_NAME   = "${var.environment}"
-        SENTRY_DSN = "https://f01c7c8bf4d04a709a65b4be8b11ba69@sentry.snowfall.se/36"
+        ENV_NAME             = "${NOMAD_NAMESPACE}"
+        SENTRY_DSN           = "https://f01c7c8bf4d04a709a65b4be8b11ba69@sentry.snowfall.se/36"
       }
     }
   }

@@ -14,10 +14,6 @@ variable "registry_username" {
   type = string
 }
 
-variable "environment" {
-  type = string
-}
-
 job "offers-import" {
   datacenters = ["junction-dev-dc1"]
   type        = "service"
@@ -39,9 +35,9 @@ job "offers-import" {
 
       template {
         data        = <<EOH
-AMQP_DSN={{range $index, $service := service (printf "amqp-${var.environment}")}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
-MONGO_DSN={{range $index, $service := service (printf "mongodb-${var.environment}")}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
-REDIS_DSN={{range $index, $service := service (printf "redis-${var.environment}")}}redis://{{.Address}}:{{.Port}}// {{end}}
+AMQP_DSN={{range $index, $service := service "amqp"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
+MONGO_DSN={{range $index, $service := service "mongodb"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
+REDIS_DSN={{range $index, $service := service "redis"}}redis://{{.Address}}:{{.Port}}// {{end}}
 EOH
         destination = "services.env"
         env         = true
@@ -62,7 +58,7 @@ EOH
       }
 
       env {
-        ENV_NAME   = "${var.environment}"
+        ENV_NAME   = "${NOMAD_NAMESPACE}"
         SENTRY_DSN = "https://7c600c1c458d403e8047091398239f20@sentry.snowfall.se/27"
       }
     }

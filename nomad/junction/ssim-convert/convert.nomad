@@ -14,10 +14,6 @@ variable "registry_username" {
   type = string
 }
 
-variable "environment" {
-  type = string
-}
-
 job "ssim-convert-convert" {
   datacenters = ["junction-dev-dc1"]
   type        = "batch"
@@ -57,7 +53,7 @@ job "ssim-convert-convert" {
       }
 
       env {
-        ENV_NAME   = "${var.environment}"
+        ENV_NAME   = "${NOMAD_NAMESPACE}"
         SENTRY_DSN = "https://43837909119c4ce186975c300c4efe6e@sentry.snowfall.se/23"
       }
     }
@@ -70,12 +66,12 @@ job "ssim-convert-convert" {
       driver = "docker"
 
       vault {
-        policies = ["ssim-convert-${var.environment}"]
+        policies = ["ssim-convert-dev"]
       }
 
       template {
         data        = <<EOH
-{{ with secret (printf "kv/${var.environment}/ssim-convert") }}
+{{ with secret "kv/dev/ssim-convert" }}
 AWS_ACCESS_KEY_ID={{ .Data.data.aws_access_key_id }}
 AWS_SECRET_ACCESS_KEY={{ .Data.data.aws_secret_access_key }}
 {{ end }}

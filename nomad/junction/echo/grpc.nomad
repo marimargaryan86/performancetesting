@@ -14,10 +14,6 @@ variable "registry_username" {
   type = string
 }
 
-variable "environment" {
-  type = string
-}
-
 job "echo-grpc" {
   datacenters = ["junction-dev-dc1"]
   type        = "service"
@@ -39,7 +35,7 @@ job "echo-grpc" {
     }
 
     service {
-      name = "echo-${var.environment}"
+      name = "echo-${NOMAD_NAMESPACE}"
       port = "grpc"
       tags = ["grpc"]
 
@@ -68,7 +64,7 @@ job "echo-grpc" {
       }
 
       env {
-        ENV_NAME     = "${var.environment}"
+        ENV_NAME     = "${NOMAD_NAMESPACE}"
         GRPC_ADDRESS = "0.0.0.0"
         GRPC_PORT    = "${NOMAD_PORT_grpc}"
         SENTRY_DSN   = "https://43837909119c4ce186975c300c4efe6e@sentry.snowfall.se/18"

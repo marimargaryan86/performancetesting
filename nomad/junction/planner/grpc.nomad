@@ -14,10 +14,6 @@ variable "registry_username" {
   type = string
 }
 
-variable "environment" {
-  type = string
-}
-
 job "planner-grpc" {
   datacenters = ["junction-dev-dc1"]
   type        = "service"
@@ -36,17 +32,12 @@ job "planner-grpc" {
 
     network {
       port "grpc" {}
-      mode = "bridge"
     }
 
     service {
-      name = "planner-${var.environment}"
+      name = "planner-${NOMAD_NAMESPACE}"
       port = "grpc"
       tags = ["grpc"]
-
-      connect {
-        sidecar_service {}
-      }
 
       check {
         type     = "grpc"
@@ -125,7 +116,7 @@ job "planner-grpc" {
       }
 
       env {
-        ENV_NAME     = "${var.environment}"
+        ENV_NAME     = "${NOMAD_NAMESPACE}"
         GRPC_ADDRESS = "0.0.0.0"
         GRPC_PORT    = "${NOMAD_PORT_grpc}"
         PROTO_DIR    = "${NOMAD_TASK_DIR}"
