@@ -117,10 +117,8 @@ class OffersRepository(
             {
                 "$push": {
                     "offer_search_history": {
-                        {
-                            "offer_search_id": offer_search_id,
-                            "created": datetime.datetime.utcnow(),
-                        }
+                        "offer_search_id": offer_search_id,
+                        "created": datetime.datetime.utcnow(),
                     }
                 }
             },

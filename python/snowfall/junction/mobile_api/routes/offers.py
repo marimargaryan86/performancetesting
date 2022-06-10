@@ -13,7 +13,7 @@ class OfferSearches(endpoints.HTTPEndpoint):
     async def post(
         self,
         request: requests.Request,
-        offers_repository: repository.OffersRepository,
+        offers_repository: repository.OffersRepository = lagom.injectable,
         junction_client: client.JunctionClient = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
