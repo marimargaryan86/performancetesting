@@ -150,8 +150,7 @@
         },
         "operationId": "trip-search",
         "description": "Search trips.",
-        "x-internal": true,
-        "security": []
+        "x-internal": true
       }
     },
     "/trips/searches/{tripSearchId}/trips": {
@@ -552,8 +551,7 @@
         },
         "operationId": "post-payment",
         "description": "Creates a paymentIntent and a stripe customer if there isn't any for this particular user",
-        "x-internal": true,
-        "security": [{"jwt": []}]
+        "x-internal": true
       }
     },
     "/users/{userId}/orders": {
@@ -647,8 +645,7 @@
           }
         },
         "operationId": "get-places",
-        "description": "Get places.",
-        "security": []
+        "description": "Get places."
       }
     },
     "/verification-code": {
@@ -708,7 +705,8 @@
           }
         },
         "operationId": "post-opt-generate",
-        "description": "Otp generation"
+        "description": "Otp generation",
+        "security": []
       }
     },
     "/users": {
@@ -2322,5 +2320,6 @@
         "scheme": "bearer"
       }
     }
-  }
+  },
+  "security": [{"jwt": []}]
 }

@@ -12,11 +12,10 @@ from motor import motor_asyncio
 from sentry_sdk.integrations import asgi
 from starlette.middleware import Middleware, authentication
 
-from snowfall.junction.client_api import jwt
 from snowfall.junction.mobile_api import (
+    auth_middleware,
     bootstrap,
     jwt_generator,
-    otp_middleware,
     places_migration,
     repository,
     smtp,
@@ -62,7 +61,6 @@ def _factory(
             jwt_private_key=app.settings.jwt_private_key,
             jwt_token_version=app.settings.jwt_token_version,
         )
-
         return cast(
             ASGIApplication,
             asgi.SentryAsgiMiddleware(
@@ -109,12 +107,7 @@ def _factory(
                         ),
                         Middleware(
                             authentication.AuthenticationMiddleware,
-                            backend=otp_middleware.OTPAuthenticationBackend(),
-                            on_error=handlers.auth_error_handler,
-                        ),
-                        Middleware(
-                            authentication.AuthenticationMiddleware,
-                            backend=jwt.JWTAuthenticationBackend(
+                            backend=auth_middleware.AuthenticationBackend(
                                 token_version=app.settings.jwt_token_version,
                                 public_key=base64.b64decode(
                                     app.settings.jwt_public_key.encode(),
