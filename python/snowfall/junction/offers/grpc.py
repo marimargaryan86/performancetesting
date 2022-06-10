@@ -92,14 +92,16 @@ class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):
         request: grpc_pb2.ListOffersRequest,
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.ListOffersResponse:
-        if not request.offer_search_id:
-            # TODO: if request.payload.offer_ids.ids:
-            return grpc_pb2.ListOffersResponse()
-
-        offer_aggregates = await self._aggregates.find_by_offer_search_id(
-            request.offer_search_id,
-            cursor=request.page_token,
-        )
+        if request.offer_search_id:
+            offer_aggregates = await self._aggregates.find_by_offer_search_id(
+                request.offer_search_id,
+                cursor=request.page_token,
+            )
+        else:
+            offer_aggregates = await self._aggregates.find(
+                list(request.offer_ids.ids),
+                cursor=request.page_token,
+            )
 
         offer_aggregates.limit(
             request.page_size

@@ -62,6 +62,26 @@ class OfferAggregateMappingRepository(
             filter_={"offer_search_id": offer_search_id},
         )
 
+    async def find(
+        self,
+        ids: Sequence[str],
+        cursor: str,
+    ) -> resultset.ResultSet[models_pb2.OfferAggregateMapping]:
+        filter_ = (
+            {
+                repository.mongo_id_key: {
+                    "$in": ids,
+                },
+            }
+            if ids
+            else {}
+        )
+
+        return await self._find_with_cursor(
+            cur=cursor,
+            filter_=filter_,
+        )
+
 
 class OfferSearchRepository(  # noqa: WPS215
     mixins.AllMixin[models_pb2.OfferSearch],
