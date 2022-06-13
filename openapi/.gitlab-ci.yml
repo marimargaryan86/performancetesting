@@ -1,3 +1,21 @@
+openapi:breaking:
+  stage: test
+  image:
+    name: "node:18"
+    entrypoint: [""]
+  interruptible: true
+  script: |
+    for f in openapi/**/*.json; do
+      git show "${CI_MERGE_REQUEST_DIFF_BASE_SHA}:${f}" > old.json || exit 0
+      npx openapi-diff -- old.json "${f}"
+    done
+  rules:
+    - if: '$CI_MERGE_REQUEST_IID'
+      changes:
+        - openapi/**/*
+  tags:
+    - docker
+
 openapi:test:
   stage: test
   image:
