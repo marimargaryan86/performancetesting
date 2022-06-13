@@ -82,7 +82,7 @@ lockfile = "vendor/lock/isort.txt"
 interpreter_constraints = ["CPython==3.9.10"]
 
 [mypy]
-version = "mypy==0.950"
+version = "mypy==0.961"
 config = "vendor/setup.cfg"
 lockfile = "vendor/lock/mypy.txt"
 interpreter_constraints = ["CPython==3.9.10"]

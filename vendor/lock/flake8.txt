@@ -667,13 +667,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "b99d9041b769b857efe45a448dc8c71b1bb311f9cacbdac5de82f96498105082",
-              "url": "https://files.pythonhosted.org/packages/56/24/df711a174189a2f40b2085fa848ce3b08edba247d2da62d2e6c27d7982e8/flake8_rst_docstrings-0.2.5-py3-none-any.whl"
+              "hash": "a7a9bd9008e763339b2e19dbece7767ac0887cfaeaf9a70b12eb4449d5df1849",
+              "url": "https://files.pythonhosted.org/packages/1a/c9/a8043561bb406bada92d6407a24a8b728de3fe433e930c067757c5175e1e/flake8_rst_docstrings-0.2.6-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "4fe93f997dea45d9d3c8bd220f12f0b6c359948fb943b5b48021a3f927edd816",
-              "url": "https://files.pythonhosted.org/packages/1f/7a/fe0efa6d80b5bd579786ee30edc3cb8d2a91b5a97597ba03a4d56f9eb1a4/flake8-rst-docstrings-0.2.5.tar.gz"
+              "hash": "7d9526a264a1c2827b3408ea5f921f12ee0689ac123fecfa95744988aea02e6c",
+              "url": "https://files.pythonhosted.org/packages/a1/bd/0b26c47d0191363d76897c0f4cde0ac9374a855c2477f9647caaa35f5f57/flake8-rst-docstrings-0.2.6.tar.gz"
             }
           ],
           "project_name": "flake8-rst-docstrings",
@@ -682,8 +682,8 @@
             "pygments",
             "restructuredtext-lint"
           ],
-          "requires_python": ">=3.6",
-          "version": "0.2.5"
+          "requires_python": ">=3.7",
+          "version": "0.2.6"
         },
         {
           "artifacts": [
@@ -1012,13 +1012,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "68e45d17c9281ba25dc0104eadd2647172b3472d9e01f911efa57965e8d51a36",
-              "url": "https://files.pythonhosted.org/packages/e9/1c/ec080fde54ab30a738c92f794eab7f5d2f354f2b619ee95b2efe353e0766/setuptools-62.3.2-py3-none-any.whl"
+              "hash": "d1746e7fd520e83bbe210d02fff1aa1a425ad671c7a9da7d246ec2401a087198",
+              "url": "https://files.pythonhosted.org/packages/27/0b/cb81bc3a06a242c7626fca8aa9ce82453af3bc44e72a39666bb4052ac302/setuptools-62.3.3-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "a43bdedf853c670e5fed28e5623403bad2f73cf02f9a2774e91def6bda8265a7",
-              "url": "https://files.pythonhosted.org/packages/4a/25/ec29a23ef38b9456f9965c57a9e1221e6c246d87abbf2a31158799bca201/setuptools-62.3.2.tar.gz"
+              "hash": "e7d11f3db616cda0751372244c2ba798e8e56a28e096ec4529010b803485f3fe",
+              "url": "https://files.pythonhosted.org/packages/fb/50/005826d31d58a7b90585b5510f2f597c5406ae34df884f4f5d63abfb6ca7/setuptools-62.3.3.tar.gz"
             }
           ],
           "project_name": "setuptools",
@@ -1066,7 +1066,7 @@
             "wheel; extra == \"testing-integration\""
           ],
           "requires_python": ">=3.7",
-          "version": "62.3.2"
+          "version": "62.3.3"
         },
         {
           "artifacts": [
@@ -1229,7 +1229,7 @@
     }
   ],
   "path_mappings": {},
-  "pex_version": "2.1.84",
+  "pex_version": "2.1.90",
   "prefer_older_binary": false,
   "requirements": [
     "flake8-annotations",
