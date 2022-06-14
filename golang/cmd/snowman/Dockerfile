@@ -1,4 +1,5 @@
-FROM golang:1.18 AS build
+ARG REGISTRY
+FROM ${REGISTRY}golang:1.18 AS build
 WORKDIR /build
 COPY golang/go.mod golang/go.sum /build/
 RUN go mod download

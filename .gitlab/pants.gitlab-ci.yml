@@ -2,7 +2,7 @@ pants:setup:
   stage: setup
   interruptible: true
   script:
-    - DOCKER_BUILDKIT=1 docker build --pull --compress -f ".gitlab/pants.Dockerfile" -t "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}" --build-arg BUILDKIT_INLINE_CACHE=1 .gitlab/
+    - DOCKER_BUILDKIT=1 docker build --pull --compress -f ".gitlab/pants.Dockerfile" -t "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}" --build-arg "REGISTRY=${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/" --build-arg BUILDKIT_INLINE_CACHE=1 .gitlab/
     - docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
     - docker push "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"
   needs: []

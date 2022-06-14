@@ -4,7 +4,7 @@
 .protobuf:buf:
   interruptible: true
   image:
-    name: bufbuild/buf
+    name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/bufbuild/buf"
     entrypoint: [""]
   variables:
     BUF_BINARY: /usr/local/bin/buf

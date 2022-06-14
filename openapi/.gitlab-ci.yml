@@ -4,9 +4,12 @@ openapi:breaking:
     name: "node:18"
     entrypoint: [""]
   interruptible: true
+  variables:
+    GIT_DEPTH: 0
+    GIT_STRATEGY: clone
   script: |
     for f in openapi/**/*.json; do
-      git show "${CI_MERGE_REQUEST_DIFF_BASE_SHA}:${f}" > old.json || exit 0
+      git show "${CI_MERGE_REQUEST_DIFF_BASE_SHA}:${f}" > old.json || continue
       npx openapi-diff -- old.json "${f}"
     done
   rules:
@@ -19,7 +22,7 @@ openapi:breaking:
 openapi:test:
   stage: test
   image:
-    name: "stoplight/spectral:6"
+    name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/stoplight/spectral:6"
     entrypoint: [""]
   interruptible: true
   script:
@@ -34,7 +37,7 @@ openapi:test:
 openapi:publish:
   stage: deploy
   image:
-    name: "node:18"
+    name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/node:18"
     entrypoint: [""]
   script:
     - npx @stoplight/cli@5 push --ci-token ${STOPLIGHT_TOKEN}

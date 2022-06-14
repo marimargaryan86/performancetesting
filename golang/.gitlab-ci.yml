@@ -5,7 +5,7 @@
 go:fmt:
   stage: test
   interruptible: true
-  image: golang:1.18
+  image: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.18"
   script:
     - gofmt -l -d golang/
   needs: [ ]
@@ -19,7 +19,7 @@ go:fmt:
 go:lint:
   stage: test
   interruptible: true
-  image: golangci/golangci-lint:v1.45.2
+  image: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golangci/golangci-lint:v1.45.2"
   before_script:
     - cd golang/
   script:
@@ -34,7 +34,7 @@ go:lint:
 go:test:
   stage: test
   interruptible: true
-  image: golang:1.18
+  image: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golang:1.18"
   before_script:
     - go install github.com/boumenot/gocover-cobertura@latest
     - cd golang/
