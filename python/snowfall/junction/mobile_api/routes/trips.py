@@ -59,13 +59,13 @@ class TripSearchesTrips(endpoints.HTTPEndpoint):
             request.path_params["tripSearchId"],
         )
 
-        if trip_search_trips:
-            trips_resources = [
-                resources.TripSearchTripsResource.from_mongo(trip)
-                for trip in trip_search_trips
-            ]
-        else:
+        if trip_search_trips is None:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+        trips_resources = [
+            resources.TripSearchTripsResource.from_mongo(trip)
+            for trip in trip_search_trips
+        ]
 
         return models.JsonApiResponse(
             models.Body(

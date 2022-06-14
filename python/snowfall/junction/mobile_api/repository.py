@@ -269,7 +269,7 @@ class TripSearchesRepository(
         if not trip_search:
             return None
 
-        return trip_search["relationships"].get("trips")
+        return trip_search["relationships"].get("trips", [])
 
     def _copy_keys(
         self,
