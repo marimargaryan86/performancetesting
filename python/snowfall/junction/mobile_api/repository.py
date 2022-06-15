@@ -15,6 +15,7 @@ from snowfall.stdlib.persistence.redis import types as redis
 _DATA_ACCESSOR = "data"
 _ID_ACCESSOR = "id"
 _ATTRIBUTES_ACCESSOR = "attributes"
+_EMAIL_KEY = "email"
 
 _DICT_SEQUENCE = Sequence[dict[str, Any]]
 
@@ -56,8 +57,13 @@ class UsersRepository(
     async def update_password(self, query: Any, document: Any) -> None:
         await self._execute(self._collection.update_one, query, document, upsert=False)
 
-    async def find_user(self, query: Any) -> Any:
-        return await self._execute(self._collection.find_one, filter=query)
+    async def find_user_by_email(self, email: str) -> Any:
+        return await self._execute(self._collection.find_one, {_EMAIL_KEY: email})
+
+    async def find_user_hide_password(self, email: str) -> Any:
+        return await self._execute(
+            self._collection.find_one, {_EMAIL_KEY: email}, {"password": 0}
+        )
 
     async def get(self, query: Any) -> Any:
         return await self._execute(self._collection.find_one, filter=query)

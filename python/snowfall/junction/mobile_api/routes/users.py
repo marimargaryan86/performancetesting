@@ -46,6 +46,30 @@ class Users(endpoints.HTTPEndpoint):
 
 
 class User(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        users_repository: repository.UsersRepository = lagom.injectable,
+    ) -> responses.Response:
+        search_id = request.path_params["userId"]
+
+        user_id = request.user.username
+
+        user = await users_repository.find_user_hide_password(search_id)
+        if not user:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        if user.get("_id") != user_id:
+            raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
+        return models.JsonApiResponse(
+            models.Body(
+                data=models.Resource(
+                    id=user.get(_id_key),
+                    type="User",
+                    attributes=user,
+                ),
+            ),
+        )
+
     async def patch(
         self,
         request: requests.Request,
@@ -110,11 +134,7 @@ class Session(endpoints.HTTPEndpoint):
         jwt_gen: jwt_generator.JwtGenerator = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
-        user = await users_repository.find_user(
-            {
-                _email_key: body[_email_key],
-            },
-        )
+        user = await users_repository.find_user_by_email(body[_email_key])
         if not user:
             raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
         password_match = bcrypt.checkpw(

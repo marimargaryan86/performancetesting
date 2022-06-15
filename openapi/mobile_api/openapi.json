@@ -492,30 +492,48 @@
                     "data": {
                       "type": "object",
                       "properties": {
-                        "type": {"type": "string"},
-                        "id": {"type": "string"},
+                        "type": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "type": "string"
+                        },
                         "attributes": {
                           "type": "object",
-                          "properties":{
-                            "clientSecret": {"type": "string"},
-                            "ephemeralKey": {"type": "string"},
-                            "customerId": {"type": "string"}
+                          "properties": {
+                            "clientSecret": {
+                              "type": "string"
+                            },
+                            "ephemeralKey": {
+                              "type": "string"
+                            },
+                            "customerId": {
+                              "type": "string"
+                            }
                           },
-                          "required": ["clientSecret", "ephemeralKey", "customerId"]
+                          "required": [
+                            "clientSecret",
+                            "ephemeralKey",
+                            "customerId"
+                          ]
                         }
                       },
-                      "required": ["type", "id", "attributes"]
+                      "required": [
+                        "type",
+                        "id",
+                        "attributes"
+                      ]
                     }
                   }
                 }
               }
             }
           },
-          "401":{
-            "$ref": "#/components/responses/Unauthorized"
-          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
           }
         },
         "requestBody": {
@@ -527,19 +545,37 @@
                   "data": {
                     "type": "object",
                     "properties": {
-                      "type": {"type": "string"},
-                      "id": {"type": "string"},
+                      "type": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string"
+                      },
                       "attributes": {
                         "type": "object",
-                        "properties":{
-                          "amount": {"type": "number"},
-                          "currency": {"type": "string"},
-                          "offerId": {"type": "string"}
+                        "properties": {
+                          "amount": {
+                            "type": "number"
+                          },
+                          "currency": {
+                            "type": "string"
+                          },
+                          "offerId": {
+                            "type": "string"
+                          }
                         },
-                        "required": ["amount", "currency", "offerId"]
+                        "required": [
+                          "amount",
+                          "currency",
+                          "offerId"
+                        ]
                       }
                     },
-                    "required": ["type", "id", "attributes"]
+                    "required": [
+                      "type",
+                      "id",
+                      "attributes"
+                    ]
                   }
                 },
                 "required": [
@@ -606,11 +642,11 @@
         "tags": [
           "places"
         ],
-        "parameters":[
+        "parameters": [
           {
             "name": "query[name]",
             "in": "query",
-            "schema":{
+            "schema": {
               "type": "string",
               "minLength": 3
             },
@@ -618,9 +654,6 @@
           }
         ],
         "responses": {
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
           "200": {
             "description": "OK",
             "content": {
@@ -642,6 +675,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "operationId": "get-places",
@@ -729,51 +765,7 @@
           "content": {
             "application/vnd.api+json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "data": {
-                    "type": "object",
-                    "properties": {
-                      "type": {
-                        "type": "string"
-                      },
-                      "id": {
-                        "type": "string"
-                      },
-                      "attributes": {
-                        "type": "object",
-                        "properties": {
-                          "name": {
-                            "type": "string"
-                          },
-                          "password": {
-                            "type": "string",
-                            "format": "password"
-                          },
-                          "email": {
-                            "type": "string",
-                            "pattern": "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$",
-                            "example": "user@example.com"
-                          },
-                          "phone": {
-                            "type": "string"
-                          }
-                        },
-                        "required": [
-                          "name",
-                          "password",
-                          "email",
-                          "phone"
-                        ]
-                      }
-                    },
-                    "required": [
-                      "type",
-                      "id",
-                      "attributes"
-                    ]
-                  }
-                }
+                "$ref": "#/components/schemas/User"
               }
             }
           }
@@ -884,6 +876,40 @@
           "description": "Target userId you want to change the password"
         }
       ],
+      "get": {
+        "summary": "Return the information of the user",
+        "tags": [
+          "user"
+        ],
+        "operationId": "get-user",
+        "description": "Get user",
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
       "patch": {
         "tags": [
           "user"
@@ -1717,6 +1743,67 @@
           "type"
         ]
       },
+      "User": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+              },
+              "type": {
+                "type": "string",
+                "example": "User"
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "writeOnly": true
+                  },
+                  "email": {
+                    "type": "string",
+                    "pattern": "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$",
+                    "example": "user@example.com"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "created": {
+                    "type": "string",
+                    "readOnly": true
+                  },
+                  "udpated": {
+                    "type": "string",
+                    "readOnly": true
+                  }
+                },
+                "required": [
+                  "name",
+                  "email",
+                  "phone",
+                  "created"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
       "Offer": {
         "title": "Offer",
         "description": "Offer for one or more segments. Used for creating an Order.",
@@ -2321,5 +2408,9 @@
       }
     }
   },
-  "security": [{"jwt": []}]
+  "security": [
+    {
+      "jwt": []
+    }
+  ]
 }
