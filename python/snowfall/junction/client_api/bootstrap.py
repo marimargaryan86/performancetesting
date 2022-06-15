@@ -3,8 +3,6 @@ from typing import Sequence
 
 import lagom
 from lagom.integrations import starlette
-from starlette import applications, exceptions, status
-from starlette.middleware import Middleware
 
 from snowfall.adapter import (  # noqa: WPS235
     legs,
@@ -17,10 +15,8 @@ from snowfall.adapter import (  # noqa: WPS235
     trip_searches,
     trips,
 )
-from snowfall.junction.client_api.routes import router
 from snowfall.junction.client_api.transformers import trip_ids_to_segments
 from snowfall.stdlib import service
-from snowfall.stdlib.integration.starlette import handlers
 
 
 class Settings(service.Settings):
@@ -67,20 +63,3 @@ def create_dependencies(  # noqa: WPS211
     )
 
     return starlette.StarletteIntegration(container)
-
-
-def create_app(
-    custom_middlewares: Sequence[Middleware],
-    dependencies: starlette.StarletteIntegration,
-) -> applications.Starlette:
-    app = applications.Starlette(
-        routes=router.get_routes(dependencies),
-        middleware=custom_middlewares,
-    )
-    app.add_exception_handler(exceptions.HTTPException, handlers.exception_handler)
-    app.add_exception_handler(
-        status.HTTP_500_INTERNAL_SERVER_ERROR,
-        handlers.error_handler,
-    )
-
-    return app

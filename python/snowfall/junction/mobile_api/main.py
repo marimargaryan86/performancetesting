@@ -1,7 +1,6 @@
 import base64
-import http
 import random
-from typing import Callable, cast
+from typing import Callable
 
 import aioredis
 import aiosmtplib
@@ -9,7 +8,6 @@ import stripe
 import uvicorn
 from asgiref.typing import ASGIApplication
 from motor import motor_asyncio
-from sentry_sdk.integrations import asgi
 from starlette.middleware import Middleware, authentication
 
 from snowfall.junction.mobile_api import (
@@ -20,13 +18,12 @@ from snowfall.junction.mobile_api import (
     repository,
     smtp,
 )
+from snowfall.junction.mobile_api.routes import router
 from snowfall.stdlib import service
-from snowfall.stdlib.integration.starlette import handlers, middlewares, validation
+from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.vendor.junction import client
-
-_SERVICE_NAME = "mobile-api"
 
 
 def _factory(
@@ -47,7 +44,7 @@ def _factory(
         )
         mongo = motor_asyncio.AsyncIOMotorClient(
             app.settings.mongo_dsn,  # nosec
-        )[_SERVICE_NAME]
+        )[app.name]
         smtp_cl = smtp.EmailClient(
             aiosmtplib.SMTP(
                 hostname=app.settings.smtp_dsn.host,
@@ -61,62 +58,54 @@ def _factory(
             jwt_private_key=app.settings.jwt_private_key,
             jwt_token_version=app.settings.jwt_token_version,
         )
-        return cast(
-            ASGIApplication,
-            asgi.SentryAsgiMiddleware(
-                bootstrap.create_app(
-                    dependencies=bootstrap.create_dependencies(
-                        offers_repository=repository.OffersRepository(
-                            mongo["offers"],
-                        ),
-                        places_repository=repository.PlacesRepository(
-                            mongo["places"],
-                        ),
-                        users_repository=repository.UsersRepository(
-                            mongo["users"],
-                        ),
-                        otp_repository=repository.OtpRepository(
-                            redis_client=redis_client,
-                            cache_ttl=app.settings.otp_cache_ttl,
-                        ),
-                        stripe_users_repository=repository.StripeUsersRepository(
-                            mongo["stripe_users"],
-                        ),
-                        payment_intent_repository=repository.PaymentIntentRepository(
-                            mongo["stripe_payment_intent"],
-                        ),
-                        smtp_client=smtp_cl,
-                        orders_repository=repository.OrdersRepository(
-                            mongo["orders"],
-                        ),
-                        trip_searches_repository=repository.TripSearchesRepository(
-                            mongo["trip-searches"],
-                        ),
-                        trips_repository=repository.TripsRepository(mongo["trips"]),
-                        junction_client=junction_client,
-                        jwt_gen=jwt_gen,
-                    ),
-                    custom_middlewares=[
-                        Middleware(
-                            middlewares.ValidationMiddleware,
-                            validator=validation.Validator(
-                                "openapi.json",
-                                filesystem.PkgLoader("mobile_api"),
-                            ),
-                            excluded_status_codes={http.HTTPStatus.METHOD_NOT_ALLOWED},
-                        ),
-                        Middleware(
-                            authentication.AuthenticationMiddleware,
-                            backend=auth_middleware.AuthenticationBackend(
-                                token_version=app.settings.jwt_token_version,
-                                public_key=base64.b64decode(
-                                    app.settings.jwt_public_key.encode(),
-                                ).decode(),
-                            ),
-                            on_error=handlers.auth_error_handler,
-                        ),
-                    ],
+
+        return application.create_asgi_app(
+            routes_factory=router.get_routes,
+            dependencies=bootstrap.create_dependencies(
+                offers_repository=repository.OffersRepository(
+                    mongo["offers"],
                 ),
+                places_repository=repository.PlacesRepository(
+                    mongo["places"],
+                ),
+                users_repository=repository.UsersRepository(
+                    mongo["users"],
+                ),
+                otp_repository=repository.OtpRepository(
+                    redis_client=redis_client,
+                    cache_ttl=app.settings.otp_cache_ttl,
+                ),
+                stripe_users_repository=repository.StripeUsersRepository(
+                    mongo["stripe_users"],
+                ),
+                payment_intent_repository=repository.PaymentIntentRepository(
+                    mongo["stripe_payment_intent"],
+                ),
+                smtp_client=smtp_cl,
+                orders_repository=repository.OrdersRepository(
+                    mongo["orders"],
+                ),
+                trip_searches_repository=repository.TripSearchesRepository(
+                    mongo["trip-searches"],
+                ),
+                trips_repository=repository.TripsRepository(mongo["trips"]),
+                junction_client=junction_client,
+                jwt_gen=jwt_gen,
+            ),
+            custom_middlewares=[
+                Middleware(
+                    authentication.AuthenticationMiddleware,
+                    backend=auth_middleware.AuthenticationBackend(
+                        token_version=app.settings.jwt_token_version,
+                        public_key=base64.b64decode(
+                            app.settings.jwt_public_key.encode(),
+                        ).decode(),
+                    ),
+                    on_error=handlers.auth_error_handler,
+                ),
+            ],
+            openapi_specification=filesystem.PkgLoader("mobile_api").load(
+                "openapi.json",
             ),
         )
 
@@ -145,7 +134,7 @@ async def _migrate(app: service.Application[bootstrap.Settings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name=_SERVICE_NAME)
+    entrypoint = service.Entrypoint(name="mobile-api")
 
     entrypoint.enter_with_commands(
         service.Command(

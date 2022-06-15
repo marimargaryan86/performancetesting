@@ -18,7 +18,7 @@ class JWTAuthenticationBackend(authentication.AuthenticationBackend):
         self,
         conn: requests.HTTPConnection,
     ) -> Optional[tuple[authentication.AuthCredentials, authentication.SimpleUser]]:
-        jwt_token = conn.scope.get("jwt")
+        jwt_token = conn.scope["security"].get("jwt")
 
         if not jwt_token:
             return None

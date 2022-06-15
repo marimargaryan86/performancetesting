@@ -1,6 +1,5 @@
-import http
 from base64 import b64decode, b64encode
-from typing import AsyncIterator, Mapping, Sequence
+from typing import Any, AsyncIterator, Mapping, Optional, Sequence
 
 import jwt as jwtlib
 import pytest
@@ -21,7 +20,8 @@ from snowfall.adapter import (
     trips,
 )
 from snowfall.junction.client_api import bootstrap, jwt
-from snowfall.stdlib.integration.starlette import handlers, middlewares, validation
+from snowfall.junction.client_api.routes import router
+from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import filesystem
 
 jwt_token_version = "1"  # nosec
@@ -46,7 +46,6 @@ jwt_public_key = b64encode(jwt_public_key_bytes).decode()
 
 
 def _create_app(  # noqa: WPS211
-    custom_middlewares: Sequence[Middleware],
     legs_client: legs.Client,
     places_client: places.Client,
     trip_searches_client: trip_searches.Client,
@@ -56,8 +55,11 @@ def _create_app(  # noqa: WPS211
     offer_searches_client: offer_searches.Client,
     segments_client: segments.Client,
     schedules_client: schedules.Client,
+    openapi_specification: Mapping[str, Any],
+    custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
-    return bootstrap.create_app(
+    return application.create_starlette_app(
+        routes_factory=router.get_routes,
         custom_middlewares=custom_middlewares,
         dependencies=bootstrap.create_dependencies(
             legs_client=legs_client,
@@ -70,6 +72,7 @@ def _create_app(  # noqa: WPS211
             segments_client=segments_client,
             schedules_client=schedules_client,
         ),
+        openapi_specification=openapi_specification,
     )
 
 
@@ -96,14 +99,6 @@ def app(  # noqa: WPS211
     return _create_app(
         custom_middlewares=[
             Middleware(
-                middlewares.ValidationMiddleware,
-                validator=validation.Validator(
-                    "openapi.json",
-                    filesystem.PkgLoader("client_api"),
-                ),
-                excluded_status_codes={http.HTTPStatus.METHOD_NOT_ALLOWED},
-            ),
-            Middleware(
                 authentication.AuthenticationMiddleware,
                 backend=jwt.JWTAuthenticationBackend(
                     public_key=b64decode(jwt_public_key).decode(),
@@ -121,6 +116,7 @@ def app(  # noqa: WPS211
         offer_searches_client=offer_searches_client,
         segments_client=segments_client,
         schedules_client=schedules_client,
+        openapi_specification=filesystem.PkgLoader("client_api").load("openapi.json"),
     )
 
 
@@ -157,16 +153,6 @@ def test_app(  # noqa: WPS211
     schedules_client: schedules.Client,
 ) -> applications.Starlette:
     return _create_app(
-        custom_middlewares=[
-            Middleware(
-                middlewares.ValidationMiddleware,
-                validator=validation.Validator(
-                    "python/snowfall/junction/client_api/fixtures/test.json",
-                    filesystem.FileLoader(),
-                ),
-                excluded_status_codes={http.HTTPStatus.METHOD_NOT_ALLOWED},
-            ),
-        ],
         legs_client=legs_client,
         places_client=places_client,
         trip_searches_client=trip_searches_client,
@@ -176,6 +162,9 @@ def test_app(  # noqa: WPS211
         offer_searches_client=offer_searches_client,
         segments_client=segments_client,
         schedules_client=schedules_client,
+        openapi_specification=filesystem.FileLoader().load(
+            "python/snowfall/junction/client_api/fixtures/test.json",
+        ),
     )
 
 

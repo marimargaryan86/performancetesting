@@ -1,5 +1,4 @@
-import http
-from typing import Mapping, Optional, Sequence
+from typing import Any, Mapping, Optional, Sequence
 
 import pytest
 from lagom.integrations import starlette
@@ -8,7 +7,8 @@ from starlette import applications, testclient
 from starlette.middleware import Middleware
 
 from snowfall.junction.mobile_api import bootstrap, jwt_generator, repository, smtp
-from snowfall.stdlib.integration.starlette import middlewares, validation
+from snowfall.junction.mobile_api.routes import router
+from snowfall.stdlib.integration.starlette import application
 from snowfall.stdlib.persistence import filesystem
 from snowfall.vendor.junction import client
 
@@ -32,11 +32,14 @@ def trips_repository() -> repository.TripsRepository:
 
 def _create_app(
     dependencies: starlette.StarletteIntegration,
+    openapi_specification: Mapping[str, Any],
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
-    return bootstrap.create_app(
+    return application.create_starlette_app(
         dependencies=dependencies,
         custom_middlewares=custom_middlewares,
+        openapi_specification=openapi_specification,
+        routes_factory=router.get_routes,
     )
 
 
@@ -128,7 +131,7 @@ def app(  # noqa: WPS211
     payment_intent_repository: repository.PaymentIntentRepository,
 ) -> applications.Starlette:
     return _create_app(
-        bootstrap.create_dependencies(
+        dependencies=bootstrap.create_dependencies(
             offers_repository,
             orders_repository,
             junction_client,
@@ -142,16 +145,7 @@ def app(  # noqa: WPS211
             stripe_users_repository,
             payment_intent_repository,
         ),
-        [
-            Middleware(
-                middlewares.ValidationMiddleware,
-                validator=validation.Validator(
-                    "openapi.json",
-                    filesystem.PkgLoader("mobile_api"),
-                ),
-                excluded_status_codes={http.HTTPStatus.METHOD_NOT_ALLOWED},
-            ),
-        ],
+        openapi_specification=filesystem.PkgLoader("mobile_api").load("openapi.json"),
     )
 
 

@@ -35,21 +35,21 @@ def auth_error_handler(
     return _error_response_from_status(http.HTTPStatus.UNAUTHORIZED)
 
 
-async def error_handler(
+async def client_error_handler(
     request: requests.Request,
     exc: Exception,
 ) -> responses.JSONResponse:
-    if isinstance(exc, exceptions.HTTPException):
-        return await exception_handler(request, exc)
-
-    return _error_response_from_status(http.HTTPStatus.INTERNAL_SERVER_ERROR)
+    return _error_response_from_status(http.HTTPStatus.BAD_REQUEST)
 
 
-async def exception_handler(
+async def server_error_handler(
     request: requests.Request,
-    exc: exceptions.HTTPException,
+    exc: Exception,
 ) -> responses.JSONResponse:
-    status = http.HTTPStatus(exc.status_code or http.HTTPStatus.INTERNAL_SERVER_ERROR)
+    status = http.HTTPStatus.INTERNAL_SERVER_ERROR
+
+    if isinstance(exc, exceptions.HTTPException) and exc.status_code:
+        status = http.HTTPStatus(exc.status_code)
 
     return _error_response_from_status(status)
 

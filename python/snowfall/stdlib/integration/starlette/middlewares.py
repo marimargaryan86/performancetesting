@@ -6,6 +6,7 @@ import sentry_sdk
 from openapi_core.exceptions import OpenAPIError
 from openapi_core.templating.paths.exceptions import PathNotFound
 from openapi_core.unmarshalling.schemas.exceptions import InvalidSchemaValue
+from openapi_core.validation.exceptions import InvalidSecurity
 from openapi_core.validation.request.datatypes import OpenAPIRequest
 from starlette import applications, exceptions, requests, responses, status, types
 from starlette.middleware import base
@@ -92,19 +93,11 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
 
         try:
             openapi_result = await self._validator.validate_request(openapi_request)
-        except PathNotFound as err:
-            raise exceptions.HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-            ) from err
-        except InvalidSchemaValue as err:
-            return await handlers.validation_error_handler(resolved_request, err)
         except OpenAPIError as err:
-            raise exceptions.HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-            ) from err
+            return await self._handle_validation_error(resolved_request, err)
 
-        resolved_request.scope["jwt"] = openapi_result.security.get("jwt")
-        resolved_request.scope["otp"] = openapi_result.security.get("otp")
+        resolved_request.scope["payload"] = openapi_result.body
+        resolved_request.scope["security"] = openapi_result.security
         resolved_request.scope["query_string"] = openapi_result.parameters.query
 
         return await self._dispatch(call_next, openapi_request, resolved_request)
@@ -125,3 +118,28 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
         await self._validator.validate_response(openapi_request, openapi_response)
 
         return resolved_response
+
+    async def _handle_validation_error(
+        self,
+        request: requests.Request,
+        err: OpenAPIError,
+    ) -> responses.JSONResponse:
+        if isinstance(err, PathNotFound):
+            return await handlers.server_error_handler(
+                request,
+                exceptions.HTTPException(status_code=status.HTTP_404_NOT_FOUND),
+            )
+
+        if isinstance(err, InvalidSchemaValue):
+            return await handlers.validation_error_handler(request, err)
+
+        if isinstance(err, InvalidSecurity):
+            return await handlers.server_error_handler(
+                request,
+                exceptions.HTTPException(status_code=status.HTTP_401_UNAUTHORIZED),
+            )
+
+        return await handlers.server_error_handler(
+            request,
+            exceptions.HTTPException(status_code=status.HTTP_400_BAD_REQUEST),
+        )

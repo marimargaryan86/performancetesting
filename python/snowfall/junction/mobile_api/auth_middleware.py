@@ -18,15 +18,15 @@ class AuthenticationBackend(authentication.AuthenticationBackend):
         self,
         conn: requests.HTTPConnection,
     ) -> Optional[tuple[authentication.AuthCredentials, authentication.SimpleUser]]:
-        otp = conn.scope.get("otp")
+        otp = conn.scope["security"].get("otp")
         if otp:
-            return await self.otp_authenticate(otp)
-        jwt_token = conn.scope.get("jwt")
+            return self._otp_authenticate(otp)
+        jwt_token = conn.scope["security"].get("jwt")
         if jwt_token:
-            return await self.jwt_authenticate(jwt_token)
+            return self._jwt_authenticate(jwt_token)
         return None
 
-    async def otp_authenticate(
+    def _otp_authenticate(
         self,
         otp: str,
     ) -> Optional[tuple[authentication.AuthCredentials, authentication.SimpleUser]]:
@@ -34,7 +34,7 @@ class AuthenticationBackend(authentication.AuthenticationBackend):
             ["otp_authenticated"],
         ), authentication.SimpleUser(otp)
 
-    async def jwt_authenticate(
+    def _jwt_authenticate(
         self,
         jwt_token: str,
     ) -> Optional[tuple[authentication.AuthCredentials, authentication.SimpleUser]]:
