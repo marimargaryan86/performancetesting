@@ -1,0 +1,10 @@
+rules:
+  oas3minimum:
+    given: "$"
+    description: "OpenAPI version must be >= 3"
+    severity: warn
+    then:
+      field: openapi
+      function: pattern
+      functionOptions:
+        match: 3.[0-9]?.[0-9]

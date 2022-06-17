@@ -2,48 +2,8 @@ extends:
   - [spectral:oas, all]
   - https://raw.githubusercontent.com/openapi-contrib/style-guides/master/apisyouwonthate.yml
   - https://raw.githubusercontent.com/openapi-contrib/style-guides/master/openapi.yml
+  - rules/snowfall-ruleset.yml
 rules:
   oas3-api-servers: info
   api-home: info
   operation-short-summary: hint
-  property-names:
-    severity: warn
-    message: "Invalid property name: {{value}} (expected: lowerCamelCase)"
-    given: "$.paths.*.*.parameters.*.name"
-    then:
-      function: pattern
-      functionOptions:
-        match: "^[a-z][A-Za-z]+(?:\\[[a-z][A-Za-z]+\\])*$"
-  response-property-names:
-    severity: warn
-    message: "Invalid response property name: {{property}} (expected: lowerCamelCase)"
-    given: "$..components.schemas.*.properties[*]~"
-    then:
-      function: pattern
-      functionOptions:
-        match: "^[a-z][A-Za-z]+$"
-  oas3minimum:
-    given: "$"
-    description: "OpenAPI version must be >= 3"
-    severity: warn
-    then:
-      field: openapi
-      function: pattern
-      functionOptions:
-        match: 3.[0-9]?.[0-9]
-  schema-names:
-    severity: warn
-    message: "Invalid schema name: {{property}} (expected: UpperCamelCase)"
-    given: "$.components.schemas[*]~"
-    then:
-      function: pattern
-      functionOptions:
-        match: "^([A-Z]{1}[a-z]{1,}){1,}$"
-  paths-kebab-case:
-    message: "Invalid path name: {{property}} (expected: kebab-case)"
-    severity: warn
-    given: "$.paths[*]~"
-    then:
-      function: pattern
-      functionOptions:
-        match: "^(/[a-z0-9-.]+|/{[a-zA-Z0-9_]+})+$"

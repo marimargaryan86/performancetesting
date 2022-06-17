@@ -1,0 +1,15 @@
+rules:
+  json-api-no-id:
+    description: Field named `id` is not allowed in `attributes`.
+    given: $..*.attributes.properties
+    severity: error
+    then:
+      - field: "id"
+        function: undefined
+  json-api-no-type:
+    description: Field named `type` is not allowed in `attributes`.
+    given: $..*.attributes.properties
+    severity: error
+    then:
+      - field: "type"
+        function: undefined

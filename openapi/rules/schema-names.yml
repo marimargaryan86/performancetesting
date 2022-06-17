@@ -1,0 +1,9 @@
+rules:
+  schema-names:
+    severity: warn
+    message: "Invalid schema name: {{property}} (expected: UpperCamelCase)"
+    given: "$.components.schemas[*]~"
+    then:
+      function: pattern
+      functionOptions:
+        match: "^([A-Z]{1}[a-z]{1,}){1,}$"

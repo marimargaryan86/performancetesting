@@ -1,0 +1,11 @@
+functions:
+  - validateOperationIdFormat
+rules:
+  ensure-operation-id-format:
+    description: An operation ID must follow our required format
+    given: $.paths[*].?(@property !== "parameters")
+    severity: error
+    resolved: true
+    message: "{{error}}"
+    then:
+      function: validateOperationIdFormat

@@ -1,0 +1,35 @@
+functions:
+  - ensurePropertiesExample
+rules:
+  ensure-param-examples:
+    description: Parameters must have examples.
+    given: $..*.parameters[*].schema
+    severity: error
+    message: "{{error}}"
+    then:
+      field: example
+      function: truthy
+  ensure-properties-example:
+    description: Properties must have examples.
+    given: $..*.properties[*]
+    severity: error
+    resolved: true
+    message: "{{error}}"
+    then:
+      function: ensurePropertiesExample
+  ensure-additional-properties-example:
+    description: Additional properties must have examples.
+    given: $..*.additionalProperties
+    severity: error
+    resolved: true
+    message: "{{error}}"
+    then:
+      function: ensurePropertiesExample
+  ensure-additional-properties-oneof-example:
+    description: Additional properties (oneOf) must have examples.
+    given: $..*.additionalProperties.oneOf[*]
+    severity: error
+    resolved: true
+    message: "{{error}}"
+    then:
+      function: ensurePropertiesExample

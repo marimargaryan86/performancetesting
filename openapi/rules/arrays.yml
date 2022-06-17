@@ -1,0 +1,11 @@
+functions:
+  - ensureAllArraysHaveItemTypes
+rules:
+  ensure-array-params-have-items-with-type:
+    description: Ensures all array parameters have an items attribute with a type
+    given: $..*.parameters[*]
+    severity: error
+    resolved: false
+    message: "{{error}}"
+    then:
+      function: ensureAllArraysHaveItemTypes

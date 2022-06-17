@@ -1,0 +1,34 @@
+functions:
+  - ensureCorrectVerbsInTitles
+  - ensureNoArticlesInTitles
+rules:
+  ensure-every-resource-has-title:
+    description: Ensures every resource has a title
+    given: $.components.schemas[*]
+    severity: error
+    message: "Resource must have a title"
+    then:
+      field: "title"
+      function: truthy
+  ensure-summary-exists:
+    description: Ensures endpoints have a summary
+    given: $.paths[*].?(@property !== "parameters")
+    severity: error
+    message: "Endpoints must have a summary"
+    then:
+      field: "summary"
+      function: truthy
+  ensure-correct-verb-title:
+    description: Summary must have the right verbs
+    given: $.paths[*].?(@property !== "parameters")
+    severity: error
+    message: "{{error}}"
+    then:
+      function: ensureCorrectVerbsInTitles
+  ensure-no-articles-in-titles:
+    description: Summary should not have "a" or "an" or "the"
+    given: $.paths[*].?(@property !== "parameters")
+    severity: error
+    message: "{{error}}"
+    then:
+      function: ensureNoArticlesInTitles

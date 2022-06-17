@@ -1,0 +1,28 @@
+functions:
+  - ensureAllArraysHaveItemTypes
+  - ensureAllOfOrder
+  - ensureSchemaHasType
+rules:
+  ensure-allof-order:
+    description: Ensures order of items in an allOf
+    given: '$..*.allOf'
+    severity: error
+    resolved: false
+    message: "{{error}}"
+    then:
+      function: ensureAllOfOrder
+  ensure-array-properties-have-items-with-type:
+    description: Ensures all array properties have an items attribute with a type
+    given: '$..*.properties[*]'
+    severity: error
+    resolved: false
+    message: "{{error}}"
+    then:
+      function: ensureAllArraysHaveItemTypes
+  ensure-schema-has-type:
+    description: Schemas must have a type
+    given: $..schema
+    severity: error
+    message: "{{error}}"
+    then:
+      function: ensureSchemaHasType

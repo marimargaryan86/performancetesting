@@ -1,0 +1,6 @@
+extends:
+  - rules/arrays.yml
+  - rules/jsonapi.yml
+  - rules/oas-minimum.yml
+  - rules/property-names.yml
+  - rules/schema-names.yml
