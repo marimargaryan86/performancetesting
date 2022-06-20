@@ -9,6 +9,7 @@ from dateutil import parser
 from pymongo import results as pymongo_results
 
 from snowfall.junction.mobile_api import resources
+from snowfall.junction.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib.persistence.mongo import mixins, repository
 from snowfall.stdlib.persistence.redis import types as redis
 
@@ -50,22 +51,24 @@ class PlacesRepository(
 
 
 class UsersRepository(
-    mixins.FindByIdMixin[dict[str, Any]],
-    mixins.InsertMixin[dict[str, Any]],
-    repository.DefaultRepository,
+    mixins.FindByIdMixin[models_pb2.User],
+    mixins.InsertMixin[models_pb2.User],
+    repository.ProtoRepository[models_pb2.User],
 ):
+    _proto = models_pb2.User
+
     async def update_password(self, query: Any, document: Any) -> None:
         await self._execute(self._collection.update_one, query, document, upsert=False)
 
-    async def find_user_by_email(self, email: str) -> Any:
+    async def find_user_by_email(self, email: str) -> Optional[models_pb2.User]:
         return await self._execute(self._collection.find_one, {_EMAIL_KEY: email})
 
-    async def find_user_hide_password(self, email: str) -> Any:
+    async def find_user_hide_password(self, email: str) -> Optional[models_pb2.User]:
         return await self._execute(
             self._collection.find_one, {_EMAIL_KEY: email}, {"password": 0}
         )
 
-    async def get(self, query: Any) -> Any:
+    async def get(self, query: Any) -> models_pb2.User:
         return await self._execute(self._collection.find_one, filter=query)
 
 

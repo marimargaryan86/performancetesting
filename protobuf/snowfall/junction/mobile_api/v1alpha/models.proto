@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package snowfall.junction.mobile_api.v1alpha;
+
+import "google/protobuf/timestamp.proto";
+import "snowfall/common/v1alpha/phone_number.proto";
+
+message User {
+  string id = 1;
+  string email = 2;
+  string password = 3;
+  snowfall.common.v1alpha.PhoneNumber phone = 4;
+  string name = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}

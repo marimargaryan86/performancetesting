@@ -7,7 +7,9 @@ import bcrypt
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
+from snowfall.common.v1alpha import phone_number_pb2
 from snowfall.junction.mobile_api import jwt_generator, repository, resources, smtp
+from snowfall.junction.mobile_api.v1alpha.models_pb2 import User as UserModel
 from snowfall.stdlib.integration.starlette import models, request_helpers
 
 _id_key = "_id"
@@ -26,21 +28,25 @@ class Users(endpoints.HTTPEndpoint):
         body = await request_helpers.flatten_request(request)
 
         verification_code = request.user.username
-
         authorized = await otp_repository.check(
             body[_email_key],
             verification_code,
         )
         if not authorized:
             raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
-        body[_id_key] = str(uuid.uuid4())
-        body[_password_key] = bcrypt.hashpw(
-            body[_password_key].encode(),
-            bcrypt.gensalt(),
-        ).decode()
-        body["created"] = datetime.datetime.utcnow()
+
+        user = UserModel(
+            id=str(uuid.uuid4()),
+            email=body[_email_key],
+            password=bcrypt.hashpw(
+                body[_password_key].encode(),
+                bcrypt.gensalt(),
+            ).decode(),
+            phone=phone_number_pb2.PhoneNumber(e164_number=body["phone"]),
+            name=body["name"],
+        )
         # TODO: handle duplicate key error
-        await users_repository.insert(body)
+        await users_repository.insert(user)
 
         return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -58,15 +64,11 @@ class User(endpoints.HTTPEndpoint):
         user = await users_repository.find_user_hide_password(search_id)
         if not user:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
-        if user.get("_id") != user_id:
+        if user.id != user_id:
             raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
         return models.JsonApiResponse(
             models.Body(
-                data=models.Resource(
-                    id=user.get(_id_key),
-                    type="User",
-                    attributes=user,
-                ),
+                data=resources.UserResource.from_proto(user),
             ),
         )
 
@@ -97,7 +99,7 @@ class User(endpoints.HTTPEndpoint):
                         body[_password_key].encode(),
                         bcrypt.gensalt(),
                     ).decode(),
-                    "updated": datetime.datetime.utcnow(),
+                    "updated_at": datetime.datetime.utcnow(),
                 },
             },
         )
@@ -139,11 +141,11 @@ class Session(endpoints.HTTPEndpoint):
             raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
         password_match = bcrypt.checkpw(
             body[_password_key].encode(),
-            user[_password_key].encode(),
+            user.password.encode(),
         )
         if not password_match:
             raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
-        token = jwt_gen.encode(user[_id_key])
+        token = jwt_gen.encode(user.id)
         return models.JsonApiResponse(
             models.Body(
                 data=models.Resource(

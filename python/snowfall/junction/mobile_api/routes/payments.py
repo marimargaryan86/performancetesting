@@ -31,8 +31,8 @@ class Payments(endpoints.HTTPEndpoint):
         stripe_user = await stripe_users_repository.get({"internal_user_id": user_id})
         if not stripe_user:
             api_response_user = stripe.Customer.create(
-                email=user[_email_key],
-                name=user[_name_key],
+                email=user.email,
+                name=user.name,
             )
             stripe_user = {
                 "_id": api_response_user.stripe_id,
