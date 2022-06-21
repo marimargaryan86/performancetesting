@@ -1365,6 +1365,7 @@
         },
         "description": "Used to initiate a search for trips based on the provided Trip Search context.",
         "requestBody": {
+          "required": true,
           "content": {
             "application/vnd.api+json": {
               "schema": {
@@ -1656,6 +1657,7 @@
         },
         "description": "Used to initiate a search for offers based on the provided Offer Search context.",
         "requestBody": {
+          "required": true,
           "content": {
             "application/vnd.api+json": {
               "schema": {
@@ -1938,6 +1940,7 @@
         },
         "description": "Used to create an Order and book the specified Offers.",
         "requestBody": {
+          "required": true,
           "content": {
             "application/vnd.api+json": {
               "schema": {
@@ -2068,6 +2071,7 @@
         },
         "description": "Used to add offers to an existing booking.",
         "requestBody": {
+          "required": true,
           "content": {
             "application/vnd.api+json": {
               "schema": {

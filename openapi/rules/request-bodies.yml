@@ -1,0 +1,8 @@
+rules:
+  request-bodies:
+    severity: warn
+    message: "All request bodies MUST be required."
+    given: "$.paths.*.*.requestBody"
+    then:
+      field: "required"
+      function: truthy

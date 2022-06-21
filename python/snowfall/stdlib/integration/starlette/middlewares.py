@@ -1,6 +1,6 @@
 import http
 from collections.abc import AsyncIterable
-from typing import Awaitable, Callable, Container, Optional
+from typing import Any, Awaitable, Callable, Container, Mapping, Optional, cast
 
 import sentry_sdk
 from openapi_core.exceptions import OpenAPIError
@@ -11,7 +11,7 @@ from openapi_core.validation.request.datatypes import OpenAPIRequest
 from starlette import applications, exceptions, requests, responses, status, types
 from starlette.middleware import base
 
-from snowfall.stdlib.integration.starlette import handlers, validation
+from snowfall.stdlib.integration.starlette import handlers, request_helpers, validation
 
 
 class RequestWithBody(requests.Request):
@@ -96,9 +96,13 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
         except OpenAPIError as err:
             return await self._handle_validation_error(resolved_request, err)
 
-        resolved_request.scope["payload"] = openapi_result.body
-        resolved_request.scope["security"] = openapi_result.security
+        if openapi_result.body:
+            resolved_request.scope["body"] = request_helpers.flatten_request_body(
+                cast(Mapping[str, Any], openapi_result.body),
+            )
+
         resolved_request.scope["query_string"] = openapi_result.parameters.query
+        resolved_request.scope["security"] = openapi_result.security
 
         return await self._dispatch(call_next, openapi_request, resolved_request)
 
