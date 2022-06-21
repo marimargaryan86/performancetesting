@@ -1,6 +1,9 @@
 extends:
   - rules/arrays.yml
+  - rules/ensure-examples.yml
   - rules/jsonapi.yml
   - rules/oas-minimum.yml
+  - rules/operation-id.yml
   - rules/property-names.yml
   - rules/schema-names.yml
+  - rules/titles.yml

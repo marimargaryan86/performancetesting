@@ -138,8 +138,8 @@
                       "properties": {
                         "data": {
                           "type": "array",
-                          "uniqueItems": true,
                           "minItems": 0,
+                          "uniqueItems": true,
                           "items": {
                             "$ref": "#/components/schemas/Place"
                           }
@@ -182,7 +182,7 @@
         }
       ],
       "get": {
-        "summary": "View Place",
+        "summary": "Get Place",
         "tags": [
           "places"
         ],
@@ -213,7 +213,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-places-place-id",
+        "operationId": "get-places-id",
         "description": "Used to lookup information about a place using its Place Identifier."
       }
     },
@@ -317,7 +317,7 @@
         }
       ],
       "get": {
-        "summary": "View Place Type",
+        "summary": "Get Place Type",
         "tags": [
           "places"
         ],
@@ -363,7 +363,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-places-types-place-type-id",
+        "operationId": "get-places-types-id",
         "description": "Used to lookup data for a Place Type Identifier."
       }
     },
@@ -467,7 +467,7 @@
         }
       ],
       "get": {
-        "summary": "View Passenger Gender",
+        "summary": "Get Passenger Gender",
         "tags": [
           "passengers"
         ],
@@ -513,7 +513,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-passengers-genders-passenger-gender-id",
+        "operationId": "get-passengers-genders-id",
         "description": "Used to lookup data for a Passenger Gender Identifier."
       }
     },
@@ -617,7 +617,7 @@
         }
       ],
       "get": {
-        "summary": "View Passenger Title",
+        "summary": "Get Passenger Title",
         "tags": [
           "passengers"
         ],
@@ -663,7 +663,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-passengers-titles-passenger-title-id",
+        "operationId": "get-passengers-titles-id",
         "description": "Used to lookup data for a Passenger Title Identifier."
       }
     },
@@ -767,7 +767,7 @@
         }
       ],
       "get": {
-        "summary": "View Cabin Class",
+        "summary": "Get Cabin Class",
         "tags": [
           "cabins"
         ],
@@ -813,7 +813,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-cabin-classes-cabin-class-id",
+        "operationId": "get-cabin-classes-id",
         "description": "Used to lookup data for a Cabin Class Identifier."
       }
     },
@@ -824,7 +824,7 @@
         }
       ],
       "get": {
-        "summary": "View Leg",
+        "summary": "Get Leg",
         "tags": [
           "legs"
         ],
@@ -854,7 +854,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-legs-leg-id",
+        "operationId": "get-legs-id",
         "description": "Used to lookup data for a Leg Identifier."
       }
     },
@@ -958,7 +958,7 @@
         }
       ],
       "get": {
-        "summary": "View Leg Type",
+        "summary": "Get Leg Type",
         "tags": [
           "legs"
         ],
@@ -1004,7 +1004,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-legs-types-leg-type-id",
+        "operationId": "get-legs-types-id",
         "description": "Used to lookup data for a Leg Type Identifier."
       }
     },
@@ -1015,7 +1015,7 @@
         }
       ],
       "get": {
-        "summary": "View Segment",
+        "summary": "Get Segment",
         "tags": [
           "segments"
         ],
@@ -1045,7 +1045,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-segments-segment-id",
+        "operationId": "get-segments-id",
         "description": "Used to lookup data for a Segment Identifier."
       }
     },
@@ -1096,7 +1096,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-segments-segment-id-legs",
+        "operationId": "get-segments-id-legs",
         "description": "Used to retrieve all Legs contained in a Segment.",
         "parameters": [
           {
@@ -1115,7 +1115,7 @@
         }
       ],
       "get": {
-        "summary": "View Trip",
+        "summary": "Get Trip",
         "tags": [
           "trips"
         ],
@@ -1145,22 +1145,14 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-trips-trip-id",
+        "operationId": "get-trips-id",
         "description": "Used to lookup data for a Trip Identifier."
       }
     },
     "/trips/{tripId}/legs": {
       "parameters": [
         {
-          "name": "tripId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "format": "uuid",
-            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
-          },
-          "description": "Trip identifier"
+          "$ref": "#/components/parameters/tripId"
         }
       ],
       "get": {
@@ -1204,7 +1196,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-trips-trip-id-legs",
+        "operationId": "get-trips-id-legs",
         "description": "Used to retrieve all Legs contained in a Trip.",
         "parameters": [
           {
@@ -1263,7 +1255,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-trips-trip-id-segments",
+        "operationId": "get-trips-id-segments",
         "description": "Used to retrieve all Segments contained in a Trip.",
         "parameters": [
           {
@@ -1322,7 +1314,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-trips-trip-id-prices",
+        "operationId": "get-trips-id-prices",
         "description": "Upcoming endpoint to retrieve cached offer prices for a particular trip. Not yet implemented.",
         "parameters": [
           {
@@ -1337,7 +1329,7 @@
     },
     "/trips/searches": {
       "post": {
-        "summary": "New Trip Search",
+        "summary": "Create Trip Search",
         "tags": [
           "trips"
         ],
@@ -1399,7 +1391,7 @@
         }
       ],
       "get": {
-        "summary": "View Trip Search",
+        "summary": "Get Trip Search",
         "tags": [
           "trips"
         ],
@@ -1429,22 +1421,14 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-trips-searches-trip-search-id",
+        "operationId": "get-trips-searches-id",
         "description": "Used to lookup data for a Trip Search Identifier."
       }
     },
     "/trips/searches/{tripSearchId}/legs": {
       "parameters": [
         {
-          "name": "tripSearchId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "format": "uuid",
-            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
-          },
-          "description": "Trip Search identifier"
+          "$ref": "#/components/parameters/tripSearchId"
         }
       ],
       "get": {
@@ -1490,7 +1474,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-trips-searches-trip-search-id-legs",
+        "operationId": "get-trips-searches-id-legs",
         "description": "Used to retrieve all Legs for all Trip results for a Trip Search.",
         "parameters": [
           {
@@ -1505,15 +1489,7 @@
     "/trips/searches/{tripSearchId}/segments": {
       "parameters": [
         {
-          "name": "tripSearchId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "format": "uuid",
-            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
-          },
-          "description": "Trip Search identifier"
+          "$ref": "#/components/parameters/tripSearchId"
         }
       ],
       "get": {
@@ -1559,7 +1535,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-trips-searches-trip-search-id-segments",
+        "operationId": "get-trips-searches-id-segments",
         "description": "Used to retrieve all Segments for all Trip results for a Trip Search.",
         "parameters": [
           {
@@ -1620,7 +1596,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-trips-searches-trip-search-id-trips",
+        "operationId": "get-trips-searches-id-trips",
         "description": "Used to retrieve all Trip results for a Trip Search.",
         "parameters": [
           {
@@ -1634,7 +1610,7 @@
     },
     "/offers/searches": {
       "post": {
-        "summary": "New Offer Search",
+        "summary": "Create Offer Search",
         "tags": [
           "offers"
         ],
@@ -1716,7 +1692,7 @@
         }
       ],
       "get": {
-        "summary": "View Offer Search",
+        "summary": "Get Offer Search",
         "tags": [
           "offers"
         ],
@@ -1756,7 +1732,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-offers-searches-offer-search-id",
+        "operationId": "get-offers-searches-id",
         "description": "Used to lookup data for an Offer Search Identifier."
       }
     },
@@ -1809,7 +1785,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-offers-searches-offer-search-id-offers",
+        "operationId": "get-offers-searches-id-offers",
         "description": "Used to retrieve all Offer results for an Offer Search.",
         "parameters": [
           {
@@ -1824,14 +1800,7 @@
     "/offers/searches/{offerSearchId}/related": {
       "parameters": [
         {
-          "name": "offerSearchId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "description": "Offer Search identifier"
+          "$ref": "#/components/parameters/offerSearchId"
         }
       ],
       "get": {
@@ -1877,7 +1846,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-offers-searches-offer-search-id-related",
+        "operationId": "get-offers-searches-id-related",
         "description": "Upcoming endpoint to retrieve related Offers that could be searched. Not yet implemented.",
         "parameters": [
           {
@@ -1897,7 +1866,7 @@
         }
       ],
       "get": {
-        "summary": "View Offer Search",
+        "summary": "Get Offer Search",
         "tags": [
           "offers"
         ],
@@ -1927,17 +1896,17 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-offers-offer-id",
+        "operationId": "get-offers-id",
         "description": "Used to lookup data for an Offer Identifier."
       }
     },
     "/orders": {
       "post": {
-        "summary": "New Order",
+        "summary": "Create Order",
         "tags": [
           "orders"
         ],
-        "operationId": "post-order",
+        "operationId": "post-orders",
         "responses": {
           "201": {
             "description": "Created",
@@ -2044,7 +2013,7 @@
         }
       ],
       "get": {
-        "summary": "View Order",
+        "summary": "Get Order",
         "tags": [
           "orders"
         ],
@@ -2074,15 +2043,15 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-orders-order-id",
+        "operationId": "get-orders-id",
         "description": "Used to lookup data for a Order Identifier."
       },
       "patch": {
-        "summary": "Patch Order",
+        "summary": "Update Order",
         "tags": [
           "orders"
         ],
-        "operationId": "patch-orders-order-id",
+        "operationId": "patch-orders-id",
         "responses": {
           "202": {
             "description": "Accepted"
@@ -2149,7 +2118,8 @@
                             "pass",
                             "fail",
                             "warn"
-                          ]
+                          ],
+                          "example": "pass"
                         }
                       }
                     }
@@ -2186,7 +2156,8 @@
                 "type": "string",
                 "enum": [
                   "passenger-genders"
-                ]
+                ],
+                "example": "passenger-genders"
               },
               "attributes": {
                 "type": "object",
@@ -2195,7 +2166,8 @@
                 ],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "male"
                   }
                 }
               }
@@ -2227,7 +2199,8 @@
                 "type": "string",
                 "enum": [
                   "passenger-titles"
-                ]
+                ],
+                "example": "passenger-titles"
               },
               "attributes": {
                 "type": "object",
@@ -2236,7 +2209,8 @@
                 ],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "mr"
                   }
                 }
               }
@@ -2268,7 +2242,8 @@
                 "type": "string",
                 "enum": [
                   "cabin-classes"
-                ]
+                ],
+                "example": "cabin-classes"
               },
               "attributes": {
                 "type": "object",
@@ -2277,7 +2252,8 @@
                 ],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "economy"
                   }
                 }
               }
@@ -2294,26 +2270,6 @@
         ],
         "description": "Indicates the cabins class, such as \"economy\" or \"business\"."
       },
-      "CabinClassIdentifier": {
-        "title": "Cabin Class Identifier",
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "economy"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "cabin-classes"
-            ]
-          }
-        },
-        "required": [
-          "id",
-          "type"
-        ]
-      },
       "PlaceType": {
         "title": "Place Type",
         "allOf": [
@@ -2329,7 +2285,8 @@
                 "type": "string",
                 "enum": [
                   "place-types"
-                ]
+                ],
+                "example": "place-types"
               },
               "attributes": {
                 "type": "object",
@@ -2338,7 +2295,8 @@
                 ],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "air"
                   }
                 }
               }
@@ -2367,7 +2325,8 @@
             "type": "string",
             "enum": [
               "place-types"
-            ]
+            ],
+            "example": "place-types"
           }
         },
         "required": [
@@ -2391,7 +2350,8 @@
                 "type": "string",
                 "enum": [
                   "places"
-                ]
+                ],
+                "example": "places"
               },
               "attributes": {
                 "type": "object",
@@ -2523,7 +2483,8 @@
             "type": "string",
             "enum": [
               "places"
-            ]
+            ],
+            "example": "places"
           }
         },
         "required": [
@@ -2586,7 +2547,8 @@
                 "type": "string",
                 "enum": [
                   "leg-types"
-                ]
+                ],
+                "example": "leg-types"
               },
               "attributes": {
                 "type": "object",
@@ -2595,7 +2557,8 @@
                 ],
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "air"
                   }
                 }
               }
@@ -2624,7 +2587,8 @@
             "type": "string",
             "enum": [
               "leg-types"
-            ]
+            ],
+            "example": "leg-types"
           }
         },
         "required": [
@@ -2648,7 +2612,8 @@
                 "type": "string",
                 "enum": [
                   "legs"
-                ]
+                ],
+                "example": "legs"
               },
               "attributes": {
                 "type": "object",
@@ -2663,15 +2628,18 @@
                   "departureAt": {
                     "type": "string",
                     "format": "date-time",
-                    "readOnly": true
+                    "readOnly": true,
+                    "example": "2019-08-24T14:15:22Z"
                   },
                   "arrivalAt": {
                     "type": "string",
                     "format": "date-time",
-                    "readOnly": true
+                    "readOnly": true,
+                    "example": "2019-08-24T14:15:22Z"
                   },
                   "operator": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "BA"
                   },
                   "origin": {
                     "$ref": "#/components/schemas/Point"
@@ -2727,7 +2695,8 @@
             "type": "string",
             "enum": [
               "legs"
-            ]
+            ],
+            "example": "legs"
           }
         },
         "required": [
@@ -2751,7 +2720,8 @@
                 "type": "string",
                 "enum": [
                   "segments"
-                ]
+                ],
+                "example": "segments"
               },
               "attributes": {
                 "type": "object"
@@ -2805,7 +2775,8 @@
             "type": "string",
             "enum": [
               "segments"
-            ]
+            ],
+            "example": "segments"
           }
         },
         "required": [
@@ -2829,7 +2800,8 @@
                 "type": "string",
                 "enum": [
                   "trips"
-                ]
+                ],
+                "example": "trips"
               },
               "attributes": {
                 "type": "object"
@@ -2884,7 +2856,8 @@
             "type": "string",
             "enum": [
               "trips"
-            ]
+            ],
+            "example": "trips"
           }
         },
         "required": [
@@ -2907,7 +2880,8 @@
                 "type": "string",
                 "enum": [
                   "trip-searches"
-                ]
+                ],
+                "example": "trip-searches"
               },
               "attributes": {
                 "type": "object",
@@ -2918,15 +2892,18 @@
                   "expiresAt": {
                     "type": "string",
                     "format": "date-time",
-                    "readOnly": true
+                    "readOnly": true,
+                    "example": "2019-08-24T14:15:22Z"
                   },
                   "departureAfter": {
                     "type": "string",
-                    "format": "date-time"
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z"
                   },
                   "arrivalBefore": {
                     "type": "string",
                     "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z",
                     "description": "Not yet implemented."
                   }
                 }
@@ -3008,7 +2985,8 @@
                 "type": "string",
                 "enum": [
                   "prices"
-                ]
+                ],
+                "example": "prices"
               },
               "attributes": {
                 "allOf": [
@@ -3046,7 +3024,8 @@
                 "type": "string",
                 "enum": [
                   "offer-aggregates"
-                ]
+                ],
+                "example": "offer-aggregates"
               },
               "attributes": {
                 "type": "object",
@@ -3064,7 +3043,8 @@
                   },
                   "expiresAt": {
                     "type": "string",
-                    "format": "date-time"
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z"
                   }
                 }
               }
@@ -3094,7 +3074,8 @@
             "type": "string",
             "enum": [
               "offer-aggregates"
-            ]
+            ],
+            "example": "offer-aggregates"
           }
         },
         "required": [
@@ -3136,7 +3117,8 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
           },
           "price": {
             "$ref": "#/components/schemas/Price"
@@ -3161,7 +3143,8 @@
         "properties": {
           "ref": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
           },
           "cabinClass": {
             "$ref": "#/components/schemas/CabinClassDetails"
@@ -3178,10 +3161,12 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "example": "economy"
           },
           "marketingName": {
-            "type": "string"
+            "type": "string",
+            "example": "Economy"
           }
         },
         "required": [
@@ -3195,10 +3180,12 @@
         "type": "object",
         "properties": {
           "currency": {
-            "type": "string"
+            "type": "string",
+            "example": "EUR"
           },
           "amount": {
-            "type": "string"
+            "type": "string",
+            "example": "13.37"
           }
         },
         "required": [
@@ -3213,7 +3200,8 @@
         "properties": {
           "ref": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
           },
           "legs": {
             "type": "array",
@@ -3224,10 +3212,12 @@
             }
           },
           "vendor": {
-            "type": "string"
+            "type": "string",
+            "example": "BA"
           },
           "operator": {
             "type": "string",
+            "example": "BA",
             "nullable": true
           },
           "routeIdentifiers": {
@@ -3247,10 +3237,12 @@
         "type": "object",
         "properties": {
           "vendor": {
-            "type": "string"
+            "type": "string",
+            "example": "BA"
           },
           "operator": {
             "type": "string",
+            "example": "BA",
             "nullable": true
           }
         },
@@ -3272,11 +3264,13 @@
           },
           "departureAt": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "example": "2019-08-24T14:15:22Z"
           },
           "arrivalAt": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "example": "2019-08-24T14:15:22Z"
           }
         },
         "required": [
@@ -3302,7 +3296,8 @@
                 "type": "string",
                 "enum": [
                   "rental-offer-searches"
-                ]
+                ],
+                "example": "rental-offer-searches"
               },
               "attributes": {
                 "type": "object",
@@ -3310,19 +3305,23 @@
                   "expiresAt": {
                     "type": "string",
                     "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z",
                     "readOnly": true
                   },
                   "driverAge": {
                     "type": "integer",
+                    "example": 42,
                     "minimum": 0
                   },
                   "pickupAt": {
                     "type": "string",
-                    "format": "date-time"
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z"
                   },
                   "dropoffAt": {
                     "type": "string",
-                    "format": "date-time"
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z"
                   }
                 },
                 "required": [
@@ -3388,7 +3387,8 @@
                 "type": "string",
                 "enum": [
                   "accommodation-offer-searches"
-                ]
+                ],
+                "example": "accommodation-offer-searches"
               },
               "attributes": {
                 "type": "object",
@@ -3396,15 +3396,18 @@
                   "expiresAt": {
                     "type": "string",
                     "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z",
                     "readOnly": true
                   },
                   "checkinAt": {
                     "type": "string",
-                    "format": "date-time"
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z"
                   },
                   "checkoutAt": {
                     "type": "string",
-                    "format": "date-time"
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z"
                   }
                 },
                 "required": [
@@ -3461,7 +3464,8 @@
                 "type": "string",
                 "enum": [
                   "trip-offer-searches"
-                ]
+                ],
+                "example": "trip-offer-searches"
               },
               "attributes": {
                 "type": "object",
@@ -3469,6 +3473,7 @@
                   "expiresAt": {
                     "type": "string",
                     "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z",
                     "readOnly": true
                   },
                   "passengers": {
@@ -3525,21 +3530,6 @@
                       }
                     },
                     "readOnly": true
-                  },
-                  "cabinClasses": {
-                    "type": "object",
-                    "properties": {
-                      "data": {
-                        "type": "array",
-                        "items": {
-                          "$ref": "#/components/schemas/CabinClassIdentifier"
-                        }
-                      }
-                    },
-                    "required": [
-                      "data"
-                    ],
-                    "writeOnly": true
                   }
                 }
               }
@@ -3572,7 +3562,8 @@
                 "type": "string",
                 "enum": [
                   "related-searches"
-                ]
+                ],
+                "example": "related-searches"
               },
               "attributes": {
                 "type": "object"
@@ -3619,7 +3610,8 @@
                 "type": "string",
                 "enum": [
                   "orders"
-                ]
+                ],
+                "example": "orders"
               },
               "attributes": {
                 "type": "object",
@@ -3637,7 +3629,8 @@
                       "properties": {
                         "offerAggregateId": {
                           "type": "string",
-                          "format": "uuid"
+                          "format": "uuid",
+                          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
                         },
                         "offerIds": {
                           "type": "array",
@@ -3645,8 +3638,12 @@
                           "uniqueItems": true,
                           "items": {
                             "type": "string",
-                            "format": "uuid"
-                          }
+                            "format": "uuid",
+                            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+                          },
+                          "example": [
+                            "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+                          ]
                         },
                         "passengers": {
                           "type": "array",
@@ -3688,20 +3685,25 @@
         "type": "object",
         "properties": {
           "firstName": {
-            "type": "string"
+            "type": "string",
+            "example": "John"
           },
           "lastName": {
-            "type": "string"
+            "type": "string",
+            "example": "Smith"
           },
           "title": {
-            "type": "string"
+            "type": "string",
+            "example": "mr"
           },
           "gender": {
-            "type": "string"
+            "type": "string",
+            "example": "male"
           },
           "dateOfBirth": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "example": "1980-02-03"
           }
         },
         "required": [
@@ -3717,7 +3719,8 @@
         "type": "object",
         "properties": {
           "email": {
-            "type": "string"
+            "type": "string",
+            "example": "john.smith@example.com"
           },
           "address": {
             "type": "object",
@@ -3725,22 +3728,30 @@
               "addressLines": {
                 "type": "array",
                 "items": {
-                  "type": "string"
-                }
+                  "type": "string",
+                  "example": "Street name 7"
+                },
+                "example": [
+                  "Street name 7"
+                ]
               },
               "countryCode": {
-                "type": "string"
+                "type": "string",
+                "example": "UK"
               },
               "postalCode": {
-                "type": "string"
+                "type": "string",
+                "example": "12345"
               },
               "city": {
-                "type": "string"
+                "type": "string",
+                "example": "London"
               }
             }
           },
           "phoneNumber": {
-            "type": "string"
+            "type": "string",
+            "example": "123456789"
           }
         }
       },
@@ -3752,16 +3763,20 @@
             "type": "string",
             "minLength": 2,
             "maxLength": 2,
-            "pattern": "^[A-Z]{2}$"
+            "pattern": "^[A-Z]{2}$",
+            "example": "BA"
           },
           "number": {
-            "type": "string"
+            "type": "string",
+            "example": "123456"
           },
           "firstName": {
-            "type": "string"
+            "type": "string",
+            "example": "John"
           },
           "lastName": {
-            "type": "string"
+            "type": "string",
+            "example": "Smith"
           }
         },
         "required": [
@@ -3777,7 +3792,8 @@
         "properties": {
           "dateOfBirth": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "example": "1980-02-03"
           }
         },
         "required": [
@@ -3821,6 +3837,7 @@
               "next": {
                 "type": "string",
                 "format": "uri",
+                "example": "https://example.com/resource/?page%5Bcursor%5D=MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D&page%5Blimit%5D=20",
                 "readOnly": true
               }
             },
@@ -4059,7 +4076,8 @@
         "required": false,
         "schema": {
           "type": "string",
-          "default": ""
+          "default": "",
+          "example": "MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D"
         },
         "description": "Pagination cursor that defines your place in the list."
       },
@@ -4071,7 +4089,8 @@
           "type": "integer",
           "minimum": 1,
           "maximum": 100,
-          "default": 20
+          "default": 20,
+          "example": 20
         },
         "description": "A limit on the number of objects to be returned, between 1 and 100."
       },
@@ -4123,7 +4142,8 @@
         "in": "path",
         "required": true,
         "schema": {
-          "type": "string"
+          "type": "string",
+          "example": "economy"
         },
         "description": "Cabin Class identifier"
       }

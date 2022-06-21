@@ -65,7 +65,8 @@
                             "pass",
                             "fail",
                             "warn"
-                          ]
+                          ],
+                          "example": "pass"
                         }
                       }
                     }

@@ -98,7 +98,7 @@
   "paths": {
     "/trips/searches": {
       "post": {
-        "summary": "Trip search",
+        "summary": "Create Trip Search",
         "tags": [
           "trips"
         ],
@@ -148,7 +148,7 @@
             "$ref": "#/components/responses/UnprocessableEntity"
           }
         },
-        "operationId": "trip-search",
+        "operationId": "post-trips-searches",
         "description": "Search trips.",
         "x-internal": true
       }
@@ -199,7 +199,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-trips-searches-trip-search-id-trips",
+        "operationId": "get-trips-searches-id-trips",
         "description": "Used to retrieve all Trip results for a Trip Search."
       }
     },
@@ -238,7 +238,8 @@
                             "pass",
                             "fail",
                             "warn"
-                          ]
+                          ],
+                          "example": "pass"
                         }
                       }
                     }
@@ -264,12 +265,12 @@
         }
       ],
       "get": {
-        "summary": "Retrieve order by id",
+        "summary": "Get Order",
         "tags": [
           "orders"
         ],
         "description": "Used to retrieve order details.",
-        "operationId": "get-order",
+        "operationId": "get-orders-id",
         "responses": {
           "200": {
             "description": "Success",
@@ -303,11 +304,11 @@
     },
     "/orders": {
       "post": {
-        "summary": "New Order",
+        "summary": "Create Order",
         "tags": [
           "orders"
         ],
-        "operationId": "post-order",
+        "operationId": "post-orders",
         "responses": {
           "201": {
             "description": "Created",
@@ -359,7 +360,7 @@
     },
     "/offers/searches": {
       "post": {
-        "summary": "New Offer Search",
+        "summary": "Create Offer Search",
         "tags": [
           "offers"
         ],
@@ -463,7 +464,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-offers-searches-offer-search-id-offers",
+        "operationId": "get-offers-searches-id-offers",
         "description": "Used to retrieve all Offer results for an Offer Search.",
         "parameters": [
           {
@@ -477,7 +478,7 @@
     },
     "/payments": {
       "post": {
-        "summary": "Creates a paymentIntent",
+        "summary": "Create Payment Intent",
         "tags": [
           "payment"
         ],
@@ -493,22 +494,31 @@
                       "type": "object",
                       "properties": {
                         "type": {
-                          "type": "string"
+                          "type": "string",
+                          "enum": [
+                            "payments"
+                          ],
+                          "example": "payments"
                         },
                         "id": {
-                          "type": "string"
+                          "type": "string",
+                          "format": "uuid",
+                          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
                         },
                         "attributes": {
                           "type": "object",
                           "properties": {
                             "clientSecret": {
-                              "type": "string"
+                              "type": "string",
+                              "example": "NEEDS EXAMPLE"
                             },
                             "ephemeralKey": {
-                              "type": "string"
+                              "type": "string",
+                              "example": "NEEDS EXAMPLE"
                             },
                             "customerId": {
-                              "type": "string"
+                              "type": "string",
+                              "example": "NEEDS EXAMPLE"
                             }
                           },
                           "required": [
@@ -546,22 +556,31 @@
                     "type": "object",
                     "properties": {
                       "type": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                          "payments"
+                        ],
+                        "example": "payments"
                       },
                       "id": {
-                        "type": "string"
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
                       },
                       "attributes": {
                         "type": "object",
                         "properties": {
                           "amount": {
-                            "type": "number"
+                            "type": "number",
+                            "example": 123456
                           },
                           "currency": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "EUR"
                           },
                           "offerId": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "NEEDS EXAMPLE"
                           }
                         },
                         "required": [
@@ -585,7 +604,7 @@
             }
           }
         },
-        "operationId": "post-payment",
+        "operationId": "post-payments",
         "description": "Creates a paymentIntent and a stripe customer if there isn't any for this particular user",
         "x-internal": true
       }
@@ -597,12 +616,12 @@
         }
       ],
       "get": {
-        "summary": "Retrieve orders created by a user",
+        "summary": "Retrieve Orders by User",
         "tags": [
           "user"
         ],
         "description": "Used to retrieve orders created by a user.",
-        "operationId": "get-orders",
+        "operationId": "get-users-id-orders",
         "responses": {
           "200": {
             "description": "Success",
@@ -648,7 +667,8 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "minLength": 3
+              "minLength": 3,
+              "example": "lon"
             },
             "description": "Used as a key to search relevant places. Ex. key: 'lon' should match London"
           }
@@ -707,10 +727,11 @@
                     "type": "object",
                     "properties": {
                       "type": {
-                        "type": "string"
-                      },
-                      "id": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                          "verification-codes"
+                        ],
+                        "example": "verification-codes"
                       },
                       "attributes": {
                         "type": "object",
@@ -728,7 +749,6 @@
                     },
                     "required": [
                       "type",
-                      "id",
                       "attributes"
                     ]
                   }
@@ -740,9 +760,10 @@
             }
           }
         },
-        "operationId": "post-opt-generate",
+        "operationId": "post-verification-code",
         "description": "Otp generation",
-        "security": []
+        "security": [],
+        "summary": "Create Verification Code"
       }
     },
     "/users": {
@@ -768,15 +789,17 @@
                 "$ref": "#/components/schemas/User"
               }
             }
-          }
+          },
+          "description": ""
         },
-        "operationId": "post-signup",
+        "operationId": "post-users",
         "description": "User signup",
         "security": [
           {
             "otp": []
           }
-        ]
+        ],
+        "summary": "Create User"
       }
     },
     "/users/sessions": {
@@ -796,10 +819,15 @@
                       "type": "object",
                       "properties": {
                         "type": {
-                          "type": "string"
+                          "type": "string",
+                          "enum": [
+                            "user-sessions"
+                          ],
+                          "example": "user-sessions"
                         },
                         "id": {
-                          "type": "string"
+                          "type": "string",
+                          "example": "NEEDS EXAMPLE"
                         }
                       },
                       "required": [
@@ -829,13 +857,19 @@
                     "type": "object",
                     "properties": {
                       "type": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                          "user-sessions"
+                        ],
+                        "example": "user-sessions"
                       },
                       "attributes": {
                         "type": "object",
                         "properties": {
                           "password": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "password",
+                            "example": "secret"
                           },
                           "email": {
                             "type": "string",
@@ -859,9 +893,10 @@
             }
           }
         },
-        "operationId": "post-login",
+        "operationId": "post-users-sessions",
         "description": "User login",
-        "security": []
+        "security": [],
+        "summary": "Create User Session"
       }
     },
     "/users/{userId}": {
@@ -871,17 +906,18 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "example": "User Identifier"
           },
           "description": "Target userId you want to change the password"
         }
       ],
       "get": {
-        "summary": "Return the information of the user",
+        "summary": "Get User",
         "tags": [
           "user"
         ],
-        "operationId": "get-user",
+        "operationId": "get-users-id",
         "description": "Get user",
         "security": [
           {
@@ -935,16 +971,24 @@
                     "type": "object",
                     "properties": {
                       "type": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                          "users"
+                        ],
+                        "example": "users"
                       },
                       "id": {
-                        "type": "string"
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
                       },
                       "attributes": {
                         "type": "object",
                         "properties": {
                           "password": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "password",
+                            "example": "secret"
                           }
                         },
                         "required": [
@@ -963,13 +1007,14 @@
             }
           }
         },
-        "operationId": "patch-change-password",
+        "operationId": "patch-users-id",
         "description": "User change password",
         "security": [
           {
             "otp": []
           }
-        ]
+        ],
+        "summary": "Update User"
       }
     }
   },
@@ -1002,7 +1047,9 @@
         "in": "path",
         "required": true,
         "schema": {
-          "type": "string"
+          "type": "string",
+          "format": "uuid",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
         },
         "description": "User identifier"
       },
@@ -1023,7 +1070,8 @@
         "required": false,
         "schema": {
           "type": "string",
-          "default": ""
+          "default": "",
+          "example": "MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D"
         },
         "description": "Pagination cursor that defines your place in the list."
       },
@@ -1035,7 +1083,8 @@
           "type": "integer",
           "minimum": 1,
           "maximum": 100,
-          "default": 20
+          "default": 20,
+          "example": 20
         },
         "description": "A limit on the number of objects to be returned, between 1 and 100."
       }
@@ -1079,7 +1128,8 @@
                 "type": "string",
                 "enum": [
                   "trips"
-                ]
+                ],
+                "example": "trips"
               },
               "attributes": {
                 "type": "object",
@@ -1123,7 +1173,8 @@
                 "type": "string",
                 "enum": [
                   "trip-searches"
-                ]
+                ],
+                "example": "trip-searches"
               },
               "attributes": {
                 "type": "object",
@@ -1134,28 +1185,34 @@
                   "expiresAt": {
                     "type": "string",
                     "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z",
                     "readOnly": true
                   },
                   "departureAfter": {
                     "type": "string",
-                    "format": "date-time"
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z"
                   },
                   "arrivalBefore": {
                     "type": "string",
                     "format": "date-time",
-                    "description": "Not yet implemented."
+                    "description": "Not yet implemented.",
+                    "example": "2019-08-24T14:15:22Z"
                   },
                   "passengers": {
                     "type": "object",
                     "properties": {
                       "adults": {
-                        "type": "integer"
+                        "type": "integer",
+                        "example": 1
                       },
                       "children": {
-                        "type": "integer"
+                        "type": "integer",
+                        "example": 1
                       },
                       "infants": {
-                        "type": "integer"
+                        "type": "integer",
+                        "example": 1
                       }
                     }
                   },
@@ -1165,10 +1222,12 @@
                       "business",
                       "firstClass"
                     ],
-                    "type": "string"
+                    "type": "string",
+                    "example": "economy"
                   },
                   "roundTrip": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": false
                   }
                 }
               },
@@ -1246,7 +1305,8 @@
             "type": "string",
             "enum": [
               "places"
-            ]
+            ],
+            "example": "places"
           }
         },
         "required": [
@@ -1267,7 +1327,8 @@
             "type": "string",
             "enum": [
               "leg-types"
-            ]
+            ],
+            "example": "leg-types"
           }
         },
         "required": [
@@ -1287,7 +1348,8 @@
             "type": "string",
             "enum": [
               "cabin-classes"
-            ]
+            ],
+            "example": "cabin-classes"
           }
         },
         "required": [
@@ -1309,7 +1371,8 @@
             "type": "string",
             "enum": [
               "places"
-            ]
+            ],
+            "example": "places"
           },
           "attributes": {
             "type": "object",
@@ -1433,7 +1496,8 @@
             "type": "string",
             "enum": [
               "place-types"
-            ]
+            ],
+            "example": "place-types"
           }
         },
         "required": [
@@ -1462,7 +1526,8 @@
                 "type": "string",
                 "enum": [
                   "orders"
-                ]
+                ],
+                "example": "orders"
               },
               "attributes": {
                 "type": "object",
@@ -1470,19 +1535,25 @@
                   "createdAt": {
                     "type": "string",
                     "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z",
                     "readOnly": true
                   },
                   "paymentIntentId": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "NEEDS EXAMPLE"
                   },
                   "offerAggregate": {
                     "type": "object",
                     "properties": {
                       "id": {
-                        "type": "string"
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
                       },
                       "expiresAt": {
-                        "type": "string"
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2019-08-24T14:15:22Z"
                       },
                       "groups": {
                         "type": "array",
@@ -1589,6 +1660,7 @@
               "next": {
                 "type": "string",
                 "format": "uri",
+                "example": "https://example.com/resource/?page%5Bcursor%5D=MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D&page%5Blimit%5D=20",
                 "readOnly": true
               }
             },
@@ -1615,7 +1687,8 @@
                 "type": "string",
                 "enum": [
                   "trip-offer-searches"
-                ]
+                ],
+                "example": "trip-offer-searches"
               },
               "attributes": {
                 "type": "object",
@@ -1623,6 +1696,7 @@
                   "expiresAt": {
                     "type": "string",
                     "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z",
                     "readOnly": true
                   },
                   "passengers": {
@@ -1634,7 +1708,8 @@
                       "properties": {
                         "dateOfBirth": {
                           "type": "string",
-                          "format": "date"
+                          "format": "date",
+                          "example": "1980-02-03"
                         }
                       },
                       "required": [
@@ -1735,7 +1810,8 @@
             "type": "string",
             "enum": [
               "trips"
-            ]
+            ],
+            "example": "trips"
           }
         },
         "required": [
@@ -1755,17 +1831,22 @@
               },
               "type": {
                 "type": "string",
-                "example": "User"
+                "enum": [
+                  "users"
+                ],
+                "example": "users"
               },
               "attributes": {
                 "type": "object",
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "john"
                   },
                   "password": {
                     "type": "string",
                     "format": "password",
+                    "example": "secret",
                     "writeOnly": true
                   },
                   "email": {
@@ -1774,14 +1855,17 @@
                     "example": "user@example.com"
                   },
                   "phone": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "123456789"
                   },
                   "created": {
                     "type": "string",
+                    "example": "2019-08-24T14:15:22Z",
                     "readOnly": true
                   },
                   "udpated": {
                     "type": "string",
+                    "example": "2019-08-24T14:15:22Z",
                     "readOnly": true
                   }
                 },
@@ -1802,7 +1886,9 @@
         },
         "required": [
           "data"
-        ]
+        ],
+        "title": "User",
+        "description": ""
       },
       "Offer": {
         "title": "Offer",
@@ -1811,7 +1897,8 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
           },
           "price": {
             "$ref": "#/components/schemas/Price"
@@ -1842,7 +1929,8 @@
             "type": "string",
             "enum": [
               "offer-aggregates"
-            ]
+            ],
+            "example": "offer-aggregates"
           }
         },
         "required": [
@@ -1857,7 +1945,8 @@
         "properties": {
           "ref": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
           },
           "cabinClass": {
             "$ref": "#/components/schemas/CabinClassDetails"
@@ -1874,10 +1963,12 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "example": "economy"
           },
           "marketingName": {
-            "type": "string"
+            "type": "string",
+            "example": "Economy"
           }
         },
         "required": [
@@ -1891,10 +1982,12 @@
         "type": "object",
         "properties": {
           "currency": {
-            "type": "string"
+            "type": "string",
+            "example": "EUR"
           },
           "amount": {
-            "type": "string"
+            "type": "string",
+            "example": "13.37"
           }
         },
         "required": [
@@ -1909,7 +2002,8 @@
         "properties": {
           "ref": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
           },
           "legs": {
             "type": "array",
@@ -1920,10 +2014,12 @@
             }
           },
           "vendor": {
-            "type": "string"
+            "type": "string",
+            "example": "BA"
           },
           "operator": {
             "type": "string",
+            "example": "BA",
             "nullable": true
           },
           "routeIdentifiers": {
@@ -1943,10 +2039,12 @@
         "type": "object",
         "properties": {
           "vendor": {
-            "type": "string"
+            "type": "string",
+            "example": "BA"
           },
           "operator": {
             "type": "string",
+            "example": "BA",
             "nullable": true
           }
         },
@@ -1980,15 +2078,18 @@
                   "departureAt": {
                     "type": "string",
                     "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z",
                     "readOnly": true
                   },
                   "arrivalAt": {
                     "type": "string",
                     "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z",
                     "readOnly": true
                   },
                   "operator": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "BA"
                   },
                   "origin": {
                     "$ref": "#/components/schemas/Point"
@@ -2040,11 +2141,13 @@
           },
           "departureAt": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "example": "2019-08-24T14:15:22Z"
           },
           "arrivalAt": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "example": "2019-08-24T14:15:22Z"
           }
         },
         "required": [
@@ -2070,7 +2173,8 @@
                 "type": "string",
                 "enum": [
                   "offer-aggregates"
-                ]
+                ],
+                "example": "offer-aggregates"
               },
               "attributes": {
                 "type": "object",
@@ -2088,7 +2192,8 @@
                   },
                   "expiresAt": {
                     "type": "string",
-                    "format": "date-time"
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z"
                   }
                 }
               }
@@ -2171,7 +2276,9 @@
         "type": "object",
         "properties": {
           "email": {
-            "type": "string"
+            "type": "string",
+            "format": "email",
+            "example": "john.smith@example.com"
           },
           "address": {
             "type": "object",
@@ -2179,22 +2286,30 @@
               "addressLines": {
                 "type": "array",
                 "items": {
-                  "type": "string"
-                }
+                  "type": "string",
+                  "example": "Street name 7"
+                },
+                "example": [
+                  "Street name 7"
+                ]
               },
               "countryCode": {
-                "type": "string"
+                "type": "string",
+                "example": "UK"
               },
               "postalCode": {
-                "type": "string"
+                "type": "string",
+                "example": "12345"
               },
               "city": {
-                "type": "string"
+                "type": "string",
+                "example": "London"
               }
             }
           },
           "phoneNumber": {
-            "type": "string"
+            "type": "string",
+            "example": "123456789"
           }
         }
       },
@@ -2227,20 +2342,25 @@
         "type": "object",
         "properties": {
           "firstName": {
-            "type": "string"
+            "type": "string",
+            "example": "John"
           },
           "lastName": {
-            "type": "string"
+            "type": "string",
+            "example": "Smith"
           },
           "title": {
-            "type": "string"
+            "type": "string",
+            "example": "mr"
           },
           "gender": {
-            "type": "string"
+            "type": "string",
+            "example": "male"
           },
           "dateOfBirth": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "example": "1980-02-03"
           }
         },
         "required": [
@@ -2259,16 +2379,20 @@
             "type": "string",
             "minLength": 2,
             "maxLength": 2,
-            "pattern": "^[A-Z]{2}$"
+            "pattern": "^[A-Z]{2}$",
+            "example": "BA"
           },
           "number": {
-            "type": "string"
+            "type": "string",
+            "example": "123456"
           },
           "firstName": {
-            "type": "string"
+            "type": "string",
+            "example": "John"
           },
           "lastName": {
-            "type": "string"
+            "type": "string",
+            "example": "Smith"
           }
         },
         "required": [
