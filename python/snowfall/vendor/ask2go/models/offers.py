@@ -99,7 +99,7 @@ class PassengerPricing(CamelCaseBaseModel):
 
 
 class Offer(CamelCaseBaseModel):
-    id: Optional[str]  # noqa: A003]
+    id: Optional[str]  # noqa: A003
     is_refundable: bool
     docs_required: bool
     gds: str

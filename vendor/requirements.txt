@@ -18,6 +18,7 @@ grpcio-status==1.46.3
 grpcio==1.46.3
 h3[numpy]==3.7.4
 httpx[http2]==0.23.0
+isodate==0.6.1
 lagom==1.7.1
 mongomock-motor==0.0.11
 more-itertools==8.13.0

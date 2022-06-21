@@ -2,9 +2,10 @@ import datetime
 import zoneinfo
 from typing import Union
 
+import isodate
 import pytest
 from dateutil import tz
-from google.protobuf import timestamp_pb2
+from google.protobuf import duration_pb2, timestamp_pb2
 
 from snowfall.common.v1alpha import datetime_pb2, models_pb2
 from snowfall.stdlib.format import protobuf
@@ -59,6 +60,28 @@ def test_enum_name_to_value() -> None:
                 tzinfo=zoneinfo.ZoneInfo("Europe/Berlin"),
             ),
         ),
+        (
+            datetime_pb2.DateTime(
+                year=1984,
+                month=2,
+                day=3,
+                hours=4,
+                minutes=5,
+                seconds=6,
+                nanos=7000,
+                utc_offset=duration_pb2.Duration(seconds=3600),
+            ),
+            datetime.datetime(
+                year=1984,
+                month=2,
+                day=3,
+                hour=4,
+                minute=5,
+                second=6,
+                microsecond=7,
+                tzinfo=tz.tzoffset("UTC+01:00", 3600),
+            ),
+        ),
     ],
 )
 def test_protobuf_to_datetime(
@@ -91,6 +114,28 @@ def test_protobuf_to_datetime(
                 seconds=6,
                 nanos=7000,
                 time_zone=datetime_pb2.TimeZone(id="Europe/Berlin"),
+            ),
+        ),
+        (
+            datetime.datetime(
+                year=1984,
+                month=2,
+                day=3,
+                hour=4,
+                minute=5,
+                second=6,
+                microsecond=7,
+                tzinfo=zoneinfo.ZoneInfo("America/New_York"),
+            ),
+            datetime_pb2.DateTime(
+                year=1984,
+                month=2,
+                day=3,
+                hours=4,
+                minutes=5,
+                seconds=6,
+                nanos=7000,
+                time_zone=datetime_pb2.TimeZone(id="America/New_York"),
             ),
         ),
         (
@@ -135,6 +180,50 @@ def test_protobuf_to_datetime(
                 seconds=6,
                 nanos=7000,
                 time_zone=datetime_pb2.TimeZone(id="UTC"),
+            ),
+        ),
+        (
+            datetime.datetime(
+                year=1984,
+                month=2,
+                day=3,
+                hour=4,
+                minute=5,
+                second=6,
+                microsecond=7,
+                tzinfo=isodate.tzinfo.Utc(),
+            ),
+            datetime_pb2.DateTime(
+                year=1984,
+                month=2,
+                day=3,
+                hours=4,
+                minutes=5,
+                seconds=6,
+                nanos=7000,
+                time_zone=datetime_pb2.TimeZone(id="UTC"),
+            ),
+        ),
+        (
+            datetime.datetime(
+                year=1984,
+                month=2,
+                day=3,
+                hour=4,
+                minute=5,
+                second=6,
+                microsecond=7,
+                tzinfo=tz.tzoffset("CET", 3600),
+            ),
+            datetime_pb2.DateTime(
+                year=1984,
+                month=2,
+                day=3,
+                hours=4,
+                minutes=5,
+                seconds=6,
+                nanos=7000,
+                utc_offset=duration_pb2.Duration(seconds=3600),
             ),
         ),
     ],
