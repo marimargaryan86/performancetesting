@@ -1,0 +1,15 @@
+{
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-config-prettier",
+    "stylelint-config-css-modules",
+    "stylelint-config-html/svelte"
+  ],
+  "plugins": ["stylelint-order"],
+  "rules": {
+    "declaration-no-important": true,
+    "order/order": ["custom-properties", "declarations"],
+    "order/properties-alphabetical-order": true,
+    "color-hex-length": "long"
+  }
+}
