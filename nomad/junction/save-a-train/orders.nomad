@@ -34,7 +34,7 @@ job "save-a-train-orders" {
       driver = "docker"
 
       vault {
-        policies = ["save-a-train-dev"]
+        policies = ["save-a-train-development"]
       }
 
       template {
@@ -42,7 +42,7 @@ job "save-a-train-orders" {
 AMQP_DSN={{range $index, $service := service "amqp"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 GEODATA_ADDRESS={{range $index, $service := service (printf "grpc.geodata-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis"}}redis://{{.Address}}:{{.Port}}// {{end}}
-{{ with secret "kv/dev/save-a-train" }}
+{{ with secret (printf "kv/data/%s/save-a-train" (env "NOMAD_NAMESPACE")) }}
 API_EMAIL={{ .Data.data.api_email }}
 API_PASSWORD={{ .Data.data.api_password }}
 API_SEARCH_PASSWORD={{ .Data.data.api_search_password }}

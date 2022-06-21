@@ -66,12 +66,12 @@ job "ssim-convert-convert" {
       driver = "docker"
 
       vault {
-        policies = ["ssim-convert-dev"]
+        policies = ["ssim-convert-development"]
       }
 
       template {
         data        = <<EOH
-{{ with secret "kv/dev/ssim-convert" }}
+{{ with secret (printf "kv/data/%s/ssim-convert" (env "NOMAD_NAMESPACE")) }}
 AWS_ACCESS_KEY_ID={{ .Data.data.aws_access_key_id }}
 AWS_SECRET_ACCESS_KEY={{ .Data.data.aws_secret_access_key }}
 {{ end }}

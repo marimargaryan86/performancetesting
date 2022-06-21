@@ -66,7 +66,7 @@ job "mobile-api-http" {
 MONGO_DSN={{range $index, $service := service (printf "mongodb-%s" (env "NOMAD_NAMESPACE"))}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service (printf "redis-%s" (env "NOMAD_NAMESPACE"))}}redis://{{.Address}}:{{.Port}}// {{end}}
 SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
-{{ with secret (printf "kv/%s/mobile-api" (env "NOMAD_NAMESPACE")) }}
+{{ with secret (printf "kv/data/%s/mobile-api" (env "NOMAD_NAMESPACE")) }}
 JUNCTION_API_TOKEN={{ .Data.data.junction_api_token }}
 JWT_TOKEN_VERSION={{ .Data.data.jwt_token_version }}
 JWT_PRIVATE_KEY={{ .Data.data.jwt_private_key }}
@@ -102,4 +102,3 @@ EOH
     }
   }
 }
-

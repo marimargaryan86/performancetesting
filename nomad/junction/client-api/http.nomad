@@ -56,7 +56,7 @@ job "client-api-http" {
       driver = "docker"
 
       vault {
-        policies = ["client-api-dev"]
+        policies = ["client-api-development"]
       }
 
       template {
@@ -69,7 +69,7 @@ ORDERS_ADDRESS={{range $index, $service := service (printf "grpc.orders-%s" (env
 PLACES_ADDRESS={{range $index, $service := service (printf "grpc.places-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
 SCHEDULES_ADDRESS={{range $index, $service := service (printf "grpc.schedules-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
 TRIPS_ADDRESS={{range $index, $service := service (printf "grpc.trips-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
-{{ with secret "kv/dev/client-api" }}
+{{ with secret (printf "kv/data/%s/client-api" (env "NOMAD_NAMESPACE")) }}
 JWT_PUBLIC_KEY={{ .Data.data.jwt_public_key }}
 {{ end }}
 EOH
