@@ -2632,14 +2632,14 @@
                   "departureAt": {
                     "type": "string",
                     "format": "date-time",
-                    "readOnly": true,
-                    "example": "2019-08-24T14:15:22Z"
+                    "example": "2019-08-24T14:15:22Z",
+                    "readOnly": true
                   },
                   "arrivalAt": {
                     "type": "string",
                     "format": "date-time",
-                    "readOnly": true,
-                    "example": "2019-08-24T14:15:22Z"
+                    "example": "2019-08-24T14:15:22Z",
+                    "readOnly": true
                   },
                   "operator": {
                     "type": "string",
@@ -2656,10 +2656,10 @@
               "relationships": {
                 "type": "object",
                 "required": [
-                  "type"
+                  "legType"
                 ],
                 "properties": {
-                  "type": {
+                  "legType": {
                     "type": "object",
                     "required": [
                       "data"

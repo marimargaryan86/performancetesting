@@ -1,15 +1,29 @@
 rules:
   json-api-no-id:
     description: Field named `id` is not allowed in `attributes`.
-    given: $..*.attributes.properties
+    given: $..attributes.properties
     severity: error
     then:
       - field: "id"
         function: undefined
   json-api-no-type:
     description: Field named `type` is not allowed in `attributes`.
-    given: $..*.attributes.properties
+    given: $..attributes.properties
     severity: error
     then:
       - field: "type"
         function: undefined
+  json-api-no-relationships-type:
+    description: Field named `type` is not allowed in `relationships`.
+    given: $..relationships.properties
+    severity: error
+    then:
+      - field: "type"
+        function: undefined
+  json-api-type-enum:
+    description: Field named `type` should have `enum`.
+    given: $..properties[type]
+    severity: error
+    then:
+      - field: "enum"
+        function: truthy

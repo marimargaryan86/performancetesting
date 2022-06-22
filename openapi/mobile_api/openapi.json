@@ -2065,7 +2065,6 @@
         "title": "Leg",
         "allOf": [
           {
-            "type": "object",
             "properties": {
               "id": {
                 "type": "string",
@@ -2110,10 +2109,10 @@
               "relationships": {
                 "type": "object",
                 "required": [
-                  "type"
+                  "legType"
                 ],
                 "properties": {
-                  "type": {
+                  "legType": {
                     "type": "object",
                     "required": [
                       "data"
@@ -2134,7 +2133,8 @@
             ]
           }
         ],
-        "description": "Smallest part of a Trip; A scheduled departure from A and a scheduled arrival to B."
+        "description": "Smallest part of a Trip; A scheduled departure from A and a scheduled arrival to B.",
+        "type": "object"
       },
       "OfferSegmentLeg": {
         "title": "Offer Segment Leg",

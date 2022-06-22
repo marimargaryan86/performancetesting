@@ -446,7 +446,7 @@ class LegResource(models.Resource):
                 "destination": Point.from_proto(leg.destination),
             },
             relationships={
-                "type": {
+                "legType": {
                     _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
                         id=protobuf.enum_value_to_slug(
                             descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
