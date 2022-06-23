@@ -150,7 +150,7 @@ class Session(endpoints.HTTPEndpoint):
             models.Body(
                 data=models.Resource(
                     id=token,
-                    type="jwt",
+                    type="user-sessions",
                 ),
             ),
         )
