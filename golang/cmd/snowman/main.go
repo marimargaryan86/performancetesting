@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"git.snowfall.se/junction/junction/golang/cmd/snowman/common"
 	"git.snowfall.se/junction/junction/golang/cmd/snowman/merge_request"
 	"git.snowfall.se/junction/junction/golang/stdlib/service"
 	"github.com/getsentry/sentry-go"
@@ -18,34 +19,41 @@ var gitlabBaseUrl string
 var gitlabToken string
 var gitlabWebhookSecret string
 var httpPort int
-var cmd = &cobra.Command{
+var parseCmd = &cobra.Command{
+	Use:   "parse",
+	Short: "Parse the title of a commit message",
+	RunE:  parse,
+	Args:  cobra.ExactArgs(1),
+}
+var serveCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "Listen to incoming web hooks from GitLab",
-	RunE:  snowman,
+	RunE:  serve,
 	Args:  cobra.ExactArgs(0),
 }
 
 func init() {
-	service.Root().AddCommand(cmd)
+	service.Root().AddCommand(parseCmd)
+	service.Root().AddCommand(serveCmd)
 
-	cmd.PersistentFlags().StringVar(&gitlabBaseUrl, "gitlab-base-url", "", "")
-	cmd.PersistentFlags().StringVar(&gitlabToken, "gitlab-token", "", "")
-	cmd.PersistentFlags().StringVar(&gitlabWebhookSecret, "gitlab-webhook-secret", "", "")
-	cmd.PersistentFlags().IntVar(&httpPort, "http-port", 80, "")
+	serveCmd.PersistentFlags().StringVar(&gitlabBaseUrl, "gitlab-base-url", "", "")
+	serveCmd.PersistentFlags().StringVar(&gitlabToken, "gitlab-token", "", "")
+	serveCmd.PersistentFlags().StringVar(&gitlabWebhookSecret, "gitlab-webhook-secret", "", "")
+	serveCmd.PersistentFlags().IntVar(&httpPort, "http-port", 80, "")
 
-	if err := viper.BindPFlag("gitlab_base_url", cmd.PersistentFlags().Lookup("gitlab-base-url")); err != nil {
+	if err := viper.BindPFlag("gitlab_base_url", serveCmd.PersistentFlags().Lookup("gitlab-base-url")); err != nil {
 		panic(err)
 	}
 
-	if err := viper.BindPFlag("gitlab_token", cmd.PersistentFlags().Lookup("gitlab-token")); err != nil {
+	if err := viper.BindPFlag("gitlab_token", serveCmd.PersistentFlags().Lookup("gitlab-token")); err != nil {
 		panic(err)
 	}
 
-	if err := viper.BindPFlag("gitlab_webhook_secret", cmd.PersistentFlags().Lookup("gitlab-webhook-secret")); err != nil {
+	if err := viper.BindPFlag("gitlab_webhook_secret", serveCmd.PersistentFlags().Lookup("gitlab-webhook-secret")); err != nil {
 		panic(err)
 	}
 
-	if err := viper.BindPFlag("http_port", cmd.PersistentFlags().Lookup("http-port")); err != nil {
+	if err := viper.BindPFlag("http_port", serveCmd.PersistentFlags().Lookup("http-port")); err != nil {
 		panic(err)
 	}
 }
@@ -56,7 +64,24 @@ func main() {
 	}
 }
 
-func snowman(cmd *cobra.Command, args []string) error {
+func parse(cmd *cobra.Command, args []string) error {
+	title, err := common.ParseCommitTitle(args[0])
+
+	if err != nil {
+		return err
+	}
+
+	cmd.Printf("Breaking: %+v\n", title.IsBreaking)
+	cmd.Printf("Description: %+v\n", title.Description)
+	cmd.Printf("Draft: %+v\n", title.IsDraft)
+	cmd.Printf("Scope: %+v\n", title.Scope)
+	cmd.Printf("Title: %+v\n", title.Title)
+	cmd.Printf("Type: %+v\n", title.Type)
+
+	return nil
+}
+
+func serve(cmd *cobra.Command, args []string) error {
 	rand.Seed(time.Now().UnixNano())
 
 	logger, _ := zap.NewProduction()

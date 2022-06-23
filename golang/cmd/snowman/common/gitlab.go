@@ -1,8 +1,42 @@
 package common
 
 import (
+	"errors"
 	"github.com/xanzy/go-gitlab"
+	"regexp"
 )
+
+var allowedTitle *regexp.Regexp
+
+func init() {
+	allowedTitle = regexp.MustCompile(`^(?P<prefix>WIP: |Draft: )?(?P<title>(?P<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(?:\((?P<scope>[a-z\d\-/]+)\))?(?P<breaking>!)?: (?P<description>[a-z].*[^.]))$`)
+}
+
+type CommitTitle struct {
+	Description string
+	IsBreaking  bool
+	IsDraft     bool
+	Scope       string
+	Title       string
+	Type        string
+}
+
+func ParseCommitTitle(title string) (CommitTitle, error) {
+	matches := allowedTitle.FindStringSubmatch(title)
+
+	if matches == nil {
+		return CommitTitle{}, errors.New("unable to parse commit title")
+	}
+
+	return CommitTitle{
+		Description: matches[allowedTitle.SubexpIndex("description")],
+		IsBreaking:  matches[allowedTitle.SubexpIndex("breaking")] != "",
+		IsDraft:     matches[allowedTitle.SubexpIndex("prefix")] != "",
+		Scope:       matches[allowedTitle.SubexpIndex("scope")],
+		Title:       matches[allowedTitle.SubexpIndex("title")],
+		Type:        matches[allowedTitle.SubexpIndex("type")],
+	}, nil
+}
 
 func LikelyFileOwners(client *gitlab.Client, projectId int, path string) ([]int, error) {
 	owners := make([]int, 0)

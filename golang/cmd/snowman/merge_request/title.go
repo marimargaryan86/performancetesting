@@ -2,7 +2,7 @@ package merge_request
 
 import (
 	"fmt"
-	"regexp"
+	"git.snowfall.se/junction/junction/golang/cmd/snowman/common"
 	"strings"
 )
 
@@ -11,11 +11,9 @@ const discussionForbiddenSuffix = "forbidden_word"
 const discussionTitleBody = "Hi @%s! :wave:\n\nSorry to interrupt, but your merge request title is not compliant with the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification."
 const discussionTitleSuffix = "invalid_title"
 
-var allowedTitle *regexp.Regexp
 var forbiddenWords []string
 
 func init() {
-	allowedTitle = regexp.MustCompile(`^(?P<prefix>WIP: |Draft: )?(?P<title>(?P<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(?:\((?P<scope>[a-z\d\-/]+)\))?(?P<breaking>!)?: (?P<description>[a-z].*[^.]))$`)
 	forbiddenWords = []string{
 		"adds", "adding", "added",
 		"allows", "allowing", "allowed",
@@ -80,14 +78,13 @@ func init() {
 }
 
 func (mr *mergeRequest) validateTitle() error {
-	if !followsConventionalCommits(mr.object.Title) {
+	title, err := common.ParseCommitTitle(mr.object.Title)
+
+	if err != nil {
 		return mr.reportIssue(discussionTitleSuffix, fmt.Sprintf(discussionTitleBody, mr.object.Author.Username))
 	}
 
-	matches := allowedTitle.FindStringSubmatch(mr.object.Title)
-	description := matches[allowedTitle.SubexpIndex("description")]
-
-	if !isImperativePresentTense(description) {
+	if !isImperativePresentTense(title.Description) {
 		return mr.reportIssue(discussionForbiddenSuffix, fmt.Sprintf(discussionForbiddenBody, mr.object.Author.Username))
 	}
 
@@ -105,8 +102,4 @@ func isImperativePresentTense(sentence string) bool {
 	}
 
 	return true
-}
-
-func followsConventionalCommits(title string) bool {
-	return allowedTitle.MatchString(title)
 }
