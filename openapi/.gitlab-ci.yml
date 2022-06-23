@@ -8,8 +8,20 @@ openapi:breaking:
   script: |
     for f in openapi/**/*.json; do
       git show "${CI_MERGE_REQUEST_DIFF_BASE_SHA}:${f}" > old.json || continue
-      oasdiff -format text -base old.json -revision "${f}"
+      if ! oasdiff -format text -base old.json -revision "${f}" -breaking-only -fail-on-diff; then
+        if [ "$BREAKING" -eq "1" ]; then
+          exit 2
+        else
+          exit 1
+        fi
+      fi
     done
+  needs:
+    - job: "allow-breaking-changes"
+      artifacts: true
+  allow_failure:
+    exit_codes:
+      - 2
   rules:
     - if: '$CI_MERGE_REQUEST_IID'
       changes:
@@ -25,6 +37,7 @@ openapi:test:
   interruptible: true
   script:
     - for f in openapi/**/*.json; do spectral lint --ruleset "openapi/.spectral.yml" --fail-severity warn "$f"; done
+  needs: []
   rules:
     - if: '$CI_MERGE_REQUEST_IID'
       changes:
@@ -39,6 +52,7 @@ openapi:publish:
     entrypoint: [""]
   script:
     - npx @stoplight/cli@5 push --ci-token ${STOPLIGHT_TOKEN}
+  needs: []
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never

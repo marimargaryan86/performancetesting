@@ -21,5 +21,17 @@
 
 protobuf:breaking:
   extends: .protobuf:buf-test
-  script:
-    - "${BUF_BINARY} breaking --against ${CI_REPOSITORY_URL}#ref=${CI_MERGE_REQUEST_DIFF_BASE_SHA}"
+  script: |
+    if ! "${BUF_BINARY}" breaking --against "${CI_REPOSITORY_URL}#ref=${CI_MERGE_REQUEST_DIFF_BASE_SHA}"; then
+      if [ "${BREAKING}" -eq "1" ]; then
+        exit 2
+      else
+        exit 1
+      fi
+    fi
+  needs:
+    - job: "allow-breaking-changes"
+      artifacts: true
+  allow_failure:
+    exit_codes:
+      - 2

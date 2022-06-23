@@ -30,3 +30,24 @@ make-uninterruptible:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
   tags:
     - shell
+
+allow-breaking-changes:
+  stage: setup
+  interruptible: true
+  before_script:
+    - docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
+    - docker pull "${CI_REGISTRY_IMAGE}/service/snowman:latest"
+  script:
+    - IS_BREAKING=$(docker run --rm "${CI_REGISTRY_IMAGE}/service/snowman:latest" parse "${CI_MERGE_REQUEST_TITLE}" 2>&1 | grep Breaking | cut -d ' ' -f2)
+    - if [ "${IS_BREAKING}" == "true" ]; then echo "BREAKING=1" > variables.env; else echo "BREAKING=0" > variables.env; fi
+  needs: []
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_MERGE_REQUEST_IID'
+  artifacts:
+    reports:
+      dotenv: variables.env
+
+  tags:
+    - shell
