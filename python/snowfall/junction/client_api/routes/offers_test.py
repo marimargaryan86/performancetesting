@@ -3,6 +3,7 @@ import rapidjson
 from starlette import status, testclient
 
 from snowfall import fixtures
+from snowfall.junction.client_api.routes import conftest
 
 
 @pytest.mark.asyncio
@@ -22,6 +23,111 @@ class TestOffers(object):
         client.headers["Authorization"] = "{0}f".format(client.headers["Authorization"])
         response = client.get("/offers/{id}".format(id=fixtures.OFFERS[0]))
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+@pytest.mark.asyncio
+class TestOfferGroups(object):
+    async def test_unknown_offer_group_returns_not_found(
+        self,
+        client: testclient.TestClient,
+    ) -> None:
+        response = client.get("/offers/groups/{id}".format(id=fixtures.NOT_FOUND))
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    async def test_offer_group_is_found(self, client: testclient.TestClient) -> None:
+        response = client.get("/offers/groups/{id}".format(id=fixtures.OFFER_GROUPS[0]))
+        assert response.status_code == status.HTTP_200_OK
+
+    async def test_offer_groups_by_offer(self, client: testclient.TestClient) -> None:
+        conftest.test_list_and_view_endpoints(
+            client=client,
+            url="/offers/{id}/groups".format(id=fixtures.OFFERS[0]),
+            expected_ids=fixtures.OFFER_GROUPS,
+        )
+
+
+@pytest.mark.asyncio
+class TestOfferGroupDetails(object):
+    async def test_unknown_offer_group_details_returns_not_found(
+        self,
+        client: testclient.TestClient,
+    ) -> None:
+        response = client.get(
+            "/offers/groups/details/{id}".format(id=fixtures.NOT_FOUND),
+        )
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    async def test_offer_group_is_found(self, client: testclient.TestClient) -> None:
+        response = client.get(
+            "/offers/groups/details/{id}".format(id=fixtures.OFFER_GROUP_DETAILS[0]),
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+    async def test_offer_group_details_by_offer_group(
+        self,
+        client: testclient.TestClient,
+    ) -> None:
+        conftest.test_list_and_view_endpoints(
+            client=client,
+            url="/offers/groups/{id}/details".format(id=fixtures.OFFER_GROUPS[0]),
+            expected_ids=fixtures.OFFER_GROUP_DETAILS,
+        )
+
+
+@pytest.mark.asyncio
+class TestOfferOptions(object):
+    async def test_unknown_offer_option_returns_not_found(
+        self,
+        client: testclient.TestClient,
+    ) -> None:
+        response = client.get(
+            "/offers/options/{id}".format(id=fixtures.NOT_FOUND),
+        )
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    async def test_offer_group_is_found(self, client: testclient.TestClient) -> None:
+        response = client.get(
+            "/offers/options/{id}".format(id=fixtures.PROVIDER_OFFERS[0]),
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+    async def test_offer_options_by_offer_group(
+        self,
+        client: testclient.TestClient,
+    ) -> None:
+        conftest.test_list_and_view_endpoints(
+            client=client,
+            url="/offers/groups/{id}/options".format(id=fixtures.OFFER_GROUPS[0]),
+            expected_ids=fixtures.PROVIDER_OFFERS,
+        )
+
+
+@pytest.mark.asyncio
+class TestOfferOptionDetails(object):
+    async def test_unknown_offer_option_details_returns_not_found(
+        self,
+        client: testclient.TestClient,
+    ) -> None:
+        response = client.get(
+            "/offers/options/details/{id}".format(id=fixtures.NOT_FOUND),
+        )
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    async def test_offer_group_is_found(self, client: testclient.TestClient) -> None:
+        response = client.get(
+            "/offers/options/details/{id}".format(id=fixtures.OFFER_DETAILS[0]),
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+    async def test_offer_option_details_by_offer_option(
+        self,
+        client: testclient.TestClient,
+    ) -> None:
+        conftest.test_list_and_view_endpoints(
+            client=client,
+            url="/offers/options/{id}/details".format(id=fixtures.PROVIDER_OFFERS[0]),
+            expected_ids=fixtures.OFFER_DETAILS,
+        )
 
 
 @pytest.mark.asyncio

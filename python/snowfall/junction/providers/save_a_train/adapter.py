@@ -129,6 +129,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                     continue
 
                 expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
+                offer_segment_id = str(uuid.uuid4())
 
                 yield offer_models_pb2.OfferGroup(
                     id=str(uuid.uuid4()),
@@ -147,7 +148,8 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                             ),
                             segment_details=[
                                 offer_models_pb2.OfferSegmentDetails(
-                                    id=search_task.segments[0].id,
+                                    id=str(uuid.uuid4()),
+                                    offer_segment_id=offer_segment_id,
                                     cabin_class=models_pb2.CabinClass(
                                         type=_cabin_to_proto(transfer_fare.name),
                                         marketing_name=transfer_fare.name.replace(
@@ -169,7 +171,8 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                     ],
                     segments=[
                         offer_models_pb2.OfferSegment(
-                            id=search_task.segments[0].id,
+                            id=offer_segment_id,
+                            segment_id=search_task.segments[0].id,
                             vehicle=offer_models_pb2.Vehicle(
                                 equipment=transfer_change.train.category or "",
                                 number=transfer_change.train.number or "",

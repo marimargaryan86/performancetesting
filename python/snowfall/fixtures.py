@@ -22,6 +22,9 @@ TRIPS = ("9d672f0e-0934-4388-8568-03e40c0bf0e9",)
 SCHEDULES = ("d77e4acb-5aa1-47ad-9a15-126c0fa0e157",)
 PROVIDER_OFFERS = ("88a8dcc9-deff-4a0e-bd96-b0faea5ea90f",)
 OFFERS = ("5927b3ce-fbd7-4f8b-b456-b1b7fd44cdad",)
+OFFER_DETAILS = ("91d4b3f7-bb9d-4ffc-9919-7892fc017740",)
+OFFER_GROUPS = ("2d178001-46ea-415f-8ec7-f22f2318b7c0",)
+OFFER_GROUP_DETAILS = ("328bc5eb-3ad0-401a-a765-3335595f2bc7",)
 SEGMENTS = ("9aeed7e9-fa69-4fd5-8590-e14e402e1346",)
 STOPS = (
     "e1f85306-35b3-4892-9e21-a6a34c02459c",
@@ -141,18 +144,18 @@ def get_offers() -> list[offers_pb2.OfferAggregate]:
 
 
 def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
-    segment_id = uuid.uuid4()
-
     return offers_pb2.OfferAggregate(
         id=identifier,
         groups=[
             offers_pb2.OfferGroup(
+                id=OFFER_GROUPS[0],
                 offers=[
                     offers_pb2.Offer(
                         id=PROVIDER_OFFERS[0],
                         segment_details=[
                             offers_pb2.OfferSegmentDetails(
-                                id=str(segment_id),
+                                id=OFFER_DETAILS[0],
+                                offer_segment_id=OFFER_GROUP_DETAILS[0],
                                 cabin_class=models_pb2.CabinClass(
                                     type=models_pb2.CabinClass.TYPE_ECONOMY,
                                     marketing_name="Economy",
@@ -167,7 +170,8 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
                 ],
                 segments=[
                     offers_pb2.OfferSegment(
-                        id=str(segment_id),
+                        id=OFFER_GROUP_DETAILS[0],
+                        segment_id=SEGMENTS[0],
                         legs=[
                             offers_pb2.OfferSegmentLeg(
                                 id=str(uuid.uuid4()),

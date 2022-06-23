@@ -1,6 +1,8 @@
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping, Sequence, cast
 
 from starlette import status, testclient
+
+from snowfall import fixtures
 
 
 def test_list_and_view_endpoints(
@@ -38,7 +40,7 @@ def _test_view_endpoint(
     current_link = None
 
     for resource in resources:
-        current_link = resource["links"]["self"]
+        current_link = cast(str, resource["links"]["self"])
         response = client.get(current_link)
 
         assert response.status_code == status.HTTP_200_OK
@@ -47,6 +49,11 @@ def _test_view_endpoint(
 
         assert body["data"] == resource
 
-    response = client.get("{0}foobar".format(current_link))
+    if not current_link:
+        return
+
+    response = client.get(
+        "{0}/{1}".format(current_link.rsplit("/", maxsplit=1), fixtures.NOT_FOUND),
+    )
 
     assert response.status_code == status.HTTP_404_NOT_FOUND

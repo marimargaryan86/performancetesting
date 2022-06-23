@@ -3,6 +3,8 @@ import datetime
 import itertools
 import uuid
 
+import more_itertools
+
 from snowfall.junction.offers import offers
 from snowfall.junction.offers.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
@@ -41,7 +43,9 @@ class OfferBucketRepository(object):
         self._redis = redis_client
 
     async def add_offer(self, offer: models_pb2.OfferGroup) -> None:
-        key = ":".join([offer.offer_search_id, offer.segments[0].id])
+        key = ":".join(
+            [offer.offer_search_id, more_itertools.first(offer.segments).segment_id],
+        )
         bucket = self._redis.list_(key)
         await bucket.push(offer.id)
         await redis.put_expires_at_if_less_than_current(
@@ -122,6 +126,6 @@ class OfferAggregator(object):
         offer: models_pb2.OfferGroup,
     ) -> OfferBuckets:
         buckets = await self._buckets.get_offer_buckets(offer.offer_search_id)
-        buckets[offer.segments[0].id] = [offer.id]
+        buckets[more_itertools.first(offer.segments).segment_id] = [offer.id]
 
         return buckets

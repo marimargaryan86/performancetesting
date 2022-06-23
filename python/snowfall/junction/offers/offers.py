@@ -1,6 +1,6 @@
 import datetime
 import uuid
-from typing import Sequence
+from typing import Optional, Sequence
 
 import pymongo
 from google.protobuf import timestamp_pb2
@@ -9,8 +9,11 @@ from motor import motor_asyncio
 from snowfall.junction.offers.v1alpha import models_pb2
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
+_IN = "$in"
+
 
 class TripOfferRepository(
+    mixins.FindByIdMixin[models_pb2.OfferGroup],
     mixins.InsertMixin[models_pb2.OfferGroup],
     repository.ProtoRepository[models_pb2.OfferGroup],
 ):
@@ -28,7 +31,7 @@ class TripOfferRepository(
         filter_ = (
             {
                 repository.mongo_id_key: {
-                    "$in": ids,
+                    _IN: ids,
                 },
             }
             if ids
@@ -39,6 +42,140 @@ class TripOfferRepository(
             cur=cursor,
             filter_=filter_,
         )
+
+
+class TripOfferGroupDetailsRepository(
+    repository.ProtoRepository[models_pb2.OfferSegment],
+):
+    _proto = models_pb2.OfferSegment
+    _indexes = [pymongo.IndexModel("segments.id", background=True)]
+
+    async def find(
+        self,
+        ids: Sequence[str],
+        cursor: str,
+    ) -> resultset.ResultSet[models_pb2.OfferSegment]:
+        filter_ = (
+            {
+                "segments.id": {
+                    _IN: ids,
+                },
+            }
+            if ids
+            else {}
+        )
+
+        return await self._find_nested(
+            path="$segments",
+            cur=cursor,
+            filter_=filter_,
+        )
+
+    async def find_by_id(self, document_id: str) -> Optional[models_pb2.OfferSegment]:
+        details = await self._find_nested(
+            path="$segments",
+            filter_={
+                "segments.id": {
+                    "$eq": document_id,
+                },
+            },
+        )
+
+        try:
+            return await details.take()
+        except StopAsyncIteration:
+            return None
+
+
+class OfferOptionsRepository(
+    repository.ProtoRepository[models_pb2.Offer],
+):
+    _proto = models_pb2.Offer
+    _indexes = [pymongo.IndexModel("offers.id", background=True)]
+
+    async def find(
+        self,
+        ids: Sequence[str],
+        cursor: str,
+    ) -> resultset.ResultSet[models_pb2.Offer]:
+        filter_ = (
+            {
+                "offers.id": {
+                    _IN: ids,
+                },
+            }
+            if ids
+            else {}
+        )
+
+        return await self._find_nested(
+            path="$offers",
+            cur=cursor,
+            filter_=filter_,
+        )
+
+    async def find_by_id(self, document_id: str) -> Optional[models_pb2.Offer]:
+        details = await self._find_nested(
+            path="$offers",
+            filter_={
+                "offers.id": {
+                    "$eq": document_id,
+                },
+            },
+        )
+
+        try:
+            return await details.take()
+        except StopAsyncIteration:
+            return None
+
+
+class OfferOptionDetailsRepository(
+    repository.ProtoRepository[models_pb2.OfferSegmentDetails],
+):
+    _proto = models_pb2.OfferSegmentDetails
+    _indexes = [
+        pymongo.IndexModel("offers.segment_details.id", background=True),
+    ]
+
+    async def find(
+        self,
+        ids: Sequence[str],
+        cursor: str,
+    ) -> resultset.ResultSet[models_pb2.OfferSegmentDetails]:
+        filter_ = (
+            {
+                "offers.segment_details.id": {
+                    _IN: ids,
+                },
+            }
+            if ids
+            else {}
+        )
+
+        return await self._find_nested(
+            path="$offers.segment_details",
+            cur=cursor,
+            filter_=filter_,
+        )
+
+    async def find_by_id(
+        self,
+        document_id: str,
+    ) -> Optional[models_pb2.OfferSegmentDetails]:
+        details = await self._find_nested(
+            path="$offers.segment_details",
+            filter_={
+                "offers.segment_details.id": {
+                    "$eq": document_id,
+                },
+            },
+        )
+
+        try:
+            return await details.take()
+        except StopAsyncIteration:
+            return None
 
 
 class OfferAggregateMappingRepository(
@@ -70,7 +207,7 @@ class OfferAggregateMappingRepository(
         filter_ = (
             {
                 repository.mongo_id_key: {
-                    "$in": ids,
+                    _IN: ids,
                 },
             }
             if ids

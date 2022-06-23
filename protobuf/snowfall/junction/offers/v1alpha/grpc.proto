@@ -12,14 +12,14 @@ service OfferSearchService {
 service OfferService {
   rpc GetOffer(GetOfferRequest) returns (GetOfferResponse) {}
   rpc ListOffers(ListOffersRequest) returns (ListOffersResponse) {}
-}
-
-message GetOfferRequest {
-  string id = 1;
-}
-
-message GetOfferResponse {
-  OfferAggregate offer = 1;
+  rpc GetOfferGroup(GetOfferGroupRequest) returns (GetOfferGroupResponse) {}
+  rpc ListOfferGroups(ListOfferGroupsRequest) returns (ListOfferGroupsResponse) {}
+  rpc GetOfferGroupDetails(GetOfferGroupDetailsRequest) returns (GetOfferGroupDetailsResponse) {}
+  rpc ListOfferGroupDetails(ListOfferGroupDetailsRequest) returns (ListOfferGroupDetailsResponse) {}
+  rpc GetOfferOption(GetOfferOptionRequest) returns (GetOfferOptionResponse) {}
+  rpc ListOfferOptions(ListOfferOptionsRequest) returns (ListOfferOptionsResponse) {}
+  rpc GetOfferOptionDetails(GetOfferOptionDetailsRequest) returns (GetOfferOptionDetailsResponse) {}
+  rpc ListOfferOptionDetails(ListOfferOptionDetailsRequest) returns (ListOfferOptionDetailsResponse) {}
 }
 
 message EnqueueOfferSearchRequest {
@@ -38,20 +38,112 @@ message GetOfferSearchResponse {
   OfferSearch search = 1;
 }
 
+message GetOfferRequest {
+  string id = 1;
+}
+
+message GetOfferResponse {
+  OfferAggregate offer = 1;
+}
+
 message ListOffersRequest {
   optional int32 page_size = 1;
   string page_token = 2;
   oneof payload {
     string offer_search_id = 3;
-    ListOfOfferIds offer_ids = 4;
+    ListOfIds offer_ids = 4;
   }
 }
 
-message ListOfOfferIds {
+message ListOfIds {
   repeated string ids = 3;
 }
 
 message ListOffersResponse {
   string next_page_token = 1;
   repeated OfferAggregate offers = 2;
+}
+
+message GetOfferGroupRequest {
+  string id = 1;
+}
+
+message GetOfferGroupResponse {
+  OfferGroup group = 1;
+}
+
+message ListOfferGroupsRequest {
+  optional int32 page_size = 1;
+  string page_token = 2;
+  oneof payload {
+    ListOfIds offer_group_ids = 3;
+  }
+}
+
+message ListOfferGroupsResponse {
+  string next_page_token = 1;
+  repeated OfferGroup groups = 2;
+}
+
+message GetOfferGroupDetailsRequest {
+  string id = 1;
+}
+
+message GetOfferGroupDetailsResponse {
+  OfferSegment details = 1;
+}
+
+message ListOfferGroupDetailsRequest {
+  optional int32 page_size = 1;
+  string page_token = 2;
+  oneof payload {
+    ListOfIds offer_group_details_ids = 3;
+  }
+}
+
+message ListOfferGroupDetailsResponse {
+  string next_page_token = 1;
+  repeated OfferSegment details = 2;
+}
+
+message GetOfferOptionRequest {
+  string id = 1;
+}
+
+message GetOfferOptionResponse {
+  Offer option = 1;
+}
+
+message ListOfferOptionsRequest {
+  optional int32 page_size = 1;
+  string page_token = 2;
+  oneof payload {
+    ListOfIds offer_option_ids = 3;
+  }
+}
+
+message ListOfferOptionsResponse {
+  string next_page_token = 1;
+  repeated Offer options = 2;
+}
+
+message GetOfferOptionDetailsRequest {
+  string id = 1;
+}
+
+message GetOfferOptionDetailsResponse {
+  OfferSegmentDetails details = 1;
+}
+
+message ListOfferOptionDetailsRequest {
+  optional int32 page_size = 1;
+  string page_token = 2;
+  oneof payload {
+    ListOfIds offer_option_details_ids = 3;
+  }
+}
+
+message ListOfferOptionDetailsResponse {
+  string next_page_token = 1;
+  repeated OfferSegmentDetails details = 2;
 }

@@ -212,9 +212,9 @@ async def test_search_result_data(  # noqa: WPS218
 
     async for offer_group in offer_groups:
         assert offer_group.offer_search_id == _ARN_LHR.offer_search_id
-        _assert_offer(offer_group.offers[0])
         segment = offer_group.segments[0]
-        assert segment.id == "segment_id"
+        _assert_offer(offer_group.offers[0], segment.id)
+        assert segment.segment_id == "segment_id"
         assert segment.operator == "SK"
         assert segment.vendor == "SK"
         assert segment.terminal == "5"
@@ -237,9 +237,9 @@ async def test_search_result_data(  # noqa: WPS218
         assert leg.arrival_at == expected_leg.arrival_at
 
 
-def _assert_offer(offer: offers_pb2.Offer) -> None:
+def _assert_offer(offer: offers_pb2.Offer, expected_segment_id: str) -> None:
     segment_details = offer.segment_details[0]
-    assert segment_details.id == "segment_id"
+    assert segment_details.offer_segment_id == expected_segment_id
     assert segment_details.cabin_class.marketing_name == "Economy"
     assert segment_details.cabin_class.type == models_pb2.CabinClass.TYPE_ECONOMY
     assert offer.price.amount == 6374

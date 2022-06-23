@@ -113,6 +113,47 @@ def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Rou
             name="ViewOffer",
         ),
         dependencies.route(
+            "/offers/{offerId}/groups",
+            offers.OfferGroupsByOffer,
+            name="ListOfferGroupsByOffer",
+        ),
+        # TripOfferGroup
+        dependencies.route(
+            "/offers/groups/{offerGroupId}",
+            offers.OfferGroup,
+            name="ViewOfferGroup",
+        ),
+        dependencies.route(
+            "/offers/groups/details/{offerGroupDetailsId}",
+            offers.OfferGroupDetails,
+            name="ViewOfferGroupDetails",
+        ),
+        dependencies.route(
+            "/offers/groups/{offerGroupId}/details",
+            offers.OfferGroupDetailsByOfferGroup,
+            name="ListOfferGroupDetailsByOfferGroup",
+        ),
+        dependencies.route(
+            "/offers/options/{offerOptionId}",
+            offers.OfferOption,
+            name="ViewOfferOption",
+        ),
+        dependencies.route(
+            "/offers/groups/{offerGroupId}/options",
+            offers.OfferOptionsByOfferGroup,
+            name="ListOfferOptionsByOfferGroup",
+        ),
+        dependencies.route(
+            "/offers/options/details/{offerOptionDetailsId}",
+            offers.OfferOptionDetails,
+            name="ViewOfferOptionDetails",
+        ),
+        dependencies.route(
+            "/offers/options/{offerOptionId}/details",
+            offers.OfferOptionDetailsByOfferOption,
+            name="ListOfferOptionDetailsByOfferOption",
+        ),
+        dependencies.route(
             "/orders",
             orders.Orders,
             name="ListOrders",

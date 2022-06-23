@@ -63,6 +63,15 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
                     offer_results=offers.TripOfferRepository(
                         mongo.offers.trip_offers,
                     ),
+                    offer_group_details=offers.TripOfferGroupDetailsRepository(
+                        mongo.offers.trip_offers,
+                    ),
+                    offer_options=offers.OfferOptionsRepository(
+                        mongo.offers.trip_offers,
+                    ),
+                    offer_option_details=offers.OfferOptionDetailsRepository(
+                        mongo.offers.trip_offers,
+                    ),
                     default_page_size=app.settings.default_page_size,
                 ),
             ],

@@ -10,6 +10,7 @@ from snowfall.junction.providers.ask2go import airports, cache, models
 from snowfall.junction.providers.ask2go.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.vendor.ask2go import models as ask2go_models
+from snowfall.vendor.ask2go.models import offers
 
 
 class OfferTransformer(object):
@@ -40,9 +41,11 @@ class OfferTransformer(object):
             more_itertools.first(offer_price.itinerary.trips).segments,
         )
         search_segment = more_itertools.first(search_task.segments)
-        origin = self._airports.get_by_iata(segment.origin.airport_code)
-        destination = self._airports.get_by_iata(segment.destination.airport_code)
         expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
+        offer_segment = self._segment_to_proto(
+            segment=segment,
+            search_segment=search_segment,
+        )
 
         return offers_pb2.OfferGroup(
             id=str(uuid.uuid4()),
@@ -59,10 +62,11 @@ class OfferTransformer(object):
                     ),
                     segment_details=[
                         offers_pb2.OfferSegmentDetails(
-                            id=search_segment.id,
+                            id=str(uuid.uuid4()),
+                            offer_segment_id=offer_segment.id,
                             cabin_class=models_pb2.CabinClass(
                                 type=models.cabin_to_proto(segment.cabin),
-                                marketing_name=str(segment.cabin),
+                                marketing_name=segment.cabin or "",
                             ),
                         ),
                     ],
@@ -75,49 +79,58 @@ class OfferTransformer(object):
                     ),
                 ),
             ],
-            segments=[
-                offers_pb2.OfferSegment(
-                    id=search_segment.id,
-                    legs=[
-                        offers_pb2.OfferSegmentLeg(
-                            id=search_segment.legs[0].id,
-                            origin=models_pb2.Point(
-                                ref=origin.iata,
-                                name=str(origin.airport_name),
-                                coordinates=models_pb2.Coordinates(
-                                    latitude=origin.latitude,
-                                    longitude=origin.longitude,
-                                ),
-                                time_zone=origin.timezone.key,
-                            ),
-                            destination=models_pb2.Point(
-                                ref=destination.iata,
-                                name=str(destination.airport_name),
-                                coordinates=models_pb2.Coordinates(
-                                    latitude=destination.latitude,
-                                    longitude=destination.longitude,
-                                ),
-                                time_zone=destination.timezone.key,
-                            ),
-                            departure_at=protobuf.datetime_to_protobuf(
-                                segment.departure.date_time.replace(
-                                    tzinfo=origin.timezone,
-                                ),
-                            ),
-                            arrival_at=protobuf.datetime_to_protobuf(
-                                segment.arrival.date_time.replace(
-                                    tzinfo=destination.timezone,
-                                ),
-                            ),
+            segments=[offer_segment],
+        )
+
+    def _segment_to_proto(
+        self,
+        segment: offers.TripSegment,
+        search_segment: models_pb2.Segment,
+    ) -> offers_pb2.OfferSegment:
+        origin = self._airports.get_by_iata(segment.origin.airport_code)
+        destination = self._airports.get_by_iata(segment.destination.airport_code)
+
+        return offers_pb2.OfferSegment(
+            id=str(uuid.uuid4()),
+            segment_id=search_segment.id,
+            legs=[
+                offers_pb2.OfferSegmentLeg(
+                    id=search_segment.legs[0].id,
+                    origin=models_pb2.Point(
+                        ref=origin.iata,
+                        name=origin.airport_name or "",
+                        coordinates=models_pb2.Coordinates(
+                            latitude=origin.latitude,
+                            longitude=origin.longitude,
                         ),
-                    ],
-                    vehicle=offers_pb2.Vehicle(
-                        equipment=segment.aircraft.equipment,
-                        number=segment.aircraft.flight_number,
+                        time_zone=origin.timezone.key,
                     ),
-                    operator=segment.operating_carrier.code,
-                    vendor=segment.marketing_carrier.code,
-                    terminal=str(segment.origin_terminal),
+                    destination=models_pb2.Point(
+                        ref=destination.iata,
+                        name=destination.airport_name or "",
+                        coordinates=models_pb2.Coordinates(
+                            latitude=destination.latitude,
+                            longitude=destination.longitude,
+                        ),
+                        time_zone=destination.timezone.key,
+                    ),
+                    departure_at=protobuf.datetime_to_protobuf(
+                        segment.departure.date_time.replace(
+                            tzinfo=origin.timezone,
+                        ),
+                    ),
+                    arrival_at=protobuf.datetime_to_protobuf(
+                        segment.arrival.date_time.replace(
+                            tzinfo=destination.timezone,
+                        ),
+                    ),
                 ),
             ],
+            vehicle=offers_pb2.Vehicle(
+                equipment=segment.aircraft.equipment,
+                number=segment.aircraft.flight_number,
+            ),
+            operator=segment.operating_carrier.code,
+            vendor=segment.marketing_carrier.code,
+            terminal=segment.origin_terminal or "",
         )

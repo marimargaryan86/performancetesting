@@ -1,7 +1,7 @@
 import dataclasses
 import datetime
 import enum
-from typing import Any, Dict, Optional, Sequence
+from typing import Any, Mapping, Optional, Sequence, Union
 
 import httpx
 
@@ -12,6 +12,8 @@ _ID_KEY = "id"
 _TYPE_KEY = "type"
 _LIMIT_KEY = "page[limit]"
 _CURSOR_KEY = "page[cursor]"
+_METHOD_GET = "GET"
+_METHOD_POST = "POST"
 
 
 class LegType(enum.Enum):
@@ -20,11 +22,6 @@ class LegType(enum.Enum):
 
 
 class JunctionClient(object):  # noqa: WPS214
-
-    _post_headers = {
-        "Content-Type": "application/vnd.api+json",
-    }
-
     def __init__(
         self,
         api_url: str,
@@ -35,91 +32,58 @@ class JunctionClient(object):  # noqa: WPS214
         self._token = token
         self._client = client or httpx.AsyncClient()
 
-    async def health(self) -> Dict[str, Any]:
-        response = await self._client.get(
-            "{0}/health".format(self._api_url),
+    async def health(self) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/health",
         )
-
-        response.raise_for_status()
-
-        return response.json()
 
     async def list_places(
         self,
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> Dict[str, Any]:
-        request_parameters = {
-            key: vl for key, vl in ((_LIMIT_KEY, limit), (_CURSOR_KEY, cursor)) if vl
-        }
-        response = await self._client.get(
-            "{0}/places".format(self._api_url),
-            headers=self._auth_headers,
-            params=request_parameters,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/places",
+            query_parameters=_make_pagination(limit, cursor),
         )
 
-        response.raise_for_status()
-
-        return response.json()
-
-    async def get_place_by_id(self, place_id: str) -> Dict[str, Any]:
-        response = await self._client.get(
-            "{0}/places/{1}".format(self._api_url, place_id),
-            headers=self._auth_headers,
+    async def get_place_by_id(self, place_id: str) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/places/{0}".format(place_id),
         )
 
-        response.raise_for_status()
-
-        return response.json()
-
-    async def get_leg_by_id(self, leg_id: str) -> Dict[str, Any]:
-        response = await self._client.get(
-            "{0}/legs/{1}".format(self._api_url, leg_id),
-            headers=self._auth_headers,
+    async def get_leg_by_id(self, leg_id: str) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/legs/{0}".format(leg_id),
         )
-
-        response.raise_for_status()
-
-        return response.json()
 
     async def get_legs_by_segment_id(
         self,
         segment_id: str,
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> Dict[str, Any]:
-        request_parameters = {
-            key: vl for key, vl in ((_LIMIT_KEY, limit), (_CURSOR_KEY, cursor)) if vl
-        }
-        response = await self._client.get(
-            "{0}/segments/{1}/legs".format(self._api_url, segment_id),
-            headers=self._auth_headers,
-            params=request_parameters,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/segments/{0}/legs".format(segment_id),
+            query_parameters=_make_pagination(limit, cursor),
         )
 
-        response.raise_for_status()
-
-        return response.json()
-
-    async def get_segment_by_id(self, segment_id: str) -> Dict[str, Any]:
-        response = await self._client.get(
-            "{0}/segments/{1}".format(self._api_url, segment_id),
-            headers=self._auth_headers,
+    async def get_segment_by_id(self, segment_id: str) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/segments/{0}".format(segment_id),
         )
 
-        response.raise_for_status()
-
-        return response.json()
-
-    async def get_trip_by_id(self, trip_id: str) -> Dict[str, Any]:
-        response = await self._client.get(
-            "{0}/trips/{1}".format(self._api_url, trip_id),
-            headers=self._auth_headers,
+    async def get_trip_by_id(self, trip_id: str) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/trips/{0}".format(trip_id),
         )
-
-        response.raise_for_status()
-
-        return response.json()
 
     async def create_trip_search(
         self,
@@ -127,7 +91,7 @@ class JunctionClient(object):  # noqa: WPS214
         destination_id: str,
         departure_after: datetime.datetime,
         leg_types: Sequence[LegType],
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         body = {
             _DATA_KEY: {
                 "attributes": {
@@ -148,52 +112,35 @@ class JunctionClient(object):  # noqa: WPS214
                 _TYPE_KEY: "trip-searches",
             },
         }
-        response = await self._client.post(
-            "{0}/trips/searches".format(self._api_url),
-            headers=dict(self._auth_headers, **self._post_headers),
-            json=body,
+        return await self._make_request(
+            method=_METHOD_POST,
+            url="/trips/searches",
+            payload=body,
         )
 
-        response.raise_for_status()
-
-        return response.json()
-
-    async def get_trip_search_by_id(self, trips_search_id: str) -> Dict[str, Any]:
-        response = await self._client.get(
-            "{0}/trips/searches/{1}".format(self._api_url, trips_search_id),
-            headers=self._auth_headers,
+    async def get_trip_search_by_id(self, trips_search_id: str) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/trips/searches/{0}".format(trips_search_id),
         )
-
-        response.raise_for_status()
-
-        return response.json()
 
     async def get_trips_by_trip_search_id(
         self,
         trips_search_id: str,
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> Dict[str, Any]:
-        request_parameters = {
-            key: vl
-            for key, vl in (("page[limit]", limit), ("page[cursor]", cursor))
-            if vl
-        }
-        response = await self._client.get(
-            "{0}/trips/searches/{1}/trips".format(self._api_url, trips_search_id),
-            headers=self._auth_headers,
-            params=request_parameters,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/trips/searches/{0}/trips".format(trips_search_id),
+            query_parameters=_make_pagination(limit, cursor),
         )
-
-        response.raise_for_status()
-
-        return response.json()
 
     async def create_offer_search(
         self,
         trip_ids: Sequence[str],
         passengers_dates_of_birth: Sequence[datetime.date],
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         body = {
             _DATA_KEY: {
                 "attributes": {
@@ -213,36 +160,71 @@ class JunctionClient(object):  # noqa: WPS214
                 _TYPE_KEY: "trip-offer-searches",
             },
         }
-        response = await self._client.post(
-            "{0}/offers/searches".format(self._api_url),
-            headers=dict(self._auth_headers, **self._post_headers),
-            json=body,
+        return await self._make_request(
+            method=_METHOD_POST,
+            url="/offers/searches",
+            payload=body,
         )
-
-        response.raise_for_status()
-
-        return response.json()
 
     async def get_offers_by_offer_search_id(
         self,
         offers_search_id: str,
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> Dict[str, Any]:
-        request_parameters = {
-            key: vl
-            for key, vl in (("page[limit]", limit), ("page[cursor]", cursor))
-            if vl
-        }
-        response = await self._client.get(
-            "{0}/offers/searches/{1}/offers".format(self._api_url, offers_search_id),
-            headers=self._auth_headers,
-            params=request_parameters,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/offers/searches/{0}/offers".format(offers_search_id),
+            query_parameters=_make_pagination(limit, cursor),
         )
 
-        response.raise_for_status()
+    async def get_offer_groups_by_offer_id(
+        self,
+        offer_id: str,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="offers/{0}/groups".format(offer_id),
+            query_parameters=_make_pagination(limit, cursor),
+        )
 
-        return response.json()
+    async def get_offer_group_details_by_offer_group_id(
+        self,
+        offer_group_id: str,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/offers/groups/{0}/details".format(offer_group_id),
+            query_parameters=_make_pagination(limit, cursor),
+        )
+
+    async def get_offer_options_by_offer_group_id(
+        self,
+        offer_group_id: str,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/offers/groups/{0}/options".format(offer_group_id),
+            query_parameters=_make_pagination(limit, cursor),
+        )
+
+    async def get_offer_option_details_by_offer_option_id(
+        self,
+        offer_option_id: str,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/offers/options/{0}/details".format(offer_option_id),
+            query_parameters=_make_pagination(limit, cursor),
+        )
 
     async def create_order(
         self,
@@ -250,7 +232,7 @@ class JunctionClient(object):  # noqa: WPS214
         offer_ids: Sequence[str],
         passengers: Sequence[models.Passenger],
         contact_details: models.ContactDetails,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         body = {
             _DATA_KEY: {
                 "attributes": {
@@ -275,28 +257,51 @@ class JunctionClient(object):  # noqa: WPS214
                 _TYPE_KEY: "orders",
             },
         }
-        response = await self._client.post(
-            "{0}/orders".format(self._api_url),
-            headers=dict(self._auth_headers, **self._post_headers),
-            json=body,
+        return await self._make_request(
+            method=_METHOD_POST,
+            url="/orders",
+            payload=body,
         )
 
-        response.raise_for_status()
-
-        return response.json()
-
-    async def get_order_by_id(self, order_id: str) -> Dict[str, Any]:
-        response = await self._client.get(
-            "{0}/orders/{1}".format(self._api_url, order_id),
-            headers=self._auth_headers,
+    async def get_order_by_id(self, order_id: str) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/orders/{0}".format(order_id),
         )
 
-        response.raise_for_status()
-
-        return response.json()
-
-    @property
-    def _auth_headers(self) -> Dict[str, str]:
-        return {
+    async def _make_request(
+        self,
+        method: str,
+        url: str,
+        query_parameters: Optional[Mapping[str, Any]] = None,
+        payload: Optional[Mapping[str, Any]] = None,
+    ) -> dict[str, Any]:
+        headers = {
             "Authorization": "Bearer {0}".format(self._token),
         }
+
+        if payload:
+            headers["Content-Type"] = "application/vnd.api+json"
+
+        response = await self._client.request(
+            method=method,
+            headers=headers,
+            url="{0}/{1}".format(self._api_url, url.lstrip("/")),
+            params=query_parameters,
+            json=payload,
+        )
+
+        response.raise_for_status()
+
+        return response.json()
+
+
+def _make_pagination(
+    limit: Optional[int],
+    cursor: Optional[str],
+) -> dict[str, Union[int, str]]:
+    return {
+        key: pagination_value
+        for key, pagination_value in ((_LIMIT_KEY, limit), (_CURSOR_KEY, cursor))
+        if pagination_value
+    }

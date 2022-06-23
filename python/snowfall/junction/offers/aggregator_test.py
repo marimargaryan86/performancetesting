@@ -62,7 +62,7 @@ _OFFER_RESULTS = (
         offer_search_id="foo",
         segments=[
             offer_protos.OfferSegment(
-                id="a",
+                segment_id="a",
             ),
         ],
         expires_at=_OFFER_RESULT_EXPIRY_PROTO,
@@ -72,7 +72,7 @@ _OFFER_RESULTS = (
         offer_search_id="foo",
         segments=[
             offer_protos.OfferSegment(
-                id="b",
+                segment_id="b",
             ),
         ],
         expires_at=_OFFER_RESULT_EXPIRY_PROTO,
@@ -82,7 +82,7 @@ _OFFER_RESULTS = (
         offer_search_id="foo",
         segments=[
             offer_protos.OfferSegment(
-                id="b",
+                segment_id="b",
             ),
         ],
         expires_at=_OFFER_RESULT_EXPIRY_PROTO,
@@ -92,7 +92,7 @@ _OFFER_RESULTS = (
         offer_search_id="foo",
         segments=[
             offer_protos.OfferSegment(
-                id="c",
+                segment_id="c",
             ),
         ],
         expires_at=_OFFER_RESULT_EXPIRY_PROTO,
@@ -102,7 +102,7 @@ _OFFER_RESULTS = (
         offer_search_id="foo",
         segments=[
             offer_protos.OfferSegment(
-                id="c",
+                segment_id="c",
             ),
         ],
         expires_at=_OFFER_RESULT_EXPIRY_PROTO,

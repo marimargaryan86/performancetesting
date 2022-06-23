@@ -7,6 +7,7 @@ from snowfall.adapter import offer_searches, offers
 from snowfall.junction.client_api import resources
 from snowfall.junction.client_api.transformers import trip_ids_to_segments
 from snowfall.junction.offers.v1alpha import models_pb2
+from snowfall.stdlib import sequence
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import (
     models,
@@ -31,6 +32,262 @@ class Offer(endpoints.HTTPEndpoint):
                 data=resources.OfferResource.from_proto(
                     offer=offer,
                     request=request,
+                ),
+            ),
+        )
+
+
+class OfferGroup(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        client: offers.Client = lagom.injectable,
+    ) -> responses.Response:
+        try:
+            offer_group = await client.get_group_by_id(
+                request.path_params["offerGroupId"],
+            )
+        except offers.NotFoundError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+
+        return models.JsonApiResponse(
+            models.Body(
+                data=resources.OfferGroupResource.from_proto(
+                    group=offer_group,
+                    request=request,
+                ),
+            ),
+        )
+
+
+class OfferGroupsByOffer(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        client: offers.Client = lagom.injectable,
+    ) -> responses.Response:
+        offer_id = request.path_params["offerId"]
+
+        try:
+            offer = await client.get(offer_id)
+        except offers.NotFoundError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+
+        pagination = pagination_helpers.get_pagination(request)
+        items_page = sequence.paginate(
+            sequence=offer.groups,
+            cursor=pagination.cursor,
+            limit=pagination.limit,
+        )
+
+        return models.JsonApiResponse(
+            models.Body(
+                data=[
+                    resources.OfferGroupResource.from_proto(
+                        group=group,
+                        request=request,
+                    )
+                    for group in items_page.sequence
+                ],
+                links=pagination_helpers.get_next_url(
+                    request.url_for(
+                        "ListOfferGroupsByOffer",
+                        offerId=offer_id,
+                    ),
+                    items_page.cursor,
+                    pagination,
+                ),
+            ),
+        )
+
+
+class OfferGroupDetails(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        client: offers.Client = lagom.injectable,
+    ) -> responses.Response:
+        try:
+            details = await client.get_group_details_by_id(
+                request.path_params["offerGroupDetailsId"],
+            )
+        except offers.NotFoundError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+
+        return models.JsonApiResponse(
+            models.Body(
+                data=resources.TripOfferGroupDetailsResource.from_proto(
+                    segment=details,
+                    request=request,
+                ),
+            ),
+        )
+
+
+class OfferGroupDetailsByOfferGroup(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        client: offers.Client = lagom.injectable,
+    ) -> responses.Response:
+        group_id = request.path_params["offerGroupId"]
+
+        try:
+            group = await client.get_group_by_id(group_id)
+        except offers.NotFoundError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+
+        pagination = pagination_helpers.get_pagination(request)
+        items_page = sequence.paginate(
+            sequence=group.segments,
+            cursor=pagination.cursor,
+            limit=pagination.limit,
+        )
+
+        return models.JsonApiResponse(
+            models.Body(
+                data=[
+                    resources.TripOfferGroupDetailsResource.from_proto(
+                        segment=details,
+                        request=request,
+                    )
+                    for details in items_page.sequence
+                ],
+                links=pagination_helpers.get_next_url(
+                    request.url_for(
+                        "ListOfferGroupDetailsByOfferGroup",
+                        offerGroupId=group_id,
+                    ),
+                    items_page.cursor,
+                    pagination,
+                ),
+            ),
+        )
+
+
+class OfferOption(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        client: offers.Client = lagom.injectable,
+    ) -> responses.Response:
+        try:
+            option = await client.get_option_by_id(
+                request.path_params["offerOptionId"],
+            )
+        except offers.NotFoundError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+
+        return models.JsonApiResponse(
+            models.Body(
+                data=resources.OfferOptionResource.from_proto(
+                    option=option,
+                    request=request,
+                ),
+            ),
+        )
+
+
+class OfferOptionsByOfferGroup(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        client: offers.Client = lagom.injectable,
+    ) -> responses.Response:
+        group_id = request.path_params["offerGroupId"]
+
+        try:
+            group = await client.get_group_by_id(group_id)
+        except offers.NotFoundError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+
+        pagination = pagination_helpers.get_pagination(request)
+        items_page = sequence.paginate(
+            sequence=group.offers,
+            cursor=pagination.cursor,
+            limit=pagination.limit,
+        )
+
+        return models.JsonApiResponse(
+            models.Body(
+                data=[
+                    resources.OfferOptionResource.from_proto(
+                        option=option,
+                        request=request,
+                    )
+                    for option in items_page.sequence
+                ],
+                links=pagination_helpers.get_next_url(
+                    request.url_for(
+                        "ListOfferOptionsByOfferGroup",
+                        offerGroupId=group_id,
+                    ),
+                    items_page.cursor,
+                    pagination,
+                ),
+            ),
+        )
+
+
+class OfferOptionDetails(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        client: offers.Client = lagom.injectable,
+    ) -> responses.Response:
+        try:
+            detail = await client.get_option_details_by_id(
+                request.path_params["offerOptionDetailsId"],
+            )
+        except offers.NotFoundError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+
+        return models.JsonApiResponse(
+            models.Body(
+                data=resources.OfferOptionDetailsResource.from_proto(
+                    details=detail,
+                    request=request,
+                ),
+            ),
+        )
+
+
+class OfferOptionDetailsByOfferOption(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        client: offers.Client = lagom.injectable,
+    ) -> responses.Response:
+        option_id = request.path_params["offerOptionId"]
+
+        try:
+            option = await client.get_option_by_id(option_id)
+        except offers.NotFoundError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+
+        pagination = pagination_helpers.get_pagination(request)
+        items_page = sequence.paginate(
+            sequence=option.segment_details,
+            cursor=pagination.cursor,
+            limit=pagination.limit,
+        )
+
+        return models.JsonApiResponse(
+            models.Body(
+                data=[
+                    resources.OfferOptionDetailsResource.from_proto(
+                        details=details,
+                        request=request,
+                    )
+                    for details in items_page.sequence
+                ],
+                links=pagination_helpers.get_next_url(
+                    request.url_for(
+                        "ListOfferOptionDetailsByOfferOption",
+                        offerOptionId=option_id,
+                    ),
+                    items_page.cursor,
+                    pagination,
                 ),
             ),
         )
@@ -136,7 +393,7 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
                 links=pagination_helpers.get_next_url(
                     request.url_for(
                         "ViewOffersByOfferSearch",
-                        offerSearchId=request.path_params["offerSearchId"],
+                        offerSearchId=offer_search_id,
                     ),
                     offers_page.next_page_token,
                     pagination,

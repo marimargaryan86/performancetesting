@@ -47,15 +47,21 @@ class OfferSearchService(service.Service, grpc_pb2_grpc.OfferSearchServiceServic
         return grpc_pb2.GetOfferSearchResponse(search=offer_search)
 
 
-class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):
-    def __init__(
+class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):  # noqa: WPS214
+    def __init__(  # noqa: WPS211
         self,
         offer_aggregates: offers.OfferAggregateMappingRepository,
         offer_results: offers.TripOfferRepository,
+        offer_group_details: offers.TripOfferGroupDetailsRepository,
+        offer_options: offers.OfferOptionsRepository,
+        offer_option_details: offers.OfferOptionDetailsRepository,
         default_page_size: int,
     ):
         self._aggregates = offer_aggregates
         self._offers_results = offer_results
+        self._group_details = offer_group_details
+        self._options = offer_options
+        self._option_details = offer_option_details
         self._default_page_size = default_page_size
 
     def get_name(self) -> str:
@@ -127,4 +133,112 @@ class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):
         return grpc_pb2.ListOffersResponse(
             offers=offer_list,
             next_page_token=await offer_aggregates.cursor(),
+        )
+
+    async def GetOfferGroup(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.GetOfferGroupRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.GetOfferGroupResponse:
+        offer_group = await self._offers_results.find_by_id(request.id)
+
+        if not offer_group:
+            await context.abort(grpc.StatusCode.NOT_FOUND)
+
+        return grpc_pb2.GetOfferGroupResponse(group=offer_group)
+
+    async def ListOfferGroups(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.ListOfferGroupsRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.ListOfferGroupsResponse:
+        offer_groups = await self._offers_results.find(
+            request.offer_group_ids.ids,
+            cursor=request.page_token,
+        )
+
+        return grpc_pb2.ListOfferGroupsResponse(
+            groups=[offer_group async for offer_group in offer_groups],
+            next_page_token=await offer_groups.cursor(),
+        )
+
+    async def GetOfferGroupDetails(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.GetOfferGroupDetailsRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.GetOfferGroupDetailsResponse:
+        details = await self._group_details.find_by_id(request.id)
+
+        if not details:
+            await context.abort(grpc.StatusCode.NOT_FOUND)
+
+        return grpc_pb2.GetOfferGroupDetailsResponse(details=details)
+
+    async def ListOfferGroupDetails(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.ListOfferGroupDetailsRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.ListOfferGroupDetailsResponse:
+        details = await self._group_details.find(
+            request.offer_group_details_ids.ids,
+            cursor=request.page_token,
+        )
+
+        return grpc_pb2.ListOfferGroupDetailsResponse(
+            details=[detail async for detail in details],
+            next_page_token=await details.cursor(),
+        )
+
+    async def GetOfferOption(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.GetOfferOptionRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.GetOfferOptionResponse:
+        option = await self._options.find_by_id(request.id)
+
+        if not option:
+            await context.abort(grpc.StatusCode.NOT_FOUND)
+
+        return grpc_pb2.GetOfferOptionResponse(option=option)
+
+    async def ListOfferOptions(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.ListOfferOptionsRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.ListOfferOptionsResponse:
+        options = await self._options.find(
+            request.offer_option_ids.ids,
+            cursor=request.page_token,
+        )
+
+        return grpc_pb2.ListOfferOptionsResponse(
+            options=[option async for option in options],
+            next_page_token=await options.cursor(),
+        )
+
+    async def GetOfferOptionDetails(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.GetOfferOptionDetailsRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.GetOfferOptionDetailsResponse:
+        details = await self._option_details.find_by_id(request.id)
+
+        if not details:
+            await context.abort(grpc.StatusCode.NOT_FOUND)
+
+        return grpc_pb2.GetOfferOptionDetailsResponse(details=details)
+
+    async def ListOfferOptionDetails(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.ListOfferOptionDetailsRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.ListOfferOptionDetailsResponse:
+        details = await self._option_details.find(
+            request.offer_option_details_ids.ids,
+            cursor=request.page_token,
+        )
+
+        return grpc_pb2.ListOfferOptionDetailsResponse(
+            details=[detail async for detail in details],
+            next_page_token=await details.cursor(),
         )

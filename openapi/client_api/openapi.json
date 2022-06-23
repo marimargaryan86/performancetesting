@@ -1764,7 +1764,7 @@
                           "uniqueItems": true,
                           "minItems": 0,
                           "items": {
-                            "$ref": "#/components/schemas/OfferAggregate"
+                            "$ref": "#/components/schemas/Offer"
                           }
                         }
                       },
@@ -1868,7 +1868,7 @@
         }
       ],
       "get": {
-        "summary": "Get Offer Search",
+        "summary": "Get Offer",
         "tags": [
           "offers"
         ],
@@ -1881,7 +1881,7 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/OfferAggregate"
+                      "$ref": "#/components/schemas/Offer"
                     }
                   },
                   "required": [
@@ -1900,6 +1900,420 @@
         },
         "operationId": "get-offers-id",
         "description": "Used to lookup data for an Offer Identifier."
+      }
+    },
+    "/offers/{offerId}/groups": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/offerId"
+        }
+      ],
+      "get": {
+        "summary": "List Offer Groups by Offer",
+        "tags": [
+          "offers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "items": {
+                            "$ref": "#/components/schemas/OfferGroup"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-offers-id-groups",
+        "description": "Used to retrieve all Offer Group results for an Offer.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
+      }
+    },
+    "/offers/groups/{offerGroupId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/offerGroupId"
+        }
+      ],
+      "get": {
+        "summary": "Get Offer Group",
+        "tags": [
+          "offers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OfferGroup"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-offers-groups-id",
+        "description": "Used to lookup data for an Offer Group Identifier."
+      }
+    },
+    "/offers/groups/{offerGroupId}/details": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/offerGroupId"
+        }
+      ],
+      "get": {
+        "summary": "List Offer Group Details by Offer Group",
+        "tags": [
+          "offers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "oneOf": [
+                            {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/components/schemas/TripOfferGroupDetails"
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-offers-groups-id-details",
+        "description": "Used to retrieve all Offer Group Details for an Offer Group.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
+      }
+    },
+    "/offers/groups/{offerGroupId}/options": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/offerGroupId"
+        }
+      ],
+      "get": {
+        "summary": "List Offer Options by Offer Group",
+        "tags": [
+          "offers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "items": {
+                            "$ref": "#/components/schemas/OfferOption"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-offers-groups-id-options",
+        "description": "Used to retrieve all Offer Options for an Offer Group.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
+      }
+    },
+    "/offers/groups/details/{offerGroupDetailsId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/offerGroupDetailsId"
+        }
+      ],
+      "get": {
+        "summary": "Get Offer Group Details",
+        "tags": [
+          "offers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/TripOfferGroupDetails"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-offers-groups-details-id",
+        "description": "Used to lookup data for an Offer Group Details Identifier."
+      }
+    },
+    "/offers/options/{offerOptionId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/offerOptionId"
+        }
+      ],
+      "get": {
+        "summary": "Get Offer Option",
+        "tags": [
+          "offers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OfferOption"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-offers-options-id",
+        "description": "Used to lookup data for an Offer Option Identifier."
+      }
+    },
+    "/offers/options/{offerOptionId}/details": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/offerOptionId"
+        }
+      ],
+      "get": {
+        "summary": "List Offer Option Details by Offer Option",
+        "tags": [
+          "offers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "oneOf": [
+                            {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/components/schemas/TripOfferOptionDetails"
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-offers-options-id-details",
+        "description": "Used to retrieve all Offer Option Details for an Offer Option.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
+      }
+    },
+    "/offers/options/details/{offerOptionDetailsId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/offerOptionDetailsId"
+        }
+      ],
+      "get": {
+        "summary": "Get Offer Option Details",
+        "tags": [
+          "offers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/TripOfferOptionDetails"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-offers-options-details-id",
+        "description": "Used to lookup data for an Offer Option Details Identifier."
       }
     },
     "/orders": {
@@ -2273,6 +2687,27 @@
           }
         ],
         "description": "Indicates the cabins class, such as \"economy\" or \"business\"."
+      },
+      "CabinClassIdentifier": {
+        "title": "Cabin Class Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "economy"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "cabin-classes"
+            ],
+            "example": "cabin-classes"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
       },
       "PlaceType": {
         "title": "Place Type",
@@ -3012,8 +3447,8 @@
         ],
         "description": "Description of an amount in a currency."
       },
-      "OfferAggregate": {
-        "title": "OfferAggregate",
+      "Offer": {
+        "title": "Offer",
         "allOf": [
           {
             "type": "object",
@@ -3027,28 +3462,42 @@
               "type": {
                 "type": "string",
                 "enum": [
-                  "offer-aggregates"
+                  "offers"
                 ],
-                "example": "offer-aggregates"
+                "example": "offers"
               },
               "attributes": {
                 "type": "object",
                 "required": [
-                  "groups",
                   "expiresAt"
                 ],
                 "properties": {
-                  "groups": {
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {
-                      "$ref": "#/components/schemas/OfferGroup"
-                    }
-                  },
                   "expiresAt": {
                     "type": "string",
                     "format": "date-time",
                     "example": "2019-08-24T14:15:22Z"
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "groups"
+                ],
+                "properties": {
+                  "groups": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/OfferGroupIdentifier"
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -3056,17 +3505,18 @@
             "required": [
               "id",
               "type",
-              "attributes"
+              "attributes",
+              "relationships"
             ]
           },
           {
             "$ref": "#/components/schemas/SelfLink"
           }
         ],
-        "description": "Result of searching for offers. Used for creating an Order. Chose one offer from each group when creating an order."
+        "description": "Result of searching for offers. Used for creating an Order. Chose one Offer Option from each Trip Offer Group when creating an order."
       },
-      "OfferAggregateIdentifier": {
-        "title": "Offer Aggregate Identifier",
+      "OfferIdentifier": {
+        "title": "Trip Offer Identifier",
         "type": "object",
         "properties": {
           "id": {
@@ -3077,9 +3527,9 @@
           "type": {
             "type": "string",
             "enum": [
-              "offer-aggregates"
+              "offers"
             ],
-            "example": "offer-aggregates"
+            "example": "offers"
           }
         },
         "required": [
@@ -3089,34 +3539,83 @@
       },
       "OfferGroup": {
         "title": "Offer Group",
-        "description": "Result of searching for offers. Used for creating an Order. Chose one offer when creating an order.",
-        "type": "object",
-        "properties": {
-          "offers": {
-            "type": "array",
-            "uniqueItems": true,
-            "minItems": 1,
-            "items": {
-              "$ref": "#/components/schemas/Offer"
-            }
+        "description": "Result of searching for offers. Used for creating an Order. Chose one Offer Option when creating an order.",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "offer-groups"
+                ],
+                "example": "offer-groups"
+              },
+              "attributes": {
+                "type": "object"
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "options",
+                  "details"
+                ],
+                "properties": {
+                  "options": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/OfferOptionIdentifier"
+                        }
+                      }
+                    }
+                  },
+                  "details": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "oneOf": [
+                          {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/components/schemas/TripOfferGroupDetailsIdentifier"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
           },
-          "segments": {
-            "type": "array",
-            "uniqueItems": true,
-            "minItems": 1,
-            "items": {
-              "$ref": "#/components/schemas/OfferSegment"
-            }
+          {
+            "$ref": "#/components/schemas/SelfLink"
           }
-        },
-        "required": [
-          "offers",
-          "segments"
         ]
       },
-      "Offer": {
-        "title": "Offer",
-        "description": "Offer for one or more segments. Used for creating an Order.",
+      "OfferGroupIdentifier": {
+        "title": "Offer Group Identifier",
         "type": "object",
         "properties": {
           "id": {
@@ -3124,58 +3623,207 @@
             "format": "uuid",
             "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
           },
-          "price": {
-            "$ref": "#/components/schemas/Price"
-          },
-          "segmentDetails": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/OfferSegmentDetails"
-            }
+          "type": {
+            "type": "string",
+            "enum": [
+              "offer-groups"
+            ],
+            "example": "offer-groups"
           }
         },
         "required": [
           "id",
-          "price",
-          "segmentDetails"
+          "type"
         ]
       },
-      "OfferSegmentDetails": {
-        "title": "Offer Segment Details",
-        "description": "Specific details for an offer on a specific segment.",
+      "OfferOption": {
+        "title": "OfferOption",
+        "description": "Offer Option for one or more segments. Used for creating an Order.",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "offer-options"
+                ],
+                "example": "offer-options"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "price"
+                ],
+                "properties": {
+                  "price": {
+                    "$ref": "#/components/schemas/Price"
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "details"
+                ],
+                "properties": {
+                  "details": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "oneOf": [
+                          {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/components/schemas/TripOfferOptionDetailsIdentifier"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ]
+      },
+      "OfferOptionIdentifier": {
+        "title": "Offer Option Identifier",
         "type": "object",
         "properties": {
-          "ref": {
+          "id": {
             "type": "string",
             "format": "uuid",
             "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
           },
-          "cabinClass": {
-            "$ref": "#/components/schemas/CabinClassDetails"
+          "type": {
+            "type": "string",
+            "enum": [
+              "offer-options"
+            ],
+            "example": "offer-options"
           }
         },
         "required": [
-          "ref",
-          "cabinClass"
+          "id",
+          "type"
         ]
       },
-      "CabinClassDetails": {
-        "title": "Cabin Class Details",
-        "description": "Internal and marketing name of a cabin class.",
+      "TripOfferOptionDetails": {
+        "title": "Trip Offer Option Details",
+        "description": "Specific details for an offer on a specific segment.",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "trip-offer-option-details"
+                ],
+                "example": "trip-offer-option-details"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "cabinClassName"
+                ],
+                "properties": {
+                  "cabinClassName": {
+                    "type": "string",
+                    "example": "Economy"
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "details",
+                  "cabinClass"
+                ],
+                "properties": {
+                  "details": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/TripOfferGroupDetailsIdentifier"
+                      }
+                    }
+                  },
+                  "cabinClass": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/CabinClassIdentifier"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ]
+      },
+      "TripOfferOptionDetailsIdentifier": {
+        "title": "Trip Offer Option Segment Identifier",
         "type": "object",
         "properties": {
-          "name": {
+          "id": {
             "type": "string",
-            "example": "economy"
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
           },
-          "marketingName": {
+          "type": {
             "type": "string",
-            "example": "Economy"
+            "enum": [
+              "trip-offer-option-details"
+            ],
+            "example": "trip-offer-option-details"
           }
         },
         "required": [
-          "name",
-          "marketingName"
+          "id",
+          "type"
         ]
       },
       "Price": {
@@ -3197,42 +3845,89 @@
           "amount"
         ]
       },
-      "OfferSegment": {
-        "title": "Offer Segment",
-        "description": "Segment related to a grouped offer.",
+      "TripOfferGroupDetails": {
+        "title": "Trip Offer Group Details",
+        "description": "Segment details related to a Trip Offer Group.",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "trip-offer-group-details"
+                ],
+                "example": "trip-offer-group-details"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "legs",
+                  "vendor",
+                  "operator",
+                  "routeIdentifiers"
+                ],
+                "properties": {
+                  "legs": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "$ref": "#/components/schemas/OfferSegmentLeg"
+                    }
+                  },
+                  "vendor": {
+                    "type": "string",
+                    "example": "BA"
+                  },
+                  "operator": {
+                    "type": "string",
+                    "example": "BA",
+                    "nullable": true
+                  },
+                  "routeIdentifiers": {
+                    "$ref": "#/components/schemas/RouteIdentifiers"
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ]
+      },
+      "TripOfferGroupDetailsIdentifier": {
+        "title": "Trip Offer Group Details Identifier",
         "type": "object",
         "properties": {
-          "ref": {
+          "id": {
             "type": "string",
             "format": "uuid",
             "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
           },
-          "legs": {
-            "type": "array",
-            "minItems": 1,
-            "uniqueItems": true,
-            "items": {
-              "$ref": "#/components/schemas/OfferSegmentLeg"
-            }
-          },
-          "vendor": {
+          "type": {
             "type": "string",
-            "example": "BA"
-          },
-          "operator": {
-            "type": "string",
-            "example": "BA",
-            "nullable": true
-          },
-          "routeIdentifiers": {
-            "$ref": "#/components/schemas/RouteIdentifiers"
+            "enum": [
+              "trip-offer-group-details"
+            ],
+            "example": "trip-offer-group-details"
           }
         },
         "required": [
-          "ref",
-          "legs",
-          "vendor",
-          "operator"
+          "id",
+          "type"
         ]
       },
       "RouteIdentifiers": {
@@ -3528,7 +4223,7 @@
                       "data": {
                         "type": "array",
                         "items": {
-                          "$ref": "#/components/schemas/OfferAggregateIdentifier"
+                          "$ref": "#/components/schemas/OfferIdentifier"
                         },
                         "readOnly": true
                       }
@@ -4150,6 +4845,50 @@
           "example": "economy"
         },
         "description": "Cabin Class identifier"
+      },
+      "offerGroupDetailsId": {
+        "name": "offerGroupDetailsId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+        },
+        "description": "Offer Group Details Identifier"
+      },
+      "offerOptionId": {
+        "name": "offerOptionId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+        },
+        "description": "Offer Option Identifier"
+      },
+      "offerOptionDetailsId": {
+        "name": "offerOptionDetailsId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+        },
+        "description": "Offer Option Details Identifier"
+      },
+      "offerGroupId": {
+        "name": "offerGroupId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+        },
+        "description": "Offer Group Identifier"
       }
     },
     "securitySchemes": {

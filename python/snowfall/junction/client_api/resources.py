@@ -16,7 +16,6 @@ from snowfall.stdlib.integration.starlette import models
 
 _SELF_HREF = "self"
 _RELATIONSHIPS_FIELD = "data"
-_OFFERS_TYPE = "offer-aggregates"
 
 
 class Point(models.BaseModel):
@@ -46,8 +45,21 @@ class OfferResource(models.Resource):
     ) -> OfferResource:
         return cls(
             id=offer.id,
-            type=_OFFERS_TYPE,
-            attributes=cls._get_attributes(offer),
+            type="offers",
+            attributes={
+                "expiresAt": protobuf.protobuf_to_datetime(offer.expires_at),
+            },
+            relationships={
+                "groups": {
+                    "data": [
+                        models.ResourceIdentifier(
+                            id=offer_group.id,
+                            type="offer-groups",
+                        )
+                        for offer_group in offer.groups
+                    ],
+                },
+            },
             links={
                 _SELF_HREF: request.url_for(
                     "ViewOffer",
@@ -56,17 +68,100 @@ class OfferResource(models.Resource):
             },
         )
 
+
+class OfferGroupResource(models.Resource):
     @classmethod
-    def _get_attributes(
+    def from_proto(
         cls,
-        offer: offer_models_pb2.OfferAggregate,
-    ) -> dict[str, Any]:
-        return {
-            "groups": [
-                OfferGroup.from_proto(offer_group) for offer_group in offer.groups
-            ],
-            "expiresAt": protobuf.protobuf_to_datetime(offer.expires_at),
-        }
+        group: offer_models_pb2.OfferGroup,
+        request: requests.Request,
+    ) -> OfferGroupResource:
+        return cls(
+            id=group.id,
+            type="offer-groups",
+            attributes={
+                "expiresAt": protobuf.protobuf_to_datetime(group.expires_at),
+            },
+            relationships={
+                "options": {
+                    "data": [
+                        models.ResourceIdentifier(
+                            id=offer.id,
+                            type="offer-options",
+                        )
+                        for offer in group.offers
+                    ],
+                },
+                "details": {
+                    "data": [
+                        models.ResourceIdentifier(
+                            id=detail.id,
+                            type="trip-offer-group-details",
+                        )
+                        for detail in group.segments
+                    ],
+                },
+            },
+            links={
+                _SELF_HREF: request.url_for(
+                    "ViewOfferGroup",
+                    offerGroupId=group.id,
+                ),
+            },
+        )
+
+
+class OfferSegmentLeg(models.BaseModel):
+    origin: Point
+    destination: Point
+    departure_at: datetime.datetime = pydantic.Field(alias="departureAt")
+    arrival_at: datetime.datetime = pydantic.Field(alias="arrivalAt")
+
+    @classmethod
+    def from_proto(cls, leg: offer_models_pb2.OfferSegmentLeg) -> OfferSegmentLeg:
+        return cls(
+            origin=Point.from_proto(leg.origin),
+            destination=Point.from_proto(leg.destination),
+            departureAt=protobuf.protobuf_to_datetime(leg.departure_at).astimezone(
+                zoneinfo.ZoneInfo(leg.origin.time_zone),
+            ),
+            arrivalAt=protobuf.protobuf_to_datetime(leg.arrival_at).astimezone(
+                zoneinfo.ZoneInfo(leg.destination.time_zone),
+            ),
+        )
+
+
+class RouteIdentifiers(models.BaseModel):
+    vendor: str
+    operator: Optional[str] = None
+
+
+class TripOfferGroupDetailsResource(models.Resource):
+    @classmethod
+    def from_proto(
+        cls,
+        segment: offer_models_pb2.OfferSegment,
+        request: requests.Request,
+    ) -> TripOfferGroupDetailsResource:
+        return cls(
+            id=segment.id,
+            type="trip-offer-group-details",
+            attributes={
+                "legs": [OfferSegmentLeg.from_proto(leg) for leg in segment.legs],
+                "vendor": segment.vendor,
+                "operator": segment.operator or None,
+                "routeIdentifiers": RouteIdentifiers(
+                    vendor=segment.vehicle.number,
+                    operator=None,
+                ),
+            },
+            links={
+                _SELF_HREF: request.url_for(
+                    "ViewOfferGroupDetails",
+                    offerGroupDetailsId=segment.id,
+                ),
+            },
+        )
 
 
 class Price(models.BaseModel):
@@ -78,6 +173,78 @@ class Price(models.BaseModel):
         return cls(
             currency=price.currency,
             amount=str(price.amount / 100),
+        )
+
+
+class OfferOptionResource(models.Resource):
+    @classmethod
+    def from_proto(
+        cls,
+        option: offer_models_pb2.Offer,
+        request: requests.Request,
+    ) -> OfferOptionResource:
+        return cls(
+            id=option.id,
+            type="offer-options",
+            attributes={
+                "price": Price.from_proto(option.price),
+            },
+            relationships={
+                "details": {
+                    "data": [
+                        models.ResourceIdentifier(
+                            id=detail.id,
+                            type="trip-offer-option-details",
+                        )
+                        for detail in option.segment_details
+                    ],
+                },
+            },
+            links={
+                _SELF_HREF: request.url_for(
+                    "ViewOfferOption",
+                    offerOptionId=option.id,
+                ),
+            },
+        )
+
+
+class OfferOptionDetailsResource(models.Resource):
+    @classmethod
+    def from_proto(
+        cls,
+        details: offer_models_pb2.OfferSegmentDetails,
+        request: requests.Request,
+    ) -> OfferOptionDetailsResource:
+        return cls(
+            id=details.id,
+            type="trip-offer-option-details",
+            attributes={
+                "cabinClassName": details.cabin_class.marketing_name,
+            },
+            relationships={
+                "details": {
+                    "data": models.ResourceIdentifier(
+                        id=details.offer_segment_id,
+                        type="trip-offer-group-details",
+                    ),
+                },
+                "cabinClass": {
+                    "data": models.ResourceIdentifier(
+                        id=protobuf.enum_value_to_slug(
+                            descriptor=models_pb2.CabinClass.Type.DESCRIPTOR,
+                            enum_value=details.cabin_class.type,
+                        ),
+                        type="cabin-classes",
+                    ),
+                },
+            },
+            links={
+                _SELF_HREF: request.url_for(
+                    "ViewOfferOptionDetails",
+                    offerOptionDetailsId=details.id,
+                ),
+            },
         )
 
 
@@ -108,85 +275,6 @@ class OfferSegmentDetails(models.BaseModel):
         return cls(
             ref=details.id,
             cabinClass=CabinClass.from_proto(details.cabin_class),
-        )
-
-
-class Offer(models.BaseModel):
-    identifier: str = pydantic.Field(alias="id")
-    price: Price
-    segment_details: Sequence[OfferSegmentDetails] = pydantic.Field(
-        alias="segmentDetails",
-    )
-
-    @classmethod
-    def from_proto(cls, offer: offer_models_pb2.Offer) -> Offer:
-        return cls(
-            id=offer.id,
-            price=Price.from_proto(offer.price),
-            segmentDetails=[
-                OfferSegmentDetails.from_proto(segment_details)
-                for segment_details in offer.segment_details
-            ],
-        )
-
-
-class OfferSegmentLeg(models.BaseModel):
-    origin: Point
-    destination: Point
-    departure_at: datetime.datetime = pydantic.Field(alias="departureAt")
-    arrival_at: datetime.datetime = pydantic.Field(alias="arrivalAt")
-
-    @classmethod
-    def from_proto(cls, leg: offer_models_pb2.OfferSegmentLeg) -> OfferSegmentLeg:
-        return cls(
-            origin=Point.from_proto(leg.origin),
-            destination=Point.from_proto(leg.destination),
-            departureAt=protobuf.protobuf_to_datetime(leg.departure_at).astimezone(
-                zoneinfo.ZoneInfo(leg.origin.time_zone),
-            ),
-            arrivalAt=protobuf.protobuf_to_datetime(leg.arrival_at).astimezone(
-                zoneinfo.ZoneInfo(leg.destination.time_zone),
-            ),
-        )
-
-
-class RouteIdentifiers(models.BaseModel):
-    vendor: str
-    operator: Optional[str] = None
-
-
-class OfferSegment(models.BaseModel):
-    ref: str
-    legs: Sequence[OfferSegmentLeg]
-    vendor: str
-    operator: Optional[str] = None
-    route_identifiers: RouteIdentifiers = pydantic.Field(alias="routeIdentifiers")
-
-    @classmethod
-    def from_proto(cls, segment: offer_models_pb2.OfferSegment) -> OfferSegment:
-        return cls(
-            ref=segment.id,
-            legs=[OfferSegmentLeg.from_proto(leg) for leg in segment.legs],
-            vendor=segment.vendor,
-            operator=segment.operator or None,
-            routeIdentifiers=RouteIdentifiers(
-                vendor=segment.vehicle.number,
-                operator=None,
-            ),
-        )
-
-
-class OfferGroup(models.BaseModel):
-    offers: Sequence[Offer]
-    segments: Sequence[OfferSegment]
-
-    @classmethod
-    def from_proto(cls, offer_group: offer_models_pb2.OfferGroup) -> OfferGroup:
-        return cls(
-            offers=[Offer.from_proto(offer) for offer in offer_group.offers],
-            segments=[
-                OfferSegment.from_proto(segment) for segment in offer_group.segments
-            ],
         )
 
 
@@ -580,7 +668,7 @@ class TripOfferSearchResource(models.Resource):
                     _RELATIONSHIPS_FIELD: [
                         models.ResourceIdentifier(
                             id=offer.id,
-                            type=_OFFERS_TYPE,
+                            type="offers",
                         )
                         for offer in offers
                     ],

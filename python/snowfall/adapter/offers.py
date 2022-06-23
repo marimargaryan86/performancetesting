@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import abc
 import dataclasses
+from collections.abc import Iterator
 from typing import Optional, Sequence
 
 import grpc
 
+from snowfall.adapter import common
 from snowfall.junction.offers.v1alpha import grpc_pb2, grpc_pb2_grpc, models_pb2
 
 
@@ -30,7 +32,7 @@ class OffersPage(object):
         )
 
 
-class Client(abc.ABC):
+class Client(abc.ABC):  # noqa: WPS214
     @abc.abstractmethod
     async def get(self, identifier: str) -> models_pb2.OfferAggregate:
         """Fetch an offer resource."""
@@ -44,6 +46,7 @@ class Client(abc.ABC):
     ) -> OffersPage:
         """Get offer results for an offer search."""
 
+    @abc.abstractmethod
     async def find_by_ids(
         self,
         identifiers: Sequence[str],
@@ -52,10 +55,67 @@ class Client(abc.ABC):
     ) -> OffersPage:
         """Return offers by offer ids."""
 
+    @abc.abstractmethod
+    async def get_group_by_id(self, identifier: str) -> models_pb2.OfferGroup:
+        """Return offer group by id."""
 
-class DictClient(Client):
+    @abc.abstractmethod
+    async def find_groups_by_ids(
+        self,
+        identifiers: Sequence[str],
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> common.ItemsPage[models_pb2.OfferGroup]:
+        """Return offer groups by ids."""
+
+    @abc.abstractmethod
+    async def get_group_details_by_id(self, identifier: str) -> models_pb2.OfferSegment:
+        """Return offer group details by id."""
+
+    @abc.abstractmethod
+    async def find_group_details_by_ids(
+        self,
+        identifiers: Sequence[str],
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> common.ItemsPage[models_pb2.OfferSegment]:
+        """Return offer group details by ids."""
+
+    @abc.abstractmethod
+    async def get_option_by_id(self, identifier: str) -> models_pb2.Offer:
+        """Return offer option by id."""
+
+    @abc.abstractmethod
+    async def find_options_by_ids(
+        self,
+        identifiers: Sequence[str],
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> common.ItemsPage[models_pb2.Offer]:
+        """Return offers by ids."""
+
+    @abc.abstractmethod
+    async def get_option_details_by_id(
+        self,
+        identifier: str,
+    ) -> models_pb2.OfferSegmentDetails:
+        """Return offer option details by id."""
+
+    @abc.abstractmethod
+    async def find_option_details_by_ids(
+        self,
+        identifiers: Sequence[str],
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> common.ItemsPage[models_pb2.OfferSegmentDetails]:
+        """Return offer details by ids."""
+
+
+class DictClient(Client):  # noqa: WPS214
     def __init__(self, offers: Sequence[models_pb2.OfferAggregate]) -> None:
-        self._offers = {offer.id: offer for offer in offers}
+        self._offers: dict[str, models_pb2.OfferAggregate] = {
+            offer.id: offer for offer in offers
+        }
 
     async def get(self, offer_id: str) -> models_pb2.OfferAggregate:
         if offer_id not in self._offers:
@@ -91,8 +151,89 @@ class DictClient(Client):
             ],
         )
 
+    async def get_group_by_id(self, identifier: str) -> models_pb2.OfferGroup:
+        for group in self._iterate_groups():
+            if group.id == identifier:
+                return group
 
-class GrpcClient(Client):
+        raise NotFoundError()
+
+    async def find_groups_by_ids(
+        self,
+        identifiers: Sequence[str],
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> common.ItemsPage[models_pb2.OfferGroup]:
+        return common.ItemsPage[models_pb2.OfferGroup](list(self._iterate_groups()))
+
+    async def get_group_details_by_id(self, identifier: str) -> models_pb2.OfferSegment:
+        for group in self._iterate_groups():
+            for detail in group.segments:
+                if detail.id == identifier:
+                    return detail
+
+        raise NotFoundError()
+
+    async def find_group_details_by_ids(
+        self,
+        identifiers: Sequence[str],
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> common.ItemsPage[models_pb2.OfferSegment]:
+        return common.ItemsPage[models_pb2.OfferSegment](
+            [detail for group in self._iterate_groups() for detail in group.segments],
+        )
+
+    async def get_option_by_id(self, identifier: str) -> models_pb2.Offer:
+        for option in self._iterate_options():
+            if option.id == identifier:
+                return option
+
+        raise NotFoundError()
+
+    async def find_options_by_ids(
+        self,
+        identifiers: Sequence[str],
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> common.ItemsPage[models_pb2.Offer]:
+        return common.ItemsPage[models_pb2.Offer](list(self._iterate_options()))
+
+    async def get_option_details_by_id(
+        self,
+        identifier: str,
+    ) -> models_pb2.OfferSegmentDetails:
+        for option in self._iterate_options():
+            for details in option.segment_details:
+                if details.id == identifier:
+                    return details
+
+        raise NotFoundError()
+
+    async def find_option_details_by_ids(
+        self,
+        identifiers: Sequence[str],
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> common.ItemsPage[models_pb2.OfferSegmentDetails]:
+        return common.ItemsPage[models_pb2.OfferSegmentDetails](
+            [
+                detail
+                for option in self._iterate_options()
+                for detail in option.segment_details
+            ],
+        )
+
+    def _iterate_groups(self) -> Iterator[models_pb2.OfferGroup]:
+        for offer in self._offers.values():
+            yield from offer.groups
+
+    def _iterate_options(self) -> Iterator[models_pb2.Offer]:
+        for group in self._iterate_groups():
+            yield from group.offers
+
+
+class GrpcClient(Client):  # noqa: WPS214
     def __init__(self, offers: grpc_pb2_grpc.OfferServiceStub, timeout: int = 10):
         self._offers = offers
         self._timeout = timeout
@@ -144,10 +285,9 @@ class GrpcClient(Client):
     ) -> OffersPage:
         request = grpc_pb2.ListOffersRequest(
             page_token=cursor or "",
-            offer_ids=grpc_pb2.ListOfOfferIds(
-                ids=list(identifiers),
-            ),
+            offer_ids=grpc_pb2.ListOfIds(ids=list(identifiers)),
         )
+
         if limit is not None:
             request.page_size = limit
 
@@ -158,5 +298,162 @@ class GrpcClient(Client):
 
         return OffersPage(
             offers=list(response.offers),
+            next_page_token=response.next_page_token,
+        )
+
+    async def get_group_by_id(self, identifier: str) -> models_pb2.OfferGroup:
+        request = grpc_pb2.GetOfferGroupRequest(id=identifier)
+
+        try:
+            response = await self._offers.GetOfferGroup(request, timeout=self._timeout)
+        except grpc.aio.AioRpcError as exc:
+            raise UnknownError() from exc
+
+        return response.group
+
+    async def find_groups_by_ids(
+        self,
+        identifiers: Sequence[str],
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> common.ItemsPage[models_pb2.OfferGroup]:
+        request = grpc_pb2.ListOfferGroupsRequest(
+            page_token=cursor or "",
+            offer_group_ids=grpc_pb2.ListOfIds(ids=list(identifiers)),
+        )
+
+        if limit is not None:
+            request.page_size = limit
+
+        try:
+            response = await self._offers.ListOfferGroups(
+                request,
+                timeout=self._timeout,
+            )
+        except grpc.aio.AioRpcError as exc:
+            raise UnknownError() from exc
+
+        return common.ItemsPage[models_pb2.OfferGroup](
+            protos=list(response.groups),
+            next_page_token=response.next_page_token,
+        )
+
+    async def get_group_details_by_id(self, identifier: str) -> models_pb2.OfferSegment:
+        request = grpc_pb2.GetOfferGroupDetailsRequest(id=identifier)
+
+        try:
+            response = await self._offers.GetOfferGroupDetails(
+                request,
+                timeout=self._timeout,
+            )
+        except grpc.aio.AioRpcError as exc:
+            raise UnknownError() from exc
+
+        return response.details
+
+    async def find_group_details_by_ids(
+        self,
+        identifiers: Sequence[str],
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> common.ItemsPage[models_pb2.OfferSegment]:
+        request = grpc_pb2.ListOfferGroupDetailsRequest(
+            page_token=cursor or "",
+            offer_group_details_ids=grpc_pb2.ListOfIds(ids=list(identifiers)),
+        )
+
+        if limit is not None:
+            request.page_size = limit
+
+        try:
+            response = await self._offers.ListOfferGroupDetails(
+                request,
+                timeout=self._timeout,
+            )
+        except grpc.aio.AioRpcError as exc:
+            raise UnknownError() from exc
+
+        return common.ItemsPage[models_pb2.OfferSegment](
+            protos=list(response.details),
+            next_page_token=response.next_page_token,
+        )
+
+    async def get_option_by_id(self, identifier: str) -> models_pb2.Offer:
+        request = grpc_pb2.GetOfferOptionRequest(id=identifier)
+
+        try:
+            response = await self._offers.GetOfferOption(request, timeout=self._timeout)
+        except grpc.aio.AioRpcError as exc:
+            raise UnknownError() from exc
+
+        return response.option
+
+    async def find_options_by_ids(
+        self,
+        identifiers: Sequence[str],
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> common.ItemsPage[models_pb2.Offer]:
+        request = grpc_pb2.ListOfferOptionsRequest(
+            page_token=cursor or "",
+            offer_option_ids=grpc_pb2.ListOfIds(ids=list(identifiers)),
+        )
+
+        if limit is not None:
+            request.page_size = limit
+
+        try:
+            response = await self._offers.ListOfferOptions(
+                request,
+                timeout=self._timeout,
+            )
+        except grpc.aio.AioRpcError as exc:
+            raise UnknownError() from exc
+
+        return common.ItemsPage[models_pb2.Offer](
+            protos=list(response.options),
+            next_page_token=response.next_page_token,
+        )
+
+    async def get_option_details_by_id(
+        self,
+        identifier: str,
+    ) -> models_pb2.OfferSegmentDetails:
+        request = grpc_pb2.GetOfferOptionDetailsRequest(id=identifier)
+
+        try:
+            response = await self._offers.GetOfferOptionDetails(
+                request,
+                timeout=self._timeout,
+            )
+        except grpc.aio.AioRpcError as exc:
+            raise UnknownError() from exc
+
+        return response.details
+
+    async def find_option_details_by_ids(
+        self,
+        identifiers: Sequence[str],
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> common.ItemsPage[models_pb2.OfferSegmentDetails]:
+        request = grpc_pb2.ListOfferGroupDetailsRequest(
+            page_token=cursor or "",
+            offer_group_details_ids=grpc_pb2.ListOfIds(ids=list(identifiers)),
+        )
+
+        if limit is not None:
+            request.page_size = limit
+
+        try:
+            response = await self._offers.ListOfferOptionDetails(
+                request,
+                timeout=self._timeout,
+            )
+        except grpc.aio.AioRpcError as exc:
+            raise UnknownError() from exc
+
+        return common.ItemsPage[models_pb2.OfferSegmentDetails](
+            protos=list(response.details),
             next_page_token=response.next_page_token,
         )
