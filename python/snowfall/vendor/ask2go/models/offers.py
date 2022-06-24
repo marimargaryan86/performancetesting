@@ -1,5 +1,4 @@
 from datetime import datetime, time
-from decimal import Decimal
 from typing import Optional
 from uuid import UUID
 
@@ -80,11 +79,11 @@ class Trip(CamelCaseBaseModel):
 
 
 class PricingInformationBase(CamelCaseBaseModel):
-    base_fare: Decimal
-    total_tax: Decimal
-    total_cost: Decimal
-    original_cost: Decimal
-    service_fee: Decimal
+    base_fare: str
+    total_tax: str
+    total_cost: str
+    original_cost: str
+    service_fee: str
     currency: str
 
 

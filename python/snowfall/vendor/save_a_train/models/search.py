@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel, Field
@@ -33,7 +32,7 @@ class SearchResult(BaseModel):
     departure_datetime: datetime
     arrival_datetime: datetime
     duration: timedelta
-    best_price: Decimal
+    best_price: str
     kind_of: str
     changes_count: int
 

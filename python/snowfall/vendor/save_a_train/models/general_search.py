@@ -1,5 +1,4 @@
 from datetime import date, time, timedelta
-from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel, Field
@@ -18,7 +17,7 @@ class GeneralTrip(BaseModel):
     changes: Optional[int]
     operator: str
     connections: Optional[str]
-    price: dict[str, Decimal]  # fare class: price
+    price: dict[str, str]  # fare class: price
     train_numbers: str
     departure_connections: Optional[str]
     arrival_connections: Optional[str]

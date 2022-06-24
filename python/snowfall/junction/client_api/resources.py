@@ -11,6 +11,7 @@ from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.offers.v1alpha import models_pb2 as offer_models_pb2
 from snowfall.junction.orders.v1alpha import models_pb2 as order_models_pb2
 from snowfall.junction.trips.v1alpha import trips_pb2
+from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
 
@@ -170,9 +171,11 @@ class Price(models.BaseModel):
 
     @classmethod
     def from_proto(cls, price: models_pb2.Price) -> Price:
+        currency = money.Currency(price.currency)
+
         return cls(
-            currency=price.currency,
-            amount=str(price.amount / 100),
+            currency=currency.code,
+            amount=str(money.Money(price.amount, currency)),
         )
 
 

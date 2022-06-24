@@ -37,7 +37,7 @@ lockfile = "vendor/lock/black.txt"
 interpreter_constraints = ["CPython==3.9.10"]
 
 [cli.alias]
-all-changed = "--changed-since=HEAD --changed-dependees=transitive"
+all-changed = "--changed-since=main --changed-dependees=transitive"
 
 [coverage-py]
 global_report = true

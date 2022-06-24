@@ -1,5 +1,4 @@
 from datetime import datetime
-from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel, Field
@@ -29,7 +28,7 @@ class SearchResultTransferChange(BaseModel):
 class SearchResultTransferFare(BaseModel):
     identifier: int = Field(..., alias="id")
     name: str
-    price: Decimal
+    price: str
 
 
 class SearchResultTransfer(BaseModel):

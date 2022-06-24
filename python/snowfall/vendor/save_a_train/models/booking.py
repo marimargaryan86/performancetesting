@@ -1,5 +1,4 @@
 from datetime import date, datetime, timedelta
-from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel
@@ -38,10 +37,10 @@ class BookingResult(BaseModel):
     search_identifier: str
     outbound_trip_info: TripInfo
     inbound_trip_info: Optional[TripInfo]
-    price: Decimal
-    outbound_seat_reservation_fee: Decimal
-    inbound_seat_reservation_fee: Optional[Decimal]
-    total_price: Decimal
+    price: str
+    outbound_seat_reservation_fee: str
+    inbound_seat_reservation_fee: Optional[str]
+    total_price: str
 
 
 class BookingConfirmationResult(BaseModel):

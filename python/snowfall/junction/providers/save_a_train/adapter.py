@@ -16,6 +16,7 @@ from snowfall.junction.offers.v1alpha import models_pb2 as offer_models_pb2
 from snowfall.junction.orders.v1alpha import models_pb2 as order_models_pb2
 from snowfall.junction.providers.save_a_train import cache, models, train_stations
 from snowfall.junction.providers.save_a_train.v1alpha import amqp_pb2
+from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.vendor.save_a_train import client, enums, exceptions
 from snowfall.vendor.save_a_train import models as save_a_train_models
@@ -130,6 +131,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
 
                 expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
                 offer_segment_id = str(uuid.uuid4())
+                currency = money.Currency("EUR")
 
                 yield offer_models_pb2.OfferGroup(
                     id=str(uuid.uuid4()),
@@ -160,10 +162,11 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                                 ),
                             ],
                             price=models_pb2.Price(
-                                amount=int(
-                                    transfer_fare.price * 100,
-                                ),
-                                currency="EUR",
+                                amount=money.from_string(
+                                    transfer_fare.price,
+                                    currency,
+                                ).amount,
+                                currency=currency.code,
                             ),
                         )
                         for transfer in search_details.transfers

@@ -8,6 +8,7 @@ from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.junction.providers.ask2go import airports, cache, models
 from snowfall.junction.providers.ask2go.v1alpha import amqp_pb2
+from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.vendor.ask2go import models as ask2go_models
 from snowfall.vendor.ask2go.models import offers
@@ -46,6 +47,10 @@ class OfferTransformer(object):
             segment=segment,
             search_segment=search_segment,
         )
+        amount = money.from_string(
+            offer_price.itinerary.pricing_information.base.total_cost,
+            money.Currency(offer_price.itinerary.pricing_information.base.currency),
+        )
 
         return offers_pb2.OfferGroup(
             id=str(uuid.uuid4()),
@@ -71,11 +76,8 @@ class OfferTransformer(object):
                         ),
                     ],
                     price=models_pb2.Price(
-                        amount=int(
-                            offer_price.itinerary.pricing_information.base.total_cost
-                            * 100,
-                        ),
-                        currency=offer_price.itinerary.pricing_information.base.currency,
+                        amount=amount.amount,
+                        currency=amount.currency.code,
                     ),
                 ),
             ],

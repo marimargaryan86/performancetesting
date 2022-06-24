@@ -1,4 +1,3 @@
-from decimal import Decimal
 from typing import Any
 
 from snowfall.vendor.ask2go.models import booking, offers
@@ -15,7 +14,7 @@ class OfferPriceDoc(CamelCaseBaseModel):
 
 
 class PriceCurrency(CamelCaseBaseModel):
-    price: Decimal
+    price: str
     currency: str
 
 

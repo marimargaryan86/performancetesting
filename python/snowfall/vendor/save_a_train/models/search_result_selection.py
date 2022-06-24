@@ -1,4 +1,3 @@
-from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel
@@ -14,7 +13,7 @@ class SearchResultSeatPreferenceOption(BaseModel):
 
 class SearchResultSeatPreference(BaseModel):
     currency: str
-    amount: Decimal
+    amount: str
     status: str
     options: list[SearchResultSeatPreferenceOption]
 
