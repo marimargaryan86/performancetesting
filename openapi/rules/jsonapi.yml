@@ -22,7 +22,7 @@ rules:
         function: undefined
   json-api-type-enum:
     description: Field named `type` should have `enum`.
-    given: $..properties[type]
+    given: $..properties[type].type^
     severity: error
     then:
       - field: "enum"

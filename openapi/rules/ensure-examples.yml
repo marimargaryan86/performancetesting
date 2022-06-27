@@ -11,7 +11,7 @@ rules:
       function: truthy
   ensure-properties-example:
     description: Properties must have examples.
-    given: $..*.properties[*]
+    given: $..*.properties[*].type^
     severity: error
     resolved: true
     message: "{{error}}"

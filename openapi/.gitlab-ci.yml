@@ -17,6 +17,7 @@ openapi:breaking:
       fi
     done
   needs:
+    - "pants:setup"
     - job: "allow-breaking-changes"
       artifacts: true
   allow_failure:
