@@ -7,3 +7,9 @@ rules:
   oas3-api-servers: info
   api-home: info
   operation-short-summary: hint
+overrides:
+  - files:
+      - "mobile_api/openapi.json#/components/schemas/SegmentIdentifier/properties/legs/items"
+      - "mobile_api/openapi.json#/components/schemas/Trip/allOf/0/properties/attributes/properties/segments/items"
+    rules:
+      json-api-no-nested-relationships: info
