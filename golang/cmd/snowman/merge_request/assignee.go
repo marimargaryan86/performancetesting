@@ -67,29 +67,51 @@ func (mr *mergeRequest) expectedAssignees() ([]int, error) {
 			return []int{}, err
 		}
 
-		approvers := make([]int, 0)
+		regulars := make([]int, 0)
+		owners := make([]int, 0)
 
 		for _, rule := range state.Rules {
 			for _, u := range rule.ApprovedBy {
-				approvers = append(approvers, u.ID)
-			}
-		}
-
-		approvers = common.Unique(approvers)
-		missing := make([]int, 0)
-
-	ReviewersLoop:
-		for _, r := range reviewers {
-			for _, a := range approvers {
-				if r == a {
-					continue ReviewersLoop
+				if rule.RuleType == "any_approver" {
+					regulars = append(regulars, u.ID)
+				} else {
+					owners = append(owners, u.ID)
 				}
 			}
-
-			missing = append(missing, r)
 		}
 
-		return missing, nil
+		newRegulars := make([]int, 0)
+
+		for _, regular := range regulars {
+			if !common.In(owners, regular) {
+				newRegulars = append(newRegulars, regular)
+			}
+		}
+
+		regulars = newRegulars
+
+		for _, approvers := range [][]int{
+			regulars,
+			owners,
+		} {
+			approvers = common.Unique(approvers)
+			missing := make([]int, 0)
+
+		ReviewersLoop:
+			for _, r := range reviewers {
+				for _, a := range approvers {
+					if r == a {
+						continue ReviewersLoop
+					}
+				}
+
+				missing = append(missing, r)
+			}
+
+			if len(missing) > 0 {
+				return missing, nil
+			}
+		}
 	}
 
 	return []int{mr.object.Author.ID}, nil

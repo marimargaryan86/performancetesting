@@ -1,6 +1,7 @@
 package merge_request
 
 import (
+	"errors"
 	"git.snowfall.se/junction/junction/golang/cmd/snowman/common"
 	"github.com/xanzy/go-gitlab"
 	"math/rand"
@@ -48,9 +49,12 @@ func (mr *mergeRequest) currentReviewers() []int {
 	return current
 }
 
-func (mr *mergeRequest) expectedReviewers() ([]int, error) {
+func (mr *mergeRequest) appendCodeOwners(expected []int, err error) ([]int, error) {
+	if err != nil {
+		return expected, err
+	}
+
 	current := mr.currentReviewers()
-	expected := make([]int, 0)
 	indecisive := make([][]*gitlab.BasicUser, 0)
 	state, err := mr.approvalState()
 
@@ -113,8 +117,14 @@ func (mr *mergeRequest) expectedReviewers() ([]int, error) {
 		return common.Unique(expected), nil
 	}
 
+	return []int{}, errors.New("unable to decide on a reviewer")
+}
+
+func (mr *mergeRequest) expectedReviewers() ([]int, error) {
+	current := mr.currentReviewers()
+
 	if len(current) > 0 {
-		return current, nil
+		return mr.appendCodeOwners(current, nil)
 	}
 
 	eligible := make([]int, 0)
@@ -127,7 +137,7 @@ func (mr *mergeRequest) expectedReviewers() ([]int, error) {
 		owners, err := common.LikelyFileOwners(mr.client, mr.object.ProjectID, c.OldPath)
 
 		if err != nil {
-			return common.Unique(expected), err
+			return mr.appendCodeOwners([]int{}, err)
 		}
 
 		for _, o := range owners {
@@ -140,13 +150,13 @@ func (mr *mergeRequest) expectedReviewers() ([]int, error) {
 	reviewer := common.MostCommon(eligible)
 
 	if reviewer != 0 {
-		return []int{reviewer}, nil
+		return mr.appendCodeOwners([]int{reviewer}, nil)
 	}
 
 	contributors, err := common.RecentContributors(mr.client, mr.object.ProjectID)
 
 	if err != nil {
-		return expected, err
+		return mr.appendCodeOwners([]int{}, err)
 	}
 
 	reviewer = mr.object.Author.ID
@@ -156,5 +166,5 @@ func (mr *mergeRequest) expectedReviewers() ([]int, error) {
 		reviewer = contributors[randomIndex]
 	}
 
-	return []int{reviewer}, nil
+	return mr.appendCodeOwners([]int{reviewer}, nil)
 }

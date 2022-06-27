@@ -1,6 +1,9 @@
 package merge_request
 
-import "strings"
+import (
+	"git.snowfall.se/junction/junction/golang/cmd/snowman/common"
+	"strings"
+)
 
 const statusAbandoned = "status::abandoned"
 const statusAccepted = "status::accepted"
@@ -32,10 +35,30 @@ func (mr *mergeRequest) expectedStatusLabel() (string, error) {
 		return statusBlocked, err
 	}
 
+	approvers := make([]int, 0)
+
 	for _, rule := range approvalState.Rules {
-		if !rule.Approved {
-			return statusReviewNeeded, nil
+		for _, u := range rule.ApprovedBy {
+			approvers = append(approvers, u.ID)
 		}
+	}
+
+	approvers = common.Unique(approvers)
+	reviewers, err := mr.expectedReviewers()
+
+	if err != nil {
+		return statusBlocked, err
+	}
+
+ReviewersLoop:
+	for _, r := range reviewers {
+		for _, a := range approvers {
+			if r == a {
+				continue ReviewersLoop
+			}
+		}
+
+		return statusReviewNeeded, nil
 	}
 
 	if mr.object.HasConflicts || mr.object.MergeError != "" || mr.object.MergeStatus != "can_be_merged" {
