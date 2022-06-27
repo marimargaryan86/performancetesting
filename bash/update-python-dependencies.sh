@@ -18,7 +18,7 @@ while IFS="" read -r line || [ -n "${line}" ]; do
 	package_name="${package%[*}"
 	pypi_info=$(curl --silent -L "https://pypi.org/pypi/${package_name}/json")
 	latest_version=$(echo "${pypi_info}" | jq -r ".info.version")
-	has_new_update=$(perl -e "if (version->parse(\"${latest_version}\") > version->parse(\"${current_version}\")) { print 1 } else { print 0 }")
+	has_new_update=$(perl -e "if (version->parse(\"${latest_version}\") > version->parse(\"${current_version}\")) { print 1 } else { print 0 }" || echo "0")
 
 	if [ "${has_new_update}" -eq "1" ]; then
 		is_likely_compatible=$(perl -e "if (version->parse(\"${latest_version}\") < version->parse(\"$(("${current_version%%.*}" + 1)).0.0\")) { print 1 } else { print 0 }")

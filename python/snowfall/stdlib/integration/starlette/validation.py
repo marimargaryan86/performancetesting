@@ -56,7 +56,7 @@ class UriFormatter(object):
 
 class Validator(object):
     def __init__(self, spec_dict: Mapping[str, Any]):
-        spec = openapi_core.create_spec(spec_dict)
+        spec = openapi_core.OpenAPISpec.create(spec_dict)
         deserializer = {"application/vnd.api+json": rapidjson.loads}
         formatter = {"uri": UriFormatter()}
         self._request_validator = RequestValidator(
