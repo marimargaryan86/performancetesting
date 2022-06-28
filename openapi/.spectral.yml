@@ -4,12 +4,17 @@ extends:
   - https://raw.githubusercontent.com/openapi-contrib/style-guides/master/openapi.yml
   - rules/snowfall-ruleset.yml
 rules:
-  oas3-api-servers: info
-  api-home: info
-  operation-short-summary: hint
+  oas3-api-servers: off
+  api-home: off
+  operation-short-summary: off
 overrides:
   - files:
       - "mobile_api/openapi.json#/components/schemas/SegmentIdentifier/properties/legs/items"
       - "mobile_api/openapi.json#/components/schemas/Trip/allOf/0/properties/attributes/properties/segments/items"
     rules:
       json-api-no-nested-relationships: info
+  - files:
+      - "mobile_api/openapi.json#/paths/~1trips~1searches~1{tripSearchId}~1trips"
+      - "admin_api/openapi.json#/paths/~1places"
+    rules:
+      ensure-pagination: info

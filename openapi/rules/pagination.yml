@@ -1,0 +1,10 @@
+functions:
+  - ensurePagination
+rules:
+  ensure-pagination:
+    description: List endpoints must have pagination
+    given: $.paths.*.?(@property !== "parameters")
+    severity: warn
+    message: "{{error}}"
+    then:
+      function: ensurePagination

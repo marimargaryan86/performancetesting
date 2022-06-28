@@ -4,6 +4,7 @@ extends:
   - rules/jsonapi.yml
   - rules/oas-minimum.yml
   - rules/operation-id.yml
+  - rules/pagination.yml
   - rules/property-names.yml
   - rules/request-bodies.yml
   - rules/schema-names.yml
