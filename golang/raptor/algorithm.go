@@ -19,17 +19,17 @@ const railPrefixSeconds = 1800
 const railSuffixSeconds = 900
 
 type raptor struct {
-	best          *sync.Map
-	connections   map[uint64]map[uint8]interface{}
-	data          *legacy.Repository
-	destinations  []*planner.Stop
-	lastDeparture uint32
-	tripCutOff    uint32
-	marked        []uint64
-	round         uint8
-	rounds        []*sync.Map
-	trips         *sync.Map
-	kindList      []models.Schedule_Type
+	best          *sync.Map                        // a map of route stops to earliest possible arrival to them, key type is Stop.Sequence, value type is unix timestamp
+	connections   map[uint64]map[uint8]interface{} // a map of ScheduleStops to a map of round number to type connection
+	data          *legacy.Repository               // helper functions to get objects from different ids
+	destinations  []*planner.Stop                  // list of destination stops
+	lastDeparture uint32                           // the last time considered to depart from the origin
+	tripCutOff    uint32                           // the last time considered to arrive at the destination
+	marked        []uint64                         // a list of stops we can start from in the current round
+	round         uint8                            // an index of the round, starts at 0
+	rounds        []*sync.Map                      // a map of round number to a map of Stop.Sequence to unix timestamps (basically a round number to that rounds `best`)
+	trips         *sync.Map                        // a map of route.Sequence to index of route.Schedules
+	kindList      []models.Schedule_Type           // list of schedule types to search for
 	stopsMap      map[h3.H3Index][]*planner.Stop
 }
 
@@ -54,6 +54,7 @@ type workerResult struct {
 	boarding uint32
 }
 
+// initializes the raptor object
 func newRaptor(
 	data *legacy.Repository,
 	origins []*planner.Stop,
@@ -90,11 +91,13 @@ func newRaptor(
 	}
 }
 
+// increases the r.round number by one and initializes the r.rounds to an empty map
 func (r *raptor) initRound() {
 	r.round++
 	r.rounds = append(r.rounds, &sync.Map{})
 }
 
+// check if this is the earliest arrival to the stop so far
 func (r *raptor) isBetter(stopSequence uint64, arrival uint32) bool {
 	best := uint32(math.MaxUint32)
 
@@ -111,6 +114,8 @@ func (r *raptor) isBetter(stopSequence uint64, arrival uint32) bool {
 	return arrival < best
 }
 
+// adds stops reached in the last round to r.marked
+// returns true if r.marked is not empty
 func (r *raptor) markStops() bool {
 	r.marked = make([]uint64, 0)
 
@@ -123,6 +128,8 @@ func (r *raptor) markStops() bool {
 	return len(r.marked) != 0
 }
 
+// adds all earliest schedule segments from route segments that can be reached
+// from stops in the r.marked list
 func (r *raptor) queue() []uint64 {
 	qMap := make(map[uint64]uint64, len(r.marked))
 
@@ -160,6 +167,8 @@ func (r *raptor) queue() []uint64 {
 	return q
 }
 
+// initializes routeWorker functions that return the earliest possible schedule
+// and updates the r.connections map with the result
 func (r *raptor) scanRoutes() {
 	wg := &sync.WaitGroup{}
 	qItems := r.queue()
@@ -205,6 +214,7 @@ func (r *raptor) scanRoutes() {
 	}
 }
 
+// finds the earliest possible transfer (schedule) from routes that satisfy the (originRouteStop, destinationRouteStop, departure) triplet
 func (r *raptor) routeWorker(wg *sync.WaitGroup, jobs chan uint64, results chan workerResult) {
 	defer wg.Done()
 
@@ -313,6 +323,9 @@ func (r *raptor) earliestPossibleDeparture(target *planner.ScheduleStop, previou
 	return previousArrival
 }
 
+// extends r.marked with all stops a person can walk to from stops already in
+// r.marked by finding stops in the neighbouring h3 hexes
+// updates the r.connections with the newly calculated transfer time
 func (r *raptor) scanTransfers() {
 	for _, p := range r.marked {
 		fromStop := r.data.StopBySequence(p)
@@ -375,6 +388,7 @@ func (r *raptor) scanTransfers() {
 	}
 }
 
+// run the raptor algorithm (the overview of the algorithm)
 func (r *raptor) run() map[uint64]map[uint8]interface{} {
 	r.scanTransfers()
 	r.markStops()
