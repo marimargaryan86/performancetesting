@@ -56,3 +56,12 @@ class UserResource(models.Resource):
                 ),
             },
         )
+
+
+class OfferSearchOffersResource(models.Resource):
+    @classmethod
+    def from_dict(
+        cls,
+        offer_search_offer: Mapping[str, Any],
+    ) -> OfferSearchOffersResource:
+        return cls(**offer_search_offer)
