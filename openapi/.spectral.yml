@@ -1,7 +1,7 @@
 extends:
   - [spectral:oas, all]
-  - https://raw.githubusercontent.com/openapi-contrib/style-guides/master/apisyouwonthate.yml
-  - https://raw.githubusercontent.com/openapi-contrib/style-guides/master/openapi.yml
+  - https://raw.githubusercontent.com/apisyouwonthate/style-guide/06bd2f71f676edc7ed56b8fbe1c35ba971d16665/apisyouwonthate.yml
+  - https://raw.githubusercontent.com/apisyouwonthate/style-guide/06bd2f71f676edc7ed56b8fbe1c35ba971d16665/openapi.yml
   - rules/snowfall-ruleset.yml
 rules:
   oas3-api-servers: off
