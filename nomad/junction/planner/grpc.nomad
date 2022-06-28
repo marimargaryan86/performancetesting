@@ -17,7 +17,7 @@ variable "registry_username" {
 job "planner-grpc" {
   datacenters = ["junction-dev-dc1"]
   type        = "service"
-
+  priority    = 75
   update {
     max_parallel      = 1
     auto_revert       = true
