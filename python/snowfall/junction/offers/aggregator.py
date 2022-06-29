@@ -1,16 +1,12 @@
 import collections
 import datetime
-import itertools
 import uuid
-
-import more_itertools
+from typing import Mapping, Sequence
 
 from snowfall.junction.offers import offers
 from snowfall.junction.offers.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.redis import types as redis
-
-OfferBuckets = dict[str, list[str]]
 
 
 class NotFoundError(Exception):
@@ -22,17 +18,64 @@ class NoExpiryError(Exception):
 
 
 def generate_offer_aggregates(
-    offer_buckets: OfferBuckets,
+    segment_ids_to_offer_ids: Mapping[str, Sequence[str]],
     expires_at: datetime.datetime,
 ) -> list[models_pb2.OfferAggregateMapping]:
+    offer_ids_to_segment_ids = collections.defaultdict(list)
+    for segment_id in segment_ids_to_offer_ids.keys():
+        for offer_id in segment_ids_to_offer_ids[segment_id]:
+            offer_ids_to_segment_ids[offer_id].append(segment_id)
+
     return [
         models_pb2.OfferAggregateMapping(
             id=str(uuid.uuid4()),
             expires_at=protobuf.datetime_to_protobuf(expires_at),
-            offer_result_ids=aggregate,
+            offer_result_ids=offer_ids,
         )
-        for aggregate in itertools.product(*offer_buckets.values())
+        for offer_ids in generate_offer_aggregates_recursive(
+            segment_ids=list(segment_ids_to_offer_ids),
+            segment_ids_to_offer_ids=segment_ids_to_offer_ids,
+            offer_ids_to_segment_ids=offer_ids_to_segment_ids,
+            fulfilled_segments=frozenset(),
+            segment_index=0,
+        )
     ]
+
+
+def generate_offer_aggregates_recursive(
+    segment_ids: Sequence[str],
+    segment_ids_to_offer_ids: Mapping[str, Sequence[str]],
+    offer_ids_to_segment_ids: Mapping[str, Sequence[str]],
+    fulfilled_segments: frozenset[str],
+    segment_index: int,
+) -> list[list[str]]:
+    if segment_index >= len(segment_ids):
+        return [[]]
+
+    aggregates = []
+
+    for offer_id in segment_ids_to_offer_ids[segment_ids[segment_index]]:
+        offer_covers_a_segment_thats_already_covered = any(
+            segment_id in fulfilled_segments
+            for segment_id in offer_ids_to_segment_ids[offer_id]
+        )
+
+        if not offer_covers_a_segment_thats_already_covered:
+            current_aggregates = generate_offer_aggregates_recursive(
+                segment_ids=segment_ids,
+                segment_ids_to_offer_ids=segment_ids_to_offer_ids,
+                offer_ids_to_segment_ids=offer_ids_to_segment_ids,
+                fulfilled_segments=fulfilled_segments.union(
+                    set(offer_ids_to_segment_ids[offer_id]),
+                ),
+                segment_index=segment_index + 1,
+            )
+            for aggregate in current_aggregates:
+                aggregate.append(offer_id)
+
+            aggregates.extend(current_aggregates)
+
+    return aggregates
 
 
 class OfferBucketRepository(object):
@@ -43,24 +86,23 @@ class OfferBucketRepository(object):
         self._redis = redis_client
 
     async def add_offer(self, offer: models_pb2.OfferGroup) -> None:
-        key = ":".join(
-            [offer.offer_search_id, more_itertools.first(offer.segments).segment_id],
-        )
-        bucket = self._redis.list_(key)
-        await bucket.push(offer.id)
-        await redis.put_expires_at_if_less_than_current(
-            self._redis,
-            bucket,
-            protobuf.protobuf_to_datetime(offer.expires_at),
-        )
+        for segment in offer.segments:
+            key = "{0}:{1}".format(offer.offer_search_id, segment.segment_id)
+            bucket = self._redis.list_(key)
+            await bucket.push(offer.id)
+            await redis.put_expires_at_if_less_than_current(
+                self._redis,
+                bucket,
+                protobuf.protobuf_to_datetime(offer.expires_at),
+            )
 
-        bucket_list = self._redis.set_(offer.offer_search_id)
-        await bucket_list.add(key)
-        await redis.put_expires_at_if_less_than_current(
-            self._redis,
-            bucket_list,
-            protobuf.protobuf_to_datetime(offer.expires_at),
-        )
+            bucket_list = self._redis.set_(offer.offer_search_id)
+            await bucket_list.add(key)
+            await redis.put_expires_at_if_less_than_current(
+                self._redis,
+                bucket_list,
+                protobuf.protobuf_to_datetime(offer.expires_at),
+            )
 
     async def get_offer_buckets(self, offer_search_id: str) -> dict[str, list[str]]:
         bucket_list = self._redis.set_(offer_search_id)
@@ -107,25 +149,22 @@ class OfferAggregator(object):
         if not offer_search:
             return
 
-        buckets = await self._get_buckets(offer)
+        buckets = await self._buckets.get_offer_buckets(offer.offer_search_id)
+
+        # this overrides the true bucket values for segments that this offer
+        # group covers, so that we only generate offer aggregates with this
+        # offer group
+        for offer_segment in offer.segments:
+            buckets[offer_segment.segment_id] = [offer.id]
 
         await self._buckets.add_offer(offer)
 
-        for segment in offer_search.trip.segments:
-            if segment.id not in buckets:
-                return
+        # check if all segments can be fulfilled by offers gotten so far
+        if any(segment.id not in buckets for segment in offer_search.trip.segments):
+            return
 
-        aggregate_expires_at = await self._buckets.get_bucket_list_expiry(offer_search)
+        expires_at = await self._buckets.get_bucket_list_expiry(offer_search)
 
-        for aggregate in generate_offer_aggregates(buckets, aggregate_expires_at):
+        for aggregate in generate_offer_aggregates(buckets, expires_at):
             aggregate.offer_search_id = offer_search.id
             await self._aggregates.insert(aggregate)
-
-    async def _get_buckets(
-        self,
-        offer: models_pb2.OfferGroup,
-    ) -> OfferBuckets:
-        buckets = await self._buckets.get_offer_buckets(offer.offer_search_id)
-        buckets[more_itertools.first(offer.segments).segment_id] = [offer.id]
-
-        return buckets

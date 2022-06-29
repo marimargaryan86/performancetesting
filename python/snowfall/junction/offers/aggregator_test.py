@@ -205,6 +205,7 @@ class TestAggregator(object):
         for offer_result in offer_results:
             await offer_aggregator.aggregate(offer_result)
 
+        expected_sorted = [sorted(aggregate) for aggregate in expected]
         async for aggregate in offer_aggregate_collection.find():
-            assert aggregate["offer_result_ids"] in expected
+            assert sorted(aggregate["offer_result_ids"]) in expected_sorted
             assert aggregate["expires_at"] == _OFFER_RESULT_EXPIRY
