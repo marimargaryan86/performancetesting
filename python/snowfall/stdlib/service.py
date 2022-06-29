@@ -21,6 +21,7 @@ from typing import (  # noqa: WPS235
 
 import click
 import pydantic
+from prometheus_async.aio import web
 from pydantic.error_wrappers import ErrorWrapper
 
 from snowfall.stdlib.logging import sentry, stdout
@@ -47,6 +48,7 @@ class _GlobalSettings(Settings):
     env_name: str = pydantic.Field(default="local", hidden=True)
     log_level: str = "INFO"
     platform_name: str = pydantic.Field(default="Junction", hidden=True)
+    prometheus_port: int = 8080
     sentry_dsn: str = ""
     version: str = pydantic.Field(default="dev", hidden=True)
 
@@ -228,14 +230,19 @@ def _command(command: Command[_Settings]) -> Callable[[click.Context], None]:
             )
 
         if not inspect.iscoroutinefunction(command.callback):
+            web.start_http_server_in_thread(port=global_settings.prometheus_port)
             command.callback(application)
             return
 
-        asyncio.run(
-            cast(
-                Callable[[Application[_Settings]], Awaitable[None]],
-                command.callback,
-            )(application),
-        )
+        async def wrapper() -> None:
+            await asyncio.gather(
+                web.start_http_server(port=global_settings.prometheus_port),
+                cast(
+                    Callable[[Application[_Settings]], Awaitable[None]],
+                    command.callback,
+                )(application),
+            )
+
+        asyncio.run(wrapper())
 
     return decorator

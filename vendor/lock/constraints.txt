@@ -38,6 +38,8 @@
 //     "openapi-core==0.15.0a1",
 //     "orjson==3.7.5",
 //     "phonenumbers==8.12.50",
+//     "prometheus-async[aiohttp]==22.2.0",
+//     "prometheus-client==0.14.1",
 //     "protobuf==4.21.2",
 //     "pycountry==22.3.5",
 //     "pydantic[email]==1.9.1",
@@ -1673,13 +1675,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "1c92d2db1900b668201f1797887d66453ab1fbfea51df8e4b46236689c427baf",
-              "url": "https://files.pythonhosted.org/packages/aa/13/0063ea808b6a1bee57e0780d83bf0c57f0ed25a1b5ed3685524359c485fd/jsonschema-4.6.0-py3-none-any.whl"
+              "hash": "5eb781753403847fb320f05e9ab2191725b58c5e7f97f1bed63285ca423159bc",
+              "url": "https://files.pythonhosted.org/packages/41/67/6fc491d809a87a7bf08fa73907705d38f26ddcc4d50d9610f772276c3ce5/jsonschema-4.6.1-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "9d6397ba4a6c0bf0300736057f649e3e12ecbc07d3e81a0dacb72de4e9801957",
-              "url": "https://files.pythonhosted.org/packages/b5/a0/dd13abb5f371f980037d271fd09461df18c85188216008a1e3a9c3f8bd0c/jsonschema-4.6.0.tar.gz"
+              "hash": "ec2802e6a37517f09d47d9ba107947589ae1d25ff557b925d83a321fc2aa5d3b",
+              "url": "https://files.pythonhosted.org/packages/42/d9/bfc795bb02d0cee772f7b339c5aa6fdd8778e852951e62603556d6143fbc/jsonschema-4.6.1.tar.gz"
             }
           ],
           "project_name": "jsonschema",
@@ -1707,7 +1709,7 @@
             "webcolors>=1.11; extra == \"format-nongpl\""
           ],
           "requires_python": ">=3.7",
-          "version": "4.6"
+          "version": "4.6.1"
         },
         {
           "artifacts": [
@@ -2221,6 +2223,76 @@
           ],
           "requires_python": ">=3.6",
           "version": "1"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "5cbfa535561342b834c087c4f3f3be0a3cb8785a0b8748111c916f3d68bbc370",
+              "url": "https://files.pythonhosted.org/packages/65/34/0d20a85b07fe16ad3423b0f11d37a3345e6967cc7391825d8f3b87f0e704/prometheus_async-22.2.0-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "b0426370eb3b3bacd99afcf1fcc669c118cb67603cc951a6fe12434e9d4307f2",
+              "url": "https://files.pythonhosted.org/packages/12/1c/6e3a318f06e786b892a12196bfb5d873802dbabc2eedd7c5b8a88098d0f5/prometheus-async-22.2.0.tar.gz"
+            }
+          ],
+          "project_name": "prometheus-async",
+          "requires_dists": [
+            "aiohttp; extra == \"dev\"",
+            "aiohttp; extra == \"docs\"",
+            "aiohttp>=3; extra == \"aiohttp\"",
+            "aiohttp>=3; extra == \"consul\"",
+            "cogapp; extra == \"dev\"",
+            "coverage[toml]; extra == \"dev\"",
+            "coverage[toml]; extra == \"tests\"",
+            "furo; extra == \"dev\"",
+            "furo; extra == \"docs\"",
+            "mypy; extra == \"dev\"",
+            "myst-parser; extra == \"dev\"",
+            "myst-parser; extra == \"docs\"",
+            "pre-commit; extra == \"dev\"",
+            "prometheus_client>=0.8.0",
+            "pytest-asyncio; extra == \"dev\"",
+            "pytest-asyncio; extra == \"tests\"",
+            "pytest-twisted; extra == \"dev\"",
+            "pytest; extra == \"dev\"",
+            "pytest; extra == \"tests\"",
+            "sphinx-notfound-page; extra == \"dev\"",
+            "sphinx-notfound-page; extra == \"docs\"",
+            "sphinx; extra == \"dev\"",
+            "sphinx; extra == \"docs\"",
+            "sphinxcontrib-asyncio; extra == \"dev\"",
+            "sphinxcontrib-asyncio; extra == \"docs\"",
+            "tomli; extra == \"dev\"",
+            "twisted; extra == \"dev\"",
+            "twisted; extra == \"docs\"",
+            "twisted; extra == \"twisted\"",
+            "typing_extensions>=3.10.0; python_version < \"3.10\"",
+            "wrapt"
+          ],
+          "requires_python": ">=3.7",
+          "version": "22.2"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "522fded625282822a89e2773452f42df14b5a8e84a86433e3f8a189c1d54dc01",
+              "url": "https://files.pythonhosted.org/packages/19/e5/7d4b4b3b0d8d2fdc55395cdb4271c6dbfde3c3ff7d6a6dbe63d19c4e2288/prometheus_client-0.14.1-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "5459c427624961076277fdc6dc50540e2bacb98eebde99886e59ec55ed92093a",
+              "url": "https://files.pythonhosted.org/packages/98/71/2f16cce64055263146eff950affe7b1ab2ff78736ff0d2b5578bc0817e49/prometheus_client-0.14.1.tar.gz"
+            }
+          ],
+          "project_name": "prometheus-client",
+          "requires_dists": [
+            "twisted; extra == \"twisted\""
+          ],
+          "requires_python": ">=3.6",
+          "version": "0.14.1"
         },
         {
           "artifacts": [
@@ -3890,6 +3962,8 @@
     "openapi-core==0.15.0a1",
     "orjson==3.7.5",
     "phonenumbers==8.12.50",
+    "prometheus-async[aiohttp]==22.2.0",
+    "prometheus-client==0.14.1",
     "protobuf==4.21.2",
     "pycountry==22.3.5",
     "pydantic[email]==1.9.1",
