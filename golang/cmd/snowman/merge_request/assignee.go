@@ -67,50 +67,42 @@ func (mr *mergeRequest) expectedAssignees() ([]int, error) {
 			return []int{}, err
 		}
 
-		regulars := make([]int, 0)
+		approvers := make([]int, 0)
 		owners := make([]int, 0)
 
 		for _, rule := range state.Rules {
 			for _, u := range rule.ApprovedBy {
-				if rule.RuleType == "any_approver" {
-					regulars = append(regulars, u.ID)
-				} else {
+				approvers = append(approvers, u.ID)
+			}
+
+			if rule.RuleType == "code_owner" {
+				for _, u := range rule.EligibleApprovers {
 					owners = append(owners, u.ID)
 				}
 			}
 		}
 
-		newRegulars := make([]int, 0)
+		missingApprovers := make([]int, 0)
+		missingOwners := make([]int, 0)
 
-		for _, regular := range regulars {
-			if !common.In(owners, regular) {
-				newRegulars = append(newRegulars, regular)
+		for _, reviewer := range reviewers {
+			if common.In(approvers, reviewer) {
+				continue
+			}
+
+			if common.In(owners, reviewer) {
+				missingOwners = append(missingOwners, reviewer)
+			} else {
+				missingApprovers = append(missingApprovers, reviewer)
 			}
 		}
 
-		regulars = newRegulars
+		if len(missingApprovers) > 0 {
+			return missingApprovers, nil
+		}
 
-		for _, approvers := range [][]int{
-			regulars,
-			owners,
-		} {
-			approvers = common.Unique(approvers)
-			missing := make([]int, 0)
-
-		ReviewersLoop:
-			for _, r := range reviewers {
-				for _, a := range approvers {
-					if r == a {
-						continue ReviewersLoop
-					}
-				}
-
-				missing = append(missing, r)
-			}
-
-			if len(missing) > 0 {
-				return missing, nil
-			}
+		if len(missingOwners) > 0 {
+			return missingOwners, nil
 		}
 	}
 
