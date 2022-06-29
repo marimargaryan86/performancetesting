@@ -215,9 +215,9 @@ def generate_order(identifier: str) -> order_models_pb2.Order:
     )
 
 
-def get_passenger_name_records() -> list[  # noqa: WPS320
-    passenger_name_records_pb2.PassengerNameRecord
-]:
+def get_passenger_name_records() -> (
+    list[passenger_name_records_pb2.PassengerNameRecord]
+):
     return [
         generate_passenger_name_record(identifier)
         for identifier in PASSENGER_NAME_RECORDS

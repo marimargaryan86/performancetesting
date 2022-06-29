@@ -144,19 +144,19 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "9f47eda37229f68eee03b24b9748937c7dc3868f906e8ba69fbcbdd3bc5dc3e2",
-              "url": "https://files.pythonhosted.org/packages/44/98/5b86278fbbf250d239ae0ecb724f8572af1c91f4a11edf4d36a206189440/colorama-0.4.4-py2.py3-none-any.whl"
+              "hash": "854bf444933e37f5824ae7bfc1e98d5bce2ebe4160d46b5edf346a89358e99da",
+              "url": "https://files.pythonhosted.org/packages/77/8b/7550e87b2d308a1b711725dfaddc19c695f8c5fa413c640b2be01662f4e6/colorama-0.4.5-py2.py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "5941b2b48a20143d2267e95b1c2a7603ce057ee39fd88e7329b0c292aa16869b",
-              "url": "https://files.pythonhosted.org/packages/1f/bb/5d3246097ab77fa083a61bd8d3d527b7ae063c7d8e8671b1cf8c4ec10cbe/colorama-0.4.4.tar.gz"
+              "hash": "e6c6b4334fc50988a639d9b98aa429a0b57da6e17b9a44f0451f930b6967b7a4",
+              "url": "https://files.pythonhosted.org/packages/2b/65/24d033a9325ce42ccbfa3ca2d0866c7e89cc68e5b9d92ecaba9feef631df/colorama-0.4.5.tar.gz"
             }
           ],
           "project_name": "colorama",
           "requires_dists": [],
           "requires_python": "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7",
-          "version": "0.4.4"
+          "version": "0.4.5"
         },
         {
           "artifacts": [
@@ -304,13 +304,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "ec374101cddf65bd7a96d393847d74e58d3b98669dbf9768344c39b6290e8bd6",
-              "url": "https://files.pythonhosted.org/packages/1f/02/00eef219137474628d22c74204bff0e0776996af24a4e0ad63d2b8cf8d27/flake8_bugbear-22.4.25-py3-none-any.whl"
+              "hash": "ad2b33dbe33a6d4ca1f0037e1d156d0a89107ee63c0600e3b4f7b60e37998ac2",
+              "url": "https://files.pythonhosted.org/packages/5c/51/1f16a0ba6cbe3bab9e1e12a9bae0b94254fa0ec9b1a6ec853d767563dbdb/flake8_bugbear-22.6.22-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "f7c080563fca75ee6b205d06b181ecba22b802babb96b0b084cc7743d6908a55",
-              "url": "https://files.pythonhosted.org/packages/ed/e8/d85a3e669970fc32f96cb7e4b170e2c1255db5ee643be57b1f1c37eea373/flake8-bugbear-22.4.25.tar.gz"
+              "hash": "ac3317eba27d79dc19dcdeb7356ca1f656f0cde11d899c4551badf770f05cbef",
+              "url": "https://files.pythonhosted.org/packages/a5/c2/dbed1a47ddaffc4f0c8f80d40995a0cb15434b3d1563228ad6b1cc322108/flake8-bugbear-22.6.22.tar.gz"
             }
           ],
           "project_name": "flake8-bugbear",
@@ -323,7 +323,7 @@
             "pre-commit; extra == \"dev\""
           ],
           "requires_python": ">=3.6",
-          "version": "22.4.25"
+          "version": "22.6.22"
         },
         {
           "artifacts": [
@@ -536,13 +536,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "48acd5b35a098f7c0b6eb948d4797303695cc7735365c571b4eef7e65a712fa2",
-              "url": "https://files.pythonhosted.org/packages/3f/5f/c66e6057402047bbb6defa524a9e4fb76e4194e6ee26fad7b1fe68c3d760/flake8_noqa-1.2.2-py3-none-any.whl"
+              "hash": "66abe96d181629d02c13efb8ab8a7fc8cf669729e342eed39c115a93f04e958b",
+              "url": "https://files.pythonhosted.org/packages/43/b9/f9dc61a97574a9b8fd7a0d3fbe1ee967843846e151b95de5c7613eac1e98/flake8_noqa-1.2.5-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "02f6a10d0e59c0d50682a8c2799bf788dc7ae0eed27a4400ea66ea18ab42397c",
-              "url": "https://files.pythonhosted.org/packages/17/4c/5901ff774bbe818d04a3e5a94eb6c0165c46bbb7081c2151f0489072e89e/flake8-noqa-1.2.2.tar.gz"
+              "hash": "dff6a04d73711ce1947af657ad95b9878a20cafd2438c0cfd5b41cb0e2a97067",
+              "url": "https://files.pythonhosted.org/packages/80/19/410c81df0662a04f30ddbb2682bdeeb9d6c470e695ae96e7c13769303e3c/flake8-noqa-1.2.5.tar.gz"
             }
           ],
           "project_name": "flake8-noqa",
@@ -557,17 +557,19 @@
             "flake8-import-order; extra == \"dev\"",
             "flake8-literal; extra == \"dev\"",
             "flake8-polyfill; extra == \"dev\"",
+            "flake8-postponed-annotations; extra == \"dev\"",
             "flake8-tabs; extra == \"dev\"",
-            "flake8-type-annotations; extra == \"dev\"",
-            "flake8<4.0; extra == \"dev\"",
+            "flake8-typechecking-import; extra == \"dev\"",
+            "flake8; extra == \"dev\"",
             "flake8<5.0,>=3.8.0",
             "mypy; extra == \"dev\"",
             "pep8-naming; extra == \"dev\"",
+            "setuptools",
             "types-setuptools; extra == \"dev\"",
             "typing-extensions<5.0,>=3.7.4.2"
           ],
-          "requires_python": ">=3.6",
-          "version": "1.2.2"
+          "requires_python": ">=3.7",
+          "version": "1.2.5"
         },
         {
           "artifacts": [
@@ -1012,13 +1014,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "d1746e7fd520e83bbe210d02fff1aa1a425ad671c7a9da7d246ec2401a087198",
-              "url": "https://files.pythonhosted.org/packages/27/0b/cb81bc3a06a242c7626fca8aa9ce82453af3bc44e72a39666bb4052ac302/setuptools-62.3.3-py3-none-any.whl"
+              "hash": "c1848f654aea2e3526d17fc3ce6aeaa5e7e24e66e645b5be2171f3f6b4e5a178",
+              "url": "https://files.pythonhosted.org/packages/e9/86/b2ede1d87122a6d4da86d84cc35d0e48b4aa2476e4281d06101c772c1961/setuptools-62.6.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "e7d11f3db616cda0751372244c2ba798e8e56a28e096ec4529010b803485f3fe",
-              "url": "https://files.pythonhosted.org/packages/fb/50/005826d31d58a7b90585b5510f2f597c5406ae34df884f4f5d63abfb6ca7/setuptools-62.3.3.tar.gz"
+              "hash": "990a4f7861b31532871ab72331e755b5f14efbe52d336ea7f6118144dd478741",
+              "url": "https://files.pythonhosted.org/packages/dc/73/88920663229023b724a854d1ab7e3e50a1a28b63eeec399a604ba30f9242/setuptools-62.6.0.tar.gz"
             }
           ],
           "project_name": "setuptools",
@@ -1066,7 +1068,7 @@
             "wheel; extra == \"testing-integration\""
           ],
           "requires_python": ">=3.7",
-          "version": "62.3.3"
+          "version": "62.6"
         },
         {
           "artifacts": [

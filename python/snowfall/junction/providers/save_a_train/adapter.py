@@ -254,7 +254,6 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         self,
         offer_details: cache.OfferDetails,
     ) -> save_a_train_models.search_result_selection.SearchResultSelectionResponse:
-
         try:
             return await self._client.select_search_result(
                 save_a_train_models.request.SelectSearchResultRequest(

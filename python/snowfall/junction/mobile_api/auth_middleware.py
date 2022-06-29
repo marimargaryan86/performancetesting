@@ -38,7 +38,6 @@ class AuthenticationBackend(authentication.AuthenticationBackend):
         self,
         jwt_token: str,
     ) -> Optional[tuple[authentication.AuthCredentials, authentication.SimpleUser]]:
-
         if not jwt_token:
             return None
 

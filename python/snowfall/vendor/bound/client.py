@@ -17,7 +17,6 @@ def _is_valid_token(token: str) -> bool:
 
 def _auth_required(func: Any) -> Any:
     async def wrapper(self: Bound, *args: Any, **kwargs: Any) -> None:
-
         if not self._auth_cookies or _is_valid_token(self._auth_cookies["jwt"]):
             await self._authenticate()
 

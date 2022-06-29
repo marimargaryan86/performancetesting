@@ -29,7 +29,6 @@ class OrderRepository(
         passengers: Sequence[order_models_pb2.Passenger],
         contact_details: order_models_pb2.ContactDetails,
     ) -> order_models_pb2.Order:
-
         passenger_name_record = await self._passenger_name_records.create()
 
         order = order_models_pb2.Order(

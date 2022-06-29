@@ -8,7 +8,6 @@ from snowfall.stdlib.format.gtfs import constants, normalizers
 
 
 class Agency(pydantic.BaseModel):
-
     agency_id: Optional[str]
     agency_name: str
     agency_url: pydantic.HttpUrl
@@ -86,7 +85,6 @@ class FeedInfo(pydantic.BaseModel):
 
 
 class Route(pydantic.BaseModel):
-
     route_id: str
     agency_id: Optional[str]
     route_short_name: Optional[str]
@@ -104,7 +102,6 @@ class Route(pydantic.BaseModel):
 
 
 class Stop(pydantic.BaseModel):
-
     stop_id: str
     stop_code: Optional[str]
     stop_name: Optional[str]
@@ -160,7 +157,6 @@ class StopTime(pydantic.BaseModel):
 
 
 class Trip(pydantic.BaseModel):
-
     route_id: str
     service_id: str
     trip_id: str

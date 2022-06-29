@@ -37,7 +37,6 @@ async def test_empty_title_error_message(
     httpx_mock: pytest_httpx.HTTPXMock,
     ask2go_client: client.Ask2GoClient,
 ) -> None:
-
     status = http.HTTPStatus(http.HTTPStatus.BAD_REQUEST)
     expected_title = "{0}: {1}".format(status.value, status.description)
     httpx_mock.add_response(

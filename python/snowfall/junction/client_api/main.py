@@ -1,4 +1,3 @@
-# flake8: noqa: WPS201
 import base64
 import random
 from typing import Callable
@@ -121,10 +120,12 @@ def _serve(app: service.Application[bootstrap.Settings]) -> None:
         access_log=False,
         log_config=None,
         proxy_headers=True,
-        forwarded_allow_ips=[
-            "*" if str(address) == "0.0.0.0" else str(address)  # nosec
-            for address in app.settings.forwarded_allowed_ips
-        ],
+        forwarded_allow_ips=",".join(
+            [
+                "*" if str(address) == "0.0.0.0" else str(address)  # nosec
+                for address in app.settings.forwarded_allowed_ips
+            ],
+        ),
     )
 
 

@@ -1,5 +1,4 @@
 import http
-from collections.abc import AsyncIterable
 from typing import Any, Awaitable, Callable, Container, Mapping, Optional, cast
 
 import sentry_sdk
@@ -53,8 +52,19 @@ async def _resolve_streaming_response(
     )
 
 
-async def _read_bytes(generator: AsyncIterable[bytes]) -> bytes:
-    return b"".join([chunk async for chunk in generator])
+async def _read_bytes(generator: responses.AsyncContentStream) -> responses.Content:
+    list_ = [chunk async for chunk in generator]
+
+    if not list_:
+        return ""
+
+    if all(isinstance(list_item, bytes) for list_item in list_):
+        return b"".join(cast(list[bytes], list_))
+
+    if all(isinstance(list_item, str) for list_item in list_):
+        return "".join(cast(list[str], list_))
+
+    raise RuntimeError
 
 
 class RequestIdMiddleware(base.BaseHTTPMiddleware):

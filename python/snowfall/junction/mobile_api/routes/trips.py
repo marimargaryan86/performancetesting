@@ -54,7 +54,6 @@ class TripSearchesTrips(endpoints.HTTPEndpoint):
         request: requests.Request,
         trip_searches_repository: repository.TripSearchesRepository = lagom.injectable,
     ) -> responses.Response:
-
         trip_search_trips = await trip_searches_repository.get_trips(
             request.path_params["tripSearchId"],
         )

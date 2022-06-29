@@ -1,5 +1,5 @@
 [GLOBAL]
-pants_version = "2.11.1rc2"
+pants_version = "2.12.0rc3"
 backend_packages = [
     "pants.backend.codegen.protobuf.lint.buf",
     "pants.backend.codegen.protobuf.python",
@@ -31,7 +31,7 @@ extra_requirements = [
 ]
 
 [black]
-version = "black==22.3.0"
+version = "black==22.6.0"
 config = "vendor/pyproject.toml"
 lockfile = "vendor/lock/black.txt"
 interpreter_constraints = ["CPython==3.9.10"]
@@ -96,13 +96,13 @@ lockfile = "vendor/lock/mypy-protobuf.txt"
 interpreter_constraints = ["CPython==3.9.10"]
 
 [protoc]
-version = "3.20.1"
+version = "21.2"
 url_platform_mapping = { linux_arm64 = "linux-aarch_64", linux_x86_64 = "linux-x86_64", macos_arm64 = "osx-aarch_64", macos_x86_64 = "osx-x86_64" }
 known_versions = [
-    "3.20.1|linux_arm64 |8a5a51876259f934cd2acc2bc59dba0e9a51bd631a5c37a4b9081d6e4dbc7591|1804837",
-    "3.20.1|linux_x86_64|3a0e900f9556fbcac4c3a913a00d07680f0fdf6b990a341462d822247b265562|1714731",
-    "3.20.1|macos_arm64 |b362acae78542872bb6aac8dba73aaf0dc6e94991b8b0a065d6c3e703fec2a8b|2708249",
-    "3.20.1|macos_x86_64|b4f36b18202d54d343a66eebc9f8ae60809a2a96cc2d1b378137550bbe4cf33c|2708249",
+    "21.2|linux_arm64 |953beb8aade43f55a6f8e0aef5314236582c5cc2712d90a09221dd0bc35da71e|1578739",
+    "21.2|linux_x86_64|997dfc13189bd0af1051cbc026a095a520e171fbeb0e7460f959ae236b00aa2e|1583228",
+    "21.2|macos_arm64 |04d79d6c1da178d38867486a861bc878f5daaa084bd5697110abd27460d1112a|1357982",
+    "21.2|macos_x86_64|b791ee763faad751505680fa8d2935af37ba014184354df6db4268cb413bc6a1|1494401",
 ]
 
 [pytest]
@@ -135,4 +135,4 @@ root_patterns = [
 ]
 
 [test]
-xml_dir = "dist/test_results"
+report_dir = "dist/test_results"
