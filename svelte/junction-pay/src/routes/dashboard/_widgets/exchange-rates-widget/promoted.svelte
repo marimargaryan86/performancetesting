@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Button from "$lib/components/ui/button.svelte";
+  import Button from "$lib/components/button.svelte";
   import GraphIcon from "$lib/icons/graph-icon.svelte";
-  import type { Fluctuation } from "$models/pay-models";
   import utils from "$lib/utils";
+  import type { Fluctuation } from "$models/pay-models";
 
   let promoted_: Fluctuation;
   export { promoted_ as promoted };

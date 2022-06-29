@@ -1,37 +1,27 @@
 <script lang="ts">
+  import ordersData from "$content/orders";
+  import promotedRateData from "$content/promoted-rate";
+  import ratesData from "$content/rates";
   import type { Fluctuation, Order, Rate } from "$models/pay-models";
-  import Header from "./_components/header/header.svelte";
-  import MainMenu from "./_components/main-menu.svelte";
-  import BalancesWidget from "./_components/widgets/balances-widget.svelte";
-  import ExchangeRatesWidget from "./_components/widgets/exchange-rates-widget/exchange-rates-widget.svelte";
-  import OrdersWidget from "./_components/widgets/orders-widget.svelte";
-  import PaymentsWidget from "./_components/widgets/payments-widget/payments-widget.svelte";
+  import Layout from "../_layout.svelte";
+  import BalancesWidget from "./_widgets/balances-widget.svelte";
+  import ExchangeRatesWidget from "./_widgets/exchange-rates-widget/exchange-rates-widget.svelte";
+  import OrdersWidget from "./_widgets/orders-widget.svelte";
+  import PaymentsWidget from "./_widgets/payments-widget/payments-widget.svelte";
 
-  const orders: Order[] = [...Array(6)].map(() => ({
-    ref: "EH96JKL",
-    createdAt: new Date("2022-07-17"),
-    provider: "Detail here",
-    price: { amount: 160, code: "GBP" },
-    status: "Pending",
-  }));
-  const promoted: Fluctuation = { amount: 0.5, code: "EUR" };
-  const rates: Rate[] = [
-    { code: "GBP", live: -0.1234, yesterday: -0.1234, lastWeek: 1.1234 },
-    { code: "EUR", live: -0.1234, yesterday: -0.1234, lastWeek: 1.1234 },
-    { code: "SEK", live: -0.1234, yesterday: -0.1234, lastWeek: 1.1234 },
-  ];
+  const orders: Order[] = ordersData as Order[];
+  const promoted: Fluctuation = promotedRateData;
+  const rates: Rate[] = ratesData;
 </script>
 
 <svelte:head>
   <title>Junction | Dashboard</title>
 </svelte:head>
 
-<main>
-  <MainMenu />
+<Layout>
+  <h1 class="title" slot="head">My <b>Pay Dashboard</b></h1>
 
-  <section class="content">
-    <Header />
-
+  <div class="dashboard" slot="body">
     <div class="column-left">
       <BalancesWidget />
 
@@ -43,25 +33,27 @@
 
       <PaymentsWidget />
     </div>
-  </section>
-</main>
+  </div>
+</Layout>
 
 <style>
-  main {
-    display: grid;
-    grid-template-columns: 218px 1fr;
-    height: 100vh;
+  .title {
+    font-family: Raleway, Arial, Helvetica, sans-serif;
+    font-size: 25px;
+    font-weight: 300;
   }
 
-  .content {
-    background-color: var(--color-light-background);
+  .title > b {
+    font-weight: 500;
+  }
+
+  .dashboard {
     display: grid;
-    gap: 0 20px;
+    gap: 20px;
     grid-template-columns: 1fr 467px;
-    grid-template-rows: 113px 1fr;
   }
 
-  .content > :global(header) {
+  .dashboard > :global(header) {
     grid-column: 1 / -1;
   }
 

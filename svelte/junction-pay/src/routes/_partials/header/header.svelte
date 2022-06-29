@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Button from "$lib/components/ui/button.svelte";
+  import Button from "$lib/components/button.svelte";
   import AccountIcon from "$lib/icons/account-icon.svelte";
   import NotificationIcon from "$lib/icons/notification-icon.svelte";
   import DashboardSelect from "./dashboard-select.svelte";
@@ -8,7 +8,7 @@
 </script>
 
 <header>
-  <h1>My <b>Pay Dashboard</b></h1>
+  <slot />
 
   <div class="menu">
     <DashboardSelect bind:value={dashboard} />
@@ -27,18 +27,9 @@
   header {
     align-items: center;
     display: flex;
+    height: 113px;
     justify-content: space-between;
     padding: 0 49px;
-  }
-
-  h1 {
-    font-family: Raleway, Arial, Helvetica, sans-serif;
-    font-size: 25px;
-    font-weight: 300;
-  }
-
-  h1 > b {
-    font-weight: 500;
   }
 
   .menu {

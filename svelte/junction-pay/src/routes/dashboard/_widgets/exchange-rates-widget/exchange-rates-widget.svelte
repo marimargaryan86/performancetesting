@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Button from "$lib/components/ui/button.svelte";
+  import Button from "$lib/components/button.svelte";
   import routeConfig from "$lib/route-config";
   import type { Fluctuation, Rate } from "$models/pay-models";
   import WidgetHeader from "../widget-header.svelte";
@@ -85,7 +85,7 @@
   }
 
   th {
-    padding-top: 23px;
+    padding-top: 16px;
   }
 
   th:first-child,

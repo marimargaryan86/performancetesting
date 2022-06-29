@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import activeLink from "$lib/actions/active-link";
   import CategoryIcon from "$lib/icons/category-icon.svelte";
   import JunctionLogo from "$lib/images/junction-logo.svelte";
   import routeConfig from "$lib/route-config";
@@ -18,15 +19,21 @@
   <JunctionLogo />
 
   <nav>
-    <a href={routeConfig.dashboard} class="filled-link"><CategoryIcon /> My Dashboard</a>
-    <a href={routeConfig.orders} class="dotted-link">My orders</a>
-    <a href={routeConfig.pay} class="dotted-link">Pay</a>
-    <a href={routeConfig.exchangeRates} class="dotted-link">FX Rates</a>
-    <a href={routeConfig.balances} class="dotted-link">Balances</a>
+    <a href={routeConfig.dashboard} use:activeLink={{ exact: false }}>
+      <CategoryIcon /> My Dashboard
+    </a>
+    <a href={routeConfig.orders} class="dotted-link" use:activeLink={{ exact: false }}>My orders</a>
+    <a href={routeConfig.pay} class="dotted-link" use:activeLink={{ exact: false }}>Pay</a>
+    <a href={routeConfig.exchangeRates} class="dotted-link" use:activeLink={{ exact: false }}>
+      FX Rates
+    </a>
+    <a href={routeConfig.balances.root} class="dotted-link" use:activeLink={{ exact: false }}>
+      Balances
+    </a>
   </nav>
 
   <nav class="secondary">
-    <a href={routeConfig.support} class="dotted-link">Support</a>
+    <a href={routeConfig.support} class="dotted-link" use:activeLink={{ exact: false }}>Support</a>
     <a href={routeConfig.login} class="dotted-link" on:click|preventDefault={logout}>Log out</a>
   </nav>
 </section>
@@ -39,12 +46,20 @@
     padding: 34px 12px 25px;
   }
 
+  a > :global(svg),
+  a::before {
+    margin-right: 12px;
+    width: 20px;
+  }
+
   .main-menu > :global(svg) {
     margin: 0 auto 36px;
   }
 
-  nav > a {
+  a {
     align-items: center;
+    border-radius: 10px;
+    color: var(--color-gray-light);
     display: flex;
     font-size: 16px;
     font-weight: 500;
@@ -54,19 +69,21 @@
     width: 100%;
   }
 
-  nav > a:not(:last-child) {
+  a:not(:last-child) {
     margin-bottom: 14px;
   }
 
-  .filled-link {
+  nav > :global(a.active) {
     background-color: var(--color-orange-lightest);
-    border-radius: 10px;
     color: var(--color-orange);
-    font-weight: 700;
   }
 
-  .dotted-link {
-    color: var(--color-gray-light);
+  nav > :global(a.active > svg) {
+    fill: var(--color-orange);
+  }
+
+  nav > :global(.dotted-link.active::before) {
+    background-color: var(--color-orange);
   }
 
   .dotted-link::before {
@@ -75,11 +92,5 @@
     content: "";
     display: block;
     height: 20px;
-  }
-
-  .filled-link > :global(svg),
-  .dotted-link::before {
-    margin-right: 12px;
-    width: 20px;
   }
 </style>

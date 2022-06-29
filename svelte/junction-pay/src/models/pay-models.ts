@@ -1,6 +1,7 @@
 export type Balance = {
   amount: number;
   code: string;
+  name?: string;
 };
 
 export type Fluctuation = Balance;

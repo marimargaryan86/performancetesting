@@ -2,8 +2,9 @@
   type Type = $$Generic<"email" | "text" | "password" | "number">;
   type Value = Type extends "number" ? number : string;
 
+  export let readOnly = false;
   export let id: string | undefined = undefined;
-  export let value: Value | undefined = undefined;
+  export let value: Value | undefined = "" as Value;
   export let type: Type = (typeof value === "number" ? "number" : "text") as Type;
   export let placeholder: string | undefined = undefined;
   export let error = false;
@@ -13,7 +14,17 @@
   }
 </script>
 
-<input {type} {value} {placeholder} {id} class="text-field" class:error on:input={input} />
+<input
+  on:click
+  {type}
+  {value}
+  {placeholder}
+  {id}
+  class="text-field"
+  class:error
+  on:input={input}
+  readonly={readOnly}
+/>
 
 <style>
   input {

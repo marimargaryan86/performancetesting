@@ -1,9 +1,9 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import Button from "$lib/components/button.svelte";
   import Spinner from "$lib/components/spinner.svelte";
-  import Button from "$lib/components/ui/button.svelte";
-  import Switch from "$lib/components/ui/switch.svelte";
-  import TextField from "$lib/components/ui/text-field.svelte";
+  import Switch from "$lib/components/switch.svelte";
+  import TextField from "$lib/components/text-field.svelte";
   import routeConfig from "$lib/route-config";
   import serviceInstances from "$services/instances";
   import { scale } from "svelte/transition";

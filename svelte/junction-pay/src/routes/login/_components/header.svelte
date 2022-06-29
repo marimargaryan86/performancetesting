@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Button from "$lib/components/ui/button.svelte";
+  import Button from "$lib/components/button.svelte";
   import JunctionLogo from "$lib/images/junction-logo.svelte";
 </script>
 

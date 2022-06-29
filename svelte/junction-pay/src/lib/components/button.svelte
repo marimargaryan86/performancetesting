@@ -5,7 +5,7 @@
   export { className as class };
 </script>
 
-<button {type} class:empty={variant === "empty"} class={className}>
+<button {type} class:empty={variant === "empty"} class={className} on:click>
   <slot />
 </button>
 
