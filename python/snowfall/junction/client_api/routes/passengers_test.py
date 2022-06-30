@@ -1,13 +1,13 @@
 from starlette import testclient
 
-from snowfall.junction.client_api.routes import conftest
 from snowfall.junction.orders.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.integration.starlette.routes import testing
 
 
 class TestPassengers(object):
     def test_passenger_genders_are_found(self, client: testclient.TestClient) -> None:
-        conftest.test_list_and_view_endpoints(
+        testing.test_list_and_view_endpoints(
             client=client,
             url="/passengers/genders",
             expected_ids=[
@@ -20,7 +20,7 @@ class TestPassengers(object):
         )
 
     def test_passenger_titles_are_found(self, client: testclient.TestClient) -> None:
-        conftest.test_list_and_view_endpoints(
+        testing.test_list_and_view_endpoints(
             client=client,
             url="/passengers/titles",
             expected_ids=[

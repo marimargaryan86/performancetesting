@@ -99,6 +99,7 @@ def generate_place(identifier: str) -> models_pb2.Place:
         ),
         country_code="",
         time_zone="Europe/Stockholm",
+        types=[models_pb2.Place.TYPE_UNSPECIFIED],
     )
 
 

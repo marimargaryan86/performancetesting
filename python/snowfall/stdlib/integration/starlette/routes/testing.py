@@ -4,6 +4,8 @@ from starlette import status, testclient
 
 from snowfall import fixtures
 
+_DATA_KEY = "data"
+
 
 def test_list_and_view_endpoints(
     client: testclient.TestClient,
@@ -20,12 +22,12 @@ def test_list_and_view_endpoints(
 
         body = response.json()
 
-        assert isinstance(body["data"], list)
+        assert isinstance(body[_DATA_KEY], list)
 
-        if not body["data"]:
+        if not body[_DATA_KEY]:
             break
 
-        resources = [*resources, *body["data"]]
+        resources = [*resources, *body[_DATA_KEY]]
         url = body["links"]["next"]
 
     assert set(expected_ids) == {resource["id"] for resource in resources}
@@ -47,7 +49,7 @@ def _test_view_endpoint(
 
         body = response.json()
 
-        assert body["data"] == resource
+        assert body[_DATA_KEY] == resource
 
     if not current_link:
         return

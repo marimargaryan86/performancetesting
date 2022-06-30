@@ -3,7 +3,7 @@ import rapidjson
 from starlette import status, testclient
 
 from snowfall import fixtures
-from snowfall.junction.client_api.routes import conftest
+from snowfall.stdlib.integration.starlette.routes import testing
 
 
 @pytest.mark.asyncio
@@ -39,7 +39,7 @@ class TestOfferGroups(object):
         assert response.status_code == status.HTTP_200_OK
 
     async def test_offer_groups_by_offer(self, client: testclient.TestClient) -> None:
-        conftest.test_list_and_view_endpoints(
+        testing.test_list_and_view_endpoints(
             client=client,
             url="/offers/{id}/groups".format(id=fixtures.OFFERS[0]),
             expected_ids=fixtures.OFFER_GROUPS,
@@ -67,7 +67,7 @@ class TestOfferGroupDetails(object):
         self,
         client: testclient.TestClient,
     ) -> None:
-        conftest.test_list_and_view_endpoints(
+        testing.test_list_and_view_endpoints(
             client=client,
             url="/offers/groups/{id}/details".format(id=fixtures.OFFER_GROUPS[0]),
             expected_ids=fixtures.OFFER_GROUP_DETAILS,
@@ -95,7 +95,7 @@ class TestOfferOptions(object):
         self,
         client: testclient.TestClient,
     ) -> None:
-        conftest.test_list_and_view_endpoints(
+        testing.test_list_and_view_endpoints(
             client=client,
             url="/offers/groups/{id}/options".format(id=fixtures.OFFER_GROUPS[0]),
             expected_ids=fixtures.PROVIDER_OFFERS,
@@ -123,7 +123,7 @@ class TestOfferOptionDetails(object):
         self,
         client: testclient.TestClient,
     ) -> None:
-        conftest.test_list_and_view_endpoints(
+        testing.test_list_and_view_endpoints(
             client=client,
             url="/offers/options/{id}/details".format(id=fixtures.PROVIDER_OFFERS[0]),
             expected_ids=fixtures.OFFER_DETAILS,

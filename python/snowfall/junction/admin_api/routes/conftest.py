@@ -4,19 +4,23 @@ import pytest
 from starlette import applications, testclient
 from starlette.middleware import Middleware
 
+from snowfall.adapter import places
 from snowfall.junction.admin_api import bootstrap, router
 from snowfall.stdlib.integration.starlette import application
 from snowfall.stdlib.persistence import filesystem
 
 
 def _create_app(
+    places_client: places.Client,
     openapi_specification: Mapping[str, Any],
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
     return application.create_starlette_app(
         routes_factory=router.get_routes,
         custom_middlewares=custom_middlewares,
-        dependencies=bootstrap.create_dependencies(),
+        dependencies=bootstrap.create_dependencies(
+            places_client=places_client,
+        ),
         openapi_specification=openapi_specification,
     )
 
@@ -30,8 +34,11 @@ def headers() -> dict[str, str]:
 
 
 @pytest.fixture()
-def app() -> applications.Starlette:
+def app(
+    places_client: places.Client,
+) -> applications.Starlette:
     return _create_app(
+        places_client=places_client,
         custom_middlewares=[],
         openapi_specification=filesystem.PkgLoader("admin_api").load("openapi.json"),
     )

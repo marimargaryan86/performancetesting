@@ -2,8 +2,8 @@ from starlette import status, testclient
 
 from snowfall import fixtures
 from snowfall.common.v1alpha import models_pb2
-from snowfall.junction.client_api.routes import conftest
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.integration.starlette.routes import testing
 
 
 class TestLegs(object):
@@ -24,7 +24,7 @@ class TestLegs(object):
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_leg_types(self, client: testclient.TestClient) -> None:
-        conftest.test_list_and_view_endpoints(
+        testing.test_list_and_view_endpoints(
             client=client,
             url="/legs/types",
             expected_ids=[

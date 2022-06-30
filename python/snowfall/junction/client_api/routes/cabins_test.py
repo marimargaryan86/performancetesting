@@ -1,13 +1,13 @@
 from starlette import testclient
 
 from snowfall.common.v1alpha import models_pb2
-from snowfall.junction.client_api.routes import conftest
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.integration.starlette.routes import testing
 
 
 class TestCabins(object):
     def test_cabin_classes_are_found(self, client: testclient.TestClient) -> None:
-        conftest.test_list_and_view_endpoints(
+        testing.test_list_and_view_endpoints(
             client=client,
             url="/cabin-classes",
             expected_ids=[
