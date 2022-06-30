@@ -1,4 +1,5 @@
-from typing import Any, Mapping
+import pathlib
+from typing import Any
 
 import openapi_core
 import rapidjson
@@ -55,20 +56,27 @@ class UriFormatter(object):
 
 
 class Validator(object):
-    def __init__(self, spec_dict: Mapping[str, Any]):
-        spec = openapi_core.OpenAPISpec.create(spec_dict)
-        deserializer = {"application/vnd.api+json": rapidjson.loads}
-        formatter = {"uri": UriFormatter()}
-        self._request_validator = RequestValidator(
-            spec,
-            custom_formatters=formatter,
-            custom_media_type_deserializers=deserializer,
-        )
-        self._response_validator = ResponseValidator(
-            spec,
-            custom_formatters=formatter,
-            custom_media_type_deserializers=deserializer,
-        )
+    def __init__(
+        self,
+        spec_path: pathlib.Path,
+    ):
+        with open(str(spec_path)) as spec_file:
+            spec = openapi_core.OpenAPISpec.create(
+                rapidjson.load(spec_file),
+                url="file://{0}".format(str(spec_path)),
+            )
+            deserializer = {"application/vnd.api+json": rapidjson.loads}
+            formatter = {"uri": UriFormatter()}
+            self._request_validator = RequestValidator(
+                spec,
+                custom_formatters=formatter,
+                custom_media_type_deserializers=deserializer,
+            )
+            self._response_validator = ResponseValidator(
+                spec,
+                custom_formatters=formatter,
+                custom_media_type_deserializers=deserializer,
+            )
 
     async def validate_request(
         self,

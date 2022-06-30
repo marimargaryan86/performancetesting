@@ -3,6 +3,9 @@ import hashlib
 import pathlib
 import pkgutil
 import zipfile
+from importlib import _bootstrap, util  # type: ignore[attr-defined] # noqa: WPS450
+from os import path
+from sys import modules
 from typing import Any
 
 import aiofiles
@@ -44,6 +47,28 @@ class PkgLoader(Loader):
             )
 
         return rapidjson.loads(file_content)
+
+
+def resource_path(package: str, resource: str) -> pathlib.Path:
+    """Based on pkgutil.get_data()."""
+    spec = util.find_spec(package)
+
+    if spec is None:
+        raise RuntimeError()
+
+    mod = modules.get(package) or _bootstrap._load(spec)  # noqa: WPS437
+
+    if mod is None:
+        raise RuntimeError()
+
+    parts = resource.split("/")
+
+    try:
+        parts.insert(0, path.dirname(str(mod.__file__)))
+    except AttributeError as err:
+        raise RuntimeError() from err
+
+    return pathlib.Path(path.join(*parts))
 
 
 async def hash_file(filepath: pathlib.Path, chunk_size: int = 1024) -> str:

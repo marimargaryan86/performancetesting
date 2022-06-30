@@ -1,4 +1,5 @@
-from typing import Any, Mapping, Optional, Sequence
+import pathlib
+from typing import Mapping, Optional, Sequence
 
 import pytest
 from lagom.integrations import starlette
@@ -32,13 +33,13 @@ def trips_repository() -> repository.TripsRepository:
 
 def _create_app(
     dependencies: starlette.StarletteIntegration,
-    openapi_specification: Mapping[str, Any],
+    openapi_path: pathlib.Path,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
     return application.create_starlette_app(
         dependencies=dependencies,
         custom_middlewares=custom_middlewares,
-        openapi_specification=openapi_specification,
+        openapi_path=openapi_path,
         routes_factory=router.get_routes,
     )
 
@@ -145,7 +146,7 @@ def app(  # noqa: WPS211
             stripe_users_repository,
             payment_intent_repository,
         ),
-        openapi_specification=filesystem.PkgLoader("mobile_api").load("openapi.json"),
+        openapi_path=filesystem.resource_path("mobile_api", "openapi.json"),
     )
 
 

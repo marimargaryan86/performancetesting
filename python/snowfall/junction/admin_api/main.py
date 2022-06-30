@@ -17,7 +17,6 @@ def _factory(
     app: service.Application[bootstrap.Settings],
 ) -> Callable[[], ASGIApplication]:
     def decorator() -> ASGIApplication:
-        openapi_spec = filesystem.PkgLoader("admin_api").load("openapi.json")
         places_channel = create_channel(
             random.choice(app.settings.places_address),  # nosec
         )
@@ -29,7 +28,7 @@ def _factory(
                     places_pb2_grpc.PlacesServiceStub(places_channel),
                 ),
             ),
-            openapi_specification=openapi_spec,
+            openapi_path=filesystem.resource_path("admin_api", "openapi.json"),
         )
 
     return decorator

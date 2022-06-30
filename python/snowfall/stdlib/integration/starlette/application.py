@@ -1,5 +1,6 @@
 import http
-from typing import Any, Callable, Mapping, Optional, Sequence, cast
+import pathlib
+from typing import Callable, Optional, Sequence, cast
 
 from asgiref.typing import ASGIApplication
 from lagom.integrations import starlette
@@ -15,7 +16,7 @@ RoutesFactory = Callable[[starlette.StarletteIntegration], list[routing.Route]]
 def create_asgi_app(
     dependencies: starlette.StarletteIntegration,
     routes_factory: RoutesFactory,
-    openapi_specification: Mapping[str, Any],
+    openapi_path: pathlib.Path,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> ASGIApplication:
     return cast(
@@ -25,7 +26,7 @@ def create_asgi_app(
                 custom_middlewares=custom_middlewares,
                 dependencies=dependencies,
                 routes_factory=routes_factory,
-                openapi_specification=openapi_specification,
+                openapi_path=openapi_path,
             ),
         ),
     )
@@ -34,7 +35,7 @@ def create_asgi_app(
 def create_starlette_app(
     dependencies: starlette.StarletteIntegration,
     routes_factory: RoutesFactory,
-    openapi_specification: Mapping[str, Any],
+    openapi_path: pathlib.Path,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
     return applications.Starlette(
@@ -45,7 +46,7 @@ def create_starlette_app(
             ),
             Middleware(
                 middlewares.ValidationMiddleware,
-                validator=validation.Validator(openapi_specification),
+                validator=validation.Validator(openapi_path),
                 excluded_status_codes={http.HTTPStatus.METHOD_NOT_ALLOWED},
             ),
             *(custom_middlewares or []),

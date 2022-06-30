@@ -1,4 +1,5 @@
-from typing import Any, Mapping, Optional, Sequence
+import pathlib
+from typing import Mapping, Optional, Sequence
 
 import pytest
 from starlette import applications, testclient
@@ -12,7 +13,7 @@ from snowfall.stdlib.persistence import filesystem
 
 def _create_app(
     places_client: places.Client,
-    openapi_specification: Mapping[str, Any],
+    openapi_path: pathlib.Path,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
     return application.create_starlette_app(
@@ -21,7 +22,7 @@ def _create_app(
         dependencies=bootstrap.create_dependencies(
             places_client=places_client,
         ),
-        openapi_specification=openapi_specification,
+        openapi_path=openapi_path,
     )
 
 
@@ -40,7 +41,7 @@ def app(
     return _create_app(
         places_client=places_client,
         custom_middlewares=[],
-        openapi_specification=filesystem.PkgLoader("admin_api").load("openapi.json"),
+        openapi_path=filesystem.resource_path("admin_api", "openapi.json"),
     )
 
 

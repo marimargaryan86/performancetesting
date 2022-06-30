@@ -104,9 +104,7 @@ def _factory(
                     on_error=handlers.auth_error_handler,
                 ),
             ],
-            openapi_specification=filesystem.PkgLoader("mobile_api").load(
-                "openapi.json",
-            ),
+            openapi_path=filesystem.resource_path("mobile_api", "openapi.json"),
         )
 
     return decorator

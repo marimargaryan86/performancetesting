@@ -1,5 +1,6 @@
+import pathlib
 from base64 import b64decode, b64encode
-from typing import Any, AsyncIterator, Mapping, Optional, Sequence
+from typing import Mapping, Optional, Sequence
 
 import jwt as jwtlib
 import pytest
@@ -55,7 +56,7 @@ def _create_app(  # noqa: WPS211
     offer_searches_client: offer_searches.Client,
     segments_client: segments.Client,
     schedules_client: schedules.Client,
-    openapi_specification: Mapping[str, Any],
+    openapi_path: pathlib.Path,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
     return application.create_starlette_app(
@@ -72,7 +73,7 @@ def _create_app(  # noqa: WPS211
             segments_client=segments_client,
             schedules_client=schedules_client,
         ),
-        openapi_specification=openapi_specification,
+        openapi_path=openapi_path,
     )
 
 
@@ -116,7 +117,7 @@ def app(  # noqa: WPS211
         offer_searches_client=offer_searches_client,
         segments_client=segments_client,
         schedules_client=schedules_client,
-        openapi_specification=filesystem.PkgLoader("client_api").load("openapi.json"),
+        openapi_path=filesystem.resource_path("client_api", "openapi.json"),
     )
 
 
@@ -138,47 +139,3 @@ def unauthorized_client(
     client.headers.pop("Authorization")
 
     return client
-
-
-@pytest.fixture()
-def test_app(  # noqa: WPS211
-    legs_client: legs.Client,
-    places_client: places.Client,
-    trip_searches_client: trip_searches.Client,
-    trips_client: trips.Client,
-    orders_client: orders.Client,
-    offers_client: offers.Client,
-    offer_searches_client: offer_searches.Client,
-    segments_client: segments.Client,
-    schedules_client: schedules.Client,
-) -> applications.Starlette:
-    return _create_app(
-        legs_client=legs_client,
-        places_client=places_client,
-        trip_searches_client=trip_searches_client,
-        trips_client=trips_client,
-        orders_client=orders_client,
-        offers_client=offers_client,
-        offer_searches_client=offer_searches_client,
-        segments_client=segments_client,
-        schedules_client=schedules_client,
-        openapi_specification=filesystem.FileLoader().load(
-            "python/snowfall/junction/client_api/fixtures/test.json",
-        ),
-    )
-
-
-@pytest.fixture()
-async def test_client(
-    test_app: applications.Starlette,
-) -> AsyncIterator[testclient.TestClient]:
-    with testclient.TestClient(test_app, raise_server_exceptions=False) as client:
-        yield client
-
-
-@pytest.fixture()
-async def test_error_client(
-    test_app: applications.Starlette,
-) -> AsyncIterator[testclient.TestClient]:
-    with testclient.TestClient(test_app) as client:
-        yield client
