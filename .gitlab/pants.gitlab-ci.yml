@@ -68,6 +68,7 @@ pants:package:
   services:
     - name: docker:dind
       alias: dockerdaemon
+  resource_group: package # needed due to Docker images disappearing :(
   artifacts:
     paths:
       - dist/
