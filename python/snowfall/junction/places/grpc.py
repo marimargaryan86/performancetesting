@@ -2,6 +2,7 @@ import uuid
 
 from grpc import StatusCode, aio
 
+from snowfall.common.v1alpha import models_pb2
 from snowfall.junction.places.places import CuratedPlaceRepository, PlaceRepository
 from snowfall.junction.places.v1alpha import places_pb2, places_pb2_grpc
 from snowfall.stdlib.transport.grpc import service
@@ -28,6 +29,9 @@ class PlacesService(service.Service, places_pb2_grpc.PlacesServiceServicer):
         if not place:
             await context.abort(StatusCode.NOT_FOUND)
 
+        if place and not place.types:  # @todo: not needed with NoReturn above.
+            place.types.append(models_pb2.Place.TYPE_UNSPECIFIED)
+
         return places_pb2.GetPlaceResponse(place=place)
 
     async def ListPlaces(  # type: ignore[override] # noqa: N802
@@ -43,8 +47,16 @@ class PlacesService(service.Service, places_pb2_grpc.PlacesServiceServicer):
             else self._default_page_size,
         )
 
+        places = []
+
+        async for place in places_result:
+            if not place.types:
+                place.types.append(models_pb2.Place.TYPE_UNSPECIFIED)
+
+            places.append(place)
+
         return places_pb2.ListPlacesResponse(
-            places=[place async for place in places_result],
+            places=places,
             next_page_token=await places_result.cursor(),
         )
 
