@@ -1,0 +1,22 @@
+rules:
+  date-time-names:
+    severity: error
+    message: "Invalid property name: {{property}}. date-times should end in 'At'"
+    given: $..attributes..properties[?(@.format=="date-time")]~
+    then:
+      function: pattern
+      functionOptions:
+        match: "^.*(At|After|Before)$"
+  date-time-format:
+    severity: error
+    message: "Invalid format: {{value}} (expected: date-time)"
+    given: $..attributes..properties[?(@property.match(/(At|After|Before)$/))]
+    then:
+      - field: format
+        function: defined
+      - field: format
+        function: enumeration
+        functionOptions:
+          values:
+            - date-time
+

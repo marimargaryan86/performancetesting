@@ -17,3 +17,25 @@ overrides:
       - "mobile_api/openapi.json#/paths/~1trips~1searches~1{tripSearchId}~1trips"
     rules:
       ensure-pagination: info
+  - files:
+      - "mobile_api/openapi.json#/components/schemas/SegmentIdentifier/properties"
+      - "mobile_api/openapi.json#/components/schemas/Trip"
+      - "mobile_api/openapi.json#/components/schemas/Order"
+      - "mobile_api/openapi.json#/components/schemas/OfferAggregate"
+      - "mobile_api/openapi.json#/components/schemas/OfferGroup/properties"
+      - "mobile_api/openapi.json#/components/schemas/OfferGroupNew/properties"
+      - "mobile_api/openapi.json#/components/schemas/OfferDetails/properties"
+      - "mobile_api/openapi.json#/components/schemas/OfferOption/properties"
+      - "mobile_api/openapi.json#/components/schemas/TripOfferOptionDetails/properties"
+    rules:
+      json-api-no-nested-id: info
+      json-api-no-type: info
+  - files:
+      - "mobile_api/openapi.json#/components/schemas/SegmentIdentifier/properties"
+      - "mobile_api/openapi.json#/components/schemas/Trip"
+      - "mobile_api/openapi.json#/components/schemas/Order"
+      - "mobile_api/openapi.json#/components/schemas/OfferAggregate"
+      - "mobile_api/openapi.json#/components/schemas/OfferGroupNew/properties"
+      - "mobile_api/openapi.json#/components/schemas/OfferOption/properties"
+    rules:
+      json-api-no-nested-data: info

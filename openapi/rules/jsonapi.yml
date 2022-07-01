@@ -8,10 +8,17 @@ rules:
         function: undefined
   json-api-no-type:
     description: Field named `type` is not allowed in `attributes`.
-    given: $..attributes.properties
+    given: $..attributes..properties
     severity: error
     then:
       - field: "type"
+        function: undefined
+  json-api-no-nested-id:
+    description: Field named `id` is not allowed in `attributes`.
+    given: $..attributes..properties
+    severity: error
+    then:
+      - field: "id"
         function: undefined
   json-api-no-nested-relationships:
     description: Field named `relationships` is not allowed in `attributes`.
@@ -19,6 +26,20 @@ rules:
     severity: error
     then:
       - field: "relationships"
+        function: undefined
+  json-api-no-nested-links:
+    description: Field named `links` is not allowed in `attributes`.
+    given: $..attributes..properties
+    severity: error
+    then:
+      - field: "links"
+        function: undefined
+  json-api-no-nested-data:
+    description: Field named `data` is not allowed in `attributes`.
+    given: $..attributes..properties
+    severity: error
+    then:
+      - field: "data"
         function: undefined
   json-api-no-relationships-type:
     description: Field named `type` is not allowed in `relationships`.
