@@ -77,9 +77,7 @@ class OrderService(
         orders_result = await self._orders.find(request.page_token)
 
         orders_result.limit(
-            request.page_size
-            if request.page_size is not None
-            else self._default_page_size,
+            request.page_size if request.page_size else self._default_page_size,
         )
 
         return orders_pb2.ListOrdersResponse(

@@ -46,9 +46,7 @@ class TripService(service.Service, trips_pb2_grpc.TripServiceServicer):
         )
 
         trips_result.limit(
-            request.page_size
-            if request.page_size is not None
-            else self._default_page_size,
+            request.page_size if request.page_size else self._default_page_size,
         )
 
         return trips_pb2.ListTripsResponse(

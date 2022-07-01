@@ -45,9 +45,7 @@ class ScheduleService(service.Service, schedules_pb2_grpc.ScheduleServiceService
         )
 
         schedules_result.limit(
-            request.page_size
-            if request.page_size is not None
-            else self._default_page_size,
+            request.page_size if request.page_size else self._default_page_size,
         )
 
         return schedules_pb2.ListSchedulesResponse(
@@ -78,9 +76,7 @@ class ScheduleService(service.Service, schedules_pb2_grpc.ScheduleServiceService
         )
 
         legs_result.limit(
-            request.page_size
-            if request.page_size is not None
-            else self._default_page_size,
+            request.page_size if request.page_size else self._default_page_size,
         )
 
         return schedules_pb2.ListLegsResponse(

@@ -50,7 +50,7 @@ message GetTripSearchDetailsResponse {
 }
 
 message ListTripsRequest {
-  optional int32 page_size = 1;
+  int32 page_size = 1;
   string page_token = 2;
   repeated string ids = 3;
 }

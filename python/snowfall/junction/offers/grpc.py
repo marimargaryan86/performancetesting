@@ -110,9 +110,7 @@ class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):  # noqa
             )
 
         offer_aggregates.limit(
-            request.page_size
-            if request.page_size is not None
-            else self._default_page_size,
+            request.page_size if request.page_size else self._default_page_size,
         )
 
         offer_list = []

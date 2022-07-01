@@ -47,7 +47,7 @@ message GetOfferResponse {
 }
 
 message ListOffersRequest {
-  optional int32 page_size = 1;
+  int32 page_size = 1;
   string page_token = 2;
   oneof payload {
     string offer_search_id = 3;
@@ -73,7 +73,7 @@ message GetOfferGroupResponse {
 }
 
 message ListOfferGroupsRequest {
-  optional int32 page_size = 1;
+  int32 page_size = 1;
   string page_token = 2;
   oneof payload {
     ListOfIds offer_group_ids = 3;
@@ -94,7 +94,7 @@ message GetOfferGroupDetailsResponse {
 }
 
 message ListOfferGroupDetailsRequest {
-  optional int32 page_size = 1;
+  int32 page_size = 1;
   string page_token = 2;
   oneof payload {
     ListOfIds offer_group_details_ids = 3;
@@ -115,7 +115,7 @@ message GetOfferOptionResponse {
 }
 
 message ListOfferOptionsRequest {
-  optional int32 page_size = 1;
+  int32 page_size = 1;
   string page_token = 2;
   oneof payload {
     ListOfIds offer_option_ids = 3;
@@ -136,7 +136,7 @@ message GetOfferOptionDetailsResponse {
 }
 
 message ListOfferOptionDetailsRequest {
-  optional int32 page_size = 1;
+  int32 page_size = 1;
   string page_token = 2;
   oneof payload {
     ListOfIds offer_option_details_ids = 3;

@@ -42,9 +42,7 @@ class PlacesService(service.Service, places_pb2_grpc.PlacesServiceServicer):
         places_result = await self._places.find(request.page_token)
 
         places_result.limit(
-            request.page_size
-            if request.page_size is not None
-            else self._default_page_size,
+            request.page_size if request.page_size else self._default_page_size,
         )
 
         places = []
@@ -97,9 +95,7 @@ class CuratedPlacesService(  # noqa: WPS214
         places_result = await self._places.find(request.page_token)
 
         places_result.limit(
-            request.page_size
-            if request.page_size is not None
-            else self._default_page_size,
+            request.page_size if request.page_size else self._default_page_size,
         )
 
         return places_pb2.ListCuratedPlacesResponse(
