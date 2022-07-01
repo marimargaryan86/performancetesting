@@ -1,4 +1,3 @@
-# flake8: noqa: WPS202
 import datetime
 import re
 import uuid
@@ -65,7 +64,9 @@ class UsersRepository(
 
     async def find_user_hide_password(self, email: str) -> Optional[models_pb2.User]:
         return await self._execute(
-            self._collection.find_one, {_EMAIL_KEY: email}, {"password": 0}
+            self._collection.find_one,
+            {_EMAIL_KEY: email},
+            {"password": 0},
         )
 
     async def get(self, query: Any) -> models_pb2.User:
@@ -128,8 +129,8 @@ class OffersRepository(
                     "offer_search_history": {
                         "offer_search_id": offer_search_id,
                         "created": datetime.datetime.utcnow(),
-                    }
-                }
+                    },
+                },
             },
             upsert=True,
         )

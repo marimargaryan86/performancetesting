@@ -5,7 +5,6 @@ from typing import Callable
 import aioredis
 import aiosmtplib
 import stripe
-import uvicorn
 from asgiref.typing import ASGIApplication
 from motor import motor_asyncio
 from starlette.middleware import Middleware, authentication
@@ -111,21 +110,11 @@ def _factory(
 
 
 def _serve(app: service.Application[bootstrap.Settings]) -> None:
-    uvicorn.run(
-        app=_factory(app),
-        factory=True,
+    application.serve(
+        factory=_factory(app),
         host=str(app.settings.http_address),
-        loop="asyncio",
         port=app.settings.http_port,
-        access_log=False,
-        log_config=None,
-        proxy_headers=True,
-        forwarded_allow_ips=",".join(
-            [
-                "*" if str(address) == "0.0.0.0" else str(address)  # nosec
-                for address in app.settings.forwarded_allowed_ips
-            ],
-        ),
+        allowed_proxy_ips=app.settings.forwarded_allowed_ips,
     )
 
 

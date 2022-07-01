@@ -3,7 +3,6 @@ from starlette import routing
 
 from snowfall.junction.client_api.routes import (
     cabins,
-    health,
     legs,
     offers,
     orders,
@@ -12,6 +11,7 @@ from snowfall.junction.client_api.routes import (
     segments,
     trips,
 )
+from snowfall.stdlib.integration.starlette.routes import health
 
 
 def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Route]:

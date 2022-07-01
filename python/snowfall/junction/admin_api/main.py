@@ -1,7 +1,6 @@
 import random
 from typing import Callable
 
-import uvicorn
 from asgiref.typing import ASGIApplication
 
 from snowfall.adapter import places
@@ -35,19 +34,11 @@ def _factory(
 
 
 def _serve(app: service.Application[bootstrap.Settings]) -> None:
-    uvicorn.run(
-        app=_factory(app),
-        factory=True,
+    application.serve(
+        factory=_factory(app),
         host=str(app.settings.http_address),
-        loop="asyncio",
         port=app.settings.http_port,
-        access_log=False,
-        log_config=None,
-        proxy_headers=True,
-        forwarded_allow_ips=[
-            "*" if str(address) == "0.0.0.0" else str(address)  # nosec
-            for address in app.settings.forwarded_allowed_ips
-        ],
+        allowed_proxy_ips=app.settings.forwarded_allowed_ips,
     )
 
 

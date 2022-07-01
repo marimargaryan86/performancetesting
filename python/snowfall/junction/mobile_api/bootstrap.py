@@ -1,31 +1,19 @@
-# flake8: noqa: WPS201
 import datetime
-import ipaddress
-from typing import Optional, Sequence
+from typing import Sequence
 
 import lagom
 from lagom.integrations import starlette
 from pydantic import AnyUrl
-from starlette import applications, exceptions, status
-from starlette.middleware import Middleware
 
 from snowfall.junction.mobile_api import jwt_generator, repository, smtp
-from snowfall.junction.mobile_api.routes import router
-from snowfall.stdlib import service
-from snowfall.stdlib.integration.starlette import handlers
+from snowfall.stdlib.integration.starlette import application
 from snowfall.vendor.junction import client
 
 
-class Settings(service.Settings):
+class Settings(application.Settings):
     junction_api_address: Sequence[str]
     junction_api_token: str
     redis_dsn: Sequence[AnyUrl]
-
-    forwarded_allowed_ips: Sequence[ipaddress.IPv4Address] = [
-        ipaddress.IPv4Address("127.0.0.1"),
-    ]
-    http_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
-    http_port: int = 80
     places_cache_ttl: datetime.timedelta = datetime.timedelta(hours=1)
     otp_cache_ttl: datetime.timedelta = datetime.timedelta(minutes=2)
     smtp_dsn: AnyUrl

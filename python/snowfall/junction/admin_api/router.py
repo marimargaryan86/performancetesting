@@ -1,7 +1,8 @@
 from lagom.integrations import starlette
 from starlette import routing
 
-from snowfall.junction.admin_api.routes import health, places
+from snowfall.junction.admin_api.routes import places
+from snowfall.stdlib.integration.starlette.routes import health
 
 
 def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Route]:

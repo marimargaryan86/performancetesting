@@ -1,16 +1,27 @@
 import http
+import ipaddress
 import pathlib
 from typing import Callable, Optional, Sequence, cast
 
+import uvicorn
 from asgiref.typing import ASGIApplication
 from lagom.integrations import starlette
 from sentry_sdk.integrations import asgi
 from starlette import applications, exceptions, routing, status
 from starlette.middleware import Middleware
 
+from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import handlers, middlewares, validation
 
 RoutesFactory = Callable[[starlette.StarletteIntegration], list[routing.Route]]
+
+
+class Settings(service.Settings):
+    forwarded_allowed_ips: Sequence[ipaddress.IPv4Address] = [
+        ipaddress.IPv4Address("127.0.0.1"),
+    ]
+    http_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
+    http_port: int = 80
 
 
 def create_asgi_app(
@@ -55,4 +66,28 @@ def create_starlette_app(
             status.HTTP_500_INTERNAL_SERVER_ERROR: handlers.server_error_handler,
             exceptions.HTTPException: handlers.server_error_handler,
         },
+    )
+
+
+def serve(
+    factory: Callable[[], ASGIApplication],
+    host: str,
+    port: int,
+    allowed_proxy_ips: Sequence[ipaddress.IPv4Address],
+) -> None:
+    return uvicorn.run(
+        app=factory,
+        factory=True,
+        host=host,
+        loop="asyncio",
+        port=port,
+        access_log=False,
+        log_config=None,
+        proxy_headers=True,
+        forwarded_allow_ips=",".join(
+            [
+                "*" if str(address) == "0.0.0.0" else str(address)  # nosec
+                for address in allowed_proxy_ips
+            ],
+        ),
     )

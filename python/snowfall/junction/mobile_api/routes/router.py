@@ -2,7 +2,6 @@ from lagom.integrations import starlette
 from starlette import routing
 
 from snowfall.junction.mobile_api.routes import (
-    health,
     offers,
     orders,
     payments,
@@ -10,6 +9,7 @@ from snowfall.junction.mobile_api.routes import (
     trips,
     users,
 )
+from snowfall.stdlib.integration.starlette.routes import health
 
 
 def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Route]:

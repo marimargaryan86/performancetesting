@@ -1,4 +1,3 @@
-import ipaddress
 from typing import Sequence
 
 import lagom
@@ -16,15 +15,10 @@ from snowfall.adapter import (  # noqa: WPS235
     trips,
 )
 from snowfall.junction.client_api.transformers import trip_ids_to_segments
-from snowfall.stdlib import service
+from snowfall.stdlib.integration.starlette import application
 
 
-class Settings(service.Settings):
-    forwarded_allowed_ips: Sequence[ipaddress.IPv4Address] = [
-        ipaddress.IPv4Address("127.0.0.1"),
-    ]
-    http_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
-    http_port: int = 80
+class Settings(application.Settings):
     jwt_public_key: str
     jwt_token_version: str
     places_address: Sequence[str]
