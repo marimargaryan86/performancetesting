@@ -93,7 +93,7 @@
     padding: 18px 16px;
     position: absolute;
     top: calc(100% + 9px);
-    transform-origin: 0 center;
+    transform-origin: center 0;
     width: 340px;
     z-index: 1;
   }

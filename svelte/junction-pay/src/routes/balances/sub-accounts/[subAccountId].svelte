@@ -91,6 +91,7 @@
     font-size: 12px;
     font-weight: 600;
     margin-bottom: 12px;
+    width: max-content;
   }
 
   .sub-account > :global(table) {

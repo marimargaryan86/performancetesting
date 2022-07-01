@@ -81,6 +81,16 @@ const weekDays = (() => {
   });
 })();
 
+const months = (() => {
+  const date = new Date("2021-12-01");
+
+  return [...Array(12)].map(() => {
+    date.setMonth(date.getMonth() + 1);
+
+    return date.toLocaleDateString("en-GB", { month: "long" });
+  });
+})();
+
 export default {
   formatCurrency,
   getCurrencySign,
@@ -91,4 +101,5 @@ export default {
   compareDates,
   sleep,
   weekDays,
+  months,
 };

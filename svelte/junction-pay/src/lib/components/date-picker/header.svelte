@@ -1,10 +1,9 @@
 <script lang="ts">
   import Button from "../button.svelte";
+  import MonthPicker from "./month-picker.svelte";
+  import YearPicker from "./year-picker.svelte";
 
   export let focusedMonth: Date;
-
-  $: month = focusedMonth.toLocaleDateString("en-GB", { month: "long" });
-  $: year = focusedMonth.getFullYear().toString();
 
   function increase(): void {
     focusedMonth.setMonth(focusedMonth.getMonth() + 1);
@@ -18,8 +17,8 @@
 </script>
 
 <div class="header">
-  <Button>{month}</Button>
-  <Button>{year}</Button>
+  <MonthPicker bind:date={focusedMonth} />
+  <YearPicker bind:date={focusedMonth} />
 
   <div class="navigation">
     <Button on:click={decrease} />

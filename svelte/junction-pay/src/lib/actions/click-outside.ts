@@ -5,7 +5,7 @@ export default function clickOutside<T extends () => void>(
   let action_ = action;
 
   function click(ev: MouseEvent): void {
-    if ((ev.target as HTMLInputElement)?.contains(node)) {
+    if (!node.contains(ev.target as HTMLInputElement)) {
       action_();
     }
   }
