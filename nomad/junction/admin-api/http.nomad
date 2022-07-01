@@ -55,6 +55,15 @@ job "admin-api-http" {
     task "http" {
       driver = "docker"
 
+      template {
+        destination = "services.env"
+        env         = true
+        change_mode = "restart"
+        data        = <<EOH
+PLACES_ADDRESS={{range $index, $service := service (printf "grpc.places-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
+EOH
+      }
+
       config {
         image = var.docker_image
         ports = ["http"]
