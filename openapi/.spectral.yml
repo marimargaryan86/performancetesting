@@ -15,6 +15,5 @@ overrides:
       json-api-no-nested-relationships: info
   - files:
       - "mobile_api/openapi.json#/paths/~1trips~1searches~1{tripSearchId}~1trips"
-      - "admin_api/openapi.json#/paths/~1places"
     rules:
       ensure-pagination: info
