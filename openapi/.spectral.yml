@@ -39,3 +39,8 @@ overrides:
       - "mobile_api/openapi.json#/components/schemas/OfferOption/properties"
     rules:
       json-api-no-nested-data: info
+  - files:
+      - "mobile_api/openapi.json#/components/schemas/PaymentIntent"
+      - "client_api/openapi.json#/components/schemas/Order"
+    rules:
+      json-api-no-nested-id: info

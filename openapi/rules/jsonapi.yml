@@ -44,14 +44,6 @@ rules:
     resolved: false
     then:
       function: ensureRefs
-
-  json-api-no-id:
-    description: Field named `id` is not allowed in `attributes`.
-    given: $..attributes.properties
-    severity: error
-    then:
-      - field: "id"
-        function: undefined
   json-api-no-type:
     description: Field named `type` is not allowed in `attributes`.
     given: $..attributes..properties
@@ -60,12 +52,11 @@ rules:
       - field: "type"
         function: undefined
   json-api-no-nested-id:
-    description: Field named `id` is not allowed in `attributes`.
-    given: $..attributes..properties
+    description: Identifiers are not allowed in `attributes`, they should be relationships.
+    given: $..attributes..properties[?(@property.match(/(^id$|Id$|Identifier$)/))]~
     severity: error
     then:
-      - field: "id"
-        function: undefined
+      function: undefined
   json-api-no-nested-relationships:
     description: Field named `relationships` is not allowed in `attributes`.
     given: $..attributes..properties
