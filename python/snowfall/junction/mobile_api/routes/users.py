@@ -151,6 +151,7 @@ class Session(endpoints.HTTPEndpoint):
                 data=models.Resource(
                     id=token,
                     type="user-sessions",
+                    attributes={},
                 ),
             ),
         )

@@ -491,48 +491,7 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "enum": [
-                            "payments"
-                          ],
-                          "example": "payments"
-                        },
-                        "id": {
-                          "type": "string",
-                          "format": "uuid",
-                          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
-                        },
-                        "attributes": {
-                          "type": "object",
-                          "properties": {
-                            "clientSecret": {
-                              "type": "string",
-                              "example": "NEEDS EXAMPLE"
-                            },
-                            "ephemeralKey": {
-                              "type": "string",
-                              "example": "NEEDS EXAMPLE"
-                            },
-                            "customerId": {
-                              "type": "string",
-                              "example": "NEEDS EXAMPLE"
-                            }
-                          },
-                          "required": [
-                            "clientSecret",
-                            "ephemeralKey",
-                            "customerId"
-                          ]
-                        }
-                      },
-                      "required": [
-                        "type",
-                        "id",
-                        "attributes"
-                      ]
+                      "$ref": "#/components/schemas/PaymentIntent"
                     }
                   }
                 }
@@ -554,48 +513,7 @@
                 "type": "object",
                 "properties": {
                   "data": {
-                    "type": "object",
-                    "properties": {
-                      "type": {
-                        "type": "string",
-                        "enum": [
-                          "payments"
-                        ],
-                        "example": "payments"
-                      },
-                      "id": {
-                        "type": "string",
-                        "format": "uuid",
-                        "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
-                      },
-                      "attributes": {
-                        "type": "object",
-                        "properties": {
-                          "amount": {
-                            "type": "number",
-                            "example": 123456
-                          },
-                          "currency": {
-                            "type": "string",
-                            "example": "EUR"
-                          },
-                          "offerId": {
-                            "type": "string",
-                            "example": "NEEDS EXAMPLE"
-                          }
-                        },
-                        "required": [
-                          "amount",
-                          "currency",
-                          "offerId"
-                        ]
-                      }
-                    },
-                    "required": [
-                      "type",
-                      "id",
-                      "attributes"
-                    ]
+                    "$ref": "#/components/schemas/PaymentIntent"
                   }
                 },
                 "required": [
@@ -726,33 +644,7 @@
                 "type": "object",
                 "properties": {
                   "data": {
-                    "type": "object",
-                    "properties": {
-                      "type": {
-                        "type": "string",
-                        "enum": [
-                          "verification-codes"
-                        ],
-                        "example": "verification-codes"
-                      },
-                      "attributes": {
-                        "type": "object",
-                        "properties": {
-                          "email": {
-                            "type": "string",
-                            "pattern": "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$",
-                            "example": "user@example.com"
-                          }
-                        },
-                        "required": [
-                          "email"
-                        ]
-                      }
-                    },
-                    "required": [
-                      "type",
-                      "attributes"
-                    ]
+                    "$ref": "#/components/schemas/VerificationCode"
                   }
                 },
                 "required": [
@@ -819,24 +711,7 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "enum": [
-                            "user-sessions"
-                          ],
-                          "example": "user-sessions"
-                        },
-                        "id": {
-                          "type": "string",
-                          "example": "NEEDS EXAMPLE"
-                        }
-                      },
-                      "required": [
-                        "type",
-                        "id"
-                      ]
+                      "$ref": "#/components/schemas/UserSession"
                     }
                   }
                 }
@@ -858,39 +733,7 @@
                 "type": "object",
                 "properties": {
                   "data": {
-                    "type": "object",
-                    "properties": {
-                      "type": {
-                        "type": "string",
-                        "enum": [
-                          "user-sessions"
-                        ],
-                        "example": "user-sessions"
-                      },
-                      "attributes": {
-                        "type": "object",
-                        "properties": {
-                          "password": {
-                            "type": "string",
-                            "format": "password",
-                            "example": "secret"
-                          },
-                          "email": {
-                            "type": "string",
-                            "pattern": "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$",
-                            "example": "user@example.com"
-                          }
-                        },
-                        "required": [
-                          "password",
-                          "email"
-                        ]
-                      }
-                    },
-                    "required": [
-                      "type",
-                      "attributes"
-                    ]
+                    "$ref": "#/components/schemas/UserSession"
                   }
                 }
               }
@@ -973,39 +816,7 @@
                 "type": "object",
                 "properties": {
                   "data": {
-                    "type": "object",
-                    "properties": {
-                      "type": {
-                        "type": "string",
-                        "enum": [
-                          "users"
-                        ],
-                        "example": "users"
-                      },
-                      "id": {
-                        "type": "string",
-                        "format": "uuid",
-                        "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
-                      },
-                      "attributes": {
-                        "type": "object",
-                        "properties": {
-                          "password": {
-                            "type": "string",
-                            "format": "password",
-                            "example": "secret"
-                          }
-                        },
-                        "required": [
-                          "password"
-                        ]
-                      }
-                    },
-                    "required": [
-                      "type",
-                      "id",
-                      "attributes"
-                    ]
+                    "$ref": "#/components/schemas/UserUpdatable"
                   }
                 }
               }
@@ -1871,6 +1682,127 @@
         "title": "User",
         "description": ""
       },
+      "UserUpdatable": {
+        "type": "object",
+        "title": "User (Update)",
+        "description": "",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "users"
+            ],
+            "example": "users"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "attributes": {
+            "type": "object",
+            "required": [
+              "password"
+            ],
+            "properties": {
+              "password": {
+                "type": "string",
+                "format": "password",
+                "example": "secret"
+              }
+            }
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "attributes"
+        ]
+      },
+      "UserSession": {
+        "type": "object",
+        "title": "User Session",
+        "description": "",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiI0MDBkMzI0NC04ZTBlLTQxMTktOWNlMi1hMjQwMDhjMDYxODciLCJ2ZXJzaW9uIjoiMS4wLjAifQ.Eh8BjN_dpv0kiN5oK2mYl8r9L9l45AYAArXljyDN-KY",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "example": "user-sessions",
+            "enum": [
+              "user-sessions"
+            ]
+          },
+          "attributes": {
+            "type": "object",
+            "required": [
+              "password",
+              "email"
+            ],
+            "properties": {
+              "password": {
+                "type": "string",
+                "format": "password",
+                "example": "secret",
+                "writeOnly": true
+              },
+              "email": {
+                "type": "string",
+                "pattern": "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$",
+                "example": "user@example.com",
+                "writeOnly": true
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ]
+      },
+      "VerificationCode": {
+        "type": "object",
+        "title": "Verification Code",
+        "description": "",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "1234",
+            "pattern": "^[0-9]{4}$",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "example": "verification-codes",
+            "enum": [
+              "verification-codes"
+            ]
+          },
+          "attributes": {
+            "type": "object",
+            "required": [
+              "email"
+            ],
+            "properties": {
+              "email": {
+                "type": "string",
+                "pattern": "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$",
+                "example": "user@example.com",
+                "writeOnly": true
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ]
+      },
       "Offer": {
         "title": "Offer",
         "description": "Offer for one or more segments. Used for creating an Order.",
@@ -2262,9 +2194,9 @@
             ],
             "example": "offer-groups"
           },
-          "attributes":{
+          "attributes": {
             "type": "object",
-            "properties":{
+            "properties": {
               "options": {
                 "type": "array",
                 "uniqueItems": true,
@@ -2311,7 +2243,7 @@
             ],
             "example": "trip-offer-group-details"
           },
-          "attributes":{
+          "attributes": {
             "type": "object",
             "properties": {
               "legs": {
@@ -2366,9 +2298,9 @@
             ],
             "example": "offer-options"
           },
-          "attributes":{
+          "attributes": {
             "type": "object",
-            "properties":{
+            "properties": {
               "price": {
                 "$ref": "#/components/schemas/Price"
               },
@@ -2391,7 +2323,7 @@
           "attributes"
         ]
       },
-      "TripOfferOptionDetails":{
+      "TripOfferOptionDetails": {
         "title": "TripOfferOptionDetails",
         "description": "",
         "type": "object",
@@ -2417,10 +2349,10 @@
               },
               "details": {
                 "type": "object",
-                "properties":{
-                  "data":{
+                "properties": {
+                  "data": {
                     "type": "object",
-                    "properties":{
+                    "properties": {
                       "id": {
                         "type": "string",
                         "format": "uuid",
@@ -2434,19 +2366,28 @@
                         "example": "trip-offer-group-details"
                       }
                     },
-                    "required": ["id", "type"]
+                    "required": [
+                      "id",
+                      "type"
+                    ]
                   }
                 },
-                "required": ["data"]
+                "required": [
+                  "data"
+                ]
               }
             },
-            "required":["cabinClassName", "details"]
+            "required": [
+              "cabinClassName",
+              "details"
+            ]
           }
         },
-        "required":[
+        "required": [
           "id",
           "type",
-          "attributes"]
+          "attributes"
+        ]
       },
       "ContactDetails": {
         "title": "ContactDetails",
@@ -2606,6 +2547,72 @@
         "required": [
           "offerId",
           "status"
+        ]
+      },
+      "PaymentIntent": {
+        "title": "Payment Intent",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "payments"
+            ],
+            "example": "payments"
+          },
+          "attributes": {
+            "type": "object",
+            "required": [
+              "amount",
+              "currency",
+              "offerId",
+              "clientSecret",
+              "ephemeralKey",
+              "customerId"
+            ],
+            "properties": {
+              "amount": {
+                "type": "number",
+                "example": 123456,
+                "writeOnly": true
+              },
+              "currency": {
+                "type": "string",
+                "example": "EUR",
+                "writeOnly": true
+              },
+              "offerId": {
+                "type": "string",
+                "example": "NEEDS EXAMPLE",
+                "writeOnly": true
+              },
+              "clientSecret": {
+                "type": "string",
+                "example": "NEEDS EXAMPLE",
+                "readOnly": true
+              },
+              "ephemeralKey": {
+                "type": "string",
+                "example": "NEEDS EXAMPLE",
+                "readOnly": true
+              },
+              "customerId": {
+                "type": "string",
+                "example": "NEEDS EXAMPLE",
+                "readOnly": true
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes"
         ]
       }
     },

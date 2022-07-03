@@ -1,4 +1,50 @@
+functions:
+  - ensureRefs
+  - ensureRequiredResourceFields
+aliases:
+  Resources:
+    - $.paths..schema.properties.data
+    - $.paths..schema.allOf[*].properties.data
+  ResourceProperties:
+    - "#Resources.properties"
+    - "#Resources.allOf[*].properties"
+  ResourceFields:
+    - "#ResourceProperties[*]"
 rules:
+  json-api-resource-allowed-fields:
+    message: "Disallowed resource field found: {{property}}"
+    severity: error
+    given: "#ResourceFields~"
+    then:
+      function: enumeration
+      functionOptions:
+        values:
+          - id
+          - type
+          - attributes
+          - relationships
+          - links
+          - meta
+
+  json-api-resource-required-fields:
+    message: "{{error}}"
+    severity: error
+    given: "#Resources"
+    then:
+      function: ensureRequiredResourceFields
+      functionOptions:
+        required:
+          - id
+          - type
+
+  json-api-resource-refs:
+    description: Resource objects must be references.
+    severity: error
+    given: "#Resources"
+    resolved: false
+    then:
+      function: ensureRefs
+
   json-api-no-id:
     description: Field named `id` is not allowed in `attributes`.
     given: $..attributes.properties
