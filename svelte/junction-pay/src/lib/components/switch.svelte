@@ -32,7 +32,7 @@
     display: block;
     height: 100%;
     position: relative;
-    transition: background-color 150ms ease;
+    transition: background-color var(--speed-fast) ease;
     width: 100%;
   }
 
@@ -51,7 +51,7 @@
     position: absolute;
     top: 1px;
     transform: translateX(-100%);
-    transition: left 150ms ease, right 150ms ease;
+    transition: left var(--speed-fast) ease, right var(--speed-fast) ease;
     width: 18px;
   }
 

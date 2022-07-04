@@ -11,7 +11,7 @@
   async function logout(): Promise<void> {
     await service.logout();
 
-    goto(routeConfig.login);
+    goto(routeConfig.login.root);
   }
 </script>
 
@@ -34,7 +34,8 @@
 
   <nav class="secondary">
     <a href={routeConfig.support} class="dotted-link" use:activeLink={{ exact: false }}>Support</a>
-    <a href={routeConfig.login} class="dotted-link" on:click|preventDefault={logout}>Log out</a>
+    <a href={routeConfig.login.root} class="dotted-link" on:click|preventDefault={logout}>Log out</a
+    >
   </nav>
 </section>
 

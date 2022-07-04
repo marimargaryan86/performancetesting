@@ -1,4 +1,7 @@
 <script lang="ts">
+  /*
+  TODO: Implement month/year navigation.
+  */
   import Button from "../button.svelte";
   import MonthPicker from "./month-picker.svelte";
   import YearPicker from "./year-picker.svelte";

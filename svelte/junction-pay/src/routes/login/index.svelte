@@ -1,59 +1,134 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
   import Button from "$lib/components/button.svelte";
-  import SupportIcon from "$lib/icons/support-icon.svelte";
-  import Header from "./_components/header.svelte";
-  import HowItWorks from "./_components/how-it-works/how-it-works.svelte";
-  import Login from "./_components/login.svelte";
+  import Spinner from "$lib/components/spinner.svelte";
+  import Switch from "$lib/components/switch.svelte";
+  import TextField from "$lib/components/text-field.svelte";
+  import routeConfig from "$lib/route-config";
+  import serviceInstances from "$services/instances";
+  import { scale } from "svelte/transition";
+
+  let email = "";
+  let password = "";
+  let error = false;
+  let pending = false;
+
+  const { auth: service } = serviceInstances;
+
+  $: email, password, (error = false);
+
+  async function login(): Promise<void> {
+    if (pending) {
+      return;
+    }
+
+    try {
+      pending = true;
+      await service.login(email, password);
+
+      goto(routeConfig.dashboard);
+    } catch {
+      error = true;
+      pending = false;
+    }
+  }
 </script>
 
 <svelte:head>
   <title>Junction | Login</title>
 </svelte:head>
 
-<main>
-  <HowItWorks />
+<form class="login" on:submit|preventDefault={login}>
+  <h1>Welcome Back To Junction</h1>
+  <h2>Please enter your details below</h2>
 
-  <section class="content">
-    <Header />
+  <label for="email" class:error>Email</label>
+  <TextField type="email" id="email" bind:value={email} placeholder="Enter your email" {error} />
 
-    <Login />
+  <label for="password" class:error>Password</label>
+  <TextField
+    type="password"
+    id="password"
+    bind:value={password}
+    placeholder="Enter your password"
+    {error}
+  />
 
-    <Button><SupportIcon /> Support</Button>
-  </section>
-</main>
+  <div class="actions">
+    <div class="remember-me">
+      <Switch id="remember-me" />
+      <label for="remember-me">Remember me</label>
+    </div>
+
+    <a href={routeConfig.login.passwordRecovery}>Forgotten password</a>
+  </div>
+
+  <Button type="submit">
+    Log in
+
+    {#if pending}
+      <Spinner transition={{ func: scale, params: { duration: 200 } }} />
+    {/if}
+  </Button>
+</form>
 
 <style>
-  main {
-    display: grid;
-    grid-template-columns: 482px 1fr;
-    height: 100vh;
+  h1 {
+    color: var(--color-gray-darkest);
+    font-size: 30px;
+    font-weight: 600;
+    margin-bottom: 14px;
   }
 
-  .content > :global(button) {
-    background-color: var(--color-gray-lightest);
-    border-radius: 44px;
-    color: var(--color-black);
-    height: 44px;
-    justify-self: flex-end;
-    margin: 30px;
-    padding: 0 18px;
+  h2 {
+    color: var(--color-gray-lighter);
+    font-size: 18px;
+    margin-bottom: 27px;
   }
 
-  .content > :global(button > svg) {
-    margin-right: 5px;
+  form > label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 12px;
+    transition: color var(--speed-fast) ease;
+  }
+
+  .error {
+    color: var(--color-red);
+  }
+
+  .login > :global(button) {
+    height: 52px;
+    width: 100%;
+  }
+
+  .login > :global(.text-field) {
+    display: block;
+    height: 52px;
+    margin-bottom: 36px;
+    width: 100%;
+  }
+
+  .remember-me > :global(.switch) {
+    margin-right: 2px;
     vertical-align: middle;
   }
 
-  .content {
-    background-color: var(--color-white);
-    display: grid;
-    grid-template-rows: 137px 1fr 104px;
+  .login > :global(button > .spinner) {
+    margin-left: 8px;
+    vertical-align: middle;
   }
 
-  .content > :global(.login) {
-    align-self: center;
-    justify-self: center;
-    max-width: 422px;
-    width: 100%;
+  .actions {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 19px;
+  }
+
+  a {
+    color: var(--color-teal);
+    font-weight: 600;
+    text-decoration: none;
   }
 </style>

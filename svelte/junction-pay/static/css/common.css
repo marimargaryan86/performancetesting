@@ -20,6 +20,7 @@
   --color-light-background: #f7f7fa;
   --color-purple: #9883bc;
   --color-blue: #3cb4e8;
+  --speed-fast: 150ms;
 }
 
 html {

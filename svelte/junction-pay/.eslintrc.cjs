@@ -18,6 +18,7 @@ module.exports = {
     node: true,
   },
   rules: {
+    curly: ["error", "all"],
     "@typescript-eslint/ban-types": [
       "error",
       {

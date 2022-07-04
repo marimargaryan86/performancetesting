@@ -1,5 +1,9 @@
 export default {
-  login: "/login",
+  login: {
+    root: "/login",
+    passwordRecovery: "/login/password-recovery",
+    passwordRecoverySent: "/login/password-recovery-sent",
+  },
   dashboard: "/dashboard",
   orders: "/my-orders",
   pay: "/pay",

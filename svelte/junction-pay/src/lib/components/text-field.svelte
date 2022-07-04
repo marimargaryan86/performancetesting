@@ -36,7 +36,7 @@
     height: 44px;
     outline: 0;
     padding: 15px 14px;
-    transition: border-color 150ms ease;
+    transition: border-color var(--speed-fast) ease;
   }
 
   input::placeholder {
