@@ -28,6 +28,7 @@ The following ports are configured in local environments by default:
 | 8000  | client-api             | HTTP Server       |
 | 8001  | mobile-api             | HTTP Server       |
 | 8002  | admin-api              | HTTP Server       |
+| 8003  | pay-api                | HTTP Server       |
 | 8080  | admin-api              | Prometheus Server |
 | 8081  | client-api             | Prometheus Server |
 | 8082  | currencies             | Prometheus Server |

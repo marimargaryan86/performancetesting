@@ -1,0 +1,665 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Junction Pay API",
+    "version": "1.0.0",
+    "description": "This API follows the [JSON:API][jsonapi] specification.\n\n[jsonapi]: https://jsonapi.org/",
+    "contact": {
+      "name": "Snowfall",
+      "url": "https://www.snowfalltravel.com",
+      "email": "info@snowfalltravel.com"
+    },
+    "license": {
+      "name": "Junction",
+      "url": "https://www.snowfalltravel.com"
+    }
+  },
+  "x-tagGroups": [
+    {
+      "name": "Balances",
+      "tags": [
+        "balances"
+      ]
+    },
+    {
+      "name": "Internal",
+      "tags": [
+        "internal"
+      ]
+    },
+    {
+      "name": "Transactions",
+      "tags": [
+        "transactions"
+      ]
+    }
+  ],
+  "tags": [
+    {
+      "name": "balances",
+      "description": "Account balances in difference currencies",
+      "x-displayName": "Balances"
+    },
+    {
+      "name": "internal",
+      "description": "Endpoints not for public use.",
+      "x-displayName": "Internal"
+    },
+    {
+      "name": "transactions",
+      "description": "Account transactions",
+      "x-displayName": "Transactions"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "tags": [
+          "internal"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "description": "",
+                  "type": "object",
+                  "x-examples": {
+                    "example-1": {
+                      "meta": {
+                        "status": "ok"
+                      }
+                    }
+                  },
+                  "properties": {
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "status"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "description": "Health status",
+                          "enum": [
+                            "pass",
+                            "fail",
+                            "warn"
+                          ],
+                          "example": "pass"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "meta"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-health",
+        "description": "Check the application health.",
+        "x-internal": true,
+        "security": []
+      }
+    },
+    "/balances": {
+      "get": {
+        "summary": "Account available balances",
+        "tags": [
+          "balances"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "items": {
+                            "$ref": "#/components/schemas/Balance"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-balances",
+        "description": "Get account balances",
+        "x-internal": true,
+        "security": []
+      }
+    },
+    "/transactions": {
+      "get": {
+        "summary": "Account transactions",
+        "tags": [
+          "transactions"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          },
+          {
+            "$ref": "#/components/parameters/sort"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "items": {
+                            "$ref": "#/components/schemas/Transaction"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-transactions",
+        "description": "Get account transactions",
+        "x-internal": true,
+        "security": []
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "page-cursor": {
+        "name": "page[cursor]",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "default": "1",
+          "example": "1"
+        },
+        "description": "Pagination cursor that defines your place in the list."
+      },
+      "page-limit": {
+        "name": "page[limit]",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20,
+          "example": 20
+        },
+        "description": "A limit on the number of objects to be returned, between 1 and 100."
+      },
+      "sort": {
+        "name": "order",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "example": "created"
+        },
+        "description": "Field name what should be used to order"
+      }
+    },
+    "schemas": {
+      "Balance": {
+        "title": "Balance",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "format": "uuid",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "example": "balances",
+                "enum": [
+                  "balances"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "integer",
+                    "example": 1000
+                  }
+                },
+                "required": ["amount"]
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "currency"
+                ],
+                "properties": {
+                  "currency": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "type"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "USD",
+                            "readOnly": true
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "currencies"
+                            ],
+                            "example": "currencies"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          }
+        ],
+        "description": "Account Balances."
+      },
+      "Transaction": {
+        "title": "Transaction",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "format": "uuid",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "transactions"
+                ],
+                "example": "transactions"
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "integer",
+                    "example": 1500
+                  },
+                  "ref": {
+                    "type": "string",
+                    "example": "reference"
+                  },
+                  "status": {
+                    "type": "string",
+                    "example": "completed"
+                  },
+                  "completedAt": {
+                    "type": "string",
+                    "example": "2022-05-13T15:09:14+00:00",
+                    "format": "date-time",
+                    "nullable": true
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "example": "2022-05-10T12:24:30+00:00",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "amount",
+                  "ref",
+                  "completedAt",
+                  "createdAt"
+                ]
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "currency"
+                ],
+                "properties": {
+                  "balance": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "type"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+                            "format": "uuid",
+                            "readOnly": true
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "balances"
+                            ],
+                            "example": "balances"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "currency": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "type"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "USD",
+                            "readOnly": true
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "currencies"
+                            ],
+                            "example": "currencies"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "transactionType": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/TransactionTypeIdentifier"
+                      }
+                    }
+                  },
+                  "status": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/TransactionStatusIdentifier"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          }
+        ],
+        "description": "Account transactions."
+      },
+      "TransactionTypeIdentifier": {
+        "title": "Transaction Type Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "debit"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "transaction-types"
+            ],
+            "example": "transaction-types"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "TransactionStatusIdentifier": {
+        "title": "Transaction Status Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "completed"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "transaction-statuses"
+            ],
+            "example": "transaction-statuses"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "NextLink": {
+        "title": "Next Link",
+        "type": "object",
+        "properties": {
+          "links": {
+            "type": "object",
+            "required": [
+              "next"
+            ],
+            "properties": {
+              "next": {
+                "type": "string",
+                "format": "uri",
+                "example": "https://example.com/resource/?page%5Bcursor%5D=MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D&page%5Blimit%5D=20",
+                "readOnly": true
+              }
+            },
+            "readOnly": true
+          }
+        },
+        "required": [
+          "links"
+        ]
+      },
+      "Error": {
+        "title": "Error",
+        "type": "object",
+        "description": "JSON:API error",
+        "properties": {
+          "status": {
+            "type": "string",
+            "pattern": "^[45][0-9]{2}$",
+            "description": "The HTTP status code applicable to this problem, expressed as a string value.",
+            "example": "404"
+          },
+          "title": {
+            "type": "string",
+            "example": "Not Found",
+            "description": "A short, human-readable summary of the problem that SHOULD NOT change from occurrence to occurrence of the problem, except for purposes of localization."
+          },
+          "detail": {
+            "type": "string",
+            "description": "A human-readable explanation specific to this occurrence of the problem. Like `title``, this field’s value can be localized.",
+            "example": "Nothing matches the given URI"
+          },
+          "code": {
+            "type": "string",
+            "example": "required",
+            "description": "An application-specific error code, expressed as a string value."
+          },
+          "source": {
+            "type": "object",
+            "description": "An object containing references to the source of the error.",
+            "properties": {
+              "pointer": {
+                "type": "string",
+                "example": "/data/attributes/title",
+                "description": "A JSON Pointer to the associated entity in the request document."
+              }
+            },
+            "required": [
+              "pointer"
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "detail"
+        ]
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "description": "Unauthorized",
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "errors": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              },
+              "required": [
+                "errors"
+              ]
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Not Found",
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "errors": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              },
+              "required": [
+                "errors"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "jwt": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "security": [
+    {
+      "jwt": []
+    }
+  ]
+}

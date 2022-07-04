@@ -11,6 +11,7 @@ python_requirements(
         "python-rapidjson": ["rapidjson"],
         "rfc3339-validator": ["rfc3339_validator"],
         "setuptools": ["easy_install", "pkg_resources", "setuptools"],
+        "currency-cloud": ["currencycloud"],
     },
     overrides={
         "mongomock-motor": {"dependencies": ["#setuptools"]},
