@@ -7,8 +7,8 @@ import pytest
 from dateutil import tz
 from google.protobuf import duration_pb2, timestamp_pb2
 
-from snowfall.common.v1alpha import datetime_pb2, models_pb2
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.v1alpha import datetime_pb2, models_pb2
 
 
 def test_enum_value_to_name() -> None:

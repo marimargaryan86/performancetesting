@@ -2,7 +2,7 @@ package legacy
 
 import (
 	"errors"
-	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/junction/planner/v1alpha"
+	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/planner/v1alpha"
 )
 
 type Repository struct {

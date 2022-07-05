@@ -1,7 +1,7 @@
 package raptor
 
 import (
-	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/junction/planner/v1alpha"
+	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/planner/v1alpha"
 	"github.com/google/uuid"
 	"strconv"
 	"strings"

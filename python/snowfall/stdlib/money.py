@@ -6,7 +6,7 @@ import functools
 
 import iso4217
 
-from snowfall.common.v1alpha import money_pb2
+from snowfall.stdlib.v1alpha import money_pb2
 
 Currency = iso4217.Currency
 

@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package snowfall.project.junction.service.providers.save_a_train.v1alpha;
+
+import "snowfall/stdlib/v1alpha/datetime.proto";
+import "snowfall/stdlib/v1alpha/models.proto";
+
+message SearchCriteriaTask {
+  string offer_search_id = 1;
+  repeated snowfall.stdlib.v1alpha.Segment segments = 2;
+  Criteria criteria = 3;
+}
+
+message Criteria {
+  string origin_id = 1;
+  string destination_id = 2;
+  repeated uint32 passengers_ages = 3;
+  snowfall.stdlib.v1alpha.DateTime departure_datetime = 4;
+  snowfall.stdlib.v1alpha.DateTime arrival_datetime = 6;
+  string cabin_class = 5;
+}

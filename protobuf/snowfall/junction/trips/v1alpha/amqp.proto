@@ -1,9 +1,0 @@
-syntax = "proto3";
-
-package snowfall.junction.trips.v1alpha;
-
-import "snowfall/junction/trips/v1alpha/trips.proto";
-
-message TripSearchTask {
-  snowfall.junction.trips.v1alpha.TripSearch trip_search = 1;
-}

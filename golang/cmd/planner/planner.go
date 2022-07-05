@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"git.snowfall.se/junction/junction/golang/legacy"
-	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/junction/planner/v1alpha"
+	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/planner/v1alpha"
 	"git.snowfall.se/junction/junction/golang/raptor"
 	"github.com/getsentry/sentry-go"
 	"github.com/uber/h3-go"

@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/common/v1alpha"
-	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/junction/planner/v1alpha"
+	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/planner/v1alpha"
+	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"
 	"git.snowfall.se/junction/junction/golang/raptor"
 	"github.com/google/uuid"
 	"github.com/uber/h3-go"

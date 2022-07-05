@@ -2,9 +2,9 @@ from typing import Collection
 
 import pytest
 
-from snowfall.common.v1alpha import models_pb2
 from snowfall.fixtures import H3LocationTestModel
 from snowfall.stdlib import h3
+from snowfall.stdlib.v1alpha import models_pb2
 
 
 @pytest.mark.parametrize(

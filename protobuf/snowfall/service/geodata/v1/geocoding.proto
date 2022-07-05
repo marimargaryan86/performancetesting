@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package snowfall.service.geodata.v1;
 
-import "snowfall/common/v1alpha/datetime.proto";
-import "snowfall/common/v1alpha/latlng.proto";
+import "snowfall/stdlib/v1alpha/datetime.proto";
+import "snowfall/stdlib/v1alpha/latlng.proto";
 
 service GeocodingService {
   rpc CountryCodeLookup(CountryCodeLookupRequest) returns (CountryCodeLookupResponse) {}
@@ -11,7 +11,7 @@ service GeocodingService {
 }
 
 message CountryCodeLookupRequest {
-  snowfall.common.v1alpha.LatLng coordinates = 1;
+  snowfall.stdlib.v1alpha.LatLng coordinates = 1;
 }
 
 message CountryCodeLookupResponse {
@@ -19,9 +19,9 @@ message CountryCodeLookupResponse {
 }
 
 message TimeZoneLookupRequest {
-  snowfall.common.v1alpha.LatLng coordinates = 1;
+  snowfall.stdlib.v1alpha.LatLng coordinates = 1;
 }
 
 message TimeZoneLookupResponse {
-  snowfall.common.v1alpha.TimeZone time_zone = 1;
+  snowfall.stdlib.v1alpha.TimeZone time_zone = 1;
 }

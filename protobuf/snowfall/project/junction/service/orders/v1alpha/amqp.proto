@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package snowfall.project.junction.service.orders.v1alpha;
+
+import "snowfall/project/junction/service/orders/v1alpha/models.proto";
+
+message PlaceOrderTask {
+  Order order = 1;
+  string offer_id = 2;
+}

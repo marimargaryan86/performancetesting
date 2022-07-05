@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package snowfall.project.junction.service.mobile_api.v1alpha;
+
+import "google/protobuf/timestamp.proto";
+import "snowfall/stdlib/v1alpha/models.proto";
+import "snowfall/stdlib/v1alpha/phone_number.proto";
+
+message User {
+  string id = 1;
+  string email = 2;
+  string password = 3;
+  snowfall.stdlib.v1alpha.PhoneNumber phone = 4;
+  string name = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+message Place {
+  string id = 1;
+  string name = 2;
+  snowfall.stdlib.v1alpha.Coordinates coordinates = 3;
+  string time_zone = 4;
+  string country_code = 5;
+  string country_name = 6;
+  google.protobuf.Timestamp updated_at = 7;
+  string source_ref = 8;
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+  }
+  repeated Type types = 9;
+}
+
+message StripeUser {
+  string id = 1;
+  string internal_user_id = 2;
+  google.protobuf.Timestamp created_at = 3;
+}
+
+message OfferSearchHistoryEntity {
+  string offer_search_id = 1;
+  google.protobuf.Timestamp created_at = 2;
+}
+
+message OfferSearchHistory {
+  string user_id = 1;
+  repeated OfferSearchHistoryEntity offer_search_history = 2;
+}

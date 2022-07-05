@@ -178,11 +178,11 @@ Bash version should be `>= 4`
 #### Pants
 
 ```shell
-bash bash/run.sh python/snowfall/junction/{service} {task}
+bash bash/run.sh python/snowfall/project/{project}/service/{service} {task}
 ```
 OR
 ```shell
-. bash/run.sh python/snowfall/junction/{service} {task}
+. bash/run.sh python/snowfall/project/{project}/service/{service} {task}
 ```
 In case if you will have some problems with `bash` version
 
@@ -193,7 +193,7 @@ In case if you will have some problems with `bash` version
 1. Under `Run`, click `Edit Configurations`.
 2. Click `Add New Configuration` and then `Shell Script`.
 3. Set `Script path` to `{repository path}/junction/bash/run.sh`.
-4. Set `Script options` to the path to the service you want to configure as well as the task you want to run, e.g. `python/snowfall/junction/echo/main.py grpc`.
+4. Set `Script options` to the path to the service you want to configure as well as the task you want to run, e.g. `python/snowfall/service/echo/main.py grpc`.
 5. Make sure `Interpreter path` is set to a **Bash** shell.
 6. Make sure `Execute in the terminal` is _unchecked_.
 
@@ -206,7 +206,7 @@ In case if you will have some problems with `bash` version
 4. Set the `Module Name` to the service you want to configure, e.g. `snowfall.junction.echo.main`.
 5. Set the `Parameters` to the task you want to run, e.g. `grpc`.
 6. Set the `Working directory` to `{repository path}`.
-7. Click `EnvFile` submenu, check `Enable EnvFile` and `Add` a new .env file path to the service's .env.dist file (or .env if you've made local changes), e.g. `{repository path}/python/snowfall/junction/echo/.env.dist`.
+7. Click `EnvFile` submenu, check `Enable EnvFile` and `Add` a new .env file path to the service's .env.dist file (or .env if you've made local changes), e.g. `{repository path}/python/snowfall/service/echo/.env.dist`.
 
 # M1 troubleshooting
 - install xcode

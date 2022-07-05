@@ -30,9 +30,9 @@ generate_dataset() {
 
 	wait_for_port localhost 50058
 
-	"${root_dir}/bash/run.sh" "${root_dir}/python/snowfall/junction/places/main.py" import 1>/dev/null 2>/dev/null &
-	"${root_dir}/bash/run.sh" "${root_dir}/python/snowfall/junction/schedules/main.py" import 1>/dev/null 2>/dev/null &
-	"${root_dir}/bash/run.sh" "${root_dir}/python/snowfall/junction/gtfs_feed/main.py" import 1>/dev/null 2>/dev/null &
+	"${root_dir}/bash/run.sh" "${root_dir}/python/snowfall/project/junction/service/places/main.py" import 1>/dev/null 2>/dev/null &
+	"${root_dir}/bash/run.sh" "${root_dir}/python/snowfall/project/junction/service/schedules/main.py" import 1>/dev/null 2>/dev/null &
+	"${root_dir}/bash/run.sh" "${root_dir}/python/snowfall/project/junction/service/gtfs_feed/main.py" import 1>/dev/null 2>/dev/null &
 	GTFS_FEED_IMPORT_PID="$!"
 
 	echo "* Importing GTFS feed..."
@@ -41,7 +41,7 @@ generate_dataset() {
 
 	echo "* Exporting optimized schedules..."
 
-	"${root_dir}/bash/run.sh" "${root_dir}/python/snowfall/junction/schedules/main.py" export 1>/dev/null 2>/dev/null &
+	"${root_dir}/bash/run.sh" "${root_dir}/python/snowfall/project/junction/service/schedules/main.py" export 1>/dev/null 2>/dev/null &
 	SCHEDULES_EXPORT_PID="$!"
 
 	wait "${SCHEDULES_EXPORT_PID}"

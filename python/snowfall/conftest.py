@@ -8,7 +8,7 @@ from fakeredis import aioredis as fakeredis
 from motor import core, motor_asyncio
 
 from snowfall import fixtures
-from snowfall.adapter import (
+from snowfall.project.junction.adapter import (
     currencies,
     legs,
     offer_searches,
@@ -21,8 +21,8 @@ from snowfall.adapter import (
     trip_searches,
     trips,
 )
-from snowfall.junction.mobile_api import smtp
-from snowfall.junction.offers.v1alpha import models_pb2
+from snowfall.project.junction.service.mobile_api import smtp
+from snowfall.project.junction.service.offers.v1alpha import models_pb2
 from snowfall.stdlib import h3
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.mongo import repository

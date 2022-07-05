@@ -8,7 +8,7 @@ from dateutil import tz
 from google.protobuf import duration_pb2, message, timestamp_pb2
 from google.protobuf.descriptor import EnumDescriptor
 
-from snowfall.common.v1alpha import datetime_pb2, models_pb2
+from snowfall.stdlib.v1alpha import datetime_pb2, models_pb2
 
 _Proto = TypeVar("_Proto", bound=message.Message)
 

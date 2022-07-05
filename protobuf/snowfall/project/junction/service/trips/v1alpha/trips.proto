@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package snowfall.project.junction.service.trips.v1alpha;
+
+import "google/protobuf/timestamp.proto";
+import "snowfall/stdlib/v1alpha/datetime.proto";
+import "snowfall/stdlib/v1alpha/models.proto";
+
+service TripSearchService {
+  rpc EnqueueTripSearch(EnqueueTripSearchRequest) returns (EnqueueTripSearchResponse) {}
+  rpc GetTripSearchDetails(GetTripSearchDetailsRequest) returns (GetTripSearchDetailsResponse) {}
+}
+
+service TripService {
+  rpc GetTrip(GetTripRequest) returns (GetTripResponse) {}
+  rpc ListTrips(ListTripsRequest) returns (ListTripsResponse) {}
+  rpc GetSegment(GetSegmentRequest) returns (GetSegmentResponse) {}
+}
+
+message GetSegmentRequest {
+  string id = 1;
+}
+
+message GetSegmentResponse {
+  snowfall.stdlib.v1alpha.SegmentReference segment = 1;
+}
+
+message GetTripRequest {
+  string id = 1;
+}
+
+message GetTripResponse {
+  snowfall.stdlib.v1alpha.TripReference trip = 1;
+}
+
+message EnqueueTripSearchRequest {
+  TripSearch trip_search = 1;
+}
+
+message EnqueueTripSearchResponse {
+  TripSearch trip_search = 1;
+}
+
+message GetTripSearchDetailsRequest {
+  string id = 1;
+}
+
+message GetTripSearchDetailsResponse {
+  TripSearch trip_search = 1;
+}
+
+message ListTripsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  repeated string ids = 3;
+}
+
+message ListTripsResponse {
+  repeated snowfall.stdlib.v1alpha.TripReference trips = 1;
+  string next_page_token = 2;
+}
+
+message TripSearch {
+  string id = 1; // read only
+  google.protobuf.Timestamp expires_at = 2; // read only
+  snowfall.stdlib.v1alpha.Place origin = 3;
+  snowfall.stdlib.v1alpha.Place destination = 4;
+  snowfall.stdlib.v1alpha.DateTime departure_after = 5;
+  repeated string trip_ids = 6; // read only
+}

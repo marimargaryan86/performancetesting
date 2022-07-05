@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package snowfall.project.junction.service.schedules.v1alpha;
+
+import "snowfall/stdlib/v1alpha/models.proto";
+
+service ScheduleService {
+  rpc GetSchedule(GetScheduleRequest) returns (GetScheduleResponse) {}
+  rpc ListSchedules(ListSchedulesRequest) returns (ListSchedulesResponse) {}
+  rpc GetLeg(GetLegRequest) returns (GetLegResponse) {}
+  rpc ListLegs(ListLegsRequest) returns (ListLegsResponse) {}
+}
+
+message GetScheduleRequest {
+  string id = 1;
+}
+
+message GetScheduleResponse {
+  snowfall.stdlib.v1alpha.Schedule schedule = 1;
+}
+
+message ListSchedulesRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  repeated string ids = 3;
+}
+
+message ListSchedulesResponse {
+  repeated snowfall.stdlib.v1alpha.Schedule schedules = 1;
+  string next_page_token = 2;
+}
+
+message GetLegRequest {
+  string id = 1;
+}
+
+message GetLegResponse {
+  snowfall.stdlib.v1alpha.Leg leg = 1;
+}
+
+message ListLegsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  repeated string ids = 3;
+}
+
+message ListLegsResponse {
+  repeated snowfall.stdlib.v1alpha.Leg legs = 1;
+  string next_page_token = 2;
+}

@@ -5,7 +5,7 @@ import (
 	"bufio"
 	"fmt"
 	"git.snowfall.se/junction/junction/golang/gtfs"
-	v1alpha "git.snowfall.se/junction/junction/golang/protobuf/snowfall/common/v1alpha"
+	v1alpha "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"
 	"git.snowfall.se/junction/junction/golang/protoio"
 	"github.com/bits-and-blooms/bloom"
 	"github.com/catmullet/tz"

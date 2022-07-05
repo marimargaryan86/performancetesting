@@ -1,4 +1,4 @@
-from snowfall.common.v1alpha import models_pb2
+from snowfall.stdlib.v1alpha import models_pb2
 
 _type_mapping = {
     0: models_pb2.Schedule.TYPE_UNSPECIFIED,

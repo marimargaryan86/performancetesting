@@ -5,7 +5,7 @@ from typing import Generic, Sequence, TypeVar
 
 from h3.api import numpy_int as h3
 
-from snowfall.common.v1alpha import models_pb2
+from snowfall.stdlib.v1alpha import models_pb2
 
 _MappedValue = TypeVar("_MappedValue")
 

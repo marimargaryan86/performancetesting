@@ -4,11 +4,15 @@ import random
 import types
 import uuid
 
-from snowfall.common.v1alpha import models_pb2
-from snowfall.junction.offers.v1alpha import models_pb2 as offers_pb2
-from snowfall.junction.orders.v1alpha import models_pb2 as order_models_pb2
-from snowfall.junction.passenger_name_records.v1alpha import passenger_name_records_pb2
+from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
+from snowfall.project.junction.service.orders.v1alpha import (
+    models_pb2 as order_models_pb2,
+)
+from snowfall.project.junction.service.passenger_name_records.v1alpha import (
+    passenger_name_records_pb2,
+)
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.v1alpha import models_pb2
 
 _LATITUDE_RANGE = (-90, 90)
 _LONGITUDE_RANGE = (-180, 180)

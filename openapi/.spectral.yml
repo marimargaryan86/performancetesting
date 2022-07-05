@@ -9,40 +9,40 @@ rules:
   operation-short-summary: off
 overrides:
   - files:
-      - "mobile_api/openapi.json#/components/schemas/SegmentIdentifier/properties/legs/items"
-      - "mobile_api/openapi.json#/components/schemas/Trip/allOf/0/properties/attributes/properties/segments/items"
+      - "junction/mobile_api/openapi.json#/components/schemas/SegmentIdentifier/properties/legs/items"
+      - "junction/mobile_api/openapi.json#/components/schemas/Trip/allOf/0/properties/attributes/properties/segments/items"
     rules:
       json-api-no-nested-relationships: info
   - files:
-      - "mobile_api/openapi.json#/paths/~1places"
-      - "mobile_api/openapi.json#/paths/~1trips~1searches~1{tripSearchId}~1trips"
-      - "mobile_api/openapi.json#/paths/~1users~1{userId}~1orders"
+      - "junction/mobile_api/openapi.json#/paths/~1places"
+      - "junction/mobile_api/openapi.json#/paths/~1trips~1searches~1{tripSearchId}~1trips"
+      - "junction/mobile_api/openapi.json#/paths/~1users~1{userId}~1orders"
     rules:
       ensure-pagination: info
   - files:
-      - "mobile_api/openapi.json#/components/schemas/SegmentIdentifier/properties"
-      - "mobile_api/openapi.json#/components/schemas/Trip"
-      - "mobile_api/openapi.json#/components/schemas/Order"
-      - "mobile_api/openapi.json#/components/schemas/OfferAggregate"
-      - "mobile_api/openapi.json#/components/schemas/OfferGroup/properties"
-      - "mobile_api/openapi.json#/components/schemas/OfferGroupNew/properties"
-      - "mobile_api/openapi.json#/components/schemas/OfferDetails/properties"
-      - "mobile_api/openapi.json#/components/schemas/OfferOption/properties"
-      - "mobile_api/openapi.json#/components/schemas/TripOfferOptionDetails/properties"
+      - "junction/mobile_api/openapi.json#/components/schemas/SegmentIdentifier/properties"
+      - "junction/mobile_api/openapi.json#/components/schemas/Trip"
+      - "junction/mobile_api/openapi.json#/components/schemas/Order"
+      - "junction/mobile_api/openapi.json#/components/schemas/OfferAggregate"
+      - "junction/mobile_api/openapi.json#/components/schemas/OfferGroup/properties"
+      - "junction/mobile_api/openapi.json#/components/schemas/OfferGroupNew/properties"
+      - "junction/mobile_api/openapi.json#/components/schemas/OfferDetails/properties"
+      - "junction/mobile_api/openapi.json#/components/schemas/OfferOption/properties"
+      - "junction/mobile_api/openapi.json#/components/schemas/TripOfferOptionDetails/properties"
     rules:
       json-api-no-nested-id: info
       json-api-no-type: info
   - files:
-      - "mobile_api/openapi.json#/components/schemas/SegmentIdentifier/properties"
-      - "mobile_api/openapi.json#/components/schemas/Trip"
-      - "mobile_api/openapi.json#/components/schemas/Order"
-      - "mobile_api/openapi.json#/components/schemas/OfferAggregate"
-      - "mobile_api/openapi.json#/components/schemas/OfferGroupNew/properties"
-      - "mobile_api/openapi.json#/components/schemas/OfferOption/properties"
+      - "junction/mobile_api/openapi.json#/components/schemas/SegmentIdentifier/properties"
+      - "junction/mobile_api/openapi.json#/components/schemas/Trip"
+      - "junction/mobile_api/openapi.json#/components/schemas/Order"
+      - "junction/mobile_api/openapi.json#/components/schemas/OfferAggregate"
+      - "junction/mobile_api/openapi.json#/components/schemas/OfferGroupNew/properties"
+      - "junction/mobile_api/openapi.json#/components/schemas/OfferOption/properties"
     rules:
       json-api-no-nested-data: info
   - files:
-      - "mobile_api/openapi.json#/components/schemas/PaymentIntent"
-      - "client_api/openapi.json#/components/schemas/Order"
+      - "junction/mobile_api/openapi.json#/components/schemas/PaymentIntent"
+      - "junction/client_api/openapi.json#/components/schemas/Order"
     rules:
       json-api-no-nested-id: info

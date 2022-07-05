@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package snowfall.project.junction.service.offers.v1alpha;
+
+import "snowfall/project/junction/service/offers/v1alpha/models.proto";
+
+message TripOfferSearchTask {
+  string offer_search_id = 1;
+  TripOfferSearch search = 2;
+}

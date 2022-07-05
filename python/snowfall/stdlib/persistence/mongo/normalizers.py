@@ -7,8 +7,8 @@ from typing import Any, Callable, Mapping
 from dateutil import parser
 from google.protobuf import descriptor, timestamp_pb2
 
-from snowfall.common.v1alpha import models_pb2
 from snowfall.stdlib import dictionary
+from snowfall.stdlib.v1alpha import models_pb2
 
 
 @functools.cache
