@@ -1,3 +1,4 @@
+# flake8: noqa: WPS202
 import datetime
 import re
 import uuid
@@ -7,9 +8,8 @@ import pymongo
 from dateutil import parser
 from pymongo import results as pymongo_results
 
-from snowfall.junction.mobile_api import resources
 from snowfall.junction.mobile_api.v1alpha import models_pb2
-from snowfall.stdlib.persistence.mongo import mixins, repository
+from snowfall.stdlib.persistence.mongo import coders, mixins, repository, resultset
 from snowfall.stdlib.persistence.redis import types as redis
 
 _DATA_ACCESSOR = "data"
@@ -21,32 +21,33 @@ _DICT_SEQUENCE = Sequence[dict[str, Any]]
 
 
 class PlacesRepository(
-    mixins.FindByIdMixin[dict[str, Any]],
-    mixins.InsertMixin[dict[str, Any]],
-    repository.DefaultRepository,
+    mixins.FindByIdMixin[models_pb2.Place],
+    mixins.InsertMixin[models_pb2.Place],
+    repository.ProtoRepository[models_pb2.Place],
 ):
-    async def match(self, search_key: Optional[str]) -> Any:
+    _proto = models_pb2.Place
+
+    async def match(
+        self, search_key: Optional[str]
+    ) -> resultset.ResultSet[models_pb2.Place]:
         # TODO: Add a resultScore so can return more relevant.
         #  $text does not work with substrings
         regex = re.compile(search_key, re.IGNORECASE)  # type: ignore[type-var]
         query = {
             "$or": [
-                {"attributes.name": regex},
-                {"attributes.countryName": regex},
-                {"attributes.iataCode": regex},
+                {"name": regex},
+                {"country_name": regex},
+                {"iata_code": regex},
             ],
         }
-        places_response = await self._execute(self._collection.find, query, {"_id": 0})
-        places_response.limit(30)  # noqa: WPS432
-        return [resources.PlaceResource(**place) async for place in places_response]
+        response = await self._execute(self._collection.find, query)
+        response.limit(30)  # noqa: WPS432
+        return response
 
-    async def find(self) -> Any:
-        places_response = await self._execute(self._collection.find, {}, {"_id": 0})
-        places_response.limit(30)  # noqa: WPS432
-        return [resources.PlaceResource(**place) async for place in places_response]
-
-    async def insert_documents(self, documents: Any) -> Any:
-        await self._execute(self._collection.insert_many, documents)
+    async def find(self) -> resultset.ResultSet[models_pb2.Place]:
+        response = await self._execute(self._collection.find, {})
+        response.limit(30)  # noqa: WPS432
+        return response
 
 
 class UsersRepository(
@@ -98,39 +99,40 @@ class OtpRepository(object):
 
 
 class StripeUsersRepository(
-    mixins.FindByIdMixin[dict[str, Any]],
-    mixins.InsertMixin[dict[str, Any]],
-    repository.DefaultRepository,
+    mixins.FindByIdMixin[models_pb2.StripeUser],
+    mixins.InsertMixin[models_pb2.StripeUser],
+    repository.ProtoRepository[models_pb2.StripeUser],
 ):
-    async def get(self, search: Any) -> Any:
-        return await self._execute(self._collection.find_one, filter=search)
+    _proto = models_pb2.StripeUser
 
-
-class PaymentIntentRepository(
-    mixins.FindByIdMixin[dict[str, Any]],
-    mixins.InsertMixin[dict[str, Any]],
-    repository.DefaultRepository,
-):
-    async def append_api_response(self, query: Any, document: Any) -> None:
-        await self._execute(self._collection.update_one, query, document, upsert=False)
+    async def get(self, user_id: str) -> Optional[models_pb2.StripeUser]:
+        return await self._execute(
+            self._collection.find_one, filter={"internal_user_id": user_id}
+        )
 
 
 class OffersRepository(
-    mixins.FindByIdMixin[dict[str, Any]],
-    mixins.InsertMixin[dict[str, Any]],
-    repository.DefaultRepository,
+    mixins.FindByIdMixin[models_pb2.OfferSearchHistory],
+    mixins.InsertMixin[models_pb2.OfferSearchHistory],
+    repository.ProtoRepository[models_pb2.OfferSearchHistory],
 ):
-    async def append_offer_search(self, user_id: str, offer_search_id: str) -> None:
+    _proto = models_pb2.OfferSearchHistory
+
+    async def append_offer_search(
+        self,
+        user_id: str,
+        offer_search_history_entity: models_pb2.OfferSearchHistoryEntity,
+    ) -> None:
+        history_entity_coder = coders.ProtoCoder(models_pb2.OfferSearchHistoryEntity)
         await self._execute(
             self._collection.update_one,
             {"user_id": user_id},
             {
                 "$push": {
-                    "offer_search_history": {
-                        "offer_search_id": offer_search_id,
-                        "created": datetime.datetime.utcnow(),
-                    },
-                },
+                    "offer_search_history": history_entity_coder.encode(
+                        offer_search_history_entity
+                    ),
+                }
             },
             upsert=True,
         )

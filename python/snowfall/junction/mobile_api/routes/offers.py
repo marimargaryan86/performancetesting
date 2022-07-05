@@ -7,6 +7,7 @@ from starlette import endpoints, requests, responses, status
 from snowfall.junction.client_api import resources
 from snowfall.junction.mobile_api import repository
 from snowfall.junction.mobile_api import resources as mobile_resources
+from snowfall.junction.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib.integration.starlette import models, request_helpers
 from snowfall.vendor.junction import client
 
@@ -35,7 +36,9 @@ class OfferSearches(endpoints.HTTPEndpoint):
         )
         await offers_repository.append_offer_search(
             user_id,
-            offer_search[_DATA_KEY][_ID_KEY],
+            models_pb2.OfferSearchHistoryEntity(
+                offer_search_id=offer_search[_DATA_KEY][_ID_KEY],
+            ),
         )
         return models.JsonApiResponse(
             models.Body(

@@ -6,9 +6,7 @@ from snowfall.junction.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
 
-
-class PlaceResource(models.Resource):
-    """Resource for a place."""
+_RELATIONSHIPS_FIELD = "data"
 
 
 class OrderResource(models.Resource):
@@ -65,3 +63,38 @@ class OfferSearchOffersResource(models.Resource):
         offer_search_offer: Mapping[str, Any],
     ) -> OfferSearchOffersResource:
         return cls(**offer_search_offer)
+
+
+class PlaceResource(models.Resource):
+    @classmethod
+    def from_proto(
+        cls,
+        place: models_pb2.Place,
+    ) -> PlaceResource:
+        return cls(
+            id=place.id,
+            type="places",
+            attributes={
+                "countryCode": place.country_code,
+                "countryName": place.country_name,
+                "iataCode": None,
+                "latitude": place.coordinates.latitude,
+                "longitude": place.coordinates.longitude,
+                "name": place.name,
+                "timeZone": place.time_zone,
+            },
+            relationships={
+                "types": {
+                    _RELATIONSHIPS_FIELD: [
+                        models.ResourceIdentifier(
+                            id=protobuf.enum_value_to_slug(
+                                descriptor=models_pb2.Place.Type.DESCRIPTOR,
+                                enum_value=place_type,
+                            ),
+                            type="place-types",
+                        )
+                        for place_type in place.types
+                    ],
+                },
+            },
+        )
