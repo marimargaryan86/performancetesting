@@ -1,19 +1,11 @@
-import ipaddress
-from typing import Sequence
-
 import currencycloud
 import lagom
 from lagom.integrations import starlette
 
-from snowfall.stdlib import service
+from snowfall.stdlib.integration.starlette import application
 
 
-class Settings(service.Settings):
-    forwarded_allowed_ips: Sequence[ipaddress.IPv4Address] = [
-        ipaddress.IPv4Address("127.0.0.1"),
-    ]
-    http_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
-    http_port: int = 8000
+class Settings(application.Settings):
     cc_login: str
     cc_api_key: str
     cc_env: str
