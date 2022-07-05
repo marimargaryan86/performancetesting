@@ -535,7 +535,7 @@
         }
       ],
       "get": {
-        "summary": "Retrieve Orders by User",
+        "summary": "List Orders by User",
         "tags": [
           "user"
         ],
@@ -576,7 +576,7 @@
     },
     "/places": {
       "get": {
-        "summary": "Places",
+        "summary": "List Places",
         "tags": [
           "places"
         ],

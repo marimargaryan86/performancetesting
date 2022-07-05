@@ -109,7 +109,7 @@
     },
     "/balances": {
       "get": {
-        "summary": "Account available balances",
+        "summary": "List Balances",
         "tags": [
           "balances"
         ],
@@ -170,7 +170,7 @@
     },
     "/transactions": {
       "get": {
-        "summary": "Account transactions",
+        "summary": "List Transactions",
         "tags": [
           "transactions"
         ],
