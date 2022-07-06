@@ -106,6 +106,7 @@ class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):  # noqa
             offer_aggregates = await self._aggregates.find_by_offer_search_id(
                 request.offer_search_id,
                 cursor=request.page_token,
+                cabin_classes=list(request.cabin_class_types),
             )
         else:
             offer_aggregates = await self._aggregates.find(

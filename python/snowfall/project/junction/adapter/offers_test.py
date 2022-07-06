@@ -1,4 +1,4 @@
-from typing import Type
+from typing import Sequence, Type
 from unittest import mock
 
 import grpc
@@ -11,6 +11,7 @@ from snowfall.project.junction.service.offers.v1alpha import (
     grpc_pb2_grpc,
     models_pb2,
 )
+from snowfall.stdlib.v1alpha import models_pb2 as common_pb2
 
 
 @pytest.mark.asyncio
@@ -48,6 +49,35 @@ class TestDictClient(object):
             limit=1,
         )
         assert offers_page.offers[0].id == fixtures.OFFERS[0]
+
+    @pytest.mark.parametrize(
+        "types, expected",
+        [
+            (
+                [],
+                1,
+            ),
+            (
+                [common_pb2.CabinClass.TYPE_ECONOMY],
+                1,
+            ),
+            (
+                [common_pb2.CabinClass.TYPE_BUSINESS],
+                0,
+            ),
+        ],
+    )
+    async def test_cabin_class_filter(
+        self,
+        offers_client: offers.Client,
+        types: Sequence[common_pb2.CabinClass.Type.ValueType],
+        expected: int,
+    ) -> None:
+        offers_page = await offers_client.find_offers_by_offer_search(
+            identifier=fixtures.OFFER_SEARCHES[0],
+            cabin_classes=types,
+        )
+        assert len(offers_page.offers) == expected
 
 
 @pytest.mark.asyncio

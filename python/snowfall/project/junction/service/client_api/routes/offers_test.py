@@ -1,3 +1,5 @@
+from typing import Sequence
+
 import pytest
 import rapidjson
 from starlette import status, testclient
@@ -312,3 +314,41 @@ class TestOfferSearches(object):
             ),
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    async def test_offers_are_found(
+        self,
+        client: testclient.TestClient,
+    ) -> None:
+        response = client.get(
+            "/offers/searches/{id}/offers".format(
+                id=fixtures.OFFER_SEARCHES[0],
+            ),
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()["data"]
+
+    @pytest.mark.parametrize(
+        "cabin_classes, expected",
+        [
+            (["economy"], 1),
+            (["economy", "business"], 1),
+            (["business"], 0),
+            (["unknown"], 0),
+            (["economy", "unknown"], 1),
+        ],
+    )
+    async def test_cabin_class_filter(
+        self,
+        client: testclient.TestClient,
+        cabin_classes: Sequence[str],
+        expected: int,
+    ) -> None:
+        response = client.get(
+            "/offers/searches/{id}/offers".format(
+                id=fixtures.OFFER_SEARCHES[0],
+            ),
+            params=[
+                ("filter[groups.options.details.cabinClass]", ",".join(cabin_classes)),
+            ],
+        )
+        assert len(response.json()["data"]) == expected

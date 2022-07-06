@@ -6,7 +6,7 @@ rules:
     then:
       function: pattern
       functionOptions:
-        match: "^[a-z][A-Za-z]+(?:\\[[a-z][A-Za-z]+\\])*$"
+        match: "^[a-z][A-Za-z]+(?:\\[[a-z]([A-Za-z]|\\.[a-z][A-Za-z])+\\])*$"
   property-names:
     severity: warn
     message: "Invalid property name: {{property}} (expected: lowerCamelCase)"

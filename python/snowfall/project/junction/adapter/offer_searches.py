@@ -3,6 +3,7 @@ from __future__ import annotations
 import abc
 import datetime
 import uuid
+from typing import Sequence
 
 import grpc
 
@@ -36,8 +37,10 @@ class Client(abc.ABC):
 
 
 class DictClient(Client):
-    def __init__(self) -> None:
-        self._searches: dict[str, models_pb2.OfferSearch] = {}
+    def __init__(self, offer_searches: Sequence[models_pb2.OfferSearch]) -> None:
+        self._searches: dict[str, models_pb2.OfferSearch] = {
+            offer_search.id: offer_search for offer_search in offer_searches
+        }
 
     async def create(
         self,

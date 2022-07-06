@@ -30,7 +30,14 @@ def offer_bucket_repository(
 def trip_offer_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> offers.TripOfferRepository:
-    return offers.TripOfferRepository(collection=mongo_client.offers.trip_offers)
+    return offers.TripOfferRepository(collection=mongo_client.test.trip_offers)
+
+
+@pytest.fixture
+def offer_options_repository(
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
+) -> offers.OfferOptionsRepository:
+    return offers.OfferOptionsRepository(collection=mongo_client.test.trip_offers)
 
 
 @pytest.fixture
@@ -38,7 +45,7 @@ def offer_searches_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> offers.OfferSearchRepository:
     return offers.OfferSearchRepository(
-        collection=mongo_client.offers.offer_searches,
+        collection=mongo_client.test.offer_searches,
         ttl=datetime.timedelta(days=1),
     )
 
@@ -47,7 +54,7 @@ def offer_searches_repository(
 def offer_aggregate_collection(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> motor_asyncio.AsyncIOMotorCollection:
-    return mongo_client.offers.offer_aggregates
+    return mongo_client.test.offer_aggregates
 
 
 @pytest.fixture

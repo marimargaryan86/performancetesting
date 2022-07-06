@@ -25,6 +25,7 @@ PLACES = (
 TRIPS = ("9d672f0e-0934-4388-8568-03e40c0bf0e9",)
 SCHEDULES = ("d77e4acb-5aa1-47ad-9a15-126c0fa0e157",)
 PROVIDER_OFFERS = ("88a8dcc9-deff-4a0e-bd96-b0faea5ea90f",)
+OFFER_SEARCHES = ("cb2c2359-5520-42fc-9bf9-dc78d708cd5e",)
 OFFERS = ("5927b3ce-fbd7-4f8b-b456-b1b7fd44cdad",)
 OFFER_DETAILS = ("91d4b3f7-bb9d-4ffc-9919-7892fc017740",)
 OFFER_GROUPS = ("2d178001-46ea-415f-8ec7-f22f2318b7c0",)
@@ -144,6 +145,16 @@ def generate_trip_reference(identifier: str) -> models_pb2.TripReference:
     )
 
 
+def get_offer_searches() -> list[offers_pb2.OfferSearch]:
+    return [generate_offer_search(identifier) for identifier in OFFER_SEARCHES]
+
+
+def generate_offer_search(identifier: str) -> offers_pb2.OfferSearch:
+    return offers_pb2.OfferSearch(
+        id=identifier,
+    )
+
+
 def get_offers() -> list[offers_pb2.OfferAggregate]:
     return [generate_offer(identifier) for identifier in OFFERS]
 
@@ -154,6 +165,7 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
         groups=[
             offers_pb2.OfferGroup(
                 id=OFFER_GROUPS[0],
+                offer_search_id=OFFER_SEARCHES[0],
                 offers=[
                     offers_pb2.Offer(
                         id=PROVIDER_OFFERS[0],

@@ -26,6 +26,7 @@ from snowfall.project.junction.service.offers.v1alpha import models_pb2
 from snowfall.stdlib import h3
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.mongo import repository
+from snowfall.stdlib.persistence.mongo.normalizers import TimestampNormalizer
 from snowfall.vendor.junction import client
 
 pytest.register_assert_rewrite("snowfall.stdlib.testing.asserts")
@@ -38,7 +39,20 @@ def _mongo_mock_configure(
     return collection
 
 
+def _mock_denormalize_value(  # type: ignore[no-untyped-def]
+    self,  # noqa: ANN001
+    normalized_value: datetime.datetime,
+) -> str:
+    if not normalized_value.tzinfo:
+        normalized_value = normalized_value.replace(tzinfo=datetime.timezone.utc)
+
+    return normalized_value.isoformat()
+
+
 repository._configure_collection = _mongo_mock_configure  # noqa: WPS437
+TimestampNormalizer._denormalize_value = (  # type: ignore[assignment] # noqa: WPS437
+    _mock_denormalize_value
+)
 
 
 @pytest.fixture
@@ -103,7 +117,7 @@ def offers_client() -> offers.Client:
 
 @pytest.fixture
 def offer_searches_client() -> offer_searches.Client:
-    return offer_searches.DictClient()
+    return offer_searches.DictClient(fixtures.get_offer_searches())
 
 
 @pytest.fixture

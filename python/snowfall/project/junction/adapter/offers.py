@@ -13,6 +13,7 @@ from snowfall.project.junction.service.offers.v1alpha import (
     grpc_pb2_grpc,
     models_pb2,
 )
+from snowfall.stdlib.v1alpha import models_pb2 as common_pb2
 
 
 class NotFoundError(Exception):
@@ -47,6 +48,7 @@ class Client(abc.ABC):  # noqa: WPS214
         identifier: str,
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
+        cabin_classes: Optional[Sequence[common_pb2.CabinClass.Type.ValueType]] = None,
     ) -> OffersPage:
         """Get offer results for an offer search."""
 
@@ -132,13 +134,22 @@ class DictClient(Client):  # noqa: WPS214
         identifier: str,
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
+        cabin_classes: Optional[Sequence[common_pb2.CabinClass.Type.ValueType]] = None,
     ) -> OffersPage:
-        return OffersPage(
-            offers=[
+        offers = [
+            offer
+            for offer in self._offers.values()
+            if offer.groups and offer.groups[0].offer_search_id == identifier
+        ]
+        if cabin_classes:
+            offers = [
                 offer
-                for offer in self._offers.values()
-                if offer.groups and offer.groups[0].offer_search_id == identifier
-            ],
+                for offer in offers
+                if self._offer_has_cabin_classes(offer, cabin_classes)
+            ]
+
+        return OffersPage(
+            offers=offers,
         )
 
     async def find_by_ids(
@@ -236,6 +247,19 @@ class DictClient(Client):  # noqa: WPS214
         for group in self._iterate_groups():
             yield from group.offers
 
+    def _offer_has_cabin_classes(
+        self,
+        offer: models_pb2.OfferAggregate,
+        cabin_classes: Sequence[common_pb2.CabinClass.Type.ValueType],
+    ) -> bool:
+        options = [option for group in offer.groups for option in group.offers]
+
+        return any(
+            detail.cabin_class.type in cabin_classes
+            for option in options
+            for detail in option.segment_details
+        )
+
 
 class GrpcClient(Client):  # noqa: WPS214
     def __init__(self, offers: grpc_pb2_grpc.OfferServiceStub, timeout: int = 10):
@@ -263,10 +287,12 @@ class GrpcClient(Client):  # noqa: WPS214
         identifier: str,
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
+        cabin_classes: Optional[Sequence[common_pb2.CabinClass.Type.ValueType]] = None,
     ) -> OffersPage:
         request = grpc_pb2.ListOffersRequest(
             page_token=cursor or "",
             offer_search_id=identifier,
+            cabin_class_types=cabin_classes,
         )
         if limit is not None:
             request.page_size = limit

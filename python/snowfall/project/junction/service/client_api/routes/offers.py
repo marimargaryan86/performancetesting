@@ -1,4 +1,5 @@
 import datetime
+from typing import cast
 
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
@@ -16,6 +17,7 @@ from snowfall.stdlib.integration.starlette import (
     pagination_helpers,
     request_helpers,
 )
+from snowfall.stdlib.v1alpha import models_pb2 as common_pb2
 
 
 class Offer(endpoints.HTTPEndpoint):
@@ -369,6 +371,7 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
         client: offers.Client = lagom.injectable,
     ) -> responses.Response:
         offer_search_id = request.path_params["offerSearchId"]
+        cabin_classes = _get_cabin_class_filter(request)
 
         # todo: Check should probably be done in the RPC, but that requires refactoring.
         try:
@@ -381,6 +384,7 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
             identifier=offer_search_id,
             cursor=pagination.cursor,
             limit=pagination.limit,
+            cabin_classes=cabin_classes,
         )
 
         return models.JsonApiResponse(
@@ -402,3 +406,30 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
                 ),
             ),
         )
+
+
+def _get_cabin_class_filter(
+    request: requests.Request,
+) -> list[common_pb2.CabinClass.Type.ValueType]:
+    cabin_classes_raw = request.scope["query_string"].get(
+        "filter[groups.options.details.cabinClass]",
+        [],
+    )
+
+    cabin_class_enums = []
+
+    for cabin_class_id in cabin_classes_raw:
+        try:
+            cabin_class_enums.append(
+                protobuf.slug_to_enum_value(
+                    common_pb2.CabinClass.Type.DESCRIPTOR,
+                    cabin_class_id,
+                ),
+            )
+        except KeyError:
+            cabin_class_enums.append(common_pb2.CabinClass.TYPE_UNSPECIFIED)
+
+    return [
+        cast(common_pb2.CabinClass.Type.ValueType, cabin_class_enum)
+        for cabin_class_enum in cabin_class_enums
+    ]

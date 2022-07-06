@@ -1,3 +1,4 @@
+import copy
 import datetime
 import uuid
 from typing import Optional, Sequence
@@ -8,6 +9,7 @@ from motor import motor_asyncio
 
 from snowfall.project.junction.service.offers.v1alpha import models_pb2
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
+from snowfall.stdlib.v1alpha import models_pb2 as common_pb2
 
 _IN = "$in"
 
@@ -115,7 +117,7 @@ class OfferOptionsRepository(
         )
 
     async def find_by_id(self, document_id: str) -> Optional[models_pb2.Offer]:
-        details = await self._find_nested(
+        options = await self._find_nested(
             path="$offers",
             filter_={
                 "offers.id": {
@@ -125,7 +127,7 @@ class OfferOptionsRepository(
         )
 
         try:
-            return await details.take()
+            return await options.take()
         except StopAsyncIteration:
             return None
 
@@ -136,6 +138,7 @@ class OfferOptionDetailsRepository(
     _proto = models_pb2.OfferSegmentDetails
     _indexes = [
         pymongo.IndexModel("offers.segment_details.id", background=True),
+        pymongo.IndexModel("offers.segment_details.cabin_class.type", background=True),
     ]
 
     async def find(
@@ -186,6 +189,7 @@ class OfferAggregateMappingRepository(
     _proto = models_pb2.OfferAggregateMapping
     _indexes = [
         pymongo.IndexModel("offer_search_id", background=True),
+        pymongo.IndexModel("offer_result_ids", background=True),
         pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True),
     ]
 
@@ -193,10 +197,40 @@ class OfferAggregateMappingRepository(
         self,
         offer_search_id: str,
         cursor: str,
+        cabin_classes: Sequence[common_pb2.CabinClass.Type.ValueType],
     ) -> resultset.ResultSet[models_pb2.OfferAggregateMapping]:
-        return await self._find_with_cursor(
-            cur=cursor,
-            filter_={"offer_search_id": offer_search_id},
+        filter_pre_cursor = {"offer_search_id": offer_search_id}
+        cursor_filter = copy.deepcopy(dict(filter_pre_cursor))
+
+        if cursor:
+            cursor_filter = self._with_cursor_filters(cursor, filter_pre_cursor)
+
+        aggregate = [
+            {
+                "$match": cursor_filter,
+            },
+            {
+                "$lookup": {
+                    "from": "trip_offers",
+                    "localField": "offer_result_ids",
+                    "foreignField": "_id",
+                    "as": "results",
+                },
+            },
+            {
+                "$match": {
+                    "results.offers.segment_details.cabin_class.type": {
+                        "$in": cabin_classes,
+                    },
+                },
+            },
+            {"$sort": {"_id": 1}},
+        ]
+
+        return await self._execute(
+            query=self._collection.aggregate,
+            pipeline=aggregate,
+            filter_pre_cursor=filter_pre_cursor,
         )
 
     async def find(

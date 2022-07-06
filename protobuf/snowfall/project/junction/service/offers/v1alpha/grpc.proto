@@ -3,6 +3,7 @@ syntax = "proto3";
 package snowfall.project.junction.service.offers.v1alpha;
 
 import "snowfall/project/junction/service/offers/v1alpha/models.proto";
+import "snowfall/stdlib/v1alpha/models.proto";
 
 service OfferSearchService {
   rpc EnqueueOfferSearch(EnqueueOfferSearchRequest) returns (EnqueueOfferSearchResponse) {}
@@ -53,6 +54,7 @@ message ListOffersRequest {
     string offer_search_id = 3;
     ListOfIds offer_ids = 4;
   }
+  repeated snowfall.stdlib.v1alpha.CabinClass.Type cabin_class_types = 5;
 }
 
 message ListOfIds {
