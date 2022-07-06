@@ -1,6 +1,7 @@
 <script lang="ts">
   import balanceAccounts from "$content/balance-accounts";
   import Button from "$lib/components/button.svelte";
+  import SelectField from "$lib/components/select-field.svelte";
   import Table from "$lib/components/table.svelte";
   import DownloadIcon from "$lib/icons/download-icon.svelte";
   import routeConfig from "$lib/route-config";
@@ -8,6 +9,15 @@
   import Layout from "../_layout.svelte";
 
   const accounts = balanceAccounts;
+
+  const currencies = [
+    { code: "USD" },
+    { code: "GBP" },
+    { code: "EUR" },
+    { code: "AED" },
+    { code: "AUD" },
+  ].map((currency) => ({ ...currency, toString: () => currency.code }));
+  let currency: { code: string } | undefined = undefined;
 </script>
 
 <svelte:head>
@@ -16,13 +26,7 @@
 
 <Layout>
   <div class="select-currency" slot="action">
-    <select>
-      <option>USD</option>
-      <option>GBP</option>
-      <option>EUR</option>
-      <option>AED</option>
-      <option>AUD</option>
-    </select>
+    <SelectField bind:value={currency} items={currencies} />
 
     <Button>
       <DownloadIcon />
@@ -94,6 +98,17 @@
 
   .sub-accounts > :global(table) {
     width: 100%;
+  }
+
+  .select-currency > :global(.select-field.select-field) {
+    height: 100%;
+    width: 388px;
+  }
+
+  .select-currency > :global(.select-field > .wrapper) {
+    border: 0;
+    border-radius: 0;
+    vertical-align: top;
   }
 
   .totals {

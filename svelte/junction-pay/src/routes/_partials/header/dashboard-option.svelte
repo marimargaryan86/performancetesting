@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let option: "go" | "pay" | "plus";
+  export let option: string;
 </script>
 
 <span>

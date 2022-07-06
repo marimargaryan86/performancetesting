@@ -15,7 +15,9 @@
   <section class="content">
     <Header />
 
-    <slot />
+    <div class="wrapper">
+      <slot />
+    </div>
 
     <Button><SupportIcon /> Support</Button>
   </section>
@@ -51,7 +53,7 @@
     overflow-x: hidden;
   }
 
-  .content > :global(:nth-child(2)) {
+  .wrapper {
     align-self: center;
     justify-self: center;
     max-width: 422px;
