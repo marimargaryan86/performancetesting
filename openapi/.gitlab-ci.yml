@@ -6,7 +6,10 @@ openapi:breaking:
     GIT_DEPTH: 0
     GIT_STRATEGY: clone
   script: |
-    for f in openapi/**/*.json; do
+    set -eu
+    shopt -s globstar
+    shopt -s nullglob
+    for f in openapi/**/openapi.json; do
       git show "${CI_MERGE_REQUEST_DIFF_BASE_SHA}:${f}" > old.json || continue
       if ! oasdiff -format text -base old.json -revision "${f}" -breaking-only -fail-on-diff; then
         if [ "$BREAKING" -eq "1" ]; then
