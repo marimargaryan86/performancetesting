@@ -304,13 +304,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "ad2b33dbe33a6d4ca1f0037e1d156d0a89107ee63c0600e3b4f7b60e37998ac2",
-              "url": "https://files.pythonhosted.org/packages/5c/51/1f16a0ba6cbe3bab9e1e12a9bae0b94254fa0ec9b1a6ec853d767563dbdb/flake8_bugbear-22.6.22-py3-none-any.whl"
+              "hash": "db5d7a831ef4412a224b26c708967ff816818cabae415e76b8c58df156c4b8e5",
+              "url": "https://files.pythonhosted.org/packages/0c/b9/52ee0bc650ac484ee0a806a9dc0a34c4f76a4e9867f01d3979ede678c5cd/flake8_bugbear-22.7.1-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "ac3317eba27d79dc19dcdeb7356ca1f656f0cde11d899c4551badf770f05cbef",
-              "url": "https://files.pythonhosted.org/packages/a5/c2/dbed1a47ddaffc4f0c8f80d40995a0cb15434b3d1563228ad6b1cc322108/flake8-bugbear-22.6.22.tar.gz"
+              "hash": "e450976a07e4f9d6c043d4f72b17ec1baf717fe37f7997009c8ae58064f88305",
+              "url": "https://files.pythonhosted.org/packages/20/6f/4685e2de876ba4b189806ab2b9fc2e4bb970b02319dbd8e87ffc5643593e/flake8-bugbear-22.7.1.tar.gz"
             }
           ],
           "project_name": "flake8-bugbear",
@@ -323,7 +323,7 @@
             "pre-commit; extra == \"dev\""
           ],
           "requires_python": ">=3.6",
-          "version": "22.6.22"
+          "version": "22.7.1"
         },
         {
           "artifacts": [
@@ -1014,13 +1014,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "c1848f654aea2e3526d17fc3ce6aeaa5e7e24e66e645b5be2171f3f6b4e5a178",
-              "url": "https://files.pythonhosted.org/packages/e9/86/b2ede1d87122a6d4da86d84cc35d0e48b4aa2476e4281d06101c772c1961/setuptools-62.6.0-py3-none-any.whl"
+              "hash": "db3b8e2f922b2a910a29804776c643ea609badb6a32c4bcc226fd4fd902cce65",
+              "url": "https://files.pythonhosted.org/packages/ae/7f/6d816941769a7783be4258dd35e28bbf1a64bb36b1b7e0c773eff07fb0a8/setuptools-63.1.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "990a4f7861b31532871ab72331e755b5f14efbe52d336ea7f6118144dd478741",
-              "url": "https://files.pythonhosted.org/packages/dc/73/88920663229023b724a854d1ab7e3e50a1a28b63eeec399a604ba30f9242/setuptools-62.6.0.tar.gz"
+              "hash": "16923d366ced322712c71ccb97164d07472abeecd13f3a6c283f6d5d26722793",
+              "url": "https://files.pythonhosted.org/packages/67/25/42e2d6664c3e106c33ecad8356a55e3ae5d81708c89098061a97fbff7cee/setuptools-63.1.0.tar.gz"
             }
           ],
           "project_name": "setuptools",
@@ -1046,7 +1046,7 @@
             "pytest-checkdocs>=2.4; extra == \"testing\"",
             "pytest-cov; platform_python_implementation != \"PyPy\" and extra == \"testing\"",
             "pytest-enabler; extra == \"testing-integration\"",
-            "pytest-enabler>=1.0.1; extra == \"testing\"",
+            "pytest-enabler>=1.3; extra == \"testing\"",
             "pytest-flake8; extra == \"testing\"",
             "pytest-mypy>=0.9.1; platform_python_implementation != \"PyPy\" and extra == \"testing\"",
             "pytest-perf; extra == \"testing\"",
@@ -1068,7 +1068,7 @@
             "wheel; extra == \"testing-integration\""
           ],
           "requires_python": ">=3.7",
-          "version": "62.6"
+          "version": "63.1"
         },
         {
           "artifacts": [
@@ -1169,19 +1169,19 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "6657594ee297170d19f67d55c05852a874e7eb634f4f753dbd667855e07c1708",
-              "url": "https://files.pythonhosted.org/packages/75/e1/932e06004039dd670c9d5e1df0cd606bf46e29a28e65d5bb28e894ea29c9/typing_extensions-4.2.0-py3-none-any.whl"
+              "hash": "25642c956049920a5aa49edcdd6ab1e06d7e5d467fc00e0506c44ac86fbfca02",
+              "url": "https://files.pythonhosted.org/packages/ed/d6/2afc375a8d55b8be879d6b4986d4f69f01115e795e36827fd3a40166028b/typing_extensions-4.3.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "f1c24655a0da0d1b67f07e17a5e6b2a105894e6824b92096378bb3668ef02376",
-              "url": "https://files.pythonhosted.org/packages/fe/71/1df93bd59163c8084d812d166c907639646e8aac72886d563851b966bf18/typing_extensions-4.2.0.tar.gz"
+              "hash": "e6d2677a32f47fc7eb2795db1dd15c1f34eff616bcaf2cfb5e997f854fa1c4a6",
+              "url": "https://files.pythonhosted.org/packages/9e/1d/d128169ff58c501059330f1ad96ed62b79114a2eb30b8238af63a2e27f70/typing_extensions-4.3.0.tar.gz"
             }
           ],
           "project_name": "typing-extensions",
           "requires_dists": [],
           "requires_python": ">=3.7",
-          "version": "4.2"
+          "version": "4.3"
         },
         {
           "artifacts": [

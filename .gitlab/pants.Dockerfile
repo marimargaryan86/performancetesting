@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gnupg \
     jq \
     lsb-release \
-&& curl -fsSL https://github.com/Tufin/oasdiff/releases/download/v1.1.30/oasdiff_1.1.30_linux_amd64.deb > /tmp/oasdiff.deb \
+&& curl -fsSL https://github.com/Tufin/oasdiff/releases/download/v1.1.36/oasdiff_1.1.36_linux_amd64.deb > /tmp/oasdiff.deb \
 && curl -fsSL https://sentry.io/get-cli/ | bash \
 && curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg \
 && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
