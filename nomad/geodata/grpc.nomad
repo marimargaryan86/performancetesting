@@ -32,6 +32,7 @@ job "geodata-grpc" {
 
     network {
       port "grpc" {}
+      port "prometheus" {}
     }
 
     service {
@@ -43,6 +44,18 @@ job "geodata-grpc" {
         type     = "grpc"
         interval = "10s"
         timeout  = "2s"
+      }
+    }
+    service {
+      name = "geodata-${NOMAD_NAMESPACE}"
+      port = "prometheus"
+      tags = ["metrics"]
+
+      check {
+        type = "http"
+        path = "/"
+        interval = "10s"
+        timeout = "2s"
       }
     }
 
@@ -60,7 +73,7 @@ EOH
 
       config {
         image = var.docker_image
-        ports = ["grpc"]
+        ports = ["grpc", "prometheus"]
         args = [
           "grpc",
         ]
@@ -77,7 +90,9 @@ EOH
         GRPC_ADDRESS = "0.0.0.0"
         GRPC_PORT    = "${NOMAD_PORT_grpc}"
         SENTRY_DSN   = "https://dd680235569f43ce97b7e91d839900a0@sentry.snowfall.se/31"
+        PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
       }
     }
   }
 }
+
