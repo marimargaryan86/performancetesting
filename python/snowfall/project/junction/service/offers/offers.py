@@ -12,6 +12,7 @@ from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 from snowfall.stdlib.v1alpha import models_pb2 as common_pb2
 
 _IN = "$in"
+_OFFER_SEARCH_ID = "offer_search_id"
 
 
 class TripOfferRepository(
@@ -21,7 +22,7 @@ class TripOfferRepository(
 ):
     _proto = models_pb2.OfferGroup
     _indexes = [
-        pymongo.IndexModel("offer_search_id", background=True),
+        pymongo.IndexModel(_OFFER_SEARCH_ID, background=True),
         pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True),
     ]
 
@@ -188,7 +189,7 @@ class OfferAggregateMappingRepository(
 ):
     _proto = models_pb2.OfferAggregateMapping
     _indexes = [
-        pymongo.IndexModel("offer_search_id", background=True),
+        pymongo.IndexModel(_OFFER_SEARCH_ID, background=True),
         pymongo.IndexModel("offer_result_ids", background=True),
         pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True),
     ]
@@ -199,7 +200,13 @@ class OfferAggregateMappingRepository(
         cursor: str,
         cabin_classes: Sequence[common_pb2.CabinClass.Type.ValueType],
     ) -> resultset.ResultSet[models_pb2.OfferAggregateMapping]:
-        filter_pre_cursor = {"offer_search_id": offer_search_id}
+        if not cabin_classes:
+            return await self._find_with_cursor(
+                cur=cursor,
+                filter_={_OFFER_SEARCH_ID: offer_search_id},
+            )
+
+        filter_pre_cursor = {_OFFER_SEARCH_ID: offer_search_id}
         cursor_filter = copy.deepcopy(dict(filter_pre_cursor))
 
         if cursor:
