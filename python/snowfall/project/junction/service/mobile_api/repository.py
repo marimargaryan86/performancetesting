@@ -170,7 +170,7 @@ class OrdersRepository(
             _ATTRIBUTES_ACCESSOR
         ]["orderResults"]
         attributes["junctionOrderId"] = junction_order[_DATA_ACCESSOR][_ID_ACCESSOR]
-        attributes["createdAt"] = datetime.datetime.utcnow()
+        attributes["createdAt"] = datetime.datetime.now(datetime.timezone.utc)
         attributes["userId"] = user_id
         document["links"] = {"self": "https://snowfall.se"}
         await self.insert(document)

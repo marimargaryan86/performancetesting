@@ -44,11 +44,11 @@ class Orders(endpoints.HTTPEndpoint):
         contact_details = body["contactDetails"]
 
         junction_order = await junction_client.create_order(
-            body["offerAggregate"][_ID],
+            body["offer"][_ID],
             [
-                offer[_ID]
-                for group in body["offerAggregate"]["groups"]
-                for offer in group["offers"]
+                option[_ID]
+                for group in body["offer"]["attributes"]["groups"]
+                for option in group["attributes"]["options"]
             ],
             [
                 vendor_models.Passenger(**vendor_models.dict_factory_to_snake(pax))

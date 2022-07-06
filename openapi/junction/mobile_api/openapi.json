@@ -1358,27 +1358,8 @@
                     "type": "string",
                     "example": "NEEDS EXAMPLE"
                   },
-                  "offerAggregate": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "format": "uuid",
-                        "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
-                      },
-                      "expiresAt": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2019-08-24T14:15:22Z"
-                      },
-                      "groups": {
-                        "type": "array",
-                        "minItems": 1,
-                        "items": {
-                          "$ref": "#/components/schemas/OfferGroup"
-                        }
-                      }
-                    }
+                  "offer": {
+                    "$ref": "#/components/schemas/OrderOfferAggregate"
                   },
                   "passengers": {
                     "type": "array",
@@ -1402,7 +1383,7 @@
                   }
                 },
                 "required": [
-                  "offerAggregate",
+                  "offer",
                   "passengers",
                   "contactDetails",
                   "paymentIntentId",
@@ -1803,32 +1784,6 @@
           "attributes"
         ]
       },
-      "Offer": {
-        "title": "Offer",
-        "description": "Offer for one or more segments. Used for creating an Order.",
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
-          },
-          "price": {
-            "$ref": "#/components/schemas/Price"
-          },
-          "segmentDetails": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/OfferSegmentDetails"
-            }
-          }
-        },
-        "required": [
-          "id",
-          "price",
-          "segmentDetails"
-        ]
-      },
       "OfferAggregateIdentifier": {
         "title": "Offer Aggregate Identifier",
         "type": "object",
@@ -1851,44 +1806,6 @@
           "type"
         ]
       },
-      "OfferSegmentDetails": {
-        "title": "Offer Segment Details",
-        "description": "Specific details for an offer on a specific segment.",
-        "type": "object",
-        "properties": {
-          "ref": {
-            "type": "string",
-            "format": "uuid",
-            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
-          },
-          "cabinClass": {
-            "$ref": "#/components/schemas/CabinClassDetails"
-          }
-        },
-        "required": [
-          "ref",
-          "cabinClass"
-        ]
-      },
-      "CabinClassDetails": {
-        "title": "Cabin Class Details",
-        "description": "Internal and marketing name of a cabin class.",
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "example": "economy"
-          },
-          "marketingName": {
-            "type": "string",
-            "example": "Economy"
-          }
-        },
-        "required": [
-          "name",
-          "marketingName"
-        ]
-      },
       "Price": {
         "title": "Price",
         "description": "Amount and currency.",
@@ -1906,44 +1823,6 @@
         "required": [
           "currency",
           "amount"
-        ]
-      },
-      "OfferSegment": {
-        "title": "Offer Segment",
-        "description": "Segment related to a grouped offer.",
-        "type": "object",
-        "properties": {
-          "ref": {
-            "type": "string",
-            "format": "uuid",
-            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
-          },
-          "legs": {
-            "type": "array",
-            "minItems": 1,
-            "uniqueItems": true,
-            "items": {
-              "$ref": "#/components/schemas/OfferSegmentLeg"
-            }
-          },
-          "vendor": {
-            "type": "string",
-            "example": "BA"
-          },
-          "operator": {
-            "type": "string",
-            "example": "BA",
-            "nullable": true
-          },
-          "routeIdentifiers": {
-            "$ref": "#/components/schemas/RouteIdentifiers"
-          }
-        },
-        "required": [
-          "ref",
-          "legs",
-          "vendor",
-          "operator"
         ]
       },
       "RouteIdentifiers": {
@@ -2115,6 +1994,50 @@
         ],
         "description": "Result of searching for offers. Used for creating an Order. Chose one offer from each group when creating an order."
       },
+      "OrderOfferAggregate": {
+        "title": "OfferAggregate",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "offers"
+                ],
+                "example": "offers"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "groups",
+                  "expiresAt"
+                ],
+                "properties": {
+                  "groups": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "$ref": "#/components/schemas/OfferGroupNew"
+                    }
+                  },
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "description": "Result of searching for offers. Used for creating an Order. Chose one offer from each group when creating an order."
+      },
       "Point": {
         "title": "Point",
         "description": "Generalized data about a location.",
@@ -2149,33 +2072,6 @@
           "timeZone"
         ]
       },
-      "OfferGroup": {
-        "title": "Offer Group",
-        "description": "Result of searching for offers. Used for creating an Order. Chose one offer when creating an order.",
-        "type": "object",
-        "properties": {
-          "offers": {
-            "type": "array",
-            "uniqueItems": true,
-            "minItems": 1,
-            "items": {
-              "$ref": "#/components/schemas/Offer"
-            }
-          },
-          "segments": {
-            "type": "array",
-            "uniqueItems": true,
-            "minItems": 1,
-            "items": {
-              "$ref": "#/components/schemas/OfferSegment"
-            }
-          }
-        },
-        "required": [
-          "offers",
-          "segments"
-        ]
-      },
       "OfferGroupNew": {
         "title": "Offer Group",
         "description": "Result of searching for offers.",
@@ -2184,8 +2080,7 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-            "readOnly": true
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
           },
           "type": {
             "type": "string",
@@ -2395,7 +2290,6 @@
         "properties": {
           "email": {
             "type": "string",
-            "format": "email",
             "example": "john.smith@example.com"
           },
           "address": {
