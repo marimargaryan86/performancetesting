@@ -243,7 +243,7 @@ class TripSearchesRepository(
             relationships_to_save,
             "relationships",
         )
-        document = self._convert_to_datetime(
+        document[_ATTRIBUTES_ACCESSOR] = self._convert_to_datetime(
             document[_ATTRIBUTES_ACCESSOR],
             date_attributes,
         )
