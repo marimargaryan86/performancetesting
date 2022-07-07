@@ -7,7 +7,7 @@ from snowfall import fixtures
 @pytest.mark.asyncio
 class TestOrders(object):
     async def test_order_unauthorized(self, client: testclient.TestClient) -> None:
-        client.headers["Authorization"] = "{0}f".format(client.headers["Authorization"])
+        client.headers["Authorization"] = "invalid"
         response = client.get("/orders/{id}".format(id=fixtures.ORDERS[0]))
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
@@ -26,7 +26,7 @@ class TestOrders(object):
         self,
         client: testclient.TestClient,
     ) -> None:
-        client.headers["Authorization"] = "{0}f".format(client.headers["Authorization"])
+        client.headers["Authorization"] = "invalid"
         response = client.post(
             "/orders",
             json={
@@ -203,7 +203,7 @@ class TestOrders(object):
         self,
         client: testclient.TestClient,
     ) -> None:
-        client.headers["Authorization"] = "{0}f".format(client.headers["Authorization"])
+        client.headers["Authorization"] = "invalid"
         response = client.patch(
             "/orders/{orderId}".format(
                 orderId=fixtures.ORDERS[0],

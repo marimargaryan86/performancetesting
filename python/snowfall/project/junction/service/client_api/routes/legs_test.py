@@ -19,7 +19,7 @@ class TestLegs(object):
         assert response.status_code == status.HTTP_200_OK
 
     def test_leg_unauthorized(self, client: testclient.TestClient) -> None:
-        client.headers["Authorization"] = "{0}f".format(client.headers["Authorization"])
+        client.headers["Authorization"] = "invalid"
         response = client.get("/legs/{id}".format(id=fixtures.LEGS[0]))
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
@@ -45,7 +45,7 @@ class TestLegs(object):
         assert response.status_code == status.HTTP_200_OK
 
     def test_segment_legs_unauthorized(self, client: testclient.TestClient) -> None:
-        client.headers["Authorization"] = "{0}f".format(client.headers["Authorization"])
+        client.headers["Authorization"] = "invalid"
         response = client.get("/segments/{id}/legs".format(id=fixtures.SEGMENTS[0]))
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
@@ -58,7 +58,7 @@ class TestLegs(object):
         assert response.status_code == status.HTTP_200_OK
 
     def test_trip_legs_unauthorized(self, client: testclient.TestClient) -> None:
-        client.headers["Authorization"] = "{0}f".format(client.headers["Authorization"])
+        client.headers["Authorization"] = "invalid"
         response = client.get("/trips/{id}/legs".format(id=fixtures.TRIPS[0]))
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 

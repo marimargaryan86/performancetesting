@@ -22,7 +22,7 @@ class TestOffers(object):
         assert response.status_code == status.HTTP_200_OK
 
     async def test_offer_unauthorized(self, client: testclient.TestClient) -> None:
-        client.headers["Authorization"] = "{0}f".format(client.headers["Authorization"])
+        client.headers["Authorization"] = "invalid"
         response = client.get("/offers/{id}".format(id=fixtures.OFFERS[0]))
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
@@ -138,7 +138,7 @@ class TestOfferSearches(object):
         self,
         client: testclient.TestClient,
     ) -> None:
-        client.headers["Authorization"] = "{0}f".format(client.headers["Authorization"])
+        client.headers["Authorization"] = "invalid"
         response = client.post(
             "/offers/searches",
             json={
@@ -298,7 +298,7 @@ class TestOfferSearches(object):
             headers={"Content-Type": "application/vnd.api+json"},
         )
         offer_search_id = rapidjson.loads(offer_search.content.decode())["data"]["id"]
-        client.headers["Authorization"] = "{0}f".format(client.headers["Authorization"])
+        client.headers["Authorization"] = "invalid"
         response = client.get(
             "/offers/searches/{id}".format(id=offer_search_id),
         )

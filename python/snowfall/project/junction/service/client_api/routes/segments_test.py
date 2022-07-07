@@ -5,7 +5,7 @@ from snowfall import fixtures
 
 class TestSegments(object):
     def test_segment_unauthorized(self, client: testclient.TestClient) -> None:
-        client.headers["Authorization"] = "{0}f".format(client.headers["Authorization"])
+        client.headers["Authorization"] = "invalid"
         response = client.get("/segments/{id}".format(id=fixtures.SEGMENTS[0]))
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 

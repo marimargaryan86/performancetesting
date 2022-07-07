@@ -55,7 +55,7 @@ class TestTripSearches(object):
         self,
         client: testclient.TestClient,
     ) -> None:
-        client.headers["Authorization"] = "{0}f".format(client.headers["Authorization"])
+        client.headers["Authorization"] = "invalid"
         request = {
             "data": {
                 "attributes": {
@@ -263,7 +263,7 @@ class TestTripSearches(object):
         trip_search_request: trip_searches.TripSearchRequest,
         client: testclient.TestClient,
     ) -> None:
-        client.headers["Authorization"] = "{0}f".format(client.headers["Authorization"])
+        client.headers["Authorization"] = "invalid"
         trip_search = await trip_searches_client.create(trip_search_request)
         response = client.get(
             "/trips/searches/{id}".format(id=trip_search.id),
@@ -285,7 +285,7 @@ class TestTripSearches(object):
         trip_search_request: trip_searches.TripSearchRequest,
         client: testclient.TestClient,
     ) -> None:
-        client.headers["Authorization"] = "{0}f".format(client.headers["Authorization"])
+        client.headers["Authorization"] = "invalid"
         trip_search = await trip_searches_client.create(trip_search_request)
         response = client.get(
             "/trips/searches/{id}/trips".format(id=trip_search.id),
