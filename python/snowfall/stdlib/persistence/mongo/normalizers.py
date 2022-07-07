@@ -58,7 +58,11 @@ class _Normalizer(abc.ABC):
 
         for path in analyzed:
             if path:
-                dictionary.set_nested_value(as_dict, path.split("."), function)
+                as_dict = dictionary.set_nested_value(
+                    as_dict,
+                    path.split("."),
+                    function,
+                )
             else:
                 as_dict = function(as_dict)
 

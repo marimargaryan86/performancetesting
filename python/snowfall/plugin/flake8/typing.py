@@ -8,11 +8,17 @@ PLUGIN_VERSION = "1.0.0"
 
 BANNED_ARG_TYPES = frozenset(
     (
+        "collections.abc.MutableMapping",
+        "collections.abc.MutableSequence",
+        "collections.abc.MutableSet",
         "dict",
         "list",
         "set",
         "typing.Dict",
         "typing.List",
+        "typing.MutableMapping",
+        "typing.MutableSequence",
+        "typing.MutableSet",
         "typing.Set",
     ),
 )

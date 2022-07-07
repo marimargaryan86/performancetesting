@@ -1,35 +1,43 @@
-from typing import Any, Awaitable, Callable, MutableMapping, Sequence
+import copy
+from typing import Any, Awaitable, Callable, Mapping, Sequence, Union
 
 
 def set_nested_value(
-    input_dict: MutableMapping[str, Any],
+    input_dict: Mapping[str, Any],
     path: Sequence[str],
     function: Callable[[Any], Any],
-) -> None:
-    # todo: This should probably return a new dict, not mutate the input dict
+) -> dict[str, Any]:
+    dict_copy = dict(copy.deepcopy(input_dict))
     path = list(path)
     key = path.pop(0)
 
     try:
-        parent = input_dict[key]
+        parent = dict_copy[key]
     except KeyError:
-        return
+        return dict_copy
 
     if path:
-        _recurse_children(parent, path, function)
+        dict_copy[key] = _recurse_children(parent, path, function)
     else:
-        input_dict[key] = function(parent)
+        dict_copy[key] = function(parent)
+
+    return dict_copy
 
 
 def _recurse_children(
     parent: Any,
     path: Sequence[str],
     function: Callable[[Any], Awaitable[Any]],
-) -> None:
+) -> Union[list[Any], dict[str, Any]]:
     if not isinstance(parent, list):
-        parent = [parent]
+        if isinstance(parent, dict):
+            return set_nested_value(parent, path, function)
+        return parent
 
-    children = (child for child in parent if isinstance(child, dict))
+    for index, child in enumerate(parent):
+        if not isinstance(child, dict):
+            continue
 
-    for child in children:
-        set_nested_value(child, path, function)
+        parent[index] = set_nested_value(child, path, function)
+
+    return parent

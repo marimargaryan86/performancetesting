@@ -1,8 +1,8 @@
-# flake8: noqa: WPS202
+import copy
 import datetime
 import re
 import uuid
-from typing import Any, Mapping, MutableMapping, Optional, Sequence
+from typing import Any, Mapping, Optional, Sequence
 
 import pymongo
 from dateutil import parser
@@ -28,7 +28,8 @@ class PlacesRepository(
     _proto = models_pb2.Place
 
     async def match(
-        self, search_key: Optional[str]
+        self,
+        search_key: Optional[str],
     ) -> resultset.ResultSet[models_pb2.Place]:
         # TODO: Add a resultScore so can return more relevant.
         #  $text does not work with substrings
@@ -107,7 +108,8 @@ class StripeUsersRepository(
 
     async def get(self, user_id: str) -> Optional[models_pb2.StripeUser]:
         return await self._execute(
-            self._collection.find_one, filter={"internal_user_id": user_id}
+            self._collection.find_one,
+            filter={"internal_user_id": user_id},
         )
 
 
@@ -130,9 +132,9 @@ class OffersRepository(
             {
                 "$push": {
                     "offer_search_history": history_entity_coder.encode(
-                        offer_search_history_entity
+                        offer_search_history_entity,
                     ),
-                }
+                },
             },
             upsert=True,
         )
@@ -181,7 +183,8 @@ class OrdersRepository(
         user_id: str,
     ) -> Any:
         orders = await self._execute(
-            self._collection.find, {"attributes.userId": user_id}
+            self._collection.find,
+            {"attributes.userId": user_id},
         )
         orders.sort(("attributes.createdAt", -1))
         return orders
@@ -240,7 +243,7 @@ class TripSearchesRepository(
             relationships_to_save,
             "relationships",
         )
-        self._convert_to_datetime(
+        document = self._convert_to_datetime(
             document[_ATTRIBUTES_ACCESSOR],
             date_attributes,
         )
@@ -296,11 +299,15 @@ class TripSearchesRepository(
 
     def _convert_to_datetime(
         self,
-        document: MutableMapping[str, Any],
+        document: Mapping[str, Any],
         keys: Sequence[str],
-    ) -> None:
+    ) -> dict[str, Any]:
+        new_document = dict(copy.deepcopy(document))
+
         for key in keys:
-            document[key] = parser.parse(document[key])
+            new_document[key] = parser.parse(new_document[key])
+
+        return new_document
 
 
 class TripsRepository(
