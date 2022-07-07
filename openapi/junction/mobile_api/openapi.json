@@ -547,10 +547,12 @@
             "content": {
               "application/vnd.api+json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "properties": {
-                      "data": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "description": "Orders list.",
+                      "type": "array",
+                      "items": {
                         "$ref": "#/components/schemas/Order"
                       }
                     }

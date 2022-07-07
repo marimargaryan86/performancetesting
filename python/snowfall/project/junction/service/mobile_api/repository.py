@@ -181,9 +181,10 @@ class OrdersRepository(
         user_id: str,
     ) -> Any:
         orders = await self._execute(
-            self._collection.find({"attributes.userId": user_id}),
+            self._collection.find, {"attributes.userId": user_id}
         )
-        return orders.sort("attributes.createdAt", -1)
+        orders.sort(("attributes.createdAt", -1))
+        return orders
 
     async def update_order_results(
         self,
