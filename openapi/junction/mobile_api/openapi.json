@@ -2435,7 +2435,7 @@
               "pending",
               "confirmed",
               "rejected",
-              "not_ticketed",
+              "not-ticketed",
               "error",
               "timeout"
             ]
