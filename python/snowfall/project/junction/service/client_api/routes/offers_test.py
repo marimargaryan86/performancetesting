@@ -197,7 +197,7 @@ class TestOfferSearches(object):
             },
             headers={"Content-Type": "application/vnd.api+json"},
         )
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert response.status_code == status.HTTP_404_NOT_FOUND
 
     async def test_offer_search_can_be_created(
         self,

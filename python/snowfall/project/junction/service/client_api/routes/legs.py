@@ -101,14 +101,11 @@ class LegsBySegmentId(endpoints.HTTPEndpoint):
         except segments_adapter.NotFoundError as segments_err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from segments_err
 
-        try:
-            legs_page = await legs_client.find_by_ids(
-                segment.leg_ids,
-                limit=pagination.limit,
-                cursor=pagination.cursor,
-            )
-        except legs_adapter.NotFoundError as legs_err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from legs_err
+        legs_page = await legs_client.find_by_ids(
+            segment.leg_ids,
+            limit=pagination.limit,
+            cursor=pagination.cursor,
+        )
 
         return models.JsonApiResponse(
             models.Body(
@@ -145,14 +142,11 @@ class LegsByTripId(endpoints.HTTPEndpoint):
         except trips_adapter.NotFoundError as trips_err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from trips_err
 
-        try:
-            legs_page = await legs_client.find_by_ids(
-                [leg_id for segment in trip.segments for leg_id in segment.leg_ids],
-                limit=pagination.limit,
-                cursor=pagination.cursor,
-            )
-        except legs_adapter.NotFoundError as legs_err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from legs_err
+        legs_page = await legs_client.find_by_ids(
+            [leg_id for segment in trip.segments for leg_id in segment.leg_ids],
+            limit=pagination.limit,
+            cursor=pagination.cursor,
+        )
 
         return models.JsonApiResponse(
             models.Body(

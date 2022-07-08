@@ -19,7 +19,7 @@ pants:setup:
   before_script:
     - ./pants --version
   after_script:
-    - ./bash/nuke-if-too-big.sh .cache 640
+    - ./bash/nuke-if-too-big.sh .cache 384
   variables:
     GIT_DEPTH: 0
     GIT_STRATEGY: clone

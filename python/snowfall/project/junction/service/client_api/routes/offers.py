@@ -13,6 +13,7 @@ from snowfall.project.junction.service.offers.v1alpha import models_pb2
 from snowfall.stdlib import sequence
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import (
+    handlers,
     models,
     pagination_helpers,
     request_helpers,
@@ -308,10 +309,8 @@ class OfferSearches(endpoints.HTTPEndpoint):
 
         try:
             segments = await trips_to_segments.transform(trip_ids=body["trips"])
-        except trip_ids_to_segments.MissingTripsError as err:
-            raise exceptions.HTTPException(
-                status.HTTP_422_UNPROCESSABLE_ENTITY,
-            ) from err
+        except trip_ids_to_segments.MissingTripsError:
+            return handlers.error_response_from_status(status.HTTP_404_NOT_FOUND)
 
         offer_search = await offer_search_client.create(
             request=models_pb2.OfferSearch(

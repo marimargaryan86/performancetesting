@@ -13,7 +13,7 @@ function nuke_if_too_big() {
 	size_mb=$(du -m -d0 "${path}" | cut -f 1)
 	if ((size_mb > limit_mb)); then
 		echo "${path} is larger than ${limit_mb}mb (currently at ${size_mb}mb), nuking it."
-		rm -rf "${path}"
+		rm -rf "${path:?}"/*
 	else
 		echo "${path} is smaller than ${limit_mb}mb (currently at ${size_mb}mb), keeping it."
 	fi
