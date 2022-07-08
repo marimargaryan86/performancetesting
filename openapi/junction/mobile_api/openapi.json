@@ -1626,7 +1626,7 @@
                   },
                   "email": {
                     "type": "string",
-                    "pattern": "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$",
+                    "format": "email",
                     "example": "user@example.com"
                   },
                   "phone": {
@@ -1734,7 +1734,7 @@
               },
               "email": {
                 "type": "string",
-                "pattern": "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$",
+                "format": "email",
                 "example": "user@example.com",
                 "writeOnly": true
               }
@@ -1773,7 +1773,7 @@
             "properties": {
               "email": {
                 "type": "string",
-                "pattern": "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$",
+                "format": "email",
                 "example": "user@example.com",
                 "writeOnly": true
               }
@@ -2292,6 +2292,7 @@
         "properties": {
           "email": {
             "type": "string",
+            "format": "email",
             "example": "john.smith@example.com"
           },
           "address": {

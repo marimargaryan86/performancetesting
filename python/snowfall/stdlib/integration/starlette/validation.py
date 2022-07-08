@@ -1,6 +1,7 @@
 import pathlib
 from typing import Any
 
+import email_validator
 import openapi_core
 import rapidjson
 from furl import furl
@@ -39,7 +40,24 @@ async def response_to_openapi(response: responses.Response) -> OpenAPIResponse:
         data=response.body.decode("utf-8"),
         mimetype=response.media_type,
         status_code=response.status_code,
+        headers=Headers(dict(response.headers)),
     )
+
+
+class EmailFormatter(object):
+    def validate(self, potential_email: Any) -> bool:
+        try:
+            self.unmarshal(potential_email)
+        except email_validator.EmailNotValidError:
+            return False
+
+        return True
+
+    def unmarshal(self, email: Any) -> str:
+        return email_validator.validate_email(
+            email=email,
+            check_deliverability=False,
+        ).email
 
 
 class UriFormatter(object):
@@ -66,7 +84,7 @@ class Validator(object):
                 url="file://{0}".format(str(spec_path)),
             )
             deserializer = {"application/vnd.api+json": rapidjson.loads}
-            formatter = {"uri": UriFormatter()}
+            formatter = {"email": EmailFormatter(), "uri": UriFormatter()}
             self._request_validator = RequestValidator(
                 spec,
                 custom_formatters=formatter,

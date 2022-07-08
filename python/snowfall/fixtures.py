@@ -229,6 +229,9 @@ def generate_order(identifier: str) -> order_models_pb2.Order:
             )
             for offer in get_offers()[0].groups[0].offers
         ],
+        contact_details=order_models_pb2.ContactDetails(
+            email="example@example.com",
+        ),
     )
 
 

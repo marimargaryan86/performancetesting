@@ -84,6 +84,8 @@ class DictClient(Client):
                 )
                 for offer_id in offer_ids
             ],
+            passengers=passengers,
+            contact_details=contact_details,
         )
         self._orders[order.id] = order
 

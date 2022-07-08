@@ -20,6 +20,7 @@
 //     "click==8.1.3",
 //     "cryptography==37.0.2",
 //     "currency-cloud==5.1.2",
+//     "email-validator==1.2.1",
 //     "fakeredis==1.8",
 //     "freezegun==1.2.1",
 //     "furl==2.1.3",
@@ -1728,13 +1729,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "5eb781753403847fb320f05e9ab2191725b58c5e7f97f1bed63285ca423159bc",
-              "url": "https://files.pythonhosted.org/packages/41/67/6fc491d809a87a7bf08fa73907705d38f26ddcc4d50d9610f772276c3ce5/jsonschema-4.6.1-py3-none-any.whl"
+              "hash": "e331e32e29743014fa59fa77895b5d8669382a4904c8ef23144f7f078ec031c7",
+              "url": "https://files.pythonhosted.org/packages/1c/4d/b6451349302b995170687c86b53630a3117f4a94ea2432e24b4d6df859f2/jsonschema-4.6.2-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "ec2802e6a37517f09d47d9ba107947589ae1d25ff557b925d83a321fc2aa5d3b",
-              "url": "https://files.pythonhosted.org/packages/42/d9/bfc795bb02d0cee772f7b339c5aa6fdd8778e852951e62603556d6143fbc/jsonschema-4.6.1.tar.gz"
+              "hash": "b19f62322b0f06927e8ae6215c01654e1885857cdcaf58ae1772b1aa97f1faf2",
+              "url": "https://files.pythonhosted.org/packages/70/84/81ce4657b6c12d56df49c6d53523597e177be12570d8aa9b5ffe62ec2080/jsonschema-4.6.2.tar.gz"
             }
           ],
           "project_name": "jsonschema",
@@ -1762,7 +1763,7 @@
             "webcolors>=1.11; extra == \"format-nongpl\""
           ],
           "requires_python": ">=3.7",
-          "version": "4.6.1"
+          "version": "4.6.2"
         },
         {
           "artifacts": [
@@ -1788,23 +1789,22 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "cac9c68dd7715b4ab6ae510c20b4676e5ce751f0a5434d5ad8236d974e2a2b69",
-              "url": "https://files.pythonhosted.org/packages/47/f0/acaaf7d4864928ee9d0018432aabf926a664fb574fdc4a58e23f9923f292/mongomock-4.0.0-py2.py3-none-any.whl"
+              "hash": "08a24938a05c80c69b6b8b19a09888d38d8c6e7328547f94d46cadb7f47209f2",
+              "url": "https://files.pythonhosted.org/packages/41/01/6561c17d130954c5a1813f6006278bf321f56ef7e782313e4f2338a86a3b/mongomock-4.1.2-py2.py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "b1832c3748d47444c18867373e5cea754c2e6f644a0cfbfd667f178f68bdecfc",
-              "url": "https://files.pythonhosted.org/packages/c7/6a/690398412a5bee6e8179eb7cf7a3007866e496bd07f69fc459092e8b0467/mongomock-4.0.0.tar.gz"
+              "hash": "f06cd62afb8ae3ef63ba31349abd220a657ef0dd4f0243a29587c5213f931b7d",
+              "url": "https://files.pythonhosted.org/packages/a7/bf/3739cf74935f0fda26ea97dcb700f5bb1247100c9478914198c594500e43/mongomock-4.1.2.tar.gz"
             }
           ],
           "project_name": "mongomock",
           "requires_dists": [
             "packaging",
-            "sentinels",
-            "six"
+            "sentinels"
           ],
           "requires_python": null,
-          "version": "4"
+          "version": "4.1.2"
         },
         {
           "artifacts": [
@@ -3518,19 +3518,19 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "6011befa13f901fc934f59bb1fd6973be6f3acf4ebfce427593a27e7f492918f",
-              "url": "https://files.pythonhosted.org/packages/32/21/c6377210b9e6ab1a4b491b1ec66f1befd4268204abe35cc1810bdad5c7e3/types_urllib3-1.26.15-py3-none-any.whl"
+              "hash": "20588c285e5ca336d908d2705994830a83cfb6bda40fc356bbafaf430a262013",
+              "url": "https://files.pythonhosted.org/packages/04/9f/65ce26fb8b191c91ec7afe3804da305c02331111d8abec7bf706a35b68a5/types_urllib3-1.26.16-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "c89283541ef92e344b7f59f83ea9b5a295b16366ceee3f25ecfc5593c79f794e",
-              "url": "https://files.pythonhosted.org/packages/0f/a4/fb3ae6c8c5440225b7ee3f9cc0a6d38b79b953862931b5f6f7281f3850e0/types-urllib3-1.26.15.tar.gz"
+              "hash": "8bb3832c684c30cbed40b96e28bc04703becb2b97d82ac65ba4b968783453b0e",
+              "url": "https://files.pythonhosted.org/packages/7f/71/f6078ac156b931e70ab206fc84938697ca1f3a08510a2e08a683ba1b0317/types-urllib3-1.26.16.tar.gz"
             }
           ],
           "project_name": "types-urllib3",
           "requires_dists": [],
           "requires_python": null,
-          "version": "1.26.15"
+          "version": "1.26.16"
         },
         {
           "artifacts": [
@@ -3554,13 +3554,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "44ece4d53fb1706f667c9bd1c648f5469a2ec925fcf3a776667042d645472c14",
-              "url": "https://files.pythonhosted.org/packages/ec/03/062e6444ce4baf1eac17a6a0ebfe36bb1ad05e1df0e20b110de59c278498/urllib3-1.26.9-py2.py3-none-any.whl"
+              "hash": "8298d6d56d39be0e3bc13c1c97d133f9b45d797169a0e11cdd0e0489d786f7ec",
+              "url": "https://files.pythonhosted.org/packages/68/47/93d3d28e97c7577f563903907912f4b3804054e4877a5ba6651f7182c53b/urllib3-1.26.10-py2.py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "aabaf16477806a5e1dd19aa41f8c2b7950dd3c746362d7e3223dbe6de6ac448e",
-              "url": "https://files.pythonhosted.org/packages/1b/a5/4eab74853625505725cefdf168f48661b2cd04e7843ab836f3f63abf81da/urllib3-1.26.9.tar.gz"
+              "hash": "879ba4d1e89654d9769ce13121e0f94310ea32e8d2f8cf587b77c08bbcdb30d6",
+              "url": "https://files.pythonhosted.org/packages/25/36/f056e5f1389004cf886bb7a8514077f24224238a7534497c014a6b9ac770/urllib3-1.26.10.tar.gz"
             }
           ],
           "project_name": "urllib3",
@@ -3575,8 +3575,8 @@
             "ipaddress; python_version == \"2.7\" and extra == \"secure\"",
             "pyOpenSSL>=0.14; extra == \"secure\""
           ],
-          "requires_python": "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,<4,>=2.7",
-          "version": "1.26.9"
+          "requires_python": "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,<4,>=2.7",
+          "version": "1.26.10"
         },
         {
           "artifacts": [
@@ -3997,6 +3997,7 @@
     "click==8.1.3",
     "cryptography==37.0.2",
     "currency-cloud==5.1.2",
+    "email-validator==1.2.1",
     "fakeredis==1.8",
     "freezegun==1.2.1",
     "furl==2.1.3",
