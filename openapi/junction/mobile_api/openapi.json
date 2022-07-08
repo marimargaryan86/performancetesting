@@ -2436,7 +2436,8 @@
               "confirmed",
               "rejected",
               "not_ticketed",
-              "error"
+              "error",
+              "timeout"
             ]
           }
         },

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import enum
 from typing import Any, Mapping
 
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
@@ -16,6 +17,16 @@ class OrderResource(models.Resource):
         order: Mapping[str, Any],
     ) -> OrderResource:
         return cls(**order)
+
+
+class OrderStatus(enum.Enum):
+    unspecified = "unspecified"
+    pending = "pending"
+    confirmed = "confirmed"
+    rejected = "rejected"
+    not_ticketed = "not_ticketed"
+    error = "error"
+    timeout = "timeout"
 
 
 class TripSearchResource(models.Resource):

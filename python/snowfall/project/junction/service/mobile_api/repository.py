@@ -8,6 +8,7 @@ import pymongo
 from dateutil import parser
 from pymongo import results as pymongo_results
 
+from snowfall.project.junction.service.mobile_api import resources
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib.persistence.mongo import coders, mixins, repository, resultset
 from snowfall.stdlib.persistence.redis import types as redis
@@ -156,6 +157,7 @@ class OrdersRepository(
     _indexes = [
         pymongo.IndexModel("attributes.userId", background=True),
         pymongo.IndexModel("attributes.createdAt", background=True),
+        pymongo.IndexModel("attributes.junctionOrderId", background=True),
     ]
 
     async def create_order(
@@ -196,12 +198,27 @@ class OrdersRepository(
     ) -> pymongo_results.UpdateResult:
         return await self._execute(
             self._collection.update_one,
-            {_ID_ACCESSOR: order_id},
+            {"attributes.junctionOrderId": order_id},
             {
                 "$set": {
                     "attributes.orderResults": junction_order[_DATA_ACCESSOR][
                         _ATTRIBUTES_ACCESSOR
                     ]["orderResults"],
+                },
+            },
+        )
+
+    async def set_order_status(
+        self,
+        order_id: str,
+        status: resources.OrderStatus,
+    ) -> pymongo_results.UpdateResult:
+        return await self._execute(
+            self._collection.update_one,
+            {"attributes.junctionOrderId": order_id},
+            {
+                "$set": {
+                    "attributes.orderResults.$[].status": status.value,
                 },
             },
         )
