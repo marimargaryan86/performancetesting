@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package snowfall.stdlib.v1alpha;
+
+import "google/protobuf/timestamp.proto";
+
+message Foobar {
+  string id = 1;
+  google.protobuf.Timestamp updated_at = 2;
+}

@@ -3,7 +3,7 @@ import datetime
 import pydantic
 
 from snowfall.stdlib.persistence.mongo import coders
-from snowfall.stdlib.v1alpha import models_pb2
+from snowfall.stdlib.v1alpha import testing_pb2
 
 
 class _TestModel(pydantic.BaseModel):
@@ -20,8 +20,8 @@ def test_noop_coder() -> None:
 
 
 def test_proto_coder() -> None:
-    coder = coders.ProtoCoder[models_pb2.Place](models_pb2.Place)
-    payload = models_pb2.Place()
+    coder = coders.ProtoCoder[testing_pb2.Foobar](testing_pb2.Foobar)
+    payload = testing_pb2.Foobar()
     encoded = coder.encode(payload)
 
     assert isinstance(encoded["updated_at"], datetime.datetime)

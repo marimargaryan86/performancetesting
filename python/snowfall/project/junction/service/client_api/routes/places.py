@@ -1,23 +1,23 @@
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.project.junction.adapter import places
+from snowfall.project.junction.adapter import locations
 from snowfall.project.junction.service.client_api import resources
+from snowfall.project.junction.service.places.v1alpha import models_pb2
 from snowfall.stdlib import sequence
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models, pagination_helpers
-from snowfall.stdlib.v1alpha import models_pb2
 
 
 class Place(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        client: places.Client = lagom.injectable,
+        client: locations.Client = lagom.injectable,
     ) -> responses.Response:
         try:
             place = await client.get(request.path_params["placeId"])
-        except places.NotFoundError as err:
+        except locations.NotFoundError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
         return models.JsonApiResponse(
@@ -31,7 +31,7 @@ class Places(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        client: places.Client = lagom.injectable,
+        client: locations.Client = lagom.injectable,
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
         response = await client.find(limit=pagination.limit, cursor=pagination.cursor)
@@ -39,8 +39,8 @@ class Places(endpoints.HTTPEndpoint):
         return models.JsonApiResponse(
             models.Body(
                 data=[
-                    resources.PlaceResource.from_proto(place, request)
-                    for place in response.places
+                    resources.PlaceResource.from_proto(location, request)
+                    for location in response.locations
                 ],
                 links=pagination_helpers.get_next_url(
                     request.url_for("ListPlaces"),
@@ -59,7 +59,7 @@ class PlaceType(endpoints.HTTPEndpoint):
         place_type_id = request.path_params["placeTypeId"]
         try:
             place_type = protobuf.slug_to_enum_value(
-                models_pb2.Place.Type.DESCRIPTOR,
+                models_pb2.Location.Type.DESCRIPTOR,
                 place_type_id,
             )
         except KeyError as err:
@@ -82,7 +82,7 @@ class PlaceTypes(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
         sequence_page = sequence.paginate(
-            sequence=models_pb2.Place.Type.values(),
+            sequence=models_pb2.Location.Type.values(),
             cursor=pagination.cursor,
             limit=pagination.limit,
         )

@@ -6,8 +6,11 @@ import pytest
 
 from snowfall import fixtures
 from snowfall.project.junction.adapter import places
-from snowfall.project.junction.service.places.v1alpha import places_pb2, places_pb2_grpc
-from snowfall.stdlib.v1alpha import models_pb2
+from snowfall.project.junction.service.places.v1alpha import (
+    models_pb2,
+    places_pb2,
+    places_pb2_grpc,
+)
 
 
 @pytest.mark.asyncio
@@ -17,7 +20,7 @@ class TestDictClient(object):
         places_client: places.Client,
     ) -> None:
         place = await places_client.get(fixtures.PLACES[0])
-        assert place.id == fixtures.PLACES[0]
+        assert place.location.id == fixtures.PLACES[0]
 
     async def test_missing_place_throws_error(
         self,
@@ -69,20 +72,20 @@ class TestGrpcClient(object):
             await client.get(fixtures.NOT_FOUND)
 
     async def test_single_place_is_retrievable(self) -> None:
-        proto = models_pb2.Place(id=fixtures.PLACES[0])
+        proto = models_pb2.Place(location=models_pb2.Location(id=fixtures.PLACES[0]))
         stub = mock.create_autospec(places_pb2_grpc.PlacesServiceStub)
         stub.GetPlace = mock.AsyncMock(
             return_value=places_pb2.GetPlaceResponse(place=proto),
         )
         client = places.GrpcClient(stub)
         place = await client.get(fixtures.PLACES[0])
-        assert place.id == fixtures.PLACES[0]
+        assert place.location.id == fixtures.PLACES[0]
 
     async def test_multiple_places_are_retrievable(self) -> None:
         response = places_pb2.ListPlacesResponse(
             places=[
-                models_pb2.Place(id=fixtures.PLACES[0]),
-                models_pb2.Place(id=fixtures.PLACES[1]),
+                models_pb2.Place(location=models_pb2.Location(id=fixtures.PLACES[0])),
+                models_pb2.Place(location=models_pb2.Location(id=fixtures.PLACES[1])),
             ],
         )
         stub = mock.create_autospec(places_pb2_grpc.PlacesServiceStub)

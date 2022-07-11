@@ -5,6 +5,7 @@ from lagom.integrations import starlette
 
 from snowfall.project.junction.adapter import (  # noqa: WPS235
     legs,
+    locations,
     offer_searches,
     offers,
     orders,
@@ -32,6 +33,7 @@ class Settings(application.Settings):
 
 def create_dependencies(  # noqa: WPS211
     legs_client: legs.Client,
+    locations_client: locations.Client,
     places_client: places.Client,
     trip_searches_client: trip_searches.Client,
     trips_client: trips.Client,
@@ -43,6 +45,7 @@ def create_dependencies(  # noqa: WPS211
 ) -> starlette.StarletteIntegration:
     container = lagom.Container()
     container[legs.Client] = legs_client  # type: ignore[misc]
+    container[locations.Client] = locations_client  # type: ignore[misc]
     container[places.Client] = places_client  # type: ignore[misc]
     container[trip_searches.Client] = trip_searches_client  # type: ignore[misc]
     container[trips.Client] = trips_client  # type: ignore[misc]

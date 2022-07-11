@@ -1,9 +1,9 @@
 from starlette import status, testclient
 
 from snowfall import fixtures
+from snowfall.project.junction.service.places.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette.routes import testing
-from snowfall.stdlib.v1alpha import models_pb2
 
 
 class TestPlaces(object):
@@ -15,7 +15,7 @@ class TestPlaces(object):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_place_is_found(self, client: testclient.TestClient) -> None:
-        response = client.get("/places/{id}".format(id=fixtures.PLACES[0]))
+        response = client.get("/places/{id}".format(id=fixtures.LOCATIONS[0]))
         assert response.status_code == status.HTTP_200_OK
 
     def test_multiple_places_are_found(self, client: testclient.TestClient) -> None:
@@ -33,9 +33,9 @@ class TestPlaces(object):
             url="/places/types",
             expected_ids=[
                 protobuf.enum_value_to_slug(
-                    descriptor=models_pb2.Place.Type.DESCRIPTOR,
+                    descriptor=models_pb2.Location.Type.DESCRIPTOR,
                     enum_value=place_type,
                 )
-                for place_type in models_pb2.Place.Type.values()
+                for place_type in models_pb2.Location.Type.values()
             ],
         )

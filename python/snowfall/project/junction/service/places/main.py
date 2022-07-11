@@ -5,13 +5,13 @@ from typing import Sequence
 from motor import motor_asyncio
 from pydantic import AnyUrl
 
-from snowfall.project.junction.service.places.consumer import PlaceImportConsumer
+from snowfall.project.junction.service.places.consumer import LocationImportConsumer
 from snowfall.project.junction.service.places.grpc import (
-    CuratedPlacesService,
+    LocationsService,
     PlacesService,
 )
 from snowfall.project.junction.service.places.places import (
-    CuratedPlaceRepository,
+    LocationRepository,
     PlaceRepository,
 )
 from snowfall.stdlib import service
@@ -40,13 +40,13 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
     )
 
     async with connection:
-        consumer = PlaceImportConsumer(
-            places=PlaceRepository(mongo.places.places),
+        consumer = LocationImportConsumer(
+            locations=LocationRepository(mongo.places.locations),
             consumer=amqp.Consumer(
                 connection=connection,
                 exchange=amqp.Exchange("places"),
-                queue_name="{0}_places_importer".format(app.name),
-                routing_key="place.import",
+                queue_name="{0}_locations_importer".format(app.name),
+                routing_key="location.import",
             ),
         )
 
@@ -65,8 +65,8 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
                 PlaceRepository(mongo.places.places),
                 app.settings.default_page_size,
             ),
-            CuratedPlacesService(
-                CuratedPlaceRepository(mongo.places.curated_places),
+            LocationsService(
+                LocationRepository(mongo.places.locations),
                 app.settings.default_page_size,
             ),
         ],

@@ -11,6 +11,7 @@ from starlette.middleware import Middleware, authentication
 
 from snowfall.project.junction.adapter import (
     legs,
+    locations,
     offer_searches,
     offers,
     orders,
@@ -48,6 +49,7 @@ jwt_public_key = b64encode(jwt_public_key_bytes).decode()
 
 def _create_app(  # noqa: WPS211
     legs_client: legs.Client,
+    locations_client: locations.Client,
     places_client: places.Client,
     trip_searches_client: trip_searches.Client,
     trips_client: trips.Client,
@@ -64,6 +66,7 @@ def _create_app(  # noqa: WPS211
         custom_middlewares=custom_middlewares,
         dependencies=bootstrap.create_dependencies(
             legs_client=legs_client,
+            locations_client=locations_client,
             places_client=places_client,
             trip_searches_client=trip_searches_client,
             trips_client=trips_client,
@@ -88,6 +91,7 @@ def headers() -> dict[str, str]:
 @pytest.fixture()
 def app(  # noqa: WPS211
     legs_client: legs.Client,
+    locations_client: locations.Client,
     places_client: places.Client,
     trip_searches_client: trip_searches.Client,
     trips_client: trips.Client,
@@ -109,6 +113,7 @@ def app(  # noqa: WPS211
             ),
         ],
         legs_client=legs_client,
+        locations_client=locations_client,
         places_client=places_client,
         trip_searches_client=trip_searches_client,
         trips_client=trips_client,

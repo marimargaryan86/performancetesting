@@ -24,8 +24,8 @@ class UnknownError(Exception):
 
 @dataclasses.dataclass(frozen=True)
 class TripSearchRequest(object):
-    origin: models_pb2.Place
-    destination: models_pb2.Place
+    origin: models_pb2.Point
+    destination: models_pb2.Point
     departure_after: datetime.datetime
 
 

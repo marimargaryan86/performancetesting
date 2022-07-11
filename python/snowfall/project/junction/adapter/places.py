@@ -6,8 +6,11 @@ from typing import Optional, Sequence
 
 import grpc
 
-from snowfall.project.junction.service.places.v1alpha import places_pb2, places_pb2_grpc
-from snowfall.stdlib.v1alpha import models_pb2
+from snowfall.project.junction.service.places.v1alpha import (
+    models_pb2,
+    places_pb2,
+    places_pb2_grpc,
+)
 
 
 class NotFoundError(Exception):
@@ -47,7 +50,7 @@ class Client(abc.ABC):
 
 class DictClient(Client):
     def __init__(self, places: Sequence[models_pb2.Place]):
-        self._places = {place.id: place for place in places}
+        self._places = {place.location.id: place for place in places}
 
     async def get(self, place_id: str) -> models_pb2.Place:
         try:

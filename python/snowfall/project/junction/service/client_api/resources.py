@@ -13,6 +13,9 @@ from snowfall.project.junction.service.offers.v1alpha import (
 from snowfall.project.junction.service.orders.v1alpha import (
     models_pb2 as order_models_pb2,
 )
+from snowfall.project.junction.service.places.v1alpha import (
+    models_pb2 as place_models_pb2,
+)
 from snowfall.project.junction.service.trips.v1alpha import trips_pb2
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
@@ -347,7 +350,7 @@ class PlaceResource(models.Resource):
     @classmethod
     def from_proto(
         cls,
-        place: models_pb2.Place,
+        place: place_models_pb2.Location,
         request: requests.Request,
     ) -> PlaceResource:
         return cls(
@@ -366,7 +369,7 @@ class PlaceResource(models.Resource):
                     _RELATIONSHIPS_FIELD: [
                         models.ResourceIdentifier(
                             id=protobuf.enum_value_to_slug(
-                                descriptor=models_pb2.Place.Type.DESCRIPTOR,
+                                descriptor=place_models_pb2.Location.Type.DESCRIPTOR,
                                 enum_value=place_type,
                             ),
                             type="place-types",
@@ -388,11 +391,11 @@ class PlaceTypeResource(models.Resource):
     @classmethod
     def from_proto(
         cls,
-        place_type: models_pb2.Place.Type.V,
+        place_type: place_models_pb2.Location.Type.V,
         request: requests.Request,
     ) -> PlaceTypeResource:
         place_type_id = protobuf.enum_value_to_slug(
-            descriptor=models_pb2.Place.Type.DESCRIPTOR,
+            descriptor=place_models_pb2.Location.Type.DESCRIPTOR,
             enum_value=place_type,
         )
         return cls(
@@ -638,13 +641,13 @@ class TripSearchResource(models.Resource):
             relationships={
                 "origin": {
                     _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
-                        id=trip_search.origin.id,
+                        id=trip_search.origin.ref,
                         type="places",
                     ),
                 },
                 "destination": {
                     _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
-                        id=trip_search.destination.id,
+                        id=trip_search.destination.ref,
                         type="places",
                     ),
                 },

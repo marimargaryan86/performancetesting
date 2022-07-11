@@ -5,7 +5,7 @@ import lagom
 from dateutil import parser
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.project.junction.adapter import places, trip_searches, trips
+from snowfall.project.junction.adapter import locations, trip_searches, trips
 from snowfall.project.junction.service.client_api import resources
 from snowfall.stdlib import sequence
 from snowfall.stdlib.integration.starlette import (
@@ -13,6 +13,7 @@ from snowfall.stdlib.integration.starlette import (
     pagination_helpers,
     request_helpers,
 )
+from snowfall.stdlib.v1alpha import models_pb2
 
 
 class Trip(endpoints.HTTPEndpoint):
@@ -100,17 +101,17 @@ class TripSearches(endpoints.HTTPEndpoint):
     async def post(
         self,
         request: requests.Request,
-        places_client: places.Client = lagom.injectable,
+        locations_client: locations.Client = lagom.injectable,
         trip_searches_client: trip_searches.Client = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
 
         try:
             (origin, destination) = await asyncio.gather(
-                places_client.get(body["origin"]),
-                places_client.get(body["destination"]),
+                locations_client.get(body["origin"]),
+                locations_client.get(body["destination"]),
             )
-        except places.NotFoundError as err:
+        except locations.NotFoundError as err:
             raise exceptions.HTTPException(
                 status.HTTP_422_UNPROCESSABLE_ENTITY,
             ) from err
@@ -131,8 +132,24 @@ class TripSearches(endpoints.HTTPEndpoint):
                 data=resources.TripSearchResource.from_proto(
                     await trip_searches_client.create(
                         trip_searches.TripSearchRequest(
-                            origin=origin,
-                            destination=destination,
+                            origin=models_pb2.Point(
+                                ref=origin.id,
+                                name=origin.name,
+                                coordinates=models_pb2.Coordinates(
+                                    latitude=origin.coordinates.latitude,
+                                    longitude=origin.coordinates.longitude,
+                                ),
+                                time_zone=origin.time_zone,
+                            ),
+                            destination=models_pb2.Point(
+                                ref=destination.id,
+                                name=destination.name,
+                                coordinates=models_pb2.Coordinates(
+                                    latitude=destination.coordinates.latitude,
+                                    longitude=destination.coordinates.longitude,
+                                ),
+                                time_zone=destination.time_zone,
+                            ),
                             departure_after=departure_after,
                         ),
                     ),

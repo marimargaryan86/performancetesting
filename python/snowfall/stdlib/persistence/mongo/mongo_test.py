@@ -5,15 +5,15 @@ import mongomock_motor
 import pytest
 
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
-from snowfall.stdlib.v1alpha import models_pb2
+from snowfall.stdlib.v1alpha import testing_pb2
 
 
 class MockProtoRepository(
-    mixins.AllMixin[models_pb2.Place],
-    mixins.InsertMixin[models_pb2.Place],
-    repository.ProtoRepository[models_pb2.Place],
+    mixins.AllMixin[testing_pb2.Foobar],
+    mixins.InsertMixin[testing_pb2.Foobar],
+    repository.ProtoRepository[testing_pb2.Foobar],
 ):
-    _proto = models_pb2.Place
+    _proto = testing_pb2.Foobar
 
 
 class MockRepository(
@@ -85,7 +85,7 @@ async def test_cursor_filters() -> None:
 
 @pytest.mark.asyncio
 async def test_proto_repository() -> None:
-    payload = models_pb2.Place()
+    payload = testing_pb2.Foobar()
     repo = MockProtoRepository(mongomock_motor.AsyncMongoMockClient()["tests"]["test"])
     await repo.insert(payload)
 

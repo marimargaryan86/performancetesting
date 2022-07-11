@@ -11,13 +11,20 @@ from snowfall.project.junction.service.orders.v1alpha import (
 from snowfall.project.junction.service.passenger_name_records.v1alpha import (
     passenger_name_records_pb2,
 )
+from snowfall.project.junction.service.places.v1alpha import (
+    models_pb2 as place_models_pb2,
+)
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import models_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
 
 _LATITUDE_RANGE = (-90, 90)
 _LONGITUDE_RANGE = (-180, 180)
 
 NOT_FOUND = "00000000-0000-0000-0000-000000000000"
+LOCATIONS = (
+    "e719b289-982c-42f0-99a2-63fa70f8f8c0",
+    "c36649e6-71f1-4dfa-aa5a-01c0ede6e538",
+)
 PLACES = (
     "28a2ee10-d0a7-4a70-89f3-6d587f4dba70",
     "f87c4a6d-fa48-4abb-927c-25447827f5a6",
@@ -90,21 +97,32 @@ def get_currencies() -> types.MappingProxyType[tuple[str, str], float]:
     return CURRENCIES_CONVERSIONS
 
 
-def get_places() -> list[models_pb2.Place]:
-    return [generate_place(identifier) for identifier in PLACES]
+def get_locations() -> list[place_models_pb2.Location]:
+    return [generate_location(identifier) for identifier in LOCATIONS]
 
 
-def generate_place(identifier: str) -> models_pb2.Place:
-    return models_pb2.Place(
+def generate_location(identifier: str) -> place_models_pb2.Location:
+    return place_models_pb2.Location(
         id=identifier,
         name="Foobar",
-        coordinates=models_pb2.Coordinates(
+        coordinates=latlng_pb2.LatLng(
             latitude=random.uniform(*_LATITUDE_RANGE),  # nosec
             longitude=random.uniform(*_LONGITUDE_RANGE),  # nosec
         ),
         country_code="",
         time_zone="Europe/Stockholm",
-        types=[models_pb2.Place.TYPE_UNSPECIFIED],
+        types=[place_models_pb2.Location.TYPE_UNSPECIFIED],
+    )
+
+
+def get_places() -> list[place_models_pb2.Place]:
+    return [generate_place(identifier) for identifier in PLACES]
+
+
+def generate_place(identifier: str) -> place_models_pb2.Place:
+    return place_models_pb2.Place(
+        location=generate_location(identifier),
+        merged_ids=LOCATIONS,
     )
 
 

@@ -38,6 +38,7 @@ class NoopCoder(BaseCoder[Mapping[str, Any]]):
 class ProtoCoder(Generic[Proto], BaseCoder[Proto]):
     _normalizers = (
         normalizers.CoordinatesNormalizer(),
+        normalizers.LatLngNormalizer(),
         normalizers.TimestampNormalizer(),
     )
 

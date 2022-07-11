@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 from typing import Sequence
 
@@ -11,6 +12,7 @@ from snowfall import fixtures
 from snowfall.project.junction.adapter import (
     currencies,
     legs,
+    locations,
     offer_searches,
     offers,
     orders,
@@ -22,11 +24,14 @@ from snowfall.project.junction.adapter import (
     trips,
 )
 from snowfall.project.junction.service.mobile_api import smtp
-from snowfall.project.junction.service.offers.v1alpha import models_pb2
+from snowfall.project.junction.service.offers.v1alpha import (
+    models_pb2 as offer_models_pb2,
+)
 from snowfall.stdlib import h3
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.mongo import repository
 from snowfall.stdlib.persistence.mongo.normalizers import TimestampNormalizer
+from snowfall.stdlib.v1alpha import models_pb2
 from snowfall.vendor.junction import client
 
 pytest.register_assert_rewrite("snowfall.stdlib.testing.asserts")
@@ -81,6 +86,11 @@ def legs_client() -> legs.Client:
 
 
 @pytest.fixture
+def locations_client() -> locations.Client:
+    return locations.DictClient(fixtures.get_locations())
+
+
+@pytest.fixture
 def places_client() -> places.Client:
     return places.DictClient(fixtures.get_places())
 
@@ -126,9 +136,9 @@ def orders_client() -> orders.Client:
 
 
 @pytest.fixture
-def offer_search() -> models_pb2.OfferSearch:
-    return models_pb2.OfferSearch(
-        trip=models_pb2.TripOfferSearch(),
+def offer_search() -> offer_models_pb2.OfferSearch:
+    return offer_models_pb2.OfferSearch(
+        trip=offer_models_pb2.TripOfferSearch(),
     )
 
 
@@ -141,12 +151,29 @@ def junction_client() -> client.JunctionClient:
 async def trip_search_request(
     places_client: places.Client,
 ) -> trip_searches.TripSearchRequest:
+    (origin, destination) = await asyncio.gather(
+        places_client.get(fixtures.PLACES[0]),
+        places_client.get(fixtures.PLACES[1]),
+    )
+
     return trip_searches.TripSearchRequest(
-        origin=await places_client.get(
-            fixtures.PLACES[0],
+        origin=models_pb2.Point(
+            ref=origin.location.id,
+            name=origin.location.name,
+            coordinates=models_pb2.Coordinates(
+                latitude=origin.location.coordinates.latitude,
+                longitude=origin.location.coordinates.longitude,
+            ),
+            time_zone=origin.location.time_zone,
         ),
-        destination=await places_client.get(
-            fixtures.PLACES[1],
+        destination=models_pb2.Point(
+            ref=destination.location.id,
+            name=destination.location.name,
+            coordinates=models_pb2.Coordinates(
+                latitude=destination.location.coordinates.latitude,
+                longitude=destination.location.coordinates.longitude,
+            ),
+            time_zone=destination.location.time_zone,
         ),
         departure_after=datetime.datetime.now(datetime.timezone.utc),
     )

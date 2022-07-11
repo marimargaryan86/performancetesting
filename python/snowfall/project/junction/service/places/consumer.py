@@ -1,22 +1,22 @@
 from typing import cast
 
-from snowfall.project.junction.service.places.places import PlaceRepository
+from snowfall.project.junction.service.places.places import LocationRepository
+from snowfall.project.junction.service.places.v1alpha.models_pb2 import Location
 from snowfall.stdlib.transport.amqp import Consumer, Message
-from snowfall.stdlib.v1alpha.models_pb2 import Place
 
 
-class PlaceImportConsumer(object):
-    def __init__(self, places: PlaceRepository, consumer: Consumer):
+class LocationImportConsumer(object):
+    def __init__(self, locations: LocationRepository, consumer: Consumer):
         self._consumer = consumer
-        self._places = places
+        self._locations = locations
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
 
     async def _process_message(self, message: Message) -> None:
-        place = cast(Place, message.body)
+        place = cast(Location, message.body)
 
-        if await self._places.upsert(place):
+        if await self._locations.upsert(place):
             await message.ack()
         else:
             await message.nack()

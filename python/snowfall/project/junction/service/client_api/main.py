@@ -7,6 +7,7 @@ from starlette.middleware import Middleware, authentication
 
 from snowfall.project.junction.adapter import (
     legs,
+    locations,
     offer_searches,
     offers,
     orders,
@@ -68,6 +69,9 @@ def _factory(
                     schedules=schedules_pb2_grpc.ScheduleServiceStub(
                         schedules_channel,
                     ),
+                ),
+                locations_client=locations.GrpcClient(
+                    places_pb2_grpc.LocationsServiceStub(places_channel),
                 ),
                 places_client=places.GrpcClient(
                     places_pb2_grpc.PlacesServiceStub(places_channel),

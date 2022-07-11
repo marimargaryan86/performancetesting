@@ -3,15 +3,72 @@ import uuid
 from grpc import StatusCode, aio
 
 from snowfall.project.junction.service.places.places import (
-    CuratedPlaceRepository,
+    LocationRepository,
     PlaceRepository,
 )
-from snowfall.project.junction.service.places.v1alpha import places_pb2, places_pb2_grpc
+from snowfall.project.junction.service.places.v1alpha import (
+    models_pb2,
+    places_pb2,
+    places_pb2_grpc,
+)
 from snowfall.stdlib.transport.grpc import service
-from snowfall.stdlib.v1alpha import models_pb2
 
 
-class PlacesService(service.Service, places_pb2_grpc.PlacesServiceServicer):
+class LocationsService(service.Service, places_pb2_grpc.LocationsServiceServicer):
+    def __init__(self, locations: LocationRepository, default_page_size: int):
+        self._default_page_size = default_page_size
+        self._locations = locations
+
+    def get_name(self) -> str:
+        return places_pb2.DESCRIPTOR.services_by_name["LocationsService"].full_name
+
+    def register(self, server: aio.Server) -> None:
+        places_pb2_grpc.add_LocationsServiceServicer_to_server(self, server)
+
+    async def GetLocation(  # type: ignore[override] # noqa: N802
+        self,
+        request: places_pb2.GetLocationRequest,
+        context: aio.ServicerContext,
+    ) -> places_pb2.GetLocationResponse:
+        location = await self._locations.find_by_id(request.id)
+
+        if not location:
+            await context.abort(StatusCode.NOT_FOUND)
+
+        if location and not location.types:  # @todo: not needed with NoReturn above.
+            location.types.append(models_pb2.Location.TYPE_UNSPECIFIED)
+
+        return places_pb2.GetLocationResponse(location=location)
+
+    async def ListLocations(  # type: ignore[override] # noqa: N802
+        self,
+        request: places_pb2.ListLocationsRequest,
+        context: aio.ServicerContext,
+    ) -> places_pb2.ListLocationsResponse:
+        locations_result = await self._locations.find(request.page_token)
+
+        locations_result.limit(
+            request.page_size if request.page_size else self._default_page_size,
+        )
+
+        locations = []
+
+        async for location in locations_result:
+            if not location.types:
+                location.types.append(models_pb2.Location.TYPE_UNSPECIFIED)
+
+            locations.append(location)
+
+        return places_pb2.ListLocationsResponse(
+            locations=locations,
+            next_page_token=await locations_result.cursor(),
+        )
+
+
+class PlacesService(  # noqa: WPS214
+    service.Service,
+    places_pb2_grpc.PlacesServiceServicer,
+):
     def __init__(self, places: PlaceRepository, default_page_size: int):
         self._default_page_size = default_page_size
         self._places = places
@@ -27,15 +84,14 @@ class PlacesService(service.Service, places_pb2_grpc.PlacesServiceServicer):
         request: places_pb2.GetPlaceRequest,
         context: aio.ServicerContext,
     ) -> places_pb2.GetPlaceResponse:
-        place = await self._places.find_by_id(request.id)
+        try:
+            uuid.UUID(request.id)
+        except ValueError:
+            await context.abort(StatusCode.INVALID_ARGUMENT)
 
-        if not place:
-            await context.abort(StatusCode.NOT_FOUND)
+        place_result = await self._places.find_by_id(request.id)
 
-        if place and not place.types:  # @todo: not needed with NoReturn above.
-            place.types.append(models_pb2.Place.TYPE_UNSPECIFIED)
-
-        return places_pb2.GetPlaceResponse(place=place)
+        return places_pb2.GetPlaceResponse(place=place_result)
 
     async def ListPlaces(  # type: ignore[override] # noqa: N802
         self,
@@ -48,78 +104,25 @@ class PlacesService(service.Service, places_pb2_grpc.PlacesServiceServicer):
             request.page_size if request.page_size else self._default_page_size,
         )
 
-        places = []
-
-        async for place in places_result:
-            if not place.types:
-                place.types.append(models_pb2.Place.TYPE_UNSPECIFIED)
-
-            places.append(place)
-
         return places_pb2.ListPlacesResponse(
-            places=places,
-            next_page_token=await places_result.cursor(),
-        )
-
-
-class CuratedPlacesService(  # noqa: WPS214
-    service.Service,
-    places_pb2_grpc.CuratedPlacesServiceServicer,
-):
-    def __init__(self, places: CuratedPlaceRepository, default_page_size: int):
-        self._default_page_size = default_page_size
-        self._places = places
-
-    def get_name(self) -> str:
-        return places_pb2.DESCRIPTOR.services_by_name["CuratedPlacesService"].full_name
-
-    def register(self, server: aio.Server) -> None:
-        places_pb2_grpc.add_CuratedPlacesServiceServicer_to_server(self, server)
-
-    async def GetCuratedPlace(  # type: ignore[override] # noqa: N802
-        self,
-        request: places_pb2.GetPlaceRequest,
-        context: aio.ServicerContext,
-    ) -> places_pb2.GetCuratedPlaceResponse:
-        try:
-            uuid.UUID(request.id)
-        except ValueError:
-            await context.abort(StatusCode.INVALID_ARGUMENT)
-
-        place_result = await self._places.find_by_id(request.id)
-
-        return places_pb2.GetCuratedPlaceResponse(place=place_result)
-
-    async def ListCuratedPlaces(  # type: ignore[override] # noqa: N802
-        self,
-        request: places_pb2.ListCuratedPlacesRequest,
-        context: aio.ServicerContext,
-    ) -> places_pb2.ListCuratedPlacesResponse:
-        places_result = await self._places.find(request.page_token)
-
-        places_result.limit(
-            request.page_size if request.page_size else self._default_page_size,
-        )
-
-        return places_pb2.ListCuratedPlacesResponse(
             places=[place async for place in places_result],
             next_page_token=await places_result.cursor(),
         )
 
-    async def CreateCuratedPlace(  # type: ignore[override] # noqa: N802
+    async def CreatePlace(  # type: ignore[override] # noqa: N802
         self,
-        request: places_pb2.CreateCuratedPlaceRequest,
+        request: places_pb2.CreatePlaceRequest,
         context: aio.ServicerContext,
-    ) -> places_pb2.CreateCuratedPlaceResponse:
+    ) -> places_pb2.CreatePlaceResponse:
         await self._places.create(request.place)
 
-        return places_pb2.CreateCuratedPlaceResponse()
+        return places_pb2.CreatePlaceResponse()
 
-    async def DeleteCuratedPlace(  # type: ignore[override] # noqa: N802
+    async def DeletePlace(  # type: ignore[override] # noqa: N802
         self,
-        request: places_pb2.DeleteCuratedPlaceRequest,
+        request: places_pb2.DeletePlaceRequest,
         context: aio.ServicerContext,
-    ) -> places_pb2.DeleteCuratedPlaceResponse:
+    ) -> places_pb2.DeletePlaceResponse:
         try:
             uuid.UUID(request.id)
         except ValueError:
@@ -127,18 +130,18 @@ class CuratedPlacesService(  # noqa: WPS214
 
         await self._places.delete(request.id)
 
-        return places_pb2.DeleteCuratedPlaceResponse()
+        return places_pb2.DeletePlaceResponse()
 
-    async def UpdateCuratedPlace(  # type: ignore[override] # noqa: N802
+    async def UpdatePlace(  # type: ignore[override] # noqa: N802
         self,
-        request: places_pb2.UpdateCuratedPlaceRequest,
+        request: places_pb2.UpdatePlaceRequest,
         context: aio.ServicerContext,
-    ) -> places_pb2.UpdateCuratedPlaceResponse:
+    ) -> places_pb2.UpdatePlaceResponse:
         try:
-            uuid.UUID(request.id)
+            uuid.UUID(request.place.location.id)
         except ValueError:
             await context.abort(StatusCode.INVALID_ARGUMENT)
 
-        await self._places.update(request.id, request.place)
+        await self._places.update(request.place.location.id, request.place)
 
-        return places_pb2.UpdateCuratedPlaceResponse()
+        return places_pb2.UpdatePlaceResponse()

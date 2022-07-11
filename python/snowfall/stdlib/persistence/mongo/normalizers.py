@@ -8,7 +8,11 @@ from dateutil import parser
 from google.protobuf import descriptor, timestamp_pb2
 
 from snowfall.stdlib import dictionary
-from snowfall.stdlib.v1alpha import models_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
+
+_LAT_KEY = "latitude"
+_LON_KEY = "longitude"
+_COORDINATES_KEY = "coordinates"
 
 
 @functools.cache
@@ -87,8 +91,8 @@ class CoordinatesNormalizer(_Normalizer):
         normalized_value: Mapping[str, Any],
     ) -> dict[str, float]:
         return {
-            "latitude": normalized_value["coordinates"][1],
-            "longitude": normalized_value["coordinates"][0],
+            _LAT_KEY: normalized_value[_COORDINATES_KEY][1],
+            _LON_KEY: normalized_value[_COORDINATES_KEY][0],
         }
 
     def _full_name(self) -> str:
@@ -100,9 +104,35 @@ class CoordinatesNormalizer(_Normalizer):
     ) -> dict[str, Any]:
         return {
             "type": "Point",
-            "coordinates": [
-                denormalized_value["longitude"],
-                denormalized_value["latitude"],
+            _COORDINATES_KEY: [
+                denormalized_value[_LON_KEY],
+                denormalized_value[_LAT_KEY],
+            ],
+        }
+
+
+class LatLngNormalizer(_Normalizer):
+    def _denormalize_value(
+        self,
+        normalized_value: Mapping[str, Any],
+    ) -> dict[str, float]:
+        return {
+            _LAT_KEY: normalized_value[_COORDINATES_KEY][1],
+            _LON_KEY: normalized_value[_COORDINATES_KEY][0],
+        }
+
+    def _full_name(self) -> str:
+        return str(latlng_pb2.LatLng().DESCRIPTOR.full_name)
+
+    def _normalize_value(
+        self,
+        denormalized_value: Mapping[str, float],
+    ) -> dict[str, Any]:
+        return {
+            "type": "Point",
+            _COORDINATES_KEY: [
+                denormalized_value[_LON_KEY],
+                denormalized_value[_LAT_KEY],
             ],
         }
 

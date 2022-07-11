@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package snowfall.project.junction.service.places.v1alpha;
+
+import "google/protobuf/timestamp.proto";
+import "snowfall/stdlib/v1alpha/latlng.proto";
+
+message Location {
+  string id = 1;
+  string name = 2;
+  snowfall.stdlib.v1alpha.LatLng coordinates = 3;
+  string time_zone = 4;
+  string country_code = 5;
+  google.protobuf.Timestamp updated_at = 6;
+  string source_ref = 7;
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+  }
+  repeated Type types = 8;
+}
+
+message Place {
+  Location location = 1;
+  repeated string merged_ids = 2;
+}

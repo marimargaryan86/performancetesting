@@ -4,9 +4,10 @@ import tenacity
 from geopy import exc
 
 from snowfall.project.junction.service.gtfs_feed import importer
+from snowfall.project.junction.service.places.v1alpha import models_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2, geocoding_pb2_grpc
 from snowfall.stdlib.transport import amqp
-from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2
 
 _NAMESPACE = uuid.UUID("5190984e-4ab7-411e-96f6-2848cc5d63e1")
 
@@ -31,7 +32,7 @@ async def process_places(
         for attempt in retry:
             with attempt:
                 await producer.publish(
-                    models_pb2.Place(
+                    models_pb2.Location(
                         id=str(
                             uuid.uuid5(
                                 namespace,
@@ -39,7 +40,7 @@ async def process_places(
                             ),
                         ),
                         name=stop.stop_name or "",
-                        coordinates=models_pb2.Coordinates(
+                        coordinates=latlng_pb2.LatLng(
                             latitude=stop.stop_lat,
                             longitude=stop.stop_lon,
                         ),
@@ -65,5 +66,5 @@ async def process_places(
                         ).time_zone.id,
                         source_ref=ref,
                     ),
-                    "place.import",
+                    "location.import",
                 )
