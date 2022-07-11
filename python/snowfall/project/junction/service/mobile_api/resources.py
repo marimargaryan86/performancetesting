@@ -24,7 +24,7 @@ class OrderStatus(enum.Enum):
     pending = "pending"
     confirmed = "confirmed"
     rejected = "rejected"
-    not_ticketed = "not_ticketed"
+    not_ticketed = "not-ticketed"
     error = "error"
     timeout = "timeout"
 
