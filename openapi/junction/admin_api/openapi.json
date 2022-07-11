@@ -22,6 +22,12 @@
       ]
     },
     {
+      "name": "Locations",
+      "tags": [
+        "locations"
+      ]
+    },
+    {
       "name": "Places",
       "tags": [
         "places"
@@ -33,6 +39,11 @@
       "name": "internal",
       "description": "Endpoints not for public use.",
       "x-displayName": "Internal"
+    },
+    {
+      "name": "locations",
+      "description": "Endpoints related to locations management.",
+      "x-displayName": "Locations"
     },
     {
       "name": "places",
@@ -94,6 +105,52 @@
         "description": "Check the application health.",
         "x-internal": true,
         "security": []
+      }
+    },
+    "/locations": {
+      "get": {
+        "summary": "List Locations",
+        "tags": [
+          "locations"
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ListLocations"
+          }
+        },
+        "operationId": "get-locations",
+        "description": "List all Locations.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
+      }
+    },
+    "/locations/{locationId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/LocationId"
+        }
+      ],
+      "get": {
+        "summary": "Get Location",
+        "tags": [
+          "locations"
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetLocation"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-locations-id",
+        "description": "Get a Location."
       }
     },
     "/places": {
@@ -198,6 +255,157 @@
   },
   "components": {
     "schemas": {
+      "LocationIdentifier": {
+        "title": "Location Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "example": "locations",
+            "enum": [
+              "locations"
+            ]
+          }
+        }
+      },
+      "Location": {
+        "title": "Location",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/LocationIdentifier"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Stockholm Arlanda Airport"
+                  },
+                  "latitude": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 59.651164062,
+                    "minimum": -90,
+                    "maximum": 90
+                  },
+                  "longitude": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 17.917829662,
+                    "minimum": -180,
+                    "maximum": 180
+                  },
+                  "countryCode": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{2}$",
+                    "minLength": 2,
+                    "maxLength": 2,
+                    "example": "SE"
+                  },
+                  "timeZone": {
+                    "type": "string",
+                    "example": "Europe/Stockholm"
+                  },
+                  "iataCode": {
+                    "type": "string",
+                    "example": "ARN",
+                    "pattern": "^[A-Z]{3}$",
+                    "minLength": 3,
+                    "maxLength": 3,
+                    "nullable": true
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "properties": {
+                  "types": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "minItems": 1,
+                        "uniqueItems": true,
+                        "items": {
+                          "$ref": "#/components/schemas/PlaceTypeIdentifier"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ]
+      },
+      "LocationFetchable": {
+        "title": "Location (Fetch)",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Location"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships",
+              "links"
+            ],
+            "properties": {
+              "id": {},
+              "type": {},
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "latitude",
+                  "longitude",
+                  "countryCode",
+                  "timeZone",
+                  "iataCode"
+                ]
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "types"
+                ],
+                "properties": {
+                  "types": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "items": {
+                          "required": [
+                            "id",
+                            "type"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
       "PlaceIdentifier": {
         "title": "Place Identifier",
         "type": "object",
@@ -270,6 +478,18 @@
               "relationships": {
                 "type": "object",
                 "properties": {
+                  "locations": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                          "$ref": "#/components/schemas/LocationIdentifier"
+                        }
+                      }
+                    }
+                  },
                   "types": {
                     "type": "object",
                     "properties": {
@@ -334,6 +554,19 @@
                   "types"
                 ],
                 "properties": {
+                  "locations": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "items": {
+                          "required": [
+                            "id",
+                            "type"
+                          ]
+                        }
+                      }
+                    }
+                  },
                   "types": {
                     "type": "object",
                     "required": [
@@ -388,9 +621,26 @@
               "relationships": {
                 "type": "object",
                 "required": [
+                  "locations",
                   "types"
                 ],
                 "properties": {
+                  "locations": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "items": {
+                          "required": [
+                            "id",
+                            "type"
+                          ]
+                        }
+                      }
+                    }
+                  },
                   "types": {
                     "type": "object",
                     "required": [
@@ -445,7 +695,36 @@
                   "iataCode": {}
                 }
               },
-              "relationships": {},
+              "relationships": {
+                "properties": {
+                  "locations": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "items": {
+                          "required": [
+                            "id",
+                            "type"
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "types": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "items": {
+                          "required": [
+                            "id",
+                            "type"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              },
               "links": {
                 "readOnly": true
               }
@@ -593,6 +872,45 @@
           }
         }
       },
+      "ListLocations": {
+        "description": "Returns a list of Locations.",
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LocationFetchable"
+                  }
+                }
+              },
+              "required": [
+                "data"
+              ]
+            }
+          }
+        }
+      },
+      "GetLocation": {
+        "description": "Returns the Location for the ID.",
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/LocationFetchable"
+                }
+              },
+              "required": [
+                "data"
+              ]
+            }
+          }
+        }
+      },
       "ListPlaces": {
         "description": "Returns a list of Places.",
         "content": {
@@ -634,6 +952,17 @@
       }
     },
     "parameters": {
+      "LocationId": {
+        "name": "locationId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+          "format": "uuid"
+        },
+        "description": "Location Identifier"
+      },
       "PlaceId": {
         "name": "placeId",
         "in": "path",

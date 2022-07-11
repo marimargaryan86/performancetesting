@@ -3,7 +3,7 @@ from typing import Callable
 
 from asgiref.typing import ASGIApplication
 
-from snowfall.project.junction.adapter import places
+from snowfall.project.junction.adapter import locations, places
 from snowfall.project.junction.service.admin_api import bootstrap, router
 from snowfall.project.junction.service.places.v1alpha import places_pb2_grpc
 from snowfall.stdlib import service
@@ -23,6 +23,9 @@ def _factory(
         return application.create_asgi_app(
             routes_factory=router.get_routes,
             dependencies=bootstrap.create_dependencies(
+                locations_client=locations.GrpcClient(
+                    places_pb2_grpc.LocationsServiceStub(places_channel),
+                ),
                 places_client=places.GrpcClient(
                     places_pb2_grpc.PlacesServiceStub(places_channel),
                 ),
