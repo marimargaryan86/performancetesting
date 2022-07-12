@@ -16,4 +16,5 @@ env_vars = [
 ]
 
 [test]
+report = true
 use_coverage = true
