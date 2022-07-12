@@ -1,3 +1,5 @@
+from typing import Sequence
+
 import lagom
 from starlette import endpoints, requests, responses
 
@@ -19,10 +21,35 @@ class Places(endpoints.HTTPEndpoint):
         else:
             places = await places_repository.match(search_key)
 
+        places_resources = [
+            resources.PlaceResource.from_proto(place) async for place in places
+        ]
+
+        deduplicated_places = self._deduplicate_places(places_resources)
+
         return models.JsonApiResponse(
             models.Body(
-                data=[
-                    resources.PlaceResource.from_proto(place) async for place in places
-                ],
+                data=deduplicated_places,
             ),
         )
+
+    def _deduplicate_places(
+        self,
+        places: Sequence[resources.PlaceResource],
+    ) -> Sequence[resources.PlaceResource]:
+        seen_places_attributes = set()
+        deduplicated_places = []
+        for place in places:
+            if not place.attributes:
+                continue
+
+            place_attributes = (
+                place.attributes.get("name"),
+                place.attributes.get("latitude"),
+                place.attributes.get("longitude"),
+            )
+            if place_attributes not in seen_places_attributes:
+                deduplicated_places.append(place)
+                seen_places_attributes.add(place_attributes)
+
+        return deduplicated_places
