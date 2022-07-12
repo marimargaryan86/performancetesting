@@ -23,6 +23,31 @@ def test_to_and_from_string(amount: int, currency: str, string_value: str) -> No
 
 
 @pytest.mark.parametrize(
+    "amount,currency,string_value,separator",
+    [
+        (450, "EUR", "4.5", "."),
+        (-450, "EUR", "-4.5", "."),
+        (400, "EUR", "4.", "."),
+        (457, "EUR", "4.567", "."),
+        (15, "JPY", "15.00", "."),
+        (15, "JPY", "15.49", "."),
+        (16, "JPY", "15.50", "."),
+        (16, "JPY", "15,50", ","),
+    ],
+)
+def test_from_string(
+    amount: int,
+    currency: str,
+    string_value: str,
+    separator: str,
+) -> None:
+    currency_obj = money.Currency(currency)
+    instance = money.Money(amount, currency_obj)
+
+    assert money.from_string(string_value, currency_obj, separator) == instance
+
+
+@pytest.mark.parametrize(
     "amount,currency,units,nanos",
     [
         (1550, "USD", 15, 500000000),

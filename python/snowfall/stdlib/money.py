@@ -75,12 +75,14 @@ def from_string(
     currency: Currency,
     separator: str = ".",
 ) -> Money:
-    parts = string_amount.split(separator, 1)
+    string_amount = string_amount.replace(separator, ".")
+    rounded_amount = str(round(float(string_amount), currency.exponent))
+    parts = rounded_amount.split(".", 1)
     units = int(parts[0])
     amount = abs(units) * _exponent(currency)
 
     with contextlib.suppress(IndexError):
-        amount += int(parts[1])
+        amount += int(parts[1].ljust(currency.exponent, "0"))
 
     return Money(
         amount=-amount if units < 0 else amount,
