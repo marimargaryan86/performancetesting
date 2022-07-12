@@ -1,0 +1,18 @@
+{
+  "required_matches": {
+    "all_python_files": ["no_file_level_flake8_noqa"]
+  },
+  "path_patterns": [
+    {
+      "name": "all_python_files",
+      "pattern": ".*\\.py$"
+    }
+  ],
+  "content_patterns": [
+    {
+      "name": "no_file_level_flake8_noqa",
+      "pattern": "# flake8: noqa",
+      "inverted": true
+    }
+  ]
+}

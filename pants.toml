@@ -5,6 +5,7 @@ backend_packages = [
     "pants.backend.codegen.protobuf.python",
     "pants.backend.docker",
     "pants.backend.docker.lint.hadolint",
+    "pants.backend.project_info",
     "pants.backend.python",
     "pants.backend.python.lint.bandit",
     "pants.backend.python.lint.black",
@@ -124,6 +125,9 @@ resolves = {python-default = "vendor/lock/constraints.txt"}
 
 [python-protobuf]
 mypy_plugin = true
+
+[regex-lint]
+config = "@vendor/regexes.json"
 
 [source]
 root_patterns = [
