@@ -68,7 +68,7 @@ class PlaceType(endpoints.HTTPEndpoint):
         return models.JsonApiResponse(
             models.Body(
                 data=resources.PlaceTypeResource.from_proto(
-                    place_type,  # type: ignore
+                    place_type,  # type: ignore[arg-type]
                     request,
                 ),
             ),

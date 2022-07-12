@@ -1,6 +1,9 @@
 {
   "required_matches": {
-    "all_python_files": ["no_file_level_flake8_noqa"]
+    "all_python_files": [
+      "no_file_level_flake8_noqa",
+      "no_unspecific_type_ignore"
+    ]
   },
   "path_patterns": [
     {
@@ -12,6 +15,11 @@
     {
       "name": "no_file_level_flake8_noqa",
       "pattern": "# flake8: noqa",
+      "inverted": true
+    },
+    {
+      "name": "no_unspecific_type_ignore",
+      "pattern": "# type: ignore\\s",
       "inverted": true
     }
   ]

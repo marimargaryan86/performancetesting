@@ -24,7 +24,7 @@ class PassengerGender(endpoints.HTTPEndpoint):
         return models.JsonApiResponse(
             models.Body(
                 data=resources.PassengerGenderResource.from_proto(
-                    passenger_gender,  # type: ignore
+                    passenger_gender,  # type: ignore[arg-type]
                     request,
                 ),
             ),
@@ -78,7 +78,7 @@ class PassengerTitle(endpoints.HTTPEndpoint):
         return models.JsonApiResponse(
             models.Body(
                 data=resources.PassengerTitleResource.from_proto(
-                    passenger_title,  # type: ignore
+                    passenger_title,  # type: ignore[arg-type]
                     request,
                 ),
             ),

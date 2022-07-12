@@ -25,7 +25,7 @@ class Cabin(endpoints.HTTPEndpoint):
         return models.JsonApiResponse(
             models.Body(
                 data=resources.CabinClassResource.from_proto(
-                    cabin_class,  # type: ignore
+                    cabin_class,  # type: ignore[arg-type]
                     request,
                 ),
             ),

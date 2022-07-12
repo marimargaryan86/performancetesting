@@ -49,7 +49,7 @@ class LegType(endpoints.HTTPEndpoint):
         return models.JsonApiResponse(
             models.Body(
                 data=resources.LegTypeResource.from_proto(
-                    leg_type,  # type: ignore
+                    leg_type,  # type: ignore[arg-type]
                     request,
                 ),
             ),
