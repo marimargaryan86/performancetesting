@@ -51,6 +51,18 @@ from typing import Any, Sequence
 def correct_function(input: Sequence[str]) -> None:
     return None
 """
+_FAILING_LIST_IN_BINOP = """
+from typing import Callable
+
+def list_in_bin_op(input: list[str] | str) -> list:
+    return []
+"""
+_FAILING_LIST_IN_BINOP_IN_SEQUENCE = """
+from typing import Callable
+
+def list_in_bin_op_in_sequence(input: Sequence[list[str] | str]) -> list:
+    return []
+"""
 
 
 @pytest.mark.parametrize(
@@ -65,6 +77,8 @@ def correct_function(input: Sequence[str]) -> None:
         (_PASSING_AWAITABLE_NONE, 0),
         (_PASSING_CORRECT_MAPPING, 0),
         (_PASSING_CORRECT_SEQUENCE, 0),
+        (_FAILING_LIST_IN_BINOP, 1),
+        (_FAILING_LIST_IN_BINOP_IN_SEQUENCE, 1),
     ],
 )
 def test_typing(code: str, expected: int) -> None:

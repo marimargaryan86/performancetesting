@@ -66,6 +66,11 @@ class Visitor(plugin.Visitor):
                 plugin.Error(node.lineno, node.col_offset, error_msg.format(fullname)),
             )
 
+        if isinstance(node, ast.BinOp):
+            self._no_forbidden_type_hints(node.left, banned, error_msg)
+            self._no_forbidden_type_hints(node.right, banned, error_msg)
+            return
+
         if not isinstance(node, ast.Subscript):
             return
 
@@ -76,9 +81,9 @@ class Visitor(plugin.Visitor):
             self._no_forbidden_type_hints(node.slice, banned, error_msg)
             return
 
-        self._handle_slice(node.slice, banned, error_msg)
+        self._handle_tuple(node.slice, banned, error_msg)
 
-    def _handle_slice(
+    def _handle_tuple(
         self,
         node: ast.Tuple,
         banned: frozenset[str],

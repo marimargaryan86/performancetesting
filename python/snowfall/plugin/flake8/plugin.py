@@ -16,6 +16,9 @@ def resolve_fullname(node: ast.AST) -> str:
     if isinstance(node, ast.Call):
         return resolve_fullname(node.func)
 
+    if isinstance(node, ast.BinOp):
+        return "typing.Union"
+
     raise RuntimeError(
         "{0} on {1}:{2} is not a resolvable type".format(
             type(node),
