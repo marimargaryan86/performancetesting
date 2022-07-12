@@ -22,6 +22,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     llvm \
     lsb-release \
     make \
+    ssh \
     tk-dev \
     unzip \
     wget \
