@@ -57,8 +57,8 @@ EOH
       }
 
       env {
-        ENV_NAME             = "${NOMAD_NAMESPACE}"
-        SENTRY_DSN           = "https://f01c7c8bf4d04a709a65b4be8b11ba69@sentry.snowfall.se/36"
+        ENV_NAME   = "${NOMAD_NAMESPACE}"
+        SENTRY_DSN = "https://f01c7c8bf4d04a709a65b4be8b11ba69@sentry.snowfall.se/36"
       }
     }
   }

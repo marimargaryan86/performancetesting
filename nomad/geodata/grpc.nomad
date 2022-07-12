@@ -52,10 +52,10 @@ job "geodata-grpc" {
       tags = ["metrics"]
 
       check {
-        type = "http"
-        path = "/"
+        type     = "http"
+        path     = "/"
         interval = "10s"
-        timeout = "2s"
+        timeout  = "2s"
       }
     }
 
@@ -86,10 +86,10 @@ EOH
       }
 
       env {
-        ENV_NAME     = "${NOMAD_NAMESPACE}"
-        GRPC_ADDRESS = "0.0.0.0"
-        GRPC_PORT    = "${NOMAD_PORT_grpc}"
-        SENTRY_DSN   = "https://dd680235569f43ce97b7e91d839900a0@sentry.snowfall.se/31"
+        ENV_NAME        = "${NOMAD_NAMESPACE}"
+        GRPC_ADDRESS    = "0.0.0.0"
+        GRPC_PORT       = "${NOMAD_PORT_grpc}"
+        SENTRY_DSN      = "https://dd680235569f43ce97b7e91d839900a0@sentry.snowfall.se/31"
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
       }
     }

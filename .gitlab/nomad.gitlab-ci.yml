@@ -2,8 +2,14 @@ nomad:validate:
   stage: test
   interruptible: true
   image: "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"
-  script:
-    - find . -name '*.nomad' -print0 | xargs -0 -n1 nomad validate
+  script: |
+    set -eu
+    shopt -s globstar
+    shopt -s nullglob
+    for f in nomad/**/*.nomad; do
+      nomad validate "${f}"
+      hclfmt -require-no-change "${f}"
+    done
   rules:
     - if: $CI_MERGE_REQUEST_IID
       changes:

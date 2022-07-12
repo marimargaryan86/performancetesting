@@ -6,7 +6,7 @@
 // {
 //   "version": 2,
 //   "valid_for_interpreter_constraints": [
-//     "CPython==3.9.10"
+//     "CPython==3.10.5"
 //   ],
 //   "generated_with_requirements": [
 //     "mypy==0.961",
@@ -33,18 +33,13 @@
             },
             {
               "algorithm": "sha256",
-              "hash": "1ece702f29270ec6af25db8cf6185c04c02311c6bb21a69f423d40e527b75c56",
-              "url": "https://files.pythonhosted.org/packages/17/63/6a173d3b80eb6b48e22fb81f2935047657089b7509d70602c6e7dcee3cfe/mypy-0.961-cp39-cp39-win_amd64.whl"
+              "hash": "e999229b9f3198c0c880d5e269f9f8129c8862451ce53a011326cad38b9ccd24",
+              "url": "https://files.pythonhosted.org/packages/02/e0/6c11b3a6828d1bf8edd066d87588f9461bce3154e4dcc542729bbe6cdc3e/mypy-0.961-cp310-cp310-win_amd64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "5f1332964963d4832a94bebc10f13d3279be3ce8f6c64da563d6ee6e2eeda932",
-              "url": "https://files.pythonhosted.org/packages/31/73/71ae84ece879f7c6fd5fbbe7c750c4663dcbd53fa5c7fa7023be59af27f5/mypy-0.961-cp39-cp39-macosx_10_9_universal2.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "006be38474216b833eca29ff6b73e143386f352e10e9c2fbe76aa8549e5554f5",
-              "url": "https://files.pythonhosted.org/packages/5e/5a/1b46c161aacdff572632695a483e64ea908089b5c1b6bb92c7e59685c889/mypy-0.961-cp39-cp39-macosx_10_9_x86_64.whl"
+              "hash": "b117650592e1782819829605a193360a08aa99f1fc23d1d71e1a75a142dc7e15",
+              "url": "https://files.pythonhosted.org/packages/46/d7/3cf7605655f78daded7a23e66f632b50a3b3a8b4262739782f558f8949cf/mypy-0.961-cp310-cp310-macosx_10_9_x86_64.whl"
             },
             {
               "algorithm": "sha256",
@@ -53,13 +48,18 @@
             },
             {
               "algorithm": "sha256",
-              "hash": "a5ea0875a049de1b63b972456542f04643daf320d27dc592d7c3d9cd5d9bf950",
-              "url": "https://files.pythonhosted.org/packages/b4/5f/6f116003e4ddb472912c13f999127d658e56a210177e23c9d6b1538a5184/mypy-0.961-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl"
+              "hash": "697540876638ce349b01b6786bc6094ccdaba88af446a9abb967293ce6eaa2b0",
+              "url": "https://files.pythonhosted.org/packages/86/df/16748348d0119a6f2528f370e20f644a15ffb8a335a79e91023babc34d0b/mypy-0.961-cp310-cp310-macosx_10_9_universal2.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "9940e6916ed9371809b35b2154baf1f684acba935cd09928952310fbddaba648",
-              "url": "https://files.pythonhosted.org/packages/e3/66/9942860fc360e529dbd695b1da3dd80336095d0d3c956e416eb656fba7dd/mypy-0.961-cp39-cp39-macosx_11_0_arm64.whl"
+              "hash": "3e09f1f983a71d0672bbc97ae33ee3709d10c779beb613febc36805a6e28bb4e",
+              "url": "https://files.pythonhosted.org/packages/9c/4b/37c32ab752c1a16cd528bfa239553207108ae33c7b617f9cfea3bb6e2f00/mypy-0.961-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "bdd5ca340beffb8c44cb9dc26697628d1b88c6bddf5c2f6eb308c46f269bb6f3",
+              "url": "https://files.pythonhosted.org/packages/ba/85/d59bd3b0c84a59d862d2494a3461710ad4a2a1616312414ecc95b2393310/mypy-0.961-cp310-cp310-macosx_11_0_arm64.whl"
             }
           ],
           "project_name": "mypy",
@@ -104,33 +104,33 @@
             },
             {
               "algorithm": "sha256",
-              "hash": "61b6760b08b7c395975d893e0b814a11cf011ebb24f7d869e7118f5a339a82e1",
-              "url": "https://files.pythonhosted.org/packages/09/ca/44704f9ed827019f15ed17bd61be8217efe0d224609980c12b961bfcefdc/pydantic-1.9.1-cp39-cp39-win_amd64.whl"
+              "hash": "a4a88dcd6ff8fd47c18b3a3709a89adb39a6373f4482e04c1b765045c7e282fd",
+              "url": "https://files.pythonhosted.org/packages/68/17/1828a267f999077fba10b24076e027df79cc2c5ede8e0a91a7cbf43428d8/pydantic-1.9.1-cp310-cp310-win_amd64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "72ccb318bf0c9ab97fc04c10c37683d9eea952ed526707fabf9ac5ae59b701fd",
-              "url": "https://files.pythonhosted.org/packages/2e/6b/7ae3031fc86b974296ef3a91221aec46fdf66a8dd6ba1d300151a812c5b3/pydantic-1.9.1-cp39-cp39-musllinux_1_1_x86_64.whl"
+              "hash": "e565a785233c2d03724c4dc55464559639b1ba9ecf091288dd47ad9c629433bd",
+              "url": "https://files.pythonhosted.org/packages/71/ea/1169909a5d70085aea49a9d4995636498d0df0e9a06f71b747eb4a104aa2/pydantic-1.9.1-cp310-cp310-musllinux_1_1_x86_64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "02eefd7087268b711a3ff4db528e9916ac9aa18616da7bca69c1871d0b7a091f",
-              "url": "https://files.pythonhosted.org/packages/5f/76/11635fe2d808c0062f4f23a6ac6453e6110d3446fb196e3b6dfc1d15f979/pydantic-1.9.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+              "hash": "18f3e912f9ad1bdec27fb06b8198a2ccc32f201e24174cec1b3424dda605a310",
+              "url": "https://files.pythonhosted.org/packages/a4/0c/fbaa7319dcb5eecd3484686eb5a5c5702a6445adb566f01aee6de3369bc4/pydantic-1.9.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "4ce9ae9e91f46c344bec3b03d6ee9612802682c1551aaf627ad24045ce090761",
-              "url": "https://files.pythonhosted.org/packages/81/48/b3c8cb4eb7106b612bbfc263d557b75e27d2720a0cf2c442ea67950d6d43/pydantic-1.9.1-cp39-cp39-musllinux_1_1_i686.whl"
+              "hash": "8bc541a405423ce0e51c19f637050acdbdf8feca34150e0d17f675e72d119580",
+              "url": "https://files.pythonhosted.org/packages/b1/34/5281371fbca70a089c9afcff8f0223f8d9da982efe0802fac36e39debdff/pydantic-1.9.1-cp310-cp310-musllinux_1_1_i686.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "b83ba3825bc91dfa989d4eed76865e71aea3a6ca1388b59fc801ee04c4d8d0d6",
-              "url": "https://files.pythonhosted.org/packages/9a/a2/585b1a747b7bbb22392fe9c875b8adfaaee9a7be506fbb66a749157f9099/pydantic-1.9.1-cp39-cp39-macosx_10_9_x86_64.whl"
+              "hash": "c320c64dd876e45254bdd350f0179da737463eea41c43bacbee9d8c9d1021f11",
+              "url": "https://files.pythonhosted.org/packages/b4/73/4fa4e18868aa0e68782a8a3b37c9e08dcc3453e122a191d077910f41fa8c/pydantic-1.9.1-cp310-cp310-macosx_11_0_arm64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "7eb57ba90929bac0b6cc2af2373893d80ac559adda6933e562dcfb375029acee",
-              "url": "https://files.pythonhosted.org/packages/c4/d2/6118efdb9fdaf3d4dfecc0276d4d47a1ef9aaf9903fa49f1ece765d917cb/pydantic-1.9.1-cp39-cp39-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl"
+              "hash": "c8098a724c2784bf03e8070993f6d46aa2eeca031f8d8a048dff277703e6e193",
+              "url": "https://files.pythonhosted.org/packages/be/11/a929057bf8742a6362e216e10f6d9caf44bae146a87321b9a18278b6b7d4/pydantic-1.9.1-cp310-cp310-macosx_10_9_x86_64.whl"
             },
             {
               "algorithm": "sha256",
@@ -139,8 +139,8 @@
             },
             {
               "algorithm": "sha256",
-              "hash": "1dd8fecbad028cd89d04a46688d2fcc14423e8a196d5b0a5c65105664901f810",
-              "url": "https://files.pythonhosted.org/packages/ed/30/cc6081090e0653b8bfeac45b5973027771050813c4ac167a277f4f355242/pydantic-1.9.1-cp39-cp39-macosx_11_0_arm64.whl"
+              "hash": "c11951b404e08b01b151222a1cb1a9f0a860a8153ce8334149ab9199cd198131",
+              "url": "https://files.pythonhosted.org/packages/e4/67/5ca471ba5dfddc309fcc0bd262a485facbd78a003513800a332fd01ce165/pydantic-1.9.1-cp310-cp310-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl"
             }
           ],
           "project_name": "pydantic",
@@ -191,8 +191,8 @@
         }
       ],
       "platform_tag": [
-        "cp39",
-        "cp39",
+        "cp310",
+        "cp310",
         "macosx_12_0_arm64"
       ]
     }
@@ -205,7 +205,7 @@
     "pydantic"
   ],
   "requires_python": [
-    "==3.9.10"
+    "==3.10.5"
   ],
   "resolver_version": "pip-2020-resolver",
   "style": "universal",

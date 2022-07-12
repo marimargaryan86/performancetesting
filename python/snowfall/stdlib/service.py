@@ -115,10 +115,10 @@ def _get_type(type_: type) -> type:
     if type_ == bool:
         return type_
 
-    if isinstance(type_, int):
+    if type_ == int:
         return int
 
-    if isinstance(type_, float):
+    if type_ == float:
         return float
 
     return str

@@ -29,9 +29,10 @@ brew install docker
 git clone git@git.snowfall.se:junction/junction.git
 cd junction
 ```
-2. Install the correct Python interpreter using `pyenv`. It will automatically install the version specified in the `.python-version` file.
+2. Install the correct Python interpreter using `pyenv`. Sadly Pants does not support Python 3.10 yet, so we need to install a second interpreter for that.
 ```shell
-pyenv install
+pyenv install 3.10.5
+pyenv install 3.9.13
 ```
 
 ### Set up your IDE (Optional)
@@ -47,7 +48,7 @@ pyenv install
 
 #### PyCharm
 
-1. In your project settings, add `dist/export/python/virtualenvs/python-default/3.9.10/bin/python` as the project interpreter.
+1. In your project settings, add `dist/export/python/virtualenvs/python-default/3.10.5/bin/python` as the project interpreter.
 2. Mark the following paths as (right click on folder + mark directory as):
    1. Source Folders:
       1. `dist/codegen/python`

@@ -2,6 +2,7 @@ pants:setup:
   stage: setup
   interruptible: true
   script:
+    - docker login -u "${CI_DEPENDENCY_PROXY_USER}" -p "${CI_DEPENDENCY_PROXY_PASSWORD}" "${CI_DEPENDENCY_PROXY_SERVER}"
     - DOCKER_BUILDKIT=1 docker build --pull --compress -f ".gitlab/pants.Dockerfile" -t "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}" --build-arg "REGISTRY=${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/" --build-arg BUILDKIT_INLINE_CACHE=1 .gitlab/
     - docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
     - docker push "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"
@@ -17,6 +18,7 @@ pants:setup:
   image: "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"
   interruptible: true
   before_script:
+    - eval "$(pyenv init -)"
     - ./pants --version
   after_script:
     - ./bash/nuke-if-too-big.sh .cache 384
@@ -27,7 +29,6 @@ pants:setup:
     PANTS_DOCKER_DEFAULT_REPOSITORY: "${CI_PROJECT_PATH}/service/{directory}"
     PANTS_DOCKER_REGISTRIES: "{'${CI_REGISTRY}': {'address': '${CI_REGISTRY}', 'default': True}}"
     PANTS_SETUP_CACHE: .cache
-    PYTHON: /usr/local/bin/python
   cache:
     key: "pants-setup"
     paths:

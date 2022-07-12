@@ -34,14 +34,14 @@ extra_requirements = [
 version = "black==22.6.0"
 config = "vendor/pyproject.toml"
 lockfile = "vendor/lock/black.txt"
-interpreter_constraints = ["CPython==3.9.10"]
+interpreter_constraints = ["CPython==3.10.5"]
 
 [cli.alias]
 all-changed = "--changed-since=main --changed-dependees=transitive"
 
 [coverage-py]
 global_report = true
-interpreter_constraints = ["CPython==3.9.10"]
+interpreter_constraints = ["CPython==3.10.5"]
 config = "vendor/pyproject.toml"
 report = ["console", "html"]
 
@@ -49,7 +49,7 @@ report = ["console", "html"]
 version = "docformatter==1.4"
 lockfile = "vendor/lock/docformatter.txt"
 args = ["--wrap-summaries", "87", "--wrap-descriptions", "80"]
-interpreter_constraints = ["CPython==3.9.10"]
+interpreter_constraints = ["CPython==3.10.5"]
 
 [flake8]
 version = "flake8==4.0.1"
@@ -79,13 +79,13 @@ source_plugins = [
 version = "isort==5.10.1"
 config = "vendor/setup.cfg"
 lockfile = "vendor/lock/isort.txt"
-interpreter_constraints = ["CPython==3.9.10"]
+interpreter_constraints = ["CPython==3.10.5"]
 
 [mypy]
 version = "mypy==0.961"
 config = "vendor/setup.cfg"
 lockfile = "vendor/lock/mypy.txt"
-interpreter_constraints = ["CPython==3.9.10"]
+interpreter_constraints = ["CPython==3.10.5"]
 extra_requirements = ["pydantic"]
 
 [mypy-protobuf]
@@ -93,7 +93,7 @@ version = "mypy-protobuf==3.2.0"
 lockfile = "vendor/lock/mypy-protobuf.txt"
 
 [poetry]
-interpreter_constraints = ["CPython==3.9.10"]
+interpreter_constraints = ["CPython==3.10.5"]
 
 [protoc]
 version = "21.2"
@@ -118,7 +118,7 @@ extra_requirements = [
 
 [python]
 lockfile_generator = "pex"
-interpreter_constraints = ["CPython==3.9.10"]
+interpreter_constraints = ["CPython==3.10.5"]
 enable_resolves = true
 resolves = {python-default = "vendor/lock/constraints.txt"}
 

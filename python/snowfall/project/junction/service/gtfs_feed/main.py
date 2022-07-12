@@ -5,7 +5,7 @@ from typing import Sequence
 
 import aioredis
 from aio_pika import abc
-from aiofiles import os, tempfile  # type: ignore[attr-defined]
+from aiofiles import os, tempfile
 from motor import motor_asyncio
 from pydantic import AnyUrl, DirectoryPath
 
