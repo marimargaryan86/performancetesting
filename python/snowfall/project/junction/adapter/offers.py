@@ -13,6 +13,7 @@ from snowfall.project.junction.service.offers.v1alpha import (
     grpc_pb2_grpc,
     models_pb2,
 )
+from snowfall.stdlib import sequence
 from snowfall.stdlib.v1alpha import models_pb2 as common_pb2
 
 
@@ -141,6 +142,7 @@ class DictClient(Client):  # noqa: WPS214
             for offer in self._offers.values()
             if offer.groups and offer.groups[0].offer_search_id == identifier
         ]
+
         if cabin_classes:
             offers = [
                 offer
@@ -148,8 +150,15 @@ class DictClient(Client):  # noqa: WPS214
                 if self._offer_has_cabin_classes(offer, cabin_classes)
             ]
 
+        page = sequence.paginate(
+            sequence=offers,
+            cursor=cursor,
+            limit=limit,
+        )
+
         return OffersPage(
-            offers=offers,
+            offers=page.sequence,
+            next_page_token=page.cursor,
         )
 
     async def find_by_ids(
@@ -158,12 +167,19 @@ class DictClient(Client):  # noqa: WPS214
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> OffersPage:
-        return OffersPage(
-            [
+        page = sequence.paginate(
+            sequence=[
                 self._offers[identifier]
                 for identifier in identifiers
                 if identifier in self._offers
             ],
+            cursor=cursor,
+            limit=limit,
+        )
+
+        return OffersPage(
+            offers=page.sequence,
+            next_page_token=page.cursor,
         )
 
     async def get_group_by_id(self, identifier: str) -> models_pb2.OfferGroup:
@@ -179,7 +195,16 @@ class DictClient(Client):  # noqa: WPS214
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> common.ItemsPage[models_pb2.OfferGroup]:
-        return common.ItemsPage[models_pb2.OfferGroup](list(self._iterate_groups()))
+        page = sequence.paginate(
+            sequence=list(self._iterate_groups()),
+            cursor=cursor,
+            limit=limit,
+        )
+
+        return common.ItemsPage[models_pb2.OfferGroup](
+            protos=page.sequence,
+            next_page_token=page.cursor,
+        )
 
     async def get_group_details_by_id(self, identifier: str) -> models_pb2.OfferSegment:
         for group in self._iterate_groups():
@@ -195,8 +220,17 @@ class DictClient(Client):  # noqa: WPS214
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> common.ItemsPage[models_pb2.OfferSegment]:
+        page = sequence.paginate(
+            sequence=[
+                detail for group in self._iterate_groups() for detail in group.segments
+            ],
+            cursor=cursor,
+            limit=limit,
+        )
+
         return common.ItemsPage[models_pb2.OfferSegment](
-            [detail for group in self._iterate_groups() for detail in group.segments],
+            protos=page.sequence,
+            next_page_token=page.cursor,
         )
 
     async def get_option_by_id(self, identifier: str) -> models_pb2.Offer:
@@ -212,7 +246,16 @@ class DictClient(Client):  # noqa: WPS214
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> common.ItemsPage[models_pb2.Offer]:
-        return common.ItemsPage[models_pb2.Offer](list(self._iterate_options()))
+        page = sequence.paginate(
+            sequence=list(self._iterate_options()),
+            cursor=cursor,
+            limit=limit,
+        )
+
+        return common.ItemsPage[models_pb2.Offer](
+            protos=page.sequence,
+            next_page_token=page.cursor,
+        )
 
     async def get_option_details_by_id(
         self,
@@ -231,12 +274,19 @@ class DictClient(Client):  # noqa: WPS214
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> common.ItemsPage[models_pb2.OfferSegmentDetails]:
-        return common.ItemsPage[models_pb2.OfferSegmentDetails](
-            [
+        page = sequence.paginate(
+            sequence=[
                 detail
                 for option in self._iterate_options()
                 for detail in option.segment_details
             ],
+            cursor=cursor,
+            limit=limit,
+        )
+
+        return common.ItemsPage[models_pb2.OfferSegmentDetails](
+            protos=page.sequence,
+            next_page_token=page.cursor,
         )
 
     def _iterate_groups(self) -> Iterator[models_pb2.OfferGroup]:

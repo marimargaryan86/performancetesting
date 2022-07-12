@@ -62,7 +62,7 @@ class TestDictClient(object):
                 1,
             ),
             (
-                [common_pb2.CabinClass.TYPE_BUSINESS],
+                [common_pb2.CabinClass.TYPE_FIRST],
                 0,
             ),
         ],

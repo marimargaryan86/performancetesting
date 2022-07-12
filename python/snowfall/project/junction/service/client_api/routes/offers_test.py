@@ -72,7 +72,7 @@ class TestOfferGroupDetails(object):
         testing.test_list_and_view_endpoints(
             client=client,
             url="/offers/groups/{id}/details".format(id=fixtures.OFFER_GROUPS[0]),
-            expected_ids=fixtures.OFFER_GROUP_DETAILS,
+            expected_ids=(fixtures.OFFER_GROUP_DETAILS[0],),
         )
 
 
@@ -100,7 +100,10 @@ class TestOfferOptions(object):
         testing.test_list_and_view_endpoints(
             client=client,
             url="/offers/groups/{id}/options".format(id=fixtures.OFFER_GROUPS[0]),
-            expected_ids=fixtures.PROVIDER_OFFERS,
+            expected_ids=(
+                fixtures.PROVIDER_OFFERS[0],
+                fixtures.PROVIDER_OFFERS[1],
+            ),
         )
 
 
@@ -128,7 +131,7 @@ class TestOfferOptionDetails(object):
         testing.test_list_and_view_endpoints(
             client=client,
             url="/offers/options/{id}/details".format(id=fixtures.PROVIDER_OFFERS[0]),
-            expected_ids=fixtures.OFFER_DETAILS,
+            expected_ids=(fixtures.OFFER_DETAILS[0],),
         )
 
 
@@ -331,8 +334,8 @@ class TestOfferSearches(object):
         "cabin_classes, expected",
         [
             (["economy"], 1),
-            (["economy", "business"], 1),
-            (["business"], 0),
+            (["economy", "first"], 1),
+            (["first"], 0),
             (["unknown"], 0),
             (["economy", "unknown"], 1),
         ],

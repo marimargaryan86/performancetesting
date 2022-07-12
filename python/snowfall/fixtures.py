@@ -31,13 +31,32 @@ PLACES = (
 )
 TRIPS = ("9d672f0e-0934-4388-8568-03e40c0bf0e9",)
 SCHEDULES = ("d77e4acb-5aa1-47ad-9a15-126c0fa0e157",)
-PROVIDER_OFFERS = ("88a8dcc9-deff-4a0e-bd96-b0faea5ea90f",)
+PROVIDER_OFFERS = (
+    "88a8dcc9-deff-4a0e-bd96-b0faea5ea90f",
+    "fcad7bb3-f74d-4624-a291-eab2cc6ef9ba",
+    "b8fabc76-5514-4d95-9af8-740f2cc3a969",
+    "91cf7f38-2418-4421-b2f8-87b2d585f6a0",
+)
 OFFER_SEARCHES = ("cb2c2359-5520-42fc-9bf9-dc78d708cd5e",)
 OFFERS = ("5927b3ce-fbd7-4f8b-b456-b1b7fd44cdad",)
-OFFER_DETAILS = ("91d4b3f7-bb9d-4ffc-9919-7892fc017740",)
-OFFER_GROUPS = ("2d178001-46ea-415f-8ec7-f22f2318b7c0",)
-OFFER_GROUP_DETAILS = ("328bc5eb-3ad0-401a-a765-3335595f2bc7",)
-SEGMENTS = ("9aeed7e9-fa69-4fd5-8590-e14e402e1346",)
+OFFER_DETAILS = (
+    "91d4b3f7-bb9d-4ffc-9919-7892fc017740",
+    "c5fabbfa-8e4a-408b-b0d4-8397f103b6b5",
+    "14445cd0-1c56-49b6-93fc-e6c7545ad8cf",
+    "f3f74630-52e0-4a87-8440-6804f6554f9c",
+)
+OFFER_GROUPS = (
+    "2d178001-46ea-415f-8ec7-f22f2318b7c0",
+    "6b368a44-0e01-43cf-80ab-f9a16f40f2b6",
+)
+OFFER_GROUP_DETAILS = (
+    "328bc5eb-3ad0-401a-a765-3335595f2bc7",
+    "de20a83e-d2a4-479a-b7b2-27e042da8b2b",
+)
+SEGMENTS = (
+    "9aeed7e9-fa69-4fd5-8590-e14e402e1346",
+    "539d336c-a221-4f59-87cb-e4cc305d0cfe",
+)
 STOPS = (
     "e1f85306-35b3-4892-9e21-a6a34c02459c",
     "d105da8e-8943-4055-8df6-adf0947d9b02",
@@ -202,11 +221,94 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
                             currency="SEK",
                         ),
                     ),
+                    offers_pb2.Offer(
+                        id=PROVIDER_OFFERS[1],
+                        segment_details=[
+                            offers_pb2.OfferSegmentDetails(
+                                id=OFFER_DETAILS[1],
+                                offer_segment_id=OFFER_GROUP_DETAILS[0],
+                                cabin_class=models_pb2.CabinClass(
+                                    type=models_pb2.CabinClass.TYPE_BUSINESS,
+                                    marketing_name="Business",
+                                ),
+                            ),
+                        ],
+                        price=models_pb2.Price(
+                            amount=31337,
+                            currency="SEK",
+                        ),
+                    ),
                 ],
                 segments=[
                     offers_pb2.OfferSegment(
                         id=OFFER_GROUP_DETAILS[0],
                         segment_id=SEGMENTS[0],
+                        legs=[
+                            offers_pb2.OfferSegmentLeg(
+                                id=str(uuid.uuid4()),
+                                origin=generate_point(str(uuid.uuid4())),
+                                destination=generate_point(str(uuid.uuid4())),
+                                departure_at=protobuf.datetime_to_protobuf(
+                                    datetime.datetime.now(),
+                                ),
+                                arrival_at=protobuf.datetime_to_protobuf(
+                                    datetime.datetime.now(),
+                                ),
+                            ),
+                        ],
+                        vehicle=offers_pb2.Vehicle(
+                            number="123",
+                            equipment="FOO",
+                        ),
+                        operator="SK",
+                        vendor="LH",
+                    ),
+                ],
+                expires_at=protobuf.datetime_to_protobuf(datetime.datetime.now()),
+            ),
+            offers_pb2.OfferGroup(
+                id=OFFER_GROUPS[1],
+                offer_search_id=OFFER_SEARCHES[0],
+                offers=[
+                    offers_pb2.Offer(
+                        id=PROVIDER_OFFERS[2],
+                        segment_details=[
+                            offers_pb2.OfferSegmentDetails(
+                                id=OFFER_DETAILS[2],
+                                offer_segment_id=OFFER_GROUP_DETAILS[1],
+                                cabin_class=models_pb2.CabinClass(
+                                    type=models_pb2.CabinClass.TYPE_ECONOMY,
+                                    marketing_name="Economy",
+                                ),
+                            ),
+                        ],
+                        price=models_pb2.Price(
+                            amount=1337,
+                            currency="SEK",
+                        ),
+                    ),
+                    offers_pb2.Offer(
+                        id=PROVIDER_OFFERS[3],
+                        segment_details=[
+                            offers_pb2.OfferSegmentDetails(
+                                id=OFFER_DETAILS[3],
+                                offer_segment_id=OFFER_GROUP_DETAILS[1],
+                                cabin_class=models_pb2.CabinClass(
+                                    type=models_pb2.CabinClass.TYPE_BUSINESS,
+                                    marketing_name="Business",
+                                ),
+                            ),
+                        ],
+                        price=models_pb2.Price(
+                            amount=31337,
+                            currency="SEK",
+                        ),
+                    ),
+                ],
+                segments=[
+                    offers_pb2.OfferSegment(
+                        id=OFFER_GROUP_DETAILS[1],
+                        segment_id=SEGMENTS[1],
                         legs=[
                             offers_pb2.OfferSegmentLeg(
                                 id=str(uuid.uuid4()),

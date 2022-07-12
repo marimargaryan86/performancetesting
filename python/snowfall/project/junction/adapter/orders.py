@@ -11,6 +11,7 @@ from snowfall.project.junction.service.orders.v1alpha import (
     models_pb2 as order_models_pb2,
 )
 from snowfall.project.junction.service.orders.v1alpha import orders_pb2, orders_pb2_grpc
+from snowfall.stdlib import sequence
 
 
 class NotFoundError(Exception):
@@ -96,7 +97,16 @@ class DictClient(Client):
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> OrdersPage:
-        return OrdersPage(orders=list(self._orders.values()))
+        page = sequence.paginate(
+            sequence=list(self._orders.values()),
+            cursor=cursor,
+            limit=limit,
+        )
+
+        return OrdersPage(
+            orders=page.sequence,
+            next_page_token=page.cursor,
+        )
 
     async def get(self, order_id: str) -> order_models_pb2.Order:
         if order_id not in self._orders:
