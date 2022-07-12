@@ -191,6 +191,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                             operator="foobar",  # TODO: add something useful
                             vendor="foobar",  # TODO: add something useful
                             terminal="foobar",  # TODO: add something useful
+                            type=models_pb2.Schedule.TYPE_RAIL,
                             legs=[
                                 offer_models_pb2.OfferSegmentLeg(
                                     id=more_itertools.first(

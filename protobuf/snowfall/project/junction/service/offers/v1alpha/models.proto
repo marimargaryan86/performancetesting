@@ -77,6 +77,7 @@ message OfferSegment {
   string operator = 4;
   string vendor = 5;
   string terminal = 6;
+  snowfall.stdlib.v1alpha.Schedule.Type type = 8;
   // direction?
   // docsRequired?
 }

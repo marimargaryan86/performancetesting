@@ -222,6 +222,7 @@ async def test_search_result_data(  # noqa: WPS218
         assert segment.terminal == "5"
         assert segment.vehicle.equipment == "32N"
         assert segment.vehicle.number == "525"
+        assert segment.type == models_pb2.Schedule.TYPE_AIR
         leg = segment.legs[0]
         assert leg.id == "leg_id"
         assert leg.origin.ref == "ARN"

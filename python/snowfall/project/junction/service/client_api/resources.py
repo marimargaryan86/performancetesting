@@ -163,6 +163,17 @@ class TripOfferGroupDetailsResource(models.Resource):
                     operator=None,
                 ),
             },
+            relationships={
+                "legType": {
+                    _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
+                        id=protobuf.enum_value_to_slug(
+                            descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
+                            enum_value=segment.type,
+                        ),
+                        type="leg-types",
+                    ),
+                },
+            },
             links={
                 _SELF_HREF: request.url_for(
                     "ViewOfferGroupDetails",

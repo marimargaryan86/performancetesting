@@ -2160,7 +2160,10 @@
                         }
                       ]
                     }
-                  }
+                  },
+                  "required": [
+                    "data"
+                  ]
                 }
               }
             }
@@ -2306,7 +2309,10 @@
                         }
                       ]
                     }
-                  }
+                  },
+                  "required": [
+                    "data"
+                  ]
                 }
               }
             }
@@ -3903,12 +3909,32 @@
                     "$ref": "#/components/schemas/RouteIdentifiers"
                   }
                 }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "legType"
+                ],
+                "properties": {
+                  "legType": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/LegTypeIdentifier"
+                      }
+                    }
+                  }
+                }
               }
             },
             "required": [
               "id",
               "type",
-              "attributes"
+              "attributes",
+              "relationships"
             ]
           },
           {

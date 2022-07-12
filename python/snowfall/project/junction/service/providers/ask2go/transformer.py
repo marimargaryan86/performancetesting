@@ -135,4 +135,5 @@ class OfferTransformer(object):
             operator=segment.operating_carrier.code,
             vendor=segment.marketing_carrier.code,
             terminal=segment.origin_terminal or "",
+            type=models_pb2.Schedule.TYPE_AIR,
         )
