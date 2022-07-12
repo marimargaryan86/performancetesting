@@ -45,8 +45,7 @@ class Places(endpoints.HTTPEndpoint):
 
             place_attributes = (
                 place.attributes.get("name"),
-                place.attributes.get("latitude"),
-                place.attributes.get("longitude"),
+                place.attributes.get("countryCode"),
             )
             if place_attributes not in seen_places_attributes:
                 deduplicated_places.append(place)
