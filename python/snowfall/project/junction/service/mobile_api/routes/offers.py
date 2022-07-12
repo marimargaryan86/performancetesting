@@ -1,5 +1,6 @@
+import copy
 import datetime
-from typing import Any
+from typing import Any, Mapping, Sequence
 
 import lagom
 from starlette import endpoints, requests, responses, status
@@ -56,6 +57,7 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         offer_search_id = request.path_params["offerSearchId"]
         offers_response = await get_response(offer_search_id, junction_client)
+        offers_response = _foobar_to_national_railways(offers_response)
         return models.JsonApiResponse(
             models.Body(
                 data=[
@@ -64,6 +66,21 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
                 ],
             ),
         )
+
+
+def _foobar_to_national_railways(  # noqa: WPS231
+    offers_response: Sequence[Mapping[str, Any]],
+) -> list[Mapping[str, Any]]:
+    modified_response = list(copy.deepcopy(offers_response))
+    for offer in modified_response:
+        for group in offer[_ATTRIBUTES_KEY]["groups"]:
+            for details in group[_ATTRIBUTES_KEY][_DETAILS_KEY]:
+                attributes = details[_ATTRIBUTES_KEY]
+                if attributes["vendor"] == "foobar":
+                    attributes["vendor"] = "National Railways"
+                if attributes["operator"] == "foobar":
+                    attributes["operator"] = "National Railways"
+    return modified_response
 
 
 async def get_response(
