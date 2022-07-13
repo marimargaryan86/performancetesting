@@ -1,5 +1,10 @@
+<script lang="ts" context="module">
+  export type Option = "pay" | "go" | "plus";
+  export const options: Option[] = ["pay", "go", "plus"];
+</script>
+
 <script lang="ts">
-  export let option: string;
+  export let option: Option = "pay";
 </script>
 
 <span>

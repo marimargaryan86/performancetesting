@@ -26,7 +26,7 @@
 
 <Layout>
   <div class="select-currency" slot="action">
-    <SelectField bind:value={currency} items={currencies} />
+    <SelectField bind:value={currency} items={currencies} placeholder="Choose Currencies" />
 
     <Button>
       <DownloadIcon />
@@ -60,7 +60,7 @@
             <td>{utils.formatCurrency(account.EUR)}</td>
             <td>{utils.formatCurrency(account.AED)}</td>
             <td>{utils.formatCurrency(account.AUD)}</td>
-            <td><a href={routeConfig.balances.subAccount(account.id)}>View</a></td>
+            <td class="view"><a href={routeConfig.balances.subAccount(account.id)}>View</a></td>
           </tr>
         {/each}
 
@@ -101,14 +101,10 @@
   }
 
   .select-currency > :global(.select-field.select-field) {
+    border-color: transparent;
+    border-radius: 0;
     height: 100%;
     width: 388px;
-  }
-
-  .select-currency > :global(.select-field > .wrapper) {
-    border: 0;
-    border-radius: 0;
-    vertical-align: top;
   }
 
   .totals {
@@ -131,5 +127,9 @@
     margin-left: 5px;
     transform: translateY(-1px) rotateZ(45deg);
     width: 6px;
+  }
+
+  .view {
+    white-space: nowrap;
   }
 </style>

@@ -12,6 +12,10 @@ export default {
     subAccounts: "/balances/sub-accounts",
     subAccount: (id: string) => `/balances/sub-accounts/${id}`,
   },
+  beneficiaries: {
+    root: "/beneficiaries",
+    addBeneficiary: "/beneficiaries/add-beneficiary",
+  },
   support: "/support",
   exchangeRates: "exchange-rates",
 };

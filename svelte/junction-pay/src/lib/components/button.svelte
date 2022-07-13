@@ -20,7 +20,12 @@
     font-size: 14px;
     font-weight: 600;
     height: 44px;
+    outline: 0;
     padding: 0 11px;
+  }
+
+  button:focus {
+    border-color: var(--color-teal-light);
   }
 
   .empty {

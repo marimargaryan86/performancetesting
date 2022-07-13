@@ -28,5 +28,7 @@
     display: grid;
     gap: 39px;
     grid-template-rows: 76px max-content 1fr;
+    height: 100%;
+    overflow: auto;
   }
 </style>

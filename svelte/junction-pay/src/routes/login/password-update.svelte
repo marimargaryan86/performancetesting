@@ -5,21 +5,22 @@
   import Spinner from "$lib/components/spinner.svelte";
   import TextField from "$lib/components/text-field.svelte";
   import routeConfig from "$lib/route-config";
+  import utils from "$lib/utils";
   import serviceInstances from "$services/instances";
   import { scale } from "svelte/transition";
 
   let password = "";
   let passwordRepeat = "";
   let error = false;
-  let pending = false;
 
   const { auth: service } = serviceInstances;
+  const { pending, func: updatePasswordFunc } = utils.pendableCall(service.updatePassword, false);
 
   $: code = $page.url.searchParams.get("code") ?? "";
   $: password, passwordRepeat, (error = false);
 
   async function updatePassword(): Promise<void> {
-    if (pending) {
+    if ($pending) {
       return;
     }
 
@@ -28,13 +29,11 @@
         throw new Error("Password mismatch");
       }
 
-      pending = true;
-      await service.updatePassword(code, password);
+      await updatePasswordFunc(code, password);
 
       goto(routeConfig.login.root);
     } catch {
       error = true;
-      pending = false;
     }
   }
 </script>
@@ -68,7 +67,7 @@
   <Button type="submit">
     Update password
 
-    {#if pending}
+    {#if $pending}
       <Spinner transition={{ func: scale, params: { duration: 200 } }} />
     {/if}
   </Button>
@@ -93,6 +92,7 @@
     font-weight: 600;
     margin-bottom: 12px;
     transition: color var(--speed-fast) ease;
+    width: max-content;
   }
 
   .error {

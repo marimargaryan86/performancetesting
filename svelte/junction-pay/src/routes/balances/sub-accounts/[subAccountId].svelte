@@ -2,23 +2,31 @@
   import { goto } from "$app/navigation";
   import { page } from "$app/stores";
   import balanceAccounts from "$content/balance-accounts";
-  import transactionData from "$content/transactions";
   import DatePicker from "$lib/components/date-picker/date-picker.svelte";
   import Table from "$lib/components/table.svelte";
   import routeConfig from "$lib/route-config";
   import utils from "$lib/utils";
+  import type { TransactionModel } from "$models/transaction-models";
+  import instances from "$services/instances";
   import { onMount } from "svelte";
   import Main from "../_layout.svelte";
 
-  const transactions = transactionData;
+  let transactions: TransactionModel[] = [];
+
+  const { transaction: service } = instances;
+  const { func: findTransactions } = utils.pendableCall(service.findTransactions.bind(service));
 
   $: ({ subAccountId } = $page.params);
   $: subAccount = balanceAccounts.find((ba) => ba.id === subAccountId);
 
-  onMount(() => {
+  onMount(async () => {
     if (!subAccount) {
       goto(routeConfig.balances.subAccounts);
+
+      return;
     }
+
+    transactions = await findTransactions();
   });
 </script>
 
@@ -58,8 +66,8 @@
             </td>
             <td>{transaction.type}</td>
             <td>{transaction.status}</td>
-            <td>{transaction.amount.code} {utils.formatCurrency(transaction.amount.amount)}</td>
-            <td>{transaction.amount.code} {utils.formatCurrency(transaction.balance.amount)}</td>
+            <td>{transaction.currencyCode} {utils.formatCurrency(transaction.amount)}</td>
+            <td>{transaction.balance.code} {utils.formatCurrency(transaction.balance.amount)}</td>
           </tr>
         {/each}
       </tbody>

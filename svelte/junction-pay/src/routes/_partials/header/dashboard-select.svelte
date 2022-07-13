@@ -1,22 +1,20 @@
 <script lang="ts">
   import SelectField from "$lib/components/select-field.svelte";
-  import DashboardOption from "./dashboard-option.svelte";
+  import DashboardOption, { options, type Option } from "./dashboard-option.svelte";
 
-  export let value: string;
-
-  const options: string[] = ["pay", "go", "plus"];
+  export let value: Option;
 </script>
 
 <div class="dashboard-select">
   <SelectField bind:value items={options}>
     <div class="selected" slot="head" let:value>
-      <DashboardOption option={value?.toString() ?? ""} />
+      <DashboardOption option={value ?? "pay"} />
     </div>
 
-    <ul class="options" let:select let:value slot="body">
-      {#each options as option}
-        <li class="option" aria-selected={option === value} on:click={() => select(option)}>
-          <DashboardOption {option} />
+    <ul class="options" let:select let:value let:items slot="body">
+      {#each items as item}
+        <li class="option" aria-selected={item === value} on:click={() => select(item)}>
+          <DashboardOption option={item} />
         </li>
       {/each}
     </ul>
@@ -30,12 +28,9 @@
   }
 
   .dashboard-select > :global(.select-field.select-field) {
+    font-size: 14px;
     height: 100%;
     width: 100%;
-  }
-
-  .dashboard-select > :global(.select-field.select-field > .wrapper > .head) {
-    height: 49px;
   }
 
   .selected {
@@ -45,17 +40,13 @@
     padding: 0 12px;
   }
 
-  .options {
-    padding: 6px 0;
-  }
-
   .option {
     cursor: pointer;
     padding: 12px;
   }
 
-  .options:not(:hover) > .option[aria-selected="true"] {
-    background-color: var(--color-light-background);
+  .option[aria-selected="true"] {
+    background-color: var(--color-gray-lightest);
   }
 
   .option:hover {

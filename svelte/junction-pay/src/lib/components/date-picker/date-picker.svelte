@@ -12,6 +12,7 @@
   export let end: Date | undefined = undefined;
   export let span = false;
 
+  let container: HTMLDivElement;
   let focusedMonth = utils.setZeroTime(start ? new Date(start) : new Date());
   let expanded = false;
 
@@ -48,10 +49,16 @@
 
     expanded = false;
   }
+
+  function blur(e: FocusEvent): void {
+    if (!container.contains(e.relatedTarget as Node)) {
+      collapse();
+    }
+  }
 </script>
 
-<div class="date-picker" use:clickOutside={collapse}>
-  <TextField {id} value={displayValue} readOnly on:click={toggle} />
+<div class="date-picker" use:clickOutside={collapse} bind:this={container}>
+  <TextField {id} value={displayValue} readOnly on:click={toggle} on:blur={blur} />
 
   {#if expanded}
     <div class="calendar" transition:scale|local={{ duration: 150, start: 0.9 }}>

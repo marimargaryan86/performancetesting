@@ -4,22 +4,26 @@
   import Spinner from "$lib/components/spinner.svelte";
   import TextField from "$lib/components/text-field.svelte";
   import routeConfig from "$lib/route-config";
+  import utils from "$lib/utils";
   import serviceInstances from "$services/instances";
   import { getContext } from "svelte";
   import type { Writable } from "svelte/store";
   import { scale } from "svelte/transition";
 
   let email = "";
-  let pending = false;
   let error = false;
 
   const { auth: service } = serviceInstances;
+  const { pending, func: recoverPassword } = utils.pendableCall(
+    service.recoverPassword.bind(service),
+    false,
+  );
   const emailStore = getContext<Writable<string>>("email");
 
   $: email, (error = false);
 
   async function reset(): Promise<void> {
-    if (pending) {
+    if ($pending) {
       return;
     }
 
@@ -28,15 +32,12 @@
       return;
     }
 
-    pending = true;
-
     try {
-      await service.recoverPassword(email);
+      await recoverPassword(email);
       $emailStore = email;
 
       goto(routeConfig.login.passwordRecoverySent, { replaceState: true });
     } catch {
-      pending = false;
       error = true;
     }
   }
@@ -56,14 +57,14 @@
     id="email"
     bind:value={email}
     placeholder="Enter your email"
-    readOnly={pending}
+    readOnly={$pending}
     {error}
   />
 
   <Button type="submit">
     Reset
 
-    {#if pending}
+    {#if $pending}
       <Spinner transition={{ func: scale, params: { duration: 200 } }} />
     {/if}
   </Button>
@@ -95,6 +96,7 @@
     font-weight: 600;
     margin-bottom: 12px;
     transition: color var(--speed-fast) ease;
+    width: max-content;
   }
 
   .password-recovery > a {

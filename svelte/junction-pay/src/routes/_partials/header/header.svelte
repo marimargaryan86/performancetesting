@@ -2,9 +2,10 @@
   import Button from "$lib/components/button.svelte";
   import AccountIcon from "$lib/icons/account-icon.svelte";
   import NotificationIcon from "$lib/icons/notification-icon.svelte";
+  import type { Option } from "./dashboard-option.svelte";
   import DashboardSelect from "./dashboard-select.svelte";
 
-  let dashboard: DashboardSelect["$$prop_def"]["value"] = "pay";
+  let dashboard: Option = "pay";
 </script>
 
 <header>

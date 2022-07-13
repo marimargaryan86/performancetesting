@@ -1,17 +1,38 @@
 import utils from "$lib/utils";
-import type { UserModel } from "$models/auth-models";
+import type { AuthenticationData, UserModel } from "$models/auth-models";
+import type { ValidationError } from "$models/common-models";
 import BaseService from "./base-service";
 
 export default class AuthService extends BaseService {
-  async login(username: string, password: string): Promise<UserModel> {
+  private validateAuthenticationData(
+    data: Partial<AuthenticationData>,
+  ): [boolean, ValidationError<AuthenticationData>] {
+    const errors: ValidationError<AuthenticationData> = {
+      email: !data.email?.trim().length ? ["Email missing"] : undefined,
+      password: !data.password?.trim().length ? ["Password missing"] : undefined,
+    };
+
+    return [this.containsNoErrors(errors), errors];
+  }
+
+  async login(data: Partial<AuthenticationData>): Promise<UserModel> {
+    const [valid, errors] = this.validateAuthenticationData(data);
+
+    if (!valid) {
+      throw errors;
+    }
+
     // TODO: Impl.
     await utils.sleep(1500);
 
-    if (!(username === "asd@asd.asd" && password === "asd")) {
-      throw new Error("Invalid credentials");
+    if (!(data.email === "asd@asd.asd" && data.password === "asd")) {
+      throw {
+        email: ["Invalid credentials"],
+        password: ["Invalid credentials"],
+      } as ValidationError<AuthenticationData>;
     }
 
-    return { id: "00000000-0000-0000-0000-000000000000", username: "asd@asd.asd" };
+    return { id: "00000000-0000-0000-0000-000000000000", username: data.email };
   }
 
   async logout(): Promise<void> {

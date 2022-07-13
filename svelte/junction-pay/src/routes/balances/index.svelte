@@ -1,14 +1,26 @@
 <script lang="ts">
-  import balancesData from "$content/balances";
   import Button from "$lib/components/button.svelte";
   import TextField from "$lib/components/text-field.svelte";
   import AddIcon from "$lib/icons/add-icon.svelte";
   import SearchIcon from "$lib/icons/search-icon.svelte";
   import utils from "$lib/utils";
-  import type { Balance } from "$models/pay-models";
+  import type { BalanceModel } from "$models/balance-models";
+  import instances from "$services/instances";
+  import { onMount } from "svelte";
   import Layout from "./_layout.svelte";
 
-  const balances: Balance[] = balancesData;
+  let balances: BalanceModel[] = [];
+
+  const { balance: service } = instances;
+  const { func: findBalances } = utils.pendableCall(service.findBalances.bind(service));
+
+  onMount(async () => {
+    try {
+      balances = await findBalances();
+    } catch {
+      //
+    }
+  });
 </script>
 
 <svelte:head>
@@ -34,7 +46,7 @@
 
             <p>
               <strong>{utils.formatCurrency(balance.amount)} {balance.code}</strong>
-              <span>{balance.name}</span>
+              <span>{balance.name ?? ""}</span>
             </p>
           </div>
         </li>
@@ -45,6 +57,7 @@
 
 <style>
   .balances {
+    height: 100%;
     padding: 0 49px 30px;
   }
 

@@ -5,31 +5,34 @@
   import Switch from "$lib/components/switch.svelte";
   import TextField from "$lib/components/text-field.svelte";
   import routeConfig from "$lib/route-config";
+  import utils from "$lib/utils";
+  import type { AuthenticationData } from "$models/auth-models";
+  import type { ValidationError } from "$models/common-models";
   import serviceInstances from "$services/instances";
   import { scale } from "svelte/transition";
 
-  let email = "";
-  let password = "";
-  let error = false;
-  let pending = false;
+  let errors: ValidationError<AuthenticationData> = {};
 
+  const data: AuthenticationData = {
+    email: "",
+    password: "",
+  };
   const { auth: service } = serviceInstances;
-
-  $: email, password, (error = false);
+  const { pending, func: loginFunc } = utils.pendableCall(service.login.bind(service), false);
 
   async function login(): Promise<void> {
-    if (pending) {
+    if ($pending) {
       return;
     }
 
+    errors = {};
+
     try {
-      pending = true;
-      await service.login(email, password);
+      await loginFunc(data);
 
       goto(routeConfig.dashboard);
-    } catch {
-      error = true;
-      pending = false;
+    } catch (e) {
+      errors = e as typeof errors;
     }
   }
 </script>
@@ -42,16 +45,22 @@
   <h1>Welcome Back To Junction</h1>
   <h2>Please enter your details below</h2>
 
-  <label for="email" class:error>Email</label>
-  <TextField type="email" id="email" bind:value={email} placeholder="Enter your email" {error} />
+  <label for="email" class:error={!!errors.email}>Email</label>
+  <TextField
+    type="email"
+    id="email"
+    bind:value={data.email}
+    placeholder="Enter your email"
+    error={!!errors.email}
+  />
 
-  <label for="password" class:error>Password</label>
+  <label for="password" class:error={!!errors.password}>Password</label>
   <TextField
     type="password"
     id="password"
-    bind:value={password}
+    bind:value={data.password}
     placeholder="Enter your password"
-    {error}
+    error={!!errors.password}
   />
 
   <div class="actions">
@@ -66,7 +75,7 @@
   <Button type="submit">
     Log in
 
-    {#if pending}
+    {#if $pending}
       <Spinner transition={{ func: scale, params: { duration: 200 } }} />
     {/if}
   </Button>
@@ -91,6 +100,7 @@
     font-weight: 600;
     margin-bottom: 12px;
     transition: color var(--speed-fast) ease;
+    width: max-content;
   }
 
   .error {

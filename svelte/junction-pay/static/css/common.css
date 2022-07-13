@@ -11,16 +11,19 @@
   --color-gray-darker: #313131;
   --color-gray-darkest: #06152b;
   --color-teal: #61b29d;
-  --color-green-light: #4efeac;
+  --color-teal-light: #96e2ce;
   --color-red: #cf2d2d;
   --color-red-light: #fe4e4e;
   --color-orange: #ff7d37;
-  --color-orange-light: #fff5f0;
+  --color-orange-light: #f7d3c2;
+  --color-orange-lighter: #fff5f0;
   --color-orange-lightest: #fff2eb;
   --color-light-background: #f7f7fa;
   --color-purple: #9883bc;
   --color-blue: #3cb4e8;
   --speed-fast: 150ms;
+  --color-green-light: #4efeac;
+  --color-green: #5bcf6d;
 }
 
 html {

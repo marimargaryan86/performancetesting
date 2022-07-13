@@ -1,14 +1,16 @@
+import { writable, type Readable } from "svelte/store";
+
 function formatCurrency(amount: number, code?: string): string {
-  if (!code) {
+  try {
+    return amount.toLocaleString("en-US", {
+      style: "currency",
+      currency: code,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  } catch {
     return amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
-
-  return amount.toLocaleString("en-US", {
-    style: "currency",
-    currency: code,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
 }
 
 function getCurrencySign(code: string): string {
@@ -71,6 +73,34 @@ async function sleep(timeMs: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, timeMs));
 }
 
+function pendableCall<TResponse, TFunc extends (...args: never[]) => Promise<TResponse>>(
+  func: TFunc,
+  stopOnSuccess = true,
+): { pending: Readable<boolean>; func: TFunc } {
+  const store = writable(false);
+
+  async function wrappedFunc(...args: never[]): Promise<TResponse> {
+    store.set(true);
+
+    try {
+      return await func(...args);
+    } catch (e: unknown) {
+      store.set(false);
+
+      throw e;
+    } finally {
+      if (stopOnSuccess) {
+        store.set(false);
+      }
+    }
+  }
+
+  return {
+    pending: store,
+    func: wrappedFunc as TFunc,
+  };
+}
+
 const weekDays = (() => {
   const date = new Date("2021-08-01");
 
@@ -100,6 +130,7 @@ export default {
   getWeekDay,
   compareDates,
   sleep,
+  pendableCall,
   weekDays,
   months,
 };

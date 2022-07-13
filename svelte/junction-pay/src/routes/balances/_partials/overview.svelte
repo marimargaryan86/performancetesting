@@ -1,9 +1,21 @@
 <script lang="ts">
-  import balancesData from "$content/balances";
   import utils from "$lib/utils";
-  import type { Balance } from "$models/pay-models";
+  import type { BalanceModel } from "$models/balance-models";
+  import instances from "$services/instances";
+  import { onMount } from "svelte";
 
-  const balances: Balance[] = balancesData;
+  let balances: BalanceModel[] = [];
+
+  const { balance: service } = instances;
+  const { func: findBalances } = utils.pendableCall(service.findBalances.bind(service));
+
+  onMount(async () => {
+    try {
+      balances = await findBalances(5);
+    } catch {
+      //
+    }
+  });
 </script>
 
 <div class="overview">

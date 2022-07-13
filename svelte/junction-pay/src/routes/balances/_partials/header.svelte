@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from "$app/stores";
   import balanceAccounts from "$content/balance-accounts";
-  import activeLink from "$lib/actions/active-link";
+  import ActiveLink from "$lib/components/active-link.svelte";
   import routeConfig from "$lib/route-config";
 
   $: ({ subAccountId } = $page.params);
@@ -10,11 +10,13 @@
 
 <div class="header">
   <div class="menu">
-    <a href={routeConfig.balances.root} use:activeLink>CC devs (220414-65188)</a>
-    <a href={routeConfig.balances.subAccounts} use:activeLink>Sub Accounts</a>
+    <ActiveLink href={routeConfig.balances.root} exact>CC devs (220414-65188)</ActiveLink>
+    <ActiveLink href={routeConfig.balances.subAccounts} exact>Sub Accounts</ActiveLink>
 
     {#if subAccount}
-      <a href={routeConfig.balances.subAccount(subAccountId)} use:activeLink>{subAccount.name}</a>
+      <ActiveLink href={routeConfig.balances.subAccount(subAccountId)} exact>
+        {subAccount.name}
+      </ActiveLink>
     {/if}
   </div>
 
@@ -37,7 +39,7 @@
     gap: 50px;
   }
 
-  .menu > a {
+  .menu > :global(a) {
     align-items: center;
     color: var(--color-gray-lighter);
     display: flex;

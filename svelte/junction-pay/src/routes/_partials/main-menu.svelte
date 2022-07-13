@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import activeLink from "$lib/actions/active-link";
+  import ActiveLink from "$lib/components/active-link.svelte";
   import CategoryIcon from "$lib/icons/category-icon.svelte";
   import JunctionLogo from "$lib/images/junction-logo.svelte";
   import routeConfig from "$lib/route-config";
@@ -19,23 +19,22 @@
   <JunctionLogo />
 
   <nav>
-    <a href={routeConfig.dashboard} use:activeLink={{ exact: false }}>
+    <ActiveLink href={routeConfig.dashboard}>
       <CategoryIcon /> My Dashboard
-    </a>
-    <a href={routeConfig.orders} class="dotted-link" use:activeLink={{ exact: false }}>My orders</a>
-    <a href={routeConfig.pay} class="dotted-link" use:activeLink={{ exact: false }}>Pay</a>
-    <a href={routeConfig.exchangeRates} class="dotted-link" use:activeLink={{ exact: false }}>
-      FX Rates
-    </a>
-    <a href={routeConfig.balances.root} class="dotted-link" use:activeLink={{ exact: false }}>
-      Balances
-    </a>
+    </ActiveLink>
+
+    <ActiveLink href={routeConfig.orders} class="dotted-link">My orders</ActiveLink>
+    <ActiveLink href={routeConfig.pay} class="dotted-link">Pay</ActiveLink>
+    <ActiveLink href={routeConfig.exchangeRates} class="dotted-link">FX Rates</ActiveLink>
+    <ActiveLink href={routeConfig.balances.root} class="dotted-link">Balances</ActiveLink>
+    <ActiveLink href={routeConfig.beneficiaries.root} class="dotted-link">Beneficiaries</ActiveLink>
   </nav>
 
   <nav class="secondary">
-    <a href={routeConfig.support} class="dotted-link" use:activeLink={{ exact: false }}>Support</a>
-    <a href={routeConfig.login.root} class="dotted-link" on:click|preventDefault={logout}>Log out</a
-    >
+    <ActiveLink href={routeConfig.support} class="dotted-link">Support</ActiveLink>
+    <a href={routeConfig.login.root} class="dotted-link" on:click|preventDefault={logout}>
+      Log out
+    </a>
   </nav>
 </section>
 
@@ -47,18 +46,9 @@
     padding: 34px 12px 25px;
   }
 
-  a > :global(svg),
-  a::before {
-    margin-right: 12px;
-    width: 20px;
-  }
-
-  .main-menu > :global(svg) {
-    margin: 0 auto 36px;
-  }
-
-  a {
+  nav > :global(a) {
     align-items: center;
+    border: transparent 1px solid;
     border-radius: 10px;
     color: var(--color-gray-light);
     display: flex;
@@ -70,7 +60,22 @@
     width: 100%;
   }
 
-  a:not(:last-child) {
+  nav > :global(a > svg),
+  nav > :global(a::before) {
+    margin-right: 12px;
+    width: 20px;
+  }
+
+  .main-menu > :global(svg) {
+    margin: 0 auto 36px;
+  }
+
+  nav > :global(a:focus) {
+    border-color: var(--color-teal);
+    outline: 0;
+  }
+
+  nav > :global(a:not(:last-child)) {
     margin-bottom: 14px;
   }
 
@@ -79,19 +84,23 @@
     color: var(--color-orange);
   }
 
-  nav > :global(a.active > svg) {
-    fill: var(--color-orange);
-  }
-
-  nav > :global(.dotted-link.active::before) {
-    background-color: var(--color-orange);
-  }
-
-  .dotted-link::before {
+  nav > :global(.dotted-link::before) {
     background-color: var(--color-gray-light);
     border-radius: 50%;
     content: "";
     display: block;
     height: 20px;
+  }
+
+  nav > :global(a.active > svg) {
+    fill: var(--color-orange);
+  }
+
+  nav > :global(a.active:focus) {
+    border-color: var(--color-orange);
+  }
+
+  nav > :global(.dotted-link.active::before) {
+    background-color: var(--color-orange);
   }
 </style>

@@ -134,7 +134,7 @@
   .day.start::after,
   .day.end::after,
   .day.span::after {
-    background-color: var(--color-orange-light);
+    background-color: var(--color-orange-lighter);
     content: "";
     display: block;
     height: calc(100% - 8px);

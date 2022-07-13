@@ -2,6 +2,8 @@
   type Type = $$Generic<"email" | "text" | "password" | "number">;
   type Value = Type extends "number" ? number : string;
 
+  export let disabled = false;
+  export let tabIndex = 0;
   export let readOnly = false;
   export let id: string | undefined = undefined;
   export let value: Value | undefined = "" as Value;
@@ -16,10 +18,14 @@
 
 <input
   on:click
+  on:blur
+  on:mousedown
   {type}
   {value}
   {placeholder}
   {id}
+  {disabled}
+  tabindex={tabIndex}
   class="text-field"
   class:error
   on:input={input}
@@ -27,7 +33,7 @@
 />
 
 <style>
-  input {
+  .text-field {
     background-color: var(--color-white);
     border: var(--color-gray-lightest) 1px solid;
     border-radius: 10px;
@@ -39,11 +45,15 @@
     transition: border-color var(--speed-fast) ease;
   }
 
-  input::placeholder {
+  .text-field::placeholder {
     color: var(--color-gray);
   }
 
-  .error {
+  .text-field.text-field.text-field.error {
     border-color: var(--color-red);
+  }
+
+  .text-field.text-field.text-field:focus {
+    border-color: var(--color-teal);
   }
 </style>
