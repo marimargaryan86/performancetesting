@@ -2836,9 +2836,7 @@
                   },
                   "countryCode": {
                     "type": "string",
-                    "pattern": "^[A-Z]{2}$",
-                    "minLength": 2,
-                    "maxLength": 2,
+                    "format":  "country",
                     "example": "SE",
                     "readOnly": true
                   },
@@ -4471,7 +4469,8 @@
               },
               "countryCode": {
                 "type": "string",
-                "example": "UK"
+                "format": "country",
+                "example": "GB"
               },
               "postalCode": {
                 "type": "string",
@@ -4485,7 +4484,8 @@
           },
           "phoneNumber": {
             "type": "string",
-            "example": "123456789"
+            "format": "phone",
+            "example": "+123456789"
           }
         }
       },

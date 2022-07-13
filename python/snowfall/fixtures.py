@@ -128,7 +128,7 @@ def generate_location(identifier: str) -> place_models_pb2.Location:
             latitude=random.uniform(*_LATITUDE_RANGE),  # nosec
             longitude=random.uniform(*_LONGITUDE_RANGE),  # nosec
         ),
-        country_code="",
+        country_code="SE",
         time_zone="Europe/Stockholm",
         types=[place_models_pb2.Location.TYPE_UNSPECIFIED],
     )

@@ -31,12 +31,6 @@ class GeocodingService(service.Service, geocoding_pb2_grpc.GeocodingServiceServi
 
         country_code = await self._cache.get(cache_key)
 
-        # todo: solve the performance issues with country code lookups
-        if not country_code:
-            return geocoding_pb2.CountryCodeLookupResponse(
-                country_code="XX",
-            )
-
         if not country_code:
             country_code = await self._geocoder.get_country_code(
                 latitude=request.coordinates.latitude,

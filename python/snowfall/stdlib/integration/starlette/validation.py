@@ -1,10 +1,7 @@
 import pathlib
-from typing import Any
 
-import email_validator
 import openapi_core
 import rapidjson
-from furl import furl
 from openapi_core.validation.request.datatypes import (
     OpenAPIRequest,
     RequestParameters,
@@ -15,6 +12,8 @@ from openapi_core.validation.response.datatypes import OpenAPIResponse
 from openapi_core.validation.response.validators import ResponseValidator
 from starlette import requests, responses
 from werkzeug.datastructures import Headers
+
+from snowfall.stdlib.integration.starlette import formatters
 
 
 async def request_to_openapi(request: requests.Request) -> OpenAPIRequest:
@@ -44,35 +43,6 @@ async def response_to_openapi(response: responses.Response) -> OpenAPIResponse:
     )
 
 
-class EmailFormatter(object):
-    def validate(self, potential_email: Any) -> bool:
-        try:
-            self.unmarshal(potential_email)
-        except email_validator.EmailNotValidError:
-            return False
-
-        return True
-
-    def unmarshal(self, email: Any) -> str:
-        return email_validator.validate_email(
-            email=email,
-            check_deliverability=False,
-        ).email
-
-
-class UriFormatter(object):
-    def validate(self, potential_url: Any) -> bool:
-        try:
-            self.unmarshal(potential_url)
-        except ValueError:
-            return False
-
-        return True
-
-    def unmarshal(self, url: Any) -> furl:
-        return furl(url)
-
-
 class Validator(object):
     def __init__(
         self,
@@ -84,15 +54,14 @@ class Validator(object):
                 url="file://{0}".format(str(spec_path)),
             )
             deserializer = {"application/vnd.api+json": rapidjson.loads}
-            formatter = {"email": EmailFormatter(), "uri": UriFormatter()}
             self._request_validator = RequestValidator(
                 spec,
-                custom_formatters=formatter,
+                custom_formatters=formatters.custom_formatters(),
                 custom_media_type_deserializers=deserializer,
             )
             self._response_validator = ResponseValidator(
                 spec,
-                custom_formatters=formatter,
+                custom_formatters=formatters.custom_formatters(),
                 custom_media_type_deserializers=deserializer,
             )
 

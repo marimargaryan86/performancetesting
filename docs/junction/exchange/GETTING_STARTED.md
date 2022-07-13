@@ -35,42 +35,42 @@ Once you've decided on an offer aggregate you want to book, you'll need to creat
 ### Place
 An indexed location in the world that Junction might have content for, such as airports, rail stations, hotels etc. Its main use is to specify origin and destination in a **Trip Search**.
 
-For more information about **Place**, see its [API schema definition](../../openapi/client_api/openapi.json/components/schemas/Place).
+For more information about **Place**, see its [API schema definition](../../openapi/junction/client_api/openapi.json/components/schemas/Place).
 
 ### Trip
 A journey between two **Points**, an origin and a destination. A trip is made up of one or multiple **Segments**, and each segment is made up of one or multiple **Legs**.
 
-For more information about **Trip**, see its [API schema definition](../../openapi/client_api/openapi.json/components/schemas/Trip).
+For more information about **Trip**, see its [API schema definition](../../openapi/junction/client_api/openapi.json/components/schemas/Trip).
 
 ### Segment
 The element of the trip between a boarding point and and an disembarking point within the same mode of travel. A segment is a collection of legs.
 The trip from one place to another that may contain multiple segments to get from an origin place to the destination place.
 
-For more information about **Segment**, see its [API schema definition](../../openapi/client_api/openapi.json/components/schemas/Segment).
+For more information about **Segment**, see its [API schema definition](../../openapi/junction/client_api/openapi.json/components/schemas/Segment).
 
 ### Leg
 A single element of the trip segment carried by a provider.
 The operation between two consecutive scheduled stops on any given flight/rail/car/bus.
 
-For more information about **Leg**, see its [API schema definition](../../openapi/client_api/openapi.json/components/schemas/Leg).
+For more information about **Leg**, see its [API schema definition](../../openapi/junction/client_api/openapi.json/components/schemas/Leg).
 
 ### Offer Aggregate
 A collection of offers that together covers your entire trip.
 
-For more information about **Offer Aggregate**, see its [API schema definition](../../openapi/client_api/openapi.json/components/schemas/OfferAggregate).
+For more information about **Offer Aggregate**, see its [API schema definition](../../openapi/junction/client_api/openapi.json/components/schemas/OfferAggregate).
 
 ### Offer Group
 A collection of offers within an offer aggregate that covers the same segment(s) and are all related to each other (e.g. sold by the same provider but with different cabin classes, baggage allowances etc.).
 
-For more information about **Offer Group**, see its [API schema definition](../../openapi/client_api/openapi.json/components/schemas/OfferGroup).
+For more information about **Offer Group**, see its [API schema definition](../../openapi/junction/client_api/openapi.json/components/schemas/OfferGroup).
 
 ### Offer
 A priced offer for one or multiple segments of a trip with a defined set of attributes (cabin class, baggage allowance etc.).
 
-For more information about **Offer**, see its [API schema definition](../../openapi/client_api/openapi.json/components/schemas/Offer).
+For more information about **Offer**, see its [API schema definition](../../openapi/junction/client_api/openapi.json/components/schemas/Offer).
 
 ### Order
 
 A booking that contains information about purchased offers. It can, once created, be extended with additional offers if needed.
 
-For more information about **Order**, see its [API schema definition](../../openapi/client_api/openapi.json/components/schemas/Order).
+For more information about **Order**, see its [API schema definition](../../openapi/junction/client_api/openapi.json/components/schemas/Order).

@@ -4,28 +4,29 @@ from typing import NamedTuple, Type
 
 
 def resolve_fullname(node: ast.AST) -> str:
-    if isinstance(node, ast.Attribute):
-        return "{0}.{1}".format(resolve_fullname(node.value), node.attr)
+    match node:
+        case ast.Attribute():
+            fullname = "{0}.{1}".format(resolve_fullname(node.value), node.attr)
+        case ast.Name():
+            fullname = node.id
+        case ast.Subscript():
+            fullname = resolve_fullname(node.value)
+        case ast.Call():
+            fullname = resolve_fullname(node.func)
+        case ast.BinOp():
+            fullname = "typing.Union"
+        case ast.Constant():
+            fullname = str(node.value)
+        case _:
+            raise RuntimeError(
+                "{0} on {1}:{2} is not a resolvable type".format(
+                    type(node),
+                    node.lineno,
+                    node.col_offset,
+                ),
+            )
 
-    if isinstance(node, ast.Name):
-        return node.id
-
-    if isinstance(node, ast.Subscript):
-        return resolve_fullname(node.value)
-
-    if isinstance(node, ast.Call):
-        return resolve_fullname(node.func)
-
-    if isinstance(node, ast.BinOp):
-        return "typing.Union"
-
-    raise RuntimeError(
-        "{0} on {1}:{2} is not a resolvable type".format(
-            type(node),
-            node.lineno,
-            node.col_offset,
-        ),
-    )
+    return fullname
 
 
 class Error(NamedTuple):

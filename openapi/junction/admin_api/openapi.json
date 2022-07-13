@@ -305,9 +305,7 @@
                   },
                   "countryCode": {
                     "type": "string",
-                    "pattern": "^[A-Z]{2}$",
-                    "minLength": 2,
-                    "maxLength": 2,
+                    "format": "country",
                     "example": "SE"
                   },
                   "timeZone": {
@@ -456,9 +454,7 @@
                   },
                   "countryCode": {
                     "type": "string",
-                    "pattern": "^[A-Z]{2}$",
-                    "minLength": 2,
-                    "maxLength": 2,
+                    "format": "country",
                     "example": "SE"
                   },
                   "timeZone": {

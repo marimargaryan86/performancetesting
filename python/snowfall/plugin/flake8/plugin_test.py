@@ -32,6 +32,10 @@ from snowfall.plugin.flake8 import plugin
             "_: str | int | bytes",
             "typing.Union",
         ],
+        [
+            "_: None",
+            "None",
+        ],
     ],
 )
 def test_resolve_fullname(source: str, expected: str) -> None:
