@@ -32,6 +32,7 @@ job "echo-grpc" {
 
     network {
       port "grpc" {}
+      port "prometheus" {}
     }
 
     service {
@@ -46,12 +47,25 @@ job "echo-grpc" {
       }
     }
 
+    service {
+      name = "echo-${NOMAD_NAMESPACE}"
+      port = "prometheus"
+      tags = ["metrics"]
+
+      check {
+        type     = "http"
+        path     = "/"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+
     task "grpc" {
       driver = "docker"
 
       config {
         image = var.docker_image
-        ports = ["grpc"]
+        ports = ["grpc", "prometheus"]
         args = [
           "grpc",
         ]
@@ -64,10 +78,11 @@ job "echo-grpc" {
       }
 
       env {
-        ENV_NAME     = "${NOMAD_NAMESPACE}"
-        GRPC_ADDRESS = "0.0.0.0"
-        GRPC_PORT    = "${NOMAD_PORT_grpc}"
-        SENTRY_DSN   = "https://43837909119c4ce186975c300c4efe6e@sentry.snowfall.se/18"
+        ENV_NAME        = "${NOMAD_NAMESPACE}"
+        GRPC_ADDRESS    = "0.0.0.0"
+        GRPC_PORT       = "${NOMAD_PORT_grpc}"
+        SENTRY_DSN      = "https://43837909119c4ce186975c300c4efe6e@sentry.snowfall.se/18"
+        PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
       }
     }
   }

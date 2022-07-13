@@ -32,6 +32,7 @@ job "admin-api-http" {
 
     network {
       port "http" {}
+      port "prometheus" {}
     }
 
     service {
@@ -52,6 +53,19 @@ job "admin-api-http" {
       }
     }
 
+    service {
+      name = "admin-api-${NOMAD_NAMESPACE}"
+      port = "prometheus"
+      tags = ["metrics"]
+
+      check {
+        type     = "http"
+        path     = "/"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+
     task "http" {
       driver = "docker"
 
@@ -66,7 +80,7 @@ EOH
 
       config {
         image = var.docker_image
-        ports = ["http"]
+        ports = ["http", "prometheus"]
         args = [
           "http",
         ]
@@ -84,6 +98,7 @@ EOH
         HTTP_ADDRESS          = "0.0.0.0"
         HTTP_PORT             = "${NOMAD_PORT_http}"
         SENTRY_DSN            = "https://c674550aaa124dd9b5f02bf6c49b1983@sentry.snowfall.se/41"
+        PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
       }
     }
   }

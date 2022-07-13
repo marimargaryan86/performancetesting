@@ -32,6 +32,7 @@ job "mobile-api-http" {
 
     network {
       port "http" {}
+      port "prometheus" {}
     }
 
     service {
@@ -47,6 +48,19 @@ job "mobile-api-http" {
       check {
         type     = "http"
         path     = "/health"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+
+    service {
+      name = "mobile-api-${NOMAD_NAMESPACE}"
+      port = "prometheus"
+      tags = ["metrics"]
+
+      check {
+        type     = "http"
+        path     = "/"
         interval = "10s"
         timeout  = "2s"
       }
@@ -78,7 +92,7 @@ EOH
 
       config {
         image = var.docker_image
-        ports = ["http"]
+        ports = ["http", "prometheus"]
         args = [
           "http",
         ]
@@ -98,6 +112,7 @@ EOH
         JWT_TOKEN_VERSION     = "1.0.0"
         JUNCTION_API_ADDRESS  = "https://api.junction.dev"
         SENTRY_DSN            = "https://6166193e2bc24153b87e9bfca3d510d4@sentry.snowfall.se/38"
+        PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
       }
     }
   }

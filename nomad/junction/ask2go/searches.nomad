@@ -30,6 +30,22 @@ job "ask2go-searches" {
   group "searches" {
     count = 5
 
+    network {
+      port "prometheus" {}
+    }
+
+    service {
+      name = "ask2go-${NOMAD_NAMESPACE}"
+      port = "prometheus"
+      tags = ["metrics"]
+
+      check {
+        type     = "http"
+        path     = "/"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
     task "searches" {
       driver = "docker"
 
@@ -53,6 +69,7 @@ EOH
 
       config {
         image = var.docker_image
+        ports = ["prometheus"]
         args = [
           "searches",
         ]
@@ -69,6 +86,7 @@ EOH
         API_BOOKING_BASE_URL = "http://ec2-3-68-186-171.eu-central-1.compute.amazonaws.com"
         ENV_NAME             = "${NOMAD_NAMESPACE}"
         SENTRY_DSN           = "https://c299617e39d446ccb1053a04d9ac12b8@sentry.snowfall.se/34"
+        PROMETHEUS_PORT      = "${NOMAD_PORT_prometheus}"
       }
     }
   }

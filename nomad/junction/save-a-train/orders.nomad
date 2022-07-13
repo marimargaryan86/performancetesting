@@ -30,6 +30,22 @@ job "save-a-train-orders" {
   group "orders" {
     count = 2
 
+    network {
+      port "prometheus" {}
+    }
+
+    service {
+      name = "save-a-train-${NOMAD_NAMESPACE}"
+      port = "prometheus"
+      tags = ["metrics"]
+
+      check {
+        type     = "http"
+        path     = "/"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
     task "orders" {
       driver = "docker"
 
@@ -56,6 +72,7 @@ EOH
 
       config {
         image = var.docker_image
+        ports = ["prometheus"]
         args = [
           "orders",
         ]
@@ -72,6 +89,7 @@ EOH
         API_SEARCH_BASE_URL = "https://apisearch.saveatrain.com/search"
         ENV_NAME            = "${NOMAD_NAMESPACE}"
         SENTRY_DSN          = "https://f01c7c8bf4d04a709a65b4be8b11ba69@sentry.snowfall.se/36"
+        PROMETHEUS_PORT     = "${NOMAD_PORT_prometheus}"
       }
     }
   }

@@ -30,6 +30,23 @@ job "trips-consume" {
   group "consume" {
     count = 5
 
+    network {
+      port "prometheus" {}
+    }
+
+    service {
+      name = "trips-${NOMAD_NAMESPACE}"
+      port = "prometheus"
+      tags = ["metrics"]
+
+      check {
+        type     = "http"
+        path     = "/"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+
     task "consume" {
       driver = "docker"
 
@@ -46,6 +63,7 @@ EOH
 
       config {
         image = var.docker_image
+        ports = ["prometheus"]
         args = [
           "consume",
         ]
@@ -58,8 +76,9 @@ EOH
       }
 
       env {
-        ENV_NAME   = "${NOMAD_NAMESPACE}"
-        SENTRY_DSN = "https://9f6821dca30141bd8f3dc919b7806f6c@sentry.snowfall.se/26"
+        ENV_NAME        = "${NOMAD_NAMESPACE}"
+        SENTRY_DSN      = "https://9f6821dca30141bd8f3dc919b7806f6c@sentry.snowfall.se/26"
+        PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
       }
     }
   }

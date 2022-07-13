@@ -30,6 +30,22 @@ job "orders-import" {
   group "import" {
     count = 2
 
+    network {
+      port "prometheus" {}
+    }
+
+    service {
+      name = "orders-${NOMAD_NAMESPACE}"
+      port = "prometheus"
+      tags = ["metrics"]
+
+      check {
+        type     = "http"
+        path     = "/"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
     task "import" {
       driver = "docker"
 
@@ -46,6 +62,7 @@ EOH
 
       config {
         image = var.docker_image
+        ports = ["prometheus"]
         args = [
           "import",
         ]
@@ -58,8 +75,9 @@ EOH
       }
 
       env {
-        ENV_NAME   = "${NOMAD_NAMESPACE}"
-        SENTRY_DSN = "https://7c600c1c458d403e8047091398239f20@sentry.snowfall.se/30"
+        ENV_NAME        = "${NOMAD_NAMESPACE}"
+        SENTRY_DSN      = "https://7c600c1c458d403e8047091398239f20@sentry.snowfall.se/30"
+        PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
       }
     }
   }

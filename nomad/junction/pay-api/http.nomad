@@ -32,6 +32,7 @@ job "pay-api-http" {
 
     network {
       port "http" {}
+      port "prometheus" {}
     }
 
     service {
@@ -47,6 +48,19 @@ job "pay-api-http" {
       check {
         type     = "http"
         path     = "/health"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+
+    service {
+      name = "pay-api-${NOMAD_NAMESPACE}"
+      port = "prometheus"
+      tags = ["metrics"]
+
+      check {
+        type     = "http"
+        path     = "/"
         interval = "10s"
         timeout  = "2s"
       }
@@ -74,7 +88,7 @@ EOH
 
       config {
         image = var.docker_image
-        ports = ["http"]
+        ports = ["http", "prometheus"]
         args = [
           "http",
         ]
@@ -92,6 +106,7 @@ EOH
         HTTP_ADDRESS          = "0.0.0.0"
         HTTP_PORT             = "${NOMAD_PORT_http}"
         SENTRY_DSN            = "https://025704ebb5d24063b1153935db50ffd5@sentry.snowfall.se/42"
+        PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
       }
     }
   }

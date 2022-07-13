@@ -32,6 +32,7 @@ job "passenger-name-records-grpc" {
 
     network {
       port "grpc" {}
+      port "prometheus" {}
     }
 
     service {
@@ -41,6 +42,18 @@ job "passenger-name-records-grpc" {
 
       check {
         type     = "grpc"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+    service {
+      name = "passenger-name-records-${NOMAD_NAMESPACE}"
+      port = "prometheus"
+      tags = ["metrics"]
+
+      check {
+        type     = "http"
+        path     = "/"
         interval = "10s"
         timeout  = "2s"
       }
@@ -60,7 +73,7 @@ EOH
 
       config {
         image = var.docker_image
-        ports = ["grpc"]
+        ports = ["grpc", "prometheus"]
         args = [
           "grpc",
         ]
@@ -73,10 +86,11 @@ EOH
       }
 
       env {
-        ENV_NAME     = "${NOMAD_NAMESPACE}"
-        GRPC_ADDRESS = "0.0.0.0"
-        GRPC_PORT    = "${NOMAD_PORT_grpc}"
-        SENTRY_DSN   = "https://602f3e0c605a42528db36cc4e82adb47@sentry.snowfall.se/32"
+        ENV_NAME        = "${NOMAD_NAMESPACE}"
+        GRPC_ADDRESS    = "0.0.0.0"
+        GRPC_PORT       = "${NOMAD_PORT_grpc}"
+        SENTRY_DSN      = "https://602f3e0c605a42528db36cc4e82adb47@sentry.snowfall.se/32"
+        PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
       }
     }
   }

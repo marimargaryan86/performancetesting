@@ -30,6 +30,23 @@ job "ask2go-orders" {
   group "orders" {
     count = 5
 
+    network {
+      port "prometheus" {}
+    }
+
+    service {
+      name = "ask2go-${NOMAD_NAMESPACE}"
+      port = "prometheus"
+      tags = ["metrics"]
+
+      check {
+        type     = "http"
+        path     = "/"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+
     task "orders" {
       driver = "docker"
 
@@ -46,6 +63,7 @@ EOH
 
       config {
         image = var.docker_image
+        ports = ["prometheus"]
         args = [
           "orders",
         ]
@@ -64,6 +82,7 @@ EOH
         SENTRY_DSN           = "https://c299617e39d446ccb1053a04d9ac12b8@sentry.snowfall.se/34"
         SMTP_SENDER          = "noreply@junction.travel"
         SMTP_RECIPIENT       = "A2GBooking@snowfalltravel.com"
+        PROMETHEUS_PORT      = "${NOMAD_PORT_prometheus}"
       }
     }
   }
