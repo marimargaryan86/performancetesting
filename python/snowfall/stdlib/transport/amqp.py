@@ -200,8 +200,11 @@ class Consumer(object):
             except Exception:
                 self._logger.exception()
                 span.set_status("nok")
+                await msg.nack()
 
                 raise
+            else:
+                await msg.ack()
             finally:
                 self._logger.info(
                     "Message consumed.",
