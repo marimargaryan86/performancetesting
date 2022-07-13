@@ -56,7 +56,7 @@ class UserResource(models.Resource):
             attributes={
                 "name": user.name,
                 "email": user.email,
-                "phone": user.phone,
+                "phone": user.phone.e164_number,
                 "created": protobuf.protobuf_to_datetime(
                     user.created_at,
                 ),
