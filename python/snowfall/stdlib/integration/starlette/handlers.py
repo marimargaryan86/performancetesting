@@ -1,11 +1,10 @@
 import http
-from typing import Optional, cast
+from typing import Optional
 
-import jsonschema
 from openapi_core.unmarshalling.schemas.exceptions import InvalidSchemaValue
 from starlette import exceptions, requests, responses, status
 
-from snowfall.stdlib.integration.starlette import models
+from snowfall.stdlib.integration.starlette import models, validation
 
 
 def error_response_from_status(
@@ -68,19 +67,10 @@ async def validation_error_handler(
 ) -> responses.JSONResponse:
     return models.JsonApiResponse(
         models.Body(
-            errors=[
-                models.Error(
-                    status=str(int(http.HTTPStatus.BAD_REQUEST)),
-                    code=error.validator,
-                    detail=error.message,
-                    source=models.ErrorSource(
-                        pointer="/{0}".format(
-                            "/".join([str(path) for path in error.absolute_path]),
-                        ),
-                    ),
-                )
-                for error in cast(list[jsonschema.ValidationError], exc.schema_errors)
-            ],
+            errors=validation.invalid_schema_value_to_errors(
+                exc=exc,
+                status_code=status.HTTP_400_BAD_REQUEST,
+            ),
         ),
         status_code=http.HTTPStatus.BAD_REQUEST,
     )

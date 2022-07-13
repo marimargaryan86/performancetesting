@@ -57,7 +57,7 @@ def create_starlette_app(
             ),
             Middleware(
                 middlewares.ValidationMiddleware,
-                validator=validation.Validator(openapi_path),
+                validator=validation.Validator(str(openapi_path)),
                 excluded_status_codes={http.HTTPStatus.METHOD_NOT_ALLOWED},
             ),
             *(custom_middlewares or []),

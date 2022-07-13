@@ -1,7 +1,9 @@
-import pathlib
+from typing import cast
 
+import jsonschema
 import openapi_core
 import rapidjson
+from openapi_core.unmarshalling.schemas.exceptions import InvalidSchemaValue
 from openapi_core.validation.request.datatypes import (
     OpenAPIRequest,
     RequestParameters,
@@ -13,7 +15,7 @@ from openapi_core.validation.response.validators import ResponseValidator
 from starlette import requests, responses
 from werkzeug.datastructures import Headers
 
-from snowfall.stdlib.integration.starlette import formatters
+from snowfall.stdlib.integration.starlette import formatters, models
 
 
 async def request_to_openapi(request: requests.Request) -> OpenAPIRequest:
@@ -43,15 +45,34 @@ async def response_to_openapi(response: responses.Response) -> OpenAPIResponse:
     )
 
 
+def invalid_schema_value_to_errors(
+    exc: InvalidSchemaValue,
+    status_code: int,
+) -> list[models.Error]:
+    return [
+        models.Error(
+            status=str(status_code),
+            code=error.validator,
+            detail=error.message,
+            source=models.ErrorSource(
+                pointer="/{0}".format(
+                    "/".join([str(path) for path in error.absolute_path]),
+                ),
+            ),
+        )
+        for error in cast(list[jsonschema.ValidationError], exc.schema_errors)
+    ]
+
+
 class Validator(object):
     def __init__(
         self,
-        spec_path: pathlib.Path,
+        spec_path: str,
     ):
-        with open(str(spec_path)) as spec_file:
+        with open(spec_path) as spec_file:
             spec = openapi_core.OpenAPISpec.create(
                 rapidjson.load(spec_file),
-                url="file://{0}".format(str(spec_path)),
+                url="file://{0}".format(spec_path),
             )
             deserializer = {"application/vnd.api+json": rapidjson.loads}
             self._request_validator = RequestValidator(

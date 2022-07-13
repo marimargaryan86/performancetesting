@@ -1,7 +1,7 @@
-import http
 from typing import Any, Awaitable, Callable, Container, Mapping, Optional, cast
 
 import sentry_sdk
+import structlog
 from openapi_core.exceptions import OpenAPIError
 from openapi_core.templating.paths.exceptions import PathNotFound
 from openapi_core.unmarshalling.schemas.exceptions import InvalidSchemaValue
@@ -11,6 +11,7 @@ from starlette import applications, exceptions, requests, responses, status, typ
 from starlette.middleware import base
 
 from snowfall.stdlib.integration.starlette import handlers, request_helpers, validation
+from snowfall.stdlib.logging import stdout
 
 
 class RequestWithBody(requests.Request):
@@ -87,9 +88,10 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
         self,
         app: applications.Starlette,
         validator: validation.Validator,
-        excluded_status_codes: Optional[Container[http.HTTPStatus]] = None,
+        excluded_status_codes: Optional[Container[int]] = None,
     ):
         super().__init__(app)
+        self._logger = structlog.get_logger(__name__)
         self._validator = validator
         self._excluded_status_codes = excluded_status_codes or []
 
@@ -129,9 +131,32 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
             return resolved_response
 
         openapi_response = await validation.response_to_openapi(resolved_response)
-        await self._validator.validate_response(openapi_request, openapi_response)
+
+        try:
+            await self._validator.validate_response(openapi_request, openapi_response)
+        except InvalidSchemaValue as err:
+            return await self._handle_response_schema_error(resolved_request, err)
 
         return resolved_response
+
+    async def _handle_response_schema_error(
+        self,
+        request: requests.Request,
+        exc: InvalidSchemaValue,
+    ) -> responses.JSONResponse:
+        with stdout.context_binding(
+            errors=[
+                error.dict()
+                for error in validation.invalid_schema_value_to_errors(
+                    exc=exc,
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+            ],
+            body=exc.value,
+        ):
+            self._logger.error("Response body does not validate against schema")
+
+        return await handlers.server_error_handler(request, exc)
 
     async def _handle_validation_error(
         self,
