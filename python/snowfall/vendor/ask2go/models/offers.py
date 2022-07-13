@@ -1,7 +1,10 @@
-from datetime import datetime, time
+from datetime import datetime, timedelta
 from typing import Optional
 from uuid import UUID
 
+import pydantic
+
+from snowfall.vendor.ask2go import normalizers
 from snowfall.vendor.ask2go.models.base import CamelCaseBaseModel
 
 
@@ -41,7 +44,7 @@ class TripSegmentCarrier(CamelCaseBaseModel):
 
 class TripSegment(CamelCaseBaseModel):
     id: Optional[UUID]  # noqa: A003
-    duration: time
+    duration: timedelta
     distance: float
     cabin: Optional[str]
     is_technical_stop: bool
@@ -60,10 +63,14 @@ class TripSegment(CamelCaseBaseModel):
     layover: str
     change_of_plane: Optional[bool]
 
+    _normalize_duration = pydantic.validator("duration", pre=True, allow_reuse=True)(
+        normalizers.normalize_duration,
+    )
+
 
 class Trip(CamelCaseBaseModel):
     id: Optional[UUID]  # noqa: A003
-    duration: time
+    duration: timedelta
     direction: str
     is_red_eye: bool
     has_long_connection_duration: bool
@@ -76,6 +83,10 @@ class Trip(CamelCaseBaseModel):
     segments: list[TripSegment]
     baggage_allowance: list[TripBaggageAllowance]
     gds: str
+
+    _normalize_duration = pydantic.validator("duration", pre=True, allow_reuse=True)(
+        normalizers.normalize_duration,
+    )
 
 
 class PricingInformationBase(CamelCaseBaseModel):
