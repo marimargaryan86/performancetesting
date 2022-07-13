@@ -13,16 +13,17 @@ class NoResultsError(Exception):
 
 
 class Ask2GoAdapter(object):
-    _poll_retries_limit = 10
-    _wait_time_between_polling = 1
-
     def __init__(
         self,
         ask2go_client: client.Ask2GoClient,
         offer_validator: validator.OfferValidator,
+        poll_retries_limit: int = 10,
+        wait_time_between_polling: float = 1,
     ):
         self._client = ask2go_client
+        self._poll_retries_limit = poll_retries_limit
         self._validator = offer_validator
+        self._wait_time_between_polling = wait_time_between_polling
 
     async def gather_search_results(
         self,

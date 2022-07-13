@@ -33,10 +33,18 @@ job "ask2go-searches" {
     task "searches" {
       driver = "docker"
 
+      vault {
+        policies = ["ask2go-development"]
+      }
+
       template {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 REDIS_DSN={{range $index, $service := service "redis"}}redis://{{.Address}}:{{.Port}}// {{end}}
+{{ with secret (printf "kv/data/%s/ask2go" (env "NOMAD_NAMESPACE")) }}
+POLL_RETRIES_LIMIT={{ .Data.data.poll_retries_limit }}
+WAIT_TIME_BETWEEN_POLLING={{ .Data.data.wait_time_between_polling }}
+{{ end }}
 EOH
         destination = "services.env"
         env         = true

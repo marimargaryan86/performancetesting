@@ -52,6 +52,8 @@ class _SearchSettings(service.Settings):
     redis_dsn: Sequence[pydantic.AnyUrl]
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
     http_timeout: float = 20.0
+    poll_retries_limit: int = 10
+    wait_time_between_polling: float = 1
 
 
 async def _offers(app: service.Application[_OffersSettings]) -> None:
@@ -161,6 +163,8 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                     ask2go_adapter=adapter.Ask2GoAdapter(
                         ask2go_client=ask2go_client,
                         offer_validator=validator.OfferValidator(),
+                        poll_retries_limit=app.settings.poll_retries_limit,
+                        wait_time_between_polling=app.settings.wait_time_between_polling,
                     ),
                     offer_transformer=transformer.OfferTransformer(
                         airport_repository=airports.AirportRepository(
