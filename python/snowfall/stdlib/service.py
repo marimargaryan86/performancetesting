@@ -21,6 +21,7 @@ from typing import (  # noqa: WPS235
 
 import click
 import pydantic
+import structlog
 from prometheus_async.aio import web
 from pydantic.error_wrappers import ErrorWrapper
 
@@ -228,6 +229,13 @@ def _command(command: Command[_Settings]) -> Callable[[click.Context], None]:
                 additional_integrations=entrypoint.sentry_settings.additional_integrations,
                 tag_keys=entrypoint.sentry_settings.tag_keys,
             )
+
+        structlog.get_logger(__name__).info(
+            "Application bootstrapped.",
+            name=application.name,
+            version=application.version,
+            environment=application.environment,
+        )
 
         if not inspect.iscoroutinefunction(command.callback):
             web.start_http_server_in_thread(port=global_settings.prometheus_port)
