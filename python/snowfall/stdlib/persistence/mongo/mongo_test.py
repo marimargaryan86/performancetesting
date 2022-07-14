@@ -2,7 +2,6 @@ import asyncio
 from typing import Any, Mapping, Sequence
 
 import mongomock_motor
-import pytest
 
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 from snowfall.stdlib.v1alpha import testing_pb2
@@ -37,7 +36,6 @@ class MockRepository(
         )
 
 
-@pytest.mark.asyncio
 async def test_result_set() -> None:
     repo = MockRepository(mongomock_motor.AsyncMongoMockClient()["tests"]["test"])
 
@@ -68,7 +66,6 @@ async def test_result_set() -> None:
     assert await documents.cursor() != ""
 
 
-@pytest.mark.asyncio
 async def test_cursor_filters() -> None:
     repo = MockRepository(mongomock_motor.AsyncMongoMockClient()["tests"]["test"])
 
@@ -83,7 +80,6 @@ async def test_cursor_filters() -> None:
     assert "foobar_foobar" in {document["_id"] async for document in documents}
 
 
-@pytest.mark.asyncio
 async def test_proto_repository() -> None:
     payload = testing_pb2.Foobar()
     repo = MockProtoRepository(mongomock_motor.AsyncMongoMockClient()["tests"]["test"])

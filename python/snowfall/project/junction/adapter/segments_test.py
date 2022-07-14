@@ -10,7 +10,6 @@ from snowfall.project.junction.service.trips.v1alpha import trips_pb2, trips_pb2
 from snowfall.stdlib.v1alpha import models_pb2
 
 
-@pytest.mark.asyncio
 class TestDictClient(object):
     async def test_single_segment_is_retrievable(
         self,
@@ -27,7 +26,6 @@ class TestDictClient(object):
             await segments_client.get(fixtures.NOT_FOUND)
 
 
-@pytest.mark.asyncio
 class TestGrpcClient(object):
     @pytest.mark.parametrize(
         "error, expected",

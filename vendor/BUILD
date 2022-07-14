@@ -17,6 +17,5 @@ python_requirements(
         "mongomock-motor": {"dependencies": ["#setuptools"]},
         "openapi-core": {"dependencies": ["#setuptools", "#rfc3339-validator"]},
         "protobuf": {"dependencies": ["#types-protobuf"]},
-        "starlette": {"dependencies": ["#requests", "#types-requests"]},
     },
 )

@@ -13,7 +13,6 @@ from snowfall.project.junction.service.orders.v1alpha import (
 )
 
 
-@pytest.mark.asyncio
 class TestDictClient(object):
     async def test_single_order_is_retrievable(
         self,
@@ -30,7 +29,6 @@ class TestDictClient(object):
             await orders_client.get(fixtures.NOT_FOUND)
 
 
-@pytest.mark.asyncio
 class TestGrpcClient(object):
     @pytest.mark.parametrize(
         "error, expected",

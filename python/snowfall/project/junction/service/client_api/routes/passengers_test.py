@@ -1,4 +1,4 @@
-from starlette import testclient
+import httpx
 
 from snowfall.project.junction.service.orders.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
@@ -6,8 +6,8 @@ from snowfall.stdlib.integration.starlette.routes import testing
 
 
 class TestPassengers(object):
-    def test_passenger_genders_are_found(self, client: testclient.TestClient) -> None:
-        testing.test_list_and_view_endpoints(
+    async def test_passenger_genders_are_found(self, client: httpx.AsyncClient) -> None:
+        await testing.test_list_and_view_endpoints(
             client=client,
             url="/passengers/genders",
             expected_ids=[
@@ -19,8 +19,8 @@ class TestPassengers(object):
             ],
         )
 
-    def test_passenger_titles_are_found(self, client: testclient.TestClient) -> None:
-        testing.test_list_and_view_endpoints(
+    async def test_passenger_titles_are_found(self, client: httpx.AsyncClient) -> None:
+        await testing.test_list_and_view_endpoints(
             client=client,
             url="/passengers/titles",
             expected_ids=[

@@ -1,4 +1,4 @@
-from starlette import testclient
+import httpx
 
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette.routes import testing
@@ -6,8 +6,8 @@ from snowfall.stdlib.v1alpha import models_pb2
 
 
 class TestCabins(object):
-    def test_cabin_classes_are_found(self, client: testclient.TestClient) -> None:
-        testing.test_list_and_view_endpoints(
+    async def test_cabin_classes_are_found(self, client: httpx.AsyncClient) -> None:
+        await testing.test_list_and_view_endpoints(
             client=client,
             url="/cabin-classes",
             expected_ids=[

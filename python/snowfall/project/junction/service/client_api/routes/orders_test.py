@@ -1,33 +1,32 @@
-import pytest
-from starlette import status, testclient
+import httpx
+from starlette import status
 
 from snowfall import fixtures
 
 
-@pytest.mark.asyncio
 class TestOrders(object):
-    async def test_order_unauthorized(self, client: testclient.TestClient) -> None:
+    async def test_order_unauthorized(self, client: httpx.AsyncClient) -> None:
         client.headers["Authorization"] = "invalid"
-        response = client.get("/orders/{id}".format(id=fixtures.ORDERS[0]))
+        response = await client.get("/orders/{id}".format(id=fixtures.ORDERS[0]))
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     async def test_unknown_order_returns_not_found(
         self,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
-        response = client.get("/orders/{id}".format(id=fixtures.NOT_FOUND))
+        response = await client.get("/orders/{id}".format(id=fixtures.NOT_FOUND))
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    async def test_order_is_found(self, client: testclient.TestClient) -> None:
-        response = client.get("/orders/{id}".format(id=fixtures.ORDERS[0]))
+    async def test_order_is_found(self, client: httpx.AsyncClient) -> None:
+        response = await client.get("/orders/{id}".format(id=fixtures.ORDERS[0]))
         assert response.status_code == status.HTTP_200_OK
 
     async def test_order_creation_unauthorized(
         self,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
         client.headers["Authorization"] = "invalid"
-        response = client.post(
+        response = await client.post(
             "/orders",
             json={
                 "data": {
@@ -69,9 +68,9 @@ class TestOrders(object):
 
     async def test_offer_aggregate_id_is_not_found(
         self,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
-        response = client.post(
+        response = await client.post(
             "/orders",
             json={
                 "data": {
@@ -118,9 +117,9 @@ class TestOrders(object):
 
     async def test_order_can_be_created(
         self,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
-        response = client.post(
+        response = await client.post(
             "/orders",
             json={
                 "data": {
@@ -163,9 +162,9 @@ class TestOrders(object):
 
     async def test_offer_aggregate_ids_are_duplicated(
         self,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
-        response = client.post(
+        response = await client.post(
             "/orders",
             json={
                 "data": {
@@ -228,9 +227,9 @@ class TestOrders(object):
 
     async def test_offer_option_id_is_invalid(
         self,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
-        response = client.post(
+        response = await client.post(
             "/orders",
             json={
                 "data": {
@@ -277,9 +276,9 @@ class TestOrders(object):
 
     async def test_offer_option_id_missing_group(
         self,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
-        response = client.post(
+        response = await client.post(
             "/orders",
             json={
                 "data": {
@@ -323,9 +322,9 @@ class TestOrders(object):
 
     async def test_offer_option_id_same_group(
         self,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
-        response = client.post(
+        response = await client.post(
             "/orders",
             json={
                 "data": {
@@ -374,10 +373,10 @@ class TestOrders(object):
 
     async def test_order_amendment_unauthorized(
         self,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
         client.headers["Authorization"] = "invalid"
-        response = client.patch(
+        response = await client.patch(
             "/orders/{orderId}".format(
                 orderId=fixtures.ORDERS[0],
             ),
@@ -421,9 +420,9 @@ class TestOrders(object):
 
     async def test_order_can_be_amended_with_existing_offer(
         self,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
-        response = client.patch(
+        response = await client.patch(
             "/orders/{orderId}".format(
                 orderId=fixtures.ORDERS[0],
             ),

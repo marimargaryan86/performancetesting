@@ -168,7 +168,6 @@ def _mock_search_responses(
             )
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize(
     "criteria, expected",
     [
@@ -194,7 +193,6 @@ async def test_number_of_results(
     assert count == expected
 
 
-@pytest.mark.asyncio
 async def test_search_result_data(  # noqa: WPS218
     ask2go_adapter: adapter.Ask2GoAdapter,
     offer_transformer: transformer.OfferTransformer,

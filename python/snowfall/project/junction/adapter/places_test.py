@@ -13,7 +13,6 @@ from snowfall.project.junction.service.places.v1alpha import (
 )
 
 
-@pytest.mark.asyncio
 class TestDictClient(object):
     async def test_single_place_is_retrievable(
         self,
@@ -37,7 +36,6 @@ class TestDictClient(object):
         assert len(found_places.places) == 2
 
 
-@pytest.mark.asyncio
 class TestGrpcClient(object):
     @pytest.mark.parametrize(
         "error, expected",

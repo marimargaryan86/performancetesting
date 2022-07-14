@@ -1,21 +1,22 @@
-from starlette import status, testclient
+import httpx
+from starlette import status
 
 from snowfall import fixtures
 
 
 class TestSegments(object):
-    def test_segment_unauthorized(self, client: testclient.TestClient) -> None:
+    async def test_segment_unauthorized(self, client: httpx.AsyncClient) -> None:
         client.headers["Authorization"] = "invalid"
-        response = client.get("/segments/{id}".format(id=fixtures.SEGMENTS[0]))
+        response = await client.get("/segments/{id}".format(id=fixtures.SEGMENTS[0]))
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_unknown_segment_returns_not_found(
+    async def test_unknown_segment_returns_not_found(
         self,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
-        response = client.get("/segments/{id}".format(id=fixtures.NOT_FOUND))
+        response = await client.get("/segments/{id}".format(id=fixtures.NOT_FOUND))
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_segment_is_found(self, client: testclient.TestClient) -> None:
-        response = client.get("/segments/{id}".format(id=fixtures.SEGMENTS[0]))
+    async def test_segment_is_found(self, client: httpx.AsyncClient) -> None:
+        response = await client.get("/segments/{id}".format(id=fixtures.SEGMENTS[0]))
         assert response.status_code == status.HTTP_200_OK

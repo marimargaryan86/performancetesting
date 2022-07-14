@@ -9,7 +9,6 @@ from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.testing import asserts
 
 
-@pytest.mark.asyncio
 class TestPrefixClient(object):
     async def test_set_get_delete(self, redis_client: aioredis.Redis) -> None:
         await asyncio.gather(

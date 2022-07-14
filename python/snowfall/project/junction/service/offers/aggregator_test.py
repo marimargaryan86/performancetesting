@@ -110,7 +110,6 @@ _OFFER_RESULTS = (
 )
 
 
-@pytest.mark.asyncio
 @freezegun.freeze_time(_OFFER_RESULT_DATE)
 class TestOfferBuckets(object):
     @pytest.mark.parametrize(
@@ -142,7 +141,6 @@ class TestOfferBuckets(object):
         )
 
 
-@pytest.mark.asyncio
 @freezegun.freeze_time(_OFFER_RESULT_DATE)
 class TestAggregator(object):
     @pytest.mark.parametrize(

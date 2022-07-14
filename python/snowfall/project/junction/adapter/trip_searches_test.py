@@ -4,7 +4,6 @@ from snowfall import fixtures
 from snowfall.project.junction.adapter import trip_searches
 
 
-@pytest.mark.asyncio
 async def test_trip_search_can_be_saved(
     trip_searches_client: trip_searches.Client,
     trip_search_request: trip_searches.TripSearchRequest,
@@ -12,7 +11,6 @@ async def test_trip_search_can_be_saved(
     await trip_searches_client.create(trip_search_request)
 
 
-@pytest.mark.asyncio
 async def test_trip_search_can_be_retrieved(
     trip_searches_client: trip_searches.Client,
     trip_search_request: trip_searches.TripSearchRequest,
@@ -22,7 +20,6 @@ async def test_trip_search_can_be_retrieved(
     assert trip_search == trip_search_created
 
 
-@pytest.mark.asyncio
 async def test_missing_trip_search_throws_error(
     trip_searches_client: trip_searches.Client,
 ) -> None:

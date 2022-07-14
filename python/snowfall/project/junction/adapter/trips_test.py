@@ -10,7 +10,6 @@ from snowfall.project.junction.service.trips.v1alpha import trips_pb2, trips_pb2
 from snowfall.stdlib.v1alpha import models_pb2
 
 
-@pytest.mark.asyncio
 class TestDictClient(object):
     async def test_single_trip_is_retrievable(self, trips_client: trips.Client) -> None:
         trip = await trips_client.get(fixtures.TRIPS[0])
@@ -28,7 +27,6 @@ class TestDictClient(object):
             assert trip.id in fixtures.TRIPS
 
 
-@pytest.mark.asyncio
 class TestGrpcClient(object):
     @pytest.mark.parametrize(
         "error, expected",

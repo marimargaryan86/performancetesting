@@ -1,4 +1,5 @@
-from starlette import status, testclient
+import httpx
+from starlette import status
 
 from snowfall import fixtures
 from snowfall.stdlib.format import protobuf
@@ -7,24 +8,24 @@ from snowfall.stdlib.v1alpha import models_pb2
 
 
 class TestLegs(object):
-    def test_unknown_leg_returns_not_found(
+    async def test_unknown_leg_returns_not_found(
         self,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
-        response = client.get("/legs/{id}".format(id=fixtures.NOT_FOUND))
+        response = await client.get("/legs/{id}".format(id=fixtures.NOT_FOUND))
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_leg_is_found(self, client: testclient.TestClient) -> None:
-        response = client.get("/legs/{id}".format(id=fixtures.LEGS[0]))
+    async def test_leg_is_found(self, client: httpx.AsyncClient) -> None:
+        response = await client.get("/legs/{id}".format(id=fixtures.LEGS[0]))
         assert response.status_code == status.HTTP_200_OK
 
-    def test_leg_unauthorized(self, client: testclient.TestClient) -> None:
+    async def test_leg_unauthorized(self, client: httpx.AsyncClient) -> None:
         client.headers["Authorization"] = "invalid"
-        response = client.get("/legs/{id}".format(id=fixtures.LEGS[0]))
+        response = await client.get("/legs/{id}".format(id=fixtures.LEGS[0]))
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_leg_types(self, client: testclient.TestClient) -> None:
-        testing.test_list_and_view_endpoints(
+    async def test_leg_types(self, client: httpx.AsyncClient) -> None:
+        await testing.test_list_and_view_endpoints(
             client=client,
             url="/legs/types",
             expected_ids=[
@@ -36,35 +37,41 @@ class TestLegs(object):
             ],
         )
 
-    def test_segment_legs_are_not_found(self, client: testclient.TestClient) -> None:
-        response = client.get("/segments/{id}/legs".format(id=fixtures.NOT_FOUND))
+    async def test_segment_legs_are_not_found(self, client: httpx.AsyncClient) -> None:
+        response = await client.get("/segments/{id}/legs".format(id=fixtures.NOT_FOUND))
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_segment_legs_are_found(self, client: testclient.TestClient) -> None:
-        response = client.get("/segments/{id}/legs".format(id=fixtures.SEGMENTS[0]))
+    async def test_segment_legs_are_found(self, client: httpx.AsyncClient) -> None:
+        response = await client.get(
+            "/segments/{id}/legs".format(id=fixtures.SEGMENTS[0]),
+        )
         assert response.status_code == status.HTTP_200_OK
 
-    def test_segment_legs_unauthorized(self, client: testclient.TestClient) -> None:
+    async def test_segment_legs_unauthorized(self, client: httpx.AsyncClient) -> None:
         client.headers["Authorization"] = "invalid"
-        response = client.get("/segments/{id}/legs".format(id=fixtures.SEGMENTS[0]))
+        response = await client.get(
+            "/segments/{id}/legs".format(id=fixtures.SEGMENTS[0]),
+        )
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_trip_legs_are_not_found(self, client: testclient.TestClient) -> None:
-        response = client.get("/trips/{id}/legs".format(id=fixtures.NOT_FOUND))
+    async def test_trip_legs_are_not_found(self, client: httpx.AsyncClient) -> None:
+        response = await client.get("/trips/{id}/legs".format(id=fixtures.NOT_FOUND))
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_trip_legs_are_found(self, client: testclient.TestClient) -> None:
-        response = client.get("/trips/{id}/legs".format(id=fixtures.TRIPS[0]))
+    async def test_trip_legs_are_found(self, client: httpx.AsyncClient) -> None:
+        response = await client.get("/trips/{id}/legs".format(id=fixtures.TRIPS[0]))
         assert response.status_code == status.HTTP_200_OK
 
-    def test_trip_legs_unauthorized(self, client: testclient.TestClient) -> None:
+    async def test_trip_legs_unauthorized(self, client: httpx.AsyncClient) -> None:
         client.headers["Authorization"] = "invalid"
-        response = client.get("/trips/{id}/legs".format(id=fixtures.TRIPS[0]))
+        response = await client.get("/trips/{id}/legs".format(id=fixtures.TRIPS[0]))
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_legs_by_trip_search_ids_are_not_found(
+    async def test_legs_by_trip_search_ids_are_not_found(
         self,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
-        response = client.get("/trips/searches/{id}/legs".format(id=fixtures.TRIPS[0]))
+        response = await client.get(
+            "/trips/searches/{id}/legs".format(id=fixtures.TRIPS[0]),
+        )
         assert response.status_code == status.HTTP_404_NOT_FOUND

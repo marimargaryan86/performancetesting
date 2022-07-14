@@ -1,9 +1,10 @@
 import pathlib
-from typing import Mapping, Optional, Sequence
+from typing import AsyncIterator, Mapping, Optional, Sequence
 
 import currencycloud
+import httpx
 import pytest
-from starlette import applications, testclient
+from starlette import applications
 from starlette.middleware import Middleware
 
 from snowfall.project.junction.adapter import currencies
@@ -71,22 +72,11 @@ def app(
 
 
 @pytest.fixture()
-def client(
+async def http_client(
     app: applications.Starlette,
     headers: Mapping[str, str],
-) -> testclient.TestClient:
-    client = testclient.TestClient(app)
-    client.headers.update(headers)
+) -> AsyncIterator[httpx.AsyncClient]:
+    async with httpx.AsyncClient(app=app, base_url="https://example.com") as client:
+        client.headers.update(dict(headers))
 
-    return client
-
-
-@pytest.fixture()
-def http_client(
-    app: applications.Starlette,
-    headers: Mapping[str, str],
-) -> testclient.TestClient:
-    http_client = testclient.TestClient(app)
-    http_client.headers.update(headers)
-
-    return http_client
+        yield client

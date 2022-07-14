@@ -5,10 +5,11 @@ import datetime
 import pathlib
 import re
 import uuid
-from typing import Any, Mapping, Optional, Sequence
+from typing import Any, AsyncIterator, Mapping, Optional, Sequence
 from unittest import mock
 
 import aiosmtplib
+import httpx
 import jwt as jwtlib
 import mongomock_motor
 import pytest
@@ -17,7 +18,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from fakeredis import aioredis as fakeredis
 from lagom.integrations import starlette
-from starlette import applications, testclient
+from starlette import applications
 from starlette.middleware import Middleware, authentication
 from typing_extensions import TypedDict
 
@@ -287,6 +288,11 @@ def junction_client() -> client.JunctionClient:
     )
 
 
+@pytest.fixture
+def non_mocked_hosts() -> list[str]:
+    return ["example.com"]
+
+
 @pytest.fixture()
 def app(  # noqa: WPS211
     offers_repository: repository.OffersRepository,
@@ -332,28 +338,30 @@ def app(  # noqa: WPS211
 
 
 @pytest.fixture()
-def http_client(
+async def http_client(
     app: applications.Starlette,
     headers: Mapping[str, str],
-) -> testclient.TestClient:
-    http_client = testclient.TestClient(app)
-    http_client.headers.update(headers)
+) -> AsyncIterator[httpx.AsyncClient]:
+    async with httpx.AsyncClient(app=app, base_url="https://example.com") as client:
+        client.headers.update(dict(headers))
 
-    return http_client
+        yield client
 
 
 @pytest.fixture()
-def authenticated_http_client(
+async def authenticated_http_client(
     app: applications.Starlette,
-    headers: Mapping[str, str],
     jwt_gen: jwt_generator.JwtGenerator,
     existing_user: ExistingUser,
-) -> testclient.TestClient:
-    http_client = testclient.TestClient(app)
-    authenticated_headers = dict(copy.deepcopy(headers))
-    authenticated_headers["Authorization"] = "Bearer {token}".format(
+    headers: Mapping[str, str],
+) -> AsyncIterator[httpx.AsyncClient]:
+    new_headers = dict(copy.copy(headers))
+
+    new_headers["Authorization"] = "Bearer {token}".format(
         token=jwt_gen.encode(existing_user["model"].id),
     )
-    http_client.headers.update(authenticated_headers)
 
-    return http_client
+    async with httpx.AsyncClient(app=app, base_url="https://example.com") as client:
+        client.headers.update(dict(new_headers))
+
+        yield client

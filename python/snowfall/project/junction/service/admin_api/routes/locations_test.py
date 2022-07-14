@@ -1,20 +1,12 @@
-from starlette import status, testclient
+import httpx
 
 from snowfall import fixtures
+from snowfall.stdlib.integration.starlette.routes import testing
 
 
-class TestLocations(object):
-    def test_unknown_location_returns_not_found(
-        self,
-        client: testclient.TestClient,
-    ) -> None:
-        response = client.get("/locations/{id}".format(id=fixtures.NOT_FOUND))
-        assert response.status_code == status.HTTP_404_NOT_FOUND
-
-    def test_location_is_found(self, client: testclient.TestClient) -> None:
-        response = client.get("/locations/{id}".format(id=fixtures.LOCATIONS[0]))
-        assert response.status_code == status.HTTP_200_OK
-
-    def test_multiple_locations_are_found(self, client: testclient.TestClient) -> None:
-        response = client.get("/locations")
-        assert response.status_code == status.HTTP_200_OK
+async def test_locations(client: httpx.AsyncClient) -> None:
+    await testing.test_list_and_view_endpoints(
+        client=client,
+        url="/locations",
+        expected_ids=fixtures.LOCATIONS,
+    )

@@ -1,12 +1,13 @@
 import pathlib
 from base64 import b64decode, b64encode
-from typing import Mapping, Optional, Sequence
+from typing import AsyncIterator, Mapping, Optional, Sequence
 
+import httpx
 import jwt as jwtlib
 import pytest
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
-from starlette import applications, testclient
+from starlette import applications
 from starlette.middleware import Middleware, authentication
 
 from snowfall.project.junction.adapter import (
@@ -127,20 +128,20 @@ def app(  # noqa: WPS211
 
 
 @pytest.fixture()
-def client(
+async def client(
     app: applications.Starlette,
     headers: Mapping[str, str],
-) -> testclient.TestClient:
-    client = testclient.TestClient(app)
-    client.headers.update(headers)
+) -> AsyncIterator[httpx.AsyncClient]:
+    async with httpx.AsyncClient(app=app, base_url="https://example.com") as client:
+        client.headers.update(dict(headers))
 
-    return client
+        yield client
 
 
 @pytest.fixture()
-def unauthorized_client(
-    client: testclient.TestClient,
-) -> testclient.TestClient:
+async def unauthorized_client(
+    client: httpx.AsyncClient,
+) -> httpx.AsyncClient:
     client.headers.pop("Authorization")
 
     return client

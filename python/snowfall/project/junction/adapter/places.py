@@ -11,6 +11,7 @@ from snowfall.project.junction.service.places.v1alpha import (
     places_pb2,
     places_pb2_grpc,
 )
+from snowfall.stdlib import sequence
 
 
 class NotFoundError(Exception):
@@ -65,7 +66,13 @@ class DictClient(Client):
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> PlacesPage:
-        return PlacesPage(places=list(self._places.values()))
+        page = sequence.paginate(
+            sequence=list(self._places.values()),
+            cursor=cursor,
+            limit=limit,
+        )
+
+        return PlacesPage(places=page.sequence, next_page_token=page.cursor)
 
 
 class GrpcClient(Client):

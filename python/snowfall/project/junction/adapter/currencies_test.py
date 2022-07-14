@@ -12,7 +12,6 @@ from snowfall.project.junction.service.currencies.v1alpha import (
 )
 
 
-@pytest.mark.asyncio
 class TestDictClient(object):
     async def test_conversion_is_retrievable(
         self,
@@ -30,7 +29,6 @@ class TestDictClient(object):
         assert amount_after == expected_amount_after
 
 
-@pytest.mark.asyncio
 class TestGrpcClient(object):
     @pytest.mark.parametrize(
         "error, expected",

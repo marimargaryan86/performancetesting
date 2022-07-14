@@ -1,10 +1,11 @@
 import pathlib
 from typing import AsyncIterator, Optional, Sequence
 
+import httpx
 import lagom
 import pytest
 from lagom.integrations import starlette
-from starlette import applications, routing, testclient
+from starlette import applications, routing
 from starlette.middleware import Middleware
 
 from snowfall.stdlib.integration.starlette import application
@@ -38,6 +39,9 @@ def test_app() -> applications.Starlette:
 @pytest.fixture()
 async def test_client(
     test_app: applications.Starlette,
-) -> AsyncIterator[testclient.TestClient]:
-    with testclient.TestClient(test_app, raise_server_exceptions=False) as client:
+) -> AsyncIterator[httpx.AsyncClient]:
+    async with httpx.AsyncClient(
+        base_url="https://example.com",
+        transport=httpx.ASGITransport(app=test_app, raise_app_exceptions=False),
+    ) as client:
         yield client

@@ -10,7 +10,6 @@ from snowfall.vendor.ask2go import client, errors
 _URL = "https://test_url/api/Airports"
 
 
-@pytest.mark.asyncio
 async def test_error_message(
     httpx_mock: pytest_httpx.HTTPXMock,
     ask2go_client: client.Ask2GoClient,
@@ -32,7 +31,6 @@ async def test_error_message(
     assert str(excinfo.value) == "400: {0}".format(expected_title)  # noqa: WPS441
 
 
-@pytest.mark.asyncio
 async def test_empty_title_error_message(
     httpx_mock: pytest_httpx.HTTPXMock,
     ask2go_client: client.Ask2GoClient,
@@ -55,7 +53,6 @@ async def test_empty_title_error_message(
     assert str(excinfo.value) == expected_title  # noqa: WPS441
 
 
-@pytest.mark.asyncio
 async def test_critical_error_message(
     httpx_mock: pytest_httpx.HTTPXMock,
     ask2go_client: client.Ask2GoClient,
@@ -70,7 +67,6 @@ async def test_critical_error_message(
     assert str(excinfo.value) == expected_title  # noqa: WPS441
 
 
-@pytest.mark.asyncio
 async def test_bad_json_error_message(
     httpx_mock: pytest_httpx.HTTPXMock,
     ask2go_client: client.Ask2GoClient,
@@ -85,7 +81,6 @@ async def test_bad_json_error_message(
     assert str(excinfo.value) == expected_title  # noqa: WPS441
 
 
-@pytest.mark.asyncio
 async def test_default_error_message(
     httpx_mock: pytest_httpx.HTTPXMock,
     ask2go_client: client.Ask2GoClient,

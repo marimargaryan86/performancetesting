@@ -1,50 +1,49 @@
 from typing import Any, Mapping
 
 import freezegun
+import httpx
 import pytest
-from starlette import status, testclient
+from starlette import status
 
 from snowfall import fixtures
 from snowfall.project.junction.adapter import trip_searches
 
 
-@pytest.mark.asyncio
 class TestTrips(object):
     async def test_missing_trip_returns_not_found(
         self,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
-        response = client.get(
+        response = await client.get(
             "/trips/{id}".format(id=fixtures.NOT_FOUND),
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     async def test_trip_is_found(
         self,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
-        response = client.get(
+        response = await client.get(
             "/trips/{id}".format(id=fixtures.TRIPS[0]),
         )
         assert response.status_code == status.HTTP_200_OK
 
     async def test_get_trip_segments(
         self,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
-        response = client.get(
+        response = await client.get(
             "/trips/{id}/segments".format(id=fixtures.TRIPS[0]),
         )
         assert response.status_code == status.HTTP_200_OK
 
 
-@pytest.mark.asyncio
 class TestTripSearches(object):
     async def test_malformed_trip_search_post_returns_bad_request(
         self,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
-        response = client.post(
+        response = await client.post(
             "/trips/searches",
             json={"foo": "bar"},
             headers={"Content-Type": "application/vnd.api+json"},
@@ -53,7 +52,7 @@ class TestTripSearches(object):
 
     async def test_trip_search_post_unauthorized(
         self,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
         client.headers["Authorization"] = "invalid"
         request = {
@@ -79,7 +78,7 @@ class TestTripSearches(object):
                 "type": "trip-searches",
             },
         }
-        response = client.post(
+        response = await client.post(
             "/trips/searches",
             json=request,
             headers={"Content-Type": "application/vnd.api+json"},
@@ -134,9 +133,9 @@ class TestTripSearches(object):
     async def test_missing_place_returns_not_found(
         self,
         query: Mapping[str, Any],
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
-        response = client.post(
+        response = await client.post(
             "/trips/searches",
             json=query,
             headers={"Content-Type": "application/vnd.api+json"},
@@ -145,7 +144,7 @@ class TestTripSearches(object):
 
     async def test_past_departure_date_returns_unprocessable_entity(
         self,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
         request = {
             "data": {
@@ -169,7 +168,7 @@ class TestTripSearches(object):
                 "type": "trip-searches",
             },
         }
-        response = client.post(
+        response = await client.post(
             "/trips/searches",
             json=request,
             headers={"Content-Type": "application/vnd.api+json"},
@@ -179,7 +178,7 @@ class TestTripSearches(object):
     @freezegun.freeze_time("2022-04-30T08:30:30.826Z")
     async def test_departure_date_without_tz_returns_unprocessable_entity(
         self,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
         request = {
             "data": {
@@ -203,7 +202,7 @@ class TestTripSearches(object):
                 "type": "trip-searches",
             },
         }
-        response = client.post(
+        response = await client.post(
             "/trips/searches",
             json=request,
             headers={"Content-Type": "application/vnd.api+json"},
@@ -213,7 +212,7 @@ class TestTripSearches(object):
     @freezegun.freeze_time("2022-04-30T08:34:30.826Z")
     async def test_trip_search_post_returns_resource(
         self,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
         request = {
             "data": {
@@ -238,7 +237,7 @@ class TestTripSearches(object):
                 "type": "trip-searches",
             },
         }
-        response = client.post(
+        response = await client.post(
             "/trips/searches",
             json=request,
             headers={"Content-Type": "application/vnd.api+json"},
@@ -249,10 +248,10 @@ class TestTripSearches(object):
         self,
         trip_searches_client: trip_searches.Client,
         trip_search_request: trip_searches.TripSearchRequest,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
         trip_search = await trip_searches_client.create(trip_search_request)
-        response = client.get(
+        response = await client.get(
             "/trips/searches/{id}".format(id=trip_search.id),
         )
         assert response.status_code == status.HTTP_200_OK
@@ -261,20 +260,20 @@ class TestTripSearches(object):
         self,
         trip_searches_client: trip_searches.Client,
         trip_search_request: trip_searches.TripSearchRequest,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
         client.headers["Authorization"] = "invalid"
         trip_search = await trip_searches_client.create(trip_search_request)
-        response = client.get(
+        response = await client.get(
             "/trips/searches/{id}".format(id=trip_search.id),
         )
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     async def test_missing_trip_search_returns_not_found(
         self,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
-        response = client.get(
+        response = await client.get(
             "/trips/searches/{id}".format(id=fixtures.NOT_FOUND),
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -283,29 +282,29 @@ class TestTripSearches(object):
         self,
         trip_searches_client: trip_searches.Client,
         trip_search_request: trip_searches.TripSearchRequest,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
         client.headers["Authorization"] = "invalid"
         trip_search = await trip_searches_client.create(trip_search_request)
-        response = client.get(
+        response = await client.get(
             "/trips/searches/{id}/trips".format(id=trip_search.id),
         )
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     async def test_missing_trips_by_search_returns_not_found(
         self,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
-        response = client.get(
+        response = await client.get(
             "/trips/searches/{id}/trips".format(id=fixtures.NOT_FOUND),
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     async def test_malformed_uuid_returns_bad_request(
         self,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
-        response = client.get(
+        response = await client.get(
             "/trips/searches/{id}/trips".format(id="foo"),
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -314,10 +313,10 @@ class TestTripSearches(object):
         self,
         trip_searches_client: trip_searches.Client,
         trip_search_request: trip_searches.TripSearchRequest,
-        client: testclient.TestClient,
+        client: httpx.AsyncClient,
     ) -> None:
         trip_search = await trip_searches_client.create(trip_search_request)
-        response = client.get(
+        response = await client.get(
             "/trips/searches/{id}/trips".format(id=trip_search.id),
         )
         assert response.status_code == status.HTTP_200_OK

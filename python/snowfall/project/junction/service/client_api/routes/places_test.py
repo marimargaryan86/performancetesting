@@ -1,4 +1,4 @@
-from starlette import status, testclient
+import httpx
 
 from snowfall import fixtures
 from snowfall.project.junction.service.places.v1alpha import models_pb2
@@ -7,28 +7,15 @@ from snowfall.stdlib.integration.starlette.routes import testing
 
 
 class TestPlaces(object):
-    def test_unknown_place_returns_not_found(
-        self,
-        client: testclient.TestClient,
-    ) -> None:
-        response = client.get("/places/{id}".format(id=fixtures.NOT_FOUND))
-        assert response.status_code == status.HTTP_404_NOT_FOUND
+    async def test_places(self, client: httpx.AsyncClient) -> None:
+        await testing.test_list_and_view_endpoints(
+            client=client,
+            url="/places",
+            expected_ids=fixtures.LOCATIONS,
+        )
 
-    def test_place_is_found(self, client: testclient.TestClient) -> None:
-        response = client.get("/places/{id}".format(id=fixtures.LOCATIONS[0]))
-        assert response.status_code == status.HTTP_200_OK
-
-    def test_multiple_places_are_found(self, client: testclient.TestClient) -> None:
-        response = client.get("/places")
-        assert response.status_code == status.HTTP_200_OK
-
-    def test_multiple_places_unauthorized(self, client: testclient.TestClient) -> None:
-        client.headers["Authorization"] = "invalid"
-        response = client.get("/places")
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
-    def test_place_types(self, client: testclient.TestClient) -> None:
-        testing.test_list_and_view_endpoints(
+    async def test_place_types(self, client: httpx.AsyncClient) -> None:
+        await testing.test_list_and_view_endpoints(
             client=client,
             url="/places/types",
             expected_ids=[

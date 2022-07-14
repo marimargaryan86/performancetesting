@@ -1,7 +1,5 @@
 from unittest import mock
 
-import pytest
-
 from snowfall.project.junction.adapter import (
     passenger_name_records as passenger_name_records_adapter,
 )
@@ -11,7 +9,6 @@ from snowfall.project.junction.service.passenger_name_records.v1alpha import (
 )
 
 
-@pytest.mark.asyncio
 class TestDictClient(object):
     async def test_single_passenger_name_record_is_creatable(
         self,
@@ -21,7 +18,6 @@ class TestDictClient(object):
         assert isinstance(passenger_name_record.id, str)
 
 
-@pytest.mark.asyncio
 class TestGrpcClient(object):
     async def test_single_order_is_retrievable(self) -> None:
         test_id = "test"

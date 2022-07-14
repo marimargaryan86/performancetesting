@@ -1,7 +1,8 @@
 import asyncio
 
+import httpx
 import pytest_httpx
-from starlette import status, testclient
+from starlette import status
 
 from snowfall.project.junction.service.mobile_api import conftest, repository
 from snowfall.project.junction.service.mobile_api.tasks import trips
@@ -10,7 +11,7 @@ from snowfall.project.junction.service.mobile_api.tasks import trips
 class TestTrips(object):
     async def test_trip_search_created(
         self,
-        authenticated_http_client: testclient.TestClient,
+        authenticated_http_client: httpx.AsyncClient,
         httpx_mock: pytest_httpx.HTTPXMock,
         trip_searches_repository: repository.TripSearchesRepository,
     ) -> None:
@@ -24,7 +25,7 @@ class TestTrips(object):
             **conftest.load_response_fixture("GET_SEGMENTS_{ID}_LEGS.json"),
         )
 
-        response = authenticated_http_client.post(
+        response = await authenticated_http_client.post(
             "/trips/searches",
             json={
                 "data": {

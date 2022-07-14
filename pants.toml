@@ -5,6 +5,7 @@ backend_packages = [
     "pants.backend.codegen.protobuf.python",
     "pants.backend.docker",
     "pants.backend.docker.lint.hadolint",
+    "pants.backend.experimental.python.lint.autoflake",
     "pants.backend.project_info",
     "pants.backend.python",
     "pants.backend.python.lint.bandit",
@@ -20,6 +21,11 @@ backend_packages = [
 
 [anonymous-telemetry]
 enabled = false
+
+[autoflake]
+version = "autoflake==1.4"
+lockfile = "vendor/lock/autoflake.txt"
+args = ["--remove-all-unused-imports", "--remove-unused-variables"]
 
 [bandit]
 version = "bandit==1.7.4"

@@ -1,14 +1,15 @@
 from typing import Any, Mapping, Sequence, cast
 
-from starlette import status, testclient
+import httpx
+from starlette import status
 
 from snowfall import fixtures
 
 _DATA_KEY = "data"
 
 
-def test_list_and_view_endpoints(
-    client: testclient.TestClient,
+async def test_list_and_view_endpoints(
+    client: httpx.AsyncClient,
     url: str,
     expected_ids: Sequence[str],
 ) -> None:
@@ -16,7 +17,7 @@ def test_list_and_view_endpoints(
     resources: list[dict[str, Any]] = []
 
     while True:
-        response = client.get(url)
+        response = await client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -27,23 +28,25 @@ def test_list_and_view_endpoints(
         if not body[_DATA_KEY]:
             break
 
-        resources = [*resources, *body[_DATA_KEY]]
+        assert len(body[_DATA_KEY]) == 1
+
+        resources.extend(body[_DATA_KEY])
         url = body["links"]["next"]
 
     assert set(expected_ids) == {resource["id"] for resource in resources}
 
-    _test_view_endpoint(client, resources)
+    await _test_view_endpoint(client, resources)
 
 
-def _test_view_endpoint(
-    client: testclient.TestClient,
+async def _test_view_endpoint(
+    client: httpx.AsyncClient,
     resources: Sequence[Mapping[str, Any]],
 ) -> None:
     current_link = None
 
     for resource in resources:
         current_link = cast(str, resource["links"]["self"])
-        response = client.get(current_link)
+        response = await client.get(current_link)
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -54,7 +57,7 @@ def _test_view_endpoint(
     if not current_link:
         return
 
-    response = client.get(
+    response = await client.get(
         "{0}/{1}".format(current_link.rsplit("/", maxsplit=1), fixtures.NOT_FOUND),
     )
 
