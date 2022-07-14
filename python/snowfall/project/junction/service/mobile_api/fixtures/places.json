@@ -1,0 +1,422 @@
+[
+    {
+        "_id": "0005eff0-2288-5be0-802d-81c63d7c9382",
+        "name": "Ebersbach(Fils)",
+        "coordinates": {
+            "type": "Point",
+            "coordinates": [
+                9.526582,
+                48.71612
+            ]
+        },
+        "time_zone": "Europe/Berlin",
+        "country_code": "DE",
+        "country_name": "Germany",
+        "updated_at": {
+            "$date": {
+                "$numberLong": "1655819957276"
+            }
+        },
+        "source_ref": "",
+        "types": []
+    },
+    {
+        "_id": "000b682b-4003-5b90-baf3-dd39b0bf038d",
+        "name": "Metz Ville",
+        "coordinates": {
+            "type": "Point",
+            "coordinates": [
+                6.17766929398568,
+                49.1093781707206
+            ]
+        },
+        "time_zone": "Europe/Paris",
+        "country_code": "FR",
+        "country_name": "France",
+        "updated_at": {
+            "$date": {
+                "$numberLong": "1655819959036"
+            }
+        },
+        "source_ref": "",
+        "types": []
+    },
+    {
+        "_id": "000d4102-adec-5612-b0ee-5c21e957c269",
+        "name": "Blaubeuren",
+        "coordinates": {
+            "type": "Point",
+            "coordinates": [
+                9.7919779580738,
+                48.4038142229568
+            ]
+        },
+        "time_zone": "Europe/Berlin",
+        "country_code": "DE",
+        "country_name": "Germany",
+        "updated_at": {
+            "$date": {
+                "$numberLong": "1655819959986"
+            }
+        },
+        "source_ref": "",
+        "types": []
+    },
+    {
+        "_id": "000e150a-88ba-5069-b416-a0969c8fe363",
+        "name": "Nördlingen",
+        "coordinates": {
+            "type": "Point",
+            "coordinates": [
+                10.497863,
+                48.85084
+            ]
+        },
+        "time_zone": "Europe/Berlin",
+        "country_code": "DE",
+        "country_name": "Germany",
+        "updated_at": {
+            "$date": {
+                "$numberLong": "1655819970725"
+            }
+        },
+        "source_ref": "",
+        "types": []
+    },
+    {
+        "_id": "00107e8d-07d9-5fbc-9e06-eb6d3c869fac",
+        "name": "Schladming",
+        "coordinates": {
+            "type": "Point",
+            "coordinates": [
+                13.678151,
+                47.393826
+            ]
+        },
+        "time_zone": "Europe/Vienna",
+        "country_code": "AT",
+        "country_name": "Austria",
+        "updated_at": {
+            "$date": {
+                "$numberLong": "1655819971211"
+            }
+        },
+        "source_ref": "",
+        "types": []
+    },
+    {
+        "_id": "0010b869-653d-5494-a637-28a84adfcda9",
+        "name": "Buffalo Niagara International Airport",
+        "coordinates": {
+            "type": "Point",
+            "coordinates": [
+                -78.730853,
+                42.940102
+            ]
+        },
+        "time_zone": "America/New_York",
+        "country_code": "US",
+        "country_name": "United States",
+        "updated_at": {
+            "$date": {
+                "$numberLong": "1655819973102"
+            }
+        },
+        "source_ref": "",
+        "types": []
+    },
+    {
+        "_id": "00227e20-1355-549a-b899-b2231f25efdc",
+        "name": "Hilversum Sportpark",
+        "coordinates": {
+            "type": "Point",
+            "coordinates": [
+                5.187219384511625,
+                52.216123014451775
+            ]
+        },
+        "time_zone": "Europe/Amsterdam",
+        "country_code": "NL",
+        "country_name": "Netherlands",
+        "updated_at": {
+            "$date": {
+                "$numberLong": "1655819973941"
+            }
+        },
+        "source_ref": "",
+        "types": []
+    },
+    {
+        "_id": "00249e15-4ce4-5c73-960f-b4fc6d299604",
+        "name": "Aarau",
+        "coordinates": {
+            "type": "Point",
+            "coordinates": [
+                8.05127649918173,
+                47.3913624954782
+            ]
+        },
+        "time_zone": "Europe/Zurich",
+        "country_code": "CH",
+        "country_name": "Switzerland",
+        "updated_at": {
+            "$date": {
+                "$numberLong": "1655819974639"
+            }
+        },
+        "source_ref": "",
+        "types": []
+    },
+    {
+        "_id": "002aea1b-a115-5c3f-b342-f36544afad05",
+        "name": "Rotterdam Centraal",
+        "coordinates": {
+            "type": "Point",
+            "coordinates": [
+                4.468569227289916,
+                51.924970372558775
+            ]
+        },
+        "time_zone": "Europe/Amsterdam",
+        "country_code": "NL",
+        "country_name": "Netherlands",
+        "updated_at": {
+            "$date": {
+                "$numberLong": "1655819977292"
+            }
+        },
+        "source_ref": "",
+        "types": []
+    },
+    {
+        "_id": "002d0dfd-a6b5-5dd6-8bca-b841ff06e931",
+        "name": "Modane",
+        "coordinates": {
+            "type": "Point",
+            "coordinates": [
+                6.659139,
+                45.193555
+            ]
+        },
+        "time_zone": "Europe/Paris",
+        "country_code": "FR",
+        "country_name": "France",
+        "updated_at": {
+            "$date": {
+                "$numberLong": "1655819979514"
+            }
+        },
+        "source_ref": "",
+        "types": []
+    },
+    {
+        "_id": "002f75d2-cca6-5b4f-af48-dd9ef0e7cdb9",
+        "name": "Weener",
+        "coordinates": {
+            "type": "Point",
+            "coordinates": [
+                7.34269738197,
+                53.1634654022
+            ]
+        },
+        "time_zone": "Europe/Berlin",
+        "country_code": "DE",
+        "country_name": "Germany",
+        "updated_at": {
+            "$date": {
+                "$numberLong": "1655819980740"
+            }
+        },
+        "source_ref": "",
+        "types": []
+    },
+    {
+        "_id": "003d70e0-2aff-577d-b2ee-55b8255b9872",
+        "name": "Wildegg",
+        "coordinates": {
+            "type": "Point",
+            "coordinates": [
+                8.16301793738891,
+                47.4152755173241
+            ]
+        },
+        "time_zone": "Europe/Zurich",
+        "country_code": "CH",
+        "country_name": "Switzerland",
+        "updated_at": {
+            "$date": {
+                "$numberLong": "1655819982195"
+            }
+        },
+        "source_ref": "",
+        "types": []
+    },
+    {
+        "_id": "003f2757-39c0-5aef-bea2-d63693700d40",
+        "name": "Lübeck St Jürgen",
+        "coordinates": {
+            "type": "Point",
+            "coordinates": [
+                10.702942,
+                53.84232
+            ]
+        },
+        "time_zone": "Europe/Berlin",
+        "country_code": "DE",
+        "country_name": "Germany",
+        "updated_at": {
+            "$date": {
+                "$numberLong": "1655819983047"
+            }
+        },
+        "source_ref": "",
+        "types": []
+    },
+    {
+        "_id": "004113bf-dcb4-5801-b9d2-d0720f8ae3ac",
+        "name": "Erbil International Airport",
+        "coordinates": {
+            "type": "Point",
+            "coordinates": [
+                43.959198,
+                36.235541
+            ]
+        },
+        "time_zone": "Asia/Baghdad",
+        "country_code": "IQ",
+        "country_name": "Iraq",
+        "updated_at": {
+            "$date": {
+                "$numberLong": "1655819983774"
+            }
+        },
+        "source_ref": "",
+        "types": []
+    },
+    {
+        "_id": "00475623-f681-5c43-ba26-c06f8db00428",
+        "name": "Warendorf",
+        "coordinates": {
+            "type": "Point",
+            "coordinates": [
+                7.984464,
+                51.950092
+            ]
+        },
+        "time_zone": "Europe/Berlin",
+        "country_code": "DE",
+        "country_name": "Germany",
+        "updated_at": {
+            "$date": {
+                "$numberLong": "1655819984520"
+            }
+        },
+        "source_ref": "",
+        "types": []
+    },
+    {
+        "_id": "0047d9c7-fa25-55d8-81f5-0c23e4be0015",
+        "name": "S Schöneberg",
+        "coordinates": {
+            "type": "Point",
+            "coordinates": [
+                13.351637,
+                52.479355
+            ]
+        },
+        "time_zone": "Europe/Berlin",
+        "country_code": "DE",
+        "country_name": "Germany",
+        "updated_at": {
+            "$date": {
+                "$numberLong": "1655819984952"
+            }
+        },
+        "source_ref": "",
+        "types": []
+    },
+    {
+        "_id": "004b7d39-1287-5f9e-846e-f65765f8b3fd",
+        "name": "Biarritz Pays Basque Airport",
+        "coordinates": {
+            "type": "Point",
+            "coordinates": [
+                -1.530406,
+                43.469375
+            ]
+        },
+        "time_zone": "Europe/Paris",
+        "country_code": "FR",
+        "country_name": "France",
+        "updated_at": {
+            "$date": {
+                "$numberLong": "1655819985402"
+            }
+        },
+        "source_ref": "",
+        "types": []
+    },
+    {
+        "_id": "004ba23b-1063-59e3-a006-0310bc8d4ed4",
+        "name": "Spa",
+        "coordinates": {
+            "type": "Point",
+            "coordinates": [
+                5.855101,
+                50.4903
+            ]
+        },
+        "time_zone": "Europe/Brussels",
+        "country_code": "BE",
+        "country_name": "Belgium",
+        "updated_at": {
+            "$date": {
+                "$numberLong": "1655819985841"
+            }
+        },
+        "source_ref": "",
+        "types": []
+    },
+    {
+        "_id": "004c811b-4e9c-5964-8c6c-465a776bd494",
+        "name": "BOT Feldhausen Bf",
+        "coordinates": {
+            "type": "Point",
+            "coordinates": [
+                6.970307,
+                51.615437
+            ]
+        },
+        "time_zone": "Europe/Berlin",
+        "country_code": "DE",
+        "country_name": "Germany",
+        "updated_at": {
+            "$date": {
+                "$numberLong": "1655819986272"
+            }
+        },
+        "source_ref": "",
+        "types": []
+    },
+    {
+        "_id": "004cc949-d866-5c51-92f1-4c151a08c0c9",
+        "name": "Taiyuan Wusu International Airport",
+        "coordinates": {
+            "type": "Point",
+            "coordinates": [
+                112.628166,
+                37.746921
+            ]
+        },
+        "time_zone": "Asia/Shanghai",
+        "country_code": "CN",
+        "country_name": "China",
+        "updated_at": {
+            "$date": {
+                "$numberLong": "1655819986705"
+            }
+        },
+        "source_ref": "",
+        "types": []
+    }
+]

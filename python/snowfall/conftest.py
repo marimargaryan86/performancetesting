@@ -3,7 +3,6 @@ import datetime
 from typing import Sequence
 
 import aioredis
-import aiosmtplib
 import pytest
 from fakeredis import aioredis as fakeredis
 from motor import core, motor_asyncio
@@ -23,7 +22,6 @@ from snowfall.project.junction.adapter import (
     trip_searches,
     trips,
 )
-from snowfall.project.junction.service.mobile_api import smtp
 from snowfall.project.junction.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
@@ -59,11 +57,6 @@ repository._configure_collection = _mongo_mock_configure  # noqa: WPS437
 TimestampNormalizer._denormalize_value = (  # type: ignore[assignment] # noqa: WPS437
     _mock_denormalize_value
 )
-
-
-@pytest.fixture
-def smtp_client() -> smtp.EmailClient:
-    return smtp.EmailClient(aiosmtplib.SMTP())
 
 
 @pytest.fixture

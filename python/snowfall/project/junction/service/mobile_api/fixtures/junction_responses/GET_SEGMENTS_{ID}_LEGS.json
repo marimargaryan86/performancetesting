@@ -1,0 +1,46 @@
+{
+    "url": "\/segments\/.*\/legs",
+    "method": "GET",
+    "status_code": 200,
+    "json": {
+        "data": [
+            {
+                "id": "3376e267-3047-5016-9104-f460b930610c",
+                "type": "legs",
+                "attributes": {
+                    "departureAt": "2022-06-22T06:00:00+02:00",
+                    "arrivalAt": "2022-06-22T07:05:00+02:00",
+                    "operator": "Snowfall",
+                    "origin": {
+                        "ref": "LYS",
+                        "name": "Lyon-Saint-Exupéry Airport",
+                        "latitude": 45.723723,
+                        "longitude": 5.082626,
+                        "timeZone": "Europe/Paris"
+                    },
+                    "destination": {
+                        "ref": "CDG",
+                        "name": "Paris Charles de Gaulle Airport",
+                        "latitude": 49.011244,
+                        "longitude": 2.548962,
+                        "timeZone": "Europe/Paris"
+                    }
+                },
+                "relationships": {
+                    "type": {
+                        "data": {
+                            "id": "air",
+                            "type": "leg-types"
+                        }
+                    }
+                },
+                "links": {
+                    "self": "https://api.junction.dev/legs/3376e267-3047-5016-9104-f460b930610c"
+                }
+            }
+        ],
+        "links": {
+            "next": "https://api.junction.dev/segments/0abc1f7b-40be-5546-88d9-a48d0731d936/legs?page%5Bcursor%5D=MTogIjMzNzZlMjY3LTMwNDctNTAxNi05MTA0LWY0NjBiOTMwNjEwYyIgMjogImE4YzAwNjFjYjNmNDliZjMiIDM6ICIwYmUzZWY1YzNlOGNlNWFmIg%3D%3D&page%5Blimit%5D=20"
+        }
+    }
+}

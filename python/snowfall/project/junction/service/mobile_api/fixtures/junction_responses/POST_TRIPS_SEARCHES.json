@@ -1,0 +1,32 @@
+{
+    "url": "\/trips\/searches",
+    "method": "POST",
+    "status_code": 201,
+    "json": {
+        "data": {
+            "id": "8c769578-e384-4cc8-b47b-90b0dc444826",
+            "type": "trip-searches",
+            "attributes": {
+                "expiresAt": "2022-06-17T07:51:49+00:00",
+                "departureAfter": "2022-06-21T20:00:00+00:00"
+            },
+            "relationships": {
+                "origin": {
+                    "data": {
+                        "id": "049c6945-de3c-5eca-a578-aec753f064c3",
+                        "type": "places"
+                    }
+                },
+                "destination": {
+                    "data": {
+                        "id": "0b2a62b3-1050-5c56-b447-b3fc89138356",
+                        "type": "places"
+                    }
+                }
+            },
+            "links": {
+                "self": "https://api.junction.dev/trips/searches/8c769578-e384-4cc8-b47b-90b0dc444826"
+            }
+        }
+    }
+}

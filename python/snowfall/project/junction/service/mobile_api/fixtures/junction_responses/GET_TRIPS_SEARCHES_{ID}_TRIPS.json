@@ -1,0 +1,226 @@
+{
+    "url": "\/trips\/searches\/.*\/trips",
+    "method": "GET",
+    "status_code": 200,
+    "json": {
+        "data": [
+            {
+                "id": "086e567b-a9de-5eb3-ac31-502ab3a72aea",
+                "type": "trips",
+                "attributes": {},
+                "relationships": {
+                    "segments": {
+                        "data": [
+                            {
+                                "id": "0369fae7-4a8b-548c-aa31-9d0331810365",
+                                "type": "segments"
+                            },
+                            {
+                                "id": "0abc1f7b-40be-5546-88d9-a48d0731d936",
+                                "type": "segments"
+                            }
+                        ]
+                    }
+                },
+                "links": {
+                    "self": "https://api.junction.dev/trips/086e567b-a9de-5eb3-ac31-502ab3a72aea"
+                }
+            },
+            {
+                "id": "0faab459-a378-5e78-a91c-8f43a5fddff3",
+                "type": "trips",
+                "attributes": {},
+                "relationships": {
+                    "segments": {
+                        "data": [
+                            {
+                                "id": "8cab9717-29bb-5e0d-a3bd-81e1d9734421",
+                                "type": "segments"
+                            },
+                            {
+                                "id": "96d39cb3-b295-53cb-b107-952f589ee8df",
+                                "type": "segments"
+                            }
+                        ]
+                    }
+                },
+                "links": {
+                    "self": "https://api.junction.dev/trips/0faab459-a378-5e78-a91c-8f43a5fddff3"
+                }
+            },
+            {
+                "id": "2d82b300-c364-5657-80b3-83f66baabc2b",
+                "type": "trips",
+                "attributes": {},
+                "relationships": {
+                    "segments": {
+                        "data": [
+                            {
+                                "id": "dccbb5da-f4c2-526c-9516-7683cae304d1",
+                                "type": "segments"
+                            },
+                            {
+                                "id": "ac27b9ee-2c16-5fe7-9cfd-b85c004fb02a",
+                                "type": "segments"
+                            }
+                        ]
+                    }
+                },
+                "links": {
+                    "self": "https://api.junction.dev/trips/2d82b300-c364-5657-80b3-83f66baabc2b"
+                }
+            },
+            {
+                "id": "425fad70-d34c-54a4-b648-b8c1cb27ed1a",
+                "type": "trips",
+                "attributes": {},
+                "relationships": {
+                    "segments": {
+                        "data": [
+                            {
+                                "id": "eb543ded-12ad-5692-84fd-a8c6412549a8",
+                                "type": "segments"
+                            },
+                            {
+                                "id": "1bd43dad-2412-5271-900c-d5b8c507f9a9",
+                                "type": "segments"
+                            },
+                            {
+                                "id": "c588d95c-f1e5-50ba-b353-ce01e2e76ab3",
+                                "type": "segments"
+                            }
+                        ]
+                    }
+                },
+                "links": {
+                    "self": "https://api.junction.dev/trips/425fad70-d34c-54a4-b648-b8c1cb27ed1a"
+                }
+            },
+            {
+                "id": "61a0b098-dab3-56d6-b83e-c811e21e35ce",
+                "type": "trips",
+                "attributes": {},
+                "relationships": {
+                    "segments": {
+                        "data": [
+                            {
+                                "id": "09cdc275-17c8-5324-8f2e-6d10ec6ae0f7",
+                                "type": "segments"
+                            },
+                            {
+                                "id": "df9325ea-9e56-5960-8266-31f0eb3b5046",
+                                "type": "segments"
+                            },
+                            {
+                                "id": "e5b8c4f3-0f6a-5d7e-84ec-3fc888fc2021",
+                                "type": "segments"
+                            }
+                        ]
+                    }
+                },
+                "links": {
+                    "self": "https://api.junction.dev/trips/61a0b098-dab3-56d6-b83e-c811e21e35ce"
+                }
+            },
+            {
+                "id": "80afd0bf-e70c-5763-805a-30e31cae0fc7",
+                "type": "trips",
+                "attributes": {},
+                "relationships": {
+                    "segments": {
+                        "data": [
+                            {
+                                "id": "656260bf-add7-51a9-9221-2cc65e7c2a14",
+                                "type": "segments"
+                            },
+                            {
+                                "id": "c4b6b0ed-4cae-55b7-a77b-1593b6c5f9a0",
+                                "type": "segments"
+                            }
+                        ]
+                    }
+                },
+                "links": {
+                    "self": "https://api.junction.dev/trips/80afd0bf-e70c-5763-805a-30e31cae0fc7"
+                }
+            },
+            {
+                "id": "88a7c4b2-64b7-5c14-924b-d06364bae1e0",
+                "type": "trips",
+                "attributes": {},
+                "relationships": {
+                    "segments": {
+                        "data": [
+                            {
+                                "id": "e5390bff-0dc5-5ef8-97fb-f72218b12591",
+                                "type": "segments"
+                            },
+                            {
+                                "id": "f0c6d336-fd01-540d-9952-21c250a5e042",
+                                "type": "segments"
+                            }
+                        ]
+                    }
+                },
+                "links": {
+                    "self": "https://api.junction.dev/trips/88a7c4b2-64b7-5c14-924b-d06364bae1e0"
+                }
+            },
+            {
+                "id": "af1bf0f9-c46a-5e26-b8d6-34adf8826a94",
+                "type": "trips",
+                "attributes": {},
+                "relationships": {
+                    "segments": {
+                        "data": [
+                            {
+                                "id": "97ec2fbf-e103-5667-826c-3cb84b770f25",
+                                "type": "segments"
+                            },
+                            {
+                                "id": "2293c59b-e2ab-5938-a7a5-1659dca43dce",
+                                "type": "segments"
+                            },
+                            {
+                                "id": "8eef8003-e022-5b51-badc-bc7d78a7b6cf",
+                                "type": "segments"
+                            },
+                            {
+                                "id": "b0fa3abd-9df8-5979-a4b2-9e8b620e1914",
+                                "type": "segments"
+                            }
+                        ]
+                    }
+                },
+                "links": {
+                    "self": "https://api.junction.dev/trips/af1bf0f9-c46a-5e26-b8d6-34adf8826a94"
+                }
+            },
+            {
+                "id": "e0ce5bd3-cae1-526a-9e66-4b116b666818",
+                "type": "trips",
+                "attributes": {},
+                "relationships": {
+                    "segments": {
+                        "data": [
+                            {
+                                "id": "97ec2fbf-e103-5667-826c-3cb84b770f25",
+                                "type": "segments"
+                            },
+                            {
+                                "id": "b936846c-6123-54d6-8a0e-f59560661bd5",
+                                "type": "segments"
+                            }
+                        ]
+                    }
+                },
+                "links": {
+                    "self": "https://api.junction.dev/trips/e0ce5bd3-cae1-526a-9e66-4b116b666818"
+                }
+            }
+        ],
+        "links": {
+            "next": "https://api.junction.dev/trips/searches/00107ecd-3957-40b3-8630-27f5c9b68957/trips?page%5Bcursor%5D=MTogImUwY2U1YmQzLWNhZTEtNTI2YS05ZTY2LTRiMTE2YjY2NjgxOCIgMjogIjA4N2FiZGUyMmI3MWY1ZTMiIDM6ICIzNzQ3ZmMwMWUyNDRlMzYxIg%3D%3D&page%5Blimit%5D=20"
+        }
+    }
+}
