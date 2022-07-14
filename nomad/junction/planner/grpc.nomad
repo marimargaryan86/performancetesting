@@ -32,7 +32,6 @@ job "planner-grpc" {
 
     network {
       port "grpc" {}
-      port "prometheus" {}
     }
 
     service {
@@ -42,18 +41,6 @@ job "planner-grpc" {
 
       check {
         type     = "grpc"
-        interval = "10s"
-        timeout  = "2s"
-      }
-    }
-    service {
-      name = "planner-${NOMAD_NAMESPACE}"
-      port = "prometheus"
-      tags = ["metrics"]
-
-      check {
-        type     = "http"
-        path     = "/"
         interval = "10s"
         timeout  = "2s"
       }
@@ -68,7 +55,7 @@ job "planner-grpc" {
 
       config {
         image = var.docker_image
-        ports = ["grpc", "prometheus"]
+        ports = ["grpc"]
         args = [
           "grpc",
         ]
@@ -129,12 +116,11 @@ job "planner-grpc" {
       }
 
       env {
-        ENV_NAME        = "${NOMAD_NAMESPACE}"
-        GRPC_ADDRESS    = "0.0.0.0"
-        GRPC_PORT       = "${NOMAD_PORT_grpc}"
-        PROTO_DIR       = "${NOMAD_TASK_DIR}"
-        SENTRY_DSN      = "https://43837909119c4ce186975c300c4efe6e@sentry.snowfall.se/23"
-        PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
+        ENV_NAME     = "${NOMAD_NAMESPACE}"
+        GRPC_ADDRESS = "0.0.0.0"
+        GRPC_PORT    = "${NOMAD_PORT_grpc}"
+        PROTO_DIR    = "${NOMAD_TASK_DIR}"
+        SENTRY_DSN   = "https://43837909119c4ce186975c300c4efe6e@sentry.snowfall.se/23"
       }
     }
   }
