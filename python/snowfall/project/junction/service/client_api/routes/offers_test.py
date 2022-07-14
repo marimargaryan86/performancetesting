@@ -6,7 +6,7 @@ import rapidjson
 from starlette import status
 
 from snowfall import fixtures
-from snowfall.stdlib.integration.starlette.routes import testing
+from snowfall.stdlib.integration.starlette import testing
 
 
 class TestOffers(object):

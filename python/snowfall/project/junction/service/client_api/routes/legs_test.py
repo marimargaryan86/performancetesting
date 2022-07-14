@@ -3,7 +3,7 @@ from starlette import status
 
 from snowfall import fixtures
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.integration.starlette.routes import testing
+from snowfall.stdlib.integration.starlette import testing
 from snowfall.stdlib.v1alpha import models_pb2
 
 

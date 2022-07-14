@@ -5,6 +5,61 @@
     "version": "1.0"
   },
   "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "tags": [
+          "internal"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "description": "",
+                  "type": "object",
+                  "x-examples": {
+                    "example-1": {
+                      "meta": {
+                        "status": "ok"
+                      }
+                    }
+                  },
+                  "properties": {
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "status"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "description": "Health status",
+                          "enum": [
+                            "pass",
+                            "fail",
+                            "warn"
+                          ],
+                          "example": "pass"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "meta"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-health",
+        "description": "Check the application health.",
+        "x-internal": true,
+        "security": []
+      }
+    },
     "/validation": {
       "get": {
         "summary": "Your GET endpoint",

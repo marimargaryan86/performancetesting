@@ -7,12 +7,10 @@ from snowfall.project.junction.service.pay_api.routes import (
     rates,
     transactions,
 )
-from snowfall.stdlib.integration.starlette.routes import health
 
 
 def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Route]:
     return [
-        dependencies.route("/health", health.Health, name="Health"),
         dependencies.route("/balances", balances.Balances, name="Balances"),
         dependencies.route(
             "/currencies/{currencyId}",

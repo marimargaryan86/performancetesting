@@ -11,7 +11,12 @@ from starlette import applications, exceptions, routing, status
 from starlette.middleware import Middleware
 
 from snowfall.stdlib import service
-from snowfall.stdlib.integration.starlette import handlers, middlewares, validation
+from snowfall.stdlib.integration.starlette import (
+    handlers,
+    middlewares,
+    routes,
+    validation,
+)
 
 RoutesFactory = Callable[[starlette.StarletteIntegration], list[routing.Route]]
 
@@ -50,7 +55,10 @@ def create_starlette_app(
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
     return applications.Starlette(
-        routes=routes_factory(dependencies),
+        routes=[
+            *routes_factory(dependencies),
+            dependencies.route("/health", routes.Health, name="Health"),
+        ],
         middleware=[
             Middleware(
                 middlewares.RequestIdMiddleware,

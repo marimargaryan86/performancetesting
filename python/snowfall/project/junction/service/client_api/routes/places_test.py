@@ -3,7 +3,7 @@ import httpx
 from snowfall import fixtures
 from snowfall.project.junction.service.places.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.integration.starlette.routes import testing
+from snowfall.stdlib.integration.starlette import testing
 
 
 class TestPlaces(object):

@@ -9,12 +9,10 @@ from snowfall.project.junction.service.mobile_api.routes import (
     trips,
     users,
 )
-from snowfall.stdlib.integration.starlette.routes import health
 
 
 def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Route]:
     return [
-        dependencies.route("/health", health.Health, name="Health"),
         dependencies.route("/places", places.Places, name="Places"),
         dependencies.route("/orders", orders.Orders, name="ListOrders"),
         dependencies.route(

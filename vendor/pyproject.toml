@@ -2,7 +2,7 @@
 skips = [
     "*_test.py",
     "*/conftest.py",
-    "python/snowfall/stdlib/integration/starlette/routes/testing.py",
+    "python/snowfall/stdlib/integration/starlette/testing.py",
 ]
 
 [tool.black]
