@@ -73,7 +73,7 @@ EOH
 
       config {
         image = var.docker_image
-        port  = ["prometheus"]
+        ports = ["prometheus"]
         args = [
           "searches",
         ]
