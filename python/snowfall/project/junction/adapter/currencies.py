@@ -29,6 +29,15 @@ class Client(abc.ABC):
     ) -> int:
         """Convert amount from one currency to another."""
 
+    @abc.abstractmethod
+    async def get_rate(
+        self,
+        from_currency: str,
+        to_currency: str,
+        amount: int,
+    ) -> float:
+        """Get rate for conversion."""
+
 
 class DictClient(Client):
     def __init__(self, currencies: Mapping[tuple[str, str], float]):
@@ -45,6 +54,18 @@ class DictClient(Client):
             raise NotFoundError()
 
         return int(amount * rate)
+
+    async def get_rate(
+        self,
+        from_currency: str,
+        to_currency: str,
+        amount: int,
+    ) -> float:
+        rate = self._currencies.get((from_currency, to_currency))
+        if rate is None:
+            raise NotFoundError()
+
+        return rate
 
 
 class GrpcClient(Client):
@@ -80,3 +101,28 @@ class GrpcClient(Client):
             raise UnknownError(exc.details()) from exc
 
         return response.amount
+
+    async def get_rate(
+        self,
+        from_currency: str,
+        to_currency: str,
+        amount: int,
+    ) -> float:
+        try:
+            response = await self._currencies.Convert(
+                currencies_pb2.ConvertRequest(
+                    to_currency=to_currency,
+                    from_currency=from_currency,
+                    amount=amount,
+                ),
+                timeout=self._timeout,
+            )
+        except grpc.aio.AioRpcError as exc:
+            if exc.code() == grpc.StatusCode.NOT_FOUND:
+                raise NotFoundError(
+                    "Currency not found.",
+                ) from exc
+
+            raise UnknownError(exc.details()) from exc
+
+        return float("{0:.2f}".format(response.rate))

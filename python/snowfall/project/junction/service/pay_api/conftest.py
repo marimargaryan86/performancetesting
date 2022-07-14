@@ -3,10 +3,10 @@ from typing import Mapping, Optional, Sequence
 
 import currencycloud
 import pytest
-from lagom.integrations import starlette
 from starlette import applications, testclient
 from starlette.middleware import Middleware
 
+from snowfall.project.junction.adapter import currencies
 from snowfall.project.junction.service.pay_api import bootstrap
 from snowfall.project.junction.service.pay_api.routes import router
 from snowfall.stdlib.integration.starlette import application
@@ -14,12 +14,13 @@ from snowfall.stdlib.persistence import filesystem
 
 
 def _create_app(
-    dependencies: starlette.StarletteIntegration,
+    cc_client: currencycloud.Client,
+    currencies_client: currencies.Client,
     openapi_path: pathlib.Path,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
     return application.create_starlette_app(
-        dependencies=dependencies,
+        dependencies=bootstrap.create_dependencies(cc_client, currencies_client),
         custom_middlewares=custom_middlewares,
         openapi_path=openapi_path,
         routes_factory=router.get_routes,
@@ -58,9 +59,13 @@ def headers() -> dict[str, str]:
 
 
 @pytest.fixture()
-def app(cc_client: currencycloud.Client) -> applications.Starlette:
+def app(
+    cc_client: currencycloud.Client,
+    currencies_client: currencies.Client,
+) -> applications.Starlette:
     return _create_app(
-        dependencies=bootstrap.create_dependencies(cc_client),
+        cc_client=cc_client,
+        currencies_client=currencies_client,
         openapi_path=filesystem.resource_path("junction.pay_api", "openapi.json"),
     )
 

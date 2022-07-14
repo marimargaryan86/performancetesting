@@ -62,6 +62,7 @@ class Bound(object):
             amount=response_data["sell"]["amount"],
             buy_currency=response_data["buy"]["currency"],
             sell_currency=response_data["sell"]["currency"],
+            rate=response_data["rawRate"]["conversionRate"],
         )
 
     @_auth_required

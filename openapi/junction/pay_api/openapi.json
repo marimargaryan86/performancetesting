@@ -34,6 +34,12 @@
       ]
     },
     {
+      "name": "Rates",
+      "tags": [
+        "rates"
+      ]
+    },
+    {
       "name": "Transactions",
       "tags": [
         "transactions"
@@ -55,6 +61,11 @@
       "name": "internal",
       "description": "Endpoints not for public use.",
       "x-displayName": "Internal"
+    },
+    {
+      "name": "rates",
+      "description": "FX rates",
+      "x-displayName": "Rates"
     },
     {
       "name": "transactions",
@@ -219,6 +230,63 @@
         "description": "Used to get currency details"
       }
     },
+    "/rates": {
+      "post": {
+        "summary": "Create Rate",
+        "tags": [
+          "rates"
+        ],
+        "operationId": "post-rates",
+        "responses": {
+          "200": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Rate"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "description": "Used to get rate between currencies",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Rate"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
     "/transactions": {
       "get": {
         "summary": "List Transactions",
@@ -328,6 +396,80 @@
       }
     },
     "schemas": {
+      "Rate": {
+        "title": "Rate",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
+                "format": "uuid",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "example": "rates",
+                "enum": [
+                  "rates"
+                ]
+              },
+              "attributes": {
+                "readOnly": true,
+                "type": "object",
+                "properties": {
+                  "rate": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 1.02,
+                    "readOnly": true
+                  }
+                },
+                "required": [
+                  "rate"
+                ]
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "fromCurrency",
+                  "toCurrency"
+                ],
+                "properties": {
+                  "fromCurrency": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/CurrencyIdentifier"
+                      }
+                    }
+                  },
+                  "toCurrency": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/CurrencyIdentifier"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "type",
+              "attributes"
+            ]
+          }
+        ],
+        "description": "Rate schema."
+      },
       "Balance": {
         "title": "Balance",
         "allOf": [
@@ -355,7 +497,9 @@
                     "example": 1000
                   }
                 },
-                "required": ["amount"]
+                "required": [
+                  "amount"
+                ]
               },
               "relationships": {
                 "type": "object",
@@ -707,6 +851,29 @@
                   "type": "array",
                   "minItems": 1,
                   "uniqueItems": true,
+                  "items": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              },
+              "required": [
+                "errors"
+              ]
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "Bad Request",
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "errors": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "minItems": 1,
                   "items": {
                     "$ref": "#/components/schemas/Error"
                   }

@@ -31,4 +31,5 @@ class CurrencyService(service.Service, currencies_pb2_grpc.CurrencyServiceServic
 
         return currencies_pb2.ConvertResponse(
             amount=quote.amount,
+            rate=quote.rate,
         )
