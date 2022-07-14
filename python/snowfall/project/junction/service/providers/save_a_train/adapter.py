@@ -185,12 +185,9 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                             id=offer_segment_id,
                             segment_id=search_task.segments[0].id,
                             vehicle=offer_models_pb2.Vehicle(
-                                equipment=transfer_change.train.category or "",
                                 number=transfer_change.train.number or "",
                             ),
-                            operator="foobar",  # TODO: add something useful
-                            vendor="foobar",  # TODO: add something useful
-                            terminal="foobar",  # TODO: add something useful
+                            vendor=transfer_change.train.category or "",
                             type=models_pb2.Schedule.TYPE_RAIL,
                             legs=[
                                 offer_models_pb2.OfferSegmentLeg(
