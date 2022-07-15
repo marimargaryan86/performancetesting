@@ -83,6 +83,12 @@ def _foobar_to_national_railways(  # noqa: WPS231
     return modified_response
 
 
+def extract_leg_type(
+    group_details_relationships: Mapping[str, Any],
+) -> Mapping[str, str]:
+    return {"legType": group_details_relationships["legType"][_DATA_KEY][_ID_KEY]}
+
+
 async def get_response(
     offer_search_id: str,
     junction_client: client.JunctionClient,
@@ -138,7 +144,8 @@ async def get_response(
                                 {
                                     _ID_KEY: group_details[_ID_KEY],
                                     _TYPE_KEY: group_details[_TYPE_KEY],
-                                    _ATTRIBUTES_KEY: group_details[_ATTRIBUTES_KEY],
+                                    _ATTRIBUTES_KEY: group_details[_ATTRIBUTES_KEY]
+                                    | extract_leg_type(group_details["relationships"]),
                                 }
                                 for group_details in (
                                     await junction_client.get_offer_group_details_by_offer_group_id(  # noqa: B950

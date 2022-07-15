@@ -2161,6 +2161,10 @@
               },
               "routeIdentifiers": {
                 "$ref": "#/components/schemas/RouteIdentifiers"
+              },
+              "legType": {
+                "type": "string",
+                "example": "air"
               }
             },
             "required": [
