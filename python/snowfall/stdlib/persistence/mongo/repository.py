@@ -257,7 +257,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
         if mongo_id_key not in filter_:
             cursor_filter[mongo_id_key] = {}
 
-            cursor_filter[mongo_id_key]["$gt"] = cursor_obj.id
+        cursor_filter[mongo_id_key]["$gt"] = cursor_obj.id
 
         return cursor_filter
 
