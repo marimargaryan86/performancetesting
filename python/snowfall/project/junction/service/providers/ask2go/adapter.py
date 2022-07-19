@@ -45,12 +45,17 @@ class Ask2GoAdapter(object):
         search_criteria = ask2go_models.search.CreateSearchCriteria(
             origin_iata=criteria.origin_iata,
             destination_iata=criteria.destination_iata,
-            outbound_date=protobuf.protobuf_to_datetime(criteria.outbound),
+            outbound_date=protobuf.protobuf_to_datetime(criteria.outbound_departure),
             cabin_class=enums.AirCabinClassType(criteria.cabin_class),
             adults=criteria.adults,
             children=criteria.children,
             infants=criteria.infants,
         )
+
+        if criteria.HasField("inbound_departure"):
+            search_criteria.inbound_date = protobuf.protobuf_to_datetime(
+                criteria.inbound_departure,
+            )
 
         return await self._client.create_search(criteria=search_criteria)
 

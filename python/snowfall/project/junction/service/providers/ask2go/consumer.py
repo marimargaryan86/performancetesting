@@ -116,7 +116,9 @@ class SearchCriteriaConsumer(object):
         with stdout.context_binding(
             origin=search_task.criteria.origin_iata,
             destination=search_task.criteria.destination_iata,
-            departure_at=protobuf.protobuf_to_datetime(search_task.criteria.outbound),
+            departure_at=protobuf.protobuf_to_datetime(
+                search_task.criteria.outbound_departure,
+            ),
         ):
             offer_groups = self._transformer.offer_prices_to_offer_groups(
                 search_task,

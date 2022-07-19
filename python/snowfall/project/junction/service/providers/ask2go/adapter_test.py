@@ -24,14 +24,14 @@ _PRICE_URL = (
 _ARN_LHR_CRITERIA = amqp_pb2.Criteria(
     origin_iata="ARN",
     destination_iata="LHR",
-    outbound=protobuf.datetime_to_protobuf_datetime(
+    outbound_departure=protobuf.datetime_to_protobuf_datetime(
         datetime.datetime(
-            2022,
-            5,
-            24,
-            7,
-            50,
-            0,
+            year=2022,
+            month=5,
+            day=24,
+            hour=7,
+            minute=50,
+            second=0,
             tzinfo=zoneinfo.ZoneInfo("Europe/Stockholm"),
         ),
     ),
@@ -185,7 +185,7 @@ async def test_number_of_results(
         httpx_mock,
         criteria.criteria.origin_iata,
         criteria.criteria.destination_iata,
-        str(protobuf.protobuf_to_date(criteria.criteria.outbound)),
+        str(protobuf.protobuf_to_date(criteria.criteria.outbound_departure)),
     )
     search_results = ask2go_adapter.gather_search_results(criteria)
     count = sum([1 async for _ in search_results])
@@ -202,7 +202,7 @@ async def test_search_result_data(  # noqa: WPS218
         httpx_mock,
         _ARN_LHR.criteria.origin_iata,
         _ARN_LHR.criteria.destination_iata,
-        str(protobuf.protobuf_to_date(_ARN_LHR.criteria.outbound)),
+        str(protobuf.protobuf_to_date(_ARN_LHR.criteria.outbound_departure)),
     )
 
     offer_groups = offer_transformer.offer_prices_to_offer_groups(
