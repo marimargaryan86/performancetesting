@@ -1,0 +1,111 @@
+from typing import Sequence
+
+from snowfall.vendor.direct_ferries.clients import base
+from snowfall.vendor.direct_ferries.models import quote as quote_models
+from snowfall.vendor.direct_ferries.models import request as request_models
+from snowfall.vendor.direct_ferries.models import ticket
+
+_GET_METHOD = "get"
+_POST_METHOD = "post"
+_DATA_KEY = "data"
+_ROUTES_KEY = "routes"
+
+
+class QuoteClient(base.BaseClient):
+    async def get_quotes(
+        self,
+        request: request_models.QuoteRequest,
+    ) -> Sequence[quote_models.Quote]:
+        response_data = (
+            await self._make_request(
+                request_details=base.RequestDetails(
+                    method=_POST_METHOD,
+                    url="{0}/api/{1}/Quotes/get-quotes-request".format(
+                        self._config.api_url,
+                        self._config.api_version,
+                    ),
+                    payload=request.json(by_alias=True),
+                ),
+            )
+        ).json()
+
+        return [
+            quote_models.Quote(**quote_data)
+            for quote_data in response_data[_DATA_KEY]["quotes"]
+        ]
+
+    async def get_accommodations(
+        self,
+        request: request_models.QuoteRequest,
+    ) -> quote_models.AccommodationResponse:
+        response_data = (
+            await self._make_request(
+                request_details=base.RequestDetails(
+                    method=_POST_METHOD,
+                    url="{0}/api/{1}/Quotes/get-accommodation-request".format(
+                        self._config.api_url,
+                        self._config.api_version,
+                    ),
+                    payload=request.json(by_alias=True),
+                ),
+            )
+        ).json()
+
+        return quote_models.AccommodationResponse(**response_data[_DATA_KEY])
+
+    async def get_ticket_types(
+        self,
+        request: request_models.QuoteRequest,
+    ) -> ticket.TicketTypesResponse:
+        response_data = (
+            await self._make_request(
+                request_details=base.RequestDetails(
+                    method=_POST_METHOD,
+                    url="{0}/api/{1}/Quotes/get-ticket-types-request".format(
+                        self._config.api_url,
+                        self._config.api_version,
+                    ),
+                    payload=request.json(by_alias=True),
+                ),
+            )
+        ).json()
+
+        return ticket.TicketTypesResponse(**response_data[_DATA_KEY])
+
+    async def generate_quote(
+        self,
+        request: request_models.QuoteRequest,
+    ) -> quote_models.Quote:
+        response_data = (
+            await self._make_request(
+                request_details=base.RequestDetails(
+                    method=_POST_METHOD,
+                    url="{0}/api/{1}/Quotes/generate-quote-request".format(
+                        self._config.api_url,
+                        self._config.api_version,
+                    ),
+                    payload=request.json(by_alias=True),
+                ),
+            )
+        ).json()
+
+        return quote_models.Quote(**response_data[_DATA_KEY]["quote"])
+
+    async def save(
+        self,
+        request: request_models.QuoteRequest,
+    ) -> quote_models.Booking:
+        response_data = (
+            await self._make_request(
+                request_details=base.RequestDetails(
+                    url="{0}/api/{1}/Quotes/save-quote-request".format(
+                        self._config.api_url,
+                        self._config.api_version,
+                    ),
+                    method=_POST_METHOD,
+                    payload=request.json(by_alias=True),
+                ),
+            )
+        ).json()
+
+        return quote_models.Booking(**response_data[_DATA_KEY]["booking"])
