@@ -93,9 +93,11 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         except httpx.TimeoutException as timeout_error:
             self._logger.info("SAT timeout error occurred.", error=timeout_error)
         except httpx.HTTPStatusError as http_status_error:
-            if http_status_error.response.text:
-                raise_http_error_with_text(http_status_error)
-            raise http_status_error
+            status_code = http_status_error.response.status_code
+            if status_code != httpx.codes.INTERNAL_SERVER_ERROR:
+                if http_status_error.response.text:
+                    raise_http_error_with_text(http_status_error)
+                raise http_status_error
 
         try:
             search_response = await self._client.create_search(
