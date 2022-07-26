@@ -1,0 +1,27 @@
+{
+    "url": "\/offers\/searches",
+    "method": "POST",
+    "status_code": 201,
+    "json": {
+      "data": {
+        "id": "2e1bde0c-db57-473a-a48f-65a1796083da",
+        "type": "trip-offer-searches",
+        "attributes": {
+          "expiresAt": "2022-07-19T09:04:56+00:00",
+          "passengers": [
+            {
+              "dateOfBirth": "1990-02-03"
+            }
+          ]
+        },
+        "relationships": {
+          "offers": {
+            "data": []
+          }
+        },
+        "links": {
+          "self": "https://snowfall.se"
+        }
+      }
+    }
+}

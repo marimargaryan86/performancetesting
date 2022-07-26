@@ -1,0 +1,142 @@
+{
+    "url": "\/offers\/searches\/.*\/offers",
+    "method": "GET",
+    "status_code": 200,
+    "json": {
+        "data": [
+          {
+            "id": "1714f7ae-547f-46d7-9b23-2330790342d3",
+            "type": "offers",
+            "attributes": {
+                "groups": [
+                    {
+                        "id": "fbe9b754-4935-4dbe-8ef9-ddb928fd3fe9",
+                        "type": "offer-groups",
+                        "attributes": {
+                            "options": [
+                                {
+                                    "id": "ddcbbfb2-fc08-46b3-a30e-484d3a4f6334",
+                                    "type": "offer-options",
+                                    "attributes": {
+                                        "price": {
+                                            "currency": "EUR",
+                                            "amount": "13.80"
+                                        },
+                                        "details": [
+                                            {
+                                                "id": "9ce14b52-912b-48ae-aa1e-535565668949",
+                                                "type": "trip-offer-option-details",
+                                                "attributes": {
+                                                    "cabinClassName": "Second class",
+                                                    "details": {
+                                                        "data": {
+                                                            "id": "248d4c3b-2278-40ac-86c5-a002ccf27c8f",
+                                                            "type": "trip-offer-group-details"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "id": "0cc5fd4c-0b6e-4901-86c4-e9554bd1bb27",
+                                    "type": "offer-options",
+                                    "attributes": {
+                                        "price": {
+                                            "currency": "EUR",
+                                            "amount": "22.40"
+                                        },
+                                        "details": [
+                                            {
+                                                "id": "72ef4411-45a6-4648-81c2-c558ba96ee3c",
+                                                "type": "trip-offer-option-details",
+                                                "attributes": {
+                                                    "cabinClassName": "Comfort class",
+                                                    "details": {
+                                                        "data": {
+                                                            "id": "248d4c3b-2278-40ac-86c5-a002ccf27c8f",
+                                                            "type": "trip-offer-group-details"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            ],
+                            "details": [
+                                {
+                                    "id": "248d4c3b-2278-40ac-86c5-a002ccf27c8f",
+                                    "type": "trip-offer-group-details",
+                                    "attributes": {
+                                        "legs": [
+                                            {
+                                                "origin": {
+                                                    "ref": "SAT_NL_RO_LCHPY",
+                                                    "name": "Rotterdam Central Station",
+                                                    "latitude": 51.924804,
+                                                    "longitude": 4.468771,
+                                                    "timeZone": "Europe/Amsterdam"
+                                                },
+                                                "destination": {
+                                                    "ref": "SAT_NL_SC_XZYAC",
+                                                    "name": "Schiphol Airport",
+                                                    "latitude": 52.308787,
+                                                    "longitude": 4.761487,
+                                                    "timeZone": "Europe/Amsterdam"
+                                                },
+                                                "departureAt": "2022-09-25T23:42:00+02:00",
+                                                "arrivalAt": "2022-09-26T00:33:00+02:00"
+                                            }
+                                        ],
+                                        "vendor": "IC",
+                                        "operator": null,
+                                        "routeIdentifiers": {
+                                            "vendor": "2291",
+                                            "operator": null
+                                        }
+                                    }
+                                },
+                                {
+                                    "id": "248d4c3b-2278-40ac-86c5-a002ccf27c8f",
+                                    "type": "trip-offer-group-details",
+                                    "attributes": {
+                                        "legs": [
+                                            {
+                                                "origin": {
+                                                    "ref": "SAT_NL_RO_LCHPY",
+                                                    "name": "Rotterdam Central Station",
+                                                    "latitude": 51.924804,
+                                                    "longitude": 4.468771,
+                                                    "timeZone": "Europe/Amsterdam"
+                                                },
+                                                "destination": {
+                                                    "ref": "SAT_NL_SC_XZYAC",
+                                                    "name": "Schiphol Airport",
+                                                    "latitude": 52.308787,
+                                                    "longitude": 4.761487,
+                                                    "timeZone": "Europe/Amsterdam"
+                                                },
+                                                "departureAt": "2022-09-25T23:42:00+02:00",
+                                                "arrivalAt": "2022-09-26T00:33:00+02:00"
+                                            }
+                                        ],
+                                        "vendor": "IC",
+                                        "operator": null,
+                                        "routeIdentifiers": {
+                                            "vendor": "1891",
+                                            "operator": null
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "expiresAt": "2022-07-19T09:34:59+00:00"
+            }
+          }
+        ]
+    }
+}

@@ -1,0 +1,33 @@
+{
+    "url": "\/offers\/options\/.*\/details",
+    "method": "GET",
+    "status_code": 200,
+    "json": {
+        "data": [
+        {
+          "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+          "type": "trip-offer-option-details",
+          "attributes": {
+            "cabinClassName": "Economy"
+          },
+          "relationships": {
+            "details": {
+              "data": {
+                "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "type": "trip-offer-group-details"
+              }
+            },
+            "cabinClass": {
+              "data": {
+                "id": "economy",
+                "type": "cabin-classes"
+              }
+            }
+          },
+          "links": {
+            "self": "https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          }
+        }
+      ]
+    }
+}

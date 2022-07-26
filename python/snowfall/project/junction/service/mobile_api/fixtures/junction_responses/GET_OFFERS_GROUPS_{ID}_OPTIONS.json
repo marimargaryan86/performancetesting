@@ -1,0 +1,32 @@
+{
+    "url": "\/offers\/groups\/.*\/options",
+    "method": "GET",
+    "status_code": 200,
+    "json": {
+        "data": [
+        {
+          "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+          "type": "offer-options",
+          "attributes": {
+            "price": {
+              "currency": "EUR",
+              "amount": "13.37"
+            }
+          },
+          "relationships": {
+            "details": {
+              "data": [
+                {
+                  "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                  "type": "trip-offer-option-details"
+                }
+              ]
+            }
+          },
+          "links": {
+            "self": "https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          }
+        }
+      ]
+    }
+}

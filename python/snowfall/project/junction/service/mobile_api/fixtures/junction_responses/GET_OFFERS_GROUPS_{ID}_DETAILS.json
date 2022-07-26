@@ -1,0 +1,52 @@
+{
+    "url": "\/offers\/groups\/.*\/details",
+    "method": "GET",
+    "status_code": 200,
+    "json": {
+        "data": [
+        {
+          "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+          "type": "trip-offer-group-details",
+          "attributes": {
+            "legs": [
+              {
+                "origin": {
+                  "ref": "890880d9d63ffff",
+                  "name": "Uppsala Central Station",
+                  "latitude": 59.858611,
+                  "longitude": 17.646111,
+                  "timeZone": "Europe/Stockholm"
+                },
+                "destination": {
+                  "ref": "890880d9d63ffff",
+                  "name": "Uppsala Central Station",
+                  "latitude": 59.858611,
+                  "longitude": 17.646111,
+                  "timeZone": "Europe/Stockholm"
+                },
+                "departureAt": "2019-08-24T14:15:22Z",
+                "arrivalAt": "2019-08-24T14:15:22Z"
+              }
+            ],
+            "vendor": "BA",
+            "operator": "BA",
+            "routeIdentifiers": {
+              "vendor": "BA",
+              "operator": "BA"
+            }
+          },
+          "relationships": {
+            "legType": {
+              "data": {
+                "id": "air",
+                "type": "leg-types"
+              }
+            }
+          },
+          "links": {
+            "self": "https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          }
+        }
+      ]
+    }
+}
