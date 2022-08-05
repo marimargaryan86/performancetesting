@@ -169,13 +169,19 @@ class JunctionClient(object):  # noqa: WPS214
     async def get_offers_by_offer_search_id(
         self,
         offers_search_id: str,
+        cabin_class: Optional[Sequence[str]],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> dict[str, Any]:
+        query_parameters = _make_pagination(limit, cursor)
+        if cabin_class:
+            query_parameters["filter[groups.options.details.cabinClass]"] = str(
+                cabin_class,
+            )
         return await self._make_request(
             method=_METHOD_GET,
             url="/offers/searches/{0}/offers".format(offers_search_id),
-            query_parameters=_make_pagination(limit, cursor),
+            query_parameters=query_parameters,
         )
 
     async def get_offer_groups_by_offer_id(

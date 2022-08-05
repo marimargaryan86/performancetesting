@@ -56,7 +56,15 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
         junction_client: client.JunctionClient = lagom.injectable,
     ) -> responses.Response:
         offer_search_id = request.path_params["offerSearchId"]
-        offers_response = await get_response(offer_search_id, junction_client)
+        cabin_class = request.scope["query_string"].get(
+            "filter[groups.options.details.cabinClass]",
+            [],
+        )
+        offers_response = await get_response(
+            offer_search_id,
+            junction_client,
+            cabin_class,
+        )
         offers_response = _foobar_to_national_railways(offers_response)
         return models.JsonApiResponse(
             models.Body(
@@ -92,6 +100,7 @@ def extract_leg_type(
 async def get_response(
     offer_search_id: str,
     junction_client: client.JunctionClient,
+    cabin_class: Sequence[str],
 ) -> Any:
     return [
         {
@@ -165,6 +174,9 @@ async def get_response(
             },
         }
         for offer in (
-            await junction_client.get_offers_by_offer_search_id(offer_search_id)
+            await junction_client.get_offers_by_offer_search_id(
+                offer_search_id,
+                cabin_class,
+            )
         )[_DATA_KEY]
     ]

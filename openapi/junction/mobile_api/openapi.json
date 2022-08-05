@@ -432,6 +432,9 @@
           },
           {
             "$ref": "#/components/parameters/page-limit"
+          },
+          {
+            "$ref": "#/components/parameters/filterOffersCabinClass"
           }
         ],
         "tags": [
@@ -905,6 +908,24 @@
           "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
         },
         "description": "Offer Search identifier"
+      },
+      "filterOffersCabinClass": {
+        "name": "filter[groups.options.details.cabinClass]",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "example": "economy"
+          },
+          "example": [
+            "economy"
+          ]
+        },
+        "description": "Filters offers based on the options cabin class",
+        "style": "form",
+        "explode": false
       }
     },
     "schemas": {
