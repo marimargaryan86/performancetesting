@@ -35,6 +35,15 @@ class TestDictClient(object):
         found_places = await places_client.find(limit=100)
         assert len(found_places.places) == 2
 
+    async def test_single_place_is_creatable(
+        self,
+        places_client: places.Client,
+    ) -> None:
+        place = await places_client.get(fixtures.PLACES[0])
+        place = await places_client.create(place)
+        new_place = await places_client.get(place.location.id)
+        assert place.location.id == new_place.location.id
+
 
 class TestGrpcClient(object):
     @pytest.mark.parametrize(

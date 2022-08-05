@@ -14,13 +14,16 @@ from snowfall.project.junction.service.places.places import (
     LocationRepository,
     PlaceRepository,
 )
+from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import service
 from snowfall.stdlib.transport import amqp
 from snowfall.stdlib.transport.grpc import server
+from snowfall.stdlib.transport.grpc.client import create_channel
 
 
 class _GrpcSettings(service.Settings):
     default_page_size: int = 100
+    geodata_address: Sequence[str]
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: Sequence[AnyUrl]
@@ -57,12 +60,20 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
+    geocoding_service = geocoding_pb2_grpc.GeocodingServiceStub(
+        create_channel(
+            random.choice(app.settings.geodata_address),  # nosec
+        ),
+    )
     grpc_server = server.create_server(
         app.settings.grpc_address,
         app.settings.grpc_port,
         [
             PlacesService(
-                PlaceRepository(mongo.places.places),
+                PlaceRepository(
+                    geocoding=geocoding_service,
+                    collection=mongo.places.places,
+                ),
                 app.settings.default_page_size,
             ),
             LocationsService(

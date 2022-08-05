@@ -180,15 +180,13 @@
         "operationId": "post-places",
         "responses": {
           "201": {
-            "description": "Created",
-            "headers": {
-              "Location": {
-                "schema": {
-                  "type": "string",
-                  "format": "uri"
-                }
-              }
-            }
+            "$ref": "#/components/responses/CreatePlace"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
           }
         },
         "tags": [
@@ -519,8 +517,7 @@
             "required": [
               "type",
               "attributes",
-              "relationships",
-              "links"
+              "relationships"
             ],
             "properties": {
               "id": {
@@ -540,8 +537,7 @@
                 "required": [
                   "name",
                   "latitude",
-                  "longitude",
-                  "iataCode"
+                  "longitude"
                 ]
               },
               "relationships": {
@@ -668,10 +664,8 @@
           {
             "type": "object",
             "required": [
-              "id",
               "type",
               "attributes",
-              "relationships",
               "links"
             ],
             "properties": {
@@ -868,6 +862,47 @@
           }
         }
       },
+      "BadRequest": {
+        "description": "Bad Request",
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "errors": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "minItems": 1,
+                  "items": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              },
+              "required": [
+                "errors"
+              ]
+            }
+          }
+        }
+      },
+      "UnprocessableEntity": {
+        "description": "Unprocessable Entity",
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "errors": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       "ListLocations": {
         "description": "Returns a list of Locations.",
         "content": {
@@ -919,6 +954,33 @@
                   "items": {
                     "$ref": "#/components/schemas/PlaceFetchable"
                   }
+                }
+              },
+              "required": [
+                "data"
+              ]
+            }
+          }
+        }
+      },
+      "CreatePlace": {
+        "description": "Returns the Place that was created.",
+        "headers": {
+          "Location": {
+            "schema": {
+              "type": "string",
+              "format": "uri"
+            },
+            "required": true
+          }
+        },
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/PlaceFetchable"
                 }
               },
               "required": [

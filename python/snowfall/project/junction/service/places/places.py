@@ -1,11 +1,13 @@
+import asyncio
 import copy
 import functools
 import uuid
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 
 from pymongo import GEOSPHERE, IndexModel, results
 
 from snowfall.project.junction.service.places.v1alpha import models_pb2
+from snowfall.service.geodata.v1 import geocoding_pb2, geocoding_pb2_grpc
 from snowfall.stdlib.persistence.mongo import coders, mixins, repository, resultset
 
 _mongo_id_key = "_id"
@@ -27,9 +29,11 @@ class LocationRepository(
     async def find(
         self,
         cursor: str,
+        identifiers: Sequence[str] | None = None,
     ) -> resultset.ResultSet[models_pb2.Location]:
         return await self._find_with_cursor(
             cur=cursor,
+            filter_={_mongo_id_key: {"$in": identifiers}} if identifiers else None,
         )
 
     async def upsert(self, resource: models_pb2.Location) -> bool:
@@ -69,6 +73,16 @@ class PlaceRepository(
 ):
     _proto = models_pb2.Place
 
+    def __init__(
+        self,
+        geocoding: geocoding_pb2_grpc.GeocodingServiceStub,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        self._geocoding = geocoding
+
+        super().__init__(*args, **kwargs)
+
     async def find(
         self,
         cursor: str,
@@ -81,23 +95,41 @@ class PlaceRepository(
         self,
         resource: models_pb2.Place,
     ) -> models_pb2.Place:
-        resource.location.id = str(uuid.uuid5(_NAMESPACE, resource.location.name))
+        country_code, time_zone = await asyncio.gather(
+            self._geocoding.CountryCodeLookup(
+                geocoding_pb2.CountryCodeLookupRequest(
+                    coordinates=resource.location.coordinates,
+                ),
+            ),
+            self._geocoding.TimeZoneLookup(
+                geocoding_pb2.TimeZoneLookupRequest(
+                    coordinates=resource.location.coordinates,
+                ),
+            ),
+        )
+
+        resource.location.id = str(uuid.uuid4())
+        resource.location.country_code = country_code.country_code
+        resource.location.time_zone = time_zone.time_zone.id
 
         return await self.insert(resource)
 
-    async def update(self, place_id: str, resource: models_pb2.Place) -> bool:
+    async def update(self, resource: models_pb2.Place) -> bool:
+        replacement = self._coder.encode(resource)
+        replacement.pop("_id")
+
         update: results.UpdateResult = await self._execute(
             self._collection.replace_one,
-            filter={_mongo_id_key: place_id},
-            replacement=self._coder.encode(resource),
+            filter={_mongo_id_key: resource.location.id},
+            replacement=replacement,
         )
 
         return update.acknowledged
 
-    async def delete(self, place_id: str) -> None:
+    async def delete(self, identifier: str) -> None:
         await self._execute(
             self._collection.delete_one,
-            filter={_mongo_id_key: place_id},
+            filter={_mongo_id_key: identifier},
         )
 
     @functools.cached_property

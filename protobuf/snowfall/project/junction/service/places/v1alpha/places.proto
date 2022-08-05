@@ -20,6 +20,9 @@ message GetLocationResponse {
 message ListLocationsRequest {
   int32 page_size = 1;
   string page_token = 2;
+  oneof filter {
+    ListOfIds ids = 3;
+  }
 }
 
 message ListLocationsResponse {
@@ -53,7 +56,9 @@ message UpdatePlaceRequest {
   Place place = 1;
 }
 
-message UpdatePlaceResponse {}
+message UpdatePlaceResponse {
+  Place place = 1;
+}
 
 message GetPlaceRequest {
   string id = 1;

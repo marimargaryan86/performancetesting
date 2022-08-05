@@ -58,7 +58,7 @@ message ListOffersRequest {
 }
 
 message ListOfIds {
-  repeated string ids = 3;
+  repeated string ids = 1;
 }
 
 message ListOffersResponse {

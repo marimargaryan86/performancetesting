@@ -4,6 +4,7 @@ import httpx
 from starlette import status
 
 from snowfall import fixtures
+from snowfall.stdlib.integration.starlette import request_helpers
 
 _DATA_KEY = "data"
 
@@ -46,13 +47,7 @@ async def _test_view_endpoint(
 
     for resource in resources:
         current_link = cast(str, resource["links"]["self"])
-        response = await client.get(current_link)
-
-        assert response.status_code == status.HTTP_200_OK
-
-        body = response.json()
-
-        assert body[_DATA_KEY] == resource
+        await test_resource_is_fetchable(client, resource)
 
     if not current_link:
         return
@@ -62,3 +57,26 @@ async def _test_view_endpoint(
     )
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+async def test_resource_is_fetchable(
+    client: httpx.AsyncClient,
+    resource: Mapping[str, Any],
+) -> None:
+    response = await client.get(cast(str, resource["links"]["self"]))
+
+    assert response.status_code == status.HTTP_200_OK
+
+    body = response.json()
+
+    assert body[_DATA_KEY] == resource
+
+
+def resource_is_subset(
+    resource_a: Mapping[str, Any],
+    resource_b: Mapping[str, Any],
+) -> bool:
+    flatten_a = request_helpers.flatten_request_body({"data": resource_a})
+    flatten_b = request_helpers.flatten_request_body({"data": resource_b})
+
+    return flatten_a.items() <= flatten_b.items()

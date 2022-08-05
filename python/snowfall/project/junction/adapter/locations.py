@@ -46,6 +46,7 @@ class Client(abc.ABC):
     @abc.abstractmethod
     async def find(
         self,
+        identifiers: Sequence[str] | None = None,
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> LocationsPage:
@@ -66,11 +67,19 @@ class DictClient(Client):
 
     async def find(
         self,
+        identifiers: Sequence[str] | None = None,
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> LocationsPage:
+        all_locations = list(self._locations.values())
+
+        if identifiers:
+            all_locations = [
+                location for location in all_locations if location.id in identifiers
+            ]
+
         page = sequence.paginate(
-            sequence=list(self._locations.values()),
+            sequence=all_locations,
             cursor=cursor,
             limit=limit,
         )
@@ -105,12 +114,14 @@ class GrpcClient(Client):
 
     async def find(
         self,
+        identifiers: Sequence[str] | None = None,
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> LocationsPage:
         # todo: handle INVALID_ARGUMENT
         request = places_pb2.ListLocationsRequest(
             page_token=cursor or "",
+            ids=models_pb2.ListOfIds(ids=identifiers or []),
         )
         if limit is not None:
             request.page_size = limit

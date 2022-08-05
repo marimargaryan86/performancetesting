@@ -50,6 +50,10 @@ from snowfall.stdlib.integration.starlette import request_helpers
                                     "id": "8c3e06ac-1c17-986c-9510-c35229954f7c",
                                     "type": "trips",
                                 },
+                                {
+                                    "id": "76f1cdcc-32d2-47ac-b715-67c495b90e00",
+                                    "type": "trips",
+                                },
                             ],
                         },
                     },
@@ -59,6 +63,7 @@ from snowfall.stdlib.integration.starlette import request_helpers
             {
                 "trips": [
                     "8c3e06ac-1c17-986c-9510-c35229954f7c",
+                    "76f1cdcc-32d2-47ac-b715-67c495b90e00",
                 ],
             },
         ),

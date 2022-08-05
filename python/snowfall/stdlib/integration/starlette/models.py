@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 from typing import Any, Mapping, Optional, Sequence, Union
 
@@ -34,11 +36,11 @@ class Resource(ResourceIdentifier):
 ResourceType = Union[ResourceIdentifier, Sequence[ResourceIdentifier]]
 
 
-class ErrorSource(BaseModel):
+class ErrorSource(BaseModel, frozen=True):
     pointer: str
 
 
-class Error(BaseModel):
+class Error(BaseModel, frozen=True):
     status: Optional[str]
     code: Optional[str]
     title: Optional[str]

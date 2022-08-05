@@ -17,8 +17,8 @@ from snowfall.project.junction.service.places.v1alpha import (
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
 
-_LATITUDE_RANGE = (-90, 90)
-_LONGITUDE_RANGE = (-180, 180)
+LATITUDE_RANGE = (-90, 90)
+LONGITUDE_RANGE = (-180, 180)
 
 NOT_FOUND = "00000000-0000-0000-0000-000000000000"
 LOCATIONS = (
@@ -125,8 +125,8 @@ def generate_location(identifier: str) -> place_models_pb2.Location:
         id=identifier,
         name="Foobar",
         coordinates=latlng_pb2.LatLng(
-            latitude=random.uniform(*_LATITUDE_RANGE),  # nosec
-            longitude=random.uniform(*_LONGITUDE_RANGE),  # nosec
+            latitude=random.uniform(*LATITUDE_RANGE),  # nosec
+            longitude=random.uniform(*LONGITUDE_RANGE),  # nosec
         ),
         country_code="SE",
         time_zone="Europe/Stockholm",

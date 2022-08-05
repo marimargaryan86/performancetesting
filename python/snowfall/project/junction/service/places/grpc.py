@@ -45,7 +45,10 @@ class LocationsService(service.Service, places_pb2_grpc.LocationsServiceServicer
         request: places_pb2.ListLocationsRequest,
         context: aio.ServicerContext,
     ) -> places_pb2.ListLocationsResponse:
-        locations_result = await self._locations.find(request.page_token)
+        locations_result = await self._locations.find(
+            cursor=request.page_token,
+            identifiers=list(request.ids.ids) if request.HasField("ids") else None,
+        )
 
         locations_result.limit(
             request.page_size if request.page_size else self._default_page_size,
@@ -91,6 +94,9 @@ class PlacesService(  # noqa: WPS214
 
         place_result = await self._places.find_by_id(request.id)
 
+        if not place_result:
+            await context.abort(StatusCode.NOT_FOUND)
+
         return places_pb2.GetPlaceResponse(place=place_result)
 
     async def ListPlaces(  # type: ignore[override] # noqa: N802
@@ -114,9 +120,11 @@ class PlacesService(  # noqa: WPS214
         request: places_pb2.CreatePlaceRequest,
         context: aio.ServicerContext,
     ) -> places_pb2.CreatePlaceResponse:
-        await self._places.create(request.place)
+        place = await self._places.create(request.place)
 
-        return places_pb2.CreatePlaceResponse()
+        return places_pb2.CreatePlaceResponse(
+            place=place,
+        )
 
     async def DeletePlace(  # type: ignore[override] # noqa: N802
         self,
@@ -137,11 +145,8 @@ class PlacesService(  # noqa: WPS214
         request: places_pb2.UpdatePlaceRequest,
         context: aio.ServicerContext,
     ) -> places_pb2.UpdatePlaceResponse:
-        try:
-            uuid.UUID(request.place.location.id)
-        except ValueError:
-            await context.abort(StatusCode.INVALID_ARGUMENT)
+        await self._places.update(request.place)
 
-        await self._places.update(request.place.location.id, request.place)
-
-        return places_pb2.UpdatePlaceResponse()
+        return places_pb2.UpdatePlaceResponse(
+            place=request.place,
+        )

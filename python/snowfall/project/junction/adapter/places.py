@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import abc
 import dataclasses
+import uuid
 from typing import Optional, Sequence
 
 import grpc
@@ -12,6 +13,8 @@ from snowfall.project.junction.service.places.v1alpha import (
     places_pb2_grpc,
 )
 from snowfall.stdlib import sequence
+
+_PLACE_NOT_FOUND_FROMAT = "Place with ID '{id}' not found."
 
 
 class NotFoundError(Exception):
@@ -37,8 +40,20 @@ class PlacesPage(object):
 
 class Client(abc.ABC):
     @abc.abstractmethod
+    async def create(self, place: models_pb2.Place) -> models_pb2.Place:
+        """Create a place resource."""
+
+    @abc.abstractmethod
     async def get(self, identifier: str) -> models_pb2.Place:
         """Fetch a place resource."""
+
+    @abc.abstractmethod
+    async def delete(self, identifier: str) -> None:
+        """Delete a place resource."""
+
+    @abc.abstractmethod
+    async def update(self, place: models_pb2.Place) -> models_pb2.Place:
+        """Update a place resource."""
 
     @abc.abstractmethod
     async def find(
@@ -53,13 +68,34 @@ class DictClient(Client):
     def __init__(self, places: Sequence[models_pb2.Place]):
         self._places = {place.location.id: place for place in places}
 
+    async def create(self, place: models_pb2.Place) -> models_pb2.Place:
+        new_place = models_pb2.Place()
+        new_place.CopyFrom(place)
+        new_place.location.id = str(uuid.uuid4())
+        self._places[new_place.location.id] = new_place
+
+        return new_place
+
     async def get(self, place_id: str) -> models_pb2.Place:
         try:
             return self._places[place_id]
         except KeyError as err:
             raise NotFoundError(
-                "Place with ID '{id}' not found.".format(id=place_id),
+                _PLACE_NOT_FOUND_FROMAT.format(id=place_id),
             ) from err
+
+    async def delete(self, place_id: str) -> None:
+        try:
+            self._places.pop(place_id)
+        except KeyError as err:
+            raise NotFoundError(
+                _PLACE_NOT_FOUND_FROMAT.format(id=place_id),
+            ) from err
+
+    async def update(self, place: models_pb2.Place) -> models_pb2.Place:
+        self._places[place.location.id] = place
+
+        return place
 
     async def find(
         self,
@@ -80,6 +116,15 @@ class GrpcClient(Client):
         self._places = places
         self._timeout = timeout
 
+    async def create(self, place: models_pb2.Place) -> models_pb2.Place:
+        response = await self._places.CreatePlace(
+            places_pb2.CreatePlaceRequest(
+                place=place,
+            ),
+        )
+
+        return response.place
+
     async def get(self, place_id: str) -> models_pb2.Place:
         try:
             response = await self._places.GetPlace(
@@ -89,7 +134,39 @@ class GrpcClient(Client):
         except grpc.aio.AioRpcError as exc:
             if exc.code() == grpc.StatusCode.NOT_FOUND:
                 raise NotFoundError(
-                    "Place with ID '{id}' not found.".format(id=place_id),
+                    _PLACE_NOT_FOUND_FROMAT.format(id=place_id),
+                ) from exc
+
+            raise UnknownError(exc.details()) from exc
+
+        return response.place
+
+    async def delete(self, identifier: str) -> None:
+        try:
+            await self._places.DeletePlace(
+                places_pb2.DeletePlaceRequest(id=identifier),
+                timeout=self._timeout,
+            )
+        except grpc.aio.AioRpcError as exc:
+            if exc.code() == grpc.StatusCode.NOT_FOUND:
+                raise NotFoundError(
+                    _PLACE_NOT_FOUND_FROMAT.format(id=identifier),
+                ) from exc
+
+            raise UnknownError(exc.details()) from exc
+
+    async def update(self, place: models_pb2.Place) -> models_pb2.Place:
+        try:
+            response = await self._places.UpdatePlace(
+                places_pb2.UpdatePlaceRequest(
+                    place=place,
+                ),
+                timeout=self._timeout,
+            )
+        except grpc.aio.AioRpcError as exc:
+            if exc.code() == grpc.StatusCode.NOT_FOUND:
+                raise NotFoundError(
+                    _PLACE_NOT_FOUND_FROMAT.format(id=place.location.id),
                 ) from exc
 
             raise UnknownError(exc.details()) from exc

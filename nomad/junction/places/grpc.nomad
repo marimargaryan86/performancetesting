@@ -64,6 +64,7 @@ job "places-grpc" {
 
       template {
         data        = <<EOH
+GEODATA_ADDRESS={{range $index, $service := service (printf "grpc.geodata-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
 MONGO_DSN={{range $index, $service := service "mongodb"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 EOH
         destination = "services.env"

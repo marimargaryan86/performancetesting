@@ -34,6 +34,18 @@ class TestDictClient(object):
     ) -> None:
         found_locations = await locations_client.find(limit=100)
         assert len(found_locations.locations) == 2
+        found_locations = await locations_client.find(limit=1)
+        assert len(found_locations.locations) == 1
+
+    async def test_multiple_filtered_locations_are_retrievable(
+        self,
+        locations_client: locations.Client,
+    ) -> None:
+        found_locations = await locations_client.find(
+            identifiers=[fixtures.LOCATIONS[0]],
+            limit=100,
+        )
+        assert len(found_locations.locations) == 1
 
 
 class TestGrpcClient(object):

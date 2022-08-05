@@ -5,6 +5,10 @@ package snowfall.project.junction.service.places.v1alpha;
 import "google/protobuf/timestamp.proto";
 import "snowfall/stdlib/v1alpha/latlng.proto";
 
+message ListOfIds {
+  repeated string ids = 1;
+}
+
 message Location {
   string id = 1;
   string name = 2;

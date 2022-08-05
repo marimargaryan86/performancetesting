@@ -62,7 +62,7 @@ class PlaceResource(models.Resource):
             id=place.location.id,
             type="places",
             attributes={
-                "countryCode": place.location.country_code.rjust(2, "X"),
+                "countryCode": place.location.country_code or "GB",
                 "iataCode": None,
                 "latitude": place.location.coordinates.latitude,
                 "longitude": place.location.coordinates.longitude,

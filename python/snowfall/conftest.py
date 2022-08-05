@@ -32,7 +32,7 @@ from snowfall.stdlib.persistence.mongo.normalizers import TimestampNormalizer
 from snowfall.stdlib.v1alpha import models_pb2
 from snowfall.vendor.junction import client
 
-pytest.register_assert_rewrite("snowfall.stdlib.integration.starlette.routes.testing")
+pytest.register_assert_rewrite("snowfall.stdlib.integration.starlette.testing")
 pytest.register_assert_rewrite("snowfall.stdlib.testing.asserts")
 stdout.configure_logger()
 
