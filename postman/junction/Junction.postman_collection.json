@@ -1,0 +1,1741 @@
+{
+	"info": {
+		"_postman_id": "5b944f5d-e2ed-401f-a5a5-42de6dcf8284",
+		"name": "Junction",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21725147"
+	},
+	"item": [
+		{
+			"name": "Health",
+			"item": [
+				{
+					"name": "Service Health Check",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/health",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Meta Information About The API."
+		},
+		{
+			"name": "Places",
+			"item": [
+				{
+					"name": "List and Get Places (auto origin and destination setting)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"const json_response = pm.response.json();",
+									"const index1 = Math.trunc(Math.random() * json_response.data.length);",
+									"const item1 = json_response.data[index1];",
+									"",
+									"const index2 = Math.trunc(Math.random() * json_response.data.length);",
+									"const item2 = json_response.data[index2];",
+									"",
+									"pm.collectionVariables.set(\"origin_id\", item1.id);",
+									"pm.collectionVariables.set(\"destination_id\", item2.id);",
+									"",
+									"//console.log(pm.environment.replaceIn('{{origin_id}}'));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/places",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"places"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check ORIGIN Place Details",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/places/{{origin_id}}",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"places",
+								"{{origin_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check DESTINATION Place Details",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/places/{{destination_id}}",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"places",
+								"{{destination_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Places Types",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							}
+						],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/places/types",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"places",
+								"types"
+							],
+							"query": [
+								{
+									"key": "page[cursor]",
+									"value": "MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D",
+									"description": "Pagination cursor that defines your place in the list.",
+									"disabled": true
+								},
+								{
+									"key": "page[limit]",
+									"value": "20",
+									"description": "A limit on the number of objects to be returned, between 1 and 100.",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Used to retrieve available Place Types."
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"description": "Added as a part of security scheme: bearer",
+										"key": "Authorization",
+										"value": "Bearer <token>"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/places/types?page[cursor]=MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D&page[limit]=20",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"places",
+										"types"
+									],
+									"query": [
+										{
+											"key": "page[cursor]",
+											"value": "MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D"
+										},
+										{
+											"key": "page[limit]",
+											"value": "20"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"data\": [\n    {\n      \"id\": \"unspecified\",\n      \"type\": \"place-types\",\n      \"attributes\": {\n        \"name\": \"unspecified\"\n      },\n      \"links\": {\n        \"self\": \"https://example.com/places/types/unspecified\"\n      }\n    },\n    {\n      \"id\": \"air\",\n      \"type\": \"place-types\",\n      \"attributes\": {\n        \"name\": \"air\"\n      },\n      \"links\": {\n        \"self\": \"https://example.com/places/types/air\"\n      }\n    },\n    {\n      \"id\": \"rail\",\n      \"type\": \"place-types\",\n      \"attributes\": {\n        \"name\": \"rail\"\n      },\n      \"links\": {\n        \"self\": \"https://example.com/places/types/rail\"\n      }\n    }\n  ],\n  \"links\": {\n    \"next\": \"https://example.com/places/types\"\n  }\n}"
+						},
+						{
+							"name": "Unauthorized",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"description": "Added as a part of security scheme: bearer",
+										"key": "Authorization",
+										"value": "Bearer <token>"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/places/types?page[cursor]=MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D&page[limit]=20",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"places",
+										"types"
+									],
+									"query": [
+										{
+											"key": "page[cursor]",
+											"value": "MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D"
+										},
+										{
+											"key": "page[limit]",
+											"value": "20"
+										}
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"errors\": [\n    {\n      \"status\": \"404\",\n      \"detail\": \"Nothing matches the given URI\",\n      \"title\": \"Not Found\",\n      \"code\": \"required\",\n      \"source\": {\n        \"pointer\": \"/data/attributes/title\"\n      }\n    }\n  ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Place Type",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							}
+						],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/places/types/unspecified",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"places",
+								"types",
+								"unspecified"
+							]
+						},
+						"description": "Used to lookup data for a Place Type Identifier."
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"description": "Added as a part of security scheme: bearer",
+										"key": "Authorization",
+										"value": "Bearer <token>"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/places/types/:placeTypeId",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"places",
+										"types",
+										":placeTypeId"
+									],
+									"variable": [
+										{
+											"key": "placeTypeId",
+											"value": "airport",
+											"description": "(Required) Place Type identifier"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"data\": {\n    \"id\": \"air\",\n    \"type\": \"place-types\",\n    \"attributes\": {\n      \"name\": \"string\"\n    },\n    \"links\": {\n      \"self\": \"https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5\"\n    }\n  }\n}"
+						},
+						{
+							"name": "Unauthorized",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"description": "Added as a part of security scheme: bearer",
+										"key": "Authorization",
+										"value": "Bearer <token>"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/places/types/:placeTypeId",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"places",
+										"types",
+										":placeTypeId"
+									],
+									"variable": [
+										{
+											"key": "placeTypeId",
+											"value": "airport",
+											"description": "(Required) Place Type identifier"
+										}
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"errors\": [\n    {\n      \"status\": \"404\",\n      \"detail\": \"Nothing matches the given URI\",\n      \"title\": \"Not Found\",\n      \"code\": \"required\",\n      \"source\": {\n        \"pointer\": \"/data/attributes/title\"\n      }\n    }\n  ]\n}"
+						},
+						{
+							"name": "Not Found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"description": "Added as a part of security scheme: bearer",
+										"key": "Authorization",
+										"value": "Bearer <token>"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/places/types/:placeTypeId",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"places",
+										"types",
+										":placeTypeId"
+									],
+									"variable": [
+										{
+											"key": "placeTypeId",
+											"value": "airport",
+											"description": "(Required) Place Type identifier"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"errors\": [\n    {\n      \"status\": \"404\",\n      \"detail\": \"Nothing matches the given URI\",\n      \"title\": \"Not Found\",\n      \"code\": \"required\",\n      \"source\": {\n        \"pointer\": \"/data/attributes/title\"\n      }\n    }\n  ]\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Trips",
+			"item": [
+				{
+					"name": "Initiate Trip Search",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"pm.collectionVariables.set(\"trip-searches_id\", response.data.id);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "X-Agent-Email",
+								"value": "gb@snowfalltravel.com",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"attributes\": {\n            \"departureAfter\": \"2022-08-31T00:30:00Z\"\n        },\n        \"relationships\": {\n            \"origin\": {\n                \"data\": {\n                    \"id\": \"{{origin_id}}\",\n                    \"type\": \"places\"\n                }\n            },\n            \"destination\": {\n                \"data\": {\n                    \"id\": \"{{destination_id}}\",\n                    \"type\": \"places\"\n                }\n            }\n        },\n        \"type\": \"trip-searches\"\n    }\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/trips/searches",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"trips",
+								"searches"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check Search Trip Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"pm.collectionVariables.set(\"trip_id\", response.data[0].id);",
+									"pm.environment.unset(\"variable_key\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/trips/searches/{{trip-searches_id}}/trips",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"trips",
+								"searches",
+								"{{trip-searches_id}}",
+								"trips"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/trips/{id}",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/trips/6b521646-d062-5715-a8e6-9632e5e7025a",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"trips",
+								"6b521646-d062-5715-a8e6-9632e5e7025a"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/trips/{id}/legs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/trips/{{trip_id}}/legs",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"trips",
+								"{{trip_id}}",
+								"legs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/trips/{id}/segments",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/trips/{{trip_id}}/segments",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"trips",
+								"{{trip_id}}",
+								"segments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check Info about the Trip (Origin and Destination)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/trips/searches/{{trip-searches_id}}",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"trips",
+								"searches",
+								"{{trip-searches_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check Info about Trip Legs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/trips/searches/{{trip-searches_id}}/legs",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"trips",
+								"searches",
+								"{{trip-searches_id}}",
+								"legs"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Offers",
+			"item": [
+				{
+					"name": "Initiate Trip Offer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"pm.collectionVariables.set(\"trip-offer-searches_id\", response.data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"type\": \"trip-offer-searches\",\n    \"attributes\": {\n      \"passengers\": [\n        {\n          \"dateOfBirth\": \"1992-04-29\"\n        }\n      ]\n      },\n    \"relationships\": {\n      \"trips\": {\n        \"data\": [\n          {\n            \"id\": \"{{trip_id}}\",\n            \"type\": \"trips\"\n          }\n        ]\n      }\n    }\n  }\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/offers/searches",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"offers",
+								"searches"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check The Offer status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"const response = pm.response.json();",
+									"pm.collectionVariables.set(\"offers_id\", response.data[0].id);",
+									"pm.collectionVariables.set(\"offer-groups_id\", response.data[0].relationships.groups.data[0].id);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/offers/searches/{{trip-offer-searches_id}}/offers",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"offers",
+								"searches",
+								"{{trip-offer-searches_id}}",
+								"offers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Offer Options by Offer Group (Mandatory step to Order)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"const response = pm.response.json();\r",
+									"pm.collectionVariables.set(\"offer-options_id\", response.data[0].id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							}
+						],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/offers/groups/{{offer-groups_id}}/options",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"offers",
+								"groups",
+								"{{offer-groups_id}}",
+								"options"
+							],
+							"query": [
+								{
+									"key": "page[cursor]",
+									"value": "MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D",
+									"description": "Pagination cursor that defines your place in the list.",
+									"disabled": true
+								},
+								{
+									"key": "page[limit]",
+									"value": "20",
+									"description": "A limit on the number of objects to be returned, between 1 and 100.",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Used to retrieve all Offer Options for an Offer Group."
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"description": "Added as a part of security scheme: bearer",
+										"key": "Authorization",
+										"value": "Bearer <token>"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/offers/groups/:offerGroupId/options?page[cursor]=MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D&page[limit]=20",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"offers",
+										"groups",
+										":offerGroupId",
+										"options"
+									],
+									"query": [
+										{
+											"key": "page[cursor]",
+											"value": "MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D"
+										},
+										{
+											"key": "page[limit]",
+											"value": "20"
+										}
+									],
+									"variable": [
+										{
+											"key": "offerGroupId",
+											"value": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+											"description": "(Required) Offer Group Identifier"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"data\": [\n    {\n      \"attributes\": {\n        \"price\": {\n          \"currency\": \"EUR\",\n          \"amount\": \"13.37\"\n        }\n      },\n      \"id\": \"04f83af9-90bb-4a0f-9881-03e1e690f7f5\",\n      \"relationships\": {\n        \"details\": {\n          \"data\": [\n            {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            },\n            {\n              \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n            }\n          ]\n        }\n      },\n      \"type\": \"offer-options\",\n      \"links\": {\n        \"self\": \"https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5\"\n      }\n    }\n  ],\n  \"links\": {\n    \"next\": \"https://example.com/resource/?page%5Bcursor%5D=MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D&page%5Blimit%5D=20\"\n  }\n}"
+						},
+						{
+							"name": "Unauthorized",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"description": "Added as a part of security scheme: bearer",
+										"key": "Authorization",
+										"value": "Bearer <token>"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/offers/groups/:offerGroupId/options?page[cursor]=MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D&page[limit]=20",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"offers",
+										"groups",
+										":offerGroupId",
+										"options"
+									],
+									"query": [
+										{
+											"key": "page[cursor]",
+											"value": "MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D"
+										},
+										{
+											"key": "page[limit]",
+											"value": "20"
+										}
+									],
+									"variable": [
+										{
+											"key": "offerGroupId",
+											"value": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+											"description": "(Required) Offer Group Identifier"
+										}
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"errors\": [\n    {\n      \"status\": \"404\",\n      \"detail\": \"Nothing matches the given URI\",\n      \"title\": \"Not Found\",\n      \"code\": \"required\",\n      \"source\": {\n        \"pointer\": \"/data/attributes/title\"\n      }\n    }\n  ]\n}"
+						},
+						{
+							"name": "Not Found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"description": "Added as a part of security scheme: bearer",
+										"key": "Authorization",
+										"value": "Bearer <token>"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/offers/groups/:offerGroupId/options?page[cursor]=MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D&page[limit]=20",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"offers",
+										"groups",
+										":offerGroupId",
+										"options"
+									],
+									"query": [
+										{
+											"key": "page[cursor]",
+											"value": "MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D"
+										},
+										{
+											"key": "page[limit]",
+											"value": "20"
+										}
+									],
+									"variable": [
+										{
+											"key": "offerGroupId",
+											"value": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+											"description": "(Required) Offer Group Identifier"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"errors\": [\n    {\n      \"status\": \"404\",\n      \"detail\": \"Nothing matches the given URI\",\n      \"title\": \"Not Found\",\n      \"code\": \"required\",\n      \"source\": {\n        \"pointer\": \"/data/attributes/title\"\n      }\n    }\n  ]\n}"
+						}
+					]
+				},
+				{
+					"name": "/offers/{id}",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/offers/0b9d6651-1e4e-45ee-81f7-176089f1b30b",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"offers",
+								"0b9d6651-1e4e-45ee-81f7-176089f1b30b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/offers/searches/{id}",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/offers/searches/3c5b4102-b5ed-4d99-a43a-f563aac574fd",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"offers",
+								"searches",
+								"3c5b4102-b5ed-4d99-a43a-f563aac574fd"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Offers Are Bookable Suggestions For A Trip."
+		},
+		{
+			"name": "Segments",
+			"item": [
+				{
+					"name": "/segments/{id}",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/segments/744daff9-74b6-5acb-9203-add14f08356f",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"segments",
+								"744daff9-74b6-5acb-9203-add14f08356f"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/segments/{id}/legs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/segments/04f83af9-90bb-4a0f-9881-03e1e690f7f5/legs",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"segments",
+								"04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+								"legs"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Legs",
+			"item": [
+				{
+					"name": "/legs/{id}",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/legs/1f041db9-301c-539b-be68-c076b235d9f8",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"legs",
+								"1f041db9-301c-539b-be68-c076b235d9f8"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/legs/types",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/legs/types",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"legs",
+								"types"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/legs/types/{id}",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/legs/types/air",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"legs",
+								"types",
+								"air"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "Make Order request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"const response = pm.response.json();",
+									"pm.collectionVariables.set(\"orders_id\", response.data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"orders\",\n        \"attributes\": {\n            \"offers\": [\n                {\n                    \"offerAggregateId\": \"{{offers_id}}\",\n                    \"offerIds\": [\n                        \"{{offer-options_id}}\"                    \n                    ],\n                    \"passengers\": [\n                        {\n                            \"firstName\": \"William\",\n                            \"lastName\": \"Neverever\",\n                            \"title\": \"mr\",\n                            \"gender\": \"male\",\n                            \"dateOfBirth\": \"1992-04-29\"\n                        }\n                    ]\n                }\n            ],\n            \"contactDetails\": {\n                \"email\": \"example@example.com\",\n                \"address\": {\n                    \"addressLines\": [\n                        \"Addr1\"\n                    ],\n                    \"countryCode\": \"PL\",\n                    \"postalCode\": \"95-000\",\n                    \"city\": \"Lodz\"\n                },\n                \"phoneNumber\": \"+48500600700\"\n            }\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/orders",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check Order Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/orders",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/orders/{id}",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{HOST}}/orders/{{orders_id}}",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"orders",
+								"{{orders_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{TOKEN}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "trip_search_id",
+			"value": ""
+		},
+		{
+			"key": "trip_id",
+			"value": ""
+		},
+		{
+			"key": "trip-offer-searches_id",
+			"value": ""
+		},
+		{
+			"key": "trip-searches_id",
+			"value": ""
+		},
+		{
+			"key": "offers_id",
+			"value": ""
+		},
+		{
+			"key": "offer-group_Id",
+			"value": ""
+		},
+		{
+			"key": "offer_id",
+			"value": ""
+		},
+		{
+			"key": "offer-groups_id",
+			"value": ""
+		},
+		{
+			"key": "offer-options_id",
+			"value": ""
+		},
+		{
+			"key": "orders_id",
+			"value": ""
+		},
+		{
+			"key": "origin_id",
+			"value": ""
+		},
+		{
+			"key": "destination_id",
+			"value": ""
+		}
+	]
+}
