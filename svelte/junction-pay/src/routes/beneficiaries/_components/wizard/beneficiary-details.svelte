@@ -2,7 +2,6 @@
   import countriesData from "$content/countries";
   import currenciesData from "$content/currencies";
   import Button from "$lib/components/button.svelte";
-  import Radio from "$lib/components/radio.svelte";
   import SelectField from "$lib/components/select-field.svelte";
   import Spinner from "$lib/components/spinner.svelte";
   import TextField from "$lib/components/text-field.svelte";
@@ -21,8 +20,6 @@
     beneficiaryCountry: undefined,
     bankAccountCountry: undefined,
     currency: undefined,
-    holderName: "",
-    type: "company",
   };
 
   const { beneficiary: service } = instances;
@@ -45,7 +42,6 @@
 
     try {
       await addBeneficiaryDetails(data as AddBeneficiaryDetailsData);
-
       goToNext();
     } catch (e) {
       errors = e as typeof errors;
@@ -55,17 +51,22 @@
 
 <form class="beneficiary-details" on:submit|preventDefault={submit}>
   <div class="field">
-    <label for="nickname" class:error={!!errors.nickname}>Beneficiary nickname</label>
+    <label for="nickname" class:error={!!errors.nickname && !data.nickname}
+      >Beneficiary nickname</label
+    >
     <TextField
       id="nickname"
       bind:value={data.nickname}
       placeholder="Enter nickname"
-      error={!!errors.nickname}
+      error={!!errors.nickname && !data.nickname}
     />
   </div>
 
   <div class="field">
-    <label for="beneficiary-country" class:error={!!errors.beneficiaryCountry}>
+    <label
+      for="beneficiary-country"
+      class:error={!!errors.beneficiaryCountry && !data.beneficiaryCountry}
+    >
       Beneficiary country
     </label>
     <SelectField
@@ -73,12 +74,15 @@
       items={countries}
       placeholder="Select country"
       id="beneficiary-country"
-      error={!!errors.beneficiaryCountry}
+      error={!!errors.beneficiaryCountry && !data.beneficiaryCountry}
     />
   </div>
 
   <div class="field">
-    <label for="bank-account-country" class:error={!!errors.bankAccountCountry}>
+    <label
+      for="bank-account-country"
+      class:error={!!errors.bankAccountCountry && !data.bankAccountCountry}
+    >
       Bank account country
     </label>
     <SelectField
@@ -86,40 +90,20 @@
       items={countries}
       placeholder="Select country"
       id="bank-account-country"
-      error={!!errors.bankAccountCountry}
+      error={!!errors.bankAccountCountry && !data.bankAccountCountry}
     />
   </div>
 
   <div class="field">
-    <label for="currency" class:error={!!errors.currency}>Currency</label>
+    <label for="currency" class:error={!!errors.currency && !data.currency}>Currency</label>
     <SelectField
       bind:value={data.currency}
       items={currencies}
       placeholder="Select currency"
       id="currency"
-      error={!!errors.currency}
+      error={!!errors.currency && !data.currency}
     />
   </div>
-
-  <div class="field">
-    <label for="holder-name" class:error={!!errors.holderName}>Account holder name</label>
-    <TextField
-      id="holder-name"
-      bind:value={data.holderName}
-      placeholder="Enter holder name"
-      error={!!errors.holderName}
-    />
-  </div>
-
-  <fieldset>
-    <legend>Beneficiary type</legend>
-    <Radio value="company" bind:group={data.type} id="company" />
-    <label for="company">Company</label>
-
-    <Radio value="individual" bind:group={data.type} id="individual" />
-    <label for="individual">Individual</label>
-  </fieldset>
-
   <span />
 
   <Button type="submit">
@@ -138,13 +122,7 @@
     grid-template-columns: 1fr 1fr;
   }
 
-  fieldset > label {
-    font-size: 18px;
-    margin-left: 4px;
-  }
-
-  .field > label,
-  legend {
+  .field > label {
     display: block;
     font-size: 18px;
     margin-bottom: 12px;
@@ -154,14 +132,6 @@
 
   .field > label.error {
     color: var(--color-red);
-  }
-
-  legend {
-    margin-bottom: 32px;
-  }
-
-  fieldset > :global(*) {
-    vertical-align: middle;
   }
 
   .beneficiary-details > :global(button) {
@@ -179,10 +149,6 @@
   .beneficiary-details > :global(button > .spinner) {
     margin-left: 8px;
     vertical-align: middle;
-  }
-
-  fieldset > :global(.radio:not(:first-of-type)) {
-    margin-left: 50px;
   }
 
   .field > :global(.text-field.text-field),

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import Modal from "$lib/components/modal.svelte";
+  import { modal } from "$lib/stores";
   import Header from "./_partials/header/header.svelte";
   import MainMenu from "./_partials/main-menu.svelte";
 </script>
@@ -11,6 +13,10 @@
   </Header>
 
   <slot name="body" />
+
+  {#if $modal.status === "open"}
+    <Modal title={$modal.title} type={$modal.type} options={$modal.options} />
+  {/if}
 </main>
 
 <style>

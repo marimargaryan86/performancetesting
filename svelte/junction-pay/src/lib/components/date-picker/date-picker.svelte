@@ -10,7 +10,9 @@
   export let id: string | undefined = undefined;
   export let start: Date | undefined = undefined;
   export let end: Date | undefined = undefined;
+  export let placeholder: string | undefined = undefined;
   export let span = false;
+  export let error = false;
 
   let container: HTMLDivElement;
   let focusedMonth = utils.setZeroTime(start ? new Date(start) : new Date());
@@ -19,7 +21,8 @@
   $: start = start ? utils.setZeroTime(start) : undefined;
   $: end = end ? utils.setZeroTime(end) : undefined;
   $: displayValue =
-    (start ? utils.formatDate(start, 1) : "") + (end ? ` - ${utils.formatDate(end, 1)}` : "");
+    (start ? utils.formatDate(start, 1) : "") +
+    (span && end ? ` - ${utils.formatDate(end, 1)}` : "");
   $: {
     focusedMonth.setDate(1);
     focusedMonth = new Date(focusedMonth);
@@ -58,7 +61,15 @@
 </script>
 
 <div class="date-picker" use:clickOutside={collapse} bind:this={container}>
-  <TextField {id} value={displayValue} readOnly on:click={toggle} on:blur={blur} />
+  <TextField
+    {id}
+    value={displayValue}
+    {placeholder}
+    readOnly
+    on:click={toggle}
+    on:blur={blur}
+    {error}
+  />
 
   {#if expanded}
     <div class="calendar" transition:scale|local={{ duration: 150, start: 0.9 }}>

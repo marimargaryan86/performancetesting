@@ -13,6 +13,7 @@
   export let id: string | undefined = undefined;
   export let tabIndex = 0;
   export let error = false;
+  export let disabled = false;
 
   let container: HTMLDivElement;
   let itemContainer: HTMLDivElement;
@@ -99,7 +100,7 @@
 >
   <div class="head" on:click={toggle} role="button">
     <slot name="head" {value}>
-      <TextField value={value?.toString() ?? ""} readOnly {placeholder} tabIndex={-1} />
+      <TextField value={value?.toString() ?? ""} readOnly {placeholder} tabIndex={-1} {disabled} />
     </slot>
   </div>
 

@@ -1,4 +1,10 @@
+<script lang="ts" context="module">
+  export type InputEvent = Event & { currentTarget: HTMLInputElement };
+</script>
+
 <script lang="ts">
+  import { createEventDispatcher } from "svelte";
+
   type Type = $$Generic<"email" | "text" | "password" | "number">;
   type Value = Type extends "number" ? number : string;
 
@@ -9,9 +15,18 @@
   export let value: Value | undefined = "" as Value;
   export let type: Type = (typeof value === "number" ? "number" : "text") as Type;
   export let placeholder: string | undefined = undefined;
-  export let error = false;
+  export let error: boolean | string | undefined = undefined;
+  export let maxLength: number | undefined = undefined;
+  export let max: number | undefined = undefined;
 
-  function input(e: Event & { currentTarget: EventTarget & HTMLInputElement }): void {
+  const dispatch = createEventDispatcher<{ input: InputEvent }>();
+
+  $: hasError = !!error;
+  $: errorMessage = typeof error === "string" ? error : undefined;
+
+  function input(e: InputEvent): void {
+    dispatch("input", e);
+
     value = (type === "number" ? Number(e.currentTarget.value) : e.currentTarget.value) as Value;
   }
 </script>
@@ -20,6 +35,8 @@
   on:click
   on:blur
   on:mousedown
+  maxlength={maxLength}
+  {max}
   {type}
   {value}
   {placeholder}
@@ -27,10 +44,14 @@
   {disabled}
   tabindex={tabIndex}
   class="text-field"
-  class:error
+  class:error={hasError}
   on:input={input}
   readonly={readOnly}
 />
+
+{#if errorMessage}
+  <p>{errorMessage}</p>
+{/if}
 
 <style>
   .text-field {
@@ -39,6 +60,7 @@
     border-radius: 10px;
     font-family: Poppins, Arial, Helvetica, sans-serif;
     font-size: 14px;
+    font-weight: 400;
     height: 44px;
     outline: 0;
     padding: 15px 14px;
@@ -53,7 +75,8 @@
     border-color: var(--color-red);
   }
 
-  .text-field.text-field.text-field:focus {
-    border-color: var(--color-teal);
+  p {
+    color: var(--color-red);
+    margin: 4px;
   }
 </style>
