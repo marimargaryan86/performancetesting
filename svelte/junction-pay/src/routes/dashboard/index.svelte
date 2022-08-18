@@ -51,7 +51,6 @@
     display: grid;
     gap: 20px;
     grid-template-columns: 1fr 467px;
-    overflow: auto;
   }
 
   .dashboard > :global(header) {

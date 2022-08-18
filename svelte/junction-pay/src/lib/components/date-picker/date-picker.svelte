@@ -60,7 +60,7 @@
   }
 </script>
 
-<div class="date-picker" use:clickOutside={collapse} bind:this={container}>
+<div class="date-picker" use:clickOutside={collapse} bind:this={container} class:error>
   <TextField
     {id}
     value={displayValue}
@@ -84,9 +84,15 @@
 
 <style>
   .date-picker {
+    border-radius: 10px;
     display: inline-block;
+    font-size: 14px;
     height: 44px;
     position: relative;
+  }
+
+  .date-picker.error {
+    border-color: var(--color-red);
   }
 
   .calendar > :global(button) {
@@ -97,7 +103,10 @@
   }
 
   .date-picker > :global(.text-field) {
+    border-radius: inherit;
+    font-size: inherit;
     height: 100%;
+    width: 100%;
   }
 
   .calendar {

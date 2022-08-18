@@ -1,9 +1,12 @@
 <script lang="ts">
+  import Button from "$lib/components/button.svelte";
   import Radio from "$lib/components/radio.svelte";
+  import Spinner from "$lib/components/spinner.svelte";
   import utils from "$lib/utils";
   import type { AddBeneficiaryBankDetailsCombined } from "$models/beneficiary-models";
   import type { ValidationError } from "$models/common-models";
   import instances from "$services/instances";
+  import { scale } from "svelte/transition";
   import Navigation from "./navigation.svelte";
   import AccountDetails from "./_components/account-details.svelte";
   import CompanyDetails from "./_components/company-details.svelte";
@@ -73,7 +76,16 @@
     {/if}
   </form>
 </div>
-<Navigation goToNext={() => submit()} {goToPrevious} />
+
+<Navigation {goToPrevious}>
+  <Button type="submit" slot="next">
+    Next
+
+    {#if $pending}
+      <Spinner transition={{ func: scale, params: { duration: 150 } }} />
+    {/if}
+  </Button>
+</Navigation>
 
 <style>
   .beneficiary-bank-details {

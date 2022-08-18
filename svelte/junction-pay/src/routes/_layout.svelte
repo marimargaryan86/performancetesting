@@ -12,7 +12,9 @@
     <slot name="head" />
   </Header>
 
-  <slot name="body" />
+  <div class="work-space">
+    <slot name="body" />
+  </div>
 
   {#if $modal.status === "open"}
     <Modal title={$modal.title} type={$modal.type} options={$modal.options} />
@@ -30,5 +32,9 @@
 
   main > :global(.main-menu) {
     grid-row: 1 / -1;
+  }
+
+  .work-space {
+    overflow: auto;
   }
 </style>

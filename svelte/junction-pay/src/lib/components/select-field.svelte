@@ -14,6 +14,7 @@
   export let tabIndex = 0;
   export let error = false;
   export let disabled = false;
+  export let readOnly = false;
 
   let container: HTMLDivElement;
   let itemContainer: HTMLDivElement;
@@ -85,20 +86,23 @@
   use:clickOutside={collapse}
   aria-expanded={partiallyExpanded}
   class:expanded
+  class:read-only={readOnly}
   {id}
   on:blur={blur}
   role="listbox"
-  use:keyBinding={{
-    Enter: toggle,
-    Space: expand,
-    Escape: collapse,
-    ArrowUp: previousItem,
-    ArrowDown: nextItem,
-    Home: () => (value = items[0]),
-    End: () => (value = items[items.length - 1]),
-  }}
+  use:keyBinding={readOnly
+    ? {}
+    : {
+        Enter: toggle,
+        Space: expand,
+        Escape: collapse,
+        ArrowUp: previousItem,
+        ArrowDown: nextItem,
+        Home: () => (value = items[0]),
+        End: () => (value = items[items.length - 1]),
+      }}
 >
-  <div class="head" on:click={toggle} role="button">
+  <div class="head" on:click={readOnly ? undefined : toggle} role="button">
     <slot name="head" {value}>
       <TextField value={value?.toString() ?? ""} readOnly {placeholder} tabIndex={-1} {disabled} />
     </slot>
@@ -142,6 +146,11 @@
     height: 44px;
     outline: 0;
     transition: border-color var(--speed-fast) ease;
+  }
+
+  .select-field.select-field.read-only {
+    background-color: var(--color-gray-lightest);
+    border-color: var(--color-gray-lighter);
   }
 
   .select-field.select-field.error {

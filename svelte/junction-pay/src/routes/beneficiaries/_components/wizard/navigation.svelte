@@ -6,24 +6,27 @@
 </script>
 
 <div class="navigation">
-  {#if goToPrevious}
-    <Button on:click={goToPrevious}>Previous</Button>
-  {:else}
-    <span />
-  {/if}
+  <slot name="previous">
+    {#if goToPrevious}
+      <Button on:click={goToPrevious}>Previous</Button>
+    {:else}
+      <span />
+    {/if}
+  </slot>
 
-  {#if goToNext}
-    <Button on:click={goToNext}>Next</Button>
-  {:else}
-    <span />
-  {/if}
+  <slot name="next">
+    {#if goToNext}
+      <Button on:click={goToNext}>Next</Button>
+    {:else}
+      <span />
+    {/if}
+  </slot>
 </div>
 
 <style>
   .navigation {
     display: flex;
     justify-content: space-between;
-    margin-top: 60px;
   }
 
   .navigation > :global(button) {

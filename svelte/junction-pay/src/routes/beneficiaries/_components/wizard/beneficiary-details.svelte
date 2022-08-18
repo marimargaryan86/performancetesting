@@ -10,6 +10,7 @@
   import type { ValidationError } from "$models/common-models";
   import instances from "$services/instances";
   import { scale } from "svelte/transition";
+  import Navigation from "./navigation.svelte";
 
   export let goToNext: () => void;
 
@@ -106,13 +107,15 @@
   </div>
   <span />
 
-  <Button type="submit">
-    Next
+  <Navigation>
+    <Button type="submit" slot="next">
+      Next
 
-    {#if $pending}
-      <Spinner transition={{ func: scale, params: { duration: 150 } }} />
-    {/if}
-  </Button>
+      {#if $pending}
+        <Spinner transition={{ func: scale, params: { duration: 150 } }} />
+      {/if}
+    </Button>
+  </Navigation>
 </form>
 
 <style>
