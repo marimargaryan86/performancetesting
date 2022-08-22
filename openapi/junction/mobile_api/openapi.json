@@ -14,6 +14,7 @@
       "url": "https://www.snowfalltravel.com"
     }
   },
+  "x-internal": true,
   "x-tagGroups": [
     {
       "name": "Internal",
@@ -150,8 +151,7 @@
           }
         },
         "operationId": "post-trips-searches",
-        "description": "Search trips.",
-        "x-internal": true
+        "description": "Search trips."
       }
     },
     "/trips/searches/{tripSearchId}/trips": {
@@ -527,8 +527,7 @@
           }
         },
         "operationId": "post-payments",
-        "description": "Creates a paymentIntent and a stripe customer if there isn't any for this particular user",
-        "x-internal": true
+        "description": "Creates a paymentIntent and a stripe customer if there isn't any for this particular user"
       }
     },
     "/users/{userId}/orders": {
