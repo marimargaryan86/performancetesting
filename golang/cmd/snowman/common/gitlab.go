@@ -38,13 +38,13 @@ func ParseCommitTitle(title string) (CommitTitle, error) {
 	}, nil
 }
 
-func LikelyFileOwners(client *gitlab.Client, projectId int, path string) ([]int, error) {
+func LikelyFileOwners(client *gitlab.Client, projectId int, path string, branch string) ([]int, error) {
 	owners := make([]int, 0)
 	blame, _, err := client.RepositoryFiles.GetFileBlame(
 		projectId,
 		path,
 		&gitlab.GetFileBlameOptions{
-			Ref: func() *string { b := "main"; return &b }(),
+			Ref: func() *string { b := branch; return &b }(),
 		},
 	)
 

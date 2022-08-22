@@ -134,7 +134,7 @@ func (mr *mergeRequest) expectedReviewers() ([]int, error) {
 			continue
 		}
 
-		owners, err := common.LikelyFileOwners(mr.client, mr.object.ProjectID, c.OldPath)
+		owners, err := common.LikelyFileOwners(mr.client, mr.object.ProjectID, c.OldPath, mr.object.TargetBranch)
 
 		if err != nil {
 			return mr.appendCodeOwners([]int{}, err)
