@@ -1,5 +1,7 @@
 [GLOBAL]
-pants_version = "2.12.0"
+pants_version = "2.13.0rc1"
+use_deprecated_directory_cli_args_semantics = false
+use_deprecated_pex_binary_run_semantics = false
 backend_packages = [
     "pants.backend.codegen.protobuf.lint.buf",
     "pants.backend.codegen.protobuf.python",
@@ -53,7 +55,7 @@ config = "vendor/pyproject.toml"
 report = ["console", "html"]
 
 [docformatter]
-version = "docformatter==1.4"
+version = "docformatter==1.5.0"
 lockfile = "vendor/lock/docformatter.txt"
 args = ["--wrap-summaries", "87", "--wrap-descriptions", "80"]
 interpreter_constraints = ["CPython==3.10.5"]
@@ -89,7 +91,7 @@ lockfile = "vendor/lock/isort.txt"
 interpreter_constraints = ["CPython==3.10.5"]
 
 [mypy]
-version = "mypy==0.961"
+version = "mypy==0.971"
 config = "vendor/setup.cfg"
 lockfile = "vendor/lock/mypy.txt"
 interpreter_constraints = ["CPython==3.10.5"]
@@ -103,13 +105,13 @@ lockfile = "vendor/lock/mypy-protobuf.txt"
 interpreter_constraints = ["CPython==3.10.5"]
 
 [protoc]
-version = "21.2"
+version = "21.5"
 url_platform_mapping = { linux_arm64 = "linux-aarch_64", linux_x86_64 = "linux-x86_64", macos_arm64 = "osx-aarch_64", macos_x86_64 = "osx-x86_64" }
 known_versions = [
-    "21.2|linux_arm64 |953beb8aade43f55a6f8e0aef5314236582c5cc2712d90a09221dd0bc35da71e|1578739",
-    "21.2|linux_x86_64|997dfc13189bd0af1051cbc026a095a520e171fbeb0e7460f959ae236b00aa2e|1583228",
-    "21.2|macos_arm64 |04d79d6c1da178d38867486a861bc878f5daaa084bd5697110abd27460d1112a|1357982",
-    "21.2|macos_x86_64|b791ee763faad751505680fa8d2935af37ba014184354df6db4268cb413bc6a1|1494401",
+    "21.5|linux_arm64 |60744ee6be123f86921c86d83d0060a7261410e246eca9e7a5c195100a89d391|1581318",
+    "21.5|linux_x86_64|92fb4f5066a6f7b870e09c73115a2c861852af8f6555d8da9955fdb80710bf7f|1585173",
+    "21.5|macos_arm64 |b22aed8dce62656687c6c4a323aab4e6baf1cb81ee423e77bc671bd69679e2c3|1360448",
+    "21.5|macos_x86_64|495d86aaaf5e8b536fbf04471ee9d7b21addeee5f1e949742c67bd09bb59c890|1496925",
 ]
 
 [pytest]
@@ -127,6 +129,7 @@ extra_requirements = [
 lockfile_generator = "pex"
 interpreter_constraints = ["CPython==3.10.5"]
 enable_resolves = true
+tailor_pex_binary_targets = false
 resolves = {python-default = "vendor/lock/constraints.txt"}
 
 [python-protobuf]

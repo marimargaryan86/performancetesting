@@ -27,10 +27,15 @@ class ReverseGeocoder(object):
         ).alpha_2
 
     async def get_time_zone(self, latitude: float, longitude: float) -> str:
-        return self._tz_finder.timezone_at(
+        time_zone = self._tz_finder.timezone_at(
             lat=latitude,
             lng=longitude,
         )
+
+        if not time_zone:
+            raise RuntimeError("Unable to determine time zone")
+
+        return time_zone
 
     async def _country_lookup(self, latitude: float, longitude: float) -> str:
         for lookup in self._country_lookup_funcs:

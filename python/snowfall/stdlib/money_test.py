@@ -12,6 +12,7 @@ from snowfall.stdlib import money
         (666, "JPY", "666"),
         (666, "JOD", "0.666"),
         (-175, "USD", "-1.75"),
+        (10, "XAU", "10"),
     ],
 )
 def test_to_and_from_string(amount: int, currency: str, string_value: str) -> None:

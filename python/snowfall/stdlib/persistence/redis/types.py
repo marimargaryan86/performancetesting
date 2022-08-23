@@ -56,7 +56,7 @@ class List(Generic[AnyStr]):
             stop = start + chunk
             list_values = await self._redis.lrange(self._name, start, stop)
 
-            for list_value in list_values:  # noqa: SIM104
+            for list_value in list_values:
                 yield list_value
 
             start = stop
@@ -79,7 +79,7 @@ class Set(Generic[AnyStr]):
         while True:
             cursor, keys = await self._redis.sscan(name=self._name, cursor=cursor)
 
-            for key in keys:  # noqa: SIM104
+            for key in keys:
                 yield key
 
             if cursor == 0:

@@ -57,13 +57,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "2d27e3784d7a565d36ab851fe94887c5eccd6a463168875832a1be79c82828b4",
-              "url": "https://files.pythonhosted.org/packages/be/be/7abce643bfdf8ca01c48afa2ddf8308c2308b0c3b239a44e57d020afa0ef/attrs-21.4.0-py2.py3-none-any.whl"
+              "hash": "86efa402f67bf2df34f51a335487cf46b1ec130d02b8d39fd248abfd30da551c",
+              "url": "https://files.pythonhosted.org/packages/f2/bc/d817287d1aa01878af07c19505fafd1165cd6a119e9d0821ca1d1c20312d/attrs-22.1.0-py2.py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "626ba8234211db98e869df76230a137c4c40a12d72445c45d5f5b716f076e2fd",
-              "url": "https://files.pythonhosted.org/packages/d7/77/ebb15fc26d0f815839ecd897b919ed6d85c050feeb83e100e020df9153d2/attrs-21.4.0.tar.gz"
+              "hash": "29adc2665447e5191d0e7c568fde78b21f9672d344281d0c6e1ab085429b22b6",
+              "url": "https://files.pythonhosted.org/packages/1a/cb/c4ffeb41e7137b23755a45e1bfec9cbb76ecf51874c6f1d113984ecaa32c/attrs-22.1.0.tar.gz"
             }
           ],
           "project_name": "attrs",
@@ -79,9 +79,9 @@
             "hypothesis; extra == \"dev\"",
             "hypothesis; extra == \"tests\"",
             "hypothesis; extra == \"tests_no_zope\"",
-            "mypy; extra == \"dev\"",
-            "mypy; extra == \"tests\"",
-            "mypy; extra == \"tests_no_zope\"",
+            "mypy!=0.940,>=0.900; extra == \"dev\"",
+            "mypy!=0.940,>=0.900; extra == \"tests\"",
+            "mypy!=0.940,>=0.900; extra == \"tests_no_zope\"",
             "pre-commit; extra == \"dev\"",
             "pympler; extra == \"dev\"",
             "pympler; extra == \"tests\"",
@@ -92,9 +92,6 @@
             "pytest>=4.3.0; extra == \"dev\"",
             "pytest>=4.3.0; extra == \"tests\"",
             "pytest>=4.3.0; extra == \"tests_no_zope\"",
-            "six; extra == \"dev\"",
-            "six; extra == \"tests\"",
-            "six; extra == \"tests_no_zope\"",
             "sphinx-notfound-page; extra == \"dev\"",
             "sphinx-notfound-page; extra == \"docs\"",
             "sphinx; extra == \"dev\"",
@@ -103,8 +100,8 @@
             "zope.interface; extra == \"docs\"",
             "zope.interface; extra == \"tests\""
           ],
-          "requires_python": "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7",
-          "version": "21.4"
+          "requires_python": ">=3.5",
+          "version": "22.1"
         },
         {
           "artifacts": [
@@ -139,24 +136,6 @@
           ],
           "requires_python": ">=3.7",
           "version": "1.7.4"
-        },
-        {
-          "artifacts": [
-            {
-              "algorithm": "sha256",
-              "hash": "854bf444933e37f5824ae7bfc1e98d5bce2ebe4160d46b5edf346a89358e99da",
-              "url": "https://files.pythonhosted.org/packages/77/8b/7550e87b2d308a1b711725dfaddc19c695f8c5fa413c640b2be01662f4e6/colorama-0.4.5-py2.py3-none-any.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "e6c6b4334fc50988a639d9b98aa429a0b57da6e17b9a44f0451f930b6967b7a4",
-              "url": "https://files.pythonhosted.org/packages/2b/65/24d033a9325ce42ccbfa3ca2d0866c7e89cc68e5b9d92ecaba9feef631df/colorama-0.4.5.tar.gz"
-            }
-          ],
-          "project_name": "colorama",
-          "requires_dists": [],
-          "requires_python": "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7",
-          "version": "0.4.5"
         },
         {
           "artifacts": [
@@ -239,23 +218,23 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "84f46de2964cb18fccea968d9eafce7cf857e34d913d515120795b9af6498d56",
-              "url": "https://files.pythonhosted.org/packages/c6/cb/3857733e2ea309cdc0851b55e1b006955538bf4e7266e4fbe53dba9eb40b/flake8_annotations-2.9.0-py3-none-any.whl"
+              "hash": "a4385158a7a9fc8af1d8820a2f4c8d03387997006a83f5f8bfe5bc6085bdf88a",
+              "url": "https://files.pythonhosted.org/packages/f6/dc/ee0cfd300f22f169d42fd951c4a44840041f777987de8c56f861be5faefd/flake8_annotations-2.9.1-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "63fb3f538970b6a8dfd84125cf5af16f7b22e52d5032acb3b7eb23645ecbda9b",
-              "url": "https://files.pythonhosted.org/packages/72/ac/15eb0053ac0f39861f78dabb872c66c136f8828f3b0da8f12de36acb81d2/flake8-annotations-2.9.0.tar.gz"
+              "hash": "11f09efb99ae63c8f9d6b492b75fe147fbc323179fddfe00b2e56eefeca42f57",
+              "url": "https://files.pythonhosted.org/packages/5f/d4/ed8d8e72c784dcb61df1dab7cbce61fcb3b6cd1191f60e006053e6f52925/flake8-annotations-2.9.1.tar.gz"
             }
           ],
           "project_name": "flake8-annotations",
           "requires_dists": [
-            "attrs<22.0,>=21.4",
+            "attrs>=21.4",
             "flake8>=3.7",
             "typed-ast<2.0,>=1.4; python_version < \"3.8\""
           ],
           "requires_python": "<4.0,>=3.7",
-          "version": "2.9"
+          "version": "2.9.1"
         },
         {
           "artifacts": [
@@ -437,24 +416,24 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "00d77faefb64cef18b3c1b48a004c3a2ad663aa3cf85650f422437d25ece6441",
-              "url": "https://files.pythonhosted.org/packages/31/98/00a35ed84c6b7c53d7e32d23c84a71df4dd2d30185aa346b1470d8b182c7/flake8_eradicate-1.2.1-py3-none-any.whl"
+              "hash": "85a71e0c5f4e07f7c6c5fec520483561fd6bd295417d622855bdeade99242e3d",
+              "url": "https://files.pythonhosted.org/packages/f1/97/0663c057ff273d37436737c21ed6afde59679eff93c8d8aca4d08ec8c3c6/flake8_eradicate-1.3.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "e486f8ab7e2dba3667223688e9239158fbf4ecaa88125e2283bcda81171412b7",
-              "url": "https://files.pythonhosted.org/packages/33/27/2a58933e975b76846c88c7ce4068eadca89c9e55ee57c55c0b97b6b3ffe6/flake8-eradicate-1.2.1.tar.gz"
+              "hash": "e4c98f00d17dc8653e3388cac2624cd81e9735de2fd4a8dcf99029633ebd7a63",
+              "url": "https://files.pythonhosted.org/packages/f7/4d/7ce475bde22d09b5deca73b83b22d7675e0887cedc9ba7fc1ee9022a56dc/flake8-eradicate-1.3.0.tar.gz"
             }
           ],
           "project_name": "flake8-eradicate",
           "requires_dists": [
             "attrs",
             "eradicate<3.0,>=2.0",
-            "flake8<5,>=3.5",
+            "flake8<6,>=3.5",
             "setuptools"
           ],
           "requires_python": "<4.0,>=3.6",
-          "version": "1.2.1"
+          "version": "1.3"
         },
         {
           "artifacts": [
@@ -500,88 +479,95 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "c4e8b6dcb7be9b71a02e6e5d4196cefcef0f3447be51e82730fb336fff164949",
-              "url": "https://files.pythonhosted.org/packages/da/92/c469d5773b89229bea01f3743cfcb7f6330b7826f874e7d3e4e215bb007a/flake8_isort-4.1.1-py3-none-any.whl"
+              "hash": "5b87630fb3719bf4c1833fd11e0d9534f43efdeba524863e15d8f14a7ef6adbf",
+              "url": "https://files.pythonhosted.org/packages/4f/be/c9901caff0d1b8b4c427a655c75ff0dd6297e9adb1f2fa3f790306168c76/flake8_isort-4.2.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "d814304ab70e6e58859bc5c3e221e2e6e71c958e7005239202fee19c24f82717",
-              "url": "https://files.pythonhosted.org/packages/cc/57/ff77211417cf7ddcf8a21b15e8e2acbe887ba40a71a3215679aeccf78214/flake8-isort-4.1.1.tar.gz"
+              "hash": "26571500cd54976bbc0cf1006ffbcd1a68dd102f816b7a1051b219616ba9fee0",
+              "url": "https://files.pythonhosted.org/packages/1f/a8/760dfaebdcde7de0dc0a7d0683e15bf4bf5bf967499d4cf5faebfabb166b/flake8-isort-4.2.0.tar.gz"
             }
           ],
           "project_name": "flake8-isort",
           "requires_dists": [
-            "flake8<5,>=3.2.1",
+            "flake8<6,>=3.2.1",
             "isort<6,>=4.3.5",
-            "pytest-cov; extra == \"test\"",
-            "testfixtures<7,>=6.8.0"
+            "pytest-cov; extra == \"test\""
           ],
           "requires_python": null,
-          "version": "4.1.1"
+          "version": "4.2"
         },
         {
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "ca5f2b7fc31c3474a0aa77d227e022890f641a025f0ba664418797d979a779f8",
-              "url": "https://files.pythonhosted.org/packages/72/ad/4bf4d21330138e216c416e0195fa63a5b598100f17e49a284e8da2108b83/flake8-logging-format-0.6.0.tar.gz"
+              "hash": "54f7e349c934ce5c594f251885bc2240e99f6b48752a672a8fc7e3d1388352bb",
+              "url": "https://files.pythonhosted.org/packages/e4/12/7478d1c3a2d4eb4c9b28a6ab4b9d8c7e46124dcd16e9f59af6bd042ec2a3/flake8-logging-format-0.7.5.tar.gz"
             }
           ],
           "project_name": "flake8-logging-format",
-          "requires_dists": [],
+          "requires_dists": [
+            "PyHamcrest; extra == \"test\"",
+            "flake8; extra == \"lint\"",
+            "pytest-cov; extra == \"test\"",
+            "pytest; extra == \"test\""
+          ],
           "requires_python": null,
-          "version": "0.6"
+          "version": "0.7.5"
         },
         {
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "66abe96d181629d02c13efb8ab8a7fc8cf669729e342eed39c115a93f04e958b",
-              "url": "https://files.pythonhosted.org/packages/43/b9/f9dc61a97574a9b8fd7a0d3fbe1ee967843846e151b95de5c7613eac1e98/flake8_noqa-1.2.5-py3-none-any.whl"
+              "hash": "445618162e0bbae1b9d983326d4e39066c5c6de71ba0c444ca2d4d1fa5b2cdb7",
+              "url": "https://files.pythonhosted.org/packages/be/37/40046b8b7e8e1c03a18c4a597940d2ad9dee4c8e817ffc9ee22fad638260/flake8_noqa-1.2.9-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "dff6a04d73711ce1947af657ad95b9878a20cafd2438c0cfd5b41cb0e2a97067",
-              "url": "https://files.pythonhosted.org/packages/80/19/410c81df0662a04f30ddbb2682bdeeb9d6c470e695ae96e7c13769303e3c/flake8-noqa-1.2.5.tar.gz"
+              "hash": "26d92ca6b72dec732d294e587a2bdeb66dab01acc609ed6a064693d6baa4e789",
+              "url": "https://files.pythonhosted.org/packages/a1/83/9d09d6bb3f8a2437496ff51f3b8dac04b829f6111fbbcff362624ad151e2/flake8-noqa-1.2.9.tar.gz"
             }
           ],
           "project_name": "flake8-noqa",
           "requires_dists": [
             "flake8-annotations; extra == \"dev\"",
+            "flake8-bandit; extra == \"dev\"",
             "flake8-bugbear; extra == \"dev\"",
             "flake8-commas; extra == \"dev\"",
+            "flake8-comprehensions; extra == \"dev\"",
             "flake8-continuation; extra == \"dev\"",
             "flake8-datetimez; extra == \"dev\"",
             "flake8-docstrings; extra == \"dev\"",
-            "flake8-docstrings; extra == \"test\"",
             "flake8-import-order; extra == \"dev\"",
             "flake8-literal; extra == \"dev\"",
+            "flake8-modern-annotations; extra == \"dev\"",
+            "flake8-noqa; extra == \"dev\"",
             "flake8-polyfill; extra == \"dev\"",
-            "flake8-postponed-annotations; extra == \"dev\"",
+            "flake8-requirements; extra == \"dev\"",
             "flake8-tabs; extra == \"dev\"",
             "flake8-typechecking-import; extra == \"dev\"",
-            "flake8; extra == \"dev\"",
-            "flake8<5.0,>=3.8.0",
+            "flake8-use-fstring; extra == \"dev\"",
+            "flake8<5.0,>=3.8.0; extra == \"dev\"",
+            "flake8<6.0,>=3.8.0",
+            "importlib-metadata<5.0.0,>=4.0.0; python_version < \"3.8.0\"",
             "mypy; extra == \"dev\"",
             "pep8-naming; extra == \"dev\"",
-            "setuptools",
-            "types-setuptools; extra == \"dev\"",
-            "typing-extensions<5.0,>=3.7.4.2"
+            "typing-extensions>=3.7.4.2"
           ],
           "requires_python": ">=3.7",
-          "version": "1.2.5"
+          "version": "1.2.9"
         },
         {
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "47fd9d232b419f8db7a6465dee95cc24b385b1b8bdfd62b65250d70eaa06fc89",
-              "url": "https://files.pythonhosted.org/packages/5d/60/756f5b9c5b2520d274cc60fe92b694d913ade6ce8a5b0c9226198a0045ce/flake8_pie-0.15.0-py3-none-any.whl"
+              "hash": "24cd7849b0eee22e2328b9e9d2a1dea40013b0a3106864bbadd06a4b05dbb71f",
+              "url": "https://files.pythonhosted.org/packages/83/4c/e953c2402b663155525faba5315df8abe6c02ea7f989cbf43327f5088fc3/flake8_pie-0.16.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "a2d1e67a374d925f688300e9d0e202d1827a0d91e0a11114f712beee639bdc7c",
-              "url": "https://files.pythonhosted.org/packages/78/3e/551da9887bf97c8d5d553e8113a1ccefb5530c61657b1af0936e8c7725c4/flake8-pie-0.15.0.tar.gz"
+              "hash": "b8dcb7b92706fa33d05d92a4b3e49b7a9fd3f0041849166275b646ba50e515ba",
+              "url": "https://files.pythonhosted.org/packages/ae/11/cebfe54fda9897188ca40d1cd755d1be13908ceedfea9e500fae162f06a9/flake8-pie-0.16.0.tar.gz"
             }
           ],
           "project_name": "flake8-pie",
@@ -589,7 +575,7 @@
             "typing_extensions"
           ],
           "requires_python": ">=3.7",
-          "version": "0.15"
+          "version": "0.16"
         },
         {
           "artifacts": [
@@ -669,13 +655,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "a7a9bd9008e763339b2e19dbece7767ac0887cfaeaf9a70b12eb4449d5df1849",
-              "url": "https://files.pythonhosted.org/packages/1a/c9/a8043561bb406bada92d6407a24a8b728de3fe433e930c067757c5175e1e/flake8_rst_docstrings-0.2.6-py3-none-any.whl"
+              "hash": "5d56075dce360bcc9c6775bfe7cb431aa395de600ca7e8d40580a28d50b2a803",
+              "url": "https://files.pythonhosted.org/packages/cf/1f/dd8b059874f964febd2425b6e18d8d117bb0b56237d77acd9f50c018f587/flake8_rst_docstrings-0.2.7-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "7d9526a264a1c2827b3408ea5f921f12ee0689ac123fecfa95744988aea02e6c",
-              "url": "https://files.pythonhosted.org/packages/a1/bd/0b26c47d0191363d76897c0f4cde0ac9374a855c2477f9647caaa35f5f57/flake8-rst-docstrings-0.2.6.tar.gz"
+              "hash": "2740067ab9237559dd45a3434d8c987792c7b259ca563621a3b95efe201f5382",
+              "url": "https://files.pythonhosted.org/packages/17/37/842c73999165d14c3172b29be96787a61a53463e9d478535a22add3b69bd/flake8-rst-docstrings-0.2.7.tar.gz"
             }
           ],
           "project_name": "flake8-rst-docstrings",
@@ -685,19 +671,19 @@
             "restructuredtext-lint"
           ],
           "requires_python": ">=3.7",
-          "version": "0.2.6"
+          "version": "0.2.7"
         },
         {
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "9c1e96ba738f9057a561697d67df7a9058898ac6313a67eda09942255cba6d38",
-              "url": "https://files.pythonhosted.org/packages/48/12/92d0086eb0c7201091e215780b587c6b57c7c1feaa53f422b6330387ec63/flake8_simplify-0.19.2-py3-none-any.whl"
+              "hash": "1057320e9312d75849541fee822900d27bcad05b2405edc84713affee635629e",
+              "url": "https://files.pythonhosted.org/packages/30/3f/7ec818e7404edbda0d86c918de6022725d2ebfa4382e3e2bdb85236e772e/flake8_simplify-0.19.3-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "a30ef76bf1c0cb89a52a8a5cee37667688e61a66735e997c08d56cd002f9e3e9",
-              "url": "https://files.pythonhosted.org/packages/5a/31/d05179feb108a25fca7e80586d0562ca8c7e5109b2308ade86e8484e3b56/flake8_simplify-0.19.2.tar.gz"
+              "hash": "2fb083bf5142a98d9c9554755cf2f56f8926eb4a33eae30c0809041b1546879e",
+              "url": "https://files.pythonhosted.org/packages/4f/ac/f48f7df445a8706ba2b34014dcb58a1d4f7f10e2f6126094c6069627bcfb/flake8_simplify-0.19.3.tar.gz"
             }
           ],
           "project_name": "flake8-simplify",
@@ -707,7 +693,7 @@
             "importlib-metadata>=0.9; python_version < \"3.8\""
           ],
           "requires_python": ">=3.6.1",
-          "version": "0.19.2"
+          "version": "0.19.3"
         },
         {
           "artifacts": [
@@ -837,19 +823,19 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "e547125940bcc052856ded43be8e101f63828c2d94239ffbe2b327ba3d5ccf0a",
-              "url": "https://files.pythonhosted.org/packages/1b/ef/0621aa0e422dda72dc89b61972e5a28d5a947c22fdff83a5d69fdbc1949a/pbr-5.9.0-py2.py3-none-any.whl"
+              "hash": "da3e18aac0a3c003e9eea1a81bd23e5a3a75d745670dcf736317b7d966887fdf",
+              "url": "https://files.pythonhosted.org/packages/88/fb/c7958b2d571c7b15091b8574a727ad14328e8de590644198e57de9b5ee57/pbr-5.10.0-py2.py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "e8dca2f4b43560edef58813969f52a56cef023146cbb8931626db80e6c1c4308",
-              "url": "https://files.pythonhosted.org/packages/96/9f/f4bc832eeb4ae723b86372277da56a5643b0ad472a95314e8f516a571bb0/pbr-5.9.0.tar.gz"
+              "hash": "cfcc4ff8e698256fc17ea3ff796478b050852585aa5bae79ecd05b2ab7b39b9a",
+              "url": "https://files.pythonhosted.org/packages/b4/40/4c5d3681b141a10c24c890c28345fac915dd67f34b8c910df7b81ac5c7b3/pbr-5.10.0.tar.gz"
             }
           ],
           "project_name": "pbr",
           "requires_dists": [],
           "requires_python": ">=2.6",
-          "version": "5.9"
+          "version": "5.10"
         },
         {
           "artifacts": [
@@ -933,36 +919,28 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "dc9c10fb40944260f6ed4c688ece0cd2048414940f1cea51b8b226318411c519",
-              "url": "https://files.pythonhosted.org/packages/5c/8e/1d9017950034297fffa336c72e693a5b51bbf85141b24a763882cf1977b5/Pygments-2.12.0-py3-none-any.whl"
+              "hash": "f643f331ab57ba3c9d89212ee4a2dabc6e94f117cf4eefde99a0574720d14c42",
+              "url": "https://files.pythonhosted.org/packages/4f/82/672cd382e5b39ab1cd422a672382f08a1fb3d08d9e0c0f3707f33a52063b/Pygments-2.13.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "5eb116118f9612ff1ee89ac96437bb6b49e8f04d8a13b514ba26f620208e26eb",
-              "url": "https://files.pythonhosted.org/packages/59/0f/eb10576eb73b5857bc22610cdfc59e424ced4004fe7132c8f2af2cc168d3/Pygments-2.12.0.tar.gz"
+              "hash": "56a8508ae95f98e2b9bdf93a6be5ae3f7d8af858b43e02c5a2ff083726be40c1",
+              "url": "https://files.pythonhosted.org/packages/e0/ef/5905cd3642f2337d44143529c941cc3a02e5af16f0f65f81cbef7af452bb/Pygments-2.13.0.tar.gz"
             }
           ],
           "project_name": "pygments",
-          "requires_dists": [],
+          "requires_dists": [
+            "importlib-metadata; python_version < \"3.8\" and extra == \"plugins\""
+          ],
           "requires_python": ">=3.6",
-          "version": "2.12"
+          "version": "2.13"
         },
         {
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "daf496c58a8c52083df09b80c860005194014c3698698d1a57cbcfa182142a3a",
-              "url": "https://files.pythonhosted.org/packages/b7/09/2f6f4851bbca08642fef087bade095edc3c47f28d1e7bff6b20de5262a77/PyYAML-6.0-cp310-cp310-win_amd64.whl"
-            },
-            {
-              "algorithm": "sha256",
               "hash": "f84fbc98b019fef2ee9a1cb3ce93e3187a6df0b2538a651bfb890254ba9f90b5",
               "url": "https://files.pythonhosted.org/packages/02/25/6ba9f6bb50a3d4fbe22c1a02554dc670682a07c8701d1716d19ddea2c940/PyYAML-6.0-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "2cd5df3de48857ed0544b34e2d40e9fac445930039f3cfe4bcc592a1f836d513",
-              "url": "https://files.pythonhosted.org/packages/0f/93/5f81d1925ce3b531f5ff215376445ec220887cd1c9a8bde23759554dbdfd/PyYAML-6.0-cp310-cp310-win32.whl"
             },
             {
               "algorithm": "sha256",
@@ -1014,13 +992,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "db3b8e2f922b2a910a29804776c643ea609badb6a32c4bcc226fd4fd902cce65",
-              "url": "https://files.pythonhosted.org/packages/ae/7f/6d816941769a7783be4258dd35e28bbf1a64bb36b1b7e0c773eff07fb0a8/setuptools-63.1.0-py3-none-any.whl"
+              "hash": "a3ca5857c89f82f5c9410e8508cb32f4872a3bafd4aa7ae122a24ca33bccc750",
+              "url": "https://files.pythonhosted.org/packages/e5/6f/942e63ec2a5c881df147782b97dc4715ca082dec9de41f43e1013faef710/setuptools-65.2.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "16923d366ced322712c71ccb97164d07472abeecd13f3a6c283f6d5d26722793",
-              "url": "https://files.pythonhosted.org/packages/67/25/42e2d6664c3e106c33ecad8356a55e3ae5d81708c89098061a97fbff7cee/setuptools-63.1.0.tar.gz"
+              "hash": "7f4bc85450898a09f76ebf28b72fa25bc7111f6c7d665d514a60bba9c75ef2a9",
+              "url": "https://files.pythonhosted.org/packages/15/a7/b4cab9eca586ed17c66b3aced23ccf945312c50742614039d0cd71c870bd/setuptools-65.2.0.tar.gz"
             }
           ],
           "project_name": "setuptools",
@@ -1030,6 +1008,7 @@
             "filelock>=3.4.0; extra == \"testing\"",
             "filelock>=3.4.0; extra == \"testing-integration\"",
             "flake8-2020; extra == \"testing\"",
+            "flake8<5; extra == \"testing\"",
             "furo; extra == \"docs\"",
             "ini2toml[lite]>=0.9; extra == \"testing\"",
             "jaraco.envs>=2.2; extra == \"testing\"",
@@ -1056,7 +1035,9 @@
             "pytest>=6; extra == \"testing\"",
             "rst.linker>=1.9; extra == \"docs\"",
             "sphinx-favicon; extra == \"docs\"",
+            "sphinx-hoverxref<2; extra == \"docs\"",
             "sphinx-inline-tabs; extra == \"docs\"",
+            "sphinx-notfound-page==0.8.3; extra == \"docs\"",
             "sphinx-reredirects; extra == \"docs\"",
             "sphinx; extra == \"docs\"",
             "sphinxcontrib-towncrier; extra == \"docs\"",
@@ -1068,7 +1049,7 @@
             "wheel; extra == \"testing-integration\""
           ],
           "requires_python": ">=3.7",
-          "version": "63.1"
+          "version": "65.2"
         },
         {
           "artifacts": [
@@ -1110,60 +1091,21 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "a547de73308fd7e90075bb4d301405bebf705292fa90a90fc3bcf9133f58616c",
-              "url": "https://files.pythonhosted.org/packages/7a/bc/fcce9e50da73ea23af6d236e05e15db8a02da1099a5e0a479451bcea3833/stevedore-3.5.0-py3-none-any.whl"
+              "hash": "87e4d27fe96d0d7e4fc24f0cbe3463baae4ec51e81d95fbe60d2474636e0c7d8",
+              "url": "https://files.pythonhosted.org/packages/d5/f7/7593812b0687e8aaf01b10f7f07bf59e5a6bbfcd9d657cefdeb48a72cd06/stevedore-4.0.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "f40253887d8712eaa2bb0ea3830374416736dc8ec0e22f5a65092c1174c44335",
-              "url": "https://files.pythonhosted.org/packages/67/73/cd693fde78c3b2397d49ad2c6cdb082eb0b6a606188876d61f53bae16293/stevedore-3.5.0.tar.gz"
+              "hash": "f82cc99a1ff552310d19c379827c2c64dd9f85a38bcd5559db2470161867b786",
+              "url": "https://files.pythonhosted.org/packages/f5/70/7953626fd19faa7a0852779c1949650e825f650ee6060f68658a84584c26/stevedore-4.0.0.tar.gz"
             }
           ],
           "project_name": "stevedore",
           "requires_dists": [
-            "importlib-metadata>=1.7.0; python_version < \"3.8\"",
             "pbr!=2.1.0,>=2.0.0"
           ],
-          "requires_python": ">=3.6",
-          "version": "3.5"
-        },
-        {
-          "artifacts": [
-            {
-              "algorithm": "sha256",
-              "hash": "7de200e24f50a4a5d6da7019fb1197aaf5abd475efb2ec2422fdcf2f2eb98c1d",
-              "url": "https://files.pythonhosted.org/packages/51/4a/0a7ecce32e82affce0ce7381955fa379779007033cd72e9bf3e50a0d31e8/testfixtures-6.18.5-py2.py3-none-any.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "02dae883f567f5b70fd3ad3c9eefb95912e78ac90be6c7444b5e2f46bf572c84",
-              "url": "https://files.pythonhosted.org/packages/b1/87/d2e5ba12f5a429327f415ddb38ec4bd712ac8ea1c4047fe21b7729fbfbe3/testfixtures-6.18.5.tar.gz"
-            }
-          ],
-          "project_name": "testfixtures",
-          "requires_dists": [
-            "django; python_version >= \"3\" and extra == \"docs\"",
-            "django; python_version >= \"3\" and extra == \"test\"",
-            "django<2; python_version < \"3\" and extra == \"docs\"",
-            "django<2; python_version < \"3\" and extra == \"test\"",
-            "mock; python_version < \"3\" and extra == \"docs\"",
-            "mock; python_version < \"3\" and extra == \"test\"",
-            "pytest-cov; extra == \"test\"",
-            "pytest-django; extra == \"test\"",
-            "pytest>=3.6; extra == \"test\"",
-            "setuptools-git; extra == \"build\"",
-            "sphinx; extra == \"docs\"",
-            "sybil; extra == \"docs\"",
-            "sybil; extra == \"test\"",
-            "twine; extra == \"build\"",
-            "twisted; extra == \"docs\"",
-            "twisted; extra == \"test\"",
-            "wheel; extra == \"build\"",
-            "zope.component; extra == \"docs\"",
-            "zope.component; extra == \"test\""
-          ],
-          "requires_python": null,
-          "version": "6.18.5"
+          "requires_python": ">=3.8",
+          "version": "4"
         },
         {
           "artifacts": [
@@ -1223,15 +1165,11 @@
           "version": "0.16.1"
         }
       ],
-      "platform_tag": [
-        "cp310",
-        "cp310",
-        "macosx_12_0_arm64"
-      ]
+      "platform_tag": null
     }
   ],
   "path_mappings": {},
-  "pex_version": "2.1.90",
+  "pex_version": "2.1.102",
   "prefer_older_binary": false,
   "requirements": [
     "flake8-annotations",
@@ -1253,6 +1191,10 @@
   ],
   "resolver_version": "pip-2020-resolver",
   "style": "universal",
+  "target_systems": [
+    "linux",
+    "mac"
+  ],
   "transitive": true,
   "use_pep517": null
 }

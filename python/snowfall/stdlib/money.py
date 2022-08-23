@@ -12,13 +12,18 @@ Currency = iso4217.Currency
 
 
 @functools.cache
+def _int_exponent(currency: Currency) -> int:
+    return currency.exponent or 0
+
+
+@functools.cache
 def _exponent(currency: Currency) -> int:
-    return 10**currency.exponent
+    return 10 ** _int_exponent(currency)
 
 
 @functools.cache
 def _nano_exponent(currency: Currency) -> int:
-    return 10 ** (9 - currency.exponent)
+    return 10 ** (9 - _int_exponent(currency))
 
 
 @dataclasses.dataclass(frozen=True)
@@ -27,7 +32,7 @@ class Money(object):
     currency: Currency
 
     def __str__(self) -> str:
-        if self.currency.exponent == 0:
+        if _int_exponent(self.currency) == 0:
             return "{symbol}{unit}".format(
                 symbol="-" if self.amount < 0 else "",
                 unit=abs(self.amount) // _exponent(self.currency),
@@ -37,7 +42,7 @@ class Money(object):
             symbol="-" if self.amount < 0 else "",
             unit=abs(self.amount) // _exponent(self.currency),
             subunit=abs(self.amount) % _exponent(self.currency),
-            width=self.currency.exponent,
+            width=_int_exponent(self.currency),
         )
 
     def add(self, money: Money) -> Money:
@@ -76,13 +81,13 @@ def from_string(
     separator: str = ".",
 ) -> Money:
     string_amount = string_amount.replace(separator, ".")
-    rounded_amount = str(round(float(string_amount), currency.exponent))
+    rounded_amount = str(round(float(string_amount), _int_exponent(currency)))
     parts = rounded_amount.split(".", 1)
     units = int(parts[0])
     amount = abs(units) * _exponent(currency)
 
     with contextlib.suppress(IndexError):
-        amount += int(parts[1].ljust(currency.exponent, "0"))
+        amount += int(parts[1].ljust(_int_exponent(currency), "0"))
 
     return Money(
         amount=-amount if units < 0 else amount,
