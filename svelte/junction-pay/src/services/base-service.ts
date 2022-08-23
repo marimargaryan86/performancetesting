@@ -1,4 +1,4 @@
-import localStorage from "$lib/storage";
+import storage from "$lib/storage";
 import type { ValidationError } from "$models/common-models";
 import config from "$src/config";
 
@@ -20,7 +20,7 @@ export default abstract class BaseService {
     let expiresAt: Date;
 
     try {
-      ({ value: apiKey, expiresAt } = localStorage.get(
+      ({ value: apiKey, expiresAt } = storage.local.get(
         "cc_api_key",
         (value: { value: string; expiresAt: Date }) => ({
           ...value,
@@ -52,7 +52,7 @@ export default abstract class BaseService {
     expiresAt = new Date();
     expiresAt.setTime(expiresAt.getTime() + 1800000);
 
-    localStorage.put("cc_api_key", { value: apiKey, expiresAt });
+    storage.local.put("cc_api_key", { value: apiKey, expiresAt });
 
     return apiKey;
   }

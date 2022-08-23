@@ -1,6 +1,6 @@
 <script lang="ts">
   import Wizard from "$lib/components/wizard.svelte";
-  import persistentStore from "$lib/persistentStore";
+  import persistentStore from "$lib/persistent-store";
   import type {
     BeneficiaryData,
     CompanyDetailsData,
