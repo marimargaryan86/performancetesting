@@ -33,6 +33,10 @@ from snowfall.plugin.flake8 import plugin
             "typing.Union",
         ],
         [
+            "_: {request}",
+            "typing.Set",
+        ],
+        [
             "_: None",
             "None",
         ],

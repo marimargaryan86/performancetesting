@@ -17,6 +17,8 @@ def resolve_fullname(node: ast.AST) -> str:
             fullname = "typing.Union"
         case ast.Constant():
             fullname = str(node.value)
+        case ast.Set():
+            fullname = "typing.Set"
         case _:
             raise RuntimeError(
                 "{0} on {1}:{2} is not a resolvable type".format(
