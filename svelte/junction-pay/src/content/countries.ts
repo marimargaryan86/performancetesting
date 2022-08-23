@@ -1,4 +1,4 @@
-import type { Country } from "$models/beneficiary-models";
+import type { Country } from "$models/location-models";
 
 const countries: Country[] = [
   { name: "Sweden", currencyCode: "SEK" },

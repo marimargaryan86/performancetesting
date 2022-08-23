@@ -1,28 +1,25 @@
 import { writable as svelteWritable, type Writable } from "svelte/store";
 import storage, { type StorageType } from "./storage";
 
-function getWritable(
-  storageType: StorageType,
-): <TValue, TRaw = unknown>(
+type PersistentStore<TValue> = Writable<TValue> & { reset: () => void };
+type GetWritableReturnType = <TValue>(
   id: string,
-  value?: TValue,
-  deserialize?: (value: TRaw) => TValue,
-) => Writable<TValue> {
-  return <TValue, TRaw>(
+  valueGenerator: () => TValue,
+  deserialize?: (value: TValue) => TValue,
+) => PersistentStore<TValue>;
+
+function getWritable(storageType: StorageType): GetWritableReturnType {
+  return <TValue>(
     id: string,
-    value?: TValue,
-    deserialize?: (value: TRaw) => TValue,
-  ): Writable<TValue> => {
+    valueFactory: () => TValue,
+    deserialize?: (value: TValue) => TValue,
+  ): PersistentStore<TValue> => {
     let data: TValue;
 
     try {
       data = storage[storageType].get(id, deserialize);
     } catch {
-      if (value === undefined) {
-        throw new Error(`No default store value for ${id}`);
-      }
-
-      data = value;
+      data = valueFactory();
     }
 
     const store = svelteWritable(data);
@@ -35,7 +32,12 @@ function getWritable(
       }
     });
 
-    return store;
+    return {
+      ...store,
+      reset() {
+        store.set(valueFactory());
+      },
+    };
   };
 }
 

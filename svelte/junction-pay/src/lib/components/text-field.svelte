@@ -38,7 +38,7 @@
   maxlength={maxLength}
   {max}
   {type}
-  {value}
+  value={value ?? ""}
   {placeholder}
   {id}
   {disabled}
@@ -71,12 +71,17 @@
     color: var(--color-gray);
   }
 
-  .text-field.text-field.text-field.error {
+  .text-field.error {
     border-color: var(--color-red);
+  }
+
+  .text-field:focus {
+    border-color: var(--color-teal);
   }
 
   p {
     color: var(--color-red);
+    font-size: 14px;
     margin: 4px;
   }
 </style>

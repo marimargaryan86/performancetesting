@@ -1,6 +1,24 @@
-import type { BeneficiaryWizardComplete, CCBeneficiaryModel } from "$models/beneficiary-models";
-import type { LocalStorageWithExpiry } from "$models/common-models";
+import type { LocalStorageWithExpiry, ValidationError } from "$models/common-models";
 import { writable, type Readable } from "svelte/store";
+
+function formatErrors<T>(errors: ValidationError<T>): ValidationError<T> | undefined {
+  return Object.values(errors).filter((value) => !!value).length ? errors : undefined;
+}
+
+function buildUrl<TValue extends { toString: () => string }>(
+  url: string | URL,
+  params?: Record<string, TValue>,
+): string {
+  const nextUrl = new URL(url);
+
+  if (params) {
+    Object.entries(params).forEach(([name, value]) =>
+      nextUrl.searchParams.set(name, value.toString()),
+    );
+  }
+
+  return nextUrl.toString();
+}
 
 function formatCurrency(amount: number, code?: string): string {
   try {
@@ -40,6 +58,15 @@ function setZeroTime(date: Date): Date {
   date.setMinutes(0);
   date.setSeconds(0);
   date.setMilliseconds(0);
+
+  return date;
+}
+
+function setZeroTimeUTC(date: Date): Date {
+  date.setUTCHours(0);
+  date.setUTCMinutes(0);
+  date.setUTCSeconds(0);
+  date.setUTCMilliseconds(0);
 
   return date;
 }
@@ -123,33 +150,6 @@ const months = (() => {
   });
 })();
 
-type ModelList = Record<string, CCBeneficiaryModel[]>;
-
-function groupByFirstLetter(collection: CCBeneficiaryModel[]) {
-  return collection
-    .sort((a, b) => {
-      if (a.bank_account_holder_name > b.bank_account_holder_name) {
-        return 1;
-      } else if (b.bank_account_holder_name > a.bank_account_holder_name) {
-        return -1;
-      } else {
-        return 0;
-      }
-    })
-    .reduce((acc: ModelList, current) => {
-      const alphabet = current.bank_account_holder_name[0];
-
-      if (!acc[alphabet]) {
-        // if theres no letter in there already add it to [letter]: object
-        acc[alphabet] = [current];
-      } else {
-        // if there is add it
-        acc[alphabet].push(current);
-      }
-      return acc;
-    }, {});
-}
-
 function fetchAndCheckLocalStorageWithExpiry(key: string) {
   if (typeof window === undefined) {
     return undefined;
@@ -189,45 +189,12 @@ function setLocalStorageWithExpiry(key: string, value: string, ttl: number): voi
   localStorage.setItem(key, JSON.stringify(item));
 }
 
-// @mattias Not sure if i should've just typed the params here. Weird feeling i should've done it like this...
-function mapStoreToBeneficiaryApi<T extends Partial<BeneficiaryWizardComplete>>(data: T) {
-  let identity = {};
-
-  if (data.beneficiaryEntityType === "company") {
-    identity = {
-      beneficiary_company_name: data.beneficiaryEntityName,
-      bank_account_holder_name: data.beneficiaryEntityName,
-    };
-  } else if (data.beneficiaryEntityType === "individual") {
-    identity = {
-      beneficiary_first_name: data.beneficiaryFirstName,
-      beneficiary_last_name: data.beneficiaryLastName,
-      bank_account_holder_name: `${data.beneficiaryFirstName} ${data.beneficiaryLastName}`,
-    };
-  }
-  return {
-    name: data.nickname,
-    bank_country: data.bankAccountCountry,
-    currency: data.currency,
-    beneficiary_entity_type: data.beneficiaryEntityType,
-    beneficiary_date_of_birth: data.beneficiaryDateOfBirth?.toISOString().split("T")[0],
-    beneficiary_address: data.addressLine,
-    beneficiary_postcode: "LS6 3EJ",
-    beneficiary_country: data.beneficiaryCountry,
-    account_number: data.accountNumber,
-    routing_code_type_1: data.sortCode && "sort_code", // We only account sort code as our identifer for now.
-    routing_code_value_1: data.sortCode?.replace(/-/g, ""),
-    bic_swift: data.bic,
-    iban: data.iban,
-    ...identity,
-  };
-}
-
 export default {
   formatCurrency,
   getCurrencySign,
   formatDate,
   setZeroTime,
+  setZeroTimeUTC,
   setWeekStart,
   getWeekDay,
   compareDates,
@@ -235,8 +202,8 @@ export default {
   pendableCall,
   weekDays,
   months,
-  groupByFirstLetter,
   fetchAndCheckLocalStorageWithExpiry,
   setLocalStorageWithExpiry,
-  mapStoreToBeneficiaryApi,
+  buildUrl,
+  formatErrors,
 };

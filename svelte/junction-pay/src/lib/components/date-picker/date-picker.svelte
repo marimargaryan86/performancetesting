@@ -12,14 +12,15 @@
   export let end: Date | undefined = undefined;
   export let placeholder: string | undefined = undefined;
   export let span = false;
-  export let error = false;
+  export let error: boolean | string | undefined = undefined;
 
   let container: HTMLDivElement;
-  let focusedMonth = utils.setZeroTime(start ? new Date(start) : new Date());
+  let focusedMonth = utils.setZeroTimeUTC(start ? new Date(start) : new Date(Date.now()));
   let expanded = false;
 
-  $: start = start ? utils.setZeroTime(start) : undefined;
-  $: end = end ? utils.setZeroTime(end) : undefined;
+  $: hasError = !!error;
+  $: start = start ? utils.setZeroTimeUTC(start) : undefined;
+  $: end = end ? utils.setZeroTimeUTC(end) : undefined;
   $: displayValue =
     (start ? utils.formatDate(start, 1) : "") +
     (span && end ? ` - ${utils.formatDate(end, 1)}` : "");
@@ -33,7 +34,7 @@
   }
 
   function updateFocusedMonth(): void {
-    focusedMonth = utils.setZeroTime(start ? new Date(start) : new Date());
+    focusedMonth = utils.setZeroTimeUTC(start ? new Date(start) : new Date(Date.now()));
   }
 
   function reset(): void {
@@ -60,7 +61,7 @@
   }
 </script>
 
-<div class="date-picker" use:clickOutside={collapse} bind:this={container} class:error>
+<div class="date-picker" use:clickOutside={collapse} bind:this={container} class:error={hasError}>
   <TextField
     {id}
     value={displayValue}
@@ -77,7 +78,7 @@
 
       <Grid {focusedMonth} bind:selectedStart={start} bind:selectedEnd={end} {span} />
 
-      <Button on:click={reset}>Reset</Button>
+      <Button on:click={reset} type="button">Reset</Button>
     </div>
   {/if}
 </div>
@@ -104,6 +105,7 @@
 
   .date-picker > :global(.text-field) {
     border-radius: inherit;
+    cursor: pointer;
     font-size: inherit;
     height: 100%;
     width: 100%;

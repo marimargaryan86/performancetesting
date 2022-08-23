@@ -1,182 +1,58 @@
-import { wizardStore } from "$lib/stores";
 import utils from "$lib/utils";
-import type {
-  AddBeneficiaryBankDetailsCombined,
-  AddBeneficiaryBankDetailsCompany,
-  AddBeneficiaryBankDetailsIndividual,
-  AddBeneficiaryDetailsData,
-  BeneficiaryWizardComplete,
-} from "$models/beneficiary-models";
-import type { ValidationError } from "$models/common-models";
+import type { BeneficiaryData } from "$models/beneficiary-models/models";
+import config from "$src/config";
 import BaseService from "./base-service";
 
 export default class BeneficiaryService extends BaseService {
-  private validateAddBeneficiaryDetailsData(
-    data: Partial<AddBeneficiaryDetailsData>,
-  ): [boolean, ValidationError<AddBeneficiaryDetailsData>] {
-    const errors: ValidationError<AddBeneficiaryDetailsData> = {
-      nickname: !data.nickname?.trim().length ? ["Nickname is missing"] : undefined,
-      beneficiaryCountry: !data.beneficiaryCountry ? ["Beneficiary country is missing"] : undefined,
-      bankAccountCountry: !data.bankAccountCountry
-        ? ["Bank account country is missing"]
-        : undefined,
-    };
+  async create(data: BeneficiaryData): Promise<void> {
+    // TODO: Error handling.
 
-    return [this.containsNoErrors(errors), errors];
-  }
-
-  private validateAddIndividualBankDetails(
-    data: Partial<AddBeneficiaryBankDetailsCombined>,
-  ): [boolean, ValidationError<AddBeneficiaryBankDetailsCombined>] {
-    if (data.beneficiaryEntityType === "individual") {
-      const errors: ValidationError<AddBeneficiaryBankDetailsIndividual> = {
-        beneficiaryEntityType: !data.beneficiaryEntityType?.trim().length
-          ? ["Missing Entity Type"]
-          : undefined,
-        beneficiaryFirstName: !data.beneficiaryFirstName?.trim().length
-          ? ["Missing First Name"]
-          : undefined,
-        beneficiaryLastName: !data.beneficiaryLastName?.trim().length
-          ? ["Missing Last Name"]
-          : undefined,
-        beneficiaryDateOfBirth: !data.beneficiaryDateOfBirth
-          ? ["Missing Date of Birth"]
-          : undefined,
-        options: !data.options ? ["Missing options"] : undefined,
-        paymentTypes: !data.paymentTypes ? ["Missing Payment Types"] : undefined,
-        accountName: !data.accountName?.trim().length ? ["Missing account name"] : undefined,
-        addressLine:
-          (data.paymentTypes?.length ?? 0) > 0 && !data.addressLine?.trim().length
-            ? ["Missing address"]
-            : undefined,
-        postCode:
-          (data.paymentTypes?.length ?? 0) > 0 && !data.postCode?.trim().length
-            ? ["Missing postal code"]
-            : undefined,
-        sortCode:
-          data.options?.includes("sort_code") && !data.sortCode?.trim().length
-            ? ["Missing sort code"]
-            : undefined,
-        accountNumber:
-          data.options?.includes("sort_code") && !data.accountNumber
-            ? ["Missing account number"]
-            : undefined,
-        bic: data.options?.includes("swift") && !data.bic ? ["Missing BIC/Swift code"] : undefined,
-        iban: data.options?.includes("swift") && !data.iban ? ["Missing IBAN"] : undefined,
-      };
-
-      return [this.containsNoErrors(errors), errors];
-    }
-    return [
-      true,
-      {
-        bic: ["Error with type"],
-      },
-    ];
-  }
-
-  private validateAddCompanyBankDetails(
-    data: Partial<AddBeneficiaryBankDetailsCombined>,
-  ): [boolean, ValidationError<AddBeneficiaryBankDetailsCombined>] {
-    if (data.beneficiaryEntityType === "company") {
-      const errors: ValidationError<AddBeneficiaryBankDetailsCompany> = {
-        beneficiaryEntityType: !data.beneficiaryEntityType?.trim().length
-          ? ["Missing Entity Type"]
-          : undefined,
-
-        beneficiaryEntityName: !data.beneficiaryEntityName?.trim().length
-          ? ["Missing Entity name"]
-          : undefined,
-
-        beneficiaryDateOfBirth: !data.beneficiaryDateOfBirth
-          ? ["Missing Date of Birth"]
-          : undefined,
-        accountName: !data.accountName?.trim().length ? ["Missing account name"] : undefined,
-        paymentTypes:
-          data.paymentTypes && data.paymentTypes.length < 1 ? ["Missing Payment Types"] : undefined,
-        addressLine:
-          (data.paymentTypes?.length ?? 0) > 0 && !data.addressLine?.trim().length
-            ? ["Missing address"]
-            : undefined,
-        postCode:
-          (data.paymentTypes?.length ?? 0) > 0 && !data.postCode?.trim().length
-            ? ["Missing postal code"]
-            : undefined,
-        options: data.options && data.options.length < 1 ? ["Missing options"] : undefined,
-        sortCode:
-          data.options?.includes("sort_code") && !data.sortCode?.trim().length
-            ? ["Missing sort code"]
-            : undefined,
-        accountNumber:
-          data.options?.includes("account_number") && !data.accountNumber
-            ? ["Missing account number"]
-            : undefined,
-        bic: data.options?.includes("swift") && !data.bic ? ["Missing BIC/Swift code"] : undefined,
-        iban: data.options?.includes("swift") && !data.iban ? ["Missing IBAN"] : undefined,
-      };
-      return [this.containsNoErrors(errors), errors];
-    }
-    return [
-      true,
-      {
-        bic: ["Error with type"],
-      },
-    ];
-  }
-
-  async createBeneficary(data: Partial<BeneficiaryWizardComplete>): Promise<void> {
-    const { auth_token } = await this.loginAndReturnApiKey();
-    const response = await fetch("https://devapi.currencycloud.com/v2/beneficiaries/create", {
+    await fetch(new URL("/beneficiaries/create", config.CC_API_BASE_URL), {
       method: "POST",
-      body: JSON.stringify(utils.mapStoreToBeneficiaryApi(data)),
+      body: JSON.stringify({
+        identity: {
+          bank_account_holder_name: data.accountHolderName,
+          ...(data.type === "company"
+            ? {
+                beneficiary_company_name: data.companyName,
+              }
+            : {
+                beneficiary_first_name: data.individualFirstName,
+                beneficiary_last_name: data.individualLastName,
+                bank_account_holder_name: data.accountHolderName,
+              }),
+        },
+        name: data.nickname,
+        bank_country: data.accountCountry.name,
+        currency: data.accountCurrency.code,
+        beneficiary_entity_type: data.type,
+        beneficiary_date_of_birth:
+          data.type === "company"
+            ? utils.formatDate(data.companyRegistrationDate)
+            : utils.formatDate(data.individualBirthDate),
+        beneficiary_address: data.addressLine,
+        beneficiary_postcode: data.addressPostalCode,
+        beneficiary_country: data.addressCountry.name,
+        account_number: data.accountNumber,
+        routing_code_type_1: data.paymentOptions.includes("sort-code") ? "sort_code" : undefined,
+        routing_code_value_1: data.sortCode.replace(/-/g, ""),
+        bic_swift: data.bicSwift,
+        iban: data.iban,
+      }),
       headers: {
         "Content-Type": "application/json",
-        "X-Auth-Token": auth_token,
+        "X-Auth-Token": await this.getApiKey(),
       },
     });
-    // add log out
-    return response.json();
   }
 
-  async addBeneficiaryDetails(data: Partial<AddBeneficiaryDetailsData>): Promise<void> {
-    const [valid, errors] = this.validateAddBeneficiaryDetailsData(data);
-
-    if (!valid) {
-      throw errors;
-    }
-
-    wizardStore.addDetails(data);
-
-    await utils.sleep(1500);
-
-    if (data.nickname === "asd") {
-      throw new Error("An unexpected error occured");
-    }
-  }
-
-  async addBeneficiaryBankDetails(data: Partial<AddBeneficiaryBankDetailsCombined>): Promise<void> {
-    const [valid, errors] =
-      data.beneficiaryEntityType === "company"
-        ? this.validateAddCompanyBankDetails(data)
-        : this.validateAddIndividualBankDetails(data);
-
-    if (!valid) {
-      throw errors;
-    }
-
-    wizardStore.addDetails(data);
-    await utils.sleep(1500);
-  }
-
-  async fetchBeneficiarys(page = 1) {
-    const { auth_token } = await this.loginAndReturnApiKey();
-
+  async find(page = 1): Promise<unknown> {
     const response = await fetch(
-      `https://devapi.currencycloud.com/v2/beneficiaries/find?page=${page}`,
+      utils.buildUrl(new URL("beneficiaries/find", config.CC_API_BASE_URL), { page }),
       {
         method: "GET",
         headers: {
-          "X-Auth-Token": auth_token,
+          "X-Auth-Token": await this.getApiKey(),
         },
       },
     );

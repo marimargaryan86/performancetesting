@@ -22,10 +22,14 @@
       return;
     }
 
+    const set = new Set(group);
+
     if (checked) {
-      group = [...group, value];
+      set.add(value);
+      group = Array.from(set);
     } else {
-      group = group.filter((item) => item !== value);
+      set.delete(value);
+      group = Array.from(set);
     }
   }
 </script>

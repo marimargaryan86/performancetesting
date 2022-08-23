@@ -12,9 +12,9 @@
   export let placeholder: string | undefined = undefined;
   export let id: string | undefined = undefined;
   export let tabIndex = 0;
-  export let error = false;
+  export let error: boolean | string | undefined = undefined;
   export let disabled = false;
-  export let readOnly = false;
+  export let displayValue: (value?: TValue) => string = (value?: TValue) => value?.toString() ?? "";
 
   let container: HTMLDivElement;
   let itemContainer: HTMLDivElement;
@@ -22,6 +22,8 @@
   let partiallyExpanded = false;
 
   $: selectedIdx = value ? items.indexOf(value) : -1;
+  $: hasError = !!error;
+  $: errorMessage = typeof error === "string" ? error : undefined;
 
   function toggle(): void {
     expanded = !expanded;
@@ -82,15 +84,14 @@
   bind:this={container}
   tabindex={tabIndex}
   class="select-field"
-  class:error
+  class:error={hasError}
   use:clickOutside={collapse}
   aria-expanded={partiallyExpanded}
   class:expanded
-  class:read-only={readOnly}
-  {id}
+  class:disabled
   on:blur={blur}
   role="listbox"
-  use:keyBinding={readOnly
+  use:keyBinding={disabled
     ? {}
     : {
         Enter: toggle,
@@ -102,9 +103,9 @@
         End: () => (value = items[items.length - 1]),
       }}
 >
-  <div class="head" on:click={readOnly ? undefined : toggle} role="button">
+  <div class="head" on:click={disabled ? undefined : toggle} role="button">
     <slot name="head" {value}>
-      <TextField value={value?.toString() ?? ""} readOnly {placeholder} tabIndex={-1} {disabled} />
+      <TextField {id} value={displayValue(value)} readOnly {placeholder} tabIndex={-1} {disabled} />
     </slot>
   </div>
 
@@ -126,7 +127,7 @@
               on:click={() => select(item)}
               role="option"
             >
-              {item.toString()}
+              {displayValue(item)}
             </li>
           {/each}
         </ul>
@@ -134,6 +135,10 @@
     </div>
   {/if}
 </div>
+
+{#if errorMessage}
+  <p>{errorMessage}</p>
+{/if}
 
 <style>
   .select-field {
@@ -148,12 +153,12 @@
     transition: border-color var(--speed-fast) ease;
   }
 
-  .select-field.select-field.read-only {
+  .select-field.disabled {
     background-color: var(--color-gray-lightest);
     border-color: var(--color-gray-lighter);
   }
 
-  .select-field.select-field.error {
+  .select-field.error {
     border-color: var(--color-red);
   }
 
@@ -180,7 +185,7 @@
     cursor: pointer;
     display: flex;
     font-size: inherit;
-    height: 100%;
+    height: inherit;
     justify-content: space-between;
   }
 
@@ -212,6 +217,7 @@
     cursor: pointer;
     font-family: inherit;
     font-size: inherit;
+    height: inherit;
     padding-left: 21px;
     padding-right: 21px;
     pointer-events: none;
@@ -246,5 +252,11 @@
 
   .option:hover {
     background-color: var(--color-light-background);
+  }
+
+  p {
+    color: var(--color-red);
+    font-size: 14px;
+    margin: 4px;
   }
 </style>

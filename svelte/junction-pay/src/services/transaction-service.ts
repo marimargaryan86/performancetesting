@@ -1,3 +1,4 @@
+import utils from "$lib/utils";
 import type { TransactionModel } from "$models/transaction-models";
 import { faker } from "@faker-js/faker";
 import BaseService from "./base-service";
@@ -7,7 +8,10 @@ export default class TransactionService extends BaseService {
   async findTransactions(limit = 20, offset = 1): Promise<TransactionModel[]> {
     try {
       const response = await fetch(
-        this.buildUrl("/transactions", { "page[cursor]": offset, "page[limit]": limit }),
+        utils.buildUrl(`${this.baseUrl}/transactions`, {
+          "page[cursor]": offset,
+          "page[limit]": limit,
+        }),
         {
           method: "GET",
         },

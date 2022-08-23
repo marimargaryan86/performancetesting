@@ -1,4 +1,6 @@
-export default [
+import type { Currency } from "$models/finance-models";
+
+const currencies: Currency[] = [
   { code: "SEK" },
   { code: "EUR" },
   { code: "GBP" },
@@ -6,3 +8,5 @@ export default [
   { code: "NOK" },
   { code: "DKK" },
 ];
+
+export default currencies;

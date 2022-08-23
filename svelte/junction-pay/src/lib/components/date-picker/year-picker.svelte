@@ -37,7 +37,7 @@
 </script>
 
 <div class="year-picker" use:clickOutside={collapse}>
-  <Button on:click={toggle}>{year}</Button>
+  <Button on:click={toggle} type="button">{year}</Button>
 
   {#if expanded}
     <ul transition:scale={{ duration: 150, start: 0.9 }} on:introstart={scrollToSelected}>

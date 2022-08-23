@@ -1,4 +1,4 @@
-import utils from "$lib/utils";
+import localStorage from "$lib/storage";
 import type { ValidationError } from "$models/common-models";
 import config from "$src/config";
 
@@ -15,31 +15,45 @@ export default abstract class BaseService {
     return Object.keys(errors).reduce((prev, curr) => prev && !errors[curr], true);
   }
 
-  protected buildUrl(url: string, params?: Record<string, string | number>): URL {
-    const nextUrl = `${this.baseUrl}${url}`;
-    const result = new URL(nextUrl);
+  protected async getApiKey(): Promise<string> {
+    let apiKey: string | undefined;
+    let expiresAt: Date;
 
-    if (params) {
-      Object.entries(params).forEach(([key, val]) => result.searchParams.set(key, val.toString()));
+    try {
+      ({ value: apiKey, expiresAt } = localStorage.get(
+        "cc_api_key",
+        (value: { value: string; expiresAt: Date }) => ({
+          ...value,
+          expiresAt: new Date(value.expiresAt),
+        }),
+      ));
+
+      if (new Date() > expiresAt) {
+        apiKey = undefined;
+      }
+    } catch {
+      apiKey = undefined;
     }
 
-    return result;
-  }
-
-  protected async loginAndReturnApiKey() {
-    const api_key = utils.fetchAndCheckLocalStorageWithExpiry("cc_api_key");
-    if (!api_key) {
-      const formData = new FormData();
-      formData.append("login_id", config.CC_LOGIN_ID);
-      formData.append("api_key", config.CC_API_KEY);
-      const response = await fetch("https://devapi.currencycloud.com/v2/authenticate/api", {
-        body: formData,
-        method: "POST",
-      });
-      const apiKey = await response.json();
-      utils.setLocalStorageWithExpiry("cc_api_key", apiKey, 30 * 60000);
+    if (apiKey) {
       return apiKey;
     }
-    return api_key;
+
+    const formData = new FormData();
+    formData.append("login_id", config.CC_LOGIN_ID);
+    formData.append("api_key", config.CC_API_KEY);
+
+    const resp = await fetch(new URL("/authenticate/api", config.CC_API_BASE_URL), {
+      body: formData,
+      method: "POST",
+    });
+
+    apiKey = (await resp.json()) as string;
+    expiresAt = new Date();
+    expiresAt.setTime(expiresAt.getTime() + 1800000);
+
+    localStorage.put("cc_api_key", { value: apiKey, expiresAt });
+
+    return apiKey;
   }
 }

@@ -24,8 +24,8 @@
   <YearPicker bind:date={focusedMonth} />
 
   <div class="navigation">
-    <Button on:click={decrease} />
-    <Button on:click={increase} />
+    <Button on:click={decrease} type="button" />
+    <Button on:click={increase} type="button" />
   </div>
 </div>
 

@@ -35,7 +35,7 @@
 </script>
 
 <div class="month-picker" use:clickOutside={collapse}>
-  <Button on:click={toggle}>{month}</Button>
+  <Button on:click={toggle} type="button">{month}</Button>
 
   {#if expanded}
     <ul transition:scale={{ duration: 150, start: 0.9 }} on:introstart={scrollToSelected}>

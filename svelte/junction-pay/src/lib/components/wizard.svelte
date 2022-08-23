@@ -124,6 +124,16 @@
   .step.completed > span {
     background-color: var(--color-orange);
     color: var(--color-white);
+    font-size: 0;
+  }
+
+  .step.completed > span::before {
+    border: var(--color-white) 0 solid;
+    border-width: 0 2px 2px 0;
+    content: "";
+    height: 13px;
+    transform: translateY(-2px) rotateZ(45deg);
+    width: 7px;
   }
 
   .step.active {

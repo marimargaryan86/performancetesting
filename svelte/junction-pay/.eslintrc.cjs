@@ -23,7 +23,6 @@ module.exports = {
       "error",
       {
         types: {
-          Omit: "You should probably use composition in a better way",
           Pick: "You should probably use composition in a better way",
           Exclude: "You should probably use composition in a better way",
         },

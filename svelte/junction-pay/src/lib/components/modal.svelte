@@ -84,7 +84,7 @@
     <div class="modal-head">
       <h3 class="title" id={titleId}>{title}</h3>
       <button type="button" on:click={closeModal}>
-        <span aria-hidden={true}>&#10005;</span>
+        <span aria-hidden>&#10005;</span>
       </button>
     </div>
     <div class="modal-body">

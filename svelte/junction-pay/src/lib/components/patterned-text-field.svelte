@@ -4,7 +4,7 @@
   export let id: string | undefined = undefined;
   export let pattern: string;
   export let value = "";
-  export let error = false;
+  export let error: boolean | string | undefined = undefined;
 
   function getDigits(value: string): number[] {
     return (value.match(/\d/g) ?? []).map((digit) => parseInt(digit, 10));

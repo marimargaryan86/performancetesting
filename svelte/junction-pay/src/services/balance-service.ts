@@ -1,4 +1,5 @@
 import currencyMapping from "$content/currency-mapping";
+import utils from "$lib/utils";
 import type { BalanceModel } from "$models/balance-models";
 import BaseService from "./base-service";
 import type { BalancesResponse } from "./schemas/balance-schemas";
@@ -7,7 +8,10 @@ export default class BalanceService extends BaseService {
   async findBalances(limit = 20, offset = 1): Promise<BalanceModel[]> {
     try {
       const response = await fetch(
-        this.buildUrl("/balances", { "page[cursor]": offset, "page[limit]": limit }),
+        utils.buildUrl(`${this.baseUrl}/balances`, {
+          "page[cursor]": offset,
+          "page[limit]": limit,
+        }),
         {
           method: "GET",
         },

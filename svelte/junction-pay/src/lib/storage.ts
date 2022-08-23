@@ -45,10 +45,15 @@ function getStorage(storage: StorageType): {
   remove: (id: string) => void;
 } {
   return {
-    put: <TValue>(id: string, value: TValue): TValue => put(storage, id, value),
-    get: <TValue, TRaw>(id: string, deserialize?: (value: TRaw) => TValue): TValue =>
-      get(storage, id, deserialize),
-    remove: (id: string): void => remove(storage, id),
+    put<TValue>(id: string, value: TValue): TValue {
+      return put(storage, id, value);
+    },
+    get<TValue, TRaw>(id: string, deserialize?: (value: TRaw) => TValue): TValue {
+      return get(storage, id, deserialize);
+    },
+    remove(id: string): void {
+      remove(storage, id);
+    },
   };
 }
 
