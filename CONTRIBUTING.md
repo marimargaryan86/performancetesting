@@ -37,6 +37,8 @@ pyenv install 3.9.13
 
 ### Set up your IDE (Optional)
 
+_(**Note** You may need to run `pyenv shell 3.9.13` as Pants does not run in Python 3.10 as of August 2022)_
+
 1. Export the virtual environment using Pants.
 ```shell
 ./pants export ::
@@ -234,7 +236,7 @@ If you're using `fish shell` you must add `-x` option to the `set` command, othe
 [pyenv]: https://github.com/pyenv/pyenv
 [junction-repo]: https://git.snowfall.se/junction/junction
 [google-styleguide]: https://google.github.io/styleguide/pyguide.html#22-imports
-[wemake-python-styleguide]: https://wemake-python-stylegui.de/en/latest/
+[wemake-python-styleguide]: https://wemake-python-styleguide.readthedocs.io/en/latest/
 [uncle-bob-video]: https://youtu.be/2a_ytyt9sf8?t=296
 [uncle-bob-summary]: https://bpoplauschi.github.io/2021/01/20/Clean-Code-Comments-by-Uncle-Bob-part-2.html
 [envfile-plugin]: https://plugins.jetbrains.com/plugin/7861-envfile
