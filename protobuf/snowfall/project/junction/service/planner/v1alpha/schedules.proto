@@ -8,7 +8,6 @@ message Route {
   uint64 sequence = 1; // index of the route in the routes.bin
   repeated uint64 schedules = 2;
   repeated uint64 route_stops = 3;
-  bool is_international = 4;
 }
 
 message RouteStop {
