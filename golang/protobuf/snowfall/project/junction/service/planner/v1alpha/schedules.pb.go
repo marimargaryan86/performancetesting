@@ -26,9 +26,10 @@ type Route struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Sequence   uint64   `protobuf:"varint,1,opt,name=sequence,proto3" json:"sequence,omitempty"` // index of the route in the routes.bin
-	Schedules  []uint64 `protobuf:"varint,2,rep,packed,name=schedules,proto3" json:"schedules,omitempty"`
-	RouteStops []uint64 `protobuf:"varint,3,rep,packed,name=route_stops,json=routeStops,proto3" json:"route_stops,omitempty"`
+	Sequence        uint64   `protobuf:"varint,1,opt,name=sequence,proto3" json:"sequence,omitempty"` // index of the route in the routes.bin
+	Schedules       []uint64 `protobuf:"varint,2,rep,packed,name=schedules,proto3" json:"schedules,omitempty"`
+	RouteStops      []uint64 `protobuf:"varint,3,rep,packed,name=route_stops,json=routeStops,proto3" json:"route_stops,omitempty"`
+	IsInternational bool     `protobuf:"varint,4,rep,packed,name=is_international,json=isInternational,proto3" json:"is_international,omitempty"`
 }
 
 func (x *Route) Reset() {
