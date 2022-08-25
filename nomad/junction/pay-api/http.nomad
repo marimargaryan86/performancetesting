@@ -78,6 +78,7 @@ job "pay-api-http" {
         env         = true
         change_mode = "restart"
         data        = <<EOH
+CURRENCIES_ADDRESS={{range $index, $service := service (printf "grpc.currencies-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
 {{ with secret (printf "kv/data/%s/pay-api" (env "NOMAD_NAMESPACE")) }}
 CC_LOGIN={{ .Data.data.cc_login }}
 CC_API_KEY={{ .Data.data.cc_api_key }}
