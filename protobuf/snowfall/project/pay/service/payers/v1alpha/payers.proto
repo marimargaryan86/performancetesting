@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package snowfall.project.pay.service.payers.v1alpha;
+
+import "snowfall/project/pay/service/payers/v1alpha/models.proto";
+
+service PayersService {
+  rpc CreatePayer(CreatePayerRequest) returns (CreatePayerResponse) {}
+  rpc GetPayer(GetPayerRequest) returns (GetPayerResponse) {}
+  rpc ListPayers(ListPayersRequest) returns (ListPayersResponse) {}
+}
+
+message GetPayerRequest {
+  string id = 1;
+}
+
+message GetPayerResponse {
+  Payer payer = 1;
+}
+
+message CreatePayerRequest {
+  Payer payer = 1;
+}
+
+message CreatePayerResponse {
+  Payer payer = 1;
+}
+
+message ListPayersRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  repeated string ids = 3;
+}
+
+message ListPayersResponse {
+  repeated Payer payers = 1;
+  string next_page_token = 2;
+}

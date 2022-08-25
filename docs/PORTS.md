@@ -55,3 +55,4 @@ The following ports are configured in local environments by default:
 | 50058 | geodata                | gRPC Server       |
 | 50059 | passenger-name-records | gRPC Server       |
 | 50060 | currencies             | gRPC Server       |
+| 50061 | payers                 | gRPC Server       |
