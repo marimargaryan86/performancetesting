@@ -35,8 +35,8 @@ job "pay-ui" {
       port = "http"
       tags = [
         "traefik.enable=true",
-        "traefik.http.routers.junction-pay.entrypoints=websecure",
-        "traefik.http.routers.junction-pay.rule=Host(`pay.junction.dev`)",
+        "traefik.http.routers.pay-ui.entrypoints=websecure",
+        "traefik.http.routers.pay-ui.rule=Host(`pay.junction.dev`)",
       ]
 
       check {
