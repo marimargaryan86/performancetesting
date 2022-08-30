@@ -11,3 +11,9 @@ class Quote(CamelCaseBaseModel):
     buy_currency: str
     sell_currency: str
     rate: float
+
+
+class Rate(CamelCaseBaseModel):
+    buy_currency: str
+    sell_currency: str
+    rate: float

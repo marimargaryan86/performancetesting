@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import time
-from typing import Any
+from typing import Any, Sequence
 
 import httpx
 import jwt
@@ -90,6 +90,27 @@ class Bound(object):
         response.raise_for_status()
 
         return response.json()
+
+    @_auth_required
+    async def get_rates(self, currency_pairs: str) -> Sequence[exchange.Rate]:
+        rates_url = "{0}/v1/indicative-rates?currencyPairs={1}".format(
+            self._base_url,
+            currency_pairs,
+        )
+
+        response = await self._http_client.get(rates_url, cookies=self._auth_cookies)
+
+        response.raise_for_status()
+        rates = response.json()["indicativeRates"]
+
+        return [
+            exchange.Rate(
+                buy_currency=rate["currencyPair"][:3],
+                sell_currency=rate["currencyPair"][3:],
+                rate=rate["midPrice"],
+            )
+            for rate in rates
+        ]
 
     async def _authenticate(self) -> None:
         credentials = {
