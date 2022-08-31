@@ -1,4 +1,4 @@
-import utils from "$src/lib/utils";
+import utils from "$lib/utils";
 import type {
   AccountDetailsData,
   AccountDetailsError,

@@ -1,4 +1,4 @@
-import config from "$src/config";
+import config from "../config";
 import AuthService from "./auth-service";
 import BalanceService from "./balance-service";
 import BeneficiaryService from "./beneficiary-service";

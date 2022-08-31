@@ -1,20 +1,50 @@
-import type { LocalStorageWithExpiry, ValidationError } from "$models/common-models";
+import type { ValidationError } from "$models/common-models";
 import { writable, type Readable } from "svelte/store";
 
 function formatErrors<T>(errors: ValidationError<T>): ValidationError<T> | undefined {
   return Object.values(errors).filter((value) => !!value).length ? errors : undefined;
 }
 
-function buildUrl<TValue extends { toString: () => string }>(
+function removeUndefinedValues<T>(obj: T, treatEmptyAsUndefined = true): T | undefined {
+  if (obj instanceof Array) {
+    const result = obj
+      .map((item) => removeUndefinedValues(item, treatEmptyAsUndefined))
+      .filter((item) => item !== undefined);
+
+    return !result.length && treatEmptyAsUndefined ? undefined : (result as unknown as T);
+  }
+
+  if (typeof obj === "function") {
+    return obj;
+  }
+
+  if (typeof obj === "object") {
+    const result = Object.fromEntries(
+      Object.entries(obj)
+        .map(([key, value]) => [key, removeUndefinedValues(value, treatEmptyAsUndefined)])
+        .filter(([, value]) => value !== undefined),
+    );
+
+    return !Object.keys(result).length && treatEmptyAsUndefined
+      ? undefined
+      : (result as unknown as T);
+  }
+
+  return obj;
+}
+
+function buildUrl<TValue extends Record<string, { toString: () => string } | undefined>>(
   url: string | URL,
-  params?: Record<string, TValue>,
+  params?: TValue,
 ): string {
   const nextUrl = new URL(url);
 
   if (params) {
-    Object.entries(params).forEach(([name, value]) =>
-      nextUrl.searchParams.set(name, value.toString()),
-    );
+    Object.entries(params).forEach(([name, value]) => {
+      if (value !== undefined) {
+        nextUrl.searchParams.set(name, value instanceof Array ? value.join(",") : value.toString());
+      }
+    });
   }
 
   return nextUrl.toString();
@@ -150,45 +180,6 @@ const months = (() => {
   });
 })();
 
-function fetchAndCheckLocalStorageWithExpiry(key: string) {
-  if (typeof window === undefined) {
-    return undefined;
-  }
-
-  const itemStr = localStorage.getItem(key);
-
-  if (!itemStr) {
-    return undefined;
-  }
-
-  const item: LocalStorageWithExpiry = JSON.parse(itemStr);
-  const now = new Date();
-
-  if (now > item.expiry) {
-    // do a bit of cleanup
-    localStorage.removeItem(key);
-
-    return undefined;
-  }
-
-  return item.value;
-}
-
-function setLocalStorageWithExpiry(key: string, value: string, ttl: number): void {
-  if (typeof window === undefined) {
-    return undefined;
-  }
-
-  const currentTime = new Date().getTime();
-
-  const item: LocalStorageWithExpiry = {
-    value,
-    expiry: new Date(currentTime + ttl),
-  };
-
-  localStorage.setItem(key, JSON.stringify(item));
-}
-
 export default {
   formatCurrency,
   getCurrencySign,
@@ -202,8 +193,7 @@ export default {
   pendableCall,
   weekDays,
   months,
-  fetchAndCheckLocalStorageWithExpiry,
-  setLocalStorageWithExpiry,
   buildUrl,
   formatErrors,
+  removeUndefinedValues,
 };

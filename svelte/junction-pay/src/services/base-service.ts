@@ -1,6 +1,6 @@
 import storage from "$lib/storage";
 import type { ValidationError } from "$models/common-models";
-import config from "$src/config";
+import config from "../config";
 
 export default abstract class BaseService {
   protected baseUrl: string;
@@ -40,7 +40,7 @@ export default abstract class BaseService {
     }
 
     const formData = new FormData();
-    formData.append("login_id", config.CC_LOGIN_ID);
+    formData.append("login_id", config.CC_CLIENT_ID);
     formData.append("api_key", config.CC_API_KEY);
 
     const resp = await fetch(new URL("/authenticate/api", config.CC_API_BASE_URL), {

@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { BeneficiaryData } from "$models/beneficiary-models/models";
-  import CheckedIcon from "$src/lib/icons/checked-icon.svelte";
-  import utils from "$src/lib/utils";
+  import CheckedIcon from "$lib/icons/checked-icon.svelte";
+  import utils from "$lib/utils";
   import Navigation from "./navigation.svelte";
 
   export let data: Partial<BeneficiaryData>;

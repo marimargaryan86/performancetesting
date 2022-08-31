@@ -1,6 +1,6 @@
 <script lang="ts">
-  import CheckedIcon from "$src/lib/icons/checked-icon.svelte";
-  import routeConfig from "$src/lib/route-config";
+  import CheckedIcon from "$lib/icons/checked-icon.svelte";
+  import routeConfig from "$lib/route-config";
   import { onMount } from "svelte";
 
   export let resetStore: () => void;

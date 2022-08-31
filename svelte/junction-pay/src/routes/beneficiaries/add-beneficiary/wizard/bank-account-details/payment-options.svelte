@@ -5,8 +5,8 @@
     PaymentOptionsData,
     PaymentOptionsError,
   } from "$models/beneficiary-models/models";
-  import PatternedTextField from "$src/lib/components/patterned-text-field.svelte";
-  import TextField from "$src/lib/components/text-field.svelte";
+  import PatternedTextField from "$lib/components/patterned-text-field.svelte";
+  import TextField from "$lib/components/text-field.svelte";
 
   export let data: Partial<PaymentOptionsData>;
   export let errors: PaymentOptionsError | undefined = undefined;

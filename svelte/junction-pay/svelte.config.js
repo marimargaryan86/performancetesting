@@ -13,7 +13,7 @@ const config = {
       $services: "src/services",
       $content: "src/content",
       $models: "src/models",
-      $src: "src",
+      $integration: "src/integration",
     },
   },
 };
