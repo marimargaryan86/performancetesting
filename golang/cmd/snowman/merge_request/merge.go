@@ -59,7 +59,7 @@ func (mr *mergeRequest) merge() error {
 		},
 	)
 
-	if resp.StatusCode == http.StatusNotAcceptable {
+	if resp.StatusCode == http.StatusNotAcceptable || resp.StatusCode == http.StatusUnprocessableEntity {
 		_, err = mr.client.MergeRequests.RebaseMergeRequest(
 			mr.object.ProjectID,
 			mr.object.IID,
