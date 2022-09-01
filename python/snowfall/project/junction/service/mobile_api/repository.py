@@ -58,6 +58,9 @@ class UsersRepository(
     repository.ProtoRepository[models_pb2.User],
 ):
     _proto = models_pb2.User
+    _indexes = [
+        pymongo.IndexModel("email", background=True, unique=True),
+    ]
 
     async def update_password(self, query: Any, document: Any) -> None:
         await self._execute(self._collection.update_one, query, document, upsert=False)

@@ -5,6 +5,7 @@ from string import digits
 
 import bcrypt
 import lagom
+from pymongo import errors
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.junction.service.mobile_api import (
@@ -52,9 +53,24 @@ class Users(endpoints.HTTPEndpoint):
             phone=phone_number_pb2.PhoneNumber(e164_number=body["phone"]),
             name=body["name"],
         )
-        # TODO: handle duplicate key error
-        await users_repository.insert(user)
-
+        try:
+            await users_repository.insert(user)
+        except errors.DuplicateKeyError:
+            return models.JsonApiResponse(
+                models.Body(
+                    errors=[
+                        models.Error(
+                            status=str(status.HTTP_400_BAD_REQUEST),
+                            code="duplicated_email",
+                            detail="User email already exists",
+                            source=models.ErrorSource(
+                                pointer="/data/attributes/email",
+                            ),
+                        ),
+                    ],
+                ),
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
         return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
