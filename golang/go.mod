@@ -9,6 +9,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/jszwec/csvutil v1.5.0
 	github.com/jyggen/confusables v0.0.0-20210123020050-f1ff430ca6a3
+	github.com/robfig/cron/v3 v3.0.0
 	github.com/schollz/progressbar/v3 v3.8.6
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.10.1
