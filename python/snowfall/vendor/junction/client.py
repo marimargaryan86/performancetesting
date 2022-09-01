@@ -173,11 +173,13 @@ class JunctionClient(object):  # noqa: WPS214
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> dict[str, Any]:
-        query_parameters = _make_pagination(limit, cursor)
+        pagination_parameters = _make_pagination(limit, cursor)
+        query_parameters: dict[str, int | str | Sequence[str]] = {
+            parameter: pagination_parameters[parameter]
+            for parameter in pagination_parameters
+        }
         if cabin_class:
-            query_parameters["filter[groups.options.details.cabinClass]"] = str(
-                cabin_class,
-            )
+            query_parameters["filter[groups.options.details.cabinClass]"] = cabin_class
         return await self._make_request(
             method=_METHOD_GET,
             url="/offers/searches/{0}/offers".format(offers_search_id),
