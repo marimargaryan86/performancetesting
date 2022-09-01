@@ -3,8 +3,8 @@ import type { OrderField, TradeType } from "$integration/currency-cloud/models/c
 export type FindCriteriaSchema = {
   "page[limit]"?: number;
   "page[offset]"?: number;
-  "order[asc]"?: OrderField;
-  "order[desc]"?: OrderField;
+  "orderBy[asc]"?: OrderField;
+  "orderBy[desc]"?: OrderField;
 };
 
 export type CurrencySchema = {

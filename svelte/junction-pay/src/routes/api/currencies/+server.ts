@@ -11,8 +11,8 @@ export async function GET(request: RequestEvent): Promise<Response> {
     const query = request.url.searchParams;
 
     const criteria: FindCriteriaSchema = {
-      "order[asc]": (query.get("order[asc]") as OrderField) ?? undefined,
-      "order[desc]": (query.get("order[desc]") as OrderField) ?? undefined,
+      "orderBy[asc]": (query.get("order[asc]") as OrderField) ?? undefined,
+      "orderBy[desc]": (query.get("order[desc]") as OrderField) ?? undefined,
       "page[limit]": parseInt(query.get("page[limit]") ?? "20", 10) ?? undefined,
       "page[offset]": parseInt(query.get("page[offset]") ?? "0", 10) ?? undefined,
     };

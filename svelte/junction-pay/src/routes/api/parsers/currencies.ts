@@ -5,7 +5,7 @@ export function parseFindCriteriaSchema(data: FindCriteriaSchema): FindCriteriaM
   return {
     limit: data["page[limit]"],
     offset: data["page[offset]"],
-    order: data["order[asc]"] ?? data["order[desc]"],
-    orderDirection: data["order[asc]"] ? "asc" : data["order[desc]"] ? "desc" : "asc",
+    order: data["orderBy[asc]"] ?? data["orderBy[desc]"],
+    orderDirection: data["orderBy[asc]"] ? "asc" : data["orderBy[desc]"] ? "desc" : "asc",
   };
 }

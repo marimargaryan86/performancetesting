@@ -6,8 +6,8 @@ import type { FindCriteriaSchema } from "../schemas/currencies";
 
 export function validateFindCriteriaSchema(data: FindCriteriaSchema): FindCriteriaSchema {
   const errors = removeUndefinedValues<ValidationError<FindCriteriaSchema>>({
-    "order[asc]": validateEnum(data["order[asc]"], orderFields, false),
-    "order[desc]": validateEnum(data["order[desc]"], orderFields, false),
+    "orderBy[asc]": validateEnum(data["orderBy[asc]"], orderFields, false),
+    "orderBy[desc]": validateEnum(data["orderBy[desc]"], orderFields, false),
     "page[limit]": validateNumber(data["page[limit]"], 1, 20, false),
     "page[offset]": validateNumber(data["page[offset]"], 0, undefined, false),
   });
