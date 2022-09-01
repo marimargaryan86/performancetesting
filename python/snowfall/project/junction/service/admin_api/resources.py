@@ -21,7 +21,7 @@ class LocationResource(models.Resource):
             id=location.id,
             type="locations",
             attributes={
-                "countryCode": location.country_code.rjust(2, "X"),
+                "countryCode": location.country_code or "GB",
                 "iataCode": None,
                 "latitude": location.coordinates.latitude,
                 "longitude": location.coordinates.longitude,
