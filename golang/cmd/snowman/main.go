@@ -135,7 +135,7 @@ func serve(cmd *cobra.Command, args []string) error {
 
 	manageMemberships(client, sugar.Named("cron"), viper.GetString("snowman_hook_url"), viper.GetString("gitlab_webhook_secret"))
 
-	if _, err = c.AddFunc("0 10 * * * *", func() {
+	if _, err = c.AddFunc("0 10 * * *", func() {
 		manageMemberships(client, sugar.Named("cron"), viper.GetString("snowman_hook_url"), viper.GetString("gitlab_webhook_secret"))
 	}); err != nil {
 		return err
