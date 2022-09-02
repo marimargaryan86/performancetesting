@@ -1,4 +1,4 @@
-from typing import Generic, Optional, TypeVar
+from typing import Generic, Optional, Sequence, TypeVar
 
 from snowfall.stdlib.persistence.mongo import repository, resultset
 
@@ -61,3 +61,19 @@ class InsertMixin(Generic[Record]):
             raise RuntimeError()
 
         return document
+
+
+class InsertManyMixin(Generic[Record]):
+    async def insert_many(
+        self: repository.RepositoryProtocol[Record],
+        documents: Sequence[Record],
+    ) -> Sequence[Record]:
+        inserts = await self._execute(
+            self._collection.insert_many,
+            [self._coder.encode(document) for document in documents],
+        )
+
+        if not inserts.acknowledged:
+            raise RuntimeError()
+
+        return documents

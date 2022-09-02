@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package snowfall.project.pay.service.rates.v1alpha;
+
+import "snowfall/project/pay/service/rates/v1alpha/models.proto";
+
+service RatesService {
+  rpc Insert(InsertRequest) returns (InsertResponse) {}
+}
+
+message InsertRequest {
+  repeated Rate rates = 1;
+}
+
+message InsertResponse {
+  repeated Rate rates = 2;
+}
