@@ -1,31 +1,30 @@
 <script lang="ts">
-  import { goto } from "$app/navigation";
   import Button from "$lib/components/button.svelte";
   import TextField from "$lib/components/text-field.svelte";
+  import SearchIcon from "$lib/icons/search-icon.svelte";
   import routeConfig from "$lib/route-config";
-  import ListBeneficiaries from "./components/list-beneficiaries.svelte";
+  import BeneficiaryList from "./components/beneficiary-list.svelte";
   import Layout from "./layout.svelte";
 </script>
 
 <svelte:head>
-  <title>Junction | Balances</title>
+  <title>Junction | Beneficiaries</title>
 </svelte:head>
 
 <Layout>
   <div class="beneficiaries" slot="body">
-    <div class="beneficiary-header">
+    <div class="header">
       <div class="search">
-        <TextField placeholder="Find a beneficiary" />
+        <SearchIcon />
+        <TextField placeholder="Search beneficiaries" />
       </div>
-      <div class="add">
-        <Button on:click={() => goto(routeConfig.beneficiaries.addBeneficiary)}>
-          Add beneficiary
-        </Button>
-      </div>
+
+      <a href={routeConfig.beneficiaries.addBeneficiary}>
+        <Button>+ Add beneficiary</Button>
+      </a>
     </div>
-    <div class="list">
-      <ListBeneficiaries />
-    </div>
+
+    <BeneficiaryList />
   </div>
 </Layout>
 
@@ -34,20 +33,36 @@
     padding: 0 49px 30px;
   }
 
-  .add :global(button) {
-    background-color: var(--color-orange);
-    padding: 4px 40px;
+  .header {
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
   }
 
-  .beneficiary-header {
-    display: flex;
+  a > :global(button) {
+    background-color: var(--color-orange);
+    white-space: nowrap;
   }
 
   .search {
-    flex-grow: 1;
+    background-color: var(--color-white);
+    max-width: 388px;
+    width: 100%;
   }
 
-  .search :global(input) {
-    width: 25%;
+  .search > :global(svg) {
+    margin: 0 4px 0 14px;
+    vertical-align: middle;
+  }
+
+  .search > :global(input) {
+    background-color: transparent;
+    border-color: transparent;
+    padding-left: 0;
+    vertical-align: middle;
+  }
+
+  .search > :global(input:focus) {
+    border-color: transparent;
   }
 </style>

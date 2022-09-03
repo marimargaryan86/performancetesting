@@ -12,14 +12,7 @@ export type CurrencyModel = {
   tradeTypes: TradeType[];
 };
 
-export const orderFieldMapping = {
-  code: "code",
-  name: "name",
-};
-
-export const orderFields = Object.keys(orderFieldMapping).map(
-  (item) => item,
-) as (keyof typeof orderFieldMapping)[];
+export const orderFields = ["code", "name"] as const;
 
 export type OrderField = typeof orderFields[number];
 

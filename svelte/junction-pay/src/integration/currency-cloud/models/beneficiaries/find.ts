@@ -1,7 +1,22 @@
 import type { BankAccountType, EntityType, ScopeType } from "../../schemas/beneficiaries";
 import type { OrderDirection } from "../../schemas/common";
+import type { OrderField as OrderFieldCC } from "../../schemas/beneficiaries";
 
-export const orderFieldMapping = {
+export const orderFields = [
+  "bankAccountNumber",
+  "bankAccountHolderName",
+  "bankAccountType",
+  "bankAccountCountryCode",
+  "bankAccountBic",
+  "bankAccountCurrency",
+  "defaultBeneficiary",
+  "bankAccountIban",
+  "nickname",
+] as const;
+
+export type OrderField = typeof orderFields[number];
+
+export const orderFieldMapping: Record<OrderField, OrderFieldCC> = {
   bankAccountNumber: "account_number",
   bankAccountHolderName: "bank_account_holder_name",
   bankAccountType: "bank_account_type",
@@ -11,13 +26,7 @@ export const orderFieldMapping = {
   defaultBeneficiary: "default_beneficiary",
   bankAccountIban: "iban",
   nickname: "name",
-} as const;
-
-export const orderFields = Object.keys(orderFieldMapping).map(
-  (item) => item,
-) as (keyof typeof orderFieldMapping)[];
-
-export type OrderField = typeof orderFields[number];
+};
 
 export type FindCriteriaBaseModel<T = EntityType | undefined> = {
   onBehalfOf?: string;

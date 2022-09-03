@@ -45,17 +45,17 @@ export type CreateBeneficiaryBaseSchema = {
 export type CreateCompanyBeneficiarySchema = CreateBeneficiaryBaseSchema & {
   entityType: "company";
   company?: {
-    name: string;
-    registrationDate: string;
+    name?: string;
+    registrationDate?: string;
   };
 };
 
 export type CreateIndividualBeneficiarySchema = CreateBeneficiaryBaseSchema & {
   entityType: "individual";
   individual?: {
-    firstName: string;
-    lastName: string;
-    birthDate: string;
+    firstName?: string;
+    lastName?: string;
+    birthDate?: string;
   };
 };
 

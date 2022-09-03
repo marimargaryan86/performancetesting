@@ -10,6 +10,12 @@ export async function GET(request: RequestEvent): Promise<Response> {
   try {
     const query = request.url.searchParams;
 
+    let limit: number | undefined = parseInt(query.get("page[limit]") ?? "-1", 10);
+
+    if (limit === -1) {
+      limit = undefined;
+    }
+
     const criteria: FindCriteriaSchema = {
       "orderBy[asc]": (query.get("order[asc]") as OrderField) ?? undefined,
       "orderBy[desc]": (query.get("order[desc]") as OrderField) ?? undefined,

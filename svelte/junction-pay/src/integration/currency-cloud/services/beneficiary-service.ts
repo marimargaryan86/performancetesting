@@ -106,6 +106,10 @@ export default class BeneficiaryService extends BaseService {
     beneficiary: BeneficiaryPutModel,
     oldBeneficiary?: BeneficiaryModel,
   ): Promise<BeneficiaryModel> {
+    if (oldBeneficiary) {
+      beneficiary = updateBeneficiaryModel(oldBeneficiary, beneficiary);
+    }
+
     const requirementsList = await this.getRequirements({
       bank: {
         account: {
@@ -123,10 +127,6 @@ export default class BeneficiaryService extends BaseService {
     const url = oldBeneficiary
       ? `/v2/beneficiaries/${oldBeneficiary.id}`
       : "/v2/beneficiaries/create";
-
-    if (oldBeneficiary) {
-      beneficiary = updateBeneficiaryModel(oldBeneficiary, beneficiary);
-    }
 
     const resp = await this.fetch(url, {
       method: "POST",
@@ -146,8 +146,12 @@ export default class BeneficiaryService extends BaseService {
 
         throw {
           entityType: errors.beneficiary_entity_type ? ["Missing"] : undefined,
-          iban: errors.iban ? ["Invalid IBAN"] : undefined,
-          bic: errors.bic_swift ? ["Invalid BIC"] : undefined,
+          bank: {
+            account: {
+              iban: errors.iban ? ["Invalid IBAN"] : undefined,
+              bic: errors.bic_swift ? ["Invalid BIC"] : undefined,
+            },
+          },
         };
       default:
         throw BeneficiaryServiceError.SERVICE_UNAVAILABLE;

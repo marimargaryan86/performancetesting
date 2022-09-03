@@ -45,9 +45,8 @@
     cursor: pointer;
     display: inline-block;
     height: 24px;
-    margin-right: 8px;
+    margin: 0;
     outline: none;
-    vertical-align: middle;
     width: 24px;
   }
 

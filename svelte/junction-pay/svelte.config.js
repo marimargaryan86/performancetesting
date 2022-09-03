@@ -14,6 +14,7 @@ const config = {
       $content: "src/content",
       $models: "src/models",
       $integration: "src/integration",
+      $helpers: "src/helpers",
     },
   },
 };

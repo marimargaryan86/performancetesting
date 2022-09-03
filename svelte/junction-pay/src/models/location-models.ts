@@ -1,4 +1,5 @@
-export type Country = {
+export type CountryModel = {
   name: string;
-  currencyCode: string;
+  currencyCode?: string;
+  code: string;
 };

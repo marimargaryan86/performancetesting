@@ -218,8 +218,6 @@
     font-family: inherit;
     font-size: inherit;
     height: inherit;
-    padding-left: 21px;
-    padding-right: 21px;
     pointer-events: none;
     vertical-align: top;
     width: 100%;
@@ -243,7 +241,7 @@
   .option {
     cursor: pointer;
     font-size: inherit;
-    padding: 19px 21px;
+    padding: 19px 14px;
   }
 
   .option[aria-selected="true"] {

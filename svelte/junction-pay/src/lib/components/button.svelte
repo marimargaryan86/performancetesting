@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let type: "button" | "menu" | "reset" | "submit" | undefined = undefined;
+  export let type: "button" | "reset" | "submit" | undefined = undefined;
   export let variant: "filled" | "empty" = "filled";
   let className: string | undefined = undefined;
   export { className as class };
@@ -21,7 +21,7 @@
     font-weight: 600;
     height: 44px;
     outline: 0;
-    padding: 0 11px;
+    padding: 0 14px;
   }
 
   button:focus {

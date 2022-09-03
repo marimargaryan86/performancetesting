@@ -22,10 +22,7 @@ module.exports = {
     "@typescript-eslint/ban-types": [
       "error",
       {
-        types: {
-          Pick: "You should probably use composition in a better way",
-          Exclude: "You should probably use composition in a better way",
-        },
+        types: {},
       },
     ],
   },

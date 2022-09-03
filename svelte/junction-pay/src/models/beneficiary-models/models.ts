@@ -1,19 +1,20 @@
+import type { CurrencyModel } from "$integration/currency-cloud/models/currencies";
 import type { ValidationError } from "$models/common-models";
 import type { Currency } from "$models/finance-models";
-import type { Country } from "$models/location-models";
+import type { CountryModel } from "$models/location-models";
 
 export type BeneficiaryDetailsData = {
   nickname: string;
-  addressCountry: Country;
-  accountCountry: Country;
-  accountCurrency: Currency;
+  addressCountry: CountryModel;
+  accountCountry: CountryModel;
+  accountCurrency: CurrencyModel;
 };
 
 export type BeneficiaryDetailsError = ValidationError<BeneficiaryDetailsData>;
 
 export type PaymentTypeData = {
   paymentTypes: ("priority" | "regular")[];
-  addressCountry: Country;
+  addressCountry: CountryModel;
   addressLine: string;
   addressPostalCode: string;
 };
@@ -52,7 +53,7 @@ export type EntityDetailsError = ValidationError<CompanyDetailsError & Individua
 export type AccountDetailsData = {
   accountCurrency: Currency;
   accountCity: string;
-  accountCountry: Country;
+  accountCountry: CountryModel;
   accountHolderName: string;
   accountNumber: string;
 };

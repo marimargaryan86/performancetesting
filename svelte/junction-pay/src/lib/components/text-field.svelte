@@ -12,7 +12,7 @@
   export let tabIndex = 0;
   export let readOnly = false;
   export let id: string | undefined = undefined;
-  export let value: Value | undefined = "" as Value;
+  export let value: Value | undefined | null = "" as Value;
   export let type: Type = (typeof value === "number" ? "number" : "text") as Type;
   export let placeholder: string | undefined = undefined;
   export let error: boolean | string | undefined = undefined;

@@ -19,8 +19,8 @@ export default class CurrencyService extends BaseService {
     const data: FindCurrenciesResponseSchema = await resp.json();
     const field = criteria.order ?? "code";
     const orderDirection = criteria.orderDirection ?? "asc";
-    const limit = criteria.limit ?? 20;
-    const offset = (criteria.offset ?? 0) * limit;
+    const limit = criteria.limit;
+    const offset = limit !== undefined ? (criteria.offset ?? 0) * limit : undefined;
 
     return data.currencies
       .sort((a, b) => {
@@ -30,7 +30,7 @@ export default class CurrencyService extends BaseService {
 
         return 0 - (a[field as keyof CurrencySchema] > b[field as keyof CurrencySchema] ? 1 : -1);
       })
-      .slice(offset, offset + limit)
+      .slice(offset, limit !== undefined && offset !== undefined ? offset + limit : undefined)
       .map((item) => parseCurrencySchema(item));
   }
 

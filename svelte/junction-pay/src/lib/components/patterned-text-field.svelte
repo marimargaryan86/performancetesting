@@ -3,7 +3,7 @@
 
   export let id: string | undefined = undefined;
   export let pattern: string;
-  export let value = "";
+  export let value: string | null | undefined = "";
   export let error: boolean | string | undefined = undefined;
 
   function getDigits(value: string): number[] {
