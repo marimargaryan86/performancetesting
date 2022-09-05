@@ -28,7 +28,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     xz-utils \
     zlib1g-dev \
-&& curl -fsSL https://github.com/Tufin/oasdiff/releases/download/v1.1.37/oasdiff_1.1.37_linux_amd64.deb > /tmp/oasdiff.deb \
+&& curl -fsSL https://github.com/Tufin/oasdiff/releases/download/v1.2.3/oasdiff_1.2.3_linux_amd64.deb > /tmp/oasdiff.deb \
 && curl -fsSL https://sentry.io/get-cli/ | bash \
 && curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg \
 && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
