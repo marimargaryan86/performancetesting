@@ -10,7 +10,6 @@ rules:
 overrides:
   - files:
       - "junction/mobile_api/openapi.json#/components/schemas/SegmentIdentifier/properties/legs/items"
-      - "junction/mobile_api/openapi.json#/components/schemas/Leg"
       - "junction/mobile_api/openapi.json#/components/schemas/Trip/allOf/0/properties/attributes/properties/segments/items"
       - "junction/mobile_api/openapi.json#/components/schemas/Leg/allOf/0/properties"
     rules:
@@ -31,9 +30,7 @@ overrides:
       - "junction/mobile_api/openapi.json#/components/schemas/OfferGroupNew/properties"
       - "junction/mobile_api/openapi.json#/components/schemas/OfferDetails/properties"
       - "junction/mobile_api/openapi.json#/components/schemas/OfferOption/properties"
-      - "junction/mobile_api/openapi.json#/components/schemas/LegTypeIdentifier/properties"
       - "junction/mobile_api/openapi.json#/components/schemas/TripOfferOptionDetails/properties"
-      - "junction/mobile_api/openapi.json#/components/schemas/Leg"
     rules:
       json-api-no-nested-id: info
       json-api-no-type: info
@@ -44,7 +41,6 @@ overrides:
       - "junction/mobile_api/openapi.json#/components/schemas/OfferAggregate"
       - "junction/mobile_api/openapi.json#/components/schemas/OfferGroupNew/properties"
       - "junction/mobile_api/openapi.json#/components/schemas/OfferOption/properties"
-      - "junction/mobile_api/openapi.json#/components/schemas/LegTypeIdentifier"
     rules:
       json-api-no-nested-data: info
   - files:
