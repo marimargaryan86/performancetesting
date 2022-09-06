@@ -22,7 +22,7 @@ class ClientConfig(object):
     client_secret: str
     api_url: str
     partner_code: str
-    timeout: int
+    timeout: int = 120
     api_version: Optional[str] = "v1.0"
 
 
@@ -53,12 +53,12 @@ class BaseClient(object):
                 headers=await self._default_headers(),
             )
         except httpx.HTTPError as raw_exc:
-            raise errors.ServiceError(inspect.getdoc(raw_exc)) from raw_exc
+            raise errors.DFServiceError(inspect.getdoc(raw_exc)) from raw_exc
 
         try:
             response.raise_for_status()
         except httpx.HTTPError as exc:
-            raise errors.ServiceError(
+            raise errors.DFServiceError(
                 errors.get_response_error_message(response),
             ) from exc
 

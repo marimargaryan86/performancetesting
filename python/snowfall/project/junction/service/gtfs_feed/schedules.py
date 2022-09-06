@@ -54,7 +54,10 @@ class SchedulesGenerator(object):
                 agency_url="https://example.com/",  # type: ignore[arg-type]
                 agency_timezone="",
             ),
-            route=models.Route.construct(route_id="", route_type=0),
+            route=models.Route.construct(
+                route_id="",
+                route_type=enums.RouteType.light_rail,
+            ),
             route_type=models_pb2.Schedule.TYPE_UNSPECIFIED,
             trip=models.Trip.construct(
                 route_id="",
@@ -74,7 +77,7 @@ class SchedulesGenerator(object):
             if not context.route or context.route.route_id != trip.route_id:
                 context.route = await self._collection.routes.get_by_id(trip.route_id)
                 context.route_type = enums.gtfs_type_to_schedule_type(
-                    context.route.route_type,
+                    context.route.route_type.value,
                 )
 
             if context.route_type == models_pb2.Schedule.TYPE_UNSPECIFIED:
@@ -106,7 +109,10 @@ class SchedulesGenerator(object):
                 [
                     stop_time
                     for stop_time in stop_times
-                    if stop_time.pickup_type == 0 or stop_time.drop_off_type == 0
+                    if stop_time.pickup_type
+                    == enums.PickupType.regularly_scheduled_pickup
+                    or stop_time.drop_off_type
+                    == enums.DropOffType.regularly_scheduled_drop_off
                 ],
             )
 
@@ -160,7 +166,7 @@ class SchedulesGenerator(object):
         departure_at = None
         arrival_at = None
 
-        if stop_time.pickup_type == 0 and stop_time.departure_time:
+        if stop_time.pickup_type.value == 0 and stop_time.departure_time:
             departure_at = timestamp_pb2.Timestamp()
             departure_at.FromDatetime(
                 datetimes.create_datetime(
@@ -170,7 +176,7 @@ class SchedulesGenerator(object):
                 ),
             )
 
-        if stop_time.drop_off_type == 0 and stop_time.arrival_time:
+        if stop_time.drop_off_type.value == 0 and stop_time.arrival_time:
             arrival_at = timestamp_pb2.Timestamp()
             arrival_at.FromDatetime(
                 datetimes.create_datetime(

@@ -71,10 +71,13 @@ def normalize_phone_number(phone: Optional[str]) -> Optional[str]:
 
 
 def normalize_time(
-    time: Optional[Union[float, str]],
+    time: Optional[Union[str, float, datetime.timedelta]],
 ) -> Optional[Union[float, datetime.timedelta]]:
     if time is None:
         return None
+
+    if isinstance(time, datetime.timedelta):
+        return time
 
     # A JSON-serialized model will contain float.
     if isinstance(time, float):

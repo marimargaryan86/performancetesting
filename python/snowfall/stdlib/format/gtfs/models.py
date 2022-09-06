@@ -4,7 +4,7 @@ from typing import Annotated, Optional
 
 import pydantic
 
-from snowfall.stdlib.format.gtfs import constants, normalizers
+from snowfall.stdlib.format.gtfs import constants, enums, normalizers
 
 
 class Agency(pydantic.BaseModel):
@@ -90,7 +90,7 @@ class Route(pydantic.BaseModel):
     route_short_name: Optional[str]
     route_long_name: Optional[str]
     route_desc: Optional[str]
-    route_type: pydantic.NonNegativeInt  # todo: validate against enums
+    route_type: enums.RouteType
     route_url: Optional[pydantic.HttpUrl]
     route_color: Optional[Annotated[str, pydantic.Field(regex=constants.COLOR_REGEX)]]
     route_text_color: Optional[
@@ -120,7 +120,7 @@ class Stop(pydantic.BaseModel):
     ]
     zone_id: Optional[str]
     stop_url: Optional[pydantic.HttpUrl]
-    location_type: pydantic.NonNegativeInt = 0
+    location_type: enums.LocationType
     parent_station: Optional[str]
     stop_timezone: Optional[str]
     wheelchair_boarding: pydantic.NonNegativeInt = 0
@@ -140,8 +140,8 @@ class StopTime(pydantic.BaseModel):
     stop_id: str
     stop_sequence: pydantic.NonNegativeInt
     stop_headsign: Optional[str]
-    pickup_type: pydantic.NonNegativeInt = 0
-    drop_off_type: pydantic.NonNegativeInt = 0
+    pickup_type: enums.PickupType
+    drop_off_type: enums.DropOffType
     continuous_pickup: pydantic.NonNegativeInt = 1
     continuous_drop_off: pydantic.NonNegativeInt = 1
     shape_dist_traveled: Optional[pydantic.NonNegativeFloat]
@@ -165,8 +165,15 @@ class Trip(pydantic.BaseModel):
     direction_id: Optional[pydantic.NonNegativeInt]
     block_id: Optional[str]
     shape_id: Optional[str]
-    wheelchair_accessible: pydantic.NonNegativeInt
-    bikes_allowed: pydantic.NonNegativeInt
+    wheelchair_accessible: pydantic.NonNegativeInt = 0
+    bikes_allowed: pydantic.NonNegativeInt = 0
+
+
+class Transfer(pydantic.BaseModel):
+    from_stop_id: str
+    to_stop_id: str
+    transfer_type: int
+    min_transfer_time: Optional[pydantic.NonNegativeInt]
 
 
 @dataclasses.dataclass(frozen=True)
