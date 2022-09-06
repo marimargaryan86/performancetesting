@@ -31,7 +31,7 @@ class Payments(endpoints.HTTPEndpoint):
                 raise exceptions.HTTPException(status.HTTP_502_BAD_GATEWAY)
             api_response_user = stripe.Customer.create(
                 email=user.email,
-                name=user.name,
+                name=user.first_name,
             )
             stripe_user = models_pb2.StripeUser(
                 id=api_response_user.stripe_id,

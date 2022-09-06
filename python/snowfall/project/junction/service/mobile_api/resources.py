@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import datetime
 import enum
 from typing import Any, Mapping
 
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
+from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
 
@@ -50,20 +52,61 @@ class TripSearchTripsResource(models.Resource):
 class UserResource(models.Resource):
     @classmethod
     def from_proto(cls, user: models_pb2.User) -> UserResource:
+        attributes = {
+            "firstName": user.first_name,
+            "lastName": user.last_name,
+            "email": user.email,
+            "phone": user.phone.e164_number,
+            "loyaltyPrograms": [
+                {"program": program.program, "number": program.number}
+                for program in user.loyalty_programs
+            ],
+            "createdAt": protobuf.protobuf_to_datetime(
+                user.created_at,
+            ),
+            "updatedAt": protobuf.protobuf_to_datetime(
+                user.updated_at,
+            ),
+        }
+        if user.gender:
+            attributes["gender"] = user.gender
+        if user.title:
+            attributes["title"] = user.title
+        if user.country_code:
+            attributes["countryCode"] = user.country_code
+        if user.date_of_birth.year:
+            attributes["dateOfBirth"] = protobuf.protobuf_to_date(user.date_of_birth)
         return cls(
             id=user.id,
             type="users",
-            attributes={
-                "name": user.name,
-                "email": user.email,
-                "phone": user.phone.e164_number,
-                "created": protobuf.protobuf_to_datetime(
-                    user.created_at,
-                ),
-                "updated": protobuf.protobuf_to_datetime(
-                    user.updated_at,
-                ),
-            },
+            attributes=attributes,
+        )
+
+    @classmethod
+    def from_dict(cls, user_id: str, user: Mapping[str, Any]) -> UserResource:
+        attributes = {}
+        for field in user.keys():
+            camel_field = string.to_camel(field)
+            attribute = user[field]
+            if camel_field == "phone":
+                attributes[camel_field] = attribute["e164_number"]
+            elif camel_field == "dateOfBirth":
+                attributes[camel_field] = datetime.date(
+                    attribute["year"],
+                    attribute["month"],
+                    attribute["day"],
+                )
+            elif camel_field == "loyaltyPrograms":
+                attributes[camel_field] = [
+                    {"program": program["program"], "number": program["number"]}
+                    for program in attribute
+                ]
+            else:
+                attributes[camel_field] = attribute
+        return cls(
+            id=user_id,
+            type="users",
+            attributes=attributes,
         )
 
 

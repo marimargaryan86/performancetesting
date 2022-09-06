@@ -15,6 +15,7 @@ from snowfall.stdlib.persistence.redis import types as redis
 
 _DATA_ACCESSOR = "data"
 _ID_ACCESSOR = "id"
+_ID_KEY = "_id"
 _ATTRIBUTES_ACCESSOR = "attributes"
 _EMAIL_KEY = "email"
 
@@ -77,6 +78,20 @@ class UsersRepository(
 
     async def get(self, query: Any) -> models_pb2.User:
         return await self._execute(self._collection.find_one, filter=query)
+
+    async def update_profile(
+        self,
+        user_id: str,
+        input_dict: Mapping[str, Any],
+    ) -> None:
+        user = dict(copy.deepcopy(input_dict))
+        user["updated_at"] = datetime.datetime.utcnow()
+        await self._execute(
+            self._collection.update_one,
+            {_ID_KEY: user_id},
+            {"$set": user},
+            upsert=False,
+        )
 
     async def delete(self, user_id: str) -> None:
         user = await self._execute(

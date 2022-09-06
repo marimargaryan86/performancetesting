@@ -22,9 +22,9 @@ async def _post_users(
         json={
             "data": {
                 "type": "users",
-                "id": "string",
                 "attributes": {
-                    "name": user.name,
+                    "firstName": user.first_name,
+                    "lastName": user.last_name,
                     "password": user.password,
                     "email": user.email,
                     "phone": user.phone.e164_number,
@@ -122,9 +122,9 @@ class TestUsers(object):
             json={
                 "data": {
                     "type": "users",
-                    "id": "string",
                     "attributes": {
-                        "name": new_user.name,
+                        "firstName": new_user.first_name,
+                        "lastName": new_user.last_name,
                         "password": new_user.password,
                         "email": new_user.email,
                         "phone": new_user.phone.e164_number,

@@ -68,7 +68,8 @@ def new_user() -> models_pb2.User:
         email="new_user@gmail.com",
         password="ReallyString1!",
         phone=phone_number_pb2.PhoneNumber(e164_number="+306966661752"),
-        name="New User",
+        first_name="New",
+        last_name="User",
     )
 
 
@@ -84,7 +85,8 @@ def existing_user() -> ExistingUser:
         id=str(uuid.uuid4()),
         email="existing_user@gmail.com",
         password="$2a$12$bb8.n1wWBXhUdJUToN.qoebWG2aZb7bMJD820mfcMDt2MW5e21VaK",
-        name="Existing User",
+        first_name="Existing",
+        last_name="User",
         phone=phone_number_pb2.PhoneNumber(e164_number="+306966661752"),
     )
     return {"model": user, "unhashed_password": "ReallyStrong1!"}

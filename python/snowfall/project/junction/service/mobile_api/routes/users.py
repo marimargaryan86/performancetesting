@@ -8,12 +8,9 @@ import lagom
 from pymongo import errors
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.project.junction.service.mobile_api import (
-    jwt_generator,
-    repository,
-    resources,
-    smtp,
-)
+from snowfall.project.junction.service.mobile_api import jwt_generator
+from snowfall.project.junction.service.mobile_api import models as mobile_models
+from snowfall.project.junction.service.mobile_api import repository, resources, smtp
 from snowfall.project.junction.service.mobile_api.v1alpha.models_pb2 import (
     User as UserModel,
 )
@@ -51,7 +48,8 @@ class Users(endpoints.HTTPEndpoint):
                 bcrypt.gensalt(),
             ).decode(),
             phone=phone_number_pb2.PhoneNumber(e164_number=body["phone"]),
-            name=body["name"],
+            first_name=body["firstName"],
+            last_name=body["lastName"],
         )
         try:
             await users_repository.insert(user)
@@ -138,6 +136,25 @@ class UserLoggedIn(endpoints.HTTPEndpoint):
         user_id = request.user.username
         await users_repository.delete(user_id)
         return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
+
+    async def patch(
+        self,
+        request: requests.Request,
+        users_repository: repository.UsersRepository = lagom.injectable,
+    ) -> responses.Response:
+        user_id = request.user.username
+        body = await request_helpers.flatten_request(request)
+        user = mobile_models.User.from_dict(body)
+
+        await users_repository.update_profile(user_id, user.dict(exclude_unset=True))
+        return models.JsonApiResponse(
+            models.Body(
+                data=resources.UserResource.from_dict(
+                    user_id,
+                    user.dict(exclude_unset=True),
+                ),
+            ),
+        )
 
 
 class UserOrders(endpoints.HTTPEndpoint):

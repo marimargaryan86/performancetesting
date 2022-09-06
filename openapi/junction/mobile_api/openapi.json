@@ -781,7 +781,7 @@
             "content": {
               "application/vnd.api+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "#/components/schemas/UserProfile"
                 }
               }
             }
@@ -834,7 +834,7 @@
             "otp": []
           }
         ],
-        "summary": "Update User"
+        "summary": "Update user's password"
       }
     },
     "/users/me":{
@@ -858,6 +858,48 @@
             "$ref": "#/components/responses/Unauthorized"
           }
         }
+      },
+      "patch": {
+        "tags": [
+          "user"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserProfile"
+              }
+            }
+          },
+          "description": ""
+        },
+        "operationId": "patch-users-me",
+        "description": "User update profile",
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Update User"
       }
     }
   },
@@ -1643,7 +1685,8 @@
             "properties": {
               "id": {
                 "type": "string",
-                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
               },
               "type": {
                 "type": "string",
@@ -1655,9 +1698,13 @@
               "attributes": {
                 "type": "object",
                 "properties": {
-                  "name": {
+                  "firstName": {
                     "type": "string",
                     "example": "john"
+                  },
+                  "lastName": {
+                    "type": "string",
+                    "example": "wick"
                   },
                   "password": {
                     "type": "string",
@@ -1675,22 +1722,25 @@
                     "format": "phone",
                     "example": "+123456789"
                   },
-                  "created": {
+                  "createdAt": {
                     "type": "string",
                     "example": "2019-08-24T14:15:22Z",
+                    "format": "date-time",
                     "readOnly": true
                   },
-                  "udpated": {
+                  "updatedAt": {
                     "type": "string",
                     "example": "2019-08-24T14:15:22Z",
+                    "format": "date-time",
                     "readOnly": true
                   }
                 },
                 "required": [
-                  "name",
+                  "firstName",
+                  "lastName",
                   "email",
                   "phone",
-                  "created"
+                  "createdAt"
                 ]
               }
             },
@@ -1707,9 +1757,112 @@
         "title": "User",
         "description": ""
       },
+      "UserProfile": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "users"
+                ],
+                "example": "users"
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "firstName": {
+                    "type": "string",
+                    "example": "john"
+                  },
+                  "lastName": {
+                    "type": "string",
+                    "example": "wick"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com",
+                    "readOnly": true
+                  },
+                  "phone": {
+                    "type": "string",
+                    "format": "phone",
+                    "example": "+123456789"
+                  },
+                  "gender": {
+                    "type": "string",
+                    "enum": [
+                      "female",
+                      "male",
+                      "unspecified"
+                    ],
+                    "example": "male"
+                  },
+                  "title": {
+                    "type": "string",
+                    "enum": [
+                      "mr",
+                      "mrs",
+                      "miss",
+                      "ms"
+                    ],
+                    "example": "mr"
+                  },
+                  "countryCode": {
+                    "type": "string",
+                    "format": "country",
+                    "example": "DE"
+                  },
+                  "dateOfBirth": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "1964-07-12"
+                  },
+                  "loyaltyPrograms": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/LoyaltyProgram"
+                    }
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "example": "2019-08-24T14:15:22Z",
+                    "format": "date-time",
+                    "readOnly": true
+                  },
+                  "updatedAt": {
+                    "type": "string",
+                    "example": "2019-08-24T14:15:22Z",
+                    "format": "date-time",
+                    "readOnly": true
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "User (Profile)",
+        "description": ""
+      },
       "UserUpdatable": {
         "type": "object",
-        "title": "User (Update)",
+        "title": "User (Update Password)",
         "description": "",
         "properties": {
           "type": {
@@ -2463,6 +2616,24 @@
           "number",
           "firstName",
           "lastName"
+        ]
+      },
+      "LoyaltyProgram": {
+        "title": "LoyaltyProgram",
+        "type": "object",
+        "properties": {
+          "program" :{
+            "type": "string",
+            "example": "Miles+Bonus"
+          },
+          "number": {
+            "type": "string",
+            "example": "123456"
+          }
+        },
+        "required": [
+          "program",
+          "number"
         ]
       },
       "OrderResult": {
