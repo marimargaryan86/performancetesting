@@ -129,6 +129,17 @@ class User(endpoints.HTTPEndpoint):
         return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
+class UserLoggedIn(endpoints.HTTPEndpoint):
+    async def delete(
+        self,
+        request: requests.Request,
+        users_repository: repository.UsersRepository = lagom.injectable,
+    ) -> responses.Response:
+        user_id = request.user.username
+        await users_repository.delete(user_id)
+        return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
 class UserOrders(endpoints.HTTPEndpoint):
     async def get(
         self,

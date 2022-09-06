@@ -836,6 +836,29 @@
         ],
         "summary": "Update User"
       }
+    },
+    "/users/me":{
+      "delete":{
+        "summary": "Delete User",
+        "tags": [
+          "user"
+        ],
+        "operationId": "delete-users-me",
+        "description": "Delete user",
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User deleted successfully"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
     }
   },
   "components": {

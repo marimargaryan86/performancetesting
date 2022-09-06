@@ -78,6 +78,16 @@ class UsersRepository(
     async def get(self, query: Any) -> models_pb2.User:
         return await self._execute(self._collection.find_one, filter=query)
 
+    async def delete(self, user_id: str) -> None:
+        user = await self._execute(
+            self._collection.find_one_and_delete,
+            filter={"_id": user_id},
+        )
+        await self._execute(
+            self._collection.database["users_deleted"].insert_one,
+            self._coder.encode(user),
+        )
+
 
 class OtpRepository(object):
     def __init__(
