@@ -3,7 +3,7 @@ files(sources=["**/*"], name="files")
 relocated_files(
     name="relocated_files",
     files_targets=[":files"],
-    src="svelte/junction-pay",
+    src="svelte/pay-web",
     dest="",
 )
 

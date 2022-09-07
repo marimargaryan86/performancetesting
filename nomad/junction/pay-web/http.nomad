@@ -14,7 +14,7 @@ variable "registry_username" {
   type = string
 }
 
-job "pay-ui" {
+job "pay-web" {
   datacenters = ["junction-dev-dc1"]
   type        = "service"
 
@@ -31,12 +31,12 @@ job "pay-ui" {
     count = 1
 
     service {
-      name = "pay-ui-${NOMAD_NAMESPACE}"
+      name = "pay-web-${NOMAD_NAMESPACE}"
       port = "http"
       tags = [
         "traefik.enable=true",
-        "traefik.http.routers.pay-ui.entrypoints=websecure",
-        "traefik.http.routers.pay-ui.rule=Host(`pay.junction.dev`)",
+        "traefik.http.routers.pay-web.entrypoints=websecure",
+        "traefik.http.routers.pay-web.rule=Host(`pay.junction.dev`)",
       ]
 
       check {
