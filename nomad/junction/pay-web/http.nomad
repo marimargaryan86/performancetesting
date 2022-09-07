@@ -63,6 +63,11 @@ job "pay-web" {
           server_address = var.registry_address
         }
       }
+
+      env {
+        ENV_NAME = "${NOMAD_NAMESPACE}"
+        PORT     = "${NOMAD_PORT_http}"
+      }
     }
   }
 }
