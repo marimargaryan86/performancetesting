@@ -30,6 +30,10 @@ job "pay-web" {
   group "http" {
     count = 1
 
+    network {
+      port "http" {}
+    }
+
     service {
       name = "pay-web-${NOMAD_NAMESPACE}"
       port = "http"
