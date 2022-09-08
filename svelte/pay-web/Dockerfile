@@ -7,6 +7,9 @@ COPY --chown=node:node ./package.json ./yarn.lock ./svelte.config.js ./
 
 USER node
 
+#Without this RM yarn build doesn't generate files
+RUN rm -rf node_modules
+
 RUN yarn install && yarn cache clean
 
 COPY --chown=node:node . .
