@@ -4,7 +4,7 @@ from typing import Any, Mapping
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.project.junction.service.mobile_api import repository, resources
+from snowfall.project.junction.service.mobile_api import repository, resources, smtp
 from snowfall.project.junction.service.mobile_api.tasks import orders
 from snowfall.stdlib.integration.starlette import models as stdlib_models
 from snowfall.stdlib.integration.starlette import request_helpers
@@ -38,6 +38,7 @@ class Orders(endpoints.HTTPEndpoint):
         request: requests.Request,
         orders_repository: repository.OrdersRepository = lagom.injectable,
         junction_client: client.JunctionClient = lagom.injectable,
+        smtp_client: smtp.EmailClient = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
 
@@ -76,6 +77,7 @@ class Orders(endpoints.HTTPEndpoint):
                 orders_repository,
                 junction_order["data"][_ID],
                 body["paymentIntentId"],
+                smtp_client,
             ),
         )
 

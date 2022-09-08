@@ -1,0 +1,25 @@
+<html>
+    <body>
+        <div style="max-width: fit-content;">
+            These details have been forwarded from the ‘Insert Name of Company’ app. <br>
+            <br>Journey details<br>
+            Booking reference - ABC123
+            {% for leg in details %}
+                <hr style="border-top: dotted 1px;">
+                <div>
+                    {%if leg.legType == 'air'%}
+                        <h4>Flight {{leg.ref}}
+                            {{leg.origin.ref}} to {{leg.destination.ref}}</h4>
+                        Departure - {{leg.origin.name}} {{leg.departureAt}}<br>
+                        Arrival - {{leg.destination.name}} {{leg.arrivalAt}}
+                    {% endif %}
+                    {%if leg.legType == 'rail'%}
+                        <h4>Rail {{leg.ref}}</h4>
+                        Departure - {{leg.origin.name}} {{leg.departureAt}}<br>
+                        Arrival - {{leg.destination.name}} {{leg.arrivalAt}}
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </body>
+</html>
