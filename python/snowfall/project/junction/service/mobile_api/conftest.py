@@ -189,6 +189,15 @@ def trip_searches_repository(
 
 
 @pytest.fixture
+def loyalty_programs_repository(
+    mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
+) -> repository.LoyaltyProgramsRepository:
+    return repository.LoyaltyProgramsRepository(
+        mongo_test_db["air_loyalty"],
+    )
+
+
+@pytest.fixture
 def trips_repository(
     mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
 ) -> repository.TripsRepository:
@@ -308,6 +317,7 @@ def app(  # noqa: WPS211
     junction_client: client.JunctionClient,
     jwt_gen: jwt_generator.JwtGenerator,
     stripe_users_repository: repository.StripeUsersRepository,
+    loyalty_programs_repository: repository.LoyaltyProgramsRepository,
 ) -> applications.Starlette:
     return _create_app(
         dependencies=bootstrap.create_dependencies(
@@ -322,6 +332,7 @@ def app(  # noqa: WPS211
             smtp_client,
             jwt_gen,
             stripe_users_repository,
+            loyalty_programs_repository,
         ),
         openapi_path=filesystem.resource_path("junction.mobile_api", "openapi.json"),
         custom_middlewares=[

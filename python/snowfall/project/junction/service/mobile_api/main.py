@@ -85,6 +85,9 @@ def _factory(
                     mongo["trip-searches"],
                 ),
                 trips_repository=repository.TripsRepository(mongo["trips"]),
+                loyalty_programs_repository=repository.LoyaltyProgramsRepository(
+                    mongo["air_loyalty"],
+                ),
                 junction_client=junction_client,
                 jwt_gen=jwt_gen,
             ),

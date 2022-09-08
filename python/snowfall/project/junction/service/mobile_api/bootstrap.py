@@ -36,6 +36,7 @@ def create_dependencies(  # noqa: WPS211
     smtp_client: smtp.EmailClient,
     jwt_gen: jwt_generator.JwtGenerator,
     stripe_users_repository: repository.StripeUsersRepository,
+    loyalty_programs_repository: repository.LoyaltyProgramsRepository,
 ) -> starlette.StarletteIntegration:
     container = lagom.Container()
     container[repository.OffersRepository] = offers_repository
@@ -49,4 +50,5 @@ def create_dependencies(  # noqa: WPS211
     container[smtp.EmailClient] = smtp_client
     container[jwt_generator.JwtGenerator] = jwt_gen
     container[repository.StripeUsersRepository] = stripe_users_repository
+    container[repository.LoyaltyProgramsRepository] = loyalty_programs_repository
     return starlette.StarletteIntegration(container)

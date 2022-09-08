@@ -152,3 +152,20 @@ class PlaceResource(models.Resource):
                 },
             },
         )
+
+
+class LoyaltyProgram(models.Resource):
+    @classmethod
+    def from_proto(
+        cls,
+        program: models_pb2.LoyaltyProgram,
+    ) -> LoyaltyProgram:
+        return cls(
+            id=program.id,
+            type="loyalty-programs",
+            attributes={
+                "iata": program.iata,
+                "airline": program.airline,
+                "name": program.name,
+            },
+        )

@@ -57,6 +57,12 @@
       "tags": [
         "user"
       ]
+    },
+    {
+      "name": "Loyalty",
+      "tags": [
+        "loyalty"
+      ]
     }
   ],
   "tags": [
@@ -64,6 +70,11 @@
       "name": "internal",
       "description": "Endpoints not for public use.",
       "x-displayName": "Internal"
+    },
+    {
+      "name": "loyalty",
+      "description": "Endpoints for loyalty programs resource management.",
+      "x-displayName": "Loyalty"
     },
     {
       "name": "offers",
@@ -152,6 +163,72 @@
         },
         "operationId": "post-trips-searches",
         "description": "Search trips."
+      }
+    },
+    "/loyalty-programs": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          },
+          {
+            "name": "query[name]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "example": "A3"
+            },
+            "description": "Used as a key to search relevant loyalty programs. Could be part of the iata code, the airline name or the loyalty program name. Min 2 characters"
+          }
+        ],
+        "summary": "List Loyalty programs",
+        "tags": [
+          "loyalty"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "items": {
+                            "$ref": "#/components/schemas/LoyaltyProgram"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-loyalty-programs",
+        "description": "Used to retrieve loyalty programs based on a search query."
       }
     },
     "/trips/searches/{tripSearchId}/trips": {
@@ -1015,6 +1092,43 @@
           "id"
         ]
       },
+      "LoyaltyProgram": {
+        "title": "Loyalty Program",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "loyalty-programs"
+            ],
+            "example": "loyalty-programs"
+          },
+          "attributes":{
+            "type": "object",
+            "properties": {
+              "iata": {
+                "type": "string",
+                "example": "A3"
+              },
+              "airline": {
+                "type": "string",
+                "example": "Aegean Airlines"
+              },
+              "name": {
+                "type": "string",
+                "example": "Miles+Bonus"
+              }
+            },
+            "required": ["iata", "airline", "name"]
+          }
+        },
+        "required": ["id", "type", "attributes"]
+      },
       "Trip": {
         "title": "Trip",
         "allOf": [
@@ -1829,7 +1943,7 @@
                   "loyaltyPrograms": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/LoyaltyProgram"
+                      "$ref": "#/components/schemas/LoyaltyProgramUserProfile"
                     }
                   },
                   "createdAt": {
@@ -2553,6 +2667,30 @@
           "links"
         ]
       },
+      "NextLink": {
+        "title": "Next Link",
+        "type": "object",
+        "properties": {
+          "links": {
+            "type": "object",
+            "required": [
+              "next"
+            ],
+            "properties": {
+              "next": {
+                "type": "string",
+                "format": "uri",
+                "example": "https://example.com/resource/?page%5Bcursor%5D=MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D&page%5Blimit%5D=20",
+                "readOnly": true
+              }
+            },
+            "readOnly": true
+          }
+        },
+        "required": [
+          "links"
+        ]
+      },
       "Passenger": {
         "title": "Passenger",
         "type": "object",
@@ -2618,8 +2756,8 @@
           "lastName"
         ]
       },
-      "LoyaltyProgram": {
-        "title": "LoyaltyProgram",
+      "LoyaltyProgramUserProfile": {
+        "title": "LoyaltyProgramUserProfile",
         "type": "object",
         "properties": {
           "program" :{

@@ -17,12 +17,12 @@ message User {
   string title = 8;
   string country_code = 9;
   snowfall.stdlib.v1alpha.Date date_of_birth = 10;
-  repeated LoyaltyProgram loyalty_programs = 11;
+  repeated LoyaltyProgramUserProfile loyalty_programs = 11;
   google.protobuf.Timestamp created_at = 12;
   google.protobuf.Timestamp updated_at = 13;
 }
 
-message LoyaltyProgram {
+message LoyaltyProgramUserProfile {
   string program = 1;
   string number = 2;
 }
@@ -56,4 +56,11 @@ message OfferSearchHistoryEntity {
 message OfferSearchHistory {
   string user_id = 1;
   repeated OfferSearchHistoryEntity offer_search_history = 2;
+}
+
+message LoyaltyProgram {
+  string id = 1;
+  string iata = 2;
+  string airline = 3;
+  string name = 4;
 }

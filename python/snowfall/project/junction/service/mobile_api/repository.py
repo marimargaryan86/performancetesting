@@ -18,7 +18,7 @@ _ID_ACCESSOR = "id"
 _ID_KEY = "_id"
 _ATTRIBUTES_ACCESSOR = "attributes"
 _EMAIL_KEY = "email"
-
+_DEFAULT_PAGE_SIZE = 20
 _DICT_SEQUENCE = Sequence[dict[str, Any]]
 
 
@@ -167,6 +167,34 @@ class OffersRepository(
             },
             upsert=True,
         )
+
+
+class LoyaltyProgramsRepository(
+    repository.ProtoRepository[models_pb2.LoyaltyProgram],
+):
+    _proto = models_pb2.LoyaltyProgram
+
+    async def find(
+        self,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+        search_key: Optional[str] = None,
+    ) -> resultset.ResultSet[models_pb2.LoyaltyProgram]:
+        query = {}
+        if search_key:
+            query = {
+                "$or": [
+                    {"iata": {"$regex": search_key, "$options": "$i"}},
+                    {"airline": {"$regex": search_key, "$options": "$i"}},
+                    {"name": {"$regex": search_key, "$options": "$i"}},
+                ],
+            }
+        programs = await self._find_with_cursor(
+            cur=cursor or "",
+            filter_=query,
+        )
+        programs.limit(limit if limit else _DEFAULT_PAGE_SIZE)
+        return programs
 
 
 class MockRepository(

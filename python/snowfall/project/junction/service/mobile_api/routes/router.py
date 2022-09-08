@@ -2,6 +2,7 @@ from lagom.integrations import starlette
 from starlette import routing
 
 from snowfall.project.junction.service.mobile_api.routes import (
+    loyalty_programs,
     offers,
     orders,
     payments,
@@ -38,4 +39,9 @@ def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Rou
             name="TripSearchesTrips",
         ),
         dependencies.route("/trips/searches", trips.TripSearches, name="TripSearches"),
+        dependencies.route(
+            "/loyalty-programs",
+            loyalty_programs.Programs,
+            name="ListLoyaltyPrograms",
+        ),
     ]
