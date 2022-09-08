@@ -56,6 +56,7 @@ job "pay-web" {
 
       config {
         image = var.docker_image
+        ports = ["http"]
 
         auth {
           username       = var.registry_username
