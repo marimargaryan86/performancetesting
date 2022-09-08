@@ -12,5 +12,6 @@ RUN yarn install && yarn cache clean
 COPY --chown=node:node . .
 
 RUN yarn run lint && yarn run build && find /app -mindepth 1 ! -regex '^/app/build\(/.*\)?' -delete
+COPY --chown=node:node ./package.json ./
 
 CMD ["node", "/app/build/index.js"]
