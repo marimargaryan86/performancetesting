@@ -184,9 +184,9 @@ class LoyaltyProgramsRepository(
         if search_key:
             query = {
                 "$or": [
-                    {"iata": {"$regex": search_key, "$options": "$i"}},
-                    {"airline": {"$regex": search_key, "$options": "$i"}},
-                    {"name": {"$regex": search_key, "$options": "$i"}},
+                    {"iata": {"$regex": search_key, "$options": "i"}},
+                    {"airline": {"$regex": search_key, "$options": "i"}},
+                    {"name": {"$regex": search_key, "$options": "i"}},
                 ],
             }
         programs = await self._find_with_cursor(
