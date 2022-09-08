@@ -6,6 +6,7 @@ import "snowfall/project/pay/service/rates/v1alpha/models.proto";
 
 service RatesService {
   rpc Insert(InsertRequest) returns (InsertResponse) {}
+  rpc Monitor(MonitorRequest) returns (MonitorResponse) {}
 }
 
 message InsertRequest {
@@ -14,4 +15,12 @@ message InsertRequest {
 
 message InsertResponse {
   repeated Rate rates = 2;
+}
+
+message MonitorRequest {
+  MonitoredRate monitored_rate = 1;
+}
+
+message MonitorResponse {
+  MonitoredRate monitored_rate = 1;
 }
