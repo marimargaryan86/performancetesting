@@ -32,6 +32,8 @@ class FetchRateJob(object):
             ],
         )
 
+        await self._update_existing_data()
+
     async def _generate_currency_pairs(self) -> str:
         monitored_currencies = await self._monitored_rates.find_enabled_rates()
         pairs = set()
@@ -41,3 +43,9 @@ class FetchRateJob(object):
             )
 
         return ",".join(pairs)
+
+    async def _update_existing_data(self) -> None:
+        await self._monitored_rates.update_fetched_date()
+
+        outdated_rates = await self._rates.find_outdated_rates()
+        await self._rates.delete_by_ids([rate.id async for rate in outdated_rates])

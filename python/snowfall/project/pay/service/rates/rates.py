@@ -1,8 +1,11 @@
+import datetime
 import uuid
 from typing import Sequence
 
 from snowfall.project.pay.service.rates.v1alpha import models_pb2
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
+
+VALID_RATE_DAYS = 30
 
 
 class RatesRepository(  # noqa: WPS215
@@ -22,6 +25,26 @@ class RatesRepository(  # noqa: WPS215
 
         return await super().insert_many(documents)
 
+    async def find_outdated_rates(self) -> resultset.ResultSet[models_pb2.Rate]:
+        date_threshold = datetime.datetime.now() - datetime.timedelta(
+            days=VALID_RATE_DAYS,
+        )
+
+        return await self._find_with_cursor(
+            "",
+            filter_={"created_at": {"$lte": date_threshold}},
+        )
+
+    async def delete_by_ids(self, ids: Sequence[str]) -> None:
+        await self._execute(
+            self._collection.delete_many,
+            {
+                repository.mongo_id_key: {
+                    "$in": list(ids),
+                },
+            },
+        )
+
 
 class MonitoredRatesRepository(  # noqa: WPS215
     mixins.AllMixin[models_pb2.MonitoredRate],
@@ -35,4 +58,11 @@ class MonitoredRatesRepository(  # noqa: WPS215
         return await self._find_with_cursor(
             "",
             filter_={"enabled": True},
+        )
+
+    async def update_fetched_date(self) -> None:
+        await self._execute(
+            self._collection.update_many,
+            {"enabled": True},
+            {"$set": {"fetched_at": datetime.datetime.now()}},
         )
