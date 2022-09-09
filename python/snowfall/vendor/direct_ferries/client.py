@@ -1,10 +1,14 @@
 import httpx
 
-from snowfall.vendor.direct_ferries.clients import auth, base
-from snowfall.vendor.direct_ferries.clients import operator as operator_client
-from snowfall.vendor.direct_ferries.clients import quote as quote_client
-from snowfall.vendor.direct_ferries.clients import route as route_client
-from snowfall.vendor.direct_ferries.clients import timetable as timetable_client
+from snowfall.vendor.direct_ferries.clients import (
+    auth,
+    base,
+    booking,
+    operator,
+    quote,
+    route,
+    timetable,
+)
 
 
 class DFClient(object):
@@ -16,31 +20,36 @@ class DFClient(object):
         auth_client: auth.AuthClient,
         config: base.ClientConfig,
     ) -> None:
-        self._routes = route_client.RouteClient(http_client, auth_client, config)
-        self._timetables = timetable_client.TimetableClient(
+        self._routes = route.RouteClient(http_client, auth_client, config)
+        self._timetables = timetable.TimetableClient(
             http_client,
             auth_client,
             config,
         )
-        self._quotes = quote_client.QuoteClient(http_client, auth_client, config)
-        self._operators = operator_client.OperatorClient(
+        self._quotes = quote.QuoteClient(http_client, auth_client, config)
+        self._operators = operator.OperatorClient(
             http_client,
             auth_client,
             config,
         )
+        self._bookings = booking.BookingClient(http_client, auth_client, config)
 
     @property
-    def routes(self) -> route_client.RouteClient:
+    def routes(self) -> route.RouteClient:
         return self._routes
 
     @property
-    def timetables(self) -> timetable_client.TimetableClient:
+    def timetables(self) -> timetable.TimetableClient:
         return self._timetables
 
     @property
-    def quotes(self) -> quote_client.QuoteClient:
+    def quotes(self) -> quote.QuoteClient:
         return self._quotes
 
     @property
-    def operators(self) -> operator_client.OperatorClient:
+    def operators(self) -> operator.OperatorClient:
         return self._operators
+
+    @property
+    def bookings(self) -> booking.BookingClient:
+        return self._bookings

@@ -5,7 +5,11 @@ import pydantic
 
 from snowfall.vendor.ask2go.models import base
 from snowfall.vendor.direct_ferries import enums, normalizers
-from snowfall.vendor.direct_ferries.models import common
+
+
+class AgeRange(pydantic.BaseModel):
+    age_from: int = pydantic.Field(..., alias="from")
+    age_to: int = pydantic.Field(..., alias="to")
 
 
 class RoutePassengerInfo(base.CamelCaseBaseModel):
@@ -24,7 +28,7 @@ class ExtraInfo(base.CamelCaseBaseModel):
 
 
 class PassengerBase(base.CamelCaseBaseModel):
-    age_range: common.AgeRange
+    age_range: AgeRange
     is_wheelchair_user: bool
     is_lead_passenger: bool
     first_name: str

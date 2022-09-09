@@ -1,5 +1,6 @@
 import datetime
 from typing import Union
+from urllib import parse as parse_url
 
 
 def datetime_str_to_date(datetime_str: Union[str, datetime.date]) -> datetime.date:
@@ -7,3 +8,7 @@ def datetime_str_to_date(datetime_str: Union[str, datetime.date]) -> datetime.da
         return datetime.date.fromisoformat(datetime_str[:10])
 
     return datetime_str
+
+
+def normalize_booking_token(token: str) -> str:
+    return parse_url.unquote(token)
