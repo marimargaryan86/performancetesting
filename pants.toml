@@ -123,6 +123,7 @@ extra_requirements = [
     "pytest-cov",
     "pytest-icdiff",
     "pygments",
+    "allure-pytest",
 ]
 
 [python]

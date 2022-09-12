@@ -1,0 +1,22 @@
+{
+  "data": {
+    "type": "trip-offer-searches",
+    "attributes": {
+      "passengers": [
+        {
+          "dateOfBirth": "1992-04-29"
+        }
+      ]
+      },
+    "relationships": {
+      "trips": {
+        "data": [
+          {
+            "id": "{{trip_id}}",
+            "type": "trips"
+          }
+        ]
+      }
+    }
+  }
+}

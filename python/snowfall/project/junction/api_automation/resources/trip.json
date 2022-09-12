@@ -1,0 +1,24 @@
+{
+  "data": {
+    "attributes": {
+      "departureAfter": "{{departure_after}}",
+      "cabinClass": "economy",
+      "roundTrip": false
+    },
+    "relationships": {
+      "origin": {
+        "data": {
+          "id": "{{origin}}",
+          "type": "places"
+        }
+      },
+      "destination": {
+        "data": {
+          "id": "{{destination}}",
+          "type": "places"
+        }
+      }
+    },
+    "type": "trip-searches"
+  }
+}

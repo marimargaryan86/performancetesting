@@ -9,6 +9,7 @@
 //     "CPython==3.10.5"
 //   ],
 //   "generated_with_requirements": [
+//     "allure-pytest",
 //     "pygments",
 //     "pytest-asyncio",
 //     "pytest-cov",
@@ -27,6 +28,51 @@
   "locked_resolves": [
     {
       "locked_requirements": [
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "08274096594758447db54c3b2c382526ee04f1fe12119cdaee92d2d93c84b530",
+              "url": "https://files.pythonhosted.org/packages/38/7c/3e389818637607be78c4f4b4be899e89c6a8d566e890937aa7f173617211/allure_pytest-2.10.0-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "3b2ab67629f4cbd8617abd817d2b22292c6eb7efd5584f992d1af8143aea6ee7",
+              "url": "https://files.pythonhosted.org/packages/3a/4f/e2c291cbafe76edd4c5c47f0f516a4942cb468101d2568b2a98c4b6f6624/allure-pytest-2.10.0.tar.gz"
+            }
+          ],
+          "project_name": "allure-pytest",
+          "requires_dists": [
+            "allure-python-commons==2.10.0",
+            "pytest>=4.5.0",
+            "six>=1.9.0"
+          ],
+          "requires_python": null,
+          "version": "2.10"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "2a717e8ca8d296bf89cd57f38fc3c21893bd7ea8cd02a6ae5420e6d1a6eda5d0",
+              "url": "https://files.pythonhosted.org/packages/e9/08/f59f04f8b8a23e8946cc9b0de0f72967ec914134b8f31098750856d39a44/allure_python_commons-2.10.0-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "d4d31344b0f0037a4a11e16b91b28cf0eeb23ffa0e50c27fcfc6aabe72212d3c",
+              "url": "https://files.pythonhosted.org/packages/c3/20/556d9451977131803af738ea1e61a1a402f7d7ef23f07cdd39b9147cba83/allure-python-commons-2.10.0.tar.gz"
+            }
+          ],
+          "project_name": "allure-python-commons",
+          "requires_dists": [
+            "attrs>=16.0.0",
+            "enum34; python_version < \"3.4\"",
+            "pluggy>=0.4.0",
+            "six>=1.9.0"
+          ],
+          "requires_python": ">=3.5",
+          "version": "2.10"
+        },
         {
           "artifacts": [
             {
@@ -393,6 +439,24 @@
           "artifacts": [
             {
               "algorithm": "sha256",
+              "hash": "8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254",
+              "url": "https://files.pythonhosted.org/packages/d9/5a/e7c31adbe875f2abbb91bd84cf2dc52d792b5a01506781dbcf25c91daf11/six-1.16.0-py2.py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926",
+              "url": "https://files.pythonhosted.org/packages/71/39/171f1c67cd00715f190ba0b100d606d440a28c93c7714febeca8b79af85e/six-1.16.0.tar.gz"
+            }
+          ],
+          "project_name": "six",
+          "requires_dists": [],
+          "requires_python": "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7",
+          "version": "1.16"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
               "hash": "939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc",
               "url": "https://files.pythonhosted.org/packages/97/75/10a9ebee3fd790d20926a90a2547f0bf78f371b2f13aa822c759680ca7b9/tomli-2.0.1-py3-none-any.whl"
             },
@@ -415,6 +479,7 @@
   "pex_version": "2.1.102",
   "prefer_older_binary": false,
   "requirements": [
+    "allure-pytest",
     "pygments",
     "pytest-asyncio",
     "pytest-cov",
