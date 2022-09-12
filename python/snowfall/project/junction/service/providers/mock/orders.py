@@ -1,3 +1,4 @@
+import copy
 import random
 from collections.abc import AsyncIterator
 from typing import Sequence, cast
@@ -5,7 +6,7 @@ from typing import Sequence, cast
 import pydantic
 
 from snowfall.project.junction.service.orders.v1alpha import amqp_pb2, models_pb2
-from snowfall.stdlib import service
+from snowfall.stdlib import money, service
 from snowfall.stdlib.transport import amqp
 
 
@@ -14,15 +15,27 @@ class OrdersSettings(service.Settings):
 
 
 class OrdersMockClient(object):
-    async def search(
+    async def book(
         self,
-        order: amqp_pb2.PlaceOrderTask,
-    ) -> AsyncIterator[models_pb2.OrderResult]:
-        yield models_pb2.OrderResult(
-            order_id=order.order.id,
-            offer_id=order.offer_id,
-            status=models_pb2.OrderResult.Status.STATUS_CONFIRMED,
+        task: amqp_pb2.PlaceOrderTask,
+    ) -> AsyncIterator[models_pb2.Booking]:
+        new_booking = copy.deepcopy(task.booking)
+
+        new_booking.MergeFrom(
+            models_pb2.Booking(
+                status=models_pb2.Booking.STATUS_CONFIRMED,
+                provider_name="Mock",
+                total_price=money.from_string(
+                    string_amount="13.37",
+                    currency=money.Currency("EUR"),
+                ).protobuf(),
+                trip_result=models_pb2.TripBooking(
+                    record_locator="ABCDEF",
+                ),
+            ),
         )
+
+        yield new_booking
 
 
 class OrdersConsumer(object):
@@ -42,7 +55,7 @@ class OrdersConsumer(object):
     async def _process_message(self, message: amqp.Message) -> None:
         search = cast(amqp_pb2.PlaceOrderTask, message.body)
 
-        async for order_result in self._client.search(search):
+        async for order_result in self._client.book(search):
             await self._producer.publish(
                 order_result,
                 routing_key="orders.result.offer",

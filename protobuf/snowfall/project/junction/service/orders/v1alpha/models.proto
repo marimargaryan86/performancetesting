@@ -2,21 +2,34 @@ syntax = "proto3";
 
 package snowfall.project.junction.service.orders.v1alpha;
 
+import "snowfall/project/junction/service/offers/v1alpha/models.proto";
 import "snowfall/stdlib/v1alpha/models.proto";
+import "snowfall/stdlib/v1alpha/money.proto";
 import "snowfall/stdlib/v1alpha/phone_number.proto";
 import "snowfall/stdlib/v1alpha/postal_address.proto";
 
-message Order {
+message Journey {
   string id = 1;
-  repeated OrderResult order_results = 2;
+  repeated Order orders = 2;
   string passenger_name_record = 3;
-  repeated Passenger passengers = 4;
-  ContactDetails contact_details = 5;
+  ContactDetails contact_details = 4;
+  // reseller id
 }
 
-message OrderResult {
-  string order_id = 1;
-  string offer_id = 2;
+message Order {
+  string id = 1;
+  string journey_id = 2;
+  repeated Booking bookings = 3;
+  repeated Passenger passengers = 4;
+  // reseller id
+}
+
+message Booking {
+  string id = 1;
+  string order_id = 2;
+  oneof option {
+    TripOption trip_option = 3;
+  }
   enum Status {
     STATUS_UNSPECIFIED = 0;
     STATUS_PENDING = 1;
@@ -25,8 +38,18 @@ message OrderResult {
     STATUS_NOT_TICKETED = 4;
     STATUS_ERROR = 5;
   }
-  Status status = 3;
-  string raw_data = 4; // json
+  Status status = 4;
+  string provider_name = 5;
+  snowfall.stdlib.v1alpha.Money total_price = 6;
+  oneof result {
+    TripBooking trip_result = 7;
+  }
+  string raw_data = 8; // json
+}
+
+message TripBooking {
+  string record_locator = 1;
+  repeated string operator_booking_references = 2;
 }
 
 message ContactDetails {
@@ -53,4 +76,15 @@ message Passenger {
   }
   Gender gender = 4;
   snowfall.stdlib.v1alpha.Date date_of_birth = 5;
+}
+
+message TripOption {
+  string id = 1;
+  repeated TripOptionDetails details = 2;
+  snowfall.stdlib.v1alpha.Price price = 3;
+}
+
+message TripOptionDetails {
+  snowfall.project.junction.service.offers.v1alpha.OfferSegment segment = 1;
+  snowfall.stdlib.v1alpha.CabinClass cabin_class = 2;
 }

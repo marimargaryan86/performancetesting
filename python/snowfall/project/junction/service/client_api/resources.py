@@ -299,6 +299,51 @@ class OfferSegmentDetails(models.BaseModel):
         )
 
 
+class JourneyResource(models.Resource):
+    @classmethod
+    def from_proto(
+        cls,
+        journey: order_models_pb2.Journey,
+        request: requests.Request,
+    ) -> JourneyResource:
+        return cls(
+            id=journey.id,
+            type="journeys",
+            attributes={
+                "reference": journey.passenger_name_record,
+                "contactDetails": {
+                    "email": journey.contact_details.email,
+                    "address": {
+                        "addressLines": list(
+                            journey.contact_details.address.address_lines,
+                        ),
+                        "countryCode": journey.contact_details.address.region_code,
+                        "postalCode": journey.contact_details.address.postal_code,
+                        "city": journey.contact_details.address.locality,
+                    },
+                    "phoneNumber": journey.contact_details.phone.e164_number,
+                },
+            },
+            relationships={
+                "orders": {
+                    _RELATIONSHIPS_FIELD: [
+                        models.ResourceIdentifier(
+                            id=order.id,
+                            type="orders",
+                        )
+                        for order in journey.orders
+                    ],
+                },
+            },
+            links={
+                _SELF_HREF: request.url_for(
+                    "ViewJourney",
+                    journeyId=journey.id,
+                ),
+            },
+        )
+
+
 class OrderResource(models.Resource):
     @classmethod
     def from_proto(
@@ -310,16 +355,6 @@ class OrderResource(models.Resource):
             id=order.id,
             type="orders",
             attributes={
-                "orderResults": [
-                    {
-                        "offerId": order_result.offer_id,
-                        "status": protobuf.enum_value_to_slug(
-                            descriptor=order_models_pb2.OrderResult.Status.DESCRIPTOR,
-                            enum_value=order_result.status,
-                        ),
-                    }
-                    for order_result in order.order_results
-                ],
                 "passengers": [
                     {
                         "firstName": passenger.first_name,
@@ -338,21 +373,70 @@ class OrderResource(models.Resource):
                     }
                     for passenger in order.passengers
                 ],
-                "contactDetails": {
-                    "address": {
-                        "addressLines": list(
-                            order.contact_details.address.address_lines,
-                        ),
-                        "regionCode": order.contact_details.address.region_code,
-                        "revision": order.contact_details.address.revision,
-                    },
-                    "email": order.contact_details.email,
-                    "phone": order.contact_details.phone.e164_number,
+            },
+            relationships={
+                "journey": {
+                    _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
+                        id=order.journey_id,
+                        type="journeys",
+                    ),
+                },
+                "bookings": {
+                    _RELATIONSHIPS_FIELD: [
+                        models.ResourceIdentifier(
+                            id=booking.id,
+                            type="trip-bookings",
+                        )
+                        for booking in order.bookings
+                    ],
                 },
             },
-            relationships={},
             links={
-                _SELF_HREF: "https://snowfall.se",
+                _SELF_HREF: request.url_for(
+                    "ViewOrder",
+                    orderId=order.id,
+                ),
+            },
+        )
+
+
+class BookingResource(models.Resource):
+    @classmethod
+    def from_proto(
+        cls,
+        booking: order_models_pb2.Booking,
+        request: requests.Request,
+    ) -> BookingResource:
+        return cls(
+            id=booking.id,
+            type="trip-bookings",
+            attributes={
+                "operatorBookingReferences": list(
+                    booking.trip_result.operator_booking_references,
+                ),
+            },
+            relationships={
+                "order": {
+                    _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
+                        id=booking.order_id,
+                        type="orders",
+                    ),
+                },
+                "status": {
+                    _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
+                        id=protobuf.enum_value_to_slug(
+                            order_models_pb2.Booking.Status.DESCRIPTOR,
+                            booking.status,
+                        ),
+                        type="booking-statuses",
+                    ),
+                },
+            },
+            links={
+                _SELF_HREF: request.url_for(
+                    "ViewBooking",
+                    bookingId=booking.id,
+                ),
             },
         )
 

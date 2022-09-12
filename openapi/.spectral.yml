@@ -53,6 +53,5 @@ overrides:
   - files:
       - "junction/mobile_api/openapi.json#/components/schemas/Leg/allOf/0/properties"
       - "junction/mobile_api/openapi.json#/components/schemas/PaymentIntent"
-      - "junction/client_api/openapi.json#/components/schemas/Order"
     rules:
       json-api-no-nested-id: info

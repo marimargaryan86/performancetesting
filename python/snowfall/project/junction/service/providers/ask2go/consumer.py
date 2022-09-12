@@ -1,11 +1,9 @@
 from typing import cast
 
-import phonenumbers
 import structlog
 
 from snowfall.project.junction.service.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
 from snowfall.project.junction.service.orders.v1alpha import amqp_pb2 as orders_amqp_pb2
-from snowfall.project.junction.service.orders.v1alpha import models_pb2
 from snowfall.project.junction.service.providers.ask2go import (
     adapter,
     booking,
@@ -17,7 +15,6 @@ from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport import amqp
-from snowfall.vendor.ask2go import errors
 
 
 class OrderConsumer(object):
@@ -39,38 +36,15 @@ class OrderConsumer(object):
 
     async def _process_message(self, amqp_message: amqp.Message) -> None:
         task = cast(orders_amqp_pb2.PlaceOrderTask, amqp_message.body)
-        offer_details = await self._cache.fetch(task.offer_id)
+        offer_details = await self._cache.fetch(task.booking.trip_option.id)
 
         if not offer_details:
             return
 
-        try:
-            raw_data = await self._booking.book(
-                task.order,
-                task.offer_id,
-                offer_details,
-            )
-        except (errors.ServiceError, phonenumbers.NumberParseException):
-            self._logger.exception()
-            await self._producer.publish(
-                models_pb2.OrderResult(
-                    order_id=task.order.id,
-                    offer_id=task.offer_id,
-                    status=models_pb2.OrderResult.STATUS_ERROR,
-                    raw_data="",
-                ),
-                routing_key="orders.result.offer",
-            )
-        else:
-            await self._producer.publish(
-                models_pb2.OrderResult(
-                    order_id=task.order.id,
-                    offer_id=task.offer_id,
-                    status=models_pb2.OrderResult.STATUS_NOT_TICKETED,
-                    raw_data=raw_data.json(),
-                ),
-                routing_key="orders.result.offer",
-            )
+        await self._producer.publish(
+            await self._booking.book(task=task, details=offer_details),
+            routing_key="orders.result.offer",
+        )
 
 
 class TripSearchConsumer(object):

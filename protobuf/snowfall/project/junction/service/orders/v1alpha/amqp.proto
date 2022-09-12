@@ -5,6 +5,15 @@ package snowfall.project.junction.service.orders.v1alpha;
 import "snowfall/project/junction/service/orders/v1alpha/models.proto";
 
 message PlaceOrderTask {
-  Order order = 1;
-  string offer_id = 2;
+  Booking booking = 1;
+  ContactDetails contact_details = 2;
+  repeated Passenger passengers = 3;
+  OrderMetadata metadata = 4;
+}
+
+message OrderMetadata {
+  string journey_id = 1;
+  string order_id = 2;
+  string booking_id = 3;
+  string passenger_name_record = 4;
 }

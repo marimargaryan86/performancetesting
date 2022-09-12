@@ -1,10 +1,7 @@
 from typing import cast
 
-import phonenumbers
-
 from snowfall.project.junction.service.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
 from snowfall.project.junction.service.orders.v1alpha import amqp_pb2 as orders_amqp_pb2
-from snowfall.project.junction.service.orders.v1alpha import models_pb2
 from snowfall.project.junction.service.providers.save_a_train import (
     adapter as save_a_train_adapter,
 )
@@ -74,36 +71,17 @@ class OrdersConsumer(object):
     async def _process_message(self, message: amqp.Message) -> None:
         task = cast(orders_amqp_pb2.PlaceOrderTask, message.body)
 
-        offer_details = await self._cache.fetch(task.offer_id)
+        offer_details = await self._cache.fetch(task.booking.trip_option.id)
 
         if not offer_details:
             return
 
-        try:
-            raw_data = await self._adapter.create_booking(
-                task.order,
-                offer_details,
-            )
-        except (
-            phonenumbers.NumberParseException,
-            save_a_train_adapter.BookingError,
-        ) as error:
-            await self._producer.publish(
-                models_pb2.OrderResult(
-                    order_id=task.order.id,
-                    offer_id=task.offer_id,
-                    status=models_pb2.OrderResult.STATUS_ERROR,
-                    raw_data=repr(error),
-                ),
-                routing_key="orders.result.offer",
-            )
-        else:
-            await self._producer.publish(
-                models_pb2.OrderResult(
-                    order_id=task.order.id,
-                    offer_id=task.offer_id,
-                    status=models_pb2.OrderResult.STATUS_CONFIRMED,
-                    raw_data=raw_data,
-                ),
-                routing_key="orders.result.offer",
-            )
+        booking_result = await self._adapter.create_booking(
+            task=task,
+            offer_details=offer_details,
+        )
+
+        await self._producer.publish(
+            booking_result,
+            routing_key="orders.result.offer",
+        )

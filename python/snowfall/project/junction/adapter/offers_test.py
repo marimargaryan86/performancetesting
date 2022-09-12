@@ -54,11 +54,11 @@ class TestDictClient(object):
         [
             (
                 [],
-                1,
+                2,
             ),
             (
                 [common_pb2.CabinClass.TYPE_ECONOMY],
-                1,
+                2,
             ),
             (
                 [common_pb2.CabinClass.TYPE_FIRST],

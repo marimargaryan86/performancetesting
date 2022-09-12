@@ -6,12 +6,23 @@ class OrderProducer(object):
     def __init__(self, producer: amqp.Producer):
         self._producer = producer
 
-    async def publish(self, order: models_pb2.Order) -> None:
-        for order_result in order.order_results:
+    async def publish(
+        self,
+        journey: models_pb2.Journey,
+        order: models_pb2.Order,
+    ) -> None:
+        for booking in order.bookings:
             await self._producer.publish(
                 amqp_pb2.PlaceOrderTask(
-                    order=order,
-                    offer_id=order_result.offer_id,
+                    booking=booking,
+                    contact_details=journey.contact_details,
+                    passengers=order.passengers,
+                    metadata=amqp_pb2.OrderMetadata(
+                        journey_id=order.journey_id,
+                        order_id=order.id,
+                        booking_id=booking.id,
+                        passenger_name_record=journey.passenger_name_record,
+                    ),
                 ),
                 "orders.offers",
             )

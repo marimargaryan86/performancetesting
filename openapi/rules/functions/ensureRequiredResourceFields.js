@@ -1,5 +1,5 @@
 const flattenResource = (input) => {
-    let resource
+    let resource = {}
 
     if (input.hasOwnProperty("items")) {
         return flattenResource(input.items)
@@ -7,7 +7,7 @@ const flattenResource = (input) => {
 
     if (input.hasOwnProperty("allOf")) {
         resource = getKeyInAllOf(input.allOf).flatMap(({ properties }) => properties)[0]
-    } else {
+    } else if (input.hasOwnProperty("properties")) {
         resource = input.properties
     }
 
@@ -40,6 +40,12 @@ let ensureRequiredFields = (input, options, context) => {
 
     if (input.hasOwnProperty("oneOf")) {
         for (const oneOf of input.oneOf) {
+            errors.concat(ensureRequiredFields(oneOf, options, context))
+        }
+
+        return errors
+    } else if (input.hasOwnProperty("items") && input.items.hasOwnProperty("oneOf")) {
+        for (const oneOf of input.items.oneOf) {
             errors.concat(ensureRequiredFields(oneOf, options, context))
         }
 

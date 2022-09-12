@@ -1,4 +1,5 @@
 import datetime
+import json
 from collections.abc import AsyncIterator
 from typing import Any, Mapping, Sequence
 
@@ -9,8 +10,10 @@ import pytest
 from snowfall.project.junction.service.providers.ask2go import (
     adapter,
     airports,
+    booking,
     cache,
     criteria,
+    notifications,
     transformer,
     validator,
 )
@@ -19,6 +22,20 @@ from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.vendor.ask2go import client
 from snowfall.vendor.ask2go.models import common
+
+
+def load_json_fixture(
+    file_name: str,
+) -> dict[str, Any]:
+    file_path = filesystem.resource_path(
+        package="snowfall.project.junction.service.providers.ask2go.conftest",
+        resource="fixtures/{file_name}.json".format(
+            file_name=file_name.removesuffix(".json"),
+        ),
+    )
+
+    with open(file_path) as file_handle:
+        return json.load(file_handle)
 
 
 @pytest.fixture
@@ -131,3 +148,11 @@ def criteria_generator(
     h3_mapping_repository: h3.H3MappingRepository[airports.Airport],
 ) -> criteria.CriteriaGenerator:
     return criteria.CriteriaGenerator(h3_mapping=h3_mapping_repository)
+
+
+@pytest.fixture
+def booking_handler(ask2go_client: client.Ask2GoClient) -> booking.BookingHandler:
+    return booking.BookingHandler(
+        ask2go_client=ask2go_client,
+        notifier=notifications.LogNotifier(),
+    )

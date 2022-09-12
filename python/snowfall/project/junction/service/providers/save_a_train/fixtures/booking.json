@@ -1,0 +1,69 @@
+{
+  "selectSearchResult": {
+    "search_identifier": "4Q5lMS",
+    "outbound_selected_result": {
+      "id": 1,
+      "route": {
+        "origin_station": {
+          "uid": "701b7333-8040-46ad-8d94-2c6a6ee05245",
+          "names": []
+        },
+        "destination_station": {
+          "uid": "c894e0f7-ca3b-4a69-88c7-a6b55769a140",
+          "names": []
+        }
+      },
+      "departure_datetime": "2022-05-16T18:10:00",
+      "arrival_datetime": "2022-05-16T18:31:00",
+      "duration": 21.0,
+      "best_price": "",
+      "kind_of": "",
+      "changes_count": 0,
+      "seat_preference": null
+    },
+    "inbound_selected_result": null
+  },
+  "makeBooking": {
+    "search_identifier": "4Q5lMS",
+    "outbound_trip_info": {
+      "origin_station_info": [
+        {
+          "name": "Luxembourg",
+          "language": {
+            "name": "English",
+            "short_name": "en",
+            "value": ""
+          }
+        }
+      ],
+      "destination_station_info": [
+        {
+          "name": "Arlon",
+          "language": {
+            "name": "English",
+            "short_name": "en",
+            "value": ""
+          }
+        }
+      ],
+      "departure": "2022-05-16T18:10:00",
+      "arrival": "2022-05-16T18:31:00",
+      "trip_duration": 21.0,
+      "fare": "Second Class"
+    },
+    "inbound_trip_info": null,
+    "price": 4.5,
+    "outbound_seat_reservation_fee": 0.0,
+    "inbound_seat_reservation_fee": null,
+    "total_price": 4.5
+  },
+  "confirmBooking": {
+    "search_identifier": "4Q5lMS",
+    "issuing_info": "Booking is completed, the pdf file retrieving process may take some time, please request pdf endpoint according to the SAT API DOCS"
+  },
+  "getTicket": {
+    "url": "",
+    "confirmation_code": "GTRHSFL",
+    "status": "completed"
+  }
+}

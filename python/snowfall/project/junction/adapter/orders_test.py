@@ -18,7 +18,7 @@ class TestDictClient(object):
         self,
         orders_client: orders.Client,
     ) -> None:
-        order = await orders_client.get(fixtures.ORDERS[0])
+        order = await orders_client.get_order(fixtures.ORDERS[0])
         assert order.id == fixtures.ORDERS[0]
 
     async def test_missing_order_throws_error(
@@ -26,7 +26,17 @@ class TestDictClient(object):
         orders_client: orders.Client,
     ) -> None:
         with pytest.raises(orders.NotFoundError):
-            await orders_client.get(fixtures.NOT_FOUND)
+            await orders_client.get_order(fixtures.NOT_FOUND)
+
+    async def test_multiple_orders_are_retrievable(
+        self,
+        orders_client: orders.Client,
+    ) -> None:
+        found_orders = await orders_client.find_orders(
+            identifiers=fixtures.ORDERS,
+            limit=100,
+        )
+        assert len(found_orders.orders) == 2
 
 
 class TestGrpcClient(object):
@@ -60,7 +70,7 @@ class TestGrpcClient(object):
         stub.GetOrder = mock.AsyncMock(side_effect=error)
         client = orders.GrpcClient(stub)
         with pytest.raises(expected):
-            await client.get(fixtures.NOT_FOUND)
+            await client.get_order(fixtures.NOT_FOUND)
 
     async def test_single_order_is_retrievable(self) -> None:
         proto = models_pb2.Order(id=fixtures.ORDERS[0])
@@ -69,12 +79,5 @@ class TestGrpcClient(object):
             return_value=orders_pb2.GetOrderResponse(order=proto),
         )
         client = orders.GrpcClient(stub)
-        order = await client.get(fixtures.ORDERS[0])
+        order = await client.get_order(fixtures.ORDERS[0])
         assert order.id == fixtures.ORDERS[0]
-
-    async def test_multiple_orders_are_retrievable(
-        self,
-        orders_client: orders.Client,
-    ) -> None:
-        found_orders = await orders_client.find(limit=100)
-        assert len(found_orders.orders) == 2

@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import copy
+import dataclasses
 import datetime
 import types
 import uuid
-from typing import AsyncIterator, Optional
+from typing import AsyncIterator, Optional, Sequence
 
 import httpx
 import more_itertools
@@ -14,6 +16,7 @@ import structlog
 from snowfall.project.junction.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
+from snowfall.project.junction.service.orders.v1alpha import amqp_pb2 as order_amqp_pb2
 from snowfall.project.junction.service.orders.v1alpha import (
     models_pb2 as order_models_pb2,
 )
@@ -36,6 +39,15 @@ _CABIN_MAPPING = types.MappingProxyType(
         "business_class": models_pb2.CabinClass.TYPE_FIRST,
     },
 )
+
+_PROVIDER_NAME = "Save A Train"
+
+
+@dataclasses.dataclass(frozen=True)
+class CombinedBookingResults(object):
+    make_booking: save_a_train_models.booking.BookingResult
+    confirm_booking: save_a_train_models.booking.BookingConfirmationResult
+    get_ticket: save_a_train_models.booking.TicketInfo
 
 
 class SaveATrainAdapterError(Exception):
@@ -235,27 +247,70 @@ class SaveATrainAdapter(object):  # noqa: WPS214
 
     async def create_booking(
         self,
-        order: order_models_pb2.Order,
+        task: order_amqp_pb2.PlaceOrderTask,
         offer_details: cache.OfferDetails,
-    ) -> str:
+    ) -> order_models_pb2.Booking:
+        new_booking = copy.deepcopy(task.booking)
+
+        try:
+            booking_responses = await self._create_booking(task, offer_details)
+        except (
+            phonenumbers.NumberParseException,
+            BookingError,
+        ) as error:
+            new_booking.MergeFrom(
+                order_models_pb2.Booking(
+                    status=order_models_pb2.Booking.STATUS_ERROR,
+                    provider_name=_PROVIDER_NAME,
+                    raw_data=repr(error),
+                ),
+            )
+
+            return new_booking
+
+        new_booking.MergeFrom(
+            order_models_pb2.Booking(
+                status=order_models_pb2.Booking.STATUS_CONFIRMED,
+                provider_name=_PROVIDER_NAME,
+                total_price=money.from_string(
+                    string_amount=booking_responses.make_booking.total_price,
+                    currency=money.Currency("EUR"),
+                ).protobuf(),
+                trip_result=order_models_pb2.TripBooking(
+                    record_locator=booking_responses.get_ticket.confirmation_code,
+                ),
+                raw_data=(
+                    "{{makeBooking: {0}, confirmBooking: {1}, getTicket: {2}}}".format(
+                        booking_responses.make_booking.json(),
+                        booking_responses.confirm_booking.json(),
+                        booking_responses.get_ticket.json(),
+                    )
+                ),
+            ),
+        )
+
+        return new_booking
+
+    async def _create_booking(
+        self,
+        task: order_amqp_pb2.PlaceOrderTask,
+        offer_details: cache.OfferDetails,
+    ) -> CombinedBookingResults:
         search_id, seat_code = self._extract_search_id_and_seat_preference_code(
             await self._select_search_result(offer_details),
         )
         booking_result = await self._make_booking(
-            order=order,
+            contact_details=task.contact_details,
+            passengers=task.passengers,
             search_id=search_id,
             seat_code=seat_code,
         )
-        confirm_booking_result = await self._confirm_booking(
-            search_id=search_id,
-        )
-        get_ticket_result = await self._get_ticket(
-            search_id=search_id,
-        )
-        return "{{makeBooking: {0}, confirmBooking: {1}, getTicket: {2}}}".format(
-            booking_result.json(),
-            confirm_booking_result.json(),
-            get_ticket_result.json(),
+        confirm_booking_result = await self._confirm_booking(search_id=search_id)
+        get_ticket_result = await self._get_ticket(search_id=search_id)
+        return CombinedBookingResults(
+            make_booking=booking_result,
+            confirm_booking=confirm_booking_result,
+            get_ticket=get_ticket_result,
         )
 
     async def _select_search_result(
@@ -321,7 +376,8 @@ class SaveATrainAdapter(object):  # noqa: WPS214
 
     async def _make_booking(
         self,
-        order: order_models_pb2.Order,
+        contact_details: order_models_pb2.ContactDetails,
+        passengers: Sequence[order_models_pb2.Passenger],
         search_id: str,
         seat_code: Optional[str],
     ) -> save_a_train_models.booking.BookingResult:
@@ -334,7 +390,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         }
 
         country = pycountry.countries.get(
-            alpha_2=order.contact_details.address.region_code,
+            alpha_2=contact_details.address.region_code,
         )
 
         try:
@@ -356,15 +412,15 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                                 == order_models_pb2.Passenger.GENDER_MALE
                                 else enums.PassengerGender.female
                             ),
-                            email=order.contact_details.email,
+                            email=contact_details.email,
                             phone_number=str(
                                 phonenumbers.parse(
-                                    order.contact_details.phone.e164_number,
+                                    contact_details.phone.e164_number,
                                 ).national_number,
                             ),
                             country=getattr(country, "common_name", country.name),
                         )
-                        for passenger in order.passengers
+                        for passenger in passengers
                     ],
                 ),
             )

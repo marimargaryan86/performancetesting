@@ -10,6 +10,9 @@ from snowfall.vendor.junction import models
 _DATA_KEY = "data"
 _ID_KEY = "id"
 _TYPE_KEY = "type"
+_RELATIONSHIPS_KEY = "relationships"
+_ATTRIBUTES_KEY = "attributes"
+_PASSENGERS_KEY = "passengers"
 _LIMIT_KEY = "page[limit]"
 _CURSOR_KEY = "page[cursor]"
 _METHOD_GET = "GET"
@@ -94,10 +97,10 @@ class JunctionClient(object):  # noqa: WPS214
     ) -> dict[str, Any]:
         body = {
             _DATA_KEY: {
-                "attributes": {
+                _ATTRIBUTES_KEY: {
                     "departureAfter": departure_after.isoformat(),
                 },
-                "relationships": {
+                _RELATIONSHIPS_KEY: {
                     "origin": {_DATA_KEY: {_ID_KEY: origin_id, _TYPE_KEY: "places"}},
                     "destination": {
                         _DATA_KEY: {_ID_KEY: destination_id, _TYPE_KEY: "places"},
@@ -143,13 +146,13 @@ class JunctionClient(object):  # noqa: WPS214
     ) -> dict[str, Any]:
         body = {
             _DATA_KEY: {
-                "attributes": {
-                    "passengers": [
+                _ATTRIBUTES_KEY: {
+                    _PASSENGERS_KEY: [
                         {"dateOfBirth": dob.isoformat()}
                         for dob in passengers_dates_of_birth
                     ],
                 },
-                "relationships": {
+                _RELATIONSHIPS_KEY: {
                     "trips": {
                         _DATA_KEY: [
                             {_ID_KEY: trip_id, _TYPE_KEY: "trips"}
@@ -236,46 +239,181 @@ class JunctionClient(object):  # noqa: WPS214
 
     async def create_order(
         self,
-        offer_aggregate_id: str,
-        offer_ids: Sequence[str],
+        offer_id: str,
+        option_ids: Sequence[str],
         passengers: Sequence[models.Passenger],
         contact_details: models.ContactDetails,
     ) -> dict[str, Any]:
         body = {
             _DATA_KEY: {
-                "attributes": {
-                    "offers": [
-                        {
-                            "offerAggregateId": offer_aggregate_id,
-                            "offerIds": offer_ids,
-                            "passengers": [
-                                dataclasses.asdict(
-                                    passenger,
-                                    dict_factory=models.dict_factory_to_camel,
-                                )
-                                for passenger in passengers
-                            ],
-                        },
+                _ATTRIBUTES_KEY: {
+                    _PASSENGERS_KEY: [
+                        dataclasses.asdict(
+                            passenger,
+                            dict_factory=models.dict_factory_to_camel,
+                        )
+                        for passenger in passengers
                     ],
                     "contactDetails": dataclasses.asdict(
                         contact_details,
                         dict_factory=models.dict_factory_to_camel,
                     ),
                 },
+                _RELATIONSHIPS_KEY: {
+                    "offer": {
+                        _DATA_KEY: {
+                            _ID_KEY: offer_id,
+                            _TYPE_KEY: "offers",
+                        },
+                    },
+                    "options": {
+                        _DATA_KEY: [
+                            {
+                                _ID_KEY: option_id,
+                                _TYPE_KEY: "offer-options",
+                            }
+                            for option_id in option_ids
+                        ],
+                    },
+                },
                 _TYPE_KEY: "orders",
             },
         }
-        return await self._make_request(
+
+        response = await self._make_request(
             method=_METHOD_POST,
             url="/orders",
             payload=body,
         )
 
-    async def get_order_by_id(self, order_id: str) -> dict[str, Any]:
+        # todo: Use the real response instead.
+        return await self._get_deprecated_order(response)
+
+    async def add_order_to_journey(
+        self,
+        journey_id: str,
+        offer_aggregate_id: str,
+        offer_ids: Sequence[str],
+        passengers: Sequence[models.Passenger],
+    ) -> dict[str, Any]:
+        body = {
+            _DATA_KEY: {
+                _ATTRIBUTES_KEY: {
+                    _PASSENGERS_KEY: [
+                        dataclasses.asdict(
+                            passenger,
+                            dict_factory=models.dict_factory_to_camel,
+                        )
+                        for passenger in passengers
+                    ],
+                },
+                _RELATIONSHIPS_KEY: {
+                    "offer": {
+                        _DATA_KEY: {
+                            _ID_KEY: offer_aggregate_id,
+                            _TYPE_KEY: "offers",
+                        },
+                    },
+                    "options": {
+                        _DATA_KEY: [
+                            {
+                                _ID_KEY: offer_id,
+                                _TYPE_KEY: "offer-options",
+                            }
+                            for offer_id in offer_ids
+                        ],
+                    },
+                },
+                _TYPE_KEY: "orders",
+            },
+        }
+
+        return await self._make_request(
+            method=_METHOD_POST,
+            url="/journeys/{0}/orders".format(journey_id),
+            payload=body,
+        )
+
+    async def get_journeys(
+        self,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
-            url="/orders/{0}".format(order_id),
+            url="journeys",
+            query_parameters=_make_pagination(limit, cursor),
         )
+
+    async def get_journey_by_id(self, identifier: str) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/journeys/{0}".format(identifier),
+        )
+
+    async def get_order_by_id(self, identifier: str) -> dict[str, Any]:
+        response = await self._make_request(
+            method=_METHOD_GET,
+            url="journeys/orders/{0}".format(identifier),
+        )
+
+        # todo: Use the real response instead.
+        return await self._get_deprecated_order(response)
+
+    async def get_orders_by_journey_id(
+        self,
+        identifier: str,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="journeys/{0}/orders".format(identifier),
+            query_parameters=_make_pagination(limit, cursor),
+        )
+
+    async def get_booking_by_id(self, identifier: str) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="journeys/bookings/{0}".format(identifier),
+        )
+
+    async def get_bookings_by_order_id(
+        self,
+        identifier: str,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="journeys/orders/{0}/bookings".format(identifier),
+            query_parameters=_make_pagination(limit, cursor),
+        )
+
+    # todo: Delete.
+    async def _get_deprecated_order(
+        self,
+        response: Mapping[str, Any],
+    ) -> dict[str, Any]:
+        bookings = await self.get_bookings_by_order_id(
+            response[_DATA_KEY][_ATTRIBUTES_KEY][_ID_KEY],
+        )
+        journey = response[_DATA_KEY][_RELATIONSHIPS_KEY]["journey"]
+        journey_response = await self.get_journey_by_id(journey[_DATA_KEY][_ID_KEY])
+        journey_response[_DATA_KEY][_TYPE_KEY] = "orders"
+        attributes = journey_response[_DATA_KEY][_ATTRIBUTES_KEY]
+        attributes.pop("journeyReference")
+        attributes[_PASSENGERS_KEY] = response[_DATA_KEY][_ATTRIBUTES_KEY][
+            _PASSENGERS_KEY
+        ]
+        attributes["orderResults"] = [
+            {
+                "status": booking[_RELATIONSHIPS_KEY]["status"][_DATA_KEY][_ID_KEY],
+            }
+            for booking in bookings[_DATA_KEY]
+        ]
+
+        return journey_response
 
     async def _make_request(
         self,

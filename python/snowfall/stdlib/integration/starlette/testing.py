@@ -53,7 +53,7 @@ async def _test_view_endpoint(
         return
 
     response = await client.get(
-        "{0}/{1}".format(current_link.rsplit("/", maxsplit=1), fixtures.NOT_FOUND),
+        "{0}/{1}".format(current_link.rsplit("/", maxsplit=1)[0], fixtures.NOT_FOUND),
     )
 
     assert response.status_code == status.HTTP_404_NOT_FOUND

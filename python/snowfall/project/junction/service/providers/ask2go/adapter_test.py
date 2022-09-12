@@ -7,15 +7,15 @@ import pytest
 import pytest_httpx
 
 from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
-from snowfall.project.junction.service.providers.ask2go import adapter, transformer
+from snowfall.project.junction.service.providers.ask2go import (
+    adapter,
+    conftest,
+    transformer,
+)
 from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.v1alpha import models_pb2
 
-_FIXTURE_PATH = (
-    "python/snowfall/project/junction/service/providers/ask2go/fixtures/{path}"
-)
 _OFFER_URL = "https://test_url/api/search/{id}/{transaction}/{page}"
 _PRICE_URL = (
     "https://test_url/api/Itinerary/{id}/{offer}/Price?transactionId={transaction}"
@@ -95,17 +95,14 @@ def _mock_responses(
     destination: str,
     departure_date: str,
 ) -> None:
-    loader = filesystem.FileLoader()
     prefix = "{origin}_{destination}_{date}".format(
         origin=origin,
         destination=destination,
         date=departure_date,
     )
 
-    search_response = loader.load(
-        _FIXTURE_PATH.format(
-            path="{prefix}_search.json".format(prefix=prefix),
-        ),
+    search_response = conftest.load_json_fixture(
+        "{prefix}_search".format(prefix=prefix),
     )
 
     httpx_mock.add_response(
@@ -114,25 +111,22 @@ def _mock_responses(
         url="https://test_url/api/search",
     )
 
-    _mock_search_responses(httpx_mock, prefix, search_response, loader)
+    _mock_search_responses(httpx_mock, prefix, search_response)
 
 
 def _mock_search_responses(
     httpx_mock: pytest_httpx.HTTPXMock,
     prefix: str,
     search_response: Mapping[str, Any],
-    loader: filesystem.Loader,
 ) -> None:
     for page in range(10):
         try:
-            offer_response = loader.load(
-                _FIXTURE_PATH.format(
-                    path="{prefix}_search_{id}_{transaction}_{page}.json".format(
-                        prefix=prefix,
-                        id=search_response["id"],
-                        transaction=search_response["transactionId"],
-                        page=page,
-                    ),
+            offer_response = conftest.load_json_fixture(
+                "{prefix}_search_{id}_{transaction}_{page}.json".format(
+                    prefix=prefix,
+                    id=search_response["id"],
+                    transaction=search_response["transactionId"],
+                    page=page,
                 ),
             )
         except FileNotFoundError:
@@ -151,13 +145,11 @@ def _mock_search_responses(
         for offer in offer_response["flight"]:
             httpx_mock.add_response(
                 method="PUT",
-                json=loader.load(
-                    _FIXTURE_PATH.format(
-                        path="{prefix}_itinerary_{id}_{offer}_price.json".format(
-                            prefix=prefix,
-                            id=search_response["id"],
-                            offer=offer["id"],
-                        ),
+                json=conftest.load_json_fixture(
+                    "{prefix}_itinerary_{id}_{offer}_price.json".format(
+                        prefix=prefix,
+                        id=search_response["id"],
+                        offer=offer["id"],
                     ),
                 ),
                 url=_PRICE_URL.format(

@@ -330,11 +330,11 @@ class TestOfferSearches(object):
     @pytest.mark.parametrize(
         "cabin_classes, expected",
         [
-            (["economy"], 1),
-            (["economy", "first"], 1),
+            (["economy"], 2),
+            (["economy", "first"], 2),
             (["first"], 0),
             (["unknown"], 0),
-            (["economy", "unknown"], 1),
+            (["economy", "unknown"], 2),
         ],
     )
     async def test_cabin_class_filter(

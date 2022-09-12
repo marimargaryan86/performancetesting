@@ -5,28 +5,55 @@ package snowfall.project.junction.service.orders.v1alpha;
 import "snowfall/project/junction/service/orders/v1alpha/models.proto";
 
 service OrderService {
-  rpc AddOffersToOrder(AddOffersToOrderRequest) returns (AddOffersToOrderResponse) {}
-  rpc EnqueueOrder(EnqueueOrderRequest) returns (EnqueueOrderResponse) {}
+  rpc CreateJourney(CreateJourneyRequest) returns (CreateJourneyResponse) {}
+  rpc GetJourney(GetJourneyRequest) returns (GetJourneyResponse) {}
+  rpc ListJourneys(ListJourneysRequest) returns (ListJourneysResponse) {}
+  rpc PlaceOrder(PlaceOrderRequest) returns (PlaceOrderResponse) {}
   rpc GetOrder(GetOrderRequest) returns (GetOrderResponse) {}
   rpc ListOrders(ListOrdersRequest) returns (ListOrdersResponse) {}
+  rpc GetBooking(GetBookingRequest) returns (GetBookingResponse) {}
+  rpc ListBookings(ListBookingsRequest) returns (ListBookingsResponse) {}
 }
 
-message AddOffersToOrderRequest {
-  string order_id = 1;
-  repeated string offer_ids = 2;
+message CreateJourneyRequest {
+  ContactDetails contact_details = 1;
 }
 
-message AddOffersToOrderResponse {
-  Order order = 1;
+message CreateJourneyResponse {
+  Journey journey = 1;
 }
 
-message EnqueueOrderRequest {
-  repeated string offer_ids = 1;
+message GetJourneyRequest {
+  string id = 1;
+}
+
+message GetJourneyResponse {
+  Journey journey = 1;
+}
+
+message ListJourneysRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  repeated string ids = 3;
+}
+
+message ListJourneysResponse {
+  repeated Journey journeys = 1;
+  string next_page_token = 2;
+}
+
+message PlaceOrderRequest {
+  string journey_id = 1;
   repeated Passenger passengers = 2;
-  ContactDetails contact_details = 3;
+  message Option {
+    oneof option {
+      TripOption trip_option = 1;
+    }
+  }
+  repeated Option options = 3;
 }
 
-message EnqueueOrderResponse {
+message PlaceOrderResponse {
   Order order = 1;
 }
 
@@ -41,10 +68,39 @@ message GetOrderResponse {
 message ListOrdersRequest {
   int32 page_size = 1;
   string page_token = 2;
-  repeated string ids = 3;
+  oneof payload {
+    string journey_id = 3;
+    ListOfIds ids = 4;
+  }
 }
 
 message ListOrdersResponse {
   repeated Order orders = 1;
   string next_page_token = 2;
+}
+
+message GetBookingRequest {
+  string id = 1;
+}
+
+message GetBookingResponse {
+  Booking booking = 1;
+}
+
+message ListBookingsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  oneof payload {
+    string order_id = 3;
+    ListOfIds ids = 4;
+  }
+}
+
+message ListBookingsResponse {
+  repeated Booking bookings = 1;
+  string next_page_token = 2;
+}
+
+message ListOfIds {
+  repeated string ids = 1;
 }

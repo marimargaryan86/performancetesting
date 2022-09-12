@@ -15,7 +15,12 @@ from snowfall.project.junction.service.places.v1alpha import (
     models_pb2 as place_models_pb2,
 )
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
+from snowfall.stdlib.v1alpha import (
+    latlng_pb2,
+    models_pb2,
+    phone_number_pb2,
+    postal_address_pb2,
+)
 
 LATITUDE_RANGE = (-90, 90)
 LONGITUDE_RANGE = (-180, 180)
@@ -38,7 +43,10 @@ PROVIDER_OFFERS = (
     "91cf7f38-2418-4421-b2f8-87b2d585f6a0",
 )
 OFFER_SEARCHES = ("cb2c2359-5520-42fc-9bf9-dc78d708cd5e",)
-OFFERS = ("5927b3ce-fbd7-4f8b-b456-b1b7fd44cdad",)
+OFFERS = (
+    "5927b3ce-fbd7-4f8b-b456-b1b7fd44cdad",
+    "c9fb49fc-7f2d-4403-a8b1-5a8c065ea8ce",
+)
 OFFER_DETAILS = (
     "91d4b3f7-bb9d-4ffc-9919-7892fc017740",
     "c5fabbfa-8e4a-408b-b0d4-8397f103b6b5",
@@ -67,9 +75,17 @@ LEGS = (
     "fe8f2db4-0913-4ece-a3fe-2b3ebecc72ff",
     "71d3750c-d5d4-47aa-9680-e575c34a2979",
 )
+JOURNEYS = (
+    "586399bc-0d13-4d00-89a1-57f7d7045382",
+    "2da9619a-5c28-43b0-9fe6-603257ee2077",
+)
 ORDERS = (
     "e61d5e73-bb7e-408f-861d-2be84218d1c4",
     "d1c4dec6-be70-4823-bb4c-bff6164de1a7",
+)
+BOOKINGS = (
+    "679283e4-673c-4919-9aac-ba23d5abb4c8",
+    "f92b5144-6357-4e7b-a11b-70eb2de2eeee",
 )
 PASSENGER_NAME_RECORDS = ("4567H3LG",)
 CURRENCIES_CONVERSIONS = types.MappingProxyType(
@@ -336,21 +352,57 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
     )
 
 
-def get_orders() -> list[order_models_pb2.Order]:
-    return [generate_order(identifier) for identifier in ORDERS]
+def get_journeys() -> list[order_models_pb2.Journey]:
+    return [
+        generate_journey(journey_id, order_id, booking_id)
+        for journey_id, order_id, booking_id in zip(JOURNEYS, ORDERS, BOOKINGS)
+    ]
 
 
-def generate_order(identifier: str) -> order_models_pb2.Order:
-    return order_models_pb2.Order(
-        id=identifier,
-        order_results=[
-            order_models_pb2.OrderResult(
-                offer_id=offer.id,
-            )
-            for offer in get_offers()[0].groups[0].offers
+def generate_journey(
+    journey_id: str,
+    order_id: str,
+    booking_id: str,
+) -> order_models_pb2.Journey:
+    return order_models_pb2.Journey(
+        id=journey_id,
+        orders=[
+            order_models_pb2.Order(
+                id=order_id,
+                journey_id=journey_id,
+                passengers=[
+                    order_models_pb2.Passenger(
+                        first_name="Foo",
+                        last_name="Bar",
+                        title=order_models_pb2.Passenger.TITLE_MR,
+                        gender=order_models_pb2.Passenger.Gender.GENDER_MALE,
+                        date_of_birth=models_pb2.Date(
+                            year=1987,
+                            month=5,
+                            day=24,
+                        ),
+                    ),
+                ],
+                bookings=[
+                    order_models_pb2.Booking(
+                        id=booking_id,
+                        order_id=order_id,
+                    ),
+                ],
+            ),
         ],
+        passenger_name_record="FOOBAR",
         contact_details=order_models_pb2.ContactDetails(
             email="example@example.com",
+            address=postal_address_pb2.PostalAddress(
+                address_lines=["Street 7"],
+                region_code="GB",
+                postal_code="10000",
+                locality="London",
+            ),
+            phone=phone_number_pb2.PhoneNumber(
+                e164_number="+385996666666",
+            ),
         ),
     )
 

@@ -1,20 +1,26 @@
 import asyncio
+import copy
 import datetime
+from typing import Sequence
 
+import more_itertools
 import phonenumbers
 import pycountry
 import structlog
 
-from snowfall.project.junction.service.orders.v1alpha import models_pb2
+from snowfall.project.junction.service.orders.v1alpha import amqp_pb2, models_pb2
 from snowfall.project.junction.service.providers.ask2go import (
     criteria,
     models,
     notifications,
 )
 from snowfall.project.junction.service.providers.ask2go.cache import OfferDetails
+from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.vendor.ask2go import client, errors
 from snowfall.vendor.ask2go.models import booking, common
+
+_PROVIDER_NAME = "Ask2Go"
 
 
 class BookingHandler(object):
@@ -32,13 +38,65 @@ class BookingHandler(object):
 
     async def book(
         self,
-        order: models_pb2.Order,
-        offer_id: str,
+        task: amqp_pb2.PlaceOrderTask,
         details: OfferDetails,
+    ) -> models_pb2.Booking:
+        new_booking = copy.deepcopy(task.booking)
+
+        try:
+            booking_result = await self._make_booking(
+                contact_details=task.contact_details,
+                passengers=task.passengers,
+                details=details,
+                metadata=task.metadata,
+            )
+        except (errors.ServiceError, phonenumbers.NumberParseException):
+            self._logger.exception()
+
+            new_booking.MergeFrom(
+                models_pb2.Booking(
+                    status=models_pb2.Booking.STATUS_ERROR,
+                    provider_name=_PROVIDER_NAME,
+                ),
+            )
+
+            return new_booking
+
+        new_booking.MergeFrom(
+            models_pb2.Booking(
+                status=models_pb2.Booking.STATUS_NOT_TICKETED,
+                provider_name=_PROVIDER_NAME,
+                total_price=money.from_string(
+                    string_amount=str(
+                        booking_result.price_information["bookPrice"]["price"],
+                    ),
+                    currency=money.Currency(
+                        booking_result.price_information["bookPrice"]["currency"],
+                    ),
+                ).protobuf(),
+                trip_result=models_pb2.TripBooking(
+                    record_locator=more_itertools.first(
+                        booking_result.information.record_locators or [""],
+                    ),
+                    operator_booking_references=booking_result.information.check_in_locators
+                    or [],
+                ),
+                raw_data=booking_result.json(),
+            ),
+        )
+
+        return new_booking
+
+    async def _make_booking(
+        self,
+        contact_details: models_pb2.ContactDetails,
+        passengers: Sequence[models_pb2.Passenger],
+        details: OfferDetails,
+        metadata: amqp_pb2.OrderMetadata,
     ) -> booking.Booking:
-        number = phonenumbers.parse(order.contact_details.phone.e164_number)
+        number = phonenumbers.parse(contact_details.phone.e164_number)
         country = pycountry.countries.get(
-            alpha_2=order.contact_details.address.region_code,
+            alpha_2=contact_details.address.region_code,
         )
 
         booking_result = await self._client.create_booking(
@@ -48,7 +106,9 @@ class BookingHandler(object):
                 common.Passenger(
                     first_name=passenger.first_name,
                     last_name=passenger.last_name,
-                    name_title=models_pb2.Passenger.Title.Name(passenger.title),
+                    name_title=models_pb2.Passenger.Title.Name(
+                        passenger.title,
+                    )[6:].capitalize(),
                     gender=models.gender_from_proto(passenger.gender),
                     type=criteria.get_passenger_type(
                         protobuf.protobuf_to_date(passenger.date_of_birth),
@@ -56,12 +116,12 @@ class BookingHandler(object):
                     ),
                     birth_date=protobuf.protobuf_to_date(passenger.date_of_birth),
                 )
-                for passenger in order.passengers
+                for passenger in passengers
             ],
             contact=common.Contact(
-                address="\n".join(order.contact_details.address.address_lines),
-                city=order.contact_details.address.locality,
-                postal_code=order.contact_details.address.postal_code,
+                address="\n".join(contact_details.address.address_lines),
+                city=contact_details.address.locality,
+                postal_code=contact_details.address.postal_code,
                 country=common.Country(
                     code=country.alpha_2,
                     name=country.name,
@@ -70,7 +130,7 @@ class BookingHandler(object):
                     country_code=str(number.country_code),
                     number=str(number.national_number),
                 ),
-                email=order.contact_details.email,
+                email=contact_details.email,
             ),
         )
 
@@ -83,7 +143,7 @@ class BookingHandler(object):
         try:
             # todo: this should be handled in a separate service
             await self._notifier.send(
-                notifications.BookingNotification(order, booking_result),
+                notifications.BookingNotification(metadata, booking_result),
             )
         except notifications.NotificationError:
             self._logger.exception()

@@ -6,7 +6,7 @@ import aiosmtplib
 import more_itertools
 import structlog
 
-from snowfall.project.junction.service.orders.v1alpha import models_pb2
+from snowfall.project.junction.service.orders.v1alpha import amqp_pb2
 from snowfall.vendor.ask2go.models import booking as a2g_booking
 
 
@@ -36,7 +36,9 @@ class BookingNotification(Notification):
     _template = """
 Reservation created by Junction
 
+Journey ID : {journey_id}
 Order ID : {order_id}
+Booking ID : {booking_id}
 SPNR : {spnr}
 Record locator (sabre) : {sabre_pnr}
 Checkin locator (other) : {checkin_pnr}
@@ -48,10 +50,10 @@ Travel departure date : {departure_at}
 
     def __init__(
         self,
-        order: models_pb2.Order,
+        metadata: amqp_pb2.OrderMetadata,
         booking: a2g_booking.Booking,
     ):
-        self._order = order
+        self._metadata = metadata
         self._booking = booking
 
     @property
@@ -67,8 +69,10 @@ Travel departure date : {departure_at}
         first_passenger = more_itertools.first(self._booking.travelers)
 
         return {
-            "order_id": self._order.id,
-            "spnr": self._order.passenger_name_record,
+            "journey_id": self._metadata.journey_id,
+            "order_id": self._metadata.order_id,
+            "booking_id": self._metadata.booking_id,
+            "spnr": self._metadata.passenger_name_record,
             "sabre_pnr": ", ".join(self._booking.information.record_locators or []),
             "checkin_pnr": ", ".join(self._booking.information.check_in_locators or []),
             "first_name": first_passenger.get("firstName", ""),

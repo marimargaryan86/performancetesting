@@ -126,7 +126,7 @@ def offer_searches_client() -> offer_searches.Client:
 
 @pytest.fixture
 def orders_client() -> orders.Client:
-    return orders.DictClient(fixtures.get_orders())
+    return orders.DictClient(fixtures.get_journeys())
 
 
 @pytest.fixture

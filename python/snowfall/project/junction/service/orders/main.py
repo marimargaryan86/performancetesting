@@ -53,9 +53,15 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
             app.settings.grpc_port,
             [
                 OrderService(
-                    orders=orders.OrderRepository(
-                        mongo.orders.orders,
+                    journeys=orders.JourneyRepository(
+                        collection=mongo.orders.journeys,
                         passenger_name_records=passenger_name_records_client,
+                    ),
+                    orders=orders.OrderRepository(
+                        collection=mongo.orders.journeys,
+                    ),
+                    bookings=orders.BookingRepository(
+                        collection=mongo.orders.journeys,
                     ),
                     publisher=OrderProducer(
                         producer=amqp.Producer(
@@ -77,30 +83,21 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
         random.choice(app.settings.mongo_dsn),  # nosec
     )
 
-    passenger_name_records_client = passenger_name_records.GrpcClient(
-        passenger_name_records=passenger_name_records_pb2_grpc.PassengerNameRecordServiceStub(
-            client.create_channel(
-                random.choice(app.settings.passenger_name_records_address),  # nosec
-            ),
-        ),
-    )
-
     async with await amqp.create_connection(
         random.choice(app.settings.amqp_dsn),  # nosec
     ) as connection:
-        order_importer = importer.OrderImporter(
+        booking_importer = importer.BookingImporter(
             consumer=amqp.Consumer(
                 connection=connection,
                 exchange=amqp.Exchange("orders"),
                 queue_name="{0}_orders".format(app.name),
                 routing_key="orders.result.offer",
             ),
-            order_repository=orders.OrderRepository(
+            booking_repository=orders.BookingRepository(
                 mongo.orders.orders,
-                passenger_name_records=passenger_name_records_client,
             ),
         )
-        await order_importer.consume()
+        await booking_importer.consume()
 
 
 if __name__ == "__main__":

@@ -34,6 +34,12 @@
       ]
     },
     {
+      "name": "Journeys",
+      "tags": [
+        "journeys"
+      ]
+    },
+    {
       "name": "Offers",
       "tags": [
         "offers"
@@ -49,12 +55,6 @@
       "name": "Places",
       "tags": [
         "places"
-      ]
-    },
-    {
-      "name": "Orders",
-      "tags": [
-        "orders"
       ]
     },
     {
@@ -83,6 +83,11 @@
       "x-displayName": "Internal"
     },
     {
+      "name": "journeys",
+      "description": "Journeys are a collection of placed orders and the bookings they resulted in.",
+      "x-displayName": "Journeys"
+    },
+    {
       "name": "legs",
       "description": "A single element of the trip carried by a provider. ",
       "x-displayName": "Legs"
@@ -91,11 +96,6 @@
       "name": "offers",
       "description": "Offers are bookable suggestions for a trip.",
       "x-displayName": "Offers"
-    },
-    {
-      "name": "orders",
-      "description": "A collection of bookings.",
-      "x-displayName": "Orders"
     },
     {
       "name": "passengers",
@@ -2328,12 +2328,213 @@
         "description": "Used to lookup data for an Offer Option Details Identifier."
       }
     },
-    "/orders": {
+    "/journeys": {
+      "get": {
+        "summary": "List Journeys",
+        "tags": [
+          "journeys"
+        ],
+        "operationId": "get-journeys",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Journey"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "description": "Used to retrieve Journeys created in Junction.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
+      },
+      "parameters": []
+    },
+    "/journeys/{journeyId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/journeyId"
+        }
+      ],
+      "get": {
+        "summary": "Get Journey",
+        "tags": [
+          "journeys"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Journey"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-journeys-id",
+        "description": "Used to lookup data for a Journey Identifier."
+      }
+    },
+    "/journeys/{journeyId}/orders": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/journeyId"
+        }
+      ],
+      "get": {
+        "summary": "List Orders by Journey",
+        "tags": [
+          "journeys"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Order"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-journeys-id-orders",
+        "description": "Used to retrieve all Orders for a Journey.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
+      },
       "post": {
         "summary": "Create Order",
+        "operationId": "post-journeys-id-orders",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Order"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "description": "Place an Order for an Offer on an existing Journey.",
         "tags": [
-          "orders"
+          "journeys"
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Order"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders": {
+      "parameters": [],
+      "post": {
+        "summary": "Create Order",
         "operationId": "post-orders",
         "responses": {
           "201": {
@@ -2364,7 +2565,10 @@
             "$ref": "#/components/responses/UnprocessableEntity"
           }
         },
-        "description": "Used to create an Order and book the specified Offers.",
+        "description": "Create an new Journey by placing an Order for an Offer.",
+        "tags": [
+          "journeys"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -2373,7 +2577,7 @@
                 "type": "object",
                 "properties": {
                   "data": {
-                    "$ref": "#/components/schemas/Order"
+                    "$ref": "#/components/schemas/OrderCreatable"
                   }
                 },
                 "required": [
@@ -2383,57 +2587,7 @@
             }
           }
         }
-      },
-      "get": {
-        "summary": "List Orders",
-        "tags": [
-          "orders"
-        ],
-        "operationId": "get-orders",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/Order"
-                          }
-                        }
-                      },
-                      "required": [
-                        "data"
-                      ]
-                    },
-                    {
-                      "$ref": "#/components/schemas/NextLink"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          }
-        },
-        "description": "Used to retrieve Orders made in Junction.",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/page-cursor"
-          },
-          {
-            "$ref": "#/components/parameters/page-limit"
-          }
-        ]
-      },
-      "parameters": []
+      }
     },
     "/orders/{orderId}": {
       "parameters": [
@@ -2444,7 +2598,7 @@
       "get": {
         "summary": "Get Order",
         "tags": [
-          "orders"
+          "journeys"
         ],
         "responses": {
           "200": {
@@ -2473,44 +2627,113 @@
           }
         },
         "operationId": "get-orders-id",
-        "description": "Used to lookup data for a Order Identifier."
-      },
-      "patch": {
-        "summary": "Update Order",
+        "description": "Used to lookup data for an Order Identifier."
+      }
+    },
+    "/orders/{orderId}/bookings": {
+      "parameters": [
+        {
+          "name": "orderId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "format": "uuid"
+          },
+          "description": "Order identifier"
+        }
+      ],
+      "get": {
+        "summary": "List Bookings by Order",
         "tags": [
-          "orders"
+          "journeys"
         ],
-        "operationId": "patch-orders-id",
         "responses": {
-          "202": {
-            "description": "Accepted"
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "$ref": "#/components/schemas/TripBooking"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
           }
         },
-        "description": "Used to add offers to an existing booking.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/vnd.api+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "data": {
-                    "$ref": "#/components/schemas/Order"
+        "operationId": "get-orders-id-bookings",
+        "description": "Used to retrieve all Bookings for an Order.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
+      }
+    },
+    "/bookings/{bookingId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/bookingId"
+        }
+      ],
+      "get": {
+        "summary": "Get Booking",
+        "tags": [
+          "journeys"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/TripBooking"
+                        }
+                      ]
+                    }
                   }
                 }
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
-        }
+        },
+        "operationId": "get-bookings-id",
+        "description": "Used to lookup data for a Booking Identifier."
       }
     },
     "/health": {
@@ -2836,8 +3059,8 @@
                   },
                   "countryCode": {
                     "type": "string",
-                    "format":  "country",
-                    "example": "SE",
+                    "format": "country",
+                    "example": "GB",
                     "readOnly": true
                   },
                   "timeZone": {
@@ -2901,7 +3124,7 @@
               "name": "Stockholm Arlanda Airport",
               "latitude": 59.651164062,
               "longitude": 17.917829662,
-              "countryCode": "SE",
+              "countryCode": "GB",
               "timeZone": "Europe/Stockholm",
               "iataCode": "ARN"
             },
@@ -4325,6 +4548,131 @@
         ],
         "description": "Not yet implemented."
       },
+      "Journey": {
+        "title": "Journey",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "example": "journeys",
+                "enum": [
+                  "journeys"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "reference",
+                  "contactDetails"
+                ],
+                "properties": {
+                  "reference": {
+                    "type": "string",
+                    "example": "IRKI2XHA"
+                  },
+                  "contactDetails": {
+                    "$ref": "#/components/schemas/ContactDetails"
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "orders"
+                ],
+                "properties": {
+                  "orders": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/OrderIdentifier"
+                        }
+                      }
+                    },
+                    "readOnly": true
+                  }
+                },
+                "readOnly": true
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "description": "Collection of multiple Orders (booked Offers)."
+      },
+      "JourneyIdentifier": {
+        "title": "Journey Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "example": "journeys",
+            "enum": [
+              "journeys"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "OrderCreatable": {
+        "title": "Order (Creatable)",
+        "description": "Collection of multiple Orders (booked Offers) used when creating a Journey.",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {},
+              "type": {},
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "contactDetails"
+                ],
+                "properties": {
+                  "contactDetails": {
+                    "$ref": "#/components/schemas/ContactDetails"
+                  }
+                }
+              }
+            },
+            "required": [
+              "attributes"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/Order"
+          }
+        ]
+      },
       "Order": {
         "title": "Order",
         "allOf": [
@@ -4347,54 +4695,87 @@
               "attributes": {
                 "type": "object",
                 "required": [
-                  "offers",
-                  "contactDetails"
+                  "passengers"
                 ],
                 "properties": {
-                  "offers": {
+                  "passengers": {
                     "type": "array",
                     "uniqueItems": true,
+                    "minItems": 1,
                     "items": {
-                      "type": "object",
-                      "minProperties": 1,
-                      "properties": {
-                        "offerAggregateId": {
-                          "type": "string",
-                          "format": "uuid",
-                          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
-                        },
-                        "offerIds": {
-                          "type": "array",
-                          "minItems": 1,
-                          "uniqueItems": true,
-                          "items": {
-                            "type": "string",
-                            "format": "uuid",
-                            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
-                          },
-                          "example": [
-                            "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
-                          ]
-                        },
-                        "passengers": {
-                          "type": "array",
-                          "minItems": 1,
-                          "uniqueItems": true,
-                          "items": {
-                            "$ref": "#/components/schemas/OrderPassenger"
-                          }
-                        }
-                      },
-                      "required": [
-                        "offerAggregateId",
-                        "offerIds",
-                        "passengers"
-                      ]
+                      "$ref": "#/components/schemas/OrderPassenger"
+                    }
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "offer",
+                  "options",
+                  "journey",
+                  "bookings"
+                ],
+                "properties": {
+                  "offer": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/OfferIdentifier"
+                      }
                     },
                     "writeOnly": true
                   },
-                  "contactDetails": {
-                    "$ref": "#/components/schemas/ContactDetails"
+                  "options": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "minItems": 1,
+                        "items": {
+                          "$ref": "#/components/schemas/OfferOptionIdentifier"
+                        }
+                      }
+                    },
+                    "writeOnly": true
+                  },
+                  "journey": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/JourneyIdentifier"
+                      }
+                    },
+                    "readOnly": true
+                  },
+                  "bookings": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "oneOf": [
+                            {
+                              "$ref": "#/components/schemas/TripBookingIdentifier"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "readOnly": true
                   }
                 }
               }
@@ -4402,14 +4783,168 @@
             "required": [
               "id",
               "type",
-              "attributes"
+              "attributes",
+              "relationships"
             ]
           },
           {
             "$ref": "#/components/schemas/SelfLink"
           }
         ],
-        "description": "Collection of multiple booked Offers."
+        "description": "Collection of multiple booked Offers Options."
+      },
+      "OrderIdentifier": {
+        "title": "Order Identifier",
+        "description": "",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "orders"
+            ],
+            "example": "orders"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "TripBooking": {
+        "title": "Trip Booking",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "example": "trip-bookings",
+                "enum": [
+                  "trip-bookings"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "operatorBookingReferences"
+                ],
+                "properties": {
+                  "operatorBookingReferences": {
+                    "type": "array",
+                    "example": [
+                      "HDZEMS"
+                    ],
+                    "items": {
+                      "type": "string",
+                      "example": "HDZEMS"
+                    }
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "order",
+                  "status"
+                ],
+                "properties": {
+                  "order": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/OrderIdentifier"
+                      }
+                    },
+                    "readOnly": true
+                  },
+                  "status": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/BookingStatusIdentifier"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "description": "A booked Trip Offer Option."
+      },
+      "TripBookingIdentifier": {
+        "title": "Booking Identifier",
+        "description": "",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "example": "trip-bookings",
+            "enum": [
+              "trip-bookings"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "BookingStatusIdentifier": {
+        "title": "Booking Status Identifier",
+        "description": "",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "confirmed",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "example": "booking-statuses",
+            "enum": [
+              "booking-statuses"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
       },
       "OrderPassenger": {
         "title": "OrderPassenger",
@@ -4456,16 +4991,22 @@
           },
           "address": {
             "type": "object",
+            "required": [
+              "addressLines",
+              "countryCode",
+              "postalCode",
+              "city"
+            ],
             "properties": {
               "addressLines": {
                 "type": "array",
+                "example": [
+                  "Street name 7"
+                ],
                 "items": {
                   "type": "string",
                   "example": "Street name 7"
-                },
-                "example": [
-                  "Street name 7"
-                ]
+                }
               },
               "countryCode": {
                 "type": "string",
@@ -4487,7 +5028,12 @@
             "format": "phone",
             "example": "+123456789"
           }
-        }
+        },
+        "required": [
+          "email",
+          "address",
+          "phoneNumber"
+        ]
       },
       "LoyaltyCard": {
         "title": "LoyaltyCard",
@@ -4942,6 +5488,28 @@
         "description": "Filters offers based on the options cabin class",
         "style": "form",
         "explode": false
+      },
+      "journeyId": {
+        "name": "journeyId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+          "format": "uuid"
+        },
+        "description": "Journey Identifier"
+      },
+      "bookingId": {
+        "name": "bookingId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+          "format": "uuid"
+        },
+        "description": "Booking Identifier"
       }
     },
     "securitySchemes": {
