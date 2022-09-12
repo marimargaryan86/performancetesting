@@ -169,3 +169,16 @@ class LoyaltyProgram(models.Resource):
                 "name": program.name,
             },
         )
+
+
+class PreferenceResource(models.Resource):
+    @classmethod
+    def from_dict(
+        cls,
+        preferences: Any,
+    ) -> PreferenceResource:
+        return cls(
+            id="",
+            type="preferences",
+            attributes=preferences,
+        )

@@ -85,6 +85,9 @@ def _factory(
                     mongo["trip-searches"],
                 ),
                 trips_repository=repository.TripsRepository(mongo["trips"]),
+                preferences_repository=repository.PreferencesRepository(
+                    mongo["preferences"],
+                ),
                 loyalty_programs_repository=repository.LoyaltyProgramsRepository(
                     mongo["air_loyalty"],
                 ),

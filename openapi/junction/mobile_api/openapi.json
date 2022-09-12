@@ -59,6 +59,12 @@
       ]
     },
     {
+      "name": "Preferences",
+      "tags": [
+        "preferences"
+      ]
+    },
+    {
       "name": "Loyalty",
       "tags": [
         "loyalty"
@@ -95,6 +101,11 @@
       "name": "places",
       "description": "Endpoints providing information about places.",
       "x-displayName": "Places"
+    },
+    {
+      "name": "preferences",
+      "description": "Endpoints for user preferences.",
+      "x-displayName": "Preferences"
     },
     {
       "name": "trips",
@@ -977,6 +988,67 @@
           }
         ],
         "summary": "Update User"
+      }
+    },
+    "/users/me/preferences": {
+      "get": {
+        "tags": [
+          "preferences"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties":{
+                    "data":{
+                      "$ref": "#/components/schemas/Preference"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-users-me-preferences",
+        "description": "User get preferences",
+        "summary": "List User Preferences"
+      },
+      "patch": {
+        "tags": [
+          "preferences"
+        ],
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Preference"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "patch-users-me-preferences",
+        "description": "User change preferences",
+        "summary": "Update Preferences"
       }
     }
   },
@@ -2598,6 +2670,133 @@
           "type",
           "attributes"
         ]
+      },
+      "Preference": {
+        "title": "Preference",
+        "description": "",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "32c3fdd6-3dbd-4161-898e-6a14eea99362",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "preferences"
+            ],
+            "example": "preferences"
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "name":{
+                "oneOf": [
+                  {"$ref": "#/components/schemas/BooleanPreferenceAttributes"},
+                  {"$ref": "#/components/schemas/BooleanCollectionPreferenceAttributes"}
+                ]
+              }
+            }
+          }
+        },
+        "required": [
+          "type",
+          "attributes"
+        ]
+      },
+      "BooleanPreferenceAttributes": {
+        "title": "Boolean Preference Value",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Push Notifications",
+            "readOnly": true
+          },
+          "ref": {
+            "type": "string",
+            "example": "push_notifications"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "boolean"
+            ],
+            "example": "boolean",
+            "readOnly": true
+          },
+          "category": {
+            "type": "string",
+            "example": "notifications",
+            "readOnly": true
+          },
+          "value": {
+            "type": "boolean",
+            "example": false
+          }
+        },
+        "required": ["title", "ref", "type", "category", "value"]
+      },
+      "BooleanCollectionPreferenceAttributes": {
+        "title": "Boolean Collection Preference Value",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Travel Preferences",
+            "readOnly": true
+          },
+          "ref": {
+            "type": "string",
+            "example": "travel_preferences"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "boolean_collection"
+            ],
+            "example": "boolean_collection",
+            "readOnly": true
+          },
+          "category": {
+            "type": "string",
+            "example": "travel_preferences",
+            "readOnly": true
+          },
+          "value": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BooleanCollectionItem"
+            }
+          }
+        },
+        "required": ["title", "ref", "type", "category", "value"]
+      },
+      "BooleanCollectionItem": {
+        "title": "Boolean Collection Item",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Nature",
+            "readOnly": true
+          },
+          "ref": {
+            "type": "string",
+            "example": "nature"
+          },
+          "value": {
+            "type": "boolean",
+            "example": false
+          },
+          "imageUrl": {
+            "type": "string",
+            "example": "http://img.net/nature",
+            "readOnly": true
+          }
+        },
+        "required": ["title", "ref", "value", "imageUrl"]
       },
       "ContactDetails": {
         "title": "ContactDetails",

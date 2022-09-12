@@ -8,9 +8,13 @@ import lagom
 from pymongo import errors
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.project.junction.service.mobile_api import jwt_generator
-from snowfall.project.junction.service.mobile_api import models as mobile_models
-from snowfall.project.junction.service.mobile_api import repository, resources, smtp
+from snowfall.project.junction.service.mobile_api import (
+    jwt_generator,
+    repository,
+    resources,
+    smtp,
+)
+from snowfall.project.junction.service.mobile_api.models import user as user_model
 from snowfall.project.junction.service.mobile_api.v1alpha.models_pb2 import (
     User as UserModel,
 )
@@ -144,7 +148,7 @@ class UserLoggedIn(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         user_id = request.user.username
         body = await request_helpers.flatten_request(request)
-        user = mobile_models.User.from_dict(body)
+        user = user_model.User.from_dict(body)
 
         await users_repository.update_profile(user_id, user.dict(exclude_unset=True))
         return models.JsonApiResponse(

@@ -197,6 +197,39 @@ class LoyaltyProgramsRepository(
         return programs
 
 
+class PreferencesRepository(
+    mixins.FindByIdMixin[dict[str, Any]],
+    repository.DefaultRepository,
+):
+    """"""
+
+    async def update_preferences(self, user_id: str, preferences: Any) -> None:
+        # TODO: check if I can do it in 1 aggregation pipeline
+        saved_preferences = await self.find_by_id(user_id, "user_id")
+        if saved_preferences:
+            for preference in preferences:
+                saved_preferences["preferences"].append(preference)
+            new_preferences = list(
+                {
+                    saved_preference["ref"]: saved_preference
+                    for saved_preference in saved_preferences["preferences"]
+                }.values(),
+            )
+        else:
+            new_preferences = preferences
+        await self._execute(
+            self._collection.update_one,
+            {"user_id": user_id},
+            {
+                "$set": {
+                    "preferences": new_preferences,
+                    "updated_at": datetime.datetime.now(datetime.timezone.utc),
+                },
+            },
+            upsert=True,
+        )
+
+
 class MockRepository(
     mixins.AllMixin[dict[str, Any]],
     mixins.InsertMixin[dict[str, Any]],
