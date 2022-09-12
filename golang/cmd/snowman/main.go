@@ -13,7 +13,6 @@ import (
 	"go.uber.org/zap"
 	"math/rand"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -155,57 +154,4 @@ func serve(cmd *cobra.Command, args []string) error {
 	mux.Handle("/", wh)
 
 	return http.ListenAndServe(fmt.Sprintf("0.0.0.0:%d", viper.GetInt("http_port")), mux)
-}
-
-func manageMemberships(client *gitlab.Client, logger *zap.SugaredLogger, hookUrl string, hookSecret string) {
-	projects, _, err := client.Projects.ListProjects(&gitlab.ListProjectsOptions{
-		Archived:                 func() *bool { b := false; return &b }(),
-		Membership:               func() *bool { b := true; return &b }(),
-		MinAccessLevel:           func() *gitlab.AccessLevelValue { b := gitlab.AccessLevelValue(40); return &b }(),
-		WithMergeRequestsEnabled: func() *bool { b := true; return &b }(),
-	})
-
-	if err != nil {
-		logger.Error(err)
-		return
-	}
-
-	for _, p := range projects {
-		var foundHook *gitlab.ProjectHook
-
-		hooks, _, _ := client.Projects.ListProjectHooks(p.ID, &gitlab.ListProjectHooksOptions{})
-
-		for _, h := range hooks {
-			if strings.TrimSuffix(h.URL, "/") == strings.TrimSuffix(hookUrl, "/") {
-				foundHook = h
-			}
-		}
-
-		if foundHook == nil {
-			enabled := func() *bool { b := true; return &b }()
-			_, _, err := client.Projects.AddProjectHook(p.ID, &gitlab.AddProjectHookOptions{
-				ConfidentialIssuesEvents: enabled,
-				ConfidentialNoteEvents:   enabled,
-				DeploymentEvents:         enabled,
-				EnableSSLVerification:    enabled,
-				IssuesEvents:             enabled,
-				JobEvents:                enabled,
-				MergeRequestsEvents:      enabled,
-				NoteEvents:               enabled,
-				PipelineEvents:           enabled,
-				PushEvents:               enabled,
-				ReleasesEvents:           enabled,
-				TagPushEvents:            enabled,
-				Token:                    &hookSecret,
-				URL:                      &hookUrl,
-				WikiPageEvents:           enabled,
-			})
-
-			if err != nil {
-				logger.Error(err)
-			} else {
-				logger.With("project", p.ID).Info("Project initialized.")
-			}
-		}
-	}
 }
