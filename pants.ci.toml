@@ -1,6 +1,7 @@
 [GLOBAL]
 colors = true
 pantsd = false
+cache_content_behavior = "validate"
 remote_cache_read = true
 remote_cache_write = true
 remote_store_address = "grpc://bazel-remote-cache:9092"
