@@ -2462,7 +2462,7 @@
           }
         },
         "operationId": "get-journeys-id-orders",
-        "description": "Used to retrieve all Orders for a Journey.",
+        "description": "Used to retrieve all Orders for a Journey container.",
         "parameters": [
           {
             "$ref": "#/components/parameters/page-cursor"
@@ -2473,7 +2473,7 @@
         ]
       },
       "post": {
-        "summary": "Create Order",
+        "summary": "Create Order by Journey",
         "operationId": "post-journeys-id-orders",
         "responses": {
           "201": {
@@ -2507,7 +2507,7 @@
             "$ref": "#/components/responses/UnprocessableEntity"
           }
         },
-        "description": "Place an Order for an Offer on an existing Journey.",
+        "description": "Create an Order for an Offer in an existing Journey container.",
         "tags": [
           "journeys"
         ],
@@ -2565,7 +2565,7 @@
             "$ref": "#/components/responses/UnprocessableEntity"
           }
         },
-        "description": "Create an new Journey by placing an Order for an Offer.",
+        "description": "Create an Order for an Offer, placing it in a new Journey container.",
         "tags": [
           "journeys"
         ],
