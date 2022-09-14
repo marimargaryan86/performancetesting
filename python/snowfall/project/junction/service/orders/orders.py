@@ -73,7 +73,7 @@ class JourneyRepository(
 class OrderRepository(repository.ProtoRepository[order_models_pb2.Order]):
     _proto = order_models_pb2.Order
     _indexes = [
-        pymongo.IndexModel("orders.id", background=True),
+        pymongo.IndexModel("orders._id", background=True),
         pymongo.IndexModel("orders.journey_id", background=True),
     ]
 
@@ -120,7 +120,7 @@ class OrderRepository(repository.ProtoRepository[order_models_pb2.Order]):
         options = await self._find_nested(
             path="$orders",
             filter_={
-                "orders.id": {
+                "orders._id": {
                     "$eq": document_id,
                 },
             },
@@ -138,7 +138,7 @@ class OrderRepository(repository.ProtoRepository[order_models_pb2.Order]):
     ) -> resultset.ResultSet[order_models_pb2.Order]:
         filter_ = (
             {
-                "orders.id": {
+                "orders._id": {
                     "$in": ids,
                 },
             }
@@ -171,7 +171,7 @@ class OrderRepository(repository.ProtoRepository[order_models_pb2.Order]):
 class BookingRepository(repository.ProtoRepository[order_models_pb2.Booking]):
     _proto = order_models_pb2.Booking
     _indexes = [
-        pymongo.IndexModel("orders.bookings.id", background=True),
+        pymongo.IndexModel("orders.bookings._id", background=True),
         pymongo.IndexModel("orders.bookings.order_id", background=True),
     ]
 
@@ -182,7 +182,7 @@ class BookingRepository(repository.ProtoRepository[order_models_pb2.Booking]):
         options = await self._find_nested(
             path="$orders.bookings",
             filter_={
-                "orders.bookings.id": {
+                "orders.bookings._id": {
                     "$eq": document_id,
                 },
             },
@@ -200,7 +200,7 @@ class BookingRepository(repository.ProtoRepository[order_models_pb2.Booking]):
     ) -> resultset.ResultSet[order_models_pb2.Booking]:
         filter_ = (
             {
-                "orders.bookings.id": {
+                "orders.bookings._id": {
                     "$in": ids,
                 },
             }
@@ -235,7 +235,7 @@ class BookingRepository(repository.ProtoRepository[order_models_pb2.Booking]):
     ) -> order_models_pb2.Booking:
         await self._execute(
             self._collection.replace_one,
-            filter={"orders.bookings.id": booking.id},
+            filter={"orders.bookings._id": booking.id},
             replacement=self._coder.encode(booking),
         )
 

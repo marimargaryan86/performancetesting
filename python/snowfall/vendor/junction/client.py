@@ -395,9 +395,7 @@ class JunctionClient(object):  # noqa: WPS214
         self,
         response: Mapping[str, Any],
     ) -> dict[str, Any]:
-        bookings = await self.get_bookings_by_order_id(
-            response[_DATA_KEY][_ATTRIBUTES_KEY][_ID_KEY],
-        )
+        bookings = await self.get_bookings_by_order_id(response[_DATA_KEY][_ID_KEY])
         journey = response[_DATA_KEY][_RELATIONSHIPS_KEY]["journey"]
         journey_response = await self.get_journey_by_id(journey[_DATA_KEY][_ID_KEY])
         journey_response[_DATA_KEY][_TYPE_KEY] = "orders"
