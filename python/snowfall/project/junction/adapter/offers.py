@@ -387,6 +387,11 @@ class GrpcClient(Client):  # noqa: WPS214
         try:
             response = await self._offers.GetOfferGroup(request, timeout=self._timeout)
         except grpc.aio.AioRpcError as exc:
+            if exc.code() == grpc.StatusCode.NOT_FOUND:
+                raise NotFoundError(
+                    "Offer group with ID '{id}' not found.".format(id=identifier),
+                ) from exc
+
             raise UnknownError() from exc
 
         return response.group
@@ -427,6 +432,13 @@ class GrpcClient(Client):  # noqa: WPS214
                 timeout=self._timeout,
             )
         except grpc.aio.AioRpcError as exc:
+            if exc.code() == grpc.StatusCode.NOT_FOUND:
+                raise NotFoundError(
+                    "Offer group details with ID '{id}' not found.".format(
+                        id=identifier,
+                    ),
+                ) from exc
+
             raise UnknownError() from exc
 
         return response.details
@@ -464,6 +476,11 @@ class GrpcClient(Client):  # noqa: WPS214
         try:
             response = await self._offers.GetOfferOption(request, timeout=self._timeout)
         except grpc.aio.AioRpcError as exc:
+            if exc.code() == grpc.StatusCode.NOT_FOUND:
+                raise NotFoundError(
+                    "Option with ID '{id}' not found.".format(id=identifier),
+                ) from exc
+
             raise UnknownError() from exc
 
         return response.option
@@ -507,6 +524,11 @@ class GrpcClient(Client):  # noqa: WPS214
                 timeout=self._timeout,
             )
         except grpc.aio.AioRpcError as exc:
+            if exc.code() == grpc.StatusCode.NOT_FOUND:
+                raise NotFoundError(
+                    "Option details with ID '{id}' not found.".format(id=identifier),
+                ) from exc
+
             raise UnknownError() from exc
 
         return response.details

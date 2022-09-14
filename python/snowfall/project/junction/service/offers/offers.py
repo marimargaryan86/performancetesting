@@ -51,7 +51,7 @@ class TripOfferGroupDetailsRepository(
     repository.ProtoRepository[models_pb2.OfferSegment],
 ):
     _proto = models_pb2.OfferSegment
-    _indexes = [pymongo.IndexModel("segments.id", background=True)]
+    _indexes = [pymongo.IndexModel("segments._id", background=True)]
 
     async def find(
         self,
@@ -60,7 +60,7 @@ class TripOfferGroupDetailsRepository(
     ) -> resultset.ResultSet[models_pb2.OfferSegment]:
         filter_ = (
             {
-                "segments.id": {
+                "segments._id": {
                     _IN: ids,
                 },
             }
@@ -78,7 +78,7 @@ class TripOfferGroupDetailsRepository(
         details = await self._find_nested(
             path="$segments",
             filter_={
-                "segments.id": {
+                "segments._id": {
                     "$eq": document_id,
                 },
             },
@@ -94,7 +94,7 @@ class OfferOptionsRepository(
     repository.ProtoRepository[models_pb2.Offer],
 ):
     _proto = models_pb2.Offer
-    _indexes = [pymongo.IndexModel("offers.id", background=True)]
+    _indexes = [pymongo.IndexModel("offers._id", background=True)]
 
     async def find(
         self,
@@ -103,7 +103,7 @@ class OfferOptionsRepository(
     ) -> resultset.ResultSet[models_pb2.Offer]:
         filter_ = (
             {
-                "offers.id": {
+                "offers._id": {
                     _IN: ids,
                 },
             }
@@ -121,7 +121,7 @@ class OfferOptionsRepository(
         options = await self._find_nested(
             path="$offers",
             filter_={
-                "offers.id": {
+                "offers._id": {
                     "$eq": document_id,
                 },
             },
@@ -138,7 +138,7 @@ class OfferOptionDetailsRepository(
 ):
     _proto = models_pb2.OfferSegmentDetails
     _indexes = [
-        pymongo.IndexModel("offers.segment_details.id", background=True),
+        pymongo.IndexModel("offers.segment_details._id", background=True),
         pymongo.IndexModel("offers.segment_details.cabin_class.type", background=True),
     ]
 
@@ -149,7 +149,7 @@ class OfferOptionDetailsRepository(
     ) -> resultset.ResultSet[models_pb2.OfferSegmentDetails]:
         filter_ = (
             {
-                "offers.segment_details.id": {
+                "offers.segment_details._id": {
                     _IN: ids,
                 },
             }
@@ -170,7 +170,7 @@ class OfferOptionDetailsRepository(
         details = await self._find_nested(
             path="$offers.segment_details",
             filter_={
-                "offers.segment_details.id": {
+                "offers.segment_details._id": {
                     "$eq": document_id,
                 },
             },
