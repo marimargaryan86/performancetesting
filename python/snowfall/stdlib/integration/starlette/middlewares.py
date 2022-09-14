@@ -6,7 +6,6 @@ from openapi_core.exceptions import OpenAPIError
 from openapi_core.templating.paths.exceptions import PathNotFound
 from openapi_core.unmarshalling.schemas.exceptions import InvalidSchemaValue
 from openapi_core.validation.exceptions import InvalidSecurity
-from openapi_core.validation.request.datatypes import OpenAPIRequest
 from starlette import applications, exceptions, requests, responses, status, types
 from starlette.middleware import base
 
@@ -121,7 +120,7 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
     async def _dispatch(
         self,
         call_next: Callable[[requests.Request], Awaitable[responses.Response]],
-        openapi_request: OpenAPIRequest,
+        openapi_request: validation.OpenAPIRequest,
         resolved_request: requests.Request,
     ) -> responses.Response:
         response = await call_next(resolved_request)

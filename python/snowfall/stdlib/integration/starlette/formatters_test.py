@@ -15,7 +15,12 @@ class _FormatChecker(Protocol):
 
 @pytest.fixture
 def format_checker() -> _FormatChecker:
-    return util.build_format_checker(**formatters.custom_formatters())
+    return util.build_format_checker(
+        **{
+            name: formatter.validate
+            for name, formatter in formatters.custom_formatters().items()
+        },
+    )
 
 
 @pytest.mark.parametrize(

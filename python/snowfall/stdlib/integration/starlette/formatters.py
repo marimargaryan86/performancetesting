@@ -1,13 +1,14 @@
 import functools
-from typing import Any, Protocol
+from typing import Any
 
 import email_validator
 import phonenumbers
 import pycountry
 from furl import furl
+from openapi_core.unmarshalling.schemas import formatters
 
 
-class _CountryFormatter(object):
+class _CountryFormatter(formatters.Formatter):
     def validate(self, potential_country: Any) -> bool:
         return self.unmarshal(potential_country) is not None
 
@@ -15,7 +16,7 @@ class _CountryFormatter(object):
         return pycountry.countries.get(alpha_2=country)
 
 
-class _EmailFormatter(object):
+class _EmailFormatter(formatters.Formatter):
     def validate(self, potential_email: Any) -> bool:
         try:
             self.unmarshal(potential_email)
@@ -31,7 +32,7 @@ class _EmailFormatter(object):
         ).email
 
 
-class _PhoneFormatter(object):
+class _PhoneFormatter(formatters.Formatter):
     def validate(self, potential_phone: Any) -> bool:
         try:
             phone = self.unmarshal(potential_phone)
@@ -44,7 +45,7 @@ class _PhoneFormatter(object):
         return phonenumbers.parse(phone, None)
 
 
-class _UriFormatter(object):
+class _UriFormatter(formatters.Formatter):
     def validate(self, potential_url: Any) -> bool:
         try:
             url = self.unmarshal(potential_url)
@@ -57,16 +58,8 @@ class _UriFormatter(object):
         return furl(url)
 
 
-class _Formatter(Protocol):
-    def validate(self, input_: Any) -> bool:
-        """Check if the input validates against the format."""
-
-    def unmarshal(self, input_: Any) -> Any:
-        """Unmarshal the input."""
-
-
 @functools.cache
-def custom_formatters() -> dict[str, _Formatter]:
+def custom_formatters() -> dict[str, formatters.Formatter]:
     return {
         "country": _CountryFormatter(),
         "email": _EmailFormatter(),
