@@ -1,148 +1,274 @@
 import abc
+import collections
 import datetime
 import functools
-from copy import deepcopy
-from typing import Any, Callable, Mapping
+from enum import IntEnum
+from typing import Any, Mapping, Sequence, Type
 
+import pydantic
 from dateutil import parser
 from google.protobuf import descriptor, timestamp_pb2
 
-from snowfall.stdlib import dictionary
 from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
 
+_Metadata = descriptor.Descriptor | Type[pydantic.BaseModel]
+_TypesMap = Mapping[str, Mapping[str, str]]
+
+_MONGO_ID_KEY = "_id"
+_MODEL_ID_KEY = "id"
 _LAT_KEY = "latitude"
 _LON_KEY = "longitude"
 _COORDINATES_KEY = "coordinates"
 
 
-@functools.cache
-def _analyze_metadata(
-    metadata: descriptor.Descriptor,
-    expected: str,
-) -> set[str]:
-    if metadata.full_name == expected:
-        return {""}
-
-    fields = set({})
-
-    for field in metadata.fields:
-        if field.message_type:
-            for path in _analyze_metadata(field.message_type, expected):
-                fields.add("{0}.{1}".format(field.name, path).rstrip("."))
-
-    return fields
-
-
 class _Normalizer(abc.ABC):
-    def __init__(self) -> None:
-        self._cache: set[str] = set({})
+    @abc.abstractmethod
+    def normalize(self, maybe_dict: Any) -> Any:
+        """"""
+
+    @abc.abstractmethod
+    def denormalize(self, maybe_dict: Any) -> Any:
+        """"""
+
+    @abc.abstractmethod
+    def supports(self, fqn: str) -> bool:
+        """"""
+
+
+class _CoordinatesNormalizer(_Normalizer):
+    def denormalize(
+        self,
+        maybe_dict: Any,
+    ) -> Any:
+        return {
+            _LAT_KEY: maybe_dict[_COORDINATES_KEY][1],
+            _LON_KEY: maybe_dict[_COORDINATES_KEY][0],
+        }
+
+    def supports(self, fqn: str) -> bool:
+        return fqn == models_pb2.Coordinates().DESCRIPTOR.full_name
 
     def normalize(
         self,
-        metadata: descriptor.Descriptor,
-        as_dict: Any,
+        maybe_dict: Any,
     ) -> Any:
-        return self._transform(metadata, as_dict, self._normalize_value)
+        return {
+            "type": "Point",
+            _COORDINATES_KEY: [
+                maybe_dict[_LON_KEY],
+                maybe_dict[_LAT_KEY],
+            ],
+        }
 
+
+class _IdNormalizer(_Normalizer):
     def denormalize(
         self,
-        metadata: descriptor.Descriptor,
-        as_dict: Any,
+        maybe_dict: Any,
     ) -> Any:
-        return self._transform(metadata, as_dict, self._denormalize_value)
+        if isinstance(maybe_dict, dict) and _MONGO_ID_KEY in maybe_dict:
+            maybe_dict[_MODEL_ID_KEY] = maybe_dict.pop(_MONGO_ID_KEY)
 
-    def _transform(
+        return maybe_dict
+
+    def supports(self, fqn: str) -> bool:
+        return True
+
+    def normalize(
         self,
-        metadata: descriptor.Descriptor,
-        as_dict: Any,
-        function: Callable[[Any], Any],
+        maybe_dict: Any,
     ) -> Any:
-        as_dict = deepcopy(as_dict)
-        analyzed = _analyze_metadata(metadata, self._full_name())
+        if isinstance(maybe_dict, dict) and _MODEL_ID_KEY in maybe_dict:
+            maybe_dict[_MONGO_ID_KEY] = maybe_dict.pop(_MODEL_ID_KEY)
 
-        for path in analyzed:
-            if path:
-                as_dict = dictionary.set_nested_value(
-                    as_dict,
-                    path.split("."),
-                    function,
+        return maybe_dict
+
+
+class _LatLngNormalizer(_Normalizer):
+    def denormalize(
+        self,
+        maybe_dict: Any,
+    ) -> Any:
+        return {
+            _LAT_KEY: maybe_dict[_COORDINATES_KEY][1],
+            _LON_KEY: maybe_dict[_COORDINATES_KEY][0],
+        }
+
+    def supports(self, fqn: str) -> bool:
+        return fqn == latlng_pb2.LatLng().DESCRIPTOR.full_name
+
+    def normalize(
+        self,
+        maybe_dict: Any,
+    ) -> Any:
+        return {
+            "type": "Point",
+            _COORDINATES_KEY: [
+                maybe_dict[_LON_KEY],
+                maybe_dict[_LAT_KEY],
+            ],
+        }
+
+
+class _TimestampNormalizer(_Normalizer):
+    def denormalize(
+        self,
+        maybe_dict: Any,
+    ) -> Any:
+        if not maybe_dict.tzinfo:
+            maybe_dict = maybe_dict.replace(tzinfo=datetime.timezone.utc)
+
+        return maybe_dict.isoformat()
+
+    def supports(self, fqn: str) -> bool:
+        return fqn == timestamp_pb2.Timestamp().DESCRIPTOR.full_name
+
+    def normalize(
+        self,
+        maybe_dict: Any,
+    ) -> Any:
+        return parser.isoparse(maybe_dict)
+
+
+class _NormalizerMode(IntEnum):
+    normalize = 1
+    denormalize = 2
+
+
+_normalizers: Sequence[_Normalizer] = (
+    _CoordinatesNormalizer(),
+    _IdNormalizer(),
+    _LatLngNormalizer(),
+    _TimestampNormalizer(),
+)
+
+
+def normalize(metadata: _Metadata, maybe_dict: Any) -> Any:
+    return _transform(
+        _metadata_fqn(metadata),
+        _metadata_to_types_map(metadata),
+        maybe_dict,
+        _NormalizerMode.normalize,
+    )
+
+
+def denormalize(metadata: _Metadata, maybe_dict: Any) -> Any:
+    return _transform(
+        _metadata_fqn(metadata),
+        _metadata_to_types_map(metadata),
+        maybe_dict,
+        _NormalizerMode.denormalize,
+    )
+
+
+def _apply_normalizers(fqn: str, mode: _NormalizerMode, maybe_dict: Any) -> Any:
+    for normalizer in _normalizers:
+        if not normalizer.supports(fqn):
+            continue
+
+        match mode:
+            case _NormalizerMode.normalize:
+                maybe_dict = normalizer.normalize(maybe_dict)
+            case _NormalizerMode.denormalize:
+                maybe_dict = normalizer.denormalize(maybe_dict)
+
+    return maybe_dict
+
+
+def _transform(
+    fqn: str,
+    types_map: _TypesMap,
+    maybe_dict: Any,
+    mode: _NormalizerMode,
+) -> Any:
+    maybe_dict = _apply_normalizers(fqn, mode, maybe_dict)
+
+    if not isinstance(maybe_dict, dict):
+        return maybe_dict
+
+    for key, dict_value in maybe_dict.items():
+        if key not in types_map[fqn]:
+            continue
+
+        if isinstance(dict_value, list):
+            for idx, list_value in enumerate(dict_value):
+                maybe_dict[key][idx] = _transform(
+                    types_map[fqn][key],
+                    types_map,
+                    list_value,
+                    mode,
                 )
-            else:
-                as_dict = function(as_dict)
+        else:
+            maybe_dict[key] = _transform(
+                types_map[fqn][key],
+                types_map,
+                dict_value,
+                mode,
+            )
 
-        return as_dict
-
-    @abc.abstractmethod
-    def _denormalize_value(self, normalized_value: Any) -> Any:
-        raise NotImplementedError()
-
-    @abc.abstractmethod
-    def _full_name(self) -> str:
-        raise NotImplementedError()
-
-    @abc.abstractmethod
-    def _normalize_value(self, denormalized_value: Any) -> Any:
-        raise NotImplementedError()
+    return maybe_dict
 
 
-class CoordinatesNormalizer(_Normalizer):
-    def _denormalize_value(
-        self,
-        normalized_value: Mapping[str, Any],
-    ) -> dict[str, float]:
-        return {
-            _LAT_KEY: normalized_value[_COORDINATES_KEY][1],
-            _LON_KEY: normalized_value[_COORDINATES_KEY][0],
-        }
-
-    def _full_name(self) -> str:
-        return str(models_pb2.Coordinates().DESCRIPTOR.full_name)
-
-    def _normalize_value(
-        self,
-        denormalized_value: Mapping[str, float],
-    ) -> dict[str, Any]:
-        return {
-            "type": "Point",
-            _COORDINATES_KEY: [
-                denormalized_value[_LON_KEY],
-                denormalized_value[_LAT_KEY],
-            ],
-        }
+def _class_fqn(type_: Type[object]) -> str:
+    return ".".join([type_.__module__, type_.__name__])
 
 
-class LatLngNormalizer(_Normalizer):
-    def _denormalize_value(
-        self,
-        normalized_value: Mapping[str, Any],
-    ) -> dict[str, float]:
-        return {
-            _LAT_KEY: normalized_value[_COORDINATES_KEY][1],
-            _LON_KEY: normalized_value[_COORDINATES_KEY][0],
-        }
+def _metadata_fqn(metadata: _Metadata) -> str:
+    if isinstance(metadata, descriptor.Descriptor):
+        return metadata.full_name
 
-    def _full_name(self) -> str:
-        return str(latlng_pb2.LatLng().DESCRIPTOR.full_name)
-
-    def _normalize_value(
-        self,
-        denormalized_value: Mapping[str, float],
-    ) -> dict[str, Any]:
-        return {
-            "type": "Point",
-            _COORDINATES_KEY: [
-                denormalized_value[_LON_KEY],
-                denormalized_value[_LAT_KEY],
-            ],
-        }
+    return _class_fqn(metadata)
 
 
-class TimestampNormalizer(_Normalizer):
-    def _denormalize_value(self, normalized_value: datetime.datetime) -> str:
-        return normalized_value.isoformat()
+@functools.cache
+def _protobuf_to_types_map(model: descriptor.Descriptor) -> _TypesMap:
+    queue = collections.deque([model])
+    types_map: dict[str, dict[str, str]] = {}
 
-    def _full_name(self) -> str:
-        return str(timestamp_pb2.Timestamp().DESCRIPTOR.full_name)
+    while len(queue):
+        model = queue.popleft()
 
-    def _normalize_value(self, denormalized_value: str) -> datetime.datetime:
-        return parser.isoparse(denormalized_value)
+        if model.full_name in types_map:
+            continue
+
+        types_map[model.full_name] = {}
+
+        for field in model.fields:
+            if field.message_type:
+                types_map[model.full_name][field.name] = field.message_type.full_name
+                queue.append(field.message_type)
+
+    return types_map
+
+
+@functools.cache
+def _pydantic_to_types_map(model: Type[pydantic.BaseModel]) -> _TypesMap:
+    queue = collections.deque([model])
+    types_map: dict[str, dict[str, str]] = {}
+
+    while len(queue):
+        model = queue.popleft()
+        model_type = _class_fqn(model)
+
+        if model_type in types_map:
+            continue
+
+        types_map[model_type] = {}
+
+        for field in model.__fields__.values():
+            if issubclass(field.type_, pydantic.BaseModel):
+                types_map[model_type][field.name] = _class_fqn(field.type_)
+                queue.append(field.type_)
+
+    return types_map
+
+
+def _metadata_to_types_map(metadata: _Metadata) -> _TypesMap:
+    types_map: _TypesMap = {}
+
+    if isinstance(metadata, descriptor.Descriptor):
+        types_map = _protobuf_to_types_map(metadata)
+    elif issubclass(metadata, pydantic.BaseModel):
+        types_map = _pydantic_to_types_map(metadata)
+
+    return types_map

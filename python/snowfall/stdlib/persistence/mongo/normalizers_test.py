@@ -3,17 +3,15 @@ import datetime
 from google.protobuf import json_format, timestamp_pb2
 
 from snowfall.stdlib.persistence.mongo import normalizers
-from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2, testing_pb2
 
 _LATITUDE = 59.85882
 _LONGITUDE = 17.63889
 
 
 def test_coordinates_normalizer() -> None:
-    normalizer = normalizers.CoordinatesNormalizer()
     expected = models_pb2.Coordinates(latitude=_LATITUDE, longitude=_LONGITUDE)
-
-    normalized = normalizer.normalize(
+    normalized = normalizers.normalize(
         models_pb2.Coordinates.DESCRIPTOR,
         json_format.MessageToDict(expected, preserving_proto_field_name=True),
     )
@@ -21,21 +19,50 @@ def test_coordinates_normalizer() -> None:
     assert normalized == {"type": "Point", "coordinates": [_LONGITUDE, _LATITUDE]}
 
     actual: models_pb2.Coordinates = json_format.ParseDict(
-        normalizer.denormalize(
-            models_pb2.Coordinates.DESCRIPTOR,
-            normalized,
-        ),
+        normalizers.denormalize(models_pb2.Coordinates.DESCRIPTOR, normalized),
         models_pb2.Coordinates(),
     )
 
     assert expected == actual
 
 
-def test_latlng_normalizer() -> None:
-    normalizer = normalizers.LatLngNormalizer()
-    expected = latlng_pb2.LatLng(latitude=_LATITUDE, longitude=_LONGITUDE)
+def test_id_normalizer() -> None:
+    expected = testing_pb2.Foobar(id="foobar")
+    normalized = normalizers.normalize(
+        testing_pb2.Foobar.DESCRIPTOR,
+        json_format.MessageToDict(expected, preserving_proto_field_name=True),
+    )
 
-    normalized = normalizer.normalize(
+    assert normalized == {"_id": "foobar"}
+
+    actual: testing_pb2.Foobar = json_format.ParseDict(
+        normalizers.denormalize(testing_pb2.Foobar.DESCRIPTOR, normalized),
+        testing_pb2.Foobar(),
+    )
+
+    assert expected == actual
+
+
+def test_id_normalizer_nested() -> None:
+    expected = testing_pb2.NestedFoobar(foobars=[testing_pb2.Foobar(id="foobar")])
+    normalized = normalizers.normalize(
+        testing_pb2.NestedFoobar.DESCRIPTOR,
+        json_format.MessageToDict(expected, preserving_proto_field_name=True),
+    )
+
+    assert normalized == {"foobars": [{"_id": "foobar"}]}
+
+    actual: testing_pb2.NestedFoobar = json_format.ParseDict(
+        normalizers.denormalize(testing_pb2.NestedFoobar.DESCRIPTOR, normalized),
+        testing_pb2.NestedFoobar(),
+    )
+
+    assert expected == actual
+
+
+def test_latlng_normalizer() -> None:
+    expected = latlng_pb2.LatLng(latitude=_LATITUDE, longitude=_LONGITUDE)
+    normalized = normalizers.normalize(
         latlng_pb2.LatLng.DESCRIPTOR,
         json_format.MessageToDict(expected, preserving_proto_field_name=True),
     )
@@ -43,10 +70,7 @@ def test_latlng_normalizer() -> None:
     assert normalized == {"type": "Point", "coordinates": [_LONGITUDE, _LATITUDE]}
 
     actual: latlng_pb2.LatLng = json_format.ParseDict(
-        normalizer.denormalize(
-            latlng_pb2.LatLng.DESCRIPTOR,
-            normalized,
-        ),
+        normalizers.denormalize(latlng_pb2.LatLng.DESCRIPTOR, normalized),
         latlng_pb2.LatLng(),
     )
 
@@ -55,12 +79,9 @@ def test_latlng_normalizer() -> None:
 
 def test_timestamp_normalizer() -> None:
     expected_dt = datetime.datetime.now()
-    normalizer = normalizers.TimestampNormalizer()
     expected_ts = timestamp_pb2.Timestamp()
-
     expected_ts.FromDatetime(expected_dt)
-
-    normalized = normalizer.normalize(
+    normalized = normalizers.normalize(
         timestamp_pb2.Timestamp.DESCRIPTOR,
         json_format.MessageToDict(expected_ts, preserving_proto_field_name=True),
     )
@@ -68,10 +89,7 @@ def test_timestamp_normalizer() -> None:
     assert isinstance(normalized, datetime.datetime)
 
     actual_ts: timestamp_pb2.Timestamp = json_format.ParseDict(
-        normalizer.denormalize(
-            timestamp_pb2.Timestamp.DESCRIPTOR,
-            normalized,
-        ),
+        normalizers.denormalize(timestamp_pb2.Timestamp.DESCRIPTOR, normalized),
         timestamp_pb2.Timestamp(),
     )
 

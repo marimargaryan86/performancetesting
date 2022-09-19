@@ -8,3 +8,7 @@ message Foobar {
   string id = 1;
   google.protobuf.Timestamp updated_at = 2;
 }
+
+message NestedFoobar {
+  repeated Foobar foobars = 1;
+}
