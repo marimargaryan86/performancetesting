@@ -4,6 +4,7 @@ import re
 import uuid
 from typing import Any, Mapping, Optional, Sequence
 
+import bcrypt
 import pymongo
 from dateutil import parser
 from pymongo import results as pymongo_results
@@ -93,15 +94,26 @@ class UsersRepository(
             upsert=False,
         )
 
-    async def delete(self, user_id: str) -> None:
+    async def delete(self, user_id: str, password: str) -> bool:
         user = await self._execute(
-            self._collection.find_one_and_delete,
+            self._collection.find_one,
+            filter={"_id": user_id},
+        )
+        password_match = bcrypt.checkpw(
+            password.encode(),
+            user.password.encode(),
+        )
+        if not password_match:
+            return False
+        await self._execute(
+            self._collection.delete_one,
             filter={"_id": user_id},
         )
         await self._execute(
             self._collection.database["users_deleted"].insert_one,
             self._coder.encode(user),
         )
+        return True
 
 
 class OtpRepository(object):

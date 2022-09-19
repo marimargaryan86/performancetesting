@@ -138,7 +138,24 @@ class UserLoggedIn(endpoints.HTTPEndpoint):
         users_repository: repository.UsersRepository = lagom.injectable,
     ) -> responses.Response:
         user_id = request.user.username
-        await users_repository.delete(user_id)
+        user_deleted = await users_repository.delete(
+            user_id,
+            request.query_params.get("password", ""),
+        )
+        if not user_deleted:
+            return models.JsonApiResponse(
+                models.Body(
+                    errors=[
+                        models.Error(
+                            status=str(status.HTTP_401_UNAUTHORIZED),
+                            code="wrong_password",
+                            detail="Provided password is wrong",
+                            #  TODO: add source parameter and change the models
+                        ),
+                    ],
+                ),
+                status_code=status.HTTP_401_UNAUTHORIZED,
+            )
         return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
 
     async def patch(

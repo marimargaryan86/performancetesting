@@ -938,6 +938,19 @@
             "jwt": []
           }
         ],
+        "parameters": [
+          {
+            "name": "password",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "password",
+              "example": "secret"
+            },
+            "description": "User's password as validation key"
+          }
+        ],
         "responses": {
           "204": {
             "description": "User deleted successfully"
