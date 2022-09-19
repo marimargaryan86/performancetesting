@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import asyncio
 import dataclasses
+import os
 from typing import Any, Callable, Coroutine, Mapping, Type, Union
 
 from aio_pika import Message as PikeMessage
@@ -148,34 +150,33 @@ class Consumer(object):
         self._routing_key = routing_key
 
     async def consume(self, callback: ConsumerCallback) -> None:
-        # @todo: if we like it then we should put put a thread it!
         async with self._connection.channel() as channel:
-            await self._consume(channel, callback)
+            await channel.set_qos(prefetch_count=os.cpu_count() or 1)
+
+            exchange = await channel.declare_exchange(
+                name=self._exchange.name,
+                type=self._exchange.type_,
+                durable=True,
+            )
+
+            queue = await channel.declare_queue(
+                name=self._queue_name,
+                durable=True,
+            )
+
+            await queue.bind(exchange, self._routing_key)
+            await self._consume(queue, callback)
 
     async def _consume(
         self,
-        channel: abc.AbstractChannel,
+        queue: abc.AbstractQueue,
         callback: ConsumerCallback,
     ) -> None:
-        exchange = await channel.declare_exchange(
-            name=self._exchange.name,
-            type=self._exchange.type_,
-            durable=True,
-        )
+        async def wrapper(incoming: abc.AbstractIncomingMessage) -> None:
+            await self._process(incoming, callback)
 
-        queue = await channel.declare_queue(
-            name=self._queue_name,
-            durable=True,
-        )
-
-        await queue.bind(exchange, self._routing_key)
-
-        incoming: abc.AbstractIncomingMessage
-
-        async with queue.iterator() as queue_iter:
-            async for incoming in queue_iter:
-                async with incoming.process(ignore_processed=True):
-                    await self._process(incoming, callback)
+        await queue.consume(wrapper)
+        await asyncio.Future()
 
     async def _process(
         self,
