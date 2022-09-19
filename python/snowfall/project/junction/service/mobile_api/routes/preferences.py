@@ -59,7 +59,7 @@ def sync_template(
     if stored:
         for preference in stored["preferences"]:
             default_preference = defaults[preference[_REF_KEY]]
-            if default_preference[_TYPE_KEY] == "boolean":
+            if default_preference[_TYPE_KEY] in {"boolean", "integer"}:
                 default_preference[_VALUE_KEY] = preference[_VALUE_KEY]
             else:  # If type==boolean_collection
                 for collection_item in preference[_VALUE_KEY]:

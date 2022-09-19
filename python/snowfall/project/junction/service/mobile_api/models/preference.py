@@ -30,12 +30,13 @@ class BooleanCollectionItem(CamelModel):
 
 class Preference(CamelModel):
     ref: str
-    value: Union[bool, Sequence[BooleanCollectionItem]]  # noqa: WPS110
+    value: Union[bool, int, Sequence[BooleanCollectionItem]]  # noqa: WPS110
 
 
 class Refs(enum.Enum):
     push_notifications = "boolean"
     travel_preferences = "boolean_collection"
+    travel_preferences_budget = "integer"
 
 
 class BooleanCollectionValues(enum.Enum):
@@ -63,6 +64,8 @@ def check_preference_value(preference: Preference, preference_type: str) -> bool
             return isinstance(preference.value, bool)
         case "boolean_collection":
             return check_boolean_collection_value(preference)
+        case "integer":
+            return isinstance(preference.value, int)
     return False
 
 
@@ -85,6 +88,13 @@ preference_defaults = {
         _TYPE_KEY: "boolean",
         _CATEGORY_KEY: "Notifications",
         _VALUE_KEY: False,
+    },
+    "travel_preferences_budget": {
+        _TITLE_KEY: "Travel Preferences Budget",
+        _REF_KEY: "travel_preferences_budget",
+        _TYPE_KEY: "integer",
+        _CATEGORY_KEY: "Travel Preferences",
+        _VALUE_KEY: 0,
     },
     "travel_preferences": {
         _TITLE_KEY: "Travel Preferences",

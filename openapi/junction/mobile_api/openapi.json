@@ -2691,9 +2691,10 @@
           "attributes": {
             "type": "object",
             "properties": {
-              "name":{
+              "preferenceName":{
                 "oneOf": [
                   {"$ref": "#/components/schemas/BooleanPreferenceAttributes"},
+                  {"$ref": "#/components/schemas/IntegerPreferenceAttributes"},
                   {"$ref": "#/components/schemas/BooleanCollectionPreferenceAttributes"}
                 ]
               }
@@ -2734,6 +2735,40 @@
           "value": {
             "type": "boolean",
             "example": false
+          }
+        },
+        "required": ["title", "ref", "type", "category", "value"]
+      },
+      "IntegerPreferenceAttributes": {
+        "title": "Integer Preference Value",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Travel Preferences Budget",
+            "readOnly": true
+          },
+          "ref": {
+            "type": "string",
+            "example": "travel_preferences_budget"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "integer"
+            ],
+            "example": "integer",
+            "readOnly": true
+          },
+          "category": {
+            "type": "string",
+            "example": "travel_preferences",
+            "readOnly": true
+          },
+          "value": {
+            "type": "integer",
+            "minimum": 0,
+            "example": 20
           }
         },
         "required": ["title", "ref", "type", "category", "value"]

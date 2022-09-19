@@ -36,6 +36,7 @@ overrides:
       - "junction/mobile_api/openapi.json#/components/schemas/TripOfferOptionDetails/properties"
       - "junction/mobile_api/openapi.json#/components/schemas/BooleanPreferenceAttributes"
       - "junction/mobile_api/openapi.json#/components/schemas/BooleanCollectionPreferenceAttributes"
+      - "junction/mobile_api/openapi.json#/components/schemas/IntegerPreferenceAttributes"
       - "junction/mobile_api/openapi.json#/components/schemas/Leg"
     rules:
       json-api-no-nested-id: info
