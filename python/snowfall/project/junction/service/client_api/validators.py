@@ -12,6 +12,7 @@ from snowfall.project.junction.service.offers.v1alpha import (
 from snowfall.project.junction.service.orders.v1alpha import (
     models_pb2 as order_models_pb2,
 )
+from snowfall.stdlib import money
 from snowfall.stdlib.integration.starlette import models, request_helpers
 
 
@@ -157,5 +158,8 @@ def _create_trip_option(
             )
             for offer_segment in group.segments
         ],
-        price=option.price,
+        price=money.from_string(
+            string_amount=str(option.price.amount / 1000),
+            currency=money.Currency(option.price.currency),
+        ).protobuf(),
     )

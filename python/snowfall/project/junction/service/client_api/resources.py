@@ -20,7 +20,7 @@ from snowfall.project.junction.service.trips.v1alpha import trips_pb2
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
-from snowfall.stdlib.v1alpha import models_pb2
+from snowfall.stdlib.v1alpha import models_pb2, money_pb2
 
 _SELF_HREF = "self"
 _RELATIONSHIPS_FIELD = "data"
@@ -188,12 +188,20 @@ class Price(models.BaseModel):
     amount: str
 
     @classmethod
-    def from_proto(cls, price: models_pb2.Price) -> Price:
-        currency = money.Currency(price.currency)
+    def from_proto(cls, price: money_pb2.Money | models_pb2.Price) -> Price:
+        if isinstance(price, models_pb2.Price):
+            units, parts = str(price.amount / 1000).split(".")
+            price = money_pb2.Money(
+                currency_code=price.currency,
+                units=int(units),
+                nanos=int(parts.ljust(9, "0")),
+            )
+
+        money_price = money.from_protobuf(price)
 
         return cls(
-            currency=currency.code,
-            amount=str(money.Money(price.amount, currency)),
+            currency=money_price.currency.code,
+            amount=str(money_price.amount),
         )
 
 
@@ -411,6 +419,7 @@ class BookingResource(models.Resource):
             id=booking.id,
             type="trip-bookings",
             attributes={
+                "totalPrice": Price.from_proto(booking.total_price),
                 "operatorBookingReferences": list(
                     booking.trip_result.operator_booking_references,
                 ),
@@ -780,7 +789,10 @@ class TripOfferSearchResource(models.Resource):
                 },
             },
             links={
-                _SELF_HREF: "https://snowfall.se",
+                _SELF_HREF: request.url_for(
+                    "ViewOfferSearch",
+                    offerSearchId=offer_search.id,
+                ),
             },
         )
 

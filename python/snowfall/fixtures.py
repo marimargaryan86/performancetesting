@@ -18,6 +18,7 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import (
     latlng_pb2,
     models_pb2,
+    money_pb2,
     phone_number_pb2,
     postal_address_pb2,
 )
@@ -387,6 +388,11 @@ def generate_journey(
                     order_models_pb2.Booking(
                         id=booking_id,
                         order_id=order_id,
+                        total_price=money_pb2.Money(
+                            currency_code="GBP",
+                            units=13,
+                            nanos=370000000,
+                        ),
                     ),
                 ],
             ),

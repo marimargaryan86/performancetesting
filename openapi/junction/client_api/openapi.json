@@ -4838,9 +4838,13 @@
               "attributes": {
                 "type": "object",
                 "required": [
+                  "totalPrice",
                   "operatorBookingReferences"
                 ],
                 "properties": {
+                  "totalPrice": {
+                    "$ref": "#/components/schemas/Price"
+                  },
                   "operatorBookingReferences": {
                     "type": "array",
                     "example": [

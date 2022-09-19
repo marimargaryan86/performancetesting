@@ -81,7 +81,7 @@ message Passenger {
 message TripOption {
   string id = 1;
   repeated TripOptionDetails details = 2;
-  snowfall.stdlib.v1alpha.Price price = 3;
+  snowfall.stdlib.v1alpha.Money price = 3;
 }
 
 message TripOptionDetails {

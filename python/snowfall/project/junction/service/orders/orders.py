@@ -92,6 +92,7 @@ class OrderRepository(repository.ProtoRepository[order_models_pb2.Order]):
                 order_models_pb2.Booking(
                     id=str(uuid.uuid4()),
                     order_id=order_id,
+                    total_price=option.price,
                     trip_option=option,
                     status=order_models_pb2.Booking.Status.STATUS_PENDING,
                 )
