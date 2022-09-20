@@ -51,3 +51,18 @@ allow-breaking-changes:
 
   tags:
     - shell
+
+editorconfig:validate:
+  stage: test
+  image: "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"
+  interruptible: true
+  script:
+    - editorconfig-checker -disable-max-line-length -exclude "^vendor/lock/|^pants$|yarn.lock$"
+  needs:
+    - "pants:setup"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_MERGE_REQUEST_IID'
+  tags:
+    - docker

@@ -52,17 +52,17 @@ _(**Note** You may need to run `pyenv shell 3.9.13` as Pants does not run in Pyt
 
 1. In your project settings, add `dist/export/python/virtualenvs/python-default/3.10.5/bin/python` as the project interpreter.
 2. Mark the following paths as (right click on folder + mark directory as):
-   1. Source Folders:
-      1. `dist/codegen/python`
-      2. `python`
-      3. `bash`
-      4. `protobuf`
-      5. `openapi`
-   2. Excluded Folders:
-      1. `.pants.d`
-      2. `.pids`
-   3. Namespace Package Folders:
-      1. `python/snowfall`
+    1. Source Folders:
+        1. `dist/codegen/python`
+        2. `python`
+        3. `bash`
+        4. `protobuf`
+        5. `openapi`
+    2. Excluded Folders:
+        1. `.pants.d`
+        2. `.pids`
+    3. Namespace Package Folders:
+        1. `python/snowfall`
 
 ## Testing
 
@@ -106,8 +106,8 @@ or check [the written summary][uncle-bob-summary].
 1. Add the dependency and its version to `vendor/requirements.txt`.
 2. Run `./pants --no-pantsd generate-lockfiles --resolve=python-default`.
 3. If the dependency's requirement name and the module name is different, or if
-   the requirement exposes additional modules, the dependency and its modules
-   needs to be added to `module_mapping` in `vendor/BUILD`.
+    the requirement exposes additional modules, the dependency and its modules
+    needs to be added to `module_mapping` in `vendor/BUILD`.
 
 #### Updating Dependencies
 
@@ -119,7 +119,7 @@ or check [the written summary][uncle-bob-summary].
 1. Remove the dependency from `vendor/requirements.txt`.
 2. Run `./pants --no-pantsd generate-lockfiles --resolve=python-default`
 3. If the dependency has been added to `module_mapping` in `vendor/BUILD`, make
-   sure to remove it.
+    sure to remove it.
 
 ### Creating A New Service
 

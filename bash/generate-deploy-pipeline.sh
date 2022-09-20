@@ -2,6 +2,7 @@
 set -eu
 shopt -s nullglob
 
+# editorconfig-checker-disable
 cat <<EOF
 stages:
   - deploy
@@ -34,6 +35,7 @@ make-uninterruptible:
   tags:
     - docker
 EOF
+# editorconfig-checker-enable
 
 for DIR in "${1}"/*; do
 	if ! [ -d "${DIR}" ]; then
@@ -87,6 +89,7 @@ for DIR in "${1}"/*; do
 
 	echo >&2 "generate: ${service_name}@${service_version}"
 
+	# editorconfig-checker-disable
 	cat <<EOF
 
 ${service_name}:
@@ -100,4 +103,5 @@ ${service_name}:
     templates: ${templates[@]}
     version: ${service_version}
 EOF
+	# editorconfig-checker-enable
 done

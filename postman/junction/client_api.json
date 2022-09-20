@@ -1,1100 +1,1100 @@
 {
-	"info": {
-		"_postman_id": "a7ca8c8f-2308-4dea-8bd4-a7bbae9c807e",
-		"name": "Junction",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-	},
-	"item": [
-		{
-			"name": "Health",
-			"item": [
-				{
-					"name": "/health",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{PROTOCOL}}://{{HOST}}/health",
-							"protocol": "{{PROTOCOL}}",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"health"
-							]
-						}
-					},
-					"response": []
-				}
-			],
-			"description": "Meta Information About The API."
-		},
-		{
-			"name": "Places",
-			"item": [
-				{
-					"name": "/places",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{PROTOCOL}}://{{HOST}}/places",
-							"protocol": "{{PROTOCOL}}",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"places"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "/places/{id}",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{PROTOCOL}}://{{HOST}}/places/0010b869-653d-5494-a637-28a84adfcda9",
-							"protocol": "{{PROTOCOL}}",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"places",
-								"0010b869-653d-5494-a637-28a84adfcda9"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Trips",
-			"item": [
-				{
-					"name": "/trips/searches",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 201\", function () {",
-									"    pm.response.to.have.status(201);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"content-type": true
-						}
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/vnd.api+json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"data\": {\n        \"attributes\": {\n            \"departureAfter\": \"2022-06-29T15:30:00Z\"\n        },\n        \"relationships\": {\n            \"origin\": {\n                \"data\": {\n                    \"id\": \"75ab2872-255b-5681-9f33-2900f8ffa5d5\",\n                    \"type\": \"places\"\n                }\n            },\n            \"destination\": {\n                \"data\": {\n                    \"id\": \"2e6d8150-092e-5a3b-8c84-2c3200375bb6\",\n                    \"type\": \"places\"\n                }\n            }\n        },\n        \"type\": \"trip-searches\"\n    }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{PROTOCOL}}://{{HOST}}/trips/searches",
-							"protocol": "{{PROTOCOL}}",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"trips",
-								"searches"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "/trips/{id}",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{PROTOCOL}}://{{HOST}}/trips/6b521646-d062-5715-a8e6-9632e5e7025a",
-							"protocol": "{{PROTOCOL}}",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"trips",
-								"6b521646-d062-5715-a8e6-9632e5e7025a"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "/trips/{id}/legs",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{PROTOCOL}}://{{HOST}}/trips/024c883a-1f3f-53e7-bd81-053b26fb333a/legs",
-							"protocol": "{{PROTOCOL}}",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"trips",
-								"024c883a-1f3f-53e7-bd81-053b26fb333a",
-								"legs"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "/trips/{id}/segments",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{PROTOCOL}}://{{HOST}}/trips/6b521646-d062-5715-a8e6-9632e5e7025a/segments",
-							"protocol": "{{PROTOCOL}}",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"trips",
-								"6b521646-d062-5715-a8e6-9632e5e7025a",
-								"segments"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "/trips/searches/{id}",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{PROTOCOL}}://{{HOST}}/trips/searches/964dc292-015b-4711-82fa-24ff265c30c5",
-							"protocol": "{{PROTOCOL}}",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"trips",
-								"searches",
-								"964dc292-015b-4711-82fa-24ff265c30c5"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "/trips/searches/{id}/trips",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"const response = pm.response.json();",
-									"pm.collectionVariables.set(\"trip_id\", response.data[0].id);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{PROTOCOL}}://{{HOST}}/trips/searches/1917014f-2064-4187-abc3-3894ccd5d61c/trips",
-							"protocol": "{{PROTOCOL}}",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"trips",
-								"searches",
-								"1917014f-2064-4187-abc3-3894ccd5d61c",
-								"trips"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "/trips/searches/{id}/legs",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{PROTOCOL}}://{{HOST}}/trips/searches/7642c3a1-385b-47b9-bc7c-51ae4d8ccbee/legs",
-							"protocol": "{{PROTOCOL}}",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"trips",
-								"searches",
-								"7642c3a1-385b-47b9-bc7c-51ae4d8ccbee",
-								"legs"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Offers",
-			"item": [
-				{
-					"name": "/offers/searches",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 201\", function () {",
-									"    pm.response.to.have.status(201);",
-									"});",
-									"",
-									"const response = pm.response.json();",
-									"pm.collectionVariables.set(\"trip-offer-searches_id\", response.data.id);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"content-type": true
-						}
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/vnd.api+json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"data\": {\n    \"type\": \"trip-offer-searches\",\n    \"attributes\": {\n      \"passengers\": [\n        {\n          \"dateOfBirth\": \"1992-04-29\"\n        }\n      ]\n      },\n    \"relationships\": {\n      \"trips\": {\n        \"data\": [\n          {\n            \"id\": \"{{trip_id}}\",\n            \"type\": \"trips\"\n          }\n        ]\n      }\n    }\n  }\n}\n",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{PROTOCOL}}://{{HOST}}/offers/searches",
-							"protocol": "{{PROTOCOL}}",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"offers",
-								"searches"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "/offers/{id}",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{PROTOCOL}}://{{HOST}}/offers/3a819916-9630-47a8-9ffc-95218e127cf1",
-							"protocol": "{{PROTOCOL}}",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"offers",
-								"3a819916-9630-47a8-9ffc-95218e127cf1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "/offers/searches/{id}",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{PROTOCOL}}://{{HOST}}/offers/searches/1c3a9c0e-eb5c-4f74-a61a-4749d1d67386",
-							"protocol": "{{PROTOCOL}}",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"offers",
-								"searches",
-								"1c3a9c0e-eb5c-4f74-a61a-4749d1d67386"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "/offers/searches/{id}/offers",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{PROTOCOL}}://{{HOST}}/offers/searches/{{trip-offer-searches_id}}/offers",
-							"protocol": "{{PROTOCOL}}",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"offers",
-								"searches",
-								"{{trip-offer-searches_id}}",
-								"offers"
-							]
-						}
-					},
-					"response": []
-				}
-			],
-			"description": "Offers Are Bookable Suggestions For A Trip."
-		},
-		{
-			"name": "Segments",
-			"item": [
-				{
-					"name": "/segments/{id}",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{PROTOCOL}}://{{HOST}}/segments/744daff9-74b6-5acb-9203-add14f08356f",
-							"protocol": "{{PROTOCOL}}",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"segments",
-								"744daff9-74b6-5acb-9203-add14f08356f"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "/segments/{id}/legs",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{PROTOCOL}}://{{HOST}}/segments/04f83af9-90bb-4a0f-9881-03e1e690f7f5/legs",
-							"protocol": "{{PROTOCOL}}",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"segments",
-								"04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-								"legs"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Legs",
-			"item": [
-				{
-					"name": "/legs/{id}",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{PROTOCOL}}://{{HOST}}/legs/1f041db9-301c-539b-be68-c076b235d9f8",
-							"protocol": "{{PROTOCOL}}",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"legs",
-								"1f041db9-301c-539b-be68-c076b235d9f8"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "/legs/types",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{PROTOCOL}}://{{HOST}}/legs/types",
-							"protocol": "{{PROTOCOL}}",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"legs",
-								"types"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "/legs/types/{id}",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{PROTOCOL}}://{{HOST}}/legs/types/air",
-							"protocol": "{{PROTOCOL}}",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"legs",
-								"types",
-								"air"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Orders",
-			"item": [
-				{
-					"name": "/orders",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"content-type": true
-						}
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/vnd.api+json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"data\": {\n        \"type\": \"orders\",\n        \"attributes\": {\n            \"offers\": [\n                {\n                    \"offerAggregateId\": \"7322ac63-43c5-4118-bc3d-d44d0588e70a\",\n                    \"offerIds\": [\n                        \"95fe8ace-e144-4af8-8790-e067a9a14ae5\",\n                        \"9ce47e0e-c42d-4cab-a404-aefd85b312ee\",\n                        \"43509c0d-1551-412a-8101-00cf43e5080f\"\n                    ],\n                    \"passengers\": [\n                        {\n                            \"firstName\": \"Williams\",\n                            \"lastName\": \"never\",\n                            \"title\": \"Mr\",\n                            \"gender\": \"Male\",\n                            \"dateOfBirth\": \"1986-05-12\"\n                        }\n                    ]\n                }\n            ],\n            \"contactDetails\": {\n                \"email\": \"example@example.com\",\n                \"address\": {\n                    \"addressLines\": [\n                        \"Addr1\"\n                    ],\n                    \"countryCode\": \"NL\",\n                    \"postalCode\": \"3063\",\n                    \"city\": \"string\"\n                },\n                \"phoneNumber\": \"+31713864315\"\n            }\n        }\n    }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{PROTOCOL}}://{{HOST}}/orders",
-							"protocol": "{{PROTOCOL}}",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"orders"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "/orders",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								]
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"content-type": true
-						}
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/vnd.api+json",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{PROTOCOL}}://{{HOST}}/orders",
-							"protocol": "{{PROTOCOL}}",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"orders"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "/orders/{id}",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"content-type": true
-						}
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/vnd.api+json",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{PROTOCOL}}://{{HOST}}/orders/0c2f4721-d3a9-45d1-b431-c37b31a95e2b",
-							"protocol": "{{PROTOCOL}}",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"orders",
-								"0c2f4721-d3a9-45d1-b431-c37b31a95e2b"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		}
-	],
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		}
-	],
-	"variable": [
-		{
-			"key": "trip_search_id",
-			"value": ""
-		},
-		{
-			"key": "trip_id",
-			"value": ""
-		},
-		{
-			"key": "trip-offer-searches_id",
-			"value": ""
-		}
-	]
+  "info": {
+    "_postman_id": "a7ca8c8f-2308-4dea-8bd4-a7bbae9c807e",
+    "name": "Junction",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "/health",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{PROTOCOL}}://{{HOST}}/health",
+              "protocol": "{{PROTOCOL}}",
+              "host": [
+                "{{HOST}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "Meta Information About The API."
+    },
+    {
+      "name": "Places",
+      "item": [
+        {
+          "name": "/places",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{PROTOCOL}}://{{HOST}}/places",
+              "protocol": "{{PROTOCOL}}",
+              "host": [
+                "{{HOST}}"
+              ],
+              "path": [
+                "places"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/places/{id}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{PROTOCOL}}://{{HOST}}/places/0010b869-653d-5494-a637-28a84adfcda9",
+              "protocol": "{{PROTOCOL}}",
+              "host": [
+                "{{HOST}}"
+              ],
+              "path": [
+                "places",
+                "0010b869-653d-5494-a637-28a84adfcda9"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Trips",
+      "item": [
+        {
+          "name": "/trips/searches",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {
+              "content-type": true
+            }
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/vnd.api+json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"data\": {\n        \"attributes\": {\n            \"departureAfter\": \"2022-06-29T15:30:00Z\"\n        },\n        \"relationships\": {\n            \"origin\": {\n                \"data\": {\n                    \"id\": \"75ab2872-255b-5681-9f33-2900f8ffa5d5\",\n                    \"type\": \"places\"\n                }\n            },\n            \"destination\": {\n                \"data\": {\n                    \"id\": \"2e6d8150-092e-5a3b-8c84-2c3200375bb6\",\n                    \"type\": \"places\"\n                }\n            }\n        },\n        \"type\": \"trip-searches\"\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{PROTOCOL}}://{{HOST}}/trips/searches",
+              "protocol": "{{PROTOCOL}}",
+              "host": [
+                "{{HOST}}"
+              ],
+              "path": [
+                "trips",
+                "searches"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/trips/{id}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{PROTOCOL}}://{{HOST}}/trips/6b521646-d062-5715-a8e6-9632e5e7025a",
+              "protocol": "{{PROTOCOL}}",
+              "host": [
+                "{{HOST}}"
+              ],
+              "path": [
+                "trips",
+                "6b521646-d062-5715-a8e6-9632e5e7025a"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/trips/{id}/legs",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{PROTOCOL}}://{{HOST}}/trips/024c883a-1f3f-53e7-bd81-053b26fb333a/legs",
+              "protocol": "{{PROTOCOL}}",
+              "host": [
+                "{{HOST}}"
+              ],
+              "path": [
+                "trips",
+                "024c883a-1f3f-53e7-bd81-053b26fb333a",
+                "legs"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/trips/{id}/segments",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{PROTOCOL}}://{{HOST}}/trips/6b521646-d062-5715-a8e6-9632e5e7025a/segments",
+              "protocol": "{{PROTOCOL}}",
+              "host": [
+                "{{HOST}}"
+              ],
+              "path": [
+                "trips",
+                "6b521646-d062-5715-a8e6-9632e5e7025a",
+                "segments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/trips/searches/{id}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{PROTOCOL}}://{{HOST}}/trips/searches/964dc292-015b-4711-82fa-24ff265c30c5",
+              "protocol": "{{PROTOCOL}}",
+              "host": [
+                "{{HOST}}"
+              ],
+              "path": [
+                "trips",
+                "searches",
+                "964dc292-015b-4711-82fa-24ff265c30c5"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/trips/searches/{id}/trips",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "pm.collectionVariables.set(\"trip_id\", response.data[0].id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{PROTOCOL}}://{{HOST}}/trips/searches/1917014f-2064-4187-abc3-3894ccd5d61c/trips",
+              "protocol": "{{PROTOCOL}}",
+              "host": [
+                "{{HOST}}"
+              ],
+              "path": [
+                "trips",
+                "searches",
+                "1917014f-2064-4187-abc3-3894ccd5d61c",
+                "trips"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/trips/searches/{id}/legs",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{PROTOCOL}}://{{HOST}}/trips/searches/7642c3a1-385b-47b9-bc7c-51ae4d8ccbee/legs",
+              "protocol": "{{PROTOCOL}}",
+              "host": [
+                "{{HOST}}"
+              ],
+              "path": [
+                "trips",
+                "searches",
+                "7642c3a1-385b-47b9-bc7c-51ae4d8ccbee",
+                "legs"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Offers",
+      "item": [
+        {
+          "name": "/offers/searches",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const response = pm.response.json();",
+                  "pm.collectionVariables.set(\"trip-offer-searches_id\", response.data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {
+              "content-type": true
+            }
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/vnd.api+json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": {\n    \"type\": \"trip-offer-searches\",\n    \"attributes\": {\n      \"passengers\": [\n        {\n          \"dateOfBirth\": \"1992-04-29\"\n        }\n      ]\n      },\n    \"relationships\": {\n      \"trips\": {\n        \"data\": [\n          {\n            \"id\": \"{{trip_id}}\",\n            \"type\": \"trips\"\n          }\n        ]\n      }\n    }\n  }\n}\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{PROTOCOL}}://{{HOST}}/offers/searches",
+              "protocol": "{{PROTOCOL}}",
+              "host": [
+                "{{HOST}}"
+              ],
+              "path": [
+                "offers",
+                "searches"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/offers/{id}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{PROTOCOL}}://{{HOST}}/offers/3a819916-9630-47a8-9ffc-95218e127cf1",
+              "protocol": "{{PROTOCOL}}",
+              "host": [
+                "{{HOST}}"
+              ],
+              "path": [
+                "offers",
+                "3a819916-9630-47a8-9ffc-95218e127cf1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/offers/searches/{id}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{PROTOCOL}}://{{HOST}}/offers/searches/1c3a9c0e-eb5c-4f74-a61a-4749d1d67386",
+              "protocol": "{{PROTOCOL}}",
+              "host": [
+                "{{HOST}}"
+              ],
+              "path": [
+                "offers",
+                "searches",
+                "1c3a9c0e-eb5c-4f74-a61a-4749d1d67386"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/offers/searches/{id}/offers",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{PROTOCOL}}://{{HOST}}/offers/searches/{{trip-offer-searches_id}}/offers",
+              "protocol": "{{PROTOCOL}}",
+              "host": [
+                "{{HOST}}"
+              ],
+              "path": [
+                "offers",
+                "searches",
+                "{{trip-offer-searches_id}}",
+                "offers"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "Offers Are Bookable Suggestions For A Trip."
+    },
+    {
+      "name": "Segments",
+      "item": [
+        {
+          "name": "/segments/{id}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{PROTOCOL}}://{{HOST}}/segments/744daff9-74b6-5acb-9203-add14f08356f",
+              "protocol": "{{PROTOCOL}}",
+              "host": [
+                "{{HOST}}"
+              ],
+              "path": [
+                "segments",
+                "744daff9-74b6-5acb-9203-add14f08356f"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/segments/{id}/legs",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{PROTOCOL}}://{{HOST}}/segments/04f83af9-90bb-4a0f-9881-03e1e690f7f5/legs",
+              "protocol": "{{PROTOCOL}}",
+              "host": [
+                "{{HOST}}"
+              ],
+              "path": [
+                "segments",
+                "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "legs"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Legs",
+      "item": [
+        {
+          "name": "/legs/{id}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{PROTOCOL}}://{{HOST}}/legs/1f041db9-301c-539b-be68-c076b235d9f8",
+              "protocol": "{{PROTOCOL}}",
+              "host": [
+                "{{HOST}}"
+              ],
+              "path": [
+                "legs",
+                "1f041db9-301c-539b-be68-c076b235d9f8"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/legs/types",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{PROTOCOL}}://{{HOST}}/legs/types",
+              "protocol": "{{PROTOCOL}}",
+              "host": [
+                "{{HOST}}"
+              ],
+              "path": [
+                "legs",
+                "types"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/legs/types/{id}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{PROTOCOL}}://{{HOST}}/legs/types/air",
+              "protocol": "{{PROTOCOL}}",
+              "host": [
+                "{{HOST}}"
+              ],
+              "path": [
+                "legs",
+                "types",
+                "air"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "/orders",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {
+              "content-type": true
+            }
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/vnd.api+json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"data\": {\n        \"type\": \"orders\",\n        \"attributes\": {\n            \"offers\": [\n                {\n                    \"offerAggregateId\": \"7322ac63-43c5-4118-bc3d-d44d0588e70a\",\n                    \"offerIds\": [\n                        \"95fe8ace-e144-4af8-8790-e067a9a14ae5\",\n                        \"9ce47e0e-c42d-4cab-a404-aefd85b312ee\",\n                        \"43509c0d-1551-412a-8101-00cf43e5080f\"\n                    ],\n                    \"passengers\": [\n                        {\n                            \"firstName\": \"Williams\",\n                            \"lastName\": \"never\",\n                            \"title\": \"Mr\",\n                            \"gender\": \"Male\",\n                            \"dateOfBirth\": \"1986-05-12\"\n                        }\n                    ]\n                }\n            ],\n            \"contactDetails\": {\n                \"email\": \"example@example.com\",\n                \"address\": {\n                    \"addressLines\": [\n                        \"Addr1\"\n                    ],\n                    \"countryCode\": \"NL\",\n                    \"postalCode\": \"3063\",\n                    \"city\": \"string\"\n                },\n                \"phoneNumber\": \"+31713864315\"\n            }\n        }\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{PROTOCOL}}://{{HOST}}/orders",
+              "protocol": "{{PROTOCOL}}",
+              "host": [
+                "{{HOST}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/orders",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {
+              "content-type": true
+            }
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/vnd.api+json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{PROTOCOL}}://{{HOST}}/orders",
+              "protocol": "{{PROTOCOL}}",
+              "host": [
+                "{{HOST}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/orders/{id}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {
+              "content-type": true
+            }
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/vnd.api+json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{PROTOCOL}}://{{HOST}}/orders/0c2f4721-d3a9-45d1-b431-c37b31a95e2b",
+              "protocol": "{{PROTOCOL}}",
+              "host": [
+                "{{HOST}}"
+              ],
+              "path": [
+                "orders",
+                "0c2f4721-d3a9-45d1-b431-c37b31a95e2b"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "trip_search_id",
+      "value": ""
+    },
+    {
+      "key": "trip_id",
+      "value": ""
+    },
+    {
+      "key": "trip-offer-searches_id",
+      "value": ""
+    }
+  ]
 }
