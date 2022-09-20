@@ -34,9 +34,9 @@ from snowfall.vendor.save_a_train import models as save_a_train_models
 
 _CABIN_MAPPING = types.MappingProxyType(
     {
-        "second_class": models_pb2.CabinClass.TYPE_ECONOMY,
-        "first_class": models_pb2.CabinClass.TYPE_BUSINESS,
-        "business_class": models_pb2.CabinClass.TYPE_FIRST,
+        "Second Class": models_pb2.CabinClass.TYPE_ECONOMY,
+        "Comfort": models_pb2.CabinClass.TYPE_BUSINESS,
+        "Premium": models_pb2.CabinClass.TYPE_FIRST,
     },
 )
 
