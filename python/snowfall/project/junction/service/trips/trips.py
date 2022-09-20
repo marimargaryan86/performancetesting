@@ -39,7 +39,6 @@ class SegmentRepository(repository.ProtoRepository[models_pb2.SegmentReference])
 
 class TripRepository(
     mixins.FindByIdMixin[models_pb2.TripReference],
-    mixins.InsertMixin[models_pb2.TripReference],
     repository.ProtoRepository[models_pb2.TripReference],
 ):
     _proto = models_pb2.TripReference
