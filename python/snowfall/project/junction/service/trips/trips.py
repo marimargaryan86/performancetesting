@@ -11,13 +11,11 @@ from snowfall.project.junction.service.trips.v1alpha import trips_pb2
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 from snowfall.stdlib.v1alpha import models_pb2
 
-SEGMENTS_ID = "segments.id"
-
 
 class SegmentRepository(repository.ProtoRepository[models_pb2.SegmentReference]):
     _proto = models_pb2.SegmentReference
     _indexes = [
-        pymongo.IndexModel("segments.id", background=True),
+        pymongo.IndexModel("segments._id", background=True),
     ]
 
     async def find_by_id(
@@ -27,7 +25,7 @@ class SegmentRepository(repository.ProtoRepository[models_pb2.SegmentReference])
         segments = await self._find_nested(
             path="$segments",
             filter_={
-                SEGMENTS_ID: {
+                "segments._id": {
                     "$eq": document_id,
                 },
             },
