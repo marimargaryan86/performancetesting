@@ -197,13 +197,17 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
                 },
             )
 
-        aggregate.append(
-            {
-                "$unwind": {
-                    "path": path,
+        path_parts = []
+
+        for path_part in path.split("."):
+            path_parts.append(path_part)
+            aggregate.append(
+                {
+                    "$unwind": {
+                        "path": ".".join(path_parts),
+                    },
                 },
-            },
-        )
+            )
 
         if cursor_filter:
             aggregate.append(
