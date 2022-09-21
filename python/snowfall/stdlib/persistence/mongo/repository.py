@@ -163,7 +163,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
                 filter_=filter_pre_cursor,
             )
 
-        if isinstance(possible_cursor, motor_asyncio.AsyncIOMotorLatentCommandCursor):
+        if isinstance(possible_cursor, motor_asyncio.AsyncIOMotorCommandCursor):
             return resultset.AggregationResultSet[Record](
                 cur=possible_cursor,
                 coder=self._coder,
