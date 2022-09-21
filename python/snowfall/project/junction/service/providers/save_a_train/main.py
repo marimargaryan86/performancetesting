@@ -1,9 +1,8 @@
 import contextlib
-import csv
 import datetime
+import json
 import pkgutil
 import random
-from io import StringIO
 from typing import Sequence
 
 import aioredis
@@ -220,15 +219,16 @@ async def _load_train_stations(
         ),
     )
 
-    csv_content = pkgutil.get_data(
+    # todo: should call SAT's stations endpoint instead?
+    json_content = pkgutil.get_data(
         "snowfall.project.junction.service.providers.save_a_train.main",
-        "train_stations_coordinates.csv",
+        "train_stations.json",
     )
 
-    if csv_content is None:
+    if json_content is None:
         return []  # TODO: throw exception
 
-    stations = csv.DictReader(StringIO(csv_content.decode("utf-8")))
+    stations = json.loads(json_content.decode("utf-8"))
     return [
         await train_stations.make_train_station(station, geocoder)
         for station in stations

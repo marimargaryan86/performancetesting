@@ -14,6 +14,7 @@ class TrainStation(object):
     timezone: zoneinfo.ZoneInfo
     latitude: float
     longitude: float
+    searchable: bool
 
 
 class TrainStationRepository(object):
@@ -41,13 +42,14 @@ def create_train_stations_mapping(
 
 
 async def make_train_station(
-    train_station: Mapping[str, str],
+    train_station: Mapping[str, str | bool],
     geocoder: geocoding_pb2_grpc.GeocodingServiceStub,
 ) -> TrainStation:
-    latitude, longitude = map(float, train_station["coordinates"].split(","))
+    coordinates = str(train_station["coordinates"]).split(",")
+    latitude, longitude = map(float, coordinates)
     return TrainStation(
-        id=train_station["station_id"],
-        name=train_station["station_name"],
+        id=str(train_station["uid"]),
+        name=str(train_station["name"]),
         timezone=zoneinfo.ZoneInfo(
             (
                 await geocoder.TimeZoneLookup(
@@ -62,4 +64,5 @@ async def make_train_station(
         ),
         latitude=latitude,
         longitude=longitude,
+        searchable=bool(train_station["searchable"]),
     )

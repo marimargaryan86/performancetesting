@@ -14,7 +14,7 @@ python_sources(dependencies=[":train_stations"])
 
 resources(
     name="train_stations",
-    sources=["train_stations_coordinates.csv"],
+    sources=["train_stations.json"],
 )
 files(
     name="fixtures",
