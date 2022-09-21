@@ -45,7 +45,7 @@ async def make_train_station(
     train_station: Mapping[str, str | bool],
     geocoder: geocoding_pb2_grpc.GeocodingServiceStub,
 ) -> TrainStation:
-    coordinates = str(train_station["coordinates"]).split(",")
+    coordinates = str(train_station["location"]).split(",")
     latitude, longitude = map(float, coordinates)
     return TrainStation(
         id=str(train_station["uid"]),
