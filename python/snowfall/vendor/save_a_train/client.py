@@ -16,6 +16,10 @@ from snowfall.vendor.save_a_train.models.booking import (
     TicketInfo,
 )
 from snowfall.vendor.save_a_train.models.general_search import GeneralSearchResponse
+from snowfall.vendor.save_a_train.models.misc import (
+    VendorStation,
+    VendorStationsResponse,
+)
 from snowfall.vendor.save_a_train.models.request import (
     CreateBookingRequest,
     CreateSearchRequest,
@@ -359,6 +363,20 @@ class SATClient(object):  # noqa: WPS214
             for station_id in station_ids
         }
         self._logger = structlog.get_logger(__name__)
+
+    async def get_vendor_stations(self) -> VendorStationsResponse:
+        response = await self._session.get(
+            "{0}vendor_stations".format(self._api_url),
+            headers=self._auth_headers,
+        )
+
+        response.raise_for_status()
+
+        response_data = response.json()
+
+        return VendorStationsResponse(
+            stations=[VendorStation(**station) for station in response_data],
+        )
 
     async def get_general_search_results(
         self,
