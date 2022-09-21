@@ -81,3 +81,13 @@ class TestGrpcClient(object):
         client = orders.GrpcClient(stub)
         order = await client.get_order(fixtures.ORDERS[0])
         assert order.id == fixtures.ORDERS[0]
+
+    async def test_single_booking_is_retrievable(self) -> None:
+        proto = models_pb2.Booking(id=fixtures.BOOKINGS[0])
+        stub = mock.create_autospec(orders_pb2_grpc.OrderServiceStub)
+        stub.GetBooking = mock.AsyncMock(
+            return_value=orders_pb2.GetBookingResponse(booking=proto),
+        )
+        client = orders.GrpcClient(stub)
+        booking = await client.get_booking(fixtures.BOOKINGS[0])
+        assert booking.id == fixtures.BOOKINGS[0]

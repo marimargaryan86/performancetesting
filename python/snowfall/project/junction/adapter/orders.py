@@ -397,7 +397,7 @@ class GrpcClient(Client):
 
             raise UnknownError(exc.details()) from exc
 
-        return response.order
+        return response.booking
 
     async def find_journeys(
         self,
