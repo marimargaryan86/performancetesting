@@ -9,6 +9,7 @@ from typing import (  # noqa: WPS235
     Awaitable,
     Callable,
     Generic,
+    Mapping,
     Optional,
     Type,
     TypeVar,
@@ -37,6 +38,7 @@ _Settings = TypeVar("_Settings", bound=Settings)
 _Settings0 = TypeVar("_Settings0", bound=Settings)
 _Settings1 = TypeVar("_Settings1", bound=Settings)
 _Settings2 = TypeVar("_Settings2", bound=Settings)
+_Settings3 = TypeVar("_Settings3", bound=Settings)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -81,28 +83,34 @@ class Entrypoint(object):
     name: str
     sentry_settings: SentrySettings = SentrySettings()
 
-    def enter_with_commands(
+    def enter_with_commands(  # noqa: WPS213
         self,
         _cmd0: Command[_Settings0],
         _cmd1: Optional[Command[_Settings1]] = None,
         _cmd2: Optional[Command[_Settings2]] = None,
+        _cmd3: Optional[Command[_Settings3]] = None,
     ) -> None:
         group = click.Group(name=self.name, callback=_group)
 
-        _add_options_from_settings(group, _GlobalSettings)
+        _add_parameters_from_settings(group, _GlobalSettings)
 
         command = click.Command(name=_cmd0.name, callback=_command(_cmd0))
-        _add_options_from_settings(command, _cmd0.settings_class)
+        _add_parameters_from_settings(command, _cmd0.settings_class)
         group.add_command(command)
 
         if _cmd1:
             command = click.Command(name=_cmd1.name, callback=_command(_cmd1))
-            _add_options_from_settings(command, _cmd1.settings_class)
+            _add_parameters_from_settings(command, _cmd1.settings_class)
             group.add_command(command)
 
         if _cmd2:
             command = click.Command(name=_cmd2.name, callback=_command(_cmd2))
-            _add_options_from_settings(command, _cmd2.settings_class)
+            _add_parameters_from_settings(command, _cmd2.settings_class)
+            group.add_command(command)
+
+        if _cmd3:
+            command = click.Command(name=_cmd3.name, callback=_command(_cmd3))
+            _add_parameters_from_settings(command, _cmd3.settings_class)
             group.add_command(command)
 
         group(
@@ -154,7 +162,42 @@ def _validate_option(
     return decorator
 
 
-def _add_options_from_settings(
+def _create_parameter_from_model(
+    arg: pydantic.fields.ModelField,
+    types: Mapping[str, type],
+) -> click.Parameter:
+    arg_type = get_origin(types[arg.name]) or types[arg.name]
+
+    if arg.field_info.extra.get("argument", False):
+        return click.Argument(
+            [arg.name],
+            callback=_validate_option(arg),
+            default=(
+                None if arg.default == pydantic.fields.UndefinedType else arg.default
+            ),
+            envvar=arg.name.upper(),
+            nargs=-1 if arg_type in {Sequence, list, set, tuple} else 1,
+            required=bool(arg.required),
+            type=_get_type(next(iter(get_args(types[arg.name])), arg_type)),
+        )
+
+    return click.Option(
+        ["--{0}".format(arg.name.replace("_", "-"))],
+        callback=_validate_option(arg),
+        default=(None if arg.default == pydantic.fields.UndefinedType else arg.default),
+        envvar=arg.name.upper(),
+        help=arg.field_info.description,
+        hidden=bool(arg.field_info.extra.get("hidden", False)),
+        is_flag=arg_type == bool,
+        multiple=arg_type in {Sequence, list, set, tuple},
+        required=arg.required,
+        show_default=True,
+        show_envvar=True,
+        type=_get_type(next(iter(get_args(types[arg.name])), arg_type)),
+    )
+
+
+def _add_parameters_from_settings(
     command: click.Command,
     settings: Type[Settings],
 ) -> None:
@@ -162,28 +205,7 @@ def _add_options_from_settings(
     types = get_type_hints(settings)
 
     for arg in args:
-        arg_type = get_origin(types[arg.name]) or types[arg.name]
-
-        command.params.append(
-            click.Option(
-                ["--{0}".format(arg.name.replace("_", "-"))],
-                callback=_validate_option(arg),
-                default=(
-                    None
-                    if arg.default == pydantic.fields.UndefinedType
-                    else arg.default
-                ),
-                envvar=arg.name.upper(),
-                help=arg.field_info.description,
-                hidden=bool(arg.field_info.extra.get("hidden", False)),
-                is_flag=arg_type == bool,
-                multiple=arg_type in {Sequence, list, set, tuple},
-                required=arg.required,
-                show_default=True,
-                show_envvar=True,
-                type=_get_type(next(iter(get_args(types[arg.name])), arg_type)),
-            ),
-        )
+        command.params.append(_create_parameter_from_model(arg, types))
 
 
 @click.pass_context
