@@ -277,6 +277,9 @@ class OrdersRepository(
         attributes["junctionOrderId"] = junction_order[_DATA_ACCESSOR][_ID_ACCESSOR]
         attributes["createdAt"] = datetime.datetime.now(datetime.timezone.utc)
         attributes["userId"] = user_id
+        attributes["reference"] = junction_order[_DATA_ACCESSOR][_ATTRIBUTES_ACCESSOR][
+            "reference"
+        ]
         document["links"] = {"self": "https://snowfall.se"}
         await self.insert(document)
         return document

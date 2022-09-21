@@ -399,13 +399,14 @@ class JunctionClient(object):  # noqa: WPS214
         journey = response[_DATA_KEY][_RELATIONSHIPS_KEY]["journey"]
         journey_response = await self.get_journey_by_id(journey[_DATA_KEY][_ID_KEY])
         journey_response[_DATA_KEY][_TYPE_KEY] = "orders"
+        journey_response[_DATA_KEY][_ID_KEY] = response[_DATA_KEY][_ID_KEY]
         attributes = journey_response[_DATA_KEY][_ATTRIBUTES_KEY]
-        attributes.pop("journeyReference")
         attributes[_PASSENGERS_KEY] = response[_DATA_KEY][_ATTRIBUTES_KEY][
             _PASSENGERS_KEY
         ]
         attributes["orderResults"] = [
             {
+                "orderId": booking[_RELATIONSHIPS_KEY]["order"][_DATA_KEY][_ID_KEY],
                 "status": booking[_RELATIONSHIPS_KEY]["status"][_DATA_KEY][_ID_KEY],
             }
             for booking in bookings[_DATA_KEY]

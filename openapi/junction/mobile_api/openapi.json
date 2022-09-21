@@ -3026,7 +3026,7 @@
         "type": "object",
         "readOnly": true,
         "properties": {
-          "offerId": {
+          "orderId": {
             "type": "string",
             "readOnly": true,
             "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
@@ -3047,7 +3047,7 @@
           }
         },
         "required": [
-          "offerId",
+          "orderId",
           "status"
         ]
       },
