@@ -36,6 +36,10 @@ _DEFAULT_TIMEOUT = datetime.timedelta(seconds=10)
 _MILLISECONDS_MULTIPLIER = 1000
 _MAX_TIME_MS_CAMEL = "maxTimeMS"
 _MAX_TIME_MS_SNAKE = "max_time_ms"
+_AGGREGATE_CURSOR_CLASS = (
+    motor_asyncio.AsyncIOMotorCommandCursor,
+    motor_asyncio.AsyncIOMotorLatentCommandCursor,
+)
 
 
 def _configure_collection(
@@ -163,7 +167,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
                 filter_=filter_pre_cursor,
             )
 
-        if isinstance(possible_cursor, motor_asyncio.AsyncIOMotorCommandCursor):
+        if isinstance(possible_cursor, _AGGREGATE_CURSOR_CLASS):
             return resultset.AggregationResultSet[Record](
                 cur=possible_cursor,
                 coder=self._coder,
