@@ -63,6 +63,9 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
                     bookings=orders.BookingRepository(
                         collection=mongo.orders.journeys,
                     ),
+                    booking_details=orders.BookingDetailsRepository(
+                        collection=mongo.orders.journeys,
+                    ),
                     publisher=OrderProducer(
                         producer=amqp.Producer(
                             connection=connection,

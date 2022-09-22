@@ -2,6 +2,7 @@ from grpc import StatusCode, aio
 
 from snowfall.project.junction.service.orders.amqp import OrderProducer
 from snowfall.project.junction.service.orders.orders import (
+    BookingDetailsRepository,
     BookingRepository,
     JourneyRepository,
     OrderRepository,
@@ -19,6 +20,7 @@ class OrderService(
         journeys: JourneyRepository,
         orders: OrderRepository,
         bookings: BookingRepository,
+        booking_details: BookingDetailsRepository,
         publisher: OrderProducer,
         default_page_size: int,
     ):
@@ -26,6 +28,7 @@ class OrderService(
         self._journeys = journeys
         self._orders = orders
         self._bookings = bookings
+        self._booking_details = booking_details
         self._publisher = publisher
 
     def get_name(self) -> str:
@@ -171,4 +174,41 @@ class OrderService(
         return orders_pb2.ListBookingsResponse(
             bookings=[order async for order in bookings_result],
             next_page_token=await bookings_result.cursor(),
+        )
+
+    async def GetBookingDetails(  # type: ignore[override] # noqa: N802
+        self,
+        request: orders_pb2.GetBookingDetailsRequest,
+        context: aio.ServicerContext,
+    ) -> orders_pb2.GetBookingDetailsResponse:
+        details = await self._booking_details.find_by_id(request.id)
+
+        if details is None:
+            await context.abort(StatusCode.NOT_FOUND)
+
+        return orders_pb2.GetBookingDetailsResponse(details=details)
+
+    async def ListBookingDetails(  # type: ignore[override] # noqa: N802
+        self,
+        request: orders_pb2.ListBookingDetailsRequest,
+        context: aio.ServicerContext,
+    ) -> orders_pb2.ListBookingDetailsResponse:
+        if request.booking_id:
+            details_result = await self._booking_details.find_by_booking_id(
+                booking_id=request.booking_id,
+                cursor=request.page_token,
+            )
+        else:
+            details_result = await self._booking_details.find(
+                ids=request.ids.ids,
+                cursor=request.page_token,
+            )
+
+        details_result.limit(
+            request.page_size if request.page_size else self._default_page_size,
+        )
+
+        return orders_pb2.ListBookingDetailsResponse(
+            details=[detail async for detail in details_result],
+            next_page_token=await details_result.cursor(),
         )
