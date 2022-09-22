@@ -69,6 +69,10 @@ job "mobile-api-http" {
     task "http" {
       driver = "docker"
 
+      resources {
+        memory = 600
+      }
+
       vault {
         policies = ["mobile-api-development"]
       }
