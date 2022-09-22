@@ -8,17 +8,15 @@ import pymongo
 from snowfall.project.junction.adapter import (
     passenger_name_records as passenger_name_records_adapter,
 )
-from snowfall.project.junction.service.orders.v1alpha import (
-    models_pb2 as order_models_pb2,
-)
+from snowfall.project.junction.service.orders.v1alpha import models_pb2
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 
 class JourneyRepository(
-    mixins.FindByIdMixin[order_models_pb2.Journey],
-    repository.ProtoRepository[order_models_pb2.Journey],
+    mixins.FindByIdMixin[models_pb2.Journey],
+    repository.ProtoRepository[models_pb2.Journey],
 ):
-    _proto = order_models_pb2.Journey
+    _proto = models_pb2.Journey
 
     def __init__(
         self,
@@ -31,9 +29,9 @@ class JourneyRepository(
 
     async def create(
         self,
-        contact_details: order_models_pb2.ContactDetails,
-    ) -> order_models_pb2.Journey:
-        journey = order_models_pb2.Journey(
+        contact_details: models_pb2.ContactDetails,
+    ) -> models_pb2.Journey:
+        journey = models_pb2.Journey(
             id=str(uuid.uuid4()),
             passenger_name_record=(await self._passenger_name_records.create()).id,
             contact_details=contact_details,
@@ -53,7 +51,7 @@ class JourneyRepository(
         self,
         ids: Sequence[str],
         cursor: str,
-    ) -> resultset.ResultSet[order_models_pb2.Journey]:
+    ) -> resultset.ResultSet[models_pb2.Journey]:
         filter_ = (
             {
                 repository.mongo_id_key: {
@@ -70,8 +68,8 @@ class JourneyRepository(
         )
 
 
-class OrderRepository(repository.ProtoRepository[order_models_pb2.Order]):
-    _proto = order_models_pb2.Order
+class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
+    _proto = models_pb2.Order
     _indexes = [
         pymongo.IndexModel("orders._id", background=True),
         pymongo.IndexModel("orders.journey_id", background=True),
@@ -80,24 +78,15 @@ class OrderRepository(repository.ProtoRepository[order_models_pb2.Order]):
     async def create_from_options(
         self,
         journey_id: str,
-        passengers: Sequence[order_models_pb2.Passenger],
-        options: Sequence[order_models_pb2.TripOption],
-    ) -> order_models_pb2.Order:
+        passengers: Sequence[models_pb2.Passenger],
+        options: Sequence[models_pb2.TripOption],
+    ) -> models_pb2.Order:
         order_id = str(uuid.uuid4())
-        order = order_models_pb2.Order(
+        order = models_pb2.Order(
             id=order_id,
             journey_id=journey_id,
             passengers=passengers,
-            bookings=[
-                order_models_pb2.Booking(
-                    id=str(uuid.uuid4()),
-                    order_id=order_id,
-                    total_price=option.price,
-                    trip_option=option,
-                    status=order_models_pb2.Booking.Status.STATUS_PENDING,
-                )
-                for option in options
-            ],
+            bookings=self._generate_bookings(order_id, options),
         )
         update = await self._execute(
             self._collection.update_one,
@@ -117,7 +106,7 @@ class OrderRepository(repository.ProtoRepository[order_models_pb2.Order]):
     async def find_by_id(
         self,
         document_id: str,
-    ) -> Optional[order_models_pb2.Order]:
+    ) -> Optional[models_pb2.Order]:
         options = await self._find_nested(
             path="$orders",
             filter_={
@@ -136,7 +125,7 @@ class OrderRepository(repository.ProtoRepository[order_models_pb2.Order]):
         self,
         ids: Sequence[str],
         cursor: str,
-    ) -> resultset.ResultSet[order_models_pb2.Order]:
+    ) -> resultset.ResultSet[models_pb2.Order]:
         filter_ = (
             {
                 "orders._id": {
@@ -157,7 +146,7 @@ class OrderRepository(repository.ProtoRepository[order_models_pb2.Order]):
         self,
         journey_id: str,
         cursor: str,
-    ) -> resultset.ResultSet[order_models_pb2.Order]:
+    ) -> resultset.ResultSet[models_pb2.Order]:
         return await self._find_nested(
             path="$orders",
             cur=cursor,
@@ -168,9 +157,44 @@ class OrderRepository(repository.ProtoRepository[order_models_pb2.Order]):
             },
         )
 
+    def _generate_bookings(
+        self,
+        order_id: str,
+        options: Sequence[models_pb2.TripOption],
+    ) -> list[models_pb2.Booking]:
+        bookings = []
 
-class BookingRepository(repository.ProtoRepository[order_models_pb2.Booking]):
-    _proto = order_models_pb2.Booking
+        for option in options:
+            booking_id = str(uuid.uuid4())
+            self._generate_option_ids(booking_id, option)
+
+            bookings.append(
+                models_pb2.Booking(
+                    id=booking_id,
+                    order_id=order_id,
+                    total_price=option.price,
+                    trip_option=option,
+                    status=models_pb2.Booking.Status.STATUS_PENDING,
+                ),
+            )
+
+        return bookings
+
+    def _generate_option_ids(
+        self,
+        booking_id: str,
+        option: models_pb2.TripOption,
+    ) -> None:
+        option.id = str(uuid.uuid4())
+        option.booking_id = booking_id
+
+        for detail in option.details:
+            detail.id = str(uuid.uuid4())
+            detail.booking_id = booking_id
+
+
+class BookingRepository(repository.ProtoRepository[models_pb2.Booking]):
+    _proto = models_pb2.Booking
     _indexes = [
         pymongo.IndexModel("orders.bookings._id", background=True),
         pymongo.IndexModel("orders.bookings.order_id", background=True),
@@ -179,8 +203,8 @@ class BookingRepository(repository.ProtoRepository[order_models_pb2.Booking]):
     async def find_by_id(
         self,
         document_id: str,
-    ) -> Optional[order_models_pb2.Booking]:
-        options = await self._find_nested(
+    ) -> Optional[models_pb2.Booking]:
+        bookings = await self._find_nested(
             path="$orders.bookings",
             filter_={
                 "orders.bookings._id": {
@@ -190,7 +214,7 @@ class BookingRepository(repository.ProtoRepository[order_models_pb2.Booking]):
         )
 
         try:
-            return await options.take()
+            return await bookings.take()
         except StopAsyncIteration:
             return None
 
@@ -198,7 +222,7 @@ class BookingRepository(repository.ProtoRepository[order_models_pb2.Booking]):
         self,
         ids: Sequence[str],
         cursor: str,
-    ) -> resultset.ResultSet[order_models_pb2.Booking]:
+    ) -> resultset.ResultSet[models_pb2.Booking]:
         filter_ = (
             {
                 "orders.bookings._id": {
@@ -219,7 +243,7 @@ class BookingRepository(repository.ProtoRepository[order_models_pb2.Booking]):
         self,
         order_id: str,
         cursor: str,
-    ) -> resultset.ResultSet[order_models_pb2.Booking]:
+    ) -> resultset.ResultSet[models_pb2.Booking]:
         return await self._find_nested(
             path="$orders.bookings",
             cur=cursor,
@@ -232,8 +256,8 @@ class BookingRepository(repository.ProtoRepository[order_models_pb2.Booking]):
 
     async def update(
         self,
-        booking: order_models_pb2.Booking,
-    ) -> order_models_pb2.Booking:
+        booking: models_pb2.Booking,
+    ) -> models_pb2.Booking:
         await self._execute(
             self._collection.replace_one,
             filter={"orders.bookings._id": booking.id},
@@ -241,3 +265,67 @@ class BookingRepository(repository.ProtoRepository[order_models_pb2.Booking]):
         )
 
         return booking
+
+
+class BookingDetailsRepository(
+    repository.ProtoRepository[models_pb2.TripOptionDetails],
+):
+    _proto = models_pb2.TripOptionDetails
+    _indexes = [
+        pymongo.IndexModel("orders.bookings.trip_option._id", background=True),
+        pymongo.IndexModel("orders.bookings.trip_option.details._id", background=True),
+    ]
+
+    async def find_by_id(
+        self,
+        document_id: str,
+    ) -> Optional[models_pb2.TripOptionDetails]:
+        options = await self._find_nested(
+            path="$orders.bookings.trip_option.details",
+            filter_={
+                "orders.bookings.trip_option.details._id": {
+                    "$eq": document_id,
+                },
+            },
+        )
+
+        try:
+            return await options.take()
+        except StopAsyncIteration:
+            return None
+
+    async def find(
+        self,
+        ids: Sequence[str],
+        cursor: str,
+    ) -> resultset.ResultSet[models_pb2.TripOptionDetails]:
+        filter_ = (
+            {
+                "orders.bookings.trip_option.details._id": {
+                    "$in": ids,
+                },
+            }
+            if ids
+            else {}
+        )
+
+        return await self._find_nested(
+            path="$orders.bookings.trip_option.details",
+            cur=cursor,
+            filter_=filter_,
+        )
+
+    async def find_by_booking_id(
+        self,
+        booking_id: str,
+        cursor: str,
+    ) -> resultset.ResultSet[models_pb2.TripOptionDetails]:
+        return await self._find_nested(
+            path="$orders.bookings.trip_option.details",
+            cur=cursor,
+            filter_={
+                "orders.bookings.trip_option.details.booking_id": {
+                    "$eq": booking_id,
+                },
+            },
+        )

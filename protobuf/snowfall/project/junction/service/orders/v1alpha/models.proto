@@ -80,11 +80,14 @@ message Passenger {
 
 message TripOption {
   string id = 1;
+  string booking_id = 4;
   repeated TripOptionDetails details = 2;
   snowfall.stdlib.v1alpha.Money price = 3;
 }
 
 message TripOptionDetails {
+  string id = 3;
+  string booking_id = 4;
   snowfall.project.junction.service.offers.v1alpha.OfferSegment segment = 1;
   snowfall.stdlib.v1alpha.CabinClass cabin_class = 2;
 }
