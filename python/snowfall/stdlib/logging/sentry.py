@@ -210,13 +210,9 @@ def configure_sentry(
         with contextlib.suppress(sentry_sdk.integrations.DidNotEnable):
             integrations = [*integrations, integration_type()]
 
-    if util.find_spec("httpx"):
-        httpx_module = import_module("sentry_sdk.integrations.httpx")
-        integrations = [*integrations, httpx_module.HttpxIntegration()]
-
     sentry_sdk.init(
         default_integrations=False,
-        integrations=integrations,
+        integrations=_with_additional_integrations(integrations),
         traces_sample_rate=kwargs.get("trace_sample_rate", _DEFAULT_TRACE_SAMPLE_RATE),
         before_send=before_send,
         in_app_include=["snowfall"],
@@ -227,3 +223,15 @@ def configure_sentry(
         tag_keys = []
 
     SentryLogger.add_tag_keys(tag_keys)
+
+
+def _with_additional_integrations(integrations: Integrations) -> Integrations:
+    if util.find_spec("httpx"):
+        httpx_module = import_module("sentry_sdk.integrations.httpx")
+        integrations = [*integrations, httpx_module.HttpxIntegration()]
+
+    if util.find_spec("starlette"):
+        starlette_module = import_module("sentry_sdk.integrations.starlette")
+        integrations = [*integrations, starlette_module.StarletteIntegration()]
+
+    return integrations

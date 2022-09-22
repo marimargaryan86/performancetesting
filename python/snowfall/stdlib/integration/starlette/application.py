@@ -6,7 +6,6 @@ from typing import Callable, Optional, Sequence, cast
 import uvicorn
 from asgiref.typing import ASGIApplication
 from lagom.integrations import starlette
-from sentry_sdk.integrations import asgi
 from starlette import applications, exceptions, routing, status
 from starlette.middleware import Middleware
 
@@ -37,13 +36,11 @@ def create_asgi_app(
 ) -> ASGIApplication:
     return cast(
         ASGIApplication,
-        asgi.SentryAsgiMiddleware(
-            create_starlette_app(
-                custom_middlewares=custom_middlewares,
-                dependencies=dependencies,
-                routes_factory=routes_factory,
-                openapi_path=openapi_path,
-            ),
+        create_starlette_app(
+            custom_middlewares=custom_middlewares,
+            dependencies=dependencies,
+            routes_factory=routes_factory,
+            openapi_path=openapi_path,
         ),
     )
 
