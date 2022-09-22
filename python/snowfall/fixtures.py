@@ -3,6 +3,7 @@ import datetime
 import random
 import types
 import uuid
+from typing import Sequence
 
 from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.project.junction.service.orders.v1alpha import (
@@ -87,6 +88,10 @@ ORDERS = (
 BOOKINGS = (
     "679283e4-673c-4919-9aac-ba23d5abb4c8",
     "f92b5144-6357-4e7b-a11b-70eb2de2eeee",
+)
+BOOKING_DETAILS = (
+    "5a93b5ae-9590-4561-a664-fbaead485e96",
+    "d184081a-92bd-4ec8-af9a-1faaa8dfbbeb",
 )
 PASSENGER_NAME_RECORDS = ("4567H3LG",)
 CURRENCIES_CONVERSIONS = types.MappingProxyType(
@@ -355,8 +360,13 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
 
 def get_journeys() -> list[order_models_pb2.Journey]:
     return [
-        generate_journey(journey_id, order_id, booking_id)
-        for journey_id, order_id, booking_id in zip(JOURNEYS, ORDERS, BOOKINGS)
+        generate_journey(journey_id, order_id, booking_id, [details_id])
+        for journey_id, order_id, booking_id, details_id in zip(
+            JOURNEYS,
+            ORDERS,
+            BOOKINGS,
+            BOOKING_DETAILS,
+        )
     ]
 
 
@@ -364,7 +374,13 @@ def generate_journey(
     journey_id: str,
     order_id: str,
     booking_id: str,
+    option_detail_ids: Sequence[str],
 ) -> order_models_pb2.Journey:
+    price = money_pb2.Money(
+        currency_code="GBP",
+        units=13,
+        nanos=370000000,
+    )
     return order_models_pb2.Journey(
         id=journey_id,
         orders=[
@@ -388,10 +404,48 @@ def generate_journey(
                     order_models_pb2.Booking(
                         id=booking_id,
                         order_id=order_id,
-                        total_price=money_pb2.Money(
-                            currency_code="GBP",
-                            units=13,
-                            nanos=370000000,
+                        total_price=price,
+                        trip_option=order_models_pb2.TripOption(
+                            id=str(uuid.uuid4()),
+                            booking_id=booking_id,
+                            price=price,
+                            details=[
+                                order_models_pb2.TripOptionDetails(
+                                    id=detail_id,
+                                    booking_id=booking_id,
+                                    segment=offers_pb2.OfferSegment(
+                                        legs=[
+                                            offers_pb2.OfferSegmentLeg(
+                                                id=str(uuid.uuid4()),
+                                                origin=generate_point(
+                                                    str(uuid.uuid4()),
+                                                ),
+                                                destination=generate_point(
+                                                    str(uuid.uuid4()),
+                                                ),
+                                                departure_at=protobuf.datetime_to_protobuf(
+                                                    datetime.datetime.now(),
+                                                ),
+                                                arrival_at=protobuf.datetime_to_protobuf(
+                                                    datetime.datetime.now(),
+                                                ),
+                                            ),
+                                        ],
+                                        vehicle=offers_pb2.Vehicle(
+                                            number="123",
+                                            equipment="77",
+                                        ),
+                                        operator="BA",
+                                        vendor="BA",
+                                        type=models_pb2.Schedule.TYPE_AIR,
+                                    ),
+                                    cabin_class=models_pb2.CabinClass(
+                                        type=models_pb2.CabinClass.TYPE_ECONOMY,
+                                        marketing_name="Economy",
+                                    ),
+                                )
+                                for detail_id in option_detail_ids
+                            ],
                         ),
                     ),
                 ],

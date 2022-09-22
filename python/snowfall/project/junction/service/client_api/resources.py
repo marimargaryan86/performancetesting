@@ -450,6 +450,63 @@ class BookingResource(models.Resource):
         )
 
 
+class TripBookingDetailsResource(models.Resource):
+    @classmethod
+    def from_proto(
+        cls,
+        details: order_models_pb2.TripOptionDetails,
+        request: requests.Request,
+    ) -> TripBookingDetailsResource:
+        return cls(
+            id=details.id,
+            type="trip-booking-details",
+            attributes={
+                "cabinClassName": details.cabin_class.marketing_name,
+                "vendor": details.segment.vendor,
+                "operator": details.segment.operator or None,
+                "routeIdentifiers": RouteIdentifiers(
+                    vendor=details.segment.vehicle.number,
+                    operator=None,
+                ),
+                "legs": [
+                    OfferSegmentLeg.from_proto(leg) for leg in details.segment.legs
+                ],
+            },
+            relationships={
+                "booking": {
+                    _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
+                        id=details.booking_id,
+                        type="trip-bookings",
+                    ),
+                },
+                "cabinClass": {
+                    _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
+                        id=protobuf.enum_value_to_slug(
+                            descriptor=models_pb2.CabinClass.Type.DESCRIPTOR,
+                            enum_value=details.cabin_class.type,
+                        ),
+                        type="cabin-classes",
+                    ),
+                },
+                "legType": {
+                    _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
+                        id=protobuf.enum_value_to_slug(
+                            descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
+                            enum_value=details.segment.type,
+                        ),
+                        type="leg-types",
+                    ),
+                },
+            },
+            links={
+                _SELF_HREF: request.url_for(
+                    "ViewBookingDetails",
+                    bookingDetailsId=details.id,
+                ),
+            },
+        )
+
+
 class PlaceResource(models.Resource):
     @classmethod
     def from_proto(

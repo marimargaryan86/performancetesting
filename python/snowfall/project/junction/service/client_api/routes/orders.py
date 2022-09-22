@@ -272,3 +272,55 @@ def _create_passengers(
         )
         for passenger in passengers
     ]
+
+
+class BookingDetails(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        client: orders_adapter.Client = lagom.injectable,
+    ) -> responses.Response:
+        try:
+            details = await client.get_booking_details(
+                request.path_params["bookingDetailsId"],
+            )
+        except orders_adapter.NotFoundError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+
+        return models.JsonApiResponse(
+            models.Body(
+                data=resources.TripBookingDetailsResource.from_proto(
+                    details=details,
+                    request=request,
+                ),
+            ),
+        )
+
+
+class BookingDetailsByBooking(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        client: orders_adapter.Client = lagom.injectable,
+    ) -> responses.Response:
+        booking_id = request.path_params["bookingId"]
+        pagination = pagination_helpers.get_pagination(request)
+        response = await client.find_booking_details_by_booking_id(
+            booking_id=booking_id,
+            limit=pagination.limit,
+            cursor=pagination.cursor,
+        )
+
+        return models.JsonApiResponse(
+            models.Body(
+                data=[
+                    resources.TripBookingDetailsResource.from_proto(details, request)
+                    for details in response.details
+                ],
+                links=pagination_helpers.get_next_url(
+                    request.url_for("ListDetailsByBooking", bookingId=booking_id),
+                    response.next_page_token,
+                    pagination,
+                ),
+            ),
+        )

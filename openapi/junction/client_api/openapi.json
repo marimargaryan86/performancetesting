@@ -2720,7 +2720,10 @@
                         }
                       ]
                     }
-                  }
+                  },
+                  "required": [
+                    "data"
+                  ]
                 }
               }
             }
@@ -2733,6 +2736,107 @@
           }
         },
         "operationId": "get-bookings-id",
+        "description": "Used to lookup data for a Booking Identifier."
+      }
+    },
+    "/bookings/{bookingId}/details": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/bookingId"
+        }
+      ],
+      "get": {
+        "summary": "List Booking Details by Booking",
+        "tags": [
+          "journeys"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "$ref": "#/components/schemas/TripBookingDetails"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-bookings-id-details",
+        "description": "Used to retrieve all Booking Details for a Booking Identifier.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
+      }
+    },
+    "/bookings/details/{bookingDetailsId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/bookingDetailsId"
+        }
+      ],
+      "get": {
+        "summary": "Get Booking Details",
+        "tags": [
+          "journeys"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/TripBookingDetails"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-bookings-details-id",
         "description": "Used to lookup data for a Booking Identifier."
       }
     },
@@ -4886,6 +4990,17 @@
                         "$ref": "#/components/schemas/BookingStatusIdentifier"
                       }
                     }
+                  },
+                  "details": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/TripBookingDetailsIdentifier"
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -4919,6 +5034,141 @@
             "example": "trip-bookings",
             "enum": [
               "trip-bookings"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "TripBookingDetails": {
+        "title": "Trip Booking Details",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "example": "trip-booking-details",
+                "enum": [
+                  "trip-booking-details"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "cabinClassName",
+                  "vendor",
+                  "operator",
+                  "routeIdentifiers",
+                  "legs"
+                ],
+                "properties": {
+                  "cabinClassName": {
+                    "type": "string",
+                    "example": "Economy"
+                  },
+                  "vendor": {
+                    "type": "string",
+                    "example": "BA"
+                  },
+                  "operator": {
+                    "type": "string",
+                    "example": "BA",
+                    "nullable": true
+                  },
+                  "routeIdentifiers": {
+                    "$ref": "#/components/schemas/RouteIdentifiers"
+                  },
+                  "legs": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/OfferSegmentLeg"
+                    }
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "booking",
+                  "cabinClass",
+                  "legType"
+                ],
+                "properties": {
+                  "booking": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/TripBookingIdentifier"
+                      }
+                    },
+                    "readOnly": true
+                  },
+                  "cabinClass": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/CabinClassIdentifier"
+                      }
+                    }
+                  },
+                  "legType": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/LegTypeIdentifier"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "description": "Details for a Trip Booking."
+      },
+      "TripBookingDetailsIdentifier": {
+        "title": "Booking Details Identifier",
+        "description": "",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "example": "trip-booking-details",
+            "enum": [
+              "trip-booking-details"
             ]
           }
         },
@@ -5514,6 +5764,17 @@
           "format": "uuid"
         },
         "description": "Booking Identifier"
+      },
+      "bookingDetailsId": {
+        "name": "bookingDetailsId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+        },
+        "description": "Booking Details Identifier"
       }
     },
     "securitySchemes": {

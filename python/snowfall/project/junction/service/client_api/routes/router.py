@@ -187,6 +187,16 @@ def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Rou
             name="ViewBooking",
         ),
         dependencies.route(
+            "/bookings/{bookingId}/details",
+            orders.BookingDetailsByBooking,
+            name="ListDetailsByBooking",
+        ),
+        dependencies.route(
+            "/bookings/details/{bookingDetailsId}",
+            orders.BookingDetails,
+            name="ViewBookingDetails",
+        ),
+        dependencies.route(
             "/passengers/genders",
             passengers.PassengerGenders,
             name="ListPassengerGenders",

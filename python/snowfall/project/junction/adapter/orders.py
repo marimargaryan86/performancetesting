@@ -13,7 +13,6 @@ from snowfall.project.junction.service.orders.v1alpha import (
     orders_pb2_grpc,
 )
 from snowfall.stdlib import sequence
-from snowfall.stdlib.v1alpha import money_pb2
 
 _MOCK_PRICE_UNITS = 13
 _MOCK_PRICE_NANOS = 370000000
@@ -55,6 +54,13 @@ class Client(abc.ABC):
     @abc.abstractmethod
     async def get_booking(self, identifier: str) -> models_pb2.Booking:
         """Fetch a booking resource."""
+
+    @abc.abstractmethod
+    async def get_booking_details(
+        self,
+        identifier: str,
+    ) -> models_pb2.TripOptionDetails:
+        """Fetch a booking details resource."""
 
     @abc.abstractmethod
     async def find_journeys(
@@ -99,7 +105,25 @@ class Client(abc.ABC):
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> orders_pb2.ListBookingsResponse:
-        """Fetch all booking resources related to a booking."""
+        """Fetch all booking resources related to an order."""
+
+    @abc.abstractmethod
+    async def find_booking_details(
+        self,
+        identifiers: Sequence[str],
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> orders_pb2.ListBookingDetailsResponse:
+        """Fetch booking details resources by identifiers."""
+
+    @abc.abstractmethod
+    async def find_booking_details_by_booking_id(
+        self,
+        booking_id: str,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> orders_pb2.ListBookingDetailsResponse:
+        """Fetch all booking details resources related to a booking."""
 
 
 class DictClient(Client):
@@ -134,24 +158,7 @@ class DictClient(Client):
         order = models_pb2.Order(
             id=order_id,
             journey_id=journey_id,
-            bookings=[
-                models_pb2.Booking(
-                    id=str(uuid.uuid4()),
-                    order_id=order_id,
-                    trip_option=option,
-                    status=models_pb2.Booking.Status.STATUS_CONFIRMED,
-                    provider_name="mock",
-                    total_price=money_pb2.Money(
-                        currency_code="GBP",
-                        units=_MOCK_PRICE_UNITS,
-                        nanos=_MOCK_PRICE_NANOS,
-                    ),
-                    trip_result=models_pb2.TripBooking(
-                        record_locator="FOOBAR",
-                    ),
-                )
-                for option in options
-            ],
+            bookings=self._generate_bookings(order_id, options),
             passengers=passengers,
         )
         self._journeys[journey_id].orders.append(order)
@@ -175,10 +182,20 @@ class DictClient(Client):
         raise NotFoundError()
 
     async def get_booking(self, identifier: str) -> models_pb2.Booking:
-        for order in self._iterate_orders():
-            for booking in order.bookings:
-                if identifier == booking.id:
-                    return booking
+        for booking in self._iterate_bookings():
+            if identifier == booking.id:
+                return booking
+
+        raise NotFoundError()
+
+    async def get_booking_details(
+        self,
+        identifier: str,
+    ) -> models_pb2.TripOptionDetails:
+        for booking in self._iterate_bookings():
+            for detail in booking.trip_option.details:
+                if identifier == detail.id:
+                    return detail
 
         raise NotFoundError()
 
@@ -297,9 +314,99 @@ class DictClient(Client):
             next_page_token=page.cursor,
         )
 
+    async def find_booking_details(
+        self,
+        identifiers: Sequence[str],
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> orders_pb2.ListBookingDetailsResponse:
+        details = [
+            detail
+            for booking in self._iterate_bookings()
+            for detail in booking.trip_option.details
+            if detail.id in identifiers
+        ]
+
+        page = sequence.paginate(
+            sequence=details,
+            cursor=cursor,
+            limit=limit,
+        )
+
+        return orders_pb2.ListBookingDetailsResponse(
+            details=page.sequence,
+            next_page_token=page.cursor,
+        )
+
+    async def find_booking_details_by_booking_id(
+        self,
+        booking_id: str,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> orders_pb2.ListBookingDetailsResponse:
+        details = [
+            detail
+            for booking in self._iterate_bookings()
+            for detail in booking.trip_option.details
+            if booking.id == booking_id
+        ]
+
+        page = sequence.paginate(
+            sequence=details,
+            cursor=cursor,
+            limit=limit,
+        )
+
+        return orders_pb2.ListBookingDetailsResponse(
+            details=page.sequence,
+            next_page_token=page.cursor,
+        )
+
     def _iterate_orders(self) -> Iterator[models_pb2.Order]:
         for journey in self._journeys.values():
             yield from journey.orders
+
+    def _iterate_bookings(self) -> Iterator[models_pb2.Booking]:
+        for order in self._iterate_orders():
+            yield from order.bookings
+
+    def _generate_bookings(
+        self,
+        order_id: str,
+        options: Sequence[models_pb2.TripOption],
+    ) -> list[models_pb2.Booking]:
+        bookings = []
+
+        for option in options:
+            booking_id = str(uuid.uuid4())
+            self._generate_option_ids(booking_id, option)
+
+            bookings.append(
+                models_pb2.Booking(
+                    id=booking_id,
+                    order_id=order_id,
+                    total_price=option.price,
+                    trip_option=option,
+                    status=models_pb2.Booking.Status.STATUS_CONFIRMED,
+                    trip_result=models_pb2.TripBooking(
+                        record_locator="FOOBAR",
+                    ),
+                ),
+            )
+
+        return bookings
+
+    def _generate_option_ids(
+        self,
+        booking_id: str,
+        option: models_pb2.TripOption,
+    ) -> None:
+        option.id = str(uuid.uuid4())
+        option.booking_id = booking_id
+
+        for detail in option.details:
+            detail.id = str(uuid.uuid4())
+            detail.booking_id = booking_id
 
 
 class GrpcClient(Client):
@@ -399,6 +506,25 @@ class GrpcClient(Client):
 
         return response.booking
 
+    async def get_booking_details(
+        self,
+        identifier: str,
+    ) -> models_pb2.TripOptionDetails:
+        try:
+            response = await self._orders.GetBookingDetails(
+                orders_pb2.GetBookingDetailsRequest(id=identifier),
+                timeout=self._timeout,
+            )
+        except grpc.aio.AioRpcError as exc:
+            if exc.code() == grpc.StatusCode.NOT_FOUND:
+                raise NotFoundError(
+                    "Booking details with ID '{id}' not found.".format(id=identifier),
+                ) from exc
+
+            raise UnknownError(exc.details()) from exc
+
+        return response.booking
+
     async def find_journeys(
         self,
         identifiers: Optional[Sequence[str]] = None,
@@ -491,5 +617,43 @@ class GrpcClient(Client):
 
         try:
             return await self._orders.ListBookings(request, timeout=self._timeout)
+        except grpc.aio.AioRpcError as exc:
+            raise UnknownError(exc.details()) from exc
+
+    async def find_booking_details(
+        self,
+        identifiers: Sequence[str],
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> orders_pb2.ListBookingDetailsResponse:
+        request = orders_pb2.ListBookingDetailsRequest(
+            ids=orders_pb2.ListOfIds(ids=identifiers),
+            page_token=cursor or "",
+        )
+
+        if limit is not None:
+            request.page_size = limit
+
+        try:
+            return await self._orders.ListBookingDetails(request, timeout=self._timeout)
+        except grpc.aio.AioRpcError as exc:
+            raise UnknownError(exc.details()) from exc
+
+    async def find_booking_details_by_booking_id(
+        self,
+        booking_id: str,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> orders_pb2.ListBookingDetailsResponse:
+        request = orders_pb2.ListBookingDetailsRequest(
+            booking_id=booking_id,
+            page_token=cursor or "",
+        )
+
+        if limit is not None:
+            request.page_size = limit
+
+        try:
+            return await self._orders.ListBookingDetails(request, timeout=self._timeout)
         except grpc.aio.AioRpcError as exc:
             raise UnknownError(exc.details()) from exc
