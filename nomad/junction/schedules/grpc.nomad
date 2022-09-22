@@ -14,8 +14,16 @@ variable "registry_username" {
   type = string
 }
 
+variable "environment" {
+  type = string
+}
+
+variable "datacenter" {
+  type = string
+}
+
 job "schedules-grpc" {
-  datacenters = ["junction-dev-dc1"]
+  datacenters = ["${var.datacenter}"]
   type        = "service"
 
   update {
@@ -36,7 +44,7 @@ job "schedules-grpc" {
     }
 
     service {
-      name = "schedules-${NOMAD_NAMESPACE}"
+      name = "schedules-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
 
@@ -47,7 +55,7 @@ job "schedules-grpc" {
       }
     }
     service {
-      name = "schedules-${NOMAD_NAMESPACE}"
+      name = "schedules-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 
@@ -64,7 +72,7 @@ job "schedules-grpc" {
 
       template {
         data        = <<EOH
-MONGO_DSN={{range $index, $service := service "mongodb"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
+MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 EOH
         destination = "services.env"
         env         = true
@@ -86,7 +94,7 @@ EOH
       }
 
       env {
-        ENV_NAME        = "${NOMAD_NAMESPACE}"
+        ENV_NAME        = "${var.environment}"
         GRPC_ADDRESS    = "0.0.0.0"
         GRPC_PORT       = "${NOMAD_PORT_grpc}"
         SENTRY_DSN      = "https://8d94d1ca059f4dc9b4e1e91dfd3d7151@sentry.snowfall.se/25"

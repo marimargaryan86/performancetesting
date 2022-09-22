@@ -14,8 +14,16 @@ variable "registry_username" {
   type = string
 }
 
+variable "environment" {
+  type = string
+}
+
+variable "datacenter" {
+  type = string
+}
+
 job "echo-grpc" {
-  datacenters = ["junction-dev-dc1"]
+  datacenters = ["${var.datacenter}"]
   type        = "service"
 
   update {
@@ -36,7 +44,7 @@ job "echo-grpc" {
     }
 
     service {
-      name = "echo-${NOMAD_NAMESPACE}"
+      name = "echo-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
 
@@ -48,7 +56,7 @@ job "echo-grpc" {
     }
 
     service {
-      name = "echo-${NOMAD_NAMESPACE}"
+      name = "echo-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 
@@ -76,9 +84,8 @@ job "echo-grpc" {
           server_address = var.registry_address
         }
       }
-
       env {
-        ENV_NAME        = "${NOMAD_NAMESPACE}"
+        ENV_NAME        = "${var.environment}"
         GRPC_ADDRESS    = "0.0.0.0"
         GRPC_PORT       = "${NOMAD_PORT_grpc}"
         SENTRY_DSN      = "https://43837909119c4ce186975c300c4efe6e@sentry.snowfall.se/18"

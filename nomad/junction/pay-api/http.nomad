@@ -14,8 +14,25 @@ variable "registry_username" {
   type = string
 }
 
+variable "environment" {
+  type = string
+}
+
+variable "datacenter" {
+  type = string
+}
+
+variable "traefik_entrypoints" {
+  type = string
+}
+
+variable "pay_api_URL" {
+  type = string
+}
+
+
 job "pay-api-http" {
-  datacenters = ["junction-dev-dc1"]
+  datacenters = ["${var.datacenter}"]
   type        = "service"
 
   update {
@@ -36,13 +53,13 @@ job "pay-api-http" {
     }
 
     service {
-      name = "pay-api-${NOMAD_NAMESPACE}"
+      name = "pay-api-${var.environment}"
       port = "http"
       tags = [
         "http",
         "traefik.enable=true",
-        "traefik.http.routers.pay-api.entrypoints=websecure",
-        "traefik.http.routers.pay-api.rule=Host(`api.pay.junction.dev`)",
+        "traefik.http.routers.pay-api.entrypoints=${var.traefik_entrypoints}",
+        "traefik.http.routers.pay-api.rule=Host(`${var.pay_api_URL}`)",
       ]
 
       check {
@@ -54,7 +71,7 @@ job "pay-api-http" {
     }
 
     service {
-      name = "pay-api-${NOMAD_NAMESPACE}"
+      name = "pay-api-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 
@@ -70,7 +87,7 @@ job "pay-api-http" {
       driver = "docker"
 
       vault {
-        policies = ["pay-api-development"]
+        policies = ["pay-api-${var.environment}"]
       }
 
       template {
@@ -78,8 +95,8 @@ job "pay-api-http" {
         env         = true
         change_mode = "restart"
         data        = <<EOH
-CURRENCIES_ADDRESS={{range $index, $service := service (printf "grpc.currencies-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
-{{ with secret (printf "kv/data/%s/pay-api" (env "NOMAD_NAMESPACE")) }}
+CURRENCIES_ADDRESS={{range $index, $service := service "grpc.currencies-${var.environment}"}}{{.Address}}:{{.Port}} {{end}}
+{{ with secret "kv/data/${var.environment}/pay-api" }}
 CC_LOGIN={{ .Data.data.cc_login }}
 CC_API_KEY={{ .Data.data.cc_api_key }}
 CC_ENV={{ .Data.data.cc_env }}
@@ -102,7 +119,7 @@ EOH
       }
 
       env {
-        ENV_NAME              = "${NOMAD_NAMESPACE}"
+        ENV_NAME              = "${var.environment}"
         FORWARDED_ALLOWED_IPS = "0.0.0.0"
         HTTP_ADDRESS          = "0.0.0.0"
         HTTP_PORT             = "${NOMAD_PORT_http}"

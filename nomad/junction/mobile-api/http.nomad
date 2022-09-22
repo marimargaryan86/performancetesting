@@ -14,8 +14,30 @@ variable "registry_username" {
   type = string
 }
 
+variable "environment" {
+  type = string
+}
+
+variable "datacenter" {
+  type = string
+}
+
+variable "traefik_entrypoints" {
+  type = string
+}
+
+variable "mobile_api_URL" {
+  type = string
+}
+
+variable "junction_api_URL" {
+  type = string
+}
+
+
+
 job "mobile-api-http" {
-  datacenters = ["junction-dev-dc1"]
+  datacenters = ["${var.datacenter}"]
   type        = "service"
 
   update {
@@ -36,13 +58,13 @@ job "mobile-api-http" {
     }
 
     service {
-      name = "mobile-api-${NOMAD_NAMESPACE}"
+      name = "mobile-api-${var.environment}"
       port = "http"
       tags = [
         "http",
         "traefik.enable=true",
-        "traefik.http.routers.mobile-api.entrypoints=websecure",
-        "traefik.http.routers.mobile-api.rule=Host(`superapp.junction.dev`)",
+        "traefik.http.routers.mobile-api.entrypoints=${var.traefik_entrypoints}",
+        "traefik.http.routers.mobile-api.rule=Host(`${var.mobile_api_URL}`)",
       ]
 
       check {
@@ -54,7 +76,7 @@ job "mobile-api-http" {
     }
 
     service {
-      name = "mobile-api-${NOMAD_NAMESPACE}"
+      name = "mobile-api-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 
@@ -74,17 +96,17 @@ job "mobile-api-http" {
       }
 
       vault {
-        policies = ["mobile-api-development"]
+        policies = ["mobile-api-${var.environment}"]
       }
       template {
         destination = "services.env"
         env         = true
         change_mode = "restart"
         data        = <<EOH
-MONGO_DSN={{range $index, $service := service (printf "mongodb-%s" (env "NOMAD_NAMESPACE"))}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
-REDIS_DSN={{range $index, $service := service (printf "redis-%s" (env "NOMAD_NAMESPACE"))}}redis://{{.Address}}:{{.Port}}// {{end}}
+MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
+REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
-{{ with secret (printf "kv/data/%s/mobile-api" (env "NOMAD_NAMESPACE")) }}
+{{ with secret "kv/data/${var.environment}/mobile-api" }}
 JUNCTION_API_TOKEN={{ .Data.data.junction_api_token }}
 JWT_TOKEN_VERSION={{ .Data.data.jwt_token_version }}
 JWT_PRIVATE_KEY={{ .Data.data.jwt_private_key }}
@@ -109,12 +131,12 @@ EOH
       }
 
       env {
-        ENV_NAME              = "${NOMAD_NAMESPACE}"
+        ENV_NAME              = "${var.environment}"
         FORWARDED_ALLOWED_IPS = "0.0.0.0"
         HTTP_ADDRESS          = "0.0.0.0"
         HTTP_PORT             = "${NOMAD_PORT_http}"
         JWT_TOKEN_VERSION     = "1.0.0"
-        JUNCTION_API_ADDRESS  = "https://api.junction.dev"
+        JUNCTION_API_ADDRESS  = "${var.junction_api_URL}"
         SENTRY_DSN            = "https://6166193e2bc24153b87e9bfca3d510d4@sentry.snowfall.se/38"
         PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
       }

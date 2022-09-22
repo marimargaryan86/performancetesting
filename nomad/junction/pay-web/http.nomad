@@ -14,8 +14,24 @@ variable "registry_username" {
   type = string
 }
 
+variable "environment" {
+  type = string
+}
+
+variable "datacenter" {
+  type = string
+}
+
+variable "traefik_entrypoints" {
+  type = string
+}
+
+variable "pay_web_URL" {
+  type = string
+}
+
 job "pay-web" {
-  datacenters = ["junction-dev-dc1"]
+  datacenters = ["${var.datacenter}"]
   type        = "service"
 
   update {
@@ -35,12 +51,12 @@ job "pay-web" {
     }
 
     service {
-      name = "pay-web-${NOMAD_NAMESPACE}"
+      name = "pay-web-${var.environment}"
       port = "http"
       tags = [
         "traefik.enable=true",
-        "traefik.http.routers.pay-web.entrypoints=websecure",
-        "traefik.http.routers.pay-web.rule=Host(`pay.junction.dev`)",
+        "traefik.http.routers.pay-web.entrypoints=${var.traefik_entrypoints}",
+        "traefik.http.routers.pay-web.rule=Host(`${pay_web_URL}`)",
       ]
 
       check {
@@ -66,7 +82,7 @@ job "pay-web" {
       }
 
       env {
-        ENV_NAME = "${NOMAD_NAMESPACE}"
+        ENV_NAME = "${var.environment}"
         PORT     = "${NOMAD_PORT_http}"
       }
     }

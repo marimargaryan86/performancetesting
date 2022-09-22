@@ -49,6 +49,12 @@ for i in nomad/**/*.nomad; do
 	mkdir -p "${repo_path}"
 	cp "${i}" "${repo_path}/${filename}"
 done
+for i in nomad/**/*.vars."${1}"; do
+	filename=$(basename "${i%.*}")
+	service_name=$(basename "$(dirname "${i}")" | sed s/_/-/g)
+	repo_path="repo/${1}/${service_name}"
+	cp "${i}" "${repo_path}/${filename}"
+done
 
 cp ".gitlab/deploy.gitlab-ci.yml" "repo/.gitlab-ci.yml"
 cp "bash/deploy.sh" "repo/${1}/deploy.sh"

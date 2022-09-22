@@ -1,0 +1,2 @@
+pay_web_URL ="pay.junction.travel"
+traefik_entrypoints="web"

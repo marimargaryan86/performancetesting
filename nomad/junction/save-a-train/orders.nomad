@@ -14,8 +14,16 @@ variable "registry_username" {
   type = string
 }
 
+variable "environment" {
+  type = string
+}
+
+variable "datacenter" {
+  type = string
+}
+
 job "save-a-train-orders" {
-  datacenters = ["junction-dev-dc1"]
+  datacenters = ["${var.datacenter}"]
   type        = "service"
 
   update {
@@ -35,7 +43,7 @@ job "save-a-train-orders" {
     }
 
     service {
-      name = "save-a-train-${NOMAD_NAMESPACE}"
+      name = "save-a-train-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 
@@ -50,15 +58,15 @@ job "save-a-train-orders" {
       driver = "docker"
 
       vault {
-        policies = ["save-a-train-development"]
+        policies = ["save-a-train-${var.environment}"]
       }
 
       template {
         data        = <<EOH
-AMQP_DSN={{range $index, $service := service "amqp"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
-GEODATA_ADDRESS={{range $index, $service := service (printf "grpc.geodata-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
-REDIS_DSN={{range $index, $service := service "redis"}}redis://{{.Address}}:{{.Port}}// {{end}}
-{{ with secret (printf "kv/data/%s/save-a-train" (env "NOMAD_NAMESPACE")) }}
+AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
+GEODATA_ADDRESS={{range $index, $service := service "grpc.geodata-${var.environment}"}}{{.Address}}:{{.Port}} {{end}}
+REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
+{{ with secret "kv/data/${var.environment}/save-a-train"  }}
 API_EMAIL={{ .Data.data.api_email }}
 API_PASSWORD={{ .Data.data.api_password }}
 API_SEARCH_PASSWORD={{ .Data.data.api_search_password }}
@@ -87,7 +95,7 @@ EOH
       env {
         API_BASE_URL        = "https://satvendorstest.saveatrain.com/api/"
         API_SEARCH_BASE_URL = "https://apisearch.saveatrain.com/search"
-        ENV_NAME            = "${NOMAD_NAMESPACE}"
+        ENV_NAME            = "${var.environment}"
         SENTRY_DSN          = "https://f01c7c8bf4d04a709a65b4be8b11ba69@sentry.snowfall.se/36"
         PROMETHEUS_PORT     = "${NOMAD_PORT_prometheus}"
       }

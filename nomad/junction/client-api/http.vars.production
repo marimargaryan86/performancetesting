@@ -1,0 +1,2 @@
+client_api_URL ="api.junction.travel"
+traefik_entrypoints="web"

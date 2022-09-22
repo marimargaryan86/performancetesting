@@ -14,8 +14,24 @@ variable "registry_username" {
   type = string
 }
 
+variable "environment" {
+  type = string
+}
+
+variable "datacenter" {
+  type = string
+}
+
+variable "traefik_entrypoints" {
+  type = string
+}
+
+variable "client_api_URL" {
+  type = string
+}
+
 job "client-api-http" {
-  datacenters = ["junction-dev-dc1"]
+  datacenters = ["${var.datacenter}"]
   type        = "service"
 
   update {
@@ -36,13 +52,13 @@ job "client-api-http" {
     }
 
     service {
-      name = "client-api-${NOMAD_NAMESPACE}"
+      name = "client-api-${var.environment}"
       port = "http"
       tags = [
         "http",
         "traefik.enable=true",
-        "traefik.http.routers.client-api.entrypoints=websecure",
-        "traefik.http.routers.client-api.rule=Host(`api.junction.dev`)",
+        "traefik.http.routers.client-api.entrypoints=${var.traefik_entrypoints}",
+        "traefik.http.routers.client-api.rule=Host(`${var.client_api_URL}`)",
       ]
 
       check {
@@ -54,7 +70,7 @@ job "client-api-http" {
     }
 
     service {
-      name = "client-api-${NOMAD_NAMESPACE}"
+      name = "client-api-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 
@@ -70,7 +86,7 @@ job "client-api-http" {
       driver = "docker"
 
       vault {
-        policies = ["client-api-development"]
+        policies = ["client-api-${var.environment}"]
       }
 
       template {
@@ -78,12 +94,12 @@ job "client-api-http" {
         env         = true
         change_mode = "restart"
         data        = <<EOH
-OFFERS_ADDRESS={{range $index, $service := service (printf "grpc.offers-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
-ORDERS_ADDRESS={{range $index, $service := service (printf "grpc.orders-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
-PLACES_ADDRESS={{range $index, $service := service (printf "grpc.places-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
-SCHEDULES_ADDRESS={{range $index, $service := service (printf "grpc.schedules-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
-TRIPS_ADDRESS={{range $index, $service := service (printf "grpc.trips-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
-{{ with secret (printf "kv/data/%s/client-api" (env "NOMAD_NAMESPACE")) }}
+OFFERS_ADDRESS={{range $index, $service := service "grpc.offers-${var.environment}"}}{{.Address}}:{{.Port}} {{end}}
+ORDERS_ADDRESS={{range $index, $service := service "grpc.orders-${var.environment}"}}{{.Address}}:{{.Port}} {{end}}
+PLACES_ADDRESS={{range $index, $service := service "grpc.places-${var.environment}"}}{{.Address}}:{{.Port}} {{end}}
+SCHEDULES_ADDRESS={{range $index, $service := service "grpc.schedules-${var.environment}"}}{{.Address}}:{{.Port}} {{end}}
+TRIPS_ADDRESS={{range $index, $service := service "grpc.trips-${var.environment}"}}{{.Address}}:{{.Port}} {{end}}
+{{ with secret "kv/data/${var.environment}/client-api" }}
 JWT_PUBLIC_KEY={{ .Data.data.jwt_public_key }}
 {{ end }}
 EOH
@@ -104,7 +120,7 @@ EOH
       }
 
       env {
-        ENV_NAME              = "${NOMAD_NAMESPACE}"
+        ENV_NAME              = "${var.environment}"
         FORWARDED_ALLOWED_IPS = "0.0.0.0"
         HTTP_ADDRESS          = "0.0.0.0"
         HTTP_PORT             = "${NOMAD_PORT_http}"

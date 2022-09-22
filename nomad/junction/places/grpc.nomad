@@ -14,8 +14,16 @@ variable "registry_username" {
   type = string
 }
 
+variable "environment" {
+  type = string
+}
+
+variable "datacenter" {
+  type = string
+}
+
 job "places-grpc" {
-  datacenters = ["junction-dev-dc1"]
+  datacenters = ["${var.datacenter}"]
   type        = "service"
 
   update {
@@ -36,7 +44,7 @@ job "places-grpc" {
     }
 
     service {
-      name = "places-${NOMAD_NAMESPACE}"
+      name = "places-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
 
@@ -47,7 +55,7 @@ job "places-grpc" {
       }
     }
     service {
-      name = "places-${NOMAD_NAMESPACE}"
+      name = "places-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 
@@ -64,8 +72,8 @@ job "places-grpc" {
 
       template {
         data        = <<EOH
-GEODATA_ADDRESS={{range $index, $service := service (printf "grpc.geodata-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
-MONGO_DSN={{range $index, $service := service "mongodb"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
+GEODATA_ADDRESS   ={{range $index, $service := service "grpc.geodata-${var.environment}"}}{{.Address}}:{{.Port}} {{end}}
+MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 EOH
         destination = "services.env"
         env         = true
@@ -87,7 +95,7 @@ EOH
       }
 
       env {
-        ENV_NAME        = "${NOMAD_NAMESPACE}"
+        ENV_NAME        = "${var.environment}"
         GRPC_ADDRESS    = "0.0.0.0"
         GRPC_PORT       = "${NOMAD_PORT_grpc}"
         SENTRY_DSN      = "https://4de05bbdaa1b4b58ab8401ad33ebac37@sentry.snowfall.se/20"

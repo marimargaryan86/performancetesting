@@ -14,8 +14,16 @@ variable "registry_username" {
   type = string
 }
 
+variable "environment" {
+  type = string
+}
+
+variable "datacenter" {
+  type = string
+}
+
 job "planner-grpc" {
-  datacenters = ["junction-dev-dc1"]
+  datacenters = ["${var.datacenter}"]
   type        = "service"
   priority    = 75
   update {
@@ -35,7 +43,7 @@ job "planner-grpc" {
     }
 
     service {
-      name = "planner-${NOMAD_NAMESPACE}"
+      name = "planner-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
 
@@ -116,7 +124,7 @@ job "planner-grpc" {
       }
 
       env {
-        ENV_NAME     = "${NOMAD_NAMESPACE}"
+        ENV_NAME     = "${var.environment}"
         GRPC_ADDRESS = "0.0.0.0"
         GRPC_PORT    = "${NOMAD_PORT_grpc}"
         PROTO_DIR    = "${NOMAD_TASK_DIR}"

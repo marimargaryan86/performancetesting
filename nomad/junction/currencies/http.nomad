@@ -14,8 +14,16 @@ variable "registry_username" {
   type = string
 }
 
+variable "environment" {
+  type = string
+}
+
+variable "datacenter" {
+  type = string
+}
+
 job "currencies" {
-  datacenters = ["junction-dev-dc1"]
+  datacenters = ["${var.datacenter}"]
   type        = "service"
 
   update {
@@ -35,7 +43,7 @@ job "currencies" {
     }
 
     service {
-      name = "currencies-${NOMAD_NAMESPACE}"
+      name = "currencies-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
 
@@ -50,12 +58,12 @@ job "currencies" {
       driver = "docker"
 
       vault {
-        policies = ["currencies-development"]
+        policies = ["currencies-${var.environment}"]
       }
 
       template {
         data        = <<EOH
-{{ with secret (printf "kv/data/%s/currencies" (env "NOMAD_NAMESPACE")) }}
+{{ with secret "kv/data/${var.environment}/currencies" }}
 PASSWORD={{ .Data.data.password }}
 EMAIL={{ .Data.data.email }}
 {{ end }}
@@ -80,7 +88,7 @@ EOH
       }
 
       env {
-        ENV_NAME     = "${NOMAD_NAMESPACE}"
+        ENV_NAME     = "${var.environment}"
         BASE_URL     = "https://sandbox-api.bound.co/api"
         GRPC_ADDRESS = "0.0.0.0"
         GRPC_PORT    = "${NOMAD_PORT_grpc}"

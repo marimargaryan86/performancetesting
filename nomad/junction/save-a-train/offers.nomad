@@ -14,8 +14,16 @@ variable "registry_username" {
   type = string
 }
 
+variable "environment" {
+  type = string
+}
+
+variable "datacenter" {
+  type = string
+}
+
 job "save-a-train-offers" {
-  datacenters = ["junction-dev-dc1"]
+  datacenters = ["${var.datacenter}"]
   type        = "service"
 
   update {
@@ -35,7 +43,7 @@ job "save-a-train-offers" {
     }
 
     service {
-      name = "save-a-train-${NOMAD_NAMESPACE}"
+      name = "save-a-train-offers-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 
@@ -52,8 +60,8 @@ job "save-a-train-offers" {
 
       template {
         data        = <<EOH
-AMQP_DSN={{range $index, $service := service "amqp"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
-GEODATA_ADDRESS={{range $index, $service := service (printf "grpc.geodata-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
+AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
+GEODATA_ADDRESS={{range $index, $service := service "grpc.geodata-${var.environment}"}}{{.Address}}:{{.Port}} {{end}}
 EOH
         destination = "services.env"
         env         = true
@@ -75,7 +83,7 @@ EOH
       }
 
       env {
-        ENV_NAME        = "${NOMAD_NAMESPACE}"
+        ENV_NAME        = "${var.environment}"
         SENTRY_DSN      = "https://f01c7c8bf4d04a709a65b4be8b11ba69@sentry.snowfall.se/36"
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
       }

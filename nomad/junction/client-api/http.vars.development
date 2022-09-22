@@ -1,0 +1,2 @@
+client_api_URL ="api.junction.dev"
+traefik_entrypoints="websecure"

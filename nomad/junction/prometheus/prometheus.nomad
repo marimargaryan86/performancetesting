@@ -1,5 +1,9 @@
+variable "datacenter" {
+  type = string
+}
+
 job "prometheus" {
-  datacenters = ["junction-dev-dc1"]
+  datacenters = ["${var.datacenter}"]
   type        = "service"
   namespace   = "monitoring"
 

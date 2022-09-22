@@ -2,14 +2,8 @@ nomad:validate:
   stage: test
   interruptible: true
   image: "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"
-  script: |
-    set -eu
-    shopt -s globstar
-    shopt -s nullglob
-    for f in nomad/**/*.nomad; do
-      nomad validate "${f}"
-      hclfmt -require-no-change "${f}"
-    done
+  script:
+    - ./bash/lint-nomad.sh development
   rules:
     - if: $CI_MERGE_REQUEST_IID
       changes:
@@ -22,9 +16,9 @@ nomad:validate:
     NOMAD_VAR_registry_password: "${CI_REGISTRY_PASSWORD}"
     NOMAD_VAR_registry_username: "${CI_REGISTRY_USER}"
     NOMAD_VAR_environment: "development"
+    NOMAD_VAR_datacenter: "junction-dev-dc1"
   tags:
     - docker
-
 nomad:deploy:
   stage: deploy
   interruptible: false

@@ -1,5 +1,14 @@
+variable "loki_endpoint" {
+  type = string
+}
+
+variable "datacenter" {
+  type = string
+}
+
+
 job "vector-loki" {
-  datacenters = ["junction-dev-dc1"]
+  datacenters = ["${var.datacenter}"]
   namespace   = "monitoring"
   type        = "system"
   update {
@@ -35,16 +44,13 @@ job "vector-loki" {
           "/var/run/docker.sock:/var/run/docker.sock"
         ]
       }
-      # Vector won't start unless the sinks(backends) configured are healthy
       env {
         VECTOR_CONFIG          = "local/vector.toml"
         VECTOR_REQUIRE_HEALTHY = "true"
       }
-      #resource limits are a good idea because you don't want your log collection to consume all resources available
       resources {
         memory = 100 # 100MB
       }
-      # template with Vector's configuration
       template {
         destination   = "local/vector.toml"
         change_mode   = "signal"
@@ -67,7 +73,7 @@ job "vector-loki" {
           [sinks.loki]
             type = "loki"
             inputs = ["logs"]
-            endpoint = "http://172.31.46.153:3100"
+            endpoint = "${var.loki_endpoint}"
             encoding.codec = "json"
             healthcheck.enabled = true
             # since . is used by Vector to denote a parent-child relationship, and Nomad's Docker labels contain ".",

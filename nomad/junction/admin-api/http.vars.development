@@ -1,0 +1,2 @@
+admin_api_URL = "api.admin.junction.dev"
+traefik_entrypoints="websecure"

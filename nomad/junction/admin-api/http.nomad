@@ -14,8 +14,24 @@ variable "registry_username" {
   type = string
 }
 
+variable "environment" {
+  type = string
+}
+
+variable "datacenter" {
+  type = string
+}
+
+variable "traefik_entrypoints" {
+  type = string
+}
+
+variable "admin_api_URL" {
+  type = string
+}
+
 job "admin-api-http" {
-  datacenters = ["junction-dev-dc1"]
+  datacenters = ["${var.datacenter}"]
   type        = "service"
 
   update {
@@ -36,13 +52,13 @@ job "admin-api-http" {
     }
 
     service {
-      name = "admin-api-${NOMAD_NAMESPACE}"
+      name = "admin-api-${var.environment}"
       port = "http"
       tags = [
         "http",
         "traefik.enable=true",
-        "traefik.http.routers.admin-api.entrypoints=websecure",
-        "traefik.http.routers.admin-api.rule=Host(`api.admin.junction.dev`)",
+        "traefik.http.routers.admin-api.entrypoints=${var.traefik_entrypoints}",
+        "traefik.http.routers.admin-api.rule=Host(`${var.admin_api_URL}`)",
       ]
 
       check {
@@ -54,7 +70,7 @@ job "admin-api-http" {
     }
 
     service {
-      name = "admin-api-${NOMAD_NAMESPACE}"
+      name = "admin-api-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 
@@ -74,7 +90,7 @@ job "admin-api-http" {
         env         = true
         change_mode = "restart"
         data        = <<EOH
-PLACES_ADDRESS={{range $index, $service := service (printf "grpc.places-%s" (env "NOMAD_NAMESPACE"))}}{{.Address}}:{{.Port}} {{end}}
+PLACES_ADDRESS={{range $index, $service := service "grpc.places-${var.environment}"}}{{.Address}}:{{.Port}} {{end}}
 EOH
       }
 
@@ -93,7 +109,7 @@ EOH
       }
 
       env {
-        ENV_NAME              = "${NOMAD_NAMESPACE}"
+        ENV_NAME              = "${var.environment}"
         FORWARDED_ALLOWED_IPS = "0.0.0.0"
         HTTP_ADDRESS          = "0.0.0.0"
         HTTP_PORT             = "${NOMAD_PORT_http}"
