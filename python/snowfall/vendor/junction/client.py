@@ -390,6 +390,24 @@ class JunctionClient(object):  # noqa: WPS214
             url="/bookings/{0}".format(identifier),
         )
 
+    async def get_bookings_details_by_booking_id(
+        self,
+        identifier: str,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/bookings/{0}/details".format(identifier),
+            query_parameters=_make_pagination(limit, cursor),
+        )
+
+    async def get_booking_details_by_id(self, identifier: str) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/bookings/details/{0}".format(identifier),
+        )
+
     # todo: Delete.
     async def _get_deprecated_order(
         self,
