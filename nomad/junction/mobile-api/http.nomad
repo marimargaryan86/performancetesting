@@ -26,7 +26,7 @@ variable "traefik_entrypoints" {
   type = string
 }
 
-variable "mobile_api_URL" {
+variable "traefik_host_URL" {
   type = string
 }
 
@@ -64,7 +64,7 @@ job "mobile-api-http" {
         "http",
         "traefik.enable=true",
         "traefik.http.routers.mobile-api.entrypoints=${var.traefik_entrypoints}",
-        "traefik.http.routers.mobile-api.rule=Host(`${var.mobile_api_URL}`)",
+        "traefik.http.routers.mobile-api.rule=Host(`${var.traefik_host_URL}`)",
       ]
 
       check {

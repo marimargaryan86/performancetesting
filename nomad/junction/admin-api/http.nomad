@@ -26,7 +26,7 @@ variable "traefik_entrypoints" {
   type = string
 }
 
-variable "admin_api_URL" {
+variable "traefik_host_URL" {
   type = string
 }
 
@@ -58,7 +58,7 @@ job "admin-api-http" {
         "http",
         "traefik.enable=true",
         "traefik.http.routers.admin-api.entrypoints=${var.traefik_entrypoints}",
-        "traefik.http.routers.admin-api.rule=Host(`${var.admin_api_URL}`)",
+        "traefik.http.routers.admin-api.rule=Host(`${var.traefik_host_URL}`)",
       ]
 
       check {

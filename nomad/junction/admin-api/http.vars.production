@@ -1,2 +1,2 @@
-admin_api_URL = "api.admin.junction.travel"
+traefik_host_URL = "api.admin.junction.travel"
 traefik_entrypoints="web"

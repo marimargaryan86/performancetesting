@@ -26,7 +26,7 @@ variable "traefik_entrypoints" {
   type = string
 }
 
-variable "pay_web_URL" {
+variable "traefik_host_URL" {
   type = string
 }
 
@@ -56,7 +56,7 @@ job "pay-web" {
       tags = [
         "traefik.enable=true",
         "traefik.http.routers.pay-web.entrypoints=${var.traefik_entrypoints}",
-        "traefik.http.routers.pay-web.rule=Host(`${pay_web_URL}`)",
+        "traefik.http.routers.pay-web.rule=Host(`${var.traefik_host_URL}`)",
       ]
 
       check {

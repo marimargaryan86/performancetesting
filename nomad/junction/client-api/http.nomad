@@ -26,7 +26,7 @@ variable "traefik_entrypoints" {
   type = string
 }
 
-variable "client_api_URL" {
+variable "traaefik_host_URL" {
   type = string
 }
 
@@ -58,7 +58,7 @@ job "client-api-http" {
         "http",
         "traefik.enable=true",
         "traefik.http.routers.client-api.entrypoints=${var.traefik_entrypoints}",
-        "traefik.http.routers.client-api.rule=Host(`${var.client_api_URL}`)",
+        "traefik.http.routers.client-api.rule=Host(`${var.traaefik_host_URL}`)",
       ]
 
       check {

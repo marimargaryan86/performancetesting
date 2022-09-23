@@ -1,2 +1,2 @@
-pay_web_URL ="pay.junction.dev"
+traefik_host_URL="pay.junction.dev"
 traefik_entrypoints="websecure"
