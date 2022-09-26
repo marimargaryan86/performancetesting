@@ -1,16 +1,24 @@
 import dataclasses
 from collections.abc import Sequence
-from typing import Any, Optional
+from typing import Any, Optional, TypeVar, cast
 
 from snowfall.stdlib.persistence import cursor as std_cursor
 
 _DEFAULT_PAGE_LIMIT = 20
+_NotList = TypeVar("_NotList")
 
 
 @dataclasses.dataclass(frozen=True)
 class Page(object):
     sequence: Sequence[Any]
     cursor: str
+
+
+def ensure(maybe_list: Sequence[_NotList] | _NotList) -> Sequence[_NotList]:
+    if not isinstance(maybe_list, Sequence) or isinstance(maybe_list, (str, bytes)):
+        return [cast(_NotList, maybe_list)]
+
+    return maybe_list
 
 
 def paginate(

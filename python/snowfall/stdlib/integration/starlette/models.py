@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any, Mapping, Optional, Sequence, Union
+from typing import Any, ClassVar, Mapping, Optional, Sequence
 
 import pydantic
 import rapidjson
@@ -9,7 +9,6 @@ from starlette import background as starlette_background
 from starlette import responses
 
 AnyMapping = Mapping[str, Any]
-Relationship = Union[AnyMapping, Sequence[AnyMapping]]
 
 
 class BaseModel(pydantic.BaseModel):
@@ -22,18 +21,21 @@ class BaseModel(pydantic.BaseModel):
 
 
 class ResourceIdentifier(BaseModel):
+    api_type: ClassVar[str]
     identifier: str = pydantic.Field(alias="id")
     data_type: str = pydantic.Field(alias="type")
 
 
 class Resource(ResourceIdentifier):
     attributes: Optional[AnyMapping] = None
-    relationships: Optional[Relationship] = None
+    relationships: Optional[AnyMapping] = None
     links: Optional[AnyMapping] = None
     meta: Optional[AnyMapping] = None
 
 
-ResourceType = Union[ResourceIdentifier, Sequence[ResourceIdentifier]]
+ResourceType = (
+    Resource | ResourceIdentifier | Sequence[Resource] | Sequence[ResourceIdentifier]
+)
 
 
 class ErrorSource(BaseModel, frozen=True):
@@ -53,6 +55,7 @@ class Body(BaseModel):
     errors: Optional[Sequence[Error]] = None
     meta: Optional[AnyMapping] = None
     links: Optional[AnyMapping] = None
+    included: Optional[Sequence[Resource]] = None
 
 
 class JsonApiResponse(responses.JSONResponse):
