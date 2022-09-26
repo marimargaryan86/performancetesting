@@ -1,5 +1,4 @@
 import abc
-import copy
 import datetime
 import functools
 from typing import (  # noqa: WPS235
@@ -188,8 +187,8 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
         cur: Optional[str] = None,
     ) -> resultset.ResultSet[Record]:
         aggregate = []
-        filter_pre_cursor = copy.deepcopy(filter_ or {})
-        cursor_filter = copy.deepcopy(dict(filter_pre_cursor))
+        filter_pre_cursor = dict(filter_ or {})
+        cursor_filter = filter_pre_cursor.copy()
 
         if cur:
             cursor_filter = self._with_cursor_filters(cur, cursor_filter)
@@ -239,8 +238,8 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
         cur: str,
         filter_: Optional[Mapping[str, Any]] = None,
     ) -> resultset.ResultSet[Record]:
-        filter_pre_cursor = copy.deepcopy(filter_ or {})
-        cursor_filter = copy.deepcopy(dict(filter_pre_cursor))
+        filter_pre_cursor = dict(filter_ or {})
+        cursor_filter = filter_pre_cursor.copy()
 
         if cur:
             cursor_filter = self._with_cursor_filters(cur, cursor_filter)
@@ -256,7 +255,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
         cur: str,
         filter_: Mapping[str, Any],
     ) -> dict[str, Any]:
-        cursor_filter = copy.deepcopy(dict(filter_))
+        cursor_filter = dict(filter_).copy()
         cursor_obj = cursor.unmarshal(cur, filter_)
 
         if cursor_obj.id == "":
