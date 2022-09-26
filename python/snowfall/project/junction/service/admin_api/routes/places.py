@@ -10,6 +10,7 @@ from snowfall.project.junction.service.admin_api.validators import (
 )
 from snowfall.project.junction.service.places.v1alpha import models_pb2
 from snowfall.stdlib.integration.starlette import (
+    messages,
     models,
     pagination_helpers,
     request_helpers,
@@ -57,10 +58,11 @@ class Place(endpoints.HTTPEndpoint):
         except places.NotFoundError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=resources.PlaceResource.from_proto(place, request),
             ),
+            request=request,
         )
 
     async def delete(
@@ -73,14 +75,15 @@ class Place(endpoints.HTTPEndpoint):
         except places.NotFoundError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=None,
             ),
+            request=request,
             status_code=status.HTTP_204_NO_CONTENT,
         )
 
-    async def patch(
+    async def patch(  # noqa: WPS217
         self,
         request: requests.Request,
         locations_client: locations.Client = lagom.injectable,
@@ -98,8 +101,9 @@ class Place(endpoints.HTTPEndpoint):
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
         if validation_result.errors:
-            return models.JsonApiResponse(
+            return await messages.create_response(
                 body=models.Body(errors=list(validation_result.errors)),
+                request=request,
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
 
@@ -111,10 +115,11 @@ class Place(endpoints.HTTPEndpoint):
             ),
         )
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=resources.PlaceResource.from_proto(place, request),
             ),
+            request=request,
         )
 
 
@@ -127,8 +132,8 @@ class Places(endpoints.HTTPEndpoint):
         pagination = pagination_helpers.get_pagination(request)
         response = await client.find(limit=pagination.limit, cursor=pagination.cursor)
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=[
                     resources.PlaceResource.from_proto(place, request)
                     for place in response.places
@@ -139,6 +144,7 @@ class Places(endpoints.HTTPEndpoint):
                     pagination,
                 ),
             ),
+            request=request,
         )
 
     async def post(
@@ -154,8 +160,9 @@ class Places(endpoints.HTTPEndpoint):
         )
 
         if validation_result.errors:
-            return models.JsonApiResponse(
+            return await messages.create_response(
                 body=models.Body(errors=list(validation_result.errors)),
+                request=request,
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
 
@@ -173,10 +180,11 @@ class Places(endpoints.HTTPEndpoint):
             ),
         )
 
-        return models.JsonApiResponse(
+        return await messages.create_response(
             body=models.Body(
                 data=resources.PlaceResource.from_proto(place, request),
             ),
+            request=request,
             headers={
                 "Location": request.url_for(
                     "Place",

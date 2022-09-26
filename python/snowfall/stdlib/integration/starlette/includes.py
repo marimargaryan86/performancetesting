@@ -10,7 +10,7 @@ from snowfall.stdlib.integration.starlette import models
 
 ResolverFunc = Callable[
     [Sequence[str], requests.Request],
-    Awaitable[list[models.Resource]],
+    Awaitable[Sequence[models.Resource]],
 ]
 
 

@@ -155,6 +155,11 @@
       }
     },
     "/places": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/PlaceInclude"
+        }
+      ],
       "get": {
         "summary": "List Places",
         "tags": [
@@ -203,6 +208,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/PlaceId"
+        },
+        {
+          "$ref": "#/components/parameters/PlaceInclude"
         }
       ],
       "get": {
@@ -1011,6 +1019,24 @@
       }
     },
     "parameters": {
+      "PlaceInclude": {
+          "name": "include",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["locations", "types", "locations.types"]
+            },
+            "example": [
+              "locations"
+            ]
+          },
+          "description": "Customize which related resources to return.",
+          "style": "form",
+          "explode": false
+      },
       "LocationId": {
         "name": "locationId",
         "in": "path",
