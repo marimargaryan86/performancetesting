@@ -4,7 +4,6 @@ import datetime
 from typing import Any, ClassVar, Mapping, Optional, Sequence
 
 import pydantic
-import rapidjson
 from starlette import background as starlette_background
 from starlette import responses
 
@@ -58,7 +57,7 @@ class Body(BaseModel):
     included: Optional[Sequence[Resource]] = None
 
 
-class JsonApiResponse(responses.JSONResponse):
+class JsonApiResponse(responses.Response):
     media_type = "application/vnd.api+json"
 
     def __init__(
@@ -69,8 +68,18 @@ class JsonApiResponse(responses.JSONResponse):
         background: Optional[starlette_background.BackgroundTask] = None,
     ) -> None:
         super().__init__(
-            content=rapidjson.loads(body.json(exclude_unset=True, by_alias=True)),
+            content=body,
             status_code=int(status_code),
             headers=dict(headers or {}),
             background=background,
         )
+
+    def render(self, body: Body) -> bytes:
+        return body.json(
+            exclude_unset=True,
+            by_alias=True,
+            ensure_ascii=False,
+            allow_nan=False,
+            indent=None,
+            separators=(",", ":"),
+        ).encode("utf-8")

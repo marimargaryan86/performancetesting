@@ -142,7 +142,7 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
         self,
         request: requests.Request,
         exc: InvalidSchemaValue,
-    ) -> responses.JSONResponse:
+    ) -> responses.Response:
         with stdout.context_binding(
             errors=[
                 error.dict()
@@ -161,7 +161,7 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
         self,
         request: requests.Request,
         err: OpenAPIError,
-    ) -> responses.JSONResponse:
+    ) -> responses.Response:
         if isinstance(err, PathNotFound):
             return await handlers.server_error_handler(
                 request,

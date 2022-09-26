@@ -10,7 +10,7 @@ from snowfall.stdlib.integration.starlette import models, validation
 def error_response_from_status(
     status_code: int,
     description: Optional[str] = None,
-) -> responses.JSONResponse:
+) -> responses.Response:
     status_code_obj = http.HTTPStatus(status_code)
 
     if not description:
@@ -33,14 +33,14 @@ def error_response_from_status(
 def auth_error_handler(
     request: requests.Request,
     exc: Exception,
-) -> responses.JSONResponse:
+) -> responses.Response:
     return error_response_from_status(status.HTTP_401_UNAUTHORIZED)
 
 
 async def client_error_handler(
     request: requests.Request,
     exc: Exception,
-) -> responses.JSONResponse:
+) -> responses.Response:
     status_code = status.BAD_REQUEST
 
     if isinstance(exc, exceptions.HTTPException) and exc.status_code:
@@ -52,7 +52,7 @@ async def client_error_handler(
 async def server_error_handler(
     request: requests.Request,
     exc: Exception,
-) -> responses.JSONResponse:
+) -> responses.Response:
     status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
     if isinstance(exc, exceptions.HTTPException) and exc.status_code:
@@ -64,7 +64,7 @@ async def server_error_handler(
 async def validation_error_handler(
     request: requests.Request,
     exc: InvalidSchemaValue,
-) -> responses.JSONResponse:
+) -> responses.Response:
     return models.JsonApiResponse(
         models.Body(
             errors=validation.invalid_schema_value_to_errors(
