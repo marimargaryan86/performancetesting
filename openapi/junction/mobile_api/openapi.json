@@ -752,6 +752,44 @@
         "summary": "Create Verification Code"
       }
     },
+    "/verification-code/{userEmail}": {
+      "parameters": [
+        {
+          "name": "userEmail",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "example": "User Email"
+          },
+          "description": "Target user email you want to verify the otp"
+        }
+      ],
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "operationId": "get-verification-code-id",
+        "description": "Get status for otp if exist for given user email",
+        "security": [
+          {
+            "otp": []
+          }
+        ],
+        "summary": "Get Verification Code Status"
+      }
+    },
     "/users": {
       "post": {
         "tags": [

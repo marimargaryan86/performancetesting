@@ -40,6 +40,7 @@ class Users(endpoints.HTTPEndpoint):
         authorized = await otp_repository.check(
             body[_email_key],
             verification_code,
+            delete_after=True,
         )
         if not authorized:
             raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
@@ -111,6 +112,7 @@ class User(endpoints.HTTPEndpoint):
         authorized = await otp_repository.check(
             user_mail,
             verification_code,
+            delete_after=True,
         )
 
         if not authorized:
@@ -253,6 +255,21 @@ class OTPGenerate(endpoints.HTTPEndpoint):
             "Your otp code is: {}".format(otp),
         )
         return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+class OTPVerify(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        otp_repository: repository.OtpRepository = lagom.injectable,
+    ) -> responses.Response:
+        user_email = request.path_params["userEmail"]
+        verification_code = request.user.username
+
+        verified = await otp_repository.check(user_email, verification_code)
+        if verified:
+            return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
+        raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
 
 
 async def otp_generation() -> str:

@@ -132,10 +132,16 @@ class OtpRepository(object):
             datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
         )
 
-    async def check(self, email: str, verification_code: str) -> bool:
+    async def check(
+        self,
+        email: str,
+        verification_code: str,
+        delete_after: bool = False,
+    ) -> bool:
         otp = await self._redis.get(email)
         if otp == verification_code:
-            await self._redis.delete(email)
+            if delete_after:
+                await self._redis.delete(email)
             return True
         return False
 

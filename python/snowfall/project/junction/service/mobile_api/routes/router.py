@@ -28,6 +28,7 @@ def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Rou
             offers.OffersByOfferSearch,
         ),
         dependencies.route("/verification-code", users.OTPGenerate),
+        dependencies.route("/verification-code/{userEmail}", users.OTPVerify),
         dependencies.route("/users/sessions", users.Session),
         dependencies.route("/users", users.Users),
         dependencies.route("/users/me", users.UserLoggedIn),
