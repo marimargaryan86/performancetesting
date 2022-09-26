@@ -221,7 +221,7 @@ ResultParser:
 			stopIds = make(map[string]struct{})
 
 			err = zipWriter.Agency().Write(gtfs.Agency{
-				Name:     "Snowfall",
+				Name:     v.AirlineDesignator,
 				Url:      "https://snowfalltravel.com/",
 				Timezone: time.UTC,
 			})
