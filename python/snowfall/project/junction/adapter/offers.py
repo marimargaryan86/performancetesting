@@ -201,7 +201,7 @@ class DictClient(Client):  # noqa: WPS214
             limit=limit,
         )
 
-        return common.ItemsPage[models_pb2.OfferGroup](
+        return common.ItemsPage(
             protos=page.sequence,
             next_page_token=page.cursor,
         )
@@ -228,7 +228,7 @@ class DictClient(Client):  # noqa: WPS214
             limit=limit,
         )
 
-        return common.ItemsPage[models_pb2.OfferSegment](
+        return common.ItemsPage(
             protos=page.sequence,
             next_page_token=page.cursor,
         )
@@ -252,7 +252,7 @@ class DictClient(Client):  # noqa: WPS214
             limit=limit,
         )
 
-        return common.ItemsPage[models_pb2.Offer](
+        return common.ItemsPage(
             protos=page.sequence,
             next_page_token=page.cursor,
         )
@@ -284,7 +284,7 @@ class DictClient(Client):  # noqa: WPS214
             limit=limit,
         )
 
-        return common.ItemsPage[models_pb2.OfferSegmentDetails](
+        return common.ItemsPage(
             protos=page.sequence,
             next_page_token=page.cursor,
         )
@@ -418,7 +418,7 @@ class GrpcClient(Client):  # noqa: WPS214
         except grpc.aio.AioRpcError as exc:
             raise UnknownError() from exc
 
-        return common.ItemsPage[models_pb2.OfferGroup](
+        return common.ItemsPage(
             protos=list(response.groups),
             next_page_token=response.next_page_token,
         )
@@ -465,7 +465,7 @@ class GrpcClient(Client):  # noqa: WPS214
         except grpc.aio.AioRpcError as exc:
             raise UnknownError() from exc
 
-        return common.ItemsPage[models_pb2.OfferSegment](
+        return common.ItemsPage(
             protos=list(response.details),
             next_page_token=response.next_page_token,
         )
@@ -507,7 +507,7 @@ class GrpcClient(Client):  # noqa: WPS214
         except grpc.aio.AioRpcError as exc:
             raise UnknownError() from exc
 
-        return common.ItemsPage[models_pb2.Offer](
+        return common.ItemsPage(
             protos=list(response.options),
             next_page_token=response.next_page_token,
         )
@@ -555,7 +555,7 @@ class GrpcClient(Client):  # noqa: WPS214
         except grpc.aio.AioRpcError as exc:
             raise UnknownError() from exc
 
-        return common.ItemsPage[models_pb2.OfferSegmentDetails](
+        return common.ItemsPage(
             protos=list(response.details),
             next_page_token=response.next_page_token,
         )
