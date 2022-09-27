@@ -83,7 +83,6 @@ def list_in_bin_op_in_sequence(input: Sequence[list[str] | str]) -> list:
 )
 def test_typing(code: str, expected: int) -> None:
     visitor = typing.Visitor()
-
     tree = ast.parse(textwrap.dedent(code))
 
     visitor.visit(tree)

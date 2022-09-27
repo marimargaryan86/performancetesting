@@ -25,7 +25,7 @@ backend_packages = [
 enabled = false
 
 [autoflake]
-version = "autoflake==1.4"
+version = "autoflake==1.6.1"
 lockfile = "vendor/lock/autoflake.txt"
 args = ["--remove-all-unused-imports", "--remove-unused-variables"]
 
@@ -40,7 +40,7 @@ extra_requirements = [
 ]
 
 [black]
-version = "black==22.6.0"
+version = "black==22.8.0"
 config = "vendor/pyproject.toml"
 lockfile = "vendor/lock/black.txt"
 interpreter_constraints = ["CPython==3.10.5"]
@@ -91,14 +91,14 @@ lockfile = "vendor/lock/isort.txt"
 interpreter_constraints = ["CPython==3.10.5"]
 
 [mypy]
-version = "mypy==0.971"
+version = "mypy==0.981"
 config = "vendor/setup.cfg"
 lockfile = "vendor/lock/mypy.txt"
 interpreter_constraints = ["CPython==3.10.5"]
 extra_requirements = ["pydantic"]
 
 [mypy-protobuf]
-version = "mypy-protobuf==3.2.0"
+version = "mypy-protobuf==3.3.0"
 lockfile = "vendor/lock/mypy-protobuf.txt"
 
 [poetry]
@@ -115,7 +115,7 @@ known_versions = [
 ]
 
 [pytest]
-version = "pytest==7.1.2"
+version = "pytest==7.1.3"
 lockfile = "vendor/lock/pytest.txt"
 args = [
     "--import-mode=importlib",

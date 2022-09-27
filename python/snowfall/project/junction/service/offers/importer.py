@@ -23,5 +23,4 @@ class OfferImporter(object):
         offer = cast(models_pb2.OfferGroup, message.body)
 
         await self._offers.insert(offer)
-
         await self._aggregator.aggregate(offer)

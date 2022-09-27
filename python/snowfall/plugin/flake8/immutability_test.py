@@ -46,7 +46,6 @@ class Frozen:
 )
 def test_immutability(code: str, expected: int) -> None:
     visitor = immutability.Visitor()
-
     tree = ast.parse(textwrap.dedent(code))
 
     visitor.visit(tree)

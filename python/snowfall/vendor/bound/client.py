@@ -128,7 +128,6 @@ class Bound(object):
 
     def _get_jwt_from_cookie(self, cookie: str) -> dict[str, Any]:
         jwt_part = cookie.split(";")[0]
-
         token = jwt_part.split("=")
 
         return {token[0]: token[1]}
