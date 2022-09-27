@@ -18,6 +18,27 @@ class SegmentRepository(repository.ProtoRepository[models_pb2.SegmentReference])
         pymongo.IndexModel("segments._id", background=True),
     ]
 
+    async def find(
+        self,
+        ids: Sequence[str],
+        cursor: str,
+    ) -> resultset.ResultSet[models_pb2.SegmentReference]:
+        filter_ = (
+            {
+                "segments._id": {
+                    "$in": ids,
+                },
+            }
+            if ids
+            else {}
+        )
+
+        return await self._find_nested(
+            path="$segments",
+            filter_=filter_,
+            cur=cursor,
+        )
+
     async def find_by_id(
         self,
         document_id: str,

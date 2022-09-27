@@ -15,6 +15,7 @@ service TripService {
   rpc GetTrip(GetTripRequest) returns (GetTripResponse) {}
   rpc ListTrips(ListTripsRequest) returns (ListTripsResponse) {}
   rpc GetSegment(GetSegmentRequest) returns (GetSegmentResponse) {}
+  rpc ListSegments(ListSegmentsRequest) returns (ListSegmentsResponse) {}
 }
 
 message GetSegmentRequest {
@@ -47,6 +48,17 @@ message GetTripSearchDetailsRequest {
 
 message GetTripSearchDetailsResponse {
   TripSearch trip_search = 1;
+}
+
+message ListSegmentsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  repeated string ids = 3;
+}
+
+message ListSegmentsResponse {
+  repeated snowfall.stdlib.v1alpha.SegmentReference segments = 1;
+  string next_page_token = 2;
 }
 
 message ListTripsRequest {

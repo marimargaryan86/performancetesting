@@ -1020,22 +1020,22 @@
     },
     "parameters": {
       "PlaceInclude": {
-          "name": "include",
-          "in": "query",
-          "required": false,
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": ["locations", "types", "locations.types"]
-            },
-            "example": [
-              "locations"
-            ]
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["locations", "types", "locations.types"]
           },
-          "description": "Customize which related resources to return.",
-          "style": "form",
-          "explode": false
+          "example": [
+            "locations"
+          ]
+        },
+        "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
       },
       "LocationId": {
         "name": "locationId",

@@ -70,6 +70,25 @@ class TripService(service.Service, trips_pb2_grpc.TripServiceServicer):
 
         return trips_pb2.GetSegmentResponse(segment=segment)
 
+    async def ListSegments(  # type: ignore[override] # noqa: N802
+        self,
+        request: trips_pb2.ListSegmentsRequest,
+        context: aio.ServicerContext,
+    ) -> trips_pb2.ListSegmentsResponse:
+        segments_result = await self._segments.find(
+            ids=list(request.ids),
+            cursor=request.page_token,
+        )
+
+        segments_result.limit(
+            request.page_size if request.page_size else self._default_page_size,
+        )
+
+        return trips_pb2.ListSegmentsResponse(
+            segments=[segment async for segment in segments_result],
+            next_page_token=await segments_result.cursor(),
+        )
+
 
 class TripSearchService(service.Service, trips_pb2_grpc.TripSearchServiceServicer):
     def __init__(

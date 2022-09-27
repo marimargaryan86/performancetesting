@@ -3,7 +3,7 @@ from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.junction.adapter import segments
 from snowfall.project.junction.service.client_api import resources
-from snowfall.stdlib.integration.starlette import models
+from snowfall.stdlib.integration.starlette import messages, models
 
 
 class Segment(endpoints.HTTPEndpoint):
@@ -17,8 +17,9 @@ class Segment(endpoints.HTTPEndpoint):
         except segments.NotFoundError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=resources.SegmentResource.from_proto(segment, request),
             ),
+            request=request,
         )

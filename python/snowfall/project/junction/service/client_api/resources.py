@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import zoneinfo
-from typing import Any, Optional, Sequence
+from typing import Any, ClassVar, Optional, Sequence
 
 import pydantic
 from starlette import requests
@@ -653,6 +653,8 @@ class PassengerTitleResource(models.Resource):
 
 
 class SegmentResource(models.Resource):
+    api_type: ClassVar[str] = "segments"
+
     @classmethod
     def from_proto(
         cls,
@@ -661,14 +663,14 @@ class SegmentResource(models.Resource):
     ) -> SegmentResource:
         return cls(
             id=segment.id,
-            type="segments",
+            type=SegmentResource.api_type,
             attributes={},
             relationships={
                 "legs": {
                     _RELATIONSHIPS_FIELD: [
                         models.ResourceIdentifier(
                             id=leg_id,
-                            type="legs",
+                            type=LegResource.api_type,
                         )
                         for leg_id in segment.leg_ids
                     ],
@@ -684,6 +686,8 @@ class SegmentResource(models.Resource):
 
 
 class LegResource(models.Resource):
+    api_type: ClassVar[str] = "legs"
+
     @classmethod
     def from_proto(
         cls,
@@ -692,7 +696,7 @@ class LegResource(models.Resource):
     ) -> LegResource:
         return cls(
             id=leg.id,
-            type="legs",
+            type=LegResource.api_type,
             attributes={
                 "departureAt": protobuf.protobuf_to_datetime(
                     leg.departure_at,
@@ -711,7 +715,7 @@ class LegResource(models.Resource):
                             descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
                             enum_value=leg.type,
                         ),
-                        type="leg-types",
+                        type=LegTypeResource.api_type,
                     ),
                 },
             },
@@ -725,6 +729,8 @@ class LegResource(models.Resource):
 
 
 class LegTypeResource(models.Resource):
+    api_type: ClassVar[str] = "leg-types"
+
     @classmethod
     def from_proto(
         cls,
@@ -737,7 +743,7 @@ class LegTypeResource(models.Resource):
         )
         return cls(
             id=schedule_type_id,
-            type="leg-types",
+            type=LegTypeResource.api_type,
             attributes={
                 "name": schedule_type_id,
             },
@@ -751,6 +757,8 @@ class LegTypeResource(models.Resource):
 
 
 class TripResource(models.Resource):
+    api_type: ClassVar[str] = "trips"
+
     @classmethod
     def from_proto(
         cls,
@@ -759,14 +767,14 @@ class TripResource(models.Resource):
     ) -> TripResource:
         return cls(
             id=trip.id,
-            type="trips",
+            type=TripResource.api_type,
             attributes={},
             relationships={
                 "segments": {
                     _RELATIONSHIPS_FIELD: [
                         models.ResourceIdentifier(
                             id=segment.id,
-                            type="segments",
+                            type=SegmentResource.api_type,
                         )
                         for segment in trip.segments
                     ],

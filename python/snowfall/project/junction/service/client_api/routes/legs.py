@@ -8,7 +8,7 @@ from snowfall.project.junction.adapter import trips as trips_adapter
 from snowfall.project.junction.service.client_api import resources
 from snowfall.stdlib import sequence
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.integration.starlette import models, pagination_helpers
+from snowfall.stdlib.integration.starlette import messages, models, pagination_helpers
 from snowfall.stdlib.v1alpha import models_pb2
 
 _NOT_FOUND_STATUS = status.HTTP_404_NOT_FOUND
@@ -25,10 +25,11 @@ class Leg(endpoints.HTTPEndpoint):
         except legs_adapter.NotFoundError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=resources.LegResource.from_proto(leg, request),
             ),
+            request=request,
         )
 
 
@@ -46,13 +47,14 @@ class LegType(endpoints.HTTPEndpoint):
         except KeyError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=resources.LegTypeResource.from_proto(
                     leg_type,  # type: ignore[arg-type]
                     request,
                 ),
             ),
+            request=request,
         )
 
 
@@ -68,8 +70,8 @@ class LegTypes(endpoints.HTTPEndpoint):
             limit=pagination.limit,
         )
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=[
                     resources.LegTypeResource.from_proto(
                         leg_type,
@@ -83,6 +85,7 @@ class LegTypes(endpoints.HTTPEndpoint):
                     pagination,
                 ),
             ),
+            request=request,
         )
 
 
@@ -107,8 +110,8 @@ class LegsBySegmentId(endpoints.HTTPEndpoint):
             cursor=pagination.cursor,
         )
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=[
                     resources.LegResource.from_proto(
                         leg=leg,
@@ -125,6 +128,7 @@ class LegsBySegmentId(endpoints.HTTPEndpoint):
                     pagination,
                 ),
             ),
+            request=request,
         )
 
 
@@ -148,8 +152,8 @@ class LegsByTripId(endpoints.HTTPEndpoint):
             cursor=pagination.cursor,
         )
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=[
                     resources.LegResource.from_proto(
                         leg=leg,
@@ -166,6 +170,7 @@ class LegsByTripId(endpoints.HTTPEndpoint):
                     pagination,
                 ),
             ),
+            request=request,
         )
 
 
@@ -189,8 +194,8 @@ class LegsByTripSearchId(endpoints.HTTPEndpoint):
         except legs_adapter.NotFoundError as err:
             raise exceptions.HTTPException(_NOT_FOUND_STATUS) from err
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=[
                     resources.LegResource.from_proto(
                         leg=leg,
@@ -207,6 +212,7 @@ class LegsByTripSearchId(endpoints.HTTPEndpoint):
                     pagination,
                 ),
             ),
+            request=request,
         )
 
     async def _get_all_trips(

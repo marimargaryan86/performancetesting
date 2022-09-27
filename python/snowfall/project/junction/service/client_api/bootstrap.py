@@ -15,6 +15,7 @@ from snowfall.project.junction.adapter import (  # noqa: WPS235
     trip_searches,
     trips,
 )
+from snowfall.project.junction.service.client_api import includes
 from snowfall.project.junction.service.client_api.transformers import (
     trip_ids_to_segments,
 )
@@ -59,6 +60,11 @@ def create_dependencies(  # noqa: WPS211
     ] = trip_ids_to_segments.TripIdsToSegments(
         legs_client=legs_client,
         trips_client=trips_client,
+    )
+
+    includes.register_resolvers(
+        legs_client=legs_client,
+        segments_client=segments_client,
     )
 
     return starlette.StarletteIntegration(container)

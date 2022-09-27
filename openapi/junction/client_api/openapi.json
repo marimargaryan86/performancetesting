@@ -821,6 +821,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/legId"
+        },
+        {
+          "$ref": "#/components/parameters/legInclude"
         }
       ],
       "get": {
@@ -1012,6 +1015,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/segmentId"
+        },
+        {
+          "$ref": "#/components/parameters/segmentInclude"
         }
       ],
       "get": {
@@ -1053,6 +1059,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/segmentId"
+        },
+        {
+          "$ref": "#/components/parameters/legInclude"
         }
       ],
       "get": {
@@ -1112,6 +1121,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/tripId"
+        },
+        {
+          "$ref": "#/components/parameters/tripInclude"
         }
       ],
       "get": {
@@ -1153,6 +1165,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/tripId"
+        },
+        {
+          "$ref": "#/components/parameters/legInclude"
         }
       ],
       "get": {
@@ -1212,6 +1227,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/tripId"
+        },
+        {
+          "$ref": "#/components/parameters/segmentInclude"
         }
       ],
       "get": {
@@ -1430,6 +1448,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/tripSearchId"
+        },
+        {
+          "$ref": "#/components/parameters/legInclude"
         }
       ],
       "get": {
@@ -1491,6 +1512,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/tripSearchId"
+        },
+        {
+          "$ref": "#/components/parameters/segmentInclude"
         }
       ],
       "get": {
@@ -1552,6 +1576,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/tripSearchId"
+        },
+        {
+          "$ref": "#/components/parameters/tripInclude"
         }
       ],
       "get": {
@@ -5582,6 +5609,24 @@
         },
         "description": "Trip identifier"
       },
+      "tripInclude": {
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["segments", "segments.legs", "segments.legs.legType"]
+          },
+          "example": [
+            "segments"
+          ]
+        },
+        "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
+      },
       "offerSearchId": {
         "name": "offerSearchId",
         "in": "path",
@@ -5639,6 +5684,24 @@
         },
         "description": "Segment identifier"
       },
+      "segmentInclude": {
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["legs", "legs.legType"]
+          },
+          "example": [
+            "legs"
+          ]
+        },
+        "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
+      },
       "legId": {
         "name": "legId",
         "in": "path",
@@ -5649,6 +5712,24 @@
           "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
         },
         "description": "Leg identifier"
+      },
+      "legInclude": {
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["legType"]
+          },
+          "example": [
+            "legType"
+          ]
+        },
+        "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
       },
       "legTypeId": {
         "name": "legTypeId",

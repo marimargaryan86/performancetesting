@@ -9,6 +9,7 @@ from snowfall.project.junction.adapter import locations, trip_searches, trips
 from snowfall.project.junction.service.client_api import resources
 from snowfall.stdlib import sequence
 from snowfall.stdlib.integration.starlette import (
+    messages,
     models,
     pagination_helpers,
     request_helpers,
@@ -27,13 +28,14 @@ class Trip(endpoints.HTTPEndpoint):
         except trips.NotFoundError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=resources.TripResource.from_proto(
                     trip=trip,
                     request=request,
                 ),
             ),
+            request=request,
         )
 
 
@@ -55,8 +57,8 @@ class TripSegments(endpoints.HTTPEndpoint):
             limit=pagination.limit,
         )
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=[
                     resources.SegmentResource.from_proto(
                         segment=segment,
@@ -73,6 +75,7 @@ class TripSegments(endpoints.HTTPEndpoint):
                     pagination,
                 ),
             ),
+            request=request,
         )
 
 
@@ -87,13 +90,14 @@ class TripSearch(endpoints.HTTPEndpoint):
         except trip_searches.NotFoundError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=resources.TripSearchResource.from_proto(
                     trip_search,
                     request,
                 ),
             ),
+            request=request,
         )
 
 
@@ -127,8 +131,8 @@ class TripSearches(endpoints.HTTPEndpoint):
         else:
             departure_after = datetime.datetime.now(datetime.timezone.utc)
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=resources.TripSearchResource.from_proto(
                     await trip_searches_client.create(
                         trip_searches.TripSearchRequest(
@@ -156,7 +160,8 @@ class TripSearches(endpoints.HTTPEndpoint):
                     request,
                 ),
             ),
-            status.HTTP_201_CREATED,
+            request=request,
+            status_code=status.HTTP_201_CREATED,
         )
 
 
@@ -177,8 +182,8 @@ class TripsByTripSearch(endpoints.HTTPEndpoint):
         except trip_searches.NotFoundError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=[
                     resources.TripResource.from_proto(
                         trip=trip,
@@ -195,4 +200,5 @@ class TripsByTripSearch(endpoints.HTTPEndpoint):
                     pagination,
                 ),
             ),
+            request=request,
         )
