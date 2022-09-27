@@ -90,7 +90,7 @@ class GrpcClient(Client):
 
         return common.ItemsPage(
             protos=response.segments,
-            next_page_token=response.cursor,
+            next_page_token=response.next_page_token,
         )
 
     async def get(self, segment_id: str) -> models_pb2.SegmentReference:
