@@ -64,6 +64,7 @@ def create_dependencies(  # noqa: WPS211
 
     includes.register_resolvers(
         legs_client=legs_client,
+        offers_client=offers_client,
         segments_client=segments_client,
     )
 

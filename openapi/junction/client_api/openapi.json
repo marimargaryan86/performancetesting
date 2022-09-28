@@ -1715,12 +1715,19 @@
           }
         }
       },
-      "parameters": []
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/offerSearchInclude"
+        }
+      ]
     },
     "/offers/searches/{offerSearchId}": {
       "parameters": [
         {
           "$ref": "#/components/parameters/offerSearchId"
+        },
+        {
+          "$ref": "#/components/parameters/offerSearchInclude"
         }
       ],
       "get": {
@@ -1772,6 +1779,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/offerSearchId"
+        },
+        {
+          "$ref": "#/components/parameters/offerInclude"
         }
       ],
       "get": {
@@ -1898,6 +1908,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/offerId"
+        },
+        {
+          "$ref": "#/components/parameters/offerInclude"
         }
       ],
       "get": {
@@ -1939,6 +1952,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/offerId"
+        },
+        {
+          "$ref": "#/components/parameters/offerGroupInclude"
         }
       ],
       "get": {
@@ -2000,6 +2016,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/offerGroupId"
+        },
+        {
+          "$ref": "#/components/parameters/offerGroupInclude"
         }
       ],
       "get": {
@@ -2041,6 +2060,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/offerGroupId"
+        },
+        {
+          "$ref": "#/components/parameters/offerGroupDetailsInclude"
         }
       ],
       "get": {
@@ -2104,6 +2126,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/offerGroupId"
+        },
+        {
+          "$ref": "#/components/parameters/offerOptionInclude"
         }
       ],
       "get": {
@@ -2165,6 +2190,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/offerGroupDetailsId"
+        },
+        {
+          "$ref": "#/components/parameters/offerGroupDetailsInclude"
         }
       ],
       "get": {
@@ -2210,6 +2238,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/offerOptionId"
+        },
+        {
+          "$ref": "#/components/parameters/offerOptionInclude"
         }
       ],
       "get": {
@@ -2251,6 +2282,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/offerOptionId"
+        },
+        {
+          "$ref": "#/components/parameters/offerOptionDetailsInclude"
         }
       ],
       "get": {
@@ -2314,6 +2348,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/offerOptionDetailsId"
+        },
+        {
+          "$ref": "#/components/parameters/offerOptionDetailsInclude"
         }
       ],
       "get": {
@@ -5638,6 +5675,33 @@
         },
         "description": "Offer Search identifier"
       },
+      "offerSearchInclude": {
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "offers",
+              "offers.groups",
+              "offers.groups.details",
+              "offers.groups.details.legType",
+              "offers.groups.options",
+              "offers.groups.options.details",
+              "offers.groups.options.details.cabinClass",
+              "offers.groups.options.details.details"
+            ]
+          },
+          "example": [
+            "offers"
+          ]
+        },
+        "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
+      },
       "orderId": {
         "name": "orderId",
         "in": "path",
@@ -5752,6 +5816,32 @@
         },
         "description": "Offer identifier"
       },
+      "offerInclude": {
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "groups",
+              "groups.details",
+              "groups.details.legType",
+              "groups.options",
+              "groups.options.details",
+              "groups.options.details.cabinClass",
+              "groups.options.details.details"
+            ]
+          },
+          "example": [
+            "groups"
+          ]
+        },
+        "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
+      },
       "cabinClassId": {
         "name": "cabinClassId",
         "in": "path",
@@ -5773,6 +5863,26 @@
         },
         "description": "Offer Group Details Identifier"
       },
+      "offerGroupDetailsInclude": {
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "legType"
+            ]
+          },
+          "example": [
+            "legType"
+          ]
+        },
+        "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
+      },
       "offerOptionId": {
         "name": "offerOptionId",
         "in": "path",
@@ -5783,6 +5893,28 @@
           "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
         },
         "description": "Offer Option Identifier"
+      },
+      "offerOptionInclude": {
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "details",
+              "details.cabinClass",
+              "details.details"
+            ]
+          },
+          "example": [
+            "details"
+          ]
+        },
+        "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
       },
       "offerOptionDetailsId": {
         "name": "offerOptionDetailsId",
@@ -5795,6 +5927,27 @@
         },
         "description": "Offer Option Details Identifier"
       },
+      "offerOptionDetailsInclude": {
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "cabinClass",
+              "details"
+            ]
+          },
+          "example": [
+            "details"
+          ]
+        },
+        "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
+      },
       "offerGroupId": {
         "name": "offerGroupId",
         "in": "path",
@@ -5805,6 +5958,31 @@
           "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
         },
         "description": "Offer Group Identifier"
+      },
+      "offerGroupInclude": {
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "details",
+              "details.legType",
+              "options",
+              "options.details",
+              "options.details.cabinClass",
+              "options.details.details"
+            ]
+          },
+          "example": [
+            "details"
+          ]
+        },
+        "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
       },
       "filterOffersCabinClass": {
         "name": "filter[groups.options.details.cabinClass]",

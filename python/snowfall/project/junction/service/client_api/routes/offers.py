@@ -14,6 +14,7 @@ from snowfall.stdlib import sequence
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import (
     handlers,
+    messages,
     models,
     pagination_helpers,
     request_helpers,
@@ -32,13 +33,14 @@ class Offer(endpoints.HTTPEndpoint):
         except offers.NotFoundError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=resources.OfferResource.from_proto(
                     offer=offer,
                     request=request,
                 ),
             ),
+            request=request,
         )
 
 
@@ -55,13 +57,14 @@ class OfferGroup(endpoints.HTTPEndpoint):
         except offers.NotFoundError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=resources.OfferGroupResource.from_proto(
                     group=offer_group,
                     request=request,
                 ),
             ),
+            request=request,
         )
 
 
@@ -85,8 +88,8 @@ class OfferGroupsByOffer(endpoints.HTTPEndpoint):
             limit=pagination.limit,
         )
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=[
                     resources.OfferGroupResource.from_proto(
                         group=group,
@@ -103,6 +106,7 @@ class OfferGroupsByOffer(endpoints.HTTPEndpoint):
                     pagination,
                 ),
             ),
+            request=request,
         )
 
 
@@ -119,13 +123,14 @@ class OfferGroupDetails(endpoints.HTTPEndpoint):
         except offers.NotFoundError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=resources.TripOfferGroupDetailsResource.from_proto(
                     segment=details,
                     request=request,
                 ),
             ),
+            request=request,
         )
 
 
@@ -149,8 +154,8 @@ class OfferGroupDetailsByOfferGroup(endpoints.HTTPEndpoint):
             limit=pagination.limit,
         )
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=[
                     resources.TripOfferGroupDetailsResource.from_proto(
                         segment=details,
@@ -167,6 +172,7 @@ class OfferGroupDetailsByOfferGroup(endpoints.HTTPEndpoint):
                     pagination,
                 ),
             ),
+            request=request,
         )
 
 
@@ -183,13 +189,14 @@ class OfferOption(endpoints.HTTPEndpoint):
         except offers.NotFoundError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=resources.OfferOptionResource.from_proto(
                     option=option,
                     request=request,
                 ),
             ),
+            request=request,
         )
 
 
@@ -213,8 +220,8 @@ class OfferOptionsByOfferGroup(endpoints.HTTPEndpoint):
             limit=pagination.limit,
         )
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=[
                     resources.OfferOptionResource.from_proto(
                         option=option,
@@ -231,6 +238,7 @@ class OfferOptionsByOfferGroup(endpoints.HTTPEndpoint):
                     pagination,
                 ),
             ),
+            request=request,
         )
 
 
@@ -247,13 +255,14 @@ class OfferOptionDetails(endpoints.HTTPEndpoint):
         except offers.NotFoundError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
-        return models.JsonApiResponse(
-            models.Body(
-                data=resources.OfferOptionDetailsResource.from_proto(
+        return await messages.create_response(
+            body=models.Body(
+                data=resources.TripOfferOptionDetailsResource.from_proto(
                     details=detail,
                     request=request,
                 ),
             ),
+            request=request,
         )
 
 
@@ -277,10 +286,10 @@ class OfferOptionDetailsByOfferOption(endpoints.HTTPEndpoint):
             limit=pagination.limit,
         )
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=[
-                    resources.OfferOptionDetailsResource.from_proto(
+                    resources.TripOfferOptionDetailsResource.from_proto(
                         details=details,
                         request=request,
                     )
@@ -295,6 +304,7 @@ class OfferOptionDetailsByOfferOption(endpoints.HTTPEndpoint):
                     pagination,
                 ),
             ),
+            request=request,
         )
 
 
@@ -328,15 +338,16 @@ class OfferSearches(endpoints.HTTPEndpoint):
             ),
         )
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=resources.TripOfferSearchResource.from_proto(
                     offer_search=offer_search,
                     offers=[],
                     request=request,
                 ),
             ),
-            status.HTTP_201_CREATED,
+            request=request,
+            status_code=status.HTTP_201_CREATED,
         )
 
 
@@ -351,14 +362,15 @@ class OfferSearch(endpoints.HTTPEndpoint):
         except offer_searches.NotFoundError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=resources.TripOfferSearchResource.from_proto(
                     offer_search=offer_search,
                     offers=[],
                     request=request,
                 ),
             ),
+            request=request,
         )
 
 
@@ -386,8 +398,8 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
             cabin_classes=cabin_classes,
         )
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=[
                     resources.OfferResource.from_proto(
                         offer=offer,
@@ -404,6 +416,7 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
                     pagination,
                 ),
             ),
+            request=request,
         )
 
 

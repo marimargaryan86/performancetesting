@@ -194,7 +194,7 @@ class Booking(endpoints.HTTPEndpoint):
 
         return models.JsonApiResponse(
             models.Body(
-                data=resources.BookingResource.from_proto(
+                data=resources.TripBookingResource.from_proto(
                     booking=booking,
                     request=request,
                 ),
@@ -219,7 +219,7 @@ class BookingsByOrder(endpoints.HTTPEndpoint):
         return models.JsonApiResponse(
             models.Body(
                 data=[
-                    resources.BookingResource.from_proto(booking, request)
+                    resources.TripBookingResource.from_proto(booking, request)
                     for booking in response.bookings
                 ],
                 links=pagination_helpers.get_next_url(

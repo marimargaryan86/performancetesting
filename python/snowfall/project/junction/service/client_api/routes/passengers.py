@@ -4,7 +4,7 @@ from snowfall.project.junction.service.client_api import resources
 from snowfall.project.junction.service.orders.v1alpha import models_pb2
 from snowfall.stdlib import sequence
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.integration.starlette import models, pagination_helpers
+from snowfall.stdlib.integration.starlette import messages, models, pagination_helpers
 
 
 class PassengerGender(endpoints.HTTPEndpoint):
@@ -21,13 +21,14 @@ class PassengerGender(endpoints.HTTPEndpoint):
         except KeyError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=resources.PassengerGenderResource.from_proto(
                     passenger_gender,  # type: ignore[arg-type]
                     request,
                 ),
             ),
+            request=request,
         )
 
 
@@ -43,8 +44,8 @@ class PassengerGenders(endpoints.HTTPEndpoint):
             limit=pagination.limit,
         )
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=[
                     resources.PassengerGenderResource.from_proto(
                         passenger_gender,
@@ -58,6 +59,7 @@ class PassengerGenders(endpoints.HTTPEndpoint):
                     pagination,
                 ),
             ),
+            request=request,
         )
 
 
@@ -75,13 +77,14 @@ class PassengerTitle(endpoints.HTTPEndpoint):
         except KeyError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=resources.PassengerTitleResource.from_proto(
                     passenger_title,  # type: ignore[arg-type]
                     request,
                 ),
             ),
+            request=request,
         )
 
 
@@ -97,8 +100,8 @@ class PassengerTitles(endpoints.HTTPEndpoint):
             limit=pagination.limit,
         )
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=[
                     resources.PassengerTitleResource.from_proto(
                         passenger_title,
@@ -112,4 +115,5 @@ class PassengerTitles(endpoints.HTTPEndpoint):
                     pagination,
                 ),
             ),
+            request=request,
         )

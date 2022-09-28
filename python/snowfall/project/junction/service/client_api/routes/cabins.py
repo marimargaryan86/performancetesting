@@ -3,7 +3,7 @@ from starlette import endpoints, exceptions, requests, responses, status
 from snowfall.project.junction.service.client_api import resources
 from snowfall.stdlib import sequence
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.integration.starlette import models, pagination_helpers
+from snowfall.stdlib.integration.starlette import messages, models, pagination_helpers
 from snowfall.stdlib.v1alpha import models_pb2
 
 
@@ -22,13 +22,14 @@ class Cabin(endpoints.HTTPEndpoint):
         except KeyError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=resources.CabinClassResource.from_proto(
                     cabin_class,  # type: ignore[arg-type]
                     request,
                 ),
             ),
+            request=request,
         )
 
 
@@ -44,8 +45,8 @@ class Cabins(endpoints.HTTPEndpoint):
             limit=pagination.limit,
         )
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=[
                     resources.CabinClassResource.from_proto(
                         cabin_class,
@@ -59,4 +60,5 @@ class Cabins(endpoints.HTTPEndpoint):
                     pagination,
                 ),
             ),
+            request=request,
         )

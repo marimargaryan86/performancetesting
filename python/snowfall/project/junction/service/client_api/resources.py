@@ -45,6 +45,8 @@ class Point(models.BaseModel):
 
 
 class OfferResource(models.Resource):
+    api_type: ClassVar[str] = "offers"
+
     @classmethod
     def from_proto(
         cls,
@@ -53,7 +55,7 @@ class OfferResource(models.Resource):
     ) -> OfferResource:
         return cls(
             id=offer.id,
-            type="offers",
+            type=OfferResource.api_type,
             attributes={
                 "expiresAt": protobuf.protobuf_to_datetime(offer.expires_at),
             },
@@ -62,7 +64,7 @@ class OfferResource(models.Resource):
                     "data": [
                         models.ResourceIdentifier(
                             id=offer_group.id,
-                            type="offer-groups",
+                            type=OfferGroupResource.api_type,
                         )
                         for offer_group in offer.groups
                     ],
@@ -78,6 +80,8 @@ class OfferResource(models.Resource):
 
 
 class OfferGroupResource(models.Resource):
+    api_type: ClassVar[str] = "offer-groups"
+
     @classmethod
     def from_proto(
         cls,
@@ -86,7 +90,7 @@ class OfferGroupResource(models.Resource):
     ) -> OfferGroupResource:
         return cls(
             id=group.id,
-            type="offer-groups",
+            type=OfferGroupResource.api_type,
             attributes={
                 "expiresAt": protobuf.protobuf_to_datetime(group.expires_at),
             },
@@ -95,7 +99,7 @@ class OfferGroupResource(models.Resource):
                     "data": [
                         models.ResourceIdentifier(
                             id=offer.id,
-                            type="offer-options",
+                            type=OfferOptionResource.api_type,
                         )
                         for offer in group.offers
                     ],
@@ -104,7 +108,7 @@ class OfferGroupResource(models.Resource):
                     "data": [
                         models.ResourceIdentifier(
                             id=detail.id,
-                            type="trip-offer-group-details",
+                            type=TripOfferGroupDetailsResource.api_type,
                         )
                         for detail in group.segments
                     ],
@@ -145,6 +149,8 @@ class RouteIdentifiers(models.BaseModel):
 
 
 class TripOfferGroupDetailsResource(models.Resource):
+    api_type: ClassVar[str] = "trip-offer-group-details"
+
     @classmethod
     def from_proto(
         cls,
@@ -153,7 +159,7 @@ class TripOfferGroupDetailsResource(models.Resource):
     ) -> TripOfferGroupDetailsResource:
         return cls(
             id=segment.id,
-            type="trip-offer-group-details",
+            type=TripOfferGroupDetailsResource.api_type,
             attributes={
                 "legs": [OfferSegmentLeg.from_proto(leg) for leg in segment.legs],
                 "vendor": segment.vendor,
@@ -170,7 +176,7 @@ class TripOfferGroupDetailsResource(models.Resource):
                             descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
                             enum_value=segment.type,
                         ),
-                        type="leg-types",
+                        type=LegTypeResource.api_type,
                     ),
                 },
             },
@@ -206,6 +212,8 @@ class Price(models.BaseModel):
 
 
 class OfferOptionResource(models.Resource):
+    api_type: ClassVar[str] = "offer-options"
+
     @classmethod
     def from_proto(
         cls,
@@ -214,7 +222,7 @@ class OfferOptionResource(models.Resource):
     ) -> OfferOptionResource:
         return cls(
             id=option.id,
-            type="offer-options",
+            type=OfferOptionResource.api_type,
             attributes={
                 "price": Price.from_proto(option.price),
             },
@@ -223,7 +231,7 @@ class OfferOptionResource(models.Resource):
                     "data": [
                         models.ResourceIdentifier(
                             id=detail.id,
-                            type="trip-offer-option-details",
+                            type=TripOfferOptionDetailsResource.api_type,
                         )
                         for detail in option.segment_details
                     ],
@@ -238,16 +246,18 @@ class OfferOptionResource(models.Resource):
         )
 
 
-class OfferOptionDetailsResource(models.Resource):
+class TripOfferOptionDetailsResource(models.Resource):
+    api_type: ClassVar[str] = "trip-offer-option-details"
+
     @classmethod
     def from_proto(
         cls,
         details: offer_models_pb2.OfferSegmentDetails,
         request: requests.Request,
-    ) -> OfferOptionDetailsResource:
+    ) -> TripOfferOptionDetailsResource:
         return cls(
             id=details.id,
-            type="trip-offer-option-details",
+            type=TripOfferOptionDetailsResource.api_type,
             attributes={
                 "cabinClassName": details.cabin_class.marketing_name,
             },
@@ -255,7 +265,7 @@ class OfferOptionDetailsResource(models.Resource):
                 "details": {
                     "data": models.ResourceIdentifier(
                         id=details.offer_segment_id,
-                        type="trip-offer-group-details",
+                        type=TripOfferGroupDetailsResource.api_type,
                     ),
                 },
                 "cabinClass": {
@@ -264,7 +274,7 @@ class OfferOptionDetailsResource(models.Resource):
                             descriptor=models_pb2.CabinClass.Type.DESCRIPTOR,
                             enum_value=details.cabin_class.type,
                         ),
-                        type="cabin-classes",
+                        type=CabinClassResource.api_type,
                     ),
                 },
             },
@@ -308,6 +318,8 @@ class OfferSegmentDetails(models.BaseModel):
 
 
 class JourneyResource(models.Resource):
+    api_type: ClassVar[str] = "journeys"
+
     @classmethod
     def from_proto(
         cls,
@@ -316,7 +328,7 @@ class JourneyResource(models.Resource):
     ) -> JourneyResource:
         return cls(
             id=journey.id,
-            type="journeys",
+            type=JourneyResource.api_type,
             attributes={
                 "reference": journey.passenger_name_record,
                 "contactDetails": {
@@ -337,7 +349,7 @@ class JourneyResource(models.Resource):
                     _RELATIONSHIPS_FIELD: [
                         models.ResourceIdentifier(
                             id=order.id,
-                            type="orders",
+                            type=OrderResource.api_type,
                         )
                         for order in journey.orders
                     ],
@@ -353,6 +365,8 @@ class JourneyResource(models.Resource):
 
 
 class OrderResource(models.Resource):
+    api_type: ClassVar[str] = "orders"
+
     @classmethod
     def from_proto(
         cls,
@@ -361,7 +375,7 @@ class OrderResource(models.Resource):
     ) -> OrderResource:
         return cls(
             id=order.id,
-            type="orders",
+            type=OrderResource.api_type,
             attributes={
                 "passengers": [
                     {
@@ -386,14 +400,14 @@ class OrderResource(models.Resource):
                 "journey": {
                     _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
                         id=order.journey_id,
-                        type="journeys",
+                        type=JourneyResource.api_type,
                     ),
                 },
                 "bookings": {
                     _RELATIONSHIPS_FIELD: [
                         models.ResourceIdentifier(
                             id=booking.id,
-                            type="trip-bookings",
+                            type=TripBookingResource.api_type,
                         )
                         for booking in order.bookings
                     ],
@@ -408,16 +422,22 @@ class OrderResource(models.Resource):
         )
 
 
-class BookingResource(models.Resource):
+class BookingStatusResource(models.Resource):
+    api_type: ClassVar[str] = "booking-statuses"
+
+
+class TripBookingResource(models.Resource):
+    api_type: ClassVar[str] = "trip-bookings"
+
     @classmethod
     def from_proto(
         cls,
         booking: order_models_pb2.Booking,
         request: requests.Request,
-    ) -> BookingResource:
+    ) -> TripBookingResource:
         return cls(
             id=booking.id,
-            type="trip-bookings",
+            type=TripBookingResource.api_type,
             attributes={
                 "totalPrice": Price.from_proto(booking.total_price),
                 "operatorBookingReferences": list(
@@ -428,7 +448,7 @@ class BookingResource(models.Resource):
                 "order": {
                     _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
                         id=booking.order_id,
-                        type="orders",
+                        type=OrderResource.api_type,
                     ),
                 },
                 "status": {
@@ -437,7 +457,7 @@ class BookingResource(models.Resource):
                             order_models_pb2.Booking.Status.DESCRIPTOR,
                             booking.status,
                         ),
-                        type="booking-statuses",
+                        type=BookingStatusResource.api_type,
                     ),
                 },
             },
@@ -451,6 +471,8 @@ class BookingResource(models.Resource):
 
 
 class TripBookingDetailsResource(models.Resource):
+    api_type: ClassVar[str] = "trip-booking-details"
+
     @classmethod
     def from_proto(
         cls,
@@ -459,7 +481,7 @@ class TripBookingDetailsResource(models.Resource):
     ) -> TripBookingDetailsResource:
         return cls(
             id=details.id,
-            type="trip-booking-details",
+            type=TripBookingDetailsResource.api_type,
             attributes={
                 "cabinClassName": details.cabin_class.marketing_name,
                 "vendor": details.segment.vendor,
@@ -476,7 +498,7 @@ class TripBookingDetailsResource(models.Resource):
                 "booking": {
                     _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
                         id=details.booking_id,
-                        type="trip-bookings",
+                        type=TripBookingResource.api_type,
                     ),
                 },
                 "cabinClass": {
@@ -485,7 +507,7 @@ class TripBookingDetailsResource(models.Resource):
                             descriptor=models_pb2.CabinClass.Type.DESCRIPTOR,
                             enum_value=details.cabin_class.type,
                         ),
-                        type="cabin-classes",
+                        type=CabinClassResource.api_type,
                     ),
                 },
                 "legType": {
@@ -494,7 +516,7 @@ class TripBookingDetailsResource(models.Resource):
                             descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
                             enum_value=details.segment.type,
                         ),
-                        type="leg-types",
+                        type=LegTypeResource.api_type,
                     ),
                 },
             },
@@ -508,6 +530,8 @@ class TripBookingDetailsResource(models.Resource):
 
 
 class PlaceResource(models.Resource):
+    api_type: ClassVar[str] = "places"
+
     @classmethod
     def from_proto(
         cls,
@@ -516,7 +540,7 @@ class PlaceResource(models.Resource):
     ) -> PlaceResource:
         return cls(
             id=place.id,
-            type="places",
+            type=PlaceResource.api_type,
             attributes={
                 "countryCode": place.country_code or "GB",
                 "iataCode": None,
@@ -533,7 +557,7 @@ class PlaceResource(models.Resource):
                                 descriptor=place_models_pb2.Location.Type.DESCRIPTOR,
                                 enum_value=place_type,
                             ),
-                            type="place-types",
+                            type=PlaceTypeResource.api_type,
                         )
                         for place_type in place.types
                     ],
@@ -549,6 +573,8 @@ class PlaceResource(models.Resource):
 
 
 class PlaceTypeResource(models.Resource):
+    api_type: ClassVar[str] = "place-types"
+
     @classmethod
     def from_proto(
         cls,
@@ -561,7 +587,7 @@ class PlaceTypeResource(models.Resource):
         )
         return cls(
             id=place_type_id,
-            type="place-types",
+            type=PlaceTypeResource.api_type,
             attributes={
                 "name": place_type_id,
             },
@@ -575,6 +601,8 @@ class PlaceTypeResource(models.Resource):
 
 
 class PassengerGenderResource(models.Resource):
+    api_type: ClassVar[str] = "passenger-genders"
+
     @classmethod
     def from_proto(
         cls,
@@ -587,7 +615,7 @@ class PassengerGenderResource(models.Resource):
         )
         return cls(
             id=passenger_gender_id,
-            type="passenger-genders",
+            type=PassengerGenderResource.api_type,
             attributes={
                 "name": passenger_gender_id,
             },
@@ -601,6 +629,8 @@ class PassengerGenderResource(models.Resource):
 
 
 class CabinClassResource(models.Resource):
+    api_type: ClassVar[str] = "cabin-classes"
+
     @classmethod
     def from_proto(
         cls,
@@ -613,7 +643,7 @@ class CabinClassResource(models.Resource):
         )
         return cls(
             id=cabin_class_id,
-            type="cabin-classes",
+            type=CabinClassResource.api_type,
             attributes={
                 "name": cabin_class_id,
             },
@@ -627,6 +657,8 @@ class CabinClassResource(models.Resource):
 
 
 class PassengerTitleResource(models.Resource):
+    api_type: ClassVar[str] = "passenger-titles"
+
     @classmethod
     def from_proto(
         cls,
@@ -639,7 +671,7 @@ class PassengerTitleResource(models.Resource):
         )
         return cls(
             id=passenger_title_id,
-            type="passenger-titles",
+            type=PassengerTitleResource.api_type,
             attributes={
                 "name": passenger_title_id,
             },
@@ -790,6 +822,8 @@ class TripResource(models.Resource):
 
 
 class TripSearchResource(models.Resource):
+    api_type: ClassVar[str] = "trip-searches"
+
     @classmethod
     def from_proto(
         cls,
@@ -798,7 +832,7 @@ class TripSearchResource(models.Resource):
     ) -> TripSearchResource:
         return cls(
             id=trip_search.id,
-            type="trip-searches",
+            type=TripSearchResource.api_type,
             attributes={
                 "expiresAt": protobuf.protobuf_to_datetime(
                     trip_search.expires_at,
@@ -811,13 +845,13 @@ class TripSearchResource(models.Resource):
                 "origin": {
                     _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
                         id=trip_search.origin.ref,
-                        type="places",
+                        type=PlaceResource.api_type,
                     ),
                 },
                 "destination": {
                     _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
                         id=trip_search.destination.ref,
-                        type="places",
+                        type=PlaceResource.api_type,
                     ),
                 },
             },
@@ -831,6 +865,8 @@ class TripSearchResource(models.Resource):
 
 
 class TripOfferSearchResource(models.Resource):
+    api_type: ClassVar[str] = "trip-offer-searches"
+
     @classmethod
     def from_proto(
         cls,
@@ -840,14 +876,14 @@ class TripOfferSearchResource(models.Resource):
     ) -> TripOfferSearchResource:
         return cls(
             id=offer_search.id,
-            type="trip-offer-searches",
+            type=TripOfferSearchResource.api_type,
             attributes=cls._get_attributes(offer_search),
             relationships={
                 "offers": {
                     _RELATIONSHIPS_FIELD: [
                         models.ResourceIdentifier(
                             id=offer.id,
-                            type="offers",
+                            type=OfferResource.api_type,
                         )
                         for offer in offers
                     ],
