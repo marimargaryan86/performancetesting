@@ -54,7 +54,7 @@ async def request_to_openapi(request: requests.Request) -> OpenAPIRequest:
             cookie=request.cookies,
         ),
         body=(await request.body()).decode("utf-8"),
-        mimetype=request.headers.get("Content-Type", request.headers.get("Accept")),
+        mimetype=request.headers.get("Content-Type", request.headers.get("Accept", "")),
     )
 
 
