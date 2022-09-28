@@ -18,7 +18,6 @@ overrides:
   - files:
       - "junction/mobile_api/openapi.json#/paths/~1places"
       - "junction/mobile_api/openapi.json#/paths/~1trips~1searches~1{tripSearchId}~1trips"
-      - "junction/mobile_api/openapi.json#/paths/~1users~1{userId}~1orders"
       - "junction/mobile_api/openapi.json#/paths/~1users~1me~1preferences"
     rules:
       ensure-pagination: info

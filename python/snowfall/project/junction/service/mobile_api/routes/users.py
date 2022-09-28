@@ -78,33 +78,13 @@ class Users(endpoints.HTTPEndpoint):
 
 
 class User(endpoints.HTTPEndpoint):
-    async def get(
-        self,
-        request: requests.Request,
-        users_repository: repository.UsersRepository = lagom.injectable,
-    ) -> responses.Response:
-        search_id = request.path_params["userId"]
-
-        user_id = request.user.username
-
-        user = await users_repository.find_user_hide_password(search_id)
-        if not user:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
-        if user.id != user_id:
-            raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
-        return models.JsonApiResponse(
-            models.Body(
-                data=resources.UserResource.from_proto(user),
-            ),
-        )
-
     async def patch(
         self,
         request: requests.Request,
         otp_repository: repository.OtpRepository = lagom.injectable,
         users_repository: repository.UsersRepository = lagom.injectable,
     ) -> responses.Response:
-        user_mail = request.path_params["userId"]
+        user_mail = request.path_params["userEmail"]
         body = await request_helpers.flatten_request(request)
 
         verification_code = request.user.username
@@ -134,6 +114,22 @@ class User(endpoints.HTTPEndpoint):
 
 
 class UserLoggedIn(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        users_repository: repository.UsersRepository = lagom.injectable,
+    ) -> responses.Response:
+        user_id = request.user.username
+
+        user = await users_repository.find_user_hide_password(user_id)
+        if not user:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        return models.JsonApiResponse(
+            models.Body(
+                data=resources.UserResource.from_proto(user),
+            ),
+        )
+
     async def delete(
         self,
         request: requests.Request,
@@ -176,28 +172,6 @@ class UserLoggedIn(endpoints.HTTPEndpoint):
                     user_id,
                     user.dict(exclude_unset=True),
                 ),
-            ),
-        )
-
-
-class UserOrders(endpoints.HTTPEndpoint):
-    async def get(
-        self,
-        request: requests.Request,
-        orders_repository: repository.OrdersRepository = lagom.injectable,
-    ) -> responses.Response:
-        user_id = request.path_params["userId"]
-        if user_id != request.user.username:
-            raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
-
-        user_orders = await orders_repository.get_user_orders(user_id)
-
-        return models.JsonApiResponse(
-            models.Body(
-                data=[
-                    resources.OrderResource.from_mongo(order)
-                    async for order in user_orders
-                ],
             ),
         )
 

@@ -32,10 +32,9 @@ def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Rou
         dependencies.route("/users/sessions", users.Session),
         dependencies.route("/users", users.Users),
         dependencies.route("/users/me", users.UserLoggedIn),
-        dependencies.route("/users/{userId}", users.User),
+        dependencies.route("/users/{userEmail}", users.User),
         dependencies.route("/users/me/preferences", preferences.Preferences),
         dependencies.route("/payments", payments.Payments),
-        dependencies.route("/users/{userId}/orders", users.UserOrders),
         dependencies.route(
             "/trips/searches/{tripSearchId}/trips",
             trips.TripSearchesTrips,

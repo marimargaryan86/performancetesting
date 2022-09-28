@@ -446,6 +446,55 @@
             }
           }
         }
+      },
+      "get": {
+        "summary": "List Orders of logged-in User",
+        "tags": [
+          "orders"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ],
+        "description": "Used to retrieve orders created by a user.",
+        "operationId": "get-orders",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "description": "Orders list.",
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Order"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
       }
     },
     "/offers/searches": {
@@ -616,54 +665,6 @@
         },
         "operationId": "post-payments",
         "description": "Creates a paymentIntent and a stripe customer if there isn't any for this particular user"
-      }
-    },
-    "/users/{userId}/orders": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/userId"
-        }
-      ],
-      "get": {
-        "summary": "List Orders by User",
-        "tags": [
-          "user"
-        ],
-        "description": "Used to retrieve orders created by a user.",
-        "operationId": "get-users-id-orders",
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "description": "Orders list.",
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Order"
-                      }
-                    }
-                  },
-                  "required": [
-                    "data"
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        }
       }
     },
     "/places": {
@@ -876,53 +877,20 @@
         "summary": "Create User Session"
       }
     },
-    "/users/{userId}": {
+    "/users/{userEmail}": {
       "parameters": [
         {
-          "name": "userId",
+          "name": "userEmail",
           "in": "path",
           "required": true,
           "schema": {
             "type": "string",
-            "example": "User Identifier"
+            "example": "user@example.com"
           },
-          "description": "Target userId you want to change the password"
+          "description": "Target userEmail you want to change the password"
         }
       ],
-      "get": {
-        "summary": "Get User",
-        "tags": [
-          "user"
-        ],
-        "operationId": "get-users-id",
-        "description": "Get user",
-        "security": [
-          {
-            "jwt": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserProfile"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        }
-      },
+
       "patch": {
         "tags": [
           "user"
@@ -954,23 +922,57 @@
           }
         },
         "operationId": "patch-users-id",
-        "description": "User change password",
+        "description": "Used for the functionality of Forgot Password. A logged out user needs to pass the email and the otp as a header in order to update the password.",
         "security": [
           {
             "otp": []
           }
         ],
-        "summary": "Update user's password"
+        "summary": "Update password - forgot password"
       }
     },
     "/users/me":{
+      "get": {
+        "summary": "Get User",
+        "tags": [
+          "user"
+        ],
+        "operationId": "get-users-me",
+        "description": "Get logged in user",
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
       "delete":{
         "summary": "Delete User",
         "tags": [
           "user"
         ],
         "operationId": "delete-users-me",
-        "description": "Delete user",
+        "description": "Delete logged in user",
         "security": [
           {
             "jwt": []
@@ -1150,17 +1152,6 @@
           "example": 20
         },
         "description": "A limit on the number of objects to be returned, between 1 and 100."
-      },
-      "userId": {
-        "name": "userId",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "format": "uuid",
-          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
-        },
-        "description": "User identifier"
       },
       "offerSearchId": {
         "name": "offerSearchId",

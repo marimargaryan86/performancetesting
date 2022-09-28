@@ -33,6 +33,22 @@ class Order(endpoints.HTTPEndpoint):
 
 
 class Orders(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        orders_repository: repository.OrdersRepository = lagom.injectable,
+    ) -> responses.Response:
+        user_orders = await orders_repository.get_user_orders(request.user.username)
+
+        return stdlib_models.JsonApiResponse(
+            stdlib_models.Body(
+                data=[
+                    resources.OrderResource.from_mongo(order)
+                    async for order in user_orders
+                ],
+            ),
+        )
+
     async def post(
         self,
         request: requests.Request,
