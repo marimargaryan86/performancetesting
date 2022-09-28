@@ -70,10 +70,10 @@ class UsersRepository(
     async def find_user_by_email(self, email: str) -> Optional[models_pb2.User]:
         return await self._execute(self._collection.find_one, {_EMAIL_KEY: email})
 
-    async def find_user_hide_password(self, email: str) -> Optional[models_pb2.User]:
+    async def find_user_hide_password(self, user_id: str) -> Optional[models_pb2.User]:
         return await self._execute(
             self._collection.find_one,
-            {_EMAIL_KEY: email},
+            {_ID_KEY: user_id},
             {"password": 0},
         )
 
