@@ -34,13 +34,14 @@ from snowfall.vendor.save_a_train import models as save_a_train_models
 
 _CABIN_MAPPING = types.MappingProxyType(
     {
-        "Second Class": models_pb2.CabinClass.TYPE_ECONOMY,
-        "Comfort": models_pb2.CabinClass.TYPE_BUSINESS,
-        "Premium": models_pb2.CabinClass.TYPE_FIRST,
+        models_pb2.CabinClass.TYPE_FIRST: {"first", "1st", "comfort", "executive"},
+        models_pb2.CabinClass.TYPE_PREMIUM: {"business"},
+        models_pb2.CabinClass.TYPE_ECONOMY: {"standard", "second", "2nd"},
     },
 )
 
 _PROVIDER_NAME = "Save A Train"
+logger = structlog.get_logger(__name__)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -459,10 +460,13 @@ class SaveATrainAdapter(object):  # noqa: WPS214
 
 
 def _cabin_to_proto(cabin: str) -> models_pb2.CabinClass.Type.V:
-    try:
-        return _CABIN_MAPPING[cabin]
-    except KeyError:
-        return models_pb2.CabinClass.TYPE_UNSPECIFIED
+    for cabin_class, possible_matches in _CABIN_MAPPING.items():
+        if any(match_item in cabin.lower() for match_item in possible_matches):
+            return cabin_class
+
+    logger.warning("SAT found UNSPECIFIED cabin type.", cabin=cabin)
+
+    return models_pb2.CabinClass.TYPE_UNSPECIFIED
 
 
 def raise_http_error_with_text(http_error: httpx.HTTPStatusError) -> None:
