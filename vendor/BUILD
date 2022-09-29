@@ -6,6 +6,7 @@ python_requirements(
         "grpcio-status": ["grpc_status"],
         "protobuf": ["google.protobuf"],
         "pyjwt": ["jwt"],
+        "pyshp": ["shapefile"],
         "pytest-httpx": ["pytest_httpx"],
         "python-dateutil": ["dateutil"],
         "python-rapidjson": ["rapidjson"],

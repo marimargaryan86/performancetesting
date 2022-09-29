@@ -3,11 +3,13 @@ import random
 from collections.abc import Sequence
 
 import aioredis
+import shapefile
 from pydantic import AnyUrl
 
 from snowfall.service.geodata import geocoding
 from snowfall.service.geodata.grpc import GeocodingService
 from snowfall.stdlib import service
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.grpc import server
 
@@ -19,6 +21,12 @@ class _Settings(service.Settings):
 
 
 async def _main(app: service.Application[_Settings]) -> None:
+    shp_path = filesystem.resource_path(
+        "snowfall.service.geodata.main",
+        "world-administrative-boundaries.zip",
+    )
+    shp_file = shapefile.Reader(shp_path)
+
     async with aioredis.from_url(
         random.choice(app.settings.redis_dsn),  # nosec
         decode_responses=True,
@@ -29,7 +37,7 @@ async def _main(app: service.Application[_Settings]) -> None:
             [
                 GeocodingService(
                     redis.Client(redis_conn),
-                    geocoder=geocoding.ReverseGeocoder(app.user_agent),
+                    geocoder=geocoding.ReverseGeocoder(shp_file, app.user_agent),
                 ),
             ],
         )

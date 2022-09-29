@@ -1,17 +1,21 @@
 from typing import Awaitable, Callable, Optional
 
+import shapefile
 import timezonefinder
 from geopy import adapters, geocoders
 from pycountry import countries
+from shapely import geometry
 
 _LookupFunc = Callable[[float, float], Awaitable[Optional[str]]]
 
 
 class ReverseGeocoder(object):
-    def __init__(self, user_agent: str):
+    def __init__(self, shp_file: shapefile.Reader, user_agent: str):
+        self._records = shp_file.shapeRecords()
         self._tz_finder = timezonefinder.TimezoneFinder()
         self._user_agent = user_agent
         self._country_lookup_funcs: list[_LookupFunc] = [
+            self._offline_country_lookup,
             self._photon_country_lookup,
             self._nominatim_country_lookup,
         ]
@@ -45,6 +49,19 @@ class ReverseGeocoder(object):
                 return country_code
 
         raise RuntimeError("Unable to find country for coordinates.")
+
+    async def _offline_country_lookup(
+        self,
+        latitude: float,
+        longitude: float,
+    ) -> Optional[str]:
+        for shape_record in self._records:
+            shape = geometry.shape(shape_record.shape)
+
+            if geometry.Point(longitude, latitude).within(shape):
+                return shape_record.record["iso_3166_1"]
+
+        return None
 
     async def _photon_country_lookup(
         self,
