@@ -61,9 +61,11 @@ class LocationRepository(
 class _PlaceNormalizer(normalizers.Normalizer):
     def denormalize(
         self,
-        maybe_dict: Any,
-    ) -> Any:
+        maybe_dict: normalizers.AnyValue,
+    ) -> normalizers.AnyValue:
         maybe_dict["location"]["id"] = maybe_dict.pop("id")
+
+        return maybe_dict
 
     def supports(self, fqn: str) -> bool:
         return fqn == models_pb2.Place().DESCRIPTOR.full_name

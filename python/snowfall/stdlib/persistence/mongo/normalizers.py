@@ -3,13 +3,15 @@ import collections
 import datetime
 import functools
 from enum import IntEnum
-from typing import Any, Mapping, Type
+from typing import Any, Mapping, Type, TypeVar, cast
 
 import pydantic
 from dateutil import parser
 from google.protobuf import descriptor, timestamp_pb2
 
 from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
+
+AnyValue = TypeVar("AnyValue", bound=Any)
 
 _Metadata = descriptor.Descriptor | Type[pydantic.BaseModel]
 _TypesMap = Mapping[str, Mapping[str, str]]
@@ -23,11 +25,11 @@ _COORDINATES_KEY = "coordinates"
 
 class Normalizer(abc.ABC):
     @abc.abstractmethod
-    def normalize(self, maybe_dict: Any) -> Any:
+    def normalize(self, maybe_dict: AnyValue) -> AnyValue:
         """"""
 
     @abc.abstractmethod
-    def denormalize(self, maybe_dict: Any) -> Any:
+    def denormalize(self, maybe_dict: AnyValue) -> AnyValue:
         """"""
 
     @abc.abstractmethod
@@ -38,34 +40,40 @@ class Normalizer(abc.ABC):
 class _CoordinatesNormalizer(Normalizer):
     def denormalize(
         self,
-        maybe_dict: Any,
-    ) -> Any:
-        return {
-            _LAT_KEY: maybe_dict[_COORDINATES_KEY][1],
-            _LON_KEY: maybe_dict[_COORDINATES_KEY][0],
-        }
+        maybe_dict: AnyValue,
+    ) -> AnyValue:
+        return cast(
+            AnyValue,
+            {
+                _LAT_KEY: maybe_dict[_COORDINATES_KEY][1],
+                _LON_KEY: maybe_dict[_COORDINATES_KEY][0],
+            },
+        )
 
     def supports(self, fqn: str) -> bool:
         return fqn == models_pb2.Coordinates().DESCRIPTOR.full_name
 
     def normalize(
         self,
-        maybe_dict: Any,
-    ) -> Any:
-        return {
-            "type": "Point",
-            _COORDINATES_KEY: [
-                maybe_dict[_LON_KEY],
-                maybe_dict[_LAT_KEY],
-            ],
-        }
+        maybe_dict: AnyValue,
+    ) -> AnyValue:
+        return cast(
+            AnyValue,
+            {
+                "type": "Point",
+                _COORDINATES_KEY: [
+                    maybe_dict[_LON_KEY],
+                    maybe_dict[_LAT_KEY],
+                ],
+            },
+        )
 
 
 class _IdNormalizer(Normalizer):
     def denormalize(
         self,
-        maybe_dict: Any,
-    ) -> Any:
+        maybe_dict: AnyValue,
+    ) -> AnyValue:
         if isinstance(maybe_dict, dict) and _MONGO_ID_KEY in maybe_dict:
             maybe_dict[_MODEL_ID_KEY] = maybe_dict.pop(_MONGO_ID_KEY)
 
@@ -76,8 +84,8 @@ class _IdNormalizer(Normalizer):
 
     def normalize(
         self,
-        maybe_dict: Any,
-    ) -> Any:
+        maybe_dict: AnyValue,
+    ) -> AnyValue:
         if isinstance(maybe_dict, dict) and _MODEL_ID_KEY in maybe_dict:
             maybe_dict[_MONGO_ID_KEY] = maybe_dict.pop(_MODEL_ID_KEY)
 
@@ -87,34 +95,40 @@ class _IdNormalizer(Normalizer):
 class _LatLngNormalizer(Normalizer):
     def denormalize(
         self,
-        maybe_dict: Any,
-    ) -> Any:
-        return {
-            _LAT_KEY: maybe_dict[_COORDINATES_KEY][1],
-            _LON_KEY: maybe_dict[_COORDINATES_KEY][0],
-        }
+        maybe_dict: AnyValue,
+    ) -> AnyValue:
+        return cast(
+            AnyValue,
+            {
+                _LAT_KEY: maybe_dict[_COORDINATES_KEY][1],
+                _LON_KEY: maybe_dict[_COORDINATES_KEY][0],
+            },
+        )
 
     def supports(self, fqn: str) -> bool:
         return fqn == latlng_pb2.LatLng().DESCRIPTOR.full_name
 
     def normalize(
         self,
-        maybe_dict: Any,
-    ) -> Any:
-        return {
-            "type": "Point",
-            _COORDINATES_KEY: [
-                maybe_dict[_LON_KEY],
-                maybe_dict[_LAT_KEY],
-            ],
-        }
+        maybe_dict: AnyValue,
+    ) -> AnyValue:
+        return cast(
+            AnyValue,
+            {
+                "type": "Point",
+                _COORDINATES_KEY: [
+                    maybe_dict[_LON_KEY],
+                    maybe_dict[_LAT_KEY],
+                ],
+            },
+        )
 
 
 class _TimestampNormalizer(Normalizer):
     def denormalize(
         self,
-        maybe_dict: Any,
-    ) -> Any:
+        maybe_dict: AnyValue,
+    ) -> AnyValue:
         if not maybe_dict.tzinfo:
             maybe_dict = maybe_dict.replace(tzinfo=datetime.timezone.utc)
 
@@ -125,9 +139,9 @@ class _TimestampNormalizer(Normalizer):
 
     def normalize(
         self,
-        maybe_dict: Any,
-    ) -> Any:
-        return parser.isoparse(maybe_dict)
+        maybe_dict: AnyValue,
+    ) -> AnyValue:
+        return cast(AnyValue, parser.isoparse(maybe_dict))
 
 
 class _NormalizerMode(IntEnum):
@@ -151,7 +165,7 @@ def register(normalizer: Normalizer) -> None:
     _additional.append(normalizer)
 
 
-def normalize(metadata: _Metadata, maybe_dict: Any) -> Any:
+def normalize(metadata: _Metadata, maybe_dict: AnyValue) -> AnyValue:
     return _transform(
         _metadata_fqn(metadata),
         _metadata_to_types_map(metadata),
@@ -160,7 +174,7 @@ def normalize(metadata: _Metadata, maybe_dict: Any) -> Any:
     )
 
 
-def denormalize(metadata: _Metadata, maybe_dict: Any) -> Any:
+def denormalize(metadata: _Metadata, maybe_dict: AnyValue) -> AnyValue:
     return _transform(
         _metadata_fqn(metadata),
         _metadata_to_types_map(metadata),
@@ -169,7 +183,11 @@ def denormalize(metadata: _Metadata, maybe_dict: Any) -> Any:
     )
 
 
-def _apply_normalizers(fqn: str, mode: _NormalizerMode, maybe_dict: Any) -> Any:
+def _apply_normalizers(
+    fqn: str,
+    mode: _NormalizerMode,
+    maybe_dict: AnyValue,
+) -> AnyValue:
     match mode:
         case _NormalizerMode.normalize:
             normalizers = [*_additional, *_normalizers]
@@ -192,9 +210,9 @@ def _apply_normalizers(fqn: str, mode: _NormalizerMode, maybe_dict: Any) -> Any:
 def _transform(
     fqn: str,
     types_map: _TypesMap,
-    maybe_dict: Any,
+    maybe_dict: AnyValue,
     mode: _NormalizerMode,
-) -> Any:
+) -> AnyValue:
     maybe_dict = _apply_normalizers(fqn, mode, maybe_dict)
 
     if not isinstance(maybe_dict, dict):
@@ -220,7 +238,7 @@ def _transform(
                 mode,
             )
 
-    return maybe_dict
+    return cast(AnyValue, maybe_dict)
 
 
 def _class_fqn(type_: Type[object]) -> str:
