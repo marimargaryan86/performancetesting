@@ -137,24 +137,28 @@ async def trip_search_request(
     )
 
     return trip_searches.TripSearchRequest(
-        origin=models_pb2.Point(
-            ref=origin.location.id,
-            name=origin.location.name,
-            coordinates=models_pb2.Coordinates(
-                latitude=origin.location.coordinates.latitude,
-                longitude=origin.location.coordinates.longitude,
+        origins=[
+            models_pb2.Point(
+                ref=origin.location.id,
+                name=origin.location.name,
+                coordinates=models_pb2.Coordinates(
+                    latitude=origin.location.coordinates.latitude,
+                    longitude=origin.location.coordinates.longitude,
+                ),
+                time_zone=origin.location.time_zone,
             ),
-            time_zone=origin.location.time_zone,
-        ),
-        destination=models_pb2.Point(
-            ref=destination.location.id,
-            name=destination.location.name,
-            coordinates=models_pb2.Coordinates(
-                latitude=destination.location.coordinates.latitude,
-                longitude=destination.location.coordinates.longitude,
+        ],
+        destinations=[
+            models_pb2.Point(
+                ref=destination.location.id,
+                name=destination.location.name,
+                coordinates=models_pb2.Coordinates(
+                    latitude=destination.location.coordinates.latitude,
+                    longitude=destination.location.coordinates.longitude,
+                ),
+                time_zone=destination.location.time_zone,
             ),
-            time_zone=destination.location.time_zone,
-        ),
+        ],
         departure_after=datetime.datetime.now(datetime.timezone.utc),
     )
 

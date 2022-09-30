@@ -145,6 +145,7 @@ type TripServiceClient interface {
 	GetTrip(ctx context.Context, in *GetTripRequest, opts ...grpc.CallOption) (*GetTripResponse, error)
 	ListTrips(ctx context.Context, in *ListTripsRequest, opts ...grpc.CallOption) (*ListTripsResponse, error)
 	GetSegment(ctx context.Context, in *GetSegmentRequest, opts ...grpc.CallOption) (*GetSegmentResponse, error)
+	ListSegments(ctx context.Context, in *ListSegmentsRequest, opts ...grpc.CallOption) (*ListSegmentsResponse, error)
 }
 
 type tripServiceClient struct {
@@ -182,6 +183,15 @@ func (c *tripServiceClient) GetSegment(ctx context.Context, in *GetSegmentReques
 	return out, nil
 }
 
+func (c *tripServiceClient) ListSegments(ctx context.Context, in *ListSegmentsRequest, opts ...grpc.CallOption) (*ListSegmentsResponse, error) {
+	out := new(ListSegmentsResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.project.junction.service.trips.v1alpha.TripService/ListSegments", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TripServiceServer is the server API for TripService service.
 // All implementations should embed UnimplementedTripServiceServer
 // for forward compatibility
@@ -189,6 +199,7 @@ type TripServiceServer interface {
 	GetTrip(context.Context, *GetTripRequest) (*GetTripResponse, error)
 	ListTrips(context.Context, *ListTripsRequest) (*ListTripsResponse, error)
 	GetSegment(context.Context, *GetSegmentRequest) (*GetSegmentResponse, error)
+	ListSegments(context.Context, *ListSegmentsRequest) (*ListSegmentsResponse, error)
 }
 
 // UnimplementedTripServiceServer should be embedded to have forward compatible implementations.
@@ -203,6 +214,9 @@ func (UnimplementedTripServiceServer) ListTrips(context.Context, *ListTripsReque
 }
 func (UnimplementedTripServiceServer) GetSegment(context.Context, *GetSegmentRequest) (*GetSegmentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSegment not implemented")
+}
+func (UnimplementedTripServiceServer) ListSegments(context.Context, *ListSegmentsRequest) (*ListSegmentsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListSegments not implemented")
 }
 
 // UnsafeTripServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -270,6 +284,24 @@ func _TripService_GetSegment_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TripService_ListSegments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListSegmentsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TripServiceServer).ListSegments(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.project.junction.service.trips.v1alpha.TripService/ListSegments",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TripServiceServer).ListSegments(ctx, req.(*ListSegmentsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TripService_ServiceDesc is the grpc.ServiceDesc for TripService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -288,6 +320,10 @@ var TripService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetSegment",
 			Handler:    _TripService_GetSegment_Handler,
+		},
+		{
+			MethodName: "ListSegments",
+			Handler:    _TripService_ListSegments_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

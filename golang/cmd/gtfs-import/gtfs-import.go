@@ -5,6 +5,7 @@ import (
 	"bufio"
 	"fmt"
 	"git.snowfall.se/junction/junction/golang/gtfs"
+	placesv1alpha "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/places/v1alpha"
 	v1alpha "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"
 	"git.snowfall.se/junction/junction/golang/protoio"
 	"github.com/bits-and-blooms/bloom"
@@ -553,7 +554,7 @@ func main() {
 
 			bar := progressbar.Default(
 				stopCount,
-				"Generating places",
+				"Generating locations",
 			)
 
 			stops := make([]*gtfs.Stop, 0)
@@ -561,10 +562,10 @@ func main() {
 			db.Find(&stops)
 
 			for _, stop := range stops {
-				check(placeWriter.Write(&v1alpha.Place{
+				check(placeWriter.Write(&placesv1alpha.Location{
 					Id:   uuid.NewSHA1(fileNamespace, []byte(stop.Id)).String(),
 					Name: stop.Name,
-					Coordinates: &v1alpha.Coordinates{
+					Coordinates: &v1alpha.LatLng{
 						Latitude:  stop.Latitude,
 						Longitude: stop.Longitude,
 					},

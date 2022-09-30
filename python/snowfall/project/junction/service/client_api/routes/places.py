@@ -1,7 +1,7 @@
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.project.junction.adapter import locations
+from snowfall.project.junction.adapter import places
 from snowfall.project.junction.service.client_api import resources
 from snowfall.project.junction.service.places.v1alpha import models_pb2
 from snowfall.stdlib import sequence
@@ -13,11 +13,11 @@ class Place(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        client: locations.Client = lagom.injectable,
+        client: places.Client = lagom.injectable,
     ) -> responses.Response:
         try:
             place = await client.get(request.path_params["placeId"])
-        except locations.NotFoundError as err:
+        except places.NotFoundError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
         return models.JsonApiResponse(
@@ -31,7 +31,7 @@ class Places(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        client: locations.Client = lagom.injectable,
+        client: places.Client = lagom.injectable,
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
         response = await client.find(limit=pagination.limit, cursor=pagination.cursor)
@@ -39,8 +39,8 @@ class Places(endpoints.HTTPEndpoint):
         return models.JsonApiResponse(
             models.Body(
                 data=[
-                    resources.PlaceResource.from_proto(location, request)
-                    for location in response.locations
+                    resources.PlaceResource.from_proto(place, request)
+                    for place in response.places
                 ],
                 links=pagination_helpers.get_next_url(
                     request.url_for("ListPlaces"),

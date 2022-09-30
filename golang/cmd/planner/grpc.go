@@ -20,45 +20,54 @@ type PlannerServiceServer struct {
 }
 
 func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *planner.SearchJourneyRequest) (*planner.SearchJourneyResponse, error) {
-	origins := make([]*planner.Stop, 0)
-	destinations := make([]*planner.Stop, 0)
-
-	if req.Origin == nil || req.Destination == nil {
-		return &planner.SearchJourneyResponse{}, status.Errorf(codes.InvalidArgument, "origin or destination missing")
+	if len(req.Origins) == 0 || len(req.Destinations) == 0 {
+		return &planner.SearchJourneyResponse{}, status.Errorf(codes.InvalidArgument, "origins or destinations missing")
 	}
 
-	origin := h3.FromGeo(h3.GeoCoord{
-		Latitude:  req.Origin.Latitude,
-		Longitude: req.Origin.Longitude,
-	}, 9)
-	destination := h3.FromGeo(h3.GeoCoord{
-		Latitude:  req.Destination.Latitude,
-		Longitude: req.Destination.Longitude,
-	}, 9)
+	origins := make([]*planner.Stop, 0, len(req.Origins))
+	destinations := make([]*planner.Stop, 0, len(req.Destinations))
 
-	if _, ok := ps.Stops[origin]; !ok {
+	for _, origin := range req.Origins {
+		h3index := h3.FromGeo(h3.GeoCoord{
+			Latitude:  origin.Latitude,
+			Longitude: origin.Longitude,
+		}, 9)
+
+		if v, ok := ps.Stops[h3index]; ok {
+			origins = append(origins, v...)
+		}
+	}
+
+	for _, destination := range req.Destinations {
+		h3index := h3.FromGeo(h3.GeoCoord{
+			Latitude:  destination.Latitude,
+			Longitude: destination.Longitude,
+		}, 9)
+
+		if v, ok := ps.Stops[h3index]; ok {
+			destinations = append(destinations, v...)
+		}
+	}
+
+	if len(origins) == 0 {
 		return &planner.SearchJourneyResponse{}, status.Errorf(codes.InvalidArgument, "no suitable origins found")
 	}
 
-	if _, ok := ps.Stops[destination]; !ok {
+	if len(destinations) == 0 {
 		return &planner.SearchJourneyResponse{}, status.Errorf(codes.InvalidArgument, "no suitable destinations found")
 	}
 
-	for _, org := range ps.Stops[origin] {
-		for _, dest := range ps.Stops[destination] {
+	for _, org := range origins {
+		for _, dest := range destinations {
 			if org.Id == dest.Id {
-				return &planner.SearchJourneyResponse{}, status.Errorf(codes.InvalidArgument, "origin or destination can't be the same")
+				return &planner.SearchJourneyResponse{}, status.Errorf(codes.InvalidArgument, "origins and destinations can't be the same")
 			}
 		}
-
-		origins = append(origins, org)
 	}
 
-	var departureTime time.Time
+	departureTime := time.Now()
 
-	if req.DepartureAfter == nil {
-		departureTime = time.Now()
-	} else {
+	if req.DepartureAfter != nil {
 		var err error
 		var originTz *time.Location
 
@@ -73,7 +82,6 @@ func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *plan
 			originTz = time.FixedZone("custom", int(v.UtcOffset.Seconds))
 		}
 
-		destinations = append(destinations, ps.Stops[destination]...)
 		departureTime = time.Date(
 			int(req.DepartureAfter.Year),
 			time.Month(req.DepartureAfter.Month),

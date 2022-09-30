@@ -64,13 +64,13 @@ class TestTripSearches(object):
                 "relationships": {
                     "origin": {
                         "data": {
-                            "id": fixtures.LOCATIONS[0],
+                            "id": fixtures.PLACES[0],
                             "type": "places",
                         },
                     },
                     "destination": {
                         "data": {
-                            "id": fixtures.LOCATIONS[1],
+                            "id": fixtures.PLACES[1],
                             "type": "places",
                         },
                     },
@@ -101,7 +101,7 @@ class TestTripSearches(object):
                         },
                         "destination": {
                             "data": {
-                                "id": fixtures.LOCATIONS[1],
+                                "id": fixtures.PLACES[1],
                                 "type": "places",
                             },
                         },
@@ -115,7 +115,7 @@ class TestTripSearches(object):
                     "relationships": {
                         "origin": {
                             "data": {
-                                "id": fixtures.LOCATIONS[0],
+                                "id": fixtures.PLACES[0],
                                 "type": "places",
                             },
                         },
@@ -154,13 +154,13 @@ class TestTripSearches(object):
                 "relationships": {
                     "origin": {
                         "data": {
-                            "id": fixtures.LOCATIONS[0],
+                            "id": fixtures.PLACES[0],
                             "type": "places",
                         },
                     },
                     "destination": {
                         "data": {
-                            "id": fixtures.LOCATIONS[1],
+                            "id": fixtures.PLACES[1],
                             "type": "places",
                         },
                     },
@@ -188,13 +188,13 @@ class TestTripSearches(object):
                 "relationships": {
                     "origin": {
                         "data": {
-                            "id": fixtures.LOCATIONS[0],
+                            "id": fixtures.PLACES[0],
                             "type": "places",
                         },
                     },
                     "destination": {
                         "data": {
-                            "id": fixtures.LOCATIONS[1],
+                            "id": fixtures.PLACES[1],
                             "type": "places",
                         },
                     },
@@ -223,13 +223,13 @@ class TestTripSearches(object):
                 "relationships": {
                     "origin": {
                         "data": {
-                            "id": fixtures.LOCATIONS[0],
+                            "id": fixtures.PLACES[0],
                             "type": "places",
                         },
                     },
                     "destination": {
                         "data": {
-                            "id": fixtures.LOCATIONS[1],
+                            "id": fixtures.PLACES[1],
                             "type": "places",
                         },
                     },

@@ -4,7 +4,7 @@ import abc
 import dataclasses
 import datetime
 import uuid
-from typing import Optional
+from typing import Optional, Sequence
 
 import grpc
 
@@ -24,8 +24,8 @@ class UnknownError(Exception):
 
 @dataclasses.dataclass(frozen=True)
 class TripSearchRequest(object):
-    origin: models_pb2.Point
-    destination: models_pb2.Point
+    origins: Sequence[models_pb2.Point]
+    destinations: Sequence[models_pb2.Point]
     departure_after: datetime.datetime
 
 
@@ -66,8 +66,8 @@ class DictClient(Client):
         trip_search = trips_pb2.TripSearch(
             id=str(uuid.uuid4()),
             expires_at=protobuf.datetime_to_protobuf(expires_at),
-            origin=trip_search_request.origin,
-            destination=trip_search_request.destination,
+            origins=trip_search_request.origins,
+            destinations=trip_search_request.destinations,
             departure_after=protobuf.datetime_to_protobuf_datetime(
                 trip_search_request.departure_after,
             ),
@@ -132,8 +132,8 @@ class GrpcClient(Client):
     ) -> trips_pb2.TripSearch:
         request = trips_pb2.EnqueueTripSearchRequest(
             trip_search=trips_pb2.TripSearch(
-                origin=trip_search_request.origin,
-                destination=trip_search_request.destination,
+                origins=trip_search_request.origins,
+                destinations=trip_search_request.destinations,
                 departure_after=protobuf.datetime_to_protobuf_datetime(
                     trip_search_request.departure_after,
                 ),

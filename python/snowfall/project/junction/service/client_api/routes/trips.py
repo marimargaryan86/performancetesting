@@ -5,7 +5,7 @@ import lagom
 from dateutil import parser
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.project.junction.adapter import locations, trip_searches, trips
+from snowfall.project.junction.adapter import locations, places, trip_searches, trips
 from snowfall.project.junction.service.client_api import resources
 from snowfall.stdlib import sequence
 from snowfall.stdlib.integration.starlette import (
@@ -102,20 +102,21 @@ class TripSearch(endpoints.HTTPEndpoint):
 
 
 class TripSearches(endpoints.HTTPEndpoint):
-    async def post(
+    async def post(  # noqa: WPS210
         self,
         request: requests.Request,
         locations_client: locations.Client = lagom.injectable,
+        places_client: places.Client = lagom.injectable,
         trip_searches_client: trip_searches.Client = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
 
         try:
             (origin, destination) = await asyncio.gather(
-                locations_client.get(body["origin"]),
-                locations_client.get(body["destination"]),
+                places_client.get(body["origin"]),
+                places_client.get(body["destination"]),
             )
-        except locations.NotFoundError as err:
+        except places.NotFoundError as err:
             raise exceptions.HTTPException(
                 status.HTTP_422_UNPROCESSABLE_ENTITY,
             ) from err
@@ -131,29 +132,43 @@ class TripSearches(endpoints.HTTPEndpoint):
         else:
             departure_after = datetime.datetime.now(datetime.timezone.utc)
 
+        location_ids = {*origin.merged_ids, *destination.merged_ids}
+        response = await locations_client.find(
+            identifiers=list(location_ids),
+            limit=len(location_ids),
+        )
+
         return await messages.create_response(
             body=models.Body(
                 data=resources.TripSearchResource.from_proto(
                     await trip_searches_client.create(
                         trip_searches.TripSearchRequest(
-                            origin=models_pb2.Point(
-                                ref=origin.id,
-                                name=origin.name,
-                                coordinates=models_pb2.Coordinates(
-                                    latitude=origin.coordinates.latitude,
-                                    longitude=origin.coordinates.longitude,
-                                ),
-                                time_zone=origin.time_zone,
-                            ),
-                            destination=models_pb2.Point(
-                                ref=destination.id,
-                                name=destination.name,
-                                coordinates=models_pb2.Coordinates(
-                                    latitude=destination.coordinates.latitude,
-                                    longitude=destination.coordinates.longitude,
-                                ),
-                                time_zone=destination.time_zone,
-                            ),
+                            origins=[
+                                models_pb2.Point(
+                                    ref=origin.location.id,
+                                    name=location.name,
+                                    coordinates=models_pb2.Coordinates(
+                                        latitude=location.coordinates.latitude,
+                                        longitude=location.coordinates.longitude,
+                                    ),
+                                    time_zone=location.time_zone,
+                                )
+                                for location in response.locations
+                                if location.id in origin.merged_ids
+                            ],
+                            destinations=[
+                                models_pb2.Point(
+                                    ref=destination.location.id,
+                                    name=location.name,
+                                    coordinates=models_pb2.Coordinates(
+                                        latitude=location.coordinates.latitude,
+                                        longitude=location.coordinates.longitude,
+                                    ),
+                                    time_zone=location.time_zone,
+                                )
+                                for location in response.locations
+                                if location.id in destination.merged_ids
+                            ],
                             departure_after=departure_after,
                         ),
                     ),

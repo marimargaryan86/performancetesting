@@ -34,23 +34,40 @@ class TripSearchConsumer(object):
 
     async def _process_message(self, message: amqp.Message) -> None:
         body = cast(amqp_pb2.TripSearchTask, message.body)
+        origins = {
+            (origin.coordinates.latitude, origin.coordinates.longitude)
+            for origin in body.trip_search.origins
+        }
+        destinations = {
+            (destination.coordinates.latitude, destination.coordinates.longitude)
+            for destination in body.trip_search.destinations
+        }
+
+        if not origins or not destinations:
+            return
 
         try:
             response = await self._planner.SearchJourney(
                 request=planner_pb2.SearchJourneyRequest(
-                    origin=latlng_pb2.LatLng(
-                        latitude=body.trip_search.origin.coordinates.latitude,
-                        longitude=body.trip_search.origin.coordinates.longitude,
-                    ),
-                    destination=latlng_pb2.LatLng(
-                        latitude=body.trip_search.destination.coordinates.latitude,
-                        longitude=body.trip_search.destination.coordinates.longitude,
-                    ),
+                    origins=[
+                        latlng_pb2.LatLng(
+                            latitude=origin[0],
+                            longitude=origin[1],
+                        )
+                        for origin in origins
+                    ],
+                    destinations=[
+                        latlng_pb2.LatLng(
+                            latitude=destination[0],
+                            longitude=destination[1],
+                        )
+                        for destination in destinations
+                    ],
                     departure_after=protobuf.datetime_to_protobuf_datetime(
                         protobuf.protobuf_to_datetime(
                             body.trip_search.departure_after,
                         ).astimezone(
-                            zoneinfo.ZoneInfo(body.trip_search.origin.time_zone),
+                            zoneinfo.ZoneInfo(body.trip_search.origins[0].time_zone),
                         ),
                     ),
                 ),

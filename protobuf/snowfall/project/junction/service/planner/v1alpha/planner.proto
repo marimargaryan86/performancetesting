@@ -11,8 +11,8 @@ service PlannerService {
 }
 
 message SearchJourneyRequest {
-  snowfall.stdlib.v1alpha.LatLng origin = 1;
-  snowfall.stdlib.v1alpha.LatLng destination = 2;
+  repeated snowfall.stdlib.v1alpha.LatLng origins = 1;
+  repeated snowfall.stdlib.v1alpha.LatLng destinations = 2;
   snowfall.stdlib.v1alpha.DateTime departure_after = 3;
 }
 

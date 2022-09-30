@@ -11,7 +11,7 @@ class TestPlaces(object):
         await testing.test_list_and_view_endpoints(
             client=client,
             url="/places",
-            expected_ids=fixtures.LOCATIONS,
+            expected_ids=fixtures.PLACES,
         )
 
     async def test_place_types(self, client: httpx.AsyncClient) -> None:

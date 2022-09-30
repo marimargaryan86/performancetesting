@@ -22,10 +22,16 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OrderServiceClient interface {
-	AddOffersToOrder(ctx context.Context, in *AddOffersToOrderRequest, opts ...grpc.CallOption) (*AddOffersToOrderResponse, error)
-	EnqueueOrder(ctx context.Context, in *EnqueueOrderRequest, opts ...grpc.CallOption) (*EnqueueOrderResponse, error)
+	CreateJourney(ctx context.Context, in *CreateJourneyRequest, opts ...grpc.CallOption) (*CreateJourneyResponse, error)
+	GetJourney(ctx context.Context, in *GetJourneyRequest, opts ...grpc.CallOption) (*GetJourneyResponse, error)
+	ListJourneys(ctx context.Context, in *ListJourneysRequest, opts ...grpc.CallOption) (*ListJourneysResponse, error)
+	PlaceOrder(ctx context.Context, in *PlaceOrderRequest, opts ...grpc.CallOption) (*PlaceOrderResponse, error)
 	GetOrder(ctx context.Context, in *GetOrderRequest, opts ...grpc.CallOption) (*GetOrderResponse, error)
 	ListOrders(ctx context.Context, in *ListOrdersRequest, opts ...grpc.CallOption) (*ListOrdersResponse, error)
+	GetBooking(ctx context.Context, in *GetBookingRequest, opts ...grpc.CallOption) (*GetBookingResponse, error)
+	ListBookings(ctx context.Context, in *ListBookingsRequest, opts ...grpc.CallOption) (*ListBookingsResponse, error)
+	GetBookingDetails(ctx context.Context, in *GetBookingDetailsRequest, opts ...grpc.CallOption) (*GetBookingDetailsResponse, error)
+	ListBookingDetails(ctx context.Context, in *ListBookingDetailsRequest, opts ...grpc.CallOption) (*ListBookingDetailsResponse, error)
 }
 
 type orderServiceClient struct {
@@ -36,18 +42,36 @@ func NewOrderServiceClient(cc grpc.ClientConnInterface) OrderServiceClient {
 	return &orderServiceClient{cc}
 }
 
-func (c *orderServiceClient) AddOffersToOrder(ctx context.Context, in *AddOffersToOrderRequest, opts ...grpc.CallOption) (*AddOffersToOrderResponse, error) {
-	out := new(AddOffersToOrderResponse)
-	err := c.cc.Invoke(ctx, "/snowfall.project.junction.service.orders.v1alpha.OrderService/AddOffersToOrder", in, out, opts...)
+func (c *orderServiceClient) CreateJourney(ctx context.Context, in *CreateJourneyRequest, opts ...grpc.CallOption) (*CreateJourneyResponse, error) {
+	out := new(CreateJourneyResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.project.junction.service.orders.v1alpha.OrderService/CreateJourney", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *orderServiceClient) EnqueueOrder(ctx context.Context, in *EnqueueOrderRequest, opts ...grpc.CallOption) (*EnqueueOrderResponse, error) {
-	out := new(EnqueueOrderResponse)
-	err := c.cc.Invoke(ctx, "/snowfall.project.junction.service.orders.v1alpha.OrderService/EnqueueOrder", in, out, opts...)
+func (c *orderServiceClient) GetJourney(ctx context.Context, in *GetJourneyRequest, opts ...grpc.CallOption) (*GetJourneyResponse, error) {
+	out := new(GetJourneyResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.project.junction.service.orders.v1alpha.OrderService/GetJourney", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *orderServiceClient) ListJourneys(ctx context.Context, in *ListJourneysRequest, opts ...grpc.CallOption) (*ListJourneysResponse, error) {
+	out := new(ListJourneysResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.project.junction.service.orders.v1alpha.OrderService/ListJourneys", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *orderServiceClient) PlaceOrder(ctx context.Context, in *PlaceOrderRequest, opts ...grpc.CallOption) (*PlaceOrderResponse, error) {
+	out := new(PlaceOrderResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.project.junction.service.orders.v1alpha.OrderService/PlaceOrder", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -72,31 +96,91 @@ func (c *orderServiceClient) ListOrders(ctx context.Context, in *ListOrdersReque
 	return out, nil
 }
 
+func (c *orderServiceClient) GetBooking(ctx context.Context, in *GetBookingRequest, opts ...grpc.CallOption) (*GetBookingResponse, error) {
+	out := new(GetBookingResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.project.junction.service.orders.v1alpha.OrderService/GetBooking", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *orderServiceClient) ListBookings(ctx context.Context, in *ListBookingsRequest, opts ...grpc.CallOption) (*ListBookingsResponse, error) {
+	out := new(ListBookingsResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.project.junction.service.orders.v1alpha.OrderService/ListBookings", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *orderServiceClient) GetBookingDetails(ctx context.Context, in *GetBookingDetailsRequest, opts ...grpc.CallOption) (*GetBookingDetailsResponse, error) {
+	out := new(GetBookingDetailsResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.project.junction.service.orders.v1alpha.OrderService/GetBookingDetails", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *orderServiceClient) ListBookingDetails(ctx context.Context, in *ListBookingDetailsRequest, opts ...grpc.CallOption) (*ListBookingDetailsResponse, error) {
+	out := new(ListBookingDetailsResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.project.junction.service.orders.v1alpha.OrderService/ListBookingDetails", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OrderServiceServer is the server API for OrderService service.
 // All implementations should embed UnimplementedOrderServiceServer
 // for forward compatibility
 type OrderServiceServer interface {
-	AddOffersToOrder(context.Context, *AddOffersToOrderRequest) (*AddOffersToOrderResponse, error)
-	EnqueueOrder(context.Context, *EnqueueOrderRequest) (*EnqueueOrderResponse, error)
+	CreateJourney(context.Context, *CreateJourneyRequest) (*CreateJourneyResponse, error)
+	GetJourney(context.Context, *GetJourneyRequest) (*GetJourneyResponse, error)
+	ListJourneys(context.Context, *ListJourneysRequest) (*ListJourneysResponse, error)
+	PlaceOrder(context.Context, *PlaceOrderRequest) (*PlaceOrderResponse, error)
 	GetOrder(context.Context, *GetOrderRequest) (*GetOrderResponse, error)
 	ListOrders(context.Context, *ListOrdersRequest) (*ListOrdersResponse, error)
+	GetBooking(context.Context, *GetBookingRequest) (*GetBookingResponse, error)
+	ListBookings(context.Context, *ListBookingsRequest) (*ListBookingsResponse, error)
+	GetBookingDetails(context.Context, *GetBookingDetailsRequest) (*GetBookingDetailsResponse, error)
+	ListBookingDetails(context.Context, *ListBookingDetailsRequest) (*ListBookingDetailsResponse, error)
 }
 
 // UnimplementedOrderServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedOrderServiceServer struct {
 }
 
-func (UnimplementedOrderServiceServer) AddOffersToOrder(context.Context, *AddOffersToOrderRequest) (*AddOffersToOrderResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddOffersToOrder not implemented")
+func (UnimplementedOrderServiceServer) CreateJourney(context.Context, *CreateJourneyRequest) (*CreateJourneyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateJourney not implemented")
 }
-func (UnimplementedOrderServiceServer) EnqueueOrder(context.Context, *EnqueueOrderRequest) (*EnqueueOrderResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method EnqueueOrder not implemented")
+func (UnimplementedOrderServiceServer) GetJourney(context.Context, *GetJourneyRequest) (*GetJourneyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetJourney not implemented")
+}
+func (UnimplementedOrderServiceServer) ListJourneys(context.Context, *ListJourneysRequest) (*ListJourneysResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListJourneys not implemented")
+}
+func (UnimplementedOrderServiceServer) PlaceOrder(context.Context, *PlaceOrderRequest) (*PlaceOrderResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PlaceOrder not implemented")
 }
 func (UnimplementedOrderServiceServer) GetOrder(context.Context, *GetOrderRequest) (*GetOrderResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOrder not implemented")
 }
 func (UnimplementedOrderServiceServer) ListOrders(context.Context, *ListOrdersRequest) (*ListOrdersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListOrders not implemented")
+}
+func (UnimplementedOrderServiceServer) GetBooking(context.Context, *GetBookingRequest) (*GetBookingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBooking not implemented")
+}
+func (UnimplementedOrderServiceServer) ListBookings(context.Context, *ListBookingsRequest) (*ListBookingsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListBookings not implemented")
+}
+func (UnimplementedOrderServiceServer) GetBookingDetails(context.Context, *GetBookingDetailsRequest) (*GetBookingDetailsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBookingDetails not implemented")
+}
+func (UnimplementedOrderServiceServer) ListBookingDetails(context.Context, *ListBookingDetailsRequest) (*ListBookingDetailsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListBookingDetails not implemented")
 }
 
 // UnsafeOrderServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -110,38 +194,74 @@ func RegisterOrderServiceServer(s grpc.ServiceRegistrar, srv OrderServiceServer)
 	s.RegisterService(&OrderService_ServiceDesc, srv)
 }
 
-func _OrderService_AddOffersToOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddOffersToOrderRequest)
+func _OrderService_CreateJourney_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateJourneyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OrderServiceServer).AddOffersToOrder(ctx, in)
+		return srv.(OrderServiceServer).CreateJourney(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/snowfall.project.junction.service.orders.v1alpha.OrderService/AddOffersToOrder",
+		FullMethod: "/snowfall.project.junction.service.orders.v1alpha.OrderService/CreateJourney",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrderServiceServer).AddOffersToOrder(ctx, req.(*AddOffersToOrderRequest))
+		return srv.(OrderServiceServer).CreateJourney(ctx, req.(*CreateJourneyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _OrderService_EnqueueOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EnqueueOrderRequest)
+func _OrderService_GetJourney_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetJourneyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OrderServiceServer).EnqueueOrder(ctx, in)
+		return srv.(OrderServiceServer).GetJourney(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/snowfall.project.junction.service.orders.v1alpha.OrderService/EnqueueOrder",
+		FullMethod: "/snowfall.project.junction.service.orders.v1alpha.OrderService/GetJourney",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrderServiceServer).EnqueueOrder(ctx, req.(*EnqueueOrderRequest))
+		return srv.(OrderServiceServer).GetJourney(ctx, req.(*GetJourneyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _OrderService_ListJourneys_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListJourneysRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderServiceServer).ListJourneys(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.project.junction.service.orders.v1alpha.OrderService/ListJourneys",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderServiceServer).ListJourneys(ctx, req.(*ListJourneysRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _OrderService_PlaceOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PlaceOrderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderServiceServer).PlaceOrder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.project.junction.service.orders.v1alpha.OrderService/PlaceOrder",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderServiceServer).PlaceOrder(ctx, req.(*PlaceOrderRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -182,6 +302,78 @@ func _OrderService_ListOrders_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _OrderService_GetBooking_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBookingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderServiceServer).GetBooking(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.project.junction.service.orders.v1alpha.OrderService/GetBooking",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderServiceServer).GetBooking(ctx, req.(*GetBookingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _OrderService_ListBookings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListBookingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderServiceServer).ListBookings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.project.junction.service.orders.v1alpha.OrderService/ListBookings",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderServiceServer).ListBookings(ctx, req.(*ListBookingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _OrderService_GetBookingDetails_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBookingDetailsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderServiceServer).GetBookingDetails(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.project.junction.service.orders.v1alpha.OrderService/GetBookingDetails",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderServiceServer).GetBookingDetails(ctx, req.(*GetBookingDetailsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _OrderService_ListBookingDetails_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListBookingDetailsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderServiceServer).ListBookingDetails(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.project.junction.service.orders.v1alpha.OrderService/ListBookingDetails",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderServiceServer).ListBookingDetails(ctx, req.(*ListBookingDetailsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // OrderService_ServiceDesc is the grpc.ServiceDesc for OrderService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -190,12 +382,20 @@ var OrderService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*OrderServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "AddOffersToOrder",
-			Handler:    _OrderService_AddOffersToOrder_Handler,
+			MethodName: "CreateJourney",
+			Handler:    _OrderService_CreateJourney_Handler,
 		},
 		{
-			MethodName: "EnqueueOrder",
-			Handler:    _OrderService_EnqueueOrder_Handler,
+			MethodName: "GetJourney",
+			Handler:    _OrderService_GetJourney_Handler,
+		},
+		{
+			MethodName: "ListJourneys",
+			Handler:    _OrderService_ListJourneys_Handler,
+		},
+		{
+			MethodName: "PlaceOrder",
+			Handler:    _OrderService_PlaceOrder_Handler,
 		},
 		{
 			MethodName: "GetOrder",
@@ -204,6 +404,22 @@ var OrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListOrders",
 			Handler:    _OrderService_ListOrders_Handler,
+		},
+		{
+			MethodName: "GetBooking",
+			Handler:    _OrderService_GetBooking_Handler,
+		},
+		{
+			MethodName: "ListBookings",
+			Handler:    _OrderService_ListBookings_Handler,
+		},
+		{
+			MethodName: "GetBookingDetails",
+			Handler:    _OrderService_GetBookingDetails_Handler,
+		},
+		{
+			MethodName: "ListBookingDetails",
+			Handler:    _OrderService_ListBookingDetails_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

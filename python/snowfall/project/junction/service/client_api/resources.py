@@ -549,19 +549,19 @@ class PlaceResource(models.Resource):
     @classmethod
     def from_proto(
         cls,
-        place: place_models_pb2.Location,
+        place: place_models_pb2.Place,
         request: requests.Request,
     ) -> PlaceResource:
         return cls(
-            id=place.id,
+            id=place.location.id,
             type=PlaceResource.api_type,
             attributes={
-                "countryCode": place.country_code or "GB",
+                "countryCode": place.location.country_code or "GB",
                 "iataCode": None,
-                "latitude": place.coordinates.latitude,
-                "longitude": place.coordinates.longitude,
-                "name": place.name,
-                "timeZone": place.time_zone,
+                "latitude": place.location.coordinates.latitude,
+                "longitude": place.location.coordinates.longitude,
+                "name": place.location.name,
+                "timeZone": place.location.time_zone,
             },
             relationships={
                 "types": {
@@ -573,14 +573,14 @@ class PlaceResource(models.Resource):
                             ),
                             type=PlaceTypeResource.api_type,
                         )
-                        for place_type in place.types
+                        for place_type in place.location.types
                     ],
                 },
             },
             links={
                 _SELF_HREF: request.url_for(
                     "ViewPlace",
-                    placeId=place.id,
+                    placeId=place.location.id,
                 ),
             },
         )
@@ -858,13 +858,13 @@ class TripSearchResource(models.Resource):
             relationships={
                 "origin": {
                     _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
-                        id=trip_search.origin.ref,
+                        id=trip_search.origins[0].ref,
                         type=PlaceResource.api_type,
                     ),
                 },
                 "destination": {
                     _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
-                        id=trip_search.destination.ref,
+                        id=trip_search.destinations[0].ref,
                         type=PlaceResource.api_type,
                     ),
                 },
