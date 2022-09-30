@@ -126,7 +126,7 @@ class OrderService(
             )
         else:
             orders_result = await self._orders.find(
-                ids=request.ids.ids,
+                ids=list(request.ids.ids),
                 cursor=request.page_token,
             )
 
@@ -163,7 +163,7 @@ class OrderService(
             )
         else:
             bookings_result = await self._bookings.find(
-                ids=request.ids.ids,
+                ids=list(request.ids.ids),
                 cursor=request.page_token,
             )
 
@@ -200,7 +200,7 @@ class OrderService(
             )
         else:
             details_result = await self._booking_details.find(
-                ids=request.ids.ids,
+                ids=list(request.ids.ids),
                 cursor=request.page_token,
             )
 

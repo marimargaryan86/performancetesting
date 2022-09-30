@@ -156,7 +156,7 @@ class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):  # noqa
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.ListOfferGroupsResponse:
         offer_groups = await self._offers_results.find(
-            request.offer_group_ids.ids,
+            list(request.offer_group_ids.ids),
             cursor=request.page_token,
         )
 
@@ -183,7 +183,7 @@ class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):  # noqa
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.ListOfferGroupDetailsResponse:
         details = await self._group_details.find(
-            request.offer_group_details_ids.ids,
+            list(request.offer_group_details_ids.ids),
             cursor=request.page_token,
         )
 
@@ -210,7 +210,7 @@ class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):  # noqa
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.ListOfferOptionsResponse:
         options = await self._options.find(
-            request.offer_option_ids.ids,
+            list(request.offer_option_ids.ids),
             cursor=request.page_token,
         )
 
@@ -237,7 +237,7 @@ class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):  # noqa
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.ListOfferOptionDetailsResponse:
         details = await self._option_details.find(
-            request.offer_option_details_ids.ids,
+            list(request.offer_option_details_ids.ids),
             cursor=request.page_token,
         )
 
