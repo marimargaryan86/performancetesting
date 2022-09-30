@@ -19,6 +19,7 @@ message Location {
   string source_ref = 7;
   enum Type {
     TYPE_UNSPECIFIED = 0;
+    TYPE_CITY = 1;
   }
   repeated Type types = 8;
 }

@@ -77,3 +77,19 @@ class InsertManyMixin(Generic[Record]):
             raise RuntimeError()
 
         return documents
+
+
+class UpsertMixin(Generic[Record]):
+    async def upsert(
+        self: repository.RepositoryProtocol[Record],
+        document: Record,
+    ) -> bool:
+        encoded = self._coder.encode(document)
+        upsert = await self._execute(
+            self._collection.replace_one,
+            filter={"_id": encoded["_id"]},
+            replacement=encoded,
+            upsert=True,
+        )
+
+        return upsert.acknowledged

@@ -3,7 +3,7 @@ import collections
 import datetime
 import functools
 from enum import IntEnum
-from typing import Any, Mapping, Sequence, Type
+from typing import Any, Mapping, Type
 
 import pydantic
 from dateutil import parser
@@ -21,7 +21,7 @@ _LON_KEY = "longitude"
 _COORDINATES_KEY = "coordinates"
 
 
-class _Normalizer(abc.ABC):
+class Normalizer(abc.ABC):
     @abc.abstractmethod
     def normalize(self, maybe_dict: Any) -> Any:
         """"""
@@ -35,7 +35,7 @@ class _Normalizer(abc.ABC):
         """"""
 
 
-class _CoordinatesNormalizer(_Normalizer):
+class _CoordinatesNormalizer(Normalizer):
     def denormalize(
         self,
         maybe_dict: Any,
@@ -61,7 +61,7 @@ class _CoordinatesNormalizer(_Normalizer):
         }
 
 
-class _IdNormalizer(_Normalizer):
+class _IdNormalizer(Normalizer):
     def denormalize(
         self,
         maybe_dict: Any,
@@ -84,7 +84,7 @@ class _IdNormalizer(_Normalizer):
         return maybe_dict
 
 
-class _LatLngNormalizer(_Normalizer):
+class _LatLngNormalizer(Normalizer):
     def denormalize(
         self,
         maybe_dict: Any,
@@ -110,7 +110,7 @@ class _LatLngNormalizer(_Normalizer):
         }
 
 
-class _TimestampNormalizer(_Normalizer):
+class _TimestampNormalizer(Normalizer):
     def denormalize(
         self,
         maybe_dict: Any,
@@ -135,12 +135,20 @@ class _NormalizerMode(IntEnum):
     denormalize = 2
 
 
-_normalizers: Sequence[_Normalizer] = (
+_additional: list[Normalizer] = []
+_normalizers: list[Normalizer] = [
     _CoordinatesNormalizer(),
     _IdNormalizer(),
     _LatLngNormalizer(),
     _TimestampNormalizer(),
-)
+]
+
+
+def register(normalizer: Normalizer) -> None:
+    if isinstance(normalizer, tuple(type(registered) for registered in _additional)):
+        return
+
+    _additional.append(normalizer)
 
 
 def normalize(metadata: _Metadata, maybe_dict: Any) -> Any:
@@ -162,7 +170,13 @@ def denormalize(metadata: _Metadata, maybe_dict: Any) -> Any:
 
 
 def _apply_normalizers(fqn: str, mode: _NormalizerMode, maybe_dict: Any) -> Any:
-    for normalizer in _normalizers:
+    match mode:
+        case _NormalizerMode.normalize:
+            normalizers = [*_additional, *_normalizers]
+        case _NormalizerMode.denormalize:
+            normalizers = [*_normalizers, *_additional]
+
+    for normalizer in normalizers:
         if not normalizer.supports(fqn):
             continue
 

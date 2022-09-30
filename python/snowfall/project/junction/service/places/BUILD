@@ -1,4 +1,4 @@
-python_sources()
+python_sources(dependencies=[":cities"])
 pex_binary(
     name="main",
     entry_point="main.py",
@@ -8,4 +8,13 @@ docker_image(
     name="docker",
     dependencies=[":main"],
     image_tags=["{build_args.VERSION}"],
+)
+resource(
+    name="cities",
+    source=http_source(
+        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/worldcities-fc9525b4d859f16a5e3a851e347d280ebd92aed4fdf4c503d349c632b885ecaf.csv",
+        len=4581116,
+        sha256="fc9525b4d859f16a5e3a851e347d280ebd92aed4fdf4c503d349c632b885ecaf",
+        filename="worldcities.csv",
+    ),
 )

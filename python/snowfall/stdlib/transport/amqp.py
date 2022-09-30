@@ -151,7 +151,9 @@ class Consumer(object):
 
     async def consume(self, callback: ConsumerCallback) -> None:
         async with self._connection.channel() as channel:
-            await channel.set_qos(prefetch_count=os.cpu_count() or 1)
+            await channel.set_qos(
+                prefetch_count=((os.cpu_count() or 1) * 2) + 1,
+            )
 
             exchange = await channel.declare_exchange(
                 name=self._exchange.name,

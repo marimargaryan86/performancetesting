@@ -120,10 +120,10 @@ class PlacesService(  # noqa: WPS214
         request: places_pb2.CreatePlaceRequest,
         context: aio.ServicerContext,
     ) -> places_pb2.CreatePlaceResponse:
-        place = await self._places.create(request.place)
+        await self._places.create(request.place)
 
         return places_pb2.CreatePlaceResponse(
-            place=place,
+            place=request.place,
         )
 
     async def DeletePlace(  # type: ignore[override] # noqa: N802

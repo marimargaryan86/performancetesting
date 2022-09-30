@@ -1,14 +1,12 @@
 import asyncio
-import copy
-import functools
 import uuid
-from typing import Any, Mapping, Sequence
+from typing import Any, Sequence
 
 from pymongo import GEOSPHERE, IndexModel, results
 
 from snowfall.project.junction.service.places.v1alpha import models_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2, geocoding_pb2_grpc
-from snowfall.stdlib.persistence.mongo import coders, mixins, repository, resultset
+from snowfall.stdlib.persistence.mongo import mixins, normalizers, repository, resultset
 
 _mongo_id_key = "_id"
 _proto_id_key = "id"
@@ -19,6 +17,7 @@ _NAMESPACE = uuid.UUID("5190984e-4ab7-411e-96f6-2848cc5d63e1")
 
 class LocationRepository(
     mixins.FindByIdMixin[models_pb2.Location],
+    mixins.UpsertMixin[models_pb2.Location],
     repository.ProtoRepository[models_pb2.Location],
 ):
     _indexes = [
@@ -36,42 +35,58 @@ class LocationRepository(
             filter_={_mongo_id_key: {"$in": identifiers}} if identifiers else None,
         )
 
-    async def upsert(self, resource: models_pb2.Location) -> bool:
-        update_result: results.UpdateResult = await self._execute(
-            self._collection.replace_one,
-            filter={"_id": resource.id},
-            replacement=self._coder.encode(resource),
-            upsert=True,
+    async def find_within_area(
+        self,
+        cursor: str,
+        latitude: float,
+        longitude: float,
+        max_distance_meters: int,
+    ) -> resultset.ResultSet[models_pb2.Location]:
+        return await self._find_with_cursor(
+            cur=cursor,
+            filter_={
+                "coordinates": {
+                    "$nearSphere": {
+                        "$geometry": {
+                            "type": "Point",
+                            "coordinates": [longitude, latitude],
+                        },
+                        "$maxDistance": max_distance_meters,
+                    },
+                },
+            },
         )
 
-        return update_result.acknowledged
+
+class _PlaceNormalizer(normalizers.Normalizer):
+    def denormalize(
+        self,
+        maybe_dict: Any,
+    ) -> Any:
+        maybe_dict["location"]["id"] = maybe_dict.pop("id")
+
+    def supports(self, fqn: str) -> bool:
+        return fqn == models_pb2.Place().DESCRIPTOR.full_name
+
+    def normalize(
+        self,
+        maybe_dict: Any,
+    ) -> Any:
+        maybe_dict["id"] = maybe_dict["location"].pop("id")
+
+        return maybe_dict
 
 
-class PlaceCoder(coders.ProtoCoder[models_pb2.Place]):
-    def __init__(self) -> None:
-        super().__init__(models_pb2.Place)
-
-    def decode(self, as_dict: Mapping[str, Any]) -> models_pb2.Place:
-        new_dict = dict(copy.deepcopy(as_dict))
-        new_dict[_location_key][_proto_id_key] = new_dict.pop(_mongo_id_key)
-
-        return super().decode(new_dict)
-
-    def encode(self, proto: models_pb2.Place) -> dict[str, Any]:
-        as_dict = super().encode(proto)
-
-        if _proto_id_key in as_dict[_location_key]:
-            as_dict[_mongo_id_key] = as_dict[_location_key].pop(_proto_id_key)
-
-        return as_dict
-
-
-class PlaceRepository(
+class PlaceRepository(  # noqa: WPS215
     mixins.FindByIdMixin[models_pb2.Place],
     mixins.InsertMixin[models_pb2.Place],
+    mixins.UpsertMixin[models_pb2.Place],
     repository.ProtoRepository[models_pb2.Place],
 ):
     _proto = models_pb2.Place
+    _indexes = [
+        IndexModel([("location.coordinates", GEOSPHERE)], background=True),
+    ]
 
     def __init__(
         self,
@@ -80,6 +95,8 @@ class PlaceRepository(
         **kwargs: Any,
     ) -> None:
         self._geocoding = geocoding
+
+        normalizers.register(_PlaceNormalizer())
 
         super().__init__(*args, **kwargs)
 
@@ -94,7 +111,7 @@ class PlaceRepository(
     async def create(
         self,
         resource: models_pb2.Place,
-    ) -> models_pb2.Place:
+    ) -> bool:
         country_code, time_zone = await asyncio.gather(
             self._geocoding.CountryCodeLookup(
                 geocoding_pb2.CountryCodeLookupRequest(
@@ -108,11 +125,13 @@ class PlaceRepository(
             ),
         )
 
-        resource.location.id = str(uuid.uuid4())
+        if not resource.location.id:
+            resource.location.id = str(uuid.uuid4())
+
         resource.location.country_code = country_code.country_code
         resource.location.time_zone = time_zone.time_zone.id
 
-        return await self.insert(resource)
+        return await self.upsert(resource)
 
     async def update(self, resource: models_pb2.Place) -> bool:
         replacement = self._coder.encode(resource)
@@ -131,7 +150,3 @@ class PlaceRepository(
             self._collection.delete_one,
             filter={_mongo_id_key: identifier},
         )
-
-    @functools.cached_property
-    def _coder(self) -> coders.ProtoCoder[models_pb2.Place]:
-        return PlaceCoder()
