@@ -1,6 +1,8 @@
 import datetime
 import uuid
 from collections.abc import AsyncIterator
+from contextlib import suppress
+from typing import Mapping, Sequence, Tuple
 
 import more_itertools
 
@@ -11,7 +13,7 @@ from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2
 from snowfall.vendor.ask2go import models as ask2go_models
-from snowfall.vendor.ask2go.models import offers
+from snowfall.vendor.ask2go.models import booking, offers
 
 
 class OfferTransformer(object):
@@ -46,6 +48,9 @@ class OfferTransformer(object):
         offer_segment = self._segment_to_proto(
             segment=segment,
             search_segment=search_segment,
+            grouped_rules=self._group_rules_by_origin_destination(
+                offer_price.fare_rules,
+            ),
         )
         amount = money.from_string(
             offer_price.itinerary.pricing_information.base.total_cost,
@@ -88,6 +93,7 @@ class OfferTransformer(object):
         self,
         segment: offers.TripSegment,
         search_segment: models_pb2.Segment,
+        grouped_rules: Mapping[Tuple[str, str], Sequence[booking.FareRule]],
     ) -> offers_pb2.OfferSegment:
         origin = self._airports.get_by_iata(segment.origin.airport_code)
         destination = self._airports.get_by_iata(segment.destination.airport_code)
@@ -126,6 +132,18 @@ class OfferTransformer(object):
                             tzinfo=destination.timezone,
                         ),
                     ),
+                    rules=[
+                        offers_pb2.Rule(
+                            body=rule.text,
+                            title=rule.title,
+                        )
+                        for rule in grouped_rules[
+                            (
+                                segment.origin.airport_code,
+                                segment.destination.airport_code,
+                            )
+                        ]
+                    ],
                 ),
             ],
             vehicle=offers_pb2.Vehicle(
@@ -137,3 +155,19 @@ class OfferTransformer(object):
             terminal=segment.origin_terminal or "",
             type=models_pb2.Schedule.TYPE_AIR,
         )
+
+    def _group_rules_by_origin_destination(
+        self,
+        fare_rules: Sequence[booking.FareRules],
+    ) -> Mapping[Tuple[str, str], Sequence[booking.FareRule]]:
+        grouped_rules = {}
+
+        for fare_rule in fare_rules:
+            with suppress(IndexError):
+                fare_rule.fare_rule.pop(0)
+
+            grouped_rules[
+                (fare_rule.origin, fare_rule.destination)
+            ] = fare_rule.fare_rule
+
+        return grouped_rules

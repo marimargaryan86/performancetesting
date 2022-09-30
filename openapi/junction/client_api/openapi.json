@@ -4393,13 +4393,39 @@
             "type": "string",
             "format": "date-time",
             "example": "2019-08-24T14:15:22Z"
+          },
+          "rules": {
+              "type": "array",
+              "minItems": 0,
+              "items": {
+                  "$ref": "#/components/schemas/OfferSegmentLegRule"
+              }
           }
         },
         "required": [
           "origin",
           "destination",
           "departureAt",
-          "arrivalAt"
+          "arrivalAt",
+          "rules"
+        ]
+      },
+      "OfferSegmentLegRule": {
+        "title": "Offer Segment Leg Rule",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "MINIMUM STAY"
+          },
+          "body": {
+            "type": "string",
+            "example": "NO MINIMUM STAY REQUIREMENTS APPLY."
+          }
+        },
+        "required": [
+          "title",
+          "body"
         ]
       },
       "RentalOfferSearch": {
