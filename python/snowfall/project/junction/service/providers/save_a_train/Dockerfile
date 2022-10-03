@@ -17,4 +17,4 @@ LABEL com.snowfalltravel.version=$VERSION
 
 RUN /bin/save_a_train --help
 
-ENTRYPOINT ["/bin/providers/save_a_train"]
+ENTRYPOINT ["/bin/save_a_train"]
