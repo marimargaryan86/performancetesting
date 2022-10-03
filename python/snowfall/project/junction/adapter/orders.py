@@ -540,7 +540,7 @@ class GrpcClient(Client):
             request.page_size = limit
 
         try:
-            return await self._orders.ListOrders(request, timeout=self._timeout)
+            return await self._orders.ListJourneys(request, timeout=self._timeout)
         except grpc.aio.AioRpcError as exc:
             raise UnknownError(exc.details()) from exc
 
