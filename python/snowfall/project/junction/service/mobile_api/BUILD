@@ -3,6 +3,7 @@ pex_binary(
     name="main",
     entry_point="main.py",
     restartable=True,
+    execution_mode="venv",
 )
 python_test_utils(
     name="test_utils", dependencies=["openapi/junction/mobile_api", ":fixtures"]

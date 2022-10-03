@@ -15,4 +15,6 @@ ENV VERSION $VERSION
 LABEL vendor="Snowfall Limited"
 LABEL com.snowfalltravel.version=$VERSION
 
+RUN /bin/offers --help
+
 ENTRYPOINT ["/bin/offers"]

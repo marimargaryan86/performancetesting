@@ -8,6 +8,7 @@ pex_binary(
     name="main",
     entry_point="main.py",
     restartable=True,
+    execution_mode="venv",
 )
 
 python_sources(dependencies=[":train_stations"])

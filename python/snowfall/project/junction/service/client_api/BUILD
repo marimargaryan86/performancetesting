@@ -4,13 +4,10 @@ pex_binary(
     name="main",
     entry_point="main.py",
     restartable=True,
+    execution_mode="venv",
 )
 docker_image(
     name="docker",
     dependencies=[":main"],
     image_tags=["{build_args.VERSION}"],
-)
-pex_binary(
-    name="jwt_generator",
-    entry_point="jwt_generator.py",
 )

@@ -3,6 +3,7 @@ pex_binary(
     name="main",
     entry_point="main.py",
     restartable=True,
+    execution_mode="venv",
 )
 
 docker_image(

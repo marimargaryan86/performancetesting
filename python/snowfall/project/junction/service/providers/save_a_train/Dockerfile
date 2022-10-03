@@ -7,12 +7,14 @@ ENV PYTHONFAULTHANDLER 1
 ENV PYTHONHASHSEED "random"
 ENV PYTHONUNBUFFERED 1
 
-COPY python.snowfall.project.junction.service.providers.save_a_train/main.pex /bin/providers/save_a_train
+COPY python.snowfall.project.junction.service.providers.save_a_train/main.pex /bin/save_a_train
 
 ARG VERSION "dev"
 ENV VERSION $VERSION
 
 LABEL vendor="Snowfall Limited"
 LABEL com.snowfalltravel.version=$VERSION
+
+RUN /bin/save_a_train --help
 
 ENTRYPOINT ["/bin/providers/save_a_train"]

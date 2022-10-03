@@ -15,4 +15,6 @@ ENV VERSION $VERSION
 LABEL vendor="Snowfall Limited"
 LABEL com.snowfalltravel.version=$VERSION
 
+RUN /bin/gtfs_feed --help
+
 ENTRYPOINT ["/bin/gtfs_feed"]
