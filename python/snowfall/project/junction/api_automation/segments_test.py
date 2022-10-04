@@ -1,7 +1,8 @@
+import json
 import logging
 import time
-from pprint import pformat
 
+import httpx
 import pytest
 
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
@@ -22,7 +23,11 @@ async def test_get_segment_by_id(
     origin: str,
     destination: str,
 ) -> None:
-    client = JunctionClient(api_url="https://{0}".format(host), token=api_token)
+    client = JunctionClient(
+        api_url="https://{0}".format(host),
+        token=api_token,
+        client=httpx.AsyncClient(timeout=10),
+    )
 
     trip_search_id = await return_trip_search_id(
         client,
@@ -42,7 +47,7 @@ async def test_get_segment_by_id(
     ), "segment_id uuid must be in uuid v5 format"
 
     r3 = await client.get_segment_by_id(segment_id)
-    logging.info("get_segment_by_id: %s", pformat(r3, indent=2))
+    logging.info("get_segment_by_id: %s", json.dumps(r3, indent=4))
 
     assert r3["data"]["id"] == segment_id, "segment_id should match"
 
@@ -72,7 +77,7 @@ async def test_get_legs_by_segment_id(
     r1 = await client.get_legs_by_segment_id(
         segment_id,
     )
-    logging.info("get_legs_by_segment_id: %s", pformat(r1))
+    logging.info("get_legs_by_segment_id: %s", json.dumps(r1, indent=4))
     assert (
         is_valid_uuid(r1["data"][0]["id"], 5) is True
     ), "trip_search_id uuid in v4 format"
@@ -83,7 +88,7 @@ async def return_segment_id_from_trip_search_id(
     trip_search_id: str,
 ) -> str:
     r2 = await client.get_trips_by_trip_search_id(trip_search_id)
-    logging.info("get_trips_by_trip_search_id response: %s", pformat(r2))
+    logging.info("get_trips_by_trip_search_id response: %s", json.dumps(r2, indent=4))
     relationships = r2["data"][0]["relationships"]
 
     return relationships["segments"]["data"][0]["id"]

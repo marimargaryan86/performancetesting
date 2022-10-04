@@ -1,8 +1,9 @@
+import json
 import logging
 import time
-from pprint import pformat
 from typing import Any
 
+import httpx
 import pytest
 
 from snowfall.project.junction.api_automation.segments_test import (
@@ -23,7 +24,11 @@ async def test_get_leg_by_id(
     origin: str,
     destination: str,
 ) -> None:
-    client = JunctionClient(api_url="https://{0}".format(host), token=api_token)
+    client = JunctionClient(
+        api_url="https://{0}".format(host),
+        token=api_token,
+        client=httpx.AsyncClient(timeout=10),
+    )
 
     r3 = await return_get_segment_by_id_response(
         client,
@@ -36,10 +41,55 @@ async def test_get_leg_by_id(
     r4 = await client.get_leg_by_id(
         leg_id=relationships["legs"]["data"][0]["id"],
     )
-    logging.info("get_leg_by_id: %s", pformat(r4))
+    logging.info("get_leg_by_id: %s", json.dumps(r4, indent=4))
 
     leg_id = r4["data"]["id"]
     assert leg_id == relationships["legs"]["data"][0]["id"], "leg_id should match"
+
+
+@pytest.mark.integration
+async def test_get_leg_types(
+    host: str,
+    api_token: str,
+    departure_after: str,
+    origin: str,
+    destination: str,
+) -> None:
+    client = JunctionClient(api_url="https://{0}".format(host), token=api_token)
+
+    response = await client.get_legs_types()
+    logging.info("get_legs_types: %s", json.dumps(response, indent=4))
+    assert response["data"][0]["id"] == "unspecified"
+    assert response["data"][1]["id"] == "air"
+    assert response["data"][2]["id"] == "rail"
+
+
+@pytest.mark.integration
+async def test_get_leg_type_by_id(
+    host: str,
+    api_token: str,
+    departure_after: str,
+    origin: str,
+    destination: str,
+) -> None:
+    client = JunctionClient(api_url="https://{0}".format(host), token=api_token)
+
+    leg_types = await return_leg_types(client)
+
+    for leg_type in leg_types:
+        r1 = await client.get_leg_type_by_id(leg_type)
+        logging.info("get_leg_type_by_id: %s", json.dumps(r1, indent=4))
+        assert r1["data"]["id"] in leg_types
+
+
+async def return_leg_types(client: JunctionClient) -> list[str]:
+    r0 = await client.get_legs_types()
+    logging.info("get_legs_types: %s", json.dumps(r0, indent=4))
+    leg_types = []
+    for idx, _ in enumerate(r0["data"]):
+        leg_types.append(r0["data"][idx]["id"])
+    logging.info("leg_types: %s", leg_types)
+    return leg_types
 
 
 async def return_get_segment_by_id_response(
@@ -61,5 +111,5 @@ async def return_get_segment_by_id_response(
             trip_search_id,
         ),
     )
-    logging.info("get_segment_by_id: %s", pformat(r3, indent=2))
+    logging.info("get_segment_by_id: %s", json.dumps(r3, indent=4))
     return r3

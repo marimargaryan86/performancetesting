@@ -41,6 +41,18 @@ class JunctionClient(object):  # noqa: WPS214
             url="/health",
         )
 
+    async def list_cabin_classes(self) -> dict[str, Any]:
+        return await self._make_request(method=_METHOD_GET, url="/cabin-classes")
+
+    async def get_cabin_class(
+        self,
+        cabin_class_id: str,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/cabin-classes/{0}".format(cabin_class_id),
+        )
+
     async def list_places(
         self,
         limit: Optional[int] = None,
@@ -62,6 +74,30 @@ class JunctionClient(object):  # noqa: WPS214
         return await self._make_request(
             method=_METHOD_GET,
             url="/legs/{0}".format(leg_id),
+        )
+
+    async def get_legs_types(self) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/legs/types",
+        )
+
+    async def get_leg_type_by_id(self, leg_type_id: str) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/legs/types/{0}".format(leg_type_id),
+        )
+
+    async def get_legs_by_trip_id(self, trip_id: str) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/trips/{0}/legs".format(trip_id),
+        )
+
+    async def get_legs_by_trip_search_id(self, trip_search_id: str) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/trips/searches/{0}/legs".format(trip_search_id),
         )
 
     async def get_legs_by_segment_id(
@@ -139,6 +175,84 @@ class JunctionClient(object):  # noqa: WPS214
             query_parameters=_make_pagination(limit, cursor),
         )
 
+    async def get_passenger_genders(
+        self,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/passengers/genders",
+            query_parameters=_make_pagination(limit, cursor),
+        )
+
+    async def get_passenger_gender(self, passenger_gender_id: str) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/passengers/genders/{0}".format(passenger_gender_id),
+        )
+
+    async def get_passenger_titles(
+        self,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/passengers/titles",
+            query_parameters=_make_pagination(limit, cursor),
+        )
+
+    async def get_passenger_title(self, passenger_title_id: str) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/passengers/titles/{0}".format(passenger_title_id),
+        )
+
+    async def get_places_types(
+        self,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/places/types",
+            query_parameters=_make_pagination(limit, cursor),
+        )
+
+    async def get_places_type(
+        self,
+        place_type_id: str,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/places/types/{0}".format(place_type_id),
+        )
+
+    async def get_segments_by_trip(
+        self,
+        trip_id: str,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/trips/{0}/segments".format(trip_id),
+            query_parameters=_make_pagination(limit, cursor),
+        )
+
+    async def get_segments_by_trip_search(
+        self,
+        trip_search_id: str,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/trips/searches/{0}/segments".format(trip_search_id),
+            query_parameters=_make_pagination(limit, cursor),
+        )
+
     async def create_offer_search(
         self,
         trip_ids: Sequence[str],
@@ -187,6 +301,60 @@ class JunctionClient(object):  # noqa: WPS214
             method=_METHOD_GET,
             url="/offers/searches/{0}/offers".format(offers_search_id),
             query_parameters=query_parameters,
+        )
+
+    async def get_offer_search(
+        self,
+        offers_search_id: str,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/offers/searches/{0}".format(offers_search_id),
+        )
+
+    async def get_offer(
+        self,
+        offer_id: str,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/offers/{0}".format(offer_id),
+        )
+
+    async def get_offer_groups_by_offer_group_id(
+        self,
+        offer_group_id: str,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/offers/groups/{0}".format(offer_group_id),
+        )
+
+    async def get_offer_group_details(
+        self,
+        offer_group_details_id: str,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/offers/groups/details/{0}".format(offer_group_details_id),
+        )
+
+    async def get_offer_options_by_offer_option_id(
+        self,
+        offer_option_id: str,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/offers/options/{0}".format(offer_option_id),
+        )
+
+    async def get_offer_option_details(
+        self,
+        offer_option_details_id: str,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/offers/options/details/{0}".format(offer_option_details_id),
         )
 
     async def get_offer_groups_by_offer_id(

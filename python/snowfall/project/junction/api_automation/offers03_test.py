@@ -1,0 +1,57 @@
+import logging
+import time
+
+import httpx
+import pytest
+
+from snowfall.project.junction.api_automation.offers01_test import (
+    return_offer_group_details,
+    return_offer_group_ids_and_offer_searches_id,
+    return_trip_search_id,
+)
+from snowfall.vendor.junction.client import JunctionClient
+
+logging.basicConfig()
+logging.getLogger().setLevel(logging.INFO)
+
+
+@pytest.mark.integration
+async def test_get_offer_group_details_by_offer_group_id(
+    host: str,
+    api_token: str,
+    departure_after: str,
+    origin: str,
+    destination: str,
+) -> None:
+    client = JunctionClient(
+        api_url="https://{0}".format(host),
+        token=api_token,
+        client=httpx.AsyncClient(timeout=10),
+    )
+
+    trips_search_id = await return_trip_search_id(
+        client,
+        departure_after,
+        destination,
+        origin,
+    )
+
+    (
+        offer_searches_id,
+        offer_group_ids,
+    ) = await return_offer_group_ids_and_offer_searches_id(
+        client,
+        trips_search_id,
+    )
+
+    assert offer_searches_id is not None, "offer_searches_id should not be empty"
+    assert offer_group_ids is not None, "offer_group_ids should not be empty"
+    time.sleep(20)
+
+    offer_group_details_ids = await return_offer_group_details(
+        client,
+        offer_group_ids,
+    )
+    assert (
+        offer_group_details_ids is not None
+    ), "offer_group_details_ids should not be empty"
