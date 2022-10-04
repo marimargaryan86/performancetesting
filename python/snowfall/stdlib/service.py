@@ -217,9 +217,11 @@ def _group(ctx: click.Context, **kwargs: Any) -> None:
     )
 
 
-def _command(command: Command[_Settings]) -> Callable[[click.Context], None]:
+def _command(  # noqa: WPS210
+    command: Command[_Settings],
+) -> Callable[[click.Context], None]:
     @click.pass_context
-    def decorator(ctx: click.Context, **kwargs: Any) -> None:
+    def decorator(ctx: click.Context, **kwargs: Any) -> None:  # noqa: WPS210
         ctx.ensure_object(dict)
 
         entrypoint: Entrypoint = ctx.obj["entrypoint"]
@@ -239,6 +241,14 @@ def _command(command: Command[_Settings]) -> Callable[[click.Context], None]:
         )
 
         stdout.configure_logger(level=global_settings.log_level)
+        logger = structlog.get_logger(__name__)
+
+        logger.info(
+            "Application bootstrapped.",
+            name=application.name,
+            version=application.version,
+            environment=application.environment,
+        )
 
         if global_settings.sentry_dsn:
             sentry.configure_sentry(
@@ -251,13 +261,10 @@ def _command(command: Command[_Settings]) -> Callable[[click.Context], None]:
                 additional_integrations=entrypoint.sentry_settings.additional_integrations,
                 tag_keys=entrypoint.sentry_settings.tag_keys,
             )
-
-        structlog.get_logger(__name__).info(
-            "Application bootstrapped.",
-            name=application.name,
-            version=application.version,
-            environment=application.environment,
-        )
+            logger.info(
+                "Sentry configured.",
+                dsn=global_settings.sentry_dsn,
+            )
 
         if not inspect.iscoroutinefunction(command.callback):
             web.start_http_server_in_thread(port=global_settings.prometheus_port)
