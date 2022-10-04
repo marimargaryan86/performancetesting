@@ -1,14 +1,8 @@
 python_sources(dependencies=[":cities"])
-pex_binary(
+python_image(
+    namespace="python.snowfall.project.junction.service.places",
     name="main",
     entry_point="main.py",
-    restartable=True,
-    execution_mode="venv",
-)
-docker_image(
-    name="docker",
-    dependencies=[":main"],
-    image_tags=["{build_args.VERSION}"],
 )
 resource(
     name="cities",

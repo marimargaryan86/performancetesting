@@ -1,14 +1,8 @@
 python_sources()
 python_tests(name="tests")
 python_test_utils(name="test_utils")
-pex_binary(
+python_image(
+    namespace="python.snowfall.project.junction.service.offers",
     name="main",
     entry_point="main.py",
-    restartable=True,
-    execution_mode="venv",
-)
-docker_image(
-    name="docker",
-    dependencies=[":main"],
-    image_tags=["{build_args.VERSION}"],
 )

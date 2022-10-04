@@ -1,5 +1,6 @@
 [GLOBAL]
 pants_version = "2.13.0"
+build_file_prelude_globs = ["python/snowfall/plugin/pants/macros.py"]
 use_deprecated_directory_cli_args_semantics = false
 use_deprecated_pex_binary_run_semantics = false
 backend_packages = [

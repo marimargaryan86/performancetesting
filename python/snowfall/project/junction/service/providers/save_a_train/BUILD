@@ -1,14 +1,7 @@
-docker_image(
-    name="docker",
-    dependencies=[":main"],
-    image_tags=["{build_args.VERSION}"],
-)
-
-pex_binary(
+python_image(
+    namespace="python.snowfall.project.junction.service.providers.save_a_train",
     name="main",
     entry_point="main.py",
-    restartable=True,
-    execution_mode="venv",
 )
 
 python_sources(dependencies=[":train_stations"])

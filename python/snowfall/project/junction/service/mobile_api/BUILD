@@ -1,17 +1,11 @@
 python_sources(dependencies=["openapi/junction/mobile_api"])
-pex_binary(
+python_image(
+    namespace="python.snowfall.project.junction.service.mobile_api",
     name="main",
     entry_point="main.py",
-    restartable=True,
-    execution_mode="venv",
 )
 python_test_utils(
     name="test_utils", dependencies=["openapi/junction/mobile_api", ":fixtures"]
-)
-docker_image(
-    name="docker",
-    dependencies=[":main"],
-    image_tags=["{build_args.VERSION}"],
 )
 files(
     name="fixtures",

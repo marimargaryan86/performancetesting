@@ -1,7 +1,8 @@
 python_sources()
 
-pex_binary(
+python_image(
+    namespace="python.snowfall.project.junction.service.providers.direct_ferries.gtfs",
     name="main",
     entry_point="main.py",
-    execution_mode="venv",
+    restartable=False,
 )

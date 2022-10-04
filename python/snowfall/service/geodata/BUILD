@@ -1,15 +1,8 @@
 python_sources(dependencies=[":borders"])
-pex_binary(
+python_image(
+    namespace="python.snowfall.service.geodata",
     name="main",
     entry_point="main.py",
-    restartable=True,
-    execution_mode="venv",
-)
-
-docker_image(
-    name="docker",
-    dependencies=[":main"],
-    image_tags=["{build_args.VERSION}"],
 )
 
 resource(

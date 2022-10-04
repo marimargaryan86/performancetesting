@@ -1,12 +1,6 @@
 python_sources(dependencies=["openapi/junction/admin_api"])
-pex_binary(
+python_image(
+    namespace="python.snowfall.project.junction.service.admin_api",
     name="main",
     entry_point="main.py",
-    restartable=True,
-    execution_mode="venv",
-)
-docker_image(
-    name="docker",
-    dependencies=[":main"],
-    image_tags=["{build_args.VERSION}"],
 )
