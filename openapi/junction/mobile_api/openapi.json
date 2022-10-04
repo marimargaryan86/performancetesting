@@ -1027,14 +1027,17 @@
           "content": {
             "application/vnd.api+json": {
               "schema": {
-                "$ref": "#/components/schemas/UserProfile"
+                "allOf": [
+                  {"$ref": "#/components/schemas/UserProfile"},
+                  {"$ref": "#/components/schemas/ChangePasswordBody"}
+                ]
               }
             }
           },
           "description": ""
         },
         "operationId": "patch-users-me",
-        "description": "User update profile",
+        "description": "Update user's profile and user's password. If you provide newPassword, you must provide oldPassword as well for verification",
         "security": [
           {
             "jwt": []
@@ -1184,6 +1187,46 @@
       }
     },
     "schemas": {
+      "ChangePasswordBody": {
+        "title": "Change Password Body",
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "users"
+                ],
+                "example": "users"
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "oldPassword": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "secret"
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "secret"
+                  }
+                }
+              }
+            },
+            "required": ["type", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
       "SegmentIdentifier": {
         "title": "Segment Identifier",
         "type": "object",

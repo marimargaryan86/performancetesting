@@ -1,7 +1,7 @@
-import datetime
 import random
 import uuid
 from string import digits
+from typing import Any, Mapping
 
 import bcrypt
 import lagom
@@ -99,16 +99,9 @@ class User(endpoints.HTTPEndpoint):
             raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
 
         await users_repository.update_password(
-            {_email_key: user_mail},
-            {
-                "$set": {
-                    _password_key: bcrypt.hashpw(
-                        body[_password_key].encode(),
-                        bcrypt.gensalt(),
-                    ).decode(),
-                    "updated_at": datetime.datetime.utcnow(),
-                },
-            },
+            body[_password_key],
+            user_mail,
+            _email_key,
         )
         return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -163,6 +156,30 @@ class UserLoggedIn(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         user_id = request.user.username
         body = await request_helpers.flatten_request(request)
+        if body.get("newPassword"):
+            if not body.get("oldPassword"):
+                return models.JsonApiResponse(
+                    models.Body(
+                        errors=[
+                            models.Error(
+                                status=str(status.HTTP_400_BAD_REQUEST),
+                                code="old_password_required",
+                                detail=(
+                                    "To change password you must provide existing one"
+                                ),
+                                source=models.ErrorSource(
+                                    pointer="/data/attributes/oldPassword",
+                                ),
+                            ),
+                        ],
+                    ),
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                )
+            await change_user_password(
+                user_id,
+                body,
+                users_repository,
+            )
         user = user_model.User.from_dict(body)
 
         await users_repository.update_profile(user_id, user.dict(exclude_unset=True))
@@ -173,6 +190,25 @@ class UserLoggedIn(endpoints.HTTPEndpoint):
                     user.dict(exclude_unset=True),
                 ),
             ),
+        )
+
+
+async def change_user_password(
+    user_id: str,
+    body: Mapping[str, Any],
+    users_repository: repository.UsersRepository,
+) -> None:
+    user = await users_repository.find_by_id(user_id)
+    if user:
+        password_match = bcrypt.checkpw(
+            body["oldPassword"].encode(),
+            user.password.encode(),
+        )
+        if not password_match:
+            raise exceptions.HTTPException(status.HTTP_400_BAD_REQUEST)
+        await users_repository.update_password(
+            body["newPassword"],
+            user_id,
         )
 
 

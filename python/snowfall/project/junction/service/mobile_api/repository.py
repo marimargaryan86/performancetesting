@@ -19,6 +19,7 @@ _ID_ACCESSOR = "id"
 _ID_KEY = "_id"
 _ATTRIBUTES_ACCESSOR = "attributes"
 _EMAIL_KEY = "email"
+_PASSWORD_KEY = str("password")
 _DEFAULT_PAGE_SIZE = 20
 _DICT_SEQUENCE = Sequence[dict[str, Any]]
 
@@ -64,8 +65,26 @@ class UsersRepository(
         pymongo.IndexModel("email", background=True, unique=True),
     ]
 
-    async def update_password(self, query: Any, document: Any) -> None:
-        await self._execute(self._collection.update_one, query, document, upsert=False)
+    async def update_password(
+        self,
+        password: str,
+        document_id: str,
+        selector: str = "_id",
+    ) -> None:
+        await self._execute(
+            self._collection.update_one,
+            {selector: document_id},
+            {
+                "$set": {
+                    _PASSWORD_KEY: bcrypt.hashpw(
+                        password.encode(),
+                        bcrypt.gensalt(),
+                    ).decode(),
+                    "updated_at": datetime.datetime.utcnow(),
+                },
+            },
+            upsert=False,
+        )
 
     async def find_user_by_email(self, email: str) -> Optional[models_pb2.User]:
         return await self._execute(self._collection.find_one, {_EMAIL_KEY: email})
