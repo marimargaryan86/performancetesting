@@ -1,6 +1,6 @@
 import abc
 from collections.abc import AsyncIterator
-from typing import Any, Generic, Mapping, Optional, TypeVar
+from typing import Any, Generic, Mapping, Optional, TypeVar, cast
 
 import pymongo
 from motor import core, motor_asyncio
@@ -32,7 +32,7 @@ class ResultSet(abc.ABC, Generic[_Record], AsyncIterator[_Record]):
         return self
 
     async def __anext__(self) -> _Record:
-        document = await self._cursor.__anext__()  # noqa: WPS609
+        document = cast(dict[str, Any], await self._cursor.__anext__())  # noqa: WPS609
         self._last = document.get(_mongo_id_key, document.get(_proto_id_key))
         self._fetched += 1
 
