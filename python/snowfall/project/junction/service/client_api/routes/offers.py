@@ -10,7 +10,7 @@ from snowfall.project.junction.service.client_api.transformers import (
     trip_ids_to_segments,
 )
 from snowfall.project.junction.service.offers.v1alpha import models_pb2
-from snowfall.stdlib import sequence
+from snowfall.stdlib import sequence, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import (
     handlers,
@@ -309,6 +309,8 @@ class OfferOptionDetailsByOfferOption(endpoints.HTTPEndpoint):
 
 
 class OfferSearches(endpoints.HTTPEndpoint):
+    _session_token_length = 32
+
     async def post(
         self,
         request: requests.Request,
@@ -335,6 +337,10 @@ class OfferSearches(endpoints.HTTPEndpoint):
                         for passenger in body["passengers"]
                     ],
                 ),
+            ),
+            session_token=body.get(
+                "sessionToken",
+                string.random(self._session_token_length),
             ),
         )
 

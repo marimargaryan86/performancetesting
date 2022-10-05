@@ -3,6 +3,14 @@ import pytest
 from snowfall.stdlib import string
 
 
+def test_random() -> None:
+    random_string = string.random(32)
+    assert len(random_string) == 32
+
+    random_string = string.random(4, charset=["a"])
+    assert random_string == "aaaa"
+
+
 @pytest.mark.parametrize(
     "snake_case,expected",
     [

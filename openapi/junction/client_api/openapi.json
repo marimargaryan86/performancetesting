@@ -4395,11 +4395,11 @@
             "example": "2019-08-24T14:15:22Z"
           },
           "rules": {
-              "type": "array",
-              "minItems": 0,
-              "items": {
-                  "$ref": "#/components/schemas/OfferSegmentLegRule"
-              }
+            "type": "array",
+            "minItems": 0,
+            "items": {
+              "$ref": "#/components/schemas/OfferSegmentLegRule"
+            }
           }
         },
         "required": [
@@ -4618,6 +4618,14 @@
               "attributes": {
                 "type": "object",
                 "properties": {
+                  "sessionToken": {
+                    "type": "string",
+                    "example": "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn",
+                    "minLength": 32,
+                    "maxLength": 32,
+                    "pattern": "^[A-Za-z\\d]{32}$",
+                    "writeOnly": true
+                  },
                   "expiresAt": {
                     "type": "string",
                     "format": "date-time",
@@ -5680,7 +5688,11 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["segments", "segments.legs", "segments.legs.legType"]
+            "enum": [
+              "segments",
+              "segments.legs",
+              "segments.legs.legType"
+            ]
           },
           "example": [
             "segments"
@@ -5782,7 +5794,10 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["legs", "legs.legType"]
+            "enum": [
+              "legs",
+              "legs.legType"
+            ]
           },
           "example": [
             "legs"
@@ -5811,7 +5826,9 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["legType"]
+            "enum": [
+              "legType"
+            ]
           },
           "example": [
             "legType"

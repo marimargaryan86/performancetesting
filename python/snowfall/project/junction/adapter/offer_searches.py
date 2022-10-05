@@ -28,6 +28,7 @@ class Client(abc.ABC):
     async def create(
         self,
         request: models_pb2.OfferSearch,
+        session_token: str,
     ) -> models_pb2.OfferSearch:
         """Create an offer search."""
 
@@ -45,6 +46,7 @@ class DictClient(Client):
     async def create(
         self,
         request: models_pb2.OfferSearch,
+        session_token: str,
     ) -> models_pb2.OfferSearch:
         expires_at = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
             days=1,
@@ -79,10 +81,14 @@ class GrpcClient(Client):
     async def create(
         self,
         request: models_pb2.OfferSearch,
+        session_token: str,
     ) -> models_pb2.OfferSearch:
         try:
             response = await self._offer_searches.EnqueueOfferSearch(
-                grpc_pb2.EnqueueOfferSearchRequest(search=request),
+                grpc_pb2.EnqueueOfferSearchRequest(
+                    search=request,
+                    session_token=session_token,
+                ),
                 timeout=self._timeout,
             )
         except grpc.aio.AioRpcError as exc:

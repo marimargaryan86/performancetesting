@@ -1,4 +1,16 @@
 import re
+import secrets
+import string as pystring
+from typing import Sequence
+
+_default_charset = pystring.ascii_uppercase + pystring.ascii_lowercase + pystring.digits
+
+
+def random(
+    length: int,
+    charset: Sequence[str] = _default_charset,
+) -> str:
+    return "".join(secrets.choice(charset) for _ in range(length))
 
 
 def to_camel(string: str) -> str:

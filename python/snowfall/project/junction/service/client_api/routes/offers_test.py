@@ -145,6 +145,7 @@ class TestOfferSearches(object):
                 "data": {
                     "type": "trip-offer-searches",
                     "attributes": {
+                        "sessionToken": "qJE1pt1ZXaGGH2E2p7cLZpWvpRmED2cE",
                         "passengers": [
                             {
                                 "dateOfBirth": "1979-09-17",
@@ -177,6 +178,7 @@ class TestOfferSearches(object):
                 "data": {
                     "type": "trip-offer-searches",
                     "attributes": {
+                        "sessionToken": "qJE1pt1ZXaGGH2E2p7cLZpWvpRmED2cE",
                         "passengers": [
                             {
                                 "dateOfBirth": "1979-09-17",
@@ -209,6 +211,7 @@ class TestOfferSearches(object):
                 "data": {
                     "type": "trip-offer-searches",
                     "attributes": {
+                        "sessionToken": "qJE1pt1ZXaGGH2E2p7cLZpWvpRmED2cE",
                         "passengers": [
                             {
                                 "dateOfBirth": "1979-09-17",
@@ -241,6 +244,7 @@ class TestOfferSearches(object):
                 "data": {
                     "type": "trip-offer-searches",
                     "attributes": {
+                        "sessionToken": "qJE1pt1ZXaGGH2E2p7cLZpWvpRmED2cE",
                         "passengers": [
                             {
                                 "dateOfBirth": "1979-09-17",
@@ -277,6 +281,7 @@ class TestOfferSearches(object):
                 "data": {
                     "type": "trip-offer-searches",
                     "attributes": {
+                        "sessionToken": "qJE1pt1ZXaGGH2E2p7cLZpWvpRmED2cE",
                         "passengers": [
                             {
                                 "dateOfBirth": "1979-09-17",

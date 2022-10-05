@@ -9,14 +9,14 @@ async def test_offer_search_can_be_saved(
     offer_searches_client: offer_searches.Client,
     offer_search: models_pb2.OfferSearch,
 ) -> None:
-    await offer_searches_client.create(offer_search)
+    await offer_searches_client.create(offer_search, "foo")
 
 
 async def test_offer_search_can_be_retrieved(
     offer_searches_client: offer_searches.Client,
     offer_search: models_pb2.OfferSearch,
 ) -> None:
-    offer_search = await offer_searches_client.create(offer_search)
+    offer_search = await offer_searches_client.create(offer_search, "foo")
     assert await offer_searches_client.get(offer_search.id)
 
 
