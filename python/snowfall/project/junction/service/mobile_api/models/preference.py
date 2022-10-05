@@ -81,63 +81,75 @@ def get_preference(input_dict: Mapping[str, Any]) -> dict[str, Any]:
     return preference.dict()
 
 
-preference_defaults = {
-    "push_notifications": {
+preference_defaults = [
+    {
         _TITLE_KEY: "Push Notifications",
         _REF_KEY: "push_notifications",
         _TYPE_KEY: "boolean",
         _CATEGORY_KEY: "Notifications",
         _VALUE_KEY: False,
     },
-    "travel_preferences_budget": {
+    {
         _TITLE_KEY: "Travel Preferences Budget",
         _REF_KEY: "travel_preferences_budget",
         _TYPE_KEY: "integer",
         _CATEGORY_KEY: "Travel Preferences",
         _VALUE_KEY: 0,
     },
-    "travel_preferences": {
+    {
         _TITLE_KEY: "Travel Preferences",
         _REF_KEY: "travel_preferences",
         _TYPE_KEY: "boolean_collection",
         _CATEGORY_KEY: "Travel Preferences",
-        _VALUE_KEY: {
-            "nature": {
+        _VALUE_KEY: [
+            {
                 _TITLE_KEY: "Nature",
                 _REF_KEY: "nature",
                 _VALUE_KEY: False,
                 _IMAGE_URL_KEY: _IMAGE_BASE_URL + str("Nature.png"),
             },
-            "sightseeing": {
+            {
                 _TITLE_KEY: "Sightseeing",
                 _REF_KEY: "sightseeing",
                 _VALUE_KEY: False,
                 _IMAGE_URL_KEY: _IMAGE_BASE_URL + str("Sightseeing.png"),
             },
-            "hiking": {
+            {
                 _TITLE_KEY: "Hiking",
                 _REF_KEY: "hiking",
                 _VALUE_KEY: False,
                 _IMAGE_URL_KEY: _IMAGE_BASE_URL + str("Hiking.png"),
             },
-            "action": {
+            {
                 _TITLE_KEY: "Action",
                 _REF_KEY: "action",
                 _VALUE_KEY: False,
                 _IMAGE_URL_KEY: _IMAGE_BASE_URL + str("Action.png"),
             },
-            "wildlife": {
+            {
                 _TITLE_KEY: "Wildlife",
                 _REF_KEY: "wildlife",
                 _VALUE_KEY: False,
                 _IMAGE_URL_KEY: _IMAGE_BASE_URL + str("Wildlife.png"),
             },
-            "food": {
+            {
                 _TITLE_KEY: "Food",
                 _REF_KEY: "food",
                 _VALUE_KEY: False,
                 _IMAGE_URL_KEY: _IMAGE_BASE_URL + str("Food.png"),
             },
-        },
+            {
+                _TITLE_KEY: "Nightlife",
+                _REF_KEY: "nightlife",
+                _VALUE_KEY: False,
+                _IMAGE_URL_KEY: _IMAGE_BASE_URL + str("Nightlife.png"),
+            },
+            {
+                _TITLE_KEY: "Relaxing",
+                _REF_KEY: "relaxing",
+                _VALUE_KEY: False,
+                _IMAGE_URL_KEY: _IMAGE_BASE_URL + str("Relaxing.png"),
+            },
+        ],
     },
-}
+]

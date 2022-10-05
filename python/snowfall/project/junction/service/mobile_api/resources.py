@@ -175,10 +175,16 @@ class PreferenceResource(models.Resource):
     @classmethod
     def from_dict(
         cls,
-        preferences: Any,
+        preference: Any,
     ) -> PreferenceResource:
         return cls(
-            id="",
+            id=preference["ref"],
             type="preferences",
-            attributes=preferences,
+            attributes={
+                "title": preference["title"],
+                "ref": preference["ref"],
+                "type": preference["type"],
+                "category": preference["category"],
+                "value": preference["value"],
+            },
         )

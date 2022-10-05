@@ -1060,9 +1060,15 @@
                   "type": "object",
                   "properties":{
                     "data":{
-                      "$ref": "#/components/schemas/Preference"
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Preference"
+                      }
                     }
-                  }
+                  },
+                  "required": [
+                    "data"
+                  ]
                 }
               }
             }
@@ -1095,9 +1101,12 @@
                 "type": "object",
                 "properties": {
                   "data": {
-                    "$ref": "#/components/schemas/Preference"
+                      "$ref": "#/components/schemas/UpdatePreference"
                   }
-                }
+                },
+                "required": [
+                  "data"
+                ]
               }
             }
           }
@@ -2757,13 +2766,43 @@
         ]
       },
       "Preference": {
-        "title": "Preference",
-        "description": "",
+        "title": "Preference value",
         "type": "object",
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ],
         "properties": {
           "id": {
             "type": "string",
-            "example": "32c3fdd6-3dbd-4161-898e-6a14eea99362",
+            "example": "push_notifications",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "preferences"
+            ],
+            "example": "preferences"
+          },
+          "attributes": {
+            "$ref": "#/components/schemas/PreferenceAttributes"
+          }
+        }
+      },
+      "UpdatePreference": {
+        "title": "Preference value (Update)",
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "push_notifications",
             "readOnly": true
           },
           "type": {
@@ -2776,23 +2815,21 @@
           "attributes": {
             "type": "object",
             "properties": {
-              "preferenceName":{
-                "oneOf": [
-                  {"$ref": "#/components/schemas/BooleanPreferenceAttributes"},
-                  {"$ref": "#/components/schemas/IntegerPreferenceAttributes"},
-                  {"$ref": "#/components/schemas/BooleanCollectionPreferenceAttributes"}
-                ]
+              "preferences": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PreferenceAttributes"
+                }
               }
-            }
+            },
+            "required": [
+              "preferences"
+            ]
           }
-        },
-        "required": [
-          "type",
-          "attributes"
-        ]
+        }
       },
-      "BooleanPreferenceAttributes": {
-        "title": "Boolean Preference Value",
+      "PreferenceAttributes": {
+        "title": "Preference attributes value",
         "type": "object",
         "properties": {
           "title": {
@@ -2807,7 +2844,9 @@
           "type": {
             "type": "string",
             "enum": [
-              "boolean"
+              "boolean",
+              "integer",
+              "boolean_collection"
             ],
             "example": "boolean",
             "readOnly": true
@@ -2818,80 +2857,33 @@
             "readOnly": true
           },
           "value": {
-            "type": "boolean",
-            "example": false
+            "oneOf": [
+              {"$ref": "#/components/schemas/BooleanPreferenceValue"},
+              {"$ref": "#/components/schemas/IntegerPreferenceValue"},
+              {"$ref": "#/components/schemas/BooleanCollectionPreferenceValue"}
+
+            ]
           }
         },
         "required": ["title", "ref", "type", "category", "value"]
       },
-      "IntegerPreferenceAttributes": {
+      "BooleanPreferenceValue": {
+        "title": "Boolean Preference Value",
+        "type": "boolean",
+        "example": false
+      },
+      "IntegerPreferenceValue": {
         "title": "Integer Preference Value",
-        "type": "object",
-        "properties": {
-          "title": {
-            "type": "string",
-            "example": "Travel Preferences Budget",
-            "readOnly": true
-          },
-          "ref": {
-            "type": "string",
-            "example": "travel_preferences_budget"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "integer"
-            ],
-            "example": "integer",
-            "readOnly": true
-          },
-          "category": {
-            "type": "string",
-            "example": "travel_preferences",
-            "readOnly": true
-          },
-          "value": {
-            "type": "integer",
-            "minimum": 0,
-            "example": 20
-          }
-        },
-        "required": ["title", "ref", "type", "category", "value"]
+        "type": "integer",
+        "minimum": 0,
+        "example": 20
       },
-      "BooleanCollectionPreferenceAttributes": {
+      "BooleanCollectionPreferenceValue": {
         "title": "Boolean Collection Preference Value",
-        "type": "object",
-        "properties": {
-          "title": {
-            "type": "string",
-            "example": "Travel Preferences",
-            "readOnly": true
-          },
-          "ref": {
-            "type": "string",
-            "example": "travel_preferences"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "boolean_collection"
-            ],
-            "example": "boolean_collection",
-            "readOnly": true
-          },
-          "category": {
-            "type": "string",
-            "example": "travel_preferences",
-            "readOnly": true
-          },
-          "value": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BooleanCollectionItem"
-            }
-          }
-        },
-        "required": ["title", "ref", "type", "category", "value"]
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/BooleanCollectionItem"
+        }
       },
       "BooleanCollectionItem": {
         "title": "Boolean Collection Item",
