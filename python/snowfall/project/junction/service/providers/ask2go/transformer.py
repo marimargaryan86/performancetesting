@@ -12,8 +12,7 @@ from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2
-from snowfall.vendor.ask2go import models as ask2go_models
-from snowfall.vendor.ask2go.models import booking, offers
+from snowfall.vendor.ask2go.models import booking, offers, price
 
 
 class OfferTransformer(object):
@@ -30,7 +29,7 @@ class OfferTransformer(object):
     async def offer_prices_to_offer_groups(
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
-        offer_prices: AsyncIterator[ask2go_models.price.OfferPriceResponse],
+        offer_prices: AsyncIterator[price.OfferPriceResponse],
     ) -> AsyncIterator[offers_pb2.OfferGroup]:
         async for offer_price in offer_prices:
             yield await self._offer_price_to_offer_group(search_task, offer_price)
@@ -38,7 +37,7 @@ class OfferTransformer(object):
     async def _offer_price_to_offer_group(
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
-        offer_price: ask2go_models.price.OfferPriceResponse,
+        offer_price: price.OfferPriceResponse,
     ) -> offers_pb2.OfferGroup:
         segment = more_itertools.first(
             more_itertools.first(offer_price.itinerary.trips).segments,

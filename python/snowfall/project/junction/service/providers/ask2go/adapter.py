@@ -5,7 +5,7 @@ from snowfall.project.junction.service.providers.ask2go import models, validator
 from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.vendor.ask2go import client, enums
-from snowfall.vendor.ask2go import models as ask2go_models
+from snowfall.vendor.ask2go.models import price, search
 
 
 class NoResultsError(Exception):
@@ -28,7 +28,7 @@ class Ask2GoAdapter(object):
     async def gather_search_results(
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
-    ) -> AsyncIterator[ask2go_models.price.OfferPriceResponse]:
+    ) -> AsyncIterator[price.OfferPriceResponse]:
         identifiers = await self._make_search(search_task.criteria)
         offer_prices = self._gather_offer_prices(
             identifiers,
@@ -41,8 +41,8 @@ class Ask2GoAdapter(object):
     async def _make_search(
         self,
         criteria: amqp_pb2.Criteria,
-    ) -> ask2go_models.search.CreateSearchResponse:
-        search_criteria = ask2go_models.search.CreateSearchCriteria(
+    ) -> search.CreateSearchResponse:
+        search_criteria = search.CreateSearchCriteria(
             origin_iata=criteria.origin_iata,
             destination_iata=criteria.destination_iata,
             outbound_date=protobuf.protobuf_to_datetime(criteria.outbound_departure),
@@ -61,9 +61,9 @@ class Ask2GoAdapter(object):
 
     async def _gather_offer_prices(
         self,
-        identifiers: ask2go_models.search.CreateSearchResponse,
+        identifiers: search.CreateSearchResponse,
         requirements: models.Requirements,
-    ) -> AsyncIterator[ask2go_models.price.OfferPriceResponse]:
+    ) -> AsyncIterator[price.OfferPriceResponse]:
         async for result_page in self._yield_pages(identifiers=identifiers):
             for offer in result_page.flight:
                 if offer.id and self._validator.matches(offer, requirements):
@@ -75,8 +75,8 @@ class Ask2GoAdapter(object):
 
     async def _yield_pages(
         self,
-        identifiers: ask2go_models.search.CreateSearchResponse,
-    ) -> AsyncIterator[ask2go_models.search.SearchResultsResponse]:
+        identifiers: search.CreateSearchResponse,
+    ) -> AsyncIterator[search.SearchResultsResponse]:
         page = 0
         total_pages = 1
 
@@ -88,9 +88,9 @@ class Ask2GoAdapter(object):
 
     async def _get_page(
         self,
-        identifiers: ask2go_models.search.CreateSearchResponse,
+        identifiers: search.CreateSearchResponse,
         page: int,
-    ) -> ask2go_models.search.SearchResultsResponse:
+    ) -> search.SearchResultsResponse:
         for _ in range(self._poll_retries_limit):
             search_result = await self._client.get_search_results(
                 search_id=identifiers.id,

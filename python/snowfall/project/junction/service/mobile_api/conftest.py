@@ -5,7 +5,7 @@ import datetime
 import pathlib
 import re
 import uuid
-from typing import Any, AsyncIterator, Mapping, Optional, Sequence
+from typing import Any, AsyncIterator, Mapping, Optional, Sequence, TypedDict
 from unittest import mock
 
 import aiosmtplib
@@ -20,7 +20,6 @@ from fakeredis import aioredis as fakeredis
 from lagom.integrations import starlette
 from starlette import applications
 from starlette.middleware import Middleware, authentication
-from typing_extensions import TypedDict
 
 from snowfall.project.junction.service.mobile_api import (
     auth_middleware,

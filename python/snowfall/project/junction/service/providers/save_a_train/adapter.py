@@ -30,8 +30,13 @@ from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2
 from snowfall.vendor.save_a_train import client, enums, exceptions
-from snowfall.vendor.save_a_train import models as save_a_train_models
-from snowfall.vendor.save_a_train.models import tariff_condition
+from snowfall.vendor.save_a_train.models import (
+    booking,
+    request,
+    search,
+    search_result_selection,
+    tariff_condition,
+)
 
 _CABIN_MAPPING = types.MappingProxyType(
     {
@@ -47,9 +52,9 @@ logger = structlog.get_logger(__name__)
 
 @dataclasses.dataclass(frozen=True)
 class CombinedBookingResults(object):
-    make_booking: save_a_train_models.booking.BookingResult
-    confirm_booking: save_a_train_models.booking.BookingConfirmationResult
-    get_ticket: save_a_train_models.booking.TicketInfo
+    make_booking: booking.BookingResult
+    confirm_booking: booking.BookingConfirmationResult
+    get_ticket: booking.TicketInfo
 
 
 class SaveATrainAdapterError(Exception):
@@ -94,7 +99,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
 
         try:
             await self._client.get_general_search_results(
-                save_a_train_models.request.GeneralSearchResultsRequest(
+                request.GeneralSearchResultsRequest(
                     origin_id=origin.id,
                     destination_id=destination.id,
                     trip_type=enums.TripType.one_way,
@@ -115,7 +120,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
 
         try:
             search_response = await self._client.create_search(
-                save_a_train_models.request.CreateSearchRequest(
+                request.CreateSearchRequest(
                     origin_id=origin.id,
                     destination_id=destination.id,
                     passengers_ages=list(search_task.criteria.passengers_ages),
@@ -143,7 +148,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
             if self._search_result_matches_requirements(search_result, requirement):
                 try:
                     search_details = await self._client.get_search_result_details(
-                        save_a_train_models.request.SearchResultRequest(
+                        request.SearchResultRequest(
                             search_id=search_response.identifier,
                             search_result_id=search_result.identifier,
                         ),
@@ -331,10 +336,10 @@ class SaveATrainAdapter(object):  # noqa: WPS214
     async def _select_search_result(
         self,
         offer_details: cache.OfferDetails,
-    ) -> save_a_train_models.search_result_selection.SearchResultSelectionResponse:
+    ) -> search_result_selection.SearchResultSelectionResponse:
         try:
             return await self._client.select_search_result(
-                save_a_train_models.request.SelectSearchResultRequest(
+                request.SelectSearchResultRequest(
                     search_id=offer_details.search_id,
                     search_result_id=offer_details.search_result_id,
                     transfer_id=offer_details.transfer_id,
@@ -350,7 +355,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
 
     def _extract_search_id_and_seat_preference_code(
         self,
-        response: save_a_train_models.search_result_selection.SearchResultSelectionResponse,
+        response: search_result_selection.SearchResultSelectionResponse,
     ) -> tuple[str, Optional[str]]:
         seat_preference_code = None
 
@@ -362,7 +367,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
 
     def _search_result_matches_requirements(
         self,
-        search_result: save_a_train_models.search.SearchResult,
+        search_result: search.SearchResult,
         requirement: models.SearchResultRequirement,
     ) -> bool:
         departure_at = search_result.departure_datetime.replace(
@@ -395,7 +400,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         passengers: Sequence[order_models_pb2.Passenger],
         search_id: str,
         seat_code: Optional[str],
-    ) -> save_a_train_models.booking.BookingResult:
+    ) -> booking.BookingResult:
         title_map = {  # TODO: map unspecified to something else?
             order_models_pb2.Passenger.Title.TITLE_UNSPECIFIED: enums.PassengerTitle.mr,
             order_models_pb2.Passenger.Title.TITLE_MR: enums.PassengerTitle.mr,
@@ -410,11 +415,11 @@ class SaveATrainAdapter(object):  # noqa: WPS214
 
         try:
             return await self._client.create_booking(
-                save_a_train_models.request.CreateBookingRequest(
+                request.CreateBookingRequest(
                     search_id=search_id,
                     seat_preference_code=seat_code or "ALLOWED_SEAT_LOCATION.W",
                     passengers=[
-                        save_a_train_models.booking.Passenger(
+                        booking.Passenger(
                             title=title_map[passenger.title],
                             first_name=passenger.first_name,
                             last_name=passenger.last_name,
@@ -449,7 +454,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
     async def _confirm_booking(
         self,
         search_id: str,
-    ) -> save_a_train_models.booking.BookingConfirmationResult:
+    ) -> booking.BookingConfirmationResult:
         try:
             return await self._client.confirm_booking(search_id)
         except exceptions.SATValidationError as booking_error:
@@ -462,7 +467,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
     async def _get_ticket(
         self,
         search_id: str,
-    ) -> save_a_train_models.booking.TicketInfo:
+    ) -> booking.TicketInfo:
         try:
             return await self._client.get_ticket(search_id)
         except exceptions.SATValidationError as booking_error:
@@ -480,7 +485,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
     ) -> tariff_condition.TariffConditionsResponse:
         try:
             return await self._client.get_tariff_conditions(
-                save_a_train_models.request.GetTariffConditionsRequest(
+                request.GetTariffConditionsRequest(
                     search_id=search_id,
                     search_result_id=search_result_id,
                     tariff_condition_id=tariff_condition_id,
