@@ -24,6 +24,7 @@ from snowfall.vendor.save_a_train.models.request import (
     CreateBookingRequest,
     CreateSearchRequest,
     GeneralSearchResultsRequest,
+    GetTariffConditionsRequest,
     SearchResultRequest,
     SelectSearchResultRequest,
 )
@@ -33,6 +34,9 @@ from snowfall.vendor.save_a_train.models.search_result_details import (
 )
 from snowfall.vendor.save_a_train.models.search_result_selection import (
     SearchResultSelectionResponse,
+)
+from snowfall.vendor.save_a_train.models.tariff_condition import (
+    TariffConditionsResponse,
 )
 
 _ALL_STATIONS = types.MappingProxyType(
@@ -543,6 +547,30 @@ class SATClient(object):  # noqa: WPS214
         response_data = response.json()
 
         return SearchResultSelectionResponse(**response_data)
+
+    async def get_tariff_conditions(
+        self,
+        request: GetTariffConditionsRequest,
+    ) -> TariffConditionsResponse:
+        """Get fare's tariff conditions."""
+        response = await self._session.get(
+            "{0}/searches/{1}/results/{2}/tariff_conditions/{3}".format(
+                self._api_url,
+                request.search_id,
+                request.search_result_id,
+                request.tariff_condition_id,
+            ),
+            headers=self._auth_headers,
+        )
+
+        if response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
+            raise SATValidationError(_exception_message_from_response(response))
+
+        response.raise_for_status()
+
+        response_data = response.json()
+
+        return TariffConditionsResponse(**response_data)
 
     async def create_booking(self, request: CreateBookingRequest) -> BookingResult:
         """Create a booking for search identified by ``search_id``."""

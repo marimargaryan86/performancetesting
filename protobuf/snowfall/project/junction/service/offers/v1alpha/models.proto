@@ -65,10 +65,16 @@ message Offer {
   // isRefundable
 }
 
+message SegmentRule {
+  string title = 1;
+  string body = 2;
+}
+
 message OfferSegmentDetails {
   string id = 1;
   string offer_segment_id = 3;
   snowfall.stdlib.v1alpha.CabinClass cabin_class = 2;
+  repeated SegmentRule rules = 4;
   // baggageAllowance
   // meal
 }

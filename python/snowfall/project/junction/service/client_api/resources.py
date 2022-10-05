@@ -260,6 +260,18 @@ class OfferOptionResource(models.Resource):
         )
 
 
+class OfferSegmentRule(models.BaseModel):
+    title: str
+    body: str
+
+    @classmethod
+    def from_proto(cls, rule: offer_models_pb2.SegmentRule) -> OfferSegmentRule:
+        return cls(
+            title=rule.title,
+            body=rule.body,
+        )
+
+
 class TripOfferOptionDetailsResource(models.Resource):
     api_type: ClassVar[str] = "trip-offer-option-details"
 
@@ -274,6 +286,7 @@ class TripOfferOptionDetailsResource(models.Resource):
             type=TripOfferOptionDetailsResource.api_type,
             attributes={
                 "cabinClassName": details.cabin_class.marketing_name,
+                "rules": [OfferSegmentRule.from_proto(rule) for rule in details.rules],
             },
             relationships={
                 "details": {

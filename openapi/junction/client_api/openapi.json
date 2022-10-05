@@ -4154,12 +4154,20 @@
               "attributes": {
                 "type": "object",
                 "required": [
-                  "cabinClassName"
+                  "cabinClassName",
+                  "rules"
                 ],
                 "properties": {
                   "cabinClassName": {
                     "type": "string",
                     "example": "Economy"
+                  },
+                  "rules": {
+                      "type": "array",
+                      "minItems": 0,
+                      "items": {
+                          "$ref": "#/components/schemas/OfferSegmentDetailRule"
+                      }
                   }
                 }
               },
@@ -4421,6 +4429,24 @@
           "body": {
             "type": "string",
             "example": "NO MINIMUM STAY REQUIREMENTS APPLY."
+          }
+        },
+        "required": [
+          "title",
+          "body"
+        ]
+      },
+      "OfferSegmentDetailRule": {
+        "title": "Offer Segment Detail Rule",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Cancellation policy"
+          },
+          "body": {
+            "type": "string",
+            "example": "Tickets can be cancelled until the day of departure without any charges. After that, no refund is possible anymore.  NOTE: the refund delay for Homeprint and Mobile tickets is 2 days. Except for agency fee of 20euro for handling."
           }
         },
         "required": [

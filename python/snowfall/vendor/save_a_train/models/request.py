@@ -35,6 +35,12 @@ class SelectSearchResultRequest(BaseModel):
     fare_id: int
 
 
+class GetTariffConditionsRequest(BaseModel):
+    search_id: str
+    search_result_id: int
+    tariff_condition_id: int
+
+
 class CreateBookingRequest(BaseModel):
     search_id: str
     passengers: Sequence[Passenger]
