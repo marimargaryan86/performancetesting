@@ -43,11 +43,6 @@ message OfferAggregate {
   repeated OfferGroup groups = 2;
 }
 
-message Rule {
-  string title = 1;
-  string body = 2;
-}
-
 message OfferGroup {
   string id = 1;
   string offer_search_id = 2;
@@ -104,5 +99,4 @@ message OfferSegmentLeg {
   snowfall.stdlib.v1alpha.Point destination = 3;
   google.protobuf.Timestamp departure_at = 4;
   google.protobuf.Timestamp arrival_at = 5;
-  repeated Rule rules = 6;
 }

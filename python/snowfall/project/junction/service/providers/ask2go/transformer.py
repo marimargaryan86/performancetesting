@@ -34,7 +34,7 @@ class OfferTransformer(object):
         async for offer_price in offer_prices:
             yield await self._offer_price_to_offer_group(search_task, offer_price)
 
-    async def _offer_price_to_offer_group(
+    async def _offer_price_to_offer_group(  # noqa: WPS210
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
         offer_price: price.OfferPriceResponse,
@@ -44,12 +44,12 @@ class OfferTransformer(object):
         )
         search_segment = more_itertools.first(search_task.segments)
         expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
+        grouped_rules = self._group_rules_by_origin_destination(
+            offer_price.fare_rules,
+        )
         offer_segment = self._segment_to_proto(
             segment=segment,
             search_segment=search_segment,
-            grouped_rules=self._group_rules_by_origin_destination(
-                offer_price.fare_rules,
-            ),
         )
         amount = money.from_string(
             offer_price.itinerary.pricing_information.base.total_cost,
@@ -77,6 +77,18 @@ class OfferTransformer(object):
                                 type=models.cabin_to_proto(segment.cabin),
                                 marketing_name=segment.cabin or "",
                             ),
+                            rules=[
+                                offers_pb2.SegmentRule(
+                                    body=rule.text,
+                                    title=rule.title,
+                                )
+                                for rule in grouped_rules[
+                                    (
+                                        segment.origin.airport_code,
+                                        segment.destination.airport_code,
+                                    )
+                                ]
+                            ],
                         ),
                     ],
                     price=models_pb2.Price(
@@ -92,7 +104,6 @@ class OfferTransformer(object):
         self,
         segment: offers.TripSegment,
         search_segment: models_pb2.Segment,
-        grouped_rules: Mapping[Tuple[str, str], Sequence[booking.FareRule]],
     ) -> offers_pb2.OfferSegment:
         origin = self._airports.get_by_iata(segment.origin.airport_code)
         destination = self._airports.get_by_iata(segment.destination.airport_code)
@@ -131,18 +142,6 @@ class OfferTransformer(object):
                             tzinfo=destination.timezone,
                         ),
                     ),
-                    rules=[
-                        offers_pb2.Rule(
-                            body=rule.text,
-                            title=rule.title,
-                        )
-                        for rule in grouped_rules[
-                            (
-                                segment.origin.airport_code,
-                                segment.destination.airport_code,
-                            )
-                        ]
-                    ],
                 ),
             ],
             vehicle=offers_pb2.Vehicle(

@@ -123,24 +123,11 @@ class OfferGroupResource(models.Resource):
         )
 
 
-class OfferSegmentLegRule(models.BaseModel):
-    title: str
-    body: str
-
-    @classmethod
-    def from_proto(cls, rule: offer_models_pb2.Rule) -> OfferSegmentLegRule:
-        return cls(
-            title=rule.title,
-            body=rule.body,
-        )
-
-
 class OfferSegmentLeg(models.BaseModel):
     origin: Point
     destination: Point
     departure_at: datetime.datetime = pydantic.Field(alias="departureAt")
     arrival_at: datetime.datetime = pydantic.Field(alias="arrivalAt")
-    rules: list[OfferSegmentLegRule]
 
     @classmethod
     def from_proto(cls, leg: offer_models_pb2.OfferSegmentLeg) -> OfferSegmentLeg:
@@ -153,7 +140,6 @@ class OfferSegmentLeg(models.BaseModel):
             arrivalAt=protobuf.protobuf_to_datetime(leg.arrival_at).astimezone(
                 zoneinfo.ZoneInfo(leg.destination.time_zone),
             ),
-            rules=[OfferSegmentLegRule.from_proto(rule) for rule in leg.rules],
         )
 
 
