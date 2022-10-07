@@ -1,5 +1,7 @@
+import asyncio
 import contextlib
 import dataclasses
+import itertools
 from collections import defaultdict
 from typing import Awaitable, Callable, Sequence, Type
 
@@ -71,17 +73,21 @@ class _IncludesResolver(object):
         for _, type_key, identifier in relationships:
             identifiers_per_type[type_key].add(identifier)
 
+        awaitables = []
+
         for api_type, identifiers in identifiers_per_type.items():
             with contextlib.suppress(KeyError):
-                resources = resources | {
-                    (resource.data_type, resource.identifier): resource
-                    for resource in await _resolvers[_lookup[api_type]].func(
+                awaitables.append(
+                    _resolvers[_lookup[api_type]].func(
                         list(identifiers),
                         request,
-                    )
-                }
+                    ),
+                )
 
-        return resources
+        return resources | {
+            (resource.data_type, resource.identifier): resource
+            for resource in itertools.chain(*(await asyncio.gather(*awaitables)))
+        }
 
     def _find_wanted_resources(  # noqa: WPS210
         self,
