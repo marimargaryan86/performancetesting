@@ -85,7 +85,6 @@ async def test_booking_can_be_placed(
     )
     total_price = money.from_protobuf(booking_proto.total_price)
 
-    assert booking_proto.provider_name == "Save A Train"
     assert total_price.currency.code == "EUR"
     assert str(total_price) == "4.50"
     assert booking_proto.trip_result.record_locator == "GTRHSFL"

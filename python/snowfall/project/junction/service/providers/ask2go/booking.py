@@ -1,5 +1,4 @@
 import asyncio
-import copy
 import datetime
 from typing import Sequence
 
@@ -20,8 +19,6 @@ from snowfall.stdlib.format import protobuf
 from snowfall.vendor.ask2go import client, errors
 from snowfall.vendor.ask2go.models import booking, common
 
-_PROVIDER_NAME = "Ask2Go"
-
 
 class BookingHandler(object):
     _poll_retries_limit = 10
@@ -41,7 +38,7 @@ class BookingHandler(object):
         task: amqp_pb2.PlaceOrderTask,
         details: OfferDetails,
     ) -> models_pb2.Booking:
-        new_booking = copy.deepcopy(task.booking)
+        new_booking = task.booking
 
         try:
             booking_result = await self._make_booking(
@@ -52,20 +49,13 @@ class BookingHandler(object):
             )
         except (errors.ServiceError, phonenumbers.NumberParseException):
             self._logger.exception()
-
-            new_booking.MergeFrom(
-                models_pb2.Booking(
-                    status=models_pb2.Booking.STATUS_ERROR,
-                    provider_name=_PROVIDER_NAME,
-                ),
-            )
+            new_booking.status = models_pb2.Booking.STATUS_ERROR
 
             return new_booking
 
         new_booking.MergeFrom(
             models_pb2.Booking(
                 status=models_pb2.Booking.STATUS_NOT_TICKETED,
-                provider_name=_PROVIDER_NAME,
                 total_price=money.from_string(
                     string_amount=str(
                         booking_result.price_information["bookPrice"]["price"],

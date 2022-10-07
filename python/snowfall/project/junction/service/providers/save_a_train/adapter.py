@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 import dataclasses
 import datetime
 import types
@@ -46,7 +45,6 @@ _CABIN_MAPPING = types.MappingProxyType(
     },
 )
 
-_PROVIDER_NAME = "Save A Train"
 logger = structlog.get_logger(__name__)
 
 
@@ -270,7 +268,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         task: order_amqp_pb2.PlaceOrderTask,
         offer_details: cache.OfferDetails,
     ) -> order_models_pb2.Booking:
-        new_booking = copy.deepcopy(task.booking)
+        new_booking = task.booking
 
         try:
             booking_responses = await self._create_booking(task, offer_details)
@@ -281,7 +279,6 @@ class SaveATrainAdapter(object):  # noqa: WPS214
             new_booking.MergeFrom(
                 order_models_pb2.Booking(
                     status=order_models_pb2.Booking.STATUS_ERROR,
-                    provider_name=_PROVIDER_NAME,
                     raw_data=repr(error),
                 ),
             )
@@ -291,7 +288,6 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         new_booking.MergeFrom(
             order_models_pb2.Booking(
                 status=order_models_pb2.Booking.STATUS_CONFIRMED,
-                provider_name=_PROVIDER_NAME,
                 total_price=money.from_string(
                     string_amount=booking_responses.make_booking.total_price,
                     currency=money.Currency("EUR"),

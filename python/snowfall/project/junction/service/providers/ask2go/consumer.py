@@ -4,6 +4,7 @@ import structlog
 
 from snowfall.project.junction.service.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
 from snowfall.project.junction.service.orders.v1alpha import amqp_pb2 as orders_amqp_pb2
+from snowfall.project.junction.service.orders.v1alpha import models_pb2
 from snowfall.project.junction.service.providers.ask2go import (
     adapter,
     booking,
@@ -15,6 +16,8 @@ from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport import amqp
+
+_PROVIDER_NAME = "Ask2Go"
 
 
 class OrderConsumer(object):
@@ -37,8 +40,21 @@ class OrderConsumer(object):
     async def _process_message(self, amqp_message: amqp.Message) -> None:
         task = cast(orders_amqp_pb2.PlaceOrderTask, amqp_message.body)
         offer_details = await self._cache.fetch(task.booking.trip_option.id)
+        task.booking.provider_name = _PROVIDER_NAME
 
         if not offer_details:
+            self._logger.error(
+                "No offer details found for booking",
+                booking_id=task.booking.id,
+                key=task.booking.trip_option.id,
+            )
+            task.booking.status = models_pb2.Booking.STATUS_ERROR
+
+            await self._producer.publish(
+                task.booking,
+                routing_key="orders.result.offer",
+            )
+
             return
 
         await self._producer.publish(
