@@ -1,6 +1,9 @@
 from typing import Any
 
+import httpx
 import pytest
+
+from snowfall.vendor.junction.client import JunctionClient
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -56,3 +59,12 @@ def pytest_collection_modifyitems(config: pytest.Config, items: Any) -> None:
         for ii in items:
             if "integration" in ii.keywords:
                 ii.add_marker(skip_me)
+
+
+@pytest.fixture(scope="function")
+def client(api_token: str, host: str) -> JunctionClient:
+    return JunctionClient(
+        api_url="https://{0}".format(host),
+        token=api_token,
+        client=httpx.AsyncClient(timeout=10),
+    )

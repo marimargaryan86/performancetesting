@@ -1,7 +1,6 @@
 import json
 import logging
 
-import httpx
 import pytest
 
 from snowfall.vendor.junction.client import JunctionClient
@@ -12,15 +11,8 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_list_cabin_classes(
-    host: str,
-    api_token: str,
+    client: JunctionClient,
 ) -> None:
-    client = JunctionClient(
-        api_url="https://{0}".format(host),
-        token=api_token,
-        client=httpx.AsyncClient(timeout=10),
-    )
-
     response = await client.list_cabin_classes()
     logging.info("list_cabin_classes: %s", json.dumps(response, indent=4))
     assert response["data"][0]["id"] == "unspecified"
@@ -32,11 +24,8 @@ async def test_list_cabin_classes(
 
 @pytest.mark.integration
 async def test_get_cabin_class(
-    host: str,
-    api_token: str,
+    client: JunctionClient,
 ) -> None:
-    client = JunctionClient(api_url="https://{0}".format(host), token=api_token)
-
     cabin_classes_ids = await return_cabin_classes_ids(client)
 
     for cabin_class_id in cabin_classes_ids:

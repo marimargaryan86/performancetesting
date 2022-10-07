@@ -1,7 +1,6 @@
 import logging
 from typing import Sequence
 
-import httpx
 import pytest
 
 from snowfall.project.junction.api_automation.offers01_test import (
@@ -17,18 +16,11 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_get_offer_options_by_offer_option_id(
-    host: str,
-    api_token: str,
+    client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
-    client = JunctionClient(
-        api_url="https://{0}".format(host),
-        token=api_token,
-        client=httpx.AsyncClient(timeout=10),
-    )
-
     offer_options_ids = await return_offer_options_ids(
         client,
         departure_after,

@@ -5,7 +5,6 @@ import logging
 import time
 from typing import Any, Mapping, Sequence, Tuple
 
-import httpx
 import pytest
 
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
@@ -19,18 +18,11 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_trip_offers_e2e_basic(
-    host: str,
-    api_token: str,
+    client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
-    client = JunctionClient(
-        api_url="https://{0}".format(host),
-        token=api_token,
-        client=httpx.AsyncClient(timeout=10),
-    )
-
     trip_offer_search_ids = await return_trip_offer_search_ids(
         client,
         departure_after,
@@ -48,7 +40,7 @@ async def test_trip_offers_e2e_basic(
         offer_id_and_offer_group_ids,
     )
 
-    assert offer_options_ids is not None, "offer_options_ids should not be empty"
+    assert offer_options_ids, "offer_options_ids should not be empty"
 
 
 async def return_offer_options_ids_from_offer_searches(

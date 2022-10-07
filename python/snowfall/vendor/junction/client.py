@@ -576,6 +576,35 @@ class JunctionClient(object):  # noqa: WPS214
             url="/bookings/details/{0}".format(identifier),
         )
 
+    async def get_search_offer_ids(
+        self,
+        offers_search_id: str,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/offers/searches/{0}/offers".format(offers_search_id),
+        )
+
+    async def make_order_request(
+        self,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/orders",
+            query_parameters=_make_pagination(limit, cursor),
+        )
+
+    async def get_orders_id(
+        self,
+        orders_id: str,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/orders/{0}".format(orders_id),
+        )
+
     # todo: Delete.
     async def _get_deprecated_order(
         self,

@@ -3,7 +3,6 @@ import logging
 import time
 from datetime import datetime, timezone
 
-import httpx
 import pytest
 
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
@@ -17,18 +16,11 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_trip_e2e_basic(
-    host: str,
-    api_token: str,
+    client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
-    client = JunctionClient(
-        api_url="https://{0}".format(host),
-        token=api_token,
-        client=httpx.AsyncClient(timeout=10),
-    )
-
     trip_search_id = await return_trip_search_id(
         client,
         departure_after,
@@ -48,18 +40,11 @@ async def test_trip_e2e_basic(
 
 @pytest.mark.integration
 async def test_get_trip_search_by_id(
-    host: str,
-    api_token: str,
+    client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
-    client = JunctionClient(
-        api_url="https://{0}".format(host),
-        token=api_token,
-        client=httpx.AsyncClient(timeout=10),
-    )
-
     trip_search_id = await return_trip_search_id(
         client,
         departure_after,
@@ -79,18 +64,11 @@ async def test_get_trip_search_by_id(
 
 @pytest.mark.integration
 async def test_get_trips_by_trip_search_id(
-    host: str,
-    api_token: str,
+    client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
-    client = JunctionClient(
-        api_url="https://{0}".format(host),
-        token=api_token,
-        client=httpx.AsyncClient(timeout=10),
-    )
-
     trip_search_id = await return_trip_search_id(
         client,
         departure_after,
@@ -110,18 +88,11 @@ async def test_get_trips_by_trip_search_id(
 
 @pytest.mark.integration
 async def test_get_trip_by_id(
-    host: str,
-    api_token: str,
+    client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
-    client = JunctionClient(
-        api_url="https://{0}".format(host),
-        token=api_token,
-        client=httpx.AsyncClient(timeout=10),
-    )
-
     trip_search_id = await return_trip_search_id(
         client,
         departure_after,
@@ -146,18 +117,11 @@ async def test_get_trip_by_id(
 
 @pytest.mark.integration
 async def test_get_legs_by_trip_id(
-    host: str,
-    api_token: str,
+    client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
-    client = JunctionClient(
-        api_url="https://{0}".format(host),
-        token=api_token,
-        client=httpx.AsyncClient(timeout=10),
-    )
-
     trip_search_id = await return_trip_search_id(
         client,
         departure_after,
@@ -182,14 +146,11 @@ async def test_get_legs_by_trip_id(
 
 @pytest.mark.integration
 async def test_get_legs_by_trip_search_id(
-    host: str,
-    api_token: str,
+    client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
-    client = JunctionClient(api_url="https://{0}".format(host), token=api_token)
-
     trip_search_id = await return_trip_search_id(
         client,
         departure_after,
@@ -208,17 +169,13 @@ async def test_get_legs_by_trip_search_id(
 @pytest.mark.integration
 async def test_list_segments_by_trip(
     host: str,
-    api_token: str,
+    client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
     trip_search_id = await return_trip_search_id(
-        JunctionClient(
-            api_url="https://{0}".format(host),
-            token=api_token,
-            client=httpx.AsyncClient(timeout=10),
-        ),
+        client,
         departure_after,
         destination,
         origin,
@@ -226,21 +183,11 @@ async def test_list_segments_by_trip(
 
     time.sleep(5)
 
-    r2 = await JunctionClient(
-        api_url="https://{0}".format(host),
-        token=api_token,
-        client=httpx.AsyncClient(timeout=10),
-    ).get_trips_by_trip_search_id(trip_search_id)
+    r2 = await client.get_trips_by_trip_search_id(trip_search_id)
 
     logging.info("get_trips_by_trip_search_id response: %s", json.dumps(r2, indent=4))
 
-    r3 = (
-        await JunctionClient(
-            api_url="https://{0}".format(host),
-            token=api_token,
-            client=httpx.AsyncClient(timeout=10),
-        ).get_segments_by_trip(r2["data"][0]["id"]),
-    )
+    r3 = (await client.get_segments_by_trip(r2["data"][0]["id"]),)
 
     logging.info("get_segments_by_trip: %s", json.dumps(r3, indent=4))
 
@@ -261,18 +208,11 @@ async def test_list_segments_by_trip(
 
 @pytest.mark.integration
 async def test_get_segments_by_trip_search_id(
-    host: str,
-    api_token: str,
+    client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
-    client = JunctionClient(
-        api_url="https://{0}".format(host),
-        token=api_token,
-        client=httpx.AsyncClient(timeout=10),
-    )
-
     trip_search_id = await return_trip_search_id(
         client,
         departure_after,

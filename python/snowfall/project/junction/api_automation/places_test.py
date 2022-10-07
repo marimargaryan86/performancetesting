@@ -2,7 +2,6 @@ import json
 import logging
 from typing import Any
 
-import httpx
 import pytest
 
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
@@ -16,32 +15,22 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_places(
-    host: str,
-    api_token: str,
+    client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
-    client = JunctionClient(
-        api_url="https://{0}".format(host),
-        token=api_token,
-        client=httpx.AsyncClient(timeout=10),
-    )
-
     r1 = await return_list_places(client)
     assert is_valid_uuid(r1["data"][0]["id"], 5) is True, "no place returned!"
 
 
 @pytest.mark.integration
 async def test_places_place_id(
-    host: str,
-    api_token: str,
+    client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
-    client = JunctionClient(api_url="https://{0}".format(host), token=api_token)
-
     r0 = await return_list_places(client)
     assert is_valid_uuid(r0["data"][0]["id"], 5) is True, "no place returned!"
 
@@ -58,13 +47,11 @@ async def test_places_place_id(
 @pytest.mark.integration
 async def test_get_places_types(
     host: str,
-    api_token: str,
+    client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
-    client = JunctionClient(api_url="https://{0}".format(host), token=api_token)
-
     response = await client.get_places_types()
     logging.info("get_places_types: %s", json.dumps(response, indent=4))
 
@@ -80,25 +67,19 @@ async def test_get_places_types(
 @pytest.mark.integration
 async def test_get_places_type(
     host: str,
-    api_token: str,
+    client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
-    response_places = await JunctionClient(
-        api_url="https://{0}".format(host),
-        token=api_token,
-    ).get_places_types()
+    response_places = await client.get_places_types()
 
     places_ids = []
     for data_item in response_places["data"]:
         places_ids.append(data_item["id"])
 
     for places_id in places_ids:
-        response_place = await JunctionClient(
-            api_url="https://{0}".format(host),
-            token=api_token,
-        ).get_places_type(places_id)
+        response_place = await client.get_places_type(places_id)
 
         logging.info("get_places_type: %s", json.dumps(response_place, indent=4))
 
