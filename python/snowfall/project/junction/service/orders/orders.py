@@ -259,9 +259,13 @@ class BookingRepository(repository.ProtoRepository[models_pb2.Booking]):
         booking: models_pb2.Booking,
     ) -> models_pb2.Booking:
         await self._execute(
-            self._collection.replace_one,
+            self._collection.update_one,
             filter={"orders.bookings._id": booking.id},
-            replacement=self._coder.encode(booking),
+            update={
+                "$set": {
+                    "orders.$.bookings": self._coder.encode(booking),
+                },
+            },
         )
 
         return booking
