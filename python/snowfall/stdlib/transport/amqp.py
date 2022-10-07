@@ -1,9 +1,21 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import dataclasses
+import enum
 import os
-from typing import Any, Callable, Coroutine, Mapping, Type, Union
+import uuid
+from typing import (
+    Any,
+    AsyncGenerator,
+    Callable,
+    Coroutine,
+    Mapping,
+    Optional,
+    Type,
+    Union,
+)
 
 from aio_pika import Message as PikeMessage
 from aio_pika import abc, connect_robust
@@ -12,9 +24,16 @@ from sentry_sdk import Hub, tracing
 from structlog import get_logger
 
 from snowfall.stdlib.instrumentation.sentry import get_span
+from snowfall.stdlib.v1alpha import amqp_pb2
 
 _SPAN_PRODUCER_OP = "amqp.produce"
 _SPAN_CONSUMER_OP = "amqp.message"
+_TRACKABLE_HEADERS = ("x-trackable-id", "x-trackable-routing-key")
+TrackableUpdateMessageType = Union[
+    Type[amqp_pb2.TrackableReceived],
+    Type[amqp_pb2.TrackableAcked],
+    Type[amqp_pb2.TrackableNacked],
+]
 
 
 class Serializer(object):
@@ -51,6 +70,12 @@ async def create_connection(dsn: str) -> abc.AbstractRobustConnection:
     return await connect_robust(url=dsn)
 
 
+@dataclasses.dataclass(frozen=True)
+class TrackableMetadata(object):
+    routing_key: str
+    trackable_id: Optional[str] = None
+
+
 class Producer(object):
     def __init__(
         self,
@@ -61,7 +86,12 @@ class Producer(object):
         self._exchange = exchange
         self._logger = get_logger(__name__)
 
-    async def publish(self, msg: message.Message, routing_key: str) -> None:
+    async def publish(  # noqa: WPS210
+        self,
+        msg: message.Message,
+        routing_key: str,
+        headers: Optional[Mapping[str, str]] = None,
+    ) -> None:
         with get_span(
             _SPAN_PRODUCER_OP,
             "{0}/{1}".format(self._exchange.name, routing_key),
@@ -73,13 +103,16 @@ class Producer(object):
                     durable=True,
                 )
 
+                span_headers = {
+                    header_key: header_value
+                    for header_key, header_value in span.iter_headers()
+                }
+                headers = headers or {}
+
                 await exchange.publish(
                     message=PikeMessage(
                         body=Serializer.serialize(msg),
-                        headers={
-                            header_key: header_value
-                            for header_key, header_value in span.iter_headers()
-                        },
+                        headers={**span_headers, **headers},
                         content_type="application/x-protobuf",
                     ),
                     routing_key=routing_key,
@@ -92,28 +125,63 @@ class Producer(object):
             type=msg.DESCRIPTOR.full_name,
         )
 
+    async def publish_trackable(
+        self,
+        msg: message.Message,
+        routing_key: str,
+        trackable_metadata: TrackableMetadata,
+        headers: Optional[Mapping[str, str]] = None,
+    ) -> str:
+        trackable_id = trackable_metadata.trackable_id or str(uuid.uuid4())
+        headers = headers or {}
+
+        await self.publish(
+            msg=msg,
+            routing_key=routing_key,
+            headers={
+                **headers,
+                "x-trackable-id": trackable_id,
+                "x-trackable-routing-key": trackable_metadata.routing_key,
+            },
+        )
+
+        return trackable_id
+
+
+class _MessageStatus(enum.Enum):
+    acked = "acked"
+    nacked = "nacked"
+    unhandled = "unhandled"
+
 
 class Message(object):
     def __init__(self, msg: abc.AbstractIncomingMessage):
         self.body = Serializer.deserialize(msg.body)
         self.headers: Mapping[str, Any] = msg.headers
         self._message = msg
+        self._status: _MessageStatus = _MessageStatus.unhandled
 
     async def ack(self) -> None:
         if self.acknowledged:
             return
 
         await self._message.ack()
+        self._status = _MessageStatus.acked
+
+    @property
+    def processed(self) -> bool:
+        return self._message.processed
 
     @property
     def acknowledged(self) -> bool:
-        return self._message.processed
+        return self._status == _MessageStatus.acked
 
     async def nack(self) -> None:
-        if self.acknowledged:
+        if self.processed:
             return
 
         await self._message.nack(requeue=False)
+        self._status = _MessageStatus.nacked
 
     async def requeue(self) -> None:
         if self.acknowledged:
@@ -133,6 +201,57 @@ ConsumerCallback = Callable[[Message], Coroutine[None, None, None]]
 class Exchange(object):
     name: str
     type_: abc.ExchangeType = abc.ExchangeType.TOPIC
+
+
+def _is_trackable(msg: Message) -> bool:
+    return all(header in msg.headers for header in _TRACKABLE_HEADERS)
+
+
+class _TrackableManager(object):
+    def __init__(self, producer: Producer) -> None:
+        self._producer = producer
+
+    async def message_received(self, msg: Message) -> None:
+        await self._report(msg, amqp_pb2.TrackableReceived)
+
+    async def message_acked(self, msg: Message) -> None:
+        await self._report(msg, amqp_pb2.TrackableAcked)
+
+    async def message_nacked(self, msg: Message) -> None:
+        await self._report(msg, amqp_pb2.TrackableNacked)
+
+    async def _report(
+        self,
+        msg: Message,
+        proto_class: TrackableUpdateMessageType,
+    ) -> None:
+        if not _is_trackable(msg):
+            return
+
+        await self._producer.publish(
+            msg=proto_class(
+                id=msg.headers["x-trackable-id"],
+            ),
+            routing_key=msg.headers["x-trackable-routing-key"],
+        )
+
+
+@contextlib.asynccontextmanager
+async def _manage_trackable(
+    msg: Message,
+    producer: Producer,
+) -> AsyncGenerator[None, None]:
+    trackable_manager = _TrackableManager(producer)
+
+    await trackable_manager.message_received(msg)
+
+    try:
+        yield
+    finally:
+        if msg.acknowledged:
+            await trackable_manager.message_acked(msg)
+        else:
+            await trackable_manager.message_nacked(msg)
 
 
 class Consumer(object):
@@ -196,20 +315,24 @@ class Consumer(object):
         )
 
         with Hub(Hub.current).start_transaction(transaction) as span:
-            span.set_status("ok")
+            async with _manage_trackable(
+                msg=msg,
+                producer=Producer(self._connection, self._exchange),
+            ):
+                span.set_status("ok")
 
-            try:
-                await callback(msg)
-            except Exception:  # noqa: PIE786
-                self._logger.exception()
-                span.set_status("nok")
-                await msg.nack()
-            else:
-                await msg.ack()
-            finally:
-                self._logger.info(
-                    "Message consumed.",
-                    queue=self._queue_name,
-                    routing_key=msg.routing_key,
-                    type=msg.body.DESCRIPTOR.full_name,
-                )
+                try:
+                    await callback(msg)
+                except Exception:  # noqa: PIE786
+                    self._logger.exception()
+                    span.set_status("nok")
+                    await msg.nack()
+                else:
+                    await msg.ack()
+                finally:
+                    self._logger.info(
+                        "Message consumed.",
+                        queue=self._queue_name,
+                        routing_key=msg.routing_key,
+                        type=msg.body.DESCRIPTOR.full_name,
+                    )

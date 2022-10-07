@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package snowfall.stdlib.v1alpha;
+
+message TrackableReceived {
+  string id = 1;
+}
+
+message TrackableAcked {
+  string id = 1;
+}
+
+message TrackableNacked {
+  string id = 1;
+}
