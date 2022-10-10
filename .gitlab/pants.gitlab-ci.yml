@@ -74,7 +74,8 @@ pants:package:
     paths:
       - dist/
   needs:
-    - "pants:test"
+    - job: "pants:test"
+      optional: true
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
