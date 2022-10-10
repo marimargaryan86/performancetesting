@@ -1,10 +1,10 @@
 import asyncio
-import contextlib
 import dataclasses
 import itertools
 from collections import defaultdict
 from typing import Awaitable, Callable, Sequence, Type
 
+import structlog
 from starlette import requests
 
 from snowfall.stdlib import sequence
@@ -34,6 +34,7 @@ def add_resolver(resolver: Resolver) -> None:
 class _IncludesResolver(object):
     def __init__(self, wanted_includes: frozenset[str]):
         self._known_resources: set[tuple[str, str]] = set()
+        self._logger = structlog.get_logger(__name__)
         self._wanted_includes = wanted_includes
 
     async def resolve(  # noqa: WPS210
@@ -49,9 +50,14 @@ class _IncludesResolver(object):
         resolvables = []
 
         for path, api_type, identifier in wanted_resources:
-            with contextlib.suppress(KeyError):
+            try:
                 resolvables.append(
                     (path, fetched_resources_map[(api_type, identifier)]),
+                )
+            except KeyError:
+                self._logger.warning(
+                    "Unable to fetch wanted resource, skipping.",
+                    composite_key=(api_type, identifier),
                 )
 
         if resolvables:
@@ -76,12 +82,17 @@ class _IncludesResolver(object):
         awaitables = []
 
         for api_type, identifiers in identifiers_per_type.items():
-            with contextlib.suppress(KeyError):
+            try:
                 awaitables.append(
                     _resolvers[_lookup[api_type]].func(
                         list(identifiers),
                         request,
                     ),
+                )
+            except KeyError:
+                self._logger.warning(
+                    "No resolver registered for type, skipping.",
+                    type=api_type,
                 )
 
         return resources | {

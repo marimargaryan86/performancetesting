@@ -18,6 +18,7 @@ class _BarTest(models.Resource):
 _id_one = str(uuid.uuid4())
 _id_two = str(uuid.uuid4())
 _id_three = str(uuid.uuid4())
+_id_four = str(uuid.uuid4())
 _test_data: dict[str, list[models.Resource]] = {
     "foo": [
         _FooTest(
@@ -27,6 +28,7 @@ _test_data: dict[str, list[models.Resource]] = {
                 "bars": {
                     "data": [
                         models.ResourceIdentifier(id=_id_one, type=_BarTest.api_type),
+                        models.ResourceIdentifier(id=_id_four, type=_BarTest.api_type),
                     ],
                 },
                 "foo": {
@@ -70,6 +72,7 @@ _test_data: dict[str, list[models.Resource]] = {
         _BarTest(id=_id_one, type=_BarTest.api_type),
         _BarTest(id=_id_two, type=_BarTest.api_type),
         _BarTest(id=_id_three, type=_BarTest.api_type),
+        _BarTest(id=_id_four, type=_BarTest.api_type),
     ],
 }
 
@@ -127,6 +130,7 @@ async def test_one_level_includes(_setup: None) -> None:
     composite_ids = {(resource.data_type, resource.identifier) for resource in included}
     expected = {
         (_BarTest.api_type, _id_one),
+        (_BarTest.api_type, _id_four),
         (_FooTest.api_type, _id_two),
     }
 
@@ -143,6 +147,7 @@ async def test_two_level_includes(_setup: None) -> None:
     expected = {
         (_BarTest.api_type, _id_one),
         (_BarTest.api_type, _id_two),
+        (_BarTest.api_type, _id_four),
         (_FooTest.api_type, _id_two),
         (_FooTest.api_type, _id_three),
     }
