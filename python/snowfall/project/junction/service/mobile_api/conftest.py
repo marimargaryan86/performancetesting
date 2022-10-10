@@ -164,7 +164,7 @@ def redis_client(decoding_redis_client: fakeredis.FakeRedis) -> redis.Client[str
 
 @pytest.fixture
 def smtp_client() -> smtp.EmailClient:
-    smtp_client = smtp.EmailClient(aiosmtplib.SMTP())
+    smtp_client = smtp.EmailClient(aiosmtplib.SMTP(), "client", "support@example.com")
     smtp_client.send_email_notification = mock.AsyncMock()  # type: ignore[assignment]
     return smtp_client
 

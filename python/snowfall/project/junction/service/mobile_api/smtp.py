@@ -6,8 +6,10 @@ import aiosmtplib
 
 
 class EmailClient(object):
-    def __init__(self, client: aiosmtplib.SMTP):
+    def __init__(self, client: aiosmtplib.SMTP, client_name: str, support_email: str):
         self._smtp = client
+        self.client_name = client_name
+        self.support_email = support_email
 
     async def send_email_notification(
         self,

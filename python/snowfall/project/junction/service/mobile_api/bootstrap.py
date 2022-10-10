@@ -22,6 +22,8 @@ class Settings(application.Settings):
     jwt_token_version: str
     jwt_public_key: str
     stripe_api_key: str
+    client_name: str
+    support_email: str
 
 
 def create_dependencies(  # noqa: WPS211

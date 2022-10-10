@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 from typing import Any, Mapping, Sequence
 
 import aiofiles
@@ -93,13 +94,23 @@ async def send_booking_confirmation(
         ),
     ) as template_file:
         template = Template(await template_file.read())
-
-    body = template.render(details=details)
-
-    booking_ref = "ABC123"
+    body = template.render(
+        details=details,
+        reference=order[_ATTRIBUTES_ACCESSOR]["reference"],
+        company_name=smtp_client.client_name,
+    )
     await smtp_client.send_email_html_template(
         order[_ATTRIBUTES_ACCESSOR]["contactDetails"]["email"],
-        "Journey details for Booking {reference}".format(reference=booking_ref),
+        "Journey details for Booking {reference}".format(
+            reference=order[_ATTRIBUTES_ACCESSOR]["reference"],
+        ),
+        body,
+    )
+    await smtp_client.send_email_html_template(
+        smtp_client.support_email,
+        "Journey details for Booking {reference}".format(
+            reference=order[_ATTRIBUTES_ACCESSOR]["reference"],
+        ),
         body,
     )
 
@@ -122,8 +133,12 @@ def order_details_by_date(
         {
             "origin": leg["origin"],
             "destination": leg["destination"],
-            "departureAt": leg["departureAt"],
-            "arrivalAt": leg["arrivalAt"],
+            "departureAt": datetime.datetime.fromisoformat(leg["departureAt"]).strftime(
+                "%A %d %b %Y %H:%M",
+            ),
+            "arrivalAt": datetime.datetime.fromisoformat(leg["arrivalAt"]).strftime(
+                "%A %d %b %Y %H:%M",
+            ),
             "ref": segment["vendor"] + segment["routeIdentifiers"]["vendor"],
             "legType": segment["legType"],
         }

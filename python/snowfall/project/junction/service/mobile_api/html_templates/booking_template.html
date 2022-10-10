@@ -1,17 +1,18 @@
 <html>
     <body>
         <div style="max-width: fit-content;">
-            These details have been forwarded from the ‘Insert Name of Company’ app. <br>
+            These details have been forwarded from the {{company_name}} app. <br>
             <br>Journey details<br>
-            Booking reference - ABC123
+            Booking reference - {{reference}}
             {% for leg in details %}
                 <hr style="border-top: dotted 1px;">
                 <div>
                     {%if leg.legType == 'air'%}
                         <h4>Flight {{leg.ref}}
                             {{leg.origin.ref}} to {{leg.destination.ref}}</h4>
-                        Departure - {{leg.origin.name}} {{leg.departureAt}}<br>
-                        Arrival - {{leg.destination.name}} {{leg.arrivalAt}}
+                        Departure - {{leg.origin.name}} <br>{{leg.departureAt}} (local time)
+                  <br><br>
+                        Arrival - {{leg.destination.name}} <br>{{leg.arrivalAt}} (local time)
                     {% endif %}
                     {%if leg.legType == 'rail'%}
                         <h4>Rail {{leg.ref}}</h4>

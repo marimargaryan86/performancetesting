@@ -52,6 +52,8 @@ def _factory(
                 password=app.settings.smtp_dsn.password,
                 start_tls=True,
             ),
+            client_name=app.settings.client_name,
+            support_email=app.settings.support_email,
         )
         jwt_gen = jwt_generator.JwtGenerator(
             jwt_private_key=app.settings.jwt_private_key,
