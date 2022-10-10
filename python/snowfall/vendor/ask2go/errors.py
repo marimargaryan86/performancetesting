@@ -8,3 +8,7 @@ class ServiceError(Ask2GoError):
 
 class DateError(Ask2GoError):
     """Raised when Inbound date is lower than outbound date."""
+
+
+class AcceptedResponseError(Ask2GoError):
+    """Raised when response status is accepted."""

@@ -22,7 +22,7 @@ class TripPlattingCarrier(CamelCaseBaseModel):
 
 class TripBaggageAllowance(CamelCaseBaseModel):
     weight: float
-    unit: str
+    unit: Optional[str]
     pieces: int
     has_free_baggage: bool
     passenger_type: str

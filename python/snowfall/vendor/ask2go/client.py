@@ -7,7 +7,14 @@ from typing import Any, Optional, Sequence
 import httpx
 
 from snowfall.vendor.ask2go import errors, parsers
-from snowfall.vendor.ask2go.models import booking, common, price, search
+from snowfall.vendor.ask2go.models import (
+    booking,
+    common,
+    price,
+    search,
+    validate_offer_criteria,
+    validated_offer,
+)
 
 
 def _get_response_error_message(response: httpx.Response) -> str:
@@ -155,6 +162,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         search_id: str,
         transaction_id: str,
         offer_id: str,
+        brand_id: Optional[str] = None,
     ) -> price.OfferPriceResponse:
         response = await self._make_request(
             "PUT",
@@ -163,11 +171,45 @@ class Ask2GoClient(object):  # noqa: WPS214
                     search_id=search_id,
                     offer_id=offer_id,
                 ),
-                params={"transactionId": transaction_id},
+                params={
+                    "transactionId": transaction_id,
+                    **({"brandId": brand_id} if brand_id else {}),
+                },
             ),
         )
 
         return price.OfferPriceResponse(**response.json())
+
+    async def validate_offer(
+        self,
+        criteria: validate_offer_criteria.ValidateOfferCriteria,
+    ) -> validate_offer_criteria.ValidateOfferResponse:
+        response = await self._make_request(
+            "POST",
+            self._api_base_url.copy_with(
+                path="/api/Itinerary/Validate",
+            ),
+            payload=parsers.parse_validated_offer_criteria(criteria),
+        )
+
+        return validate_offer_criteria.ValidateOfferResponse(**response.json())
+
+    async def get_validated_offer(
+        self,
+        pricing_id: str,
+        transaction_id: str,
+    ) -> validated_offer.ValidatedOfferResponse:
+        response = await self._make_request(
+            "GET",
+            self._api_base_url.copy_with(
+                path="/api/Itinerary/Validate/{pricing_id}/{transaction_id}".format(
+                    pricing_id=pricing_id,
+                    transaction_id=transaction_id,
+                ),
+            ),
+        )
+
+        return validated_offer.ValidatedOfferResponse(**response.json())
 
     async def _make_request(
         self,
@@ -188,5 +230,8 @@ class Ask2GoClient(object):  # noqa: WPS214
             response.raise_for_status()
         except httpx.HTTPError as exc:
             raise errors.ServiceError(_get_response_error_message(response)) from exc
+
+        if response.status_code == http.HTTPStatus.ACCEPTED:
+            raise errors.AcceptedResponseError()
 
         return response
