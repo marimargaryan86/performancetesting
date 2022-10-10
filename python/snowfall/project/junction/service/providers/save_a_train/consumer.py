@@ -4,7 +4,6 @@ import structlog
 
 from snowfall.project.junction.service.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
 from snowfall.project.junction.service.orders.v1alpha import amqp_pb2 as orders_amqp_pb2
-from snowfall.project.junction.service.orders.v1alpha import models_pb2
 from snowfall.project.junction.service.providers.save_a_train import (
     adapter as save_a_train_adapter,
 )
@@ -80,16 +79,10 @@ class OrdersConsumer(object):
         task.booking.provider_name = _PROVIDER_NAME
 
         if not offer_details:
-            self._logger.error(
+            self._logger.warning(
                 "No offer details found for booking",
                 booking_id=task.booking.id,
                 key=task.booking.trip_option.id,
-            )
-            task.booking.status = models_pb2.Booking.STATUS_ERROR
-
-            await self._producer.publish(
-                task.booking,
-                routing_key="orders.result.offer",
             )
 
             return
