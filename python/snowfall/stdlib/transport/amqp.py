@@ -162,7 +162,7 @@ class Message(object):
         self._status: _MessageStatus = _MessageStatus.unhandled
 
     async def ack(self) -> None:
-        if self.acknowledged:
+        if self.processed:
             return
 
         await self._message.ack()
@@ -184,7 +184,7 @@ class Message(object):
         self._status = _MessageStatus.nacked
 
     async def requeue(self) -> None:
-        if self.acknowledged:
+        if self.processed:
             return
 
         await self._message.nack(requeue=True)
