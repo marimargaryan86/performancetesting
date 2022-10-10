@@ -37,7 +37,7 @@
 //     "jinja2==3.1.2",
 //     "jsonschema==4.16.0",
 //     "lagom==2.0.0",
-//     "mongomock-motor==0.0.12",
+//     "mongomock-motor==0.0.13",
 //     "more-itertools==8.14.0",
 //     "motor==3.0.0",
 //     "openapi-core==0.15.0",
@@ -1749,13 +1749,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "c2e27fe2ad0c1376922579abed0011fb32c4c022f57db85cefad5f6b02ffe055",
-              "url": "https://files.pythonhosted.org/packages/fd/6b/ebb1314fc5b619f7c338709d426d4910184cf77825b2cad0f95bec6cc52a/mongomock_motor-0.0.12-py3-none-any.whl"
+              "hash": "724f58c57b4aef297e989fcf824aa2b183a779af7c149a1bd40fbcd465b83144",
+              "url": "https://files.pythonhosted.org/packages/23/b3/a47063afe678b7d6b456649ac65ff35ab1ed14a9c8b7a52064774489174c/mongomock_motor-0.0.13-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "55dbf7bd76f4885c48fc48aa3a1de75d9e8fd2f5570ebb5e80316c621c260a1f",
-              "url": "https://files.pythonhosted.org/packages/e3/8e/f4a5ed01a7facd08e79a47fb090d3965b0b79819f0c66e08ce84c47e79f6/mongomock_motor-0.0.12.tar.gz"
+              "hash": "61be8f98c963005da81c26319e02648f6094b206f30d5601a1770b16af488788",
+              "url": "https://files.pythonhosted.org/packages/41/7a/eab1e02dd88ca85d6179290d49b26da0696c275dc781e64cd6cd30048f14/mongomock_motor-0.0.13.tar.gz"
             }
           ],
           "project_name": "mongomock-motor",
@@ -1763,7 +1763,7 @@
             "mongomock<5.0.0,>=3.23.0"
           ],
           "requires_python": ">=3.6",
-          "version": "0.0.12"
+          "version": "0.0.13"
         },
         {
           "artifacts": [
@@ -3400,19 +3400,19 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "25642c956049920a5aa49edcdd6ab1e06d7e5d467fc00e0506c44ac86fbfca02",
-              "url": "https://files.pythonhosted.org/packages/ed/d6/2afc375a8d55b8be879d6b4986d4f69f01115e795e36827fd3a40166028b/typing_extensions-4.3.0-py3-none-any.whl"
+              "hash": "16fa4864408f655d35ec496218b85f79b3437c829e93320c7c9215ccfd92489e",
+              "url": "https://files.pythonhosted.org/packages/0b/8e/f1a0a5a76cfef77e1eb6004cb49e5f8d72634da638420b9ea492ce8305e8/typing_extensions-4.4.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "e6d2677a32f47fc7eb2795db1dd15c1f34eff616bcaf2cfb5e997f854fa1c4a6",
-              "url": "https://files.pythonhosted.org/packages/9e/1d/d128169ff58c501059330f1ad96ed62b79114a2eb30b8238af63a2e27f70/typing_extensions-4.3.0.tar.gz"
+              "hash": "1511434bb92bf8dd198c12b1cc812e800d4181cfcb867674e0f8279cc93087aa",
+              "url": "https://files.pythonhosted.org/packages/e3/a7/8f4e456ef0adac43f452efc2d0e4b242ab831297f1bac60ac815d37eb9cf/typing_extensions-4.4.0.tar.gz"
             }
           ],
           "project_name": "typing-extensions",
           "requires_dists": [],
           "requires_python": ">=3.7",
-          "version": "4.3"
+          "version": "4.4"
         },
         {
           "artifacts": [
@@ -3842,7 +3842,7 @@
     "jinja2==3.1.2",
     "jsonschema==4.16.0",
     "lagom==2.0.0",
-    "mongomock-motor==0.0.12",
+    "mongomock-motor==0.0.13",
     "more-itertools==8.14.0",
     "motor==3.0.0",
     "openapi-core==0.15.0",
