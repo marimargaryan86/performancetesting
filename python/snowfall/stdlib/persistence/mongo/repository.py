@@ -219,12 +219,27 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
                 },
             )
 
-        aggregate.append(
-            {
-                "$replaceRoot": {
-                    "newRoot": path,
+        aggregate.extend(
+            (
+                {
+                    "$replaceRoot": {
+                        "newRoot": path,
+                    },
                 },
-            },
+                {
+                    "$group": {
+                        "_id": "$_id",
+                        "document": {
+                            "$first": "$$ROOT",
+                        },
+                    },
+                },
+                {
+                    "$replaceRoot": {
+                        "newRoot": "$document",
+                    },
+                },
+            ),
         )
 
         return await self._execute(
