@@ -39,6 +39,7 @@ job "save-a-train-offers" {
     count = 5
 
     network {
+      mode = "bridge"
       port "prometheus" {}
     }
 
@@ -46,6 +47,17 @@ job "save-a-train-offers" {
       name = "save-a-train-offers-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
+
+      connect {
+        sidecar_service {
+          proxy {
+            upstreams {
+              local_bind_port  = 8020
+              destination_name = "geodata-${var.environment}"
+            }
+          }
+        }
+      }
 
       check {
         type     = "http"
@@ -61,7 +73,7 @@ job "save-a-train-offers" {
       template {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
-GEODATA_ADDRESS={{range $index, $service := service "grpc.geodata-${var.environment}"}}{{.Address}}:{{.Port}} {{end}}
+GEODATA_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_geodata-${var.environment}"))}}
 EOH
         destination = "services.env"
         env         = true

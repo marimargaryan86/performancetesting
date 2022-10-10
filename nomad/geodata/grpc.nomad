@@ -39,6 +39,7 @@ job "geodata-grpc" {
     count = 1
 
     network {
+      mode = "bridge"
       port "grpc" {}
       port "prometheus" {}
     }
@@ -47,6 +48,10 @@ job "geodata-grpc" {
       name = "geodata-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
+
+      connect {
+        sidecar_service {}
+      }
 
       check {
         type     = "grpc"

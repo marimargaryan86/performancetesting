@@ -47,6 +47,7 @@ job "pay-web" {
     count = 1
 
     network {
+      mode = "bridge"
       port "http" {}
     }
 
@@ -55,9 +56,14 @@ job "pay-web" {
       port = "http"
       tags = [
         "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
         "traefik.http.routers.pay-web.entrypoints=${var.traefik_entrypoints}",
         "traefik.http.routers.pay-web.rule=Host(`${var.traefik_host_URL}`)",
       ]
+
+      connect {
+        sidecar_service {}
+      }
 
       check {
         type     = "http"

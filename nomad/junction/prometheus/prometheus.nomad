@@ -11,6 +11,7 @@ job "prometheus" {
     count = 1
 
     network {
+      mode = "bridge"
       port "prometheus_ui" {
         static = 9090
       }

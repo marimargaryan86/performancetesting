@@ -47,6 +47,7 @@ job "admin-api-http" {
     count = 1
 
     network {
+      mode = "bridge"
       port "http" {}
       port "prometheus" {}
     }
@@ -57,9 +58,21 @@ job "admin-api-http" {
       tags = [
         "http",
         "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
         "traefik.http.routers.admin-api.entrypoints=${var.traefik_entrypoints}",
         "traefik.http.routers.admin-api.rule=Host(`${var.traefik_host_URL}`)",
       ]
+
+      connect {
+        sidecar_service {
+          proxy {
+            upstreams {
+              local_bind_port  = 8050
+              destination_name = "places-${var.environment}"
+            }
+          }
+        }
+      }
 
       check {
         type     = "http"
@@ -90,7 +103,7 @@ job "admin-api-http" {
         env         = true
         change_mode = "restart"
         data        = <<EOH
-PLACES_ADDRESS={{range $index, $service := service "grpc.places-${var.environment}"}}{{.Address}}:{{.Port}} {{end}}
+PLACES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_places-${var.environment}"))}}
 EOH
       }
 

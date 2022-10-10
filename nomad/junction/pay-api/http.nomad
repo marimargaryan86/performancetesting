@@ -48,6 +48,7 @@ job "pay-api-http" {
     count = 1
 
     network {
+      mode = "bridge"
       port "http" {}
       port "prometheus" {}
     }
@@ -58,9 +59,21 @@ job "pay-api-http" {
       tags = [
         "http",
         "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
         "traefik.http.routers.pay-api.entrypoints=${var.traefik_entrypoints}",
         "traefik.http.routers.pay-api.rule=Host(`${var.traefik_host_URL}`)",
       ]
+
+      connect {
+        sidecar_service {
+          proxy {
+            upstreams {
+              local_bind_port  = 8020
+              destination_name = "currencies-${var.environment}"
+            }
+          }
+        }
+      }
 
       check {
         type     = "http"
@@ -95,7 +108,7 @@ job "pay-api-http" {
         env         = true
         change_mode = "restart"
         data        = <<EOH
-CURRENCIES_ADDRESS={{range $index, $service := service "grpc.currencies-${var.environment}"}}{{.Address}}:{{.Port}} {{end}}
+CURRENCIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_currencies-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/pay-api" }}
 CC_LOGIN={{ .Data.data.cc_login }}
 CC_API_KEY={{ .Data.data.cc_api_key }}

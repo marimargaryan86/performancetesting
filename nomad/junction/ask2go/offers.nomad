@@ -39,6 +39,7 @@ job "ask2go-offers" {
     count = 2
 
     network {
+      mode = "bridge"
       port "prometheus" {}
     }
 
@@ -46,6 +47,10 @@ job "ask2go-offers" {
       name = "ask2go-offers-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
+
+      connect {
+        sidecar_service {}
+      }
 
       check {
         type     = "http"

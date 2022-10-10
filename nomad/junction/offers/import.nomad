@@ -39,6 +39,7 @@ job "offers-import" {
     count = 2
 
     network {
+      mode = "bridge"
       port "prometheus" {}
     }
 
@@ -46,6 +47,10 @@ job "offers-import" {
       name = "offers-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
+
+      connect {
+        sidecar_service {}
+      }
 
       check {
         type     = "http"

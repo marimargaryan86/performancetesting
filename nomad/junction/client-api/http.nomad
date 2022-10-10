@@ -47,6 +47,7 @@ job "client-api-http" {
     count = 1
 
     network {
+      mode = "bridge"
       port "http" {}
       port "prometheus" {}
     }
@@ -57,9 +58,37 @@ job "client-api-http" {
       tags = [
         "http",
         "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
         "traefik.http.routers.client-api.entrypoints=${var.traefik_entrypoints}",
         "traefik.http.routers.client-api.rule=Host(`${var.traaefik_host_URL}`)",
       ]
+
+      connect {
+        sidecar_service {
+          proxy {
+            upstreams {
+              local_bind_port  = 8070
+              destination_name = "offers-${var.environment}"
+            }
+            upstreams {
+              local_bind_port  = 8060
+              destination_name = "orders-${var.environment}"
+            }
+            upstreams {
+              local_bind_port  = 8050
+              destination_name = "places-${var.environment}"
+            }
+            upstreams {
+              local_bind_port  = 8040
+              destination_name = "schedules-${var.environment}"
+            }
+            upstreams {
+              local_bind_port  = 8020
+              destination_name = "trips-${var.environment}"
+            }
+          }
+        }
+      }
 
       check {
         type     = "http"
@@ -94,11 +123,11 @@ job "client-api-http" {
         env         = true
         change_mode = "restart"
         data        = <<EOH
-OFFERS_ADDRESS={{range $index, $service := service "grpc.offers-${var.environment}"}}{{.Address}}:{{.Port}} {{end}}
-ORDERS_ADDRESS={{range $index, $service := service "grpc.orders-${var.environment}"}}{{.Address}}:{{.Port}} {{end}}
-PLACES_ADDRESS={{range $index, $service := service "grpc.places-${var.environment}"}}{{.Address}}:{{.Port}} {{end}}
-SCHEDULES_ADDRESS={{range $index, $service := service "grpc.schedules-${var.environment}"}}{{.Address}}:{{.Port}} {{end}}
-TRIPS_ADDRESS={{range $index, $service := service "grpc.trips-${var.environment}"}}{{.Address}}:{{.Port}} {{end}}
+OFFERS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_offers-${var.environment}"))}}
+ORDERS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_orders-${var.environment}"))}}
+PLACES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_places-${var.environment}"))}}
+SCHEDULES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_schedules-${var.environment}"))}}
+TRIPS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_trips-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/client-api" }}
 JWT_PUBLIC_KEY={{ .Data.data.jwt_public_key }}
 {{ end }}

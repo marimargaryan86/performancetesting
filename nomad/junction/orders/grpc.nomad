@@ -39,6 +39,7 @@ job "orders-grpc" {
     count = 1
 
     network {
+      mode = "bridge"
       port "grpc" {}
       port "prometheus" {}
     }
@@ -47,6 +48,17 @@ job "orders-grpc" {
       name = "orders-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
+
+      connect {
+        sidecar_service {
+          proxy {
+            upstreams {
+              local_bind_port  = 8020
+              destination_name = "passenger-name-records-${var.environment}"
+            }
+          }
+        }
+      }
 
       check {
         type     = "grpc"
@@ -74,7 +86,7 @@ job "orders-grpc" {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
-PASSENGER_NAME_RECORDS_ADDRESS={{range $index, $service := service "grpc.passenger-name-records-${var.environment}"}}{{.Address}}:{{.Port}} {{end}}
+PASSENGER_NAME_RECORDS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_passenger-name-records-${var.environment}"))}}
 EOH
         destination = "services.env"
         env         = true

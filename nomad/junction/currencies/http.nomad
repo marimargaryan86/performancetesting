@@ -39,6 +39,7 @@ job "currencies" {
     count = 1
 
     network {
+      mode = "bridge"
       port "grpc" {}
     }
 
@@ -46,6 +47,10 @@ job "currencies" {
       name = "currencies-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
+
+      connect {
+        sidecar_service {}
+      }
 
       check {
         type     = "grpc"

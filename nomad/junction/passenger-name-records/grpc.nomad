@@ -39,6 +39,7 @@ job "passenger-name-records-grpc" {
     count = 1
 
     network {
+      mode = "bridge"
       port "grpc" {}
       port "prometheus" {}
     }
@@ -47,6 +48,10 @@ job "passenger-name-records-grpc" {
       name = "passenger-name-records-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
+
+      connect {
+        sidecar_service {}
+      }
 
       check {
         type     = "grpc"

@@ -39,6 +39,7 @@ job "trips-consume" {
     count = 5
 
     network {
+      mode = "bridge"
       port "prometheus" {}
     }
 
@@ -46,6 +47,17 @@ job "trips-consume" {
       name = "trips-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
+
+      connect {
+        sidecar_service {
+          proxy {
+            upstreams {
+              local_bind_port  = 8020
+              destination_name = "planner-${var.environment}"
+            }
+          }
+        }
+      }
 
       check {
         type     = "http"
@@ -62,7 +74,7 @@ job "trips-consume" {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
-PLANNER_ADDRESS={{range $index, $service := service "grpc.planner-${var.environment}"}}{{.Address}}:{{.Port}} {{end}}
+PLANNER_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_planner-${var.environment}"))}}
 EOH
         destination = "services.env"
         env         = true
