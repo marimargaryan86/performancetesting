@@ -185,6 +185,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
         path: str,
         filter_: Optional[Mapping[str, Any]] = None,
         cur: Optional[str] = None,
+        id_key: str = "_id",
     ) -> resultset.ResultSet[Record]:
         aggregate = []
         filter_pre_cursor = dict(filter_ or {})
@@ -228,7 +229,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
                 },
                 {
                     "$group": {
-                        "_id": "$_id",
+                        "_id": "${0}".format(id_key),
                         "document": {
                             "$first": "$$ROOT",
                         },
