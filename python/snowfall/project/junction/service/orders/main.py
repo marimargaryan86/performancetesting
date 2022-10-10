@@ -97,7 +97,7 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
                 routing_key="orders.result.offer",
             ),
             booking_repository=orders.BookingRepository(
-                mongo.orders.orders,
+                mongo.orders.journeys,
             ),
         )
         await booking_importer.consume()
