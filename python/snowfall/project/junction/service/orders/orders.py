@@ -185,7 +185,6 @@ class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
         booking_id: str,
         option: models_pb2.TripOption,
     ) -> None:
-        option.id = str(uuid.uuid4())
         option.booking_id = booking_id
 
         for detail in option.details:

@@ -144,6 +144,7 @@ def _create_trip_option(
     group: offer_models_pb2.OfferGroup,
 ) -> order_models_pb2.TripOption:
     return order_models_pb2.TripOption(
+        id=option.id,
         details=[
             order_models_pb2.TripOptionDetails(
                 segment=offer_segment,
