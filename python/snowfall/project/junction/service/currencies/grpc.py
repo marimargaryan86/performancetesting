@@ -24,8 +24,8 @@ class CurrencyService(service.Service, currencies_pb2_grpc.CurrencyServiceServic
         context: grpc.aio.ServicerContext,
     ) -> currencies_pb2.ConvertResponse:
         quote = await self.client.quote(
-            request.to_currency,
             request.from_currency,
+            request.to_currency,
             request.amount,
         )
 
