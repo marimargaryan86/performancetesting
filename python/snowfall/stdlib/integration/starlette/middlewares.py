@@ -1,4 +1,4 @@
-from typing import Any, Awaitable, Callable, Container, Mapping, Optional, cast
+from typing import Awaitable, Callable, Container, Optional, cast
 
 import sentry_sdk
 import structlog
@@ -6,10 +6,11 @@ from openapi_core.exceptions import OpenAPIError
 from openapi_core.templating.paths.exceptions import PathNotFound
 from openapi_core.unmarshalling.schemas.exceptions import InvalidSchemaValue
 from openapi_core.validation.exceptions import InvalidSecurity
+from openapi_core.validation.request import protocols as request_protocols
 from starlette import applications, exceptions, requests, responses, status, types
 from starlette.middleware import base
 
-from snowfall.stdlib.integration.starlette import handlers, request_helpers, validation
+from snowfall.stdlib.integration.starlette import handlers, validation
 from snowfall.stdlib.logging import stdout
 
 
@@ -107,11 +108,6 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
         except OpenAPIError as err:
             return await self._handle_validation_error(resolved_request, err)
 
-        if openapi_result.body:
-            resolved_request.scope["body"] = request_helpers.flatten_request_body(
-                cast(Mapping[str, Any], openapi_result.body),
-            )
-
         resolved_request.scope["query_string"] = openapi_result.parameters.query
         resolved_request.scope["security"] = openapi_result.security
 
@@ -120,7 +116,7 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
     async def _dispatch(
         self,
         call_next: Callable[[requests.Request], Awaitable[responses.Response]],
-        openapi_request: validation.OpenAPIRequest,
+        openapi_request: request_protocols.Request,
         resolved_request: requests.Request,
     ) -> responses.Response:
         response = await call_next(resolved_request)

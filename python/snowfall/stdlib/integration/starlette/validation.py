@@ -5,14 +5,19 @@ import jsonschema
 import openapi_core
 import openapi_schema_validator
 import rapidjson
-from openapi_core.deserializing.media_types import MediaTypeDeserializersFactory
-from openapi_core.unmarshalling.schemas import SchemaUnmarshallersFactory, enums
+from openapi_core.deserializing.media_types.factories import (
+    MediaTypeDeserializersFactory,
+)
+from openapi_core.unmarshalling.schemas import enums
 from openapi_core.unmarshalling.schemas.exceptions import InvalidSchemaValue
+from openapi_core.unmarshalling.schemas.factories import SchemaUnmarshallersFactory
+from openapi_core.validation.request import protocols as request_protocols
 from openapi_core.validation.request.datatypes import (
     RequestParameters,
     RequestValidationResult,
 )
 from openapi_core.validation.request.validators import RequestValidator
+from openapi_core.validation.response import protocols as response_protocols
 from openapi_core.validation.response.validators import ResponseValidator
 from starlette import requests, responses
 from werkzeug.datastructures import Headers
@@ -40,30 +45,41 @@ class OpenAPIResponse(object):
     headers: Headers = dataclasses.field(default_factory=Headers)
 
 
-async def request_to_openapi(request: requests.Request) -> OpenAPIRequest:
-    return OpenAPIRequest(
-        host_url="{scheme}://{hostname}".format(
-            scheme=request.url.scheme,
-            hostname=request.url.hostname,
+async def request_to_openapi(request: requests.Request) -> request_protocols.Request:
+    return cast(
+        request_protocols.Request,
+        OpenAPIRequest(
+            host_url="{scheme}://{hostname}".format(
+                scheme=request.url.scheme,
+                hostname=request.url.hostname,
+            ),
+            path=request.url.path,
+            method=request.method.lower(),
+            parameters=RequestParameters(
+                query=request.query_params,
+                header=Headers(dict(request.headers)),
+                cookie=request.cookies,
+            ),
+            body=(await request.body()).decode("utf-8"),
+            mimetype=request.headers.get(
+                "Content-Type",
+                request.headers.get("Accept", ""),
+            ),
         ),
-        path=request.url.path,
-        method=request.method.lower(),
-        parameters=RequestParameters(
-            query=request.query_params,
-            header=Headers(dict(request.headers)),
-            cookie=request.cookies,
-        ),
-        body=(await request.body()).decode("utf-8"),
-        mimetype=request.headers.get("Content-Type", request.headers.get("Accept", "")),
     )
 
 
-async def response_to_openapi(response: responses.Response) -> OpenAPIResponse:
-    return OpenAPIResponse(
-        data=response.body.decode("utf-8"),
-        mimetype=str(response.media_type) if response.media_type else "",
-        status_code=response.status_code,
-        headers=Headers(dict(response.headers)),
+async def response_to_openapi(
+    response: responses.Response,
+) -> response_protocols.Response:
+    return cast(
+        response_protocols.Response,
+        OpenAPIResponse(
+            data=response.body.decode("utf-8"),
+            mimetype=str(response.media_type) if response.media_type else "",
+            status_code=response.status_code,
+            headers=Headers(dict(response.headers)),
+        ),
     )
 
 
@@ -122,7 +138,7 @@ class Validator(object):
 
     async def validate_request(
         self,
-        request: OpenAPIRequest,
+        request: request_protocols.Request,
     ) -> RequestValidationResult:
         validation_result = self._request_validator.validate(
             spec=self._spec,
@@ -135,8 +151,8 @@ class Validator(object):
 
     async def validate_response(
         self,
-        request: OpenAPIRequest,
-        response: OpenAPIResponse,
+        request: request_protocols.Request,
+        response: response_protocols.Response,
     ) -> None:
         validation_result = self._response_validator.validate(
             spec=self._spec,
