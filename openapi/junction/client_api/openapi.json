@@ -841,6 +841,16 @@
                   "properties": {
                     "data": {
                       "$ref": "#/components/schemas/Leg"
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/LegType"
+                          }
+                        ]
+                      }
                     }
                   },
                   "required": [
@@ -1035,6 +1045,19 @@
                   "properties": {
                     "data": {
                       "$ref": "#/components/schemas/Segment"
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/Leg"
+                          },
+                          {
+                            "$ref": "#/components/schemas/LegType"
+                          }
+                        ]
+                      }
                     }
                   },
                   "required": [
@@ -1083,6 +1106,16 @@
                           "type": "array",
                           "items": {
                             "$ref": "#/components/schemas/Leg"
+                          }
+                        },
+                        "included": {
+                          "type": "array",
+                          "items": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/components/schemas/LegType"
+                              }
+                            ]
                           }
                         }
                       },
@@ -1141,6 +1174,22 @@
                   "properties": {
                     "data": {
                       "$ref": "#/components/schemas/Trip"
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/Segment"
+                          },
+                          {
+                            "$ref": "#/components/schemas/Leg"
+                          },
+                          {
+                            "$ref": "#/components/schemas/LegType"
+                          }
+                        ]
+                      }
                     }
                   },
                   "required": [
@@ -1189,6 +1238,16 @@
                           "type": "array",
                           "items": {
                             "$ref": "#/components/schemas/Leg"
+                          }
+                        },
+                        "included": {
+                          "type": "array",
+                          "items": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/components/schemas/LegType"
+                              }
+                            ]
                           }
                         }
                       },
@@ -1251,6 +1310,19 @@
                           "type": "array",
                           "items": {
                             "$ref": "#/components/schemas/Segment"
+                          }
+                        },
+                        "included": {
+                          "type": "array",
+                          "items": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/components/schemas/Leg"
+                              },
+                              {
+                                "$ref": "#/components/schemas/LegType"
+                              }
+                            ]
                           }
                         }
                       },
@@ -1475,6 +1547,16 @@
                           "items": {
                             "$ref": "#/components/schemas/Leg"
                           }
+                        },
+                        "included": {
+                          "type": "array",
+                          "items": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/components/schemas/LegType"
+                              }
+                            ]
+                          }
                         }
                       },
                       "required": [
@@ -1538,6 +1620,19 @@
                           "minItems": 0,
                           "items": {
                             "$ref": "#/components/schemas/Segment"
+                          }
+                        },
+                        "included": {
+                          "type": "array",
+                          "items": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/components/schemas/Leg"
+                              },
+                              {
+                                "$ref": "#/components/schemas/LegType"
+                              }
+                            ]
                           }
                         }
                       },
@@ -1603,6 +1698,22 @@
                           "items": {
                             "$ref": "#/components/schemas/Trip"
                           }
+                        },
+                        "included": {
+                          "type": "array",
+                          "items": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/components/schemas/Segment"
+                              },
+                              {
+                                "$ref": "#/components/schemas/Leg"
+                              },
+                              {
+                                "$ref": "#/components/schemas/LegType"
+                              }
+                            ]
+                          }
                         }
                       },
                       "required": [
@@ -1663,6 +1774,34 @@
                           "$ref": "#/components/schemas/RentalOfferSearch"
                         }
                       ]
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/Offer"
+                          },
+                          {
+                            "$ref": "#/components/schemas/OfferGroup"
+                          },
+                          {
+                            "$ref": "#/components/schemas/TripOfferGroupDetails"
+                          },
+                          {
+                            "$ref": "#/components/schemas/LegType"
+                          },
+                          {
+                            "$ref": "#/components/schemas/OfferOption"
+                          },
+                          {
+                            "$ref": "#/components/schemas/TripOfferOptionDetails"
+                          },
+                          {
+                            "$ref": "#/components/schemas/CabinClass"
+                          }
+                        ]
+                      }
                     }
                   },
                   "required": [
@@ -1755,6 +1894,34 @@
                           "$ref": "#/components/schemas/RentalOfferSearch"
                         }
                       ]
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/Offer"
+                          },
+                          {
+                            "$ref": "#/components/schemas/OfferGroup"
+                          },
+                          {
+                            "$ref": "#/components/schemas/TripOfferGroupDetails"
+                          },
+                          {
+                            "$ref": "#/components/schemas/LegType"
+                          },
+                          {
+                            "$ref": "#/components/schemas/OfferOption"
+                          },
+                          {
+                            "$ref": "#/components/schemas/TripOfferOptionDetails"
+                          },
+                          {
+                            "$ref": "#/components/schemas/CabinClass"
+                          }
+                        ]
+                      }
                     }
                   },
                   "required": [
@@ -1805,6 +1972,31 @@
                           "minItems": 0,
                           "items": {
                             "$ref": "#/components/schemas/Offer"
+                          }
+                        },
+                        "included": {
+                          "type": "array",
+                          "items": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/components/schemas/OfferGroup"
+                              },
+                              {
+                                "$ref": "#/components/schemas/TripOfferGroupDetails"
+                              },
+                              {
+                                "$ref": "#/components/schemas/LegType"
+                              },
+                              {
+                                "$ref": "#/components/schemas/OfferOption"
+                              },
+                              {
+                                "$ref": "#/components/schemas/TripOfferOptionDetails"
+                              },
+                              {
+                                "$ref": "#/components/schemas/CabinClass"
+                              }
+                            ]
                           }
                         }
                       },
@@ -1928,6 +2120,31 @@
                   "properties": {
                     "data": {
                       "$ref": "#/components/schemas/Offer"
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/OfferGroup"
+                          },
+                          {
+                            "$ref": "#/components/schemas/TripOfferGroupDetails"
+                          },
+                          {
+                            "$ref": "#/components/schemas/LegType"
+                          },
+                          {
+                            "$ref": "#/components/schemas/OfferOption"
+                          },
+                          {
+                            "$ref": "#/components/schemas/TripOfferOptionDetails"
+                          },
+                          {
+                            "$ref": "#/components/schemas/CabinClass"
+                          }
+                        ]
+                      }
                     }
                   },
                   "required": [
@@ -1978,6 +2195,28 @@
                           "minItems": 0,
                           "items": {
                             "$ref": "#/components/schemas/OfferGroup"
+                          }
+                        },
+                        "included": {
+                          "type": "array",
+                          "items": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/components/schemas/TripOfferGroupDetails"
+                              },
+                              {
+                                "$ref": "#/components/schemas/LegType"
+                              },
+                              {
+                                "$ref": "#/components/schemas/OfferOption"
+                              },
+                              {
+                                "$ref": "#/components/schemas/TripOfferOptionDetails"
+                              },
+                              {
+                                "$ref": "#/components/schemas/CabinClass"
+                              }
+                            ]
                           }
                         }
                       },
@@ -2036,6 +2275,28 @@
                   "properties": {
                     "data": {
                       "$ref": "#/components/schemas/OfferGroup"
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/TripOfferGroupDetails"
+                          },
+                          {
+                            "$ref": "#/components/schemas/LegType"
+                          },
+                          {
+                            "$ref": "#/components/schemas/OfferOption"
+                          },
+                          {
+                            "$ref": "#/components/schemas/TripOfferOptionDetails"
+                          },
+                          {
+                            "$ref": "#/components/schemas/CabinClass"
+                          }
+                        ]
+                      }
                     }
                   },
                   "required": [
@@ -2089,6 +2350,16 @@
                               }
                             }
                           ]
+                        },
+                        "included": {
+                          "type": "array",
+                          "items": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/components/schemas/LegType"
+                              }
+                            ]
+                          }
                         }
                       },
                       "required": [
@@ -2112,70 +2383,6 @@
         },
         "operationId": "get-offers-groups-id-details",
         "description": "Used to retrieve all Offer Group Details for an Offer Group.",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/page-cursor"
-          },
-          {
-            "$ref": "#/components/parameters/page-limit"
-          }
-        ]
-      }
-    },
-    "/offers/groups/{offerGroupId}/options": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/offerGroupId"
-        },
-        {
-          "$ref": "#/components/parameters/offerOptionInclude"
-        }
-      ],
-      "get": {
-        "summary": "List Offer Options by Offer Group",
-        "tags": [
-          "offers"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "uniqueItems": true,
-                          "minItems": 0,
-                          "items": {
-                            "$ref": "#/components/schemas/OfferOption"
-                          }
-                        }
-                      },
-                      "required": [
-                        "data"
-                      ]
-                    },
-                    {
-                      "$ref": "#/components/schemas/NextLink"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        },
-        "operationId": "get-offers-groups-id-options",
-        "description": "Used to retrieve all Offer Options for an Offer Group.",
         "parameters": [
           {
             "$ref": "#/components/parameters/page-cursor"
@@ -2214,6 +2421,16 @@
                           "$ref": "#/components/schemas/TripOfferGroupDetails"
                         }
                       ]
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/LegType"
+                          }
+                        ]
+                      }
                     }
                   },
                   "required": [
@@ -2232,6 +2449,86 @@
         },
         "operationId": "get-offers-groups-details-id",
         "description": "Used to lookup data for an Offer Group Details Identifier."
+      }
+    },
+    "/offers/groups/{offerGroupId}/options": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/offerGroupId"
+        },
+        {
+          "$ref": "#/components/parameters/offerOptionInclude"
+        }
+      ],
+      "get": {
+        "summary": "List Offer Options by Offer Group",
+        "tags": [
+          "offers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "items": {
+                            "$ref": "#/components/schemas/OfferOption"
+                          }
+                        },
+                        "included": {
+                          "type": "array",
+                          "items": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/components/schemas/TripOfferGroupDetails"
+                              },
+                              {
+                                "$ref": "#/components/schemas/TripOfferOptionDetails"
+                              },
+                              {
+                                "$ref": "#/components/schemas/CabinClass"
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-offers-groups-id-options",
+        "description": "Used to retrieve all Offer Options for an Offer Group.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
       }
     },
     "/offers/options/{offerOptionId}": {
@@ -2258,6 +2555,22 @@
                   "properties": {
                     "data": {
                       "$ref": "#/components/schemas/OfferOption"
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/TripOfferGroupDetails"
+                          },
+                          {
+                            "$ref": "#/components/schemas/TripOfferOptionDetails"
+                          },
+                          {
+                            "$ref": "#/components/schemas/CabinClass"
+                          }
+                        ]
+                      }
                     }
                   },
                   "required": [
@@ -2311,6 +2624,19 @@
                               }
                             }
                           ]
+                        },
+                        "included": {
+                          "type": "array",
+                          "items": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/components/schemas/TripOfferGroupDetails"
+                              },
+                              {
+                                "$ref": "#/components/schemas/CabinClass"
+                              }
+                            ]
+                          }
                         }
                       },
                       "required": [
@@ -2372,6 +2698,19 @@
                           "$ref": "#/components/schemas/TripOfferOptionDetails"
                         }
                       ]
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/TripOfferGroupDetails"
+                          },
+                          {
+                            "$ref": "#/components/schemas/CabinClass"
+                          }
+                        ]
+                      }
                     }
                   },
                   "required": [
@@ -4163,11 +4502,11 @@
                     "example": "Economy"
                   },
                   "rules": {
-                      "type": "array",
-                      "minItems": 0,
-                      "items": {
-                          "$ref": "#/components/schemas/OfferSegmentDetailRule"
-                      }
+                    "type": "array",
+                    "minItems": 0,
+                    "items": {
+                      "$ref": "#/components/schemas/OfferSegmentDetailRule"
+                    }
                   }
                 }
               },
@@ -4216,7 +4555,7 @@
         ]
       },
       "TripOfferOptionDetailsIdentifier": {
-        "title": "Trip Offer Option Segment Identifier",
+        "title": "Trip Offer Option Details Identifier",
         "type": "object",
         "properties": {
           "id": {
