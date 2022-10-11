@@ -67,19 +67,6 @@ class TestBookings(object):
         assert booking
         assert booking_id == booking.id
 
-    async def test_booking_can_be_updated(
-        self,
-        journey_repository: orders.JourneyRepository,
-        booking_repository: orders.BookingRepository,
-        order: models_pb2.Order,
-    ) -> None:
-        original_booking = more_itertools.first(order.bookings)
-        original_booking.status = models_pb2.Booking.STATUS_CONFIRMED
-        await booking_repository.update(original_booking)
-        updated_booking = await booking_repository.find_by_id(original_booking.id)
-        assert updated_booking
-        assert updated_booking.status == models_pb2.Booking.STATUS_CONFIRMED
-
 
 class TestBookingDetails(object):
     async def test_booking_details_can_be_retrieved(

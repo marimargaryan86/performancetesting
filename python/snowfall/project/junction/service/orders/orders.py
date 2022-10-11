@@ -262,9 +262,17 @@ class BookingRepository(repository.ProtoRepository[models_pb2.Booking]):
             filter={"orders.bookings._id": booking.id},
             update={
                 "$set": {
-                    "orders.$.bookings": self._coder.encode(booking),
+                    "orders.$[order].bookings.$[booking]": self._coder.encode(booking),
                 },
             },
+            array_filters=[
+                {
+                    "order._id": booking.order_id,
+                },
+                {
+                    "booking._id": booking.id,
+                },
+            ],
         )
 
         return booking
