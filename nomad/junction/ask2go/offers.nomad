@@ -38,6 +38,13 @@ job "ask2go-offers" {
   group "offers" {
     count = 2
 
+    restart {
+      attempts = 3
+      delay    = "15s"
+      interval = "10m"
+      mode     = "delay"
+    }
+
     network {
       mode = "bridge"
       port "prometheus" {}

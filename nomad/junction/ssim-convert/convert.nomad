@@ -34,6 +34,13 @@ job "ssim-convert-convert" {
   group "convert" {
     count = 1
 
+    restart {
+      attempts = 3
+      delay    = "15s"
+      interval = "10m"
+      mode     = "delay"
+    }
+
     task "convert" {
       driver = "docker"
 

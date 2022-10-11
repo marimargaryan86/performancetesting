@@ -21,9 +21,9 @@ job "vector-loki" {
     count = 1
     restart {
       attempts = 3
+      delay    = "15s"
       interval = "10m"
-      delay    = "30s"
-      mode     = "fail"
+      mode     = "delay"
     }
     network {
       port "api" {

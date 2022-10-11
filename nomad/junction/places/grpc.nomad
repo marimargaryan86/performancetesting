@@ -38,6 +38,13 @@ job "places-grpc" {
   group "grpc" {
     count = 1
 
+    restart {
+      attempts = 3
+      delay    = "15s"
+      interval = "10m"
+      mode     = "delay"
+    }
+
     network {
       mode = "bridge"
       port "grpc" {}

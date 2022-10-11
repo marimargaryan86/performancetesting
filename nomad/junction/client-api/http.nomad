@@ -46,6 +46,13 @@ job "client-api-http" {
   group "http" {
     count = 1
 
+    restart {
+      attempts = 3
+      delay    = "15s"
+      interval = "10m"
+      mode     = "delay"
+    }
+
     network {
       mode = "bridge"
       port "http" {}

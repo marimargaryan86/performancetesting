@@ -38,6 +38,13 @@ job "offers-import" {
   group "import" {
     count = 2
 
+    restart {
+      attempts = 3
+      delay    = "15s"
+      interval = "10m"
+      mode     = "delay"
+    }
+
     network {
       mode = "bridge"
       port "prometheus" {}

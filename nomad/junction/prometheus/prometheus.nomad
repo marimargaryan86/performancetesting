@@ -18,10 +18,10 @@ job "prometheus" {
     }
 
     restart {
-      attempts = 2
-      interval = "30m"
+      attempts = 3
+      interval = "10m"
       delay    = "15s"
-      mode     = "fail"
+      mode     = "delay"
     }
 
     ephemeral_disk {

@@ -38,6 +38,13 @@ job "save-a-train-offers" {
   group "offers" {
     count = 5
 
+    restart {
+      attempts = 3
+      delay    = "15s"
+      interval = "10m"
+      mode     = "delay"
+    }
+
     network {
       mode = "bridge"
       port "prometheus" {}
