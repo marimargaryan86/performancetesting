@@ -62,7 +62,7 @@ job "ssim-convert-convert" {
 
       env {
         ENV_NAME   = "${var.environment}"
-        SENTRY_DSN = "https://43837909119c4ce186975c300c4efe6e@sentry.snowfall.se/23"
+        SENTRY_DSN = "https://43837909119c4ce186975c300c4efe6e@sentry.snowfall.se/24"
       }
     }
 
