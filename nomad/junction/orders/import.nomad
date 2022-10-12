@@ -51,7 +51,7 @@ job "orders-import" {
     }
 
     service {
-      name = "orders-${var.environment}"
+      name = "orders-import-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 

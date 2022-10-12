@@ -51,7 +51,7 @@ job "trips-consume" {
     }
 
     service {
-      name = "trips-${var.environment}"
+      name = "trips-consume-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 
