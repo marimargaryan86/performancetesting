@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Sequence
 
 import httpx
 import pytest
@@ -53,7 +53,11 @@ def headers(api_token: str) -> dict[str, str]:
     }
 
 
-def pytest_collection_modifyitems(config: pytest.Config, items: Any) -> None:
+def pytest_collection_modifyitems(
+    session: pytest.Session,
+    config: pytest.Config,
+    items: Sequence[pytest.Item],  # noqa: WPS110
+) -> None:
     if not config.getoption("-m"):
         skip_me = pytest.mark.skip(reason="use `-m integration` to run this test")
         for ii in items:
