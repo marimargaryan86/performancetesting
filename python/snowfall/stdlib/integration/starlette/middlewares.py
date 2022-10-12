@@ -10,6 +10,7 @@ from openapi_core.validation.request import protocols as request_protocols
 from starlette import applications, exceptions, requests, responses, status, types
 from starlette.middleware import base
 
+from snowfall.stdlib.instrumentation import sentry
 from snowfall.stdlib.integration.starlette import handlers, validation
 from snowfall.stdlib.logging import stdout
 
@@ -103,13 +104,14 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
         resolved_request = await resolve_request(request)
         openapi_request = await validation.request_to_openapi(resolved_request)
 
-        try:
-            openapi_result = await self._validator.validate_request(openapi_request)
-        except OpenAPIError as err:
-            return await self._handle_validation_error(resolved_request, err)
+        with sentry.get_span("openapi.request"):
+            try:
+                openapi_result = await self._validator.validate_request(openapi_request)
+            except OpenAPIError as err:
+                return await self._handle_validation_error(resolved_request, err)
 
-        resolved_request.scope["query_string"] = openapi_result.parameters.query
-        resolved_request.scope["security"] = openapi_result.security
+            resolved_request.scope["query_string"] = openapi_result.parameters.query
+            resolved_request.scope["security"] = openapi_result.security
 
         return await self._dispatch(call_next, openapi_request, resolved_request)
 
@@ -127,12 +129,16 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
 
         openapi_response = await validation.response_to_openapi(resolved_response)
 
-        try:
-            await self._validator.validate_response(openapi_request, openapi_response)
-        except InvalidSchemaValue as err:
-            return await self._handle_response_schema_error(resolved_request, err)
+        with sentry.get_span("openapi.response"):
+            try:
+                await self._validator.validate_response(
+                    openapi_request,
+                    openapi_response,
+                )
+            except InvalidSchemaValue as err:
+                return await self._handle_response_schema_error(resolved_request, err)
 
-        return resolved_response
+            return resolved_response
 
     async def _handle_response_schema_error(
         self,
