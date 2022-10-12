@@ -38,7 +38,9 @@ ResourceType = (
 
 
 class ErrorSource(BaseModel, frozen=True):
-    pointer: str
+    header: Optional[str]
+    parameter: Optional[str]
+    pointer: Optional[str]
 
 
 class Error(BaseModel, frozen=True):

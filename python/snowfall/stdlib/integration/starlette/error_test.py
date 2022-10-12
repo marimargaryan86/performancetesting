@@ -3,6 +3,8 @@ import http
 import httpx
 from starlette import applications, requests, responses, status
 
+from snowfall.stdlib.persistence import cursor
+
 _NOT_FOUND_PATH = "/not-found"
 _UNHANDLED_ERROR_PATH = "/validation"
 
@@ -27,15 +29,19 @@ async def test_not_found_format(test_client: httpx.AsyncClient) -> None:
         assert error["detail"] == status_code.description
 
 
-async def _error_endpoint(request: requests.Request) -> responses.Response:
+async def _unhandled_error_endpoint(request: requests.Request) -> responses.Response:
     raise RuntimeError("Unhandled exception")
+
+
+async def _cursor_error_endpoint(request: requests.Request) -> responses.Response:
+    raise cursor.CursorError("Invalid filter.")
 
 
 async def test_unhandled_error_content_type(
     test_app: applications.Starlette,
     test_client: httpx.AsyncClient,
 ) -> None:
-    test_app.add_route(_UNHANDLED_ERROR_PATH, _error_endpoint)
+    test_app.add_route(_UNHANDLED_ERROR_PATH, _unhandled_error_endpoint)
     response = await test_client.get(_UNHANDLED_ERROR_PATH)
     assert response.headers["content-type"] == "application/vnd.api+json"
 
@@ -44,7 +50,7 @@ async def test_unhandled_error_status_code(
     test_app: applications.Starlette,
     test_client: httpx.AsyncClient,
 ) -> None:
-    test_app.add_route(_UNHANDLED_ERROR_PATH, _error_endpoint)
+    test_app.add_route(_UNHANDLED_ERROR_PATH, _unhandled_error_endpoint)
     response = await test_client.get(_UNHANDLED_ERROR_PATH)
     assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
 
@@ -53,11 +59,28 @@ async def test_unhandled_error_format(
     test_app: applications.Starlette,
     test_client: httpx.AsyncClient,
 ) -> None:
-    test_app.add_route(_UNHANDLED_ERROR_PATH, _error_endpoint)
+    test_app.add_route(_UNHANDLED_ERROR_PATH, _unhandled_error_endpoint)
     response = await test_client.get(_UNHANDLED_ERROR_PATH)
     status_code = http.HTTPStatus(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     for error in response.json()["errors"]:
-        assert error["status"] == str(status.HTTP_500_INTERNAL_SERVER_ERROR)
+        assert error["status"] == str(int(status_code))
         assert error["title"] == status_code.phrase
         assert error["detail"] == status_code.description
+
+
+async def test_cursor_error_status_code(
+    test_app: applications.Starlette,
+    test_client: httpx.AsyncClient,
+) -> None:
+    test_app.add_route(_UNHANDLED_ERROR_PATH, _cursor_error_endpoint)
+    response = await test_client.get(_UNHANDLED_ERROR_PATH)
+    status_code = http.HTTPStatus(status.HTTP_400_BAD_REQUEST)
+    errors = response.json()["errors"]
+    assert errors
+
+    for error in errors:
+        assert error["status"] == str(int(status_code))
+        assert error["title"] == status_code.phrase
+        assert error["detail"] != status_code.description
+        assert error["source"] == {"parameter": "page[cursor]"}

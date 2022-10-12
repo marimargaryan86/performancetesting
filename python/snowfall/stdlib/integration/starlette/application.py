@@ -16,6 +16,7 @@ from snowfall.stdlib.integration.starlette import (
     routes,
     validation,
 )
+from snowfall.stdlib.persistence import cursor
 
 RoutesFactory = Callable[[starlette.StarletteIntegration], list[routing.Route]]
 
@@ -70,6 +71,7 @@ def create_starlette_app(
         exception_handlers={
             status.HTTP_500_INTERNAL_SERVER_ERROR: handlers.server_error_handler,
             exceptions.HTTPException: handlers.server_error_handler,
+            cursor.CursorError: handlers.cursor_error_handler,
         },
     )
 

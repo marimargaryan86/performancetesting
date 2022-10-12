@@ -37,11 +37,34 @@ def auth_error_handler(
     return error_response_from_status(status.HTTP_401_UNAUTHORIZED)
 
 
+async def cursor_error_handler(
+    request: requests.Request,
+    exc: Exception,
+) -> responses.Response:
+    status_code_obj = http.HTTPStatus(status.HTTP_400_BAD_REQUEST)
+
+    return models.JsonApiResponse(
+        models.Body(
+            errors=[
+                models.Error(
+                    status=str(int(status_code_obj)),
+                    title=status_code_obj.phrase,
+                    detail="Invalid cursor",
+                    source=models.ErrorSource(
+                        parameter="page[cursor]",
+                    ),
+                ),
+            ],
+        ),
+        status_code=int(status_code_obj),
+    )
+
+
 async def client_error_handler(
     request: requests.Request,
     exc: Exception,
 ) -> responses.Response:
-    status_code = status.BAD_REQUEST
+    status_code = status.HTTP_400_BAD_REQUEST
 
     if isinstance(exc, exceptions.HTTPException) and exc.status_code:
         status_code = exc.status_code
