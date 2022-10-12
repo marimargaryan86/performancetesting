@@ -61,6 +61,7 @@
 //     "setuptools==65.4.1",
 //     "starlette==0.21.0",
 //     "stripe==4.2.0",
+//     "structlog-sentry==2.0.0",
 //     "structlog==22.1.0",
 //     "tenacity==8.1.0",
 //     "timezonefinder==6.1.3",
@@ -3295,6 +3296,27 @@
           "artifacts": [
             {
               "algorithm": "sha256",
+              "hash": "67e9d56a73b9a09b3122f0beb5da3706423d890ae440961c8f8e9b0b7bd1e1fa",
+              "url": "https://files.pythonhosted.org/packages/aa/e0/91463784cacf0a2a07adfa128d354cd79bc4587c25de91f38bd9a7125bd0/structlog_sentry-2.0.0-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "0149f42a51b32deb036fa4fdb8a77d106b08cf227c963f28faf1abcbb3b38b2d",
+              "url": "https://files.pythonhosted.org/packages/55/2a/b4cc640f5abfd633406b0239fa271a5d116a3b4667477e0a5dabf95935ac/structlog-sentry-2.0.0.tar.gz"
+            }
+          ],
+          "project_name": "structlog-sentry",
+          "requires_dists": [
+            "sentry-sdk",
+            "structlog"
+          ],
+          "requires_python": "<4.0,>=3.7",
+          "version": "2"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
               "hash": "35525cd47f82830069f0d6b73f7eb83bc5b73ee2fff0437952cedf98b27653ac",
               "url": "https://files.pythonhosted.org/packages/a5/94/933ce16d18450ccf518a6da5bd51418611e8776b992070b9f40b2f9cedff/tenacity-8.1.0-py3-none-any.whl"
             },
@@ -3964,6 +3986,7 @@
     "setuptools==65.4.1",
     "starlette==0.21.0",
     "stripe==4.2.0",
+    "structlog-sentry==2.0.0",
     "structlog==22.1.0",
     "tenacity==8.1.0",
     "timezonefinder==6.1.3",

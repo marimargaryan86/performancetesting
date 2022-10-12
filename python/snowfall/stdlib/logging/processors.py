@@ -1,6 +1,8 @@
+import logging
 from typing import Any, Callable, Sequence
 
 import structlog
+import structlog_sentry
 
 from snowfall.stdlib.logging import filtering, sentry
 
@@ -61,7 +63,7 @@ def _get_before_processors() -> list[Processor]:
 
 def _get_after_processors() -> list[Processor]:
     return [
-        sentry.log_to_sentry_processor,
+        structlog_sentry.SentryProcessor(event_level=logging.ERROR),
         structlog.processors.StackInfoRenderer(),
         structlog.processors.format_exc_info,
         structlog.processors.UnicodeDecoder(),
