@@ -1,5 +1,5 @@
 import contextlib
-from typing import AsyncIterable, Callable, Iterator, Union
+from typing import AsyncIterable, Callable, Iterator
 
 from google.protobuf.message import Message
 from grpc import aio
@@ -25,7 +25,7 @@ class TracingClientInterceptor(  # noqa: WPS215 (too many base classes)
         continuation: Callable[[aio.ClientCallDetails, Message], aio.UnaryUnaryCall],
         client_call_details: aio.ClientCallDetails,
         request: Message,
-    ) -> Union[aio.UnaryUnaryCall, Message]:
+    ) -> aio.UnaryUnaryCall | Message:
         with get_span(_SPAN_CLIENT_OP, client_call_details.method) as span:
             for header_key, header_value in span.iter_headers():
                 client_call_details.metadata.add(header_key, header_value)
@@ -40,7 +40,7 @@ class TracingClientInterceptor(  # noqa: WPS215 (too many base classes)
         continuation: Callable[[aio.ClientCallDetails, Message], aio.UnaryStreamCall],
         client_call_details: aio.ClientCallDetails,
         request: Message,
-    ) -> Union[aio.UnaryStreamCall, _IterMsg]:
+    ) -> aio.UnaryStreamCall | _IterMsg:
         with get_span(_SPAN_CLIENT_OP, client_call_details.method) as span:
             for header_key, header_value in span.iter_headers():
                 client_call_details.metadata.add(header_key, header_value)
@@ -55,7 +55,7 @@ class TracingClientInterceptor(  # noqa: WPS215 (too many base classes)
         continuation: Callable[[aio.ClientCallDetails, _IterMsg], aio.StreamUnaryCall],
         client_call_details: aio.ClientCallDetails,
         request_iterator: _IterMsg,
-    ) -> Union[aio.StreamUnaryCall, Message]:
+    ) -> aio.StreamUnaryCall | Message:
         with get_span(_SPAN_CLIENT_OP, client_call_details.method) as span:
             for header_key, header_value in span.iter_headers():
                 client_call_details.metadata.add(header_key, header_value)
@@ -70,7 +70,7 @@ class TracingClientInterceptor(  # noqa: WPS215 (too many base classes)
         continuation: Callable[[aio.ClientCallDetails, _IterMsg], aio.StreamStreamCall],
         client_call_details: aio.ClientCallDetails,
         request_iterator: _IterMsg,
-    ) -> Union[aio.StreamStreamCall, _IterMsg]:
+    ) -> aio.StreamStreamCall | _IterMsg:
         with get_span(_SPAN_CLIENT_OP, client_call_details.method) as span:
             for header_key, header_value in span.iter_headers():
                 client_call_details.metadata.add(header_key, header_value)

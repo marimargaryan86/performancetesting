@@ -1,5 +1,4 @@
 import ast
-from typing import Union
 
 from snowfall.plugin.flake8 import plugin
 
@@ -20,10 +19,13 @@ BANNED_ARG_TYPES = frozenset(
         "typing.MutableSequence",
         "typing.MutableSet",
         "typing.Set",
+        "typing.Union",
     ),
 )
 
-BANNED_RETURN_TYPES: frozenset[str] = frozenset()
+BANNED_RETURN_TYPES: frozenset[str] = frozenset(
+    ("typing.Union",),
+)
 
 SF20 = "SF20 Found forbidden argument type: {0}"
 SF21 = "SF21 Found forbidden return type: {0}"
@@ -41,7 +43,7 @@ class Visitor(plugin.Visitor):
         self._func_visitor(function_def)
         self.generic_visit(function_def)
 
-    def _func_visitor(self, node: Union[ast.AsyncFunctionDef, ast.FunctionDef]) -> None:
+    def _func_visitor(self, node: ast.AsyncFunctionDef | ast.FunctionDef) -> None:
         for arg in (*node.args.args, node.args.kwarg, node.args.vararg):
             if not arg or not arg.annotation:
                 continue

@@ -1,7 +1,7 @@
 import dataclasses
 import datetime
 import enum
-from typing import Any, Literal, Mapping, Optional, Sequence, Union, cast
+from typing import Any, Literal, Mapping, Optional, Sequence, cast
 
 import httpx
 
@@ -710,7 +710,7 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
 def _make_pagination(
     limit: Optional[int],
     cursor: Optional[str],
-) -> dict[str, Union[int, str]]:
+) -> dict[str, int | str]:
     return {
         key: pagination_value
         for key, pagination_value in ((_LIMIT_KEY, limit), (_CURSOR_KEY, cursor))

@@ -1,7 +1,7 @@
 import datetime
 import struct
 import zoneinfo
-from typing import AsyncIterator, Optional, Type, TypeVar, Union
+from typing import AsyncIterator, Optional, Type, TypeVar
 
 from aiofiles.threadpool import binary
 from dateutil import tz
@@ -80,7 +80,7 @@ def datetime_to_protobuf_datetime(
 
 
 def protobuf_to_datetime(
-    proto: Union[timestamp_pb2.Timestamp, datetime_pb2.DateTime],
+    proto: timestamp_pb2.Timestamp | datetime_pb2.DateTime,
 ) -> datetime.datetime:
     tzinfo: datetime.tzinfo
 
@@ -121,7 +121,7 @@ def date_to_protobuf(date: datetime.date) -> models_pb2.Date:
 
 
 def protobuf_to_date(
-    proto: Union[models_pb2.Date, datetime_pb2.DateTime],
+    proto: models_pb2.Date | datetime_pb2.DateTime,
 ) -> datetime.date:
     return datetime.date(year=proto.year, month=proto.month, day=proto.day)
 

@@ -48,7 +48,7 @@ class Serializer(object):
         return any_message.SerializeToString()
 
     @classmethod
-    def deserialize(cls, blob: Union[bytes, memoryview]) -> message.Message:
+    def deserialize(cls, blob: bytes | memoryview) -> message.Message:
         packed_message = any_pb2.Any()
 
         if isinstance(blob, memoryview):

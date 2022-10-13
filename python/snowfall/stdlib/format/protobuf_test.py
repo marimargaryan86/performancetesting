@@ -1,6 +1,5 @@
 import datetime
 import zoneinfo
-from typing import Union
 
 import isodate
 import pytest
@@ -85,7 +84,7 @@ def test_enum_name_to_value() -> None:
     ],
 )
 def test_protobuf_to_datetime(
-    proto: Union[timestamp_pb2.Timestamp, datetime_pb2.DateTime],
+    proto: timestamp_pb2.Timestamp | datetime_pb2.DateTime,
     expected: datetime.datetime,
 ) -> None:
     assert protobuf.protobuf_to_datetime(proto) == expected

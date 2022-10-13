@@ -1,6 +1,6 @@
 import datetime
 import zoneinfo
-from typing import Any, Callable, Optional, Sequence, Union
+from typing import Any, Callable, Optional, Sequence
 
 import phonenumbers
 import pycountry
@@ -71,8 +71,8 @@ def normalize_phone_number(phone: Optional[str]) -> Optional[str]:
 
 
 def normalize_time(
-    time: Optional[Union[str, float, datetime.timedelta]],
-) -> Optional[Union[float, datetime.timedelta]]:
+    time: Optional[str | float | datetime.timedelta],
+) -> Optional[float | datetime.timedelta]:
     if time is None:
         return None
 

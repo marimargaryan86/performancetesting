@@ -1,13 +1,13 @@
 import datetime
-from typing import Any, Callable, Optional, Sequence, TypeVar, Union
+from typing import Any, Callable, Optional, Sequence, TypeVar
 
 from dateutil.parser import parse as date_parser
 from pydantic import typing, validator
 
 
 def normalize_time(
-    time: Optional[Union[int, float, str]],
-) -> Optional[Union[float, datetime.timedelta]]:
+    time: Optional[int | float | str],
+) -> Optional[float | datetime.timedelta]:
     if time is None:
         return None
 

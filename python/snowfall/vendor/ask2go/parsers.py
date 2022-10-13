@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Sequence, Union
+from typing import Any, Sequence
 
 import more_itertools
 
@@ -9,7 +9,7 @@ from snowfall.vendor.ask2go.models import common, search, validate_offer_criteri
 def parse_search_criteria(
     origin_iata: str,
     destination_iata: str,
-    date: Union[datetime.date, datetime.datetime],
+    date: datetime.date | datetime.datetime,
 ) -> dict[str, Any]:
     return {
         "origin": origin_iata,

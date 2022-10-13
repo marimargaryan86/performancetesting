@@ -1,5 +1,5 @@
 import copy
-from typing import Any, Awaitable, Callable, Mapping, Sequence, Union
+from typing import Any, Awaitable, Callable, Mapping, Sequence
 
 
 def set_nested_value(
@@ -28,7 +28,7 @@ def _recurse_children(
     parent: Any,
     path: Sequence[str],
     function: Callable[[Any], Awaitable[Any]],
-) -> Union[list[Any], dict[str, Any]]:
+) -> list[Any] | dict[str, Any]:
     if not isinstance(parent, list):
         if isinstance(parent, dict):
             return set_nested_value(parent, path, function)

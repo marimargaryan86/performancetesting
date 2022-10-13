@@ -2,7 +2,7 @@ import contextlib
 import contextvars
 import logging
 import sys
-from typing import Any, Iterator, Optional, Sequence, Type, Union
+from typing import Any, Iterator, Optional, Sequence, Type
 
 import rapidjson
 import structlog
@@ -11,7 +11,7 @@ from snowfall.stdlib.logging import processors
 
 
 def configure_logger(
-    level: Optional[Union[str, int]] = None,
+    level: Optional[str | int] = None,
     additional_processors: Optional[Sequence[processors.Processor]] = None,
     wrapper_class: Optional[Type[structlog.types.BindableLogger]] = None,
 ) -> None:
@@ -104,7 +104,7 @@ def _is_structlog_context(
 
 
 def _configure_standard_logger(
-    level: Union[str, int],
+    level: str | int,
     common_processors: Sequence[processors.Processor],
 ) -> None:
     log_handler = _get_log_handler(common_processors)

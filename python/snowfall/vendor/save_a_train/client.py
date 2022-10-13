@@ -2,7 +2,7 @@ import asyncio
 import json
 import types
 from datetime import date, timedelta
-from typing import Dict, Optional, Union
+from typing import Dict, Optional
 
 import httpx
 import structlog
@@ -303,7 +303,7 @@ def _get_passenger_type_by_age(age: int) -> str:
 
 def _generate_passenger_type_attributes(
     date_of_birth: date,
-) -> Dict[str, Union[str, int]]:
+) -> Dict[str, str | int]:
     age = date_to_age(date_of_birth)
     return {
         "type": _get_passenger_type_by_age(age),

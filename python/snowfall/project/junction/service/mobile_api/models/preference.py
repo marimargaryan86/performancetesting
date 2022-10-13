@@ -1,5 +1,5 @@
 import enum
-from typing import Any, Mapping, Sequence, Union
+from typing import Any, Mapping, Sequence
 
 import pydantic
 from starlette import exceptions, status
@@ -30,7 +30,7 @@ class BooleanCollectionItem(CamelModel):
 
 class Preference(CamelModel):
     ref: str
-    value: Union[bool, int, Sequence[BooleanCollectionItem]]  # noqa: WPS110
+    value: bool | int | Sequence[BooleanCollectionItem]  # noqa: WPS110
 
 
 class Refs(enum.Enum):
