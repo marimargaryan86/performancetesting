@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, AnyStr, AsyncIterable, Generic, Optional
+from typing import AnyStr, AsyncIterable, Generic, Optional
 
 import aioredis
 
@@ -12,7 +12,11 @@ class Hash(Generic[AnyStr]):
     def __str__(self) -> str:
         return self._name
 
-    async def put(self, hash_key: str, hash_value: Any) -> None:
+    async def put(
+        self,
+        hash_key: str,
+        hash_value: aioredis.client.EncodableT | None,
+    ) -> None:
         await self._redis.hset(self._name, hash_key, hash_value)
 
     async def delete(self, hash_key: str) -> None:
@@ -45,7 +49,7 @@ class List(Generic[AnyStr]):
     def __str__(self) -> str:
         return self._name
 
-    async def push(self, list_value: Any) -> None:
+    async def push(self, list_value: aioredis.client.EncodableT) -> None:
         await self._redis.rpush(self._name, list_value)
 
     async def to_iterable(self, chunk: int = 100) -> AsyncIterable[AnyStr]:
@@ -122,7 +126,7 @@ class Client(Generic[AnyStr]):  # noqa: WPS214
     def set_(self, name: str) -> Set[AnyStr]:
         return Set[AnyStr](self._redis, self._prefix + name)
 
-    async def put(self, name: str, raw_value: Any) -> None:
+    async def put(self, name: str, raw_value: aioredis.client.EncodableT) -> None:
         return await self._redis.set(self._prefix + name, raw_value)
 
     async def put_expires_at(self, name: object, expiry: datetime.datetime) -> None:

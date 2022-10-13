@@ -1,8 +1,8 @@
-from typing import Any, Callable, Coroutine, Sequence
+from typing import Awaitable, Callable, Sequence, TypeVar
 
 import lagom
 import more_itertools
-from starlette import requests, responses, status
+from starlette import endpoints, requests, responses, status
 
 from snowfall.project.junction.adapter import offers as offers_adapter
 from snowfall.project.junction.adapter import orders as orders_adapter
@@ -15,20 +15,30 @@ from snowfall.project.junction.service.orders.v1alpha import (
 from snowfall.stdlib import money
 from snowfall.stdlib.integration.starlette import models, request_helpers
 
+_Endpoint = TypeVar("_Endpoint", bound=endpoints.HTTPEndpoint)
 
-def order_request_validator(
+
+def order_request_validator(  # noqa: WPS320
     function: Callable[  # noqa: WPS320
         [
-            Any,
+            _Endpoint,
             requests.Request,
             orders_adapter.Client,
             Sequence[order_models_pb2.TripOption],
         ],
-        Coroutine[Any, Any, responses.Response],
+        Awaitable[responses.Response],
     ],
-) -> Callable[..., Any]:
+) -> Callable[
+    [
+        _Endpoint,
+        requests.Request,
+        offers_adapter.Client,
+        orders_adapter.Client,
+    ],
+    Awaitable[responses.Response],
+]:
     async def wrapper(
-        self: Any,
+        self: _Endpoint,
         request: requests.Request,
         offers_client: offers_adapter.Client = lagom.injectable,
         orders_client: orders_adapter.Client = lagom.injectable,

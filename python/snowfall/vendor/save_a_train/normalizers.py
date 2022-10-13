@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Callable, Optional, Sequence, Union
+from typing import Any, Callable, Optional, Sequence, TypeVar, Union
 
 from dateutil.parser import parse as date_parser
 from pydantic import typing, validator
@@ -24,9 +24,13 @@ def normalize_time(
         return datetime.timedelta(seconds=time)
 
 
-def normalize_nullable_fields(field_value: Any) -> Optional[str]:
+_Input = TypeVar("_Input")
+
+
+def normalize_nullable_fields(field_value: _Input | None) -> _Input | None:
     if isinstance(field_value, str) and field_value.upper() == "NULL":
         field_value = None
+
     return field_value
 
 

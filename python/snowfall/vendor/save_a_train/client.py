@@ -2,7 +2,7 @@ import asyncio
 import json
 import types
 from datetime import date, timedelta
-from typing import Any, Dict, Optional, Union
+from typing import Dict, Optional, Union
 
 import httpx
 import structlog
@@ -333,7 +333,6 @@ class SATClient(object):  # noqa: WPS214
         api_search_timeout: int,
         api_search_requests_limit: int,
         client: httpx.AsyncClient,
-        **kwargs: Any,
     ) -> None:
         """Construct Save A Train API client library.
 

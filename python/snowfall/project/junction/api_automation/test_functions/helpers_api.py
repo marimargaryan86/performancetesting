@@ -3,7 +3,7 @@ from uuid import UUID
 
 
 def is_valid_uuid(
-    uuid_to_test: Any,
+    uuid_to_test: str,
     version: int = 4,
 ) -> Any:
     """Check if uuid_to_test is a valid UUID.

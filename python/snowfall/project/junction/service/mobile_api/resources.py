@@ -175,7 +175,7 @@ class PreferenceResource(models.Resource):
     @classmethod
     def from_dict(
         cls,
-        preference: Any,
+        preference: Mapping[str, Any],
     ) -> PreferenceResource:
         return cls(
             id=preference["ref"],

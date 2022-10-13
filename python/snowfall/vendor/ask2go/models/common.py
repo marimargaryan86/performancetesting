@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Optional
+from typing import Optional
 
 from snowfall.vendor.ask2go.enums import Gender, PassengerType
 from snowfall.vendor.ask2go.models.base import CamelCaseBaseModel
@@ -50,7 +50,7 @@ class Contact(CamelCaseBaseModel):
 class Passenger(CamelCaseBaseModel):
     first_name: str
     last_name: str
-    name_title: Any  # enums.NameTitle
+    name_title: str
     gender: Gender
     type: PassengerType  # noqa: A003
     birth_date: datetime.date

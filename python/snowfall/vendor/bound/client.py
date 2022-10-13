@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import time
-from typing import Any, Sequence
+from typing import Any, Awaitable, Callable, Concatenate, ParamSpec, Sequence, TypeVar
 
 import httpx
 import jwt
@@ -15,8 +15,14 @@ def _is_valid_token(token: str) -> bool:
     return decoded["exp"] < int(time.time())
 
 
-def _auth_required(func: Any) -> Any:
-    async def wrapper(self: Bound, *args: Any, **kwargs: Any) -> None:
+_In = ParamSpec("_In")
+_Out = TypeVar("_Out")
+
+
+def _auth_required(
+    func: Callable[Concatenate[Bound, _In], Awaitable[_Out]],
+) -> Callable[Concatenate[Bound, _In], Awaitable[_Out]]:
+    async def wrapper(self: Bound, *args: _In.args, **kwargs: _In.kwargs) -> _Out:
         if not self._auth_cookies or _is_valid_token(self._auth_cookies["jwt"]):
             await self._authenticate()
 
