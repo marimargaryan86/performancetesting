@@ -33,8 +33,6 @@ def create_dependencies(  # noqa: WPS211
     places_repository: repository.PlacesRepository,
     users_repository: repository.UsersRepository,
     otp_repository: repository.OtpRepository,
-    trip_searches_repository: repository.TripSearchesRepository,
-    trips_repository: repository.TripsRepository,
     smtp_client: smtp.EmailClient,
     jwt_gen: jwt_generator.JwtGenerator,
     stripe_users_repository: repository.StripeUsersRepository,
@@ -48,8 +46,6 @@ def create_dependencies(  # noqa: WPS211
     container[repository.PlacesRepository] = places_repository
     container[repository.UsersRepository] = users_repository
     container[repository.OtpRepository] = otp_repository
-    container[repository.TripSearchesRepository] = trip_searches_repository
-    container[repository.TripsRepository] = trips_repository
     container[smtp.EmailClient] = smtp_client
     container[jwt_generator.JwtGenerator] = jwt_gen
     container[repository.StripeUsersRepository] = stripe_users_repository

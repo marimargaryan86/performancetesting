@@ -1,7 +1,7 @@
 import dataclasses
 import datetime
 import enum
-from typing import Any, Mapping, Optional, Sequence, Union
+from typing import Any, Literal, Mapping, Optional, Sequence, Union, cast
 
 import httpx
 
@@ -17,6 +17,9 @@ _LIMIT_KEY = "page[limit]"
 _CURSOR_KEY = "page[cursor]"
 _METHOD_GET = "GET"
 _METHOD_POST = "POST"
+
+
+trip_includes = Literal["segments", "segments.legs", "segments.legs.legType"]
 
 
 class LegType(enum.Enum):
@@ -166,13 +169,20 @@ class JunctionClient(object):  # noqa: WPS214
     async def get_trips_by_trip_search_id(
         self,
         trips_search_id: str,
+        include: Optional[Sequence[trip_includes]] = None,
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> dict[str, Any]:
+        query_parameters = cast(
+            dict[str, int | str | Sequence[trip_includes]],
+            _make_pagination(limit, cursor),
+        )
+        if include:
+            query_parameters["include"] = include
         return await self._make_request(
             method=_METHOD_GET,
             url="/trips/searches/{0}/trips".format(trips_search_id),
-            query_parameters=_make_pagination(limit, cursor),
+            query_parameters=query_parameters,
         )
 
     async def get_passenger_genders(

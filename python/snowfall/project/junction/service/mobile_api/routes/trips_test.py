@@ -1,11 +1,8 @@
-import asyncio
-
 import httpx
 import pytest_httpx
 from starlette import status
 
-from snowfall.project.junction.service.mobile_api import conftest, repository
-from snowfall.project.junction.service.mobile_api.tasks import trips
+from snowfall.project.junction.service.mobile_api import conftest
 
 
 class TestTrips(object):
@@ -13,16 +10,9 @@ class TestTrips(object):
         self,
         authenticated_http_client: httpx.AsyncClient,
         httpx_mock: pytest_httpx.HTTPXMock,
-        trip_searches_repository: repository.TripSearchesRepository,
     ) -> None:
         httpx_mock.add_response(
             **conftest.load_response_fixture("POST_TRIPS_SEARCHES.json"),
-        )
-        httpx_mock.add_response(
-            **conftest.load_response_fixture("GET_TRIPS_SEARCHES_{ID}_TRIPS.json"),
-        )
-        httpx_mock.add_response(
-            **conftest.load_response_fixture("GET_SEGMENTS_{ID}_LEGS.json"),
         )
 
         response = await authenticated_http_client.post(
@@ -57,20 +47,3 @@ class TestTrips(object):
         )
 
         assert response.status_code == status.HTTP_201_CREATED
-        assert (
-            await trip_searches_repository.find_by_id(
-                response.json()["data"]["id"],
-                "id",
-            )
-            is not None
-        )
-        await asyncio.sleep(trips._TRIPS_POLLING_INTERVAL + 0.5)  # noqa: WPS437
-        stored_trip_search = await trip_searches_repository.find_by_id(
-            response.json()["data"]["id"],
-            "id",
-        )
-
-        assert stored_trip_search
-        relationships = stored_trip_search.get("relationships")
-        assert relationships
-        assert relationships.get("trips")

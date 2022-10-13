@@ -188,29 +188,11 @@ def preferences_repository(
 
 
 @pytest.fixture
-def trip_searches_repository(
-    mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
-) -> repository.TripSearchesRepository:
-    return repository.TripSearchesRepository(
-        mongo_test_db["trip-searches"],
-    )
-
-
-@pytest.fixture
 def loyalty_programs_repository(
     mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
 ) -> repository.LoyaltyProgramsRepository:
     return repository.LoyaltyProgramsRepository(
         mongo_test_db["air_loyalty"],
-    )
-
-
-@pytest.fixture
-def trips_repository(
-    mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
-) -> repository.TripsRepository:
-    return repository.TripsRepository(
-        mongo_test_db["trips"],
     )
 
 
@@ -320,8 +302,6 @@ def app(  # noqa: WPS211
     otp_repository: repository.OtpRepository,
     smtp_client: smtp.EmailClient,
     orders_repository: repository.OrdersRepository,
-    trip_searches_repository: repository.TripSearchesRepository,
-    trips_repository: repository.TripsRepository,
     junction_client: client.JunctionClient,
     jwt_gen: jwt_generator.JwtGenerator,
     stripe_users_repository: repository.StripeUsersRepository,
@@ -336,8 +316,6 @@ def app(  # noqa: WPS211
             places_repository,
             users_repository,
             otp_repository,
-            trip_searches_repository,
-            trips_repository,
             smtp_client,
             jwt_gen,
             stripe_users_repository,

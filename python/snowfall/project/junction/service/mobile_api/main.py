@@ -83,10 +83,6 @@ def _factory(
                 orders_repository=repository.OrdersRepository(
                     mongo["orders"],
                 ),
-                trip_searches_repository=repository.TripSearchesRepository(
-                    mongo["trip-searches"],
-                ),
-                trips_repository=repository.TripsRepository(mongo["trips"]),
                 preferences_repository=repository.PreferencesRepository(
                     mongo["preferences"],
                 ),

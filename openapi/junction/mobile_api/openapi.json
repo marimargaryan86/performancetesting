@@ -246,9 +246,20 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/tripSearchId"
+        },
+        {
+          "$ref": "#/components/parameters/tripInclude"
         }
       ],
       "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ],
         "summary": "List Trips by Trip Search",
         "tags": [
           "trips"
@@ -269,6 +280,22 @@
                           "minItems": 0,
                           "items": {
                             "$ref": "#/components/schemas/Trip"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "included": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "items": {
+                            "anyOf": [
+                              {"$ref": "#/components/schemas/Segment"},
+                              {"$ref": "#/components/schemas/Leg"},
+                              {"$ref": "#/components/schemas/LegType"}
+                            ]
                           }
                         }
                       },
@@ -1165,6 +1192,28 @@
         },
         "description": "A limit on the number of objects to be returned, between 1 and 100."
       },
+      "tripInclude": {
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "segments",
+              "segments.legs",
+              "segments.legs.legType"
+            ]
+          },
+          "example": [
+            "segments"
+          ]
+        },
+        "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
+      },
       "offerSearchId": {
         "name": "offerSearchId",
         "in": "path",
@@ -1245,17 +1294,38 @@
             "format": "uuid",
             "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
           },
-          "legs": {
-            "type": "array",
-            "minItems": 1,
-            "uniqueItems": true,
-            "items": {
-              "$ref": "#/components/schemas/Leg"
-            }
+          "type": {
+            "type": "string",
+            "enum": [
+              "segments"
+            ],
+            "example": "segments"
           }
         },
         "required": [
           "id"
+        ]
+      },
+      "LegIdentifier": {
+        "title": "Leg Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "legs"
+            ],
+            "example": "legs"
+          }
+        },
+        "required": [
+          "id",
+          "type"
         ]
       },
       "LoyaltyProgram": {
@@ -1315,15 +1385,26 @@
                 "example": "trips"
               },
               "attributes": {
+                "type": "object"
+              },
+              "relationships": {
                 "type": "object",
                 "required": [
                   "segments"
                 ],
                 "properties": {
                   "segments": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/SegmentIdentifier"
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/SegmentIdentifier"
+                        }
+                      }
                     }
                   }
                 }
@@ -1332,7 +1413,8 @@
             "required": [
               "id",
               "type",
-              "attributes"
+              "attributes",
+              "relationships"
             ]
           },
           {
@@ -1340,6 +1422,64 @@
           }
         ],
         "description": "Sequenced container of Segments."
+      },
+      "Segment": {
+        "title": "Segment",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "segments"
+                ],
+                "example": "segments"
+              },
+              "attributes": {
+                "type": "object"
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "legs"
+                ],
+                "properties": {
+                  "legs": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/LegIdentifier"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "description": "Sequenced collection of Legs with a common equipment."
       },
       "TripSearch": {
         "allOf": [
@@ -1362,7 +1502,8 @@
               "attributes": {
                 "type": "object",
                 "required": [
-                  "expiresAt"
+                  "expiresAt",
+                  "departureAfter"
                 ],
                 "properties": {
                   "expiresAt": {
@@ -1381,36 +1522,6 @@
                     "format": "date-time",
                     "description": "Not yet implemented.",
                     "example": "2019-08-24T14:15:22Z"
-                  },
-                  "passengers": {
-                    "type": "object",
-                    "properties": {
-                      "adults": {
-                        "type": "integer",
-                        "example": 1
-                      },
-                      "children": {
-                        "type": "integer",
-                        "example": 1
-                      },
-                      "infants": {
-                        "type": "integer",
-                        "example": 1
-                      }
-                    }
-                  },
-                  "cabinClass": {
-                    "enum": [
-                      "economy",
-                      "business",
-                      "firstClass"
-                    ],
-                    "type": "string",
-                    "example": "economy"
-                  },
-                  "roundTrip": {
-                    "type": "boolean",
-                    "example": false
                   }
                 }
               },
@@ -2326,12 +2437,20 @@
         "title": "Leg",
         "allOf": [
           {
+            "type": "object",
             "properties": {
               "id": {
                 "type": "string",
                 "format": "uuid",
                 "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
                 "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "legs"
+                ],
+                "example": "legs"
               },
               "attributes": {
                 "type": "object",
@@ -2389,13 +2508,59 @@
             },
             "required": [
               "id",
+              "type",
               "attributes",
               "relationships"
             ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
           }
         ],
-        "description": "Smallest part of a Trip; A scheduled departure from A and a scheduled arrival to B.",
-        "type": "object"
+        "description": "Smallest part of a Trip; A scheduled departure from A and a scheduled arrival to B."
+      },
+      "LegType": {
+        "title": "Leg Type",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "air",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "leg-types"
+                ],
+                "example": "leg-types"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "air"
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "description": "Indicates the type of the leg, such as \"air\" or \"rail\"."
       },
       "OfferSegmentLeg": {
         "title": "Offer Segment Leg",
