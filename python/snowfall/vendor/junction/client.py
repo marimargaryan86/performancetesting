@@ -34,9 +34,18 @@ class JunctionClient(object):  # noqa: WPS214
         token: str,
         client: Optional[httpx.AsyncClient] = None,
     ) -> None:
-        self._api_url = api_url
-        self._token = token
         self._client = client or httpx.AsyncClient()
+        self._client.base_url = httpx.URL(api_url)
+
+        self._client.headers.update(
+            httpx.Headers(
+                {
+                    "Accept": "application/vnd.api+json",
+                    "Authorization": "Bearer {0}".format(token),
+                    "Content-Type": "application/vnd.api+json",
+                },
+            ),
+        )
 
     async def health(self) -> dict[str, Any]:
         return await self._make_request(
@@ -646,17 +655,9 @@ class JunctionClient(object):  # noqa: WPS214
         query_parameters: Optional[Mapping[str, Any]] = None,
         payload: Optional[Mapping[str, Any]] = None,
     ) -> dict[str, Any]:
-        headers = {
-            "Authorization": "Bearer {0}".format(self._token),
-        }
-
-        if payload:
-            headers["Content-Type"] = "application/vnd.api+json"
-
         response = await self._client.request(
             method=method,
-            headers=headers,
-            url="{0}/{1}".format(self._api_url, url.lstrip("/")),
+            url=url,
             params=query_parameters,
             json=payload,
         )
