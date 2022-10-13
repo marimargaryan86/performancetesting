@@ -34,13 +34,13 @@ async def test_places_place_id(
     r0 = await return_list_places(client)
     assert is_valid_uuid(r0["data"][0]["id"], 5) is True, "no place returned!"
 
-    r1 = await client.list_places()
+    r1 = await client.places().list_places()
     logging.info("list_places %s", json.dumps(r1, indent=4))
     place_id = r1["data"][0]["id"]
 
     assert is_valid_uuid(place_id, 5) is not None, "place_id should be returned"
 
-    r2 = await client.get_place_by_id(place_id)
+    r2 = await client.places().get_place_by_id(place_id)
     logging.info("get_place_by_id: %s", json.dumps(r2, indent=4))
 
 
@@ -52,7 +52,7 @@ async def test_get_places_types(
     origin: str,
     destination: str,
 ) -> None:
-    response = await client.get_places_types()
+    response = await client.places().get_places_types()
     logging.info("get_places_types: %s", json.dumps(response, indent=4))
 
     for data_item in response["data"]:
@@ -72,14 +72,14 @@ async def test_get_places_type(
     origin: str,
     destination: str,
 ) -> None:
-    response_places = await client.get_places_types()
+    response_places = await client.places().get_places_types()
 
     places_ids = []
     for data_item in response_places["data"]:
         places_ids.append(data_item["id"])
 
     for places_id in places_ids:
-        response_place = await client.get_places_type(places_id)
+        response_place = await client.places().get_places_type(places_id)
 
         logging.info("get_places_type: %s", json.dumps(response_place, indent=4))
 
@@ -99,6 +99,6 @@ async def test_get_places_type(
 async def return_list_places(
     client: JunctionClient,
 ) -> dict[str, Any]:
-    r1 = await client.list_places()
+    r1 = await client.places().list_places()
     logging.info("list_places %s", json.dumps(r1, indent=4))
     return r1

@@ -20,7 +20,7 @@ class TripSearches(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
 
-        junction_trip_search = await junction_client.create_trip_search(
+        junction_trip_search = await junction_client.trips().create_trip_search(
             origin_id=body["origin"],
             destination_id=body["destination"],
             departure_after=parser.parse(body["departureAfter"]),
@@ -44,7 +44,7 @@ class TripSearchesTrips(endpoints.HTTPEndpoint):
         junction_client: client.JunctionClient = lagom.injectable,
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
-        junction_trip_search = await junction_client.get_trips_by_trip_search_id(
+        trip_search = await junction_client.trips().get_trips_by_trip_search_id(
             trips_search_id=request.path_params["tripSearchId"],
             include=request.scope["query_string"].get(
                 "include",
@@ -54,7 +54,7 @@ class TripSearchesTrips(endpoints.HTTPEndpoint):
             limit=pagination.limit,
         )
         response_body = models.Body(
-            data=junction_trip_search["data"],
+            data=trip_search["data"],
             links={
                 # TODO: make a function inside pagination_helpers for that
                 "next": re.sub(
@@ -64,10 +64,10 @@ class TripSearchesTrips(endpoints.HTTPEndpoint):
                         tripSearchId=request.path_params["tripSearchId"],
                     )
                     + str("?"),
-                    junction_trip_search["links"]["next"],
+                    trip_search["links"]["next"],
                 ),
             },
         )
-        if junction_trip_search.get("included"):
-            response_body.included = junction_trip_search.get("included")
+        if trip_search.get("included"):
+            response_body.included = trip_search.get("included")
         return models.JsonApiResponse(response_body)

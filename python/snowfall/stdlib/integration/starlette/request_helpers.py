@@ -2,8 +2,7 @@ from typing import Any, Mapping
 
 from starlette import requests
 
-_IDENTIFIER = "id"
-_DATA_KEY = "data"
+from snowfall.stdlib.format import jsonapi
 
 
 async def flatten_request(request: requests.Request) -> dict[str, Any]:
@@ -11,30 +10,4 @@ async def flatten_request(request: requests.Request) -> dict[str, Any]:
 
 
 def flatten_request_body(body: Mapping[str, Any]) -> dict[str, Any]:
-    return _flatten_data(body[_DATA_KEY])
-
-
-def _flatten_relationships(relationships: Mapping[str, Any]) -> dict[str, Any]:
-    flattened = {}
-
-    for key, relationship in relationships.items():
-        if isinstance(relationship[_DATA_KEY], dict):
-            flattened[key] = relationship[_DATA_KEY][_IDENTIFIER]
-        else:
-            flattened[key] = []
-            for relationship_data in relationship[_DATA_KEY]:
-                flattened[key].append(relationship_data[_IDENTIFIER])
-
-    return flattened
-
-
-def _flatten_data(resource_data: Mapping[str, Any]) -> dict[str, Any]:
-    flattened = {}
-
-    if resource_data.get("attributes"):
-        flattened.update(resource_data["attributes"])
-
-    if resource_data.get("relationships"):
-        flattened.update(_flatten_relationships(resource_data["relationships"]))
-
-    return flattened
+    return jsonapi.flatten_resource(body["data"])

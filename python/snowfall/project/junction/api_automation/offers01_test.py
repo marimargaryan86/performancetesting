@@ -341,7 +341,7 @@ async def get_trip_ids(
     destination: str,
     origin: str,
 ) -> list[str]:
-    r1 = await client.create_trip_search(
+    r1 = await client.trips().create_trip_search(
         origin_id=origin,
         destination_id=destination,
         departure_after=datetime.datetime.fromisoformat(
@@ -355,7 +355,7 @@ async def get_trip_ids(
 
     time.sleep(15)
 
-    r2 = await client.get_trips_by_trip_search_id(trip_search_id)
+    r2 = await client.trips().get_trips_by_trip_search_id(trip_search_id)
     logging.info("get_trips_by_trip_search_id: %s", json.dumps(r2, indent=4))
 
     trip_ids = []
@@ -372,7 +372,7 @@ async def get_trip_id(
     destination: str,
     origin: str,
 ) -> str:
-    r1 = await client.create_trip_search(
+    r1 = await client.trips().create_trip_search(
         origin_id=origin,
         destination_id=destination,
         departure_after=datetime.datetime.fromisoformat(
@@ -386,7 +386,7 @@ async def get_trip_id(
 
     time.sleep(5)
 
-    r2 = await client.get_trips_by_trip_search_id(trip_search_id)
+    r2 = await client.trips().get_trips_by_trip_search_id(trip_search_id)
     logging.info("get_trips_by_trip_search_id: %s", json.dumps(r2, indent=4))
 
     trip_id = r2["data"][0]["id"]

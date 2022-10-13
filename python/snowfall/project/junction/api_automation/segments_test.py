@@ -38,7 +38,7 @@ async def test_get_segment_by_id(
         is_valid_uuid(segment_id, 5) is True
     ), "segment_id uuid must be in uuid v5 format"
 
-    r3 = await client.get_segment_by_id(segment_id)
+    r3 = await client.segments().get_segment_by_id(segment_id)
     logging.info("get_segment_by_id: %s", json.dumps(r3, indent=4))
 
     assert r3["data"]["id"] == segment_id, "segment_id should match"
@@ -63,7 +63,7 @@ async def test_get_legs_by_segment_id(
 
     segment_id = await return_segment_id_from_trip_search_id(client, trip_search_id)
 
-    r1 = await client.get_legs_by_segment_id(
+    r1 = await client.legs().get_legs_by_segment_id(
         segment_id,
     )
     logging.info("get_legs_by_segment_id: %s", json.dumps(r1, indent=4))
@@ -76,7 +76,7 @@ async def return_segment_id_from_trip_search_id(
     client: JunctionClient,
     trip_search_id: str,
 ) -> str:
-    r2 = await client.get_trips_by_trip_search_id(trip_search_id)
+    r2 = await client.trips().get_trips_by_trip_search_id(trip_search_id)
     logging.info("get_trips_by_trip_search_id response: %s", json.dumps(r2, indent=4))
     relationships = r2["data"][0]["relationships"]
 

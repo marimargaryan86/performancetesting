@@ -27,15 +27,17 @@ class LegType(enum.Enum):
     rail = "rail"
 
 
-class JunctionClient(object):  # noqa: WPS214
+class _BaseClient(object):
     def __init__(
         self,
         api_url: str,
         token: str,
         client: Optional[httpx.AsyncClient] = None,
     ) -> None:
+        self._api_url = api_url
         self._client = client or httpx.AsyncClient()
         self._client.base_url = httpx.URL(api_url)
+        self._token = token
 
         self._client.headers.update(
             httpx.Headers(
@@ -47,41 +49,26 @@ class JunctionClient(object):  # noqa: WPS214
             ),
         )
 
-    async def health(self) -> dict[str, Any]:
-        return await self._make_request(
-            method=_METHOD_GET,
-            url="/health",
-        )
-
-    async def list_cabin_classes(self) -> dict[str, Any]:
-        return await self._make_request(method=_METHOD_GET, url="/cabin-classes")
-
-    async def get_cabin_class(
+    async def _make_request(
         self,
-        cabin_class_id: str,
+        method: str,
+        url: str,
+        query_parameters: Optional[Mapping[str, Any]] = None,
+        payload: Optional[Mapping[str, Any]] = None,
     ) -> dict[str, Any]:
-        return await self._make_request(
-            method=_METHOD_GET,
-            url="/cabin-classes/{0}".format(cabin_class_id),
+        response = await self._client.request(
+            method=method,
+            url=url,
+            params=query_parameters,
+            json=payload,
         )
 
-    async def list_places(
-        self,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
-    ) -> dict[str, Any]:
-        return await self._make_request(
-            method=_METHOD_GET,
-            url="/places",
-            query_parameters=_make_pagination(limit, cursor),
-        )
+        response.raise_for_status()
 
-    async def get_place_by_id(self, place_id: str) -> dict[str, Any]:
-        return await self._make_request(
-            method=_METHOD_GET,
-            url="/places/{0}".format(place_id),
-        )
+        return response.json()
 
+
+class LegsClient(_BaseClient):
     async def get_leg_by_id(self, leg_id: str) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
@@ -100,18 +87,6 @@ class JunctionClient(object):  # noqa: WPS214
             url="/legs/types/{0}".format(leg_type_id),
         )
 
-    async def get_legs_by_trip_id(self, trip_id: str) -> dict[str, Any]:
-        return await self._make_request(
-            method=_METHOD_GET,
-            url="/trips/{0}/legs".format(trip_id),
-        )
-
-    async def get_legs_by_trip_search_id(self, trip_search_id: str) -> dict[str, Any]:
-        return await self._make_request(
-            method=_METHOD_GET,
-            url="/trips/searches/{0}/legs".format(trip_search_id),
-        )
-
     async def get_legs_by_segment_id(
         self,
         segment_id: str,
@@ -124,12 +99,91 @@ class JunctionClient(object):  # noqa: WPS214
             query_parameters=_make_pagination(limit, cursor),
         )
 
+    async def get_legs_by_trip_id(self, trip_id: str) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/trips/{0}/legs".format(trip_id),
+        )
+
+    async def get_legs_by_trip_search_id(self, trip_search_id: str) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/trips/searches/{0}/legs".format(trip_search_id),
+        )
+
+
+class PlacesClient(_BaseClient):
+    async def list_places(
+        self,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/places",
+            query_parameters=_make_pagination(limit, cursor),
+        )
+
+    async def get_place_by_id(self, place_id: str) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/places/{0}".format(place_id),
+        )
+
+    async def get_places_types(
+        self,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/places/types",
+            query_parameters=_make_pagination(limit, cursor),
+        )
+
+    async def get_places_type(
+        self,
+        place_type_id: str,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/places/types/{0}".format(place_type_id),
+        )
+
+
+class SegmentsClient(_BaseClient):
     async def get_segment_by_id(self, segment_id: str) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
             url="/segments/{0}".format(segment_id),
         )
 
+    async def get_segments_by_trip(
+        self,
+        trip_id: str,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/trips/{0}/segments".format(trip_id),
+            query_parameters=_make_pagination(limit, cursor),
+        )
+
+    async def get_segments_by_trip_search(
+        self,
+        trip_search_id: str,
+        limit: Optional[int] = None,
+        cursor: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/trips/searches/{0}/segments".format(trip_search_id),
+            query_parameters=_make_pagination(limit, cursor),
+        )
+
+
+class TripsClient(_BaseClient):
     async def get_trip_by_id(self, trip_id: str) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
@@ -194,6 +248,54 @@ class JunctionClient(object):  # noqa: WPS214
             query_parameters=query_parameters,
         )
 
+
+class JunctionClient(_BaseClient):  # noqa: WPS214
+    def legs(self) -> LegsClient:
+        return LegsClient(
+            api_url=self._api_url,
+            token=self._token,
+            client=self._client,
+        )
+
+    def places(self) -> PlacesClient:
+        return PlacesClient(
+            api_url=self._api_url,
+            token=self._token,
+            client=self._client,
+        )
+
+    def segments(self) -> SegmentsClient:
+        return SegmentsClient(
+            api_url=self._api_url,
+            token=self._token,
+            client=self._client,
+        )
+
+    def trips(self) -> TripsClient:
+        return TripsClient(
+            api_url=self._api_url,
+            token=self._token,
+            client=self._client,
+        )
+
+    async def health(self) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/health",
+        )
+
+    async def list_cabin_classes(self) -> dict[str, Any]:
+        return await self._make_request(method=_METHOD_GET, url="/cabin-classes")
+
+    async def get_cabin_class(
+        self,
+        cabin_class_id: str,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/cabin-classes/{0}".format(cabin_class_id),
+        )
+
     async def get_passenger_genders(
         self,
         limit: Optional[int] = None,
@@ -226,50 +328,6 @@ class JunctionClient(object):  # noqa: WPS214
         return await self._make_request(
             method=_METHOD_GET,
             url="/passengers/titles/{0}".format(passenger_title_id),
-        )
-
-    async def get_places_types(
-        self,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
-    ) -> dict[str, Any]:
-        return await self._make_request(
-            method=_METHOD_GET,
-            url="/places/types",
-            query_parameters=_make_pagination(limit, cursor),
-        )
-
-    async def get_places_type(
-        self,
-        place_type_id: str,
-    ) -> dict[str, Any]:
-        return await self._make_request(
-            method=_METHOD_GET,
-            url="/places/types/{0}".format(place_type_id),
-        )
-
-    async def get_segments_by_trip(
-        self,
-        trip_id: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
-    ) -> dict[str, Any]:
-        return await self._make_request(
-            method=_METHOD_GET,
-            url="/trips/{0}/segments".format(trip_id),
-            query_parameters=_make_pagination(limit, cursor),
-        )
-
-    async def get_segments_by_trip_search(
-        self,
-        trip_search_id: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
-    ) -> dict[str, Any]:
-        return await self._make_request(
-            method=_METHOD_GET,
-            url="/trips/searches/{0}/segments".format(trip_search_id),
-            query_parameters=_make_pagination(limit, cursor),
         )
 
     async def create_offer_search(
@@ -647,24 +705,6 @@ class JunctionClient(object):  # noqa: WPS214
         ]
 
         return journey_response
-
-    async def _make_request(
-        self,
-        method: str,
-        url: str,
-        query_parameters: Optional[Mapping[str, Any]] = None,
-        payload: Optional[Mapping[str, Any]] = None,
-    ) -> dict[str, Any]:
-        response = await self._client.request(
-            method=method,
-            url=url,
-            params=query_parameters,
-            json=payload,
-        )
-
-        response.raise_for_status()
-
-        return response.json()
 
 
 def _make_pagination(

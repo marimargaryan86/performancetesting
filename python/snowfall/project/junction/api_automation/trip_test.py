@@ -31,7 +31,7 @@ async def test_trip_e2e_basic(
 
     time.sleep(5)
 
-    r2 = await client.get_trips_by_trip_search_id(trip_search_id)
+    r2 = await client.trips().get_trips_by_trip_search_id(trip_search_id)
     logging.info("get_trips_by_trip_search_id response: %s", json.dumps(r2, indent=4))
 
     trip_id = r2["data"][0]["id"]
@@ -55,7 +55,7 @@ async def test_get_trip_search_by_id(
 
     time.sleep(5)
 
-    r2 = await client.get_trip_search_by_id(trip_search_id)
+    r2 = await client.trips().get_trip_search_by_id(trip_search_id)
     logging.info("get_trip_search_by_id response: %s", json.dumps(r2, indent=4))
 
     trip_id = r2["data"]["id"]
@@ -79,7 +79,7 @@ async def test_get_trips_by_trip_search_id(
 
     time.sleep(5)
 
-    r2 = await client.get_trips_by_trip_search_id(trip_search_id)
+    r2 = await client.trips().get_trips_by_trip_search_id(trip_search_id)
     logging.info("get_trips_by_trip_search_id response: %s", json.dumps(r2, indent=4))
 
     trip_id = r2["data"][0]["id"]
@@ -103,7 +103,7 @@ async def test_get_trip_by_id(
 
     time.sleep(5)
 
-    r2 = await client.get_trips_by_trip_search_id(trip_search_id)
+    r2 = await client.trips().get_trips_by_trip_search_id(trip_search_id)
     logging.info("get_trips_by_trip_search_id response: %s", json.dumps(r2, indent=4))
 
     trip_id = r2["data"][0]["id"]
@@ -111,7 +111,7 @@ async def test_get_trip_by_id(
     assert is_valid_uuid(trip_id, 5) is True, "trip_id uuid must be in uuid v5 format"
 
     time.sleep(15)
-    r3 = await client.get_trip_by_id(trip_id)
+    r3 = await client.trips().get_trip_by_id(trip_id)
     logging.info("get_trip_by_id: %s", json.dumps(r3, indent=4))
 
 
@@ -132,7 +132,7 @@ async def test_get_legs_by_trip_id(
 
     time.sleep(5)
 
-    r2 = await client.get_trips_by_trip_search_id(trip_search_id)
+    r2 = await client.trips().get_trips_by_trip_search_id(trip_search_id)
     logging.info("get_trips_by_trip_search_id response: %s", json.dumps(r2, indent=4))
 
     trip_id = r2["data"][0]["id"]
@@ -140,7 +140,7 @@ async def test_get_legs_by_trip_id(
     assert is_valid_uuid(trip_id, 5) is True, "trip_id uuid must be in uuid v5 format"
 
     time.sleep(15)
-    r3 = await client.get_legs_by_trip_id(trip_id)
+    r3 = await client.legs().get_legs_by_trip_id(trip_id)
     logging.info("get_trip_by_id: %s", json.dumps(r3, indent=4))
 
 
@@ -161,7 +161,7 @@ async def test_get_legs_by_trip_search_id(
 
     time.sleep(5)
 
-    response = await client.get_legs_by_trip_search_id(trip_search_id)
+    response = await client.legs().get_legs_by_trip_search_id(trip_search_id)
     logging.info("get_legs_by_trip_search_id: %s", json.dumps(response, indent=4))
     assert response
 
@@ -183,11 +183,15 @@ async def test_list_segments_by_trip(
 
     time.sleep(5)
 
-    r2 = await client.get_trips_by_trip_search_id(trip_search_id)
+    r2 = await client.trips().get_trips_by_trip_search_id(trip_search_id)
 
     logging.info("get_trips_by_trip_search_id response: %s", json.dumps(r2, indent=4))
 
-    r3 = (await client.get_segments_by_trip(r2["data"][0]["id"]),)
+    r3 = (
+        await client.segments().get_segments_by_trip(
+            r2["data"][0]["id"],
+        ),
+    )
 
     logging.info("get_segments_by_trip: %s", json.dumps(r3, indent=4))
 
@@ -223,7 +227,7 @@ async def test_get_segments_by_trip_search_id(
 
     time.sleep(5)
 
-    response = await client.get_segments_by_trip_search(trip_search_id)
+    response = await client.segments().get_segments_by_trip_search(trip_search_id)
     logging.info("get_segments_by_trip_search: %s", json.dumps(response, indent=4))
     assert response
 
@@ -234,7 +238,7 @@ async def return_trip_search_id(
     destination: str,
     origin: str,
 ) -> str:
-    r1 = await client.create_trip_search(
+    r1 = await client.trips().create_trip_search(
         origin_id=origin,
         destination_id=destination,
         departure_after=datetime.fromisoformat(
