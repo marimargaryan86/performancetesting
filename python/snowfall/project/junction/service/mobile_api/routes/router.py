@@ -16,6 +16,7 @@ from snowfall.project.junction.service.mobile_api.routes import (
 def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Route]:
     return [
         dependencies.route("/places", places.Places, name="Places"),
+        dependencies.route("/places/{placeId}", places.Place, name="ViewPlace"),
         dependencies.route("/orders", orders.Orders, name="ListOrders"),
         dependencies.route(
             "/orders/{orderId}",

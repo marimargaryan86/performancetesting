@@ -1,12 +1,28 @@
 from typing import Sequence
 
 import lagom
-from starlette import endpoints, requests, responses
+from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.junction.service.mobile_api import repository, resources
 from snowfall.stdlib.integration.starlette import models
 
 _SEARCH_KEY = "query[name]"
+
+
+class Place(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        places_repository: repository.PlacesRepository = lagom.injectable,
+    ) -> responses.Response:
+        place = await places_repository.find_by_id(request.path_params["placeId"])
+        if place is None:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        return models.JsonApiResponse(
+            models.Body(
+                data=resources.PlaceResource.from_proto(place),
+            ),
+        )
 
 
 class Places(endpoints.HTTPEndpoint):

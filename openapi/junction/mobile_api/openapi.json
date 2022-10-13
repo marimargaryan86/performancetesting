@@ -743,6 +743,50 @@
         "description": "Get places."
       }
     },
+    "/places/{placeId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/placeId"
+        }
+      ],
+      "get": {
+        "summary": "Get Place",
+        "tags": [
+          "places"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/Place"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "operationId": "get-places-id",
+        "description": "Get place by id."
+      }
+    },
     "/verification-code": {
       "post": {
         "tags": [
@@ -1156,6 +1200,17 @@
           "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
         },
         "description": "Trip Search identifier"
+      },
+      "placeId": {
+        "name": "placeId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+        },
+        "description": "Place identifier"
       },
       "orderId": {
         "name": "orderId",
