@@ -1,6 +1,5 @@
-import uuid
-
 from snowfall.project.pay.service.payers.v1alpha import models_pb2
+from snowfall.stdlib import string
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 
@@ -16,7 +15,7 @@ class PayersRepository(  # noqa: WPS215
         self,
         document: models_pb2.Payer,
     ) -> models_pb2.Payer:
-        document.id = str(uuid.uuid4())
+        document.id = string.uuid()
 
         return await super().insert(document)
 

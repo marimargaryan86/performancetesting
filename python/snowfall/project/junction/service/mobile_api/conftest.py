@@ -4,7 +4,6 @@ import dataclasses
 import datetime
 import pathlib
 import re
-import uuid
 from typing import Any, AsyncIterator, Mapping, Optional, Sequence, TypedDict
 from unittest import mock
 
@@ -30,6 +29,7 @@ from snowfall.project.junction.service.mobile_api import (
 )
 from snowfall.project.junction.service.mobile_api.routes import router
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
+from snowfall.stdlib import string
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
@@ -63,7 +63,7 @@ jwt_public_key = base64.b64encode(jwt_public_key_bytes).decode()
 @pytest.fixture
 def new_user() -> models_pb2.User:
     return models_pb2.User(  # nosec
-        id=str(uuid.uuid4()),
+        id=string.uuid(),
         email="new_user@gmail.com",
         password="ReallyString1!",
         phone=phone_number_pb2.PhoneNumber(e164_number="+306966661752"),
@@ -81,7 +81,7 @@ ExistingUser = TypedDict(
 @pytest.fixture
 def existing_user() -> ExistingUser:
     user = models_pb2.User(  # nosec
-        id=str(uuid.uuid4()),
+        id=string.uuid(),
         email="existing_user@gmail.com",
         password="$2a$12$bb8.n1wWBXhUdJUToN.qoebWG2aZb7bMJD820mfcMDt2MW5e21VaK",
         first_name="Existing",

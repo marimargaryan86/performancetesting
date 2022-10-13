@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import abc
 import datetime
-import uuid
 from typing import Generic, Optional, Type, TypeVar
 
 import pydantic
 
+from snowfall.stdlib import string
 from snowfall.stdlib.persistence.redis import types as redis
 
 
@@ -30,7 +30,7 @@ class PydanticRepository(Generic[Record]):
         expires_at: Optional[datetime.datetime] = None,
     ) -> str:
         """Store a redis record into the cache and returns a key to access it."""
-        key = str(uuid.uuid4())
+        key = string.uuid()
 
         await self._redis.put(key, record.json())
 

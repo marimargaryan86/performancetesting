@@ -5,7 +5,6 @@ import contextlib
 import dataclasses
 import enum
 import os
-import uuid
 from typing import (
     Any,
     AsyncGenerator,
@@ -23,6 +22,7 @@ from google.protobuf import any_pb2, message, symbol_database
 from sentry_sdk import Hub, tracing
 from structlog import get_logger
 
+from snowfall.stdlib import string
 from snowfall.stdlib.instrumentation.sentry import get_span
 from snowfall.stdlib.v1alpha import amqp_pb2
 
@@ -132,7 +132,7 @@ class Producer(object):
         trackable_metadata: TrackableMetadata,
         headers: Optional[Mapping[str, str]] = None,
     ) -> str:
-        trackable_id = trackable_metadata.trackable_id or str(uuid.uuid4())
+        trackable_id = trackable_metadata.trackable_id or string.uuid()
         headers = headers or {}
 
         await self.publish(

@@ -1,9 +1,9 @@
-import uuid
 from typing import ClassVar, Sequence
 
 import pytest
 from starlette import requests
 
+from snowfall.stdlib import string
 from snowfall.stdlib.integration.starlette import includes, models
 
 
@@ -15,10 +15,10 @@ class _BarTest(models.Resource):
     api_type: ClassVar[str] = "bar"
 
 
-_id_one = str(uuid.uuid4())
-_id_two = str(uuid.uuid4())
-_id_three = str(uuid.uuid4())
-_id_four = str(uuid.uuid4())
+_id_one = string.uuid()
+_id_two = string.uuid()
+_id_three = string.uuid()
+_id_four = string.uuid()
 _test_data: dict[str, list[models.Resource]] = {
     "foo": [
         _FooTest(

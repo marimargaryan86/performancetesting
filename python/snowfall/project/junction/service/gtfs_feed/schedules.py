@@ -10,6 +10,7 @@ from google.protobuf import timestamp_pb2
 
 from snowfall.project.junction.service.gtfs_feed import importer
 from snowfall.service.geodata.v1 import geocoding_pb2, geocoding_pb2_grpc
+from snowfall.stdlib import string
 from snowfall.stdlib.format.gtfs import constants, datetimes, enums, models
 from snowfall.stdlib.transport import amqp
 from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
@@ -139,11 +140,9 @@ class SchedulesGenerator(object):
             return None
 
         schedule = models_pb2.Schedule(
-            id=str(
-                uuid.uuid5(
-                    self._namespace,
-                    "\x00".join((context.trip.trip_id, service_date.isoformat())),
-                ),
+            id=string.to_uuid(
+                "\x00".join((context.trip.trip_id, service_date.isoformat())),
+                self._namespace,
             ),
             name=context.route.route_short_name or context.route.route_long_name or "",
             stops=stops,
@@ -187,7 +186,7 @@ class SchedulesGenerator(object):
             )
 
         return models_pb2.Stop(
-            id=str(uuid.uuid5(self._namespace, "\x00".join(id_parts))),
+            id=string.to_uuid("\x00".join(id_parts), self._namespace),
             departure_at=departure_at,
             arrival_at=arrival_at,
             point=models_pb2.Point(
@@ -250,11 +249,9 @@ def _append_legs(
     schedule.legs.extend(
         [
             models_pb2.Leg(
-                id=str(
-                    uuid.uuid5(
-                        schedule_id,
-                        "\x00".join((origin.id, destination.id)),
-                    ),
+                id=string.to_uuid(
+                    "\x00".join((origin.id, destination.id)),
+                    schedule_id,
                 ),
                 origin=origin.point,
                 destination=destination.point,

@@ -1,10 +1,10 @@
 import collections
 import datetime
-import uuid
 from typing import Mapping, Sequence
 
 from snowfall.project.junction.service.offers import offers
 from snowfall.project.junction.service.offers.v1alpha import models_pb2
+from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.redis import types as redis
 
@@ -28,7 +28,7 @@ def generate_offer_aggregates(
 
     return [
         models_pb2.OfferAggregateMapping(
-            id=str(uuid.uuid4()),
+            id=string.uuid(),
             expires_at=protobuf.datetime_to_protobuf(expires_at),
             offer_result_ids=offer_ids,
         )

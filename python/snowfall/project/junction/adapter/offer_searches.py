@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import abc
 import datetime
-import uuid
 from typing import Sequence
 
 import grpc
@@ -12,6 +11,7 @@ from snowfall.project.junction.service.offers.v1alpha import (
     grpc_pb2_grpc,
     models_pb2,
 )
+from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 
 
@@ -52,7 +52,7 @@ class DictClient(Client):
             days=1,
         )
         offer_search = models_pb2.OfferSearch(
-            id=str(uuid.uuid4()),
+            id=string.uuid(),
             expires_at=protobuf.datetime_to_protobuf(expires_at),
             trip=request.trip,
         )

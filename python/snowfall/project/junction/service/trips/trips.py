@@ -1,5 +1,4 @@
 import datetime
-import uuid
 from typing import Optional, Sequence
 
 import pymongo
@@ -8,6 +7,7 @@ from motor import motor_asyncio
 
 from snowfall.project.junction.service.planner.v1alpha import planner_pb2
 from snowfall.project.junction.service.trips.v1alpha import trips_pb2
+from snowfall.stdlib import string
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 from snowfall.stdlib.v1alpha import models_pb2
 
@@ -162,7 +162,7 @@ class TripSearchRepository(
 
         document.CopyFrom(message)
 
-        document.id = str(uuid.uuid4())
+        document.id = string.uuid()
         expires_at = timestamp_pb2.Timestamp()
 
         expires_at.FromDatetime(

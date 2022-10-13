@@ -1,10 +1,10 @@
-import uuid
 from typing import Protocol
 
 import pytest
 from jsonschema import exceptions
 from openapi_core.unmarshalling.schemas import util
 
+from snowfall.stdlib import string
 from snowfall.stdlib.integration.starlette import formatters
 
 
@@ -143,7 +143,7 @@ def test_uri_format_with_invalid_uri(
 
 @pytest.mark.parametrize(
     "uuid_str",
-    (str(uuid.uuid4()),),
+    (string.uuid(),),
 )
 def test_uuid_format_with_valid_uuid(
     format_checker: _FormatChecker,

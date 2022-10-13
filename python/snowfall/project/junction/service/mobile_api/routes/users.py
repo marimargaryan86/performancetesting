@@ -1,5 +1,4 @@
 import random
-import uuid
 from string import digits
 from typing import Any, Mapping
 
@@ -18,6 +17,7 @@ from snowfall.project.junction.service.mobile_api.models import user as user_mod
 from snowfall.project.junction.service.mobile_api.v1alpha.models_pb2 import (
     User as UserModel,
 )
+from snowfall.stdlib import string
 from snowfall.stdlib.integration.starlette import models, request_helpers
 from snowfall.stdlib.v1alpha import phone_number_pb2
 
@@ -46,7 +46,7 @@ class Users(endpoints.HTTPEndpoint):
             raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
 
         user = UserModel(
-            id=str(uuid.uuid4()),
+            id=string.uuid(),
             email=body[_email_key],
             password=bcrypt.hashpw(
                 body[_password_key].encode(),

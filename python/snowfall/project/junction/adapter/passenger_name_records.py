@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import abc
-import uuid
 from typing import Sequence
 
 import grpc
@@ -10,6 +9,7 @@ from snowfall.project.junction.service.passenger_name_records.v1alpha import (
     passenger_name_records_pb2,
     passenger_name_records_pb2_grpc,
 )
+from snowfall.stdlib import string
 
 
 class NotFoundError(Exception):
@@ -40,7 +40,7 @@ class DictClient(Client):
 
     async def create(self) -> passenger_name_records_pb2.PassengerNameRecord:
         passenger_name_record = passenger_name_records_pb2.PassengerNameRecord(
-            id=str(uuid.uuid4()),
+            id=string.uuid(),
         )
         self._passenger_name_records[passenger_name_record.id] = passenger_name_record
 

@@ -1,8 +1,8 @@
 import datetime
-import uuid
 from typing import Sequence
 
 from snowfall.project.pay.service.rates.v1alpha import models_pb2
+from snowfall.stdlib import string
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 VALID_RATE_DAYS = 30
@@ -21,7 +21,7 @@ class RatesRepository(  # noqa: WPS215
         documents: Sequence[models_pb2.Rate],
     ) -> Sequence[models_pb2.Rate]:
         for document in documents:
-            document.id = str(uuid.uuid4())
+            document.id = string.uuid()
 
         return await super().insert_many(documents)
 

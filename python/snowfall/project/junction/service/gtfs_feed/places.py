@@ -6,6 +6,7 @@ from geopy import exc
 from snowfall.project.junction.service.gtfs_feed import importer
 from snowfall.project.junction.service.places.v1alpha import models_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2, geocoding_pb2_grpc
+from snowfall.stdlib import string
 from snowfall.stdlib.transport import amqp
 from snowfall.stdlib.v1alpha import latlng_pb2
 
@@ -33,12 +34,7 @@ async def process_places(
             with attempt:
                 await producer.publish(
                     models_pb2.Location(
-                        id=str(
-                            uuid.uuid5(
-                                namespace,
-                                stop.stop_id,
-                            ),
-                        ),
+                        id=string.to_uuid(stop.stop_id, namespace),
                         name=stop.stop_name or "",
                         coordinates=latlng_pb2.LatLng(
                             latitude=stop.stop_lat,

@@ -1,7 +1,6 @@
 import copy
 import datetime
 import re
-import uuid
 from typing import Any, Mapping, Optional, Sequence
 
 import bcrypt
@@ -10,6 +9,7 @@ from pymongo import results as pymongo_results
 
 from snowfall.project.junction.service.mobile_api import resources
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
+from snowfall.stdlib import string
 from snowfall.stdlib.persistence.mongo import coders, mixins, repository, resultset
 from snowfall.stdlib.persistence.redis import types as redis
 
@@ -291,7 +291,7 @@ class OrdersRepository(
         junction_order: Mapping[str, Any],
         user_id: str,
     ) -> dict[str, Any]:
-        order_id = str(uuid.uuid4())
+        order_id = string.uuid()
         document = request_body[_DATA_ACCESSOR]
         document[_ID_ACCESSOR] = order_id
         attributes = document[_ATTRIBUTES_ACCESSOR]

@@ -3,13 +3,13 @@ from __future__ import annotations
 import abc
 import dataclasses
 import datetime
-import uuid
 from typing import Optional, Sequence
 
 import grpc
 
 from snowfall.project.junction.adapter.trips import TripsPage
 from snowfall.project.junction.service.trips.v1alpha import trips_pb2, trips_pb2_grpc
+from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2
 
@@ -64,7 +64,7 @@ class DictClient(Client):
             days=1,
         )
         trip_search = trips_pb2.TripSearch(
-            id=str(uuid.uuid4()),
+            id=string.uuid(),
             expires_at=protobuf.datetime_to_protobuf(expires_at),
             origins=trip_search_request.origins,
             destinations=trip_search_request.destinations,
@@ -104,10 +104,10 @@ class DictClient(Client):
                 id="b3e45af0-f3ae-46e5-a94f-fd1c9d86fb7d",
                 segments=[
                     models_pb2.SegmentReference(
-                        id=str(uuid.uuid4()),
-                        schedule_id=str(uuid.uuid4()),
+                        id=string.uuid(),
+                        schedule_id=string.uuid(),
                         leg_ids=[
-                            str(uuid.uuid4()),
+                            string.uuid(),
                         ],
                     ),
                 ],

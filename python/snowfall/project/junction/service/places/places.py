@@ -6,6 +6,7 @@ from pymongo import GEOSPHERE, IndexModel, results
 
 from snowfall.project.junction.service.places.v1alpha import models_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2, geocoding_pb2_grpc
+from snowfall.stdlib import string
 from snowfall.stdlib.persistence.mongo import mixins, normalizers, repository, resultset
 
 _mongo_id_key = "_id"
@@ -128,7 +129,7 @@ class PlaceRepository(  # noqa: WPS215
         )
 
         if not resource.location.id:
-            resource.location.id = str(uuid.uuid4())
+            resource.location.id = string.uuid()
 
         resource.location.country_code = country_code.country_code
         resource.location.time_zone = time_zone.time_zone.id

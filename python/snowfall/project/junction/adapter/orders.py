@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import abc
-import uuid
 from collections.abc import Iterator
 from typing import Optional, Sequence
 
@@ -12,7 +11,7 @@ from snowfall.project.junction.service.orders.v1alpha import (
     orders_pb2,
     orders_pb2_grpc,
 )
-from snowfall.stdlib import sequence
+from snowfall.stdlib import sequence, string
 
 _MOCK_PRICE_UNITS = 13
 _MOCK_PRICE_NANOS = 370000000
@@ -137,7 +136,7 @@ class DictClient(Client):
         contact_details: models_pb2.ContactDetails,
     ) -> models_pb2.Journey:
         journey = models_pb2.Journey(
-            id=str(uuid.uuid4()),
+            id=string.uuid(),
             passenger_name_record="FOOBAR",
             contact_details=contact_details,
         )
@@ -154,7 +153,7 @@ class DictClient(Client):
         if journey_id not in self._journeys:
             raise NotFoundError()
 
-        order_id = str(uuid.uuid4())
+        order_id = string.uuid()
         order = models_pb2.Order(
             id=order_id,
             journey_id=journey_id,
@@ -378,7 +377,7 @@ class DictClient(Client):
         bookings = []
 
         for option in options:
-            booking_id = str(uuid.uuid4())
+            booking_id = string.uuid()
             self._generate_option_ids(booking_id, option)
 
             bookings.append(
@@ -401,11 +400,11 @@ class DictClient(Client):
         booking_id: str,
         option: models_pb2.TripOption,
     ) -> None:
-        option.id = str(uuid.uuid4())
+        option.id = string.uuid()
         option.booking_id = booking_id
 
         for detail in option.details:
-            detail.id = str(uuid.uuid4())
+            detail.id = string.uuid()
             detail.booking_id = booking_id
 
 

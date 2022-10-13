@@ -1,5 +1,4 @@
 import datetime
-import uuid
 from collections.abc import AsyncIterator
 from contextlib import suppress
 from typing import Mapping, Sequence, Tuple
@@ -9,7 +8,7 @@ import more_itertools
 from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.project.junction.service.providers.ask2go import airports, cache, models
 from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
-from snowfall.stdlib import money
+from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2
 from snowfall.vendor.ask2go.models import booking, offers, price
@@ -57,7 +56,7 @@ class OfferTransformer(object):
         )
 
         return offers_pb2.OfferGroup(
-            id=str(uuid.uuid4()),
+            id=string.uuid(),
             offer_search_id=search_task.offer_search_id,
             expires_at=protobuf.datetime_to_protobuf(expires_at),
             offers=[
@@ -71,7 +70,7 @@ class OfferTransformer(object):
                     ),
                     segment_details=[
                         offers_pb2.OfferSegmentDetails(
-                            id=str(uuid.uuid4()),
+                            id=string.uuid(),
                             offer_segment_id=offer_segment.id,
                             cabin_class=models_pb2.CabinClass(
                                 type=models.cabin_to_proto(segment.cabin),
@@ -109,7 +108,7 @@ class OfferTransformer(object):
         destination = self._airports.get_by_iata(segment.destination.airport_code)
 
         return offers_pb2.OfferSegment(
-            id=str(uuid.uuid4()),
+            id=string.uuid(),
             segment_id=search_segment.id,
             legs=[
                 offers_pb2.OfferSegmentLeg(

@@ -1,6 +1,5 @@
 import datetime
 import random
-import uuid
 from collections.abc import AsyncIterator
 from typing import Sequence, cast
 
@@ -8,7 +7,7 @@ import pydantic
 
 from snowfall.project.junction.service.offers.v1alpha import amqp_pb2
 from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
-from snowfall.stdlib import service
+from snowfall.stdlib import service, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport import amqp
 from snowfall.stdlib.v1alpha import models_pb2
@@ -24,7 +23,7 @@ class OffersMockClient(object):
         search: amqp_pb2.TripOfferSearchTask,
     ) -> AsyncIterator[offers_pb2.OfferGroup]:
         yield offers_pb2.OfferGroup(
-            id=str(uuid.uuid4()),
+            id=string.uuid(),
             offer_search_id=search.offer_search_id,
             offers=[
                 offers_pb2.Offer(

@@ -1,9 +1,8 @@
-import uuid
-
 import lagom
 from starlette import endpoints, requests, responses
 
 from snowfall.project.junction.adapter import currencies
+from snowfall.stdlib import string
 from snowfall.stdlib.integration.starlette import request_helpers
 
 _DATA_KEY = "data"
@@ -27,7 +26,7 @@ class Rates(endpoints.HTTPEndpoint):
         payload = {
             _DATA_KEY: {
                 "type": "rates",
-                "id": str(uuid.uuid4()),
+                "id": string.uuid(),
                 "attributes": {
                     "rate": float(rate),
                 },

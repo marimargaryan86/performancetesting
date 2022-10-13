@@ -5,6 +5,7 @@ from aiocsv import AsyncDictReader, protocols
 
 from snowfall.project.junction.service.places import places
 from snowfall.project.junction.service.places.v1alpha import models_pb2
+from snowfall.stdlib import string
 from snowfall.stdlib.v1alpha import latlng_pb2
 
 _MIN_POPULATION = 20000
@@ -37,7 +38,7 @@ async def parse_csv(
         yield models_pb2.Place(
             merged_ids=location_ids,
             location=models_pb2.Location(
-                id=str(uuid.uuid5(_NAMESPACE, row["id"])),
+                id=string.to_uuid(row["id"], _NAMESPACE),
                 name=row["city"],
                 coordinates=latlng_pb2.LatLng(
                     latitude=float(row["lat"]),

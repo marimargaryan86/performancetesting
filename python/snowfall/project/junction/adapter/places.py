@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import abc
 import dataclasses
-import uuid
 from typing import Optional, Sequence
 
 import grpc
@@ -12,7 +11,7 @@ from snowfall.project.junction.service.places.v1alpha import (
     places_pb2,
     places_pb2_grpc,
 )
-from snowfall.stdlib import sequence
+from snowfall.stdlib import sequence, string
 
 _PLACE_NOT_FOUND_FROMAT = "Place with ID '{id}' not found."
 
@@ -71,7 +70,7 @@ class DictClient(Client):
     async def create(self, place: models_pb2.Place) -> models_pb2.Place:
         new_place = models_pb2.Place()
         new_place.CopyFrom(place)
-        new_place.location.id = str(uuid.uuid4())
+        new_place.location.id = string.uuid()
         self._places[new_place.location.id] = new_place
 
         return new_place

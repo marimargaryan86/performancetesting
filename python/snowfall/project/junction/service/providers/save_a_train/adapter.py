@@ -3,7 +3,6 @@ from __future__ import annotations
 import dataclasses
 import datetime
 import types
-import uuid
 from typing import AsyncIterator, Optional, Sequence
 
 import httpx
@@ -25,7 +24,7 @@ from snowfall.project.junction.service.providers.save_a_train import (
     train_stations,
 )
 from snowfall.project.junction.service.providers.save_a_train.v1alpha import amqp_pb2
-from snowfall.stdlib import money
+from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2
 from snowfall.vendor.save_a_train import client, enums, exceptions
@@ -157,11 +156,11 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                     continue
 
                 expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
-                offer_segment_id = str(uuid.uuid4())
+                offer_segment_id = string.uuid()
                 currency = money.Currency("EUR")
 
                 yield offer_models_pb2.OfferGroup(
-                    id=str(uuid.uuid4()),
+                    id=string.uuid(),
                     offer_search_id=search_task.offer_search_id,
                     expires_at=protobuf.datetime_to_protobuf(expires_at),
                     offers=[
@@ -177,7 +176,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                             ),
                             segment_details=[
                                 offer_models_pb2.OfferSegmentDetails(
-                                    id=str(uuid.uuid4()),
+                                    id=string.uuid(),
                                     offer_segment_id=offer_segment_id,
                                     cabin_class=models_pb2.CabinClass(
                                         type=_cabin_to_proto(transfer_fare.name),

@@ -1,6 +1,5 @@
 import copy
 import datetime
-import uuid
 from typing import Optional, Sequence
 
 import pymongo
@@ -8,6 +7,7 @@ from google.protobuf import timestamp_pb2
 from motor import motor_asyncio
 
 from snowfall.project.junction.service.offers.v1alpha import models_pb2
+from snowfall.stdlib import string
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 from snowfall.stdlib.v1alpha import models_pb2 as common_pb2
 
@@ -287,7 +287,7 @@ class OfferSearchRepository(  # noqa: WPS215
             datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
         )
         offer_search = models_pb2.OfferSearch(
-            id=str(uuid.uuid4()),
+            id=string.uuid(),
             expires_at=expires_at,
             trip=document.trip,
         )

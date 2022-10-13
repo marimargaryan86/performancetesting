@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import uuid
 from typing import Any, Optional, Sequence
 
 import pymongo
@@ -9,6 +8,7 @@ from snowfall.project.junction.adapter import (
     passenger_name_records as passenger_name_records_adapter,
 )
 from snowfall.project.junction.service.orders.v1alpha import models_pb2
+from snowfall.stdlib import string
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 
@@ -32,7 +32,7 @@ class JourneyRepository(
         contact_details: models_pb2.ContactDetails,
     ) -> models_pb2.Journey:
         journey = models_pb2.Journey(
-            id=str(uuid.uuid4()),
+            id=string.uuid(),
             passenger_name_record=(await self._passenger_name_records.create()).id,
             contact_details=contact_details,
         )
@@ -81,7 +81,7 @@ class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
         passengers: Sequence[models_pb2.Passenger],
         options: Sequence[models_pb2.TripOption],
     ) -> models_pb2.Order:
-        order_id = str(uuid.uuid4())
+        order_id = string.uuid()
         order = models_pb2.Order(
             id=order_id,
             journey_id=journey_id,
@@ -165,7 +165,7 @@ class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
         bookings = []
 
         for option in options:
-            booking_id = str(uuid.uuid4())
+            booking_id = string.uuid()
             self._generate_option_ids(booking_id, option)
 
             bookings.append(
@@ -188,7 +188,7 @@ class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
         option.booking_id = booking_id
 
         for detail in option.details:
-            detail.id = str(uuid.uuid4())
+            detail.id = string.uuid()
             detail.booking_id = booking_id
 
 

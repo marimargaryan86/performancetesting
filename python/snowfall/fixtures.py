@@ -2,7 +2,6 @@ import dataclasses
 import datetime
 import random
 import types
-import uuid
 from typing import Sequence
 
 from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
@@ -15,6 +14,7 @@ from snowfall.project.junction.service.passenger_name_records.v1alpha import (
 from snowfall.project.junction.service.places.v1alpha import (
     models_pb2 as place_models_pb2,
 )
+from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import (
     latlng_pb2,
@@ -267,9 +267,9 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
                         segment_id=SEGMENTS[0],
                         legs=[
                             offers_pb2.OfferSegmentLeg(
-                                id=str(uuid.uuid4()),
-                                origin=generate_point(str(uuid.uuid4())),
-                                destination=generate_point(str(uuid.uuid4())),
+                                id=string.uuid(),
+                                origin=generate_point(string.uuid()),
+                                destination=generate_point(string.uuid()),
                                 departure_at=protobuf.datetime_to_protobuf(
                                     datetime.datetime.now(),
                                 ),
@@ -333,9 +333,9 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
                         segment_id=SEGMENTS[1],
                         legs=[
                             offers_pb2.OfferSegmentLeg(
-                                id=str(uuid.uuid4()),
-                                origin=generate_point(str(uuid.uuid4())),
-                                destination=generate_point(str(uuid.uuid4())),
+                                id=string.uuid(),
+                                origin=generate_point(string.uuid()),
+                                destination=generate_point(string.uuid()),
                                 departure_at=protobuf.datetime_to_protobuf(
                                     datetime.datetime.now(),
                                 ),
@@ -406,7 +406,7 @@ def generate_journey(
                         order_id=order_id,
                         total_price=price,
                         trip_option=order_models_pb2.TripOption(
-                            id=str(uuid.uuid4()),
+                            id=string.uuid(),
                             booking_id=booking_id,
                             price=price,
                             details=[
@@ -416,12 +416,12 @@ def generate_journey(
                                     segment=offers_pb2.OfferSegment(
                                         legs=[
                                             offers_pb2.OfferSegmentLeg(
-                                                id=str(uuid.uuid4()),
+                                                id=string.uuid(),
                                                 origin=generate_point(
-                                                    str(uuid.uuid4()),
+                                                    string.uuid(),
                                                 ),
                                                 destination=generate_point(
-                                                    str(uuid.uuid4()),
+                                                    string.uuid(),
                                                 ),
                                                 departure_at=protobuf.datetime_to_protobuf(
                                                     datetime.datetime.now(),
@@ -489,8 +489,8 @@ def get_legs() -> list[models_pb2.Leg]:
 def generate_leg(identifier: str) -> models_pb2.Leg:
     return models_pb2.Leg(
         id=identifier,
-        origin=generate_point(str(uuid.uuid4())),
-        destination=generate_point(str(uuid.uuid4())),
+        origin=generate_point(string.uuid()),
+        destination=generate_point(string.uuid()),
         departure_at=protobuf.datetime_to_protobuf(
             datetime.datetime.now(),
         ),
