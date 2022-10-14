@@ -47,6 +47,8 @@ class BooleanCollectionValues(enum.Enum):
         "wildlife",
         "action",
         "food",
+        "nightlife",
+        "relaxing",
     ]
 
 
