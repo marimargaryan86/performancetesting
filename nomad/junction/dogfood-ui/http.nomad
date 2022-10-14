@@ -73,6 +73,7 @@ job "dogfood-ui-http" {
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
         "traefik.http.routers.dogfood-ui.entrypoints=${var.traefik_entrypoints}",
+        "traefik.http.routers.dogfood-ui.middlewares=dogfood-auth",
         "traefik.http.routers.dogfood-ui.rule=Host(`${var.traefik_host_URL}`)",
         "traefik.http.middlewares.dogfood-auth.basicauth.users=snowfall:$$2y$$10$$c2L899ZtagQWgguPSK0KrO/P7ru1Q5NmM2RtEocMePNZkEiH2ZMue"
       ]
