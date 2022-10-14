@@ -32,7 +32,7 @@ class Settings(service.Settings):
 def create_asgi_app(
     dependencies: starlette.StarletteIntegration,
     routes_factory: RoutesFactory,
-    openapi_path: pathlib.Path,
+    openapi_path: pathlib.Path | None,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> ASGIApplication:
     return cast(
@@ -49,23 +49,27 @@ def create_asgi_app(
 def create_starlette_app(
     dependencies: starlette.StarletteIntegration,
     routes_factory: RoutesFactory,
-    openapi_path: pathlib.Path,
+    openapi_path: pathlib.Path | None,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
+    stack = [Middleware(middlewares.RequestIdMiddleware)]
+
+    if openapi_path:
+        stack.append(
+            Middleware(
+                middlewares.ValidationMiddleware,
+                validator=validation.Validator(str(openapi_path)),
+                excluded_status_codes={http.HTTPStatus.METHOD_NOT_ALLOWED},
+            ),
+        )
+
     return applications.Starlette(
         routes=[
             *routes_factory(dependencies),
             dependencies.route("/health", routes.Health, name="Health"),
         ],
         middleware=[
-            Middleware(
-                middlewares.RequestIdMiddleware,
-            ),
-            Middleware(
-                middlewares.ValidationMiddleware,
-                validator=validation.Validator(str(openapi_path)),
-                excluded_status_codes={http.HTTPStatus.METHOD_NOT_ALLOWED},
-            ),
+            *stack,
             *(custom_middlewares or []),
         ],
         exception_handlers={

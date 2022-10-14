@@ -29,6 +29,7 @@ The following ports are configured in local environments by default:
 | 8001  | mobile-api             | HTTP Server       |
 | 8002  | admin-api              | HTTP Server       |
 | 8003  | pay-api                | HTTP Server       |
+| 8004  | dogfood-ui             | HTTP Server       |
 | 8080  | admin-api              | Prometheus Server |
 | 8081  | client-api             | Prometheus Server |
 | 8082  | currencies             | Prometheus Server |
@@ -45,6 +46,7 @@ The following ports are configured in local environments by default:
 | 8093  | schedules              | Prometheus Server |
 | 8094  | trips                  | Prometheus Server |
 | 8095  | geodata                | Prometheus Server |
+| 8096  | dogfood-ui             | Prometheus Server |
 | 50051 | echo                   | gRPC Server       |
 | 50052 | places                 | gRPC Server       |
 | 50053 | planner                | gRPC Server       |
