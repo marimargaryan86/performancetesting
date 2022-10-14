@@ -9,6 +9,7 @@ from lagom.integrations import starlette
 from starlette import applications, exceptions, routing, status
 from starlette.middleware import Middleware
 
+from snowfall.project.junction.adapter import common
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import (
     handlers,
@@ -76,6 +77,7 @@ def create_starlette_app(
             status.HTTP_500_INTERNAL_SERVER_ERROR: handlers.server_error_handler,
             exceptions.HTTPException: handlers.server_error_handler,
             cursor.CursorError: handlers.cursor_error_handler,
+            common.CursorError: handlers.cursor_error_handler,
         },
     )
 

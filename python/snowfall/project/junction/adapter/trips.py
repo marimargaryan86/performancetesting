@@ -6,6 +6,7 @@ from typing import Optional, Sequence
 
 import grpc
 
+from snowfall.project.junction.adapter import common
 from snowfall.project.junction.service.trips.v1alpha import trips_pb2, trips_pb2_grpc
 from snowfall.stdlib.v1alpha import models_pb2
 
@@ -102,7 +103,9 @@ class GrpcClient(Client):
             request.page_size = limit
 
         try:
-            response = await self._trips.ListTrips(request, timeout=self._timeout)
+            response = await common.handle_grpc_errors(
+                self._trips.ListTrips(request, timeout=self._timeout),
+            )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError() from exc
 

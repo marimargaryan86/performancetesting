@@ -8,7 +8,7 @@ import grpc
 from grpc_reflection.v1alpha import reflection
 from structlog import get_logger
 
-from snowfall.stdlib.transport.grpc import tracing
+from snowfall.stdlib.transport.grpc import handler, tracing
 from snowfall.stdlib.transport.grpc.service import HealthService, Service
 
 
@@ -34,7 +34,12 @@ def create_server(
     port: int,
     services: Sequence[Service],
 ) -> Server:
-    server = grpc.aio.server(interceptors=[tracing.TracingServerInterceptor()])
+    server = grpc.aio.server(
+        interceptors=[
+            tracing.TracingServerInterceptor(),
+            handler.ErrorHandlerServerInterceptor(),
+        ],
+    )
     names = {reflection.SERVICE_NAME}
     address_concat = "{address}:{port}".format(address=str(address), port=port)
 

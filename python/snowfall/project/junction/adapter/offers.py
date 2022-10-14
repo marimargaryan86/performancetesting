@@ -348,7 +348,9 @@ class GrpcClient(Client):  # noqa: WPS214
             request.page_size = limit
 
         try:
-            response = await self._offers.ListOffers(request, timeout=self._timeout)
+            response = await common.handle_grpc_errors(
+                self._offers.ListOffers(request, timeout=self._timeout),
+            )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError(exc.details()) from exc
 
@@ -372,7 +374,9 @@ class GrpcClient(Client):  # noqa: WPS214
             request.page_size = limit
 
         try:
-            response = await self._offers.ListOffers(request, timeout=self._timeout)
+            response = await common.handle_grpc_errors(
+                self._offers.ListOffers(request, timeout=self._timeout),
+            )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError() from exc
 
@@ -411,9 +415,8 @@ class GrpcClient(Client):  # noqa: WPS214
             request.page_size = limit
 
         try:
-            response = await self._offers.ListOfferGroups(
-                request,
-                timeout=self._timeout,
+            response = await common.handle_grpc_errors(
+                self._offers.ListOfferGroups(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError() from exc
@@ -427,9 +430,8 @@ class GrpcClient(Client):  # noqa: WPS214
         request = grpc_pb2.GetOfferGroupDetailsRequest(id=identifier)
 
         try:
-            response = await self._offers.GetOfferGroupDetails(
-                request,
-                timeout=self._timeout,
+            response = await common.handle_grpc_errors(
+                self._offers.GetOfferGroupDetails(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
             if exc.code() == grpc.StatusCode.NOT_FOUND:
@@ -458,9 +460,8 @@ class GrpcClient(Client):  # noqa: WPS214
             request.page_size = limit
 
         try:
-            response = await self._offers.ListOfferGroupDetails(
-                request,
-                timeout=self._timeout,
+            response = await common.handle_grpc_errors(
+                self._offers.ListOfferGroupDetails(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError() from exc
@@ -500,9 +501,8 @@ class GrpcClient(Client):  # noqa: WPS214
             request.page_size = limit
 
         try:
-            response = await self._offers.ListOfferOptions(
-                request,
-                timeout=self._timeout,
+            response = await common.handle_grpc_errors(
+                self._offers.ListOfferOptions(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError() from exc
@@ -548,9 +548,8 @@ class GrpcClient(Client):  # noqa: WPS214
             request.page_size = limit
 
         try:
-            response = await self._offers.ListOfferOptionDetails(
-                request,
-                timeout=self._timeout,
+            response = await common.handle_grpc_errors(
+                self._offers.ListOfferOptionDetails(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError() from exc

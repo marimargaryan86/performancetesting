@@ -6,6 +6,7 @@ from typing import Optional, Sequence
 
 import grpc
 
+from snowfall.project.junction.adapter import common
 from snowfall.project.junction.service.schedules.v1alpha import (
     schedules_pb2,
     schedules_pb2_grpc,
@@ -112,7 +113,9 @@ class GrpcClient(Client):
             request.page_size = limit
 
         try:
-            response = await self._schedules.ListLegs(request, timeout=self._timeout)
+            response = await common.handle_grpc_errors(
+                self._schedules.ListLegs(request, timeout=self._timeout),
+            )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError() from exc
 

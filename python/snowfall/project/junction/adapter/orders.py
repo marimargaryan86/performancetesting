@@ -6,6 +6,7 @@ from typing import Optional, Sequence
 
 import grpc
 
+from snowfall.project.junction.adapter import common
 from snowfall.project.junction.service.orders.v1alpha import (
     models_pb2,
     orders_pb2,
@@ -539,7 +540,9 @@ class GrpcClient(Client):
             request.page_size = limit
 
         try:
-            return await self._orders.ListJourneys(request, timeout=self._timeout)
+            return await common.handle_grpc_errors(
+                self._orders.ListJourneys(request, timeout=self._timeout),
+            )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError(exc.details()) from exc
 
@@ -558,7 +561,9 @@ class GrpcClient(Client):
             request.page_size = limit
 
         try:
-            return await self._orders.ListOrders(request, timeout=self._timeout)
+            return await common.handle_grpc_errors(
+                self._orders.ListOrders(request, timeout=self._timeout),
+            )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError(exc.details()) from exc
 
@@ -577,7 +582,9 @@ class GrpcClient(Client):
             request.page_size = limit
 
         try:
-            return await self._orders.ListOrders(request, timeout=self._timeout)
+            return await common.handle_grpc_errors(
+                self._orders.ListOrders(request, timeout=self._timeout),
+            )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError(exc.details()) from exc
 
@@ -596,7 +603,9 @@ class GrpcClient(Client):
             request.page_size = limit
 
         try:
-            return await self._orders.ListBookings(request, timeout=self._timeout)
+            return await common.handle_grpc_errors(
+                self._orders.ListBookings(request, timeout=self._timeout),
+            )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError(exc.details()) from exc
 
@@ -615,7 +624,9 @@ class GrpcClient(Client):
             request.page_size = limit
 
         try:
-            return await self._orders.ListBookings(request, timeout=self._timeout)
+            return await common.handle_grpc_errors(
+                self._orders.ListBookings(request, timeout=self._timeout),
+            )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError(exc.details()) from exc
 
@@ -634,7 +645,9 @@ class GrpcClient(Client):
             request.page_size = limit
 
         try:
-            return await self._orders.ListBookingDetails(request, timeout=self._timeout)
+            return await common.handle_grpc_errors(
+                self._orders.ListBookingDetails(request, timeout=self._timeout),
+            )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError(exc.details()) from exc
 
@@ -653,6 +666,8 @@ class GrpcClient(Client):
             request.page_size = limit
 
         try:
-            return await self._orders.ListBookingDetails(request, timeout=self._timeout)
+            return await common.handle_grpc_errors(
+                self._orders.ListBookingDetails(request, timeout=self._timeout),
+            )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError(exc.details()) from exc

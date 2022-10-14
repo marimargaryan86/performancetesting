@@ -86,7 +86,9 @@ class GrpcClient(Client):
         if limit is not None:
             request.page_size = limit
 
-        response = await self._segments.ListSegments(request, timeout=self._timeout)
+        response = await common.handle_grpc_errors(
+            self._segments.ListSegments(request, timeout=self._timeout),
+        )
 
         return common.ItemsPage(
             protos=response.segments,
