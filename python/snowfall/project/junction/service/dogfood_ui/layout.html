@@ -578,7 +578,7 @@
           item.append(cell);
 
           cell = document.createElement('td')
-          cell.textContent = segment.relationships.legs.data[0].attributes.destination.name
+          cell.textContent = segment.relationships.legs.data[segment.relationships.legs.data.length-1].attributes.destination.name
           item.append(cell);
 
           cell = document.createElement('td')
@@ -610,7 +610,6 @@
             }
           });
 
-          //latlngs.push(...leg.Path);
           latlngs.push(marker.getLatLng());
       })
 
