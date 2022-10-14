@@ -5,10 +5,10 @@ python_sources(
         },
     },
 )
-pex_binary(
+python_image(
+    namespace="python.snowfall.project.junction.service.dogfood_ui",
     name="main",
     entry_point="main.py",
-    restartable=True,
 )
 resource(
     name="layout",
