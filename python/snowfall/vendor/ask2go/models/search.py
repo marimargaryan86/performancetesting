@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from snowfall.vendor.ask2go.enums import AirCabinClassType
 from snowfall.vendor.ask2go.models import offers
@@ -30,8 +30,8 @@ class SearchResultsResponse(CamelCaseBaseModel):
 class CreateSearchCriteria(CamelCaseBaseModel):
     origin_iata: str
     destination_iata: str
-    outbound_date: Union[datetime.date, datetime.datetime]
-    inbound_date: Optional[Union[datetime.date, datetime.datetime]]
+    outbound_date: datetime.datetime | datetime.date
+    inbound_date: Optional[datetime.datetime | datetime.date]
     cabin_class: AirCabinClassType = AirCabinClassType.any_
     adults: int = 0
     children: int = 0
