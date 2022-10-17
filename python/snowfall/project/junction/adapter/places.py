@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import abc
-import dataclasses
 from typing import Optional, Sequence
 
 import grpc
@@ -23,19 +22,6 @@ class NotFoundError(Exception):
 
 class UnknownError(Exception):
     """Raised when an unhandled error occurs."""
-
-
-@dataclasses.dataclass(frozen=True)
-class PlacesPage(object):
-    places: Sequence[models_pb2.Place]
-    next_page_token: str = ""
-
-    @classmethod
-    async def from_proto(cls, grpc_places: places_pb2.ListPlacesResponse) -> PlacesPage:
-        return cls(
-            places=grpc_places.places,
-            next_page_token=grpc_places.next_page_token,
-        )
 
 
 class Client(abc.ABC):
@@ -60,7 +46,7 @@ class Client(abc.ABC):
         self,
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> PlacesPage:
+    ) -> places_pb2.ListPlacesResponse:
         """Fetch all place resources."""
 
 
@@ -101,14 +87,17 @@ class DictClient(Client):
         self,
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> PlacesPage:
+    ) -> places_pb2.ListPlacesResponse:
         page = sequence.paginate(
             sequence=list(self._places.values()),
             cursor=cursor,
             limit=limit,
         )
 
-        return PlacesPage(places=page.sequence, next_page_token=page.cursor)
+        return places_pb2.ListPlacesResponse(
+            places=page.sequence,
+            next_page_token=page.cursor,
+        )
 
 
 class GrpcClient(Client):
@@ -177,7 +166,7 @@ class GrpcClient(Client):
         self,
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> PlacesPage:
+    ) -> places_pb2.ListPlacesResponse:
         # todo: handle INVALID_ARGUMENT
         request = places_pb2.ListPlacesRequest(
             page_token=cursor or "",
@@ -185,8 +174,6 @@ class GrpcClient(Client):
         if limit is not None:
             request.page_size = limit
 
-        response = await errors.handle_grpc_errors(
+        return await errors.handle_grpc_errors(
             self._places.ListPlaces(request, timeout=self._timeout),
         )
-
-        return await PlacesPage.from_proto(response)

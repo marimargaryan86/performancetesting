@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import abc
-import dataclasses
 from typing import Optional, Sequence
 
 import grpc
@@ -19,19 +18,6 @@ class UnknownError(Exception):
     """Raised when an unhandled error occurs."""
 
 
-@dataclasses.dataclass(frozen=True)
-class TripsPage(object):
-    trips: Sequence[models_pb2.TripReference]
-    next_page_token: str = ""
-
-    @classmethod
-    def from_proto(cls, grpc_trips: trips_pb2.ListTripsResponse) -> TripsPage:
-        return cls(
-            trips=grpc_trips.trips,
-            next_page_token=grpc_trips.next_page_token,
-        )
-
-
 class Client(abc.ABC):
     @abc.abstractmethod
     async def get(self, identifier: str) -> models_pb2.TripReference:
@@ -43,7 +29,7 @@ class Client(abc.ABC):
         identifiers: Sequence[str],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> TripsPage:
+    ) -> trips_pb2.ListTripsResponse:
         """Find trips by trip by ID."""
 
 
@@ -62,8 +48,8 @@ class DictClient(Client):
         identifiers: Sequence[str],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> TripsPage:
-        return TripsPage(
+    ) -> trips_pb2.ListTripsResponse:
+        return trips_pb2.ListTripsResponse(
             trips=[trip for trip in self._trips.values() if trip.id in identifiers],
         )
 
@@ -94,7 +80,7 @@ class GrpcClient(Client):
         identifiers: Sequence[str],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> TripsPage:
+    ) -> trips_pb2.ListTripsResponse:
         request = trips_pb2.ListTripsRequest(
             ids=list(identifiers),
             page_token=cursor or "",
@@ -103,13 +89,8 @@ class GrpcClient(Client):
             request.page_size = limit
 
         try:
-            response = await errors.handle_grpc_errors(
+            return await errors.handle_grpc_errors(
                 self._trips.ListTrips(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError() from exc
-
-        return TripsPage(
-            trips=list(response.trips),
-            next_page_token=response.next_page_token,
-        )

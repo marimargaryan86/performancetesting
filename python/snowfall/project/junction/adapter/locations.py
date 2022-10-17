@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import abc
-import dataclasses
 from typing import Optional, Sequence
 
 import grpc
@@ -23,22 +22,6 @@ class UnknownError(Exception):
     """Raised when an unhandled error occurs."""
 
 
-@dataclasses.dataclass(frozen=True)
-class LocationsPage(object):
-    locations: Sequence[models_pb2.Location]
-    next_page_token: str = ""
-
-    @classmethod
-    async def from_proto(
-        cls,
-        grpc_locations: places_pb2.ListLocationsResponse,
-    ) -> LocationsPage:
-        return cls(
-            locations=grpc_locations.locations,
-            next_page_token=grpc_locations.next_page_token,
-        )
-
-
 class Client(abc.ABC):
     @abc.abstractmethod
     async def get(self, identifier: str) -> models_pb2.Location:
@@ -50,7 +33,7 @@ class Client(abc.ABC):
         identifiers: Sequence[str] | None = None,
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> LocationsPage:
+    ) -> places_pb2.ListLocationsResponse:
         """Fetch all location resources."""
 
 
@@ -71,7 +54,7 @@ class DictClient(Client):
         identifiers: Sequence[str] | None = None,
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> LocationsPage:
+    ) -> places_pb2.ListLocationsResponse:
         all_locations = list(self._locations.values())
 
         if identifiers:
@@ -85,7 +68,10 @@ class DictClient(Client):
             limit=limit,
         )
 
-        return LocationsPage(locations=page.sequence, next_page_token=page.cursor)
+        return places_pb2.ListLocationsResponse(
+            locations=page.sequence,
+            next_page_token=page.cursor,
+        )
 
 
 class GrpcClient(Client):
@@ -118,7 +104,7 @@ class GrpcClient(Client):
         identifiers: Sequence[str] | None = None,
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> LocationsPage:
+    ) -> places_pb2.ListLocationsResponse:
         # todo: handle INVALID_ARGUMENT
         request = places_pb2.ListLocationsRequest(
             page_token=cursor or "",
@@ -127,8 +113,6 @@ class GrpcClient(Client):
         if limit is not None:
             request.page_size = limit
 
-        response = await errors.handle_grpc_errors(
+        return await errors.handle_grpc_errors(
             self._locations.ListLocations(request, timeout=self._timeout),
         )
-
-        return await LocationsPage.from_proto(response)

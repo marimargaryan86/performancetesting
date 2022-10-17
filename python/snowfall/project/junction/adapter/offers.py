@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import abc
-import dataclasses
 from collections.abc import Iterator
 from typing import Optional, Sequence
 
@@ -25,19 +24,6 @@ class UnknownError(Exception):
     """Raised when an unhandled error occurs."""
 
 
-@dataclasses.dataclass(frozen=True)
-class OffersPage(object):
-    offers: Sequence[models_pb2.OfferAggregate]
-    next_page_token: str = ""
-
-    @classmethod
-    def from_proto(cls, grpc_offers: grpc_pb2.ListOffersResponse) -> OffersPage:
-        return cls(
-            offers=grpc_offers.offers,
-            next_page_token=grpc_offers.next_page_token,
-        )
-
-
 class Client(abc.ABC):  # noqa: WPS214
     @abc.abstractmethod
     async def get(self, identifier: str) -> models_pb2.OfferAggregate:
@@ -50,7 +36,7 @@ class Client(abc.ABC):  # noqa: WPS214
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
         cabin_classes: Optional[Sequence[common_pb2.CabinClass.Type.ValueType]] = None,
-    ) -> OffersPage:
+    ) -> grpc_pb2.ListOffersResponse:
         """Get offer results for an offer search."""
 
     @abc.abstractmethod
@@ -59,7 +45,7 @@ class Client(abc.ABC):  # noqa: WPS214
         identifiers: Sequence[str],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> OffersPage:
+    ) -> grpc_pb2.ListOffersResponse:
         """Return offers by offer ids."""
 
     @abc.abstractmethod
@@ -136,7 +122,7 @@ class DictClient(Client):  # noqa: WPS214
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
         cabin_classes: Optional[Sequence[common_pb2.CabinClass.Type.ValueType]] = None,
-    ) -> OffersPage:
+    ) -> grpc_pb2.ListOffersResponse:
         offers = [
             offer
             for offer in self._offers.values()
@@ -156,7 +142,7 @@ class DictClient(Client):  # noqa: WPS214
             limit=limit,
         )
 
-        return OffersPage(
+        return grpc_pb2.ListOffersResponse(
             offers=page.sequence,
             next_page_token=page.cursor,
         )
@@ -166,7 +152,7 @@ class DictClient(Client):  # noqa: WPS214
         identifiers: Sequence[str],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> OffersPage:
+    ) -> grpc_pb2.ListOffersResponse:
         page = sequence.paginate(
             sequence=[
                 self._offers[identifier]
@@ -177,7 +163,7 @@ class DictClient(Client):  # noqa: WPS214
             limit=limit,
         )
 
-        return OffersPage(
+        return grpc_pb2.ListOffersResponse(
             offers=page.sequence,
             next_page_token=page.cursor,
         )
@@ -338,7 +324,7 @@ class GrpcClient(Client):  # noqa: WPS214
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
         cabin_classes: Optional[Sequence[common_pb2.CabinClass.Type.ValueType]] = None,
-    ) -> OffersPage:
+    ) -> grpc_pb2.ListOffersResponse:
         request = grpc_pb2.ListOffersRequest(
             page_token=cursor or "",
             offer_search_id=identifier,
@@ -348,23 +334,18 @@ class GrpcClient(Client):  # noqa: WPS214
             request.page_size = limit
 
         try:
-            response = await errors.handle_grpc_errors(
+            return await errors.handle_grpc_errors(
                 self._offers.ListOffers(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError(exc.details()) from exc
-
-        return OffersPage(
-            offers=response.offers,
-            next_page_token=response.next_page_token,
-        )
 
     async def find_by_ids(
         self,
         identifiers: Sequence[str],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> OffersPage:
+    ) -> grpc_pb2.ListOffersResponse:
         request = grpc_pb2.ListOffersRequest(
             page_token=cursor or "",
             offer_ids=grpc_pb2.ListOfIds(ids=list(identifiers)),
@@ -374,16 +355,11 @@ class GrpcClient(Client):  # noqa: WPS214
             request.page_size = limit
 
         try:
-            response = await errors.handle_grpc_errors(
+            return await errors.handle_grpc_errors(
                 self._offers.ListOffers(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError() from exc
-
-        return OffersPage(
-            offers=list(response.offers),
-            next_page_token=response.next_page_token,
-        )
 
     async def get_group_by_id(self, identifier: str) -> models_pb2.OfferGroup:
         request = grpc_pb2.GetOfferGroupRequest(id=identifier)

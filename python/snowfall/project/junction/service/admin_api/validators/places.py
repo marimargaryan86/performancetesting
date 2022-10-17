@@ -4,7 +4,7 @@ from typing import Any, Mapping, Sequence
 from starlette import status
 
 from snowfall.project.junction.adapter import locations
-from snowfall.project.junction.service.places.v1alpha import models_pb2
+from snowfall.project.junction.service.places.v1alpha import models_pb2, places_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
 
@@ -44,7 +44,7 @@ async def _validate_locations(
         return set(), set()
 
     found_locations: set[str] = set()
-    page = locations.LocationsPage(locations=[])
+    page = places_pb2.ListLocationsResponse()
 
     while True:
         page = await locations_client.find(

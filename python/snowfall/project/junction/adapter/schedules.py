@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import abc
-import dataclasses
 from typing import Optional, Sequence
 
 import grpc
@@ -22,22 +21,6 @@ class UnknownError(Exception):
     """Raised when an unhandled error occurs."""
 
 
-@dataclasses.dataclass(frozen=True)
-class SchedulesPage(object):
-    schedules: Sequence[models_pb2.Schedule]
-    next_page_token: Optional[str] = None
-
-    @classmethod
-    def from_proto(
-        cls,
-        grpc_schedules: schedules_pb2.ListSchedulesResponse,
-    ) -> SchedulesPage:
-        return cls(
-            schedules=grpc_schedules.schedules,
-            next_page_token=grpc_schedules.next_page_token,
-        )
-
-
 class Client(abc.ABC):
     @abc.abstractmethod
     async def get(self, identifier: str) -> models_pb2.Schedule:
@@ -49,7 +32,7 @@ class Client(abc.ABC):
         identifiers: Sequence[str],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> SchedulesPage:
+    ) -> schedules_pb2.ListSchedulesResponse:
         """Find schedules by IDs."""
 
 
@@ -68,8 +51,10 @@ class DictClient(Client):
         identifiers: Sequence[str],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> SchedulesPage:
-        return SchedulesPage(schedules=list(self._schedules.values()))
+    ) -> schedules_pb2.ListSchedulesResponse:
+        return schedules_pb2.ListSchedulesResponse(
+            schedules=list(self._schedules.values()),
+        )
 
 
 class GrpcClient(Client):
@@ -102,7 +87,7 @@ class GrpcClient(Client):
         identifiers: Sequence[str],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> SchedulesPage:
+    ) -> schedules_pb2.ListSchedulesResponse:
         request = schedules_pb2.ListSchedulesRequest(
             ids=list(identifiers),
             page_token=cursor or "",
@@ -111,13 +96,8 @@ class GrpcClient(Client):
             request.page_size = limit
 
         try:
-            response = await errors.handle_grpc_errors(
+            return await errors.handle_grpc_errors(
                 self._schedules.ListSchedules(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError() from exc
-
-        return SchedulesPage(
-            schedules=list(response.schedules),
-            next_page_token=response.next_page_token,
-        )

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import abc
-import dataclasses
 from typing import Optional, Sequence
 
 import grpc
@@ -22,22 +21,6 @@ class UnknownError(Exception):
     """Raised when an unhandled error occurs."""
 
 
-@dataclasses.dataclass(frozen=True)
-class LegsPage(object):
-    legs: Sequence[models_pb2.Leg]
-    next_page_token: str = ""
-
-    @classmethod
-    def from_proto(
-        cls,
-        grpc_legs: schedules_pb2.ListLegsResponse,
-    ) -> LegsPage:
-        return cls(
-            legs=grpc_legs.legs,
-            next_page_token=grpc_legs.next_page_token,
-        )
-
-
 class Client(abc.ABC):
     @abc.abstractmethod
     async def get(self, identifier: str) -> models_pb2.Leg:
@@ -49,7 +32,7 @@ class Client(abc.ABC):
         identifiers: Sequence[str],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> LegsPage:
+    ) -> schedules_pb2.ListLegsResponse:
         """Find legs by IDs."""
 
 
@@ -70,8 +53,8 @@ class DictClient(Client):
         identifiers: Sequence[str],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> LegsPage:
-        return LegsPage(legs=list(self._legs.values()))
+    ) -> schedules_pb2.ListLegsResponse:
+        return schedules_pb2.ListLegsResponse(legs=list(self._legs.values()))
 
 
 class GrpcClient(Client):
@@ -104,7 +87,7 @@ class GrpcClient(Client):
         identifiers: Sequence[str],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> LegsPage:
+    ) -> schedules_pb2.ListLegsResponse:
         request = schedules_pb2.ListLegsRequest(
             ids=list(identifiers),
             page_token=cursor or "",
@@ -113,13 +96,8 @@ class GrpcClient(Client):
             request.page_size = limit
 
         try:
-            response = await errors.handle_grpc_errors(
+            return await errors.handle_grpc_errors(
                 self._schedules.ListLegs(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError() from exc
-
-        return LegsPage(
-            legs=list(response.legs),
-            next_page_token=response.next_page_token,
-        )

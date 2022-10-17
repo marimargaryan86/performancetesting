@@ -8,7 +8,6 @@ from typing import Optional, Sequence
 import grpc
 
 from snowfall.project.junction.adapter import errors
-from snowfall.project.junction.adapter.trips import TripsPage
 from snowfall.project.junction.service.trips.v1alpha import trips_pb2, trips_pb2_grpc
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
@@ -48,7 +47,7 @@ class Client(abc.ABC):
         identifier: str,
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> TripsPage:
+    ) -> trips_pb2.ListTripsResponse:
         """List trips by trip search."""
 
 
@@ -89,12 +88,10 @@ class DictClient(Client):
         identifier: str,
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> TripsPage:
+    ) -> trips_pb2.ListTripsResponse:
         try:
-            return TripsPage.from_proto(
-                trips_pb2.ListTripsResponse(
-                    trips=self._trips_cache[identifier],
-                ),
+            return trips_pb2.ListTripsResponse(
+                trips=self._trips_cache[identifier],
             )
         except KeyError as err:
             raise NotFoundError() from err
@@ -171,11 +168,11 @@ class GrpcClient(Client):
         identifier: str,
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> TripsPage:
+    ) -> trips_pb2.ListTripsResponse:
         trip_search = await self.get(identifier)
 
         if not trip_search.trip_ids:
-            return TripsPage.from_proto(trips_pb2.ListTripsResponse())
+            return trips_pb2.ListTripsResponse()
 
         request = trips_pb2.ListTripsRequest(
             ids=trip_search.trip_ids,
@@ -185,8 +182,6 @@ class GrpcClient(Client):
         if limit is not None:
             request.page_size = limit
 
-        response = await errors.handle_grpc_errors(
+        return await errors.handle_grpc_errors(
             self._trips.ListTrips(request, timeout=self._timeout),
         )
-
-        return TripsPage.from_proto(response)
