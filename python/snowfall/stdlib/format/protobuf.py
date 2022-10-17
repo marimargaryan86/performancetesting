@@ -85,7 +85,7 @@ def protobuf_to_datetime(
     tzinfo: datetime.tzinfo
 
     if isinstance(proto, timestamp_pb2.Timestamp):
-        return proto.ToDatetime().replace(tzinfo=datetime.timezone.utc)
+        return proto.ToDatetime(tzinfo=datetime.timezone.utc)
 
     if proto.HasField("time_zone"):
         tzinfo = zoneinfo.ZoneInfo(proto.time_zone.id)
