@@ -1,5 +1,13 @@
 python_requirements(
     module_mapping={
+        "googleapis-common-protos": [
+            "google.api",
+            "google.cloud",
+            "google.logging",
+            "google.longrunning",
+            "google.rpc",
+            "google.type",
+        ],
         "grpcio": ["grpc"],
         "grpcio-health-checking": ["grpc_health"],
         "grpcio-reflection": ["grpc_reflection"],
