@@ -4,7 +4,6 @@ import re
 import lagom
 from starlette import endpoints, requests, responses, status
 
-from snowfall.project.junction.service.client_api import resources
 from snowfall.project.junction.service.mobile_api import repository
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib.integration.starlette import (
@@ -45,7 +44,7 @@ class OfferSearches(endpoints.HTTPEndpoint):
         )
         return models.JsonApiResponse(
             models.Body(
-                data=resources.TripOfferSearchResource(**offer_search[_DATA_KEY]),
+                data=models.Resource(**offer_search[_DATA_KEY]),
             ),
             status.HTTP_201_CREATED,
         )
