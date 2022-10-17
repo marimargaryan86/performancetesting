@@ -7,7 +7,7 @@ from typing import Optional, Sequence
 
 import grpc
 
-from snowfall.project.junction.adapter import common, errors
+from snowfall.project.junction.adapter import errors
 from snowfall.project.junction.service.offers.v1alpha import (
     grpc_pb2,
     grpc_pb2_grpc,
@@ -72,7 +72,7 @@ class Client(abc.ABC):  # noqa: WPS214
         identifiers: Sequence[str],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> common.ItemsPage[models_pb2.OfferGroup]:
+    ) -> grpc_pb2.ListOfferGroupsResponse:
         """Return offer groups by ids."""
 
     @abc.abstractmethod
@@ -85,7 +85,7 @@ class Client(abc.ABC):  # noqa: WPS214
         identifiers: Sequence[str],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> common.ItemsPage[models_pb2.OfferSegment]:
+    ) -> grpc_pb2.ListOfferGroupDetailsResponse:
         """Return offer group details by ids."""
 
     @abc.abstractmethod
@@ -98,7 +98,7 @@ class Client(abc.ABC):  # noqa: WPS214
         identifiers: Sequence[str],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> common.ItemsPage[models_pb2.Offer]:
+    ) -> grpc_pb2.ListOfferOptionsResponse:
         """Return offers by ids."""
 
     @abc.abstractmethod
@@ -114,7 +114,7 @@ class Client(abc.ABC):  # noqa: WPS214
         identifiers: Sequence[str],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> common.ItemsPage[models_pb2.OfferSegmentDetails]:
+    ) -> grpc_pb2.ListOfferOptionDetailsResponse:
         """Return offer details by ids."""
 
 
@@ -194,15 +194,15 @@ class DictClient(Client):  # noqa: WPS214
         identifiers: Sequence[str],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> common.ItemsPage[models_pb2.OfferGroup]:
+    ) -> grpc_pb2.ListOfferGroupsResponse:
         page = sequence.paginate(
             sequence=list(self._iterate_groups()),
             cursor=cursor,
             limit=limit,
         )
 
-        return common.ItemsPage(
-            protos=page.sequence,
+        return grpc_pb2.ListOfferGroupsResponse(
+            groups=page.sequence,
             next_page_token=page.cursor,
         )
 
@@ -219,7 +219,7 @@ class DictClient(Client):  # noqa: WPS214
         identifiers: Sequence[str],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> common.ItemsPage[models_pb2.OfferSegment]:
+    ) -> grpc_pb2.ListOfferGroupDetailsResponse:
         page = sequence.paginate(
             sequence=[
                 detail for group in self._iterate_groups() for detail in group.segments
@@ -228,8 +228,8 @@ class DictClient(Client):  # noqa: WPS214
             limit=limit,
         )
 
-        return common.ItemsPage(
-            protos=page.sequence,
+        return grpc_pb2.ListOfferGroupDetailsResponse(
+            details=page.sequence,
             next_page_token=page.cursor,
         )
 
@@ -245,15 +245,15 @@ class DictClient(Client):  # noqa: WPS214
         identifiers: Sequence[str],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> common.ItemsPage[models_pb2.Offer]:
+    ) -> grpc_pb2.ListOfferOptionsResponse:
         page = sequence.paginate(
             sequence=list(self._iterate_options()),
             cursor=cursor,
             limit=limit,
         )
 
-        return common.ItemsPage(
-            protos=page.sequence,
+        return grpc_pb2.ListOfferOptionsResponse(
+            options=page.sequence,
             next_page_token=page.cursor,
         )
 
@@ -273,7 +273,7 @@ class DictClient(Client):  # noqa: WPS214
         identifiers: Sequence[str],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> common.ItemsPage[models_pb2.OfferSegmentDetails]:
+    ) -> grpc_pb2.ListOfferOptionDetailsResponse:
         page = sequence.paginate(
             sequence=[
                 detail
@@ -284,8 +284,8 @@ class DictClient(Client):  # noqa: WPS214
             limit=limit,
         )
 
-        return common.ItemsPage(
-            protos=page.sequence,
+        return grpc_pb2.ListOfferOptionDetailsResponse(
+            details=page.sequence,
             next_page_token=page.cursor,
         )
 
@@ -405,7 +405,7 @@ class GrpcClient(Client):  # noqa: WPS214
         identifiers: Sequence[str],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> common.ItemsPage[models_pb2.OfferGroup]:
+    ) -> grpc_pb2.ListOfferGroupsResponse:
         request = grpc_pb2.ListOfferGroupsRequest(
             page_token=cursor or "",
             offer_group_ids=grpc_pb2.ListOfIds(ids=list(identifiers)),
@@ -415,16 +415,11 @@ class GrpcClient(Client):  # noqa: WPS214
             request.page_size = limit
 
         try:
-            response = await errors.handle_grpc_errors(
+            return await errors.handle_grpc_errors(
                 self._offers.ListOfferGroups(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError() from exc
-
-        return common.ItemsPage(
-            protos=list(response.groups),
-            next_page_token=response.next_page_token,
-        )
 
     async def get_group_details_by_id(self, identifier: str) -> models_pb2.OfferSegment:
         request = grpc_pb2.GetOfferGroupDetailsRequest(id=identifier)
@@ -450,7 +445,7 @@ class GrpcClient(Client):  # noqa: WPS214
         identifiers: Sequence[str],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> common.ItemsPage[models_pb2.OfferSegment]:
+    ) -> grpc_pb2.ListOfferGroupDetailsResponse:
         request = grpc_pb2.ListOfferGroupDetailsRequest(
             page_token=cursor or "",
             offer_group_details_ids=grpc_pb2.ListOfIds(ids=list(identifiers)),
@@ -460,16 +455,11 @@ class GrpcClient(Client):  # noqa: WPS214
             request.page_size = limit
 
         try:
-            response = await errors.handle_grpc_errors(
+            return await errors.handle_grpc_errors(
                 self._offers.ListOfferGroupDetails(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError() from exc
-
-        return common.ItemsPage(
-            protos=list(response.details),
-            next_page_token=response.next_page_token,
-        )
 
     async def get_option_by_id(self, identifier: str) -> models_pb2.Offer:
         request = grpc_pb2.GetOfferOptionRequest(id=identifier)
@@ -491,7 +481,7 @@ class GrpcClient(Client):  # noqa: WPS214
         identifiers: Sequence[str],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> common.ItemsPage[models_pb2.Offer]:
+    ) -> grpc_pb2.ListOfferOptionsResponse:
         request = grpc_pb2.ListOfferOptionsRequest(
             page_token=cursor or "",
             offer_option_ids=grpc_pb2.ListOfIds(ids=list(identifiers)),
@@ -501,16 +491,11 @@ class GrpcClient(Client):  # noqa: WPS214
             request.page_size = limit
 
         try:
-            response = await errors.handle_grpc_errors(
+            return await errors.handle_grpc_errors(
                 self._offers.ListOfferOptions(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError() from exc
-
-        return common.ItemsPage(
-            protos=list(response.options),
-            next_page_token=response.next_page_token,
-        )
 
     async def get_option_details_by_id(
         self,
@@ -538,23 +523,18 @@ class GrpcClient(Client):  # noqa: WPS214
         identifiers: Sequence[str],
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
-    ) -> common.ItemsPage[models_pb2.OfferSegmentDetails]:
-        request = grpc_pb2.ListOfferGroupDetailsRequest(
+    ) -> grpc_pb2.ListOfferOptionDetailsResponse:
+        request = grpc_pb2.ListOfferOptionDetailsRequest(
             page_token=cursor or "",
-            offer_group_details_ids=grpc_pb2.ListOfIds(ids=list(identifiers)),
+            offer_option_details_ids=grpc_pb2.ListOfIds(ids=list(identifiers)),
         )
 
         if limit is not None:
             request.page_size = limit
 
         try:
-            response = await errors.handle_grpc_errors(
+            return await errors.handle_grpc_errors(
                 self._offers.ListOfferOptionDetails(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
             raise UnknownError() from exc
-
-        return common.ItemsPage(
-            protos=list(response.details),
-            next_page_token=response.next_page_token,
-        )

@@ -80,7 +80,7 @@ def _offer_groups_resolver(
 
         return [
             resources.OfferGroupResource.from_proto(offer_group, request)
-            for offer_group in page.protos
+            for offer_group in page.groups
         ]
 
     return wrapper
@@ -97,7 +97,7 @@ def _offer_options_resolver(
 
         return [
             resources.OfferOptionResource.from_proto(offer_option, request)
-            for offer_option in page.protos
+            for offer_option in page.options
         ]
 
     return wrapper
@@ -130,7 +130,7 @@ def _segments_resolver(
 
         return [
             resources.SegmentResource.from_proto(segment, request)
-            for segment in page.protos
+            for segment in page.segments
         ]
 
     return wrapper
@@ -153,7 +153,7 @@ def _trip_offer_group_details_resolver(
                 trip_offer_group_details,
                 request,
             )
-            for trip_offer_group_details in page.protos
+            for trip_offer_group_details in page.details
         ]
 
     return wrapper
@@ -176,7 +176,7 @@ def _trip_offer_option_details_resolver(
                 trip_offer_option_details,
                 request,
             )
-            for trip_offer_option_details in page.protos
+            for trip_offer_option_details in page.details
         ]
 
     return wrapper
