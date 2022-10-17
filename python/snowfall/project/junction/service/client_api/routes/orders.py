@@ -14,6 +14,7 @@ from snowfall.project.junction.service.orders.v1alpha import (
 )
 from snowfall.stdlib.format.protobuf import date_to_protobuf, slug_to_enum_value
 from snowfall.stdlib.integration.starlette import (
+    messages,
     models,
     pagination_helpers,
     request_helpers,
@@ -35,13 +36,14 @@ class Journey(endpoints.HTTPEndpoint):
         except orders_adapter.NotFoundError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=resources.JourneyResource.from_proto(
                     journey=journey,
                     request=request,
                 ),
             ),
+            request=request,
         )
 
 
@@ -57,8 +59,8 @@ class Journeys(endpoints.HTTPEndpoint):
             cursor=pagination.cursor,
         )
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=[
                     resources.JourneyResource.from_proto(journey, request)
                     for journey in response.journeys
@@ -69,6 +71,7 @@ class Journeys(endpoints.HTTPEndpoint):
                     pagination,
                 ),
             ),
+            request=request,
         )
 
 
@@ -83,13 +86,14 @@ class Order(endpoints.HTTPEndpoint):
         except orders_adapter.NotFoundError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=resources.OrderResource.from_proto(
                     order=order,
                     request=request,
                 ),
             ),
+            request=request,
         )
 
 
@@ -111,14 +115,15 @@ class Orders(endpoints.HTTPEndpoint):
             options=options,
         )
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=resources.OrderResource.from_proto(
                     order=order,
                     request=request,
                 ),
             ),
-            status.HTTP_201_CREATED,
+            status_code=status.HTTP_201_CREATED,
+            request=request,
         )
 
 
@@ -136,8 +141,8 @@ class OrdersByJourney(endpoints.HTTPEndpoint):
             cursor=pagination.cursor,
         )
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=[
                     resources.OrderResource.from_proto(order, request)
                     for order in response.orders
@@ -148,6 +153,7 @@ class OrdersByJourney(endpoints.HTTPEndpoint):
                     pagination,
                 ),
             ),
+            request=request,
         )
 
     @order_request_validator
@@ -170,14 +176,15 @@ class OrdersByJourney(endpoints.HTTPEndpoint):
 
         # todo: Expire (delete) the offer the order was placed for.
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=resources.OrderResource.from_proto(
                     order=order,
                     request=request,
                 ),
             ),
-            status.HTTP_201_CREATED,
+            status_code=status.HTTP_201_CREATED,
+            request=request,
         )
 
 
@@ -192,13 +199,14 @@ class Booking(endpoints.HTTPEndpoint):
         except orders_adapter.NotFoundError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=resources.TripBookingResource.from_proto(
                     booking=booking,
                     request=request,
                 ),
             ),
+            request=request,
         )
 
 
@@ -216,8 +224,8 @@ class BookingsByOrder(endpoints.HTTPEndpoint):
             cursor=pagination.cursor,
         )
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=[
                     resources.TripBookingResource.from_proto(booking, request)
                     for booking in response.bookings
@@ -228,6 +236,7 @@ class BookingsByOrder(endpoints.HTTPEndpoint):
                     pagination,
                 ),
             ),
+            request=request,
         )
 
 
@@ -287,13 +296,14 @@ class BookingDetails(endpoints.HTTPEndpoint):
         except orders_adapter.NotFoundError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=resources.TripBookingDetailsResource.from_proto(
                     details=details,
                     request=request,
                 ),
             ),
+            request=request,
         )
 
 
@@ -311,8 +321,8 @@ class BookingDetailsByBooking(endpoints.HTTPEndpoint):
             cursor=pagination.cursor,
         )
 
-        return models.JsonApiResponse(
-            models.Body(
+        return await messages.create_response(
+            body=models.Body(
                 data=[
                     resources.TripBookingDetailsResource.from_proto(details, request)
                     for details in response.details
@@ -323,4 +333,5 @@ class BookingDetailsByBooking(endpoints.HTTPEndpoint):
                     pagination,
                 ),
             ),
+            request=request,
         )

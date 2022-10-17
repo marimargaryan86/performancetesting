@@ -3,7 +3,7 @@ from typing import Sequence
 
 from starlette import requests
 
-from snowfall.project.junction.adapter import legs, offers, segments
+from snowfall.project.junction.adapter import legs, offers, orders, segments
 from snowfall.project.junction.service.client_api import resources
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import includes
@@ -29,6 +29,23 @@ async def _cabin_classes_resolver(
             )
 
     return cabin_classes
+
+
+def _journeys_resolver(
+    orders_client: orders.Client,
+) -> includes.ResolverFunc:
+    async def wrapper(
+        identifiers: Sequence[str],
+        request: requests.Request,
+    ) -> Sequence[resources.JourneyResource]:
+        response = await orders_client.find_journeys(identifiers, len(identifiers))
+
+        return [
+            resources.JourneyResource.from_proto(journey, request)
+            for journey in response.journeys
+        ]
+
+    return wrapper
 
 
 def _legs_resolver(
@@ -119,6 +136,23 @@ def _offers_resolver(
     return wrapper
 
 
+def _orders_resolver(
+    orders_client: orders.Client,
+) -> includes.ResolverFunc:
+    async def wrapper(
+        identifiers: Sequence[str],
+        request: requests.Request,
+    ) -> Sequence[resources.OrderResource]:
+        response = await orders_client.find_orders(identifiers, len(identifiers))
+
+        return [
+            resources.OrderResource.from_proto(order, request)
+            for order in response.orders
+        ]
+
+    return wrapper
+
+
 def _segments_resolver(
     segments_client: segments.Client,
 ) -> includes.ResolverFunc:
@@ -131,6 +165,43 @@ def _segments_resolver(
         return [
             resources.SegmentResource.from_proto(segment, request)
             for segment in page.segments
+        ]
+
+    return wrapper
+
+
+def _trip_bookings_resolver(
+    orders_client: orders.Client,
+) -> includes.ResolverFunc:
+    async def wrapper(
+        identifiers: Sequence[str],
+        request: requests.Request,
+    ) -> Sequence[resources.TripBookingResource]:
+        response = await orders_client.find_bookings(identifiers, len(identifiers))
+
+        return [
+            resources.TripBookingResource.from_proto(booking, request)
+            for booking in response.bookings
+        ]
+
+    return wrapper
+
+
+def _trip_booking_details_resolver(
+    orders_client: orders.Client,
+) -> includes.ResolverFunc:
+    async def wrapper(
+        identifiers: Sequence[str],
+        request: requests.Request,
+    ) -> Sequence[resources.TripBookingDetailsResource]:
+        response = await orders_client.find_booking_details(
+            identifiers,
+            len(identifiers),
+        )
+
+        return [
+            resources.TripBookingDetailsResource.from_proto(booking_details, request)
+            for booking_details in response.details
         ]
 
     return wrapper
@@ -186,11 +257,16 @@ def register_resolvers(
     legs_client: legs.Client,
     offers_client: offers.Client,
     segments_client: segments.Client,
+    orders_client: orders.Client,
 ) -> None:
     resolvers = (
         includes.Resolver(
             resource=resources.CabinClassResource,
             func=_cabin_classes_resolver,
+        ),
+        includes.Resolver(
+            resource=resources.JourneyResource,
+            func=_journeys_resolver(orders_client),
         ),
         includes.Resolver(
             resource=resources.LegTypeResource,
@@ -213,8 +289,20 @@ def register_resolvers(
             func=_offers_resolver(offers_client),
         ),
         includes.Resolver(
+            resource=resources.OrderResource,
+            func=_orders_resolver(orders_client),
+        ),
+        includes.Resolver(
             resource=resources.SegmentResource,
             func=_segments_resolver(segments_client),
+        ),
+        includes.Resolver(
+            resource=resources.TripBookingDetailsResource,
+            func=_trip_booking_details_resolver(orders_client),
+        ),
+        includes.Resolver(
+            resource=resources.TripBookingResource,
+            func=_trip_bookings_resolver(orders_client),
         ),
         includes.Resolver(
             resource=resources.TripOfferGroupDetailsResource,

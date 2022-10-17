@@ -2810,6 +2810,28 @@
                           "items": {
                             "$ref": "#/components/schemas/Journey"
                           }
+                        },
+                        "included": {
+                          "type": "array",
+                          "items": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/components/schemas/Order"
+                              },
+                              {
+                                "$ref": "#/components/schemas/TripBooking"
+                              },
+                              {
+                                "$ref": "#/components/schemas/TripBookingDetails"
+                              },
+                              {
+                                "$ref": "#/components/schemas/CabinClass"
+                              },
+                              {
+                                "$ref": "#/components/schemas/LegType"
+                              }
+                            ]
+                          }
                         }
                       },
                       "required": [
@@ -2841,12 +2863,19 @@
           }
         ]
       },
-      "parameters": []
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/journeyInclude"
+        }
+      ]
     },
     "/journeys/{journeyId}": {
       "parameters": [
         {
           "$ref": "#/components/parameters/journeyId"
+        },
+        {
+          "$ref": "#/components/parameters/journeyInclude"
         }
       ],
       "get": {
@@ -2864,6 +2893,28 @@
                   "properties": {
                     "data": {
                       "$ref": "#/components/schemas/Journey"
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/Order"
+                          },
+                          {
+                            "$ref": "#/components/schemas/TripBooking"
+                          },
+                          {
+                            "$ref": "#/components/schemas/TripBookingDetails"
+                          },
+                          {
+                            "$ref": "#/components/schemas/CabinClass"
+                          },
+                          {
+                            "$ref": "#/components/schemas/LegType"
+                          }
+                        ]
+                      }
                     }
                   },
                   "required": [
@@ -2888,6 +2939,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/journeyId"
+        },
+        {
+          "$ref": "#/components/parameters/orderInclude"
         }
       ],
       "get": {
@@ -2907,6 +2961,28 @@
                       "type": "array",
                       "items": {
                         "$ref": "#/components/schemas/Order"
+                      }
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/Journey"
+                          },
+                          {
+                            "$ref": "#/components/schemas/TripBooking"
+                          },
+                          {
+                            "$ref": "#/components/schemas/TripBookingDetails"
+                          },
+                          {
+                            "$ref": "#/components/schemas/CabinClass"
+                          },
+                          {
+                            "$ref": "#/components/schemas/LegType"
+                          }
+                        ]
                       }
                     }
                   },
@@ -2951,6 +3027,28 @@
                   "properties": {
                     "data": {
                       "$ref": "#/components/schemas/Order"
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/Journey"
+                          },
+                          {
+                            "$ref": "#/components/schemas/TripBooking"
+                          },
+                          {
+                            "$ref": "#/components/schemas/TripBookingDetails"
+                          },
+                          {
+                            "$ref": "#/components/schemas/CabinClass"
+                          },
+                          {
+                            "$ref": "#/components/schemas/LegType"
+                          }
+                        ]
+                      }
                     }
                   },
                   "required": [
@@ -2998,7 +3096,11 @@
       }
     },
     "/orders": {
-      "parameters": [],
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/orderInclude"
+        }
+      ],
       "post": {
         "summary": "Create Order",
         "operationId": "post-orders",
@@ -3012,6 +3114,28 @@
                   "properties": {
                     "data": {
                       "$ref": "#/components/schemas/Order"
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/Journey"
+                          },
+                          {
+                            "$ref": "#/components/schemas/TripBooking"
+                          },
+                          {
+                            "$ref": "#/components/schemas/TripBookingDetails"
+                          },
+                          {
+                            "$ref": "#/components/schemas/CabinClass"
+                          },
+                          {
+                            "$ref": "#/components/schemas/LegType"
+                          }
+                        ]
+                      }
                     }
                   },
                   "required": [
@@ -3059,6 +3183,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/orderId"
+        },
+        {
+          "$ref": "#/components/parameters/orderInclude"
         }
       ],
       "get": {
@@ -3076,6 +3203,28 @@
                   "properties": {
                     "data": {
                       "$ref": "#/components/schemas/Order"
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/Journey"
+                          },
+                          {
+                            "$ref": "#/components/schemas/TripBooking"
+                          },
+                          {
+                            "$ref": "#/components/schemas/TripBookingDetails"
+                          },
+                          {
+                            "$ref": "#/components/schemas/CabinClass"
+                          },
+                          {
+                            "$ref": "#/components/schemas/LegType"
+                          }
+                        ]
+                      }
                     }
                   },
                   "required": [
@@ -3099,15 +3248,10 @@
     "/orders/{orderId}/bookings": {
       "parameters": [
         {
-          "name": "orderId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-            "format": "uuid"
-          },
-          "description": "Order identifier"
+          "$ref": "#/components/parameters/orderId"
+        },
+        {
+          "$ref": "#/components/parameters/bookingInclude"
         }
       ],
       "get": {
@@ -3129,6 +3273,28 @@
                         "oneOf": [
                           {
                             "$ref": "#/components/schemas/TripBooking"
+                          }
+                        ]
+                      }
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/Order"
+                          },
+                          {
+                            "$ref": "#/components/schemas/Journey"
+                          },
+                          {
+                            "$ref": "#/components/schemas/TripBookingDetails"
+                          },
+                          {
+                            "$ref": "#/components/schemas/CabinClass"
+                          },
+                          {
+                            "$ref": "#/components/schemas/LegType"
                           }
                         ]
                       }
@@ -3167,6 +3333,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/bookingId"
+        },
+        {
+          "$ref": "#/components/parameters/bookingInclude"
         }
       ],
       "get": {
@@ -3188,6 +3357,28 @@
                           "$ref": "#/components/schemas/TripBooking"
                         }
                       ]
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/Order"
+                          },
+                          {
+                            "$ref": "#/components/schemas/Journey"
+                          },
+                          {
+                            "$ref": "#/components/schemas/TripBookingDetails"
+                          },
+                          {
+                            "$ref": "#/components/schemas/CabinClass"
+                          },
+                          {
+                            "$ref": "#/components/schemas/LegType"
+                          }
+                        ]
+                      }
                     }
                   },
                   "required": [
@@ -3212,6 +3403,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/bookingId"
+        },
+        {
+          "$ref": "#/components/parameters/bookingDetailsInclude"
         }
       ],
       "get": {
@@ -3233,6 +3427,28 @@
                         "oneOf": [
                           {
                             "$ref": "#/components/schemas/TripBookingDetails"
+                          }
+                        ]
+                      }
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/Order"
+                          },
+                          {
+                            "$ref": "#/components/schemas/Journey"
+                          },
+                          {
+                            "$ref": "#/components/schemas/TripBooking"
+                          },
+                          {
+                            "$ref": "#/components/schemas/CabinClass"
+                          },
+                          {
+                            "$ref": "#/components/schemas/LegType"
                           }
                         ]
                       }
@@ -3271,6 +3487,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/bookingDetailsId"
+        },
+        {
+          "$ref": "#/components/parameters/bookingDetailsInclude"
         }
       ],
       "get": {
@@ -3292,6 +3511,28 @@
                           "$ref": "#/components/schemas/TripBookingDetails"
                         }
                       ]
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/Order"
+                          },
+                          {
+                            "$ref": "#/components/schemas/Journey"
+                          },
+                          {
+                            "$ref": "#/components/schemas/TripBooking"
+                          },
+                          {
+                            "$ref": "#/components/schemas/CabinClass"
+                          },
+                          {
+                            "$ref": "#/components/schemas/LegType"
+                          }
+                        ]
+                      }
                     }
                   },
                   "required": [
@@ -6187,6 +6428,30 @@
         },
         "description": "Order identifier"
       },
+      "orderInclude": {
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "journey",
+              "bookings",
+              "bookings.details",
+              "bookings.details.cabinClass",
+              "bookings.details.legType"
+            ]
+          },
+          "example": [
+            "bookings"
+          ]
+        },
+        "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
+      },
       "page-cursor": {
         "name": "page[cursor]",
         "in": "query",
@@ -6492,6 +6757,30 @@
         },
         "description": "Journey Identifier"
       },
+      "journeyInclude": {
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "orders",
+              "orders.bookings",
+              "orders.bookings.details",
+              "orders.bookings.details.cabinClass",
+              "orders.bookings.details.legType"
+            ]
+          },
+          "example": [
+            "orders"
+          ]
+        },
+        "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
+      },
       "bookingId": {
         "name": "bookingId",
         "in": "path",
@@ -6503,6 +6792,30 @@
         },
         "description": "Booking Identifier"
       },
+      "bookingInclude": {
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "order",
+              "order.journey",
+              "details",
+              "details.cabinClass",
+              "details.legType"
+            ]
+          },
+          "example": [
+            "order"
+          ]
+        },
+        "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
+      },
       "bookingDetailsId": {
         "name": "bookingDetailsId",
         "in": "path",
@@ -6513,6 +6826,30 @@
           "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
         },
         "description": "Booking Details Identifier"
+      },
+      "bookingDetailsInclude": {
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "booking",
+              "booking.order",
+              "booking.order.journey",
+              "cabinClass",
+              "legType"
+            ]
+          },
+          "example": [
+            "cabinClass"
+          ]
+        },
+        "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
       }
     },
     "securitySchemes": {
