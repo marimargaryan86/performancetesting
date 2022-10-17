@@ -6,7 +6,7 @@ from typing import Optional, Sequence
 
 import grpc
 
-from snowfall.project.junction.adapter import common
+from snowfall.project.junction.adapter import errors
 from snowfall.project.junction.service.orders.v1alpha import (
     models_pb2,
     orders_pb2,
@@ -540,7 +540,7 @@ class GrpcClient(Client):
             request.page_size = limit
 
         try:
-            return await common.handle_grpc_errors(
+            return await errors.handle_grpc_errors(
                 self._orders.ListJourneys(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
@@ -561,7 +561,7 @@ class GrpcClient(Client):
             request.page_size = limit
 
         try:
-            return await common.handle_grpc_errors(
+            return await errors.handle_grpc_errors(
                 self._orders.ListOrders(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
@@ -582,7 +582,7 @@ class GrpcClient(Client):
             request.page_size = limit
 
         try:
-            return await common.handle_grpc_errors(
+            return await errors.handle_grpc_errors(
                 self._orders.ListOrders(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
@@ -603,7 +603,7 @@ class GrpcClient(Client):
             request.page_size = limit
 
         try:
-            return await common.handle_grpc_errors(
+            return await errors.handle_grpc_errors(
                 self._orders.ListBookings(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
@@ -624,7 +624,7 @@ class GrpcClient(Client):
             request.page_size = limit
 
         try:
-            return await common.handle_grpc_errors(
+            return await errors.handle_grpc_errors(
                 self._orders.ListBookings(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
@@ -645,7 +645,7 @@ class GrpcClient(Client):
             request.page_size = limit
 
         try:
-            return await common.handle_grpc_errors(
+            return await errors.handle_grpc_errors(
                 self._orders.ListBookingDetails(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
@@ -666,7 +666,7 @@ class GrpcClient(Client):
             request.page_size = limit
 
         try:
-            return await common.handle_grpc_errors(
+            return await errors.handle_grpc_errors(
                 self._orders.ListBookingDetails(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:

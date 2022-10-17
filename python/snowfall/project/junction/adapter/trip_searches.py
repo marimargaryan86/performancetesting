@@ -7,7 +7,7 @@ from typing import Optional, Sequence
 
 import grpc
 
-from snowfall.project.junction.adapter import common
+from snowfall.project.junction.adapter import errors
 from snowfall.project.junction.adapter.trips import TripsPage
 from snowfall.project.junction.service.trips.v1alpha import trips_pb2, trips_pb2_grpc
 from snowfall.stdlib import string
@@ -185,7 +185,7 @@ class GrpcClient(Client):
         if limit is not None:
             request.page_size = limit
 
-        response = await common.handle_grpc_errors(
+        response = await errors.handle_grpc_errors(
             self._trips.ListTrips(request, timeout=self._timeout),
         )
 

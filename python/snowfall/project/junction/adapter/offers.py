@@ -7,7 +7,7 @@ from typing import Optional, Sequence
 
 import grpc
 
-from snowfall.project.junction.adapter import common
+from snowfall.project.junction.adapter import common, errors
 from snowfall.project.junction.service.offers.v1alpha import (
     grpc_pb2,
     grpc_pb2_grpc,
@@ -348,7 +348,7 @@ class GrpcClient(Client):  # noqa: WPS214
             request.page_size = limit
 
         try:
-            response = await common.handle_grpc_errors(
+            response = await errors.handle_grpc_errors(
                 self._offers.ListOffers(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
@@ -374,7 +374,7 @@ class GrpcClient(Client):  # noqa: WPS214
             request.page_size = limit
 
         try:
-            response = await common.handle_grpc_errors(
+            response = await errors.handle_grpc_errors(
                 self._offers.ListOffers(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
@@ -415,7 +415,7 @@ class GrpcClient(Client):  # noqa: WPS214
             request.page_size = limit
 
         try:
-            response = await common.handle_grpc_errors(
+            response = await errors.handle_grpc_errors(
                 self._offers.ListOfferGroups(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
@@ -430,7 +430,7 @@ class GrpcClient(Client):  # noqa: WPS214
         request = grpc_pb2.GetOfferGroupDetailsRequest(id=identifier)
 
         try:
-            response = await common.handle_grpc_errors(
+            response = await errors.handle_grpc_errors(
                 self._offers.GetOfferGroupDetails(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
@@ -460,7 +460,7 @@ class GrpcClient(Client):  # noqa: WPS214
             request.page_size = limit
 
         try:
-            response = await common.handle_grpc_errors(
+            response = await errors.handle_grpc_errors(
                 self._offers.ListOfferGroupDetails(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
@@ -501,7 +501,7 @@ class GrpcClient(Client):  # noqa: WPS214
             request.page_size = limit
 
         try:
-            response = await common.handle_grpc_errors(
+            response = await errors.handle_grpc_errors(
                 self._offers.ListOfferOptions(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:
@@ -548,7 +548,7 @@ class GrpcClient(Client):  # noqa: WPS214
             request.page_size = limit
 
         try:
-            response = await common.handle_grpc_errors(
+            response = await errors.handle_grpc_errors(
                 self._offers.ListOfferOptionDetails(request, timeout=self._timeout),
             )
         except grpc.aio.AioRpcError as exc:

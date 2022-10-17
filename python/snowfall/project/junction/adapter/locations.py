@@ -6,7 +6,7 @@ from typing import Optional, Sequence
 
 import grpc
 
-from snowfall.project.junction.adapter import common
+from snowfall.project.junction.adapter import errors
 from snowfall.project.junction.service.places.v1alpha import (
     models_pb2,
     places_pb2,
@@ -127,7 +127,7 @@ class GrpcClient(Client):
         if limit is not None:
             request.page_size = limit
 
-        response = await common.handle_grpc_errors(
+        response = await errors.handle_grpc_errors(
             self._locations.ListLocations(request, timeout=self._timeout),
         )
 

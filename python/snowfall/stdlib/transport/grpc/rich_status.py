@@ -2,7 +2,7 @@ from typing import Awaitable, Iterator, NoReturn, cast
 
 import grpc
 from google.protobuf import any_pb2, message, symbol_database
-from google.rpc import status_pb2
+from google.rpc import error_details_pb2, status_pb2
 from grpc_status import rpc_status
 
 _SYMBOL_DATABASE = symbol_database.Default()
@@ -27,26 +27,50 @@ def iter_rich_statuses(
         yield error
 
 
-async def abort_with_rich_status(
-    context: grpc.aio.ServicerContext,
+def build_rich_status(
     code: grpc.StatusCode,
     error: message.Message,
     description: str | None = None,
-) -> NoReturn:
+) -> status_pb2.Status:
     detail = any_pb2.Any()
     detail.Pack(error)
-    rich_status = status_pb2.Status(
+    return status_pb2.Status(
         code=code.value[0],
         message=description,
         details=[detail],
     )
-    status = rpc_status.to_status(rich_status)
+
+
+def build_bad_request(
+    field_name: str,
+    field_description: str,
+    description: str | None = None,
+) -> status_pb2.Status:
+    return build_rich_status(
+        code=grpc.StatusCode.INVALID_ARGUMENT,
+        error=error_details_pb2.BadRequest(
+            field_violations=[
+                error_details_pb2.BadRequest.FieldViolation(
+                    field=field_name,
+                    description=field_description,
+                ),
+            ],
+        ),
+        description=description,
+    )
+
+
+async def abort_with_rich_status(
+    context: grpc.aio.ServicerContext,
+    status: status_pb2.Status,
+) -> NoReturn:
+    rich_status = rpc_status.to_status(status)
 
     await cast(
         Awaitable[NoReturn],
         context.abort(
-            code=status.code,
-            details=status.details,
-            trailing_metadata=status.trailing_metadata,
+            code=rich_status.code,
+            details=rich_status.details,
+            trailing_metadata=rich_status.trailing_metadata,
         ),
     )
