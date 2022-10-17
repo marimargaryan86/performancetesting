@@ -171,6 +171,15 @@ class StripeUsersRepository(
 ):
     _proto = models_pb2.StripeUser
 
+    def __init__(
+        self,
+        *args: Any,
+        create_stripe_customers: bool,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(*args, **kwargs)
+        self.create_stripe_customers = create_stripe_customers
+
     async def get(self, user_id: str) -> Optional[models_pb2.StripeUser]:
         return await self._execute(
             self._collection.find_one,

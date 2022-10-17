@@ -3357,9 +3357,7 @@
               "amount",
               "currency",
               "offerId",
-              "clientSecret",
-              "ephemeralKey",
-              "customerId"
+              "clientSecret"
             ],
             "properties": {
               "amount": {

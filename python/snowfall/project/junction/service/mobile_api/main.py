@@ -78,6 +78,7 @@ def _factory(
                 ),
                 stripe_users_repository=repository.StripeUsersRepository(
                     mongo["stripe_users"],
+                    create_stripe_customers=app.settings.create_stripe_customers,
                 ),
                 smtp_client=smtp_cl,
                 orders_repository=repository.OrdersRepository(

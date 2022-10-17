@@ -15,6 +15,28 @@ _password_key = str("password")
 _stripe_version = "2020-08-27"
 
 
+async def get_or_create_stripe_customer(
+    stripe_users_repository: repository.StripeUsersRepository,
+    users_repository: repository.UsersRepository,
+    user_id: str,
+) -> str:
+    stripe_user = await stripe_users_repository.get(user_id)
+    if not stripe_user:
+        user = await users_repository.find_by_id(user_id)
+        if user is None:
+            raise exceptions.HTTPException(status.HTTP_502_BAD_GATEWAY)
+        api_response_user = stripe.Customer.create(
+            email=user.email,
+            name=user.first_name,
+        )
+        stripe_user = models_pb2.StripeUser(
+            id=api_response_user.stripe_id,
+            internal_user_id=user_id,
+        )
+        await stripe_users_repository.insert(stripe_user)
+    return stripe_user.id
+
+
 class Payments(endpoints.HTTPEndpoint):
     async def post(  # noqa: WPS210
         self,
@@ -23,47 +45,48 @@ class Payments(endpoints.HTTPEndpoint):
         stripe_users_repository: repository.StripeUsersRepository = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
-        user_id = request.user.username
-        stripe_user = await stripe_users_repository.get(user_id)
-        if not stripe_user:
-            user = await users_repository.find_by_id(user_id)
-            if user is None:
-                raise exceptions.HTTPException(status.HTTP_502_BAD_GATEWAY)
-            api_response_user = stripe.Customer.create(
-                email=user.email,
-                name=user.first_name,
-            )
-            stripe_user = models_pb2.StripeUser(
-                id=api_response_user.stripe_id,
-                internal_user_id=user_id,
-            )
-            await stripe_users_repository.insert(stripe_user)
 
-        ephemeral_key = stripe.EphemeralKey.create(
-            customer=stripe_user.id,
-            stripe_version=_stripe_version,
-        )
+        stripe_user_id = None
+        ephemeral_key_secret = None
+        if stripe_users_repository.create_stripe_customers:
+            stripe_user_id = await get_or_create_stripe_customer(
+                stripe_users_repository,
+                users_repository,
+                request.user.username,
+            )
+            ephemeral_key_secret = stripe.EphemeralKey.create(
+                customer=stripe_user_id,
+                stripe_version=_stripe_version,
+            ).secret
+
         intent = stripe.PaymentIntent.create(
             amount=body["amount"],
             currency=body["currency"],
             capture_method="manual",
-            customer=stripe_user.id,
+            customer=stripe_user_id,
             automatic_payment_methods={
                 "enabled": True,
             },
             metadata={"offerId": body["offerId"]},
         )
 
+        attributes = {
+            "clientSecret": intent.client_secret,
+            "ephemeralKey": ephemeral_key_secret,
+            "customerId": stripe_user_id,
+        }
+        attributes = {
+            key: attr_value
+            for key, attr_value in attributes.items()
+            if attr_value is not None
+        }
+
         return models.JsonApiResponse(
             models.Body(
                 data=models.Resource(
                     id=intent.stripe_id,
                     type="payments",
-                    attributes={
-                        "clientSecret": intent.client_secret,
-                        "ephemeralKey": ephemeral_key.secret,
-                        "customerId": stripe_user.id,
-                    },
+                    attributes=attributes,
                 ),
             ),
         )

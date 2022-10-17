@@ -127,6 +127,7 @@ JWT_PUBLIC_KEY={{ .Data.data.jwt_public_key }}
 STRIPE_API_KEY={{ .Data.data.stripe_api_key }}
 CLIENT_NAME={{ .Data.data.client_name }}
 SUPPORT_EMAIL={{ .Data.data.support_email }}
+CREATE_STRIPE_CUSTOMERS={{ .Data.data.create_stripe_customers }}
 {{ end }}
 EOH
       }

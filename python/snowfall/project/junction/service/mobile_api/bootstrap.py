@@ -24,6 +24,7 @@ class Settings(application.Settings):
     stripe_api_key: str
     client_name: str
     support_email: str
+    create_stripe_customers: bool
 
 
 def create_dependencies(  # noqa: WPS211

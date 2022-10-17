@@ -211,6 +211,7 @@ def stripe_users_repository(
 ) -> repository.StripeUsersRepository:
     return repository.StripeUsersRepository(
         mongo_test_db["stripe_users"],
+        create_stripe_customers=True,
     )
 
 
