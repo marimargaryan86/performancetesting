@@ -1,15 +1,17 @@
-import copy
 import datetime
-from typing import Any, Mapping, Sequence
+import re
 
 import lagom
 from starlette import endpoints, requests, responses, status
 
 from snowfall.project.junction.service.client_api import resources
 from snowfall.project.junction.service.mobile_api import repository
-from snowfall.project.junction.service.mobile_api import resources as mobile_resources
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
-from snowfall.stdlib.integration.starlette import models, request_helpers
+from snowfall.stdlib.integration.starlette import (
+    models,
+    pagination_helpers,
+    request_helpers,
+)
 from snowfall.vendor.junction import client
 
 _DATA_KEY = "data"
@@ -55,128 +57,34 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
         request: requests.Request,
         junction_client: client.JunctionClient = lagom.injectable,
     ) -> responses.Response:
-        offer_search_id = request.path_params["offerSearchId"]
-        cabin_class = request.scope["query_string"].get(
-            "filter[groups.options.details.cabinClass]",
-            [],
-        )
-        offers_response = await get_response(
-            offer_search_id,
-            junction_client,
-            cabin_class,
-        )
-        offers_response = _foobar_to_national_railways(offers_response)
-        return models.JsonApiResponse(
-            models.Body(
-                data=[
-                    mobile_resources.OfferSearchOffersResource.from_dict(offer_response)
-                    for offer_response in offers_response
-                ],
+        pagination = pagination_helpers.get_pagination(request)
+        offers_response = await junction_client.get_offers_by_offer_search_id(
+            offers_search_id=request.path_params["offerSearchId"],
+            cabin_class=request.scope["query_string"].get(
+                "filter[groups.options.details.cabinClass]",
+                [],
             ),
+            include=request.scope["query_string"].get(
+                "include",
+                [],
+            ),
+            cursor=pagination.cursor,
+            limit=pagination.limit,
         )
-
-
-def _foobar_to_national_railways(  # noqa: WPS231
-    offers_response: Sequence[Mapping[str, Any]],
-) -> list[Mapping[str, Any]]:
-    modified_response = list(copy.deepcopy(offers_response))
-    for offer in modified_response:
-        for group in offer[_ATTRIBUTES_KEY]["groups"]:
-            for details in group[_ATTRIBUTES_KEY][_DETAILS_KEY]:
-                attributes = details[_ATTRIBUTES_KEY]
-                if attributes["vendor"] == "foobar":
-                    attributes["vendor"] = "National Railways"
-                if attributes["operator"] == "foobar":
-                    attributes["operator"] = "National Railways"
-    return modified_response
-
-
-def extract_leg_type(
-    group_details_relationships: Mapping[str, Any],
-) -> Mapping[str, str]:
-    return {"legType": group_details_relationships["legType"][_DATA_KEY][_ID_KEY]}
-
-
-async def get_response(
-    offer_search_id: str,
-    junction_client: client.JunctionClient,
-    cabin_class: Sequence[str],
-) -> Any:
-    return [
-        {
-            _ID_KEY: offer[_ID_KEY],
-            _TYPE_KEY: offer[_TYPE_KEY],
-            _ATTRIBUTES_KEY: {
-                "groups": [
-                    {
-                        _ID_KEY: group[_ID_KEY],
-                        _TYPE_KEY: group[_TYPE_KEY],
-                        _ATTRIBUTES_KEY: {
-                            "options": [
-                                {
-                                    _ID_KEY: offer_option[_ID_KEY],
-                                    _TYPE_KEY: offer_option[_TYPE_KEY],
-                                    _ATTRIBUTES_KEY: {
-                                        "price": offer_option[_ATTRIBUTES_KEY]["price"],
-                                        _DETAILS_KEY: [
-                                            {
-                                                _ID_KEY: offer_option_detail[_ID_KEY],
-                                                _TYPE_KEY: offer_option_detail[
-                                                    _TYPE_KEY
-                                                ],
-                                                _ATTRIBUTES_KEY: {
-                                                    "cabinClassName": offer_option_detail[
-                                                        _ATTRIBUTES_KEY
-                                                    ][
-                                                        "cabinClassName"
-                                                    ],
-                                                    _DETAILS_KEY: offer_option_detail[
-                                                        "relationships"
-                                                    ][_DETAILS_KEY],
-                                                },
-                                            }
-                                            for offer_option_detail in (
-                                                await junction_client.get_offer_option_details_by_offer_option_id(  # noqa: B950
-                                                    offer_option[_ID_KEY],
-                                                )
-                                            )[_DATA_KEY]
-                                        ],
-                                    },
-                                }
-                                for offer_option in (
-                                    await junction_client.get_offer_options_by_offer_group_id(  # noqa: B950
-                                        group[_ID_KEY],
-                                    )
-                                )[_DATA_KEY]
-                            ],
-                            _DETAILS_KEY: [
-                                {
-                                    _ID_KEY: group_details[_ID_KEY],
-                                    _TYPE_KEY: group_details[_TYPE_KEY],
-                                    _ATTRIBUTES_KEY: group_details[_ATTRIBUTES_KEY]
-                                    | extract_leg_type(group_details["relationships"]),
-                                }
-                                for group_details in (
-                                    await junction_client.get_offer_group_details_by_offer_group_id(  # noqa: B950
-                                        group[_ID_KEY],
-                                    )
-                                )[_DATA_KEY]
-                            ],
-                        },
-                    }
-                    for group in (
-                        await junction_client.get_offer_groups_by_offer_id(
-                            offer[_ID_KEY],
-                        )
-                    )[_DATA_KEY]
-                ],
-                "expiresAt": offer[_ATTRIBUTES_KEY]["expiresAt"],
+        response_body = models.Body(
+            data=offers_response["data"],
+            links={
+                "next": re.sub(
+                    r"^.+\?",
+                    request.url_for(
+                        "OffersByOfferSearch",
+                        offerSearchId=request.path_params["offerSearchId"],
+                    )
+                    + str("?"),
+                    offers_response["links"]["next"],
+                ),
             },
-        }
-        for offer in (
-            await junction_client.get_offers_by_offer_search_id(
-                offer_search_id,
-                cabin_class,
-            )
-        )[_DATA_KEY]
-    ]
+        )
+        if offers_response.get("included"):
+            response_body.included = offers_response.get("included")
+        return models.JsonApiResponse(response_body)

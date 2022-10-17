@@ -47,18 +47,6 @@ class TestOffers(object):
         httpx_mock.add_response(
             **conftest.load_response_fixture("GET_OFFERS_SEARCHES_{ID}_OFFERS.json"),
         )
-        httpx_mock.add_response(
-            **conftest.load_response_fixture("GET_OFFERS_{ID}_GROUPS.json"),
-        )
-        httpx_mock.add_response(
-            **conftest.load_response_fixture("GET_OFFERS_GROUPS_{ID}_OPTIONS.json"),
-        )
-        httpx_mock.add_response(
-            **conftest.load_response_fixture("GET_OFFERS_GROUPS_{ID}_DETAILS.json"),
-        )
-        httpx_mock.add_response(
-            **conftest.load_response_fixture("GET_OFFERS_OPTIONS_{ID}_DETAILS.json"),
-        )
 
         response = await authenticated_http_client.get(
             "/offers/searches/{offerSearchId}/offers".format(

@@ -360,20 +360,22 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
             payload=body,
         )
 
-    async def get_offers_by_offer_search_id(
+    async def get_offers_by_offer_search_id(  # noqa: WPS211
         self,
         offers_search_id: str,
         cabin_class: Optional[Sequence[str]],
+        include: Optional[Sequence[trip_includes]] = None,
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> dict[str, Any]:
-        pagination_parameters = _make_pagination(limit, cursor)
-        query_parameters: dict[str, int | str | Sequence[str]] = {
-            parameter: pagination_parameters[parameter]
-            for parameter in pagination_parameters
-        }
+        query_parameters = cast(
+            dict[str, int | str | Sequence[str]],
+            _make_pagination(limit, cursor),
+        )
         if cabin_class:
             query_parameters["filter[groups.options.details.cabinClass]"] = cabin_class
+        if include:
+            query_parameters["include"] = include
         return await self._make_request(
             method=_METHOD_GET,
             url="/offers/searches/{0}/offers".format(offers_search_id),
