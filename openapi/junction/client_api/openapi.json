@@ -5712,7 +5712,8 @@
                 "type": "object",
                 "required": [
                   "order",
-                  "status"
+                  "status",
+                  "details"
                 ],
                 "properties": {
                   "order": {
@@ -5740,6 +5741,9 @@
                   },
                   "details": {
                     "type": "object",
+                    "required": [
+                      "data"
+                    ],
                     "properties": {
                       "data": {
                         "type": "array",

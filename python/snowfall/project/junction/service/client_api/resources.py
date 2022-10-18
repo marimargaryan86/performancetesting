@@ -473,6 +473,15 @@ class TripBookingResource(models.Resource):
                         type=BookingStatusResource.api_type,
                     ),
                 },
+                "details": {
+                    _RELATIONSHIPS_FIELD: [
+                        models.ResourceIdentifier(
+                            id=details.id,
+                            type=TripBookingDetailsResource.api_type,
+                        )
+                        for details in booking.trip_option.details
+                    ],
+                },
             },
             links={
                 _SELF_HREF: request.url_for(
