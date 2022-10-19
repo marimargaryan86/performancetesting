@@ -66,7 +66,7 @@ class OrderService(
         context: aio.ServicerContext,
     ) -> orders_pb2.ListJourneysResponse:
         journeys_result = await self._journeys.find(
-            ids=request.ids,
+            ids=list(request.ids),
             cursor=request.page_token,
         )
 

@@ -44,6 +44,17 @@ class TestJourneys(object):
         assert journey
         assert journey.id == order.journey_id
 
+    async def test_journey_is_retrievable_by_ids(
+        self,
+        journey_repository: orders.JourneyRepository,
+        order: models_pb2.Order,
+    ) -> None:
+        journeys_result = await journey_repository.find([order.journey_id], "")
+        journeys = [journey async for journey in journeys_result]
+
+        assert len(journeys) == 1
+        assert more_itertools.first(journeys).id == order.journey_id
+
 
 class TestOrders(object):
     async def test_order_is_retrievable_by_id(
