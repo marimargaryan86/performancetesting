@@ -31,7 +31,7 @@ class _OffersSettings(service.Settings):
     amqp_dsn: Sequence[pydantic.AnyUrl]
     api_base_url: pydantic.AnyUrl
     api_booking_base_url: pydantic.AnyUrl
-    http_timeout: float = 20.0
+    http_timeout: float = 60.0
 
 
 class _OrdersSettings(service.Settings):
@@ -51,7 +51,7 @@ class _SearchSettings(service.Settings):
     api_booking_base_url: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
-    http_timeout: float = 20.0
+    http_timeout: float = 60.0
     poll_retries_limit: int = 10
     wait_time_between_polling: float = 1
 

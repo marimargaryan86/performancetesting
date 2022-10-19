@@ -13,6 +13,9 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2
 from snowfall.vendor.ask2go.models import booking, offers, price
 
+_BrandedOffersType = Tuple[Sequence[str], Sequence[price.OfferPriceResponse]]
+_GroupedOfferSegment = Tuple[offers.TripSegment, offers_pb2.OfferSegment]
+
 
 class OfferTransformer(object):
     def __init__(
@@ -28,38 +31,64 @@ class OfferTransformer(object):
     async def offer_prices_to_offer_groups(
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
-        offer_prices: AsyncIterator[price.OfferPriceResponse],
+        grouped_offer_prices: AsyncIterator[_BrandedOffersType],
     ) -> AsyncIterator[offers_pb2.OfferGroup]:
-        async for offer_price in offer_prices:
-            yield await self._offer_price_to_offer_group(search_task, offer_price)
+        async for offer_prices in grouped_offer_prices:
+            yield await self._offer_prices_to_offer_group(search_task, offer_prices)
 
-    async def _offer_price_to_offer_group(  # noqa: WPS210
+    async def _offer_prices_to_offer_group(
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
-        offer_price: price.OfferPriceResponse,
+        branded_prices: Tuple[Sequence[str], Sequence[price.OfferPriceResponse]],
     ) -> offers_pb2.OfferGroup:
-        segment = more_itertools.first(
-            more_itertools.first(offer_price.itinerary.trips).segments,
-        )
+        brands = branded_prices[0]
+        offer_prices = branded_prices[1]
         search_segment = more_itertools.first(search_task.segments)
         expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
-        grouped_rules = self._group_rules_by_origin_destination(
-            offer_price.fare_rules,
-        )
-        offer_segment = self._segment_to_proto(
-            segment=segment,
-            search_segment=search_segment,
-        )
-        amount = money.from_string(
-            offer_price.itinerary.pricing_information.base.total_cost,
-            money.Currency(offer_price.itinerary.pricing_information.base.currency),
-        )
+
+        grouped_offer_segments = [
+            (
+                segment,
+                self._segment_to_proto(
+                    segment=segment,
+                    search_segment=search_segment,
+                ),
+            )
+            for trip in offer_prices[0].itinerary.trips
+            for segment in trip.segments
+        ]
 
         return offers_pb2.OfferGroup(
             id=string.uuid(),
             offer_search_id=search_task.offer_search_id,
             expires_at=protobuf.datetime_to_protobuf(expires_at),
-            offers=[
+            offers=await self._get_group_offers(
+                offer_prices,
+                brands,
+                expires_at,
+                grouped_offer_segments,
+            ),
+            segments=[grouped_segment[1] for grouped_segment in grouped_offer_segments],
+        )
+
+    async def _get_group_offers(
+        self,
+        offer_prices: Sequence[price.OfferPriceResponse],
+        brands: Sequence[str],
+        expires_at: datetime.datetime,
+        grouped_trips_segments: Sequence[_GroupedOfferSegment],
+    ) -> Sequence[offers_pb2.Offer]:
+        group_offers = []
+        for index, offer_price in enumerate(offer_prices):
+            grouped_rules = self._group_rules_by_origin_destination(
+                offer_price.fare_rules,
+            )
+            amount = money.from_string(
+                offer_price.itinerary.pricing_information.base.total_cost,
+                money.Currency(offer_price.itinerary.pricing_information.base.currency),
+            )
+
+            group_offers.append(
                 offers_pb2.Offer(
                     id=await self._cache.store(
                         cache.OfferDetails(
@@ -68,36 +97,51 @@ class OfferTransformer(object):
                         ),
                         expires_at=expires_at,
                     ),
-                    segment_details=[
-                        offers_pb2.OfferSegmentDetails(
-                            id=string.uuid(),
-                            offer_segment_id=offer_segment.id,
-                            cabin_class=models_pb2.CabinClass(
-                                type=models.cabin_to_proto(segment.cabin),
-                                marketing_name=segment.cabin or "",
-                            ),
-                            rules=[
-                                offers_pb2.SegmentRule(
-                                    body=rule.text,
-                                    title=rule.title,
-                                )
-                                for rule in grouped_rules[
-                                    (
-                                        segment.origin.airport_code,
-                                        segment.destination.airport_code,
-                                    )
-                                ]
-                            ],
-                        ),
-                    ],
+                    segment_details=self._get_segment_details(
+                        grouped_trips_segments,
+                        grouped_rules,
+                    ),
                     price=models_pb2.Price(
                         amount=amount.amount,
                         currency=amount.currency.code,
                     ),
+                    brand_name=brands[index],
                 ),
-            ],
-            segments=[offer_segment],
-        )
+            )
+
+        return group_offers
+
+    def _get_segment_details(
+        self,
+        grouped_trips_segments: Sequence[_GroupedOfferSegment],
+        grouped_rules: Mapping[Tuple[str, str], Sequence[booking.FareRule]],
+    ) -> Sequence[offers_pb2.OfferSegmentDetails]:
+        segment_details = []
+        for grouped_segment in grouped_trips_segments:
+            segment_details.append(
+                offers_pb2.OfferSegmentDetails(
+                    id=string.uuid(),
+                    offer_segment_id=grouped_segment[1].id,
+                    cabin_class=models_pb2.CabinClass(
+                        type=models.cabin_to_proto(grouped_segment[0].cabin),
+                        marketing_name=grouped_segment[0].cabin or "",
+                    ),
+                    rules=[
+                        offers_pb2.SegmentRule(
+                            body=rule.text,
+                            title=rule.title,
+                        )
+                        for rule in grouped_rules[
+                            (
+                                grouped_segment[0].origin.airport_code,
+                                grouped_segment[0].destination.airport_code,
+                            )
+                        ]
+                    ],
+                ),
+            )
+
+        return segment_details
 
     def _segment_to_proto(
         self,

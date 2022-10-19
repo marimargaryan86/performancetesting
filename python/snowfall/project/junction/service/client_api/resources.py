@@ -225,6 +225,7 @@ class OfferOptionResource(models.Resource):
             type=OfferOptionResource.api_type,
             attributes={
                 "price": Price.from_proto(option.price),
+                "brandName": option.brand_name,
             },
             relationships={
                 "details": {

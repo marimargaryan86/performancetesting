@@ -242,6 +242,7 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
                             amount=1337,
                             currency="SEK",
                         ),
+                        brand_name="PLUS SELECT",
                     ),
                     offers_pb2.Offer(
                         id=PROVIDER_OFFERS[1],
@@ -259,6 +260,7 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
                             amount=31337,
                             currency="SEK",
                         ),
+                        brand_name="PLUS FLEX",
                     ),
                 ],
                 segments=[
@@ -308,6 +310,7 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
                             amount=1337,
                             currency="SEK",
                         ),
+                        brand_name="PLUS SELECT",
                     ),
                     offers_pb2.Offer(
                         id=PROVIDER_OFFERS[3],
@@ -325,6 +328,7 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
                             amount=31337,
                             currency="SEK",
                         ),
+                        brand_name="PLUS FLEX",
                     ),
                 ],
                 segments=[

@@ -1,18 +1,30 @@
 import asyncio
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Coroutine
+from typing import Any, Mapping, Sequence, Tuple
+
+import tenacity
 
 from snowfall.project.junction.service.providers.ask2go import models, validator
 from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.vendor.ask2go import client, enums
-from snowfall.vendor.ask2go.models import price, search
+from snowfall.vendor.ask2go import errors as ask2go_errors
+from snowfall.vendor.ask2go.models import (
+    offers,
+    price,
+    search,
+    validate_offer_criteria,
+    validated_offer,
+)
+
+_BrandedOffersType = Tuple[Sequence[str], Sequence[price.OfferPriceResponse]]
 
 
 class NoResultsError(Exception):
     """Raised when a result page has not results."""
 
 
-class Ask2GoAdapter(object):
+class Ask2GoAdapter(object):  # noqa: WPS214
     def __init__(
         self,
         ask2go_client: client.Ask2GoClient,
@@ -28,15 +40,16 @@ class Ask2GoAdapter(object):
     async def gather_search_results(
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
-    ) -> AsyncIterator[price.OfferPriceResponse]:
+    ) -> AsyncIterator[_BrandedOffersType]:
         identifiers = await self._make_search(search_task.criteria)
-        offer_prices = self._gather_offer_prices(
+        branded_prices = self._gather_offer_branded_prices(
             identifiers,
             models.requirements_from_segments(search_task.segments),
+            search_task.criteria,
         )
 
-        async for offer in offer_prices:
-            yield offer
+        async for branded_prices_item in branded_prices:
+            yield branded_prices_item
 
     async def _make_search(
         self,
@@ -59,19 +72,148 @@ class Ask2GoAdapter(object):
 
         return await self._client.create_search(criteria=search_criteria)
 
-    async def _gather_offer_prices(
+    async def _gather_offer_branded_prices(
         self,
         identifiers: search.CreateSearchResponse,
         requirements: models.Requirements,
-    ) -> AsyncIterator[price.OfferPriceResponse]:
+        criteria: amqp_pb2.Criteria,
+    ) -> AsyncIterator[_BrandedOffersType]:
         async for result_page in self._yield_pages(identifiers=identifiers):
             for offer in result_page.flight:
                 if offer.id and self._validator.matches(offer, requirements):
-                    yield await self._client.create_air_offer(
-                        search_id=identifiers.id,
+                    validate_identifiers = await self._get_offer_validate(
+                        identifiers,
+                        offer,
+                        criteria,
+                    )
+                    branded_offer = await self._get_branded_offer(validate_identifiers)
+                    mapped_brand_price = self._get_mapped_brand_price(
+                        offer,
+                        identifiers,
+                        validate_identifiers,
+                        branded_offer,
+                    )
+
+                    yield await self._merge_brands_prices(
+                        list(mapped_brand_price.keys()),
+                        list(mapped_brand_price.values()),
+                    )
+
+    def _get_mapped_brand_price(
+        self,
+        offer: offers.Offer,
+        identifiers: search.CreateSearchResponse,
+        validate_identifiers: validate_offer_criteria.ValidateOfferResponse,
+        branded_offer: validated_offer.ValidatedOfferResponse,
+    ) -> Mapping[str, Coroutine[price.OfferPriceResponse, Any, Any]]:
+        mapped_brand_price = {}
+        if branded_offer.itinerary.branded_fares:
+            mapped_brand_price.update(
+                {
+                    fare.brand_name: self._client.create_air_offer(
+                        search_id=validate_identifiers.identifier,
                         transaction_id=identifiers.transaction_id,
                         offer_id=offer.id,
+                        brand_id=fare.brand_id,
                     )
+                    for fare in branded_offer.itinerary.branded_fares
+                },
+            )
+        else:
+            mapped_brand_price["BASIC FARE"] = self._client.create_air_offer(
+                search_id=validate_identifiers.identifier,
+                transaction_id=identifiers.transaction_id,
+                offer_id=offer.id,
+            )
+
+        return mapped_brand_price
+
+    async def _merge_brands_prices(
+        self,
+        fare_brands: Sequence[str],
+        coroutines: Sequence[Coroutine[price.OfferPriceResponse, Any, Any]],
+    ) -> _BrandedOffersType:
+        return (
+            fare_brands,
+            await asyncio.gather(*coroutines),
+        )
+
+    async def _get_offer_validate(
+        self,
+        identifiers: search.CreateSearchResponse,
+        offer: offers.Offer,
+        criteria: amqp_pb2.Criteria,
+    ) -> validate_offer_criteria.ValidateOfferResponse:
+        return await self._client.validate_offer(
+            criteria=validate_offer_criteria.ValidateOfferCriteria(
+                transaction_id=identifiers.transaction_id,
+                currency="EUR",
+                flight_segments=[
+                    validate_offer_criteria.SegmentCriteria(
+                        trip_number=trip_index,
+                        segment_number=segment_index,
+                        flight_number=segment.aircraft.flight_number,
+                        departure_date=segment.departure.date_time,
+                        arrival_date=segment.arrival.date_time,
+                        origin_iata=segment.origin.airport_code,
+                        destination_iata=segment.destination.airport_code,
+                        marketing_airline=segment.marketing_carrier.code,
+                        operating_airline=segment.operating_carrier.code,
+                        equipment=segment.aircraft.equipment,
+                    )
+                    for trip_index, trip in enumerate(offer.trips)
+                    for segment_index, segment in enumerate(trip.segments)
+                ],
+                passengers=self._get_offer_validate_passengers(criteria),
+            ),
+        )
+
+    def _get_offer_validate_passengers(
+        self,
+        criteria: amqp_pb2.Criteria,
+    ) -> list[validate_offer_criteria.PassengerCriteria]:
+        passengers = []
+
+        if criteria.adults:
+            passengers.append(
+                validate_offer_criteria.PassengerCriteria(
+                    code=enums.PassengerType.adult,
+                    count=criteria.adults,
+                ),
+            )
+        if criteria.children:
+            passengers.append(
+                validate_offer_criteria.PassengerCriteria(
+                    code=enums.PassengerType.child,
+                    count=criteria.children,
+                ),
+            )
+        if criteria.infants:
+            passengers.append(
+                validate_offer_criteria.PassengerCriteria(
+                    code=enums.PassengerType.infant,
+                    count=criteria.infants,
+                ),
+            )
+
+        return passengers
+
+    async def _get_branded_offer(
+        self,
+        validate_identifiers: validate_offer_criteria.ValidateOfferResponse,
+    ) -> validated_offer.ValidatedOfferResponse:
+        retry = tenacity.Retrying(
+            retry=tenacity.retry_if_exception_type(ask2go_errors.AcceptedResponseError),
+            wait=tenacity.wait_random_exponential(multiplier=1, max=5),
+        )
+        for attempt in retry:
+            with attempt:
+                branded_offer = await self._client.get_validated_offer(
+                    pricing_id=validate_identifiers.identifier,
+                    transaction_id=validate_identifiers.transaction_id,
+                )
+
+        return branded_offer
 
     async def _yield_pages(
         self,

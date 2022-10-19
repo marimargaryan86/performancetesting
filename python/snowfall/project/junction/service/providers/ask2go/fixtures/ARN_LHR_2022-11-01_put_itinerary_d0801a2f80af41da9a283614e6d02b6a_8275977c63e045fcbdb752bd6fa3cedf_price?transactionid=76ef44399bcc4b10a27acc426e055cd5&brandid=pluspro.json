@@ -1,20 +1,19 @@
 {
-  "id": "d7790b481aa043bf8763c5062f440578",
+  "id": "68f9b92e4578461aa21fca8c816eae01",
   "information": {
     "bookingId": 0,
     "status": "PricingSuccedded"
   },
   "itinerary": {
-    "id": "7a1c90a1d8c34d3d9ea660b9638086bf",
+    "id": "c25697dfabf648b6bf74899b4b643933",
     "isRefundable": false,
-    "docsRequired": false,
     "gds": "Sabre",
-    "direction": "Outbound",
+    "direction": "Both",
     "trips": [
       {
-        "id": "dd8ca0183f7f4fb8aeb5be558afe5f54",
-        "duration": "02:45:00",
-        "direction": "Outbound",
+        "id": "e01db6203caf4eb79aaa7162a6ad3c0c",
+        "duration": "02:40:00",
+        "direction": "Both",
         "isRedEye": false,
         "hasLongConnectionDuration": false,
         "numberOfStops": 0,
@@ -25,27 +24,27 @@
           "airportCode": "LHR"
         },
         "departure": {
-          "dateTime": "2022-05-24T07:50:00"
+          "dateTime": "2022-11-01T19:40:00"
         },
         "arrival": {
-          "dateTime": "2022-05-24T09:35:00"
+          "dateTime": "2022-11-01T21:20:00"
         },
         "plattingCarrier": {
-          "code": "SK"
+          "code": ""
         },
         "segments": [
           {
-            "id": "577a8baec49e4dc49bf87b759a7f6c08",
-            "duration": "02:45:00",
+            "id": "f51fd34736514ec1bd958760edc14782",
+            "duration": "02:40:00",
             "distance": 911.0,
             "cabin": "Economy",
             "isTechnicalStop": false,
             "aircraft": {
-              "flightNumber": "525",
+              "flightNumber": "1527",
               "equipment": "32N"
             },
             "availability": {
-              "bookingCode": "Y",
+              "bookingCode": "S",
               "count": 9
             },
             "origin": {
@@ -55,10 +54,10 @@
               "airportCode": "LHR"
             },
             "departure": {
-              "dateTime": "2022-05-24T07:50:00"
+              "dateTime": "2022-11-01T19:40:00"
             },
             "arrival": {
-              "dateTime": "2022-05-24T09:35:00"
+              "dateTime": "2022-11-01T21:20:00"
             },
             "marketingCarrier": {
               "code": "SK"
@@ -68,93 +67,45 @@
             },
             "originTerminal": "5",
             "destinationTerminal": "2",
-            "onTimePerformance": -1.0,
-            "meal": "V",
+            "onTimePerformance": 0.0,
+            "meal": "M",
             "layover": "00:00:00",
-            "changeOfPlane": false
+            "changeOfPlane": false,
+            "segmentAmenities": {
+              "cabin": "S",
+              "beverage": {
+                "exists": true,
+                "free": true
+              },
+              "entertainment": {
+                "exists": false,
+                "free": false
+              },
+              "food": {
+                "exists": true,
+                "free": true,
+                "information": "premiummeal"
+              },
+              "power": {
+                "exists": true,
+                "free": true,
+                "information": "usb"
+              },
+              "wifi": {
+                "exists": true,
+                "free": true
+              }
+            },
+            "segmentIndex": 0
           }
         ],
         "baggageAllowance": [
           {
             "weight": 0.0,
-            "unit": "",
-            "pieces": 0,
-            "hasFreeBaggage": false,
-            "passengerType": "ADT"
-          }
-        ],
-        "gds": "Sabre"
-      },
-      {
-        "id": "e3ad8c68bfaa4bc482879f868c8370ab",
-        "duration": "02:25:00",
-        "direction": "Outbound",
-        "isRedEye": true,
-        "hasLongConnectionDuration": false,
-        "numberOfStops": 0,
-        "origin": {
-          "airportCode": "LHR"
-        },
-        "destination": {
-          "airportCode": "ARN"
-        },
-        "departure": {
-          "dateTime": "2022-05-24T21:05:00"
-        },
-        "arrival": {
-          "dateTime": "2022-05-25T00:30:00"
-        },
-        "plattingCarrier": {
-          "code": "SK"
-        },
-        "segments": [
-          {
-            "id": "06eff4b1a238433c84c4b6ba17629356",
-            "duration": "02:25:00",
-            "distance": 911.0,
-            "cabin": "Economy",
-            "isTechnicalStop": false,
-            "aircraft": {
-              "flightNumber": "534",
-              "equipment": "32N"
-            },
-            "availability": {
-              "bookingCode": "Y",
-              "count": 9
-            },
-            "origin": {
-              "airportCode": "LHR"
-            },
-            "destination": {
-              "airportCode": "ARN"
-            },
-            "departure": {
-              "dateTime": "2022-05-24T21:05:00"
-            },
-            "arrival": {
-              "dateTime": "2022-05-25T00:30:00"
-            },
-            "marketingCarrier": {
-              "code": "SK"
-            },
-            "operatingCarrier": {
-              "code": "SK"
-            },
-            "originTerminal": "2",
-            "destinationTerminal": "5",
-            "onTimePerformance": -1.0,
-            "meal": "V",
-            "layover": "00:00:00",
-            "changeOfPlane": false
-          }
-        ],
-        "baggageAllowance": [
-          {
-            "weight": 0.0,
-            "unit": "",
-            "pieces": 0,
-            "hasFreeBaggage": false,
-            "passengerType": "ADT"
+            "pieces": 2,
+            "hasFreeBaggage": true,
+            "passengerType": "ADT",
+            "segmentIndex": 0
           }
         ],
         "gds": "Sabre"
@@ -162,11 +113,11 @@
     ],
     "pricingInformation": {
       "base": {
-        "baseFare": 42.0,
-        "totalTax": 89.05,
-        "totalCost": 139.55,
-        "originalCost": 131.05,
-        "serviceFee": 8.5,
+        "baseFare": 1197.0,
+        "totalTax": 64.84,
+        "totalCost": 1261.84,
+        "originalCost": 1261.84,
+        "serviceFee": 0.0,
         "currency": "EUR"
       }
     },
@@ -175,17 +126,15 @@
         "passengerType": "ADT",
         "quantity": 1,
         "priceInformation": {
-          "baseFare": 42.0,
-          "totalTax": 89.05,
-          "totalCost": 139.55,
-          "originalCost": 131.05,
-          "serviceFee": 8.5,
+          "baseFare": 109.0,
+          "totalTax": 64.84,
+          "totalCost": 173.84,
+          "originalCost": 173.84,
+          "serviceFee": 0.0,
           "currency": "EUR"
         }
       }
-    ],
-    "outboundTripKey": "ARN_LHR_2022.05.24.07.50_2022.05.24.09.35_SK_SK_525_O_(139.55, SKSK)",
-    "inboundTripKey": "_(139.55, SKSK)"
+    ]
   },
   "docs": [
     {
@@ -201,14 +150,14 @@
     {
       "origin": "ARN",
       "destination": "LHR",
-      "fareBasis": "OKSRGHT",
+      "fareBasis": "BKSOSMA",
       "fareRule": [
         {
-          "text": "NOTE - THE FOLLOWING TEXT IS INFORMATIONAL AND NOT\nVALIDATED FOR AUTOPRICING.\nSAS GO LIGHT\nAPPLICATION\nAREA\nTHESE FARES APPLY WITHIN EUROPE.\nCLASS OF SERVICE\nTHESE FARES APPLY FOR ECONOMY CLASS SERVICE.\nTYPES OF TRANSPORTATION\nFARES GOVERNED BY THIS RULE CAN BE USED TO CREATE\nONE-WAY/ROUND-TRIP/OPEN-JAW JOURNEYS.\nFARES ONLY APPLY IF PURCHASED BEFORE DEPARTURE.\nEXCEPTION -\nFARES MAY BE USED FOR ENROUTE UPGRADING FROM A\nLOWER SK GO LIGHT FARE PROVIDED THAT ALL\nCONDITIONS OF THE NEW FARE ARE MET.\nCAPACITY LIMITATIONS\nTHE CARRIER SHALL LIMIT THE NUMBER OF PASSENGERS\nCARRIED ON ANY ONE FLIGHT AT FARES GOVERNED BY\nTHIS RULE AND SUCH FARES WILL NOT NECESSARILY BE\nAVAILABLE ON ALL FLIGHTS. THE NUMBER OF SEATS,\nWHICH THE CARRIER SHALL MAKE AVAILABLE ON A GIVEN\nFLIGHT, WILL BE DETERMINED BY THE CARRIER'S BEST\nJUDGEMENT.\nOTHER CONDITIONS\nNO BAGGAGE ALLOWANCE.",
+          "text": "NOTE - THE FOLLOWING TEXT IS INFORMATIONAL AND NOT\nVALIDATED FOR AUTOPRICING.\nSAS PLUS SMART\nCLASS OF SERVICE PREMIUM ECONOMY.\nAPPLICATION\nAREA\nTHESE FARES APPLY WITHIN EUROPE.\nTYPES OF TRANSPORTATION\nFARES GOVERNED BY THIS RULE CAN BE USED TO CREATE\nONE-WAY/ROUND-TRIP/CIRCLE-TRIP/OPEN-JAW JOURNEYS.\nFARES ONLY APPLY IF PURCHASED BEFORE DEPARTURE.\nEXCEPTION -\nFARES MAY BE USED FOR ENROUTE UPGRADING FROM A\nLOWER SK GO LIGHT/SK GO/SK PLUS SAVER FARE\nPROVIDED THAT ALL CONDITIONS OF THE\nNEW FARE ARE MET.\nCAPACITY LIMITATIONS\nTHE CARRIER SHALL LIMIT THE NUMBER OF PASSENGERS\nCARRIED ON ANY ONE FLIGHT AT FARES GOVERNED BY\nTHIS RULE AND SUCH FARES WILL NOT NECESSARILY BE\nAVAILABLE ON ALL FLIGHTS. THE NUMBER OF SEATS,\nWHICH THE CARRIER SHALL MAKE AVAILABLE ON A GIVEN\nFLIGHT, WILL BE DETERMINED BY THE CARRIER'S BEST\nJUDGEMENT.",
           "title": "RULE APPLICATION AND OTHER CONDITIONS"
         },
         {
-          "text": "NOTE - TEXT BELOW NOT VALIDATED FOR AUTOPRICING.\nTHIS FARE IS VALID FOR PASSENGERS TRAVELLING\nWITHOUT BAGGAGE.",
+          "text": "NO ELIGIBILITY REQUIREMENTS APPLY.",
           "title": "ELIGIBILITY"
         },
         {
@@ -236,7 +185,7 @@
           "title": "MAXIMUM STAY"
         },
         {
-          "text": "STOPOVERS ARE NOT PERMITTED AT INTERMEDIATE POINTS.",
+          "text": "UNLIMITED FREE STOPOVERS PERMITTED ON THE PRICING\nUNIT.",
           "title": "STOPOVERS"
         },
         {
@@ -244,7 +193,7 @@
           "title": "TRANSFERS"
         },
         {
-          "text": "CIRCLE TRIPS NOT PERMITTED.\nEND-ON-END NOT PERMITTED. SIDE TRIPS NOT PERMITTED.\nOPEN JAWS/ROUND TRIPS\nFARES MAY BE COMBINED ON A HALF ROUND TRIP BASIS\n-TO FORM SINGLE OR DOUBLE OPEN JAWS WHICH CONSISTS\nOF NO MORE THAN 2 INTERNATIONAL FARE COMPONENTS AND\nTHE OPEN SEGMENT AT ORIGIN MUST BE IN ONE COUNTRY.\nTHE OPEN SEGMENT AT DESTINATION HAS NO RESTRICTIONS\nMILEAGE OF THE INTERNATIONAL OPEN SEGMENT MUST BE\nEQUAL/LESS THAN MILEAGE OF THE LONGEST FLOWN FARE\nCOMPONENT. THERE IS NO MILEAGE RESTRICTION ON AN\nOPEN SEGMENT WITHIN ONE COUNTRY.\n-TO FORM ROUND TRIPS.\nPROVIDED -\nCOMBINATIONS ARE WITH ANY FARE FOR CARRIER SK IN\nRULE DKE1/DKE2/EMEC/EMNO/EMO1/EMO2/EMO3/FIEC/FIFX/\nGPRO/OBAG/PRO1/SAV1/SEE1/SEE2 IN TARIFF\nIPREURP - WITHIN EUROPE-INTERNATIONAL.",
+          "text": "END-ON-END NOT PERMITTED. SIDE TRIPS NOT PERMITTED.\nOPEN JAWS/ROUND TRIPS/CIRCLE TRIPS\nFARES MAY BE COMBINED ON A HALF ROUND TRIP BASIS\n-TO FORM SINGLE OR DOUBLE OPEN JAWS WHICH CONSISTS\nOF NO MORE THAN 2 INTERNATIONAL FARE COMPONENTS AND\nTHE OPEN SEGMENT AT ORIGIN MUST BE IN ONE COUNTRY.\nTHE OPEN SEGMENT AT DESTINATION HAS NO RESTRICTIONS\nA MAXIMUM OF TWO INTERNATIONAL FARE COMPONENTS\nPERMITTED. MILEAGE OF THE OPEN SEGMENT MUST BE EQUAL/\nLESS THAN MILEAGE OF THE LONGEST FLOWN FARE\nCOMPONENT.\n-TO FORM ROUND TRIPS/CIRCLE TRIPS.\nPROVIDED -\nCOMBINATIONS ARE WITH ANY FARE FOR CARRIER SK IN\nRULE DKE1/DKE2/EMEC/EMNO/EMO1/EMO2/FIEC/FIFX/OBAG/\nSAV1/SEE1/SEE2 IN TARIFF\nIPREURP - WITHIN EUROPE-INTERNATIONAL.",
           "title": "COMBINATIONS"
         },
         {
@@ -268,7 +217,7 @@
           "title": "SALES RESTRICTIONS"
         },
         {
-          "text": "CANCELLATIONS\nANY TIME\nTICKET IS NON-REFUNDABLE.\nNOTE - TEXT BELOW NOT VALIDATED FOR AUTOPRICING.\nWHEN COMBINING ON A HALF ROUNDTRIP BASIS THE\nPENALTY CONDITIONS FOR EACH FARE COMPONENT APPLY.\n--------------------------------------------------\nFOR NON REFUNDABLE TICKETS YQ/YR DOMESTIC/\nINTERNATIONAL FEES WILL NOT BE REFUNDED.\n--------------------------------------------------\nREFUND OF UNUSED TAXES/FEES/CHARGES PERMITTED\n--------------------------------------------------\nFULL REFUND PERMITTED BEFORE DEPARTURE IN CASE OF\nREJECTIONS OF VISA. EMBASSY STATEMENT REQUIRED\nCHANGES\nANY TIME\nCHANGES PERMITTED.\nNOTE - TEXT BELOW NOT VALIDATED FOR AUTOPRICING.\nNO CHILD DISCOUNT. INFANTS FREE OF CHARGE.\n--------------------------------------------------\nORIGIN/DESTINATION OF THE FARE COMPONENT MAY NOT\nBE CHANGED.\n--------------------------------------------------\nNO CHANGE FEE FOR ALL CHANGES MADE UP TO 72\nHOURS BEFORE DEPARTURE OF ORIGININALLY BOOKED\nFLIGHT.\n--------------------------------------------------\nCHANGES MADE LESS THAN 72 HOURS BEFORE DEPARTURE\nREBOOKING IN SAME BOOKING CLASS AS TICKETED\nCHARGE SEK 700 PER TRANSACTION\n--------------------------------------------------\nCHANGE FEE WILL BE THE HIGHEST OF ALL CHANGED FARE\nCOMPONENTS PER TICKET\n--------------------------------------------------\nCHANGE FEE APPLIES FOR EVERY SINGLE CLOSED\nTRANSACTION\n--------------------------------------------------\nFOR AUTOMATIC REISSUE PENALTY FEE MUST BE\nCOLLECTED ON AN EMD. FOR MANUAL REISSUE ON AN EMD\nOR AS DU TAX. PENALTY FEE MUST REMAIN NON\nREFUNDABLE.\n--------------------------------------------------\nFARES MAY BE UPGRADED TO ANY HIGHER SK GO LIGHT /\nSK GO SMART / SK PLUS SMART / SK PLUS PRO FARE UP\nTO AND INCLUDING C-CLASS. IN CASE OF UPGRADING TO\nHIGHER FARE CHARGE SEK 700 PER TRANSACTION AND\nCHARGE DIFFERENCE BETWEEN FARE PAID AND HIGHER\nUPGRADED SECTOR.\n--------------------------------------------------\nIN CASE OF TICKET UPGRADE ORIGINAL NON-REFUNDABLE\nAMOUNT REMAINS NON-REFUNDABLE. REISSUED TICKET\nMUST BE ANNOTATED -\nORIGINAL FARE PAID REMAINS NON-REFUNDABLE.\n--------------------------------------------------\nDOWNGRADING TO A LOWER BOOKING CLASS OR A LOWER\nSERVICE CLASS NOT PERMITTED.\n--------------------------------------------------\nREBOOKING/REISSUE/PAYMENT MUST BE MADE IN ONE\nTRANSACTION NOT LATER THAN 1 HOUR BEFORE\nDEPARTURE OF EITHER FLIGHT BEING CHANGED OR NEW\nFLIGHT WHICHEVER IS EARLIER",
+          "text": "CANCELLATIONS\nBEFORE DEPARTURE\nPER ONE WAY CHARGE SEK 650.\nNOTE - TEXT BELOW NOT VALIDATED FOR AUTOPRICING.\nTICKET IS NON REFUNDABLE IN CASE OF NO SHOW\n------------------------------------------\nCANCELLATION FEE APPLIES BEFORE DEPARTURE OF POINT\nOF ORIGIN FOR THE WHOLE TICKET.\n------------------------------------------\nIF THE CANCELLATION FEE IS HIGHER THEN THE\nFARE/TAX AMOUNT THE YQ/YR FEE WILL BE USED TO PAY\nPART OF THE CANCELLATION FEE.\n------------------------------------------------\nNO CHILD DISCOUNT. INFANT FREE OF CHARGE.\n------------------------------------------\nFULL REFUND PERMITTED BEFORE DEPARTURE IN CASE\nOF REJECTIONS OF VISA. EMBASSY STATEMENT REQUIRED\nAFTER DEPARTURE\nTICKET IS NON-REFUNDABLE.\nNOTE - TEXT BELOW NOT VALIDATED FOR AUTOPRICING.\nFOR NON REFUNDABLE TICKETS YQ/YR DOMESTIC/\nINTERNATIONAL FEES WILL NOT BE REFUNDED.\n------------------------------------------\nREFUND OF UNUSED TAXES/FEES/CHARGES PERMITTED\nCHANGES\nANY TIME\nPER TICKET CHARGE SEK 650.\nNOTE - TEXT BELOW NOT VALIDATED FOR AUTOPRICING.\nNO CHILD DISCOUNT. INFANTS FREE OF CHARGE.\n--------------------------------------------------\nORIGIN/DESTINATION OF THE FARE COMPONENT MAY NOT\nBE CHANGED.\n--------------------------------------------------\nREBOOKING IN SAME BOOKING CLASS AS TICKETED\nCHARGE SEK 650 PER TRANSACTION\n--------------------------------------------------\nCHANGE FEE WILL BE THE HIGHEST OF ALL CHANGED FARE\nCOMPONENTS PER TICKET\n--------------------------------------------------\nCHANGE FEE APPLIES FOR EVERY SINGLE CLOSED\nTRANSACTION\n--------------------------------------------------\nFOR AUTOMATIC REISSUE PENALTY FEE MUST BE\nCOLLECTED ON AN EMD. FOR MANUAL REISSUE ON AN EMD\nOR AS DU TAX. PENALTY FEE MUST REMAIN NON\nREFUNDABLE.\n--------------------------------------------------\nFARES MAY BE UPGRADED TO ANY HIGHER SK PLUS\nPRO/PLUS SMART FARE UP TO AND INCLUDING C-CLASS.IN\nCASE OF UPGRADING TO HIGHER FARE CHARGE SEK 650\nPER TRANSACTION AND CHARGE DIFFERENCE BETWEEN FARE\nPAID AND HIGHER UPGRADED SECTOR.\n--------------------------------------------------\nIN CASE OF TICKET UPGRADE ORIGINAL NON-REFUNDABLE\nAMOUNT REMAINS NON-REFUNDABLE. REISSUED TICKET\nMUST BE ANNOTATED -\nORIGINAL FARE PAID REMAINS NON-REFUNDABLE.\n--------------------------------------------------\nDOWNGRADING TO A LOWER BOOKING CLASS OR A LOWER\nSERVICE CLASS NOT PERMITTED.\n--------------------------------------------------\nREBOOKING/REISSUE/PAYMENT MUST BE MADE IN ONE\nTRANSACTION NOT LATER THAN 1 HOUR BEFORE\nDEPARTURE OF EITHER FLIGHT BEING CHANGED OR NEW\nFLIGHT WHICHEVER IS EARLIER",
           "title": "PENALTIES"
         },
         {
@@ -276,7 +225,7 @@
           "title": "HIP/MILEAGE EXCEPTIONS"
         },
         {
-          "text": "THE ORIGINAL AND THE REISSUED TICKET MUST BE ANNOTATED\n- RESTR APPLY PER FARE COMP/ - AND - NONREF - IN THE\nENDORSEMENT BOX.",
+          "text": "TICKET ENDORSEMENT NOT REQUIRED.",
           "title": "TICKET ENDORSEMENTS"
         },
         {
@@ -320,7 +269,7 @@
           "title": "DEPOSITS"
         },
         {
-          "text": "ENTER RD*31 OR RD\u0087LINE NUM\u0087*31 FOR VOLUNTARY CHGS.",
+          "text": "ENTER RD*31 OR RDLINE NUM*31 FOR VOLUNTARY CHGS.",
           "title": "VOLUNTARY CHANGES"
         },
         {
@@ -336,29 +285,24 @@
           "title": "INTERNATIONAL CONSTRUCTION"
         }
       ]
-    },
-    {
-      "origin": "LHR",
-      "destination": "ARN",
-      "fareBasis": "OKSRGHT",
-      "fareRule": []
     }
   ],
+  "penalties": [],
   "extras": {
     "available": [],
-    "id": "bb4bbdb5acbe4707966eb72ce2e486f7",
+    "id": "88878299a0f641689b75f5d51c6a4170",
     "selected": []
   },
   "pricingResponseInformation": {
     "oldPrice": {
-      "price": 139.55,
+      "price": 1261.84,
       "currency": "EUR"
     },
     "newPrice": {
-      "price": 139.55,
+      "price": 173.84,
       "currency": "EUR"
     }
   },
   "hasFinished": true,
-  "transactionId": "762073ba5a7e48a39662332b4df6d220"
+  "transactionId": "76ef44399bcc4b10a27acc426e055cd5"
 }

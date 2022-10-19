@@ -18,7 +18,11 @@ from snowfall.stdlib.v1alpha import models_pb2
 
 _OFFER_URL = "https://test_url/api/search/{id}/{transaction}/{page}"
 _PRICE_URL = (
-    "https://test_url/api/Itinerary/{id}/{offer}/Price?transactionId={transaction}"
+    "https://test_url/api/Itinerary/{id}/{offer}/Price?"
+    + "transactionId={transaction_id}&brandId={brand_id}"
+)
+_VALIDATE_PRICE_URL = (
+    "https://test_url/api/Itinerary/Validate/{pricing_id}/{transaction_id}"
 )
 
 _ARN_LHR_CRITERIA = amqp_pb2.Criteria(
@@ -27,15 +31,15 @@ _ARN_LHR_CRITERIA = amqp_pb2.Criteria(
     outbound_departure=protobuf.datetime_to_protobuf_datetime(
         datetime.datetime(
             year=2022,
-            month=5,
-            day=24,
-            hour=7,
-            minute=50,
+            month=11,
+            day=1,
+            hour=19,
+            minute=40,
             second=0,
             tzinfo=zoneinfo.ZoneInfo("Europe/Stockholm"),
         ),
     ),
-    cabin_class="Any",
+    cabin_class="Economy",
     adults=1,
 )
 _ARN_LHR = amqp_pb2.SearchCriteriaTask(
@@ -55,10 +59,10 @@ _ARN_LHR = amqp_pb2.SearchCriteriaTask(
                     departure_at=protobuf.datetime_to_protobuf(
                         datetime.datetime(
                             2022,
-                            5,
-                            24,
-                            7,
-                            50,
+                            11,
+                            1,
+                            19,
+                            40,
                             0,
                             tzinfo=zoneinfo.ZoneInfo("Europe/Stockholm"),
                         ),
@@ -66,10 +70,10 @@ _ARN_LHR = amqp_pb2.SearchCriteriaTask(
                     arrival_at=protobuf.datetime_to_protobuf(
                         datetime.datetime(
                             2022,
-                            5,
-                            24,
-                            9,
-                            35,
+                            11,
+                            1,
+                            21,
+                            20,
                             0,
                             tzinfo=zoneinfo.ZoneInfo("Europe/London"),
                         ),
@@ -102,7 +106,7 @@ def _mock_responses(
     )
 
     search_response = conftest.load_json_fixture(
-        "{prefix}_search".format(prefix=prefix),
+        "{prefix}_post_search".format(prefix=prefix),
     )
 
     httpx_mock.add_response(
@@ -111,18 +115,53 @@ def _mock_responses(
         url="https://test_url/api/search",
     )
 
-    _mock_search_responses(httpx_mock, prefix, search_response)
+    itinerary_validate_response = conftest.load_json_fixture(
+        "{prefix}_post_itinerary_validate".format(prefix=prefix),
+    )
+
+    httpx_mock.add_response(
+        method="POST",
+        json=itinerary_validate_response,
+        url="https://test_url/api/Itinerary/Validate",
+    )
+
+    branded_itinerary_response = conftest.load_json_fixture(
+        "{prefix}_get_itinerary_validate_{id}_{transaction_id}".format(
+            prefix=prefix,
+            id=itinerary_validate_response["id"],
+            transaction_id=itinerary_validate_response["transactionId"],
+        ),
+    )
+
+    httpx_mock.add_response(
+        method="GET",
+        json=branded_itinerary_response,
+        url=_VALIDATE_PRICE_URL.format(
+            pricing_id="d0801a2f80af41da9a283614e6d02b6a",
+            transaction_id=search_response["transactionId"],
+        ),
+    )
+
+    _mock_search_responses(
+        httpx_mock,
+        prefix,
+        search_response,
+        itinerary_validate_response,
+        branded_itinerary_response,
+    )
 
 
 def _mock_search_responses(
     httpx_mock: pytest_httpx.HTTPXMock,
     prefix: str,
     search_response: Mapping[str, Any],
+    itinerary_validate_response: Mapping[str, Any],
+    branded_itinerary_response: Mapping[str, Any],
 ) -> None:
     for page in range(10):
         try:
             offer_response = conftest.load_json_fixture(
-                "{prefix}_search_{id}_{transaction}_{page}.json".format(
+                "{prefix}_get_search_{id}_{transaction}_{page}.json".format(
                     prefix=prefix,
                     id=search_response["id"],
                     transaction=search_response["transactionId"],
@@ -142,20 +181,27 @@ def _mock_search_responses(
             ),
         )
 
-        for offer in offer_response["flight"]:
+        offer = offer_response["flight"][0]
+        for brand in branded_itinerary_response["itinerary"]["brandedFares"]:
             httpx_mock.add_response(
                 method="PUT",
                 json=conftest.load_json_fixture(
-                    "{prefix}_itinerary_{id}_{offer}_price.json".format(
+                    (
+                        "{prefix}_put_itinerary_{id}_{offer}_price?"
+                        + "transactionid={transaction_id}&brandid={brand_id}.json"
+                    ).format(
                         prefix=prefix,
-                        id=search_response["id"],
+                        id=itinerary_validate_response["id"],
                         offer=offer["id"],
+                        transaction_id=search_response["transactionId"],
+                        brand_id=brand["brandId"].lower(),
                     ),
                 ),
                 url=_PRICE_URL.format(
-                    id=search_response["id"],
+                    id=itinerary_validate_response["id"],
                     offer=offer["id"],
-                    transaction=search_response["transactionId"],
+                    transaction_id=search_response["transactionId"],
+                    brand_id=brand["brandId"],
                 ),
             )
 
@@ -211,7 +257,7 @@ async def test_search_result_data(  # noqa: WPS218
         assert segment.vendor == "SK"
         assert segment.terminal == "5"
         assert segment.vehicle.equipment == "32N"
-        assert segment.vehicle.number == "525"
+        assert segment.vehicle.number == "1527"
         assert segment.type == models_pb2.Schedule.TYPE_AIR
         leg = segment.legs[0]
         assert leg.id == "leg_id"
@@ -235,5 +281,5 @@ def _assert_offer(offer: offers_pb2.Offer, expected_segment_id: str) -> None:
     assert segment_details.offer_segment_id == expected_segment_id
     assert segment_details.cabin_class.marketing_name == "Economy"
     assert segment_details.cabin_class.type == models_pb2.CabinClass.TYPE_ECONOMY
-    assert offer.price.amount == 6374
+    assert offer.price.amount == 126184
     assert offer.price.currency == "EUR"

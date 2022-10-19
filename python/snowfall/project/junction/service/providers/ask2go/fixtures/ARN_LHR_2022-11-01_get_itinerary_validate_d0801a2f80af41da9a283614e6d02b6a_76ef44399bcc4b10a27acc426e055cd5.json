@@ -1,0 +1,160 @@
+{
+  "itinerary": {
+    "id": "c25697dfabf648b6bf74899b4b643933",
+    "isRefundable": false,
+    "gds": "Sabre",
+    "direction": "Both",
+    "trips": [
+      {
+        "id": "e01db6203caf4eb79aaa7162a6ad3c0c",
+        "duration": "02:40:00",
+        "direction": "Both",
+        "isRedEye": false,
+        "hasLongConnectionDuration": false,
+        "numberOfStops": 0,
+        "origin": {
+          "airportCode": "ARN"
+        },
+        "destination": {
+          "airportCode": "LHR"
+        },
+        "departure": {
+          "dateTime": "2022-11-01T19:40:00"
+        },
+        "arrival": {
+          "dateTime": "2022-11-01T21:20:00"
+        },
+        "plattingCarrier": {
+          "code": ""
+        },
+        "segments": [
+          {
+            "id": "f51fd34736514ec1bd958760edc14782",
+            "duration": "02:40:00",
+            "distance": 911.0,
+            "cabin": "Economy",
+            "isTechnicalStop": false,
+            "aircraft": {
+              "flightNumber": "1527",
+              "equipment": "32N"
+            },
+            "availability": {
+              "bookingCode": "S",
+              "count": 9
+            },
+            "origin": {
+              "airportCode": "ARN"
+            },
+            "destination": {
+              "airportCode": "LHR"
+            },
+            "departure": {
+              "dateTime": "2022-11-01T19:40:00"
+            },
+            "arrival": {
+              "dateTime": "2022-11-01T21:20:00"
+            },
+            "marketingCarrier": {
+              "code": "SK"
+            },
+            "operatingCarrier": {
+              "code": "SK"
+            },
+            "originTerminal": "5",
+            "destinationTerminal": "2",
+            "onTimePerformance": 0.0,
+            "meal": "M",
+            "layover": "00:00:00",
+            "changeOfPlane": false,
+            "segmentAmenities": {
+              "cabin": "S",
+              "beverage": {
+                "exists": true,
+                "free": true
+              },
+              "entertainment": {
+                "exists": false,
+                "free": false
+              },
+              "food": {
+                "exists": true,
+                "free": true,
+                "information": "premiummeal"
+              },
+              "power": {
+                "exists": true,
+                "free": true,
+                "information": "usb"
+              },
+              "wifi": {
+                "exists": true,
+                "free": true
+              }
+            },
+            "segmentIndex": 0
+          }
+        ],
+        "baggageAllowance": [
+          {
+            "weight": 0.0,
+            "pieces": 1,
+            "hasFreeBaggage": true,
+            "passengerType": "ADT",
+            "segmentIndex": 0
+          }
+        ],
+        "gds": "Sabre"
+      }
+    ],
+    "pricingInformation": {
+      "base": {
+        "baseFare": 87.0,
+        "totalTax": 64.84,
+        "totalCost": 151.84,
+        "originalCost": 151.84,
+        "serviceFee": 0.0,
+        "currency": "EUR"
+      }
+    },
+    "passengerPricing": [
+      {
+        "passengerType": "ADT",
+        "quantity": 1,
+        "priceInformation": {
+          "baseFare": 87.0,
+          "totalTax": 64.84,
+          "totalCost": 151.84,
+          "originalCost": 151.84,
+          "serviceFee": 0.0,
+          "currency": "EUR"
+        }
+      }
+    ],
+    "brandedFares": [
+      {
+        "baseFare": 1197.0,
+        "totalTax": 64.84,
+        "currency": "EUR",
+        "ticketingCost": 1261.84,
+        "fareBasis": [
+          "BKSEOPR"
+        ],
+        "isRefundable": true,
+        "brandId": "PLUSPRO",
+        "brandName": "SAS PLUS PRO"
+      },
+      {
+        "baseFare": 4737.0,
+        "totalTax": 64.84,
+        "currency": "EUR",
+        "ticketingCost": 4801.84,
+        "fareBasis": [
+          "CKSEOFX"
+        ],
+        "isRefundable": true,
+        "brandId": "PLUSFLEX",
+        "brandName": "SAS PLUS FULL FLEX"
+      }
+    ]
+  }
+}

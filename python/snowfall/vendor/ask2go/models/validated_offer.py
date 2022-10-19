@@ -1,3 +1,5 @@
+from typing import Optional
+
 import pydantic
 
 from snowfall.vendor.ask2go.models import offers
@@ -22,7 +24,7 @@ class BrandedFare(CamelCaseBaseModel):
 class ValidatedOfferItinerary(CamelCaseBaseModel):
     identifier: str = pydantic.Field(alias="id")
     is_refundable: bool
-    docs_required: bool
+    docs_required: Optional[bool]
     gds: str
     direction: str
     trips: list[offers.Trip]
