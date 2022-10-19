@@ -5,13 +5,7 @@ from typing import Any, Mapping, Sequence
 import aiofiles
 from jinja2 import Template
 
-from snowfall.project.junction.service.mobile_api import (
-    payments,
-    repository,
-    resources,
-    smtp,
-)
-from snowfall.stdlib.integration.starlette import request_helpers
+from snowfall.project.junction.service.mobile_api import payments, resources, smtp
 from snowfall.stdlib.persistence import filesystem
 from snowfall.vendor.junction import client
 
@@ -21,33 +15,25 @@ _ATTRIBUTES_ACCESSOR = "attributes"
 
 
 async def _handle_new_order_results(
-    orders_repository: repository.OrdersRepository,
-    order_id: str,
-    payment_intent: str,
+    payment_intent_id: str,
     order: Mapping[str, Any],
     smtp_client: smtp.EmailClient,
 ) -> bool:
-    await orders_repository.update_order_results(order_id, order)
-    mobile_order = (
-        await orders_repository.find_by_id(
-            order["data"]["id"],
-            "attributes.junctionOrderId",
-        )
-        or {}
-    )
-    order = request_helpers.flatten_request_body(order)
-    order_statuses = {order_result["status"] for order_result in order["orderResults"]}
+    booking_statuses = {
+        booking["relationships"]["status"]["data"]["id"]
+        for booking in order["included"]
+    }
     success_statuses = {
         resources.OrderStatus.confirmed.value,
         resources.OrderStatus.not_ticketed.value,
     }
-    if order_statuses and not order_statuses.difference(success_statuses):
-        await payments.capture(payment_intent)
-        await send_booking_confirmation(mobile_order, smtp_client)
+    if booking_statuses and not booking_statuses.difference(success_statuses):
+        await payments.capture(payment_intent_id)
+        await send_booking_confirmation(order, smtp_client)
         return True
 
-    if resources.OrderStatus.pending.value not in order_statuses:
-        await payments.cancel(payment_intent)
+    if resources.OrderStatus.pending.value not in booking_statuses:
+        await payments.cancel(payment_intent_id)
         return True
 
     return False
@@ -55,18 +41,18 @@ async def _handle_new_order_results(
 
 async def poll_order_status(
     junction_client: client.JunctionClient,
-    orders_repository: repository.OrdersRepository,
     order_id: str,
-    payment_intent: str,
+    payment_intent_id: str,
     smtp_client: smtp.EmailClient,
 ) -> bool:
     time_spent = 0
     while time_spent <= _ORDER_STATUS_POLLING_TIMEOUT:
-        order = await junction_client.get_order_by_id(order_id)
+        order = await junction_client.get_order_by_id(
+            identifier=order_id,
+            include=["bookings"],
+        )
         payment_processed = await _handle_new_order_results(
-            orders_repository,
-            order_id,
-            payment_intent,
+            payment_intent_id,
             order,
             smtp_client,
         )
@@ -76,11 +62,11 @@ async def poll_order_status(
         await asyncio.sleep(_ORDER_STATUS_POLLING_INTERVAL)
         time_spent += _ORDER_STATUS_POLLING_INTERVAL
 
-    await orders_repository.set_order_status(order_id, resources.OrderStatus.timeout)
-    await payments.cancel(payment_intent)
+    await payments.cancel(payment_intent_id)
     return False
 
 
+# TODO: refactor using includes
 async def send_booking_confirmation(
     order: Mapping[str, Any],
     smtp_client: smtp.EmailClient,

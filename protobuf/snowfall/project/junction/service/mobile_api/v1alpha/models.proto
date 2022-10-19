@@ -64,3 +64,10 @@ message LoyaltyProgram {
   string airline = 3;
   string name = 4;
 }
+
+message MobileOrder {
+  string id = 1;
+  string payment_intent_id = 2;
+  string user_id = 3;
+  google.protobuf.Timestamp created_at = 4;
+}

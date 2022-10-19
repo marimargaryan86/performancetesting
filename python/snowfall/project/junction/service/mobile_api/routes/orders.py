@@ -1,17 +1,18 @@
 import asyncio
-from typing import Any, Mapping
+from typing import Any
 
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.project.junction.service.mobile_api import repository, resources, smtp
+from snowfall.project.junction.service.mobile_api import repository, smtp
 from snowfall.project.junction.service.mobile_api.tasks import orders
+from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib.integration.starlette import models as stdlib_models
 from snowfall.stdlib.integration.starlette import request_helpers
 from snowfall.vendor.junction import client
 from snowfall.vendor.junction import models as vendor_models
 
-_ID = "id"
+_ID = "_id"
 
 
 class Order(endpoints.HTTPEndpoint):
@@ -19,17 +20,27 @@ class Order(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         orders_repository: repository.OrdersRepository = lagom.injectable,
+        junction_client: client.JunctionClient = lagom.injectable,
     ) -> responses.Response:
-        order = await orders_repository.find_by_id(request.path_params["orderId"], "id")
-        if not order:
+        mobile_order = await orders_repository.find_by_id(
+            request.path_params["orderId"],
+        )
+        if not mobile_order:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
-        if order["attributes"]["userId"] != request.user.username:
+        if mobile_order.user_id != request.user.username:
             raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
-
-        return stdlib_models.JsonApiResponse(
-            stdlib_models.Body(data=resources.OrderResource.from_mongo(order)),
+        order_response = await junction_client.get_order_by_id(
+            identifier=mobile_order.id,
+            include=request.scope["query_string"].get(
+                "include",
+                [],
+            ),
         )
+        response_body = stdlib_models.Body(data=order_response["data"])
+        if order_response.get("included"):
+            response_body.included = order_response.get("included")
+        return stdlib_models.JsonApiResponse(response_body)
 
 
 class Orders(endpoints.HTTPEndpoint):
@@ -37,17 +48,29 @@ class Orders(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         orders_repository: repository.OrdersRepository = lagom.injectable,
+        junction_client: client.JunctionClient = lagom.injectable,
     ) -> responses.Response:
-        user_orders = await orders_repository.get_user_orders(request.user.username)
-
-        return stdlib_models.JsonApiResponse(
-            stdlib_models.Body(
-                data=[
-                    resources.OrderResource.from_mongo(order)
-                    async for order in user_orders
-                ],
-            ),
+        # TODO: create pagination for this one (!581)
+        user_mobile_orders = await orders_repository.get_user_orders(
+            request.user.username,
         )
+        user_orders: dict[str, list[Any]] = {"data": [], "included": []}
+        async for mobile_order in user_mobile_orders:
+            order_response = await junction_client.get_order_by_id(
+                identifier=mobile_order.id,
+                include=request.scope["query_string"].get(
+                    "include",
+                    [],
+                ),
+            )
+            user_orders["data"].append(order_response["data"])
+            if order_response.get("included"):
+                user_orders["included"].extend(order_response["included"])
+
+        response_body = stdlib_models.Body(data=user_orders["data"])
+        if user_orders.get("included"):
+            response_body.included = user_orders.get("included")
+        return stdlib_models.JsonApiResponse(response_body)
 
     async def post(
         self,
@@ -61,12 +84,8 @@ class Orders(endpoints.HTTPEndpoint):
         contact_details = body["contactDetails"]
 
         junction_order = await junction_client.create_order(
-            body["offer"][_ID],
-            [
-                option[_ID]
-                for group in body["offer"]["attributes"]["groups"]
-                for option in group["attributes"]["options"]
-            ],
+            body["offer"],
+            body["options"],
             [
                 vendor_models.Passenger(**vendor_models.dict_factory_to_snake(pax))
                 for pax in body["passengers"]
@@ -79,38 +98,23 @@ class Orders(endpoints.HTTPEndpoint):
                 phone_number=contact_details["phoneNumber"],
             ),
         )
-
-        document = await self._save_order(
-            orders_repository,
-            request,
-            junction_client,
-            junction_order,
+        mobile_order = models_pb2.MobileOrder(
+            id=junction_order["data"][_ID],
+            payment_intent_id=body["payment"],
+            user_id=request.user.username,
         )
+        await orders_repository.insert(mobile_order)
 
         asyncio.create_task(
             orders.poll_order_status(
                 junction_client,
-                orders_repository,
-                junction_order["data"][_ID],
-                body["paymentIntentId"],
+                mobile_order.id,
+                mobile_order.payment_intent_id,
                 smtp_client,
             ),
         )
 
         return stdlib_models.JsonApiResponse(
-            stdlib_models.Body(data=resources.OrderResource.from_mongo(document)),
+            stdlib_models.Body(data=junction_order["data"]),
             status.HTTP_201_CREATED,
-        )
-
-    async def _save_order(
-        self,
-        orders_repository: repository.OrdersRepository,
-        request: requests.Request,
-        junction_client: client.JunctionClient,
-        junction_order: Mapping[str, Any],
-    ) -> dict[str, Any]:
-        return await orders_repository.create_order(
-            await request.json(),
-            await junction_client.get_order_by_id(junction_order["data"][_ID]),
-            request.user.username,
         )

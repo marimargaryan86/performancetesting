@@ -20,6 +20,22 @@ _METHOD_POST = "POST"
 
 
 trip_includes = Literal["segments", "segments.legs", "segments.legs.legType"]
+offer_includes = Literal[
+    "groups",
+    "groups.details",
+    "groups.details.legType",
+    "groups.options",
+    "groups.options.details",
+    "groups.options.details.cabinClass",
+    "groups.options.details.details",
+]
+order_includes = Literal[
+    "journey",
+    "bookings",
+    "bookings.details",
+    "bookings.details.cabinClass",
+    "bookings.details.legType",
+]
 
 
 class LegType(enum.Enum):
@@ -364,7 +380,7 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
         self,
         offers_search_id: str,
         cabin_class: Optional[Sequence[str]],
-        include: Optional[Sequence[trip_includes]] = None,
+        include: Optional[Sequence[offer_includes]] = None,
         limit: Optional[int] = None,
         cursor: Optional[str] = None,
     ) -> dict[str, Any]:
@@ -601,23 +617,25 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
             },
         }
 
-        response = await self._make_request(
+        return await self._make_request(
             method=_METHOD_POST,
             url="/orders",
             payload=body,
         )
 
-        # todo: Use the real response instead.
-        return await self._get_deprecated_order(response)
-
-    async def get_order_by_id(self, identifier: str) -> dict[str, Any]:
-        response = await self._make_request(
+    async def get_order_by_id(
+        self,
+        identifier: str,
+        include: Optional[Sequence[order_includes]] = None,
+    ) -> dict[str, Any]:
+        query_parameters: dict[str, Sequence[order_includes]] = {}
+        if include:
+            query_parameters["include"] = include
+        return await self._make_request(
             method=_METHOD_GET,
             url="/orders/{0}".format(identifier),
+            query_parameters=query_parameters,
         )
-
-        # todo: Use the real response instead.
-        return await self._get_deprecated_order(response)
 
     async def get_bookings_by_order_id(
         self,
@@ -683,30 +701,6 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
             method=_METHOD_GET,
             url="/orders/{0}".format(orders_id),
         )
-
-    # todo: Delete.
-    async def _get_deprecated_order(
-        self,
-        response: Mapping[str, Any],
-    ) -> dict[str, Any]:
-        bookings = await self.get_bookings_by_order_id(response[_DATA_KEY][_ID_KEY])
-        journey = response[_DATA_KEY][_RELATIONSHIPS_KEY]["journey"]
-        journey_response = await self.get_journey_by_id(journey[_DATA_KEY][_ID_KEY])
-        journey_response[_DATA_KEY][_TYPE_KEY] = "orders"
-        journey_response[_DATA_KEY][_ID_KEY] = response[_DATA_KEY][_ID_KEY]
-        attributes = journey_response[_DATA_KEY][_ATTRIBUTES_KEY]
-        attributes[_PASSENGERS_KEY] = response[_DATA_KEY][_ATTRIBUTES_KEY][
-            _PASSENGERS_KEY
-        ]
-        attributes["orderResults"] = [
-            {
-                "orderId": booking[_RELATIONSHIPS_KEY]["order"][_DATA_KEY][_ID_KEY],
-                "status": booking[_RELATIONSHIPS_KEY]["status"][_DATA_KEY][_ID_KEY],
-            }
-            for booking in bookings[_DATA_KEY]
-        ]
-
-        return journey_response
 
 
 def _make_pagination(

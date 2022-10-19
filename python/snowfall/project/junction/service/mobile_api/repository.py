@@ -5,11 +5,8 @@ from typing import Any, Mapping, Optional, Sequence
 
 import bcrypt
 import pymongo
-from pymongo import results as pymongo_results
 
-from snowfall.project.junction.service.mobile_api import resources
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
-from snowfall.stdlib import string
 from snowfall.stdlib.persistence.mongo import coders, mixins, repository, resultset
 from snowfall.stdlib.persistence.redis import types as redis
 
@@ -284,78 +281,22 @@ class MockRepository(
 
 
 class OrdersRepository(
-    mixins.FindByIdMixin[dict[str, Any]],
-    mixins.InsertMixin[dict[str, Any]],
-    repository.DefaultRepository,
+    mixins.FindByIdMixin[models_pb2.MobileOrder],
+    mixins.InsertMixin[models_pb2.MobileOrder],
+    repository.ProtoRepository[models_pb2.MobileOrder],
 ):
+    _proto = models_pb2.MobileOrder
     _indexes = [
-        pymongo.IndexModel("attributes.userId", background=True),
-        pymongo.IndexModel("attributes.createdAt", background=True),
-        pymongo.IndexModel("attributes.junctionOrderId", background=True),
+        pymongo.IndexModel("userId", background=True),
     ]
-
-    async def create_order(
-        self,
-        request_body: Mapping[str, Any],
-        junction_order: Mapping[str, Any],
-        user_id: str,
-    ) -> dict[str, Any]:
-        order_id = string.uuid()
-        document = request_body[_DATA_ACCESSOR]
-        document[_ID_ACCESSOR] = order_id
-        attributes = document[_ATTRIBUTES_ACCESSOR]
-        attributes["orderResults"] = junction_order[_DATA_ACCESSOR][
-            _ATTRIBUTES_ACCESSOR
-        ]["orderResults"]
-        attributes["junctionOrderId"] = junction_order[_DATA_ACCESSOR][_ID_ACCESSOR]
-        attributes["createdAt"] = datetime.datetime.now(datetime.timezone.utc)
-        attributes["userId"] = user_id
-        attributes["reference"] = junction_order[_DATA_ACCESSOR][_ATTRIBUTES_ACCESSOR][
-            "reference"
-        ]
-        document["links"] = {"self": "https://snowfall.se"}
-        await self.insert(document)
-        return document
 
     async def get_user_orders(
         self,
         user_id: str,
-    ) -> Any:
+    ) -> resultset.ResultSet[models_pb2.MobileOrder]:
         orders = await self._execute(
             self._collection.find,
-            {"attributes.userId": user_id},
+            {"user_id": user_id},
         )
-        orders.sort(("attributes.createdAt", -1))
+        orders.sort(("created_at", -1))
         return orders
-
-    async def update_order_results(
-        self,
-        order_id: str,
-        junction_order: Mapping[str, Any],
-    ) -> pymongo_results.UpdateResult:
-        return await self._execute(
-            self._collection.update_one,
-            {"attributes.junctionOrderId": order_id},
-            {
-                "$set": {
-                    "attributes.orderResults": junction_order[_DATA_ACCESSOR][
-                        _ATTRIBUTES_ACCESSOR
-                    ]["orderResults"],
-                },
-            },
-        )
-
-    async def set_order_status(
-        self,
-        order_id: str,
-        status: resources.OrderStatus,
-    ) -> pymongo_results.UpdateResult:
-        return await self._execute(
-            self._collection.update_one,
-            {"attributes.junctionOrderId": order_id},
-            {
-                "$set": {
-                    "attributes.orderResults.$[].status": status.value,
-                },
-            },
-        )
