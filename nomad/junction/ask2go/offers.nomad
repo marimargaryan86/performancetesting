@@ -68,10 +68,17 @@ job "ask2go-offers" {
     }
     task "offers" {
       driver = "docker"
+      vault {
+        policies = ["ask2go-${var.environment}"]
+      }
 
       template {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
+{{ with secret "kv/data/${var.environment}/ask2go" }}
+API_BASE_URL={{ .Data.data.api_base_url }}
+API_BOOKING_BASE_URL={{ .Data.data.api_booking_base_url }}
+{{ end }}
 EOH
         destination = "services.env"
         env         = true
@@ -93,11 +100,9 @@ EOH
       }
 
       env {
-        API_BASE_URL         = "http://ec2-18-194-173-6.eu-central-1.compute.amazonaws.com"
-        API_BOOKING_BASE_URL = "http://ec2-3-68-186-171.eu-central-1.compute.amazonaws.com"
-        ENV_NAME             = "${var.environment}"
-        SENTRY_DSN           = "https://c299617e39d446ccb1053a04d9ac12b8@sentry.snowfall.se/34"
-        PROMETHEUS_PORT      = "${NOMAD_PORT_prometheus}"
+        ENV_NAME        = "${var.environment}"
+        SENTRY_DSN      = "https://c299617e39d446ccb1053a04d9ac12b8@sentry.snowfall.se/34"
+        PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
       }
     }
   }
