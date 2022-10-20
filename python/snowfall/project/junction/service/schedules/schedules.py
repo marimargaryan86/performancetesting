@@ -7,13 +7,13 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 from snowfall.stdlib.v1alpha import models_pb2
 
-LEGS_ID = "legs.id"
+LEGS_ID = "legs._id"
 
 
 class LegRepository(repository.ProtoRepository[models_pb2.Leg]):
     _proto = models_pb2.Leg
     _indexes: list[IndexModel] = [
-        IndexModel("legs.id", background=True, unique=True),
+        IndexModel(LEGS_ID, background=True, unique=True),
     ]
 
     async def find(
@@ -35,7 +35,7 @@ class LegRepository(repository.ProtoRepository[models_pb2.Leg]):
             path="$legs",
             filter_=filter_,
             cur=cursor,
-            id_key="id",
+            id_key="_id",
         )
 
     async def find_by_id(self, document_id: str) -> Optional[models_pb2.Leg]:
@@ -46,7 +46,7 @@ class LegRepository(repository.ProtoRepository[models_pb2.Leg]):
                     "$eq": document_id,
                 },
             },
-            id_key="id",
+            id_key="_id",
         )
 
         try:
