@@ -67,7 +67,6 @@ class Payments(endpoints.HTTPEndpoint):
             automatic_payment_methods={
                 "enabled": True,
             },
-            metadata={"offerId": body["offerId"]},
         )
 
         attributes = {

@@ -4185,7 +4185,6 @@
             "required": [
               "amount",
               "currency",
-              "offerId",
               "clientSecret"
             ],
             "properties": {
@@ -4197,11 +4196,6 @@
               "currency": {
                 "type": "string",
                 "example": "EUR",
-                "writeOnly": true
-              },
-              "offerId": {
-                "type": "string",
-                "example": "NEEDS EXAMPLE",
                 "writeOnly": true
               },
               "clientSecret": {

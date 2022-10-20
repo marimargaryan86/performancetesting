@@ -1,7 +1,8 @@
 import asyncio
-from typing import Any
+from typing import Any, Sequence, Tuple
 
 import lagom
+import stripe
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.junction.service.mobile_api import repository, smtp
@@ -81,7 +82,44 @@ class Orders(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
 
-        contact_details = body["contactDetails"]
+        (correct_amount, correct_state) = await check_payment_amount_and_state(
+            body["paymentIntentId"],
+            body["options"],
+            junction_client,
+        )
+        if not correct_amount:
+            stripe.PaymentIntent.cancel(body["paymentIntentId"])
+            return stdlib_models.JsonApiResponse(
+                stdlib_models.Body(
+                    errors=[
+                        stdlib_models.Error(
+                            status=str(status.HTTP_400_BAD_REQUEST),
+                            code="invalid_amount",
+                            detail="Payment's amount does not match with order",
+                            source=stdlib_models.ErrorSource(
+                                pointer="/data/attributes/paymentIntentId",
+                            ),
+                        ),
+                    ],
+                ),
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+        if not correct_state:
+            return stdlib_models.JsonApiResponse(
+                stdlib_models.Body(
+                    errors=[
+                        stdlib_models.Error(
+                            status=str(status.HTTP_400_BAD_REQUEST),
+                            code="invalid_payment_state",
+                            detail="Payment Intent is not confirmed",
+                            source=stdlib_models.ErrorSource(
+                                pointer="/data/attributes/paymentIntentId",
+                            ),
+                        ),
+                    ],
+                ),
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
 
         junction_order = await junction_client.create_order(
             body["offer"],
@@ -91,11 +129,13 @@ class Orders(endpoints.HTTPEndpoint):
                 for pax in body["passengers"]
             ],
             vendor_models.ContactDetails(
-                email=contact_details["email"],
+                email=body["contactDetails"]["email"],
                 address=vendor_models.Address(
-                    **vendor_models.dict_factory_to_snake(contact_details["address"]),
+                    **vendor_models.dict_factory_to_snake(
+                        body["contactDetails"]["address"],
+                    ),
                 ),
-                phone_number=contact_details["phoneNumber"],
+                phone_number=body["contactDetails"]["phoneNumber"],
             ),
         )
         mobile_order = models_pb2.MobileOrder(
@@ -103,6 +143,11 @@ class Orders(endpoints.HTTPEndpoint):
             payment_intent_id=body["payment"],
             user_id=request.user.username,
         )
+        stripe.PaymentIntent.modify(
+            body["paymentIntentId"],
+            metadata={"order_id": mobile_order.id},
+        )
+
         await orders_repository.insert(mobile_order)
 
         asyncio.create_task(
@@ -118,3 +163,23 @@ class Orders(endpoints.HTTPEndpoint):
             stdlib_models.Body(data=junction_order["data"]),
             status.HTTP_201_CREATED,
         )
+
+
+async def check_payment_amount_and_state(
+    payment_intent_id: str,
+    offer_options: Sequence[str],
+    junction_client: client.JunctionClient,
+) -> Tuple[bool, bool]:
+    # TODO: check for currency as well (!473)
+    offer_amount = 0
+    for offer_option in offer_options:
+        offer_option_response = (
+            await junction_client.get_offer_options_by_offer_option_id(
+                offer_option,
+            )
+        )
+        offer_amount += int(
+            float(offer_option_response["attributes"]["price"]["amount"]) * 100,
+        )
+    pi = stripe.PaymentIntent.retrieve(payment_intent_id)
+    return pi["amount"] == offer_amount, pi["status"] == "confirmed"
