@@ -51,7 +51,7 @@ class _GlobalSettings(Settings):
     env_name: str = pydantic.Field(default="local", hidden=True)
     log_level: str = "INFO"
     platform_name: str = pydantic.Field(default="Junction", hidden=True)
-    prometheus_port: int = 8080
+    prometheus_port: int | None = None
     sentry_dsn: str = ""
     version: str = pydantic.Field(default="dev", hidden=True)
 
@@ -217,6 +217,37 @@ def _group(ctx: click.Context, **kwargs: Any) -> None:
     )
 
 
+def _configure(
+    entrypoint: Entrypoint,
+    global_settings: _GlobalSettings,
+) -> None:
+    stdout.configure_logger(level=global_settings.log_level)
+    logger = structlog.get_logger(__name__)
+
+    logger.info(
+        "Application bootstrapped.",
+        name=entrypoint.name,
+        version=global_settings.version,
+        environment=global_settings.env_name,
+    )
+
+    if global_settings.sentry_dsn:
+        sentry.configure_sentry(
+            dsn=global_settings.sentry_dsn,
+            environment=global_settings.env_name,
+            release="{name}@{version}".format(
+                name=entrypoint.name,
+                version=global_settings.version,
+            ),
+            additional_integrations=entrypoint.sentry_settings.additional_integrations,
+            tag_keys=entrypoint.sentry_settings.tag_keys,
+        )
+        logger.info(
+            "Sentry configured.",
+            dsn=global_settings.sentry_dsn,
+        )
+
+
 def _command(  # noqa: WPS210
     command: Command[_Settings],
 ) -> Callable[[click.Context], None]:
@@ -240,45 +271,28 @@ def _command(  # noqa: WPS210
             version=global_settings.version,
         )
 
-        stdout.configure_logger(level=global_settings.log_level)
-        logger = structlog.get_logger(__name__)
-
-        logger.info(
-            "Application bootstrapped.",
-            name=application.name,
-            version=application.version,
-            environment=application.environment,
-        )
-
-        if global_settings.sentry_dsn:
-            sentry.configure_sentry(
-                dsn=global_settings.sentry_dsn,
-                environment=application.environment,
-                release="{name}@{version}".format(
-                    name=application.name,
-                    version=application.version,
-                ),
-                additional_integrations=entrypoint.sentry_settings.additional_integrations,
-                tag_keys=entrypoint.sentry_settings.tag_keys,
-            )
-            logger.info(
-                "Sentry configured.",
-                dsn=global_settings.sentry_dsn,
-            )
+        _configure(entrypoint, global_settings)
 
         if not inspect.iscoroutinefunction(command.callback):
-            web.start_http_server_in_thread(port=global_settings.prometheus_port)
+            if global_settings.prometheus_port:
+                web.start_http_server_in_thread(port=global_settings.prometheus_port)
             command.callback(application)
             return
 
         async def wrapper() -> None:
-            await asyncio.gather(
-                web.start_http_server(port=global_settings.prometheus_port),
+            tasks: list[Awaitable[None | web.MetricsHTTPServer]] = [
                 cast(
                     Callable[[Application[_Settings]], Awaitable[None]],
                     command.callback,
                 )(application),
-            )
+            ]
+
+            if global_settings.prometheus_port:
+                tasks.append(
+                    web.start_http_server(port=global_settings.prometheus_port),
+                )
+
+            await asyncio.gather(*tasks)
 
         asyncio.run(wrapper())
 
