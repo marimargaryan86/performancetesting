@@ -22,3 +22,13 @@ class Gender(enum.Enum):
     female = "Female"
     male = "Male"
     unknown = "Unknown"
+
+
+class PenaltyType(enum.Enum):
+    exchange = "Exchange"
+    refund = "Refund"
+
+
+class Applicability(enum.Enum):
+    before = "Before"
+    after = "After"

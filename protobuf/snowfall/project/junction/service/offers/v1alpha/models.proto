@@ -4,6 +4,7 @@ package snowfall.project.junction.service.offers.v1alpha;
 
 import "google/protobuf/timestamp.proto";
 import "snowfall/stdlib/v1alpha/models.proto";
+import "snowfall/stdlib/v1alpha/money.proto";
 
 message OfferSearch {
   string id = 1;
@@ -43,6 +44,30 @@ message OfferAggregate {
   repeated OfferGroup groups = 2;
 }
 
+message ApplicableTo {
+  optional snowfall.stdlib.v1alpha.Date date_of_birth_before = 1;
+  optional snowfall.stdlib.v1alpha.Date date_of_birth_after = 2;
+}
+
+message Penalty {
+  ApplicableTo applicable_to = 1;
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+    TYPE_EXCHANGE = 1;
+    TYPE_REFUND = 2;
+  }
+  Type penalty_type = 2;
+  optional bool changeable = 3;
+  bool refundable = 4;
+  enum Applicability {
+    APPLICABILITY_UNSPECIFIED = 0;
+    APPLICABILITY_BEFORE = 1;
+    APPLICABILITY_AFTER = 2;
+  }
+  Applicability applicability = 5;
+  optional snowfall.stdlib.v1alpha.Money price = 6;
+}
+
 message OfferGroup {
   string id = 1;
   string offer_search_id = 2;
@@ -58,6 +83,7 @@ message Offer {
   repeated OfferSegmentDetails segment_details = 2;
   snowfall.stdlib.v1alpha.Price price = 3;
   string brand_name = 4;
+  repeated Penalty penalties = 5;
   // isRefundable
 }
 

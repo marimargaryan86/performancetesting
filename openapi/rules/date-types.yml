@@ -9,7 +9,7 @@ rules:
         match: "^.*(At|After|Before)$"
   date-time-format:
     severity: error
-    message: "Invalid format: {{value}} (expected: date-time)"
+    message: "Invalid format: {{value}} (expected: date-time or date)"
     given: $..attributes..properties[?(@property.match(/(At|After|Before)$/))]
     then:
       - field: format
@@ -19,4 +19,4 @@ rules:
         functionOptions:
           values:
             - date-time
-
+            - date

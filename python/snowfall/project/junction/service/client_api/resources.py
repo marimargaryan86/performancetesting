@@ -211,6 +211,59 @@ class Price(models.BaseModel):
         )
 
 
+class PenaltyApplicableTo(models.BaseModel):
+    date_of_birth_after: Optional[datetime.date] = pydantic.Field(
+        alias="dateOfBirthAfter",
+    )
+    date_of_birth_before: Optional[datetime.date] = pydantic.Field(
+        alias="dateOfBirthBefore",
+    )
+
+    @classmethod
+    def from_proto(
+        cls,
+        applicable_to: offer_models_pb2.ApplicableTo,
+    ) -> PenaltyApplicableTo:
+        return cls(
+            dateOfBirthAfter=protobuf.protobuf_to_date(
+                applicable_to.date_of_birth_after,
+            )
+            if applicable_to.date_of_birth_after.ByteSize()
+            else None,
+            dateOfBirthBefore=protobuf.protobuf_to_date(
+                applicable_to.date_of_birth_before,
+            )
+            if applicable_to.date_of_birth_before.ByteSize()
+            else None,
+        )
+
+
+class Penalty(models.BaseModel):
+    applicable_to: PenaltyApplicableTo = pydantic.Field(alias="applicableTo")
+    penalty_type: str = pydantic.Field(alias="penaltyType")
+    changeable: bool
+    refundable: Optional[bool]
+    applicability: str
+    price: Optional[Price]
+
+    @classmethod
+    def from_proto(cls, penalty: offer_models_pb2.Penalty) -> Penalty:
+        return cls(
+            applicableTo=PenaltyApplicableTo.from_proto(penalty.applicable_to),
+            penaltyType=protobuf.enum_value_to_slug(
+                descriptor=offer_models_pb2.Penalty.Type.DESCRIPTOR,
+                enum_value=penalty.penalty_type,
+            ),
+            changeable=penalty.changeable,
+            refundable=penalty.refundable,
+            applicability=protobuf.enum_value_to_slug(
+                descriptor=offer_models_pb2.Penalty.Applicability.DESCRIPTOR,
+                enum_value=penalty.applicability,
+            ),
+            price=Price.from_proto(penalty.price) if penalty.price.ByteSize() else None,
+        )
+
+
 class OfferOptionResource(models.Resource):
     api_type: ClassVar[str] = "offer-options"
 
@@ -226,6 +279,9 @@ class OfferOptionResource(models.Resource):
             attributes={
                 "price": Price.from_proto(option.price),
                 "brandName": option.brand_name,
+                "penalties": [
+                    Penalty.from_proto(penalty) for penalty in option.penalties
+                ],
             },
             relationships={
                 "details": {

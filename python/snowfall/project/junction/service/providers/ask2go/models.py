@@ -6,6 +6,7 @@ import types
 import zoneinfo
 from typing import Optional, Sequence
 
+from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.project.junction.service.orders.v1alpha import models_pb2 as orders_models
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2
@@ -23,6 +24,20 @@ _CABIN_MAPPING = types.MappingProxyType(
     },
 )
 
+_PENALTY_TYPE_MAPPING = types.MappingProxyType(
+    {
+        "Exchange": offers_pb2.Penalty.Type.TYPE_EXCHANGE,
+        "Refund": offers_pb2.Penalty.Type.TYPE_REFUND,
+    },
+)
+
+_APPLICABILITY_TYPE_MAPPING = types.MappingProxyType(
+    {
+        "Before": offers_pb2.Penalty.Applicability.APPLICABILITY_BEFORE,
+        "After": offers_pb2.Penalty.Applicability.APPLICABILITY_AFTER,
+    },
+)
+
 
 def cabin_to_proto(cabin: Optional[str]) -> models_pb2.CabinClass.Type.V:
     if cabin is None:
@@ -32,6 +47,30 @@ def cabin_to_proto(cabin: Optional[str]) -> models_pb2.CabinClass.Type.V:
         return _CABIN_MAPPING[cabin]
     except KeyError:
         return models_pb2.CabinClass.TYPE_UNSPECIFIED
+
+
+def penalty_type_to_proto(
+    penalty_type: Optional[str],
+) -> offers_pb2.Penalty.Type.V:
+    if penalty_type is None:
+        return offers_pb2.Penalty.Type.TYPE_UNSPECIFIED
+
+    try:
+        return _PENALTY_TYPE_MAPPING[penalty_type]
+    except KeyError:
+        return offers_pb2.Penalty.Type.TYPE_UNSPECIFIED
+
+
+def applicability_type_to_proto(
+    applicability_type: Optional[str],
+) -> offers_pb2.Penalty.Applicability.V:
+    if applicability_type is None:
+        return offers_pb2.Penalty.Applicability.APPLICABILITY_UNSPECIFIED
+
+    try:
+        return _APPLICABILITY_TYPE_MAPPING[applicability_type]
+    except KeyError:
+        return offers_pb2.Penalty.Applicability.APPLICABILITY_UNSPECIFIED
 
 
 def gender_from_proto(gender: orders_models.Passenger.Gender.V) -> common.Gender:

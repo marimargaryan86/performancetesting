@@ -4722,6 +4722,12 @@
                     "type": "string",
                     "example": "PLUS",
                     "readOnly": true
+                  },
+                  "penalties": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/TripOfferOptionPenalty"
+                    }
                   }
                 }
               },
@@ -4890,6 +4896,79 @@
         "required": [
           "id",
           "type"
+        ]
+      },
+      "TripOfferOptionPenalty": {
+        "title": "Trip Offer Option Penalty",
+        "type": "object",
+        "properties": {
+          "applicableTo": {
+            "$ref": "#/components/schemas/TripOfferOptionPenaltyApplicableTo"
+          },
+          "penaltyType": {
+            "type": "string",
+            "example": "exchange",
+            "enum": [
+              "exchange",
+              "refund"
+            ]
+          },
+          "changeable": {
+            "type": "boolean",
+            "example": true
+          },
+          "refundable": {
+            "type": "boolean",
+            "example": false
+          },
+          "applicability": {
+            "type": "string",
+            "example": "before",
+            "enum": [
+              "before",
+              "after"
+            ]
+          },
+          "price": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Price"
+              },
+              {
+                "nullable": true
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "applicableTo",
+          "penaltyType",
+          "refundable",
+          "applicability",
+          "price"
+        ]
+      },
+      "TripOfferOptionPenaltyApplicableTo": {
+        "title": "Trip Offer Option Penalty Applicable To",
+        "type": "object",
+        "properties": {
+          "dateOfBirthAfter": {
+            "nullable": true,
+            "type": "string",
+            "format": "date",
+            "example": "1980-02-03"
+          },
+          "dateOfBirthBefore": {
+            "nullable": true,
+            "type": "string",
+            "format": "date",
+            "example": "1980-02-03"
+          }
+        },
+        "required": [
+          "dateOfBirthAfter",
+          "dateOfBirthBefore"
         ]
       },
       "Price": {
