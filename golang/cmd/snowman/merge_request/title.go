@@ -8,7 +8,7 @@ import (
 
 const discussionForbiddenBody = "Hi @%s! :wave:\n\nSorry to interrupt, but your merge request title is not in imperative present tense (e.g. it should be `add` and not `adds`, `adding` or `added`)."
 const discussionForbiddenSuffix = "forbidden_word"
-const discussionTitleBody = "Hi @%s! :wave:\n\nSorry to interrupt, but your merge request title is not compliant with the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification."
+const discussionTitleBody = "Hi @%s! :wave:\n\nSorry to interrupt, but your merge request title is not compliant with the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification. It also needs to be 72 characters or shorter and not end with a period.\n\nThese are the types we currently allow:\n-build\n-chore\n-ci\n-docs\n-feat\n-fix\n-perf\n-refactor\n-revert\n-style\n-test"
 const discussionTitleSuffix = "invalid_title"
 
 var forbiddenWords []string

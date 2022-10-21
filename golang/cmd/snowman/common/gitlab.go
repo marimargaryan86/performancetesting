@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/xanzy/go-gitlab"
 	"regexp"
+	"strings"
 )
 
 var allowedTitle *regexp.Regexp
@@ -21,11 +22,21 @@ type CommitTitle struct {
 	Type        string
 }
 
-func ParseCommitTitle(title string) (CommitTitle, error) {
-	matches := allowedTitle.FindStringSubmatch(title)
+func ParseCommitTitle(message string) (CommitTitle, error) {
+	matches := allowedTitle.FindStringSubmatch(message)
 
 	if matches == nil {
 		return CommitTitle{}, errors.New("unable to parse commit title")
+	}
+
+	title := matches[allowedTitle.SubexpIndex("title")]
+
+	if len(title) > 72 {
+		return CommitTitle{}, errors.New("commit title is too long")
+	}
+
+	if strings.HasSuffix(title, ".") {
+		return CommitTitle{}, errors.New("commit title must not end with a period")
 	}
 
 	return CommitTitle{
@@ -33,7 +44,7 @@ func ParseCommitTitle(title string) (CommitTitle, error) {
 		IsBreaking:  matches[allowedTitle.SubexpIndex("breaking")] != "",
 		IsDraft:     matches[allowedTitle.SubexpIndex("prefix")] != "",
 		Scope:       matches[allowedTitle.SubexpIndex("scope")],
-		Title:       matches[allowedTitle.SubexpIndex("title")],
+		Title:       title,
 		Type:        matches[allowedTitle.SubexpIndex("type")],
 	}, nil
 }
