@@ -36,6 +36,7 @@
 //     "iso4217==1.11.20220401",
 //     "isodate==0.6.1",
 //     "jinja2==3.1.2",
+//     "json_api_doc==0.15.0",
 //     "jsonschema==4.16.0",
 //     "lagom==2.0.0",
 //     "mongomock-motor==0.0.13",
@@ -365,13 +366,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "cb29b9c70620506a9a8f87a309591713446953302d7d995344d0d7c6c0c9a7be",
-              "url": "https://files.pythonhosted.org/packages/c3/22/4cba7e1b4f45ffbefd2ca817a6800ba1c671c26f288d7705f20289872012/anyio-3.6.1-py3-none-any.whl"
+              "hash": "fbbe32bd270d2a2ef3ed1c5d45041250284e31fc0a4df4a5a6071842051a51e3",
+              "url": "https://files.pythonhosted.org/packages/77/2b/b4c0b7a3f3d61adb1a1e0b78f90a94e2b6162a043880704b7437ef297cad/anyio-3.6.2-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "413adf95f93886e442aea925f3ee43baa5a765a64a0f52c6081894f9992fdd0b",
-              "url": "https://files.pythonhosted.org/packages/67/c4/fd50bbb2fb72532a4b778562e28ba581da15067cfb2537dbd3a2e64689c1/anyio-3.6.1.tar.gz"
+              "hash": "25ea0d673ae30af41a0c442f81cf3b38c7e79fdc7b60335a4c14e05eb0947421",
+              "url": "https://files.pythonhosted.org/packages/8b/94/6928d4345f2bc1beecbff03325cad43d320717f51ab74ab5a571324f4f5a/anyio-3.6.2.tar.gz"
             }
           ],
           "project_name": "anyio",
@@ -389,14 +390,14 @@
             "sniffio>=1.1",
             "sphinx-autodoc-typehints>=1.2.0; extra == \"doc\"",
             "sphinx-rtd-theme; extra == \"doc\"",
-            "trio>=0.16; extra == \"trio\"",
+            "trio<0.22,>=0.16; extra == \"trio\"",
             "trustme; extra == \"test\"",
             "typing-extensions; python_version < \"3.8\"",
             "uvloop<0.15; (python_version < \"3.7\" and (platform_python_implementation == \"CPython\" and platform_system != \"Windows\")) and extra == \"test\"",
             "uvloop>=0.15; (python_version >= \"3.7\" and (platform_python_implementation == \"CPython\" and platform_system != \"Windows\")) and extra == \"test\""
           ],
           "requires_python": ">=3.6.2",
-          "version": "3.6.1"
+          "version": "3.6.2"
         },
         {
           "artifacts": [
@@ -1624,6 +1625,24 @@
           ],
           "requires_python": ">=3.7",
           "version": "3.1.2"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "4a9abc840c8706b17057be8e99958821a133040e891bdb5beac0abe045ab6b1d",
+              "url": "https://files.pythonhosted.org/packages/4b/30/33f9ccb7e265ff98e17e1662d2871322ea7adbc73d9c8c69ef4d9d5605a7/json_api_doc-0.15.0-py2.py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "1cbbf34d04b7768bf0de187363333a1c96294588e778f722a98ef60765458a9c",
+              "url": "https://files.pythonhosted.org/packages/82/5f/f2fea5059a8e60e38712eafbfda3fd254ca8f2c44c3b5b3dd94c398ae672/json-api-doc-0.15.0.tar.gz"
+            }
+          ],
+          "project_name": "json-api-doc",
+          "requires_dists": [],
+          "requires_python": null,
+          "version": "0.15"
         },
         {
           "artifacts": [
@@ -3662,48 +3681,48 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "ffff3418dc753a2aed2d00200a4daeaac295c40458f8012836a65555f288be8b",
-              "url": "https://files.pythonhosted.org/packages/39/3b/dfb74ca88b5e8f149bfb6adc1159e1e165e7a9cdd1454beec04b73db74ee/watchfiles-0.17.0-cp37-abi3-musllinux_1_1_x86_64.whl"
+              "hash": "cfdbfc4b6797c28dd1a8524581fed00ca333971b4111af8cd42fb7a92dcdc227",
+              "url": "https://files.pythonhosted.org/packages/eb/40/464afc392f87199abb7d87387f1c414b4bde09a3f5ee950452cfe3f1d8b1/watchfiles-0.18.0-cp37-abi3-musllinux_1_1_x86_64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "1dd1e3181ad5d83ca35e9147c72e24f39437fcdf570c9cdc532016399fb62957",
-              "url": "https://files.pythonhosted.org/packages/4c/ef/08933cdfdfa7e0e206cf5b14dee5db6b61a52f8cef5ecb9e1e203e33eaf8/watchfiles-0.17.0-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl"
+              "hash": "d5d799614d4c56d29c5ba56f4f619f967210dc10a0d6965b62d326b9e2f72c9e",
+              "url": "https://files.pythonhosted.org/packages/04/58/9d7bd8868fcc598f46f0f5b11df6428dc5aa942a0ebcef535baeac9f5df6/watchfiles-0.18.0-cp37-abi3-macosx_11_0_arm64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "ae7c57ef920589a40270d5ef3216d693f4e6f8864d8fc8b6cb7885ca98ad2a61",
-              "url": "https://files.pythonhosted.org/packages/64/4a/d3916ad0c51aaf2ce9e24a71a49ae2274009e370962852bd9de4170cbea4/watchfiles-0.17.0.tar.gz"
+              "hash": "1686bc4ac40ffde7256b6543b0f9a2cc8b531ae45243786f1d3f1dda2fe39e24",
+              "url": "https://files.pythonhosted.org/packages/3a/78/575c946a72305b5ba4862ebb855ee951608de61a3dd85c898a188704432a/watchfiles-0.18.0-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "92675f379a9d5adbc6a52179f3e39aa56944c6eecb80384608fff2ed2619103a",
-              "url": "https://files.pythonhosted.org/packages/6a/e3/b17d27724a2deea610ae08fd71167192f4c8e943e6d8e873f5418c5a2fd4/watchfiles-0.17.0-cp37-abi3-manylinux_2_12_x86_64.manylinux2010_x86_64.whl"
+              "hash": "39b932b044fef6c43e813e0bef908e0edf185bf7b5d8d53246651cb7ac9efe79",
+              "url": "https://files.pythonhosted.org/packages/4c/d8/cd598f6938a3380d11e24964f3acd0dbb74cbfd6538f8cdfc478dfa3e371/watchfiles-0.18.0-cp37-abi3-manylinux_2_12_i686.manylinux2010_i686.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "204950f1d6083539af5c8b7d4f5f8039c3ce36fa692da12d9743448f3199cb15",
-              "url": "https://files.pythonhosted.org/packages/71/71/7d0a44871d316f6143d91bf8d773050b86ae19aeea629bf301a6c8c8c945/watchfiles-0.17.0-cp37-abi3-manylinux_2_17_armv7l.manylinux2014_armv7l.whl"
+              "hash": "bbe10d134eef1666451382015e48f092c941a6d4562a98ffa1a288f79a897c46",
+              "url": "https://files.pythonhosted.org/packages/86/77/93890b16c82d08137b95cef4629914e41df78480108b04ab447e9adb13c5/watchfiles-0.18.0.tar.gz"
             },
             {
               "algorithm": "sha256",
-              "hash": "4056398d8f6d4972fe0918707b59d4cb84470c91d3c37f0e11e5a66c2a598760",
-              "url": "https://files.pythonhosted.org/packages/77/0b/9bf88af4daae12b8ea9dfbc5cae83843a6fc7673f10ea568d8f4288a2abb/watchfiles-0.17.0-cp37-abi3-musllinux_1_1_aarch64.whl"
+              "hash": "320bcde0adaa972403ed3b70f784409437325a1a4df2de54ba0672203d8847e5",
+              "url": "https://files.pythonhosted.org/packages/ef/b7/663c5f3a4ae99e7d7b3cd787f756ce618013799b6f8e3b008c5a0bab602c/watchfiles-0.18.0-cp37-abi3-manylinux_2_17_armv7l.manylinux2014_armv7l.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "c7e1ffbd03cbcb46d1b7833e10e7d6b678ab083b4e4b80db06cfff5baca3c93f",
-              "url": "https://files.pythonhosted.org/packages/86/83/27325bf6e86ddde518c6a51ca8b31035757ae33e6246dc4682999e902190/watchfiles-0.17.0-cp37-abi3-macosx_10_7_x86_64.whl"
+              "hash": "fd4215badad1e3d1ad5fb79f21432dd5157e2e7b0765d27a19dc2a28580c6979",
+              "url": "https://files.pythonhosted.org/packages/ef/bb/bfcd1165f0dc06d7fdc09a042640b2e2c9a0119493d5ce42ec4bbc52cd32/watchfiles-0.18.0-cp37-abi3-musllinux_1_1_aarch64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "539bcdb55a487126776c9d8c011094214d1df3f9a2321a6c0b1583197309405a",
-              "url": "https://files.pythonhosted.org/packages/ee/34/a250d5dc73c7eaaaf0ec720359f3f83898411e0434c03273c8705fc22818/watchfiles-0.17.0-cp37-abi3-macosx_11_0_arm64.whl"
+              "hash": "4ba6d8c2f957cae3e888bc250bc60ed09fe869b3f55f09d020ed3fecbefb6a4c",
+              "url": "https://files.pythonhosted.org/packages/fa/a4/cdf121a2e2d7f39388bda35879e533e78cfa9a97fa237b44b445d3a7e88b/watchfiles-0.18.0-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "00e5f307a58752ec1478eeb738863544bde21cc7a2728bd1c216060406bde9c1",
-              "url": "https://files.pythonhosted.org/packages/f9/55/d3027b9c636799a02ec65b6ac3b81607fff4c7f0603fda58258dd06ffa6b/watchfiles-0.17.0-cp37-abi3-manylinux_2_12_i686.manylinux2010_i686.whl"
+              "hash": "76a4c4a8e25a2c9a4f7fa3d373bbaf5558c17b97b4cf8411d33de368fe6b68a9",
+              "url": "https://files.pythonhosted.org/packages/fe/1d/73d00065fc7e2abffc970ed41ed749c74a33d598d40a139ea8fb0f23cd6c/watchfiles-0.18.0-cp37-abi3-macosx_10_7_x86_64.whl"
             }
           ],
           "project_name": "watchfiles",
@@ -3711,7 +3730,7 @@
             "anyio<4,>=3.0.0"
           ],
           "requires_python": ">=3.7",
-          "version": "0.17"
+          "version": "0.18"
         },
         {
           "artifacts": [
@@ -3962,6 +3981,7 @@
     "iso4217==1.11.20220401",
     "isodate==0.6.1",
     "jinja2==3.1.2",
+    "json_api_doc==0.15.0",
     "jsonschema==4.16.0",
     "lagom==2.0.0",
     "mongomock-motor==0.0.13",

@@ -628,9 +628,9 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
         identifier: str,
         include: Optional[Sequence[order_includes]] = None,
     ) -> dict[str, Any]:
-        query_parameters: dict[str, Sequence[order_includes]] = {}
+        query_parameters: dict[str, str] = {}
         if include:
-            query_parameters["include"] = include
+            query_parameters["include"] = ",".join(include)
         return await self._make_request(
             method=_METHOD_GET,
             url="/orders/{0}".format(identifier),

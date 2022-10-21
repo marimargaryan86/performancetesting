@@ -1,9 +1,11 @@
 <html>
     <body>
         <div style="max-width: fit-content;">
-            These details have been forwarded from the {{company_name}} app. <br>
-            <br>Journey details<br>
-            Booking reference - {{reference}}
+            Thank you for booking with {{company_name}}. Please find below the details of you booking. <br>
+            Please note that your booking has been received by the team and you will receive
+            an email with your complete itinerary and ticket details. Should you need any assistance
+            in the meantime please email {{support_email}}<br>
+            <br>Itinerary details Booking reference - {{reference}}
             {% for leg in details %}
                 <hr style="border-top: dotted 1px;">
                 <div>
@@ -16,11 +18,20 @@
                     {% endif %}
                     {%if leg.legType == 'rail'%}
                         <h4>Rail {{leg.ref}}</h4>
-                        Departure - {{leg.origin.name}} {{leg.departureAt}}<br>
-                        Arrival - {{leg.destination.name}} {{leg.arrivalAt}}
+                        Departure - {{leg.origin.name}} <br>{{leg.departureAt}} (local time)
+                  <br><br>
+                        Arrival - {{leg.destination.name}} <br>{{leg.arrivalAt}} (local time)
                     {% endif %}
                 </div>
             {% endfor %}
+          <hr style="border-top: dotted 1px;">
+          Passengers <br>
+          {% for passenger in passengers %}
+            {{passenger.lastName}} {{passenger.firstName}}<br>
+          {% endfor %}
+          <br>Issuing Agent <br>
+          Diplomat Travel on behalf of Snowfall Travel <br>
+          68 Voutsina Str., 5561 Holargos Athens, Greece {{support_email}}
         </div>
     </body>
 </html>
