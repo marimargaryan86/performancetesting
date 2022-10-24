@@ -1,5 +1,6 @@
 import abc
-from typing import Any, Generic, Mapping, Type, TypeVar
+import contextlib
+from typing import Any, Generic, Mapping, Type, TypeVar, cast
 
 import pydantic
 import rapidjson
@@ -67,7 +68,13 @@ class PydanticCoder(Generic[Model], BaseCoder[Model]):
         self._model = model
 
     def decode(self, as_dict: Mapping[str, Any]) -> Model:
-        as_dict = normalizers.denormalize(self._model, as_dict)
+        as_dict = cast(
+            dict[str, str],
+            normalizers.denormalize(self._model, as_dict),
+        )
+
+        with contextlib.suppress(KeyError):
+            as_dict["id"] = str(as_dict["id"])
 
         return self._model.parse_raw(rapidjson.dumps(as_dict))
 
