@@ -34,8 +34,6 @@ variable "junction_api_URL" {
   type = string
 }
 
-
-
 job "mobile-api-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
