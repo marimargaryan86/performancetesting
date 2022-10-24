@@ -1,5 +1,5 @@
 [GLOBAL]
-pants_version = "2.14.0rc2"
+pants_version = "2.14.0rc5"
 build_file_prelude_globs = ["python/snowfall/plugin/pants/macros.py"]
 backend_packages = [
     "pants.backend.codegen.protobuf.lint.buf",
@@ -24,7 +24,7 @@ backend_packages = [
 enabled = false
 
 [autoflake]
-version = "autoflake==1.6.1"
+version = "autoflake==1.7.7"
 lockfile = "vendor/lock/autoflake.txt"
 args = ["--remove-all-unused-imports", "--remove-unused-variables"]
 
@@ -39,10 +39,21 @@ extra_requirements = [
 ]
 
 [black]
-version = "black==22.8.0"
+version = "black==22.10.0"
 config = "vendor/pyproject.toml"
 lockfile = "vendor/lock/black.txt"
 interpreter_constraints = ["CPython==3.10.5"]
+
+[buf]
+version = "1.9.0"
+lint_args = ["--config", "'version: v1\nlint:\n  use:\n    - DEFAULT\n    - UNARY_RPC\n    - PACKAGE_NO_IMPORT_CYCLE\n'"]
+url_template = "https://github.com/bufbuild/buf/releases/download/v{version}/buf-{platform}.tar.gz"
+known_versions = [
+    "1.9.0|linux_arm64 |46c64043b308a23b1e50a5daacc74e3895ffbc8ca2258c9c84b5ffd23c4419d7|15342506",
+    "1.9.0|linux_x86_64|6c1e7258b79273c60085df8825a52a5ee306530e7327942c91ec84545cd2d40a|16836275",
+    "1.9.0|macos_arm64 |1a6333bc1b6977b8d41b0deaa020c45624fd0810c00943c8c84624b13c170f21|17367856",
+    "1.9.0|macos_x86_64|27ea882bdaf5a4e46410fb3f5ef3507f6ce65cc8e6f4c943c37e89683b2866fb|17849449",
+]
 
 [cli.alias]
 all-changed = "--changed-since=main --changed-dependees=transitive"
@@ -90,27 +101,28 @@ lockfile = "vendor/lock/isort.txt"
 interpreter_constraints = ["CPython==3.10.5"]
 
 [mypy]
-version = "mypy==0.981"
+version = "mypy==0.982"
 config = "vendor/setup.cfg"
 lockfile = "vendor/lock/mypy.txt"
 interpreter_constraints = ["CPython==3.10.5"]
 extra_requirements = ["pydantic"]
 
 [mypy-protobuf]
-version = "mypy-protobuf==3.3.0"
+version = "mypy-protobuf==3.4.0"
 lockfile = "vendor/lock/mypy-protobuf.txt"
+extra_requirements = ["protobuf>=4.21.8"]
 
 [poetry]
 interpreter_constraints = ["CPython==3.10.5"]
 
 [protoc]
-version = "21.5"
+version = "21.8"
 url_platform_mapping = { linux_arm64 = "linux-aarch_64", linux_x86_64 = "linux-x86_64", macos_arm64 = "osx-aarch_64", macos_x86_64 = "osx-x86_64" }
 known_versions = [
-    "21.5|linux_arm64 |60744ee6be123f86921c86d83d0060a7261410e246eca9e7a5c195100a89d391|1581318",
-    "21.5|linux_x86_64|92fb4f5066a6f7b870e09c73115a2c861852af8f6555d8da9955fdb80710bf7f|1585173",
-    "21.5|macos_arm64 |b22aed8dce62656687c6c4a323aab4e6baf1cb81ee423e77bc671bd69679e2c3|1360448",
-    "21.5|macos_x86_64|495d86aaaf5e8b536fbf04471ee9d7b21addeee5f1e949742c67bd09bb59c890|1496925",
+    "21.8|linux_arm64 |f3d8eb5839d6186392d8c7b54fbeabbb6fcdd90618a500b77cb2e24faa245cad|1579779",
+    "21.8|linux_x86_64|f90d0dd59065fef94374745627336d622702b67f0319f96cee894d41a974d47a|1583986",
+    "21.8|macos_arm64 |430b644f190e9def5034d641d4e1e0939d59c4bef28a73656a390c3314d44d88|1363556",
+    "21.8|macos_x86_64|e1f32612386601ce703dfa10c4ec8b8187e1bf89762b3241f0caa481339cad46|1500574",
 ]
 
 [pytest]

@@ -4,13 +4,17 @@
 //
 // --- BEGIN PANTS LOCKFILE METADATA: DO NOT EDIT OR REMOVE ---
 // {
-//   "version": 2,
+//   "version": 3,
 //   "valid_for_interpreter_constraints": [
 //     "CPython<4,>=3.7"
 //   ],
 //   "generated_with_requirements": [
-//     "autoflake==1.6.1"
-//   ]
+//     "autoflake==1.7.7"
+//   ],
+//   "manylinux": "manylinux2014",
+//   "requirement_constraints": [],
+//   "only_binary": [],
+//   "no_binary": []
 // }
 // --- END PANTS LOCKFILE METADATA ---
 
@@ -27,13 +31,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "dfef4c851fb07e6111f9115d3e7c8c52d8564cbf71c12ade2d8b8a2a7b8bd176",
-              "url": "https://files.pythonhosted.org/packages/14/31/bb02ec9fd27b688dfa966c1bd71b21337c1765aec7d69376657757173369/autoflake-1.6.1-py2.py3-none-any.whl"
+              "hash": "a9b43d08f8e455824e4f7b3f078399f59ba538ba53872f466c09e55c827773ef",
+              "url": "https://files.pythonhosted.org/packages/da/7d/6cfefbc9db987d211526a62ea79a8bdc3fdde0e0c04282bc6db07be5fc58/autoflake-1.7.7-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "72bce741144ef6db26005d47dba242c1fd6a91ea53f7f4c5a90ad4b051e394c2",
-              "url": "https://files.pythonhosted.org/packages/7c/39/4cb913a80105c532f33f5c3a52f01e3d64fa7f1de2a8c1106cf40ff21d2b/autoflake-1.6.1.tar.gz"
+              "hash": "c8e4fc41aa3eae0f5c94b939e3a3d50923d7a9306786a6cbf4866a077b8f6832",
+              "url": "https://files.pythonhosted.org/packages/30/67/87494f5acb710faa4fb5688e2957150385eb610a4fdad6c2848ef374fe30/autoflake-1.7.7.tar.gz"
             }
           ],
           "project_name": "autoflake",
@@ -42,7 +46,7 @@
             "tomli>=2.0.1; python_version < \"3.11\""
           ],
           "requires_python": ">=3.7",
-          "version": "1.6.1"
+          "version": "1.7.7"
         },
         {
           "artifacts": [
@@ -85,10 +89,11 @@
     }
   ],
   "path_mappings": {},
-  "pex_version": "2.1.102",
+  "pex_version": "2.1.108",
+  "pip_version": "20.3.4-patched",
   "prefer_older_binary": false,
   "requirements": [
-    "autoflake==1.6.1"
+    "autoflake==1.7.7"
   ],
   "requires_python": [
     "<4,>=3.7"

@@ -4,7 +4,7 @@
 //
 // --- BEGIN PANTS LOCKFILE METADATA: DO NOT EDIT OR REMOVE ---
 // {
-//   "version": 2,
+//   "version": 3,
 //   "valid_for_interpreter_constraints": [
 //     "CPython==3.10.5"
 //   ],
@@ -22,7 +22,11 @@
 //     "flake8==4.0.1",
 //     "setuptools",
 //     "wemake-python-styleguide"
-//   ]
+//   ],
+//   "manylinux": "manylinux2014",
+//   "requirement_constraints": [],
+//   "only_binary": [],
+//   "no_binary": []
 // }
 // --- END PANTS LOCKFILE METADATA ---
 
@@ -308,26 +312,22 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "7706babee43879320376861897e5d1468e396a40b8918ed7bccf70e5f90b8687",
-              "url": "https://files.pythonhosted.org/packages/fb/84/6ee650fc479ecee8f143d20fdb7526595ef8c41382d24cc380c4c08e1aac/flake8_builtins-1.5.3-py2.py3-none-any.whl"
+              "hash": "39bfa3badb5e8d22f92baf4e0ea1b816707245233846932d6b13e81fc6f673e8",
+              "url": "https://files.pythonhosted.org/packages/9b/ee/39cfe9ab07e8e9e765158ae8cd9ff1357752b1e6c216e697f68f84f89b04/flake8_builtins-2.0.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "09998853b2405e98e61d2ff3027c47033adbdc17f9fe44ca58443d876eb00f3b",
-              "url": "https://files.pythonhosted.org/packages/84/5a/bdeb2ffd2bbf200d17bd4c654a1c789380ca654515cdd321696ee6c80189/flake8-builtins-1.5.3.tar.gz"
+              "hash": "98833fa16139a75cd4913003492a9bd9a61c6f8ac146c3db12a2ebaf420dade3",
+              "url": "https://files.pythonhosted.org/packages/9b/ed/2ac3f3438df4df10d02f06868a91ae56a71ac68f82dca15dc35aec85d808/flake8-builtins-2.0.0.tar.gz"
             }
           ],
           "project_name": "flake8-builtins",
           "requires_dists": [
-            "coverage; extra == \"test\"",
-            "coveralls; extra == \"test\"",
             "flake8",
-            "mock; extra == \"test\"",
-            "pytest-cov; extra == \"test\"",
             "pytest; extra == \"test\""
           ],
           "requires_python": null,
-          "version": "1.5.3"
+          "version": "2"
         },
         {
           "artifacts": [
@@ -501,8 +501,8 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "54f7e349c934ce5c594f251885bc2240e99f6b48752a672a8fc7e3d1388352bb",
-              "url": "https://files.pythonhosted.org/packages/e4/12/7478d1c3a2d4eb4c9b28a6ab4b9d8c7e46124dcd16e9f59af6bd042ec2a3/flake8-logging-format-0.7.5.tar.gz"
+              "hash": "fecab361ff1700d4550cedbd3f4475d45eda01fcaa800768c9551d2ced16b780",
+              "url": "https://files.pythonhosted.org/packages/cc/a5/27d601e17d782a21ca5b0db18e69dd4b8dcd4e23e517b0a71367a62b54be/flake8-logging-format-0.8.1.tar.gz"
             }
           ],
           "project_name": "flake8-logging-format",
@@ -513,7 +513,7 @@
             "pytest; extra == \"test\""
           ],
           "requires_python": null,
-          "version": "0.7.5"
+          "version": "0.8.1"
         },
         {
           "artifacts": [
@@ -760,13 +760,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "5b68b000463593e05ff2b261acff0ff0972df8ab1b70d3cdbd41b546c8b8fc3d",
-              "url": "https://files.pythonhosted.org/packages/83/32/ce68915670da6fd6b1e3fb4b3554b4462512f6441dddd194fc0f4f6ec653/GitPython-3.1.27-py3-none-any.whl"
+              "hash": "41eea0deec2deea139b459ac03656f0dd28fc4a3387240ec1d3c259a2c47850f",
+              "url": "https://files.pythonhosted.org/packages/1f/d3/020efb312a7d25fa00e144497a33378d415552e5581be080a99017af6d39/GitPython-3.1.29-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "1c885ce809e8ba2d88a29befeb385fcea06338d3640712b59ca623c220bb5704",
-              "url": "https://files.pythonhosted.org/packages/d6/39/5b91b6c40570dc1c753359de7492404ba8fe7d71af40b618a780c7ad1fc7/GitPython-3.1.27.tar.gz"
+              "hash": "cc36bfc4a3f913e66805a28e84703e419d9c264c1077e537b54f0e1af85dbefd",
+              "url": "https://files.pythonhosted.org/packages/22/ab/3dd8b8a24399cee9c903d5f7600d20e8703d48904020f46f7fa5ac5474e9/GitPython-3.1.29.tar.gz"
             }
           ],
           "project_name": "gitpython",
@@ -775,7 +775,7 @@
             "typing-extensions>=3.7.4.3; python_version < \"3.8\""
           ],
           "requires_python": ">=3.7",
-          "version": "3.1.27"
+          "version": "3.1.29"
         },
         {
           "artifacts": [
@@ -823,19 +823,19 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "da3e18aac0a3c003e9eea1a81bd23e5a3a75d745670dcf736317b7d966887fdf",
-              "url": "https://files.pythonhosted.org/packages/88/fb/c7958b2d571c7b15091b8574a727ad14328e8de590644198e57de9b5ee57/pbr-5.10.0-py2.py3-none-any.whl"
+              "hash": "db2317ff07c84c4c63648c9064a79fe9d9f5c7ce85a9099d4b6258b3db83225a",
+              "url": "https://files.pythonhosted.org/packages/e5/37/10e8a53f196cf0bcb93008daed42e2c47c7876430a7efd044ff4d647f30a/pbr-5.11.0-py2.py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "cfcc4ff8e698256fc17ea3ff796478b050852585aa5bae79ecd05b2ab7b39b9a",
-              "url": "https://files.pythonhosted.org/packages/b4/40/4c5d3681b141a10c24c890c28345fac915dd67f34b8c910df7b81ac5c7b3/pbr-5.10.0.tar.gz"
+              "hash": "b97bc6695b2aff02144133c2e7399d5885223d42b7912ffaec2ca3898e673bfe",
+              "url": "https://files.pythonhosted.org/packages/52/fb/630d52aaca8fc7634a0711b6ae12a0e828b6f9264bd8051225025c3ed075/pbr-5.11.0.tar.gz"
             }
           ],
           "project_name": "pbr",
           "requires_dists": [],
           "requires_python": ">=2.6",
-          "version": "5.10"
+          "version": "5.11"
         },
         {
           "artifacts": [
@@ -991,13 +991,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "c2d2709550f15aab6c9110196ea312f468f41cd546bceb24127a1be6fdcaeeb1",
-              "url": "https://files.pythonhosted.org/packages/d5/e6/e3a70a77dda22766b9ef4ff47ff8320720311e78d11d1401baffca3f6879/setuptools-65.4.0-py3-none-any.whl"
+              "hash": "f62ea9da9ed6289bfe868cd6845968a2c854d1427f8548d52cae02a42b4f0356",
+              "url": "https://files.pythonhosted.org/packages/41/82/7f54bbfe5c247a8c9f78d8d1d7c051847bcb78843c397b866dba335c1e88/setuptools-65.5.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "a8f6e213b4b0661f590ccf40de95d28a177cd747d098624ad3f69c40287297e9",
-              "url": "https://files.pythonhosted.org/packages/4c/61/86c94ae2cccb05749abfb1b2961125d40368c8f03ac59275550c45e634f1/setuptools-65.4.0.tar.gz"
+              "hash": "512e5536220e38146176efb833d4a62aa726b7bbff82cfbc8ba9eaa3996e0b17",
+              "url": "https://files.pythonhosted.org/packages/c5/41/247814d8b7a044717164c74080725a6c8f3d2b5fc82b34bd825b617df663/setuptools-65.5.0.tar.gz"
             }
           ],
           "project_name": "setuptools",
@@ -1038,7 +1038,7 @@
             "sphinx-inline-tabs; extra == \"docs\"",
             "sphinx-notfound-page==0.8.3; extra == \"docs\"",
             "sphinx-reredirects; extra == \"docs\"",
-            "sphinx; extra == \"docs\"",
+            "sphinx>=3.5; extra == \"docs\"",
             "sphinxcontrib-towncrier; extra == \"docs\"",
             "tomli-w>=1.0.0; extra == \"testing\"",
             "tomli; extra == \"testing-integration\"",
@@ -1048,7 +1048,7 @@
             "wheel; extra == \"testing-integration\""
           ],
           "requires_python": ">=3.7",
-          "version": "65.4"
+          "version": "65.5"
         },
         {
           "artifacts": [
@@ -1090,13 +1090,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "87e4d27fe96d0d7e4fc24f0cbe3463baae4ec51e81d95fbe60d2474636e0c7d8",
-              "url": "https://files.pythonhosted.org/packages/d5/f7/7593812b0687e8aaf01b10f7f07bf59e5a6bbfcd9d657cefdeb48a72cd06/stevedore-4.0.0-py3-none-any.whl"
+              "hash": "3b1cbd592a87315f000d05164941ee5e164899f8fc0ce9a00bb0f321f40ef93e",
+              "url": "https://files.pythonhosted.org/packages/1e/ec/147ee629ff89cef1184293682a9a97ffeeef87daa180ce788b8980bbe8fd/stevedore-4.1.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "f82cc99a1ff552310d19c379827c2c64dd9f85a38bcd5559db2470161867b786",
-              "url": "https://files.pythonhosted.org/packages/f5/70/7953626fd19faa7a0852779c1949650e825f650ee6060f68658a84584c26/stevedore-4.0.0.tar.gz"
+              "hash": "02518a8f0d6d29be8a445b7f2ac63753ff29e8f2a2faa01777568d5500d777a6",
+              "url": "https://files.pythonhosted.org/packages/62/4c/5445ea215b920e55f40a4f519571d5bfffb81c2f0c9ba4f2c70b1b501954/stevedore-4.1.0.tar.gz"
             }
           ],
           "project_name": "stevedore",
@@ -1104,25 +1104,25 @@
             "pbr!=2.1.0,>=2.0.0"
           ],
           "requires_python": ">=3.8",
-          "version": "4"
+          "version": "4.1"
         },
         {
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "25642c956049920a5aa49edcdd6ab1e06d7e5d467fc00e0506c44ac86fbfca02",
-              "url": "https://files.pythonhosted.org/packages/ed/d6/2afc375a8d55b8be879d6b4986d4f69f01115e795e36827fd3a40166028b/typing_extensions-4.3.0-py3-none-any.whl"
+              "hash": "16fa4864408f655d35ec496218b85f79b3437c829e93320c7c9215ccfd92489e",
+              "url": "https://files.pythonhosted.org/packages/0b/8e/f1a0a5a76cfef77e1eb6004cb49e5f8d72634da638420b9ea492ce8305e8/typing_extensions-4.4.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "e6d2677a32f47fc7eb2795db1dd15c1f34eff616bcaf2cfb5e997f854fa1c4a6",
-              "url": "https://files.pythonhosted.org/packages/9e/1d/d128169ff58c501059330f1ad96ed62b79114a2eb30b8238af63a2e27f70/typing_extensions-4.3.0.tar.gz"
+              "hash": "1511434bb92bf8dd198c12b1cc812e800d4181cfcb867674e0f8279cc93087aa",
+              "url": "https://files.pythonhosted.org/packages/e3/a7/8f4e456ef0adac43f452efc2d0e4b242ab831297f1bac60ac815d37eb9cf/typing_extensions-4.4.0.tar.gz"
             }
           ],
           "project_name": "typing-extensions",
           "requires_dists": [],
           "requires_python": ">=3.7",
-          "version": "4.3"
+          "version": "4.4"
         },
         {
           "artifacts": [
@@ -1168,7 +1168,8 @@
     }
   ],
   "path_mappings": {},
-  "pex_version": "2.1.102",
+  "pex_version": "2.1.108",
+  "pip_version": "20.3.4-patched",
   "prefer_older_binary": false,
   "requirements": [
     "flake8-annotations",
