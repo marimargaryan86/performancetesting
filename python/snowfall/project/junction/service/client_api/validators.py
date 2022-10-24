@@ -25,7 +25,7 @@ _OfferSearchEndpointSignature = Callable[
         _Endpoint,
         requests.Request,
         offer_searches.Client,
-        Sequence[models_pb2.Segment],
+        Sequence[models_pb2.Trip],
     ],
     Awaitable[responses.Response],
 ]
@@ -63,25 +63,15 @@ def offer_search_request_validator(
             ).trips
         }
 
-        segments = [segment for trip in trips_map.values() for segment in trip.segments]
-        leg_ids = {leg_id for segment in segments for leg_id in segment.leg_ids}
-        segments_and_errors = _validate_trips(
+        trips_list, errors = _validate_trips(
             body,
             trips_map,
-            {
-                leg.id: leg
-                for leg in (
-                    await legs_client.find_by_ids(
-                        list(leg_ids),
-                        limit=len(leg_ids),
-                    )
-                ).legs
-            },
+            await _make_legs_map(legs_client, trips_map),
         )
 
-        if segments_and_errors[1]:
+        if errors:
             return models.JsonApiResponse(
-                models.Body(errors=segments_and_errors[1]),
+                models.Body(errors=errors),
                 status_code=status.HTTP_404_NOT_FOUND,
             )
 
@@ -89,18 +79,49 @@ def offer_search_request_validator(
             self,
             request,
             offer_search_client,
-            segments_and_errors[0],
+            sorted(
+                trips_list,
+                key=lambda trip: (
+                    trip.segments[0].legs[0].departure_at.seconds,  # noqa: WPS219
+                    trip.segments[0].legs[0].departure_at.nanos,  # noqa: WPS219
+                ),
+            ),
         )
 
     return wrapper
+
+
+async def _make_legs_map(
+    legs_client: legs.Client,
+    trips_map: Mapping[str, models_pb2.TripReference],
+) -> dict[str, models_pb2.Leg]:
+    segments = [segment for trip in trips_map.values() for segment in trip.segments]
+    leg_ids = {leg_id for segment in segments for leg_id in segment.leg_ids}
+
+    return {
+        leg.id: leg
+        for leg in (
+            await legs_client.find_by_ids(
+                list(leg_ids),
+                limit=len(leg_ids),
+            )
+        ).legs
+    }
+
+
+def _sort_keys(segment: models_pb2.Segment) -> tuple[int, int]:
+    return (
+        segment.legs[0].departure_at.seconds,
+        segment.legs[0].departure_at.nanos,
+    )
 
 
 def _validate_trips(
     body: Mapping[str, Any],
     trips_map: Mapping[str, models_pb2.TripReference],
     legs_map: Mapping[str, models_pb2.Leg],
-) -> tuple[list[models_pb2.Segment], list[models.Error]]:
-    segments_list: list[models_pb2.Segment] = []
+) -> tuple[list[models_pb2.Trip], list[models.Error]]:
+    trips_list: list[models_pb2.Trip] = []
     errors: list[models.Error] = []
 
     for trip_idx, trip_id in enumerate(body["trips"]):
@@ -120,14 +141,20 @@ def _validate_trips(
             continue
 
         try:
-            segments_list.extend(
-                [
-                    models_pb2.Segment(
-                        id=segment.id,
-                        legs=[legs_map[leg_id] for leg_id in segment.leg_ids],
-                    )
-                    for segment in trips_map[trip_id].segments
-                ],
+            trips_list.append(
+                models_pb2.Trip(
+                    id=trip_id,
+                    segments=sorted(
+                        [
+                            models_pb2.Segment(
+                                id=segment.id,
+                                legs=[legs_map[leg_id] for leg_id in segment.leg_ids],
+                            )
+                            for segment in trips_map[trip_id].segments
+                        ],
+                        key=_sort_keys,
+                    ),
+                ),
             )
         except KeyError:
             errors.append(
@@ -143,7 +170,7 @@ def _validate_trips(
                 ),
             )
 
-    return segments_list, errors
+    return trips_list, errors
 
 
 def order_request_validator(  # noqa: WPS320

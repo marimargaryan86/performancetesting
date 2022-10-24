@@ -312,13 +312,13 @@ class OfferSearches(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         offer_search_client: offer_searches.Client,
-        segments: Sequence[common_pb2.Segment],
+        trips_list: Sequence[common_pb2.Trip],
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
         offer_search = await offer_search_client.create(
             request=models_pb2.OfferSearch(
                 trip=models_pb2.TripOfferSearch(
-                    segments=segments,
+                    trips=trips_list,
                     passengers=[
                         models_pb2.Passenger(
                             date_of_birth=protobuf.date_to_protobuf(

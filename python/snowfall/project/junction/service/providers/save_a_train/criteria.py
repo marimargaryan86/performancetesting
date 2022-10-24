@@ -20,7 +20,9 @@ class CriteriaGenerator(object):
         self,
         search_task: offers_amqp_pb2.TripOfferSearchTask,
     ) -> Iterator[amqp_pb2.SearchCriteriaTask]:
-        for segment in search_task.search.segments:
+        segments = itertools.chain(*[tr.segments for tr in search_task.search.trips])
+
+        for segment in segments:
             first_leg = more_itertools.first(segment.legs)
             last_leg = more_itertools.last(segment.legs)
 

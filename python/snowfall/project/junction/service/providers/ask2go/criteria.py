@@ -78,7 +78,8 @@ class CriteriaGenerator(object):
             date=_get_last_travel_date(search_task),
         )
 
-        segments_details = self.generate_segment_details(search_task.search.segments)
+        segments = itertools.chain(*[tr.segments for tr in search_task.search.trips])
+        segments_details = self.generate_segment_details(list(segments))
         for trip_details in generate_potential_return_trips(list(segments_details)):
             task = provider_amqp_pb2.SearchCriteriaTask(
                 offer_search_id=search_task.offer_search_id,
@@ -113,11 +114,13 @@ class CriteriaGenerator(object):
 def _get_last_travel_date(
     search_task: amqp_pb2.TripOfferSearchTask,
 ) -> datetime.date:
+    segments = itertools.chain(*[tr.segments for tr in search_task.search.trips])
+
     return max(
         protobuf.protobuf_to_datetime(
             more_itertools.last(segment.legs).departure_at,
         ).date()
-        for segment in search_task.search.segments
+        for segment in segments
     )
 
 

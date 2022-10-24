@@ -1,4 +1,5 @@
 import datetime
+import itertools
 import random
 from collections.abc import AsyncIterator
 from typing import Sequence, cast
@@ -22,6 +23,8 @@ class OffersMockClient(object):
         self,
         search: amqp_pb2.TripOfferSearchTask,
     ) -> AsyncIterator[offers_pb2.OfferGroup]:
+        segments = itertools.chain(*[tr.segments for tr in search.search.trips])
+
         yield offers_pb2.OfferGroup(
             id=string.uuid(),
             offer_search_id=search.offer_search_id,
@@ -32,7 +35,7 @@ class OffersMockClient(object):
                         offers_pb2.OfferSegmentDetails(
                             id=segment.id,
                         )
-                        for segment in search.search.segments
+                        for segment in segments
                     ],
                     price=models_pb2.Price(
                         amount=1337,
@@ -60,7 +63,7 @@ class OffersMockClient(object):
                     vendor="BA",
                     terminal="5",
                 )
-                for segment in search.search.segments
+                for segment in segments
                 for leg in segment.legs
             ],
             expires_at=protobuf.datetime_to_protobuf(

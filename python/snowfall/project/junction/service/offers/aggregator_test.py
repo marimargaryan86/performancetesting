@@ -14,9 +14,14 @@ _OFFER_SEARCHES = (
     offer_protos.OfferSearch(
         id="foo",
         trip=offer_protos.TripOfferSearch(
-            segments=[
-                models_pb2.Segment(
+            trips=[
+                models_pb2.Trip(
                     id="a",
+                    segments=[
+                        models_pb2.Segment(
+                            id="a",
+                        ),
+                    ],
                 ),
             ],
         ),
@@ -24,12 +29,17 @@ _OFFER_SEARCHES = (
     offer_protos.OfferSearch(
         id="foo",
         trip=offer_protos.TripOfferSearch(
-            segments=[
-                models_pb2.Segment(
+            trips=[
+                models_pb2.Trip(
                     id="a",
-                ),
-                models_pb2.Segment(
-                    id="b",
+                    segments=[
+                        models_pb2.Segment(
+                            id="a",
+                        ),
+                        models_pb2.Segment(
+                            id="b",
+                        ),
+                    ],
                 ),
             ],
         ),
@@ -37,15 +47,20 @@ _OFFER_SEARCHES = (
     offer_protos.OfferSearch(
         id="foo",
         trip=offer_protos.TripOfferSearch(
-            segments=[
-                models_pb2.Segment(
+            trips=[
+                models_pb2.Trip(
                     id="a",
-                ),
-                models_pb2.Segment(
-                    id="b",
-                ),
-                models_pb2.Segment(
-                    id="c",
+                    segments=[
+                        models_pb2.Segment(
+                            id="a",
+                        ),
+                        models_pb2.Segment(
+                            id="b",
+                        ),
+                        models_pb2.Segment(
+                            id="c",
+                        ),
+                    ],
                 ),
             ],
         ),

@@ -16,7 +16,7 @@ message OfferSearch {
 }
 
 message TripOfferSearch {
-  repeated snowfall.stdlib.v1alpha.Segment segments = 1;
+  repeated snowfall.stdlib.v1alpha.Trip trips = 1;
   repeated Passenger passengers = 2;
   LoyaltyCard loyalty_card = 3;
 }

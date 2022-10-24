@@ -1,5 +1,6 @@
 import collections
 import datetime
+import itertools
 from typing import Mapping, Sequence
 
 from snowfall.project.junction.service.offers import offers
@@ -143,7 +144,7 @@ class OfferAggregator(object):
         self._buckets = offer_buckets
         self._aggregates = offer_aggregates
 
-    async def aggregate(self, offer: models_pb2.OfferGroup) -> None:
+    async def aggregate(self, offer: models_pb2.OfferGroup) -> None:  # noqa: WPS210
         offer_search = await self._searches.find_by_id(offer.offer_search_id)
 
         if not offer_search:
@@ -159,8 +160,10 @@ class OfferAggregator(object):
 
         await self._buckets.add_offer(offer)
 
+        segments = itertools.chain(*[trip.segments for trip in offer_search.trip.trips])
+
         # check if all segments can be fulfilled by offers gotten so far
-        if any(segment.id not in buckets for segment in offer_search.trip.segments):
+        if any(segment.id not in buckets for segment in segments):
             return
 
         expires_at = await self._buckets.get_bucket_list_expiry(offer_search)

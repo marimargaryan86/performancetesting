@@ -78,6 +78,11 @@ message SegmentReference {
   repeated string leg_ids = 3;
 }
 
+message Trip {
+  string id = 1;
+  repeated Segment segments = 2;
+}
+
 message TripReference {
   string id = 1;
   repeated SegmentReference segments = 2;

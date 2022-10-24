@@ -13,28 +13,33 @@ from snowfall.stdlib.v1alpha import models_pb2 as common_models_pb2
 _SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
     offer_search_id="SEARCH1",
     search=models_pb2.TripOfferSearch(
-        segments=[
-            common_models_pb2.Segment(
-                id="SEGMENT1",
-                legs=[
-                    common_models_pb2.Leg(
-                        id="LEG1",
-                        origin=common_models_pb2.Point(
-                            coordinates=common_models_pb2.Coordinates(
-                                latitude=59.351209,
-                                longitude=-2.900537,
+        trips=[
+            common_models_pb2.Trip(
+                id="TRIP1",
+                segments=[
+                    common_models_pb2.Segment(
+                        id="SEGMENT1",
+                        legs=[
+                            common_models_pb2.Leg(
+                                id="LEG1",
+                                origin=common_models_pb2.Point(
+                                    coordinates=common_models_pb2.Coordinates(
+                                        latitude=59.351209,
+                                        longitude=-2.900537,
+                                    ),
+                                ),
+                                destination=common_models_pb2.Point(
+                                    coordinates=common_models_pb2.Coordinates(
+                                        latitude=59.350376,
+                                        longitude=-2.949954,
+                                    ),
+                                ),
+                                departure_at=protobuf.datetime_to_protobuf(
+                                    datetime.datetime.now(),
+                                ),
+                                type=common_models_pb2.Schedule.TYPE_AIR,
                             ),
-                        ),
-                        destination=common_models_pb2.Point(
-                            coordinates=common_models_pb2.Coordinates(
-                                latitude=59.350376,
-                                longitude=-2.949954,
-                            ),
-                        ),
-                        departure_at=protobuf.datetime_to_protobuf(
-                            datetime.datetime.now(),
-                        ),
-                        type=common_models_pb2.Schedule.TYPE_AIR,
+                        ],
                     ),
                 ],
             ),
