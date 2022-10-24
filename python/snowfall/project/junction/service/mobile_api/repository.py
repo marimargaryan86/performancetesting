@@ -20,6 +20,43 @@ _DEFAULT_PAGE_SIZE = 20
 _DICT_SEQUENCE = Sequence[dict[str, Any]]
 
 
+class RedisRepository(object):
+    def __init__(
+        self,
+        redis_client: redis.Client[str],
+        cache_ttl: datetime.timedelta,
+    ) -> None:
+        self._redis = redis_client
+        self._ttl = cache_ttl
+
+    async def create(self, identifier: str, atr_value: str) -> None:
+        await self._redis.put(identifier, atr_value)
+        await self._redis.put_expires_at(
+            identifier,
+            datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
+        )
+
+
+class OtpRepository(RedisRepository):
+    async def check(
+        self,
+        email: str,
+        verification_code: str,
+        delete_after: bool = False,
+    ) -> bool:
+        otp = await self._redis.get(email)
+        if otp == verification_code:
+            if delete_after:
+                await self._redis.delete(email)
+            return True
+        return False
+
+
+class OffersRatesRepository(RedisRepository):
+    async def get(self, identifier: str) -> Optional[str]:
+        return await self._redis.get(identifier)
+
+
 class PlacesRepository(
     mixins.FindByIdMixin[models_pb2.Place],
     mixins.InsertMixin[models_pb2.Place],
@@ -129,36 +166,6 @@ class UsersRepository(
             self._coder.encode(user),
         )
         return True
-
-
-class OtpRepository(object):
-    def __init__(
-        self,
-        redis_client: redis.Client[str],
-        cache_ttl: datetime.timedelta,
-    ) -> None:
-        self._redis = redis_client
-        self._ttl = cache_ttl
-
-    async def create(self, email: str, verification_code: str) -> None:
-        await self._redis.put(email, verification_code)
-        await self._redis.put_expires_at(
-            email,
-            datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
-        )
-
-    async def check(
-        self,
-        email: str,
-        verification_code: str,
-        delete_after: bool = False,
-    ) -> bool:
-        otp = await self._redis.get(email)
-        if otp == verification_code:
-            if delete_after:
-                await self._redis.delete(email)
-            return True
-        return False
 
 
 class StripeUsersRepository(

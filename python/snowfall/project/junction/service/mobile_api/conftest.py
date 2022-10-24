@@ -248,6 +248,18 @@ async def otp_repository(
 
 
 @pytest.fixture
+async def offers_rates_repository(
+    redis_client: redis.Client[str],
+    new_user_verification_code: VerificationCode,
+    existing_user_verification_code: VerificationCode,
+) -> repository.OffersRatesRepository:
+    return repository.OffersRatesRepository(
+        redis_client,
+        datetime.timedelta(minutes=20),  # noqa: WPS432
+    )
+
+
+@pytest.fixture
 async def places_repository(
     mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
     places_fixture: Sequence[Mapping[str, Any]],
@@ -301,6 +313,7 @@ def app(  # noqa: WPS211
     places_repository: repository.PlacesRepository,
     users_repository: repository.UsersRepository,
     otp_repository: repository.OtpRepository,
+    offers_rates_repository: repository.OffersRatesRepository,
     smtp_client: smtp.EmailClient,
     orders_repository: repository.OrdersRepository,
     junction_client: client.JunctionClient,
@@ -317,6 +330,7 @@ def app(  # noqa: WPS211
             places_repository,
             users_repository,
             otp_repository,
+            offers_rates_repository,
             smtp_client,
             jwt_gen,
             stripe_users_repository,

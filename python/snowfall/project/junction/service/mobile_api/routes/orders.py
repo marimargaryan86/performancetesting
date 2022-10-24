@@ -73,12 +73,13 @@ class Orders(endpoints.HTTPEndpoint):
             response_body.included = user_orders.get("included")
         return stdlib_models.JsonApiResponse(response_body)
 
-    async def post(
+    async def post(  # noqa: WPS211
         self,
         request: requests.Request,
         orders_repository: repository.OrdersRepository = lagom.injectable,
         junction_client: client.JunctionClient = lagom.injectable,
         smtp_client: smtp.EmailClient = lagom.injectable,
+        offers_rates_repository: repository.OffersRatesRepository = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
 
@@ -86,16 +87,20 @@ class Orders(endpoints.HTTPEndpoint):
             body["payment"],
             body["options"],
             junction_client,
+            offers_rates_repository,
         )
         if not correct_amount:
             stripe.PaymentIntent.cancel(body["payment"])
+            # TODO: split this into invalid amount & invalid currency. Create err func
             return stdlib_models.JsonApiResponse(
                 stdlib_models.Body(
                     errors=[
                         stdlib_models.Error(
                             status=str(status.HTTP_400_BAD_REQUEST),
-                            code="invalid_amount",
-                            detail="Payment's amount does not match with order",
+                            code="invalid_amount_or_currency",
+                            detail=(
+                                "Payment's amount or currency doesn't match with order"
+                            ),
                             source=stdlib_models.ErrorSource(
                                 pointer="/data/relationships/payment",
                             ),
@@ -165,12 +170,13 @@ class Orders(endpoints.HTTPEndpoint):
         )
 
 
-async def check_payment_amount_and_state(
+async def check_payment_amount_and_state(  # noqa: WPS210
     payment_intent_id: str,
     offer_options: Sequence[str],
     junction_client: client.JunctionClient,
+    offers_rates_repository: repository.OffersRatesRepository,
 ) -> Tuple[bool, bool]:
-    # TODO: check for currency as well (!473)
+    pi = stripe.PaymentIntent.retrieve(payment_intent_id)
     offer_amount = 0
     for offer_option in offer_options:
         offer_option_response = (
@@ -178,8 +184,17 @@ async def check_payment_amount_and_state(
                 offer_option,
             )
         )
+        rate = float(1)
+        if pi["currency"].upper() != "EUR":
+            rate_str = await offers_rates_repository.get(
+                "_".join(
+                    [offer_option_response["id"], "EUR", pi["currency"].upper()],
+                ),
+            )
+            if not rate_str:
+                return False, False
+            rate = float(rate_str)
         offer_amount += int(
-            float(offer_option_response["attributes"]["price"]["amount"]) * 100,
+            float(offer_option_response["attributes"]["price"]["amount"]) * 100 * rate,
         )
-    pi = stripe.PaymentIntent.retrieve(payment_intent_id)
     return pi["amount"] == offer_amount, pi["status"] == "confirmed"

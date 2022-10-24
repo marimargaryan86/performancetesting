@@ -16,6 +16,9 @@ class Settings(application.Settings):
     redis_dsn: Sequence[AnyUrl]
     places_cache_ttl: datetime.timedelta = datetime.timedelta(hours=1)
     otp_cache_ttl: datetime.timedelta = datetime.timedelta(minutes=2)
+    offers_rates_cache_ttl: datetime.timedelta = datetime.timedelta(
+        minutes=20,  # noqa: WPS432
+    )
     smtp_dsn: AnyUrl
     mongo_dsn: Sequence[AnyUrl]
     jwt_private_key: str
@@ -34,6 +37,7 @@ def create_dependencies(  # noqa: WPS211
     places_repository: repository.PlacesRepository,
     users_repository: repository.UsersRepository,
     otp_repository: repository.OtpRepository,
+    offers_rates_repository: repository.OffersRatesRepository,
     smtp_client: smtp.EmailClient,
     jwt_gen: jwt_generator.JwtGenerator,
     stripe_users_repository: repository.StripeUsersRepository,
@@ -47,6 +51,7 @@ def create_dependencies(  # noqa: WPS211
     container[repository.PlacesRepository] = places_repository
     container[repository.UsersRepository] = users_repository
     container[repository.OtpRepository] = otp_repository
+    container[repository.OffersRatesRepository] = offers_rates_repository
     container[smtp.EmailClient] = smtp_client
     container[jwt_generator.JwtGenerator] = jwt_gen
     container[repository.StripeUsersRepository] = stripe_users_repository

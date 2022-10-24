@@ -391,7 +391,7 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
         if cabin_class:
             query_parameters["filter[groups.options.details.cabinClass]"] = cabin_class
         if include:
-            query_parameters["include"] = include
+            query_parameters["include"] = ",".join(include)
         return await self._make_request(
             method=_METHOD_GET,
             url="/offers/searches/{0}/offers".format(offers_search_id),

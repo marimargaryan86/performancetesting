@@ -663,6 +663,9 @@
           },
           {
             "$ref": "#/components/parameters/filterOffersCabinClass"
+          },
+          {
+            "$ref": "#/components/parameters/offerCurrency"
           }
         ],
         "tags": [
@@ -726,6 +729,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         },
         "operationId": "get-offers-searches-id-offers",
@@ -1383,6 +1389,16 @@
         "description": "Customize which related resources to return.",
         "style": "form",
         "explode": false
+      },
+      "offerCurrency": {
+        "name": "currency",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "example": "SEK"
+        },
+        "description": "Requested currency for offers. Default: EUR"
       },
       "orderInclude": {
         "name": "include",

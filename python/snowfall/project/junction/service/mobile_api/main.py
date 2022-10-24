@@ -76,6 +76,10 @@ def _factory(
                     redis_client=redis_client,
                     cache_ttl=app.settings.otp_cache_ttl,
                 ),
+                offers_rates_repository=repository.OffersRatesRepository(
+                    redis_client=redis_client,
+                    cache_ttl=app.settings.offers_rates_cache_ttl,
+                ),
                 stripe_users_repository=repository.StripeUsersRepository(
                     mongo["stripe_users"],
                     create_stripe_customers=app.settings.create_stripe_customers,
