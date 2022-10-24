@@ -83,12 +83,12 @@ class Orders(endpoints.HTTPEndpoint):
         body = await request_helpers.flatten_request(request)
 
         (correct_amount, correct_state) = await check_payment_amount_and_state(
-            body["paymentIntentId"],
+            body["payment"],
             body["options"],
             junction_client,
         )
         if not correct_amount:
-            stripe.PaymentIntent.cancel(body["paymentIntentId"])
+            stripe.PaymentIntent.cancel(body["payment"])
             return stdlib_models.JsonApiResponse(
                 stdlib_models.Body(
                     errors=[
@@ -97,7 +97,7 @@ class Orders(endpoints.HTTPEndpoint):
                             code="invalid_amount",
                             detail="Payment's amount does not match with order",
                             source=stdlib_models.ErrorSource(
-                                pointer="/data/attributes/paymentIntentId",
+                                pointer="/data/relationships/payment",
                             ),
                         ),
                     ],
@@ -113,7 +113,7 @@ class Orders(endpoints.HTTPEndpoint):
                             code="invalid_payment_state",
                             detail="Payment Intent is not confirmed",
                             source=stdlib_models.ErrorSource(
-                                pointer="/data/attributes/paymentIntentId",
+                                pointer="/data/relationships/payment",
                             ),
                         ),
                     ],
@@ -144,7 +144,7 @@ class Orders(endpoints.HTTPEndpoint):
             user_id=request.user.username,
         )
         stripe.PaymentIntent.modify(
-            body["paymentIntentId"],
+            body["payment"],
             metadata={"order_id": mobile_order.id},
         )
 
