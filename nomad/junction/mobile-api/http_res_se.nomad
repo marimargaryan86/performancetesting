@@ -127,6 +127,7 @@ SUPPORT_EMAIL={{ .Data.data.support_email }}
 {{ end }}
 {{ with secret "kv/data/${var.environment}/res-se-mobile-api" }}
 STRIPE_API_KEY={{ .Data.data.stripe_api_key }}
+CREATE_STRIPE_CUSTOMERS={{ .Data.data.create_stripe_customers }}
 {{ end }}
 EOH
       }
