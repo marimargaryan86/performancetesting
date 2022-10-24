@@ -1,19 +1,15 @@
 import datetime
-from typing import cast
+from typing import Sequence, cast
 
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.junction.adapter import offer_searches, offers
-from snowfall.project.junction.service.client_api import resources
-from snowfall.project.junction.service.client_api.transformers import (
-    trip_ids_to_segments,
-)
+from snowfall.project.junction.service.client_api import resources, validators
 from snowfall.project.junction.service.offers.v1alpha import models_pb2
 from snowfall.stdlib import sequence, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import (
-    handlers,
     messages,
     models,
     pagination_helpers,
@@ -311,19 +307,14 @@ class OfferOptionDetailsByOfferOption(endpoints.HTTPEndpoint):
 class OfferSearches(endpoints.HTTPEndpoint):
     _session_token_length = 32
 
+    @validators.offer_search_request_validator
     async def post(
         self,
         request: requests.Request,
-        trips_to_segments: trip_ids_to_segments.TripIdsToSegments = lagom.injectable,
-        offer_search_client: offer_searches.Client = lagom.injectable,
+        offer_search_client: offer_searches.Client,
+        segments: Sequence[common_pb2.Segment],
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
-
-        try:
-            segments = await trips_to_segments.transform(trip_ids=body["trips"])
-        except trip_ids_to_segments.MissingTripsError:
-            return handlers.error_response_from_status(status.HTTP_404_NOT_FOUND)
-
         offer_search = await offer_search_client.create(
             request=models_pb2.OfferSearch(
                 trip=models_pb2.TripOfferSearch(

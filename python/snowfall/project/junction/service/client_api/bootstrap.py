@@ -16,9 +16,6 @@ from snowfall.project.junction.adapter import (  # noqa: WPS235
     trips,
 )
 from snowfall.project.junction.service.client_api import includes
-from snowfall.project.junction.service.client_api.transformers import (
-    trip_ids_to_segments,
-)
 from snowfall.stdlib.integration.starlette import application
 
 
@@ -55,12 +52,6 @@ def create_dependencies(  # noqa: WPS211
     container[offer_searches.Client] = offer_searches_client  # type: ignore[misc]
     container[segments.Client] = segments_client  # type: ignore[misc]
     container[schedules.Client] = schedules_client  # type: ignore[misc]
-    container[
-        trip_ids_to_segments.TripIdsToSegments
-    ] = trip_ids_to_segments.TripIdsToSegments(
-        legs_client=legs_client,
-        trips_client=trips_client,
-    )
 
     includes.register_resolvers(
         legs_client=legs_client,

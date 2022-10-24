@@ -1,11 +1,13 @@
-from typing import Awaitable, Callable, Sequence, TypeVar
+from typing import Any, Awaitable, Callable, Mapping, Sequence, TypeVar
 
 import lagom
 import more_itertools
 from starlette import endpoints, requests, responses, status
 
+from snowfall.project.junction.adapter import legs, offer_searches
 from snowfall.project.junction.adapter import offers as offers_adapter
 from snowfall.project.junction.adapter import orders as orders_adapter
+from snowfall.project.junction.adapter import trips
 from snowfall.project.junction.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
@@ -14,8 +16,134 @@ from snowfall.project.junction.service.orders.v1alpha import (
 )
 from snowfall.stdlib import money
 from snowfall.stdlib.integration.starlette import models, request_helpers
+from snowfall.stdlib.v1alpha import models_pb2
 
 _Endpoint = TypeVar("_Endpoint", bound=endpoints.HTTPEndpoint)
+
+_OfferSearchEndpointSignature = Callable[
+    [
+        _Endpoint,
+        requests.Request,
+        offer_searches.Client,
+        Sequence[models_pb2.Segment],
+    ],
+    Awaitable[responses.Response],
+]
+
+_OfferSearchValidatorSignature = Callable[
+    [
+        _Endpoint,
+        requests.Request,
+        legs.Client,
+        trips.Client,
+        offer_searches.Client,
+    ],
+    Awaitable[responses.Response],
+]
+
+
+def offer_search_request_validator(
+    function: _OfferSearchEndpointSignature[_Endpoint],
+) -> _OfferSearchValidatorSignature[_Endpoint]:
+    async def wrapper(
+        self: _Endpoint,
+        request: requests.Request,
+        legs_client: legs.Client = lagom.injectable,
+        trips_client: trips.Client = lagom.injectable,
+        offer_search_client: offer_searches.Client = lagom.injectable,
+    ) -> responses.Response:
+        body = await request_helpers.flatten_request(request)
+        trips_map = {
+            trip.id: trip
+            for trip in (
+                await trips_client.find_by_ids(
+                    body["trips"],
+                    limit=len(body["trips"]),
+                )
+            ).trips
+        }
+
+        segments = [segment for trip in trips_map.values() for segment in trip.segments]
+        leg_ids = {leg_id for segment in segments for leg_id in segment.leg_ids}
+        segments_and_errors = _validate_trips(
+            body,
+            trips_map,
+            {
+                leg.id: leg
+                for leg in (
+                    await legs_client.find_by_ids(
+                        list(leg_ids),
+                        limit=len(leg_ids),
+                    )
+                ).legs
+            },
+        )
+
+        if segments_and_errors[1]:
+            return models.JsonApiResponse(
+                models.Body(errors=segments_and_errors[1]),
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
+
+        return await function(
+            self,
+            request,
+            offer_search_client,
+            segments_and_errors[0],
+        )
+
+    return wrapper
+
+
+def _validate_trips(
+    body: Mapping[str, Any],
+    trips_map: Mapping[str, models_pb2.TripReference],
+    legs_map: Mapping[str, models_pb2.Leg],
+) -> tuple[list[models_pb2.Segment], list[models.Error]]:
+    segments_list: list[models_pb2.Segment] = []
+    errors: list[models.Error] = []
+
+    for trip_idx, trip_id in enumerate(body["trips"]):
+        if trip_id not in trips_map.keys():
+            errors.append(
+                models.Error(
+                    status=str(status.HTTP_404_NOT_FOUND),
+                    code="not_found",
+                    detail="'{0}' was not found".format(trip_id),
+                    source=models.ErrorSource(
+                        pointer="/data/relationships/trips/data/{0}/id".format(
+                            trip_idx,
+                        ),
+                    ),
+                ),
+            )
+            continue
+
+        try:
+            segments_list.extend(
+                [
+                    models_pb2.Segment(
+                        id=segment.id,
+                        legs=[legs_map[leg_id] for leg_id in segment.leg_ids],
+                    )
+                    for segment in trips_map[trip_id].segments
+                ],
+            )
+        except KeyError:
+            errors.append(
+                models.Error(
+                    status=str(status.HTTP_404_NOT_FOUND),
+                    code="not_found",
+                    detail="'{0}' was not found".format(trip_id),
+                    source=models.ErrorSource(
+                        pointer="/data/relationships/trips/data/{0}/id".format(
+                            trip_idx,
+                        ),
+                    ),
+                ),
+            )
+
+    return segments_list, errors
 
 
 def order_request_validator(  # noqa: WPS320
