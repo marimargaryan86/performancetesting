@@ -31,7 +31,9 @@ class CreateSearchCriteria(CamelCaseBaseModel):
     origin_iata: str
     destination_iata: str
     outbound_date: datetime.datetime | datetime.date
+    outbound_departure_window: Optional[tuple[datetime.time, datetime.time]]
     inbound_date: Optional[datetime.datetime | datetime.date]
+    inbound_departure_window: Optional[tuple[datetime.time, datetime.time]]
     cabin_class: AirCabinClassType = AirCabinClassType.any_
     adults: int = 0
     children: int = 0

@@ -10,12 +10,21 @@ def parse_search_criteria(
     origin_iata: str,
     destination_iata: str,
     date: datetime.date | datetime.datetime,
+    departure_window: tuple[datetime.time, datetime.time] | None = None,
 ) -> dict[str, Any]:
-    return {
+    search_criteria: dict[str, Any] = {
         "origin": origin_iata,
         "destination": destination_iata,
         "departure": date.isoformat(),
     }
+
+    if departure_window:
+        search_criteria["departureWindow"] = {
+            "earliest": departure_window[0].isoformat(timespec="minutes"),
+            "latest": departure_window[1].isoformat(timespec="minutes"),
+        }
+
+    return search_criteria
 
 
 def parse_search_request(criteria: search.CreateSearchCriteria) -> dict[str, Any]:
@@ -24,6 +33,7 @@ def parse_search_request(criteria: search.CreateSearchCriteria) -> dict[str, Any
             criteria.origin_iata,
             criteria.destination_iata,
             criteria.outbound_date,
+            criteria.outbound_departure_window,
         ),
     ]
 
@@ -35,6 +45,7 @@ def parse_search_request(criteria: search.CreateSearchCriteria) -> dict[str, Any
                 criteria.destination_iata,
                 criteria.origin_iata,
                 criteria.inbound_date,
+                criteria.inbound_departure_window,
             ),
         )
     else:

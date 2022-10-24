@@ -337,10 +337,10 @@ class OfferSearches(endpoints.HTTPEndpoint):
                         for passenger in body["passengers"]
                     ],
                 ),
-            ),
-            session_token=body.get(
-                "sessionToken",
-                string.random(self._session_token_length),
+                session_token=body.get(
+                    "sessionToken",
+                    string.random(self._session_token_length),
+                ),
             ),
         )
 

@@ -283,3 +283,35 @@ def _assert_offer(offer: offers_pb2.Offer, expected_segment_id: str) -> None:
     assert segment_details.cabin_class.type == models_pb2.CabinClass.TYPE_ECONOMY
     assert offer.price.amount == 126184
     assert offer.price.currency == "EUR"
+
+
+@pytest.mark.parametrize(
+    "departure_time, expected",
+    [
+        (
+            datetime.time(hour=3, minute=45),
+            (datetime.time(hour=0), datetime.time(hour=6)),
+        ),
+        (
+            datetime.time(hour=0, minute=0),
+            (datetime.time(hour=0), datetime.time(hour=6)),
+        ),
+        (
+            datetime.time(hour=6, minute=0),
+            (datetime.time(hour=6), datetime.time(hour=12)),
+        ),
+        (
+            datetime.time(hour=17, minute=56),
+            (datetime.time(hour=12), datetime.time(hour=18)),
+        ),
+        (
+            datetime.time(hour=23, minute=45),
+            (datetime.time(hour=18), datetime.time(hour=00)),
+        ),
+    ],
+)
+def test_time_to_window(
+    departure_time: datetime.time,
+    expected: tuple[datetime.time, datetime.time],
+) -> None:
+    assert adapter.time_to_window(departure_time) == expected

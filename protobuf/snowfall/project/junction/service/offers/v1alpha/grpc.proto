@@ -25,7 +25,6 @@ service OfferService {
 
 message EnqueueOfferSearchRequest {
   OfferSearch search = 1;
-  string session_token = 2;
 }
 
 message EnqueueOfferSearchResponse {

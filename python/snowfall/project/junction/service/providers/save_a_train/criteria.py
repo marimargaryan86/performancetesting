@@ -61,6 +61,7 @@ class CriteriaGenerator(object):
                             ).astimezone(end.timezone),
                         ),
                     ),
+                    session_token=search_task.session_token,
                 )
                 for start, end in itertools.product(origins, destinations)
             )

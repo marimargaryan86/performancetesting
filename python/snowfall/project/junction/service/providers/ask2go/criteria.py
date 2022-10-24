@@ -94,6 +94,7 @@ class CriteriaGenerator(object):
                     children=number_of_types[1],
                     infants=number_of_types[2],
                 ),
+                session_token=search_task.session_token,
             )
 
             if trip_details.is_return_trip:

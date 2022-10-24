@@ -6,11 +6,15 @@ class OfferSearchProducer(object):
     def __init__(self, producer: amqp.Producer):
         self._producer = producer
 
-    async def publish(self, offer_search: models_pb2.OfferSearch) -> None:
+    async def publish(
+        self,
+        offer_search: models_pb2.OfferSearch,
+    ) -> None:
         await self._producer.publish(
             amqp_pb2.TripOfferSearchTask(
                 offer_search_id=offer_search.id,
                 search=offer_search.trip,
+                session_token=offer_search.session_token,
             ),
             "offers.search.trip",
         )

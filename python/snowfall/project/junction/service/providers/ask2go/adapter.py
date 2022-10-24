@@ -1,4 +1,6 @@
 import asyncio
+import datetime
+import math
 from collections.abc import AsyncIterator, Coroutine
 from typing import Any, Mapping, Sequence, Tuple
 
@@ -18,6 +20,23 @@ from snowfall.vendor.ask2go.models import (
 )
 
 _BrandedOffersType = Tuple[Sequence[str], Sequence[price.OfferPriceResponse]]
+_WINDOW_SIZE = 6
+
+
+def time_to_window(
+    departure_time: datetime.time,
+) -> tuple[datetime.time, datetime.time]:
+    lower_bound_multiplier = math.floor(departure_time.hour / _WINDOW_SIZE)
+    earliest_hour = _WINDOW_SIZE * lower_bound_multiplier
+    latest_hour = _WINDOW_SIZE * (lower_bound_multiplier + 1)
+
+    if latest_hour == 24:
+        latest_hour = 0
+
+    return (
+        datetime.time(hour=earliest_hour),
+        datetime.time(hour=latest_hour),
+    )
 
 
 class NoResultsError(Exception):
@@ -55,10 +74,12 @@ class Ask2GoAdapter(object):  # noqa: WPS214
         self,
         criteria: amqp_pb2.Criteria,
     ) -> search.CreateSearchResponse:
+        outbound_date = protobuf.protobuf_to_datetime(criteria.outbound_departure)
         search_criteria = search.CreateSearchCriteria(
             origin_iata=criteria.origin_iata,
             destination_iata=criteria.destination_iata,
-            outbound_date=protobuf.protobuf_to_datetime(criteria.outbound_departure),
+            outbound_date=outbound_date.date(),
+            outbound_departure_window=time_to_window(outbound_date.time()),
             cabin_class=enums.AirCabinClassType(criteria.cabin_class),
             adults=criteria.adults,
             children=criteria.children,
@@ -66,8 +87,10 @@ class Ask2GoAdapter(object):  # noqa: WPS214
         )
 
         if criteria.HasField("inbound_departure"):
-            search_criteria.inbound_date = protobuf.protobuf_to_datetime(
-                criteria.inbound_departure,
+            inbound_date = protobuf.protobuf_to_datetime(criteria.inbound_departure)
+            search_criteria.inbound_date = inbound_date.date()
+            search_criteria.inbound_departure_window = time_to_window(
+                inbound_date.time(),
             )
 
         return await self._client.create_search(criteria=search_criteria)

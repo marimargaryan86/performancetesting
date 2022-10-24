@@ -12,6 +12,7 @@ message OfferSearch {
   oneof search {
     TripOfferSearch trip = 3;
   }
+  string session_token = 4;
 }
 
 message TripOfferSearch {
