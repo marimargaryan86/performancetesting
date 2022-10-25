@@ -655,7 +655,7 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
             url="/bookings/{0}".format(identifier),
         )
 
-    async def get_bookings_details_by_booking_id(
+    async def get_booking_details_by_booking_id(
         self,
         identifier: str,
         limit: Optional[int] = None,

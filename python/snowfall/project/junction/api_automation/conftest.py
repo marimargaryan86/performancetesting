@@ -1,9 +1,16 @@
-from typing import Sequence
+import datetime
+import json
+import logging
+import os
+from typing import Mapping, Sequence
 
 import httpx
 import pytest
 
 from snowfall.vendor.junction.client import JunctionClient
+
+logging.basicConfig()
+logging.getLogger().setLevel(logging.INFO)
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -16,13 +23,29 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 
 @pytest.fixture(scope="session")
-def api_token(request: pytest.FixtureRequest) -> str:
-    return request.config.getoption("API_TOKEN")
+def _local_config() -> Mapping[str, str]:
+    json_file_name = os.path.expanduser("~/test_config.json")
+    if not os.path.exists(json_file_name):
+        return {}
+    logging.info("Reading of local configuration...")
+    with open(json_file_name) as json_file:
+        return json.load(json_file)
+
+
+@pytest.fixture(scope="session")
+def api_token(
+    _local_config: Mapping[str, str],
+    request: pytest.FixtureRequest,
+) -> str:
+    return request.config.getoption("API_TOKEN") or _local_config.get("API_TOKEN") or ""
 
 
 @pytest.fixture(scope="session")
 def departure_after(request: pytest.FixtureRequest) -> str:
-    return request.config.getoption("DEPARTURE_AFTER")
+    tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+    return request.config.getoption("DEPARTURE_AFTER") or tomorrow.strftime(
+        "%Y-%m-%dT00:00:00.000Z",
+    )
 
 
 @pytest.fixture(scope="session")
@@ -54,7 +77,6 @@ def headers(api_token: str) -> dict[str, str]:
 
 
 def pytest_collection_modifyitems(
-    session: pytest.Session,
     config: pytest.Config,
     items: Sequence[pytest.Item],  # noqa: WPS110
 ) -> None:
