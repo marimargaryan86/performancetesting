@@ -1,0 +1,74 @@
+from typing import Optional
+
+import pymongo
+
+from snowfall.service.authentication.v1alpha import models_pb2
+from snowfall.stdlib.persistence.mongo import mixins, repository
+
+
+class UsersRepository(
+    mixins.FindByIdMixin[models_pb2.User],
+    mixins.InsertMixin[models_pb2.User],
+    repository.ProtoRepository[models_pb2.User],
+):
+    """Repository for keeping users information."""
+
+    _proto = models_pb2.User
+    _indexes = [
+        pymongo.IndexModel("email", background=True, unique=True),
+    ]
+
+    async def update(
+        self,
+        user: models_pb2.User,
+        password: str,
+    ) -> pymongo.results.UpdateResult:
+        return await self._execute(
+            self._collection.update_one,
+            self._get_filter_by_email(user.email),
+            {
+                "$set": {
+                    "password": password,
+                },
+            },
+        )
+
+    async def find_user_by_id(
+        self,
+        document_id: str,
+    ) -> Optional[models_pb2.User]:
+        return await self._execute(
+            query=self._collection.find_one,
+            filter=self._get_filter_by_id(document_id),
+            filter_pre_cursor={},
+        )
+
+    async def find_user_by_email(
+        self,
+        email: str,
+    ) -> Optional[models_pb2.User]:
+        return await self._execute(
+            query=self._collection.find_one,
+            filter=self._get_filter_by_email(email),
+            filter_pre_cursor={},
+        )
+
+    def _get_filter_by_email(
+        self,
+        email: str,
+    ) -> dict[str, dict[str, str]]:
+        return {
+            "email": {
+                "$eq": email,
+            },
+        }
+
+    def _get_filter_by_id(
+        self,
+        document_id: str,
+    ) -> dict[str, dict[str, str]]:
+        return {
+            "_id": {
+                "$eq": document_id,
+            },
+        }

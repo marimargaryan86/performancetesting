@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package snowfall.service.authentication.v1alpha;
+
+import "snowfall/service/authentication/v1alpha/models.proto";
+
+service AuthenticationService {
+  rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse);
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse);
+}
+
+message AuthenticateRequest {
+  oneof identifier {
+    string id = 1;
+    string email = 2;
+  }
+  string password = 3;
+}
+
+message AuthenticateResponse {
+  string auth_token = 1;
+}
+
+message CreateUserRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message CreateUserResponse {
+  User user = 1;
+}
+
+message ChangePasswordRequest {
+  oneof identifier {
+    string id = 1;
+    string email = 2;
+  }
+  string password = 3;
+}
+
+message ChangePasswordResponse {
+  User user = 1;
+}
