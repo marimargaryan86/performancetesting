@@ -168,6 +168,10 @@ class TripOfferGroupDetailsResource(models.Resource):
                     vendor=segment.vehicle.number,
                     operator=None,
                 ),
+                "sequences": {
+                    "trip": segment.trip_sequence,
+                    "segment": segment.segment_sequence,
+                },
             },
             relationships={
                 "legType": {

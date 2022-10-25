@@ -54,6 +54,11 @@ _OFFER_SEARCHES = (
                         models_pb2.Segment(
                             id="a",
                         ),
+                    ],
+                ),
+                models_pb2.Trip(
+                    id="b",
+                    segments=[
                         models_pb2.Segment(
                             id="b",
                         ),

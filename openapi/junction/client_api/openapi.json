@@ -5016,7 +5016,8 @@
                   "legs",
                   "vendor",
                   "operator",
-                  "routeIdentifiers"
+                  "routeIdentifiers",
+                  "sequences"
                 ],
                 "properties": {
                   "legs": {
@@ -5038,6 +5039,25 @@
                   },
                   "routeIdentifiers": {
                     "$ref": "#/components/schemas/RouteIdentifiers"
+                  },
+                  "sequences": {
+                    "type": "object",
+                    "required": [
+                      "trip",
+                      "segment"
+                    ],
+                    "properties": {
+                      "trip": {
+                        "type": "integer",
+                        "example": 1,
+                        "minimum": 1
+                      },
+                      "segment": {
+                        "type": "integer",
+                        "example": 1,
+                        "minimum": 1
+                      }
+                    }
                   }
                 }
               },

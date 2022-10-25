@@ -150,6 +150,8 @@ class OfferAggregator(object):
         if not offer_search:
             return
 
+        _set_sequence_numbers(offer_search, offer)
+
         buckets = await self._buckets.get_offer_buckets(offer.offer_search_id)
 
         # this overrides the true bucket values for segments that this offer
@@ -171,3 +173,19 @@ class OfferAggregator(object):
         for aggregate in generate_offer_aggregates(buckets, expires_at):
             aggregate.offer_search_id = offer_search.id
             await self._aggregates.insert(aggregate)
+
+
+def _set_sequence_numbers(  # noqa: WPS210
+    offer_search: models_pb2.OfferSearch,
+    offer: models_pb2.OfferGroup,
+) -> None:
+    sequence_mapping: dict[str, tuple[int, int]] = {}
+
+    for trip_idx, trip in enumerate(offer_search.trip.trips):
+        for segment_idx, trip_segment in enumerate(trip.segments):
+            sequence_mapping[trip_segment.id] = (trip_idx + 1, segment_idx + 1)
+
+    for segment in offer.segments:
+        trip_sequence, segment_sequence = sequence_mapping[segment.segment_id]
+        segment.trip_sequence = trip_sequence
+        segment.segment_sequence = segment_sequence

@@ -112,6 +112,8 @@ message OfferSegment {
   string vendor = 5;
   string terminal = 6;
   snowfall.stdlib.v1alpha.Schedule.Type type = 8;
+  uint32 trip_sequence = 9;
+  uint32 segment_sequence = 10;
   // direction?
   // docsRequired?
 }
