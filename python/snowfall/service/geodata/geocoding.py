@@ -1,6 +1,7 @@
 from typing import Awaitable, Callable, Optional
 
 import shapefile
+import tenacity
 import timezonefinder
 from geopy import adapters, geocoders
 from pycountry import countries
@@ -63,6 +64,7 @@ class ReverseGeocoder(object):
 
         return None
 
+    @tenacity.retry
     async def _photon_country_lookup(
         self,
         latitude: float,
@@ -82,6 +84,7 @@ class ReverseGeocoder(object):
 
         return response.raw["properties"]["countrycode"].upper()
 
+    @tenacity.retry
     async def _nominatim_country_lookup(
         self,
         latitude: float,

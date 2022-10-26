@@ -1,3 +1,4 @@
+import asyncio
 import ipaddress
 import random
 from typing import Sequence
@@ -58,12 +59,25 @@ async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
     )
     csv_path = filesystem.resource_path(
         "snowfall.project.junction.service.places.main",
-        "worldcities.csv",
+        "cities.csv",
     )
 
     async with aiofiles.open(csv_path) as csv_file:
+        resources = []
+
         async for city in cities.parse_csv(locations_repository, csv_file):
-            await places_repository.create(city)
+            resources.append(city)
+
+            if len(resources) == 10:
+                await asyncio.gather(
+                    *[places_repository.create(city) for city in resources],
+                )
+                resources = []
+
+        if not resources:
+            await asyncio.gather(
+                *[places_repository.create(resource) for resource in resources],
+            )
 
 
 async def _import(app: service.Application[_ImportSettings]) -> None:

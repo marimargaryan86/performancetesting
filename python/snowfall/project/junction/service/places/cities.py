@@ -18,15 +18,12 @@ async def parse_csv(
     csv_file: protocols.WithAsyncRead,
 ) -> AsyncIterable[models_pb2.Place]:
     async for row in AsyncDictReader(csv_file):
-        if int(float(row["population"] or 0)) < _MIN_POPULATION:
-            continue
-
         location_ids = [
             location.id
             async for location in await locations_repository.find_within_area(
                 cursor="",
-                latitude=float(row["lat"]),
-                longitude=float(row["lng"]),
+                latitude=float(row["latitude"]),
+                longitude=float(row["longitude"]),
                 max_distance_meters=_MAX_DISTANCE,
             )
             # todo: only locations in the same country
@@ -39,10 +36,10 @@ async def parse_csv(
             merged_ids=location_ids,
             location=models_pb2.Location(
                 id=string.to_uuid(row["id"], _NAMESPACE),
-                name=row["city"],
+                name=row["name"],
                 coordinates=latlng_pb2.LatLng(
-                    latitude=float(row["lat"]),
-                    longitude=float(row["lng"]),
+                    latitude=float(row["latitude"]),
+                    longitude=float(row["longitude"]),
                 ),
                 types=[models_pb2.Location.TYPE_CITY],
             ),

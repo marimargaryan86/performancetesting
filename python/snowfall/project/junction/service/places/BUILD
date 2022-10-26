@@ -7,9 +7,9 @@ python_image(
 resource(
     name="cities",
     source=http_source(
-        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/worldcities-fc9525b4d859f16a5e3a851e347d280ebd92aed4fdf4c503d349c632b885ecaf.csv",
-        len=4581116,
-        sha256="fc9525b4d859f16a5e3a851e347d280ebd92aed4fdf4c503d349c632b885ecaf",
-        filename="worldcities.csv",
+        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/cities-52d3ada3e4558eab3526658e272aeb096d8623b4a5b2db2fecfc2bbbeeb6bbbb.csv",
+        len=8558677,
+        sha256="52d3ada3e4558eab3526658e272aeb096d8623b4a5b2db2fecfc2bbbeeb6bbbb",
+        filename="cities.csv",
     ),
 )
