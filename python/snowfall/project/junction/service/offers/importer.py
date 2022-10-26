@@ -22,5 +22,5 @@ class OfferImporter(object):
     async def _process_message(self, message: amqp.Message) -> None:
         offer = cast(models_pb2.OfferGroup, message.body)
 
-        await self._offers.insert(offer)
         await self._aggregator.aggregate(offer)
+        await self._offers.insert(offer)
