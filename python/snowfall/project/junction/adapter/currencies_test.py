@@ -5,7 +5,7 @@ import grpc
 import pytest
 
 from snowfall import fixtures
-from snowfall.project.junction.adapter import currencies
+from snowfall.project.junction.adapter import currencies, errors
 from snowfall.project.junction.service.currencies.v1alpha import (
     currencies_pb2,
     currencies_pb2_grpc,
@@ -39,7 +39,7 @@ class TestGrpcClient(object):
                     initial_metadata=grpc.aio.Metadata(),
                     trailing_metadata=grpc.aio.Metadata(),
                 ),
-                currencies.NotFoundError,
+                errors.NotFoundError,
             ),
         ],
     )

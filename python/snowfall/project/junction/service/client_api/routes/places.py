@@ -15,10 +15,7 @@ class Place(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: places.Client = lagom.injectable,
     ) -> responses.Response:
-        try:
-            place = await client.get(request.path_params["placeId"])
-        except places.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+        place = await client.get(request.path_params["placeId"])
 
         return models.JsonApiResponse(
             models.Body(

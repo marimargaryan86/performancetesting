@@ -3,22 +3,12 @@ from __future__ import annotations
 import abc
 from typing import Optional, Sequence
 
-import grpc
-
 from snowfall.project.junction.adapter import errors
 from snowfall.project.junction.service.schedules.v1alpha import (
     schedules_pb2,
     schedules_pb2_grpc,
 )
 from snowfall.stdlib.v1alpha import models_pb2
-
-
-class NotFoundError(Exception):
-    """Raised when a leg is not found."""
-
-
-class UnknownError(Exception):
-    """Raised when an unhandled error occurs."""
 
 
 class Client(abc.ABC):
@@ -44,7 +34,7 @@ class DictClient(Client):
         leg = self._legs.get(leg_id)
 
         if not leg:
-            raise NotFoundError()
+            raise errors.NotFoundError()
 
         return leg
 
@@ -67,18 +57,12 @@ class GrpcClient(Client):
         self._timeout = timeout
 
     async def get(self, leg_id: str) -> models_pb2.Leg:
-        try:
-            response = await self._schedules.GetLeg(
+        response = await errors.handle_grpc_errors(
+            self._schedules.GetLeg(
                 schedules_pb2.GetLegRequest(id=leg_id),
                 timeout=self._timeout,
-            )
-        except grpc.aio.AioRpcError as exc:
-            if exc.code() == grpc.StatusCode.NOT_FOUND:
-                raise NotFoundError(
-                    "Leg with ID '{id}' not found.".format(id=leg_id),
-                ) from exc
-
-            raise UnknownError() from exc
+            ),
+        )
 
         return response.leg
 
@@ -95,9 +79,6 @@ class GrpcClient(Client):
         if limit is not None:
             request.page_size = limit
 
-        try:
-            return await errors.handle_grpc_errors(
-                self._schedules.ListLegs(request, timeout=self._timeout),
-            )
-        except grpc.aio.AioRpcError as exc:
-            raise UnknownError() from exc
+        return await errors.handle_grpc_errors(
+            self._schedules.ListLegs(request, timeout=self._timeout),
+        )

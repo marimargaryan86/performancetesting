@@ -3,8 +3,6 @@ from __future__ import annotations
 import abc
 from typing import Optional, Sequence
 
-import grpc
-
 from snowfall.project.junction.adapter import errors
 from snowfall.project.junction.service.places.v1alpha import (
     models_pb2,
@@ -12,14 +10,6 @@ from snowfall.project.junction.service.places.v1alpha import (
     places_pb2_grpc,
 )
 from snowfall.stdlib import sequence
-
-
-class NotFoundError(Exception):
-    """Raised when a location is not found."""
-
-
-class UnknownError(Exception):
-    """Raised when an unhandled error occurs."""
 
 
 class Client(abc.ABC):
@@ -45,9 +35,7 @@ class DictClient(Client):
         try:
             return self._locations[location_id]
         except KeyError as err:
-            raise NotFoundError(
-                "Location with ID '{id}' not found.".format(id=location_id),
-            ) from err
+            raise errors.NotFoundError() from err
 
     async def find(
         self,
@@ -84,18 +72,12 @@ class GrpcClient(Client):
         self._timeout = timeout
 
     async def get(self, location_id: str) -> models_pb2.Location:
-        try:
-            response = await self._locations.GetLocation(
+        response = await errors.handle_grpc_errors(
+            self._locations.GetLocation(
                 places_pb2.GetLocationRequest(id=location_id),
                 timeout=self._timeout,
-            )
-        except grpc.aio.AioRpcError as exc:
-            if exc.code() == grpc.StatusCode.NOT_FOUND:
-                raise NotFoundError(
-                    "Location with ID '{id}' not found.".format(id=location_id),
-                ) from exc
-
-            raise UnknownError(exc.details()) from exc
+            ),
+        )
 
         return response.location
 

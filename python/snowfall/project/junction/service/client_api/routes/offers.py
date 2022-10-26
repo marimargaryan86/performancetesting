@@ -2,7 +2,7 @@ import datetime
 from typing import Sequence, cast
 
 import lagom
-from starlette import endpoints, exceptions, requests, responses, status
+from starlette import endpoints, requests, responses, status
 
 from snowfall.project.junction.adapter import offer_searches, offers
 from snowfall.project.junction.service.client_api import resources, validators
@@ -24,10 +24,7 @@ class Offer(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: offers.Client = lagom.injectable,
     ) -> responses.Response:
-        try:
-            offer = await client.get(request.path_params["offerId"])
-        except offers.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+        offer = await client.get(request.path_params["offerId"])
 
         return await messages.create_response(
             body=models.Body(
@@ -46,12 +43,9 @@ class OfferGroup(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: offers.Client = lagom.injectable,
     ) -> responses.Response:
-        try:
-            offer_group = await client.get_group_by_id(
-                request.path_params["offerGroupId"],
-            )
-        except offers.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+        offer_group = await client.get_group_by_id(
+            request.path_params["offerGroupId"],
+        )
 
         return await messages.create_response(
             body=models.Body(
@@ -71,12 +65,7 @@ class OfferGroupsByOffer(endpoints.HTTPEndpoint):
         client: offers.Client = lagom.injectable,
     ) -> responses.Response:
         offer_id = request.path_params["offerId"]
-
-        try:
-            offer = await client.get(offer_id)
-        except offers.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
-
+        offer = await client.get(offer_id)
         pagination = pagination_helpers.get_pagination(request)
         items_page = sequence.paginate(
             sequence=offer.groups,
@@ -112,12 +101,9 @@ class OfferGroupDetails(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: offers.Client = lagom.injectable,
     ) -> responses.Response:
-        try:
-            details = await client.get_group_details_by_id(
-                request.path_params["offerGroupDetailsId"],
-            )
-        except offers.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+        details = await client.get_group_details_by_id(
+            request.path_params["offerGroupDetailsId"],
+        )
 
         return await messages.create_response(
             body=models.Body(
@@ -137,12 +123,7 @@ class OfferGroupDetailsByOfferGroup(endpoints.HTTPEndpoint):
         client: offers.Client = lagom.injectable,
     ) -> responses.Response:
         group_id = request.path_params["offerGroupId"]
-
-        try:
-            group = await client.get_group_by_id(group_id)
-        except offers.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
-
+        group = await client.get_group_by_id(group_id)
         pagination = pagination_helpers.get_pagination(request)
         items_page = sequence.paginate(
             sequence=group.segments,
@@ -178,12 +159,9 @@ class OfferOption(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: offers.Client = lagom.injectable,
     ) -> responses.Response:
-        try:
-            option = await client.get_option_by_id(
-                request.path_params["offerOptionId"],
-            )
-        except offers.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+        option = await client.get_option_by_id(
+            request.path_params["offerOptionId"],
+        )
 
         return await messages.create_response(
             body=models.Body(
@@ -203,12 +181,7 @@ class OfferOptionsByOfferGroup(endpoints.HTTPEndpoint):
         client: offers.Client = lagom.injectable,
     ) -> responses.Response:
         group_id = request.path_params["offerGroupId"]
-
-        try:
-            group = await client.get_group_by_id(group_id)
-        except offers.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
-
+        group = await client.get_group_by_id(group_id)
         pagination = pagination_helpers.get_pagination(request)
         items_page = sequence.paginate(
             sequence=group.offers,
@@ -244,12 +217,9 @@ class OfferOptionDetails(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: offers.Client = lagom.injectable,
     ) -> responses.Response:
-        try:
-            detail = await client.get_option_details_by_id(
-                request.path_params["offerOptionDetailsId"],
-            )
-        except offers.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+        detail = await client.get_option_details_by_id(
+            request.path_params["offerOptionDetailsId"],
+        )
 
         return await messages.create_response(
             body=models.Body(
@@ -269,12 +239,7 @@ class OfferOptionDetailsByOfferOption(endpoints.HTTPEndpoint):
         client: offers.Client = lagom.injectable,
     ) -> responses.Response:
         option_id = request.path_params["offerOptionId"]
-
-        try:
-            option = await client.get_option_by_id(option_id)
-        except offers.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
-
+        option = await client.get_option_by_id(option_id)
         pagination = pagination_helpers.get_pagination(request)
         items_page = sequence.paginate(
             sequence=option.segment_details,
@@ -354,10 +319,7 @@ class OfferSearch(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: offer_searches.Client = lagom.injectable,
     ) -> responses.Response:
-        try:
-            offer_search = await client.get(request.path_params["offerSearchId"])
-        except offer_searches.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+        offer_search = await client.get(request.path_params["offerSearchId"])
 
         return await messages.create_response(
             body=models.Body(
@@ -382,10 +344,7 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
         cabin_classes = _get_cabin_class_filter(request)
 
         # todo: Check should probably be done in the RPC, but that requires refactoring.
-        try:
-            await search_client.get(offer_search_id)
-        except offer_searches.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+        await search_client.get(offer_search_id)
 
         pagination = pagination_helpers.get_pagination(request)
         offers_page = await client.find_offers_by_offer_search(

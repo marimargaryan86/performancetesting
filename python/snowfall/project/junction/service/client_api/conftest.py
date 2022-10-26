@@ -11,6 +11,7 @@ from starlette import applications
 from starlette.middleware import Middleware, authentication
 
 from snowfall.project.junction.adapter import (
+    errors,
     legs,
     locations,
     offer_searches,
@@ -25,7 +26,7 @@ from snowfall.project.junction.adapter import (
 from snowfall.project.junction.service.client_api import bootstrap, jwt
 from snowfall.project.junction.service.client_api.routes import router
 from snowfall.stdlib.integration.starlette import application, handlers
-from snowfall.stdlib.persistence import filesystem
+from snowfall.stdlib.persistence import cursor, filesystem
 
 jwt_token_version = "1"  # nosec
 jwt_payload = {"version": jwt_token_version, "client_id": "test"}
@@ -62,7 +63,7 @@ def _create_app(  # noqa: WPS211
     openapi_path: pathlib.Path,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
-    return application.create_starlette_app(
+    app = application.create_starlette_app(
         routes_factory=router.get_routes,
         custom_middlewares=custom_middlewares,
         dependencies=bootstrap.create_dependencies(
@@ -79,6 +80,11 @@ def _create_app(  # noqa: WPS211
         ),
         openapi_path=openapi_path,
     )
+    app.add_exception_handler(cursor.CursorError, handlers.cursor_error_handler)
+    app.add_exception_handler(errors.CursorError, handlers.cursor_error_handler)
+    app.add_exception_handler(errors.NotFoundError, handlers.not_found_error_handler)
+
+    return app
 
 
 @pytest.fixture()

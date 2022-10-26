@@ -5,7 +5,7 @@ import grpc
 import pytest
 
 from snowfall import fixtures
-from snowfall.project.junction.adapter import schedules
+from snowfall.project.junction.adapter import errors, schedules
 from snowfall.project.junction.service.schedules.v1alpha import (
     schedules_pb2,
     schedules_pb2_grpc,
@@ -25,7 +25,7 @@ class TestDictClient(object):
         self,
         schedules_client: schedules.Client,
     ) -> None:
-        with pytest.raises(schedules.NotFoundError):
+        with pytest.raises(errors.NotFoundError):
             await schedules_client.get(fixtures.NOT_FOUND)
 
     async def test_schedules_are_found_by_id(
@@ -52,7 +52,7 @@ class TestGrpcClient(object):
                     initial_metadata=grpc.aio.Metadata(),
                     trailing_metadata=grpc.aio.Metadata(),
                 ),
-                schedules.NotFoundError,
+                errors.NotFoundError,
             ),
             (
                 grpc.aio.AioRpcError(
@@ -60,7 +60,7 @@ class TestGrpcClient(object):
                     initial_metadata=grpc.aio.Metadata(),
                     trailing_metadata=grpc.aio.Metadata(),
                 ),
-                schedules.UnknownError,
+                errors.UnhandledError,
             ),
         ],
     )

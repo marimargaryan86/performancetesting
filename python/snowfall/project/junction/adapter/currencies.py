@@ -3,20 +3,11 @@ from __future__ import annotations
 import abc
 from typing import Mapping
 
-import grpc
-
+from snowfall.project.junction.adapter import errors
 from snowfall.project.junction.service.currencies.v1alpha import (
     currencies_pb2,
     currencies_pb2_grpc,
 )
-
-
-class NotFoundError(Exception):
-    """Raised when a currency is not found."""
-
-
-class UnknownError(Exception):
-    """Raised when an unhandled error occurs."""
 
 
 class Client(abc.ABC):
@@ -51,7 +42,7 @@ class DictClient(Client):
     ) -> int:
         rate = self._currencies.get((from_currency, to_currency))
         if rate is None:
-            raise NotFoundError()
+            raise errors.NotFoundError()
 
         return int(amount * rate)
 
@@ -63,7 +54,7 @@ class DictClient(Client):
     ) -> float:
         rate = self._currencies.get((from_currency, to_currency))
         if rate is None:
-            raise NotFoundError()
+            raise errors.NotFoundError()
 
         return rate
 
@@ -83,22 +74,16 @@ class GrpcClient(Client):
         to_currency: str,
         amount: int,
     ) -> int:
-        try:
-            response = await self._currencies.Convert(
+        response = await errors.handle_grpc_errors(
+            self._currencies.Convert(
                 currencies_pb2.ConvertRequest(
                     to_currency=to_currency,
                     from_currency=from_currency,
                     amount=amount,
                 ),
                 timeout=self._timeout,
-            )
-        except grpc.aio.AioRpcError as exc:
-            if exc.code() == grpc.StatusCode.NOT_FOUND:
-                raise NotFoundError(
-                    "Currency not found.",
-                ) from exc
-
-            raise UnknownError(exc.details()) from exc
+            ),
+        )
 
         return response.amount
 
@@ -108,21 +93,15 @@ class GrpcClient(Client):
         to_currency: str,
         amount: int,
     ) -> float:
-        try:
-            response = await self._currencies.Convert(
+        response = await errors.handle_grpc_errors(
+            self._currencies.Convert(
                 currencies_pb2.ConvertRequest(
                     to_currency=to_currency,
                     from_currency=from_currency,
                     amount=amount,
                 ),
                 timeout=self._timeout,
-            )
-        except grpc.aio.AioRpcError as exc:
-            if exc.code() == grpc.StatusCode.NOT_FOUND:
-                raise NotFoundError(
-                    "Currency not found.",
-                ) from exc
-
-            raise UnknownError(exc.details()) from exc
+            ),
+        )
 
         return float("{0:.2f}".format(response.rate))

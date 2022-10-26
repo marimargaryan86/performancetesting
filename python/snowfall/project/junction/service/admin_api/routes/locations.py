@@ -1,5 +1,5 @@
 import lagom
-from starlette import endpoints, exceptions, requests, responses, status
+from starlette import endpoints, requests, responses
 
 from snowfall.project.junction.adapter import locations
 from snowfall.project.junction.service.admin_api import resources
@@ -12,10 +12,7 @@ class Location(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: locations.Client = lagom.injectable,
     ) -> responses.Response:
-        try:
-            location = await client.get(request.path_params["locationId"])
-        except locations.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+        location = await client.get(request.path_params["locationId"])
 
         return models.JsonApiResponse(
             models.Body(

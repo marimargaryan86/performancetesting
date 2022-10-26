@@ -5,7 +5,13 @@ import lagom
 from dateutil import parser
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.project.junction.adapter import locations, places, trip_searches, trips
+from snowfall.project.junction.adapter import (
+    errors,
+    locations,
+    places,
+    trip_searches,
+    trips,
+)
 from snowfall.project.junction.service.client_api import resources
 from snowfall.stdlib import sequence
 from snowfall.stdlib.integration.starlette import (
@@ -23,10 +29,7 @@ class Trip(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: trips.Client = lagom.injectable,
     ) -> responses.Response:
-        try:
-            trip = await client.get(request.path_params["tripId"])
-        except trips.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+        trip = await client.get(request.path_params["tripId"])
 
         return await messages.create_response(
             body=models.Body(
@@ -45,10 +48,7 @@ class TripSegments(endpoints.HTTPEndpoint):
         request: requests.Request,
         trips_client: trips.Client = lagom.injectable,
     ) -> responses.Response:
-        try:
-            trip = await trips_client.get(request.path_params["tripId"])
-        except trips.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+        trip = await trips_client.get(request.path_params["tripId"])
 
         pagination = pagination_helpers.get_pagination(request)
         sequence_page = sequence.paginate(
@@ -85,10 +85,7 @@ class TripSearch(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: trip_searches.Client = lagom.injectable,
     ) -> responses.Response:
-        try:
-            trip_search = await client.get(request.path_params["tripSearchId"])
-        except trip_searches.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+        trip_search = await client.get(request.path_params["tripSearchId"])
 
         return await messages.create_response(
             body=models.Body(
@@ -116,7 +113,7 @@ class TripSearches(endpoints.HTTPEndpoint):
                 places_client.get(body["origin"]),
                 places_client.get(body["destination"]),
             )
-        except places.NotFoundError as err:
+        except errors.NotFoundError as err:
             raise exceptions.HTTPException(
                 status.HTTP_422_UNPROCESSABLE_ENTITY,
             ) from err
@@ -187,15 +184,11 @@ class TripsByTripSearch(endpoints.HTTPEndpoint):
         client: trip_searches.Client = lagom.injectable,
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
-
-        try:
-            response = await client.list_trips_by_trip_search(
-                request.path_params["tripSearchId"],
-                cursor=pagination.cursor,
-                limit=pagination.limit,
-            )
-        except trip_searches.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+        response = await client.list_trips_by_trip_search(
+            request.path_params["tripSearchId"],
+            cursor=pagination.cursor,
+            limit=pagination.limit,
+        )
 
         return await messages.create_response(
             body=models.Body(

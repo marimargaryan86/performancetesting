@@ -1,7 +1,7 @@
 from typing import Any
 
 import lagom
-from starlette import endpoints, exceptions, requests, responses, status
+from starlette import endpoints, requests, responses, status
 
 from snowfall.project.junction.adapter import locations, places
 from snowfall.project.junction.service.admin_api import resources
@@ -53,10 +53,7 @@ class Place(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: places.Client = lagom.injectable,
     ) -> responses.Response:
-        try:
-            place = await client.get(request.path_params[_place_id_key])
-        except places.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+        place = await client.get(request.path_params[_place_id_key])
 
         return await messages.create_response(
             body=models.Body(
@@ -70,10 +67,7 @@ class Place(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: places.Client = lagom.injectable,
     ) -> responses.Response:
-        try:
-            await client.delete(request.path_params[_place_id_key])
-        except places.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+        await client.delete(request.path_params[_place_id_key])
 
         return await messages.create_response(
             body=models.Body(
@@ -94,11 +88,7 @@ class Place(endpoints.HTTPEndpoint):
             locations_client,
             payload,
         )
-
-        try:
-            place = await client.get(request.path_params[_place_id_key])
-        except places.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+        place = await client.get(request.path_params[_place_id_key])
 
         if validation_result.errors:
             return await messages.create_response(

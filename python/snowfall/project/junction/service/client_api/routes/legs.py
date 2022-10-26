@@ -20,10 +20,7 @@ class Leg(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: legs_adapter.Client = lagom.injectable,
     ) -> responses.Response:
-        try:
-            leg = await client.get(request.path_params["legId"])
-        except legs_adapter.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+        leg = await client.get(request.path_params["legId"])
 
         return await messages.create_response(
             body=models.Body(
@@ -98,12 +95,7 @@ class LegsBySegmentId(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
         segment_id = request.path_params["segmentId"]
-
-        try:
-            segment = await segments_client.get(segment_id)
-        except segments_adapter.NotFoundError as segments_err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from segments_err
-
+        segment = await segments_client.get(segment_id)
         legs_page = await legs_client.find_by_ids(
             segment.leg_ids,
             limit=pagination.limit,
@@ -140,12 +132,7 @@ class LegsByTripId(endpoints.HTTPEndpoint):
         trips_client: trips_adapter.Client = lagom.injectable,
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
-
-        try:
-            trip = await trips_client.get(request.path_params["tripId"])
-        except trips_adapter.NotFoundError as trips_err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from trips_err
-
+        trip = await trips_client.get(request.path_params["tripId"])
         legs_page = await legs_client.find_by_ids(
             [leg_id for segment in trip.segments for leg_id in segment.leg_ids],
             limit=pagination.limit,
@@ -185,14 +172,11 @@ class LegsByTripSearchId(endpoints.HTTPEndpoint):
         trips = await self._get_all_trips(request, trip_searches_client)
         segments = [segment for trip in trips for segment in trip.segments]
         leg_ids = [leg_id for segment in segments for leg_id in segment.leg_ids]
-        try:
-            legs_page = await legs_client.find_by_ids(
-                leg_ids,
-                limit=pagination.limit,
-                cursor=pagination.cursor,
-            )
-        except legs_adapter.NotFoundError as err:
-            raise exceptions.HTTPException(_NOT_FOUND_STATUS) from err
+        legs_page = await legs_client.find_by_ids(
+            leg_ids,
+            limit=pagination.limit,
+            cursor=pagination.cursor,
+        )
 
         return await messages.create_response(
             body=models.Body(
@@ -222,15 +206,12 @@ class LegsByTripSearchId(endpoints.HTTPEndpoint):
     ) -> list[models_pb2.TripReference]:
         trips: list[models_pb2.TripReference] = []
         trips_cursor = None
-        while True:
-            try:
-                trips_page = await trip_searches_client.list_trips_by_trip_search(
-                    request.path_params["tripSearchId"],
-                    cursor=trips_cursor,
-                )
-            except trip_searches_adapter.NotFoundError as err:
-                raise exceptions.HTTPException(_NOT_FOUND_STATUS) from err
 
+        while True:
+            trips_page = await trip_searches_client.list_trips_by_trip_search(
+                request.path_params["tripSearchId"],
+                cursor=trips_cursor,
+            )
             trips.extend(trips_page.trips)
             trips_cursor = trips_page.next_page_token
 

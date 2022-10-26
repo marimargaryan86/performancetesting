@@ -5,7 +5,7 @@ import grpc
 import pytest
 
 from snowfall import fixtures
-from snowfall.project.junction.adapter import locations
+from snowfall.project.junction.adapter import errors, locations
 from snowfall.project.junction.service.places.v1alpha import (
     models_pb2,
     places_pb2,
@@ -25,7 +25,7 @@ class TestDictClient(object):
         self,
         locations_client: locations.Client,
     ) -> None:
-        with pytest.raises(locations.NotFoundError):
+        with pytest.raises(errors.NotFoundError):
             await locations_client.get(fixtures.NOT_FOUND)
 
     async def test_multiple_locations_are_retrievable(
@@ -58,7 +58,7 @@ class TestGrpcClient(object):
                     initial_metadata=grpc.aio.Metadata(),
                     trailing_metadata=grpc.aio.Metadata(),
                 ),
-                locations.NotFoundError,
+                errors.NotFoundError,
             ),
             (
                 grpc.aio.AioRpcError(
@@ -66,7 +66,7 @@ class TestGrpcClient(object):
                     initial_metadata=grpc.aio.Metadata(),
                     trailing_metadata=grpc.aio.Metadata(),
                 ),
-                locations.UnknownError,
+                errors.UnhandledError,
             ),
         ],
     )

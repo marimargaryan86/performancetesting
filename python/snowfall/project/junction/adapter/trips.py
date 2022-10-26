@@ -3,19 +3,9 @@ from __future__ import annotations
 import abc
 from typing import Optional, Sequence
 
-import grpc
-
 from snowfall.project.junction.adapter import errors
 from snowfall.project.junction.service.trips.v1alpha import trips_pb2, trips_pb2_grpc
 from snowfall.stdlib.v1alpha import models_pb2
-
-
-class NotFoundError(Exception):
-    """Raised when a trip is not found."""
-
-
-class UnknownError(Exception):
-    """Raised when an unhandled error occurs."""
 
 
 class Client(abc.ABC):
@@ -41,7 +31,7 @@ class DictClient(Client):
         try:
             return self._trips[trip_id]
         except KeyError as err:
-            raise NotFoundError() from err
+            raise errors.NotFoundError() from err
 
     async def find_by_ids(
         self,
@@ -60,18 +50,12 @@ class GrpcClient(Client):
         self._trips = trips
 
     async def get(self, trip_id: str) -> models_pb2.TripReference:
-        try:
-            response = await self._trips.GetTrip(
+        response = await errors.handle_grpc_errors(
+            self._trips.GetTrip(
                 trips_pb2.GetTripRequest(id=trip_id),
                 timeout=self._timeout,
-            )
-        except grpc.aio.AioRpcError as exc:
-            if exc.code() == grpc.StatusCode.NOT_FOUND:
-                raise NotFoundError(
-                    "Trip with ID '{id}' not found.".format(id=trip_id),
-                ) from exc
-
-            raise UnknownError() from exc
+            ),
+        )
 
         return response.trip
 
@@ -85,12 +69,10 @@ class GrpcClient(Client):
             ids=list(identifiers),
             page_token=cursor or "",
         )
+
         if limit is not None:
             request.page_size = limit
 
-        try:
-            return await errors.handle_grpc_errors(
-                self._trips.ListTrips(request, timeout=self._timeout),
-            )
-        except grpc.aio.AioRpcError as exc:
-            raise UnknownError() from exc
+        return await errors.handle_grpc_errors(
+            self._trips.ListTrips(request, timeout=self._timeout),
+        )

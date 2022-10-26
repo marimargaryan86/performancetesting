@@ -5,7 +5,7 @@ import grpc
 import pytest
 
 from snowfall import fixtures
-from snowfall.project.junction.adapter import segments
+from snowfall.project.junction.adapter import errors, segments
 from snowfall.project.junction.service.trips.v1alpha import trips_pb2, trips_pb2_grpc
 from snowfall.stdlib.v1alpha import models_pb2
 
@@ -22,7 +22,7 @@ class TestDictClient(object):
         self,
         segments_client: segments.Client,
     ) -> None:
-        with pytest.raises(segments.NotFoundError):
+        with pytest.raises(errors.NotFoundError):
             await segments_client.get(fixtures.NOT_FOUND)
 
 
@@ -36,7 +36,7 @@ class TestGrpcClient(object):
                     initial_metadata=grpc.aio.Metadata(),
                     trailing_metadata=grpc.aio.Metadata(),
                 ),
-                segments.NotFoundError,
+                errors.NotFoundError,
             ),
             (
                 grpc.aio.AioRpcError(
@@ -44,7 +44,7 @@ class TestGrpcClient(object):
                     initial_metadata=grpc.aio.Metadata(),
                     trailing_metadata=grpc.aio.Metadata(),
                 ),
-                segments.UnknownError,
+                errors.UnhandledError,
             ),
         ],
     )

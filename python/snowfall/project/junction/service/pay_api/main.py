@@ -2,14 +2,14 @@ import random
 from typing import Callable
 
 import currencycloud
-from asgiref.typing import ASGIApplication
+from starlette import applications
 
-from snowfall.project.junction.adapter import currencies
+from snowfall.project.junction.adapter import currencies, errors
 from snowfall.project.junction.service.currencies.v1alpha import currencies_pb2_grpc
 from snowfall.project.junction.service.pay_api import bootstrap
 from snowfall.project.junction.service.pay_api.routes import router
 from snowfall.stdlib import service
-from snowfall.stdlib.integration.starlette import application
+from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.transport.grpc.client import create_channel
 
@@ -18,8 +18,8 @@ _SERVICE_NAME = "pay-api"
 
 def _factory(
     app: service.Application[bootstrap.Settings],
-) -> Callable[[], ASGIApplication]:
-    def decorator() -> ASGIApplication:
+) -> Callable[[], applications.Starlette]:
+    def decorator() -> applications.Starlette:
         orders_channel = create_channel(
             random.choice(app.settings.currencies_address),  # nosec
         )
@@ -29,7 +29,7 @@ def _factory(
             app.settings.cc_env,
         )
 
-        return application.create_asgi_app(
+        asgi_app = application.create_starlette_app(
             routes_factory=router.get_routes,
             dependencies=bootstrap.create_dependencies(
                 cc_client=cc_client,
@@ -39,6 +39,17 @@ def _factory(
             ),
             openapi_path=filesystem.resource_path("junction.pay_api", "openapi.json"),
         )
+
+        asgi_app.add_exception_handler(
+            errors.CursorError,
+            handlers.cursor_error_handler,
+        )
+        asgi_app.add_exception_handler(
+            errors.NotFoundError,
+            handlers.not_found_error_handler,
+        )
+
+        return asgi_app
 
     return decorator
 

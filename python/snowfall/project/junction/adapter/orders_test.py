@@ -5,7 +5,7 @@ import grpc
 import pytest
 
 from snowfall import fixtures
-from snowfall.project.junction.adapter import orders
+from snowfall.project.junction.adapter import errors, orders
 from snowfall.project.junction.service.orders.v1alpha import (
     models_pb2,
     orders_pb2,
@@ -25,7 +25,7 @@ class TestDictClient(object):
         self,
         orders_client: orders.Client,
     ) -> None:
-        with pytest.raises(orders.NotFoundError):
+        with pytest.raises(errors.NotFoundError):
             await orders_client.get_order(fixtures.NOT_FOUND)
 
     async def test_multiple_orders_are_retrievable(
@@ -49,7 +49,7 @@ class TestGrpcClient(object):
                     initial_metadata=grpc.aio.Metadata(),
                     trailing_metadata=grpc.aio.Metadata(),
                 ),
-                orders.NotFoundError,
+                errors.NotFoundError,
             ),
             (
                 grpc.aio.AioRpcError(
@@ -57,7 +57,7 @@ class TestGrpcClient(object):
                     initial_metadata=grpc.aio.Metadata(),
                     trailing_metadata=grpc.aio.Metadata(),
                 ),
-                orders.UnknownError,
+                errors.UnhandledError,
             ),
         ],
     )

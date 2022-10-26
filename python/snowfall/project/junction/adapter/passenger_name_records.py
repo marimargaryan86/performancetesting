@@ -3,21 +3,12 @@ from __future__ import annotations
 import abc
 from typing import Sequence
 
-import grpc
-
+from snowfall.project.junction.adapter import errors
 from snowfall.project.junction.service.passenger_name_records.v1alpha import (
     passenger_name_records_pb2,
     passenger_name_records_pb2_grpc,
 )
 from snowfall.stdlib import string
-
-
-class NotFoundError(Exception):
-    """Raised when a passenger name record is not found."""
-
-
-class UnknownError(Exception):
-    """Raised when an unhandled error occurs."""
 
 
 class Client(abc.ABC):
@@ -57,12 +48,11 @@ class GrpcClient(Client):
         self._timeout = timeout
 
     async def create(self) -> passenger_name_records_pb2.PassengerNameRecord:
-        try:
-            response = await self._passenger_name_records.CreatePassengerNameRecord(
+        response = await errors.handle_grpc_errors(
+            self._passenger_name_records.CreatePassengerNameRecord(
                 passenger_name_records_pb2.CreatePassengerNameRecordRequest(),
                 timeout=self._timeout,
-            )
-        except grpc.aio.AioRpcError as exc:
-            raise UnknownError(exc.details()) from exc
+            ),
+        )
 
         return response.passenger_name_record

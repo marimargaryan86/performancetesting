@@ -1,15 +1,14 @@
 import http
 import ipaddress
 import pathlib
-from typing import Callable, Optional, Sequence, cast
+from typing import Any, Awaitable, Callable, Mapping, Optional, Sequence, cast
 
 import uvicorn
 from asgiref.typing import ASGIApplication
 from lagom.integrations import starlette
-from starlette import applications, exceptions, routing, status
+from starlette import applications, exceptions, requests, responses, routing, status
 from starlette.middleware import Middleware
 
-from snowfall.project.junction.adapter import errors
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import (
     handlers,
@@ -17,9 +16,11 @@ from snowfall.stdlib.integration.starlette import (
     routes,
     validation,
 )
-from snowfall.stdlib.persistence import cursor
 
 RoutesFactory = Callable[[starlette.StarletteIntegration], list[routing.Route]]
+ExceptionHandlerResponse = responses.Response | Awaitable[responses.Response]
+ExceptionHandler = Callable[[requests.Request, Exception], ExceptionHandlerResponse]
+ExceptionHandlerMapping = Mapping[Any, ExceptionHandler]
 
 
 class Settings(service.Settings):
@@ -28,23 +29,6 @@ class Settings(service.Settings):
     ]
     http_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     http_port: int = 80
-
-
-def create_asgi_app(
-    dependencies: starlette.StarletteIntegration,
-    routes_factory: RoutesFactory,
-    openapi_path: pathlib.Path | None,
-    custom_middlewares: Optional[Sequence[Middleware]] = None,
-) -> ASGIApplication:
-    return cast(
-        ASGIApplication,
-        create_starlette_app(
-            custom_middlewares=custom_middlewares,
-            dependencies=dependencies,
-            routes_factory=routes_factory,
-            openapi_path=openapi_path,
-        ),
-    )
 
 
 def create_starlette_app(
@@ -76,20 +60,18 @@ def create_starlette_app(
         exception_handlers={
             status.HTTP_500_INTERNAL_SERVER_ERROR: handlers.server_error_handler,
             exceptions.HTTPException: handlers.server_error_handler,
-            cursor.CursorError: handlers.cursor_error_handler,
-            errors.CursorError: handlers.cursor_error_handler,
         },
     )
 
 
 def serve(
-    factory: Callable[[], ASGIApplication],
+    factory: Callable[[], applications.Starlette],
     host: str,
     port: int,
     allowed_proxy_ips: Sequence[ipaddress.IPv4Address],
 ) -> None:
     return uvicorn.run(
-        app=factory,
+        app=cast(ASGIApplication, factory),
         factory=True,
         host=host,
         loop="asyncio",

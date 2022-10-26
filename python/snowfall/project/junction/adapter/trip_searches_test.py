@@ -1,7 +1,7 @@
 import pytest
 
 from snowfall import fixtures
-from snowfall.project.junction.adapter import trip_searches
+from snowfall.project.junction.adapter import errors, trip_searches
 
 
 async def test_trip_search_can_be_saved(
@@ -23,5 +23,5 @@ async def test_trip_search_can_be_retrieved(
 async def test_missing_trip_search_throws_error(
     trip_searches_client: trip_searches.Client,
 ) -> None:
-    with pytest.raises(trip_searches.NotFoundError):
+    with pytest.raises(errors.NotFoundError):
         await trip_searches_client.get(fixtures.NOT_FOUND)

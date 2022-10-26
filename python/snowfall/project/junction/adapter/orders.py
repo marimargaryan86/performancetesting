@@ -4,8 +4,6 @@ import abc
 from collections.abc import Iterator
 from typing import Optional, Sequence
 
-import grpc
-
 from snowfall.project.junction.adapter import errors
 from snowfall.project.junction.service.orders.v1alpha import (
     models_pb2,
@@ -16,14 +14,6 @@ from snowfall.stdlib import sequence, string
 
 _MOCK_PRICE_UNITS = 13
 _MOCK_PRICE_NANOS = 370000000
-
-
-class NotFoundError(Exception):
-    """Raised when an order is not found."""
-
-
-class UnknownError(Exception):
-    """Raised when an unhandled error occurs."""
 
 
 class Client(abc.ABC):
@@ -152,7 +142,7 @@ class DictClient(Client):
         options: Sequence[models_pb2.TripOption],
     ) -> models_pb2.Order:
         if journey_id not in self._journeys:
-            raise NotFoundError()
+            raise errors.NotFoundError()
 
         order_id = string.uuid()
         order = models_pb2.Order(
@@ -170,7 +160,7 @@ class DictClient(Client):
         identifier: str,
     ) -> models_pb2.Journey:
         if identifier not in self._journeys:
-            raise NotFoundError()
+            raise errors.NotFoundError()
 
         return self._journeys[identifier]
 
@@ -179,14 +169,14 @@ class DictClient(Client):
             if identifier == order.id:
                 return order
 
-        raise NotFoundError()
+        raise errors.NotFoundError()
 
     async def get_booking(self, identifier: str) -> models_pb2.Booking:
         for booking in self._iterate_bookings():
             if identifier == booking.id:
                 return booking
 
-        raise NotFoundError()
+        raise errors.NotFoundError()
 
     async def get_booking_details(
         self,
@@ -197,7 +187,7 @@ class DictClient(Client):
                 if identifier == detail.id:
                     return detail
 
-        raise NotFoundError()
+        raise errors.NotFoundError()
 
     async def find_journeys(
         self,
@@ -418,13 +408,12 @@ class GrpcClient(Client):
         self,
         contact_details: models_pb2.ContactDetails,
     ) -> models_pb2.Journey:
-        try:
-            response = await self._orders.CreateJourney(
+        response = await errors.handle_grpc_errors(
+            self._orders.CreateJourney(
                 orders_pb2.CreateJourneyRequest(contact_details=contact_details),
                 timeout=self._timeout,
-            )
-        except grpc.aio.AioRpcError as exc:
-            raise UnknownError(exc.details()) from exc
+            ),
+        )
 
         return response.journey
 
@@ -434,8 +423,8 @@ class GrpcClient(Client):
         passengers: Sequence[models_pb2.Passenger],
         options: Sequence[models_pb2.TripOption],
     ) -> models_pb2.Order:
-        try:
-            response = await self._orders.PlaceOrder(
+        response = await errors.handle_grpc_errors(
+            self._orders.PlaceOrder(
                 orders_pb2.PlaceOrderRequest(
                     journey_id=journey_id,
                     passengers=passengers,
@@ -447,62 +436,38 @@ class GrpcClient(Client):
                     ],
                 ),
                 timeout=self._timeout,
-            )
-        except grpc.aio.AioRpcError as exc:
-            if exc.code() == grpc.StatusCode.NOT_FOUND:
-                raise NotFoundError(
-                    "Journey with ID '{id}' not found.".format(id=journey_id),
-                ) from exc
-
-            raise UnknownError(exc.details()) from exc
+            ),
+        )
 
         return response.order
 
     async def get_journey(self, identifier: str) -> models_pb2.Journey:
-        try:
-            response = await self._orders.GetJourney(
+        response = await errors.handle_grpc_errors(
+            self._orders.GetJourney(
                 orders_pb2.GetJourneyRequest(id=identifier),
                 timeout=self._timeout,
-            )
-        except grpc.aio.AioRpcError as exc:
-            if exc.code() == grpc.StatusCode.NOT_FOUND:
-                raise NotFoundError(
-                    "Journey with ID '{id}' not found.".format(id=identifier),
-                ) from exc
-
-            raise UnknownError(exc.details()) from exc
+            ),
+        )
 
         return response.journey
 
     async def get_order(self, identifier: str) -> models_pb2.Order:
-        try:
-            response = await self._orders.GetOrder(
+        response = await errors.handle_grpc_errors(
+            self._orders.GetOrder(
                 orders_pb2.GetOrderRequest(id=identifier),
                 timeout=self._timeout,
-            )
-        except grpc.aio.AioRpcError as exc:
-            if exc.code() == grpc.StatusCode.NOT_FOUND:
-                raise NotFoundError(
-                    "Order with ID '{id}' not found.".format(id=identifier),
-                ) from exc
-
-            raise UnknownError(exc.details()) from exc
+            ),
+        )
 
         return response.order
 
     async def get_booking(self, identifier: str) -> models_pb2.Booking:
-        try:
-            response = await self._orders.GetBooking(
+        response = await errors.handle_grpc_errors(
+            self._orders.GetBooking(
                 orders_pb2.GetBookingRequest(id=identifier),
                 timeout=self._timeout,
-            )
-        except grpc.aio.AioRpcError as exc:
-            if exc.code() == grpc.StatusCode.NOT_FOUND:
-                raise NotFoundError(
-                    "Booking with ID '{id}' not found.".format(id=identifier),
-                ) from exc
-
-            raise UnknownError(exc.details()) from exc
+            ),
+        )
 
         return response.booking
 
@@ -510,18 +475,12 @@ class GrpcClient(Client):
         self,
         identifier: str,
     ) -> models_pb2.TripOptionDetails:
-        try:
-            response = await self._orders.GetBookingDetails(
+        response = await errors.handle_grpc_errors(
+            self._orders.GetBookingDetails(
                 orders_pb2.GetBookingDetailsRequest(id=identifier),
                 timeout=self._timeout,
-            )
-        except grpc.aio.AioRpcError as exc:
-            if exc.code() == grpc.StatusCode.NOT_FOUND:
-                raise NotFoundError(
-                    "Booking details with ID '{id}' not found.".format(id=identifier),
-                ) from exc
-
-            raise UnknownError(exc.details()) from exc
+            ),
+        )
 
         return response.details
 
@@ -539,12 +498,9 @@ class GrpcClient(Client):
         if limit is not None:
             request.page_size = limit
 
-        try:
-            return await errors.handle_grpc_errors(
-                self._orders.ListJourneys(request, timeout=self._timeout),
-            )
-        except grpc.aio.AioRpcError as exc:
-            raise UnknownError(exc.details()) from exc
+        return await errors.handle_grpc_errors(
+            self._orders.ListJourneys(request, timeout=self._timeout),
+        )
 
     async def find_orders(
         self,
@@ -560,12 +516,9 @@ class GrpcClient(Client):
         if limit is not None:
             request.page_size = limit
 
-        try:
-            return await errors.handle_grpc_errors(
-                self._orders.ListOrders(request, timeout=self._timeout),
-            )
-        except grpc.aio.AioRpcError as exc:
-            raise UnknownError(exc.details()) from exc
+        return await errors.handle_grpc_errors(
+            self._orders.ListOrders(request, timeout=self._timeout),
+        )
 
     async def find_orders_by_journey_id(
         self,
@@ -581,12 +534,9 @@ class GrpcClient(Client):
         if limit is not None:
             request.page_size = limit
 
-        try:
-            return await errors.handle_grpc_errors(
-                self._orders.ListOrders(request, timeout=self._timeout),
-            )
-        except grpc.aio.AioRpcError as exc:
-            raise UnknownError(exc.details()) from exc
+        return await errors.handle_grpc_errors(
+            self._orders.ListOrders(request, timeout=self._timeout),
+        )
 
     async def find_bookings(
         self,
@@ -602,12 +552,9 @@ class GrpcClient(Client):
         if limit is not None:
             request.page_size = limit
 
-        try:
-            return await errors.handle_grpc_errors(
-                self._orders.ListBookings(request, timeout=self._timeout),
-            )
-        except grpc.aio.AioRpcError as exc:
-            raise UnknownError(exc.details()) from exc
+        return await errors.handle_grpc_errors(
+            self._orders.ListBookings(request, timeout=self._timeout),
+        )
 
     async def find_bookings_by_order_id(
         self,
@@ -623,12 +570,9 @@ class GrpcClient(Client):
         if limit is not None:
             request.page_size = limit
 
-        try:
-            return await errors.handle_grpc_errors(
-                self._orders.ListBookings(request, timeout=self._timeout),
-            )
-        except grpc.aio.AioRpcError as exc:
-            raise UnknownError(exc.details()) from exc
+        return await errors.handle_grpc_errors(
+            self._orders.ListBookings(request, timeout=self._timeout),
+        )
 
     async def find_booking_details(
         self,
@@ -644,12 +588,9 @@ class GrpcClient(Client):
         if limit is not None:
             request.page_size = limit
 
-        try:
-            return await errors.handle_grpc_errors(
-                self._orders.ListBookingDetails(request, timeout=self._timeout),
-            )
-        except grpc.aio.AioRpcError as exc:
-            raise UnknownError(exc.details()) from exc
+        return await errors.handle_grpc_errors(
+            self._orders.ListBookingDetails(request, timeout=self._timeout),
+        )
 
     async def find_booking_details_by_booking_id(
         self,
@@ -665,9 +606,6 @@ class GrpcClient(Client):
         if limit is not None:
             request.page_size = limit
 
-        try:
-            return await errors.handle_grpc_errors(
-                self._orders.ListBookingDetails(request, timeout=self._timeout),
-            )
-        except grpc.aio.AioRpcError as exc:
-            raise UnknownError(exc.details()) from exc
+        return await errors.handle_grpc_errors(
+            self._orders.ListBookingDetails(request, timeout=self._timeout),
+        )

@@ -6,10 +6,10 @@ import pytest
 from starlette import applications
 from starlette.middleware import Middleware
 
-from snowfall.project.junction.adapter import locations, places
+from snowfall.project.junction.adapter import errors, locations, places
 from snowfall.project.junction.service.admin_api import bootstrap, router
-from snowfall.stdlib.integration.starlette import application
-from snowfall.stdlib.persistence import filesystem
+from snowfall.stdlib.integration.starlette import application, handlers
+from snowfall.stdlib.persistence import cursor, filesystem
 
 
 def _create_app(
@@ -18,7 +18,7 @@ def _create_app(
     openapi_path: pathlib.Path,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
-    return application.create_starlette_app(
+    app = application.create_starlette_app(
         routes_factory=router.get_routes,
         custom_middlewares=custom_middlewares,
         dependencies=bootstrap.create_dependencies(
@@ -27,6 +27,11 @@ def _create_app(
         ),
         openapi_path=openapi_path,
     )
+    app.add_exception_handler(cursor.CursorError, handlers.cursor_error_handler)
+    app.add_exception_handler(errors.CursorError, handlers.cursor_error_handler)
+    app.add_exception_handler(errors.NotFoundError, handlers.not_found_error_handler)
+
+    return app
 
 
 @pytest.fixture()

@@ -5,21 +5,11 @@ import dataclasses
 import datetime
 from typing import Optional, Sequence
 
-import grpc
-
 from snowfall.project.junction.adapter import errors
 from snowfall.project.junction.service.trips.v1alpha import trips_pb2, trips_pb2_grpc
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2
-
-
-class NotFoundError(Exception):
-    """Raised when a trip search resource is not found."""
-
-
-class UnknownError(Exception):
-    """Raised when an unhandled error occurs."""
 
 
 @dataclasses.dataclass(frozen=True)
@@ -81,7 +71,7 @@ class DictClient(Client):
         try:
             return self._searches[identifier]
         except KeyError as err:
-            raise NotFoundError() from err
+            raise errors.NotFoundError() from err
 
     async def list_trips_by_trip_search(
         self,
@@ -94,7 +84,7 @@ class DictClient(Client):
                 trips=self._trips_cache[identifier],
             )
         except KeyError as err:
-            raise NotFoundError() from err
+            raise errors.NotFoundError() from err
 
     async def _generate_trips(self, trip_search: trips_pb2.TripSearch) -> None:
         self._trips_cache[trip_search.id] = [
@@ -138,28 +128,24 @@ class GrpcClient(Client):
             ),
         )
 
-        response = await self._trip_searches.EnqueueTripSearch(
-            request,
-            timeout=self._timeout,
+        response = await errors.handle_grpc_errors(
+            self._trip_searches.EnqueueTripSearch(
+                request,
+                timeout=self._timeout,
+            ),
         )
 
         return response.trip_search
 
     async def get(self, identifier: str) -> trips_pb2.TripSearch:
-        try:
-            response = await self._trip_searches.GetTripSearchDetails(
+        response = await errors.handle_grpc_errors(
+            self._trip_searches.GetTripSearchDetails(
                 trips_pb2.GetTripSearchDetailsRequest(
                     id=identifier,
                 ),
                 timeout=self._timeout,
-            )
-        except grpc.aio.AioRpcError as exc:
-            if exc.code() == grpc.StatusCode.NOT_FOUND:
-                raise NotFoundError(
-                    "Trip Search with ID '{id}' not found.".format(id=identifier),
-                ) from exc
-
-            raise UnknownError(exc.details()) from exc
+            ),
+        )
 
         return response.trip_search
 

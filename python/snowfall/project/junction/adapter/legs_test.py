@@ -5,7 +5,7 @@ import grpc
 import pytest
 
 from snowfall import fixtures
-from snowfall.project.junction.adapter import legs
+from snowfall.project.junction.adapter import errors, legs
 from snowfall.project.junction.service.schedules.v1alpha import (
     schedules_pb2,
     schedules_pb2_grpc,
@@ -25,7 +25,7 @@ class TestDictClient(object):
         self,
         legs_client: legs.Client,
     ) -> None:
-        with pytest.raises(legs.NotFoundError):
+        with pytest.raises(errors.NotFoundError):
             await legs_client.get(fixtures.NOT_FOUND)
 
     async def test_multiple_legs_are_retrievable(
@@ -46,7 +46,7 @@ class TestGrpcClient(object):
                     initial_metadata=grpc.aio.Metadata(),
                     trailing_metadata=grpc.aio.Metadata(),
                 ),
-                legs.NotFoundError,
+                errors.NotFoundError,
             ),
             (
                 grpc.aio.AioRpcError(
@@ -54,7 +54,7 @@ class TestGrpcClient(object):
                     initial_metadata=grpc.aio.Metadata(),
                     trailing_metadata=grpc.aio.Metadata(),
                 ),
-                legs.UnknownError,
+                errors.UnhandledError,
             ),
         ],
     )

@@ -4,8 +4,7 @@ import abc
 import datetime
 from typing import Sequence
 
-import grpc
-
+from snowfall.project.junction.adapter import errors
 from snowfall.project.junction.service.offers.v1alpha import (
     grpc_pb2,
     grpc_pb2_grpc,
@@ -13,14 +12,6 @@ from snowfall.project.junction.service.offers.v1alpha import (
 )
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
-
-
-class NotFoundError(Exception):
-    """Raised when an offer search resource is not found."""
-
-
-class UnknownError(Exception):
-    """Raised when an unhandled error occurs."""
 
 
 class Client(abc.ABC):
@@ -62,7 +53,7 @@ class DictClient(Client):
         try:
             return self._searches[identifier]
         except KeyError as err:
-            raise NotFoundError() from err
+            raise errors.NotFoundError() from err
 
 
 class GrpcClient(Client):
@@ -80,30 +71,23 @@ class GrpcClient(Client):
         self,
         request: models_pb2.OfferSearch,
     ) -> models_pb2.OfferSearch:
-        try:
-            response = await self._offer_searches.EnqueueOfferSearch(
+        response = await errors.handle_grpc_errors(
+            self._offer_searches.EnqueueOfferSearch(
                 grpc_pb2.EnqueueOfferSearchRequest(
                     search=request,
                 ),
                 timeout=self._timeout,
-            )
-        except grpc.aio.AioRpcError as exc:
-            raise UnknownError(exc.details()) from exc
+            ),
+        )
 
         return response.search
 
     async def get(self, offer_search_id: str) -> models_pb2.OfferSearch:
-        try:
-            response = await self._offer_searches.GetOfferSearch(
+        response = await errors.handle_grpc_errors(
+            self._offer_searches.GetOfferSearch(
                 grpc_pb2.GetOfferSearchRequest(id=offer_search_id),
                 timeout=self._timeout,
-            )
-        except grpc.aio.AioRpcError as exc:
-            if exc.code() == grpc.StatusCode.NOT_FOUND:
-                raise NotFoundError(
-                    "Offer Search with ID '{id}' not found.".format(id=offer_search_id),
-                ) from exc
-
-            raise UnknownError(exc.details()) from exc
+            ),
+        )
 
         return response.search

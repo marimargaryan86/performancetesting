@@ -4,7 +4,7 @@ import lagom
 import more_itertools
 from starlette import endpoints, requests, responses, status
 
-from snowfall.project.junction.adapter import legs, offer_searches
+from snowfall.project.junction.adapter import errors, legs, offer_searches
 from snowfall.project.junction.adapter import offers as offers_adapter
 from snowfall.project.junction.adapter import orders as orders_adapter
 from snowfall.project.junction.adapter import trips
@@ -63,15 +63,15 @@ def offer_search_request_validator(
             ).trips
         }
 
-        trips_list, errors = _validate_trips(
+        trips_list, validation_errors = _validate_trips(
             body,
             trips_map,
             await _make_legs_map(legs_client, trips_map),
         )
 
-        if errors:
+        if validation_errors:
             return models.JsonApiResponse(
-                models.Body(errors=errors),
+                models.Body(errors=validation_errors),
                 status_code=status.HTTP_404_NOT_FOUND,
             )
 
@@ -122,11 +122,11 @@ def _validate_trips(
     legs_map: Mapping[str, models_pb2.Leg],
 ) -> tuple[list[models_pb2.Trip], list[models.Error]]:
     trips_list: list[models_pb2.Trip] = []
-    errors: list[models.Error] = []
+    validation_errors: list[models.Error] = []
 
     for trip_idx, trip_id in enumerate(body["trips"]):
         if trip_id not in trips_map.keys():
-            errors.append(
+            validation_errors.append(
                 models.Error(
                     status=str(status.HTTP_404_NOT_FOUND),
                     code="not_found",
@@ -157,7 +157,7 @@ def _validate_trips(
                 ),
             )
         except KeyError:
-            errors.append(
+            validation_errors.append(
                 models.Error(
                     status=str(status.HTTP_404_NOT_FOUND),
                     code="not_found",
@@ -170,7 +170,7 @@ def _validate_trips(
                 ),
             )
 
-    return trips_list, errors
+    return trips_list, validation_errors
 
 
 def order_request_validator(  # noqa: WPS320
@@ -202,7 +202,7 @@ def order_request_validator(  # noqa: WPS320
 
         try:
             offer = await offers_client.get(body["offer"])
-        except offers_adapter.NotFoundError:
+        except errors.NotFoundError:
             return models.JsonApiResponse(
                 models.Body(
                     errors=[
@@ -221,11 +221,11 @@ def order_request_validator(  # noqa: WPS320
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
 
-        errors = _validate_options(offer, body["options"])
+        validation_errors = _validate_options(offer, body["options"])
 
-        if errors:
+        if validation_errors:
             return models.JsonApiResponse(
-                models.Body(errors=errors),
+                models.Body(errors=validation_errors),
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
 
@@ -240,7 +240,7 @@ def _validate_options(
     offer: offer_models_pb2.OfferAggregate,
     option_ids: Sequence[str],
 ) -> list[models.Error]:
-    errors = [
+    validation_errors = [
         models.Error(
             status=str(status.HTTP_422_UNPROCESSABLE_ENTITY),
             code="invalid",
@@ -254,9 +254,9 @@ def _validate_options(
         not in {option.id for group in offer.groups for option in group.offers}
     ]
 
-    errors.extend(_validate_groups(offer, option_ids))
+    validation_errors.extend(_validate_groups(offer, option_ids))
 
-    return errors
+    return validation_errors
 
 
 def _validate_groups(
@@ -267,7 +267,7 @@ def _validate_groups(
         group.id: {option.id for option in group.offers} for group in offer.groups
     }
 
-    errors = [
+    validation_errors = [
         models.Error(
             status=str(status.HTTP_422_UNPROCESSABLE_ENTITY),
             code="missing",
@@ -277,7 +277,7 @@ def _validate_groups(
         if not options.intersection(set(option_ids))
     ]
 
-    errors.extend(
+    validation_errors.extend(
         [
             models.Error(
                 status=str(status.HTTP_422_UNPROCESSABLE_ENTITY),
@@ -289,7 +289,7 @@ def _validate_groups(
         ],
     )
 
-    return errors
+    return validation_errors
 
 
 def _create_trip_options(

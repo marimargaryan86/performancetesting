@@ -4,8 +4,6 @@ import abc
 from collections.abc import Iterator
 from typing import Optional, Sequence
 
-import grpc
-
 from snowfall.project.junction.adapter import errors
 from snowfall.project.junction.service.offers.v1alpha import (
     grpc_pb2,
@@ -14,14 +12,6 @@ from snowfall.project.junction.service.offers.v1alpha import (
 )
 from snowfall.stdlib import sequence
 from snowfall.stdlib.v1alpha import models_pb2 as common_pb2
-
-
-class NotFoundError(Exception):
-    """Raised when an offer is not found."""
-
-
-class UnknownError(Exception):
-    """Raised when an unhandled error occurs."""
 
 
 class Client(abc.ABC):  # noqa: WPS214
@@ -112,7 +102,7 @@ class DictClient(Client):  # noqa: WPS214
 
     async def get(self, offer_id: str) -> models_pb2.OfferAggregate:
         if offer_id not in self._offers:
-            raise NotFoundError()
+            raise errors.NotFoundError()
 
         return self._offers[offer_id]
 
@@ -173,7 +163,7 @@ class DictClient(Client):  # noqa: WPS214
             if group.id == identifier:
                 return group
 
-        raise NotFoundError()
+        raise errors.NotFoundError()
 
     async def find_groups_by_ids(
         self,
@@ -198,7 +188,7 @@ class DictClient(Client):  # noqa: WPS214
                 if detail.id == identifier:
                     return detail
 
-        raise NotFoundError()
+        raise errors.NotFoundError()
 
     async def find_group_details_by_ids(
         self,
@@ -224,7 +214,7 @@ class DictClient(Client):  # noqa: WPS214
             if option.id == identifier:
                 return option
 
-        raise NotFoundError()
+        raise errors.NotFoundError()
 
     async def find_options_by_ids(
         self,
@@ -252,7 +242,7 @@ class DictClient(Client):  # noqa: WPS214
                 if details.id == identifier:
                     return details
 
-        raise NotFoundError()
+        raise errors.NotFoundError()
 
     async def find_option_details_by_ids(
         self,
@@ -303,18 +293,12 @@ class GrpcClient(Client):  # noqa: WPS214
         self._timeout = timeout
 
     async def get(self, offer_id: str) -> models_pb2.OfferAggregate:
-        try:
-            response = await self._offers.GetOffer(
+        response = await errors.handle_grpc_errors(
+            self._offers.GetOffer(
                 grpc_pb2.GetOfferRequest(id=offer_id),
                 timeout=self._timeout,
-            )
-        except grpc.aio.AioRpcError as exc:
-            if exc.code() == grpc.StatusCode.NOT_FOUND:
-                raise NotFoundError(
-                    "Offer with ID '{id}' not found.".format(id=offer_id),
-                ) from exc
-
-            raise UnknownError() from exc
+            ),
+        )
 
         return response.offer
 
@@ -333,12 +317,9 @@ class GrpcClient(Client):  # noqa: WPS214
         if limit is not None:
             request.page_size = limit
 
-        try:
-            return await errors.handle_grpc_errors(
-                self._offers.ListOffers(request, timeout=self._timeout),
-            )
-        except grpc.aio.AioRpcError as exc:
-            raise UnknownError(exc.details()) from exc
+        return await errors.handle_grpc_errors(
+            self._offers.ListOffers(request, timeout=self._timeout),
+        )
 
     async def find_by_ids(
         self,
@@ -354,25 +335,15 @@ class GrpcClient(Client):  # noqa: WPS214
         if limit is not None:
             request.page_size = limit
 
-        try:
-            return await errors.handle_grpc_errors(
-                self._offers.ListOffers(request, timeout=self._timeout),
-            )
-        except grpc.aio.AioRpcError as exc:
-            raise UnknownError() from exc
+        return await errors.handle_grpc_errors(
+            self._offers.ListOffers(request, timeout=self._timeout),
+        )
 
     async def get_group_by_id(self, identifier: str) -> models_pb2.OfferGroup:
         request = grpc_pb2.GetOfferGroupRequest(id=identifier)
-
-        try:
-            response = await self._offers.GetOfferGroup(request, timeout=self._timeout)
-        except grpc.aio.AioRpcError as exc:
-            if exc.code() == grpc.StatusCode.NOT_FOUND:
-                raise NotFoundError(
-                    "Offer group with ID '{id}' not found.".format(id=identifier),
-                ) from exc
-
-            raise UnknownError() from exc
+        response = await errors.handle_grpc_errors(
+            self._offers.GetOfferGroup(request, timeout=self._timeout),
+        )
 
         return response.group
 
@@ -390,29 +361,15 @@ class GrpcClient(Client):  # noqa: WPS214
         if limit is not None:
             request.page_size = limit
 
-        try:
-            return await errors.handle_grpc_errors(
-                self._offers.ListOfferGroups(request, timeout=self._timeout),
-            )
-        except grpc.aio.AioRpcError as exc:
-            raise UnknownError() from exc
+        return await errors.handle_grpc_errors(
+            self._offers.ListOfferGroups(request, timeout=self._timeout),
+        )
 
     async def get_group_details_by_id(self, identifier: str) -> models_pb2.OfferSegment:
         request = grpc_pb2.GetOfferGroupDetailsRequest(id=identifier)
-
-        try:
-            response = await errors.handle_grpc_errors(
-                self._offers.GetOfferGroupDetails(request, timeout=self._timeout),
-            )
-        except grpc.aio.AioRpcError as exc:
-            if exc.code() == grpc.StatusCode.NOT_FOUND:
-                raise NotFoundError(
-                    "Offer group details with ID '{id}' not found.".format(
-                        id=identifier,
-                    ),
-                ) from exc
-
-            raise UnknownError() from exc
+        response = await errors.handle_grpc_errors(
+            self._offers.GetOfferGroupDetails(request, timeout=self._timeout),
+        )
 
         return response.details
 
@@ -430,25 +387,15 @@ class GrpcClient(Client):  # noqa: WPS214
         if limit is not None:
             request.page_size = limit
 
-        try:
-            return await errors.handle_grpc_errors(
-                self._offers.ListOfferGroupDetails(request, timeout=self._timeout),
-            )
-        except grpc.aio.AioRpcError as exc:
-            raise UnknownError() from exc
+        return await errors.handle_grpc_errors(
+            self._offers.ListOfferGroupDetails(request, timeout=self._timeout),
+        )
 
     async def get_option_by_id(self, identifier: str) -> models_pb2.Offer:
         request = grpc_pb2.GetOfferOptionRequest(id=identifier)
-
-        try:
-            response = await self._offers.GetOfferOption(request, timeout=self._timeout)
-        except grpc.aio.AioRpcError as exc:
-            if exc.code() == grpc.StatusCode.NOT_FOUND:
-                raise NotFoundError(
-                    "Option with ID '{id}' not found.".format(id=identifier),
-                ) from exc
-
-            raise UnknownError() from exc
+        response = await errors.handle_grpc_errors(
+            self._offers.GetOfferOption(request, timeout=self._timeout),
+        )
 
         return response.option
 
@@ -466,31 +413,21 @@ class GrpcClient(Client):  # noqa: WPS214
         if limit is not None:
             request.page_size = limit
 
-        try:
-            return await errors.handle_grpc_errors(
-                self._offers.ListOfferOptions(request, timeout=self._timeout),
-            )
-        except grpc.aio.AioRpcError as exc:
-            raise UnknownError() from exc
+        return await errors.handle_grpc_errors(
+            self._offers.ListOfferOptions(request, timeout=self._timeout),
+        )
 
     async def get_option_details_by_id(
         self,
         identifier: str,
     ) -> models_pb2.OfferSegmentDetails:
         request = grpc_pb2.GetOfferOptionDetailsRequest(id=identifier)
-
-        try:
-            response = await self._offers.GetOfferOptionDetails(
+        response = await errors.handle_grpc_errors(
+            self._offers.GetOfferOptionDetails(
                 request,
                 timeout=self._timeout,
-            )
-        except grpc.aio.AioRpcError as exc:
-            if exc.code() == grpc.StatusCode.NOT_FOUND:
-                raise NotFoundError(
-                    "Option details with ID '{id}' not found.".format(id=identifier),
-                ) from exc
-
-            raise UnknownError() from exc
+            ),
+        )
 
         return response.details
 
@@ -508,9 +445,6 @@ class GrpcClient(Client):  # noqa: WPS214
         if limit is not None:
             request.page_size = limit
 
-        try:
-            return await errors.handle_grpc_errors(
-                self._offers.ListOfferOptionDetails(request, timeout=self._timeout),
-            )
-        except grpc.aio.AioRpcError as exc:
-            raise UnknownError() from exc
+        return await errors.handle_grpc_errors(
+            self._offers.ListOfferOptionDetails(request, timeout=self._timeout),
+        )

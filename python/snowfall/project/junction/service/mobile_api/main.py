@@ -5,8 +5,8 @@ from typing import Callable
 import aioredis
 import aiosmtplib
 import stripe
-from asgiref.typing import ASGIApplication
 from motor import motor_asyncio
+from starlette import applications
 from starlette.middleware import Middleware, authentication
 
 from snowfall.project.junction.service.mobile_api import (
@@ -27,8 +27,8 @@ from snowfall.vendor.junction import client
 
 def _factory(
     app: service.Application[bootstrap.Settings],
-) -> Callable[[], ASGIApplication]:
-    def decorator() -> ASGIApplication:
+) -> Callable[[], applications.Starlette]:
+    def decorator() -> applications.Starlette:
         stripe.api_key = app.settings.stripe_api_key
         junction_client = client.JunctionClient(
             api_url=random.choice(app.settings.junction_api_address),  # nosec
@@ -60,7 +60,7 @@ def _factory(
             jwt_token_version=app.settings.jwt_token_version,
         )
 
-        return application.create_asgi_app(
+        return application.create_starlette_app(
             routes_factory=router.get_routes,
             dependencies=bootstrap.create_dependencies(
                 offers_repository=repository.OffersRepository(

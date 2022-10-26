@@ -1,5 +1,5 @@
 import lagom
-from starlette import endpoints, exceptions, requests, responses, status
+from starlette import endpoints, requests, responses
 
 from snowfall.project.junction.adapter import segments
 from snowfall.project.junction.service.client_api import resources
@@ -12,10 +12,7 @@ class Segment(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: segments.Client = lagom.injectable,
     ) -> responses.Response:
-        try:
-            segment = await client.get(request.path_params["segmentId"])
-        except segments.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+        segment = await client.get(request.path_params["segmentId"])
 
         return await messages.create_response(
             body=models.Body(

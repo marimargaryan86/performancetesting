@@ -5,7 +5,7 @@ import grpc
 import pytest
 
 from snowfall import fixtures
-from snowfall.project.junction.adapter import offers
+from snowfall.project.junction.adapter import errors, offers
 from snowfall.project.junction.service.offers.v1alpha import (
     grpc_pb2,
     grpc_pb2_grpc,
@@ -26,7 +26,7 @@ class TestDictClient(object):
         self,
         offers_client: offers.Client,
     ) -> None:
-        with pytest.raises(offers.NotFoundError):
+        with pytest.raises(errors.NotFoundError):
             await offers_client.get(fixtures.NOT_FOUND)
 
     async def test_missing_offer_is_not_found_by_id(
@@ -89,7 +89,7 @@ class TestGrpcClient(object):
                     initial_metadata=grpc.aio.Metadata(),
                     trailing_metadata=grpc.aio.Metadata(),
                 ),
-                offers.NotFoundError,
+                errors.NotFoundError,
             ),
             (
                 grpc.aio.AioRpcError(
@@ -97,7 +97,7 @@ class TestGrpcClient(object):
                     initial_metadata=grpc.aio.Metadata(),
                     trailing_metadata=grpc.aio.Metadata(),
                 ),
-                offers.UnknownError,
+                errors.UnhandledError,
             ),
         ],
     )

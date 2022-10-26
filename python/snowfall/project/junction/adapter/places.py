@@ -3,8 +3,6 @@ from __future__ import annotations
 import abc
 from typing import Optional, Sequence
 
-import grpc
-
 from snowfall.project.junction.adapter import errors
 from snowfall.project.junction.service.places.v1alpha import (
     models_pb2,
@@ -12,16 +10,6 @@ from snowfall.project.junction.service.places.v1alpha import (
     places_pb2_grpc,
 )
 from snowfall.stdlib import sequence, string
-
-_PLACE_NOT_FOUND_FROMAT = "Place with ID '{id}' not found."
-
-
-class NotFoundError(Exception):
-    """Raised when a place is not found."""
-
-
-class UnknownError(Exception):
-    """Raised when an unhandled error occurs."""
 
 
 class Client(abc.ABC):
@@ -66,17 +54,13 @@ class DictClient(Client):
         try:
             return self._places[place_id]
         except KeyError as err:
-            raise NotFoundError(
-                _PLACE_NOT_FOUND_FROMAT.format(id=place_id),
-            ) from err
+            raise errors.NotFoundError() from err
 
     async def delete(self, place_id: str) -> None:
         try:
             self._places.pop(place_id)
         except KeyError as err:
-            raise NotFoundError(
-                _PLACE_NOT_FOUND_FROMAT.format(id=place_id),
-            ) from err
+            raise errors.NotFoundError() from err
 
     async def update(self, place: models_pb2.Place) -> models_pb2.Place:
         self._places[place.location.id] = place
@@ -106,59 +90,43 @@ class GrpcClient(Client):
         self._timeout = timeout
 
     async def create(self, place: models_pb2.Place) -> models_pb2.Place:
-        response = await self._places.CreatePlace(
-            places_pb2.CreatePlaceRequest(
-                place=place,
+        response = await errors.handle_grpc_errors(
+            self._places.CreatePlace(
+                places_pb2.CreatePlaceRequest(
+                    place=place,
+                ),
             ),
         )
 
         return response.place
 
     async def get(self, place_id: str) -> models_pb2.Place:
-        try:
-            response = await self._places.GetPlace(
+        response = await errors.handle_grpc_errors(
+            self._places.GetPlace(
                 places_pb2.GetPlaceRequest(id=place_id),
                 timeout=self._timeout,
-            )
-        except grpc.aio.AioRpcError as exc:
-            if exc.code() == grpc.StatusCode.NOT_FOUND:
-                raise NotFoundError(
-                    _PLACE_NOT_FOUND_FROMAT.format(id=place_id),
-                ) from exc
-
-            raise UnknownError(exc.details()) from exc
+            ),
+        )
 
         return response.place
 
     async def delete(self, identifier: str) -> None:
-        try:
-            await self._places.DeletePlace(
+        await errors.handle_grpc_errors(
+            self._places.DeletePlace(
                 places_pb2.DeletePlaceRequest(id=identifier),
                 timeout=self._timeout,
-            )
-        except grpc.aio.AioRpcError as exc:
-            if exc.code() == grpc.StatusCode.NOT_FOUND:
-                raise NotFoundError(
-                    _PLACE_NOT_FOUND_FROMAT.format(id=identifier),
-                ) from exc
-
-            raise UnknownError(exc.details()) from exc
+            ),
+        )
 
     async def update(self, place: models_pb2.Place) -> models_pb2.Place:
-        try:
-            response = await self._places.UpdatePlace(
+        response = await errors.handle_grpc_errors(
+            self._places.UpdatePlace(
                 places_pb2.UpdatePlaceRequest(
                     place=place,
                 ),
                 timeout=self._timeout,
-            )
-        except grpc.aio.AioRpcError as exc:
-            if exc.code() == grpc.StatusCode.NOT_FOUND:
-                raise NotFoundError(
-                    _PLACE_NOT_FOUND_FROMAT.format(id=place.location.id),
-                ) from exc
-
-            raise UnknownError(exc.details()) from exc
+            ),
+        )
 
         return response.place
 

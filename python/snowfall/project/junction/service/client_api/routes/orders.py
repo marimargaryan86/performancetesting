@@ -2,7 +2,7 @@ import datetime
 from typing import Any, Mapping, Sequence
 
 import lagom
-from starlette import endpoints, exceptions, requests, responses, status
+from starlette import endpoints, requests, responses, status
 
 from snowfall.project.junction.adapter import orders as orders_adapter
 from snowfall.project.junction.service.client_api import resources
@@ -31,10 +31,7 @@ class Journey(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders_adapter.Client = lagom.injectable,
     ) -> responses.Response:
-        try:
-            journey = await client.get_journey(request.path_params["journeyId"])
-        except orders_adapter.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+        journey = await client.get_journey(request.path_params["journeyId"])
 
         return await messages.create_response(
             body=models.Body(
@@ -81,10 +78,7 @@ class Order(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders_adapter.Client = lagom.injectable,
     ) -> responses.Response:
-        try:
-            order = await client.get_order(request.path_params["orderId"])
-        except orders_adapter.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+        order = await client.get_order(request.path_params["orderId"])
 
         return await messages.create_response(
             body=models.Body(
@@ -164,16 +158,11 @@ class OrdersByJourney(endpoints.HTTPEndpoint):
         options: Sequence[order_models_pb2.TripOption],
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
-
-        try:
-            order = await orders_client.place_order(
-                journey_id=request.path_params["journeyId"],
-                passengers=_create_passengers(body["passengers"]),
-                options=options,
-            )
-        except orders_adapter.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
-
+        order = await orders_client.place_order(
+            journey_id=request.path_params["journeyId"],
+            passengers=_create_passengers(body["passengers"]),
+            options=options,
+        )
         # todo: Expire (delete) the offer the order was placed for.
 
         return await messages.create_response(
@@ -194,10 +183,7 @@ class Booking(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders_adapter.Client = lagom.injectable,
     ) -> responses.Response:
-        try:
-            booking = await client.get_booking(request.path_params["bookingId"])
-        except orders_adapter.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+        booking = await client.get_booking(request.path_params["bookingId"])
 
         return await messages.create_response(
             body=models.Body(
@@ -289,12 +275,9 @@ class BookingDetails(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders_adapter.Client = lagom.injectable,
     ) -> responses.Response:
-        try:
-            details = await client.get_booking_details(
-                request.path_params["bookingDetailsId"],
-            )
-        except orders_adapter.NotFoundError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+        details = await client.get_booking_details(
+            request.path_params["bookingDetailsId"],
+        )
 
         return await messages.create_response(
             body=models.Body(

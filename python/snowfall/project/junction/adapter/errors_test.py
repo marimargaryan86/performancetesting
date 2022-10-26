@@ -24,9 +24,9 @@ async def _raise_grpc_bad_request_error(field: str) -> NoReturn:
     )
 
 
-async def _raise_grpc_error() -> NoReturn:
+async def _raise_grpc_error(code: grpc.StatusCode) -> NoReturn:
     raise grpc.aio.AioRpcError(
-        code=grpc.StatusCode.UNKNOWN,
+        code=code,
         initial_metadata=grpc.aio.Metadata(),
         trailing_metadata=grpc.aio.Metadata(),
     )
@@ -37,11 +37,16 @@ async def test_cursor_error_is_handled() -> None:
         await errors.handle_grpc_errors(_raise_grpc_bad_request_error("page_token"))
 
 
+async def test_not_found_error_is_handled() -> None:
+    with pytest.raises(errors.NotFoundError):
+        await errors.handle_grpc_errors(_raise_grpc_error(grpc.StatusCode.NOT_FOUND))
+
+
 async def test_unknown_field_is_not_handled() -> None:
-    with pytest.raises(grpc.aio.AioRpcError):
+    with pytest.raises(errors.UnhandledError):
         await errors.handle_grpc_errors(_raise_grpc_bad_request_error("unknown"))
 
 
 async def test_unknown_error_is_not_handled() -> None:
-    with pytest.raises(grpc.aio.AioRpcError):
-        await errors.handle_grpc_errors(_raise_grpc_error())
+    with pytest.raises(errors.UnhandledError):
+        await errors.handle_grpc_errors(_raise_grpc_error(grpc.StatusCode.UNKNOWN))

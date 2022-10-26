@@ -2,9 +2,8 @@ from typing import Callable
 
 import httpx
 import lagom
-from asgiref.typing import ASGIApplication
 from lagom.integrations import starlette
-from starlette import routing
+from starlette import applications, routing
 
 from snowfall.project.junction.service.dogfood_ui import routes
 from snowfall.stdlib import service
@@ -54,9 +53,11 @@ def _routes(dependencies: starlette.StarletteIntegration) -> list[routing.Route]
     ]
 
 
-def _factory(app: service.Application[_Settings]) -> Callable[[], ASGIApplication]:
-    def decorator() -> ASGIApplication:
-        return application.create_asgi_app(
+def _factory(
+    app: service.Application[_Settings],
+) -> Callable[[], applications.Starlette]:
+    def decorator() -> applications.Starlette:
+        return application.create_starlette_app(
             routes_factory=_routes,
             dependencies=_dependencies(app),
             openapi_path=None,
