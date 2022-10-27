@@ -13,6 +13,7 @@ import (
 	"go.uber.org/zap"
 	"math/rand"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -68,6 +69,7 @@ func init() {
 func main() {
 	if err := service.Root().Execute(); err != nil {
 		fmt.Println(err)
+		os.Exit(1)
 	}
 }
 

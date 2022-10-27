@@ -25,6 +25,9 @@ go:lint:
   script:
     - golangci-lint run --new-from-rev="${CI_MERGE_REQUEST_DIFF_BASE_SHA}" --timeout 5m
   needs: [ ]
+  variables:
+    GIT_DEPTH: 0
+    GIT_STRATEGY: clone
   rules:
     - if: $CI_MERGE_REQUEST_IID
       changes: *files

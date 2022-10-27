@@ -35,6 +35,7 @@ allow-breaking-changes:
   stage: setup
   interruptible: true
   before_script:
+    - set -euo pipefail
     - docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
     - docker pull "${CI_REGISTRY_IMAGE}/service/snowman:latest"
   script:
@@ -48,7 +49,6 @@ allow-breaking-changes:
   artifacts:
     reports:
       dotenv: variables.env
-
   tags:
     - shell
 
