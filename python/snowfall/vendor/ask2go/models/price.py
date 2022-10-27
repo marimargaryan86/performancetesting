@@ -52,3 +52,8 @@ class OfferPriceResponse(CamelCaseBaseModel):
     pricing_response_information: PricingResponseInformation
     has_finished: bool
     transaction_id: str
+
+
+class AsyncOfferPriceResponse(CamelCaseBaseModel):
+    id: str  # noqa: A003
+    transaction_id: str

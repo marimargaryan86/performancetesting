@@ -180,6 +180,43 @@ class Ask2GoClient(object):  # noqa: WPS214
 
         return price.OfferPriceResponse(**response.json())
 
+    async def create_air_offer_async(
+        self,
+        search_id: str,
+        transaction_id: str,
+        offer_id: str,
+        brand_id: Optional[str] = None,
+    ) -> price.AsyncOfferPriceResponse:
+        response = await self._make_request(
+            "PUT",
+            self._api_base_url.copy_with(path="/api/Itinerary/PriceAsync"),
+            payload={
+                "searchId": search_id,
+                "itineraryId": offer_id,
+                "transactionId": transaction_id,
+                **({"brandId": brand_id} if brand_id else {}),
+            },
+        )
+
+        return price.AsyncOfferPriceResponse(**response.json())
+
+    async def get_air_offer_result(
+        self,
+        transaction_id: str,
+        pricing_id: str,
+    ) -> price.OfferPriceResponse:
+        response = await self._make_request(
+            "GET",
+            self._api_base_url.copy_with(
+                path="/api/Itinerary/{pricing_id}/{transaction_id}/GetPrice".format(
+                    transaction_id=transaction_id,
+                    pricing_id=pricing_id,
+                ),
+            ),
+        )
+
+        return price.OfferPriceResponse(**response.json())
+
     async def validate_offer(
         self,
         criteria: validate_offer_criteria.ValidateOfferCriteria,
