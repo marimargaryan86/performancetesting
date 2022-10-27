@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 import math
+import uuid
 from collections.abc import AsyncIterator, Coroutine
 from typing import Any, Mapping, Sequence, Tuple
 
@@ -8,6 +9,7 @@ import tenacity
 
 from snowfall.project.junction.service.providers.ask2go import models, validator
 from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
+from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.vendor.ask2go import client, enums
 from snowfall.vendor.ask2go import errors as ask2go_errors
@@ -60,7 +62,7 @@ class Ask2GoAdapter(object):  # noqa: WPS214
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
     ) -> AsyncIterator[_BrandedOffersType]:
-        identifiers = await self._make_search(search_task.criteria)
+        identifiers = await self._make_search(search_task)
         branded_prices = self._gather_offer_branded_prices(
             identifiers,
             models.requirements_from_segments(search_task.segments),
@@ -72,22 +74,27 @@ class Ask2GoAdapter(object):  # noqa: WPS214
 
     async def _make_search(
         self,
-        criteria: amqp_pb2.Criteria,
+        search_task: amqp_pb2.SearchCriteriaTask,
     ) -> search.CreateSearchResponse:
-        outbound_date = protobuf.protobuf_to_datetime(criteria.outbound_departure)
+        outbound_date = protobuf.protobuf_to_datetime(
+            search_task.criteria.outbound_departure,
+        )
         search_criteria = search.CreateSearchCriteria(
-            origin_iata=criteria.origin_iata,
-            destination_iata=criteria.destination_iata,
+            transaction_id=uuid.UUID(string.to_uuid(search_task.session_token)),
+            origin_iata=search_task.criteria.origin_iata,
+            destination_iata=search_task.criteria.destination_iata,
             outbound_date=outbound_date.date(),
             outbound_departure_window=time_to_window(outbound_date.time()),
-            cabin_class=enums.AirCabinClassType(criteria.cabin_class),
-            adults=criteria.adults,
-            children=criteria.children,
-            infants=criteria.infants,
+            cabin_class=enums.AirCabinClassType(search_task.criteria.cabin_class),
+            adults=search_task.criteria.adults,
+            children=search_task.criteria.children,
+            infants=search_task.criteria.infants,
         )
 
-        if criteria.HasField("inbound_departure"):
-            inbound_date = protobuf.protobuf_to_datetime(criteria.inbound_departure)
+        if search_task.criteria.HasField("inbound_departure"):
+            inbound_date = protobuf.protobuf_to_datetime(
+                search_task.criteria.inbound_departure,
+            )
             search_criteria.inbound_date = inbound_date.date()
             search_criteria.inbound_departure_window = time_to_window(
                 inbound_date.time(),

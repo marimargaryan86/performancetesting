@@ -6,6 +6,7 @@ import pytest
 from motor import motor_asyncio
 
 from snowfall.project.junction.service.offers import aggregator, offers
+from snowfall.project.junction.service.offers.v1alpha import amqp_pb2
 from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offer_protos
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2
@@ -79,7 +80,6 @@ _OFFER_RESULT_EXPIRY_PROTO = protobuf.datetime_to_protobuf(_OFFER_RESULT_EXPIRY)
 _OFFER_RESULTS = (
     offer_protos.OfferGroup(
         id="1",
-        offer_search_id="foo",
         segments=[
             offer_protos.OfferSegment(
                 segment_id="a",
@@ -89,7 +89,6 @@ _OFFER_RESULTS = (
     ),
     offer_protos.OfferGroup(
         id="2",
-        offer_search_id="foo",
         segments=[
             offer_protos.OfferSegment(
                 segment_id="b",
@@ -99,7 +98,6 @@ _OFFER_RESULTS = (
     ),
     offer_protos.OfferGroup(
         id="3",
-        offer_search_id="foo",
         segments=[
             offer_protos.OfferSegment(
                 segment_id="b",
@@ -109,7 +107,6 @@ _OFFER_RESULTS = (
     ),
     offer_protos.OfferGroup(
         id="4",
-        offer_search_id="foo",
         segments=[
             offer_protos.OfferSegment(
                 segment_id="c",
@@ -119,7 +116,6 @@ _OFFER_RESULTS = (
     ),
     offer_protos.OfferGroup(
         id="5",
-        offer_search_id="foo",
         segments=[
             offer_protos.OfferSegment(
                 segment_id="c",
@@ -151,11 +147,11 @@ class TestOfferBuckets(object):
         expected: Mapping[str, Sequence[str]],
     ) -> None:
         for offer in offer_results:
-            await offer_bucket_repository.add_offer(offer)
+            await offer_bucket_repository.add_offer("foobar", offer)
 
         assert (
             await offer_bucket_repository.get_offer_buckets(
-                offer_results[0].offer_search_id,
+                "foobar",
             )
             == expected
         )
@@ -184,7 +180,12 @@ class TestAggregator(object):
         await offer_searches_repository.insert(offer_search)
 
         for offer_result in offer_results:
-            await offer_aggregator.aggregate(offer_result)
+            await offer_aggregator.aggregate(
+                amqp_pb2.TripOfferSearchResult(
+                    offer_search_id=offer_search.id,
+                    offer=offer_result,
+                ),
+            )
 
         assert await offer_aggregate_collection.count_documents({}) == expected
 
@@ -221,7 +222,12 @@ class TestAggregator(object):
     ) -> None:
         await offer_searches_repository.insert(offer_search)
         for offer_result in offer_results:
-            await offer_aggregator.aggregate(offer_result)
+            await offer_aggregator.aggregate(
+                amqp_pb2.TripOfferSearchResult(
+                    offer_search_id=offer_search.id,
+                    offer=offer_result,
+                ),
+            )
 
         expected_sorted = [sorted(aggregate) for aggregate in expected]
         async for aggregate in offer_aggregate_collection.find():

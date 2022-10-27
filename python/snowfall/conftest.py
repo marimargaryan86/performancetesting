@@ -102,7 +102,7 @@ def trip_searches_client() -> trip_searches.Client:
 
 @pytest.fixture
 def offers_client() -> offers.Client:
-    return offers.DictClient(fixtures.get_offers())
+    return offers.DictClient(fixtures.OFFER_SEARCHES[0], fixtures.get_offers())
 
 
 @pytest.fixture

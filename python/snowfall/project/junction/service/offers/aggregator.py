@@ -4,7 +4,7 @@ import itertools
 from typing import Mapping, Sequence
 
 from snowfall.project.junction.service.offers import offers
-from snowfall.project.junction.service.offers.v1alpha import models_pb2
+from snowfall.project.junction.service.offers.v1alpha import amqp_pb2, models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.redis import types as redis
@@ -86,9 +86,13 @@ class OfferBucketRepository(object):
     ):
         self._redis = redis_client
 
-    async def add_offer(self, offer: models_pb2.OfferGroup) -> None:
+    async def add_offer(
+        self,
+        offer_search_id: str,
+        offer: models_pb2.OfferGroup,
+    ) -> None:
         for segment in offer.segments:
-            key = "{0}:{1}".format(offer.offer_search_id, segment.segment_id)
+            key = "{0}:{1}".format(offer_search_id, segment.segment_id)
             bucket = self._redis.list_(key)
             await bucket.push(offer.id)
             await redis.put_expires_at_if_less_than_current(
@@ -97,7 +101,7 @@ class OfferBucketRepository(object):
                 protobuf.protobuf_to_datetime(offer.expires_at),
             )
 
-            bucket_list = self._redis.set_(offer.offer_search_id)
+            bucket_list = self._redis.set_(offer_search_id)
             await bucket_list.add(key)
             await redis.put_expires_at_if_less_than_current(
                 self._redis,
@@ -144,23 +148,26 @@ class OfferAggregator(object):
         self._buckets = offer_buckets
         self._aggregates = offer_aggregates
 
-    async def aggregate(self, offer: models_pb2.OfferGroup) -> None:  # noqa: WPS210
-        offer_search = await self._searches.find_by_id(offer.offer_search_id)
+    async def aggregate(  # noqa: WPS210
+        self,
+        search_result: amqp_pb2.TripOfferSearchResult,
+    ) -> None:
+        offer_search = await self._searches.find_by_id(search_result.offer_search_id)
 
         if not offer_search:
             return
 
-        _set_sequence_numbers(offer_search, offer)
+        _set_sequence_numbers(offer_search, search_result.offer)
 
-        buckets = await self._buckets.get_offer_buckets(offer.offer_search_id)
+        buckets = await self._buckets.get_offer_buckets(offer_search.id)
 
         # this overrides the true bucket values for segments that this offer
         # group covers, so that we only generate offer aggregates with this
         # offer group
-        for offer_segment in offer.segments:
-            buckets[offer_segment.segment_id] = [offer.id]
+        for offer_segment in search_result.offer.segments:
+            buckets[offer_segment.segment_id] = [search_result.offer.id]
 
-        await self._buckets.add_offer(offer)
+        await self._buckets.add_offer(offer_search.id, search_result.offer)
 
         segments = itertools.chain(*[trip.segments for trip in offer_search.trip.trips])
 

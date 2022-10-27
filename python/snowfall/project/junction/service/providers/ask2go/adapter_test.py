@@ -249,7 +249,6 @@ async def test_search_result_data(  # noqa: WPS218
     )
 
     async for offer_group in offer_groups:
-        assert offer_group.offer_search_id == _ARN_LHR.offer_search_id
         segment = offer_group.segments[0]
         _assert_offer(offer_group.offers[0], segment.id)
         assert segment.segment_id == "segment_id"

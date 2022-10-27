@@ -71,7 +71,6 @@ message Penalty {
 
 message OfferGroup {
   string id = 1;
-  string offer_search_id = 2;
   google.protobuf.Timestamp expires_at = 3;
   // provider info?
   // min/max prices?

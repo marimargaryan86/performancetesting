@@ -67,7 +67,6 @@ class OfferTransformer(object):  # noqa: WPS214
 
         return offers_pb2.OfferGroup(
             id=string.uuid(),
-            offer_search_id=search_task.offer_search_id,
             expires_at=protobuf.datetime_to_protobuf(expires_at),
             offers=await self._get_group_offers(
                 offer_prices,

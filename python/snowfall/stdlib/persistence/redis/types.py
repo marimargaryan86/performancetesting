@@ -1,11 +1,11 @@
 import datetime
 from typing import AnyStr, AsyncIterable, Generic, Optional
 
-import aioredis
+from aioredis import Redis, client, lock
 
 
 class Hash(Generic[AnyStr]):
-    def __init__(self, redis: aioredis.Redis, name: str):
+    def __init__(self, redis: Redis, name: str):
         self._name = name
         self._redis = redis
 
@@ -15,7 +15,7 @@ class Hash(Generic[AnyStr]):
     async def put(
         self,
         hash_key: str,
-        hash_value: aioredis.client.EncodableT | None,
+        hash_value: client.EncodableT | None,
     ) -> None:
         await self._redis.hset(self._name, hash_key, hash_value)
 
@@ -42,14 +42,14 @@ class Hash(Generic[AnyStr]):
 
 
 class List(Generic[AnyStr]):
-    def __init__(self, redis: aioredis.Redis, name: str):
+    def __init__(self, redis: Redis, name: str):
         self._name = name
         self._redis = redis
 
     def __str__(self) -> str:
         return self._name
 
-    async def push(self, list_value: aioredis.client.EncodableT) -> None:
+    async def push(self, list_value: client.EncodableT) -> None:
         await self._redis.rpush(self._name, list_value)
 
     async def to_iterable(self, chunk: int = 100) -> AsyncIterable[AnyStr]:
@@ -67,15 +67,15 @@ class List(Generic[AnyStr]):
 
 
 class Set(Generic[AnyStr]):
-    def __init__(self, redis: aioredis.Redis, name: str):
+    def __init__(self, redis: Redis, name: str):
         self._name = name
         self._redis = redis
 
     def __str__(self) -> str:
         return self._name
 
-    async def add(self, name: str) -> None:
-        await self._redis.sadd(self._name, name)
+    async def add(self, set_value: client.EncodableT) -> None:
+        await self._redis.sadd(self._name, set_value)
 
     async def to_iterable(self) -> AsyncIterable[AnyStr]:
         cursor = 0
@@ -91,7 +91,7 @@ class Set(Generic[AnyStr]):
 
 
 class Client(Generic[AnyStr]):  # noqa: WPS214
-    def __init__(self, redis: aioredis.Redis, prefix: str = ""):
+    def __init__(self, redis: Redis, prefix: str = ""):
         self._prefix = "{0}:".format(prefix) if prefix else ""
         self._redis = redis
 
@@ -126,7 +126,26 @@ class Client(Generic[AnyStr]):  # noqa: WPS214
     def set_(self, name: str) -> Set[AnyStr]:
         return Set[AnyStr](self._redis, self._prefix + name)
 
-    async def put(self, name: str, raw_value: aioredis.client.EncodableT) -> None:
+    def lock(  # noqa: WPS211
+        self,
+        name: str,
+        timeout: float | None = None,
+        sleep: float = 0.1,
+        blocking: bool = True,
+        blocking_timeout: float | None = None,
+        thread_local: bool = True,
+    ) -> lock.Lock:
+        return lock.Lock(
+            redis=self._redis,
+            name=name,
+            timeout=timeout,
+            sleep=sleep,
+            blocking=blocking,
+            blocking_timeout=blocking_timeout,
+            thread_local=thread_local,
+        )
+
+    async def put(self, name: str, raw_value: client.EncodableT) -> None:
         return await self._redis.set(self._prefix + name, raw_value)
 
     async def put_expires_at(self, name: object, expiry: datetime.datetime) -> None:
@@ -151,13 +170,13 @@ class Client(Generic[AnyStr]):  # noqa: WPS214
 
 
 async def put_expires_at_if_less_than_current(
-    client: Client[AnyStr],
+    redis_client: Client[AnyStr],
     name: object,
     expiry: datetime.datetime,
 ) -> None:
-    expiry_at = await client.get_expires_at(name)
+    expiry_at = await redis_client.get_expires_at(name)
 
     if expiry_at and expiry_at > expiry:
         return
 
-    await client.put_expires_at(name, expiry)
+    await redis_client.put_expires_at(name, expiry)

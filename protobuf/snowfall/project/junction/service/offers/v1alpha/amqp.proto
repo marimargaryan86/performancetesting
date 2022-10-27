@@ -9,3 +9,8 @@ message TripOfferSearchTask {
   TripOfferSearch search = 2;
   string session_token = 3;
 }
+
+message TripOfferSearchResult {
+  string offer_search_id = 1;
+  OfferGroup offer = 2;
+}

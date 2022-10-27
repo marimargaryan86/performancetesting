@@ -27,7 +27,6 @@ class OffersMockClient(object):
 
         yield offers_pb2.OfferGroup(
             id=string.uuid(),
-            offer_search_id=search.offer_search_id,
             offers=[
                 offers_pb2.Offer(
                     id="FOO",
@@ -93,7 +92,13 @@ class TripSearchConsumer(object):
         search = cast(amqp_pb2.TripOfferSearchTask, message.body)
 
         async for offer_result in self._client.search(search):
-            await self._producer.publish(offer_result, routing_key="offers.result.trip")
+            await self._producer.publish(
+                amqp_pb2.TripOfferSearchResult(
+                    offer_search_id=search.offer_search_id,
+                    offer=offer_result,
+                ),
+                routing_key="offers.result.trip",
+            )
 
         await message.ack()
 

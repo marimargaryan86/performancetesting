@@ -121,6 +121,10 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
                         app.settings.default_ttl,
                     ),
                 ),
+                redis=redis.Client(
+                    redis=redis_conn,
+                    prefix=app.name,
+                ),
             )
             await offer_importer.consume()
 

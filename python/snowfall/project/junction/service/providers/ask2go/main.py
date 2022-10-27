@@ -178,6 +178,10 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                         ),
                         offer_ttl=app.settings.ttl,
                     ),
+                    redis=redis.Client[bytes](
+                        redis=redis_conn,
+                        prefix=app.name,
+                    ),
                 )
 
                 await trip_search_consumer.consume()

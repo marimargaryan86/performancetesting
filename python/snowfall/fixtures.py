@@ -224,7 +224,6 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
         groups=[
             offers_pb2.OfferGroup(
                 id=OFFER_GROUPS[0],
-                offer_search_id=OFFER_SEARCHES[0],
                 offers=[
                     offers_pb2.Offer(
                         id=PROVIDER_OFFERS[0],
@@ -294,7 +293,6 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
             ),
             offers_pb2.OfferGroup(
                 id=OFFER_GROUPS[1],
-                offer_search_id=OFFER_SEARCHES[0],
                 offers=[
                     offers_pb2.Offer(
                         id=PROVIDER_OFFERS[2],

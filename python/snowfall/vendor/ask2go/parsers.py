@@ -51,7 +51,7 @@ def parse_search_request(criteria: search.CreateSearchCriteria) -> dict[str, Any
     else:
         direction = "Outbound"
 
-    return {
+    request_body = {
         "adults": criteria.adults,
         "children": criteria.children,
         "infants": criteria.infants,
@@ -59,6 +59,11 @@ def parse_search_request(criteria: search.CreateSearchCriteria) -> dict[str, Any
         "direction": direction,
         "searchCriteria": search_criteria,
     }
+
+    if criteria.transaction_id:
+        request_body["transactionId"] = str(criteria.transaction_id)
+
+    return request_body
 
 
 def parse_create_booking_request(

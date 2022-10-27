@@ -53,7 +53,13 @@ class SearchCriteriaConsumer(object):
         search = cast(amqp_pb2.SearchCriteriaTask, message.body)
 
         async for offer_result in self._adapter.gather_search_results(search):
-            await self._producer.publish(offer_result, routing_key="offers.result.trip")
+            await self._producer.publish(
+                offers_amqp_pb2.TripOfferSearchResult(
+                    offer_search_id=search.offer_search_id,
+                    offer=offer_result,
+                ),
+                routing_key="offers.result.trip",
+            )
 
 
 class OrdersConsumer(object):

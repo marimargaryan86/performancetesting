@@ -1,4 +1,5 @@
 import datetime
+import uuid
 from typing import Any, Optional
 
 from snowfall.vendor.ask2go.enums import AirCabinClassType
@@ -38,3 +39,4 @@ class CreateSearchCriteria(CamelCaseBaseModel):
     adults: int = 0
     children: int = 0
     infants: int = 0
+    transaction_id: uuid.UUID | None = None

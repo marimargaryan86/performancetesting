@@ -95,7 +95,12 @@ class Client(abc.ABC):  # noqa: WPS214
 
 
 class DictClient(Client):  # noqa: WPS214
-    def __init__(self, offers: Sequence[models_pb2.OfferAggregate]) -> None:
+    def __init__(
+        self,
+        offer_search_id: str,
+        offers: Sequence[models_pb2.OfferAggregate],
+    ) -> None:
+        self._offer_search_id = offer_search_id
         self._offers: dict[str, models_pb2.OfferAggregate] = {
             offer.id: offer for offer in offers
         }
@@ -116,7 +121,7 @@ class DictClient(Client):  # noqa: WPS214
         offers = [
             offer
             for offer in self._offers.values()
-            if offer.groups and offer.groups[0].offer_search_id == identifier
+            if identifier == self._offer_search_id
         ]
 
         if cabin_classes:

@@ -14,6 +14,7 @@ from snowfall.project.junction.service.providers.ask2go import (
 from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
+from snowfall.stdlib.persistence.redis import types
 from snowfall.stdlib.transport import amqp
 
 _PROVIDER_NAME = "Ask2Go"
@@ -78,17 +79,19 @@ class TripSearchConsumer(object):
 
 
 class SearchCriteriaConsumer(object):
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
         consumer: amqp.Consumer,
         producer: amqp.Producer,
         ask2go_adapter: adapter.Ask2GoAdapter,
         offer_transformer: transformer.OfferTransformer,
+        redis: types.Client[bytes],
     ):
         self._consumer = consumer
         self._producer = producer
         self._adapter = ask2go_adapter
         self._transformer = offer_transformer
+        self._redis = redis
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -103,13 +106,37 @@ class SearchCriteriaConsumer(object):
                 search_task.criteria.outbound_departure,
             ),
         ):
+            offer_cache = cache.OfferGroupCache(search_task, self._redis)
+
+            async with offer_cache:
+                await self._search_offers(search_task, offer_cache)
+
+    async def _search_offers(
+        self,
+        search_task: amqp_pb2.SearchCriteriaTask,
+        offer_cache: cache.OfferGroupCache,
+    ) -> None:
+        try:
+            async for cached_offer_group in offer_cache.to_iterable():
+                await self._producer.publish(
+                    msg=offers_amqp_pb2.TripOfferSearchResult(
+                        offer_search_id=search_task.offer_search_id,
+                        offer=cached_offer_group,
+                    ),
+                    routing_key="offers.result.trip",
+                )
+        except cache.NoCacheExistsError:
             offer_groups = self._transformer.offer_prices_to_offer_groups(
                 search_task,
                 self._adapter.gather_search_results(search_task),
             )
 
             async for offer_group in offer_groups:
+                await offer_cache.put(offer_group)
                 await self._producer.publish(
-                    msg=offer_group,
+                    msg=offers_amqp_pb2.TripOfferSearchResult(
+                        offer_search_id=search_task.offer_search_id,
+                        offer=offer_group,
+                    ),
                     routing_key="offers.result.trip",
                 )

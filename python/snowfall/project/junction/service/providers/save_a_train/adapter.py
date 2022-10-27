@@ -161,7 +161,6 @@ class SaveATrainAdapter(object):  # noqa: WPS214
 
                 yield offer_models_pb2.OfferGroup(
                     id=string.uuid(),
-                    offer_search_id=search_task.offer_search_id,
                     expires_at=protobuf.datetime_to_protobuf(expires_at),
                     offers=[
                         offer_models_pb2.Offer(

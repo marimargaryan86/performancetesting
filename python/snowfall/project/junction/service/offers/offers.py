@@ -22,7 +22,6 @@ class TripOfferRepository(
 ):
     _proto = models_pb2.OfferGroup
     _indexes = [
-        pymongo.IndexModel(_OFFER_SEARCH_ID, background=True),
         pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True),
     ]
 
