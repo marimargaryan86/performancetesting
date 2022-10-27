@@ -14,7 +14,7 @@ _ATTRIBUTES_KEY = "attributes"
 
 async def migrate(settings: bootstrap.Settings) -> None:
     places_repository = motor_asyncio.AsyncIOMotorClient(settings.mongo_dsn)[  # nosec
-        _SERVICE_NAME
+        settings.mongo_db
     ]["places"]
     http_client = httpx.AsyncClient()
     auth_headers = {"Authorization": "Bearer {0}".format(settings.junction_api_token)}

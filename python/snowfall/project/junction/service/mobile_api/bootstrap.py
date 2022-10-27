@@ -28,6 +28,7 @@ class Settings(application.Settings):
     client_name: str
     support_email: str
     create_stripe_customers: bool
+    mongo_db: str
 
 
 def create_dependencies(  # noqa: WPS211

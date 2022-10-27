@@ -155,6 +155,7 @@ EOH
         JUNCTION_API_ADDRESS  = "${var.junction_api_URL}"
         SENTRY_DSN            = "https://6166193e2bc24153b87e9bfca3d510d4@sentry.snowfall.se/38"
         PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
+        MONGO_DB              = "res-se-mobile-api"
       }
     }
   }
