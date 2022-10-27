@@ -416,6 +416,9 @@
 
       header.append(subtext)
 
+      const tripIdText = document.createElement('p');
+      tripIdText.textContent = "TripId: " + trip.id;
+
       let badges = document.createElement("p")
 
       if (trip.direct) {
@@ -474,6 +477,7 @@
       }
 
       container.append(header)
+      container.append(tripIdText)
       container.append(badges)
 
       let map = document.createElement('div');
