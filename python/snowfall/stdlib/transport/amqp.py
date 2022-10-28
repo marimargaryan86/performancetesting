@@ -323,7 +323,7 @@ class Consumer(object):
 
                 try:
                     await callback(msg)
-                except Exception:  # noqa: PIE786
+                except (Exception, asyncio.CancelledError):  # noqa: PIE786
                     self._logger.exception()
                     span.set_status("nok")
                     await msg.nack()
