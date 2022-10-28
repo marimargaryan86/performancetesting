@@ -42,7 +42,7 @@ class OfferTransformer(object):  # noqa: WPS214
     async def _offer_prices_to_offer_group(  # noqa: WPS210
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
-        branded_prices: Tuple[Sequence[str], Sequence[price.OfferPriceResponse]],
+        branded_prices: _BrandedOffersType,
     ) -> offers_pb2.OfferGroup:
         brands = branded_prices[0]
         offer_prices = branded_prices[1]
