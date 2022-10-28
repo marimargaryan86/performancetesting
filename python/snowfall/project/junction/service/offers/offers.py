@@ -281,14 +281,14 @@ class OfferSearchRepository(  # noqa: WPS215
         self,
         document: models_pb2.OfferSearch,
     ) -> models_pb2.OfferSearch:
+        offer_search = models_pb2.OfferSearch()
         expires_at = timestamp_pb2.Timestamp()
         expires_at.FromDatetime(
             datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
         )
-        offer_search = models_pb2.OfferSearch(
-            id=string.uuid(),
-            expires_at=expires_at,
-            trip=document.trip,
-        )
+
+        offer_search.CopyFrom(document)
+        offer_search.id = string.uuid()
+        offer_search.expires_at.CopyFrom(expires_at)
 
         return await self.insert(offer_search)
