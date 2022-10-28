@@ -2,7 +2,6 @@ import random
 from typing import Any, Mapping, Sequence
 
 import httpx
-from geopy import adapters, geocoders
 from motor import motor_asyncio
 from pycountry import countries
 
@@ -37,24 +36,8 @@ async def _save_enrich_data(
     places: Sequence[Mapping[str, Any]],
     repo: motor_asyncio.AsyncIOMotorCollection,
 ) -> None:
-    async with geocoders.Nominatim(
-        adapter_factory=adapters.AioHTTPAdapter,
-    ) as geocoder:
-        for place in places:
-            response = await geocoder.reverse(
-                "{0}, {1}".format(
-                    place[_ATTRIBUTES_KEY]["latitude"],
-                    place[_ATTRIBUTES_KEY]["longitude"],
-                ),
-                exactly_one=True,
-            )
+    for place in places:
+        country = countries.get(alpha_2=place[_ATTRIBUTES_KEY]["countryCode"])
+        place[_ATTRIBUTES_KEY]["countryName"] = country.name
 
-            if not response:
-                raise RuntimeError
-
-            country = countries.get(
-                alpha_2=response.raw["address"]["country_code"].upper(),
-            )
-            place[_ATTRIBUTES_KEY]["countryCode"] = country.alpha_2
-            place[_ATTRIBUTES_KEY]["countryName"] = country.name
     repo.insert_many(places)
