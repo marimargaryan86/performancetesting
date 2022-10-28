@@ -66,7 +66,7 @@ class Serializer(object):
         return unpacked_message
 
 
-async def create_connection(dsn: str) -> abc.AbstractRobustConnection:
+async def create_connection(dsn: str) -> abc.AbstractConnection:
     return await connect_robust(url=dsn)
 
 
@@ -294,7 +294,10 @@ class Consumer(object):
         callback: ConsumerCallback,
     ) -> None:
         async def wrapper(incoming: abc.AbstractIncomingMessage) -> None:
-            await self._process(incoming, callback)
+            try:
+                await self._process(incoming, callback)
+            except Exception:  # noqa: PIE786
+                self._logger.exception("An error occurred while processing message")
 
         await queue.consume(wrapper)
         await asyncio.Future()
@@ -323,8 +326,8 @@ class Consumer(object):
 
                 try:
                     await callback(msg)
-                except (Exception, asyncio.CancelledError):  # noqa: PIE786
-                    self._logger.exception()
+                except Exception:  # noqa: PIE786
+                    self._logger.exception("An error occurred in consumer callback")
                     span.set_status("nok")
                     await msg.nack()
                 else:
