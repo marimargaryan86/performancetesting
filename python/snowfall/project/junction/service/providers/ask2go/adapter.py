@@ -117,7 +117,7 @@ class Ask2GoAdapter(object):  # noqa: WPS214
                         criteria,
                     )
                     branded_offer = await self._get_branded_offer(validate_identifiers)
-                    mapped_brand_price = self._get_mapped_brand_price(
+                    mapped_brand_price = await self._get_mapped_brand_price(
                         offer,
                         identifiers,
                         validate_identifiers,
@@ -129,7 +129,7 @@ class Ask2GoAdapter(object):  # noqa: WPS214
                         list(mapped_brand_price.values()),
                     )
 
-    def _get_mapped_brand_price(
+    async def _get_mapped_brand_price(
         self,
         offer: offers.Offer,
         identifiers: search.CreateSearchResponse,
@@ -140,7 +140,7 @@ class Ask2GoAdapter(object):  # noqa: WPS214
         if branded_offer.itinerary.branded_fares:
             mapped_brand_price.update(
                 {
-                    fare.brand_name: self._client.create_air_offer(
+                    fare.brand_name: await self._get_async_price(
                         search_id=validate_identifiers.identifier,
                         transaction_id=identifiers.transaction_id,
                         offer_id=offer.id,
@@ -150,13 +150,42 @@ class Ask2GoAdapter(object):  # noqa: WPS214
                 },
             )
         else:
-            mapped_brand_price["BASIC FARE"] = self._client.create_air_offer(
+            mapped_brand_price["BASIC FARE"] = await self._get_async_price(
                 search_id=validate_identifiers.identifier,
                 transaction_id=identifiers.transaction_id,
                 offer_id=offer.id,
             )
 
         return mapped_brand_price
+
+    async def _get_async_price(
+        self,
+        transaction_id: str,
+        search_id: str,
+        offer_id: str,
+        brand_id: str | None = None,
+    ) -> Coroutine[price.OfferPriceResponse, Any, Any]:
+        async_offer = await self._client.create_air_offer_async(
+            search_id=search_id,
+            transaction_id=transaction_id,
+            offer_id=offer_id,
+            brand_id=brand_id,
+        )
+
+        return self._get_async_price_result(async_offer)
+
+    @tenacity.retry(
+        retry=tenacity.retry_if_exception_type(ask2go_errors.TimeOutError),
+        wait=tenacity.wait_random_exponential(multiplier=1, max=5),
+    )
+    async def _get_async_price_result(
+        self,
+        async_offer: price.AsyncOfferPriceResponse,
+    ) -> price.OfferPriceResponse:
+        return await self._client.get_air_offer_result(
+            transaction_id=async_offer.transaction_id,
+            pricing_id=async_offer.id,
+        )
 
     async def _merge_brands_prices(
         self,

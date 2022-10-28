@@ -85,9 +85,21 @@ async def test_default_error_message(
     httpx_mock: pytest_httpx.HTTPXMock,
     ask2go_client: client.Ask2GoClient,
 ) -> None:
-    httpx_mock.add_exception(url=_URL, exception=httpx.ReadTimeout(""))
+    httpx_mock.add_exception(url=_URL, exception=httpx.ConnectError(""))
 
     with pytest.raises(errors.ServiceError) as excinfo:
+        await ask2go_client.get_airports()
+
+    assert str(excinfo.value) == inspect.getdoc(httpx.ConnectError)  # noqa: WPS441
+
+
+async def test_timeout_error_message(
+    httpx_mock: pytest_httpx.HTTPXMock,
+    ask2go_client: client.Ask2GoClient,
+) -> None:
+    httpx_mock.add_exception(url=_URL, exception=httpx.ReadTimeout(""))
+
+    with pytest.raises(errors.TimeOutError) as excinfo:
         await ask2go_client.get_airports()
 
     assert str(excinfo.value) == inspect.getdoc(httpx.ReadTimeout)  # noqa: WPS441

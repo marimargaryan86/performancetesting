@@ -12,3 +12,7 @@ class DateError(Ask2GoError):
 
 class AcceptedResponseError(Ask2GoError):
     """Raised when response status is accepted."""
+
+
+class TimeOutError(Ask2GoError):
+    """Raised when a request times out."""

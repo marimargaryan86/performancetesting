@@ -260,15 +260,21 @@ class Ask2GoClient(object):  # noqa: WPS214
                 url=url,
                 json=payload,
             )
+        except httpx.TimeoutException as timeout_exc:
+            raise errors.TimeOutError(inspect.getdoc(timeout_exc)) from timeout_exc
         except httpx.HTTPError as raw_exc:
             raise errors.ServiceError(inspect.getdoc(raw_exc)) from raw_exc
 
-        try:
-            response.raise_for_status()
-        except httpx.HTTPError as exc:
-            raise errors.ServiceError(_get_response_error_message(response)) from exc
+        return _handle_error_status(response)
 
-        if response.status_code == http.HTTPStatus.ACCEPTED:
-            raise errors.AcceptedResponseError()
 
-        return response
+def _handle_error_status(response: httpx.Response) -> httpx.Response:
+    try:
+        response.raise_for_status()
+    except httpx.HTTPError as exc:
+        raise errors.ServiceError(_get_response_error_message(response)) from exc
+
+    if response.status_code == http.HTTPStatus.ACCEPTED:
+        raise errors.AcceptedResponseError()
+
+    return response

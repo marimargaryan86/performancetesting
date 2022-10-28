@@ -93,7 +93,7 @@ _ARN_LHR_NO_RESULTS = amqp_pb2.SearchCriteriaTask(
 )
 
 
-def _mock_responses(
+def _mock_responses(  # noqa: WPS210
     httpx_mock: pytest_httpx.HTTPXMock,
     origin: str,
     destination: str,
@@ -142,6 +142,33 @@ def _mock_responses(
         ),
     )
 
+    price_async_response = conftest.load_json_fixture(
+        "{prefix}_put_itinerary_priceasync".format(prefix=prefix),
+    )
+
+    httpx_mock.add_response(
+        method="PUT",
+        json=price_async_response,
+        url="https://test_url/api/Itinerary/PriceAsync",
+    )
+
+    pricing_response = conftest.load_json_fixture(
+        "{prefix}_get_itinerary_{id}_{transaction_id}_getprice".format(
+            prefix=prefix,
+            id=price_async_response["id"],
+            transaction_id=price_async_response["transactionId"],
+        ),
+    )
+
+    httpx_mock.add_response(
+        method="GET",
+        json=pricing_response,
+        url="https://test_url/api/Itinerary/{id}/{transaction_id}/GetPrice".format(
+            id=price_async_response["id"],
+            transaction_id=price_async_response["transactionId"],
+        ),
+    )
+
     _mock_search_responses(
         httpx_mock,
         prefix,
@@ -180,30 +207,6 @@ def _mock_search_responses(
                 page=page,
             ),
         )
-
-        offer = offer_response["flight"][0]
-        for brand in branded_itinerary_response["itinerary"]["brandedFares"]:
-            httpx_mock.add_response(
-                method="PUT",
-                json=conftest.load_json_fixture(
-                    (
-                        "{prefix}_put_itinerary_{id}_{offer}_price?"
-                        + "transactionid={transaction_id}&brandid={brand_id}.json"
-                    ).format(
-                        prefix=prefix,
-                        id=itinerary_validate_response["id"],
-                        offer=offer["id"],
-                        transaction_id=search_response["transactionId"],
-                        brand_id=brand["brandId"].lower(),
-                    ),
-                ),
-                url=_PRICE_URL.format(
-                    id=itinerary_validate_response["id"],
-                    offer=offer["id"],
-                    transaction_id=search_response["transactionId"],
-                    brand_id=brand["brandId"],
-                ),
-            )
 
 
 @pytest.mark.parametrize(
