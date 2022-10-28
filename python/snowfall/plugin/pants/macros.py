@@ -24,9 +24,11 @@ def python_image(namespace: str, name: str, **kwargs) -> None:  # type: ignore[n
             "ARG REGISTRY",
             "FROM ${{REGISTRY}}python@sha256:{hash} AS runtime".format(hash=tag_sha),
             'ENV PIP_NO_CACHE_DIR "false"',
+            "ENV PYTHONASYNCIODEBUG 1",
             "ENV PYTHONFAULTHANDLER 1",
             'ENV PYTHONHASHSEED "random"',
             "ENV PYTHONUNBUFFERED 1",
+            'ENV LOG_LEVEL "DEBUG"',
             "COPY {namespace}/{name}.pex /bin/{name}".format(
                 namespace=namespace,
                 name=name,
@@ -36,6 +38,8 @@ def python_image(namespace: str, name: str, **kwargs) -> None:  # type: ignore[n
             'LABEL vendor="Snowfall Limited"',
             "LABEL com.snowfalltravel.version=$VERSION",
             "RUN /usr/local/bin/python3.10 /bin/{name} --help".format(name=name),
-            'ENTRYPOINT ["/usr/local/bin/python3.10", "/bin/{name}"]'.format(name=name),
+            'ENTRYPOINT ["/usr/local/bin/python3.10", "-Wdefault", "/bin/{0}"]'.format(
+                name,
+            ),
         ],
     )
