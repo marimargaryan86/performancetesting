@@ -19,11 +19,21 @@ type PlannerServiceServer struct {
 	Stops   map[h3.H3Index][]*planner.Stop
 }
 
-func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *planner.SearchJourneyRequest) (*planner.SearchJourneyResponse, error) {
-	if len(req.Origins) == 0 || len(req.Destinations) == 0 {
-		return &planner.SearchJourneyResponse{}, status.Errorf(codes.InvalidArgument, "origins or destinations missing")
+func difference[T comparable](a, b []T) []T {
+	mb := make(map[T]struct{}, len(b))
+	for _, x := range b {
+		mb[x] = struct{}{}
 	}
+	var diff []T
+	for _, x := range a {
+		if _, found := mb[x]; !found {
+			diff = append(diff, x)
+		}
+	}
+	return diff
+}
 
+func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *planner.SearchJourneyRequest) (*planner.SearchJourneyResponse, error) {
 	origins := make([]*planner.Stop, 0, len(req.Origins))
 	destinations := make([]*planner.Stop, 0, len(req.Destinations))
 
@@ -49,20 +59,16 @@ func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *plan
 		}
 	}
 
+	origins = difference(origins, destinations)
+
 	if len(origins) == 0 {
 		return &planner.SearchJourneyResponse{}, status.Errorf(codes.InvalidArgument, "no suitable origins found")
 	}
 
+	destinations = difference(destinations, origins)
+
 	if len(destinations) == 0 {
 		return &planner.SearchJourneyResponse{}, status.Errorf(codes.InvalidArgument, "no suitable destinations found")
-	}
-
-	for _, org := range origins {
-		for _, dest := range destinations {
-			if org.Id == dest.Id {
-				return &planner.SearchJourneyResponse{}, status.Errorf(codes.InvalidArgument, "origins and destinations can't be the same")
-			}
-		}
 	}
 
 	departureTime := time.Now()
@@ -80,6 +86,8 @@ func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *plan
 			}
 		case *models.DateTime_UtcOffset:
 			originTz = time.FixedZone("custom", int(v.UtcOffset.Seconds))
+		default:
+			return &planner.SearchJourneyResponse{}, status.Errorf(codes.Internal, "unknown time zone")
 		}
 
 		departureTime = time.Date(
