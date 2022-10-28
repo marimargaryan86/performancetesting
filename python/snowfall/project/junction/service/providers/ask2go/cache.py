@@ -61,7 +61,9 @@ class OfferGroupCache(contextlib.AsyncContextDecorator):
         exc_value: BaseException | None,
         traceback: std_types.TracebackType | None,
     ) -> bool:
-        fallback_expiry = datetime.datetime.now() + datetime.timedelta(hours=1)
+        fallback_expiry = datetime.datetime.now(
+            tz=datetime.timezone.utc,
+        ) + datetime.timedelta(hours=1)
 
         await self._redis.put(self._seen_key, b"\x00")
         await types.put_expires_at_if_less_than_current(
