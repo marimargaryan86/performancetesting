@@ -36,6 +36,7 @@ class OfferSearches(endpoints.HTTPEndpoint):
                 datetime.date.fromisoformat(passenger["dateOfBirth"])
                 for passenger in body["passengers"]
             ],
+            session_token=body.get("sessionToken"),
         )
         await offers_repository.append_offer_search(
             user_id,

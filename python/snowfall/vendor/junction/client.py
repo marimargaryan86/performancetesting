@@ -350,15 +350,20 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
         self,
         trip_ids: Sequence[str],
         passengers_dates_of_birth: Sequence[datetime.date],
+        session_token: str | None = None,
     ) -> dict[str, Any]:
+        attributes: dict[str, Any] = {
+            _PASSENGERS_KEY: [
+                {"dateOfBirth": dob.isoformat()} for dob in passengers_dates_of_birth
+            ],
+        }
+
+        if session_token:
+            attributes["sessionToken"] = session_token
+
         body = {
             _DATA_KEY: {
-                _ATTRIBUTES_KEY: {
-                    _PASSENGERS_KEY: [
-                        {"dateOfBirth": dob.isoformat()}
-                        for dob in passengers_dates_of_birth
-                    ],
-                },
+                _ATTRIBUTES_KEY: attributes,
                 _RELATIONSHIPS_KEY: {
                     "trips": {
                         _DATA_KEY: [
@@ -370,6 +375,7 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
                 _TYPE_KEY: "trip-offer-searches",
             },
         }
+
         return await self._make_request(
             method=_METHOD_POST,
             url="/offers/searches",
