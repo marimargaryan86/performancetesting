@@ -175,8 +175,10 @@ class Ask2GoAdapter(object):  # noqa: WPS214
         return self._get_async_price_result(async_offer)
 
     @tenacity.retry(
+        stop=tenacity.stop_after_attempt(3),
         retry=tenacity.retry_if_exception_type(ask2go_errors.TimeOutError),
         wait=tenacity.wait_random_exponential(multiplier=1, max=5),
+        reraise=True,
     )
     async def _get_async_price_result(
         self,
@@ -257,22 +259,22 @@ class Ask2GoAdapter(object):  # noqa: WPS214
 
         return passengers
 
+    @tenacity.retry(
+        stop=tenacity.stop_after_attempt(3),
+        retry=tenacity.retry_if_exception_type(
+            (ask2go_errors.AcceptedResponseError, ask2go_errors.TimeOutError),
+        ),
+        wait=tenacity.wait_random_exponential(multiplier=1, max=5),
+        reraise=True,
+    )
     async def _get_branded_offer(
         self,
         validate_identifiers: validate_offer_criteria.ValidateOfferResponse,
     ) -> validated_offer.ValidatedOfferResponse:
-        retry = tenacity.Retrying(
-            retry=tenacity.retry_if_exception_type(ask2go_errors.AcceptedResponseError),
-            wait=tenacity.wait_random_exponential(multiplier=1, max=5),
+        return await self._client.get_validated_offer(
+            pricing_id=validate_identifiers.identifier,
+            transaction_id=validate_identifiers.transaction_id,
         )
-        for attempt in retry:
-            with attempt:
-                branded_offer = await self._client.get_validated_offer(
-                    pricing_id=validate_identifiers.identifier,
-                    transaction_id=validate_identifiers.transaction_id,
-                )
-
-        return branded_offer
 
     async def _yield_pages(
         self,

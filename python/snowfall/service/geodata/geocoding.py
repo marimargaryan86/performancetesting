@@ -64,7 +64,11 @@ class ReverseGeocoder(object):
 
         return None
 
-    @tenacity.retry
+    @tenacity.retry(
+        stop=tenacity.stop_after_attempt(3),
+        wait=tenacity.wait_random_exponential(multiplier=1, max=5),
+        reraise=True,
+    )
     async def _photon_country_lookup(
         self,
         latitude: float,
@@ -84,7 +88,11 @@ class ReverseGeocoder(object):
 
         return response.raw["properties"]["countrycode"].upper()
 
-    @tenacity.retry
+    @tenacity.retry(
+        stop=tenacity.stop_after_attempt(3),
+        wait=tenacity.wait_random_exponential(multiplier=1, max=5),
+        reraise=True,
+    )
     async def _nominatim_country_lookup(
         self,
         latitude: float,

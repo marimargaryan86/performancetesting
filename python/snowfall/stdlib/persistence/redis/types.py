@@ -137,7 +137,7 @@ class Client(Generic[AnyStr]):  # noqa: WPS214
     ) -> lock.Lock:
         return lock.Lock(
             redis=self._redis,
-            name=name,
+            name=self._prefix + name,
             timeout=timeout,
             sleep=sleep,
             blocking=blocking,

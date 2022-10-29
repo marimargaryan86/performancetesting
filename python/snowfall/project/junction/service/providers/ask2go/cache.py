@@ -29,6 +29,8 @@ class NoCacheExistsError(Exception):
 
 
 class OfferGroupCache(contextlib.AsyncContextDecorator):
+    _lock_timeout_seconds = 120  # todo: tweak to what we want
+
     def __init__(
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
@@ -46,7 +48,10 @@ class OfferGroupCache(contextlib.AsyncContextDecorator):
         )
 
         self._seen_key = "criteria_cache.seen:{0}".format(cache_key)
-        self._lock = redis.lock("criteria_cache.locks:{0}".format(cache_key))
+        self._lock = redis.lock(
+            name="criteria_cache.locks:{0}".format(cache_key),
+            timeout=self._lock_timeout_seconds,
+        )
         self._offers = redis.set_("criteria_cache.offers:{0}".format(cache_key))
         self._redis = redis
 
@@ -63,7 +68,9 @@ class OfferGroupCache(contextlib.AsyncContextDecorator):
     ) -> bool:
         fallback_expiry = datetime.datetime.now(
             tz=datetime.timezone.utc,
-        ) + datetime.timedelta(hours=1)
+        ) + datetime.timedelta(
+            hours=1,
+        )  # todo: tweak to what we want
 
         await self._redis.put(self._seen_key, b"\x00")
         await types.put_expires_at_if_less_than_current(

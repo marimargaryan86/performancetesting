@@ -1,8 +1,5 @@
 import uuid
 
-import tenacity
-from geopy import exc
-
 from snowfall.project.junction.service.gtfs_feed import importer
 from snowfall.project.junction.service.places.v1alpha import models_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2, geocoding_pb2_grpc
@@ -25,42 +22,35 @@ async def process_places(
         if not stop.stop_lat or not stop.stop_lon or stop.parent_station:
             continue
 
-        retry = tenacity.Retrying(
-            retry=tenacity.retry_if_exception_type(exc.GeocoderTimedOut),
-            wait=tenacity.wait_random_exponential(multiplier=1, max=60),
-        )
-
-        for attempt in retry:
-            with attempt:
-                await producer.publish(
-                    models_pb2.Location(
-                        id=string.to_uuid(stop.stop_id, namespace),
-                        name=stop.stop_name or "",
-                        coordinates=latlng_pb2.LatLng(
-                            latitude=stop.stop_lat,
-                            longitude=stop.stop_lon,
+        await producer.publish(
+            models_pb2.Location(
+                id=string.to_uuid(stop.stop_id, namespace),
+                name=stop.stop_name or "",
+                coordinates=latlng_pb2.LatLng(
+                    latitude=stop.stop_lat,
+                    longitude=stop.stop_lon,
+                ),
+                country_code=(
+                    await geocoder.CountryCodeLookup(
+                        geocoding_pb2.CountryCodeLookupRequest(
+                            coordinates=latlng_pb2.LatLng(
+                                latitude=stop.stop_lat,
+                                longitude=stop.stop_lon,
+                            ),
                         ),
-                        country_code=(
-                            await geocoder.CountryCodeLookup(
-                                geocoding_pb2.CountryCodeLookupRequest(
-                                    coordinates=latlng_pb2.LatLng(
-                                        latitude=stop.stop_lat,
-                                        longitude=stop.stop_lon,
-                                    ),
-                                ),
-                            )
-                        ).country_code,
-                        time_zone=(
-                            await geocoder.TimeZoneLookup(
-                                geocoding_pb2.TimeZoneLookupRequest(
-                                    coordinates=latlng_pb2.LatLng(
-                                        latitude=stop.stop_lat,
-                                        longitude=stop.stop_lon,
-                                    ),
-                                ),
-                            )
-                        ).time_zone.id,
-                        source_ref=ref,
-                    ),
-                    "location.import",
-                )
+                    )
+                ).country_code,
+                time_zone=(
+                    await geocoder.TimeZoneLookup(
+                        geocoding_pb2.TimeZoneLookupRequest(
+                            coordinates=latlng_pb2.LatLng(
+                                latitude=stop.stop_lat,
+                                longitude=stop.stop_lon,
+                            ),
+                        ),
+                    )
+                ).time_zone.id,
+                source_ref=ref,
+            ),
+            "location.import",
+        )
