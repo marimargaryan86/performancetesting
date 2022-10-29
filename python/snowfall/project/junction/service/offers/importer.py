@@ -29,7 +29,7 @@ class OfferImporter(object):
         search_result = cast(amqp_pb2.TripOfferSearchResult, message.body)
         redis_lock = "results:{0}".format(search_result.offer_search_id)
 
-        async with self._redis.lock(redis_lock):
+        async with self._redis.lock(redis_lock, timeout=10):
             await self._aggregator.aggregate(search_result)
 
             with contextlib.suppress(errors.DuplicateKeyError):

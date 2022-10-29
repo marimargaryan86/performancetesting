@@ -1,9 +1,9 @@
 import datetime
+import itertools
 from collections.abc import AsyncIterator
 from contextlib import suppress
 from typing import Mapping, Optional, Sequence, Tuple
 
-import more_itertools
 from dateutil import relativedelta
 
 from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
@@ -46,7 +46,6 @@ class OfferTransformer(object):  # noqa: WPS214
     ) -> offers_pb2.OfferGroup:
         brands = branded_prices[0]
         offer_prices = branded_prices[1]
-        search_segment = more_itertools.first(search_task.segments)
         expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
 
         grouped_offer_segments = [
@@ -54,11 +53,14 @@ class OfferTransformer(object):  # noqa: WPS214
                 segment,
                 self._segment_to_proto(
                     segment=segment,
-                    search_segment=search_segment,
+                    search_segment=search_task.segments[segment_index],
                 ),
             )
-            for trip in offer_prices[0].itinerary.trips
-            for segment in trip.segments
+            for segment_index, segment in enumerate(
+                itertools.chain(
+                    *[trip.segments for trip in offer_prices[0].itinerary.trips],
+                ),
+            )
         ]
 
         passenger_applicable_dates = self._get_passenger_type_to_applicable_dates(
@@ -179,12 +181,13 @@ class OfferTransformer(object):  # noqa: WPS214
         origin = self._airports.get_by_iata(segment.origin.airport_code)
         destination = self._airports.get_by_iata(segment.destination.airport_code)
 
+        # todo: does not handle multi-leg flights?
         return offers_pb2.OfferSegment(
             id=string.uuid(),
             segment_id=search_segment.id,
             legs=[
                 offers_pb2.OfferSegmentLeg(
-                    id=search_segment.legs[0].id,
+                    id=leg.id,
                     origin=models_pb2.Point(
                         ref=origin.iata,
                         name=origin.airport_name or "",
@@ -213,7 +216,8 @@ class OfferTransformer(object):  # noqa: WPS214
                             tzinfo=destination.timezone,
                         ),
                     ),
-                ),
+                )
+                for leg in search_segment.legs
             ],
             vehicle=offers_pb2.Vehicle(
                 equipment=segment.aircraft.equipment,
