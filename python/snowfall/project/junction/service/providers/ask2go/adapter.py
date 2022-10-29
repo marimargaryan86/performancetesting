@@ -175,7 +175,7 @@ class Ask2GoAdapter(object):  # noqa: WPS214
         return self._get_async_price_result(async_offer)
 
     @tenacity.retry(
-        stop=tenacity.stop_after_attempt(3),
+        stop=tenacity.stop_after_attempt(10),
         retry=tenacity.retry_if_exception_type(ask2go_errors.TimeOutError),
         wait=tenacity.wait_random_exponential(multiplier=1, max=5),
         reraise=True,
@@ -260,7 +260,7 @@ class Ask2GoAdapter(object):  # noqa: WPS214
         return passengers
 
     @tenacity.retry(
-        stop=tenacity.stop_after_attempt(3),
+        stop=tenacity.stop_after_attempt(10),
         retry=tenacity.retry_if_exception_type(
             (ask2go_errors.AcceptedResponseError, ask2go_errors.TimeOutError),
         ),

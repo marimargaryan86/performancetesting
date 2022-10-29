@@ -65,7 +65,7 @@ class ReverseGeocoder(object):
         return None
 
     @tenacity.retry(
-        stop=tenacity.stop_after_attempt(3),
+        stop=tenacity.stop_after_delay(20),  # noqa: WPS432
         wait=tenacity.wait_random_exponential(multiplier=1, max=5),
         reraise=True,
     )
@@ -89,7 +89,7 @@ class ReverseGeocoder(object):
         return response.raw["properties"]["countrycode"].upper()
 
     @tenacity.retry(
-        stop=tenacity.stop_after_attempt(3),
+        stop=tenacity.stop_after_delay(20),  # noqa: WPS432
         wait=tenacity.wait_random_exponential(multiplier=1, max=5),
         reraise=True,
     )

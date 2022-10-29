@@ -66,18 +66,20 @@ class OfferGroupCache(contextlib.AsyncContextDecorator):
         exc_value: BaseException | None,
         traceback: std_types.TracebackType | None,
     ) -> bool:
-        fallback_expiry = datetime.datetime.now(
-            tz=datetime.timezone.utc,
-        ) + datetime.timedelta(
-            hours=1,
-        )  # todo: tweak to what we want
+        # only claim to have cached result if we were successful
+        if not exc_type:
+            fallback_expiry = datetime.datetime.now(
+                tz=datetime.timezone.utc,
+            ) + datetime.timedelta(
+                hours=1,
+            )  # todo: tweak to what we want
 
-        await self._redis.put(self._seen_key, b"\x00")
-        await types.put_expires_at_if_less_than_current(
-            self._redis,
-            self._seen_key,
-            await self._redis.get_expires_at(self._offers) or fallback_expiry,
-        )
+            await self._redis.put(self._seen_key, b"\x00")
+            await types.put_expires_at_if_less_than_current(
+                self._redis,
+                self._seen_key,
+                await self._redis.get_expires_at(self._offers) or fallback_expiry,
+            )
 
         await self._lock.release()
 

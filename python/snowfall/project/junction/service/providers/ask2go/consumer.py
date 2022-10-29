@@ -104,7 +104,7 @@ class SearchCriteriaConsumer(object):
             destination=search_task.criteria.destination_iata,
             departure_at=protobuf.protobuf_to_datetime(
                 search_task.criteria.outbound_departure,
-            ),
+            ).isoformat(),
         ):
             offer_cache = cache.OfferGroupCache(search_task, self._redis)
 
