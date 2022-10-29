@@ -1,7 +1,6 @@
 def python_image(  # type: ignore[no-untyped-def]
     namespace: str,
     name: str,
-    debug: bool = False,
     **kwargs,
 ) -> None:
     pex_binary(  # type: ignore[name-defined]  # noqa: F821
@@ -29,11 +28,9 @@ def python_image(  # type: ignore[no-untyped-def]
             "ARG REGISTRY",
             "FROM ${{REGISTRY}}python@sha256:{hash} AS runtime".format(hash=tag_sha),
             'ENV PIP_NO_CACHE_DIR "false"',
-            "ENV PYTHONASYNCIODEBUG {0}".format(1 if debug else 0),
             "ENV PYTHONFAULTHANDLER 1",
             'ENV PYTHONHASHSEED "random"',
             "ENV PYTHONUNBUFFERED 1",
-            'ENV LOG_LEVEL "{0}"'.format("DEBUG" if debug else "INFO"),
             "COPY {namespace}/{name}.pex /bin/{name}".format(
                 namespace=namespace,
                 name=name,

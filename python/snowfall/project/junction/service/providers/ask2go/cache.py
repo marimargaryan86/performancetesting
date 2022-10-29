@@ -84,7 +84,7 @@ class OfferGroupCache(contextlib.AsyncContextDecorator):
         return False  # type: ignore[unreachable]
 
     async def to_iterable(self) -> AsyncIterable[offers_pb2.OfferGroup]:
-        if not self._redis.get(self._seen_key):
+        if not await self._redis.get(self._seen_key):
             raise NoCacheExistsError
 
         async for offer in self._offers.to_iterable():
