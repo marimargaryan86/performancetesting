@@ -8,12 +8,13 @@ class OfferValidator(object):
     def __init__(self) -> None:
         self._logger = structlog.get_logger(__name__)
 
-    def matches(
+    def matches(  # noqa: WPS210
         self,
         offer: offers.Offer,
         requirements: models.Requirements,
     ) -> bool:
         last_index = 0
+        matches = 0
 
         for trip in offer.trips:
             for segment_index, segment in enumerate(trip.segments, start=last_index):
@@ -25,9 +26,10 @@ class OfferValidator(object):
                 if not self._segment_in_requirements(segment, requirement):
                     return False
 
-                last_index = segment_index
+                last_index = segment_index + 1
+                matches += 1
 
-        return True
+        return matches == len(requirements)  # make sure all requirements are matched
 
     def _segment_in_requirements(
         self,
