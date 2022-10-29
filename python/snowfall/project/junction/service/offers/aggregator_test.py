@@ -1,4 +1,5 @@
 import datetime
+import random
 from typing import Mapping, Sequence
 
 import freezegun
@@ -123,6 +124,33 @@ _OFFER_RESULTS = (
         ],
         expires_at=_OFFER_RESULT_EXPIRY_PROTO,
     ),
+    offer_protos.OfferGroup(
+        id="6",
+        segments=[
+            offer_protos.OfferSegment(
+                segment_id="a",
+            ),
+            offer_protos.OfferSegment(
+                segment_id="b",
+            ),
+        ],
+        expires_at=_OFFER_RESULT_EXPIRY_PROTO,
+    ),
+    offer_protos.OfferGroup(
+        id="7",
+        segments=[
+            offer_protos.OfferSegment(
+                segment_id="a",
+            ),
+            offer_protos.OfferSegment(
+                segment_id="b",
+            ),
+            offer_protos.OfferSegment(
+                segment_id="c",
+            ),
+        ],
+        expires_at=_OFFER_RESULT_EXPIRY_PROTO,
+    ),
 )
 
 
@@ -137,6 +165,18 @@ class TestOfferBuckets(object):
             (
                 _OFFER_RESULTS[:5],
                 {"a": ["1"], "b": ["2", "3"], "c": ["4", "5"]},
+            ),
+            (
+                _OFFER_RESULTS[:6],
+                {"a": ["1", "6"], "b": ["2", "3", "6"], "c": ["4", "5"]},
+            ),
+            (
+                _OFFER_RESULTS[:7],
+                {
+                    "a": ["1", "6", "7"],
+                    "b": ["2", "3", "6", "7"],
+                    "c": ["4", "5", "7"],
+                },
             ),
         ],
     )
@@ -162,36 +202,6 @@ class TestAggregator(object):
     @pytest.mark.parametrize(
         ["offer_search", "offer_results", "expected"],
         [
-            (_OFFER_SEARCHES[0], _OFFER_RESULTS[:1], 1),
-            (_OFFER_SEARCHES[1], _OFFER_RESULTS[:2], 1),
-            (_OFFER_SEARCHES[1], _OFFER_RESULTS[:3], 2),
-            (_OFFER_SEARCHES[2], _OFFER_RESULTS[:5], 4),
-        ],
-    )
-    async def test_offers_generate_expected_number_of_aggregates(
-        self,
-        offer_searches_repository: offers.OfferSearchRepository,
-        offer_aggregator: aggregator.OfferAggregator,
-        offer_aggregate_collection: motor_asyncio.AsyncIOMotorCollection,
-        offer_search: offer_protos.OfferSearch,
-        offer_results: Sequence[offer_protos.OfferGroup],
-        expected: int,
-    ) -> None:
-        await offer_searches_repository.insert(offer_search)
-
-        for offer_result in offer_results:
-            await offer_aggregator.aggregate(
-                amqp_pb2.TripOfferSearchResult(
-                    offer_search_id=offer_search.id,
-                    offer=offer_result,
-                ),
-            )
-
-        assert await offer_aggregate_collection.count_documents({}) == expected
-
-    @pytest.mark.parametrize(
-        ["offer_search", "offer_results", "expected"],
-        [
             (_OFFER_SEARCHES[0], _OFFER_RESULTS[:1], [["1"]]),
             (_OFFER_SEARCHES[1], _OFFER_RESULTS[:2], [["1", "2"]]),
             (
@@ -209,6 +219,31 @@ class TestAggregator(object):
                     ["1", "3", "5"],
                 ],
             ),
+            (
+                _OFFER_SEARCHES[2],
+                _OFFER_RESULTS[:6],
+                [
+                    ["1", "2", "4"],
+                    ["1", "3", "4"],
+                    ["1", "2", "5"],
+                    ["1", "3", "5"],
+                    ["6", "4"],
+                    ["6", "5"],
+                ],
+            ),
+            (
+                _OFFER_SEARCHES[2],
+                _OFFER_RESULTS[:7],
+                [
+                    ["1", "2", "4"],
+                    ["1", "3", "4"],
+                    ["1", "2", "5"],
+                    ["1", "3", "5"],
+                    ["6", "4"],
+                    ["6", "5"],
+                    ["7"],
+                ],
+            ),
         ],
     )
     async def test_offers_generate_expected_aggregates(
@@ -221,7 +256,8 @@ class TestAggregator(object):
         expected: Sequence[Sequence[str]],
     ) -> None:
         await offer_searches_repository.insert(offer_search)
-        for offer_result in offer_results:
+
+        for offer_result in random.sample(list(offer_results), len(offer_results)):
             await offer_aggregator.aggregate(
                 amqp_pb2.TripOfferSearchResult(
                     offer_search_id=offer_search.id,
@@ -233,3 +269,5 @@ class TestAggregator(object):
         async for aggregate in offer_aggregate_collection.find():
             assert sorted(aggregate["offer_result_ids"]) in expected_sorted
             assert aggregate["expires_at"] == _OFFER_RESULT_EXPIRY
+
+        assert await offer_aggregate_collection.count_documents({}) == len(expected)

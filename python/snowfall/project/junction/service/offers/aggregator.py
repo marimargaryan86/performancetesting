@@ -43,7 +43,7 @@ def generate_offer_aggregates(
     ]
 
 
-def generate_offer_aggregates_recursive(
+def generate_offer_aggregates_recursive(  # noqa: WPS210
     segment_ids: Sequence[str],
     segment_ids_to_offer_ids: Mapping[str, Sequence[str]],
     offer_ids_to_segment_ids: Mapping[str, Sequence[str]],
@@ -66,11 +66,26 @@ def generate_offer_aggregates_recursive(
                 segment_ids=segment_ids,
                 segment_ids_to_offer_ids=segment_ids_to_offer_ids,
                 offer_ids_to_segment_ids=offer_ids_to_segment_ids,
-                fulfilled_segments=fulfilled_segments.union(
-                    set(offer_ids_to_segment_ids[offer_id]),
+                fulfilled_segments=frozenset(
+                    (
+                        *fulfilled_segments,
+                        *offer_ids_to_segment_ids[offer_id],
+                    ),
                 ),
-                segment_index=segment_index + 1,
+                segment_index=next(
+                    (
+                        segment_idx
+                        for segment_idx, segment_id in enumerate(segment_ids)
+                        if segment_id
+                        not in {
+                            *fulfilled_segments,
+                            *offer_ids_to_segment_ids[offer_id],
+                        }
+                    ),
+                    len(segment_ids),
+                ),
             )
+
             for aggregate in current_aggregates:
                 aggregate.append(offer_id)
 
@@ -148,7 +163,7 @@ class OfferAggregator(object):
         self._buckets = offer_buckets
         self._aggregates = offer_aggregates
 
-    async def aggregate(  # noqa: WPS210
+    async def aggregate(
         self,
         search_result: amqp_pb2.TripOfferSearchResult,
     ) -> None:
@@ -159,13 +174,10 @@ class OfferAggregator(object):
 
         _set_sequence_numbers(offer_search, search_result.offer)
 
-        buckets = await self._buckets.get_offer_buckets(offer_search.id)
-
-        # this overrides the true bucket values for segments that this offer
-        # group covers, so that we only generate offer aggregates with this
-        # offer group
-        for offer_segment in search_result.offer.segments:
-            buckets[offer_segment.segment_id] = [search_result.offer.id]
+        buckets = _override_buckets(
+            search_result,
+            await self._buckets.get_offer_buckets(offer_search.id),
+        )
 
         await self._buckets.add_offer(offer_search.id, search_result.offer)
 
@@ -180,6 +192,34 @@ class OfferAggregator(object):
         for aggregate in generate_offer_aggregates(buckets, expires_at):
             aggregate.offer_search_id = offer_search.id
             await self._aggregates.insert(aggregate)
+
+
+def _override_buckets(
+    search_result: amqp_pb2.TripOfferSearchResult,
+    buckets: Mapping[str, Sequence[str]],
+) -> dict[str, list[str]]:
+    # this overrides the true bucket values for segments that this offer
+    # group covers, so that we only generate offer aggregates with this
+    # offer group
+    #
+    # we also need to mark all offers we override as unqualified, so we
+    # can remove multi-segment offers from other buckets they're in, else
+    # we'll end up with partial offers
+    unqualified_offers: set[str] = set()
+    mutable_buckets = dict(buckets)
+
+    for offer_segment in search_result.offer.segments:
+        unqualified_offers = {
+            *unqualified_offers,
+            *mutable_buckets.get(offer_segment.segment_id, set()),
+        }
+
+        mutable_buckets[offer_segment.segment_id] = [search_result.offer.id]
+
+    return {
+        idx: [offer_id for offer_id in bucket if offer_id not in unqualified_offers]
+        for idx, bucket in mutable_buckets.items()
+    }
 
 
 def _set_sequence_numbers(  # noqa: WPS210
