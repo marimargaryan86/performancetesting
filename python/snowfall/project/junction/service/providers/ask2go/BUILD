@@ -1,9 +1,14 @@
 python_sources(dependencies=[":airports"])
 python_tests(name="tests", dependencies=[":fixtures"])
 python_test_utils(name="test_utils", dependencies=[":airports"])
-resources(
+resource(
     name="airports",
-    sources=["airport_coordinates.json"],
+    source=http_source(
+        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/airports-0c47905459e9b66dd6214d175fec83ae88a2b36d732503c563426abeb8a25cc3.json",
+        len=2587457,
+        sha256="0c47905459e9b66dd6214d175fec83ae88a2b36d732503c563426abeb8a25cc3",
+        filename="airports.json",
+    ),
 )
 files(
     name="fixtures",

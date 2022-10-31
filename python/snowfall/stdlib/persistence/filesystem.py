@@ -6,20 +6,25 @@ import zipfile
 from importlib import _bootstrap, util  # type: ignore[attr-defined] # noqa: WPS450
 from os import path
 from sys import modules
-from typing import Any
+from typing import Any, Union
 
 import aiofiles
 import rapidjson
 
+_PkgLoaderReturn = Union[
+    list[dict[str, Any]],
+    dict[str, Any],
+]
+
 
 class Loader(abc.ABC):
     @abc.abstractmethod
-    def load(self, ref: str) -> dict[str, Any]:
+    def load(self, ref: str) -> _PkgLoaderReturn:
         """Load the file."""
 
 
 class FileLoader(Loader):
-    def load(self, ref: str) -> dict[str, Any]:
+    def load(self, ref: str) -> _PkgLoaderReturn:
         try:
             with open(ref) as file_handle:
                 return rapidjson.load(file_handle)
@@ -33,7 +38,7 @@ class PkgLoader(Loader):
     def __init__(self, pkg: str):
         self._pkg = pkg
 
-    def load(self, ref: str) -> dict[str, Any]:
+    def load(self, ref: str) -> _PkgLoaderReturn:
         try:
             file_content = pkgutil.get_data(self._pkg, ref)
         except (AttributeError, OSError) as err:

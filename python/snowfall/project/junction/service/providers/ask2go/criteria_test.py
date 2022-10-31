@@ -1,3 +1,4 @@
+import base64
 import datetime
 from typing import Mapping, Sequence
 
@@ -70,6 +71,21 @@ _SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
     ),
 )
 
+# SK - 2022-11-11 - ARN -> BER - 18:15:00 -> 19:50:00 - 1 ADULT
+_SEARCH_TASK2_ENCODED = """
+Clh0eXBlLmdvb2dsZWFwaXMuY29tL3Nub3dmYWxsLnByb2plY3QuanVuY3Rpb24uc2VydmljZS5vZmZlcnMudjFh
+bHBoYS5UcmlwT2ZmZXJTZWFyY2hUYXNrEvUCCiRmZGFiODEwOS00YmMxLTQ2NTYtODI4MS03Y2EyNjYyZmI4YzIS
+qgIKnAIKJDAzNjdmMmM0LWRmMWQtNThiNi1hZTFjLTk3Mjg1MDgzY2ZiZBLzAQokMWIzNWZhZDYtY2RlZC01YWZl
+LThjNDYtNjdmMWY3MWE4MThlEsoBCiRmOTAyZDZjOC02MWIyLTUyNGEtOTgyZS05OWZhZjQ3MjNlNjQSRgoDQVJO
+EhlTdG9ja2hvbG0tQXJsYW5kYSBBaXJwb3J0GhIJihwibk7TTUAR+WabG9PrMUAiEEV1cm9wZS9TdG9ja2hvbG0a
+RAoDQkVSEhpCZXJsaW4gQnJhbmRlbmJ1cmcgQWlycG9ydBoSCVIOZhNgLkpAEb0bCwqDAitAIg1FdXJvcGUvQmVy
+bGluIgYIlIa6mwYqBgjYsrqbBjABOgJTSxIJCgcIxg8QChgZGiAwMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzI1Njc4
+OTAxMg==
+"""
+_SEARCH_TASK2 = protobuf.AnySerializer[amqp_pb2.TripOfferSearchTask].deserialize(
+    base64.b64decode(_SEARCH_TASK2_ENCODED),
+)
+
 
 @pytest.mark.parametrize(
     "search_task, expected",
@@ -80,6 +96,12 @@ _SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
                 ("PPW", "WRY"),
             ],
         ),
+        (
+            _SEARCH_TASK2,
+            [
+                ("ARN", "BER"),
+            ],
+        ),
     ],
 )
 def test_criteria_with_expected_pairs_are_generated(
@@ -88,15 +110,13 @@ def test_criteria_with_expected_pairs_are_generated(
     expected: Sequence[Sequence[str]],
 ) -> None:
     search_tasks = list(criteria_generator.from_search_task(search_task=search_task))
-    assert len(search_tasks) == len(expected)
-
     search_task_pairs = [
         (search_task.criteria.origin_iata, search_task.criteria.destination_iata)
         for search_task in search_tasks
     ]
 
-    for pair in expected:
-        assert pair in search_task_pairs
+    assert all(pair in search_task_pairs for pair in expected)
+    assert all(pair in expected for pair in search_task_pairs)
 
 
 @pytest.mark.parametrize(
@@ -108,6 +128,14 @@ def test_criteria_with_expected_pairs_are_generated(
                 "adults": 1,
                 "children": 1,
                 "infants": 1,
+            },
+        ),
+        (
+            _SEARCH_TASK2,
+            {
+                "adults": 1,
+                "children": 0,
+                "infants": 0,
             },
         ),
     ],

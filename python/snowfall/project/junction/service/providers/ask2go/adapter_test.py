@@ -264,12 +264,12 @@ async def test_search_result_data(  # noqa: WPS218
         leg = segment.legs[0]
         assert leg.id == "leg_id"
         assert leg.origin.ref == "ARN"
-        assert leg.origin.name == "Arlanda"
+        assert leg.origin.name == "Stockholm-Arlanda Airport"
         assert leg.origin.time_zone == "Europe/Stockholm"
         assert math.isclose(leg.origin.coordinates.latitude, 59.650831)
         assert math.isclose(leg.origin.coordinates.longitude, 17.92119)
         assert leg.destination.ref == "LHR"
-        assert leg.destination.name == "Heathrow"
+        assert leg.destination.name == "Heathrow Airport"
         assert leg.destination.time_zone == "Europe/London"
         assert math.isclose(leg.destination.coordinates.latitude, 51.470311)
         assert math.isclose(leg.destination.coordinates.longitude, -0.458118)

@@ -1,9 +1,8 @@
 import dataclasses
 import zoneinfo
-from typing import Any, Mapping, Optional, Sequence
+from typing import Any, Iterator, Mapping, Optional, Sequence
 
 from snowfall.stdlib import h3
-from snowfall.vendor.ask2go.models import common
 
 
 @dataclasses.dataclass(frozen=True)
@@ -18,53 +17,41 @@ class Airport(object):
 class AirportRepository(object):
     def __init__(
         self,
-        coordinates: Mapping[str, Mapping[str, Any]],
-        airports: Sequence[common.Airport],
+        airports_data: Sequence[Mapping[str, Any]],
     ):
         self._airports = {
-            airport.iata: _make_airport(airport, coordinates[airport.iata])
-            for airport in _filter_airports(airports, coordinates)
+            airport["iata_code"]: _make_airport(airport)
+            for airport in airports_data
+            if airport["time_zone"] and airport["latitude"] and airport["longitude"]
         }
+
+    def all_(self) -> Iterator[Airport]:
+        yield from self._airports.values()
 
     def get_by_iata(self, iata: str) -> Airport:
         return self._airports[iata]
 
 
 def create_airports_mapping(
-    coordinates: Mapping[str, Mapping[str, Any]],
-    airports: Sequence[common.Airport],
+    airports: AirportRepository,
 ) -> list[h3.CoordinatesItem[Airport]]:
     return [
         h3.CoordinatesItem[Airport](
-            latitude=coordinates[airport.iata]["lat"],
-            longitude=coordinates[airport.iata]["lon"],
-            mapped_value=_make_airport(airport, coordinates[airport.iata]),
+            latitude=airport.latitude,
+            longitude=airport.longitude,
+            mapped_value=airport,
         )
-        for airport in _filter_airports(airports, coordinates)
-    ]
-
-
-def _filter_airports(
-    airports: Sequence[common.Airport],
-    coordinates: Mapping[str, Mapping[str, Any]],
-) -> list[common.Airport]:
-    return [
-        airport
-        for airport in airports
-        if airport.iata in coordinates
-        and airport.language == "en"
-        and airport.is_parent is False
+        for airport in airports.all_()
     ]
 
 
 def _make_airport(
-    airport: common.Airport,
-    airport_date: Mapping[str, Any],
+    airport: Mapping[str, Any],
 ) -> Airport:
     return Airport(
-        airport_name=airport.airport_name,
-        iata=airport.iata,
-        timezone=zoneinfo.ZoneInfo(airport_date["tz"]),
-        latitude=airport_date["lat"],
-        longitude=airport_date["lon"],
+        airport_name=airport["name"],
+        iata=airport["iata_code"],
+        timezone=zoneinfo.ZoneInfo(airport["time_zone"]),
+        latitude=airport["latitude"],
+        longitude=airport["longitude"],
     )

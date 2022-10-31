@@ -1,7 +1,7 @@
 import datetime
 import json
 from collections.abc import AsyncIterator
-from typing import Any, Mapping, Sequence
+from typing import Any, cast
 
 import aioredis
 import httpx
@@ -21,7 +21,6 @@ from snowfall.stdlib import h3
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.vendor.ask2go import client
-from snowfall.vendor.ask2go.models import common
 
 
 def load_json_fixture(
@@ -44,13 +43,13 @@ def assert_all_responses_were_requested() -> bool:
 
 
 @pytest.fixture
-async def airport_repository(
-    airport_coordinates: Mapping[str, Mapping[str, Any]],
-    ask2go_airports: Sequence[common.Airport],
-) -> airports.AirportRepository:
+async def airport_repository() -> airports.AirportRepository:
+    loader = filesystem.PkgLoader(
+        "snowfall.project.junction.service.providers.ask2go.airports",
+    )
+
     return airports.AirportRepository(
-        coordinates=airport_coordinates,
-        airports=ask2go_airports,
+        cast(list[dict[str, Any]], loader.load("airports.json")),
     )
 
 
@@ -100,44 +99,12 @@ def offer_transformer(
 
 
 @pytest.fixture
-def ask2go_airports() -> list[common.Airport]:
-    return [
-        common.Airport(iata="ARN", language="en", airport_name="Arlanda"),
-        common.Airport(iata="LHR", language="en", airport_name="Heathrow"),
-        common.Airport(
-            iata="DMM",
-            language="en",
-            airport_name="King Fahad International",
-        ),
-        common.Airport(
-            iata="PBM",
-            language="en",
-            airport_name="Zanderij International",
-        ),
-        common.Airport(iata="ORG", language="en"),
-        common.Airport(iata="WRY", language="en", airport_name="Westray"),
-        common.Airport(iata="PPW", language="en", airport_name="Papa Westray"),
-    ]
-
-
-@pytest.fixture
-def airport_coordinates() -> Mapping[str, Mapping[str, Any]]:
-    loader = filesystem.PkgLoader(
-        "snowfall.project.junction.service.providers.ask2go.airports",
-    )
-
-    return loader.load("airport_coordinates.json")
-
-
-@pytest.fixture
 def h3_mapping_repository(
-    airport_coordinates: Mapping[str, Mapping[str, Any]],
-    ask2go_airports: Sequence[common.Airport],
+    airport_repository: airports.AirportRepository,
 ) -> h3.H3MappingRepository[airports.Airport]:
     return h3.H3MappingRepository[airports.Airport](
         mapping=airports.create_airports_mapping(
-            coordinates=airport_coordinates,
-            airports=ask2go_airports,
+            airports=airport_repository,
         ),
         resolution=7,
     )

@@ -1,6 +1,6 @@
 import datetime
 import random
-from typing import Sequence
+from typing import Any, Sequence, cast
 
 import aioredis
 import aiosmtplib
@@ -29,9 +29,6 @@ _OFFERS = "offers"
 
 class _OffersSettings(service.Settings):
     amqp_dsn: Sequence[pydantic.AnyUrl]
-    api_base_url: pydantic.AnyUrl
-    api_booking_base_url: pydantic.AnyUrl
-    http_timeout: float = 20.0
 
 
 class _OrdersSettings(service.Settings):
@@ -57,36 +54,38 @@ class _SearchSettings(service.Settings):
 
 
 async def _offers(app: service.Application[_OffersSettings]) -> None:
-    async with httpx.AsyncClient(timeout=app.settings.http_timeout) as http_client:
-        async with await amqp.create_connection(
-            random.choice(app.settings.amqp_dsn),  # nosec
-        ) as connection:
-            trip_search_consumer = consumer.TripSearchConsumer(
-                consumer=amqp.Consumer(
-                    connection=connection,
-                    exchange=amqp.Exchange(_OFFERS),
-                    queue_name="{0}_offers".format(app.name),
-                    routing_key="offers.search.trip",
-                ),
-                producer=amqp.Producer(
-                    connection=connection,
-                    exchange=amqp.Exchange("ask2go"),
-                ),
-                generator=criteria.CriteriaGenerator(
-                    h3_mapping=h3.H3MappingRepository[airports.Airport](
-                        mapping=await _get_iata_mapping(
-                            ask2go_client=client.Ask2GoClient(
-                                api_base_url=app.settings.api_base_url,
-                                api_booking_base_url=app.settings.api_booking_base_url,
-                                http_client=http_client,
+    async with await amqp.create_connection(
+        random.choice(app.settings.amqp_dsn),  # nosec
+    ) as connection:
+        trip_search_consumer = consumer.TripSearchConsumer(
+            consumer=amqp.Consumer(
+                connection=connection,
+                exchange=amqp.Exchange(_OFFERS),
+                queue_name="{0}_offers".format(app.name),
+                routing_key="offers.search.trip",
+            ),
+            producer=amqp.Producer(
+                connection=connection,
+                exchange=amqp.Exchange("ask2go"),
+            ),
+            generator=criteria.CriteriaGenerator(
+                h3_mapping=h3.H3MappingRepository[airports.Airport](
+                    mapping=airports.create_airports_mapping(
+                        airports.AirportRepository(
+                            airports_data=cast(
+                                list[dict[str, Any]],
+                                filesystem.PkgLoader(
+                                    "snowfall.project.junction.service.providers.ask2go.main",
+                                ).load("airports.json"),
                             ),
                         ),
-                        resolution=7,
                     ),
+                    resolution=7,
                 ),
-            )
+            ),
+        )
 
-            await trip_search_consumer.consume()
+        await trip_search_consumer.consume()
 
 
 async def _orders(app: service.Application[_OrdersSettings]) -> None:
@@ -168,10 +167,12 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                     ),
                     offer_transformer=transformer.OfferTransformer(
                         airport_repository=airports.AirportRepository(
-                            airports=await ask2go_client.get_airports(),
-                            coordinates=filesystem.PkgLoader(
-                                "snowfall.project.junction.service.providers.ask2go.main",
-                            ).load("airport_coordinates.json"),
+                            airports_data=cast(
+                                list[dict[str, Any]],
+                                filesystem.PkgLoader(
+                                    "snowfall.project.junction.service.providers.ask2go.main",
+                                ).load("airports.json"),
+                            ),
                         ),
                         offer_cache=cache.OfferCache(
                             client=redis.Client[bytes](redis_conn, prefix=app.name),
@@ -185,19 +186,6 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                 )
 
                 await trip_search_consumer.consume()
-
-
-async def _get_iata_mapping(
-    ask2go_client: client.Ask2GoClient,
-) -> list[h3.CoordinatesItem[airports.Airport]]:
-    loader = filesystem.PkgLoader(
-        "snowfall.project.junction.service.providers.ask2go.main",
-    )
-
-    return airports.create_airports_mapping(
-        coordinates=loader.load("airport_coordinates.json"),
-        airports=await ask2go_client.get_airports(),
-    )
 
 
 if __name__ == "__main__":
