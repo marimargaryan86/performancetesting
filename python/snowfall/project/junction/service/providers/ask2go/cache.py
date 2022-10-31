@@ -29,7 +29,7 @@ class NoCacheExistsError(Exception):
 
 
 class OfferGroupCache(contextlib.AsyncContextDecorator):
-    _lock_timeout_seconds = 120  # todo: tweak to what we want
+    _lock_timeout = datetime.timedelta(minutes=5)  # todo: tweak to what we want
 
     def __init__(
         self,
@@ -50,7 +50,7 @@ class OfferGroupCache(contextlib.AsyncContextDecorator):
         self._seen_key = "criteria_cache.seen:{0}".format(cache_key)
         self._lock = redis.lock(
             name="criteria_cache.locks:{0}".format(cache_key),
-            timeout=self._lock_timeout_seconds,
+            timeout=self._lock_timeout.total_seconds(),
         )
         self._offers = redis.set_("criteria_cache.offers:{0}".format(cache_key))
         self._redis = redis
@@ -81,9 +81,10 @@ class OfferGroupCache(contextlib.AsyncContextDecorator):
                 await self._redis.get_expires_at(self._offers) or fallback_expiry,
             )
 
-        await self._lock.release()
+        if self._lock.owned():
+            await self._lock.release()
 
-        return False  # type: ignore[unreachable]
+        return False
 
     async def to_iterable(self) -> AsyncIterable[offers_pb2.OfferGroup]:
         if not await self._redis.get(self._seen_key):
