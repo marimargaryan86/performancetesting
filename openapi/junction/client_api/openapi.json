@@ -4816,7 +4816,8 @@
                 "type": "object",
                 "required": [
                   "cabinClassName",
-                  "rules"
+                  "rules",
+                  "baggageAllowances"
                 ],
                 "properties": {
                   "cabinClassName": {
@@ -4828,6 +4829,13 @@
                     "minItems": 0,
                     "items": {
                       "$ref": "#/components/schemas/OfferSegmentDetailRule"
+                    }
+                  },
+                  "baggageAllowances": {
+                    "type": "array",
+                    "minItems": 0,
+                    "items": {
+                      "$ref": "#/components/schemas/TripOfferOptionPenaltyBaggageAllowance"
                     }
                   }
                 }
@@ -4969,6 +4977,23 @@
         "required": [
           "dateOfBirthAfter",
           "dateOfBirthBefore"
+        ]
+      },
+      "TripOfferOptionPenaltyBaggageAllowance": {
+        "title": "Trip Offer Option Penalty Baggage Allowance",
+        "type": "object",
+        "properties": {
+          "free": {
+            "type": "boolean",
+            "example": true
+          },
+          "applicableTo": {
+            "$ref": "#/components/schemas/TripOfferOptionPenaltyApplicableTo"
+          }
+        },
+        "required": [
+          "free",
+          "applicableTo"
         ]
       },
       "Price": {

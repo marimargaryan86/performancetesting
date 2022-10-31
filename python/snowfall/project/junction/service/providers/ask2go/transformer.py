@@ -80,7 +80,7 @@ class OfferTransformer(object):  # noqa: WPS214
             segments=[grouped_segment[1] for grouped_segment in grouped_offer_segments],
         )
 
-    async def _get_group_offers(  # noqa:WPS211
+    async def _get_group_offers(  # noqa: WPS211
         self,
         offer_prices: Sequence[price.OfferPriceResponse],
         brands: Sequence[str],
@@ -110,6 +110,7 @@ class OfferTransformer(object):  # noqa: WPS214
                     segment_details=self._get_segment_details(
                         grouped_trips_segments,
                         grouped_rules,
+                        offer_price.itinerary.trips,
                     ),
                     price=models_pb2.Price(
                         amount=amount.amount,
@@ -141,20 +142,36 @@ class OfferTransformer(object):  # noqa: WPS214
 
         return group_offers
 
-    def _get_segment_details(
+    def _get_segment_details(  # noqa: WPS210
         self,
         grouped_trips_segments: Sequence[_GroupedOfferSegment],
         grouped_rules: Mapping[Tuple[str, str], Sequence[booking.FareRule]],
+        trips: Sequence[offers.Trip],
     ) -> Sequence[offers_pb2.OfferSegmentDetails]:
         segment_details = []
+        segment_baggabe_allowances = {
+            segment_index: list(baggage_allowances)
+            for segment_index, baggage_allowances in itertools.groupby(
+                [baggage for trip in trips for baggage in trip.baggage_allowance],
+                lambda baggage: baggage.segment_index,
+            )
+        }
+
         for grouped_segment in grouped_trips_segments:
+            trip_segment = grouped_segment[0]
+            baggage_allowance = segment_baggabe_allowances.get(
+                trip_segment.segment_index,
+            )
+            passenger_applicable_dates = self._get_passenger_type_to_applicable_dates(
+                trip_segment,
+            )
             segment_details.append(
                 offers_pb2.OfferSegmentDetails(
                     id=string.uuid(),
                     offer_segment_id=grouped_segment[1].id,
                     cabin_class=models_pb2.CabinClass(
-                        type=models.cabin_to_proto(grouped_segment[0].cabin),
-                        marketing_name=grouped_segment[0].cabin or "",
+                        type=models.cabin_to_proto(trip_segment.cabin),
+                        marketing_name=trip_segment.cabin or "",
                     ),
                     rules=[
                         offers_pb2.SegmentRule(
@@ -163,11 +180,22 @@ class OfferTransformer(object):  # noqa: WPS214
                         )
                         for rule in grouped_rules[
                             (
-                                grouped_segment[0].origin.airport_code,
-                                grouped_segment[0].destination.airport_code,
+                                trip_segment.origin.airport_code,
+                                trip_segment.destination.airport_code,
                             )
                         ]
                     ],
+                    baggage_allowances=[
+                        offers_pb2.BaggageAllowance(
+                            free=baggage.has_free_baggage,
+                            applicable_to=passenger_applicable_dates[
+                                baggage.passenger_type
+                            ],
+                        )
+                        for baggage in baggage_allowance
+                    ]
+                    if baggage_allowance
+                    else [],
                 ),
             )
 

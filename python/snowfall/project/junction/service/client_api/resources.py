@@ -319,6 +319,18 @@ class OfferSegmentRule(models.BaseModel):
         )
 
 
+class BaggageAllowance(models.BaseModel):
+    free: bool
+    applicable_to: PenaltyApplicableTo = pydantic.Field(alias="applicableTo")
+
+    @classmethod
+    def from_proto(cls, baggage: offer_models_pb2.BaggageAllowance) -> BaggageAllowance:
+        return cls(
+            free=baggage.free,
+            applicableTo=PenaltyApplicableTo.from_proto(baggage.applicable_to),
+        )
+
+
 class TripOfferOptionDetailsResource(models.Resource):
     api_type: ClassVar[str] = "trip-offer-option-details"
 
@@ -334,6 +346,10 @@ class TripOfferOptionDetailsResource(models.Resource):
             attributes={
                 "cabinClassName": details.cabin_class.marketing_name,
                 "rules": [OfferSegmentRule.from_proto(rule) for rule in details.rules],
+                "baggageAllowances": [
+                    BaggageAllowance.from_proto(baggage)
+                    for baggage in details.baggage_allowances
+                ],
             },
             relationships={
                 "details": {

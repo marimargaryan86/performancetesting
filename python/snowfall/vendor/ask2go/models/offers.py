@@ -26,6 +26,7 @@ class TripBaggageAllowance(CamelCaseBaseModel):
     pieces: int
     has_free_baggage: bool
     passenger_type: str
+    segment_index: Optional[int]
 
 
 class SegmentAircraft(CamelCaseBaseModel):
@@ -62,6 +63,7 @@ class TripSegment(CamelCaseBaseModel):
     meal: Optional[str]
     layover: str
     change_of_plane: Optional[bool]
+    segment_index: Optional[int]
 
     _normalize_duration = pydantic.validator("duration", pre=True, allow_reuse=True)(
         normalizers.normalize_duration,
