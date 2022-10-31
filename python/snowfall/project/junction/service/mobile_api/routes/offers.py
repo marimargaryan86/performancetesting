@@ -100,7 +100,9 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
             if offers_response.get("included"):
                 for include in offers_response.get("included", []):
                     if include["type"] == "offer-options":
-                        include["attributes"]["price"]["amount"] *= rate
+                        include["attributes"]["price"]["amount"] = str(
+                            rate * float(include["attributes"]["price"]["amount"]),
+                        )
                         include["attributes"]["price"][
                             "currency"
                         ] = request.query_params.get("currency")
