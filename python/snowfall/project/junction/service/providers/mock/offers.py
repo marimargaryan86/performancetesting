@@ -2,7 +2,7 @@ import datetime
 import itertools
 import random
 from collections.abc import AsyncIterator
-from typing import Sequence, cast
+from typing import Sequence
 
 import pydantic
 
@@ -88,13 +88,14 @@ class TripSearchConsumer(object):
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
 
-    async def _process_message(self, message: amqp.Message) -> None:
-        search = cast(amqp_pb2.TripOfferSearchTask, message.body)
-
-        async for offer_result in self._client.search(search):
+    async def _process_message(
+        self,
+        message: amqp.Message[amqp_pb2.TripOfferSearchTask],
+    ) -> None:
+        async for offer_result in self._client.search(message.body):
             await self._producer.publish(
                 amqp_pb2.TripOfferSearchResult(
-                    offer_search_id=search.offer_search_id,
+                    offer_search_id=message.body.offer_search_id,
                     offer=offer_result,
                 ),
                 routing_key="offers.result.trip",

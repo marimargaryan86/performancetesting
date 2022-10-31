@@ -1,6 +1,6 @@
 import zoneinfo
-from typing import cast
 
+import more_itertools
 import structlog
 from grpc import aio
 
@@ -32,15 +32,17 @@ class TripSearchConsumer(object):
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
 
-    async def _process_message(self, message: amqp.Message) -> None:
-        body = cast(amqp_pb2.TripSearchTask, message.body)
+    async def _process_message(
+        self,
+        message: amqp.Message[amqp_pb2.TripSearchTask],
+    ) -> None:
         origins = {
             (origin.coordinates.latitude, origin.coordinates.longitude)
-            for origin in body.trip_search.origins
+            for origin in message.body.trip_search.origins
         }
         destinations = {
             (destination.coordinates.latitude, destination.coordinates.longitude)
-            for destination in body.trip_search.destinations
+            for destination in message.body.trip_search.destinations
         }
 
         if not origins or not destinations:
@@ -65,9 +67,13 @@ class TripSearchConsumer(object):
                     ],
                     departure_after=protobuf.datetime_to_protobuf_datetime(
                         protobuf.protobuf_to_datetime(
-                            body.trip_search.departure_after,
+                            message.body.trip_search.departure_after,
                         ).astimezone(
-                            zoneinfo.ZoneInfo(body.trip_search.origins[0].time_zone),
+                            zoneinfo.ZoneInfo(
+                                more_itertools.first(
+                                    message.body.trip_search.origins,
+                                ).time_zone,
+                            ),
                         ),
                     ),
                 ),
@@ -80,7 +86,7 @@ class TripSearchConsumer(object):
 
         await self._trip_repository.add_from_journey_search(response)
         await self._trip_search_repository.add_results_from_journey_search(
-            body.trip_search,
+            message.body.trip_search,
             response,
         )
 

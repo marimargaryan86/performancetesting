@@ -9,6 +9,24 @@ from google.protobuf import duration_pb2, timestamp_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import datetime_pb2, models_pb2
 
+_seconds = 1639696695
+
+
+class TestSerializer(object):
+    def test_serialize(self) -> None:
+        message = timestamp_pb2.Timestamp(seconds=_seconds)
+        message_serialized = protobuf.AnySerializer.serialize(message)
+        assert isinstance(message_serialized, bytes)
+
+    def test_deserialize(self) -> None:
+        blob = (
+            b"\n-type.googleapis.com/google.protobuf.Timestamp\x12\x06\x08\xb7\x92\xef"
+            + b"\x8d\x06"
+        )
+        message = protobuf.AnySerializer[timestamp_pb2.Timestamp].deserialize(blob)
+        assert isinstance(message, timestamp_pb2.Timestamp)
+        assert message.seconds == _seconds
+
 
 def test_enum_value_to_name() -> None:
     assert (

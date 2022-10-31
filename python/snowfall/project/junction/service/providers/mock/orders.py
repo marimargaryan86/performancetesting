@@ -1,7 +1,7 @@
 import copy
 import random
 from collections.abc import AsyncIterator
-from typing import Sequence, cast
+from typing import Sequence
 
 import pydantic
 
@@ -52,10 +52,11 @@ class OrdersConsumer(object):
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
 
-    async def _process_message(self, message: amqp.Message) -> None:
-        search = cast(amqp_pb2.PlaceOrderTask, message.body)
-
-        async for order_result in self._client.book(search):
+    async def _process_message(
+        self,
+        message: amqp.Message[amqp_pb2.PlaceOrderTask],
+    ) -> None:
+        async for order_result in self._client.book(message.body):
             await self._producer.publish(
                 order_result,
                 routing_key="orders.result.offer",

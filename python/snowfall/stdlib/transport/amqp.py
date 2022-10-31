@@ -10,60 +10,34 @@ from typing import (
     AsyncGenerator,
     Callable,
     Coroutine,
+    Generic,
     Mapping,
     Optional,
     Type,
+    TypeVar,
     Union,
 )
 
 from aio_pika import Message as PikeMessage
 from aio_pika import abc, connect_robust
-from google.protobuf import any_pb2, message, symbol_database
+from google.protobuf import message
 from sentry_sdk import Hub, tracing
 from structlog import get_logger
 
 from snowfall.stdlib import string
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.instrumentation.sentry import get_span
 from snowfall.stdlib.v1alpha import amqp_pb2
 
 _SPAN_PRODUCER_OP = "amqp.produce"
 _SPAN_CONSUMER_OP = "amqp.message"
 _TRACKABLE_HEADERS = ("x-trackable-id", "x-trackable-routing-key")
+_Proto = TypeVar("_Proto", bound=message.Message)
 TrackableUpdateMessageType = Union[
     Type[amqp_pb2.TrackableReceived],
     Type[amqp_pb2.TrackableAcked],
     Type[amqp_pb2.TrackableNacked],
 ]
-
-
-class Serializer(object):
-    _db = symbol_database.Default()
-
-    @classmethod
-    def serialize(cls, msg: message.Message) -> bytes:
-        any_message = any_pb2.Any()
-
-        any_message.Pack(msg)
-
-        return any_message.SerializeToString()
-
-    @classmethod
-    def deserialize(cls, blob: bytes | memoryview) -> message.Message:
-        packed_message = any_pb2.Any()
-
-        if isinstance(blob, memoryview):
-            blob = blob.tobytes()
-
-        packed_message.ParseFromString(blob)
-
-        symbol: Type[message.Message] = cls._db.GetSymbol(
-            packed_message.TypeName(),
-        )
-        unpacked_message = symbol()
-
-        packed_message.Unpack(unpacked_message)
-
-        return unpacked_message
 
 
 async def create_connection(dsn: str) -> abc.AbstractConnection:
@@ -111,7 +85,7 @@ class Producer(object):
 
                 await exchange.publish(
                     message=PikeMessage(
-                        body=Serializer.serialize(msg),
+                        body=protobuf.AnySerializer.serialize(msg),
                         headers={**span_headers, **headers},
                         content_type="application/x-protobuf",
                     ),
@@ -154,9 +128,9 @@ class _MessageStatus(enum.Enum):
     unhandled = "unhandled"
 
 
-class Message(object):
+class Message(Generic[_Proto]):
     def __init__(self, msg: abc.AbstractIncomingMessage):
-        self.body = Serializer.deserialize(msg.body)
+        self.body = protobuf.AnySerializer[_Proto].deserialize(msg.body)
         self.headers: Mapping[str, Any] = msg.headers
         self._message = msg
         self._status: _MessageStatus = _MessageStatus.unhandled
@@ -194,7 +168,10 @@ class Message(object):
         return self._message.routing_key or ""
 
 
-ConsumerCallback = Callable[[Message], Coroutine[None, None, None]]
+ConsumerCallback = Callable[
+    [Message[_Proto]],
+    Coroutine[None, None, None],
+]
 
 
 @dataclasses.dataclass(frozen=True)
@@ -203,7 +180,7 @@ class Exchange(object):
     type_: abc.ExchangeType = abc.ExchangeType.TOPIC
 
 
-def _is_trackable(msg: Message) -> bool:
+def _is_trackable(msg: Message[_Proto]) -> bool:
     return all(header in msg.headers for header in _TRACKABLE_HEADERS)
 
 
@@ -211,18 +188,18 @@ class _TrackableManager(object):
     def __init__(self, producer: Producer) -> None:
         self._producer = producer
 
-    async def message_received(self, msg: Message) -> None:
+    async def message_received(self, msg: Message[_Proto]) -> None:
         await self._report(msg, amqp_pb2.TrackableReceived)
 
-    async def message_acked(self, msg: Message) -> None:
+    async def message_acked(self, msg: Message[_Proto]) -> None:
         await self._report(msg, amqp_pb2.TrackableAcked)
 
-    async def message_nacked(self, msg: Message) -> None:
+    async def message_nacked(self, msg: Message[_Proto]) -> None:
         await self._report(msg, amqp_pb2.TrackableNacked)
 
     async def _report(
         self,
-        msg: Message,
+        msg: Message[_Proto],
         proto_class: TrackableUpdateMessageType,
     ) -> None:
         if not _is_trackable(msg):
@@ -238,7 +215,7 @@ class _TrackableManager(object):
 
 @contextlib.asynccontextmanager
 async def _manage_trackable(
-    msg: Message,
+    msg: Message[_Proto],
     producer: Producer,
 ) -> AsyncGenerator[None, None]:
     trackable_manager = _TrackableManager(producer)
@@ -268,7 +245,7 @@ class Consumer(object):
         self._queue_name = queue_name
         self._routing_key = routing_key
 
-    async def consume(self, callback: ConsumerCallback) -> None:
+    async def consume(self, callback: ConsumerCallback[_Proto]) -> None:
         async with self._connection.channel() as channel:
             await channel.set_qos(
                 prefetch_count=((os.cpu_count() or 1) * 2) + 1,
@@ -291,7 +268,7 @@ class Consumer(object):
     async def _consume(
         self,
         queue: abc.AbstractQueue,
-        callback: ConsumerCallback,
+        callback: ConsumerCallback[_Proto],
     ) -> None:
         async def wrapper(incoming: abc.AbstractIncomingMessage) -> None:
             try:
@@ -305,9 +282,9 @@ class Consumer(object):
     async def _process(
         self,
         incoming: abc.AbstractIncomingMessage,
-        callback: ConsumerCallback,
+        callback: ConsumerCallback[_Proto],
     ) -> None:
-        msg = Message(incoming)
+        msg = Message[_Proto](incoming)
         transaction = tracing.Transaction.continue_from_headers(
             {
                 metadata_key: metadata_value

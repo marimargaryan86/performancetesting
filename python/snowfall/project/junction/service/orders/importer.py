@@ -1,5 +1,3 @@
-from typing import cast
-
 from snowfall.project.junction.service.orders import orders
 from snowfall.project.junction.service.orders.v1alpha import models_pb2
 from snowfall.stdlib.transport import amqp
@@ -17,6 +15,5 @@ class BookingImporter(object):
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
 
-    async def _process_message(self, message: amqp.Message) -> None:
-        booking = cast(models_pb2.Booking, message.body)
-        await self._bookings.update(booking=booking)
+    async def _process_message(self, message: amqp.Message[models_pb2.Booking]) -> None:
+        await self._bookings.update(booking=message.body)

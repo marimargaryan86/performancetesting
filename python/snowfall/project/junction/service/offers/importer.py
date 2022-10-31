@@ -1,5 +1,4 @@
 import contextlib
-from typing import cast
 
 from pymongo import errors
 
@@ -25,12 +24,14 @@ class OfferImporter(object):
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
 
-    async def _process_message(self, message: amqp.Message) -> None:
-        search_result = cast(amqp_pb2.TripOfferSearchResult, message.body)
-        redis_lock = "results:{0}".format(search_result.offer_search_id)
+    async def _process_message(
+        self,
+        message: amqp.Message[amqp_pb2.TripOfferSearchResult],
+    ) -> None:
+        redis_lock = "results:{0}".format(message.body.offer_search_id)
 
         async with self._redis.lock(redis_lock, timeout=10):
-            await self._aggregator.aggregate(search_result)
+            await self._aggregator.aggregate(message.body)
 
             with contextlib.suppress(errors.DuplicateKeyError):
-                await self._offers.insert(search_result.offer)
+                await self._offers.insert(message.body.offer)

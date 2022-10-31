@@ -1,16 +1,52 @@
 import datetime
 import struct
 import zoneinfo
-from typing import AsyncIterator, Optional, Type, TypeVar
+from typing import AsyncIterator, Generic, Optional, Type, TypeVar
 
 from aiofiles.threadpool import binary
 from dateutil import tz
-from google.protobuf import duration_pb2, message, timestamp_pb2
+from google.protobuf import (
+    any_pb2,
+    duration_pb2,
+    message,
+    symbol_database,
+    timestamp_pb2,
+)
 from google.protobuf.descriptor import EnumDescriptor
 
 from snowfall.stdlib.v1alpha import datetime_pb2, models_pb2
 
 _Proto = TypeVar("_Proto", bound=message.Message)
+
+
+class AnySerializer(Generic[_Proto]):
+    _db = symbol_database.Default()
+
+    @classmethod
+    def serialize(cls, msg: _Proto) -> bytes:
+        any_message = any_pb2.Any()
+
+        any_message.Pack(msg)
+
+        return any_message.SerializeToString()
+
+    @classmethod
+    def deserialize(cls, blob: bytes | memoryview) -> _Proto:
+        packed_message = any_pb2.Any()
+
+        if isinstance(blob, memoryview):
+            blob = blob.tobytes()
+
+        packed_message.ParseFromString(blob)
+
+        symbol: Type[_Proto] = cls._db.GetSymbol(
+            packed_message.TypeName(),
+        )
+        unpacked_message = symbol()
+
+        packed_message.Unpack(unpacked_message)
+
+        return unpacked_message
 
 
 async def dump(proto: message.Message, pointer: binary.AsyncBufferedIOBase) -> None:

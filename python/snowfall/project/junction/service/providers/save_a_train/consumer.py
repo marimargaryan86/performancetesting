@@ -1,5 +1,3 @@
-from typing import cast
-
 import structlog
 
 from snowfall.project.junction.service.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
@@ -28,10 +26,11 @@ class TripSearchConsumer(object):
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
 
-    async def _process_message(self, message: amqp.Message) -> None:
-        search = cast(offers_amqp_pb2.TripOfferSearchTask, message.body)
-
-        for task in self._generator.from_search_task(search):
+    async def _process_message(
+        self,
+        message: amqp.Message[offers_amqp_pb2.TripOfferSearchTask],
+    ) -> None:
+        for task in self._generator.from_search_task(message.body):
             await self._producer.publish(task, routing_key="offers.search.trip")
 
 
@@ -49,13 +48,14 @@ class SearchCriteriaConsumer(object):
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
 
-    async def _process_message(self, message: amqp.Message) -> None:
-        search = cast(amqp_pb2.SearchCriteriaTask, message.body)
-
-        async for offer_result in self._adapter.gather_search_results(search):
+    async def _process_message(
+        self,
+        message: amqp.Message[amqp_pb2.SearchCriteriaTask],
+    ) -> None:
+        async for offer_result in self._adapter.gather_search_results(message.body):
             await self._producer.publish(
                 offers_amqp_pb2.TripOfferSearchResult(
-                    offer_search_id=search.offer_search_id,
+                    offer_search_id=message.body.offer_search_id,
                     offer=offer_result,
                 ),
                 routing_key="offers.result.trip",
@@ -79,22 +79,24 @@ class OrdersConsumer(object):
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
 
-    async def _process_message(self, message: amqp.Message) -> None:
-        task = cast(orders_amqp_pb2.PlaceOrderTask, message.body)
-        offer_details = await self._cache.fetch(task.booking.trip_option.id)
-        task.booking.provider_name = _PROVIDER_NAME
+    async def _process_message(
+        self,
+        message: amqp.Message[orders_amqp_pb2.PlaceOrderTask],
+    ) -> None:
+        offer_details = await self._cache.fetch(message.body.booking.trip_option.id)
+        message.body.booking.provider_name = _PROVIDER_NAME
 
         if not offer_details:
             self._logger.warning(
                 "No offer details found for booking",
-                booking_id=task.booking.id,
-                key=task.booking.trip_option.id,
+                booking_id=message.body.booking.id,
+                key=message.body.booking.trip_option.id,
             )
 
             return
 
         booking_result = await self._adapter.create_booking(
-            task=task,
+            task=message.body,
             offer_details=offer_details,
         )
 

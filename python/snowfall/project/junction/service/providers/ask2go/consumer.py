@@ -1,5 +1,3 @@
-from typing import cast
-
 import structlog
 
 from snowfall.project.junction.service.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
@@ -37,22 +35,26 @@ class OrderConsumer(object):
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
 
-    async def _process_message(self, amqp_message: amqp.Message) -> None:
-        task = cast(orders_amqp_pb2.PlaceOrderTask, amqp_message.body)
-        offer_details = await self._cache.fetch(task.booking.trip_option.id)
-        task.booking.provider_name = _PROVIDER_NAME
+    async def _process_message(
+        self,
+        amqp_message: amqp.Message[orders_amqp_pb2.PlaceOrderTask],
+    ) -> None:
+        offer_details = await self._cache.fetch(
+            amqp_message.body.booking.trip_option.id,
+        )
+        amqp_message.body.booking.provider_name = _PROVIDER_NAME
 
         if not offer_details:
             self._logger.warning(
                 "No offer details found for booking",
-                booking_id=task.booking.id,
-                key=task.booking.trip_option.id,
+                booking_id=amqp_message.body.booking.id,
+                key=amqp_message.body.booking.trip_option.id,
             )
 
             return
 
         await self._producer.publish(
-            await self._booking.book(task=task, details=offer_details),
+            await self._booking.book(task=amqp_message.body, details=offer_details),
             routing_key="orders.result.offer",
         )
 
@@ -71,10 +73,11 @@ class TripSearchConsumer(object):
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
 
-    async def _process_message(self, amqp_message: amqp.Message) -> None:
-        search = cast(offers_amqp_pb2.TripOfferSearchTask, amqp_message.body)
-
-        for task in self._generator.from_search_task(search):
+    async def _process_message(
+        self,
+        amqp_message: amqp.Message[offers_amqp_pb2.TripOfferSearchTask],
+    ) -> None:
+        for task in self._generator.from_search_task(amqp_message.body):
             await self._producer.publish(task, routing_key="offers.search.trip")
 
 
@@ -96,20 +99,21 @@ class SearchCriteriaConsumer(object):
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
 
-    async def _process_message(self, amqp_message: amqp.Message) -> None:
-        search_task = cast(amqp_pb2.SearchCriteriaTask, amqp_message.body)
-
+    async def _process_message(
+        self,
+        amqp_message: amqp.Message[amqp_pb2.SearchCriteriaTask],
+    ) -> None:
         with stdout.context_binding(
-            origin=search_task.criteria.origin_iata,
-            destination=search_task.criteria.destination_iata,
+            origin=amqp_message.body.criteria.origin_iata,
+            destination=amqp_message.body.criteria.destination_iata,
             departure_at=protobuf.protobuf_to_datetime(
-                search_task.criteria.outbound_departure,
+                amqp_message.body.criteria.outbound_departure,
             ).isoformat(),
         ):
-            offer_cache = cache.OfferGroupCache(search_task, self._redis)
+            offer_cache = cache.OfferGroupCache(amqp_message.body, self._redis)
 
             async with offer_cache:
-                await self._search_offers(search_task, offer_cache)
+                await self._search_offers(amqp_message.body, offer_cache)
 
     async def _search_offers(
         self,

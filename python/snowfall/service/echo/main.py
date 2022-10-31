@@ -1,7 +1,7 @@
 import asyncio
 import ipaddress
 import random
-from typing import Sequence, cast
+from typing import Sequence
 
 from grpc import aio
 from pydantic import AnyUrl
@@ -66,10 +66,8 @@ async def _produce(app: service.Application[_AmqpSettings]) -> None:
             await producer.publish(echo_pb2.EchoRequest(echo="foobar"), "echo.foobar")
 
 
-async def _echo_message_and_sleep(message: amqp.Message) -> None:
-    echo_request = cast(echo_pb2.EchoRequest, message.body)
-
-    get_logger(__name__).info(echo_request.echo)
+async def _echo_message_and_sleep(message: amqp.Message[echo_pb2.EchoRequest]) -> None:
+    get_logger(__name__).info(message.body.echo)
 
     await asyncio.sleep(5)
 
