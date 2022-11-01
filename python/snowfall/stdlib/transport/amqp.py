@@ -414,7 +414,7 @@ class Consumer(object):
         now = datetime.datetime.now(tz=datetime.timezone.utc)
 
         self._histogram_processing_time.labels(**self._prometheus_labels).observe(
-            (start_time - now).total_seconds(),
+            (now - start_time).total_seconds(),
         )
 
     def _track_wait_time(self, enqueued_at: datetime.datetime) -> None:
