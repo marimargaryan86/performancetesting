@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import dataclasses
+import datetime
 import enum
 import os
 from typing import (
@@ -18,7 +19,8 @@ from typing import (
     Union,
 )
 
-from aio_pika import Message as PikeMessage
+import prometheus_client
+from aio_pika import Message as PikaMessage
 from aio_pika import abc, connect_robust
 from google.protobuf import message
 from sentry_sdk import Hub, tracing
@@ -26,6 +28,7 @@ from structlog import get_logger
 
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.instrumentation import prometheus
 from snowfall.stdlib.instrumentation.sentry import get_span
 from snowfall.stdlib.v1alpha import amqp_pb2
 
@@ -51,6 +54,12 @@ class TrackableMetadata(object):
 
 
 class Producer(object):
+    _counter_messages = prometheus_client.Counter(
+        "amqp_producer_produced_messages_total",
+        "Total number of produced messages.",
+        labelnames=("exchange", "routing_key"),
+    )
+
     def __init__(
         self,
         connection: abc.AbstractConnection,
@@ -84,13 +93,25 @@ class Producer(object):
                 headers = headers or {}
 
                 await exchange.publish(
-                    message=PikeMessage(
+                    message=PikaMessage(
                         body=protobuf.AnySerializer.serialize(msg),
-                        headers={**span_headers, **headers},
+                        headers={
+                            **headers,
+                            **span_headers,
+                            "x-enqueued-at": int(
+                                datetime.datetime.now(
+                                    tz=datetime.timezone.utc,
+                                ).timestamp(),
+                            ),
+                        },
                         content_type="application/x-protobuf",
                     ),
                     routing_key=routing_key,
                 )
+
+                self._counter_messages.labels(
+                    **self._prometheus_labels(routing_key),
+                ).inc()
 
         self._logger.info(
             "Message published.",
@@ -121,6 +142,12 @@ class Producer(object):
 
         return trackable_id
 
+    def _prometheus_labels(self, routing_key: str) -> dict[str, str]:
+        return {
+            "exchange": self._exchange.name,
+            "routing_key": routing_key,
+        }
+
 
 class _MessageStatus(enum.Enum):
     acked = "acked"
@@ -141,6 +168,15 @@ class Message(Generic[_Proto]):
 
         await self._message.ack()
         self._status = _MessageStatus.acked
+
+    @property
+    def enqueued_at(self) -> datetime.datetime | None:
+        try:
+            enqueued_at = self.headers["x-enqueued-at"]
+        except KeyError:
+            return None
+
+        return datetime.datetime.fromtimestamp(enqueued_at, tz=datetime.timezone.utc)
 
     @property
     def processed(self) -> bool:
@@ -232,6 +268,32 @@ async def _manage_trackable(
 
 
 class Consumer(object):
+    _counter_messages = prometheus_client.Counter(
+        "amqp_consumer_consumed_messages_total",
+        "Total number of consumed messages.",
+        labelnames=("exchange", "queue", "routing_key"),
+    )
+
+    _counter_failed_messages = prometheus_client.Counter(
+        "amqp_consumer_failed_messages_total",
+        "Total number of failed messages.",
+        labelnames=("exchange", "queue", "routing_key"),
+    )
+
+    _histogram_wait_time = prometheus_client.Histogram(
+        "amqp_consumer_wait_time_seconds",
+        "Wait time of consumed messages (in seconds).",
+        labelnames=("exchange", "queue", "routing_key"),
+        buckets=prometheus.BUCKETS,
+    )
+
+    _histogram_processing_time = prometheus_client.Histogram(
+        "amqp_consumer_processing_time_seconds",
+        "Processing time of consumed messages (in seconds).",
+        labelnames=("exchange", "queue", "routing_key"),
+        buckets=prometheus.BUCKETS,
+    )
+
     def __init__(
         self,
         connection: abc.AbstractConnection,
@@ -285,21 +347,17 @@ class Consumer(object):
         callback: ConsumerCallback[_Proto],
     ) -> None:
         msg = Message[_Proto](incoming)
-        transaction = tracing.Transaction.continue_from_headers(
-            {
-                metadata_key: metadata_value
-                for metadata_key, metadata_value in msg.headers.items()
-            },
-            op=_SPAN_CONSUMER_OP,
-            name="{0}/{1}".format(self._queue_name, msg.routing_key),
-        )
 
-        with Hub(Hub.current).start_transaction(transaction) as span:
+        if msg.enqueued_at:
+            self._track_wait_time(msg.enqueued_at)
+
+        with self._with_transaction(msg) as span:
             async with _manage_trackable(
                 msg=msg,
                 producer=Producer(self._connection, self._exchange),
             ):
                 span.set_status("ok")
+                start_time = datetime.datetime.now(tz=datetime.timezone.utc)
 
                 try:
                     await callback(msg)
@@ -310,9 +368,58 @@ class Consumer(object):
                 else:
                     await msg.ack()
                 finally:
-                    self._logger.info(
-                        "Message consumed.",
-                        queue=self._queue_name,
-                        routing_key=msg.routing_key,
-                        type=msg.body.DESCRIPTOR.full_name,
-                    )
+                    self._finalize_message(msg, start_time)
+
+    def _with_transaction(self, msg: Message[_Proto]) -> tracing.Transaction:
+        transaction = tracing.Transaction.continue_from_headers(
+            {
+                metadata_key: metadata_value
+                for metadata_key, metadata_value in msg.headers.items()
+            },
+            op=_SPAN_CONSUMER_OP,
+            name="{0}/{1}".format(self._queue_name, msg.routing_key),
+        )
+
+        return Hub(Hub.current).start_transaction(transaction)
+
+    @property
+    def _prometheus_labels(self) -> dict[str, str]:
+        return {
+            "exchange": self._exchange.name,
+            "queue": self._queue_name,
+            "routing_key": self._routing_key,
+        }
+
+    def _finalize_message(
+        self,
+        msg: Message[_Proto],
+        start_time: datetime.datetime,
+    ) -> None:
+        self._track_processing_time(start_time)
+        self._counter_messages.labels(**self._prometheus_labels).inc()
+
+        if not msg.acknowledged:
+            self._counter_failed_messages.labels(
+                **self._prometheus_labels,
+            ).inc()
+
+        self._logger.info(
+            "Message consumed.",
+            queue=self._queue_name,
+            routing_key=msg.routing_key,
+            type=msg.body.DESCRIPTOR.full_name,
+        )
+
+    def _track_processing_time(self, start_time: datetime.datetime) -> None:
+        now = datetime.datetime.now(tz=datetime.timezone.utc)
+
+        self._histogram_processing_time.labels(**self._prometheus_labels).observe(
+            (start_time - now).total_seconds(),
+        )
+
+    def _track_wait_time(self, enqueued_at: datetime.datetime) -> None:
+        now = datetime.datetime.now(tz=datetime.timezone.utc)
+
+        self._histogram_wait_time.labels(**self._prometheus_labels).observe(
+            (now - enqueued_at).total_seconds(),
+        )
