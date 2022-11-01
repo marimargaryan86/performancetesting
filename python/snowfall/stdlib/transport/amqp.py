@@ -186,18 +186,14 @@ class Message(Generic[_Proto]):
     def acknowledged(self) -> bool:
         return self._status == _MessageStatus.acked
 
-    async def nack(self) -> None:
+    async def nack(self, requeue: bool = False) -> None:
         if self.processed:
             return
 
-        await self._message.nack(requeue=False)
+        # todo: make sure we don't requeue forever?
+
+        await self._message.nack(requeue=requeue)
         self._status = _MessageStatus.nacked
-
-    async def requeue(self) -> None:
-        if self.processed:
-            return
-
-        await self._message.nack(requeue=True)
 
     @property
     def routing_key(self) -> str:

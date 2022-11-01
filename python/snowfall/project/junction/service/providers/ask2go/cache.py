@@ -29,6 +29,7 @@ class NoCacheExistsError(Exception):
 
 
 class OfferGroupCache(contextlib.AsyncContextDecorator):
+    _blocking_timeout = datetime.timedelta(seconds=10)  # todo: tweak to what we want
     _lock_timeout = datetime.timedelta(minutes=5)  # todo: tweak to what we want
 
     def __init__(
@@ -51,14 +52,13 @@ class OfferGroupCache(contextlib.AsyncContextDecorator):
         self._lock = redis.lock(
             name="criteria_cache.locks:{0}".format(cache_key),
             timeout=self._lock_timeout.total_seconds(),
+            blocking_timeout=self._blocking_timeout.total_seconds(),
         )
         self._offers = redis.set_("criteria_cache.offers:{0}".format(cache_key))
         self._redis = redis
 
-    async def __aenter__(self) -> "OfferGroupCache":
-        await self._lock.acquire()
-
-        return self
+    async def __aenter__(self) -> bool:
+        return await self._lock.acquire()
 
     async def __aexit__(
         self,

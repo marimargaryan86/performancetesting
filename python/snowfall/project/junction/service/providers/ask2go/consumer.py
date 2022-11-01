@@ -112,8 +112,11 @@ class SearchCriteriaConsumer(object):
         ):
             offer_cache = cache.OfferGroupCache(amqp_message.body, self._redis)
 
-            async with offer_cache:
-                await self._search_offers(amqp_message.body, offer_cache)
+            async with offer_cache as has_lock:
+                if has_lock:
+                    await self._search_offers(amqp_message.body, offer_cache)
+                else:
+                    await amqp_message.nack(requeue=True)
 
     async def _search_offers(
         self,
