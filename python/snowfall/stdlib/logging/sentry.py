@@ -6,7 +6,7 @@ import structlog
 from sentry_sdk.integrations import logging as sentry_logging
 
 Integrations = Sequence[sentry_sdk.integrations.Integration]
-_DEFAULT_TRACE_SAMPLE_RATE = 0.2
+_DEFAULT_TRACE_SAMPLE_RATE = 0.05
 
 
 def sentry_trace_processor(
