@@ -50,7 +50,7 @@ class CriteriaGenerator(object):
                 neighbour_search_radius=1,
             )
             destinations = self._mapping.find_mapped_values(
-                coordinates=more_itertools.last(segment.legs).destination.coordinates,
+                coordinates=last_leg.destination.coordinates,
                 neighbour_search_radius=1,
             )
 
@@ -59,7 +59,7 @@ class CriteriaGenerator(object):
                     segment=segment,
                     departure=protobuf.protobuf_to_datetime(
                         first_leg.departure_at,
-                    ).astimezone(destination.timezone),
+                    ).astimezone(origin.timezone),
                     arrival=protobuf.protobuf_to_datetime(
                         last_leg.arrival_at,
                     ).astimezone(destination.timezone),

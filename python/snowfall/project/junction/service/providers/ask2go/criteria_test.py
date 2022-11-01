@@ -86,6 +86,20 @@ _SEARCH_TASK2 = protobuf.AnySerializer[amqp_pb2.TripOfferSearchTask].deserialize
     base64.b64decode(_SEARCH_TASK2_ENCODED),
 )
 
+# BA - 2023-02-20 - LHR -> SIN -> SYD - 21:35:00 -> 06:55:00 - 1 ADULT
+_SEARCH_TASK3_ENCODED = """
+Clh0eXBlLmdvb2dsZWFwaXMuY29tL3Nub3dmYWxsLnByb2plY3QuanVuY3Rpb24uc2VydmljZS5vZmZlcnMudjFh
+bHBoYS5UcmlwT2ZmZXJTZWFyY2hUYXNrEuACCiRhOTUwMWU2Mi05Zjc5LTQ4OTItYWE5ZC01OGQyMjI4OWUzYTkS
+lQIKhwIKJDYwN2FmMGNiLWY2NDItNTg4Yi05ZTYyLTNhZTdiNmUyMjdlMBLeAQokNzQ2ZjA1YTYtM2MzOS01ZTU4
+LWE1OTAtODNkYmIzMDIzNjQ1ErUBCiQwNjcwYTc4ZC0zMjM4LTUzMjktYTJmNC1mZDMyNmQwY2IwODISOgoDTEhS
+EhBIZWF0aHJvdyBBaXJwb3J0GhIJe/mdJjO8SUARFF/tKM5R3b8iDUV1cm9wZS9Mb25kb24aOwoDU1lEEg5TeWRu
+ZXkgQWlycG9ydBoSCVZinpW0+EDAEaeyKOyi5WJAIhBBdXN0cmFsaWEvU3lkbmV5IgYIhM/PnwYqBgiUw9SfBjAB
+OgJCQRIJCgcIxg8QChgZGiAwMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzI1Njc4OTAxMg==
+"""
+_SEARCH_TASK3 = protobuf.AnySerializer[amqp_pb2.TripOfferSearchTask].deserialize(
+    base64.b64decode(_SEARCH_TASK3_ENCODED),
+)
+
 
 @pytest.mark.parametrize(
     "search_task, expected",
@@ -93,13 +107,19 @@ _SEARCH_TASK2 = protobuf.AnySerializer[amqp_pb2.TripOfferSearchTask].deserialize
         (
             _SEARCH_TASK,
             [
-                ("PPW", "WRY"),
+                ("PPW", "WRY", "Europe/London"),
             ],
         ),
         (
             _SEARCH_TASK2,
             [
-                ("ARN", "BER"),
+                ("ARN", "BER", "Europe/Stockholm"),
+            ],
+        ),
+        (
+            _SEARCH_TASK3,
+            [
+                ("LHR", "SYD", "Europe/London"),
             ],
         ),
     ],
@@ -111,7 +131,11 @@ def test_criteria_with_expected_pairs_are_generated(
 ) -> None:
     search_tasks = list(criteria_generator.from_search_task(search_task=search_task))
     search_task_pairs = [
-        (search_task.criteria.origin_iata, search_task.criteria.destination_iata)
+        (
+            search_task.criteria.origin_iata,
+            search_task.criteria.destination_iata,
+            search_task.criteria.outbound_departure.time_zone.id,
+        )
         for search_task in search_tasks
     ]
 
@@ -132,6 +156,14 @@ def test_criteria_with_expected_pairs_are_generated(
         ),
         (
             _SEARCH_TASK2,
+            {
+                "adults": 1,
+                "children": 0,
+                "infants": 0,
+            },
+        ),
+        (
+            _SEARCH_TASK3,
             {
                 "adults": 1,
                 "children": 0,
