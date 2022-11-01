@@ -81,7 +81,7 @@ class OfferGroupCache(contextlib.AsyncContextDecorator):
                 await self._redis.get_expires_at(self._offers) or fallback_expiry,
             )
 
-        if self._lock.owned():
+        if await self._lock.owned():
             await self._lock.release()
 
         return False
