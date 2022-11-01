@@ -157,7 +157,6 @@ class SaveATrainAdapter(object):  # noqa: WPS214
 
                 expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
                 offer_segment_id = string.uuid()
-                currency = money.Currency("EUR")
 
                 yield offer_models_pb2.OfferGroup(
                     id=string.uuid(),
@@ -199,13 +198,10 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                                     ],
                                 ),
                             ],
-                            price=models_pb2.Price(
-                                amount=money.from_string(
-                                    transfer_fare.price,
-                                    currency,
-                                ).amount,
-                                currency=currency.code,
-                            ),
+                            price=money.from_string(
+                                string_amount=transfer_fare.price,
+                                currency=money.Currency("EUR"),
+                            ).protobuf(),
                         )
                         for transfer in search_details.transfers
                         for transfer_fare in transfer.fares

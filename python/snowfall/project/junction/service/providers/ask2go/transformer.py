@@ -112,10 +112,7 @@ class OfferTransformer(object):  # noqa: WPS214
                         grouped_rules,
                         offer_price.itinerary.trips,
                     ),
-                    price=models_pb2.Price(
-                        amount=amount.amount,
-                        currency=amount.currency.code,
-                    ),
+                    price=amount.protobuf(),
                     brand_name=brands[index],
                     penalties=[
                         offers_pb2.Penalty(

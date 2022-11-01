@@ -8,10 +8,9 @@ import pydantic
 
 from snowfall.project.junction.service.offers.v1alpha import amqp_pb2
 from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
-from snowfall.stdlib import service, string
+from snowfall.stdlib import money, service, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport import amqp
-from snowfall.stdlib.v1alpha import models_pb2
 
 
 class OffersSettings(service.Settings):
@@ -36,10 +35,10 @@ class OffersMockClient(object):
                         )
                         for segment in segments
                     ],
-                    price=models_pb2.Price(
-                        amount=1337,
-                        currency="EUR",
-                    ),
+                    price=money.from_string(
+                        string_amount="13.37",
+                        currency=money.Currency("EUR"),
+                    ).protobuf(),
                 ),
             ],
             segments=[

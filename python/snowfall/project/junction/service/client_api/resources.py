@@ -198,20 +198,12 @@ class Price(models.BaseModel):
     amount: str
 
     @classmethod
-    def from_proto(cls, price: money_pb2.Money | models_pb2.Price) -> Price:
-        if isinstance(price, models_pb2.Price):
-            units, parts = str(price.amount / 1000).split(".")
-            price = money_pb2.Money(
-                currency_code=price.currency,
-                units=int(units),
-                nanos=int(parts.ljust(9, "0")),
-            )
-
+    def from_proto(cls, price: money_pb2.Money) -> Price:
         money_price = money.from_protobuf(price)
 
         return cls(
             currency=money_price.currency.code,
-            amount=str(money_price.amount),
+            amount=str(money_price),
         )
 
 

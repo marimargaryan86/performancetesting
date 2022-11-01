@@ -13,6 +13,7 @@ from snowfall.project.junction.service.providers.ask2go import (
     transformer,
 )
 from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
+from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2
 
@@ -283,8 +284,9 @@ def _assert_offer(offer: offers_pb2.Offer, expected_segment_id: str) -> None:
     assert segment_details.offer_segment_id == expected_segment_id
     assert segment_details.cabin_class.marketing_name == "Economy"
     assert segment_details.cabin_class.type == models_pb2.CabinClass.TYPE_ECONOMY
-    assert offer.price.amount == 126184
-    assert offer.price.currency == "EUR"
+    price = money.from_protobuf(offer.price)
+    assert price.amount == 126184
+    assert price.currency.code == "EUR"
 
 
 @pytest.mark.parametrize(

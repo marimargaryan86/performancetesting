@@ -14,12 +14,11 @@ from snowfall.project.junction.service.passenger_name_records.v1alpha import (
 from snowfall.project.junction.service.places.v1alpha import (
     models_pb2 as place_models_pb2,
 )
-from snowfall.stdlib import string
+from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import (
     latlng_pb2,
     models_pb2,
-    money_pb2,
     phone_number_pb2,
     postal_address_pb2,
 )
@@ -237,10 +236,10 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
                                 ),
                             ),
                         ],
-                        price=models_pb2.Price(
-                            amount=1337,
-                            currency="SEK",
-                        ),
+                        price=money.from_string(
+                            string_amount="13.37",
+                            currency=money.Currency("SEK"),
+                        ).protobuf(),
                         brand_name="PLUS SELECT",
                     ),
                     offers_pb2.Offer(
@@ -255,10 +254,10 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
                                 ),
                             ),
                         ],
-                        price=models_pb2.Price(
-                            amount=31337,
-                            currency="SEK",
-                        ),
+                        price=money.from_string(
+                            string_amount="13.37",
+                            currency=money.Currency("SEK"),
+                        ).protobuf(),
                         brand_name="PLUS FLEX",
                     ),
                 ],
@@ -306,10 +305,10 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
                                 ),
                             ),
                         ],
-                        price=models_pb2.Price(
-                            amount=1337,
-                            currency="SEK",
-                        ),
+                        price=money.from_string(
+                            string_amount="13.37",
+                            currency=money.Currency("SEK"),
+                        ).protobuf(),
                         brand_name="PLUS SELECT",
                     ),
                     offers_pb2.Offer(
@@ -324,10 +323,10 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
                                 ),
                             ),
                         ],
-                        price=models_pb2.Price(
-                            amount=31337,
-                            currency="SEK",
-                        ),
+                        price=money.from_string(
+                            string_amount="13.37",
+                            currency=money.Currency("SEK"),
+                        ).protobuf(),
                         brand_name="PLUS FLEX",
                     ),
                 ],
@@ -382,11 +381,10 @@ def generate_journey(
     booking_id: str,
     option_detail_ids: Sequence[str],
 ) -> order_models_pb2.Journey:
-    price = money_pb2.Money(
-        currency_code="GBP",
-        units=13,
-        nanos=370000000,
-    )
+    price = money.from_string(
+        string_amount="13.37",
+        currency=money.Currency("GBP"),
+    ).protobuf()
     return order_models_pb2.Journey(
         id=journey_id,
         orders=[
