@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 import datetime
 import math
 import uuid
@@ -23,6 +24,8 @@ from snowfall.vendor.ask2go.models import (
 
 _BrandedOffersType = Tuple[Sequence[str], Sequence[price.OfferPriceResponse]]
 _WINDOW_SIZE = 6
+_SUCCESSFUL_PRICE_STATUSES = ("PricingSuccedded", "PriceDifference")
+_FAILED_PRICE_STATUSES = ("PricingFailed", "Unknown")
 
 
 def time_to_window(
@@ -43,6 +46,10 @@ def time_to_window(
 
 class NoResultsError(Exception):
     """Raised when a result page has not results."""
+
+
+class NoPricingError(Exception):
+    """Raised when no successful pricing result is received."""
 
 
 class Ask2GoAdapter(object):  # noqa: WPS214
@@ -138,17 +145,14 @@ class Ask2GoAdapter(object):  # noqa: WPS214
     ) -> Mapping[str, Coroutine[price.OfferPriceResponse, Any, Any]]:
         mapped_brand_price = {}
         if branded_offer.itinerary.branded_fares:
-            mapped_brand_price.update(
-                {
-                    fare.brand_name: await self._get_async_price(
+            for fare in branded_offer.itinerary.branded_fares:
+                with contextlib.suppress(NoPricingError):
+                    mapped_brand_price[fare.brand_name] = await self._get_async_price(
                         search_id=validate_identifiers.identifier,
                         transaction_id=identifiers.transaction_id,
                         offer_id=offer.id,
                         brand_id=fare.brand_id,
                     )
-                    for fare in branded_offer.itinerary.branded_fares
-                },
-            )
         else:
             mapped_brand_price["BASIC FARE"] = await self._get_async_price(
                 search_id=validate_identifiers.identifier,
@@ -184,9 +188,26 @@ class Ask2GoAdapter(object):  # noqa: WPS214
         self,
         async_offer: price.AsyncOfferPriceResponse,
     ) -> price.OfferPriceResponse:
-        return await self._client.get_air_offer_result(
-            transaction_id=async_offer.transaction_id,
-            pricing_id=async_offer.id,
+        for _ in range(self._poll_retries_limit):
+            price_result = await self._client.get_air_offer_result(
+                transaction_id=async_offer.transaction_id,
+                pricing_id=async_offer.id,
+            )
+
+            if price_result.information.status in _SUCCESSFUL_PRICE_STATUSES:
+                return price_result
+
+            if await self._failed_pricing(price_result):
+                break
+
+            await asyncio.sleep(self._wait_time_between_polling)
+
+        raise NoPricingError("Pricing did not succeed.")
+
+    async def _failed_pricing(self, price_result: price.OfferPriceResponse) -> bool:
+        return (
+            price_result.information.status in _FAILED_PRICE_STATUSES
+            or not price_result.itinerary.pricing_information.base.total_cost
         )
 
     async def _merge_brands_prices(
