@@ -1,3 +1,5 @@
+import decimal
+
 import pytest
 
 from snowfall.stdlib import money
@@ -96,3 +98,27 @@ def test_add_with_different_currencies() -> None:
 
     with pytest.raises(RuntimeError):
         instance.add(instance2)
+
+
+@pytest.mark.parametrize(
+    "amount,from_currency,to_currency,rate,expected",
+    [
+        ("12.99", "USD", "JPY", decimal.Decimal(148.978), "1935"),
+        ("12.99", "USD", "GBP", decimal.Decimal(0.88417), "11.49"),
+        ("12.99", "USD", "SEK", decimal.Decimal(11.215), "145.68"),
+        ("12.99", "USD", "KWD", decimal.Decimal(0.309496), "4.020"),
+        ("1935", "JPY", "USD", decimal.Decimal(0.00671131), "12.99"),
+    ],
+)
+def test_convert(
+    amount: str,
+    from_currency: str,
+    to_currency: str,
+    rate: decimal.Decimal,
+    expected: str,
+) -> None:
+    currency = money.Currency(from_currency)
+    instance = money.from_string(amount, currency)
+    converted = instance.convert(money.Currency(to_currency), rate)
+
+    assert str(converted) == expected

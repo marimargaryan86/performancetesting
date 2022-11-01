@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import contextlib
 import dataclasses
+import decimal
 import functools
 
 import iso4217
@@ -50,6 +51,13 @@ class Money(object):
             raise RuntimeError("Can't add money in two different currencies.")
 
         return Money(self.amount + money.amount, self.currency)
+
+    def convert(self, currency: Currency, rate: decimal.Decimal) -> Money:
+        diff = decimal.Decimal(
+            str(10 ** (_int_exponent(self.currency) - _int_exponent(currency))),
+        )
+
+        return Money(int(round(self.amount * rate / diff)), currency)
 
     def protobuf(self) -> money_pb2.Money:
         units = abs(self.amount) // _exponent(self.currency)
