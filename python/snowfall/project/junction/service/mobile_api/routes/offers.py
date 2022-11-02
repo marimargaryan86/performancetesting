@@ -6,6 +6,7 @@ import httpx
 import lagom
 from starlette import endpoints, requests, responses, status
 
+from snowfall.project.junction.adapter import currencies, errors
 from snowfall.project.junction.service.mobile_api import repository
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib import money
@@ -60,6 +61,7 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
         request: requests.Request,
         junction_client: client.JunctionClient = lagom.injectable,
         offers_rates_repository: repository.OffersRatesRepository = lagom.injectable,
+        currencies_client: currencies.Client = lagom.injectable,
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
         try:
@@ -85,8 +87,12 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
             )
         if request.query_params.get("currency"):
             try:
-                rate = get_offer_rate("EUR", request.query_params.get("currency", ""))
-            except RateError as exc:
+                rate = await currencies_client.get_rate(
+                    "EUR",
+                    request.query_params.get("currency", ""),
+                    1000,
+                )
+            except errors.NotFoundError as exc:
                 return models.JsonApiResponse(
                     models.Body(
                         errors=[
@@ -140,14 +146,3 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
         if offers_response.get("included"):
             response_body.included = offers_response.get("included")
         return models.JsonApiResponse(response_body)
-
-
-# TODO: use currency service (!473)
-def get_offer_rate(from_currency: str, to_currency: str) -> float:
-    if to_currency == "SEK":
-        return 11.06  # noqa: WPS432
-    raise RateError("Unsupported currency")
-
-
-class RateError(Exception):
-    """Currency service base exception."""

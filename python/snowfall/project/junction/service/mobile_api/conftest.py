@@ -20,6 +20,7 @@ from lagom.integrations import starlette
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
+from snowfall.project.junction.adapter import currencies
 from snowfall.project.junction.service.mobile_api import (
     auth_middleware,
     bootstrap,
@@ -309,6 +310,7 @@ def non_mocked_hosts() -> list[str]:
 
 @pytest.fixture()
 def app(  # noqa: WPS211
+    currencies_client: currencies.Client,
     offers_repository: repository.OffersRepository,
     places_repository: repository.PlacesRepository,
     users_repository: repository.UsersRepository,
@@ -324,6 +326,7 @@ def app(  # noqa: WPS211
 ) -> applications.Starlette:
     return _create_app(
         dependencies=bootstrap.create_dependencies(
+            currencies_client,
             offers_repository,
             orders_repository,
             junction_client,

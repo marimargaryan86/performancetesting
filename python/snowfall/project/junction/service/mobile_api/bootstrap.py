@@ -5,12 +5,14 @@ import lagom
 from lagom.integrations import starlette
 from pydantic import AnyUrl
 
+from snowfall.project.junction.adapter import currencies
 from snowfall.project.junction.service.mobile_api import jwt_generator, repository, smtp
 from snowfall.stdlib.integration.starlette import application
 from snowfall.vendor.junction import client
 
 
 class Settings(application.Settings):
+    currencies_address: Sequence[str]
     junction_api_address: Sequence[str]
     junction_api_token: str
     redis_dsn: Sequence[AnyUrl]
@@ -32,6 +34,7 @@ class Settings(application.Settings):
 
 
 def create_dependencies(  # noqa: WPS211
+    currencies_client: currencies.Client,
     offers_repository: repository.OffersRepository,
     orders_repository: repository.OrdersRepository,
     junction_client: client.JunctionClient,
@@ -46,6 +49,7 @@ def create_dependencies(  # noqa: WPS211
     preferences_repository: repository.PreferencesRepository,
 ) -> starlette.StarletteIntegration:
     container = lagom.Container()
+    container[currencies.Client] = currencies_client  # type: ignore[misc]
     container[repository.OffersRepository] = offers_repository
     container[repository.OrdersRepository] = orders_repository
     container[client.JunctionClient] = junction_client

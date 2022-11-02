@@ -9,6 +9,8 @@ from motor import motor_asyncio
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
+from snowfall.project.junction.adapter import currencies
+from snowfall.project.junction.service.currencies.v1alpha import currencies_pb2_grpc
 from snowfall.project.junction.service.mobile_api import (
     auth_middleware,
     bootstrap,
@@ -22,6 +24,7 @@ from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.transport.grpc.client import create_channel
 from snowfall.vendor.junction import client
 
 
@@ -29,6 +32,9 @@ def _factory(
     app: service.Application[bootstrap.Settings],
 ) -> Callable[[], applications.Starlette]:
     def decorator() -> applications.Starlette:
+        currencies_channel = create_channel(
+            random.choice(app.settings.currencies_address),  # nosec
+        )
         stripe.api_key = app.settings.stripe_api_key
         junction_client = client.JunctionClient(
             api_url=random.choice(app.settings.junction_api_address),  # nosec
@@ -63,6 +69,9 @@ def _factory(
         return application.create_starlette_app(
             routes_factory=router.get_routes,
             dependencies=bootstrap.create_dependencies(
+                currencies_client=currencies.GrpcClient(
+                    currencies_pb2_grpc.CurrencyServiceStub(currencies_channel),
+                ),
                 offers_repository=repository.OffersRepository(
                     mongo["offers"],
                 ),
