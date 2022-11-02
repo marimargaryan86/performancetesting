@@ -1,4 +1,5 @@
 import datetime
+import decimal
 import re
 
 import httpx
@@ -7,6 +8,7 @@ from starlette import endpoints, requests, responses, status
 
 from snowfall.project.junction.service.mobile_api import repository
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
+from snowfall.stdlib import money
 from snowfall.stdlib.integration.starlette import (
     models,
     pagination_helpers,
@@ -53,7 +55,7 @@ class OfferSearches(endpoints.HTTPEndpoint):
 
 
 class OffersByOfferSearch(endpoints.HTTPEndpoint):
-    async def get(  # noqa: C901,WPS231
+    async def get(  # noqa: C901,WPS231,WPS210
         self,
         request: requests.Request,
         junction_client: client.JunctionClient = lagom.injectable,
@@ -100,9 +102,14 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
             if offers_response.get("included"):
                 for include in offers_response.get("included", []):
                     if include["type"] == "offer-options":
-                        include["attributes"]["price"]["amount"] = str(
-                            rate * float(include["attributes"]["price"]["amount"]),
+                        new_money = money.from_string(
+                            include["attributes"]["price"]["amount"],
+                            money.Currency(include["attributes"]["price"]["currency"]),
+                        ).convert(
+                            money.Currency(request.query_params.get("currency")),
+                            decimal.Decimal(rate),
                         )
+                        include["attributes"]["price"]["amount"] = str(new_money)
                         include["attributes"]["price"][
                             "currency"
                         ] = request.query_params.get("currency")

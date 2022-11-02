@@ -1,4 +1,5 @@
 import asyncio
+import decimal
 from typing import Any, Sequence, Tuple
 
 import httpx
@@ -9,6 +10,7 @@ from starlette import endpoints, exceptions, requests, responses, status
 from snowfall.project.junction.service.mobile_api import payments, repository, smtp
 from snowfall.project.junction.service.mobile_api.tasks import orders
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
+from snowfall.stdlib import money
 from snowfall.stdlib.integration.starlette import models as stdlib_models
 from snowfall.stdlib.integration.starlette import request_helpers
 from snowfall.vendor.junction import client
@@ -195,17 +197,29 @@ async def check_payment_amount_and_state(  # noqa: WPS210
                 offer_option,
             )
         )
-        rate = float(1)
+        rate = decimal.Decimal(1)
         if pi["currency"].upper() != "EUR":
             rate_str = await offers_rates_repository.get(
                 "_".join(
-                    [offer_option_response["id"], "EUR", pi["currency"].upper()],
+                    [
+                        offer_option_response["data"]["id"],
+                        "EUR",
+                        pi["currency"].upper(),
+                    ],
                 ),
             )
             if not rate_str:
                 return False, False
-            rate = float(rate_str)
-        offer_amount += int(
-            float(offer_option_response["attributes"]["price"]["amount"]) * 100 * rate,
+            rate = decimal.Decimal(rate_str)
+        offer_money = money.from_string(
+            offer_option_response["data"]["attributes"]["price"]["amount"],
+            money.Currency(
+                offer_option_response["data"]["attributes"]["price"]["currency"],
+            ),
+        ).convert(
+            money.Currency(pi["currency"].upper()),
+            rate,
         )
-    return pi["amount"] == offer_amount, pi["status"] == "confirmed"
+
+        offer_amount += offer_money.amount
+    return pi["amount"] == offer_amount, pi["status"] == "requires_capture"
