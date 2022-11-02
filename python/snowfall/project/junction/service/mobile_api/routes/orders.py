@@ -1,11 +1,12 @@
 import asyncio
 from typing import Any, Sequence, Tuple
 
+import httpx
 import lagom
 import stripe
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.project.junction.service.mobile_api import repository, smtp
+from snowfall.project.junction.service.mobile_api import payments, repository, smtp
 from snowfall.project.junction.service.mobile_api.tasks import orders
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib.integration.starlette import models as stdlib_models
@@ -73,7 +74,7 @@ class Orders(endpoints.HTTPEndpoint):
             response_body.included = user_orders.get("included")
         return stdlib_models.JsonApiResponse(response_body)
 
-    async def post(  # noqa: WPS211
+    async def post(  # noqa: WPS211, WPS210
         self,
         request: requests.Request,
         orders_repository: repository.OrdersRepository = lagom.injectable,
@@ -82,15 +83,15 @@ class Orders(endpoints.HTTPEndpoint):
         offers_rates_repository: repository.OffersRatesRepository = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
-
+        payment = body["payment"]
         (correct_amount, correct_state) = await check_payment_amount_and_state(
-            body["payment"],
+            payment,
             body["options"],
             junction_client,
             offers_rates_repository,
         )
         if not correct_amount:
-            stripe.PaymentIntent.cancel(body["payment"])
+            stripe.PaymentIntent.cancel(payment)
             # TODO: split this into invalid amount & invalid currency. Create err func
             return stdlib_models.JsonApiResponse(
                 stdlib_models.Body(
@@ -126,30 +127,40 @@ class Orders(endpoints.HTTPEndpoint):
                 status_code=status.HTTP_400_BAD_REQUEST,
             )
 
-        junction_order = await junction_client.create_order(
-            body["offer"],
-            body["options"],
-            [
-                vendor_models.Passenger(**vendor_models.dict_factory_to_snake(pax))
-                for pax in body["passengers"]
-            ],
-            vendor_models.ContactDetails(
-                email=body["contactDetails"]["email"],
-                address=vendor_models.Address(
-                    **vendor_models.dict_factory_to_snake(
-                        body["contactDetails"]["address"],
+        try:
+            junction_order = await junction_client.create_order(
+                body["offer"],
+                body["options"],
+                [
+                    vendor_models.Passenger(**vendor_models.dict_factory_to_snake(pax))
+                    for pax in body["passengers"]
+                ],
+                vendor_models.ContactDetails(
+                    email=body["contactDetails"]["email"],
+                    address=vendor_models.Address(
+                        **vendor_models.dict_factory_to_snake(
+                            body["contactDetails"]["address"],
+                        ),
                     ),
+                    phone_number=body["contactDetails"]["phoneNumber"],
                 ),
-                phone_number=body["contactDetails"]["phoneNumber"],
-            ),
-        )
+            )
+        except httpx.HTTPStatusError as error:
+            await payments.cancel(payment)
+            return stdlib_models.JsonApiResponse(
+                stdlib_models.Body(
+                    errors=error.response.json()["errors"],
+                ),
+                error.response.status_code,
+            )
+
         mobile_order = models_pb2.MobileOrder(
             id=junction_order["data"][_ID],
-            payment_intent_id=body["payment"],
+            payment_intent_id=payment,
             user_id=request.user.username,
         )
         stripe.PaymentIntent.modify(
-            body["payment"],
+            payment,
             metadata={"order_id": mobile_order.id},
         )
 
