@@ -157,7 +157,7 @@ class Orders(endpoints.HTTPEndpoint):
             )
 
         mobile_order = models_pb2.MobileOrder(
-            id=junction_order["data"][_ID],
+            id=junction_order["data"]["id"],
             payment_intent_id=payment,
             user_id=request.user.username,
         )
