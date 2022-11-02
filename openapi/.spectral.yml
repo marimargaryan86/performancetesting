@@ -21,3 +21,7 @@ overrides:
       - "junction/mobile_api/openapi.json#/components/schemas/PaymentIntent"
     rules:
       json-api-no-nested-id: info
+  - files:
+      - "junction/pay_api/openapi.json#/components/parameters/currencyId"
+    rules:
+      no-numeric-ids: info

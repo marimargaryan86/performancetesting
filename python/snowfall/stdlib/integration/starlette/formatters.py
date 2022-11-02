@@ -2,6 +2,7 @@ import functools
 from typing import Any
 
 import email_validator
+import iso4217
 import phonenumbers
 import pycountry
 from furl import furl
@@ -14,6 +15,17 @@ class _CountryFormatter(formatters.Formatter):
 
     def unmarshal(self, country: Any) -> pycountry.db.Data | None:
         return pycountry.countries.get(alpha_2=country)
+
+
+class _CurrencyFormatter(formatters.Formatter):
+    def validate(self, potential_currency: Any) -> bool:
+        return self.unmarshal(potential_currency) is not None
+
+    def unmarshal(self, currency: Any) -> iso4217.Currency | None:
+        try:
+            return iso4217.Currency(currency)
+        except ValueError:
+            return None
 
 
 class _EmailFormatter(formatters.Formatter):
@@ -62,6 +74,7 @@ class _UriFormatter(formatters.Formatter):
 def custom_formatters() -> dict[str, formatters.Formatter]:
     return {
         "country": _CountryFormatter(),
+        "currency": _CurrencyFormatter(),
         "email": _EmailFormatter(),
         "phone": _PhoneFormatter(),
         "uri": _UriFormatter(),

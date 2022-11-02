@@ -1396,6 +1396,7 @@
         "required": false,
         "schema": {
           "type": "string",
+          "format": "currency",
           "example": "SEK"
         },
         "description": "Requested currency for offers. Default: EUR"
@@ -3204,6 +3205,7 @@
         "properties": {
           "currency": {
             "type": "string",
+            "format": "currency",
             "example": "EUR"
           },
           "amount": {
@@ -3697,10 +3699,12 @@
           },
           "latitude": {
             "type": "number",
+            "format": "float",
             "example": 59.858611
           },
           "longitude": {
             "type": "number",
+            "format": "float",
             "example": 17.646111
           },
           "timeZone": {
@@ -4233,12 +4237,13 @@
             ],
             "properties": {
               "amount": {
-                "type": "number",
+                "type": "integer",
                 "example": 123456,
                 "writeOnly": true
               },
               "currency": {
                 "type": "string",
+                "format": "currency",
                 "example": "EUR",
                 "writeOnly": true
               },

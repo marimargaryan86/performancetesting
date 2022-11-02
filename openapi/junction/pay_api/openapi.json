@@ -391,6 +391,7 @@
         "required": true,
         "schema": {
           "type": "string",
+          "format": "currency",
           "example": "USD"
         },
         "description": "Currency id"

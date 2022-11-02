@@ -47,6 +47,29 @@ def test_country_format_with_invalid_country(
 
 
 @pytest.mark.parametrize(
+    "currency",
+    ("SEK",),
+)
+def test_currency_format_with_valid_currency(
+    format_checker: _FormatChecker,
+    currency: str,
+) -> None:
+    format_checker.check(currency, "currency")
+
+
+@pytest.mark.parametrize(
+    "currency",
+    ("XYZ",),
+)
+def test_currency_format_with_invalid_currency(
+    format_checker: _FormatChecker,
+    currency: str,
+) -> None:
+    with pytest.raises(exceptions.FormatError):
+        format_checker.check(currency, "currency")
+
+
+@pytest.mark.parametrize(
     "date_time",
     ("2022-07-12T22:06:59Z",),
 )
