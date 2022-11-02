@@ -87,11 +87,8 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
             )
         if request.query_params.get("currency"):
             try:
-                rate = await currencies_client.get_rate(
-                    "EUR",
-                    request.query_params.get("currency", ""),
-                    1000,
-                )
+                # TODO: change this
+                rate = 11.06
             except errors.NotFoundError as exc:
                 return models.JsonApiResponse(
                     models.Body(
@@ -108,17 +105,19 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
             if offers_response.get("included"):
                 for include in offers_response.get("included", []):
                     if include["type"] == "offer-options":
+                        currency = request.query_params.get("currency", "").split(".")[
+                            1
+                        ]
                         new_money = money.from_string(
                             include["attributes"]["price"]["amount"],
                             money.Currency(include["attributes"]["price"]["currency"]),
-                        ).convert(
-                            money.Currency(request.query_params.get("currency")),
+                        ).convert(  # TODO: change this
+                            money.Currency(currency.upper()),
                             decimal.Decimal(rate),
                         )
                         include["attributes"]["price"]["amount"] = str(new_money)
-                        include["attributes"]["price"][
-                            "currency"
-                        ] = request.query_params.get("currency")
+                        include["attributes"]["price"]["currency"] = currency.upper()
+                        # TODO: change this
                         await offers_rates_repository.create(  # noqa: WPS220
                             identifier="_".join(
                                 [
