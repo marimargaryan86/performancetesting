@@ -4237,8 +4237,8 @@
             ],
             "properties": {
               "amount": {
-                "type": "integer",
-                "example": 123456,
+                "type": "string",
+                "example": "13.37",
                 "writeOnly": true
               },
               "currency": {

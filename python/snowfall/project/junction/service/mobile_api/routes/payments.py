@@ -4,6 +4,7 @@ from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.junction.service.mobile_api import repository
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
+from snowfall.stdlib import money
 from snowfall.stdlib.integration.starlette import models, request_helpers
 
 _email_key = "email"
@@ -58,9 +59,12 @@ class Payments(endpoints.HTTPEndpoint):
                 customer=stripe_user_id,
                 stripe_version=_stripe_version,
             ).secret
-
+        intent_money = money.from_string(
+            body["amount"],
+            money.Currency(body["currency"]),
+        )
         intent = stripe.PaymentIntent.create(
-            amount=body["amount"],
+            amount=intent_money.amount,
             currency=body["currency"],
             capture_method="manual",
             customer=stripe_user_id,
