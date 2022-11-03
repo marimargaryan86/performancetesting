@@ -105,25 +105,22 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
             if offers_response.get("included"):
                 for include in offers_response.get("included", []):
                     if include["type"] == "offer-options":
-                        currency = request.query_params.get("currency", "").split(".")[
-                            1
-                        ]
+                        currency = request.scope["query_string"].get("currency")
                         new_money = money.from_string(
                             include["attributes"]["price"]["amount"],
                             money.Currency(include["attributes"]["price"]["currency"]),
-                        ).convert(  # TODO: change this
-                            money.Currency(currency.upper()),
+                        ).convert(
+                            currency,
                             decimal.Decimal(rate),
                         )
                         include["attributes"]["price"]["amount"] = str(new_money)
-                        include["attributes"]["price"]["currency"] = currency.upper()
-                        # TODO: change this
+                        include["attributes"]["price"]["currency"] = currency.code
                         await offers_rates_repository.create(  # noqa: WPS220
                             identifier="_".join(
                                 [
                                     include["id"],
                                     "EUR",
-                                    request.query_params.get("currency", ""),
+                                    request.scope["query_string"].get("currency").code,
                                 ],
                             ),
                             atr_value=str(rate),
