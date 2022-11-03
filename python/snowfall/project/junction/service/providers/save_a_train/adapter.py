@@ -269,6 +269,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         except (
             phonenumbers.NumberParseException,
             BookingError,
+            SaveATrainAdapterError,
         ) as error:
             new_booking.MergeFrom(
                 order_models_pb2.Booking(
