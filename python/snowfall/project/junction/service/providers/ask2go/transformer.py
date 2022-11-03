@@ -47,6 +47,7 @@ class OfferTransformer(object):  # noqa: WPS214
         brands = branded_prices[0]
         offer_prices = branded_prices[1]
         expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
+        required = set[offers_pb2.OfferGroup.Required.ValueType]()
 
         grouped_offer_segments = [
             (
@@ -63,6 +64,9 @@ class OfferTransformer(object):  # noqa: WPS214
             )
         ]
 
+        for offer_price in offer_prices:
+            required.update(self._get_offer_price_requirements(offer_price.docs))
+
         passenger_applicable_dates = self._get_passenger_type_to_applicable_dates(
             grouped_offer_segments[0][0],
         )
@@ -78,7 +82,42 @@ class OfferTransformer(object):  # noqa: WPS214
                 passenger_applicable_dates,
             ),
             segments=[grouped_segment[1] for grouped_segment in grouped_offer_segments],
+            required=list(required) if required else None,
         )
+
+    def _get_offer_price_doc_requirements(
+        self,
+        doc: price.OfferPriceDoc,
+    ) -> set[offers_pb2.OfferGroup.Required.ValueType]:
+        required = set[offers_pb2.OfferGroup.Required.ValueType]()
+
+        if doc.required_date_of_birth:
+            required.add(offers_pb2.OfferGroup.Required.REQUIRED_DATE_OF_BIRTH)
+
+        if doc.required_nationality:
+            required.add(offers_pb2.OfferGroup.Required.REQUIRED_NATIONALITY)
+
+        if doc.required_passport_number:
+            required.add(offers_pb2.OfferGroup.Required.REQUIRED_PASSPORT_NUMBER)
+
+        if doc.required_expiration_date:
+            required.add(offers_pb2.OfferGroup.Required.REQUIRED_EXPIRATION_DATE)
+
+        if doc.required_issuing_country:
+            required.add(offers_pb2.OfferGroup.Required.REQUIRED_ISSUING_COUNTRY)
+
+        return required
+
+    def _get_offer_price_requirements(
+        self,
+        offer_price_docs: Sequence[price.OfferPriceDoc],
+    ) -> set[offers_pb2.OfferGroup.Required.ValueType]:
+        required = set[offers_pb2.OfferGroup.Required.ValueType]()
+
+        for doc in offer_price_docs or []:
+            required.update(self._get_offer_price_doc_requirements(doc))
+
+        return required
 
     async def _get_group_offers(  # noqa: WPS211
         self,

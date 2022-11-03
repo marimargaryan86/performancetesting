@@ -32,3 +32,11 @@ class PenaltyType(enum.Enum):
 class Applicability(enum.Enum):
     before = "Before"
     after = "After"
+
+
+class OfferPriceDocType(enum.Enum):
+    full_sfpd = "FullSfpd"
+    basic_sfpd = "BasicSfpd"
+    none = "None"
+    foid = "Foid"
+    russian_passport = "RussianPassport"

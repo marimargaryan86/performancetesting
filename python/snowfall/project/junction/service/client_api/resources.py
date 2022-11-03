@@ -93,6 +93,13 @@ class OfferGroupResource(models.Resource):
             type=OfferGroupResource.api_type,
             attributes={
                 "expiresAt": protobuf.protobuf_to_datetime(group.expires_at),
+                "required": [
+                    protobuf.enum_value_to_slug(
+                        descriptor=offer_models_pb2.OfferGroup.Required.DESCRIPTOR,
+                        enum_value=required_value,
+                    )
+                    for required_value in group.required
+                ],
             },
             relationships={
                 "options": {

@@ -7,7 +7,7 @@ from snowfall.vendor.ask2go.models.base import CamelCaseBaseModel
 
 
 class OfferPriceDoc(CamelCaseBaseModel):
-    doc_type: str
+    doc_type: enums.OfferPriceDocType
     required_date_of_birth: bool
     required_nationality: bool
     required_expiration_date: bool

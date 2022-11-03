@@ -76,6 +76,15 @@ message OfferGroup {
   // min/max prices?
   repeated Offer offers = 4;
   repeated OfferSegment segments = 5;
+  enum Required {
+    REQUIRED_UNSPECIFIED = 0;
+    REQUIRED_DATE_OF_BIRTH = 1;
+    REQUIRED_NATIONALITY = 2;
+    REQUIRED_EXPIRATION_DATE = 3;
+    REQUIRED_ISSUING_COUNTRY = 4;
+    REQUIRED_PASSPORT_NUMBER = 5;
+  }
+  repeated Required required = 6;
 }
 
 message Offer {
