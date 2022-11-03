@@ -319,14 +319,51 @@ class OfferSegmentRule(models.BaseModel):
 
 
 class BaggageAllowance(models.BaseModel):
-    free: bool
+    is_included: bool = pydantic.Field(alias="isIncluded")
     applicable_to: PenaltyApplicableTo = pydantic.Field(alias="applicableTo")
 
     @classmethod
     def from_proto(cls, baggage: offer_models_pb2.BaggageAllowance) -> BaggageAllowance:
         return cls(
-            free=baggage.free,
+            isIncluded=baggage.free,
             applicableTo=PenaltyApplicableTo.from_proto(baggage.applicable_to),
+        )
+
+
+class OfferSegmentAmenity(models.BaseModel):
+    availability: str
+
+    @classmethod
+    def from_proto(
+        cls,
+        amenity: offer_models_pb2.SegmentAmenity,
+    ) -> OfferSegmentAmenity:
+        return cls(
+            availability=protobuf.enum_value_to_slug(
+                descriptor=offer_models_pb2.SegmentAmenity.Type.DESCRIPTOR,
+                enum_value=amenity.availability,
+            ),
+        )
+
+
+class OfferSegmentAmenities(models.BaseModel):
+    beverage: OfferSegmentAmenity
+    entertainment: OfferSegmentAmenity
+    food: OfferSegmentAmenity
+    power: OfferSegmentAmenity
+    wifi: OfferSegmentAmenity
+
+    @classmethod
+    def from_proto(
+        cls,
+        amenities: offer_models_pb2.SegmentAmenities,
+    ) -> OfferSegmentAmenities:
+        return cls(
+            beverage=OfferSegmentAmenity.from_proto(amenities.beverage),
+            entertainment=OfferSegmentAmenity.from_proto(amenities.entertainment),
+            food=OfferSegmentAmenity.from_proto(amenities.food),
+            power=OfferSegmentAmenity.from_proto(amenities.power),
+            wifi=OfferSegmentAmenity.from_proto(amenities.wifi),
         )
 
 
@@ -349,6 +386,7 @@ class TripOfferOptionDetailsResource(models.Resource):
                     BaggageAllowance.from_proto(baggage)
                     for baggage in details.baggage_allowances
                 ],
+                "amenities": OfferSegmentAmenities.from_proto(details.amenities),
             },
             relationships={
                 "details": {

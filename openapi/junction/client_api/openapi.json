@@ -4836,7 +4836,8 @@
                 "required": [
                   "cabinClassName",
                   "rules",
-                  "baggageAllowances"
+                  "baggageAllowances",
+                  "amenities"
                 ],
                 "properties": {
                   "cabinClassName": {
@@ -4856,6 +4857,9 @@
                     "items": {
                       "$ref": "#/components/schemas/TripOfferOptionPenaltyBaggageAllowance"
                     }
+                  },
+                  "amenities": {
+                    "$ref": "#/components/schemas/OfferSegmentDetailAmenities"
                   }
                 }
               },
@@ -5002,7 +5006,7 @@
         "title": "Trip Offer Option Penalty Baggage Allowance",
         "type": "object",
         "properties": {
-          "free": {
+          "isIncluded": {
             "type": "boolean",
             "example": true
           },
@@ -5011,7 +5015,7 @@
           }
         },
         "required": [
-          "free",
+          "isIncluded",
           "applicableTo"
         ]
       },
@@ -5225,6 +5229,53 @@
         "required": [
           "title",
           "body"
+        ]
+      },
+      "OfferSegmentDetailAmenities": {
+        "title": "Offer Segment Detail Amenities",
+        "type": "object",
+        "properties": {
+          "beverage": {
+            "$ref": "#/components/schemas/OfferSegmentDetailAmenity"
+          },
+          "entertainment": {
+            "$ref": "#/components/schemas/OfferSegmentDetailAmenity"
+          },
+          "food": {
+            "$ref": "#/components/schemas/OfferSegmentDetailAmenity"
+          },
+          "power": {
+            "$ref": "#/components/schemas/OfferSegmentDetailAmenity"
+          },
+          "wifi": {
+            "$ref": "#/components/schemas/OfferSegmentDetailAmenity"
+          }
+        },
+        "required": [
+          "beverage",
+          "entertainment",
+          "food",
+          "power",
+          "wifi"
+        ]
+      },
+      "OfferSegmentDetailAmenity": {
+        "title": "Offer Segment Detail Amenity",
+        "type": "object",
+        "properties": {
+          "availability": {
+            "type": "string",
+            "enum": [
+              "unspecified",
+              "unavailable",
+              "available",
+              "included"
+            ],
+            "example": "included"
+          }
+        },
+        "required": [
+          "availability"
         ]
       },
       "RentalOfferSearch": {

@@ -106,12 +106,31 @@ message BaggageAllowance {
   ApplicableTo applicable_to = 2;
 }
 
+message SegmentAmenity {
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+    TYPE_UNAVAILABLE = 1;
+    TYPE_AVAILABLE = 2;
+    TYPE_INCLUDED = 3;
+  }
+  Type availability = 1;
+}
+
+message SegmentAmenities {
+  SegmentAmenity beverage = 1;
+  SegmentAmenity entertainment = 2;
+  SegmentAmenity food = 3;
+  SegmentAmenity power = 4;
+  SegmentAmenity wifi = 5;
+}
+
 message OfferSegmentDetails {
   string id = 1;
   string offer_segment_id = 3;
   snowfall.stdlib.v1alpha.CabinClass cabin_class = 2;
   repeated SegmentRule rules = 4;
   repeated BaggageAllowance baggage_allowances = 5;
+  SegmentAmenities amenities = 6;
   // meal
 }
 

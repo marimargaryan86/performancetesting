@@ -232,10 +232,51 @@ class OfferTransformer(object):  # noqa: WPS214
                     ]
                     if baggage_allowance
                     else [],
+                    amenities=self._transform_amenities_to_protos(
+                        trip_segment.segment_amenities,
+                    ),
                 ),
             )
 
         return segment_details
+
+    def _transform_amenities_to_protos(
+        self,
+        amenities: Optional[offers.SegmentAmenities],
+    ) -> offers_pb2.SegmentAmenities:
+        return offers_pb2.SegmentAmenities(
+            beverage=self._get_amenity_option_proto(
+                amenity=(amenities.beverage if amenities else None),
+            ),
+            entertainment=self._get_amenity_option_proto(
+                amenity=(amenities.entertainment if amenities else None),
+            ),
+            food=self._get_amenity_option_proto(
+                amenity=(amenities.food if amenities else None),
+            ),
+            power=self._get_amenity_option_proto(
+                amenity=(amenities.power if amenities else None),
+            ),
+            wifi=self._get_amenity_option_proto(
+                amenity=(amenities.wifi if amenities else None),
+            ),
+        )
+
+    def _get_amenity_option_proto(
+        self,
+        amenity: Optional[offers.SegmentAmenity],
+    ) -> offers_pb2.SegmentAmenity:
+        if amenity is None:
+            availability = offers_pb2.SegmentAmenity.Type.TYPE_UNSPECIFIED
+        else:
+            if amenity.exists and amenity.free:
+                availability = offers_pb2.SegmentAmenity.Type.TYPE_INCLUDED
+            elif amenity.exists and not amenity.free:
+                availability = offers_pb2.SegmentAmenity.Type.TYPE_AVAILABLE
+            else:
+                availability = offers_pb2.SegmentAmenity.Type.TYPE_UNAVAILABLE
+
+        return offers_pb2.SegmentAmenity(availability=availability)
 
     def _segment_to_proto(
         self,

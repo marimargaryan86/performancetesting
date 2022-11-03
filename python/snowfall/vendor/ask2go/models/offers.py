@@ -43,6 +43,20 @@ class TripSegmentCarrier(CamelCaseBaseModel):
     code: str
 
 
+class SegmentAmenity(CamelCaseBaseModel):
+    exists: bool
+    free: bool
+    information: Optional[str]
+
+
+class SegmentAmenities(CamelCaseBaseModel):
+    beverage: Optional[SegmentAmenity]
+    entertainment: Optional[SegmentAmenity]
+    food: Optional[SegmentAmenity]
+    power: Optional[SegmentAmenity]
+    wifi: Optional[SegmentAmenity]
+
+
 class TripSegment(CamelCaseBaseModel):
     id: Optional[UUID]  # noqa: A003
     duration: timedelta
@@ -64,6 +78,7 @@ class TripSegment(CamelCaseBaseModel):
     layover: str
     change_of_plane: Optional[bool]
     segment_index: Optional[int]
+    segment_amenities: Optional[SegmentAmenities]
 
     _normalize_duration = pydantic.validator("duration", pre=True, allow_reuse=True)(
         normalizers.normalize_duration,
