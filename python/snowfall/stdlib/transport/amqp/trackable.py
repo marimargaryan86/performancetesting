@@ -2,19 +2,13 @@ from __future__ import annotations
 
 import contextlib
 import functools
-from typing import AsyncGenerator, Mapping, Type, TypeVar, Union
+from typing import AsyncGenerator, Mapping, TypeVar
 
 from google.protobuf import message
 
 from snowfall.stdlib import string
 from snowfall.stdlib.transport.amqp import protocol, types
 from snowfall.stdlib.v1alpha import amqp_pb2
-
-TrackableUpdateMessageType = Union[
-    Type[amqp_pb2.TrackableReceived],
-    Type[amqp_pb2.TrackableAcked],
-    Type[amqp_pb2.TrackableNacked],
-]
 
 _Proto = TypeVar("_Proto", bound=message.Message)
 _TRACKABLE_HEADERS = ("x-trackable-id", "x-trackable-routing-key")
@@ -29,26 +23,35 @@ class StatusReporter(object):
         self._producer = producer
 
     async def receive(self, msg: types.Message[_Proto]) -> None:
-        await self._report(msg, amqp_pb2.TrackableReceived)
+        await self._report(
+            msg,
+            amqp_pb2.Trackable(event=amqp_pb2.Trackable.EVENT_RECEIVED),
+        )
 
     async def ack(self, msg: types.Message[_Proto]) -> None:
-        await self._report(msg, amqp_pb2.TrackableAcked)
+        await self._report(
+            msg,
+            amqp_pb2.Trackable(event=amqp_pb2.Trackable.EVENT_ACKED),
+        )
 
     async def nack(self, msg: types.Message[_Proto]) -> None:
-        await self._report(msg, amqp_pb2.TrackableNacked)
+        await self._report(
+            msg,
+            amqp_pb2.Trackable(event=amqp_pb2.Trackable.EVENT_NACKED),
+        )
 
     async def _report(
         self,
         msg: types.Message[_Proto],
-        proto_class: TrackableUpdateMessageType,
+        trackable: amqp_pb2.Trackable,
     ) -> None:
         if not _is_trackable(msg):
             return
 
+        trackable.id = msg.headers["x-trackable-id"]
+
         await self._producer.publish(
-            msg=proto_class(
-                id=msg.headers["x-trackable-id"],
-            ),
+            msg=trackable,
             routing_key=msg.headers["x-trackable-routing-key"],
         )
 

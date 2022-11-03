@@ -4398,6 +4398,17 @@
                     "format": "date-time",
                     "example": "2019-08-24T14:15:22Z",
                     "description": "Not yet implemented."
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "unspecified",
+                      "pending",
+                      "processing",
+                      "completed",
+                      "failed"
+                    ],
+                    "example": "completed"
                   }
                 }
               },

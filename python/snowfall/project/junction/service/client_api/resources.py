@@ -20,7 +20,7 @@ from snowfall.project.junction.service.trips.v1alpha import trips_pb2
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
-from snowfall.stdlib.v1alpha import models_pb2, money_pb2
+from snowfall.stdlib.v1alpha import amqp_pb2, models_pb2, money_pb2
 
 _SELF_HREF = "self"
 _RELATIONSHIPS_FIELD = "data"
@@ -975,6 +975,10 @@ class TripSearchResource(models.Resource):
                 ),
                 "departureAfter": protobuf.protobuf_to_datetime(
                     trip_search.departure_after,
+                ),
+                "status": protobuf.enum_value_to_slug(
+                    amqp_pb2.Trackable.Status.DESCRIPTOR,
+                    trip_search.status,
                 ),
             },
             relationships={

@@ -3,6 +3,7 @@ syntax = "proto3";
 package snowfall.project.junction.service.trips.v1alpha;
 
 import "google/protobuf/timestamp.proto";
+import "snowfall/stdlib/v1alpha/amqp.proto";
 import "snowfall/stdlib/v1alpha/datetime.proto";
 import "snowfall/stdlib/v1alpha/models.proto";
 
@@ -79,4 +80,5 @@ message TripSearch {
   repeated snowfall.stdlib.v1alpha.Point destinations = 4;
   snowfall.stdlib.v1alpha.DateTime departure_after = 5;
   repeated string trip_ids = 6; // read only
+  snowfall.stdlib.v1alpha.Trackable.Status status = 7; // read only
 }

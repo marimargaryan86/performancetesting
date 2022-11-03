@@ -2,14 +2,20 @@ syntax = "proto3";
 
 package snowfall.stdlib.v1alpha;
 
-message TrackableReceived {
+message Trackable {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_PENDING = 1;
+    STATUS_PROCESSING = 2;
+    STATUS_COMPLETED = 3;
+    STATUS_FAILED = 4;
+  }
   string id = 1;
-}
-
-message TrackableAcked {
-  string id = 1;
-}
-
-message TrackableNacked {
-  string id = 1;
+  enum Event {
+    EVENT_UNSPECIFIED = 0;
+    EVENT_RECEIVED = 1;
+    EVENT_ACKED = 2;
+    EVENT_NACKED = 3;
+  }
+  Event event = 2;
 }

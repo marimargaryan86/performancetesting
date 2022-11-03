@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import datetime
 import os
-from typing import TypeVar
+from typing import Sequence, TypeVar, cast
 
 import prometheus_client
 from aio_pika import abc
@@ -11,6 +11,7 @@ from google.protobuf import message
 from sentry_sdk import Hub, tracing
 from structlog import get_logger
 
+from snowfall.stdlib import sequence
 from snowfall.stdlib.instrumentation import prometheus
 from snowfall.stdlib.transport.amqp import protocol, types
 
@@ -51,13 +52,13 @@ class Consumer(protocol.Consumer):  # noqa: WPS214
         connection: abc.AbstractConnection,
         exchange: types.Exchange,
         queue_name: str,
-        routing_key: str,
+        routing_key: Sequence[str] | str,
     ):
         self._connection = connection
         self._exchange = exchange
         self._logger = get_logger(__name__)
         self._queue_name = queue_name
-        self._routing_key = routing_key
+        self._routing_keys: Sequence[str] = sequence.ensure(routing_key)
 
     async def consume(self, callback: protocol.ConsumerCallback[_Proto]) -> None:
         async with self._connection.channel() as channel:
@@ -76,7 +77,9 @@ class Consumer(protocol.Consumer):  # noqa: WPS214
                 durable=True,
             )
 
-            await queue.bind(exchange, self._routing_key)
+            for routing_key in self._routing_keys:
+                await queue.bind(exchange, routing_key)
+
             await self._consume(queue, callback)
 
     async def _consume(
@@ -100,8 +103,7 @@ class Consumer(protocol.Consumer):  # noqa: WPS214
     ) -> None:
         msg = types.Message[_Proto](incoming)
 
-        if msg.enqueued_at:
-            self._track_wait_time(msg.enqueued_at)
+        self._track_wait_time(msg)
 
         with self._with_transaction(msg) as span:
             span.set_status("ok")
@@ -130,12 +132,11 @@ class Consumer(protocol.Consumer):  # noqa: WPS214
 
         return Hub(Hub.current).start_transaction(transaction)
 
-    @property
-    def _prometheus_labels(self) -> dict[str, str]:
+    def _prometheus_labels(self, msg: types.Message[_Proto]) -> dict[str, str]:
         return {
             "exchange": self._exchange.name,
             "queue": self._queue_name,
-            "routing_key": self._routing_key,
+            "routing_key": msg.routing_key,
         }
 
     def _finalize_message(
@@ -143,12 +144,12 @@ class Consumer(protocol.Consumer):  # noqa: WPS214
         msg: types.Message[_Proto],
         start_time: datetime.datetime,
     ) -> None:
-        self._track_processing_time(start_time)
-        self._counter_messages.labels(**self._prometheus_labels).inc()
+        self._track_processing_time(msg, start_time)
+        self._counter_messages.labels(**self._prometheus_labels(msg)).inc()
 
         if not msg.acknowledged:
             self._counter_failed_messages.labels(
-                **self._prometheus_labels,
+                **self._prometheus_labels(msg),
             ).inc()
 
         self._logger.info(
@@ -158,16 +159,26 @@ class Consumer(protocol.Consumer):  # noqa: WPS214
             type=msg.body.DESCRIPTOR.full_name,
         )
 
-    def _track_processing_time(self, start_time: datetime.datetime) -> None:
+    def _track_processing_time(
+        self,
+        msg: types.Message[_Proto],
+        start_time: datetime.datetime,
+    ) -> None:
         now = datetime.datetime.now(tz=datetime.timezone.utc)
 
-        self._histogram_processing_time.labels(**self._prometheus_labels).observe(
+        self._histogram_processing_time.labels(**self._prometheus_labels(msg)).observe(
             (now - start_time).total_seconds(),
         )
 
-    def _track_wait_time(self, enqueued_at: datetime.datetime) -> None:
+    def _track_wait_time(
+        self,
+        msg: types.Message[_Proto],
+    ) -> None:
+        if msg.enqueued_at:
+            return
+
         now = datetime.datetime.now(tz=datetime.timezone.utc)
 
-        self._histogram_wait_time.labels(**self._prometheus_labels).observe(
-            (now - enqueued_at).total_seconds(),
+        self._histogram_wait_time.labels(**self._prometheus_labels(msg)).observe(
+            (now - cast(datetime.datetime, msg.enqueued_at)).total_seconds(),
         )

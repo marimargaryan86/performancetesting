@@ -9,7 +9,7 @@ from snowfall.project.junction.service.planner.v1alpha import planner_pb2
 from snowfall.project.junction.service.trips.v1alpha import trips_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
-from snowfall.stdlib.v1alpha import models_pb2
+from snowfall.stdlib.v1alpha import amqp_pb2, models_pb2
 
 
 class SegmentRepository(repository.ProtoRepository[models_pb2.SegmentReference]):
@@ -143,12 +143,17 @@ class TripSearchRepository(
         new_trip_search.CopyFrom(trip_search)
         new_trip_search.ClearField("trip_ids")
         new_trip_search.trip_ids.extend([trip.id for trip in response.trips])
+        # todo: can't assume this once journey planner call isn't blocking
+        new_trip_search.status = amqp_pb2.Trackable.STATUS_COMPLETED
 
         update = await self._execute(
             self._collection.update_one,
             {"_id": new_trip_search.id},
             {
-                "$set": {"trip_ids": list(new_trip_search.trip_ids)},
+                "$set": {
+                    "trip_ids": list(new_trip_search.trip_ids),
+                    "status": new_trip_search.status,
+                },
             },
         )
 
@@ -157,17 +162,55 @@ class TripSearchRepository(
 
         return new_trip_search
 
-    async def insert(self, message: trips_pb2.TripSearch) -> trips_pb2.TripSearch:
-        document = trips_pb2.TripSearch()
+    async def insert(self, trip_search: trips_pb2.TripSearch) -> trips_pb2.TripSearch:
+        new_trip_search = trips_pb2.TripSearch()
 
-        document.CopyFrom(message)
+        new_trip_search.CopyFrom(trip_search)
 
-        document.id = string.uuid()
+        new_trip_search.id = string.uuid()
+        new_trip_search.status = amqp_pb2.Trackable.STATUS_PENDING
         expires_at = timestamp_pb2.Timestamp()
 
         expires_at.FromDatetime(
             datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
         )
-        document.expires_at.CopyFrom(expires_at)
+        new_trip_search.expires_at.CopyFrom(expires_at)
 
-        return await super().insert(document)
+        return await super().insert(new_trip_search)
+
+    async def mark_as_failed(
+        self,
+        trip_search: trips_pb2.TripSearch,
+    ) -> trips_pb2.TripSearch:
+        return await self._set_status(trip_search, amqp_pb2.Trackable.STATUS_FAILED)
+
+    async def mark_as_processing(
+        self,
+        trip_search: trips_pb2.TripSearch,
+    ) -> trips_pb2.TripSearch:
+        return await self._set_status(trip_search, amqp_pb2.Trackable.STATUS_PROCESSING)
+
+    async def _set_status(
+        self,
+        trip_search: trips_pb2.TripSearch,
+        status: amqp_pb2.Trackable.Status.ValueType,
+    ) -> trips_pb2.TripSearch:
+        new_trip_search = trips_pb2.TripSearch()
+
+        new_trip_search.CopyFrom(trip_search)
+        new_trip_search.status = status
+
+        update = await self._execute(
+            self._collection.update_one,
+            {"_id": new_trip_search.id},
+            {
+                "$set": {
+                    "status": new_trip_search.status,
+                },
+            },
+        )
+
+        if not update.acknowledged:
+            raise RuntimeError()
+
+        return new_trip_search

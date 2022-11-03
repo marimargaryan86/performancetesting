@@ -1,8 +1,12 @@
+from __future__ import annotations
+
+import asyncio
+import types as std_types
 import zoneinfo
+from typing import Type
 
 import more_itertools
 import structlog
-from grpc import aio
 
 from snowfall.project.junction.service.planner.v1alpha import (
     planner_pb2,
@@ -13,6 +17,30 @@ from snowfall.project.junction.service.trips.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.amqp import consumer, types
 from snowfall.stdlib.v1alpha import latlng_pb2
+
+
+class _TripSearchContext(object):
+    def __init__(
+        self,
+        repository: trips.TripSearchRepository,
+        message: amqp_pb2.TripSearchTask,
+    ) -> None:
+        self._message = message
+        self._repository = repository
+
+    async def __aenter__(self) -> _TripSearchContext:
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: Type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: std_types.TracebackType | None,
+    ) -> bool:
+        if exc_type:
+            await self._repository.mark_as_failed(self._message.trip_search)
+
+        return False
 
 
 class TripSearchConsumer(object):
@@ -36,6 +64,8 @@ class TripSearchConsumer(object):
         self,
         message: types.Message[amqp_pb2.TripSearchTask],
     ) -> None:
+        await self._trip_search_repository.mark_as_processing(message.body.trip_search)
+
         origins = {
             (origin.coordinates.latitude, origin.coordinates.longitude)
             for origin in message.body.trip_search.origins
@@ -48,7 +78,7 @@ class TripSearchConsumer(object):
         if not origins or not destinations:
             return
 
-        try:
+        async with _TripSearchContext(self._trip_search_repository, message.body):
             response = await self._planner.SearchJourney(
                 request=planner_pb2.SearchJourneyRequest(
                     origins=[
@@ -78,16 +108,11 @@ class TripSearchConsumer(object):
                     ),
                 ),
             )
-        except aio.AioRpcError:
-            self._logger.exception()
-            await message.nack()
 
-            return
-
-        await self._trip_repository.add_from_journey_search(response)
-        await self._trip_search_repository.add_results_from_journey_search(
-            message.body.trip_search,
-            response,
-        )
-
-        await message.ack()
+            await asyncio.gather(
+                self._trip_repository.add_from_journey_search(response),
+                self._trip_search_repository.add_results_from_journey_search(
+                    message.body.trip_search,
+                    response,
+                ),
+            )
