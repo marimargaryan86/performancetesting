@@ -14,12 +14,12 @@ from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import service
 from snowfall.stdlib.logging.stdout import context_binding
 from snowfall.stdlib.persistence.mongo import temporary
-from snowfall.stdlib.transport import amqp
+from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.stdlib.transport.grpc.client import create_channel
 
 
 class _Settings(service.Settings):
-    amqp_dsn: Sequence[AnyUrl]
+    amqp_dsn: AnyUrl
     feeds_dir: DirectoryPath
     geodata_address: Sequence[str]
     mongo_dsn: Sequence[AnyUrl]
@@ -90,9 +90,7 @@ async def _import(  # noqa: WPS210
                 if not imported:
                     return
 
-                async with await amqp.create_connection(
-                    random.choice(app.settings.amqp_dsn),  # nosec
-                ) as connection:
+                async with types.Connection(app.settings.amqp_dsn) as connection:
                     await _process(connection, geocoder, repositories, feed_ref)
 
 
@@ -111,9 +109,9 @@ async def _process(
     await schedules.produce_schedules(connection, generator)
     await places.process_places(
         geocoder,
-        amqp.Producer(
+        producer.Producer(
             connection=connection,
-            exchange=amqp.Exchange("places"),
+            exchange=types.Exchange("places"),
         ),
         repositories,
         feed_ref,

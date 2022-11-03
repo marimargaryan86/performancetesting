@@ -4,7 +4,7 @@ from snowfall.project.junction.service.gtfs_feed import importer
 from snowfall.project.junction.service.places.v1alpha import models_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2, geocoding_pb2_grpc
 from snowfall.stdlib import string
-from snowfall.stdlib.transport import amqp
+from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.v1alpha import latlng_pb2
 
 _NAMESPACE = uuid.UUID("5190984e-4ab7-411e-96f6-2848cc5d63e1")
@@ -12,7 +12,7 @@ _NAMESPACE = uuid.UUID("5190984e-4ab7-411e-96f6-2848cc5d63e1")
 
 async def process_places(
     geocoder: geocoding_pb2_grpc.GeocodingServiceStub,
-    producer: amqp.Producer,
+    producer_obj: producer.Producer,
     collection: importer.RepositoryCollection,
     ref: str,
 ) -> None:
@@ -22,7 +22,7 @@ async def process_places(
         if not stop.stop_lat or not stop.stop_lon or stop.parent_station:
             continue
 
-        await producer.publish(
+        await producer_obj.publish(
             models_pb2.Location(
                 id=string.to_uuid(stop.stop_id, namespace),
                 name=stop.stop_name or "",

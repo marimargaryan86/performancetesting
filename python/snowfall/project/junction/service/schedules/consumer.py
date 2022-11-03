@@ -1,5 +1,6 @@
 from snowfall.project.junction.service.schedules.schedules import ScheduleRepository
-from snowfall.stdlib.transport.amqp import Consumer, Message
+from snowfall.stdlib.transport.amqp.consumer import Consumer
+from snowfall.stdlib.transport.amqp.types import Message
 from snowfall.stdlib.v1alpha.models_pb2 import Schedule
 
 

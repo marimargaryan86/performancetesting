@@ -7,7 +7,7 @@ from snowfall.project.junction.service.providers.save_a_train import (
 )
 from snowfall.project.junction.service.providers.save_a_train import cache, criteria
 from snowfall.project.junction.service.providers.save_a_train.v1alpha import amqp_pb2
-from snowfall.stdlib.transport import amqp
+from snowfall.stdlib.transport.amqp import consumer, producer, types
 
 _PROVIDER_NAME = "Save A Train"
 
@@ -15,12 +15,12 @@ _PROVIDER_NAME = "Save A Train"
 class TripSearchConsumer(object):
     def __init__(
         self,
-        consumer: amqp.Consumer,
-        producer: amqp.Producer,
+        consumer_obj: consumer.Consumer,
+        producer_obj: producer.Producer,
         generator: criteria.CriteriaGenerator,
     ):
-        self._consumer = consumer
-        self._producer = producer
+        self._consumer = consumer_obj
+        self._producer = producer_obj
         self._generator = generator
 
     async def consume(self) -> None:
@@ -28,7 +28,7 @@ class TripSearchConsumer(object):
 
     async def _process_message(
         self,
-        message: amqp.Message[offers_amqp_pb2.TripOfferSearchTask],
+        message: types.Message[offers_amqp_pb2.TripOfferSearchTask],
     ) -> None:
         for task in self._generator.from_search_task(message.body):
             await self._producer.publish(task, routing_key="offers.search.trip")
@@ -37,12 +37,12 @@ class TripSearchConsumer(object):
 class SearchCriteriaConsumer(object):
     def __init__(
         self,
-        consumer: amqp.Consumer,
-        producer: amqp.Producer,
+        consumer_obj: consumer.Consumer,
+        producer_obj: producer.Producer,
         adapter: save_a_train_adapter.SaveATrainAdapter,
     ):
-        self._consumer = consumer
-        self._producer = producer
+        self._consumer = consumer_obj
+        self._producer = producer_obj
         self._adapter = adapter
 
     async def consume(self) -> None:
@@ -50,7 +50,7 @@ class SearchCriteriaConsumer(object):
 
     async def _process_message(
         self,
-        message: amqp.Message[amqp_pb2.SearchCriteriaTask],
+        message: types.Message[amqp_pb2.SearchCriteriaTask],
     ) -> None:
         async for offer_result in self._adapter.gather_search_results(message.body):
             await self._producer.publish(
@@ -65,14 +65,14 @@ class SearchCriteriaConsumer(object):
 class OrdersConsumer(object):
     def __init__(
         self,
-        consumer: amqp.Consumer,
+        consumer_obj: consumer.Consumer,
         offers_cache: cache.OffersCache,
-        producer: amqp.Producer,
+        producer_obj: producer.Producer,
         adapter: save_a_train_adapter.SaveATrainAdapter,
     ):
         self._cache = offers_cache
-        self._consumer = consumer
-        self._producer = producer
+        self._consumer = consumer_obj
+        self._producer = producer_obj
         self._adapter = adapter
         self._logger = structlog.get_logger(__name__)
 
@@ -81,7 +81,7 @@ class OrdersConsumer(object):
 
     async def _process_message(
         self,
-        message: amqp.Message[orders_amqp_pb2.PlaceOrderTask],
+        message: types.Message[orders_amqp_pb2.PlaceOrderTask],
     ) -> None:
         offer_details = await self._cache.fetch(message.body.booking.trip_option.id)
         message.body.booking.provider_name = _PROVIDER_NAME

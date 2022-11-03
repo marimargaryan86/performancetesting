@@ -20,7 +20,8 @@ from snowfall.project.junction.service.providers.save_a_train import (
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import h3, service
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.transport import amqp
+from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
+from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.stdlib.transport.grpc import client as grpc_client
 from snowfall.vendor.save_a_train import client
 
@@ -45,35 +46,33 @@ class _DumpStationsSettings(_SatConfig, service.Settings):
 
 
 class _OffersSettings(service.Settings):
-    amqp_dsn: Sequence[pydantic.AnyUrl]
+    amqp_dsn: pydantic.AnyUrl
 
 
 class _SearchSettings(_SatConfig, service.Settings):
-    amqp_dsn: Sequence[pydantic.AnyUrl]
+    amqp_dsn: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
 
 
 class _OrdersSettings(_SatConfig, service.Settings):
-    amqp_dsn: Sequence[pydantic.AnyUrl]
+    amqp_dsn: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
 
 
 async def _offers(app: service.Application[_OffersSettings]) -> None:
-    async with await amqp.create_connection(
-        random.choice(app.settings.amqp_dsn),  # nosec
-    ) as connection:
+    async with types.Connection(app.settings.amqp_dsn) as connection:
         trip_search_consumer = consumer.TripSearchConsumer(
-            consumer=amqp.Consumer(
+            consumer_obj=amqp_consumer.Consumer(
                 connection=connection,
-                exchange=amqp.Exchange(_OFFERS),
+                exchange=types.Exchange(_OFFERS),
                 queue_name="{0}_offers".format(app.name),
                 routing_key="offers.search.trip",
             ),
-            producer=amqp.Producer(
+            producer_obj=producer.Producer(
                 connection=connection,
-                exchange=amqp.Exchange("save_a_train"),
+                exchange=types.Exchange("save_a_train"),
             ),
             generator=criteria.CriteriaGenerator(
                 h3_mapping=h3.H3MappingRepository[train_stations.TrainStation](
@@ -96,7 +95,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
             ),
         )
         amqp_connection = await stack.enter_async_context(
-            await amqp.create_connection(random.choice(app.settings.amqp_dsn)),  # nosec
+            types.Connection(app.settings.amqp_dsn),
         )
         redis_connection = await stack.enter_async_context(
             aioredis.from_url(
@@ -119,15 +118,15 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
         # TODO: do we need to call get_token on the save_a_train_client?
 
         search_consumer = consumer.SearchCriteriaConsumer(
-            consumer=amqp.Consumer(
+            consumer_obj=amqp_consumer.Consumer(
                 connection=amqp_connection,
-                exchange=amqp.Exchange("save_a_train"),
+                exchange=types.Exchange("save_a_train"),
                 queue_name="{0}_searches".format(app.name),
                 routing_key="offers.search.trip",
             ),
-            producer=amqp.Producer(
+            producer_obj=producer.Producer(
                 connection=amqp_connection,
-                exchange=amqp.Exchange(_OFFERS),
+                exchange=types.Exchange(_OFFERS),
             ),
             adapter=adapter.SaveATrainAdapter(
                 save_a_train_client=save_a_train_client,
@@ -152,7 +151,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
             ),
         )
         amqp_connection = await stack.enter_async_context(
-            await amqp.create_connection(random.choice(app.settings.amqp_dsn)),  # nosec
+            types.Connection(app.settings.amqp_dsn),
         )
         redis_connection = await stack.enter_async_context(
             aioredis.from_url(
@@ -177,15 +176,15 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
             client=redis.Client[bytes](redis_connection, prefix=app.name),
         )
         orders_consumer = consumer.OrdersConsumer(
-            consumer=amqp.Consumer(
+            consumer_obj=amqp_consumer.Consumer(
                 connection=amqp_connection,
-                exchange=amqp.Exchange("orders"),
+                exchange=types.Exchange("orders"),
                 queue_name="{0}_orders".format(app.name),
                 routing_key="orders.offers",
             ),
-            producer=amqp.Producer(
+            producer_obj=producer.Producer(
                 connection=amqp_connection,
-                exchange=amqp.Exchange("orders"),
+                exchange=types.Exchange("orders"),
             ),
             adapter=adapter.SaveATrainAdapter(
                 save_a_train_client=save_a_train_client,

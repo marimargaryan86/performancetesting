@@ -20,7 +20,7 @@ from snowfall.project.junction.service.places.places import (
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import service
 from snowfall.stdlib.persistence import filesystem
-from snowfall.stdlib.transport import amqp
+from snowfall.stdlib.transport.amqp import consumer, types
 from snowfall.stdlib.transport.grpc import server
 from snowfall.stdlib.transport.grpc.client import create_channel
 
@@ -39,7 +39,7 @@ class _GrpcSettings(service.Settings):
 
 
 class _ImportSettings(service.Settings):
-    amqp_dsn: Sequence[AnyUrl]
+    amqp_dsn: AnyUrl
     mongo_dsn: Sequence[AnyUrl]
 
 
@@ -84,22 +84,19 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
-    connection = await amqp.create_connection(
-        random.choice(app.settings.amqp_dsn),  # nosec
-    )
 
-    async with connection:
-        consumer = LocationImportConsumer(
+    async with types.Connection(app.settings.amqp_dsn) as connection:
+        consumer_obj = LocationImportConsumer(
             locations=LocationRepository(mongo.places.locations),
-            consumer=amqp.Consumer(
+            consumer=consumer.Consumer(
                 connection=connection,
-                exchange=amqp.Exchange("places"),
+                exchange=types.Exchange("places"),
                 queue_name="{0}_locations_importer".format(app.name),
                 routing_key="location.import",
             ),
         )
 
-        await consumer.consume()
+        await consumer_obj.consume()
 
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:

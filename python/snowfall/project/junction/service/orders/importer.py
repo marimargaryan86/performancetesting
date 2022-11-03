@@ -1,19 +1,22 @@
 from snowfall.project.junction.service.orders import orders
 from snowfall.project.junction.service.orders.v1alpha import models_pb2
-from snowfall.stdlib.transport import amqp
+from snowfall.stdlib.transport.amqp import consumer, types
 
 
 class BookingImporter(object):
     def __init__(
         self,
-        consumer: amqp.Consumer,
+        consumer_obj: consumer.Consumer,
         booking_repository: orders.BookingRepository,
     ):
-        self._consumer = consumer
+        self._consumer = consumer_obj
         self._bookings = booking_repository
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
 
-    async def _process_message(self, message: amqp.Message[models_pb2.Booking]) -> None:
+    async def _process_message(
+        self,
+        message: types.Message[models_pb2.Booking],
+    ) -> None:
         await self._bookings.update(booking=message.body)

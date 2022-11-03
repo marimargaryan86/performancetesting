@@ -13,12 +13,12 @@ from snowfall.project.junction.service.passenger_name_records.v1alpha import (
     passenger_name_records_pb2_grpc,
 )
 from snowfall.stdlib import service
-from snowfall.stdlib.transport import amqp
+from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.grpc import client, server
 
 
 class _GrpcSettings(service.Settings):
-    amqp_dsn: Sequence[pydantic.AnyUrl]
+    amqp_dsn: pydantic.AnyUrl
     default_page_size: int = 100
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
@@ -27,7 +27,7 @@ class _GrpcSettings(service.Settings):
 
 
 class _ImportSettings(service.Settings):
-    amqp_dsn: Sequence[pydantic.AnyUrl]
+    amqp_dsn: pydantic.AnyUrl
     mongo_dsn: Sequence[pydantic.AnyUrl]
     passenger_name_records_address: Sequence[str]
 
@@ -45,9 +45,7 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
         ),
     )
 
-    async with await amqp.create_connection(
-        random.choice(app.settings.amqp_dsn),  # nosec
-    ) as connection:
+    async with types.Connection(app.settings.amqp_dsn) as connection:
         grpc_server = server.create_server(
             app.settings.grpc_address,
             app.settings.grpc_port,
@@ -67,9 +65,9 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
                         collection=mongo.orders.journeys,
                     ),
                     publisher=OrderProducer(
-                        producer=amqp.Producer(
+                        producer_obj=producer.Producer(
                             connection=connection,
-                            exchange=amqp.Exchange("orders"),
+                            exchange=types.Exchange("orders"),
                         ),
                     ),
                     default_page_size=app.settings.default_page_size,
@@ -86,13 +84,11 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
         random.choice(app.settings.mongo_dsn),  # nosec
     )
 
-    async with await amqp.create_connection(
-        random.choice(app.settings.amqp_dsn),  # nosec
-    ) as connection:
+    async with types.Connection(app.settings.amqp_dsn) as connection:
         booking_importer = importer.BookingImporter(
-            consumer=amqp.Consumer(
+            consumer_obj=consumer.Consumer(
                 connection=connection,
-                exchange=amqp.Exchange("orders"),
+                exchange=types.Exchange("orders"),
                 queue_name="{0}_orders".format(app.name),
                 routing_key="orders.result.offer",
             ),

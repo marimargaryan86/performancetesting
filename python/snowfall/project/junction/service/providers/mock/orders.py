@@ -1,17 +1,15 @@
 import copy
-import random
 from collections.abc import AsyncIterator
-from typing import Sequence
 
 import pydantic
 
 from snowfall.project.junction.service.orders.v1alpha import amqp_pb2, models_pb2
 from snowfall.stdlib import money, service
-from snowfall.stdlib.transport import amqp
+from snowfall.stdlib.transport.amqp import consumer, producer, types
 
 
 class OrdersSettings(service.Settings):
-    amqp_dsn: Sequence[pydantic.AnyUrl]
+    amqp_dsn: pydantic.AnyUrl
 
 
 class OrdersMockClient(object):
@@ -41,12 +39,12 @@ class OrdersMockClient(object):
 class OrdersConsumer(object):
     def __init__(
         self,
-        consumer: amqp.Consumer,
-        producer: amqp.Producer,
+        consumer_obj: consumer.Consumer,
+        producer_obj: producer.Producer,
         client: OrdersMockClient,
     ):
-        self._consumer = consumer
-        self._producer = producer
+        self._consumer = consumer_obj
+        self._producer = producer_obj
         self._client = client
 
     async def consume(self) -> None:
@@ -54,7 +52,7 @@ class OrdersConsumer(object):
 
     async def _process_message(
         self,
-        message: amqp.Message[amqp_pb2.PlaceOrderTask],
+        message: types.Message[amqp_pb2.PlaceOrderTask],
     ) -> None:
         async for order_result in self._client.book(message.body):
             await self._producer.publish(
@@ -66,21 +64,19 @@ class OrdersConsumer(object):
 
 
 async def orders(app: service.Application[OrdersSettings]) -> None:
-    async with await amqp.create_connection(
-        random.choice(app.settings.amqp_dsn),  # nosec
-    ) as connection:
-        consumer = OrdersConsumer(
-            consumer=amqp.Consumer(
+    async with types.Connection(app.settings.amqp_dsn) as connection:
+        consumer_obj = OrdersConsumer(
+            consumer_obj=consumer.Consumer(
                 connection=connection,
-                exchange=amqp.Exchange("orders"),
+                exchange=types.Exchange("orders"),
                 queue_name="{0}_orders".format(app.name),
                 routing_key="orders.offers",
             ),
-            producer=amqp.Producer(
+            producer_obj=producer.Producer(
                 connection=connection,
-                exchange=amqp.Exchange("orders"),
+                exchange=types.Exchange("orders"),
             ),
             client=OrdersMockClient(),
         )
 
-        await consumer.consume()
+        await consumer_obj.consume()

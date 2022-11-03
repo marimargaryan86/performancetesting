@@ -1,8 +1,6 @@
 import datetime
 import itertools
-import random
 from collections.abc import AsyncIterator
-from typing import Sequence
 
 import pydantic
 
@@ -10,11 +8,11 @@ from snowfall.project.junction.service.offers.v1alpha import amqp_pb2
 from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.stdlib import money, service, string
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.transport import amqp
+from snowfall.stdlib.transport.amqp import consumer, producer, types
 
 
 class OffersSettings(service.Settings):
-    amqp_dsn: Sequence[pydantic.AnyUrl]
+    amqp_dsn: pydantic.AnyUrl
 
 
 class OffersMockClient(object):
@@ -76,12 +74,12 @@ class OffersMockClient(object):
 class TripSearchConsumer(object):
     def __init__(
         self,
-        consumer: amqp.Consumer,
-        producer: amqp.Producer,
+        consumer_obj: consumer.Consumer,
+        producer_obj: producer.Producer,
         client: OffersMockClient,
     ):
-        self._consumer = consumer
-        self._producer = producer
+        self._consumer = consumer_obj
+        self._producer = producer_obj
         self._client = client
 
     async def consume(self) -> None:
@@ -89,7 +87,7 @@ class TripSearchConsumer(object):
 
     async def _process_message(
         self,
-        message: amqp.Message[amqp_pb2.TripOfferSearchTask],
+        message: types.Message[amqp_pb2.TripOfferSearchTask],
     ) -> None:
         async for offer_result in self._client.search(message.body):
             await self._producer.publish(
@@ -104,21 +102,19 @@ class TripSearchConsumer(object):
 
 
 async def offers(app: service.Application[OffersSettings]) -> None:
-    async with await amqp.create_connection(
-        random.choice(app.settings.amqp_dsn),  # nosec
-    ) as connection:
-        consumer = TripSearchConsumer(
-            consumer=amqp.Consumer(
+    async with types.Connection(app.settings.amqp_dsn) as connection:
+        consumer_obj = TripSearchConsumer(
+            consumer_obj=consumer.Consumer(
                 connection=connection,
-                exchange=amqp.Exchange("offers"),
+                exchange=types.Exchange("offers"),
                 queue_name="{0}_offers".format(app.name),
                 routing_key="offers.search.trip",
             ),
-            producer=amqp.Producer(
+            producer_obj=producer.Producer(
                 connection=connection,
-                exchange=amqp.Exchange("offers"),
+                exchange=types.Exchange("offers"),
             ),
             client=OffersMockClient(),
         )
 
-        await consumer.consume()
+        await consumer_obj.consume()

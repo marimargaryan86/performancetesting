@@ -1,10 +1,10 @@
 from snowfall.project.junction.service.orders.v1alpha import amqp_pb2, models_pb2
-from snowfall.stdlib.transport import amqp
+from snowfall.stdlib.transport.amqp import producer
 
 
 class OrderProducer(object):
-    def __init__(self, producer: amqp.Producer):
-        self._producer = producer
+    def __init__(self, producer_obj: producer.Producer):
+        self._producer = producer_obj
 
     async def publish(
         self,

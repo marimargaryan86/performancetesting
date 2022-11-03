@@ -6,7 +6,7 @@ from snowfall.project.junction.service.trips.v1alpha import (
     trips_pb2,
     trips_pb2_grpc,
 )
-from snowfall.stdlib.transport import amqp
+from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.transport.grpc import service
 
 
@@ -94,9 +94,9 @@ class TripSearchService(service.Service, trips_pb2_grpc.TripSearchServiceService
     def __init__(
         self,
         repository: trips.TripSearchRepository,
-        producer: amqp.Producer,
+        producer_obj: producer.Producer,
     ) -> None:
-        self._producer = producer
+        self._producer = producer_obj
         self._repository = repository
 
     def get_name(self) -> str:

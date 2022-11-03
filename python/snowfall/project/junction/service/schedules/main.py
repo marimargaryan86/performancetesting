@@ -14,7 +14,8 @@ from snowfall.project.junction.service.schedules import (
 )
 from snowfall.stdlib import service
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.transport import amqp
+from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
+from snowfall.stdlib.transport.amqp import types
 from snowfall.stdlib.transport.grpc import server
 
 
@@ -33,7 +34,7 @@ class _ExportSettings(service.Settings):
 
 
 class _ImportSettings(service.Settings):
-    amqp_dsn: tuple[AnyUrl]
+    amqp_dsn: AnyUrl
     mongo_dsn: tuple[AnyUrl]
 
 
@@ -58,16 +59,13 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
-    connection = await amqp.create_connection(
-        random.choice(app.settings.amqp_dsn),  # nosec
-    )
 
-    async with connection:
+    async with types.Connection(app.settings.amqp_dsn) as connection:
         import_consumer = consumer.ScheduleImportConsumer(
             schedules=schedules.ScheduleRepository(mongo.schedules.schedules),
-            consumer=amqp.Consumer(
+            consumer=amqp_consumer.Consumer(
                 connection=connection,
-                exchange=amqp.Exchange("schedules"),
+                exchange=types.Exchange("schedules"),
                 queue_name="{0}_schedules_importer".format(app.name),
                 routing_key="schedule.import",
             ),

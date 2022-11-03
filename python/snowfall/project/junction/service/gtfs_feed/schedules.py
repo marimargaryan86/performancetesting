@@ -12,7 +12,7 @@ from snowfall.project.junction.service.gtfs_feed import importer
 from snowfall.service.geodata.v1 import geocoding_pb2, geocoding_pb2_grpc
 from snowfall.stdlib import string
 from snowfall.stdlib.format.gtfs import constants, datetimes, enums, models
-from snowfall.stdlib.transport import amqp
+from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
 
 
@@ -271,10 +271,10 @@ async def produce_schedules(
     connection: abc.AbstractConnection,
     generator: SchedulesGenerator,
 ) -> None:
-    producer = amqp.Producer(
+    producer_obj = producer.Producer(
         connection=connection,
-        exchange=amqp.Exchange("schedules"),
+        exchange=types.Exchange("schedules"),
     )
 
     async for schedule in generator.generate():
-        await producer.publish(schedule, "schedule.import")
+        await producer_obj.publish(schedule, "schedule.import")

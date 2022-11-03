@@ -11,19 +11,19 @@ from snowfall.project.junction.service.planner.v1alpha import (
 from snowfall.project.junction.service.trips import trips
 from snowfall.project.junction.service.trips.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.transport import amqp
+from snowfall.stdlib.transport.amqp import consumer, types
 from snowfall.stdlib.v1alpha import latlng_pb2
 
 
 class TripSearchConsumer(object):
     def __init__(
         self,
-        consumer: amqp.Consumer,
+        consumer_obj: consumer.Consumer,
         planner: planner_pb2_grpc.PlannerServiceStub,
         trip_search_repository: trips.TripSearchRepository,
         trip_repository: trips.TripRepository,
     ):
-        self._consumer = consumer
+        self._consumer = consumer_obj
         self._logger = structlog.get_logger(__name__)
         self._planner = planner
         self._trip_search_repository = trip_search_repository
@@ -34,7 +34,7 @@ class TripSearchConsumer(object):
 
     async def _process_message(
         self,
-        message: amqp.Message[amqp_pb2.TripSearchTask],
+        message: types.Message[amqp_pb2.TripSearchTask],
     ) -> None:
         origins = {
             (origin.coordinates.latitude, origin.coordinates.longitude)

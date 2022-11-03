@@ -1,6 +1,7 @@
 from snowfall.project.junction.service.places.places import LocationRepository
 from snowfall.project.junction.service.places.v1alpha.models_pb2 import Location
-from snowfall.stdlib.transport.amqp import Consumer, Message
+from snowfall.stdlib.transport.amqp.consumer import Consumer
+from snowfall.stdlib.transport.amqp.types import Message
 
 
 class LocationImportConsumer(object):

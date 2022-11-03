@@ -15,12 +15,12 @@ from snowfall.project.junction.service.offers.grpc import (
 )
 from snowfall.stdlib import service
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.transport import amqp
+from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.grpc import server
 
 
 class _GrpcSettings(service.Settings):
-    amqp_dsn: Sequence[pydantic.AnyUrl]
+    amqp_dsn: pydantic.AnyUrl
     default_page_size: int = 100
     default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
@@ -29,7 +29,7 @@ class _GrpcSettings(service.Settings):
 
 
 class _ImportSettings(service.Settings):
-    amqp_dsn: Sequence[pydantic.AnyUrl]
+    amqp_dsn: pydantic.AnyUrl
     default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
     mongo_dsn: Sequence[pydantic.AnyUrl]
     redis_dsn: Sequence[pydantic.AnyUrl]
@@ -39,9 +39,7 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
-    async with await amqp.create_connection(
-        random.choice(app.settings.amqp_dsn),  # nosec
-    ) as connection:
+    async with types.Connection(app.settings.amqp_dsn) as connection:
         grpc_server = server.create_server(
             app.settings.grpc_address,
             app.settings.grpc_port,
@@ -52,9 +50,9 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
                         app.settings.default_ttl,
                     ),
                     publisher=OfferSearchProducer(
-                        producer=amqp.Producer(
+                        producer_obj=producer.Producer(
                             connection=connection,
-                            exchange=amqp.Exchange("offers"),
+                            exchange=types.Exchange("offers"),
                         ),
                     ),
                     default_page_size=app.settings.default_page_size,
@@ -89,17 +87,15 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
         random.choice(app.settings.mongo_dsn),  # nosec
     )
 
-    async with await amqp.create_connection(
-        random.choice(app.settings.amqp_dsn),  # nosec
-    ) as connection:
+    async with types.Connection(app.settings.amqp_dsn) as connection:
         async with aioredis.from_url(
             random.choice(app.settings.redis_dsn),  # nosec
             decode_responses=True,
         ).client() as redis_conn:
             offer_importer = importer.OfferImporter(
-                consumer=amqp.Consumer(
+                consumer_obj=consumer.Consumer(
                     connection=connection,
-                    exchange=amqp.Exchange("offers"),
+                    exchange=types.Exchange("offers"),
                     queue_name="{0}_offers".format(app.name),
                     routing_key="offers.result.trip",
                 ),
