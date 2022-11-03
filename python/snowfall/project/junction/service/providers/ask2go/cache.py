@@ -1,4 +1,3 @@
-import contextlib
 import datetime
 import types as std_types
 from typing import AsyncIterable, Type
@@ -28,7 +27,7 @@ class NoCacheExistsError(Exception):
     """Thrown when the cache for an offer search hasn't been created yet."""
 
 
-class OfferGroupCache(contextlib.AsyncContextDecorator):
+class OfferGroupCache(object):
     _blocking_timeout = datetime.timedelta(seconds=10)  # todo: tweak to what we want
     _lock_timeout = datetime.timedelta(minutes=5)  # todo: tweak to what we want
 

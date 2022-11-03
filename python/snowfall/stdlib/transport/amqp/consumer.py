@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import datetime
 import os
-from typing import Awaitable, Callable, TypeVar
+from typing import TypeVar
 
 import prometheus_client
 from aio_pika import abc
@@ -12,20 +12,14 @@ from sentry_sdk import Hub, tracing
 from structlog import get_logger
 
 from snowfall.stdlib.instrumentation import prometheus
-from snowfall.stdlib.transport.amqp import types
-from snowfall.stdlib.transport.amqp.producer import Producer
-from snowfall.stdlib.transport.amqp.trackable import manage_trackable
+from snowfall.stdlib.transport.amqp import protocol, types
 
 _SPAN_CONSUMER_OP = "amqp.message"
 _label_names = ("exchange", "queue", "routing_key")
 _Proto = TypeVar("_Proto", bound=message.Message)
-ConsumerCallback = Callable[
-    [types.Message[_Proto]],
-    Awaitable[None],
-]
 
 
-class Consumer(object):  # noqa: WPS214
+class Consumer(protocol.Consumer):  # noqa: WPS214
     _counter_messages = prometheus_client.Counter(
         "amqp_consumer_consumed_messages_total",
         "Total number of consumed messages.",
@@ -65,7 +59,7 @@ class Consumer(object):  # noqa: WPS214
         self._queue_name = queue_name
         self._routing_key = routing_key
 
-    async def consume(self, callback: ConsumerCallback[_Proto]) -> None:
+    async def consume(self, callback: protocol.ConsumerCallback[_Proto]) -> None:
         async with self._connection.channel() as channel:
             await channel.set_qos(
                 prefetch_count=((os.cpu_count() or 1) * 2) + 1,
@@ -88,7 +82,7 @@ class Consumer(object):  # noqa: WPS214
     async def _consume(
         self,
         queue: abc.AbstractQueue,
-        callback: ConsumerCallback[_Proto],
+        callback: protocol.ConsumerCallback[_Proto],
     ) -> None:
         async def wrapper(incoming: abc.AbstractIncomingMessage) -> None:
             try:
@@ -102,7 +96,7 @@ class Consumer(object):  # noqa: WPS214
     async def _process(
         self,
         incoming: abc.AbstractIncomingMessage,
-        callback: ConsumerCallback[_Proto],
+        callback: protocol.ConsumerCallback[_Proto],
     ) -> None:
         msg = types.Message[_Proto](incoming)
 
@@ -110,23 +104,19 @@ class Consumer(object):  # noqa: WPS214
             self._track_wait_time(msg.enqueued_at)
 
         with self._with_transaction(msg) as span:
-            async with manage_trackable(
-                msg=msg,
-                producer_obj=Producer(self._connection, self._exchange),
-            ):
-                span.set_status("ok")
-                start_time = datetime.datetime.now(tz=datetime.timezone.utc)
+            span.set_status("ok")
+            start_time = datetime.datetime.now(tz=datetime.timezone.utc)
 
-                try:
-                    await callback(msg)
-                except Exception:  # noqa: PIE786
-                    self._logger.exception("An error occurred in consumer callback")
-                    span.set_status("nok")
-                    await msg.nack()
-                else:
-                    await msg.ack()
-                finally:
-                    self._finalize_message(msg, start_time)
+            try:
+                await callback(msg)
+            except Exception:  # noqa: PIE786
+                self._logger.exception("An error occurred in consumer callback")
+                span.set_status("nok")
+                await msg.nack()
+            else:
+                await msg.ack()
+            finally:
+                self._finalize_message(msg, start_time)
 
     def _with_transaction(self, msg: types.Message[_Proto]) -> tracing.Transaction:
         transaction = tracing.Transaction.continue_from_headers(

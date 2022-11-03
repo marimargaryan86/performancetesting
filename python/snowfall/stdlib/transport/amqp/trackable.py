@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import contextlib
-import dataclasses
+import functools
 from typing import AsyncGenerator, Mapping, Type, TypeVar, Union
 
 from google.protobuf import message
 
 from snowfall.stdlib import string
-from snowfall.stdlib.transport.amqp import producer, types
+from snowfall.stdlib.transport.amqp import protocol, types
 from snowfall.stdlib.v1alpha import amqp_pb2
 
 TrackableUpdateMessageType = Union[
@@ -20,27 +20,21 @@ _Proto = TypeVar("_Proto", bound=message.Message)
 _TRACKABLE_HEADERS = ("x-trackable-id", "x-trackable-routing-key")
 
 
-@dataclasses.dataclass(frozen=True)
-class TrackableMetadata(object):
-    routing_key: str
-    trackable_id: str | None = None
-
-
 def _is_trackable(msg: types.Message[_Proto]) -> bool:
     return all(header in msg.headers for header in _TRACKABLE_HEADERS)
 
 
-class _TrackableManager(object):
-    def __init__(self, producer_obj: producer.Producer) -> None:
-        self._producer = producer_obj
+class StatusReporter(object):
+    def __init__(self, producer: protocol.Producer) -> None:
+        self._producer = producer
 
-    async def message_received(self, msg: types.Message[_Proto]) -> None:
+    async def receive(self, msg: types.Message[_Proto]) -> None:
         await self._report(msg, amqp_pb2.TrackableReceived)
 
-    async def message_acked(self, msg: types.Message[_Proto]) -> None:
+    async def ack(self, msg: types.Message[_Proto]) -> None:
         await self._report(msg, amqp_pb2.TrackableAcked)
 
-    async def message_nacked(self, msg: types.Message[_Proto]) -> None:
+    async def nack(self, msg: types.Message[_Proto]) -> None:
         await self._report(msg, amqp_pb2.TrackableNacked)
 
     async def _report(
@@ -60,38 +54,63 @@ class _TrackableManager(object):
 
 
 @contextlib.asynccontextmanager
-async def manage_trackable(
+async def report_status(
+    status_reporter: StatusReporter,
     msg: types.Message[_Proto],
-    producer_obj: producer.Producer,
 ) -> AsyncGenerator[None, None]:
-    trackable_manager = _TrackableManager(producer_obj)
-
-    await trackable_manager.message_received(msg)
+    await status_reporter.receive(msg)
 
     try:
         yield
     finally:
         if msg.acknowledged:
-            await trackable_manager.message_acked(msg)
+            await status_reporter.ack(msg)
         else:
-            await trackable_manager.message_nacked(msg)
+            await status_reporter.nack(msg)
 
 
-async def publish_trackable(
-    msg: _Proto,
-    routing_key: str,
-    trackable_metadata: TrackableMetadata,
-    headers: Mapping[str, str] | None = None,
-) -> dict[str, dict[str, str] | str | _Proto]:
-    trackable_id = trackable_metadata.trackable_id or string.uuid()
-    headers = headers or {}
+class Consumer(protocol.Consumer):
+    def __init__(
+        self,
+        consumer: protocol.Consumer,
+        producer: protocol.Producer,
+    ) -> None:
+        self._consumer = consumer
+        self._status_reporter = StatusReporter(producer)
 
-    return {
-        "msg": msg,
-        "routing_key": routing_key,
-        "headers": {
-            **headers,
-            "x-trackable-id": trackable_id,
-            "x-trackable-routing-key": trackable_metadata.routing_key,
-        },
-    }
+    async def consume(self, callback: protocol.ConsumerCallback[_Proto]) -> None:
+        @functools.wraps(callback)
+        async def wrapper(msg: types.Message[_Proto]) -> None:
+            async with report_status(self._status_reporter, msg):
+                return await callback(msg)
+
+        return await self._consumer.consume(wrapper)
+
+
+class Producer(protocol.Producer):
+    def __init__(self, producer: protocol.Producer) -> None:
+        self._producer = producer
+
+    async def publish(  # noqa: WPS211
+        self,
+        msg: message.Message,
+        routing_key: str,
+        headers: Mapping[str, str] | None = None,
+        trackable_id: str | None = None,
+        trackable_routing_key: str | None = None,
+    ) -> None:
+        headers = headers or {}
+        trackable_id = trackable_id or string.uuid()
+        trackable_routing_key = trackable_routing_key or "trackable.{0}".format(
+            routing_key,
+        )
+
+        return await self._producer.publish(
+            msg=msg,
+            routing_key=routing_key,
+            headers={
+                **headers,
+                "x-trackable-id": trackable_id,
+                "x-trackable-routing-key": trackable_routing_key,
+            },
+        )

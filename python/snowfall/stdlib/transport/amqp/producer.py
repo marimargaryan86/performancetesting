@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Mapping, Optional
+from typing import Mapping
 
 import prometheus_client
 from aio_pika import Message as PikaMessage
@@ -11,12 +11,12 @@ from structlog import get_logger
 
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.instrumentation.sentry import get_span
-from snowfall.stdlib.transport.amqp import types
+from snowfall.stdlib.transport.amqp import protocol, types
 
 _SPAN_PRODUCER_OP = "amqp.produce"
 
 
-class Producer(object):
+class Producer(protocol.Producer):
     _counter_messages = prometheus_client.Counter(
         "amqp_producer_produced_messages_total",
         "Total number of produced messages.",
@@ -36,7 +36,7 @@ class Producer(object):
         self,
         msg: message.Message,
         routing_key: str,
-        headers: Optional[Mapping[str, str]] = None,
+        headers: Mapping[str, str] | None = None,
     ) -> None:
         with get_span(
             _SPAN_PRODUCER_OP,
