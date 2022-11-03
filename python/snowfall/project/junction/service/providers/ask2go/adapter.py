@@ -58,7 +58,7 @@ class Ask2GoAdapter(object):  # noqa: WPS214
         ask2go_client: client.Ask2GoClient,
         offer_validator: validator.OfferValidator,
         poll_retries_limit: int = 10,
-        wait_time_between_polling: float = 1,
+        wait_time_between_polling: float = 2,
     ):
         self._client = ask2go_client
         self._poll_retries_limit = poll_retries_limit
@@ -189,22 +189,25 @@ class Ask2GoAdapter(object):  # noqa: WPS214
         async_offer: price.AsyncOfferPriceResponse,
     ) -> price.OfferPriceResponse:
         for _ in range(self._poll_retries_limit):
+            await asyncio.sleep(self._wait_time_between_polling)
+
             price_result = await self._client.get_air_offer_result(
                 transaction_id=async_offer.transaction_id,
                 pricing_id=async_offer.id,
             )
 
+            if not price_result:
+                continue
+
             if price_result.information.status in _SUCCESSFUL_PRICE_STATUSES:
                 return price_result
 
-            if await self._failed_pricing(price_result):
+            if self._failed_pricing(price_result):
                 break
-
-            await asyncio.sleep(self._wait_time_between_polling)
 
         raise NoPricingError("Pricing did not succeed.")
 
-    async def _failed_pricing(self, price_result: price.OfferPriceResponse) -> bool:
+    def _failed_pricing(self, price_result: price.OfferPriceResponse) -> bool:
         return (
             price_result.information.status in _FAILED_PRICE_STATUSES
             or not price_result.itinerary.pricing_information.base.total_cost
@@ -316,6 +319,8 @@ class Ask2GoAdapter(object):  # noqa: WPS214
         page: int,
     ) -> search.SearchResultsResponse:
         for _ in range(self._poll_retries_limit):
+            await asyncio.sleep(self._wait_time_between_polling)
+
             search_result = await self._client.get_search_results(
                 search_id=identifiers.id,
                 transaction_id=identifiers.transaction_id,
@@ -324,7 +329,5 @@ class Ask2GoAdapter(object):  # noqa: WPS214
 
             if search_result.is_finished:
                 return search_result
-
-            await asyncio.sleep(self._wait_time_between_polling)
 
         raise NoResultsError("No results found.")

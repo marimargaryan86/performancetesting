@@ -204,7 +204,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         self,
         transaction_id: str,
         pricing_id: str,
-    ) -> price.OfferPriceResponse:
+    ) -> price.OfferPriceResponse | None:
         response = await self._make_request(
             "GET",
             self._api_base_url.copy_with(
@@ -215,7 +215,12 @@ class Ask2GoClient(object):  # noqa: WPS214
             ),
         )
 
-        return price.OfferPriceResponse(**response.json())
+        json_data = response.json()
+
+        if not json_data["hasFinished"]:
+            return None
+
+        return price.OfferPriceResponse(**json_data)
 
     async def validate_offer(
         self,
