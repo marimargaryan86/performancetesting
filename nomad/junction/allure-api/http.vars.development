@@ -1,0 +1,2 @@
+traefik_host_URL ="allureapi.junction.dev"
+traefik_entrypoints="websecure"
