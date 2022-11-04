@@ -4638,7 +4638,9 @@
                         "passport-number"
                       ]
                     },
-                    "example": ["passport-number"]
+                    "example": [
+                      "passport-number"
+                    ]
                   }
                 }
               },
@@ -5182,11 +5184,11 @@
         "properties": {
           "vendor": {
             "type": "string",
-            "example": "BA"
+            "example": "123"
           },
           "operator": {
             "type": "string",
-            "example": "BA",
+            "example": "123",
             "nullable": true
           }
         },
