@@ -3628,7 +3628,24 @@
                 "example": "offer-groups"
               },
               "attributes": {
-                "type": "object"
+                "type": "object",
+                "properties": {
+                  "required": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "passport-number",
+                      "enum": [
+                        "date-of-birth",
+                        "nationality",
+                        "expiration-date",
+                        "issuing-country",
+                        "passport-number"
+                      ]
+                    },
+                    "example": ["passport-number"]
+                  }
+                }
               },
               "relationships": {
                 "type": "object",
