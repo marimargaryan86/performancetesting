@@ -374,6 +374,53 @@
         "security": []
       }
     },
+    "/orders/{orderId}/messages": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/orderId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "orders"
+        ],
+        "description": "Used to forward the booking summary of the given order.",
+        "summary": "Add Forward Order",
+        "operationId": "post-orders-id-messages",
+        "responses": {
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/OrderMessage"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
     "/orders/{orderId}": {
       "parameters": [
         {
@@ -4284,6 +4331,42 @@
         },
         "required": [
           "id",
+          "type",
+          "attributes"
+        ]
+      },
+      "OrderMessage": {
+        "title": "Order Message",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "email-messages"
+            ],
+            "example": "email-messages"
+          },
+          "attributes": {
+            "type": "object",
+            "required": [
+              "email"
+            ],
+            "properties": {
+              "email": {
+                "type": "string",
+                "format": "email",
+                "example": "user@example.com"
+              }
+            }
+          }
+        },
+        "required": [
           "type",
           "attributes"
         ]

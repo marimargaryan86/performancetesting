@@ -19,6 +19,32 @@ from snowfall.vendor.junction import models as vendor_models
 _ID = "_id"
 
 
+class MessageOrder(endpoints.HTTPEndpoint):
+    async def post(
+        self,
+        request: requests.Request,
+        orders_repository: repository.OrdersRepository = lagom.injectable,
+        junction_client: client.JunctionClient = lagom.injectable,
+        smtp_client: smtp.EmailClient = lagom.injectable,
+    ) -> responses.Response:
+        body = await request_helpers.flatten_request(request)
+        mobile_order = await orders_repository.find_by_id(
+            request.path_params["orderId"],
+        )
+        if not mobile_order or mobile_order.user_id != request.user.username:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        order_response = await junction_client.get_order_by_id(
+            identifier=mobile_order.id,
+            include=["journey", "bookings.details"],
+        )
+        await orders.email_booking_details(
+            order_response,
+            smtp_client,
+            body["email"],
+        )
+        return responses.Response(status_code=status.HTTP_202_ACCEPTED)
+
+
 class Order(endpoints.HTTPEndpoint):
     async def get(
         self,

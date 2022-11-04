@@ -23,6 +23,11 @@ def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Rou
             orders.Order,
             name="ViewOrder",
         ),
+        dependencies.route(
+            "/orders/{orderId}/messages",
+            orders.MessageOrder,
+            name="MessageOrder",
+        ),
         dependencies.route("/offers/searches", offers.OfferSearches),
         dependencies.route(
             "/offers/searches/{offerSearchId}/offers",

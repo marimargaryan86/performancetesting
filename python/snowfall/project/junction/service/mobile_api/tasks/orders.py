@@ -69,6 +69,8 @@ async def poll_order_status(
 async def send_booking_confirmation(
     order: Mapping[str, Any],
     smtp_client: smtp.EmailClient,
+    forward_to_support: bool = True,
+    forward_email: str = "",
 ) -> None:
     details: Sequence[Mapping[str, Any]] = [
         detail for booking in order["bookings"] for detail in booking["details"]
@@ -89,20 +91,35 @@ async def send_booking_confirmation(
         passengers=order["passengers"],
     )
     await smtp_client.send_email_html_template(
-        order["journey"]["contactDetails"]["email"],
+        forward_email or order["journey"]["contactDetails"]["email"],
         "{company_name}. Itinerary details for Booking {reference}".format(
             company_name=smtp_client.client_name,
             reference=order["journey"]["reference"],
         ),
         body,
     )
-    await smtp_client.send_email_html_template(
-        smtp_client.support_email,
-        "{company_name}. Itinerary details for Booking {reference}".format(
-            company_name=smtp_client.client_name,
-            reference=order["journey"]["reference"],
-        ),
-        body,
+    if forward_to_support:
+        await smtp_client.send_email_html_template(
+            smtp_client.support_email,
+            "{company_name}. Itinerary details for Booking {reference}".format(
+                company_name=smtp_client.client_name,
+                reference=order["journey"]["reference"],
+            ),
+            body,
+        )
+
+
+async def email_booking_details(
+    order: Mapping[str, Any],
+    smtp_client: smtp.EmailClient,
+    forward_email: str,
+) -> None:
+    order = json_api_doc.deserialize(order)
+    await send_booking_confirmation(
+        order,
+        smtp_client,
+        forward_to_support=False,
+        forward_email=forward_email,
     )
 
 
