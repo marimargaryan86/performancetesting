@@ -48,7 +48,7 @@ job "res-se-mobile-api-http" {
   }
 
   group "http" {
-    count = 1
+    count = 3
 
     restart {
       attempts = 3
