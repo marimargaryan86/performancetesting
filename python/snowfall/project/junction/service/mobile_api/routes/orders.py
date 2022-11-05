@@ -190,6 +190,7 @@ class Orders(endpoints.HTTPEndpoint):
         stripe.PaymentIntent.modify(
             payment,
             metadata={"order_id": mobile_order.id},
+            receipt_email=body["contactDetails"]["email"],
         )
 
         await orders_repository.insert(mobile_order)
