@@ -3784,6 +3784,28 @@
           "timeZone"
         ]
       },
+      "ApplicableTo": {
+        "title": "Applicable To",
+        "type": "object",
+        "properties": {
+          "dateOfBirthAfter": {
+            "nullable": true,
+            "type": "string",
+            "format": "date",
+            "example": "1980-02-03"
+          },
+          "dateOfBirthBefore": {
+            "nullable": true,
+            "type": "string",
+            "format": "date",
+            "example": "1980-02-03"
+          }
+        },
+        "required": [
+          "dateOfBirthAfter",
+          "dateOfBirthBefore"
+        ]
+      },
       "OfferOption": {
         "title": "OfferOption",
         "description": "Offer Option for one or more segments. Used for creating an Order.",
@@ -3807,7 +3829,9 @@
               "attributes": {
                 "type": "object",
                 "required": [
-                  "price"
+                  "price",
+                  "brandName",
+                  "penalties"
                 ],
                 "properties": {
                   "price": {
@@ -3816,6 +3840,13 @@
                   "brandName": {
                     "type": "string",
                     "example": "economy"
+                  },
+                  "penalties": {
+                    "type": "array",
+                    "minItems": 0,
+                    "items": {
+                      "$ref": "#/components/schemas/TripOfferOptionPenalty"
+                    }
                   }
                 }
               },
@@ -3882,7 +3913,9 @@
                 "type": "object",
                 "required": [
                   "cabinClassName",
-                  "rules"
+                  "rules",
+                  "baggageAllowances",
+                  "amenities"
                 ],
                 "properties": {
                   "cabinClassName": {
@@ -3895,6 +3928,16 @@
                     "items": {
                       "$ref": "#/components/schemas/OfferSegmentDetailRule"
                     }
+                  },
+                  "baggageAllowances": {
+                    "type": "array",
+                    "minItems": 0,
+                    "items": {
+                      "$ref": "#/components/schemas/TripOfferOptionPenaltyBaggageAllowance"
+                    }
+                  },
+                  "amenities": {
+                    "$ref": "#/components/schemas/OfferSegmentDetailAmenities"
                   }
                 }
               },
@@ -3942,6 +3985,74 @@
           }
         ]
       },
+      "TripOfferOptionPenalty": {
+        "title": "Trip Offer Option Penalty",
+        "type": "object",
+        "properties": {
+          "applicableTo": {
+            "$ref": "#/components/schemas/ApplicableTo"
+          },
+          "penaltyType": {
+            "type": "string",
+            "example": "exchange",
+            "enum": [
+              "exchange",
+              "refund"
+            ]
+          },
+          "changeable": {
+            "type": "boolean",
+            "example": true
+          },
+          "refundable": {
+            "type": "boolean",
+            "example": false
+          },
+          "applicability": {
+            "type": "string",
+            "example": "before",
+            "enum": [
+              "before",
+              "after"
+            ]
+          },
+          "price": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Price"
+              },
+              {
+                "nullable": true
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "applicableTo",
+          "penaltyType",
+          "refundable",
+          "applicability",
+          "price"
+        ]
+      },
+      "TripOfferOptionPenaltyBaggageAllowance": {
+        "title": "Trip Offer Option Penalty Baggage Allowance",
+        "type": "object",
+        "properties": {
+          "isIncluded": {
+            "type": "boolean",
+            "example": true
+          },
+          "applicableTo": {
+            "$ref": "#/components/schemas/ApplicableTo"
+          }
+        },
+        "required": [
+          "isIncluded",
+          "applicableTo"
+        ]
+      },
       "OfferSegmentDetailRule": {
         "title": "Offer Segment Detail Rule",
         "type": "object",
@@ -3958,6 +4069,53 @@
         "required": [
           "title",
           "body"
+        ]
+      },
+      "OfferSegmentDetailAmenities": {
+        "title": "Offer Segment Detail Amenities",
+        "type": "object",
+        "properties": {
+          "beverage": {
+            "$ref": "#/components/schemas/OfferSegmentDetailAmenity"
+          },
+          "entertainment": {
+            "$ref": "#/components/schemas/OfferSegmentDetailAmenity"
+          },
+          "food": {
+            "$ref": "#/components/schemas/OfferSegmentDetailAmenity"
+          },
+          "power": {
+            "$ref": "#/components/schemas/OfferSegmentDetailAmenity"
+          },
+          "wifi": {
+            "$ref": "#/components/schemas/OfferSegmentDetailAmenity"
+          }
+        },
+        "required": [
+          "beverage",
+          "entertainment",
+          "food",
+          "power",
+          "wifi"
+        ]
+      },
+      "OfferSegmentDetailAmenity": {
+        "title": "Offer Segment Detail Amenity",
+        "type": "object",
+        "properties": {
+          "availability": {
+            "type": "string",
+            "enum": [
+              "unspecified",
+              "unavailable",
+              "available",
+              "included"
+            ],
+            "example": "included"
+          }
+        },
+        "required": [
+          "availability"
         ]
       },
       "Preference": {

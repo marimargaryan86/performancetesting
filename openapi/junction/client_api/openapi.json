@@ -4744,7 +4744,8 @@
                 "type": "object",
                 "required": [
                   "price",
-                  "brandName"
+                  "brandName",
+                  "penalties"
                 ],
                 "properties": {
                   "price": {
@@ -4757,6 +4758,7 @@
                   },
                   "penalties": {
                     "type": "array",
+                    "minItems": 0,
                     "items": {
                       "$ref": "#/components/schemas/TripOfferOptionPenalty"
                     }
@@ -4947,7 +4949,7 @@
         "type": "object",
         "properties": {
           "applicableTo": {
-            "$ref": "#/components/schemas/TripOfferOptionPenaltyApplicableTo"
+            "$ref": "#/components/schemas/ApplicableTo"
           },
           "penaltyType": {
             "type": "string",
@@ -4993,8 +4995,8 @@
           "price"
         ]
       },
-      "TripOfferOptionPenaltyApplicableTo": {
-        "title": "Trip Offer Option Penalty Applicable To",
+      "ApplicableTo": {
+        "title": "Applicable To",
         "type": "object",
         "properties": {
           "dateOfBirthAfter": {
@@ -5024,7 +5026,7 @@
             "example": true
           },
           "applicableTo": {
-            "$ref": "#/components/schemas/TripOfferOptionPenaltyApplicableTo"
+            "$ref": "#/components/schemas/ApplicableTo"
           }
         },
         "required": [
