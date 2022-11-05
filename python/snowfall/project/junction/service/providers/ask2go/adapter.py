@@ -154,7 +154,7 @@ class Ask2GoAdapter(object):  # noqa: WPS214
                         brand_id=fare.brand_id,
                     )
         else:
-            mapped_brand_price["BASIC FARE"] = await self._get_async_price(
+            mapped_brand_price["LOWEST FARE AVAILABLE"] = await self._get_async_price(
                 search_id=validate_identifiers.identifier,
                 transaction_id=identifiers.transaction_id,
                 offer_id=offer.id,
