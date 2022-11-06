@@ -1,5 +1,6 @@
 import structlog
 
+from snowfall.project.junction.provider import status
 from snowfall.project.junction.service.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
 from snowfall.project.junction.service.orders.v1alpha import amqp_pb2 as orders_amqp_pb2
 from snowfall.project.junction.service.providers.ask2go import (
@@ -13,10 +14,12 @@ from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types
-from snowfall.stdlib.transport.amqp import consumer, producer
+from snowfall.stdlib.transport.amqp import consumer, producer, trackable
 from snowfall.stdlib.transport.amqp import types as amqp_types
+from snowfall.stdlib.v1alpha import amqp_pb2 as trackable_pb2
 
 _PROVIDER_NAME = "Ask2Go"
+TripSearchMessages = offers_amqp_pb2.TripOfferSearchTask | trackable_pb2.Trackable
 
 
 class OrderConsumer(object):
@@ -63,29 +66,52 @@ class OrderConsumer(object):
 class TripSearchConsumer(object):
     def __init__(
         self,
-        consumer_obj: consumer.Consumer[offers_amqp_pb2.TripOfferSearchTask],
-        producer_obj: producer.Producer,
+        consumer_obj: consumer.Consumer[TripSearchMessages],
+        producer_obj: trackable.TrackableProducer,
         generator: criteria.CriteriaGenerator,
+        status_handler: status.SubtaskStatusHandler,
     ):
         self._consumer = consumer_obj
         self._producer = producer_obj
         self._generator = generator
+        self._status_handler = status_handler
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
 
     async def _process_message(
         self,
-        amqp_message: amqp_types.Message[offers_amqp_pb2.TripOfferSearchTask],
+        amqp_message: amqp_types.Message[TripSearchMessages],
     ) -> None:
-        for task in self._generator.from_search_task(amqp_message.body):
-            await self._producer.publish(task, routing_key="offers.search.trip")
+        match amqp_message.body:
+            case offers_amqp_pb2.TripOfferSearchTask():
+                await self._process_trip_offer_search_task(amqp_message.body)
+            case trackable_pb2.Trackable():
+                await self._status_handler.on_message(amqp_message.body)
+
+    async def _process_trip_offer_search_task(
+        self,
+        body: offers_amqp_pb2.TripOfferSearchTask,
+    ) -> None:
+        tasks = list(self._generator.from_search_task(body))
+
+        await self._status_handler.set_expected_size(
+            body.offer_search_id,
+            len(tasks),
+        )
+
+        for task in tasks:
+            await self._producer.publish(
+                task,
+                routing_key="offers.search.trip",
+                trackable_id=body.offer_search_id,
+            )
 
 
 class SearchCriteriaConsumer(object):
     def __init__(  # noqa: WPS211
         self,
-        consumer_obj: consumer.Consumer[amqp_pb2.SearchCriteriaTask],
+        consumer_obj: trackable.ReportingConsumer[amqp_pb2.SearchCriteriaTask],
         producer_obj: producer.Producer,
         ask2go_adapter: adapter.Ask2GoAdapter,
         offer_transformer: transformer.OfferTransformer,

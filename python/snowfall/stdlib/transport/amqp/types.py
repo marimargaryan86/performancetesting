@@ -44,10 +44,11 @@ class MessageStatus(enum.IntEnum):
     unprocessed = 0
     acked = 1
     nacked = 2
+    requeued = 3
 
 
 @dataclasses.dataclass(init=False)  # noqa: SF10
-class Message(Generic[_Proto]):
+class Message(Generic[_Proto]):  # noqa: WPS214
     body: _Proto
     headers: Mapping[str, Any]
     status: MessageStatus
@@ -82,6 +83,10 @@ class Message(Generic[_Proto]):
     def acknowledged(self) -> bool:
         return self._status == MessageStatus.acked
 
+    @property
+    def requeued(self) -> bool:
+        return self._status == MessageStatus.requeued
+
     async def nack(self, requeue: bool = False) -> None:
         if self.processed:
             return
@@ -89,7 +94,7 @@ class Message(Generic[_Proto]):
         # todo: make sure we don't requeue forever?
 
         await self._message.nack(requeue=requeue)
-        self._status = MessageStatus.nacked
+        self._status = MessageStatus.requeued if requeue else MessageStatus.nacked
 
     @property
     def routing_key(self) -> str:

@@ -3,8 +3,9 @@ from __future__ import annotations
 import abc
 import asyncio
 import contextlib
+import datetime
 import functools
-from typing import AsyncGenerator, Mapping, TypeVar
+from typing import Any, AsyncGenerator, Mapping, TypeVar
 
 from google.protobuf import message
 
@@ -16,7 +17,9 @@ from snowfall.stdlib.v1alpha import amqp_pb2
 
 _Proto = TypeVar("_Proto", bound=message.Message)
 _Record = TypeVar("_Record", covariant=True)
-_TRACKABLE_HEADERS = ("x-trackable-id", "x-trackable-routing-key")
+TRACKABLE_ID = "x-trackable-id"
+TRACKABLE_ROUTING_KEY = "x-trackable-routing-key"
+_TRACKABLE_HEADERS = (TRACKABLE_ID, TRACKABLE_ROUTING_KEY)
 _skippable_statuses = (
     amqp_pb2.Trackable.STATUS_FAILED,
     amqp_pb2.Trackable.STATUS_COMPLETED,
@@ -24,8 +27,8 @@ _skippable_statuses = (
 )
 
 
-def _is_trackable(msg: types.Message[_Proto]) -> bool:
-    return all(header in msg.headers for header in _TRACKABLE_HEADERS)
+def _is_trackable(headers: Mapping[str, Any]) -> bool:
+    return all(header in headers for header in _TRACKABLE_HEADERS)
 
 
 def to_tracking_key(routing_key: str) -> str:
@@ -66,14 +69,11 @@ async def _get_status_stats(
 
 
 class _AbstractStatusHandler(abc.ABC):
-    def __init__(
-        self,
-        redis: redis_types.Client[str],
-    ) -> None:
+    def __init__(self, redis: redis_types.Client[str]) -> None:
         self._redis = redis
 
     async def on_message(self, msg: amqp_pb2.Trackable) -> None:
-        status = await self._get_by_id(msg.id)
+        status, expiry_at = await self._get_status_and_expiry_by_id(msg.id)
 
         if status in _skippable_statuses:
             return
@@ -89,7 +89,14 @@ class _AbstractStatusHandler(abc.ABC):
             ),
         )
 
-        await self._determine_status(msg, status, status_hash)
+        await asyncio.gather(
+            self._determine_status(msg, status, status_hash),
+            redis_types.put_expires_at_if_less_than_current(
+                self._redis,
+                status_hash,
+                expiry_at,
+            ),
+        )
 
     @abc.abstractmethod
     async def _determine_status(
@@ -104,13 +111,13 @@ class _AbstractStatusHandler(abc.ABC):
         """
 
     @abc.abstractmethod
-    async def _get_by_id(
+    async def _get_status_and_expiry_by_id(
         self,
         trackable_id: str,
-    ) -> amqp_pb2.Trackable.Status.ValueType:
-        """Get the current status by its trackable ID.
+    ) -> tuple[amqp_pb2.Trackable.Status.ValueType, datetime.datetime]:
+        """Get the current status and expiry date by its trackable ID.
 
-        Should return `STATUS_UNSPECIFIED` if unknown.
+        Should return `STATUS_UNSPECIFIED` and `datetime.now()` if unknown.
         """
 
     @abc.abstractmethod
@@ -152,7 +159,7 @@ class FixedSizeStatusHandler(_AbstractStatusHandler):
         elif acked >= expected:
             await self._on_completed(msg)
         elif current_status == amqp_pb2.Trackable.STATUS_PENDING:
-            await self._on_failed(msg)
+            await self._on_processing(msg)
 
 
 class AnySizeStatusHandler(_AbstractStatusHandler):
@@ -176,37 +183,37 @@ class StatusReporter(object):
     def __init__(self, producer: protocol.Producer) -> None:
         self._producer = producer
 
-    async def receive(self, msg: types.Message[_Proto]) -> None:
+    async def receive(self, headers: Mapping[str, Any]) -> None:
         await self._report(
-            msg,
+            headers,
             amqp_pb2.Trackable(event=amqp_pb2.Trackable.EVENT_RECEIVED),
         )
 
-    async def ack(self, msg: types.Message[_Proto]) -> None:
+    async def ack(self, headers: Mapping[str, Any]) -> None:
         await self._report(
-            msg,
+            headers,
             amqp_pb2.Trackable(event=amqp_pb2.Trackable.EVENT_ACKED),
         )
 
-    async def nack(self, msg: types.Message[_Proto]) -> None:
+    async def nack(self, headers: Mapping[str, Any]) -> None:
         await self._report(
-            msg,
+            headers,
             amqp_pb2.Trackable(event=amqp_pb2.Trackable.EVENT_NACKED),
         )
 
     async def _report(
         self,
-        msg: types.Message[_Proto],
+        headers: Mapping[str, Any],
         trackable: amqp_pb2.Trackable,
     ) -> None:
-        if not _is_trackable(msg):
+        if not _is_trackable(headers):
             return
 
-        trackable.id = msg.headers["x-trackable-id"]
+        trackable.id = headers[TRACKABLE_ID]
 
         await self._producer.publish(
             msg=trackable,
-            routing_key=msg.headers["x-trackable-routing-key"],
+            routing_key=headers[TRACKABLE_ROUTING_KEY],
         )
 
 
@@ -215,15 +222,15 @@ async def report_status(
     status_reporter: StatusReporter,
     msg: types.Message[_Proto],
 ) -> AsyncGenerator[None, None]:
-    await status_reporter.receive(msg)
+    await status_reporter.receive(msg.headers)
 
     try:
         yield
     finally:
         if msg.acknowledged:
-            await status_reporter.ack(msg)
-        else:
-            await status_reporter.nack(msg)
+            await status_reporter.ack(msg.headers)
+        elif not msg.requeued:
+            await status_reporter.nack(msg.headers)
 
 
 class ReportingConsumer(protocol.Consumer[_Proto]):
@@ -265,7 +272,7 @@ class TrackableProducer(protocol.Producer):
             routing_key=routing_key,
             headers={
                 **headers,
-                "x-trackable-id": trackable_id,
-                "x-trackable-routing-key": trackable_routing_key,
+                TRACKABLE_ID: trackable_id,
+                TRACKABLE_ROUTING_KEY: trackable_routing_key,
             },
         )

@@ -1,10 +1,12 @@
 import contextlib
+import datetime
 from typing import Union
 
 from pymongo import errors
 
 from snowfall.project.junction.service.offers import aggregator, offers
 from snowfall.project.junction.service.offers.v1alpha import amqp_pb2
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.redis import types
 from snowfall.stdlib.transport.amqp import consumer, trackable
 from snowfall.stdlib.transport.amqp import types as amqp_types
@@ -26,13 +28,18 @@ class StatusHandler(trackable.AnySizeStatusHandler):
 
         self._repository = repository
 
-    async def _get_by_id(
+    async def _get_status_and_expiry_by_id(
         self,
         trackable_id: str,
-    ) -> trackable_pb2.Trackable.Status.ValueType:
+    ) -> tuple[trackable_pb2.Trackable.Status.ValueType, datetime.datetime]:
         record = await self._repository.find_by_id(trackable_id)
 
-        return record.status if record else trackable_pb2.Trackable.STATUS_UNSPECIFIED
+        return (
+            record.status if record else trackable_pb2.Trackable.STATUS_UNSPECIFIED,
+            protobuf.protobuf_to_datetime(record.expires_at)
+            if record
+            else datetime.datetime.now(tz=datetime.timezone.utc),
+        )
 
     async def _on_completed(
         self,

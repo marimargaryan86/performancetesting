@@ -10,6 +10,7 @@ import aioredis
 import httpx
 import pydantic
 
+from snowfall.project.junction.provider import status
 from snowfall.project.junction.service.providers.save_a_train import (
     adapter,
     cache,
@@ -21,7 +22,7 @@ from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import h3, service
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
-from snowfall.stdlib.transport.amqp import producer, types
+from snowfall.stdlib.transport.amqp import producer, trackable, types
 from snowfall.stdlib.transport.grpc import client as grpc_client
 from snowfall.vendor.save_a_train import client
 
@@ -47,6 +48,7 @@ class _DumpStationsSettings(_SatConfig, service.Settings):
 
 class _OffersSettings(service.Settings):
     amqp_dsn: pydantic.AnyUrl
+    redis_dsn: Sequence[pydantic.AnyUrl]
 
 
 class _SearchSettings(_SatConfig, service.Settings):
@@ -62,7 +64,17 @@ class _OrdersSettings(_SatConfig, service.Settings):
 
 
 async def _offers(app: service.Application[_OffersSettings]) -> None:
-    async with types.Connection(app.settings.amqp_dsn) as connection:
+    async with contextlib.AsyncExitStack() as stack:
+        redis_conn = await stack.enter_async_context(
+            aioredis.from_url(
+                app.settings.redis_dsn,
+                decode_responses=True,
+            ).client(),
+        )
+        connection = await stack.enter_async_context(
+            types.Connection(app.settings.amqp_dsn),
+        )
+
         trip_search_consumer = consumer.TripSearchConsumer(
             consumer_obj=amqp_consumer.Consumer(
                 connection=connection,
@@ -70,15 +82,27 @@ async def _offers(app: service.Application[_OffersSettings]) -> None:
                 queue_name="{0}_offers".format(app.name),
                 routing_key="offers.search.trip",
             ),
-            producer_obj=producer.Producer(
-                connection=connection,
-                exchange=types.Exchange("save_a_train"),
+            producer_obj=trackable.TrackableProducer(
+                producer.Producer(
+                    connection=connection,
+                    exchange=types.Exchange("save_a_train"),
+                ),
             ),
             generator=criteria.CriteriaGenerator(
                 h3_mapping=h3.H3MappingRepository[train_stations.TrainStation](
                     mapping=await _load_train_stations(),
                     resolution=8,
                 ),
+            ),
+            status_handler=status.SubtaskStatusHandler(
+                reporter=trackable.StatusReporter(
+                    producer.Producer(
+                        connection=connection,
+                        exchange=types.Exchange(_OFFERS),
+                    ),
+                ),
+                redis=redis.Client[str](redis_conn, prefix=app.name),
+                trackable_key=trackable.to_tracking_key("offers.search.trip"),
             ),
         )
 
@@ -116,11 +140,17 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
         # TODO: do we need to call get_token on the save_a_train_client?
 
         search_consumer = consumer.SearchCriteriaConsumer(
-            consumer_obj=amqp_consumer.Consumer(
-                connection=amqp_connection,
-                exchange=types.Exchange("save_a_train"),
-                queue_name="{0}_searches".format(app.name),
-                routing_key="offers.search.trip",
+            consumer_obj=trackable.ReportingConsumer(
+                amqp_consumer.Consumer(
+                    connection=amqp_connection,
+                    exchange=types.Exchange("save_a_train"),
+                    queue_name="{0}_searches".format(app.name),
+                    routing_key="offers.search.trip",
+                ),
+                producer.Producer(
+                    connection=amqp_connection,
+                    exchange=types.Exchange("save_a_train"),
+                ),
             ),
             producer_obj=producer.Producer(
                 connection=amqp_connection,

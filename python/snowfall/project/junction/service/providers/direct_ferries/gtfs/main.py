@@ -68,7 +68,7 @@ async def _create_gtfs(app: service.Application[DFSetting]) -> None:
 
     async with pool.client() as conn:  # nosec
         await export.Exporter(
-            redis.Client[bytes](conn, "exporter"),
+            redis.Client[bytes](conn, app.name),
             schedules.ScheduleRepository(mongo.schedules.schedules),
             always_run=app.settings.always_run,
         ).export(output_path)

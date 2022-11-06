@@ -28,7 +28,6 @@ class _GrpcSettings(service.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: Sequence[pydantic.AnyUrl]
-    redis_dsn: Sequence[pydantic.AnyUrl]
 
 
 class _ImportSettings(service.Settings):
@@ -43,57 +42,49 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
         random.choice(app.settings.mongo_dsn),  # nosec
     )
     async with types.Connection(app.settings.amqp_dsn) as connection:
-        async with aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # nosec
-            decode_responses=True,
-        ).client() as redis_conn:
-            grpc_server = server.create_server(
-                app.settings.grpc_address,
-                app.settings.grpc_port,
-                [
-                    OfferSearchService(
-                        offers_searches=offers.OfferSearchRepository(
-                            mongo.offers.offer_searches,
-                            app.settings.default_ttl,
-                        ),
-                        publisher=OfferSearchProducer(
-                            producer=trackable.TrackableProducer(
-                                producer.Producer(
-                                    connection=connection,
-                                    exchange=types.Exchange("offers"),
-                                ),
-                            ),
-                            redis=redis.Client(
-                                redis=redis_conn,
-                                prefix=app.name,
-                            ),
-                            routing_key=_TRIP_OFFER_SEARCH_ROUTING_KEY,
-                        ),
-                        default_page_size=app.settings.default_page_size,
+        grpc_server = server.create_server(
+            app.settings.grpc_address,
+            app.settings.grpc_port,
+            [
+                OfferSearchService(
+                    offers_searches=offers.OfferSearchRepository(
+                        mongo.offers.offer_searches,
+                        app.settings.default_ttl,
                     ),
-                    OfferService(
-                        offer_aggregates=offers.OfferAggregateMappingRepository(
-                            mongo.offers.offer_aggregates,
+                    publisher=OfferSearchProducer(
+                        producer=trackable.TrackableProducer(
+                            producer.Producer(
+                                connection=connection,
+                                exchange=types.Exchange("offers"),
+                            ),
                         ),
-                        offer_results=offers.TripOfferRepository(
-                            mongo.offers.trip_offers,
-                        ),
-                        offer_group_details=offers.TripOfferGroupDetailsRepository(
-                            mongo.offers.trip_offers,
-                        ),
-                        offer_options=offers.OfferOptionsRepository(
-                            mongo.offers.trip_offers,
-                        ),
-                        offer_option_details=offers.OfferOptionDetailsRepository(
-                            mongo.offers.trip_offers,
-                        ),
-                        default_page_size=app.settings.default_page_size,
+                        routing_key=_TRIP_OFFER_SEARCH_ROUTING_KEY,
                     ),
-                ],
-            )
+                    default_page_size=app.settings.default_page_size,
+                ),
+                OfferService(
+                    offer_aggregates=offers.OfferAggregateMappingRepository(
+                        mongo.offers.offer_aggregates,
+                    ),
+                    offer_results=offers.TripOfferRepository(
+                        mongo.offers.trip_offers,
+                    ),
+                    offer_group_details=offers.TripOfferGroupDetailsRepository(
+                        mongo.offers.trip_offers,
+                    ),
+                    offer_options=offers.OfferOptionsRepository(
+                        mongo.offers.trip_offers,
+                    ),
+                    offer_option_details=offers.OfferOptionDetailsRepository(
+                        mongo.offers.trip_offers,
+                    ),
+                    default_page_size=app.settings.default_page_size,
+                ),
+            ],
+        )
 
-            async with grpc_server.serve() as running:
-                await running.wait_for_termination()
+        async with grpc_server.serve() as running:
+            await running.wait_for_termination()
 
 
 async def _import(app: service.Application[_ImportSettings]) -> None:
