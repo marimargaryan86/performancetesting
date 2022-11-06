@@ -76,9 +76,7 @@ async def _offers(app: service.Application[_OffersSettings]) -> None:
             ),
             generator=criteria.CriteriaGenerator(
                 h3_mapping=h3.H3MappingRepository[train_stations.TrainStation](
-                    mapping=train_stations.create_train_stations_mapping(
-                        train_stations=await _load_train_stations(),
-                    ),
+                    mapping=await _load_train_stations(),
                     resolution=8,
                 ),
             ),

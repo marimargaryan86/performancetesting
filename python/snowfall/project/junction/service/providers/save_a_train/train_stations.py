@@ -13,12 +13,8 @@ from snowfall.vendor.save_a_train.models.misc import VendorStationsResponse
 
 
 @dataclasses.dataclass(frozen=True)
-class TrainStation(object):
-    id: str  # noqa: A003
+class TrainStation(h3.CoordinatesItem):
     name: Optional[str]
-    timezone: zoneinfo.ZoneInfo
-    latitude: float
-    longitude: float
 
 
 class TrainStationRepository(object):
@@ -26,23 +22,12 @@ class TrainStationRepository(object):
         self,
         train_stations: Sequence[TrainStation],
     ):
-        self._train_stations = {station.id: station for station in train_stations}
+        self._train_stations = {
+            station.identifier: station for station in train_stations
+        }
 
     def get_by_id(self, train_station_id: str) -> TrainStation:
         return self._train_stations[train_station_id]
-
-
-def create_train_stations_mapping(
-    train_stations: Sequence[TrainStation],
-) -> list[h3.CoordinatesItem[TrainStation]]:
-    return [
-        h3.CoordinatesItem[TrainStation](
-            latitude=station.latitude,
-            longitude=station.longitude,
-            mapped_value=station,
-        )
-        for station in train_stations
-    ]
 
 
 async def dump_sat_stations(
@@ -85,7 +70,7 @@ async def make_train_station(
     train_station: Mapping[str, str | float],
 ) -> TrainStation:
     return TrainStation(
-        id=str(train_station["id"]),
+        identifier=str(train_station["id"]),
         name=str(train_station["name"]),
         timezone=zoneinfo.ZoneInfo(str(train_station["time_zone"])),
         latitude=float(train_station["latitude"]),

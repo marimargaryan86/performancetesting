@@ -1,7 +1,7 @@
-import dataclasses
 import datetime
 import random
 import types
+import zoneinfo
 from typing import Sequence
 
 from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
@@ -14,7 +14,7 @@ from snowfall.project.junction.service.passenger_name_records.v1alpha import (
 from snowfall.project.junction.service.places.v1alpha import (
     models_pb2 as place_models_pb2,
 )
-from snowfall.stdlib import money, string
+from snowfall.stdlib import h3, money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import (
     latlng_pb2,
@@ -101,34 +101,30 @@ CURRENCIES_CONVERSIONS = types.MappingProxyType(
 )
 CURRENCIES = ("USD", "EUR")
 
-
-@dataclasses.dataclass(frozen=True)
-class H3LocationTestModel(object):
-    id_: str
-    longitude: float
-    latitude: float
-
-
 H3_LOCATIONS = [
-    H3LocationTestModel(
+    h3.CoordinatesItem(
+        identifier="SAT_IT_MA_XZWAD",
         latitude=46.287961,
         longitude=11.232652,
-        id_="SAT_IT_MA_XZWAD",
+        timezone=zoneinfo.ZoneInfo("Europe/Stockholm"),
     ),
-    H3LocationTestModel(
+    h3.CoordinatesItem(
+        identifier="SAT_DE_VO_XSTMO",
         latitude=49.2556226,
         longitude=6.8588948,
-        id_="SAT_DE_VO_XSTMO",
+        timezone=zoneinfo.ZoneInfo("Europe/Stockholm"),
     ),
-    H3LocationTestModel(
+    h3.CoordinatesItem(
+        identifier="SAT_FR_PA_WXNGQ",
         latitude=48.861496,
         longitude=2.33368,
-        id_="SAT_FR_PA_WXNGQ",
+        timezone=zoneinfo.ZoneInfo("Europe/Stockholm"),
     ),
-    H3LocationTestModel(
+    h3.CoordinatesItem(
+        identifier="SAT_FR_RE_VDQTY",
         latitude=48.103175,
         longitude=-1.672335,
-        id_="SAT_FR_RE_VDQTY",
+        timezone=zoneinfo.ZoneInfo("Europe/Stockholm"),
     ),
 ]
 

@@ -1,7 +1,7 @@
 import datetime
 import itertools
 from collections.abc import Iterator
-from typing import Sequence
+from typing import Iterable, Sequence
 
 import more_itertools
 
@@ -13,12 +13,8 @@ from snowfall.project.junction.service.providers.ask2go import airports
 from snowfall.project.junction.service.providers.ask2go.v1alpha import (
     amqp_pb2 as provider_amqp_pb2,
 )
-from snowfall.stdlib import h3
+from snowfall.stdlib import h3, segment_grouper
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.segment_grouper import (
-    SegmentDetails,
-    generate_potential_return_trips,
-)
 from snowfall.stdlib.v1alpha import models_pb2
 from snowfall.vendor.ask2go import enums
 from snowfall.vendor.ask2go.models import common
@@ -33,41 +29,7 @@ class CriteriaGenerator(object):
         h3_mapping: h3.H3MappingRepository[airports.Airport],
     ):
         self._mapping = h3_mapping
-
-    def generate_segment_details(  # noqa: WPS210
-        self,
-        segments: Sequence[models_pb2.Segment],
-    ) -> Iterator[SegmentDetails]:
-        for segment in segments:
-            first_leg = more_itertools.first(segment.legs)
-            last_leg = more_itertools.last(segment.legs)
-
-            if first_leg.type != models_pb2.Schedule.TYPE_AIR:
-                continue
-
-            origins = self._mapping.find_mapped_values(
-                coordinates=first_leg.origin.coordinates,
-                neighbour_search_radius=1,
-            )
-            destinations = self._mapping.find_mapped_values(
-                coordinates=last_leg.destination.coordinates,
-                neighbour_search_radius=1,
-            )
-
-            yield from (
-                SegmentDetails(
-                    segment=segment,
-                    departure=protobuf.protobuf_to_datetime(
-                        first_leg.departure_at,
-                    ).astimezone(origin.timezone),
-                    arrival=protobuf.protobuf_to_datetime(
-                        last_leg.arrival_at,
-                    ).astimezone(destination.timezone),
-                    origin=origin.iata,
-                    destination=destination.iata,
-                )
-                for origin, destination in itertools.product(origins, destinations)
-            )
+        self._grouper = segment_grouper.SegmentGrouper(h3_mapping)
 
     def from_search_task(
         self,
@@ -77,10 +39,13 @@ class CriteriaGenerator(object):
             passengers=search_task.search.passengers,
             date=_get_last_travel_date(search_task),
         )
+        sub_trips = self._grouper.trips_to_sub_trips(
+            trips=search_task.search.trips,
+            type_filter=models_pb2.Schedule.TYPE_AIR,
+        )
+        segments_details = list(self._generate_segment_details(sub_trips))
 
-        segments = itertools.chain(*[tr.segments for tr in search_task.search.trips])
-        segments_details = self.generate_segment_details(list(segments))
-        for trip_details in generate_potential_return_trips(list(segments_details)):
+        for trip_details in segment_grouper.generate_trips(segments_details):
             task = provider_amqp_pb2.SearchCriteriaTask(
                 offer_search_id=search_task.offer_search_id,
                 segments=[trip_details.outbound_segment],
@@ -109,6 +74,40 @@ class CriteriaGenerator(object):
                 )
 
             yield task
+
+    # todo: refactor this, probably remove it also
+    def _generate_segment_details(  # noqa: WPS210
+        self,
+        sub_trips: Iterable[segment_grouper.SubTrip],
+    ) -> Iterator[segment_grouper.SegmentDetails]:
+        for trip in sub_trips:
+            for segment in trip.segments:
+                first_leg = more_itertools.first(segment.legs)
+                last_leg = more_itertools.last(segment.legs)
+
+                origins = self._mapping.find_mapped_values(
+                    coordinates=first_leg.origin.coordinates,
+                    neighbour_search_radius=1,
+                )
+                destinations = self._mapping.find_mapped_values(
+                    coordinates=last_leg.destination.coordinates,
+                    neighbour_search_radius=1,
+                )
+
+                yield from (
+                    segment_grouper.SegmentDetails(
+                        segment=segment,
+                        departure=protobuf.protobuf_to_datetime(
+                            first_leg.departure_at,
+                        ).astimezone(origin.timezone),
+                        arrival=protobuf.protobuf_to_datetime(
+                            last_leg.arrival_at,
+                        ).astimezone(destination.timezone),
+                        origin=origin.identifier,
+                        destination=destination.identifier,
+                    )
+                    for origin, destination in itertools.product(origins, destinations)
+                )
 
 
 def _get_last_travel_date(

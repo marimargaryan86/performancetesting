@@ -103,9 +103,7 @@ def h3_mapping_repository(
     airport_repository: airports.AirportRepository,
 ) -> h3.H3MappingRepository[airports.Airport]:
     return h3.H3MappingRepository[airports.Airport](
-        mapping=airports.create_airports_mapping(
-            airports=airport_repository,
-        ),
+        mapping=airport_repository.all_(),
         resolution=7,
     )
 

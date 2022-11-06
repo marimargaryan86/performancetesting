@@ -2,7 +2,6 @@ from typing import Collection
 
 import pytest
 
-from snowfall.fixtures import H3LocationTestModel
 from snowfall.stdlib import h3
 from snowfall.stdlib.v1alpha import models_pb2
 
@@ -53,13 +52,13 @@ from snowfall.stdlib.v1alpha import models_pb2
     ],
 )
 def test_coordinates_to_id(
-    h3_mapping_repository: h3.H3MappingRepository[H3LocationTestModel],
+    h3_mapping_repository: h3.H3MappingRepository[h3.CoordinatesItem],
     coordinates: models_pb2.Coordinates,
     radius: int,
     expected_station_ids: Collection[str],
 ) -> None:
     assert expected_station_ids == {
-        location.id_
+        location.identifier
         for location in h3_mapping_repository.find_mapped_values(
             coordinates=coordinates,
             neighbour_search_radius=radius,

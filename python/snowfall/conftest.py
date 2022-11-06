@@ -1,6 +1,5 @@
 import asyncio
 import datetime
-from typing import Sequence
 
 import aioredis
 import pytest
@@ -164,22 +163,8 @@ async def trip_search_request(
 
 
 @pytest.fixture
-def h3_mapping_repository(
-    h3_mapping: Sequence[h3.CoordinatesItem[fixtures.H3LocationTestModel]],
-) -> h3.H3MappingRepository[fixtures.H3LocationTestModel]:
+def h3_mapping_repository() -> h3.H3MappingRepository[h3.CoordinatesItem]:
     return h3.H3MappingRepository(
-        mapping=h3_mapping,
+        mapping=fixtures.H3_LOCATIONS,
         resolution=8,
     )
-
-
-@pytest.fixture
-def h3_mapping() -> list[h3.CoordinatesItem[fixtures.H3LocationTestModel]]:
-    return [
-        h3.CoordinatesItem[fixtures.H3LocationTestModel](
-            latitude=location.latitude,
-            longitude=location.longitude,
-            mapped_value=location,
-        )
-        for location in fixtures.H3_LOCATIONS
-    ]

@@ -1,31 +1,34 @@
 import collections
 import dataclasses
 import itertools
-from typing import Generic, Sequence, TypeVar
+import zoneinfo
+from typing import Generic, Iterable, TypeVar
 
 from h3.api import numpy_int as h3
 
 from snowfall.stdlib.v1alpha import models_pb2
 
-_MappedValue = TypeVar("_MappedValue")
-
 
 @dataclasses.dataclass(frozen=True)
-class CoordinatesItem(Generic[_MappedValue]):
+class CoordinatesItem(object):
+    identifier: str
     latitude: float
     longitude: float
-    mapped_value: _MappedValue
+    timezone: zoneinfo.ZoneInfo
 
 
-class H3MappingRepository(Generic[_MappedValue]):
+MappedValue = TypeVar("MappedValue", bound=CoordinatesItem)
+
+
+class H3MappingRepository(Generic[MappedValue]):
     def __init__(
         self,
-        mapping: Sequence[CoordinatesItem[_MappedValue]],
+        mapping: Iterable[MappedValue],
         resolution: int,
     ):
         # For a good resolution, see https://h3geo.org/docs/core-library/restable/
         self._resolution = resolution
-        self._mapping: dict[int, list[_MappedValue]] = collections.defaultdict(list)
+        self._mapping: dict[int, list[MappedValue]] = collections.defaultdict(list)
 
         for coordinates_item in mapping:
             self._mapping[
@@ -34,13 +37,13 @@ class H3MappingRepository(Generic[_MappedValue]):
                     coordinates_item.longitude,
                     self._resolution,
                 )
-            ].append(coordinates_item.mapped_value)
+            ].append(coordinates_item)
 
     def find_mapped_values(
         self,
         coordinates: models_pb2.Coordinates,
         neighbour_search_radius: int = 0,
-    ) -> set[_MappedValue]:
+    ) -> set[MappedValue]:
         point_h3 = h3.geo_to_h3(
             coordinates.latitude,
             coordinates.longitude,

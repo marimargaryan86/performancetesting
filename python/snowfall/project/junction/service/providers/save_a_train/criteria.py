@@ -42,8 +42,8 @@ class CriteriaGenerator(object):
                     offer_search_id=search_task.offer_search_id,
                     segments=[segment],
                     criteria=amqp_pb2.Criteria(
-                        origin_id=start.id,
-                        destination_id=end.id,
+                        origin_id=start.identifier,
+                        destination_id=end.identifier,
                         passengers_ages=[
                             date_to_age(
                                 protobuf.protobuf_to_date(

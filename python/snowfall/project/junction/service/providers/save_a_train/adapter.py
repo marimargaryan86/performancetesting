@@ -97,8 +97,8 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         try:
             await self._client.get_general_search_results(
                 request.GeneralSearchResultsRequest(
-                    origin_id=origin.id,
-                    destination_id=destination.id,
+                    origin_id=origin.identifier,
+                    destination_id=destination.identifier,
                     trip_type=enums.TripType.one_way,
                     number_of_passengers=len(search_task.criteria.passengers_ages),
                     departure_date=protobuf.protobuf_to_date(
@@ -118,8 +118,8 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         try:
             search_response = await self._client.create_search(
                 request.CreateSearchRequest(
-                    origin_id=origin.id,
-                    destination_id=destination.id,
+                    origin_id=origin.identifier,
+                    destination_id=destination.identifier,
                     passengers_ages=list(search_task.criteria.passengers_ages),
                     departure_datetime=protobuf.protobuf_to_datetime(
                         search_task.criteria.departure_datetime,
@@ -221,7 +221,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                                         more_itertools.first(search_task.segments).legs,
                                     ).id,
                                     origin=models_pb2.Point(
-                                        ref=origin.id,
+                                        ref=origin.identifier,
                                         name=str(origin.name),
                                         coordinates=models_pb2.Coordinates(
                                             latitude=origin.latitude,
@@ -230,7 +230,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                                         time_zone=origin.timezone.key,
                                     ),
                                     destination=models_pb2.Point(
-                                        ref=destination.id,
+                                        ref=destination.identifier,
                                         name=str(destination.name),
                                         coordinates=models_pb2.Coordinates(
                                             latitude=destination.latitude,

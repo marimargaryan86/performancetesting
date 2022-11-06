@@ -1,0 +1,102 @@
+import zoneinfo
+from typing import Iterable
+from unittest import mock
+
+import pytest
+
+from snowfall.stdlib import h3, segment_grouper
+from snowfall.stdlib.v1alpha import models_pb2
+
+
+@pytest.fixture
+def h3_mapping() -> h3.H3MappingRepository[h3.MappedValue]:
+    stub = mock.create_autospec(h3.H3MappingRepository)
+    mocked_value = h3.CoordinatesItem(
+        identifier="foo",
+        longitude=0,
+        latitude=0,
+        timezone=zoneinfo.ZoneInfo("Europe/Stockholm"),
+    )
+    stub.find_mapped_values = mock.Mock(return_value={mocked_value})
+
+    return stub
+
+
+@pytest.fixture
+def grouper(
+    h3_mapping: h3.H3MappingRepository[h3.MappedValue],
+) -> segment_grouper.SegmentGrouper:
+    return segment_grouper.SegmentGrouper(h3_mapping)
+
+
+def _generate_trips(
+    trips: Iterable[Iterable[models_pb2.Schedule.Type.ValueType]],
+) -> list[models_pb2.Trip]:
+    return [
+        models_pb2.Trip(
+            id=str(idx),
+            segments=[
+                models_pb2.Segment(legs=[models_pb2.Leg(type=segment)])
+                for segment in segments
+            ],
+        )
+        for idx, segments in enumerate(trips)
+    ]
+
+
+@pytest.mark.parametrize(
+    "trips, expected",
+    [
+        (_generate_trips([[models_pb2.Schedule.TYPE_RAIL]]), 0),
+        (
+            _generate_trips(
+                [
+                    [
+                        models_pb2.Schedule.TYPE_AIR,
+                        models_pb2.Schedule.TYPE_RAIL,
+                        models_pb2.Schedule.TYPE_AIR,
+                    ],
+                ],
+            ),
+            2,
+        ),
+        (
+            _generate_trips(
+                [
+                    [
+                        models_pb2.Schedule.TYPE_AIR,
+                        models_pb2.Schedule.TYPE_RAIL,
+                        models_pb2.Schedule.TYPE_AIR,
+                        models_pb2.Schedule.TYPE_RAIL,
+                    ],
+                ],
+            ),
+            2,
+        ),
+        (
+            _generate_trips(
+                [
+                    [
+                        models_pb2.Schedule.TYPE_AIR,
+                        models_pb2.Schedule.TYPE_AIR,
+                    ],
+                    [
+                        models_pb2.Schedule.TYPE_AIR,
+                        models_pb2.Schedule.TYPE_AIR,
+                    ],
+                ],
+            ),
+            2,
+        ),
+    ],
+)
+def test_trips_are_broken_into_sub_trips(
+    grouper: segment_grouper.SegmentGrouper,
+    trips: Iterable[models_pb2.Trip],
+    expected: int,
+) -> None:
+    sub_trips = grouper.trips_to_sub_trips(
+        trips=trips,
+        type_filter=models_pb2.Schedule.TYPE_AIR,
+    )
+    assert len(list(sub_trips)) == expected

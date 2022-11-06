@@ -294,7 +294,7 @@ class OfferTransformer(object):  # noqa: WPS214
                 offers_pb2.OfferSegmentLeg(
                     id=leg.id,
                     origin=models_pb2.Point(
-                        ref=origin.iata,
+                        ref=origin.identifier,
                         name=origin.airport_name or "",
                         coordinates=models_pb2.Coordinates(
                             latitude=origin.latitude,
@@ -303,7 +303,7 @@ class OfferTransformer(object):  # noqa: WPS214
                         time_zone=origin.timezone.key,
                     ),
                     destination=models_pb2.Point(
-                        ref=destination.iata,
+                        ref=destination.identifier,
                         name=destination.airport_name or "",
                         coordinates=models_pb2.Coordinates(
                             latitude=destination.latitude,

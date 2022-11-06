@@ -1,6 +1,6 @@
 import base64
 import datetime
-from typing import Mapping, Sequence
+from typing import Any, Mapping, Sequence
 
 import freezegun
 import more_itertools
@@ -100,47 +100,366 @@ _SEARCH_TASK3 = protobuf.AnySerializer[amqp_pb2.TripOfferSearchTask].deserialize
     base64.b64decode(_SEARCH_TASK3_ENCODED),
 )
 
+_MULTIMODAL_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
+    offer_search_id="SEARCH4",
+    search=models_pb2.TripOfferSearch(
+        trips=[
+            common_models_pb2.Trip(
+                id="TRIP1",
+                segments=[
+                    common_models_pb2.Segment(
+                        id="SEGMENT1",
+                        legs=[
+                            common_models_pb2.Leg(
+                                id="LEG1",
+                                origin=common_models_pb2.Point(
+                                    coordinates=common_models_pb2.Coordinates(
+                                        latitude=59.650831,
+                                        longitude=17.92119,
+                                    ),
+                                ),
+                                destination=common_models_pb2.Point(
+                                    coordinates=common_models_pb2.Coordinates(
+                                        latitude=57.667778,
+                                        longitude=12.294444,
+                                    ),
+                                ),
+                                departure_at=protobuf.datetime_to_protobuf(
+                                    datetime.datetime.now(),
+                                ),
+                                type=common_models_pb2.Schedule.TYPE_AIR,
+                            ),
+                        ],
+                    ),
+                    common_models_pb2.Segment(
+                        id="SEGMENT2",
+                        legs=[
+                            common_models_pb2.Leg(
+                                id="LEG2",
+                                origin=common_models_pb2.Point(
+                                    coordinates=common_models_pb2.Coordinates(
+                                        latitude=57.667778,
+                                        longitude=12.294444,
+                                    ),
+                                ),
+                                destination=common_models_pb2.Point(
+                                    coordinates=common_models_pb2.Coordinates(
+                                        latitude=51.470311,
+                                        longitude=-0.458118,
+                                    ),
+                                ),
+                                departure_at=protobuf.datetime_to_protobuf(
+                                    datetime.datetime.now(),
+                                ),
+                                type=common_models_pb2.Schedule.TYPE_RAIL,
+                            ),
+                        ],
+                    ),
+                    common_models_pb2.Segment(
+                        id="SEGMENT3",
+                        legs=[
+                            common_models_pb2.Leg(
+                                id="LEG3",
+                                origin=common_models_pb2.Point(
+                                    coordinates=common_models_pb2.Coordinates(
+                                        latitude=51.470311,
+                                        longitude=-0.458118,
+                                    ),
+                                ),
+                                destination=common_models_pb2.Point(
+                                    coordinates=common_models_pb2.Coordinates(
+                                        latitude=33.9425,
+                                        longitude=-118.408056,
+                                    ),
+                                ),
+                                departure_at=protobuf.datetime_to_protobuf(
+                                    datetime.datetime.now(),
+                                ),
+                                type=common_models_pb2.Schedule.TYPE_AIR,
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+        ],
+        passengers=[
+            models_pb2.Passenger(
+                date_of_birth=common_models_pb2.Date(
+                    year=2000,
+                    month=1,
+                    day=1,
+                ),
+            ),
+        ],
+    ),
+)
+
+_MULTISEGMENT_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
+    offer_search_id="SEARCH5",
+    search=models_pb2.TripOfferSearch(
+        trips=[
+            common_models_pb2.Trip(
+                id="TRIP1",
+                segments=[
+                    common_models_pb2.Segment(
+                        id="SEGMENT1",
+                        legs=[
+                            common_models_pb2.Leg(
+                                id="LEG1",
+                                origin=common_models_pb2.Point(
+                                    coordinates=common_models_pb2.Coordinates(
+                                        latitude=59.650831,
+                                        longitude=17.92119,
+                                    ),
+                                ),
+                                destination=common_models_pb2.Point(
+                                    coordinates=common_models_pb2.Coordinates(
+                                        latitude=57.667778,
+                                        longitude=12.294444,
+                                    ),
+                                ),
+                                departure_at=protobuf.datetime_to_protobuf(
+                                    datetime.datetime.now(),
+                                ),
+                                type=common_models_pb2.Schedule.TYPE_AIR,
+                            ),
+                        ],
+                    ),
+                    common_models_pb2.Segment(
+                        id="SEGMENT2",
+                        legs=[
+                            common_models_pb2.Leg(
+                                id="LEG2",
+                                origin=common_models_pb2.Point(
+                                    coordinates=common_models_pb2.Coordinates(
+                                        latitude=57.667778,
+                                        longitude=12.294444,
+                                    ),
+                                ),
+                                destination=common_models_pb2.Point(
+                                    coordinates=common_models_pb2.Coordinates(
+                                        latitude=51.470311,
+                                        longitude=-0.458118,
+                                    ),
+                                ),
+                                departure_at=protobuf.datetime_to_protobuf(
+                                    datetime.datetime.now(),
+                                ),
+                                type=common_models_pb2.Schedule.TYPE_AIR,
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+        ],
+        passengers=[
+            models_pb2.Passenger(
+                date_of_birth=common_models_pb2.Date(
+                    year=2000,
+                    month=1,
+                    day=1,
+                ),
+            ),
+        ],
+    ),
+)
+
+_ROUNDTRIP_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
+    offer_search_id="SEARCH6",
+    search=models_pb2.TripOfferSearch(
+        trips=[
+            common_models_pb2.Trip(
+                id="TRIP1",
+                segments=[
+                    common_models_pb2.Segment(
+                        id="SEGMENT1",
+                        legs=[
+                            common_models_pb2.Leg(
+                                id="LEG1",
+                                origin=common_models_pb2.Point(
+                                    coordinates=common_models_pb2.Coordinates(
+                                        latitude=59.650831,
+                                        longitude=17.92119,
+                                    ),
+                                ),
+                                destination=common_models_pb2.Point(
+                                    coordinates=common_models_pb2.Coordinates(
+                                        latitude=57.667778,
+                                        longitude=12.294444,
+                                    ),
+                                ),
+                                departure_at=protobuf.datetime_to_protobuf(
+                                    datetime.datetime.now(),
+                                ),
+                                type=common_models_pb2.Schedule.TYPE_AIR,
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+            common_models_pb2.Trip(
+                id="TRIP2",
+                segments=[
+                    common_models_pb2.Segment(
+                        id="SEGMENT2",
+                        legs=[
+                            common_models_pb2.Leg(
+                                id="LEG2",
+                                origin=common_models_pb2.Point(
+                                    coordinates=common_models_pb2.Coordinates(
+                                        latitude=57.667778,
+                                        longitude=12.294444,
+                                    ),
+                                ),
+                                destination=common_models_pb2.Point(
+                                    coordinates=common_models_pb2.Coordinates(
+                                        latitude=59.650831,
+                                        longitude=17.92119,
+                                    ),
+                                ),
+                                departure_at=protobuf.datetime_to_protobuf(
+                                    datetime.datetime.now(),
+                                ),
+                                type=common_models_pb2.Schedule.TYPE_AIR,
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+        ],
+        passengers=[
+            models_pb2.Passenger(
+                date_of_birth=common_models_pb2.Date(
+                    year=2000,
+                    month=1,
+                    day=1,
+                ),
+            ),
+        ],
+    ),
+)
+
 
 @pytest.mark.parametrize(
-    "search_task, expected",
+    "search_task, expected, skipped",
     [
         (
             _SEARCH_TASK,
             [
-                ("PPW", "WRY", "Europe/London"),
+                {
+                    "origin": "PPW",
+                    "destination": "WRY",
+                    "outbound_tz": "Europe/London",
+                    "inbound_tz": "",
+                },
             ],
+            False,
         ),
         (
             _SEARCH_TASK2,
             [
-                ("ARN", "BER", "Europe/Stockholm"),
+                {
+                    "origin": "ARN",
+                    "destination": "BER",
+                    "outbound_tz": "Europe/Stockholm",
+                    "inbound_tz": "",
+                },
             ],
+            False,
         ),
         (
             _SEARCH_TASK3,
             [
-                ("LHR", "SYD", "Europe/London"),
+                {
+                    "origin": "LHR",
+                    "destination": "SYD",
+                    "outbound_tz": "Europe/London",
+                    "inbound_tz": "",
+                },
             ],
+            False,
+        ),
+        (
+            _MULTIMODAL_SEARCH_TASK,
+            [
+                {
+                    "origin": "ARN",
+                    "destination": "GOT",
+                    "outbound_tz": "Europe/Stockholm",
+                    "inbound_tz": "",
+                },
+                {
+                    "origin": "LHR",
+                    "destination": "LAX",
+                    "outbound_tz": "Europe/London",
+                    "inbound_tz": "",
+                },
+            ],
+            False,
+        ),
+        (
+            _MULTISEGMENT_SEARCH_TASK,
+            [
+                {
+                    "origin": "ARN",
+                    "destination": "LHR",
+                    "outbound_tz": "Europe/Stockholm",
+                    "inbound_tz": "",
+                },
+            ],
+            True,
+        ),
+        (
+            _ROUNDTRIP_SEARCH_TASK,
+            [
+                {
+                    "origin": "ARN",
+                    "destination": "GOT",
+                    "outbound_tz": "Europe/Stockholm",
+                    "inbound_tz": "",
+                },
+                {
+                    "origin": "GOT",
+                    "destination": "ARN",
+                    "outbound_tz": "Europe/Stockholm",
+                    "inbound_tz": "",
+                },
+                {
+                    "origin": "ARN",
+                    "destination": "GOT",
+                    "outbound_tz": "Europe/Stockholm",
+                    "inbound_tz": "Europe/Stockholm",
+                },
+            ],
+            False,
         ),
     ],
 )
 def test_criteria_with_expected_pairs_are_generated(
     criteria_generator: criteria.CriteriaGenerator,
     search_task: amqp_pb2.TripOfferSearchTask,
-    expected: Sequence[Sequence[str]],
+    expected: Sequence[Mapping[str, Any]],
+    skipped: bool,
 ) -> None:
+    if skipped:
+        pytest.skip("Not supported yet")
+
     search_tasks = list(criteria_generator.from_search_task(search_task=search_task))
     search_task_pairs = [
-        (
-            search_task.criteria.origin_iata,
-            search_task.criteria.destination_iata,
-            search_task.criteria.outbound_departure.time_zone.id,
-        )
+        {
+            "origin": search_task.criteria.origin_iata,
+            "destination": search_task.criteria.destination_iata,
+            "outbound_tz": search_task.criteria.outbound_departure.time_zone.id,
+            "inbound_tz": search_task.criteria.inbound_departure.time_zone.id,
+        }
         for search_task in search_tasks
     ]
 
-    assert all(pair in search_task_pairs for pair in expected)
-    assert all(pair in expected for pair in search_task_pairs)
+    for expected_pair in expected:
+        assert expected_pair in search_task_pairs
+
+    for search_task_pair in search_task_pairs:
+        assert search_task_pair in expected
 
 
 @pytest.mark.parametrize(

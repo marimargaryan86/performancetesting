@@ -71,16 +71,14 @@ async def _offers(app: service.Application[_OffersSettings]) -> None:
             ),
             generator=criteria.CriteriaGenerator(
                 h3_mapping=h3.H3MappingRepository[airports.Airport](
-                    mapping=airports.create_airports_mapping(
-                        airports.AirportRepository(
-                            airports_data=cast(
-                                list[dict[str, Any]],
-                                filesystem.PkgLoader(
-                                    "snowfall.project.junction.service.providers.ask2go.main",
-                                ).load("airports.json"),
-                            ),
+                    mapping=airports.AirportRepository(
+                        airports_data=cast(
+                            list[dict[str, Any]],
+                            filesystem.PkgLoader(
+                                "snowfall.project.junction.service.providers.ask2go.main",
+                            ).load("airports.json"),
                         ),
-                    ),
+                    ).all_(),
                     resolution=7,
                 ),
             ),
