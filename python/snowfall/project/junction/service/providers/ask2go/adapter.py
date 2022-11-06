@@ -143,6 +143,9 @@ class Ask2GoAdapter(object):  # noqa: WPS214
         validate_identifiers: validate_offer_criteria.ValidateOfferResponse,
         branded_offer: validated_offer.ValidatedOfferResponse,
     ) -> Mapping[str, Coroutine[price.OfferPriceResponse, Any, Any]]:
+        if not offer.id:
+            raise NoResultsError("Offer is missing ID.")
+
         mapped_brand_price = {}
         if branded_offer.itinerary.branded_fares:
             for fare in branded_offer.itinerary.branded_fares:

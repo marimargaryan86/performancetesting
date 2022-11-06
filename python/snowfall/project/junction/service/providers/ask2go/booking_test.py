@@ -78,3 +78,16 @@ async def test_booking_can_be_placed(
     assert str(total_price) == "188.07"
     assert booking_proto.trip_result.record_locator == "LLBEIS"
     assert booking_proto.trip_result.operator_booking_references == ["JJODCR"]
+
+
+@pytest.mark.asyncio
+async def test_booking_failed(
+    httpx_mock: pytest_httpx.HTTPXMock,
+    booking_handler: booking.BookingHandler,
+) -> None:
+    _mock_responses(httpx_mock, "ARN_LAX_2022-11-26")
+    booking_proto = await booking_handler.book(
+        task=_ORDER_TASK,
+        details=cache.OfferDetails(pricing_id="foo", transaction_id="bar"),
+    )
+    assert booking_proto.status == models_pb2.Booking.STATUS_ERROR

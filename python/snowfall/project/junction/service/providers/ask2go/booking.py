@@ -132,6 +132,7 @@ class BookingHandler(object):
             transaction_id=booking_result.transaction_id,
         )
         booking_result = await self._poll_booking(booking_result)
+        _validate_booking(booking_result)
 
         try:
             # todo: this should be handled in a separate service
@@ -156,3 +157,8 @@ class BookingHandler(object):
             await asyncio.sleep(self._wait_time_between_polling)
 
         raise errors.ServiceError("Unable to get booking details in time")
+
+
+def _validate_booking(booking_result: booking.Booking) -> None:
+    if booking_result.information.status == "BookingFailed":
+        raise errors.ServiceError("Booking failed")
