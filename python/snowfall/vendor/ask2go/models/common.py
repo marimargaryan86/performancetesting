@@ -1,7 +1,7 @@
 import datetime
 from typing import Optional
 
-from snowfall.vendor.ask2go.enums import Gender, PassengerType
+from snowfall.vendor.ask2go.enums import DocumentType, Gender, PassengerType
 from snowfall.vendor.ask2go.models.base import CamelCaseBaseModel
 
 
@@ -47,6 +47,14 @@ class Contact(CamelCaseBaseModel):
     email: str
 
 
+class TravelerDocument(CamelCaseBaseModel):
+    document_type: DocumentType
+    document_number: str
+    document_issue_country: str
+    document_exp_date: datetime.date
+    nationality: str
+
+
 class Passenger(CamelCaseBaseModel):
     first_name: str
     last_name: str
@@ -54,3 +62,4 @@ class Passenger(CamelCaseBaseModel):
     gender: Gender
     type: PassengerType  # noqa: A003
     birth_date: datetime.date
+    traveler_document: Optional[TravelerDocument]

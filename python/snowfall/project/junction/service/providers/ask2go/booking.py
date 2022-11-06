@@ -105,6 +105,9 @@ class BookingHandler(object):
                         datetime.date.today(),  # todo: date of travel
                     ),
                     birth_date=protobuf.protobuf_to_date(passenger.date_of_birth),
+                    traveler_document=models.traveler_document_from_proto(
+                        passenger.doc_details,
+                    ),
                 )
                 for passenger in passengers
             ],

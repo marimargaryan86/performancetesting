@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Sequence
+from typing import Any, Optional, Sequence
 
 import more_itertools
 
@@ -66,6 +66,24 @@ def parse_search_request(criteria: search.CreateSearchCriteria) -> dict[str, Any
     return request_body
 
 
+def _parse_traveler_document(
+    traveler_document: Optional[common.TravelerDocument],
+) -> dict[str, Any]:
+    return (
+        {
+            "nationality": traveler_document.nationality,
+            "travelerDocument": {
+                "documentType": traveler_document.document_type.value,
+                "documentNumber": traveler_document.document_number,
+                "documentIssueCountry": traveler_document.document_issue_country,
+                "documentExpDate": traveler_document.document_exp_date.isoformat(),
+            },
+        }
+        if traveler_document
+        else {}
+    )
+
+
 def parse_create_booking_request(
     pricing_id: str,
     transaction_id: str,
@@ -99,6 +117,7 @@ def parse_create_booking_request(
                 "dateOfBirth": passenger.birth_date.strftime("%d-%m-%Y"),
                 "gender": passenger.gender.value,
                 "passengerType": passenger.type.value,
+                **_parse_traveler_document(passenger.traveler_document),
             }
             for passenger in passengers
         ],

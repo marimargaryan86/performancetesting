@@ -246,6 +246,28 @@ def _create_contact_details(
     )
 
 
+def _create_traveler_doc(
+    passenger: Mapping[str, Any],
+) -> order_models_pb2.DocumentDetails | None:
+    document = passenger.get("travelerDocument")
+
+    if not document:
+        return None
+
+    return order_models_pb2.DocumentDetails(
+        document_type=slug_to_enum_value(  # type: ignore[arg-type]
+            descriptor=order_models_pb2.DocumentDetails.Type.DESCRIPTOR,
+            name=document["documentType"],
+        ),
+        document_number=document["documentNumber"],
+        issue_county=document["documentIssueCountry"],
+        nationality=document["nationality"],
+        exp_date=date_to_protobuf(
+            datetime.date.fromisoformat(document["documentExpirationDate"]),
+        ),
+    )
+
+
 def _create_passengers(
     passengers: Sequence[Mapping[str, Any]],
 ) -> list[order_models_pb2.Passenger]:
@@ -264,6 +286,7 @@ def _create_passengers(
             date_of_birth=date_to_protobuf(
                 datetime.date.fromisoformat(passenger["dateOfBirth"]),
             ),
+            doc_details=_create_traveler_doc(passenger),
         )
         for passenger in passengers
     ]

@@ -18,6 +18,14 @@ class PassengerType(enum.Enum):
     infant = "INF"
 
 
+class DocumentType(enum.Enum):
+    passport = "passport"
+    national_id = "nationalid"
+    military = "military"
+    naturalization = "naturalization"
+    permit = "permit"
+
+
 class Gender(enum.Enum):
     female = "Female"
     male = "Male"

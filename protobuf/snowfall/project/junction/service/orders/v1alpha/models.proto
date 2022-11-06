@@ -76,6 +76,19 @@ message Passenger {
   }
   Gender gender = 4;
   snowfall.stdlib.v1alpha.Date date_of_birth = 5;
+  optional DocumentDetails doc_details = 6;
+}
+
+message DocumentDetails {
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+    TYPE_PASSPORT = 1;
+  }
+  Type document_type = 1;
+  string document_number = 2;
+  string issue_county = 3;
+  string nationality = 4;
+  snowfall.stdlib.v1alpha.Date exp_date = 5;
 }
 
 message TripOption {

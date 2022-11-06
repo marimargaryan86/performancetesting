@@ -81,6 +81,36 @@ def gender_from_proto(gender: orders_models.Passenger.Gender.V) -> common.Gender
     return common.Gender.unknown
 
 
+def document_type_from_proto(
+    document_type: orders_models.DocumentDetails.Type.ValueType,
+) -> Optional[common.DocumentType]:
+    if document_type == orders_models.DocumentDetails.Type.TYPE_PASSPORT:
+        return common.DocumentType.passport
+
+    return None
+
+
+def traveler_document_from_proto(
+    traveler_document: Optional[orders_models.DocumentDetails],
+) -> Optional[common.TravelerDocument]:
+    if not traveler_document:
+        return None
+
+    document_type = document_type_from_proto(traveler_document.document_type)
+
+    return (
+        common.TravelerDocument(
+            document_type=document_type,
+            document_number=traveler_document.document_number,
+            document_issue_country=traveler_document.issue_county,
+            document_exp_date=protobuf.protobuf_to_date(traveler_document.exp_date),
+            nationality=traveler_document.nationality,
+        )
+        if document_type
+        else None
+    )
+
+
 @dataclasses.dataclass(frozen=True)
 class Requirement(object):
     departure_at: datetime.datetime
