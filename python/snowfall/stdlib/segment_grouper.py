@@ -1,4 +1,5 @@
 import datetime
+import itertools
 from dataclasses import dataclass
 from typing import Iterable, Iterator, Optional, Sequence
 
@@ -12,33 +13,23 @@ from snowfall.stdlib.v1alpha import models_pb2
 @dataclass(frozen=True)
 class SubTrip(object):
     trip_id: str
-    origins: Sequence[str]
-    destinations: Sequence[str]
+    origins: frozenset[str]
+    destinations: frozenset[str]
     departure: datetime.datetime
     arrival: datetime.datetime
     segments: Sequence[models_pb2.Segment]
 
 
 @dataclass(frozen=True)
-class SegmentDetails(object):
-    segment: models_pb2.Segment
-    origin: str
-    destination: str
-    departure: datetime.datetime
-    arrival: datetime.datetime
+class TripCriteria(object):
+    outbound: SubTrip
+    inbound: Optional[SubTrip] = None
 
-
-@dataclass(frozen=True)
-class TripDetails(object):
-    is_return_trip: bool
-    outbound_segment: models_pb2.Segment
-    inbound_segment: Optional[models_pb2.Segment]
-    origin: str
-    destination: str
-    outbound_departure: datetime.datetime
-    outbound_arrival: datetime.datetime
-    inbound_departure: Optional[datetime.datetime]
-    inbound_arrival: Optional[datetime.datetime]
+    def get_combinations(self) -> Iterator[tuple[str, str]]:
+        return itertools.product(
+            self.outbound.origins,
+            self.outbound.destinations,
+        )
 
 
 class SegmentGrouper(object):
@@ -98,43 +89,43 @@ class SegmentGrouper(object):
             arrival=protobuf.protobuf_to_datetime(
                 last_leg.arrival_at,
             ).astimezone(more_itertools.first(destinations).timezone),
-            origins=[origin.identifier for origin in origins],
-            destinations=[destination.identifier for destination in destinations],
+            origins=frozenset(origin.identifier for origin in origins),
+            destinations=frozenset(
+                destination.identifier for destination in destinations
+            ),
             segments=segments,
         )
 
 
-# todo: refactor this, probably remove it also
-def generate_trips(
-    segments: Sequence[SegmentDetails],
-) -> Iterator[TripDetails]:
-    for segment_i, outbound_segment in enumerate(segments):
-        for inbound_segment in segments[segment_i + 1 :]:
-            segments_form_a_return_trip = (
-                outbound_segment.origin == inbound_segment.destination
-                and outbound_segment.destination == inbound_segment.origin
-            )
-            if segments_form_a_return_trip:
-                yield TripDetails(
-                    is_return_trip=True,
-                    outbound_segment=outbound_segment.segment,
-                    inbound_segment=inbound_segment.segment,
-                    origin=outbound_segment.origin,
-                    destination=outbound_segment.destination,
-                    outbound_departure=outbound_segment.departure,
-                    outbound_arrival=outbound_segment.arrival,
-                    inbound_departure=inbound_segment.departure,
-                    inbound_arrival=inbound_segment.arrival,
-                )
+def generate_trip_criteria(
+    sub_trips: Iterable[SubTrip],
+) -> Iterator[TripCriteria]:
+    remaining_trips = sorted(sub_trips, key=lambda trip: trip.departure)
 
-        yield TripDetails(
-            is_return_trip=False,
-            outbound_segment=outbound_segment.segment,
-            inbound_segment=None,
-            origin=outbound_segment.origin,
-            destination=outbound_segment.destination,
-            outbound_departure=outbound_segment.departure,
-            outbound_arrival=outbound_segment.arrival,
-            inbound_departure=None,
-            inbound_arrival=None,
-        )
+    while len(remaining_trips):
+        outbound = remaining_trips.pop(0)
+        inbound = _find_return_trip(outbound, remaining_trips)
+
+        if inbound:
+            yield TripCriteria(outbound=outbound, inbound=inbound)
+
+        yield TripCriteria(outbound=outbound)
+
+
+def _find_return_trip(
+    outbound: SubTrip,
+    possible_inbounds: Sequence[SubTrip],
+) -> SubTrip | None:
+    for possible_inbound in possible_inbounds:
+        if _is_inbound_match(outbound, possible_inbound):
+            return possible_inbound
+
+    return None
+
+
+def _is_inbound_match(outbound: SubTrip, possible_inbound: SubTrip) -> bool:
+    return (
+        outbound.trip_id != possible_inbound.trip_id
+        and outbound.origins == possible_inbound.destinations
+        and outbound.destinations == possible_inbound.origins
+    )

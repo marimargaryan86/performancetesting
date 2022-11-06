@@ -5,11 +5,24 @@ from typing import Any, Mapping, Sequence
 import freezegun
 import more_itertools
 import pytest
+from google.protobuf import timestamp_pb2
 
 from snowfall.project.junction.service.offers.v1alpha import amqp_pb2, models_pb2
 from snowfall.project.junction.service.providers.ask2go import criteria
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2 as common_models_pb2
+
+
+class _IncrementalTime(object):
+    _current = datetime.datetime.now()
+
+    @classmethod
+    def get_time(cls) -> timestamp_pb2.Timestamp:
+        current = cls._current
+        cls._current = current + datetime.timedelta(seconds=1)
+
+        return protobuf.datetime_to_protobuf(current)
+
 
 _SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
     offer_search_id="SEARCH1",
@@ -35,9 +48,7 @@ _SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
                                         longitude=-2.949954,
                                     ),
                                 ),
-                                departure_at=protobuf.datetime_to_protobuf(
-                                    datetime.datetime.now(),
-                                ),
+                                departure_at=_IncrementalTime.get_time(),
                                 type=common_models_pb2.Schedule.TYPE_AIR,
                             ),
                         ],
@@ -101,7 +112,7 @@ _SEARCH_TASK3 = protobuf.AnySerializer[amqp_pb2.TripOfferSearchTask].deserialize
 )
 
 _MULTIMODAL_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
-    offer_search_id="SEARCH4",
+    offer_search_id="MULTIMODAL",
     search=models_pb2.TripOfferSearch(
         trips=[
             common_models_pb2.Trip(
@@ -124,9 +135,7 @@ _MULTIMODAL_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
                                         longitude=12.294444,
                                     ),
                                 ),
-                                departure_at=protobuf.datetime_to_protobuf(
-                                    datetime.datetime.now(),
-                                ),
+                                departure_at=_IncrementalTime.get_time(),
                                 type=common_models_pb2.Schedule.TYPE_AIR,
                             ),
                         ],
@@ -148,9 +157,7 @@ _MULTIMODAL_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
                                         longitude=-0.458118,
                                     ),
                                 ),
-                                departure_at=protobuf.datetime_to_protobuf(
-                                    datetime.datetime.now(),
-                                ),
+                                departure_at=_IncrementalTime.get_time(),
                                 type=common_models_pb2.Schedule.TYPE_RAIL,
                             ),
                         ],
@@ -172,9 +179,7 @@ _MULTIMODAL_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
                                         longitude=-118.408056,
                                     ),
                                 ),
-                                departure_at=protobuf.datetime_to_protobuf(
-                                    datetime.datetime.now(),
-                                ),
+                                departure_at=_IncrementalTime.get_time(),
                                 type=common_models_pb2.Schedule.TYPE_AIR,
                             ),
                         ],
@@ -195,7 +200,7 @@ _MULTIMODAL_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
 )
 
 _MULTISEGMENT_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
-    offer_search_id="SEARCH5",
+    offer_search_id="MULTISEGMENT",
     search=models_pb2.TripOfferSearch(
         trips=[
             common_models_pb2.Trip(
@@ -218,9 +223,7 @@ _MULTISEGMENT_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
                                         longitude=12.294444,
                                     ),
                                 ),
-                                departure_at=protobuf.datetime_to_protobuf(
-                                    datetime.datetime.now(),
-                                ),
+                                departure_at=_IncrementalTime.get_time(),
                                 type=common_models_pb2.Schedule.TYPE_AIR,
                             ),
                         ],
@@ -242,9 +245,7 @@ _MULTISEGMENT_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
                                         longitude=-0.458118,
                                     ),
                                 ),
-                                departure_at=protobuf.datetime_to_protobuf(
-                                    datetime.datetime.now(),
-                                ),
+                                departure_at=_IncrementalTime.get_time(),
                                 type=common_models_pb2.Schedule.TYPE_AIR,
                             ),
                         ],
@@ -265,7 +266,7 @@ _MULTISEGMENT_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
 )
 
 _ROUNDTRIP_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
-    offer_search_id="SEARCH6",
+    offer_search_id="ROUNDTRIP",
     search=models_pb2.TripOfferSearch(
         trips=[
             common_models_pb2.Trip(
@@ -288,9 +289,7 @@ _ROUNDTRIP_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
                                         longitude=12.294444,
                                     ),
                                 ),
-                                departure_at=protobuf.datetime_to_protobuf(
-                                    datetime.datetime.now(),
-                                ),
+                                departure_at=_IncrementalTime.get_time(),
                                 type=common_models_pb2.Schedule.TYPE_AIR,
                             ),
                         ],
@@ -317,9 +316,7 @@ _ROUNDTRIP_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
                                         longitude=17.92119,
                                     ),
                                 ),
-                                departure_at=protobuf.datetime_to_protobuf(
-                                    datetime.datetime.now(),
-                                ),
+                                departure_at=_IncrementalTime.get_time(),
                                 type=common_models_pb2.Schedule.TYPE_AIR,
                             ),
                         ],
@@ -341,7 +338,7 @@ _ROUNDTRIP_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
 
 
 @pytest.mark.parametrize(
-    "search_task, expected, skipped",
+    "search_task, expected",
     [
         (
             _SEARCH_TASK,
@@ -353,7 +350,6 @@ _ROUNDTRIP_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
                     "inbound_tz": "",
                 },
             ],
-            False,
         ),
         (
             _SEARCH_TASK2,
@@ -365,7 +361,6 @@ _ROUNDTRIP_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
                     "inbound_tz": "",
                 },
             ],
-            False,
         ),
         (
             _SEARCH_TASK3,
@@ -377,7 +372,6 @@ _ROUNDTRIP_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
                     "inbound_tz": "",
                 },
             ],
-            False,
         ),
         (
             _MULTIMODAL_SEARCH_TASK,
@@ -395,7 +389,6 @@ _ROUNDTRIP_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
                     "inbound_tz": "",
                 },
             ],
-            False,
         ),
         (
             _MULTISEGMENT_SEARCH_TASK,
@@ -407,7 +400,6 @@ _ROUNDTRIP_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
                     "inbound_tz": "",
                 },
             ],
-            True,
         ),
         (
             _ROUNDTRIP_SEARCH_TASK,
@@ -431,7 +423,6 @@ _ROUNDTRIP_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
                     "inbound_tz": "Europe/Stockholm",
                 },
             ],
-            False,
         ),
     ],
 )
@@ -439,11 +430,7 @@ def test_criteria_with_expected_pairs_are_generated(
     criteria_generator: criteria.CriteriaGenerator,
     search_task: amqp_pb2.TripOfferSearchTask,
     expected: Sequence[Mapping[str, Any]],
-    skipped: bool,
 ) -> None:
-    if skipped:
-        pytest.skip("Not supported yet")
-
     search_tasks = list(criteria_generator.from_search_task(search_task=search_task))
     search_task_pairs = [
         {
@@ -498,8 +485,8 @@ def test_criteria_with_expected_passengers_are_generated(
     expected: Mapping[str, int],
 ) -> None:
     search_tasks = list(criteria_generator.from_search_task(search_task=search_task))
-    first_search_task = more_itertools.first(search_tasks)
-
+    first_search_task = more_itertools.first(search_tasks, None)
+    assert first_search_task
     assert first_search_task.criteria.adults == expected["adults"]
     assert first_search_task.criteria.children == expected["children"]
     assert first_search_task.criteria.infants == expected["infants"]

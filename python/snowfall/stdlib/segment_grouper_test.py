@@ -1,11 +1,23 @@
+import datetime
 import zoneinfo
-from typing import Iterable
+from typing import Any, Iterable, Mapping, Sequence
 from unittest import mock
 
 import pytest
 
 from snowfall.stdlib import h3, segment_grouper
 from snowfall.stdlib.v1alpha import models_pb2
+
+
+class _IncrementalTime(object):
+    _current = datetime.datetime.now()
+
+    @classmethod
+    def get_time(cls) -> datetime.datetime:
+        current = cls._current
+        cls._current = current + datetime.timedelta(seconds=1)
+
+        return current
 
 
 @pytest.fixture
@@ -27,6 +39,28 @@ def grouper(
     h3_mapping: h3.H3MappingRepository[h3.MappedValue],
 ) -> segment_grouper.SegmentGrouper:
     return segment_grouper.SegmentGrouper(h3_mapping)
+
+
+@pytest.fixture
+def roundtrip() -> list[segment_grouper.SubTrip]:
+    return [
+        segment_grouper.SubTrip(
+            trip_id="foo",
+            origins=frozenset(("ARN",)),
+            destinations=frozenset(("LHR",)),
+            departure=_IncrementalTime.get_time(),
+            arrival=_IncrementalTime.get_time(),
+            segments=[],
+        ),
+        segment_grouper.SubTrip(
+            trip_id="bar",
+            origins=frozenset(("LHR",)),
+            destinations=frozenset(("ARN",)),
+            departure=_IncrementalTime.get_time(),
+            arrival=_IncrementalTime.get_time(),
+            segments=[],
+        ),
+    ]
 
 
 def _generate_trips(
@@ -100,3 +134,89 @@ def test_trips_are_broken_into_sub_trips(
         type_filter=models_pb2.Schedule.TYPE_AIR,
     )
     assert len(list(sub_trips)) == expected
+
+
+@pytest.mark.parametrize(
+    "sub_trips, expected",
+    [
+        (
+            [
+                {
+                    "id": "foo",
+                    "org": {"ARN"},
+                    "dest": {"LHR"},
+                },
+            ],
+            1,
+        ),
+        (
+            [
+                {
+                    "id": "foo",
+                    "org": {"GOT"},
+                    "dest": {"ARN"},
+                },
+                {
+                    "id": "foo",
+                    "org": {"LHR"},
+                    "dest": {"LAX"},
+                },
+            ],
+            2,
+        ),
+        (
+            [
+                {
+                    "id": "foo",
+                    "org": {"GOT"},
+                    "dest": {"ARN"},
+                },
+                {
+                    "id": "bar",
+                    "org": {"LHR"},
+                    "dest": {"LAX"},
+                },
+            ],
+            2,
+        ),
+    ],
+)
+def test_trip_outbound_criteria_are_generated(
+    sub_trips: Sequence[Mapping[str, Any]],
+    expected: int,
+) -> None:
+    trips = list(
+        segment_grouper.generate_trip_criteria(
+            [
+                segment_grouper.SubTrip(
+                    trip_id=sub_trip["id"],
+                    origins=frozenset(sub_trip["org"]),
+                    destinations=frozenset(sub_trip["dest"]),
+                    departure=datetime.datetime.now(),
+                    arrival=datetime.datetime.now(),
+                    segments=[],
+                )
+                for sub_trip in sub_trips
+            ],
+        ),
+    )
+    assert len(trips) == expected
+    assert not any(criteria.inbound for criteria in trips)
+
+
+def test_trip_roundtrip_criteria_are_generated(
+    roundtrip: Sequence[segment_grouper.SubTrip],
+) -> None:
+    trips = list(segment_grouper.generate_trip_criteria(roundtrip))
+    assert len(trips) == 3
+    assert any(criteria.inbound for criteria in trips)
+
+
+def test_trip_roundtrip_criteria_handles_reversed_order(
+    roundtrip: Sequence[segment_grouper.SubTrip],
+) -> None:
+    sub_trips = list(roundtrip)
+    trips = list(segment_grouper.generate_trip_criteria(sub_trips))
+    sub_trips.reverse()
+    reversed_trips = list(segment_grouper.generate_trip_criteria(sub_trips))
+    assert trips == reversed_trips

@@ -1,7 +1,7 @@
 import datetime
 import itertools
 from collections.abc import Iterator
-from typing import Iterable, Sequence
+from typing import Sequence
 
 import more_itertools
 
@@ -43,71 +43,49 @@ class CriteriaGenerator(object):
             trips=search_task.search.trips,
             type_filter=models_pb2.Schedule.TYPE_AIR,
         )
-        segments_details = list(self._generate_segment_details(sub_trips))
 
-        for trip_details in segment_grouper.generate_trips(segments_details):
-            task = provider_amqp_pb2.SearchCriteriaTask(
-                offer_search_id=search_task.offer_search_id,
-                segments=[trip_details.outbound_segment],
-                criteria=provider_amqp_pb2.Criteria(
-                    origin_iata=trip_details.origin,
-                    destination_iata=trip_details.destination,
-                    outbound_departure=protobuf.datetime_to_protobuf_datetime(
-                        trip_details.outbound_departure,
-                    ),
-                    cabin_class=enums.AirCabinClassType.any_.value,
-                    adults=number_of_types[0],
-                    children=number_of_types[1],
-                    infants=number_of_types[2],
-                ),
-                session_token=search_task.session_token,
+        for trip_criteria in segment_grouper.generate_trip_criteria(sub_trips):
+            yield from _generate_search_criteria(
+                search_task=search_task,
+                trip_criteria=trip_criteria,
+                number_of_types=number_of_types,
             )
 
-            if trip_details.is_return_trip:
-                task.segments.append(
-                    trip_details.inbound_segment,  # type: ignore[arg-type]
-                )
-                task.criteria.inbound_departure.CopyFrom(
-                    protobuf.datetime_to_protobuf_datetime(
-                        trip_details.inbound_departure,  # type: ignore[arg-type]
-                    ),
-                )
 
-            yield task
+def _generate_search_criteria(
+    search_task: amqp_pb2.TripOfferSearchTask,
+    trip_criteria: segment_grouper.TripCriteria,
+    number_of_types: tuple[int, int, int],
+) -> Iterator[provider_amqp_pb2.SearchCriteriaTask]:
+    for origin, destination in trip_criteria.get_combinations():
+        task = provider_amqp_pb2.SearchCriteriaTask(
+            offer_search_id=search_task.offer_search_id,
+            segments=trip_criteria.outbound.segments,
+            criteria=provider_amqp_pb2.Criteria(
+                origin_iata=origin,
+                destination_iata=destination,
+                outbound_departure=protobuf.datetime_to_protobuf_datetime(
+                    trip_criteria.outbound.departure,
+                ),
+                cabin_class=enums.AirCabinClassType.any_.value,
+                adults=number_of_types[0],
+                children=number_of_types[1],
+                infants=number_of_types[2],
+            ),
+            session_token=search_task.session_token,
+        )
 
-    # todo: refactor this, probably remove it also
-    def _generate_segment_details(  # noqa: WPS210
-        self,
-        sub_trips: Iterable[segment_grouper.SubTrip],
-    ) -> Iterator[segment_grouper.SegmentDetails]:
-        for trip in sub_trips:
-            for segment in trip.segments:
-                first_leg = more_itertools.first(segment.legs)
-                last_leg = more_itertools.last(segment.legs)
+        if trip_criteria.inbound:
+            task.segments.extend(
+                trip_criteria.inbound.segments,
+            )
+            task.criteria.inbound_departure.CopyFrom(
+                protobuf.datetime_to_protobuf_datetime(
+                    trip_criteria.inbound.departure,
+                ),
+            )
 
-                origins = self._mapping.find_mapped_values(
-                    coordinates=first_leg.origin.coordinates,
-                    neighbour_search_radius=1,
-                )
-                destinations = self._mapping.find_mapped_values(
-                    coordinates=last_leg.destination.coordinates,
-                    neighbour_search_radius=1,
-                )
-
-                yield from (
-                    segment_grouper.SegmentDetails(
-                        segment=segment,
-                        departure=protobuf.protobuf_to_datetime(
-                            first_leg.departure_at,
-                        ).astimezone(origin.timezone),
-                        arrival=protobuf.protobuf_to_datetime(
-                            last_leg.arrival_at,
-                        ).astimezone(destination.timezone),
-                        origin=origin.identifier,
-                        destination=destination.identifier,
-                    )
-                    for origin, destination in itertools.product(origins, destinations)
-                )
+        yield task
 
 
 def _get_last_travel_date(
