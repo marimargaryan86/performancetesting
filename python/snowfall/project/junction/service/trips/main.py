@@ -44,9 +44,8 @@ async def _consume(app: service.Application[_ConsumeSettings]) -> None:
         consumer_obj = TripSearchConsumer(
             consumer_obj=consumer.Consumer(
                 connection=connection,
-                exchange=types.Exchange(_TRIPS),
                 queue_name="{0}_trip_searches_consumer".format(app.name),
-                routing_key="trips.search",
+                binds=[(types.Exchange(_TRIPS), "trips.search")],
             ),
             planner=planner_pb2_grpc.PlannerServiceStub(
                 create_channel(

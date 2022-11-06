@@ -68,9 +68,8 @@ async def orders(app: service.Application[OrdersSettings]) -> None:
         consumer_obj = OrdersConsumer(
             consumer_obj=consumer.Consumer(
                 connection=connection,
-                exchange=types.Exchange("orders"),
                 queue_name="{0}_orders".format(app.name),
-                routing_key="orders.offers",
+                binds=[(types.Exchange("orders"), "orders.offers")],
             ),
             producer_obj=producer.Producer(
                 connection=connection,

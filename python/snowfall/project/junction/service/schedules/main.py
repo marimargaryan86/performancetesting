@@ -65,9 +65,8 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
             schedules=schedules.ScheduleRepository(mongo.schedules.schedules),
             consumer=amqp_consumer.Consumer(
                 connection=connection,
-                exchange=types.Exchange("schedules"),
                 queue_name="{0}_schedules_importer".format(app.name),
-                routing_key="schedule.import",
+                binds=[(types.Exchange("schedules"), "schedule.import")],
             ),
         )
 

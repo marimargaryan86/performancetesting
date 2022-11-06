@@ -88,9 +88,8 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
         booking_importer = importer.BookingImporter(
             consumer_obj=consumer.Consumer(
                 connection=connection,
-                exchange=types.Exchange("orders"),
                 queue_name="{0}_orders".format(app.name),
-                routing_key="orders.result.offer",
+                binds=[(types.Exchange("orders"), "orders.result.offer")],
             ),
             booking_repository=orders.BookingRepository(
                 mongo.orders.journeys,

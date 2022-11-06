@@ -2,10 +2,8 @@ from __future__ import annotations
 
 import abc
 import asyncio
-import contextlib
 import datetime
-import functools
-from typing import Any, AsyncGenerator, Mapping, TypeVar
+from typing import Any, Mapping, TypeVar
 
 from google.protobuf import message
 
@@ -184,32 +182,26 @@ class StatusReporter(object):
         self._producer = producer
 
     async def receive(self, headers: Mapping[str, Any]) -> None:
-        await self._report(
-            headers,
-            amqp_pb2.Trackable(event=amqp_pb2.Trackable.EVENT_RECEIVED),
-        )
+        await self._report(headers, amqp_pb2.Trackable.EVENT_RECEIVED)
 
     async def ack(self, headers: Mapping[str, Any]) -> None:
-        await self._report(
-            headers,
-            amqp_pb2.Trackable(event=amqp_pb2.Trackable.EVENT_ACKED),
-        )
+        await self._report(headers, amqp_pb2.Trackable.EVENT_ACKED)
 
     async def nack(self, headers: Mapping[str, Any]) -> None:
-        await self._report(
-            headers,
-            amqp_pb2.Trackable(event=amqp_pb2.Trackable.EVENT_NACKED),
-        )
+        await self._report(headers, amqp_pb2.Trackable.EVENT_NACKED)
 
     async def _report(
         self,
         headers: Mapping[str, Any],
-        trackable: amqp_pb2.Trackable,
+        event: amqp_pb2.Trackable.Event.ValueType,
     ) -> None:
         if not _is_trackable(headers):
             return
 
-        trackable.id = headers[TRACKABLE_ID]
+        trackable = amqp_pb2.Trackable(
+            id=headers[TRACKABLE_ID],
+            event=event,
+        )
 
         await self._producer.publish(
             msg=trackable,
@@ -217,38 +209,18 @@ class StatusReporter(object):
         )
 
 
-@contextlib.asynccontextmanager
-async def report_status(
-    status_reporter: StatusReporter,
-    msg: types.Message[_Proto],
-) -> AsyncGenerator[None, None]:
-    await status_reporter.receive(msg.headers)
+class ReportingMiddleware(protocol.ConsumerMiddleware[_Proto]):
+    def __init__(self, status_reporter: StatusReporter) -> None:
+        self._status_reporter = status_reporter
 
-    try:
-        yield
-    finally:
+    async def before(self, msg: types.Message[_Proto]) -> None:
+        await self._status_reporter.receive(msg.headers)
+
+    async def after(self, msg: types.Message[_Proto]) -> None:
         if msg.acknowledged:
-            await status_reporter.ack(msg.headers)
+            await self._status_reporter.ack(msg.headers)
         elif not msg.requeued:
-            await status_reporter.nack(msg.headers)
-
-
-class ReportingConsumer(protocol.Consumer[_Proto]):
-    def __init__(
-        self,
-        consumer: protocol.Consumer[_Proto],
-        producer: protocol.Producer,
-    ) -> None:
-        self._consumer = consumer
-        self._status_reporter = StatusReporter(producer)
-
-    async def consume(self, callback: protocol.ConsumerCallback[_Proto]) -> None:
-        @functools.wraps(callback)
-        async def wrapper(msg: types.Message[_Proto]) -> None:
-            async with report_status(self._status_reporter, msg):
-                return await callback(msg)
-
-        return await self._consumer.consume(wrapper)
+            await self._status_reporter.nack(msg.headers)
 
 
 class TrackableProducer(protocol.Producer):

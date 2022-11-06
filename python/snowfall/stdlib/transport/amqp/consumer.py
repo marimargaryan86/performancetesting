@@ -11,7 +11,6 @@ from google.protobuf import message
 from sentry_sdk import Hub, tracing
 from structlog import get_logger
 
-from snowfall.stdlib import sequence
 from snowfall.stdlib.instrumentation import prometheus
 from snowfall.stdlib.transport.amqp import protocol, types
 
@@ -50,15 +49,15 @@ class Consumer(protocol.Consumer[_Proto]):  # noqa: WPS214
     def __init__(
         self,
         connection: abc.AbstractConnection,
-        exchange: types.Exchange,
         queue_name: str,
-        routing_key: Sequence[str] | str,
+        binds: Sequence[tuple[types.Exchange, str]],
+        middlewares: Sequence[protocol.ConsumerMiddleware[_Proto]] | None = None,
     ):
+        self._binds = binds
         self._connection = connection
-        self._exchange = exchange
+        self._middlewares = middlewares or []
         self._logger = get_logger(__name__)
         self._queue_name = queue_name
-        self._routing_keys: Sequence[str] = sequence.ensure(routing_key)
 
     async def consume(self, callback: protocol.ConsumerCallback[_Proto]) -> None:
         async with self._connection.channel() as channel:
@@ -66,19 +65,19 @@ class Consumer(protocol.Consumer[_Proto]):  # noqa: WPS214
                 prefetch_count=((os.cpu_count() or 1) * 2) + 1,
             )
 
-            exchange = await channel.declare_exchange(
-                name=self._exchange.name,
-                type=self._exchange.type_,
-                durable=True,
-            )
-
             queue = await channel.declare_queue(
                 name=self._queue_name,
                 durable=True,
             )
 
-            for routing_key in self._routing_keys:
-                await queue.bind(exchange, routing_key)
+            for exchange, routing_key in self._binds:
+                declared_exchange = await channel.declare_exchange(
+                    name=exchange.name,
+                    type=exchange.type_,
+                    durable=True,
+                )
+
+                await queue.bind(declared_exchange, routing_key)
 
             await self._consume(queue, callback)
 
@@ -109,6 +108,9 @@ class Consumer(protocol.Consumer[_Proto]):  # noqa: WPS214
             span.set_status("ok")
             start_time = datetime.datetime.now(tz=datetime.timezone.utc)
 
+            for middleware in self._middlewares:
+                await middleware.before(msg)
+
             try:
                 await callback(msg)
             except Exception:  # noqa: PIE786
@@ -118,7 +120,7 @@ class Consumer(protocol.Consumer[_Proto]):  # noqa: WPS214
             else:
                 await msg.ack()
             finally:
-                self._finalize_message(msg, start_time)
+                await self._finalize_message(msg, start_time)
 
     def _with_transaction(self, msg: types.Message[_Proto]) -> tracing.Transaction:
         transaction = tracing.Transaction.continue_from_headers(
@@ -134,16 +136,19 @@ class Consumer(protocol.Consumer[_Proto]):  # noqa: WPS214
 
     def _prometheus_labels(self, msg: types.Message[_Proto]) -> dict[str, str]:
         return {
-            "exchange": self._exchange.name,
+            "exchange": msg.exchange,
             "queue": self._queue_name,
             "routing_key": msg.routing_key,
         }
 
-    def _finalize_message(
+    async def _finalize_message(
         self,
         msg: types.Message[_Proto],
         start_time: datetime.datetime,
     ) -> None:
+        for middleware in self._middlewares:
+            await middleware.after(msg)
+
         self._track_processing_time(msg, start_time)
         self._counter_messages.labels(**self._prometheus_labels(msg)).inc()
 
@@ -154,8 +159,7 @@ class Consumer(protocol.Consumer[_Proto]):  # noqa: WPS214
 
         self._logger.info(
             "Message consumed.",
-            queue=self._queue_name,
-            routing_key=msg.routing_key,
+            **self._prometheus_labels(msg),
             type=msg.body.DESCRIPTOR.full_name,
         )
 

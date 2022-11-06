@@ -106,9 +106,8 @@ async def offers(app: service.Application[OffersSettings]) -> None:
         consumer_obj = TripSearchConsumer(
             consumer_obj=consumer.Consumer(
                 connection=connection,
-                exchange=types.Exchange("offers"),
                 queue_name="{0}_offers".format(app.name),
-                routing_key="offers.search.trip",
+                binds=[(types.Exchange("offers"), "offers.search.trip")],
             ),
             producer_obj=producer.Producer(
                 connection=connection,

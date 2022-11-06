@@ -57,14 +57,14 @@ class Message(Generic[_Proto]):  # noqa: WPS214
         self.body = protobuf.AnySerializer[_Proto].deserialize(msg.body)
         self.headers = msg.headers
         self._message = msg
-        self._status = MessageStatus.unprocessed
+        self.status = MessageStatus.unprocessed
 
     async def ack(self) -> None:
         if self.processed:
             return
 
         await self._message.ack()
-        self._status = MessageStatus.acked
+        self.status = MessageStatus.acked
 
     @property
     def enqueued_at(self) -> datetime.datetime | None:
@@ -76,25 +76,28 @@ class Message(Generic[_Proto]):  # noqa: WPS214
         return datetime.datetime.fromtimestamp(enqueued_at, tz=datetime.timezone.utc)
 
     @property
+    def exchange(self) -> str:
+        return self._message.exchange or ""
+
+    @property
     def processed(self) -> bool:
         return self._message.processed
 
     @property
     def acknowledged(self) -> bool:
-        return self._status == MessageStatus.acked
+        return self.status == MessageStatus.acked
 
     @property
     def requeued(self) -> bool:
-        return self._status == MessageStatus.requeued
+        return self.status == MessageStatus.requeued
 
     async def nack(self, requeue: bool = False) -> None:
         if self.processed:
             return
 
         # todo: make sure we don't requeue forever?
-
         await self._message.nack(requeue=requeue)
-        self._status = MessageStatus.requeued if requeue else MessageStatus.nacked
+        self.status = MessageStatus.requeued if requeue else MessageStatus.nacked
 
     @property
     def routing_key(self) -> str:

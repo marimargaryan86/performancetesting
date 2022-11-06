@@ -63,7 +63,7 @@ class TripSearchConsumer(object):
 class SearchCriteriaConsumer(object):
     def __init__(
         self,
-        consumer_obj: trackable.ReportingConsumer[amqp_pb2.SearchCriteriaTask],
+        consumer_obj: consumer.Consumer[amqp_pb2.SearchCriteriaTask],
         producer_obj: producer.Producer,
         adapter: save_a_train_adapter.SaveATrainAdapter,
     ):

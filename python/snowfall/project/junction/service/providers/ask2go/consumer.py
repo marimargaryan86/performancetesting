@@ -111,7 +111,7 @@ class TripSearchConsumer(object):
 class SearchCriteriaConsumer(object):
     def __init__(  # noqa: WPS211
         self,
-        consumer_obj: trackable.ReportingConsumer[amqp_pb2.SearchCriteriaTask],
+        consumer_obj: consumer.Consumer[amqp_pb2.SearchCriteriaTask],
         producer_obj: producer.Producer,
         ask2go_adapter: adapter.Ask2GoAdapter,
         offer_transformer: transformer.OfferTransformer,

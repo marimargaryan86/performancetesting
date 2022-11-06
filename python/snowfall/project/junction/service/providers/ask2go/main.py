@@ -73,9 +73,14 @@ async def _offers(app: service.Application[_OffersSettings]) -> None:
         trip_search_consumer = consumer.TripSearchConsumer(
             consumer_obj=amqp_consumer.Consumer(
                 connection=connection,
-                exchange=types.Exchange(_OFFERS),
                 queue_name="{0}_offers".format(app.name),
-                routing_key="offers.search.trip",
+                binds=[
+                    (types.Exchange(_OFFERS), "offers.search.trip"),
+                    (
+                        types.Exchange("ask2go"),
+                        trackable.to_tracking_key("offers.search.trip"),
+                    ),
+                ],
             ),
             producer_obj=trackable.TrackableProducer(
                 producer.Producer(
@@ -138,9 +143,8 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
         await consumer.OrderConsumer(
             consumer_obj=amqp_consumer.Consumer(
                 connection=amqp_connection,
-                exchange=types.Exchange("orders"),
                 queue_name="{0}_orders".format(app.name),
-                routing_key="orders.offers",
+                binds=[(types.Exchange("orders"), "orders.offers")],
             ),
             producer_obj=producer.Producer(
                 connection=amqp_connection,
@@ -191,17 +195,20 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
         )
 
         await consumer.SearchCriteriaConsumer(
-            consumer_obj=trackable.ReportingConsumer(
-                amqp_consumer.Consumer(
-                    connection=amqp_connection,
-                    exchange=types.Exchange("ask2go"),
-                    queue_name="{0}_searches".format(app.name),
-                    routing_key="offers.search.trip",
-                ),
-                producer=producer.Producer(
-                    connection=amqp_connection,
-                    exchange=types.Exchange("ask2go"),
-                ),
+            consumer_obj=amqp_consumer.Consumer(
+                connection=amqp_connection,
+                queue_name="{0}_searches".format(app.name),
+                binds=[(types.Exchange("ask2go"), "offers.search.trip")],
+                middlewares=[
+                    trackable.ReportingMiddleware(
+                        status_reporter=trackable.StatusReporter(
+                            producer=producer.Producer(
+                                connection=amqp_connection,
+                                exchange=types.Exchange("ask2go"),
+                            ),
+                        ),
+                    ),
+                ],
             ),
             producer_obj=producer.Producer(
                 connection=amqp_connection,

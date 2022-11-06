@@ -90,9 +90,8 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
             locations=LocationRepository(mongo.places.locations),
             consumer=consumer.Consumer(
                 connection=connection,
-                exchange=types.Exchange("places"),
                 queue_name="{0}_locations_importer".format(app.name),
-                routing_key="location.import",
+                binds=[(types.Exchange("places"), "location.import")],
             ),
         )
 

@@ -98,13 +98,15 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
             decode_responses=True,
         ).client() as redis_conn:
             offer_importer = importer.OfferImporter(
-                consumer_obj=consumer.Consumer[importer.ExpectedMessages](
+                consumer_obj=consumer.Consumer(
                     connection=connection,
-                    exchange=types.Exchange("offers"),
                     queue_name="{0}_offers".format(app.name),
-                    routing_key=[
-                        trackable.to_tracking_key(_TRIP_OFFER_SEARCH_ROUTING_KEY),
-                        "offers.result.trip",
+                    binds=[
+                        (
+                            types.Exchange("offers"),
+                            trackable.to_tracking_key(_TRIP_OFFER_SEARCH_ROUTING_KEY),
+                        ),
+                        (types.Exchange("offers"), "offers.result.trip"),
                     ],
                 ),
                 trip_offers=offers.TripOfferRepository(

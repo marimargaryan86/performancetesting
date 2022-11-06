@@ -8,6 +8,14 @@ _Proto = TypeVar("_Proto", bound=message.Message)
 ConsumerCallback = Callable[[types.Message[_Proto]], Awaitable[None]]
 
 
+class ConsumerMiddleware(Protocol[_Proto]):
+    async def before(self, msg: types.Message[_Proto]) -> None:
+        """Is called before a message is processed."""
+
+    async def after(self, msg: types.Message[_Proto]) -> None:
+        """Is called after a message is processed."""
+
+
 class Consumer(Protocol[_Proto]):
     async def consume(self, callback: ConsumerCallback[_Proto]) -> None:
         """Consume a message from the queue."""

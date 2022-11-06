@@ -73,9 +73,8 @@ async def _consume(app: service.Application[_AmqpSettings]) -> None:
     async with types.Connection(app.settings.amqp_dsn) as connection:
         await consumer.Consumer[echo_pb2.EchoRequest](
             connection=connection,
-            exchange=types.Exchange(app.name),
             queue_name="{0}_consumer".format(app.name),
-            routing_key="echo.foobar",
+            binds=[(types.Exchange(app.name), "echo.foobar")],
         ).consume(_echo_message_and_sleep)
 
 
