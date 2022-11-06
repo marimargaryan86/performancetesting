@@ -91,8 +91,8 @@ API_EMAIL={{ .Data.data.api_email }}
 API_PASSWORD={{ .Data.data.api_password }}
 API_SEARCH_PASSWORD={{ .Data.data.api_search_password }}
 API_BOOKING_TOKEN={{ .Data.data.api_booking_token }}
-API_BASE_URL={{ .Data.api_base_url }}
-API_SEARCH_BASE_URL={{ .Data.api_search_base_url }}
+API_BASE_URL={{ .Data.data.api_base_url }}
+API_SEARCH_BASE_URL={{ .Data.data.api_search_base_url }}
 {{ end }}
 EOH
         destination = "services.env"
