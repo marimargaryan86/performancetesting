@@ -8,6 +8,7 @@ from snowfall.project.junction.service.offers.v1alpha import amqp_pb2, models_pb
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.v1alpha import amqp_pb2 as trackable_pb2
 
 
 class NotFoundError(Exception):
@@ -153,6 +154,11 @@ class OfferBucketRepository(object):
 
 
 class OfferAggregator(object):
+    _skippable_statuses = (
+        trackable_pb2.Trackable.STATUS_FAILED,
+        trackable_pb2.Trackable.STATUS_COMPLETED,
+    )
+
     def __init__(
         self,
         offer_searches: offers.OfferSearchRepository,
@@ -169,7 +175,7 @@ class OfferAggregator(object):
     ) -> None:
         offer_search = await self._searches.find_by_id(search_result.offer_search_id)
 
-        if not offer_search:
+        if not offer_search or offer_search.status in self._skippable_statuses:
             return
 
         _set_sequence_numbers(offer_search, search_result.offer)

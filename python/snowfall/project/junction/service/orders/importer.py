@@ -6,7 +6,7 @@ from snowfall.stdlib.transport.amqp import consumer, types
 class BookingImporter(object):
     def __init__(
         self,
-        consumer_obj: consumer.Consumer,
+        consumer_obj: consumer.Consumer[models_pb2.Booking],
         booking_repository: orders.BookingRepository,
     ):
         self._consumer = consumer_obj

@@ -20,7 +20,7 @@ _label_names = ("exchange", "queue", "routing_key")
 _Proto = TypeVar("_Proto", bound=message.Message)
 
 
-class Consumer(protocol.Consumer):  # noqa: WPS214
+class Consumer(protocol.Consumer[_Proto]):  # noqa: WPS214
     _counter_messages = prometheus_client.Counter(
         "amqp_consumer_consumed_messages_total",
         "Total number of consumed messages.",

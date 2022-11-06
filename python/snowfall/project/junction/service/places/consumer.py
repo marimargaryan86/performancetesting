@@ -5,7 +5,7 @@ from snowfall.stdlib.transport.amqp.types import Message
 
 
 class LocationImportConsumer(object):
-    def __init__(self, locations: LocationRepository, consumer: Consumer):
+    def __init__(self, locations: LocationRepository, consumer: Consumer[Location]):
         self._consumer = consumer
         self._locations = locations
 

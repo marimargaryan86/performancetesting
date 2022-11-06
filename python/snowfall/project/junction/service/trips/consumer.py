@@ -38,7 +38,7 @@ class _TripSearchContext(object):
         traceback: std_types.TracebackType | None,
     ) -> bool:
         if exc_type:
-            await self._repository.mark_as_failed(self._message.trip_search)
+            await self._repository.mark_as_failed(self._message.trip_search.id)
 
         return False
 
@@ -46,7 +46,7 @@ class _TripSearchContext(object):
 class TripSearchConsumer(object):
     def __init__(
         self,
-        consumer_obj: consumer.Consumer,
+        consumer_obj: consumer.Consumer[amqp_pb2.TripSearchTask],
         planner: planner_pb2_grpc.PlannerServiceStub,
         trip_search_repository: trips.TripSearchRepository,
         trip_repository: trips.TripRepository,
@@ -64,7 +64,9 @@ class TripSearchConsumer(object):
         self,
         message: types.Message[amqp_pb2.TripSearchTask],
     ) -> None:
-        await self._trip_search_repository.mark_as_processing(message.body.trip_search)
+        await self._trip_search_repository.mark_as_processing(
+            message.body.trip_search.id,
+        )
 
         origins = {
             (origin.coordinates.latitude, origin.coordinates.longitude)

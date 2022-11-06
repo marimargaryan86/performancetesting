@@ -5,7 +5,7 @@ from snowfall.stdlib.v1alpha.models_pb2 import Schedule
 
 
 class ScheduleImportConsumer(object):
-    def __init__(self, schedules: ScheduleRepository, consumer: Consumer):
+    def __init__(self, schedules: ScheduleRepository, consumer: Consumer[Schedule]):
         self._consumer = consumer
         self._schedules = schedules
 

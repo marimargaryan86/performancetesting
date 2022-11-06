@@ -15,7 +15,7 @@ _PROVIDER_NAME = "Save A Train"
 class TripSearchConsumer(object):
     def __init__(
         self,
-        consumer_obj: consumer.Consumer,
+        consumer_obj: consumer.Consumer[offers_amqp_pb2.TripOfferSearchTask],
         producer_obj: producer.Producer,
         generator: criteria.CriteriaGenerator,
     ):
@@ -37,7 +37,7 @@ class TripSearchConsumer(object):
 class SearchCriteriaConsumer(object):
     def __init__(
         self,
-        consumer_obj: consumer.Consumer,
+        consumer_obj: consumer.Consumer[amqp_pb2.SearchCriteriaTask],
         producer_obj: producer.Producer,
         adapter: save_a_train_adapter.SaveATrainAdapter,
     ):
@@ -65,7 +65,7 @@ class SearchCriteriaConsumer(object):
 class OrdersConsumer(object):
     def __init__(
         self,
-        consumer_obj: consumer.Consumer,
+        consumer_obj: consumer.Consumer[orders_amqp_pb2.PlaceOrderTask],
         offers_cache: cache.OffersCache,
         producer_obj: producer.Producer,
         adapter: save_a_train_adapter.SaveATrainAdapter,

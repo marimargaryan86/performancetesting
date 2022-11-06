@@ -4379,7 +4379,8 @@
               "attributes": {
                 "type": "object",
                 "required": [
-                  "expiresAt"
+                  "expiresAt",
+                  "status"
                 ],
                 "properties": {
                   "expiresAt": {
@@ -4401,6 +4402,7 @@
                   },
                   "status": {
                     "type": "string",
+                    "readOnly": true,
                     "enum": [
                       "unspecified",
                       "pending",
@@ -5506,11 +5508,24 @@
                   },
                   "loyalty": {
                     "$ref": "#/components/schemas/LoyaltyCard"
+                  },
+                  "status": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                      "unspecified",
+                      "pending",
+                      "processing",
+                      "completed",
+                      "failed"
+                    ],
+                    "example": "completed"
                   }
                 },
                 "required": [
                   "expiresAt",
-                  "passengers"
+                  "passengers",
+                  "status"
                 ]
               },
               "relationships": {

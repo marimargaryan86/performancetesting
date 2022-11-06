@@ -22,7 +22,7 @@ _PROVIDER_NAME = "Ask2Go"
 class OrderConsumer(object):
     def __init__(
         self,
-        consumer_obj: consumer.Consumer,
+        consumer_obj: consumer.Consumer[orders_amqp_pb2.PlaceOrderTask],
         producer_obj: producer.Producer,
         booking_handler: booking.BookingHandler,
         offer_cache: cache.OfferCache,
@@ -63,7 +63,7 @@ class OrderConsumer(object):
 class TripSearchConsumer(object):
     def __init__(
         self,
-        consumer_obj: consumer.Consumer,
+        consumer_obj: consumer.Consumer[offers_amqp_pb2.TripOfferSearchTask],
         producer_obj: producer.Producer,
         generator: criteria.CriteriaGenerator,
     ):
@@ -85,7 +85,7 @@ class TripSearchConsumer(object):
 class SearchCriteriaConsumer(object):
     def __init__(  # noqa: WPS211
         self,
-        consumer_obj: consumer.Consumer,
+        consumer_obj: consumer.Consumer[amqp_pb2.SearchCriteriaTask],
         producer_obj: producer.Producer,
         ask2go_adapter: adapter.Ask2GoAdapter,
         offer_transformer: transformer.OfferTransformer,

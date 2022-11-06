@@ -9,6 +9,7 @@ from motor import motor_asyncio
 from snowfall.project.junction.service.offers.v1alpha import models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
+from snowfall.stdlib.v1alpha import amqp_pb2
 from snowfall.stdlib.v1alpha import models_pb2 as common_pb2
 
 _IN = "$in"
@@ -264,6 +265,7 @@ class OfferSearchRepository(  # noqa: WPS215
     mixins.AllMixin[models_pb2.OfferSearch],
     mixins.FindByIdMixin[models_pb2.OfferSearch],
     mixins.InsertMixin[models_pb2.OfferSearch],
+    mixins.StatusMixin[models_pb2.OfferSearch],
     repository.ProtoRepository[models_pb2.OfferSearch],
 ):
     _proto = models_pb2.OfferSearch
@@ -289,6 +291,7 @@ class OfferSearchRepository(  # noqa: WPS215
 
         offer_search.CopyFrom(document)
         offer_search.id = string.uuid()
+        offer_search.status = amqp_pb2.Trackable.Status.STATUS_PENDING
         offer_search.expires_at.CopyFrom(expires_at)
 
         return await self.insert(offer_search)

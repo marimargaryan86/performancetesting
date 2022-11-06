@@ -4,13 +4,16 @@ from typing import AnyStr, AsyncIterable, Generic, Optional
 from aioredis import Redis, client, lock
 
 
-class Hash(Generic[AnyStr]):
+class Hash(Generic[AnyStr]):  # noqa: WPS214
     def __init__(self, redis: Redis, name: str):
         self._name = name
         self._redis = redis
 
     def __str__(self) -> str:
         return self._name
+
+    async def increment(self, hash_key: str, amount: int = 1) -> int:
+        return await self._redis.hincrby(self._name, hash_key, amount)
 
     async def put(
         self,

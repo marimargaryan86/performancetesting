@@ -1050,6 +1050,10 @@ class TripOfferSearchResource(models.Resource):
                 {"dateOfBirth": protobuf.protobuf_to_date(passenger.date_of_birth)}
                 for passenger in offer_search.trip.passengers
             ],
+            "status": protobuf.enum_value_to_slug(
+                amqp_pb2.Trackable.Status.DESCRIPTOR,
+                offer_search.status,
+            ),
         }
 
         if offer_search.trip.HasField("loyalty_card"):

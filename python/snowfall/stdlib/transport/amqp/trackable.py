@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import abc
+import asyncio
 import contextlib
 import functools
 from typing import AsyncGenerator, Mapping, TypeVar
@@ -7,15 +9,167 @@ from typing import AsyncGenerator, Mapping, TypeVar
 from google.protobuf import message
 
 from snowfall.stdlib import string
+from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.persistence.redis import types as redis_types
 from snowfall.stdlib.transport.amqp import protocol, types
 from snowfall.stdlib.v1alpha import amqp_pb2
 
 _Proto = TypeVar("_Proto", bound=message.Message)
+_Record = TypeVar("_Record", covariant=True)
 _TRACKABLE_HEADERS = ("x-trackable-id", "x-trackable-routing-key")
+_skippable_statuses = (
+    amqp_pb2.Trackable.STATUS_FAILED,
+    amqp_pb2.Trackable.STATUS_COMPLETED,
+    amqp_pb2.Trackable.STATUS_UNSPECIFIED,
+)
 
 
 def _is_trackable(msg: types.Message[_Proto]) -> bool:
     return all(header in msg.headers for header in _TRACKABLE_HEADERS)
+
+
+def to_tracking_key(routing_key: str) -> str:
+    return "trackable.{0}".format(
+        routing_key,
+    )
+
+
+async def _get_status_stats(
+    status_hash: redis_types.Hash[str],
+) -> tuple[int, int, int]:
+    received, acked, nacked = await asyncio.gather(
+        status_hash.get(
+            protobuf.enum_value_to_slug(
+                amqp_pb2.Trackable.Event.DESCRIPTOR,
+                amqp_pb2.Trackable.EVENT_RECEIVED,
+            ),
+        ),
+        status_hash.get(
+            protobuf.enum_value_to_slug(
+                amqp_pb2.Trackable.Event.DESCRIPTOR,
+                amqp_pb2.Trackable.EVENT_ACKED,
+            ),
+        ),
+        status_hash.get(
+            protobuf.enum_value_to_slug(
+                amqp_pb2.Trackable.Event.DESCRIPTOR,
+                amqp_pb2.Trackable.EVENT_NACKED,
+            ),
+        ),
+    )
+
+    return (
+        int(received or 0),
+        int(acked or 0),
+        int(nacked or 0),
+    )
+
+
+class _AbstractStatusHandler(abc.ABC):
+    def __init__(
+        self,
+        redis: redis_types.Client[str],
+    ) -> None:
+        self._redis = redis
+
+    async def on_message(self, msg: amqp_pb2.Trackable) -> None:
+        status = await self._get_by_id(msg.id)
+
+        if status in _skippable_statuses:
+            return
+
+        status_hash = self._redis.hash_(
+            "offer_searches.{0}.statuses".format(msg.id),
+        )
+
+        await status_hash.increment(
+            protobuf.enum_value_to_slug(
+                amqp_pb2.Trackable.Event.DESCRIPTOR,
+                msg.event,
+            ),
+        )
+
+        await self._determine_status(msg, status, status_hash)
+
+    @abc.abstractmethod
+    async def _determine_status(
+        self,
+        msg: amqp_pb2.Trackable,
+        current_status: amqp_pb2.Trackable.Status.ValueType,
+        status_hash: redis_types.Hash[str],
+    ) -> None:
+        """Determine the new status, if any.
+
+        Should call the _on_* methods on change.
+        """
+
+    @abc.abstractmethod
+    async def _get_by_id(
+        self,
+        trackable_id: str,
+    ) -> amqp_pb2.Trackable.Status.ValueType:
+        """Get the current status by its trackable ID.
+
+        Should return `STATUS_UNSPECIFIED` if unknown.
+        """
+
+    @abc.abstractmethod
+    async def _on_completed(self, msg: amqp_pb2.Trackable) -> None:
+        """Logic to run when the status changes to 'completed'."""
+
+    @abc.abstractmethod
+    async def _on_failed(self, msg: amqp_pb2.Trackable) -> None:
+        """Logic to run when the status changes to 'failed'."""
+
+    @abc.abstractmethod
+    async def _on_processing(self, msg: amqp_pb2.Trackable) -> None:
+        """Logic to run when the status changes to 'processing'."""
+
+
+class FixedSizeStatusHandler(_AbstractStatusHandler):
+    async def set_expected_size(
+        self,
+        trackable_id: str,
+        size: int,
+    ) -> None:
+        status_hash = self._redis.hash_(
+            "offer_searches.{0}.statuses".format(trackable_id),
+        )
+
+        await status_hash.put("expected", size)
+
+    async def _determine_status(
+        self,
+        msg: amqp_pb2.Trackable,
+        current_status: amqp_pb2.Trackable.Status.ValueType,
+        status_hash: redis_types.Hash[str],
+    ) -> None:
+        expected = int(await status_hash.get("expected") or 0)
+        _, acked, nacked = await _get_status_stats(status_hash)
+
+        if nacked > 0:
+            await self._on_failed(msg)
+        elif acked >= expected:
+            await self._on_completed(msg)
+        elif current_status == amqp_pb2.Trackable.STATUS_PENDING:
+            await self._on_failed(msg)
+
+
+class AnySizeStatusHandler(_AbstractStatusHandler):
+    async def _determine_status(
+        self,
+        msg: amqp_pb2.Trackable,
+        current_status: amqp_pb2.Trackable.Status.ValueType,
+        status_hash: redis_types.Hash[str],
+    ) -> None:
+        received, acked, nacked = await _get_status_stats(status_hash)
+
+        if nacked > 0:
+            await self._on_failed(msg)
+        elif acked >= received:
+            await self._on_completed(msg)
+        elif current_status == amqp_pb2.Trackable.STATUS_PENDING:
+            await self._on_processing(msg)
 
 
 class StatusReporter(object):
@@ -72,10 +226,10 @@ async def report_status(
             await status_reporter.nack(msg)
 
 
-class Consumer(protocol.Consumer):
+class ReportingConsumer(protocol.Consumer[_Proto]):
     def __init__(
         self,
-        consumer: protocol.Consumer,
+        consumer: protocol.Consumer[_Proto],
         producer: protocol.Producer,
     ) -> None:
         self._consumer = consumer
@@ -90,7 +244,7 @@ class Consumer(protocol.Consumer):
         return await self._consumer.consume(wrapper)
 
 
-class Producer(protocol.Producer):
+class TrackableProducer(protocol.Producer):
     def __init__(self, producer: protocol.Producer) -> None:
         self._producer = producer
 
@@ -104,9 +258,7 @@ class Producer(protocol.Producer):
     ) -> None:
         headers = headers or {}
         trackable_id = trackable_id or string.uuid()
-        trackable_routing_key = trackable_routing_key or "trackable.{0}".format(
-            routing_key,
-        )
+        trackable_routing_key = trackable_routing_key or to_tracking_key(routing_key)
 
         return await self._producer.publish(
             msg=msg,

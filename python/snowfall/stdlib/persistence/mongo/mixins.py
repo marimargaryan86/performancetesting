@@ -1,6 +1,11 @@
+from __future__ import annotations
+
 from typing import Generic, Optional, Sequence, TypeVar
 
+import pymongo
+
 from snowfall.stdlib.persistence.mongo import repository, resultset
+from snowfall.stdlib.v1alpha import amqp_pb2
 
 Record = TypeVar("Record")
 
@@ -77,6 +82,53 @@ class InsertManyMixin(Generic[Record]):
             raise RuntimeError()
 
         return documents
+
+
+class StatusMixin(Generic[Record]):
+    async def mark_as_completed(
+        self: repository.RepositoryProtocol[Record],
+        document_id: str,
+    ) -> Record:
+        return await self._execute(
+            self._collection.find_one_and_update,
+            {"_id": document_id},
+            {
+                "$set": {
+                    "status": amqp_pb2.Trackable.STATUS_COMPLETED,
+                },
+            },
+            return_document=pymongo.ReturnDocument.AFTER,
+        )
+
+    async def mark_as_failed(
+        self: repository.RepositoryProtocol[Record],
+        document_id: str,
+    ) -> Record:
+        return await self._execute(
+            self._collection.find_one_and_update,
+            {"_id": document_id},
+            {
+                "$set": {
+                    "status": amqp_pb2.Trackable.STATUS_FAILED,
+                },
+            },
+            return_document=pymongo.ReturnDocument.AFTER,
+        )
+
+    async def mark_as_processing(
+        self: repository.RepositoryProtocol[Record],
+        document_id: str,
+    ) -> Record:
+        return await self._execute(
+            self._collection.find_one_and_update,
+            {"_id": document_id},
+            {
+                "$set": {
+                    "status": amqp_pb2.Trackable.STATUS_PROCESSING,
+                },
+            },
+            return_document=pymongo.ReturnDocument.AFTER,
+        )
 
 
 class UpsertMixin(Generic[Record]):

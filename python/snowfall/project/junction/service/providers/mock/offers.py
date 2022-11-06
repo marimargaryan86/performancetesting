@@ -74,7 +74,7 @@ class OffersMockClient(object):
 class TripSearchConsumer(object):
     def __init__(
         self,
-        consumer_obj: consumer.Consumer,
+        consumer_obj: consumer.Consumer[amqp_pb2.TripOfferSearchTask],
         producer_obj: producer.Producer,
         client: OffersMockClient,
     ):

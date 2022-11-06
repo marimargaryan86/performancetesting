@@ -116,9 +116,10 @@ class TripRepository(
         )
 
 
-class TripSearchRepository(
+class TripSearchRepository(  # noqa: WPS215
     mixins.FindByIdMixin[trips_pb2.TripSearch],
     mixins.InsertMixin[trips_pb2.TripSearch],
+    mixins.StatusMixin[trips_pb2.TripSearch],
     repository.ProtoRepository[trips_pb2.TripSearch],
 ):
     _proto = trips_pb2.TripSearch
@@ -177,40 +178,3 @@ class TripSearchRepository(
         new_trip_search.expires_at.CopyFrom(expires_at)
 
         return await super().insert(new_trip_search)
-
-    async def mark_as_failed(
-        self,
-        trip_search: trips_pb2.TripSearch,
-    ) -> trips_pb2.TripSearch:
-        return await self._set_status(trip_search, amqp_pb2.Trackable.STATUS_FAILED)
-
-    async def mark_as_processing(
-        self,
-        trip_search: trips_pb2.TripSearch,
-    ) -> trips_pb2.TripSearch:
-        return await self._set_status(trip_search, amqp_pb2.Trackable.STATUS_PROCESSING)
-
-    async def _set_status(
-        self,
-        trip_search: trips_pb2.TripSearch,
-        status: amqp_pb2.Trackable.Status.ValueType,
-    ) -> trips_pb2.TripSearch:
-        new_trip_search = trips_pb2.TripSearch()
-
-        new_trip_search.CopyFrom(trip_search)
-        new_trip_search.status = status
-
-        update = await self._execute(
-            self._collection.update_one,
-            {"_id": new_trip_search.id},
-            {
-                "$set": {
-                    "status": new_trip_search.status,
-                },
-            },
-        )
-
-        if not update.acknowledged:
-            raise RuntimeError()
-
-        return new_trip_search

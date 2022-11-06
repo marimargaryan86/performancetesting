@@ -39,7 +39,7 @@ class OrdersMockClient(object):
 class OrdersConsumer(object):
     def __init__(
         self,
-        consumer_obj: consumer.Consumer,
+        consumer_obj: consumer.Consumer[amqp_pb2.PlaceOrderTask],
         producer_obj: producer.Producer,
         client: OrdersMockClient,
     ):

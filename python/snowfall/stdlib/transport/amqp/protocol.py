@@ -8,7 +8,7 @@ _Proto = TypeVar("_Proto", bound=message.Message)
 ConsumerCallback = Callable[[types.Message[_Proto]], Awaitable[None]]
 
 
-class Consumer(Protocol):
+class Consumer(Protocol[_Proto]):
     async def consume(self, callback: ConsumerCallback[_Proto]) -> None:
         """Consume a message from the queue."""
 
