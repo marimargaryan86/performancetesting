@@ -214,12 +214,13 @@ class OfferTransformer(object):  # noqa: WPS214
                             body=rule.text,
                             title=rule.title,
                         )
-                        for rule in grouped_rules[
+                        for rule in grouped_rules.get(
                             (
                                 trip_segment.origin.airport_code,
                                 trip_segment.destination.airport_code,
-                            )
-                        ]
+                            ),
+                            [],
+                        )
                     ],
                     baggage_allowances=[
                         offers_pb2.BaggageAllowance(
