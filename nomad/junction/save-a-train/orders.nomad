@@ -90,6 +90,8 @@ API_EMAIL={{ .Data.data.api_email }}
 API_PASSWORD={{ .Data.data.api_password }}
 API_SEARCH_PASSWORD={{ .Data.data.api_search_password }}
 API_BOOKING_TOKEN={{ .Data.data.api_booking_token }}
+API_BASE_URL={{ .api_base_url }}
+API_SEARCH_BASE_URL={{ .api_search_base_url }}
 {{ end }}
 EOH
         destination = "services.env"
@@ -112,11 +114,9 @@ EOH
       }
 
       env {
-        API_BASE_URL        = "https://satvendorstest.saveatrain.com/api/"
-        API_SEARCH_BASE_URL = "https://apisearch.saveatrain.com/search"
-        ENV_NAME            = "${var.environment}"
-        SENTRY_DSN          = "https://f01c7c8bf4d04a709a65b4be8b11ba69@sentry.snowfall.se/36"
-        PROMETHEUS_PORT     = "${NOMAD_PORT_prometheus}"
+        ENV_NAME        = "${var.environment}"
+        SENTRY_DSN      = "https://f01c7c8bf4d04a709a65b4be8b11ba69@sentry.snowfall.se/36"
+        PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
       }
     }
   }
