@@ -121,6 +121,10 @@ job "client-api-http" {
     task "http" {
       driver = "docker"
 
+      resources {
+        cpu = 600
+      }
+
       vault {
         policies = ["client-api-${var.environment}"]
       }
