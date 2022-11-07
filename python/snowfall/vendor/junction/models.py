@@ -18,12 +18,22 @@ def dict_factory_to_snake(input_dict: Mapping[str, Any]) -> dict[str, Any]:
 
 
 @dataclasses.dataclass(frozen=True)
+class TravelerDocument(object):
+    document_type: str
+    document_number: str
+    document_issue_country: str
+    document_expiration_date: str
+    nationality: str
+
+
+@dataclasses.dataclass(frozen=True)
 class Passenger(object):
     first_name: str
     last_name: str
     title: str
     gender: str
     date_of_birth: str
+    traveler_document: TravelerDocument
 
 
 @dataclasses.dataclass(frozen=True)
