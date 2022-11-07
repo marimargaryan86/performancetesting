@@ -111,6 +111,7 @@ job "res-se-mobile-api-http" {
 
       resources {
         memory = 600
+        cpu    = 350
       }
 
       vault {
