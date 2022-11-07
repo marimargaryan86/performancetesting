@@ -1,12 +1,14 @@
 import dataclasses
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping, Optional, Sequence
 
 from snowfall.stdlib import string
 
 
 def dict_factory_to_camel(dict_items: Sequence[tuple[str, Any]]) -> dict[str, Any]:
     return {
-        string.to_camel(dict_key): dict_value for dict_key, dict_value in dict_items
+        string.to_camel(dict_key): dict_value
+        for dict_key, dict_value in dict_items
+        if dict_value is not None
     }
 
 
@@ -33,7 +35,7 @@ class Passenger(object):
     title: str
     gender: str
     date_of_birth: str
-    traveler_document: TravelerDocument
+    traveler_document: Optional[TravelerDocument] = None
 
 
 @dataclasses.dataclass(frozen=True)
