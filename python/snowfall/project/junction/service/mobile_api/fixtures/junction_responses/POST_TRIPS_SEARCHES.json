@@ -8,7 +8,8 @@
             "type": "trip-searches",
             "attributes": {
                 "expiresAt": "2022-06-17T07:51:49+00:00",
-                "departureAfter": "2022-06-21T20:00:00+00:00"
+                "departureAfter": "2022-06-21T20:00:00+00:00",
+                "status": "pending"
             },
             "relationships": {
                 "origin": {

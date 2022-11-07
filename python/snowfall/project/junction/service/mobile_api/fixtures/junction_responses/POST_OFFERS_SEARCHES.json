@@ -12,7 +12,8 @@
             {
               "dateOfBirth": "1990-02-03"
             }
-          ]
+          ],
+          "status": "pending"
         },
         "relationships": {
           "offers": {

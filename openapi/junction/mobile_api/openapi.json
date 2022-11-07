@@ -1940,7 +1940,8 @@
                 "type": "object",
                 "required": [
                   "expiresAt",
-                  "departureAfter"
+                  "departureAfter",
+                  "status"
                 ],
                 "properties": {
                   "expiresAt": {
@@ -1959,6 +1960,18 @@
                     "format": "date-time",
                     "description": "Not yet implemented.",
                     "example": "2019-08-24T14:15:22Z"
+                  },
+                  "status": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                      "unspecified",
+                      "pending",
+                      "processing",
+                      "completed",
+                      "failed"
+                    ],
+                    "example": "completed"
                   }
                 }
               },
@@ -2485,11 +2498,24 @@
                   },
                   "loyalty": {
                     "$ref": "#/components/schemas/LoyaltyCard"
+                  },
+                  "status": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                      "unspecified",
+                      "pending",
+                      "processing",
+                      "completed",
+                      "failed"
+                    ],
+                    "example": "completed"
                   }
                 },
                 "required": [
                   "expiresAt",
-                  "passengers"
+                  "passengers",
+                  "status"
                 ]
               },
               "relationships": {
