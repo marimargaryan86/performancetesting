@@ -69,7 +69,7 @@ class TestVerificationCode(object):
         )
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
-        smtp_client.send_email_notification.assert_called_once_with(  # type: ignore[attr-defined] # noqa: B950
+        smtp_client.send_email_html_template.assert_called_once_with(  # type: ignore[attr-defined] # noqa: B950
             new_user.email,
             mock.ANY,
             mock.ANY,

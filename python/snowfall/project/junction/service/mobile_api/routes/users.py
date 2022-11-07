@@ -2,8 +2,10 @@ import random
 from string import digits
 from typing import Any, Mapping
 
+import aiofiles
 import bcrypt
 import lagom
+from jinja2 import Template
 from pymongo import errors
 from starlette import endpoints, exceptions, requests, responses, status
 
@@ -19,6 +21,7 @@ from snowfall.project.junction.service.mobile_api.v1alpha.models_pb2 import (
 )
 from snowfall.stdlib import string
 from snowfall.stdlib.integration.starlette import models, request_helpers
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.v1alpha import phone_number_pb2
 
 _id_key = "_id"
@@ -259,10 +262,18 @@ class OTPGenerate(endpoints.HTTPEndpoint):
         otp = await otp_generation()
 
         await otp_repository.create(body[_email_key], otp)
-        await smtp_client.send_email_notification(
+        async with aiofiles.open(
+            filesystem.resource_path(
+                "snowfall.project.junction.service.mobile_api.html_templates",
+                "otp_template.html",
+            ),
+        ) as template_file:
+            template = Template(await template_file.read())
+        email_body = template.render(company_name=smtp_client.client_name, otp=otp)
+        await smtp_client.send_email_html_template(
             body[_email_key],
-            "Email verification",
-            "Your otp code is: {}".format(otp),
+            "Your One Time Pin: {}".format(otp),
+            email_body,
         )
         return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
 
