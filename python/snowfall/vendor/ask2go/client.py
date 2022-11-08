@@ -157,6 +157,15 @@ class Ask2GoClient(object):  # noqa: WPS214
             ),
         )
 
+    async def cancel_booking(self, booking_id: str | int, record_locator: str) -> None:
+        await self._make_request(
+            "DELETE",
+            self._api_booking_base_url.copy_with(
+                path="/api/Booking",
+            ),
+            payload={"bookingId": int(booking_id), "recordLocator": record_locator},
+        )
+
     async def create_air_offer(
         self,
         search_id: str,
