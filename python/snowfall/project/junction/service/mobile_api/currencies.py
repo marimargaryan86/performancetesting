@@ -17,7 +17,7 @@ class CurrencyClient(object):
         self._currencies_client = currencies_client
 
     def get_ttl_hash(self) -> int:
-        return round(time.time() / self._cache_ttl.seconds)
+        return round(time.time() / self._cache_ttl.total_seconds())
 
     @asyncstdlib.lru_cache
     async def get_rate(
