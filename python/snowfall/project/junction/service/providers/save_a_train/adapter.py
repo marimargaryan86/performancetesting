@@ -295,6 +295,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                     currency=money.Currency("EUR"),
                 ).protobuf(),
                 trip_result=order_models_pb2.TripBooking(
+                    provider_booking_reference=booking_responses.make_booking.search_identifier,
                     record_locator=booking_responses.get_ticket.confirmation_code,
                 ),
                 raw_data=(

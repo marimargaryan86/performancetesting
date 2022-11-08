@@ -65,6 +65,9 @@ class BookingHandler(object):
                     ),
                 ).protobuf(),
                 trip_result=models_pb2.TripBooking(
+                    provider_booking_reference=str(
+                        booking_result.information.booking_id,
+                    ),
                     record_locator=more_itertools.first(
                         booking_result.information.record_locators or [""],
                     ),

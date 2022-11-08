@@ -48,6 +48,7 @@ message Booking {
 }
 
 message TripBooking {
+  string provider_booking_reference = 3;
   string record_locator = 1;
   repeated string operator_booking_references = 2;
 }
