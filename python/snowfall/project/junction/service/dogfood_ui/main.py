@@ -8,6 +8,7 @@ from starlette import applications, routing
 from snowfall.project.junction.service.dogfood_ui import routes
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application
+from snowfall.stdlib.integration.starlette import routes as stdlib_routes
 from snowfall.stdlib.persistence import filesystem
 
 
@@ -45,11 +46,9 @@ def _dependencies(
 def _routes(dependencies: starlette.StarletteIntegration) -> list[routing.Route]:
     return [
         dependencies.route("/", routes.UI),
-        dependencies.route(
-            "/{path:path}",
-            routes.proxy,
-            methods=["POST", "GET", "PATCH", "DELETE"],
-        ),
+        stdlib_routes.Proxy(
+            dependencies._container[httpx.AsyncClient],  # noqa: WPS437
+        ).to_route(),
     ]
 
 
