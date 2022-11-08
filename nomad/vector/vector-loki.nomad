@@ -79,14 +79,13 @@ job "vector-loki" {
             healthcheck.enabled = true
             # since . is used by Vector to denote a parent-child relationship, and Nomad's Docker labels contain ".",
             # we need to escape them twice, once for TOML, once for Vector
-            labels.job = "{{ label.com\\.hashicorp\\.nomad\\.job_name }}"
             labels.task = "{{ label.com\\.hashicorp\\.nomad\\.task_name }}"
             labels.group = "{{ label.com\\.hashicorp\\.nomad\\.task_group_name }}"
             labels.namespace = "{{ label.com\\.hashicorp\\.nomad\\.namespace }}"
             labels.node = "{{ label.com\\.hashicorp\\.nomad\\.node_name }}"
             labels.job = "${var.datacenter}"
             labels.stream = "{{ stream }}"
-            # remove fields that have been converted to labels to avoid having the field twice
+            #remove fields that have been converted to labels to avoid having the field twice
             remove_label_fields = true
 
         EOH
