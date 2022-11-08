@@ -8,7 +8,6 @@ from motor import motor_asyncio
 from pydantic import AnyUrl
 
 from snowfall.project.junction.service.places import cities
-from snowfall.project.junction.service.places.consumer import LocationImportConsumer
 from snowfall.project.junction.service.places.grpc import (
     LocationsService,
     PlacesService,
@@ -20,7 +19,6 @@ from snowfall.project.junction.service.places.places import (
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import service
 from snowfall.stdlib.persistence import filesystem
-from snowfall.stdlib.transport.amqp import consumer, types
 from snowfall.stdlib.transport.grpc import server
 from snowfall.stdlib.transport.grpc.client import create_channel
 
@@ -35,11 +33,6 @@ class _GrpcSettings(service.Settings):
     geodata_address: Sequence[str]
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
-    mongo_dsn: Sequence[AnyUrl]
-
-
-class _ImportSettings(service.Settings):
-    amqp_dsn: AnyUrl
     mongo_dsn: Sequence[AnyUrl]
 
 
@@ -78,24 +71,6 @@ async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
             await asyncio.gather(
                 *[places_repository.create(resource) for resource in resources],
             )
-
-
-async def _import(app: service.Application[_ImportSettings]) -> None:
-    mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
-    )
-
-    async with types.Connection(app.settings.amqp_dsn) as connection:
-        consumer_obj = LocationImportConsumer(
-            locations=LocationRepository(mongo.places.locations),
-            consumer=consumer.Consumer(
-                connection=connection,
-                queue_name="{0}_locations_importer".format(app.name),
-                binds=[(types.Exchange("places"), "location.import")],
-            ),
-        )
-
-        await consumer_obj.consume()
 
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
@@ -142,10 +117,5 @@ if __name__ == "__main__":
             name="grpc",
             callback=_serve,
             settings_class=_GrpcSettings,
-        ),
-        service.Command(
-            name="import",
-            callback=_import,
-            settings_class=_ImportSettings,
         ),
     )

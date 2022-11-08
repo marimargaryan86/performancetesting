@@ -1,9 +1,0 @@
-syntax = "proto3";
-
-package snowfall.project.junction.service.places.v1alpha;
-
-import "snowfall/project/junction/service/places/v1alpha/models.proto";
-
-message ImportLocationTask {
-  Location location = 1;
-}

@@ -1,7 +1,7 @@
 import datetime
 from typing import Optional, Sequence
 
-from pymongo import IndexModel, results
+from pymongo import IndexModel
 
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
@@ -100,13 +100,3 @@ class ScheduleRepository(
             return datetime.datetime.fromtimestamp(0, tz=datetime.timezone.utc)
 
         return protobuf.protobuf_to_datetime(schedule.updated_at)
-
-    async def upsert(self, resource: models_pb2.Schedule) -> bool:
-        update_result: results.UpdateResult = await self._execute(
-            self._collection.replace_one,
-            filter={"_id": resource.id},
-            replacement=self._coder.encode(resource),
-            upsert=True,
-        )
-
-        return update_result.acknowledged

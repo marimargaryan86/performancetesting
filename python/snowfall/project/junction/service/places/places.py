@@ -18,7 +18,6 @@ _NAMESPACE = uuid.UUID("5190984e-4ab7-411e-96f6-2848cc5d63e1")
 
 class LocationRepository(
     mixins.FindByIdMixin[models_pb2.Location],
-    mixins.UpsertMixin[models_pb2.Location],
     repository.ProtoRepository[models_pb2.Location],
 ):
     _indexes = [

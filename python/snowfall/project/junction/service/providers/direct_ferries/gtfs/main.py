@@ -1,10 +1,7 @@
 import contextlib
 import pathlib
-import random
 
-import aioredis
 import httpx
-from motor import motor_asyncio
 
 from snowfall.project.junction.service.providers.direct_ferries.gtfs import (
     converter as gtfs_converter,
@@ -18,9 +15,7 @@ from snowfall.project.junction.service.providers.direct_ferries.gtfs.settings im
 from snowfall.project.junction.service.providers.direct_ferries.gtfs.timetables import (
     TimetableRepository,
 )
-from snowfall.project.junction.service.schedules import export, schedules
 from snowfall.stdlib import service
-from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.vendor.direct_ferries import client
 from snowfall.vendor.direct_ferries.clients import auth, base
 
@@ -60,18 +55,6 @@ async def _create_gtfs(app: service.Application[DFSetting]) -> None:
         timetables_data=timetables_data,
     )
     await GTFSGenerator().generate_feed(converter)
-
-    mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
-    )
-    pool = aioredis.from_url(random.choice(app.settings.redis_dsn))  # nosec
-
-    async with pool.client() as conn:  # nosec
-        await export.Exporter(
-            redis.Client[bytes](conn, app.name),
-            schedules.ScheduleRepository(mongo.schedules.schedules),
-            always_run=app.settings.always_run,
-        ).export(output_path)
 
 
 if __name__ == "__main__":
