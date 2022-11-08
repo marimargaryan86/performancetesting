@@ -6,6 +6,9 @@ import pytest
 from dateutil import tz
 from google.protobuf import duration_pb2, timestamp_pb2
 
+from snowfall.project.junction.service.places.v1alpha import (
+    models_pb2 as places_models_pb2,
+)
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import datetime_pb2, models_pb2
 
@@ -28,7 +31,7 @@ class TestSerializer(object):
         assert message.seconds == _seconds
 
 
-def test_enum_value_to_name() -> None:
+def test_enum_value_to_slug() -> None:
     assert (
         protobuf.enum_value_to_slug(
             models_pb2.Schedule.Type.DESCRIPTOR,
@@ -37,14 +40,30 @@ def test_enum_value_to_name() -> None:
         == "air"
     )
 
+    assert (
+        protobuf.enum_value_to_slug(
+            places_models_pb2.Location.Type.DESCRIPTOR,
+            places_models_pb2.Location.TYPE_RAILWAY_STATION,
+        )
+        == "railway-station"
+    )
 
-def test_enum_name_to_value() -> None:
+
+def test_slug_to_enum_value() -> None:
     assert (
         protobuf.slug_to_enum_value(
             models_pb2.Schedule.Type.DESCRIPTOR,
             "air",
         )
         == models_pb2.Schedule.TYPE_AIR
+    )
+
+    assert (
+        protobuf.slug_to_enum_value(
+            places_models_pb2.Location.Type.DESCRIPTOR,
+            "railway-station",
+        )
+        == places_models_pb2.Location.TYPE_RAILWAY_STATION
     )
 
 

@@ -20,6 +20,8 @@ message Location {
   enum Type {
     TYPE_UNSPECIFIED = 0;
     TYPE_CITY = 1;
+    TYPE_RAILWAY_STATION = 2;
+    TYPE_AIRPORT = 3;
   }
   repeated Type types = 8;
 }

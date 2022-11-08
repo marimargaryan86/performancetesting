@@ -618,6 +618,77 @@ func (x *LoyaltyProgram) GetName() string {
 	return ""
 }
 
+type MobileOrder struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id              string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	PaymentIntentId string                 `protobuf:"bytes,2,opt,name=payment_intent_id,json=paymentIntentId,proto3" json:"payment_intent_id,omitempty"`
+	UserId          string                 `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	CreatedAt       *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+}
+
+func (x *MobileOrder) Reset() {
+	*x = MobileOrder{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_snowfall_project_junction_service_mobile_api_v1alpha_models_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MobileOrder) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MobileOrder) ProtoMessage() {}
+
+func (x *MobileOrder) ProtoReflect() protoreflect.Message {
+	mi := &file_snowfall_project_junction_service_mobile_api_v1alpha_models_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MobileOrder.ProtoReflect.Descriptor instead.
+func (*MobileOrder) Descriptor() ([]byte, []int) {
+	return file_snowfall_project_junction_service_mobile_api_v1alpha_models_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *MobileOrder) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *MobileOrder) GetPaymentIntentId() string {
+	if x != nil {
+		return x.PaymentIntentId
+	}
+	return ""
+}
+
+func (x *MobileOrder) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *MobileOrder) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
 var File_snowfall_project_junction_service_mobile_api_v1alpha_models_proto protoreflect.FileDescriptor
 
 var file_snowfall_project_junction_service_mobile_api_v1alpha_models_proto_rawDesc = []byte{
@@ -737,7 +808,17 @@ var file_snowfall_project_junction_service_mobile_api_v1alpha_models_proto_rawDe
 	0x01, 0x28, 0x09, 0x52, 0x04, 0x69, 0x61, 0x74, 0x61, 0x12, 0x18, 0x0a, 0x07, 0x61, 0x69, 0x72,
 	0x6c, 0x69, 0x6e, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x61, 0x69, 0x72, 0x6c,
 	0x69, 0x6e, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x42, 0xb4, 0x03, 0x0a, 0x38, 0x63, 0x6f, 0x6d, 0x2e,
+	0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x9d, 0x01, 0x0a, 0x0b, 0x4d, 0x6f, 0x62, 0x69,
+	0x6c, 0x65, 0x4f, 0x72, 0x64, 0x65, 0x72, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x2a, 0x0a, 0x11, 0x70, 0x61, 0x79, 0x6d, 0x65,
+	0x6e, 0x74, 0x5f, 0x69, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x0f, 0x70, 0x61, 0x79, 0x6d, 0x65, 0x6e, 0x74, 0x49, 0x6e, 0x74, 0x65, 0x6e,
+	0x74, 0x49, 0x64, 0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x39, 0x0a, 0x0a,
+	0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62,
+	0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x09, 0x63, 0x72,
+	0x65, 0x61, 0x74, 0x65, 0x64, 0x41, 0x74, 0x42, 0xb4, 0x03, 0x0a, 0x38, 0x63, 0x6f, 0x6d, 0x2e,
 	0x73, 0x6e, 0x6f, 0x77, 0x66, 0x61, 0x6c, 0x6c, 0x2e, 0x70, 0x72, 0x6f, 0x6a, 0x65, 0x63, 0x74,
 	0x2e, 0x6a, 0x75, 0x6e, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63,
 	0x65, 0x2e, 0x6d, 0x6f, 0x62, 0x69, 0x6c, 0x65, 0x5f, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x61,
@@ -781,7 +862,7 @@ func file_snowfall_project_junction_service_mobile_api_v1alpha_models_proto_rawD
 }
 
 var file_snowfall_project_junction_service_mobile_api_v1alpha_models_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_snowfall_project_junction_service_mobile_api_v1alpha_models_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_snowfall_project_junction_service_mobile_api_v1alpha_models_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_snowfall_project_junction_service_mobile_api_v1alpha_models_proto_goTypes = []interface{}{
 	(Place_Type)(0),                   // 0: snowfall.project.junction.service.mobile_api.v1alpha.Place.Type
 	(*User)(nil),                      // 1: snowfall.project.junction.service.mobile_api.v1alpha.User
@@ -791,28 +872,30 @@ var file_snowfall_project_junction_service_mobile_api_v1alpha_models_proto_goTyp
 	(*OfferSearchHistoryEntity)(nil),  // 5: snowfall.project.junction.service.mobile_api.v1alpha.OfferSearchHistoryEntity
 	(*OfferSearchHistory)(nil),        // 6: snowfall.project.junction.service.mobile_api.v1alpha.OfferSearchHistory
 	(*LoyaltyProgram)(nil),            // 7: snowfall.project.junction.service.mobile_api.v1alpha.LoyaltyProgram
-	(*v1alpha.PhoneNumber)(nil),       // 8: snowfall.stdlib.v1alpha.PhoneNumber
-	(*v1alpha.Date)(nil),              // 9: snowfall.stdlib.v1alpha.Date
-	(*timestamppb.Timestamp)(nil),     // 10: google.protobuf.Timestamp
-	(*v1alpha.Coordinates)(nil),       // 11: snowfall.stdlib.v1alpha.Coordinates
+	(*MobileOrder)(nil),               // 8: snowfall.project.junction.service.mobile_api.v1alpha.MobileOrder
+	(*v1alpha.PhoneNumber)(nil),       // 9: snowfall.stdlib.v1alpha.PhoneNumber
+	(*v1alpha.Date)(nil),              // 10: snowfall.stdlib.v1alpha.Date
+	(*timestamppb.Timestamp)(nil),     // 11: google.protobuf.Timestamp
+	(*v1alpha.Coordinates)(nil),       // 12: snowfall.stdlib.v1alpha.Coordinates
 }
 var file_snowfall_project_junction_service_mobile_api_v1alpha_models_proto_depIdxs = []int32{
-	8,  // 0: snowfall.project.junction.service.mobile_api.v1alpha.User.phone:type_name -> snowfall.stdlib.v1alpha.PhoneNumber
-	9,  // 1: snowfall.project.junction.service.mobile_api.v1alpha.User.date_of_birth:type_name -> snowfall.stdlib.v1alpha.Date
+	9,  // 0: snowfall.project.junction.service.mobile_api.v1alpha.User.phone:type_name -> snowfall.stdlib.v1alpha.PhoneNumber
+	10, // 1: snowfall.project.junction.service.mobile_api.v1alpha.User.date_of_birth:type_name -> snowfall.stdlib.v1alpha.Date
 	2,  // 2: snowfall.project.junction.service.mobile_api.v1alpha.User.loyalty_programs:type_name -> snowfall.project.junction.service.mobile_api.v1alpha.LoyaltyProgramUserProfile
-	10, // 3: snowfall.project.junction.service.mobile_api.v1alpha.User.created_at:type_name -> google.protobuf.Timestamp
-	10, // 4: snowfall.project.junction.service.mobile_api.v1alpha.User.updated_at:type_name -> google.protobuf.Timestamp
-	11, // 5: snowfall.project.junction.service.mobile_api.v1alpha.Place.coordinates:type_name -> snowfall.stdlib.v1alpha.Coordinates
-	10, // 6: snowfall.project.junction.service.mobile_api.v1alpha.Place.updated_at:type_name -> google.protobuf.Timestamp
+	11, // 3: snowfall.project.junction.service.mobile_api.v1alpha.User.created_at:type_name -> google.protobuf.Timestamp
+	11, // 4: snowfall.project.junction.service.mobile_api.v1alpha.User.updated_at:type_name -> google.protobuf.Timestamp
+	12, // 5: snowfall.project.junction.service.mobile_api.v1alpha.Place.coordinates:type_name -> snowfall.stdlib.v1alpha.Coordinates
+	11, // 6: snowfall.project.junction.service.mobile_api.v1alpha.Place.updated_at:type_name -> google.protobuf.Timestamp
 	0,  // 7: snowfall.project.junction.service.mobile_api.v1alpha.Place.types:type_name -> snowfall.project.junction.service.mobile_api.v1alpha.Place.Type
-	10, // 8: snowfall.project.junction.service.mobile_api.v1alpha.StripeUser.created_at:type_name -> google.protobuf.Timestamp
-	10, // 9: snowfall.project.junction.service.mobile_api.v1alpha.OfferSearchHistoryEntity.created_at:type_name -> google.protobuf.Timestamp
+	11, // 8: snowfall.project.junction.service.mobile_api.v1alpha.StripeUser.created_at:type_name -> google.protobuf.Timestamp
+	11, // 9: snowfall.project.junction.service.mobile_api.v1alpha.OfferSearchHistoryEntity.created_at:type_name -> google.protobuf.Timestamp
 	5,  // 10: snowfall.project.junction.service.mobile_api.v1alpha.OfferSearchHistory.offer_search_history:type_name -> snowfall.project.junction.service.mobile_api.v1alpha.OfferSearchHistoryEntity
-	11, // [11:11] is the sub-list for method output_type
-	11, // [11:11] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	11, // 11: snowfall.project.junction.service.mobile_api.v1alpha.MobileOrder.created_at:type_name -> google.protobuf.Timestamp
+	12, // [12:12] is the sub-list for method output_type
+	12, // [12:12] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_snowfall_project_junction_service_mobile_api_v1alpha_models_proto_init() }
@@ -905,6 +988,18 @@ func file_snowfall_project_junction_service_mobile_api_v1alpha_models_proto_init
 				return nil
 			}
 		}
+		file_snowfall_project_junction_service_mobile_api_v1alpha_models_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MobileOrder); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -912,7 +1007,7 @@ func file_snowfall_project_junction_service_mobile_api_v1alpha_models_proto_init
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_snowfall_project_junction_service_mobile_api_v1alpha_models_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   7,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

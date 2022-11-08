@@ -171,6 +171,9 @@ def enum_value_to_slug(descriptor: EnumDescriptor, enum_value: int) -> str:
 
 
 def slug_to_enum_value(descriptor: EnumDescriptor, name: str) -> int:
-    enum_name = "{0}_{1}".format(descriptor.name.upper(), name.upper())
+    enum_name = "{0}_{1}".format(
+        descriptor.name.upper(),
+        name.replace("-", "_").upper(),
+    )
 
     return descriptor.values_by_name[enum_name].number
