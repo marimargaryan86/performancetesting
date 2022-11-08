@@ -32,6 +32,7 @@ from snowfall.vendor.save_a_train.models import (
     booking,
     request,
     search,
+    search_result_details,
     search_result_selection,
     tariff_condition,
 )
@@ -153,6 +154,12 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                 except exceptions.SATValidationError:
                     continue
                 except httpx.HTTPStatusError:
+                    continue
+
+                if not self._search_details_transfers_matches_segments(  # noqa: WPS337
+                    search_details.transfers,
+                    search_task.segments,
+                ):
                     continue
 
                 expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
@@ -356,6 +363,13 @@ class SaveATrainAdapter(object):  # noqa: WPS214
 
         return response.search_identifier, seat_preference_code
 
+    def _search_details_transfers_matches_segments(
+        self,
+        transfers: Sequence[search_result_details.SearchResultTransfer],
+        segments: Sequence[models_pb2.Segment],
+    ) -> bool:
+        return len(transfers) == len(segments)
+
     def _search_result_matches_requirements(
         self,
         search_result: search.SearchResult,
@@ -378,10 +392,11 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         )
         if abs((arrival_datetime - requirement.arrival_datetime).seconds // 60) > 10:
             self._logger.info(
-                "Arrival times do not match but we still approved the offer.",
+                "Arrival times do not match",
                 requirement_arrival_datetime=requirement.arrival_datetime.isoformat(),
                 offer_arrival_datetime=arrival_datetime.isoformat(),
             )
+            return False
 
         return True
 
