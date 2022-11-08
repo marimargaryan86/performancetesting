@@ -648,11 +648,15 @@
   }
 
   function load_trips(id, polled_since) {
-    fetch("/trips/searches/" + id + "/trips?page[limit]=100&include=segments,segments.legs,segments.legs.legType")
+    fetch("/trips/searches/" + id)
     .then(res => res.json())
     .then(response => {
-      if (response.data.length > 0 || (new Date() - polled_since) > (30*1000)) {
-        inject_trips(response);
+      if (response.data.attributes.status == "completed" || response.data.attributes.status == "failed") {
+        fetch("/trips/searches/" + id + "/trips?page[limit]=100&include=segments,segments.legs,segments.legs.legType")
+        .then(res => res.json())
+        .then(response => {
+          inject_trips(response);
+        })
       } else {
         setTimeout(() => {
           load_trips(id);
