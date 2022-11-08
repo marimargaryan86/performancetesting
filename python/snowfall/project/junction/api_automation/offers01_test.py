@@ -46,13 +46,13 @@ async def test_trip_offers_e2e_basic(
 async def return_offer_options_ids_from_offer_searches(
     client: JunctionClient,
     offer_id_and_offer_group_ids: Sequence[Tuple[Any, ...]],
-) -> Sequence[Sequence[str]]:
+) -> Sequence[str]:
     offer_options_ids = []
     for idx, _ in enumerate(offer_id_and_offer_group_ids):
         single_item = offer_id_and_offer_group_ids[idx]
         if single_item != ("None", ["None"]):
             offer_group_ids = single_item[1]
-            offer_options_ids.append(
+            offer_options_ids.extend(
                 await return_offer_options_ids(
                     client,
                     offer_group_ids,
@@ -107,11 +107,10 @@ async def return_offer_ids(
 
 async def return_offer_options_details_ids(
     client: JunctionClient,
-    offer_options_ids: Sequence[Sequence[str]],
+    offer_options_ids: Sequence[str],
 ) -> Sequence[str]:
-    offer_options_id_flat = [i0 for sublist in offer_options_ids for i0 in sublist]
     offer_options_details_ids = []
-    for offer_options_id in offer_options_id_flat:
+    for offer_options_id in offer_options_ids:
         response = await client.get_offer_option_details_by_offer_option_id(
             offer_options_id,
         )

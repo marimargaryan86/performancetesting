@@ -49,13 +49,25 @@ def departure_after(request: pytest.FixtureRequest) -> str:
 
 
 @pytest.fixture(scope="session")
-def origin(request: pytest.FixtureRequest) -> str:
-    return request.config.getoption("ORIGIN")
+def origin(
+    _local_config: Mapping[str, str],
+    request: pytest.FixtureRequest,
+) -> str:
+    return request.config.getoption("ORIGIN") or _local_config.get("ORIGIN") or ""
 
 
 @pytest.fixture(scope="session")
-def destination(request: pytest.FixtureRequest) -> str:
-    return request.config.getoption("DESTINATION")
+def destination(
+    _local_config: Mapping[str, str],
+    request: pytest.FixtureRequest,
+) -> str:
+    return (
+        request.config.getoption("DESTINATION")
+        or _local_config.get(
+            "DESTINATION",
+        )
+        or ""
+    )
 
 
 @pytest.fixture(scope="session")

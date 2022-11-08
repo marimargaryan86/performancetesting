@@ -28,11 +28,7 @@ async def test_get_offer_options_by_offer_option_id(
         origin,
     )
 
-    flat_offer_options_ids = [
-        data_item for sublist in offer_options_ids for data_item in sublist
-    ]
-
-    for offer_options_id in flat_offer_options_ids:
+    for offer_options_id in offer_options_ids:
         response = await client.get_offer_options_by_offer_option_id(offer_options_id)
         logging.info("get_offer_options_by_offer_option_id: %s", response)
         assert response is not None, "offer_options_ids should not be empty"
@@ -43,7 +39,7 @@ async def return_offer_options_ids(
     departure_after: str,
     destination: str,
     origin: str,
-) -> Sequence[Sequence[str]]:
+) -> Sequence[str]:
     trips_offer_search_ids = await return_trip_offer_search_ids(
         client,
         departure_after,

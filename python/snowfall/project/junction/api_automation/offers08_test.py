@@ -49,7 +49,7 @@ async def return_offer_options_ids(
     departure_after: str,
     destination: str,
     origin: str,
-) -> Sequence[Sequence[str]]:
+) -> Sequence[str]:
     trips_offer_search_ids = await return_trip_offer_search_ids(
         client,
         departure_after,
