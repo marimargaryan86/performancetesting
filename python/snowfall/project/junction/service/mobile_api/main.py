@@ -11,9 +11,9 @@ from starlette.middleware import Middleware, authentication
 
 from snowfall.project.junction.adapter import currencies
 from snowfall.project.junction.service.currencies.v1alpha import currencies_pb2_grpc
+from snowfall.project.junction.service.mobile_api import auth_middleware, bootstrap
+from snowfall.project.junction.service.mobile_api import currencies as mobile_currencies
 from snowfall.project.junction.service.mobile_api import (
-    auth_middleware,
-    bootstrap,
     jwt_generator,
     places_migration,
     repository,
@@ -69,8 +69,11 @@ def _factory(
         return application.create_starlette_app(
             routes_factory=router.get_routes,
             dependencies=bootstrap.create_dependencies(
-                currencies_client=currencies.GrpcClient(
-                    currencies_pb2_grpc.CurrencyServiceStub(currencies_channel),
+                currencies_client=mobile_currencies.CurrencyClient(
+                    app.settings.currency_rate_cache_ttl,
+                    currencies.GrpcClient(
+                        currencies_pb2_grpc.CurrencyServiceStub(currencies_channel),
+                    ),
                 ),
                 offers_repository=repository.OffersRepository(
                     mongo["offers"],

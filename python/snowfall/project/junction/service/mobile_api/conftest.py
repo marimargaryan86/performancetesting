@@ -21,13 +21,9 @@ from starlette import applications
 from starlette.middleware import Middleware, authentication
 
 from snowfall.project.junction.adapter import currencies
-from snowfall.project.junction.service.mobile_api import (
-    auth_middleware,
-    bootstrap,
-    jwt_generator,
-    repository,
-    smtp,
-)
+from snowfall.project.junction.service.mobile_api import auth_middleware, bootstrap
+from snowfall.project.junction.service.mobile_api import currencies as mobile_currencies
+from snowfall.project.junction.service.mobile_api import jwt_generator, repository, smtp
 from snowfall.project.junction.service.mobile_api.routes import router
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib import string
@@ -308,9 +304,19 @@ def non_mocked_hosts() -> list[str]:
     return ["example.com"]
 
 
+@pytest.fixture
+def mobile_currencies_client(
+    currencies_client: currencies.Client,
+) -> mobile_currencies.CurrencyClient:
+    return mobile_currencies.CurrencyClient(
+        datetime.timedelta(minutes=10),
+        currencies_client,
+    )
+
+
 @pytest.fixture()
 def app(  # noqa: WPS211
-    currencies_client: currencies.Client,
+    mobile_currencies_client: mobile_currencies.CurrencyClient,
     offers_repository: repository.OffersRepository,
     places_repository: repository.PlacesRepository,
     users_repository: repository.UsersRepository,
@@ -326,7 +332,7 @@ def app(  # noqa: WPS211
 ) -> applications.Starlette:
     return _create_app(
         dependencies=bootstrap.create_dependencies(
-            currencies_client,
+            mobile_currencies_client,
             offers_repository,
             orders_repository,
             junction_client,

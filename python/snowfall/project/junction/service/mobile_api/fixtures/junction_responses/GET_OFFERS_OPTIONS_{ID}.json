@@ -1,0 +1,162 @@
+{
+  "url": "\/offers\/options\/.*",
+  "method": "GET",
+  "status_code": 200,
+  "json": {
+    "data": {
+      "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+      "type": "offer-options",
+      "attributes": {
+        "price": {
+          "currency": "EUR",
+          "amount": "13.37"
+        },
+        "brandName": "PLUS",
+        "penalties": [
+          {
+            "applicableTo": {
+              "dateOfBirthAfter": "1980-02-03",
+              "dateOfBirthBefore": "1980-02-03"
+            },
+            "penaltyType": "exchange",
+            "changeable": true,
+            "refundable": false,
+            "applicability": "before",
+            "price": {
+              "currency": "EUR",
+              "amount": "13.37"
+            }
+          }
+        ]
+      },
+      "relationships": {
+        "details": {
+          "data": [
+            {
+              "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+              "type": "trip-offer-option-details"
+            }
+          ]
+        }
+      },
+      "links": {
+        "self": "https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+      }
+    },
+    "included": [
+      {
+        "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+        "type": "trip-offer-group-details",
+        "attributes": {
+          "legs": [
+            {
+              "origin": {
+                "ref": "890880d9d63ffff",
+                "name": "Uppsala Central Station",
+                "latitude": 59.858611,
+                "longitude": 17.646111,
+                "timeZone": "Europe/Stockholm"
+              },
+              "destination": {
+                "ref": "890880d9d63ffff",
+                "name": "Uppsala Central Station",
+                "latitude": 59.858611,
+                "longitude": 17.646111,
+                "timeZone": "Europe/Stockholm"
+              },
+              "departureAt": "2019-08-24T14:15:22Z",
+              "arrivalAt": "2019-08-24T14:15:22Z"
+            }
+          ],
+          "vendor": "BA",
+          "operator": "BA",
+          "routeIdentifiers": {
+            "vendor": "123",
+            "operator": "123"
+          },
+          "sequences": {
+            "trip": 1,
+            "segment": 1
+          }
+        },
+        "relationships": {
+          "legType": {
+            "data": {
+              "id": "air",
+              "type": "leg-types"
+            }
+          }
+        },
+        "links": {
+          "self": "https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+        }
+      },
+      {
+        "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+        "type": "trip-offer-option-details",
+        "attributes": {
+          "cabinClassName": "Economy",
+          "rules": [
+            {
+              "title": "Cancellation policy",
+              "body": "Tickets can be cancelled until the day of departure without any charges. After that, no refund is possible anymore.  NOTE: the refund delay for Homeprint and Mobile tickets is 2 days. Except for agency fee of 20euro for handling."
+            }
+          ],
+          "baggageAllowances": [
+            {
+              "isIncluded": true,
+              "applicableTo": {
+                "dateOfBirthAfter": "1980-02-03",
+                "dateOfBirthBefore": "1980-02-03"
+              }
+            }
+          ],
+          "amenities": {
+            "beverage": {
+              "availability": "included"
+            },
+            "entertainment": {
+              "availability": "included"
+            },
+            "food": {
+              "availability": "included"
+            },
+            "power": {
+              "availability": "included"
+            },
+            "wifi": {
+              "availability": "included"
+            }
+          }
+        },
+        "relationships": {
+          "details": {
+            "data": {
+              "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+              "type": "trip-offer-group-details"
+            }
+          },
+          "cabinClass": {
+            "data": {
+              "id": "economy",
+              "type": "cabin-classes"
+            }
+          }
+        },
+        "links": {
+          "self": "https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+        }
+      },
+      {
+        "id": "airport",
+        "type": "cabin-classes",
+        "attributes": {
+          "name": "economy"
+        },
+        "links": {
+          "self": "https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+        }
+      }
+    ]
+  }
+}

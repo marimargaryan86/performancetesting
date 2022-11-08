@@ -5,8 +5,12 @@ import lagom
 from lagom.integrations import starlette
 from pydantic import AnyUrl
 
-from snowfall.project.junction.adapter import currencies
-from snowfall.project.junction.service.mobile_api import jwt_generator, repository, smtp
+from snowfall.project.junction.service.mobile_api import (
+    currencies,
+    jwt_generator,
+    repository,
+    smtp,
+)
 from snowfall.stdlib.integration.starlette import application
 from snowfall.vendor.junction import client
 
@@ -21,6 +25,9 @@ class Settings(application.Settings):
     offers_rates_cache_ttl: datetime.timedelta = datetime.timedelta(
         minutes=20,  # noqa: WPS432
     )
+    currency_rate_cache_ttl: datetime.timedelta = datetime.timedelta(
+        minutes=10,
+    )
     smtp_dsn: AnyUrl
     mongo_dsn: Sequence[AnyUrl]
     jwt_private_key: str
@@ -34,7 +41,7 @@ class Settings(application.Settings):
 
 
 def create_dependencies(  # noqa: WPS211
-    currencies_client: currencies.Client,
+    currencies_client: currencies.CurrencyClient,
     offers_repository: repository.OffersRepository,
     orders_repository: repository.OrdersRepository,
     junction_client: client.JunctionClient,
@@ -49,7 +56,7 @@ def create_dependencies(  # noqa: WPS211
     preferences_repository: repository.PreferencesRepository,
 ) -> starlette.StarletteIntegration:
     container = lagom.Container()
-    container[currencies.Client] = currencies_client  # type: ignore[misc]
+    container[currencies.CurrencyClient] = currencies_client
     container[repository.OffersRepository] = offers_repository
     container[repository.OrdersRepository] = orders_repository
     container[client.JunctionClient] = junction_client

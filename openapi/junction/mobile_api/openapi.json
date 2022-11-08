@@ -2261,8 +2261,7 @@
                       "data": {
                         "$ref": "#/components/schemas/PaymentIdentifier"
                       }
-                    },
-                    "writeOnly": true
+                    }
                   }
                 }
               }
@@ -2317,9 +2316,21 @@
                   "offer",
                   "options",
                   "journey",
-                  "bookings"
+                  "bookings",
+                  "payment"
                 ],
                 "properties": {
+                  "payment": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/PaymentIdentifier"
+                      }
+                    }
+                  },
                   "offer": {
                     "type": "object",
                     "required": [

@@ -6,8 +6,8 @@ import httpx
 import lagom
 from starlette import endpoints, requests, responses, status
 
-from snowfall.project.junction.adapter import currencies, errors
-from snowfall.project.junction.service.mobile_api import repository
+from snowfall.project.junction.adapter import errors
+from snowfall.project.junction.service.mobile_api import currencies, repository
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib import money
 from snowfall.stdlib.integration.starlette import (
@@ -61,17 +61,18 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
         request: requests.Request,
         junction_client: client.JunctionClient = lagom.injectable,
         offers_rates_repository: repository.OffersRatesRepository = lagom.injectable,
-        currencies_client: currencies.Client = lagom.injectable,
+        currencies_client: currencies.CurrencyClient = lagom.injectable,
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
+        query_string = request.scope["query_string"]
         try:
             offers_response = await junction_client.get_offers_by_offer_search_id(
                 offers_search_id=request.path_params["offerSearchId"],
-                cabin_class=request.scope["query_string"].get(
+                cabin_class=query_string.get(
                     "filter[groups.options.details.cabinClass]",
                     [],
                 ),
-                include=request.scope["query_string"].get(
+                include=query_string.get(
                     "include",
                     [],
                 ),
@@ -87,8 +88,11 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
             )
         if request.query_params.get("currency"):
             try:
-                # TODO: change this
-                rate = 11.06
+                rate = await currencies_client.get_rate(
+                    "EUR",  # type: ignore[arg-type]
+                    query_string["currency"].code,
+                    currencies_client.get_ttl_hash(),  # type: ignore[arg-type]
+                )
             except errors.NotFoundError as exc:
                 return models.JsonApiResponse(
                     models.Body(
@@ -105,7 +109,7 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
             if offers_response.get("included"):
                 for include in offers_response.get("included", []):
                     if include["type"] == "offer-options":
-                        currency = request.scope["query_string"].get("currency")
+                        currency = query_string.get("currency")
                         new_money = money.from_string(
                             include["attributes"]["price"]["amount"],
                             money.Currency(include["attributes"]["price"]["currency"]),
@@ -120,7 +124,7 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
                                 [
                                     include["id"],
                                     "EUR",
-                                    request.scope["query_string"].get("currency").code,
+                                    query_string.get("currency").code,
                                 ],
                             ),
                             atr_value=str(rate),

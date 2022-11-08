@@ -67,7 +67,15 @@ class Order(endpoints.HTTPEndpoint):
                 [],
             ),
         )
+
+        order_response["data"]["relationships"]["payment"] = {
+            "data": {
+                "id": mobile_order.payment_intent_id,
+                "type": "payments",
+            },
+        }
         response_body = stdlib_models.Body(data=order_response["data"])
+
         if order_response.get("included"):
             response_body.included = order_response.get("included")
         return stdlib_models.JsonApiResponse(response_body)
@@ -93,6 +101,12 @@ class Orders(endpoints.HTTPEndpoint):
                     [],
                 ),
             )
+            order_response["data"]["relationships"]["payment"] = {
+                "data": {
+                    "id": mobile_order.payment_intent_id,
+                    "type": "payments",
+                },
+            }
             user_orders["data"].append(order_response["data"])
             if order_response.get("included"):
                 user_orders["included"].extend(order_response["included"])
@@ -204,6 +218,12 @@ class Orders(endpoints.HTTPEndpoint):
             ),
         )
 
+        junction_order["data"]["relationships"]["payment"] = {
+            "data": {
+                "id": mobile_order.payment_intent_id,
+                "type": "payments",
+            },
+        }
         return stdlib_models.JsonApiResponse(
             stdlib_models.Body(data=junction_order["data"]),
             status.HTTP_201_CREATED,
