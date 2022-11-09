@@ -28,6 +28,7 @@ class Settings(application.Settings):
     currency_rate_cache_ttl: datetime.timedelta = datetime.timedelta(
         minutes=10,
     )
+    fallback_rate_sek: float = 10.85
     smtp_dsn: AnyUrl
     mongo_dsn: Sequence[AnyUrl]
     jwt_private_key: str

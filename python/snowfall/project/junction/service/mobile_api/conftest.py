@@ -311,6 +311,7 @@ def mobile_currencies_client(
     return mobile_currencies.CurrencyClient(
         datetime.timedelta(minutes=10),
         currencies_client,
+        fallback_rates={"SEK": 10.0},
     )
 
 

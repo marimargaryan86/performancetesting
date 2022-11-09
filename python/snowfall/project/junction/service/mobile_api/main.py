@@ -74,6 +74,7 @@ def _factory(
                     currencies.GrpcClient(
                         currencies_pb2_grpc.CurrencyServiceStub(currencies_channel),
                     ),
+                    fallback_rates={"SEK": app.settings.fallback_rate_sek},
                 ),
                 offers_repository=repository.OffersRepository(
                     mongo["offers"],
