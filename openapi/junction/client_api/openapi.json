@@ -4411,6 +4411,12 @@
                       "failed"
                     ],
                     "example": "completed"
+                  },
+                  "maximumConnections": {
+                    "type": "integer",
+                    "format": "int32",
+                    "example": 2,
+                    "minimum": 0
                   }
                 }
               },
@@ -4443,7 +4449,7 @@
                       }
                     }
                   },
-                  "legTypes": {
+                  "allowedSegmentTypes": {
                     "type": "object",
                     "properties": {
                       "data": {

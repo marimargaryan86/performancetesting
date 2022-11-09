@@ -102,11 +102,25 @@ func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *plan
 		)
 	}
 
-	results, err := ps.Planner.Search(origins, destinations, departureTime, []models.Schedule_Type{
-		models.Schedule_TYPE_UNSPECIFIED,
-		models.Schedule_TYPE_AIR,
-		models.Schedule_TYPE_RAIL,
-	})
+	allowedSegmentTypes := make([]models.Schedule_Type, len(req.AllowedSegmentTypes))
+
+	copy(allowedSegmentTypes, req.AllowedSegmentTypes)
+
+	if len(allowedSegmentTypes) == 0 {
+		allowedSegmentTypes = append(
+			allowedSegmentTypes,
+			models.Schedule_TYPE_UNSPECIFIED,
+			models.Schedule_TYPE_AIR,
+			models.Schedule_TYPE_RAIL,
+		)
+	}
+	maxConnections := -1
+
+	if req.MaximumConnections != nil {
+		maxConnections = int(*req.MaximumConnections)
+	}
+
+	results, err := ps.Planner.Search(origins, destinations, departureTime, allowedSegmentTypes, maxConnections)
 
 	if err != nil {
 		return &planner.SearchJourneyResponse{}, status.Errorf(codes.Unknown, "raptor returned an error")

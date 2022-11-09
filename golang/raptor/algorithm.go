@@ -19,18 +19,19 @@ const railPrefixSeconds = 1800
 const railSuffixSeconds = 900
 
 type raptor struct {
-	best          *sync.Map                        // a map of route stops to earliest possible arrival to them, key type is Stop.Sequence, value type is unix timestamp
-	connections   map[uint64]map[uint8]interface{} // a map of ScheduleStops to a map of round number to type connection
-	data          *legacy.Repository               // helper functions to get objects from different ids
-	destinations  []*planner.Stop                  // list of destination stops
-	lastDeparture uint32                           // the last time considered to depart from the origin
-	tripCutOff    uint32                           // the last time considered to arrive at the destination
-	marked        []uint64                         // a list of stops we can start from in the current round
-	round         uint8                            // an index of the round, starts at 0
-	rounds        []*sync.Map                      // a map of round number to a map of Stop.Sequence to unix timestamps (basically a round number to that rounds `best`)
-	trips         *sync.Map                        // a map of route.Sequence to index of route.Schedules
-	kindList      []models.Schedule_Type           // list of schedule types to search for
-	stopsMap      map[h3.H3Index][]*planner.Stop
+	best           *sync.Map                        // a map of route stops to earliest possible arrival to them, key type is Stop.Sequence, value type is unix timestamp
+	connections    map[uint64]map[uint8]interface{} // a map of ScheduleStops to a map of round number to type connection
+	data           *legacy.Repository               // helper functions to get objects from different ids
+	destinations   []*planner.Stop                  // list of destination stops
+	lastDeparture  uint32                           // the last time considered to depart from the origin
+	tripCutOff     uint32                           // the last time considered to arrive at the destination
+	marked         []uint64                         // a list of stops we can start from in the current round
+	round          uint8                            // an index of the round, starts at 0
+	rounds         []*sync.Map                      // a map of round number to a map of Stop.Sequence to unix timestamps (basically a round number to that rounds `best`)
+	trips          *sync.Map                        // a map of route.Sequence to index of route.Schedules
+	kindList       []models.Schedule_Type           // list of schedule types to search for
+	stopsMap       map[h3.H3Index][]*planner.Stop
+	maxConnections int
 }
 
 type connection struct {
@@ -62,6 +63,7 @@ func newRaptor(
 	departureAt time.Time,
 	kindList []models.Schedule_Type,
 	stopsMap map[h3.H3Index][]*planner.Stop,
+	maxConnections int,
 ) *raptor {
 	y, m, d := departureAt.AddDate(0, 0, 1).Date()
 	best := &sync.Map{}
@@ -76,18 +78,19 @@ func newRaptor(
 	}
 
 	return &raptor{
-		best:          best,
-		connections:   map[uint64]map[uint8]interface{}{},
-		data:          data,
-		destinations:  destinations,
-		lastDeparture: uint32(time.Date(y, m, d, 4, 0, 0, 0, departureAt.Location()).Unix()),
-		tripCutOff:    uint32(departureAt.Add(48 * time.Hour).Unix()),
-		marked:        marked,
-		round:         0,
-		rounds:        rounds,
-		trips:         &sync.Map{},
-		kindList:      kindList,
-		stopsMap:      stopsMap,
+		best:           best,
+		connections:    map[uint64]map[uint8]interface{}{},
+		data:           data,
+		destinations:   destinations,
+		lastDeparture:  uint32(time.Date(y, m, d, 4, 0, 0, 0, departureAt.Location()).Unix()),
+		tripCutOff:     uint32(departureAt.Add(48 * time.Hour).Unix()),
+		marked:         marked,
+		round:          0,
+		rounds:         rounds,
+		trips:          &sync.Map{},
+		kindList:       kindList,
+		stopsMap:       stopsMap,
+		maxConnections: maxConnections,
 	}
 }
 
@@ -388,6 +391,10 @@ func (r *raptor) scanTransfers() {
 	}
 }
 
+func (r *raptor) hasReachedMaxConnections() bool {
+	return r.maxConnections != -1 && int(r.round) == (r.maxConnections+1)
+}
+
 // run the raptor algorithm (the overview of the algorithm)
 func (r *raptor) run() map[uint64]map[uint8]interface{} {
 	r.scanTransfers()
@@ -397,7 +404,7 @@ func (r *raptor) run() map[uint64]map[uint8]interface{} {
 		r.initRound()
 		r.scanRoutes()
 
-		if !r.markStops() {
+		if !r.markStops() || r.hasReachedMaxConnections() {
 			break
 		}
 

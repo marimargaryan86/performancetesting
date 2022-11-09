@@ -17,6 +17,8 @@ class TripSearchRequest(object):
     origins: Sequence[models_pb2.Point]
     destinations: Sequence[models_pb2.Point]
     departure_after: datetime.datetime
+    maximum_connections: int | None
+    allowed_segment_types: Sequence[models_pb2.Schedule.Type.ValueType]
 
 
 class Client(abc.ABC):
@@ -61,6 +63,8 @@ class DictClient(Client):
             departure_after=protobuf.datetime_to_protobuf_datetime(
                 trip_search_request.departure_after,
             ),
+            maximum_connections=trip_search_request.maximum_connections,
+            allowed_segment_types=trip_search_request.allowed_segment_types,
         )
         self._searches[trip_search.id] = trip_search
         await self._generate_trips(trip_search)
@@ -125,6 +129,8 @@ class GrpcClient(Client):
                 departure_after=protobuf.datetime_to_protobuf_datetime(
                     trip_search_request.departure_after,
                 ),
+                maximum_connections=trip_search_request.maximum_connections,
+                allowed_segment_types=trip_search_request.allowed_segment_types,
             ),
         )
 

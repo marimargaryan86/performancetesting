@@ -31,7 +31,7 @@ func NewPlanner(
 	}
 }
 
-func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAt time.Time, kindList []models.Schedule_Type) ([]*Trip, error) {
+func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAt time.Time, kindList []models.Schedule_Type, maxConnections int) ([]*Trip, error) {
 	if len(kindList) == 0 {
 		kindList = []models.Schedule_Type{
 			models.Schedule_TYPE_UNSPECIFIED,
@@ -51,7 +51,7 @@ func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAt
 	for sTime.Before(eTime) {
 		iterations++
 
-		r := newRaptor(p.data, froms, tos, sTime, kindList, p.stopsMap)
+		r := newRaptor(p.data, froms, tos, sTime, kindList, p.stopsMap, maxConnections)
 		results := r.run()
 		min := eTime
 		found := false

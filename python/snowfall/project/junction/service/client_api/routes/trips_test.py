@@ -1,3 +1,4 @@
+import datetime
 from typing import Any, Mapping
 
 import freezegun
@@ -175,6 +176,49 @@ class TestTripSearches(object):
         )
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
+    async def test_invalid_segment_types(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        request = {
+            "data": {
+                "attributes": {
+                    "departureAfter": datetime.datetime.now(
+                        tz=datetime.timezone.utc,
+                    ).isoformat(timespec="seconds"),
+                },
+                "relationships": {
+                    "origin": {
+                        "data": {
+                            "id": fixtures.PLACES[0],
+                            "type": "places",
+                        },
+                    },
+                    "destination": {
+                        "data": {
+                            "id": fixtures.PLACES[1],
+                            "type": "places",
+                        },
+                    },
+                    "allowedSegmentTypes": {
+                        "data": [
+                            {
+                                "id": "foobar",
+                                "type": "leg-types",
+                            },
+                        ],
+                    },
+                },
+                "type": "trip-searches",
+            },
+        }
+        response = await client.post(
+            "/trips/searches",
+            json=request,
+            headers={"Content-Type": "application/vnd.api+json"},
+        )
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
     @freezegun.freeze_time("2022-04-30T08:30:30.826Z")
     async def test_departure_date_without_tz_returns_unprocessable_entity(
         self,
@@ -232,6 +276,14 @@ class TestTripSearches(object):
                             "id": fixtures.PLACES[1],
                             "type": "places",
                         },
+                    },
+                    "allowedSegmentTypes": {
+                        "data": [
+                            {
+                                "id": "air",
+                                "type": "leg-types",
+                            },
+                        ],
                     },
                 },
                 "type": "trip-searches",

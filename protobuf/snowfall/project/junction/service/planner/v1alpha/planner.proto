@@ -14,6 +14,8 @@ message SearchJourneyRequest {
   repeated snowfall.stdlib.v1alpha.LatLng origins = 1;
   repeated snowfall.stdlib.v1alpha.LatLng destinations = 2;
   snowfall.stdlib.v1alpha.DateTime departure_after = 3;
+  optional uint32 maximum_connections = 4;
+  repeated snowfall.stdlib.v1alpha.Schedule.Type allowed_segment_types = 5;
 }
 
 message SearchJourneyResponse {

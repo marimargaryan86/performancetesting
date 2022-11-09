@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+from typing import cast
 
 import lagom
 from dateutil import parser
@@ -14,6 +15,7 @@ from snowfall.project.junction.adapter import (
 )
 from snowfall.project.junction.service.client_api import resources
 from snowfall.stdlib import sequence
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import (
     messages,
     models,
@@ -99,7 +101,7 @@ class TripSearch(endpoints.HTTPEndpoint):
 
 
 class TripSearches(endpoints.HTTPEndpoint):
-    async def post(  # noqa: WPS210
+    async def post(  # noqa: WPS210,C901
         self,
         request: requests.Request,
         locations_client: locations.Client = lagom.injectable,
@@ -117,6 +119,22 @@ class TripSearches(endpoints.HTTPEndpoint):
             raise exceptions.HTTPException(
                 status.HTTP_422_UNPROCESSABLE_ENTITY,
             ) from err
+
+        try:
+            allowed_segment_types = [
+                cast(
+                    models_pb2.Schedule.Type.ValueType,
+                    protobuf.slug_to_enum_value(
+                        descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
+                        name=leg_type,
+                    ),
+                )
+                for leg_type in body.get("allowedSegmentTypes", [])
+            ]
+        except KeyError as key_err:
+            raise exceptions.HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY,
+            ) from key_err
 
         if body.get("departureAfter"):
             departure_after = parser.isoparse(body["departureAfter"])
@@ -167,6 +185,8 @@ class TripSearches(endpoints.HTTPEndpoint):
                                 if location.id in destination.merged_ids
                             ],
                             departure_after=departure_after,
+                            maximum_connections=body.get("maximumConnections"),
+                            allowed_segment_types=allowed_segment_types,
                         ),
                     ),
                     request,
