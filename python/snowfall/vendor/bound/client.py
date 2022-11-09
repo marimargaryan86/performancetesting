@@ -32,11 +32,11 @@ def _auth_required(
 
 
 class Bound(object):
-    def __init__(self, base_url: str, email: str, password: str):
+    def __init__(self, base_url: str, email: str, password: str, timeout: float = 5.0):
         self._base_url = base_url
         self._email = email
         self._password = password
-        self._http_client = httpx.AsyncClient(verify=False)
+        self._http_client = httpx.AsyncClient(verify=False, timeout=timeout)
         self._auth_cookies: dict[str, Any] = {}
 
     @_auth_required

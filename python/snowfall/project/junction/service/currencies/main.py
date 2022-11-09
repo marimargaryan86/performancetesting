@@ -1,3 +1,4 @@
+import datetime
 import ipaddress
 
 from pydantic import HttpUrl
@@ -14,6 +15,7 @@ class _Settings(service.Settings):
     base_url: HttpUrl
     email: str
     password: str
+    bound_api_timeout: datetime.timedelta = datetime.timedelta(seconds=15)
 
 
 async def _main(app: service.Application[_Settings]) -> None:
@@ -21,6 +23,7 @@ async def _main(app: service.Application[_Settings]) -> None:
         app.settings.base_url,
         app.settings.email,
         app.settings.password,
+        app.settings.bound_api_timeout.total_seconds(),
     )
     grpc_server = server.create_server(
         app.settings.grpc_address,
