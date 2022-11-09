@@ -153,15 +153,16 @@ EOH
       }
 
       env {
-        ENV_NAME              = "${var.environment}"
-        FORWARDED_ALLOWED_IPS = "0.0.0.0"
-        HTTP_ADDRESS          = "0.0.0.0"
-        HTTP_PORT             = "${NOMAD_PORT_http}"
-        JWT_TOKEN_VERSION     = "1.0.0"
-        JUNCTION_API_ADDRESS  = "${var.junction_api_URL}"
-        SENTRY_DSN            = "https://6166193e2bc24153b87e9bfca3d510d4@sentry.snowfall.se/38"
-        PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
-        MONGO_DB              = "mobile-api"
+        ENV_NAME                        = "${var.environment}"
+        FORWARDED_ALLOWED_IPS           = "0.0.0.0"
+        HTTP_ADDRESS                    = "0.0.0.0"
+        HTTP_PORT                       = "${NOMAD_PORT_http}"
+        JWT_TOKEN_VERSION               = "1.0.0"
+        JUNCTION_API_ADDRESS            = "${var.junction_api_URL}"
+        SENTRY_DSN                      = "https://6166193e2bc24153b87e9bfca3d510d4@sentry.snowfall.se/38"
+        PROMETHEUS_PORT                 = "${NOMAD_PORT_prometheus}"
+        MONGO_DB                        = "mobile-api"
+        VALIDATE_RESPONSES_AGAINST_SPEC = false
       }
     }
   }

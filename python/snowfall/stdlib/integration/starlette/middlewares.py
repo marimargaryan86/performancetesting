@@ -90,11 +90,13 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
         app: applications.Starlette,
         validator: validation.Validator,
         excluded_status_codes: Optional[Container[int]] = None,
+        validate_response: bool = True,
     ):
         super().__init__(app)
         self._logger = structlog.get_logger(__name__)
         self._validator = validator
         self._excluded_status_codes = excluded_status_codes or []
+        self._validate_response = validate_response
 
     async def dispatch(
         self,
@@ -122,6 +124,10 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
         resolved_request: requests.Request,
     ) -> responses.Response:
         response = await call_next(resolved_request)
+
+        if not self._validate_response:
+            return response
+
         resolved_response = await resolve_response(response)
 
         if resolved_response.status_code in self._excluded_status_codes:

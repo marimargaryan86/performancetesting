@@ -126,6 +126,7 @@ def _factory(
                 "junction.mobile_api",
                 "openapi.json",
             ),
+            validate_response=app.settings.validate_responses_against_spec,
         )
 
     return decorator

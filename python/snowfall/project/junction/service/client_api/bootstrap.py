@@ -27,6 +27,7 @@ class Settings(application.Settings):
     orders_address: Sequence[str]
     trips_address: Sequence[str]
     schedules_address: Sequence[str]
+    validate_responses_against_spec: bool = True
 
 
 def create_dependencies(  # noqa: WPS211

@@ -10,6 +10,7 @@ from snowfall.stdlib.integration.starlette import application
 
 class Settings(application.Settings):
     places_address: Sequence[str]
+    validate_responses_against_spec: bool = True
 
 
 def create_dependencies(

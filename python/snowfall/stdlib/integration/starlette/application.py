@@ -36,6 +36,7 @@ def create_starlette_app(
     routes_factory: RoutesFactory,
     openapi_path: pathlib.Path | None,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
+    validate_response: bool = True,
 ) -> applications.Starlette:
     stack = [Middleware(middlewares.RequestIdMiddleware)]
 
@@ -45,6 +46,7 @@ def create_starlette_app(
                 middlewares.ValidationMiddleware,
                 validator=validation.Validator(str(openapi_path)),
                 excluded_status_codes={http.HTTPStatus.METHOD_NOT_ALLOWED},
+                validate_response=validate_response,
             ),
         )
 
