@@ -95,7 +95,10 @@ class OfferImporter(object):
         redis_lock = "results:{0}".format(message.offer_search_id)
 
         async with self._redis.lock(redis_lock, timeout=10):
-            await self._aggregator.aggregate(message)
+            try:
+                await self._aggregator.aggregate(message)
+            except aggregator.SkippedOfferError:
+                return
 
             with contextlib.suppress(errors.DuplicateKeyError):
                 await self._offers.insert(message.offer)

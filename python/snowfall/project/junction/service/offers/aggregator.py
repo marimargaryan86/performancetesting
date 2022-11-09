@@ -19,6 +19,10 @@ class NoExpiryError(Exception):
     """Raised when an offer bucket list has no expiry."""
 
 
+class SkippedOfferError(Exception):
+    """Raised when an offer is skipped."""
+
+
 def generate_offer_aggregates(
     segment_ids_to_offer_ids: Mapping[str, Sequence[str]],
     expires_at: datetime.datetime,
@@ -176,7 +180,7 @@ class OfferAggregator(object):
         offer_search = await self._searches.find_by_id(search_result.offer_search_id)
 
         if not offer_search or offer_search.status in self._skippable_statuses:
-            return
+            raise SkippedOfferError()
 
         _set_sequence_numbers(offer_search, search_result.offer)
 
