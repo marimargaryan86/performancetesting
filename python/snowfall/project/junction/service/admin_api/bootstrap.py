@@ -18,8 +18,8 @@ def create_dependencies(
     places_client: places.Client,
 ) -> starlette.StarletteIntegration:
     container = lagom.Container()
-    container[locations.Client] = locations_client  # type: ignore[misc]
-    container[places.Client] = places_client  # type: ignore[misc]
+    container[locations.Client] = locations_client  # type: ignore[type-abstract]
+    container[places.Client] = places_client  # type: ignore[type-abstract]
 
     includes.register_resolvers(locations_client)
 

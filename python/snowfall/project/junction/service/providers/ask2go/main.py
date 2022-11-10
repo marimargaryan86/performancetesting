@@ -156,7 +156,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
                 notifier=notifications.SmtpNotifier(
                     smtp_client=aiosmtplib.SMTP(
                         hostname=app.settings.smtp_dsn.host,
-                        port=app.settings.smtp_dsn.port,
+                        port=int(app.settings.smtp_dsn.port or 0) or None,
                         username=app.settings.smtp_dsn.user,
                         password=app.settings.smtp_dsn.password,
                         start_tls=True,

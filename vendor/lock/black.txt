@@ -137,28 +137,28 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "027d8e83a2d7de06bbac4e5ef7e023c02b863d7ea5d079477e722bb41ab25788",
-              "url": "https://files.pythonhosted.org/packages/ed/22/967181c94c3a4063fe64e15331b4cb366bdd7dfbf46fcb8ad89650026fec/platformdirs-2.5.2-py3-none-any.whl"
+              "hash": "0cb405749187a194f444c25c82ef7225232f11564721eabffc6ec70df83b11cb",
+              "url": "https://files.pythonhosted.org/packages/2b/65/6750814157aba2e560993260d0a5a802536b3bf64bad7e54afc4334eddcc/platformdirs-2.5.3-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "58c8abb07dcb441e6ee4b11d8df0ac856038f944ab98b7be6b27b2a3c7feef19",
-              "url": "https://files.pythonhosted.org/packages/ff/7b/3613df51e6afbf2306fc2465671c03390229b55e3ef3ab9dd3f846a53be6/platformdirs-2.5.2.tar.gz"
+              "hash": "6e52c21afff35cb659c6e52d8b4d61b9bd544557180440538f255d9382c8cbe0",
+              "url": "https://files.pythonhosted.org/packages/32/3d/711a708e9b69b263e5cf190a030a77fd79a05613820f6ce0c7ea6f92f99f/platformdirs-2.5.3.tar.gz"
             }
           ],
           "project_name": "platformdirs",
           "requires_dists": [
             "appdirs==1.4.4; extra == \"test\"",
-            "furo>=2021.7.5b38; extra == \"docs\"",
-            "proselint>=0.10.2; extra == \"docs\"",
-            "pytest-cov>=2.7; extra == \"test\"",
-            "pytest-mock>=3.6; extra == \"test\"",
-            "pytest>=6; extra == \"test\"",
-            "sphinx-autodoc-typehints>=1.12; extra == \"docs\"",
-            "sphinx>=4; extra == \"docs\""
+            "furo>=2022.9.29; extra == \"docs\"",
+            "proselint>=0.13; extra == \"docs\"",
+            "pytest-cov>=4; extra == \"test\"",
+            "pytest-mock>=3.10; extra == \"test\"",
+            "pytest>=7.2; extra == \"test\"",
+            "sphinx-autodoc-typehints>=1.19.4; extra == \"docs\"",
+            "sphinx>=5.3; extra == \"docs\""
           ],
           "requires_python": ">=3.7",
-          "version": "2.5.2"
+          "version": "2.5.3"
         },
         {
           "artifacts": [

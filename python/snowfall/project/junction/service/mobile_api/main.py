@@ -53,7 +53,7 @@ def _factory(
         smtp_cl = smtp.EmailClient(
             aiosmtplib.SMTP(
                 hostname=app.settings.smtp_dsn.host,
-                port=app.settings.smtp_dsn.port,
+                port=int(app.settings.smtp_dsn.port or 0) or None,
                 username=app.settings.smtp_dsn.user,
                 password=app.settings.smtp_dsn.password,
                 start_tls=True,

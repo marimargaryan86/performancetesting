@@ -43,16 +43,16 @@ def create_dependencies(  # noqa: WPS211
     schedules_client: schedules.Client,
 ) -> starlette.StarletteIntegration:
     container = lagom.Container()
-    container[legs.Client] = legs_client  # type: ignore[misc]
-    container[locations.Client] = locations_client  # type: ignore[misc]
-    container[places.Client] = places_client  # type: ignore[misc]
-    container[trip_searches.Client] = trip_searches_client  # type: ignore[misc]
-    container[trips.Client] = trips_client  # type: ignore[misc]
-    container[orders.Client] = orders_client  # type: ignore[misc]
-    container[offers.Client] = offers_client  # type: ignore[misc]
-    container[offer_searches.Client] = offer_searches_client  # type: ignore[misc]
-    container[segments.Client] = segments_client  # type: ignore[misc]
-    container[schedules.Client] = schedules_client  # type: ignore[misc]
+    container[legs.Client] = legs_client  # type: ignore[type-abstract]
+    container[locations.Client] = locations_client  # type: ignore[type-abstract]
+    container[places.Client] = places_client  # type: ignore[type-abstract]
+    container[trip_searches.Client] = trip_searches_client  # type: ignore[type-abstract]
+    container[trips.Client] = trips_client  # type: ignore[type-abstract]
+    container[orders.Client] = orders_client  # type: ignore[type-abstract]
+    container[offers.Client] = offers_client  # type: ignore[type-abstract]
+    container[offer_searches.Client] = offer_searches_client  # type: ignore[type-abstract]
+    container[segments.Client] = segments_client  # type: ignore[type-abstract]
+    container[schedules.Client] = schedules_client  # type: ignore[type-abstract]
 
     includes.register_resolvers(
         legs_client=legs_client,

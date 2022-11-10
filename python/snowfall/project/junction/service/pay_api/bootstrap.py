@@ -21,5 +21,5 @@ def create_dependencies(
 ) -> starlette.StarletteIntegration:
     container = lagom.Container()
     container[currencycloud.Client] = cc_client
-    container[currencies.Client] = currencies_client  # type: ignore[misc]
+    container[currencies.Client] = currencies_client  # type: ignore[type-abstract]
     return starlette.StarletteIntegration(container)
