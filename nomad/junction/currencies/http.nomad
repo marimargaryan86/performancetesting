@@ -75,8 +75,10 @@ job "currencies" {
 
       template {
         data        = <<EOH
+
 {{ with secret "kv/data/${var.environment}/currencies" }}
 PASSWORD={{ .Data.data.password }}
+BASE_URL={{ .Data.data.base_url }}
 EMAIL={{ .Data.data.email }}
 {{ end }}
 EOH
@@ -101,7 +103,6 @@ EOH
 
       env {
         ENV_NAME     = "${var.environment}"
-        BASE_URL     = "https://sandbox-api.bound.co/api"
         GRPC_ADDRESS = "0.0.0.0"
         GRPC_PORT    = "${NOMAD_PORT_grpc}"
         SENTRY_DSN   = "https://862dba8da99649d28747c88ad44699e8@sentry.snowfall.se/35"
