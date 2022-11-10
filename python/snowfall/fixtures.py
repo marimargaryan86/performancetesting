@@ -148,6 +148,9 @@ def generate_location(identifier: str) -> place_models_pb2.Location:
         country_code="SE",
         time_zone="Europe/Stockholm",
         types=[place_models_pb2.Location.TYPE_UNSPECIFIED],
+        updated_at=protobuf.datetime_to_protobuf(
+            datetime.datetime.now(tz=datetime.timezone.utc),
+        ),
     )
 
 

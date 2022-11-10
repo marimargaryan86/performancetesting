@@ -685,6 +685,7 @@ class PlaceResource(models.Resource):
                 "longitude": place.location.coordinates.longitude,
                 "name": place.location.name,
                 "timeZone": place.location.time_zone,
+                "updatedAt": protobuf.protobuf_to_datetime(place.location.updated_at),
             },
             relationships={
                 "types": {

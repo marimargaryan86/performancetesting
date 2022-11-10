@@ -1,3 +1,4 @@
+import datetime
 import uuid
 from typing import AsyncIterable
 
@@ -6,6 +7,7 @@ from aiocsv import AsyncDictReader, protocols
 from snowfall.project.junction.service.places import places
 from snowfall.project.junction.service.places.v1alpha import models_pb2
 from snowfall.stdlib import string
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import latlng_pb2
 
 _MIN_POPULATION = 20000
@@ -42,5 +44,8 @@ async def parse_csv(
                     longitude=float(row["longitude"]),
                 ),
                 types=[models_pb2.Location.TYPE_CITY],
+                updated_at=protobuf.datetime_to_protobuf(
+                    datetime.datetime.now(tz=datetime.timezone.utc),
+                ),
             ),
         )
