@@ -121,6 +121,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
         http_client = await stack.enter_async_context(
             httpx_metrics.with_metrics(
                 httpx.AsyncClient(
+                    http2=True,
                     timeout=app.settings.http_timeout,
                 ),
             ),
@@ -175,6 +176,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
         http_client = await stack.enter_async_context(
             httpx_metrics.with_metrics(
                 httpx.AsyncClient(
+                    http2=True,
                     timeout=app.settings.http_timeout,
                 ),
             ),

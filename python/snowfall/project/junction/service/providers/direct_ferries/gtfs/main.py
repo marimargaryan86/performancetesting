@@ -26,7 +26,7 @@ async def _create_gtfs(app: service.Application[DFSetting]) -> None:
 
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
-            httpx.AsyncClient(timeout=app.settings.timeout),
+            httpx.AsyncClient(http2=True, timeout=app.settings.timeout),
         )
         settings = app.settings
 

@@ -31,6 +31,7 @@ def _dependencies(
 
     container[routes.Template] = routes.Template(html=layout)
     container[httpx.AsyncClient] = httpx.AsyncClient(
+        http2=True,
         base_url=app.settings.base_url,
         headers={
             "Accept": "application/vnd.api+json",

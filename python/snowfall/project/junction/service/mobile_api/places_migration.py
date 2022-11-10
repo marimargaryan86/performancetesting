@@ -18,7 +18,7 @@ _ATTRIBUTES_KEY = "attributes"
 async def migrate(settings: bootstrap.Settings) -> None:  # noqa: WPS210
     mongo = motor_asyncio.AsyncIOMotorClient(settings.mongo_dsn)
     places_repository = repository.PlacesRepository(mongo[settings.mongo_db]["places"])
-    http_client = httpx.AsyncClient()
+    http_client = httpx.AsyncClient(http2=True)
     auth_headers = {"Authorization": "Bearer {0}".format(settings.junction_api_token)}
     places_response = await http_client.get(
         "{0}/places".format(random.choice(settings.junction_api_address)),  # nosec

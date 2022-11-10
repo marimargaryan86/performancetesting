@@ -51,7 +51,7 @@ class _BaseClient(object):
         client: Optional[httpx.AsyncClient] = None,
     ) -> None:
         self._api_url = api_url
-        self._client = client or httpx.AsyncClient()
+        self._client = client or httpx.AsyncClient(http2=True)
         self._client.base_url = httpx.URL(api_url)
         self._token = token
 

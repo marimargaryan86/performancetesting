@@ -118,6 +118,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
             httpx.AsyncClient(
+                http2=True,
                 timeout=app.settings.api_timeout,
             ),
         )
@@ -183,6 +184,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
             httpx.AsyncClient(
+                http2=True,
                 timeout=app.settings.api_timeout,
             ),
         )
@@ -239,6 +241,7 @@ async def _dump_stations(app: service.Application[_DumpStationsSettings]) -> Non
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
             httpx.AsyncClient(
+                http2=True,
                 timeout=app.settings.api_timeout,
             ),
         )
