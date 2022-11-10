@@ -70,10 +70,11 @@ job "planner-grpc" {
       driver = "docker"
 
       resources {
-        memory = 65 * 1024
+        memory = 10 * 1024
       }
 
       config {
+
         image = var.docker_image
         ports = ["grpc"]
         args = [
