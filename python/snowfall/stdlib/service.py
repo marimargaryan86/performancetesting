@@ -50,7 +50,6 @@ class SentrySettings(object):
 class _GlobalSettings(Settings):
     env_name: str = pydantic.Field(default="local", hidden=True)
     log_level: str = "INFO"
-    platform_name: str = pydantic.Field(default="Junction", hidden=True)
     prometheus_port: int | None = None
     sentry_dsn: str = ""
     version: str = pydantic.Field(default="dev", hidden=True)
@@ -263,10 +262,9 @@ def _command(  # noqa: WPS210
             settings=command.settings_class.construct(
                 **{kwarg_key: kwarg_value for kwarg_key, kwarg_value in kwargs.items()},
             ),
-            user_agent="{name}/{version} ({platform_name})".format(
+            user_agent="{name}/{version} (+https://snowfalltravel.com/)".format(
                 name=entrypoint.name,
                 version=global_settings.version,
-                platform_name=global_settings.platform_name,
             ),
             version=global_settings.version,
         )
