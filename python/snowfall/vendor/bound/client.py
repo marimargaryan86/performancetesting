@@ -36,7 +36,7 @@ class Bound(object):
         self._base_url = base_url
         self._email = email
         self._password = password
-        self._http_client = httpx.AsyncClient(http2=True, verify=False, timeout=timeout)
+        self._http_client = httpx.AsyncClient(verify=False, timeout=timeout)
         self._auth_cookies: dict[str, Any] = {}
 
     @_auth_required
