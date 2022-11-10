@@ -38,12 +38,14 @@ class OfferGroupCache(object):
     ) -> None:
         cache_key = string.to_uuid(
             b"\x00".decode().join(
-                sorted(
-                    [
-                        search_task.session_token,
-                        *[segment.id for segment in search_task.segments],
-                    ],
-                ),
+                [
+                    search_task.session_token,
+                    *[segment.id for segment in search_task.segments],
+                    search_task.criteria.cabin_class,
+                    str(search_task.criteria.adults),
+                    str(search_task.criteria.children),
+                    str(search_task.criteria.infants),
+                ],
             ),
         )
 
