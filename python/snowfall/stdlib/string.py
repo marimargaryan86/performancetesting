@@ -15,11 +15,27 @@ def random(
     return "".join(secrets.choice(charset) for _ in range(length))
 
 
-def to_camel(string: str) -> str:
-    return "".join(
+def to_lower_camel(string: str) -> str:
+    camel_case = "".join(
         (word.title() if step else word)
-        for (step, word) in enumerate(string.split("_"))
+        for (step, word) in enumerate(
+            string.replace("-", "_").replace(" ", "_").split("_"),
+        )
     )
+
+    if camel_case:
+        camel_case = camel_case[0].lower() + camel_case[1:]
+
+    return camel_case
+
+
+def to_upper_camel(string: str) -> str:
+    camel_case = to_lower_camel(string)
+
+    if camel_case:
+        camel_case = camel_case[0].upper() + camel_case[1:]
+
+    return camel_case
 
 
 def to_snake(string: str) -> str:

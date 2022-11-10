@@ -256,7 +256,7 @@ def _create_traveler_doc(
 
     return order_models_pb2.DocumentDetails(
         document_type=slug_to_enum_value(  # type: ignore[arg-type]
-            descriptor=order_models_pb2.DocumentDetails.Type.DESCRIPTOR,
+            enum_descriptor=order_models_pb2.DocumentDetails.Type.DESCRIPTOR,
             name=document["documentType"],
         ),
         document_number=document["documentNumber"],
@@ -276,11 +276,11 @@ def _create_passengers(
             first_name=passenger["firstName"],
             last_name=passenger["lastName"],
             title=slug_to_enum_value(  # type: ignore[arg-type]
-                descriptor=order_models_pb2.Passenger.Title.DESCRIPTOR,
+                enum_descriptor=order_models_pb2.Passenger.Title.DESCRIPTOR,
                 name=passenger["title"],
             ),
             gender=slug_to_enum_value(  # type: ignore[arg-type]
-                descriptor=order_models_pb2.Passenger.Gender.DESCRIPTOR,
+                enum_descriptor=order_models_pb2.Passenger.Gender.DESCRIPTOR,
                 name=passenger["gender"],
             ),
             date_of_birth=date_to_protobuf(

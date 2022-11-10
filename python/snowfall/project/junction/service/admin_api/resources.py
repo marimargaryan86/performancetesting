@@ -22,7 +22,7 @@ class PlaceTypeResource(models.Resource):
         request: requests.Request,
     ) -> PlaceTypeResource:
         place_type_id = protobuf.enum_value_to_slug(
-            descriptor=models_pb2.Location.Type.DESCRIPTOR,
+            enum_descriptor=models_pb2.Location.Type.DESCRIPTOR,
             enum_value=place_type,
         )
         return cls(
@@ -60,7 +60,7 @@ class LocationResource(models.Resource):
                     _DATA_KEY: [
                         models.ResourceIdentifier(
                             id=protobuf.enum_value_to_slug(
-                                descriptor=models_pb2.Location.Type.DESCRIPTOR,
+                                enum_descriptor=models_pb2.Location.Type.DESCRIPTOR,
                                 enum_value=location_type,
                             ),
                             type=PlaceTypeResource.api_type,
@@ -112,7 +112,7 @@ class PlaceResource(models.Resource):
                     _DATA_KEY: [
                         models.ResourceIdentifier(
                             id=protobuf.enum_value_to_slug(
-                                descriptor=models_pb2.Location.Type.DESCRIPTOR,
+                                enum_descriptor=models_pb2.Location.Type.DESCRIPTOR,
                                 enum_value=place_type,
                             ),
                             type=PlaceTypeResource.api_type,

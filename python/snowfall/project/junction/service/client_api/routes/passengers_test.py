@@ -12,7 +12,7 @@ class TestPassengers(object):
             url="/passengers/genders",
             expected_ids=[
                 protobuf.enum_value_to_slug(
-                    descriptor=models_pb2.Passenger.Gender.DESCRIPTOR,
+                    enum_descriptor=models_pb2.Passenger.Gender.DESCRIPTOR,
                     enum_value=passenger_gender,
                 )
                 for passenger_gender in models_pb2.Passenger.Gender.values()
@@ -25,7 +25,7 @@ class TestPassengers(object):
             url="/passengers/titles",
             expected_ids=[
                 protobuf.enum_value_to_slug(
-                    descriptor=models_pb2.Passenger.Title.DESCRIPTOR,
+                    enum_descriptor=models_pb2.Passenger.Title.DESCRIPTOR,
                     enum_value=passenger_title,
                 )
                 for passenger_title in models_pb2.Passenger.Title.values()

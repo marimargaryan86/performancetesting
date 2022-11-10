@@ -17,7 +17,7 @@ class User(pydantic.BaseModel):
     loyalty_programs: Optional[Sequence[Mapping[str, str]]]  # noqa: WPS234
 
     class Config(object):
-        alias_generator = string.to_camel
+        alias_generator = string.to_lower_camel
         allow_population_by_field_name = True
 
     @classmethod

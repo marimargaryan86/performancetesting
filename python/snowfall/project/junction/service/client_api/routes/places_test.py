@@ -20,7 +20,7 @@ class TestPlaces(object):
             url="/places/types",
             expected_ids=[
                 protobuf.enum_value_to_slug(
-                    descriptor=models_pb2.Location.Type.DESCRIPTOR,
+                    enum_descriptor=models_pb2.Location.Type.DESCRIPTOR,
                     enum_value=place_type,
                 )
                 for place_type in models_pb2.Location.Type.values()

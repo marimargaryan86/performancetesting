@@ -95,7 +95,7 @@ class OfferGroupResource(models.Resource):
                 "expiresAt": protobuf.protobuf_to_datetime(group.expires_at),
                 "required": [
                     protobuf.enum_value_to_slug(
-                        descriptor=offer_models_pb2.OfferGroup.Required.DESCRIPTOR,
+                        enum_descriptor=offer_models_pb2.OfferGroup.Required.DESCRIPTOR,
                         enum_value=required_value,
                     )
                     for required_value in group.required
@@ -184,7 +184,7 @@ class TripOfferGroupDetailsResource(models.Resource):
                 "legType": {
                     _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
                         id=protobuf.enum_value_to_slug(
-                            descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
+                            enum_descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
                             enum_value=segment.type,
                         ),
                         type=LegTypeResource.api_type,
@@ -254,13 +254,13 @@ class Penalty(models.BaseModel):
         return cls(
             applicableTo=PenaltyApplicableTo.from_proto(penalty.applicable_to),
             penaltyType=protobuf.enum_value_to_slug(
-                descriptor=offer_models_pb2.Penalty.Type.DESCRIPTOR,
+                enum_descriptor=offer_models_pb2.Penalty.Type.DESCRIPTOR,
                 enum_value=penalty.penalty_type,
             ),
             changeable=penalty.changeable,
             refundable=penalty.refundable,
             applicability=protobuf.enum_value_to_slug(
-                descriptor=offer_models_pb2.Penalty.Applicability.DESCRIPTOR,
+                enum_descriptor=offer_models_pb2.Penalty.Applicability.DESCRIPTOR,
                 enum_value=penalty.applicability,
             ),
             price=Price.from_proto(penalty.price) if penalty.price.ByteSize() else None,
@@ -340,7 +340,7 @@ class OfferSegmentAmenity(models.BaseModel):
     ) -> OfferSegmentAmenity:
         return cls(
             availability=protobuf.enum_value_to_slug(
-                descriptor=offer_models_pb2.SegmentAmenity.Type.DESCRIPTOR,
+                enum_descriptor=offer_models_pb2.SegmentAmenity.Type.DESCRIPTOR,
                 enum_value=amenity.availability,
             ),
         )
@@ -398,7 +398,7 @@ class TripOfferOptionDetailsResource(models.Resource):
                 "cabinClass": {
                     "data": models.ResourceIdentifier(
                         id=protobuf.enum_value_to_slug(
-                            descriptor=models_pb2.CabinClass.Type.DESCRIPTOR,
+                            enum_descriptor=models_pb2.CabinClass.Type.DESCRIPTOR,
                             enum_value=details.cabin_class.type,
                         ),
                         type=CabinClassResource.api_type,
@@ -422,7 +422,7 @@ class CabinClass(models.BaseModel):
     def from_proto(cls, cabin_class: models_pb2.CabinClass) -> CabinClass:
         return cls(
             name=protobuf.enum_value_to_slug(
-                descriptor=models_pb2.CabinClass.Type.DESCRIPTOR,
+                enum_descriptor=models_pb2.CabinClass.Type.DESCRIPTOR,
                 enum_value=cabin_class.type,
             ),
             marketingName=cabin_class.marketing_name,
@@ -511,12 +511,12 @@ class OrderResource(models.Resource):
                             passenger.date_of_birth,
                         ),
                         "title": protobuf.enum_value_to_slug(
-                            descriptor=order_models_pb2.Passenger.Title.DESCRIPTOR,
+                            enum_descriptor=order_models_pb2.Passenger.Title.DESCRIPTOR,
                             enum_value=passenger.title,
                         ),
                         "lastName": passenger.last_name,
                         "gender": protobuf.enum_value_to_slug(
-                            descriptor=order_models_pb2.Passenger.Gender.DESCRIPTOR,
+                            enum_descriptor=order_models_pb2.Passenger.Gender.DESCRIPTOR,
                             enum_value=passenger.gender,
                         ),
                     }
@@ -640,7 +640,7 @@ class TripBookingDetailsResource(models.Resource):
                 "cabinClass": {
                     _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
                         id=protobuf.enum_value_to_slug(
-                            descriptor=models_pb2.CabinClass.Type.DESCRIPTOR,
+                            enum_descriptor=models_pb2.CabinClass.Type.DESCRIPTOR,
                             enum_value=details.cabin_class.type,
                         ),
                         type=CabinClassResource.api_type,
@@ -649,7 +649,7 @@ class TripBookingDetailsResource(models.Resource):
                 "legType": {
                     _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
                         id=protobuf.enum_value_to_slug(
-                            descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
+                            enum_descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
                             enum_value=details.segment.type,
                         ),
                         type=LegTypeResource.api_type,
@@ -690,7 +690,7 @@ class PlaceResource(models.Resource):
                     _RELATIONSHIPS_FIELD: [
                         models.ResourceIdentifier(
                             id=protobuf.enum_value_to_slug(
-                                descriptor=place_models_pb2.Location.Type.DESCRIPTOR,
+                                enum_descriptor=place_models_pb2.Location.Type.DESCRIPTOR,
                                 enum_value=place_type,
                             ),
                             type=PlaceTypeResource.api_type,
@@ -715,10 +715,10 @@ class PlaceTypeResource(models.Resource):
     def from_proto(
         cls,
         place_type: place_models_pb2.Location.Type.V,
-        request: requests.Request,
+        self_link: str,
     ) -> PlaceTypeResource:
         place_type_id = protobuf.enum_value_to_slug(
-            descriptor=place_models_pb2.Location.Type.DESCRIPTOR,
+            enum_descriptor=place_models_pb2.Location.Type.DESCRIPTOR,
             enum_value=place_type,
         )
         return cls(
@@ -728,10 +728,7 @@ class PlaceTypeResource(models.Resource):
                 "name": place_type_id,
             },
             links={
-                _SELF_HREF: request.url_for(
-                    "ViewPlaceType",
-                    placeTypeId=place_type_id,
-                ),
+                _SELF_HREF: self_link,
             },
         )
 
@@ -743,10 +740,10 @@ class PassengerGenderResource(models.Resource):
     def from_proto(
         cls,
         passenger_gender: order_models_pb2.Passenger.Gender.V,
-        request: requests.Request,
+        self_link: str,
     ) -> PassengerGenderResource:
         passenger_gender_id = protobuf.enum_value_to_slug(
-            descriptor=order_models_pb2.Passenger.Gender.DESCRIPTOR,
+            enum_descriptor=order_models_pb2.Passenger.Gender.DESCRIPTOR,
             enum_value=passenger_gender,
         )
         return cls(
@@ -756,10 +753,7 @@ class PassengerGenderResource(models.Resource):
                 "name": passenger_gender_id,
             },
             links={
-                _SELF_HREF: request.url_for(
-                    "ViewPassengerGender",
-                    passengerGenderId=passenger_gender_id,
-                ),
+                _SELF_HREF: self_link,
             },
         )
 
@@ -771,10 +765,10 @@ class CabinClassResource(models.Resource):
     def from_proto(
         cls,
         cabin_class: models_pb2.CabinClass.Type.V,
-        request: requests.Request,
+        self_link: str,
     ) -> CabinClassResource:
         cabin_class_id = protobuf.enum_value_to_slug(
-            descriptor=models_pb2.CabinClass.Type.DESCRIPTOR,
+            enum_descriptor=models_pb2.CabinClass.Type.DESCRIPTOR,
             enum_value=cabin_class,
         )
         return cls(
@@ -784,10 +778,7 @@ class CabinClassResource(models.Resource):
                 "name": cabin_class_id,
             },
             links={
-                _SELF_HREF: request.url_for(
-                    "ViewCabinClass",
-                    cabinClassId=cabin_class_id,
-                ),
+                _SELF_HREF: self_link,
             },
         )
 
@@ -799,10 +790,10 @@ class PassengerTitleResource(models.Resource):
     def from_proto(
         cls,
         passenger_title: order_models_pb2.Passenger.Title.V,
-        request: requests.Request,
+        self_link: str,
     ) -> PassengerTitleResource:
         passenger_title_id = protobuf.enum_value_to_slug(
-            descriptor=order_models_pb2.Passenger.Title.DESCRIPTOR,
+            enum_descriptor=order_models_pb2.Passenger.Title.DESCRIPTOR,
             enum_value=passenger_title,
         )
         return cls(
@@ -812,10 +803,7 @@ class PassengerTitleResource(models.Resource):
                 "name": passenger_title_id,
             },
             links={
-                _SELF_HREF: request.url_for(
-                    "ViewPassengerTitle",
-                    passengerTitleId=passenger_title_id,
-                ),
+                _SELF_HREF: self_link,
             },
         )
 
@@ -880,7 +868,7 @@ class LegResource(models.Resource):
                 "legType": {
                     _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
                         id=protobuf.enum_value_to_slug(
-                            descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
+                            enum_descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
                             enum_value=leg.type,
                         ),
                         type=LegTypeResource.api_type,
@@ -903,10 +891,10 @@ class LegTypeResource(models.Resource):
     def from_proto(
         cls,
         schedule_type: models_pb2.Schedule.Type.V,
-        request: requests.Request,
+        self_link: str,
     ) -> LegTypeResource:
         schedule_type_id = protobuf.enum_value_to_slug(
-            descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
+            enum_descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
             enum_value=schedule_type,
         )
         return cls(
@@ -916,10 +904,7 @@ class LegTypeResource(models.Resource):
                 "name": schedule_type_id,
             },
             links={
-                _SELF_HREF: request.url_for(
-                    "ViewLegType",
-                    legTypeId=schedule_type_id,
-                ),
+                _SELF_HREF: self_link,
             },
         )
 

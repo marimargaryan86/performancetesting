@@ -1,13 +1,11 @@
 import lagom
-from starlette import endpoints, exceptions, requests, responses, status
+from starlette import endpoints, requests, responses, status
 
 from snowfall.project.junction.adapter import legs as legs_adapter
 from snowfall.project.junction.adapter import segments as segments_adapter
 from snowfall.project.junction.adapter import trip_searches as trip_searches_adapter
 from snowfall.project.junction.adapter import trips as trips_adapter
 from snowfall.project.junction.service.client_api import resources
-from snowfall.stdlib import sequence
-from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import messages, models, pagination_helpers
 from snowfall.stdlib.v1alpha import models_pb2
 
@@ -25,62 +23,6 @@ class Leg(endpoints.HTTPEndpoint):
         return await messages.create_response(
             body=models.Body(
                 data=resources.LegResource.from_proto(leg, request),
-            ),
-            request=request,
-        )
-
-
-class LegType(endpoints.HTTPEndpoint):
-    async def get(
-        self,
-        request: requests.Request,
-    ) -> responses.Response:
-        leg_type_id = request.path_params["legTypeId"]
-        try:
-            leg_type = protobuf.slug_to_enum_value(
-                models_pb2.Schedule.Type.DESCRIPTOR,
-                leg_type_id,
-            )
-        except KeyError as err:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
-
-        return await messages.create_response(
-            body=models.Body(
-                data=resources.LegTypeResource.from_proto(
-                    leg_type,  # type: ignore[arg-type]
-                    request,
-                ),
-            ),
-            request=request,
-        )
-
-
-class LegTypes(endpoints.HTTPEndpoint):
-    async def get(
-        self,
-        request: requests.Request,
-    ) -> responses.Response:
-        pagination = pagination_helpers.get_pagination(request)
-        sequence_page = sequence.paginate(
-            sequence=models_pb2.Schedule.Type.values(),
-            cursor=pagination.cursor,
-            limit=pagination.limit,
-        )
-
-        return await messages.create_response(
-            body=models.Body(
-                data=[
-                    resources.LegTypeResource.from_proto(
-                        leg_type,
-                        request,
-                    )
-                    for leg_type in sequence_page.sequence
-                ],
-                links=pagination_helpers.get_next_url(
-                    request.url_for("ListLegTypes"),
-                    sequence_page.cursor,
-                    pagination,
-                ),
             ),
             request=request,
         )

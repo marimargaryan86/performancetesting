@@ -18,13 +18,35 @@ def test_random() -> None:
         ("test", "test"),
         ("test_word", "testWord"),
         ("test_word_foobar", "testWordFoobar"),
+        ("Test_word_foobar", "testWordFoobar"),
+        ("test-word different_spacing", "testWordDifferentSpacing"),
+        ("t", "t"),
     ],
 )
-def test_to_camel(
+def test_to_lower_camel(
     snake_case: str,
     expected: str,
 ) -> None:
-    assert string.to_camel(snake_case) == expected
+    assert string.to_lower_camel(snake_case) == expected
+
+
+@pytest.mark.parametrize(
+    "snake_case,expected",
+    [
+        ("", ""),
+        ("test", "Test"),
+        ("test_word", "TestWord"),
+        ("test_word_foobar", "TestWordFoobar"),
+        ("Test_word_foobar", "TestWordFoobar"),
+        ("test-word different_spacing", "TestWordDifferentSpacing"),
+        ("t", "T"),
+    ],
+)
+def test_to_upper_camel(
+    snake_case: str,
+    expected: str,
+) -> None:
+    assert string.to_upper_camel(snake_case) == expected
 
 
 @pytest.mark.parametrize(

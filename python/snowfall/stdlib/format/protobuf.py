@@ -7,12 +7,12 @@ from aiofiles.threadpool import binary
 from dateutil import tz
 from google.protobuf import (
     any_pb2,
+    descriptor,
     duration_pb2,
     message,
     symbol_database,
     timestamp_pb2,
 )
-from google.protobuf.descriptor import EnumDescriptor
 
 from snowfall.stdlib.v1alpha import datetime_pb2, models_pb2
 
@@ -162,18 +162,21 @@ def protobuf_to_date(
     return datetime.date(year=proto.year, month=proto.month, day=proto.day)
 
 
-def enum_value_to_slug(descriptor: EnumDescriptor, enum_value: int) -> str:
-    name = descriptor.values_by_number[enum_value].name.removeprefix(
-        "{0}_".format(descriptor.name.upper()),
+def enum_value_to_slug(
+    enum_descriptor: descriptor.EnumDescriptor,
+    enum_value: int,
+) -> str:
+    name = enum_descriptor.values_by_number[enum_value].name.removeprefix(
+        "{0}_".format(enum_descriptor.name.upper()),
     )
 
     return name.lower().replace("_", "-")
 
 
-def slug_to_enum_value(descriptor: EnumDescriptor, name: str) -> int:
+def slug_to_enum_value(enum_descriptor: descriptor.EnumDescriptor, name: str) -> int:
     enum_name = "{0}_{1}".format(
-        descriptor.name.upper(),
+        enum_descriptor.name.upper(),
         name.replace("-", "_").upper(),
     )
 
-    return descriptor.values_by_name[enum_name].number
+    return enum_descriptor.values_by_name[enum_name].number

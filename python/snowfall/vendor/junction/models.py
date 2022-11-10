@@ -6,7 +6,7 @@ from snowfall.stdlib import string
 
 def dict_factory_to_camel(dict_items: Sequence[tuple[str, Any]]) -> dict[str, Any]:
     return {
-        string.to_camel(dict_key): dict_value
+        string.to_lower_camel(dict_key): dict_value
         for dict_key, dict_value in dict_items
         if dict_value is not None
     }

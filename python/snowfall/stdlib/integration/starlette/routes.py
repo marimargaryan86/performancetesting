@@ -1,11 +1,14 @@
 import os
 import re
-from typing import Sequence
+from typing import Any, Callable, Sequence
 
 import httpx
-from starlette import endpoints, requests, responses, routing
+from google.protobuf import descriptor
+from starlette import endpoints, exceptions, requests, responses, routing, status
 
-from snowfall.stdlib.integration.starlette import models
+from snowfall.stdlib import sequence, string
+from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.integration.starlette import messages, models, pagination_helpers
 
 
 class Proxy(object):
@@ -66,4 +69,104 @@ class Health(endpoints.HTTPEndpoint):
                 meta={"status": "pass"},
                 links={"self": str(request.url_for("Health"))},
             ),
+        )
+
+
+class ListAndViewEnum(object):
+    def __init__(
+        self,
+        enum_descriptor: descriptor.EnumDescriptor,
+        resource_factory: Callable[[Any, str], models.Resource],
+        path: str,
+    ) -> None:
+        self._enum_descriptor = enum_descriptor
+        self._path = path.lstrip("/").rstrip("/")
+        self._resource_factory = resource_factory
+        self._list_route_name = string.to_upper_camel(
+            "list-{0}".format(self._path).replace("/", " "),
+        )
+        self._view_route_name = string.to_upper_camel(
+            "view-{0}".format(self._path).replace("/", " "),
+        )
+
+    def to_routes(self) -> tuple[routing.Route, routing.Route]:
+        return (
+            routing.Route(
+                path="/{0}".format(self._path),
+                endpoint=self._list,
+                methods=["GET"],
+                name=self._list_route_name,
+            ),
+            routing.Route(
+                path="/{0}/{{enumId}}".format(self._path),
+                endpoint=self._view,
+                methods=["GET"],
+                name=self._view_route_name,
+            ),
+        )
+
+    def _to_id(self, leg_type: int) -> str:
+        return protobuf.enum_value_to_slug(
+            enum_descriptor=self._enum_descriptor,
+            enum_value=leg_type,
+        )
+
+    async def _list(
+        self,
+        request: requests.Request,
+    ) -> responses.Response:
+        pagination = pagination_helpers.get_pagination(request)
+        sequence_page = sequence.paginate(
+            sequence=sorted(
+                (enum_value.number for enum_value in self._enum_descriptor.values),
+                key=self._to_id,
+            ),
+            cursor=pagination.cursor,
+            limit=pagination.limit,
+        )
+
+        return await messages.create_response(
+            body=models.Body(
+                data=[
+                    self._resource_factory(
+                        enum_value,
+                        request.url_for(
+                            self._view_route_name,
+                            enumId=self._to_id(enum_value),
+                        ),
+                    )
+                    for enum_value in sequence_page.sequence
+                ],
+                links=pagination_helpers.get_next_url(
+                    request.url_for(self._list_route_name),
+                    sequence_page.cursor,
+                    pagination,
+                ),
+            ),
+            request=request,
+        )
+
+    async def _view(
+        self,
+        request: requests.Request,
+    ) -> responses.Response:
+        try:
+            enum_value = protobuf.slug_to_enum_value(
+                self._enum_descriptor,
+                request.path_params["enumId"],
+            )
+        except KeyError as err:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
+
+        return await messages.create_response(
+            body=models.Body(
+                data=self._resource_factory(
+                    enum_value,
+                    request.url_for(
+                        self._view_route_name,
+                        enumId=request.path_params["enumId"],
+                    ),
+                ),
+            ),
+            request=request,
         )

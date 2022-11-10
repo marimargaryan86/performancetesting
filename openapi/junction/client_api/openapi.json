@@ -169,6 +169,9 @@
         "description": "The List places endpoint is used to find the origin and destination locations for the Trip Search endpoint.\n\nA place is an indexed reference to a location that Junction might have related content for. It is specified in a trip search to state where a passenger wishes to travel from/to. Each place is allocated a unique identifier.\nA place can be a Rail station or an Airport.\n\nThe List places endpoint purposefully doesn't support filtering and sorting. The API client should fetch the places once, and store them on their side, so that multiple calls to this endpoint are avoided.",
         "parameters": [
           {
+            "$ref": "#/components/parameters/placeSort"
+          },
+          {
             "$ref": "#/components/parameters/page-cursor"
           },
           {
@@ -307,6 +310,9 @@
         "operationId": "get-places-types",
         "description": "Used to retrieve available Place Types.",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/placeTypeSort"
+          },
           {
             "$ref": "#/components/parameters/page-cursor"
           },
@@ -461,6 +467,9 @@
         "description": "Used to retrieve available Passenger Genders.",
         "parameters": [
           {
+            "$ref": "#/components/parameters/passengerGenderSort"
+          },
+          {
             "$ref": "#/components/parameters/page-cursor"
           },
           {
@@ -614,6 +623,9 @@
         "description": "Used to retrieve available Passenger TItles.",
         "parameters": [
           {
+            "$ref": "#/components/parameters/passengerTitleSort"
+          },
+          {
             "$ref": "#/components/parameters/page-cursor"
           },
           {
@@ -766,6 +778,9 @@
         "operationId": "get-cabin-classes",
         "description": "Used to retrieve available Cabin Classes.",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/cabinClassSort"
+          },
           {
             "$ref": "#/components/parameters/page-cursor"
           },
@@ -974,6 +989,9 @@
         "description": "Used to retrieve available Leg Types.",
         "parameters": [
           {
+            "$ref": "#/components/parameters/legTypeSort"
+          },
+          {
             "$ref": "#/components/parameters/page-cursor"
           },
           {
@@ -1163,6 +1181,9 @@
         "description": "Used to retrieve all Legs contained in a Segment.",
         "parameters": [
           {
+            "$ref": "#/components/parameters/legSort"
+          },
+          {
             "$ref": "#/components/parameters/page-cursor"
           },
           {
@@ -1298,6 +1319,9 @@
         "description": "Used to retrieve all Legs contained in a Trip.",
         "parameters": [
           {
+            "$ref": "#/components/parameters/legSort"
+          },
+          {
             "$ref": "#/components/parameters/page-cursor"
           },
           {
@@ -1375,6 +1399,9 @@
         "operationId": "get-trips-id-segments",
         "description": "Used to retrieve all Segments contained in a Trip.",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/segmentSort"
+          },
           {
             "$ref": "#/components/parameters/page-cursor"
           },
@@ -1615,6 +1642,9 @@
         "description": "Used to retrieve all Legs for all Trip results for a Trip Search.",
         "parameters": [
           {
+            "$ref": "#/components/parameters/legSort"
+          },
+          {
             "$ref": "#/components/parameters/page-cursor"
           },
           {
@@ -1694,6 +1724,9 @@
         "operationId": "get-trips-searches-id-segments",
         "description": "Used to retrieve all Segments for all Trip results for a Trip Search.",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/segmentSort"
+          },
           {
             "$ref": "#/components/parameters/page-cursor"
           },
@@ -1777,6 +1810,9 @@
         "operationId": "get-trips-searches-id-trips",
         "description": "Used to retrieve all Trip results for a Trip Search.",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/tripSort"
+          },
           {
             "$ref": "#/components/parameters/page-cursor"
           },
@@ -2065,6 +2101,9 @@
         "description": "Used to retrieve all Offer results for an Offer Search.",
         "parameters": [
           {
+            "$ref": "#/components/parameters/offerSort"
+          },
+          {
             "$ref": "#/components/parameters/page-cursor"
           },
           {
@@ -2291,6 +2330,9 @@
         "description": "Used to retrieve all Offer Group results for an Offer.",
         "parameters": [
           {
+            "$ref": "#/components/parameters/offerGroupSort"
+          },
+          {
             "$ref": "#/components/parameters/page-cursor"
           },
           {
@@ -2436,6 +2478,9 @@
         "description": "Used to retrieve all Offer Group Details for an Offer Group.",
         "parameters": [
           {
+            "$ref": "#/components/parameters/offerGroupDetailsSort"
+          },
+          {
             "$ref": "#/components/parameters/page-cursor"
           },
           {
@@ -2576,6 +2621,9 @@
         "operationId": "get-offers-groups-id-options",
         "description": "Used to retrieve all Offer Options for an Offer Group.",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/offerOptionSort"
+          },
           {
             "$ref": "#/components/parameters/page-cursor"
           },
@@ -2719,6 +2767,9 @@
         "description": "Used to retrieve all Offer Option Details for an Offer Option.",
         "parameters": [
           {
+            "$ref": "#/components/parameters/offerOptionDetailsSort"
+          },
+          {
             "$ref": "#/components/parameters/page-cursor"
           },
           {
@@ -2855,6 +2906,9 @@
         },
         "description": "Used to retrieve Journeys created in Junction.",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/journeySort"
+          },
           {
             "$ref": "#/components/parameters/page-cursor"
           },
@@ -3006,6 +3060,9 @@
         "operationId": "get-journeys-id-orders",
         "description": "Used to retrieve all Orders for a Journey container.",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/orderSort"
+          },
           {
             "$ref": "#/components/parameters/page-cursor"
           },
@@ -3321,6 +3378,9 @@
         "description": "Used to retrieve all Bookings for an Order.",
         "parameters": [
           {
+            "$ref": "#/components/parameters/bookingSort"
+          },
+          {
             "$ref": "#/components/parameters/page-cursor"
           },
           {
@@ -3474,6 +3534,9 @@
         "operationId": "get-bookings-id-details",
         "description": "Used to retrieve all Booking Details for a Booking Identifier.",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/bookingDetailsSort"
+          },
           {
             "$ref": "#/components/parameters/page-cursor"
           },
@@ -6613,6 +6676,29 @@
         },
         "description": "Place identifier"
       },
+      "placeSort": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id"
+            ]
+          },
+          "default": [
+            "id"
+          ],
+          "example": [
+            "id"
+          ]
+        },
+        "description": "Customize which field(s) to sort the places by.",
+        "style": "form",
+        "explode": false
+      },
       "placeTypeId": {
         "name": "placeTypeId",
         "in": "path",
@@ -6622,6 +6708,29 @@
           "example": "airport"
         },
         "description": "Place Type identifier"
+      },
+      "placeTypeSort": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id"
+            ]
+          },
+          "default": [
+            "id"
+          ],
+          "example": [
+            "id"
+          ]
+        },
+        "description": "Customize which field(s) to sort the place types by.",
+        "style": "form",
+        "explode": false
       },
       "passengerGenderId": {
         "name": "passengerGenderId",
@@ -6633,6 +6742,29 @@
         },
         "description": "Passenger Gender identifier"
       },
+      "passengerGenderSort": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id"
+            ]
+          },
+          "default": [
+            "id"
+          ],
+          "example": [
+            "id"
+          ]
+        },
+        "description": "Customize which field(s) to sort the passenger genders by.",
+        "style": "form",
+        "explode": false
+      },
       "passengerTitleId": {
         "name": "passengerTitleId",
         "in": "path",
@@ -6642,6 +6774,29 @@
           "example": "mr"
         },
         "description": "Passenger Title identifier"
+      },
+      "passengerTitleSort": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id"
+            ]
+          },
+          "default": [
+            "id"
+          ],
+          "example": [
+            "id"
+          ]
+        },
+        "description": "Customize which field(s) to sort the passenger titles by.",
+        "style": "form",
+        "explode": false
       },
       "tripId": {
         "name": "tripId",
@@ -6673,6 +6828,29 @@
           ]
         },
         "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
+      },
+      "tripSort": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id"
+            ]
+          },
+          "default": [
+            "id"
+          ],
+          "example": [
+            "id"
+          ]
+        },
+        "description": "Customize which field(s) to sort the trips by.",
         "style": "form",
         "explode": false
       },
@@ -6749,6 +6927,29 @@
         "style": "form",
         "explode": false
       },
+      "orderSort": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id"
+            ]
+          },
+          "default": [
+            "id"
+          ],
+          "example": [
+            "id"
+          ]
+        },
+        "description": "Customize which field(s) to sort the orders by.",
+        "style": "form",
+        "explode": false
+      },
       "page-cursor": {
         "name": "page[cursor]",
         "in": "query",
@@ -6805,6 +7006,29 @@
         "style": "form",
         "explode": false
       },
+      "segmentSort": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id"
+            ]
+          },
+          "default": [
+            "id"
+          ],
+          "example": [
+            "id"
+          ]
+        },
+        "description": "Customize which field(s) to sort the segments by.",
+        "style": "form",
+        "explode": false
+      },
       "legId": {
         "name": "legId",
         "in": "path",
@@ -6836,6 +7060,29 @@
         "style": "form",
         "explode": false
       },
+      "legSort": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id"
+            ]
+          },
+          "default": [
+            "id"
+          ],
+          "example": [
+            "id"
+          ]
+        },
+        "description": "Customize which field(s) to sort the legs by.",
+        "style": "form",
+        "explode": false
+      },
       "legTypeId": {
         "name": "legTypeId",
         "in": "path",
@@ -6845,6 +7092,29 @@
           "example": "air"
         },
         "description": "Leg Type identifier"
+      },
+      "legTypeSort": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id"
+            ]
+          },
+          "default": [
+            "id"
+          ],
+          "example": [
+            "id"
+          ]
+        },
+        "description": "Customize which field(s) to sort the leg types by.",
+        "style": "form",
+        "explode": false
       },
       "offerId": {
         "name": "offerId",
@@ -6883,6 +7153,29 @@
         "style": "form",
         "explode": false
       },
+      "offerSort": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id"
+            ]
+          },
+          "default": [
+            "id"
+          ],
+          "example": [
+            "id"
+          ]
+        },
+        "description": "Customize which field(s) to sort the offers by.",
+        "style": "form",
+        "explode": false
+      },
       "cabinClassId": {
         "name": "cabinClassId",
         "in": "path",
@@ -6892,6 +7185,29 @@
           "example": "economy"
         },
         "description": "Cabin Class identifier"
+      },
+      "cabinClassSort": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id"
+            ]
+          },
+          "default": [
+            "id"
+          ],
+          "example": [
+            "id"
+          ]
+        },
+        "description": "Customize which field(s) to sort the cabin classes by.",
+        "style": "form",
+        "explode": false
       },
       "offerGroupDetailsId": {
         "name": "offerGroupDetailsId",
@@ -6921,6 +7237,29 @@
           ]
         },
         "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
+      },
+      "offerGroupDetailsSort": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id"
+            ]
+          },
+          "default": [
+            "id"
+          ],
+          "example": [
+            "id"
+          ]
+        },
+        "description": "Customize which field(s) to sort the offer group details by.",
         "style": "form",
         "explode": false
       },
@@ -6957,6 +7296,29 @@
         "style": "form",
         "explode": false
       },
+      "offerOptionSort": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id"
+            ]
+          },
+          "default": [
+            "id"
+          ],
+          "example": [
+            "id"
+          ]
+        },
+        "description": "Customize which field(s) to sort the offer options by.",
+        "style": "form",
+        "explode": false
+      },
       "offerOptionDetailsId": {
         "name": "offerOptionDetailsId",
         "in": "path",
@@ -6986,6 +7348,29 @@
           ]
         },
         "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
+      },
+      "offerOptionDetailsSort": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id"
+            ]
+          },
+          "default": [
+            "id"
+          ],
+          "example": [
+            "id"
+          ]
+        },
+        "description": "Customize which field(s) to sort the offer option details by.",
         "style": "form",
         "explode": false
       },
@@ -7022,6 +7407,29 @@
           ]
         },
         "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
+      },
+      "offerGroupSort": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id"
+            ]
+          },
+          "default": [
+            "id"
+          ],
+          "example": [
+            "id"
+          ]
+        },
+        "description": "Customize which field(s) to sort the offer groups by.",
         "style": "form",
         "explode": false
       },
@@ -7078,6 +7486,29 @@
         "style": "form",
         "explode": false
       },
+      "journeySort": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id"
+            ]
+          },
+          "default": [
+            "id"
+          ],
+          "example": [
+            "id"
+          ]
+        },
+        "description": "Customize which field(s) to sort the journeys by.",
+        "style": "form",
+        "explode": false
+      },
       "bookingId": {
         "name": "bookingId",
         "in": "path",
@@ -7113,6 +7544,29 @@
         "style": "form",
         "explode": false
       },
+      "bookingSort": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id"
+            ]
+          },
+          "default": [
+            "id"
+          ],
+          "example": [
+            "id"
+          ]
+        },
+        "description": "Customize which field(s) to sort the bookings by.",
+        "style": "form",
+        "explode": false
+      },
       "bookingDetailsId": {
         "name": "bookingDetailsId",
         "in": "path",
@@ -7145,6 +7599,29 @@
           ]
         },
         "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
+      },
+      "bookingDetailsSort": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id"
+            ]
+          },
+          "default": [
+            "id"
+          ],
+          "example": [
+            "id"
+          ]
+        },
+        "description": "Customize which field(s) to sort the booking details by.",
         "style": "form",
         "explode": false
       }

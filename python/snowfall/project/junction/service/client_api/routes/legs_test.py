@@ -30,7 +30,7 @@ class TestLegs(object):
             url="/legs/types",
             expected_ids=[
                 protobuf.enum_value_to_slug(
-                    descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
+                    enum_descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
                     enum_value=leg_type,
                 )
                 for leg_type in models_pb2.Schedule.Type.values()

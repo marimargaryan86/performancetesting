@@ -19,7 +19,7 @@ _IMAGE_BASE_URL = (
 
 class CamelModel(pydantic.BaseModel):
     class Config(object):
-        alias_generator = string.to_camel
+        alias_generator = string.to_lower_camel
         allow_population_by_field_name = True
 
 

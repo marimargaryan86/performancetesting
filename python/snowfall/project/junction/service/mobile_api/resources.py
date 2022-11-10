@@ -86,7 +86,7 @@ class UserResource(models.Resource):
     def from_dict(cls, user_id: str, user: Mapping[str, Any]) -> UserResource:
         attributes = {}
         for field in user.keys():
-            camel_field = string.to_camel(field)
+            camel_field = string.to_lower_camel(field)
             attribute = user[field]
             if camel_field == "phone":
                 attributes[camel_field] = attribute["e164_number"]
@@ -133,7 +133,7 @@ class PlaceResource(models.Resource):
                     _RELATIONSHIPS_FIELD: [
                         models.ResourceIdentifier(
                             id=protobuf.enum_value_to_slug(
-                                descriptor=models_pb2.Place.Type.DESCRIPTOR,
+                                enum_descriptor=models_pb2.Place.Type.DESCRIPTOR,
                                 enum_value=place_type,
                             ),
                             type="place-types",

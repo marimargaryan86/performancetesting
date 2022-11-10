@@ -24,7 +24,7 @@ async def _cabin_classes_resolver(
                         models_pb2.CabinClass.Type.DESCRIPTOR,
                         identifier,
                     ),
-                    request,
+                    request.url_for("ViewCabinClasses", enumId=identifier),
                 ),
             )
 
@@ -79,7 +79,7 @@ async def _leg_types_resolver(
                         models_pb2.Schedule.Type.DESCRIPTOR,
                         identifier,
                     ),
-                    request,
+                    request.url_for("ViewLegsTypes", enumId=identifier),
                 ),
             )
 

@@ -12,7 +12,7 @@ class TestCabins(object):
             url="/cabin-classes",
             expected_ids=[
                 protobuf.enum_value_to_slug(
-                    descriptor=models_pb2.CabinClass.Type.DESCRIPTOR,
+                    enum_descriptor=models_pb2.CabinClass.Type.DESCRIPTOR,
                     enum_value=cabin_class,
                 )
                 for cabin_class in models_pb2.CabinClass.Type.values()

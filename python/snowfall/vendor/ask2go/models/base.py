@@ -5,5 +5,5 @@ from snowfall.stdlib import string
 
 class CamelCaseBaseModel(BaseModel):
     class Config(object):
-        alias_generator = string.to_camel
+        alias_generator = string.to_lower_camel
         allow_population_by_field_name = True

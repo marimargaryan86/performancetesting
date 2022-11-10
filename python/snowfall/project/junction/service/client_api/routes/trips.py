@@ -125,7 +125,7 @@ class TripSearches(endpoints.HTTPEndpoint):
                 cast(
                     models_pb2.Schedule.Type.ValueType,
                     protobuf.slug_to_enum_value(
-                        descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
+                        enum_descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
                         name=leg_type,
                     ),
                 )
