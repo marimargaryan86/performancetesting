@@ -30,6 +30,11 @@ def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Rou
         ),
         dependencies.route("/offers/searches", offers.OfferSearches),
         dependencies.route(
+            "/offers/searches/{offerSearchId}",
+            offers.OfferSearch,
+            name="OfferSearch",
+        ),
+        dependencies.route(
             "/offers/searches/{offerSearchId}/offers",
             offers.OffersByOfferSearch,
             name="OffersByOfferSearch",

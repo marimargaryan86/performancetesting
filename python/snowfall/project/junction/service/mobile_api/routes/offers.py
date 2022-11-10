@@ -55,6 +55,25 @@ class OfferSearches(endpoints.HTTPEndpoint):
         )
 
 
+class OfferSearch(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        junction_client: client.JunctionClient = lagom.injectable,
+    ) -> responses.Response:
+        offer_search = await junction_client.get_offer_search(
+            offers_search_id=request.path_params["offerSearchId"],
+            include=request.scope["query_string"].get(
+                "include",
+                [],
+            ),
+        )
+        response_body = models.Body(data=offer_search["data"])
+        if offer_search.get("included"):
+            response_body.included = offer_search.get("included")
+        return models.JsonApiResponse(response_body)
+
+
 class OffersByOfferSearch(endpoints.HTTPEndpoint):
     async def get(  # noqa: C901,WPS231,WPS210
         self,

@@ -29,6 +29,15 @@ offer_includes = Literal[
     "groups.options.details.cabinClass",
     "groups.options.details.details",
 ]
+offer_search_includes = Literal[
+    "offers.groups",
+    "offers.groups.details",
+    "offers.groups.details.legType",
+    "offers.groups.options",
+    "offers.groups.options.details",
+    "offers.groups.options.details.cabinClass",
+    "offers.groups.options.details.details",
+]
 order_includes = Literal[
     "journey",
     "bookings",
@@ -407,10 +416,15 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
     async def get_offer_search(
         self,
         offers_search_id: str,
+        include: Optional[Sequence[offer_search_includes]] = None,
     ) -> dict[str, Any]:
+        query_parameters = {}
+        if include:
+            query_parameters["include"] = ",".join(include)
         return await self._make_request(
             method=_METHOD_GET,
             url="/offers/searches/{0}".format(offers_search_id),
+            query_parameters=query_parameters,
         )
 
     async def get_offer(

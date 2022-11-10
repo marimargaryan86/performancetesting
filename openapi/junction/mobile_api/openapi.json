@@ -690,6 +690,82 @@
       },
       "parameters": []
     },
+    "/offers/searches/{offerSearchId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/offerSearchId"
+        },
+        {
+          "$ref": "#/components/parameters/offerSearchInclude"
+        }
+      ],
+      "get": {
+        "summary": "Get Offer Search",
+        "tags": [
+          "offers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/TripOfferSearch"
+                        }
+                      ]
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/Offer"
+                          },
+                          {
+                            "$ref": "#/components/schemas/OfferGroup"
+                          },
+                          {
+                            "$ref": "#/components/schemas/TripOfferGroupDetails"
+                          },
+                          {
+                            "$ref": "#/components/schemas/LegType"
+                          },
+                          {
+                            "$ref": "#/components/schemas/OfferOption"
+                          },
+                          {
+                            "$ref": "#/components/schemas/TripOfferOptionDetails"
+                          },
+                          {
+                            "$ref": "#/components/schemas/CabinClass"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-offers-searches-id",
+        "description": "Used to lookup data for an Offer Search Identifier."
+      }
+    },
     "/offers/searches/{offerSearchId}/offers": {
       "parameters": [
         {
@@ -1431,6 +1507,33 @@
           },
           "example": [
             "groups"
+          ]
+        },
+        "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
+      },
+      "offerSearchInclude": {
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "offers",
+              "offers.groups",
+              "offers.groups.details",
+              "offers.groups.details.legType",
+              "offers.groups.options",
+              "offers.groups.options.details",
+              "offers.groups.options.details.cabinClass",
+              "offers.groups.options.details.details"
+            ]
+          },
+          "example": [
+            "offers"
           ]
         },
         "description": "Customize which related resources to return.",
