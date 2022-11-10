@@ -570,6 +570,7 @@ class TripBookingResource(models.Resource):
                 "operatorBookingReferences": list(
                     booking.trip_result.operator_booking_references,
                 ),
+                "externalReference": booking.trip_result.provider_booking_reference,
             },
             relationships={
                 "order": {
