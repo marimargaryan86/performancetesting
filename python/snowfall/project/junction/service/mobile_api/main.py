@@ -1,9 +1,11 @@
 import base64
 import random
+from functools import partial
 from typing import Callable
 
 import aioredis
 import aiosmtplib
+import httpx
 import stripe
 from motor import motor_asyncio
 from starlette import applications
@@ -11,10 +13,12 @@ from starlette.middleware import Middleware, authentication
 
 from snowfall.project.junction.adapter import currencies
 from snowfall.project.junction.service.currencies.v1alpha import currencies_pb2_grpc
-from snowfall.project.junction.service.mobile_api import auth_middleware, bootstrap
+from snowfall.project.junction.service.mobile_api import bootstrap
 from snowfall.project.junction.service.mobile_api import currencies as mobile_currencies
+from snowfall.project.junction.service.mobile_api import handlers as mobile_handlers
 from snowfall.project.junction.service.mobile_api import (
     jwt_generator,
+    middleware,
     places_migration,
     repository,
     smtp,
@@ -66,7 +70,7 @@ def _factory(
             jwt_token_version=app.settings.jwt_token_version,
         )
 
-        return application.create_starlette_app(
+        asgi_app = application.create_starlette_app(
             routes_factory=router.get_routes,
             dependencies=bootstrap.create_dependencies(
                 currencies_client=mobile_currencies.CurrencyClient(
@@ -113,7 +117,7 @@ def _factory(
             custom_middlewares=[
                 Middleware(
                     authentication.AuthenticationMiddleware,
-                    backend=auth_middleware.AuthenticationBackend(
+                    backend=middleware.AuthenticationBackend(
                         token_version=app.settings.jwt_token_version,
                         public_key=base64.b64decode(
                             app.settings.jwt_public_key.encode(),
@@ -128,6 +132,14 @@ def _factory(
             ),
             validate_response=app.settings.validate_responses_against_spec,
         )
+        asgi_app.add_exception_handler(
+            httpx.HTTPStatusError,
+            partial(
+                mobile_handlers.go_status_error_handler,
+                go_urls=app.settings.junction_api_address,
+            ),
+        )
+        return asgi_app
 
     return decorator
 

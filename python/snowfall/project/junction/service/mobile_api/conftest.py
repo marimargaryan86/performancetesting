@@ -4,6 +4,7 @@ import dataclasses
 import datetime
 import pathlib
 import re
+from functools import partial
 from typing import Any, AsyncIterator, Mapping, Optional, Sequence, TypedDict
 from unittest import mock
 
@@ -21,9 +22,15 @@ from starlette import applications
 from starlette.middleware import Middleware, authentication
 
 from snowfall.project.junction.adapter import currencies
-from snowfall.project.junction.service.mobile_api import auth_middleware, bootstrap
+from snowfall.project.junction.service.mobile_api import bootstrap
 from snowfall.project.junction.service.mobile_api import currencies as mobile_currencies
-from snowfall.project.junction.service.mobile_api import jwt_generator, repository, smtp
+from snowfall.project.junction.service.mobile_api import handlers as mobile_handlers
+from snowfall.project.junction.service.mobile_api import (
+    jwt_generator,
+    middleware,
+    repository,
+    smtp,
+)
 from snowfall.project.junction.service.mobile_api.routes import router
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib import string
@@ -55,6 +62,7 @@ jwt_public_key_bytes = jwt_private_key.public_key().public_bytes(
     format=serialization.PublicFormat.SubjectPublicKeyInfo,
 )
 jwt_public_key = base64.b64encode(jwt_public_key_bytes).decode()
+junction_api_address = "https://api.junction.dev"
 
 
 @pytest.fixture
@@ -143,12 +151,20 @@ def _create_app(
     openapi_path: pathlib.Path,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
-    return application.create_starlette_app(
+    asgi_app = application.create_starlette_app(
         dependencies=dependencies,
         custom_middlewares=custom_middlewares,
         openapi_path=openapi_path,
         routes_factory=router.get_routes,
     )
+    asgi_app.add_exception_handler(
+        httpx.HTTPStatusError,
+        partial(
+            mobile_handlers.go_status_error_handler,
+            go_urls=["https://api.junction.dev"],
+        ),
+    )
+    return asgi_app
 
 
 @pytest.fixture
@@ -292,7 +308,6 @@ def headers() -> dict[str, str]:
 
 @pytest.fixture()
 def junction_client() -> client.JunctionClient:
-    junction_api_address = "https://api.junction.dev"
     return client.JunctionClient(  # nosec
         api_url=junction_api_address,
         token="",
@@ -351,7 +366,7 @@ def app(  # noqa: WPS211
         custom_middlewares=[
             Middleware(
                 authentication.AuthenticationMiddleware,
-                backend=auth_middleware.AuthenticationBackend(
+                backend=middleware.AuthenticationBackend(
                     token_version=jwt_token_version,
                     public_key=base64.b64decode(
                         jwt_public_key,

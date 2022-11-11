@@ -11,3 +11,7 @@ files(
     name="fixtures",
     sources=["fixtures/*", "fixtures/*/*"],
 )
+python_tests(
+    name="tests",
+    dependencies=["python/snowfall/project/junction/service/mobile_api:fixtures"],
+)

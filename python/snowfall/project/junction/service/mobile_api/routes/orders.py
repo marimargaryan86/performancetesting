@@ -189,12 +189,7 @@ class Orders(endpoints.HTTPEndpoint):
             )
         except httpx.HTTPStatusError as error:
             await payments.cancel(payment)
-            return stdlib_models.JsonApiResponse(
-                stdlib_models.Body(
-                    errors=error.response.json()["errors"],
-                ),
-                error.response.status_code,
-            )
+            raise error
 
         mobile_order = models_pb2.MobileOrder(
             id=junction_order["data"]["id"],

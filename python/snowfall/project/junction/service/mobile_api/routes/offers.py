@@ -2,7 +2,6 @@ import datetime
 import decimal
 import re
 
-import httpx
 import lagom
 from starlette import endpoints, requests, responses, status
 
@@ -84,27 +83,21 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
         query_string = request.scope["query_string"]
-        try:
-            offers_response = await junction_client.get_offers_by_offer_search_id(
-                offers_search_id=request.path_params["offerSearchId"],
-                cabin_class=query_string.get(
-                    "filter[groups.options.details.cabinClass]",
-                    [],
-                ),
-                include=query_string.get(
-                    "include",
-                    [],
-                ),
-                cursor=pagination.cursor,
-                limit=pagination.limit,
-            )
-        except httpx.HTTPStatusError as error:
-            return models.JsonApiResponse(
-                models.Body(
-                    errors=error.response.json()["errors"],
-                ),
-                error.response.status_code,
-            )
+
+        offers_response = await junction_client.get_offers_by_offer_search_id(
+            offers_search_id=request.path_params["offerSearchId"],
+            cabin_class=query_string.get(
+                "filter[groups.options.details.cabinClass]",
+                [],
+            ),
+            include=query_string.get(
+                "include",
+                [],
+            ),
+            cursor=pagination.cursor,
+            limit=pagination.limit,
+        )
+
         if request.query_params.get("currency"):
             try:
                 rate = await currencies_client.get_rate(
