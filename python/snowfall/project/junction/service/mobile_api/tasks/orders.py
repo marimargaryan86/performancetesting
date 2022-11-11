@@ -66,16 +66,22 @@ async def poll_order_status(
     return False
 
 
-async def send_booking_confirmation(
+async def send_booking_confirmation(  # noqa: WPS210
     order: Mapping[str, Any],
     smtp_client: smtp.EmailClient,
     forward_to_support: bool = True,
-    forward_email: str = "",
+    forward_email: str | None = None,
 ) -> None:
     details: Sequence[Mapping[str, Any]] = [
         detail for booking in order["bookings"] for detail in booking["details"]
     ]
     details = order_details_by_date(details)
+    record_locators = [booking["externalReference"] for booking in order["bookings"]]
+    operator_booking_references = [
+        reference
+        for booking in order["bookings"]
+        for reference in booking["operatorBookingReferences"]
+    ]
     async with aiofiles.open(
         filesystem.resource_path(
             "snowfall.project.junction.service.mobile_api.html_templates",
@@ -89,6 +95,8 @@ async def send_booking_confirmation(
         company_name=smtp_client.client_name,
         support_email=smtp_client.support_email,
         passengers=order["passengers"],
+        record_locators=record_locators,
+        operator_booking_references=operator_booking_references,
     )
     await smtp_client.send_email_html_template(
         forward_email or order["journey"]["contactDetails"]["email"],
