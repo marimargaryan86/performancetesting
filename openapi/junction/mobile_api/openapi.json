@@ -69,9 +69,20 @@
       "tags": [
         "loyalty"
       ]
+    },
+    {
+      "name": "Coupons",
+      "tags": [
+        "coupons"
+      ]
     }
   ],
   "tags": [
+    {
+      "name": "coupons",
+      "description": "Coupons used to make discounts for orders.",
+      "x-displayName": "Coupons"
+    },
     {
       "name": "internal",
       "description": "Endpoints not for public use.",
@@ -119,6 +130,51 @@
     }
   ],
   "paths": {
+    "/coupons/{couponCode}": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/couponCode"
+          }
+        ],
+        "summary": "Get coupon",
+        "tags": [
+          "coupons"
+        ],
+        "operationId": "get-coupons-id",
+        "description": "Used to get coupon by id.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Coupon"
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
     "/trips/searches": {
       "post": {
         "summary": "Create Trip Search",
@@ -1408,6 +1464,17 @@
   },
   "components": {
     "parameters": {
+      "couponCode": {
+        "name": "couponCode",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{6}$",
+          "example": "AB1234"
+        },
+        "description": "Trip Search identifier"
+      },
       "tripSearchId": {
         "name": "tripSearchId",
         "in": "path",
@@ -1901,6 +1968,50 @@
               }
             },
             "required": ["iata", "airline", "name"]
+          }
+        },
+        "required": ["id", "type", "attributes"]
+      },
+      "Coupon": {
+        "title": "Coupon",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "coupons"
+            ],
+            "example": "coupons"
+          },
+          "attributes":{
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "pattern": "^[A-Z0-9]{6}$",
+                "example": "AB1234"
+              },
+              "expiresAt": {
+                "type": "string",
+                "format": "date",
+                "example": "1980-02-03"
+              },
+              "price": {
+                "$ref": "#/components/schemas/Price"
+              },
+              "status": {
+                "type": "string",
+                "enum": ["used", "valid"],
+                "example": "valid"
+              }
+            },
+            "required": ["code", "expiresAt", "price", "status"]
           }
         },
         "required": ["id", "type", "attributes"]
