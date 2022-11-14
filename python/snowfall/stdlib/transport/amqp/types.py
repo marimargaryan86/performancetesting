@@ -53,10 +53,11 @@ class Message(Generic[_Proto]):  # noqa: WPS214
     headers: Mapping[str, Any]
     status: MessageStatus
 
-    def __init__(self, msg: abc.AbstractIncomingMessage):
+    def __init__(self, msg: abc.AbstractIncomingMessage, queue_name: str) -> None:
         self.body = protobuf.AnySerializer[_Proto].deserialize(msg.body)
         self.headers = msg.headers
         self._message = msg
+        self._queue = queue_name
         self.status = MessageStatus.unprocessed
 
     async def ack(self) -> None:
@@ -86,6 +87,10 @@ class Message(Generic[_Proto]):  # noqa: WPS214
     @property
     def acknowledged(self) -> bool:
         return self.status == MessageStatus.acked
+
+    @property
+    def queue(self) -> str:
+        return self._queue
 
     @property
     def requeued(self) -> bool:

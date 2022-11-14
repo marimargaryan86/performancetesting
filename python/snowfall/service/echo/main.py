@@ -1,4 +1,3 @@
-import asyncio
 import ipaddress
 
 from grpc import aio
@@ -56,17 +55,14 @@ async def _produce(app: service.Application[_AmqpSettings]) -> None:
             exchange=types.Exchange(app.name),
         )
 
-        for _ in range(10):
-            await echo_producer.publish(
-                echo_pb2.EchoRequest(echo="foobar"),
-                "echo.foobar",
-            )
+        await echo_producer.publish(
+            echo_pb2.EchoRequest(echo="foobar"),
+            "echo.foobar",
+        )
 
 
-async def _echo_message_and_sleep(message: types.Message[echo_pb2.EchoRequest]) -> None:
+async def _echo_message(message: types.Message[echo_pb2.EchoRequest]) -> None:
     get_logger(__name__).info(message.body.echo)
-
-    await asyncio.sleep(5)
 
 
 async def _consume(app: service.Application[_AmqpSettings]) -> None:
@@ -75,7 +71,7 @@ async def _consume(app: service.Application[_AmqpSettings]) -> None:
             connection=connection,
             queue_name="{0}_consumer".format(app.name),
             binds=[(types.Exchange(app.name), "echo.foobar")],
-        ).consume(_echo_message_and_sleep)
+        ).consume(_echo_message)
 
 
 if __name__ == "__main__":

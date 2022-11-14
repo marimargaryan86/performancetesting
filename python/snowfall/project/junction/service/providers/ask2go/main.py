@@ -201,7 +201,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                 connection=amqp_connection,
                 queue_name="{0}_searches".format(app.name),
                 binds=[(types.Exchange("ask2go"), "offers.search.trip")],
-                middlewares=[
+                middleware_stack=[
                     trackable.ReportingMiddleware(
                         status_reporter=trackable.StatusReporter(
                             producer=producer.Producer(
@@ -209,7 +209,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                                 exchange=types.Exchange("ask2go"),
                             ),
                         ),
-                    ),
+                    ).execute,
                 ],
             ),
             producer_obj=producer.Producer(

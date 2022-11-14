@@ -209,14 +209,18 @@ class StatusReporter(object):
         )
 
 
-class ReportingMiddleware(protocol.ConsumerMiddleware[_Proto]):
+class ReportingMiddleware(object):
     def __init__(self, status_reporter: StatusReporter) -> None:
         self._status_reporter = status_reporter
 
-    async def before(self, msg: types.Message[_Proto]) -> None:
+    async def execute(
+        self,
+        msg: types.Message[_Proto],
+        next_func: protocol.ConsumerFunc[_Proto],
+    ) -> None:
         await self._status_reporter.receive(msg.headers)
+        await next_func(msg)
 
-    async def after(self, msg: types.Message[_Proto]) -> None:
         if msg.acknowledged:
             await self._status_reporter.ack(msg.headers)
         elif not msg.requeued:

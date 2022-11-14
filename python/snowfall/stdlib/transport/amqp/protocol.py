@@ -5,19 +5,15 @@ from google.protobuf import message
 from snowfall.stdlib.transport.amqp import types
 
 _Proto = TypeVar("_Proto", bound=message.Message)
-ConsumerCallback = Callable[[types.Message[_Proto]], Awaitable[None]]
-
-
-class ConsumerMiddleware(Protocol[_Proto]):
-    async def before(self, msg: types.Message[_Proto]) -> None:
-        """Is called before a message is processed."""
-
-    async def after(self, msg: types.Message[_Proto]) -> None:
-        """Is called after a message is processed."""
+ConsumerFunc = Callable[[types.Message[_Proto]], Awaitable[None]]
+ConsumerMiddleware = Callable[
+    [types.Message[_Proto], ConsumerFunc[_Proto]],
+    Awaitable[None],
+]
 
 
 class Consumer(Protocol[_Proto]):
-    async def consume(self, callback: ConsumerCallback[_Proto]) -> None:
+    async def consume(self, callback: ConsumerFunc[_Proto]) -> None:
         """Consume a message from the queue."""
 
 
