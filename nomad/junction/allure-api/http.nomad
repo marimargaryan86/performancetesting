@@ -66,6 +66,10 @@ job "allure-api-http" {
     task "http" {
       driver = "docker"
 
+      resources {
+        memory = 600
+      }
+
       vault {
         policies = ["allure-${var.environment}"]
       }
