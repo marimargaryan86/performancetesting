@@ -1,6 +1,8 @@
+import lagom
 from lagom.integrations import starlette
 from starlette import routing
 
+from snowfall.project.junction.adapter import places as places_adapter
 from snowfall.project.junction.service.client_api import resources
 from snowfall.project.junction.service.client_api.routes import (
     legs,
@@ -16,21 +18,26 @@ from snowfall.stdlib.integration.starlette import routes
 from snowfall.stdlib.v1alpha import models_pb2
 
 
-def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Route]:
+def get_routes(dependencies: lagom.Container) -> list[routing.Route]:
+    integration = starlette.StarletteIntegration(dependencies)
+    place_handler = places.Places(
+        dependencies[places_adapter.Client],  # type: ignore[type-abstract]
+    )
+
     return [
         *routes.ListAndViewEnum(
             enum_descriptor=places_pb2.Location.Type.DESCRIPTOR,
             resource_factory=resources.PlaceTypeResource.from_proto,
             path="/places/types",
         ).to_routes(),
-        dependencies.route(
+        routes.to_route(
             "/places",
-            places.Places,
+            place_handler.list_,
             name="ListPlaces",
         ),
-        dependencies.route(
+        routes.to_route(
             "/places/{placeId}",
-            places.Place,
+            place_handler.view,
             name="ViewPlace",
         ),
         *routes.ListAndViewEnum(
@@ -38,153 +45,153 @@ def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Rou
             resource_factory=resources.LegTypeResource.from_proto,
             path="/legs/types",
         ).to_routes(),
-        dependencies.route(
+        integration.route(
             "/legs/{legId}",
             legs.Leg,
             name="ViewLeg",
         ),
-        dependencies.route(
+        integration.route(
             "/segments/{segmentId}",
             segments.Segment,
             name="ViewSegment",
         ),
-        dependencies.route(
+        integration.route(
             "/segments/{segmentId}/legs",
             legs.LegsBySegmentId,
             name="ListLegsBySegmentId",
         ),
-        dependencies.route("/trips/searches", trips.TripSearches),
-        dependencies.route(
+        integration.route("/trips/searches", trips.TripSearches),
+        integration.route(
             "/trips/{tripId}",
             trips.Trip,
             name="ViewTrip",
         ),
-        dependencies.route(
+        integration.route(
             "/trips/{tripId}/legs",
             legs.LegsByTripId,
             name="ListLegsByTripId",
         ),
-        dependencies.route(
+        integration.route(
             "/trips/{tripId}/segments",
             trips.TripSegments,
             name="ListTripSegments",
         ),
         # todo: add GET /trips/{tripId}/prices
-        dependencies.route(
+        integration.route(
             "/trips/searches/{tripSearchId}",
             trips.TripSearch,
             name="ViewTripSearch",
         ),
-        dependencies.route(
+        integration.route(
             "/trips/searches/{tripSearchId}/legs",
             legs.LegsByTripSearchId,
             name="ListLegsByTripSearchId",
         ),
         # todo: add GET /trips/searches/{tripSearchId}/segments
-        dependencies.route(
+        integration.route(
             "/trips/searches/{tripSearchId}/trips",
             trips.TripsByTripSearch,
             name="ViewTripsByTripSearch",
         ),
-        dependencies.route("/offers/searches", offers.OfferSearches),
-        dependencies.route(
+        integration.route("/offers/searches", offers.OfferSearches),
+        integration.route(
             "/offers/searches/{offerSearchId}",
             offers.OfferSearch,
             name="ViewOfferSearch",
         ),
-        dependencies.route(
+        integration.route(
             "/offers/searches/{offerSearchId}/offers",
             offers.OffersByOfferSearch,
             name="ViewOffersByOfferSearch",
         ),
         # todo: add GET /offers/searches/{offerSearchId}/related
-        dependencies.route(
+        integration.route(
             "/offers/{offerId}",
             offers.Offer,
             name="ViewOffer",
         ),
-        dependencies.route(
+        integration.route(
             "/offers/{offerId}/groups",
             offers.OfferGroupsByOffer,
             name="ListOfferGroupsByOffer",
         ),
         # TripOfferGroup
-        dependencies.route(
+        integration.route(
             "/offers/groups/{offerGroupId}",
             offers.OfferGroup,
             name="ViewOfferGroup",
         ),
-        dependencies.route(
+        integration.route(
             "/offers/groups/details/{offerGroupDetailsId}",
             offers.OfferGroupDetails,
             name="ViewOfferGroupDetails",
         ),
-        dependencies.route(
+        integration.route(
             "/offers/groups/{offerGroupId}/details",
             offers.OfferGroupDetailsByOfferGroup,
             name="ListOfferGroupDetailsByOfferGroup",
         ),
-        dependencies.route(
+        integration.route(
             "/offers/options/{offerOptionId}",
             offers.OfferOption,
             name="ViewOfferOption",
         ),
-        dependencies.route(
+        integration.route(
             "/offers/groups/{offerGroupId}/options",
             offers.OfferOptionsByOfferGroup,
             name="ListOfferOptionsByOfferGroup",
         ),
-        dependencies.route(
+        integration.route(
             "/offers/options/details/{offerOptionDetailsId}",
             offers.OfferOptionDetails,
             name="ViewOfferOptionDetails",
         ),
-        dependencies.route(
+        integration.route(
             "/offers/options/{offerOptionId}/details",
             offers.OfferOptionDetailsByOfferOption,
             name="ListOfferOptionDetailsByOfferOption",
         ),
-        dependencies.route(
+        integration.route(
             "/journeys",
             orders.Journeys,
             name="ListJourneys",
         ),
-        dependencies.route(
+        integration.route(
             "/journeys/{journeyId}",
             orders.Journey,
             name="ViewJourney",
         ),
-        dependencies.route(
+        integration.route(
             "/journeys/{journeyId}/orders",
             orders.OrdersByJourney,
             name="ListOrdersByJourney",
         ),
-        dependencies.route(
+        integration.route(
             "/orders",
             orders.Orders,
             name="ListOrders",
         ),
-        dependencies.route(
+        integration.route(
             "/orders/{orderId}",
             orders.Order,
             name="ViewOrder",
         ),
-        dependencies.route(
+        integration.route(
             "/orders/{orderId}/bookings",
             orders.BookingsByOrder,
             name="ListBookingsByOrder",
         ),
-        dependencies.route(
+        integration.route(
             "/bookings/{bookingId}",
             orders.Booking,
             name="ViewBooking",
         ),
-        dependencies.route(
+        integration.route(
             "/bookings/{bookingId}/details",
             orders.BookingDetailsByBooking,
             name="ListDetailsByBooking",
         ),
-        dependencies.route(
+        integration.route(
             "/bookings/details/{bookingDetailsId}",
             orders.BookingDetails,
             name="ViewBookingDetails",

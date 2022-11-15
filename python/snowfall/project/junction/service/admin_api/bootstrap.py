@@ -1,7 +1,6 @@
 from typing import Sequence
 
 import lagom
-from lagom.integrations import starlette
 
 from snowfall.project.junction.adapter import locations, places
 from snowfall.project.junction.service.admin_api import includes
@@ -16,11 +15,11 @@ class Settings(application.Settings):
 def create_dependencies(
     locations_client: locations.Client,
     places_client: places.Client,
-) -> starlette.StarletteIntegration:
+) -> lagom.Container:
     container = lagom.Container()
     container[locations.Client] = locations_client  # type: ignore[type-abstract]
     container[places.Client] = places_client  # type: ignore[type-abstract]
 
     includes.register_resolvers(locations_client)
 
-    return starlette.StarletteIntegration(container)
+    return container

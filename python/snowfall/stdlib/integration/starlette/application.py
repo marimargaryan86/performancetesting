@@ -3,9 +3,9 @@ import ipaddress
 import pathlib
 from typing import Any, Awaitable, Callable, Mapping, Optional, Sequence, cast
 
+import lagom
 import uvicorn
 from asgiref.typing import ASGIApplication
-from lagom.integrations import starlette
 from starlette import applications, exceptions, requests, responses, routing, status
 from starlette.middleware import Middleware
 
@@ -17,7 +17,7 @@ from snowfall.stdlib.integration.starlette import (
     validation,
 )
 
-RoutesFactory = Callable[[starlette.StarletteIntegration], list[routing.Route]]
+RoutesFactory = Callable[[lagom.Container], list[routing.Route]]
 ExceptionHandlerResponse = responses.Response | Awaitable[responses.Response]
 ExceptionHandler = Callable[[requests.Request, Exception], ExceptionHandlerResponse]
 ExceptionHandlerMapping = Mapping[Any, ExceptionHandler]
@@ -32,7 +32,7 @@ class Settings(service.Settings):
 
 
 def create_starlette_app(
-    dependencies: starlette.StarletteIntegration,
+    dependencies: lagom.Container,
     routes_factory: RoutesFactory,
     openapi_path: pathlib.Path | None,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
@@ -53,7 +53,7 @@ def create_starlette_app(
     return applications.Starlette(
         routes=[
             *routes_factory(dependencies),
-            dependencies.route("/health", routes.Health, name="Health"),
+            routing.Route("/health", routes.Health, name="Health"),
         ],
         middleware=[
             *stack,

@@ -1,9 +1,17 @@
+import dataclasses
 from typing import Any, Mapping, Optional
 
 from starlette import background as starlette_background
 from starlette import requests
 
-from snowfall.stdlib.integration.starlette import includes, models
+from snowfall.stdlib.integration.starlette import includes, models, pagination_helpers
+
+
+@dataclasses.dataclass(frozen=True)
+class Request(object):
+    pagination: pagination_helpers.Pagination
+    path_params: Mapping[str, str]
+    starlette_request: requests.Request  # @deprecated
 
 
 async def create_response(

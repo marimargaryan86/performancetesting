@@ -2,7 +2,6 @@ from typing import Sequence
 
 import currencycloud
 import lagom
-from lagom.integrations import starlette
 
 from snowfall.project.junction.adapter import currencies
 from snowfall.stdlib.integration.starlette import application
@@ -18,8 +17,8 @@ class Settings(application.Settings):
 def create_dependencies(
     cc_client: currencycloud.Client,
     currencies_client: currencies.Client,
-) -> starlette.StarletteIntegration:
+) -> lagom.Container:
     container = lagom.Container()
     container[currencycloud.Client] = cc_client
     container[currencies.Client] = currencies_client  # type: ignore[type-abstract]
-    return starlette.StarletteIntegration(container)
+    return container

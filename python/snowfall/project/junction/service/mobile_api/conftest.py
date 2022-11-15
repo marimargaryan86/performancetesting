@@ -11,13 +11,13 @@ from unittest import mock
 import aiosmtplib
 import httpx
 import jwt as jwtlib
+import lagom
 import mongomock_motor
 import pytest
 from bson import json_util
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from fakeredis import aioredis as fakeredis
-from lagom.integrations import starlette
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
@@ -147,7 +147,7 @@ def mongo_test_db() -> mongomock_motor.AsyncMongoMockDatabase:
 
 
 def _create_app(
-    dependencies: starlette.StarletteIntegration,
+    dependencies: lagom.Container,
     openapi_path: pathlib.Path,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:

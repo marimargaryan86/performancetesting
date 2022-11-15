@@ -1,7 +1,6 @@
 from typing import Sequence
 
 import lagom
-from lagom.integrations import starlette
 
 from snowfall.project.junction.adapter import (  # noqa: WPS235
     legs,
@@ -41,7 +40,7 @@ def create_dependencies(  # noqa: WPS211
     offer_searches_client: offer_searches.Client,
     segments_client: segments.Client,
     schedules_client: schedules.Client,
-) -> starlette.StarletteIntegration:
+) -> lagom.Container:
     container = lagom.Container()
     container[legs.Client] = legs_client  # type: ignore[type-abstract]
     container[locations.Client] = locations_client  # type: ignore[type-abstract]
@@ -61,4 +60,4 @@ def create_dependencies(  # noqa: WPS211
         orders_client=orders_client,
     )
 
-    return starlette.StarletteIntegration(container)
+    return container

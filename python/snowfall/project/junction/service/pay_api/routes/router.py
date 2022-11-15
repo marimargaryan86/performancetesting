@@ -1,3 +1,4 @@
+import lagom
 from lagom.integrations import starlette
 from starlette import routing
 
@@ -9,18 +10,20 @@ from snowfall.project.junction.service.pay_api.routes import (
 )
 
 
-def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Route]:
+def get_routes(dependencies: lagom.Container) -> list[routing.Route]:
+    integration = starlette.StarletteIntegration(dependencies)
+
     return [
-        dependencies.route("/balances", balances.Balances, name="Balances"),
-        dependencies.route(
+        integration.route("/balances", balances.Balances, name="Balances"),
+        integration.route(
             "/currencies/{currencyId}",
             currencies.Currencies,
             name="Currencies",
         ),
-        dependencies.route(
+        integration.route(
             "/transactions",
             transactions.Transactions,
             name="Transactions",
         ),
-        dependencies.route("/rates", rates.Rates, name="Rate"),
+        integration.route("/rates", rates.Rates, name="Rate"),
     ]

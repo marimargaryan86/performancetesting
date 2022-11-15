@@ -2,7 +2,6 @@ import datetime
 from typing import Sequence
 
 import lagom
-from lagom.integrations import starlette
 from pydantic import AnyUrl
 
 from snowfall.project.junction.service.mobile_api import (
@@ -57,7 +56,7 @@ def create_dependencies(  # noqa: WPS211
     loyalty_programs_repository: repository.LoyaltyProgramsRepository,
     preferences_repository: repository.PreferencesRepository,
     vouchers_repository: repository.VouchersRepository,
-) -> starlette.StarletteIntegration:
+) -> lagom.Container:
     container = lagom.Container()
     container[currencies.CurrencyClient] = currencies_client
     container[repository.OffersRepository] = offers_repository
@@ -73,4 +72,4 @@ def create_dependencies(  # noqa: WPS211
     container[repository.LoyaltyProgramsRepository] = loyalty_programs_repository
     container[repository.PreferencesRepository] = preferences_repository
     container[repository.VouchersRepository] = vouchers_repository
-    return starlette.StarletteIntegration(container)
+    return container

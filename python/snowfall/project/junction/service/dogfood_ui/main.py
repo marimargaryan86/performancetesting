@@ -19,7 +19,7 @@ class _Settings(application.Settings):
 
 def _dependencies(
     app: service.Application[_Settings],
-) -> starlette.StarletteIntegration:
+) -> lagom.Container:
     container = lagom.Container()
     layout_path = filesystem.resource_path(
         "snowfall.project.junction.service.dogfood_ui.routes",
@@ -41,14 +41,15 @@ def _dependencies(
         },
     )
 
-    return starlette.StarletteIntegration(container)
+    return container
 
 
-def _routes(dependencies: starlette.StarletteIntegration) -> list[routing.Route]:
+def _routes(dependencies: lagom.Container) -> list[routing.Route]:
+    integration = starlette.StarletteIntegration(dependencies)
     return [
-        dependencies.route("/", routes.UI),
+        integration.route("/", routes.UI),
         stdlib_routes.Proxy(
-            dependencies._container[httpx.AsyncClient],  # noqa: WPS437
+            dependencies[httpx.AsyncClient],
         ).to_route(),
     ]
 

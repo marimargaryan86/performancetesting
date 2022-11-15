@@ -1,45 +1,48 @@
-import lagom
-from starlette import endpoints, requests, responses
+from starlette import responses
 
 from snowfall.project.junction.adapter import places
 from snowfall.project.junction.service.client_api import resources
-from snowfall.stdlib.integration.starlette import models, pagination_helpers
+from snowfall.stdlib.integration.starlette import messages, models, pagination_helpers
 
 
-class Place(endpoints.HTTPEndpoint):
-    async def get(
+class Places(object):
+    def __init__(self, client: places.Client) -> None:
+        self._client = client
+
+    async def view(
         self,
-        request: requests.Request,
-        client: places.Client = lagom.injectable,
+        request: messages.Request,
     ) -> responses.Response:
-        place = await client.get(request.path_params["placeId"])
+        place = await self._client.get(request.path_params["placeId"])
 
         return models.JsonApiResponse(
             models.Body(
-                data=resources.PlaceResource.from_proto(place, request),
+                data=resources.PlaceResource.from_proto(
+                    place,
+                    request.starlette_request,
+                ),
             ),
         )
 
-
-class Places(endpoints.HTTPEndpoint):
-    async def get(
+    async def list_(
         self,
-        request: requests.Request,
-        client: places.Client = lagom.injectable,
+        request: messages.Request,
     ) -> responses.Response:
-        pagination = pagination_helpers.get_pagination(request)
-        response = await client.find(limit=pagination.limit, cursor=pagination.cursor)
+        response = await self._client.find(
+            limit=request.pagination.limit,
+            cursor=request.pagination.cursor,
+        )
 
         return models.JsonApiResponse(
             models.Body(
                 data=[
-                    resources.PlaceResource.from_proto(place, request)
+                    resources.PlaceResource.from_proto(place, request.starlette_request)
                     for place in response.places
                 ],
                 links=pagination_helpers.get_next_url(
-                    request.url_for("ListPlaces"),
+                    request.starlette_request.url_for("ListPlaces"),
                     response.next_page_token,
-                    pagination,
+                    request.pagination,
                 ),
             ),
         )

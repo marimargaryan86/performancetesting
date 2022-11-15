@@ -1,6 +1,7 @@
+import functools
 import os
 import re
-from typing import Any, Callable, Sequence
+from typing import Any, Awaitable, Callable, Sequence
 
 import httpx
 from google.protobuf import descriptor
@@ -9,6 +10,30 @@ from starlette import endpoints, exceptions, requests, responses, routing, statu
 from snowfall.stdlib import sequence, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import messages, models, pagination_helpers
+
+
+def to_route(
+    path: str,
+    endpoint: Callable[[messages.Request], Awaitable[responses.Response]],
+    methods: Sequence[str] | None = None,
+    name: str | None = None,
+) -> routing.Route:
+    @functools.wraps(endpoint)
+    async def wrapper(request: requests.Request) -> responses.Response:
+        return await endpoint(
+            messages.Request(
+                pagination=pagination_helpers.get_pagination(request),
+                path_params=request.path_params,
+                starlette_request=request,
+            ),
+        )
+
+    return routing.Route(
+        path=path,
+        endpoint=wrapper,
+        methods=list(methods) if methods else None,
+        name=name,
+    )
 
 
 class Proxy(object):

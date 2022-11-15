@@ -1,17 +1,20 @@
+import lagom
 from lagom.integrations import starlette
 from starlette import routing
 
 from snowfall.project.junction.service.admin_api.routes import locations, places
 
 
-def get_routes(dependencies: starlette.StarletteIntegration) -> list[routing.Route]:
+def get_routes(dependencies: lagom.Container) -> list[routing.Route]:
+    integration = starlette.StarletteIntegration(dependencies)
+
     return [
-        dependencies.route("/locations", locations.Locations, name="Locations"),
-        dependencies.route(
+        integration.route("/locations", locations.Locations, name="Locations"),
+        integration.route(
             "/locations/{locationId}",
             locations.Location,
             name="Location",
         ),
-        dependencies.route("/places", places.Places, name="Places"),
-        dependencies.route("/places/{placeId}", places.Place, name="Place"),
+        integration.route("/places", places.Places, name="Places"),
+        integration.route("/places/{placeId}", places.Place, name="Place"),
     ]
