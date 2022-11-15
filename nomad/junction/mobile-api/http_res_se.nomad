@@ -131,12 +131,12 @@ JUNCTION_API_TOKEN={{ .Data.data.junction_api_token }}
 JWT_TOKEN_VERSION={{ .Data.data.jwt_token_version }}
 JWT_PRIVATE_KEY={{ .Data.data.jwt_private_key }}
 JWT_PUBLIC_KEY={{ .Data.data.jwt_public_key }}
-SUPPORT_EMAIL={{ .Data.data.support_email }}
 {{ end }}
 {{ with secret "kv/data/${var.environment}/res-se-mobile-api" }}
 CLIENT_NAME={{ .Data.data.client_name }}
 STRIPE_API_KEY={{ .Data.data.stripe_api_key }}
 CREATE_STRIPE_CUSTOMERS={{ .Data.data.create_stripe_customers }}
+SUPPORT_EMAIL={{ .Data.data.support_email }}
 {{ end }}
 EOH
       }
