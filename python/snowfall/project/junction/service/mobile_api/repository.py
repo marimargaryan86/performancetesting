@@ -7,6 +7,7 @@ import bcrypt
 import pymongo
 
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.mongo import coders, mixins, repository, resultset
 from snowfall.stdlib.persistence.redis import types as redis
 
@@ -307,3 +308,28 @@ class OrdersRepository(
         )
         orders.sort(("created_at", -1))
         return orders
+
+
+class VouchersRepository(
+    mixins.InsertMixin[models_pb2.Voucher],
+    repository.ProtoRepository[models_pb2.Voucher],
+):
+    _proto = models_pb2.Voucher
+    _indexes = [
+        pymongo.IndexModel("code", background=True, unique=True),
+    ]
+
+    async def find_valid_voucher(
+        self,
+        voucher_code: str,
+    ) -> Optional[models_pb2.Voucher]:
+        return await self._execute(
+            self._collection.find_one,
+            {
+                "code": voucher_code,
+                "status": protobuf.slug_to_enum_value(
+                    enum_descriptor=models_pb2.Voucher.Status.DESCRIPTOR,
+                    name="valid",
+                ),
+            },
+        )

@@ -111,6 +111,9 @@ def _factory(
                 loyalty_programs_repository=repository.LoyaltyProgramsRepository(
                     mongo["air_loyalty"],
                 ),
+                vouchers_repository=repository.VouchersRepository(
+                    mongo["vouchers"],
+                ),
                 junction_client=junction_client,
                 jwt_gen=jwt_gen,
             ),

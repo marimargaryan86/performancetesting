@@ -5,9 +5,10 @@ import enum
 from typing import Any, Mapping
 
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
-from snowfall.stdlib import string
+from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
+from snowfall.stdlib.v1alpha import money_pb2
 
 _RELATIONSHIPS_FIELD = "data"
 
@@ -177,5 +178,42 @@ class PreferenceResource(models.Resource):
                 "type": preference["type"],
                 "category": preference["category"],
                 "value": preference["value"],
+            },
+        )
+
+
+class Price(models.BaseModel):
+    currency: str
+    amount: str
+
+    @classmethod
+    def from_proto(cls, price: money_pb2.Money) -> Price:
+        money_price = money.from_protobuf(price)
+
+        return cls(
+            currency=money_price.currency.code,
+            amount=str(money_price),
+        )
+
+
+class VoucherResource(models.Resource):
+    @classmethod
+    def from_proto(
+        cls,
+        coupon: models_pb2.Voucher,
+    ) -> VoucherResource:
+        return cls(
+            id=coupon.id,
+            type="vouchers",
+            attributes={
+                "code": coupon.code,
+                "expiresAt": protobuf.protobuf_to_date(
+                    coupon.expires_at,
+                ),
+                "price": Price.from_proto(coupon.price),
+                "status": protobuf.enum_value_to_slug(
+                    models_pb2.Voucher.Status.DESCRIPTOR,
+                    coupon.status,
+                ),
             },
         )

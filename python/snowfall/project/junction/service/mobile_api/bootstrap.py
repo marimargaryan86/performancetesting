@@ -56,6 +56,7 @@ def create_dependencies(  # noqa: WPS211
     stripe_users_repository: repository.StripeUsersRepository,
     loyalty_programs_repository: repository.LoyaltyProgramsRepository,
     preferences_repository: repository.PreferencesRepository,
+    vouchers_repository: repository.VouchersRepository,
 ) -> starlette.StarletteIntegration:
     container = lagom.Container()
     container[currencies.CurrencyClient] = currencies_client
@@ -71,4 +72,5 @@ def create_dependencies(  # noqa: WPS211
     container[repository.StripeUsersRepository] = stripe_users_repository
     container[repository.LoyaltyProgramsRepository] = loyalty_programs_repository
     container[repository.PreferencesRepository] = preferences_repository
+    container[repository.VouchersRepository] = vouchers_repository
     return starlette.StarletteIntegration(container)

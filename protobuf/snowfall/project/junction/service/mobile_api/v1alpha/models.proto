@@ -73,7 +73,7 @@ message MobileOrder {
   google.protobuf.Timestamp created_at = 4;
 }
 
-message Coupon {
+message Voucher {
   string id = 1;
   string code = 2;
   snowfall.stdlib.v1alpha.Date expires_at = 3;

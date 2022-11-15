@@ -71,18 +71,13 @@
       ]
     },
     {
-      "name": "Coupons",
+      "name": "Vouchers",
       "tags": [
-        "coupons"
+        "vouchers"
       ]
     }
   ],
   "tags": [
-    {
-      "name": "coupons",
-      "description": "Coupons used to make discounts for orders.",
-      "x-displayName": "Coupons"
-    },
     {
       "name": "internal",
       "description": "Endpoints not for public use.",
@@ -127,22 +122,27 @@
       "name": "user",
       "description": "Endpoints for user resource management.",
       "x-displayName": "Authorization"
+    },
+    {
+      "name": "vouchers",
+      "description": "Vouchers used to make discounts for orders.",
+      "x-displayName": "Vouchers"
     }
   ],
   "paths": {
-    "/coupons/{couponCode}": {
+    "/vouchers/{voucherCode}": {
       "get": {
         "parameters": [
           {
-            "$ref": "#/components/parameters/couponCode"
+            "$ref": "#/components/parameters/voucherCode"
           }
         ],
-        "summary": "Get coupon",
+        "summary": "Get voucher",
         "tags": [
-          "coupons"
+          "vouchers"
         ],
-        "operationId": "get-coupons-id",
-        "description": "Used to get coupon by id.",
+        "operationId": "get-vouchers-id",
+        "description": "Used to get vouchers by id.",
         "responses": {
           "200": {
             "description": "OK",
@@ -154,7 +154,7 @@
                       "type": "object",
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/Coupon"
+                          "$ref": "#/components/schemas/Voucher"
                         }
                       },
                       "required": [
@@ -1464,16 +1464,16 @@
   },
   "components": {
     "parameters": {
-      "couponCode": {
-        "name": "couponCode",
+      "voucherCode": {
+        "name": "voucherCode",
         "in": "path",
         "required": true,
         "schema": {
           "type": "string",
-          "pattern": "^[A-Z0-9]{6}$",
-          "example": "AB1234"
+          "pattern": "^[A-Z0-9]{8}$",
+          "example": "ABC12345"
         },
-        "description": "Trip Search identifier"
+        "description": "Voucher identifier"
       },
       "tripSearchId": {
         "name": "tripSearchId",
@@ -1972,8 +1972,8 @@
         },
         "required": ["id", "type", "attributes"]
       },
-      "Coupon": {
-        "title": "Coupon",
+      "Voucher": {
+        "title": "Voucher",
         "type": "object",
         "properties": {
           "id": {
@@ -1985,17 +1985,17 @@
           "type": {
             "type": "string",
             "enum": [
-              "coupons"
+              "vouchers"
             ],
-            "example": "coupons"
+            "example": "vouchers"
           },
           "attributes":{
             "type": "object",
             "properties": {
               "code": {
                 "type": "string",
-                "pattern": "^[A-Z0-9]{6}$",
-                "example": "AB1234"
+                "pattern": "^[A-Z0-9]{8}$",
+                "example": "ABC12345"
               },
               "expiresAt": {
                 "type": "string",

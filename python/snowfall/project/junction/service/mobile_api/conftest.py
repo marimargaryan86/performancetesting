@@ -201,6 +201,15 @@ def preferences_repository(
 
 
 @pytest.fixture
+def vouchers_repository(
+    mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
+) -> repository.VouchersRepository:
+    return repository.VouchersRepository(
+        mongo_test_db["vouchers"],
+    )
+
+
+@pytest.fixture
 def loyalty_programs_repository(
     mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
 ) -> repository.LoyaltyProgramsRepository:
@@ -345,6 +354,7 @@ def app(  # noqa: WPS211
     stripe_users_repository: repository.StripeUsersRepository,
     loyalty_programs_repository: repository.LoyaltyProgramsRepository,
     preferences_repository: repository.PreferencesRepository,
+    vouchers_repository: repository.VouchersRepository,
 ) -> applications.Starlette:
     return _create_app(
         dependencies=bootstrap.create_dependencies(
@@ -361,6 +371,7 @@ def app(  # noqa: WPS211
             stripe_users_repository,
             loyalty_programs_repository,
             preferences_repository,
+            vouchers_repository,
         ),
         openapi_path=filesystem.resource_path("junction.mobile_api", "openapi.json"),
         custom_middlewares=[
