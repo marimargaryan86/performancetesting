@@ -594,12 +594,13 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
             payload=body,
         )
 
-    async def create_order(
+    async def create_order(  # noqa: WPS211
         self,
         offer_id: str,
         option_ids: Sequence[str],
         passengers: Sequence[models.Passenger],
         contact_details: models.ContactDetails,
+        include: Optional[Sequence[order_includes]] = None,
     ) -> dict[str, Any]:
         body = {
             _DATA_KEY: {
@@ -636,11 +637,14 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
                 _TYPE_KEY: "orders",
             },
         }
-
+        query_parameters: dict[str, str] = {}
+        if include:
+            query_parameters["include"] = ",".join(include)
         return await self._make_request(
             method=_METHOD_POST,
             url="/orders",
             payload=body,
+            query_parameters=query_parameters,
         )
 
     async def get_order_by_id(

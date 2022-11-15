@@ -116,7 +116,7 @@ class Orders(endpoints.HTTPEndpoint):
             response_body.included = user_orders.get("included")
         return stdlib_models.JsonApiResponse(response_body)
 
-    async def post(  # noqa: WPS211, WPS210
+    async def post(  # noqa: WPS211, WPS210, C901
         self,
         request: requests.Request,
         orders_repository: repository.OrdersRepository = lagom.injectable,
@@ -186,6 +186,7 @@ class Orders(endpoints.HTTPEndpoint):
                     ),
                     phone_number=body["contactDetails"]["phoneNumber"],
                 ),
+                include=["journey"],
             )
         except httpx.HTTPStatusError as error:
             await payments.cancel(payment)
@@ -196,9 +197,13 @@ class Orders(endpoints.HTTPEndpoint):
             payment_intent_id=payment,
             user_id=request.user.username,
         )
+        try:
+            spnr = junction_order["included"][0]["attributes"]["reference"]
+        except (KeyError, IndexError):
+            spnr = "XX"
         stripe.PaymentIntent.modify(
             payment,
-            metadata={"order_id": mobile_order.id},
+            metadata={"order_id": mobile_order.id, "spnr": spnr},
             receipt_email=body["contactDetails"]["email"],
         )
 
