@@ -4,6 +4,7 @@ from typing import Sequence
 
 import more_itertools
 import phonenumbers
+import prometheus_client
 import pycountry
 import structlog
 
@@ -23,6 +24,11 @@ from snowfall.vendor.ask2go.models import booking, common
 class BookingHandler(object):
     _poll_retries_limit = 10
     _wait_time_between_polling = 1
+    _counter_bookings = prometheus_client.Counter(
+        "ask2go_bookings_total",
+        "Total number of bookings placed.",
+        labelnames=("status",),
+    )
 
     def __init__(
         self,
@@ -135,7 +141,7 @@ class BookingHandler(object):
             transaction_id=booking_result.transaction_id,
         )
         booking_result = await self._poll_booking(booking_result)
-        _validate_booking(booking_result)
+        self._validate_booking(booking_result)
 
         try:
             # todo: this should be handled in a separate service
@@ -161,7 +167,9 @@ class BookingHandler(object):
 
         raise errors.ServiceError("Unable to get booking details in time")
 
+    def _validate_booking(self, booking_result: booking.Booking) -> None:
+        self._counter_bookings.labels(status=booking_result.information.status).inc()
 
-def _validate_booking(booking_result: booking.Booking) -> None:
-    if booking_result.information.status == "BookingFailed":
-        raise errors.ServiceError("Booking failed")
+        # todo: this should probably do the inverse, checking successful statuses
+        if booking_result.information.status in {"BookingFailed", "GeneralException"}:
+            raise errors.ServiceError("Booking failed")
