@@ -25,7 +25,7 @@
 //     "fakeredis==1.8",
 //     "freezegun==1.2.2",
 //     "furl==2.1.3",
-//     "geopy[aiohttp]==2.2.0",
+//     "geopy[aiohttp]==2.3.0",
 //     "googleapis-common-protos==1.56.4",
 //     "grpcio-health-checking==1.50.0",
 //     "grpcio-reflection==1.50.0",
@@ -38,7 +38,7 @@
 //     "jinja2==3.1.2",
 //     "json_api_doc==0.15.0",
 //     "jsonschema==4.17.0",
-//     "lagom==2.1.0",
+//     "lagom==2.2.0",
 //     "mongomock-motor==0.0.13",
 //     "more-itertools==9.0.0",
 //     "motor==3.1.1",
@@ -59,7 +59,7 @@
 //     "python-dateutil==2.8.2",
 //     "python-rapidjson==1.9",
 //     "rfc3339-validator==0.1.4",
-//     "sentry-sdk==1.10.1",
+//     "sentry-sdk==1.11.0",
 //     "setuptools==65.5.1",
 //     "starlette==0.21.0",
 //     "stripe==4.2.0",
@@ -67,14 +67,14 @@
 //     "structlog==22.1.0",
 //     "tenacity==8.1.0",
 //     "timezonefinder==6.1.6",
-//     "types-aiofiles==22.1.0.2",
+//     "types-aiofiles==22.1.0.3",
 //     "types-certifi==2021.10.8.3",
 //     "types-freezegun==1.1.10",
-//     "types-protobuf==3.20.4.4",
+//     "types-protobuf==3.20.4.5",
 //     "types-python-dateutil==2.8.19.3",
-//     "types-setuptools==65.5.0.2",
-//     "types-stripe==3.5.2.2",
-//     "types-toml==0.10.8",
+//     "types-setuptools==65.5.0.3",
+//     "types-stripe==3.5.2.3",
+//     "types-toml==0.10.8.1",
 //     "uvicorn[standard]==0.19.0",
 //     "werkzeug==2.2.2"
 //   ],
@@ -914,13 +914,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "4d6c0aa6dd825810941c792f53d7b8d71da26f5e5f84f20f9508e8f2d33b140a",
-              "url": "https://files.pythonhosted.org/packages/66/c7/564f6fb7412070356a31b03d53ee3c8f2d3695c2babe261a5cc1b75cf1a3/exceptiongroup-1.0.1-py3-none-any.whl"
+              "hash": "542adf9dea4055530d6e1279602fa5cb11dab2395fa650b8674eaec35fc4a828",
+              "url": "https://files.pythonhosted.org/packages/ce/2e/9a327cc0d2d674ee2d570ee30119755af772094edba86d721dda94404d1a/exceptiongroup-1.0.4-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "73866f7f842ede6cb1daa42c4af078e2035e5f7607f0e2c762cc51bb31bbe7b2",
-              "url": "https://files.pythonhosted.org/packages/13/55/43ff6658a50a7f722d2f904810b42514c23a5d649d8a5d890cdc16b617de/exceptiongroup-1.0.1.tar.gz"
+              "hash": "bd14967b79cd9bdb54d97323216f8fdf533e278df937aa2a90089e7d6e06e5ec",
+              "url": "https://files.pythonhosted.org/packages/fa/e1/4f89a2608978a78876a76e69e82fa1fc5ce3fb346297eed2a51dd3df2dcf/exceptiongroup-1.0.4.tar.gz"
             }
           ],
           "project_name": "exceptiongroup",
@@ -928,7 +928,7 @@
             "pytest>=6; extra == \"test\""
           ],
           "requires_python": ">=3.7",
-          "version": "1.0.1"
+          "version": "1.0.4"
         },
         {
           "artifacts": [
@@ -1077,48 +1077,45 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "8f441c527b0b8a26cd96c965565ff0513d1e4d9952b704bf449409e5015c77b7",
-              "url": "https://files.pythonhosted.org/packages/df/60/d1d4c4944f9726228faa80fbe2206c8ddfd9757791b2de2facb8818c5d74/geographiclib-1.52-py3-none-any.whl"
+              "hash": "6b7225248e45ff7edcee32becc4e0a1504c606ac5ee163a5656d482e0cd38734",
+              "url": "https://files.pythonhosted.org/packages/9f/5a/a26132406f1f40cf51ea349a5f11b0a46cec02a2031ff82e391c2537247a/geographiclib-2.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "ac400d672b8954b0306bca890b088bb8ba2a757dc8133cca0b878f34b33b2740",
-              "url": "https://files.pythonhosted.org/packages/22/be/13de9dddbee1cfa79fa4dcc69f9bbf4787aecb7eef90752416b5d0fe88cf/geographiclib-1.52.tar.gz"
+              "hash": "f7f41c85dc3e1c2d3d935ec86660dc3b2c848c83e17f9a9e51ba9d5146a15859",
+              "url": "https://files.pythonhosted.org/packages/96/cd/90271fd195d79a9c2af0ca21632b297a6cc3e852e0413a2e4519e67be213/geographiclib-2.0.tar.gz"
             }
           ],
           "project_name": "geographiclib",
           "requires_dists": [],
-          "requires_python": null,
-          "version": "1.52"
+          "requires_python": ">=3.7",
+          "version": "2"
         },
         {
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "8f1f949082b964385de61fcc3a667a6a9a6e242beb1ae8972449f164b2ba0e89",
-              "url": "https://files.pythonhosted.org/packages/e1/e1/45f25e3d3acf26782888f847de7c958a2807a039210fb1016cc3fb9555c4/geopy-2.2.0-py3-none-any.whl"
+              "hash": "4a29a16d41d8e56ba8e07310802a1cbdf098eeb6069cc3d6d3068fc770629ffc",
+              "url": "https://files.pythonhosted.org/packages/e4/00/6313c0ffdd230164890f433019749189e0b884562bdc170e9c3a3454b3a6/geopy-2.3.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "58b7edf526b8c32e33126570b5f4fcdfaa29d4416506064777ae8d84cd103fdd",
-              "url": "https://files.pythonhosted.org/packages/9f/ab/1274d2bda70aa733d5a150aecc9fc64fc41df8c1654cd397a9307253161e/geopy-2.2.0.tar.gz"
+              "hash": "228cd53b6eef699b2289d1172e462a90d5057779a10388a7366291812601187f",
+              "url": "https://files.pythonhosted.org/packages/b5/a7/3f45be21951e48e0f367b1c87b7e00d3a9cd054bee8b6e13a35b0f652c6f/geopy-2.3.0.tar.gz"
             }
           ],
           "project_name": "geopy",
           "requires_dists": [
             "aiohttp; extra == \"aiohttp\"",
-            "async-generator; extra == \"dev\"",
-            "async-generator; extra == \"dev-lint\"",
-            "async-generator; extra == \"dev-test\"",
             "coverage; extra == \"dev\"",
             "coverage; extra == \"dev-test\"",
-            "flake8<3.9.0,>=3.8.0; extra == \"dev\"",
-            "flake8<3.9.0,>=3.8.0; extra == \"dev-lint\"",
-            "geographiclib<2,>=1.49",
-            "isort<5.7.0,>=5.6.0; extra == \"dev\"",
-            "isort<5.7.0,>=5.6.0; extra == \"dev-lint\"",
-            "pytest-aiohttp; extra == \"dev\"",
-            "pytest-aiohttp; extra == \"dev-test\"",
+            "flake8<5.1,>=5.0; extra == \"dev\"",
+            "flake8<5.1,>=5.0; extra == \"dev-lint\"",
+            "geographiclib<3,>=1.52",
+            "isort<5.11.0,>=5.10.0; extra == \"dev\"",
+            "isort<5.11.0,>=5.10.0; extra == \"dev-lint\"",
+            "pytest-asyncio>=0.17; extra == \"dev\"",
+            "pytest-asyncio>=0.17; extra == \"dev-test\"",
             "pytest>=3.10; extra == \"dev\"",
             "pytest>=3.10; extra == \"dev-test\"",
             "pytz; extra == \"timezone\"",
@@ -1129,13 +1126,13 @@
             "sphinx-issues; extra == \"dev-docs\"",
             "sphinx-rtd-theme>=0.5.0; extra == \"dev\"",
             "sphinx-rtd-theme>=0.5.0; extra == \"dev-docs\"",
-            "sphinx; extra == \"dev\"",
-            "sphinx; extra == \"dev-docs\"",
-            "sphinx; extra == \"dev-test\"",
+            "sphinx<=4.3.2; extra == \"dev\"",
+            "sphinx<=4.3.2; extra == \"dev-docs\"",
+            "sphinx<=4.3.2; extra == \"dev-test\"",
             "urllib3>=1.24.2; extra == \"requests\""
           ],
-          "requires_python": ">=3.5",
-          "version": "2.2"
+          "requires_python": ">=3.7",
+          "version": "2.3"
         },
         {
           "artifacts": [
@@ -1731,23 +1728,23 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "21223d028bbf6c65ee09738ee84f6bb356a2172b5d23539f30b4501b4f98fdc7",
-              "url": "https://files.pythonhosted.org/packages/e0/03/d4468b4f024d644efd2d23a237f2d6df75b995d0f36e287bc4c3c587d14c/lagom-2.1.0-py3-none-any.whl"
+              "hash": "e5359ac8cd67ddbcd13a452d137489359b6438a13f6f3639e6d8d89821467903",
+              "url": "https://files.pythonhosted.org/packages/b2/69/6e6a621a66ef502637c979cd590e907b294dadbe34b781f5b0bda0ca82e9/lagom-2.2.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "b3b04d7e44f262395d25ffe6a60cbe398cf786a97f19b7fc55a2bc3335d91c45",
-              "url": "https://files.pythonhosted.org/packages/07/36/6bdde536c8688e577f0287082aac795400c75aad5356de6b95cb8b6254c5/lagom-2.1.0-cp310-cp310-musllinux_1_1_x86_64.whl"
+              "hash": "0d5d50e81d2d37e13fbb5ca656b5fe8e1c883954b7ecd2bcd963fc8a5a0422c4",
+              "url": "https://files.pythonhosted.org/packages/6e/7f/1552f6be17dcbccfb05a32d9fd363aa5d080512a9faabf20ce865108907c/lagom-2.2.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "5a628e8c80489e56e3555a13cf3fa2b35aecf47064fc780865ed3e1face90e07",
-              "url": "https://files.pythonhosted.org/packages/48/a2/93975e78466ec2b9fbad4b0eacb2063b22638361513a4115463152e12c45/lagom-2.1.0-cp310-cp310-macosx_10_9_x86_64.whl"
+              "hash": "6049188436c3f8523ee4f9a5c80cb0ad2662301d3ed5988b5e89e4c036b4f0ac",
+              "url": "https://files.pythonhosted.org/packages/83/62/7060a59a96309fe09e72d92e1692bd35372fb7ec185e1af64481282250da/lagom-2.2.0-cp310-cp310-musllinux_1_1_x86_64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "b19d3307af50892f132817d481346976280044217b991b63eb405fedfac5405b",
-              "url": "https://files.pythonhosted.org/packages/e2/ce/4fc155c378dd9dca9d367d6841da9bf1a11a7ac2bf7fc069ab909e473f5d/lagom-2.1.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+              "hash": "2a84397581307f2a7f7d673c06440f74811a8bc3756a2a5a162f9e54cf9d405b",
+              "url": "https://files.pythonhosted.org/packages/ea/ba/6ab3d454c430f2f474ba008b5ba10576b74a326c3a1ec09b182d0bd23d67/lagom-2.2.0-cp310-cp310-macosx_10_9_x86_64.whl"
             }
           ],
           "project_name": "lagom",
@@ -1755,7 +1752,7 @@
             "pydantic<2.0.0,>=1.0.0; extra == \"env\""
           ],
           "requires_python": ">=3.7",
-          "version": "2.1"
+          "version": "2.2"
         },
         {
           "artifacts": [
@@ -2983,13 +2980,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "06c0fa9ccfdc80d7e3b5d2021978d6eb9351fa49db9b5847cf4d1f2a473414ad",
-              "url": "https://files.pythonhosted.org/packages/48/ad/1adaf9c1c89b105e3244367bb621627b2e8104c72648ee82139c8c69ccb8/sentry_sdk-1.10.1-py2.py3-none-any.whl"
+              "hash": "f467e6c7fac23d4d42bc83eb049c400f756cd2d65ab44f0cc1165d0c7c3d40bc",
+              "url": "https://files.pythonhosted.org/packages/b9/73/c3201e119935c18521d2aed60803269ffe0ac92b22a84e8717b68478eec6/sentry_sdk-1.11.0-py2.py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "105faf7bd7b7fa25653404619ee261527266b14103fe1389e0ce077bd23a9691",
-              "url": "https://files.pythonhosted.org/packages/43/37/89598a56119199b69a3c4b13e2ce1b57ff69f68313ed393016086d6b487b/sentry-sdk-1.10.1.tar.gz"
+              "hash": "e7b78a1ddf97a5f715a50ab8c3f7a93f78b114c67307785ee828ef67a5d6f117",
+              "url": "https://files.pythonhosted.org/packages/51/0d/15c10d58042cd46c19a143d8877d7bc4abe23dd6418b78955d2be2865243/sentry-sdk-1.11.0.tar.gz"
             }
           ],
           "project_name": "sentry-sdk",
@@ -3010,6 +3007,7 @@
             "flask>=0.11; extra == \"flask\"",
             "httpx>=0.16.0; extra == \"httpx\"",
             "pure-eval; extra == \"pure_eval\"",
+            "pymongo>=3.1; extra == \"pymongo\"",
             "pyspark>=2.4.4; extra == \"pyspark\"",
             "quart>=0.16.1; extra == \"quart\"",
             "rq>=0.6; extra == \"rq\"",
@@ -3022,7 +3020,7 @@
             "urllib3>=1.26.9; python_version == \"3.5\""
           ],
           "requires_python": null,
-          "version": "1.10.1"
+          "version": "1.11"
         },
         {
           "artifacts": [
@@ -3365,19 +3363,19 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "a92193f807c6714f77281fc4ca8e1100cac20288f0fa27659a355da925012750",
-              "url": "https://files.pythonhosted.org/packages/87/2c/abb02666be37d1d0a79d9beb2f196179f52b01a1060033b8f2d9fb58c00a/types_aiofiles-22.1.0.2-py3-none-any.whl"
+              "hash": "c12668e29307ce06f751dbe02960a9fe6a3e3d9055911ca254839e8e9a78553f",
+              "url": "https://files.pythonhosted.org/packages/c5/12/f338e89440605f7226d57324d42d6c69a555461aa20f2e97f2e4949b9142/types_aiofiles-22.1.0.3-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "121b88f160798b29d34dd0ad6539f1bec102d75fe771e3e40238c3324fc2a937",
-              "url": "https://files.pythonhosted.org/packages/69/9a/1030583a1d63aac12b37a5c47fd2e5469b146b8cc445483f0613fd155f8c/types-aiofiles-22.1.0.2.tar.gz"
+              "hash": "9406b93f970e5d647b2183c3a01a253e77693b175b6e31de997192639f6c4955",
+              "url": "https://files.pythonhosted.org/packages/50/03/5c0be9290e54c1ba68e0fe74117c15627426aa2e09b0a321d0f18708536e/types-aiofiles-22.1.0.3.tar.gz"
             }
           ],
           "project_name": "types-aiofiles",
           "requires_dists": [],
           "requires_python": null,
-          "version": "22.1.0.2"
+          "version": "22.1.0.3"
         },
         {
           "artifacts": [
@@ -3419,19 +3417,19 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "01d1c5bd42cbec4fc41e7c0980e8827378f0d670e91bd08edb0bcbf34b2989fe",
-              "url": "https://files.pythonhosted.org/packages/86/7b/311e340a11b84f4e442e8fa4c4ed54bbfebd6cd28d90981910d4b7a90630/types_protobuf-3.20.4.4-py3-none-any.whl"
+              "hash": "97af5ce70d890fdb94cb0c906f5a6624ca2fef58bc04e27990a25509e992a950",
+              "url": "https://files.pythonhosted.org/packages/92/02/cebbb618bf72fb671e9e0a710da26c959579a8964d8df79e1c60b3d38187/types_protobuf-3.20.4.5-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "55feb2bb48b860aad5592db201c80d1598889ebec06bf554610f0a62880f5685",
-              "url": "https://files.pythonhosted.org/packages/d1/03/57083bc924651fe8c55f8159e7ba7037399413415a1e3a6aa934facd839b/types-protobuf-3.20.4.4.tar.gz"
+              "hash": "e9b45008d106e1d10cc77a29d2d344b85c0f01e2e643aaccf32f69e9e81b0cdd",
+              "url": "https://files.pythonhosted.org/packages/0a/e3/d80ef95536b29285096f2de61b83e4ef733eb2ef34cbcc4f9e8bd4b40ee1/types-protobuf-3.20.4.5.tar.gz"
             }
           ],
           "project_name": "types-protobuf",
           "requires_dists": [],
           "requires_python": null,
-          "version": "3.20.4.4"
+          "version": "3.20.4.5"
         },
         {
           "artifacts": [
@@ -3455,55 +3453,55 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "2d33e4ef0d35cd2da48a143eb02184f58398381ddb1f772eff20ccc4126fec13",
-              "url": "https://files.pythonhosted.org/packages/07/e0/699564435f3aacc21ec62ae8bc963315e964a11dda364e3f0b724c71ea91/types_setuptools-65.5.0.2-py3-none-any.whl"
+              "hash": "9254c32b0cc91c486548e7d7561243b5bd185402a383e93c6691e1b9bc8d86e2",
+              "url": "https://files.pythonhosted.org/packages/1e/07/77f506c72429f68756abc363b5f9e7fd4203a21f896c19a5c370cc274012/types_setuptools-65.5.0.3-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "9847de6d7087fb1dd4a88c2a21543d1b86a6179c36744f081974303fe2f30f50",
-              "url": "https://files.pythonhosted.org/packages/5f/c0/ae2509853766832dceee90c946a2c134b29c3cd4011b6cfc18cbc43fcdd5/types-setuptools-65.5.0.2.tar.gz"
+              "hash": "17769171f5f2a2dc69b25c0d3106552a5cda767bbf6b36cb6212b26dae5aa9fc",
+              "url": "https://files.pythonhosted.org/packages/b0/18/0638b49c03a73700c9d1b190a5f05d59cea59f20f5202c4e6c777160a13b/types-setuptools-65.5.0.3.tar.gz"
             }
           ],
           "project_name": "types-setuptools",
           "requires_dists": [],
           "requires_python": null,
-          "version": "65.5.0.2"
+          "version": "65.5.0.3"
         },
         {
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "adc4430efccfd536df1c4a3f5f3e32311704d0236d1e34fdb9fa5b7c933b0133",
-              "url": "https://files.pythonhosted.org/packages/5e/ea/549de318d29c0864f889e2b9c0f02ca0b3b52e6240343973a3165519db78/types_stripe-3.5.2.2-py3-none-any.whl"
+              "hash": "cb47476381d4f973fe73bd58b7a8699e3ee7c9e40183e13322e90f17c7226365",
+              "url": "https://files.pythonhosted.org/packages/03/02/3ed8b5f23cc66f8dbbd9c53f4bce3e2eac1698ca9716e01597d8702b0188/types_stripe-3.5.2.3-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "0487fb59b9ec3f41bb71562a3728bbac576df253ca93b1a95d0b39e3658e6d86",
-              "url": "https://files.pythonhosted.org/packages/6b/f5/4233c827668394afd59dfda8ffbf3da2e54140dcbb84ae9bb3f9ea9631e7/types-stripe-3.5.2.2.tar.gz"
+              "hash": "312b90a2fd05eb38b78587edecb0b83c308e5b8d4ec6e0a8a433bc6bdb9edc3b",
+              "url": "https://files.pythonhosted.org/packages/20/ed/fc2a6b98792901a2034ca95b51f38ced4f336525d1d471b778f115014c19/types-stripe-3.5.2.3.tar.gz"
             }
           ],
           "project_name": "types-stripe",
           "requires_dists": [],
           "requires_python": null,
-          "version": "3.5.2.2"
+          "version": "3.5.2.3"
         },
         {
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "8300fd093e5829eb9c1fba69cee38130347d4b74ddf32d0a7df650ae55c2b599",
-              "url": "https://files.pythonhosted.org/packages/ae/2c/a642f8cfa7f9e67c29316bf04b7675db292d006275c67ec07f0c0069cf91/types_toml-0.10.8-py3-none-any.whl"
+              "hash": "b7b5c4977f96ab7b5ac06d8a6590d17c0bf252a96efc03b109c2711fb3e0eafd",
+              "url": "https://files.pythonhosted.org/packages/84/e9/9569cdc5c54b7d36d36b2bacefeb01a1b2feb90c9fd18ee15797ad4fa67b/types_toml-0.10.8.1-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "b7e7ea572308b1030dc86c3ba825c5210814c2825612ec679eb7814f8dd9295a",
-              "url": "https://files.pythonhosted.org/packages/76/d0/11897ab7b3b2211be5c733e241d83401f5d37473c961ea5c9460393c6f45/types-toml-0.10.8.tar.gz"
+              "hash": "171bdb3163d79a520560f24ba916a9fc9bff81659c5448a9fea89240923722be",
+              "url": "https://files.pythonhosted.org/packages/c6/8b/a8544990966e9b475c1767f21272cbbdc2b470d4e690e04b5510b129b311/types-toml-0.10.8.1.tar.gz"
             }
           ],
           "project_name": "types-toml",
           "requires_dists": [],
           "requires_python": null,
-          "version": "0.10.8"
+          "version": "0.10.8.1"
         },
         {
           "artifacts": [
@@ -3940,7 +3938,7 @@
     "fakeredis==1.8",
     "freezegun==1.2.2",
     "furl==2.1.3",
-    "geopy[aiohttp]==2.2.0",
+    "geopy[aiohttp]==2.3.0",
     "googleapis-common-protos==1.56.4",
     "grpcio-health-checking==1.50.0",
     "grpcio-reflection==1.50.0",
@@ -3953,7 +3951,7 @@
     "jinja2==3.1.2",
     "json_api_doc==0.15.0",
     "jsonschema==4.17.0",
-    "lagom==2.1.0",
+    "lagom==2.2.0",
     "mongomock-motor==0.0.13",
     "more-itertools==9.0.0",
     "motor==3.1.1",
@@ -3974,7 +3972,7 @@
     "python-dateutil==2.8.2",
     "python-rapidjson==1.9",
     "rfc3339-validator==0.1.4",
-    "sentry-sdk==1.10.1",
+    "sentry-sdk==1.11.0",
     "setuptools==65.5.1",
     "starlette==0.21.0",
     "stripe==4.2.0",
@@ -3982,14 +3980,14 @@
     "structlog==22.1.0",
     "tenacity==8.1.0",
     "timezonefinder==6.1.6",
-    "types-aiofiles==22.1.0.2",
+    "types-aiofiles==22.1.0.3",
     "types-certifi==2021.10.8.3",
     "types-freezegun==1.1.10",
-    "types-protobuf==3.20.4.4",
+    "types-protobuf==3.20.4.5",
     "types-python-dateutil==2.8.19.3",
-    "types-setuptools==65.5.0.2",
-    "types-stripe==3.5.2.2",
-    "types-toml==0.10.8",
+    "types-setuptools==65.5.0.3",
+    "types-stripe==3.5.2.3",
+    "types-toml==0.10.8.1",
     "uvicorn[standard]==0.19.0",
     "werkzeug==2.2.2"
   ],

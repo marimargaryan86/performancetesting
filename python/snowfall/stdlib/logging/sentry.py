@@ -50,4 +50,8 @@ def _with_additional_integrations(integrations: Integrations) -> Integrations:
         httpx_module = import_module("sentry_sdk.integrations.httpx")
         integrations = [*integrations, httpx_module.HttpxIntegration()]
 
+    if util.find_spec("pymongo"):
+        pymongo_module = import_module("sentry_sdk.integrations.pymongo")
+        integrations = [*integrations, pymongo_module.PyMongoIntegration()]
+
     return integrations
