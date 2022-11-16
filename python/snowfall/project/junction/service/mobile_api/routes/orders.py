@@ -1,13 +1,18 @@
 import asyncio
 import decimal
-from typing import Any, Sequence, Tuple
+from typing import Any, Optional, Sequence, Tuple
 
 import httpx
 import lagom
 import stripe
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.project.junction.service.mobile_api import payments, repository, smtp
+from snowfall.project.junction.service.mobile_api import (
+    payments,
+    repository,
+    smtp,
+    validators,
+)
 from snowfall.project.junction.service.mobile_api.tasks import orders
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib import money
@@ -116,19 +121,24 @@ class Orders(endpoints.HTTPEndpoint):
             response_body.included = user_orders.get("included")
         return stdlib_models.JsonApiResponse(response_body)
 
-    async def post(  # noqa: WPS211, WPS210, C901
+    @validators.voucher_validator
+    async def post(  # noqa: WPS211, WPS210, WPS217, C901
         self,
         request: requests.Request,
+        voucher: Optional[models_pb2.Voucher],
         orders_repository: repository.OrdersRepository = lagom.injectable,
         junction_client: client.JunctionClient = lagom.injectable,
         smtp_client: smtp.EmailClient = lagom.injectable,
         offers_rates_repository: repository.OffersRatesRepository = lagom.injectable,
+        vouchers_repository: repository.VouchersRepository = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
         payment = body["payment"]
+        voucher_code = body.get("voucher", "")
         (correct_amount, correct_state) = await check_payment_amount_and_state(
             payment,
             body["options"],
+            voucher,
             junction_client,
             offers_rates_repository,
         )
@@ -191,7 +201,6 @@ class Orders(endpoints.HTTPEndpoint):
         except httpx.HTTPStatusError as error:
             await payments.cancel(payment)
             raise error
-
         mobile_order = models_pb2.MobileOrder(
             id=junction_order["data"]["id"],
             payment_intent_id=payment,
@@ -201,6 +210,9 @@ class Orders(endpoints.HTTPEndpoint):
             spnr = junction_order["included"][0]["attributes"]["reference"]
         except (KeyError, IndexError):
             spnr = "XX"
+        if voucher_code:
+            await vouchers_repository.use_voucher(voucher_code, payment)
+            mobile_order.voucher_code = voucher_code
         stripe.PaymentIntent.modify(
             payment,
             metadata={"order_id": mobile_order.id, "spnr": spnr},
@@ -233,6 +245,7 @@ class Orders(endpoints.HTTPEndpoint):
 async def check_payment_amount_and_state(  # noqa: WPS210
     payment_intent_id: str,
     offer_options: Sequence[str],
+    voucher: Optional[models_pb2.Voucher],
     junction_client: client.JunctionClient,
     offers_rates_repository: repository.OffersRatesRepository,
 ) -> Tuple[bool, bool]:
@@ -269,4 +282,9 @@ async def check_payment_amount_and_state(  # noqa: WPS210
         )
 
         offer_amount += offer_money.amount
-    return pi["amount"] == offer_amount, pi["status"] == "requires_capture"
+    if voucher:
+        offer_amount -= money.from_protobuf(voucher.price).amount
+    return (
+        pi["amount"] == offer_amount if offer_amount > 0 else 1,
+        pi["status"] == "requires_capture",
+    )

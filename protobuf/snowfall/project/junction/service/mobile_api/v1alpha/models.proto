@@ -60,6 +60,7 @@ message MobileOrder {
   string id = 1;
   string payment_intent_id = 2;
   string user_id = 3;
+  string voucher_code = 5;
   google.protobuf.Timestamp created_at = 4;
 }
 

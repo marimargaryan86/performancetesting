@@ -51,6 +51,7 @@ def get_routes(dependencies: lagom.Container) -> list[routing.Route]:
         integration.route("/users/{userEmail}", users.User),
         integration.route("/users/me/preferences", preferences.Preferences),
         integration.route("/payments", payments.Payments),
+        integration.route("/payments/{paymentIntentId}", payments.Payment),
         integration.route(
             "/trips/searches/{tripSearchId}/trips",
             trips.TripSearchesTrips,

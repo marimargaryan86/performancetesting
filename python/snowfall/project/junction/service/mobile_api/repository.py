@@ -284,6 +284,7 @@ class OrdersRepository(
 
 
 class VouchersRepository(
+    mixins.FindByIdMixin[models_pb2.Voucher],
     mixins.InsertMixin[models_pb2.Voucher],
     repository.ProtoRepository[models_pb2.Voucher],
 ):
@@ -296,7 +297,7 @@ class VouchersRepository(
         self,
         voucher_code: str,
     ) -> Optional[models_pb2.Voucher]:
-        return await self._execute(
+        voucher = await self._execute(
             self._collection.find_one,
             {
                 "code": voucher_code,
@@ -305,4 +306,30 @@ class VouchersRepository(
                     name="valid",
                 ),
             },
+        )
+        if not voucher:
+            return None
+        if protobuf.protobuf_to_date(voucher.expires_at) < datetime.date.today():
+            return None
+        return voucher
+
+    async def use_voucher(
+        self,
+        voucher_code: str,
+        payment_intent_id: str,
+    ) -> None:
+        await self._execute(
+            self._collection.update_one,
+            {"code": voucher_code},
+            {
+                "$set": {
+                    "status": protobuf.slug_to_enum_value(
+                        enum_descriptor=models_pb2.Voucher.Status.DESCRIPTOR,
+                        name="used",
+                    ),
+                    "payment_intent_id": payment_intent_id,
+                    "updated_at": datetime.datetime.utcnow(),
+                },
+            },
+            upsert=False,
         )

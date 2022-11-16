@@ -1,8 +1,10 @@
+from typing import Optional
+
 import lagom
 import stripe
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.project.junction.service.mobile_api import repository
+from snowfall.project.junction.service.mobile_api import repository, validators
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib import money
 from snowfall.stdlib.integration.starlette import models, request_helpers
@@ -46,7 +48,10 @@ class Payments(endpoints.HTTPEndpoint):
         stripe_users_repository: repository.StripeUsersRepository = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
-
+        intent_money = money.from_string(
+            body["amount"],
+            money.Currency(body["currency"]),
+        )
         stripe_user_id = None
         ephemeral_key_secret = None
         if stripe_users_repository.create_stripe_customers:
@@ -59,13 +64,10 @@ class Payments(endpoints.HTTPEndpoint):
                 customer=stripe_user_id,
                 stripe_version=_stripe_version,
             ).secret
-        intent_money = money.from_string(
-            body["amount"],
-            money.Currency(body["currency"]),
-        )
+
         intent = stripe.PaymentIntent.create(
             amount=intent_money.amount,
-            currency=body["currency"],
+            currency=intent_money.currency.code,
             capture_method="manual",
             customer=stripe_user_id,
             automatic_payment_methods={
@@ -93,3 +95,26 @@ class Payments(endpoints.HTTPEndpoint):
                 ),
             ),
         )
+
+
+class Payment(endpoints.HTTPEndpoint):
+    @validators.voucher_validator
+    async def patch(
+        self,
+        request: requests.Request,
+        voucher: Optional[models_pb2.Voucher],
+        vouchers_repository: repository.VouchersRepository = lagom.injectable,
+    ) -> responses.Response:
+        if voucher:
+            payment_intent = stripe.PaymentIntent.retrieve(
+                request.path_params["paymentIntentId"],
+            )
+            new_amount = (
+                payment_intent["amount"] - money.from_protobuf(voucher.price).amount
+            )
+
+            stripe.PaymentIntent.modify(
+                request.path_params["paymentIntentId"],
+                amount=new_amount if new_amount > 0 else 1,
+            )
+        return responses.Response(status_code=status.HTTP_204_NO_CONTENT)

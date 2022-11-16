@@ -968,6 +968,53 @@
         "description": "Creates a paymentIntent and a stripe customer if there isn't any for this particular user"
       }
     },
+    "/payments/{paymentIntentId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/paymentIntentId"
+        }
+      ],
+      "patch": {
+        "summary": "Update Payment Intent",
+        "tags": [
+          "payment"
+        ],
+        "operationId": "patch-payments-id",
+        "description": "Update a paymentIntent to apply a voucher",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                      "$ref": "#/components/schemas/UpdatePaymentIntent"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
     "/places": {
       "get": {
         "summary": "List Places",
@@ -1464,6 +1511,16 @@
   },
   "components": {
     "parameters": {
+      "paymentIntentId": {
+        "name": "paymentIntentId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "example": "pi_3LI6quJnOM9CmRvL19DPvqwU"
+        },
+        "description": "Payment intent identifier"
+      },
       "voucherCode": {
         "name": "voucherCode",
         "in": "path",
@@ -2476,6 +2533,17 @@
                         "$ref": "#/components/schemas/PaymentIdentifier"
                       }
                     }
+                  },
+                  "voucher": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/VoucherIdentifier"
+                      }
+                    }
                   }
                 }
               }
@@ -2857,6 +2925,27 @@
               "payments"
             ],
             "example": "payments"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "VoucherIdentifier": {
+        "title": "Voucher Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "ABC12345"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "vouchers"
+            ],
+            "example": "vouchers"
           }
         },
         "required": [
@@ -4741,6 +4830,45 @@
         "required": [
           "program",
           "number"
+        ]
+      },
+      "UpdatePaymentIntent": {
+        "title": "Payment Intent (Update)",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "pi_3LI6quJnOM9CmRvL19DPvqwU",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "payments"
+            ],
+            "example": "payments"
+          },
+          "relationships": {
+            "type": "object",
+            "properties": {
+              "voucher": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/VoucherIdentifier"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "relationships"
         ]
       },
       "PaymentIntent": {
