@@ -297,6 +297,9 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                 trip_result=order_models_pb2.TripBooking(
                     provider_booking_reference=booking_responses.make_booking.search_identifier,
                     record_locator=booking_responses.get_ticket.confirmation_code,
+                    created_at=protobuf.datetime_to_protobuf(
+                        datetime.datetime.now(tz=datetime.timezone.utc),
+                    ),
                 ),
                 raw_data=(
                     "{{makeBooking: {0}, confirmBooking: {1}, getTicket: {2}}}".format(

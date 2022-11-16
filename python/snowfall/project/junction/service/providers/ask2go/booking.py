@@ -79,6 +79,9 @@ class BookingHandler(object):
                     ),
                     operator_booking_references=booking_result.information.check_in_locators
                     or [],
+                    created_at=protobuf.datetime_to_protobuf(
+                        datetime.datetime.now(tz=datetime.timezone.utc),
+                    ),
                 ),
                 raw_data=booking_result.json(),
             ),

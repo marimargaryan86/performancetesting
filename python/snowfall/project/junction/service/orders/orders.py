@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import Any, Optional, Sequence
 
 import pymongo
@@ -9,6 +10,7 @@ from snowfall.project.junction.adapter import (
 )
 from snowfall.project.junction.service.orders.v1alpha import models_pb2
 from snowfall.stdlib import string
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 
@@ -95,6 +97,7 @@ class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
                 "$push": {
                     "orders": self._coder.encode(order),
                 },
+                "$set": {"updated_at": datetime.datetime.now(tz=datetime.timezone.utc)},
             },
         )
 
@@ -163,6 +166,9 @@ class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
         options: Sequence[models_pb2.TripOption],
     ) -> list[models_pb2.Booking]:
         bookings = []
+        now = protobuf.datetime_to_protobuf(
+            datetime.datetime.now(tz=datetime.timezone.utc),
+        )
 
         for option in options:
             booking_id = string.uuid()
@@ -175,6 +181,8 @@ class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
                     total_price=option.price,
                     trip_option=option,
                     status=models_pb2.Booking.Status.STATUS_PENDING,
+                    created_at=now,
+                    updated_at=now,
                 ),
             )
 
@@ -257,12 +265,16 @@ class BookingRepository(repository.ProtoRepository[models_pb2.Booking]):
         self,
         booking: models_pb2.Booking,
     ) -> models_pb2.Booking:
+        now = datetime.datetime.now(tz=datetime.timezone.utc)
+
         await self._execute(
             self._collection.update_one,
             filter={"orders.bookings._id": booking.id},
             update={
                 "$set": {
                     "orders.$[order].bookings.$[booking]": self._coder.encode(booking),
+                    "orders.$[order].updated_at": now,
+                    "updated_at": now,
                 },
             },
             array_filters=[

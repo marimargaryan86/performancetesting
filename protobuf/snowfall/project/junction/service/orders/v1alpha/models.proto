@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package snowfall.project.junction.service.orders.v1alpha;
 
+import "google/protobuf/timestamp.proto";
 import "snowfall/project/junction/service/offers/v1alpha/models.proto";
 import "snowfall/stdlib/v1alpha/models.proto";
 import "snowfall/stdlib/v1alpha/money.proto";
@@ -13,6 +14,8 @@ message Journey {
   repeated Order orders = 2;
   string passenger_name_record = 3;
   ContactDetails contact_details = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
   // reseller id
 }
 
@@ -21,6 +24,8 @@ message Order {
   string journey_id = 2;
   repeated Booking bookings = 3;
   repeated Passenger passengers = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
   // reseller id
 }
 
@@ -45,12 +50,15 @@ message Booking {
     TripBooking trip_result = 7;
   }
   string raw_data = 8; // json
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
 }
 
 message TripBooking {
   string provider_booking_reference = 3;
   string record_locator = 1;
   repeated string operator_booking_references = 2;
+  google.protobuf.Timestamp created_at = 4;
 }
 
 message ContactDetails {
