@@ -8,7 +8,7 @@ import pymongo
 
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.persistence.mongo import coders, mixins, repository, resultset
+from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 from snowfall.stdlib.persistence.redis import types as redis
 
 _DATA_ACCESSOR = "data"
@@ -189,33 +189,6 @@ class StripeUsersRepository(
         return await self._execute(
             self._collection.find_one,
             filter={"internal_user_id": user_id},
-        )
-
-
-class OffersRepository(
-    mixins.FindByIdMixin[models_pb2.OfferSearchHistory],
-    mixins.InsertMixin[models_pb2.OfferSearchHistory],
-    repository.ProtoRepository[models_pb2.OfferSearchHistory],
-):
-    _proto = models_pb2.OfferSearchHistory
-
-    async def append_offer_search(
-        self,
-        user_id: str,
-        offer_search_history_entity: models_pb2.OfferSearchHistoryEntity,
-    ) -> None:
-        history_entity_coder = coders.ProtoCoder(models_pb2.OfferSearchHistoryEntity)
-        await self._execute(
-            self._collection.update_one,
-            {"user_id": user_id},
-            {
-                "$push": {
-                    "offer_search_history": history_entity_coder.encode(
-                        offer_search_history_entity,
-                    ),
-                },
-            },
-            upsert=True,
         )
 
 

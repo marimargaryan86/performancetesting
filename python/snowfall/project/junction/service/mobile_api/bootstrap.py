@@ -43,7 +43,6 @@ class Settings(application.Settings):
 
 def create_dependencies(  # noqa: WPS211
     currencies_client: currencies.CurrencyClient,
-    offers_repository: repository.OffersRepository,
     orders_repository: repository.OrdersRepository,
     junction_client: client.JunctionClient,
     places_repository: repository.PlacesRepository,
@@ -59,7 +58,6 @@ def create_dependencies(  # noqa: WPS211
 ) -> lagom.Container:
     container = lagom.Container()
     container[currencies.CurrencyClient] = currencies_client
-    container[repository.OffersRepository] = offers_repository
     container[repository.OrdersRepository] = orders_repository
     container[client.JunctionClient] = junction_client
     container[repository.PlacesRepository] = places_repository

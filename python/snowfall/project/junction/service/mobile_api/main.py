@@ -80,9 +80,6 @@ def _factory(
                     ),
                     fallback_rates={"SEK": app.settings.fallback_rate_sek},
                 ),
-                offers_repository=repository.OffersRepository(
-                    mongo["offers"],
-                ),
                 places_repository=repository.PlacesRepository(
                     mongo["places"],
                 ),

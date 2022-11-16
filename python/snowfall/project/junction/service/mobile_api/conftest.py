@@ -183,19 +183,10 @@ def smtp_client() -> smtp.EmailClient:
 
 
 @pytest.fixture
-def offers_repository(
-    mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
-) -> repository.OffersRepository:
-    return repository.OffersRepository(
-        mongo_test_db["offers"],
-    )
-
-
-@pytest.fixture
 def preferences_repository(
     mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
-) -> repository.OffersRepository:
-    return repository.OffersRepository(
+) -> repository.PreferencesRepository:
+    return repository.PreferencesRepository(
         mongo_test_db["preferences"],
     )
 
@@ -342,7 +333,6 @@ def mobile_currencies_client(
 @pytest.fixture()
 def app(  # noqa: WPS211
     mobile_currencies_client: mobile_currencies.CurrencyClient,
-    offers_repository: repository.OffersRepository,
     places_repository: repository.PlacesRepository,
     users_repository: repository.UsersRepository,
     otp_repository: repository.OtpRepository,
@@ -359,7 +349,6 @@ def app(  # noqa: WPS211
     return _create_app(
         dependencies=bootstrap.create_dependencies(
             mobile_currencies_client,
-            offers_repository,
             orders_repository,
             junction_client,
             places_repository,

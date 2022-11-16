@@ -7,7 +7,6 @@ from starlette import endpoints, requests, responses, status
 
 from snowfall.project.junction.adapter import errors
 from snowfall.project.junction.service.mobile_api import currencies, repository
-from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib import money
 from snowfall.stdlib.integration.starlette import (
     models,
@@ -27,11 +26,9 @@ class OfferSearches(endpoints.HTTPEndpoint):
     async def post(
         self,
         request: requests.Request,
-        offers_repository: repository.OffersRepository = lagom.injectable,
         junction_client: client.JunctionClient = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
-        user_id = request.user.username
         offer_search = await junction_client.create_offer_search(
             trip_ids=body["trips"],
             passengers_dates_of_birth=[
@@ -39,12 +36,6 @@ class OfferSearches(endpoints.HTTPEndpoint):
                 for passenger in body["passengers"]
             ],
             session_token=body.get("sessionToken"),
-        )
-        await offers_repository.append_offer_search(
-            user_id,
-            models_pb2.OfferSearchHistoryEntity(
-                offer_search_id=offer_search[_DATA_KEY][_ID_KEY],
-            ),
         )
         return models.JsonApiResponse(
             models.Body(

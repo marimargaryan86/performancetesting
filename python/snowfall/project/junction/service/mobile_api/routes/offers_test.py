@@ -2,7 +2,7 @@ import httpx
 import pytest_httpx
 from starlette import status
 
-from snowfall.project.junction.service.mobile_api import conftest, repository
+from snowfall.project.junction.service.mobile_api import conftest
 
 
 class TestOffers(object):
@@ -10,7 +10,6 @@ class TestOffers(object):
         self,
         authenticated_http_client: httpx.AsyncClient,
         httpx_mock: pytest_httpx.HTTPXMock,
-        offers_repository: repository.OffersRepository,
     ) -> None:
         httpx_mock.add_response(
             **conftest.load_response_fixture("POST_OFFERS_SEARCHES.json"),
@@ -42,7 +41,6 @@ class TestOffers(object):
         self,
         authenticated_http_client: httpx.AsyncClient,
         httpx_mock: pytest_httpx.HTTPXMock,
-        offers_repository: repository.OffersRepository,
     ) -> None:
         httpx_mock.add_response(
             **conftest.load_response_fixture("GET_OFFERS_SEARCHES_{ID}_OFFERS.json"),
