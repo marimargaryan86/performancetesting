@@ -1,0 +1,229 @@
+{
+    "data": {
+        "id": "VICA",
+        "type": "marketing_carriers",
+        "attributes": {
+            "code": "VICA",
+            "trade_name": "Virtual Carrier European intercity bus",
+            "legal_name": "Virtual Carrier European Intercity Bus",
+            "address": "Wattstrasse 10",
+            "phone": "4900000000",
+            "fax": "4900000000",
+            "customer_service_phone": "4900000000",
+            "customer_service_email": "test@distribusion.com",
+            "email": "test@distribusion.com",
+            "commercial_register": "Test",
+            "commercial_register_number": "9999999",
+            "vat_no": "123456",
+            "authorised_representative": "John Smith",
+            "white_label_logo": "",
+            "white_label_colour_code": "",
+            "terms": "t&c",
+            "privacy_policy": null,
+            "flight_number_required": false,
+            "has_mobile_tickets": true,
+            "tickets_validity_in_hours": null,
+            "tickets_validity_info": "",
+            "cancellation_type": "fee_per_booking",
+            "status": "expected_demo",
+            "supports_seats": false,
+            "ticket_printing_required": false,
+            "booking_fee": 0,
+            "cancellation_fee": 1,
+            "cancellation_cutoff": 0
+        },
+        "relationships": {
+            "default_passenger_type": {
+                "data": {
+                    "id": "PNOS",
+                    "type": "passenger_types"
+                }
+            },
+            "passenger_types": {
+                "data": [
+                    {
+                        "id": "PNOS",
+                        "type": "passenger_types"
+                    }
+                ]
+            },
+            "extra_types": {
+                "data": []
+            },
+            "vehicle_types": {
+                "data": [
+                    {
+                        "id": "BUS",
+                        "type": "vehicle_types"
+                    }
+                ]
+            },
+            "fare_classes": {
+                "data": [
+                    {
+                        "id": "VICA-FARE-1",
+                        "type": "fare_classes"
+                    },
+                    {
+                        "id": "VICA-FARE-2",
+                        "type": "fare_classes"
+                    }
+                ]
+            }
+        }
+    },
+    "jsonapi": {
+        "version": "1.0"
+    },
+    "meta": {
+        "locale": "en",
+        "currency": "EUR"
+    },
+    "included": [
+        {
+            "id": "PNOS",
+            "type": "passenger_types",
+            "attributes": {
+                "code": "PNOS",
+                "name": "Adult",
+                "description": "",
+                "min_age": 0,
+                "max_age": 99
+            }
+        },
+        {
+            "id": "BUS",
+            "type": "vehicle_types",
+            "attributes": {
+                "code": "BUS",
+                "name": "Bus",
+                "description": "Long vehicle which is usually transporting a group of people (ca. 45) on streets."
+            }
+        },
+        {
+            "id": "VICA-FARE-1",
+            "type": "fare_classes",
+            "attributes": {
+                "code": "FARE-1",
+                "name": "Economy",
+                "iata_category": null,
+                "journey_type": "single",
+                "default": true
+            },
+            "relationships": {
+                "fare_features": {
+                    "data": [
+                        {
+                            "id": "VICA-WIFI",
+                            "type": "fare_features"
+                        },
+                        {
+                            "id": "VICA-PREF",
+                            "type": "fare_features"
+                        }
+                    ]
+                },
+                "ticket_validity_rules": {
+                    "data": [
+                        {
+                            "id": "VICA-FARE-1-TICKET_VALIDITY_RULE-0",
+                            "type": "ticket_validity_rules"
+                        }
+                    ]
+                },
+                "passenger_group_rules": {
+                    "data": []
+                }
+            }
+        },
+        {
+            "id": "VICA-FARE-2",
+            "type": "fare_classes",
+            "attributes": {
+                "code": "FARE-2",
+                "name": "Business",
+                "iata_category": null,
+                "journey_type": "single",
+                "default": false
+            },
+            "relationships": {
+                "fare_features": {
+                    "data": [
+                        {
+                            "id": "VICA-WIFI",
+                            "type": "fare_features"
+                        },
+                        {
+                            "id": "VICA-REFU",
+                            "type": "fare_features"
+                        }
+                    ]
+                },
+                "ticket_validity_rules": {
+                    "data": [
+                        {
+                            "id": "VICA-FARE-2-TICKET_VALIDITY_RULE-0",
+                            "type": "ticket_validity_rules"
+                        }
+                    ]
+                },
+                "passenger_group_rules": {
+                    "data": []
+                }
+            }
+        },
+        {
+            "id": "VICA-WIFI",
+            "type": "fare_features",
+            "attributes": {
+                "code": "WIFI",
+                "name": "Wifi",
+                "description": "Free wifi is available on board."
+            }
+        },
+        {
+            "id": "VICA-PREF",
+            "type": "fare_features",
+            "attributes": {
+                "code": "PREF",
+                "name": "Partially refundable",
+                "description": "The ticket can be cancelled and partially refunded. There is a cancellation fee of EUR2.80."
+            }
+        },
+        {
+            "id": "VICA-FARE-1-TICKET_VALIDITY_RULE-0",
+            "type": "ticket_validity_rules",
+            "attributes": {
+                "rule_type": "outbound",
+                "reference_time_type": "departure_time",
+                "use_type": "once",
+                "offset_type": "minutes",
+                "duration_type": "minutes",
+                "offset": 0,
+                "duration": 0
+            }
+        },
+        {
+            "id": "VICA-REFU",
+            "type": "fare_features",
+            "attributes": {
+                "code": "REFU",
+                "name": "Fully refundable",
+                "description": "The ticket can be cancelled and refunded."
+            }
+        },
+        {
+            "id": "VICA-FARE-2-TICKET_VALIDITY_RULE-0",
+            "type": "ticket_validity_rules",
+            "attributes": {
+                "rule_type": "outbound",
+                "reference_time_type": "departure_time",
+                "use_type": "once",
+                "offset_type": "minutes",
+                "duration_type": "minutes",
+                "offset": 0,
+                "duration": 0
+            }
+        }
+    ]
+}

@@ -1,0 +1,39 @@
+{
+    "data": [
+        {
+            "id": "RJET",
+            "type": "marketing_carriers",
+            "attributes": {
+                "code": "RJET",
+                "trade_name": "RegioJet"
+            }
+        },
+        {
+            "id": "REJE",
+            "type": "marketing_carriers",
+            "attributes": {
+                "code": "REJE",
+                "trade_name": "RegioJet"
+            }
+        },
+        {
+            "id": "HEXR",
+            "type": "marketing_carriers",
+            "attributes": {
+                "code": "HEXR",
+                "trade_name": "Heathrow Express"
+            }
+        },
+        {
+            "id": "VICA",
+            "type": "marketing_carriers",
+            "attributes": {
+                "code": "VICA",
+                "trade_name": "Virtual Carrier European intercity bus"
+            }
+        }
+    ],
+    "jsonapi": {
+        "version": "1.0"
+    }
+}

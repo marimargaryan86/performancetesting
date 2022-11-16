@@ -1,0 +1,56 @@
+{
+    "data": [
+        {
+            "id": "DEFAMFHH",
+            "type": "stations",
+            "attributes": {
+                "station_type": "bus_station",
+                "code": "DEFAMFHH",
+                "name": "Frankfurt Main Central Train Station (Main exit)",
+                "description": "The bus stop is located at the front side of the Frankfurt Central Station, to the right of the main entrance. The stop can be found directly between the station and the street named Am Bahnhof.",
+                "street_and_number": "Am Hauptbahnhof",
+                "zip_code": "60329",
+                "time_zone": "Europe/Berlin",
+                "longitude": 8.66441,
+                "latitude": 50.106867
+            },
+            "relationships": {
+                "city": {
+                    "data": {
+                        "id": "DEFAM",
+                        "type": "cities"
+                    }
+                },
+                "area": {
+                    "data": null
+                }
+            }
+        }
+    ],
+    "jsonapi": {
+        "version": "1.0"
+    },
+    "meta": {
+        "locale": "en"
+    },
+    "included": [
+            {
+            "id": "FRXBI",
+            "type": "cities",
+            "attributes": {
+                "code": "FRXBI",
+                "name": "Le Bourg Doisans",
+                "subdivision_code": ""
+            }
+        },
+        {
+            "id": "FRLSS",
+            "type": "cities",
+            "attributes": {
+                "code": "FRLSS",
+                "name": "Luz Saint Sauveur",
+                "subdivision_code": ""
+            }
+        }
+    ]
+}
