@@ -107,7 +107,7 @@
                     </div>
                     <div class="mb-3 form-floating">
                         <input class="form-control" id="departure-at" type="datetime-local">
-                        <label for="departure-at">Departure At (UTC)</label>
+                        <label for="departure-at">Departure At (origin time)</label>
                     </div>
                     <div class="mb-3">
                         <button type="submit" class="btn btn-primary mb-3">Search</button>
@@ -119,16 +119,22 @@
     </div>
 </main>
 <div id="loader"></div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" integrity="sha512-RXf+QSDCUQs5uwRKaDoXt55jygZZm2V++WUZduaU/Ui/9EGp3f/2KZVahFZBKGH0s774sd3HmrhUy+SgOFQLVQ==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.2/js/bootstrap.bundle.min.js" integrity="sha512-BOsvKbLb0dB1IVplOL9ptU1EYA+LuCKEluZWRUYG73hxqNBU85JBIBhPGwhQl7O633KtkjMv8lvxZcWP+N3V3w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" integrity="sha512-RXf+QSDCUQs5uwRKaDoXt55jygZZm2V++WUZduaU/Ui/9EGp3f/2KZVahFZBKGH0s774sd3HmrhUy+SgOFQLVQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.6/dayjs.min.js" integrity="sha512-hcV6DX35BKgiTiWYrJgPbu3FxS6CsCjKgmrsPRpUPkXWbvPiKxvSVSdhWX0yXcPctOI2FJ4WP6N1zH+17B/sAA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.6/plugin/utc.min.js" integrity="sha512-z84O912dDT9nKqvpBnl1tri5IN0j/OEgMzLN1GlkpKLMscs5ZHVu+G2CYtA6dkS0YnOGi3cODt3BOPnYc8Agjg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.6/plugin/timezone.min.js" integrity="sha512-fG1tT/Wn/ZOyH6/Djm8HQBuqvztPQdK/vBgNFLx6DQVt3yYYDPN3bXnGZT4z4kAnURzGQwAnM3CspmhLJAD/5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
+  dayjs.extend(window.dayjs_plugin_utc);
+  dayjs.extend(window.dayjs_plugin_timezone);
+
   let db;
   const icons = {
-        "road": "car", // Unspecified
-        "air": "plane", // Air
-        "rail": "train", // Rail
-        "foot": "walking", // Walk
-    }
+      "road": "car", // Unspecified
+      "air": "plane", // Air
+      "rail": "train", // Rail
+      "foot": "walking", // Walk
+  }
 
 
   function clear_places() {
@@ -224,6 +230,8 @@
   function sort_legs(a, b) {
     a_date = new Date(a.attributes.departureAt);
     b_date = new Date(b.attributes.departureAt);
+    a2_date = new Date(a.attributes.arrivalAt);
+    b2_date = new Date(b.attributes.arrivalAt);
 
     if (a_date < b_date) {
       return -1;
@@ -233,11 +241,39 @@
       return 1;
     }
 
+    if (a2_date < b2_date) {
+      return -1;
+    }
+
+    if (a2_date > b2_date) {
+      return 1;
+    }
+
     return 0;
   }
 
   function sort_segments(a, b) {
-    return sort_legs(a.relationships.legs.data[0], b.relationships.legs.data[0])
+    order = 0
+    leg_idx = 0
+
+    while(order == 0 && leg_idx < a.relationships.legs.data.length && leg_idx < b.relationships.legs.data.length) {
+      order = sort_legs(a.relationships.legs.data[leg_idx], b.relationships.legs.data[leg_idx])
+      leg_idx++
+    }
+
+    return order
+  }
+
+  function sort_trips(a, b) {
+    order = 0
+    segment_idx = 0
+
+    while(order == 0 && segment_idx < a.relationships.segments.data.length && segment_idx < b.relationships.segments.data.length) {
+      order = sort_segments(a.relationships.segments.data[segment_idx], b.relationships.segments.data[segment_idx])
+      segment_idx++
+    }
+
+    return order
   }
 
   function nice_format_seconds(secs) {
@@ -319,6 +355,8 @@
       environment: {trip_idx: [], time: Number.MAX_SAFE_INTEGER},
     }
 
+    trips = []
+
     for (const [i, resource] of response.data.entries()) {
       trip = flatten(resource, included)
 
@@ -328,7 +366,13 @@
       }
 
       trip.relationships.segments.data.sort(sort_segments);
+      trips.push(trip)
+    }
 
+    trips.sort(sort_trips);
+
+    for (let i = 0; i < trips.length; i++) {
+      const trip = trips[i];
       firstSegment = trip.relationships.segments.data[0]
       lastSegment = trip.relationships.segments.data[trip.relationships.segments.data.length-1];
       departsAt = new Date(firstSegment.relationships.legs.data[0].attributes.departureAt);
@@ -417,7 +461,7 @@
       header.append(subtext)
 
       const tripIdText = document.createElement('p');
-      tripIdText.textContent = "TripId: " + trip.id;
+      tripIdText.innerHTML = "<strong>Trip ID:</strong> " + trip.id;
 
       let badges = document.createElement("p")
 
@@ -696,39 +740,45 @@
         const origin = document.getElementById('origin').value;
         const destination = document.getElementById('destination').value;
         const departureAt = document.getElementById('departure-at').value;
+        const transaction = db.transaction('places', 'readwrite');
+        const objectStore = transaction.objectStore('places');
+        const originRequest = objectStore.get(origin);
 
-        fetch('/trips/searches', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/vnd.api+json',
-          },
-          body: JSON.stringify({
-            data: {
-              type: 'trip-searches',
-              attributes: {
-                departureAfter: departureAt + ":00Z",
-              },
-              relationships: {
-                origin: {
-                  data: {
-                    id: origin,
-                    type: 'places'
-                  }
+        originRequest.onsuccess = (event) => {
+          const originTimeZone = originRequest.result.attributes.timeZone;
+          fetch('/trips/searches', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/vnd.api+json',
+            },
+            body: JSON.stringify({
+              data: {
+                type: 'trip-searches',
+                attributes: {
+                  departureAfter: dayjs.tz(departureAt, originTimeZone).format(),
                 },
-                destination: {
-                  data: {
-                    id: destination,
-                    type: 'places'
+                relationships: {
+                  origin: {
+                    data: {
+                      id: origin,
+                      type: 'places'
+                    }
+                  },
+                  destination: {
+                    data: {
+                      id: destination,
+                      type: 'places'
+                    }
                   }
                 }
               }
-            }
-          }),
-        })
-        .then((response) => response.json())
-        .then((data) => {
-          load_trips(data.data.id, new Date());
-        });
+            }),
+          })
+          .then((response) => response.json())
+          .then((data) => {
+            load_trips(data.data.id, new Date());
+          });
+        };
     };
 
     searchForm.addEventListener('submit', search_trips);
