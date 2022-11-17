@@ -9,5 +9,5 @@ python_tests(name="tests")
 
 files(
     name="fixtures",
-    sources=["fixtures/*", "fixtures/*/*"],
+    sources=["fixtures/*"],
 )
