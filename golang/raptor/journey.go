@@ -3,7 +3,6 @@ package raptor
 import (
 	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/planner/v1alpha"
 	"github.com/google/uuid"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -65,11 +64,11 @@ func (p *Planner) toJourneySet(destination *planner.Stop, connections map[uint64
 				segmentIdParts := make([]string, 0, len(segments))
 
 				for _, s := range stops {
-					segmentIdParts = append(segmentIdParts, strconv.FormatInt(s.Sequence, 10))
+					segmentIdParts = append(segmentIdParts, s.Id)
 				}
 
 				segments = append(segments, &Segment{
-					Id:         uuid.NewSHA1(namespace, []byte(strings.Join(segmentIdParts, "_"))),
+					Id:         uuid.NewSHA1(namespace, []byte(strings.Join(segmentIdParts, "\x00"))),
 					ScheduleId: uuid.MustParse(v.schedule.Id),
 					Stops:      stops,
 					Depart:     time.Unix(int64(depart), 0),
