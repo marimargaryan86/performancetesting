@@ -38,6 +38,21 @@ async def test_get_carriers_by_id(
 
 @disable_by_default
 @pytest.mark.asyncio
+async def test_get_all_carriers_by_id(
+    distribusion_client: client.DistribusionClient,
+) -> None:
+    marketing_carriers = await distribusion_client.get_marketing_carriers()
+    assert marketing_carriers
+
+    for marketing_carrier in marketing_carriers:
+        carrier = await distribusion_client.get_marketing_carrier_details(
+            marketing_carrier.code,
+        )
+        assert carrier is not None
+
+
+@disable_by_default
+@pytest.mark.asyncio
 async def test_get_marketing_carrier_stations(
     distribusion_client: client.DistribusionClient,
 ) -> None:
