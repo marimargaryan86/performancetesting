@@ -1527,7 +1527,7 @@
         "required": true,
         "schema": {
           "type": "string",
-          "pattern": "^[A-Z0-9]{8}$",
+          "pattern": "^[A-Za-z0-9]{8}$",
           "example": "ABC12345"
         },
         "description": "Voucher identifier"
@@ -2051,7 +2051,7 @@
             "properties": {
               "code": {
                 "type": "string",
-                "pattern": "^[A-Z0-9]{8}$",
+                "pattern": "^[A-Za-z0-9]{8}$",
                 "example": "ABC12345"
               },
               "expiresAt": {
