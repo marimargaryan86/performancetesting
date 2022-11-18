@@ -1,6 +1,8 @@
 import datetime
 from typing import Optional
 
+import pydantic
+
 from snowfall.vendor.distribusion import enums
 from snowfall.vendor.distribusion.models.base import DistribusionBaseModel
 
@@ -39,7 +41,7 @@ class ConnectionSeats(DistribusionBaseModel):
 class Passenger(DistribusionBaseModel):
     first_name: str
     last_name: str
-    passenger_type: str
+    passenger_type: str = pydantic.Field(alias="type")
 
 
 class ConnectedStationsCriteria(DistribusionBaseModel):

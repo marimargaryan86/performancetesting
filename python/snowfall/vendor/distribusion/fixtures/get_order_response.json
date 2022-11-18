@@ -1,0 +1,270 @@
+{
+  "data": {
+    "id": "VICA-37de14da-6169-4afd-9d68-e90be76b51a1",
+    "type": "orders",
+    "attributes": {
+      "state": "executed",
+      "executed_at": "2021-06-20T09:10"
+    },
+    "relationships": {
+      "booking": {
+        "data": {
+          "id": "Cb3bK2CeS1y-l_Jq_nB9KQ",
+          "type": "bookings"
+        }
+      }
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "meta": {
+    "locale": "en",
+    "currency": "GBP"
+  },
+  "included": [
+    {
+      "id": "Cb3bK2CeS1y-l_Jq_nB9KQ",
+      "type": "bookings",
+      "attributes": {
+        "departure_time": "2021-07-20T13:20",
+        "arrival_time": "2021-07-20T15:40",
+        "duration": 5400,
+        "total_price": 2148,
+        "pax": 2,
+        "flight_number": null,
+        "distribusion_booking_number": "DQ8KS4",
+        "marketing_carrier_booking_number": "P3BB2227",
+        "connection_reference": null,
+        "created_at": "2021-06-20T09:10"
+      },
+      "relationships": {
+        "fare_class": {
+          "data": {
+            "id": "VICA-FARE-1",
+            "type": "fare_classes"
+          }
+        },
+        "segments": {
+          "data": [
+            {
+              "id": "VICA-DEBERCBS-FRPARPGB-2021-07-20T13:20-2021-07-20T15:40-0",
+              "type": "segments"
+            }
+          ]
+        },
+        "passengers": {
+          "data": [
+            {
+              "id": "PNOS-TEST-TESTS-OUTBOUND-1-0",
+              "type": "passengers"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "VICA-DEBERCBS-FRPARPGB-2021-07-20T13:20-2021-07-20T15:40-0",
+      "type": "segments",
+      "attributes": {
+        "departure_time": "2021-07-20T13:20",
+        "arrival_time": "2021-07-20T15:40",
+        "index": 0
+      },
+      "relationships": {
+        "segment_passengers": {
+          "data": [
+            {
+              "id": "PNOS-TEST-TEST-OUTBOUND-1-0",
+              "type": "segment_passengers"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "PNOS-TEST-TEST-OUTBOUND-1-0",
+      "type": "segment_passengers",
+      "attributes": {
+        "seat_number": null
+      },
+      "relationships": {
+        "passenger": {
+          "data": {
+            "id": "PNOS-TEST-TEST-OUTBOUND-1",
+            "type": "passengers"
+          }
+        }
+      }
+    },
+    {
+      "id": "PNOS-TEST-TEST-OUTBOUND-1-0",
+      "type": "passengers",
+      "attributes": {
+        "first_name": "TEST",
+        "last_name": "TEST",
+        "serial_code": null,
+        "type": "PNOS"
+      }
+    },
+    {
+      "id": "VICA-FARE-1",
+      "type": "fare_classes",
+      "attributes": {
+        "code": "FARE-1",
+        "name": "Standard",
+        "iata_category": null,
+        "journey_type": "single"
+      },
+      "relationships": {
+        "fare_features": {
+          "data": [
+            {
+              "id": "VICA-ACON",
+              "type": "fare_features"
+            },
+            {
+              "id": "VICA-TOIL",
+              "type": "fare_features"
+            },
+            {
+              "id": "VICA-ALRO",
+              "type": "fare_features"
+            },
+            {
+              "id": "VICA-REFU",
+              "type": "fare_features"
+            },
+            {
+              "id": "VICA-AMEN",
+              "type": "fare_features"
+            },
+            {
+              "id": "VICA-WIFI",
+              "type": "fare_features"
+            },
+            {
+              "id": "VICA-MSYS",
+              "type": "fare_features"
+            },
+            {
+              "id": "VICA-UCHA",
+              "type": "fare_features"
+            },
+            {
+              "id": "VICA-AAFO",
+              "type": "fare_features"
+            },
+            {
+              "id": "VICA-BLUG",
+              "type": "fare_features"
+            },
+            {
+              "id": "VICA-AAFR",
+              "type": "fare_features"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "VICA-ACON",
+      "type": "fare_features",
+      "attributes": {
+        "code": "ACON",
+        "name": "Air Conditioning",
+        "description": "The bus has a cooling ventilation."
+      }
+    },
+    {
+      "id": "VICA-TOIL",
+      "type": "fare_features",
+      "attributes": {
+        "code": "TOIL",
+        "name": "Toilet",
+        "description": "A toilet is available on board."
+      }
+    },
+    {
+      "id": "VICA-ALRO",
+      "type": "fare_features",
+      "attributes": {
+        "code": "ALRO",
+        "name": "Additional Leg Room",
+        "description": "The seat has additional leg space."
+      }
+    },
+    {
+      "id": "VICA-REFU",
+      "type": "fare_features",
+      "attributes": {
+        "code": "REFU",
+        "name": "Refundable",
+        "description": "The ticket is refundable and can be cancelled no less than 72 hours in advance of travel."
+      }
+    },
+    {
+      "id": "VICA-AMEN",
+      "type": "fare_features",
+      "attributes": {
+        "code": "AMEN",
+        "name": "Amendable",
+        "description": "The ticket is amendable. Please proceed via the link https://coach.nationalexpress.com/nxbooking/mmb2ManageMyBooking. A £5 amendment fee is applicable. "
+      }
+    },
+    {
+      "id": "VICA-WIFI",
+      "type": "fare_features",
+      "attributes": {
+        "code": "WIFI",
+        "name": "Wifi",
+        "description": "Free wifi is available on board."
+      }
+    },
+    {
+      "id": "VICA-MSYS",
+      "type": "fare_features",
+      "attributes": {
+        "code": "MSYS",
+        "name": "Media System",
+        "description": "Free-of-charge infotainment system VUER. Travellers can download the VUER app, which allows them to stream films and TV shows on their own phone or tablet."
+      }
+    },
+    {
+      "id": "VICA-UCHA",
+      "type": "fare_features",
+      "attributes": {
+        "code": "UCHA",
+        "name": "USB charger",
+        "description": "USB plug is available at each seat. "
+      }
+    },
+    {
+      "id": "VICA-AAFO",
+      "type": "fare_features",
+      "attributes": {
+        "code": "AAFO",
+        "name": "Accessible area for bicycles",
+        "description": "Bicycles are allowed on board as long as they are designed to fold in half by means of a special link in the main frame and are carried in a proper protective carrying case. A passenger has to pay an extra fee for a bike."
+      }
+    },
+    {
+      "id": "VICA-BLUG",
+      "type": "fare_features",
+      "attributes": {
+        "code": "BLUG",
+        "name": "Bulky Luggage",
+        "description": "Folding pushchairs/buggies will be carried free of charge in the hold, in addition to the standard luggage allowance. Except this National Express will accept bulky luggage for an extra charge."
+      }
+    },
+    {
+      "id": "VICA-AAFR",
+      "type": "fare_features",
+      "attributes": {
+        "code": "AAFR",
+        "name": "Accessible area for wheelchairs",
+        "description": "Fully collapsible wheelchairs and fully collapsible pushchairs may be stowed free of charge. Passenger have to contact bus operator 36 hours before the departure."
+      }
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "marketing_carrier": "VICA",
+  "departure_station": "DEBERCBS",
+  "arrival_station": "FRPARPGB",
+  "departure_time": "2021-07-20T13:20",
+  "arrival_time": "2021-07-20T15:40",
+  "retailer_partner_number": "000000",
+  "title": "mr",
+  "first_name": "Test",
+  "last_name": "Test",
+  "email": "test.test@gmail.com",
+  "phone": "4915237601929",
+  "city": "Berlin",
+  "zip_code": "10123",
+  "street_and_number": "Berlinstr. 23",
+  "execute_payment": false,
+  "payment_method": "demand_note",
+  "total_price": 2148,
+  "pax": 1,
+  "terms_accepted": true,
+  "locale": "en",
+  "currency": "GBP",
+  "send_customer_email": true,
+  "fare_class": "FARE-1",
+  "passengers": [
+    {
+      "first_name": "Test",
+      "last_name": "Test",
+      "type": "PNOS"
+    }
+  ]
+}

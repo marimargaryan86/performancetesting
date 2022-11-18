@@ -1,6 +1,7 @@
 import pytest_httpx
 
 from snowfall.vendor.distribusion import client, conftest
+from snowfall.vendor.distribusion.models import criterias
 
 _BASE_URL = "{base_path}/retailers/v4/{path}"
 
@@ -72,3 +73,56 @@ async def test_get_stations(
     assert len(response) == 1
     assert response[0] and response[0].identifier == "DEFAMFHH"
     assert response[0] and response[0].zip_code == "60329"
+
+
+async def test_create_order(
+    distribusion_client: client.DistribusionClient,
+    httpx_mock: pytest_httpx.HTTPXMock,
+) -> None:
+    json_req = conftest.load_file_fixture("create_order_request.json")
+    json_res = conftest.load_file_fixture("create_order_response.json")
+
+    httpx_mock.add_response(
+        url=_BASE_URL.format(
+            base_path=conftest.API_BASE_URL,
+            path="orders/create",
+        ),
+        method="POST",
+        json=json_res,
+    )
+
+    response = await distribusion_client.create_order(criterias.CreateOrder(**json_req))
+
+    assert response
+    assert response.identifier == "VICA-37de14da-6169-4afd-9d68-e90be76b51a1"
+    assert response.state == "created"
+
+
+async def test_get_order(
+    distribusion_client: client.DistribusionClient,
+    httpx_mock: pytest_httpx.HTTPXMock,
+) -> None:
+    order_id = "VICA-37de14da-6169-4afd-9d68-e90be76b51a1"
+    json_res = conftest.load_file_fixture("get_order_response.json")
+
+    httpx_mock.add_response(
+        url=_BASE_URL.format(
+            base_path=conftest.API_BASE_URL,
+            path="orders/{order_id}".format(order_id=order_id),
+        ),
+        method="GET",
+        json=json_res,
+    )
+
+    response = await distribusion_client.get_order(order_id)
+
+    assert response
+    assert response.identifier == order_id
+    assert response.booking and response.booking.total_price == 2148
+    assert (
+        response.booking
+        and response.booking.fare_class
+        and response.booking.fare_class.fare_features
+        and response.booking.fare_class.fare_features[10].name  # noqa: WPS219
+        == "Accessible area for wheelchairs"
+    )
