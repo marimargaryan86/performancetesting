@@ -17,6 +17,12 @@
   "x-internal": true,
   "x-tagGroups": [
     {
+      "name": "Authentication",
+      "tags": [
+        "authentication"
+      ]
+    },
+    {
       "name": "Balances",
       "tags": [
         "balances"
@@ -48,6 +54,11 @@
     }
   ],
   "tags": [
+    {
+      "name": "authentication",
+      "description": "Authentication",
+      "x-displayName": "Authentication"
+    },
     {
       "name": "balances",
       "description": "Account balances in difference currencies",
@@ -128,6 +139,170 @@
         "description": "Check the application health.",
         "x-internal": true,
         "security": []
+      }
+    },
+    "/users/tokens": {
+      "post": {
+        "summary": "Create authentication token",
+        "description": "Authenticate user and provide JWT token",
+        "security": [],
+        "tags": [
+          "authentication"
+        ],
+        "operationId": "post-users-tokens",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Authentication"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Authentication"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "post": {
+        "summary": "Create user",
+        "description": "Create user by provided email and password",
+        "security": [],
+        "tags": [
+          "authentication"
+        ],
+        "operationId": "post-users",
+        "responses": {
+          "201": {
+            "description": "User is created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                },
+                "required": [
+                  "data"
+                  ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/me": {
+      "patch": {
+        "summary": "Update user password",
+        "description": "Update user password by provided credentials",
+        "tags": [
+          "authentication"
+        ],
+        "operationId": "patch-users-me",
+        "responses": {
+          "200": {
+            "description": "User is updated",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/ChangePassword"
+                    }
+                  },
+                  "required" : [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                        "$ref": "#/components/schemas/ChangePassword"
+                  }
+                },
+                "required" : [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
       }
     },
     "/balances": {
@@ -398,6 +573,136 @@
       }
     },
     "schemas": {
+      "User": {
+        "title": "User",
+        "type": "object",
+        "description": "User information",
+        "required": [
+          "attributes"
+        ],
+        "properties": {
+          "id" : {
+            "type": "string",
+            "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "type" : {
+            "type": "string",
+            "enum": [
+              "users"
+            ],
+            "example": "users"
+          },
+          "attributes" : {
+            "required": [
+              "email",
+              "password"
+              ],
+            "properties": {
+              "email": {
+                "type": "string",
+                "format": "email",
+                "example": "example@example.com"
+              },
+              "password": {
+                "type": "string",
+                "format": "password",
+                "example": "myPassword",
+                "writeOnly": true
+              }
+            }
+          }
+        }
+      },
+      "Authentication": {
+        "title": "Authentication",
+        "type" : "object",
+        "required" : [
+          "attributes"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "user-tokens"
+            ],
+            "example": "user-tokens"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
+            "readOnly": true
+          },
+          "attributes": {
+            "type": "object",
+            "required": [
+              "email",
+              "password"
+            ],
+            "properties": {
+              "email": {
+                "type": "string",
+                "format": "email",
+                "example": "example@example.com",
+                "writeOnly": true
+              },
+              "password": {
+                "type": "string",
+                "format": "password",
+                "example": "myPassword",
+                "writeOnly": true
+              },
+              "token": {
+                "type": "string",
+                "readOnly": true,
+                "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+              }
+            }
+          }
+        }
+      },
+      "ChangePassword": {
+        "title": "ChangePassword",
+        "required" : [
+          "attributes"
+        ],
+        "properties": {
+          "type" : {
+            "type": "string",
+            "enum": [
+              "users"
+            ],
+            "example": "users"
+          },
+          "id": {
+            "type": "string",
+            "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "attributes": {
+            "required": [
+              "password"
+            ],
+            "properties": {
+              "email": {
+                "type": "string",
+                "format": "email",
+                "example": "example@example.com"
+              },
+              "password": {
+                "type": "string",
+                "description": "New password",
+                "format": "password",
+                "example": "myPassword",
+                "writeOnly": true
+              }
+            }
+          }
+        }
+      },
       "Rate": {
         "title": "Rate",
         "allOf": [
@@ -559,7 +864,9 @@
                     "example": "US Dollar"
                   }
                 },
-                "required": ["name"]
+                "required": [
+                  "name"
+                ]
               }
             },
             "required": [
@@ -910,12 +1217,34 @@
             }
           }
         }
+      },
+      "Forbidden": {
+        "description": "Forbidden request",
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "type": "object",
+              "required": ["errors"],
+              "properties": {
+                "errors" : {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "securitySchemes": {
       "jwt": {
         "type": "http",
-        "scheme": "bearer"
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   },

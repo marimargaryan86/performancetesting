@@ -1,12 +1,15 @@
+import base64
 import random
 from typing import Callable
 
 import currencycloud
 from starlette import applications
+from starlette.middleware import Middleware, authentication
 
+from snowfall.project.adapter import authentication as auth
 from snowfall.project.junction.adapter import currencies, errors
 from snowfall.project.junction.service.currencies.v1alpha import currencies_pb2_grpc
-from snowfall.project.junction.service.pay_api import bootstrap
+from snowfall.project.junction.service.pay_api import authenticator, bootstrap
 from snowfall.project.junction.service.pay_api.routes import router
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application, handlers
@@ -23,18 +26,36 @@ def _factory(
         orders_channel = create_channel(
             random.choice(app.settings.currencies_address),  # nosec
         )
+        authentication_channel = create_channel(
+            app.settings.authentication_address,
+        )
         cc_client = currencycloud.Client(
             app.settings.cc_login,
             app.settings.cc_api_key,
             app.settings.cc_env,
         )
-
         asgi_app = application.create_starlette_app(
             routes_factory=router.get_routes,
+            custom_middlewares=[
+                Middleware(
+                    authentication.AuthenticationMiddleware,
+                    backend=authenticator.Authenticator(
+                        public_key_content=base64.b64decode(
+                            app.settings.jwt_public_key.encode(),
+                        ).decode(),
+                    ),
+                    on_error=handlers.auth_error_handler,
+                ),
+            ],
             dependencies=bootstrap.create_dependencies(
                 cc_client=cc_client,
                 currencies_client=currencies.GrpcClient(
                     currencies_pb2_grpc.CurrencyServiceStub(orders_channel),
+                ),
+                authentication_client=auth.GrpcClient(
+                    auth.auth_pb2_grpc.AuthenticationServiceStub(
+                        authentication_channel,
+                    ),
                 ),
             ),
             openapi_path=filesystem.resource_path("junction.pay_api", "openapi.json"),

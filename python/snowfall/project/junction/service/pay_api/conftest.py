@@ -7,6 +7,7 @@ import pytest
 from starlette import applications
 from starlette.middleware import Middleware
 
+from snowfall.project.adapter import authentication
 from snowfall.project.junction.adapter import currencies, errors
 from snowfall.project.junction.service.pay_api import bootstrap
 from snowfall.project.junction.service.pay_api.routes import router
@@ -17,11 +18,16 @@ from snowfall.stdlib.persistence import filesystem
 def _create_app(
     cc_client: currencycloud.Client,
     currencies_client: currencies.Client,
+    authentication_client: authentication.Client,
     openapi_path: pathlib.Path,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
     app = application.create_starlette_app(
-        dependencies=bootstrap.create_dependencies(cc_client, currencies_client),
+        dependencies=bootstrap.create_dependencies(
+            cc_client,
+            currencies_client,
+            authentication_client,
+        ),
         custom_middlewares=custom_middlewares,
         openapi_path=openapi_path,
         routes_factory=router.get_routes,
@@ -67,10 +73,12 @@ def headers() -> dict[str, str]:
 def app(
     cc_client: currencycloud.Client,
     currencies_client: currencies.Client,
+    authentication_client: authentication.Client,
 ) -> applications.Starlette:
     return _create_app(
         cc_client=cc_client,
         currencies_client=currencies_client,
+        authentication_client=authentication_client,
         openapi_path=filesystem.resource_path("junction.pay_api", "openapi.json"),
     )
 

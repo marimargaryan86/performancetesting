@@ -16,21 +16,7 @@ from snowfall.service.authentication.validators import (
 )
 from snowfall.stdlib.jwt import JWTEncoder
 from snowfall.stdlib.string import uuid
-from snowfall.stdlib.transport.grpc import service
-
-
-async def validate(
-    email: str,
-    password: str,
-    context: grpc.aio.ServicerContext,
-) -> None:
-    email_error = validate_email(email)
-    password_error = validate_password(password)
-    if email_error or password_error:
-        await context.abort(
-            grpc.StatusCode.INVALID_ARGUMENT,
-            details="\n".join([email_error, password_error]),
-        )
+from snowfall.stdlib.transport.grpc import rich_status, service
 
 
 class AuthenticationService(
@@ -78,9 +64,13 @@ class AuthenticationService(
             )
 
         if not match_passwords(request.password, user.password):
-            return await context.abort(
-                grpc.StatusCode.INVALID_ARGUMENT,
-                details="Password is not correct",
+            return await rich_status.abort_with_rich_status(
+                context,
+                rich_status.build_bad_request(
+                    "password",
+                    "Passwords do not match",
+                    description="Passwords do not match",
+                ),
             )
 
         payload = {
@@ -92,21 +82,50 @@ class AuthenticationService(
 
         return auth_pb2.AuthenticateResponse(auth_token=token)
 
-    async def CreateUser(  # type: ignore[override] # noqa: N802
+    async def CreateUser(  # type: ignore[override] # noqa: N802,WPS217
         self,
         request: auth_pb2.CreateUserRequest,
         context: grpc.aio.ServicerContext,
     ) -> Optional[auth_pb2.CreateUserResponse]:
         email = request.email.lower()
-
-        await validate(email, request.password, context)
+        email_error = validate_email(email)
+        if email_error:
+            return await rich_status.abort_with_rich_status(
+                context,
+                rich_status.build_bad_request(
+                    "email",
+                    email_error,
+                    description=email_error,
+                ),
+            )
+        password_error = validate_password(request.password)
+        if password_error:
+            return await rich_status.abort_with_rich_status(
+                context,
+                rich_status.build_bad_request(
+                    "password",
+                    password_error,
+                    description=password_error,
+                ),
+            )
 
         user = await self._users.find_user_by_email(email)
 
         if user:
-            return await context.abort(
-                grpc.StatusCode.ALREADY_EXISTS,
-                details="User is already exist",
+            return await rich_status.abort_with_rich_status(
+                context,
+                rich_status.build_rich_status(
+                    code=grpc.StatusCode.ALREADY_EXISTS,
+                    error=rich_status.error_details_pb2.BadRequest(
+                        field_violations=[
+                            rich_status.error_details_pb2.BadRequest.FieldViolation(
+                                field="user",
+                                description="User already exists",
+                            ),
+                        ],
+                    ),
+                    description="User already exists",
+                ),
             )
 
         hashed_password = password2hash(request.password)
@@ -136,9 +155,9 @@ class AuthenticationService(
     ) -> Optional[auth_pb2.ChangePasswordResponse]:
         error = validate_password(request.password)
         if error:
-            return await context.abort(
-                grpc.StatusCode.INVALID_ARGUMENT,
-                details=error,
+            return await rich_status.abort_with_rich_status(
+                context,
+                rich_status.build_bad_request("password", error, description=error),
             )
 
         if request.email:
