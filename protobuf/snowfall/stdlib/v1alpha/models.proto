@@ -31,7 +31,6 @@ message Point {
 message Schedule {
   string id = 1;
   string name = 2;
-  repeated Stop stops = 3;
   string agency_name = 4;
   google.protobuf.Timestamp updated_at = 5;
   string source_ref = 6;
@@ -53,14 +52,6 @@ message Leg {
   google.protobuf.Timestamp arrival_at = 5;
   Schedule.Type type = 6;
   string agency_name = 7;
-}
-
-message Stop {
-  string id = 1;
-  google.protobuf.Timestamp departure_at = 2;
-  google.protobuf.Timestamp arrival_at = 3;
-  Point point = 4;
-  uint32 order = 5;
 }
 
 message Segment {

@@ -4182,7 +4182,6 @@
                 "required": [
                   "departureAt",
                   "arrivalAt",
-                  "operator",
                   "origin",
                   "destination"
                 ],
@@ -4198,10 +4197,6 @@
                     "format": "date-time",
                     "example": "2019-08-24T14:15:22Z",
                     "readOnly": true
-                  },
-                  "operator": {
-                    "type": "string",
-                    "example": "BA"
                   },
                   "origin": {
                     "$ref": "#/components/schemas/Point"
@@ -4286,7 +4281,21 @@
                 "example": "segments"
               },
               "attributes": {
-                "type": "object"
+                "type": "object",
+                "required": [
+                  "name",
+                  "operator"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "BA1"
+                  },
+                  "operator": {
+                    "type": "string",
+                    "example": "BA"
+                  }
+                }
               },
               "relationships": {
                 "type": "object",

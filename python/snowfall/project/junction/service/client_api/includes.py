@@ -3,7 +3,7 @@ from typing import Sequence
 
 from starlette import requests
 
-from snowfall.project.junction.adapter import legs, offers, orders, segments
+from snowfall.project.junction.adapter import legs, offers, orders, schedules, segments
 from snowfall.project.junction.service.client_api import resources
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import includes
@@ -155,16 +155,28 @@ def _orders_resolver(
 
 def _segments_resolver(
     segments_client: segments.Client,
+    schedules_client: schedules.Client,
 ) -> includes.ResolverFunc:
     async def wrapper(
         identifiers: Sequence[str],
         request: requests.Request,
     ) -> Sequence[resources.SegmentResource]:
-        page = await segments_client.find(identifiers, len(identifiers))
+        segments_page = await segments_client.find(identifiers, len(identifiers))
+        schedule_ids = list({segment.schedule_id for segment in segments_page.segments})
+        schedules_map = {
+            schedule.id: schedule
+            for schedule in (
+                await schedules_client.find_by_ids(schedule_ids, len(schedule_ids))
+            ).schedules
+        }
 
         return [
-            resources.SegmentResource.from_proto(segment, request)
-            for segment in page.segments
+            resources.SegmentResource.from_proto(
+                segment,
+                schedules_map[segment.schedule_id],
+                request,
+            )
+            for segment in segments_page.segments
         ]
 
     return wrapper
@@ -258,6 +270,7 @@ def register_resolvers(
     offers_client: offers.Client,
     segments_client: segments.Client,
     orders_client: orders.Client,
+    schedules_client: schedules.Client,
 ) -> None:
     resolvers = (
         includes.Resolver(
@@ -294,7 +307,7 @@ def register_resolvers(
         ),
         includes.Resolver(
             resource=resources.SegmentResource,
-            func=_segments_resolver(segments_client),
+            func=_segments_resolver(segments_client, schedules_client),
         ),
         includes.Resolver(
             resource=resources.TripBookingDetailsResource,

@@ -817,12 +817,16 @@ class SegmentResource(models.Resource):
     def from_proto(
         cls,
         segment: models_pb2.SegmentReference,
+        schedule: models_pb2.Schedule,
         request: requests.Request,
     ) -> SegmentResource:
         return cls(
             id=segment.id,
             type=SegmentResource.api_type,
-            attributes={},
+            attributes={
+                "name": schedule.name,
+                "operator": schedule.agency_name,
+            },
             relationships={
                 "legs": {
                     _RELATIONSHIPS_FIELD: [
@@ -862,7 +866,6 @@ class LegResource(models.Resource):
                 "arrivalAt": protobuf.protobuf_to_datetime(
                     leg.arrival_at,
                 ).astimezone(zoneinfo.ZoneInfo(leg.destination.time_zone)),
-                "operator": leg.agency_name,
                 "origin": Point.from_proto(leg.origin),
                 "destination": Point.from_proto(leg.destination),
             },

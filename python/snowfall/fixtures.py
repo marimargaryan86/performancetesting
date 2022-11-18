@@ -172,7 +172,6 @@ def get_schedules() -> list[models_pb2.Schedule]:
 def generate_schedule(identifier: str) -> models_pb2.Schedule:
     return models_pb2.Schedule(
         id=identifier,
-        stops=[generate_stop(stop_id) for stop_id in STOPS],
     )
 
 
@@ -183,12 +182,9 @@ def get_segments() -> list[models_pb2.SegmentReference]:
 def generate_segment_reference(identifier: str) -> models_pb2.SegmentReference:
     return models_pb2.SegmentReference(
         id=identifier,
+        schedule_id=get_schedules()[0].id,
         leg_ids=[leg.id for leg in get_legs()],
     )
-
-
-def generate_stop(stop_id: str) -> models_pb2.Stop:
-    return models_pb2.Stop(id=stop_id)
 
 
 def get_trips() -> list[models_pb2.TripReference]:

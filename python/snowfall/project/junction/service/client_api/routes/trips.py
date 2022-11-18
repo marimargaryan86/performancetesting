@@ -10,6 +10,7 @@ from snowfall.project.junction.adapter import (
     errors,
     locations,
     places,
+    schedules,
     trip_searches,
     trips,
 )
@@ -49,6 +50,7 @@ class TripSegments(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         trips_client: trips.Client = lagom.injectable,
+        schedules_client: schedules.Client = lagom.injectable,
     ) -> responses.Response:
         trip = await trips_client.get(request.path_params["tripId"])
 
@@ -58,12 +60,20 @@ class TripSegments(endpoints.HTTPEndpoint):
             cursor=pagination.cursor,
             limit=pagination.limit,
         )
+        schedule_ids = list({segment.schedule_id for segment in sequence_page.sequence})
+        schedules_map = {
+            schedule.id: schedule
+            for schedule in (
+                await schedules_client.find_by_ids(schedule_ids, len(schedule_ids))
+            ).schedules
+        }
 
         return await messages.create_response(
             body=models.Body(
                 data=[
                     resources.SegmentResource.from_proto(
                         segment=segment,
+                        schedule=schedules_map[segment.schedule_id],
                         request=request,
                     )
                     for segment in sequence_page.sequence

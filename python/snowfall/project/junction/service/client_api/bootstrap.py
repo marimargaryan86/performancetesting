@@ -58,6 +58,7 @@ def create_dependencies(  # noqa: WPS211
         offers_client=offers_client,
         segments_client=segments_client,
         orders_client=orders_client,
+        schedules_client=schedules_client,
     )
 
     return container
