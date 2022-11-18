@@ -13,8 +13,8 @@ import (
 	"time"
 )
 
-const airPrefixSeconds = 5400
-const airSuffixSeconds = 3600
+const airPrefixSeconds = 4500
+const airSuffixSeconds = 2700
 const railPrefixSeconds = 1800
 const railSuffixSeconds = 900
 
