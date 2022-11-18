@@ -183,6 +183,15 @@ def smtp_client() -> smtp.EmailClient:
 
 
 @pytest.fixture
+def notification_tokens_repository(
+    mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
+) -> repository.NotificationTokensRepository:
+    return repository.NotificationTokensRepository(
+        mongo_test_db["notifications"],
+    )
+
+
+@pytest.fixture
 def preferences_repository(
     mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
 ) -> repository.PreferencesRepository:
@@ -345,6 +354,7 @@ def app(  # noqa: WPS211
     loyalty_programs_repository: repository.LoyaltyProgramsRepository,
     preferences_repository: repository.PreferencesRepository,
     vouchers_repository: repository.VouchersRepository,
+    notification_tokens_repository: repository.NotificationTokensRepository,
 ) -> applications.Starlette:
     return _create_app(
         dependencies=bootstrap.create_dependencies(
@@ -361,6 +371,7 @@ def app(  # noqa: WPS211
             loyalty_programs_repository,
             preferences_repository,
             vouchers_repository,
+            notification_tokens_repository,
         ),
         openapi_path=filesystem.resource_path("junction.mobile_api", "openapi.json"),
         custom_middlewares=[

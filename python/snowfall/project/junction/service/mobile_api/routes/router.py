@@ -4,6 +4,7 @@ from starlette import routing
 
 from snowfall.project.junction.service.mobile_api.routes import (  # noqa: WPS235
     loyalty_programs,
+    notification_tokens,
     offers,
     orders,
     payments,
@@ -67,5 +68,15 @@ def get_routes(dependencies: lagom.Container) -> list[routing.Route]:
             "/vouchers/{voucherCode}",
             vouchers.Voucher,
             name="Voucher",
+        ),
+        integration.route(
+            "/push-notifications/tokens",
+            notification_tokens.PushNotificationTokens,
+            name="PushNotificationTokens",
+        ),
+        integration.route(
+            "/push-notifications/tokens/{deviceToken}",
+            notification_tokens.PushNotificationToken,
+            name="PushNotificationToken",
         ),
     ]

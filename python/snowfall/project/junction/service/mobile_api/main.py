@@ -111,6 +111,9 @@ def _factory(
                 vouchers_repository=repository.VouchersRepository(
                     mongo["vouchers"],
                 ),
+                notification_tokens_repository=repository.NotificationTokensRepository(
+                    mongo["notifications"],
+                ),
                 junction_client=junction_client,
                 jwt_gen=jwt_gen,
             ),

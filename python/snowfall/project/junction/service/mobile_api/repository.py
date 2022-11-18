@@ -333,3 +333,51 @@ class VouchersRepository(
             },
             upsert=False,
         )
+
+
+class NotificationTokensRepository(
+    mixins.FindByIdMixin[models_pb2.NotificationToken],
+    mixins.InsertMixin[models_pb2.NotificationToken],
+    repository.ProtoRepository[models_pb2.NotificationToken],
+):
+    _proto = models_pb2.NotificationToken
+    _indexes = [
+        pymongo.IndexModel("user_id", background=True),
+        pymongo.IndexModel("device_token", background=True, unique=True),
+        pymongo.IndexModel("notification_token", background=True, unique=True),
+    ]
+
+    async def delete(self, document_id: str, user_id: str) -> int:
+        delete = await self._execute(
+            self._collection.delete_one,
+            filter={"device_token": document_id, "user_id": user_id},
+        )
+        if not delete.acknowledged:
+            raise RuntimeError()
+        return delete.deleted_count
+
+    async def find_by_user(
+        self,
+        user_id: str,
+    ) -> resultset.ResultSet[models_pb2.NotificationToken]:
+        response = await self._execute(self._collection.find, {"user_id": user_id})
+        response.limit(30)  # noqa: WPS432
+        return response
+
+    async def refresh_token(
+        self,
+        user_id: str,
+        device_token: str,
+        notification_token: str,
+    ) -> pymongo.results.UpdateResult:
+        return await self._execute(
+            self._collection.update_one,
+            {"user_id": user_id, "device_token": device_token},
+            {
+                "$set": {
+                    "notification_token": notification_token,
+                    "updated_at": datetime.datetime.utcnow(),
+                },
+            },
+            upsert=False,
+        )

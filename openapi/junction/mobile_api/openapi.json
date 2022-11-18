@@ -75,6 +75,12 @@
       "tags": [
         "vouchers"
       ]
+    },
+    {
+      "name": "Notifications",
+      "tags": [
+        "notifications"
+      ]
     }
   ],
   "tags": [
@@ -87,6 +93,11 @@
       "name": "loyalty",
       "description": "Endpoints for loyalty programs resource management.",
       "x-displayName": "Loyalty"
+    },
+    {
+      "name": "notifications",
+      "description": "Endpoints for notifications related resource management. For now, only for push notification tokens",
+      "x-displayName": "Notifications"
     },
     {
       "name": "offers",
@@ -165,6 +176,228 @@
                 }
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/push-notifications/tokens": {
+      "post": {
+        "summary": "Create Push Notification Token",
+        "tags": [
+          "notifications"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/PushNotificationToken"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PushNotificationToken"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "operationId": "post-push-notifications-tokens",
+        "description": "Create new notification token"
+      },
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ],
+        "summary": "List user's tokens used for receiving push notifications",
+        "tags": [
+          "notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "items": {
+                            "$ref": "#/components/schemas/PushNotificationToken"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-push-notifications-tokens",
+        "description": "Get all push notification tokens by user"
+      }
+    },
+    "/push-notifications/tokens/{deviceToken}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/deviceToken"
+        }
+      ],
+      "get": {
+        "summary": "Get push notification token by id",
+        "tags": [
+          "notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/PushNotificationToken"
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-push-notifications-tokens-id",
+        "description": "Used to retrieve get push notification token by id."
+      },
+      "patch": {
+        "summary": "Update push notification token by id",
+        "tags": [
+          "notifications"
+        ],
+        "operationId": "patch-push-notifications-tokens-id",
+        "description": "Used to refresh the push notification token for a given device.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/PushNotificationTokenUpdate"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/PushNotificationToken"
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete-push-notifications-tokens-id",
+        "description": "Used to delete get push notification token by id.",
+        "summary": "Delete push notification token by id",
+        "tags": [
+          "notifications"
+        ],
+        "responses": {
+          "204": {
+            "description": "Token deleted successfully"
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
@@ -1531,6 +1764,16 @@
           "example": "ABC12345"
         },
         "description": "Voucher identifier"
+      },
+      "deviceToken": {
+        "name": "deviceToken",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "example": "NEEDS EXAMPLE"
+        },
+        "description": "Push notifications token identifier"
       },
       "tripSearchId": {
         "name": "tripSearchId",
@@ -4919,6 +5162,96 @@
               "customerId": {
                 "type": "string",
                 "example": "NEEDS EXAMPLE",
+                "readOnly": true
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ]
+      },
+      "PushNotificationTokenUpdate": {
+        "title": "Push Notification Token (Update)",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "NEEDS EXAMPLE",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "push-notification-tokens"
+            ],
+            "example": "push-notification-tokens"
+          },
+          "attributes": {
+            "type": "object",
+            "required": [
+              "notificationToken"
+            ],
+            "properties": {
+              "notificationToken": {
+                "type": "string",
+                "example": "NEEDS EXAMPLE",
+                "writeOnly": true
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ]
+      },
+      "PushNotificationToken": {
+        "title": "Push Notification Token",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "NEEDS EXAMPLE",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "push-notification-tokens"
+            ],
+            "example": "push-notification-tokens"
+          },
+          "attributes": {
+            "type": "object",
+            "required": [
+              "deviceToken",
+              "notificationToken",
+              "createdAt"
+            ],
+            "properties": {
+              "notificationToken": {
+                "type": "string",
+                "example": "NEEDS EXAMPLE",
+                "writeOnly": true
+              },
+              "deviceToken": {
+                "type": "string",
+                "example": "NEEDS EXAMPLE"
+              },
+              "createdAt": {
+                "type": "string",
+                "example": "2019-08-24T14:15:22Z",
+                "format": "date-time",
+                "readOnly": true
+              },
+              "updatedAt": {
+                "type": "string",
+                "example": "2019-08-24T14:15:22Z",
+                "format": "date-time",
                 "readOnly": true
               }
             }

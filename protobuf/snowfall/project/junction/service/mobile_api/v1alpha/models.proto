@@ -82,3 +82,12 @@ message Voucher {
   google.protobuf.Timestamp created_at = 7;
   google.protobuf.Timestamp updated_at = 8;
 }
+
+message NotificationToken {
+  string id = 1;
+  string user_id = 2;
+  string notification_token = 3;
+  string device_token = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}

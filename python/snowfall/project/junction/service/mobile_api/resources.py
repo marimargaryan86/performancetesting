@@ -163,6 +163,27 @@ class LoyaltyProgram(models.Resource):
         )
 
 
+class PushNotificationToken(models.Resource):
+    @classmethod
+    def from_proto(
+        cls,
+        token: models_pb2.NotificationToken,
+    ) -> PushNotificationToken:
+        return cls(
+            id=token.notification_token,
+            type="push-notification-tokens",
+            attributes={
+                "deviceToken": token.device_token,
+                "createdAt": protobuf.protobuf_to_datetime(
+                    token.created_at,
+                ),
+                "updatedAt": protobuf.protobuf_to_datetime(
+                    token.updated_at,
+                ),
+            },
+        )
+
+
 class PreferenceResource(models.Resource):
     @classmethod
     def from_dict(

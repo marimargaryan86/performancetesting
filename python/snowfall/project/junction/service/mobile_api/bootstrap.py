@@ -55,6 +55,7 @@ def create_dependencies(  # noqa: WPS211
     loyalty_programs_repository: repository.LoyaltyProgramsRepository,
     preferences_repository: repository.PreferencesRepository,
     vouchers_repository: repository.VouchersRepository,
+    notification_tokens_repository: repository.NotificationTokensRepository,
 ) -> lagom.Container:
     container = lagom.Container()
     container[currencies.CurrencyClient] = currencies_client
@@ -70,4 +71,5 @@ def create_dependencies(  # noqa: WPS211
     container[repository.LoyaltyProgramsRepository] = loyalty_programs_repository
     container[repository.PreferencesRepository] = preferences_repository
     container[repository.VouchersRepository] = vouchers_repository
+    container[repository.NotificationTokensRepository] = notification_tokens_repository
     return container
