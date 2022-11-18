@@ -4,12 +4,19 @@ from snowfall.vendor.ask2go.models import offers
 from snowfall.vendor.ask2go.models.base import CamelCaseBaseModel
 
 
+class InformationError(CamelCaseBaseModel):
+    code: int
+    message: Optional[str]
+
+
 class Information(CamelCaseBaseModel):
     record_locators: Optional[list[str]]
     check_in_locators: Optional[list[str]]
     booking_id: int
     display_booking_id: Optional[str]
     status: str
+    errors: Optional[InformationError]
+    warnings: Optional[str]
 
 
 class ContactDetailsAddress(CamelCaseBaseModel):
