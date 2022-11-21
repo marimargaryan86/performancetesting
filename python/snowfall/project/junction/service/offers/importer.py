@@ -2,6 +2,7 @@ import contextlib
 import datetime
 from typing import Union
 
+import structlog
 from pymongo import errors
 
 from snowfall.project.junction.service.offers import aggregator, offers
@@ -72,6 +73,7 @@ class OfferImporter(object):
         self._consumer = consumer_obj
         self._offers = trip_offers
         self._aggregator = offer_aggregator
+        self._logger = structlog.get_logger(__name__)
         self._redis = redis
         self._status_handler = status_handler
 
@@ -98,6 +100,10 @@ class OfferImporter(object):
             try:
                 await self._aggregator.aggregate(message)
             except aggregator.SkippedOfferError:
+                self._logger.exception(
+                    "An offer arrived too late",
+                    offer_search_id=message.offer_search_id,
+                )
                 return
 
             with contextlib.suppress(errors.DuplicateKeyError):
