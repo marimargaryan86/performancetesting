@@ -85,7 +85,60 @@
                 transform: scale(0.9);
             }
         }
-
+        .lds-ellipsis {
+          display: inline-block;
+          position: relative;
+          width: 80px;
+          height: 12px;
+        }
+        .lds-ellipsis div {
+          position: absolute;
+          width: 13px;
+          height: 13px;
+          border-radius: 50%;
+          background: #000;
+          animation-timing-function: cubic-bezier(0, 1, 1, 0);
+        }
+        .lds-ellipsis div:nth-child(1) {
+          left: 8px;
+          animation: lds-ellipsis1 0.6s infinite;
+        }
+        .lds-ellipsis div:nth-child(2) {
+          left: 8px;
+          animation: lds-ellipsis2 0.6s infinite;
+        }
+        .lds-ellipsis div:nth-child(3) {
+          left: 32px;
+          animation: lds-ellipsis2 0.6s infinite;
+        }
+        .lds-ellipsis div:nth-child(4) {
+          left: 56px;
+          animation: lds-ellipsis3 0.6s infinite;
+        }
+        @keyframes lds-ellipsis1 {
+          0% {
+            transform: scale(0);
+          }
+          100% {
+            transform: scale(1);
+          }
+        }
+        @keyframes lds-ellipsis3 {
+          0% {
+            transform: scale(1);
+          }
+          100% {
+            transform: scale(0);
+          }
+        }
+        @keyframes lds-ellipsis2 {
+          0% {
+            transform: translate(0, 0);
+          }
+          100% {
+            transform: translate(24px, 0);
+          }
+        }
     </style>
 </head>
 <body>
@@ -109,6 +162,14 @@
                         <input class="form-control" id="departure-at" type="datetime-local">
                         <label for="departure-at">Departure At (origin time)</label>
                     </div>
+                    <div class="mb-3 form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="show-maps">
+                        <label class="form-check-label" for="show-maps">Show Maps</label>
+                    </div>
+                    <div class="mb-3 form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="search-offers">
+                        <label class="form-check-label" for="search-offers">Search Offers</label>
+                    </div>
                     <div class="mb-3">
                         <button type="submit" class="btn btn-primary mb-3">Search</button>
                     </div>
@@ -128,13 +189,42 @@
   dayjs.extend(window.dayjs_plugin_utc);
   dayjs.extend(window.dayjs_plugin_timezone);
 
+  function makeid(length) {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+  }
+
   let db;
+  const sessionToken = makeid(32);
   const icons = {
       "road": "car", // Unspecified
       "air": "plane", // Air
       "rail": "train", // Rail
       "foot": "walking", // Walk
   }
+
+  const greenIcon = new L.Icon({
+      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41]
+  });
+  const redIcon = new L.Icon({
+      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41]
+  });
+
 
 
   function clear_places() {
@@ -330,6 +420,8 @@
   function inject_trips(response) {
     hide_loader();
 
+    const showMaps = document.getElementById('show-maps').checked;
+    const searchOffers = document.getElementById('search-offers').checked;
     const container = document.getElementById('result');
 
     if (response.data.length == 0) {
@@ -460,8 +552,14 @@
 
       header.append(subtext)
 
-      const tripIdText = document.createElement('p');
-      tripIdText.innerHTML = "<strong>Trip ID:</strong> " + trip.id;
+      const infoList = document.createElement('dl');
+      infoList.className = "row";
+      infoList.innerHTML = '<dt class="col-sm-2">Trip ID</dt><dd class="col-sm-10">'+trip.id+'</dd>';
+
+      if (searchOffers) {
+        infoList.innerHTML += '<dt class="col-sm-2">Offers</dt><dd class="col-sm-10" id="offers-' + trip.id + '"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></dd>';
+        search_offers(trip.id);
+      }
 
       let badges = document.createElement("p")
 
@@ -521,26 +619,8 @@
       }
 
       container.append(header)
-      container.append(tripIdText)
       container.append(badges)
-
-      let map = document.createElement('div');
-      map.id = 'map' + i
-      map.className = 'map col-sm'
-
-      container.append(map)
-
-      var mapItem = L.map('map' + i);
-
-      L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-          attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-          maxZoom: 18,
-          id: 'mapbox/streets-v11',
-          tileSize: 512,
-          zoomOffset: -1,
-          accessToken: 'pk.eyJ1IjoianlnZ2VuIiwiYSI6ImNrdDZmaGVsbDBodDMyd283dG9ucjdmejQifQ.4JXvYcrRq1FmBj3LqW5zDg'
-      }).addTo(mapItem);
-
+      container.append(infoList)
 
       let description = document.createElement('table');
       description.id = 'description' + i
@@ -553,7 +633,7 @@
       row.append(cell);
 
       cell = document.createElement('th')
-      cell.textContent = 'Trip'
+      cell.textContent = 'Name'
       row.append(cell);
 
       cell = document.createElement('th')
@@ -576,26 +656,11 @@
       description.append(head)
 
       let body = document.createElement('tbody')
-      let latlngs = Array();
-      var greenIcon = new L.Icon({
-          iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-          iconSize: [25, 41],
-          iconAnchor: [12, 41],
-          popupAnchor: [1, -34],
-          shadowSize: [41, 41]
-      });
-      var redIcon = new L.Icon({
-          iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-          iconSize: [25, 41],
-          iconAnchor: [12, 41],
-          popupAnchor: [1, -34],
-          shadowSize: [41, 41]
-      });
+      let latlngs = [];
+      let markers = [];
 
       let marker = L.marker([trip.relationships.segments.data[0].relationships.legs.data[0].attributes.origin.latitude, trip.relationships.segments.data[0].relationships.legs.data[0].attributes.origin.longitude], {icon: greenIcon})
-      marker.addTo(mapItem);
+      markers.push(marker);
       latlngs.push(marker.getLatLng());
 
       trip.relationships.segments.data.forEach(function (segment, k) {
@@ -647,7 +712,7 @@
               marker = L.marker([segment.relationships.legs.data[segment.relationships.legs.data.length-1].attributes.destination.latitude, segment.relationships.legs.data[segment.relationships.legs.data.length-1].attributes.destination.longitude])
           }
 
-          marker.addTo(mapItem);
+          markers.push(marker);
 
           segment.relationships.legs.data.forEach(function (leg, k) {
             if (k != segment.relationships.legs.data.length-1) {
@@ -661,11 +726,34 @@
           latlngs.push(marker.getLatLng());
       })
 
-      let polyline = L.polyline(latlngs, {color: 'blue'}).addTo(mapItem);
+      if (showMaps) {
+        let map = document.createElement('div');
+        map.id = 'map' + i
+        map.className = 'map col-sm'
+        container.append(map);
+
+        var mapItem = L.map('map' + i);
+
+        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            maxZoom: 18,
+            id: 'mapbox/streets-v11',
+            tileSize: 512,
+            zoomOffset: -1,
+            accessToken: 'pk.eyJ1IjoianlnZ2VuIiwiYSI6ImNrdDZmaGVsbDBodDMyd283dG9ucjdmejQifQ.4JXvYcrRq1FmBj3LqW5zDg'
+        }).addTo(mapItem);
+
+        for (const marker of markers) {
+          marker.addTo(mapItem);
+        }
+
+        let polyline = L.polyline(latlngs, {color: 'blue'}).addTo(mapItem);
+        mapItem.fitBounds(polyline.getBounds());
+      }
+
       description.append(body)
       container.append(description)
 
-      mapItem.fitBounds(polyline.getBounds());
     }
   }
 
@@ -691,7 +779,35 @@
     });
   }
 
-  function load_trips(id, polled_since) {
+  function inject_offers(response, tripId) {
+    const status = document.getElementById('offers-' + tripId)
+
+    if (response.data.length > 0) {
+      status.innerHTML = '<i class="fas fa-check"></i>';
+    } else {
+      status.innerHTML = '<i class="fas fa-times-circle"></i>';
+    }
+  }
+
+  function load_offers(id, tripId) {
+    fetch("/offers/searches/" + id)
+    .then(res => res.json())
+    .then(response => {
+      if (response.data.attributes.status == "completed" || response.data.attributes.status == "failed") {
+        fetch("/offers/searches/" + id + "/offers")
+        .then(res => res.json())
+        .then(response => {
+          inject_offers(response, tripId);
+        })
+      } else {
+        setTimeout(() => {
+          load_offers(id, tripId);
+        }, "5000");
+      }
+    });
+  }
+
+  function load_trips(id) {
     fetch("/trips/searches/" + id)
     .then(res => res.json())
     .then(response => {
@@ -707,6 +823,44 @@
         }, "2000");
       }
     });
+  }
+
+  function search_offers(tripId) {
+      setTimeout(() => {
+          fetch('/offers/searches', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/vnd.api+json',
+        },
+        body: JSON.stringify({
+          data: {
+            type: 'trip-offer-searches',
+            attributes: {
+              sessionToken: sessionToken,
+              passengers: [
+                {
+                  dateOfBirth: "1990-10-25"
+                }
+              ]
+            },
+            relationships: {
+              trips: {
+                data: [
+                  {
+                    id: tripId,
+                    type: 'trips'
+                  }
+                ]
+              }
+            }
+          }
+        }),
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        load_offers(data.data.id, tripId);
+      });
+      }, Math.floor(Math.random() * 10000));
   }
 
   window.onload = () => {
@@ -776,7 +930,7 @@
           })
           .then((response) => response.json())
           .then((data) => {
-            load_trips(data.data.id, new Date());
+            load_trips(data.data.id);
           });
         };
     };
