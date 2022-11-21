@@ -5,10 +5,12 @@ from typing import Any
 
 import pytest
 
-from snowfall.project.junction.api_automation.segments_test import (
+from snowfall.project.junction.api_automation.backend_api_tests.segments_test import (
     return_segment_id_from_trip_search_id,
 )
-from snowfall.project.junction.api_automation.trip_test import return_trip_search_id
+from snowfall.project.junction.api_automation.backend_api_tests.trip_test import (
+    return_trip_search_id,
+)
 from snowfall.vendor.junction.client import JunctionClient
 
 logging.basicConfig()
@@ -48,9 +50,8 @@ async def test_get_leg_types(
 ) -> None:
     response = await client.legs().get_legs_types()
     logging.info("get_legs_types: %s", json.dumps(response, indent=4))
-    assert response["data"][0]["id"] == "unspecified"
-    assert response["data"][1]["id"] == "air"
-    assert response["data"][2]["id"] == "rail"
+    leg_types = {leg_type["id"] for leg_type in response["data"]}
+    assert leg_types == {"unspecified", "ferry", "air", "rail"}
 
 
 @pytest.mark.integration

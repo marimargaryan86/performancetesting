@@ -22,17 +22,28 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption("--HOST", action="store", help="prod dev or any other host")
 
 
-@pytest.fixture(scope="session")
-def _local_config() -> Mapping[str, str]:
-    json_file_name = os.path.expanduser("~/test_config.json")
+@pytest.fixture(scope="package")
+def _local_config(
+    request: pytest.FixtureRequest,
+) -> Mapping[str, str]:
+    config_file_name = request.path.parent.name
+    json_file_name = os.path.expanduser("~/{0}.json".format(config_file_name))
     if not os.path.exists(json_file_name):
         return {}
-    logging.info("Reading of local configuration...")
+    logging.debug("Reading of local config from {0}.json ...", config_file_name)
     with open(json_file_name) as json_file:
-        return json.load(json_file)
+        config = json.load(json_file)
+        malformed_keys = [
+            key
+            for key in config
+            if any(not (char.isupper() or char == "_") for char in key)
+        ]
+        if malformed_keys:
+            raise ValueError("Bad config keys: {0}".format(malformed_keys))
+        return config
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="package")
 def api_token(
     _local_config: Mapping[str, str],
     request: pytest.FixtureRequest,
@@ -40,7 +51,7 @@ def api_token(
     return request.config.getoption("API_TOKEN") or _local_config.get("API_TOKEN") or ""
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="package")
 def departure_after(request: pytest.FixtureRequest) -> str:
     tomorrow = datetime.date.today() + datetime.timedelta(days=1)
     return request.config.getoption("DEPARTURE_AFTER") or tomorrow.strftime(
@@ -48,7 +59,7 @@ def departure_after(request: pytest.FixtureRequest) -> str:
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="package")
 def origin(
     _local_config: Mapping[str, str],
     request: pytest.FixtureRequest,
@@ -56,7 +67,7 @@ def origin(
     return request.config.getoption("ORIGIN") or _local_config.get("ORIGIN") or ""
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="package")
 def destination(
     _local_config: Mapping[str, str],
     request: pytest.FixtureRequest,
@@ -70,17 +81,23 @@ def destination(
     )
 
 
-@pytest.fixture(scope="session")
-def protocol(request: pytest.FixtureRequest) -> str:
-    return request.config.getoption("PROTOCOL")
+@pytest.fixture(scope="package")
+def protocol(
+    request: pytest.FixtureRequest,
+    _local_config: Mapping[str, str],
+) -> str:
+    return request.config.getoption("PROTOCOL") or _local_config.get("PROTOCOL") or ""
 
 
-@pytest.fixture(scope="session")
-def host(request: pytest.FixtureRequest) -> str:
-    return request.config.getoption("HOST")
+@pytest.fixture(scope="package")
+def host(
+    request: pytest.FixtureRequest,
+    _local_config: Mapping[str, str],
+) -> str:
+    return request.config.getoption("HOST") or _local_config.get("HOST") or ""
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="package")
 def headers(api_token: str) -> dict[str, str]:
     return {
         "Content-Type": "application/vnd.api+json",

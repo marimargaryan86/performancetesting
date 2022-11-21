@@ -3,7 +3,7 @@ import time
 
 import pytest
 
-from snowfall.project.junction.api_automation.offers01_test import (
+from snowfall.project.junction.api_automation.backend_api_tests.offers01_test import (
     return_offer_group_details,
     return_offer_group_ids_and_offer_searches_id,
     return_trip_search_id,
@@ -15,37 +15,19 @@ logging.getLogger().setLevel(logging.INFO)
 
 
 @pytest.mark.integration
-async def test_get_offer_group_details(
+async def test_get_offer_group_details_by_offer_group_id(
     client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
-    offer_group_details_ids = await return_offer_group_details_ids(
-        client,
-        departure_after,
-        destination,
-        origin,
-    )
-
-    for offer_group_details_id in offer_group_details_ids:
-        response = await client.get_offer_group_details(offer_group_details_id)
-        logging.info("get_offer_group_details: %s", response)
-        assert response is not None
-
-
-async def return_offer_group_details_ids(
-    client: JunctionClient,
-    departure_after: str,
-    destination: str,
-    origin: str,
-) -> list[str]:
     trips_search_id = await return_trip_search_id(
         client,
         departure_after,
         destination,
         origin,
     )
+
     (
         offer_searches_id,
         offer_group_ids,
@@ -53,8 +35,15 @@ async def return_offer_group_details_ids(
         client,
         trips_search_id,
     )
+
+    assert offer_searches_id is not None, "offer_searches_id should not be empty"
+    assert offer_group_ids is not None, "offer_group_ids should not be empty"
     time.sleep(20)
-    return await return_offer_group_details(
+
+    offer_group_details_ids = await return_offer_group_details(
         client,
         offer_group_ids,
     )
+    assert (
+        offer_group_details_ids is not None
+    ), "offer_group_details_ids should not be empty"

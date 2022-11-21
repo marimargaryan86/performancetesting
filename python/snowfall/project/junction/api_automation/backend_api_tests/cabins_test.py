@@ -15,11 +15,8 @@ async def test_list_cabin_classes(
 ) -> None:
     response = await client.list_cabin_classes()
     logging.info("list_cabin_classes: %s", json.dumps(response, indent=4))
-    assert response["data"][0]["id"] == "unspecified"
-    assert response["data"][1]["id"] == "economy"
-    assert response["data"][2]["id"] == "premium"
-    assert response["data"][3]["id"] == "business"
-    assert response["data"][4]["id"] == "first"
+    classes = {cabin["id"] for cabin in response["data"]}
+    assert classes == {"unspecified", "economy", "premium", "business", "first"}
 
 
 @pytest.mark.integration

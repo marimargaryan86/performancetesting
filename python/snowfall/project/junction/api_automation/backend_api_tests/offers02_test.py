@@ -1,9 +1,9 @@
 import logging
-from typing import Sequence
 
 import pytest
 
-from snowfall.project.junction.api_automation.offers01_test import (
+from snowfall.project.junction.api_automation.backend_api_tests.offers01_test import (
+    return_offer_options_details_ids,
     return_offer_options_ids_from_offer_searches,
     return_offer_searches_id_and_offer_group_ids,
     return_trip_offer_search_ids,
@@ -15,44 +15,37 @@ logging.getLogger().setLevel(logging.INFO)
 
 
 @pytest.mark.integration
-async def test_get_offer_options_by_offer_option_id(
+async def test_get_offer_option_details_by_offer_option_id(
     client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
-    offer_options_ids = await return_offer_options_ids(
-        client,
-        departure_after,
-        destination,
-        origin,
-    )
-
-    for offer_options_id in offer_options_ids:
-        response = await client.get_offer_options_by_offer_option_id(offer_options_id)
-        logging.info("get_offer_options_by_offer_option_id: %s", response)
-        assert response is not None, "offer_options_ids should not be empty"
-
-
-async def return_offer_options_ids(
-    client: JunctionClient,
-    departure_after: str,
-    destination: str,
-    origin: str,
-) -> Sequence[str]:
     trips_offer_search_ids = await return_trip_offer_search_ids(
         client,
         departure_after,
         destination,
         origin,
     )
+
     offer_searches_id_and_offer_group_ids = (
         await return_offer_searches_id_and_offer_group_ids(
             client,
             trips_offer_search_ids,
         )
     )
-    return await return_offer_options_ids_from_offer_searches(
+
+    offer_options_ids = await return_offer_options_ids_from_offer_searches(
         client,
         offer_searches_id_and_offer_group_ids,
     )
+    assert offer_options_ids is not None, "offer_options_ids should not be empty"
+
+    offer_options_details_ids = await return_offer_options_details_ids(
+        client,
+        offer_options_ids,
+    )
+
+    assert (
+        offer_options_details_ids is not None
+    ), "offer_options_details_ids should not be empty"

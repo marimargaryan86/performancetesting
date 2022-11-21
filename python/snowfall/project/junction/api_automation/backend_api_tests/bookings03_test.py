@@ -4,7 +4,7 @@ from typing import Sequence
 
 import pytest
 
-from snowfall.project.junction.api_automation.bookings01_test import (
+from snowfall.project.junction.api_automation.backend_api_tests.bookings01_test import (
     return_some_order_ids,
 )
 from snowfall.vendor.junction.client import JunctionClient

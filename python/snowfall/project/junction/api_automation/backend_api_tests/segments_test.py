@@ -4,10 +4,12 @@ import time
 
 import pytest
 
+from snowfall.project.junction.api_automation.backend_api_tests.trip_test import (
+    return_trip_search_id,
+)
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
     is_valid_uuid,
 )
-from snowfall.project.junction.api_automation.trip_test import return_trip_search_id
 from snowfall.vendor.junction.client import JunctionClient
 
 logging.basicConfig()

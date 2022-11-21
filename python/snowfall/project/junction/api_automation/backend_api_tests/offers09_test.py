@@ -2,7 +2,7 @@ import logging
 
 import pytest
 
-from snowfall.project.junction.api_automation.offers01_test import (
+from snowfall.project.junction.api_automation.backend_api_tests.offers01_test import (
     return_offer_options_ids_from_offer_searches,
     return_offer_searches_id_and_offer_group_ids,
     return_trip_offer_search_ids,

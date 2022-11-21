@@ -2,7 +2,7 @@ import logging
 
 import pytest
 
-from snowfall.project.junction.api_automation.legs_test import (
+from snowfall.project.junction.api_automation.backend_api_tests.legs_test import (
     return_get_segment_by_id_response,
 )
 from snowfall.vendor.junction.client import JunctionClient

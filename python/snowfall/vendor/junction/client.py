@@ -74,6 +74,12 @@ class _BaseClient(object):
             ),
         )
 
+    def __repr__(self) -> str:
+        return "{cls}({url}".format(
+            cls=self.__class__.__name__,
+            url=self._api_url,
+        )
+
     async def _make_request(
         self,
         method: str,
