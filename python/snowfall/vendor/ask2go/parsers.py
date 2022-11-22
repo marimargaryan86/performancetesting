@@ -72,11 +72,11 @@ def _parse_traveler_document(
     return (
         {
             "nationality": traveler_document.nationality,
-            "travelerDocument": {
+            "travellerDocument": {
                 "documentType": traveler_document.document_type.value,
                 "documentNumber": traveler_document.document_number,
                 "documentIssueCountry": traveler_document.document_issue_country,
-                "documentExpDate": traveler_document.document_exp_date.isoformat(),
+                "documentExpirationDate": traveler_document.document_exp_date.isoformat(),
             },
         }
         if traveler_document
