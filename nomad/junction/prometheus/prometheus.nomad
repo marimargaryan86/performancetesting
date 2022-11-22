@@ -64,7 +64,10 @@ EOH
       config {
         image = "prom/prometheus:latest"
         ports = ["prometheus_ui"]
-        args  = ["--config.file=${NOMAD_TASK_DIR}/prometheus.yml"]
+        args = [
+          "--config.file=${NOMAD_TASK_DIR}/prometheus.yml",
+          "--storage.tsdb.retention.time=2d"
+        ]
       }
 
       service {
