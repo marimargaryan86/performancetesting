@@ -1,3 +1,2 @@
 traefik_host_URL   = "superapp.junction.travel"
-junction_api_URL = "https://api.junction.travel"
 traefik_entrypoints="web"

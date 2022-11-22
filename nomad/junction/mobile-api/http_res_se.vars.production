@@ -1,3 +1,2 @@
 traefik_host_URL   = "res-se-mobile-api.junction.travel"
-junction_api_URL = "https://api.junction.travel"
 traefik_entrypoints="web"

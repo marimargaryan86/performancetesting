@@ -1,3 +1,2 @@
 traefik_host_URL   = "superapp.junction.dev"
-junction_api_URL = "https://api.junction.dev"
 traefik_entrypoints="websecure"

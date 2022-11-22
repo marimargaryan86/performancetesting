@@ -30,10 +30,6 @@ variable "traefik_host_URL" {
   type = string
 }
 
-variable "junction_api_URL" {
-  type = string
-}
-
 job "mobile-api-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -81,6 +77,10 @@ job "mobile-api-http" {
               local_bind_port  = 8020
               destination_name = "currencies-${var.environment}"
             }
+            upstreams {
+              local_bind_port  = 8070
+              destination_name = "client-api-${var.environment}"
+            }
           }
         }
       }
@@ -122,6 +122,7 @@ job "mobile-api-http" {
         change_mode = "restart"
         data        = <<EOH
 CURRENCIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_currencies-${var.environment}"))}}
+JUNCTION_API_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_client-api-${var.environment}"))}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
@@ -158,7 +159,6 @@ EOH
         HTTP_ADDRESS                    = "0.0.0.0"
         HTTP_PORT                       = "${NOMAD_PORT_http}"
         JWT_TOKEN_VERSION               = "1.0.0"
-        JUNCTION_API_ADDRESS            = "${var.junction_api_URL}"
         SENTRY_DSN                      = "https://6166193e2bc24153b87e9bfca3d510d4@sentry.snowfall.se/38"
         PROMETHEUS_PORT                 = "${NOMAD_PORT_prometheus}"
         MONGO_DB                        = "mobile-api"
