@@ -64,6 +64,11 @@ class PlacesRepository(
     repository.ProtoRepository[models_pb2.Place],
 ):
     _proto = models_pb2.Place
+    _indexes = [
+        pymongo.IndexModel("name", background=True),
+        pymongo.IndexModel("country_name", background=True),
+        pymongo.IndexModel("iata_code", background=True),
+    ]
 
     async def match(
         self,
