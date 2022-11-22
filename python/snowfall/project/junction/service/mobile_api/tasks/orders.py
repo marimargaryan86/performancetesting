@@ -150,5 +150,10 @@ def order_details_by_date(
         for segment in details
         for leg in segment["legs"]
     ]
-    ordered_details.sort(key=lambda leg: leg["departureAt"])
+    ordered_details.sort(
+        key=lambda leg: datetime.datetime.strptime(
+            leg["departureAt"],
+            "%A %d %b %Y %H:%M",
+        ),
+    )
     return ordered_details
