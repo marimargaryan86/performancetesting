@@ -1,14 +1,21 @@
 import datetime
+import logging
 import os
 
 import pytest
 
-from snowfall.vendor.distribusion import client
+from snowfall.vendor.distribusion import client, enums
+from snowfall.vendor.distribusion.models.connections import (
+    Connection,
+    ConnectionVacancy,
+)
 from snowfall.vendor.distribusion.models.criterias import (
     ConnectedStationsCriteria,
     ConnectionSeats,
     ConnectionVacancyCriteria,
+    CreateOrder,
     FindConnectionsCriteria,
+    Passenger,
 )
 
 disable_by_default = pytest.mark.skipif(
@@ -34,6 +41,18 @@ async def test_get_carriers_by_id(
         marketing_carrier_id,
     )
     assert carrier is not None
+
+
+@disable_by_default
+@pytest.mark.asyncio
+async def test_get_carrier_booking_schema(
+    distribusion_client: client.DistribusionClient,
+) -> None:
+    marketing_carrier_id = "VICA"
+    booking_schema = await distribusion_client.get_marketing_carrier_booking_schema(
+        marketing_carrier_id,
+    )
+    assert booking_schema
 
 
 @disable_by_default
@@ -72,7 +91,7 @@ async def test_connections_find(
         FindConnectionsCriteria(
             departure_stations=["DEBERCBS"],
             arrival_stations=["FRPARPGB"],
-            departure_date=datetime.date.today() + datetime.timedelta(days=20),
+            departure_date=datetime.date.today() + datetime.timedelta(days=10),
             pax=1,
             locale="en",
             currency="EUR",
@@ -157,3 +176,97 @@ async def test_get_booking_by_id(
     booking_id = "28wfnEhKzGEWqZ02ykHtdw"
     booking_details = await distribusion_client.get_booking_by_id(booking_id)
     assert booking_details
+
+
+async def test_order_create(  # noqa: WPS210
+    distribusion_client: client.DistribusionClient,
+) -> None:
+    departure_station = "DEBERCBS"
+    arrival_station = "FRPARPGB"
+
+    connections = await distribusion_client.find_connections(
+        FindConnectionsCriteria(
+            departure_stations=[departure_station],
+            arrival_stations=[arrival_station],
+            departure_date=datetime.date.today() + datetime.timedelta(days=10),
+            pax=1,
+            locale="en",
+            currency="EUR",
+        ),
+    )
+
+    assert connections
+    connection: Connection = connections[0]
+    marketing_carrier_code = (
+        connection.marketing_carrier.identifier if connection.marketing_carrier else ""
+    )
+    departure_time = datetime.datetime.fromisoformat(connection.departure_time or "")
+    arrival_time = datetime.datetime.fromisoformat(connection.arrival_time or "")
+
+    connection_vacancy_criteria = ConnectionVacancyCriteria(
+        marketing_carrier=marketing_carrier_code,
+        departure_station=departure_station,
+        arrival_station=arrival_station,
+        departure_time=departure_time,
+        arrival_time=arrival_time,
+        pax=[1],
+        passenger_type=["PNOS"],
+        locale="en",
+        currency="EUR",
+    )
+
+    vacancy: ConnectionVacancy = await distribusion_client.get_connection_vacancy(
+        connection_vacancy_criteria,
+    )
+
+    assert vacancy and vacancy.vacant
+
+    order_create_request = CreateOrder(
+        marketing_carrier=marketing_carrier_code,
+        departure_station=departure_station,
+        arrival_station=arrival_station,
+        departure_time=departure_time.isoformat(timespec="minutes"),
+        arrival_time=arrival_time.isoformat(timespec="minutes"),
+        title="mr",
+        first_name="Snowfall",
+        last_name="Traveller",
+        email="andriy.n@snowfalltravel.com",
+        phone="4877777777777",
+        city="Montreal",
+        zip_code="H9G 1B3",
+        street_and_number="5 Street",
+        execute_payment=True,
+        payment_method=enums.PaymentMethod.demand_note,
+        total_price=connection.cheapest_total_adult_price or 0,
+        pax=1,
+        terms_accepted=True,
+        locale="en",
+        currency="EUR",
+        send_customer_email=False,
+        fare_class=connection.cheapest_fare_class_code or "",
+        passengers=[
+            Passenger(
+                first_name="Snowfall",
+                last_name="Traveller",
+                passenger_type="PNOS",
+            ),
+        ],
+    )
+
+    order = await distribusion_client.create_order(order_create_request)
+    assert order
+    logging.info("Order ID: %s", order.identifier)
+
+    order_details = await distribusion_client.get_order(order.identifier)
+    assert order_details
+    logging.info("Order state: %s", order_details.state)
+
+
+@disable_by_default
+@pytest.mark.asyncio
+async def test_get_order_by_id(
+    distribusion_client: client.DistribusionClient,
+) -> None:
+    order_id = "VICA-66bbc46a-7bfd-4c5b-bcdd-d984ff247f0b"
+    order_details = await distribusion_client.get_order(order_id)
+    assert order_details

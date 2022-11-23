@@ -88,3 +88,9 @@ class MarketingCarrierDetails(DistribusionBaseModel):
     fare_classes: Optional[List[FareClass]] = None
     passenger_types: Optional[List[PassengerType]] = None
     vehicle_types: Optional[List[VehicleType]] = None
+
+
+class BookingSchema(DistribusionBaseModel):
+    identifier: str = pydantic.Field(..., alias="id")
+    mandatory: Optional[List[str]] = None
+    optional: Optional[List[str]] = None

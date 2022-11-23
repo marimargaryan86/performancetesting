@@ -75,6 +75,21 @@ class DistribusionClient(object):  # noqa: WPS214
             **jsonapi_helpers.flatten_object(response.json()),
         )
 
+    async def get_marketing_carrier_booking_schema(
+        self,
+        marketing_carrier_id: str,
+    ) -> marketing_carriers.BookingSchema:
+        response = await self._make_request(
+            "GET",
+            "/marketing_carriers/{marketing_carrier_id}/booking/schema".format(
+                marketing_carrier_id=marketing_carrier_id,
+            ),
+        )
+
+        return marketing_carriers.BookingSchema(
+            **jsonapi_helpers.flatten_object(response.json()),
+        )
+
     async def get_stations(self) -> list[stations.Station]:
         response = await self._make_request(
             "GET",
