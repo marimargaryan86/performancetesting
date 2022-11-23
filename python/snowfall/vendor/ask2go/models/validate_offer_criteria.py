@@ -32,11 +32,13 @@ class SegmentCriteria(CamelCaseBaseModel):
 
 
 class ValidateOfferCriteria(CamelCaseBaseModel):
+    search_id: str
+    itinerary_id: str
     transaction_id: str
     client_ip: Optional[str]
     currency: str
-    flight_segments: list[SegmentCriteria]
-    passengers: list[PassengerCriteria]
+    flight_segments: Optional[list[SegmentCriteria]]
+    passengers: Optional[list[PassengerCriteria]]
     ancillaries: Optional[list[AncillaryCriteria]]
 
 

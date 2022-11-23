@@ -155,7 +155,6 @@ class Ask2GoAdapter(object):  # noqa: WPS214
                     validate_identifiers = await self._get_offer_validate(
                         identifiers,
                         offer,
-                        criteria,
                     )
                     branded_offer = await self._get_branded_offer(validate_identifiers)
                     mapped_brand_price = await self._get_mapped_brand_price(
@@ -263,61 +262,15 @@ class Ask2GoAdapter(object):  # noqa: WPS214
         self,
         identifiers: search.CreateSearchResponse,
         offer: offers.Offer,
-        criteria: amqp_pb2.Criteria,
     ) -> validate_offer_criteria.ValidateOfferResponse:
         return await self._client.validate_offer(
             criteria=validate_offer_criteria.ValidateOfferCriteria(
+                search_id=identifiers.id,
+                itinerary_id=cast(str, offer.id),
                 transaction_id=identifiers.transaction_id,
                 currency="EUR",
-                flight_segments=[
-                    validate_offer_criteria.SegmentCriteria(
-                        trip_number=trip_index,
-                        segment_number=segment_index,
-                        flight_number=segment.aircraft.flight_number,
-                        departure_date=segment.departure.date_time,
-                        arrival_date=segment.arrival.date_time,
-                        origin_iata=segment.origin.airport_code,
-                        destination_iata=segment.destination.airport_code,
-                        marketing_airline=segment.marketing_carrier.code,
-                        operating_airline=segment.operating_carrier.code,
-                        equipment=segment.aircraft.equipment,
-                    )
-                    for trip_index, trip in enumerate(offer.trips)
-                    for segment_index, segment in enumerate(trip.segments)
-                ],
-                passengers=self._get_offer_validate_passengers(criteria),
             ),
         )
-
-    def _get_offer_validate_passengers(
-        self,
-        criteria: amqp_pb2.Criteria,
-    ) -> list[validate_offer_criteria.PassengerCriteria]:
-        passengers = []
-
-        if criteria.adults:
-            passengers.append(
-                validate_offer_criteria.PassengerCriteria(
-                    code=enums.PassengerType.adult,
-                    count=criteria.adults,
-                ),
-            )
-        if criteria.children:
-            passengers.append(
-                validate_offer_criteria.PassengerCriteria(
-                    code=enums.PassengerType.child,
-                    count=criteria.children,
-                ),
-            )
-        if criteria.infants:
-            passengers.append(
-                validate_offer_criteria.PassengerCriteria(
-                    code=enums.PassengerType.infant,
-                    count=criteria.infants,
-                ),
-            )
-
-        return passengers
 
     @tenacity.retry(
         stop=tenacity.stop_after_attempt(10),

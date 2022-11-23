@@ -153,29 +153,11 @@ def parse_validated_offer_criteria(
     criteria: validate_offer_criteria.ValidateOfferCriteria,
 ) -> dict[str, Any]:
     return {
+        "searchId": criteria.search_id,
+        "itineraryId": criteria.itinerary_id,
         "transactionId": criteria.transaction_id,
         "clientIp": criteria.client_ip,
         "currency": criteria.currency,
-        "flightSegments": [
-            {
-                "tripNumber": segment.trip_number,
-                "segmentNumber": segment.segment_number,
-                "flightNumber": segment.flight_number,
-                "departureDate": segment.departure_date.isoformat(),
-                "arrivalDate": segment.arrival_date.isoformat(),
-                "origin": segment.origin_iata,
-                "destination": segment.destination_iata,
-                "marketingAirline": segment.marketing_airline,
-                "operatingAirline": segment.operating_airline,
-                "equipment": segment.equipment,
-                "resBookDesigCode": segment.res_book_desig_code,
-            }
-            for segment in criteria.flight_segments
-        ],
-        "passengers": [
-            {"code": passenger.code.value, "count": passenger.count}
-            for passenger in criteria.passengers
-        ],
         "ancillaries": [
             {"code": ancillary.code, "numberOfItems": ancillary.number_of_items}
             for ancillary in criteria.ancillaries
