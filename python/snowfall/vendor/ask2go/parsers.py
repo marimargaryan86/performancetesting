@@ -2,6 +2,7 @@ import datetime
 from typing import Any, Optional, Sequence
 
 import more_itertools
+import unidecode
 
 from snowfall.vendor.ask2go.models import common, search, validate_offer_criteria
 
@@ -95,8 +96,8 @@ def parse_create_booking_request(
         "pricingId": pricing_id,
         "transactionId": transaction_id,
         "contactDetails": {
-            "firstName": first_passenger.first_name,
-            "lastName": first_passenger.last_name,
+            "firstName": unidecode.unidecode(first_passenger.first_name),
+            "lastName": unidecode.unidecode(first_passenger.last_name),
             "title": first_passenger.name_title,
             "address": {
                 "street": contact.address,
@@ -111,8 +112,8 @@ def parse_create_booking_request(
         "travelerDetails": [
             {
                 "travelerId": 0,
-                "firstName": passenger.first_name,
-                "lastName": passenger.last_name,
+                "firstName": unidecode.unidecode(passenger.first_name),
+                "lastName": unidecode.unidecode(passenger.last_name),
                 "title": passenger.name_title,
                 "dateOfBirth": passenger.birth_date.strftime("%d-%m-%Y"),
                 "gender": passenger.gender.value,
