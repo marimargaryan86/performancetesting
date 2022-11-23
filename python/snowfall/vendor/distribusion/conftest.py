@@ -6,19 +6,24 @@ from bson import json_util
 
 from snowfall.stdlib.persistence import filesystem
 from snowfall.vendor.distribusion import client
+from snowfall.vendor.distribusion.httpx_logger import with_logging
 
 TIMEOUT = 50.0
-
 API_BASE_URL = "https://api.demo.distribusion.com"
 
 
 @pytest.fixture
-def distribusion_client() -> client.DistribusionClient:
+def http_client() -> httpx.AsyncClient:
+    return with_logging(httpx.AsyncClient(timeout=TIMEOUT))
+
+
+@pytest.fixture
+def distribusion_client(http_client: httpx.AsyncClient) -> client.DistribusionClient:
     return client.DistribusionClient(
         api_base_url=API_BASE_URL,
         api_key="MkQQ6J6BO2ooqwZYpM6fUmDu6rGwWXP1obaQuITo",
         retailer_partner_number="431926",
-        http_client=httpx.AsyncClient(timeout=TIMEOUT),
+        http_client=http_client,
     )
 
 
