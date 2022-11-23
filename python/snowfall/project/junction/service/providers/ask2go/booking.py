@@ -138,13 +138,14 @@ class BookingHandler(object):
                 email=contact_details.email,
             ),
         )
+        self._validate_booking_is_pending(booking_result)
 
         await self._client.update_booking_billing_address(
             booking_ref_id=booking_result.id,
             transaction_id=booking_result.transaction_id,
         )
         booking_result = await self._poll_booking(booking_result)
-        self._validate_booking(booking_result)
+        self._validate_booking_is_done(booking_result)
 
         try:
             # todo: this should be handled in a separate service
@@ -170,9 +171,15 @@ class BookingHandler(object):
 
         raise errors.ServiceError("Unable to get booking details in time")
 
-    def _validate_booking(self, booking_result: booking.Booking) -> None:
+    def _validate_booking_is_pending(self, booking_result: booking.Booking) -> None:
+        status = booking_result.information.status
+
+        if status not in {"BookingDone", "BookingPending"}:
+            self._counter_bookings.labels(status=status).inc()
+            raise errors.ServiceError("Booking failed")
+
+    def _validate_booking_is_done(self, booking_result: booking.Booking) -> None:
         self._counter_bookings.labels(status=booking_result.information.status).inc()
 
-        # todo: this should probably do the inverse, checking successful statuses
-        if booking_result.information.status in {"BookingFailed", "GeneralException"}:
+        if booking_result.information.status != "BookingDone":
             raise errors.ServiceError("Booking failed")
