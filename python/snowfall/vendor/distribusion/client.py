@@ -19,12 +19,19 @@ from snowfall.vendor.distribusion.models import (
 
 def _get_response_error_message(response: httpx.Response) -> str:
     status = http.HTTPStatus(response.status_code)
-    description = status.description
+    description = None
 
     with contextlib.suppress(json.decoder.JSONDecodeError, AttributeError):
-        description = response.json().get("title") or status.description
+        response_json = response.json()
+        errors_list = response_json.get("errors")
 
-    return "{0}: {1}".format(status.value, description)
+        if errors_list and isinstance(errors_list, list):
+            description = errors_list[0].get("title")
+
+        if not description:
+            description = response_json.get("title")
+
+    return "{0}: {1}".format(status.value, description or status.description)
 
 
 class DistribusionClient(object):  # noqa: WPS214
@@ -279,7 +286,11 @@ class DistribusionClient(object):  # noqa: WPS214
                 url=path,
                 params=query_params,
                 json=payload,
-                headers={"Api-Key": self._api_key, "accept": "application/json"},
+                headers={
+                    "Api-Key": self._api_key,
+                    "accept": "*/*",
+                    "Content-type": "application/json",
+                },
             )
         except httpx.HTTPError as raw_exc:
             raise errors.ServiceError(inspect.getdoc(raw_exc)) from raw_exc
