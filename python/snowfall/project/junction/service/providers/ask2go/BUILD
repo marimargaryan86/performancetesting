@@ -12,7 +12,7 @@ resource(
 )
 files(
     name="fixtures",
-    sources=["fixtures/*"],
+    sources=["fixtures/**"],
 )
 python_image(
     namespace="python.snowfall.project.junction.service.providers.ask2go",

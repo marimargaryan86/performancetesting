@@ -1,19 +1,19 @@
 import asyncio
-import contextlib
 import datetime
 import math
 import uuid
 from collections.abc import AsyncIterator, Coroutine
-from typing import Any, Mapping, Sequence, Tuple
+from typing import Any, Iterable, Mapping, Sequence, Tuple, cast
 
+import more_itertools
+import structlog
 import tenacity
 
 from snowfall.project.junction.service.providers.ask2go import models, validator
 from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
-from snowfall.vendor.ask2go import client, enums
-from snowfall.vendor.ask2go import errors as ask2go_errors
+from snowfall.vendor.ask2go import client, enums, errors
 from snowfall.vendor.ask2go.models import (
     offers,
     price,
@@ -49,7 +49,11 @@ class NoResultsError(Exception):
 
 
 class NoPricingError(Exception):
-    """Raised when no successful pricing result is received."""
+    """Raised when a failed pricing result is received."""
+
+
+class PricingTimeoutError(Exception):
+    """Raised when no successful pricing result is received within the time limit."""
 
 
 class Ask2GoAdapter(object):  # noqa: WPS214
@@ -64,6 +68,7 @@ class Ask2GoAdapter(object):  # noqa: WPS214
         self._poll_retries_limit = poll_retries_limit
         self._validator = offer_validator
         self._wait_time_between_polling = wait_time_between_polling
+        self._logger = structlog.get_logger(__name__)
 
     async def gather_search_results(
         self,
@@ -77,7 +82,36 @@ class Ask2GoAdapter(object):  # noqa: WPS214
         )
 
         async for branded_prices_item in branded_prices:
-            yield branded_prices_item
+            filtered_branded_prices_item = self._filter_errors(branded_prices_item)
+
+            if filtered_branded_prices_item:
+                yield filtered_branded_prices_item
+
+    def _filter_errors(
+        self,
+        branded_prices_item: _BrandedOffersType,
+    ) -> _BrandedOffersType | None:
+        filtered: list[tuple[str, price.OfferPriceResponse]] = []
+
+        for branded_price in zip(branded_prices_item[0], branded_prices_item[1]):
+            if isinstance(branded_price[1], Exception):
+                self._logger.error(
+                    "Pricing failed",
+                    exception=str(type(branded_price[1]).__name__),
+                    brand=branded_price[0],
+                )
+                continue
+
+            filtered.append(branded_price)
+
+        if not filtered:
+            return None
+
+        brands, prices = more_itertools.unzip(filtered)
+
+        return list(cast(Iterable[str], brands)), list(
+            cast(Iterable[price.OfferPriceResponse], prices),
+        )
 
     async def _make_search(
         self,
@@ -149,13 +183,12 @@ class Ask2GoAdapter(object):  # noqa: WPS214
         mapped_brand_price = {}
         if branded_offer.itinerary.branded_fares:
             for fare in branded_offer.itinerary.branded_fares:
-                with contextlib.suppress(NoPricingError):
-                    mapped_brand_price[fare.brand_name] = await self._get_async_price(
-                        search_id=validate_identifiers.identifier,
-                        transaction_id=identifiers.transaction_id,
-                        offer_id=offer.id,
-                        brand_id=fare.brand_id,
-                    )
+                mapped_brand_price[fare.brand_name] = await self._get_async_price(
+                    search_id=validate_identifiers.identifier,
+                    transaction_id=identifiers.transaction_id,
+                    offer_id=offer.id,
+                    brand_id=fare.brand_id,
+                )
         else:
             mapped_brand_price["LOWEST FARE AVAILABLE"] = await self._get_async_price(
                 search_id=validate_identifiers.identifier,
@@ -183,7 +216,7 @@ class Ask2GoAdapter(object):  # noqa: WPS214
 
     @tenacity.retry(
         stop=tenacity.stop_after_attempt(10),
-        retry=tenacity.retry_if_exception_type(ask2go_errors.TimeOutError),
+        retry=tenacity.retry_if_exception_type(errors.TimeOutError),
         wait=tenacity.wait_random_exponential(multiplier=1, max=5),
         reraise=True,
     )
@@ -206,9 +239,9 @@ class Ask2GoAdapter(object):  # noqa: WPS214
                 return price_result
 
             if self._failed_pricing(price_result):
-                break
+                raise NoPricingError("Pricing did not succeed.")
 
-        raise NoPricingError("Pricing did not succeed.")
+        raise PricingTimeoutError("Pricing timed out after maximum retries.")
 
     def _failed_pricing(self, price_result: price.OfferPriceResponse) -> bool:
         return (
@@ -223,7 +256,7 @@ class Ask2GoAdapter(object):  # noqa: WPS214
     ) -> _BrandedOffersType:
         return (
             fare_brands,
-            await asyncio.gather(*coroutines),
+            await asyncio.gather(*coroutines, return_exceptions=True),
         )
 
     async def _get_offer_validate(
@@ -289,7 +322,7 @@ class Ask2GoAdapter(object):  # noqa: WPS214
     @tenacity.retry(
         stop=tenacity.stop_after_attempt(10),
         retry=tenacity.retry_if_exception_type(
-            (ask2go_errors.AcceptedResponseError, ask2go_errors.TimeOutError),
+            (errors.AcceptedResponseError, errors.TimeOutError),
         ),
         wait=tenacity.wait_random_exponential(multiplier=1, max=5),
         reraise=True,

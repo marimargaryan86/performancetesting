@@ -92,18 +92,76 @@ _ARN_LHR_NO_RESULTS = amqp_pb2.SearchCriteriaTask(
     ],
     criteria=_ARN_LHR_CRITERIA,
 )
+_ARN_LHR_PRICE_FAILURE = amqp_pb2.SearchCriteriaTask(
+    offer_search_id="FOO",
+    segments=[
+        models_pb2.Segment(
+            id="segment_id",
+            legs=[
+                models_pb2.Leg(
+                    id="leg_id",
+                    origin=models_pb2.Point(
+                        time_zone="Europe/Stockholm",
+                    ),
+                    destination=models_pb2.Point(
+                        time_zone="Europe/London",
+                    ),
+                    departure_at=protobuf.datetime_to_protobuf(
+                        datetime.datetime(
+                            2022,
+                            11,
+                            24,
+                            7,
+                            45,
+                            0,
+                            tzinfo=zoneinfo.ZoneInfo("Europe/Stockholm"),
+                        ),
+                    ),
+                    arrival_at=protobuf.datetime_to_protobuf(
+                        datetime.datetime(
+                            2022,
+                            11,
+                            24,
+                            9,
+                            35,
+                            0,
+                            tzinfo=zoneinfo.ZoneInfo("Europe/London"),
+                        ),
+                    ),
+                ),
+            ],
+        ),
+    ],
+    criteria=amqp_pb2.Criteria(
+        origin_iata="ARN",
+        destination_iata="LHR",
+        outbound_departure=protobuf.datetime_to_protobuf_datetime(
+            datetime.datetime(
+                year=2022,
+                month=11,
+                day=24,
+                hour=7,
+                minute=45,
+                second=0,
+                tzinfo=zoneinfo.ZoneInfo("Europe/Stockholm"),
+            ),
+        ),
+        cabin_class="Any",
+        adults=1,
+    ),
+)
 
 
-def _mock_responses(  # noqa: WPS210
+def _mock_responses(
     httpx_mock: pytest_httpx.HTTPXMock,
     origin: str,
     destination: str,
-    departure_date: str,
+    departure_date: datetime.date,
 ) -> None:
     prefix = "{origin}_{destination}_{date}".format(
         origin=origin,
         destination=destination,
-        date=departure_date,
+        date=str(departure_date),
     )
 
     search_response = conftest.load_json_fixture(
@@ -138,14 +196,26 @@ def _mock_responses(  # noqa: WPS210
         method="GET",
         json=branded_itinerary_response,
         url=_VALIDATE_PRICE_URL.format(
-            pricing_id="d0801a2f80af41da9a283614e6d02b6a",
+            pricing_id=itinerary_validate_response["id"],
             transaction_id=search_response["transactionId"],
         ),
     )
 
-    price_async_response = conftest.load_json_fixture(
-        "{prefix}_put_itinerary_priceasync".format(prefix=prefix),
+    _mock_pricing(httpx_mock, prefix)
+    _mock_search_responses(
+        httpx_mock,
+        prefix,
+        search_response,
     )
+
+
+def _mock_pricing(httpx_mock: pytest_httpx.HTTPXMock, prefix: str) -> None:
+    try:
+        price_async_response = conftest.load_json_fixture(
+            "{prefix}_put_itinerary_priceasync".format(prefix=prefix),
+        )
+    except FileNotFoundError:
+        return
 
     httpx_mock.add_response(
         method="PUT",
@@ -170,21 +240,11 @@ def _mock_responses(  # noqa: WPS210
         ),
     )
 
-    _mock_search_responses(
-        httpx_mock,
-        prefix,
-        search_response,
-        itinerary_validate_response,
-        branded_itinerary_response,
-    )
-
 
 def _mock_search_responses(
     httpx_mock: pytest_httpx.HTTPXMock,
     prefix: str,
     search_response: Mapping[str, Any],
-    itinerary_validate_response: Mapping[str, Any],
-    branded_itinerary_response: Mapping[str, Any],
 ) -> None:
     for page in range(10):
         try:
@@ -227,7 +287,7 @@ async def test_number_of_results(
         httpx_mock,
         criteria.criteria.origin_iata,
         criteria.criteria.destination_iata,
-        str(protobuf.protobuf_to_date(criteria.criteria.outbound_departure)),
+        protobuf.protobuf_to_date(criteria.criteria.outbound_departure),
     )
     search_results = ask2go_adapter.gather_search_results(criteria)
     count = sum([1 async for _ in search_results])
@@ -244,7 +304,7 @@ async def test_search_result_data(  # noqa: WPS218
         httpx_mock,
         _ARN_LHR.criteria.origin_iata,
         _ARN_LHR.criteria.destination_iata,
-        str(protobuf.protobuf_to_date(_ARN_LHR.criteria.outbound_departure)),
+        protobuf.protobuf_to_date(_ARN_LHR.criteria.outbound_departure),
     )
 
     offer_groups = offer_transformer.offer_prices_to_offer_groups(
@@ -319,3 +379,35 @@ def test_time_to_window(
     expected: tuple[datetime.time, datetime.time],
 ) -> None:
     assert adapter.time_to_window(departure_time) == expected
+
+
+async def test_price_failure_still_returns_options(
+    ask2go_adapter: adapter.Ask2GoAdapter,
+    offer_transformer: transformer.OfferTransformer,
+    magic_mocker: conftest.MagicMocker,
+) -> None:
+    with magic_mocker.with_fixture_path("price_failure"):
+        offer_groups = offer_transformer.offer_prices_to_offer_groups(
+            _ARN_LHR_PRICE_FAILURE,
+            ask2go_adapter.gather_search_results(_ARN_LHR_PRICE_FAILURE),
+        )
+
+        async for offer_group in offer_groups:
+            for offer in offer_group.offers:
+                assert offer.brand_name == "SAS PLUS FULL FLEX"
+
+
+async def test_price_timeout_still_returns_options(
+    ask2go_adapter: adapter.Ask2GoAdapter,
+    offer_transformer: transformer.OfferTransformer,
+    magic_mocker: conftest.MagicMocker,
+) -> None:
+    with magic_mocker.with_fixture_path("price_timeout"):
+        offer_groups = offer_transformer.offer_prices_to_offer_groups(
+            _ARN_LHR_PRICE_FAILURE,
+            ask2go_adapter.gather_search_results(_ARN_LHR_PRICE_FAILURE),
+        )
+
+        async for offer_group in offer_groups:
+            for offer in offer_group.offers:
+                assert offer.brand_name == "SAS PLUS FULL FLEX"
