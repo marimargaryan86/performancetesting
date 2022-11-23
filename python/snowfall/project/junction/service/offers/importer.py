@@ -1,3 +1,4 @@
+import asyncio
 import contextlib
 import datetime
 from typing import Union
@@ -46,6 +47,7 @@ class StatusHandler(trackable.AnySizeStatusHandler):
         self,
         msg: trackable_pb2.Trackable,
     ) -> None:
+        await asyncio.sleep(2)  # @todo: solve race condition properly
         await self._repository.mark_as_completed(msg.id)
 
     async def _on_failed(

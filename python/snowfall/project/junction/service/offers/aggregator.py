@@ -179,7 +179,7 @@ class OfferAggregator(object):
     ) -> None:
         offer_search = await self._searches.find_by_id(search_result.offer_search_id)
 
-        if not offer_search or offer_search.status in self._skippable_statuses:
+        if not offer_search:
             raise SkippedOfferError()
 
         _set_sequence_numbers(offer_search, search_result.offer)
