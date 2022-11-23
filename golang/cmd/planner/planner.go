@@ -6,6 +6,7 @@ import (
 	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/planner/v1alpha"
 	"git.snowfall.se/junction/junction/golang/raptor"
 	"github.com/getsentry/sentry-go"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/uber/h3-go"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -13,6 +14,7 @@ import (
 	healthgrpc "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 	"net"
+	"net/http"
 	"os"
 	"strconv"
 	"time"
@@ -115,6 +117,16 @@ func main() {
 		Stops:   stopsMap,
 	})
 	reflection.Register(grpcServer)
+
+	if prometheusPort, prometheusOk := os.LookupEnv("PROMETHEUS_PORT"); prometheusOk {
+		go func() {
+			http.Handle("/metrics", promhttp.Handler())
+
+			if err := http.ListenAndServe(":"+prometheusPort, nil); err != nil {
+				sugar.Fatal(err)
+			}
+		}()
+	}
 
 	sugar.Infow("gRPC server starting", "address", grpcAddress, "port", grpcPort)
 

@@ -6,7 +6,6 @@ import (
 	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"
 	"github.com/uber/h3-go"
 	"math"
-	"runtime"
 	"sort"
 	"strconv"
 	"sync"
@@ -19,7 +18,7 @@ const railPrefixSeconds = 1800
 const railSuffixSeconds = 900
 
 type raptor struct {
-	best           *sync.Map                        // a map of route stops to earliest possible arrival to them, key type is Stop.Sequence, value type is unix timestamp
+	best           map[uint64]uint32                // a map of route stops to earliest possible arrival to them, key type is Stop.Sequence, value type is unix timestamp
 	connections    map[uint64]map[uint8]interface{} // a map of ScheduleStops to a map of round number to type connection
 	data           *legacy.Repository               // helper functions to get objects from different ids
 	destinations   []*planner.Stop                  // list of destination stops
@@ -27,11 +26,12 @@ type raptor struct {
 	tripCutOff     uint32                           // the last time considered to arrive at the destination
 	marked         []uint64                         // a list of stops we can start from in the current round
 	round          uint8                            // an index of the round, starts at 0
-	rounds         []*sync.Map                      // a map of round number to a map of Stop.Sequence to unix timestamps (basically a round number to that rounds `best`)
+	rounds         []map[uint64]uint32              // a map of round number to a map of Stop.Sequence to unix timestamps (basically a round number to that rounds `best`)
 	trips          *sync.Map                        // a map of route.Sequence to index of route.Schedules
 	kindList       []models.Schedule_Type           // list of schedule types to search for
 	stopsMap       map[h3.H3Index][]*planner.Stop
 	maxConnections int
+	workerCount    int
 }
 
 type connection struct {
@@ -64,16 +64,17 @@ func newRaptor(
 	kindList []models.Schedule_Type,
 	stopsMap map[h3.H3Index][]*planner.Stop,
 	maxConnections int,
+	workerCount int,
 ) *raptor {
 	y, m, d := departureAt.AddDate(0, 0, 1).Date()
-	best := &sync.Map{}
-	rounds := []*sync.Map{0: {}}
+	best := make(map[uint64]uint32)
+	rounds := []map[uint64]uint32{0: {}}
 	marked := make([]uint64, 0, len(origins))
 	departureAtTs := uint32(departureAt.Unix())
 
 	for _, origin := range origins {
-		best.Store(origin.Sequence, departureAtTs)
-		rounds[0].Store(origin.Sequence, departureAtTs)
+		best[origin.Sequence] = departureAtTs
+		rounds[0][origin.Sequence] = departureAtTs
 		marked = append(marked, origin.Sequence)
 	}
 
@@ -91,27 +92,40 @@ func newRaptor(
 		kindList:       kindList,
 		stopsMap:       stopsMap,
 		maxConnections: maxConnections,
+		workerCount:    workerCount,
 	}
 }
 
 // increases the r.round number by one and initializes the r.rounds to an empty map
 func (r *raptor) initRound() {
 	r.round++
-	r.rounds = append(r.rounds, &sync.Map{})
+	r.rounds = append(r.rounds, map[uint64]uint32{})
+}
+
+func (r *raptor) bestTimeAtDestination() uint32 {
+	best := uint32(math.MaxUint32)
+
+	for _, destination := range r.destinations {
+		if v, ok := r.best[destination.Sequence]; ok && v < best {
+			best = v
+		}
+	}
+
+	return best
 }
 
 // check if this is the earliest arrival to the stop so far
 func (r *raptor) isBetter(stopSequence uint64, arrival uint32) bool {
 	best := uint32(math.MaxUint32)
 
-	if v, ok := r.best.Load(stopSequence); ok {
-		best = v.(uint32)
+	if v, ok := r.best[stopSequence]; ok {
+		best = v
 	}
 
-	for _, destination := range r.destinations {
-		if v, ok := r.best.Load(destination.Sequence); ok && v.(uint32) < best {
-			best = v.(uint32)
-		}
+	destination := r.bestTimeAtDestination()
+
+	if destination < best {
+		best = destination
 	}
 
 	return arrival < best
@@ -120,13 +134,11 @@ func (r *raptor) isBetter(stopSequence uint64, arrival uint32) bool {
 // adds stops reached in the last round to r.marked
 // returns true if r.marked is not empty
 func (r *raptor) markStops() bool {
-	r.marked = make([]uint64, 0)
+	r.marked = make([]uint64, 0, len(r.rounds[r.round]))
 
-	r.rounds[r.round].Range(func(key, value interface{}) bool {
-		r.marked = append(r.marked, key.(uint64))
-
-		return true
-	})
+	for stopSequence := range r.rounds[r.round] {
+		r.marked = append(r.marked, stopSequence)
+	}
 
 	return len(r.marked) != 0
 }
@@ -138,7 +150,7 @@ func (r *raptor) queue() []uint64 {
 
 	for _, stopSequence := range r.marked {
 		stop := r.data.StopBySequence(stopSequence)
-		arrival, _ := r.rounds[r.round-1].Load(stop.Sequence)
+		arrival, _ := r.rounds[r.round-1][stop.Sequence]
 
 		for _, routeSegmentSequence := range stop.RouteStops {
 			routeSegment := r.data.RouteStopBySequence(routeSegmentSequence)
@@ -151,7 +163,7 @@ func (r *raptor) queue() []uint64 {
 			trip := r.data.ScheduleBySequence(route.Schedules[len(route.Schedules)-1])
 			tripSegment := r.data.ScheduleStopBySequence(trip.ScheduleStops[routeSegment.Order])
 
-			if tripSegment.DepartureAt < arrival.(uint32) {
+			if tripSegment.DepartureAt < arrival {
 				continue
 			}
 
@@ -178,7 +190,13 @@ func (r *raptor) scanRoutes() {
 	results := make(chan workerResult, len(qItems))
 	jobs := make(chan uint64, len(qItems))
 
-	for w := 1; w <= runtime.NumCPU(); w++ {
+	for _, qItem := range qItems {
+		jobs <- qItem
+	}
+
+	close(jobs)
+
+	for w := 1; w <= r.workerCount; w++ {
 		wg.Add(1)
 		go r.routeWorker(wg, jobs, results)
 	}
@@ -188,30 +206,29 @@ func (r *raptor) scanRoutes() {
 		close(results)
 	}()
 
-	for _, qItem := range qItems {
-		jobs <- qItem
-	}
-
-	close(jobs)
+	candidates := make([]workerResult, 0)
 
 	for result := range results {
-		tripSegment := result.stop
-		arrival := result.arrival
-		current := result.current
-		boarding := result.boarding
+		if r.isBetter(result.stop.Stop, result.arrival) {
+			r.best[result.stop.Stop] = result.arrival
+			candidates = append(candidates, result)
+		}
+	}
 
-		if r.isBetter(tripSegment.Stop, arrival) {
-			r.rounds[r.round].Store(tripSegment.Stop, arrival)
-			r.best.Store(tripSegment.Stop, arrival)
+	bestAtDestination := r.bestTimeAtDestination()
 
-			if _, ok := r.connections[tripSegment.Stop]; !ok {
-				r.connections[tripSegment.Stop] = make(map[uint8]interface{})
+	for _, candidate := range candidates {
+		if candidate.arrival <= bestAtDestination && candidate.arrival == r.best[candidate.stop.Stop] {
+			r.rounds[r.round][candidate.stop.Stop] = candidate.arrival
+
+			if _, ok := r.connections[candidate.stop.Stop]; !ok {
+				r.connections[candidate.stop.Stop] = make(map[uint8]interface{})
 			}
 
-			r.connections[tripSegment.Stop][r.round] = connection{
-				schedule: current,
-				from:     boarding,
-				to:       tripSegment.Order,
+			r.connections[candidate.stop.Stop][r.round] = connection{
+				schedule: candidate.current,
+				from:     candidate.boarding,
+				to:       candidate.stop.Order,
 			}
 		}
 	}
@@ -220,6 +237,8 @@ func (r *raptor) scanRoutes() {
 // finds the earliest possible transfer (schedule) from routes that satisfy the (originRouteStop, destinationRouteStop, departure) triplet
 func (r *raptor) routeWorker(wg *sync.WaitGroup, jobs chan uint64, results chan workerResult) {
 	defer wg.Done()
+
+	lastRound := r.rounds[r.round-1]
 
 	for qItem := range jobs {
 		qRouteSegment := r.data.RouteStopBySequence(qItem)
@@ -249,28 +268,25 @@ func (r *raptor) routeWorker(wg *sync.WaitGroup, jobs chan uint64, results chan 
 						arrival += railSuffixSeconds
 					}
 
-					if r.isBetter(tripSegment.Stop, arrival) {
-						results <- workerResult{
-							stop:     tripSegment,
-							arrival:  arrival,
-							current:  current,
-							boarding: boarding,
-						}
+					results <- workerResult{
+						stop:     tripSegment,
+						arrival:  arrival,
+						current:  current,
+						boarding: boarding,
 					}
 				}
 			}
 
-			previousArrival, ok := r.rounds[r.round-1].Load(routeSegment.Stop)
+			previousArrival, ok := lastRound[routeSegment.Stop]
 
-			if ok && (current == nil || previousArrival.(uint32) < arrival) {
-				current = nil
+			if ok && (current == nil || previousArrival < arrival) {
 				index, ok := r.trips.Load(qRoute.Sequence)
 
 				if !ok {
 					index = sort.Search(len(qRoute.Schedules)-1, func(i int) bool {
 						trip := r.data.ScheduleBySequence(qRoute.Schedules[i])
 						tripSegment := r.data.ScheduleStopBySequence(trip.ScheduleStops[routeSegment.Order])
-						return tripSegment.DepartureAt > r.earliestPossibleDeparture(tripSegment, previousArrival.(uint32))
+						return tripSegment.DepartureAt > r.earliestPossibleDeparture(tripSegment, previousArrival)
 					})
 					r.trips.Store(qRoute.Sequence, index)
 				}
@@ -293,11 +309,11 @@ func (r *raptor) routeWorker(wg *sync.WaitGroup, jobs chan uint64, results chan 
 					tripSegment := r.data.ScheduleStopBySequence(trip.ScheduleStops[routeSegment.Order])
 					departure := tripSegment.DepartureAt
 
-					if r.round == 1 && departure > r.lastDeparture || departure > r.tripCutOff {
+					if (r.round == 1 && departure > r.lastDeparture) || departure > r.tripCutOff {
 						continue
 					}
 
-					if departure < r.earliestPossibleDeparture(tripSegment, previousArrival.(uint32)) {
+					if departure < r.earliestPossibleDeparture(tripSegment, previousArrival) {
 						break
 					}
 
@@ -332,7 +348,7 @@ func (r *raptor) earliestPossibleDeparture(target *planner.ScheduleStop, previou
 func (r *raptor) scanTransfers() {
 	for _, p := range r.marked {
 		fromStop := r.data.StopBySequence(p)
-		departure, _ := r.rounds[r.round].Load(fromStop.Sequence)
+		departure, _ := r.rounds[r.round][fromStop.Sequence]
 		idInt, _ := strconv.ParseUint(fromStop.Id, 10, 0)
 		hex := h3.H3Index(idInt)
 		neighbours := h3.KRing(hex, 2)
@@ -345,11 +361,11 @@ func (r *raptor) scanTransfers() {
 			}
 
 			for _, toStop := range toStops {
-				arrival := departure.(uint32) + (60 * 10) + toStop.TransferTime
+				arrival := departure + (60 * 10) + toStop.TransferTime
 
 				if r.isBetter(toStop.Sequence, arrival) {
-					r.rounds[r.round].Store(toStop.Sequence, arrival)
-					r.best.Store(toStop.Sequence, arrival)
+					r.rounds[r.round][toStop.Sequence] = arrival
+					r.best[toStop.Sequence] = arrival
 
 					if _, ok := r.connections[toStop.Sequence]; !ok {
 						r.connections[toStop.Sequence] = make(map[uint8]interface{})
@@ -358,8 +374,8 @@ func (r *raptor) scanTransfers() {
 					r.connections[toStop.Sequence][r.round] = transfer{
 						from:      fromStop,
 						to:        toStop,
-						departure: departure.(uint32),
-						arrival:   departure.(uint32) + (60 * 10),
+						departure: departure,
+						arrival:   departure + (60 * 10),
 						kind:      models.Schedule_TYPE_UNSPECIFIED,
 					}
 				}
@@ -369,11 +385,11 @@ func (r *raptor) scanTransfers() {
 		for _, t := range fromStop.Transfers {
 			trans := r.data.TransferBySequence(t)
 			toStop := r.data.StopBySequence(trans.ToStop)
-			arrival := departure.(uint32) + trans.TransferTime + toStop.TransferTime
+			arrival := departure + trans.TransferTime + toStop.TransferTime
 
 			if r.isBetter(toStop.Sequence, arrival) {
-				r.rounds[r.round].Store(toStop.Sequence, arrival)
-				r.best.Store(toStop.Sequence, arrival)
+				r.rounds[r.round][toStop.Sequence] = arrival
+				r.best[toStop.Sequence] = arrival
 
 				if _, ok := r.connections[toStop.Sequence]; !ok {
 					r.connections[toStop.Sequence] = make(map[uint8]interface{})
@@ -382,8 +398,8 @@ func (r *raptor) scanTransfers() {
 				r.connections[toStop.Sequence][r.round] = transfer{
 					from:      fromStop,
 					to:        toStop,
-					departure: departure.(uint32),
-					arrival:   departure.(uint32) + trans.TransferTime,
+					departure: departure,
+					arrival:   departure + trans.TransferTime,
 					kind:      trans.Type,
 				}
 			}

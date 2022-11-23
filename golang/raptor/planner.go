@@ -5,6 +5,8 @@ import (
 	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/planner/v1alpha"
 	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"
 	"github.com/google/uuid"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/uber/h3-go"
 	"runtime"
 	"sort"
@@ -12,6 +14,33 @@ import (
 
 	"go.uber.org/zap"
 )
+
+var executionTimes = promauto.NewHistogram(prometheus.HistogramOpts{
+	Name: "planner_execution_time_seconds",
+	Buckets: []float64{
+		0.005,
+		0.01,
+		0.025,
+		0.05,
+		0.075,
+		0.1,
+		0.25,
+		0.5,
+		0.75,
+		1.0,
+		2.5,
+		5.0,
+		7.5,
+		10.0,
+		15.0,
+		30.0,
+		60.0,
+		150.0,
+		300.0,
+		450.0,
+		600.0,
+	},
+})
 
 type Planner struct {
 	data     *legacy.Repository
@@ -40,6 +69,7 @@ func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAt
 		}
 	}
 
+	workerCount := (runtime.NumCPU() * 2) + 1
 	seen := make(map[uuid.UUID]struct{})
 	trips := make([]*Trip, 0)
 	iterations := 0
@@ -51,7 +81,7 @@ func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAt
 	for sTime.Before(eTime) {
 		iterations++
 
-		r := newRaptor(p.data, froms, tos, sTime, kindList, p.stopsMap, maxConnections)
+		r := newRaptor(p.data, froms, tos, sTime, kindList, p.stopsMap, maxConnections, workerCount)
 		results := r.run()
 		min := eTime
 		found := false
@@ -130,6 +160,8 @@ func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAt
 		toIds = append(toIds, to.Id)
 	}
 
+	executionTimes.Observe(time.Since(start).Seconds())
+
 	p.logger.Infow(
 		"search performed",
 		"origins", fromIds,
@@ -137,7 +169,7 @@ func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAt
 		"departure", departureAt.Format(time.RFC3339),
 		"iterations", iterations,
 		"results", len(trips),
-		"workers", runtime.NumCPU(),
+		"workers", workerCount,
 		"exec", time.Since(start),
 	)
 
