@@ -8,6 +8,7 @@ import httpx
 
 from snowfall.vendor.distribusion import errors, jsonapi_helpers
 from snowfall.vendor.distribusion.models import (
+    bookings,
     connections,
     criterias,
     marketing_carriers,
@@ -93,6 +94,18 @@ class DistribusionClient(object):  # noqa: WPS214
             stations.StationId(**station)
             for station in jsonapi_helpers.flatten_list(response.json())
         ]
+
+    async def get_booking_by_id(
+        self,
+        booking_id: str,
+    ) -> bookings.Booking:
+        url = "/bookings/{booking_id}"
+        response = await self._make_request(
+            "GET",
+            path=url.format(booking_id=booking_id),
+        )
+
+        return bookings.Booking(**jsonapi_helpers.flatten_object(response.json()))
 
     async def find_connections(
         self,

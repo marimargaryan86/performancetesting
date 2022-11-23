@@ -147,3 +147,13 @@ async def test_connection_seats(
     )
 
     assert connections is not None
+
+
+@disable_by_default
+@pytest.mark.asyncio
+async def test_get_booking_by_id(
+    distribusion_client: client.DistribusionClient,
+) -> None:
+    booking_id = "28wfnEhKzGEWqZ02ykHtdw"
+    booking_details = await distribusion_client.get_booking_by_id(booking_id)
+    assert booking_details
