@@ -1,5 +1,4 @@
 import datetime
-from typing import Optional
 
 import pydantic
 
@@ -22,11 +21,11 @@ class ConnectionVacancyCriteria(DistribusionBaseModel):
     arrival_station: str
     departure_time: datetime.datetime
     arrival_time: datetime.datetime
-    return_departure_time: Optional[datetime.datetime] = None
-    return_arrival_time: Optional[datetime.datetime] = None
+    return_departure_time: datetime.datetime | None
+    return_arrival_time: datetime.datetime | None
     pax: list[int]
     passenger_type: list[str]
-    fare_class: Optional[str] = None
+    fare_class: str | None
     currency: str
 
 
@@ -45,9 +44,9 @@ class Passenger(DistribusionBaseModel):
 
 
 class ConnectedStationsCriteria(DistribusionBaseModel):
-    page_size: Optional[int] = None
-    next_page: Optional[str] = None
-    carrier_code: Optional[str] = None
+    page_size: int | None
+    next_page: str | None
+    carrier_code: str | None
 
 
 class CreateOrder(DistribusionBaseModel):

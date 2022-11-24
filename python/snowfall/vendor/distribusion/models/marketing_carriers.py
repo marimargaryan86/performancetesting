@@ -13,46 +13,46 @@ class MarketingCarrier(DistribusionBaseModel):
 
 class PassengerType(DistribusionBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
-    code: Optional[str] = None
-    description: Optional[str] = None
-    max_age: Optional[int] = None
-    min_age: Optional[int] = None
-    name: Optional[str] = None
+    code: str | None
+    description: str | None
+    max_age: int | None
+    min_age: int | None
+    name: str | None
 
 
 class FareFeature(DistribusionBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
-    code: Optional[str] = None
-    description: Optional[str] = None
-    name: Optional[str] = None
+    code: str | None
+    description: str | None
+    name: str | None
 
 
 class VehicleType(DistribusionBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
-    code: Optional[str] = None
-    description: Optional[str] = None
-    name: Optional[str] = None
+    code: str | None
+    description: str | None
+    name: str | None
 
 
 class TicketValidityRule(DistribusionBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
-    rule_type: Optional[str] = None
-    reference_time_type: Optional[str] = None
-    use_type: Optional[str] = None
-    offset_type: Optional[str] = None
-    duration_type: Optional[str] = None
-    offset: Optional[int] = None
-    duration: Optional[int] = None
+    rule_type: str | None
+    reference_time_type: str | None
+    use_type: str | None
+    offset_type: str | None
+    duration_type: str | None
+    offset: int | None
+    duration: int | None
 
 
 class FareClass(DistribusionBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
-    code: Optional[str] = None
-    iata_category: Optional[str] = None
-    journey_type: Optional[str] = None
-    name: Optional[str] = None
-    fare_features: Optional[List[FareFeature]] = None
-    ticket_validity_rules: Optional[List[TicketValidityRule]] = None
+    code: str | None
+    iata_category: str | None
+    journey_type: str | None
+    name: str | None
+    fare_features: List[FareFeature] | None
+    ticket_validity_rules: List[TicketValidityRule] | None
 
 
 class MarketingCarrierDetails(DistribusionBaseModel):
@@ -83,14 +83,14 @@ class MarketingCarrierDetails(DistribusionBaseModel):
     ticket_printing_required: bool
     booking_fee: int
     cancellation_fee: int
-    cancellation_cutoff: Optional[int] = None
-    default_passenger_type: Optional[PassengerType] = None
-    fare_classes: Optional[List[FareClass]] = None
-    passenger_types: Optional[List[PassengerType]] = None
-    vehicle_types: Optional[List[VehicleType]] = None
+    cancellation_cutoff: int | None
+    default_passenger_type: PassengerType | None
+    fare_classes: List[FareClass] | None
+    passenger_types: List[PassengerType] | None
+    vehicle_types: List[VehicleType] | None
 
 
 class BookingSchema(DistribusionBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
-    mandatory: Optional[List[str]] = None
-    optional: Optional[List[str]] = None
+    mandatory: List[str] | None
+    optional: List[str] | None
