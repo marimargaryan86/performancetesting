@@ -36,6 +36,7 @@ class MetricsClientInterceptor(aio.UnaryUnaryClientInterceptor):
         request: Message,
     ) -> aio.UnaryUnaryCall | Message:
         start = time.perf_counter()
+        rpc_name = bytes(client_call_details.method).decode()
         response = await continuation(
             client_call_details,
             request,
@@ -44,15 +45,15 @@ class MetricsClientInterceptor(aio.UnaryUnaryClientInterceptor):
         code = await response.code()
 
         self._total.labels(
-            rpc=client_call_details.method,
+            rpc=rpc_name,
             status=code.name,
         ).inc()
 
         if code != StatusCode.OK:
-            self._failed.labels(rpc=client_call_details.method).inc()
+            self._failed.labels(rpc=rpc_name).inc()
 
         self._histogram.labels(
-            rpc=client_call_details.method,
+            rpc=rpc_name,
             status=code.name,
         ).observe(time.perf_counter() - start)
 
@@ -90,6 +91,7 @@ class MetricsServerInterceptor(interceptor.ServerInterceptor):
         context: aio.ServicerContext,
     ) -> Message:
         start = time.perf_counter()
+        rpc_name = continuation.__name__
 
         try:
             return await continuation(request, context)
@@ -100,14 +102,14 @@ class MetricsServerInterceptor(interceptor.ServerInterceptor):
             status_code = self._status_codes[context.code()]
 
             self._total.labels(
-                rpc=continuation.__name__,
+                rpc=rpc_name,
                 status=status_code.name,
             ).inc()
 
             if status_code != StatusCode.OK:
-                self._failed.labels(rpc=continuation.__name__).inc()
+                self._failed.labels(rpc=rpc_name).inc()
 
             self._histogram.labels(
-                rpc=continuation.__name__,
+                rpc=rpc_name,
                 status=status_code.name,
             ).observe(time.perf_counter() - start)
