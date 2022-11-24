@@ -1,4 +1,3 @@
-import asyncio
 import decimal
 from typing import Any, Optional, Sequence, Tuple
 
@@ -6,6 +5,7 @@ import httpx
 import lagom
 import stripe
 from starlette import endpoints, exceptions, requests, responses, status
+from starlette.background import BackgroundTask
 
 from snowfall.project.junction.service.mobile_api import (
     payments,
@@ -221,13 +221,12 @@ class Orders(endpoints.HTTPEndpoint):
 
         await orders_repository.insert(mobile_order)
 
-        asyncio.create_task(
-            orders.poll_order_status(
-                junction_client,
-                mobile_order.id,
-                mobile_order.payment_intent_id,
-                smtp_client,
-            ),
+        task = BackgroundTask(
+            orders.poll_order_status,
+            junction_client,
+            mobile_order.id,
+            mobile_order.payment_intent_id,
+            smtp_client,
         )
 
         junction_order["data"]["relationships"]["payment"] = {
@@ -239,6 +238,7 @@ class Orders(endpoints.HTTPEndpoint):
         return stdlib_models.JsonApiResponse(
             stdlib_models.Body(data=junction_order["data"]),
             status.HTTP_201_CREATED,
+            background=task,
         )
 
 
