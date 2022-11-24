@@ -6,6 +6,7 @@ from pydantic import HttpUrl
 from snowfall.project.junction.service.currencies.grpc import CurrencyService
 from snowfall.stdlib import service
 from snowfall.stdlib.transport.grpc import server
+from snowfall.vendor.apilayer.client import APILayer
 from snowfall.vendor.bound.client import Bound
 
 
@@ -16,6 +17,8 @@ class _Settings(service.Settings):
     email: str
     password: str
     bound_api_timeout: datetime.timedelta = datetime.timedelta(seconds=15)
+    api_layer_api_key: str
+    api_layer_base_url: str
 
 
 async def _main(app: service.Application[_Settings]) -> None:
@@ -25,11 +28,16 @@ async def _main(app: service.Application[_Settings]) -> None:
         app.settings.password,
         app.settings.bound_api_timeout.total_seconds(),
     )
+    api_layer_client = APILayer(
+        app.settings.api_layer_base_url,
+        app.settings.api_layer_api_key,
+    )
     grpc_server = server.create_server(
         app.settings.grpc_address,
         app.settings.grpc_port,
         [
             CurrencyService(
+                api_layer_client,
                 bound_client,
             ),
         ],
