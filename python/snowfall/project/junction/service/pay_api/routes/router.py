@@ -3,12 +3,12 @@ from lagom.integrations import starlette
 from starlette import routing
 
 from snowfall.project.junction.service.pay_api.routes import (
+    authentication,
     balances,
     currencies,
     rates,
     transactions,
 )
-from snowfall.project.routes import authentication
 
 
 def get_routes(dependencies: lagom.Container) -> list[routing.Route]:
