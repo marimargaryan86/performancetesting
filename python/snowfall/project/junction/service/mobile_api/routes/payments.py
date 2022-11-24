@@ -16,6 +16,7 @@ _name_key = "name"
 _stripe_customer_id_key = "stripe_customer_id"
 _password_key = str("password")
 _stripe_version = "2020-08-27"
+_MIN_CHARGE = 500
 
 
 async def get_or_create_stripe_customer(
@@ -115,6 +116,6 @@ class Payment(endpoints.HTTPEndpoint):
 
             stripe.PaymentIntent.modify(
                 request.path_params["paymentIntentId"],
-                amount=new_amount if new_amount > 0 else 1,
+                amount=max(new_amount, _MIN_CHARGE),
             )
         return responses.Response(status_code=status.HTTP_204_NO_CONTENT)

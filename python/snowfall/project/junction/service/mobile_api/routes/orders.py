@@ -22,6 +22,7 @@ from snowfall.vendor.junction import client
 from snowfall.vendor.junction import models as vendor_models
 
 _ID = "_id"
+_MIN_CHARGE = 500
 
 
 class MessageOrder(endpoints.HTTPEndpoint):
@@ -79,6 +80,13 @@ class Order(endpoints.HTTPEndpoint):
                 "type": "payments",
             },
         }
+        if mobile_order.voucher_code:
+            order_response["data"]["relationships"]["voucher"] = {
+                "data": {
+                    "id": mobile_order.voucher_code,
+                    "type": "vouchers",
+                },
+            }
         response_body = stdlib_models.Body(data=order_response["data"])
 
         if order_response.get("included"):
@@ -285,6 +293,6 @@ async def check_payment_amount_and_state(  # noqa: WPS210
     if voucher:
         offer_amount -= money.from_protobuf(voucher.price).amount
     return (
-        pi["amount"] == offer_amount if offer_amount > 0 else 1,
+        pi["amount"] == max(offer_amount, _MIN_CHARGE),
         pi["status"] == "requires_capture",
     )
