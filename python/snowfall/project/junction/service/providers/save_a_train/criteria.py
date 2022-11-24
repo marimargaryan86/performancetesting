@@ -1,5 +1,4 @@
 import itertools
-from collections.abc import Iterator
 
 import more_itertools
 
@@ -19,8 +18,9 @@ class CriteriaGenerator(object):
     def from_search_task(  # noqa: WPS210
         self,
         search_task: offers_amqp_pb2.TripOfferSearchTask,
-    ) -> Iterator[amqp_pb2.SearchCriteriaTask]:
+    ) -> list[amqp_pb2.SearchCriteriaTask]:
         segments = itertools.chain(*[tr.segments for tr in search_task.search.trips])
+        tasks: list[amqp_pb2.SearchCriteriaTask] = []
 
         for segment in segments:
             first_leg = more_itertools.first(segment.legs)
@@ -37,7 +37,7 @@ class CriteriaGenerator(object):
                 coordinates=last_leg.destination.coordinates,
                 neighbour_search_radius=1,
             )
-            yield from (
+            tasks.extend(
                 amqp_pb2.SearchCriteriaTask(
                     offer_search_id=search_task.offer_search_id,
                     segments=[segment],
@@ -67,3 +67,5 @@ class CriteriaGenerator(object):
                 )
                 for start, end in itertools.product(origins, destinations)
             )
+
+        return tasks

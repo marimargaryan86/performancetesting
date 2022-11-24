@@ -10,7 +10,7 @@ import aioredis
 import httpx
 import pydantic
 
-from snowfall.project.junction.provider import status
+from snowfall.project.junction.provider import offers
 from snowfall.project.junction.service.providers.save_a_train import (
     adapter,
     cache,
@@ -75,40 +75,16 @@ async def _offers(app: service.Application[_OffersSettings]) -> None:
             types.Connection(app.settings.amqp_dsn),
         )
 
-        trip_search_consumer = consumer.TripSearchConsumer(
-            consumer_obj=amqp_consumer.Consumer(
-                connection=connection,
-                queue_name="{0}_offers".format(app.name),
-                binds=[
-                    (types.Exchange(_OFFERS), "offers.search.trip"),
-                    (
-                        types.Exchange("save_a_train"),
-                        trackable.to_tracking_key("offers.search.trip"),
-                    ),
-                ],
-            ),
-            producer_obj=trackable.TrackableProducer(
-                producer.Producer(
-                    connection=connection,
-                    exchange=types.Exchange("save_a_train"),
-                ),
-            ),
-            generator=criteria.CriteriaGenerator(
+        trip_search_consumer = offers.create_trip_offer_search_consumer(
+            amqp_connection=connection,
+            redis_client=redis.Client[str](redis_conn, prefix=app.name),
+            criteria_generator=criteria.CriteriaGenerator(
                 h3_mapping=h3.H3MappingRepository[train_stations.TrainStation](
                     mapping=await _load_train_stations(),
                     resolution=8,
                 ),
-            ),
-            status_handler=status.SubtaskStatusHandler(
-                reporter=trackable.StatusReporter(
-                    producer.Producer(
-                        connection=connection,
-                        exchange=types.Exchange(_OFFERS),
-                    ),
-                ),
-                redis=redis.Client[str](redis_conn, prefix=app.name),
-                trackable_key=trackable.to_tracking_key("offers.search.trip"),
-            ),
+            ).from_search_task,
+            internal_exchange_name=app.name,
         )
 
         await trip_search_consumer.consume()

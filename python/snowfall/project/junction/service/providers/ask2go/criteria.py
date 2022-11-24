@@ -34,7 +34,7 @@ class CriteriaGenerator(object):
     def from_search_task(
         self,
         search_task: amqp_pb2.TripOfferSearchTask,
-    ) -> Iterator[provider_amqp_pb2.SearchCriteriaTask]:
+    ) -> list[provider_amqp_pb2.SearchCriteriaTask]:
         number_of_types = get_num_of_passenger_types(
             passengers=search_task.search.passengers,
             date=_get_last_travel_date(search_task),
@@ -43,13 +43,18 @@ class CriteriaGenerator(object):
             trips=search_task.search.trips,
             type_filter=models_pb2.Schedule.TYPE_AIR,
         )
+        tasks: list[provider_amqp_pb2.SearchCriteriaTask] = []
 
         for trip_criteria in segment_grouper.generate_trip_criteria(sub_trips):
-            yield from _generate_search_criteria(
-                search_task=search_task,
-                trip_criteria=trip_criteria,
-                number_of_types=number_of_types,
+            tasks.extend(
+                _generate_search_criteria(
+                    search_task=search_task,
+                    trip_criteria=trip_criteria,
+                    number_of_types=number_of_types,
+                ),
             )
+
+        return tasks
 
 
 def _generate_search_criteria(
