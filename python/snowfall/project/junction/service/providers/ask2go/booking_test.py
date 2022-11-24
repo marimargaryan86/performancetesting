@@ -2,6 +2,7 @@ import datetime
 
 import pytest
 import pytest_httpx
+from structlog import testing
 
 from snowfall.project.junction.service.orders.v1alpha import amqp_pb2, models_pb2
 from snowfall.project.junction.service.providers.ask2go import booking, cache, conftest
@@ -91,3 +92,24 @@ async def test_booking_failed(
         details=cache.OfferDetails(pricing_id="foo", transaction_id="bar"),
     )
     assert booking_proto.status == models_pb2.Booking.STATUS_ERROR
+
+
+@pytest.mark.asyncio
+async def test_booking_errors(
+    booking_handler: booking.BookingHandler,
+    magic_mocker: conftest.MagicMocker,
+) -> None:
+    with testing.capture_logs() as cap_logs:
+        with magic_mocker.with_fixture_path("booking_error"):
+            booking_proto = await booking_handler.book(
+                task=_ORDER_TASK,
+                details=cache.OfferDetails(pricing_id="foo", transaction_id="bar"),
+            )
+
+        assert booking_proto.status == models_pb2.Booking.STATUS_ERROR
+        assert len(cap_logs) == 1
+
+        for log in cap_logs:
+            assert len(log["details"]) == 1
+            assert log["details"][0]["code"] == 500
+            assert log["details"][0]["message"]

@@ -21,6 +21,19 @@ from snowfall.vendor.ask2go import client, errors
 from snowfall.vendor.ask2go.models import booking, common
 
 
+class BookingError(errors.ServiceError):
+    def __init__(
+        self,
+        message: str,
+        *,
+        status: str,
+        details: Sequence[booking.InformationError] | None,
+    ):
+        super().__init__(message)
+        self.status = status
+        self.details = details
+
+
 class BookingHandler(object):
     _poll_retries_limit = 10
     _wait_time_between_polling = 1
@@ -53,8 +66,18 @@ class BookingHandler(object):
                 details=details,
                 metadata=task.metadata,
             )
-        except (errors.ServiceError, phonenumbers.NumberParseException):
-            self._logger.exception()
+        except (errors.ServiceError, phonenumbers.NumberParseException) as err:
+            if isinstance(err, BookingError):
+                self._logger.exception(
+                    "Booking failed",
+                    status=err.status,
+                    details=[
+                        {"code": detail.code, "message": detail.message}
+                        for detail in err.details or []
+                    ],
+                )
+            else:
+                self._logger.exception()
             new_booking.status = models_pb2.Booking.STATUS_ERROR
 
             return new_booking
@@ -176,10 +199,18 @@ class BookingHandler(object):
 
         if status not in {"BookingDone", "BookingPending"}:
             self._counter_bookings.labels(status=status).inc()
-            raise errors.ServiceError("Booking failed")
+            raise BookingError(
+                "Booking failed",
+                status=booking_result.information.status,
+                details=booking_result.information.errors,
+            )
 
     def _validate_booking_is_done(self, booking_result: booking.Booking) -> None:
         self._counter_bookings.labels(status=booking_result.information.status).inc()
 
         if booking_result.information.status != "BookingDone":
-            raise errors.ServiceError("Booking failed")
+            raise BookingError(
+                "Booking failed",
+                status=booking_result.information.status,
+                details=booking_result.information.errors,
+            )

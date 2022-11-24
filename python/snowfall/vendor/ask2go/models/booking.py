@@ -5,7 +5,7 @@ from snowfall.vendor.ask2go.models.base import CamelCaseBaseModel
 
 
 class InformationError(CamelCaseBaseModel):
-    code: Any
+    code: int
     message: Optional[str]
 
 
@@ -15,7 +15,7 @@ class Information(CamelCaseBaseModel):
     booking_id: int
     display_booking_id: Optional[str]
     status: str
-    errors: Optional[InformationError]
+    errors: Optional[list[InformationError]]
     warnings: Optional[str]
 
 
