@@ -417,7 +417,7 @@
     return d;
   }
 
-  function inject_trips(response) {
+  function inject_trips(tripSearchId, response) {
     hide_loader();
 
     const showMaps = document.getElementById('show-maps').checked;
@@ -434,6 +434,12 @@
     let mega = document.createElement("h2")
     mega.innerText = "Search Results: " + response.data.length + " trips found"
     container.append(mega)
+    let searchInfo = document.createElement("dl")
+    searchInfo.className = "row";
+    searchInfo.innerHTML += '<dt class="col-sm-2">Trip Search ID</dt><dd class="col-sm-10">' + tripSearchId + '</dd>';
+    searchInfo.innerHTML += '<dt class="col-sm-2">Session Token</dt><dd class="col-sm-10">' + sessionToken + '</dd>';
+    container.append(searchInfo)
+
     included = {}
 
     for (const resource of response.included) {
@@ -548,7 +554,7 @@
       subtext.textContent = " - " + (trip.relationships.segments.data.length - 1)
       subtext.textContent += " connection(s), " + nice_format_seconds(trip.totalTime)
       subtext.textContent += ", " + (Math.round((trip.totalDistance / 1000) * 10) / 10)
-      subtext.textContent += "km, " + (Math.round((trip.totalEmission / 1000) * 10) / 10) + "kg CO2"
+      subtext.textContent += "km"
 
       header.append(subtext)
 
@@ -557,6 +563,7 @@
       infoList.innerHTML = '<dt class="col-sm-2">Trip ID</dt><dd class="col-sm-10">'+trip.id+'</dd>';
 
       if (searchOffers) {
+        infoList.innerHTML += '<dt class="col-sm-2">Offer Search ID</dt><dd class="col-sm-10" id="offer-search-' + trip.id + '"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></dd>';
         infoList.innerHTML += '<dt class="col-sm-2">Offers</dt><dd class="col-sm-10" id="offers-' + trip.id + '"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></dd>';
         search_offers(trip.id);
       }
@@ -600,17 +607,6 @@
           let badge = document.createElement("span")
           badge.className = "badge bg-secondary"
           badge.innerText = "Shortest Distance"
-          badges.append(badge)
-
-          badge = document.createElement("span")
-          badge.innerText = " "
-          badges.append(badge)
-      }
-
-      if (trip.environment) {
-          let badge = document.createElement("span")
-          badge.className = "badge bg-success"
-          badge.innerText = "Smallest CO2 Footprint"
           badges.append(badge)
 
           badge = document.createElement("span")
@@ -663,7 +659,23 @@
       markers.push(marker);
       latlngs.push(marker.getLatLng());
 
+      let prev_date = "";
+
       trip.relationships.segments.data.forEach(function (segment, k) {
+          let curr_date = (new Date(segment.relationships.legs.data[0].attributes.departureAt)).toLocaleDateString('en-GB', { timeZone: segment.relationships.legs.data[0].attributes.origin.timeZone });
+
+          if (prev_date != curr_date) {
+            let item = document.createElement('tr');
+            let cell = document.createElement('td');
+            cell.colSpan = 6;
+            cell.innerHTML = "<small>" + curr_date + "</small>";
+            cell.classList.add("text-center");
+            item.append(cell);
+            body.append(item);
+          }
+
+          prev_date = curr_date;
+
           let item = document.createElement('tr')
 
           if (k == 0) {
@@ -779,13 +791,13 @@
     });
   }
 
-  function inject_offers(response, tripId, searchStatus) {
+  function inject_offers(response, offerSearchId, tripId, searchStatus) {
     const status = document.getElementById('offers-' + tripId)
 
     if (response.data.length > 0) {
       status.innerHTML = '<i class="fas fa-check"></i> ' + response.data.length + ' offers';
     } else {
-      status.innerHTML = '<i class="fas fa-times-circle"></i> ' + searchStatus;
+      status.innerHTML = '<i class="fas fa-times-circle"></i> ' + response.data.length + ' offers';
     }
   }
 
@@ -797,7 +809,7 @@
         fetch("/offers/searches/" + id + "/offers")
         .then(res => res.json())
         .then(offersResponse => {
-          inject_offers(offersResponse, tripId, response.data.attributes.status);
+          inject_offers(offersResponse, id, tripId, response.data.attributes.status);
         })
       } else {
         setTimeout(() => {
@@ -815,7 +827,7 @@
         fetch("/trips/searches/" + id + "/trips?page[limit]=100&include=segments,segments.legs,segments.legs.legType")
         .then(res => res.json())
         .then(response => {
-          inject_trips(response);
+          inject_trips(id, response);
         })
       } else {
         setTimeout(() => {
@@ -858,6 +870,8 @@
       })
       .then((response) => response.json())
       .then((data) => {
+        const search = document.getElementById('offer-search-' + tripId)
+        search.innerHTML = data.data.id;
         load_offers(data.data.id, tripId);
       });
       }, Math.floor(Math.random() * 10000));
