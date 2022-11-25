@@ -289,13 +289,15 @@ class DistribusionClient(object):  # noqa: WPS214
 
         return orders.OrderResponse(**jsonapi_helpers.flatten_object(response.json()))
 
-    async def get_tickets(self, booking_id: str) -> bytes:
+    async def get_tickets(self, booking_id: str) -> orders.TicketDocument:
         response = await self._make_request(
             "GET",
             "/bookings/{booking_id}/tickets".format(booking_id=booking_id),
         )
-
-        return response.content
+        return orders.TicketDocument(
+            ticket_content=response.content,
+            content_type=response.headers.get("content-type"),
+        )
 
     async def get_cancellation_conditions(
         self,

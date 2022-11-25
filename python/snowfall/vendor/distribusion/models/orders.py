@@ -73,4 +73,9 @@ class OrderResponse(DistribusionBaseModel):
     executed_at: str | None
     created_at: str | None
     booking: Booking | None
-    currency: str
+    currency: str | None
+
+
+class TicketDocument(DistribusionBaseModel):
+    ticket_content: bytes
+    content_type: str | None
