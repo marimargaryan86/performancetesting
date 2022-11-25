@@ -194,6 +194,15 @@ def _mock_responses(
 
     httpx_mock.add_response(
         method="GET",
+        status_code=202,
+        url=_VALIDATE_PRICE_URL.format(
+            pricing_id=itinerary_validate_response["id"],
+            transaction_id=search_response["transactionId"],
+        ),
+    )
+
+    httpx_mock.add_response(
+        method="GET",
         json=branded_itinerary_response,
         url=_VALIDATE_PRICE_URL.format(
             pricing_id=itinerary_validate_response["id"],

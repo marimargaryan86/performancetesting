@@ -10,9 +10,5 @@ class DateError(Ask2GoError):
     """Raised when Inbound date is lower than outbound date."""
 
 
-class AcceptedResponseError(Ask2GoError):
-    """Raised when response status is accepted."""
-
-
 class TimeOutError(Ask2GoError):
     """Raised when a request times out."""

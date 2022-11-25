@@ -249,7 +249,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         self,
         pricing_id: str,
         transaction_id: str,
-    ) -> validated_offer.ValidatedOfferResponse:
+    ) -> validated_offer.ValidatedOfferResponse | None:
         response = await self._make_request(
             "GET",
             self._api_base_url.copy_with(
@@ -259,6 +259,9 @@ class Ask2GoClient(object):  # noqa: WPS214
                 ),
             ),
         )
+
+        if not response.content:
+            return None
 
         return validated_offer.ValidatedOfferResponse(**response.json())
 
@@ -279,16 +282,9 @@ class Ask2GoClient(object):  # noqa: WPS214
         except httpx.HTTPError as raw_exc:
             raise errors.ServiceError(inspect.getdoc(raw_exc)) from raw_exc
 
-        return _handle_error_status(response)
+        try:
+            response.raise_for_status()
+        except httpx.HTTPError as exc:
+            raise errors.ServiceError(_get_response_error_message(response)) from exc
 
-
-def _handle_error_status(response: httpx.Response) -> httpx.Response:
-    try:
-        response.raise_for_status()
-    except httpx.HTTPError as exc:
-        raise errors.ServiceError(_get_response_error_message(response)) from exc
-
-    if response.status_code == http.HTTPStatus.ACCEPTED:
-        raise errors.AcceptedResponseError()
-
-    return response
+        return response

@@ -274,9 +274,7 @@ class Ask2GoAdapter(object):  # noqa: WPS214
 
     @tenacity.retry(
         stop=tenacity.stop_after_attempt(10),
-        retry=tenacity.retry_if_exception_type(
-            (errors.AcceptedResponseError, errors.TimeOutError),
-        ),
+        retry=tenacity.retry_if_exception_type((NoResultsError, errors.TimeOutError)),
         wait=tenacity.wait_random_exponential(multiplier=1, max=5),
         reraise=True,
     )
@@ -284,10 +282,15 @@ class Ask2GoAdapter(object):  # noqa: WPS214
         self,
         validate_identifiers: validate_offer_criteria.ValidateOfferResponse,
     ) -> validated_offer.ValidatedOfferResponse:
-        return await self._client.get_validated_offer(
+        response = await self._client.get_validated_offer(
             pricing_id=validate_identifiers.identifier,
             transaction_id=validate_identifiers.transaction_id,
         )
+
+        if not response:
+            raise NoResultsError("No offer result available yet.")
+
+        return response
 
     async def _yield_pages(
         self,
