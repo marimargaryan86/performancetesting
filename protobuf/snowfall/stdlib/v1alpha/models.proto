@@ -39,6 +39,7 @@ message Schedule {
     TYPE_AIR = 1;
     TYPE_RAIL = 2;
     TYPE_FERRY = 3;
+    TYPE_BUS = 4;
   }
   Type type = 7;
   repeated Leg legs = 8;

@@ -22,6 +22,7 @@ message Location {
     TYPE_CITY = 1;
     TYPE_RAILWAY_STATION = 2;
     TYPE_AIRPORT = 3;
+    TYPE_BUS_STATION = 4;
   }
   repeated Type types = 8;
 }
