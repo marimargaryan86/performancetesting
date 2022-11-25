@@ -33,7 +33,11 @@ class ResponseLogHandler(object):
     def has_json_content(self, response: httpx.Response) -> bool:
         if response and response.headers:
             content_type = response.headers.get("content-type")
-            return content_type and content_type.startswith("application/json")
+            return (
+                content_type
+                and content_type.startswith("application/")
+                and "json" in content_type
+            )
 
         return False
 
