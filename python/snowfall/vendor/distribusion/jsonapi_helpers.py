@@ -11,7 +11,9 @@ def flatten_list(content: Any) -> List[Any]:
 
         if isinstance(content["data"], list):
             for data_item in content["data"]:
-                result.append(_resolve(_flat(data_item), included, set()))
+                flat_data_item = _flat(data_item)
+                flat_data_item.update(content.get("meta", {}))
+                result.append(_resolve(flat_data_item, included, set()))
 
     return result
 
@@ -22,7 +24,9 @@ def flatten_object(content: Any) -> Mapping[str, Any]:
         included = _parse_included(content.get("included", []))
 
         if isinstance(content["data"], dict):
-            return _resolve(_flat(content["data"]), included, set())
+            flat_data = _flat(content["data"])
+            flat_data.update(content.get("meta", {}))
+            return _resolve(flat_data, included, set())
 
     return {}
 

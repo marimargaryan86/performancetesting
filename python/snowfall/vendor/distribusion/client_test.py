@@ -118,6 +118,7 @@ async def test_get_order(
 
     assert response
     assert response.identifier == order_id
+    assert response.currency == "GBP"
     assert response.booking and response.booking.total_price == 2148
     assert (
         response.booking

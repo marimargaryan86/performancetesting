@@ -124,6 +124,7 @@ class Connection(DistribusionBaseModel):
     fares: List[FaresRelFareClassPrice] | None
     marketing_carrier: MarketingCarrier | None
     segments: List[Segment] | None
+    currency: str
 
 
 class ConnectionVacancy(DistribusionBaseModel):
@@ -131,6 +132,7 @@ class ConnectionVacancy(DistribusionBaseModel):
     total_price: int | None
     vacant: bool | None
     fees: Dict[str, Any] | None
+    currency: str
 
 
 class Coordinates(DistribusionBaseModel):

@@ -176,8 +176,11 @@ async def test_get_booking_by_id(
     booking_id = "28wfnEhKzGEWqZ02ykHtdw"
     booking_details = await distribusion_client.get_booking_by_id(booking_id)
     assert booking_details
+    assert booking_details.currency == "EUR"
 
 
+@disable_by_default
+@pytest.mark.asyncio
 async def test_order_create(  # noqa: WPS210
     distribusion_client: client.DistribusionClient,
 ) -> None:

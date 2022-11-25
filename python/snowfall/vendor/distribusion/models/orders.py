@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import pydantic
 
@@ -70,6 +70,7 @@ class OrderCreateResponse(DistribusionBaseModel):
 class OrderResponse(DistribusionBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
     state: str
-    executed_at: Optional[str]
-    created_at: Optional[str]
-    booking: Optional[Booking]
+    executed_at: str | None
+    created_at: str | None
+    booking: Booking | None
+    currency: str

@@ -155,6 +155,7 @@ class Booking(DistribusionBaseModel):
     terms_accepted: bool | None
     title: str | None
     total_price: int | None
+    currency: str
     zip_code: str | None
     arrival_station: Station | None
     cancellation: CancellationsId | None
