@@ -779,13 +779,13 @@
     });
   }
 
-  function inject_offers(response, tripId) {
+  function inject_offers(response, tripId, searchStatus) {
     const status = document.getElementById('offers-' + tripId)
 
     if (response.data.length > 0) {
-      status.innerHTML = '<i class="fas fa-check"></i>';
+      status.innerHTML = '<i class="fas fa-check"></i> ' + response.data.length + ' offers';
     } else {
-      status.innerHTML = '<i class="fas fa-times-circle"></i>';
+      status.innerHTML = '<i class="fas fa-times-circle"></i> ' + searchStatus;
     }
   }
 
@@ -796,8 +796,8 @@
       if (response.data.attributes.status == "completed" || response.data.attributes.status == "failed") {
         fetch("/offers/searches/" + id + "/offers")
         .then(res => res.json())
-        .then(response => {
-          inject_offers(response, tripId);
+        .then(offersResponse => {
+          inject_offers(offersResponse, tripId, response.data.attributes.status);
         })
       } else {
         setTimeout(() => {
