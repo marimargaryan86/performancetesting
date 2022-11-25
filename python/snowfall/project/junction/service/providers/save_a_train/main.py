@@ -151,6 +151,10 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                 ),
                 ttl=app.settings.ttl,
             ),
+            redis=redis.Client[bytes](
+                redis=redis_connection,
+                prefix=app.name,
+            ),
         )
 
         await search_consumer.consume()

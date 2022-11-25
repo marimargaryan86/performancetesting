@@ -1,5 +1,6 @@
 import structlog
 
+from snowfall.project.junction.provider import offers
 from snowfall.project.junction.service.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
 from snowfall.project.junction.service.orders.v1alpha import amqp_pb2 as orders_amqp_pb2
 from snowfall.project.junction.service.providers.ask2go import (
@@ -9,6 +10,7 @@ from snowfall.project.junction.service.providers.ask2go import (
     transformer,
 )
 from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
+from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types
@@ -59,6 +61,21 @@ class OrderConsumer(object):
         )
 
 
+def _offer_group_cache_key(task: amqp_pb2.SearchCriteriaTask) -> str:
+    return string.to_uuid(
+        b"\x00".decode().join(
+            [
+                task.session_token,
+                *[segment.id for segment in task.segments],
+                task.criteria.cabin_class,
+                str(task.criteria.adults),
+                str(task.criteria.children),
+                str(task.criteria.infants),
+            ],
+        ),
+    )
+
+
 class SearchCriteriaConsumer(object):
     def __init__(  # noqa: WPS211
         self,
@@ -88,7 +105,10 @@ class SearchCriteriaConsumer(object):
                 amqp_message.body.criteria.outbound_departure,
             ).isoformat(),
         ):
-            offer_cache = cache.OfferGroupCache(amqp_message.body, self._redis)
+            offer_cache = offers.OfferGroupCache(
+                _offer_group_cache_key(amqp_message.body),
+                self._redis,
+            )
 
             async with offer_cache as has_lock:
                 if has_lock:
@@ -99,7 +119,7 @@ class SearchCriteriaConsumer(object):
     async def _search_offers(
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
-        offer_cache: cache.OfferGroupCache,
+        offer_cache: offers.OfferGroupCache,
     ) -> None:
         try:
             async for cached_offer_group in offer_cache.to_iterable():
@@ -110,7 +130,7 @@ class SearchCriteriaConsumer(object):
                     ),
                     routing_key="offers.result.trip",
                 )
-        except cache.NoCacheExistsError:
+        except offers.NoCacheExistsError:
             offer_groups = self._transformer.offer_prices_to_offer_groups(
                 search_task,
                 self._adapter.gather_search_results(search_task),
