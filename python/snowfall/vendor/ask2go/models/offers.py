@@ -62,7 +62,6 @@ class TripSegment(CamelCaseBaseModel):
     duration: timedelta
     distance: float
     cabin: Optional[str]
-    is_technical_stop: bool
     aircraft: SegmentAircraft
     availability: Optional[SegmentAvailability]
     origin: TripOriginDestination
