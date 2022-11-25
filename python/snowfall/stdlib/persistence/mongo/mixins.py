@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import Generic, Optional, Sequence, TypeVar
 
 import pymongo
@@ -95,6 +96,7 @@ class StatusMixin(Generic[Record]):
             {
                 "$set": {
                     "status": amqp_pb2.Trackable.STATUS_COMPLETED,
+                    "updated_at": datetime.datetime.now(tz=datetime.timezone.utc),
                 },
             },
             return_document=pymongo.ReturnDocument.AFTER,
@@ -110,6 +112,7 @@ class StatusMixin(Generic[Record]):
             {
                 "$set": {
                     "status": amqp_pb2.Trackable.STATUS_FAILED,
+                    "updated_at": datetime.datetime.now(tz=datetime.timezone.utc),
                 },
             },
             return_document=pymongo.ReturnDocument.AFTER,
@@ -125,6 +128,7 @@ class StatusMixin(Generic[Record]):
             {
                 "$set": {
                     "status": amqp_pb2.Trackable.STATUS_PROCESSING,
+                    "updated_at": datetime.datetime.now(tz=datetime.timezone.utc),
                 },
             },
             return_document=pymongo.ReturnDocument.AFTER,

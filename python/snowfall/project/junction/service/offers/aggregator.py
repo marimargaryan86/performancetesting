@@ -3,6 +3,8 @@ import datetime
 import itertools
 from typing import Mapping, Sequence
 
+import structlog
+
 from snowfall.project.junction.service.offers import offers
 from snowfall.project.junction.service.offers.v1alpha import amqp_pb2, models_pb2
 from snowfall.stdlib import string
@@ -172,6 +174,7 @@ class OfferAggregator(object):
         self._searches = offer_searches
         self._buckets = offer_buckets
         self._aggregates = offer_aggregates
+        self._logger = structlog.get_logger(__name__)
 
     async def aggregate(
         self,
@@ -181,6 +184,17 @@ class OfferAggregator(object):
 
         if not offer_search:
             raise SkippedOfferError()
+
+        if offer_search.status in self._skippable_statuses:
+            self._logger.error(
+                "Offer arrived too late",
+                offer_search_id=offer_search.id,
+                offer_group_id=search_result.offer.id,
+                delay_seconds=(
+                    datetime.datetime.now(tz=datetime.timezone.utc)
+                    - protobuf.protobuf_to_datetime(offer_search.updated_at)
+                ).total_seconds(),
+            )
 
         _set_sequence_numbers(offer_search, search_result.offer)
 

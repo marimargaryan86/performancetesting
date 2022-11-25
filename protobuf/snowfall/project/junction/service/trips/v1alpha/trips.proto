@@ -83,4 +83,6 @@ message TripSearch {
   snowfall.stdlib.v1alpha.Trackable.Status status = 7; // read only
   optional uint32 maximum_connections = 8;
   repeated snowfall.stdlib.v1alpha.Schedule.Type allowed_segment_types = 9;
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp updated_at = 11;
 }
