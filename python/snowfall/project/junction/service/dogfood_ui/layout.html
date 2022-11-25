@@ -225,7 +225,11 @@
       shadowSize: [41, 41]
   });
 
-
+  function getLang() {
+    if (navigator.languages != undefined)
+      return navigator.languages[0];
+    return navigator.language;
+  }
 
   function clear_places() {
     const transaction = db.transaction('places', 'readwrite');
@@ -662,7 +666,7 @@
       let prev_date = "";
 
       trip.relationships.segments.data.forEach(function (segment, k) {
-          let curr_date = (new Date(segment.relationships.legs.data[0].attributes.departureAt)).toLocaleDateString('en-GB', { timeZone: segment.relationships.legs.data[0].attributes.origin.timeZone });
+          let curr_date = (new Date(segment.relationships.legs.data[0].attributes.departureAt)).toLocaleDateString(getLang(), { timeZone: segment.relationships.legs.data[0].attributes.origin.timeZone });
 
           if (prev_date != curr_date) {
             let item = document.createElement('tr');
@@ -707,11 +711,11 @@
           item.append(cell);
 
           cell = document.createElement('td')
-          cell.textContent = (new Date(segment.relationships.legs.data[0].attributes.departureAt)).toLocaleTimeString('en-GB', { timeZone: segment.relationships.legs.data[0].attributes.origin.timeZone })
+          cell.textContent = (new Date(segment.relationships.legs.data[0].attributes.departureAt)).toLocaleTimeString(getLang(), { timeZone: segment.relationships.legs.data[0].attributes.origin.timeZone })
           item.append(cell);
 
           cell = document.createElement('td')
-          cell.textContent = (new Date(segment.relationships.legs.data[segment.relationships.legs.data.length-1].attributes.arrivalAt)).toLocaleTimeString('en-GB', { timeZone: segment.relationships.legs.data[segment.relationships.legs.data.length-1].attributes.destination.timeZone })
+          cell.textContent = (new Date(segment.relationships.legs.data[segment.relationships.legs.data.length-1].attributes.arrivalAt)).toLocaleTimeString(getLang(), { timeZone: segment.relationships.legs.data[segment.relationships.legs.data.length-1].attributes.destination.timeZone })
           item.append(cell);
 
           body.append(item)
