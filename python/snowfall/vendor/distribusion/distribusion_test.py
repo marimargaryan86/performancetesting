@@ -273,3 +273,54 @@ async def test_get_order_by_id(
     order_id = "VICA-66bbc46a-7bfd-4c5b-bcdd-d984ff247f0b"
     order_details = await distribusion_client.get_order(order_id)
     assert order_details
+
+
+@disable_by_default
+@pytest.mark.asyncio
+async def test_get_tickets(
+    distribusion_client: client.DistribusionClient,
+) -> None:
+    order_id = "VICA-66bbc46a-7bfd-4c5b-bcdd-d984ff247f0b"
+    order_details = await distribusion_client.get_order(order_id)
+    assert order_details
+    assert order_details.booking
+    assert order_details.booking.identifier
+
+    tickets = await distribusion_client.get_tickets(order_details.booking.identifier)
+    assert tickets
+
+
+@disable_by_default
+@pytest.mark.asyncio
+async def test_get_cancellation_conditions(
+    distribusion_client: client.DistribusionClient,
+) -> None:
+    order_id = "VICA-66bbc46a-7bfd-4c5b-bcdd-d984ff247f0b"
+    order_details = await distribusion_client.get_order(order_id)
+    assert order_details and order_details.booking and order_details.booking.identifier
+
+    cancellation_conditions = await distribusion_client.get_cancellation_conditions(
+        order_details.booking.identifier,
+    )
+    assert cancellation_conditions and cancellation_conditions.identifier
+    assert cancellation_conditions and cancellation_conditions.allowed
+    assert cancellation_conditions and cancellation_conditions.cutoff
+    assert cancellation_conditions and cancellation_conditions.fee is not None
+
+
+@disable_by_default
+@pytest.mark.asyncio
+async def test_create_cancellation(
+    distribusion_client: client.DistribusionClient,
+) -> None:
+    order_id = "VICA-4be6700c-4dcd-4513-987b-6d64669367ea"
+    order_details = await distribusion_client.get_order(order_id)
+    assert order_details and order_details.booking and order_details.booking.identifier
+
+    cancellation = await distribusion_client.create_cancellation(
+        order_details.booking.identifier,
+    )
+    assert cancellation and cancellation.identifier
+    assert cancellation and cancellation.total_price
+    assert cancellation and cancellation.total_refund
+    assert cancellation and cancellation.created_at

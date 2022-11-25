@@ -9,6 +9,7 @@ import httpx
 from snowfall.vendor.distribusion import errors, jsonapi_helpers
 from snowfall.vendor.distribusion.models import (
     bookings,
+    cancellations,
     connections,
     criterias,
     marketing_carriers,
@@ -72,7 +73,7 @@ class DistribusionClient(object):  # noqa: WPS214
         )
 
         return marketing_carriers.MarketingCarrierDetails(
-            **jsonapi_helpers.flatten_object(response.json()),
+            **jsonapi_helpers.flatten_object(response.json()),  # noqa: WPS204
         )
 
     async def get_marketing_carrier_booking_schema(
@@ -287,6 +288,42 @@ class DistribusionClient(object):  # noqa: WPS214
         )
 
         return orders.OrderResponse(**jsonapi_helpers.flatten_object(response.json()))
+
+    async def get_tickets(self, booking_id: str) -> bytes:
+        response = await self._make_request(
+            "GET",
+            "/bookings/{booking_id}/tickets".format(booking_id=booking_id),
+        )
+
+        return response.content
+
+    async def get_cancellation_conditions(
+        self,
+        booking_id: str,
+    ) -> cancellations.CancellationCondition:
+        response = await self._make_request(
+            "GET",
+            "/cancellations/conditions",
+            httpx.QueryParams(booking=booking_id),
+        )
+
+        return cancellations.CancellationCondition(
+            **jsonapi_helpers.flatten_object(response.json()),
+        )
+
+    async def create_cancellation(
+        self,
+        booking_id: str,
+    ) -> cancellations.Cancellation:
+        response = await self._make_request(
+            "POST",
+            "/cancellations/create",
+            payload={"booking": booking_id},
+        )
+
+        return cancellations.Cancellation(
+            **jsonapi_helpers.flatten_object(response.json()),
+        )
 
     async def _make_request(
         self,
