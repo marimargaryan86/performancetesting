@@ -50,4 +50,6 @@ message ScheduleStop {
   uint32 departure_at = 5; // unix timestamp
   uint32 arrival_at = 6; // unix timestamp
   uint32 order = 7; // order of the stop in the schedule
+  bool boarding_allowed = 8; // whether or not boarding is allowed
+  bool alighting_allowed = 9; // whether or not alighting is allowed
 }

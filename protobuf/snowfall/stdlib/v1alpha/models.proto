@@ -52,6 +52,8 @@ message Leg {
   google.protobuf.Timestamp arrival_at = 5;
   Schedule.Type type = 6;
   string agency_name = 7;
+  bool boarding_allowed = 8;
+  bool alighting_allowed = 9;
 }
 
 message Segment {
