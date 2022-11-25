@@ -21,7 +21,7 @@ from snowfall.vendor.ask2go import client, errors
 from snowfall.vendor.ask2go.models import booking, common
 
 
-class BookingError(errors.ServiceError):
+class BookingError(errors.Ask2GoError):
     def __init__(
         self,
         message: str,
@@ -66,18 +66,10 @@ class BookingHandler(object):
                 details=details,
                 metadata=task.metadata,
             )
-        except (errors.ServiceError, phonenumbers.NumberParseException) as err:
-            if isinstance(err, BookingError):
-                self._logger.exception(
-                    "Booking failed",
-                    status=err.status,
-                    details=[
-                        {"code": detail.code, "message": detail.message}
-                        for detail in err.details or []
-                    ],
-                )
-            else:
-                self._logger.exception()
+        except (errors.Ask2GoError, phonenumbers.NumberParseException) as error:
+            if isinstance(error, errors.Ask2GoError):
+                await self._log_exception(error)
+
             new_booking.status = models_pb2.Booking.STATUS_ERROR
 
             return new_booking
@@ -111,6 +103,35 @@ class BookingHandler(object):
         )
 
         return new_booking
+
+    async def _log_exception(self, error: errors.Ask2GoError) -> None:
+        if isinstance(error, BookingError):
+            self._logger.exception(
+                "Booking failed",
+                status=error.status,
+                details=[
+                    {"code": detail.code, "message": detail.message}
+                    for detail in error.details or []
+                ],
+            )
+        elif isinstance(error, errors.RequestError):
+            self._logger.exception(
+                "Booking failed",
+                method=error.request.method,
+                url=error.request.url,
+                request=error.request.body,
+            )
+        elif isinstance(error, errors.HttpStatusError):
+            self._logger.exception(
+                "Booking failed",
+                method=error.request.method,
+                url=error.request.url,
+                request=error.request.body,
+                status_code=error.response.status_code,
+                response=error.response.body,
+            )
+        else:
+            self._logger.exception()
 
     async def _make_booking(
         self,
@@ -180,19 +201,23 @@ class BookingHandler(object):
 
         return booking_result
 
-    async def _poll_booking(self, model: booking.Booking) -> booking.Booking:
+    async def _poll_booking(self, booking_result: booking.Booking) -> booking.Booking:
         for _ in range(self._poll_retries_limit):
-            model = await self._client.get_booking(
-                booking_ref_id=model.id,
-                transaction_id=model.transaction_id,
+            booking_result = await self._client.get_booking(
+                booking_ref_id=booking_result.id,
+                transaction_id=booking_result.transaction_id,
             )
 
-            if model.contact_details:
-                return model
+            if booking_result.contact_details:
+                return booking_result
 
             await asyncio.sleep(self._wait_time_between_polling)
 
-        raise errors.ServiceError("Unable to get booking details in time")
+        raise BookingError(
+            "Booking did not complete in time",
+            status=booking_result.information.status,
+            details=booking_result.information.errors,
+        )
 
     def _validate_booking_is_pending(self, booking_result: booking.Booking) -> None:
         status = booking_result.information.status

@@ -1,7 +1,3 @@
-import contextlib
-import http
-import inspect
-import json
 from typing import Any, Optional, Sequence
 
 import httpx
@@ -15,16 +11,6 @@ from snowfall.vendor.ask2go.models import (
     validate_offer_criteria,
     validated_offer,
 )
-
-
-def _get_response_error_message(response: httpx.Response) -> str:
-    status = http.HTTPStatus(response.status_code)
-    description = status.description
-
-    with contextlib.suppress(json.decoder.JSONDecodeError, AttributeError):
-        description = response.json().get("title") or status.description
-
-    return "{0}: {1}".format(status.value, description)
 
 
 class Ask2GoClient(object):  # noqa: WPS214
@@ -278,13 +264,13 @@ class Ask2GoClient(object):  # noqa: WPS214
                 json=payload,
             )
         except httpx.TimeoutException as timeout_exc:
-            raise errors.TimeOutError(inspect.getdoc(timeout_exc)) from timeout_exc
-        except httpx.HTTPError as raw_exc:
-            raise errors.ServiceError(inspect.getdoc(raw_exc)) from raw_exc
+            raise errors.TimeOutError.from_error(timeout_exc) from timeout_exc
+        except httpx.RequestError as request_exc:
+            raise errors.RequestError.from_error(request_exc) from request_exc
 
         try:
             response.raise_for_status()
-        except httpx.HTTPError as exc:
-            raise errors.ServiceError(_get_response_error_message(response)) from exc
+        except httpx.HTTPStatusError as exc:
+            raise errors.HttpStatusError.from_error(exc) from exc
 
         return response

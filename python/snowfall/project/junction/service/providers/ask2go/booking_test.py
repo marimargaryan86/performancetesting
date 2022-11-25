@@ -1,5 +1,6 @@
 import datetime
 
+import more_itertools
 import pytest
 import pytest_httpx
 from structlog import testing
@@ -113,3 +114,29 @@ async def test_booking_errors(
             assert len(log["details"]) == 1
             assert log["details"][0]["code"] == 500
             assert log["details"][0]["message"]
+
+
+@pytest.mark.asyncio
+async def test_unhandled_booking_error(
+    booking_handler: booking.BookingHandler,
+    httpx_mock: pytest_httpx.HTTPXMock,
+) -> None:
+    httpx_mock.add_response(
+        method="POST",
+        status_code=406,
+        json={"foo": "bar"},
+        url="https://test_url/api/Booking",
+    )
+
+    with testing.capture_logs() as cap_logs:
+        await booking_handler.book(
+            task=_ORDER_TASK,
+            details=cache.OfferDetails(pricing_id="foo", transaction_id="bar"),
+        )
+        log = more_itertools.last(cap_logs)
+
+        assert log["status_code"] == 406
+        assert log["url"] == "https://test_url/api/Booking"
+        assert log["method"] == "POST"
+        assert log["request"]
+        assert log["response"]

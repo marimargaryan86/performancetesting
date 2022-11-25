@@ -25,7 +25,7 @@ async def test_error_message(
         },
     )
 
-    with pytest.raises(errors.ServiceError) as excinfo:
+    with pytest.raises(errors.HttpStatusError) as excinfo:
         await ask2go_client.get_airports()
 
     assert str(excinfo.value) == "400: {0}".format(expected_title)  # noqa: WPS441
@@ -47,7 +47,7 @@ async def test_empty_title_error_message(
         },
     )
 
-    with pytest.raises(errors.ServiceError) as excinfo:
+    with pytest.raises(errors.HttpStatusError) as excinfo:
         await ask2go_client.get_airports()
 
     assert str(excinfo.value) == expected_title  # noqa: WPS441
@@ -61,7 +61,7 @@ async def test_critical_error_message(
     expected_title = "{0}: {1}".format(status.value, status.description)
     httpx_mock.add_response(url=_URL, status_code=status.value)
 
-    with pytest.raises(errors.ServiceError) as excinfo:
+    with pytest.raises(errors.HttpStatusError) as excinfo:
         await ask2go_client.get_airports()
 
     assert str(excinfo.value) == expected_title  # noqa: WPS441
@@ -75,7 +75,7 @@ async def test_bad_json_error_message(
     expected_title = "{0}: {1}".format(status.value, status.description)
     httpx_mock.add_response(url=_URL, status_code=status.value, json=[])
 
-    with pytest.raises(errors.ServiceError) as excinfo:
+    with pytest.raises(errors.HttpStatusError) as excinfo:
         await ask2go_client.get_airports()
 
     assert str(excinfo.value) == expected_title  # noqa: WPS441
@@ -87,7 +87,7 @@ async def test_default_error_message(
 ) -> None:
     httpx_mock.add_exception(url=_URL, exception=httpx.ConnectError(""))
 
-    with pytest.raises(errors.ServiceError) as excinfo:
+    with pytest.raises(errors.RequestError) as excinfo:
         await ask2go_client.get_airports()
 
     assert str(excinfo.value) == inspect.getdoc(httpx.ConnectError)  # noqa: WPS441
