@@ -2,9 +2,9 @@ import ipaddress
 import random
 from collections.abc import Sequence
 
-import aioredis
 import shapefile
 from pydantic import AnyUrl
+from redis import asyncio as aioredis
 
 from snowfall.service.geodata import geocoding
 from snowfall.service.geodata.grpc import GeocodingService

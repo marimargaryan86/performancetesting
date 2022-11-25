@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import contextlib
 import datetime
 import json
@@ -6,9 +8,9 @@ import pkgutil
 import random
 from typing import Sequence
 
-import aioredis
 import httpx
 import pydantic
+from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import offers
 from snowfall.project.junction.service.providers.save_a_train import (
@@ -65,7 +67,7 @@ class _OrdersSettings(_SatConfig, service.Settings):
 
 async def _offers(app: service.Application[_OffersSettings]) -> None:
     async with contextlib.AsyncExitStack() as stack:
-        redis_conn = await stack.enter_async_context(
+        redis_conn: aioredis.Redis[str] = await stack.enter_async_context(
             aioredis.from_url(
                 random.choice(app.settings.redis_dsn),  # nosec
                 decode_responses=True,
@@ -77,7 +79,7 @@ async def _offers(app: service.Application[_OffersSettings]) -> None:
 
         trip_search_consumer = offers.create_trip_offer_search_consumer(
             amqp_connection=connection,
-            redis_client=redis.Client[str](redis_conn, prefix=app.name),
+            redis_client=redis.Client(redis_conn, prefix=app.name),
             criteria_generator=criteria.CriteriaGenerator(
                 h3_mapping=h3.H3MappingRepository[train_stations.TrainStation](
                     mapping=await _load_train_stations(),
@@ -101,7 +103,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
         amqp_connection = await stack.enter_async_context(
             types.Connection(app.settings.amqp_dsn),
         )
-        redis_connection = await stack.enter_async_context(
+        redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
             aioredis.from_url(
                 random.choice(app.settings.redis_dsn),  # nosec
                 decode_responses=False,
@@ -147,7 +149,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                     train_stations=await _load_train_stations(),
                 ),
                 offers_cache=cache.OffersCache(
-                    client=redis.Client[bytes](redis_connection, prefix=app.name),
+                    client=redis.Client(redis_connection, prefix=app.name),
                 ),
                 ttl=app.settings.ttl,
             ),
@@ -171,7 +173,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
         amqp_connection = await stack.enter_async_context(
             types.Connection(app.settings.amqp_dsn),
         )
-        redis_connection = await stack.enter_async_context(
+        redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
             aioredis.from_url(
                 random.choice(app.settings.redis_dsn),  # nosec
                 decode_responses=False,
@@ -191,7 +193,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
         )
         # TODO: do we need to call get_token on the save_a_train_client?
         offer_cache = cache.OffersCache(
-            client=redis.Client[bytes](redis_connection, prefix=app.name),
+            client=redis.Client(redis_connection, prefix=app.name),
         )
         orders_consumer = consumer.OrdersConsumer(
             consumer_obj=amqp_consumer.Consumer(

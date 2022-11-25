@@ -1,16 +1,18 @@
+from __future__ import annotations
+
 import asyncio
 import datetime
 
-import aioredis
 import freezegun
 import pytest
+from redis import asyncio as aioredis
 
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.testing import asserts
 
 
 class TestPrefixClient(object):
-    async def test_set_get_delete(self, redis_client: aioredis.Redis) -> None:
+    async def test_set_get_delete(self, redis_client: aioredis.Redis[str]) -> None:
         await asyncio.gather(
             self._foo_client.put("foobar", "foobar"),
             self._bar_client.put("foobar", "bazqux"),
@@ -28,7 +30,7 @@ class TestPrefixClient(object):
             (self._bar_client.get("foobar"), None),
         )
 
-    async def test_wildcard_delete(self, redis_client: aioredis.Redis) -> None:
+    async def test_wildcard_delete(self, redis_client: aioredis.Redis[str]) -> None:
         await asyncio.gather(
             self._foo_client.put("foo.bar", "foobar"),
             self._foo_client.put("foo.baz", "foobar"),
@@ -52,7 +54,7 @@ class TestPrefixClient(object):
             (self._bar_client.get("foo.baz"), None),
         )
 
-    async def test_hash(self, redis_client: aioredis.Redis) -> None:
+    async def test_hash(self, redis_client: aioredis.Redis[str]) -> None:
         hash1 = self._foo_client.hash_("foobar")
         hash2 = self._bar_client.hash_("foobar")
 
@@ -227,6 +229,6 @@ class TestPrefixClient(object):
         )
 
     @pytest.fixture(autouse=True)
-    def _setup(self, redis_client: aioredis.Redis) -> None:
-        self._foo_client = redis.Client[bytes](redis_client, "foo")
-        self._bar_client = redis.Client[bytes](redis_client, "bar")
+    def _setup(self, redis_client: aioredis.Redis[bytes]) -> None:
+        self._foo_client = redis.Client(redis_client, "foo")
+        self._bar_client = redis.Client(redis_client, "bar")

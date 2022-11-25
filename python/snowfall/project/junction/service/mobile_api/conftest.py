@@ -169,7 +169,7 @@ def _create_app(
 
 @pytest.fixture
 def redis_client(decoding_redis_client: fakeredis.FakeRedis) -> redis.Client[str]:
-    return redis.Client[str](
+    return redis.Client(
         decoding_redis_client,
         prefix="mobile-api",
     )

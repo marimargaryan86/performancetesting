@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import datetime
 
-import aioredis
 import mongomock_motor
 import pytest
 from motor import motor_asyncio
+from redis import asyncio as aioredis
 
 from snowfall.project.junction.service.offers import aggregator, offers
 from snowfall.stdlib.persistence.redis import types as redis
@@ -16,10 +18,10 @@ def mongo_client() -> motor_asyncio.AsyncIOMotorClient:
 
 @pytest.fixture
 def offer_bucket_repository(
-    decoding_redis_client: aioredis.Redis,
+    decoding_redis_client: aioredis.Redis[str],
 ) -> aggregator.OfferBucketRepository:
     return aggregator.OfferBucketRepository(
-        redis_client=redis.Client[str](
+        redis_client=redis.Client(
             redis=decoding_redis_client,
             prefix="offer_bucket",
         ),

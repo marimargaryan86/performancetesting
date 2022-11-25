@@ -11,7 +11,7 @@ SF30 = "SF30 Found restricted import: not allowed to import {0} here"
 
 class Visitor(plugin.Visitor):
     _callee_whitelist = {
-        "aioredis": frozenset(("snowfall.stdlib.persistence.redis.types",)),
+        "redis.asyncio": frozenset(("snowfall.stdlib.persistence.redis.types",)),
     }
 
     def __init__(self, module: str):

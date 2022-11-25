@@ -1,11 +1,13 @@
+from __future__ import annotations
+
 import datetime
 import json
 from collections.abc import AsyncIterator
 from typing import Any
 
-import aioredis
 import httpx
 import pytest
+from redis import asyncio as aioredis
 
 from snowfall.project.junction.service.providers.save_a_train import (
     adapter,
@@ -63,13 +65,13 @@ def train_station_repository() -> train_stations.TrainStationRepository:
 def save_a_train_adapter(
     save_a_train_client: client.SATClient,
     train_station_repository: train_stations.TrainStationRepository,
-    redis_client: aioredis.Redis,
+    redis_client: aioredis.Redis[bytes],
 ) -> adapter.SaveATrainAdapter:
     return adapter.SaveATrainAdapter(
         save_a_train_client=save_a_train_client,
         train_station_repository=train_station_repository,
         offers_cache=cache.OffersCache(
-            client=redis.Client[bytes](redis_client),
+            client=redis.Client(redis_client),
         ),
         ttl=datetime.timedelta(minutes=1),
     )

@@ -3,9 +3,9 @@ import ipaddress
 import random
 from typing import Sequence
 
-import aioredis
 import pydantic
 from motor import motor_asyncio
+from redis import asyncio as aioredis
 
 from snowfall.project.junction.service.offers import aggregator, importer, offers
 from snowfall.project.junction.service.offers.amqp import OfferSearchProducer

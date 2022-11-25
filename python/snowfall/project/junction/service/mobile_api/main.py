@@ -3,11 +3,11 @@ import random
 from functools import partial
 from typing import Callable
 
-import aioredis
 import aiosmtplib
 import httpx
 import stripe
 from motor import motor_asyncio
+from redis import asyncio as aioredis
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 

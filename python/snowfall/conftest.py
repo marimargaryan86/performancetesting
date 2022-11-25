@@ -1,10 +1,13 @@
+from __future__ import annotations
+
 import asyncio
 import datetime
+from typing import AnyStr
 
-import aioredis
 import pytest
 from fakeredis import aioredis as fakeredis
 from motor import core, motor_asyncio
+from redis import asyncio as aioredis
 
 from snowfall import fixtures
 from snowfall.project.junction.adapter import (
@@ -45,12 +48,12 @@ repository._configure_collection = _mongo_mock_configure  # noqa: WPS437
 
 
 @pytest.fixture
-def redis_client() -> aioredis.Redis:
+def redis_client() -> aioredis.Redis[AnyStr]:
     return fakeredis.FakeRedis()
 
 
 @pytest.fixture
-def decoding_redis_client() -> aioredis.Redis:
+def decoding_redis_client() -> aioredis.Redis[AnyStr]:
     return fakeredis.FakeRedis(decode_responses=True)
 
 

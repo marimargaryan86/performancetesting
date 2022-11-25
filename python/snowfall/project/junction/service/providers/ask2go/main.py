@@ -1,12 +1,14 @@
+from __future__ import annotations
+
 import contextlib
 import datetime
 import random
 from typing import Any, Sequence, cast
 
-import aioredis
 import aiosmtplib
 import httpx
 import pydantic
+from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import offers
 from snowfall.project.junction.service.providers.ask2go import (
@@ -60,7 +62,7 @@ class _SearchSettings(service.Settings):
 
 async def _offers(app: service.Application[_OffersSettings]) -> None:
     async with contextlib.AsyncExitStack() as stack:
-        redis_conn = await stack.enter_async_context(
+        redis_conn: aioredis.Redis[str] = await stack.enter_async_context(
             aioredis.from_url(
                 app.settings.redis_dsn,
                 decode_responses=True,
@@ -72,7 +74,7 @@ async def _offers(app: service.Application[_OffersSettings]) -> None:
 
         trip_search_consumer = offers.create_trip_offer_search_consumer(
             amqp_connection=connection,
-            redis_client=redis.Client[str](redis_conn, prefix=app.name),
+            redis_client=redis.Client(redis_conn, prefix=app.name),
             criteria_generator=criteria.CriteriaGenerator(
                 h3_mapping=h3.H3MappingRepository[airports.Airport](
                     mapping=airports.AirportRepository(
@@ -102,7 +104,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
                 ),
             ),
         )
-        redis_connection = await stack.enter_async_context(
+        redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
             aioredis.from_url(
                 random.choice(app.settings.redis_dsn),  # nosec
                 decode_responses=False,
@@ -142,7 +144,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
                 ),
             ),
             offer_cache=cache.OfferCache(
-                client=redis.Client[bytes](redis_connection, prefix=app.name),
+                client=redis.Client(redis_connection, prefix=app.name),
             ),
         ).consume()
 
@@ -157,7 +159,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                 ),
             ),
         )
-        redis_connection = await stack.enter_async_context(
+        redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
             aioredis.from_url(
                 random.choice(app.settings.redis_dsn),  # nosec
                 decode_responses=False,
@@ -208,11 +210,11 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                     ),
                 ),
                 offer_cache=cache.OfferCache(
-                    client=redis.Client[bytes](redis_connection, prefix=app.name),
+                    client=redis.Client(redis_connection, prefix=app.name),
                 ),
                 offer_ttl=app.settings.ttl,
             ),
-            redis=redis.Client[bytes](
+            redis=redis.Client(
                 redis=redis_connection,
                 prefix=app.name,
             ),

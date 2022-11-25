@@ -5,7 +5,7 @@ from snowfall.plugin.flake8 import imports
 
 def test_imports_ok() -> None:
     visitor = imports.Visitor("snowfall.stdlib.persistence.redis.types")
-    tree = ast.parse("import aioredis")
+    tree = ast.parse("from redis import asyncio as aioredis")
 
     visitor.visit(tree)
 
@@ -14,7 +14,7 @@ def test_imports_ok() -> None:
 
 def test_imports_nok() -> None:
     visitor = imports.Visitor("foobar")
-    tree = ast.parse("import aioredis")
+    tree = ast.parse("from redis import asyncio as aioredis")
 
     visitor.visit(tree)
 

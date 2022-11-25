@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import datetime
 from typing import Type
 
-import aioredis
+from redis import asyncio as aioredis
 
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.persistence.redis.repository import (
@@ -22,10 +24,10 @@ class TestRepository(RedisRepository[TestRecord]):
 
 
 async def test_record_can_be_created(
-    redis_client: aioredis.Redis,
+    redis_client: aioredis.Redis[bytes],
 ) -> None:
     repository = TestRepository(
-        client=redis.Client[bytes](redis_client),
+        client=redis.Client(redis_client),
     )
     record = TestRecord(test_id="test", created_at=datetime.datetime.now())
     key = await repository.store(record)

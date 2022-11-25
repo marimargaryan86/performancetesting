@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import contextlib
 import datetime
 import hashlib
@@ -5,11 +7,11 @@ import json
 from collections.abc import AsyncIterator
 from typing import Any, Iterator, cast
 
-import aioredis
 import httpx
 import pytest
 import pytest_httpx
 import structlog
+from redis import asyncio as aioredis
 
 from snowfall.project.junction.service.providers.ask2go import (
     adapter,
@@ -143,12 +145,12 @@ def ask2go_adapter(
 @pytest.fixture
 def offer_transformer(
     airport_repository: airports.AirportRepository,
-    redis_client: aioredis.Redis,
+    redis_client: aioredis.Redis[bytes],
 ) -> transformer.OfferTransformer:
     return transformer.OfferTransformer(
         airport_repository=airport_repository,
         offer_cache=cache.OfferCache(
-            client=redis.Client[bytes](redis_client),
+            client=redis.Client(redis_client),
         ),
         offer_ttl=datetime.timedelta(days=1),
     )
