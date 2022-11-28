@@ -26,6 +26,7 @@ type AuthenticateRequest struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Identifier:
+	//
 	//	*AuthenticateRequest_Id
 	//	*AuthenticateRequest_Email
 	Identifier isAuthenticateRequest_Identifier `protobuf_oneof:"identifier"`
@@ -263,6 +264,7 @@ type ChangePasswordRequest struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Identifier:
+	//
 	//	*ChangePasswordRequest_Id
 	//	*ChangePasswordRequest_Email
 	Identifier isChangePasswordRequest_Identifier `protobuf_oneof:"identifier"`

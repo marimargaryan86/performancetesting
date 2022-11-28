@@ -122,6 +122,7 @@ type ListLocationsRequest struct {
 	PageSize  int32  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	PageToken string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	// Types that are assignable to Filter:
+	//
 	//	*ListLocationsRequest_Ids
 	Filter isListLocationsRequest_Filter `protobuf_oneof:"filter"`
 }

@@ -1,4 +1,5 @@
 import asyncio
+import os
 from datetime import datetime
 from typing import Any, Sequence
 
@@ -11,6 +12,7 @@ _LAST_MONTH_OF_YEAR = 12
 _LAST_DAY_OF_YEAR = 31
 _CURRENT_DATE = datetime.now().date()
 _DURATION = 300
+_CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
 class Schedule(pydantic.BaseModel):
@@ -22,33 +24,50 @@ class Schedule(pydantic.BaseModel):
 class TimetableRepository(object):
     _requests_per_second = 40
 
-    def __init__(self, df_client: client.DFClient) -> None:
+    def __init__(self, df_client: client.DfClient) -> None:
         self._df_client = df_client
 
-    async def get_timetables(self) -> Sequence[timetable.TimeTable]:
-        operator_routes = await self._routes_for_operators(
-            await self._df_client.operators.get_operators(),
-        )
+    async def get_timetables(self) -> Sequence[timetable.TimetableResponse]:
+        operators = (
+            await self._df_client.operators.get_operators()
+        ).operator_data.operators
+
+        routes = await self._routes_for_operators(operators)
 
         return await self._timetables_from_routes(
-            [route for routes in operator_routes for route in routes],
+            [
+                route
+                for route in routes
+                if route.port_from.code.strip() and route.port_to.code.strip()
+            ],
         )
 
     async def _routes_for_operators(
         self,
         operators: Sequence[operator.Operator],
-    ) -> Sequence[Sequence[route.Route]]:
-        return await self._request_by_chunks(
+    ) -> Sequence[route.Route]:
+        route_responses: Sequence[route.RouteResponse] = await self._request_by_chunks(
             [
                 [self._df_client.routes.get_routes_by_operator, [operator.identifier]]
                 for operator in operators
             ],
         )
 
+        seen = set()
+        unique_routes = []
+
+        for route_res in route_responses:
+            for route_obj in route_res.route_data.routes:
+                if route_obj.route_id not in seen:
+                    seen.add(route_obj.route_id)
+                    unique_routes.append(route_obj)
+
+        return unique_routes
+
     async def _timetables_from_routes(
         self,
         routes: Sequence[route.Route],
-    ) -> Sequence[timetable.TimeTable]:
+    ) -> Sequence[timetable.TimetableResponse]:
         return await self._request_by_chunks(
             [
                 [
@@ -85,7 +104,7 @@ class TimetableRepository(object):
             )
 
             for current_index, response in enumerate(responses):
-                if isinstance(response, errors.DFTimeoutError):
+                if isinstance(response, errors.DFServiceError):
                     failed.append(requests[index + current_index])
                 else:
                     response_data.append(response)

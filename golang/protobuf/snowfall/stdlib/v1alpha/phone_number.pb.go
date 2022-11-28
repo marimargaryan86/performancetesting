@@ -75,6 +75,7 @@ type PhoneNumber struct {
 	// numbers for which none of the fields they coded against are set.
 	//
 	// Types that are assignable to Kind:
+	//
 	//	*PhoneNumber_E164Number
 	//	*PhoneNumber_ShortCode_
 	Kind isPhoneNumber_Kind `protobuf_oneof:"kind"`
@@ -159,17 +160,17 @@ type PhoneNumber_E164Number struct {
 	// phone number that uses a relaxed ITU E.164 format consisting of the
 	// country calling code (1 to 3 digits) and the subscriber number, with no
 	// additional spaces or formatting, e.g.:
-	//  - correct: "+15552220123"
-	//  - incorrect: "+1 (555) 222-01234 x123".
+	//   - correct: "+15552220123"
+	//   - incorrect: "+1 (555) 222-01234 x123".
 	//
 	// The ITU E.164 format limits the latter to 12 digits, but in practice not
 	// all countries respect that, so we relax that restriction here.
 	// National-only numbers are not allowed.
 	//
 	// References:
-	//  - https://www.itu.int/rec/T-REC-E.164-201011-I
-	//  - https://en.wikipedia.org/wiki/E.164.
-	//  - https://en.wikipedia.org/wiki/List_of_country_calling_codes
+	//   - https://www.itu.int/rec/T-REC-E.164-201011-I
+	//   - https://en.wikipedia.org/wiki/E.164.
+	//   - https://en.wikipedia.org/wiki/List_of_country_calling_codes
 	E164Number string `protobuf:"bytes,1,opt,name=e164_number,json=e164Number,proto3,oneof"`
 }
 
@@ -177,7 +178,7 @@ type PhoneNumber_ShortCode_ struct {
 	// A short code.
 	//
 	// Reference(s):
-	//  - https://en.wikipedia.org/wiki/Short_code
+	//   - https://en.wikipedia.org/wiki/Short_code
 	ShortCode *PhoneNumber_ShortCode `protobuf:"bytes,2,opt,name=short_code,json=shortCode,proto3,oneof"`
 }
 
@@ -203,7 +204,7 @@ type PhoneNumber_ShortCode struct {
 	// short code can be made, such as "US" and "BB".
 	//
 	// Reference(s):
-	//  - http://www.unicode.org/reports/tr35/#unicode_region_subtag
+	//   - http://www.unicode.org/reports/tr35/#unicode_region_subtag
 	RegionCode string `protobuf:"bytes,1,opt,name=region_code,json=regionCode,proto3" json:"region_code,omitempty"`
 	// Required. The short code digits, without a leading plus ('+') or country
 	// calling code, e.g. "611".

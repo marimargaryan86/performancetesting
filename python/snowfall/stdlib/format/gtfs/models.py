@@ -7,7 +7,25 @@ import pydantic
 from snowfall.stdlib.format.gtfs import constants, enums, normalizers
 
 
-class Agency(pydantic.BaseModel):
+def _timedelta_to_time(td: datetime.timedelta) -> str:
+    day_hours, minutes_seconds = str(
+        datetime.timedelta(seconds=td.seconds),
+    ).split(":", maxsplit=1)
+
+    real_hours = int(day_hours) + 24 * td.days
+
+    return ":".join([str(real_hours), minutes_seconds])
+
+
+class _BaseModel(pydantic.BaseModel):
+    class Config(object):
+        json_encoders = {
+            datetime.date: lambda date_obj: date_obj.strftime("%Y%m%d"),
+            datetime.timedelta: _timedelta_to_time,
+        }
+
+
+class Agency(_BaseModel):
     agency_id: Optional[str]
     agency_name: str
     agency_url: pydantic.HttpUrl
@@ -31,7 +49,7 @@ class Agency(pydantic.BaseModel):
     )
 
 
-class Calendar(pydantic.BaseModel):
+class Calendar(_BaseModel):
     service_id: str
     monday: bool
     tuesday: bool
@@ -49,7 +67,7 @@ class Calendar(pydantic.BaseModel):
     )
 
 
-class CalendarDate(pydantic.BaseModel):
+class CalendarDate(_BaseModel):
     service_id: str
     date: datetime.date
     exception_type: Annotated[int, pydantic.Field(ge=1, le=2)]
@@ -57,7 +75,7 @@ class CalendarDate(pydantic.BaseModel):
     _normalize_date = normalizers.normalizer(("date",), normalizers.normalize_date)
 
 
-class FeedInfo(pydantic.BaseModel):
+class FeedInfo(_BaseModel):
     feed_publisher_name: str
     feed_publisher_url: pydantic.HttpUrl
     feed_lang: str
@@ -84,7 +102,7 @@ class FeedInfo(pydantic.BaseModel):
     )
 
 
-class Route(pydantic.BaseModel):
+class Route(_BaseModel):
     route_id: str
     agency_id: Optional[str]
     route_short_name: Optional[str]
@@ -101,7 +119,7 @@ class Route(pydantic.BaseModel):
     continuous_drop_off: Optional[pydantic.NonNegativeInt]
 
 
-class Stop(pydantic.BaseModel):
+class Stop(_BaseModel):
     stop_id: str
     stop_code: Optional[str]
     stop_name: Optional[str]
@@ -133,7 +151,7 @@ class Stop(pydantic.BaseModel):
     )
 
 
-class StopTime(pydantic.BaseModel):
+class StopTime(_BaseModel):
     trip_id: str
     arrival_time: Optional[datetime.timedelta]
     departure_time: Optional[datetime.timedelta]
@@ -156,7 +174,7 @@ class StopTime(pydantic.BaseModel):
     )
 
 
-class Trip(pydantic.BaseModel):
+class Trip(_BaseModel):
     route_id: str
     service_id: str
     trip_id: str
@@ -169,7 +187,7 @@ class Trip(pydantic.BaseModel):
     bikes_allowed: pydantic.NonNegativeInt = 0
 
 
-class Transfer(pydantic.BaseModel):
+class Transfer(_BaseModel):
     from_stop_id: str
     to_stop_id: str
     transfer_type: int

@@ -1,9 +1,14 @@
-from enum import IntEnum
+from enum import Enum
 
 from snowfall.stdlib.v1alpha import models_pb2
 
 
-class LocationType(IntEnum):
+class _StringableIntEnum(Enum):
+    def __str__(self) -> str:
+        return str(self.value)
+
+
+class LocationType(_StringableIntEnum):
     """Type of the location."""
 
     platform = 0
@@ -13,7 +18,7 @@ class LocationType(IntEnum):
     boarding_area = 4
 
 
-class RouteType(IntEnum):
+class RouteType(_StringableIntEnum):
     """Indicates the type of transportation used on a route."""
 
     light_rail = 0
@@ -50,7 +55,6 @@ class RouteType(IntEnum):
     trolleybus_service = 800
     tram_service = 900
     water_transport_service = 1000
-    air_service = 1100
     ferry_service = 1200
     aerial_lift_service = 1300
     funicular_service = 1400
@@ -59,7 +63,7 @@ class RouteType(IntEnum):
     horse_drawn_carriage = 1702
 
 
-class PickupType(IntEnum):
+class PickupType(_StringableIntEnum):
     """Indicates pickup method."""
 
     regularly_scheduled_pickup = 0
@@ -68,7 +72,7 @@ class PickupType(IntEnum):
     coordinate_with_driver_to_arrange_pickup = 3
 
 
-class DropOffType(IntEnum):
+class DropOffType(_StringableIntEnum):
     """Indicates drop off method."""
 
     regularly_scheduled_drop_off = 0

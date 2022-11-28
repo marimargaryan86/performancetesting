@@ -2,9 +2,10 @@ import csv
 import enum
 import os
 import zipfile
-from typing import Optional, Sequence
+from typing import Generator, Optional, Sequence
 
 import pydantic
+import rapidjson
 
 from snowfall.project.junction.service.providers.direct_ferries.gtfs import (
     converter as gtfs_converter,
@@ -26,7 +27,6 @@ class CompressFileList(enum.Enum):
     trips = "trips.txt"
     stop_times = "stop_times.txt"
     calendar_dates = "calendar_dates.txt"
-    transfers = "transfers.txt"
 
     @classmethod
     def file_list(cls) -> Sequence[str]:
@@ -45,44 +45,45 @@ class RouteMapping(pydantic.BaseModel):
     destination: Optional[str]
 
 
+def _models_to_csv(
+    file_name: str,
+    models: Generator[pydantic.BaseModel, None, None],
+) -> str:
+    with open(file_name, _WRITE_MODE) as file_obj:
+        first = next(models)
+
+        writer = csv.DictWriter(
+            file_obj,
+            fieldnames=first.schema()[_CLASS_PROPERTIES].keys(),
+        )
+
+        writer.writeheader()
+        writer.writerow(rapidjson.loads(first.json()))
+        writer.writerows(rapidjson.loads(data_item.json()) for data_item in models)
+
+    return file_name
+
+
 class GTFSGenerator(object):
-    async def generate_feed(  # noqa: WPS210
+    async def generate_feed(
         self,
         converter: gtfs_converter.DFDataConverter,
     ) -> None:
-        agency = converter.convert_agency()
-        feed_info = converter.convert_feed_info()
-        stops = converter.convert_stops()
-        routes = converter.convert_routes()
-        trips = converter.convert_trips()
-        stop_times = converter.convert_stop_times()
-        calendar_dates = converter.convert_calendar_dates()
-        transfers = converter.convert_transfers()
+        _models_to_csv(CompressFileList.agency.value, converter.convert_agency())
+        _models_to_csv(CompressFileList.feed_info.value, converter.convert_feed_info())
+        _models_to_csv(CompressFileList.stops.value, converter.convert_stops())
+        _models_to_csv(CompressFileList.routes.value, converter.convert_routes())
+        _models_to_csv(CompressFileList.trips.value, converter.convert_trips())
+        _models_to_csv(
+            CompressFileList.stop_times.value,
+            converter.convert_stop_times(),
+        )
+        _models_to_csv(
+            CompressFileList.calendar_dates.value,
+            converter.convert_calendar_dates(),
+        )
 
-        self.prepare_file(CompressFileList.agency, agency)
-        self.prepare_file(CompressFileList.feed_info, feed_info)
-        self.prepare_file(CompressFileList.stops, stops)
-        self.prepare_file(CompressFileList.routes, routes)
-        self.prepare_file(CompressFileList.trips, trips)
-        self.prepare_file(CompressFileList.stop_times, stop_times)
-        self.prepare_file(CompressFileList.calendar_dates, calendar_dates)
-        self.prepare_file(CompressFileList.transfers, transfers)
         self.compress_files()
-
-    def prepare_file(
-        self,
-        file_name: CompressFileList,
-        gtfs_data: Sequence[pydantic.BaseModel],
-    ) -> None:
-        with open(file_name.value, _WRITE_MODE) as csvfile:
-            writer = csv.DictWriter(
-                csvfile,
-                fieldnames=gtfs_data[0].schema()[_CLASS_PROPERTIES].keys(),
-            )
-            writer.writeheader()
-            for data_item in gtfs_data:
-                file_item = data_item.dict()
-                writer.writerow(file_item)
 
     def compress_files(self) -> None:
         with zipfile.ZipFile(

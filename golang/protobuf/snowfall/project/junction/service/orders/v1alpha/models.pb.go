@@ -413,12 +413,14 @@ type Booking struct {
 	Id      string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	OrderId string `protobuf:"bytes,2,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
 	// Types that are assignable to Option:
+	//
 	//	*Booking_TripOption
 	Option       isBooking_Option `protobuf_oneof:"option"`
 	Status       Booking_Status   `protobuf:"varint,4,opt,name=status,proto3,enum=snowfall.project.junction.service.orders.v1alpha.Booking_Status" json:"status,omitempty"`
 	ProviderName string           `protobuf:"bytes,5,opt,name=provider_name,json=providerName,proto3" json:"provider_name,omitempty"`
 	TotalPrice   *v1alpha.Money   `protobuf:"bytes,6,opt,name=total_price,json=totalPrice,proto3" json:"total_price,omitempty"`
 	// Types that are assignable to Result:
+	//
 	//	*Booking_TripResult
 	Result    isBooking_Result       `protobuf_oneof:"result"`
 	RawData   string                 `protobuf:"bytes,8,opt,name=raw_data,json=rawData,proto3" json:"raw_data,omitempty"` // json

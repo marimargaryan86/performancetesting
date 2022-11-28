@@ -1,3 +1,4 @@
+import abc
 from typing import Sequence
 
 import httpx
@@ -10,8 +11,14 @@ _DATA_KEY = "data"
 _ROUTES_KEY = "routes"
 
 
-class RouteClient(base.BaseClient):
-    async def get_routes_by_country(self, country_iso: str) -> Sequence[route.Route]:
+class RouteClient(abc.ABC):
+    @abc.abstractmethod
+    async def get_routes_by_operator(self, operator_id: int) -> route.RouteResponse:
+        """Get routes for a given operator."""
+
+
+class RouteHttpClient(base.BaseClient, RouteClient):
+    async def get_routes_by_country(self, country_iso: str) -> route.RouteResponse:
         response_data = (
             await self._make_request(
                 request_details=base.RequestDetails(
@@ -26,10 +33,7 @@ class RouteClient(base.BaseClient):
             )
         ).json()
 
-        return [
-            route.Route(**route_data)
-            for route_data in response_data[_DATA_KEY][_ROUTES_KEY]
-        ]
+        return route.RouteResponse(**response_data)
 
     async def get_routes_by_coordinates(
         self,
@@ -37,7 +41,7 @@ class RouteClient(base.BaseClient):
         south_west_lng: str,
         north_east_lat: str,
         north_east_lng: str,
-    ) -> Sequence[route.Route]:
+    ) -> route.RouteResponse:
         response_data = (
             await self._make_request(
                 request_details=base.RequestDetails(
@@ -55,12 +59,9 @@ class RouteClient(base.BaseClient):
             )
         ).json()
 
-        return [
-            route.Route(**route_data)
-            for route_data in response_data[_DATA_KEY][_ROUTES_KEY]
-        ]
+        return route.RouteResponse(**response_data)
 
-    async def get_routes_by_operator(self, operator_id: int) -> Sequence[route.Route]:
+    async def get_routes_by_operator(self, operator_id: int) -> route.RouteResponse:
         response_data = (
             await self._make_request(
                 request_details=base.RequestDetails(
@@ -74,12 +75,9 @@ class RouteClient(base.BaseClient):
             )
         ).json()
 
-        return [
-            route.Route(**route_data)
-            for route_data in response_data[_DATA_KEY][_ROUTES_KEY]
-        ]
+        return route.RouteResponse(**response_data)
 
-    async def get_routes_by_port(self, port_code: str) -> Sequence[route.Route]:
+    async def get_routes_by_port(self, port_code: str) -> route.RouteResponse:
         response_data = (
             await self._make_request(
                 request_details=base.RequestDetails(
@@ -93,10 +91,7 @@ class RouteClient(base.BaseClient):
             )
         ).json()
 
-        return [
-            route.Route(**route_data)
-            for route_data in response_data[_DATA_KEY][_ROUTES_KEY]
-        ]
+        return route.RouteResponse(**response_data)
 
     async def get_passenger_info_by_route_and_operator(
         self,

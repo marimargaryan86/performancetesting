@@ -238,6 +238,7 @@ type OfferSearch struct {
 	Id        string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	ExpiresAt *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
 	// Types that are assignable to Search:
+	//
 	//	*OfferSearch_Trip
 	Search       isOfferSearch_Search     `protobuf_oneof:"search"`
 	SessionToken string                   `protobuf:"bytes,4,opt,name=session_token,json=sessionToken,proto3" json:"session_token,omitempty"`

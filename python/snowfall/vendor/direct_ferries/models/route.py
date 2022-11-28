@@ -51,5 +51,9 @@ class Route(base.CamelCaseBaseModel):
     pet_conditions: Optional[str]
 
 
+class RouteData(base.CamelCaseBaseModel):
+    routes: Sequence[Route]
+
+
 class RouteResponse(base.CamelCaseBaseModel):
-    route_data: Sequence[Route] = pydantic.Field(..., alias="data")
+    route_data: RouteData = pydantic.Field(..., alias="data")

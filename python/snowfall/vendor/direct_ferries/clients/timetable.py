@@ -1,19 +1,31 @@
+import abc
 import datetime
 
 import httpx
 
 from snowfall.vendor.direct_ferries.clients import base
+from snowfall.vendor.direct_ferries.models import timetable
 from snowfall.vendor.direct_ferries.models.route import Route
-from snowfall.vendor.direct_ferries.models.timetable import TimeTable, TimetableData
 
 
-class TimetableClient(base.BaseClient):
+class TimetableClient(abc.ABC):
+    @abc.abstractmethod
     async def get_timetables(
         self,
         route: Route,
         date_from: datetime.date,
         date_to: datetime.date,
-    ) -> TimeTable:
+    ) -> timetable.TimetableResponse:
+        """Get timetables of the given route."""
+
+
+class TimetableHttpClient(base.BaseClient, TimetableClient):
+    async def get_timetables(
+        self,
+        route: Route,
+        date_from: datetime.date,
+        date_to: datetime.date,
+    ) -> timetable.TimetableResponse:
         response_data = (
             await self._make_request(
                 request_details=base.RequestDetails(
@@ -31,16 +43,4 @@ class TimetableClient(base.BaseClient):
             )
         ).json()
 
-        operator_time_tables = response_data["data"]["operatorTimetables"]
-        return TimeTable(
-            timetables=[
-                TimetableData(
-                    departure_time=time_table_data["departureTime"],
-                    arrival_time=time_table_data["arrivalTime"],
-                    duration_in_minutes=time_table_data["durationInMinutes"],
-                )
-                for operator_time_table in operator_time_tables
-                for time_table_data in operator_time_table["timetables"]
-            ],
-            route=route,
-        )
+        return timetable.TimetableResponse(**response_data, route=route)

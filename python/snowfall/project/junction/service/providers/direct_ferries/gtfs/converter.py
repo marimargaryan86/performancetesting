@@ -1,7 +1,9 @@
 import datetime
-import typing
+import functools
+from typing import Generator, Sequence
 
 import pydantic
+import timezonefinder
 
 from snowfall.stdlib.format.gtfs import enums as gtfs_enums
 from snowfall.stdlib.format.gtfs import models as gtfs_models
@@ -21,6 +23,17 @@ _EXCEPTION_TYPE = 1
 _TRANSFER_TYPE = 0
 
 
+@functools.lru_cache(maxsize=100)
+def _timedelta_to_time(td: datetime.timedelta) -> str:
+    day_hours, minutes_seconds = str(
+        datetime.timedelta(seconds=td.seconds),
+    ).split(":", maxsplit=1)
+
+    real_hours = int(day_hours) + 24 * td.days
+
+    return ":".join([str(real_hours), minutes_seconds])
+
+
 class StopTimeFields(pydantic.BaseModel):
     departure: datetime.datetime
     arrival: datetime.datetime
@@ -33,181 +46,186 @@ class StopTimeFields(pydantic.BaseModel):
 class DFDataConverter(object):  # noqa: WPS214
     def __init__(
         self,
-        timetables_data: typing.Sequence[df_timetable_models.TimeTable],
+        timetable_responses: Sequence[df_timetable_models.TimetableResponse],
     ):
-        self._timetables_data = timetables_data
+        self._timetable_responses = timetable_responses
         self._calendar_dates_mapping: dict[int, str] = {}
 
-    def convert_agency(self) -> typing.Sequence[gtfs_models.Agency]:
-        return [
-            gtfs_models.Agency(
-                agency_id=_AGENCY_ID,
-                agency_name=_AGENCY_NAME,
-                agency_url=pydantic.HttpUrl(
-                    _AGENCY_URL,
-                    scheme=_URL_SCHEME,
-                    host=_URL_HOST,
-                ),
-                agency_timezone=_AGENCY_TIMEZONE,
-            ),
-        ]
+        self._tz_finder = timezonefinder.TimezoneFinder()
 
-    def convert_feed_info(self) -> typing.Sequence[gtfs_models.FeedInfo]:
-        return [
-            gtfs_models.FeedInfo(
-                feed_publisher_name=_FEED_PUBLISHER_NAME,
-                feed_publisher_url=pydantic.HttpUrl(
-                    _AGENCY_URL,
-                    scheme=_URL_SCHEME,
-                    host=_URL_HOST,
-                ),
-                feed_lang=_FEED_LANG,
+    def convert_agency(self) -> Generator[gtfs_models.Agency, None, None]:
+        yield gtfs_models.Agency(
+            agency_id=_AGENCY_ID,
+            agency_name=_AGENCY_NAME,
+            agency_url=pydantic.HttpUrl(
+                _AGENCY_URL,
+                scheme=_URL_SCHEME,
+                host=_URL_HOST,
             ),
-        ]
+            agency_timezone=_AGENCY_TIMEZONE,
+        )
 
-    def convert_stops(self) -> typing.Sequence[gtfs_models.Stop]:
+    def convert_feed_info(self) -> Generator[gtfs_models.FeedInfo, None, None]:
+        yield gtfs_models.FeedInfo(
+            feed_publisher_name=_FEED_PUBLISHER_NAME,
+            feed_publisher_url=pydantic.HttpUrl(
+                _AGENCY_URL,
+                scheme=_URL_SCHEME,
+                host=_URL_HOST,
+            ),
+            feed_lang=_FEED_LANG,
+        )
+
+    def convert_stops(self) -> Generator[gtfs_models.Stop, None, None]:
         existing_stops = set()
-        stops = []
-        for timetable in self._timetables_data:
-            ports = [timetable.route.port_from, timetable.route.port_to]
+
+        for timetable_response in self._timetable_responses:
+            ports = [
+                timetable_response.route.port_from,
+                timetable_response.route.port_to,
+            ]
             for port in ports:
                 if port.code not in existing_stops:
                     existing_stops.add(port.code)
-                    stops.append(
-                        gtfs_models.Stop(
-                            stop_id=port.code,
-                            stop_name=port.name,
-                            stop_lat=port.latitude,
-                            stop_lon=port.longitude,
-                            location_type=gtfs_enums.LocationType.platform,
+
+                    yield gtfs_models.Stop(
+                        stop_id=port.code,
+                        stop_name=port.name,
+                        stop_lat=port.latitude,
+                        stop_lon=port.longitude,
+                        location_type=gtfs_enums.LocationType.platform,
+                        stop_timezone=self._tz_finder.timezone_at(
+                            lat=port.latitude,
+                            lng=port.longitude,
                         ),
                     )
-        return stops
 
-    def convert_routes(self) -> typing.Sequence[gtfs_models.Route]:
+    def convert_routes(self) -> Generator[gtfs_models.Route, None, None]:
         route_identifiers = set()
-        routes = []
-        for timetable in self._timetables_data:
+
+        for timetable_response in self._timetable_responses:
             route_identifier = "{0}-{1}".format(
-                timetable.route.port_from.code,
-                timetable.route.port_to.code,
+                timetable_response.route.port_from.code,
+                timetable_response.route.port_to.code,
             ).strip()
             if route_identifier not in route_identifiers:
                 route_identifiers.add(route_identifier)
-                routes.append(
-                    gtfs_models.Route(
-                        route_id=str(timetable.route.route_id),
-                        agency_id=_AGENCY_ID,
-                        route_long_name=timetable.route.name,
-                        route_short_name=route_identifier,
-                        route_type=gtfs_enums.RouteType.ferry,
-                    ),
+                yield gtfs_models.Route(
+                    route_id=str(timetable_response.route.route_id),
+                    agency_id=_AGENCY_ID,
+                    route_long_name=timetable_response.route.name,
+                    route_short_name=route_identifier,
+                    route_type=gtfs_enums.RouteType.ferry,
                 )
-        return routes
 
-    def convert_trips(self) -> typing.Sequence[gtfs_models.Trip]:  # noqa: WPS210
-        trips = []
-        service_id = 0
-        for timetable in self._timetables_data:
-            for date in timetable.timetables:
-                trip_id = "{0}-{1}-{2}-{3}".format(
-                    timetable.route.operator_details.identifier,
-                    timetable.route.route_id,
-                    date.departure_time,
-                    date.arrival_time,
-                )
-                for time_type in _DEPARTURE_ARRIVAL:
-                    service_id = service_id + 1
-                    trips.append(
-                        gtfs_models.Trip(
-                            route_id="{0}-{1}".format(
-                                timetable.route.port_from.code,
-                                timetable.route.port_to.code,
-                            ),
-                            service_id=str(service_id),
-                            trip_id=trip_id,
+    def convert_trips(self) -> Generator[gtfs_models.Trip, None, None]:
+        for timetable_response in self._timetable_responses:
+            for operator_tt in timetable_response.timetable_data.operator_timetables:
+                for timetable in operator_tt.timetables:
+                    trip_id = "{0}-{1}-{2}-{3}".format(
+                        operator_tt.operator_id,
+                        timetable_response.route.route_id,
+                        timetable.departure_time.isoformat(),
+                        timetable.arrival_time.isoformat(),
+                    )
+
+                    yield gtfs_models.Trip(
+                        route_id=str(timetable_response.route.route_id),
+                        service_id=trip_id,
+                        trip_id=trip_id,
+                    )
+
+    def convert_stop_times(self) -> Generator[gtfs_models.StopTime, None, None]:
+        for timetable_response in self._timetable_responses:
+            for operator_tt in timetable_response.timetable_data.operator_timetables:
+                for date in operator_tt.timetables:
+                    yield gtfs_models.StopTime(
+                        trip_id="{0}-{1}-{2}-{3}".format(
+                            operator_tt.operator_id,
+                            timetable_response.route.route_id,
+                            date.departure_time.isoformat(),
+                            date.arrival_time.isoformat(),
                         ),
-                    )
-                    self._calendar_dates_mapping[service_id] = (
-                        date.departure_time.strftime("%Y%m%d")
-                        if time_type == "departure"
-                        else date.arrival_time.strftime("%Y%m%d")
-                    )
-
-        return trips
-
-    def convert_stop_times(self) -> typing.Sequence[gtfs_models.StopTime]:
-        stop_times = []
-        for timetable in self._timetables_data:
-            for date in timetable.timetables:
-                for time_type in _DEPARTURE_ARRIVAL:
-                    fields = self.stop_time_fields(
-                        time_type=time_type,
-                        date=date,
-                        route=timetable.route,
-                    )
-                    stop_times.append(
-                        gtfs_models.StopTime(
-                            trip_id="{0}-{1}-{2}-{3}".format(
-                                timetable.route.operator_details.identifier,
-                                timetable.route.route_id,
-                                date.departure_time,
-                                date.arrival_time,
-                            ),
-                            departure_time=datetime.timedelta(
-                                hours=fields.departure.hour,
-                                minutes=fields.departure.minute,
-                                seconds=fields.departure.second,
-                            ),
-                            arrival_time=datetime.timedelta(
-                                hours=fields.arrival.hour,
-                                minutes=fields.arrival.minute,
-                                seconds=fields.arrival.second,
-                            ),
-                            stop_id=fields.stop_code,
-                            stop_sequence=fields.stop_sequence,
-                            pickup_type=fields.pickup_type,
-                            drop_off_type=fields.drop_off_type,
+                        departure_time=datetime.timedelta(
+                            hours=date.departure_time.hour,
+                            minutes=date.departure_time.minute,
+                            seconds=date.departure_time.second,
                         ),
+                        arrival_time=datetime.timedelta(
+                            hours=date.departure_time.hour,
+                            minutes=date.departure_time.minute,
+                            seconds=date.departure_time.second,
+                        ),
+                        stop_id=timetable_response.route.port_from.code,
+                        stop_sequence=1,
+                        pickup_type=gtfs_enums.PickupType.regularly_scheduled_pickup,
+                        drop_off_type=gtfs_enums.DropOffType.no_drop_off_available,
                     )
-        return stop_times
 
-    def convert_calendar_dates(self) -> typing.Sequence[gtfs_models.CalendarDate]:
-        calendar_dates = []
-        service_id = 0
-        for timetable in self._timetables_data:
-            for _ in timetable.timetables:
-                service_id += 1
-                calendar_date = gtfs_models.CalendarDate(
-                    service_id=str(service_id),
-                    date=self._calendar_dates_mapping[service_id],  # type: ignore[arg-type]
-                    exception_type=_EXCEPTION_TYPE,
-                )
-                calendar_dates.append(calendar_date)
-        return calendar_dates
+                    yield gtfs_models.StopTime(
+                        trip_id="{0}-{1}-{2}-{3}".format(
+                            operator_tt.operator_id,
+                            timetable_response.route.route_id,
+                            date.departure_time.isoformat(),
+                            date.arrival_time.isoformat(),
+                        ),
+                        departure_time=datetime.timedelta(
+                            hours=date.arrival_time.hour,
+                            minutes=date.arrival_time.minute,
+                            seconds=date.arrival_time.second,
+                        ),
+                        arrival_time=datetime.timedelta(
+                            hours=date.arrival_time.hour,
+                            minutes=date.arrival_time.minute,
+                            seconds=date.arrival_time.second,
+                        ),
+                        stop_id=timetable_response.route.port_to.code,
+                        stop_sequence=2,
+                        pickup_type=gtfs_enums.PickupType.regularly_scheduled_pickup,
+                        drop_off_type=gtfs_enums.DropOffType.no_drop_off_available,
+                    )
 
-    def convert_transfers(self) -> typing.Sequence[gtfs_models.Transfer]:
-        transfers = []
-        route_identifiers = []
-        for timetable in self._timetables_data:
+    def convert_calendar_dates(self) -> Generator[gtfs_models.CalendarDate, None, None]:
+        yield from (  # noqa: WPS224
+            gtfs_models.CalendarDate(
+                service_id="{0}-{1}-{2}-{3}".format(
+                    operator_tt.operator_id,
+                    timetable_response.route.route_id,
+                    tt.departure_time.isoformat(),
+                    tt.arrival_time.isoformat(),
+                ),
+                date=tt.departure_time.strftime(  # type: ignore[arg-type]
+                    "%Y%m%d",
+                ),
+                exception_type=_EXCEPTION_TYPE,
+            )
+            for timetable_response in self._timetable_responses
+            for operator_tt in timetable_response.timetable_data.operator_timetables
+            for tt in operator_tt.timetables
+        )
+
+    def convert_transfers(self) -> Generator[gtfs_models.Transfer, None, None]:
+        route_identifiers = set()
+
+        for timetable_response in self._timetable_responses:
             route_identifier = "{0}-{1}".format(
-                timetable.route.port_from.code,
-                timetable.route.port_to.code,
+                timetable_response.route.port_from.code,
+                timetable_response.route.port_to.code,
             ).strip()
+
             if route_identifier not in route_identifiers:
-                route_identifiers.append(route_identifier)
-                transfer = gtfs_models.Transfer(
-                    from_stop_id=timetable.route.port_from.code,
-                    to_stop_id=timetable.route.port_to.code,
+                route_identifiers.add(route_identifier)
+
+                yield gtfs_models.Transfer(
+                    from_stop_id=timetable_response.route.port_from.code,
+                    to_stop_id=timetable_response.route.port_to.code,
                     transfer_type=_TRANSFER_TYPE,
                 )
-                transfers.append(transfer)
-        return transfers
 
     def stop_time_fields(
         self,
         time_type: str,
-        date: df_timetable_models.TimetableData,
+        date: df_timetable_models.Timetable,
         route: df_route_models.Route,
     ) -> StopTimeFields:
         """stop_sequence: Order of stops for a particular trip.

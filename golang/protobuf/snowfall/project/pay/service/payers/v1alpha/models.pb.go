@@ -28,6 +28,7 @@ type Payer struct {
 
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Types that are assignable to PayerDetails:
+	//
 	//	*Payer_CompanyDetails
 	//	*Payer_IndividualDetails
 	PayerDetails isPayer_PayerDetails `protobuf_oneof:"payer_details"`

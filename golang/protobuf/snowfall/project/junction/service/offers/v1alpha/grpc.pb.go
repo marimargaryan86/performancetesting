@@ -311,6 +311,7 @@ type ListOffersRequest struct {
 	PageSize  int32  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	PageToken string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	// Types that are assignable to Payload:
+	//
 	//	*ListOffersRequest_OfferSearchId
 	//	*ListOffersRequest_OfferIds
 	Payload         isListOffersRequest_Payload `protobuf_oneof:"payload"`
@@ -611,6 +612,7 @@ type ListOfferGroupsRequest struct {
 	PageSize  int32  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	PageToken string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	// Types that are assignable to Payload:
+	//
 	//	*ListOfferGroupsRequest_OfferGroupIds
 	Payload isListOfferGroupsRequest_Payload `protobuf_oneof:"payload"`
 }
@@ -842,6 +844,7 @@ type ListOfferGroupDetailsRequest struct {
 	PageSize  int32  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	PageToken string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	// Types that are assignable to Payload:
+	//
 	//	*ListOfferGroupDetailsRequest_OfferGroupDetailsIds
 	Payload isListOfferGroupDetailsRequest_Payload `protobuf_oneof:"payload"`
 }
@@ -1073,6 +1076,7 @@ type ListOfferOptionsRequest struct {
 	PageSize  int32  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	PageToken string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	// Types that are assignable to Payload:
+	//
 	//	*ListOfferOptionsRequest_OfferOptionIds
 	Payload isListOfferOptionsRequest_Payload `protobuf_oneof:"payload"`
 }
@@ -1304,6 +1308,7 @@ type ListOfferOptionDetailsRequest struct {
 	PageSize  int32  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	PageToken string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	// Types that are assignable to Payload:
+	//
 	//	*ListOfferOptionDetailsRequest_OfferOptionDetailsIds
 	Payload isListOfferOptionDetailsRequest_Payload `protobuf_oneof:"payload"`
 }

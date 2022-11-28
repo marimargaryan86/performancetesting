@@ -95,6 +95,7 @@ type DateTime struct {
 	// If omitted, the DateTime is considered to be in local time.
 	//
 	// Types that are assignable to TimeOffset:
+	//
 	//	*DateTime_UtcOffset
 	//	*DateTime_TimeZone
 	TimeOffset isDateTime_TimeOffset `protobuf_oneof:"time_offset"`

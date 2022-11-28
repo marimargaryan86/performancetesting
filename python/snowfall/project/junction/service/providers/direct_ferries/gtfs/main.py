@@ -28,32 +28,32 @@ async def _create_gtfs(app: service.Application[DFSetting]) -> None:
         http_client = await stack.enter_async_context(
             httpx.AsyncClient(http2=True, timeout=app.settings.timeout),
         )
-        settings = app.settings
 
         timetable_repository = TimetableRepository(
-            df_client=client.DFClient(
+            df_client=client.DfHttpClient(
                 auth_client=auth.AuthClient(
-                    api_url=settings.affiliate_api_url,
-                    client_secret=settings.client_secret,
-                    client_id=settings.client_id,
+                    api_url=app.settings.affiliate_api_url,
+                    client_secret=app.settings.client_secret,
+                    client_id=app.settings.client_id,
                     http_client=http_client,
                 ),
                 http_client=http_client,
                 config=base.ClientConfig(
-                    api_url=settings.api_url,
-                    partner_code=settings.partner_code,
-                    client_id=settings.client_id,
-                    client_secret=settings.client_secret,
-                    timeout=settings.timeout,
+                    api_url=app.settings.api_url,
+                    partner_code=app.settings.partner_code,
+                    client_id=app.settings.client_id,
+                    client_secret=app.settings.client_secret,
+                    timeout=app.settings.timeout,
                 ),
             ),
         )
 
-        timetables_data = await timetable_repository.get_timetables()
+        timetable_responses = await timetable_repository.get_timetables()
 
     converter = gtfs_converter.DFDataConverter(
-        timetables_data=timetables_data,
+        timetable_responses=timetable_responses,
     )
+
     await GTFSGenerator().generate_feed(converter)
 
 

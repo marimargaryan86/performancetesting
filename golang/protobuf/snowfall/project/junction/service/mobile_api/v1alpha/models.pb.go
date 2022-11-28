@@ -645,6 +645,7 @@ type Voucher struct {
 	Code      string        `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
 	ExpiresAt *v1alpha.Date `protobuf:"bytes,3,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
 	// Types that are assignable to Discount:
+	//
 	//	*Voucher_Price
 	Discount        isVoucher_Discount     `protobuf_oneof:"discount"`
 	Status          Voucher_Status         `protobuf:"varint,5,opt,name=status,proto3,enum=snowfall.project.junction.service.mobile_api.v1alpha.Voucher_Status" json:"status,omitempty"`
@@ -753,7 +754,7 @@ type isVoucher_Discount interface {
 }
 
 type Voucher_Price struct {
-	//  TODO: add Percentage
+	// TODO: add Percentage
 	Price *v1alpha.Money `protobuf:"bytes,4,opt,name=price,proto3,oneof"`
 }
 
