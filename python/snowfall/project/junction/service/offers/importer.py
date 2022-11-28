@@ -3,12 +3,14 @@ import contextlib
 import datetime
 from typing import Union
 
+import prometheus_client
 import structlog
 from pymongo import errors
 
 from snowfall.project.junction.service.offers import aggregator, offers
 from snowfall.project.junction.service.offers.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.instrumentation import prometheus
 from snowfall.stdlib.persistence.redis import types
 from snowfall.stdlib.transport.amqp import consumer, trackable
 from snowfall.stdlib.transport.amqp import types as amqp_types
@@ -18,6 +20,13 @@ ExpectedMessages = Union[
     amqp_pb2.TripOfferSearchResult,
     trackable_pb2.Trackable,
 ]
+
+
+_histogram_search_time = prometheus_client.Histogram(
+    "offers_search_time_seconds",
+    "Time needed to complete offer searches (in seconds).",
+    buckets=prometheus.BUCKETS,
+)
 
 
 class StatusHandler(trackable.AnySizeStatusHandler):
@@ -48,7 +57,11 @@ class StatusHandler(trackable.AnySizeStatusHandler):
         msg: trackable_pb2.Trackable,
     ) -> None:
         await asyncio.sleep(2)  # @todo: solve race condition properly
-        await self._repository.mark_as_completed(msg.id)
+        search = await self._repository.mark_as_completed(msg.id)
+        created_at = protobuf.protobuf_to_datetime(search.created_at)
+        updated_at = protobuf.protobuf_to_datetime(search.updated_at)
+
+        _histogram_search_time.observe((updated_at - created_at).total_seconds())
 
     async def _on_failed(
         self,
