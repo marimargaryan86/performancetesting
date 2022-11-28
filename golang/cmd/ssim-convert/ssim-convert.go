@@ -170,8 +170,8 @@ ResultParser:
 				DepartureTime:     dep,
 				StopId:            lastLeg.ArrivalStation,
 				StopSequence:      uint(lastLeg.LegSequenceNumber),
-				PickupType:        1,
-				DropOffType:       1,
+				PickupType:        0,
+				DropOffType:       0,
 				ContinuousPickup:  1,
 				ContinuousDropOff: 1,
 			}); err != nil {
