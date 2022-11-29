@@ -4,8 +4,8 @@ import os
 import zipfile
 from typing import Generator, Optional, Sequence
 
+import orjson
 import pydantic
-import rapidjson
 
 from snowfall.project.junction.service.providers.direct_ferries.gtfs import (
     converter as gtfs_converter,
@@ -58,8 +58,8 @@ def _models_to_csv(
         )
 
         writer.writeheader()
-        writer.writerow(rapidjson.loads(first.json()))
-        writer.writerows(rapidjson.loads(data_item.json()) for data_item in models)
+        writer.writerow(orjson.loads(first.json()))
+        writer.writerows(orjson.loads(data_item.json()) for data_item in models)
 
     return file_name
 

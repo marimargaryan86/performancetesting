@@ -1,8 +1,8 @@
 from typing import Sequence
 
 import httpx
+import orjson
 import pytest
-import rapidjson
 from starlette import status
 
 from snowfall import fixtures
@@ -265,7 +265,7 @@ class TestOfferSearches(object):
             },
             headers={"Content-Type": "application/vnd.api+json"},
         )
-        offer_search_id = rapidjson.loads(offer_search.content.decode())["data"]["id"]
+        offer_search_id = orjson.loads(offer_search.content)["data"]["id"]
         response = await client.get(
             "/offers/searches/{id}".format(id=offer_search_id),
         )
@@ -302,7 +302,7 @@ class TestOfferSearches(object):
             },
             headers={"Content-Type": "application/vnd.api+json"},
         )
-        offer_search_id = rapidjson.loads(offer_search.content.decode())["data"]["id"]
+        offer_search_id = orjson.loads(offer_search.content)["data"]["id"]
         client.headers["Authorization"] = "invalid"
         response = await client.get(
             "/offers/searches/{id}".format(id=offer_search_id),

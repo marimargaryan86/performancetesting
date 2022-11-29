@@ -4,7 +4,7 @@ from typing import Optional, cast
 import jsonschema
 import openapi_core
 import openapi_schema_validator
-import rapidjson
+import orjson
 from openapi_core.deserializing.media_types.factories import (
     MediaTypeDeserializersFactory,
 )
@@ -109,11 +109,11 @@ class Validator(object):
     ):
         with open(spec_path) as spec_file:
             self._spec = openapi_core.Spec.create(
-                rapidjson.load(spec_file),
+                orjson.loads(spec_file.read()),
                 url="file://{0}".format(spec_path),
             )
 
-        deserializer = {"application/vnd.api+json": rapidjson.loads}
+        deserializer = {"application/vnd.api+json": orjson.loads}
 
         self._request_validator = RequestValidator(
             schema_unmarshallers_factory=SchemaUnmarshallersFactory(

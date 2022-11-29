@@ -2,8 +2,8 @@ import abc
 import contextlib
 from typing import Any, Generic, Mapping, Type, TypeVar, cast
 
+import orjson
 import pydantic
-import rapidjson
 from google.protobuf import json_format, message
 
 from snowfall.stdlib.persistence.mongo import normalizers
@@ -76,11 +76,11 @@ class PydanticCoder(Generic[Model], BaseCoder[Model]):
         with contextlib.suppress(KeyError):
             as_dict["id"] = str(as_dict["id"])
 
-        return self._model.parse_raw(rapidjson.dumps(as_dict))
+        return self._model.parse_raw(orjson.dumps(as_dict))
 
     def encode(self, model: Model) -> dict[str, Any]:
         as_dict = dict(
-            rapidjson.loads(
+            orjson.loads(
                 model.json(
                     exclude_defaults=True,
                     exclude_none=True,

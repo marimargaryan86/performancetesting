@@ -56,7 +56,6 @@
 //     "pytest-httpx==0.21.2",
 //     "pytest==7.2.0",
 //     "python-dateutil==2.8.2",
-//     "python-rapidjson==1.9",
 //     "redis[hiredis]==4.3.5",
 //     "rfc3339-validator==0.1.4",
 //     "sentry-sdk==1.11.0",
@@ -2735,54 +2734,6 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "4ffb853b2f4e7ffc8e6201e369926200fa36ae10db780d2b7431885ba75e9f58",
-              "url": "https://files.pythonhosted.org/packages/0c/64/18710ee20f06d08a5ae3648e5eae252d11e2f7ce93d4497ace90977f1516/python_rapidjson-1.9-cp310-cp310-musllinux_1_1_x86_64.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "eec5e7f5667484a0f837c829355b24978c4311b053a699f4e3fef05c3c3410b5",
-              "url": "https://files.pythonhosted.org/packages/06/26/7af183494170e252e2a9c0b0c3aeca0f688984d572a9f7d7e16520f1b85a/python_rapidjson-1.9-cp310-cp310-musllinux_1_1_i686.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "a01e42b35987e27d97f1f722de5221cfdf621d0d8aa530cd00ffa8acecdba0b9",
-              "url": "https://files.pythonhosted.org/packages/0d/7f/9556c1a042fa46617cdf16d74008468212fa35618f930634761b03bf693b/python_rapidjson-1.9-cp310-cp310-macosx_10_9_x86_64.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "875d468d2a965d92d479ef2d6df7dc5ee289ae1275008580631656c65e612be5",
-              "url": "https://files.pythonhosted.org/packages/0f/bd/98211e83494b1062cb8042f2cde26a0c7f0af4158c126a0613d851a344ef/python_rapidjson-1.9-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "c229cd186316ecf5474d25e8bfdc83c97256454403ac5e9656d38bd26f1cf910",
-              "url": "https://files.pythonhosted.org/packages/8f/b9/2ffc175f3fb1637e7ce6103cee83a27f9d3b7a6f0020832244092c4cd995/python_rapidjson-1.9-cp310-cp310-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "41388e80cb0300dc33d3f1f06e5c2719aa9ef60b30fbee8a8bb6b35b203eda18",
-              "url": "https://files.pythonhosted.org/packages/95/fd/3af63e13ec799b1f556079bdca67cabeb0b7744e442cf6533f8aace7420c/python_rapidjson-1.9-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "ff1f2d24689352e24cc753c2f0a4dd06478304b41acb7bfea482b37a285f21de",
-              "url": "https://files.pythonhosted.org/packages/be/81/5ae7e17fe8a3ccf0f217d0b8253f859cf4dcdc76d7a6cd8ea27635241d25/python_rapidjson-1.9-cp310-cp310-musllinux_1_1_aarch64.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "be7d351c7112dac608133a23f60e95395668d0981a07f4037f63e0e88afcf01a",
-              "url": "https://files.pythonhosted.org/packages/de/df/1f3e0a73f6ae6f76389d3ea55e3d9a17bfe1eac42dfe5498f34e052e984d/python-rapidjson-1.9.tar.gz"
-            }
-          ],
-          "project_name": "python-rapidjson",
-          "requires_dists": [],
-          "requires_python": ">=3.6",
-          "version": "1.9"
-        },
-        {
-          "artifacts": [
-            {
-              "algorithm": "sha256",
               "hash": "f84fbc98b019fef2ee9a1cb3ce93e3187a6df0b2538a651bfb890254ba9f90b5",
               "url": "https://files.pythonhosted.org/packages/02/25/6ba9f6bb50a3d4fbe22c1a02554dc670682a07c8701d1716d19ddea2c940/PyYAML-6.0-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl"
             },
@@ -3507,13 +3458,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "b930dd878d5a8afb066a637fbb35144fe7901e3b209d1cd4f524bd0e9deee997",
-              "url": "https://files.pythonhosted.org/packages/6f/de/5be2e3eed8426f871b170663333a0f627fc2924cc386cd41be065e7ea870/urllib3-1.26.12-py2.py3-none-any.whl"
+              "hash": "47cc05d99aaa09c9e72ed5809b60e7ba354e64b59c9c173ac3018642d8bb41fc",
+              "url": "https://files.pythonhosted.org/packages/65/0c/cc6644eaa594585e5875f46f3c83ee8762b647b51fc5b0fb253a242df2dc/urllib3-1.26.13-py2.py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "3fa96cf423e6987997fc326ae8df396db2a8b7c667747d47ddd8ecba91f4a74e",
-              "url": "https://files.pythonhosted.org/packages/b2/56/d87d6d3c4121c0bcec116919350ca05dc3afd2eeb7dc88d07e8083f8ea94/urllib3-1.26.12.tar.gz"
+              "hash": "c083dd0dce68dbfbe1129d5271cb90f9447dea7d52097c6e0126120c521ddea8",
+              "url": "https://files.pythonhosted.org/packages/c2/51/32da03cf19d17d46cce5c731967bf58de9bd71db3a379932f53b094deda4/urllib3-1.26.13.tar.gz"
             }
           ],
           "project_name": "urllib3",
@@ -3529,8 +3480,8 @@
             "pyOpenSSL>=0.14; extra == \"secure\"",
             "urllib3-secure-extra; extra == \"secure\""
           ],
-          "requires_python": "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,<4,>=2.7",
-          "version": "1.26.12"
+          "requires_python": "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,>=2.7",
+          "version": "1.26.13"
         },
         {
           "artifacts": [
@@ -3951,7 +3902,6 @@
     "pytest-httpx==0.21.2",
     "pytest==7.2.0",
     "python-dateutil==2.8.2",
-    "python-rapidjson==1.9",
     "redis[hiredis]==4.3.5",
     "rfc3339-validator==0.1.4",
     "sentry-sdk==1.11.0",

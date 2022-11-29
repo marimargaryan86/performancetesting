@@ -4,7 +4,7 @@ import hashlib
 import hmac
 from typing import Any
 
-import rapidjson
+import orjson
 from google.protobuf import text_format
 
 from snowfall.stdlib.v1alpha.models_pb2 import Cursor
@@ -53,7 +53,7 @@ def new(identifier: str, filter_: Any) -> Cursor:
 def _hash_filter(identifier: str, filter_: Any) -> str:
     digest = hashlib.blake2b(key=identifier.encode(), digest_size=_DIGEST_SIZE)
 
-    digest.update(rapidjson.dumps(filter_).encode())
+    digest.update(orjson.dumps(filter_))
 
     return digest.hexdigest()
 

@@ -9,7 +9,7 @@ from sys import modules
 from typing import Any, Union
 
 import aiofiles
-import rapidjson
+import orjson
 
 _PkgLoaderReturn = Union[
     list[dict[str, Any]],
@@ -27,7 +27,7 @@ class FileLoader(Loader):
     def load(self, ref: str) -> _PkgLoaderReturn:
         try:
             with open(ref) as file_handle:
-                return rapidjson.load(file_handle)
+                return orjson.loads(file_handle.read())
         except FileNotFoundError as err:
             raise FileNotFoundError(
                 "Schema file '{ref}' not found.".format(ref=ref),
@@ -51,7 +51,7 @@ class PkgLoader(Loader):
                 "Schema file '{ref}' not found.".format(ref=ref),
             )
 
-        return rapidjson.loads(file_content)
+        return orjson.loads(file_content)
 
 
 def resource_path(package: str, resource: str) -> pathlib.Path:

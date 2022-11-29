@@ -4,7 +4,7 @@ import logging
 import sys
 from typing import Any, Iterator, Optional, Sequence, Type
 
-import rapidjson
+import orjson
 import structlog
 
 from snowfall.stdlib.logging import processors
@@ -118,13 +118,17 @@ def _configure_standard_logger(
     root_logger.setLevel(level)
 
 
+def _dumps(*args: Any, **kwargs: Any) -> str:
+    return orjson.dumps(*args, **kwargs).decode()
+
+
 def _get_log_handler(
     common_processors: Sequence[processors.Processor],
 ) -> logging.Handler:
     log_handler = logging.StreamHandler(sys.stdout)
     formatter = structlog.stdlib.ProcessorFormatter(
         processor=structlog.processors.JSONRenderer(
-            serializer=rapidjson.dumps,
+            serializer=_dumps,
         ),
         foreign_pre_chain=common_processors,
     )
