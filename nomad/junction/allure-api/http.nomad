@@ -67,7 +67,7 @@ job "allure-api-http" {
       driver = "docker"
 
       resources {
-        memory = 600
+        memory = 1024
       }
 
       vault {
