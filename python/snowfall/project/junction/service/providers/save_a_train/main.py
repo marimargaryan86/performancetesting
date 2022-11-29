@@ -18,8 +18,12 @@ from snowfall.project.junction.service.providers.save_a_train import (
     cache,
     consumer,
     criteria,
-    train_stations,
 )
+from snowfall.project.junction.service.providers.save_a_train import (
+    offers as sat_offers,
+)
+from snowfall.project.junction.service.providers.save_a_train import train_stations
+from snowfall.project.junction.service.providers.save_a_train.v1alpha import amqp_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import h3, service
 from snowfall.stdlib.persistence.redis import types as redis
@@ -123,8 +127,8 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
         )
         # TODO: do we need to call get_token on the save_a_train_client?
 
-        search_consumer = consumer.SearchCriteriaConsumer(
-            consumer_obj=amqp_consumer.Consumer(
+        search_consumer = offers.SearchCriteriaConsumer[amqp_pb2.SearchCriteriaTask](
+            consumer=amqp_consumer.Consumer(
                 connection=amqp_connection,
                 queue_name="{0}_searches".format(app.name),
                 binds=[(types.Exchange("save_a_train"), "offers.search.trip")],
@@ -139,11 +143,16 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                     ).execute,
                 ],
             ),
-            producer_obj=producer.Producer(
+            producer=producer.Producer(
                 connection=amqp_connection,
                 exchange=types.Exchange(_OFFERS),
             ),
-            adapter=adapter.SaveATrainAdapter(
+            redis=redis.Client[bytes](
+                redis=redis_connection,
+                prefix=app.name,
+            ),
+            offer_group_cache_key_func=sat_offers.offer_group_cache_key,
+            offer_group_generator=adapter.SaveATrainAdapter(
                 save_a_train_client=save_a_train_client,
                 train_station_repository=train_stations.TrainStationRepository(
                     train_stations=await _load_train_stations(),
@@ -152,11 +161,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                     client=redis.Client(redis_connection, prefix=app.name),
                 ),
                 ttl=app.settings.ttl,
-            ),
-            redis=redis.Client[bytes](
-                redis=redis_connection,
-                prefix=app.name,
-            ),
+            ).gather_search_results,
         )
 
         await search_consumer.consume()

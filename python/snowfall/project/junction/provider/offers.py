@@ -1,6 +1,6 @@
 import datetime
 import types as std_types
-from typing import AsyncIterable, Callable, Generic, Type, TypeVar
+from typing import AsyncIterable, AsyncIterator, Callable, Generic, Type, TypeVar
 
 from google.protobuf import message
 
@@ -175,3 +175,70 @@ class OfferGroupCache(object):
             self._offers,
             offer.expires_at.ToDatetime(tzinfo=datetime.timezone.utc),
         )
+
+
+OfferGroupCacheKeyFunc = Callable[[_Proto], str]
+OfferGroupGenerator = Callable[[_Proto], AsyncIterator[offers_pb2.OfferGroup]]
+
+
+class SearchCriteriaConsumer(Generic[_Proto]):
+    def __init__(  # noqa: WPS211
+        self,
+        consumer: amqp_consumer.Consumer[_Proto],
+        producer: amqp_producer.Producer,
+        redis: redis_types.Client[bytes],
+        offer_group_cache_key_func: OfferGroupCacheKeyFunc[_Proto],
+        offer_group_generator: OfferGroupGenerator[_Proto],
+    ):
+        self._consumer = consumer
+        self._offer_group_cache_key_func = offer_group_cache_key_func
+        self._offer_group_generator = offer_group_generator
+        self._producer = producer
+        self._redis = redis
+
+    async def consume(self) -> None:
+        await self._consumer.consume(self._process_message)
+
+    async def _process_message(
+        self,
+        amqp_message: amqp_types.Message[_Proto],
+    ) -> None:
+        offer_cache = OfferGroupCache(
+            self._offer_group_cache_key_func(amqp_message.body),
+            self._redis,
+        )
+
+        async with offer_cache as has_lock:
+            if has_lock:
+                await self._search_offers(amqp_message.body, offer_cache)
+            else:
+                await amqp_message.nack(requeue=True)
+
+    async def _search_offers(
+        self,
+        search_task: _Proto,
+        offer_cache: OfferGroupCache,
+    ) -> None:
+        # todo: shared protobuf, or type intersection support in Python
+        if not hasattr(search_task, "offer_search_id"):  # noqa: WPS421
+            raise TypeError
+
+        try:
+            async for cached_offer_group in offer_cache.to_iterable():
+                await self._producer.publish(
+                    msg=offers_amqp_pb2.TripOfferSearchResult(
+                        offer_search_id=search_task.offer_search_id,
+                        offer=cached_offer_group,
+                    ),
+                    routing_key="offers.result.trip",
+                )
+        except NoCacheExistsError:
+            async for offer_result in self._offer_group_generator(search_task):
+                await offer_cache.put(offer_result)
+                await self._producer.publish(
+                    msg=offers_amqp_pb2.TripOfferSearchResult(
+                        offer_search_id=search_task.offer_search_id,
+                        offer=offer_result,
+                    ),
+                    routing_key="offers.result.trip",
+                )
