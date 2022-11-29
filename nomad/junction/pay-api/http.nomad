@@ -78,6 +78,10 @@ job "pay-api-http" {
               local_bind_port  = 8020
               destination_name = "currencies-${var.environment}"
             }
+            upstreams {
+              local_bind_port  = 8030
+              destination_name = "authentication-${var.environment}"
+            }
           }
         }
       }
@@ -116,6 +120,7 @@ job "pay-api-http" {
         change_mode = "restart"
         data        = <<EOH
 CURRENCIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_currencies-${var.environment}"))}}
+AUTHENTICATION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_currencies-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/pay-api" }}
 CC_LOGIN={{ .Data.data.cc_login }}
 CC_API_KEY={{ .Data.data.cc_api_key }}
