@@ -81,9 +81,20 @@
       "tags": [
         "notifications"
       ]
+    },
+    {
+      "name": "Groups",
+      "tags": [
+        "groups"
+      ]
     }
   ],
   "tags": [
+    {
+      "name": "groups",
+      "description": "Endpoints for user groups.",
+      "x-displayName": "Groups"
+    },
     {
       "name": "internal",
       "description": "Endpoints not for public use.",
@@ -141,6 +152,369 @@
     }
   ],
   "paths": {
+    "/users/groups": {
+      "post": {
+        "summary": "Create user group",
+        "tags": [
+          "groups"
+        ],
+        "operationId": "post-users-groups",
+        "description": "Used to create new user group.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/UserGroup"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/UserGroup"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      },
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ],
+        "summary": "List user groups",
+        "tags": [
+          "groups"
+        ],
+        "operationId": "get-users-groups",
+        "description": "Used to get all user groups that belong to the user.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "minItems": 1,
+                      "items": {
+                        "$ref": "#/components/schemas/UserGroup"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/users/groups/{groupId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/groupId"
+        }
+      ],
+      "get":{
+        "summary": "Get user group",
+        "tags": [
+          "groups"
+        ],
+        "operationId": "get-users-groups-id",
+        "description": "Used to get user group by id.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/UserGroup"
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update trip group",
+        "tags": [
+          "groups"
+        ],
+        "operationId": "patch-users-groups-id",
+        "description": "Used to update user group's attributes by id.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/UserGroup"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete user group",
+        "tags": [
+          "groups"
+        ],
+        "operationId": "delete-users-groups-id",
+        "description": "Used to delete user group by id.",
+        "responses": {
+          "204": {
+            "description": "Group deleted successfully"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/users/groups/{groupId}/members": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/groupId"
+        }
+      ],
+      "post": {
+        "summary": "Add user group member",
+        "tags": [
+          "groups"
+        ],
+        "operationId": "post-users-groups-id-members",
+        "description": "Used to add new member in a user group by id.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/UserGroupMember"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/UserGroupMember"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      },
+      "get":{
+        "summary": "List user group members",
+        "tags": [
+          "groups"
+        ],
+        "operationId": "get-users-groups-id-members",
+        "description": "Used to get members by user group by id.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "minItems": 1,
+                      "items": {
+                        "$ref": "#/components/schemas/UserGroupMember"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/users/groups/members/{memberId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/memberId"
+        }
+      ],
+      "patch": {
+        "summary": "Update user group",
+        "tags": [
+          "groups"
+        ],
+        "operationId": "patch-users-groups-members-id",
+        "description": "Used to update user group member by id.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/UserGroupMember"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete user group member",
+        "tags": [
+          "groups"
+        ],
+        "operationId": "delete-users-groups-members-id",
+        "description": "Used to delete user group's member by id.",
+        "responses": {
+          "204": {
+            "description": "Group member deleted successfully"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
     "/vouchers/{voucherCode}": {
       "get": {
         "parameters": [
@@ -1754,6 +2128,28 @@
         },
         "description": "Payment intent identifier"
       },
+      "memberId": {
+        "name": "memberId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+        },
+        "description": "Trip Group member identifier"
+      },
+      "groupId": {
+        "name": "groupId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+        },
+        "description": "Trip Group identifier"
+      },
       "voucherCode": {
         "name": "voucherCode",
         "in": "path",
@@ -2315,6 +2711,28 @@
           }
         },
         "required": ["id", "type", "attributes"]
+      },
+      "UserGroupMemberIdentifier": {
+        "title": "Trip Group Member Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "user-group-members"
+            ],
+            "example": "user-group-members"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
       },
       "Trip": {
         "title": "Trip",
@@ -3633,6 +4051,53 @@
         "type": "object",
         "properties": {
           "data": {
+            "allOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                    "readOnly": true
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "users"
+                    ],
+                    "example": "users"
+                  }
+                },
+                "required": [
+                  "id",
+                  "type"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "attributes":{
+                    "$ref": "#/components/schemas/UserProfileAttributes"
+                  }
+                },
+                "required": [
+                  "attributes"
+                ]
+              }
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "User (Profile)",
+        "description": ""
+      },
+      "UserGroupMember": {
+        "title": "Group Member",
+        "description": "",
+        "allOf": [
+          {
             "type": "object",
             "properties": {
               "id": {
@@ -3643,94 +4108,100 @@
               "type": {
                 "type": "string",
                 "enum": [
-                  "users"
+                  "user-group-members"
                 ],
-                "example": "users"
-              },
-              "attributes": {
-                "type": "object",
-                "properties": {
-                  "firstName": {
-                    "type": "string",
-                    "example": "john"
-                  },
-                  "lastName": {
-                    "type": "string",
-                    "example": "wick"
-                  },
-                  "email": {
-                    "type": "string",
-                    "format": "email",
-                    "example": "user@example.com",
-                    "readOnly": true
-                  },
-                  "phone": {
-                    "type": "string",
-                    "format": "phone",
-                    "example": "+123456789"
-                  },
-                  "gender": {
-                    "type": "string",
-                    "enum": [
-                      "female",
-                      "male",
-                      "unspecified"
-                    ],
-                    "example": "male"
-                  },
-                  "title": {
-                    "type": "string",
-                    "enum": [
-                      "mr",
-                      "mrs",
-                      "miss",
-                      "ms"
-                    ],
-                    "example": "mr"
-                  },
-                  "countryCode": {
-                    "type": "string",
-                    "format": "country",
-                    "example": "DE"
-                  },
-                  "dateOfBirth": {
-                    "type": "string",
-                    "format": "date",
-                    "example": "1964-07-12"
-                  },
-                  "loyaltyPrograms": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/LoyaltyProgramUserProfile"
-                    }
-                  },
-                  "createdAt": {
-                    "type": "string",
-                    "example": "2019-08-24T14:15:22Z",
-                    "format": "date-time",
-                    "readOnly": true
-                  },
-                  "updatedAt": {
-                    "type": "string",
-                    "example": "2019-08-24T14:15:22Z",
-                    "format": "date-time",
-                    "readOnly": true
-                  }
-                }
+                "example": "user-group-members"
               }
             },
             "required": [
               "id",
-              "type",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "attributes":{
+                "$ref": "#/components/schemas/UserProfileAttributes"
+              }
+            },
+            "required": [
               "attributes"
             ]
           }
-        },
-        "required": [
-          "data"
-        ],
-        "title": "User (Profile)",
-        "description": ""
+        ]
+      },
+      "UserProfileAttributes": {
+        "title": "User profile attributes",
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "example": "john"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "wick"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "user@example.com",
+            "readOnly": true
+          },
+          "phone": {
+            "type": "string",
+            "format": "phone",
+            "example": "+123456789"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "female",
+              "male",
+              "unspecified"
+            ],
+            "example": "male"
+          },
+          "title": {
+            "type": "string",
+            "enum": [
+              "mr",
+              "mrs",
+              "miss",
+              "ms"
+            ],
+            "example": "mr"
+          },
+          "countryCode": {
+            "type": "string",
+            "format": "country",
+            "example": "DE"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date",
+            "example": "1964-07-12"
+          },
+          "loyaltyPrograms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LoyaltyProgramUserProfile"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2019-08-24T14:15:22Z",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "updatedAt": {
+            "type": "string",
+            "example": "2019-08-24T14:15:22Z",
+            "format": "date-time",
+            "readOnly": true
+          }
+        }
       },
       "UserUpdatable": {
         "type": "object",
@@ -5191,6 +5662,79 @@
           "id",
           "type",
           "attributes"
+        ]
+      },
+      "UserGroup": {
+        "title": "Trip Group",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "user-groups"
+            ],
+            "example": "user-groups"
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "example": "Group Name"
+              },
+              "createdAt": {
+                "type": "string",
+                "example": "2019-08-24T14:15:22Z",
+                "format": "date-time",
+                "readOnly": true
+              },
+              "updatedAt": {
+                "type": "string",
+                "example": "2019-08-24T14:15:22Z",
+                "format": "date-time",
+                "readOnly": true
+              }
+            },
+            "required": [
+              "name"
+            ]
+          },
+          "relationships": {
+            "type": "object",
+            "properties": {
+              "members": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "minItems": 0,
+                    "items": {
+                      "$ref": "#/components/schemas/UserGroupMemberIdentifier"
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "members"
+            ],
+            "readOnly": true
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes",
+          "relationships"
         ]
       },
       "PushNotificationTokenUpdate": {
