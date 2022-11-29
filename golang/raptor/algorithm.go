@@ -255,25 +255,25 @@ func (r *raptor) routeWorker(wg *sync.WaitGroup, jobs chan uint64, results chan 
 			if current != nil {
 				tripSegment := r.data.ScheduleStopBySequence(current.ScheduleStops[routeSegment.Order])
 
-				if tripSegment.ArrivalAt == 0 {
-					current = nil
-				} else {
-					arrival = tripSegment.ArrivalAt
+				if !tripSegment.AlightingAllowed {
+					continue
+				}
 
-					// adds additional transfer time based on origin type
-					switch r.data.ScheduleBySequence(tripSegment.Schedule).Type {
-					case models.Schedule_TYPE_AIR:
-						arrival += airSuffixSeconds
-					case models.Schedule_TYPE_RAIL:
-						arrival += railSuffixSeconds
-					}
+				arrival = tripSegment.ArrivalAt
 
-					results <- workerResult{
-						stop:     tripSegment,
-						arrival:  arrival,
-						current:  current,
-						boarding: boarding,
-					}
+				// adds additional transfer time based on origin type
+				switch r.data.ScheduleBySequence(tripSegment.Schedule).Type {
+				case models.Schedule_TYPE_AIR:
+					arrival += airSuffixSeconds
+				case models.Schedule_TYPE_RAIL:
+					arrival += railSuffixSeconds
+				}
+
+				results <- workerResult{
+					stop:     tripSegment,
+					arrival:  arrival,
+					current:  current,
+					boarding: boarding,
 				}
 			}
 
@@ -309,7 +309,7 @@ func (r *raptor) routeWorker(wg *sync.WaitGroup, jobs chan uint64, results chan 
 					tripSegment := r.data.ScheduleStopBySequence(trip.ScheduleStops[routeSegment.Order])
 					departure := tripSegment.DepartureAt
 
-					if (r.round == 1 && departure > r.lastDeparture) || departure > r.tripCutOff {
+					if !tripSegment.BoardingAllowed || (r.round == 1 && departure > r.lastDeparture) || departure > r.tripCutOff {
 						continue
 					}
 
