@@ -106,7 +106,13 @@ async def with_sentry_context(
             for metadata_key, metadata_value in msg.headers.items()
         },
         op="amqp.message",
-        name="{0}/{1}".format(msg.queue, msg.routing_key),
+        name="{0}/{1}/{2}".format(msg.exchange, msg.queue, msg.routing_key),
+        description="{0}/{1}/{2}".format(msg.exchange, msg.queue, msg.routing_key),
+        tags={
+            "exchange": msg.exchange,
+            "queue": msg.queue,
+            "routing_key": msg.routing_key,
+        },
     )
 
     with Hub(Hub.current).start_transaction(transaction) as span:

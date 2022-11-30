@@ -14,12 +14,7 @@ _SPAN_SERVER_OP = "grpc.server"
 _IterMsg = AsyncIterable[Message]
 
 
-class TracingClientInterceptor(  # noqa: WPS215 (too many base classes)
-    aio.UnaryUnaryClientInterceptor,
-    aio.UnaryStreamClientInterceptor,
-    aio.StreamUnaryClientInterceptor,
-    aio.StreamStreamClientInterceptor,
-):
+class TracingClientInterceptor(aio.UnaryUnaryClientInterceptor):
     async def intercept_unary_unary(
         self,
         continuation: Callable[[aio.ClientCallDetails, Message], aio.UnaryUnaryCall],
@@ -33,51 +28,6 @@ class TracingClientInterceptor(  # noqa: WPS215 (too many base classes)
             return await continuation(
                 client_call_details,
                 request,
-            )
-
-    async def intercept_unary_stream(
-        self,
-        continuation: Callable[[aio.ClientCallDetails, Message], aio.UnaryStreamCall],
-        client_call_details: aio.ClientCallDetails,
-        request: Message,
-    ) -> aio.UnaryStreamCall | _IterMsg:
-        with get_span(_SPAN_CLIENT_OP, client_call_details.method) as span:
-            for header_key, header_value in span.iter_headers():
-                client_call_details.metadata.add(header_key, header_value)
-
-            return continuation(
-                client_call_details,
-                request,
-            )
-
-    async def intercept_stream_unary(
-        self,
-        continuation: Callable[[aio.ClientCallDetails, _IterMsg], aio.StreamUnaryCall],
-        client_call_details: aio.ClientCallDetails,
-        request_iterator: _IterMsg,
-    ) -> aio.StreamUnaryCall | Message:
-        with get_span(_SPAN_CLIENT_OP, client_call_details.method) as span:
-            for header_key, header_value in span.iter_headers():
-                client_call_details.metadata.add(header_key, header_value)
-
-            return await continuation(
-                client_call_details,
-                request_iterator,
-            )
-
-    async def intercept_stream_stream(
-        self,
-        continuation: Callable[[aio.ClientCallDetails, _IterMsg], aio.StreamStreamCall],
-        client_call_details: aio.ClientCallDetails,
-        request_iterator: _IterMsg,
-    ) -> aio.StreamStreamCall | _IterMsg:
-        with get_span(_SPAN_CLIENT_OP, client_call_details.method) as span:
-            for header_key, header_value in span.iter_headers():
-                client_call_details.metadata.add(header_key, header_value)
-
-            return continuation(
-                client_call_details,
-                request_iterator,
             )
 
 
@@ -107,6 +57,7 @@ class TracingServerInterceptor(interceptor.ServerInterceptor):
             },
             op=_SPAN_SERVER_OP,
             name=name,
+            description=name,
         )
 
         with Hub(Hub.current).start_transaction(transaction) as span:
