@@ -19,12 +19,13 @@ def _create_app(
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
     app = application.create_starlette_app(
-        routes_factory=router.get_routes,
-        custom_middlewares=custom_middlewares,
-        dependencies=bootstrap.create_dependencies(
-            locations_client=locations_client,
-            places_client=places_client,
+        routes=router.get_routes(
+            bootstrap.create_dependencies(
+                locations_client=locations_client,
+                places_client=places_client,
+            ),
         ),
+        custom_middlewares=custom_middlewares,
         openapi_path=openapi_path,
     )
     app.add_exception_handler(cursor.CursorError, handlers.cursor_error_handler)

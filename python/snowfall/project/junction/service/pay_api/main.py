@@ -35,7 +35,6 @@ def _factory(
             app.settings.cc_env,
         )
         asgi_app = application.create_starlette_app(
-            routes_factory=router.get_routes,
             custom_middlewares=[
                 Middleware(
                     authentication.AuthenticationMiddleware,
@@ -47,14 +46,16 @@ def _factory(
                     on_error=handlers.auth_error_handler,
                 ),
             ],
-            dependencies=bootstrap.create_dependencies(
-                cc_client=cc_client,
-                currencies_client=currencies.GrpcClient(
-                    currencies_pb2_grpc.CurrencyServiceStub(orders_channel),
-                ),
-                authentication_client=auth.GrpcClient(
-                    auth.auth_pb2_grpc.AuthenticationServiceStub(
-                        authentication_channel,
+            routes=router.get_routes(
+                bootstrap.create_dependencies(
+                    cc_client=cc_client,
+                    currencies_client=currencies.GrpcClient(
+                        currencies_pb2_grpc.CurrencyServiceStub(orders_channel),
+                    ),
+                    authentication_client=auth.GrpcClient(
+                        auth.auth_pb2_grpc.AuthenticationServiceStub(
+                            authentication_channel,
+                        ),
                     ),
                 ),
             ),

@@ -2,16 +2,11 @@ import pathlib
 from typing import AsyncIterator, Optional, Sequence
 
 import httpx
-import lagom
 import pytest
-from starlette import applications, routing
+from starlette import applications
 from starlette.middleware import Middleware
 
 from snowfall.stdlib.integration.starlette import application
-
-
-def _no_routes_factory(deps: lagom.Container) -> list[routing.Route]:
-    return []
 
 
 def _create_app(
@@ -21,8 +16,7 @@ def _create_app(
 ) -> applications.Starlette:
     return application.create_starlette_app(
         custom_middlewares=custom_middlewares,
-        dependencies=lagom.Container(),
-        routes_factory=_no_routes_factory,
+        routes=[],
         openapi_path=openapi_path,
         validate_response=validate_response,
     )

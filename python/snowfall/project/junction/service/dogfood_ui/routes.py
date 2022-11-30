@@ -1,18 +1,15 @@
-import dataclasses
+from starlette import requests, responses
 
-import lagom
-from starlette import endpoints, requests, responses
-
-
-@dataclasses.dataclass(frozen=True)
-class Template(object):
-    html: str
+from snowfall.stdlib.persistence import filesystem
 
 
-class UI(endpoints.HTTPEndpoint):
-    async def get(
-        self,
-        request: requests.Request,
-        template: Template = lagom.injectable,
-    ) -> responses.Response:
-        return responses.Response(template.html)
+async def ui(_: requests.Request) -> responses.Response:
+    layout_path = filesystem.resource_path(
+        "snowfall.project.junction.service.dogfood_ui.routes",
+        "layout.html",
+    )
+
+    with open(layout_path) as template:
+        layout = str(template.read())
+
+    return responses.Response(layout)

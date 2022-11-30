@@ -1,15 +1,12 @@
 from typing import Callable
 
 import httpx
-import lagom
-from lagom.integrations import starlette
 from starlette import applications, routing
 
 from snowfall.project.junction.service.dogfood_ui import routes
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application
 from snowfall.stdlib.integration.starlette import routes as stdlib_routes
-from snowfall.stdlib.persistence import filesystem
 
 
 class _Settings(application.Settings):
@@ -17,39 +14,20 @@ class _Settings(application.Settings):
     base_url: str
 
 
-def _dependencies(
-    app: service.Application[_Settings],
-) -> lagom.Container:
-    container = lagom.Container()
-    layout_path = filesystem.resource_path(
-        "snowfall.project.junction.service.dogfood_ui.routes",
-        "layout.html",
-    )
-
-    with open(layout_path) as template:
-        layout = str(template.read())
-
-    container[routes.Template] = routes.Template(html=layout)
-    container[httpx.AsyncClient] = httpx.AsyncClient(
-        http2=True,
-        base_url=app.settings.base_url,
-        headers={
-            "Accept": "application/vnd.api+json",
-            "Authorization": "Bearer {0}".format(app.settings.auth_token),
-            "Content-Type": "application/vnd.api+json",
-            "User-Agent": app.user_agent,
-        },
-    )
-
-    return container
-
-
-def _routes(dependencies: lagom.Container) -> list[routing.Route]:
-    integration = starlette.StarletteIntegration(dependencies)
+def _routes(app: service.Application[_Settings]) -> list[routing.Route]:
     return [
-        integration.route("/", routes.UI),
+        routing.Route("/", routes.ui),
         stdlib_routes.Proxy(
-            dependencies[httpx.AsyncClient],
+            httpx.AsyncClient(
+                http2=True,
+                base_url=app.settings.base_url,
+                headers={
+                    "Accept": "application/vnd.api+json",
+                    "Authorization": "Bearer {0}".format(app.settings.auth_token),
+                    "Content-Type": "application/vnd.api+json",
+                    "User-Agent": app.user_agent,
+                },
+            ),
         ).to_route(),
     ]
 
@@ -59,8 +37,7 @@ def _factory(
 ) -> Callable[[], applications.Starlette]:
     def decorator() -> applications.Starlette:
         return application.create_starlette_app(
-            routes_factory=_routes,
-            dependencies=_dependencies(app),
+            routes=_routes(app),
             openapi_path=None,
         )
 

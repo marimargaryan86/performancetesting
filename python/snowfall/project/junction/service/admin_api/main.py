@@ -21,13 +21,14 @@ def _factory(
         )
 
         asgi_app = application.create_starlette_app(
-            routes_factory=router.get_routes,
-            dependencies=bootstrap.create_dependencies(
-                locations_client=locations.GrpcClient(
-                    places_pb2_grpc.LocationsServiceStub(places_channel),
-                ),
-                places_client=places.GrpcClient(
-                    places_pb2_grpc.PlacesServiceStub(places_channel),
+            routes=router.get_routes(
+                bootstrap.create_dependencies(
+                    locations_client=locations.GrpcClient(
+                        places_pb2_grpc.LocationsServiceStub(places_channel),
+                    ),
+                    places_client=places.GrpcClient(
+                        places_pb2_grpc.PlacesServiceStub(places_channel),
+                    ),
                 ),
             ),
             openapi_path=filesystem.resource_path("junction.admin_api", "openapi.json"),

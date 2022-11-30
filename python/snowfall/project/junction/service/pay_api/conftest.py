@@ -23,14 +23,15 @@ def _create_app(
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
     app = application.create_starlette_app(
-        dependencies=bootstrap.create_dependencies(
-            cc_client,
-            currencies_client,
-            authentication_client,
-        ),
         custom_middlewares=custom_middlewares,
         openapi_path=openapi_path,
-        routes_factory=router.get_routes,
+        routes=router.get_routes(
+            bootstrap.create_dependencies(
+                cc_client,
+                currencies_client,
+                authentication_client,
+            ),
+        ),
     )
     app.add_exception_handler(errors.CursorError, handlers.cursor_error_handler)
     app.add_exception_handler(errors.NotFoundError, handlers.not_found_error_handler)

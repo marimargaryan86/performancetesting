@@ -52,7 +52,50 @@ def _factory(
         )
 
         asgi_app = application.create_starlette_app(
-            routes_factory=router.get_routes,
+            routes=router.get_routes(
+                bootstrap.create_dependencies(
+                    legs_client=legs.GrpcClient(
+                        schedules=schedules_pb2_grpc.ScheduleServiceStub(
+                            schedules_channel,
+                        ),
+                    ),
+                    locations_client=locations.GrpcClient(
+                        places_pb2_grpc.LocationsServiceStub(places_channel),
+                    ),
+                    places_client=places.GrpcClient(
+                        places_pb2_grpc.PlacesServiceStub(places_channel),
+                    ),
+                    trip_searches_client=trip_searches.GrpcClient(
+                        trips=trips_pb2_grpc.TripServiceStub(trips_channel),
+                        trip_searches=trips_pb2_grpc.TripSearchServiceStub(
+                            trips_channel,
+                        ),
+                    ),
+                    trips_client=trips.GrpcClient(
+                        trips_pb2_grpc.TripServiceStub(trips_channel),
+                    ),
+                    offers_client=offers.GrpcClient(
+                        offers=grpc_pb2_grpc.OfferServiceStub(offers_channel),
+                    ),
+                    offer_searches_client=offer_searches.GrpcClient(
+                        offers=grpc_pb2_grpc.OfferServiceStub(offers_channel),
+                        offer_searches=grpc_pb2_grpc.OfferSearchServiceStub(
+                            offers_channel,
+                        ),
+                    ),
+                    orders_client=orders.GrpcClient(
+                        orders=orders_pb2_grpc.OrderServiceStub(orders_channel),
+                    ),
+                    segments_client=segments.GrpcClient(
+                        segments=trips_pb2_grpc.TripServiceStub(trips_channel),
+                    ),
+                    schedules_client=schedules.GrpcClient(
+                        schedules=schedules_pb2_grpc.ScheduleServiceStub(
+                            schedules_channel,
+                        ),
+                    ),
+                ),
+            ),
             custom_middlewares=[
                 Middleware(
                     authentication.AuthenticationMiddleware,
@@ -65,48 +108,6 @@ def _factory(
                     on_error=handlers.auth_error_handler,
                 ),
             ],
-            dependencies=bootstrap.create_dependencies(
-                legs_client=legs.GrpcClient(
-                    schedules=schedules_pb2_grpc.ScheduleServiceStub(
-                        schedules_channel,
-                    ),
-                ),
-                locations_client=locations.GrpcClient(
-                    places_pb2_grpc.LocationsServiceStub(places_channel),
-                ),
-                places_client=places.GrpcClient(
-                    places_pb2_grpc.PlacesServiceStub(places_channel),
-                ),
-                trip_searches_client=trip_searches.GrpcClient(
-                    trips=trips_pb2_grpc.TripServiceStub(trips_channel),
-                    trip_searches=trips_pb2_grpc.TripSearchServiceStub(
-                        trips_channel,
-                    ),
-                ),
-                trips_client=trips.GrpcClient(
-                    trips_pb2_grpc.TripServiceStub(trips_channel),
-                ),
-                offers_client=offers.GrpcClient(
-                    offers=grpc_pb2_grpc.OfferServiceStub(offers_channel),
-                ),
-                offer_searches_client=offer_searches.GrpcClient(
-                    offers=grpc_pb2_grpc.OfferServiceStub(offers_channel),
-                    offer_searches=grpc_pb2_grpc.OfferSearchServiceStub(
-                        offers_channel,
-                    ),
-                ),
-                orders_client=orders.GrpcClient(
-                    orders=orders_pb2_grpc.OrderServiceStub(orders_channel),
-                ),
-                segments_client=segments.GrpcClient(
-                    segments=trips_pb2_grpc.TripServiceStub(trips_channel),
-                ),
-                schedules_client=schedules.GrpcClient(
-                    schedules=schedules_pb2_grpc.ScheduleServiceStub(
-                        schedules_channel,
-                    ),
-                ),
-            ),
             openapi_path=filesystem.resource_path(
                 "junction.client_api",
                 "openapi.json",

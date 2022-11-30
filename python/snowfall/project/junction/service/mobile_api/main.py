@@ -71,51 +71,52 @@ def _factory(
         )
 
         asgi_app = application.create_starlette_app(
-            routes_factory=router.get_routes,
-            dependencies=bootstrap.create_dependencies(
-                currencies_client=mobile_currencies.CurrencyClient(
-                    app.settings.currency_rate_cache_ttl,
-                    currencies.GrpcClient(
-                        currencies_pb2_grpc.CurrencyServiceStub(currencies_channel),
+            routes=router.get_routes(
+                bootstrap.create_dependencies(
+                    currencies_client=mobile_currencies.CurrencyClient(
+                        app.settings.currency_rate_cache_ttl,
+                        currencies.GrpcClient(
+                            currencies_pb2_grpc.CurrencyServiceStub(currencies_channel),
+                        ),
+                        fallback_rates={"SEK": app.settings.fallback_rate_sek},
                     ),
-                    fallback_rates={"SEK": app.settings.fallback_rate_sek},
+                    places_repository=repository.PlacesRepository(
+                        mongo["places"],
+                    ),
+                    users_repository=repository.UsersRepository(
+                        mongo["users"],
+                    ),
+                    otp_repository=repository.OtpRepository(
+                        redis_client=redis_client,
+                        cache_ttl=app.settings.otp_cache_ttl,
+                    ),
+                    offers_rates_repository=repository.OffersRatesRepository(
+                        redis_client=redis_client,
+                        cache_ttl=app.settings.offers_rates_cache_ttl,
+                    ),
+                    stripe_users_repository=repository.StripeUsersRepository(
+                        mongo["stripe_users"],
+                        create_stripe_customers=app.settings.create_stripe_customers,
+                    ),
+                    smtp_client=smtp_cl,
+                    orders_repository=repository.OrdersRepository(
+                        mongo["orders"],
+                    ),
+                    preferences_repository=repository.PreferencesRepository(
+                        mongo["preferences"],
+                    ),
+                    loyalty_programs_repository=repository.LoyaltyProgramsRepository(
+                        mongo["air_loyalty"],
+                    ),
+                    vouchers_repository=repository.VouchersRepository(
+                        mongo["vouchers"],
+                    ),
+                    notification_tokens_repository=repository.NotificationTokensRepository(
+                        mongo["notifications"],
+                    ),
+                    junction_client=junction_client,
+                    jwt_gen=jwt_gen,
                 ),
-                places_repository=repository.PlacesRepository(
-                    mongo["places"],
-                ),
-                users_repository=repository.UsersRepository(
-                    mongo["users"],
-                ),
-                otp_repository=repository.OtpRepository(
-                    redis_client=redis_client,
-                    cache_ttl=app.settings.otp_cache_ttl,
-                ),
-                offers_rates_repository=repository.OffersRatesRepository(
-                    redis_client=redis_client,
-                    cache_ttl=app.settings.offers_rates_cache_ttl,
-                ),
-                stripe_users_repository=repository.StripeUsersRepository(
-                    mongo["stripe_users"],
-                    create_stripe_customers=app.settings.create_stripe_customers,
-                ),
-                smtp_client=smtp_cl,
-                orders_repository=repository.OrdersRepository(
-                    mongo["orders"],
-                ),
-                preferences_repository=repository.PreferencesRepository(
-                    mongo["preferences"],
-                ),
-                loyalty_programs_repository=repository.LoyaltyProgramsRepository(
-                    mongo["air_loyalty"],
-                ),
-                vouchers_repository=repository.VouchersRepository(
-                    mongo["vouchers"],
-                ),
-                notification_tokens_repository=repository.NotificationTokensRepository(
-                    mongo["notifications"],
-                ),
-                junction_client=junction_client,
-                jwt_gen=jwt_gen,
             ),
             custom_middlewares=[
                 Middleware(

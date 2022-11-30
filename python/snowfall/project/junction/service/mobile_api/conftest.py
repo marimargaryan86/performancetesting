@@ -152,10 +152,9 @@ def _create_app(
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
     asgi_app = application.create_starlette_app(
-        dependencies=dependencies,
         custom_middlewares=custom_middlewares,
         openapi_path=openapi_path,
-        routes_factory=router.get_routes,
+        routes=router.get_routes(dependencies),
     )
     asgi_app.add_exception_handler(
         httpx.HTTPStatusError,
