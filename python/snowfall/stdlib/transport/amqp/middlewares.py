@@ -5,7 +5,7 @@ from typing import TypeVar
 import prometheus_client
 import structlog
 from google.protobuf import message
-from sentry_sdk import Hub, tracing
+from sentry_sdk import Hub, set_tag, tracing
 
 from snowfall.stdlib.instrumentation import prometheus
 from snowfall.stdlib.transport.amqp import protocol, types
@@ -108,14 +108,13 @@ async def with_sentry_context(
         op="amqp.message",
         name="{0}/{1}/{2}".format(msg.exchange, msg.queue, msg.routing_key),
         description="{0}/{1}/{2}".format(msg.exchange, msg.queue, msg.routing_key),
-        tags={
-            "exchange": msg.exchange,
-            "queue": msg.queue,
-            "routing_key": msg.routing_key,
-        },
     )
 
     with Hub(Hub.current).start_transaction(transaction) as span:
+        set_tag("exchange", msg.exchange)
+        set_tag("queue", msg.queue)
+        set_tag("routing_key", msg.routing_key)
+
         await next_func(msg)
 
         match msg.status:
