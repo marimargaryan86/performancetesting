@@ -849,6 +849,16 @@ window.onload = () => {
     const transaction = db.transaction("places", "readwrite");
     const objectStore = transaction.objectStore("places");
     const originRequest = objectStore.get(origin);
+    const legTypes = document.querySelectorAll("input[name=leg-types]:checked")
+
+    let allowedSegmentTypes = []
+
+    legTypes.forEach(function(legType) {
+      allowedSegmentTypes.push({
+        id: legType.value,
+        type: "leg-types",
+      })
+    })
 
     originRequest.onsuccess = (event) => {
       const originTimeZone = originRequest.result.attributes.timeZone;
@@ -875,6 +885,9 @@ window.onload = () => {
                   id: destination,
                   type: "places",
                 },
+              },
+              allowedSegmentTypes: {
+                data: allowedSegmentTypes,
               },
             },
           },
