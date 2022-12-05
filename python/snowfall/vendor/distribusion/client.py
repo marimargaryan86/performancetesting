@@ -142,6 +142,11 @@ class DistribusionClient(object):  # noqa: WPS214
                 "departure_stations[]": criteria.departure_stations,
                 "arrival_stations[]": criteria.arrival_stations,
                 "departure_date": criteria.departure_date.isoformat(),
+                **(
+                    {"return_date": criteria.return_date.isoformat()}
+                    if criteria.return_date
+                    else {}
+                ),
                 "pax": criteria.pax,
                 "currency": criteria.currency,
             },

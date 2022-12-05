@@ -103,6 +103,26 @@ async def test_connections_find(
 
 @disable_by_default
 @pytest.mark.asyncio
+async def test_connections_find_round_trip(
+    distribusion_client: client.DistribusionClient,
+) -> None:
+    connections = await distribusion_client.find_connections(
+        FindConnectionsCriteria(
+            departure_stations=["DEBERCBS"],
+            arrival_stations=["FRPARPGB"],
+            departure_date=datetime.date.today() + datetime.timedelta(days=10),
+            return_date=datetime.date.today() + datetime.timedelta(days=12),
+            pax=1,
+            locale="en",
+            currency="EUR",
+        ),
+    )
+
+    assert connections is not None
+
+
+@disable_by_default
+@pytest.mark.asyncio
 async def test_stations(distribusion_client: client.DistribusionClient) -> None:
     stations = await distribusion_client.get_stations()
     assert stations is not None

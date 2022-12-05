@@ -29,7 +29,7 @@ class City(DistribusionBaseModel):
 
 class Station(DistribusionBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
-    code: str | None
+    code: str
     description: str | None
     latitude: float | None
     longitude: float | None
@@ -98,8 +98,8 @@ class Segment(DistribusionBaseModel):
     arrival_time: str | None
     departure_time: str | None
     index: int | None
-    arrival_station: Station | None
-    departure_station: Station | None
+    arrival_station: Station
+    departure_station: Station
     operating_carrier: OperatingCarrier | None
     vehicle: Vehicle | None
 
@@ -123,7 +123,7 @@ class Connection(DistribusionBaseModel):
     departure_station: Station | None
     fares: List[FaresRelFareClassPrice] | None
     marketing_carrier: MarketingCarrier | None
-    segments: List[Segment] | None
+    segments: List[Segment]
     currency: str
 
 

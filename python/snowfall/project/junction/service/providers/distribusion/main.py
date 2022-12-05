@@ -1,9 +1,9 @@
 from snowfall.project.junction.service.providers.distribusion import (
     offers,
     orders,
-    searches,
     stations,
 )
+from snowfall.project.junction.service.providers.distribusion.search import searches
 from snowfall.stdlib import service
 
 if __name__ == "__main__":

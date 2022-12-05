@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 
 import pydantic
 
@@ -72,10 +72,10 @@ class MarketingCarrierDetails(DistribusionBaseModel):
     white_label_logo: str
     white_label_colour_code: str
     terms: str
-    privacy_policy: Optional[str]
+    privacy_policy: str | None
     flight_number_required: bool
     has_mobile_tickets: bool
-    tickets_validity_in_hours: Optional[str]
+    tickets_validity_in_hours: str | None
     tickets_validity_info: str
     cancellation_type: str
     status: str

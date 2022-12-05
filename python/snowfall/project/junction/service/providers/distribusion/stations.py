@@ -27,6 +27,17 @@ class Station(h3.CoordinatesItem):
     name: Optional[str]
 
 
+class StationRepository(object):
+    def __init__(
+        self,
+        stations: Sequence[Station],
+    ):
+        self._stations = {station.identifier: station for station in stations}
+
+    def get_by_id(self, station_id: str) -> Station:
+        return self._stations[station_id]
+
+
 async def dump_stations(app: service.Application[DumpStationsSettings]) -> None:
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
