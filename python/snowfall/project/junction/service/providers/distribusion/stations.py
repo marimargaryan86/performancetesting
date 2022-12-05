@@ -1,8 +1,12 @@
 import contextlib
 import dataclasses
+import json
 import pathlib
-from typing import Optional, Sequence
+import pkgutil
+import zoneinfo
+from typing import Mapping, Optional, Sequence
 
+import aiofiles
 import httpx
 import pydantic
 
@@ -48,9 +52,43 @@ async def _dump_stations(
     response: Sequence[VendorStation],
     output_file: pathlib.Path,
 ) -> None:
-    pass  # noqa: WPS420
+    stations = []
+
+    for station in response:
+        stations.append(
+            {
+                "id": station.code,
+                "name": station.name,
+                "time_zone": station.time_zone,
+                "latitude": station.latitude,
+                "longitude": station.longitude,
+            },
+        )
+
+    async with aiofiles.open(str(output_file), "w") as out_file:
+        await out_file.write(json.dumps(stations, indent=4))
 
 
-async def _load_stations() -> list[Station]:
-    # todo
-    return []
+async def load_stations() -> list[Station]:
+    json_content = pkgutil.get_data(
+        "snowfall.project.junction.service.providers.distribusion.main",
+        "stations.json",
+    )
+
+    if json_content is None:
+        return []  # TODO: throw exception
+
+    stations = json.loads(json_content.decode("utf-8"))
+    return [await _make_station(station) for station in stations]
+
+
+async def _make_station(
+    station: Mapping[str, str | float],
+) -> Station:
+    return Station(
+        identifier=str(station["id"]),
+        name=str(station["name"]),
+        timezone=zoneinfo.ZoneInfo(str(station["time_zone"])),
+        latitude=float(station["latitude"]),
+        longitude=float(station["longitude"]),
+    )
