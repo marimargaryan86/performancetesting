@@ -98,7 +98,7 @@
       }
     },
     {
-      "id": "PNOS-TEST-TEST-OUTBOUND-1-0",
+      "id": "PNOS-TEST-TESTS-OUTBOUND-1-0",
       "type": "passengers",
       "attributes": {
         "first_name": "TEST",

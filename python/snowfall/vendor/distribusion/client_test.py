@@ -116,8 +116,7 @@ async def test_get_order(
 
     response = await distribusion_client.get_order(order_id)
 
-    assert response
-    assert response.identifier == order_id
+    assert response and response.identifier == order_id
     assert response.currency == "GBP"
     assert response.booking and response.booking.total_price == 2148
     assert (
@@ -126,4 +125,8 @@ async def test_get_order(
         and response.booking.fare_class.fare_features
         and response.booking.fare_class.fare_features[10].name  # noqa: WPS219
         == "Accessible area for wheelchairs"
+    )
+    assert (
+        response.booking.passengers
+        and response.booking.passengers[0].first_name == "TEST"
     )

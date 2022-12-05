@@ -84,7 +84,14 @@ def _parse_included(
 
 def _flat(obj: Any) -> Any:
     obj.pop("links", None)
-    obj.update(obj.pop("attributes", {}))
+
+    if obj.get("attributes"):
+        obj.get("attributes").pop("type", None)
+        obj.update(obj.pop("attributes", {}))
+    return _parse_relationships(obj)
+
+
+def _parse_relationships(obj: Any) -> Any:
     if "relationships" in obj:
         for relationship, item in obj.pop("relationships").items():
             data = item.get("data")
