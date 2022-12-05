@@ -54,7 +54,7 @@ class PkgLoader(Loader):
         return orjson.loads(file_content)
 
 
-def resource_path(package: str, resource: str) -> pathlib.Path:
+def package_path(package: str) -> pathlib.Path:
     """Based on pkgutil.get_data()."""
     spec = util.find_spec(package)
 
@@ -66,10 +66,18 @@ def resource_path(package: str, resource: str) -> pathlib.Path:
     if mod is None:
         raise RuntimeError()
 
+    try:
+        return pathlib.Path(path.dirname(str(mod.__file__)))
+    except AttributeError as err:
+        raise RuntimeError() from err
+
+
+def resource_path(package: str, resource: str) -> pathlib.Path:
+    """Based on pkgutil.get_data()."""
     parts = resource.split("/")
 
     try:
-        parts.insert(0, path.dirname(str(mod.__file__)))
+        parts.insert(0, str(package_path(package)))
     except AttributeError as err:
         raise RuntimeError() from err
 

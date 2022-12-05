@@ -1,7 +1,7 @@
 python_sources(
     overrides={
-        "routes.py": {
-            "dependencies": [":layout"],
+        "main.py": {
+            "dependencies": ["./static", "./templates", "vendor#jinja2"],
         },
     },
 )
@@ -9,8 +9,4 @@ python_image(
     namespace="python.snowfall.project.junction.service.dogfood_ui",
     name="main",
     entry_point="main.py",
-)
-resource(
-    name="layout",
-    source="layout.html",
 )

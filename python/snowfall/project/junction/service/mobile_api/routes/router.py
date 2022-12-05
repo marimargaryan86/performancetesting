@@ -16,7 +16,7 @@ from snowfall.project.junction.service.mobile_api.routes import (  # noqa: WPS23
 )
 
 
-def get_routes(dependencies: lagom.Container) -> list[routing.Route]:
+def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
     integration = starlette.StarletteIntegration(dependencies)
 
     return [

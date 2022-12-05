@@ -1,12 +1,15 @@
 from typing import Callable
 
 import httpx
-from starlette import applications, routing
+import lagom
+from lagom.integrations import starlette
+from starlette import applications, routing, staticfiles, templating
 
 from snowfall.project.junction.service.dogfood_ui import routes
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application
 from snowfall.stdlib.integration.starlette import routes as stdlib_routes
+from snowfall.stdlib.persistence import filesystem
 
 
 class _Settings(application.Settings):
@@ -14,9 +17,26 @@ class _Settings(application.Settings):
     base_url: str
 
 
-def _routes(app: service.Application[_Settings]) -> list[routing.Route]:
+def _routes(app: service.Application[_Settings]) -> list[routing.BaseRoute]:
+    container = lagom.Container()
+    container[templating.Jinja2Templates] = templating.Jinja2Templates(
+        filesystem.package_path(
+            "snowfall.project.junction.service.dogfood_ui.templates",
+        ),
+    )
+
+    integration = starlette.StarletteIntegration(container)
+
     return [
-        routing.Route("/", routes.ui),
+        integration.route("/", routes.UI),
+        routing.Mount(
+            "/static",
+            staticfiles.StaticFiles(
+                directory=filesystem.package_path(
+                    "snowfall.project.junction.service.dogfood_ui.static",
+                ),
+            ),
+        ),
         stdlib_routes.Proxy(
             httpx.AsyncClient(
                 http2=True,

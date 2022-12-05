@@ -1,0 +1,891 @@
+dayjs.extend(window.dayjs_plugin_utc);
+dayjs.extend(window.dayjs_plugin_timezone);
+
+let db;
+
+const icons = {
+  road: "car", // Unspecified
+  air: "plane", // Air
+  rail: "train", // Rail
+  foot: "walking", // Walk
+};
+
+const greenIcon = new L.Icon({
+  iconUrl:
+    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
+const redIcon = new L.Icon({
+  iconUrl:
+    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
+
+function getLang() {
+  if (navigator.languages != undefined) return navigator.languages[0];
+  return navigator.language;
+}
+
+function clear_places() {
+  const transaction = db.transaction("places", "readwrite");
+  const objectStore = transaction.objectStore("places");
+  const clearRequest = objectStore.clear();
+
+  clearRequest.onerror = (event) => {
+    console.log(event);
+  };
+}
+
+function count_places() {
+  const transaction = db.transaction("places", "readonly");
+  const objectStore = transaction.objectStore("places");
+  const countRequest = objectStore.count();
+
+  countRequest.onerror = (event) => {
+    console.log(event);
+  };
+
+  countRequest.onsuccess = (event) => {
+    if (countRequest.result != 0) {
+      console.log("Places already indexed, skipping.");
+      inject_places();
+    } else {
+      console.log("No places in DB, indexing...");
+      load_places();
+    }
+  };
+}
+
+function inject_places() {
+  const placesList = document.getElementById("places");
+  const transaction = db.transaction("places", "readonly");
+  const objectStore = transaction.objectStore("places");
+  const openCursorRequest = objectStore.openCursor();
+
+  openCursorRequest.onerror = (event) => {
+    console.log(event);
+  };
+
+  openCursorRequest.onsuccess = (event) => {
+    const cursor = event.target.result;
+
+    if (!cursor) {
+      hide_loader();
+      return;
+    }
+
+    const option = document.createElement("option");
+    option.value = cursor.value.id;
+    option.innerText =
+      cursor.value.attributes.name + ", " + cursor.value.attributes.countryCode;
+
+    placesList.append(option);
+    cursor.continue();
+  };
+}
+
+function show_loader(status_message = "") {
+  const container = document.getElementById("loader");
+  container.classList.add("overlay");
+  container.innerHTML =
+    '<div><div class="lds-heart"><div></div></div><br>' +
+    status_message +
+    "</div>";
+}
+
+function hide_loader() {
+  const container = document.getElementById("loader");
+  container.classList.remove("overlay");
+  container.innerHTML = "";
+}
+
+function flatten(resource, included) {
+  if (!resource.hasOwnProperty("relationships")) {
+    return resource;
+  }
+
+  for (const key of Object.keys(resource.relationships)) {
+    if (resource.relationships[key].data instanceof Array) {
+      for (const [i, value] of resource.relationships[key].data.entries()) {
+        resource.relationships[key].data[i] = flatten(
+          included[value.type + value.id],
+          included
+        );
+      }
+    } else {
+      resource.relationships[key].data = flatten(
+        included[
+          resource.relationships[key].data.type +
+            resource.relationships[key].data.id
+        ],
+        included
+      );
+    }
+  }
+
+  return resource;
+}
+
+function sort_legs(a, b) {
+  a_date = new Date(a.attributes.departureAt);
+  b_date = new Date(b.attributes.departureAt);
+  a2_date = new Date(a.attributes.arrivalAt);
+  b2_date = new Date(b.attributes.arrivalAt);
+
+  if (a_date < b_date) {
+    return -1;
+  }
+
+  if (a_date > b_date) {
+    return 1;
+  }
+
+  if (a2_date < b2_date) {
+    return -1;
+  }
+
+  if (a2_date > b2_date) {
+    return 1;
+  }
+
+  return 0;
+}
+
+function sort_segments(a, b) {
+  order = 0;
+  leg_idx = 0;
+
+  while (
+    order == 0 &&
+    leg_idx < a.relationships.legs.data.length &&
+    leg_idx < b.relationships.legs.data.length
+  ) {
+    order = sort_legs(
+      a.relationships.legs.data[leg_idx],
+      b.relationships.legs.data[leg_idx]
+    );
+    leg_idx++;
+  }
+
+  return order;
+}
+
+function sort_trips(a, b) {
+  order = 0;
+  segment_idx = 0;
+
+  while (
+    order == 0 &&
+    segment_idx < a.relationships.segments.data.length &&
+    segment_idx < b.relationships.segments.data.length
+  ) {
+    order = sort_segments(
+      a.relationships.segments.data[segment_idx],
+      b.relationships.segments.data[segment_idx]
+    );
+    segment_idx++;
+  }
+
+  return order;
+}
+
+function nice_format_seconds(secs) {
+  let hours = Math.floor(secs / 3600);
+  let minutes = Math.floor((secs % 3600) / 60);
+  let nice = "";
+
+  if (hours > 0) {
+    nice += hours + " hours ";
+  }
+
+  if (minutes > 0) {
+    if (hours > 0) {
+      nice += "and ";
+    }
+
+    nice += minutes + " minutes";
+  }
+
+  return nice.trim();
+}
+
+function getMsSinceMidnight(d) {
+  var e = new Date(d);
+  return d - e.setHours(0, 0, 0, 0);
+}
+
+function haversine_distance(coords1, coords2) {
+  function toRad(x) {
+    return (x * Math.PI) / 180;
+  }
+
+  var lon1 = coords1[0];
+  var lat1 = coords1[1];
+
+  var lon2 = coords2[0];
+  var lat2 = coords2[1];
+
+  var R = 6371 * 1000;
+
+  var x1 = lat2 - lat1;
+  var dLat = toRad(x1);
+  var x2 = lon2 - lon1;
+  var dLon = toRad(x2);
+  var a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  var d = R * c;
+
+  return d;
+}
+
+function inject_trips(tripSearchId, response) {
+  hide_loader();
+
+  const showMaps = document.getElementById("show-maps").checked;
+  const searchOffers = document.getElementById("search-offers").checked;
+  const container = document.getElementById("result");
+
+  if (response.data.length == 0) {
+    container.innerText = "No possible trips found.";
+    return;
+  }
+
+  container.innerText = "";
+
+  let mega = document.createElement("h2");
+  mega.innerText = "Search Results: " + response.data.length + " trips found";
+  container.append(mega);
+  let searchInfo = document.createElement("dl");
+  searchInfo.className = "row";
+  searchInfo.innerHTML +=
+    '<dt class="col-sm-2">Trip Search ID</dt><dd class="col-sm-10">' +
+    tripSearchId +
+    "</dd>";
+  searchInfo.innerHTML +=
+    '<dt class="col-sm-2">Session Token</dt><dd class="col-sm-10">' +
+    sessionToken +
+    "</dd>";
+  container.append(searchInfo);
+
+  included = {};
+
+  for (const resource of response.included) {
+    included[resource.type + resource.id] = resource;
+  }
+
+  let stats = {
+    earliest: { trip_idx: [], time: Number.MAX_SAFE_INTEGER },
+    fastest: { trip_idx: [], time: Number.MAX_SAFE_INTEGER },
+    shortest: { trip_idx: [], time: Number.MAX_SAFE_INTEGER },
+    environment: { trip_idx: [], time: Number.MAX_SAFE_INTEGER },
+  };
+
+  trips = [];
+
+  for (const [i, resource] of response.data.entries()) {
+    trip = flatten(resource, included);
+
+    for (const [j, segment] of trip.relationships.segments.data.entries()) {
+      segment.relationships.legs.data.sort(sort_legs);
+      trip.relationships.segments.data[j] = segment;
+    }
+
+    trip.relationships.segments.data.sort(sort_segments);
+    trips.push(trip);
+  }
+
+  trips.sort(sort_trips);
+
+  for (let i = 0; i < trips.length; i++) {
+    const trip = trips[i];
+    firstSegment = trip.relationships.segments.data[0];
+    lastSegment =
+      trip.relationships.segments.data[
+        trip.relationships.segments.data.length - 1
+      ];
+    departsAt = new Date(
+      firstSegment.relationships.legs.data[0].attributes.departureAt
+    );
+    arrivesAt = new Date(
+      lastSegment.relationships.legs.data[
+        lastSegment.relationships.legs.data.length - 1
+      ].attributes.arrivalAt
+    );
+
+    let total =
+      Math.floor(arrivesAt.getTime() / 1000) -
+      Math.floor(departsAt.getTime() / 1000);
+    let totalDistance = 0;
+    let totalEmission = 0;
+
+    for (const segment of trip.relationships.segments.data) {
+      for (const leg of segment.relationships.legs.data) {
+        totalDistance += haversine_distance(
+          [leg.attributes.origin.longitude, leg.attributes.origin.latitude],
+          [
+            leg.attributes.destination.longitude,
+            leg.attributes.destination.latitude,
+          ]
+        );
+      }
+    }
+
+    if (stats.earliest.time > arrivesAt.getTime()) {
+      stats.earliest.trip_idx = [i];
+      stats.earliest.time = arrivesAt.getTime();
+    } else if (stats.earliest.time == arrivesAt.getTime()) {
+      stats.earliest.trip_idx.push(i);
+    }
+
+    if (stats.fastest.time > total) {
+      stats.fastest.trip_idx = [i];
+      stats.fastest.time = total;
+    } else if (stats.fastest.time == total) {
+      stats.fastest.trip_idx.push(i);
+    }
+
+    if (stats.shortest.time > totalDistance) {
+      stats.shortest.trip_idx = [i];
+      stats.shortest.time = totalDistance;
+    } else if (stats.shortest.time == totalDistance) {
+      stats.shortest.trip_idx.push(i);
+    }
+
+    if (stats.environment.time > totalEmission) {
+      stats.environment.trip_idx = [i];
+      stats.environment.time = totalEmission;
+    } else if (stats.environment.time == totalEmission) {
+      stats.environment.trip_idx.push(i);
+    }
+
+    trip.totalTime = total;
+    trip.totalDistance = totalDistance;
+    trip.totalEmission = totalEmission;
+    trip.direct = trip.relationships.segments.data.length == 1;
+    trip.earliest = false;
+    trip.fastest = false;
+    trip.shortest = false;
+    trip.environment = false;
+    response.data[i] = trip;
+  }
+
+  for (const idx of stats.earliest.trip_idx) {
+    response.data[idx].earliest = true;
+  }
+
+  for (const idx of stats.fastest.trip_idx) {
+    response.data[idx].fastest = true;
+  }
+
+  for (const idx of stats.shortest.trip_idx) {
+    response.data[idx].shortest = true;
+  }
+
+  for (const idx of stats.environment.trip_idx) {
+    response.data[idx].environment = true;
+  }
+
+  for (const [i, trip] of response.data.entries()) {
+    let header = document.createElement("h3");
+    header.textContent = "Journey #" + (i + 1);
+
+    let subtext = document.createElement("small");
+
+    subtext.className = "text-muted";
+    subtext.textContent = " - " + (trip.relationships.segments.data.length - 1);
+    subtext.textContent +=
+      " connection(s), " + nice_format_seconds(trip.totalTime);
+    subtext.textContent +=
+      ", " + Math.round((trip.totalDistance / 1000) * 10) / 10;
+    subtext.textContent += "km";
+
+    header.append(subtext);
+
+    const infoList = document.createElement("dl");
+    infoList.className = "row";
+    infoList.innerHTML =
+      '<dt class="col-sm-2">Trip ID</dt><dd class="col-sm-10">' +
+      trip.id +
+      "</dd>";
+
+    if (searchOffers) {
+      infoList.innerHTML +=
+        '<dt class="col-sm-2">Offer Search ID</dt><dd class="col-sm-10" id="offer-search-' +
+        trip.id +
+        '"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></dd>';
+      infoList.innerHTML +=
+        '<dt class="col-sm-2">Offers</dt><dd class="col-sm-10" id="offers-' +
+        trip.id +
+        '"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></dd>';
+      search_offers(trip.id);
+    }
+
+    let badges = document.createElement("p");
+
+    if (trip.direct) {
+      let badge = document.createElement("span");
+      badge.className = "badge bg-primary";
+      badge.innerText = "Direct";
+      badges.append(badge);
+
+      badge = document.createElement("span");
+      badge.innerText = " ";
+      badges.append(badge);
+    }
+
+    if (trip.earliest) {
+      let badge = document.createElement("span");
+      badge.className = "badge bg-warning";
+      badge.innerText = "Earliest Arrival";
+      badges.append(badge);
+
+      badge = document.createElement("span");
+      badge.innerText = " ";
+      badges.append(badge);
+    }
+
+    if (trip.fastest) {
+      let badge = document.createElement("span");
+      badge.className = "badge bg-info";
+      badge.innerText = "Fastest Journey";
+      badges.append(badge);
+
+      badge = document.createElement("span");
+      badge.innerText = " ";
+      badges.append(badge);
+    }
+
+    if (trip.shortest) {
+      let badge = document.createElement("span");
+      badge.className = "badge bg-secondary";
+      badge.innerText = "Shortest Distance";
+      badges.append(badge);
+
+      badge = document.createElement("span");
+      badge.innerText = " ";
+      badges.append(badge);
+    }
+
+    container.append(header);
+    container.append(badges);
+    container.append(infoList);
+
+    let description = document.createElement("table");
+    description.id = "description" + i;
+    description.className = "table table-sm table-striped";
+
+    let head = document.createElement("thead");
+    let row = document.createElement("tr");
+    let cell = document.createElement("th");
+    cell.textContent = "#";
+    row.append(cell);
+
+    cell = document.createElement("th");
+    cell.textContent = "Name";
+    row.append(cell);
+
+    cell = document.createElement("th");
+    cell.textContent = "From";
+    row.append(cell);
+
+    cell = document.createElement("th");
+    cell.textContent = "To";
+    row.append(cell);
+
+    cell = document.createElement("th");
+    cell.textContent = "Departure";
+    row.append(cell);
+
+    cell = document.createElement("th");
+    cell.textContent = "Arrival";
+    row.append(cell);
+
+    head.append(row);
+    description.append(head);
+
+    let body = document.createElement("tbody");
+    let latlngs = [];
+    let markers = [];
+
+    let marker = L.marker(
+      [
+        trip.relationships.segments.data[0].relationships.legs.data[0]
+          .attributes.origin.latitude,
+        trip.relationships.segments.data[0].relationships.legs.data[0]
+          .attributes.origin.longitude,
+      ],
+      { icon: greenIcon }
+    );
+    markers.push(marker);
+    latlngs.push(marker.getLatLng());
+
+    let prev_date = "";
+
+    trip.relationships.segments.data.forEach(function (segment, k) {
+      let curr_date = new Date(
+        segment.relationships.legs.data[0].attributes.departureAt
+      ).toLocaleDateString(getLang(), {
+        timeZone: segment.relationships.legs.data[0].attributes.origin.timeZone,
+      });
+
+      if (prev_date != curr_date) {
+        let item = document.createElement("tr");
+        let cell = document.createElement("td");
+        cell.colSpan = 6;
+        cell.innerHTML = "<small>" + curr_date + "</small>";
+        cell.classList.add("text-center");
+        item.append(cell);
+        body.append(item);
+      }
+
+      prev_date = curr_date;
+
+      let item = document.createElement("tr");
+
+      if (k == 0) {
+        item.className = "table-success";
+      } else if (k == trip.relationships.segments.data.length - 1) {
+        item.className = "table-danger";
+      }
+
+      let cell = document.createElement("td");
+      cell.textContent = k + 1;
+      item.append(cell);
+
+      let icon = document.createElement("i");
+      icon.className =
+        "fas fa-" +
+        icons[segment.relationships.legs.data[0].relationships.legType.data.id];
+      let text = document.createElement("span");
+      text.textContent = " " + segment.attributes.name;
+
+      cell = document.createElement("td");
+      cell.append(icon);
+      cell.append(text);
+      item.append(cell);
+
+      cell = document.createElement("td");
+      cell.textContent =
+        segment.relationships.legs.data[0].attributes.origin.name;
+      item.append(cell);
+
+      cell = document.createElement("td");
+      cell.textContent =
+        segment.relationships.legs.data[
+          segment.relationships.legs.data.length - 1
+        ].attributes.destination.name;
+      item.append(cell);
+
+      cell = document.createElement("td");
+      cell.textContent = new Date(
+        segment.relationships.legs.data[0].attributes.departureAt
+      ).toLocaleTimeString(getLang(), {
+        timeZone: segment.relationships.legs.data[0].attributes.origin.timeZone,
+      });
+      item.append(cell);
+
+      cell = document.createElement("td");
+      cell.textContent = new Date(
+        segment.relationships.legs.data[
+          segment.relationships.legs.data.length - 1
+        ].attributes.arrivalAt
+      ).toLocaleTimeString(getLang(), {
+        timeZone:
+          segment.relationships.legs.data[
+            segment.relationships.legs.data.length - 1
+          ].attributes.destination.timeZone,
+      });
+      item.append(cell);
+
+      body.append(item);
+
+      let marker;
+
+      if (k == trip.relationships.segments.data.length - 1) {
+        marker = L.marker(
+          [
+            segment.relationships.legs.data[
+              segment.relationships.legs.data.length - 1
+            ].attributes.destination.latitude,
+            segment.relationships.legs.data[
+              segment.relationships.legs.data.length - 1
+            ].attributes.destination.longitude,
+          ],
+          { icon: redIcon }
+        );
+      } else {
+        marker = L.marker([
+          segment.relationships.legs.data[
+            segment.relationships.legs.data.length - 1
+          ].attributes.destination.latitude,
+          segment.relationships.legs.data[
+            segment.relationships.legs.data.length - 1
+          ].attributes.destination.longitude,
+        ]);
+      }
+
+      markers.push(marker);
+
+      segment.relationships.legs.data.forEach(function (leg, k) {
+        if (k != segment.relationships.legs.data.length - 1) {
+          latlngs.push([
+            leg.attributes.destination.latitude,
+            leg.attributes.destination.longitude,
+          ]);
+        }
+      });
+
+      latlngs.push(marker.getLatLng());
+    });
+
+    if (showMaps) {
+      let map = document.createElement("div");
+      map.id = "map" + i;
+      map.className = "map col-sm";
+      container.append(map);
+
+      var mapItem = L.map("map" + i);
+
+      L.tileLayer(
+        "https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}",
+        {
+          attribution:
+            'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+          maxZoom: 18,
+          id: "mapbox/streets-v11",
+          tileSize: 512,
+          zoomOffset: -1,
+          accessToken:
+            "pk.eyJ1IjoianlnZ2VuIiwiYSI6ImNrdDZmaGVsbDBodDMyd283dG9ucjdmejQifQ.4JXvYcrRq1FmBj3LqW5zDg",
+        }
+      ).addTo(mapItem);
+
+      for (const marker of markers) {
+        marker.addTo(mapItem);
+      }
+
+      let polyline = L.polyline(latlngs, { color: "blue" }).addTo(mapItem);
+      mapItem.fitBounds(polyline.getBounds());
+    }
+
+    description.append(body);
+    container.append(description);
+  }
+}
+
+function load_places(url = null) {
+  if (url == null) {
+    url = "/places?page[limit]=100";
+  }
+
+  fetch(url)
+    .then((res) => res.json())
+    .then((response) => {
+      for (const place of response.data) {
+        const transaction = db.transaction("places", "readwrite");
+        const objectStore = transaction.objectStore("places");
+        const addRequest = objectStore.add(place);
+      }
+
+      if (response.data.length > 0) {
+        load_places(response.links.next);
+      } else {
+        inject_places();
+      }
+    });
+}
+
+function inject_offers(response, offerSearchId, tripId, searchStatus) {
+  const status = document.getElementById("offers-" + tripId);
+
+  if (response.data.length > 0) {
+    status.innerHTML =
+      '<i class="fas fa-check"></i> ' + response.data.length + " offers";
+  } else {
+    status.innerHTML =
+      '<i class="fas fa-times-circle"></i> ' + response.data.length + " offers";
+  }
+}
+
+function load_offers(id, tripId) {
+  fetch("/offers/searches/" + id)
+    .then((res) => res.json())
+    .then((response) => {
+      if (
+        response.data.attributes.status == "completed" ||
+        response.data.attributes.status == "failed"
+      ) {
+        fetch("/offers/searches/" + id + "/offers")
+          .then((res) => res.json())
+          .then((offersResponse) => {
+            inject_offers(
+              offersResponse,
+              id,
+              tripId,
+              response.data.attributes.status
+            );
+          });
+      } else {
+        setTimeout(() => {
+          load_offers(id, tripId);
+        }, "5000");
+      }
+    });
+}
+
+function load_trips(id) {
+  fetch("/trips/searches/" + id)
+    .then((res) => res.json())
+    .then((response) => {
+      if (
+        response.data.attributes.status == "completed" ||
+        response.data.attributes.status == "failed"
+      ) {
+        fetch(
+          "/trips/searches/" +
+            id +
+            "/trips?page[limit]=100&include=segments,segments.legs,segments.legs.legType"
+        )
+          .then((res) => res.json())
+          .then((response) => {
+            inject_trips(id, response);
+          });
+      } else {
+        setTimeout(() => {
+          load_trips(id);
+        }, "2000");
+      }
+    });
+}
+
+function search_offers(tripId) {
+  setTimeout(() => {
+    fetch("/offers/searches", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/vnd.api+json",
+      },
+      body: JSON.stringify({
+        data: {
+          type: "trip-offer-searches",
+          attributes: {
+            sessionToken: sessionToken,
+            passengers: [
+              {
+                dateOfBirth: "1990-10-25",
+              },
+            ],
+          },
+          relationships: {
+            trips: {
+              data: [
+                {
+                  id: tripId,
+                  type: "trips",
+                },
+              ],
+            },
+          },
+        },
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const search = document.getElementById("offer-search-" + tripId);
+        search.innerHTML = data.data.id;
+        load_offers(data.data.id, tripId);
+      });
+  }, Math.floor(Math.random() * 10000));
+}
+
+window.onload = () => {
+  show_loader(
+    "Loading places, this might take a minute or two the first time..."
+  );
+  const DBOpenRequest = window.indexedDB.open("places");
+
+  DBOpenRequest.onupgradeneeded = (event) => {
+    db = event.target.result;
+    const objectStore = db.createObjectStore("places", { keyPath: "id" });
+
+    console.log("Object store created.");
+  };
+
+  DBOpenRequest.onerror = (event) => {
+    console.log(event);
+  };
+
+  DBOpenRequest.onsuccess = (event) => {
+    db = DBOpenRequest.result;
+
+    console.log("Database opened.");
+    count_places();
+  };
+
+  const searchForm = document.getElementById("search-form");
+
+  function search_trips(event) {
+    event.preventDefault();
+    show_loader("Searching for trips, please wait...");
+
+    const origin = document.getElementById("origin").value;
+    const destination = document.getElementById("destination").value;
+    const departureAt = document.getElementById("departure-at").value;
+    const transaction = db.transaction("places", "readwrite");
+    const objectStore = transaction.objectStore("places");
+    const originRequest = objectStore.get(origin);
+
+    originRequest.onsuccess = (event) => {
+      const originTimeZone = originRequest.result.attributes.timeZone;
+      fetch("/trips/searches", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/vnd.api+json",
+        },
+        body: JSON.stringify({
+          data: {
+            type: "trip-searches",
+            attributes: {
+              departureAfter: dayjs.tz(departureAt, originTimeZone).format(),
+            },
+            relationships: {
+              origin: {
+                data: {
+                  id: origin,
+                  type: "places",
+                },
+              },
+              destination: {
+                data: {
+                  id: destination,
+                  type: "places",
+                },
+              },
+            },
+          },
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          load_trips(data.data.id);
+        });
+    };
+  }
+
+  searchForm.addEventListener("submit", search_trips);
+};

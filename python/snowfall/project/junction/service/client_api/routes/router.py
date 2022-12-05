@@ -18,7 +18,7 @@ from snowfall.stdlib.integration.starlette import routes
 from snowfall.stdlib.v1alpha import models_pb2
 
 
-def get_routes(dependencies: lagom.Container) -> list[routing.Route]:
+def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
     integration = starlette.StarletteIntegration(dependencies)
     place_handler = places.Places(
         dependencies[places_adapter.Client],  # type: ignore[type-abstract]

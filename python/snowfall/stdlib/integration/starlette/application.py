@@ -27,7 +27,7 @@ class Settings(service.Settings):
 
 
 def create_starlette_app(
-    routes: Sequence[routing.Route],
+    routes: Sequence[routing.BaseRoute],
     openapi_path: pathlib.Path | None,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
     validate_response: bool = True,

@@ -11,7 +11,7 @@ from snowfall.project.junction.service.pay_api.routes import (
 )
 
 
-def get_routes(dependencies: lagom.Container) -> list[routing.Route]:
+def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
     integration = starlette.StarletteIntegration(dependencies)
 
     return [

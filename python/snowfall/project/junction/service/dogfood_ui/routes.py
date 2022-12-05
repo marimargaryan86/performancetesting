@@ -1,15 +1,21 @@
-from starlette import requests, responses
+import lagom
+from starlette import endpoints, requests, responses, templating
 
-from snowfall.stdlib.persistence import filesystem
+from snowfall.stdlib import string
+
+_SESSION_TOKEN_LENGTH = 32
 
 
-async def ui(_: requests.Request) -> responses.Response:
-    layout_path = filesystem.resource_path(
-        "snowfall.project.junction.service.dogfood_ui.routes",
-        "layout.html",
-    )
-
-    with open(layout_path) as template:
-        layout = str(template.read())
-
-    return responses.Response(layout)
+class UI(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        template: templating.Jinja2Templates = lagom.injectable,
+    ) -> responses.Response:
+        return template.TemplateResponse(
+            "layout.html",
+            {
+                "request": request,
+                "session_token": string.random(_SESSION_TOKEN_LENGTH),
+            },
+        )

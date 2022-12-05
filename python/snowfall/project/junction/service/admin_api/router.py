@@ -5,7 +5,7 @@ from starlette import routing
 from snowfall.project.junction.service.admin_api.routes import locations, places
 
 
-def get_routes(dependencies: lagom.Container) -> list[routing.Route]:
+def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
     integration = starlette.StarletteIntegration(dependencies)
 
     return [
