@@ -1,14 +1,17 @@
+import csv
 import datetime
 import random
 from typing import Any, Mapping, Sequence
 
 import httpx
+from bson.son import SON
 from google.protobuf import timestamp_pb2
 from motor import motor_asyncio
 from pycountry import countries
 
 from snowfall.project.junction.service.mobile_api import bootstrap, repository
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.v1alpha import models_pb2 as stdlib_models_pb2
 
 _SERVICE_NAME = "mobile-api"
@@ -35,6 +38,7 @@ async def migrate(settings: bootstrap.Settings) -> None:  # noqa: WPS210
         places_response.raise_for_status()
         json_response = places_response.json()
         await _save_enrich_data(json_response["data"], places_repository)
+    await _populate(places_repository)
 
 
 async def _save_enrich_data(
@@ -62,3 +66,30 @@ async def _save_enrich_data(
                 types=[models_pb2.Place.Type.TYPE_UNSPECIFIED],
             ),
         )
+
+
+async def _populate(places_repository: repository.PlacesRepository) -> None:
+    with open(
+        filesystem.resource_path(
+            "snowfall.project.junction.service.mobile_api.main",
+            "cities_populations.csv",
+        ),
+    ) as csvfile:
+        populations_reader = csv.DictReader(csvfile)
+        for row in populations_reader:
+            try:
+                population = int(row["population"])
+            except ValueError:
+                population = None
+            if population:
+                await places_repository._collection.update_one(  # noqa: WPS437
+                    {
+                        "coordinates.coordinates": SON(
+                            [
+                                ("$near", [float(row["long"]), float(row["lat"])]),
+                                ("$maxDistance", 0),
+                            ],
+                        ),
+                    },
+                    {"$set": {"population": population}},
+                )

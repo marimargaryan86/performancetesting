@@ -68,6 +68,11 @@ class PlacesRepository(
         pymongo.IndexModel("name", background=True),
         pymongo.IndexModel("country_name", background=True),
         pymongo.IndexModel("iata_code", background=True),
+        pymongo.IndexModel("population", background=True),
+        pymongo.IndexModel(
+            [("coordinates.coordinates", pymongo.GEO2D)],
+            background=True,
+        ),
     ]
 
     async def match(
@@ -85,6 +90,7 @@ class PlacesRepository(
             ],
         }
         response = await self._execute(self._collection.find, query)
+        response.sort(("population", -1))
         response.limit(30)  # noqa: WPS432
         return response
 

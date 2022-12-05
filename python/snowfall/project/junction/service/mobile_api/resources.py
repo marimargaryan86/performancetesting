@@ -128,6 +128,7 @@ class PlaceResource(models.Resource):
                 "longitude": place.coordinates.longitude,
                 "name": place.name,
                 "timeZone": place.time_zone,
+                "population": place.population,
             },
             relationships={
                 "types": {

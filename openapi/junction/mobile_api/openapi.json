@@ -3098,6 +3098,11 @@
                 "maxLength": 3,
                 "nullable": true,
                 "readOnly": true
+              },
+              "population": {
+                "type": "integer",
+                "example": 1984,
+                "readOnly": true
               }
             }
           },

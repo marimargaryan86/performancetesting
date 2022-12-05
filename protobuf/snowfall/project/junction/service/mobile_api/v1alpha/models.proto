@@ -41,6 +41,7 @@ message Place {
     TYPE_UNSPECIFIED = 0;
   }
   repeated Type types = 9;
+  int32 population = 10;
 }
 
 message StripeUser {
