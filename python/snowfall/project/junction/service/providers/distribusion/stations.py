@@ -71,7 +71,7 @@ async def _dump_stations(
 
 async def load_stations() -> list[Station]:
     json_content = pkgutil.get_data(
-        "snowfall.project.junction.service.providers.distribusion.main",
+        "snowfall.project.junction.service.providers.distribusion.stations",
         "stations.json",
     )
 
