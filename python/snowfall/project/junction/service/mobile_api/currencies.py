@@ -22,14 +22,15 @@ class CurrencyClient(object):
         return round(time.time() / self._cache_ttl.total_seconds())
 
     @asyncstdlib.lru_cache
-    async def get_rate(
+    async def get_rate(  # noqa: WPS615
         self,
         from_currency: str,
         to_currency: str,
         ttl_hash: Hashable = None,
     ) -> float:
+        rate: float | None = None
         try:
-            return await self._currencies_client.get_rate(
+            rate = await self._currencies_client.get_rate(
                 from_currency,
                 to_currency,
                 1000,
@@ -38,4 +39,7 @@ class CurrencyClient(object):
             rate = self._fallback_rates.get(to_currency)
             if not rate:
                 raise err
-            return rate
+        if from_currency == "EUR" and to_currency == "SEK":
+            rate_markup = 5.4
+            rate = ((rate / 100) * rate_markup) + rate
+        return rate
