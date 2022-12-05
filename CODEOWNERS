@@ -1,24 +1,18 @@
 [CI/CD]
-/.gitlab/ @platform-governance
-/nomad/ @platform-governance
-/python/snowfall/plugin/ @platform-governance
-/vendor/ @platform-governance
-.editorconfig @platform-governance
-.gitignore @platform-governance
-.gitlab-ci.yml @platform-governance
-.python-version @platform-governance
-buf.gen.yaml @platform-governance
-buf.yaml @platform-governance
-docker-compose.yml @platform-governance
-pants @platform-governance
-pants.ci.toml @platform-governance
-pants.toml @platform-governance
-README.md @platform-governance
+/.gitlab/ @jyggen
+.editorconfig @jyggen @mb
+.gitignore @jyggen @mb
+.gitlab-ci.yml @jyggen
+.python-version @jyggen
+buf.gen.yaml @jyggen
+buf.yaml @jyggen
+docker-compose.yml @jyggen
+pants @jyggen
+pants.ci.toml @jyggen
+pants.toml @jyggen
+*.nomad @jyggen
 
 [Specification]
-/docs/ @platform-governance
-/openapi/ @platform-governance
-/protobuf/ @platform-governance
-
-[Standard Library]
-/python/snowfall/stdlib/ @platform-governance
+/openapi/ @jyggen @mb
+/protobuf/ @jyggen @mb
+/vendor/ @jyggen @mb
