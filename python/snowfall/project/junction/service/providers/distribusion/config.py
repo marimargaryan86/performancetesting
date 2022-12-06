@@ -1,4 +1,8 @@
+from typing import Sequence
+
 import pydantic
+
+from snowfall.stdlib import service
 
 
 class DistribusionConfig(pydantic.BaseModel):
@@ -6,3 +10,11 @@ class DistribusionConfig(pydantic.BaseModel):
     api_key: str
     api_timeout: int = 500
     retailer_partner_number: str
+
+
+class OrdersSettings(DistribusionConfig, service.Settings):
+    amqp_dsn: pydantic.AnyUrl
+    redis_dsn: Sequence[pydantic.AnyUrl]
+    smtp_dsn: pydantic.AnyUrl
+    smtp_sender: pydantic.EmailStr
+    smtp_recipient: pydantic.EmailStr

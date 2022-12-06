@@ -1,4 +1,5 @@
 from snowfall.project.junction.service.providers.distribusion import (
+    config,
     offers,
     orders,
     stations,
@@ -28,6 +29,6 @@ if __name__ == "__main__":
         service.Command(
             name="orders",
             callback=orders.orders,
-            settings_class=orders.OrdersSettings,
+            settings_class=config.OrdersSettings,
         ),
     )
