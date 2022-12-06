@@ -13,9 +13,9 @@ import pytest_httpx
 import structlog
 from redis import asyncio as aioredis
 
+from snowfall.project.junction.provider import airports
 from snowfall.project.junction.service.providers.ask2go import (
     adapter,
-    airports,
     booking,
     cache,
     criteria,
@@ -93,9 +93,7 @@ def assert_all_responses_were_requested() -> bool:
 
 @pytest.fixture
 async def airport_repository() -> airports.AirportRepository:
-    loader = filesystem.PkgLoader(
-        "snowfall.project.junction.service.providers.ask2go.airports",
-    )
+    loader = filesystem.PkgLoader(__name__)
 
     return airports.AirportRepository(
         cast(list[dict[str, Any]], loader.load("airports.json")),

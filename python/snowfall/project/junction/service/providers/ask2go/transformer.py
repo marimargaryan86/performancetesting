@@ -6,8 +6,9 @@ from typing import Mapping, Optional, Sequence, Tuple
 
 from dateutil import relativedelta
 
+from snowfall.project.junction.provider import airports
 from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
-from snowfall.project.junction.service.providers.ask2go import airports, cache, models
+from snowfall.project.junction.service.providers.ask2go import cache, models
 from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
