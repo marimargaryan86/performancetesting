@@ -4,6 +4,8 @@ import datetime
 import enum
 from typing import Any, Mapping
 
+from google.protobuf.json_format import MessageToDict
+
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
@@ -52,39 +54,39 @@ class TripSearchTripsResource(models.Resource):
 
 class UserResource(models.Resource):
     @classmethod
-    def from_proto(cls, user: models_pb2.User) -> UserResource:
-        attributes = {
-            "firstName": user.first_name,
-            "lastName": user.last_name,
-            "email": user.email,
-            "phone": user.phone.e164_number,
-            "loyaltyPrograms": [
-                {"program": program.program, "number": program.number}
-                for program in user.loyalty_programs
-            ],
-            "createdAt": protobuf.protobuf_to_datetime(
-                user.created_at,
-            ),
-            "updatedAt": protobuf.protobuf_to_datetime(
-                user.updated_at,
-            ),
-        }
-        if user.gender:
-            attributes["gender"] = user.gender
-        if user.title:
-            attributes["title"] = user.title
-        if user.country_code:
-            attributes["countryCode"] = user.country_code
-        if user.date_of_birth.year:
-            attributes["dateOfBirth"] = protobuf.protobuf_to_date(user.date_of_birth)
+    def from_proto(
+        cls,
+        user: models_pb2.User,
+        data_type: str = "users",
+    ) -> UserResource:
+        user_dict = MessageToDict(user)
+        user_dict.pop("id")
+        for user_field in user_dict:
+            if user_field == "phone":
+                user_dict["phone"] = user_dict["phone"]["e164Number"]
+            if user_field == "dateOfBirth":
+                user_dict[user_field] = protobuf.protobuf_to_date(user.date_of_birth)
+            if user_field == "createdAt":
+                user_dict[user_field] = protobuf.protobuf_to_datetime(
+                    user.created_at,
+                )
+            if user_field == "updatedAt":
+                user_dict[user_field] = protobuf.protobuf_to_datetime(
+                    user.updated_at,
+                )
         return cls(
             id=user.id,
-            type="users",
-            attributes=attributes,
+            type=data_type,
+            attributes=user_dict,
         )
 
     @classmethod
-    def from_dict(cls, user_id: str, user: Mapping[str, Any]) -> UserResource:
+    def from_dict(
+        cls,
+        user_id: str,
+        data_type: str,
+        user: Mapping[str, Any],
+    ) -> UserResource:
         attributes = {}
         for field in user.keys():
             camel_field = string.to_lower_camel(field)
@@ -106,7 +108,7 @@ class UserResource(models.Resource):
                 attributes[camel_field] = attribute
         return cls(
             id=user_id,
-            type="users",
+            type=data_type,
             attributes=attributes,
         )
 
@@ -237,5 +239,37 @@ class VoucherResource(models.Resource):
                     models_pb2.Voucher.Status.DESCRIPTOR,
                     coupon.status,
                 ),
+            },
+        )
+
+
+class UserGroupResource(models.Resource):
+    @classmethod
+    def from_proto(
+        cls,
+        group: models_pb2.UserGroup,
+    ) -> UserGroupResource:
+        return cls(
+            id=group.id,
+            type="user-groups",
+            attributes={
+                "name": group.name,
+                "createdAt": protobuf.protobuf_to_datetime(
+                    group.created_at,
+                ),
+                "updatedAt": protobuf.protobuf_to_datetime(
+                    group.updated_at,
+                ),
+            },
+            relationships={
+                "members": {
+                    _RELATIONSHIPS_FIELD: [
+                        models.ResourceIdentifier(
+                            id=member.id,
+                            type="user-group-members",
+                        )
+                        for member in group.members
+                    ],
+                },
             },
         )

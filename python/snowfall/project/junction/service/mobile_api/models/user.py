@@ -36,3 +36,7 @@ class User(pydantic.BaseModel):
             else:
                 out_dict[key] = attribute
         return cls(**out_dict)
+
+
+class UserGroupMember(User):
+    email: Optional[str]

@@ -231,7 +231,6 @@
                     "data": {
                       "type": "array",
                       "uniqueItems": true,
-                      "minItems": 1,
                       "items": {
                         "$ref": "#/components/schemas/UserGroup"
                       }
@@ -430,7 +429,6 @@
                     "data": {
                       "type": "array",
                       "uniqueItems": true,
-                      "minItems": 1,
                       "items": {
                         "$ref": "#/components/schemas/UserGroupMember"
                       }
@@ -4151,8 +4149,7 @@
           "email": {
             "type": "string",
             "format": "email",
-            "example": "user@example.com",
-            "readOnly": true
+            "example": "user@example.com"
           },
           "phone": {
             "type": "string",

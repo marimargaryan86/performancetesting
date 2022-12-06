@@ -227,6 +227,15 @@ def orders_repository(
 
 
 @pytest.fixture
+def user_groups_repository(
+    mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
+) -> repository.UserGroupsRepository:
+    return repository.UserGroupsRepository(
+        mongo_test_db["user_groups"],
+    )
+
+
+@pytest.fixture
 def stripe_users_repository(
     mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
 ) -> repository.StripeUsersRepository:
@@ -354,6 +363,7 @@ def app(  # noqa: WPS211
     preferences_repository: repository.PreferencesRepository,
     vouchers_repository: repository.VouchersRepository,
     notification_tokens_repository: repository.NotificationTokensRepository,
+    user_groups_repository: repository.UserGroupsRepository,
 ) -> applications.Starlette:
     return _create_app(
         dependencies=bootstrap.create_dependencies(
@@ -371,6 +381,7 @@ def app(  # noqa: WPS211
             preferences_repository,
             vouchers_repository,
             notification_tokens_repository,
+            user_groups_repository,
         ),
         openapi_path=filesystem.resource_path("junction.mobile_api", "openapi.json"),
         custom_middlewares=[

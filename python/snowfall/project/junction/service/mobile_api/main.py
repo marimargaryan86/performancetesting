@@ -114,6 +114,9 @@ def _factory(
                     notification_tokens_repository=repository.NotificationTokensRepository(
                         mongo["notifications"],
                     ),
+                    user_groups_repository=repository.UserGroupsRepository(
+                        mongo["user_groups"],
+                    ),
                     junction_client=junction_client,
                     jwt_gen=jwt_gen,
                 ),

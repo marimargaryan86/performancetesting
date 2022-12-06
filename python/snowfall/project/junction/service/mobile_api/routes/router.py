@@ -11,6 +11,7 @@ from snowfall.project.junction.service.mobile_api.routes import (  # noqa: WPS23
     places,
     preferences,
     trips,
+    user_groups,
     users,
     vouchers,
 )
@@ -49,6 +50,26 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
         integration.route("/users/sessions", users.Session),
         integration.route("/users", users.Users),
         integration.route("/users/me", users.UserLoggedIn),
+        integration.route(
+            "/users/groups",
+            user_groups.UserGroups,
+            name="UserGroups",
+        ),
+        integration.route(
+            "/users/groups/{groupId}",
+            user_groups.UserGroup,
+            name="UserGroup",
+        ),
+        integration.route(
+            "/users/groups/{groupId}/members",
+            user_groups.UserGroupMembers,
+            name="UserGroupMembers",
+        ),
+        integration.route(
+            "/users/groups/members/{memberId}",
+            user_groups.UserGroupMember,
+            name="UserGroupMember",
+        ),
         integration.route("/users/{userEmail}", users.User),
         integration.route("/users/me/preferences", preferences.Preferences),
         integration.route("/payments", payments.Payments),

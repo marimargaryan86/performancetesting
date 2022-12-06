@@ -411,3 +411,103 @@ class NotificationTokensRepository(
             },
             upsert=False,
         )
+
+
+class UserGroupsRepository(
+    mixins.FindByIdMixin[models_pb2.UserGroup],
+    mixins.InsertMixin[models_pb2.UserGroup],
+    repository.ProtoRepository[models_pb2.UserGroup],
+):
+    _proto = models_pb2.UserGroup
+    _indexes = [
+        pymongo.IndexModel("user_id", background=True),
+    ]
+
+    # TODO: Add pagination
+    async def find_by_user(
+        self,
+        user_id: str,
+    ) -> resultset.ResultSet[models_pb2.UserGroup]:
+        return await self._execute(self._collection.find, {"user_id": user_id})
+
+    async def update(
+        self,
+        group_id: str,
+        user_id: str,
+        input_dict: Mapping[str, Any],
+    ) -> None:
+        group = dict(copy.deepcopy(input_dict))
+        group["updated_at"] = datetime.datetime.utcnow()
+        await self._execute(
+            self._collection.update_one,
+            {_ID_KEY: group_id, "user_id": user_id},
+            {"$set": group},
+            upsert=False,
+        )
+
+    async def delete(self, document_id: str, user_id: str) -> int:
+        delete = await self._execute(
+            self._collection.delete_one,
+            filter={"_id": document_id, "user_id": user_id},
+        )
+        if not delete.acknowledged:
+            raise RuntimeError()
+        return delete.deleted_count
+
+    async def add_member(
+        self,
+        member_id: str,
+        group_id: str,
+        user_id: str,
+        input_dict: Mapping[str, Any],
+    ) -> None:
+        member = dict(copy.deepcopy(input_dict))
+        member["_id"] = member_id
+        member["created_at"] = datetime.datetime.utcnow()
+        member["updated_at"] = datetime.datetime.utcnow()
+        # TODO: check somehow for limit of members from env_var
+        await self._execute(
+            self._collection.update_one,
+            {_ID_KEY: group_id, "user_id": user_id},
+            {"$push": {"members": member}},
+            upsert=False,
+        )
+
+    async def update_member(
+        self,
+        user_id: str,
+        member_id: str,
+        input_dict: Mapping[str, Any],
+    ) -> None:
+        member = dict(copy.deepcopy(input_dict))
+        member["_id"] = member_id
+        member["updated_at"] = datetime.datetime.utcnow()
+        await self._execute(
+            self._collection.update_one,
+            filter={
+                "user_id": user_id,
+                "members._id": member_id,
+            },
+            update={
+                "$set": {
+                    "members.$.{}".format(member_field): member[member_field]
+                    for member_field in member
+                },
+            },
+            upsert=False,
+        )
+
+    async def delete_member(
+        self,
+        member_id: str,
+        user_id: str,
+    ) -> bool:
+        update_result = await self._execute(
+            self._collection.update_one,
+            filter={
+                "user_id": user_id,
+                "members._id": member_id,
+            },
+            update={"$pull": {"members": {"_id": member_id}}},
+        )
+        return update_result.modified_count > 0

@@ -190,6 +190,7 @@ class UserLoggedIn(endpoints.HTTPEndpoint):
             models.Body(
                 data=resources.UserResource.from_dict(
                     user_id,
+                    "users",
                     user.dict(exclude_unset=True),
                 ),
             ),
