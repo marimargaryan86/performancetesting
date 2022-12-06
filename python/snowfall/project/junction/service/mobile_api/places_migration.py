@@ -83,7 +83,7 @@ async def _populate(places_repository: repository.PlacesRepository) -> None:
             if population:
                 await places_repository._collection.update_one(  # noqa: WPS437
                     {
-                        "coordinates.coordinates": {
+                        "coordinates": {
                             "$nearSphere": {
                                 "$geometry": {
                                     "type": "Point",
