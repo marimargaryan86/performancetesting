@@ -77,18 +77,37 @@ class PlacesRepository(
 
     async def match(
         self,
-        search_key: Optional[str],
+        search_key: str,
     ) -> resultset.ResultSet[models_pb2.Place]:
-        # TODO: Add a resultScore so can return more relevant.
-        #  $text does not work with substrings
-        regex = re.compile(search_key, re.IGNORECASE)  # type: ignore[type-var]
-        query = {
-            "$or": [
-                {"name": regex},
-                {"country_name": regex},
-                {"iata_code": regex},
-            ],
-        }
+        search_keys = [key.strip() for key in search_key.split(",")]
+        comma = len(search_keys) == 2
+
+        if comma:
+            query = {
+                "$and": [
+                    {
+                        "name": re.compile(
+                            search_keys[0],
+                            re.IGNORECASE,
+                        ),
+                    },
+                    {
+                        "country_name": re.compile(
+                            search_keys[1],
+                            re.IGNORECASE,
+                        ),
+                    },
+                ],
+            }
+        else:
+            regex = re.compile(search_keys[0], re.IGNORECASE)
+            query = {
+                "$or": [
+                    {"name": regex},
+                    {"country_name": regex},
+                ],
+            }
+
         response = await self._execute(self._collection.find, query)
         response.sort(("population", -1))
         response.limit(30)  # noqa: WPS432
