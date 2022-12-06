@@ -11,7 +11,7 @@ from snowfall.stdlib.format import protobuf
 _Proto = TypeVar("_Proto", bound=message.Message)
 
 
-class Connection(robust_connection.Connection):
+class Connection(robust_connection.RobustConnection):
     def __init__(
         self,
         url: str,
