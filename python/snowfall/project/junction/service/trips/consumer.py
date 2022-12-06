@@ -108,6 +108,7 @@ class TripSearchConsumer(object):
                             ),
                         ),
                     ),
+                    allowed_segment_types=message.body.trip_search.allowed_segment_types,
                 ),
             )
 
