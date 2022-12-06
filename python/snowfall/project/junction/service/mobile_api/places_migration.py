@@ -4,7 +4,6 @@ import random
 from typing import Any, Mapping, Sequence
 
 import httpx
-from bson.son import SON
 from google.protobuf import timestamp_pb2
 from motor import motor_asyncio
 from pycountry import countries
@@ -84,12 +83,18 @@ async def _populate(places_repository: repository.PlacesRepository) -> None:
             if population:
                 await places_repository._collection.update_one(  # noqa: WPS437
                     {
-                        "coordinates.coordinates": SON(
-                            [
-                                ("$near", [float(row["long"]), float(row["lat"])]),
-                                ("$maxDistance", 0),
-                            ],
-                        ),
+                        "coordinates.coordinates": {
+                            "$nearSphere": {
+                                "$geometry": {
+                                    "type": "Point",
+                                    "coordinates": [
+                                        float(row["long"]),
+                                        float(row["lat"]),
+                                    ],
+                                },
+                                "$maxDistance": 0,
+                            },
+                        },
                     },
                     {"$set": {"population": population}},
                 )

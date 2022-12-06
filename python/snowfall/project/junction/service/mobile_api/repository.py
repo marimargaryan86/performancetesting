@@ -70,7 +70,7 @@ class PlacesRepository(
         pymongo.IndexModel("iata_code", background=True),
         pymongo.IndexModel("population", background=True),
         pymongo.IndexModel(
-            [("coordinates.coordinates", pymongo.GEO2D)],
+            [("coordinates.coordinates", pymongo.GEOSPHERE)],
             background=True,
         ),
     ]
