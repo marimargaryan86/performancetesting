@@ -9,7 +9,7 @@ class RequestLogHandler(object):
         self._logger = structlog.get_logger(__name__)
 
     async def __call__(self, request: httpx.Request) -> None:
-        self._logger.info("Request", url=request.url)
+        self._logger.info("Request", url=request.url, headers=request.headers)
 
         if request.content and request.headers.get("content-type"):
             self._logger.info("Request", content=request.content.decode("utf-8"))
@@ -26,6 +26,7 @@ class ResponseLogHandler(object):
             json_data = json.loads(response.content)
             self._logger.info(
                 "Response",
+                header=response.headers,
                 status_code=response.status_code,
                 content=json.dumps(json_data),
             )
