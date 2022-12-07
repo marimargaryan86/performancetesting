@@ -9,8 +9,10 @@ from snowfall.vendor.ba_ndc.models import (  # noqa: WPS235
     request_add_seat_schemas,
     request_name_correction_schemas,
     request_offer_search_schemas,
+    request_order_change_schemas,
     request_order_schemas,
     response_offer_search_schemas,
+    response_order_change_schemas,
     response_order_schemas,
     response_priced_offer_schemas,
     response_seat_schemas,
@@ -177,6 +179,25 @@ class BaNdcClient(object):  # noqa: WPS214
         )
 
         return response_order_schemas.OrderResponse.parse_raw(
+            response.content,
+        )
+
+    async def reshop(
+        self,
+        order_id: UUID,
+        request: request_order_change_schemas.OrderReshopRequest,
+    ) -> response_order_change_schemas.ReshopResponse:
+        response = await self._make_request(
+            "POST",
+            "/orders/{order_id}/reshop".format(order_id=order_id),
+            payload=request.json(
+                exclude_none=True,
+                exclude_unset=True,
+                by_alias=True,
+            ),
+        )
+
+        return response_order_change_schemas.ReshopResponse.parse_raw(
             response.content,
         )
 

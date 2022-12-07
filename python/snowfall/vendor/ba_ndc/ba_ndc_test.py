@@ -6,11 +6,12 @@ import uuid
 import pytest
 
 from snowfall.vendor.ba_ndc import client, errors
-from snowfall.vendor.ba_ndc.models import (
+from snowfall.vendor.ba_ndc.models import (  # noqa: WPS235
     payer_details,
     request_add_seat_schemas,
     request_name_correction_schemas,
     request_offer_search_schemas,
+    request_order_change_schemas,
     request_order_schemas,
     response_offer_search_schemas,
     response_order_schemas,
@@ -207,6 +208,33 @@ async def test_add_seat(ba_ndc_client: client.BaNdcClient) -> None:
 
     assert order_rs is not None
     assert seat_item is not None and seat_item.column == seat.column
+
+    await call_cancel_order(ba_ndc_client, order_rs.identifier)
+
+
+@disable_by_default
+@pytest.mark.asyncio
+async def test_reshop(ba_ndc_client: client.BaNdcClient) -> None:
+    order_rs = await generate_order(ba_ndc_client)
+    assert order_rs is not None
+    assert order_rs.order is not None and order_rs.origin_destinations
+
+    reshop_rq = request_order_change_schemas.OrderReshopRequest(
+        cabin_preference=util.offer_enums.CabinTypeEnum.first,
+        origin_destinations=[
+            request_order_change_schemas.OriginDestination(
+                identifier=order_rs.origin_destinations[0].identifier,
+                departure_date=order_rs.origin_destinations[
+                    0
+                ].departure_date_time.date()
+                + datetime.timedelta(days=1),
+            ),
+        ],
+    )
+
+    reshop_rs = await ba_ndc_client.reshop(order_rs.identifier, reshop_rq)
+    assert reshop_rs is not None
+    assert reshop_rs.offers
 
     await call_cancel_order(ba_ndc_client, order_rs.identifier)
 
