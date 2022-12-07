@@ -7,6 +7,7 @@ import httpx
 from google.protobuf import timestamp_pb2
 from motor import motor_asyncio
 from pycountry import countries
+from unidecode import unidecode
 
 from snowfall.project.junction.service.mobile_api import bootstrap, repository
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
@@ -53,6 +54,7 @@ async def _save_enrich_data(
             models_pb2.Place(
                 id=place["id"],
                 name=attributes["name"],
+                no_accent_name=unidecode(attributes["name"]),
                 coordinates=stdlib_models_pb2.Coordinates(
                     latitude=attributes["latitude"],
                     longitude=attributes["longitude"],

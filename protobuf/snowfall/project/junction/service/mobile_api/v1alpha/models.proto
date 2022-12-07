@@ -42,6 +42,7 @@ message Place {
   }
   repeated Type types = 9;
   int32 population = 10;
+  string no_accent_name = 11;
 }
 
 message StripeUser {

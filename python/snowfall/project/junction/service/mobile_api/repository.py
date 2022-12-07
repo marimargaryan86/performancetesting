@@ -66,6 +66,7 @@ class PlacesRepository(
     _proto = models_pb2.Place
     _indexes = [
         pymongo.IndexModel("name", background=True),
+        pymongo.IndexModel("no_accent_name", background=True),
         pymongo.IndexModel("country_name", background=True),
         pymongo.IndexModel("iata_code", background=True),
         pymongo.IndexModel("population", background=True),
@@ -80,31 +81,28 @@ class PlacesRepository(
         search_key: str,
     ) -> resultset.ResultSet[models_pb2.Place]:
         search_keys = [key.strip() for key in search_key.split(",")]
-        comma = len(search_keys) == 2
-
-        if comma:
+        name_regex = re.compile(search_keys[0], re.IGNORECASE)
+        if len(search_keys) == 2:
+            country_regex = re.compile(search_keys[1], re.IGNORECASE)
             query = {
                 "$and": [
                     {
-                        "name": re.compile(
-                            search_keys[0],
-                            re.IGNORECASE,
-                        ),
+                        "$or": [
+                            {"name": name_regex},
+                            {"no_accent_name": name_regex},
+                        ],
                     },
                     {
-                        "country_name": re.compile(
-                            search_keys[1],
-                            re.IGNORECASE,
-                        ),
+                        "country_name": country_regex,
                     },
                 ],
             }
         else:
-            regex = re.compile(search_keys[0], re.IGNORECASE)
             query = {
                 "$or": [
-                    {"name": regex},
-                    {"country_name": regex},
+                    {"name": name_regex},
+                    {"no_accent_name": name_regex},
+                    {"country_name": name_regex},
                 ],
             }
 
