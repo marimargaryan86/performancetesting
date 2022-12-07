@@ -7,7 +7,9 @@ import httpx
 from snowfall.vendor.ba_ndc import errors
 from snowfall.vendor.ba_ndc.models import (
     request_offer_search_schemas,
+    request_order_schemas,
     response_offer_search_schemas,
+    response_order_schemas,
     response_priced_offer_schemas,
 )
 
@@ -52,6 +54,24 @@ class BaNdcClient(object):
         )
 
         return response_priced_offer_schemas.PricedOfferResponse.parse_raw(
+            response.content,
+        )
+
+    async def create_order(
+        self,
+        request: request_order_schemas.CreateOrderRequest,
+    ) -> response_order_schemas.OrderResponse:
+        response = await self._make_request(
+            "POST",
+            "/orders",
+            payload=request.json(
+                exclude_none=True,
+                exclude_unset=True,
+                by_alias=True,
+            ),
+        )
+
+        return response_order_schemas.OrderResponse.parse_raw(
             response.content,
         )
 
