@@ -5,7 +5,7 @@ import uuid
 
 import pytest
 
-from snowfall.vendor.ba_ndc import client
+from snowfall.vendor.ba_ndc import client, errors
 from snowfall.vendor.ba_ndc.models import (
     payer_details,
     request_offer_search_schemas,
@@ -46,6 +46,32 @@ async def test_create_order(ba_ndc_client: client.BaNdcClient) -> None:
     order_rs = await generate_order(ba_ndc_client)
     assert order_rs is not None
     assert order_rs.order is not None
+
+    await call_cancel_order(ba_ndc_client, order_rs.identifier)
+
+
+@disable_by_default
+@pytest.mark.asyncio
+async def test_get_order(ba_ndc_client: client.BaNdcClient) -> None:
+    order_rs = await generate_order(ba_ndc_client)
+    assert order_rs is not None
+    assert order_rs.order is not None
+
+    order_rs = await ba_ndc_client.get_order(order_rs.identifier)
+    assert order_rs is not None
+    assert order_rs.order is not None
+
+    await call_cancel_order(ba_ndc_client, order_rs.identifier)
+
+
+@disable_by_default
+@pytest.mark.asyncio
+async def test_get_order_with_invalid_order(ba_ndc_client: client.BaNdcClient) -> None:
+    invalid_order = "50f5666c-eeee-4b65-8162-d0680f0a7959"
+    with pytest.raises(errors.BaNdcError) as error_info:
+        await ba_ndc_client.get_order(uuid.UUID(invalid_order))
+
+    assert invalid_order in str(error_info.value)  # noqa: WPS441
 
 
 @disable_by_default

@@ -75,6 +75,16 @@ class BaNdcClient(object):
             response.content,
         )
 
+    async def get_order(self, order_id: UUID) -> response_order_schemas.OrderResponse:
+        response = await self._make_request(
+            "GET",
+            "/orders/{order_id}".format(order_id=order_id),
+        )
+
+        return response_order_schemas.OrderResponse.parse_raw(
+            response.content,
+        )
+
     async def cancel_order(self, order_id: UUID) -> None:
         await self._make_request(
             "DELETE",
