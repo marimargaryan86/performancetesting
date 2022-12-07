@@ -8,6 +8,7 @@ import pytest
 from snowfall.vendor.ba_ndc import client, errors
 from snowfall.vendor.ba_ndc.models import (
     payer_details,
+    request_name_correction_schemas,
     request_offer_search_schemas,
     request_order_schemas,
     response_offer_search_schemas,
@@ -80,6 +81,40 @@ async def test_cancel_order(ba_ndc_client: client.BaNdcClient) -> None:
     order_rs = await generate_order(ba_ndc_client)
     assert order_rs is not None
     assert order_rs.order is not None
+
+    await call_cancel_order(ba_ndc_client, order_rs.identifier)
+
+
+@disable_by_default
+@pytest.mark.asyncio
+async def test_passenger_name_correction(ba_ndc_client: client.BaNdcClient) -> None:
+    order_rs = await generate_order(ba_ndc_client)
+    assert order_rs is not None
+    assert order_rs.order is not None
+    assert order_rs.passengers is not None
+
+    new_passenger_first_name = "Johnnie"
+    name_correction = request_name_correction_schemas.NameCorrection(
+        current_passenger=request_name_correction_schemas.Passenger(
+            passenger_id=order_rs.passengers[0].identifier,
+            first_name=order_rs.passengers[0].first_name,
+            last_name=order_rs.passengers[0].last_name,
+            name_title=order_rs.passengers[0].name_title,
+        ),
+        new_passenger=request_name_correction_schemas.Passenger(
+            passenger_id=order_rs.passengers[0].identifier,
+            first_name=new_passenger_first_name,
+            last_name=order_rs.passengers[0].last_name,
+            name_title=order_rs.passengers[0].name_title,
+        ),
+    )
+
+    order_rs = await ba_ndc_client.passenger_name_correction(
+        order_rs.identifier,
+        name_correction,
+    )
+    assert order_rs is not None and order_rs.order is not None
+    assert order_rs.passengers[0].first_name.lower() == new_passenger_first_name.lower()
 
     await call_cancel_order(ba_ndc_client, order_rs.identifier)
 

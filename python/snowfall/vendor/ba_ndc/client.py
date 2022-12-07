@@ -6,6 +6,7 @@ import httpx
 
 from snowfall.vendor.ba_ndc import errors
 from snowfall.vendor.ba_ndc.models import (
+    request_name_correction_schemas,
     request_offer_search_schemas,
     request_order_schemas,
     response_offer_search_schemas,
@@ -14,7 +15,7 @@ from snowfall.vendor.ba_ndc.models import (
 )
 
 
-class BaNdcClient(object):
+class BaNdcClient(object):  # noqa: WPS214
     def __init__(
         self,
         api_base_url: str,
@@ -89,6 +90,25 @@ class BaNdcClient(object):
         await self._make_request(
             "DELETE",
             "/orders/{order_id}".format(order_id=order_id),
+        )
+
+    async def passenger_name_correction(
+        self,
+        order_id: UUID,
+        request: request_name_correction_schemas.NameCorrection,
+    ) -> response_order_schemas.OrderResponse:
+        response = await self._make_request(
+            "POST",
+            "/orders/{order_id}/name-correction".format(order_id=order_id),
+            payload=request.json(
+                exclude_none=True,
+                exclude_unset=True,
+                by_alias=True,
+            ),
+        )
+
+        return response_order_schemas.OrderResponse.parse_raw(
+            response.content,
         )
 
     async def _make_request(
