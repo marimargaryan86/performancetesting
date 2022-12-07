@@ -1,5 +1,6 @@
 import inspect
 from typing import Any, Mapping, Optional
+from uuid import UUID
 
 import httpx
 
@@ -7,6 +8,7 @@ from snowfall.vendor.ba_ndc import errors
 from snowfall.vendor.ba_ndc.models import (
     request_offer_search_schemas,
     response_offer_search_schemas,
+    response_priced_offer_schemas,
 )
 
 
@@ -37,6 +39,19 @@ class BaNdcClient(object):
         )
 
         return response_offer_search_schemas.OfferSearchResponse.parse_raw(
+            response.content,
+        )
+
+    async def get_offer(
+        self,
+        offer_id: UUID,
+    ) -> response_priced_offer_schemas.PricedOfferResponse:
+        response = await self._make_request(
+            "GET",
+            "/offers/{offer_id}".format(offer_id=offer_id),
+        )
+
+        return response_priced_offer_schemas.PricedOfferResponse.parse_raw(
             response.content,
         )
 

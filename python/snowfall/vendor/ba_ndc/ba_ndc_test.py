@@ -1,5 +1,6 @@
 import datetime
 import os
+import random
 
 import pytest
 
@@ -22,6 +23,17 @@ async def test_get_offers(ba_ndc_client: client.BaNdcClient) -> None:
     offer_searches_rs = await call_get_offers(ba_ndc_client)
     assert offer_searches_rs is not None
     assert offer_searches_rs.offers
+
+
+@disable_by_default
+@pytest.mark.asyncio
+async def test_get_offer(ba_ndc_client: client.BaNdcClient) -> None:
+    offer_searches_rs = await call_get_offers(ba_ndc_client)
+    offer = random.choice(offer_searches_rs.offers)  # nosec
+    offer_search_rs = await ba_ndc_client.get_offer(offer.identifier)
+
+    assert offer_search_rs is not None
+    assert offer_search_rs.offer is not None
 
 
 async def call_get_offers(
