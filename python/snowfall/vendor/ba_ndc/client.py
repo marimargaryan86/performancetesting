@@ -12,7 +12,15 @@ from snowfall.vendor.ba_ndc.models import (
     response_offer_search_schemas,
     response_order_schemas,
     response_priced_offer_schemas,
+    response_service_schemas,
 )
+
+
+def _request_query_params(offer_id: UUID | None, order_id: UUID | None) -> Any:
+    if offer_id:
+        return {"offerId": offer_id}
+
+    return {"orderId": order_id}
 
 
 class BaNdcClient(object):  # noqa: WPS214
@@ -108,6 +116,26 @@ class BaNdcClient(object):  # noqa: WPS214
         )
 
         return response_order_schemas.OrderResponse.parse_raw(
+            response.content,
+        )
+
+    async def get_services(
+        self,
+        offer_id: UUID | None = None,
+        order_id: UUID | None = None,
+    ) -> response_service_schemas.ServicesResponse:
+        if offer_id is None and order_id is None:
+            raise errors.BaNdcError(
+                "one of [offerId, orderId] is required",
+            )
+
+        response = await self._make_request(
+            "GET",
+            "/services",
+            _request_query_params(offer_id, order_id),
+        )
+
+        return response_service_schemas.ServicesResponse.parse_raw(
             response.content,
         )
 

@@ -119,6 +119,33 @@ async def test_passenger_name_correction(ba_ndc_client: client.BaNdcClient) -> N
     await call_cancel_order(ba_ndc_client, order_rs.identifier)
 
 
+@disable_by_default
+@pytest.mark.asyncio
+async def test_get_services_by_offer(ba_ndc_client: client.BaNdcClient) -> None:
+    offer_searches_rs = await call_get_offers(ba_ndc_client)
+    assert offer_searches_rs is not None
+    assert offer_searches_rs.offers
+
+    offer = random.choice(offer_searches_rs.offers)  # nosec
+    offer_service_rs = await ba_ndc_client.get_services(offer_id=offer.identifier)
+    assert offer_service_rs is not None
+    assert offer_service_rs.offers
+
+
+@disable_by_default
+@pytest.mark.asyncio
+async def test_get_services_by_order(ba_ndc_client: client.BaNdcClient) -> None:
+    order_rs = await generate_order(ba_ndc_client)
+    assert order_rs is not None
+    assert order_rs.order is not None
+
+    order_service_rs = await ba_ndc_client.get_services(order_id=order_rs.identifier)
+    assert order_service_rs is not None
+    assert order_service_rs.offers
+
+    await call_cancel_order(ba_ndc_client, order_rs.identifier)
+
+
 async def call_get_offers(
     ba_ndc_client: client.BaNdcClient,
 ) -> response_offer_search_schemas.OfferSearchResponse:
