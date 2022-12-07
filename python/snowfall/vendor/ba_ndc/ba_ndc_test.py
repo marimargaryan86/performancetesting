@@ -8,6 +8,7 @@ import pytest
 from snowfall.vendor.ba_ndc import client, errors
 from snowfall.vendor.ba_ndc.models import (
     payer_details,
+    request_add_seat_schemas,
     request_name_correction_schemas,
     request_offer_search_schemas,
     request_order_schemas,
@@ -170,6 +171,42 @@ async def test_get_seats_by_order(ba_ndc_client: client.BaNdcClient) -> None:
     seats_rs = await ba_ndc_client.get_seats(order_id=order_rs.identifier)
     assert seats_rs is not None
     assert seats_rs.seat_maps
+
+    await call_cancel_order(ba_ndc_client, order_rs.identifier)
+
+
+@disable_by_default
+@pytest.mark.asyncio
+async def test_add_seat(ba_ndc_client: client.BaNdcClient) -> None:
+    order_rs = await generate_order(ba_ndc_client)
+    assert order_rs is not None
+    assert order_rs.order is not None
+
+    seats_rs = await ba_ndc_client.get_seats(order_id=order_rs.identifier)
+    assert seats_rs is not None and seats_rs.seat_maps
+    seat = random.choice(  # nosec
+        random.choice(random.choice(seats_rs.seat_maps).cabins).seats,  # nosec
+    )
+
+    request = request_add_seat_schemas.AddSeats(
+        pairs=[
+            request_add_seat_schemas.SeatPassengerPair(
+                seat_id=str(seat.identifier),
+                passenger_id=seat.passenger_ids[0],
+            ),
+        ],
+        payment=None,
+    )
+
+    order_rs = await ba_ndc_client.add_seat(order_rs.identifier, request)
+    seat_item = [
+        seat_elem
+        for seat_elem in order_rs.order.order_items
+        if isinstance(seat_elem, response_order_schemas.SeatOrderItem)
+    ][0]
+
+    assert order_rs is not None
+    assert seat_item is not None and seat_item.column == seat.column
 
     await call_cancel_order(ba_ndc_client, order_rs.identifier)
 

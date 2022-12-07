@@ -5,7 +5,8 @@ from uuid import UUID
 import httpx
 
 from snowfall.vendor.ba_ndc import errors
-from snowfall.vendor.ba_ndc.models import (
+from snowfall.vendor.ba_ndc.models import (  # noqa: WPS235
+    request_add_seat_schemas,
     request_name_correction_schemas,
     request_offer_search_schemas,
     request_order_schemas,
@@ -157,6 +158,25 @@ class BaNdcClient(object):  # noqa: WPS214
         )
 
         return response_seat_schemas.SeatsResponse.parse_raw(
+            response.content,
+        )
+
+    async def add_seat(
+        self,
+        order_id: UUID,
+        request: request_add_seat_schemas.AddSeats,
+    ) -> response_order_schemas.OrderResponse:
+        response = await self._make_request(
+            "POST",
+            "/orders/{order_id}/seats".format(order_id=order_id),
+            payload=request.json(
+                exclude_none=True,
+                exclude_unset=True,
+                by_alias=True,
+            ),
+        )
+
+        return response_order_schemas.OrderResponse.parse_raw(
             response.content,
         )
 
