@@ -36,7 +36,7 @@ class OrderSliceSegment(DuffelBaseModel):
     origin: Airport
     origin_terminal: str | None
     distance: str | None
-    duration: str | None
+    duration: datetime.timedelta | None
     marketing_carrier: Airline
     marketing_carrier_flight_number: str
     operating_carrier: Airline
@@ -61,6 +61,6 @@ class OrderSlice(DuffelBaseModel):
     destination: Place
     origin_type: str
     origin: Place
-    duration: str | None
+    duration: datetime.timedelta | None
     segments: List[OrderSliceSegment]
     conditions: OrderSliceConditions

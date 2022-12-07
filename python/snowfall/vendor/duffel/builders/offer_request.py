@@ -13,11 +13,17 @@ class OfferRequestSlice(DuffelRequestBaseModel):
     departure_date: datetime.date
 
 
+class LoyaltyProgrammeAccount(DuffelRequestBaseModel):
+    airline_iata_code: str
+    account_number: str
+
+
 class OfferRequestPassenger(DuffelRequestBaseModel):
     age: int | None
     pax_type: str | None = pydantic.Field(alias="type")
     given_name: str | None
     family_name: str | None
+    loyalty_programme_accounts: list[LoyaltyProgrammeAccount] | None
 
 
 class OfferRequestDataList(DuffelRequestBaseModel):

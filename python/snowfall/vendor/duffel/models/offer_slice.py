@@ -30,8 +30,17 @@ class OfferSliceSegmentPassenger(DuffelBaseModel):
     fare_basis_code: str | None
 
 
+class Stop(DuffelBaseModel):
+    identifier: str = pydantic.Field(..., alias="id")
+    duration: datetime.timedelta | None
+    departing_at: datetime.datetime
+    arriving_at: datetime.datetime
+    airport: Airport
+
+
 class OfferSliceSegment(DuffelBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
+    stops: List[Stop] | None
     aircraft: Aircraft | None
     arriving_at: datetime.datetime
     departing_at: datetime.datetime
@@ -40,7 +49,7 @@ class OfferSliceSegment(DuffelBaseModel):
     origin: Airport
     origin_terminal: str | None
     distance: str | None
-    duration: str | None
+    duration: datetime.timedelta | None
     marketing_carrier: Airline
     marketing_carrier_flight_number: str
     operating_carrier: Airline
@@ -54,7 +63,7 @@ class OfferSlice(DuffelBaseModel):
     destination_terminal: str | None
     origin: Place
     origin_terminal: str | None
-    duration: str | None
+    duration: datetime.timedelta | None
     fare_brand_name: str | None
     segments: List[OfferSliceSegment]
     conditions: OfferSliceConditions
