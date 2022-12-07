@@ -94,7 +94,7 @@ async def _populate(places_repository: repository.PlacesRepository) -> None:
                                         float(row["lat"]),
                                     ],
                                 },
-                                "$maxDistance": 0,
+                                "$maxDistance": 10,
                             },
                         },
                     },
