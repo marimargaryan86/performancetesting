@@ -75,6 +75,12 @@ class BaNdcClient(object):
             response.content,
         )
 
+    async def cancel_order(self, order_id: UUID) -> None:
+        await self._make_request(
+            "DELETE",
+            "/orders/{order_id}".format(order_id=order_id),
+        )
+
     async def _make_request(
         self,
         method: str,

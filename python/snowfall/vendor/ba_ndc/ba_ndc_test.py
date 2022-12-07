@@ -48,6 +48,16 @@ async def test_create_order(ba_ndc_client: client.BaNdcClient) -> None:
     assert order_rs.order is not None
 
 
+@disable_by_default
+@pytest.mark.asyncio
+async def test_cancel_order(ba_ndc_client: client.BaNdcClient) -> None:
+    order_rs = await generate_order(ba_ndc_client)
+    assert order_rs is not None
+    assert order_rs.order is not None
+
+    await call_cancel_order(ba_ndc_client, order_rs.identifier)
+
+
 async def call_get_offers(
     ba_ndc_client: client.BaNdcClient,
 ) -> response_offer_search_schemas.OfferSearchResponse:
@@ -116,3 +126,10 @@ async def call_create_order(
     )
 
     return await ba_ndc_client.create_order(order_rq)
+
+
+async def call_cancel_order(
+    ba_ndc_client: client.BaNdcClient,
+    order_id: uuid.UUID,
+) -> None:
+    await ba_ndc_client.cancel_order(order_id)
