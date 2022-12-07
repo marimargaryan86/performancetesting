@@ -146,6 +146,34 @@ async def test_get_services_by_order(ba_ndc_client: client.BaNdcClient) -> None:
     await call_cancel_order(ba_ndc_client, order_rs.identifier)
 
 
+@disable_by_default
+@pytest.mark.asyncio
+async def test_get_seats_by_offer(ba_ndc_client: client.BaNdcClient) -> None:
+    offer_searches_rs = await call_get_offers(ba_ndc_client)
+    assert offer_searches_rs is not None
+    assert offer_searches_rs.offers
+
+    offer = random.choice(offer_searches_rs.offers)  # nosec
+    offer_search_rs = await ba_ndc_client.get_offer(offer.identifier)
+    seats_rs = await ba_ndc_client.get_seats(offer_id=offer_search_rs.offer.identifier)
+    assert seats_rs is not None
+    assert seats_rs.seat_maps
+
+
+@disable_by_default
+@pytest.mark.asyncio
+async def test_get_seats_by_order(ba_ndc_client: client.BaNdcClient) -> None:
+    order_rs = await generate_order(ba_ndc_client)
+    assert order_rs is not None
+    assert order_rs.order is not None
+
+    seats_rs = await ba_ndc_client.get_seats(order_id=order_rs.identifier)
+    assert seats_rs is not None
+    assert seats_rs.seat_maps
+
+    await call_cancel_order(ba_ndc_client, order_rs.identifier)
+
+
 async def call_get_offers(
     ba_ndc_client: client.BaNdcClient,
 ) -> response_offer_search_schemas.OfferSearchResponse:

@@ -12,6 +12,7 @@ from snowfall.vendor.ba_ndc.models import (
     response_offer_search_schemas,
     response_order_schemas,
     response_priced_offer_schemas,
+    response_seat_schemas,
     response_service_schemas,
 )
 
@@ -136,6 +137,26 @@ class BaNdcClient(object):  # noqa: WPS214
         )
 
         return response_service_schemas.ServicesResponse.parse_raw(
+            response.content,
+        )
+
+    async def get_seats(
+        self,
+        offer_id: UUID | None = None,
+        order_id: UUID | None = None,
+    ) -> response_seat_schemas.SeatsResponse:
+        if offer_id is None and order_id is None:
+            raise errors.BaNdcError(
+                "one of [offerId, orderId] is required",
+            )
+
+        response = await self._make_request(
+            "GET",
+            "/seats",
+            _request_query_params(offer_id, order_id),
+        )
+
+        return response_seat_schemas.SeatsResponse.parse_raw(
             response.content,
         )
 
