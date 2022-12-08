@@ -81,6 +81,7 @@ PASSWORD={{ .Data.data.password }}
 BASE_URL={{ .Data.data.base_url }}
 EMAIL={{ .Data.data.email }}
 API_LAYER_API_KEY={{ .Data.data.api_layer_api_key }}
+API_LAYER_BASE_URL={{ .Data.data.api_layer_base_url }}
 {{ end }}
 EOH
         destination = "services.env"
