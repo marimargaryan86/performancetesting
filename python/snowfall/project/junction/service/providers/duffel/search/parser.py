@@ -49,7 +49,7 @@ class OfferParser(object):  # noqa: WPS214
         return offer_models_pb2.OfferGroup(
             id=string.uuid(),
             expires_at=protobuf.datetime_to_protobuf(expires_at),
-            offers=await self._get_group_offers(offers, search_task, expires_at),
+            offers=await self._get_group_offers(offers, offer_segments, expires_at),
             segments=offer_segments,
         )
 
@@ -122,7 +122,7 @@ class OfferParser(object):  # noqa: WPS214
     async def _get_group_offers(
         self,
         offers: Sequence[Offer],
-        search_task: amqp_pb2.SearchCriteriaTask,
+        offer_segments: Sequence[offer_models_pb2.OfferSegment],
         expires_at: datetime.datetime,
     ) -> Sequence[offer_models_pb2.Offer]:
         pb_offers = list[offer_models_pb2.Offer]()
@@ -146,12 +146,13 @@ class OfferParser(object):  # noqa: WPS214
                                 )
                                 for passenger in offer.passengers
                             ],
+                            doc_required=offer.passenger_identity_documents_required,
                         ),
                         expires_at=expires_at,
                     ),
                     segment_details=self._parse_segment_details(
                         offer.slices,
-                        search_task,
+                        offer_segments,
                     ),
                     price=amount.protobuf(),
                     brand_name=offer.slices[0].fare_brand_name or "",
@@ -164,21 +165,21 @@ class OfferParser(object):  # noqa: WPS214
     def _parse_segment_details(
         self,
         slices: Sequence[OfferSlice],
-        search_task: amqp_pb2.SearchCriteriaTask,
+        offer_segments: Sequence[offer_models_pb2.OfferSegment],
     ) -> List[offer_models_pb2.OfferSegmentDetails]:
-        offer_segments = [
+        duffel_segments = [
             segment for offer_slice in slices for segment in offer_slice.segments
         ]
 
         segment_details = []
 
-        for offer_segment, task_segment in zip(offer_segments, search_task.segments):
+        for duffel_segment, offer_segment in zip(duffel_segments, offer_segments):
             segment_details.append(
                 offer_models_pb2.OfferSegmentDetails(
                     id=string.uuid(),
-                    offer_segment_id=task_segment.id,
-                    cabin_class=self._parse_cabin_class(offer_segment),
-                    baggage_allowances=self._parse_baggage_allowance(offer_segment),
+                    offer_segment_id=offer_segment.id,
+                    cabin_class=self._parse_cabin_class(duffel_segment),
+                    baggage_allowances=self._parse_baggage_allowance(duffel_segment),
                 ),
             )
         return segment_details

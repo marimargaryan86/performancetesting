@@ -11,7 +11,7 @@ _DEFAULT_TTL_IN_MINUTES = 45
 class DuffelConfig(pydantic.BaseModel):
     api_base_url: pydantic.AnyUrl
     api_key: str
-    api_version: str
+    api_version: str = "v1"
     http_timeout: int = 30
 
 

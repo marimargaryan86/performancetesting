@@ -1,7 +1,4 @@
-import contextlib
-import http
 import inspect
-import json
 from typing import Any, Mapping, Optional
 
 import httpx
@@ -11,6 +8,7 @@ from snowfall.vendor.duffel.builders.offer_request import OfferRequestData
 from snowfall.vendor.duffel.builders.order_cancel import OrderCancelRequest
 from snowfall.vendor.duffel.builders.order_request import OrderData
 from snowfall.vendor.duffel.models.cancel_pending import CancelData, CancelResponse
+from snowfall.vendor.duffel.models.errors import ErrorResponse
 from snowfall.vendor.duffel.models.offer_request import (
     OfferRequest,
     OfferRequestResponse,
@@ -19,20 +17,15 @@ from snowfall.vendor.duffel.models.order import Order, OrderResponse
 
 
 def _get_response_error_message(response: httpx.Response) -> str:
-    status = http.HTTPStatus(response.status_code)
-    description = None
+    errors_response = ErrorResponse.parse_raw(response.content)
+    if errors_response:
+        error_status = str(errors_response.meta.status if errors_response.meta else "")
+        error_message = (
+            errors_response.errors[0].title if errors_response.errors else ""
+        )
+        return "{0}: {1}".format(error_status, error_message)
 
-    with contextlib.suppress(json.decoder.JSONDecodeError, AttributeError):
-        response_json = response.json()
-        errors_list = response_json.get("errors")
-
-        if errors_list and isinstance(errors_list, list):
-            description = errors_list[0].get("title")
-
-        if not description:
-            description = response_json.get("title")
-
-    return "{0}: {1}".format(status.value, description or status.description)
+    return "can't parse error"
 
 
 class DuffelClient(object):

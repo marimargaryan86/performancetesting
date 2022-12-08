@@ -16,6 +16,7 @@ class OfferDetails(RedisRecord):
     passengers: List[OfferDetailsPassenger]
     total_amount: str
     currency: str
+    doc_required: bool = False
 
 
 class OfferCache(RedisRepository[OfferDetails]):

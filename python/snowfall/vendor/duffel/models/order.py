@@ -48,7 +48,7 @@ class OrderPassenger(DuffelBaseModel):
     family_name: str
     gender: str
     title: str
-    born_on: str
+    born_on: datetime.date | None
     loyalty_programme_accounts: List[LoyaltyProgrammeAccount]
 
 
