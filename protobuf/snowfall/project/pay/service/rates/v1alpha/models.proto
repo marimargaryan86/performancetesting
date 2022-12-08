@@ -18,3 +18,10 @@ message MonitoredRate {
   bool enabled = 3;
   google.protobuf.Timestamp fetched_at = 4;
 }
+
+message BackUpRate {
+  string id = 1;
+  string buy_currency = 2;
+  string sell_currency = 3;
+  float rate = 4;
+}

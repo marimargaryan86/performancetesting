@@ -1,9 +1,12 @@
 import datetime
 import ipaddress
+import random
 
+from motor import motor_asyncio
 from pydantic import HttpUrl
 
 from snowfall.project.junction.service.currencies.grpc import CurrencyService
+from snowfall.project.pay.service.rates.rates import BackUpRatesRepository
 from snowfall.stdlib import service
 from snowfall.stdlib.transport.grpc import server
 from snowfall.vendor.apilayer.client import APILayer
@@ -19,9 +22,13 @@ class _Settings(service.Settings):
     bound_api_timeout: datetime.timedelta = datetime.timedelta(seconds=15)
     api_layer_api_key: str
     api_layer_base_url: str
+    mongo_dsn: str
 
 
 async def _main(app: service.Application[_Settings]) -> None:
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        random.choice(app.settings.mongo_dsn),  # nosec
+    )
     bound_client = Bound(
         app.settings.base_url,
         app.settings.email,
@@ -39,6 +46,7 @@ async def _main(app: service.Application[_Settings]) -> None:
             CurrencyService(
                 api_layer_client,
                 bound_client,
+                BackUpRatesRepository(mongo.backup_rates.backup_rates),
             ),
         ],
     )

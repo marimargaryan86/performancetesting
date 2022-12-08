@@ -1,6 +1,8 @@
 import datetime
 from typing import Sequence
 
+import pymongo
+
 from snowfall.project.pay.service.rates.v1alpha import models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
@@ -66,3 +68,37 @@ class MonitoredRatesRepository(  # noqa: WPS215
             {"enabled": True},
             {"$set": {"fetched_at": datetime.datetime.now()}},
         )
+
+
+class BackUpRatesRepository(
+    mixins.AllMixin[models_pb2.BackUpRate],
+    mixins.InsertManyMixin[models_pb2.BackUpRate],
+    repository.ProtoRepository[models_pb2.BackUpRate],
+):
+    _proto = models_pb2.BackUpRate
+    _indexes = [
+        pymongo.IndexModel("buy_currency", background=True),
+        pymongo.IndexModel("sell_currency", background=True),
+    ]
+
+    async def insert_many(
+        self,
+        documents: Sequence[models_pb2.BackUpRate],
+    ) -> Sequence[models_pb2.BackUpRate]:
+        for document in documents:
+            document.id = string.uuid()
+
+        return await super().insert_many(documents)
+
+    async def find_by_currency_pair(
+        self,
+        buy_currency: str,
+        sell_currency: str,
+    ) -> models_pb2.BackUpRate:
+        return await self._execute(
+            self._collection.find_one,
+            {"buy_currency": buy_currency, "sell_currency": sell_currency},
+        )
+
+    async def delete_all(self) -> None:
+        await self._execute(self._collection.delete_many, {})
