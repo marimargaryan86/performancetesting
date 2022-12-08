@@ -80,6 +80,7 @@ job "currencies" {
 PASSWORD={{ .Data.data.password }}
 BASE_URL={{ .Data.data.base_url }}
 EMAIL={{ .Data.data.email }}
+API_LAYER_API_KEY={{ .Data.data.api_layer_api_key }}
 {{ end }}
 EOH
         destination = "services.env"
