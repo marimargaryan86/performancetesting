@@ -38,8 +38,8 @@ class CurrencyService(service.Service, currencies_pb2_grpc.CurrencyServiceServic
     ) -> currencies_pb2.ConvertResponse:
         try:
             quote = await self.api_layer_client.quote(
-                request.from_currency,
                 request.to_currency,
+                request.from_currency,
                 request.amount,
             )
 
@@ -66,7 +66,7 @@ class CurrencyService(service.Service, currencies_pb2_grpc.CurrencyServiceServic
         context: grpc.aio.ServicerContext,
     ) -> currencies_pb2.ConvertResponse:
         try:
-            quote = await self.bound_client.quote(from_currency, to_currency, amount)
+            quote = await self.bound_client.quote(to_currency, from_currency, amount)
         except httpx.HTTPError:
             backup_rate = await self.backup_rates.find_by_currency_pair(
                 from_currency,
