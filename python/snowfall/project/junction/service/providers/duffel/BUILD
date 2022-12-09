@@ -1,5 +1,4 @@
 python_sources(dependencies=[":airports"])
-python_tests(name="tests")
 python_test_utils(name="test_utils", dependencies=[":airports", ":fixtures"])
 resource(
     name="airports",
