@@ -4,7 +4,7 @@ from typing import Sequence, cast
 import lagom
 from starlette import endpoints, requests, responses, status
 
-from snowfall.project.junction.adapter import offer_searches, offers
+from snowfall.project.junction.adapter import offer_searches, offers, price_quotes
 from snowfall.project.junction.service.client_api import resources, validators
 from snowfall.project.junction.service.offers.v1alpha import models_pb2
 from snowfall.stdlib import sequence, string
@@ -16,6 +16,8 @@ from snowfall.stdlib.integration.starlette import (
     request_helpers,
 )
 from snowfall.stdlib.v1alpha import models_pb2 as common_pb2
+
+_SESSION_TOKEN_LENGTH = 32
 
 
 class Offer(endpoints.HTTPEndpoint):
@@ -270,8 +272,6 @@ class OfferOptionDetailsByOfferOption(endpoints.HTTPEndpoint):
 
 
 class OfferSearches(endpoints.HTTPEndpoint):
-    _session_token_length = 32
-
     @validators.offer_search_request_validator
     async def post(
         self,
@@ -295,7 +295,7 @@ class OfferSearches(endpoints.HTTPEndpoint):
                 ),
                 session_token=body.get(
                     "sessionToken",
-                    string.random(self._session_token_length),
+                    string.random(_SESSION_TOKEN_LENGTH),
                 ),
             ),
         )
@@ -372,6 +372,55 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
                     pagination,
                 ),
             ),
+            request=request,
+        )
+
+
+class PriceQuote(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        client: price_quotes.Client = lagom.injectable,
+    ) -> responses.Response:
+        price_quote = await client.get(request.path_params["offerPriceQuoteId"])
+
+        return await messages.create_response(
+            body=models.Body(
+                data=resources.PriceQuoteResource.from_proto(
+                    price_quote=price_quote,
+                    request=request,
+                ),
+            ),
+            request=request,
+        )
+
+
+class PriceQuotes(endpoints.HTTPEndpoint):
+    @validators.price_quote_request_validator
+    async def post(
+        self,
+        request: requests.Request,
+        client: price_quotes.Client,
+        option_ids: Sequence[str],
+    ) -> responses.Response:
+        body = await request_helpers.flatten_request(request)
+        price_quote = await client.create(
+            offer_id=body["offer"],
+            option_ids=option_ids,
+            session_token=body.get(
+                "sessionToken",
+                string.random(_SESSION_TOKEN_LENGTH),
+            ),
+        )
+
+        return await messages.create_response(
+            body=models.Body(
+                data=resources.PriceQuoteResource.from_proto(
+                    price_quote=price_quote,
+                    request=request,
+                ),
+            ),
+            status_code=status.HTTP_201_CREATED,
             request=request,
         )
 

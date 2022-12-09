@@ -178,8 +178,8 @@ class Ask2GoClient(object):  # noqa: WPS214
     async def create_air_offer_async(
         self,
         search_id: str,
-        transaction_id: str,
         offer_id: str,
+        transaction_id: Optional[str] = None,
         brand_id: Optional[str] = None,
     ) -> price.AsyncOfferPriceResponse:
         response = await self._make_request(
@@ -188,8 +188,8 @@ class Ask2GoClient(object):  # noqa: WPS214
             payload={
                 "searchId": search_id,
                 "itineraryId": offer_id,
-                "transactionId": transaction_id,
                 **({"brandId": brand_id} if brand_id else {}),
+                **({"transactionId": transaction_id} if transaction_id else {}),
             },
         )
 

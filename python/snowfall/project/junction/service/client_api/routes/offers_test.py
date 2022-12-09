@@ -1,4 +1,4 @@
-from typing import Sequence
+from typing import Any, Sequence
 
 import httpx
 import orjson
@@ -357,3 +357,158 @@ class TestOfferSearches(object):
             ],
         )
         assert len(response.json()["data"]) == expected
+
+
+class TestPriceQuote(object):
+    async def test_unknown_price_quote_returns_not_found(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        response = await client.get("/offers/quotes/{id}".format(id=fixtures.NOT_FOUND))
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    async def test_price_quote_is_found(self, client: httpx.AsyncClient) -> None:
+        response = await client.get(
+            "/offers/quotes/{id}".format(id=fixtures.PRICE_QUOTES[0]),
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+    async def test_pending_price_quote_is_found(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        response = await client.get(
+            "/offers/quotes/{id}".format(id=fixtures.PRICE_QUOTES[1]),
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+    async def test_price_quote_unauthorized(self, client: httpx.AsyncClient) -> None:
+        client.headers["Authorization"] = "invalid"
+        response = await client.get(
+            "/offers/quotes/{id}".format(id=fixtures.PRICE_QUOTES[0]),
+        )
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+def _get_price_quote_request() -> dict[str, Any]:
+    return {
+        "data": {
+            "type": "trip-offer-price-quotes",
+            "attributes": {},
+            "relationships": {
+                "offer": {
+                    "data": {
+                        "id": fixtures.OFFERS[0],
+                        "type": "offers",
+                    },
+                },
+                "options": {
+                    "data": [
+                        {
+                            "id": fixtures.PROVIDER_OFFERS[0],
+                            "type": "offer-options",
+                        },
+                        {
+                            "id": fixtures.PROVIDER_OFFERS[2],
+                            "type": "offer-options",
+                        },
+                    ],
+                },
+            },
+        },
+    }
+
+
+class TestPriceQuotes(object):
+    async def test_price_quote_succeeds(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        response = await client.post(
+            "/offers/quotes",
+            json=_get_price_quote_request(),
+            headers={"Content-Type": "application/vnd.api+json"},
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+
+    async def test_price_quote_with_unknown_offer_fails(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        price_quote = _get_price_quote_request()
+        offer = price_quote["data"]["relationships"]["offer"]
+        offer["data"]["id"] = fixtures.NOT_FOUND
+
+        response = await client.post(
+            "/offers/quotes",
+            json=price_quote,
+            headers={"Content-Type": "application/vnd.api+json"},
+        )
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert response.json()["errors"][0][
+            "detail"
+        ] == "'{0}' was not found or has expired".format(fixtures.NOT_FOUND)
+
+    async def test_price_quote_with_unknown_option_fails(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        price_quote = _get_price_quote_request()
+        options = price_quote["data"]["relationships"]["options"]
+        options["data"][0]["id"] = fixtures.NOT_FOUND
+
+        response = await client.post(
+            "/offers/quotes",
+            json=price_quote,
+            headers={"Content-Type": "application/vnd.api+json"},
+        )
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert response.json()["errors"][0][
+            "detail"
+        ] == "'{0}' is not a valid option for this offer".format(fixtures.NOT_FOUND)
+
+    async def test_price_quote_with_missing_group_fails(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        price_quote = _get_price_quote_request()
+        options = price_quote["data"]["relationships"]["options"]
+        options["data"].pop()
+
+        response = await client.post(
+            "/offers/quotes",
+            json=price_quote,
+            headers={"Content-Type": "application/vnd.api+json"},
+        )
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert response.json()["errors"][0][
+            "detail"
+        ] == "No option chosen for offer group '{0}'".format(fixtures.OFFER_GROUPS[1])
+
+    async def test_price_quote_with_option_from_same_group_fails(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        price_quote = _get_price_quote_request()
+        options = price_quote["data"]["relationships"]["options"]
+        options["data"].append(
+            {
+                "id": fixtures.PROVIDER_OFFERS[1],
+                "type": "offer-options",
+            },
+        )
+
+        response = await client.post(
+            "/offers/quotes",
+            json=price_quote,
+            headers={"Content-Type": "application/vnd.api+json"},
+        )
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert response.json()["errors"][0][
+            "detail"
+        ] == "Multiple options chosen for group '{0}'".format(fixtures.OFFER_GROUPS[0])

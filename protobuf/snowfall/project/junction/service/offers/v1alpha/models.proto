@@ -80,6 +80,21 @@ message OfferGroup {
   // min/max prices?
   repeated Offer offers = 4;
   repeated OfferSegment segments = 5;
+}
+
+message Offer {
+  string id = 1;
+  repeated OfferSegmentDetails segment_details = 2;
+  snowfall.stdlib.v1alpha.Money price = 3;
+  string brand_name = 4;
+  // isRefundable
+}
+
+message PriceQuote {
+  string id = 1;
+  string option_id = 2;
+  google.protobuf.Timestamp expires_at = 3;
+  snowfall.stdlib.v1alpha.Money price = 4;
   enum Required {
     REQUIRED_UNSPECIFIED = 0;
     REQUIRED_DATE_OF_BIRTH = 1;
@@ -88,19 +103,21 @@ message OfferGroup {
     REQUIRED_ISSUING_COUNTRY = 4;
     REQUIRED_PASSPORT_NUMBER = 5;
   }
-  repeated Required required = 6;
+  repeated Required required_documents = 5;
+  repeated Penalty penalties = 6;
+  repeated FareRule rules = 7;
 }
 
-message Offer {
+message PriceQuoteContainer {
   string id = 1;
-  repeated OfferSegmentDetails segment_details = 2;
-  snowfall.stdlib.v1alpha.Money price = 3;
-  string brand_name = 4;
-  repeated Penalty penalties = 5;
-  // isRefundable
+  google.protobuf.Timestamp expires_at = 2;
+  repeated PriceQuote quotes = 3;
+  string offer_id = 4;
+  repeated string option_ids = 5;
+  string session_token = 6;
 }
 
-message SegmentRule {
+message FareRule {
   string title = 1;
   string body = 2;
 }
@@ -132,7 +149,6 @@ message OfferSegmentDetails {
   string id = 1;
   string offer_segment_id = 3;
   snowfall.stdlib.v1alpha.CabinClass cabin_class = 2;
-  repeated SegmentRule rules = 4;
   repeated BaggageAllowance baggage_allowances = 5;
   SegmentAmenities amenities = 6;
   // meal

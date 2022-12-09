@@ -13,6 +13,7 @@ from snowfall.project.junction.adapter import (
     offers,
     orders,
     places,
+    price_quotes,
     schedules,
     segments,
     trip_searches,
@@ -64,6 +65,11 @@ def _factory(
                     ),
                     places_client=places.GrpcClient(
                         places_pb2_grpc.PlacesServiceStub(places_channel),
+                    ),
+                    price_quotes_client=price_quotes.GrpcClient(
+                        price_quotes=grpc_pb2_grpc.PriceQuoteServiceStub(
+                            offers_channel,
+                        ),
                     ),
                     trip_searches_client=trip_searches.GrpcClient(
                         trips=trips_pb2_grpc.TripServiceStub(trips_channel),

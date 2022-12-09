@@ -2,12 +2,15 @@ import datetime
 from typing import Any, Mapping, Sequence
 
 import lagom
+import more_itertools
 from starlette import endpoints, requests, responses, status
 
+from snowfall.project.junction.adapter import offers as offers_adapter
 from snowfall.project.junction.adapter import orders as orders_adapter
+from snowfall.project.junction.adapter import price_quotes as price_quotes_adapter
 from snowfall.project.junction.service.client_api import resources
-from snowfall.project.junction.service.client_api.validators import (
-    order_request_validator,
+from snowfall.project.junction.service.offers.v1alpha import (
+    models_pb2 as offer_models_pb2,
 )
 from snowfall.project.junction.service.orders.v1alpha import (
     models_pb2 as order_models_pb2,
@@ -92,21 +95,24 @@ class Order(endpoints.HTTPEndpoint):
 
 
 class Orders(endpoints.HTTPEndpoint):
-    @order_request_validator
-    async def post(
+    async def post(  # noqa: WPS217
         self,
         request: requests.Request,
-        orders_client: orders_adapter.Client,
-        options: Sequence[order_models_pb2.TripOption],
+        price_quotes_client: price_quotes_adapter.Client = lagom.injectable,
+        offers_client: offers_adapter.Client = lagom.injectable,
+        orders_client: orders_adapter.Client = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
+        price_quote = await price_quotes_client.get(body["quote"])
+        offer = await offers_client.get(price_quote.offer_id)
+
         journey = await orders_client.create_journey(
             contact_details=_create_contact_details(body["contactDetails"]),
         )
         order = await orders_client.place_order(
             journey_id=journey.id,
             passengers=_create_passengers(body["passengers"]),
-            options=options,
+            options=_create_trip_options(offer, price_quote),
         )
 
         return await messages.create_response(
@@ -150,18 +156,21 @@ class OrdersByJourney(endpoints.HTTPEndpoint):
             request=request,
         )
 
-    @order_request_validator
     async def post(
         self,
         request: requests.Request,
-        orders_client: orders_adapter.Client,
-        options: Sequence[order_models_pb2.TripOption],
+        price_quotes_client: price_quotes_adapter.Client = lagom.injectable,
+        offers_client: offers_adapter.Client = lagom.injectable,
+        orders_client: orders_adapter.Client = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
+        price_quote = await price_quotes_client.get(body["quote"])
+        offer = await offers_client.get(price_quote.offer_id)
+
         order = await orders_client.place_order(
             journey_id=request.path_params["journeyId"],
             passengers=_create_passengers(body["passengers"]),
-            options=options,
+            options=_create_trip_options(offer, price_quote),
         )
         # todo: Expire (delete) the offer the order was placed for.
 
@@ -341,3 +350,42 @@ class BookingDetailsByBooking(endpoints.HTTPEndpoint):
             ),
             request=request,
         )
+
+
+def _create_trip_options(
+    offer: offer_models_pb2.OfferAggregate,
+    price_quote: offer_models_pb2.PriceQuoteContainer,
+) -> list[order_models_pb2.TripOption]:
+    quote_mapping = {quote.option_id: quote for quote in price_quote.quotes}
+
+    return [
+        _create_trip_option(option, group, quote_mapping[option.id])
+        for group in offer.groups
+        for option in group.offers
+        if option.id in price_quote.option_ids
+    ]
+
+
+def _create_trip_option(
+    option: offer_models_pb2.Offer,
+    group: offer_models_pb2.OfferGroup,
+    price_quote: offer_models_pb2.PriceQuote,
+) -> order_models_pb2.TripOption:
+    return order_models_pb2.TripOption(
+        id=option.id,
+        price_quote_id=price_quote.id,
+        details=[
+            order_models_pb2.TripOptionDetails(
+                segment=offer_segment,
+                cabin_class=more_itertools.first(
+                    [
+                        detail.cabin_class
+                        for detail in option.segment_details
+                        if detail.offer_segment_id == offer_segment.id
+                    ],
+                ),
+            )
+            for offer_segment in group.segments
+        ],
+        price=price_quote.price,
+    )

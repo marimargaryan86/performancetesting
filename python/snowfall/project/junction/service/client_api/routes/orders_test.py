@@ -23,23 +23,11 @@ def _get_order_request() -> dict[str, Any]:
                 ],
             },
             "relationships": {
-                "offer": {
+                "quote": {
                     "data": {
-                        "id": fixtures.OFFERS[0],
-                        "type": "offers",
+                        "id": fixtures.PRICE_QUOTES[0],
+                        "type": "trip-offer-price-quotes",
                     },
-                },
-                "options": {
-                    "data": [
-                        {
-                            "id": fixtures.PROVIDER_OFFERS[0],
-                            "type": "offer-options",
-                        },
-                        {
-                            "id": fixtures.PROVIDER_OFFERS[2],
-                            "type": "offer-options",
-                        },
-                    ],
                 },
             },
         },
@@ -113,87 +101,6 @@ class TestOrders(object):
         )
 
         assert response.status_code == status.HTTP_201_CREATED
-
-    async def test_order_with_unknown_offer_fails(
-        self,
-        client: httpx.AsyncClient,
-    ) -> None:
-        order = _get_journey_request()
-        offer = order["data"]["relationships"]["offer"]
-        offer["data"]["id"] = fixtures.NOT_FOUND
-
-        response = await client.post(
-            "/orders",
-            json=order,
-            headers={"Content-Type": "application/vnd.api+json"},
-        )
-
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-        assert response.json()["errors"][0][
-            "detail"
-        ] == "'{0}' was not found or has expired".format(fixtures.NOT_FOUND)
-
-    async def test_order_with_unknown_option_fails(
-        self,
-        client: httpx.AsyncClient,
-    ) -> None:
-        order = _get_journey_request()
-        options = order["data"]["relationships"]["options"]
-        options["data"][0]["id"] = fixtures.NOT_FOUND
-
-        response = await client.post(
-            "/orders",
-            json=order,
-            headers={"Content-Type": "application/vnd.api+json"},
-        )
-
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-        assert response.json()["errors"][0][
-            "detail"
-        ] == "'{0}' is not a valid option for this offer".format(fixtures.NOT_FOUND)
-
-    async def test_order_with_missing_group_fails(
-        self,
-        client: httpx.AsyncClient,
-    ) -> None:
-        order = _get_journey_request()
-        options = order["data"]["relationships"]["options"]
-        options["data"].pop()
-
-        response = await client.post(
-            "/orders",
-            json=order,
-            headers={"Content-Type": "application/vnd.api+json"},
-        )
-
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-        assert response.json()["errors"][0][
-            "detail"
-        ] == "No option chosen for offer group '{0}'".format(fixtures.OFFER_GROUPS[1])
-
-    async def test_order_with_option_from_same_group_fails(
-        self,
-        client: httpx.AsyncClient,
-    ) -> None:
-        order = _get_journey_request()
-        options = order["data"]["relationships"]["options"]
-        options["data"].append(
-            {
-                "id": fixtures.PROVIDER_OFFERS[1],
-                "type": "offer-options",
-            },
-        )
-
-        response = await client.post(
-            "/orders",
-            json=order,
-            headers={"Content-Type": "application/vnd.api+json"},
-        )
-
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-        assert response.json()["errors"][0][
-            "detail"
-        ] == "Multiple options chosen for group '{0}'".format(fixtures.OFFER_GROUPS[0])
 
 
 class TestBookingsByOrder(object):

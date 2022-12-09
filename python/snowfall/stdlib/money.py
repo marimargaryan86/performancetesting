@@ -4,6 +4,7 @@ import contextlib
 import dataclasses
 import decimal
 import functools
+from typing import Iterable
 
 import iso4217
 
@@ -101,3 +102,7 @@ def from_string(
         amount=-amount if units < 0 else amount,
         currency=currency,
     )
+
+
+def total(moneys: Iterable[Money]) -> Money:
+    return functools.reduce(lambda carry, money: carry.add(money), moneys)

@@ -122,3 +122,11 @@ def test_convert(
     converted = instance.convert(money.Currency(to_currency), rate)
 
     assert str(converted) == expected
+
+
+def test_total() -> None:
+    amounts = [
+        money.Money(amount, money.Currency("USD")) for amount in (10, 10, 10, 10)
+    ]
+
+    assert money.Money(40, money.Currency("USD")) == money.total(amounts)

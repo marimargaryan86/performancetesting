@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import zoneinfo
-from typing import Any, ClassVar, Optional, Sequence
+from typing import Any, ClassVar, Iterable, Optional, Sequence
 
 import pydantic
 from starlette import requests
@@ -93,13 +93,6 @@ class OfferGroupResource(models.Resource):
             type=OfferGroupResource.api_type,
             attributes={
                 "expiresAt": protobuf.protobuf_to_datetime(group.expires_at),
-                "required": [
-                    protobuf.enum_value_to_slug(
-                        enum_descriptor=offer_models_pb2.OfferGroup.Required.DESCRIPTOR,
-                        enum_value=required_value,
-                    )
-                    for required_value in group.required
-                ],
             },
             relationships={
                 "options": {
@@ -213,6 +206,17 @@ class Price(models.BaseModel):
             amount=str(money_price),
         )
 
+    @classmethod
+    def from_protos(cls, prices: Iterable[money_pb2.Money]) -> Price:
+        money_price = money.total(
+            [money.from_protobuf(price) for price in prices],
+        )
+
+        return cls(
+            currency=money_price.currency.code,
+            amount=str(money_price),
+        )
+
 
 class PenaltyApplicableTo(models.BaseModel):
     date_of_birth_after: Optional[datetime.date] = pydantic.Field(
@@ -282,9 +286,6 @@ class OfferOptionResource(models.Resource):
             attributes={
                 "price": Price.from_proto(option.price),
                 "brandName": option.brand_name,
-                "penalties": [
-                    Penalty.from_proto(penalty) for penalty in option.penalties
-                ],
             },
             relationships={
                 "details": {
@@ -306,12 +307,12 @@ class OfferOptionResource(models.Resource):
         )
 
 
-class OfferSegmentRule(models.BaseModel):
+class FareRule(models.BaseModel):
     title: str
     body: str
 
     @classmethod
-    def from_proto(cls, rule: offer_models_pb2.SegmentRule) -> OfferSegmentRule:
+    def from_proto(cls, rule: offer_models_pb2.FareRule) -> FareRule:
         return cls(
             title=rule.title,
             body=rule.body,
@@ -381,7 +382,6 @@ class TripOfferOptionDetailsResource(models.Resource):
             type=TripOfferOptionDetailsResource.api_type,
             attributes={
                 "cabinClassName": details.cabin_class.marketing_name,
-                "rules": [OfferSegmentRule.from_proto(rule) for rule in details.rules],
                 "baggageAllowances": [
                     BaggageAllowance.from_proto(baggage)
                     for baggage in details.baggage_allowances
@@ -441,6 +441,76 @@ class OfferSegmentDetails(models.BaseModel):
         return cls(
             ref=details.id,
             cabinClass=CabinClass.from_proto(details.cabin_class),
+        )
+
+
+class PriceQuoteResource(models.Resource):
+    api_type: ClassVar[str] = "trip-offer-price-quotes"
+
+    @classmethod
+    def from_proto(
+        cls,
+        price_quote: offer_models_pb2.PriceQuoteContainer,
+        request: requests.Request,
+    ) -> PriceQuoteResource:
+        if len(price_quote.quotes) < len(price_quote.option_ids):
+            status = "pending"
+            price = None
+        else:
+            status = "completed"
+            price = Price.from_protos(
+                [quote.price for quote in price_quote.quotes],
+            )
+
+        return cls(
+            id=price_quote.id,
+            type=PriceQuoteResource.api_type,
+            attributes={
+                "expiresAt": protobuf.protobuf_to_datetime(price_quote.expires_at),
+                "price": price,
+                "penalties": [
+                    Penalty.from_proto(penalty)
+                    for quote in price_quote.quotes
+                    for penalty in quote.penalties
+                ],
+                "required": [
+                    protobuf.enum_value_to_slug(
+                        enum_descriptor=offer_models_pb2.PriceQuote.Required.DESCRIPTOR,
+                        enum_value=required_value,
+                    )
+                    for quote in price_quote.quotes
+                    for required_value in quote.required_documents
+                ],
+                "rules": [
+                    FareRule.from_proto(rule)
+                    for quote in price_quote.quotes
+                    for rule in quote.rules
+                ],
+                "status": status,
+            },
+            relationships={
+                "offer": {
+                    _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
+                        id=price_quote.offer_id,
+                        type=OfferResource.api_type,
+                    ),
+                },
+                "options": {
+                    _RELATIONSHIPS_FIELD: [
+                        models.ResourceIdentifier(
+                            id=option_id,
+                            type=OfferOptionResource.api_type,
+                        )
+                        for option_id in price_quote.option_ids
+                    ],
+                },
+            },
+            links={
+                _SELF_HREF: request.url_for(
+                    "ViewPriceQuote",
+                    offerPriceQuoteId=price_quote.id,
+                ),
+            },
         )
 
 

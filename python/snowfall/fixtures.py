@@ -76,6 +76,10 @@ LEGS = (
     "fe8f2db4-0913-4ece-a3fe-2b3ebecc72ff",
     "71d3750c-d5d4-47aa-9680-e575c34a2979",
 )
+PRICE_QUOTES = (
+    "686e0abe-d9f6-466d-a2da-786ab15302d8",
+    "4157739c-809a-4459-b01b-79037938d886",
+)
 JOURNEYS = (
     "586399bc-0d13-4d00-89a1-57f7d7045382",
     "2da9619a-5c28-43b0-9fe6-603257ee2077",
@@ -356,6 +360,43 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
             ),
         ],
     )
+
+
+def get_price_quotes() -> list[offers_pb2.PriceQuoteContainer]:
+    return [
+        offers_pb2.PriceQuoteContainer(
+            id=PRICE_QUOTES[0],
+            quotes=[
+                offers_pb2.PriceQuote(
+                    option_id=PROVIDER_OFFERS[0],
+                    price=money.from_string(
+                        string_amount="13.37",
+                        currency=money.Currency("SEK"),
+                    ).protobuf(),
+                ),
+                offers_pb2.PriceQuote(
+                    option_id=PROVIDER_OFFERS[2],
+                    price=money.from_string(
+                        string_amount="13.37",
+                        currency=money.Currency("SEK"),
+                    ).protobuf(),
+                ),
+            ],
+            offer_id=OFFERS[0],
+            option_ids=[
+                PROVIDER_OFFERS[0],
+                PROVIDER_OFFERS[2],
+            ],
+        ),
+        offers_pb2.PriceQuoteContainer(
+            id=PRICE_QUOTES[1],
+            offer_id=OFFERS[0],
+            option_ids=[
+                PROVIDER_OFFERS[0],
+                PROVIDER_OFFERS[2],
+            ],
+        ),
+    ]
 
 
 def get_journeys() -> list[order_models_pb2.Journey]:

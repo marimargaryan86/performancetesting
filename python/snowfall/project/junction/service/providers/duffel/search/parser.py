@@ -156,7 +156,6 @@ class OfferParser(object):  # noqa: WPS214
                     ),
                     price=amount.protobuf(),
                     brand_name=offer.slices[0].fare_brand_name or "",
-                    penalties=self._parse_penalties(),
                 ),
             )
 
@@ -196,10 +195,6 @@ class OfferParser(object):  # noqa: WPS214
         return models_pb2.CabinClass(
             type=enums.cabin_to_proto(None),
         )
-
-    def _parse_penalties(self) -> List[offer_models_pb2.Penalty]:
-        # todo
-        return []
 
     def _parse_baggage_allowance(
         self,

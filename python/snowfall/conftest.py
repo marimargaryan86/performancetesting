@@ -19,6 +19,7 @@ from snowfall.project.junction.adapter import (
     orders,
     passenger_name_records,
     places,
+    price_quotes,
     schedules,
     segments,
     trip_searches,
@@ -110,6 +111,11 @@ def offers_client() -> offers.Client:
 @pytest.fixture
 def offer_searches_client() -> offer_searches.Client:
     return offer_searches.DictClient(fixtures.get_offer_searches())
+
+
+@pytest.fixture
+def price_quotes_client() -> price_quotes.Client:
+    return price_quotes.DictClient(fixtures.get_price_quotes())
 
 
 @pytest.fixture

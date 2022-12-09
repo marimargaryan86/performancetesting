@@ -39,10 +39,27 @@ import decimal
 from snowfall.stdlib import money
 
 a = money.from_string("12.99", money.Currency("USD"))
-b = money.convert(money.Currency("GBP"), decimal.Decimal(0.88417))
+b = a.convert(money.Currency("GBP"), decimal.Decimal(0.88417))
 
 print(b.amount)  # 1149
 print(b)  # "11.49"
+```
+
+If you need to add several monetary values together, there's `total()`:
+
+```py
+from snowfall.stdlib import money
+
+values = [
+    money.from_string("12.00", money.Currency("USD")),
+    money.from_string("13.00", money.Currency("USD")),
+    money.from_string("15.00", money.Currency("USD")),
+]
+
+total = money.total(values)
+
+print(total.amount)  # 4000
+print(total)  # "40.00"
 ```
 
 When sending monetary values between services, the protobuf `snowfall.stdlib.v1alpha.Money` should be used. An instance of `snowfall.stdlib.money.Money` can be created from a Python representation of `snowfall.stdlib.v1alpha.Money` and also be turned into one:

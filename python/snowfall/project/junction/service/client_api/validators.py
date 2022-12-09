@@ -1,18 +1,14 @@
 from typing import Any, Awaitable, Callable, Mapping, Sequence, TypeVar
 
 import lagom
-import more_itertools
 from starlette import endpoints, requests, responses, status
 
 from snowfall.project.junction.adapter import errors, legs, offer_searches
 from snowfall.project.junction.adapter import offers as offers_adapter
-from snowfall.project.junction.adapter import orders as orders_adapter
+from snowfall.project.junction.adapter import price_quotes as price_quotes_adapter
 from snowfall.project.junction.adapter import trips
 from snowfall.project.junction.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
-)
-from snowfall.project.junction.service.orders.v1alpha import (
-    models_pb2 as order_models_pb2,
 )
 from snowfall.stdlib.integration.starlette import models, request_helpers
 from snowfall.stdlib.v1alpha import models_pb2
@@ -172,13 +168,13 @@ def _validate_trips(
     return trips_list, validation_errors
 
 
-def order_request_validator(  # noqa: WPS320
+def price_quote_request_validator(  # noqa: WPS320
     function: Callable[  # noqa: WPS320
         [
             _Endpoint,
             requests.Request,
-            orders_adapter.Client,
-            Sequence[order_models_pb2.TripOption],
+            price_quotes_adapter.Client,
+            Sequence[str],
         ],
         Awaitable[responses.Response],
     ],
@@ -187,7 +183,7 @@ def order_request_validator(  # noqa: WPS320
         _Endpoint,
         requests.Request,
         offers_adapter.Client,
-        orders_adapter.Client,
+        price_quotes_adapter.Client,
     ],
     Awaitable[responses.Response],
 ]:
@@ -195,7 +191,7 @@ def order_request_validator(  # noqa: WPS320
         self: _Endpoint,
         request: requests.Request,
         offers_client: offers_adapter.Client = lagom.injectable,
-        orders_client: orders_adapter.Client = lagom.injectable,
+        price_quotes_client: price_quotes_adapter.Client = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
 
@@ -228,9 +224,7 @@ def order_request_validator(  # noqa: WPS320
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
 
-        options = _create_trip_options(offer, body["options"])
-
-        return await function(self, request, orders_client, options)
+        return await function(self, request, price_quotes_client, body["options"])
 
     return wrapper
 
@@ -289,38 +283,3 @@ def _validate_groups(
     )
 
     return validation_errors
-
-
-def _create_trip_options(
-    offer: offer_models_pb2.OfferAggregate,
-    options: Sequence[str],
-) -> list[order_models_pb2.TripOption]:
-    return [
-        _create_trip_option(option, group)
-        for group in offer.groups
-        for option in group.offers
-        if option.id in options
-    ]
-
-
-def _create_trip_option(
-    option: offer_models_pb2.Offer,
-    group: offer_models_pb2.OfferGroup,
-) -> order_models_pb2.TripOption:
-    return order_models_pb2.TripOption(
-        id=option.id,
-        details=[
-            order_models_pb2.TripOptionDetails(
-                segment=offer_segment,
-                cabin_class=more_itertools.first(
-                    [
-                        detail.cabin_class
-                        for detail in option.segment_details
-                        if detail.offer_segment_id == offer_segment.id
-                    ],
-                ),
-            )
-            for offer_segment in group.segments
-        ],
-        price=option.price,
-    )

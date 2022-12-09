@@ -1,0 +1,107 @@
+import abc
+import datetime
+from typing import Sequence
+
+from snowfall.project.junction.adapter import errors
+from snowfall.project.junction.service.offers.v1alpha import (
+    grpc_pb2,
+    grpc_pb2_grpc,
+    models_pb2,
+)
+from snowfall.stdlib import money, string
+from snowfall.stdlib.format import protobuf
+
+
+class Client(abc.ABC):
+    @abc.abstractmethod
+    async def create(
+        self,
+        offer_id: str,
+        option_ids: Sequence[str],
+        session_token: str,
+    ) -> models_pb2.PriceQuoteContainer:
+        """Create a price quote."""
+
+    @abc.abstractmethod
+    async def get(self, identifier: str) -> models_pb2.PriceQuoteContainer:
+        """Get a price quote."""
+
+
+class DictClient(Client):
+    def __init__(self, price_quotes: Sequence[models_pb2.PriceQuoteContainer]) -> None:
+        self._searches: dict[str, models_pb2.PriceQuoteContainer] = {
+            price_quote.id: price_quote for price_quote in price_quotes
+        }
+
+    async def create(
+        self,
+        offer_id: str,
+        option_ids: Sequence[str],
+        session_token: str,
+    ) -> models_pb2.PriceQuoteContainer:
+        expires_at = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
+            days=1,
+        )
+        price_quote = models_pb2.PriceQuoteContainer(
+            id=string.uuid(),
+            expires_at=protobuf.datetime_to_protobuf(expires_at),
+            quotes=[
+                models_pb2.PriceQuote(
+                    id=string.uuid(),
+                    expires_at=protobuf.datetime_to_protobuf(expires_at),
+                    price=money.from_string("13.37", money.Currency("EUR")).protobuf(),
+                )
+                for _ in option_ids
+            ],
+            offer_id=offer_id,
+            option_ids=option_ids,
+            session_token=session_token,
+        )
+        self._searches[price_quote.id] = price_quote
+
+        return price_quote
+
+    async def get(self, identifier: str) -> models_pb2.PriceQuoteContainer:
+        try:
+            return self._searches[identifier]
+        except KeyError as err:
+            raise errors.NotFoundError() from err
+
+
+class GrpcClient(Client):
+    def __init__(
+        self,
+        price_quotes: grpc_pb2_grpc.PriceQuoteServiceStub,
+        timeout: int = 10,
+    ):
+        self._price_quotes = price_quotes
+        self._timeout = timeout
+
+    async def create(
+        self,
+        offer_id: str,
+        option_ids: Sequence[str],
+        session_token: str,
+    ) -> models_pb2.PriceQuoteContainer:
+        response = await errors.handle_grpc_errors(
+            self._price_quotes.CreatePriceQuote(
+                grpc_pb2.CreatePriceQuoteRequest(
+                    offer_id=offer_id,
+                    option_ids=option_ids,
+                    session_token=session_token,
+                ),
+                timeout=self._timeout,
+            ),
+        )
+
+        return response.price_quote
+
+    async def get(self, identifier: str) -> models_pb2.PriceQuoteContainer:
+        response = await errors.handle_grpc_errors(
+            self._price_quotes.GetPriceQuote(
+                grpc_pb2.GetPriceQuoteRequest(id=identifier),
+                timeout=self._timeout,
+            ),
+        )
+
+        return response.price_quote

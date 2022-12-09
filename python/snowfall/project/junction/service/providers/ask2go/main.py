@@ -12,7 +12,6 @@ from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import airports, offers
 from snowfall.project.junction.service.providers.ask2go import (
-    adapter,
     booking,
     cache,
     consumer,
@@ -20,7 +19,12 @@ from snowfall.project.junction.service.providers.ask2go import (
     notifications,
 )
 from snowfall.project.junction.service.providers.ask2go import offers as a2g_offers
-from snowfall.project.junction.service.providers.ask2go import transformer, validator
+from snowfall.project.junction.service.providers.ask2go import (
+    pricing,
+    search,
+    transformer,
+    validator,
+)
 from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
 from snowfall.stdlib import h3, service
 from snowfall.stdlib.instrumentation import httpx_metrics
@@ -143,7 +147,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
                     recipient=app.settings.smtp_recipient,
                 ),
             ),
-            offer_cache=cache.OfferCache(
+            price_quote_cache=cache.PriceQuoteCache(
                 client=redis.Client(redis_connection, prefix=app.name),
             ),
         ).consume()
@@ -200,7 +204,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
             ),
             offer_group_cache_key_func=a2g_offers.offer_group_cache_key,
             offer_group_generator=a2g_offers.offer_group_generator(
-                a2g_adapter=adapter.Ask2GoAdapter(
+                a2g_adapter=search.Adapter(
                     ask2go_client=ask2go_client,
                     offer_validator=validator.OfferValidator(),
                     poll_retries_limit=app.settings.poll_retries_limit,
@@ -218,9 +222,71 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                     offer_cache=cache.OfferCache(
                         client=redis.Client[bytes](redis_connection, prefix=app.name),
                     ),
+                    price_cache=cache.PriceQuoteCache(
+                        client=redis.Client[bytes](redis_connection, prefix=app.name),
+                    ),
                     offer_ttl=app.settings.ttl,
                 ),
             ),
+        ).consume()
+
+
+async def _price_quotes(app: service.Application[_SearchSettings]) -> None:
+    async with contextlib.AsyncExitStack() as stack:
+        http_client = await stack.enter_async_context(
+            httpx_metrics.with_metrics(
+                httpx.AsyncClient(
+                    http2=True,
+                    timeout=app.settings.http_timeout,
+                ),
+            ),
+        )
+        redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
+            aioredis.from_url(
+                random.choice(app.settings.redis_dsn),  # nosec
+                decode_responses=False,
+            ).client(),
+        )
+        amqp_connection = await stack.enter_async_context(
+            types.Connection(app.settings.amqp_dsn),
+        )
+        ask2go_client = client.Ask2GoClient(
+            api_base_url=app.settings.api_base_url,
+            api_booking_base_url=app.settings.api_booking_base_url,
+            http_client=http_client,
+        )
+
+        await consumer.PriceQuoteConsumer(
+            consumer_obj=amqp_consumer.Consumer(
+                connection=amqp_connection,
+                queue_name="{0}_prices".format(app.name),
+                binds=[(types.Exchange("prices"), "offers.pricing")],
+            ),
+            producer_obj=producer.Producer(
+                connection=amqp_connection,
+                exchange=types.Exchange("prices"),
+            ),
+            offer_cache=cache.OfferCache(
+                client=redis.Client(redis_connection, prefix=app.name),
+            ),
+            offer_transformer=transformer.OfferTransformer(
+                airport_repository=airports.AirportRepository(
+                    airports_data=cast(
+                        list[dict[str, Any]],
+                        filesystem.PkgLoader(
+                            "snowfall.project.junction.service.providers.ask2go.main",
+                        ).load("airports.json"),
+                    ),
+                ),
+                offer_cache=cache.OfferCache(
+                    client=redis.Client[bytes](redis_connection, prefix=app.name),
+                ),
+                price_cache=cache.PriceQuoteCache(
+                    client=redis.Client[bytes](redis_connection, prefix=app.name),
+                ),
+                offer_ttl=app.settings.ttl,
+            ),
+            pricing_adapter=pricing.Adapter(ask2go_client=ask2go_client),
         ).consume()
 
 
@@ -241,6 +307,11 @@ if __name__ == "__main__":
         service.Command(
             name="searches",
             callback=_searches,
+            settings_class=_SearchSettings,
+        ),
+        service.Command(
+            name="pricing",
+            callback=_price_quotes,
             settings_class=_SearchSettings,
         ),
     )

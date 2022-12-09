@@ -114,8 +114,22 @@ class PricingInformationBase(CamelCaseBaseModel):
     currency: str
 
 
+class BrandedPriceInformation(CamelCaseBaseModel):
+    base_fare: str
+    total_tax: str
+    total_cost: str
+    original_cost: str
+    service_fee: str
+    currency: str
+    brand_name: Optional[str]
+    brand_id: Optional[str]
+    fare_basis: Optional[list[str]]
+    is_refundable: bool = False
+
+
 class PricingInformation(CamelCaseBaseModel):
     base: PricingInformationBase
+    additional: list[BrandedPriceInformation] | None
 
 
 class PassengerPricing(CamelCaseBaseModel):
@@ -133,3 +147,4 @@ class Offer(CamelCaseBaseModel):
     trips: list[Trip]
     pricing_information: PricingInformation
     passenger_pricing: list[PassengerPricing]
+    search_id: Optional[str]

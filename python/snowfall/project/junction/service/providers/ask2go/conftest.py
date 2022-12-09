@@ -15,11 +15,12 @@ from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import airports
 from snowfall.project.junction.service.providers.ask2go import (
-    adapter,
     booking,
     cache,
     criteria,
     notifications,
+    pricing,
+    search,
     transformer,
     validator,
 )
@@ -128,13 +129,24 @@ def offer_validator() -> validator.OfferValidator:
 
 
 @pytest.fixture
-def ask2go_adapter(
+def search_adapter(
     ask2go_client: client.Ask2GoClient,
     offer_validator: validator.OfferValidator,
-) -> adapter.Ask2GoAdapter:
-    return adapter.Ask2GoAdapter(
+) -> search.Adapter:
+    return search.Adapter(
         ask2go_client=ask2go_client,
         offer_validator=offer_validator,
+        poll_retries_limit=1,
+        wait_time_between_polling=0,
+    )
+
+
+@pytest.fixture
+def pricing_adapter(
+    ask2go_client: client.Ask2GoClient,
+) -> pricing.Adapter:
+    return pricing.Adapter(
+        ask2go_client=ask2go_client,
         poll_retries_limit=1,
         wait_time_between_polling=0,
     )
@@ -148,6 +160,9 @@ def offer_transformer(
     return transformer.OfferTransformer(
         airport_repository=airport_repository,
         offer_cache=cache.OfferCache(
+            client=redis.Client(redis_client),
+        ),
+        price_cache=cache.PriceQuoteCache(
             client=redis.Client(redis_client),
         ),
         offer_ttl=datetime.timedelta(days=1),

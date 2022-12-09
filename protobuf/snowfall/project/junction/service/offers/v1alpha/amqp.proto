@@ -14,3 +14,15 @@ message TripOfferSearchResult {
   string offer_search_id = 1;
   OfferGroup offer = 2;
 }
+
+message TripPriceQuoteTask {
+  string price_quote_container_id = 1;
+  string option_id = 2;
+  string session_token = 3;
+}
+
+message TripPriceQuoteResult {
+  string price_quote_container_id = 1;
+  string option_id = 2;
+  PriceQuote price_quote = 3;
+}

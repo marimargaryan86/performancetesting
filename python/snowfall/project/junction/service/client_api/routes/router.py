@@ -106,6 +106,16 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
         ),
         # todo: add GET /offers/searches/{offerSearchId}/related
         integration.route(
+            "/offers/quotes",
+            offers.PriceQuotes,
+            name="CreateOfferQuotes",
+        ),
+        integration.route(
+            "/offers/quotes/{offerPriceQuoteId}",
+            offers.PriceQuote,
+            name="ViewPriceQuote",
+        ),
+        integration.route(
             "/offers/{offerId}",
             offers.Offer,
             name="ViewOffer",

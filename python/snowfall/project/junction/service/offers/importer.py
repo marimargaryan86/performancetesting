@@ -7,7 +7,7 @@ import prometheus_client
 import structlog
 from pymongo import errors
 
-from snowfall.project.junction.service.offers import aggregator, offers
+from snowfall.project.junction.service.offers import aggregator, offers, price_quotes
 from snowfall.project.junction.service.offers.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.instrumentation import prometheus
@@ -123,3 +123,25 @@ class OfferImporter(object):
 
             with contextlib.suppress(errors.DuplicateKeyError):
                 await self._offers.insert(message.offer)
+
+
+class PriceQuoteImporter(object):
+    def __init__(
+        self,
+        consumer_obj: consumer.Consumer[amqp_pb2.TripPriceQuoteResult],
+        price_quotes_repository: price_quotes.PriceQuoteRepository,
+    ):
+        self._consumer = consumer_obj
+        self._quotes = price_quotes_repository
+
+    async def consume(self) -> None:
+        await self._consumer.consume(self._process_message)
+
+    async def _process_message(
+        self,
+        message: amqp_types.Message[amqp_pb2.TripPriceQuoteResult],
+    ) -> None:
+        await self._quotes.add_to_container(
+            price_quote_container_id=message.body.price_quote_container_id,
+            price_quote=message.body.price_quote,
+        )

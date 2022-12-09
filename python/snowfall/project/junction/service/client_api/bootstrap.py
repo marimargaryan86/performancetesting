@@ -9,6 +9,7 @@ from snowfall.project.junction.adapter import (  # noqa: WPS235
     offers,
     orders,
     places,
+    price_quotes,
     schedules,
     segments,
     trip_searches,
@@ -33,6 +34,7 @@ def create_dependencies(  # noqa: WPS211
     legs_client: legs.Client,
     locations_client: locations.Client,
     places_client: places.Client,
+    price_quotes_client: price_quotes.Client,
     trip_searches_client: trip_searches.Client,
     trips_client: trips.Client,
     orders_client: orders.Client,
@@ -45,6 +47,7 @@ def create_dependencies(  # noqa: WPS211
     container[legs.Client] = legs_client  # type: ignore[type-abstract]
     container[locations.Client] = locations_client  # type: ignore[type-abstract]
     container[places.Client] = places_client  # type: ignore[type-abstract]
+    container[price_quotes.Client] = price_quotes_client  # type: ignore[type-abstract]
     container[trip_searches.Client] = trip_searches_client  # type: ignore[type-abstract]
     container[trips.Client] = trips_client  # type: ignore[type-abstract]
     container[orders.Client] = orders_client  # type: ignore[type-abstract]

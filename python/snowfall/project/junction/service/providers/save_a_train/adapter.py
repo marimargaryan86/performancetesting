@@ -34,7 +34,6 @@ from snowfall.vendor.save_a_train.models import (
     search,
     search_result_details,
     search_result_selection,
-    tariff_condition,
 )
 
 _CABIN_MAPPING = types.MappingProxyType(
@@ -190,19 +189,6 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                                             " ",
                                         ).capitalize(),
                                     ),
-                                    rules=[
-                                        offer_models_pb2.SegmentRule(
-                                            title=condition.name,
-                                            body=condition.description,
-                                        )
-                                        for condition in (
-                                            await self._get_tariff_conditions(
-                                                search_id=search_response.identifier,
-                                                search_result_id=search_result.identifier,
-                                                tariff_condition_id=transfer_fare.identifier,
-                                            )
-                                        ).tariff_conditions.conditions
-                                    ],
                                 ),
                             ],
                             price=money.from_string(
@@ -482,25 +468,6 @@ class SaveATrainAdapter(object):  # noqa: WPS214
             return await self._client.get_ticket(search_id)
         except exceptions.SATValidationError as booking_error:
             raise BookingError(booking_error) from booking_error
-        except httpx.HTTPStatusError as http_error:
-            if http_error.response.text:
-                raise_http_error_with_text(http_error)
-            raise http_error
-
-    async def _get_tariff_conditions(
-        self,
-        search_id: str,
-        search_result_id: int,
-        tariff_condition_id: int,
-    ) -> tariff_condition.TariffConditionsResponse:
-        try:
-            return await self._client.get_tariff_conditions(
-                request.GetTariffConditionsRequest(
-                    search_id=search_id,
-                    search_result_id=search_result_id,
-                    tariff_condition_id=tariff_condition_id,
-                ),
-            )
         except httpx.HTTPStatusError as http_error:
             if http_error.response.text:
                 raise_http_error_with_text(http_error)

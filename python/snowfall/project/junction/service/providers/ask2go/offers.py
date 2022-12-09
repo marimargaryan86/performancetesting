@@ -2,7 +2,7 @@ from typing import AsyncIterator
 
 from snowfall.project.junction.provider import offers
 from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
-from snowfall.project.junction.service.providers.ask2go import adapter, transformer
+from snowfall.project.junction.service.providers.ask2go import search, transformer
 from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
 from snowfall.stdlib import string
 
@@ -23,13 +23,13 @@ def offer_group_cache_key(task: amqp_pb2.SearchCriteriaTask) -> str:
 
 
 def offer_group_generator(
-    a2g_adapter: adapter.Ask2GoAdapter,
+    a2g_adapter: search.Adapter,
     a2g_transformer: transformer.OfferTransformer,
 ) -> offers.OfferGroupGenerator[amqp_pb2.SearchCriteriaTask]:
     def wrapper(
         search_task: amqp_pb2.SearchCriteriaTask,
     ) -> AsyncIterator[offers_pb2.OfferGroup]:
-        return a2g_transformer.offer_prices_to_offer_groups(
+        return a2g_transformer.to_offer_groups(
             search_task,
             a2g_adapter.gather_search_results(search_task),
         )

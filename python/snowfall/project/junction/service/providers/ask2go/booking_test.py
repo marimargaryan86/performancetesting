@@ -72,7 +72,7 @@ async def test_booking_can_be_placed(
     _mock_responses(httpx_mock, "ARN_LHR_2022-07-26")
     booking_proto = await booking_handler.book(
         task=_ORDER_TASK,
-        details=cache.OfferDetails(pricing_id="foo", transaction_id="bar"),
+        quote=cache.PriceQuote(pricing_id="foo", transaction_id="bar"),
     )
     total_price = money.from_protobuf(booking_proto.total_price)
 
@@ -90,7 +90,7 @@ async def test_booking_failed(
     _mock_responses(httpx_mock, "ARN_LAX_2022-11-26")
     booking_proto = await booking_handler.book(
         task=_ORDER_TASK,
-        details=cache.OfferDetails(pricing_id="foo", transaction_id="bar"),
+        quote=cache.PriceQuote(pricing_id="foo", transaction_id="bar"),
     )
     assert booking_proto.status == models_pb2.Booking.STATUS_ERROR
 
@@ -104,7 +104,7 @@ async def test_booking_errors(
         with magic_mocker.with_fixture_path("booking_error"):
             booking_proto = await booking_handler.book(
                 task=_ORDER_TASK,
-                details=cache.OfferDetails(pricing_id="foo", transaction_id="bar"),
+                quote=cache.PriceQuote(pricing_id="foo", transaction_id="bar"),
             )
 
         assert booking_proto.status == models_pb2.Booking.STATUS_ERROR
@@ -131,7 +131,7 @@ async def test_unhandled_booking_error(
     with testing.capture_logs() as cap_logs:
         await booking_handler.book(
             task=_ORDER_TASK,
-            details=cache.OfferDetails(pricing_id="foo", transaction_id="bar"),
+            quote=cache.PriceQuote(pricing_id="foo", transaction_id="bar"),
         )
         log = more_itertools.last(cap_logs)
 

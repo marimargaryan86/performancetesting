@@ -7,11 +7,20 @@ import pydantic
 from motor import motor_asyncio
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.service.offers import aggregator, importer, offers
-from snowfall.project.junction.service.offers.amqp import OfferSearchProducer
+from snowfall.project.junction.service.offers import (
+    aggregator,
+    importer,
+    offers,
+    price_quotes,
+)
+from snowfall.project.junction.service.offers.amqp import (
+    OfferSearchProducer,
+    PriceQuoteProducer,
+)
 from snowfall.project.junction.service.offers.grpc import (
     OfferSearchService,
     OfferService,
+    PriceQuoteService,
 )
 from snowfall.stdlib import service
 from snowfall.stdlib.persistence.redis import types as redis
@@ -35,6 +44,12 @@ class _ImportSettings(service.Settings):
     default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
     mongo_dsn: Sequence[pydantic.AnyUrl]
     redis_dsn: Sequence[pydantic.AnyUrl]
+
+
+class _GatherPriceQuoteSettings(service.Settings):
+    amqp_dsn: pydantic.AnyUrl
+    default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
+    mongo_dsn: Sequence[pydantic.AnyUrl]
 
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
@@ -79,6 +94,19 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
                         mongo.offers.trip_offers,
                     ),
                     default_page_size=app.settings.default_page_size,
+                ),
+                PriceQuoteService(
+                    price_quotes_repository=price_quotes.PriceQuoteContainerRepository(
+                        mongo.offers.price_quotes,
+                        app.settings.default_ttl,
+                    ),
+                    publisher=PriceQuoteProducer(
+                        producer=producer.Producer(
+                            connection=connection,
+                            exchange=types.Exchange("prices"),
+                        ),
+                        routing_key="offers.pricing",
+                    ),
                 ),
             ],
         )
@@ -145,6 +173,27 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
             await offer_importer.consume()
 
 
+async def _gather_price_quotes(
+    app: service.Application[_GatherPriceQuoteSettings],
+) -> None:
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        random.choice(app.settings.mongo_dsn),  # nosec
+    )
+
+    async with types.Connection(app.settings.amqp_dsn) as connection:
+        price_quote_importer = importer.PriceQuoteImporter(
+            consumer_obj=consumer.Consumer(
+                connection=connection,
+                queue_name="{0}_prices".format(app.name),
+                binds=[(types.Exchange("prices"), "offers.result.price")],
+            ),
+            price_quotes_repository=price_quotes.PriceQuoteRepository(
+                collection=mongo.offers.price_quotes,
+            ),
+        )
+        await price_quote_importer.consume()
+
+
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(name="offers")
 
@@ -154,5 +203,10 @@ if __name__ == "__main__":
             name="import",
             callback=_import,
             settings_class=_ImportSettings,
+        ),
+        service.Command(
+            name="pricing",
+            callback=_gather_price_quotes,
+            settings_class=_GatherPriceQuoteSettings,
         ),
     )

@@ -10,11 +10,11 @@ import structlog
 
 from snowfall.project.junction.service.orders.v1alpha import amqp_pb2, models_pb2
 from snowfall.project.junction.service.providers.ask2go import (
+    cache,
     criteria,
     models,
     notifications,
 )
-from snowfall.project.junction.service.providers.ask2go.cache import OfferDetails
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.vendor.ask2go import client, errors
@@ -55,7 +55,7 @@ class BookingHandler(object):
     async def book(
         self,
         task: amqp_pb2.PlaceOrderTask,
-        details: OfferDetails,
+        quote: cache.PriceQuote,
     ) -> models_pb2.Booking:
         new_booking = task.booking
 
@@ -63,7 +63,7 @@ class BookingHandler(object):
             booking_result = await self._make_booking(
                 contact_details=task.contact_details,
                 passengers=task.passengers,
-                details=details,
+                quote=quote,
                 metadata=task.metadata,
             )
         except (errors.Ask2GoError, phonenumbers.NumberParseException) as error:
@@ -137,7 +137,7 @@ class BookingHandler(object):
         self,
         contact_details: models_pb2.ContactDetails,
         passengers: Sequence[models_pb2.Passenger],
-        details: OfferDetails,
+        quote: cache.PriceQuote,
         metadata: amqp_pb2.OrderMetadata,
     ) -> booking.Booking:
         number = phonenumbers.parse(contact_details.phone.e164_number)
@@ -146,8 +146,8 @@ class BookingHandler(object):
         )
 
         booking_result = await self._client.create_booking(
-            pricing_id=details.pricing_id,
-            transaction_id=details.transaction_id,
+            pricing_id=quote.pricing_id,
+            transaction_id=quote.transaction_id,
             passengers=[
                 common.Passenger(
                     first_name=passenger.first_name,

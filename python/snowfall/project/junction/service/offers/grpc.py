@@ -1,6 +1,6 @@
 import grpc
 
-from snowfall.project.junction.service.offers import amqp, offers
+from snowfall.project.junction.service.offers import amqp, offers, price_quotes
 from snowfall.project.junction.service.offers.v1alpha import (
     grpc_pb2,
     grpc_pb2_grpc,
@@ -245,3 +245,44 @@ class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):  # noqa
             details=[detail async for detail in details],
             next_page_token=await details.cursor(),
         )
+
+
+class PriceQuoteService(service.Service, grpc_pb2_grpc.PriceQuoteServiceServicer):
+    def __init__(
+        self,
+        price_quotes_repository: price_quotes.PriceQuoteContainerRepository,
+        publisher: amqp.PriceQuoteProducer,
+    ):
+        self._price_quotes = price_quotes_repository
+        self._publisher = publisher
+
+    def get_name(self) -> str:
+        return grpc_pb2.DESCRIPTOR.services_by_name["PriceQuoteService"].full_name
+
+    def register(self, server: grpc.aio.Server) -> None:
+        grpc_pb2_grpc.add_PriceQuoteServiceServicer_to_server(self, server)
+
+    async def CreatePriceQuote(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.CreatePriceQuoteRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.CreatePriceQuoteResponse:
+        price_quote = await self._price_quotes.create(
+            offer_id=request.offer_id,
+            option_ids=list(request.option_ids),
+            session_token=request.session_token,
+        )
+
+        return grpc_pb2.CreatePriceQuoteResponse(price_quote=price_quote)
+
+    async def GetPriceQuote(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.GetPriceQuoteRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.GetPriceQuoteResponse:
+        price_quote = await self._price_quotes.find_by_id(request.id)
+
+        if not price_quote:
+            await context.abort(grpc.StatusCode.NOT_FOUND)
+
+        return grpc_pb2.GetPriceQuoteResponse(price_quote=price_quote)
