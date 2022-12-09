@@ -12,7 +12,7 @@ class Voucher(endpoints.HTTPEndpoint):
         vouchers_repository: repository.VouchersRepository = lagom.injectable,
     ) -> responses.Response:
         voucher_code = request.path_params["voucherCode"]
-        voucher = await vouchers_repository.find_valid_voucher(voucher_code)
+        voucher = await vouchers_repository.find_voucher(voucher_code)
         if not voucher:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
         return models.JsonApiResponse(

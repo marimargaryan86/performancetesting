@@ -321,6 +321,30 @@ class VouchersRepository(
         pymongo.IndexModel("code", background=True, unique=True),
     ]
 
+    async def find_voucher(
+        self,
+        voucher_code: str,
+    ) -> Optional[models_pb2.Voucher]:
+        voucher = await self._execute(
+            self._collection.find_one,
+            {
+                "code": voucher_code,
+            },
+        )
+        if not voucher:
+            return None
+        if protobuf.protobuf_to_date(voucher.expires_at) < datetime.date.today():
+            valid_status = protobuf.slug_to_enum_value(
+                enum_descriptor=models_pb2.Voucher.Status.DESCRIPTOR,
+                name="valid",
+            )
+            if voucher.status == valid_status:
+                voucher.status = protobuf.slug_to_enum_value(
+                    enum_descriptor=models_pb2.Voucher.Status.DESCRIPTOR,
+                    name="expired",
+                )
+        return voucher
+
     async def find_valid_voucher(
         self,
         voucher_code: str,

@@ -2701,7 +2701,7 @@
               },
               "status": {
                 "type": "string",
-                "enum": ["used", "valid"],
+                "enum": ["used", "valid", "expired"],
                 "example": "valid"
               }
             },

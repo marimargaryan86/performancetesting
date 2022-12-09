@@ -78,6 +78,7 @@ message Voucher {
     STATUS_UNSPECIFIED = 0;
     STATUS_USED = 1;
     STATUS_VALID = 2;
+    STATUS_EXPIRED = 3;
   }
   Status status = 5;
   string payment_intent_id = 6;
