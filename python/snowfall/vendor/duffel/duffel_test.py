@@ -66,6 +66,14 @@ async def test_request_round_trip_offers(duffel_client: client.DuffelClient) -> 
 
 @disable_by_default
 @pytest.mark.asyncio
+async def test_get_offers(duffel_client: client.DuffelClient) -> None:
+    offer_id = "off_0000AQRKj9nf2S3luPitBA"
+    offers = await duffel_client.get_single_offer(offer_id)
+    assert offers is not None
+
+
+@disable_by_default
+@pytest.mark.asyncio
 async def test_order_create(duffel_client: client.DuffelClient) -> None:
     offer_request_create = OffersRequestBuilder()
     offer_request_create.add_passenger(OfferRequestPassenger(pax_type="adult"))

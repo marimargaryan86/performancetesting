@@ -9,11 +9,13 @@ from snowfall.vendor.duffel.builders.order_cancel import OrderCancelRequest
 from snowfall.vendor.duffel.builders.order_request import OrderData
 from snowfall.vendor.duffel.models.cancel_pending import CancelData, CancelResponse
 from snowfall.vendor.duffel.models.errors import ErrorResponse
+from snowfall.vendor.duffel.models.offer import Offer
 from snowfall.vendor.duffel.models.offer_request import (
     OfferRequest,
     OfferRequestResponse,
 )
 from snowfall.vendor.duffel.models.order import Order, OrderResponse
+from snowfall.vendor.duffel.models.single_offer import SingleOfferResponse
 
 
 def _get_response_error_message(response: httpx.Response) -> str:
@@ -28,7 +30,7 @@ def _get_response_error_message(response: httpx.Response) -> str:
     return "can't parse error"
 
 
-class DuffelClient(object):
+class DuffelClient(object):  # noqa: WPS214
     def __init__(
         self,
         api_base_url: str,
@@ -56,6 +58,17 @@ class DuffelClient(object):
         )
 
         return OfferRequestResponse.parse_raw(response.content).response_data
+
+    async def get_single_offer(
+        self,
+        offer_id: str,
+    ) -> Offer:
+        response = await self._make_request(
+            "GET",
+            "air/offers/{id}".format(id=offer_id),
+        )
+
+        return SingleOfferResponse.parse_raw(response.content).response_data
 
     async def order_request(
         self,

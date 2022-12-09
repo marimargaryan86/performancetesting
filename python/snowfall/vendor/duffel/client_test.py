@@ -50,6 +50,28 @@ async def test_offer_request(
 
 
 @pytest.mark.asyncio
+async def test_single_offer(
+    duffel_client: client.DuffelClient,
+    httpx_mock: pytest_httpx.HTTPXMock,
+) -> None:
+    offer_id = "off_0000AQRKj9nf2S3luPitBA"
+    json_res = conftest.load_file_fixture("single_offer.json")
+
+    httpx_mock.add_response(
+        url=_BASE_URL.format(
+            base_path=conftest.API_BASE_URL,
+            path="/air/offers/{id}".format(id=offer_id),
+        ),
+        method="GET",
+        json=json_res,
+    )
+
+    response = await duffel_client.get_single_offer(offer_id)
+
+    assert response
+
+
+@pytest.mark.asyncio
 async def test_order_create(
     duffel_client: client.DuffelClient,
     httpx_mock: pytest_httpx.HTTPXMock,
