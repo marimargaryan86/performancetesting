@@ -23,6 +23,11 @@ overrides:
     rules:
       json-api-no-nested-id: info
   - files:
+      - "junction/mobile_api/openapi.json#/components/parameters/sessionToken"
+    rules:
+      parameter-names: info
+  - files:
       - "junction/pay_api/openapi.json#/components/parameters/currencyId"
     rules:
       no-numeric-ids: info
+

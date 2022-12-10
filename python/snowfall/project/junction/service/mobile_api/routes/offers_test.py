@@ -17,6 +17,7 @@ class TestOffers(object):
 
         response = await authenticated_http_client.post(
             "/offers/searches",
+            headers={"Session-Token": "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn"},
             json={
                 "data": {
                     "type": "trip-offer-searches",
@@ -34,7 +35,6 @@ class TestOffers(object):
                 },
             },
         )
-
         assert response.status_code == status.HTTP_201_CREATED
 
     async def test_get_offer_search_offers(
@@ -50,6 +50,7 @@ class TestOffers(object):
             "/offers/searches/{offerSearchId}/offers".format(
                 offerSearchId="04f83af9-90bb-4a0f-9881-03e1e690f7f5",
             ),
+            headers={"Session-Token": "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn"},
         )
 
         assert response.status_code == status.HTTP_200_OK

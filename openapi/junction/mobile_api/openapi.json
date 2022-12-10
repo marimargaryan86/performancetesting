@@ -1164,6 +1164,11 @@
     },
     "/orders": {
       "post": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sessionToken"
+          }
+        ],
         "summary": "Create Order",
         "tags": [
           "orders"
@@ -1295,6 +1300,11 @@
     },
     "/offers/searches": {
       "post": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sessionToken"
+          }
+        ],
         "summary": "Create Offer Search",
         "tags": [
           "offers"
@@ -1449,7 +1459,7 @@
             "$ref": "#/components/parameters/filterOffersCabinClass"
           },
           {
-            "$ref": "#/components/parameters/offerCurrency"
+            "$ref": "#/components/parameters/sessionToken"
           }
         ],
         "tags": [
@@ -1520,6 +1530,114 @@
         },
         "operationId": "get-offers-searches-id-offers",
         "description": "Used to retrieve all Offer results for an Offer Search."
+      }
+    },
+    "/offers/quotes": {
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sessionToken"
+          }
+        ],
+        "summary": "Create Offer Price Quote",
+        "operationId": "post-offers-quotes",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TripOfferPriceQuote"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "description": "Create a Price Quote for an Offer, to later place an Order for it.",
+        "tags": [
+          "offers"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/TripOfferPriceQuote"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/offers/quotes/{offerPriceQuoteId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/offerPriceQuoteId"
+        }
+      ],
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sessionToken"
+          }
+        ],
+        "summary": "Get Offer Price Quote",
+        "operationId": "get-offers-quotes-id",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TripOfferPriceQuote"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "description": "Get a Price Quote for an Offer.",
+        "tags": [
+          "offers"
+        ]
       }
     },
     "/payments": {
@@ -2202,6 +2320,17 @@
         },
         "description": "Order identifier"
       },
+      "offerPriceQuoteId": {
+        "name": "offerPriceQuoteId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+        },
+        "description": "Offer Price Quote Identifier"
+      },
       "page-cursor": {
         "name": "page[cursor]",
         "in": "query",
@@ -2247,6 +2376,19 @@
         "description": "Customize which related resources to return.",
         "style": "form",
         "explode": false
+      },
+      "sessionToken": {
+        "name": "Session-Token",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "example": "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn",
+          "minLength": 32,
+          "maxLength": 32,
+          "pattern": "^[A-Za-z\\d]{32}$"
+        },
+        "description": "Unique session token that follows the flow until order creation. Used for rate and offer caching."
       },
       "offerInclude": {
         "name": "include",
@@ -2300,17 +2442,6 @@
         "description": "Customize which related resources to return.",
         "style": "form",
         "explode": false
-      },
-      "offerCurrency": {
-        "name": "currency",
-        "in": "query",
-        "required": false,
-        "schema": {
-          "type": "string",
-          "format": "currency",
-          "example": "SEK"
-        },
-        "description": "Requested currency for offers. Default: EUR"
       },
       "orderInclude": {
         "name": "include",
@@ -3273,8 +3404,7 @@
               "relationships": {
                 "type": "object",
                 "required": [
-                  "offer",
-                  "options",
+                  "quote",
                   "journey",
                   "bookings",
                   "payment"
@@ -3302,31 +3432,14 @@
                       }
                     }
                   },
-                  "offer": {
+                  "quote": {
                     "type": "object",
                     "required": [
                       "data"
                     ],
                     "properties": {
                       "data": {
-                        "$ref": "#/components/schemas/OfferIdentifier"
-                      }
-                    },
-                    "writeOnly": true
-                  },
-                  "options": {
-                    "type": "object",
-                    "required": [
-                      "data"
-                    ],
-                    "properties": {
-                      "data": {
-                        "type": "array",
-                        "uniqueItems": true,
-                        "minItems": 1,
-                        "items": {
-                          "$ref": "#/components/schemas/OfferOptionIdentifier"
-                        }
+                        "$ref": "#/components/schemas/TripOfferPriceQuoteIdentifier"
                       }
                     },
                     "writeOnly": true
@@ -3446,12 +3559,10 @@
               "attributes": {
                 "type": "object",
                 "properties": {
-                  "sessionToken": {
+                  "currency": {
                     "type": "string",
-                    "example": "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn",
-                    "minLength": 32,
-                    "maxLength": 32,
-                    "pattern": "^[A-Za-z\\d]{32}$",
+                    "format": "currency",
+                    "example": "SEK",
                     "writeOnly": true
                   },
                   "expiresAt": {
@@ -3554,6 +3665,160 @@
           }
         ],
         "description": "Context for which Trip-related Offers can be found."
+      },
+      "TripOfferPriceQuote": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "example": "trip-offer-price-quotes",
+                "enum": [
+                  "trip-offer-price-quotes"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z",
+                    "readOnly": true
+                  },
+                  "price": {
+                    "$ref": "#/components/schemas/Price"
+                  },
+                  "penalties": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/TripOfferOptionPenalty"
+                    },
+                    "readOnly": true
+                  },
+                  "required": {
+                    "type": "array",
+                    "example": [
+                      "passport-number"
+                    ],
+                    "items": {
+                      "type": "string",
+                      "example": "passport-number",
+                      "enum": [
+                        "date-of-birth",
+                        "nationality",
+                        "expiration-date",
+                        "issuing-country",
+                        "passport-number"
+                      ]
+                    },
+                    "readOnly": true
+                  },
+                  "rules": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/OfferSegmentDetailRule"
+                    },
+                    "readOnly": true
+                  },
+                  "status": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                      "unspecified",
+                      "pending",
+                      "processing",
+                      "completed",
+                      "failed"
+                    ],
+                    "example": "completed"
+                  }
+                },
+                "required": [
+                  "expiresAt",
+                  "price",
+                  "penalties",
+                  "required",
+                  "rules",
+                  "status"
+                ]
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "offer",
+                  "options"
+                ],
+                "properties": {
+                  "offer": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/OfferIdentifier"
+                      }
+                    }
+                  },
+                  "options": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/OfferOptionIdentifier"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "title": "Trip Offer Price Quote"
+      },
+      "TripOfferPriceQuoteIdentifier": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "example": "trip-offer-price-quotes",
+            "enum": [
+              "trip-offer-price-quotes"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ],
+        "type": "object",
+        "description": "",
+        "title": "Trip Offer Price Quote Identifier"
       },
       "TripIdentifier": {
         "title": "Trip Identifier",
@@ -4344,7 +4609,8 @@
         "required": [
           "currency",
           "amount"
-        ]
+        ],
+        "readOnly": true
       },
       "TripOfferGroupDetails": {
         "title": "Trip Offer Group Details",
@@ -4752,23 +5018,7 @@
               },
               "attributes": {
                 "type": "object",
-                "properties": {
-                  "required": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "example": "passport-number",
-                      "enum": [
-                        "date-of-birth",
-                        "nationality",
-                        "expiration-date",
-                        "issuing-country",
-                        "passport-number"
-                      ]
-                    },
-                    "example": ["passport-number"]
-                  }
-                }
+                "properties": {}
               },
               "relationships": {
                 "type": "object",
@@ -4906,8 +5156,7 @@
                 "type": "object",
                 "required": [
                   "price",
-                  "brandName",
-                  "penalties"
+                  "brandName"
                 ],
                 "properties": {
                   "price": {
@@ -4916,13 +5165,6 @@
                   "brandName": {
                     "type": "string",
                     "example": "economy"
-                  },
-                  "penalties": {
-                    "type": "array",
-                    "minItems": 0,
-                    "items": {
-                      "$ref": "#/components/schemas/TripOfferOptionPenalty"
-                    }
                   }
                 }
               },
@@ -4989,7 +5231,6 @@
                 "type": "object",
                 "required": [
                   "cabinClassName",
-                  "rules",
                   "baggageAllowances",
                   "amenities"
                 ],
@@ -4997,13 +5238,6 @@
                   "cabinClassName": {
                     "type": "string",
                     "example": "Economy"
-                  },
-                  "rules": {
-                    "type": "array",
-                    "minItems": 0,
-                    "items": {
-                      "$ref": "#/components/schemas/OfferSegmentDetailRule"
-                    }
                   },
                   "baggageAllowances": {
                     "type": "array",
