@@ -22,7 +22,7 @@ class Settings(application.Settings):
     places_cache_ttl: datetime.timedelta = datetime.timedelta(hours=1)
     otp_cache_ttl: datetime.timedelta = datetime.timedelta(minutes=2)
     offers_rates_cache_ttl: datetime.timedelta = datetime.timedelta(
-        minutes=20,  # noqa: WPS432
+        minutes=45,  # noqa: WPS432
     )
     currency_rate_cache_ttl: datetime.timedelta = datetime.timedelta(
         minutes=10,

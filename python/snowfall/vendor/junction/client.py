@@ -526,6 +526,49 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
             query_parameters=_make_pagination(limit, cursor),
         )
 
+    async def create_offer_quote(
+        self,
+        offer_id: str,
+        option_ids: Sequence[str],
+        session_token: str | None = None,
+    ) -> dict[str, Any]:
+        body = {
+            _DATA_KEY: {
+                _ATTRIBUTES_KEY: {},
+                _RELATIONSHIPS_KEY: {
+                    "offer": {
+                        _DATA_KEY: {
+                            _ID_KEY: offer_id,
+                            _TYPE_KEY: "offers",
+                        },
+                    },
+                    "options": {
+                        _DATA_KEY: [
+                            {
+                                _ID_KEY: option_id,
+                                _TYPE_KEY: "offer-options",
+                            }
+                            for option_id in option_ids
+                        ],
+                    },
+                },
+                _TYPE_KEY: "trip-offer-price-quotes",
+            },
+        }
+        if session_token:
+            body[_ATTRIBUTES_KEY]["sessionToken"] = session_token
+        return await self._make_request(
+            method=_METHOD_POST,
+            url="/offers/quotes",
+            payload=body,
+        )
+
+    async def get_offer_quote_by_id(self, identifier: str) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/offers/quotes/{0}".format(identifier),
+        )
+
     async def get_journeys(
         self,
         limit: Optional[int] = None,

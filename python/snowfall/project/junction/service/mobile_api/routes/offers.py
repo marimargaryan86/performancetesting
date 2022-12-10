@@ -1,12 +1,19 @@
 import datetime
 import decimal
+import json
 import re
+from typing import Optional
 
 import lagom
 from starlette import endpoints, requests, responses, status
 
 from snowfall.project.junction.adapter import errors
-from snowfall.project.junction.service.mobile_api import currencies, repository
+from snowfall.project.junction.service.mobile_api import (
+    currencies,
+    repository,
+    validators,
+)
+from snowfall.project.junction.service.mobile_api.models.cached_rate import CachedRate
 from snowfall.stdlib import money
 from snowfall.stdlib.integration.starlette import (
     models,
@@ -27,15 +34,42 @@ class OfferSearches(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         junction_client: client.JunctionClient = lagom.injectable,
+        offers_rates_repository: repository.OffersRatesRepository = lagom.injectable,
+        currencies_client: currencies.CurrencyClient = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
+        if body.get("currency"):
+            try:
+                rate = await currencies_client.get_rate(
+                    "EUR",  # type: ignore[arg-type]
+                    body["currency"],
+                    currencies_client.get_ttl_hash(),  # type: ignore[arg-type]
+                )
+            except errors.NotFoundError as exc:
+                return models.JsonApiResponse(
+                    models.Body(
+                        errors=[
+                            models.Error(
+                                status=str(status.HTTP_400_BAD_REQUEST),
+                                code="unsupported_currency",
+                                detail=exc.args[0],
+                            ),
+                        ],
+                    ),
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                )
+            await offers_rates_repository.create(
+                # TODO: This will not work with multiple currencies simultaneously
+                identifier=request.headers.get("Session-Token", ""),
+                atr_value=json.dumps({"rate": rate, "currency": body["currency"]}),
+            )
         offer_search = await junction_client.create_offer_search(
             trip_ids=body["trips"],
             passengers_dates_of_birth=[
                 datetime.date.fromisoformat(passenger["dateOfBirth"])
                 for passenger in body["passengers"]
             ],
-            session_token=body.get("sessionToken"),
+            session_token=request.headers.get("Session-Token"),
         )
         return models.JsonApiResponse(
             models.Body(
@@ -65,12 +99,13 @@ class OfferSearch(endpoints.HTTPEndpoint):
 
 
 class OffersByOfferSearch(endpoints.HTTPEndpoint):
-    async def get(  # noqa: C901,WPS231,WPS210
+    @validators.get_session_token_rates
+    async def get(  # noqa: WPS210
         self,
         request: requests.Request,
+        cached_rate: Optional[CachedRate],
         junction_client: client.JunctionClient = lagom.injectable,
         offers_rates_repository: repository.OffersRatesRepository = lagom.injectable,
-        currencies_client: currencies.CurrencyClient = lagom.injectable,
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
         query_string = request.scope["query_string"]
@@ -89,49 +124,18 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
             limit=pagination.limit,
         )
 
-        if request.query_params.get("currency"):
-            try:
-                rate = await currencies_client.get_rate(
-                    "EUR",  # type: ignore[arg-type]
-                    query_string["currency"].code,
-                    currencies_client.get_ttl_hash(),  # type: ignore[arg-type]
-                )
-            except errors.NotFoundError as exc:
-                return models.JsonApiResponse(
-                    models.Body(
-                        errors=[
-                            models.Error(
-                                status=str(status.HTTP_400_BAD_REQUEST),
-                                code="unsupported_currency",
-                                detail=exc.args[0],
-                            ),
-                        ],
-                    ),
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                )
-            if offers_response.get("included"):
-                for include in offers_response.get("included", []):
-                    if include["type"] == "offer-options":
-                        currency = query_string.get("currency")
-                        new_money = money.from_string(
-                            include["attributes"]["price"]["amount"],
-                            money.Currency(include["attributes"]["price"]["currency"]),
-                        ).convert(
-                            currency,
-                            decimal.Decimal(rate),
-                        )
-                        include["attributes"]["price"]["amount"] = str(new_money)
-                        include["attributes"]["price"]["currency"] = currency.code
-                        await offers_rates_repository.create(  # noqa: WPS220
-                            identifier="_".join(
-                                [
-                                    include["id"],
-                                    "EUR",
-                                    query_string.get("currency").code,
-                                ],
-                            ),
-                            atr_value=str(rate),
-                        )
+        if cached_rate:
+            for include in offers_response.get("included", []):
+                if include["type"] == "offer-options":
+                    new_money = money.from_string(
+                        include["attributes"]["price"]["amount"],
+                        money.Currency(include["attributes"]["price"]["currency"]),
+                    ).convert(
+                        money.Currency(cached_rate.currency),
+                        decimal.Decimal(cached_rate.rate),
+                    )
+                    include["attributes"]["price"]["amount"] = str(new_money)
+                    include["attributes"]["price"]["currency"] = cached_rate.currency
         response_body = models.Body(
             data=offers_response["data"],
             links={
