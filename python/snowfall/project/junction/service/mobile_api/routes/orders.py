@@ -1,6 +1,6 @@
 import copy
 import decimal
-from typing import Any, Mapping, Optional, Sequence, Tuple
+from typing import Any, Mapping, Optional, Tuple
 
 import httpx
 import lagom
@@ -161,7 +161,7 @@ class Orders(endpoints.HTTPEndpoint):
         voucher_code = body.get("voucher", "")
         (correct_amount, correct_state) = await check_payment_amount_and_state(
             payment,
-            body["options"],
+            body["quote"],
             voucher,
             junction_client,
             cached_rate,
@@ -269,41 +269,38 @@ class Orders(endpoints.HTTPEndpoint):
         )
 
 
-async def check_payment_amount_and_state(  # noqa: WPS210
+async def check_payment_amount_and_state(
     payment_intent_id: str,
-    offer_options: Sequence[str],
+    quote: str,
     voucher: Optional[models_pb2.Voucher],
     junction_client: client.JunctionClient,
     cached_rate: Optional[CachedRate],
 ) -> Tuple[bool, bool]:
     pi = stripe.PaymentIntent.retrieve(payment_intent_id)
-    offer_amount = 0
-    for offer_option in offer_options:
-        offer_option_response = (
-            await junction_client.get_offer_options_by_offer_option_id(
-                offer_option,
-            )
-        )
-        rate = decimal.Decimal(1)
-        if pi["currency"].upper() != "EUR":
-            if not cached_rate:
-                return False, False
-            rate = decimal.Decimal(cached_rate.rate)
-        offer_money = money.from_string(
-            offer_option_response["data"]["attributes"]["price"]["amount"],
-            money.Currency(
-                offer_option_response["data"]["attributes"]["price"]["currency"],
-            ),
-        ).convert(
-            money.Currency(pi["currency"].upper()),
-            rate,
-        )
 
-        offer_amount += offer_money.amount
+    quote_response = await junction_client.get_offer_quote_by_id(
+        quote,
+    )
+    rate = decimal.Decimal(1)
+    if pi["currency"].upper() != "EUR":
+        if not cached_rate:
+            raise exceptions.HTTPException(status.HTTP_502_BAD_GATEWAY)
+        rate = decimal.Decimal(cached_rate.rate)
+    quote_money = money.from_string(
+        quote_response["data"]["attributes"]["price"]["amount"],
+        money.Currency(
+            quote_response["data"]["attributes"]["price"]["currency"],
+        ),
+    ).convert(
+        money.Currency(pi["currency"].upper()),
+        rate,
+    )
+
+    quote_amount = quote_money.amount
     if voucher:
-        offer_amount -= money.from_protobuf(voucher.price).amount
+        quote_amount -= money.from_protobuf(voucher.price).amount
     return (
-        pi["amount"] == max(offer_amount, _MIN_CHARGE),
+        pi["amount"] == max(quote_amount, _MIN_CHARGE),
         pi["status"] == "requires_capture",
     )
 
