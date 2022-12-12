@@ -44,6 +44,13 @@ def not_found_error_handler(
     return error_response_from_status(status.HTTP_404_NOT_FOUND)
 
 
+def service_unavailable_error_handler(
+    request: requests.Request,
+    exc: Exception,
+) -> responses.Response:
+    return error_response_from_status(status.HTTP_503_SERVICE_UNAVAILABLE)
+
+
 async def cursor_error_handler(
     request: requests.Request,
     exc: Exception,

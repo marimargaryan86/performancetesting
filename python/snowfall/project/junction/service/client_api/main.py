@@ -132,6 +132,10 @@ def _factory(
             errors.NotFoundError,
             handlers.not_found_error_handler,
         )
+        asgi_app.add_exception_handler(
+            errors.ServiceUnavailableError,
+            handlers.service_unavailable_error_handler,
+        )
 
         return asgi_app
 

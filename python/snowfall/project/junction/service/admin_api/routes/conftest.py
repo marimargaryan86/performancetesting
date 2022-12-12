@@ -29,7 +29,6 @@ def _create_app(
         openapi_path=openapi_path,
     )
     app.add_exception_handler(cursor.CursorError, handlers.cursor_error_handler)
-    app.add_exception_handler(errors.CursorError, handlers.cursor_error_handler)
     app.add_exception_handler(errors.NotFoundError, handlers.not_found_error_handler)
 
     return app

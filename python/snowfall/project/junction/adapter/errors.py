@@ -17,6 +17,10 @@ class NotFoundError(Exception):
     """Raised when a resource is not found."""
 
 
+class ServiceUnavailableError(Exception):
+    """Raised when a resource is not found."""
+
+
 class UnhandledError(Exception):
     """Raised when an unhandled error occurs."""
 
@@ -29,8 +33,11 @@ async def handle_grpc_errors(grpc_request: Awaitable[Proto]) -> Proto:
             if isinstance(status, error_details_pb2.BadRequest):
                 _handle_bad_request(status, err)
 
-        if err.code() == grpc.StatusCode.NOT_FOUND:
-            raise NotFoundError(err.details()) from err
+        match err.code():
+            case grpc.StatusCode.NOT_FOUND:
+                raise NotFoundError(err.details()) from err
+            case grpc.StatusCode.UNAVAILABLE:
+                raise ServiceUnavailableError(err.details()) from err
 
         raise UnhandledError() from err
 
