@@ -52,7 +52,7 @@ class Bound(object):
                 "currency": sell_currency,
             },
             "otherCurrency": buy_currency,
-            "sendKnown": True,
+            "sellKnown": True,
         }
 
         response = await self._http_client.post(
