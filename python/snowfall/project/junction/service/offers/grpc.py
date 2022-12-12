@@ -272,6 +272,7 @@ class PriceQuoteService(service.Service, grpc_pb2_grpc.PriceQuoteServiceServicer
             option_ids=list(request.option_ids),
             session_token=request.session_token,
         )
+        await self._publisher.publish(price_quote)
 
         return grpc_pb2.CreatePriceQuoteResponse(price_quote=price_quote)
 
