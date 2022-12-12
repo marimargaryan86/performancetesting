@@ -1,4 +1,9 @@
-from snowfall.project.junction.service.providers.duffel import config, offers, orders
+from snowfall.project.junction.service.providers.duffel import (
+    config,
+    offers,
+    orders,
+    pricing,
+)
 from snowfall.project.junction.service.providers.duffel.search import searches
 from snowfall.stdlib import service
 
@@ -14,6 +19,11 @@ if __name__ == "__main__":
         service.Command(
             name="searches",
             callback=searches.searches,
+            settings_class=config.SearchesSettings,
+        ),
+        service.Command(
+            name="pricing",
+            callback=pricing.price_quotes,
             settings_class=config.SearchesSettings,
         ),
         service.Command(

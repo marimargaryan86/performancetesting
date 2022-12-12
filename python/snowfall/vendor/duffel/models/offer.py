@@ -8,21 +8,15 @@ from snowfall.vendor.duffel.models.common import Airline, LoyaltyProgrammeAccoun
 from snowfall.vendor.duffel.models.offer_slice import OfferSlice
 
 
-class OfferConditionChangeBeforeDeparture(DuffelBaseModel):
-    allowed: bool
-    penalty_amount: str | None
-    penalty_currency: str | None
-
-
-class OfferConditionRefundBeforeDeparture(DuffelBaseModel):
+class OfferCondition(DuffelBaseModel):
     allowed: bool
     penalty_amount: str | None
     penalty_currency: str | None
 
 
 class OfferConditions(DuffelBaseModel):
-    change_before_departure: OfferConditionChangeBeforeDeparture | None
-    refund_before_departure: OfferConditionRefundBeforeDeparture | None
+    change_before_departure: OfferCondition | None
+    refund_before_departure: OfferCondition | None
 
 
 class PaymentRequirements(DuffelBaseModel):

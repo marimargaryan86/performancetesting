@@ -3,7 +3,7 @@ import datetime
 import pytest
 import pytest_httpx
 
-from snowfall.vendor.duffel import client, conftest
+from snowfall.vendor.duffel import client, conftest, errors
 from snowfall.vendor.duffel.builders.offer_request import (
     OfferRequestPassenger,
     OfferRequestSlice,
@@ -69,6 +69,56 @@ async def test_single_offer(
     response = await duffel_client.get_single_offer(offer_id)
 
     assert response
+
+
+@pytest.mark.asyncio
+async def test_error(
+    duffel_client: client.DuffelClient,
+    httpx_mock: pytest_httpx.HTTPXMock,
+) -> None:
+    offer_id = "off_0000AQRKj9nf2S3luPitBA"
+    json_res = conftest.load_file_fixture("errors.json")
+    expected_title = "422: Can't book multiple offers from the same offer request"
+
+    httpx_mock.add_response(
+        url=_BASE_URL.format(
+            base_path=conftest.API_BASE_URL,
+            path="/air/offers/{id}".format(id=offer_id),
+        ),
+        status_code=422,
+        method="GET",
+        json=json_res,
+    )
+
+    with pytest.raises(errors.ServiceError) as excinfo:
+        await duffel_client.get_single_offer(offer_id)
+
+    assert str(excinfo.value) == expected_title  # noqa: WPS441
+
+
+@pytest.mark.asyncio
+async def test_error_with_source_str(
+    duffel_client: client.DuffelClient,
+    httpx_mock: pytest_httpx.HTTPXMock,
+) -> None:
+    offer_id = "off_0000AQRKj9nf2S3luPitBA"
+    json_res = conftest.load_file_fixture("order_create_error.json")
+    expected_title = "500: Internal Airline Error"
+
+    httpx_mock.add_response(
+        url=_BASE_URL.format(
+            base_path=conftest.API_BASE_URL,
+            path="/air/offers/{id}".format(id=offer_id),
+        ),
+        status_code=500,
+        method="GET",
+        json=json_res,
+    )
+
+    with pytest.raises(errors.ServiceError) as excinfo:
+        await duffel_client.get_single_offer(offer_id)
+
+    assert str(excinfo.value) == expected_title  # noqa: WPS441
 
 
 @pytest.mark.asyncio

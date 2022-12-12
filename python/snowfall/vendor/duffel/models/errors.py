@@ -18,7 +18,7 @@ class Source(DuffelBaseModel):
 class Error(DuffelBaseModel):
     error_type: str | None = pydantic.Field(..., alias="type")
     title: str | None
-    source: Source | None
+    source: Source | str | None
     message: str | None
     documentation_url: str | None
     code: str | None

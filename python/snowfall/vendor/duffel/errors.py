@@ -1,6 +1,6 @@
-class DistribusionError(Exception):
-    """Raised when there is an Distribusion-related issue."""
+class DuffelError(Exception):
+    """Raised when there is an Duffel-related issue."""
 
 
-class ServiceError(DistribusionError):
-    """Raised when the Distribusion service is unhealthy."""
+class ServiceError(DuffelError):
+    """Raised when the Duffel service is unhealthy."""
