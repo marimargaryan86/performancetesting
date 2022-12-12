@@ -65,6 +65,12 @@ job "dogfood-ui-http" {
       port "prometheus" {}
     }
 
+    scaling {
+      enabled = false
+      min     = 1
+      max     = 20
+    }
+
     service {
       name = "dogfood-ui-${var.environment}"
       port = "http"

@@ -45,6 +45,12 @@ job "passenger-name-records-grpc" {
       mode     = "delay"
     }
 
+    scaling {
+      enabled = false
+      min     = 1
+      max     = 20
+    }
+
     network {
       mode = "bridge"
       port "grpc" {}

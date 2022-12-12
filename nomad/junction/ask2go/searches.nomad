@@ -50,6 +50,12 @@ job "ask2go-searches" {
       port "prometheus" {}
     }
 
+    scaling {
+      enabled = false
+      min     = 1
+      max     = 20
+    }
+
     service {
       name = "ask2go-searches-${var.environment}"
       port = "prometheus"

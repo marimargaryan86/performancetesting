@@ -50,6 +50,12 @@ job "save-a-train-orders" {
       port "prometheus" {}
     }
 
+    scaling {
+      enabled = false
+      min     = 1
+      max     = 20
+    }
+
     service {
       name = "save-a-train-${var.environment}"
       port = "prometheus"

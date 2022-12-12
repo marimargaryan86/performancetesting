@@ -50,6 +50,12 @@ job "currencies" {
       port "grpc" {}
     }
 
+    scaling {
+      enabled = false
+      min     = 1
+      max     = 20
+    }
+
     service {
       name = "currencies-${var.environment}"
       port = "grpc"

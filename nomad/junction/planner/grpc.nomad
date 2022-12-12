@@ -51,6 +51,12 @@ job "planner-grpc" {
       port "prometheus" {}
     }
 
+    scaling {
+      enabled = false
+      min     = 1
+      max     = 20
+    }
+
     service {
       name = "planner-${var.environment}"
       port = "grpc"

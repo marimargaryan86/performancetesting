@@ -51,6 +51,12 @@ job "authentication-grpc" {
       port "prometheus" {}
     }
 
+    scaling {
+      enabled = false
+      min     = 1
+      max     = 20
+    }
+
     service {
       name = "authentication-${var.environment}"
       port = "grpc"

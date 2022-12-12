@@ -51,6 +51,12 @@ job "trips-grpc" {
       port "prometheus" {}
     }
 
+    scaling {
+      enabled = false
+      min     = 1
+      max     = 20
+    }
+
     service {
       name = "trips-${var.environment}"
       port = "grpc"

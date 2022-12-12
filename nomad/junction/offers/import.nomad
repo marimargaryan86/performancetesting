@@ -50,6 +50,12 @@ job "offers-import" {
       port "prometheus" {}
     }
 
+    scaling {
+      enabled = false
+      min     = 1
+      max     = 20
+    }
+
     service {
       name = "offers-import-${var.environment}"
       port = "prometheus"

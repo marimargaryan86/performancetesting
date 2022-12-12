@@ -51,6 +51,12 @@ job "geodata-grpc" {
       port "prometheus" {}
     }
 
+    scaling {
+      enabled = false
+      min     = 1
+      max     = 20
+    }
+
     service {
       name = "geodata-${var.environment}"
       port = "grpc"

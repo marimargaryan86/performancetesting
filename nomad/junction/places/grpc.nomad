@@ -51,6 +51,12 @@ job "places-grpc" {
       port "prometheus" {}
     }
 
+    scaling {
+      enabled = false
+      min     = 1
+      max     = 20
+    }
+
     service {
       name = "places-${var.environment}"
       port = "grpc"

@@ -59,6 +59,12 @@ job "res-se-mobile-api-http" {
       port "prometheus" {}
     }
 
+    scaling {
+      enabled = false
+      min     = 1
+      max     = 20
+    }
+
     service {
       name = "res-se-mobile-api-${var.environment}"
       port = "http"

@@ -58,6 +58,12 @@ job "pay-web" {
       port "http" {}
     }
 
+    scaling {
+      enabled = false
+      min     = 1
+      max     = 20
+    }
+
     service {
       name = "pay-web-${var.environment}"
       port = "http"

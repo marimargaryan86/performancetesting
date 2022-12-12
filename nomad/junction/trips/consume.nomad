@@ -50,6 +50,12 @@ job "trips-consume" {
       port "prometheus" {}
     }
 
+    scaling {
+      enabled = false
+      min     = 1
+      max     = 20
+    }
+
     service {
       name = "trips-consume-${var.environment}"
       port = "prometheus"

@@ -60,6 +60,12 @@ job "pay-api-http" {
       port "prometheus" {}
     }
 
+    scaling {
+      enabled = false
+      min     = 1
+      max     = 20
+    }
+
     service {
       name = "pay-api-${var.environment}"
       port = "http"

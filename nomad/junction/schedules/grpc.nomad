@@ -51,6 +51,12 @@ job "schedules-grpc" {
       port "prometheus" {}
     }
 
+    scaling {
+      enabled = false
+      min     = 1
+      max     = 20
+    }
+
     service {
       name = "schedules-${var.environment}"
       port = "grpc"

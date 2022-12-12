@@ -45,6 +45,12 @@ job "orders-import" {
       mode     = "delay"
     }
 
+    scaling {
+      enabled = false
+      min     = 1
+      max     = 20
+    }
+
     network {
       mode = "bridge"
       port "prometheus" {}

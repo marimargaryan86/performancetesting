@@ -51,6 +51,12 @@ job "orders-grpc" {
       port "prometheus" {}
     }
 
+    scaling {
+      enabled = false
+      min     = 1
+      max     = 20
+    }
+
     service {
       name = "orders-${var.environment}"
       port = "grpc"
