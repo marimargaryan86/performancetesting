@@ -43,13 +43,15 @@ class PriceQuoteProducer(object):
         price_quote_container: models_pb2.PriceQuoteContainer,
     ) -> None:
         await asyncio.gather(
-            self._producer.publish(
-                amqp_pb2.TripPriceQuoteTask(
-                    price_quote_container_id=price_quote_container.id,
-                    option_id=option_id,
-                    session_token=price_quote_container.session_token,
-                ),
-                self._routing_key,
-            )
-            for option_id in price_quote_container.option_ids
+            *[
+                self._producer.publish(
+                    amqp_pb2.TripPriceQuoteTask(
+                        price_quote_container_id=price_quote_container.id,
+                        option_id=option_id,
+                        session_token=price_quote_container.session_token,
+                    ),
+                    self._routing_key,
+                )
+                for option_id in price_quote_container.option_ids
+            ],
         )
