@@ -3694,7 +3694,16 @@
                     "readOnly": true
                   },
                   "price": {
-                    "$ref": "#/components/schemas/Price"
+                    "readOnly": true,
+                    "nullable": true,
+                    "anyOf": [
+                      {
+                        "$ref": "#/components/schemas/Price"
+                      },
+                      {
+                        "nullable": true
+                      }
+                    ]
                   },
                   "penalties": {
                     "type": "array",
@@ -4609,8 +4618,7 @@
         "required": [
           "currency",
           "amount"
-        ],
-        "readOnly": true
+        ]
       },
       "TripOfferGroupDetails": {
         "title": "Trip Offer Group Details",

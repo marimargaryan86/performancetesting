@@ -47,7 +47,7 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             name="OffersByOfferSearch",
         ),
         integration.route("/offers/quotes", quotes.OfferQuotes),
-        integration.route("/offers/quotes{offerPriceQuoteId}", quotes.OfferQuote),
+        integration.route("/offers/quotes/{offerPriceQuoteId}", quotes.OfferQuote),
         integration.route("/verification-code", users.OTPGenerate),
         integration.route("/verification-code/{userEmail}", users.OTPVerify),
         integration.route("/users/sessions", users.Session),

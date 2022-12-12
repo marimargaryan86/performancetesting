@@ -534,7 +534,6 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
     ) -> dict[str, Any]:
         body = {
             _DATA_KEY: {
-                _ATTRIBUTES_KEY: {},
                 _RELATIONSHIPS_KEY: {
                     "offer": {
                         _DATA_KEY: {
@@ -556,7 +555,9 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
             },
         }
         if session_token:
-            body[_ATTRIBUTES_KEY]["sessionToken"] = session_token
+            body[_DATA_KEY][_ATTRIBUTES_KEY] = {"sessionToken": session_token}
+        else:
+            body[_DATA_KEY][_ATTRIBUTES_KEY] = {}
         return await self._make_request(
             method=_METHOD_POST,
             url="/offers/quotes",

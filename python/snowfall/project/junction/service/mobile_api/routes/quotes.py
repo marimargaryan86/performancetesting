@@ -49,22 +49,19 @@ class OfferQuote(endpoints.HTTPEndpoint):
         offer_quote_response = await junction_client.get_offer_quote_by_id(
             request.path_params["offerPriceQuoteId"],
         )
-        if cached_rate:
+        attributes = offer_quote_response[_DATA_KEY][_ATTRIBUTES_KEY]
+        if cached_rate and attributes["status"] == "completed":
             new_money = money.from_string(
-                offer_quote_response[_DATA_KEY][_ATTRIBUTES_KEY]["price"]["amount"],
+                attributes["price"]["amount"],
                 money.Currency(
-                    offer_quote_response[_DATA_KEY][_ATTRIBUTES_KEY]["price"][
-                        "currency"
-                    ],
+                    attributes["price"]["currency"],
                 ),
             ).convert(
                 money.Currency(cached_rate.currency),
                 decimal.Decimal(cached_rate.rate),
             )
-            offer_quote_response[_DATA_KEY][_ATTRIBUTES_KEY]["price"]["amount"] = str(
+            attributes["price"]["amount"] = str(
                 new_money,
             )
-            offer_quote_response[_DATA_KEY][_ATTRIBUTES_KEY]["price"][
-                "currency"
-            ] = cached_rate.currency
+            attributes["price"]["currency"] = cached_rate.currency
         return models.JsonApiResponse(models.Body(data=offer_quote_response["data"]))
