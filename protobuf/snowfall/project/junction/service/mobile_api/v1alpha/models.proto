@@ -64,6 +64,8 @@ message MobileOrder {
   string user_id = 3;
   string voucher_code = 5;
   google.protobuf.Timestamp created_at = 4;
+  float rate = 6;
+  string currency = 7;
 }
 
 message Voucher {

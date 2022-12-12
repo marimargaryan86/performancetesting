@@ -1,5 +1,6 @@
+import copy
 import decimal
-from typing import Any, Optional, Sequence, Tuple
+from typing import Any, Mapping, Optional, Sequence, Tuple
 
 import httpx
 import lagom
@@ -13,6 +14,7 @@ from snowfall.project.junction.service.mobile_api import (
     smtp,
     validators,
 )
+from snowfall.project.junction.service.mobile_api.models.cached_rate import CachedRate
 from snowfall.project.junction.service.mobile_api.tasks import orders
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib import money
@@ -87,6 +89,13 @@ class Order(endpoints.HTTPEndpoint):
                     "type": "vouchers",
                 },
             }
+
+        if mobile_order.rate and mobile_order.currency:
+            order_response = _convert_junction_order_currency(
+                order_response,
+                mobile_order,
+            )
+
         response_body = stdlib_models.Body(data=order_response["data"])
 
         if order_response.get("included"):
@@ -114,6 +123,11 @@ class Orders(endpoints.HTTPEndpoint):
                     [],
                 ),
             )
+            if mobile_order.rate and mobile_order.currency:
+                order_response = _convert_junction_order_currency(
+                    order_response,
+                    mobile_order,
+                )
             order_response["data"]["relationships"]["payment"] = {
                 "data": {
                     "id": mobile_order.payment_intent_id,
@@ -130,14 +144,16 @@ class Orders(endpoints.HTTPEndpoint):
         return stdlib_models.JsonApiResponse(response_body)
 
     @validators.voucher_validator
+    @validators.get_session_token_rates
     async def post(  # noqa: WPS211, WPS210, WPS217, C901
         self,
         request: requests.Request,
         voucher: Optional[models_pb2.Voucher],
+        cached_rate: Optional[CachedRate],
+        offers_rates_repository: repository.OffersRatesRepository = lagom.injectable,
         orders_repository: repository.OrdersRepository = lagom.injectable,
         junction_client: client.JunctionClient = lagom.injectable,
         smtp_client: smtp.EmailClient = lagom.injectable,
-        offers_rates_repository: repository.OffersRatesRepository = lagom.injectable,
         vouchers_repository: repository.VouchersRepository = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
@@ -148,7 +164,7 @@ class Orders(endpoints.HTTPEndpoint):
             body["options"],
             voucher,
             junction_client,
-            offers_rates_repository,
+            cached_rate,
         )
         if not correct_amount:
             stripe.PaymentIntent.cancel(payment)
@@ -214,6 +230,9 @@ class Orders(endpoints.HTTPEndpoint):
             payment_intent_id=payment,
             user_id=request.user.username,
         )
+        if cached_rate:
+            mobile_order.rate = cached_rate.rate
+            mobile_order.currency = cached_rate.currency
         try:
             spnr = junction_order["included"][0]["attributes"]["reference"]
         except (KeyError, IndexError):
@@ -255,7 +274,7 @@ async def check_payment_amount_and_state(  # noqa: WPS210
     offer_options: Sequence[str],
     voucher: Optional[models_pb2.Voucher],
     junction_client: client.JunctionClient,
-    offers_rates_repository: repository.OffersRatesRepository,
+    cached_rate: Optional[CachedRate],
 ) -> Tuple[bool, bool]:
     pi = stripe.PaymentIntent.retrieve(payment_intent_id)
     offer_amount = 0
@@ -267,18 +286,9 @@ async def check_payment_amount_and_state(  # noqa: WPS210
         )
         rate = decimal.Decimal(1)
         if pi["currency"].upper() != "EUR":
-            rate_str = await offers_rates_repository.get(
-                "_".join(
-                    [
-                        offer_option_response["data"]["id"],
-                        "EUR",
-                        pi["currency"].upper(),
-                    ],
-                ),
-            )
-            if not rate_str:
+            if not cached_rate:
                 return False, False
-            rate = decimal.Decimal(rate_str)
+            rate = decimal.Decimal(cached_rate.rate)
         offer_money = money.from_string(
             offer_option_response["data"]["attributes"]["price"]["amount"],
             money.Currency(
@@ -296,3 +306,22 @@ async def check_payment_amount_and_state(  # noqa: WPS210
         pi["amount"] == max(offer_amount, _MIN_CHARGE),
         pi["status"] == "requires_capture",
     )
+
+
+def _convert_junction_order_currency(
+    order_response: Mapping[str, Any],
+    mobile_order: models_pb2.MobileOrder,
+) -> dict[str, Any]:
+    order_response = copy.deepcopy(order_response)
+    for include in order_response.get("included", []):
+        if include["type"] == "trip-bookings":
+            new_money = money.from_string(
+                include["attributes"]["totalPrice"]["amount"],
+                money.Currency(include["attributes"]["totalPrice"]["currency"]),
+            ).convert(
+                money.Currency(mobile_order.currency),
+                decimal.Decimal(mobile_order.rate),
+            )
+            include["attributes"]["totalPrice"]["amount"] = str(new_money)
+            include["attributes"]["totalPrice"]["currency"] = mobile_order.currency
+    return dict(order_response)
