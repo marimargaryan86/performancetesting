@@ -12,12 +12,12 @@ logging.getLogger().setLevel(logging.INFO)
 @pytest.mark.integration
 async def test_get_passenger_genders(
     host: str,
-    client: JunctionClient,
+    junction_client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
-    response = await client.get_passenger_genders()
+    response = await junction_client.get_passenger_genders()
     logging.info("get_passenger_genders: %s", json.dumps(response, indent=4))
 
     for data_item in response["data"]:
@@ -32,19 +32,19 @@ async def test_get_passenger_genders(
 @pytest.mark.integration
 async def test_get_passenger_gender(
     host: str,
-    client: JunctionClient,
+    junction_client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
-    response_genders = await client.get_passenger_genders()
+    response_genders = await junction_client.get_passenger_genders()
 
     gender_ids = []
     for data_item in response_genders["data"]:
         gender_ids.append(data_item["id"])
 
     for gender_id in gender_ids:
-        response_gender = await client.get_passenger_gender(gender_id)
+        response_gender = await junction_client.get_passenger_gender(gender_id)
 
         logging.info("get_passenger_gender: %s", json.dumps(response_gender, indent=4))
 
@@ -64,12 +64,12 @@ async def test_get_passenger_gender(
 @pytest.mark.integration
 async def test_get_passenger_titles(
     host: str,
-    client: JunctionClient,
+    junction_client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
-    response = await client.get_passenger_titles()
+    response = await junction_client.get_passenger_titles()
     logging.info("get_passenger_titles: %s", json.dumps(response, indent=4))
 
     for data_item in response["data"]:
@@ -84,19 +84,19 @@ async def test_get_passenger_titles(
 @pytest.mark.integration
 async def test_get_passenger_title(
     host: str,
-    client: JunctionClient,
+    junction_client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
-    response_titles = await client.get_passenger_titles()
+    response_titles = await junction_client.get_passenger_titles()
 
     title_ids = []
     for data_item in response_titles["data"]:
         title_ids.append(data_item["id"])
 
     for title_id in title_ids:
-        response_title = await client.get_passenger_title(title_id)
+        response_title = await junction_client.get_passenger_title(title_id)
 
         logging.info("get_passenger_gender: %s", json.dumps(response_title, indent=4))
 

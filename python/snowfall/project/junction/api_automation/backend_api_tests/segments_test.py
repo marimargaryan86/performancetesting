@@ -18,13 +18,13 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_get_segment_by_id(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
     trip_search_id = await return_trip_search_id(
-        client,
+        junction_client,
         departure_after,
         destination,
         origin,
@@ -33,14 +33,17 @@ async def test_get_segment_by_id(
 
     time.sleep(5)
 
-    segment_id = await return_segment_id_from_trip_search_id(client, trip_search_id)
+    segment_id = await return_segment_id_from_trip_search_id(
+        junction_client,
+        trip_search_id,
+    )
 
     logging.info("segment_id: %s", segment_id)
     assert (
         is_valid_uuid(segment_id, 5) is True
     ), "segment_id uuid must be in uuid v5 format"
 
-    r3 = await client.segments().get_segment_by_id(segment_id)
+    r3 = await junction_client.segments().get_segment_by_id(segment_id)
     logging.info("get_segment_by_id: %s", json.dumps(r3, indent=4))
 
     assert r3["data"]["id"] == segment_id, "segment_id should match"
@@ -48,13 +51,13 @@ async def test_get_segment_by_id(
 
 @pytest.mark.integration
 async def test_get_legs_by_segment_id(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
     trip_search_id = await return_trip_search_id(
-        client,
+        junction_client,
         departure_after,
         destination,
         origin,
@@ -63,9 +66,12 @@ async def test_get_legs_by_segment_id(
 
     time.sleep(5)
 
-    segment_id = await return_segment_id_from_trip_search_id(client, trip_search_id)
+    segment_id = await return_segment_id_from_trip_search_id(
+        junction_client,
+        trip_search_id,
+    )
 
-    r1 = await client.legs().get_legs_by_segment_id(
+    r1 = await junction_client.legs().get_legs_by_segment_id(
         segment_id,
     )
     logging.info("get_legs_by_segment_id: %s", json.dumps(r1, indent=4))
@@ -75,10 +81,10 @@ async def test_get_legs_by_segment_id(
 
 
 async def return_segment_id_from_trip_search_id(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     trip_search_id: str,
 ) -> str:
-    r2 = await client.trips().get_trips_by_trip_search_id(trip_search_id)
+    r2 = await junction_client.trips().get_trips_by_trip_search_id(trip_search_id)
     logging.info("get_trips_by_trip_search_id response: %s", json.dumps(r2, indent=4))
     relationships = r2["data"][0]["relationships"]
 

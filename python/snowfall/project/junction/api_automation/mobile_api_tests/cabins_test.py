@@ -3,7 +3,7 @@ import logging
 
 import pytest
 
-from snowfall.vendor.junction.client import JunctionClient
+from snowfall.vendor.junction.client import MobileApiClient
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -13,9 +13,9 @@ logging.getLogger().setLevel(logging.INFO)
 async def test_list_cabin_classes(
     protocol: str,
     host: str,
-    client: JunctionClient,
+    mobile_client: MobileApiClient,
 ) -> None:
-    response = await client.list_cabin_classes()
+    response = await mobile_client.list_cabin_classes()
     logging.info("list_cabin_classes: %s", json.dumps(response, indent=4))
     assert response["data"][0]["id"] == "unspecified"
     assert response["data"][1]["id"] == "economy"
@@ -26,20 +26,20 @@ async def test_list_cabin_classes(
 
 @pytest.mark.integration
 async def test_get_cabin_class(
-    client: JunctionClient,
+    mobile_client: MobileApiClient,
 ) -> None:
-    cabin_classes_ids = await return_cabin_classes_ids(client)
+    cabin_classes_ids = await return_cabin_classes_ids(mobile_client)
 
     for cabin_class_id in cabin_classes_ids:
-        r1 = await client.get_cabin_class(cabin_class_id)
+        r1 = await mobile_client.get_cabin_class(cabin_class_id)
         logging.info("get_cabin_class: %s", json.dumps(r1, indent=4))
         assert r1["data"]["attributes"]["name"] == cabin_class_id
 
 
 async def return_cabin_classes_ids(
-    client: JunctionClient,
+    mobile_client: MobileApiClient,
 ) -> list[str]:
-    r0 = await client.list_cabin_classes()
+    r0 = await mobile_client.list_cabin_classes()
     logging.info("list_cabin_classes: %s", json.dumps(r0, indent=4))
     cabin_classes_ids = []
     for idx, _ in enumerate(r0["data"]):

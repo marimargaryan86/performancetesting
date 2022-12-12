@@ -7,7 +7,7 @@ from typing import Mapping, Sequence
 import httpx
 import pytest
 
-from snowfall.vendor.junction.client import JunctionClient
+from snowfall.vendor.junction.client import JunctionClient, MobileApiClient
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -117,8 +117,23 @@ def pytest_collection_modifyitems(
 
 
 @pytest.fixture(scope="function")
-def client(api_token: str, host: str) -> JunctionClient:
+def junction_client(
+    api_token: str,
+    host: str,
+) -> JunctionClient:
     return JunctionClient(
+        api_url="https://{0}".format(host),
+        token=api_token,
+        client=httpx.AsyncClient(timeout=10),
+    )
+
+
+@pytest.fixture(scope="function")
+def mobile_client(
+    api_token: str,
+    host: str,
+) -> JunctionClient:
+    return MobileApiClient(
         api_url="https://{0}".format(host),
         token=api_token,
         client=httpx.AsyncClient(timeout=10),

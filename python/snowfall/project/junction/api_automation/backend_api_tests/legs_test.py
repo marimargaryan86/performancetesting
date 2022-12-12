@@ -19,20 +19,20 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_get_leg_by_id(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
     r3 = await return_get_segment_by_id_response(
-        client,
+        junction_client,
         departure_after,
         destination,
         origin,
     )
     relationships = r3["data"]["relationships"]
 
-    r4 = await client.legs().get_leg_by_id(
+    r4 = await junction_client.legs().get_leg_by_id(
         leg_id=relationships["legs"]["data"][0]["id"],
     )
     logging.info("get_leg_by_id: %s", json.dumps(r4, indent=4))
@@ -43,12 +43,12 @@ async def test_get_leg_by_id(
 
 @pytest.mark.integration
 async def test_get_leg_types(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
-    response = await client.legs().get_legs_types()
+    response = await junction_client.legs().get_legs_types()
     logging.info("get_legs_types: %s", json.dumps(response, indent=4))
     leg_types = {leg_type["id"] for leg_type in response["data"]}
     assert leg_types == {"unspecified", "ferry", "air", "rail"}
@@ -56,21 +56,21 @@ async def test_get_leg_types(
 
 @pytest.mark.integration
 async def test_get_leg_type_by_id(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
-    leg_types = await return_leg_types(client)
+    leg_types = await return_leg_types(junction_client)
 
     for leg_type in leg_types:
-        r1 = await client.legs().get_leg_type_by_id(leg_type)
+        r1 = await junction_client.legs().get_leg_type_by_id(leg_type)
         logging.info("get_leg_type_by_id: %s", json.dumps(r1, indent=4))
         assert r1["data"]["id"] in leg_types
 
 
-async def return_leg_types(client: JunctionClient) -> list[str]:
-    r0 = await client.legs().get_legs_types()
+async def return_leg_types(junction_client: JunctionClient) -> list[str]:
+    r0 = await junction_client.legs().get_legs_types()
     logging.info("get_legs_types: %s", json.dumps(r0, indent=4))
     leg_types = []
     for idx, _ in enumerate(r0["data"]):
@@ -80,21 +80,21 @@ async def return_leg_types(client: JunctionClient) -> list[str]:
 
 
 async def return_get_segment_by_id_response(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     departure_after: str,
     destination: str,
     origin: str,
 ) -> dict[str, Any]:
     trip_search_id = await return_trip_search_id(
-        client,
+        junction_client,
         departure_after,
         destination,
         origin,
     )
     time.sleep(5)
-    r3 = await client.segments().get_segment_by_id(
+    r3 = await junction_client.segments().get_segment_by_id(
         await return_segment_id_from_trip_search_id(
-            client,
+            junction_client,
             trip_search_id,
         ),
     )

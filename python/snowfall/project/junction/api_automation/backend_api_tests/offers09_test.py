@@ -16,30 +16,32 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_get_offer_option_detail_rules(  # noqa: WPS210
-    client: JunctionClient,
+    junction_client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
     trip_offer_search_ids = await return_trip_offer_search_ids(
-        client,
+        junction_client,
         departure_after,
         destination,
         origin,
     )
 
     offer_id_and_offer_group_ids = await return_offer_searches_id_and_offer_group_ids(
-        client,
+        junction_client,
         trip_offer_search_ids,
     )
 
     offer_options_ids = await return_offer_options_ids_from_offer_searches(
-        client,
+        junction_client,
         offer_id_and_offer_group_ids,
     )
 
     for option_id in offer_options_ids:
-        resp = await with_log(client.get_offer_option_details_by_offer_option_id)(
+        resp = await with_log(
+            junction_client.get_offer_option_details_by_offer_option_id,
+        )(
             option_id,
         )
         for detail in resp["data"]:

@@ -1,7 +1,7 @@
 import json
 import logging
 from functools import wraps
-from typing import Any, Callable
+from typing import Any, Callable, ParamSpec
 from uuid import UUID
 
 
@@ -29,11 +29,14 @@ def is_valid_uuid(
     return str(uuid_obj) == uuid_to_test
 
 
-def with_log(function: Callable[[Any], Any]) -> Callable[[Any], Any]:
+P = ParamSpec("P")  # noqa: WPS111
+
+
+def with_log(function: Callable[P, Any]) -> Callable[P, Any]:
     """Add some logging to any async function."""
 
     @wraps(function)
-    async def wrapper(*args: Any, **kwargs: Any) -> Any:
+    async def wrapper(*args: P.args, **kwargs: P.kwargs) -> Any:
         """Call the original function and then write to the log."""
         res = await function(*args, **kwargs)
         logging.info("%s: %s", function.__name__, json.dumps(res, indent=4))

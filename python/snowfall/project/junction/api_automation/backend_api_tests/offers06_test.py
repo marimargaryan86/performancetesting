@@ -16,32 +16,32 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_get_offer_group_details(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
     offer_group_details_ids = await return_offer_group_details_ids(
-        client,
+        junction_client,
         departure_after,
         destination,
         origin,
     )
 
     for offer_group_details_id in offer_group_details_ids:
-        response = await client.get_offer_group_details(offer_group_details_id)
+        response = await junction_client.get_offer_group_details(offer_group_details_id)
         logging.info("get_offer_group_details: %s", response)
         assert response is not None
 
 
 async def return_offer_group_details_ids(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     departure_after: str,
     destination: str,
     origin: str,
 ) -> list[str]:
     trips_search_id = await return_trip_search_id(
-        client,
+        junction_client,
         departure_after,
         destination,
         origin,
@@ -50,11 +50,11 @@ async def return_offer_group_details_ids(
         offer_searches_id,
         offer_group_ids,
     ) = await return_offer_group_ids_and_offer_searches_id(
-        client,
+        junction_client,
         trips_search_id,
     )
     time.sleep(20)
     return await return_offer_group_details(
-        client,
+        junction_client,
         offer_group_ids,
     )

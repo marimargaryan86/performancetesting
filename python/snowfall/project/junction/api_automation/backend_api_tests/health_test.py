@@ -10,7 +10,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_health(
-    client: JunctionClient,
+    junction_client: JunctionClient,
 ) -> None:
-    health_response = await client.health()
+    health_response = await junction_client.health()
     assert health_response["meta"]["status"] == "pass", "health check is not o.k."

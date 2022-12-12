@@ -15,17 +15,17 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_get_booking_by_booking_id(
-    client: JunctionClient,
+    junction_client: JunctionClient,
 ) -> None:
-    order_ids = await return_some_order_ids(client)
+    order_ids = await return_some_order_ids(junction_client)
     assert order_ids, "No orders"
 
-    booking_ids = await return_booking_ids_by_order_ids(client, order_ids)
+    booking_ids = await return_booking_ids_by_order_ids(junction_client, order_ids)
     assert booking_ids, "No bookings ever found"
 
     was_any_booking = False
     for booking_id in booking_ids:
-        resp = await client.get_booking_by_id(booking_id)
+        resp = await junction_client.get_booking_by_id(booking_id)
         logging.info(
             "get_booking_by_booking_id: %s",
             json.dumps(resp, indent=4),
@@ -37,12 +37,12 @@ async def test_get_booking_by_booking_id(
 
 
 async def return_booking_ids_by_order_ids(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     order_ids: Sequence[str],
 ) -> Sequence[str]:
     booking_ids = []
     for order_id in order_ids:
-        resp = await client.get_bookings_by_order_id(order_id)
+        resp = await junction_client.get_bookings_by_order_id(order_id)
         logging.info("get_bookings_by_order_id: %s", json.dumps(resp, indent=4))
         for booking in resp["data"]:
             booking_ids.append(booking["id"])

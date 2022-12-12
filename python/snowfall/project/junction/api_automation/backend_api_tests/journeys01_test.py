@@ -11,8 +11,8 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_get_journeys(
-    client: JunctionClient,
+    junction_client: JunctionClient,
 ) -> None:
-    response = await client.get_journeys()
+    response = await junction_client.get_journeys()
     logging.info("get_journeys: %s", json.dumps(response, indent=4))
     assert response

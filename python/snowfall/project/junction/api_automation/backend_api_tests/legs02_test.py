@@ -13,13 +13,13 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_get_leg_by_id(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
     r3 = await return_get_segment_by_id_response(
-        client,
+        junction_client,
         departure_after,
         destination,
         origin,
@@ -27,5 +27,5 @@ async def test_get_leg_by_id(
     legs = r3["data"]["relationships"]["legs"]["data"]
 
     for leg in legs:
-        leg_data = await client.legs().get_leg_by_id(leg["id"])
+        leg_data = await junction_client.legs().get_leg_by_id(leg["id"])
         assert "operator" in leg_data["data"]["attributes"]

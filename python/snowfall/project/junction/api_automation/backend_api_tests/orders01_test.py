@@ -20,26 +20,31 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_get_orders_status(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     origin: str,
     departure_after: str,
     destination: str,
 ) -> None:
     trips_offer_search_ids = await return_trip_offer_search_ids(
-        client,
+        junction_client,
         departure_after,
         destination,
         origin,
     )
     assert trips_offer_search_ids, "No searches"
 
-    offer_ids = (await client.get_search_offer_ids(trips_offer_search_ids[0]))["data"]
+    offer_ids = (await junction_client.get_search_offer_ids(trips_offer_search_ids[0]))[
+        "data"
+    ]
     assert offer_ids, "No offers"
 
-    offer_option_ids = await return_options_by_order_groups(client, offer_ids[0])
+    offer_option_ids = await return_options_by_order_groups(
+        junction_client,
+        offer_ids[0],
+    )
 
     order_id = await get_orders_id(
-        client=client,
+        junction_client=junction_client,
         offer_id=offer_ids[0],
         option_ids=offer_option_ids,
         passengers=[],
@@ -60,13 +65,13 @@ async def test_get_orders_status(
 
 
 async def get_orders_id(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     offer_id: str,
     option_ids: Sequence[str],
     passengers: Sequence[models.Passenger],
     contact_details: models.ContactDetails,
 ) -> str:
-    r1 = await client.create_order(
+    r1 = await junction_client.create_order(
         option_ids=option_ids,
         passengers=passengers,
         contact_details=contact_details,
@@ -78,12 +83,12 @@ async def get_orders_id(
 
 
 async def return_options_by_order_groups(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     order_group_ids: Sequence[str],
 ) -> Sequence[str]:
     option_ids = []
     for group_id in order_group_ids:
-        resp = await client.get_offer_options_by_offer_group_id(group_id)
+        resp = await junction_client.get_offer_options_by_offer_group_id(group_id)
         for option in resp["data"]:
             option_ids.append(option["id"])
     return option_ids

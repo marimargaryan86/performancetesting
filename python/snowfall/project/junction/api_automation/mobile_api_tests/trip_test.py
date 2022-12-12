@@ -8,20 +8,20 @@ import pytest
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
     is_valid_uuid,
 )
-from snowfall.vendor.junction.client import JunctionClient, LegType
+from snowfall.vendor.junction.client import LegType, MobileApiClient
 
 
 @pytest.mark.integration
 async def test_trip_e2e_basic(
     host: str,
     protocol: str,
-    client: JunctionClient,
+    mobile_client: MobileApiClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
     trip_search_id = await return_trip_search_id(
-        client,
+        mobile_client,
         departure_after,
         destination,
         origin,
@@ -30,7 +30,7 @@ async def test_trip_e2e_basic(
 
     time.sleep(5)
 
-    r2 = await client.trips().get_trips_by_trip_search_id(trip_search_id)
+    r2 = await mobile_client.trips().get_trips_by_trip_search_id(trip_search_id)
     logging.info("get_trips_by_trip_search_id response: %s", json.dumps(r2, indent=4))
 
     trip_id = r2["data"][0]["id"]
@@ -48,13 +48,13 @@ async def test_trip_e2e_basic(
 
 @pytest.mark.integration
 async def test_get_trip_search_by_id(
-    client: JunctionClient,
+    mobile_client: MobileApiClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
     trip_search_id = await return_trip_search_id(
-        client,
+        mobile_client,
         departure_after,
         destination,
         origin,
@@ -63,7 +63,7 @@ async def test_get_trip_search_by_id(
 
     time.sleep(5)
 
-    r2 = await client.trips().get_trip_search_by_id(trip_search_id)
+    r2 = await mobile_client.trips().get_trip_search_by_id(trip_search_id)
     logging.info("get_trip_search_by_id response: %s", json.dumps(r2, indent=4))
 
     trip_id = r2["data"]["id"]
@@ -72,13 +72,13 @@ async def test_get_trip_search_by_id(
 
 @pytest.mark.integration
 async def test_get_trips_by_trip_search_id(
-    client: JunctionClient,
+    mobile_client: MobileApiClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
     trip_search_id = await return_trip_search_id(
-        client,
+        mobile_client,
         departure_after,
         destination,
         origin,
@@ -87,7 +87,7 @@ async def test_get_trips_by_trip_search_id(
 
     time.sleep(5)
 
-    r2 = await client.trips().get_trips_by_trip_search_id(trip_search_id)
+    r2 = await mobile_client.trips().get_trips_by_trip_search_id(trip_search_id)
     logging.info("get_trips_by_trip_search_id response: %s", json.dumps(r2, indent=4))
 
     trip_id = r2["data"][0]["id"]
@@ -96,13 +96,13 @@ async def test_get_trips_by_trip_search_id(
 
 @pytest.mark.integration
 async def test_get_trip_by_id(
-    client: JunctionClient,
+    mobile_client: MobileApiClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
     trip_search_id = await return_trip_search_id(
-        client,
+        mobile_client,
         departure_after,
         destination,
         origin,
@@ -111,7 +111,7 @@ async def test_get_trip_by_id(
 
     time.sleep(5)
 
-    r2 = await client.trips().get_trips_by_trip_search_id(trip_search_id)
+    r2 = await mobile_client.trips().get_trips_by_trip_search_id(trip_search_id)
     logging.info("get_trips_by_trip_search_id response: %s", json.dumps(r2, indent=4))
 
     trip_id = r2["data"][0]["id"]
@@ -119,19 +119,19 @@ async def test_get_trip_by_id(
     assert is_valid_uuid(trip_id, 5) is True, "trip_id uuid must be in uuid v5 format"
 
     time.sleep(15)
-    r3 = await client.trips().get_trip_by_id(trip_id)
+    r3 = await mobile_client.trips().get_trip_by_id(trip_id)
     logging.info("get_trip_by_id: %s", json.dumps(r3, indent=4))
 
 
 @pytest.mark.integration
 async def test_get_legs_by_trip_id(
-    client: JunctionClient,
+    mobile_client: MobileApiClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
     trip_search_id = await return_trip_search_id(
-        client,
+        mobile_client,
         departure_after,
         destination,
         origin,
@@ -140,7 +140,7 @@ async def test_get_legs_by_trip_id(
 
     time.sleep(5)
 
-    r2 = await client.trips().get_trips_by_trip_search_id(trip_search_id)
+    r2 = await mobile_client.trips().get_trips_by_trip_search_id(trip_search_id)
     logging.info("get_trips_by_trip_search_id response: %s", json.dumps(r2, indent=4))
 
     trip_id = r2["data"][0]["id"]
@@ -148,19 +148,19 @@ async def test_get_legs_by_trip_id(
     assert is_valid_uuid(trip_id, 5) is True, "trip_id uuid must be in uuid v5 format"
 
     time.sleep(15)
-    r3 = await client.legs().get_legs_by_trip_id(trip_id)
+    r3 = await mobile_client.legs().get_legs_by_trip_id(trip_id)
     logging.info("get_trip_by_id: %s", json.dumps(r3, indent=4))
 
 
 @pytest.mark.integration
 async def test_get_legs_by_trip_search_id(
-    client: JunctionClient,
+    mobile_client: MobileApiClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
     trip_search_id = await return_trip_search_id(
-        client,
+        mobile_client,
         departure_after,
         destination,
         origin,
@@ -169,7 +169,7 @@ async def test_get_legs_by_trip_search_id(
 
     time.sleep(5)
 
-    response = await client.legs().get_legs_by_trip_search_id(trip_search_id)
+    response = await mobile_client.legs().get_legs_by_trip_search_id(trip_search_id)
     logging.info("get_legs_by_trip_search_id: %s", json.dumps(response, indent=4))
     assert response
 
@@ -177,13 +177,13 @@ async def test_get_legs_by_trip_search_id(
 @pytest.mark.integration
 async def test_list_segments_by_trip(
     host: str,
-    client: JunctionClient,
+    mobile_client: MobileApiClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
     trip_search_id = await return_trip_search_id(
-        client,
+        mobile_client,
         departure_after,
         destination,
         origin,
@@ -191,12 +191,12 @@ async def test_list_segments_by_trip(
 
     time.sleep(5)
 
-    r2 = await client.trips().get_trips_by_trip_search_id(trip_search_id)
+    r2 = await mobile_client.trips().get_trips_by_trip_search_id(trip_search_id)
 
     logging.info("get_trips_by_trip_search_id response: %s", json.dumps(r2, indent=4))
 
     r3 = (
-        await client.segments().get_segments_by_trip(
+        await mobile_client.segments().get_segments_by_trip(
             r2["data"][0]["id"],
         ),
     )
@@ -220,13 +220,13 @@ async def test_list_segments_by_trip(
 
 @pytest.mark.integration
 async def test_get_segments_by_trip_search_id(
-    client: JunctionClient,
+    mobile_client: MobileApiClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
     trip_search_id = await return_trip_search_id(
-        client,
+        mobile_client,
         departure_after,
         destination,
         origin,
@@ -235,18 +235,20 @@ async def test_get_segments_by_trip_search_id(
 
     time.sleep(5)
 
-    response = await client.segments().get_segments_by_trip_search(trip_search_id)
+    response = await mobile_client.segments().get_segments_by_trip_search(
+        trip_search_id,
+    )
     logging.info("get_segments_by_trip_search: %s", json.dumps(response, indent=4))
     assert response
 
 
 async def return_trip_search_id(
-    client: JunctionClient,
+    mobile_client: MobileApiClient,
     departure_after: str,
     destination: str,
     origin: str,
 ) -> str:
-    r1 = await client.trips().create_trip_search(
+    r1 = await mobile_client.trips().create_trip_search(
         origin_id=origin,
         destination_id=destination,
         departure_after=datetime.fromisoformat(

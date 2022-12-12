@@ -16,15 +16,15 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_get_offer_groups_by_offer_group_id(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
     offer_id_and_offer_group_ids = await return_offer_searches_id_and_offer_group_ids(
-        client,
+        junction_client,
         await return_trip_offer_search_ids(
-            client,
+            junction_client,
             departure_after,
             destination,
             origin,
@@ -41,7 +41,7 @@ async def test_get_offer_groups_by_offer_group_id(
 
     responses = await return_flat_responses_get_offer_groups_by_offer_group_id(
         clean_offer_id_and_offer_group_ids,
-        client,
+        junction_client,
     )
     for response in responses:
         assert response is not None
@@ -49,14 +49,14 @@ async def test_get_offer_groups_by_offer_group_id(
 
 async def return_flat_responses_get_offer_groups_by_offer_group_id(
     clean_offer_id_and_offer_group_ids: Sequence[Tuple[Any, ...]],
-    client: JunctionClient,
+    junction_client: JunctionClient,
 ) -> Sequence[dict[str, Any]]:
     responses = []
     for clean_offer_id_and_offer_group_id in clean_offer_id_and_offer_group_ids:
         responses.append(
             await responses_get_offer_groups_by_offer_group_id(
                 clean_offer_id_and_offer_group_id,
-                client,
+                junction_client,
             ),
         )
 
@@ -65,13 +65,13 @@ async def return_flat_responses_get_offer_groups_by_offer_group_id(
 
 async def responses_get_offer_groups_by_offer_group_id(
     clean_offer_id_and_offer_group_id: Tuple[Any, ...],
-    client: JunctionClient,
+    junction_client: JunctionClient,
 ) -> Sequence[dict[str, Any]]:
     responses = []
     for idx, offer_group_ids in enumerate(clean_offer_id_and_offer_group_id):
         if idx != 0:
             for offer_group_id in offer_group_ids:
-                response = await client.get_offer_groups_by_offer_group_id(
+                response = await junction_client.get_offer_groups_by_offer_group_id(
                     offer_group_id,
                 )
                 logging.info(
@@ -84,15 +84,15 @@ async def responses_get_offer_groups_by_offer_group_id(
 
 
 async def return_nonempty_offer_ids_and_offer_group_ids(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     departure_after: str,
     destination: str,
     origin: str,
 ) -> Sequence[Tuple[Any, ...]]:
     offer_id_and_offer_group_ids = await return_offer_searches_id_and_offer_group_ids(
-        client,
+        junction_client,
         await return_trip_offer_search_ids(
-            client,
+            junction_client,
             departure_after,
             destination,
             origin,

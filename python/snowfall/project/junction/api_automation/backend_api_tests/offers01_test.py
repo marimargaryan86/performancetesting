@@ -18,25 +18,25 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_trip_offers_e2e_basic(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     departure_after: str,
     origin: str,
     destination: str,
 ) -> None:
     trip_offer_search_ids = await return_trip_offer_search_ids(
-        client,
+        junction_client,
         departure_after,
         destination,
         origin,
     )
 
     offer_id_and_offer_group_ids = await return_offer_searches_id_and_offer_group_ids(
-        client,
+        junction_client,
         trip_offer_search_ids,
     )
 
     offer_options_ids = await return_offer_options_ids_from_offer_searches(
-        client,
+        junction_client,
         offer_id_and_offer_group_ids,
     )
 
@@ -44,7 +44,7 @@ async def test_trip_offers_e2e_basic(
 
 
 async def return_offer_options_ids_from_offer_searches(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     offer_id_and_offer_group_ids: Sequence[Tuple[Any, ...]],
 ) -> Sequence[str]:
     offer_options_ids = []
@@ -54,7 +54,7 @@ async def return_offer_options_ids_from_offer_searches(
             offer_group_ids = single_item[1]
             offer_options_ids.extend(
                 await return_offer_options_ids(
-                    client,
+                    junction_client,
                     offer_group_ids,
                 ),
             )
@@ -62,7 +62,7 @@ async def return_offer_options_ids_from_offer_searches(
 
 
 async def return_offer_searches_id_and_offer_group_ids(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     trip_offer_search_ids: Sequence[str],
 ) -> Sequence[Tuple[Any, ...]]:
     tasks = []
@@ -70,7 +70,7 @@ async def return_offer_searches_id_and_offer_group_ids(
         tasks.append(
             asyncio.create_task(
                 return_offer_group_ids_and_offer_searches_id(
-                    client,
+                    junction_client,
                     trip_offer_search_id,
                 ),
             ),
@@ -84,7 +84,7 @@ async def return_offer_searches_id_and_offer_group_ids(
 
 
 async def return_offer_ids(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     trip_offer_search_ids: Sequence[str],
 ) -> Sequence[str]:
     tasks = []
@@ -92,7 +92,7 @@ async def return_offer_ids(
         tasks.append(
             asyncio.create_task(
                 return_offer_id(
-                    client,
+                    junction_client,
                     trip_offer_search_id,
                 ),
             ),
@@ -106,12 +106,12 @@ async def return_offer_ids(
 
 
 async def return_offer_options_details_ids(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     offer_options_ids: Sequence[str],
 ) -> Sequence[str]:
     offer_options_details_ids = []
     for offer_options_id in offer_options_ids:
-        response = await client.get_offer_option_details_by_offer_option_id(
+        response = await junction_client.get_offer_option_details_by_offer_option_id(
             offer_options_id,
         )
         logging.info(
@@ -125,14 +125,14 @@ async def return_offer_options_details_ids(
 
 
 async def return_offer_group_ids_and_offer_searches_id(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     trip_offer_search_id: str,
 ) -> Tuple[str, Sequence[str]]:
     attempts = 25
     for i0 in range(attempts):
         time.sleep(2)
         (offer_id, offer_group_ids) = await return_offer_search_id_and_offer_group_ids(
-            client,
+            junction_client,
             trip_offer_search_id,
         )
         if not (offer_id is None or offer_group_ids == ["None"]):
@@ -149,13 +149,13 @@ async def return_offer_group_ids_and_offer_searches_id(
 
 
 async def return_offer_id(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     trips_search_id: str,
 ) -> str:
     attempts = 5
     for i0 in range(attempts):
         time.sleep(2)
-        response = await client.get_offers_by_offer_search_id(
+        response = await junction_client.get_offers_by_offer_search_id(
             trips_search_id,
             cabin_class=["economy"],
         )
@@ -176,10 +176,10 @@ async def return_offer_id(
 
 
 async def return_offer_search_id_and_offer_group_ids(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     trips_search_id: str,
 ) -> Tuple[str, Sequence[str]]:
-    response = await client.get_offers_by_offer_search_id(
+    response = await junction_client.get_offers_by_offer_search_id(
         trips_search_id,
         cabin_class=["economy"],
     )
@@ -210,13 +210,13 @@ async def return_offer_group_ids_from_response(
 
 
 async def return_trip_offer_search_ids(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     departure_after: str,
     destination: str,
     origin: str,
 ) -> Sequence[str]:
     trip_ids = await get_trip_ids(
-        client,
+        junction_client,
         departure_after,
         destination,
         origin,
@@ -226,7 +226,7 @@ async def return_trip_offer_search_ids(
     trip_offer_search_ids = []
     for trip_id in trip_ids:
         trip_offer_search_id = await return_trip_offer_search_id(
-            client,
+            junction_client,
             [trip_id],
             1992,
             4,
@@ -238,13 +238,13 @@ async def return_trip_offer_search_ids(
 
 
 async def return_trip_search_id(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     departure_after: str,
     destination: str,
     origin: str,
 ) -> str:
     trip_id = await get_trip_id(
-        client,
+        junction_client,
         departure_after,
         destination,
         origin,
@@ -253,7 +253,7 @@ async def return_trip_search_id(
     logging.info("trip_id: %s", json.dumps(trip_id, indent=4))
 
     return await return_trip_search_id_from_trip_id(
-        client,
+        junction_client,
         trip_id,
         year=1992,
         month=4,
@@ -262,12 +262,12 @@ async def return_trip_search_id(
 
 
 async def return_offer_group_details(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     offer_group_ids: Sequence[str],
 ) -> list[str]:
     offer_group_details_ids = []
     for offer_groups_id in offer_group_ids:
-        response = await client.get_offer_group_details_by_offer_group_id(
+        response = await junction_client.get_offer_group_details_by_offer_group_id(
             offer_groups_id,
         )
         logging.info(
@@ -284,12 +284,12 @@ async def return_offer_group_details(
 
 
 async def return_offer_options_ids(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     offer_group_ids: Sequence[str],
 ) -> list[str]:
     offer_options_ids = []
     for offer_groups_id in offer_group_ids:
-        r6 = await client.get_offer_options_by_offer_group_id(
+        r6 = await junction_client.get_offer_options_by_offer_group_id(
             offer_groups_id,
         )
         offer_options_ids.append(r6["data"][0]["id"])
@@ -299,13 +299,13 @@ async def return_offer_options_ids(
 
 
 async def return_trip_offer_search_id(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     trip_ids: Sequence[str],
     year: int,
     month: int,
     day: int,
 ) -> str:
-    r3 = await client.create_offer_search(
+    r3 = await junction_client.create_offer_search(
         trip_ids=trip_ids,
         passengers_dates_of_birth=[datetime.date(year=year, month=month, day=day)],
     )
@@ -315,13 +315,13 @@ async def return_trip_offer_search_id(
 
 
 async def return_trip_search_id_from_trip_id(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     trip_id: str,
     year: int,
     month: int,
     day: int,
 ) -> str:
-    r3 = await client.create_offer_search(
+    r3 = await junction_client.create_offer_search(
         trip_ids=[trip_id],
         passengers_dates_of_birth=[datetime.date(year=year, month=month, day=day)],
     )
@@ -335,12 +335,12 @@ async def return_trip_search_id_from_trip_id(
 
 
 async def get_trip_ids(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     departure_after: str,
     destination: str,
     origin: str,
 ) -> list[str]:
-    r1 = await client.trips().create_trip_search(
+    r1 = await junction_client.trips().create_trip_search(
         origin_id=origin,
         destination_id=destination,
         departure_after=datetime.datetime.fromisoformat(
@@ -354,7 +354,7 @@ async def get_trip_ids(
 
     time.sleep(15)
 
-    r2 = await client.trips().get_trips_by_trip_search_id(trip_search_id)
+    r2 = await junction_client.trips().get_trips_by_trip_search_id(trip_search_id)
     logging.info("get_trips_by_trip_search_id: %s", json.dumps(r2, indent=4))
 
     trip_ids = []
@@ -366,12 +366,12 @@ async def get_trip_ids(
 
 
 async def get_trip_id(
-    client: JunctionClient,
+    junction_client: JunctionClient,
     departure_after: str,
     destination: str,
     origin: str,
 ) -> str:
-    r1 = await client.trips().create_trip_search(
+    r1 = await junction_client.trips().create_trip_search(
         origin_id=origin,
         destination_id=destination,
         departure_after=datetime.datetime.fromisoformat(
@@ -385,7 +385,7 @@ async def get_trip_id(
 
     time.sleep(5)
 
-    r2 = await client.trips().get_trips_by_trip_search_id(trip_search_id)
+    r2 = await junction_client.trips().get_trips_by_trip_search_id(trip_search_id)
     logging.info("get_trips_by_trip_search_id: %s", json.dumps(r2, indent=4))
 
     trip_id = r2["data"][0]["id"]
