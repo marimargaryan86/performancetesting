@@ -39,6 +39,7 @@ _Settings0 = TypeVar("_Settings0", bound=Settings)
 _Settings1 = TypeVar("_Settings1", bound=Settings)
 _Settings2 = TypeVar("_Settings2", bound=Settings)
 _Settings3 = TypeVar("_Settings3", bound=Settings)
+_Settings4 = TypeVar("_Settings4", bound=Settings)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -82,12 +83,13 @@ class Entrypoint(object):
     name: str
     sentry_settings: SentrySettings = SentrySettings()
 
-    def enter_with_commands(  # noqa: WPS213
+    def enter_with_commands(  # noqa: WPS213, WPS211
         self,
         _cmd0: Command[_Settings0],
         _cmd1: Optional[Command[_Settings1]] = None,
         _cmd2: Optional[Command[_Settings2]] = None,
         _cmd3: Optional[Command[_Settings3]] = None,
+        _cmd4: Optional[Command[_Settings4]] = None,
     ) -> None:
         group = click.Group(name=self.name, callback=_group)
 
@@ -95,7 +97,7 @@ class Entrypoint(object):
 
         command = click.Command(name=_cmd0.name, callback=_command(_cmd0))
         _add_parameters_from_settings(command, _cmd0.settings_class)
-        group.add_command(command)
+        group.add_command(command)  # noqa: WPS204
 
         if _cmd1:
             command = click.Command(name=_cmd1.name, callback=_command(_cmd1))
@@ -110,6 +112,11 @@ class Entrypoint(object):
         if _cmd3:
             command = click.Command(name=_cmd3.name, callback=_command(_cmd3))
             _add_parameters_from_settings(command, _cmd3.settings_class)
+            group.add_command(command)
+
+        if _cmd4:
+            command = click.Command(name=_cmd4.name, callback=_command(_cmd4))
+            _add_parameters_from_settings(command, _cmd4.settings_class)
             group.add_command(command)
 
         group(
