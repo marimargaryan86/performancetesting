@@ -645,10 +645,9 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
             payload=body,
         )
 
-    async def create_order(  # noqa: WPS211
+    async def create_order(
         self,
-        offer_id: str,
-        option_ids: Sequence[str],
+        quote_id: str,
         passengers: Sequence[models.Passenger],
         contact_details: models.ContactDetails,
         include: Optional[Sequence[order_includes]] = None,
@@ -669,20 +668,11 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
                     ),
                 },
                 _RELATIONSHIPS_KEY: {
-                    "offer": {
+                    "quote": {
                         _DATA_KEY: {
-                            _ID_KEY: offer_id,
-                            _TYPE_KEY: "offers",
+                            _ID_KEY: quote_id,
+                            _TYPE_KEY: "trip-offer-price-quotes",
                         },
-                    },
-                    "options": {
-                        _DATA_KEY: [
-                            {
-                                _ID_KEY: option_id,
-                                _TYPE_KEY: "offer-options",
-                            }
-                            for option_id in option_ids
-                        ],
                     },
                 },
                 _TYPE_KEY: "orders",
@@ -820,10 +810,9 @@ class MobileApiClient(JunctionClient):
         response.raise_for_status()
         return response.status_code
 
-    async def create_order(  # noqa: WPS211
+    async def create_order(
         self,
-        offer_id: str,
-        option_ids: Sequence[str],
+        quote_id: str,
         passengers: Sequence[models.Passenger],
         contact_details: models.ContactDetails,
         include: Optional[Sequence[order_includes]] = None,

@@ -205,8 +205,7 @@ class Orders(endpoints.HTTPEndpoint):
 
         try:
             junction_order = await junction_client.create_order(
-                body["offer"],
-                body["options"],
+                body["quote"],
                 [
                     vendor_models.Passenger(**vendor_models.dict_factory_to_snake(pax))
                     for pax in body["passengers"]
