@@ -1,8 +1,11 @@
+import datetime
 from typing import Sequence
 
 import pydantic
 
 from snowfall.stdlib import service
+
+_DEFAULT_TTL_IN_MINUTES = 45
 
 
 class DistribusionConfig(pydantic.BaseModel):
@@ -18,3 +21,9 @@ class OrdersSettings(DistribusionConfig, service.Settings):
     smtp_dsn: pydantic.AnyUrl
     smtp_sender: pydantic.EmailStr
     smtp_recipient: pydantic.EmailStr
+
+
+class SearchesSettings(DistribusionConfig, service.Settings):
+    amqp_dsn: pydantic.AnyUrl
+    redis_dsn: Sequence[pydantic.AnyUrl]
+    ttl: datetime.timedelta = datetime.timedelta(minutes=_DEFAULT_TTL_IN_MINUTES)

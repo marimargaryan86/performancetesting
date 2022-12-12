@@ -191,10 +191,14 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
                 offer_models_pb2.Offer(
                     id=await self._offers_cache.store(
                         cache.OfferDetails(
+                            expires_at=expires_at,
+                            price=fare.price,
+                            currency=connection.currency,
                             fare_class=fare.fare_class.code
                             if fare.fare_class and fare.fare_class.code
                             else "",
                         ),
+                        expires_at=expires_at,
                     ),
                     price=money.Money(
                         amount=fare.price,

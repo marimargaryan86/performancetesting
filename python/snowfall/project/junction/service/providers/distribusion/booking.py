@@ -45,16 +45,17 @@ class BookingHandler(object):
             return new_booking
 
         if booking_result.booking is not None:
+            booking_status = models_pb2.Booking.STATUS_NOT_TICKETED
+
+            if booking_result.booking.marketing_carrier_booking_number:
+                booking_status = models_pb2.Booking.STATUS_CONFIRMED
+
             new_booking.MergeFrom(
                 models_pb2.Booking(
-                    status=models_pb2.Booking.STATUS_NOT_TICKETED,
-                    total_price=money.from_string(
-                        string_amount=str(
-                            booking_result.booking.total_price,
-                        ),
-                        currency=money.Currency(
-                            booking_result.currency,
-                        ),
+                    status=booking_status,
+                    total_price=money.Money(
+                        amount=booking_result.booking.total_price or 0,
+                        currency=money.Currency(booking_result.currency),
                     ).protobuf(),
                     trip_result=models_pb2.TripBooking(
                         provider_booking_reference=str(
@@ -62,8 +63,11 @@ class BookingHandler(object):
                         ),
                         record_locator=booking_result.booking.marketing_carrier_booking_number
                         or "",
-                        operator_booking_references=booking_result.booking.distribusion_booking_number
-                        or [],
+                        operator_booking_references=[
+                            booking_result.booking.distribusion_booking_number,
+                        ]
+                        if booking_result.booking.distribusion_booking_number
+                        else [],
                         created_at=protobuf.datetime_to_protobuf(
                             datetime.datetime.now(tz=datetime.timezone.utc),
                         ),

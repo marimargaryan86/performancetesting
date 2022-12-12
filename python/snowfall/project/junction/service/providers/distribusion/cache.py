@@ -1,3 +1,4 @@
+import datetime
 from typing import Type
 
 from snowfall.stdlib.persistence.redis.repository import (
@@ -7,6 +8,9 @@ from snowfall.stdlib.persistence.redis.repository import RedisRecord
 
 
 class OfferDetails(RedisRecord):
+    expires_at: datetime.datetime
+    currency: str
+    price: int
     fare_class: str
 
 

@@ -2,6 +2,7 @@ from snowfall.project.junction.service.providers.distribusion import (
     config,
     offers,
     orders,
+    pricing,
     stations,
 )
 from snowfall.project.junction.service.providers.distribusion.search import searches
@@ -24,7 +25,12 @@ if __name__ == "__main__":
         service.Command(
             name="searches",
             callback=searches.searches,
-            settings_class=searches.SearchesSettings,
+            settings_class=config.SearchesSettings,
+        ),
+        service.Command(
+            name="pricing",
+            callback=pricing.price_quotes,
+            settings_class=config.SearchesSettings,
         ),
         service.Command(
             name="orders",

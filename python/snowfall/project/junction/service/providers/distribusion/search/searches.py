@@ -1,14 +1,14 @@
 import contextlib
-import datetime
 import random
-from typing import Sequence
 
 import httpx
-import pydantic
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import offers
-from snowfall.project.junction.service.providers.distribusion import cache, config
+from snowfall.project.junction.service.providers.distribusion import cache
+from snowfall.project.junction.service.providers.distribusion.config import (
+    SearchesSettings,
+)
 from snowfall.project.junction.service.providers.distribusion.search import (
     adapter,
     validator,
@@ -18,14 +18,6 @@ from snowfall.stdlib import service
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, producer, trackable, types
 from snowfall.vendor.distribusion import client
-
-_DEFAULT_TTL_IN_MINUTES = 45
-
-
-class SearchesSettings(config.DistribusionConfig, service.Settings):
-    amqp_dsn: pydantic.AnyUrl
-    redis_dsn: Sequence[pydantic.AnyUrl]
-    ttl: datetime.timedelta = datetime.timedelta(minutes=_DEFAULT_TTL_IN_MINUTES)
 
 
 async def searches(app: service.Application[SearchesSettings]) -> None:  # noqa: WPS210
