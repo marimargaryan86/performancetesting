@@ -67,6 +67,8 @@ class Adapter(object):
         async_offer: price.AsyncOfferPriceResponse,
     ) -> price.OfferPriceResponse:
         for _ in range(self._poll_retries_limit):
+            await asyncio.sleep(self._wait_time_between_polling)
+
             price_result = await self._client.get_air_offer_result(
                 transaction_id=async_offer.transaction_id,
                 pricing_id=async_offer.id,
@@ -80,8 +82,6 @@ class Adapter(object):
 
             if self._failed_pricing(price_result):
                 raise NoPricingError("Pricing did not succeed.")
-
-            await asyncio.sleep(self._wait_time_between_polling)
 
         raise PricingTimeoutError("Pricing timed out after maximum retries.")
 
