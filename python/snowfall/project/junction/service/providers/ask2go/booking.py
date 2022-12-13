@@ -47,10 +47,12 @@ class BookingHandler(object):
         self,
         ask2go_client: client.Ask2GoClient,
         notifier: notifications.Notifier,
+        override_double_booking_check: bool,
     ):
         self._client = ask2go_client
         self._logger = structlog.get_logger(__name__)
         self._notifier = notifier
+        self._override_double_booking_check = override_double_booking_check
 
     async def book(
         self,
@@ -187,6 +189,7 @@ class BookingHandler(object):
         await self._client.update_booking_billing_address(
             booking_ref_id=booking_result.id,
             transaction_id=booking_result.transaction_id,
+            override_double_booking_check=self._override_double_booking_check,
         )
         booking_result = await self._poll_booking(booking_result)
         self._validate_booking_is_done(booking_result)

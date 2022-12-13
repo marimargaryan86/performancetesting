@@ -191,4 +191,5 @@ def booking_handler(ask2go_client: client.Ask2GoClient) -> booking.BookingHandle
     return booking.BookingHandler(
         ask2go_client=ask2go_client,
         notifier=notifications.LogNotifier(),
+        override_double_booking_check=False,
     )

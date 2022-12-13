@@ -51,6 +51,7 @@ class _OrdersSettings(service.Settings):
     smtp_sender: pydantic.EmailStr
     smtp_recipient: pydantic.EmailStr
     http_timeout: float = 60.0
+    override_double_booking_check: bool = False
 
 
 class _SearchSettings(service.Settings):
@@ -146,6 +147,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
                     sender=app.settings.smtp_sender,
                     recipient=app.settings.smtp_recipient,
                 ),
+                override_double_booking_check=app.settings.override_double_booking_check,
             ),
             price_quote_cache=cache.PriceQuoteCache(
                 client=redis.Client(redis_connection, prefix=app.name),

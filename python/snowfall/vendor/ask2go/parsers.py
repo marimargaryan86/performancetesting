@@ -130,6 +130,7 @@ def parse_create_booking_request(
 def parse_update_booking_request(
     booking_ref_id: str,
     transaction_id: str,
+    override_double_booking_check: bool,
 ) -> dict[str, Any]:
     return {
         "id": booking_ref_id,
@@ -146,6 +147,7 @@ def parse_update_booking_request(
             },
         },
         "isInvoiceRequested": True,
+        "overrideDoubleBookingCheck": override_double_booking_check,
     }
 
 

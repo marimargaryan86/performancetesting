@@ -80,6 +80,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         self,
         booking_ref_id: str,
         transaction_id: str,
+        override_double_booking_check: bool,
     ) -> booking.Booking:
         response = await self._make_request(
             "PUT",
@@ -89,6 +90,7 @@ class Ask2GoClient(object):  # noqa: WPS214
             payload=parsers.parse_update_booking_request(
                 booking_ref_id,
                 transaction_id,
+                override_double_booking_check,
             ),
         )
 

@@ -91,6 +91,7 @@ SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.usern
 {{ with secret "kv/data/${var.environment}/ask2go" }}
 API_BASE_URL={{ .Data.data.api_base_url }}
 API_BOOKING_BASE_URL={{ .Data.data.api_booking_base_url }}
+OVERRIDE_DOUBLE_BOOKING_CHECK={{ .Data.data.override_double_booking_check }}
 {{ end }}
 EOH
         destination = "services.env"
