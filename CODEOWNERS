@@ -1,18 +1,25 @@
 [CI/CD]
 /.gitlab/ @jyggen
-.editorconfig @jyggen @mb
-.gitignore @jyggen @mb
+/nomad/ @jyggen
+/python/snowfall/plugin/ @jyggen
+/vendor/ @bolmis @jyggen
+.editorconfig @bolmis @jyggen
+.gitignore @bolmis @jyggen
 .gitlab-ci.yml @jyggen
 .python-version @jyggen
 buf.gen.yaml @jyggen
 buf.yaml @jyggen
-docker-compose.yml @jyggen
+CONTRIBUTING.md @bolmis @jyggen
+docker-compose.yml @bolmis @jyggen
 pants @jyggen
 pants.ci.toml @jyggen
 pants.toml @jyggen
-*.nomad @jyggen
+README.md @bolmis @jyggen
 
 [Specification]
-/openapi/ @jyggen @mb
-/protobuf/ @jyggen @mb
-/vendor/ @jyggen @mb
+/docs/ @bolmis @jyggen
+/openapi/ @bolmis @jyggen
+/protobuf/ @bolmis @jyggen
+
+[Standard Library]
+/python/snowfall/stdlib/ @bolmis @jyggen
