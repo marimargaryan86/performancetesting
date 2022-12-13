@@ -148,6 +148,9 @@ enable_resolves = true
 tailor_pex_binary_targets = false
 resolves = {python-default = "vendor/lock/constraints.txt"}
 
+[python-infer]
+unowned_dependency_behavior = "error"
+
 [python-protobuf]
 mypy_plugin = true
 

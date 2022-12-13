@@ -6,7 +6,7 @@ import uuid
 import pytest
 
 from snowfall.vendor.ba_ndc import client, errors
-from snowfall.vendor.ba_ndc.models import (  # noqa: WPS235
+from snowfall.vendor.ba_ndc.models import (
     payer_details,
     request_add_seat_schemas,
     request_name_correction_schemas,
@@ -15,8 +15,8 @@ from snowfall.vendor.ba_ndc.models import (  # noqa: WPS235
     request_order_schemas,
     response_offer_search_schemas,
     response_order_schemas,
-    util,
 )
+from snowfall.vendor.ba_ndc.models.util import offer_enums, passenger_enums
 
 disable_by_default = pytest.mark.skipif(
     os.getenv("BA_NDC_TESTS") != "ENABLED",
@@ -220,7 +220,7 @@ async def test_reshop(ba_ndc_client: client.BaNdcClient) -> None:
     assert order_rs.order is not None and order_rs.origin_destinations
 
     reshop_rq = request_order_change_schemas.OrderReshopRequest(
-        cabin_preference=util.offer_enums.CabinTypeEnum.first,
+        cabin_preference=offer_enums.CabinTypeEnum.first,
         origin_destinations=[
             request_order_change_schemas.OriginDestination(
                 identifier=order_rs.origin_destinations[0].identifier,
@@ -243,13 +243,13 @@ async def call_get_offers(
     ba_ndc_client: client.BaNdcClient,
 ) -> response_offer_search_schemas.OfferSearchResponse:
     offer_search_rq = request_offer_search_schemas.OfferSearchRequest(
-        cabin_type=util.offer_enums.CabinTypeEnum.economy,
+        cabin_type=offer_enums.CabinTypeEnum.economy,
         fare_preferences={
-            util.offer_enums.FareGroupEnum.fare_rules,
+            offer_enums.FareGroupEnum.fare_rules,
         },
         passengers=[
             request_offer_search_schemas.Passenger(
-                passenger_type=util.passenger_enums.PassengerTypeEnum.adult,
+                passenger_type=passenger_enums.PassengerTypeEnum.adult,
                 birth_date=datetime.date.fromisoformat("1970-01-01"),
             ),
         ],
@@ -288,16 +288,16 @@ async def call_create_order(
         passengers=[
             request_order_schemas.PassengerExtended(
                 identifier="PA0",
-                passenger_type=util.passenger_enums.PassengerTypeEnum.adult,
+                passenger_type=passenger_enums.PassengerTypeEnum.adult,
                 first_name="John",
                 last_name="Doe",
                 name_title="MR",
                 birth_date=datetime.date.fromisoformat("1970-01-01"),
-                gender=util.passenger_enums.GenderEnum.male,
+                gender=passenger_enums.GenderEnum.male,
                 contact=request_order_schemas.Contact(
                     email="john.doe@snowfall.com",
                     phone=payer_details.Phone(
-                        phone_type=util.passenger_enums.PhoneTypeEnum.mobile,
+                        phone_type=passenger_enums.PhoneTypeEnum.mobile,
                         number="15141234567",
                     ),
                 ),
