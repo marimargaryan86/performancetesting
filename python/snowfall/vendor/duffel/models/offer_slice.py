@@ -18,7 +18,7 @@ class OfferSliceConditions(DuffelBaseModel):
 
 
 class OfferSliceSegmentPassengerBaggage(DuffelBaseModel):
-    offer_type: str = pydantic.Field(alias="type")
+    baggage_type: str = pydantic.Field(alias="type")
     quantity: int
 
 

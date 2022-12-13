@@ -200,5 +200,16 @@ class OfferParser(object):  # noqa: WPS214
         self,
         offer_segment: OfferSliceSegment,
     ) -> List[offer_models_pb2.BaggageAllowance]:
-        # todo
-        return []
+        return [
+            offer_models_pb2.BaggageAllowance(
+                free=self._free_checked_baggage(offer_segment) > 0,
+            ),
+        ]
+
+    def _free_checked_baggage(self, offer_segment: OfferSliceSegment) -> int:
+        return sum(
+            baggage.quantity
+            for passenger in offer_segment.passengers
+            for baggage in passenger.baggages
+            if baggage.baggage_type == "checked"
+        )

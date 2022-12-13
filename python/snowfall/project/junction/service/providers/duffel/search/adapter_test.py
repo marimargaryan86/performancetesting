@@ -31,7 +31,12 @@ async def test_adapter(
         async for offer_group in search_adapter.gather_search_results(search_task)
     ]
 
-    assert len(offer_groups) == 1
-    assert len(offer_groups[0].offers) == 2
-    assert offer_groups[0].offers[0].brand_name == "Economy Light"
-    assert offer_groups[0].offers[1].brand_name == "Economy Essential"
+    offers = [offer for group in offer_groups for offer in group.offers]
+    assert [offer.brand_name for offer in offers] == [
+        "Economy Light",
+        "Economy Essential",
+    ]
+    assert [
+        [segment.baggage_allowances[0].free for segment in offer.segment_details]
+        for offer in offers
+    ] == [[True, True], [True, True]]
