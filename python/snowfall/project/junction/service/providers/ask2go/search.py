@@ -120,8 +120,6 @@ class Adapter(object):
         page: int,
     ) -> search.SearchResultsResponse:
         for _ in range(self._poll_retries_limit):
-            await asyncio.sleep(self._wait_time_between_polling)
-
             search_result = await self._client.get_search_results(
                 search_id=identifiers.id,
                 transaction_id=identifiers.transaction_id,
@@ -130,5 +128,7 @@ class Adapter(object):
 
             if search_result.is_finished:
                 return search_result
+
+            await asyncio.sleep(self._wait_time_between_polling)
 
         raise NoResultsError("No results found.")
