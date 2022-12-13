@@ -25,14 +25,12 @@ disable_by_default = pytest.mark.skipif(
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_carriers(distribusion_client: client.DistribusionClient) -> None:
     carriers = await distribusion_client.get_marketing_carriers()
     assert carriers is not None
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_get_carriers_by_id(
     distribusion_client: client.DistribusionClient,
 ) -> None:
@@ -44,7 +42,6 @@ async def test_get_carriers_by_id(
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_get_carrier_booking_schema(
     distribusion_client: client.DistribusionClient,
 ) -> None:
@@ -56,7 +53,6 @@ async def test_get_carrier_booking_schema(
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_get_all_carriers_by_id(
     distribusion_client: client.DistribusionClient,
 ) -> None:
@@ -71,7 +67,6 @@ async def test_get_all_carriers_by_id(
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_get_marketing_carrier_stations(
     distribusion_client: client.DistribusionClient,
 ) -> None:
@@ -83,7 +78,6 @@ async def test_get_marketing_carrier_stations(
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_connections_find(
     distribusion_client: client.DistribusionClient,
 ) -> None:
@@ -102,7 +96,6 @@ async def test_connections_find(
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_connections_find_round_trip(
     distribusion_client: client.DistribusionClient,
 ) -> None:
@@ -122,14 +115,12 @@ async def test_connections_find_round_trip(
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_stations(distribusion_client: client.DistribusionClient) -> None:
     stations = await distribusion_client.get_stations()
     assert stations is not None
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_connection_vacancy(
     distribusion_client: client.DistribusionClient,
 ) -> None:
@@ -153,7 +144,6 @@ async def test_connection_vacancy(
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_get_connected_stations(
     distribusion_client: client.DistribusionClient,
 ) -> None:
@@ -169,7 +159,6 @@ async def test_get_connected_stations(
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_connection_seats(
     distribusion_client: client.DistribusionClient,
 ) -> None:
@@ -189,7 +178,6 @@ async def test_connection_seats(
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_get_booking_by_id(
     distribusion_client: client.DistribusionClient,
 ) -> None:
@@ -200,7 +188,6 @@ async def test_get_booking_by_id(
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_order_create(  # noqa: WPS210
     distribusion_client: client.DistribusionClient,
 ) -> None:
@@ -286,7 +273,6 @@ async def test_order_create(  # noqa: WPS210
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_get_order_by_id(
     distribusion_client: client.DistribusionClient,
 ) -> None:
@@ -296,7 +282,6 @@ async def test_get_order_by_id(
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_get_tickets(
     distribusion_client: client.DistribusionClient,
 ) -> None:
@@ -311,7 +296,6 @@ async def test_get_tickets(
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_get_cancellation_conditions(
     distribusion_client: client.DistribusionClient,
 ) -> None:
@@ -329,7 +313,6 @@ async def test_get_cancellation_conditions(
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_create_cancellation(
     distribusion_client: client.DistribusionClient,
 ) -> None:

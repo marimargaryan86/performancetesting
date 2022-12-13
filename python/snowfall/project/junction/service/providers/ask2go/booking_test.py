@@ -1,7 +1,6 @@
 import datetime
 
 import more_itertools
-import pytest
 import pytest_httpx
 from structlog import testing
 
@@ -64,7 +63,6 @@ def _mock_responses(
     )
 
 
-@pytest.mark.asyncio
 async def test_booking_can_be_placed(
     httpx_mock: pytest_httpx.HTTPXMock,
     booking_handler: booking.BookingHandler,
@@ -82,7 +80,6 @@ async def test_booking_can_be_placed(
     assert booking_proto.trip_result.operator_booking_references == ["JJODCR"]
 
 
-@pytest.mark.asyncio
 async def test_booking_failed(
     httpx_mock: pytest_httpx.HTTPXMock,
     booking_handler: booking.BookingHandler,
@@ -95,7 +92,6 @@ async def test_booking_failed(
     assert booking_proto.status == models_pb2.Booking.STATUS_ERROR
 
 
-@pytest.mark.asyncio
 async def test_booking_errors(
     booking_handler: booking.BookingHandler,
     magic_mocker: conftest.MagicMocker,
@@ -116,7 +112,6 @@ async def test_booking_errors(
             assert log["details"][0]["message"]
 
 
-@pytest.mark.asyncio
 async def test_unhandled_booking_error(
     booking_handler: booking.BookingHandler,
     httpx_mock: pytest_httpx.HTTPXMock,

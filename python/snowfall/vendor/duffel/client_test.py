@@ -19,7 +19,6 @@ from snowfall.vendor.duffel.builders.order_request import (
 _BASE_URL = "{base_path}{path}"
 
 
-@pytest.mark.asyncio
 async def test_offer_request(
     duffel_client: client.DuffelClient,
     httpx_mock: pytest_httpx.HTTPXMock,
@@ -49,7 +48,6 @@ async def test_offer_request(
     assert response
 
 
-@pytest.mark.asyncio
 async def test_single_offer(
     duffel_client: client.DuffelClient,
     httpx_mock: pytest_httpx.HTTPXMock,
@@ -71,7 +69,6 @@ async def test_single_offer(
     assert response
 
 
-@pytest.mark.asyncio
 async def test_error(
     duffel_client: client.DuffelClient,
     httpx_mock: pytest_httpx.HTTPXMock,
@@ -96,7 +93,6 @@ async def test_error(
     assert str(excinfo.value) == expected_title  # noqa: WPS441
 
 
-@pytest.mark.asyncio
 async def test_error_with_source_str(
     duffel_client: client.DuffelClient,
     httpx_mock: pytest_httpx.HTTPXMock,
@@ -121,7 +117,6 @@ async def test_error_with_source_str(
     assert str(excinfo.value) == expected_title  # noqa: WPS441
 
 
-@pytest.mark.asyncio
 async def test_order_create(
     duffel_client: client.DuffelClient,
     httpx_mock: pytest_httpx.HTTPXMock,

@@ -25,7 +25,6 @@ disable_by_default = pytest.mark.skipif(
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_get_offers(ba_ndc_client: client.BaNdcClient) -> None:
     offer_searches_rs = await call_get_offers(ba_ndc_client)
     assert offer_searches_rs is not None
@@ -33,7 +32,6 @@ async def test_get_offers(ba_ndc_client: client.BaNdcClient) -> None:
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_get_offer(ba_ndc_client: client.BaNdcClient) -> None:
     offer_searches_rs = await call_get_offers(ba_ndc_client)
     offer = random.choice(offer_searches_rs.offers)  # nosec
@@ -44,7 +42,6 @@ async def test_get_offer(ba_ndc_client: client.BaNdcClient) -> None:
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_create_order(ba_ndc_client: client.BaNdcClient) -> None:
     order_rs = await generate_order(ba_ndc_client)
     assert order_rs is not None
@@ -54,7 +51,6 @@ async def test_create_order(ba_ndc_client: client.BaNdcClient) -> None:
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_get_order(ba_ndc_client: client.BaNdcClient) -> None:
     order_rs = await generate_order(ba_ndc_client)
     assert order_rs is not None
@@ -68,7 +64,6 @@ async def test_get_order(ba_ndc_client: client.BaNdcClient) -> None:
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_get_order_with_invalid_order(ba_ndc_client: client.BaNdcClient) -> None:
     invalid_order = "50f5666c-eeee-4b65-8162-d0680f0a7959"
     with pytest.raises(errors.BaNdcError) as error_info:
@@ -78,7 +73,6 @@ async def test_get_order_with_invalid_order(ba_ndc_client: client.BaNdcClient) -
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_cancel_order(ba_ndc_client: client.BaNdcClient) -> None:
     order_rs = await generate_order(ba_ndc_client)
     assert order_rs is not None
@@ -88,7 +82,6 @@ async def test_cancel_order(ba_ndc_client: client.BaNdcClient) -> None:
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_passenger_name_correction(ba_ndc_client: client.BaNdcClient) -> None:
     order_rs = await generate_order(ba_ndc_client)
     assert order_rs is not None
@@ -122,7 +115,6 @@ async def test_passenger_name_correction(ba_ndc_client: client.BaNdcClient) -> N
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_get_services_by_offer(ba_ndc_client: client.BaNdcClient) -> None:
     offer_searches_rs = await call_get_offers(ba_ndc_client)
     assert offer_searches_rs is not None
@@ -135,7 +127,6 @@ async def test_get_services_by_offer(ba_ndc_client: client.BaNdcClient) -> None:
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_get_services_by_order(ba_ndc_client: client.BaNdcClient) -> None:
     order_rs = await generate_order(ba_ndc_client)
     assert order_rs is not None
@@ -149,7 +140,6 @@ async def test_get_services_by_order(ba_ndc_client: client.BaNdcClient) -> None:
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_get_seats_by_offer(ba_ndc_client: client.BaNdcClient) -> None:
     offer_searches_rs = await call_get_offers(ba_ndc_client)
     assert offer_searches_rs is not None
@@ -163,7 +153,6 @@ async def test_get_seats_by_offer(ba_ndc_client: client.BaNdcClient) -> None:
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_get_seats_by_order(ba_ndc_client: client.BaNdcClient) -> None:
     order_rs = await generate_order(ba_ndc_client)
     assert order_rs is not None
@@ -177,7 +166,6 @@ async def test_get_seats_by_order(ba_ndc_client: client.BaNdcClient) -> None:
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_add_seat(ba_ndc_client: client.BaNdcClient) -> None:
     order_rs = await generate_order(ba_ndc_client)
     assert order_rs is not None
@@ -213,7 +201,6 @@ async def test_add_seat(ba_ndc_client: client.BaNdcClient) -> None:
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_reshop(ba_ndc_client: client.BaNdcClient) -> None:
     order_rs = await generate_order(ba_ndc_client)
     assert order_rs is not None

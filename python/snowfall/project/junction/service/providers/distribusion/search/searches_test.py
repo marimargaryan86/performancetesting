@@ -1,8 +1,6 @@
 import datetime
 import zoneinfo
 
-import pytest
-
 from snowfall.project.junction.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
@@ -76,7 +74,6 @@ _DEBERCBS_FRPARPGB = amqp_pb2.SearchCriteriaTask(
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_search(
     distribusion_search_adapter: DistribusionSearchAdapter,
 ) -> None:

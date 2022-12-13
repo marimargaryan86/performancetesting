@@ -11,7 +11,6 @@ disable_by_default = pytest.mark.skipif(
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_load_stations() -> None:
     station_list = await stations.load_stations()
     assert station_list

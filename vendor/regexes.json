@@ -2,7 +2,8 @@
   "required_matches": {
     "all_python_files": [
       "no_file_level_flake8_noqa",
-      "no_unspecific_type_ignore"
+      "no_unspecific_type_ignore",
+      "no_pytest_mark_asyncio"
     ]
   },
   "path_patterns": [
@@ -20,6 +21,11 @@
     {
       "name": "no_unspecific_type_ignore",
       "pattern": "# type: ignore\\s",
+      "inverted": true
+    },
+    {
+      "name": "no_pytest_mark_asyncio",
+      "pattern": "@pytest\\.mark\\.asyncio",
       "inverted": true
     }
   ]

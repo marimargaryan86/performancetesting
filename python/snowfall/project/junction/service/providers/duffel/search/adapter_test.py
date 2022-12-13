@@ -1,4 +1,3 @@
-import pytest
 import pytest_httpx
 
 from snowfall.project.junction.service.providers.duffel.conftest import (
@@ -10,7 +9,6 @@ from snowfall.project.junction.service.providers.duffel.search import adapter
 from snowfall.vendor.duffel.models.offer_request import OfferRequestResponse
 
 
-@pytest.mark.asyncio
 async def test_adapter(
     httpx_mock: pytest_httpx.HTTPXMock,
     search_adapter: adapter.DuffelSearchAdapter,

@@ -24,7 +24,6 @@ disable_by_default = pytest.mark.skipif(
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_request_offers(duffel_client: client.DuffelClient) -> None:
     offer_request_create = OffersRequestBuilder()
     offer_request_create.add_passenger(OfferRequestPassenger(pax_type="adult"))
@@ -41,7 +40,6 @@ async def test_request_offers(duffel_client: client.DuffelClient) -> None:
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_request_round_trip_offers(duffel_client: client.DuffelClient) -> None:
     offer_request_create = OffersRequestBuilder()
     offer_request_create.add_passenger(OfferRequestPassenger(pax_type="adult"))
@@ -65,7 +63,6 @@ async def test_request_round_trip_offers(duffel_client: client.DuffelClient) -> 
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_get_offers(duffel_client: client.DuffelClient) -> None:
     offer_id = "off_0000AQRKj9nf2S3luPitBA"
     offers = await duffel_client.get_single_offer(offer_id)
@@ -73,7 +70,6 @@ async def test_get_offers(duffel_client: client.DuffelClient) -> None:
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_order_create(duffel_client: client.DuffelClient) -> None:
     offer_request_create = OffersRequestBuilder()
     offer_request_create.add_passenger(OfferRequestPassenger(pax_type="adult"))
@@ -122,14 +118,12 @@ async def test_order_create(duffel_client: client.DuffelClient) -> None:
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_get_order(duffel_client: client.DuffelClient) -> None:
     order_response = await duffel_client.get_order("ord_0000AQLMc7fLefajMkhgDh")
     assert order_response is not None
 
 
 @disable_by_default
-@pytest.mark.asyncio
 async def test_order_cancel(duffel_client: client.DuffelClient) -> None:
     order_cancel_request = OrderCancelRequestBuilder()
     order_cancel_request.order_type("ord_0000AQLMc7fLefajMkhgDh")

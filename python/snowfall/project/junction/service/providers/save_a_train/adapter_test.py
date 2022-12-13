@@ -1,6 +1,5 @@
 import datetime
 
-import pytest
 import pytest_httpx
 
 from snowfall.project.junction.service.orders.v1alpha import amqp_pb2, models_pb2
@@ -68,7 +67,6 @@ def _mock_responses(httpx_mock: pytest_httpx.HTTPXMock) -> None:
     )
 
 
-@pytest.mark.asyncio
 async def test_booking_can_be_placed(
     httpx_mock: pytest_httpx.HTTPXMock,
     save_a_train_adapter: adapter.SaveATrainAdapter,
