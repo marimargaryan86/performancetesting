@@ -22,6 +22,10 @@ variable "datacenter" {
   type = string
 }
 
+variable "count" {
+  type = number
+}
+
 job "trips-consume" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -36,7 +40,7 @@ job "trips-consume" {
   }
 
   group "consume" {
-    count = 5
+    count = "${var.count}"
 
     restart {
       attempts = 3

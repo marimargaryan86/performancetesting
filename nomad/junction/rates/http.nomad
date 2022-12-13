@@ -22,6 +22,10 @@ variable "datacenter" {
   type = string
 }
 
+variable "count" {
+  type = number
+}
+
 job "rates" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -36,7 +40,7 @@ job "rates" {
   }
 
   group "grpc" {
-    count = 1
+    count = "${var.count}"
 
     network {
       port "grpc" {}

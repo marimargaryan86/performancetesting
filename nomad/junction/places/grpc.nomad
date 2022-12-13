@@ -22,6 +22,10 @@ variable "datacenter" {
   type = string
 }
 
+variable "count" {
+  type = number
+}
+
 job "places-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -36,7 +40,7 @@ job "places-grpc" {
   }
 
   group "grpc" {
-    count = 1
+    count = "${var.count}"
 
     restart {
       attempts = 3

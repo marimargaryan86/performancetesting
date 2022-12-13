@@ -22,6 +22,10 @@ variable "datacenter" {
   type = string
 }
 
+variable "count" {
+  type = number
+}
+
 job "ask2go-offers" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -36,7 +40,7 @@ job "ask2go-offers" {
   }
 
   group "offers" {
-    count = 2
+    count = "${var.count}"
 
     restart {
       attempts = 3

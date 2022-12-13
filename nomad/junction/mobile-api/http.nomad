@@ -30,6 +30,10 @@ variable "traefik_host_URL" {
   type = string
 }
 
+variable "count" {
+  type = number
+}
+
 job "mobile-api-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -44,7 +48,7 @@ job "mobile-api-http" {
   }
 
   group "http" {
-    count = 1
+    count = "${var.count}"
 
     restart {
       attempts = 3
