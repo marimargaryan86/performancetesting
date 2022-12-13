@@ -1,13 +1,75 @@
+import datetime
+
 import structlog
 
+from snowfall.project.junction.service.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
+from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.project.junction.service.orders.v1alpha import amqp_pb2 as orders_amqp_pb2
 from snowfall.project.junction.service.providers.save_a_train import (
     adapter as save_a_train_adapter,
 )
 from snowfall.project.junction.service.providers.save_a_train import cache
+from snowfall.stdlib import money
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 
 _PROVIDER_NAME = "Save A Train"
+
+
+class PriceQuoteConsumer(object):
+    def __init__(  # noqa: WPS211
+        self,
+        consumer_obj: consumer.Consumer[offers_amqp_pb2.TripPriceQuoteTask],
+        producer_obj: producer.Producer,
+        offer_cache: cache.OffersCache,
+        price_cache: cache.PriceQuoteCache,
+        price_ttl: datetime.timedelta,
+    ):
+        self._offer_cache = offer_cache
+        self._price_cache = price_cache
+        self._ttl = price_ttl
+        self._consumer = consumer_obj
+        self._logger = structlog.get_logger(__name__)
+        self._producer = producer_obj
+
+    async def consume(self) -> None:
+        await self._consumer.consume(self._process_message)
+
+    async def _process_message(
+        self,
+        amqp_message: types.Message[offers_amqp_pb2.TripPriceQuoteTask],
+    ) -> None:
+        offer_details = await self._offer_cache.fetch(amqp_message.body.option_id)
+
+        if not offer_details:
+            return
+
+        expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
+
+        await self._producer.publish(
+            offers_amqp_pb2.TripPriceQuoteResult(
+                price_quote_container_id=amqp_message.body.price_quote_container_id,
+                option_id=amqp_message.body.option_id,
+                price_quote=offers_pb2.PriceQuote(
+                    id=await self._price_cache.store(
+                        cache.PriceQuote(
+                            search_id=offer_details.search_id,
+                            search_result_id=offer_details.search_result_id,
+                            transfer_id=offer_details.transfer_id,
+                            fare_id=offer_details.fare_id,
+                        ),
+                        expires_at=expires_at,
+                    ),
+                    option_id=amqp_message.body.option_id,
+                    expires_at=protobuf.datetime_to_protobuf(expires_at),
+                    price=money.from_string(
+                        offer_details.price,
+                        money.Currency(offer_details.currency),
+                    ).protobuf(),
+                ),
+            ),
+            routing_key="offers.result.price",
+        )
 
 
 class OrdersConsumer(object):

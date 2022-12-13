@@ -175,6 +175,8 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                                     search_result_id=search_result.identifier,
                                     transfer_id=transfer.identifier,
                                     fare_id=transfer_fare.identifier,
+                                    price=transfer_fare.price,
+                                    currency="EUR",
                                 ),
                                 expires_at=expires_at,
                             ),

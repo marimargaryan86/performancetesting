@@ -79,6 +79,8 @@ async def test_booking_can_be_placed(
             search_id="4Q5lMS",
             search_result_id=2,
             transfer_id=3,
+            price="13.37",
+            currency="EUR",
         ),
     )
     total_price = money.from_protobuf(booking_proto.total_price)

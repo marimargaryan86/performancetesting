@@ -55,6 +55,7 @@ class _DumpStationsSettings(_SatConfig, service.Settings):
 class _OffersSettings(service.Settings):
     amqp_dsn: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
+    ttl: datetime.timedelta = datetime.timedelta(minutes=45)
 
 
 class _SearchSettings(_SatConfig, service.Settings):
@@ -224,6 +225,38 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
         await orders_consumer.consume()
 
 
+async def _price_quotes(app: service.Application[_OffersSettings]) -> None:
+    async with contextlib.AsyncExitStack() as stack:
+        redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
+            aioredis.from_url(
+                random.choice(app.settings.redis_dsn),  # nosec
+                decode_responses=False,
+            ).client(),
+        )
+        amqp_connection = await stack.enter_async_context(
+            types.Connection(app.settings.amqp_dsn),
+        )
+
+        await consumer.PriceQuoteConsumer(
+            consumer_obj=amqp_consumer.Consumer(
+                connection=amqp_connection,
+                queue_name="{0}_prices".format(app.name),
+                binds=[(types.Exchange("prices"), "offers.pricing")],
+            ),
+            producer_obj=producer.Producer(
+                connection=amqp_connection,
+                exchange=types.Exchange("prices"),
+            ),
+            offer_cache=cache.OffersCache(
+                client=redis.Client(redis_connection, prefix=app.name),
+            ),
+            price_cache=cache.PriceQuoteCache(
+                client=redis.Client(redis_connection, prefix=app.name),
+            ),
+            price_ttl=app.settings.ttl,
+        ).consume()
+
+
 async def _dump_stations(app: service.Application[_DumpStationsSettings]) -> None:
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
@@ -292,5 +325,10 @@ if __name__ == "__main__":
             name="orders",
             callback=_orders,
             settings_class=_OrdersSettings,
+        ),
+        service.Command(
+            name="pricing",
+            callback=_price_quotes,
+            settings_class=_OffersSettings,
         ),
     )
