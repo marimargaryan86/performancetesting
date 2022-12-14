@@ -3,6 +3,7 @@ import datetime
 import itertools
 from typing import Mapping, Sequence
 
+import prometheus_client
 import structlog
 
 from snowfall.project.junction.service.offers import offers
@@ -165,6 +166,12 @@ class OfferAggregator(object):
         trackable_pb2.Trackable.STATUS_COMPLETED,
     )
 
+    _aggregated_total = prometheus_client.Counter(
+        "offers_aggregated_total",
+        "Total number of offer groups aggregated",
+        ["offer_search_status"],
+    )
+
     def __init__(
         self,
         offer_searches: offers.OfferSearchRepository,
@@ -184,6 +191,13 @@ class OfferAggregator(object):
 
         if not offer_search:
             raise SkippedOfferError()
+
+        self._aggregated_total.labels(
+            offer_search_status=protobuf.enum_value_to_slug(
+                trackable_pb2.Trackable.Status.DESCRIPTOR,
+                offer_search.status,
+            ),
+        ).inc()
 
         if offer_search.status in self._skippable_statuses:
             self._logger.error(
