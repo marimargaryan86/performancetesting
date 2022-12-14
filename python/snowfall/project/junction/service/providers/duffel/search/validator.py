@@ -8,6 +8,7 @@ from typing import Sequence
 import structlog
 from google.protobuf import timestamp_pb2
 
+from snowfall.project.junction.service.providers.duffel.search import parser
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2
 from snowfall.vendor.duffel.models.offer import Offer
@@ -61,11 +62,11 @@ class OfferValidator(object):
         if not offer or not offer.slices:
             return False
 
-        slice_segments = [
-            segment
+        slice_segments = [  # noqa: WPS224
+            leg
             for offer_slice in offer.slices
             for segment in offer_slice.segments or []
-            # todo handle stops
+            for leg in parser.segment_to_legs(segment)
         ]
 
         if len(self._requirements) != len(slice_segments):

@@ -40,3 +40,42 @@ async def test_adapter(
         [segment.baggage_allowances[0].free for segment in offer.segment_details]
         for offer in offers
     ] == [[True, True], [True, True]]
+
+
+async def test_offer_with_stop(
+    httpx_mock: pytest_httpx.HTTPXMock,
+    search_adapter: adapter.DuffelSearchAdapter,
+) -> None:
+    json = load_file_fixture("offers_with_stop.json")
+    assert json is not None
+
+    httpx_mock.add_response(
+        url="{api_base_url}/air/offer_requests".format(
+            api_base_url=API_BASE_URL,
+        ),
+        method="POST",
+        json=json,
+    )
+
+    offer_response = OfferRequestResponse.parse_obj(json)
+    ba15_offer = next(
+        offer
+        for offer in offer_response.response_data.offers
+        if all(
+            segment.marketing_carrier_flight_number == "0015"
+            for offer_slice in offer.slices
+            for segment in offer_slice.segments
+        )
+    )
+    search_task = search_task_from_offer(ba15_offer)
+    offer_groups = [
+        offer_group
+        async for offer_group in search_adapter.gather_search_results(search_task)
+    ]
+
+    assert all(
+        segment.vehicle.number == "0015"
+        for offer_group in offer_groups
+        for segment in offer_group.segments
+    )
+    assert len(offer_groups[0].segments[0].legs) == 2

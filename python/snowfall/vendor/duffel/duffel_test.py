@@ -29,9 +29,9 @@ async def test_request_offers(duffel_client: client.DuffelClient) -> None:
     offer_request_create.add_passenger(OfferRequestPassenger(pax_type="adult"))
     offer_request_create.add_slice(
         OfferRequestSlice(
-            destination="JFK",
             origin="LHR",
-            departure_date=datetime.date.today() + datetime.timedelta(days=10),
+            destination="SYD",
+            departure_date=datetime.date.fromisoformat("2023-02-26"),
         ),
     )
 

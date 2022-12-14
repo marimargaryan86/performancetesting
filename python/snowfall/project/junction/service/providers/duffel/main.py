@@ -8,7 +8,7 @@ from snowfall.project.junction.service.providers.duffel.search import searches
 from snowfall.stdlib import service
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="distribusion")
+    entrypoint = service.Entrypoint(name="duffel")
 
     entrypoint.enter_with_commands(
         service.Command(

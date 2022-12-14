@@ -11,7 +11,7 @@ from bson import json_util
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.service.providers.duffel import cache
-from snowfall.project.junction.service.providers.duffel.search import adapter
+from snowfall.project.junction.service.providers.duffel.search import adapter, parser
 from snowfall.project.junction.service.providers.duffel.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence import filesystem
@@ -69,34 +69,35 @@ def search_task_from_offer(offer: Offer) -> amqp_pb2.SearchCriteriaTask:
                         id=str(uuid.uuid4()),
                         origin=models_pb2.Point(
                             coordinates=models_pb2.Coordinates(
-                                longitude=offer_segment.origin.longitude,
-                                latitude=offer_segment.origin.latitude,
+                                longitude=offer_leg.origin.longitude,
+                                latitude=offer_leg.origin.latitude,
                             ),
-                            time_zone=offer_segment.origin.time_zone,
+                            time_zone=offer_leg.origin.time_zone,
                         ),
                         destination=models_pb2.Point(
                             coordinates=models_pb2.Coordinates(
-                                longitude=offer_segment.destination.longitude,
-                                latitude=offer_segment.destination.latitude,
+                                longitude=offer_leg.destination.longitude,
+                                latitude=offer_leg.destination.latitude,
                             ),
-                            time_zone=offer_segment.destination.time_zone,
+                            time_zone=offer_leg.destination.time_zone,
                         ),
                         departure_at=protobuf.datetime_to_protobuf(
-                            offer_segment.departing_at.replace(
+                            offer_leg.departing_at.replace(
                                 tzinfo=zoneinfo.ZoneInfo(
-                                    offer_segment.origin.time_zone,
+                                    offer_leg.origin.time_zone,
                                 ),
                             ),
                         ),
                         arrival_at=protobuf.datetime_to_protobuf(
-                            offer_segment.arriving_at.replace(
+                            offer_leg.arriving_at.replace(
                                 tzinfo=zoneinfo.ZoneInfo(
-                                    offer_segment.destination.time_zone,
+                                    offer_leg.destination.time_zone,
                                 ),
                             ),
                         ),
                         type=models_pb2.Schedule.Type.TYPE_AIR,
-                    ),
+                    )
+                    for offer_leg in parser.segment_to_legs(offer_segment)
                 ],
             )
             for offer_slice in offer.slices

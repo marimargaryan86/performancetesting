@@ -70,45 +70,45 @@ class OfferParser(object):  # noqa: WPS214
         segment: OfferSliceSegment,
         search_segment: models_pb2.Segment,
     ) -> offer_models_pb2.OfferSegment:
-        first_search_segment_leg = search_segment.legs[0]
-        # todo: add support of stops
-
-        leg = offer_models_pb2.OfferSegmentLeg(
-            id=first_search_segment_leg.id,
-            origin=models_pb2.Point(
-                ref=segment.origin.iata_code or "",
-                name=segment.origin.name,
-                coordinates=models_pb2.Coordinates(
-                    latitude=segment.origin.latitude,
-                    longitude=segment.origin.longitude,
-                ),
-                time_zone=segment.origin.time_zone,
-            ),
-            destination=models_pb2.Point(
-                ref=segment.destination.iata_code or "",
-                name=segment.destination.name or "",
-                coordinates=models_pb2.Coordinates(
-                    latitude=segment.destination.latitude,
-                    longitude=segment.destination.longitude,
-                ),
-                time_zone=segment.destination.time_zone,
-            ),
-            departure_at=protobuf.datetime_to_protobuf(
-                segment.departing_at.replace(
-                    tzinfo=zoneinfo.ZoneInfo(segment.origin.time_zone),
-                ),
-            ),
-            arrival_at=protobuf.datetime_to_protobuf(
-                segment.arriving_at.replace(
-                    tzinfo=zoneinfo.ZoneInfo(segment.destination.time_zone),
-                ),
-            ),
-        )
+        offer_legs = segment_to_legs(segment)
 
         return offer_models_pb2.OfferSegment(
             id=string.uuid(),
             segment_id=search_segment.id,
-            legs=[leg],
+            legs=[
+                offer_models_pb2.OfferSegmentLeg(
+                    id=search_leg.id,
+                    origin=models_pb2.Point(
+                        ref=offer_leg.origin.iata_code or "",
+                        name=offer_leg.origin.name,
+                        coordinates=models_pb2.Coordinates(
+                            latitude=offer_leg.origin.latitude,
+                            longitude=offer_leg.origin.longitude,
+                        ),
+                        time_zone=offer_leg.origin.time_zone,
+                    ),
+                    destination=models_pb2.Point(
+                        ref=offer_leg.destination.iata_code or "",
+                        name=offer_leg.destination.name or "",
+                        coordinates=models_pb2.Coordinates(
+                            latitude=offer_leg.destination.latitude,
+                            longitude=offer_leg.destination.longitude,
+                        ),
+                        time_zone=offer_leg.destination.time_zone,
+                    ),
+                    departure_at=protobuf.datetime_to_protobuf(
+                        offer_leg.departing_at.replace(
+                            tzinfo=zoneinfo.ZoneInfo(offer_leg.origin.time_zone),
+                        ),
+                    ),
+                    arrival_at=protobuf.datetime_to_protobuf(
+                        offer_leg.arriving_at.replace(
+                            tzinfo=zoneinfo.ZoneInfo(offer_leg.destination.time_zone),
+                        ),
+                    ),
+                )
+                for offer_leg, search_leg in zip(offer_legs, search_segment.legs)
+            ],
             vehicle=offer_models_pb2.Vehicle(
                 equipment=segment.aircraft.identifier if segment.aircraft else "",
                 number=segment.marketing_carrier_flight_number,
@@ -213,3 +213,38 @@ class OfferParser(object):  # noqa: WPS214
             for baggage in passenger.baggages
             if baggage.baggage_type == "checked"
         )
+
+
+def segment_to_legs(
+    segment: OfferSliceSegment,
+) -> Sequence[OfferSliceSegment]:
+    if not segment.stops:
+        return [segment]
+
+    legs = [segment.copy()]
+
+    for stop in segment.stops:
+        last_leg = legs[-1]
+
+        legs.append(
+            OfferSliceSegment(
+                identifier=last_leg.identifier,
+                aircraft=last_leg.aircraft,
+                arriving_at=last_leg.arriving_at,
+                departing_at=stop.departing_at,
+                destination=last_leg.destination,
+                destination_terminal=last_leg.destination_terminal,
+                origin=stop.airport,
+                marketing_carrier=last_leg.marketing_carrier,
+                marketing_carrier_flight_number=last_leg.marketing_carrier_flight_number,
+                operating_carrier=last_leg.operating_carrier,
+                operating_carrier_flight_number=last_leg.operating_carrier_flight_number,
+                passengers=last_leg.passengers,
+            ),
+        )
+
+        last_leg.destination = stop.airport
+        last_leg.destination_terminal = None
+        last_leg.arriving_at = stop.arriving_at
+
+    return legs
