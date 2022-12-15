@@ -8,6 +8,7 @@ import prometheus_client
 import pycountry
 import structlog
 
+from snowfall.project.junction.provider import notifications as base_notifications
 from snowfall.project.junction.service.orders.v1alpha import amqp_pb2, models_pb2
 from snowfall.project.junction.service.providers.ask2go import (
     cache,
@@ -46,7 +47,7 @@ class BookingHandler(object):
     def __init__(
         self,
         ask2go_client: client.Ask2GoClient,
-        notifier: notifications.Notifier,
+        notifier: base_notifications.Notifier,
         override_double_booking_check: bool,
     ):
         self._client = ask2go_client
@@ -199,7 +200,7 @@ class BookingHandler(object):
             await self._notifier.send(
                 notifications.BookingNotification(metadata, booking_result),
             )
-        except notifications.NotificationError:
+        except base_notifications.NotificationError:
             self._logger.exception()
 
         return booking_result

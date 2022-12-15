@@ -95,6 +95,7 @@ job "save-a-train-orders" {
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 GEODATA_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_geodata-${var.environment}"))}}
+SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
 {{ with secret "kv/data/${var.environment}/save-a-train"  }}
 API_EMAIL={{ .Data.data.api_email }}
 API_PASSWORD={{ .Data.data.api_password }}
@@ -126,6 +127,8 @@ EOH
       env {
         ENV_NAME        = "${var.environment}"
         SENTRY_DSN      = "https://f01c7c8bf4d04a709a65b4be8b11ba69@sentry.snowfall.se/36"
+        SMTP_SENDER     = "noreply@junction.travel"
+        SMTP_RECIPIENT  = "SATBooking@snowfalltravel.com"
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
       }
     }

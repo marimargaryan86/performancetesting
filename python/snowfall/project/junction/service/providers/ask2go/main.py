@@ -10,13 +10,12 @@ import httpx
 import pydantic
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import airports, offers
+from snowfall.project.junction.provider import airports, notifications, offers
 from snowfall.project.junction.service.providers.ask2go import (
     booking,
     cache,
     consumer,
     criteria,
-    notifications,
 )
 from snowfall.project.junction.service.providers.ask2go import offers as a2g_offers
 from snowfall.project.junction.service.providers.ask2go import (

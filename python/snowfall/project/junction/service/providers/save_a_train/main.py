@@ -8,11 +8,12 @@ import pkgutil
 import random
 from typing import Sequence
 
+import aiosmtplib
 import httpx
 import pydantic
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import offers
+from snowfall.project.junction.provider import notifications, offers
 from snowfall.project.junction.service.providers.save_a_train import (
     adapter,
     cache,
@@ -68,6 +69,9 @@ class _OrdersSettings(_SatConfig, service.Settings):
     amqp_dsn: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
+    smtp_dsn: pydantic.AnyUrl
+    smtp_sender: pydantic.EmailStr
+    smtp_recipient: pydantic.EmailStr
 
 
 async def _offers(app: service.Application[_OffersSettings]) -> None:
@@ -162,6 +166,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                     client=redis.Client(redis_connection, prefix=app.name),
                 ),
                 ttl=app.settings.ttl,
+                notifier=notifications.LogNotifier(),
             ).gather_search_results,
         )
 
@@ -218,6 +223,17 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
                 ),
                 offers_cache=offer_cache,
                 ttl=app.settings.ttl,
+                notifier=notifications.SmtpNotifier(
+                    smtp_client=aiosmtplib.SMTP(
+                        hostname=app.settings.smtp_dsn.host,
+                        port=int(app.settings.smtp_dsn.port or 0) or None,
+                        username=app.settings.smtp_dsn.user,
+                        password=app.settings.smtp_dsn.password,
+                        start_tls=True,
+                    ),
+                    sender=app.settings.smtp_sender,
+                    recipient=app.settings.smtp_recipient,
+                ),
             ),
             offers_cache=offer_cache,
         )

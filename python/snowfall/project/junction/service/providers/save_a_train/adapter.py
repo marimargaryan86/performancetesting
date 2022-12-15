@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import dataclasses
 import datetime
 import types
 from typing import AsyncIterator, Optional, Sequence
@@ -11,6 +10,7 @@ import phonenumbers
 import pycountry
 import structlog
 
+from snowfall.project.junction.provider import notifications as base_notifications
 from snowfall.project.junction.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
@@ -21,6 +21,7 @@ from snowfall.project.junction.service.orders.v1alpha import (
 from snowfall.project.junction.service.providers.save_a_train import (
     cache,
     models,
+    notifications,
     train_stations,
 )
 from snowfall.project.junction.service.providers.save_a_train.v1alpha import amqp_pb2
@@ -47,13 +48,6 @@ _CABIN_MAPPING = types.MappingProxyType(
 logger = structlog.get_logger(__name__)
 
 
-@dataclasses.dataclass(frozen=True)
-class CombinedBookingResults(object):
-    make_booking: booking.BookingResult
-    confirm_booking: booking.BookingConfirmationResult
-    get_ticket: booking.TicketInfo
-
-
 class SaveATrainAdapterError(Exception):
     """Raised when there is an exception in the Save a Train adapter."""
 
@@ -70,17 +64,19 @@ class SaveATrainAdapter(object):  # noqa: WPS214
     _poll_retries_limit = 10
     _wait_time_between_polling = 1
 
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
         save_a_train_client: client.SATClient,
         train_station_repository: train_stations.TrainStationRepository,
         offers_cache: cache.OffersCache,
         ttl: datetime.timedelta,
+        notifier: base_notifications.Notifier,
     ) -> None:
         self._train_stations = train_station_repository
         self._client = save_a_train_client
         self._offers_cache = offers_cache
         self._ttl = ttl
+        self._notifier = notifier
         self._logger = structlog.get_logger(__name__)
 
     async def gather_search_results(  # noqa: C901,WPS210,WPS231
@@ -275,6 +271,14 @@ class SaveATrainAdapter(object):  # noqa: WPS214
 
             return new_booking
 
+        try:
+            # todo: this should be handled in a separate service
+            await self._notifier.send(
+                notifications.BookingNotification(task.metadata, booking_responses),
+            )
+        except base_notifications.NotificationError:
+            self._logger.exception()
+
         new_booking.MergeFrom(
             order_models_pb2.Booking(
                 status=order_models_pb2.Booking.STATUS_CONFIRMED,
@@ -305,7 +309,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         self,
         task: order_amqp_pb2.PlaceOrderTask,
         offer_details: cache.OfferDetails,
-    ) -> CombinedBookingResults:
+    ) -> models.CombinedBookingResults:
         search_id, seat_code = self._extract_search_id_and_seat_preference_code(
             await self._select_search_result(offer_details),
         )
@@ -317,7 +321,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         )
         confirm_booking_result = await self._confirm_booking(search_id=search_id)
         get_ticket_result = await self._get_ticket(search_id=search_id)
-        return CombinedBookingResults(
+        return models.CombinedBookingResults(
             make_booking=booking_result,
             confirm_booking=confirm_booking_result,
             get_ticket=get_ticket_result,

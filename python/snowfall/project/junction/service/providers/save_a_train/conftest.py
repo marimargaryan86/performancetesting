@@ -9,6 +9,7 @@ import httpx
 import pytest
 from redis import asyncio as aioredis
 
+from snowfall.project.junction.provider import notifications
 from snowfall.project.junction.service.providers.save_a_train import (
     adapter,
     cache,
@@ -74,4 +75,5 @@ def save_a_train_adapter(
             client=redis.Client(redis_client),
         ),
         ttl=datetime.timedelta(minutes=1),
+        notifier=notifications.LogNotifier(),
     )

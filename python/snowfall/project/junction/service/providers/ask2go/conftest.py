@@ -13,12 +13,11 @@ import pytest_httpx
 import structlog
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import airports
+from snowfall.project.junction.provider import airports, notifications
 from snowfall.project.junction.service.providers.ask2go import (
     booking,
     cache,
     criteria,
-    notifications,
     pricing,
     search,
     transformer,
