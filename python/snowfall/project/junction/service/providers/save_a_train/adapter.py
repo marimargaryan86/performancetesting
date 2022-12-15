@@ -354,8 +354,19 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         seat_preference_code = None
 
         seat_preference = response.outbound_selected_result.seat_preference
-        if seat_preference is not None and seat_preference.status == "included":
-            seat_preference_code = seat_preference.options[0].code
+
+        if seat_preference is not None:
+            if seat_preference.status == "included":
+                seat_preference_code = seat_preference.options[0].code
+            else:
+                seat_preference_code = next(
+                    (
+                        option.code
+                        for option in seat_preference.options
+                        if option.name == "notreserve"
+                    ),
+                    None,
+                )
 
         return response.search_identifier, seat_preference_code
 
@@ -419,7 +430,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
             return await self._client.create_booking(
                 request.CreateBookingRequest(
                     search_id=search_id,
-                    seat_preference_code=seat_code or "ALLOWED_SEAT_LOCATION.W",
+                    seat_preference_code=seat_code or None,
                     passengers=[
                         booking.Passenger(
                             title=title_map[passenger.title],

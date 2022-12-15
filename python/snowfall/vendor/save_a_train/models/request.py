@@ -44,4 +44,4 @@ class GetTariffConditionsRequest(BaseModel):
 class CreateBookingRequest(BaseModel):
     search_id: str
     passengers: Sequence[Passenger]
-    seat_preference_code: str = ""
+    seat_preference_code: str | None = None
