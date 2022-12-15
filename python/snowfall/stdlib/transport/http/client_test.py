@@ -21,12 +21,12 @@ async def test_http_status_error(
         },
     )
 
-    with pytest.raises(errors.HttpStatusError) as status_exc:
+    with pytest.raises(errors.HttpStatusError) as exc:
         await http_client._make_request(  # noqa: WPS437
             client.RequestOptions(method="GET", path="/hello", query={"a": "24"}),
         )
 
-        assert str(status_exc.value.body["message"]) == "Bad request"
+    assert str(exc.value.body["message"]) == "Bad request"  # noqa: WPS441
 
 
 async def test_empty_title_error_message(
@@ -39,12 +39,12 @@ async def test_empty_title_error_message(
         status_code=400,
     )
 
-    with pytest.raises(errors.HttpStatusError) as status_exc:
+    with pytest.raises(errors.HttpStatusError) as exc:
         await http_client._make_request(  # noqa: WPS437
             client.RequestOptions(method="POST", path="/hello", payload={"a": 24}),
         )
 
-        assert str(status_exc.value) == status.description
+    assert str(exc.value) == status.description  # noqa: WPS441
 
 
 async def test_default_error_message(
@@ -56,7 +56,7 @@ async def test_default_error_message(
         exception=httpx.ConnectError(""),
     )
 
-    with pytest.raises(errors.RequestError) as exc_info:
+    with pytest.raises(errors.RequestError) as exc:
         await http_client._make_request(  # noqa: WPS437
             client.RequestOptions(
                 method="PATCH",
@@ -65,7 +65,7 @@ async def test_default_error_message(
             ),
         )
 
-        assert str(exc_info.value) == inspect.getdoc(httpx.ConnectError)
+    assert str(exc.value) == inspect.getdoc(httpx.ConnectError)  # noqa: WPS441
 
 
 async def test_timeout_error_message(
@@ -77,9 +77,9 @@ async def test_timeout_error_message(
         exception=httpx.ReadTimeout(""),
     )
 
-    with pytest.raises(errors.TimeOutError) as exc_info:
+    with pytest.raises(errors.TimeOutError) as exc:
         await http_client._make_request(  # noqa: WPS437
             client.RequestOptions(method="DELETE", path="/hello"),
         )
 
-        assert str(exc_info.value) == inspect.getdoc(httpx.ReadTimeout)
+    assert str(exc.value) == inspect.getdoc(httpx.ReadTimeout)  # noqa: WPS441

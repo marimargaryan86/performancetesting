@@ -37,11 +37,11 @@ class ResponseMetaData(object):
         )
 
 
-class RESTBaseClientError(Exception):
+class HttpError(Exception):
     """Raised when there is HTTP client-related issue."""
 
 
-class RequestError(RESTBaseClientError):
+class RequestError(HttpError):
     """Raised when a request fails."""
 
     def __init__(
@@ -60,7 +60,7 @@ class RequestError(RESTBaseClientError):
         )
 
 
-class HttpStatusError(RESTBaseClientError):
+class HttpStatusError(HttpError):
     """Raised when a response is not 2XX."""
 
     def __init__(
