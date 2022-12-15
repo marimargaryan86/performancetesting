@@ -35,7 +35,10 @@ PLACES = (
     "28a2ee10-d0a7-4a70-89f3-6d587f4dba70",
     "f87c4a6d-fa48-4abb-927c-25447827f5a6",
 )
-TRIPS = ("9d672f0e-0934-4388-8568-03e40c0bf0e9",)
+TRIPS = (
+    "9d672f0e-0934-4388-8568-03e40c0bf0e9",
+    "51e3688b-057f-4553-95c7-53dc05559688",
+)
 SCHEDULES = ("d77e4acb-5aa1-47ad-9a15-126c0fa0e157",)
 PROVIDER_OFFERS = (
     "88a8dcc9-deff-4a0e-bd96-b0faea5ea90f",
@@ -192,7 +195,15 @@ def generate_segment_reference(identifier: str) -> models_pb2.SegmentReference:
 
 
 def get_trips() -> list[models_pb2.TripReference]:
-    return [generate_trip_reference(identifier) for identifier in TRIPS]
+    trips = [generate_trip_reference(identifier) for identifier in TRIPS[:-1]]
+
+    # make last trip duplicate of first so we can test overlap
+    trip = models_pb2.TripReference()
+    trip.CopyFrom(trips[0])
+    trip.id = TRIPS[-1]
+    trips.append(trip)
+
+    return trips
 
 
 def generate_trip_reference(identifier: str) -> models_pb2.TripReference:

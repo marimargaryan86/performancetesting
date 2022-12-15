@@ -1,3 +1,4 @@
+import itertools
 from typing import Any, Awaitable, Callable, Mapping, Sequence, TypeVar
 
 import lagom
@@ -65,22 +66,13 @@ def offer_search_request_validator(
         )
 
         if validation_errors:
-            return models.JsonApiResponse(
-                models.Body(errors=validation_errors),
-                status_code=status.HTTP_404_NOT_FOUND,
-            )
+            return models.JsonApiResponse.from_errors(validation_errors)
 
         return await function(
             self,
             request,
             offer_search_client,
-            sorted(
-                trips_list,
-                key=lambda trip: (
-                    trip.segments[0].legs[0].departure_at.seconds,  # noqa: WPS219
-                    trip.segments[0].legs[0].departure_at.nanos,  # noqa: WPS219
-                ),
-            ),
+            trips_list,
         )
 
     return wrapper
@@ -162,6 +154,40 @@ def _validate_trips(
                             trip_idx,
                         ),
                     ),
+                ),
+            )
+
+    trips_list = sorted(
+        trips_list,
+        key=lambda trip: (
+            trip.segments[0].legs[0].departure_at.seconds,  # noqa: WPS219
+            trip.segments[0].legs[0].departure_at.nanos,  # noqa: WPS219
+        ),
+    )
+
+    return _check_trip_conflicts(trips_list, validation_errors)
+
+
+def _check_trip_conflicts(
+    trips_list: list[models_pb2.Trip],  # noqa: SF20
+    validation_errors: list[models.Error],  # noqa: SF20
+) -> tuple[list[models_pb2.Trip], list[models.Error]]:
+    for trip_a, trip_b in itertools.pairwise(trips_list):
+        trip_a_arrival = trip_a.segments[-1].legs[-1].arrival_at.seconds  # noqa: WPS219
+        trip_b_departure = (
+            trip_b.segments[0].legs[0].departure_at.seconds  # noqa: WPS219
+        )  # noqa: WPS219
+
+        if trip_a_arrival >= trip_b_departure:
+            validation_errors.append(
+                models.Error(
+                    status=str(status.HTTP_409_CONFLICT),
+                    code="trips_conflict",
+                    detail="'{0}' and '{1}' are overlapping".format(
+                        trip_a.id,
+                        trip_b.id,
+                    ),
+                    source=models.ErrorSource(pointer="/data/relationships/trips"),
                 ),
             )
 

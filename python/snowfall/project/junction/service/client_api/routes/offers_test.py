@@ -201,6 +201,43 @@ class TestOfferSearches(object):
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    async def test_offer_search_overlapping_trip_returns_error(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        response = await client.post(
+            "/offers/searches",
+            json={
+                "data": {
+                    "type": "trip-offer-searches",
+                    "attributes": {
+                        "sessionToken": "qJE1pt1ZXaGGH2E2p7cLZpWvpRmED2cE",
+                        "passengers": [
+                            {
+                                "dateOfBirth": "1979-09-17",
+                            },
+                        ],
+                    },
+                    "relationships": {
+                        "trips": {
+                            "data": [
+                                {
+                                    "id": fixtures.TRIPS[0],
+                                    "type": "trips",
+                                },
+                                {
+                                    "id": fixtures.TRIPS[-1],
+                                    "type": "trips",
+                                },
+                            ],
+                        },
+                    },
+                },
+            },
+            headers={"Content-Type": "application/vnd.api+json"},
+        )
+        assert response.status_code == status.HTTP_409_CONFLICT
+
     async def test_offer_search_can_be_created(
         self,
         client: httpx.AsyncClient,

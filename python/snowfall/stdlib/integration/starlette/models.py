@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any, ClassVar, Mapping, Optional, Sequence
+from typing import Any, ClassVar, Mapping, Optional, Sequence, cast
 
 import pydantic
 from starlette import background as starlette_background
-from starlette import responses
+from starlette import responses, status
 
 AnyMapping = Mapping[str, Any]
 
@@ -74,6 +74,29 @@ class JsonApiResponse(responses.Response):
             status_code=int(status_code),
             headers=dict(headers or {}),
             background=background,
+        )
+
+    @classmethod
+    def from_errors(cls, errors: Sequence[Error]) -> JsonApiResponse:
+        status_codes = cast(set[str], {error.status for error in errors if error})
+
+        if len(status_codes) == 1:
+            return JsonApiResponse(
+                body=Body(errors=errors),
+                status_code=int(str(status_codes.pop())),
+            )
+
+        status_codes = {status_code[0] for status_code in status_codes}
+
+        if len(status_codes) == 1 and status_codes.pop()[0] == "4":
+            return JsonApiResponse(
+                body=Body(errors=errors),
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return JsonApiResponse(
+            body=Body(errors=errors),
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
     def render(self, body: Body) -> bytes:
