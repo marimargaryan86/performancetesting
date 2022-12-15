@@ -161,10 +161,7 @@ class OfferBucketRepository(object):
 
 
 class OfferAggregator(object):
-    _skippable_statuses = (
-        trackable_pb2.Trackable.STATUS_FAILED,
-        trackable_pb2.Trackable.STATUS_COMPLETED,
-    )
+    _skippable_statuses = (trackable_pb2.Trackable.STATUS_FAILED,)
 
     _aggregated_total = prometheus_client.Counter(
         "offers_aggregated_total",
@@ -200,6 +197,9 @@ class OfferAggregator(object):
         ).inc()
 
         if offer_search.status in self._skippable_statuses:
+            raise SkippedOfferError()
+
+        if offer_search.status == trackable_pb2.Trackable.STATUS_COMPLETED:
             self._logger.error(
                 "Offer arrived too late",
                 offer_search_id=offer_search.id,
