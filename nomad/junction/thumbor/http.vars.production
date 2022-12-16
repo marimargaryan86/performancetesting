@@ -1,0 +1,2 @@
+traefik_host_URL="thumbor.junction.travel"
+traefik_entrypoints="web"
