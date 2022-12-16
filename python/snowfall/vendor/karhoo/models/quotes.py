@@ -3,7 +3,7 @@ from typing import Literal
 
 from snowfall.vendor.karhoo.models.base import KarhooBaseModel
 from snowfall.vendor.karhoo.models.price import Price
-from snowfall.vendor.karhoo.models.vechicle import Vehicle, Vehicles
+from snowfall.vendor.karhoo.models.vehicle import Vehicle, Vehicles
 
 
 class Rating(KarhooBaseModel):
@@ -42,6 +42,7 @@ class Fleet(KarhooBaseModel):
             "vehicle_details",
         ]
     ]
+    email: str | None
 
 
 class Quote(KarhooBaseModel):

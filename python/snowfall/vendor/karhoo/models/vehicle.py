@@ -3,6 +3,30 @@ from typing import Literal
 from snowfall.vendor.karhoo.models.base import KarhooBaseModel
 
 
+class Driver(KarhooBaseModel):
+    first_name: str
+    last_name: str
+    phone_number: str
+    photo_url: str | None
+    license_number: str | None
+
+
+class VehicleAttributes(KarhooBaseModel):
+    passenger_capacity: int | None
+    luggage_capacity: int | None
+    hybrid: bool | None
+    electric: bool | None
+    child_seat: bool | None
+
+
+class BookingVehicle(KarhooBaseModel):
+    vehicle_class: str
+    description: str | None
+    vehicle_license_plate: str
+    driver: Driver
+    attributes: VehicleAttributes
+
+
 class Qta(KarhooBaseModel):
     high_minutes: int
     low_minutes: int
