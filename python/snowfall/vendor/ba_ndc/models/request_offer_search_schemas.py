@@ -27,7 +27,7 @@ class Passenger(BaseSchema):
         description="Passenger type",
         alias="type",
     )
-    birth_date: datetime.date = pydantic.Field(description="Birth date")
+    birth_date: datetime.date | None = pydantic.Field(description="Birth date")
 
 
 class OfferSearchRequest(BaseSchema):

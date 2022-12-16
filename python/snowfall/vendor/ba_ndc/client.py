@@ -5,6 +5,9 @@ from uuid import UUID
 import httpx
 
 from snowfall.vendor.ba_ndc import errors
+from snowfall.vendor.ba_ndc.adapters.offers_response_adapter import (
+    OffersResponseAdapter,
+)
 from snowfall.vendor.ba_ndc.models import (  # noqa: WPS235
     request_add_seat_schemas,
     request_name_correction_schemas,
@@ -42,7 +45,7 @@ class BaNdcClient(object):  # noqa: WPS214
     async def get_offers(
         self,
         request: request_offer_search_schemas.OfferSearchRequest,
-    ) -> response_offer_search_schemas.OfferSearchResponse:
+    ) -> OffersResponseAdapter:
         response = await self._make_request(
             "POST",
             "/offers",
@@ -53,8 +56,10 @@ class BaNdcClient(object):  # noqa: WPS214
             ),
         )
 
-        return response_offer_search_schemas.OfferSearchResponse.parse_raw(
-            response.content,
+        return OffersResponseAdapter(
+            response_offer_search_schemas.OfferSearchResponse.parse_raw(
+                response.content,
+            ),
         )
 
     async def get_offer(

@@ -1,0 +1,20 @@
+python_sources(dependencies=[":airports"])
+python_test_utils(name="test_utils", dependencies=[":airports", ":fixtures"])
+resource(
+    name="airports",
+    source=http_source(
+        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/airports-0c47905459e9b66dd6214d175fec83ae88a2b36d732503c563426abeb8a25cc3.json",
+        len=2587457,
+        sha256="0c47905459e9b66dd6214d175fec83ae88a2b36d732503c563426abeb8a25cc3",
+        filename="airports.json",
+    ),
+)
+python_image(
+    namespace="python.snowfall.project.junction.service.providers.ba_ndc",
+    name="main",
+    entry_point="main.py",
+)
+files(
+    name="fixtures",
+    sources=["fixtures/*"],
+)

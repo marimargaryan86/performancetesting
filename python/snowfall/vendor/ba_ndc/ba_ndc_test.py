@@ -6,6 +6,10 @@ import uuid
 import pytest
 
 from snowfall.vendor.ba_ndc import client, errors
+from snowfall.vendor.ba_ndc.adapters.offers_response_adapter import (
+    OffersResponseAdapter,
+)
+from snowfall.vendor.ba_ndc.builders.offer_request import OffersRequestBuilder
 from snowfall.vendor.ba_ndc.models import (
     payer_details,
     request_add_seat_schemas,
@@ -13,7 +17,6 @@ from snowfall.vendor.ba_ndc.models import (
     request_offer_search_schemas,
     request_order_change_schemas,
     request_order_schemas,
-    response_offer_search_schemas,
     response_order_schemas,
 )
 from snowfall.vendor.ba_ndc.models.util import offer_enums, passenger_enums
@@ -28,13 +31,13 @@ disable_by_default = pytest.mark.skipif(
 async def test_get_offers(ba_ndc_client: client.BaNdcClient) -> None:
     offer_searches_rs = await call_get_offers(ba_ndc_client)
     assert offer_searches_rs is not None
-    assert offer_searches_rs.offers
+    assert offer_searches_rs.get_offers()
 
 
 @disable_by_default
 async def test_get_offer(ba_ndc_client: client.BaNdcClient) -> None:
     offer_searches_rs = await call_get_offers(ba_ndc_client)
-    offer = random.choice(offer_searches_rs.offers)  # nosec
+    offer = random.choice(offer_searches_rs.get_offers())  # nosec
     offer_search_rs = await ba_ndc_client.get_offer(offer.identifier)
 
     assert offer_search_rs is not None
@@ -118,9 +121,9 @@ async def test_passenger_name_correction(ba_ndc_client: client.BaNdcClient) -> N
 async def test_get_services_by_offer(ba_ndc_client: client.BaNdcClient) -> None:
     offer_searches_rs = await call_get_offers(ba_ndc_client)
     assert offer_searches_rs is not None
-    assert offer_searches_rs.offers
+    assert offer_searches_rs.get_offers()
 
-    offer = random.choice(offer_searches_rs.offers)  # nosec
+    offer = random.choice(offer_searches_rs.get_offers())  # nosec
     offer_service_rs = await ba_ndc_client.get_services(offer_id=offer.identifier)
     assert offer_service_rs is not None
     assert offer_service_rs.offers
@@ -143,9 +146,9 @@ async def test_get_services_by_order(ba_ndc_client: client.BaNdcClient) -> None:
 async def test_get_seats_by_offer(ba_ndc_client: client.BaNdcClient) -> None:
     offer_searches_rs = await call_get_offers(ba_ndc_client)
     assert offer_searches_rs is not None
-    assert offer_searches_rs.offers
+    assert offer_searches_rs.get_offers()
 
-    offer = random.choice(offer_searches_rs.offers)  # nosec
+    offer = random.choice(offer_searches_rs.get_offers())  # nosec
     offer_search_rs = await ba_ndc_client.get_offer(offer.identifier)
     seats_rs = await ba_ndc_client.get_seats(offer_id=offer_search_rs.offer.identifier)
     assert seats_rs is not None
@@ -228,36 +231,26 @@ async def test_reshop(ba_ndc_client: client.BaNdcClient) -> None:
 
 async def call_get_offers(
     ba_ndc_client: client.BaNdcClient,
-) -> response_offer_search_schemas.OfferSearchResponse:
-    offer_search_rq = request_offer_search_schemas.OfferSearchRequest(
-        cabin_type=offer_enums.CabinTypeEnum.economy,
-        fare_preferences={
-            offer_enums.FareGroupEnum.fare_rules,
-        },
-        passengers=[
-            request_offer_search_schemas.Passenger(
-                passenger_type=passenger_enums.PassengerTypeEnum.adult,
-                birth_date=datetime.date.fromisoformat("1970-01-01"),
-            ),
-        ],
-        trips=[
-            request_offer_search_schemas.Trip(
-                origin="LHR",
-                destination="MAN",
-                date=datetime.date.fromisoformat("2023-01-30"),
-                time=datetime.time.fromisoformat("08:00"),
-            ),
-        ],
+) -> OffersResponseAdapter:
+    offers_request_builder = OffersRequestBuilder()
+    offers_request_builder.add_passenger(passenger_enums.PassengerTypeEnum.adult)
+    offers_request_builder.add_trip(
+        request_offer_search_schemas.Trip(
+            origin="LHR",
+            destination="MAN",
+            date=datetime.date.fromisoformat("2023-01-30"),
+            time=datetime.time.fromisoformat("08:00"),
+        ),
     )
 
-    return await ba_ndc_client.get_offers(offer_search_rq)
+    return await ba_ndc_client.get_offers(offers_request_builder.build())
 
 
 async def generate_order(
     ba_ndc_client: client.BaNdcClient,
 ) -> response_order_schemas.OrderResponse:
     offer_searches_rs = await call_get_offers(ba_ndc_client)
-    offer = random.choice(offer_searches_rs.offers)  # nosec
+    offer = random.choice(offer_searches_rs.get_offers())  # nosec
     offer_search_rs = await ba_ndc_client.get_offer(offer.identifier)
 
     assert offer_search_rs is not None

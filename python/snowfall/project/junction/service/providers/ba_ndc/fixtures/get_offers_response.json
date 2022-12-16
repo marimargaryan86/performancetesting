@@ -1,0 +1,2129 @@
+{
+  "expiresAt": "2022-12-14T21:25:56.636000+00:00",
+  "paymentExpiresAt": "2022-12-14T23:59:59+00:00",
+  "priceGuaranteeExpiresAt": null,
+  "offers": [
+    {
+      "id": "f1610de9-522f-43ef-82f7-5c915d7dad4d",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "48.20",
+        "baseAmount": "12.00",
+        "taxAmount": "36.20"
+      },
+      "trips": [
+        {
+          "duration": 3900,
+          "priceClassId": "PCR_1",
+          "segmentIds": [
+            "BA1398"
+          ],
+          "penaltyIds": [
+            "Rule1",
+            "Rule2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "edabba35-deaa-426d-8204-37bf6de60406",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "48.20",
+        "baseAmount": "12.00",
+        "taxAmount": "36.20"
+      },
+      "trips": [
+        {
+          "duration": 3900,
+          "priceClassId": "PCR_1",
+          "segmentIds": [
+            "BA1402"
+          ],
+          "penaltyIds": [
+            "Rule1",
+            "Rule2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2f3960f9-2bfe-456e-a3ad-9d677574ac65",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "48.20",
+        "baseAmount": "12.00",
+        "taxAmount": "36.20"
+      },
+      "trips": [
+        {
+          "duration": 4200,
+          "priceClassId": "PCR_1",
+          "segmentIds": [
+            "BA1396"
+          ],
+          "penaltyIds": [
+            "Rule1",
+            "Rule2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "419dc5da-2ece-42c2-9940-00754f5b01c6",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "53.20",
+        "baseAmount": "17.00",
+        "taxAmount": "36.20"
+      },
+      "trips": [
+        {
+          "duration": 3600,
+          "priceClassId": "PCR_1",
+          "segmentIds": [
+            "BA1370"
+          ],
+          "penaltyIds": [
+            "Rule1",
+            "Rule2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "8552c489-3474-459b-a0b2-10c732ee8edc",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "53.20",
+        "baseAmount": "17.00",
+        "taxAmount": "36.20"
+      },
+      "trips": [
+        {
+          "duration": 3600,
+          "priceClassId": "PCR_1",
+          "segmentIds": [
+            "BA1386"
+          ],
+          "penaltyIds": [
+            "Rule1",
+            "Rule2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "56577f22-9dd5-43cf-84d1-404612251635",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "57.20",
+        "baseAmount": "21.00",
+        "taxAmount": "36.20"
+      },
+      "trips": [
+        {
+          "duration": 3900,
+          "priceClassId": "PCR_1",
+          "segmentIds": [
+            "BA1390"
+          ],
+          "penaltyIds": [
+            "Rule1",
+            "Rule2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "295b27f9-23ac-4bd9-857a-d4d939572c72",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "70.20",
+        "baseAmount": "34.00",
+        "taxAmount": "36.20"
+      },
+      "trips": [
+        {
+          "duration": 3900,
+          "priceClassId": "PCR_1",
+          "segmentIds": [
+            "BA1394"
+          ],
+          "penaltyIds": [
+            "Rule1",
+            "Rule2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "9c1aea76-303c-4d71-9026-05d7fa2c7244",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "70.20",
+        "baseAmount": "34.00",
+        "taxAmount": "36.20"
+      },
+      "trips": [
+        {
+          "duration": 3900,
+          "priceClassId": "PCR_2",
+          "segmentIds": [
+            "BA1398"
+          ],
+          "penaltyIds": [
+            "Rule1",
+            "Rule2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3adb10d2-cf83-4c0c-8d6f-9a7e2234a212",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "70.20",
+        "baseAmount": "34.00",
+        "taxAmount": "36.20"
+      },
+      "trips": [
+        {
+          "duration": 3900,
+          "priceClassId": "PCR_2",
+          "segmentIds": [
+            "BA1402"
+          ],
+          "penaltyIds": [
+            "Rule1",
+            "Rule2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f8e36d78-6ea9-4b5d-a512-ef545aa55452",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "70.20",
+        "baseAmount": "34.00",
+        "taxAmount": "36.20"
+      },
+      "trips": [
+        {
+          "duration": 4200,
+          "priceClassId": "PCR_2",
+          "segmentIds": [
+            "BA1396"
+          ],
+          "penaltyIds": [
+            "Rule1",
+            "Rule2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f4388b8a-c407-47b8-9fbe-50124040e718",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "75.20",
+        "baseAmount": "39.00",
+        "taxAmount": "36.20"
+      },
+      "trips": [
+        {
+          "duration": 3600,
+          "priceClassId": "PCR_2",
+          "segmentIds": [
+            "BA1370"
+          ],
+          "penaltyIds": [
+            "Rule1",
+            "Rule2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "6bdf6992-c8f4-44c9-84d1-5a6571e9ee1d",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "75.20",
+        "baseAmount": "39.00",
+        "taxAmount": "36.20"
+      },
+      "trips": [
+        {
+          "duration": 3600,
+          "priceClassId": "PCR_2",
+          "segmentIds": [
+            "BA1386"
+          ],
+          "penaltyIds": [
+            "Rule1",
+            "Rule2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ec29facc-e87e-4476-b3b3-b2b538d6a1a0",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "79.20",
+        "baseAmount": "43.00",
+        "taxAmount": "36.20"
+      },
+      "trips": [
+        {
+          "duration": 3900,
+          "priceClassId": "PCR_2",
+          "segmentIds": [
+            "BA1390"
+          ],
+          "penaltyIds": [
+            "Rule1",
+            "Rule2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "9c2d9830-6b3b-4c25-ae60-a30475948907",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "92.20",
+        "baseAmount": "56.00",
+        "taxAmount": "36.20"
+      },
+      "trips": [
+        {
+          "duration": 3900,
+          "priceClassId": "PCR_2",
+          "segmentIds": [
+            "BA1394"
+          ],
+          "penaltyIds": [
+            "Rule1",
+            "Rule2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "d3a3da39-0b30-436a-a328-378e402154f3",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "122.20",
+        "baseAmount": "86.00",
+        "taxAmount": "36.20"
+      },
+      "trips": [
+        {
+          "duration": 3900,
+          "priceClassId": "PCR_3",
+          "segmentIds": [
+            "BA1398"
+          ],
+          "penaltyIds": [
+            "Rule3",
+            "Rule4"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "18b68a82-ed8a-4cfd-b3a7-27f8987e7b82",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "122.20",
+        "baseAmount": "86.00",
+        "taxAmount": "36.20"
+      },
+      "trips": [
+        {
+          "duration": 3900,
+          "priceClassId": "PCR_3",
+          "segmentIds": [
+            "BA1402"
+          ],
+          "penaltyIds": [
+            "Rule3",
+            "Rule4"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "67892312-a765-4622-bbb8-ca7c79663e0e",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "122.20",
+        "baseAmount": "86.00",
+        "taxAmount": "36.20"
+      },
+      "trips": [
+        {
+          "duration": 4200,
+          "priceClassId": "PCR_3",
+          "segmentIds": [
+            "BA1396"
+          ],
+          "penaltyIds": [
+            "Rule3",
+            "Rule4"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "01927349-d092-4dc1-ba6f-b214d8d354ee",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "127.20",
+        "baseAmount": "91.00",
+        "taxAmount": "36.20"
+      },
+      "trips": [
+        {
+          "duration": 3600,
+          "priceClassId": "PCR_3",
+          "segmentIds": [
+            "BA1370"
+          ],
+          "penaltyIds": [
+            "Rule3",
+            "Rule4"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ce755632-bbce-44ff-9f76-7471637a7ae5",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "127.20",
+        "baseAmount": "91.00",
+        "taxAmount": "36.20"
+      },
+      "trips": [
+        {
+          "duration": 3600,
+          "priceClassId": "PCR_3",
+          "segmentIds": [
+            "BA1386"
+          ],
+          "penaltyIds": [
+            "Rule3",
+            "Rule4"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "13b12807-4bfa-41e1-85a0-09b6ce3e4f4e",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "132.20",
+        "baseAmount": "96.00",
+        "taxAmount": "36.20"
+      },
+      "trips": [
+        {
+          "duration": 3900,
+          "priceClassId": "PCR_3",
+          "segmentIds": [
+            "BA1390"
+          ],
+          "penaltyIds": [
+            "Rule3",
+            "Rule4"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "70d6b045-9b2b-44b5-be09-add2f1a42ef0",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "144.20",
+        "baseAmount": "108.00",
+        "taxAmount": "36.20"
+      },
+      "trips": [
+        {
+          "duration": 3900,
+          "priceClassId": "PCR_3",
+          "segmentIds": [
+            "BA1394"
+          ],
+          "penaltyIds": [
+            "Rule3",
+            "Rule4"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f8504e79-635f-492f-822b-ad2ab53ac2ae",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "144.85",
+        "baseAmount": "80.00",
+        "taxAmount": "64.85"
+      },
+      "trips": [
+        {
+          "duration": 15900,
+          "priceClassId": "PCR_2",
+          "segmentIds": [
+            "BA1414",
+            "BA8902"
+          ],
+          "penaltyIds": [
+            "Rule1",
+            "Rule2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5a5da588-094f-45e0-8329-ff5648c442eb",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "146.85",
+        "baseAmount": "82.00",
+        "taxAmount": "64.85"
+      },
+      "trips": [
+        {
+          "duration": 13200,
+          "priceClassId": "PCR_2",
+          "segmentIds": [
+            "BA1416",
+            "BA8904"
+          ],
+          "penaltyIds": [
+            "Rule1",
+            "Rule2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0fcbd25a-248d-4bc9-9b4a-53047413e352",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "146.85",
+        "baseAmount": "82.00",
+        "taxAmount": "64.85"
+      },
+      "trips": [
+        {
+          "duration": 23100,
+          "priceClassId": "PCR_2",
+          "segmentIds": [
+            "BA1416",
+            "BA8906"
+          ],
+          "penaltyIds": [
+            "Rule1",
+            "Rule2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "53fdf6ec-f54b-4dea-a4d9-b1682e596cf5",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "163.18",
+        "baseAmount": "109.00",
+        "taxAmount": "54.18"
+      },
+      "trips": [
+        {
+          "duration": 3900,
+          "priceClassId": "PCR_4",
+          "segmentIds": [
+            "BA1398"
+          ],
+          "penaltyIds": [
+            "Rule2",
+            "Rule5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "b5a188b4-ba25-48e5-8d91-7c051368c780",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "163.18",
+        "baseAmount": "109.00",
+        "taxAmount": "54.18"
+      },
+      "trips": [
+        {
+          "duration": 3900,
+          "priceClassId": "PCR_4",
+          "segmentIds": [
+            "BA1402"
+          ],
+          "penaltyIds": [
+            "Rule2",
+            "Rule5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "914ca6b9-d192-4cdf-bec0-a05b00fb3b48",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "163.18",
+        "baseAmount": "109.00",
+        "taxAmount": "54.18"
+      },
+      "trips": [
+        {
+          "duration": 4200,
+          "priceClassId": "PCR_4",
+          "segmentIds": [
+            "BA1396"
+          ],
+          "penaltyIds": [
+            "Rule2",
+            "Rule5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fba7d0f3-e270-4f45-8469-9f841bdc1b39",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "168.18",
+        "baseAmount": "114.00",
+        "taxAmount": "54.18"
+      },
+      "trips": [
+        {
+          "duration": 3600,
+          "priceClassId": "PCR_4",
+          "segmentIds": [
+            "BA1370"
+          ],
+          "penaltyIds": [
+            "Rule2",
+            "Rule5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2daaa3d5-af72-49ce-9cf7-7c1f2fe38cd6",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "168.18",
+        "baseAmount": "114.00",
+        "taxAmount": "54.18"
+      },
+      "trips": [
+        {
+          "duration": 3600,
+          "priceClassId": "PCR_4",
+          "segmentIds": [
+            "BA1386"
+          ],
+          "penaltyIds": [
+            "Rule2",
+            "Rule5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2bfcf785-2c53-46a2-97de-8aaffcf12032",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "173.18",
+        "baseAmount": "119.00",
+        "taxAmount": "54.18"
+      },
+      "trips": [
+        {
+          "duration": 3900,
+          "priceClassId": "PCR_4",
+          "segmentIds": [
+            "BA1390"
+          ],
+          "penaltyIds": [
+            "Rule2",
+            "Rule5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1d0039ef-f1c9-4906-926d-84bdbfd055de",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "182.82",
+        "baseAmount": "91.00",
+        "taxAmount": "91.82"
+      },
+      "trips": [
+        {
+          "duration": 15000,
+          "priceClassId": "PCR_5",
+          "segmentIds": [
+            "BA8756",
+            "BA8906"
+          ],
+          "penaltyIds": [
+            "Rule1",
+            "Rule2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f278b498-f81a-478f-936a-b513f9c4cfbd",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "185.82",
+        "baseAmount": "94.00",
+        "taxAmount": "91.82"
+      },
+      "trips": [
+        {
+          "duration": 27600,
+          "priceClassId": "PCR_5",
+          "segmentIds": [
+            "BA8752",
+            "BA8904"
+          ],
+          "penaltyIds": [
+            "Rule1",
+            "Rule2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "968def04-bdf3-4c93-a90a-3b411a487665",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "202.85",
+        "baseAmount": "138.00",
+        "taxAmount": "64.85"
+      },
+      "trips": [
+        {
+          "duration": 14100,
+          "priceClassId": "PCR_2",
+          "segmentIds": [
+            "BA5985",
+            "BA8906"
+          ],
+          "penaltyIds": [
+            "Rule1",
+            "Rule2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f502e3b2-447d-448f-9c16-462745ec8774",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "202.85",
+        "baseAmount": "138.00",
+        "taxAmount": "64.85"
+      },
+      "trips": [
+        {
+          "duration": 19500,
+          "priceClassId": "PCR_2",
+          "segmentIds": [
+            "BA5981",
+            "BA8904"
+          ],
+          "penaltyIds": [
+            "Rule1",
+            "Rule2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a499a9df-c2d4-4b16-ba3f-0ee861892aac",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "202.85",
+        "baseAmount": "138.00",
+        "taxAmount": "64.85"
+      },
+      "trips": [
+        {
+          "duration": 29400,
+          "priceClassId": "PCR_2",
+          "segmentIds": [
+            "BA5981",
+            "BA8906"
+          ],
+          "penaltyIds": [
+            "Rule1",
+            "Rule2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e080e7ca-017e-4fe0-9bd1-a230b688564b",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "220.83",
+        "baseAmount": "138.00",
+        "taxAmount": "82.83"
+      },
+      "trips": [
+        {
+          "duration": 15900,
+          "priceClassId": "PCR_4",
+          "segmentIds": [
+            "BA1414",
+            "BA8902"
+          ],
+          "penaltyIds": [
+            "Rule2",
+            "Rule5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fb12cdda-6cce-4642-900e-7ae8a57f8a4d",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "222.83",
+        "baseAmount": "140.00",
+        "taxAmount": "82.83"
+      },
+      "trips": [
+        {
+          "duration": 13200,
+          "priceClassId": "PCR_4",
+          "segmentIds": [
+            "BA1416",
+            "BA8904"
+          ],
+          "penaltyIds": [
+            "Rule2",
+            "Rule5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a13763da-b7af-4d89-8494-55494561fc69",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "222.83",
+        "baseAmount": "140.00",
+        "taxAmount": "82.83"
+      },
+      "trips": [
+        {
+          "duration": 23100,
+          "priceClassId": "PCR_4",
+          "segmentIds": [
+            "BA1416",
+            "BA8906"
+          ],
+          "penaltyIds": [
+            "Rule2",
+            "Rule5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1fd0b933-2a4a-4f58-b097-27c4db47c698",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "224.18",
+        "baseAmount": "170.00",
+        "taxAmount": "54.18"
+      },
+      "trips": [
+        {
+          "duration": 3900,
+          "priceClassId": "PCR_4",
+          "segmentIds": [
+            "BA1394"
+          ],
+          "penaltyIds": [
+            "Rule2",
+            "Rule5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "7cab2f83-502d-4e94-a77a-71aa44ee6f5a",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "240.90",
+        "baseAmount": "134.00",
+        "taxAmount": "106.90"
+      },
+      "trips": [
+        {
+          "duration": 15000,
+          "priceClassId": "PCR_4",
+          "segmentIds": [
+            "BA8756",
+            "BA8906"
+          ],
+          "penaltyIds": [
+            "Rule2",
+            "Rule5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e5f2638a-afae-4aed-b857-6fe41abcfaca",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "243.90",
+        "baseAmount": "137.00",
+        "taxAmount": "106.90"
+      },
+      "trips": [
+        {
+          "duration": 27600,
+          "priceClassId": "PCR_4",
+          "segmentIds": [
+            "BA8752",
+            "BA8904"
+          ],
+          "penaltyIds": [
+            "Rule2",
+            "Rule5"
+          ]
+        }
+      ]
+    }
+  ],
+  "passengers": [
+    {
+      "id": "PA0",
+      "type": "adult"
+    }
+  ],
+  "segments": [
+    {
+      "id": "BA1398",
+      "origin": {
+        "code": "LHR",
+        "name": "HEATHROW",
+        "terminalGate": null,
+        "terminalName": "5"
+      },
+      "destination": {
+        "code": "MAN",
+        "name": "MANCHESTER",
+        "terminalGate": null,
+        "terminalName": "3"
+      },
+      "departureDateTime": "2023-01-30T17:25:00",
+      "arrivalDateTime": "2023-01-30T18:30:00",
+      "duration": 3900,
+      "equipment": {
+        "code": "320",
+        "name": "Airbus A320 jet"
+      },
+      "marketingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": "1398"
+      },
+      "operatingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": null
+      },
+      "stopCount": 0
+    },
+    {
+      "id": "BA1402",
+      "origin": {
+        "code": "LHR",
+        "name": "HEATHROW",
+        "terminalGate": null,
+        "terminalName": "5"
+      },
+      "destination": {
+        "code": "MAN",
+        "name": "MANCHESTER",
+        "terminalGate": null,
+        "terminalName": "3"
+      },
+      "departureDateTime": "2023-01-30T18:35:00",
+      "arrivalDateTime": "2023-01-30T19:40:00",
+      "duration": 3900,
+      "equipment": {
+        "code": "320",
+        "name": "Airbus A320 jet"
+      },
+      "marketingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": "1402"
+      },
+      "operatingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": null
+      },
+      "stopCount": 0
+    },
+    {
+      "id": "BA1396",
+      "origin": {
+        "code": "LHR",
+        "name": "HEATHROW",
+        "terminalGate": null,
+        "terminalName": "5"
+      },
+      "destination": {
+        "code": "MAN",
+        "name": "MANCHESTER",
+        "terminalGate": null,
+        "terminalName": "3"
+      },
+      "departureDateTime": "2023-01-30T15:15:00",
+      "arrivalDateTime": "2023-01-30T16:25:00",
+      "duration": 4200,
+      "equipment": {
+        "code": "32N",
+        "name": "Airbus A320 jet"
+      },
+      "marketingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": "1396"
+      },
+      "operatingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": null
+      },
+      "stopCount": 0
+    },
+    {
+      "id": "BA1370",
+      "origin": {
+        "code": "LHR",
+        "name": "HEATHROW",
+        "terminalGate": null,
+        "terminalName": "5"
+      },
+      "destination": {
+        "code": "MAN",
+        "name": "MANCHESTER",
+        "terminalGate": null,
+        "terminalName": "3"
+      },
+      "departureDateTime": "2023-01-30T06:55:00",
+      "arrivalDateTime": "2023-01-30T07:55:00",
+      "duration": 3600,
+      "equipment": {
+        "code": "32N",
+        "name": "Airbus A320 jet"
+      },
+      "marketingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": "1370"
+      },
+      "operatingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": null
+      },
+      "stopCount": 0
+    },
+    {
+      "id": "BA1386",
+      "origin": {
+        "code": "LHR",
+        "name": "HEATHROW",
+        "terminalGate": null,
+        "terminalName": "5"
+      },
+      "destination": {
+        "code": "MAN",
+        "name": "MANCHESTER",
+        "terminalGate": null,
+        "terminalName": "3"
+      },
+      "departureDateTime": "2023-01-30T07:55:00",
+      "arrivalDateTime": "2023-01-30T08:55:00",
+      "duration": 3600,
+      "equipment": {
+        "code": "32N",
+        "name": "Airbus A320 jet"
+      },
+      "marketingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": "1386"
+      },
+      "operatingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": null
+      },
+      "stopCount": 0
+    },
+    {
+      "id": "BA1390",
+      "origin": {
+        "code": "LHR",
+        "name": "HEATHROW",
+        "terminalGate": null,
+        "terminalName": "5"
+      },
+      "destination": {
+        "code": "MAN",
+        "name": "MANCHESTER",
+        "terminalGate": null,
+        "terminalName": "3"
+      },
+      "departureDateTime": "2023-01-30T10:15:00",
+      "arrivalDateTime": "2023-01-30T11:20:00",
+      "duration": 3900,
+      "equipment": {
+        "code": "319",
+        "name": "Airbus A319 jet"
+      },
+      "marketingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": "1390"
+      },
+      "operatingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": null
+      },
+      "stopCount": 0
+    },
+    {
+      "id": "BA1394",
+      "origin": {
+        "code": "LHR",
+        "name": "HEATHROW",
+        "terminalGate": null,
+        "terminalName": "5"
+      },
+      "destination": {
+        "code": "MAN",
+        "name": "MANCHESTER",
+        "terminalGate": null,
+        "terminalName": "3"
+      },
+      "departureDateTime": "2023-01-30T12:55:00",
+      "arrivalDateTime": "2023-01-30T14:00:00",
+      "duration": 3900,
+      "equipment": {
+        "code": "319",
+        "name": "Airbus A319 jet"
+      },
+      "marketingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": "1394"
+      },
+      "operatingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": null
+      },
+      "stopCount": 0
+    },
+    {
+      "id": "BA1414",
+      "origin": {
+        "code": "LHR",
+        "name": "HEATHROW",
+        "terminalGate": null,
+        "terminalName": "5"
+      },
+      "destination": {
+        "code": "BHD",
+        "name": "BELFAST CITY AIRPORT",
+        "terminalGate": null,
+        "terminalName": null
+      },
+      "departureDateTime": "2023-01-30T06:40:00",
+      "arrivalDateTime": "2023-01-30T08:05:00",
+      "duration": 5100,
+      "equipment": {
+        "code": "319",
+        "name": "Airbus A319 jet"
+      },
+      "marketingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": "1414"
+      },
+      "operatingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": null
+      },
+      "stopCount": 0
+    },
+    {
+      "id": "BA8902",
+      "origin": {
+        "code": "BHD",
+        "name": "BELFAST CITY AIRPORT",
+        "terminalGate": null,
+        "terminalName": null
+      },
+      "destination": {
+        "code": "MAN",
+        "name": "MANCHESTER",
+        "terminalGate": null,
+        "terminalName": "1"
+      },
+      "departureDateTime": "2023-01-30T10:00:00",
+      "arrivalDateTime": "2023-01-30T11:05:00",
+      "duration": 3900,
+      "equipment": {
+        "code": "AT7",
+        "name": "Aero ATR 72 turbo prop"
+      },
+      "marketingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": "8902"
+      },
+      "operatingCarrier": {
+        "airlineId": "YY",
+        "airlineName": "EMERALD AIRLINES FOR AER LINGUS",
+        "flightNumber": null
+      },
+      "stopCount": 0
+    },
+    {
+      "id": "BA1416",
+      "origin": {
+        "code": "LHR",
+        "name": "HEATHROW",
+        "terminalGate": null,
+        "terminalName": "5"
+      },
+      "destination": {
+        "code": "BHD",
+        "name": "BELFAST CITY AIRPORT",
+        "terminalGate": null,
+        "terminalName": null
+      },
+      "departureDateTime": "2023-01-30T12:50:00",
+      "arrivalDateTime": "2023-01-30T14:15:00",
+      "duration": 5100,
+      "equipment": {
+        "code": "320",
+        "name": "Airbus A320 jet"
+      },
+      "marketingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": "1416"
+      },
+      "operatingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": null
+      },
+      "stopCount": 0
+    },
+    {
+      "id": "BA8904",
+      "origin": {
+        "code": "BHD",
+        "name": "BELFAST CITY AIRPORT",
+        "terminalGate": null,
+        "terminalName": null
+      },
+      "destination": {
+        "code": "MAN",
+        "name": "MANCHESTER",
+        "terminalGate": null,
+        "terminalName": "1"
+      },
+      "departureDateTime": "2023-01-30T15:20:00",
+      "arrivalDateTime": "2023-01-30T16:30:00",
+      "duration": 4200,
+      "equipment": {
+        "code": "AT7",
+        "name": "Aero ATR 72 turbo prop"
+      },
+      "marketingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": "8904"
+      },
+      "operatingCarrier": {
+        "airlineId": "YY",
+        "airlineName": "EMERALD AIRLINES FOR AER LINGUS",
+        "flightNumber": null
+      },
+      "stopCount": 0
+    },
+    {
+      "id": "BA8906",
+      "origin": {
+        "code": "BHD",
+        "name": "BELFAST CITY AIRPORT",
+        "terminalGate": null,
+        "terminalName": null
+      },
+      "destination": {
+        "code": "MAN",
+        "name": "MANCHESTER",
+        "terminalGate": null,
+        "terminalName": "1"
+      },
+      "departureDateTime": "2023-01-30T18:10:00",
+      "arrivalDateTime": "2023-01-30T19:15:00",
+      "duration": 3900,
+      "equipment": {
+        "code": "AT7",
+        "name": "Aero ATR 72 turbo prop"
+      },
+      "marketingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": "8906"
+      },
+      "operatingCarrier": {
+        "airlineId": "YY",
+        "airlineName": "EMERALD AIRLINES FOR AER LINGUS",
+        "flightNumber": null
+      },
+      "stopCount": 0
+    },
+    {
+      "id": "BA8756",
+      "origin": {
+        "code": "LCY",
+        "name": "CITY AIRPORT",
+        "terminalGate": null,
+        "terminalName": null
+      },
+      "destination": {
+        "code": "BHD",
+        "name": "BELFAST CITY AIRPORT",
+        "terminalGate": null,
+        "terminalName": null
+      },
+      "departureDateTime": "2023-01-30T15:05:00",
+      "arrivalDateTime": "2023-01-30T16:30:00",
+      "duration": 5100,
+      "equipment": {
+        "code": "E90",
+        "name": "Embraer E190SR"
+      },
+      "marketingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": "8756"
+      },
+      "operatingCarrier": {
+        "airlineId": "CJ",
+        "airlineName": "BA CityFlyer",
+        "flightNumber": null
+      },
+      "stopCount": 0
+    },
+    {
+      "id": "BA8752",
+      "origin": {
+        "code": "LCY",
+        "name": "CITY AIRPORT",
+        "terminalGate": null,
+        "terminalName": null
+      },
+      "destination": {
+        "code": "BHD",
+        "name": "BELFAST CITY AIRPORT",
+        "terminalGate": null,
+        "terminalName": null
+      },
+      "departureDateTime": "2023-01-30T08:50:00",
+      "arrivalDateTime": "2023-01-30T10:15:00",
+      "duration": 5100,
+      "equipment": {
+        "code": "E90",
+        "name": "Embraer E190SR"
+      },
+      "marketingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": "8752"
+      },
+      "operatingCarrier": {
+        "airlineId": "CJ",
+        "airlineName": "BA CityFlyer",
+        "flightNumber": null
+      },
+      "stopCount": 0
+    },
+    {
+      "id": "BA5985",
+      "origin": {
+        "code": "LHR",
+        "name": "HEATHROW",
+        "terminalGate": null,
+        "terminalName": "2"
+      },
+      "destination": {
+        "code": "BHD",
+        "name": "BELFAST CITY AIRPORT",
+        "terminalGate": null,
+        "terminalName": null
+      },
+      "departureDateTime": "2023-01-30T15:20:00",
+      "arrivalDateTime": "2023-01-30T16:40:00",
+      "duration": 4800,
+      "equipment": {
+        "code": "320",
+        "name": "Airbus A320 jet"
+      },
+      "marketingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": "5985"
+      },
+      "operatingCarrier": {
+        "airlineId": "EI",
+        "airlineName": "Aer Lingus",
+        "flightNumber": null
+      },
+      "stopCount": 0
+    },
+    {
+      "id": "BA5981",
+      "origin": {
+        "code": "LHR",
+        "name": "HEATHROW",
+        "terminalGate": null,
+        "terminalName": "2"
+      },
+      "destination": {
+        "code": "BHD",
+        "name": "BELFAST CITY AIRPORT",
+        "terminalGate": null,
+        "terminalName": null
+      },
+      "departureDateTime": "2023-01-30T11:05:00",
+      "arrivalDateTime": "2023-01-30T12:25:00",
+      "duration": 4800,
+      "equipment": {
+        "code": "320",
+        "name": "Airbus A320 jet"
+      },
+      "marketingCarrier": {
+        "airlineId": "BA",
+        "airlineName": "British Airways",
+        "flightNumber": "5981"
+      },
+      "operatingCarrier": {
+        "airlineId": "EI",
+        "airlineName": "Aer Lingus",
+        "flightNumber": null
+      },
+      "stopCount": 0
+    }
+  ],
+  "priceClasses": [
+    {
+      "id": "PCR_1",
+      "cabinType": "unknown",
+      "name": "BASIC",
+      "classesOfService": [
+        {
+          "disclosureId": "C5",
+          "segmentId": "BA1398",
+          "fareGroupId": "FBCODE1",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": "C5",
+          "segmentId": "BA1402",
+          "fareGroupId": "FBCODE1",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": "C5",
+          "segmentId": "BA1396",
+          "fareGroupId": "FBCODE1",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": "C5",
+          "segmentId": "BA1370",
+          "fareGroupId": "FBCODE2",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": "C5",
+          "segmentId": "BA1386",
+          "fareGroupId": "FBCODE2",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": "C5",
+          "segmentId": "BA1390",
+          "fareGroupId": "FBCODE3",
+          "seatsLeft": 5
+        },
+        {
+          "disclosureId": "C5",
+          "segmentId": "BA1394",
+          "fareGroupId": "FBCODE4",
+          "seatsLeft": 9
+        }
+      ]
+    },
+    {
+      "id": "PCR_2",
+      "cabinType": "unknown",
+      "name": "PLUS",
+      "classesOfService": [
+        {
+          "disclosureId": "C5",
+          "segmentId": "BA1398",
+          "fareGroupId": "FBCODE5",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": "C5",
+          "segmentId": "BA1402",
+          "fareGroupId": "FBCODE5",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": "C5",
+          "segmentId": "BA1396",
+          "fareGroupId": "FBCODE5",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": "C5",
+          "segmentId": "BA1370",
+          "fareGroupId": "FBCODE6",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": "C5",
+          "segmentId": "BA1386",
+          "fareGroupId": "FBCODE6",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": "C5",
+          "segmentId": "BA1390",
+          "fareGroupId": "FBCODE7",
+          "seatsLeft": 5
+        },
+        {
+          "disclosureId": "C5",
+          "segmentId": "BA1394",
+          "fareGroupId": "FBCODE8",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": "C5",
+          "segmentId": "BA1414",
+          "fareGroupId": "FBCODE13",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": null,
+          "segmentId": "BA8902",
+          "fareGroupId": "FBCODE14",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": "C5",
+          "segmentId": "BA1416",
+          "fareGroupId": "FBCODE15",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": null,
+          "segmentId": "BA8904",
+          "fareGroupId": "FBCODE14",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": null,
+          "segmentId": "BA8906",
+          "fareGroupId": "FBCODE14",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": null,
+          "segmentId": "BA5985",
+          "fareGroupId": "FBCODE14",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": null,
+          "segmentId": "BA5981",
+          "fareGroupId": "FBCODE14",
+          "seatsLeft": 9
+        }
+      ]
+    },
+    {
+      "id": "PCR_3",
+      "cabinType": "unknown",
+      "name": "PLUS SELECT",
+      "classesOfService": [
+        {
+          "disclosureId": "C5",
+          "segmentId": "BA1398",
+          "fareGroupId": "FBCODE9",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": "C5",
+          "segmentId": "BA1402",
+          "fareGroupId": "FBCODE9",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": "C5",
+          "segmentId": "BA1396",
+          "fareGroupId": "FBCODE9",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": "C5",
+          "segmentId": "BA1370",
+          "fareGroupId": "FBCODE10",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": "C5",
+          "segmentId": "BA1386",
+          "fareGroupId": "FBCODE10",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": "C5",
+          "segmentId": "BA1390",
+          "fareGroupId": "FBCODE11",
+          "seatsLeft": 5
+        },
+        {
+          "disclosureId": "C5",
+          "segmentId": "BA1394",
+          "fareGroupId": "FBCODE12",
+          "seatsLeft": 9
+        }
+      ]
+    },
+    {
+      "id": "PCR_4",
+      "cabinType": "unknown",
+      "name": "CLUB PLUS",
+      "classesOfService": [
+        {
+          "disclosureId": "C2",
+          "segmentId": "BA1398",
+          "fareGroupId": "FBCODE16",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": "C2",
+          "segmentId": "BA1402",
+          "fareGroupId": "FBCODE16",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": "C2",
+          "segmentId": "BA1396",
+          "fareGroupId": "FBCODE16",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": "C2",
+          "segmentId": "BA1370",
+          "fareGroupId": "FBCODE17",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": "C2",
+          "segmentId": "BA1386",
+          "fareGroupId": "FBCODE17",
+          "seatsLeft": 7
+        },
+        {
+          "disclosureId": "C2",
+          "segmentId": "BA1390",
+          "fareGroupId": "FBCODE18",
+          "seatsLeft": 1
+        },
+        {
+          "disclosureId": "C2",
+          "segmentId": "BA1414",
+          "fareGroupId": "FBCODE22",
+          "seatsLeft": 6
+        },
+        {
+          "disclosureId": null,
+          "segmentId": "BA8902",
+          "fareGroupId": "FBCODE14",
+          "seatsLeft": 6
+        },
+        {
+          "disclosureId": "C2",
+          "segmentId": "BA1416",
+          "fareGroupId": "FBCODE23",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": null,
+          "segmentId": "BA8904",
+          "fareGroupId": "FBCODE14",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": null,
+          "segmentId": "BA8906",
+          "fareGroupId": "FBCODE14",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": "C2",
+          "segmentId": "BA1394",
+          "fareGroupId": "FBCODE24",
+          "seatsLeft": 2
+        },
+        {
+          "disclosureId": null,
+          "segmentId": "BA8756",
+          "fareGroupId": "FBCODE25",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": null,
+          "segmentId": "BA8752",
+          "fareGroupId": "FBCODE26",
+          "seatsLeft": 9
+        }
+      ]
+    },
+    {
+      "id": "PCR_5",
+      "cabinType": "unknown",
+      "name": "PLUS",
+      "classesOfService": [
+        {
+          "disclosureId": null,
+          "segmentId": "BA8756",
+          "fareGroupId": "FBCODE19",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": null,
+          "segmentId": "BA8906",
+          "fareGroupId": "FBCODE20",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": null,
+          "segmentId": "BA8752",
+          "fareGroupId": "FBCODE21",
+          "seatsLeft": 9
+        },
+        {
+          "disclosureId": null,
+          "segmentId": "BA8904",
+          "fareGroupId": "FBCODE20",
+          "seatsLeft": 9
+        }
+      ]
+    }
+  ],
+  "fareGroups": [
+    {
+      "id": "FBCODE1",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "OXZ0RO/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE2",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "OTZ0RO/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE3",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "OWZ0RO/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE4",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "NFZ0RO/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE5",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "OXV2RO/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE6",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "OTV2RO/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE7",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "OWV2RO/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE8",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "NFV2RO/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE9",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "OXV2OMJ/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE10",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "OTV2OMJ/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE11",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "OWV2OMJ/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE12",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "NFV2OMJ/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE13",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "OPV2R/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE14",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "OEIR/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE15",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "OTV2R/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE16",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "IXV2RO/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE17",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "ITV2RO/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE18",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "IWV2RO/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE19",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "OPV2YO/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE20",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "OEIRO/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE21",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "OTV2YO/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE22",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "IPV2R/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE23",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "ITV2R/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE24",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "RFV2RON/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE25",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "IPV2Y/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    },
+    {
+      "id": "FBCODE26",
+      "type": "non_negotiated_public_fare",
+      "basisCode": "ITV2Y/Y",
+      "passengerIds": [
+        "PA0"
+      ]
+    }
+  ],
+  "disclosures": [
+    {
+      "id": "C5",
+      "text": [
+        "Drinks and M&S food available to buy on flights to/from London Heathrow and London Gatwick",
+        "Contoured leather seat"
+      ]
+    },
+    {
+      "id": "C2",
+      "text": [
+        "Access to British Airways lounges where available",
+        "Dedicated check-in area",
+        "Complimentary bar service including champagne upon request ",
+        "Contoured leather seat with guaranteed window or aisle",
+        "Guaranteed window or aisle seat"
+      ]
+    }
+  ],
+  "penalties": [
+    {
+      "id": "Rule1",
+      "type": "change",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "58.00"
+      },
+      "passengerIds": [
+        "BA1370",
+        "BA1386",
+        "BA1390",
+        "BA1394",
+        "BA1396",
+        "BA1398",
+        "BA1402",
+        "BA1414",
+        "BA1416",
+        "BA5981",
+        "BA5985",
+        "BA8752",
+        "BA8756",
+        "BA8902",
+        "BA8904",
+        "BA8906",
+        "PA0"
+      ],
+      "remarks": [
+        "Time/date changes permitted at any time before each flight departure for a change fee of 58.0EUR or an upgrade fee of 58.0EUR plus any difference in fare. All sectors may be repriced. Changes subject to availability. Fees apply per ticket"
+      ]
+    },
+    {
+      "id": "Rule2",
+      "type": "cancel",
+      "price": null,
+      "passengerIds": [
+        "BA1370",
+        "BA1386",
+        "BA1390",
+        "BA1394",
+        "BA1396",
+        "BA1398",
+        "BA1402",
+        "BA1414",
+        "BA1416",
+        "BA5981",
+        "BA5985",
+        "BA8752",
+        "BA8756",
+        "BA8902",
+        "BA8904",
+        "BA8906",
+        "PA0"
+      ],
+      "remarks": [
+        "There are no refunds except for any Government & airport taxes"
+      ]
+    },
+    {
+      "id": "Rule3",
+      "type": "change",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "0.00"
+      },
+      "passengerIds": [
+        "BA1370",
+        "BA1386",
+        "BA1390",
+        "BA1394",
+        "BA1396",
+        "BA1398",
+        "BA1402",
+        "PA0"
+      ],
+      "remarks": [
+        "Time/date changes permitted at any time for the difference in fare. Changes subject to availability"
+      ]
+    },
+    {
+      "id": "Rule4",
+      "type": "cancel",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "29.00"
+      },
+      "passengerIds": [
+        "BA1370",
+        "BA1386",
+        "BA1390",
+        "BA1394",
+        "BA1396",
+        "BA1398",
+        "BA1402",
+        "PA0"
+      ],
+      "remarks": [
+        "If the booking is cancelled before the first flight, a cancellation fee of 29.0EUR per ticket applies. At any other time there are no refunds except for any government & airport taxes."
+      ]
+    },
+    {
+      "id": "Rule5",
+      "type": "change",
+      "price": {
+        "currency": "EUR",
+        "totalAmount": "116.00"
+      },
+      "passengerIds": [
+        "BA1370",
+        "BA1386",
+        "BA1390",
+        "BA1394",
+        "BA1396",
+        "BA1398",
+        "BA1402",
+        "BA1414",
+        "BA1416",
+        "BA8752",
+        "BA8756",
+        "BA8902",
+        "BA8904",
+        "BA8906",
+        "PA0"
+      ],
+      "remarks": [
+        "Time/date changes permitted at any time before each flight departure for a change fee of 116.0EUR or an upgrade fee of 116.0EUR plus any difference in fare. All sectors may be repriced. Changes subject to availability. Fees apply per ticket"
+      ]
+    }
+  ]
+}
