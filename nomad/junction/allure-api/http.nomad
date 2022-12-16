@@ -51,8 +51,8 @@ job "allure-api-http" {
       tags = [
         "http",
         "traefik.enable=true",
-        "traefik.http.routers.allure-api.entrypoints=${var.traefik_entrypoints}",
-        "traefik.http.routers.allure-api.rule=Host(${var.traefik_host_URL}`)",
+        "traefik.http.routers.allure-api-${var.environment}.entrypoints=${var.traefik_entrypoints}",
+        "traefik.http.routers.allure-api-${var.environment}.rule=Host(${var.traefik_host_URL}`)",
       ]
 
       check {

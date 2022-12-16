@@ -76,8 +76,8 @@ job "res-se-mobile-api-http" {
         "http",
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.res-se-mobile-api.entrypoints=${var.traefik_entrypoints}",
-        "traefik.http.routers.res-se-mobile-api.rule=Host(`${var.traefik_host_URL}`)",
+        "traefik.http.routers.res-se-mobile-api-${var.environment}.entrypoints=${var.traefik_entrypoints}",
+        "traefik.http.routers.res-se-mobile-api-${var.environment}.rule=Host(`${var.traefik_host_URL}`)",
       ]
 
       connect {

@@ -74,8 +74,8 @@ job "pay-web" {
       tags = [
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.pay-web.entrypoints=${var.traefik_entrypoints}",
-        "traefik.http.routers.pay-web.rule=Host(`${var.traefik_host_URL}`)",
+        "traefik.http.routers.pay-web-${var.environment}.entrypoints=${var.traefik_entrypoints}",
+        "traefik.http.routers.pay-web-${var.environment}.rule=Host(`${var.traefik_host_URL}`)",
       ]
 
       connect {

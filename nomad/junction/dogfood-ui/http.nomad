@@ -78,9 +78,9 @@ job "dogfood-ui-http" {
         "http",
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.dogfood-ui.entrypoints=${var.traefik_entrypoints}",
-        "traefik.http.routers.dogfood-ui.middlewares=dogfood-auth",
-        "traefik.http.routers.dogfood-ui.rule=Host(`${var.traefik_host_URL}`)",
+        "traefik.http.routers.dogfood-ui-${var.environment}.entrypoints=${var.traefik_entrypoints}",
+        "traefik.http.routers.dogfood-ui-${var.environment}.middlewares=dogfood-auth",
+        "traefik.http.routers.dogfood-ui-${var.environment}.rule=Host(`${var.traefik_host_URL}`)",
         "traefik.http.middlewares.dogfood-auth.basicauth.users=snowfall:$apr1$nVeL//e6$BP5DcRDvCLbuXfWca.jzc." // snowfall / N6z5fu&dTvp7j4rgK4V1uPrG
       ]
 

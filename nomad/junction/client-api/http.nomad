@@ -76,8 +76,8 @@ job "client-api-http" {
         "http",
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.client-api.entrypoints=${var.traefik_entrypoints}",
-        "traefik.http.routers.client-api.rule=Host(`${var.traaefik_host_URL}`)",
+        "traefik.http.routers.client-api-${var.environment}.entrypoints=${var.traefik_entrypoints}",
+        "traefik.http.routers.client-api-${var.environment}.rule=Host(`${var.traaefik_host_URL}`)",
       ]
 
       connect {
