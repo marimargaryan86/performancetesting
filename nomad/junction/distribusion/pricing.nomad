@@ -22,6 +22,10 @@ variable "datacenter" {
   type = string
 }
 
+variable "count" {
+  type = number
+}
+
 job "distribusion-pricing" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -36,7 +40,7 @@ job "distribusion-pricing" {
   }
 
   group "orders" {
-    count = 5
+    count = "${var.count}"
 
     restart {
       attempts = 3
@@ -48,6 +52,12 @@ job "distribusion-pricing" {
     network {
       mode = "bridge"
       port "prometheus" {}
+    }
+
+    scaling {
+      enabled = false
+      min     = 1
+      max     = 20
     }
 
     service {
