@@ -8,7 +8,7 @@ from snowfall.vendor.karhoo import parsers
 from snowfall.vendor.karhoo.models import bookings, location, quotes
 
 
-class KarhooClient(client.HttpClient):
+class KarhooClient(client.HttpClient):  # noqa: WPS214
     def __init__(self, api_key: str, base_url: str, http_client: httpx.AsyncClient):
         super().__init__(base_url, http_client)
         self._api_key = api_key
@@ -91,6 +91,20 @@ class KarhooClient(client.HttpClient):
                 headers=self._auth_header,
             ),
         )
+
+    async def get_position_of_trip(
+        self,
+        ident: uuid.UUID,
+    ) -> location.TripPositionResponse:
+        response = await self._make_request(
+            client.RequestOptions(
+                method="GET",
+                path="/v1/bookings/{ident}/track".format(ident=ident),
+                headers=self._auth_header,
+            ),
+        )
+
+        return location.TripPositionResponse(**response.json())
 
     @property
     def _auth_header(self) -> dict[str, str]:

@@ -40,3 +40,15 @@ class Place(KarhooBaseModel):
         "NEAREST",
     ] | None
     timezone: str | None
+
+
+class Direction(KarhooBaseModel):
+    kph: int
+    heading: int
+
+
+class TripPositionResponse(KarhooBaseModel):
+    position: Position
+    direction: Direction
+    origin_eta: int | None
+    destination_eta: int | None

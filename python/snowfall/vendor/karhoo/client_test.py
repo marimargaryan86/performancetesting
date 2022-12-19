@@ -376,7 +376,7 @@ async def test_cancel_booking_not_found(
         url="https://test_url/v1/bookings/00000000-0000-0000-0000-000000000000",
         status_code=404,
         json={
-            "code": "",
+            "code": "K3003",
             "message": "Not found.",
         },
     )
@@ -389,3 +389,33 @@ async def test_cancel_booking_not_found(
         )
 
     assert exc.value.body["message"] == "Not found."  # noqa: WPS441
+
+
+async def test_get_position_of_trip(
+    httpx_mock: pytest_httpx.HTTPXMock,
+    karhoo_client: client.KarhooClient,
+) -> None:
+    httpx_mock.add_response(
+        url="https://test_url/v1/bookings/00000000-0000-0000-0000-000000000000/track",
+        status_code=200,
+        json={
+            "position": {
+                "latitude": 51.157753,
+                "longitude": -0.1619743,
+            },
+            "direction": {
+                "kph": 50,
+                "heading": 10,
+            },
+            "origin_eta": 10,
+            "destination_eta": 10,
+        },
+    )
+
+    response = await karhoo_client.get_position_of_trip(
+        uuid.UUID("00000000-0000-0000-0000-000000000000"),
+    )
+
+    assert response
+    assert response.origin_eta == 10
+    assert response.direction.kph == 50
