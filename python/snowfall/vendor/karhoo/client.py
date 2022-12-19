@@ -5,7 +5,7 @@ import httpx
 
 from snowfall.stdlib.transport.http import client
 from snowfall.vendor.karhoo import parsers
-from snowfall.vendor.karhoo.models import bookings, location, quotes
+from snowfall.vendor.karhoo.models import bookings, fares, location, quotes
 
 
 class KarhooClient(client.HttpClient):  # noqa: WPS214
@@ -105,6 +105,17 @@ class KarhooClient(client.HttpClient):  # noqa: WPS214
         )
 
         return location.TripPositionResponse(**response.json())
+
+    async def get_final_fare(self, trip_id: uuid.UUID) -> fares.FinalFare:
+        response = await self._make_request(
+            client.RequestOptions(
+                method="GET",
+                path="/v1/fares/trip/{trip_id}".format(trip_id=trip_id),
+                headers=self._auth_header,
+            ),
+        )
+
+        return fares.FinalFare(**response.json())
 
     @property
     def _auth_header(self) -> dict[str, str]:

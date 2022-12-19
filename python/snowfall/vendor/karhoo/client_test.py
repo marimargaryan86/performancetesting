@@ -419,3 +419,24 @@ async def test_get_position_of_trip(
     assert response
     assert response.origin_eta == 10
     assert response.direction.kph == 50
+
+
+async def test_get_final_fare(
+    httpx_mock: pytest_httpx.HTTPXMock,
+    karhoo_client: client.KarhooClient,
+) -> None:
+    httpx_mock.add_response(
+        url="https://test_url/v1/fares/trip/00000000-0000-0000-0000-000000000000",
+        status_code=200,
+        json={
+            "expected_final_time": "2022-12-19T18:13:08.000Z",
+            "expected_in": 11318,
+            "state": "PENDING",
+        },
+    )
+
+    response = await karhoo_client.get_final_fare(
+        uuid.UUID("00000000-0000-0000-0000-000000000000"),
+    )
+
+    assert response.state == "PENDING"
