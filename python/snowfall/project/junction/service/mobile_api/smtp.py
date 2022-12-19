@@ -1,8 +1,17 @@
+import dataclasses
 from email import message
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 import aiosmtplib
+
+
+@dataclasses.dataclass(frozen=True)
+class Attachment(object):
+    payload: str
+    main_type: str
+    sub_type: str
+    file_name: str
 
 
 class EmailClient(object):
@@ -16,12 +25,21 @@ class EmailClient(object):
         mail_to: str,
         subject: str,
         body: str,
+        attachment: Attachment | None,
     ) -> None:
         email = message.EmailMessage()
         email["From"] = "no-reply@snowfalltravel.com"
         email["To"] = mail_to
         email["Subject"] = subject
         email.set_content(body)
+
+        if attachment:
+            email.add_attachment(
+                attachment.payload.encode("utf-8"),
+                maintype=attachment.main_type,
+                subtype=attachment.sub_type,
+                filename=attachment.file_name,
+            )
 
         async with self._smtp:
             await self._smtp.send_message(email)

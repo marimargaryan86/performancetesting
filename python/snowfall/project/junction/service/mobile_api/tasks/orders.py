@@ -3,7 +3,7 @@ import datetime
 from typing import Any, Mapping, Sequence
 
 import aiofiles
-import json_api_doc  # type: ignore[import]
+import json_api_doc
 from jinja2 import Template
 
 from snowfall.project.junction.service.mobile_api import payments, resources, smtp
@@ -13,6 +13,12 @@ from snowfall.vendor.junction import client
 _ORDER_STATUS_POLLING_TIMEOUT = 180
 _ORDER_STATUS_POLLING_INTERVAL = 10
 _ATTRIBUTES_ACCESSOR = "attributes"
+_SUCCESS_STATUSES = frozenset(
+    (
+        resources.OrderStatus.confirmed.value,
+        resources.OrderStatus.not_ticketed.value,
+    ),
+)
 
 
 async def _handle_new_order_results(
@@ -21,11 +27,7 @@ async def _handle_new_order_results(
     smtp_client: smtp.EmailClient,
 ) -> bool:
     booking_statuses = {booking["status"]["id"] for booking in order["bookings"]}
-    success_statuses = {
-        resources.OrderStatus.confirmed.value,
-        resources.OrderStatus.not_ticketed.value,
-    }
-    if booking_statuses and not booking_statuses.difference(success_statuses):
+    if booking_statuses and not booking_statuses.difference(_SUCCESS_STATUSES):
         await payments.capture(payment_intent_id)
         await send_booking_confirmation(order, smtp_client)
         return True

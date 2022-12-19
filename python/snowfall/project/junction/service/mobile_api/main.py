@@ -19,6 +19,7 @@ from snowfall.project.junction.service.mobile_api import handlers as mobile_hand
 from snowfall.project.junction.service.mobile_api import (
     jwt_generator,
     middleware,
+    orders_report,
     places_migration,
     repository,
     smtp,
@@ -164,6 +165,10 @@ async def _migrate(app: service.Application[bootstrap.Settings]) -> None:
     await places_migration.migrate(app.settings)
 
 
+async def _orders_report(app: service.Application[orders_report.Settings]) -> None:
+    await orders_report.orders_report(app)
+
+
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(name="mobile-api")
 
@@ -177,5 +182,10 @@ if __name__ == "__main__":
             name="migrate",
             callback=_migrate,
             settings_class=bootstrap.Settings,
+        ),
+        service.Command(
+            name="orders_report",
+            callback=_orders_report,
+            settings_class=orders_report.Settings,
         ),
     )
