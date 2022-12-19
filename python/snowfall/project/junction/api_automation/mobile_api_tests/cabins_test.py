@@ -17,11 +17,14 @@ async def test_list_cabin_classes(
 ) -> None:
     response = await mobile_client.list_cabin_classes()
     logging.info("list_cabin_classes: %s", json.dumps(response, indent=4))
-    assert response["data"][0]["id"] == "unspecified"
-    assert response["data"][1]["id"] == "economy"
-    assert response["data"][2]["id"] == "premium"
-    assert response["data"][3]["id"] == "business"
-    assert response["data"][4]["id"] == "first"
+
+    cabin_classes = []
+    for idx, _ in enumerate(response["data"]):
+        cabin_classes.append(response["data"][idx]["id"])
+    logging.info("actual cabin_classes: %s", cabin_classes)
+
+    expected_classes = {"business", "economy", "first", "premium", "unspecified"}
+    assert set(cabin_classes) == expected_classes
 
 
 @pytest.mark.integration
