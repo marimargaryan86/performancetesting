@@ -1,9 +1,8 @@
 import uuid
 from typing import Literal
 
+from snowfall.vendor.karhoo.models import price, vehicle
 from snowfall.vendor.karhoo.models.base import KarhooBaseModel
-from snowfall.vendor.karhoo.models.price import Price
-from snowfall.vendor.karhoo.models.vehicle import Vehicle, Vehicles
 
 
 class Rating(KarhooBaseModel):
@@ -47,17 +46,17 @@ class Fleet(KarhooBaseModel):
 
 class Quote(KarhooBaseModel):
     id: uuid.UUID  # noqa: A003
-    price: Price
+    price: price.Price
     pick_up_type: Literal["DEFAULT", "MEET_AND_GREET", "CURB_SIDE", "STAND_BY"] | None
     quote_type: Literal["FIXED", "METERED", "ESTIMATED"]
     source: Literal["FLEET", "MARKET"] | None
     fleet: Fleet
-    vehicle: Vehicle | None
+    vehicle: vehicle.Vehicle | None
     service_level_agreements: ServiceLevelAgreements | None
 
 
 class Availability(KarhooBaseModel):
-    vehicles: Vehicles | None
+    vehicles: vehicle.Vehicles | None
 
 
 class RequestQuotesResponse(KarhooBaseModel):

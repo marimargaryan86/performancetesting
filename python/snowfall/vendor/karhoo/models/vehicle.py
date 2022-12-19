@@ -19,14 +19,6 @@ class VehicleAttributes(KarhooBaseModel):
     child_seat: bool | None
 
 
-class BookingVehicle(KarhooBaseModel):
-    vehicle_class: str
-    description: str | None
-    vehicle_license_plate: str
-    driver: Driver
-    attributes: VehicleAttributes
-
-
 class Qta(KarhooBaseModel):
     high_minutes: int
     low_minutes: int

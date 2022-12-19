@@ -1,7 +1,7 @@
 import datetime
 from typing import Any
 
-from snowfall.vendor.karhoo.models import location
+from snowfall.vendor.karhoo.models import bookings, location, passenger
 
 
 def parse_coordinates(
@@ -28,3 +28,60 @@ def parse_request_quotes_request(
         payload["local_time_of_pickup"] = departure_at.isoformat()
 
     return payload
+
+
+def parse_booking_cancellation(
+    reason: str,
+    explanation: str | None,
+) -> dict[str, Any]:
+    return {
+        "reason": reason,
+        "explanation": explanation,
+    }
+
+
+def parse_passenger_details(
+    passenger_details: passenger.PassengerDetails,
+) -> dict[str, Any]:
+    return {
+        "first_name": passenger_details.first_name,
+        "last_name": passenger_details.last_name,
+        "email": passenger_details.email,
+        "phone_number": passenger_details.phone_number,
+        "locale": passenger_details.locale,
+    }
+
+
+def parse_luggage(
+    luggage: passenger.Luggage,
+) -> dict[str, Any]:
+    return {
+        "total": luggage.total,
+    }
+
+
+def parse_passengers(
+    passengers: bookings.Passengers,
+) -> dict[str, Any]:
+    return {
+        "additional_passengers": passengers.additional_passengers,
+        "passenger_details": [
+            parse_passenger_details(passenger_details)
+            for passenger_details in passengers.passenger_details
+        ],
+        "luggage": parse_luggage(passengers.luggage),
+    }
+
+
+def parse_book_trip(booking: bookings.Booking) -> dict[str, Any]:
+    return {
+        "meta": booking.meta,
+        "quote_id": booking.quote_id,
+        "passengers": parse_passengers(booking.passengers),
+        "partner_trip_id": booking.partner_trip_id,
+        "comments": booking.comments,
+        "flight_number": booking.flight_number,
+        "train_number": booking.train_number,
+        "cost_center_reference": booking.cost_center_reference,
+        "train_time": booking.train_time,
+    }

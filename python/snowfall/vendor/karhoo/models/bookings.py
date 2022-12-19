@@ -1,12 +1,13 @@
+import datetime
 import uuid
 from typing import Literal
 
 from snowfall.vendor.karhoo.models.base import KarhooBaseModel
 from snowfall.vendor.karhoo.models.location import MeetingPoint, Place
-from snowfall.vendor.karhoo.models.passenger import Passenger
+from snowfall.vendor.karhoo.models.passenger import Passengers
 from snowfall.vendor.karhoo.models.price import Fare
-from snowfall.vendor.karhoo.models.quotes import Fleet, Quote, ServiceLevelAgreements
-from snowfall.vendor.karhoo.models.vehicle import BookingVehicle
+from snowfall.vendor.karhoo.models.quotes import ServiceLevelAgreements
+from snowfall.vendor.karhoo.models.vehicle import Driver, VehicleAttributes
 
 
 class BookingCancellation(KarhooBaseModel):
@@ -40,9 +41,9 @@ class CancelledBy(KarhooBaseModel):
 
 
 class Booking(KarhooBaseModel):
-    id: uuid.UUID  # noqa: A003
-    quote_id: uuid.UUID
-    passengers: Passenger
+    meta: dict[str, str] | None
+    quote_id: str
+    passengers: Passengers
     partner_trip_id: str | None
     flight_number: str | None
     train_number: str | None
@@ -51,10 +52,46 @@ class Booking(KarhooBaseModel):
     train_time: str | None
 
 
-class RequestBookingResponse(KarhooBaseModel):
+class BookingVehicle(KarhooBaseModel):
+    vehicle_class: str
+    description: str | None
+    vehicle_license_plate: str
+    driver: Driver
+    attributes: VehicleAttributes
+
+
+class BookingQuote(KarhooBaseModel):
+    type: Literal[  # noqa: A003
+        "QUOTE_TYPE_NOT_SET",
+        "FIXED",
+        "METERED",
+        "ESTIMATED",
+    ] | None
+    currency: str
+    gratuity_percent: int | None
+    vehicle_class: str | None
+    qta_high_minutes: int | None
+    qta_low_minutes: int | None
+    vehicle_attributes: VehicleAttributes
+    source: Literal["FLEET", "MARKET"] | None
+    high_price: int | None
+    low_price: int | None
+
+
+class BookingFleet(KarhooBaseModel):
+    fleet_id: uuid.UUID | None
+    name: str | None
+    logo_url: str | None
+    description: str | None
+    phone_number: str | None
+    terms_conditions_url: str | None
+    email: str | None
+
+
+class BookingResponse(KarhooBaseModel):
     id: uuid.UUID  # noqa: A003
-    passengers: Passenger
-    partner_traveller_id: str
+    passengers: Passengers
+    partner_traveller_id: str | None
     status: Literal[
         "REQUESTED",
         "CONFIRMED",
@@ -74,11 +111,11 @@ class RequestBookingResponse(KarhooBaseModel):
     origin: Place
     destination: Place
     date_scheduled: str | None
-    quote: Quote
+    quote: BookingQuote
     fare: Fare
     external_trip_id: str | None
     display_trip_id: str | None
-    fleet: Fleet
+    fleet_info: BookingFleet
     vehicle: BookingVehicle
     partner_trip_id: str | None
     comments: str | None
@@ -91,5 +128,5 @@ class RequestBookingResponse(KarhooBaseModel):
     cancelled_by: CancelledBy | None
     follow_code: str | None
     meta: dict[str, str] | None
-    train_time: str | None
+    train_time: datetime.datetime | None
     service_level_agreements: ServiceLevelAgreements | None

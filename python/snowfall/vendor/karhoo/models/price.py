@@ -21,6 +21,6 @@ class Breakdown(KarhooBaseModel):
 
 class Fare(KarhooBaseModel):
     total: int
-    currency_code: str
+    currency: str
     gratuity_percent: int | None
     breakdown: list[Breakdown]

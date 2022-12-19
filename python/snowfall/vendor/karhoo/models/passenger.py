@@ -10,10 +10,10 @@ class PassengerDetails(KarhooBaseModel):
     last_name: str
     email: str | None
     phone_number: str
-    locale: str
+    locale: str | None
 
 
-class Passenger(KarhooBaseModel):
+class Passengers(KarhooBaseModel):
     additional_passengers: int | None
     passenger_details: list[PassengerDetails]
     luggage: Luggage

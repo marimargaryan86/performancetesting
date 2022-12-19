@@ -5,7 +5,7 @@ import httpx
 
 from snowfall.stdlib.transport.http import client
 from snowfall.vendor.karhoo import parsers
-from snowfall.vendor.karhoo.models import location, quotes
+from snowfall.vendor.karhoo.models import bookings, location, quotes
 
 
 class KarhooClient(client.HttpClient):
@@ -44,6 +44,50 @@ class KarhooClient(client.HttpClient):
         )
 
         return quotes.RequestQuotesResponse(**response.json())
+
+    async def book_trip(
+        self,
+        booking: bookings.Booking,
+    ) -> bookings.BookingResponse:
+        response = await self._make_request(
+            client.RequestOptions(
+                method="POST",
+                path="/v1/bookings",
+                payload=parsers.parse_book_trip(booking),
+                headers=self._auth_header,
+            ),
+        )
+
+        return bookings.BookingResponse(**response.json())
+
+    async def get_booking_details(
+        self,
+        ident: uuid.UUID,
+    ) -> bookings.BookingResponse:
+        response = await self._make_request(
+            client.RequestOptions(
+                method="GET",
+                path="/v1/bookings/{ident}".format(ident=ident),
+                headers=self._auth_header,
+            ),
+        )
+
+        return bookings.BookingResponse(**response.json())
+
+    async def cancel_booking(
+        self,
+        ident: uuid.UUID,
+        reason: str,
+        explanation: str | None,
+    ) -> None:
+        await self._make_request(
+            client.RequestOptions(
+                method="POST",
+                path="/v1/bookings/{ident}".format(ident=ident),
+                payload=(reason, explanation),
+                headers=self._auth_header,
+            ),
+        )
 
     @property
     def _auth_header(self) -> dict[str, str]:

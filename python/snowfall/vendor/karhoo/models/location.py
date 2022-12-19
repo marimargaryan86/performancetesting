@@ -1,4 +1,3 @@
-import uuid
 from typing import Literal
 
 from snowfall.vendor.karhoo.models.base import KarhooBaseModel
@@ -30,7 +29,7 @@ class MeetingPoint(KarhooBaseModel):
 
 
 class Place(KarhooBaseModel):
-    place_id: uuid.UUID
+    place_id: str
     display_address: str
     position: Position
     poi_type: Literal[
