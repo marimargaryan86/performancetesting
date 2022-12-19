@@ -9,21 +9,18 @@ from snowfall.vendor.karhoo.models.price import Fare
 from snowfall.vendor.karhoo.models.quotes import ServiceLevelAgreements
 from snowfall.vendor.karhoo.models.vehicle import Driver, VehicleAttributes
 
-
-class BookingCancellation(KarhooBaseModel):
-    reason: Literal[
-        "OTHER_USER_REASON",
-        "DRIVER_DIDNT_SHOW_UP",
-        "ETA_TOO_LONG",
-        "DRIVER_IS_LATE",
-        "CAN_NOT_FIND_VEHICLE",
-        "NOT_NEEDED_ANYMORE",
-        "ASKED_BY_DRIVER_TO_CANCEL",
-        "FOUND_BETTER_PRICE",
-        "NOT_CLEAR_MEETING_INSTRUCTIONS",
-        "COULD_NOT_CONTACT_CARRIER",
-    ]
-    explanation: str | None
+CANCELLATION_REASON = Literal[
+    "OTHER_USER_REASON",
+    "DRIVER_DIDNT_SHOW_UP",
+    "ETA_TOO_LONG",
+    "DRIVER_IS_LATE",
+    "CAN_NOT_FIND_VEHICLE",
+    "NOT_NEEDED_ANYMORE",
+    "ASKED_BY_DRIVER_TO_CANCEL",
+    "FOUND_BETTER_PRICE",
+    "NOT_CLEAR_MEETING_INSTRUCTIONS",
+    "COULD_NOT_CONTACT_CARRIER",
+]
 
 
 class Agent(KarhooBaseModel):

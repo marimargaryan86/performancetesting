@@ -77,14 +77,17 @@ class KarhooClient(client.HttpClient):
     async def cancel_booking(
         self,
         ident: uuid.UUID,
-        reason: str,
+        reason: bookings.CANCELLATION_REASON,
         explanation: str | None,
     ) -> None:
         await self._make_request(
             client.RequestOptions(
                 method="POST",
                 path="/v1/bookings/{ident}".format(ident=ident),
-                payload=(reason, explanation),
+                payload={
+                    "reason": reason,
+                    "explanation": explanation,
+                },
                 headers=self._auth_header,
             ),
         )
