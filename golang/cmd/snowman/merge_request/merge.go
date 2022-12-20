@@ -23,25 +23,20 @@ func (mr *mergeRequest) merge() error {
 	}
 
 	names := make([]string, 0)
+	hasSnowman := false
 
 	for _, rule := range state.Rules {
 		for _, user := range rule.ApprovedBy {
 			if user.ID != mr.snowman.ID {
 				names = append(names, user.Name)
+			} else {
+				hasSnowman = true
 			}
 		}
 	}
 
-	_, _, err = mr.client.MergeRequestApprovals.ApproveMergeRequest(
-		mr.object.ProjectID,
-		mr.object.IID,
-		&gitlab.ApproveMergeRequestOptions{
-			SHA: &mr.object.SHA,
-		},
-	)
-
-	if err != nil {
-		return err
+	if !hasSnowman {
+		return mr.approve()
 	}
 
 	for _, name := range common.Unique(names) {

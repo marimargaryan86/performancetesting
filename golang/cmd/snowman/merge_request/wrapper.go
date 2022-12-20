@@ -231,3 +231,21 @@ func (mr *mergeRequest) setLabel(label string) error {
 
 	return nil
 }
+
+func (mr *mergeRequest) approve() error {
+	_, _, err := mr.client.MergeRequestApprovals.ApproveMergeRequest(
+		mr.object.ProjectID,
+		mr.object.IID,
+		&gitlab.ApproveMergeRequestOptions{
+			SHA: &mr.object.SHA,
+		},
+	)
+
+	if err != nil {
+		return err
+	}
+
+	mr.hasChanged = true
+
+	return nil
+}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"git.snowfall.se/junction/junction/golang/cmd/snowman/common"
 	"git.snowfall.se/junction/junction/golang/cmd/snowman/merge_request"
+	"git.snowfall.se/junction/junction/golang/stdlib/logging"
 	"git.snowfall.se/junction/junction/golang/stdlib/service"
 	"github.com/getsentry/sentry-go"
 	"github.com/robfig/cron/v3"
@@ -103,7 +104,6 @@ func serve(cmd *cobra.Command, args []string) error {
 		}
 	}()
 
-	sugar := logger.Sugar()
 	sentryDsn := viper.GetString("sentry_dsn")
 
 	if sentryDsn != "" {
@@ -116,12 +116,14 @@ func serve(cmd *cobra.Command, args []string) error {
 		})
 
 		if err != nil {
-			sugar.Fatal(err)
+			logger.Sugar().Fatal(err)
 		}
 
 		defer sentry.Flush(2 * time.Second)
+		logger = logging.ModifyToSentryLogger(logger, sentry.CurrentHub().Client())
 	}
 
+	sugar := logger.Sugar()
 	c := cron.New()
 	client, err := gitlab.NewClient(viper.GetString("gitlab_token"), gitlab.WithBaseURL(viper.GetString("gitlab_base_url")))
 

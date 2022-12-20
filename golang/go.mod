@@ -16,7 +16,7 @@ require (
 	github.com/spf13/viper v1.10.1
 	github.com/uber/h3-go v3.0.1+incompatible
 	github.com/xanzy/go-gitlab v0.73.1
-	go.uber.org/zap v1.20.0
+	go.uber.org/zap v1.21.0
 	golang.org/x/text v0.3.7
 	google.golang.org/grpc v1.44.0
 	google.golang.org/protobuf v1.28.1
@@ -25,6 +25,7 @@ require (
 )
 
 require (
+	github.com/TheZeroSlave/zapsentry v1.12.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
