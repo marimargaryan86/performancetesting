@@ -9,9 +9,10 @@ import (
 )
 
 type MergeRequestPlugin struct {
-	Client *gitlab.Client
-	Logger *zap.SugaredLogger
-	mu     sync.Mutex
+	Client  *gitlab.Client
+	Logger  *zap.SugaredLogger
+	mu      sync.Mutex
+	Snowman *gitlab.User
 }
 
 type invokable func() error
@@ -30,10 +31,11 @@ func (plugin *MergeRequestPlugin) Test(mrId int) {
 	fmt.Println(mrId)
 
 	wrapper := &mergeRequest{
-		cache:  &cache{},
-		client: plugin.Client,
-		logger: plugin.Logger,
-		object: mr,
+		cache:   &cache{},
+		client:  plugin.Client,
+		logger:  plugin.Logger,
+		object:  mr,
+		snowman: plugin.Snowman,
 	}
 
 	fmt.Println(wrapper.expectedReviewers())
@@ -104,10 +106,11 @@ func (plugin *MergeRequestPlugin) OnEvent(event interface{}) {
 
 	logger := plugin.Logger.With("project", mr.ProjectID, "IID", mr.IID)
 	wrapper := &mergeRequest{
-		cache:  &cache{},
-		client: plugin.Client,
-		logger: logger,
-		object: mr,
+		cache:   &cache{},
+		client:  plugin.Client,
+		logger:  logger,
+		object:  mr,
+		snowman: plugin.Snowman,
 	}
 
 	for _, i := range []invokable{

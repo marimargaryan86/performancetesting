@@ -64,7 +64,9 @@ func (mr *mergeRequest) appendCodeOwners(expected []int, err error) ([]int, erro
 
 	for _, r := range state.Rules {
 		if len(r.EligibleApprovers) == 1 {
-			expected = append(expected, r.EligibleApprovers[0].ID)
+			if r.EligibleApprovers[0].ID != mr.snowman.ID {
+				expected = append(expected, r.EligibleApprovers[0].ID)
+			}
 		} else if len(r.EligibleApprovers) != 0 {
 			indecisive = append(indecisive, r.EligibleApprovers)
 		}
