@@ -34,8 +34,8 @@ job "planner-grpc" {
     max_parallel      = 1
     auto_revert       = true
     auto_promote      = true
-    healthy_deadline  = "10m"
-    progress_deadline = "15m"
+    healthy_deadline  = "15m"
+    progress_deadline = "17m"
     canary            = 1
   }
 
@@ -94,7 +94,8 @@ job "planner-grpc" {
       driver = "docker"
 
       resources {
-        memory = 62 * 1024
+        memory     = 66 * 1024
+        memory_max = 80 * 1024
       }
 
       config {
