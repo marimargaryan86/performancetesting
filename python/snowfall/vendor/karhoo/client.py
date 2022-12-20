@@ -119,4 +119,4 @@ class KarhooClient(client.HttpClient):  # noqa: WPS214
 
     @property
     def _auth_header(self) -> dict[str, str]:
-        return {"Authorization": "Bearer {api_key}".format(api_key=self._api_key)}
+        return {"Authorization": "ApiKey {api_key}".format(api_key=self._api_key)}
