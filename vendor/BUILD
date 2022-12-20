@@ -21,6 +21,7 @@ python_requirements(
         "rfc3339-validator": ["rfc3339_validator"],
         "setuptools": ["easy_install", "pkg_resources", "setuptools"],
         "currency-cloud": ["currencycloud"],
+        "allure-python-commons": ["allure"],
     },
     overrides={
         "mongomock-motor": {"dependencies": ["#setuptools"]},

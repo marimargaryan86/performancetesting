@@ -66,6 +66,15 @@ def departure_after(request: pytest.FixtureRequest) -> str:
 
 
 @pytest.fixture(scope="package", autouse=True)
+def departures_after(request: pytest.FixtureRequest) -> Sequence[str]:
+    tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+    departures = request.config.getoption("DEPARTURE_AFTER") or tomorrow.strftime(
+        "%Y-%m-%dT00:00:00.000Z",
+    )
+    return departures.split(",")
+
+
+@pytest.fixture(scope="package", autouse=True)
 def origin(
     _local_config: Mapping[str, str],
     request: pytest.FixtureRequest,
