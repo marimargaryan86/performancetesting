@@ -1,0 +1,63 @@
+{
+    "url": "\/offers\/quotes",
+    "method": "POST",
+    "status_code": 201,
+    "json": {
+      "data": {
+        "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+        "type": "trip-offer-price-quotes",
+        "attributes": {
+          "expiresAt": "2019-08-24T14:15:22Z",
+          "price": {
+            "currency": "EUR",
+            "amount": "13.37"
+          },
+          "penalties": [
+            {
+              "applicableTo": {
+                "dateOfBirthAfter": "1980-02-03",
+                "dateOfBirthBefore": "1980-02-03"
+              },
+              "penaltyType": "exchange",
+              "changeable": true,
+              "refundable": false,
+              "applicability": "before",
+              "price": {
+                "currency": "EUR",
+                "amount": "13.37"
+              }
+            }
+          ],
+          "required": [
+            "passport-number"
+          ],
+          "rules": [
+            {
+              "title": "Cancellation policy",
+              "body": "Tickets can be cancelled until the day of departure without any charges. After that, no refund is possible anymore.  NOTE: the refund delay for Homeprint and Mobile tickets is 2 days. Except for agency fee of 20euro for handling."
+            }
+          ],
+          "status": "completed"
+        },
+        "relationships": {
+          "offer": {
+            "data": {
+              "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+              "type": "offers"
+            }
+          },
+          "options": {
+            "data": [
+              {
+                "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "type": "offer-options"
+              }
+            ]
+          }
+        },
+        "links": {
+          "self": "https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+        }
+      }
+    }
+}
