@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package snowfall.project.pay.service.quotations.v1alpha;
+
+import "google/protobuf/timestamp.proto";
+import "snowfall/stdlib/v1alpha/money.proto";
+
+message Quotation {
+  string id = 1;
+  snowfall.stdlib.v1alpha.Money beneficiary_amount = 2;
+  float exchange_rate = 3;
+  snowfall.stdlib.v1alpha.Money converted_beneficiary_amount = 4;
+  float buffer_rate = 5;
+  snowfall.stdlib.v1alpha.Money buffer_amount = 6;
+  float sales_rate = 7;
+  snowfall.stdlib.v1alpha.Money sales_amount = 8;
+  snowfall.stdlib.v1alpha.Money offer_amount = 9;
+  google.protobuf.Timestamp expires_at = 10;
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_QUOTED = 1;
+    STATUS_CONFIRMED = 2;
+    STATUS_INVALIDATED = 3;
+    STATUS_UTILIZED = 4;
+  }
+  Status status = 11;
+  string reseller_id = 12;
+  optional string transaction_id = 13;
+  google.protobuf.Timestamp created_at = 14;
+  google.protobuf.Timestamp updated_at = 15;
+}
