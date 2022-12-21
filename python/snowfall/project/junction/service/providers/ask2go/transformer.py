@@ -174,20 +174,21 @@ class OfferTransformer(object):  # noqa: WPS214
     ) -> Sequence[offers_pb2.Offer]:
         group_offers = []
 
+        branded_fares = [
+            offers.BrandedPriceInformation(
+                base_fare=offer.pricing_information.base.base_fare,
+                total_tax=offer.pricing_information.base.total_tax,
+                total_cost=offer.pricing_information.base.total_cost,
+                original_cost=offer.pricing_information.base.original_cost,
+                service_fee=offer.pricing_information.base.service_fee,
+                currency=offer.pricing_information.base.currency,
+                brand_name=offer.pricing_information.base.brand_name
+                if offer.pricing_information.base.brand_name
+                else "LOWEST FARE AVAILABLE",
+            ),
+        ]
         if offer.pricing_information.additional:
-            branded_fares = offer.pricing_information.additional
-        else:
-            branded_fares = [
-                offers.BrandedPriceInformation(
-                    base_fare=offer.pricing_information.base.base_fare,
-                    total_tax=offer.pricing_information.base.total_tax,
-                    total_cost=offer.pricing_information.base.total_cost,
-                    original_cost=offer.pricing_information.base.original_cost,
-                    service_fee=offer.pricing_information.base.service_fee,
-                    currency=offer.pricing_information.base.currency,
-                    brand_name="LOWEST FARE AVAILABLE",
-                ),
-            ]
+            branded_fares.extend(offer.pricing_information.additional)
 
         for brand in branded_fares:
             amount = money.from_string(

@@ -112,6 +112,7 @@ class PricingInformationBase(CamelCaseBaseModel):
     original_cost: str
     service_fee: str
     currency: str
+    brand_name: Optional[str]
 
 
 class BrandedPriceInformation(CamelCaseBaseModel):

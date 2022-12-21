@@ -135,9 +135,9 @@ def _assert_offer(  # noqa: WPS218
         == offers_pb2.SegmentAmenity.TYPE_INCLUDED
     )
     price = money.from_protobuf(offer.price)
-    assert str(price) == "69.54"
+    assert str(price) == "55.54"
     assert price.currency.code == "EUR"
-    assert offer.brand_name == "SAS GO SMART"
+    assert offer.brand_name == "LOWEST FARE AVAILABLE"
 
 
 @pytest.mark.parametrize(
