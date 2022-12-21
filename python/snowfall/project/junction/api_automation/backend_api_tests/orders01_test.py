@@ -1,6 +1,5 @@
 import json
 import logging
-import time
 from typing import Sequence
 
 import pytest
@@ -60,8 +59,6 @@ async def test_get_orders_status(
         ),
     )
     assert is_valid_uuid(order_id) is True, "order_id uuid in v4 format"
-
-    time.sleep(5)
 
 
 async def get_orders_id(

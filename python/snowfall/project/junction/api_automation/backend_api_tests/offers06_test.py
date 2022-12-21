@@ -1,5 +1,4 @@
 import logging
-import time
 
 import pytest
 
@@ -53,7 +52,7 @@ async def return_offer_group_details_ids(
         junction_client,
         trips_search_id,
     )
-    time.sleep(20)
+
     return await return_offer_group_details(
         junction_client,
         offer_group_ids,

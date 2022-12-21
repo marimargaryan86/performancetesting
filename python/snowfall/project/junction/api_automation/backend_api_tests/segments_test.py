@@ -4,7 +4,7 @@ import time
 
 import pytest
 
-from snowfall.project.junction.api_automation.backend_api_tests.trip_test import (
+from snowfall.project.junction.api_automation.backend_api_tests.trip01_test import (
     return_trip_search_id,
 )
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (

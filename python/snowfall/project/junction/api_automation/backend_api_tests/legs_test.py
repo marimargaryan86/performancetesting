@@ -8,7 +8,7 @@ import pytest
 from snowfall.project.junction.api_automation.backend_api_tests.segments_test import (
     return_segment_id_from_trip_search_id,
 )
-from snowfall.project.junction.api_automation.backend_api_tests.trip_test import (
+from snowfall.project.junction.api_automation.backend_api_tests.trip01_test import (
     return_trip_search_id,
 )
 from snowfall.vendor.junction.client import JunctionClient
