@@ -10,6 +10,42 @@ const commitTemplate = "%{title}"
 const mergeRequestTemplate = "# Merge Request\n\n## What does this MR do?\n\n## Related Issues\n"
 const suggestionCommitMessage = "fix: apply review suggestions"
 
+func verifyApprovalRules(client *gitlab.Client, logger *zap.SugaredLogger, p *gitlab.Project, snowman *gitlab.User) {
+	rules, _, err := client.Projects.GetProjectApprovalRules(p.ID)
+
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+
+	hasSnowman := false
+
+	for _, r := range rules {
+		if r.Name == snowman.Username {
+			hasSnowman = true
+			break
+		}
+	}
+
+	if hasSnowman {
+		// @todo: update existing rule if needed
+		return
+	}
+
+	_, _, err = client.Projects.CreateProjectApprovalRule(p.ID, &gitlab.CreateProjectLevelRuleOptions{
+		Name:              &snowman.Username,
+		ApprovalsRequired: func() *int { i := 1; return &i }(),
+		UserIDs:           func() *[]int { i := []int{snowman.ID}; return &i }(),
+	})
+
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+
+	logger.Info("Approval rule created.")
+}
+
 func verifyProjectSettings(client *gitlab.Client, logger *zap.SugaredLogger, p *gitlab.Project) {
 	empty := gitlab.EditProjectOptions{}
 	changed := gitlab.EditProjectOptions{}
@@ -85,7 +121,7 @@ func verifyProjectSettings(client *gitlab.Client, logger *zap.SugaredLogger, p *
 	}
 }
 
-func manageMemberships(client *gitlab.Client, logger *zap.SugaredLogger, hookUrl string, hookSecret string) {
+func manageMemberships(client *gitlab.Client, logger *zap.SugaredLogger, snowman *gitlab.User, hookUrl string, hookSecret string) {
 	projects, _, err := client.Projects.ListProjects(&gitlab.ListProjectsOptions{
 		Archived:                 func() *bool { b := false; return &b }(),
 		Membership:               func() *bool { b := true; return &b }(),
@@ -102,6 +138,7 @@ func manageMemberships(client *gitlab.Client, logger *zap.SugaredLogger, hookUrl
 		pLogger := logger.With("project", p.ID, "name", p.Name)
 
 		verifyProjectSettings(client, pLogger, p)
+		verifyApprovalRules(client, pLogger, p, snowman)
 
 		var foundHook *gitlab.ProjectHook
 
