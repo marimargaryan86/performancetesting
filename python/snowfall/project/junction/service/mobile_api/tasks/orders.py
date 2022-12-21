@@ -6,7 +6,12 @@ import aiofiles
 import json_api_doc
 from jinja2 import Template
 
-from snowfall.project.junction.service.mobile_api import payments, resources, smtp
+from snowfall.project.junction.service.mobile_api import (
+    payments,
+    repository,
+    resources,
+    smtp,
+)
 from snowfall.stdlib.persistence import filesystem
 from snowfall.vendor.junction import client
 
@@ -25,6 +30,7 @@ async def _handle_new_order_results(
     payment_intent_id: str,
     order: Mapping[str, Any],
     smtp_client: smtp.EmailClient,
+    vouchers_repository: repository.VouchersRepository,
 ) -> bool:
     booking_statuses = {booking["status"]["id"] for booking in order["bookings"]}
     if booking_statuses and not booking_statuses.difference(_SUCCESS_STATUSES):
@@ -34,6 +40,7 @@ async def _handle_new_order_results(
 
     if resources.OrderStatus.pending.value not in booking_statuses:
         await payments.cancel(payment_intent_id)
+        await vouchers_repository.revert_voucher(payment_intent_id)
         return True
 
     return False
@@ -44,6 +51,7 @@ async def poll_order_status(
     order_id: str,
     payment_intent_id: str,
     smtp_client: smtp.EmailClient,
+    vouchers_repository: repository.VouchersRepository,
 ) -> bool:
     time_spent = 0
     while time_spent <= _ORDER_STATUS_POLLING_TIMEOUT:
@@ -57,6 +65,7 @@ async def poll_order_status(
             payment_intent_id,
             order,
             smtp_client,
+            vouchers_repository,
         )
         if payment_processed:
             return True
@@ -65,6 +74,7 @@ async def poll_order_status(
         time_spent += _ORDER_STATUS_POLLING_INTERVAL
 
     await payments.cancel(payment_intent_id)
+    await vouchers_repository.revert_voucher(payment_intent_id)
     return False
 
 

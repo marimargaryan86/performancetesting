@@ -253,6 +253,7 @@ class Orders(endpoints.HTTPEndpoint):
             mobile_order.id,
             mobile_order.payment_intent_id,
             smtp_client,
+            vouchers_repository,
         )
 
         junction_order["data"]["relationships"]["payment"] = {

@@ -386,6 +386,26 @@ class VouchersRepository(
             upsert=False,
         )
 
+    async def revert_voucher(
+        self,
+        payment_intent_id: str,
+    ) -> None:
+        await self._execute(
+            self._collection.update_one,
+            {"payment_intent_id": payment_intent_id},
+            {
+                "$set": {
+                    "status": protobuf.slug_to_enum_value(
+                        enum_descriptor=models_pb2.Voucher.Status.DESCRIPTOR,
+                        name="valid",
+                    ),
+                    "payment_intent_id": "",
+                    "updated_at": datetime.datetime.utcnow(),
+                },
+            },
+            upsert=False,
+        )
+
 
 class NotificationTokensRepository(
     mixins.FindByIdMixin[models_pb2.NotificationToken],
