@@ -2892,7 +2892,31 @@
                 },
                 "required": [
                   "data"
-                ]
+                ],
+                "example": {
+                  "data": {
+                    "type": "trip-offer-price-quotes",
+                    "attributes": {
+                      "sessionToken": "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn"
+                    },
+                    "relationships": {
+                      "offer": {
+                        "data": {
+                          "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                          "type": "offers"
+                        }
+                      },
+                      "options": {
+                        "data": [
+                          {
+                            "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                            "type": "offer-options"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
               }
             }
           }

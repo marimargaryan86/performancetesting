@@ -9,6 +9,10 @@ rules:
   operation-short-summary: off
 overrides:
   - files:
+      - "junction/client_api/openapi.json#/paths/~1offers~1quotes/post/requestBody/content"
+    rules:
+      oas3-valid-schema-example: info
+  - files:
       - "junction/mobile_api/openapi.json#/paths/~1places"
       - "junction/mobile_api/openapi.json#/paths/~1users~1me~1preferences"
       - "junction/mobile_api/openapi.json#/paths/~1users~1groups~1{groupId}~1members"
