@@ -24,8 +24,9 @@ message Quotation {
     STATUS_UTILIZED = 4;
   }
   Status status = 11;
-  string reseller_id = 12;
-  optional string transaction_id = 13;
-  google.protobuf.Timestamp created_at = 14;
-  google.protobuf.Timestamp updated_at = 15;
+  string payer_id = 12;
+  string beneficiary_id = 13;
+  string transaction_id = 14;
+  google.protobuf.Timestamp created_at = 15;
+  google.protobuf.Timestamp updated_at = 16;
 }

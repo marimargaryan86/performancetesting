@@ -41,6 +41,12 @@
       ]
     },
     {
+      "name": "Quotes",
+      "tags": [
+        "quotes"
+      ]
+    },
+    {
       "name": "Rates",
       "tags": [
         "rates"
@@ -73,6 +79,11 @@
       "name": "internal",
       "description": "Endpoints not for public use.",
       "x-displayName": "Internal"
+    },
+    {
+      "name": "quotes",
+      "description": "Currency quotes",
+      "x-displayName": "Quotes"
     },
     {
       "name": "rates",
@@ -463,6 +474,63 @@
         }
       }
     },
+    "/quotes": {
+      "post": {
+        "summary": "Create Quote",
+        "tags": [
+          "quotes"
+        ],
+        "operationId": "post-quotes",
+        "responses": {
+          "200": {
+            "description": "Quoted",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Quote"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "description": "Used to get quote for exchanging currencies",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Quote"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
     "/transactions": {
       "get": {
         "summary": "List Transactions",
@@ -777,6 +845,103 @@
         ],
         "description": "Rate schema."
       },
+      "Quote": {
+        "title": "Quote",
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
+                "format": "uuid",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "example": "quotes",
+                "enum": [
+                  "quotes"
+                ]
+              },
+              "attributes": {
+                "readOnly": true,
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "number",
+                    "example": 1000
+                  }
+                },
+                "required": [
+                  "amount",
+                  "referenceId"
+                ]
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "fromCurrency",
+                  "toCurrency",
+                  "payer",
+                  "beneficiary"
+                ],
+                "properties": {
+                  "fromCurrency": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/CurrencyIdentifier"
+                      }
+                    }
+                  },
+                  "payer": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/CompanyIdentifier"
+                      }
+                    }
+                  },
+                  "beneficiary": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/CompanyIdentifier"
+                      }
+                    }
+                  },
+                  "toCurrency": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/CurrencyIdentifier"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "type",
+              "attributes"
+            ]
+          }
+        ],
+        "description": "Quote schema."
+      },
       "Balance": {
         "title": "Balance",
         "allOf": [
@@ -1007,6 +1172,27 @@
               "balances"
             ],
             "example": "balances"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "CompanyIdentifier": {
+        "title": "Company Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "companies"
+            ],
+            "example": "companies"
           }
         },
         "required": [
