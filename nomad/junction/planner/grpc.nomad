@@ -26,6 +26,10 @@ variable "count" {
   type = number
 }
 
+variable "s3_bucket" {
+  type = string
+}
+
 job "planner-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -114,7 +118,7 @@ job "planner-grpc" {
       }
 
       artifact {
-        source = "s3::https://s3-eu-west-2.amazonaws.com/junction-schedules-export/route_stops.bin"
+        source = "s3::https://s3-eu-west-2.amazonaws.com/${var.s3_bucket}/route_stops.bin"
         options {
           aws_access_key_id     = "AKIA6JO5TGEWEV7G2IHA"
           aws_access_key_secret = "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"
@@ -122,7 +126,7 @@ job "planner-grpc" {
       }
 
       artifact {
-        source = "s3::https://s3-eu-west-2.amazonaws.com/junction-schedules-export/routes.bin"
+        source = "s3::https://s3-eu-west-2.amazonaws.com/${var.s3_bucket}/routes.bin"
         options {
           aws_access_key_id     = "AKIA6JO5TGEWEV7G2IHA"
           aws_access_key_secret = "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"
@@ -130,7 +134,7 @@ job "planner-grpc" {
       }
 
       artifact {
-        source = "s3::https://s3-eu-west-2.amazonaws.com/junction-schedules-export/stops.bin"
+        source = "s3::https://s3-eu-west-2.amazonaws.com/${var.s3_bucket}/stops.bin"
         options {
           aws_access_key_id     = "AKIA6JO5TGEWEV7G2IHA"
           aws_access_key_secret = "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"
@@ -138,7 +142,7 @@ job "planner-grpc" {
       }
 
       artifact {
-        source = "s3::https://s3-eu-west-2.amazonaws.com/junction-schedules-export/transfers.bin"
+        source = "s3::https://s3-eu-west-2.amazonaws.com/${var.s3_bucket}/transfers.bin"
         options {
           aws_access_key_id     = "AKIA6JO5TGEWEV7G2IHA"
           aws_access_key_secret = "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"
@@ -146,7 +150,7 @@ job "planner-grpc" {
       }
 
       artifact {
-        source = "s3::https://s3-eu-west-2.amazonaws.com/junction-schedules-export/schedule_stops.bin"
+        source = "s3::https://s3-eu-west-2.amazonaws.com/${var.s3_bucket}/schedule_stops.bin"
         options {
           aws_access_key_id     = "AKIA6JO5TGEWEV7G2IHA"
           aws_access_key_secret = "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"
@@ -154,7 +158,7 @@ job "planner-grpc" {
       }
 
       artifact {
-        source = "s3::https://s3-eu-west-2.amazonaws.com/junction-schedules-export/schedules.bin"
+        source = "s3::https://s3-eu-west-2.amazonaws.com/${var.s3_bucket}/schedules.bin"
         options {
           aws_access_key_id     = "AKIA6JO5TGEWEV7G2IHA"
           aws_access_key_secret = "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"
