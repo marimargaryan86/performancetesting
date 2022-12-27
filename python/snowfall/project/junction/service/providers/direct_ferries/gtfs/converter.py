@@ -1,9 +1,8 @@
 import datetime
-import functools
 from typing import Generator, Sequence
 
 import pydantic
-import timezonefinder
+from dateutil import tz
 
 from snowfall.stdlib.format.gtfs import enums as gtfs_enums
 from snowfall.stdlib.format.gtfs import models as gtfs_models
@@ -16,22 +15,11 @@ _AGENCY_NAME = "Direct Ferries"
 _AGENCY_URL = "https://www.directferries.com/"
 _URL_HOST = "directferries.com"
 _URL_SCHEME = "https"
-_AGENCY_TIMEZONE = "utc"
+_AGENCY_TIMEZONE = "UTC"
 _FEED_PUBLISHER_NAME = "Direct Ferries"
 _FEED_LANG = "en"
 _EXCEPTION_TYPE = 1
 _TRANSFER_TYPE = 0
-
-
-@functools.lru_cache(maxsize=100)
-def _timedelta_to_time(td: datetime.timedelta) -> str:
-    day_hours, minutes_seconds = str(
-        datetime.timedelta(seconds=td.seconds),
-    ).split(":", maxsplit=1)
-
-    real_hours = int(day_hours) + 24 * td.days
-
-    return ":".join([str(real_hours), minutes_seconds])
 
 
 class StopTimeFields(pydantic.BaseModel):
@@ -50,8 +38,6 @@ class DFDataConverter(object):  # noqa: WPS214
     ):
         self._timetable_responses = timetable_responses
         self._calendar_dates_mapping: dict[int, str] = {}
-
-        self._tz_finder = timezonefinder.TimezoneFinder()
 
     def convert_agency(self) -> Generator[gtfs_models.Agency, None, None]:
         yield gtfs_models.Agency(
@@ -94,27 +80,25 @@ class DFDataConverter(object):  # noqa: WPS214
                         stop_lat=port.latitude,
                         stop_lon=port.longitude,
                         location_type=gtfs_enums.LocationType.platform,
-                        stop_timezone=self._tz_finder.timezone_at(
-                            lat=port.latitude,
-                            lng=port.longitude,
-                        ),
+                        stop_timezone=port.timezone,
                     )
 
     def convert_routes(self) -> Generator[gtfs_models.Route, None, None]:
         route_identifiers = set()
 
         for timetable_response in self._timetable_responses:
-            route_identifier = "{0}-{1}".format(
-                timetable_response.route.port_from.code,
-                timetable_response.route.port_to.code,
-            ).strip()
-            if route_identifier not in route_identifiers:
-                route_identifiers.add(route_identifier)
+            route_id = timetable_response.route.route_id
+
+            if route_id not in route_identifiers:
+                route_identifiers.add(route_id)
                 yield gtfs_models.Route(
-                    route_id=str(timetable_response.route.route_id),
+                    route_id=str(route_id),
                     agency_id=_AGENCY_ID,
                     route_long_name=timetable_response.route.name,
-                    route_short_name=route_identifier,
+                    route_short_name="{0}-{1}".format(
+                        timetable_response.route.port_from.code,
+                        timetable_response.route.port_to.code,
+                    ).strip(),
                     route_type=gtfs_enums.RouteType.ferry,
                 )
 
@@ -135,50 +119,51 @@ class DFDataConverter(object):  # noqa: WPS214
                         trip_id=trip_id,
                     )
 
-    def convert_stop_times(self) -> Generator[gtfs_models.StopTime, None, None]:
+    def convert_stop_times(  # noqa: WPS210
+        self,
+    ) -> Generator[gtfs_models.StopTime, None, None]:
         for timetable_response in self._timetable_responses:
             for operator_tt in timetable_response.timetable_data.operator_timetables:
-                for date in operator_tt.timetables:
+                sorted_timetables = sorted(
+                    operator_tt.timetables,
+                    key=lambda tt: tt.departure_time,
+                )
+
+                for schedule in sorted_timetables:
+                    departure_at_utc = schedule.departure_time.replace(
+                        tzinfo=tz.gettz(timetable_response.route.port_from.timezone),
+                    ).astimezone(datetime.timezone.utc)
+                    arrival_at_utc = schedule.arrival_time.replace(
+                        tzinfo=tz.gettz(timetable_response.route.port_to.timezone),
+                    ).astimezone(datetime.timezone.utc)
+
+                    departure_td = datetime.timedelta(
+                        hours=departure_at_utc.hour,
+                        minutes=departure_at_utc.minute,
+                        seconds=departure_at_utc.second,
+                    )
+                    trip_id = "{0}-{1}-{2}-{3}".format(
+                        operator_tt.operator_id,
+                        timetable_response.route.route_id,
+                        schedule.departure_time.isoformat(),
+                        schedule.arrival_time.isoformat(),
+                    )
+
                     yield gtfs_models.StopTime(
-                        trip_id="{0}-{1}-{2}-{3}".format(
-                            operator_tt.operator_id,
-                            timetable_response.route.route_id,
-                            date.departure_time.isoformat(),
-                            date.arrival_time.isoformat(),
-                        ),
-                        departure_time=datetime.timedelta(
-                            hours=date.departure_time.hour,
-                            minutes=date.departure_time.minute,
-                            seconds=date.departure_time.second,
-                        ),
-                        arrival_time=datetime.timedelta(
-                            hours=date.departure_time.hour,
-                            minutes=date.departure_time.minute,
-                            seconds=date.departure_time.second,
-                        ),
+                        trip_id=trip_id,
+                        departure_time=departure_td,
+                        arrival_time=departure_td,
                         stop_id=timetable_response.route.port_from.code,
                         stop_sequence=1,
                         pickup_type=gtfs_enums.PickupType.regularly_scheduled_pickup,
                         drop_off_type=gtfs_enums.DropOffType.no_drop_off_available,
                     )
 
+                    arrival_td = departure_td + (arrival_at_utc - departure_at_utc)
                     yield gtfs_models.StopTime(
-                        trip_id="{0}-{1}-{2}-{3}".format(
-                            operator_tt.operator_id,
-                            timetable_response.route.route_id,
-                            date.departure_time.isoformat(),
-                            date.arrival_time.isoformat(),
-                        ),
-                        departure_time=datetime.timedelta(
-                            hours=date.arrival_time.hour,
-                            minutes=date.arrival_time.minute,
-                            seconds=date.arrival_time.second,
-                        ),
-                        arrival_time=datetime.timedelta(
-                            hours=date.arrival_time.hour,
-                            minutes=date.arrival_time.minute,
-                            seconds=date.arrival_time.second,
-                        ),
+                        trip_id=trip_id,
+                        departure_time=arrival_td,
+                        arrival_time=arrival_td,
                         stop_id=timetable_response.route.port_to.code,
                         stop_sequence=2,
                         pickup_type=gtfs_enums.PickupType.regularly_scheduled_pickup,

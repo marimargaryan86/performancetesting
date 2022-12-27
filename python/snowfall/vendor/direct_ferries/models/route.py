@@ -1,9 +1,13 @@
+import functools
 from typing import Optional, Sequence
 
 import pydantic
+import timezonefinder
 
 from snowfall.vendor.direct_ferries import enums
 from snowfall.vendor.direct_ferries.models import base, operator
+
+_tz_finder = timezonefinder.TimezoneFinder()
 
 
 class Pet(base.CamelCaseBaseModel):
@@ -35,6 +39,10 @@ class Port(base.CamelCaseBaseModel):
     address: Optional[str]
     latitude: float
     longitude: float
+
+    @functools.cached_property
+    def timezone(self) -> str:
+        return _tz_finder.timezone_at(lng=self.longitude, lat=self.latitude) or ""
 
 
 class Route(base.CamelCaseBaseModel):
