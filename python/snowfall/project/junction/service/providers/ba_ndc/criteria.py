@@ -26,7 +26,6 @@ class CriteriaGenerator(object):
         self,
         h3_mapping: h3.H3MappingRepository[airports.Airport],
     ):
-        self._mapping = h3_mapping
         self._grouper = segment_grouper.SegmentGrouper(h3_mapping)
 
     def from_search_task(

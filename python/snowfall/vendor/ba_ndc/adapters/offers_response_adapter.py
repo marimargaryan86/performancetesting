@@ -3,15 +3,17 @@ from typing import Mapping
 
 from snowfall.vendor.ba_ndc.models import (
     response_common_offer_schemas,
+    response_common_order_schemas,
     response_common_passenger_schemas,
     response_offer_search_schemas,
 )
 
 
-class OffersResponseAdapter(object):
+class OffersResponseAdapter(object):  # noqa: WPS214
     offers_response: response_offer_search_schemas.OfferSearchResponse
     segments: Mapping[str, response_common_offer_schemas.Segment]
     price_classes: Mapping[str, response_common_offer_schemas.PriceClass]
+    penalties: Mapping[str, response_common_order_schemas.Penalty]
 
     def __init__(
         self,
@@ -19,10 +21,14 @@ class OffersResponseAdapter(object):
     ) -> None:
         self.offers_response = offers_response
         self.segments = {
-            segment.identifier: segment for segment in offers_response.segments
+            segment.identifier: segment for segment in offers_response.segments or []
         }
         self.price_classes = {
-            price_c.identifier: price_c for price_c in offers_response.price_classes
+            price_c.identifier: price_c
+            for price_c in offers_response.price_classes or []
+        }
+        self.penalties = {
+            penalty.identifier: penalty for penalty in offers_response.penalties or []
         }
 
     def get_offers(self) -> list[response_offer_search_schemas.Offer]:
@@ -45,6 +51,12 @@ class OffersResponseAdapter(object):
         price_class_id: str,
     ) -> response_common_offer_schemas.PriceClass | None:
         return self.price_classes.get(price_class_id)
+
+    def get_penalty_by_id(
+        self,
+        penalty_id: str,
+    ) -> response_common_order_schemas.Penalty | None:
+        return self.penalties.get(penalty_id)
 
     def get_brand_name(
         self,

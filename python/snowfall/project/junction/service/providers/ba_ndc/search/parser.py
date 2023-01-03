@@ -14,6 +14,7 @@ from snowfall.vendor.ba_ndc.adapters.offers_response_adapter import (
 )
 from snowfall.vendor.ba_ndc.models import (
     response_common_offer_schemas,
+    response_common_order_schemas,
     response_offer_search_schemas,
 )
 
@@ -89,6 +90,40 @@ def _segment_to_proto(
     return None
 
 
+def get_penalties(
+    trips: Sequence[response_common_offer_schemas.Trip],
+    offers_adapter: OffersResponseAdapter,
+) -> List[cache.OfferPenalty]:
+    penalties = []
+    penalty_ids = [
+        penalty_id for trip in trips for penalty_id in trip.penalty_ids or []
+    ]
+
+    for penalty_id in penalty_ids:
+        penalty = offers_adapter.get_penalty_by_id(penalty_id)
+
+        if penalty:
+            penalties.append(to_offer_penalty(penalty))
+
+    return penalties
+
+
+def to_offer_penalty(
+    penalty: response_common_order_schemas.Penalty,
+) -> cache.OfferPenalty:
+    return cache.OfferPenalty(
+        penalty_type=penalty.penalty_type.value,
+        price=cache.Price(
+            amount=penalty.price.total_amount if penalty.price else "",
+            currency=penalty.price.currency if penalty.price else "",
+        ),
+    )
+
+
+def _get_doc_required(offer_segments: Sequence[offer_models_pb2.OfferSegment]) -> bool:
+    return True  # TODO return this properly
+
+
 class OfferParser(object):
     def __init__(
         self,
@@ -152,8 +187,10 @@ class OfferParser(object):
                     id=await self._offer_cache.store(
                         cache.OfferDetails(
                             offer_id=str(offer.identifier),
-                            total_amount=offer.price.total_amount,
-                            currency=offer.price.currency,
+                            price=cache.Price(
+                                amount=offer.price.total_amount,
+                                currency=offer.price.currency,
+                            ),
                             passengers=[
                                 cache.OfferDetailsPassenger(
                                     identifier=passenger_info.identifier,
@@ -161,6 +198,9 @@ class OfferParser(object):
                                 )
                                 for passenger_info in offers_adapter.get_passengers()
                             ],
+                            expires_at=offers_adapter.get_expires_at(),
+                            penalties=get_penalties(offer.trips, offers_adapter),
+                            doc_required=_get_doc_required(offer_segments),
                         ),
                         expires_at=offers_adapter.get_expires_at(),
                     ),

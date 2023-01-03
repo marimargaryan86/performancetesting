@@ -1,9 +1,20 @@
+import datetime
 from typing import List, Type
 
 from snowfall.stdlib.persistence.redis.repository import (
     PydanticRepository as RedisRepository,
 )
 from snowfall.stdlib.persistence.redis.repository import RedisRecord
+
+
+class Price(RedisRecord):
+    amount: str
+    currency: str
+
+
+class OfferPenalty(RedisRecord):
+    penalty_type: str
+    price: Price
 
 
 class OfferDetailsPassenger(RedisRecord):
@@ -14,9 +25,10 @@ class OfferDetailsPassenger(RedisRecord):
 class OfferDetails(RedisRecord):
     offer_id: str
     passengers: List[OfferDetailsPassenger]
-    total_amount: str
-    currency: str
+    price: Price
     doc_required: bool = False
+    expires_at: datetime.datetime
+    penalties: List[OfferPenalty]
 
 
 class OfferCache(RedisRepository[OfferDetails]):
