@@ -9,7 +9,10 @@ from snowfall.project.junction.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
 from snowfall.project.junction.service.providers.distribusion import cache
-from snowfall.project.junction.service.providers.distribusion.search import validator
+from snowfall.project.junction.service.providers.distribusion.search import (
+    amenities,
+    validator,
+)
 from snowfall.project.junction.service.providers.distribusion.v1alpha import amqp_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
@@ -51,9 +54,23 @@ class MarketingCarrierAdapter(object):
     def get_fare_class(self, fare_class_code: str) -> Optional[connections.FareClass]:
         return self._get_fare_classes().get(fare_class_code)
 
+    def get_fare_feature_codes(
+        self,
+        fare: connections.FaresRelFareClassPrice | None,
+    ) -> set[str] | None:
+        if fare and fare.fare_class and fare.fare_class.code:
+            fare_class = self.get_fare_class(fare.fare_class.code)
+
+            if fare_class and fare_class.fare_features:
+                return {
+                    feature.code for feature in fare_class.fare_features if feature.code
+                }
+
+        return None
+
     def get_fare_class_name(
         self,
-        fare: Optional[connections.FaresRelFareClassPrice],
+        fare: connections.FaresRelFareClassPrice | None,
     ) -> str:
         if fare and fare.fare_class and fare.fare_class.code:
             fare_class = self.get_fare_class(fare.fare_class.code)
@@ -183,6 +200,7 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
                 offer_models_pb2.OfferSegmentDetails(
                     id=string.uuid(),
                     offer_segment_id=segment.id,
+                    amenities=self._parse_amenities(carrier, fare),
                 )
                 for segment in segments
             ]
@@ -312,3 +330,15 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
             ),
             time_zone=station.time_zone or search_point.time_zone,
         )
+
+    def _parse_amenities(
+        self,
+        carrier: MarketingCarrierAdapter,
+        fare: connections.FaresRelFareClassPrice,
+    ) -> offer_models_pb2.SegmentAmenities | None:
+        fare_feature_codes = carrier.get_fare_feature_codes(fare)
+
+        if fare_feature_codes:
+            return amenities.parse_amenities(fare_feature_codes)
+
+        return None
