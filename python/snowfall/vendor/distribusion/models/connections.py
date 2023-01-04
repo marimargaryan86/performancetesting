@@ -59,11 +59,11 @@ class FareClass(DistribusionBaseModel):
 
 class PassengerType(DistribusionBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
-    code: str | None
-    description: str | None
-    max_age: int | None
-    min_age: int | None
-    name: str | None
+    code: str
+    description: str
+    max_age: int
+    min_age: int
+    name: str
 
 
 class MarketingCarrier(DistribusionBaseModel):

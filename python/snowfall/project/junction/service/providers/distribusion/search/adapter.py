@@ -46,7 +46,8 @@ class MarketingCarrierAdapter(object):
         marketing_carrier: connections.MarketingCarrier,
     ) -> None:
         self._marketing_carrier = marketing_carrier
-        self._fare_classes: Optional[dict[str, connections.FareClass]] = None
+        self._fare_classes: dict[str, connections.FareClass] | None = None
+        self._passenger_types: list[cache.PassengerType] | None = None
 
     def get_code(self) -> str:
         return self._marketing_carrier.code or ""
@@ -79,6 +80,25 @@ class MarketingCarrierAdapter(object):
                 return fare_class.name
 
         return _DEFAULT_FARE_CLASS_NAME
+
+    def passenger_types(self) -> list[cache.PassengerType]:
+        if self._passenger_types is not None:
+            return self._passenger_types
+
+        self._passenger_types = []
+
+        for pax_type in self._marketing_carrier.passenger_types or []:
+            if pax_type.code and pax_type.min_age and pax_type.max_age:
+                self._passenger_types.append(
+                    cache.PassengerType(
+                        type_name=pax_type.name,
+                        type_code=pax_type.code,
+                        min_age=pax_type.min_age,
+                        max_age=pax_type.max_age,
+                    ),
+                )
+
+        return self._passenger_types
 
     def _get_fare_classes(self) -> dict[str, connections.FareClass]:
         if self._fare_classes is None:
@@ -191,6 +211,7 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
     ) -> offer_models_pb2.OfferGroup:
         offers = list[offer_models_pb2.Offer]()
         segments = self._parse_segments(connection, search_segments, carrier)
+        passenger_types = carrier.passenger_types()
 
         for fare in connection.fares or []:
             if not fare.price:
@@ -215,6 +236,7 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
                             fare_class=fare.fare_class.code
                             if fare.fare_class and fare.fare_class.code
                             else "",
+                            passenger_types=passenger_types,
                         ),
                         expires_at=expires_at,
                     ),

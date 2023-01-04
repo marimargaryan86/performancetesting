@@ -1,0 +1,512 @@
+{
+  "meta": {
+    "locale": "en",
+    "currency": "EUR"
+  },
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "included": [
+    {
+      "type": "segments",
+      "relationships": {
+        "vehicle": {
+          "data": {
+            "type": "vehicles",
+            "id": "BUS-VICA-DEBERCBS-FRPARPGB-2023-01-14T05:17-2023-01-14T21:36-0"
+          }
+        },
+        "operating_carrier": {
+          "data": {
+            "type": "operating_carriers",
+            "id": "VICA"
+          }
+        },
+        "marketing_carrier": {
+          "data": {
+            "type": "marketing_carriers",
+            "id": "VICA"
+          }
+        },
+        "departure_station": {
+          "data": {
+            "type": "stations",
+            "id": "DEBERCBS"
+          }
+        },
+        "arrival_station": {
+          "data": {
+            "type": "stations",
+            "id": "FRPARPGB"
+          }
+        }
+      },
+      "id": "VICA-DEBERCBS-FRPARPGB-2023-01-14T05:17-2023-01-14T21:36-0",
+      "attributes": {
+        "index": 0,
+        "departure_time": "2023-01-14T05:17",
+        "arrival_time": "2023-01-14T21:36"
+      }
+    },
+    {
+      "type": "marketing_carriers",
+      "relationships": {
+        "passenger_types": {
+          "data": [
+            {
+              "type": "passenger_types",
+              "id": "PNOS"
+            }
+          ]
+        },
+        "fare_classes": {
+          "data": [
+            {
+              "type": "fare_classes",
+              "id": "VICA-FARE-1"
+            },
+            {
+              "type": "fare_classes",
+              "id": "VICA-FARE-2"
+            }
+          ]
+        },
+        "extra_types": {
+          "data": []
+        }
+      },
+      "id": "VICA",
+      "attributes": {
+        "trade_name": "Virtual Carrier European intercity bus",
+        "legal_name": "Virtual Carrier European Intercity Bus",
+        "code": "VICA",
+        "booking_fee": 0
+      }
+    },
+    {
+      "type": "operating_carriers",
+      "id": "VICA",
+      "attributes": {
+        "trade_name": "Virtual Carrier European intercity bus",
+        "legal_name": "Virtual Carrier European Intercity Bus",
+        "code": "VICA"
+      }
+    },
+    {
+      "type": "passenger_types",
+      "id": "PNOS",
+      "attributes": {
+        "name": "Adult",
+        "min_age": 0,
+        "max_age": 99,
+        "description": "",
+        "code": "PNOS"
+      }
+    },
+    {
+      "type": "stations",
+      "relationships": {
+        "city": {
+          "data": {
+            "type": "cities",
+            "id": "DEBER"
+          }
+        },
+        "area": {
+          "data": null
+        }
+      },
+      "id": "DEBERCBS",
+      "attributes": {
+        "zip_code": "14057",
+        "time_zone": "Europe/Berlin",
+        "street_and_number": "Masurenallee 4-6",
+        "name": "Berlin Central Bus Station",
+        "longitude": 13.279692,
+        "latitude": 52.507589,
+        "description": "The Berlin Central Bus Station is located close to the S-Bahn Station \"Berlin Messe Nord\" (lines S41, S42 and S46). In case of waiting times, a waiting area with 130 seats and a snack bar can help passengers stay relaxed and comfortable.",
+        "code": "DEBERCBS"
+      }
+    },
+    {
+      "type": "cities",
+      "id": "DEBER",
+      "attributes": {
+        "name": "Berlin",
+        "code": "DEBER"
+      }
+    },
+    {
+      "type": "stations",
+      "relationships": {
+        "city": {
+          "data": {
+            "type": "cities",
+            "id": "FRPAR"
+          }
+        },
+        "area": {
+          "data": null
+        }
+      },
+      "id": "FRPARPGB",
+      "attributes": {
+        "zip_code": "75012",
+        "time_zone": "Europe/Paris",
+        "street_and_number": "210 Quai de Bercy",
+        "name": "Paris Gare de Bercy Seine",
+        "longitude": 2.38016074684572,
+        "latitude": 48.8356868853674,
+        "description": "The Bercy-Seine bus station is located inside the Bercy park. You can access it from the #69 rue de Bercy and then walk straight ahead. The entry is located just behind the training gym area. ",
+        "code": "FRPARPGB"
+      }
+    },
+    {
+      "type": "cities",
+      "id": "FRPAR",
+      "attributes": {
+        "name": "Paris",
+        "code": "FRPAR"
+      }
+    },
+    {
+      "type": "vehicles",
+      "relationships": {
+        "vehicle_type": {
+          "data": {
+            "type": "vehicle_types",
+            "id": "BUS"
+          }
+        }
+      },
+      "id": "BUS-VICA-DEBERCBS-FRPARPGB-2023-01-14T05:17-2023-01-14T21:36-0"
+    },
+    {
+      "type": "vehicle_types",
+      "id": "BUS",
+      "attributes": {
+        "code": "BUS"
+      }
+    },
+    {
+      "type": "fare_classes",
+      "relationships": {
+        "fare_features": {
+          "data": [
+            {
+              "type": "fare_features",
+              "id": "VICA-WIFI"
+            },
+            {
+              "type": "fare_features",
+              "id": "VICA-PREF"
+            }
+          ]
+        }
+      },
+      "id": "VICA-FARE-1",
+      "attributes": {
+        "name": "Economy",
+        "journey_type": "single",
+        "iata_category": null,
+        "code": "FARE-1"
+      }
+    },
+    {
+      "type": "fare_features",
+      "id": "VICA-WIFI",
+      "attributes": {
+        "name": "Wifi",
+        "description": "Free wifi is available on board.",
+        "code": "WIFI"
+      }
+    },
+    {
+      "type": "fare_features",
+      "id": "VICA-PREF",
+      "attributes": {
+        "name": "Partially refundable",
+        "description": "The ticket can be cancelled and partially refunded. There is a cancellation fee of EUR2.80.",
+        "code": "PREF"
+      }
+    },
+    {
+      "type": "fare_classes",
+      "relationships": {
+        "fare_features": {
+          "data": [
+            {
+              "type": "fare_features",
+              "id": "VICA-WIFI"
+            },
+            {
+              "type": "fare_features",
+              "id": "VICA-REFU"
+            }
+          ]
+        }
+      },
+      "id": "VICA-FARE-2",
+      "attributes": {
+        "name": "Business",
+        "journey_type": "single",
+        "iata_category": null,
+        "code": "FARE-2"
+      }
+    },
+    {
+      "type": "fare_features",
+      "id": "VICA-REFU",
+      "attributes": {
+        "name": "Fully refundable",
+        "description": "The ticket can be cancelled and refunded.",
+        "code": "REFU"
+      }
+    },
+    {
+      "type": "fares",
+      "relationships": {
+        "fare_class": {
+          "data": {
+            "type": "fare_classes",
+            "id": "VICA-FARE-1"
+          }
+        }
+      },
+      "id": "VICA-DEBERCBS-FRPARPGB-2023-01-14T05:17-2023-01-14T21:36-FARE-1",
+      "attributes": {
+        "price": 2800
+      }
+    },
+    {
+      "type": "fares",
+      "relationships": {
+        "fare_class": {
+          "data": {
+            "type": "fare_classes",
+            "id": "VICA-FARE-2"
+          }
+        }
+      },
+      "id": "VICA-DEBERCBS-FRPARPGB-2023-01-14T05:17-2023-01-14T21:36-FARE-2",
+      "attributes": {
+        "price": 3700
+      }
+    },
+    {
+      "type": "segments",
+      "relationships": {
+        "vehicle": {
+          "data": {
+            "type": "vehicles",
+            "id": "BUS-VICA-DEBERCBS-FRPARPGB-2023-01-14T13:20-2023-01-14T15:40-0"
+          }
+        },
+        "operating_carrier": {
+          "data": {
+            "type": "operating_carriers",
+            "id": "VICA"
+          }
+        },
+        "marketing_carrier": {
+          "data": {
+            "type": "marketing_carriers",
+            "id": "VICA"
+          }
+        },
+        "departure_station": {
+          "data": {
+            "type": "stations",
+            "id": "DEBERCBS"
+          }
+        },
+        "arrival_station": {
+          "data": {
+            "type": "stations",
+            "id": "FRPARPGB"
+          }
+        }
+      },
+      "id": "VICA-DEBERCBS-FRPARPGB-2023-01-14T13:20-2023-01-14T15:40-0",
+      "attributes": {
+        "index": 0,
+        "departure_time": "2023-01-14T13:20",
+        "arrival_time": "2023-01-14T15:40"
+      }
+    },
+    {
+      "type": "vehicles",
+      "relationships": {
+        "vehicle_type": {
+          "data": {
+            "type": "vehicle_types",
+            "id": "BUS"
+          }
+        }
+      },
+      "id": "BUS-VICA-DEBERCBS-FRPARPGB-2023-01-14T13:20-2023-01-14T15:40-0"
+    },
+    {
+      "type": "fares",
+      "relationships": {
+        "fare_class": {
+          "data": {
+            "type": "fare_classes",
+            "id": "VICA-FARE-1"
+          }
+        }
+      },
+      "id": "VICA-DEBERCBS-FRPARPGB-2023-01-14T13:20-2023-01-14T15:40-FARE-1",
+      "attributes": {
+        "price": 3200
+      }
+    },
+    {
+      "type": "fares",
+      "relationships": {
+        "fare_class": {
+          "data": {
+            "type": "fare_classes",
+            "id": "VICA-FARE-2"
+          }
+        }
+      },
+      "id": "VICA-DEBERCBS-FRPARPGB-2023-01-14T13:20-2023-01-14T15:40-FARE-2",
+      "attributes": {
+        "price": 3700
+      }
+    }
+  ],
+  "data": [
+    {
+      "type": "connections",
+      "relationships": {
+        "segments": {
+          "data": [
+            {
+              "type": "segments",
+              "id": "VICA-DEBERCBS-FRPARPGB-2023-01-14T05:17-2023-01-14T21:36-0"
+            }
+          ]
+        },
+        "marketing_carrier": {
+          "data": {
+            "type": "marketing_carriers",
+            "id": "VICA"
+          }
+        },
+        "fares": {
+          "data": [
+            {
+              "type": "fares",
+              "price": 2800,
+              "id": "VICA-DEBERCBS-FRPARPGB-2023-01-14T05:17-2023-01-14T21:36-FARE-1",
+              "fare_class": {
+                "type": "fare_classes",
+                "id": "VICA-FARE-1",
+                "code": "FARE-1"
+              }
+            },
+            {
+              "type": "fares",
+              "price": 3700,
+              "id": "VICA-DEBERCBS-FRPARPGB-2023-01-14T05:17-2023-01-14T21:36-FARE-2",
+              "fare_class": {
+                "type": "fare_classes",
+                "id": "VICA-FARE-2",
+                "code": "FARE-2"
+              }
+            }
+          ]
+        },
+        "departure_station": {
+          "data": {
+            "type": "stations",
+            "id": "DEBERCBS"
+          }
+        },
+        "arrival_station": {
+          "data": {
+            "type": "stations",
+            "id": "FRPARPGB"
+          }
+        }
+      },
+      "id": "VICA-DEBERCBS-FRPARPGB-2023-01-14T05:17-2023-01-14T21:36",
+      "attributes": {
+        "electronic_ticket_available": false,
+        "duration": 58740,
+        "departure_time": "2023-01-14T05:17",
+        "cheapest_total_adult_price": 2800,
+        "cheapest_fare_class_code": "FARE-1",
+        "booked_out": false,
+        "arrival_time": "2023-01-14T21:36"
+      }
+    },
+    {
+      "type": "connections",
+      "relationships": {
+        "segments": {
+          "data": [
+            {
+              "type": "segments",
+              "id": "VICA-DEBERCBS-FRPARPGB-2023-01-14T13:20-2023-01-14T15:40-0"
+            }
+          ]
+        },
+        "marketing_carrier": {
+          "data": {
+            "type": "marketing_carriers",
+            "id": "VICA"
+          }
+        },
+        "fares": {
+          "data": [
+            {
+              "type": "fares",
+              "price": 3200,
+              "id": "VICA-DEBERCBS-FRPARPGB-2023-01-14T13:20-2023-01-14T15:40-FARE-1",
+              "fare_class": {
+                "type": "fare_classes",
+                "id": "VICA-FARE-1",
+                "code": "FARE-1"
+              }
+            },
+            {
+              "type": "fares",
+              "price": 3700,
+              "id": "VICA-DEBERCBS-FRPARPGB-2023-01-14T13:20-2023-01-14T15:40-FARE-2",
+              "fare_class": {
+                "type": "fare_classes",
+                "id": "VICA-FARE-2",
+                "code": "FARE-2"
+              }
+            }
+          ]
+        },
+        "departure_station": {
+          "data": {
+            "type": "stations",
+            "id": "DEBERCBS"
+          }
+        },
+        "arrival_station": {
+          "data": {
+            "type": "stations",
+            "id": "FRPARPGB"
+          }
+        }
+      },
+      "id": "VICA-DEBERCBS-FRPARPGB-2023-01-14T13:20-2023-01-14T15:40",
+      "attributes": {
+        "electronic_ticket_available": false,
+        "duration": 8400,
+        "departure_time": "2023-01-14T13:20",
+        "cheapest_total_adult_price": 3200,
+        "cheapest_fare_class_code": "FARE-1",
+        "booked_out": false,
+        "arrival_time": "2023-01-14T15:40"
+      }
+    }
+  ]
+}

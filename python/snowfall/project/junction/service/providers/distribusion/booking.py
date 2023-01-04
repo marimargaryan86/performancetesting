@@ -3,7 +3,9 @@ import datetime
 import zoneinfo
 
 import structlog
+from dateutil.relativedelta import relativedelta
 
+from snowfall.project.junction.service.offers.v1alpha.models_pb2 import OfferSegmentLeg
 from snowfall.project.junction.service.orders.v1alpha import amqp_pb2, models_pb2
 from snowfall.project.junction.service.providers.distribusion import (
     cache,
@@ -150,7 +152,11 @@ class BookingHandler(object):
                     criterias.Passenger(
                         first_name=passenger.first_name,
                         last_name=passenger.last_name,
-                        passenger_type="PNOS",  # TODO get this properly
+                        passenger_type=self._get_passenger_type(
+                            first_segment,
+                            details,
+                            passenger,
+                        ),
                     )
                     for passenger in task.passengers
                 ],
@@ -184,3 +190,19 @@ class BookingHandler(object):
         raise errors.ServiceError(
             "Unable to get order {0} details in time".format(model.identifier),
         )
+
+    def _get_passenger_type(
+        self,
+        first_segment: OfferSegmentLeg,
+        details: cache.OfferDetails,
+        passenger: models_pb2.Passenger,
+    ) -> str:
+        departure_time = protobuf.protobuf_to_datetime(first_segment.departure_at)
+        birth_date = protobuf.protobuf_to_date(passenger.date_of_birth)
+        age = relativedelta(departure_time, birth_date)
+
+        for pax_type in details.passenger_types:
+            if pax_type.min_age <= age.years <= pax_type.max_age:
+                return pax_type.type_code
+
+        return "PNOS"
