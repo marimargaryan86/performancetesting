@@ -14,12 +14,20 @@ class PassengerType(RedisRecord):
     max_age: int
 
 
+class FareRule(RedisRecord):
+    name: str
+    description: str
+
+
 class OfferDetails(RedisRecord):
     expires_at: datetime.datetime
     currency: str
     price: int
     fare_class: str
     passenger_types: list[PassengerType]
+    fully_refundable: bool | None
+    non_refundable: bool | None
+    fare_rules: list[FareRule] | None
 
 
 class OffersCache(RedisRepository[OfferDetails]):

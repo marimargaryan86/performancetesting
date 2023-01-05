@@ -1,6 +1,7 @@
 import contextlib
 import random
 import uuid
+from typing import List
 
 import structlog
 from redis import asyncio as aioredis
@@ -83,7 +84,42 @@ class PriceQuoteConsumer(object):
                         amount=offer_details.price,
                         currency=money.Currency(offer_details.currency),
                     ).protobuf(),
+                    rules=[
+                        offers_pb2.FareRule(
+                            title=fare_rule.name,
+                            body=fare_rule.description,
+                        )
+                        for fare_rule in offer_details.fare_rules or []
+                    ],
+                    penalties=self._create_penalties(offer_details),
                 ),
             ),
             routing_key="offers.result.price",
         )
+
+    def _create_penalties(
+        self,
+        offer_details: cache.OfferDetails,
+    ) -> List[offers_pb2.Penalty]:
+        res = None
+
+        if offer_details.fully_refundable or offer_details.non_refundable:
+            res = []
+            if offer_details.fully_refundable:
+                res.append(
+                    offers_pb2.Penalty(
+                        penalty_type=offers_pb2.Penalty.Type.TYPE_REFUND,
+                        refundable=True,
+                        applicability=offers_pb2.Penalty.Applicability.APPLICABILITY_BEFORE,
+                    ),
+                )
+            if offer_details.non_refundable:
+                res.append(
+                    offers_pb2.Penalty(
+                        penalty_type=offers_pb2.Penalty.Type.TYPE_REFUND,
+                        refundable=False,
+                        applicability=offers_pb2.Penalty.Applicability.APPLICABILITY_BEFORE,
+                    ),
+                )
+
+        return res

@@ -198,8 +198,9 @@ class BookingHandler(object):
         passenger: models_pb2.Passenger,
     ) -> str:
         departure_time = protobuf.protobuf_to_datetime(first_segment.departure_at)
+        departure_date = departure_time.replace(tzinfo=None).date()
         birth_date = protobuf.protobuf_to_date(passenger.date_of_birth)
-        age = relativedelta(departure_time, birth_date)
+        age = relativedelta(departure_date, birth_date)
 
         for pax_type in details.passenger_types:
             if pax_type.min_age <= age.years <= pax_type.max_age:

@@ -1,6 +1,6 @@
 import datetime
 import zoneinfo
-from typing import AsyncIterator, Optional, Sequence
+from typing import AsyncIterator, Collection, List, Optional, Sequence
 
 import more_itertools
 import structlog
@@ -24,6 +24,19 @@ from snowfall.vendor.distribusion.models.criterias import FindConnectionsCriteri
 _DEFAULT_FARE_CLASS_NAME = "Economy"
 _DEFAULT_LOCALE = "en"
 _DEFAULT_CURRENCY = "EUR"
+_FARE_RULE_CODES = (
+    "BLUG",  # Bulky luggage
+    "AAFR",  # Accessible area for bicycles
+    "REFU",  # Fully refundable
+    "PALL",  # Pet allowance
+    "NREF",  # Non-refundable
+    "NAME",  # Non-amendable
+    "AMEN",  # Amendable
+    "PREF",  # Partially refundable
+    "STVA",  # Ticket Validity OW
+    "RTVA",  # Ticket Validity RT
+    "CBYE",  # Child below 15 years travels for free
+)
 
 
 def offer_group_cache_key(task: amqp_pb2.SearchCriteriaTask) -> str:
@@ -40,7 +53,7 @@ def offer_group_cache_key(task: amqp_pb2.SearchCriteriaTask) -> str:
     )
 
 
-class MarketingCarrierAdapter(object):
+class MarketingCarrierAdapter(object):  # noqa: WPS214
     def __init__(
         self,
         marketing_carrier: connections.MarketingCarrier,
@@ -59,13 +72,10 @@ class MarketingCarrierAdapter(object):
         self,
         fare: connections.FaresRelFareClassPrice | None,
     ) -> set[str] | None:
-        if fare and fare.fare_class and fare.fare_class.code:
-            fare_class = self.get_fare_class(fare.fare_class.code)
+        fare_features = self._get_fare_features(fare)
 
-            if fare_class and fare_class.fare_features:
-                return {
-                    feature.code for feature in fare_class.fare_features if feature.code
-                }
+        if fare_features:
+            return {feature.code for feature in fare_features if feature.code}
 
         return None
 
@@ -99,6 +109,42 @@ class MarketingCarrierAdapter(object):
                 )
 
         return self._passenger_types
+
+    def has_any_fare_feature(
+        self,
+        fare: connections.FaresRelFareClassPrice | None,
+        codes: Collection[str],
+    ) -> bool:
+        fare_codes = self.get_fare_feature_codes(fare)
+        return fare_codes is not None and bool(fare_codes.intersection(codes))
+
+    def get_fare_rules(
+        self,
+        fare: connections.FaresRelFareClassPrice | None,
+    ) -> List[cache.FareRule] | None:
+        fare_features = self._get_fare_features(fare)
+
+        if fare_features:
+            return [
+                cache.FareRule(name=feature.name, description=feature.description)
+                for feature in fare_features
+                if feature.code
+                and feature.code in _FARE_RULE_CODES
+                and feature.name
+                and feature.description
+            ]
+
+        return None
+
+    def _get_fare_features(
+        self,
+        fare: connections.FaresRelFareClassPrice | None,
+    ) -> Sequence[connections.FareFeature] | None:
+        if fare and fare.fare_class and fare.fare_class.code:
+            fare_class = self.get_fare_class(fare.fare_class.code)
+            return fare_class.fare_features if fare_class else None
+
+        return None
 
     def _get_fare_classes(self) -> dict[str, connections.FareClass]:
         if self._fare_classes is None:
@@ -237,6 +283,12 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
                             if fare.fare_class and fare.fare_class.code
                             else "",
                             passenger_types=passenger_types,
+                            fully_refundable=carrier.has_any_fare_feature(
+                                fare,
+                                ["REFU", "PREF"],
+                            ),
+                            non_refundable=carrier.has_any_fare_feature(fare, ["NREF"]),
+                            fare_rules=carrier.get_fare_rules(fare),
                         ),
                         expires_at=expires_at,
                     ),
