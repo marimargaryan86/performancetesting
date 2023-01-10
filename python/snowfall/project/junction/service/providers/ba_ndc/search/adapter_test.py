@@ -22,7 +22,7 @@ async def test_adapter(
     assert json is not None
 
     httpx_mock.add_response(
-        url="{api_base_url}/v2/offers".format(
+        url="{api_base_url}/offers".format(
             api_base_url=API_BASE_URL,
         ),
         method="POST",

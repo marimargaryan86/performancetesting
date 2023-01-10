@@ -37,7 +37,7 @@ class BaNdcClient(object):  # noqa: WPS214
         api_key: str,
         http_client: httpx.AsyncClient,
     ) -> None:
-        self._api_base_url = httpx.URL(api_base_url).copy_with(path="/v2")
+        self._api_base_url = httpx.URL(api_base_url)
         self._api_key = api_key
         self._http_client = http_client
         self._http_client.base_url = self._api_base_url
