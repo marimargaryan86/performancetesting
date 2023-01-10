@@ -16,11 +16,14 @@ brew install pyenv
 ```shell
 export PATH="$(pyenv root)/shims:$PATH"
 ```
-3. Install [Docker][docker].
+3. Install [Docker Desktop][docker-desktop].
 ```shell
-brew install docker
+brew install --cask docker
 ```
 4. If you are on a Mac with an arm64 processor, make sure you have Rosetta installed.
+```shell
+softwareupdate --install-rosetta
+```
 
 ### Set up the Junction environment
 
@@ -212,18 +215,24 @@ In case if you will have some problems with `bash` version
 7. Click `EnvFile` submenu, check `Enable EnvFile` and `Add` a new .env file path to the service's .env.dist file (or .env if you've made local changes), e.g. `{repository path}/python/snowfall/service/echo/.env.dist`.
 
 # M1 troubleshooting
-- install xcode
-- install openssl
+- install xcode tools
+```shell
+xcode-select --install
 ```
+- install openssl
+```shell
 brew install openssl@3
 ```
 and follow instructions for setting appropriate environment variables (in the output of the `brew install` command).
 - install llvm (for python rapidjson package)
-```
+```shell
 brew install llvm
 ```
 and follow instructions for setting appropriate environment variables (in the output of the `brew install` command).
 - install rust (for python cryptography package)
+```shell
+brew install rust
+```
 
 # FAQ
 ## When running a service Settings are not being loaded properly, e.g. `amqp_dsn field required (type=value_error.missing)`.
@@ -232,7 +241,7 @@ Make sure to set the environment variables in `.env.dist` in every service folde
 If you're using `fish shell` you must add `-x` option to the `set` command, otherwise the variables are only set locally.
 
 [pants]: https://pantsbuild.github.io/
-[docker]: https://www.docker.com/
+[docker-desktop]: https://docs.docker.com/desktop/install/mac-install/
 [pyenv]: https://github.com/pyenv/pyenv
 [junction-repo]: https://git.snowfall.se/junction/junction
 [google-styleguide]: https://google.github.io/styleguide/pyguide.html#22-imports
