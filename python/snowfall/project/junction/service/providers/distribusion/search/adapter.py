@@ -46,8 +46,8 @@ def offer_group_cache_key(task: amqp_pb2.SearchCriteriaTask) -> str:
                 task.session_token,
                 *[segment.id for segment in task.segments],
                 *[str(age) for age in task.criteria.passengers_age],
-                task.criteria.origin_id,
-                task.criteria.destination_id,
+                *task.criteria.origin_ids,
+                *task.criteria.destination_ids,
             ],
         ),
     )
@@ -195,8 +195,8 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
     ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
         criteria = FindConnectionsCriteria(
             locale=search_task.criteria.locale or _DEFAULT_LOCALE,
-            departure_stations=[search_task.criteria.origin_id],
-            arrival_stations=[search_task.criteria.destination_id],
+            departure_stations=list(search_task.criteria.origin_ids),
+            arrival_stations=list(search_task.criteria.destination_ids),
             departure_date=protobuf.protobuf_to_date(
                 search_task.criteria.outbound_departure,
             ),
@@ -223,8 +223,8 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
 
         self._logger.info(
             "Connections",
-            origin=search_task.criteria.origin_id,
-            destination=search_task.criteria.destination_id,
+            origins=search_task.criteria.origin_ids,
+            destinations=search_task.criteria.destination_ids,
             count=len(connection_list),
         )
 

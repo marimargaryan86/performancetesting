@@ -17,8 +17,8 @@ from snowfall.stdlib.v1alpha import models_pb2
 _DEFAULT_PASSENGER_AGE = 40
 _DEPARTURE_IN_DAYS = 11
 _DEBERCBS_FRPARPGB_CRITERIA = amqp_pb2.Criteria(
-    origin_id="DEBERCBS",
-    destination_id="FRPARPGB",
+    origin_ids=["DEBERCBS"],
+    destination_ids=["FRPARPGB"],
     outbound_departure=protobuf.date_to_protobuf(
         datetime.date.today() + datetime.timedelta(days=_DEPARTURE_IN_DAYS),
     ),

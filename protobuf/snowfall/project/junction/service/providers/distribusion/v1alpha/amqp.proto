@@ -12,8 +12,8 @@ message SearchCriteriaTask {
 }
 
 message Criteria {
-  string origin_id = 1;
-  string destination_id = 2;
+  repeated string origin_ids = 1;
+  repeated string destination_ids = 2;
   snowfall.stdlib.v1alpha.Date outbound_departure = 3;
   optional snowfall.stdlib.v1alpha.Date inbound_departure = 4;
   repeated uint32 passengers_age = 5;
