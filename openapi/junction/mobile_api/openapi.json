@@ -17,6 +17,12 @@
   "x-internal": true,
   "x-tagGroups": [
     {
+      "name": "Cabins",
+      "tags": [
+        "cabins"
+      ]
+    },
+    {
       "name": "Internal",
       "tags": [
         "internal"
@@ -32,6 +38,12 @@
       "name": "Orders",
       "tags": [
         "orders"
+      ]
+    },
+    {
+      "name": "Passengers",
+      "tags": [
+        "passengers"
       ]
     },
     {
@@ -91,6 +103,11 @@
   ],
   "tags": [
     {
+      "name": "cabins",
+      "description": "Cabin class information.",
+      "x-displayName": "Cabins"
+    },
+    {
       "name": "groups",
       "description": "Endpoints for user groups.",
       "x-displayName": "Groups"
@@ -119,6 +136,11 @@
       "name": "orders",
       "description": "A collection of bookings.",
       "x-displayName": "Orders"
+    },
+    {
+      "name": "passengers",
+      "description": "A trip has one or more passengers.",
+      "x-displayName": "Passengers"
     },
     {
       "name": "payment",
@@ -152,6 +174,303 @@
     }
   ],
   "paths": {
+    "/cabin-classes": {
+      "parameters": [],
+      "get": {
+        "summary": "List Cabin Classes",
+        "tags": [
+          "cabins"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/CabinClass"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "data": [
+                        {
+                          "id": "unspecified",
+                          "type": "cabin-classes",
+                          "attributes": {
+                            "name": "unspecified"
+                          },
+                          "links": {
+                            "self": "https://example.com/cabin-classes/unspecified"
+                          }
+                        },
+                        {
+                          "id": "economy",
+                          "type": "cabin-classes",
+                          "attributes": {
+                            "name": "economy"
+                          },
+                          "links": {
+                            "self": "https://example.com/cabin-classes/economy"
+                          }
+                        },
+                        {
+                          "id": "business",
+                          "type": "cabin-classes",
+                          "attributes": {
+                            "name": "business"
+                          },
+                          "links": {
+                            "self": "https://example.com/cabin-classes/business"
+                          }
+                        }
+                      ],
+                      "links": {
+                        "next": "https://example.com/cabin-classes"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "operationId": "get-cabin-classes",
+        "description": "Used to retrieve available Cabin Classes.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/cabinClassSort"
+          },
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
+      }
+    },
+    "/passengers/genders": {
+      "parameters": [],
+      "get": {
+        "summary": "List Passenger Genders",
+        "tags": [
+          "passengers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/PassengerGender"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "data": [
+                        {
+                          "id": "unspecified",
+                          "type": "passenger-genders",
+                          "attributes": {
+                            "name": "unspecified"
+                          },
+                          "links": {
+                            "self": "https://example.com/passengers/genders/unspecified"
+                          }
+                        },
+                        {
+                          "id": "male",
+                          "type": "passenger-genders",
+                          "attributes": {
+                            "name": "male"
+                          },
+                          "links": {
+                            "self": "https://example.com/passengers/genders/male"
+                          }
+                        },
+                        {
+                          "id": "female",
+                          "type": "passenger-genders",
+                          "attributes": {
+                            "name": "female"
+                          },
+                          "links": {
+                            "self": "https://example.com/passengers/genders/female"
+                          }
+                        }
+                      ],
+                      "links": {
+                        "next": "https://example.com/passengers/genders"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "operationId": "get-passengers-genders",
+        "description": "Used to retrieve available Passenger Genders.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/passengerGenderSort"
+          },
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
+      }
+    },
+    "/passengers/titles": {
+      "parameters": [],
+      "get": {
+        "summary": "List Passenger Titles",
+        "tags": [
+          "passengers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/PassengerTitle"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "data": [
+                        {
+                          "id": "unspecified",
+                          "type": "passenger-titles",
+                          "attributes": {
+                            "name": "unspecified"
+                          },
+                          "links": {
+                            "self": "https://example.com/passengers/titles/unspecified"
+                          }
+                        },
+                        {
+                          "id": "mr",
+                          "type": "passenger-titles",
+                          "attributes": {
+                            "name": "mr"
+                          },
+                          "links": {
+                            "self": "https://example.com/passengers/titles/mr"
+                          }
+                        },
+                        {
+                          "id": "mrs",
+                          "type": "passenger-titles",
+                          "attributes": {
+                            "name": "mrs"
+                          },
+                          "links": {
+                            "self": "https://example.com/passengers/titles/mrs"
+                          }
+                        }
+                      ],
+                      "links": {
+                        "next": "https://example.com/passengers/titles"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "operationId": "get-passengers-titles",
+        "description": "Used to retrieve available Passenger TItles.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/passengerTitleSort"
+          },
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
+      }
+    },
     "/users/groups": {
       "post": {
         "summary": "Create user group",
@@ -2495,9 +2814,164 @@
         "description": "Filters offers based on the options cabin class",
         "style": "form",
         "explode": false
+      },
+      "passengerGenderSort": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id"
+            ]
+          },
+          "default": [
+            "id"
+          ],
+          "example": [
+            "id"
+          ]
+        },
+        "description": "Customize which field(s) to sort the passenger genders by.",
+        "style": "form",
+        "explode": false
+      },
+      "passengerTitleSort": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id"
+            ]
+          },
+          "default": [
+            "id"
+          ],
+          "example": [
+            "id"
+          ]
+        },
+        "description": "Customize which field(s) to sort the passenger titles by.",
+        "style": "form",
+        "explode": false
+      },
+      "cabinClassSort": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id"
+            ]
+          },
+          "default": [
+            "id"
+          ],
+          "example": [
+            "id"
+          ]
+        },
+        "description": "Customize which field(s) to sort the cabin classes by.",
+        "style": "form",
+        "explode": false
       }
     },
     "schemas": {
+      "PassengerGender": {
+        "title": "Passenger Gender",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "male",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "passenger-genders"
+                ],
+                "example": "passenger-genders"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "male"
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "description": "Indicates the passenger's gender, such as \"male\" or \"female\"."
+      },
+      "PassengerTitle": {
+        "title": "Passenger Title",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "mr",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "passenger-titles"
+                ],
+                "example": "passenger-titles"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "mr"
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "description": "Indicates the passenger's title, such as \"mr\" or \"mrs\"."
+      },
       "ChangePasswordBody": {
         "title": "Change Password Body",
         "type": "object",

@@ -25,17 +25,18 @@ class RedisRepository(object):
     def __init__(
         self,
         redis_client: redis.Client[str],
-        cache_ttl: datetime.timedelta,
+        cache_ttl: datetime.timedelta | None = None,
     ) -> None:
         self._redis = redis_client
         self._ttl = cache_ttl
 
     async def create(self, identifier: str, atr_value: str) -> None:
         await self._redis.put(identifier, atr_value)
-        await self._redis.put_expires_at(
-            identifier,
-            datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
-        )
+        if self._ttl:
+            await self._redis.put_expires_at(
+                identifier,
+                datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
+            )
 
 
 class OtpRepository(RedisRepository):
@@ -54,6 +55,11 @@ class OtpRepository(RedisRepository):
 
 
 class OffersRatesRepository(RedisRepository):
+    async def get(self, identifier: str) -> Optional[str]:
+        return await self._redis.get(identifier)
+
+
+class EnumsValuesRepository(RedisRepository):
     async def get(self, identifier: str) -> Optional[str]:
         return await self._redis.get(identifier)
 

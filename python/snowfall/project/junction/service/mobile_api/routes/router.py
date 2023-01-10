@@ -2,7 +2,9 @@ import lagom
 from lagom.integrations import starlette
 from starlette import routing
 
+from snowfall.project.junction.service.mobile_api import repository
 from snowfall.project.junction.service.mobile_api.routes import (  # noqa: WPS235
+    enums,
     loyalty_programs,
     notification_tokens,
     offers,
@@ -16,11 +18,11 @@ from snowfall.project.junction.service.mobile_api.routes import (  # noqa: WPS23
     users,
     vouchers,
 )
+from snowfall.vendor.junction import client
 
 
 def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
     integration = starlette.StarletteIntegration(dependencies)
-
     return [
         integration.route("/places", places.Places, name="Places"),
         integration.route("/places/{placeId}", places.Place, name="ViewPlace"),
@@ -103,4 +105,19 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             notification_tokens.PushNotificationToken,
             name="PushNotificationToken",
         ),
+        enums.CacheAndListEnum(
+            dependencies[client.JunctionClient].list_cabin_classes,
+            dependencies[repository.EnumsValuesRepository],
+            "/cabin-classes",
+        ).to_route(),
+        enums.CacheAndListEnum(
+            dependencies[client.JunctionClient].get_passenger_genders,
+            dependencies[repository.EnumsValuesRepository],
+            "/passengers/genders",
+        ).to_route(),
+        enums.CacheAndListEnum(
+            dependencies[client.JunctionClient].get_passenger_titles,
+            dependencies[repository.EnumsValuesRepository],
+            "/passengers/titles",
+        ).to_route(),
     ]

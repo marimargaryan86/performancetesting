@@ -95,6 +95,9 @@ def _factory(
                         redis_client=redis_client,
                         cache_ttl=app.settings.offers_rates_cache_ttl,
                     ),
+                    enums_values_repository=repository.EnumsValuesRepository(
+                        redis_client=redis_client,
+                    ),
                     stripe_users_repository=repository.StripeUsersRepository(
                         mongo["stripe_users"],
                         create_stripe_customers=app.settings.create_stripe_customers,
