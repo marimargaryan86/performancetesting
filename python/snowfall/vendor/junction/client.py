@@ -227,7 +227,7 @@ class TripsClient(_BaseClient):
         origin_id: str,
         destination_id: str,
         departure_after: datetime.datetime,
-        leg_types: Sequence[LegType],
+        allowed_segment_types: Sequence[LegType],
     ) -> dict[str, Any]:
         body = {
             _DATA_KEY: {
@@ -239,10 +239,10 @@ class TripsClient(_BaseClient):
                     "destination": {
                         _DATA_KEY: {_ID_KEY: destination_id, _TYPE_KEY: "places"},
                     },
-                    "legTypes": {
+                    "allowedSegmentTypes": {
                         _DATA_KEY: [
                             {_ID_KEY: leg_type.value, "type": "leg-types"}
-                            for leg_type in leg_types
+                            for leg_type in allowed_segment_types
                         ],
                     },
                 },

@@ -40,7 +40,7 @@ class TestTrips(object):
                                 "type": "places",
                             },
                         },
-                        "legTypes": {"data": []},
+                        "allowedSegmentTypes": {"data": []},
                     },
                 },
             },

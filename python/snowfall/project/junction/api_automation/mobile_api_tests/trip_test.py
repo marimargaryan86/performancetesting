@@ -254,7 +254,7 @@ async def return_trip_search_id(
         departure_after=datetime.fromisoformat(
             departure_after[:-1],
         ).astimezone(timezone.utc),
-        leg_types=[LegType.air],
+        allowed_segment_types=[LegType.air],
     )
     logging.info("create_trip_search response: %s", json.dumps(r1, indent=4))
 

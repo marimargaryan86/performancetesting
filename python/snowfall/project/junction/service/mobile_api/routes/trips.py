@@ -24,8 +24,9 @@ class TripSearches(endpoints.HTTPEndpoint):
             origin_id=body["origin"],
             destination_id=body["destination"],
             departure_after=parser.parse(body["departureAfter"]),
-            leg_types=[
-                client.LegType(leg_type) for leg_type in body.get("legTypes", [])
+            allowed_segment_types=[
+                client.LegType(leg_type)
+                for leg_type in body.get("allowedSegmentTypes", [])
             ],
         )
 

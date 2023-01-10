@@ -3079,7 +3079,7 @@
                       }
                     }
                   },
-                  "legTypes": {
+                  "allowedSegmentTypes": {
                     "type": "object",
                     "properties": {
                       "data": {
