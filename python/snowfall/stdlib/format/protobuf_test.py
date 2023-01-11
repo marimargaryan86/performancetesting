@@ -10,7 +10,7 @@ from snowfall.project.junction.service.places.v1alpha import (
     models_pb2 as places_models_pb2,
 )
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import datetime_pb2, models_pb2
+from snowfall.stdlib.v1alpha import datetime_pb2, models_pb2, testing_pb2
 
 _seconds = 1639696695
 
@@ -64,6 +64,13 @@ def test_slug_to_enum_value() -> None:
             "railway-station",
         )
         == places_models_pb2.Location.TYPE_RAILWAY_STATION
+    )
+    assert (
+        protobuf.slug_to_enum_value(
+            testing_pb2.PascalCaseEnum.PascalCase.DESCRIPTOR,
+            "unspecified",
+        )
+        == 0
     )
 
 

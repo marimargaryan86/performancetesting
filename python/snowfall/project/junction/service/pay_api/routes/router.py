@@ -5,6 +5,7 @@ from starlette import routing
 from snowfall.project.junction.service.pay_api.routes import (
     authentication,
     balances,
+    companies,
     currencies,
     rates,
     transactions,
@@ -52,5 +53,10 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             "/rates",
             rates.Rates,
             name="Rate",
+        ),
+        integration.route(
+            "/companies",
+            companies.StoreCompany,
+            name="Company",
         ),
     ]

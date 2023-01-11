@@ -14,6 +14,7 @@ from google.protobuf import (
     timestamp_pb2,
 )
 
+from snowfall.stdlib import string
 from snowfall.stdlib.v1alpha import datetime_pb2, models_pb2
 
 _Proto = TypeVar("_Proto", bound=message.Message)
@@ -173,9 +174,12 @@ def enum_value_to_slug(
     return name.lower().replace("_", "-")
 
 
-def slug_to_enum_value(enum_descriptor: descriptor.EnumDescriptor, name: str) -> int:
+def slug_to_enum_value(
+    enum_descriptor: descriptor.EnumDescriptor,
+    name: str,
+) -> int:
     enum_name = "{0}_{1}".format(
-        enum_descriptor.name.upper(),
+        string.to_snake(enum_descriptor.name).upper(),
         name.replace("-", "_").upper(),
     )
 

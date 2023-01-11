@@ -3,6 +3,7 @@ import random
 from typing import Callable
 
 import currencycloud
+from motor import motor_asyncio
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
@@ -10,6 +11,7 @@ from snowfall.project.adapter import authentication as auth
 from snowfall.project.junction.adapter import currencies, errors
 from snowfall.project.junction.service.currencies.v1alpha import currencies_pb2_grpc
 from snowfall.project.junction.service.pay_api import authenticator, bootstrap
+from snowfall.project.junction.service.pay_api.repositories import CompanyRepository
 from snowfall.project.junction.service.pay_api.routes import router
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application, handlers
@@ -34,6 +36,9 @@ def _factory(
             app.settings.cc_api_key,
             app.settings.cc_env,
         )
+        mongo = motor_asyncio.AsyncIOMotorClient(
+            app.settings.mongo_dsn,
+        )
         asgi_app = application.create_starlette_app(
             custom_middlewares=[
                 Middleware(
@@ -56,6 +61,9 @@ def _factory(
                         auth.auth_pb2_grpc.AuthenticationServiceStub(
                             authentication_channel,
                         ),
+                    ),
+                    companies_repository=CompanyRepository(
+                        mongo.companies.companies,
                     ),
                 ),
             ),

@@ -56,6 +56,9 @@ def test_to_upper_camel(
         ("test", "test"),
         ("testWord", "test_word"),
         ("testWordFoobar", "test_word_foobar"),
+        ("test_test", "test_test"),
+        ("TestTest", "test_test"),
+        ("TestTestTest", "test_test_test"),
     ],
 )
 def test_to_snake(

@@ -57,6 +57,12 @@
       "tags": [
         "transactions"
       ]
+    },
+    {
+      "name": "Companies",
+      "tags": [
+        "companies"
+      ]
     }
   ],
   "tags": [
@@ -69,6 +75,11 @@
       "name": "balances",
       "description": "Account balances in difference currencies",
       "x-displayName": "Balances"
+    },
+    {
+      "name": "companies",
+      "description": "Companies creation for resellers and providers",
+      "x-displayName": "Companies"
     },
     {
       "name": "currencies",
@@ -255,7 +266,7 @@
                 },
                 "required": [
                   "data"
-                  ]
+                ]
               }
             }
           }
@@ -279,10 +290,10 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                        "$ref": "#/components/schemas/ChangePassword"
+                      "$ref": "#/components/schemas/ChangePassword"
                     }
                   },
-                  "required" : [
+                  "required": [
                     "data"
                   ]
                 }
@@ -304,10 +315,61 @@
                 "type": "object",
                 "properties": {
                   "data": {
-                        "$ref": "#/components/schemas/ChangePassword"
+                    "$ref": "#/components/schemas/ChangePassword"
                   }
                 },
-                "required" : [
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/companies": {
+      "post": {
+        "summary": "Create company",
+        "description": "Create company for resellers and providers",
+        "tags": [
+          "companies"
+        ],
+        "operationId": "post-companies",
+        "responses": {
+          "201": {
+            "description": "Company is created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Company"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Company"
+                  }
+                },
+                "required": [
                   "data"
                 ]
               }
@@ -649,24 +711,24 @@
           "attributes"
         ],
         "properties": {
-          "id" : {
+          "id": {
             "type": "string",
             "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
             "format": "uuid",
             "readOnly": true
           },
-          "type" : {
+          "type": {
             "type": "string",
             "enum": [
               "users"
             ],
             "example": "users"
           },
-          "attributes" : {
+          "attributes": {
             "required": [
               "email",
               "password"
-              ],
+            ],
             "properties": {
               "email": {
                 "type": "string",
@@ -685,8 +747,8 @@
       },
       "Authentication": {
         "title": "Authentication",
-        "type" : "object",
-        "required" : [
+        "type": "object",
+        "required": [
           "attributes"
         ],
         "properties": {
@@ -733,11 +795,11 @@
       },
       "ChangePassword": {
         "title": "ChangePassword",
-        "required" : [
+        "required": [
           "attributes"
         ],
         "properties": {
-          "type" : {
+          "type": {
             "type": "string",
             "enum": [
               "users"
@@ -1158,6 +1220,79 @@
         ],
         "description": "Account transactions."
       },
+      "Company": {
+        "title": "Company",
+        "required": [
+          "attributes"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "companies"
+            ],
+            "example": "companies"
+          },
+          "id": {
+            "type": "string",
+            "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "attributes": {
+            "required": [
+              "name",
+              "address",
+              "bufferRate",
+              "salesRate"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "example": "Company"
+              },
+              "address": {
+                "type": "object",
+                "properties": {
+                  "addressLines": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "Street name 7"
+                    },
+                    "example": [
+                      "Street name 7"
+                    ]
+                  },
+                  "countryCode": {
+                    "type": "string",
+                    "format": "country",
+                    "example": "GB"
+                  },
+                  "postalCode": {
+                    "type": "string",
+                    "example": "12345"
+                  },
+                  "city": {
+                    "type": "string",
+                    "example": "London"
+                  }
+                }
+              },
+              "bufferRate": {
+                "type": "number",
+                "format": "float",
+                "example": 5.6
+              },
+              "salesRate": {
+                "type": "number",
+                "format": "float",
+                "example": 5.6
+              }
+            }
+          }
+        }
+      },
       "BalanceIdentifier": {
         "title": "Balance Identifier",
         "type": "object",
@@ -1410,9 +1545,11 @@
           "application/vnd.api+json": {
             "schema": {
               "type": "object",
-              "required": ["errors"],
+              "required": [
+                "errors"
+              ],
               "properties": {
-                "errors" : {
+                "errors": {
                   "type": "array",
                   "minItems": 1,
                   "uniqueItems": true,

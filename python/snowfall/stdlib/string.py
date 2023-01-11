@@ -39,7 +39,7 @@ def to_upper_camel(string: str) -> str:
 
 
 def to_snake(string: str) -> str:
-    return re.sub("([A-Z]+)", r"_\1", string).lower()
+    return re.sub("(?<!^)(?=[A-Z])", "_", string).lower()
 
 
 def to_uuid(string: str, namespace: pyuuid.UUID | None = None) -> str:

@@ -12,3 +12,9 @@ message Foobar {
 message NestedFoobar {
   repeated Foobar foobars = 1;
 }
+
+message PascalCaseEnum {
+  enum PascalCase {
+    PASCAL_CASE_UNSPECIFIED = 0;
+  }
+}
