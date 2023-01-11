@@ -56,7 +56,7 @@ class Bound(object):
         }
 
         response = await self._http_client.post(
-            "{0}/v1/spots/quotes".format(self._base_url),
+            "{0}/v1/trades/quotes".format(self._base_url),
             cookies=self._auth_cookies,
             json=quote_data,
         )
@@ -76,7 +76,7 @@ class Bound(object):
         quote_data = {"quoteId": quote_id}
 
         response = await self._http_client.post(
-            "{0}/v1/spots/".format(self._base_url),
+            "{0}/v1/trades/".format(self._base_url),
             cookies=self._auth_cookies,
             json=quote_data,
         )
@@ -87,7 +87,7 @@ class Bound(object):
 
     @_auth_required
     async def get_spot(self, spot_id: str) -> dict[str, Any]:
-        spot_url = "{0}/v1/spots/{1}".format(self._base_url, spot_id)
+        spot_url = "{0}/v1/trades/{1}".format(self._base_url, spot_id)
         response = await self._http_client.get(
             spot_url,
             cookies=self._auth_cookies,
