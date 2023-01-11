@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import abc
 import dataclasses
 import datetime
 import zoneinfo
-from typing import Sequence
+from typing import AbstractSet, Sequence
 
 import structlog
 from google.protobuf import timestamp_pb2
@@ -43,7 +44,62 @@ class Requirement(object):
 Requirements = Sequence[Requirement]
 
 
-class OfferValidator(object):
+class Validator(object):
+    @abc.abstractmethod
+    def matches(self, offer: Offer) -> bool:
+        raise NotImplementedError()
+
+
+class Validators(Validator):
+    def __init__(self, *args: Validator) -> None:
+        self.validators = args
+
+    def matches(self, offer: Offer) -> bool:
+        return all((validator.matches(offer) for validator in self.validators))
+
+
+class AirlineValidator(Validator):
+    def __init__(
+        self,
+        enabled_airlines: AbstractSet[str] | None = None,
+        disabled_airlines: AbstractSet[str] | None = None,
+    ) -> None:
+        self._enabled_airlines = enabled_airlines
+        self._disabled_airlines = disabled_airlines
+
+    def matches(self, offer: Offer) -> bool:
+        if not self._enabled_airlines and not self._disabled_airlines:
+            return True
+
+        for offer_slice in offer.slices:
+            for segment in offer_slice.segments or []:
+                airline = segment.marketing_carrier.iata_code
+
+                if not self._airline_matches(airline):
+                    return False
+
+        return True
+
+    def _airline_enabled(self, airline: str) -> bool:
+        if not self._enabled_airlines:
+            return True
+
+        return airline in self._enabled_airlines
+
+    def _airline_disabled(self, airline: str) -> bool:
+        if not self._disabled_airlines:
+            return False
+
+        return airline in self._disabled_airlines
+
+    def _airline_matches(self, airline: str | None) -> bool:
+        if not airline:
+            return False
+
+        return self._airline_enabled(airline) and not self._airline_disabled(airline)
+
+
+class OfferValidator(Validator):
     def __init__(self, requirements: Requirements) -> None:
         self._logger = structlog.get_logger(__name__)
         self._requirements = requirements

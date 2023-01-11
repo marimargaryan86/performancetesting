@@ -76,6 +76,8 @@ async def searches(app: service.Application[SearchesSettings]) -> None:  # noqa:
                     client=redis.Client[bytes](redis_connection, prefix=app.name),
                 ),
                 ttl=app.settings.ttl,
+                enabled_airlines=app.settings.enabled_airlines,
+                disabled_airlines=app.settings.disabled_airlines,
             ).gather_search_results,
         )
 

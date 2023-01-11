@@ -19,3 +19,5 @@ class SearchesSettings(DuffelConfig, service.Settings):
     amqp_dsn: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
     ttl: datetime.timedelta = datetime.timedelta(minutes=_DEFAULT_TTL_IN_MINUTES)
+    enabled_airlines: set[str] = set()
+    disabled_airlines: set[str] = set()

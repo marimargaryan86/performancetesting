@@ -1,6 +1,6 @@
 import datetime
 from collections import defaultdict
-from typing import AsyncIterator, Callable, List, Mapping, Sequence
+from typing import AbstractSet, AsyncIterator, Callable, List, Mapping, Sequence
 
 import structlog
 
@@ -10,7 +10,9 @@ from snowfall.project.junction.service.offers.v1alpha import (
 from snowfall.project.junction.service.providers.duffel import cache
 from snowfall.project.junction.service.providers.duffel.search.parser import OfferParser
 from snowfall.project.junction.service.providers.duffel.search.validator import (
+    AirlineValidator,
     OfferValidator,
+    Validators,
 )
 from snowfall.project.junction.service.providers.duffel.v1alpha import amqp_pb2
 from snowfall.stdlib import string
@@ -79,15 +81,21 @@ class OfferGrouper(object):
 
 
 class DuffelSearchAdapter(object):
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
         duffel_client: client.DuffelClient,
         offers_cache: cache.OfferCache,
         ttl: datetime.timedelta,
+        enabled_airlines: AbstractSet[str] | None = None,
+        disabled_airlines: AbstractSet[str] | None = None,
     ) -> None:
         self._client = duffel_client
         self._offer_parser = OfferParser(default_ttl=ttl, offer_cache=offers_cache)
         self._logger = structlog.get_logger(__name__)
+        self._airline_validator = AirlineValidator(
+            enabled_airlines=enabled_airlines,
+            disabled_airlines=disabled_airlines,
+        )
 
     async def gather_search_results(
         self,
@@ -98,7 +106,10 @@ class DuffelSearchAdapter(object):
         )
 
         if res and res.offers:
-            validator = OfferValidator.from_segments(search_task.segments)
+            validator = Validators(
+                OfferValidator.from_segments(search_task.segments),
+                self._airline_validator,
+            )
             grouped_offers = OfferGrouper.group_offers(res.offers, validator.matches)
 
             for offers in grouped_offers.values():

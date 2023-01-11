@@ -55,6 +55,36 @@ def search_adapter(
     )
 
 
+@pytest.fixture
+def search_adapter_no_ba(
+    duffel_client: client.DuffelClient,
+    redis_client: aioredis.Redis[bytes],
+) -> adapter.DuffelSearchAdapter:
+    return adapter.DuffelSearchAdapter(
+        duffel_client=duffel_client,
+        offers_cache=cache.OfferCache(
+            client=redis.Client(redis_client),
+        ),
+        ttl=datetime.timedelta(minutes=_TTL_MINUTES),
+        disabled_airlines={"BA"},
+    )
+
+
+@pytest.fixture
+def search_adapter_ba_only(
+    duffel_client: client.DuffelClient,
+    redis_client: aioredis.Redis[bytes],
+) -> adapter.DuffelSearchAdapter:
+    return adapter.DuffelSearchAdapter(
+        duffel_client=duffel_client,
+        offers_cache=cache.OfferCache(
+            client=redis.Client(redis_client),
+        ),
+        ttl=datetime.timedelta(minutes=_TTL_MINUTES),
+        enabled_airlines={"BA"},
+    )
+
+
 def search_task_from_offer(offer: Offer) -> amqp_pb2.SearchCriteriaTask:
     first_segment = offer.slices[0].segments[0]
     last_segment = offer.slices[0].segments[-1]

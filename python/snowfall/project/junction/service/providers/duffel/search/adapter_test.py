@@ -79,3 +79,74 @@ async def test_offer_with_stop(
         for segment in offer_group.segments
     )
     assert len(offer_groups[0].segments[0].legs) == 2
+
+
+async def test_airline_validator(  # noqa: WPS210
+    httpx_mock: pytest_httpx.HTTPXMock,
+    search_adapter_no_ba: adapter.DuffelSearchAdapter,
+    search_adapter_ba_only: adapter.DuffelSearchAdapter,
+) -> None:
+    json = load_file_fixture("offers_with_stop.json")
+    assert json is not None
+
+    httpx_mock.add_response(
+        url="{api_base_url}/air/offer_requests".format(
+            api_base_url=API_BASE_URL,
+        ),
+        method="POST",
+        json=json,
+    )
+
+    offer_response = OfferRequestResponse.parse_obj(json)
+    ba15_offer = next(
+        offer
+        for offer in offer_response.response_data.offers
+        if all(
+            segment.marketing_carrier_flight_number == "0015"
+            for offer_slice in offer.slices
+            for segment in offer_slice.segments
+        )
+    )
+
+    search_task = search_task_from_offer(ba15_offer)
+    offer_groups = [
+        offer_group
+        async for offer_group in search_adapter_no_ba.gather_search_results(search_task)
+    ]
+
+    assert not offer_groups
+
+    offer_groups = [
+        offer_group
+        async for offer_group in search_adapter_ba_only.gather_search_results(
+            search_task,
+        )
+    ]
+    assert offer_groups
+
+    vs23_offer = next(
+        offer
+        for offer in offer_response.response_data.offers
+        if any(
+            segment.marketing_carrier_flight_number == "23"
+            for offer_slice in offer.slices
+            for segment in offer_slice.segments
+        )
+    )
+
+    search_task = search_task_from_offer(vs23_offer)
+    offer_groups = [
+        offer_group
+        async for offer_group in search_adapter_no_ba.gather_search_results(search_task)
+    ]
+
+    assert offer_groups
+
+    offer_groups = [
+        offer_group
+        async for offer_group in search_adapter_ba_only.gather_search_results(
+            search_task,
+        )
+    ]
+
+    assert not offer_groups
