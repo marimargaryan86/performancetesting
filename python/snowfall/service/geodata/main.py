@@ -23,7 +23,7 @@ class _Settings(service.Settings):
 async def _main(app: service.Application[_Settings]) -> None:
     shp_path = filesystem.resource_path(
         "snowfall.service.geodata.main",
-        "world-administrative-boundaries.zip",
+        "EEZ_land_union_v3_202003.zip",
     )
     shp_file = shapefile.Reader(shp_path)
 

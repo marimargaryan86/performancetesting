@@ -8,9 +8,9 @@ python_image(
 resource(
     name="borders",
     source=http_source(
-        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/world-administrative-boundaries-0932da19fd832994de5ad3068241c5833940482bbf43d6da7dcabbf1a1750a53.zip",
-        len=2014345,
-        sha256="0932da19fd832994de5ad3068241c5833940482bbf43d6da7dcabbf1a1750a53",
-        filename="world-administrative-boundaries.zip",
+        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/EEZ_land_union_v3_202003-198dfb029c8b98840e5d9e164ed7cb5fc089ec644c54efe47fbd1009578f686f.zip",
+        len=19932478,
+        sha256="198dfb029c8b98840e5d9e164ed7cb5fc089ec644c54efe47fbd1009578f686f",
+        filename="EEZ_land_union_v3_202003.zip",
     ),
 )

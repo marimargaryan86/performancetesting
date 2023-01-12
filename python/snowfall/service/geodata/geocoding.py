@@ -22,14 +22,19 @@ class ReverseGeocoder(object):
         ]
 
     async def get_country_code(self, latitude: float, longitude: float) -> str:
-        return countries.get(
+        country = countries.get(
             alpha_2=(
                 await self._country_lookup(
                     latitude=latitude,
                     longitude=longitude,
                 )
             ),
-        ).alpha_2
+        )
+
+        if not country:
+            raise ValueError("Unknown country code")
+
+        return country.alpha_2
 
     async def get_time_zone(self, latitude: float, longitude: float) -> str:
         time_zone = self._tz_finder.timezone_at(
@@ -60,7 +65,14 @@ class ReverseGeocoder(object):
             shape = geometry.shape(shape_record.shape)
 
             if geometry.Point(longitude, latitude).within(shape):
-                return shape_record.record["iso_3166_1"]
+                country = countries.get(
+                    alpha_3=shape_record.record["ISO_SOV1"],
+                )
+
+                if not country:
+                    raise ValueError("Unknown country code")
+
+                return country.alpha_2
 
         return None
 
