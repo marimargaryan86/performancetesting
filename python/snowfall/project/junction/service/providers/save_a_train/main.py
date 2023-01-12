@@ -11,6 +11,7 @@ from typing import Sequence
 import aiosmtplib
 import httpx
 import pydantic
+from motor import motor_asyncio
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import notifications, offers
@@ -23,7 +24,10 @@ from snowfall.project.junction.service.providers.save_a_train import (
 from snowfall.project.junction.service.providers.save_a_train import (
     offers as sat_offers,
 )
-from snowfall.project.junction.service.providers.save_a_train import train_stations
+from snowfall.project.junction.service.providers.save_a_train import (
+    repositories,
+    train_stations,
+)
 from snowfall.project.junction.service.providers.save_a_train.v1alpha import amqp_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import h3, service
@@ -63,6 +67,7 @@ class _SearchSettings(_SatConfig, service.Settings):
     amqp_dsn: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
+    mongo_dsn: tuple[pydantic.AnyUrl]
 
 
 class _OrdersSettings(_SatConfig, service.Settings):
@@ -72,6 +77,7 @@ class _OrdersSettings(_SatConfig, service.Settings):
     smtp_dsn: pydantic.AnyUrl
     smtp_sender: pydantic.EmailStr
     smtp_recipient: pydantic.EmailStr
+    mongo_dsn: tuple[pydantic.AnyUrl]
 
 
 async def _offers(app: service.Application[_OffersSettings]) -> None:
@@ -102,6 +108,9 @@ async def _offers(app: service.Application[_OffersSettings]) -> None:
 
 
 async def _searches(app: service.Application[_SearchSettings]) -> None:
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        random.choice(app.settings.mongo_dsn),  # nosec
+    )
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
             httpx.AsyncClient(
@@ -130,6 +139,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
             api_search_requests_limit=app.settings.api_search_requests_limit,
             client=http_client,
         )
+
         # TODO: do we need to call get_token on the save_a_train_client?
 
         search_consumer = offers.SearchCriteriaConsumer[amqp_pb2.SearchCriteriaTask](
@@ -162,6 +172,9 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                 train_station_repository=train_stations.TrainStationRepository(
                     train_stations=await _load_train_stations(),
                 ),
+                provider_cabin_class_mapping=repositories.ProviderCabinMappingRepository(
+                    mongo.sat.provider_cabin_mapping,
+                ),
                 offers_cache=cache.OffersCache(
                     client=redis.Client(redis_connection, prefix=app.name),
                 ),
@@ -174,6 +187,9 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
 
 
 async def _orders(app: service.Application[_OrdersSettings]) -> None:
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        random.choice(app.settings.mongo_dsn),  # nosec
+    )
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
             httpx.AsyncClient(
@@ -220,6 +236,9 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
                 save_a_train_client=save_a_train_client,
                 train_station_repository=train_stations.TrainStationRepository(
                     train_stations=await _load_train_stations(),
+                ),
+                provider_cabin_class_mapping=repositories.ProviderCabinMappingRepository(
+                    mongo.sat.provider_cabin_mapping,
                 ),
                 offers_cache=offer_cache,
                 ttl=app.settings.ttl,

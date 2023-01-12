@@ -13,6 +13,7 @@ from snowfall.project.junction.provider import notifications
 from snowfall.project.junction.service.providers.save_a_train import (
     adapter,
     cache,
+    repositories,
     train_stations,
 )
 from snowfall.stdlib.persistence import filesystem
@@ -63,14 +64,21 @@ def train_station_repository() -> train_stations.TrainStationRepository:
 
 
 @pytest.fixture
+def provider_cabin_class_mapping() -> repositories.ProviderCabinMappingRepository:
+    return repositories.ProviderCabinMappingRepository(collection=[])
+
+
+@pytest.fixture
 def save_a_train_adapter(
     save_a_train_client: client.SATClient,
     train_station_repository: train_stations.TrainStationRepository,
+    provider_cabin_class_mapping: repositories.ProviderCabinMappingRepository,
     redis_client: aioredis.Redis[bytes],
 ) -> adapter.SaveATrainAdapter:
     return adapter.SaveATrainAdapter(
         save_a_train_client=save_a_train_client,
         train_station_repository=train_station_repository,
+        provider_cabin_class_mapping=provider_cabin_class_mapping,
         offers_cache=cache.OffersCache(
             client=redis.Client(redis_client),
         ),

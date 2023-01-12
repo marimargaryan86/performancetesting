@@ -20,3 +20,8 @@ message Criteria {
   snowfall.stdlib.v1alpha.DateTime arrival_datetime = 6;
   string cabin_class = 5;
 }
+
+message CabinClassMapping {
+  snowfall.stdlib.v1alpha.CabinClass.Type type = 1;
+  string mapping = 2;
+}

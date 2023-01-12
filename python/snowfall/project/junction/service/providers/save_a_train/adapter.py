@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-import types
 from typing import AsyncIterator, Optional, Sequence
 
 import httpx
@@ -22,6 +21,7 @@ from snowfall.project.junction.service.providers.save_a_train import (
     cache,
     models,
     notifications,
+    repositories,
     train_stations,
 )
 from snowfall.project.junction.service.providers.save_a_train.v1alpha import amqp_pb2
@@ -35,14 +35,6 @@ from snowfall.vendor.save_a_train.models import (
     search,
     search_result_details,
     search_result_selection,
-)
-
-_CABIN_MAPPING = types.MappingProxyType(
-    {
-        models_pb2.CabinClass.TYPE_FIRST: {"first", "1st", "comfort", "executive"},
-        models_pb2.CabinClass.TYPE_PREMIUM: {"business"},
-        models_pb2.CabinClass.TYPE_ECONOMY: {"standard", "second", "2nd"},
-    },
 )
 
 logger = structlog.get_logger(__name__)
@@ -71,8 +63,10 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         offers_cache: cache.OffersCache,
         ttl: datetime.timedelta,
         notifier: base_notifications.Notifier,
+        provider_cabin_class_mapping: repositories.ProviderCabinMappingRepository,
     ) -> None:
         self._train_stations = train_station_repository
+        self._provider_cabin_class_mapping = provider_cabin_class_mapping
         self._client = save_a_train_client
         self._offers_cache = offers_cache
         self._ttl = ttl
@@ -181,7 +175,9 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                                     id=string.uuid(),
                                     offer_segment_id=offer_segment_id,
                                     cabin_class=models_pb2.CabinClass(
-                                        type=_cabin_to_proto(transfer_fare.name),
+                                        type=await self._cabin_to_proto(
+                                            transfer_fare.name,
+                                        ),
                                         marketing_name=transfer_fare.name.replace(
                                             "_",
                                             " ",
@@ -490,15 +486,29 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                 raise_http_error_with_text(http_error)
             raise http_error
 
+    async def _get_cabin_class_mapping(
+        self,
+        provider_cabin_class: str,
+    ) -> amqp_pb2.CabinClassMapping:
+        return await self._provider_cabin_class_mapping.find_by_mapping(
+            provider_cabin_class=provider_cabin_class,
+        )
 
-def _cabin_to_proto(cabin: str) -> models_pb2.CabinClass.Type.V:
-    for cabin_class, possible_matches in _CABIN_MAPPING.items():
-        if any(match_item in cabin.lower() for match_item in possible_matches):
-            return cabin_class
+    async def _cabin_to_proto(self, cabin: str) -> models_pb2.CabinClass.Type.V:
+        provider_mapping = await self._get_cabin_class_mapping(
+            provider_cabin_class=cabin,
+        )
+        if provider_mapping:
+            return provider_mapping.type
 
-    logger.warning("SAT found UNSPECIFIED cabin type.", cabin=cabin)
+        unspecified_mapping = await self._provider_cabin_class_mapping.create(
+            cabin_class_type=models_pb2.CabinClass.TYPE_UNSPECIFIED,
+            provider_cabin_class=cabin,
+        )
 
-    return models_pb2.CabinClass.TYPE_UNSPECIFIED
+        logger.warning("SAT found UNSPECIFIED cabin type.", cabin=cabin)
+
+        return unspecified_mapping.type
 
 
 def raise_http_error_with_text(http_error: httpx.HTTPStatusError) -> None:
