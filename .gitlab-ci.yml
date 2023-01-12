@@ -11,6 +11,7 @@ variables:
   GIT_STRATEGY: fetch
 
 include:
+  - local: .gitlab/junction/api_automation.gitlab-ci.yml
   - local: .gitlab/markdown.gitlab-ci.yml
   - local: .gitlab/nomad.gitlab-ci.yml
   - local: .gitlab/pants.gitlab-ci.yml

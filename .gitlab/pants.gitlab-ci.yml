@@ -8,8 +8,6 @@ pants:setup:
     - docker push "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"
   needs: []
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
-      when: never
     - if: '$CI_MERGE_REQUEST_IID || $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
   tags:
     - shell
