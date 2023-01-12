@@ -7,8 +7,11 @@ from typing import Any, Callable, Iterator, Mapping, Sequence
 import httpx
 import pytest
 
+from snowfall.project.junction.api_automation.test_functions.mobile_client import (
+    MobileApiClient,
+)
 from snowfall.vendor.apilayer.client import APILayer
-from snowfall.vendor.junction.client import JunctionClient, MobileApiClient
+from snowfall.vendor.junction.client import JunctionClient
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)

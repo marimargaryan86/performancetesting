@@ -10,7 +10,9 @@ from snowfall.project.junction.api_automation.backend_api_tests.offers01_test im
     get_trip_ids,
     return_trip_offer_search_id,
 )
-from snowfall.vendor.junction.client import MobileApiClient
+from snowfall.project.junction.api_automation.test_functions.mobile_client import (
+    MobileApiClient,
+)
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)

@@ -3,7 +3,9 @@ import logging
 
 import pytest
 
-from snowfall.vendor.junction.client import MobileApiClient
+from snowfall.project.junction.api_automation.test_functions.mobile_client import (
+    MobileApiClient,
+)
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)

@@ -6,7 +6,9 @@ import pytest
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
     is_valid_uuid,
 )
-from snowfall.vendor.junction.client import MobileApiClient
+from snowfall.project.junction.api_automation.test_functions.mobile_client import (
+    MobileApiClient,
+)
 
 
 @pytest.mark.integration

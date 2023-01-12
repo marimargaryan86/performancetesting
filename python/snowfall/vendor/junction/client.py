@@ -1,7 +1,7 @@
 import dataclasses
 import datetime
 import enum
-from typing import Any, Dict, Literal, Mapping, Optional, Sequence, cast
+from typing import Any, Literal, Mapping, Optional, Sequence, cast
 
 import httpx
 
@@ -18,7 +18,7 @@ _CURSOR_KEY = "page[cursor]"
 _METHOD_GET = "GET"
 _METHOD_POST = "POST"
 _METHOD_PATCH = "PATCH"
-
+_METHOD_DELETE = "DELETE"
 
 trip_includes = Literal["segments", "segments.legs", "segments.legs.legType"]
 offer_includes = Literal[
@@ -765,146 +765,6 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
         return await self._make_request(
             method=_METHOD_GET,
             url="/orders/{0}".format(orders_id),
-        )
-
-
-class MobileApiClient(JunctionClient):
-    async def create_payment(self, currency: str, amount: str) -> dict[str, Any]:
-        return await self._make_request(
-            method=_METHOD_POST,
-            url="/payments",
-            payload={
-                _DATA_KEY: {
-                    _TYPE_KEY: "payments",
-                    _ATTRIBUTES_KEY: {
-                        "currency": currency,
-                        "amount": amount,
-                    },
-                },
-            },
-        )
-
-    async def update_payment(
-        self,
-        payment_intent_id: str,
-        voucher_id: str,
-    ) -> int:
-        body = {
-            _DATA_KEY: {
-                _TYPE_KEY: "payments",
-                _RELATIONSHIPS_KEY: {
-                    "voucher": {
-                        _DATA_KEY: {
-                            _TYPE_KEY: "vouchers",
-                            _ID_KEY: voucher_id,
-                        },
-                    },
-                },
-            },
-        }
-        response = await self._client.request(
-            method=_METHOD_PATCH,
-            url="/payments/{0}".format(payment_intent_id),
-            json=body,
-        )
-        response.raise_for_status()
-        return response.status_code
-
-    async def create_order(
-        self,
-        quote_id: str,
-        passengers: Sequence[models.Passenger],
-        contact_details: models.ContactDetails,
-        include: Optional[Sequence[order_includes]] = None,
-    ) -> dict[str, Any]:
-        raise RuntimeError(
-            "This client cannot create orders without payments. "
-            + "Please, use create_order_with_payments",
-        )
-
-    async def create_order_with_payment(  # noqa: WPS211
-        self,
-        offer_id: str,
-        option_ids: Sequence[str],
-        passengers: Sequence[models.Passenger],
-        contact_details: models.ContactDetails,
-        payment_id: str,
-        voucher_id: Optional[str] = None,
-        include: Optional[Sequence[order_includes]] = None,
-    ) -> dict[str, Any]:
-        body: Dict[str, Dict[str, Any]]
-        body = {
-            _DATA_KEY: {
-                _ATTRIBUTES_KEY: {
-                    _PASSENGERS_KEY: [
-                        dataclasses.asdict(
-                            passenger,
-                            dict_factory=models.dict_factory_to_camel,
-                        )
-                        for passenger in passengers
-                    ],
-                    "contactDetails": dataclasses.asdict(
-                        contact_details,
-                        dict_factory=models.dict_factory_to_camel,
-                    ),
-                },
-                _RELATIONSHIPS_KEY: {
-                    "offer": {
-                        _DATA_KEY: {
-                            _ID_KEY: offer_id,
-                            _TYPE_KEY: "offers",
-                        },
-                    },
-                    "options": {
-                        _DATA_KEY: [
-                            {
-                                _ID_KEY: option_id,
-                                _TYPE_KEY: "offer-options",
-                            }
-                            for option_id in option_ids
-                        ],
-                    },
-                    "payment": {
-                        _DATA_KEY: {_TYPE_KEY: "payments", _ID_KEY: payment_id},
-                    },
-                },
-                _TYPE_KEY: "orders",
-            },
-        }
-        if voucher_id:
-            body[_DATA_KEY][_RELATIONSHIPS_KEY]["voucher"] = {
-                _DATA_KEY: {
-                    _TYPE_KEY: "vouchers",
-                    _ID_KEY: voucher_id,
-                },
-            }
-        query_parameters: dict[str, str] = {}
-        if include:
-            query_parameters["include"] = ",".join(include)
-        return await self._make_request(
-            method=_METHOD_POST,
-            url="/orders",
-            payload=body,
-            query_parameters=query_parameters,
-        )
-
-    async def add_forward_order(
-        self,
-        order_id: str,
-        email: str,
-    ) -> dict[str, Any]:
-        body = {
-            _DATA_KEY: {
-                _ATTRIBUTES_KEY: {
-                    "email": email,
-                },
-                _TYPE_KEY: "email-messages",
-            },
-        }
-        return await self._make_request(
-            method=_METHOD_POST,
-            url="/orders/{0}/messages".format(order_id),
-            payload=body,
         )
 
 
