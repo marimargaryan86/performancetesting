@@ -109,6 +109,25 @@ class BaNdcClient(object):  # noqa: WPS214
             "/orders/{order_id}".format(order_id=order_id),
         )
 
+    async def update_order(
+        self,
+        order_id: UUID,
+        request: request_order_schemas.UpdateOrderRequest,
+    ) -> response_order_schemas.OrderResponse:
+        response = await self._make_request(
+            "PATCH",
+            "/orders/{order_id}".format(order_id=order_id),
+            payload=request.json(
+                exclude_none=True,
+                exclude_unset=True,
+                by_alias=True,
+            ),
+        )
+
+        return response_order_schemas.OrderResponse.parse_raw(
+            response.content,
+        )
+
     async def passenger_name_correction(
         self,
         order_id: UUID,

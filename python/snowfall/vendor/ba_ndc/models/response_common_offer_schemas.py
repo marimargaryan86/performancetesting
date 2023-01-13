@@ -95,3 +95,6 @@ class Trip(BaseSchema):
     price_class_id: str = pydantic.Field(description="Price class identifier")
     segment_ids: list[str] = pydantic.Field(description="Segment identifiers")
     penalty_ids: list[str] | None = pydantic.Field(description="Penalty identifiers")
+    baggage_allowance_refs: list[str] = pydantic.Field(
+        description="Baggage allowance identifiers",
+    )

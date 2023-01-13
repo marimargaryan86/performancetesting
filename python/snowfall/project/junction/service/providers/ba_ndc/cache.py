@@ -1,4 +1,5 @@
 import datetime
+import uuid
 from typing import List, Type
 
 from snowfall.stdlib.persistence.redis.repository import (
@@ -23,7 +24,7 @@ class OfferDetailsPassenger(RedisRecord):
 
 
 class OfferDetails(RedisRecord):
-    offer_id: str
+    offer_id: uuid.UUID
     passengers: List[OfferDetailsPassenger]
     price: Price
     doc_required: bool = False

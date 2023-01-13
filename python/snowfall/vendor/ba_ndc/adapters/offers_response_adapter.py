@@ -6,6 +6,7 @@ from snowfall.vendor.ba_ndc.models import (
     response_common_order_schemas,
     response_common_passenger_schemas,
     response_offer_search_schemas,
+    response_priced_offer_schemas,
 )
 
 
@@ -14,6 +15,7 @@ class OffersResponseAdapter(object):  # noqa: WPS214
     segments: Mapping[str, response_common_offer_schemas.Segment]
     price_classes: Mapping[str, response_common_offer_schemas.PriceClass]
     penalties: Mapping[str, response_common_order_schemas.Penalty]
+    bag_allowances: Mapping[str, response_priced_offer_schemas.BagAllowance]
 
     def __init__(
         self,
@@ -29,6 +31,10 @@ class OffersResponseAdapter(object):  # noqa: WPS214
         }
         self.penalties = {
             penalty.identifier: penalty for penalty in offers_response.penalties or []
+        }
+        self.bag_allowances = {
+            bag_allowance.identifier: bag_allowance
+            for bag_allowance in offers_response.bag_allowances or []
         }
 
     def get_offers(self) -> list[response_offer_search_schemas.Offer]:
@@ -57,6 +63,12 @@ class OffersResponseAdapter(object):  # noqa: WPS214
         penalty_id: str,
     ) -> response_common_order_schemas.Penalty | None:
         return self.penalties.get(penalty_id)
+
+    def get_bag_allowance_by_id(
+        self,
+        bag_allowance_id: str,
+    ) -> response_priced_offer_schemas.BagAllowance | None:
+        return self.bag_allowances.get(bag_allowance_id)
 
     def get_brand_name(
         self,

@@ -26,6 +26,7 @@ class GenderEnum(enum.Enum):
 
     male = "male"
     female = "female"
+    unspecified = "unspecified"
 
 
 class PaymentCardTypeEnum(enum.Enum):

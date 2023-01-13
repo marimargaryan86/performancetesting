@@ -9,7 +9,7 @@ from snowfall.vendor.ba_ndc import client, errors
 from snowfall.vendor.ba_ndc.adapters.offers_response_adapter import (
     OffersResponseAdapter,
 )
-from snowfall.vendor.ba_ndc.builders.offer_request import OffersRequestBuilder
+from snowfall.vendor.ba_ndc.builders import offer_request, order_request
 from snowfall.vendor.ba_ndc.models import (
     payer_details,
     request_add_seat_schemas,
@@ -113,6 +113,43 @@ async def test_passenger_name_correction(ba_ndc_client: client.BaNdcClient) -> N
     )
     assert order_rs is not None and order_rs.order is not None
     assert order_rs.passengers[0].first_name.lower() == new_passenger_first_name.lower()
+
+    await call_cancel_order(ba_ndc_client, order_rs.identifier)
+
+
+@disable_by_default
+async def test_update_order(ba_ndc_client: client.BaNdcClient) -> None:
+    order_rs = await generate_order(ba_ndc_client)
+    assert order_rs is not None
+    assert order_rs.order is not None
+
+    passenger = order_rs.passengers[0]
+    request = request_order_schemas.UpdateOrderRequest(
+        passengers=[
+            request_order_schemas.PassengerPartial(
+                identifier=passenger.identifier,
+                first_name=passenger.first_name,
+                last_name=passenger.last_name,
+                name_title=passenger.name_title,
+                identity_documents=[
+                    request_order_schemas.IdentityDocument(
+                        document_number="7534567891",
+                        document_type="PT",
+                        birth_date=passenger.birth_date
+                        or datetime.date.fromisoformat("1970-01-01"),
+                        nationality="GBR",
+                        issuing_country="GBR",
+                        expiration_date=datetime.date.fromisoformat("2027-07-08"),
+                    ),
+                ],
+            ),
+        ],
+        payment=None,
+    )
+
+    order_rs = await ba_ndc_client.update_order(order_rs.identifier, request)
+    assert order_rs is not None
+    assert order_rs.order is not None
 
     await call_cancel_order(ba_ndc_client, order_rs.identifier)
 
@@ -232,7 +269,7 @@ async def test_reshop(ba_ndc_client: client.BaNdcClient) -> None:
 async def call_get_offers(
     ba_ndc_client: client.BaNdcClient,
 ) -> OffersResponseAdapter:
-    offers_request_builder = OffersRequestBuilder()
+    offers_request_builder = offer_request.OffersRequestBuilder()
     offers_request_builder.add_passenger(passenger_enums.PassengerTypeEnum.adult)
     offers_request_builder.add_trip(
         request_offer_search_schemas.Trip(
@@ -256,37 +293,39 @@ async def generate_order(
     assert offer_search_rs is not None
     assert offer_search_rs.offer is not None
 
-    return await call_create_order(ba_ndc_client, offer_search_rs.offer.identifier)
-
-
-async def call_create_order(
-    ba_ndc_client: client.BaNdcClient,
-    offer_id: uuid.UUID,
-) -> response_order_schemas.OrderResponse:
-    order_rq = request_order_schemas.CreateOrderRequest(
-        offer_id=offer_id,
-        passengers=[
-            request_order_schemas.PassengerExtended(
-                identifier="PA0",
-                passenger_type=passenger_enums.PassengerTypeEnum.adult,
-                first_name="John",
-                last_name="Doe",
-                name_title="MR",
-                birth_date=datetime.date.fromisoformat("1970-01-01"),
-                gender=passenger_enums.GenderEnum.male,
-                contact=request_order_schemas.Contact(
-                    email="john.doe@snowfall.com",
-                    phone=payer_details.Phone(
-                        phone_type=passenger_enums.PhoneTypeEnum.mobile,
-                        number="15141234567",
-                    ),
+    order_request_builder = order_request.OrderRequestBuilder(
+        offer_search_rs.offer.identifier,
+    )
+    order_request_builder.add_passenger(
+        request_order_schemas.PassengerExtended(
+            identifier="PA0",
+            passenger_type=passenger_enums.PassengerTypeEnum.adult,
+            first_name="John",
+            last_name="Doe",
+            name_title="MR",
+            birth_date=datetime.date.fromisoformat("1970-01-01"),
+            gender=passenger_enums.GenderEnum.male,
+            contact=request_order_schemas.Contact(
+                email="john.doe@snowfall.com",
+                phone=payer_details.Phone(
+                    phone_type=passenger_enums.PhoneTypeEnum.mobile,
+                    number="15141234567",
                 ),
             ),
-        ],
-        payment=None,
+            identity_documents=[
+                request_order_schemas.IdentityDocument(
+                    document_number="7534567891",
+                    document_type="PT",
+                    birth_date=datetime.date.fromisoformat("1970-01-01"),
+                    nationality="GBR",
+                    issuing_country="GBR",
+                    expiration_date=datetime.date.fromisoformat("2027-07-08"),
+                ),
+            ],
+        ),
     )
 
-    return await ba_ndc_client.create_order(order_rq)
+    return await ba_ndc_client.create_order(order_request_builder.build())
 
 
 async def call_cancel_order(

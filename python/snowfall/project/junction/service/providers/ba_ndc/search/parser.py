@@ -4,7 +4,7 @@ from typing import List, Sequence
 from snowfall.project.junction.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
-from snowfall.project.junction.service.providers.ba_ndc import cache
+from snowfall.project.junction.service.providers.ba_ndc import cache, enums
 from snowfall.project.junction.service.providers.ba_ndc.v1alpha import amqp_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
@@ -16,26 +16,73 @@ from snowfall.vendor.ba_ndc.models import (
     response_common_offer_schemas,
     response_common_order_schemas,
     response_offer_search_schemas,
+    response_priced_offer_schemas,
 )
+from snowfall.vendor.ba_ndc.models.util import offer_enums
 
 
-def _parse_segment_details(
-    trips: Sequence[response_common_offer_schemas.Trip],
-    offer_segments: Sequence[offer_models_pb2.OfferSegment],
-) -> List[offer_models_pb2.OfferSegmentDetails]:
-    ba_ndc_segments = [
-        segment for offer_slice in trips for segment in offer_slice.segment_ids
+def _parse_cabin_class(
+    price_class: response_common_offer_schemas.PriceClass | None,
+) -> models_pb2.CabinClass:
+    if price_class:
+        return models_pb2.CabinClass(
+            type=enums.cabin_to_proto(price_class.cabin_type),
+            marketing_name=price_class.name,
+        )
+
+    return models_pb2.CabinClass(
+        type=enums.cabin_to_proto(None),
+    )
+
+
+def _parse_baggage_allowance(
+    bag_allowances: Sequence[response_priced_offer_schemas.BagAllowance],
+) -> List[offer_models_pb2.BaggageAllowance]:
+    return [
+        offer_models_pb2.BaggageAllowance(
+            free=free_checked_baggage(bag_allowances) > 0,
+        ),
     ]
 
+
+def free_checked_baggage(
+    bag_allowances: Sequence[response_priced_offer_schemas.BagAllowance],
+) -> int:
+    return sum(
+        piece_allowance.quantity
+        for bag_allowance in bag_allowances
+        for piece_allowance in bag_allowance.piece_allowance
+        if bag_allowance.category == offer_enums.BagCategoryEnum.checked
+    )
+
+
+def _parse_segment_details(  # noqa: WPS210
+    trips: Sequence[response_common_offer_schemas.Trip],
+    offer_segments: Sequence[offer_models_pb2.OfferSegment],
+    offers_adapter: OffersResponseAdapter,
+) -> List[offer_models_pb2.OfferSegmentDetails]:
     segment_details = []
 
-    for _ba_ndc_segment, offer_segment in zip(ba_ndc_segments, offer_segments):
-        segment_details.append(
-            offer_models_pb2.OfferSegmentDetails(
-                id=string.uuid(),
-                offer_segment_id=offer_segment.id,
-            ),
-        )
+    for trip in trips:
+        for _ba_ndc_segment, offer_segment in zip(trip.segment_ids, offer_segments):
+            bag_allowances: list[response_priced_offer_schemas.BagAllowance] = []
+
+            for bag_ref in trip.baggage_allowance_refs:
+                bag_allowance = offers_adapter.get_bag_allowance_by_id(bag_ref)
+
+                if bag_allowance:
+                    bag_allowances.append(bag_allowance)
+
+            segment_details.append(
+                offer_models_pb2.OfferSegmentDetails(
+                    id=string.uuid(),
+                    offer_segment_id=offer_segment.id,
+                    cabin_class=_parse_cabin_class(
+                        offers_adapter.get_price_class_by_id(trip.price_class_id),
+                    ),
+                    baggage_allowances=_parse_baggage_allowance(bag_allowances),
+                ),
+            )
     return segment_details
 
 
@@ -121,7 +168,7 @@ def to_offer_penalty(
 
 
 def _get_doc_required(offer_segments: Sequence[offer_models_pb2.OfferSegment]) -> bool:
-    return True  # TODO return this properly
+    return False  # TODO return this properly
 
 
 class OfferParser(object):
@@ -186,7 +233,7 @@ class OfferParser(object):
                 offer_models_pb2.Offer(
                     id=await self._offer_cache.store(
                         cache.OfferDetails(
-                            offer_id=str(offer.identifier),
+                            offer_id=offer.identifier,
                             price=cache.Price(
                                 amount=offer.price.total_amount,
                                 currency=offer.price.currency,
@@ -207,6 +254,7 @@ class OfferParser(object):
                     segment_details=_parse_segment_details(
                         offer.trips,
                         offer_segments,
+                        offers_adapter,
                     ),
                     price=amount.protobuf(),
                     brand_name=offers_adapter.get_brand_name(offer),

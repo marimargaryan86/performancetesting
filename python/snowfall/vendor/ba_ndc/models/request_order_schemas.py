@@ -14,6 +14,17 @@ from snowfall.vendor.ba_ndc.models.payment_type_schemas import (
 from snowfall.vendor.ba_ndc.models.util import passenger_enums
 
 
+class IdentityDocument(BaseSchema):
+    document_number: str = pydantic.Field(description="Document number")
+    document_type: str = pydantic.Field(description="Document type")
+    birth_date: datetime.date = pydantic.Field(description="Birth date")
+    nationality: str = pydantic.Field(description="Passenger nationality")
+    issuing_country: str = pydantic.Field(description="Document issuing country")
+    expiration_date: datetime.date = pydantic.Field(
+        description="Document expiration date",
+    )
+
+
 class Passenger(BaseSchema):
     """Passenger schema."""
 
@@ -34,6 +45,7 @@ class PassengerExtended(Passenger):
     """Passenger extended schema."""
 
     service_ids: list[uuid.UUID] = pydantic.Field(default_factory=list)
+    identity_documents: list[IdentityDocument] = pydantic.Field(default_factory=list)
 
 
 class PassengerPartial(BaseSchema):
@@ -46,6 +58,10 @@ class PassengerPartial(BaseSchema):
     service_ids: list[uuid.UUID] = pydantic.Field(
         default_factory=list,
         description="Identifiers of services this passenger has",
+    )
+    identity_documents: list[IdentityDocument] = pydantic.Field(
+        default_factory=list,
+        description="Identity documents list associated to this passenger",
     )
 
     # TODO: Extend

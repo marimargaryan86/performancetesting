@@ -2,18 +2,21 @@ import types
 
 from snowfall.project.junction.service.orders.v1alpha import models_pb2 as orders_models
 from snowfall.stdlib.v1alpha import models_pb2
+from snowfall.vendor.ba_ndc.models.util import offer_enums, passenger_enums
 
 _CABIN_MAPPING = types.MappingProxyType(
     {
-        "economy": models_pb2.CabinClass.TYPE_ECONOMY,
-        "premium_economy": models_pb2.CabinClass.TYPE_PREMIUM,
-        "business": models_pb2.CabinClass.TYPE_BUSINESS,
-        "first": models_pb2.CabinClass.TYPE_FIRST,
+        offer_enums.CabinTypeEnum.economy: models_pb2.CabinClass.TYPE_ECONOMY,
+        offer_enums.CabinTypeEnum.premium_economy: models_pb2.CabinClass.TYPE_PREMIUM,
+        offer_enums.CabinTypeEnum.business: models_pb2.CabinClass.TYPE_BUSINESS,
+        offer_enums.CabinTypeEnum.first: models_pb2.CabinClass.TYPE_FIRST,
     },
 )
 
 
-def cabin_to_proto(cabin: str | None) -> models_pb2.CabinClass.Type.ValueType:
+def cabin_to_proto(
+    cabin: offer_enums.CabinTypeEnum | None,
+) -> models_pb2.CabinClass.Type.ValueType:
     if cabin is None:
         return models_pb2.CabinClass.TYPE_UNSPECIFIED
 
@@ -23,10 +26,12 @@ def cabin_to_proto(cabin: str | None) -> models_pb2.CabinClass.Type.ValueType:
         return models_pb2.CabinClass.TYPE_UNSPECIFIED
 
 
-def gender_from_proto(gender: orders_models.Passenger.Gender.ValueType) -> str:
+def gender_from_proto(
+    gender: orders_models.Passenger.Gender.ValueType,
+) -> passenger_enums.GenderEnum:
     if gender == orders_models.Passenger.GENDER_MALE:
-        return "m"
+        return passenger_enums.GenderEnum.male
     elif gender == orders_models.Passenger.GENDER_FEMALE:
-        return "f"
+        return passenger_enums.GenderEnum.female
 
-    return "u"
+    return passenger_enums.GenderEnum.unspecified

@@ -16,6 +16,7 @@ from snowfall.stdlib import h3, segment_grouper
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2
 from snowfall.vendor.ask2go.models import common
+from snowfall.vendor.ba_ndc.models.util import passenger_enums
 
 _ADULT_YEARS = 12
 _CHILD_YEARS = 2
@@ -115,6 +116,21 @@ def get_passenger_type(
         return common.PassengerType.child
 
     return common.PassengerType.infant
+
+
+def get_passenger_type_enum(
+    date_of_birth: datetime.date,
+    date_of_travel: datetime.date,
+) -> passenger_enums.PassengerTypeEnum:
+    age = _get_age_at_date(date_of_birth, date_of_travel)
+
+    if age >= _ADULT_YEARS:
+        return passenger_enums.PassengerTypeEnum.adult
+
+    if age >= _CHILD_YEARS:
+        return passenger_enums.PassengerTypeEnum.child
+
+    return passenger_enums.PassengerTypeEnum.infant
 
 
 def _get_age_at_date(birth_date: datetime.date, travel_date: datetime.date) -> int:

@@ -8,6 +8,7 @@ from snowfall.vendor.ba_ndc.models import (
     response_common_offer_schemas,
     response_common_order_schemas,
     response_common_passenger_schemas,
+    response_priced_offer_schemas,
 )
 from snowfall.vendor.ba_ndc.models.base_schema import BaseSchema
 
@@ -56,4 +57,7 @@ class OfferSearchResponse(BaseSchema):
     )
     penalties: list[response_common_order_schemas.Penalty] = pydantic.Field(
         description="Penalty definitions",
+    )
+    bag_allowances: list[response_priced_offer_schemas.BagAllowance] = pydantic.Field(
+        description="Bag allowance definitions",
     )
