@@ -47,9 +47,9 @@ class OfferTransformer(object):  # noqa: WPS214
         option_id: str,
     ) -> offers_pb2.PriceQuote:
         expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
-        first_trip = price_result.itinerary.trips[0]
+
         passenger_applicable_dates = self._get_passenger_type_to_applicable_dates(
-            first_trip.segments[0],
+            price_result.itinerary.trips[0],
         )
 
         return offers_pb2.PriceQuote(
@@ -185,6 +185,11 @@ class OfferTransformer(object):  # noqa: WPS214
                 brand_name=offer.pricing_information.base.brand_name
                 if offer.pricing_information.base.brand_name
                 else "LOWEST FARE AVAILABLE",
+                features=[
+                    offers.BrandedPriceInformationfeature(
+                        baggage=offer.trips[0].baggage_allowance,
+                    ),
+                ],
             ),
         ]
         if offer.pricing_information.additional:
@@ -196,6 +201,9 @@ class OfferTransformer(object):  # noqa: WPS214
                 money.Currency(brand.currency),
             )
 
+            passenger_applicable_dates = self._get_passenger_type_to_applicable_dates(
+                offer.trips[0],
+            )
             group_offers.append(
                 offers_pb2.Offer(
                     id=await self._offer_cache.store(
@@ -210,6 +218,17 @@ class OfferTransformer(object):  # noqa: WPS214
                         grouped_trips_segments,
                         offer.trips,
                     ),
+                    baggage_allowances=[
+                        offers_pb2.BaggageAllowance(
+                            free=baggage.has_free_baggage,
+                            applicable_to=passenger_applicable_dates[
+                                baggage.passenger_type
+                            ],
+                        )
+                        for baggage in brand.features[0].baggage
+                    ]
+                    if brand.features and brand.features[0].baggage
+                    else [],
                     price=amount.protobuf(),
                     brand_name=str(brand.brand_name),
                 ),
@@ -237,7 +256,7 @@ class OfferTransformer(object):  # noqa: WPS214
                 trip_segment.segment_index,
             )
             passenger_applicable_dates = self._get_passenger_type_to_applicable_dates(
-                trip_segment,
+                trips[0],
             )
             segment_details.append(
                 offers_pb2.OfferSegmentDetails(
@@ -385,10 +404,9 @@ class OfferTransformer(object):  # noqa: WPS214
 
     def _get_passenger_type_to_applicable_dates(
         self,
-        first_segment: offers.TripSegment,
+        first_trip: offers.Trip,
     ) -> Mapping[str, offers_pb2.ApplicableTo]:
-        departure_date = first_segment.departure.date_time.date()
-
+        departure_date = first_trip.departure.date_time.date()
         return {
             "ADT": offers_pb2.ApplicableTo(
                 date_of_birth_before=protobuf.date_to_protobuf(

@@ -36,10 +36,7 @@ async def test_adapter(
         "Economy Light",
         "Economy Essential",
     ]
-    assert [
-        [segment.baggage_allowances[0].free for segment in offer.segment_details]
-        for offer in offers
-    ] == [[True, True], [True, True]]
+    assert [offer.baggage_allowances[0].free for offer in offers] == [True, True]
 
 
 async def test_offer_with_stop(

@@ -115,6 +115,10 @@ class PricingInformationBase(CamelCaseBaseModel):
     brand_name: Optional[str]
 
 
+class BrandedPriceInformationfeature(CamelCaseBaseModel):
+    baggage: Optional[list[TripBaggageAllowance]]
+
+
 class BrandedPriceInformation(CamelCaseBaseModel):
     base_fare: str
     total_tax: str
@@ -126,6 +130,7 @@ class BrandedPriceInformation(CamelCaseBaseModel):
     brand_id: Optional[str]
     fare_basis: Optional[list[str]]
     is_refundable: bool = False
+    features: Optional[list[BrandedPriceInformationfeature]]
 
 
 class PricingInformation(CamelCaseBaseModel):

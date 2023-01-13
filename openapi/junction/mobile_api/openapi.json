@@ -5638,7 +5638,8 @@
                 "type": "object",
                 "required": [
                   "price",
-                  "brandName"
+                  "brandName",
+                  "baggageAllowances"
                 ],
                 "properties": {
                   "price": {
@@ -5647,6 +5648,13 @@
                   "brandName": {
                     "type": "string",
                     "example": "economy"
+                  },
+                  "baggageAllowances": {
+                    "type": "array",
+                    "minItems": 0,
+                    "items": {
+                      "$ref": "#/components/schemas/TripOfferOptionPenaltyBaggageAllowance"
+                    }
                   }
                 }
               },
@@ -5722,6 +5730,7 @@
                     "example": "Economy"
                   },
                   "baggageAllowances": {
+                    "deprecated": true,
                     "type": "array",
                     "minItems": 0,
                     "items": {

@@ -286,6 +286,10 @@ class OfferOptionResource(models.Resource):
             attributes={
                 "price": Price.from_proto(option.price),
                 "brandName": option.brand_name,
+                "baggageAllowances": [
+                    BaggageAllowance.from_proto(baggage)
+                    for baggage in option.baggage_allowances
+                ],
             },
             relationships={
                 "details": {

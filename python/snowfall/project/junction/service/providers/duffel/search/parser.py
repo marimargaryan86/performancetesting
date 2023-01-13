@@ -156,6 +156,9 @@ class OfferParser(object):  # noqa: WPS214
                     ),
                     price=amount.protobuf(),
                     brand_name=offer.slices[0].fare_brand_name or "",
+                    baggage_allowances=self._parse_baggage_allowance(
+                        offer.slices[0].segments[0],
+                    ),
                 ),
             )
 

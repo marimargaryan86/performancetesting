@@ -87,6 +87,7 @@ message Offer {
   repeated OfferSegmentDetails segment_details = 2;
   snowfall.stdlib.v1alpha.Money price = 3;
   string brand_name = 4;
+  repeated BaggageAllowance baggage_allowances = 5;
   // isRefundable
 }
 
