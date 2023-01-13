@@ -344,6 +344,62 @@
                   "type": "object",
                   "properties": {
                     "data": {
+                      "$ref": "#/components/schemas/CompanyCreatable"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/CompanyCreatable"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/companies/{companyId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/companyId"
+        }
+      ],
+      "patch": {
+        "summary": "Update Company",
+        "description": "Update company for resellers and providers",
+        "tags": [
+          "companies"
+        ],
+        "operationId": "patch-companies-id",
+        "responses": {
+          "200": {
+            "description": "Company is updated",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
                       "$ref": "#/components/schemas/Company"
                     }
                   },
@@ -356,6 +412,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "requestBody": {
@@ -700,6 +759,17 @@
           "example": "USD"
         },
         "description": "Currency id"
+      },
+      "companyId": {
+        "name": "companyId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
+        },
+        "description": "Company id"
       }
     },
     "schemas": {
@@ -1220,12 +1290,48 @@
         ],
         "description": "Account transactions."
       },
+      "AddressDetails": {
+        "title": "Address Details",
+        "type": "object",
+        "properties": {
+          "addressLines": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "Street name 7"
+            },
+            "example": [
+              "Street name 7"
+            ]
+          },
+          "countryCode": {
+            "type": "string",
+            "format": "country",
+            "example": "GB"
+          },
+          "postalCode": {
+            "type": "string",
+            "example": "12345"
+          },
+          "city": {
+            "type": "string",
+            "example": "London"
+          }
+        }
+      },
       "Company": {
-        "title": "Company",
+        "title": "Company Details",
+        "type": "object",
         "required": [
           "attributes"
         ],
         "properties": {
+          "id": {
+            "type": "string",
+            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+            "format": "uuid",
+            "readOnly": true
+          },
           "type": {
             "type": "string",
             "enum": [
@@ -1233,51 +1339,14 @@
             ],
             "example": "companies"
           },
-          "id": {
-            "type": "string",
-            "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
-            "format": "uuid",
-            "readOnly": true
-          },
           "attributes": {
-            "required": [
-              "name",
-              "address",
-              "bufferRate",
-              "salesRate"
-            ],
             "properties": {
               "name": {
                 "type": "string",
                 "example": "Company"
               },
               "address": {
-                "type": "object",
-                "properties": {
-                  "addressLines": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "example": "Street name 7"
-                    },
-                    "example": [
-                      "Street name 7"
-                    ]
-                  },
-                  "countryCode": {
-                    "type": "string",
-                    "format": "country",
-                    "example": "GB"
-                  },
-                  "postalCode": {
-                    "type": "string",
-                    "example": "12345"
-                  },
-                  "city": {
-                    "type": "string",
-                    "example": "London"
-                  }
-                }
+                "$ref": "#/components/schemas/AddressDetails"
               },
               "bufferRate": {
                 "type": "number",
@@ -1292,6 +1361,27 @@
             }
           }
         }
+      },
+      "CompanyCreatable": {
+        "title": "Company (Creatable)",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Company"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "attributes": {
+                "required": [
+                  "name",
+                  "address",
+                  "bufferRate",
+                  "salesRate"
+                ]
+              }
+            }
+          }
+        ]
       },
       "BalanceIdentifier": {
         "title": "Balance Identifier",
@@ -1320,7 +1410,8 @@
         "properties": {
           "id": {
             "type": "string",
-            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5"
+            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+            "format": "uuid"
           },
           "type": {
             "type": "string",
