@@ -3,6 +3,7 @@ from typing import AsyncIterator, Callable, List, Mapping
 
 import structlog
 
+from snowfall.project.junction.provider import airports
 from snowfall.project.junction.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
@@ -140,10 +141,14 @@ class BaNdcSearchAdapter(object):
     def __init__(
         self,
         ba_ndc_client: client.BaNdcClient,
+        airport_repository: airports.AirportRepository,
         offers_cache: cache.OfferCache,
     ) -> None:
         self._client = ba_ndc_client
-        self._offer_parser = parser.OfferParser(offer_cache=offers_cache)
+        self._offer_parser = parser.OfferParser(
+            offer_cache=offers_cache,
+            airport_repository=airport_repository,
+        )
         self._logger = structlog.get_logger(__name__)
 
     async def gather_search_results(

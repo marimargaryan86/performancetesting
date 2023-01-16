@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import datetime
 import uuid
-from typing import Any
+from typing import Any, cast
 
 import httpx
 import pytest
 from bson import json_util
 from redis import asyncio as aioredis
 
+from snowfall.project.junction.provider import airports
 from snowfall.project.junction.service.providers.ba_ndc import cache
 from snowfall.project.junction.service.providers.ba_ndc.search import adapter
 from snowfall.project.junction.service.providers.ba_ndc.v1alpha import amqp_pb2
@@ -40,12 +41,23 @@ def ba_ndc_client(http_client: httpx.AsyncClient) -> client.BaNdcClient:
 
 
 @pytest.fixture
+async def airport_repository() -> airports.AirportRepository:
+    loader = filesystem.PkgLoader(__name__)
+
+    return airports.AirportRepository(
+        cast(list[dict[str, Any]], loader.load("airports.json")),
+    )
+
+
+@pytest.fixture
 def search_adapter(
     ba_ndc_client: client.BaNdcClient,
+    airport_repository: airports.AirportRepository,
     redis_client: aioredis.Redis[bytes],
 ) -> adapter.BaNdcSearchAdapter:
     return adapter.BaNdcSearchAdapter(
         ba_ndc_client=ba_ndc_client,
+        airport_repository=airport_repository,
         offers_cache=cache.OfferCache(
             client=redis.Client(redis_client),
         ),

@@ -8,6 +8,7 @@ from snowfall.stdlib import h3
 @dataclasses.dataclass(frozen=True)
 class Airport(h3.CoordinatesItem):
     airport_name: Optional[str]
+    iata_country_code: str
 
 
 class AirportRepository(object):
@@ -37,4 +38,5 @@ def _make_airport(
         timezone=zoneinfo.ZoneInfo(airport["time_zone"]),
         latitude=airport["latitude"],
         longitude=airport["longitude"],
+        iata_country_code=airport["iata_country_code"],
     )

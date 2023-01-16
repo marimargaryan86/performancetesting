@@ -1,23 +1,30 @@
 import contextlib
 import random
+from typing import Any, cast
 
 import httpx
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import offers
-from snowfall.project.junction.service.providers.ba_ndc import cache
-from snowfall.project.junction.service.providers.ba_ndc.config import SearchesSettings
-from snowfall.project.junction.service.providers.ba_ndc.search import adapter
-from snowfall.project.junction.service.providers.ba_ndc.v1alpha import amqp_pb2
+from snowfall.project.junction.provider import airports, offers
+from snowfall.project.junction.service.providers.ba_ndc import cache, config
+from snowfall.project.junction.service.providers.ba_ndc.search.adapter import (
+    BaNdcSearchAdapter,
+    offer_group_cache_key,
+)
+from snowfall.project.junction.service.providers.ba_ndc.v1alpha.amqp_pb2 import (
+    SearchCriteriaTask,
+)
 from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation import httpx_metrics
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
-from snowfall.stdlib.transport.amqp import producer, trackable, types
+from snowfall.stdlib.transport.amqp import consumer, producer, trackable, types
 from snowfall.vendor.ba_ndc import client
 
 
-async def searches(app: service.Application[SearchesSettings]) -> None:  # noqa: WPS210
+async def searches(  # noqa: WPS210
+    app: service.Application[config.SearchesSettings],
+) -> None:
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
             httpx_metrics.with_metrics(
@@ -41,9 +48,16 @@ async def searches(app: service.Application[SearchesSettings]) -> None:  # noqa:
             api_key=app.settings.api_key,
             http_client=http_client,
         )
-
-        search_consumer = offers.SearchCriteriaConsumer[amqp_pb2.SearchCriteriaTask](
-            consumer=amqp_consumer.Consumer(
+        airport_repository = airports.AirportRepository(
+            airports_data=cast(
+                list[dict[str, Any]],
+                filesystem.PkgLoader(
+                    "snowfall.project.junction.service.providers.ba_ndc.main",
+                ).load("airports.json"),
+            ),
+        )
+        search_consumer = offers.SearchCriteriaConsumer[SearchCriteriaTask](
+            consumer=consumer.Consumer(
                 connection=amqp_connection,
                 queue_name="{0}_searches".format(app.name),
                 binds=[(types.Exchange("ba_ndc"), "offers.search.trip")],
@@ -66,9 +80,10 @@ async def searches(app: service.Application[SearchesSettings]) -> None:  # noqa:
                 redis=redis_connection,
                 prefix=app.name,
             ),
-            offer_group_cache_key_func=adapter.offer_group_cache_key,
-            offer_group_generator=adapter.BaNdcSearchAdapter(
+            offer_group_cache_key_func=offer_group_cache_key,
+            offer_group_generator=BaNdcSearchAdapter(
                 ba_ndc_client=ba_ndc_client,
+                airport_repository=airport_repository,
                 offers_cache=cache.OfferCache(
                     client=redis.Client[bytes](redis_connection, prefix=app.name),
                 ),

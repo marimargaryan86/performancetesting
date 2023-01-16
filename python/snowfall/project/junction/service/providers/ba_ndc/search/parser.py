@@ -1,6 +1,7 @@
 import itertools
 from typing import List, Sequence
 
+from snowfall.project.junction.provider import airports
 from snowfall.project.junction.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
@@ -167,16 +168,14 @@ def to_offer_penalty(
     )
 
 
-def _get_doc_required(offer_segments: Sequence[offer_models_pb2.OfferSegment]) -> bool:
-    return False  # TODO return this properly
-
-
 class OfferParser(object):
     def __init__(
         self,
         offer_cache: cache.OfferCache,
+        airport_repository: airports.AirportRepository,
     ) -> None:
         self._offer_cache = offer_cache
+        self._airport_repository = airport_repository
 
     async def parse_offer_group(
         self,
@@ -216,6 +215,31 @@ class OfferParser(object):
             segments=offer_segm,
         )
 
+    def check_if_domestic_flight(
+        self,
+        trips: Sequence[response_common_offer_schemas.Trip],
+        offers_adapter: OffersResponseAdapter,
+    ) -> bool:
+        iata_code_set = set()
+
+        for trip in trips:
+            for segment_id in trip.segment_ids:
+                segment = offers_adapter.get_segment_by_id(segment_id)
+
+                if segment:
+                    iata_code_set.add(segment.origin.code)
+                    iata_code_set.add(segment.destination.code)
+
+        return (
+            len(
+                {
+                    self._airport_repository.get_by_iata(iata).iata_country_code
+                    for iata in iata_code_set
+                },
+            )
+            <= 1
+        )
+
     async def _get_group_offers(
         self,
         offers: Sequence[response_offer_search_schemas.Offer],
@@ -247,7 +271,10 @@ class OfferParser(object):
                             ],
                             expires_at=offers_adapter.get_expires_at(),
                             penalties=get_penalties(offer.trips, offers_adapter),
-                            doc_required=_get_doc_required(offer_segments),
+                            doc_required=not self.check_if_domestic_flight(
+                                offer.trips,
+                                offers_adapter,
+                            ),
                         ),
                         expires_at=offers_adapter.get_expires_at(),
                     ),
