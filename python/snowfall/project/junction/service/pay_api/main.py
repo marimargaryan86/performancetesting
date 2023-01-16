@@ -13,6 +13,7 @@ from snowfall.project.junction.service.currencies.v1alpha import currencies_pb2_
 from snowfall.project.junction.service.pay_api import authenticator, bootstrap
 from snowfall.project.junction.service.pay_api.repositories import CompanyRepository
 from snowfall.project.junction.service.pay_api.routes import router
+from snowfall.project.pay.service.quotations.quotations import QuotationsRepository
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import filesystem
@@ -25,6 +26,9 @@ def _factory(
     app: service.Application[bootstrap.Settings],
 ) -> Callable[[], applications.Starlette]:
     def decorator() -> applications.Starlette:
+        mongo = motor_asyncio.AsyncIOMotorClient(
+            random.choice(app.settings.mongo_dsn),  # nosec
+        )
         orders_channel = create_channel(
             random.choice(app.settings.currencies_address),  # nosec
         )
@@ -36,9 +40,7 @@ def _factory(
             app.settings.cc_api_key,
             app.settings.cc_env,
         )
-        mongo = motor_asyncio.AsyncIOMotorClient(
-            app.settings.mongo_dsn,
-        )
+        quotations_repo = QuotationsRepository(mongo.quotations.quotations)
         asgi_app = application.create_starlette_app(
             custom_middlewares=[
                 Middleware(
@@ -62,6 +64,7 @@ def _factory(
                             authentication_channel,
                         ),
                     ),
+                    quotations_repository=quotations_repo,
                     companies_repository=CompanyRepository(
                         mongo.companies.companies,
                     ),

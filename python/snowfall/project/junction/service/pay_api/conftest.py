@@ -4,6 +4,7 @@ from typing import AsyncIterator, Mapping, Optional, Sequence
 import currencycloud
 import httpx
 import pytest
+from motor import motor_asyncio
 from starlette import applications
 from starlette.middleware import Middleware
 
@@ -12,6 +13,7 @@ from snowfall.project.junction.adapter import currencies, errors
 from snowfall.project.junction.service.pay_api import bootstrap
 from snowfall.project.junction.service.pay_api.repositories import CompanyRepository
 from snowfall.project.junction.service.pay_api.routes import router
+from snowfall.project.pay.service.quotations import quotations
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import filesystem
 
@@ -20,6 +22,7 @@ def _create_app(  # noqa: WPS211
     cc_client: currencycloud.Client,
     currencies_client: currencies.Client,
     authentication_client: authentication.Client,
+    quotations_repository: quotations.QuotationsRepository,
     companies_repository: CompanyRepository,
     openapi_path: pathlib.Path,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
@@ -32,6 +35,7 @@ def _create_app(  # noqa: WPS211
                 cc_client,
                 currencies_client,
                 authentication_client,
+                quotations_repository,
                 companies_repository,
             ),
         ),
@@ -58,6 +62,15 @@ def cc_env() -> str:
 
 
 @pytest.fixture()
+def quotations_repository(
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
+) -> quotations.QuotationsRepository:
+    return quotations.QuotationsRepository(
+        collection=mongo_client.test.quotations,
+    )
+
+
+@pytest.fixture()
 def cc_client(cc_login: str, cc_api_key: str, cc_env: str) -> currencycloud.Client:
     return currencycloud.Client(
         cc_login,
@@ -78,12 +91,14 @@ def app(
     cc_client: currencycloud.Client,
     currencies_client: currencies.Client,
     authentication_client: authentication.Client,
+    quotations_repository: quotations.QuotationsRepository,
     companies_repository: CompanyRepository,
 ) -> applications.Starlette:
     return _create_app(
         cc_client=cc_client,
         currencies_client=currencies_client,
         authentication_client=authentication_client,
+        quotations_repository=quotations_repository,
         companies_repository=companies_repository,
         openapi_path=filesystem.resource_path("junction.pay_api", "openapi.json"),
     )

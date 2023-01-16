@@ -2,8 +2,56 @@ from __future__ import annotations
 
 from typing import ClassVar
 
+from starlette import requests
+
 from snowfall.project.pay.service.companies.v1alpha import models_pb2
+from snowfall.project.pay.service.quotations.v1alpha import (
+    models_pb2 as quotation_models,
+)
+from snowfall.stdlib import money
 from snowfall.stdlib.integration.starlette import models
+
+
+class QuoteResource(models.Resource):
+    api_type: ClassVar[str] = "quotes"
+
+    @classmethod
+    def from_proto(
+        cls,
+        quotation: quotation_models.Quotation,
+        request: requests.Request,
+    ) -> QuoteResource:
+        return cls(
+            id=quotation.id,
+            type=QuoteResource.api_type,
+            attributes={"amount": money.from_protobuf(quotation.offer_amount).amount},
+            relationships={
+                "fromCurrency": {
+                    "data": {
+                        "id": quotation.beneficiary_amount.currency_code,
+                        "type": "currencies",
+                    },
+                },
+                "toCurrency": {
+                    "data": {
+                        "id": quotation.offer_amount.currency_code,
+                        "type": "currencies",
+                    },
+                },
+                "payer": {
+                    "data": {
+                        "id": quotation.payer_id,
+                        "type": "companies",
+                    },
+                },
+                "beneficiary": {
+                    "data": {
+                        "id": quotation.beneficiary_id,
+                        "type": "companies",
+                    },
+                },
+            },
+        )
 
 
 class Company(models.Resource):

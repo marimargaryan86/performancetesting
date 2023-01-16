@@ -997,7 +997,6 @@
                 ]
               },
               "attributes": {
-                "readOnly": true,
                 "type": "object",
                 "properties": {
                   "amount": {
@@ -1006,8 +1005,7 @@
                   }
                 },
                 "required": [
-                  "amount",
-                  "referenceId"
+                  "amount"
                 ]
               },
               "relationships": {

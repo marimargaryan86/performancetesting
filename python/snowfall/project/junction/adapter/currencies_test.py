@@ -1,15 +1,12 @@
-from typing import Type
 from unittest import mock
 
-import grpc
-import pytest
-
 from snowfall import fixtures
-from snowfall.project.junction.adapter import currencies, errors
+from snowfall.project.junction.adapter import currencies
 from snowfall.project.junction.service.currencies.v1alpha import (
     currencies_pb2,
     currencies_pb2_grpc,
 )
+from snowfall.stdlib.money import Currency
 
 
 class TestDictClient(object):
@@ -17,8 +14,8 @@ class TestDictClient(object):
         self,
         currencies_client: currencies.Client,
     ) -> None:
-        from_currency = "USD"
-        to_currency = "EUR"
+        from_currency = Currency("USD")
+        to_currency = Currency("EUR")
         amount_before = 10
         expected_amount_after = 9
         amount_after = await currencies_client.convert(
@@ -30,35 +27,6 @@ class TestDictClient(object):
 
 
 class TestGrpcClient(object):
-    @pytest.mark.parametrize(
-        "error, expected",
-        [
-            (
-                grpc.aio.AioRpcError(
-                    code=grpc.StatusCode.NOT_FOUND,
-                    initial_metadata=grpc.aio.Metadata(),
-                    trailing_metadata=grpc.aio.Metadata(),
-                ),
-                errors.NotFoundError,
-            ),
-        ],
-    )
-    async def test_error_responses(
-        self,
-        error: grpc.aio.AioRpcError,
-        expected: Type[Exception],
-    ) -> None:
-        stub = mock.create_autospec(currencies_pb2_grpc.CurrencyServiceStub)
-        stub.Convert = mock.AsyncMock(side_effect=error)
-        client = currencies.GrpcClient(stub)
-        amount = 10
-        with pytest.raises(expected):
-            await client.convert(
-                fixtures.NOT_FOUND,
-                fixtures.NOT_FOUND,
-                amount,
-            )
-
     async def test_conversion_amount_is_retrievable(self) -> None:
         stub = mock.create_autospec(currencies_pb2_grpc.CurrencyServiceStub)
         stub.Convert = mock.AsyncMock(

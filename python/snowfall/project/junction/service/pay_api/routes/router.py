@@ -7,6 +7,7 @@ from snowfall.project.junction.service.pay_api.routes import (
     balances,
     companies,
     currencies,
+    quotations,
     rates,
     transactions,
 )
@@ -53,6 +54,11 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             "/rates",
             rates.Rates,
             name="Rate",
+        ),
+        integration.route(
+            "/quotes",
+            quotations.Quotations,
+            name="Quotation",
         ),
         integration.route(
             "/companies",

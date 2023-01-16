@@ -8,14 +8,15 @@ from snowfall.project.junction.service.currencies.v1alpha import (
     currencies_pb2,
     currencies_pb2_grpc,
 )
+from snowfall.stdlib.money import Currency
 
 
 class Client(abc.ABC):
     @abc.abstractmethod
     async def convert(
         self,
-        from_currency: str,
-        to_currency: str,
+        from_currency: Currency,
+        to_currency: Currency,
         amount: int,
     ) -> int:
         """Convert amount from one currency to another."""
@@ -23,8 +24,8 @@ class Client(abc.ABC):
     @abc.abstractmethod
     async def get_rate(
         self,
-        from_currency: str,
-        to_currency: str,
+        from_currency: Currency,
+        to_currency: Currency,
         amount: int,
     ) -> float:
         """Get rate for conversion."""
@@ -36,11 +37,11 @@ class DictClient(Client):
 
     async def convert(
         self,
-        from_currency: str,
-        to_currency: str,
+        from_currency: Currency,
+        to_currency: Currency,
         amount: int,
     ) -> int:
-        rate = self._currencies.get((from_currency, to_currency))
+        rate = self._currencies.get((from_currency.code, to_currency.code))
         if rate is None:
             raise errors.NotFoundError()
 
@@ -48,11 +49,11 @@ class DictClient(Client):
 
     async def get_rate(
         self,
-        from_currency: str,
-        to_currency: str,
+        from_currency: Currency,
+        to_currency: Currency,
         amount: int,
     ) -> float:
-        rate = self._currencies.get((from_currency, to_currency))
+        rate = self._currencies.get((from_currency.code, to_currency.code))
         if rate is None:
             raise errors.NotFoundError()
 
@@ -70,15 +71,15 @@ class GrpcClient(Client):
 
     async def convert(
         self,
-        from_currency: str,
-        to_currency: str,
+        from_currency: Currency,
+        to_currency: Currency,
         amount: int,
     ) -> int:
         response = await errors.handle_grpc_errors(
             self._currencies.Convert(
                 currencies_pb2.ConvertRequest(
-                    to_currency=to_currency,
-                    from_currency=from_currency,
+                    to_currency=to_currency.code,
+                    from_currency=from_currency.code,
                     amount=amount,
                 ),
                 timeout=self._timeout,
@@ -89,15 +90,15 @@ class GrpcClient(Client):
 
     async def get_rate(
         self,
-        from_currency: str,
-        to_currency: str,
+        from_currency: Currency,
+        to_currency: Currency,
         amount: int,
     ) -> float:
         response = await errors.handle_grpc_errors(
             self._currencies.Convert(
                 currencies_pb2.ConvertRequest(
-                    to_currency=to_currency,
-                    from_currency=from_currency,
+                    to_currency=to_currency.code,
+                    from_currency=from_currency.code,
                     amount=amount,
                 ),
                 timeout=self._timeout,

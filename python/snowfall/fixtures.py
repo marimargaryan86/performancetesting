@@ -27,6 +27,7 @@ LATITUDE_RANGE = (-90, 90)
 LONGITUDE_RANGE = (-180, 180)
 
 NOT_FOUND = "00000000-0000-0000-0000-000000000000"
+
 LOCATIONS = (
     "e719b289-982c-42f0-99a2-63fa70f8f8c0",
     "c36649e6-71f1-4dfa-aa5a-01c0ede6e538",
@@ -106,7 +107,7 @@ CURRENCIES_CONVERSIONS = types.MappingProxyType(
         ("EUR", "USD"): 1.05,
     },
 )
-CURRENCIES = ("USD", "EUR")
+CURRENCIES = (money.Currency("USD"), money.Currency("EUR"))
 
 H3_LOCATIONS = [
     h3.CoordinatesItem(
