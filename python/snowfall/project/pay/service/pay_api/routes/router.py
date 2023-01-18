@@ -65,4 +65,10 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             companies.StoreCompany,
             name="Company",
         ),
+        integration.route(
+            "/companies/{companyId}",
+            companies.StoreCompany,
+            name="Company",
+            methods=["PATCH"],
+        ),
     ]
