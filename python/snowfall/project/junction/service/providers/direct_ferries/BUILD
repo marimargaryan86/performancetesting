@@ -1,0 +1,24 @@
+python_sources(dependencies=[":routes", ":ports"])
+resource(
+    name="routes",
+    source=http_source(
+        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/df-routes-7e6a7901292ce33ac04608199c22b59201c70211d0d8ca79d3a116d73217accb.json",
+        len=316750,
+        sha256="7e6a7901292ce33ac04608199c22b59201c70211d0d8ca79d3a116d73217accb",
+        filename="routes.json",
+    ),
+)
+resource(
+    name="ports",
+    source=http_source(
+        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/df-ports-3908230be39c7d907203859b41ef40516509951bb3fb28d24fbcc82bf45adbcc.json",
+        len=95804,
+        sha256="3908230be39c7d907203859b41ef40516509951bb3fb28d24fbcc82bf45adbcc",
+        filename="ports.json",
+    ),
+)
+python_image(
+    namespace="python.snowfall.project.junction.service.providers.direct_ferries",
+    name="main",
+    entry_point="main.py",
+)

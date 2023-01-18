@@ -1,6 +1,8 @@
 import json
 from typing import Sequence
 
+import httpx
+
 from snowfall.vendor.direct_ferries.clients import base
 from snowfall.vendor.direct_ferries.models import common, quote
 from snowfall.vendor.direct_ferries.models import request as request_models
@@ -17,6 +19,8 @@ class QuoteClient(base.BaseClient):
         self,
         request: request_models.QuoteRequest,
     ) -> Sequence[quote.Quote]:
+        request.quote.partner_code = self._config.partner_code
+
         response_data = (
             await self._make_request(
                 request_details=base.RequestDetails(
@@ -26,6 +30,7 @@ class QuoteClient(base.BaseClient):
                         self._config.api_version,
                     ),
                     payload=request.json(by_alias=True),
+                    query_params=httpx.QueryParams(self._request_params),
                 ),
             )
         ).json()
@@ -39,6 +44,8 @@ class QuoteClient(base.BaseClient):
         self,
         request: request_models.QuoteRequest,
     ) -> quote.AccommodationResponse:
+        request.quote.partner_code = self._config.partner_code
+
         response_data = (
             await self._make_request(
                 request_details=base.RequestDetails(
@@ -48,6 +55,7 @@ class QuoteClient(base.BaseClient):
                         self._config.api_version,
                     ),
                     payload=request.json(by_alias=True),
+                    query_params=httpx.QueryParams(self._request_params),
                 ),
             )
         ).json()
@@ -58,6 +66,8 @@ class QuoteClient(base.BaseClient):
         self,
         request: request_models.QuoteRequest,
     ) -> ticket.TicketTypesResponse:
+        request.quote.partner_code = self._config.partner_code
+
         response_data = (
             await self._make_request(
                 request_details=base.RequestDetails(
@@ -67,6 +77,7 @@ class QuoteClient(base.BaseClient):
                         self._config.api_version,
                     ),
                     payload=request.json(by_alias=True),
+                    query_params=httpx.QueryParams(self._request_params),
                 ),
             )
         ).json()
@@ -77,6 +88,8 @@ class QuoteClient(base.BaseClient):
         self,
         request: request_models.QuoteRequest,
     ) -> quote.Quote:
+        request.quote.partner_code = self._config.partner_code
+
         response_data = (
             await self._make_request(
                 request_details=base.RequestDetails(
@@ -86,6 +99,7 @@ class QuoteClient(base.BaseClient):
                         self._config.api_version,
                     ),
                     payload=request.json(by_alias=True),
+                    query_params=httpx.QueryParams(self._request_params),
                 ),
             )
         ).json()
@@ -96,6 +110,8 @@ class QuoteClient(base.BaseClient):
         self,
         request: request_models.QuoteRequest,
     ) -> common.Booking:
+        request.quote.partner_code = self._config.partner_code
+
         response_data = (
             await self._make_request(
                 request_details=base.RequestDetails(
@@ -105,6 +121,7 @@ class QuoteClient(base.BaseClient):
                     ),
                     method=_POST_METHOD,
                     payload=request.json(by_alias=True),
+                    query_params=httpx.QueryParams(self._request_params),
                 ),
             )
         ).json()
@@ -130,6 +147,7 @@ class QuoteClient(base.BaseClient):
                             "bookingToken": booking_token,
                         },
                     ),
+                    query_params=httpx.QueryParams(self._request_params),
                 ),
             )
         ).json()

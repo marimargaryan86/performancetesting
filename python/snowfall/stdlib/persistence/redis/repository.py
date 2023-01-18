@@ -32,7 +32,7 @@ class PydanticRepository(Generic[Record]):
         """Store a redis record into the cache and returns a key to access it."""
         key = string.uuid()
 
-        await self._redis.put(key, record.json())
+        await self._redis.put(key, record.json(by_alias=True))
 
         if expires_at is not None:
             await self._redis.put_expires_at(key, expires_at)

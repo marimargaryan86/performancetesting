@@ -1,0 +1,82 @@
+import datetime
+
+import phonenumbers
+
+from snowfall.project.junction.service.orders.v1alpha import amqp_pb2 as order_amqp_pb2
+from snowfall.project.junction.service.orders.v1alpha import (
+    models_pb2 as order_models_pb2,
+)
+from snowfall.project.junction.service.providers.direct_ferries import cache
+from snowfall.stdlib import money
+from snowfall.stdlib.format import protobuf
+from snowfall.vendor.direct_ferries import client
+from snowfall.vendor.direct_ferries.models import quote
+
+
+class PassengerCountNotMatchingError(Exception):
+    """Raised when the number of passengers changed during the booking."""
+
+
+class BookingHandler(object):
+    def __init__(self, df_client: client.DfHttpClient) -> None:
+        self._client = df_client
+
+    async def create_booking(
+        self,
+        task: order_amqp_pb2.PlaceOrderTask,
+        offer_details: cache.OfferDetails,
+    ) -> order_models_pb2.Booking:
+        new_booking = task.booking
+
+        booking_response = await self._client.create_booking(
+            _fill_pax_details(offer_details.quote, task),
+        )
+
+        new_booking.MergeFrom(
+            order_models_pb2.Booking(
+                status=order_models_pb2.Booking.STATUS_CONFIRMED,
+                total_price=money.from_string(
+                    string_amount=str(
+                        booking_response.booking.price.total_in_selected_currency,
+                    ),
+                    currency=money.Currency(booking_response.booking.selected_currency),
+                ).protobuf(),
+                trip_result=order_models_pb2.TripBooking(
+                    provider_booking_reference=str(booking_response.booking.identifier),
+                    record_locator=booking_response.booking.booking_reference,
+                    created_at=protobuf.datetime_to_protobuf(
+                        booking_response.booking.created_date_time.replace(
+                            tzinfo=datetime.timezone.utc,
+                        ),
+                    ),
+                ),
+                raw_data="{{confirmBooking: {0}}}".format(booking_response.json()),
+            ),
+        )
+
+        return new_booking
+
+
+def _fill_pax_details(
+    quote_obj: quote.Quote,
+    task: order_amqp_pb2.PlaceOrderTask,
+) -> quote.Quote:
+    number = phonenumbers.parse(task.contact_details.phone.e164_number)
+
+    for leg_obj in quote_obj.legs:
+        if len(leg_obj.passengers) != len(task.passengers):
+            raise PassengerCountNotMatchingError
+
+        pax_pairs = zip(leg_obj.passengers, task.passengers)
+
+        for quote_passenger, order_passenger in pax_pairs:
+            quote_passenger.first_name = order_passenger.first_name
+            quote_passenger.sur_name = order_passenger.last_name
+            quote_passenger.email = task.contact_details.email
+            quote_passenger.telephone = "+{country_code}{national_number}".format(
+                country_code=str(number.country_code),
+                national_number=str(number.national_number),
+            )
+            quote_passenger.nationality = order_passenger.doc_details.nationality
+
+    return quote_obj

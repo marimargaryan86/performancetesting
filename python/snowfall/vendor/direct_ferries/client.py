@@ -11,6 +11,9 @@ from snowfall.vendor.direct_ferries.clients import (
     route,
     timetable,
 )
+from snowfall.vendor.direct_ferries.models import booking as booking_models
+from snowfall.vendor.direct_ferries.models import quote as quote_models
+from snowfall.vendor.direct_ferries.models import request as request_models
 
 
 class DfClient(abc.ABC):
@@ -72,3 +75,26 @@ class DfHttpClient(DfClient):
     @property
     def bookings(self) -> booking.BookingClient:
         return self._bookings
+
+    async def create_booking(
+        self,
+        initial_quote: quote_models.Quote,
+    ) -> booking_models.BookingResponse:
+        booking_obj = await self.quotes.save(
+            request=request_models.QuoteRequest(
+                quote=await self.quotes.generate_quote(
+                    request=request_models.QuoteRequest(
+                        quote=initial_quote,
+                    ),
+                ),
+            ),
+        )
+        booking_obj = await self.quotes.validate(
+            booking_id=booking_obj.identifier,
+            booking_token=booking_obj.booking_token,
+        )
+
+        return await self.bookings.confirm_booking(
+            booking_id=booking_obj.identifier,
+            booking_token=booking_obj.booking_token,
+        )

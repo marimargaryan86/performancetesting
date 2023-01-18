@@ -42,7 +42,12 @@ class Port(base.CamelCaseBaseModel):
 
     @functools.cached_property
     def timezone(self) -> str:
-        return _tz_finder.timezone_at(lng=self.longitude, lat=self.latitude) or ""
+        timezone_name = _tz_finder.timezone_at(lng=self.longitude, lat=self.latitude)
+
+        if not timezone_name:
+            raise RuntimeError("Unable to determine time zone")
+
+        return timezone_name
 
 
 class Route(base.CamelCaseBaseModel):

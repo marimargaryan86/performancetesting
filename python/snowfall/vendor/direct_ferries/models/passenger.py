@@ -31,13 +31,13 @@ class PassengerBase(base.CamelCaseBaseModel):
     age_range: AgeRange
     is_wheelchair_user: bool
     is_lead_passenger: bool
-    first_name: str
-    sur_name: str
-    email: str
-    telephone: str
-    nationality: str
-    passport_number: str
-    date_of_birth: datetime.date
+    first_name: Optional[str] = None
+    sur_name: Optional[str] = None
+    email: Optional[str] = None
+    telephone: Optional[str] = None
+    nationality: Optional[str] = None
+    passport_number: Optional[str] = None
+    date_of_birth: Optional[datetime.date] = None
 
     _normalize_date_of_birth = pydantic.validator(
         "date_of_birth",

@@ -22,13 +22,13 @@ class Customer(base.CamelCaseBaseModel):
 
 
 class Booking(base.CamelCaseBaseModel):
-    identifier: Optional[int] = pydantic.Field(..., alias="id")
-    booking_reference: Optional[str]
-    booking_token: Optional[str]
+    identifier: int = pydantic.Field(..., alias="id")
+    booking_reference: str
+    booking_token: str
     is_cancelled: Optional[bool]
     is_amended: Optional[bool]
     is_confirmed: Optional[bool]
-    created_date_time: Optional[datetime.datetime]
+    created_date_time: datetime.datetime
     selected_currency: Optional[str]
     partner_code: str
     is_different_outbound_return: Optional[bool]

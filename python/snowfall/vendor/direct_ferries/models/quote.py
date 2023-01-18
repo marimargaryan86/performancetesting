@@ -6,12 +6,11 @@ from snowfall.vendor.direct_ferries.models import base, common, leg
 
 class QuoteBase(base.CamelCaseBaseModel):
     selected_currency: str
-    partner_code: str
+    partner_code: Optional[str]
     is_different_outbound_return: bool
     return_alternative_routes: bool
     is_open_ticket: bool
     legs: Sequence[leg.LegBase]
-    culture: str
 
 
 class Quote(QuoteBase):
