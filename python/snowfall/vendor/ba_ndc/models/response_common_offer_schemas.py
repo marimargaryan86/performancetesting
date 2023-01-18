@@ -3,7 +3,10 @@ import datetime
 import pydantic
 
 from snowfall.vendor.ba_ndc.models.base_schema import BaseSchema
-from snowfall.vendor.ba_ndc.models.response_common_order_schemas import Airport
+from snowfall.vendor.ba_ndc.models.response_common_order_schemas import (
+    Airport,
+    StopLocation,
+)
 from snowfall.vendor.ba_ndc.models.util import offer_enums
 
 
@@ -38,7 +41,7 @@ class Segment(BaseSchema):
     equipment: Equipment | None = pydantic.Field(description="Segment aircraft")
     marketing_carrier: Carrier = pydantic.Field(description="Marketing carrier")
     operating_carrier: Carrier | None = pydantic.Field(description="Operating carrier")
-    stop_count: int | None = pydantic.Field(description="Number of stops")
+    stops: list[StopLocation] = pydantic.Field(description="Stops")
 
 
 class FareGroup(BaseSchema):

@@ -87,55 +87,35 @@ def _parse_segment_details(  # noqa: WPS210
     return segment_details
 
 
-def _segment_to_proto(
-    segment: response_common_offer_schemas.Segment | None,
-    search_segment: models_pb2.Segment,
-) -> offer_models_pb2.OfferSegment | None:
-    first_search_segment_leg = search_segment.legs[0]
-    # todo: add support of stops
+def segment_to_legs(
+    segment: response_common_offer_schemas.Segment,
+) -> Sequence[response_common_offer_schemas.Segment]:
+    legs = [segment.copy()]
 
-    if segment:
-        leg = offer_models_pb2.OfferSegmentLeg(
-            id=first_search_segment_leg.id,
-            origin=models_pb2.Point(
-                ref=segment.origin.code or "",
-                name=segment.origin.name or "",
-                coordinates=models_pb2.Coordinates(
-                    latitude=first_search_segment_leg.origin.coordinates.latitude,
-                    longitude=first_search_segment_leg.origin.coordinates.longitude,
+    for stop in segment.stops:
+        last_leg = legs[-1]
+
+        legs.append(
+            response_common_offer_schemas.Segment(
+                identifier=last_leg.identifier,
+                origin=response_common_order_schemas.Airport(
+                    code=stop.airport_code,
+                    name=None,
+                    terminal_gate=None,
+                    terminal_name=None,
                 ),
-                time_zone=first_search_segment_leg.origin.time_zone,
+                destination=last_leg.destination,
+                departure_date_time=stop.departure_date_time,
+                arrival_date_time=stop.arrival_date_time,
+                marketing_carrier=last_leg.marketing_carrier,
+                operating_carrier=last_leg.operating_carrier,
+                equipment=last_leg.equipment,
+                duration=None,
+                stops=[],
             ),
-            destination=models_pb2.Point(
-                ref=segment.destination.code or "",
-                name=segment.destination.name or "",
-                coordinates=models_pb2.Coordinates(
-                    latitude=first_search_segment_leg.destination.coordinates.latitude,
-                    longitude=first_search_segment_leg.destination.coordinates.longitude,
-                ),
-                time_zone=first_search_segment_leg.origin.time_zone,
-            ),
-            departure_at=protobuf.datetime_to_protobuf(segment.departure_date_time),
-            arrival_at=protobuf.datetime_to_protobuf(segment.arrival_date_time),
         )
 
-        return offer_models_pb2.OfferSegment(
-            id=string.uuid(),
-            segment_id=search_segment.id,
-            legs=[leg],
-            vehicle=offer_models_pb2.Vehicle(
-                equipment=segment.equipment.code if segment.equipment else "",
-                number=segment.marketing_carrier.flight_number or "",
-            ),
-            operator=segment.operating_carrier.airline_id
-            if segment.operating_carrier
-            else "",
-            vendor=segment.marketing_carrier.airline_id or "",
-            terminal=segment.destination.terminal_name or "",
-            type=models_pb2.Schedule.TYPE_AIR,
-        )
-
-    return None
+    return legs
 
 
 def get_penalties(
@@ -188,7 +168,7 @@ class OfferParser(object):
 
         first_offer = offers[0]
         offer_segments = [
-            _segment_to_proto(
+            self._segment_to_proto(
                 segment=offers_adapter.get_segment_by_id(segment),
                 search_segment=search_task.segments[segment_index],
             )
@@ -238,6 +218,68 @@ class OfferParser(object):
                 },
             )
             <= 1
+        )
+
+    def _segment_to_proto(
+        self,
+        segment: response_common_offer_schemas.Segment | None,
+        search_segment: models_pb2.Segment,
+    ) -> offer_models_pb2.OfferSegment | None:
+        if segment:
+            offer_legs = segment_to_legs(segment)
+
+            return offer_models_pb2.OfferSegment(
+                id=string.uuid(),
+                segment_id=search_segment.id,
+                legs=[
+                    offer_models_pb2.OfferSegmentLeg(
+                        id=search_leg.id,
+                        origin=models_pb2.Point(
+                            ref=offer_leg.origin.code or "",
+                            name=offer_leg.origin.name or "",
+                            coordinates=self._get_coordinates(offer_leg.origin.code),
+                            time_zone=search_leg.origin.time_zone,
+                        ),
+                        destination=models_pb2.Point(
+                            ref=offer_leg.destination.code or "",
+                            name=offer_leg.destination.name or "",
+                            coordinates=self._get_coordinates(
+                                offer_leg.destination.code,
+                            ),
+                            time_zone=search_leg.destination.time_zone,
+                        ),
+                        departure_at=protobuf.datetime_to_protobuf(
+                            offer_leg.departure_date_time,
+                        ),
+                        arrival_at=protobuf.datetime_to_protobuf(
+                            offer_leg.arrival_date_time,
+                        ),
+                    )
+                    for offer_leg, search_leg in zip(offer_legs, search_segment.legs)
+                ],
+                vehicle=offer_models_pb2.Vehicle(
+                    equipment=segment.equipment.code if segment.equipment else "",
+                    number=segment.marketing_carrier.flight_number or "",
+                ),
+                operator=segment.operating_carrier.airline_id
+                if segment.operating_carrier
+                else "",
+                vendor=segment.marketing_carrier.airline_id or "",
+                terminal=segment.destination.terminal_name or "",
+                type=models_pb2.Schedule.TYPE_AIR,
+            )
+
+        return None
+
+    def _get_coordinates(
+        self,
+        iata_airport_code: str,
+    ) -> models_pb2.Coordinates:
+        airport = self._airport_repository.get_by_iata(iata_airport_code)
+
+        return models_pb2.Coordinates(
+            latitude=airport.latitude,
+            longitude=airport.longitude,
         )
 
     async def _get_group_offers(

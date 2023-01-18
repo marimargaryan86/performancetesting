@@ -27,6 +27,16 @@ class PriceDetailed(Price):
     tax_amount: str = pydantic.Field(description="Tax amount")
 
 
+class StopLocation(BaseSchema):
+    airport_code: str = pydantic.Field(description="Airline identifier")
+    arrival_date_time: datetime.datetime = pydantic.Field(
+        description="Date and time of arrival stop (local)",
+    )
+    departure_date_time: datetime.datetime = pydantic.Field(
+        description="Date and time of departure stop (local)",
+    )
+
+
 class Airport(BaseSchema):
     """Airport schema."""
 

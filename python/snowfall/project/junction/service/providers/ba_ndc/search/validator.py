@@ -8,9 +8,10 @@ from typing import Mapping, Sequence
 import structlog
 from google.protobuf import timestamp_pb2
 
+from snowfall.project.junction.service.providers.ba_ndc.search import parser
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2
-from snowfall.vendor.ba_ndc.models.response_common_offer_schemas import Segment
+from snowfall.vendor.ba_ndc.models import response_common_offer_schemas
 from snowfall.vendor.ba_ndc.models.response_offer_search_schemas import Offer
 
 
@@ -46,7 +47,7 @@ class OfferValidator(object):
     def __init__(
         self,
         requirements: Requirements,
-        ba_ndc_segments: Mapping[str, Segment],
+        ba_ndc_segments: Mapping[str, response_common_offer_schemas.Segment],
     ) -> None:
         self._logger = structlog.get_logger(__name__)
         self._requirements = requirements
@@ -56,7 +57,7 @@ class OfferValidator(object):
     def from_segments(
         cls,
         segments: Sequence[models_pb2.Segment],
-        ba_ndc_segments: Mapping[str, Segment],
+        ba_ndc_segments: Mapping[str, response_common_offer_schemas.Segment],
     ) -> OfferValidator:
         return cls(
             requirements=[
@@ -71,22 +72,16 @@ class OfferValidator(object):
         if not offer.trips:
             return False
 
-        segments = [
-            segment
-            for trip in offer.trips
-            for segment in trip.segment_ids or []
-            # todo handle stops
-        ]
+        legs = self._get_legs_from_offer(offer)
 
-        if len(self._requirements) != len(segments):
+        if len(self._requirements) != len(legs):
             return False  # make sure all requirements are matched
 
-        for segment_index, segment in enumerate(segments):
+        for segment_index, segment in enumerate(legs):
             requirement = self._requirements[segment_index]
-            ba_ndc_segment = self._ba_ndc_segments.get(segment)
 
-            if ba_ndc_segment and not self._segment_in_requirements(  # noqa: WPS337
-                ba_ndc_segment,
+            if not self._segment_in_requirements(  # noqa: WPS337
+                segment,
                 requirement,
             ):
                 return False
@@ -95,7 +90,7 @@ class OfferValidator(object):
 
     def _segment_in_requirements(
         self,
-        segment: Segment,
+        segment: response_common_offer_schemas.Segment,
         requirement: Requirement,
     ) -> bool:
         if segment.departure_date_time != requirement.departure_at:
@@ -121,3 +116,18 @@ class OfferValidator(object):
             return False
 
         return True
+
+    def _get_legs_from_offer(
+        self,
+        offer: Offer,
+    ) -> list[response_common_offer_schemas.Segment]:
+        legs: list[response_common_offer_schemas.Segment] = []
+
+        for trip in offer.trips:
+            for segment_id in trip.segment_ids:
+                ndc_segment = self._ba_ndc_segments.get(segment_id)
+
+                if ndc_segment:
+                    legs = legs + list(parser.segment_to_legs(ndc_segment))
+
+        return legs

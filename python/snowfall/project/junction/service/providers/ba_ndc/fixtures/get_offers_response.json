@@ -950,7 +950,7 @@
         "airlineName": "British Airways",
         "flightNumber": null
       },
-      "stopCount": 0
+      "stops": []
     },
     {
       "id": "BA1398",
@@ -983,7 +983,7 @@
         "airlineName": "British Airways",
         "flightNumber": null
       },
-      "stopCount": 0
+      "stops": []
     },
     {
       "id": "BA1402",
@@ -1016,7 +1016,7 @@
         "airlineName": "British Airways",
         "flightNumber": null
       },
-      "stopCount": 0
+      "stops": []
     },
     {
       "id": "BA1386",
@@ -1049,7 +1049,7 @@
         "airlineName": "British Airways",
         "flightNumber": null
       },
-      "stopCount": 0
+      "stops": []
     },
     {
       "id": "BA1390",
@@ -1082,7 +1082,7 @@
         "airlineName": "British Airways",
         "flightNumber": null
       },
-      "stopCount": 0
+      "stops": []
     },
     {
       "id": "BA1394",
@@ -1115,7 +1115,7 @@
         "airlineName": "British Airways",
         "flightNumber": null
       },
-      "stopCount": 0
+      "stops": []
     },
     {
       "id": "BA1396",
@@ -1148,7 +1148,7 @@
         "airlineName": "British Airways",
         "flightNumber": null
       },
-      "stopCount": 0
+      "stops": []
     },
     {
       "id": "BA1414",
@@ -1181,7 +1181,7 @@
         "airlineName": "British Airways",
         "flightNumber": null
       },
-      "stopCount": 0
+      "stops": []
     },
     {
       "id": "BA8902",
@@ -1214,7 +1214,7 @@
         "airlineName": "EMERALD AIRLINES FOR AER LINGUS",
         "flightNumber": null
       },
-      "stopCount": 0
+      "stops": []
     },
     {
       "id": "BA8752",
@@ -1247,7 +1247,7 @@
         "airlineName": "BA CityFlyer",
         "flightNumber": null
       },
-      "stopCount": 0
+      "stops": []
     },
     {
       "id": "BA8904",
@@ -1280,7 +1280,7 @@
         "airlineName": "EMERALD AIRLINES FOR AER LINGUS",
         "flightNumber": null
       },
-      "stopCount": 0
+      "stops": []
     },
     {
       "id": "BA8756",
@@ -1313,7 +1313,7 @@
         "airlineName": "BA CityFlyer",
         "flightNumber": null
       },
-      "stopCount": 0
+      "stops": []
     },
     {
       "id": "BA8906",
@@ -1346,7 +1346,7 @@
         "airlineName": "EMERALD AIRLINES FOR AER LINGUS",
         "flightNumber": null
       },
-      "stopCount": 0
+      "stops": []
     },
     {
       "id": "BA1416",
@@ -1379,7 +1379,7 @@
         "airlineName": "British Airways",
         "flightNumber": null
       },
-      "stopCount": 0
+      "stops": []
     },
     {
       "id": "BA5985",
@@ -1412,7 +1412,7 @@
         "airlineName": "Aer Lingus",
         "flightNumber": null
       },
-      "stopCount": 0
+      "stops": []
     },
     {
       "id": "BA5981",
@@ -1445,7 +1445,13 @@
         "airlineName": "Aer Lingus",
         "flightNumber": null
       },
-      "stopCount": 0
+      "stops": [
+        {
+          "airportCode": "MAN",
+          "arrivalDateTime": "2023-01-30T11:05:00",
+          "departureDateTime": "2023-01-30T11:05:00"
+        }
+      ]
     }
   ],
   "priceClasses": [
