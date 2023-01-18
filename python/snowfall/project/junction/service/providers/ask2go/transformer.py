@@ -68,7 +68,9 @@ class OfferTransformer(object):  # noqa: WPS214
                     price_result.itinerary.pricing_information.base.currency,
                 ),
             ).protobuf(),
-            required_documents=self._get_offer_price_requirements(price_result.docs),
+            required_documents=self._get_offer_price_requirements(price_result.docs)
+            if price_result.docs
+            else None,
             penalties=[
                 offers_pb2.Penalty(
                     applicable_to=passenger_applicable_dates[

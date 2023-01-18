@@ -45,7 +45,7 @@ class OfferPriceResponse(CamelCaseBaseModel):
     id: str  # noqa: A003
     information: booking.Information
     itinerary: offers.Offer
-    docs: list[OfferPriceDoc]
+    docs: Optional[list[OfferPriceDoc]]
     fare_rules: list[booking.FareRules]
     penalties: Optional[list[PricePenalty]]
     extras: dict[str, Any]
