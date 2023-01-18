@@ -102,16 +102,23 @@ class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):  # noqa
         request: grpc_pb2.ListOffersRequest,
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.ListOffersResponse:
-        if request.offer_search_id:
-            offer_aggregates = await self._aggregates.find_by_offer_search_id(
-                request.offer_search_id,
+        payload_attr_name = request.WhichOneof("payload")
+        if payload_attr_name == "offer_search_id":
+            offer_aggregates = await self._aggregates.find_by_offer_search_ids(
+                [request.offer_search_id],
                 cursor=request.page_token,
                 cabin_classes=list(request.cabin_class_types),
             )
-        else:
+        elif payload_attr_name == "offer_ids":
             offer_aggregates = await self._aggregates.find(
                 list(request.offer_ids.ids),
                 cursor=request.page_token,
+            )
+        else:
+            offer_aggregates = await self._aggregates.find_by_offer_search_ids(
+                list(request.offer_search_ids.ids),
+                cursor=request.page_token,
+                cabin_classes=list(request.cabin_class_types),
             )
 
         offer_aggregates.limit(

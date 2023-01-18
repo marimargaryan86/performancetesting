@@ -194,19 +194,19 @@ class OfferAggregateMappingRepository(
         pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True),
     ]
 
-    async def find_by_offer_search_id(
+    async def find_by_offer_search_ids(
         self,
-        offer_search_id: str,
+        offer_search_ids: Sequence[str],
         cursor: str,
         cabin_classes: Sequence[common_pb2.CabinClass.Type.ValueType],
     ) -> resultset.ResultSet[models_pb2.OfferAggregateMapping]:
         if not cabin_classes:
             return await self._find_with_cursor(
                 cur=cursor,
-                filter_={_OFFER_SEARCH_ID: offer_search_id},
+                filter_={_OFFER_SEARCH_ID: {"$in": offer_search_ids}},
             )
 
-        filter_pre_cursor = {_OFFER_SEARCH_ID: offer_search_id}
+        filter_pre_cursor = {_OFFER_SEARCH_ID: {"$in": offer_search_ids}}
         cursor_filter = copy.deepcopy(dict(filter_pre_cursor))
 
         if cursor:

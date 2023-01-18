@@ -58,6 +58,7 @@ message ListOffersRequest {
   oneof payload {
     string offer_search_id = 3;
     ListOfIds offer_ids = 4;
+    ListOfIds offer_search_ids = 6;
   }
   repeated snowfall.stdlib.v1alpha.CabinClass.Type cabin_class_types = 5;
 }
