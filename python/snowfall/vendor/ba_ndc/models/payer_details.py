@@ -3,14 +3,7 @@ from typing import Literal
 import pydantic
 
 from snowfall.vendor.ba_ndc.models.base_schema import BaseSchema
-from snowfall.vendor.ba_ndc.models.util import passenger_enums
-
-
-class Phone(BaseSchema):
-    """Phone schema."""
-
-    phone_type: passenger_enums.PhoneTypeEnum = pydantic.Field(..., alias="type")
-    number: str = pydantic.Field(description="Phone number, including country code")
+from snowfall.vendor.ba_ndc.models.response_common_passenger_schemas import Contact
 
 
 class Address(BaseSchema):
@@ -21,13 +14,6 @@ class Address(BaseSchema):
     city: str = pydantic.Field(description="City name")
     zip_code: str = pydantic.Field(description="Zip code", alias="zip")
     country_code: str = pydantic.Field(description="Country code")
-
-
-class Contact(BaseSchema):
-    """Contact simple schema."""
-
-    email: str = pydantic.Field(description="E-mail address")
-    phone: Phone = pydantic.Field(description="Phone number")
 
 
 class ContactDetailed(Contact):

@@ -19,5 +19,5 @@ class AddAncillaries(BaseSchema):
     )
     payment: CreditCardPayment | CashPayment | VoucherPayment | None = pydantic.Field(
         description="Payment",
-        discriminator="type",
+        discriminator="payment_type",
     )

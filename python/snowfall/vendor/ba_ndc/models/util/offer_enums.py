@@ -18,8 +18,8 @@ class DimensionUnitEnum(enum.Enum):
 class BagPieceAllowanceCombinationEnum(enum.Enum):
     """Bag piece allowance combination."""
 
-    _and = "and"
-    _or = "or"
+    and_operand = "and"
+    or_operator = "or"
 
 
 class BagCategoryEnum(enum.Enum):

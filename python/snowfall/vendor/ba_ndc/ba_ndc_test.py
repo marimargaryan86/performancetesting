@@ -11,12 +11,12 @@ from snowfall.vendor.ba_ndc.adapters.offers_response_adapter import (
 )
 from snowfall.vendor.ba_ndc.builders import offer_request, order_request
 from snowfall.vendor.ba_ndc.models import (
-    payer_details,
     request_add_seat_schemas,
     request_name_correction_schemas,
     request_offer_search_schemas,
     request_order_change_schemas,
     request_order_schemas,
+    response_common_passenger_schemas,
     response_order_schemas,
 )
 from snowfall.vendor.ba_ndc.models.util import offer_enums, passenger_enums
@@ -275,7 +275,10 @@ async def call_get_offers(
         request_offer_search_schemas.Trip(
             origin="LHR",
             destination="MAN",
-            date=datetime.date.fromisoformat("2023-01-30"),
+            date=datetime.datetime.now(datetime.timezone.utc)
+            + datetime.timedelta(
+                days=45,
+            ),
             time=datetime.time.fromisoformat("08:00"),
         ),
     )
@@ -307,21 +310,11 @@ async def generate_order(
             gender=passenger_enums.GenderEnum.male,
             contact=request_order_schemas.Contact(
                 email="john.doe@snowfall.com",
-                phone=payer_details.Phone(
+                phone=response_common_passenger_schemas.Phone(
                     phone_type=passenger_enums.PhoneTypeEnum.mobile,
                     number="15141234567",
                 ),
             ),
-            identity_documents=[
-                request_order_schemas.IdentityDocument(
-                    document_number="7534567891",
-                    document_type="PT",
-                    birth_date=datetime.date.fromisoformat("1970-01-01"),
-                    nationality="GBR",
-                    issuing_country="GBR",
-                    expiration_date=datetime.date.fromisoformat("2027-07-08"),
-                ),
-            ],
         ),
     )
 

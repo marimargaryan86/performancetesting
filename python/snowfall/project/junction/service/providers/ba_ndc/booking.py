@@ -17,7 +17,10 @@ from snowfall.stdlib.format import protobuf
 from snowfall.vendor.ba_ndc import client, errors
 from snowfall.vendor.ba_ndc.adapters.order_view_adapter import OrderViewAdapter
 from snowfall.vendor.ba_ndc.builders.order_request import OrderRequestBuilder
-from snowfall.vendor.ba_ndc.models import payer_details, request_order_schemas
+from snowfall.vendor.ba_ndc.models import (
+    request_order_schemas,
+    response_common_passenger_schemas,
+)
 
 
 def _get_last_travel_date(
@@ -131,9 +134,9 @@ class BookingHandler(object):
                     ].upper(),
                     gender=enums.gender_from_proto(passenger.gender),
                     birth_date=protobuf.protobuf_to_date(passenger.date_of_birth),
-                    contact=payer_details.Contact(
+                    contact=response_common_passenger_schemas.Contact(
                         email=task.contact_details.email,
-                        phone=payer_details.Phone(
+                        phone=response_common_passenger_schemas.Phone(
                             phone_type=enums.passenger_enums.PhoneTypeEnum.mobile,
                             number="+{country_code}{national_number}".format(
                                 country_code=str(number.country_code),
