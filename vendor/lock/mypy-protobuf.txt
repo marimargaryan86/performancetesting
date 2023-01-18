@@ -53,57 +53,57 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "48e2cd6b88c6ed3d5877a3ea40df79d08374088e89bedc32557348848dff250b",
-              "url": "https://files.pythonhosted.org/packages/0b/c3/bfe27bff58e895261e5054f38e9f12fcccd67d70ccad66c22ba987b17fc9/protobuf-4.21.9-py3-none-any.whl"
+              "hash": "b98d0148f84e3a3c569e19f52103ca1feacdac0d2df8d6533cf983d1fda28462",
+              "url": "https://files.pythonhosted.org/packages/d4/9f/5cb64224bdd4695f5b024a05a4bea31af1d8e3127d45a74161631fe8180e/protobuf-4.21.12-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "61f21493d96d2a77f9ca84fefa105872550ab5ef71d21c458eb80edcf4885a99",
-              "url": "https://files.pythonhosted.org/packages/0f/cd/165eaac1c43a5ba391a36087dc909e03c3ae3f7dbcab74f287631208ba92/protobuf-4.21.9.tar.gz"
+              "hash": "299ea899484ee6f44604deb71f424234f654606b983cb496ea2a53e3c63ab791",
+              "url": "https://files.pythonhosted.org/packages/05/b6/6e9b82445e3561132a871e38f5601b12749beb5305eaa085d7f0c59728c9/protobuf-4.21.12-cp37-abi3-macosx_10_9_universal2.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "7eb8f2cc41a34e9c956c256e3ac766cf4e1a4c9c925dc757a41a01be3e852965",
-              "url": "https://files.pythonhosted.org/packages/74/11/d8e34deda056e91bfc470ad759e94e61ee1d7df092c33392a956820bc7cb/protobuf-4.21.9-py2.py3-none-any.whl"
+              "hash": "d1736130bce8cf131ac7957fa26880ca19227d4ad68b4888b3be0dea1f95df97",
+              "url": "https://files.pythonhosted.org/packages/76/74/28f42d3e6b0c7bffaa04348a631de7a22c3d81d1564753301d058c80fff5/protobuf-4.21.12-cp37-abi3-manylinux2014_aarch64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "b5ab0b8918c136345ff045d4b3d5f719b505b7c8af45092d7f45e304f55e50a1",
-              "url": "https://files.pythonhosted.org/packages/74/44/ec74b5c0dcc9725545212d13216fe7550377b1600cac9b2bbb21cbd625d7/protobuf-4.21.9-cp37-abi3-macosx_10_9_universal2.whl"
+              "hash": "7cd532c4566d0e6feafecc1059d04c7915aec8e182d1cf7adee8b24ef1e2e6ab",
+              "url": "https://files.pythonhosted.org/packages/ba/dd/f8a01b146bf45ac12a829bbc599e6590aa6a6849ace7d28c42d77041d6ab/protobuf-4.21.12.tar.gz"
             },
             {
               "algorithm": "sha256",
-              "hash": "2c9c2ed7466ad565f18668aa4731c535511c5d9a40c6da39524bccf43e441719",
-              "url": "https://files.pythonhosted.org/packages/ea/7c/554ebfedfb9d1800afbd7522858239aae1ac3314527a85f0683db65180df/protobuf-4.21.9-cp37-abi3-manylinux2014_aarch64.whl"
+              "hash": "a53fd3f03e578553623272dc46ac2f189de23862e68565e83dde203d41b76fc5",
+              "url": "https://files.pythonhosted.org/packages/c6/3b/33f3bd47dbfdd17ed87024b6473b26ee3a8c3303f019e91557b2654703a4/protobuf-4.21.12-py2.py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "e575c57dc8b5b2b2caa436c16d44ef6981f2235eb7179bfc847557886376d740",
-              "url": "https://files.pythonhosted.org/packages/fe/00/2bd2cb913a9b69b1379f1c18b6cae88b9e5f337a44b9e84b7c6bf0962c83/protobuf-4.21.9-cp37-abi3-manylinux2014_x86_64.whl"
+              "hash": "78a28c9fa223998472886c77042e9b9afb6fe4242bd2a2a5aced88e3f4422aa7",
+              "url": "https://files.pythonhosted.org/packages/e7/a2/3273c05fc5d959fa90de6453ebd6d45c6d4fab3ec212d631625ea5780921/protobuf-4.21.12-cp37-abi3-manylinux2014_x86_64.whl"
             }
           ],
           "project_name": "protobuf",
           "requires_dists": [],
           "requires_python": ">=3.7",
-          "version": "4.21.9"
+          "version": "4.21.12"
         },
         {
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "ab2d315ba82246b83d28f8797c98dc0fe1dd5cfd187909e56faf87239aedaae3",
-              "url": "https://files.pythonhosted.org/packages/e7/3e/61a9503adbcc63792d5e23393dc349944f57910764a00072c8fa5d2e203c/types_protobuf-3.20.4.6-py3-none-any.whl"
+              "hash": "6c87c7f8df61d57a53de8221777e4fcc3c7ed24419fbf43b8e9f50887f3773fa",
+              "url": "https://files.pythonhosted.org/packages/18/21/2ae3f1404ec1e1ba6364b8cf6f535a2a2a4bbcfb2affadf40b1a1e62cf56/types_protobuf-4.21.0.3-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "ba27443c592bbec1629dd69494a24c84461c63f0d3b7d648ce258aaae9680965",
-              "url": "https://files.pythonhosted.org/packages/d3/9b/f1d0b5089b44e1b2a87e09402bc9cc8fd3b482d86fb611f0f6667de1fdd2/types-protobuf-3.20.4.6.tar.gz"
+              "hash": "824109e0fe87525a9d2da4cc4eec36ca004f1a0f3d1c0838cfd2873a484cffdd",
+              "url": "https://files.pythonhosted.org/packages/a2/99/c90a81cec8328849a1a8260baa8db0e12e6ccbd682b26aa39a023bd0306f/types-protobuf-4.21.0.3.tar.gz"
             }
           ],
           "project_name": "types-protobuf",
           "requires_dists": [],
           "requires_python": null,
-          "version": "3.20.4.6"
+          "version": "4.21.0.3"
         }
       ],
       "platform_tag": null
