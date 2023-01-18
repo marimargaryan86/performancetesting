@@ -489,7 +489,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
     async def _get_cabin_class_mapping(
         self,
         provider_cabin_class: str,
-    ) -> amqp_pb2.CabinClassMapping:
+    ) -> amqp_pb2.CabinClassMapping | None:
         return await self._provider_cabin_class_mapping.find_by_mapping(
             provider_cabin_class=provider_cabin_class,
         )

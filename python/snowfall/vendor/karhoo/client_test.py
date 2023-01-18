@@ -416,7 +416,6 @@ async def test_get_position_of_trip(
         uuid.UUID("00000000-0000-0000-0000-000000000000"),
     )
 
-    assert response
     assert response.origin_eta == 10
     assert response.direction.kph == 50
 

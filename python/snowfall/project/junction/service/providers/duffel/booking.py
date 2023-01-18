@@ -88,15 +88,14 @@ class BookingHandler(object):
         for index, passenger in enumerate(task.passengers):
             document: IdentityDocument | None = None
 
-            if passenger.doc_details:
-                document = IdentityDocument(
-                    unique_identifier=passenger.doc_details.document_number,
-                    document_type="passport",
-                    issuing_country_code=passenger.doc_details.issue_county,
-                    expires_on=protobuf.protobuf_to_date(
-                        passenger.doc_details.exp_date,
-                    ),
-                )
+            document = IdentityDocument(
+                unique_identifier=passenger.doc_details.document_number,
+                document_type="passport",
+                issuing_country_code=passenger.doc_details.issue_county,
+                expires_on=protobuf.protobuf_to_date(
+                    passenger.doc_details.exp_date,
+                ),
+            )
 
             order_request.add_passenger(
                 OrderPassenger(
@@ -111,9 +110,7 @@ class BookingHandler(object):
                     family_name=passenger.last_name,
                     email=task.contact_details.email,
                     born_on=protobuf.protobuf_to_date(passenger.date_of_birth),
-                    identity_documents=[document]
-                    if document and details.doc_required
-                    else None,
+                    identity_documents=[document] if details.doc_required else None,
                 ),
             )
 

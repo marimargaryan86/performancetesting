@@ -49,7 +49,7 @@ async def test_get_carrier_booking_schema(
     booking_schema = await distribusion_client.get_marketing_carrier_booking_schema(
         marketing_carrier_id,
     )
-    assert booking_schema
+    assert booking_schema.identifier
 
 
 @disable_by_default
@@ -183,7 +183,6 @@ async def test_get_booking_by_id(
 ) -> None:
     booking_id = "28wfnEhKzGEWqZ02ykHtdw"
     booking_details = await distribusion_client.get_booking_by_id(booking_id)
-    assert booking_details
     assert booking_details.currency == "EUR"
 
 
@@ -229,7 +228,7 @@ async def test_order_create(  # noqa: WPS210
         connection_vacancy_criteria,
     )
 
-    assert vacancy and vacancy.vacant
+    assert vacancy.vacant
 
     order_create_request = CreateOrder(
         marketing_carrier=marketing_carrier_code,
@@ -264,11 +263,11 @@ async def test_order_create(  # noqa: WPS210
     )
 
     order = await distribusion_client.create_order(order_create_request)
-    assert order
+    assert order.identifier
     logging.info("Order ID: %s", order.identifier)
 
     order_details = await distribusion_client.get_order(order.identifier)
-    assert order_details
+    assert order_details.state
     logging.info("Order state: %s", order_details.state)
 
 
@@ -278,7 +277,7 @@ async def test_get_order_by_id(
 ) -> None:
     order_id = "VICA-66bbc46a-7bfd-4c5b-bcdd-d984ff247f0b"
     order_details = await distribusion_client.get_order(order_id)
-    assert order_details
+    assert order_details.identifier
 
 
 @disable_by_default
@@ -287,12 +286,11 @@ async def test_get_tickets(
 ) -> None:
     order_id = "VICA-66bbc46a-7bfd-4c5b-bcdd-d984ff247f0b"
     order_details = await distribusion_client.get_order(order_id)
-    assert order_details
     assert order_details.booking
     assert order_details.booking.identifier
 
     tickets = await distribusion_client.get_tickets(order_details.booking.identifier)
-    assert tickets
+    assert tickets.ticket_content
 
 
 @disable_by_default
@@ -301,15 +299,15 @@ async def test_get_cancellation_conditions(
 ) -> None:
     order_id = "VICA-66bbc46a-7bfd-4c5b-bcdd-d984ff247f0b"
     order_details = await distribusion_client.get_order(order_id)
-    assert order_details and order_details.booking and order_details.booking.identifier
+    assert order_details.booking and order_details.booking.identifier
 
     cancellation_conditions = await distribusion_client.get_cancellation_conditions(
         order_details.booking.identifier,
     )
-    assert cancellation_conditions and cancellation_conditions.identifier
-    assert cancellation_conditions and cancellation_conditions.allowed
-    assert cancellation_conditions and cancellation_conditions.cutoff
-    assert cancellation_conditions and cancellation_conditions.fee is not None
+    assert cancellation_conditions.identifier
+    assert cancellation_conditions.allowed
+    assert cancellation_conditions.cutoff
+    assert cancellation_conditions.fee is not None
 
 
 @disable_by_default
@@ -318,12 +316,12 @@ async def test_create_cancellation(
 ) -> None:
     order_id = "VICA-4be6700c-4dcd-4513-987b-6d64669367ea"
     order_details = await distribusion_client.get_order(order_id)
-    assert order_details and order_details.booking and order_details.booking.identifier
+    assert order_details.booking and order_details.booking.identifier
 
     cancellation = await distribusion_client.create_cancellation(
         order_details.booking.identifier,
     )
-    assert cancellation and cancellation.identifier
-    assert cancellation and cancellation.total_price
-    assert cancellation and cancellation.total_refund
-    assert cancellation and cancellation.created_at
+    assert cancellation.identifier
+    assert cancellation.total_price
+    assert cancellation.total_refund
+    assert cancellation.created_at

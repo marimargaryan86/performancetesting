@@ -159,7 +159,7 @@ class BaNdcSearchAdapter(object):
             build_search_request(search_task),
         )
 
-        if res and res.get_offers():
+        if res.get_offers():
             offer_validator = validator.OfferValidator.from_segments(
                 search_task.segments,
                 res.segments,

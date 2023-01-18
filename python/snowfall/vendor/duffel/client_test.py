@@ -45,7 +45,7 @@ async def test_offer_request(
 
     response = await duffel_client.create_offer_request(offer_request_create.build())
 
-    assert response
+    assert response.identifier
 
 
 async def test_single_offer(
@@ -66,7 +66,7 @@ async def test_single_offer(
 
     response = await duffel_client.get_single_offer(offer_id)
 
-    assert response
+    assert response.identifier
 
 
 async def test_error(
@@ -159,4 +159,4 @@ async def test_order_create(
 
     response = await duffel_client.order_request(order_request.build())
 
-    assert response
+    assert response.identifier

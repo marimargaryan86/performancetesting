@@ -115,7 +115,7 @@ class OfferValidator(Validator):
         )
 
     def matches(self, offer: Offer) -> bool:
-        if not offer or not offer.slices:
+        if not offer.slices:
             return False
 
         slice_segments = [  # noqa: WPS224
@@ -141,12 +141,6 @@ class OfferValidator(Validator):
         segment: OfferSliceSegment,
         requirement: Requirement,
     ) -> bool:
-        if not segment.departing_at or not segment.arriving_at:
-            return False
-
-        if not segment.origin or not segment.destination:
-            return False
-
         if segment.departing_at != requirement.departure_at:
             self._logger.debug(
                 "Departure times do not match",

@@ -74,6 +74,8 @@ class CurrencyService(service.Service, currencies_pb2_grpc.CurrencyServiceServic
             )
             if not backup_rate:
                 await context.abort(grpc.StatusCode.NOT_FOUND)
+                # TODO: Remove after https://github.com/grpc/grpc/pull/31879
+                raise RuntimeError() from None
 
             base_amount = Money(amount, Currency(from_currency))
             conversion = base_amount.convert(

@@ -46,7 +46,6 @@ async def test_marketing_carrier_details(
 
     response = await distribusion_client.get_marketing_carrier_details("VICA")
 
-    assert response
     assert response.address == "Wattstrasse 10"
     assert response.terms == "t&c"
     assert response.authorised_representative == "John Smith"
@@ -71,8 +70,8 @@ async def test_get_stations(
 
     assert response
     assert len(response) == 1
-    assert response[0] and response[0].identifier == "DEFAMFHH"
-    assert response[0] and response[0].zip_code == "60329"
+    assert response[0].identifier == "DEFAMFHH"
+    assert response[0].zip_code == "60329"
 
 
 async def test_create_order(
@@ -93,7 +92,6 @@ async def test_create_order(
 
     response = await distribusion_client.create_order(criterias.CreateOrder(**json_req))
 
-    assert response
     assert response.identifier == "VICA-37de14da-6169-4afd-9d68-e90be76b51a1"
     assert response.state == "created"
 
@@ -116,12 +114,11 @@ async def test_get_order(
 
     response = await distribusion_client.get_order(order_id)
 
-    assert response and response.identifier == order_id
+    assert response.identifier == order_id
     assert response.currency == "GBP"
     assert response.booking and response.booking.total_price == 2148
     assert (
-        response.booking
-        and response.booking.fare_class
+        response.booking.fare_class
         and response.booking.fare_class.fare_features
         and response.booking.fare_class.fare_features[10].name  # noqa: WPS219
         == "Accessible area for wheelchairs"

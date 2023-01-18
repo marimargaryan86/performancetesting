@@ -26,7 +26,7 @@ class OrderViewAdapter(object):
         return self.order_response.order
 
     def is_success(self) -> bool:
-        return self.order_response is not None and self.order_response.order is not None
+        return self.order_response.order is not None
 
     def get_passengers(self) -> list[response_order_schemas.Passenger]:
         return self.order_response.passengers or []

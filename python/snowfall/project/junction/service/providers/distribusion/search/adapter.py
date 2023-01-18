@@ -374,7 +374,7 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
                 datetime.datetime.fromisoformat(departure_time).replace(
                     tzinfo=zoneinfo.ZoneInfo(
                         origin.time_zone
-                        if origin and origin.time_zone
+                        if origin.time_zone
                         else search_leg.origin.time_zone,
                     ),
                 ),
@@ -383,7 +383,7 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
                 datetime.datetime.fromisoformat(arrival_time).replace(
                     tzinfo=zoneinfo.ZoneInfo(
                         destination.time_zone
-                        if destination and destination.time_zone
+                        if destination.time_zone
                         else search_leg.destination.time_zone,
                     ),
                 ),

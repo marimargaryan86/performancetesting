@@ -94,7 +94,7 @@ class BackUpRatesRepository(
         self,
         buy_currency: str,
         sell_currency: str,
-    ) -> models_pb2.BackUpRate:
+    ) -> models_pb2.BackUpRate | None:
         return await self._execute(
             self._collection.find_one,
             {"buy_currency": buy_currency, "sell_currency": sell_currency},

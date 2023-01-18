@@ -2,7 +2,6 @@
   "required_matches": {
     "all_python_files": [
       "no_file_level_flake8_noqa",
-      "no_unspecific_type_ignore",
       "no_pytest_mark_asyncio"
     ]
   },
@@ -16,11 +15,6 @@
     {
       "name": "no_file_level_flake8_noqa",
       "pattern": "# flake8: noqa",
-      "inverted": true
-    },
-    {
-      "name": "no_unspecific_type_ignore",
-      "pattern": "# type: ignore\\s",
       "inverted": true
     },
     {

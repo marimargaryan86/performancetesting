@@ -70,7 +70,7 @@
 //     "types-aiofiles==22.1.0.3",
 //     "types-certifi==2021.10.8.3",
 //     "types-freezegun==1.1.10",
-//     "types-protobuf==3.20.4.5",
+//     "types-protobuf==3.20.4.6",
 //     "types-python-dateutil==2.8.19.3",
 //     "types-redis==4.3.21.4",
 //     "types-setuptools==65.5.0.3",
@@ -725,6 +725,11 @@
               "algorithm": "sha256",
               "hash": "728f2694fa743a996d7784a6194da430f197d5c58e2f4e278612b359f455e4a2",
               "url": "https://files.pythonhosted.org/packages/37/19/234484df6fc7bdf4cf81cd4a89f600fce9f8f7a4bc1b307d7abbcd382b64/cryptography-38.0.3-cp36-abi3-manylinux_2_24_x86_64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "726e3a1bfee0e919b278c8f766fdcf1fe30f8e6feea590e3f248d3636b58ffb3",
+              "url": "https://files.pythonhosted.org/packages/50/e0/151f2563aae9cd45a053bb845c41fae78fd2548aa44a93d0a955104dcdcf/cryptography-38.0.3-cp36-abi3-macosx_10_12_universal2.whl"
             },
             {
               "algorithm": "sha256",
@@ -3338,19 +3343,19 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "97af5ce70d890fdb94cb0c906f5a6624ca2fef58bc04e27990a25509e992a950",
-              "url": "https://files.pythonhosted.org/packages/92/02/cebbb618bf72fb671e9e0a710da26c959579a8964d8df79e1c60b3d38187/types_protobuf-3.20.4.5-py3-none-any.whl"
+              "hash": "ab2d315ba82246b83d28f8797c98dc0fe1dd5cfd187909e56faf87239aedaae3",
+              "url": "https://files.pythonhosted.org/packages/e7/3e/61a9503adbcc63792d5e23393dc349944f57910764a00072c8fa5d2e203c/types_protobuf-3.20.4.6-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "e9b45008d106e1d10cc77a29d2d344b85c0f01e2e643aaccf32f69e9e81b0cdd",
-              "url": "https://files.pythonhosted.org/packages/0a/e3/d80ef95536b29285096f2de61b83e4ef733eb2ef34cbcc4f9e8bd4b40ee1/types-protobuf-3.20.4.5.tar.gz"
+              "hash": "ba27443c592bbec1629dd69494a24c84461c63f0d3b7d648ce258aaae9680965",
+              "url": "https://files.pythonhosted.org/packages/d3/9b/f1d0b5089b44e1b2a87e09402bc9cc8fd3b482d86fb611f0f6667de1fdd2/types-protobuf-3.20.4.6.tar.gz"
             }
           ],
           "project_name": "types-protobuf",
           "requires_dists": [],
           "requires_python": null,
-          "version": "3.20.4.5"
+          "version": "3.20.4.6"
         },
         {
           "artifacts": [
@@ -3940,7 +3945,7 @@
     "types-aiofiles==22.1.0.3",
     "types-certifi==2021.10.8.3",
     "types-freezegun==1.1.10",
-    "types-protobuf==3.20.4.5",
+    "types-protobuf==3.20.4.6",
     "types-python-dateutil==2.8.19.3",
     "types-redis==4.3.21.4",
     "types-setuptools==65.5.0.3",

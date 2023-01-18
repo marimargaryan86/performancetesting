@@ -68,7 +68,7 @@ class OfferValidator(object):
         )
 
     def matches(self, offer: Offer) -> bool:
-        if not offer or not offer.trips:
+        if not offer.trips:
             return False
 
         segments = [
@@ -98,12 +98,6 @@ class OfferValidator(object):
         segment: Segment,
         requirement: Requirement,
     ) -> bool:
-        if not segment.departure_date_time or not segment.arrival_date_time:
-            return False
-
-        if not segment.origin or not segment.destination:
-            return False
-
         if segment.departure_date_time != requirement.departure_at:
             self._logger.debug(
                 "Departure times do not match",

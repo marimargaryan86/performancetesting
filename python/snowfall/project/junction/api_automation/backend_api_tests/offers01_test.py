@@ -151,7 +151,7 @@ async def return_offer_group_ids_and_offer_searches_id(
         junction_client,
         trip_offer_search_id,
     )
-    if not (offer_id is None or offer_group_ids == ["None"]):
+    if not (offer_id == "None" or offer_group_ids == ["None"]):
         logging.info(
             "offer_id: %s, offer_group_ids: %s",
             offer_id,

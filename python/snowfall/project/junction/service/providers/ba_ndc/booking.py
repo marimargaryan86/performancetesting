@@ -105,7 +105,7 @@ class BookingHandler(object):
             passport_document: request_order_schemas.IdentityDocument | None = None
             doc_details = passenger.doc_details
 
-            if doc_details and doc_details.document_type == 1 and details.doc_required:
+            if doc_details.document_type == 1 and details.doc_required:
                 passport_document = request_order_schemas.IdentityDocument(
                     document_number=passenger.doc_details.document_number,
                     document_type="PT",

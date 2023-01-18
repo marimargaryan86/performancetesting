@@ -1,7 +1,7 @@
 import datetime
 import struct
 import zoneinfo
-from typing import AsyncIterator, Generic, Optional, Type, TypeVar
+from typing import AsyncIterator, Generic, Optional, Type, TypeVar, cast
 
 from aiofiles.threadpool import binary
 from dateutil import tz
@@ -40,9 +40,7 @@ class AnySerializer(Generic[_Proto]):
 
         packed_message.ParseFromString(blob)
 
-        symbol: Type[_Proto] = cls._db.GetSymbol(
-            packed_message.TypeName(),
-        )
+        symbol = cast(Type[_Proto], cls._db.GetSymbol(packed_message.TypeName()))
         unpacked_message = symbol()
 
         packed_message.Unpack(unpacked_message)

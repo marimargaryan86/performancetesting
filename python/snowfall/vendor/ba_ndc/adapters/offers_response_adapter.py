@@ -74,7 +74,7 @@ class OffersResponseAdapter(object):  # noqa: WPS214
         self,
         offer: response_offer_search_schemas.Offer,
     ) -> str:
-        if offer and offer.trips:
+        if offer.trips:
             price_class = self.get_price_class_by_id(offer.trips[0].price_class_id)
 
             if price_class:

@@ -74,18 +74,17 @@ class PriceQuoteTransformer(object):
     ) -> List[offers_pb2.Penalty]:
         penalties = list[offers_pb2.Penalty]()
 
-        if duffel_offer.conditions:
-            penalties.append(
-                self._create_penalty(
-                    duffel_offer.conditions.change_before_departure,
-                    offers_pb2.Penalty.Type.TYPE_EXCHANGE,
-                ),
-            )
-            penalties.append(
-                self._create_penalty(
-                    duffel_offer.conditions.refund_before_departure,
-                    offers_pb2.Penalty.Type.TYPE_REFUND,
-                ),
-            )
+        penalties.append(
+            self._create_penalty(
+                duffel_offer.conditions.change_before_departure,
+                offers_pb2.Penalty.Type.TYPE_EXCHANGE,
+            ),
+        )
+        penalties.append(
+            self._create_penalty(
+                duffel_offer.conditions.refund_before_departure,
+                offers_pb2.Penalty.Type.TYPE_REFUND,
+            ),
+        )
 
         return penalties

@@ -52,12 +52,17 @@ class PushNotificationTokens(endpoints.HTTPEndpoint):
         tokens = await notification_tokens_repository.find_by_user(
             request.user.username,
         )
-        if not tokens:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        try:
+            first_token = resources.PushNotificationToken.from_proto(
+                await tokens.take(),
+            )
+        except StopAsyncIteration as exc:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from exc
 
         return models.JsonApiResponse(
             models.Body(
-                data=[
+                data=[first_token]
+                + [
                     resources.PushNotificationToken.from_proto(token)
                     async for token in tokens
                 ],

@@ -86,7 +86,7 @@ class ScheduleRepository(
         )
 
     async def get_last_updated_at(self) -> datetime.datetime:
-        schedule: models_pb2.Schedule = await self._execute(
+        schedule: models_pb2.Schedule | None = await self._execute(
             self._collection.find_one,
             filter={},
             projection={

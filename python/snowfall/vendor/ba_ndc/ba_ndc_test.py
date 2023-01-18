@@ -111,7 +111,7 @@ async def test_passenger_name_correction(ba_ndc_client: client.BaNdcClient) -> N
         order_rs.identifier,
         name_correction,
     )
-    assert order_rs is not None and order_rs.order is not None
+    assert order_rs.order is not None
     assert order_rs.passengers[0].first_name.lower() == new_passenger_first_name.lower()
 
     await call_cancel_order(ba_ndc_client, order_rs.identifier)
@@ -212,7 +212,7 @@ async def test_add_seat(ba_ndc_client: client.BaNdcClient) -> None:
     assert order_rs.order is not None
 
     seats_rs = await ba_ndc_client.get_seats(order_id=order_rs.identifier)
-    assert seats_rs is not None and seats_rs.seat_maps
+    assert seats_rs.seat_maps
     seat = random.choice(  # nosec
         random.choice(random.choice(seats_rs.seat_maps).cabins).seats,  # nosec
     )
@@ -228,14 +228,14 @@ async def test_add_seat(ba_ndc_client: client.BaNdcClient) -> None:
     )
 
     order_rs = await ba_ndc_client.add_seat(order_rs.identifier, request)
-    seat_item = [
+    seat_item = next(
         seat_elem
         for seat_elem in order_rs.order.order_items
         if isinstance(seat_elem, response_order_schemas.SeatOrderItem)
-    ][0]
+    )
 
     assert order_rs is not None
-    assert seat_item is not None and seat_item.column == seat.column
+    assert seat_item.column == seat.column
 
     await call_cancel_order(ba_ndc_client, order_rs.identifier)
 
@@ -244,7 +244,7 @@ async def test_add_seat(ba_ndc_client: client.BaNdcClient) -> None:
 async def test_reshop(ba_ndc_client: client.BaNdcClient) -> None:
     order_rs = await generate_order(ba_ndc_client)
     assert order_rs is not None
-    assert order_rs.order is not None and order_rs.origin_destinations
+    assert order_rs.origin_destinations
 
     reshop_rq = request_order_change_schemas.OrderReshopRequest(
         cabin_preference=offer_enums.CabinTypeEnum.first,

@@ -78,7 +78,7 @@ class JsonApiResponse(responses.Response):
 
     @classmethod
     def from_errors(cls, errors: Sequence[Error]) -> JsonApiResponse:
-        status_codes = cast(set[str], {error.status for error in errors if error})
+        status_codes = cast(set[str], {error.status for error in errors})
 
         if len(status_codes) == 1:
             return JsonApiResponse(

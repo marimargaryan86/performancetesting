@@ -89,4 +89,4 @@ async def test_proto_repository() -> None:
     documents.limit(1)
 
     async for document in documents:
-        assert document.updated_at
+        assert document.updated_at.ToSeconds() > 0

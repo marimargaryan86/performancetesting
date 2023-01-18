@@ -74,9 +74,6 @@ class ConnectionValidator(object):
         if not segment.departure_time or not segment.arrival_time:
             return False
 
-        if not segment.departure_station or not segment.arrival_station:
-            return False
-
         departure_at = datetime.datetime.fromisoformat(segment.departure_time).replace(
             tzinfo=requirement.departure_tz,
         )

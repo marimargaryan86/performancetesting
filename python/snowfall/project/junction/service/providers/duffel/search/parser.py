@@ -57,7 +57,7 @@ class OfferParser(object):  # noqa: WPS214
         expires_at: datetime.datetime | None = None
 
         for offer in offers:
-            if offer.expires_at and (not expires_at or expires_at < offer.expires_at):
+            if not expires_at or expires_at < offer.expires_at:
                 expires_at = offer.expires_at
 
         if expires_at is not None:

@@ -17,7 +17,8 @@ async def test_offer_search_can_be_retrieved(
     offer_search: models_pb2.OfferSearch,
 ) -> None:
     offer_search = await offer_searches_client.create(offer_search)
-    assert await offer_searches_client.get(offer_search.id)
+    offer_search_result = await offer_searches_client.get(offer_search.id)
+    assert offer_search_result == offer_search
 
 
 async def test_missing_offer_search_throws_error(

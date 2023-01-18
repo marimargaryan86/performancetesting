@@ -2,6 +2,7 @@ import inspect
 from typing import Any, Mapping, Optional
 
 import httpx
+from pydantic import ValidationError
 
 from snowfall.vendor.duffel import errors
 from snowfall.vendor.duffel.builders.offer_request import OfferRequestData
@@ -19,15 +20,14 @@ from snowfall.vendor.duffel.models.single_offer import SingleOfferResponse
 
 
 def _get_response_error_message(response: httpx.Response) -> str:
-    errors_response = ErrorResponse.parse_raw(response.content)
-    if errors_response:
-        error_status = str(errors_response.meta.status if errors_response.meta else "")
-        error_message = (
-            errors_response.errors[0].title if errors_response.errors else ""
-        )
-        return "{0}: {1}".format(error_status, error_message)
+    try:
+        errors_response = ErrorResponse.parse_raw(response.content)
+    except ValidationError:
+        return "can't parse error"
 
-    return "can't parse error"
+    error_status = str(errors_response.meta.status if errors_response.meta else "")
+    error_message = errors_response.errors[0].title if errors_response.errors else ""
+    return "{0}: {1}".format(error_status, error_message)
 
 
 class DuffelClient(object):  # noqa: WPS214

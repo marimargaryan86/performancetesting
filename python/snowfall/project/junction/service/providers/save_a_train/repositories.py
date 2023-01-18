@@ -18,7 +18,7 @@ class ProviderCabinMappingRepository(
     async def find_by_mapping(
         self,
         provider_cabin_class: str,
-    ) -> provider_amqp_pb2.CabinClassMapping:
+    ) -> provider_amqp_pb2.CabinClassMapping | None:
         return await self._execute(
             query=self._collection.find_one,
             filter={

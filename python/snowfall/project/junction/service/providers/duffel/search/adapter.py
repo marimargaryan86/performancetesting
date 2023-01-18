@@ -105,7 +105,7 @@ class DuffelSearchAdapter(object):
             self._build_search_request(search_task),
         )
 
-        if res and res.offers:
+        if res.offers:
             validator = Validators(
                 OfferValidator.from_segments(search_task.segments),
                 self._airline_validator,
