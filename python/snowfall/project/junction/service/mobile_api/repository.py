@@ -258,8 +258,6 @@ class PreferencesRepository(
     mixins.FindByIdMixin[dict[str, Any]],
     repository.DefaultRepository,
 ):
-    """"""
-
     async def update_preferences(self, user_id: str, preferences: Any) -> None:
         # TODO: check if I can do it in 1 aggregation pipeline
         saved_preferences = await self.find_by_id(user_id, "user_id")

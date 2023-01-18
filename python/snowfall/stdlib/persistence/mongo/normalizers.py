@@ -26,15 +26,15 @@ _COORDINATES_KEY = "coordinates"
 class Normalizer(abc.ABC):
     @abc.abstractmethod
     def normalize(self, maybe_dict: AnyValue) -> AnyValue:
-        """"""
+        """Normalize a value."""
 
     @abc.abstractmethod
     def denormalize(self, maybe_dict: AnyValue) -> AnyValue:
-        """"""
+        """Denormalize a value."""
 
     @abc.abstractmethod
     def supports(self, fqn: str) -> bool:
-        """"""
+        """Return whether this normalizer supports normalizing a specific FQN."""
 
 
 class _CoordinatesNormalizer(Normalizer):
