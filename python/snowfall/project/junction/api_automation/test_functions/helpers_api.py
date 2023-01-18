@@ -1,5 +1,7 @@
 import json
 import logging
+import secrets
+import string
 from functools import wraps
 from typing import Any, Callable, ParamSpec
 from uuid import UUID
@@ -43,3 +45,9 @@ def with_log(function: Callable[P, Any]) -> Callable[P, Any]:
         return res
 
     return wrapper
+
+
+def return_randomized_token() -> str:
+    alphabet = string.ascii_letters + string.digits
+    length_of_string = 32
+    return "".join(secrets.choice(alphabet) for ii in range(length_of_string))

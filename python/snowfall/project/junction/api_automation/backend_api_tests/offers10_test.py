@@ -1,7 +1,5 @@
 import json
 import logging
-import secrets
-import string
 
 import pytest
 
@@ -12,16 +10,12 @@ from snowfall.project.junction.api_automation.backend_api_tests.offers01_test im
 )
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
     is_valid_uuid,
+    return_randomized_token,
 )
 from snowfall.vendor.junction.client import JunctionClient
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
-
-
-def return_randomized_token() -> str:
-    alphabet = string.ascii_letters + string.digits
-    return "".join(secrets.choice(alphabet) for ii in range(32))
 
 
 @pytest.mark.integration

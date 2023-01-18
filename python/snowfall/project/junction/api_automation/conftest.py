@@ -10,6 +10,9 @@ import pytest
 from snowfall.project.junction.api_automation.test_functions.mobile_client import (
     MobileApiClient,
 )
+from snowfall.project.junction.api_automation.test_functions.pay_client import (
+    PayApiClient,
+)
 from snowfall.vendor.apilayer.client import APILayer
 from snowfall.vendor.junction.client import JunctionClient
 
@@ -56,6 +59,18 @@ def api_token(
     request: pytest.FixtureRequest,
 ) -> str:
     return request.config.getoption("API_TOKEN") or _local_config.get("API_TOKEN") or ""
+
+
+@pytest.fixture(scope="package")
+def apilayer_api_token(
+    _local_config: Mapping[str, str],
+    request: pytest.FixtureRequest,
+) -> str:
+    return (
+        request.config.getoption("APILAYER_API_TOKEN")
+        or _local_config.get("APILAYER_API_TOKEN")
+        or ""
+    )
 
 
 @pytest.fixture(scope="package", autouse=True)
@@ -187,14 +202,27 @@ def mobile_client(
 
 
 @pytest.fixture(scope="function")
-def api_layer_client(
+def pay_client(
     api_token: str,
+    host: str,
+) -> PayApiClient:
+    client_timeout = 20
+    return PayApiClient(
+        api_url="https://{0}".format(host),
+        token=api_token,
+        client=httpx.AsyncClient(timeout=client_timeout),
+    )
+
+
+@pytest.fixture(scope="function")
+def api_layer_client(
+    apilayer_api_token: str,
     host: str,
 ) -> APILayer:
     client_timeout = 20.0
     return APILayer(
-        base_url="https://{0}".format(host),
-        api_key=api_token,
+        base_url="https://api.apilayer.com",
+        api_key=apilayer_api_token,
         timeout=client_timeout,
     )
 
