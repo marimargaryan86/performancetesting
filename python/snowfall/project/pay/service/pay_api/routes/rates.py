@@ -1,7 +1,7 @@
 import lagom
 from starlette import endpoints, requests, responses
 
-from snowfall.project.junction.adapter import currencies
+from snowfall.project.pay.adapter import currencies
 from snowfall.stdlib import string
 from snowfall.stdlib.integration.starlette import request_helpers
 
@@ -17,7 +17,7 @@ class Rates(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
 
-        rate = await client.get_rate(
+        conversion = await client.convert(
             body["fromCurrency"],
             body["toCurrency"],
             _CONVERSION_AMOUNT,
@@ -28,7 +28,7 @@ class Rates(endpoints.HTTPEndpoint):
                 "type": "rates",
                 "id": string.uuid(),
                 "attributes": {
-                    "rate": float(rate),
+                    "rate": float(conversion.rate),
                 },
                 "relationships": {
                     "fromCurrency": {

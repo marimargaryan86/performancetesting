@@ -5,8 +5,8 @@ import lagom
 from pydantic import AnyUrl
 
 from snowfall.project.adapter import authentication
-from snowfall.project.junction.adapter import currencies
-from snowfall.project.junction.service.pay_api.repositories import CompanyRepository
+from snowfall.project.pay.adapter import currencies
+from snowfall.project.pay.service.pay_api.repositories import CompanyRepository
 from snowfall.project.pay.service.quotations import quotations
 from snowfall.stdlib.integration.starlette import application
 

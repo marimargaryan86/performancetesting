@@ -11,8 +11,6 @@ from redis import asyncio as aioredis
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
-from snowfall.project.junction.adapter import currencies
-from snowfall.project.junction.service.currencies.v1alpha import currencies_pb2_grpc
 from snowfall.project.junction.service.mobile_api import bootstrap
 from snowfall.project.junction.service.mobile_api import currencies as mobile_currencies
 from snowfall.project.junction.service.mobile_api import handlers as mobile_handlers
@@ -25,6 +23,8 @@ from snowfall.project.junction.service.mobile_api import (
     smtp,
 )
 from snowfall.project.junction.service.mobile_api.routes import router
+from snowfall.project.pay.adapter import currencies
+from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import filesystem

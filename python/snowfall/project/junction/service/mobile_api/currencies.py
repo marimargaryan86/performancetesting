@@ -4,7 +4,8 @@ from typing import Hashable, Mapping
 
 import asyncstdlib
 
-from snowfall.project.junction.adapter import currencies, errors
+from snowfall.project.junction.adapter import errors
+from snowfall.project.pay.adapter import currencies
 from snowfall.stdlib.money import Currency
 
 
@@ -31,11 +32,14 @@ class CurrencyClient(object):
     ) -> float:
         rate: float | None = None
         try:
-            rate = await self._currencies_client.get_rate(
-                Currency(from_currency),
-                Currency(to_currency),
-                1000,
-            )
+            rate = (
+                await self._currencies_client.convert(
+                    Currency(from_currency),
+                    Currency(to_currency),
+                    1,
+                )
+            ).rate
+
         except errors.UnhandledError as err:
             rate = self._fallback_rates.get(to_currency)
             if not rate:

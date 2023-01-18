@@ -1,11 +1,12 @@
 import datetime
 import ipaddress
 import random
+from typing import Sequence
 
 from motor import motor_asyncio
-from pydantic import HttpUrl
+from pydantic import AnyUrl, HttpUrl
 
-from snowfall.project.junction.service.currencies.grpc import CurrencyService
+from snowfall.project.pay.service.currencies.grpc import CurrencyService
 from snowfall.project.pay.service.rates.rates import BackUpRatesRepository
 from snowfall.stdlib import service
 from snowfall.stdlib.transport.grpc import server
@@ -22,7 +23,7 @@ class _Settings(service.Settings):
     bound_api_timeout: datetime.timedelta = datetime.timedelta(seconds=15)
     api_layer_api_key: str
     api_layer_base_url: str
-    mongo_dsn: str
+    mongo_dsn: Sequence[AnyUrl]
 
 
 async def _main(app: service.Application[_Settings]) -> None:

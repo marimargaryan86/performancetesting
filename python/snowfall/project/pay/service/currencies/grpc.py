@@ -3,7 +3,7 @@ from decimal import Decimal
 import grpc
 import httpx
 
-from snowfall.project.junction.service.currencies.v1alpha import (
+from snowfall.project.pay.service.currencies.v1alpha import (
     currencies_pb2,
     currencies_pb2_grpc,
 )

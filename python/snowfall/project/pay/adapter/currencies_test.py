@@ -1,8 +1,8 @@
 from unittest import mock
 
 from snowfall import fixtures
-from snowfall.project.junction.adapter import currencies
-from snowfall.project.junction.service.currencies.v1alpha import (
+from snowfall.project.pay.adapter import currencies
+from snowfall.project.pay.service.currencies.v1alpha import (
     currencies_pb2,
     currencies_pb2_grpc,
 )
@@ -18,12 +18,12 @@ class TestDictClient(object):
         to_currency = Currency("EUR")
         amount_before = 10
         expected_amount_after = 9
-        amount_after = await currencies_client.convert(
+        conversion = await currencies_client.convert(
             from_currency=from_currency,
             to_currency=to_currency,
             amount=amount_before,
         )
-        assert amount_after == expected_amount_after
+        assert conversion.amount == expected_amount_after
 
 
 class TestGrpcClient(object):
@@ -33,9 +33,9 @@ class TestGrpcClient(object):
             return_value=currencies_pb2.ConvertResponse(amount=95),
         )
         client = currencies.GrpcClient(stub)
-        amount = await client.convert(
+        conversion = await client.convert(
             fixtures.CURRENCIES[0],
             fixtures.CURRENCIES[1],
             100,
         )
-        assert amount == 95
+        assert conversion.amount == 95

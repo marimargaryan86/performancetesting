@@ -1,9 +1,9 @@
 import lagom
 from starlette import endpoints, requests, status
 
-from snowfall.project.junction.service.pay_api import resources
-from snowfall.project.junction.service.pay_api.repositories import CompanyRepository
 from snowfall.project.pay.service.companies.v1alpha import models_pb2
+from snowfall.project.pay.service.pay_api import resources
+from snowfall.project.pay.service.pay_api.repositories import CompanyRepository
 from snowfall.stdlib.integration.starlette import messages, models, request_helpers
 from snowfall.stdlib.v1alpha import postal_address_pb2
 

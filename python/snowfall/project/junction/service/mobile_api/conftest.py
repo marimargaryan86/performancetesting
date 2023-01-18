@@ -21,7 +21,6 @@ from fakeredis import aioredis as fakeredis
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
-from snowfall.project.junction.adapter import currencies
 from snowfall.project.junction.service.mobile_api import bootstrap
 from snowfall.project.junction.service.mobile_api import currencies as mobile_currencies
 from snowfall.project.junction.service.mobile_api import handlers as mobile_handlers
@@ -33,6 +32,7 @@ from snowfall.project.junction.service.mobile_api import (
 )
 from snowfall.project.junction.service.mobile_api.routes import router
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
+from snowfall.project.pay.adapter import currencies
 from snowfall.stdlib import string
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import filesystem

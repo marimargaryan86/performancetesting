@@ -9,10 +9,11 @@ from starlette import applications
 from starlette.middleware import Middleware
 
 from snowfall.project.adapter import authentication
-from snowfall.project.junction.adapter import currencies, errors
-from snowfall.project.junction.service.pay_api import bootstrap
-from snowfall.project.junction.service.pay_api.repositories import CompanyRepository
-from snowfall.project.junction.service.pay_api.routes import router
+from snowfall.project.junction.adapter import errors
+from snowfall.project.pay.adapter import currencies
+from snowfall.project.pay.service.pay_api import bootstrap
+from snowfall.project.pay.service.pay_api.repositories import CompanyRepository
+from snowfall.project.pay.service.pay_api.routes import router
 from snowfall.project.pay.service.quotations import quotations
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import filesystem

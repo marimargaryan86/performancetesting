@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package snowfall.project.junction.service.currencies.v1alpha;
+package snowfall.project.pay.service.currencies.v1alpha;
 
 service CurrencyService {
   rpc Convert(ConvertRequest) returns (ConvertResponse) {}

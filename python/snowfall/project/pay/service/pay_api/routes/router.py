@@ -2,7 +2,7 @@ import lagom
 from lagom.integrations import starlette
 from starlette import routing
 
-from snowfall.project.junction.service.pay_api.routes import (
+from snowfall.project.pay.service.pay_api.routes import (
     authentication,
     balances,
     companies,

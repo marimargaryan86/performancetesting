@@ -11,7 +11,6 @@ from redis import asyncio as aioredis
 
 from snowfall import fixtures
 from snowfall.project.junction.adapter import (
-    currencies,
     legs,
     locations,
     offer_searches,
@@ -28,6 +27,7 @@ from snowfall.project.junction.adapter import (
 from snowfall.project.junction.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
+from snowfall.project.pay.adapter import currencies
 from snowfall.stdlib import h3
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.mongo import repository
