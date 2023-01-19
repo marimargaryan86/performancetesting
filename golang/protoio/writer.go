@@ -8,7 +8,8 @@ import (
 )
 
 type ProtoWriter struct {
-	w io.Writer
+	w          io.Writer
+	FileLength uint64
 }
 
 func NewProtoWriter(w io.Writer) *ProtoWriter {
@@ -28,9 +29,14 @@ func (pw *ProtoWriter) Write(message proto.Message) error {
 		return fmt.Errorf("unable to write length: %w", err)
 	}
 
-	if _, err = pw.w.Write(wire); err != nil {
+	bytesWrote, err := pw.w.Write(wire)
+	if err != nil {
 		return fmt.Errorf("unable to write message: %w", err)
 	}
+	if bytesWrote != len(wire) {
+		return fmt.Errorf("Bytes written: %d does no match buffer length: %d", bytesWrote, len(wire))
+	}
+	pw.FileLength += uint64(4 + len(wire)) // 4 byte uint32 length + protobuffer
 
 	return nil
 }

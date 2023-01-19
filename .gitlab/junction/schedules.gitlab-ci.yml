@@ -1,0 +1,23 @@
+stages:
+  - download
+  - import
+  - export
+
+variables:
+  ARTIFACT_COMPRESSION_LEVEL: fastest
+  CACHE_COMPRESSION_LEVEL: fastest
+  GIT_STRATEGY: clone
+
+oag:
+  stage: download
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - data-input/
+  script:
+    - ssh-keyscan ftp.oag.com >> ~/.ssh/known_hosts
+    - curl -u "${OAG_USERNAME}:${OAG_PASSWORD}" 'sftp://ftp.oag.com/SIMSFL.DAT.gz' | gunzip > SIMSFL.DAT
+    - docker login git.snowfall.se:4567 -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}"
+    - docker run -u "${UID}" --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/ssim-convert:latest convert /data/SIMSFL.DAT /data/data-input/
+  tags:
+    - shell
