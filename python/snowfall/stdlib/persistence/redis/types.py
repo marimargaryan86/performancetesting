@@ -181,7 +181,7 @@ async def put_expires_at_if_less_than_current(
 ) -> None:
     expiry_at = await redis_client.get_expires_at(name)
 
-    if expiry_at and expiry_at > expiry:
+    if expiry_at and expiry > expiry_at:
         return
 
     await redis_client.put_expires_at(name, expiry)

@@ -47,7 +47,10 @@ async def test_client(
 ) -> AsyncIterator[httpx.AsyncClient]:
     async with httpx.AsyncClient(
         base_url="https://example.com",
-        transport=httpx.ASGITransport(app=test_app, raise_app_exceptions=False),
+        transport=httpx.ASGITransport(
+            app=test_app,  # type: ignore[arg-type]
+            raise_app_exceptions=False,
+        ),
     ) as client:
         yield client
 
@@ -59,7 +62,7 @@ async def test_client_without_response_validation(
     async with httpx.AsyncClient(
         base_url="https://example.com",
         transport=httpx.ASGITransport(
-            app=test_app_without_response_validation,
+            app=test_app_without_response_validation,  # type: ignore[arg-type]
             raise_app_exceptions=False,
         ),
     ) as client:

@@ -11,17 +11,17 @@ from openapi_core.unmarshalling.schemas import formatters
 
 class _CountryFormatter(formatters.Formatter):
     def validate(self, potential_country: Any) -> bool:
-        return self.unmarshal(potential_country) is not None
+        return self.format(potential_country) is not None
 
-    def unmarshal(self, country: Any) -> pycountry.db.Data | None:
+    def format(self, country: Any) -> pycountry.db.Data | None:  # noqa: A003
         return pycountry.countries.get(alpha_2=country)
 
 
 class _CurrencyFormatter(formatters.Formatter):
     def validate(self, potential_currency: Any) -> bool:
-        return self.unmarshal(potential_currency) is not None
+        return self.format(potential_currency) is not None
 
-    def unmarshal(self, currency: Any) -> iso4217.Currency | None:
+    def format(self, currency: Any) -> iso4217.Currency | None:  # noqa: A003
         try:
             return iso4217.Currency(currency)
         except ValueError:
@@ -31,13 +31,13 @@ class _CurrencyFormatter(formatters.Formatter):
 class _EmailFormatter(formatters.Formatter):
     def validate(self, potential_email: Any) -> bool:
         try:
-            self.unmarshal(potential_email)
+            self.format(potential_email)
         except email_validator.EmailNotValidError:
             return False
 
         return True
 
-    def unmarshal(self, email: Any) -> str:
+    def format(self, email: Any) -> str:  # noqa: A003
         return email_validator.validate_email(
             email=email,
             check_deliverability=False,
@@ -47,26 +47,26 @@ class _EmailFormatter(formatters.Formatter):
 class _PhoneFormatter(formatters.Formatter):
     def validate(self, potential_phone: Any) -> bool:
         try:
-            phone = self.unmarshal(potential_phone)
+            phone = self.format(potential_phone)
         except phonenumbers.NumberParseException:
             return False
 
         return phonenumbers.is_valid_number(phone)
 
-    def unmarshal(self, phone: Any) -> phonenumbers.PhoneNumber:
+    def format(self, phone: Any) -> phonenumbers.PhoneNumber:  # noqa: A003
         return phonenumbers.parse(phone, None)
 
 
 class _UriFormatter(formatters.Formatter):
     def validate(self, potential_url: Any) -> bool:
         try:
-            url = self.unmarshal(potential_url)
+            url = self.format(potential_url)
         except ValueError:
             return False
 
         return bool(url.scheme)
 
-    def unmarshal(self, url: Any) -> furl:
+    def format(self, url: Any) -> furl:  # noqa: A003
         return furl(url)
 
 

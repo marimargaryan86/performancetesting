@@ -26,7 +26,7 @@ backend_packages = [
 enabled = false
 
 [autoflake]
-version = "autoflake==1.7.7"
+version = "autoflake==2.0.0"
 lockfile = "vendor/lock/autoflake.txt"
 args = ["--remove-all-unused-imports", "--remove-unused-variables"]
 
@@ -41,7 +41,7 @@ extra_requirements = [
 ]
 
 [black]
-version = "black==22.10.0"
+version = "black==22.12.0"
 config = "vendor/pyproject.toml"
 lockfile = "vendor/lock/black.txt"
 interpreter_constraints = ["CPython==3.10.5"]
@@ -59,7 +59,7 @@ config = "vendor/pyproject.toml"
 report = ["console", "html"]
 
 [docformatter]
-version = "docformatter==1.5.0"
+version = "docformatter==1.5.1"
 lockfile = "vendor/lock/docformatter.txt"
 args = ["--wrap-summaries", "87", "--wrap-descriptions", "80"]
 interpreter_constraints = ["CPython==3.10.5"]
@@ -89,13 +89,13 @@ source_plugins = [
 ]
 
 [isort]
-version = "isort==5.10.1"
+version = "isort==5.11.4"
 config = "vendor/setup.cfg"
 lockfile = "vendor/lock/isort.txt"
 interpreter_constraints = ["CPython==3.10.5"]
 
 [mypy]
-version = "mypy==0.990"
+version = "mypy==0.991"
 config = "vendor/setup.cfg"
 lockfile = "vendor/lock/mypy.txt"
 interpreter_constraints = ["CPython==3.10.5"]
@@ -106,21 +106,18 @@ version = "mypy-protobuf==3.4.0"
 lockfile = "vendor/lock/mypy-protobuf.txt"
 extra_requirements = ["protobuf>=4.21.8"]
 
-[poetry]
-interpreter_constraints = ["CPython==3.10.5"]
-
 [protoc]
-version = "21.8"
+version = "21.12"
 url_platform_mapping = { linux_arm64 = "linux-aarch_64", linux_x86_64 = "linux-x86_64", macos_arm64 = "osx-aarch_64", macos_x86_64 = "osx-x86_64" }
 known_versions = [
-    "21.8|linux_arm64 |f3d8eb5839d6186392d8c7b54fbeabbb6fcdd90618a500b77cb2e24faa245cad|1579779",
-    "21.8|linux_x86_64|f90d0dd59065fef94374745627336d622702b67f0319f96cee894d41a974d47a|1583986",
-    "21.8|macos_arm64 |430b644f190e9def5034d641d4e1e0939d59c4bef28a73656a390c3314d44d88|1363556",
-    "21.8|macos_x86_64|e1f32612386601ce703dfa10c4ec8b8187e1bf89762b3241f0caa481339cad46|1500574",
+    "21.12|linux_arm64 |2dd17f75d66a682640b136e31848da9fb2eefe68d55303baf8b32617374f6711|1582596",
+    "21.12|linux_x86_64|3a4c1e5f2516c639d3079b1586e703fc7bcfa2136d58bda24d1d54f949c315e8|1585982",
+    "21.12|macos_arm64 |96839af0caed64352442fc8236f4bdf7c1cd6efcfaa98fa5db37307a73fc7c70|1364715",
+    "21.12|macos_x86_64|9448ff40278504a7ae5139bb70c962acc78c32d8fc54b4890a55c14c68b9d10a|1490613",
 ]
 
 [pytest]
-version = "pytest==7.2.0"
+version = "pytest==7.2.1"
 lockfile = "vendor/lock/pytest.txt"
 xdist_enabled = true
 args = [

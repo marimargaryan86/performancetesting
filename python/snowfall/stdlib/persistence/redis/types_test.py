@@ -208,6 +208,7 @@ class TestPrefixClient(object):
         expiry = datetime.datetime.now(
             tz=datetime.timezone.utc,
         ) + datetime.timedelta(seconds=30)
+        less_expiry = expiry - datetime.timedelta(seconds=20)
 
         await asyncio.gather(
             set1.add("foo"),
@@ -216,15 +217,12 @@ class TestPrefixClient(object):
             redis.put_expires_at_if_less_than_current(
                 self._foo_client,
                 set1,
-                datetime.datetime.now(
-                    tz=datetime.timezone.utc,
-                )
-                + datetime.timedelta(seconds=10),
+                less_expiry,
             ),
         )
 
         await asserts.assert_awaitables(
-            (self._foo_client.get_expires_at(set1), expiry),
+            (self._foo_client.get_expires_at(set1), less_expiry),
             (self._bar_client.get_expires_at(set2), None),
         )
 

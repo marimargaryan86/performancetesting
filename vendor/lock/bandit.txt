@@ -164,13 +164,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "a78d01d1e2c175c474884671dde039962c9d74c7223db7369771fcf6e29ceeab",
-              "url": "https://files.pythonhosted.org/packages/bd/ef/76cffd20061a0c6512dad4ba3537314904c6350738b99526c2f48992ff58/setuptools-66.0.0-py3-none-any.whl"
+              "hash": "fc19f9f62120a763300fd78e234b3cbd3417be098f08c156eaaf36420627e57b",
+              "url": "https://files.pythonhosted.org/packages/c5/94/00e3d21daa5a47c4f13d278ff08c1b3dbd167231e4a1c4b2c99e4616790e/setuptools-66.1.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "bd6eb2d6722568de6d14b87c44a96fac54b2a45ff5e940e639979a3d1792adb6",
-              "url": "https://files.pythonhosted.org/packages/67/ba/27235b9eebee2492fbf03ac1828a997d3d686031445d491f9cfa36a7085e/setuptools-66.0.0.tar.gz"
+              "hash": "78a02bdea8a5cb66dec1c507598c443bcc75562817d2556c1a17f7a344615bb4",
+              "url": "https://files.pythonhosted.org/packages/34/4d/5c3547ed1dd4cb8623ec6843a49a6a0598b37ec5358551e84b97bc4f5ee8/setuptools-66.1.0.tar.gz"
             }
           ],
           "project_name": "setuptools",
@@ -222,7 +222,7 @@
             "wheel; extra == \"testing-integration\""
           ],
           "requires_python": ">=3.7",
-          "version": "66"
+          "version": "66.1"
         },
         {
           "artifacts": [

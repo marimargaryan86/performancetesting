@@ -15,7 +15,7 @@
 //     "pytest-cov",
 //     "pytest-icdiff",
 //     "pytest-xdist",
-//     "pytest==7.2.0"
+//     "pytest==7.2.1"
 //   ],
 //   "manylinux": "manylinux2014",
 //   "requirement_constraints": [],
@@ -334,13 +334,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "892f933d339f068883b6fd5a459f03d85bfcb355e4981e146d2c7616c21fef71",
-              "url": "https://files.pythonhosted.org/packages/67/68/a5eb36c3a8540594b6035e6cdae40c1ef1b6a2bfacbecc3d1a544583c078/pytest-7.2.0-py3-none-any.whl"
+              "hash": "c7c6ca206e93355074ae32f7403e8ea12163b1163c976fee7d4d84027c162be5",
+              "url": "https://files.pythonhosted.org/packages/cc/02/8f59bf194c9a1ceac6330850715e9ec11e21e2408a30a596c65d54cf4d2a/pytest-7.2.1-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "c4014eb40e10f11f355ad4e3c2fb2c6c6d1919c73f3b5a433de4708202cade59",
-              "url": "https://files.pythonhosted.org/packages/0b/21/055f39bf8861580b43f845f9e8270c7786fe629b2f8562ff09007132e2e7/pytest-7.2.0.tar.gz"
+              "hash": "d45e0952f3727241918b8fd0f376f5ff6b301cc0777c6f9a556935c92d8a7d42",
+              "url": "https://files.pythonhosted.org/packages/e5/6c/f3a15217ac72912c28c5d7a7a8e87ff6d6475c9530595ae9f0f8dedd8dd8/pytest-7.2.1.tar.gz"
             }
           ],
           "project_name": "pytest",
@@ -362,7 +362,7 @@
             "xmlschema; extra == \"testing\""
           ],
           "requires_python": ">=3.7",
-          "version": "7.2"
+          "version": "7.2.1"
         },
         {
           "artifacts": [
@@ -511,7 +511,7 @@
     "pytest-cov",
     "pytest-icdiff",
     "pytest-xdist",
-    "pytest==7.2.0"
+    "pytest==7.2.1"
   ],
   "requires_python": [
     "==3.10.5"
