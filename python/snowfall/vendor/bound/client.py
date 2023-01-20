@@ -72,32 +72,6 @@ class Bound(object):
         )
 
     @_auth_required
-    async def create_spot(self, quote_id: str) -> dict[str, Any]:
-        quote_data = {"quoteId": quote_id}
-
-        response = await self._http_client.post(
-            "{0}/v1/trades/".format(self._base_url),
-            cookies=self._auth_cookies,
-            json=quote_data,
-        )
-
-        response.raise_for_status()
-
-        return response.json()
-
-    @_auth_required
-    async def get_spot(self, spot_id: str) -> dict[str, Any]:
-        spot_url = "{0}/v1/trades/{1}".format(self._base_url, spot_id)
-        response = await self._http_client.get(
-            spot_url,
-            cookies=self._auth_cookies,
-        )
-
-        response.raise_for_status()
-
-        return response.json()
-
-    @_auth_required
     async def get_rates(self, currency_pairs: str) -> Sequence[exchange.Rate]:
         rates_url = "{0}/v1/indicative-rates?currencyPairs={1}".format(
             self._base_url,
