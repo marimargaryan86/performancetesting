@@ -1192,6 +1192,215 @@
         ]
       }
     },
+    "/trip-candidates/searches": {
+      "post": {
+        "summary": "Create Trip Candidates Search",
+        "tags": [
+          "trips"
+        ],
+        "operationId": "post-trip-candidates-searches",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TripCandidatesSearch"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "description": "Used to initiate a search for trip candidates based on the provided Trip Candidates Search context.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/TripCandidatesSearch"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+            "$ref": "#/components/parameters/sessionToken"
+          }
+      ]
+    },
+    "/trip-candidates/searches/{tripCandidatesSearchId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/tripCandidatesSearchId"
+        }
+      ],
+      "get": {
+        "summary": "Get Trip Candidate Search",
+        "tags": [
+          "trips"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TripCandidatesSearch"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-trip-candidates-searches-id",
+        "description": "Used to lookup data for a Trip Candidates Search Identifier.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sessionToken"
+          }
+        ]
+      }
+    },
+    "/trip-candidates/searches/{tripCandidatesSearchId}/offers": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/tripCandidatesSearchId"
+        },
+        {
+          "$ref": "#/components/parameters/offerInclude"
+        }
+      ],
+      "get": {
+        "summary": "List Trip Candidates Offers by Trip Candidates Search",
+        "tags": [
+          "trips"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "items": {
+                            "$ref": "#/components/schemas/Offer"
+                          }
+                        },
+                        "included": {
+                          "type": "array",
+                          "items": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/components/schemas/OfferGroup"
+                              },
+                              {
+                                "$ref": "#/components/schemas/TripOfferGroupDetails"
+                              },
+                              {
+                                "$ref": "#/components/schemas/LegType"
+                              },
+                              {
+                                "$ref": "#/components/schemas/OfferOption"
+                              },
+                              {
+                                "$ref": "#/components/schemas/TripOfferOptionDetails"
+                              },
+                              {
+                                "$ref": "#/components/schemas/CabinClass"
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-trip-candidates-searches-id-offers",
+        "description": "Used to retrieve all Trip Candidates Offer results for an Trip Candidates Search.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sessionToken"
+          },
+          {
+            "$ref": "#/components/parameters/offerSort"
+          },
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          },
+          {
+            "$ref": "#/components/parameters/filterOffersCabinClass"
+          }
+        ]
+      }
+    },
     "/trips/{tripId}": {
       "parameters": [
         {
@@ -4684,6 +4893,170 @@
         "title": "Trip Search",
         "description": "Context for which Trips can be found."
       },
+      "TripCandidatesSearch": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "trip-candidates-searches"
+                ],
+                "example": "trip-candidates-searches"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "expiresAt",
+                  "status",
+                  "criteria",
+                  "passengers"
+                ],
+                "properties": {
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true,
+                    "example": "2019-08-24T14:15:22Z"
+                  },
+                  "status": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                      "unspecified",
+                      "pending",
+                      "processing",
+                      "completed",
+                      "failed"
+                    ],
+                    "example": "completed"
+                  },
+                  "criteria": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                      "$ref": "#/components/schemas/TripCandidatesSearchCriteria"
+                    }
+                  },
+                  "passengers": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "$ref": "#/components/schemas/Passenger"
+                    }
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "properties": {
+                  "allowedSegmentTypes": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                          "$ref": "#/components/schemas/LegTypeIdentifier"
+                        }
+                      }
+                    },
+                    "required": [
+                      "data"
+                    ]
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "title": "Trip Candidates Search",
+        "description": "Context for which Trip Candidates can be found."
+      },
+      "TripCandidatesSearchCriteria": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "origin",
+                  "destination",
+                  "departureAfter"
+                ],
+                "properties": {
+                  "origin": {
+                    "$ref": "#/components/schemas/Coordinates"
+                  },
+                  "destination": {
+                    "$ref": "#/components/schemas/Coordinates"
+                  },
+                  "departureAfter": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z"
+                  },
+                  "maximumConnections": {
+                    "type": "integer",
+                    "format": "int32",
+                    "example": 2,
+                    "minimum": 0
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "title": "Trip Candidates Search Criteria",
+        "description": "Criteria to use in a Trip Candidates Search"
+      },
+      "Coordinates": {
+        "title": "Coordinates",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "latitude",
+                  "longitude"
+                ],
+                "properties": {
+                  "latitude": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 59.858611
+                  },
+                  "longitude": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 59.858611
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "description": "A Coordinate represented via latitude and longitude"
+      },
       "PriceResource": {
         "title": "PriceResource",
         "allOf": [
@@ -6940,6 +7313,19 @@
       }
     },
     "parameters": {
+      "sessionToken": {
+        "name": "Session-Token",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "example": "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn",
+          "minLength": 32,
+          "maxLength": 32,
+          "pattern": "^[A-Za-z\\d]{32}$"
+        },
+        "description": "Unique session token that follows the flow until order creation. Used for rate and offer caching."
+      },
       "tripSearchId": {
         "name": "tripSearchId",
         "in": "path",
@@ -6950,6 +7336,17 @@
           "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
         },
         "description": "Trip Search identifier"
+      },
+      "tripCandidatesSearchId": {
+        "name": "tripCandidatesSearchId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+        },
+        "description": "Trip Candidates Search identifier"
       },
       "placeId": {
         "name": "placeId",
