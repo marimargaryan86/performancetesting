@@ -4,7 +4,7 @@ import random
 import httpx
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import offers
+from snowfall.project.junction.provider import offers, repository
 from snowfall.project.junction.service.providers.distribusion import cache
 from snowfall.project.junction.service.providers.distribusion.config import (
     SearchesSettings,
@@ -63,19 +63,21 @@ async def searches(app: service.Application[SearchesSettings]) -> None:  # noqa:
                 connection=amqp_connection,
                 exchange=types.Exchange("offers"),
             ),
-            redis=redis.Client[bytes](
-                redis=redis_connection,
-                prefix=app.name,
-            ),
-            offer_group_cache_key_func=adapter.offer_group_cache_key,
-            offer_group_generator=adapter.DistribusionSearchAdapter(
-                distribusion_client=distribusion_client,
-                connection_validator=validator.ConnectionValidator(),
-                offers_cache=cache.OffersCache(
-                    client=redis.Client(redis_connection, prefix=app.name),
+            offer_group_repository=repository.OfferGroupRepository(
+                redis=redis.Client(
+                    redis=redis_connection,
+                    prefix=app.name,
                 ),
-                ttl=app.settings.ttl,
-            ).gather_search_results,
+                offer_group_cache_key_func=adapter.offer_group_cache_key,
+                offer_group_generator=adapter.DistribusionSearchAdapter(
+                    distribusion_client=distribusion_client,
+                    connection_validator=validator.ConnectionValidator(),
+                    offers_cache=cache.OffersCache(
+                        client=redis.Client(redis_connection, prefix=app.name),
+                    ),
+                    ttl=app.settings.ttl,
+                ).gather_search_results,
+            ),
         )
 
         await search_consumer.consume()

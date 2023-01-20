@@ -4,7 +4,7 @@ import random
 import httpx
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import offers
+from snowfall.project.junction.provider import offers, repository
 from snowfall.project.junction.service.providers.duffel import cache
 from snowfall.project.junction.service.providers.duffel.config import SearchesSettings
 from snowfall.project.junction.service.providers.duffel.search import adapter
@@ -65,20 +65,22 @@ async def searches(app: service.Application[SearchesSettings]) -> None:  # noqa:
                 connection=amqp_connection,
                 exchange=types.Exchange(_OFFERS),
             ),
-            redis=redis.Client(
-                redis=redis_connection,
-                prefix=app.name,
-            ),
-            offer_group_cache_key_func=adapter.offer_group_cache_key,
-            offer_group_generator=adapter.DuffelSearchAdapter(
-                duffel_client=duffel_client,
-                offers_cache=cache.OfferCache(
-                    client=redis.Client[bytes](redis_connection, prefix=app.name),
+            offer_group_repository=repository.OfferGroupRepository(
+                redis=redis.Client(
+                    redis=redis_connection,
+                    prefix=app.name,
                 ),
-                ttl=app.settings.ttl,
-                enabled_airlines=app.settings.enabled_airlines,
-                disabled_airlines=app.settings.disabled_airlines,
-            ).gather_search_results,
+                offer_group_cache_key_func=adapter.offer_group_cache_key,
+                offer_group_generator=adapter.DuffelSearchAdapter(
+                    duffel_client=duffel_client,
+                    offers_cache=cache.OfferCache(
+                        client=redis.Client[bytes](redis_connection, prefix=app.name),
+                    ),
+                    ttl=app.settings.ttl,
+                    enabled_airlines=app.settings.enabled_airlines,
+                    disabled_airlines=app.settings.disabled_airlines,
+                ).gather_search_results,
+            ),
         )
 
         await search_consumer.consume()

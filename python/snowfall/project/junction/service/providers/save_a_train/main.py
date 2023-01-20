@@ -14,7 +14,7 @@ import pydantic
 from motor import motor_asyncio
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import notifications, offers
+from snowfall.project.junction.provider import notifications, offers, repository
 from snowfall.project.junction.service.providers.save_a_train import (
     adapter,
     cache,
@@ -162,25 +162,27 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                 connection=amqp_connection,
                 exchange=types.Exchange(_OFFERS),
             ),
-            redis=redis.Client[bytes](
-                redis=redis_connection,
-                prefix=app.name,
+            offer_group_repository=repository.OfferGroupRepository(
+                redis=redis.Client(
+                    redis=redis_connection,
+                    prefix=app.name,
+                ),
+                offer_group_cache_key_func=sat_offers.offer_group_cache_key,
+                offer_group_generator=adapter.SaveATrainAdapter(
+                    save_a_train_client=save_a_train_client,
+                    train_station_repository=train_stations.TrainStationRepository(
+                        train_stations=await _load_train_stations(),
+                    ),
+                    provider_cabin_class_mapping=repositories.ProviderCabinMappingRepository(
+                        mongo.sat.provider_cabin_mapping,
+                    ),
+                    offers_cache=cache.OffersCache(
+                        client=redis.Client(redis_connection, prefix=app.name),
+                    ),
+                    ttl=app.settings.ttl,
+                    notifier=notifications.LogNotifier(),
+                ).gather_search_results,
             ),
-            offer_group_cache_key_func=sat_offers.offer_group_cache_key,
-            offer_group_generator=adapter.SaveATrainAdapter(
-                save_a_train_client=save_a_train_client,
-                train_station_repository=train_stations.TrainStationRepository(
-                    train_stations=await _load_train_stations(),
-                ),
-                provider_cabin_class_mapping=repositories.ProviderCabinMappingRepository(
-                    mongo.sat.provider_cabin_mapping,
-                ),
-                offers_cache=cache.OffersCache(
-                    client=redis.Client(redis_connection, prefix=app.name),
-                ),
-                ttl=app.settings.ttl,
-                notifier=notifications.LogNotifier(),
-            ).gather_search_results,
         )
 
         await search_consumer.consume()

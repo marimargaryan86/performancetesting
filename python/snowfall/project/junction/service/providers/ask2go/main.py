@@ -10,7 +10,12 @@ import httpx
 import pydantic
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import airports, notifications, offers
+from snowfall.project.junction.provider import (
+    airports,
+    notifications,
+    offers,
+    repository,
+)
 from snowfall.project.junction.service.providers.ask2go import (
     booking,
     cache,
@@ -199,34 +204,42 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                 connection=amqp_connection,
                 exchange=types.Exchange(_OFFERS),
             ),
-            redis=redis.Client(
-                redis=redis_connection,
-                prefix=app.name,
-            ),
-            offer_group_cache_key_func=a2g_offers.offer_group_cache_key,
-            offer_group_generator=a2g_offers.offer_group_generator(
-                a2g_adapter=search.Adapter(
-                    ask2go_client=ask2go_client,
-                    offer_validator=validator.OfferValidator(),
-                    poll_retries_limit=app.settings.poll_retries_limit,
-                    wait_time_between_polling=app.settings.wait_time_between_polling,
+            offer_group_repository=repository.OfferGroupRepository(
+                redis=redis.Client(
+                    redis=redis_connection,
+                    prefix=app.name,
                 ),
-                a2g_transformer=transformer.OfferTransformer(
-                    airport_repository=airports.AirportRepository(
-                        airports_data=cast(
-                            list[dict[str, Any]],
-                            filesystem.PkgLoader(
-                                "snowfall.project.junction.service.providers.ask2go.main",
-                            ).load("airports.json"),
+                offer_group_cache_key_func=a2g_offers.offer_group_cache_key,
+                offer_group_generator=a2g_offers.offer_group_generator(
+                    a2g_adapter=search.Adapter(
+                        ask2go_client=ask2go_client,
+                        offer_validator=validator.OfferValidator(),
+                        poll_retries_limit=app.settings.poll_retries_limit,
+                        wait_time_between_polling=app.settings.wait_time_between_polling,
+                    ),
+                    a2g_transformer=transformer.OfferTransformer(
+                        airport_repository=airports.AirportRepository(
+                            airports_data=cast(
+                                list[dict[str, Any]],
+                                filesystem.PkgLoader(
+                                    "snowfall.project.junction.service.providers.ask2go.main",
+                                ).load("airports.json"),
+                            ),
                         ),
+                        offer_cache=cache.OfferCache(
+                            client=redis.Client[bytes](
+                                redis_connection,
+                                prefix=app.name,
+                            ),
+                        ),
+                        price_cache=cache.PriceQuoteCache(
+                            client=redis.Client[bytes](
+                                redis_connection,
+                                prefix=app.name,
+                            ),
+                        ),
+                        offer_ttl=app.settings.ttl,
                     ),
-                    offer_cache=cache.OfferCache(
-                        client=redis.Client[bytes](redis_connection, prefix=app.name),
-                    ),
-                    price_cache=cache.PriceQuoteCache(
-                        client=redis.Client[bytes](redis_connection, prefix=app.name),
-                    ),
-                    offer_ttl=app.settings.ttl,
                 ),
             ),
         ).consume()

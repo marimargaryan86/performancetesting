@@ -5,7 +5,7 @@ from typing import Any, cast
 import httpx
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import airports, offers
+from snowfall.project.junction.provider import airports, offers, repository
 from snowfall.project.junction.service.providers.ba_ndc import cache, config
 from snowfall.project.junction.service.providers.ba_ndc.search.adapter import (
     BaNdcSearchAdapter,
@@ -76,18 +76,20 @@ async def searches(  # noqa: WPS210
                 connection=amqp_connection,
                 exchange=types.Exchange("offers"),
             ),
-            redis=redis.Client(
-                redis=redis_connection,
-                prefix=app.name,
-            ),
-            offer_group_cache_key_func=offer_group_cache_key,
-            offer_group_generator=BaNdcSearchAdapter(
-                ba_ndc_client=ba_ndc_client,
-                airport_repository=airport_repository,
-                offers_cache=cache.OfferCache(
-                    client=redis.Client[bytes](redis_connection, prefix=app.name),
+            offer_group_repository=repository.OfferGroupRepository(
+                redis=redis.Client(
+                    redis=redis_connection,
+                    prefix=app.name,
                 ),
-            ).gather_search_results,
+                offer_group_cache_key_func=offer_group_cache_key,
+                offer_group_generator=BaNdcSearchAdapter(
+                    ba_ndc_client=ba_ndc_client,
+                    airport_repository=airport_repository,
+                    offers_cache=cache.OfferCache(
+                        client=redis.Client[bytes](redis_connection, prefix=app.name),
+                    ),
+                ).gather_search_results,
+            ),
         )
 
         await search_consumer.consume()
