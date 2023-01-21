@@ -57,7 +57,7 @@
 //     "pytest-httpx==0.21.3",
 //     "pytest==7.2.1",
 //     "python-dateutil==2.8.2",
-//     "redis[hiredis]==4.4.2",
+//     "redis[hiredis]==4.3.5",
 //     "rfc3339-validator==0.1.4",
 //     "sentry-sdk==1.13.0",
 //     "setuptools==66.1.0",
@@ -2809,13 +2809,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "e6206448e2f8a432871d07d432c13ed6c2abcf6b74edb436c99752b1371be387",
-              "url": "https://files.pythonhosted.org/packages/73/0f/cce821f7cd8463bf2f133029a13c0abb614cb6fe24188e2a5d1332758017/redis-4.4.2-py3-none-any.whl"
+              "hash": "46652271dc7525cd5a9667e5b0ca983c848c75b2b8f7425403395bb8379dcf25",
+              "url": "https://files.pythonhosted.org/packages/76/ad/dd7b6423295394b95e03d961d454e3046b569715dcc2dd4a030bb43a7cff/redis-4.3.5-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "a010f6cb7378065040a02839c3f75c7e0fb37a87116fb4a95be82a95552776c7",
-              "url": "https://files.pythonhosted.org/packages/06/4c/d13280a1e0dcfbf2cb3c443598abea70f651936ec8a39284160a9369d71c/redis-4.4.2.tar.gz"
+              "hash": "30c07511627a4c5c4d970e060000772f323174f75e745a26938319817ead7a12",
+              "url": "https://files.pythonhosted.org/packages/c9/33/8841abbbb9b9f0202fac6e96539cfb98728a709a9b0c5b2ccfb745fb8211/redis-4.3.5.tar.gz"
             }
           ],
           "project_name": "redis",
@@ -2824,12 +2824,13 @@
             "cryptography>=36.0.1; extra == \"ocsp\"",
             "hiredis>=1.0.0; extra == \"hiredis\"",
             "importlib-metadata>=1.0; python_version < \"3.8\"",
+            "packaging>=20.4",
             "pyopenssl==20.0.1; extra == \"ocsp\"",
             "requests>=2.26.0; extra == \"ocsp\"",
             "typing-extensions; python_version < \"3.8\""
           ],
-          "requires_python": ">=3.7",
-          "version": "4.4.2"
+          "requires_python": ">=3.6",
+          "version": "4.3.5"
         },
         {
           "artifacts": [
@@ -3976,7 +3977,7 @@
     "pytest-httpx==0.21.3",
     "pytest==7.2.1",
     "python-dateutil==2.8.2",
-    "redis[hiredis]==4.4.2",
+    "redis[hiredis]==4.3.5",
     "rfc3339-validator==0.1.4",
     "sentry-sdk==1.13.0",
     "setuptools==66.1.0",
