@@ -92,8 +92,8 @@ class BackUpRatesRepository(
 
     async def find_by_currency_pair(
         self,
-        buy_currency: str,
         sell_currency: str,
+        buy_currency: str,
     ) -> models_pb2.BackUpRate | None:
         return await self._execute(
             self._collection.find_one,
