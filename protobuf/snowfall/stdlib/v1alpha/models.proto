@@ -98,3 +98,9 @@ message CabinClass {
   Type type = 1;
   string marketing_name = 2;
 }
+
+message CabinClassMapping {
+  CabinClass.Type type = 1;
+  string fare_brand = 2;
+  string operator = 3;
+}
