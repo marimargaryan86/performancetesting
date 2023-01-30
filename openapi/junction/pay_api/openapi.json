@@ -653,63 +653,57 @@
       }
     },
     "/transactions": {
-      "get": {
-        "summary": "List Transactions",
+      "post": {
+        "summary": "Create transactions",
+        "description": "Create transactions if quotation is valid",
         "tags": [
           "transactions"
         ],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/page-cursor"
-          },
-          {
-            "$ref": "#/components/parameters/page-limit"
-          },
-          {
-            "$ref": "#/components/parameters/sort"
-          }
-        ],
+        "operationId": "post-transactions",
         "responses": {
-          "200": {
-            "description": "OK",
+          "201": {
+            "description": "Transaction is created",
             "content": {
               "application/vnd.api+json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "uniqueItems": true,
-                          "minItems": 0,
-                          "items": {
-                            "$ref": "#/components/schemas/Transaction"
-                          }
-                        }
-                      },
-                      "required": [
-                        "data"
-                      ]
-                    },
-                    {
-                      "$ref": "#/components/schemas/NextLink"
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Transaction"
                     }
-                  ]
+                  }
                 }
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-transactions",
-        "description": "Get account transactions",
-        "security": []
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Transaction"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   },
@@ -1173,121 +1167,6 @@
         ],
         "description": "Currency details."
       },
-      "Transaction": {
-        "title": "Transaction",
-        "allOf": [
-          {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-                "format": "uuid",
-                "readOnly": true
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "transactions"
-                ],
-                "example": "transactions"
-              },
-              "attributes": {
-                "type": "object",
-                "properties": {
-                  "amount": {
-                    "type": "integer",
-                    "example": 1500
-                  },
-                  "ref": {
-                    "type": "string",
-                    "example": "reference"
-                  },
-                  "completedAt": {
-                    "type": "string",
-                    "example": "2022-05-13T15:09:14+00:00",
-                    "format": "date-time",
-                    "nullable": true
-                  },
-                  "createdAt": {
-                    "type": "string",
-                    "example": "2022-05-10T12:24:30+00:00",
-                    "format": "date-time"
-                  }
-                },
-                "required": [
-                  "amount",
-                  "ref",
-                  "completedAt",
-                  "createdAt"
-                ]
-              },
-              "relationships": {
-                "type": "object",
-                "required": [
-                  "balance",
-                  "currency",
-                  "status",
-                  "transactionType"
-                ],
-                "properties": {
-                  "balance": {
-                    "type": "object",
-                    "required": [
-                      "data"
-                    ],
-                    "properties": {
-                      "data": {
-                        "$ref": "#/components/schemas/BalanceIdentifier"
-                      }
-                    }
-                  },
-                  "currency": {
-                    "type": "object",
-                    "required": [
-                      "data"
-                    ],
-                    "properties": {
-                      "data": {
-                        "$ref": "#/components/schemas/CurrencyIdentifier"
-                      }
-                    }
-                  },
-                  "transactionType": {
-                    "type": "object",
-                    "required": [
-                      "data"
-                    ],
-                    "properties": {
-                      "data": {
-                        "$ref": "#/components/schemas/TransactionTypeIdentifier"
-                      }
-                    }
-                  },
-                  "status": {
-                    "type": "object",
-                    "required": [
-                      "data"
-                    ],
-                    "properties": {
-                      "data": {
-                        "$ref": "#/components/schemas/TransactionStatusIdentifier"
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "required": [
-              "id",
-              "type",
-              "attributes",
-              "relationships"
-            ]
-          }
-        ],
-        "description": "Account transactions."
-      },
       "AddressDetails": {
         "title": "Address Details",
         "type": "object",
@@ -1381,26 +1260,71 @@
           }
         ]
       },
-      "BalanceIdentifier": {
-        "title": "Balance Identifier",
+      "Transaction": {
+        "title": "Transaction",
         "type": "object",
+        "description": "Transaction data",
+        "required": [
+          "attributes"
+        ],
         "properties": {
           "id": {
             "type": "string",
-            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5"
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "format": "uuid",
+            "readOnly": true
           },
           "type": {
             "type": "string",
             "enum": [
-              "balances"
+              "transactions"
             ],
-            "example": "balances"
+            "example": "transactions"
+          },
+          "attributes": {
+            "required": [
+              "externalReference",
+              "parentExternalReference",
+              "createdAt"
+            ],
+            "properties": {
+              "externalReference": {
+                "type": "string",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "format": "uuid"
+              },
+              "parentExternalReference": {
+                "type": "string",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "format": "uuid"
+              },
+              "createdAt": {
+                "type": "string",
+                "example": "2023-01-20T17:04:14+00:00",
+                "format": "date-time",
+                "readOnly": true
+              }
+            }
+          },
+          "relationships": {
+            "required": [
+              "quotationId"
+            ],
+            "properties": {
+              "quotationId": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/QuotationIdentifier"
+                  }
+                }
+              }
+            }
           }
-        },
-        "required": [
-          "id",
-          "type"
-        ]
+        }
       },
       "CompanyIdentifier": {
         "title": "Company Identifier",
@@ -1445,47 +1369,27 @@
           "type"
         ]
       },
-      "TransactionTypeIdentifier": {
-        "title": "Transaction Type Identifier",
+      "QuotationIdentifier": {
+        "title": "Quotation Identifier",
         "type": "object",
+        "required": [
+          "id",
+          "type"
+        ],
         "properties": {
           "id": {
             "type": "string",
-            "example": "debit"
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
           },
           "type": {
             "type": "string",
             "enum": [
-              "transaction-types"
+              "quotations"
             ],
-            "example": "transaction-types"
+            "example": "quotations"
           }
-        },
-        "required": [
-          "id",
-          "type"
-        ]
-      },
-      "TransactionStatusIdentifier": {
-        "title": "Transaction Status Identifier",
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "completed"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "transaction-statuses"
-            ],
-            "example": "transaction-statuses"
-          }
-        },
-        "required": [
-          "id",
-          "type"
-        ]
+        }
       },
       "NextLink": {
         "title": "Next Link",
