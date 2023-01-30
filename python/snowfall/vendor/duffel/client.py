@@ -1,5 +1,5 @@
 import inspect
-from typing import Any, Mapping, Optional
+from typing import Any, List, Mapping, Optional
 
 import httpx
 from pydantic import ValidationError
@@ -16,6 +16,7 @@ from snowfall.vendor.duffel.models.offer_request import (
     OfferRequestResponse,
 )
 from snowfall.vendor.duffel.models.order import Order, OrderResponse
+from snowfall.vendor.duffel.models.seat_map import SeatResponse, Seats
 from snowfall.vendor.duffel.models.single_offer import SingleOfferResponse
 
 
@@ -69,6 +70,18 @@ class DuffelClient(object):  # noqa: WPS214
         )
 
         return SingleOfferResponse.parse_raw(response.content).response_data
+
+    async def get_seat_map(
+        self,
+        offer_id: str,
+    ) -> List[Seats]:
+        response = await self._make_request(
+            "GET",
+            "air/seat_maps",
+            query_params={"offer_id": offer_id},
+        )
+
+        return SeatResponse.parse_raw(response.content).response_data
 
     async def order_request(
         self,

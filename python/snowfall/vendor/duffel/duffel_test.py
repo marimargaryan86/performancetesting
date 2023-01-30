@@ -70,6 +70,13 @@ async def test_get_offers(duffel_client: client.DuffelClient) -> None:
 
 
 @disable_by_default
+async def test_seat_map(duffel_client: client.DuffelClient) -> None:
+    offer_id = "off_0000ASApQL0LdDq30usAoj"
+    seats = await duffel_client.get_seat_map(offer_id)
+    assert seats is not None
+
+
+@disable_by_default
 async def test_order_create(duffel_client: client.DuffelClient) -> None:
     offer_request_create = OffersRequestBuilder()
     offer_request_create.add_passenger(OfferRequestPassenger(pax_type="adult"))
