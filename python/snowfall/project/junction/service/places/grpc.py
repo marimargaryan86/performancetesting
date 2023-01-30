@@ -2,10 +2,7 @@ import uuid
 
 from grpc import StatusCode, aio
 
-from snowfall.project.junction.service.places.places import (
-    LocationRepository,
-    PlaceRepository,
-)
+from snowfall.project.junction.service.places import places
 from snowfall.project.junction.service.places.v1alpha import (
     models_pb2,
     places_pb2,
@@ -13,9 +10,12 @@ from snowfall.project.junction.service.places.v1alpha import (
 )
 from snowfall.stdlib.transport.grpc import service
 
+_MAX_DISTANCE_AIRPORT = 50000
+_MAX_DISTANCE_RAIL_STATION = 10000
+
 
 class LocationsService(service.Service, places_pb2_grpc.LocationsServiceServicer):
-    def __init__(self, locations: LocationRepository, default_page_size: int):
+    def __init__(self, locations: places.LocationRepository, default_page_size: int):
         self._default_page_size = default_page_size
         self._locations = locations
 
@@ -67,14 +67,43 @@ class LocationsService(service.Service, places_pb2_grpc.LocationsServiceServicer
             next_page_token=await locations_result.cursor(),
         )
 
+    async def ListNearbyLocations(  # type: ignore[override] # noqa: N802
+        self,
+        request: places_pb2.ListNearbyLocationsRequest,
+        context: aio.ServicerContext,
+    ) -> places_pb2.ListNearbyLocationsResponse:
+        return places_pb2.ListNearbyLocationsResponse(
+            locations=await self._locations.find_within_area_per_type(
+                cursor="",
+                filter_=places.FindPlacesPerAreaFilter(
+                    latitude=float(request.coordinates.latitude),
+                    longitude=float(request.coordinates.longitude),
+                    type_distances=[
+                        places.PlaceTypeDistancePair(
+                            max_distance_meters=_MAX_DISTANCE_AIRPORT,
+                            location_type=models_pb2.Location.Type.TYPE_AIRPORT,
+                        ),
+                        places.PlaceTypeDistancePair(
+                            max_distance_meters=_MAX_DISTANCE_RAIL_STATION,
+                            location_type=models_pb2.Location.Type.TYPE_RAILWAY_STATION,
+                        ),
+                    ],
+                ),
+            ),
+        )
+
 
 class PlacesService(  # noqa: WPS214
     service.Service,
     places_pb2_grpc.PlacesServiceServicer,
 ):
-    def __init__(self, places: PlaceRepository, default_page_size: int):
+    def __init__(
+        self,
+        places_repository: places.PlaceRepository,
+        default_page_size: int,
+    ):
         self._default_page_size = default_page_size
-        self._places = places
+        self._places = places_repository
 
     def get_name(self) -> str:
         return places_pb2.DESCRIPTOR.services_by_name["PlacesService"].full_name

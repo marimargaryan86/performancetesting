@@ -1,4 +1,5 @@
 import asyncio
+import dataclasses
 import uuid
 from typing import Any, Sequence
 
@@ -14,6 +15,31 @@ _proto_id_key = "id"
 _location_key = "location"
 
 _NAMESPACE = uuid.UUID("5190984e-4ab7-411e-96f6-2848cc5d63e1")
+
+
+@dataclasses.dataclass(frozen=True)
+class PlaceTypeDistancePair(object):
+    max_distance_meters: int
+    location_type: models_pb2.Location.Type.ValueType
+
+
+@dataclasses.dataclass(frozen=True)
+class FindPlacesPerAreaFilter(object):
+    latitude: float
+    longitude: float
+    type_distances: Sequence[PlaceTypeDistancePair]
+
+
+def _unique(locations: Sequence[models_pb2.Location]) -> Sequence[models_pb2.Location]:
+    unique_locations = []
+    found_ids = set()
+
+    for location in locations:
+        if location.id not in found_ids:
+            unique_locations.append(location)
+            found_ids.add(location.id)
+
+    return unique_locations
 
 
 class LocationRepository(
@@ -56,6 +82,42 @@ class LocationRepository(
                 },
             },
         )
+
+    async def find_within_area_per_type(
+        self,
+        cursor: str,
+        filter_: FindPlacesPerAreaFilter,
+    ) -> Sequence[models_pb2.Location]:
+        locations = []
+
+        for type_distance_pair in filter_.type_distances:
+            current_filter = {
+                "coordinates": {
+                    "$nearSphere": {
+                        "$geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                filter_.longitude,
+                                filter_.latitude,
+                            ],
+                        },
+                        "$maxDistance": type_distance_pair.max_distance_meters,
+                    },
+                },
+                "types": type_distance_pair.location_type,
+            }
+
+            locations.extend(
+                [
+                    location
+                    async for location in await self._find_with_cursor(
+                        cur=cursor,
+                        filter_=current_filter,
+                    )
+                ],
+            )
+
+        return _unique(locations)
 
 
 class _PlaceNormalizer(normalizers.Normalizer):

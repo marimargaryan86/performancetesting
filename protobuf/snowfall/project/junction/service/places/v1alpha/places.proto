@@ -3,10 +3,12 @@ syntax = "proto3";
 package snowfall.project.junction.service.places.v1alpha;
 
 import "snowfall/project/junction/service/places/v1alpha/models.proto";
+import "snowfall/stdlib/v1alpha/latlng.proto";
 
 service LocationsService {
   rpc GetLocation(GetLocationRequest) returns (GetLocationResponse) {}
   rpc ListLocations(ListLocationsRequest) returns (ListLocationsResponse) {}
+  rpc ListNearbyLocations(ListNearbyLocationsRequest) returns (ListNearbyLocationsResponse) {}
 }
 
 message GetLocationRequest {
@@ -28,6 +30,14 @@ message ListLocationsRequest {
 message ListLocationsResponse {
   repeated Location locations = 1;
   string next_page_token = 2;
+}
+
+message ListNearbyLocationsRequest {
+  snowfall.stdlib.v1alpha.LatLng coordinates = 1;
+}
+
+message ListNearbyLocationsResponse {
+  repeated Location locations = 1;
 }
 
 service PlacesService {
