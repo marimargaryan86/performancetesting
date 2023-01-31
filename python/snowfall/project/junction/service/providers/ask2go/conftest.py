@@ -8,12 +8,14 @@ from collections.abc import AsyncIterator
 from typing import Any, Iterator, cast
 
 import httpx
+import mongomock_motor
 import pytest
 import pytest_httpx
 import structlog
+from motor import motor_asyncio
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import airports, notifications
+from snowfall.project.junction.provider import airports, cabin_classes, notifications
 from snowfall.project.junction.service.providers.ask2go import (
     booking,
     cache,
@@ -123,6 +125,11 @@ def ask2go_client(http_client: httpx.AsyncClient) -> client.Ask2GoClient:
 
 
 @pytest.fixture
+def mongo_client() -> motor_asyncio.AsyncIOMotorClient:
+    return mongomock_motor.AsyncMongoMockClient()
+
+
+@pytest.fixture
 def offer_validator() -> validator.OfferValidator:
     return validator.OfferValidator()
 
@@ -154,10 +161,12 @@ def pricing_adapter(
 @pytest.fixture
 def offer_transformer(
     airport_repository: airports.AirportRepository,
+    provider_cabin_class_mapping: cabin_classes.CabinMappingRepository,
     redis_client: aioredis.Redis[bytes],
 ) -> transformer.OfferTransformer:
     return transformer.OfferTransformer(
         airport_repository=airport_repository,
+        cabin_mapping_repository=provider_cabin_class_mapping,
         offer_cache=cache.OfferCache(
             client=redis.Client(redis_client),
         ),
@@ -191,4 +200,13 @@ def booking_handler(ask2go_client: client.Ask2GoClient) -> booking.BookingHandle
         ask2go_client=ask2go_client,
         notifier=notifications.LogNotifier(),
         override_double_booking_check=False,
+    )
+
+
+@pytest.fixture
+def provider_cabin_class_mapping(
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
+) -> cabin_classes.CabinMappingRepository:
+    return cabin_classes.CabinMappingRepository(
+        collection=mongo_client.test.provider_cabin_mapping,
     )

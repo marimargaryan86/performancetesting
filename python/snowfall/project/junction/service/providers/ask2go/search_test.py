@@ -125,7 +125,9 @@ def _assert_offer(  # noqa: WPS218
     segment_details = offer.segment_details[0]
     assert segment_details.offer_segment_id == expected_segment_id
     assert segment_details.cabin_class.marketing_name == "Economy"
-    assert segment_details.cabin_class.type == models_pb2.CabinClass.TYPE_ECONOMY
+    assert (
+        segment_details.cabin_class.type == models_pb2.CabinClass.Type.TYPE_UNSPECIFIED
+    )
     assert (
         segment_details.amenities.beverage.availability
         == offers_pb2.SegmentAmenity.TYPE_AVAILABLE

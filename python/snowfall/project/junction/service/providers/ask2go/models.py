@@ -12,18 +12,6 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2
 from snowfall.vendor.ask2go.models import common
 
-_CABIN_MAPPING = types.MappingProxyType(
-    {
-        "Economy": models_pb2.CabinClass.TYPE_ECONOMY,
-        "EconomyWithRestrictions": models_pb2.CabinClass.TYPE_ECONOMY,
-        "EconomyWithoutRestrictions": models_pb2.CabinClass.TYPE_ECONOMY,
-        "PremiumEconomy": models_pb2.CabinClass.TYPE_PREMIUM,
-        "Business": models_pb2.CabinClass.TYPE_BUSINESS,
-        "PremiumBusiness": models_pb2.CabinClass.TYPE_BUSINESS,
-        "First": models_pb2.CabinClass.TYPE_FIRST,
-    },
-)
-
 _PENALTY_TYPE_MAPPING = types.MappingProxyType(
     {
         "Exchange": offers_pb2.Penalty.Type.TYPE_EXCHANGE,
@@ -37,16 +25,6 @@ _APPLICABILITY_TYPE_MAPPING = types.MappingProxyType(
         "After": offers_pb2.Penalty.Applicability.APPLICABILITY_AFTER,
     },
 )
-
-
-def cabin_to_proto(cabin: Optional[str]) -> models_pb2.CabinClass.Type.V:
-    if cabin is None:
-        return models_pb2.CabinClass.TYPE_UNSPECIFIED
-
-    try:
-        return _CABIN_MAPPING[cabin]
-    except KeyError:
-        return models_pb2.CabinClass.TYPE_UNSPECIFIED
 
 
 def penalty_type_to_proto(

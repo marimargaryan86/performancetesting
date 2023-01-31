@@ -8,10 +8,12 @@ from typing import Any, Sequence, cast
 import aiosmtplib
 import httpx
 import pydantic
+from motor import motor_asyncio
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import (
     airports,
+    cabin_classes,
     notifications,
     offers,
     repository,
@@ -67,6 +69,7 @@ class _SearchSettings(service.Settings):
     http_timeout: float = 20.0
     poll_retries_limit: int = 10
     wait_time_between_polling: float = 1
+    mongo_dsn: Sequence[pydantic.AnyUrl]
 
 
 async def _offers(app: service.Application[_OffersSettings]) -> None:
@@ -160,6 +163,9 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
 
 
 async def _searches(app: service.Application[_SearchSettings]) -> None:
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        random.choice(app.settings.mongo_dsn),  # nosec
+    )
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
             httpx_metrics.with_metrics(
@@ -226,6 +232,9 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                                 ).load("airports.json"),
                             ),
                         ),
+                        cabin_mapping_repository=cabin_classes.CabinMappingRepository(
+                            mongo.ask2go.provider_cabin_mapping,
+                        ),
                         offer_cache=cache.OfferCache(
                             client=redis.Client[bytes](
                                 redis_connection,
@@ -246,6 +255,9 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
 
 
 async def _price_quotes(app: service.Application[_SearchSettings]) -> None:
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        random.choice(app.settings.mongo_dsn),  # nosec
+    )
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
             httpx_metrics.with_metrics(
@@ -291,6 +303,9 @@ async def _price_quotes(app: service.Application[_SearchSettings]) -> None:
                             "snowfall.project.junction.service.providers.ask2go.main",
                         ).load("airports.json"),
                     ),
+                ),
+                cabin_mapping_repository=cabin_classes.CabinMappingRepository(
+                    mongo.ask2go.provider_cabin_mapping,
                 ),
                 offer_cache=cache.OfferCache(
                     client=redis.Client[bytes](redis_connection, prefix=app.name),

@@ -6,7 +6,7 @@ from typing import Mapping, Optional, Sequence, Tuple
 
 from dateutil import relativedelta
 
-from snowfall.project.junction.provider import airports
+from snowfall.project.junction.provider import airports, cabin_classes
 from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.project.junction.service.providers.ask2go import cache, models
 from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
@@ -21,14 +21,16 @@ _InfantMaxAge = 2
 
 
 class OfferTransformer(object):  # noqa: WPS214
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
         airport_repository: airports.AirportRepository,
+        cabin_mapping_repository: cabin_classes.CabinMappingRepository,
         offer_cache: cache.OfferCache,
         price_cache: cache.PriceQuoteCache,
         offer_ttl: datetime.timedelta,
     ):
         self._airports = airport_repository
+        self._cabin_mappings = cabin_mapping_repository
         self._offer_cache = offer_cache
         self._price_cache = price_cache
         self._ttl = offer_ttl
@@ -216,7 +218,8 @@ class OfferTransformer(object):  # noqa: WPS214
                         ),
                         expires_at=expires_at,
                     ),
-                    segment_details=self._get_segment_details(
+                    segment_details=await self._get_segment_details(
+                        brand.brand_name,
                         grouped_trips_segments,
                         offer.trips,
                     ),
@@ -238,8 +241,9 @@ class OfferTransformer(object):  # noqa: WPS214
 
         return group_offers
 
-    def _get_segment_details(  # noqa: WPS210
+    async def _get_segment_details(  # noqa: WPS210
         self,
+        fare_brand: Optional[str],
         grouped_trips_segments: Sequence[_GroupedOfferSegment],
         trips: Sequence[offers.Trip],
     ) -> Sequence[offers_pb2.OfferSegmentDetails]:
@@ -265,7 +269,10 @@ class OfferTransformer(object):  # noqa: WPS214
                     id=string.uuid(),
                     offer_segment_id=grouped_segment[1].id,
                     cabin_class=models_pb2.CabinClass(
-                        type=models.cabin_to_proto(trip_segment.cabin),
+                        type=await self._cabin_mappings.resolve_cabin_class(
+                            fare_brand=fare_brand,
+                            operator=str(trip_segment.operating_carrier.code),
+                        ),
                         marketing_name=trip_segment.cabin or "",
                     ),
                     baggage_allowances=[
