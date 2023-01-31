@@ -19,6 +19,8 @@ _METHOD_GET = "GET"
 _METHOD_POST = "POST"
 _METHOD_PATCH = "PATCH"
 _METHOD_DELETE = "DELETE"
+_EMAIL_KEY = "email"
+_PASSWORD_KEY = "password"  # nosec
 
 trip_includes = Literal["segments", "segments.legs", "segments.legs.legType"]
 offer_includes = Literal[

@@ -5,12 +5,14 @@ from snowfall.vendor.junction import models
 from snowfall.vendor.junction.client import (  # noqa: WPS450,WPS235
     _ATTRIBUTES_KEY,
     _DATA_KEY,
+    _EMAIL_KEY,
     _ID_KEY,
     _METHOD_DELETE,
     _METHOD_GET,
     _METHOD_PATCH,
     _METHOD_POST,
     _PASSENGERS_KEY,
+    _PASSWORD_KEY,
     _RELATIONSHIPS_KEY,
     _TYPE_KEY,
     JunctionClient,
@@ -323,4 +325,156 @@ class MobileApiClient(JunctionClient):  # noqa: WPS214
         return await self._make_request(
             method=_METHOD_DELETE,
             url="/users/groups/members/{0}".format(member_id),
+        )
+
+    async def create_users(  # noqa: WPS211
+        self,
+        first_name: str,
+        last_name: str,
+        password: str,
+        email: str,
+        phone: str,
+    ) -> dict[str, Any]:
+        body = {
+            _DATA_KEY: {
+                _TYPE_KEY: "users",
+                _ATTRIBUTES_KEY: {
+                    "firstName": first_name,
+                    "lastName": last_name,
+                    "email": email,
+                    "password": password,
+                    "phone": phone,
+                },
+            },
+        }
+        return await self._make_request(
+            method=_METHOD_POST,
+            url="/users",
+            payload=body,
+        )
+
+    async def create_users_session(
+        self,
+        password: str,
+        email: str,
+    ) -> dict[str, Any]:
+        body = {
+            _DATA_KEY: {
+                _TYPE_KEY: "user-sessions",
+                _ATTRIBUTES_KEY: {"password": password, "email": email},
+            },
+        }
+        return await self._make_request(
+            method=_METHOD_POST,
+            url="/users/sessions",
+            payload=body,
+        )
+
+    async def create_verification_code(
+        self,
+        email: str,
+    ) -> dict[str, Any]:
+        body = {
+            _DATA_KEY: {
+                _TYPE_KEY: "verification-codes",
+                _ATTRIBUTES_KEY: {"email": email},
+            },
+        }
+        return await self._make_request(
+            method=_METHOD_POST,
+            url="/verification_code",
+            payload=body,
+        )
+
+    async def update_password(
+        self,
+        email: str,
+        password: str,
+        user_id: str,
+    ) -> dict[str, Any]:
+        body = {
+            _DATA_KEY: {
+                _TYPE_KEY: "users",
+                _ID_KEY: user_id,
+                _ATTRIBUTES_KEY: {"password": password},
+            },
+        }
+        return await self._make_request(
+            method=_METHOD_PATCH,
+            url="/users/{0}".format(email),
+            payload=body,
+        )
+
+    async def update_user(  # noqa: WPS211,WPS234
+        self,
+        email: Optional[str] = None,
+        first_name: Optional[str] = None,
+        last_name: Optional[str] = None,
+        phone: Optional[str] = None,
+        gender: Optional[str] = None,
+        title: Optional[str] = None,
+        country_code: Optional[str] = None,
+        date_of_birth: Optional[str] = None,
+        loyalty_programs: Optional[Sequence[Mapping[str, Any]]] = None,
+        old_password: Optional[str] = None,
+        new_password: Optional[str] = None,
+    ) -> dict[str, Any]:
+        attributes = {
+            "firstName": first_name,
+            "lastName": last_name,
+            "email": email,
+            "phone": phone,
+            "gender": gender,
+            "title": title,
+            "countryCode": country_code,
+            "dateOfBirth": date_of_birth,
+            "loyaltyPrograms": loyalty_programs,
+            "oldPassword": old_password,
+            "newPassword": new_password,
+        }
+        for attr, attr_value in attributes.items():
+            if attr_value is None:
+                attributes.pop(attr)
+        body = {
+            _DATA_KEY: {
+                _TYPE_KEY: "users",
+                _ATTRIBUTES_KEY: attributes,
+            },
+        }
+        return await self._make_request(
+            method=_METHOD_PATCH,
+            url="/users/{0}".format(email),
+            payload=body,
+        )
+
+    async def get_user(
+        self,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/users/me",
+        )
+
+    async def get_verification_code(
+        self,
+        email: str,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/verification-code/{0}".format(email),
+            query_parameters={
+                _EMAIL_KEY: email,
+            },
+        )
+
+    async def delete_user(
+        self,
+        password: str,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_DELETE,
+            url="/users/me",
+            query_parameters={
+                _PASSWORD_KEY: password,
+            },
         )
