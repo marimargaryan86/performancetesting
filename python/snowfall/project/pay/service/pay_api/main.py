@@ -12,7 +12,10 @@ from snowfall.project.junction.adapter import errors
 from snowfall.project.pay.adapter import currencies
 from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
 from snowfall.project.pay.service.pay_api import authenticator, bootstrap
-from snowfall.project.pay.service.pay_api.repositories import CompanyRepository
+from snowfall.project.pay.service.pay_api.repositories import (
+    CompanyRepository,
+    TransactionRepository,
+)
 from snowfall.project.pay.service.pay_api.routes import router
 from snowfall.project.pay.service.quotations.quotations import QuotationsRepository
 from snowfall.stdlib import service
@@ -68,6 +71,9 @@ def _factory(
                     quotations_repository=quotations_repo,
                     companies_repository=CompanyRepository(
                         mongo.companies.companies,
+                    ),
+                    transactions_repository=TransactionRepository(
+                        mongo.transactions.transactions,
                     ),
                 ),
             ),

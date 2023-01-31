@@ -7,6 +7,7 @@ from snowfall.stdlib.persistence.mongo import mixins, repository
 
 class QuotationsRepository(
     mixins.InsertMixin[models_pb2.Quotation],
+    mixins.FindByIdMixin[models_pb2.Quotation],
     repository.ProtoRepository[models_pb2.Quotation],
 ):
     _proto = models_pb2.Quotation

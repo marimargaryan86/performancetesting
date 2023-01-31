@@ -8,7 +8,11 @@ from snowfall.project.pay.service.companies.v1alpha import models_pb2
 from snowfall.project.pay.service.quotations.v1alpha import (
     models_pb2 as quotation_models,
 )
+from snowfall.project.pay.service.transactions.v1alpha import (
+    models_pb2 as transaction_models,
+)
 from snowfall.stdlib import money
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
 
 
@@ -75,5 +79,32 @@ class Company(models.Resource):
                 },
                 "bufferRate": round(company.buffer_rate, 3),
                 "salesRate": round(company.sales_rate, 3),
+            },
+        )
+
+
+class Transaction(models.Resource):
+    api_type: ClassVar[str] = "transactions"
+
+    @classmethod
+    def from_proto(
+        cls,
+        transaction: transaction_models.Transaction,
+    ) -> Transaction:
+        return cls(
+            id=transaction.id,
+            type=Transaction.api_type,
+            attributes={
+                "externalReference": transaction.external_reference_id,
+                "parentExternalReference": transaction.parent_external_id,
+                "createdAt": protobuf.protobuf_to_datetime(transaction.created_at),
+            },
+            relationships={
+                "quotation": {
+                    "data": {
+                        "id": transaction.quotation_id,
+                        "type": "quotations",
+                    },
+                },
             },
         )

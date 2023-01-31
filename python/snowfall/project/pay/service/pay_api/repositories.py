@@ -1,6 +1,7 @@
 import pymongo
 
 from snowfall.project.pay.service.companies.v1alpha import models_pb2
+from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Transaction
 from snowfall.stdlib import string
 from snowfall.stdlib.persistence.mongo import mixins, repository
 
@@ -32,3 +33,15 @@ class CompanyRepository(
             filter={"_id": document_id},
             replacement=replacement,
         )
+
+
+class TransactionRepository(
+    mixins.FindByIdMixin[Transaction],
+    mixins.InsertMixin[Transaction],
+    repository.ProtoRepository[Transaction],
+):
+    _proto = Transaction
+
+    async def insert(self, document: Transaction) -> Transaction:
+        document.id = string.uuid()
+        return await super().insert(document)

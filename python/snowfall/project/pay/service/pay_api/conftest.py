@@ -12,7 +12,10 @@ from snowfall.project.adapter import authentication
 from snowfall.project.junction.adapter import errors
 from snowfall.project.pay.adapter import currencies
 from snowfall.project.pay.service.pay_api import bootstrap
-from snowfall.project.pay.service.pay_api.repositories import CompanyRepository
+from snowfall.project.pay.service.pay_api.repositories import (
+    CompanyRepository,
+    TransactionRepository,
+)
 from snowfall.project.pay.service.pay_api.routes import router
 from snowfall.project.pay.service.quotations import quotations
 from snowfall.stdlib.integration.starlette import application, handlers
@@ -25,6 +28,7 @@ def _create_app(  # noqa: WPS211
     authentication_client: authentication.Client,
     quotations_repository: quotations.QuotationsRepository,
     companies_repository: CompanyRepository,
+    transaction_repository: TransactionRepository,
     openapi_path: pathlib.Path,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
@@ -38,6 +42,7 @@ def _create_app(  # noqa: WPS211
                 authentication_client,
                 quotations_repository,
                 companies_repository,
+                transaction_repository,
             ),
         ),
     )
@@ -88,12 +93,13 @@ def headers() -> dict[str, str]:
 
 
 @pytest.fixture()
-def app(
+def app(  # noqa: WPS211
     cc_client: currencycloud.Client,
     currencies_client: currencies.Client,
     authentication_client: authentication.Client,
     quotations_repository: quotations.QuotationsRepository,
     companies_repository: CompanyRepository,
+    transactions_repository: TransactionRepository,
 ) -> applications.Starlette:
     return _create_app(
         cc_client=cc_client,
@@ -101,6 +107,7 @@ def app(
         authentication_client=authentication_client,
         quotations_repository=quotations_repository,
         companies_repository=companies_repository,
+        transaction_repository=transactions_repository,
         openapi_path=filesystem.resource_path("junction.pay_api", "openapi.json"),
     )
 

@@ -1,82 +1,50 @@
-import currencycloud
 import lagom
-from starlette import endpoints, requests, responses
+from starlette import endpoints, requests, status
 
-from snowfall.project.pay.service.pay_api import pagination_helpers
-from snowfall.stdlib import money
-
-_ID_KEY = "id"
-_TYPE_KEY = "type"
-_DATA_KEY = "data"
+from snowfall.project.pay.service.pay_api import repositories, resources
+from snowfall.project.pay.service.quotations import quotations
+from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Transaction
+from snowfall.stdlib.integration.starlette import messages, models, request_helpers
 
 
 class Transactions(endpoints.HTTPEndpoint):
-    async def get(  # noqa: WPS210
+    async def post(
         self,
         request: requests.Request,
-        client: currencycloud.Client = lagom.injectable,
-    ) -> responses.Response:
-        mapped_params = pagination_helpers.map_query_params(
-            dict(request.query_params),
-            pagination_helpers.PAGINATION_PARAMS_MAPPING,
-        )
-        transactions = client.transactions.find(**mapped_params)
-
-        next_url = pagination_helpers.get_next_link(
-            request.url_for("Transactions"),
-            transactions.pagination,
-        )
-
-        response = []
-
-        for transaction in transactions:
-            price = money.from_string(
-                transaction.amount,
-                money.Currency(transaction.currency),
-            )
-            completed_at = (
-                transaction.completed_at if transaction.completed_at else None
+        transaction_repository: repositories.TransactionRepository = lagom.injectable,
+        quotation_repository: quotations.QuotationsRepository = lagom.injectable,
+    ) -> models.JsonApiResponse:
+        body = await request_helpers.flatten_request(request)
+        if await quotation_repository.find_by_id(body["quotation"]):
+            transaction = await transaction_repository.insert(
+                Transaction(
+                    external_reference_id=body["externalReference"],
+                    quotation_id=body["quotation"],
+                    parent_external_id=body["parentExternalReference"],
+                ),
             )
 
-            response.append(
-                {
-                    _ID_KEY: transaction.id,
-                    _TYPE_KEY: "transactions",
-                    "attributes": {
-                        "amount": price.amount,
-                        "ref": transaction.related_entity_short_reference,
-                        "completedAt": completed_at,
-                        "createdAt": transaction.created_at,
-                    },
-                    "relationships": {
-                        "currency": {
-                            _DATA_KEY: {
-                                _TYPE_KEY: "currencies",
-                                _ID_KEY: transaction.currency,
-                            },
-                        },
-                        "balance": {
-                            _DATA_KEY: {
-                                _TYPE_KEY: "balances",
-                                _ID_KEY: transaction.balance_id,
-                            },
-                        },
-                        "transactionType": {
-                            _DATA_KEY: {
-                                _TYPE_KEY: "transaction-types",
-                                _ID_KEY: transaction.type,
-                            },
-                        },
-                        "status": {
-                            _DATA_KEY: {
-                                _TYPE_KEY: "transaction-statuses",
-                                _ID_KEY: transaction.status,
-                            },
-                        },
-                    },
-                },
+            return await messages.create_response(
+                body=messages.models.Body(
+                    data=resources.Transaction.from_proto(
+                        transaction=transaction,
+                    ),
+                ),
+                request=request,
+                status_code=status.HTTP_201_CREATED,
             )
-
-        return responses.JSONResponse(
-            {"data": response, "links": next_url},
+        return models.JsonApiResponse(
+            body=messages.models.Body(
+                errors=[
+                    messages.models.Error(
+                        status=str(status.HTTP_404_NOT_FOUND),
+                        code="not_found",
+                        detail="Quotation not valid",
+                        source=messages.models.ErrorSource(
+                            pointer="/data/relationships/quotation/data/id",
+                        ),
+                    ),
+                ],
+            ),
+            status_code=status.HTTP_404_NOT_FOUND,
         )
