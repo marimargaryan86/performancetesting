@@ -1,0 +1,15 @@
+version: '3'
+services:
+  pss-db:
+    restart: always
+    platform: linux/amd64
+    image: "mysql:5.6"
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=tardis
+      - MYSQL_ROOT_PASSWORD=password
+    volumes:
+      - pss-db:/var/lib/mysql
+volumes:
+  pss-db:

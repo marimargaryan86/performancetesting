@@ -24,6 +24,10 @@ brew install --cask docker
 ```shell
 softwareupdate --install-rosetta
 ```
+5. Install [MySQL Client][mysql]. (This is because the `mysqlclient` Python package requires a `mysql` client)
+```shell
+brew install mysql-client
+```
 
 ### Set up the Junction environment
 
@@ -242,6 +246,7 @@ If you're using `fish shell` you must add `-x` option to the `set` command, othe
 
 [pants]: https://pantsbuild.github.io/
 [docker-desktop]: https://docs.docker.com/desktop/install/mac-install/
+[mysql]: https://www.mysql.com/
 [pyenv]: https://github.com/pyenv/pyenv
 [junction-repo]: https://git.snowfall.se/junction/junction
 [google-styleguide]: https://google.github.io/styleguide/pyguide.html#22-imports
