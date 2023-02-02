@@ -5,7 +5,6 @@ import (
 	"git.snowfall.se/junction/junction/golang/cmd/snowman/common"
 	"github.com/xanzy/go-gitlab"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
@@ -50,10 +49,10 @@ func (mr *mergeRequest) merge() error {
 	}
 
 	for _, issue := range closesIssues {
-		commitMessage += "Closes: #" + strconv.Itoa(issue.IID) + "\n"
+		commitMessage += "Closes: " + issue.References.Full + "\n"
 	}
 
-	commitMessage += "Refs: !" + strconv.Itoa(mr.object.IID) + "\n"
+	commitMessage += "Refs: " + mr.object.References.Full + "\n"
 
 	_, resp, err := mr.client.MergeRequests.AcceptMergeRequest(
 		mr.object.ProjectID,
