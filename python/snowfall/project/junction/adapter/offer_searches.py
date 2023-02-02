@@ -59,11 +59,9 @@ class DictClient(Client):
 class GrpcClient(Client):
     def __init__(
         self,
-        offers: grpc_pb2_grpc.OfferServiceStub,
         offer_searches: grpc_pb2_grpc.OfferSearchServiceStub,
         timeout: int = 10,
     ):
-        self._offers = offers
         self._offer_searches = offer_searches
         self._timeout = timeout
 

@@ -84,7 +84,6 @@ def _factory(
                         offers=grpc_pb2_grpc.OfferServiceStub(offers_channel),
                     ),
                     offer_searches_client=offer_searches.GrpcClient(
-                        offers=grpc_pb2_grpc.OfferServiceStub(offers_channel),
                         offer_searches=grpc_pb2_grpc.OfferSearchServiceStub(
                             offers_channel,
                         ),
