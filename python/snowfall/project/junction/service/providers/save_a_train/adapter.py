@@ -9,6 +9,7 @@ import phonenumbers
 import pycountry
 import structlog
 
+from snowfall.project.junction.provider import cabin_classes
 from snowfall.project.junction.provider import notifications as base_notifications
 from snowfall.project.junction.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
@@ -21,7 +22,6 @@ from snowfall.project.junction.service.providers.save_a_train import (
     cache,
     models,
     notifications,
-    repositories,
     train_stations,
 )
 from snowfall.project.junction.service.providers.save_a_train.v1alpha import amqp_pb2
@@ -63,10 +63,10 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         offers_cache: cache.OffersCache,
         ttl: datetime.timedelta,
         notifier: base_notifications.Notifier,
-        provider_cabin_class_mapping: repositories.ProviderCabinMappingRepository,
+        provider_cabin_class_mapping: cabin_classes.CabinMappingRepository,
     ) -> None:
         self._train_stations = train_station_repository
-        self._provider_cabin_class_mapping = provider_cabin_class_mapping
+        self._cabin_mapping = provider_cabin_class_mapping
         self._client = save_a_train_client
         self._offers_cache = offers_cache
         self._ttl = ttl
@@ -175,8 +175,12 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                                     id=string.uuid(),
                                     offer_segment_id=offer_segment_id,
                                     cabin_class=models_pb2.CabinClass(
-                                        type=await self._cabin_to_proto(
-                                            transfer_fare.name,
+                                        type=await self._cabin_mapping.resolve_cabin_class(
+                                            fare_brand=transfer_fare.name,
+                                            operator=_resolve_train_operator(
+                                                train_category=transfer_change.train.category,
+                                                train_number=transfer_change.train.number,
+                                            ),
                                         ),
                                         marketing_name=transfer_fare.name.replace(
                                             "_",
@@ -191,7 +195,10 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                             ).protobuf(),
                         )
                         for transfer in search_details.transfers
-                        for transfer_fare in transfer.fares
+                        for transfer_fare, transfer_change in zip(
+                            transfer.fares,
+                            transfer.changes,
+                        )
                     ],
                     segments=[
                         offer_models_pb2.OfferSegment(
@@ -486,30 +493,6 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                 raise_http_error_with_text(http_error)
             raise http_error
 
-    async def _get_cabin_class_mapping(
-        self,
-        provider_cabin_class: str,
-    ) -> amqp_pb2.CabinClassMapping | None:
-        return await self._provider_cabin_class_mapping.find_by_mapping(
-            provider_cabin_class=provider_cabin_class,
-        )
-
-    async def _cabin_to_proto(self, cabin: str) -> models_pb2.CabinClass.Type.V:
-        provider_mapping = await self._get_cabin_class_mapping(
-            provider_cabin_class=cabin,
-        )
-        if provider_mapping:
-            return provider_mapping.type
-
-        unspecified_mapping = await self._provider_cabin_class_mapping.create(
-            cabin_class_type=models_pb2.CabinClass.TYPE_UNSPECIFIED,
-            provider_cabin_class=cabin,
-        )
-
-        logger.warning("SAT found UNSPECIFIED cabin type.", cabin=cabin)
-
-        return unspecified_mapping.type
-
 
 def raise_http_error_with_text(http_error: httpx.HTTPStatusError) -> None:
     raise SaveATrainAdapterError(
@@ -517,3 +500,10 @@ def raise_http_error_with_text(http_error: httpx.HTTPStatusError) -> None:
             http_error.response.text,
         ),
     ) from http_error
+
+
+def _resolve_train_operator(
+    train_category: str | None,
+    train_number: str | None,
+) -> str | None:
+    return train_category + train_number if train_category and train_number else None

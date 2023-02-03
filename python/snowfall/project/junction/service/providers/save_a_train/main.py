@@ -14,7 +14,12 @@ import pydantic
 from motor import motor_asyncio
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import notifications, offers, repository
+from snowfall.project.junction.provider import (
+    cabin_classes,
+    notifications,
+    offers,
+    repository,
+)
 from snowfall.project.junction.service.providers.save_a_train import (
     adapter,
     cache,
@@ -24,10 +29,7 @@ from snowfall.project.junction.service.providers.save_a_train import (
 from snowfall.project.junction.service.providers.save_a_train import (
     offers as sat_offers,
 )
-from snowfall.project.junction.service.providers.save_a_train import (
-    repositories,
-    train_stations,
-)
+from snowfall.project.junction.service.providers.save_a_train import train_stations
 from snowfall.project.junction.service.providers.save_a_train.v1alpha import amqp_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import h3, service
@@ -173,7 +175,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                     train_station_repository=train_stations.TrainStationRepository(
                         train_stations=await _load_train_stations(),
                     ),
-                    provider_cabin_class_mapping=repositories.ProviderCabinMappingRepository(
+                    provider_cabin_class_mapping=cabin_classes.CabinMappingRepository(
                         mongo.sat.provider_cabin_mapping,
                     ),
                     offers_cache=cache.OffersCache(
@@ -239,7 +241,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
                 train_station_repository=train_stations.TrainStationRepository(
                     train_stations=await _load_train_stations(),
                 ),
-                provider_cabin_class_mapping=repositories.ProviderCabinMappingRepository(
+                provider_cabin_class_mapping=cabin_classes.CabinMappingRepository(
                     mongo.sat.provider_cabin_mapping,
                 ),
                 offers_cache=offer_cache,

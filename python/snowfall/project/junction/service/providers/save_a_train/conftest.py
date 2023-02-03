@@ -9,11 +9,10 @@ import httpx
 import pytest
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import notifications
+from snowfall.project.junction.provider import cabin_classes, notifications
 from snowfall.project.junction.service.providers.save_a_train import (
     adapter,
     cache,
-    repositories,
     train_stations,
 )
 from snowfall.stdlib.persistence import filesystem
@@ -64,15 +63,15 @@ def train_station_repository() -> train_stations.TrainStationRepository:
 
 
 @pytest.fixture
-def provider_cabin_class_mapping() -> repositories.ProviderCabinMappingRepository:
-    return repositories.ProviderCabinMappingRepository(collection=[])
+def provider_cabin_class_mapping() -> cabin_classes.CabinMappingRepository:
+    return cabin_classes.CabinMappingRepository(collection=[])
 
 
 @pytest.fixture
 def save_a_train_adapter(
     save_a_train_client: client.SATClient,
     train_station_repository: train_stations.TrainStationRepository,
-    provider_cabin_class_mapping: repositories.ProviderCabinMappingRepository,
+    provider_cabin_class_mapping: cabin_classes.CabinMappingRepository,
     redis_client: aioredis.Redis[bytes],
 ) -> adapter.SaveATrainAdapter:
     return adapter.SaveATrainAdapter(
