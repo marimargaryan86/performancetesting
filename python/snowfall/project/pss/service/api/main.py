@@ -3,7 +3,7 @@ from typing import Callable
 from fastapi import FastAPI
 from starlette import applications
 
-from snowfall.project.pss.service.api.routes import countries
+from snowfall.project.pss.service.api.routes import api_router
 from snowfall.project.pss.service.api.settings import Settings
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application
@@ -12,7 +12,7 @@ from snowfall.stdlib.integration.starlette import application
 def _factory() -> Callable[[], applications.Starlette]:
     def decorator() -> applications.Starlette:
         fastapi_app = FastAPI()
-        fastapi_app.include_router(countries.router)
+        fastapi_app.include_router(api_router.router)
         return fastapi_app
 
     return decorator

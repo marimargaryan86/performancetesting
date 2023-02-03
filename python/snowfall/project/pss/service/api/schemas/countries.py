@@ -1,13 +1,10 @@
 from pydantic.fields import Field
-from pydantic.main import BaseModel
+
+from snowfall.project.pss.service.api.schemas.schema import BaseSchema
 
 
-class CountrySchema(BaseModel):
+class CountrySchema(BaseSchema):
     id_: int = Field(alias="id")
     code: str
     name: str
     label: str
-
-    class Config(object):
-        orm_mode = True
-        allow_population_by_field_name = True

@@ -10,7 +10,7 @@ from snowfall.project.pss.service.api.services.countries import CountriesService
 router = APIRouter()
 
 
-@router.get("/countries", response_model=List[CountrySchema])
+@router.get("", response_model=List[CountrySchema])
 def _get_all_countries(
     countries: CountriesService = Depends(CountriesService),
 ) -> Sequence[Country]:
