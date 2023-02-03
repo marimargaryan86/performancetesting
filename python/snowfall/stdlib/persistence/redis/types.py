@@ -160,7 +160,8 @@ class Client(Generic[AnyStr]):  # noqa: WPS214
     async def get_expires_at(self, name: object) -> datetime.datetime | None:
         expiry = await self._redis.pttl(self._prefix_name(name))
 
-        if expiry < 0:
+        # `pttl` should return `int`, but we have seen `None` and `str`
+        if not isinstance(expiry, int) or expiry < 0:  # type: ignore[redundant-expr]
             return None
 
         return datetime.datetime.now(
