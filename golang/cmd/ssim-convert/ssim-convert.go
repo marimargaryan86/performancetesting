@@ -32,11 +32,11 @@ var airlinesFile []byte
 var sugar *zap.SugaredLogger
 
 type Airport struct {
-	TimeZone  string  `json:"time_zone" bson:"time_zone"`
-	Name      string  `json:"name" bson:"name"`
-	Longitude float64 `json:"longitude" bson:"longitude"`
-	Latitude  float64 `json:"latitude" bson:"latitude"`
-	IataCode  string  `json:"iata_code" bson:"iata_code"`
+	TimeZone  string  `json:"time_zone"`
+	Name      string  `json:"name"`
+	Longitude float64 `json:"longitude"`
+	Latitude  float64 `json:"latitude"`
+	IataCode  string  `json:"iata_code"`
 }
 
 var cmd = &cobra.Command{
