@@ -1,4 +1,5 @@
 import datetime
+from unittest import mock
 
 import pytest_httpx
 
@@ -71,6 +72,10 @@ async def test_booking_can_be_placed(
     httpx_mock: pytest_httpx.HTTPXMock,
     save_a_train_adapter: adapter.SaveATrainAdapter,
 ) -> None:
+    save_a_train_adapter._notifications_producer.publish = (  # type: ignore[assignment] # noqa: WPS437, B950
+        mock.AsyncMock()
+    )
+
     _mock_responses(httpx_mock)
     booking_proto = await save_a_train_adapter.create_booking(
         task=_ORDER_TASK,
@@ -89,3 +94,4 @@ async def test_booking_can_be_placed(
     assert str(total_price) == "4.50"
     assert booking_proto.trip_result.record_locator == "GTRHSFL"
     assert not booking_proto.trip_result.operator_booking_references
+    save_a_train_adapter._notifications_producer.publish.assert_awaited_once()  # noqa: WPS437, B950

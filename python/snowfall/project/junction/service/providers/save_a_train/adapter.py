@@ -21,12 +21,12 @@ from snowfall.project.junction.service.orders.v1alpha import (
 from snowfall.project.junction.service.providers.save_a_train import (
     cache,
     models,
-    notifications,
     train_stations,
 )
 from snowfall.project.junction.service.providers.save_a_train.v1alpha import amqp_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.v1alpha import models_pb2
 from snowfall.vendor.save_a_train import client, enums, exceptions
 from snowfall.vendor.save_a_train.models import (
@@ -64,6 +64,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         ttl: datetime.timedelta,
         notifier: base_notifications.Notifier,
         provider_cabin_class_mapping: cabin_classes.CabinMappingRepository,
+        notifications_producer: producer.Producer,
     ) -> None:
         self._train_stations = train_station_repository
         self._cabin_mapping = provider_cabin_class_mapping
@@ -71,6 +72,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         self._offers_cache = offers_cache
         self._ttl = ttl
         self._notifier = notifier
+        self._notifications_producer = notifications_producer
         self._logger = structlog.get_logger(__name__)
 
     async def gather_search_results(  # noqa: C901,WPS210,WPS231
@@ -274,13 +276,20 @@ class SaveATrainAdapter(object):  # noqa: WPS214
 
             return new_booking
 
-        try:
-            # todo: this should be handled in a separate service
-            await self._notifier.send(
-                notifications.BookingNotification(task.metadata, booking_responses),
-            )
-        except base_notifications.NotificationError:
-            self._logger.exception()
+        await self._notifications_producer.publish(
+            msg=amqp_pb2.BookingNotificationTask(
+                journey_id=task.metadata.journey_id,
+                order_id=task.metadata.order_id,
+                booking_id=task.metadata.booking_id,
+                passenger_name_record=task.metadata.passenger_name_record,
+                search_identifier=booking_responses.make_booking.search_identifier,
+                departure_at=booking_responses.make_booking.outbound_trip_info.departure.isoformat(
+                    timespec="seconds",
+                ),
+                ticket_url=booking_responses.get_ticket.url,
+            ),
+            routing_key="notifications",
+        )
 
         new_booking.MergeFrom(
             order_models_pb2.Booking(
@@ -308,6 +317,19 @@ class SaveATrainAdapter(object):  # noqa: WPS214
 
         return new_booking
 
+    async def get_ticket(
+        self,
+        search_id: str,
+    ) -> booking.TicketInfo:
+        try:
+            return await self._client.get_ticket(search_id)
+        except exceptions.SATValidationError as booking_error:
+            raise BookingError(booking_error) from booking_error
+        except httpx.HTTPStatusError as http_error:
+            if http_error.response.text:
+                raise_http_error_with_text(http_error)
+            raise http_error
+
     async def _create_booking(
         self,
         task: order_amqp_pb2.PlaceOrderTask,
@@ -323,7 +345,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
             seat_code=seat_code,
         )
         confirm_booking_result = await self._confirm_booking(search_id=search_id)
-        get_ticket_result = await self._get_ticket(search_id=search_id)
+        get_ticket_result = await self.get_ticket(search_id=search_id)
         return models.CombinedBookingResults(
             make_booking=booking_result,
             confirm_booking=confirm_booking_result,
@@ -473,19 +495,6 @@ class SaveATrainAdapter(object):  # noqa: WPS214
     ) -> booking.BookingConfirmationResult:
         try:
             return await self._client.confirm_booking(search_id)
-        except exceptions.SATValidationError as booking_error:
-            raise BookingError(booking_error) from booking_error
-        except httpx.HTTPStatusError as http_error:
-            if http_error.response.text:
-                raise_http_error_with_text(http_error)
-            raise http_error
-
-    async def _get_ticket(
-        self,
-        search_id: str,
-    ) -> booking.TicketInfo:
-        try:
-            return await self._client.get_ticket(search_id)
         except exceptions.SATValidationError as booking_error:
             raise BookingError(booking_error) from booking_error
         except httpx.HTTPStatusError as http_error:

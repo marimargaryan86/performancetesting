@@ -25,3 +25,14 @@ message CabinClassMapping {
   snowfall.stdlib.v1alpha.CabinClass.Type type = 1;
   string mapping = 2;
 }
+
+message BookingNotificationTask {
+  string journey_id = 1;
+  string order_id = 2;
+  string booking_id = 3;
+  string passenger_name_record = 4;
+  string search_identifier = 5;
+  string departure_at = 6;
+  string ticket_confirmation_code = 7;
+  string ticket_url = 8;
+}

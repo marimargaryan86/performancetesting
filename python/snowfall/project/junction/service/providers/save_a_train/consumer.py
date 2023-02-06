@@ -2,18 +2,61 @@ import datetime
 
 import structlog
 
+from snowfall.project.junction.provider import notifications as base_notifications
 from snowfall.project.junction.service.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
 from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.project.junction.service.orders.v1alpha import amqp_pb2 as orders_amqp_pb2
 from snowfall.project.junction.service.providers.save_a_train import (
     adapter as save_a_train_adapter,
 )
-from snowfall.project.junction.service.providers.save_a_train import cache
+from snowfall.project.junction.service.providers.save_a_train import (
+    cache,
+    notifications,
+)
+from snowfall.project.junction.service.providers.save_a_train.v1alpha import (
+    amqp_pb2 as sat_amqp_pb2,
+)
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 
 _PROVIDER_NAME = "Save A Train"
+
+
+class NotificationsConsumer(object):
+    def __init__(
+        self,
+        consumer_obj: consumer.Consumer[sat_amqp_pb2.BookingNotificationTask],
+        adapter: save_a_train_adapter.SaveATrainAdapter,
+        notifier: base_notifications.Notifier,
+    ):
+        self._consumer = consumer_obj
+        self._adapter = adapter
+        self._notifier = notifier
+
+    async def consume(self) -> None:
+        await self._consumer.consume(self._process_message)
+
+    async def _process_message(
+        self,
+        message: types.Message[sat_amqp_pb2.BookingNotificationTask],
+    ) -> None:
+        if message.body.ticket_url:
+            await self._notifier.send(
+                notifications.BookingNotification(message.body),
+            )
+            return
+
+        get_ticket_result = await self._adapter.get_ticket(
+            search_id=message.body.search_identifier,
+        )
+        if get_ticket_result.url:
+            message.body.ticket_url = get_ticket_result.url
+            await self._notifier.send(
+                notifications.BookingNotification(message.body),
+            )
+        else:
+            await message.nack(requeue=False)
 
 
 class PriceQuoteConsumer(object):

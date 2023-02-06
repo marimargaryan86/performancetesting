@@ -3,14 +3,16 @@ from __future__ import annotations
 import contextlib
 import datetime
 import json
+import os
 import pathlib
 import pkgutil
 import random
-from typing import Sequence
+from typing import Sequence, cast
 
 import aiosmtplib
 import httpx
 import pydantic
+from aio_pika import abc
 from motor import motor_asyncio
 from redis import asyncio as aioredis
 
@@ -80,6 +82,15 @@ class _OrdersSettings(_SatConfig, service.Settings):
     smtp_sender: pydantic.EmailStr
     smtp_recipient: pydantic.EmailStr
     mongo_dsn: tuple[pydantic.AnyUrl]
+
+
+class _NotificationsSettings(_SatConfig, service.Settings):
+    amqp_dsn: pydantic.AnyUrl
+    redis_dsn: Sequence[pydantic.AnyUrl]
+    ttl: datetime.timedelta = datetime.timedelta(minutes=45)
+    smtp_dsn: pydantic.AnyUrl
+    smtp_sender: pydantic.EmailStr
+    smtp_recipient: pydantic.EmailStr
 
 
 async def _offers(app: service.Application[_OffersSettings]) -> None:
@@ -183,6 +194,10 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                     ),
                     ttl=app.settings.ttl,
                     notifier=notifications.LogNotifier(),
+                    notifications_producer=producer.Producer(
+                        amqp_connection,
+                        types.Exchange("notifications"),
+                    ),
                 ).gather_search_results,
             ),
         )
@@ -257,6 +272,10 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
                     sender=app.settings.smtp_sender,
                     recipient=app.settings.smtp_recipient,
                 ),
+                notifications_producer=producer.Producer(
+                    amqp_connection,
+                    types.Exchange("notifications"),
+                ),
             ),
             offers_cache=offer_cache,
         )
@@ -294,6 +313,107 @@ async def _price_quotes(app: service.Application[_OffersSettings]) -> None:
             ),
             price_ttl=app.settings.ttl,
         ).consume()
+
+
+async def _notifications(app: service.Application[_NotificationsSettings]) -> None:
+    async with contextlib.AsyncExitStack() as stack:
+        http_client = await stack.enter_async_context(
+            httpx.AsyncClient(
+                http2=True,
+                timeout=app.settings.api_timeout,
+            ),
+        )
+        amqp_connection = await stack.enter_async_context(
+            types.Connection(app.settings.amqp_dsn),
+        )
+        redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
+            aioredis.from_url(
+                random.choice(app.settings.redis_dsn),  # nosec
+                decode_responses=False,
+            ).client(),
+        )
+        notifier = notifications.SmtpNotifier(
+            smtp_client=aiosmtplib.SMTP(
+                hostname=app.settings.smtp_dsn.host,
+                port=int(app.settings.smtp_dsn.port or 0) or None,
+                username=app.settings.smtp_dsn.user,
+                password=app.settings.smtp_dsn.password,
+                start_tls=True,
+            ),
+            sender=app.settings.smtp_sender,
+            recipient=app.settings.smtp_recipient,
+        )
+        sat_adapter = adapter.SaveATrainAdapter(
+            save_a_train_client=client.SATClient(
+                email=app.settings.api_email,
+                password=app.settings.api_password,
+                password_search=app.settings.api_search_password,
+                token=app.settings.api_booking_token,
+                api_url=app.settings.api_base_url,
+                api_search_url=app.settings.api_search_base_url,
+                api_search_timeout=app.settings.api_search_timeout,
+                api_search_requests_limit=app.settings.api_search_requests_limit,
+                client=http_client,
+            ),
+            train_station_repository=train_stations.TrainStationRepository(
+                train_stations=await _load_train_stations(),
+            ),
+            offers_cache=cache.OffersCache(
+                client=redis.Client(redis_connection, prefix=app.name),
+            ),
+            ttl=app.settings.ttl,
+            notifier=notifier,
+            notifications_producer=producer.Producer(
+                connection=amqp_connection,
+                exchange=types.Exchange("notifications"),
+            ),
+            provider_cabin_class_mapping=cabin_classes.CabinMappingRepository(
+                collection=[],
+            ),
+        )
+        notifications_consumer = consumer.NotificationsConsumer(
+            consumer_obj=amqp_consumer.Consumer(
+                connection=amqp_connection,
+                queue_name="notifications",
+                queue_arguments={
+                    "x-dead-letter-exchange": "notifications.retry",
+                    "x-dead-letter-routing-key": "notifications.retry",
+                },
+                binds=[(types.Exchange("notifications"), "notifications")],
+            ),
+            adapter=sat_adapter,
+            notifier=notifier,
+        )
+        channel = await stack.enter_async_context(
+            cast(
+                contextlib.AbstractAsyncContextManager[abc.AbstractChannel],
+                amqp_connection.channel(),
+            ),
+        )
+        await channel.set_qos(
+            prefetch_count=((os.cpu_count() or 1) * 2) + 1,
+        )
+
+        queue = await channel.declare_queue(
+            name="notifications.retry",
+            durable=True,
+            arguments={
+                "x-message-ttl": 300000,
+                "x-dead-letter-exchange": "notifications",
+                "x-dead-letter-routing-key": "notifications",
+            },
+        )
+        exchange = types.Exchange("notifications.retry")
+
+        declared_exchange = await channel.declare_exchange(
+            name=exchange.name,
+            type=exchange.type_,
+            durable=True,
+        )
+
+        await queue.bind(declared_exchange, "notifications.retry")
+
+        await notifications_consumer.consume()
 
 
 async def _dump_stations(app: service.Application[_DumpStationsSettings]) -> None:
@@ -364,6 +484,11 @@ if __name__ == "__main__":
             name="orders",
             callback=_orders,
             settings_class=_OrdersSettings,
+        ),
+        service.Command(
+            name="notifications",
+            callback=_notifications,
+            settings_class=_NotificationsSettings,
         ),
         service.Command(
             name="pricing",

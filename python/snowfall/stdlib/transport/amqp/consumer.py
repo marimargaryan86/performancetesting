@@ -6,6 +6,7 @@ from typing import Sequence, TypeVar, cast
 
 from aio_pika import abc
 from google.protobuf import message
+from pamqp.common import Arguments  # pants: no-infer-dep
 from structlog import get_logger
 
 from snowfall.stdlib.transport.amqp import middlewares, protocol, types
@@ -22,12 +23,13 @@ class Consumer(protocol.Consumer[_Proto]):
         middlewares.auto_ack_and_nack_factory(),
     ]
 
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
         connection: abc.AbstractConnection,
         queue_name: str,
         binds: Sequence[tuple[types.Exchange, str]],
         middleware_stack: Sequence[protocol.ConsumerMiddleware[_Proto]] | None = None,
+        queue_arguments: Arguments | None = None,
     ):
         self._binds = binds
         self._connection = connection
@@ -40,6 +42,7 @@ class Consumer(protocol.Consumer[_Proto]):
         )
         self._logger = get_logger(__name__)
         self._queue_name = queue_name
+        self._queue_arguments = queue_arguments
 
     async def consume(self, callback: protocol.ConsumerFunc[_Proto]) -> None:
         async with self._connection.channel() as channel:
@@ -50,6 +53,7 @@ class Consumer(protocol.Consumer[_Proto]):
             queue = await channel.declare_queue(
                 name=self._queue_name,
                 durable=True,
+                arguments=self._queue_arguments,
             )
 
             for exchange, routing_key in self._binds:

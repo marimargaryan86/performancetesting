@@ -1,8 +1,7 @@
 import datetime
 
 from snowfall.project.junction.provider import notifications
-from snowfall.project.junction.service.orders.v1alpha import amqp_pb2
-from snowfall.project.junction.service.providers.save_a_train import models
+from snowfall.project.junction.service.providers.save_a_train.v1alpha import amqp_pb2
 
 
 class BookingNotification(notifications.Notification):
@@ -22,34 +21,28 @@ Travel departure date : {departure_at}
 
     def __init__(
         self,
-        metadata: amqp_pb2.OrderMetadata,
-        booking: models.CombinedBookingResults,
+        message: amqp_pb2.BookingNotificationTask,
     ):
-        self._metadata = metadata
-        self._booking = booking
+        self._message = message
 
     @property
     def subject(self) -> str:
         return "SAT BOOKING : {identifier}".format(
-            identifier=self._booking.get_ticket.confirmation_code,
+            identifier=self._message.ticket_confirmation_code,
         )
 
     @property
     def template_parameters(self) -> dict[str, str]:
-        booking = self._booking.make_booking
-
         return {
-            "journey_id": self._metadata.journey_id,
-            "order_id": self._metadata.order_id,
-            "booking_id": self._metadata.booking_id,
-            "spnr": self._metadata.passenger_name_record,
-            "search_identifier": booking.search_identifier,
-            "confirmation_code": self._booking.get_ticket.confirmation_code,
-            "ticket_url": self._booking.get_ticket.url,
+            "journey_id": self._message.journey_id,
+            "order_id": self._message.order_id,
+            "booking_id": self._message.booking_id,
+            "spnr": self._message.passenger_name_record,
+            "search_identifier": self._message.search_identifier,
+            "confirmation_code": self._message.ticket_confirmation_code,
+            "ticket_url": self._message.ticket_url,
             "created_at": datetime.datetime.now(
                 tz=datetime.timezone.utc,
             ).isoformat(timespec="seconds"),
-            "departure_at": booking.outbound_trip_info.departure.isoformat(
-                timespec="seconds",
-            ),
+            "departure_at": self._message.departure_at,
         }

@@ -41,7 +41,7 @@ async def _consume(app: service.Application[_ConsumeSettings]) -> None:
     )
 
     async with types.Connection(app.settings.amqp_dsn) as connection:
-        consumer_obj = TripSearchConsumer(
+        trip_search_consumer_obj = TripSearchConsumer(
             consumer_obj=consumer.Consumer(
                 connection=connection,
                 queue_name="{0}_trip_searches_consumer".format(app.name),
@@ -59,7 +59,7 @@ async def _consume(app: service.Application[_ConsumeSettings]) -> None:
             trip_repository=trips.TripRepository(mongo[_TRIPS][_TRIPS]),
         )
 
-        await consumer_obj.consume()
+        await trip_search_consumer_obj.consume()
 
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:

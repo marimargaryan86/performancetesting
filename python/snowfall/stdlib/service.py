@@ -40,6 +40,7 @@ _Settings1 = TypeVar("_Settings1", bound=Settings)
 _Settings2 = TypeVar("_Settings2", bound=Settings)
 _Settings3 = TypeVar("_Settings3", bound=Settings)
 _Settings4 = TypeVar("_Settings4", bound=Settings)
+_Settings5 = TypeVar("_Settings5", bound=Settings)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -90,6 +91,7 @@ class Entrypoint(object):
         _cmd2: Optional[Command[_Settings2]] = None,
         _cmd3: Optional[Command[_Settings3]] = None,
         _cmd4: Optional[Command[_Settings4]] = None,
+        _cmd5: Optional[Command[_Settings5]] = None,
     ) -> None:
         group = click.Group(name=self.name, callback=_group)
 
@@ -117,6 +119,11 @@ class Entrypoint(object):
         if _cmd4:
             command = click.Command(name=_cmd4.name, callback=_command(_cmd4))
             _add_parameters_from_settings(command, _cmd4.settings_class)
+            group.add_command(command)
+
+        if _cmd5:
+            command = click.Command(name=_cmd5.name, callback=_command(_cmd5))
+            _add_parameters_from_settings(command, _cmd5.settings_class)
             group.add_command(command)
 
         group(

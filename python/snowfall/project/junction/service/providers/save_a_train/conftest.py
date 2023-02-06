@@ -17,6 +17,7 @@ from snowfall.project.junction.service.providers.save_a_train import (
 )
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.vendor.save_a_train import client
 
 
@@ -83,4 +84,8 @@ def save_a_train_adapter(
         ),
         ttl=datetime.timedelta(minutes=1),
         notifier=notifications.LogNotifier(),
+        notifications_producer=producer.Producer(
+            types.Connection(""),
+            types.Exchange("notifications"),
+        ),
     )
