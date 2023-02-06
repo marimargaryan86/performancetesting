@@ -195,6 +195,10 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                                 string_amount=transfer_fare.price,
                                 currency=money.Currency("EUR"),
                             ).protobuf(),
+                            brand_name=transfer_fare.name.replace(
+                                "_",
+                                " ",
+                            ).capitalize(),
                         )
                         for transfer in search_details.transfers
                         for transfer_fare, transfer_change in zip(
