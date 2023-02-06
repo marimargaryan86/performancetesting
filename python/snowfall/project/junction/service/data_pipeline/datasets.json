@@ -1,0 +1,80 @@
+[
+  {
+    "active": true,
+    "country": "Germany",
+    "name": "gtfs.de",
+    "url": "https://download.gtfs.de/snowfalltravel/latest.zip"
+  },
+  {
+    "active": true,
+    "country": "France",
+    "name": "Intercites",
+    "url": "https://eu.ftp.opendatasoft.com/sncf/gtfs/export-intercites-gtfs-last.zip"
+  },
+  {
+    "active": true,
+    "country": "Belgium",
+    "name": "NMBS_SNCB",
+    "url": "https://gtfs.irail.be/nmbs/gtfs/latest.zip"
+  },
+  {
+    "active": true,
+    "country": "Luxembourg",
+    "name": "openov",
+    "url": "http://openov.lu/data/gtfs/gtfs-openov-lu.zip"
+  },
+  {
+    "active": true,
+    "country": "Netherlands",
+    "name": "OVapi",
+    "url": "http://gtfs.ovapi.nl/gtfs-nl.zip"
+  },
+  {
+    "active": true,
+    "country": "Poland",
+    "name": "PKP",
+    "url": "https://mkuran.pl/gtfs/pkpic.zip"
+  },
+  {
+    "active": true,
+    "country": "Denmark",
+    "name": "Rejseplanen",
+    "url": "https://www.rejseplanen.info/labs/GTFS.zip"
+  },
+  {
+    "active": true,
+    "country": "Spain",
+    "name": "renfe",
+    "url": "https://ssl.renfe.com/gtransit/Fichero_AV_LD/google_transit.zip"
+  },
+  {
+    "active": true,
+    "country": "Switzerland",
+    "name": "SBB",
+    "url": "https://opentransportdata.swiss/dataset"
+  },
+  {
+    "active": true,
+    "country": "France",
+    "name": "TER",
+    "url": "https://eu.ftp.opendatasoft.com/sncf/gtfs/export-ter-gtfs-last.zip"
+  },
+  {
+    "active": true,
+    "country": "France",
+    "name": "TGV",
+    "url": "https://eu.ftp.opendatasoft.com/sncf/gtfs/export_gtfs_voyages.zip"
+  },
+  {
+    "active": true,
+    "country": "Austria",
+    "name": "OBB",
+    "url": "https://api-gateway.oebb.at/gateway/OpenDataSets_API/1.0/opendata"
+  },
+  {
+    "active": true,
+    "country": "Various",
+    "name": "distribusion",
+    "url": "https://api.demo.distribusion.com"
+  }
+]

@@ -18,6 +18,20 @@ oag:
     - ssh-keyscan ftp.oag.com >> ~/.ssh/known_hosts
     - curl -u "${OAG_USERNAME}:${OAG_PASSWORD}" 'sftp://ftp.oag.com/SIMSFL.DAT.gz' | gunzip > SIMSFL.DAT
     - docker login git.snowfall.se:4567 -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}"
+    - docker pull git.snowfall.se:4567/junction/junction/service/ssim-convert:latest
     - docker run -u "${UID}" --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/ssim-convert:latest convert /data/SIMSFL.DAT /data/data-input/
+  tags:
+    - shell
+
+feeds:
+  stage: download
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - data-input/
+  script:
+    - docker login git.snowfall.se:4567 -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}"
+    - docker pull git.snowfall.se:4567/junction/junction/service/data_pipeline:latest
+    - docker run -u "${UID}" $(env | grep '^PIPELINE_' | cut -f1 -d= | sed 's/^/-e /') --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/data_pipeline:latest download --path /data/data-input/
   tags:
     - shell

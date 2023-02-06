@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import dataclasses
 import inspect
+import pathlib
 from collections.abc import Sequence
 from typing import (  # noqa: WPS235
     Any,
@@ -169,6 +170,9 @@ def _validate_option(
                 ctx=ctx,
                 param=param_def,
             )
+
+        if isinstance(response[0], pathlib.Path):
+            return response[0].expanduser()
 
         return response[0]
 
