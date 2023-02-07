@@ -4968,7 +4968,8 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "readOnly": true
           },
           "attributes": {
             "type": "object",

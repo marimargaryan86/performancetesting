@@ -238,7 +238,6 @@ class TestUsers(object):
             json={
                 "data": {
                     "type": "users",
-                    "id": user["model"].id,
                     "attributes": {
                         "password": user["unhashed_password"][::-1],
                     },
