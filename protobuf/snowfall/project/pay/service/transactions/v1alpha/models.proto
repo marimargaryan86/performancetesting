@@ -10,4 +10,5 @@ message Transaction {
   string quotation_id = 3;
   string parent_external_id = 4;
   google.protobuf.Timestamp created_at = 5;
+  string conversion_id = 6;
 }

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package snowfall.project.pay.service.conversions.v1alpha;
+
+import "google/protobuf/timestamp.proto";
+import "snowfall/stdlib/v1alpha/money.proto";
+
+message Conversion {
+  string id = 1;
+  string external_id = 2;
+  google.protobuf.Timestamp settlement_date = 3;
+  google.protobuf.Timestamp conversion_date = 4;
+  snowfall.stdlib.v1alpha.Money buy_amount = 5;
+  snowfall.stdlib.v1alpha.Money sell_amount = 6;
+  string fixed_side = 7;
+  float core_rate = 8;
+}
