@@ -74,7 +74,7 @@ class PayApiClient(JunctionClient):
             },
         )
 
-    async def quote(  # noqa: WPS211
+    async def create_quote(  # noqa: WPS211
         self,
         amount: int,
         payer_id: str,
@@ -104,6 +104,34 @@ class PayApiClient(JunctionClient):
                         },
                         "toCurrency": {
                             "data": {"id": to_currency, _TYPE_KEY: "currencies"},
+                        },
+                    },
+                },
+            },
+        )
+
+    async def create_transactions(
+        self,
+        external_reference: str,
+        parent_external_reference: str,
+        quotation_id: str,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_POST,
+            url="/transactions",
+            payload={
+                _DATA_KEY: {
+                    _TYPE_KEY: "transactions",
+                    _ATTRIBUTES_KEY: {
+                        "externalReference": external_reference,
+                        "parentExternalReference": parent_external_reference,
+                    },
+                    "relationships": {
+                        "quotation": {
+                            "data": {
+                                "id": quotation_id,
+                                "type": "quotations",
+                            },
                         },
                     },
                 },

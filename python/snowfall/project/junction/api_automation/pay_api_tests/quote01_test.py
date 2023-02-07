@@ -39,7 +39,7 @@ async def test_create_quote(  # noqa: WPS218
         sales_rate=float(0),
     )
 
-    response_create_quote = await pay_client.quote(
+    response_create_quote = await pay_client.create_quote(
         amount=1000,
         payer_id=response_payer["data"]["id"],
         beneficiary_id=response_beneficiary["data"]["id"],
