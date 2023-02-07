@@ -49,10 +49,16 @@ func (mr *mergeRequest) merge() error {
 	}
 
 	for _, issue := range closesIssues {
+		if issue.References == nil {
+			continue
+		}
+
 		commitMessage += "Closes: " + issue.References.Full + "\n"
 	}
 
-	commitMessage += "Refs: " + mr.object.References.Full + "\n"
+	if mr.object.References != nil {
+		commitMessage += "Refs: " + mr.object.References.Full + "\n"
+	}
 
 	_, resp, err := mr.client.MergeRequests.AcceptMergeRequest(
 		mr.object.ProjectID,
