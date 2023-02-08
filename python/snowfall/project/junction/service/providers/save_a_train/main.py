@@ -91,6 +91,7 @@ class _NotificationsSettings(_SatConfig, service.Settings):
     smtp_dsn: pydantic.AnyUrl
     smtp_sender: pydantic.EmailStr
     smtp_recipient: pydantic.EmailStr
+    mongo_dsn: tuple[pydantic.AnyUrl]
 
 
 async def _offers(app: service.Application[_OffersSettings]) -> None:
@@ -316,6 +317,9 @@ async def _price_quotes(app: service.Application[_OffersSettings]) -> None:
 
 
 async def _notifications(app: service.Application[_NotificationsSettings]) -> None:
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        random.choice(app.settings.mongo_dsn),  # nosec
+    )
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
             httpx.AsyncClient(
@@ -368,7 +372,7 @@ async def _notifications(app: service.Application[_NotificationsSettings]) -> No
                 exchange=types.Exchange("notifications"),
             ),
             provider_cabin_class_mapping=cabin_classes.CabinMappingRepository(
-                collection=[],
+                mongo.sat.provider_cabin_mapping,
             ),
         )
         notifications_consumer = consumer.NotificationsConsumer(
