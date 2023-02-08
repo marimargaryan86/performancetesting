@@ -21,7 +21,7 @@ func (mr *mergeRequest) expectedStatusLabel() (string, error) {
 		return statusAbandoned, nil
 	}
 
-	if mr.object.WorkInProgress {
+	if mr.object.WorkInProgress || mr.object.Pipeline == nil {
 		return statusInProgress, nil
 	}
 
