@@ -1,9 +1,11 @@
+import datetime
 import pathlib
 from typing import AsyncIterator, Mapping, Optional, Sequence
 
 import currencycloud
 import httpx
 import pytest
+from fakeredis import aioredis as fakeredis
 from motor import motor_asyncio
 from starlette import applications
 from starlette.middleware import Middleware
@@ -12,6 +14,7 @@ from snowfall.project.adapter import authentication
 from snowfall.project.junction.adapter import errors
 from snowfall.project.pay.adapter import currencies
 from snowfall.project.pay.service.pay_api import bootstrap
+from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.repositories import (
     CompanyRepository,
     TransactionRepository,
@@ -20,6 +23,7 @@ from snowfall.project.pay.service.pay_api.routes import router
 from snowfall.project.pay.service.quotations import quotations
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import filesystem
+from snowfall.stdlib.persistence.redis import types as redis
 
 
 def _create_app(  # noqa: WPS211
@@ -28,6 +32,7 @@ def _create_app(  # noqa: WPS211
     authentication_client: authentication.Client,
     quotations_repository: quotations.QuotationsRepository,
     companies_repository: CompanyRepository,
+    redis_repository: UserSessionRepository,
     transaction_repository: TransactionRepository,
     openapi_path: pathlib.Path,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
@@ -41,6 +46,7 @@ def _create_app(  # noqa: WPS211
                 currencies_client,
                 authentication_client,
                 quotations_repository,
+                redis_repository,
                 companies_repository,
                 transaction_repository,
             ),
@@ -50,6 +56,24 @@ def _create_app(  # noqa: WPS211
     app.add_exception_handler(errors.NotFoundError, handlers.not_found_error_handler)
 
     return app
+
+
+@pytest.fixture
+def redis_client(redis_client: fakeredis.FakeRedis) -> redis.Client[str]:
+    return redis.Client(
+        redis_client,
+        prefix="pay_api",
+    )
+
+
+@pytest.fixture
+async def redis_repository(
+    redis_client: redis.Client[str],
+) -> UserSessionRepository:
+    return UserSessionRepository(
+        redis_client,
+        datetime.timedelta(minutes=15),  # noqa: WPS432
+    )
 
 
 @pytest.fixture()
@@ -99,6 +123,7 @@ def app(  # noqa: WPS211
     authentication_client: authentication.Client,
     quotations_repository: quotations.QuotationsRepository,
     companies_repository: CompanyRepository,
+    redis_repository: UserSessionRepository,
     transactions_repository: TransactionRepository,
 ) -> applications.Starlette:
     return _create_app(
@@ -106,6 +131,7 @@ def app(  # noqa: WPS211
         currencies_client=currencies_client,
         authentication_client=authentication_client,
         quotations_repository=quotations_repository,
+        redis_repository=redis_repository,
         companies_repository=companies_repository,
         transaction_repository=transactions_repository,
         openapi_path=filesystem.resource_path("junction.pay_api", "openapi.json"),

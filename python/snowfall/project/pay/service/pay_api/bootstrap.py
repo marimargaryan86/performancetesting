@@ -6,6 +6,7 @@ from pydantic import AnyUrl
 
 from snowfall.project.adapter import authentication
 from snowfall.project.pay.adapter import currencies
+from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.repositories import (
     CompanyRepository,
     TransactionRepository,
@@ -15,6 +16,7 @@ from snowfall.stdlib.integration.starlette import application
 
 
 class Settings(application.Settings):
+    name: str
     cc_login: str
     cc_api_key: str
     cc_env: str
@@ -22,6 +24,7 @@ class Settings(application.Settings):
     authentication_address: str
     jwt_public_key: str
     mongo_dsn: Sequence[AnyUrl]
+    redis_dsn: Sequence[AnyUrl]
 
 
 def create_dependencies(  # noqa: WPS211
@@ -29,6 +32,7 @@ def create_dependencies(  # noqa: WPS211
     currencies_client: currencies.Client,
     authentication_client: authentication.Client,
     quotations_repository: quotations.QuotationsRepository,
+    redis_client: UserSessionRepository,
     companies_repository: CompanyRepository,
     transactions_repository: TransactionRepository,
 ) -> lagom.Container:
@@ -38,5 +42,6 @@ def create_dependencies(  # noqa: WPS211
     container[authentication.Client] = authentication_client  # type: ignore[type-abstract]
     container[quotations.QuotationsRepository] = quotations_repository
     container[CompanyRepository] = companies_repository
+    container[UserSessionRepository] = redis_client
     container[TransactionRepository] = transactions_repository
     return container

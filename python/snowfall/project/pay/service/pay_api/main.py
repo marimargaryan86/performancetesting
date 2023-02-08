@@ -1,9 +1,11 @@
 import base64
+import datetime
 import random
 from typing import Callable
 
 import currencycloud
 from motor import motor_asyncio
+from redis import asyncio as aioredis
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
@@ -12,6 +14,7 @@ from snowfall.project.junction.adapter import errors
 from snowfall.project.pay.adapter import currencies
 from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
 from snowfall.project.pay.service.pay_api import authenticator, bootstrap
+from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.repositories import (
     CompanyRepository,
     TransactionRepository,
@@ -21,6 +24,7 @@ from snowfall.project.pay.service.quotations.quotations import QuotationsReposit
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import filesystem
+from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.grpc.client import create_channel
 
 _SERVICE_NAME = "pay-api"
@@ -32,6 +36,13 @@ def _factory(
     def decorator() -> applications.Starlette:
         mongo = motor_asyncio.AsyncIOMotorClient(
             random.choice(app.settings.mongo_dsn),  # nosec
+        )
+        redis_client = redis.Client[str](
+            aioredis.from_url(
+                random.choice(app.settings.redis_dsn),  # nosec
+                decode_responses=True,
+            ).client(),
+            prefix=app.name,
         )
         orders_channel = create_channel(
             random.choice(app.settings.currencies_address),  # nosec
@@ -69,6 +80,10 @@ def _factory(
                         ),
                     ),
                     quotations_repository=quotations_repo,
+                    redis_client=UserSessionRepository(
+                        redis_client=redis_client,
+                        cache_ttl=datetime.timedelta(minutes=15),
+                    ),
                     companies_repository=CompanyRepository(
                         mongo.companies.companies,
                     ),

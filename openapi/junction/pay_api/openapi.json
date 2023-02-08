@@ -999,6 +999,10 @@
                   "amount": {
                     "type": "number",
                     "example": 1000
+                  },
+                  "externalReference": {
+                    "type": "string",
+                    "example": "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn"
                   }
                 },
                 "required": [
