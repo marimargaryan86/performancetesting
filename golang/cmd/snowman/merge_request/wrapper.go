@@ -62,6 +62,16 @@ func (mr *mergeRequest) closesIssues() ([]*gitlab.Issue, error) {
 		opts.Page = resp.NextPage
 	}
 
+	for i, issue := range all {
+		newIssue, _, err := mr.client.Issues.GetIssue(issue.ProjectID, issue.IID)
+
+		if err != nil {
+			return all, err
+		}
+
+		all[i] = newIssue
+	}
+
 	return all, nil
 }
 
