@@ -600,6 +600,7 @@ class SATClient(object):  # noqa: WPS214
                 },
                 "seat_preference_attributes": {
                     "seat_preference_outbound": request.seat_preference_code,
+                    "seat_preference_inbound": None,
                 },
             },
         }
