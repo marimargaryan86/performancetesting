@@ -1,12 +1,13 @@
-from typing import Any, Generator, Type
+from typing import AsyncGenerator, Type
 
 import pytest
+from async_factory_boy.factory.sqlalchemy import AsyncSQLAlchemyFactory
 from factory import Faker, Sequence
-from factory.alchemy import SQLAlchemyModelFactory
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, exc
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy import exc
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from starlette import applications
 
 from snowfall.project.pss.service.pss_api_v2.db.db import Base, InternalDBError, get_db
 from snowfall.project.pss.service.pss_api_v2.db.models.accounts import Account
@@ -15,55 +16,57 @@ from snowfall.project.pss.service.pss_api_v2.routes.api_router import (
     router as api_router,
 )
 
-SQLALCHEMY_DATABASE_URL = "sqlite://"
+SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite://"
 
-engine = create_engine(
+engine = create_async_engine(
     SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False},
 )
 # Use connect_args parameter only with sqlite
-SessionTesting = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionTesting = async_sessionmaker(
+    engine,
+    expire_on_commit=False,
+    class_=AsyncSession,
+)
 
 
 @pytest.fixture(scope="function")
-def db_session() -> Generator[Session, Any, None]:
-    connection = engine.connect()
-    transaction = connection.begin()
-    session = SessionTesting(bind=connection)
+async def db_session() -> AsyncGenerator[AsyncSession, None]:
+    async with engine.begin() as create_conn:
+        await create_conn.run_sync(Base.metadata.create_all)
+    session = SessionTesting()
     yield session  # use the session in tests.
-    session.close()
-    transaction.rollback()
-    connection.close()
+    await session.close()
+    async with engine.begin() as drop_conn:
+        await drop_conn.run_sync(Base.metadata.drop_all)
 
 
 @pytest.fixture(scope="function")
-def fast_api_app() -> Generator[FastAPI, Any, None]:
-    """Create a fresh database on each test case."""
-    Base.metadata.create_all(engine)  # Create the tables.
+def fast_api_app() -> applications.Starlette:
     app = FastAPI()
     app.include_router(api_router)
-    yield app
-    Base.metadata.drop_all(engine)
+    return app
 
 
 @pytest.fixture(scope="function")
-def client(
+async def client(
     fast_api_app: FastAPI,
-    db_session: Session,
-) -> Generator[TestClient, Any, None]:
+    db_session: AsyncSession,
+) -> AsyncGenerator[TestClient, None]:
     """Create a new FastAPI TestClient.
 
     It uses the `db_session` fixture to override the `get_db` dependency that is
     injected into routes.
     """
 
-    def _get_test_db() -> Generator[Session, None, None]:
-        try:
-            yield db_session
-        except exc.SQLAlchemyError as ex:
-            raise InternalDBError from ex
-        finally:
-            db_session.close()
+    async def _get_test_db() -> AsyncGenerator[AsyncSession, None]:
+        async with db_session as session:
+            async with session.begin():
+                try:
+                    yield session
+                except exc.SQLAlchemyError as ex:
+                    raise InternalDBError from ex
+                finally:
+                    await session.close()
 
     fast_api_app.dependency_overrides[get_db] = _get_test_db
     with TestClient(fast_api_app) as client:
@@ -71,8 +74,8 @@ def client(
 
 
 @pytest.fixture(scope="function")
-def account_factory(db_session: Session) -> Type[SQLAlchemyModelFactory]:
-    class AccountFactory(SQLAlchemyModelFactory):
+def account_factory(db_session: AsyncSession) -> Type[AsyncSQLAlchemyFactory]:
+    class AccountFactory(AsyncSQLAlchemyFactory):
         class Meta:
             model = Account
             sqlalchemy_session = db_session
@@ -87,8 +90,8 @@ def account_factory(db_session: Session) -> Type[SQLAlchemyModelFactory]:
 
 
 @pytest.fixture(scope="function")
-def country_factory(db_session: Session) -> Type[SQLAlchemyModelFactory]:
-    class CountryFactory(SQLAlchemyModelFactory):
+def country_factory(db_session: AsyncSession) -> Type[AsyncSQLAlchemyFactory]:
+    class CountryFactory(AsyncSQLAlchemyFactory):
         class Meta:
             model = Country
             sqlalchemy_session = db_session

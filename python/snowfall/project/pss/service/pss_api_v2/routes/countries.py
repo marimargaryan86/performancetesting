@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.get("", response_model=List[CountrySchema])
-def _get_all_countries(
+async def _get_all_countries(
     countries: CountriesService = Depends(CountriesService),
 ) -> Sequence[Country]:
-    return countries.get_all()
+    return await countries.get_all()

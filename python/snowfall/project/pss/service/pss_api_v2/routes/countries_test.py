@@ -1,15 +1,15 @@
 from typing import Type
 
-from factory.alchemy import SQLAlchemyModelFactory
+from async_factory_boy.factory.sqlalchemy import AsyncSQLAlchemyFactory
 from fastapi import status
 from fastapi.testclient import TestClient
 
 
-def test_can_get_all_countries(
+async def test_can_get_all_countries(
     client: TestClient,
-    country_factory: Type[SQLAlchemyModelFactory],
+    country_factory: Type[AsyncSQLAlchemyFactory],
 ) -> None:
-    countries = country_factory.create_batch(10)
+    countries = await country_factory.create_batch(10)
     response = client.get("/countries")
 
     assert response.status_code == status.HTTP_200_OK

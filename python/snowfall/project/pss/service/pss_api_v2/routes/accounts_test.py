@@ -1,15 +1,15 @@
 from typing import Type
 
-from factory.alchemy import SQLAlchemyModelFactory
+from async_factory_boy.factory.sqlalchemy import AsyncSQLAlchemyFactory
 from fastapi import status
 from fastapi.testclient import TestClient
 
 
-def test_can_get_accounts(
+async def test_can_get_accounts(
     client: TestClient,
-    account_factory: Type[SQLAlchemyModelFactory],
+    account_factory: Type[AsyncSQLAlchemyFactory],
 ) -> None:
-    account = account_factory.create()
+    account = await account_factory.create()
     response = client.get("/accounts")
 
     assert response.status_code == status.HTTP_200_OK

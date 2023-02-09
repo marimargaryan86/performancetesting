@@ -13,5 +13,5 @@ class CountriesService(object):
     ) -> None:
         self._repository = country_repository
 
-    def get_all(self) -> Sequence[Country]:
-        return self._repository.list_all()
+    async def get_all(self) -> Sequence[Country]:
+        return await self._repository.list_all()

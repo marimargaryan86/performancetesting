@@ -13,5 +13,5 @@ class AccountsService(object):
     ) -> None:
         self._repository = account_repository
 
-    def get_all(self) -> Sequence[Account]:
-        return self._repository.list_all()
+    async def get_all(self) -> Sequence[Account]:
+        return await self._repository.list_all()

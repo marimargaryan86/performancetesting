@@ -13,7 +13,7 @@ router = APIRouter()
 
 
 @router.get("", response_model=List[AccountResponseSchema])
-def read_accounts(
+async def read_accounts(
     account_service: AccountsService = Depends(AccountsService),
 ) -> Sequence[Account]:
-    return account_service.get_all()
+    return await account_service.get_all()
