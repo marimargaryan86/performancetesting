@@ -15,16 +15,21 @@ for ((idx = 3; idx < ${#ARGS[@]}; ++idx)); do
 		ADDITIONAL_ARGS=("-var-file=${VARS_FILE}")
 	fi
 
+	echo "Deploying '${TEMPLATE_FILE%.*}' of '${SERVICE_NAME}'..."
+
 	nomad plan "${ADDITIONAL_ARGS[@]}" "${TEMPLATE_FILE}" | tee /dev/stderr | grep 'Job Modify Index:' | awk -F': ' '{ print $2 }' >check-index
 	if [ $? -eq 255 ]; then exit 1; else true; fi
 
-	if ! nomad run "${ADDITIONAL_ARGS[@]}" -check-index="$(cat check-index)" -detach "${TEMPLATE_FILE}" | tee /dev/stderr | grep 'Evaluation ID:' | awk -F': ' '{ print $2 }' >eval-id; then exit 1; else true; fi
+	if ! nomad run "${ADDITIONAL_ARGS[@]}" -check-index="$(cat check-index)" -detach "${TEMPLATE_FILE}" | tee /dev/stderr | grep 'Evaluation ID:' | awk -F': ' '{ print $2 }' >eval-id; then
+		exit 1
+	else
+		true
+	fi
 
-	if [ "$(cat eval-id)" -eq "" ] || nomad eval status -monitor "$(cat eval-id)" >/dev/null 2>&1; then
-		echo "'${TEMPLATE_FILE%.*}' of '${SERVICE_NAME}' was successfully deployed."
+	if [ "$(cat eval-id)" = "" ] || nomad eval status -monitor "$(cat eval-id)" >/dev/null 2>&1; then
 		continue
 	else
-		echo "'${TEMPLATE_FILE%.*}' of '${SERVICE_NAME}' failed to deploy."
+		true
 	fi
 
 	DEPLOYMENT_ID=$(nomad eval status -json "$(cat eval-id)" | jq -r ".DeploymentID")
@@ -37,9 +42,9 @@ for ((idx = 3; idx < ${#ARGS[@]}; ++idx)); do
 		JOBS=$(nomad alloc status -json "${ALLOC_ID}" | jq -r ".TaskStates | keys[]")
 		while IFS= read -r JOB; do
 			echo "stdout of '${JOB}':"
-			nomad alloc logs "${ALLOC_ID}" "${JOB}"
+			nomad alloc logs -tail "${ALLOC_ID}" "${JOB}"
 			echo "stderr of '${JOB}':"
-			nomad alloc logs -stderr "${ALLOC_ID}" "${JOB}"
+			nomad alloc logs -stderr -tail "${ALLOC_ID}" "${JOB}"
 		done <<<"${JOBS}"
 	done <<<"${ALLOC_IDS}"
 
