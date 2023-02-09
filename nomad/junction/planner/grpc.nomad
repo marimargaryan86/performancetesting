@@ -98,8 +98,8 @@ job "planner-grpc" {
       driver = "docker"
 
       resources {
-        memory     = 66 * 1024
-        memory_max = 80 * 1024
+        memory     = 75 * 1024
+        memory_max = 129 * 1024
       }
 
       config {
