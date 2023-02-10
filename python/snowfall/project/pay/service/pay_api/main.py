@@ -17,6 +17,7 @@ from snowfall.project.pay.service.pay_api import authenticator, bootstrap
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.repositories import (
     CompanyRepository,
+    ConversionRepository,
     TransactionRepository,
 )
 from snowfall.project.pay.service.pay_api.routes import router
@@ -89,6 +90,9 @@ def _factory(
                     ),
                     transactions_repository=TransactionRepository(
                         mongo.transactions.transactions,
+                    ),
+                    conversions_repository=ConversionRepository(
+                        mongo.conversions.conversions,
                     ),
                 ),
             ),

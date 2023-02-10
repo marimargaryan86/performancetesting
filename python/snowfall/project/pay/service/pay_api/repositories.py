@@ -3,8 +3,10 @@ import pymongo
 from snowfall.project.pay.service.companies.v1alpha import models_pb2
 from snowfall.project.pay.service.conversions.v1alpha.models_pb2 import Conversion
 from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Transaction
-from snowfall.stdlib import string
+from snowfall.stdlib import money, string
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.mongo import mixins, repository
+from snowfall.vendor.payment.models.conversion import ConversionResponse
 
 
 class CompanyRepository(
@@ -43,10 +45,6 @@ class TransactionRepository(
 ):
     _proto = Transaction
 
-    async def insert(self, document: Transaction) -> Transaction:
-        document.id = string.uuid()
-        return await super().insert(document)
-
 
 class ConversionRepository(
     mixins.FindByIdMixin[Conversion],
@@ -54,3 +52,30 @@ class ConversionRepository(
     repository.ProtoRepository[Conversion],
 ):
     _proto = Conversion
+
+    async def create(
+        self,
+        cc_conversion: ConversionResponse,
+    ) -> Conversion:
+        conversion = Conversion(
+            id=string.uuid(),
+            external_id=cc_conversion.identifier,
+            settlement_date=protobuf.datetime_to_protobuf(
+                cc_conversion.settlement_date,
+            ),
+            conversion_date=protobuf.datetime_to_protobuf(
+                cc_conversion.conversion_date,
+            ),
+            buy_amount=money.from_string(
+                cc_conversion.client_buy_amount,
+                money.Currency(cc_conversion.buy_currency),
+            ).protobuf(),
+            sell_amount=money.from_string(
+                cc_conversion.client_sell_amount,
+                money.Currency(cc_conversion.sell_currency),
+            ).protobuf(),
+            fixed_side=cc_conversion.fixed_side,
+            core_rate=cc_conversion.core_rate,
+        )
+
+        return await self.insert(conversion)

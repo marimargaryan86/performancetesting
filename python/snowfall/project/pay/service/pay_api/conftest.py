@@ -17,6 +17,7 @@ from snowfall.project.pay.service.pay_api import bootstrap
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.repositories import (
     CompanyRepository,
+    ConversionRepository,
     TransactionRepository,
 )
 from snowfall.project.pay.service.pay_api.routes import router
@@ -34,6 +35,7 @@ def _create_app(  # noqa: WPS211
     companies_repository: CompanyRepository,
     redis_repository: UserSessionRepository,
     transaction_repository: TransactionRepository,
+    conversion_repository: ConversionRepository,
     openapi_path: pathlib.Path,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
@@ -49,6 +51,7 @@ def _create_app(  # noqa: WPS211
                 redis_repository,
                 companies_repository,
                 transaction_repository,
+                conversion_repository,
             ),
         ),
     )
@@ -125,6 +128,7 @@ def app(  # noqa: WPS211
     companies_repository: CompanyRepository,
     redis_repository: UserSessionRepository,
     transactions_repository: TransactionRepository,
+    conversions_repository: ConversionRepository,
 ) -> applications.Starlette:
     return _create_app(
         cc_client=cc_client,
@@ -134,6 +138,7 @@ def app(  # noqa: WPS211
         redis_repository=redis_repository,
         companies_repository=companies_repository,
         transaction_repository=transactions_repository,
+        conversion_repository=conversions_repository,
         openapi_path=filesystem.resource_path("junction.pay_api", "openapi.json"),
     )
 

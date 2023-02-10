@@ -9,10 +9,12 @@ from snowfall.project.pay.adapter import currencies
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.repositories import (
     CompanyRepository,
+    ConversionRepository,
     TransactionRepository,
 )
 from snowfall.project.pay.service.quotations import quotations
 from snowfall.stdlib.integration.starlette import application
+from snowfall.vendor.payment import client
 
 
 class Settings(application.Settings):
@@ -35,13 +37,16 @@ def create_dependencies(  # noqa: WPS211
     redis_client: UserSessionRepository,
     companies_repository: CompanyRepository,
     transactions_repository: TransactionRepository,
+    conversions_repository: ConversionRepository,
 ) -> lagom.Container:
     container = lagom.Container()
     container[currencycloud.Client] = cc_client
+    container[client.PaymentClient] = client.PaymentClient(cc_client)
     container[currencies.Client] = currencies_client  # type: ignore[type-abstract]
     container[authentication.Client] = authentication_client  # type: ignore[type-abstract]
     container[quotations.QuotationsRepository] = quotations_repository
     container[CompanyRepository] = companies_repository
     container[UserSessionRepository] = redis_client
     container[TransactionRepository] = transactions_repository
+    container[ConversionRepository] = conversions_repository
     return container
