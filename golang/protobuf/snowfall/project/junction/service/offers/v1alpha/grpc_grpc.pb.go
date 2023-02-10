@@ -545,3 +545,123 @@ var OfferService_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "snowfall/project/junction/service/offers/v1alpha/grpc.proto",
 }
+
+// PriceQuoteServiceClient is the client API for PriceQuoteService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type PriceQuoteServiceClient interface {
+	CreatePriceQuote(ctx context.Context, in *CreatePriceQuoteRequest, opts ...grpc.CallOption) (*CreatePriceQuoteResponse, error)
+	GetPriceQuote(ctx context.Context, in *GetPriceQuoteRequest, opts ...grpc.CallOption) (*GetPriceQuoteResponse, error)
+}
+
+type priceQuoteServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewPriceQuoteServiceClient(cc grpc.ClientConnInterface) PriceQuoteServiceClient {
+	return &priceQuoteServiceClient{cc}
+}
+
+func (c *priceQuoteServiceClient) CreatePriceQuote(ctx context.Context, in *CreatePriceQuoteRequest, opts ...grpc.CallOption) (*CreatePriceQuoteResponse, error) {
+	out := new(CreatePriceQuoteResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.project.junction.service.offers.v1alpha.PriceQuoteService/CreatePriceQuote", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *priceQuoteServiceClient) GetPriceQuote(ctx context.Context, in *GetPriceQuoteRequest, opts ...grpc.CallOption) (*GetPriceQuoteResponse, error) {
+	out := new(GetPriceQuoteResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.project.junction.service.offers.v1alpha.PriceQuoteService/GetPriceQuote", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// PriceQuoteServiceServer is the server API for PriceQuoteService service.
+// All implementations should embed UnimplementedPriceQuoteServiceServer
+// for forward compatibility
+type PriceQuoteServiceServer interface {
+	CreatePriceQuote(context.Context, *CreatePriceQuoteRequest) (*CreatePriceQuoteResponse, error)
+	GetPriceQuote(context.Context, *GetPriceQuoteRequest) (*GetPriceQuoteResponse, error)
+}
+
+// UnimplementedPriceQuoteServiceServer should be embedded to have forward compatible implementations.
+type UnimplementedPriceQuoteServiceServer struct {
+}
+
+func (UnimplementedPriceQuoteServiceServer) CreatePriceQuote(context.Context, *CreatePriceQuoteRequest) (*CreatePriceQuoteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePriceQuote not implemented")
+}
+func (UnimplementedPriceQuoteServiceServer) GetPriceQuote(context.Context, *GetPriceQuoteRequest) (*GetPriceQuoteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPriceQuote not implemented")
+}
+
+// UnsafePriceQuoteServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to PriceQuoteServiceServer will
+// result in compilation errors.
+type UnsafePriceQuoteServiceServer interface {
+	mustEmbedUnimplementedPriceQuoteServiceServer()
+}
+
+func RegisterPriceQuoteServiceServer(s grpc.ServiceRegistrar, srv PriceQuoteServiceServer) {
+	s.RegisterService(&PriceQuoteService_ServiceDesc, srv)
+}
+
+func _PriceQuoteService_CreatePriceQuote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePriceQuoteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PriceQuoteServiceServer).CreatePriceQuote(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.project.junction.service.offers.v1alpha.PriceQuoteService/CreatePriceQuote",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PriceQuoteServiceServer).CreatePriceQuote(ctx, req.(*CreatePriceQuoteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PriceQuoteService_GetPriceQuote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPriceQuoteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PriceQuoteServiceServer).GetPriceQuote(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.project.junction.service.offers.v1alpha.PriceQuoteService/GetPriceQuote",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PriceQuoteServiceServer).GetPriceQuote(ctx, req.(*GetPriceQuoteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// PriceQuoteService_ServiceDesc is the grpc.ServiceDesc for PriceQuoteService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var PriceQuoteService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "snowfall.project.junction.service.offers.v1alpha.PriceQuoteService",
+	HandlerType: (*PriceQuoteServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreatePriceQuote",
+			Handler:    _PriceQuoteService_CreatePriceQuote_Handler,
+		},
+		{
+			MethodName: "GetPriceQuote",
+			Handler:    _PriceQuoteService_GetPriceQuote_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "snowfall/project/junction/service/offers/v1alpha/grpc.proto",
+}

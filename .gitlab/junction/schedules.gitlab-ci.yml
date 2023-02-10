@@ -1,6 +1,5 @@
 stages:
   - download
-  - import
   - export
 
 variables:
@@ -33,5 +32,20 @@ feeds:
     - docker login git.snowfall.se:4567 -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}"
     - docker pull git.snowfall.se:4567/junction/junction/service/data_pipeline:latest
     - docker run -u "${UID}" $(env | grep '^PIPELINE_' | cut -f1 -d= | sed 's/^/-e /') --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/data_pipeline:latest download --path /data/data-input/
+  tags:
+    - shell
+
+import:
+  stage: export
+  needs: ["oag", "feeds"]
+  timeout: 6h
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - data-output/
+  script:
+    - docker login git.snowfall.se:4567 -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}"
+    - docker pull git.snowfall.se:4567/junction/junction/service/gtfs-import:latest
+    - docker run -u "${UID}" --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/gtfs-import:latest /data/data-input/ /data/data-output/
   tags:
     - shell

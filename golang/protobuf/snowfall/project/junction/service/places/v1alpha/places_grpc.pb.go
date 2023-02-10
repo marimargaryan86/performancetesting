@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type LocationsServiceClient interface {
 	GetLocation(ctx context.Context, in *GetLocationRequest, opts ...grpc.CallOption) (*GetLocationResponse, error)
 	ListLocations(ctx context.Context, in *ListLocationsRequest, opts ...grpc.CallOption) (*ListLocationsResponse, error)
+	ListNearbyLocations(ctx context.Context, in *ListNearbyLocationsRequest, opts ...grpc.CallOption) (*ListNearbyLocationsResponse, error)
 }
 
 type locationsServiceClient struct {
@@ -52,12 +53,22 @@ func (c *locationsServiceClient) ListLocations(ctx context.Context, in *ListLoca
 	return out, nil
 }
 
+func (c *locationsServiceClient) ListNearbyLocations(ctx context.Context, in *ListNearbyLocationsRequest, opts ...grpc.CallOption) (*ListNearbyLocationsResponse, error) {
+	out := new(ListNearbyLocationsResponse)
+	err := c.cc.Invoke(ctx, "/snowfall.project.junction.service.places.v1alpha.LocationsService/ListNearbyLocations", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LocationsServiceServer is the server API for LocationsService service.
 // All implementations should embed UnimplementedLocationsServiceServer
 // for forward compatibility
 type LocationsServiceServer interface {
 	GetLocation(context.Context, *GetLocationRequest) (*GetLocationResponse, error)
 	ListLocations(context.Context, *ListLocationsRequest) (*ListLocationsResponse, error)
+	ListNearbyLocations(context.Context, *ListNearbyLocationsRequest) (*ListNearbyLocationsResponse, error)
 }
 
 // UnimplementedLocationsServiceServer should be embedded to have forward compatible implementations.
@@ -69,6 +80,9 @@ func (UnimplementedLocationsServiceServer) GetLocation(context.Context, *GetLoca
 }
 func (UnimplementedLocationsServiceServer) ListLocations(context.Context, *ListLocationsRequest) (*ListLocationsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListLocations not implemented")
+}
+func (UnimplementedLocationsServiceServer) ListNearbyLocations(context.Context, *ListNearbyLocationsRequest) (*ListNearbyLocationsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListNearbyLocations not implemented")
 }
 
 // UnsafeLocationsServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -118,6 +132,24 @@ func _LocationsService_ListLocations_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _LocationsService_ListNearbyLocations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListNearbyLocationsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LocationsServiceServer).ListNearbyLocations(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/snowfall.project.junction.service.places.v1alpha.LocationsService/ListNearbyLocations",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LocationsServiceServer).ListNearbyLocations(ctx, req.(*ListNearbyLocationsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // LocationsService_ServiceDesc is the grpc.ServiceDesc for LocationsService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -132,6 +164,10 @@ var LocationsService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListLocations",
 			Handler:    _LocationsService_ListLocations_Handler,
+		},
+		{
+			MethodName: "ListNearbyLocations",
+			Handler:    _LocationsService_ListNearbyLocations_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

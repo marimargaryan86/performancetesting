@@ -138,6 +138,132 @@ func (x *TripOfferSearchResult) GetOffer() *OfferGroup {
 	return nil
 }
 
+type TripPriceQuoteTask struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	PriceQuoteContainerId string `protobuf:"bytes,1,opt,name=price_quote_container_id,json=priceQuoteContainerId,proto3" json:"price_quote_container_id,omitempty"`
+	OptionId              string `protobuf:"bytes,2,opt,name=option_id,json=optionId,proto3" json:"option_id,omitempty"`
+	SessionToken          string `protobuf:"bytes,3,opt,name=session_token,json=sessionToken,proto3" json:"session_token,omitempty"`
+}
+
+func (x *TripPriceQuoteTask) Reset() {
+	*x = TripPriceQuoteTask{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_snowfall_project_junction_service_offers_v1alpha_amqp_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TripPriceQuoteTask) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TripPriceQuoteTask) ProtoMessage() {}
+
+func (x *TripPriceQuoteTask) ProtoReflect() protoreflect.Message {
+	mi := &file_snowfall_project_junction_service_offers_v1alpha_amqp_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TripPriceQuoteTask.ProtoReflect.Descriptor instead.
+func (*TripPriceQuoteTask) Descriptor() ([]byte, []int) {
+	return file_snowfall_project_junction_service_offers_v1alpha_amqp_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *TripPriceQuoteTask) GetPriceQuoteContainerId() string {
+	if x != nil {
+		return x.PriceQuoteContainerId
+	}
+	return ""
+}
+
+func (x *TripPriceQuoteTask) GetOptionId() string {
+	if x != nil {
+		return x.OptionId
+	}
+	return ""
+}
+
+func (x *TripPriceQuoteTask) GetSessionToken() string {
+	if x != nil {
+		return x.SessionToken
+	}
+	return ""
+}
+
+type TripPriceQuoteResult struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	PriceQuoteContainerId string      `protobuf:"bytes,1,opt,name=price_quote_container_id,json=priceQuoteContainerId,proto3" json:"price_quote_container_id,omitempty"`
+	OptionId              string      `protobuf:"bytes,2,opt,name=option_id,json=optionId,proto3" json:"option_id,omitempty"`
+	PriceQuote            *PriceQuote `protobuf:"bytes,3,opt,name=price_quote,json=priceQuote,proto3" json:"price_quote,omitempty"`
+}
+
+func (x *TripPriceQuoteResult) Reset() {
+	*x = TripPriceQuoteResult{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_snowfall_project_junction_service_offers_v1alpha_amqp_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TripPriceQuoteResult) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TripPriceQuoteResult) ProtoMessage() {}
+
+func (x *TripPriceQuoteResult) ProtoReflect() protoreflect.Message {
+	mi := &file_snowfall_project_junction_service_offers_v1alpha_amqp_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TripPriceQuoteResult.ProtoReflect.Descriptor instead.
+func (*TripPriceQuoteResult) Descriptor() ([]byte, []int) {
+	return file_snowfall_project_junction_service_offers_v1alpha_amqp_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *TripPriceQuoteResult) GetPriceQuoteContainerId() string {
+	if x != nil {
+		return x.PriceQuoteContainerId
+	}
+	return ""
+}
+
+func (x *TripPriceQuoteResult) GetOptionId() string {
+	if x != nil {
+		return x.OptionId
+	}
+	return ""
+}
+
+func (x *TripPriceQuoteResult) GetPriceQuote() *PriceQuote {
+	if x != nil {
+		return x.PriceQuote
+	}
+	return nil
+}
+
 var File_snowfall_project_junction_service_offers_v1alpha_amqp_proto protoreflect.FileDescriptor
 
 var file_snowfall_project_junction_service_offers_v1alpha_amqp_proto_rawDesc = []byte{
@@ -173,7 +299,29 @@ var file_snowfall_project_junction_service_offers_v1alpha_amqp_proto_rawDesc = [
 	0x63, 0x74, 0x2e, 0x6a, 0x75, 0x6e, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x73, 0x65, 0x72, 0x76,
 	0x69, 0x63, 0x65, 0x2e, 0x6f, 0x66, 0x66, 0x65, 0x72, 0x73, 0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70,
 	0x68, 0x61, 0x2e, 0x4f, 0x66, 0x66, 0x65, 0x72, 0x47, 0x72, 0x6f, 0x75, 0x70, 0x52, 0x05, 0x6f,
-	0x66, 0x66, 0x65, 0x72, 0x42, 0x9a, 0x03, 0x0a, 0x34, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x6e, 0x6f,
+	0x66, 0x66, 0x65, 0x72, 0x22, 0x8f, 0x01, 0x0a, 0x12, 0x54, 0x72, 0x69, 0x70, 0x50, 0x72, 0x69,
+	0x63, 0x65, 0x51, 0x75, 0x6f, 0x74, 0x65, 0x54, 0x61, 0x73, 0x6b, 0x12, 0x37, 0x0a, 0x18, 0x70,
+	0x72, 0x69, 0x63, 0x65, 0x5f, 0x71, 0x75, 0x6f, 0x74, 0x65, 0x5f, 0x63, 0x6f, 0x6e, 0x74, 0x61,
+	0x69, 0x6e, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x15, 0x70,
+	0x72, 0x69, 0x63, 0x65, 0x51, 0x75, 0x6f, 0x74, 0x65, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e,
+	0x65, 0x72, 0x49, 0x64, 0x12, 0x1b, 0x0a, 0x09, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x69,
+	0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x49,
+	0x64, 0x12, 0x23, 0x0a, 0x0d, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x5f, 0x74, 0x6f, 0x6b,
+	0x65, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f,
+	0x6e, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x22, 0xcb, 0x01, 0x0a, 0x14, 0x54, 0x72, 0x69, 0x70, 0x50,
+	0x72, 0x69, 0x63, 0x65, 0x51, 0x75, 0x6f, 0x74, 0x65, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12,
+	0x37, 0x0a, 0x18, 0x70, 0x72, 0x69, 0x63, 0x65, 0x5f, 0x71, 0x75, 0x6f, 0x74, 0x65, 0x5f, 0x63,
+	0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x15, 0x70, 0x72, 0x69, 0x63, 0x65, 0x51, 0x75, 0x6f, 0x74, 0x65, 0x43, 0x6f, 0x6e,
+	0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x49, 0x64, 0x12, 0x1b, 0x0a, 0x09, 0x6f, 0x70, 0x74, 0x69,
+	0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x6f, 0x70, 0x74,
+	0x69, 0x6f, 0x6e, 0x49, 0x64, 0x12, 0x5d, 0x0a, 0x0b, 0x70, 0x72, 0x69, 0x63, 0x65, 0x5f, 0x71,
+	0x75, 0x6f, 0x74, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x3c, 0x2e, 0x73, 0x6e, 0x6f,
+	0x77, 0x66, 0x61, 0x6c, 0x6c, 0x2e, 0x70, 0x72, 0x6f, 0x6a, 0x65, 0x63, 0x74, 0x2e, 0x6a, 0x75,
+	0x6e, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x6f,
+	0x66, 0x66, 0x65, 0x72, 0x73, 0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x2e, 0x50, 0x72,
+	0x69, 0x63, 0x65, 0x51, 0x75, 0x6f, 0x74, 0x65, 0x52, 0x0a, 0x70, 0x72, 0x69, 0x63, 0x65, 0x51,
+	0x75, 0x6f, 0x74, 0x65, 0x42, 0x9a, 0x03, 0x0a, 0x34, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x6e, 0x6f,
 	0x77, 0x66, 0x61, 0x6c, 0x6c, 0x2e, 0x70, 0x72, 0x6f, 0x6a, 0x65, 0x63, 0x74, 0x2e, 0x6a, 0x75,
 	0x6e, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x6f,
 	0x66, 0x66, 0x65, 0x72, 0x73, 0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x42, 0x09, 0x41,
@@ -214,21 +362,25 @@ func file_snowfall_project_junction_service_offers_v1alpha_amqp_proto_rawDescGZI
 	return file_snowfall_project_junction_service_offers_v1alpha_amqp_proto_rawDescData
 }
 
-var file_snowfall_project_junction_service_offers_v1alpha_amqp_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_snowfall_project_junction_service_offers_v1alpha_amqp_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_snowfall_project_junction_service_offers_v1alpha_amqp_proto_goTypes = []interface{}{
 	(*TripOfferSearchTask)(nil),   // 0: snowfall.project.junction.service.offers.v1alpha.TripOfferSearchTask
 	(*TripOfferSearchResult)(nil), // 1: snowfall.project.junction.service.offers.v1alpha.TripOfferSearchResult
-	(*TripOfferSearch)(nil),       // 2: snowfall.project.junction.service.offers.v1alpha.TripOfferSearch
-	(*OfferGroup)(nil),            // 3: snowfall.project.junction.service.offers.v1alpha.OfferGroup
+	(*TripPriceQuoteTask)(nil),    // 2: snowfall.project.junction.service.offers.v1alpha.TripPriceQuoteTask
+	(*TripPriceQuoteResult)(nil),  // 3: snowfall.project.junction.service.offers.v1alpha.TripPriceQuoteResult
+	(*TripOfferSearch)(nil),       // 4: snowfall.project.junction.service.offers.v1alpha.TripOfferSearch
+	(*OfferGroup)(nil),            // 5: snowfall.project.junction.service.offers.v1alpha.OfferGroup
+	(*PriceQuote)(nil),            // 6: snowfall.project.junction.service.offers.v1alpha.PriceQuote
 }
 var file_snowfall_project_junction_service_offers_v1alpha_amqp_proto_depIdxs = []int32{
-	2, // 0: snowfall.project.junction.service.offers.v1alpha.TripOfferSearchTask.search:type_name -> snowfall.project.junction.service.offers.v1alpha.TripOfferSearch
-	3, // 1: snowfall.project.junction.service.offers.v1alpha.TripOfferSearchResult.offer:type_name -> snowfall.project.junction.service.offers.v1alpha.OfferGroup
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	4, // 0: snowfall.project.junction.service.offers.v1alpha.TripOfferSearchTask.search:type_name -> snowfall.project.junction.service.offers.v1alpha.TripOfferSearch
+	5, // 1: snowfall.project.junction.service.offers.v1alpha.TripOfferSearchResult.offer:type_name -> snowfall.project.junction.service.offers.v1alpha.OfferGroup
+	6, // 2: snowfall.project.junction.service.offers.v1alpha.TripPriceQuoteResult.price_quote:type_name -> snowfall.project.junction.service.offers.v1alpha.PriceQuote
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_snowfall_project_junction_service_offers_v1alpha_amqp_proto_init() }
@@ -262,6 +414,30 @@ func file_snowfall_project_junction_service_offers_v1alpha_amqp_proto_init() {
 				return nil
 			}
 		}
+		file_snowfall_project_junction_service_offers_v1alpha_amqp_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*TripPriceQuoteTask); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_snowfall_project_junction_service_offers_v1alpha_amqp_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*TripPriceQuoteResult); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -269,7 +445,7 @@ func file_snowfall_project_junction_service_offers_v1alpha_amqp_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_snowfall_project_junction_service_offers_v1alpha_amqp_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
