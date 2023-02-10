@@ -9,6 +9,7 @@ pants:setup:
   needs: []
   rules:
     - if: '$CI_MERGE_REQUEST_IID || $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: $E2E == "true"  # Needed to run the planner-test.gitlab-ci.yml tests
   tags:
     - shell
 

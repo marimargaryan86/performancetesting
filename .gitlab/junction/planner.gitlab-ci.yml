@@ -1,0 +1,17 @@
+planner-test:
+  stage: test
+  interruptible: true
+  image: "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"
+
+  script:
+    - echo "planner-test.gitlab-ci.yml RUNNING"
+    - ./bash/planner-test.sh
+
+  rules:
+    # do not run if branch 'main' or this is a merge.
+    - if: $E2E == "true"
+
+  needs:
+    - "pants:setup"
+  tags:
+    - docker

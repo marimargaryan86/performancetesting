@@ -9,15 +9,19 @@ variables:
   CACHE_COMPRESSION_LEVEL: fastest
   GIT_DEPTH: 1
   GIT_STRATEGY: fetch
-
+  E2E:
+    value: 'false'
+    description: "Run the schedules pipeline e2e test? then set to 'true'"
 include:
   - local: .gitlab/junction/api_automation.gitlab-ci.yml
   - local: .gitlab/markdown.gitlab-ci.yml
   - local: .gitlab/nomad.gitlab-ci.yml
   - local: .gitlab/pants.gitlab-ci.yml
+  - local: .gitlab/junction/planner.gitlab-ci.yml
   - local: golang/.gitlab-ci.yml
   - local: openapi/.gitlab-ci.yml
   - local: protobuf/.gitlab-ci.yml
+
 
 make-uninterruptible:
   stage: setup
