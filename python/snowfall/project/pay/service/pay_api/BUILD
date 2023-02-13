@@ -10,3 +10,4 @@ python_test_utils(
     name="test_utils",
     dependencies=["openapi/junction/pay_api"],
 )
+python_tests(name="tests")
