@@ -118,18 +118,9 @@ known_versions = [
 
 [pytest]
 version = "pytest==7.2.1"
+config = "vendor/pyproject.toml"
 lockfile = "vendor/lock/pytest.txt"
 xdist_enabled = true
-args = [
-    "--import-mode=importlib",
-    "--asyncio-mode=auto",
-    "-W ignore::DeprecationWarning:aioredis.connection:",
-    "-W ignore::DeprecationWarning:jsonschema.validators:",
-    "-W ignore::DeprecationWarning:openapi_core.unmarshalling.schemas.unmarshallers:",
-    "-W ignore::DeprecationWarning:openapi_spec_validator.validators:",
-    "-W ignore::DeprecationWarning:openapi_spec_validator.factories:",
-    "-W ignore::DeprecationWarning:openapi_schema_validator.validators:",
-]
 extra_requirements = [
     "allure-pytest",
     "pytest-asyncio",
