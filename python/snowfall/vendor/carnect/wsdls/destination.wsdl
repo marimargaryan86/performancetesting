@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://www.opentravel.org/OTA/2003/05" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://www.opentravel.org/OTA/2003/05">
+    <wsdl:types>
+        <s:schema elementFormDefault="qualified" targetNamespace="http://www.opentravel.org/OTA/2003/05">
+            <s:element name="VehicleRegionRequest" type="tns:VehicleRegionRequest"/>
+            <s:complexType name="VehicleRegionRequest">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="1" name="Language" type="s:string"/>
+                    <s:element minOccurs="0" maxOccurs="1" name="CountryISO" type="s:string"/>
+                </s:sequence>
+            </s:complexType>
+            <s:element name="VehicleRegionResponse">
+                <s:complexType>
+                    <s:complexContent mixed="false">
+                        <s:extension base="tns:DestinationResponse">
+                            <s:sequence>
+                                <s:element minOccurs="0" maxOccurs="1" name="Regions" type="tns:ArrayOfRegion"/>
+                            </s:sequence>
+                        </s:extension>
+                    </s:complexContent>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="DestinationResponse" abstract="true">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="1" name="Errors" type="tns:ArrayOfErrorMessage"/>
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="ArrayOfErrorMessage">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="unbounded" name="ErrorMessage" nillable="true" type="tns:ErrorMessage"/>
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="ErrorMessage">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="1" name="Name" type="s:string"/>
+                    <s:element minOccurs="1" maxOccurs="1" name="Type" type="s:int"/>
+                </s:sequence>
+                <s:attribute name="id" type="s:int" use="required"/>
+            </s:complexType>
+            <s:complexType name="ArrayOfRegion">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="unbounded" name="Region" type="tns:Region"/>
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="Region">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="1" name="Name" type="s:string"/>
+                    <s:element minOccurs="1" maxOccurs="1" name="countryID" type="s:int"/>
+                </s:sequence>
+                <s:attribute name="id" type="s:int" use="required"/>
+                <s:attribute name="state-code" type="s:string"/>
+            </s:complexType>
+            <s:element name="informationHeader" type="tns:InformationHeader"/>
+            <s:complexType name="InformationHeader">
+                <s:sequence>
+                    <s:element minOccurs="1" maxOccurs="1" name="Successfully" type="s:boolean"/>
+                    <s:element minOccurs="1" maxOccurs="1" name="ProcessingTime" type="s:double"/>
+                </s:sequence>
+                <s:anyAttribute/>
+            </s:complexType>
+            <s:element name="VehicleCountryRequest" type="tns:VehicleCountryRequest"/>
+            <s:complexType name="VehicleCountryRequest">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="1" name="Language" type="s:string"/>
+                </s:sequence>
+            </s:complexType>
+            <s:element name="VehicleCountryResponse">
+                <s:complexType>
+                    <s:complexContent mixed="false">
+                        <s:extension base="tns:DestinationResponse">
+                            <s:sequence>
+                                <s:element minOccurs="0" maxOccurs="1" name="Countries" type="tns:ArrayOfCountry"/>
+                            </s:sequence>
+                        </s:extension>
+                    </s:complexContent>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="ArrayOfCountry">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="unbounded" name="Country" type="tns:Country"/>
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="Country">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="1" name="Name" type="s:string"/>
+                    <s:element minOccurs="0" maxOccurs="1" name="ISO" type="s:string"/>
+                </s:sequence>
+                <s:attribute name="id" type="s:int" use="required"/>
+            </s:complexType>
+            <s:element name="VehicleCityRequest" type="tns:VehicleCityRequest"/>
+            <s:complexType name="VehicleCityRequest">
+                <s:sequence>
+                    <s:element minOccurs="1" maxOccurs="1" name="RegionId" type="s:int"/>
+                    <s:element minOccurs="1" maxOccurs="1" name="CountryID" type="s:int"/>
+                    <s:element minOccurs="0" maxOccurs="1" name="CountryISO" type="s:string"/>
+                    <s:element minOccurs="0" maxOccurs="1" name="Language" type="s:string"/>
+                </s:sequence>
+            </s:complexType>
+            <s:element name="VehicleCityResponse">
+                <s:complexType>
+                    <s:complexContent mixed="false">
+                        <s:extension base="tns:DestinationResponse">
+                            <s:sequence>
+                                <s:element minOccurs="0" maxOccurs="1" name="Cities" type="tns:ArrayOfCity"/>
+                            </s:sequence>
+                        </s:extension>
+                    </s:complexContent>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="ArrayOfCity">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="unbounded" name="City" type="tns:City"/>
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="City">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="1" name="Name" type="s:string"/>
+                    <s:element minOccurs="1" maxOccurs="1" name="RegionID" type="s:int"/>
+                </s:sequence>
+                <s:attribute name="id" type="s:int" use="required"/>
+                <s:attribute name="state-code" type="s:string"/>
+                <s:attribute name="iata" type="s:string"/>
+                <s:attribute name="latitude" type="s:double" use="required"/>
+                <s:attribute name="longitude" type="s:double" use="required"/>
+            </s:complexType>
+            <s:element name="VehicleAirportRequest" type="tns:VehicleAirportRequest"/>
+            <s:complexType name="VehicleAirportRequest">
+                <s:sequence>
+                    <s:element minOccurs="1" maxOccurs="1" name="RegionId" type="s:int"/>
+                    <s:element minOccurs="0" maxOccurs="1" name="Language" type="s:string"/>
+                    <s:element minOccurs="1" maxOccurs="1" name="CityID" type="s:int"/>
+                    <s:element minOccurs="1" maxOccurs="1" name="CountryID" type="s:int"/>
+                </s:sequence>
+            </s:complexType>
+            <s:element name="VehicleAirportResponse">
+                <s:complexType>
+                    <s:complexContent mixed="false">
+                        <s:extension base="tns:DestinationResponse">
+                            <s:sequence>
+                                <s:element minOccurs="0" maxOccurs="1" name="Airports" type="tns:ArrayOfAirport"/>
+                            </s:sequence>
+                        </s:extension>
+                    </s:complexContent>
+                </s:complexType>
+            </s:element>
+            <s:complexType name="ArrayOfAirport">
+                <s:sequence>
+                    <s:element minOccurs="0" maxOccurs="unbounded" name="Airport" type="tns:Airport"/>
+                </s:sequence>
+            </s:complexType>
+            <s:complexType name="Airport">
+                <s:sequence>
+                    <s:element minOccurs="1" maxOccurs="1" name="CityID" type="s:int"/>
+                    <s:element minOccurs="0" maxOccurs="1" name="Name" type="s:string"/>
+                </s:sequence>
+                <s:attribute name="id" type="s:int" use="required"/>
+                <s:attribute name="iata" type="s:string"/>
+                <s:attribute name="latitude" type="s:decimal" use="required"/>
+                <s:attribute name="longitude" type="s:decimal" use="required"/>
+                <s:attribute name="state-code" type="s:string"/>
+            </s:complexType>
+        </s:schema>
+    </wsdl:types>
+    <wsdl:message name="GetRegionsSoapIn">
+        <wsdl:part name="VehicleRegionRequest" element="tns:VehicleRegionRequest"/>
+    </wsdl:message>
+    <wsdl:message name="GetRegionsSoapOut">
+        <wsdl:part name="GetRegionsResult" element="tns:VehicleRegionResponse"/>
+    </wsdl:message>
+    <wsdl:message name="GetRegionsinformationHeader">
+        <wsdl:part name="informationHeader" element="tns:informationHeader"/>
+    </wsdl:message>
+    <wsdl:message name="GetCountriesSoapIn">
+        <wsdl:part name="VehicleCountryRequest" element="tns:VehicleCountryRequest"/>
+    </wsdl:message>
+    <wsdl:message name="GetCountriesSoapOut">
+        <wsdl:part name="GetCountriesResult" element="tns:VehicleCountryResponse"/>
+    </wsdl:message>
+    <wsdl:message name="GetCountriesinformationHeader">
+        <wsdl:part name="informationHeader" element="tns:informationHeader"/>
+    </wsdl:message>
+    <wsdl:message name="GetCitiesSoapIn">
+        <wsdl:part name="VehicleCityRequest" element="tns:VehicleCityRequest"/>
+    </wsdl:message>
+    <wsdl:message name="GetCitiesSoapOut">
+        <wsdl:part name="GetCitiesResult" element="tns:VehicleCityResponse"/>
+    </wsdl:message>
+    <wsdl:message name="GetCitiesinformationHeader">
+        <wsdl:part name="informationHeader" element="tns:informationHeader"/>
+    </wsdl:message>
+    <wsdl:message name="GetAirportsSoapIn">
+        <wsdl:part name="VehicleAirportRequest" element="tns:VehicleAirportRequest"/>
+    </wsdl:message>
+    <wsdl:message name="GetAirportsSoapOut">
+        <wsdl:part name="GetAirportsResult" element="tns:VehicleAirportResponse"/>
+    </wsdl:message>
+    <wsdl:message name="GetAirportsinformationHeader">
+        <wsdl:part name="informationHeader" element="tns:informationHeader"/>
+    </wsdl:message>
+    <wsdl:portType name="destinationSoap">
+        <wsdl:operation name="GetRegions">
+            <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+                Diplays an array of Regions.
+            </wsdl:documentation>
+            <wsdl:input message="tns:GetRegionsSoapIn"/>
+            <wsdl:output message="tns:GetRegionsSoapOut"/>
+        </wsdl:operation>
+        <wsdl:operation name="GetCountries">
+            <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+                Diplays an array of Countries.
+            </wsdl:documentation>
+            <wsdl:input message="tns:GetCountriesSoapIn"/>
+            <wsdl:output message="tns:GetCountriesSoapOut"/>
+        </wsdl:operation>
+        <wsdl:operation name="GetCities">
+            <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+                Diplays an array of Cities.
+            </wsdl:documentation>
+            <wsdl:input message="tns:GetCitiesSoapIn"/>
+            <wsdl:output message="tns:GetCitiesSoapOut"/>
+        </wsdl:operation>
+        <wsdl:operation name="GetAirports">
+            <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+                Diplays an array of Airports.
+            </wsdl:documentation>
+            <wsdl:input message="tns:GetAirportsSoapIn"/>
+            <wsdl:output message="tns:GetAirportsSoapOut"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="destinationSoap" type="tns:destinationSoap">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="GetRegions">
+            <soap:operation soapAction="http://www.opentravel.org/OTA/2003/05/GetRegions" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+                <soap:header message="tns:GetRegionsinformationHeader" part="informationHeader" use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="GetCountries">
+            <soap:operation soapAction="http://www.opentravel.org/OTA/2003/05/GetCountries" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+                <soap:header message="tns:GetCountriesinformationHeader" part="informationHeader" use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="GetCities">
+            <soap:operation soapAction="http://www.opentravel.org/OTA/2003/05/GetCities" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+                <soap:header message="tns:GetCitiesinformationHeader" part="informationHeader" use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="GetAirports">
+            <soap:operation soapAction="http://www.opentravel.org/OTA/2003/05/GetAirports" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+                <soap:header message="tns:GetAirportsinformationHeader" part="informationHeader" use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="destinationSoap12" type="tns:destinationSoap">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="GetRegions">
+            <soap12:operation soapAction="http://www.opentravel.org/OTA/2003/05/GetRegions" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+                <soap12:header message="tns:GetRegionsinformationHeader" part="informationHeader" use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="GetCountries">
+            <soap12:operation soapAction="http://www.opentravel.org/OTA/2003/05/GetCountries" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+                <soap12:header message="tns:GetCountriesinformationHeader" part="informationHeader" use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="GetCities">
+            <soap12:operation soapAction="http://www.opentravel.org/OTA/2003/05/GetCities" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+                <soap12:header message="tns:GetCitiesinformationHeader" part="informationHeader" use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="GetAirports">
+            <soap12:operation soapAction="http://www.opentravel.org/OTA/2003/05/GetAirports" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+                <soap12:header message="tns:GetAirportsinformationHeader" part="informationHeader" use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="destination">
+        <wsdl:port name="destinationSoap" binding="tns:destinationSoap">
+            <soap:address location="https://ota2007a.micronnexus-staging.com/destination.asmx"/>
+        </wsdl:port>
+        <wsdl:port name="destinationSoap12" binding="tns:destinationSoap12">
+            <soap12:address location="https://ota2007a.micronnexus-staging.com/destination.asmx"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
