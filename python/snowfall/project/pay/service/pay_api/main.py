@@ -28,8 +28,6 @@ from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.grpc.client import create_channel
 
-_SERVICE_NAME = "pay-api"
-
 
 def _factory(
     app: service.Application[bootstrap.Settings],

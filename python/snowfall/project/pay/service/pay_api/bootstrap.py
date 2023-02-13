@@ -18,7 +18,6 @@ from snowfall.vendor.payment import client
 
 
 class Settings(application.Settings):
-    name: str
     cc_login: str
     cc_api_key: str
     cc_env: str
