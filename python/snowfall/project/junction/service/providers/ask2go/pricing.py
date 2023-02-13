@@ -51,12 +51,12 @@ class Adapter(object):
             )
 
             try:
-                return await self._get_async_price_result(async_offer)
+                return await self._get_async_price_result(async_offer)  # type: ignore[misc]
             except (NoPricingError, PricingTimeoutError) as err:
                 self._logger.error("Pricing failed", exception=str(type(err).__name__))
                 raise
 
-    @tenacity.retry(
+    @tenacity.retry(  # type: ignore[arg-type]
         stop=tenacity.stop_after_attempt(10),
         retry=tenacity.retry_if_exception_type(errors.TimeOutError),
         wait=tenacity.wait_random_exponential(multiplier=1, max=5),

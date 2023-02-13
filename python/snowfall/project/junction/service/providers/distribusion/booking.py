@@ -65,11 +65,13 @@ class BookingHandler(object):
                         ),
                         record_locator=booking_result.booking.marketing_carrier_booking_number
                         or "",
-                        operator_booking_references=[
-                            booking_result.booking.distribusion_booking_number,
-                        ]
-                        if booking_result.booking.distribusion_booking_number
-                        else [],
+                        operator_booking_references=(
+                            [
+                                booking_result.booking.distribusion_booking_number,
+                            ]
+                            if booking_result.booking.distribusion_booking_number
+                            else []
+                        ),
                         created_at=protobuf.datetime_to_protobuf(
                             datetime.datetime.now(tz=datetime.timezone.utc),
                         ),

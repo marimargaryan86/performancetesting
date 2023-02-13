@@ -261,9 +261,11 @@ class OfferParser(object):
                     equipment=segment.equipment.code if segment.equipment else "",
                     number=segment.marketing_carrier.flight_number or "",
                 ),
-                operator=segment.operating_carrier.airline_id
-                if segment.operating_carrier
-                else "",
+                operator=(
+                    segment.operating_carrier.airline_id
+                    if segment.operating_carrier
+                    else ""
+                ),
                 vendor=segment.marketing_carrier.airline_id or "",
                 terminal=segment.destination.terminal_name or "",
                 type=models_pb2.Schedule.TYPE_AIR,

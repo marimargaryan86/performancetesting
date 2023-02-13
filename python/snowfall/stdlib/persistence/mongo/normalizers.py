@@ -77,7 +77,7 @@ class _IdNormalizer(Normalizer):
         if isinstance(maybe_dict, dict) and _MONGO_ID_KEY in maybe_dict:
             maybe_dict[_MODEL_ID_KEY] = maybe_dict.pop(_MONGO_ID_KEY)
 
-        return maybe_dict
+        return cast(AnyValue, maybe_dict)
 
     def supports(self, fqn: str) -> bool:
         return True
@@ -89,7 +89,7 @@ class _IdNormalizer(Normalizer):
         if isinstance(maybe_dict, dict) and _MODEL_ID_KEY in maybe_dict:
             maybe_dict[_MONGO_ID_KEY] = maybe_dict.pop(_MODEL_ID_KEY)
 
-        return maybe_dict
+        return cast(AnyValue, maybe_dict)
 
 
 class _LatLngNormalizer(Normalizer):

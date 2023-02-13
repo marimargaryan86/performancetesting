@@ -110,11 +110,13 @@ Travel departure date : {departure_at}
                 "created_at": datetime.datetime.now(
                     tz=datetime.timezone.utc,
                 ).isoformat(timespec="seconds"),
-                "departure_at": datetime.datetime.fromisoformat(
-                    first_segment.departure_time or "",
-                )
-                .replace(tzinfo=datetime.timezone.utc)  # noqa: WPS348
-                .isoformat(timespec="seconds")  # noqa: WPS348
-                or "",
+                "departure_at": (
+                    datetime.datetime.fromisoformat(
+                        first_segment.departure_time or "",
+                    )
+                    .replace(tzinfo=datetime.timezone.utc)  # noqa: WPS348
+                    .isoformat(timespec="seconds")  # noqa: WPS348
+                    or ""
+                ),
             }
         return {}

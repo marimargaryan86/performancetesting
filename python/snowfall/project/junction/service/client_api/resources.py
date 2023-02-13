@@ -232,16 +232,20 @@ class PenaltyApplicableTo(models.BaseModel):
         applicable_to: offer_models_pb2.ApplicableTo,
     ) -> PenaltyApplicableTo:
         return cls(
-            dateOfBirthAfter=protobuf.protobuf_to_date(
-                applicable_to.date_of_birth_after,
-            )
-            if applicable_to.date_of_birth_after.ByteSize()
-            else None,
-            dateOfBirthBefore=protobuf.protobuf_to_date(
-                applicable_to.date_of_birth_before,
-            )
-            if applicable_to.date_of_birth_before.ByteSize()
-            else None,
+            dateOfBirthAfter=(
+                protobuf.protobuf_to_date(
+                    applicable_to.date_of_birth_after,
+                )
+                if applicable_to.date_of_birth_after.ByteSize()
+                else None
+            ),
+            dateOfBirthBefore=(
+                protobuf.protobuf_to_date(
+                    applicable_to.date_of_birth_before,
+                )
+                if applicable_to.date_of_birth_before.ByteSize()
+                else None
+            ),
         )
 
 

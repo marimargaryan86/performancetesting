@@ -87,15 +87,15 @@ class ArrayOfAcceptablePaymentCardsInfoTypeAcceptablePaymentCard(object):
 
 @dataclass
 class ArrayOfOperationScheduleTypeOperationTime(object):
-    operation_time: List[
-        "ArrayOfOperationScheduleTypeOperationTime.OperationTime"
-    ] = field(
-        default_factory=list,
-        metadata={
-            "name": "OperationTime",
-            "type": "Element",
-            "namespace": "http://www.opentravel.org/OTA/2003/05",
-        },
+    operation_time: List["ArrayOfOperationScheduleTypeOperationTime.OperationTime"] = (
+        field(
+            default_factory=list,
+            metadata={
+                "name": "OperationTime",
+                "type": "Element",
+                "namespace": "http://www.opentravel.org/OTA/2003/05",
+            },
+        )
     )
 
     @dataclass
@@ -5408,15 +5408,15 @@ class ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipment(object):
 
 @dataclass
 class ArrayOfVehicleLocationVehiclesTypeVehicleInfo(object):
-    vehicle_info: List[
-        "ArrayOfVehicleLocationVehiclesTypeVehicleInfo.VehicleInfo"
-    ] = field(
-        default_factory=list,
-        metadata={
-            "name": "VehicleInfo",
-            "type": "Element",
-            "namespace": "http://www.opentravel.org/OTA/2003/05",
-        },
+    vehicle_info: List["ArrayOfVehicleLocationVehiclesTypeVehicleInfo.VehicleInfo"] = (
+        field(
+            default_factory=list,
+            metadata={
+                "name": "VehicleInfo",
+                "type": "Element",
+                "namespace": "http://www.opentravel.org/OTA/2003/05",
+            },
+        )
     )
 
     @dataclass
@@ -6394,14 +6394,14 @@ class VehRateRuleRq(object):
                     "type": "Attribute",
                 },
             )
-            rate_period: Optional[
-                OtaVehRateRuleRqrentalInfoRateQualifierRatePeriod
-            ] = field(
-                default=None,
-                metadata={
-                    "name": "RatePeriod",
-                    "type": "Attribute",
-                },
+            rate_period: Optional[OtaVehRateRuleRqrentalInfoRateQualifierRatePeriod] = (
+                field(
+                    default=None,
+                    metadata={
+                        "name": "RatePeriod",
+                        "type": "Attribute",
+                    },
+                )
             )
             guaranteed_ind: Optional[bool] = field(
                 default=None,
@@ -6622,15 +6622,15 @@ class VehicleAvailRqcoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    special_equip_prefs: Optional[
-        ArrayOfVehicleAvailRqcoreTypeSpecialEquipPref
-    ] = field(
-        default=None,
-        metadata={
-            "name": "SpecialEquipPrefs",
-            "type": "Element",
-            "namespace": "http://www.opentravel.org/OTA/2003/05",
-        },
+    special_equip_prefs: Optional[ArrayOfVehicleAvailRqcoreTypeSpecialEquipPref] = (
+        field(
+            default=None,
+            metadata={
+                "name": "SpecialEquipPrefs",
+                "type": "Element",
+                "namespace": "http://www.opentravel.org/OTA/2003/05",
+            },
+        )
     )
     tpa_extensions: Optional[TpaExtensionsType] = field(
         default=None,
@@ -6948,15 +6948,15 @@ class VehicleLocationAdditionalFeesType(object):
 
     @dataclass
     class Surcharges(object):
-        surcharge: List[
-            "VehicleLocationAdditionalFeesType.Surcharges.Surcharge"
-        ] = field(
-            default_factory=list,
-            metadata={
-                "name": "Surcharge",
-                "type": "Element",
-                "namespace": "http://www.opentravel.org/OTA/2003/05",
-            },
+        surcharge: List["VehicleLocationAdditionalFeesType.Surcharges.Surcharge"] = (
+            field(
+                default_factory=list,
+                metadata={
+                    "name": "Surcharge",
+                    "type": "Element",
+                    "namespace": "http://www.opentravel.org/OTA/2003/05",
+                },
+            )
         )
         info: Optional[FormattedTextType] = field(
             default=None,
@@ -8090,15 +8090,15 @@ class VehicleLocationRequirementsType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    additional_driver: Optional[
-        "VehicleLocationRequirementsType.AdditionalDriver"
-    ] = field(
-        default=None,
-        metadata={
-            "name": "AdditionalDriver",
-            "type": "Element",
-            "namespace": "http://www.opentravel.org/OTA/2003/05",
-        },
+    additional_driver: Optional["VehicleLocationRequirementsType.AdditionalDriver"] = (
+        field(
+            default=None,
+            metadata={
+                "name": "AdditionalDriver",
+                "type": "Element",
+                "namespace": "http://www.opentravel.org/OTA/2003/05",
+            },
+        )
     )
     payment_options: Optional["VehicleLocationRequirementsType.PaymentOptions"] = field(
         default=None,
@@ -8216,15 +8216,15 @@ class VehicleLocationRequirementsType(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        voucher: Optional[
-            "VehicleLocationRequirementsType.PaymentOptions.Voucher"
-        ] = field(
-            default=None,
-            metadata={
-                "name": "Voucher",
-                "type": "Element",
-                "namespace": "http://www.opentravel.org/OTA/2003/05",
-            },
+        voucher: Optional["VehicleLocationRequirementsType.PaymentOptions.Voucher"] = (
+            field(
+                default=None,
+                metadata={
+                    "name": "Voucher",
+                    "type": "Element",
+                    "namespace": "http://www.opentravel.org/OTA/2003/05",
+                },
+            )
         )
         bank_acct: Optional[
             "VehicleLocationRequirementsType.PaymentOptions.BankAcct"
@@ -8962,15 +8962,15 @@ class VehicleAvailRqadditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    coverage_prefs: Optional[
-        ArrayOfVehicleAvailRqadditionalInfoTypeCoveragePref
-    ] = field(
-        default=None,
-        metadata={
-            "name": "CoveragePrefs",
-            "type": "Element",
-            "namespace": "http://www.opentravel.org/OTA/2003/05",
-        },
+    coverage_prefs: Optional[ArrayOfVehicleAvailRqadditionalInfoTypeCoveragePref] = (
+        field(
+            default=None,
+            metadata={
+                "name": "CoveragePrefs",
+                "type": "Element",
+                "namespace": "http://www.opentravel.org/OTA/2003/05",
+            },
+        )
     )
     off_loc_service: List[OffLocationServiceType] = field(
         default_factory=list,
@@ -9228,15 +9228,15 @@ class VehicleReservationRqcoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    special_equip_prefs: Optional[
-        "VehicleReservationRqcoreType.SpecialEquipPrefs"
-    ] = field(
-        default=None,
-        metadata={
-            "name": "SpecialEquipPrefs",
-            "type": "Element",
-            "namespace": "http://www.opentravel.org/OTA/2003/05",
-        },
+    special_equip_prefs: Optional["VehicleReservationRqcoreType.SpecialEquipPrefs"] = (
+        field(
+            default=None,
+            metadata={
+                "name": "SpecialEquipPrefs",
+                "type": "Element",
+                "namespace": "http://www.opentravel.org/OTA/2003/05",
+            },
+        )
     )
     rate_distance: List["VehicleReservationRqcoreType.RateDistance"] = field(
         default_factory=list,
@@ -9971,14 +9971,14 @@ class VehRateRuleRs(OtaResponse):
                 "type": "Element",
             },
         )
-        pickup_return_rules: Optional[
-            "VehRateRuleRs.RateRules.PickupReturnRules"
-        ] = field(
-            default=None,
-            metadata={
-                "name": "PickupReturnRules",
-                "type": "Element",
-            },
+        pickup_return_rules: Optional["VehRateRuleRs.RateRules.PickupReturnRules"] = (
+            field(
+                default=None,
+                metadata={
+                    "name": "PickupReturnRules",
+                    "type": "Element",
+                },
+            )
         )
         rate_guarantee: Optional["VehRateRuleRs.RateRules.RateGuarantee"] = field(
             default=None,
@@ -10230,14 +10230,14 @@ class VehRateRuleRs(OtaResponse):
 
         @dataclass
         class CancelPenaltyInfo(object):
-            deadline: List[
-                "VehRateRuleRs.RateRules.CancelPenaltyInfo.Deadline"
-            ] = field(
-                default_factory=list,
-                metadata={
-                    "name": "Deadline",
-                    "type": "Element",
-                },
+            deadline: List["VehRateRuleRs.RateRules.CancelPenaltyInfo.Deadline"] = (
+                field(
+                    default_factory=list,
+                    metadata={
+                        "name": "Deadline",
+                        "type": "Element",
+                    },
+                )
             )
             penalty_fee: Optional[
                 "VehRateRuleRs.RateRules.CancelPenaltyInfo.PenaltyFee"

@@ -164,13 +164,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "fc19f9f62120a763300fd78e234b3cbd3417be098f08c156eaaf36420627e57b",
-              "url": "https://files.pythonhosted.org/packages/c5/94/00e3d21daa5a47c4f13d278ff08c1b3dbd167231e4a1c4b2c99e4616790e/setuptools-66.1.0-py3-none-any.whl"
+              "hash": "16ccf598aab3b506593c17378473978908a2734d7336755a8769b480906bec1c",
+              "url": "https://files.pythonhosted.org/packages/34/6a/d89fe6b83a7fa4c39686d8a5cda83b48da0b117a13484f0e294c2cc2c337/setuptools-67.2.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "78a02bdea8a5cb66dec1c507598c443bcc75562817d2556c1a17f7a344615bb4",
-              "url": "https://files.pythonhosted.org/packages/34/4d/5c3547ed1dd4cb8623ec6843a49a6a0598b37ec5358551e84b97bc4f5ee8/setuptools-66.1.0.tar.gz"
+              "hash": "b440ee5f7e607bb8c9de15259dba2583dd41a38879a7abc1d43a71c59524da48",
+              "url": "https://files.pythonhosted.org/packages/5f/36/7374297692bb9dbd7569a0f84887c7e5e314c41d5d9518cb76fbb130620d/setuptools-67.2.0.tar.gz"
             }
           ],
           "project_name": "setuptools",
@@ -222,7 +222,7 @@
             "wheel; extra == \"testing-integration\""
           ],
           "requires_python": ">=3.7",
-          "version": "66.1"
+          "version": "67.2"
         },
         {
           "artifacts": [
@@ -246,13 +246,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "aa6436565c069b2946fe4ebff07f5041e0c8bf18c7376dd29edf80cf7d524e4e",
-              "url": "https://files.pythonhosted.org/packages/74/a3/72792236f981aee8bb1ef15e72a6f65444150834830f6a97178fe1e2cdf4/stevedore-4.1.1-py3-none-any.whl"
+              "hash": "bd5a71ff5e5e5f5ea983880e4a1dd1bb47f8feebbb3d95b592398e2f02194771",
+              "url": "https://files.pythonhosted.org/packages/41/1b/bad9124b400334d48aed1e04799032909fd8f1ca4a8e0eb30841284dd489/stevedore-5.0.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "7f8aeb6e3f90f96832c301bff21a7eb5eefbe894c88c506483d355565d88cc1a",
-              "url": "https://files.pythonhosted.org/packages/66/c0/26afabea111a642f33cfd15f54b3dbe9334679294ad5c0423c556b75eba2/stevedore-4.1.1.tar.gz"
+              "hash": "2c428d2338976279e8eb2196f7a94910960d9f7ba2f41f3988511e95ca447021",
+              "url": "https://files.pythonhosted.org/packages/f1/25/993d09dc7be3e7927228853c75324104d734bb784bd766b025ebf9f47b16/stevedore-5.0.0.tar.gz"
             }
           ],
           "project_name": "stevedore",
@@ -260,7 +260,7 @@
             "pbr!=2.1.0,>=2.0.0"
           ],
           "requires_python": ">=3.8",
-          "version": "4.1.1"
+          "version": "5"
         },
         {
           "artifacts": [

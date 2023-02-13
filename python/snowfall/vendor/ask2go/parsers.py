@@ -77,7 +77,9 @@ def _parse_traveler_document(
                 "documentType": traveler_document.document_type.value,
                 "documentNumber": traveler_document.document_number,
                 "documentIssueCountry": traveler_document.document_issue_country,
-                "documentExpirationDate": traveler_document.document_exp_date.isoformat(),
+                "documentExpirationDate": (
+                    traveler_document.document_exp_date.isoformat()
+                ),
             },
         }
         if traveler_document
@@ -160,10 +162,12 @@ def parse_validated_offer_criteria(
         "transactionId": criteria.transaction_id,
         "clientIp": criteria.client_ip,
         "currency": criteria.currency,
-        "ancillaries": [
-            {"code": ancillary.code, "numberOfItems": ancillary.number_of_items}
-            for ancillary in criteria.ancillaries
-        ]
-        if criteria.ancillaries
-        else None,
+        "ancillaries": (
+            [
+                {"code": ancillary.code, "numberOfItems": ancillary.number_of_items}
+                for ancillary in criteria.ancillaries
+            ]
+            if criteria.ancillaries
+            else None
+        ),
     }

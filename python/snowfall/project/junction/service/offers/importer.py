@@ -47,9 +47,11 @@ class StatusHandler(trackable.AnySizeStatusHandler):
 
         return (
             record.status if record else trackable_pb2.Trackable.STATUS_UNSPECIFIED,
-            protobuf.protobuf_to_datetime(record.expires_at)
-            if record
-            else datetime.datetime.now(tz=datetime.timezone.utc),
+            (
+                protobuf.protobuf_to_datetime(record.expires_at)
+                if record
+                else datetime.datetime.now(tz=datetime.timezone.utc)
+            ),
         )
 
     async def _on_completed(

@@ -107,6 +107,7 @@ Travel departure date : {departure_at}
             "created_at": datetime.datetime.now(
                 tz=datetime.timezone.utc,
             ).isoformat(timespec="seconds"),
-            "departure_at": first_segment.departing_at.isoformat(timespec="seconds")
-            or "",
+            "departure_at": (
+                first_segment.departing_at.isoformat(timespec="seconds") or ""
+            ),
         }

@@ -23,9 +23,11 @@ def _to_penalties(penalties: Sequence[cache.OfferPenalty]) -> List[offers_pb2.Pe
             if penalty is not None:
                 res.append(
                     offers_pb2.Penalty(
-                        penalty_type=offers_pb2.Penalty.Type.TYPE_REFUND
-                        if penalty.penalty_type.lower().startswith("cancel")
-                        else offers_pb2.Penalty.Type.TYPE_EXCHANGE,
+                        penalty_type=(
+                            offers_pb2.Penalty.Type.TYPE_REFUND
+                            if penalty.penalty_type.lower().startswith("cancel")
+                            else offers_pb2.Penalty.Type.TYPE_EXCHANGE
+                        ),
                         applicability=offers_pb2.Penalty.Applicability.APPLICABILITY_BEFORE,
                         refundable=penalty.penalty_type.lower().startswith("cancel"),
                         changeable=penalty.penalty_type.lower().startswith("change"),

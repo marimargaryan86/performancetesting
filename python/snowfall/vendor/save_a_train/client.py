@@ -390,9 +390,11 @@ class SATClient(object):  # noqa: WPS214
             triptype=request.trip_type.value,
             passengers=request.number_of_passengers,
             ddate=(request.departure_date - timedelta(hours=1)).isoformat(),
-            rdate=(request.return_date - timedelta(hours=1)).isoformat()
-            if request.return_date
-            else "",
+            rdate=(
+                (request.return_date - timedelta(hours=1)).isoformat()
+                if request.return_date
+                else ""
+            ),
             email=self._email,
             password=self._password_search,
         )
@@ -592,8 +594,10 @@ class SATClient(object):  # noqa: WPS214
                         "birthdate": passenger.date_of_birth.isoformat(),
                         "country": passenger.country,
                         "gender": passenger.gender.value,
-                        "passenger_type_attributes": _generate_passenger_type_attributes(
-                            passenger.date_of_birth,
+                        "passenger_type_attributes": (
+                            _generate_passenger_type_attributes(
+                                passenger.date_of_birth,
+                            )
                         ),
                     }
                     for number, passenger in enumerate(request.passengers)

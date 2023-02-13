@@ -26,7 +26,7 @@ backend_packages = [
 enabled = false
 
 [autoflake]
-version = "autoflake==2.0.0"
+version = "autoflake==2.0.1"
 lockfile = "vendor/lock/autoflake.txt"
 args = ["--remove-all-unused-imports", "--remove-unused-variables"]
 
@@ -41,7 +41,7 @@ extra_requirements = [
 ]
 
 [black]
-version = "black==22.12.0"
+version = "black==23.1.0"
 config = "vendor/pyproject.toml"
 lockfile = "vendor/lock/black.txt"
 interpreter_constraints = ["CPython==3.10.5"]
@@ -89,13 +89,13 @@ source_plugins = [
 ]
 
 [isort]
-version = "isort==5.11.4"
+version = "isort==5.12.0"
 config = "vendor/setup.cfg"
 lockfile = "vendor/lock/isort.txt"
 interpreter_constraints = ["CPython==3.10.5"]
 
 [mypy]
-version = "mypy==0.991"
+version = "mypy==1.0.0"
 config = "vendor/setup.cfg"
 lockfile = "vendor/lock/mypy.txt"
 interpreter_constraints = ["CPython==3.10.5"]

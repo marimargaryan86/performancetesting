@@ -114,9 +114,11 @@ class OfferGrouper(object):
                     segment.origin.code or "",
                     segment.destination.code or "",
                     segment.marketing_carrier.airline_id or "",
-                    segment.operating_carrier.airline_id
-                    if segment.operating_carrier
-                    else "",
+                    (
+                        segment.operating_carrier.airline_id
+                        if segment.operating_carrier
+                        else ""
+                    ),
                     segment.marketing_carrier.flight_number or "",
                 ],
             )

@@ -70,29 +70,33 @@ class OfferTransformer(object):  # noqa: WPS214
                     price_result.itinerary.pricing_information.base.currency,
                 ),
             ).protobuf(),
-            required_documents=self._get_offer_price_requirements(price_result.docs)
-            if price_result.docs
-            else None,
-            penalties=[
-                offers_pb2.Penalty(
-                    applicable_to=passenger_applicable_dates[
-                        penalty.passenger_type.value
-                    ],
-                    penalty_type=models.penalty_type_to_proto(
-                        information.penalty_type.value,
-                    ),
-                    changeable=information.changeable,
-                    refundable=information.refundable,
-                    applicability=models.applicability_type_to_proto(
-                        information.applicability.value,
-                    ),
-                    price=self._get_penalty_price(information),
-                )
-                for penalty in price_result.penalties
-                for information in penalty.information
-            ]
-            if price_result.penalties
-            else [],
+            required_documents=(
+                self._get_offer_price_requirements(price_result.docs)
+                if price_result.docs
+                else None
+            ),
+            penalties=(
+                [
+                    offers_pb2.Penalty(
+                        applicable_to=passenger_applicable_dates[
+                            penalty.passenger_type.value
+                        ],
+                        penalty_type=models.penalty_type_to_proto(
+                            information.penalty_type.value,
+                        ),
+                        changeable=information.changeable,
+                        refundable=information.refundable,
+                        applicability=models.applicability_type_to_proto(
+                            information.applicability.value,
+                        ),
+                        price=self._get_penalty_price(information),
+                    )
+                    for penalty in price_result.penalties
+                    for information in penalty.information
+                ]
+                if price_result.penalties
+                else []
+            ),
             rules=[
                 offers_pb2.FareRule(
                     body=rule.text,
@@ -186,9 +190,11 @@ class OfferTransformer(object):  # noqa: WPS214
                 original_cost=offer.pricing_information.base.original_cost,
                 service_fee=offer.pricing_information.base.service_fee,
                 currency=offer.pricing_information.base.currency,
-                brand_name=offer.pricing_information.base.brand_name
-                if offer.pricing_information.base.brand_name
-                else "LOWEST FARE AVAILABLE",
+                brand_name=(
+                    offer.pricing_information.base.brand_name
+                    if offer.pricing_information.base.brand_name
+                    else "LOWEST FARE AVAILABLE"
+                ),
                 features=[
                     offers.BrandedPriceInformationfeature(
                         baggage=offer.trips[0].baggage_allowance,
@@ -223,17 +229,19 @@ class OfferTransformer(object):  # noqa: WPS214
                         grouped_trips_segments,
                         offer.trips,
                     ),
-                    baggage_allowances=[
-                        offers_pb2.BaggageAllowance(
-                            free=baggage.has_free_baggage,
-                            applicable_to=passenger_applicable_dates[
-                                baggage.passenger_type
-                            ],
-                        )
-                        for baggage in brand.features[0].baggage
-                    ]
-                    if brand.features and brand.features[0].baggage
-                    else [],
+                    baggage_allowances=(
+                        [
+                            offers_pb2.BaggageAllowance(
+                                free=baggage.has_free_baggage,
+                                applicable_to=passenger_applicable_dates[
+                                    baggage.passenger_type
+                                ],
+                            )
+                            for baggage in brand.features[0].baggage
+                        ]
+                        if brand.features and brand.features[0].baggage
+                        else []
+                    ),
                     price=amount.protobuf(),
                     brand_name=str(brand.brand_name),
                 ),
@@ -275,17 +283,19 @@ class OfferTransformer(object):  # noqa: WPS214
                         ),
                         marketing_name=trip_segment.cabin or "",
                     ),
-                    baggage_allowances=[
-                        offers_pb2.BaggageAllowance(
-                            free=baggage.has_free_baggage,
-                            applicable_to=passenger_applicable_dates[
-                                baggage.passenger_type
-                            ],
-                        )
-                        for baggage in baggage_allowance
-                    ]
-                    if baggage_allowance
-                    else [],
+                    baggage_allowances=(
+                        [
+                            offers_pb2.BaggageAllowance(
+                                free=baggage.has_free_baggage,
+                                applicable_to=passenger_applicable_dates[
+                                    baggage.passenger_type
+                                ],
+                            )
+                            for baggage in baggage_allowance
+                        ]
+                        if baggage_allowance
+                        else []
+                    ),
                     amenities=self._transform_amenities_to_protos(
                         trip_segment.segment_amenities,
                     ),

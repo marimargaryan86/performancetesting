@@ -144,9 +144,11 @@ class BookingHandler(object):
                             ),
                         ),
                     ),
-                    identity_documents=[passport_document]
-                    if passport_document and details.doc_required
-                    else [],
+                    identity_documents=(
+                        [passport_document]
+                        if passport_document and details.doc_required
+                        else []
+                    ),
                 ),
             )
 

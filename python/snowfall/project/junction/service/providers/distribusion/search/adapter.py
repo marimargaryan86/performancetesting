@@ -199,11 +199,13 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
             departure_date=protobuf.protobuf_to_date(
                 search_task.criteria.outbound_departure,
             ),
-            return_date=protobuf.protobuf_to_date(
-                search_task.criteria.inbound_departure,
-            )
-            if search_task.criteria.HasField("inbound_departure")
-            else None,
+            return_date=(
+                protobuf.protobuf_to_date(
+                    search_task.criteria.inbound_departure,
+                )
+                if search_task.criteria.HasField("inbound_departure")
+                else None
+            ),
             pax=len(search_task.criteria.passengers_age),
             currency=search_task.criteria.currency or _DEFAULT_CURRENCY,
         )
@@ -278,9 +280,11 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
                             expires_at=expires_at,
                             price=fare.price,
                             currency=connection.currency,
-                            fare_class=fare.fare_class.code
-                            if fare.fare_class and fare.fare_class.code
-                            else "",
+                            fare_class=(
+                                fare.fare_class.code
+                                if fare.fare_class and fare.fare_class.code
+                                else ""
+                            ),
                             passenger_types=passenger_types,
                             fully_refundable=carrier.has_any_fare_feature(
                                 fare,
@@ -372,18 +376,22 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
             departure_at=protobuf.datetime_to_protobuf(
                 datetime.datetime.fromisoformat(departure_time).replace(
                     tzinfo=zoneinfo.ZoneInfo(
-                        origin.time_zone
-                        if origin.time_zone
-                        else search_leg.origin.time_zone,
+                        (
+                            origin.time_zone
+                            if origin.time_zone
+                            else search_leg.origin.time_zone
+                        ),
                     ),
                 ),
             ),
             arrival_at=protobuf.datetime_to_protobuf(
                 datetime.datetime.fromisoformat(arrival_time).replace(
                     tzinfo=zoneinfo.ZoneInfo(
-                        destination.time_zone
-                        if destination.time_zone
-                        else search_leg.destination.time_zone,
+                        (
+                            destination.time_zone
+                            if destination.time_zone
+                            else search_leg.destination.time_zone
+                        ),
                     ),
                 ),
             ),

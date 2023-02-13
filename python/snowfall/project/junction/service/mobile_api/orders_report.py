@@ -90,11 +90,13 @@ async def _generate_report(
                     for booking in bookings
                     for reference in booking["operatorBookingReferences"]
                 ],
-                "status": "failed"
-                if {booking["status"]["id"] for booking in bookings}.difference(
-                    orders._SUCCESS_STATUSES,  # noqa: WPS437
-                )
-                else "success",
+                "status": (
+                    "failed"
+                    if {booking["status"]["id"] for booking in bookings}.difference(
+                        orders._SUCCESS_STATUSES,  # noqa: WPS437
+                    )
+                    else "success"
+                ),
                 "segments": [
                     {
                         field: detail[field]
