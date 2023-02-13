@@ -6,6 +6,10 @@ from snowfall.vendor.carnect.models.service import (
     ServiceSoapGetPing,
     ServiceSoapGetPingInput,
     ServiceSoapGetPingOutput,
+    ServiceSoapGetVehLocationSearch,
+    ServiceSoapGetVehLocationSearchInput,
+    ServiceSoapGetVehLocationSearchOutput,
+    VehLocationSearchRq,
 )
 from snowfall.vendor.carnect.soap.soap_client import (
     AsyncSoapClient,
@@ -29,6 +33,12 @@ class CarnectClient(object):
         self._ping_client = AsyncSoapClient.create_client(
             ServiceSoapGetPing,
             self._transport,
+            location=config.base_url,
+        )
+        self._location_search_client = AsyncSoapClient.create_client(
+            ServiceSoapGetVehLocationSearch,
+            self._transport,
+            location=config.base_url,
         )
 
     async def ping(self, rq: PingRq) -> ServiceSoapGetPingOutput.Body:
@@ -39,7 +49,23 @@ class CarnectClient(object):
         )
         return rs.body
 
+    async def location_search(
+        self,
+        rq: VehLocationSearchRq,
+    ) -> ServiceSoapGetVehLocationSearchOutput.Body:
+        request = ServiceSoapGetVehLocationSearchInput(
+            body=ServiceSoapGetVehLocationSearchInput.Body(veh_location_search_rq=rq),
+        )
+
+        rs = await self._location_search_client.send(
+            request,
+            headers=self._get_headers(ServiceSoapGetVehLocationSearch.soap_action),
+        )
+        return rs.body
+
     def _get_headers(self, soap_action: str) -> dict[str, str]:
         return {
             "SOAPAction": soap_action,
+            # "Content-Type": "text/xml;charset=UTF-8",
+            "Accept-Encoding": "gzip",
         }
