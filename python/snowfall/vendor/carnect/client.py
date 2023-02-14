@@ -1,14 +1,18 @@
 import httpx
 
 from snowfall.vendor.carnect.config import Config
-from snowfall.vendor.carnect.models.service import (
+from snowfall.vendor.carnect.models.service import (  # noqa: WPS235
     PingRq,
     ServiceSoapGetPing,
     ServiceSoapGetPingInput,
     ServiceSoapGetPingOutput,
+    ServiceSoapGetVehAvailRate,
+    ServiceSoapGetVehAvailRateInput,
+    ServiceSoapGetVehAvailRateOutput,
     ServiceSoapGetVehLocationSearch,
     ServiceSoapGetVehLocationSearchInput,
     ServiceSoapGetVehLocationSearchOutput,
+    VehAvailRateRq,
     VehLocationSearchRq,
 )
 from snowfall.vendor.carnect.soap.soap_client import (
@@ -40,6 +44,11 @@ class CarnectClient(object):
             self._transport,
             location=config.base_url,
         )
+        self._get_avail_rate_client = AsyncSoapClient.create_client(
+            ServiceSoapGetVehAvailRate,
+            self._transport,
+            location=config.base_url,
+        )
 
     async def ping(self, rq: PingRq) -> ServiceSoapGetPingOutput.Body:
         request = ServiceSoapGetPingInput(body=ServiceSoapGetPingInput.Body(ping_rq=rq))
@@ -60,6 +69,19 @@ class CarnectClient(object):
         return await self._location_search_client.send(
             request,
             headers=self._get_headers(ServiceSoapGetVehLocationSearch.soap_action),
+        )
+
+    async def get_avail_rate(
+        self,
+        rq: VehAvailRateRq,
+    ) -> ServiceSoapGetVehAvailRateOutput:
+        request = ServiceSoapGetVehAvailRateInput(
+            body=ServiceSoapGetVehAvailRateInput.Body(veh_avail_rate_rq=rq),
+        )
+
+        return await self._get_avail_rate_client.send(
+            request,
+            headers=self._get_headers(ServiceSoapGetVehAvailRate.soap_action),
         )
 
     def _get_headers(self, soap_action: str) -> dict[str, str]:
