@@ -10,9 +10,13 @@ line-length = 88
 target-version = ["py310"]
 preview = true
 
+[tool.coverage.report]
+omit = ["*_pb2.py", "*_pb2_grpc.py"]
+
 [tool.coverage.run]
 branch = true
-omit = ["*/conftest.py", "*_test.py", "*_pb2.py", "*_pb2_grpc.py"]
+omit = ["*_pb2.py", "*_pb2_grpc.py"]
+relative_files = true
 
 [tool.pytest.ini_options]
 addopts = "--import-mode=importlib --asyncio-mode=auto -W ignore::DeprecationWarning:aioredis.connection: -W ignore::DeprecationWarning:jsonschema.validators: -W ignore::DeprecationWarning:openapi_core.unmarshalling.schemas.unmarshallers: -W ignore::DeprecationWarning:openapi_spec_validator.validators: -W ignore::DeprecationWarning:openapi_spec_validator.factories: -W ignore::DeprecationWarning:openapi_schema_validator.validators:"

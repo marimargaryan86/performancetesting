@@ -44,6 +44,7 @@ pants:test:
   interruptible: true
   script:
     - ./bash/lint-pants.sh
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     reports:
       junit: dist/test_results/*.xml
