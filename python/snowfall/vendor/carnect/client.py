@@ -26,7 +26,7 @@ class CarnectClient(object):
             timeout=self._config.timeout,
             soap_logger=SoapLogger(
                 secret_words=(),
-                export_files=False,
+                export_files=config.export_soap_requests,
             ),
         )
 
@@ -52,20 +52,17 @@ class CarnectClient(object):
     async def location_search(
         self,
         rq: VehLocationSearchRq,
-    ) -> ServiceSoapGetVehLocationSearchOutput.Body:
+    ) -> ServiceSoapGetVehLocationSearchOutput:
         request = ServiceSoapGetVehLocationSearchInput(
             body=ServiceSoapGetVehLocationSearchInput.Body(veh_location_search_rq=rq),
         )
 
-        rs = await self._location_search_client.send(
+        return await self._location_search_client.send(
             request,
             headers=self._get_headers(ServiceSoapGetVehLocationSearch.soap_action),
         )
-        return rs.body
 
     def _get_headers(self, soap_action: str) -> dict[str, str]:
         return {
             "SOAPAction": soap_action,
-            # "Content-Type": "text/xml;charset=UTF-8",
-            "Accept-Encoding": "gzip",
         }

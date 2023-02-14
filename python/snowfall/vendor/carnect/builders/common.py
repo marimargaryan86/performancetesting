@@ -1,3 +1,5 @@
+from abc import ABC, abstractmethod
+
 from snowfall.vendor.carnect.models.service import ArrayOfSourceType, SourceType
 
 
@@ -35,3 +37,9 @@ class PosBuilder(object):
         source = PosSourceBuilder()
         self._pos.source.append(source.get())
         return source
+
+
+class BaseBuilderRq(ABC):
+    @abstractmethod
+    def pos(self) -> PosBuilder:
+        """Return POS builder."""

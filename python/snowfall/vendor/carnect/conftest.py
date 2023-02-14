@@ -13,7 +13,11 @@ API_BASE_URL = "https://ota2007a.micronnexus-staging.com/service.asmx"
 
 @pytest.fixture
 def carnect_config() -> config.Config:
-    return config.Config(timeout=TIMEOUT, base_url=API_BASE_URL)
+    return config.Config(
+        timeout=TIMEOUT,
+        base_url=API_BASE_URL,
+        export_soap_requests=True,
+    )
 
 
 @pytest.fixture

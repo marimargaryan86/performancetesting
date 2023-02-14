@@ -3,6 +3,9 @@ import os
 import pytest
 
 from snowfall.vendor.carnect import client
+from snowfall.vendor.carnect.adapters.location_search_adapter import (
+    LocationSearchAdapter,
+)
 from snowfall.vendor.carnect.builders.location_search_builder import (
     LocationSearchRqBuilder,
 )
@@ -36,8 +39,8 @@ async def test_search_location(carnect_client: client.CarnectClient) -> None:
     pos_source = rq.pos().add_source()
     pos_source.iso_country("EN")
     pos_source.user_name("CarnectNet")
-    pos_source.password("1lK3F98B")
+    pos_source.password("1nK9DFF9")
     rq.pos().add_source().iso_country("GB")
 
-    rs = await carnect_client.location_search(rq.build())
-    assert rs.veh_location_search_rs is not None
+    rs_adapter = LocationSearchAdapter(await carnect_client.location_search(rq.build()))
+    assert rs_adapter.is_success(), rs_adapter.get_error()

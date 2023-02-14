@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from snowfall.vendor.carnect.builders.common import PosBuilder
+from snowfall.vendor.carnect.builders.common import BaseBuilderRq, PosBuilder
 from snowfall.vendor.carnect.models.service import (
     ItemSearchCriterionType,
     VehLocationSearchRq,
@@ -34,7 +34,7 @@ class VehLocSearchCriterionBuilder(object):
         self._criterion.ranking = ranking
 
 
-class LocationSearchRqBuilder(object):
+class LocationSearchRqBuilder(BaseBuilderRq):
     def __init__(self) -> None:
         self._rq = VehLocationSearchRq()
         self._pos = PosBuilder()

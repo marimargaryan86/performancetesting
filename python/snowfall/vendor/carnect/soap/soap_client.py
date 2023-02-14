@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import os
+import re
 from dataclasses import dataclass, field
 from typing import Any, Dict, Mapping, NamedTuple, Tuple, Type
 
@@ -70,6 +71,7 @@ class SoapLogger(object):
         self._logger = structlog.get_logger(__name__)
         self._log_filter = LogFilter(secret_words=secret_words)
         self._export_files = export_files
+        self._operation_name_re = re.compile(r"^(.*?)(\w+)$")
 
         if export_dir:
             self._export_dir = export_dir
@@ -103,7 +105,7 @@ class SoapLogger(object):
         file_name = "-".join(
             [
                 datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S.%f%z"),
-                operation_name,
+                self._operation_name_re.sub(r"\2", operation_name),
                 postfix,
             ],
         )
