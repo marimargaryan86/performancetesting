@@ -43,24 +43,28 @@ for DIR in "${1}"/*; do
 		continue
 	fi
 
+	service_name=$(basename "${DIR}")
+	docker_image=""
+	service_version="latest"
 	image_file="${DIR}/image.txt"
 
 	if ! [ -f "${image_file}" ] && grep -q 'variable "docker_image" {' "${DIR}"/*.nomad; then
 		echo >&2 "skip: \"${image_file}\" is missing"
 		continue
-	fi
+	elif [ -f "${image_file}" ]; then
+		docker_image=$(cat "${image_file}")
+		service_name=$(basename "${docker_image%:*}" | sed s/_/-/g)
+		service_version="${docker_image##*:}"
 
-	has_changed_image=1
+		has_changed_image=1
 
-	if [ -n "${CI_COMMIT_BEFORE_SHA+x}" ] && [ "${CI_COMMIT_BEFORE_SHA}" != "0000000000000000000000000000000000000000" ]; then
-		if ! git diff --name-only -r "${CI_COMMIT_BEFORE_SHA}" "${CI_COMMIT_SHA}" | grep -q "^${image_file}"; then
-			has_changed_image=0
+		if [ -n "${CI_COMMIT_BEFORE_SHA+x}" ] && [ "${CI_COMMIT_BEFORE_SHA}" != "0000000000000000000000000000000000000000" ]; then
+			if ! git diff --name-only -r "${CI_COMMIT_BEFORE_SHA}" "${CI_COMMIT_SHA}" | grep -q "^${image_file}"; then
+				has_changed_image=0
+			fi
 		fi
 	fi
 
-	docker_image=$(cat "${image_file}")
-	service_name=$(basename "${docker_image%:*}" | sed s/_/-/g)
-	service_version="${docker_image##*:}"
 	has_changed_templates=0
 	templates=()
 
