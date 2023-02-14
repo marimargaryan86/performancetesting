@@ -10,12 +10,10 @@ import pytest
 from snowfall.project.junction.api_automation.test_functions.mobile_client import (
     MobileApiClient,
 )
-from snowfall.project.junction.api_automation.test_functions.pay_client import (
-    PayApiClient,
-)
 from snowfall.vendor.apilayer.client import APILayer
 from snowfall.vendor.bound.client import Bound
 from snowfall.vendor.junction.client import JunctionClient
+from snowfall.vendor.pay.client import PayAuthentication, PayClient
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -194,12 +192,27 @@ def mobile_client(
 def pay_client(
     api_token: str,
     host: str,
-) -> PayApiClient:
+) -> PayClient:
     client_timeout = 20
-    return PayApiClient(
-        api_url="https://{0}".format(host),
-        token=api_token,
-        client=httpx.AsyncClient(timeout=client_timeout),
+    email, password = api_token.split(":")
+    base_url = "https://api.pay.junction.dev"
+
+    auth = PayAuthentication(
+        base_url=base_url,
+        headers=httpx.Headers({"Content-Type": "application/vnd.api+json"}),
+        email=email,
+        password=password,
+    )
+
+    return PayClient(
+        base_url=base_url,
+        auth=auth,
+        client=httpx.AsyncClient(
+            base_url=base_url,
+            verify=False,
+            timeout=client_timeout,
+            auth=auth,
+        ),
     )
 
 
