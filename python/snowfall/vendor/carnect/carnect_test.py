@@ -4,10 +4,16 @@ import os
 import pytest
 
 from snowfall.vendor.carnect import client
+from snowfall.vendor.carnect.adapters.location_details_adapter import (
+    LocationDetailsAdapter,
+)
 from snowfall.vendor.carnect.adapters.location_search_adapter import (
     LocationSearchAdapter,
 )
 from snowfall.vendor.carnect.adapters.veh_avail_rate_adapter import VehAvailRateAdapter
+from snowfall.vendor.carnect.builders.location_details_builder import (
+    LocationDetailsRqBuilder,
+)
 from snowfall.vendor.carnect.builders.location_search_builder import (
     LocationSearchRqBuilder,
 )
@@ -52,6 +58,36 @@ async def test_search_location(carnect_client: client.CarnectClient) -> None:
 
     rs_adapter = LocationSearchAdapter(await carnect_client.location_search(rq.build()))
     assert rs_adapter.is_success(), rs_adapter.get_error()
+
+
+@disable_by_default
+async def test_get_location_details_by_location_code(
+    carnect_client: client.CarnectClient,
+    carnect_config: client.Config,
+) -> None:
+    rq = LocationDetailsRqBuilder(carnect_config)
+    rq.location_code("7600868")
+
+    rs_adapter = LocationDetailsAdapter(
+        await carnect_client.get_location_details(rq.build()),
+    )
+    assert rs_adapter.is_success(), rs_adapter.get_error()
+    assert rs_adapter.location_details() is not None
+
+
+@disable_by_default
+async def test_get_location_details_by_extended_location_code(
+    carnect_client: client.CarnectClient,
+    carnect_config: client.Config,
+) -> None:
+    rq = LocationDetailsRqBuilder(carnect_config)
+    rq.extended_location_code("ZEARN")
+
+    rs_adapter = LocationDetailsAdapter(
+        await carnect_client.get_location_details(rq.build()),
+    )
+    assert rs_adapter.is_success(), rs_adapter.get_error()
+    assert rs_adapter.location_details() is not None
 
 
 @disable_by_default

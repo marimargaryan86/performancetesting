@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+from snowfall.vendor.carnect import config
 from snowfall.vendor.carnect.models.service import ArrayOfSourceType, SourceType
 
 
@@ -36,6 +37,15 @@ class PosBuilder(object):
     def add_source(self) -> PosSourceBuilder:
         source = PosSourceBuilder()
         self._pos.source.append(source.get())
+        return source
+
+    def set_credentials(self, conf: config.Config) -> PosSourceBuilder:
+        source = PosSourceBuilder()
+        self._pos.source.append(source.get())
+
+        source.iso_country("EN")
+        source.user_name(conf.username)
+        source.password(conf.password)
         return source
 
 

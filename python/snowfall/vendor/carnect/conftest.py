@@ -9,6 +9,7 @@ from snowfall.vendor.carnect import client, config
 
 TIMEOUT = 50
 API_BASE_URL = "https://ota2007a.micronnexus-staging.com/service.asmx"
+HASH = "1nK9DFF9"
 
 
 @pytest.fixture
@@ -17,6 +18,7 @@ def carnect_config() -> config.Config:
         timeout=TIMEOUT,
         base_url=API_BASE_URL,
         export_soap_requests=True,
+        password=HASH,
     )
 
 
