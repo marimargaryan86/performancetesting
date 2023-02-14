@@ -4,14 +4,14 @@ from snowfall.vendor.karhoo.models.base import KarhooBaseModel
 
 
 class Coordinates(KarhooBaseModel):
-    latitude: float
-    longitude: float
+    latitude: str
+    longitude: str
     display_address: str | None = None
 
 
 class Position(KarhooBaseModel):
-    latitude: float
-    longitude: float
+    latitude: str
+    longitude: str
 
 
 class MeetingPoint(KarhooBaseModel):

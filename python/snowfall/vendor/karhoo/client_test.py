@@ -25,13 +25,13 @@ async def test_request_quotes(
 
     quotes = await karhoo_client.request_quotes(
         origin=location.Coordinates(
-            latitude=51.5054564,
-            longitude=-0.0775452,
+            latitude="51.5054564",
+            longitude="-0.0775452",
             display_address=None,
         ),
         destination=location.Coordinates(
-            latitude=51.501364,
-            longitude=-0.14189,
+            latitude="51.501364",
+            longitude="-0.14189",
             display_address=None,
         ),
         departure_at=None,

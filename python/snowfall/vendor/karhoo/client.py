@@ -31,7 +31,6 @@ class KarhooClient(client.HttpClient):  # noqa: WPS214
                 headers=self._auth_header,
             ),
         )
-
         return quotes.RequestQuotesResponse(**response.json())
 
     async def list_quotes(self, ident: uuid.UUID) -> quotes.RequestQuotesResponse:

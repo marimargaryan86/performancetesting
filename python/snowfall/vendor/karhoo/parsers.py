@@ -25,7 +25,7 @@ def parse_request_quotes_request(
     }
 
     if departure_at:
-        payload["local_time_of_pickup"] = departure_at.isoformat()
+        payload["local_time_of_pickup"] = departure_at.strftime("%Y-%m-%dT%H:%M")
 
     return payload
 
