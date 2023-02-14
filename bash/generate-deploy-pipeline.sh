@@ -45,7 +45,7 @@ for DIR in "${1}"/*; do
 
 	image_file="${DIR}/image.txt"
 
-	if ! [ -f "${image_file}" ]; then
+	if ! [ -f "${image_file}" ] && grep -q 'variable "docker_image" {' "${DIR}"/*.nomad; then
 		echo >&2 "skip: \"${image_file}\" is missing"
 		continue
 	fi
