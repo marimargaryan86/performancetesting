@@ -9,6 +9,9 @@ from snowfall.vendor.carnect.models.service import (  # noqa: WPS235
     ServiceSoapGetVehAvailRate,
     ServiceSoapGetVehAvailRateInput,
     ServiceSoapGetVehAvailRateOutput,
+    ServiceSoapGetVehCancelReservation,
+    ServiceSoapGetVehCancelReservationInput,
+    ServiceSoapGetVehCancelReservationOutput,
     ServiceSoapGetVehLocationSearch,
     ServiceSoapGetVehLocationSearchInput,
     ServiceSoapGetVehLocationSearchOutput,
@@ -19,6 +22,7 @@ from snowfall.vendor.carnect.models.service import (  # noqa: WPS235
     ServiceSoapGetVehRateRuleInput,
     ServiceSoapGetVehRateRuleOutput,
     VehAvailRateRq,
+    VehCancelResRq,
     VehLocationSearchRq,
     VehLocDetailRq,
     VehRateRuleRq,
@@ -30,7 +34,7 @@ from snowfall.vendor.carnect.soap.soap_client import (
 )
 
 
-class CarnectClient(object):
+class CarnectClient(object):  # noqa: WPS214
     def __init__(self, http_client: httpx.AsyncClient, config: Config) -> None:
         self._config: Config = config
         self._transport = AsyncSoapTransport(
@@ -64,6 +68,11 @@ class CarnectClient(object):
         )
         self._veh_rate_rule_client = AsyncSoapClient.create_client(
             ServiceSoapGetVehRateRule,
+            self._transport,
+            location=config.base_url,
+        )
+        self._cancel_reservation_client = AsyncSoapClient.create_client(
+            ServiceSoapGetVehCancelReservation,
             self._transport,
             location=config.base_url,
         )
@@ -125,6 +134,19 @@ class CarnectClient(object):
         return await self._veh_rate_rule_client.send(
             request,
             headers=self._get_headers(ServiceSoapGetVehAvailRate.soap_action),
+        )
+
+    async def cancel_reservation(
+        self,
+        rq: VehCancelResRq,
+    ) -> ServiceSoapGetVehCancelReservationOutput:
+        request = ServiceSoapGetVehCancelReservationInput(
+            body=ServiceSoapGetVehCancelReservationInput.Body(veh_cancel_res_rq=rq),
+        )
+
+        return await self._cancel_reservation_client.send(
+            request,
+            headers=self._get_headers(ServiceSoapGetVehCancelReservation.soap_action),
         )
 
     def _get_headers(self, soap_action: str) -> dict[str, str]:
