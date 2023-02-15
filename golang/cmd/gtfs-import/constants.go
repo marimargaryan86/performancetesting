@@ -21,6 +21,13 @@ var scheduleTypeMapping = map[v1alpha.Schedule_Type]places.Location_Type{
 	v1alpha.Schedule_TYPE_BUS:         places.Location_TYPE_BUS_STATION,
 }
 
+var whitelistTypeMapping = map[string]v1alpha.Schedule_Type{
+	"air":   v1alpha.Schedule_TYPE_AIR,
+	"rail":  v1alpha.Schedule_TYPE_RAIL,
+	"ferry": v1alpha.Schedule_TYPE_FERRY,
+	"bus":   v1alpha.Schedule_TYPE_BUS,
+}
+
 var gtfsTypeMapping = map[uint]v1alpha.Schedule_Type{
 	0:    v1alpha.Schedule_TYPE_UNSPECIFIED,
 	1:    v1alpha.Schedule_TYPE_UNSPECIFIED,

@@ -17,6 +17,8 @@ Creates a temporary directory for the .TXT files, destroyed on exit
 import (
 	"archive/zip"
 	"bufio"
+	_ "embed"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -106,6 +108,9 @@ type mongoLocation struct {
 }
 
 var bsonRegistry *bsoncodec.Registry
+
+//go:embed routes-whitelist.json
+var routesWhitelistFile []byte
 
 // ******** Interface functions
 
@@ -479,14 +484,15 @@ func processTripFile(files map[string]*zip.File, db *gorm.DB, tripsFilter *bloom
 		})
 }
 
-func processRoutes(files map[string]*zip.File, db *gorm.DB, routesFilter *bloom.BloomFilter) {
+func processRoutes(files map[string]*zip.File, db *gorm.DB, routesFilter *bloom.BloomFilter, validRouteTypes map[v1alpha.Schedule_Type]struct{}) {
 	indexFile[gtfs.Route](
 		files["routes.txt"], db,
 		func(row gtfs.Route) {
 			routesFilter.AddString(row.Id)
 		},
 		func(row gtfs.Route) bool { // filter
-			return gtfsTypeMapping[row.Type] != v1alpha.Schedule_TYPE_UNSPECIFIED
+			_, ok := validRouteTypes[gtfsTypeMapping[row.Type]]
+			return ok
 		})
 }
 
@@ -579,9 +585,14 @@ func main() {
 		panic("ERROR No .ZIP files found in file source.")
 	}
 
+	var routesWhitelist map[string][]string
+	if err := json.Unmarshal(routesWhitelistFile, &routesWhitelist); err != nil {
+		panic(err)
+	}
+
 	for fileCount, feedFileName := range feedFiles {
 		if filepath.Ext(feedFileName.Name()) != ".zip" {
-			panic("Unexpected file (not .zip).")
+			continue // Skip annoying local files like .DS_Store
 		}
 
 		func() {
@@ -625,11 +636,29 @@ func main() {
 			tripsFilter := bloom.NewWithEstimates(1000000, 0.001)
 			servicesFilter := bloom.NewWithEstimates(1000000, 0.001)
 			stopTimesFilter := bloom.NewWithEstimates(1000000, 0.001)
+			validRouteTypes := make(map[v1alpha.Schedule_Type]struct{})
+			fileStem := strings.TrimSuffix(feedFileName.Name(), filepath.Ext(feedFileName.Name()))
+			whitelist, ok := routesWhitelist[fileStem]
+			if !ok {
+				// Match partial names (e.g. ssim-ba match ssim, OBB-1 match OBB).
+				prefix, _, _ := strings.Cut(fileStem, "-")
+				whitelist, ok = routesWhitelist[prefix]
+				if !ok {
+					panic(fmt.Sprintf("No whitelist found for %s", fileStem))
+				}
+			}
+			for _, typeName := range whitelist {
+				t, ok := whitelistTypeMapping[typeName]
+				if !ok {
+					panic(fmt.Sprintf("Unrecognised type in whitelist: %s", typeName))
+				}
+				validRouteTypes[t] = struct{}{}
+			}
 
 			now := time.Now()
 			now = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 
-			processRoutes(files, db, routesFilter)
+			processRoutes(files, db, routesFilter, validRouteTypes)
 			processCalendarFile(files, db, servicesFilter, now)
 			processCalendarDatesFile(files, db, servicesFilter, now)
 			processTripFile(files, db, tripsFilter, routesFilter, servicesFilter)

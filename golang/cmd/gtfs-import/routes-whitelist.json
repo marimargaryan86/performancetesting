@@ -1,0 +1,17 @@
+{
+    "directferries": ["ferry"],
+    "distribusion": ["bus"],
+    "gtfs.de": ["rail"],
+    "Intercites": ["rail"],
+    "NMBS_SNCB": ["rail"],
+    "openov": ["rail"],
+    "OBB": ["rail"],
+    "OVapi": ["rail"],
+    "PKP": ["rail"],
+    "Rejseplanen": ["rail"],
+    "renfe": ["rail"],
+    "SBB": ["rail"],
+    "ssim": ["air"],
+    "TER": ["rail"],
+    "TGV": ["rail"]
+}
