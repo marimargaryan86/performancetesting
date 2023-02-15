@@ -11,7 +11,7 @@ class LocationDetailsRqBuilder(object):
         self._rq.pos = self._pos.get()
         self._rq.target = (
             VehLocDetailRqTarget.TEST
-            if conf.target == "TEST"
+            if conf.is_test
             else VehLocDetailRqTarget.PRODUCTION
         )
 

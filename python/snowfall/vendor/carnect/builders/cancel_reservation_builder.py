@@ -70,7 +70,7 @@ class CancelReservationRqBuilder(object):
         self._rq.pos = self._pos.get()
         self._rq.target = (
             VehCancelResRqTarget.TEST
-            if conf.target == "TEST"
+            if conf.is_test
             else VehCancelResRqTarget.PRODUCTION
         )
 

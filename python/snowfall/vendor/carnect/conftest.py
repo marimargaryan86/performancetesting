@@ -31,6 +31,7 @@ def carnect_config() -> config.Config:
         base_url=API_BASE_URL,
         export_soap_requests=True,
         password=HASH,
+        is_test=True,
     )
 
 

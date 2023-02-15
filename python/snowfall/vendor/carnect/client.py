@@ -1,3 +1,5 @@
+from typing import Any
+
 import httpx
 
 from snowfall.vendor.carnect.config import Config
@@ -46,41 +48,20 @@ class CarnectClient(object):  # noqa: WPS214
             ),
         )
 
-        self._ping_client = AsyncSoapClient.create_client(
-            ServiceSoapGetPing,
-            self._transport,
-            location=config.base_url,
-        )
-        self._location_search_client = AsyncSoapClient.create_client(
-            ServiceSoapGetVehLocationSearch,
-            self._transport,
-            location=config.base_url,
-        )
-        self._get_veh_loc_detail_client = AsyncSoapClient.create_client(
-            ServiceSoapGetVehLocDetail,
-            self._transport,
-            location=config.base_url,
-        )
-        self._get_avail_rate_client = AsyncSoapClient.create_client(
-            ServiceSoapGetVehAvailRate,
-            self._transport,
-            location=config.base_url,
-        )
-        self._veh_rate_rule_client = AsyncSoapClient.create_client(
-            ServiceSoapGetVehRateRule,
-            self._transport,
-            location=config.base_url,
-        )
-        self._cancel_reservation_client = AsyncSoapClient.create_client(
+        self._ping_client = self._create_client(ServiceSoapGetPing)
+        self._loc_search_client = self._create_client(ServiceSoapGetVehLocationSearch)
+        self._get_loc_detail_client = self._create_client(ServiceSoapGetVehLocDetail)
+        self._get_avail_rate_client = self._create_client(ServiceSoapGetVehAvailRate)
+        self._veh_rate_rule_client = self._create_client(ServiceSoapGetVehRateRule)
+        self._cancel_reservation_client = self._create_client(
             ServiceSoapGetVehCancelReservation,
-            self._transport,
-            location=config.base_url,
         )
 
     async def ping(self, rq: PingRq) -> ServiceSoapGetPingOutput.Body:
-        request = ServiceSoapGetPingInput(body=ServiceSoapGetPingInput.Body(ping_rq=rq))
         rs = await self._ping_client.send(
-            request,
+            rq_object=ServiceSoapGetPingInput(
+                body=ServiceSoapGetPingInput.Body(ping_rq=rq),
+            ),
             headers=self._get_headers(ServiceSoapGetPing.soap_action),
         )
         return rs.body
@@ -89,12 +70,12 @@ class CarnectClient(object):  # noqa: WPS214
         self,
         rq: VehLocationSearchRq,
     ) -> ServiceSoapGetVehLocationSearchOutput:
-        request = ServiceSoapGetVehLocationSearchInput(
-            body=ServiceSoapGetVehLocationSearchInput.Body(veh_location_search_rq=rq),
-        )
-
-        return await self._location_search_client.send(
-            request,
+        return await self._loc_search_client.send(
+            rq_object=ServiceSoapGetVehLocationSearchInput(
+                body=ServiceSoapGetVehLocationSearchInput.Body(
+                    veh_location_search_rq=rq,
+                ),
+            ),
             headers=self._get_headers(ServiceSoapGetVehLocationSearch.soap_action),
         )
 
@@ -102,11 +83,10 @@ class CarnectClient(object):  # noqa: WPS214
         self,
         rq: VehLocDetailRq,
     ) -> ServiceSoapGetVehLocDetailOutput:
-        request = ServiceSoapGetVehLocDetailInput(
-            body=ServiceSoapGetVehLocDetailInput.Body(veh_loc_detail_rq=rq),
-        )
-        return await self._get_veh_loc_detail_client.send(
-            request,
+        return await self._get_loc_detail_client.send(
+            rq_object=ServiceSoapGetVehLocDetailInput(
+                body=ServiceSoapGetVehLocDetailInput.Body(veh_loc_detail_rq=rq),
+            ),
             headers=self._get_headers(ServiceSoapGetVehLocDetail.soap_action),
         )
 
@@ -114,12 +94,10 @@ class CarnectClient(object):  # noqa: WPS214
         self,
         rq: VehAvailRateRq,
     ) -> ServiceSoapGetVehAvailRateOutput:
-        request = ServiceSoapGetVehAvailRateInput(
-            body=ServiceSoapGetVehAvailRateInput.Body(veh_avail_rate_rq=rq),
-        )
-
         return await self._get_avail_rate_client.send(
-            request,
+            rq_object=ServiceSoapGetVehAvailRateInput(
+                body=ServiceSoapGetVehAvailRateInput.Body(veh_avail_rate_rq=rq),
+            ),
             headers=self._get_headers(ServiceSoapGetVehAvailRate.soap_action),
         )
 
@@ -127,12 +105,10 @@ class CarnectClient(object):  # noqa: WPS214
         self,
         rq: VehRateRuleRq,
     ) -> ServiceSoapGetVehRateRuleOutput:
-        request = ServiceSoapGetVehRateRuleInput(
-            body=ServiceSoapGetVehRateRuleInput.Body(veh_rate_rule_rq=rq),
-        )
-
         return await self._veh_rate_rule_client.send(
-            request,
+            rq_object=ServiceSoapGetVehRateRuleInput(
+                body=ServiceSoapGetVehRateRuleInput.Body(veh_rate_rule_rq=rq),
+            ),
             headers=self._get_headers(ServiceSoapGetVehAvailRate.soap_action),
         )
 
@@ -140,12 +116,10 @@ class CarnectClient(object):  # noqa: WPS214
         self,
         rq: VehCancelResRq,
     ) -> ServiceSoapGetVehCancelReservationOutput:
-        request = ServiceSoapGetVehCancelReservationInput(
-            body=ServiceSoapGetVehCancelReservationInput.Body(veh_cancel_res_rq=rq),
-        )
-
         return await self._cancel_reservation_client.send(
-            request,
+            rq_object=ServiceSoapGetVehCancelReservationInput(
+                body=ServiceSoapGetVehCancelReservationInput.Body(veh_cancel_res_rq=rq),
+            ),
             headers=self._get_headers(ServiceSoapGetVehCancelReservation.soap_action),
         )
 
@@ -153,3 +127,10 @@ class CarnectClient(object):  # noqa: WPS214
         return {
             "SOAPAction": soap_action,
         }
+
+    def _create_client(self, service: Any) -> AsyncSoapClient:
+        return AsyncSoapClient.create_client(
+            service=service,
+            transport=self._transport,
+            location=self._config.base_url,
+        )

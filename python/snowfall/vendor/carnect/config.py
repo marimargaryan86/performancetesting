@@ -8,4 +8,4 @@ class Config(object):
     timeout: int = 90
     username: str = "CarnectNet"
     password: str = ""
-    target: str = "TEST"
+    is_test: bool = True
