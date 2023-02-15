@@ -15,9 +15,13 @@ from snowfall.vendor.carnect.models.service import (  # noqa: WPS235
     ServiceSoapGetVehLocDetail,
     ServiceSoapGetVehLocDetailInput,
     ServiceSoapGetVehLocDetailOutput,
+    ServiceSoapGetVehRateRule,
+    ServiceSoapGetVehRateRuleInput,
+    ServiceSoapGetVehRateRuleOutput,
     VehAvailRateRq,
     VehLocationSearchRq,
     VehLocDetailRq,
+    VehRateRuleRq,
 )
 from snowfall.vendor.carnect.soap.soap_client import (
     AsyncSoapClient,
@@ -55,6 +59,11 @@ class CarnectClient(object):
         )
         self._get_avail_rate_client = AsyncSoapClient.create_client(
             ServiceSoapGetVehAvailRate,
+            self._transport,
+            location=config.base_url,
+        )
+        self._veh_rate_rule_client = AsyncSoapClient.create_client(
+            ServiceSoapGetVehRateRule,
             self._transport,
             location=config.base_url,
         )
@@ -101,6 +110,19 @@ class CarnectClient(object):
         )
 
         return await self._get_avail_rate_client.send(
+            request,
+            headers=self._get_headers(ServiceSoapGetVehAvailRate.soap_action),
+        )
+
+    async def veh_rate_rules(
+        self,
+        rq: VehRateRuleRq,
+    ) -> ServiceSoapGetVehRateRuleOutput:
+        request = ServiceSoapGetVehRateRuleInput(
+            body=ServiceSoapGetVehRateRuleInput.Body(veh_rate_rule_rq=rq),
+        )
+
+        return await self._veh_rate_rule_client.send(
             request,
             headers=self._get_headers(ServiceSoapGetVehAvailRate.soap_action),
         )
