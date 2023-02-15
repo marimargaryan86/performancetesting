@@ -126,6 +126,7 @@ extra_requirements = [
     "pytest-asyncio",
     "pytest-cov",
     "pytest-icdiff",
+    "pytest-socket",
     "pytest-xdist",
     "pygments",
 ]
