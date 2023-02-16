@@ -51,4 +51,6 @@ for ((idx = 3; idx < ${#ARGS[@]}; ++idx)); do
 	exit 1
 done
 
-sentry-cli releases deploys "${SERVICE_NAME}@${SERVICE_VERSION}" new -e "${ENVIRONMENT_NAME}"
+if sentry-cli projects list | awk -F '|' '{print $3}' | sed 's/^ *//;s/ *$//' | grep -q "${SERVICE_NAME}"; then
+	sentry-cli releases deploys "${SERVICE_NAME}@${SERVICE_VERSION}" new -e "${ENVIRONMENT_NAME}"
+fi
