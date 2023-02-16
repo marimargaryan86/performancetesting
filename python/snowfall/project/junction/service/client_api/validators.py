@@ -85,6 +85,9 @@ async def _make_legs_map(
     segments = [segment for trip in trips_map.values() for segment in trip.segments]
     leg_ids = {leg_id for segment in segments for leg_id in segment.leg_ids}
 
+    if not leg_ids:
+        return {}
+
     return {
         leg.id: leg
         for leg in (
