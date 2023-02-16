@@ -32,15 +32,15 @@ softwareupdate --install-rosetta
 git clone git@git.snowfall.se:junction/junction.git
 cd junction
 ```
-2. Install the correct Python interpreter using `pyenv`. Sadly Pants does not support Python 3.10 yet, so we need to install a second interpreter for that.
+2. Install the correct Python interpreter using `pyenv`. Sadly Pants does not support Python 3.11 yet, so we need to install a second interpreter for that.
 ```shell
-pyenv install 3.10.5
-pyenv install 3.9.13
+pyenv install 3.11
+pyenv install 3.9
 ```
 
 ### Set up your IDE (Optional)
 
-_(**Note** You may need to run `pyenv shell 3.9.13` as Pants does not run in Python 3.10 as of August 2022)_
+_(**Note** You may need to run `pyenv shell 3.9` as Pants does not run in Python 3.11 as of February 2023)_
 
 1. Export the virtual environment using Pants.
 ```shell
@@ -53,7 +53,8 @@ _(**Note** You may need to run `pyenv shell 3.9.13` as Pants does not run in Pyt
 
 #### PyCharm
 
-1. In your project settings, add `dist/export/python/virtualenvs/python-default/3.10.5/bin/python` as the project interpreter.
+1. In your project settings, add `dist/export/python/virtualenvs/python-default/3.11.2/bin/python` as the project interpreter.
+    - Note that `3.11.2` in the path above could be different depending on what version of Python 3.11 you have installed.
 2. Mark the following paths as (right click on folder + mark directory as):
     1. Source Folders:
         1. `dist/codegen/python`

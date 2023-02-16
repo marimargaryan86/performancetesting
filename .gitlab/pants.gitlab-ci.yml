@@ -29,7 +29,7 @@ pants:setup:
     PANTS_DOCKER_REGISTRIES: "{'${CI_REGISTRY}': {'address': '${CI_REGISTRY}', 'default': True}}"
     PANTS_SETUP_CACHE: .cache
   cache:
-    key: "pants-setup"
+    key: "pants-setup-3.9.16"
     paths:
       - .cache/
     when: always

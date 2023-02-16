@@ -17,8 +17,8 @@ def python_image(  # type: ignore[no-untyped-def]
         ),
     )
 
-    # python:3.10.5-slim-bullseye
-    tag_sha = "df9e675c0f6f0f758f7d49ea1b4e12cf7b8688d78df7d9986085fa0f24933ade"
+    # python:3.11.2-slim-bullseye
+    tag_sha = "d36b86a6a56b7376171651de411cb7393d2f02841c149665c2ddff4c0f322855"
 
     docker_image(  # type: ignore[name-defined]  # noqa: F821
         name="{name}_docker".format(name=name),
@@ -39,8 +39,8 @@ def python_image(  # type: ignore[no-untyped-def]
             "ENV VERSION $VERSION",
             'LABEL vendor="Snowfall Limited"',
             "LABEL com.snowfalltravel.version=$VERSION",
-            "RUN /usr/local/bin/python3.10 /bin/{name} --help".format(name=name),
-            'ENTRYPOINT ["/usr/local/bin/python3.10", "-Wdefault", "/bin/{0}"]'.format(
+            "RUN /usr/local/bin/python3.11 /bin/{name} --help".format(name=name),
+            'ENTRYPOINT ["/usr/local/bin/python3.11", "-Wdefault", "/bin/{0}"]'.format(
                 name,
             ),
         ],

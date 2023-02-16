@@ -44,7 +44,7 @@ extra_requirements = [
 version = "black==23.1.0"
 config = "vendor/pyproject.toml"
 lockfile = "vendor/lock/black.txt"
-interpreter_constraints = ["CPython==3.10.5"]
+interpreter_constraints = ["CPython==3.11.*"]
 
 [buf]
 lint_args = ["--config", "'version: v1\nlint:\n  use:\n    - DEFAULT\n    - UNARY_RPC\n    - PACKAGE_NO_IMPORT_CYCLE\n'"]
@@ -54,7 +54,7 @@ all-changed = "--changed-since=main --changed-dependees=transitive"
 
 [coverage-py]
 global_report = true
-interpreter_constraints = ["CPython==3.10.5"]
+interpreter_constraints = ["CPython==3.11.*"]
 config = "vendor/pyproject.toml"
 report = ["console", "html"]
 
@@ -62,7 +62,7 @@ report = ["console", "html"]
 version = "docformatter==1.5.1"
 lockfile = "vendor/lock/docformatter.txt"
 args = ["--wrap-summaries", "87", "--wrap-descriptions", "80"]
-interpreter_constraints = ["CPython==3.10.5"]
+interpreter_constraints = ["CPython==3.11.*"]
 
 [flake8]
 version = "flake8==4.0.1"
@@ -92,13 +92,13 @@ source_plugins = [
 version = "isort==5.12.0"
 config = "vendor/setup.cfg"
 lockfile = "vendor/lock/isort.txt"
-interpreter_constraints = ["CPython==3.10.5"]
+interpreter_constraints = ["CPython==3.11.*"]
 
 [mypy]
 version = "mypy==1.0.0"
 config = "vendor/setup.cfg"
 lockfile = "vendor/lock/mypy.txt"
-interpreter_constraints = ["CPython==3.10.5"]
+interpreter_constraints = ["CPython==3.11.*"]
 extra_requirements = ["pydantic"]
 
 [mypy-protobuf]
@@ -132,7 +132,7 @@ extra_requirements = [
 ]
 
 [python]
-interpreter_constraints = ["CPython==3.10.5"]
+interpreter_constraints = ["CPython==3.11.*"]
 enable_resolves = true
 tailor_pex_binary_targets = false
 resolves = {python-default = "vendor/lock/constraints.txt"}

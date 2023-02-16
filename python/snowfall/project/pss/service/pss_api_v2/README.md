@@ -5,7 +5,7 @@ internal: true
 # PSS API V2
 
 This section of the `Junction` Monorepo is related to the migration of PSS API
-from PHP 5.6 into Python 3.10+ and everything that goes with it.
+from PHP 5.6 into Python 3.11+ and everything that goes with it.
 
 To develop on PSS API V2, you will need all the pre-requisites for the `Junction`
 Monorepo, you will also need to have installed:

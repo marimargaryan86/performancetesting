@@ -41,8 +41,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     nomad=1.4.4-1 \
     /tmp/oasdiff.deb \
 && curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash \
-&& pyenv install 3.10.5 \
-&& pyenv install 3.9.13 \
+&& pyenv install 3.11.2 \
+&& pyenv install 3.9.16 \
 && rm -rf /var/lib/apt/lists/* /tmp/oasdiff.deb \
-&& pyenv global 3.10.5 3.9.13
+&& pyenv global 3.11.2 3.9.16
 COPY --from=golang:1.18.3 /usr/local/go/ /usr/local/go/
