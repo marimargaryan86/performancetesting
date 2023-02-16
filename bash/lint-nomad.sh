@@ -12,5 +12,8 @@ for f in nomad/**/*.nomad; do
 		ADDITIONAL_ARGS=("-var-file=${VARS_FILE}")
 	fi
 	nomad validate "${ADDITIONAL_ARGS[@]}" "${f}"
-	hclfmt -require-no-change "${f}"
+
+	if [[ $(nomad fmt -check -write=false "${f}") ]]; then
+		exit 1
+	fi
 done
