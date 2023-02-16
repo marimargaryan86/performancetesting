@@ -1,7 +1,14 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 
 from snowfall.vendor.carnect import config
-from snowfall.vendor.carnect.models.service import ArrayOfSourceType, SourceType
+from snowfall.vendor.carnect.models.service import (
+    ArrayOfSourceType,
+    PersonNameType,
+    SourceType,
+    UniqueIdType,
+)
 
 
 class PosSourceBuilder(object):
@@ -47,6 +54,38 @@ class PosBuilder(object):
         source.user_name(conf.username)
         source.password(conf.password)
         return source
+
+
+class UniqueIdTypeBuilder(object):
+    def __init__(self) -> None:
+        self._builder = UniqueIdType()
+
+    def get(self) -> UniqueIdType:
+        return self._builder
+
+    def unique_id(self, unique_id: str) -> UniqueIdTypeBuilder:
+        self._builder.id = unique_id
+        return self
+
+    def id_context(self, unique_id_context: str) -> UniqueIdTypeBuilder:
+        self._builder.id_context = unique_id_context
+        return self
+
+    def unique_id_type(self, unique_id_type: str) -> UniqueIdTypeBuilder:
+        self._builder.type = unique_id_type
+        return self
+
+
+class PersonNameTypeBuilder(object):
+    def __init__(self) -> None:
+        self._builder = PersonNameType()
+
+    def get(self) -> PersonNameType:
+        return self._builder
+
+    def surname(self, surname: str) -> PersonNameTypeBuilder:
+        self._builder.surname = surname
+        return self
 
 
 class BaseBuilderRq(ABC):

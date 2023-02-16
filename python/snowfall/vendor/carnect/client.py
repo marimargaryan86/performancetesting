@@ -23,11 +23,15 @@ from snowfall.vendor.carnect.models.service import (  # noqa: WPS235
     ServiceSoapGetVehRateRule,
     ServiceSoapGetVehRateRuleInput,
     ServiceSoapGetVehRateRuleOutput,
+    ServiceSoapGetVehRetReservation,
+    ServiceSoapGetVehRetReservationInput,
+    ServiceSoapGetVehRetReservationOutput,
     VehAvailRateRq,
     VehCancelResRq,
     VehLocationSearchRq,
     VehLocDetailRq,
     VehRateRuleRq,
+    VehRetResRq,
 )
 from snowfall.vendor.carnect.soap.soap_client import (
     AsyncSoapClient,
@@ -56,6 +60,7 @@ class CarnectClient(object):  # noqa: WPS214
         self._cancel_reservation_client = self._create_client(
             ServiceSoapGetVehCancelReservation,
         )
+        self._veh_ret_res_client = self._create_client(ServiceSoapGetVehRetReservation)
 
     async def ping(self, rq: PingRq) -> ServiceSoapGetPingOutput.Body:
         rs = await self._ping_client.send(
@@ -121,6 +126,17 @@ class CarnectClient(object):  # noqa: WPS214
                 body=ServiceSoapGetVehCancelReservationInput.Body(veh_cancel_res_rq=rq),
             ),
             headers=self._get_headers(ServiceSoapGetVehCancelReservation.soap_action),
+        )
+
+    async def retrieve_reservation(
+        self,
+        rq: VehRetResRq,
+    ) -> ServiceSoapGetVehRetReservationOutput:
+        return await self._veh_ret_res_client.send(
+            rq_object=ServiceSoapGetVehRetReservationInput(
+                body=ServiceSoapGetVehRetReservationInput.Body(veh_ret_res_rq=rq),
+            ),
+            headers=self._get_headers(ServiceSoapGetVehRetReservation.soap_action),
         )
 
     def _get_headers(self, soap_action: str) -> dict[str, str]:

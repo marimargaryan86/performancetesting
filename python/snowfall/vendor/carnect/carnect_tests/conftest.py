@@ -1,16 +1,15 @@
 import datetime
-from typing import Any, List
+from typing import List
 
 import httpx
 import pytest
-from bson import json_util
 
-from snowfall.stdlib.persistence import filesystem
-from snowfall.vendor.carnect import client, config
 from snowfall.vendor.carnect.adapters.veh_avail_rate_adapter import VehAvailRateAdapter
 from snowfall.vendor.carnect.builders.veh_avail_rate_builder import (
     VehAvailRateRqBuilder,
 )
+from snowfall.vendor.carnect.client import CarnectClient
+from snowfall.vendor.carnect.config import Config
 from snowfall.vendor.carnect.models.service import (
     RateQueryType,
     VehicleVendorAvailabilityType,
@@ -25,8 +24,8 @@ HASH = "1nK9DFF9"
 
 
 @pytest.fixture
-def carnect_config() -> config.Config:
-    return config.Config(
+def carnect_config() -> Config:
+    return Config(
         timeout=TIMEOUT,
         base_url=API_BASE_URL,
         export_soap_requests=True,
@@ -43,20 +42,17 @@ def http_client() -> httpx.AsyncClient:
 @pytest.fixture
 def carnect_client(
     http_client: httpx.AsyncClient,
-    carnect_config: config.Config,
-) -> client.CarnectClient:
-    return client.CarnectClient(http_client=http_client, config=carnect_config)
+    carnect_config: Config,
+) -> CarnectClient:
+    return CarnectClient(http_client=http_client, config=carnect_config)
 
 
 @pytest.fixture
 async def offers(
-    carnect_client: client.CarnectClient,
+    carnect_client: CarnectClient,
+    carnect_config: Config,
 ) -> List[VehicleVendorAvailabilityType]:
-    rq = VehAvailRateRqBuilder()
-
-    pos_source = rq.pos().add_source()
-    pos_source.user_name("CarnectNet")
-    pos_source.password("1nK9DFF9")
+    rq = VehAvailRateRqBuilder(carnect_config)
 
     rq.rate_query_type(RateQueryType.LIVE)
     rq.rate_query_parameter_type("4")
@@ -73,17 +69,3 @@ async def offers(
     rs_adapter = VehAvailRateAdapter(await carnect_client.get_avail_rate(rq.build()))
     assert rs_adapter.is_success(), rs_adapter.get_error()
     return rs_adapter.available()
-
-
-def load_file_fixture(
-    file_name: str,
-) -> Any:
-    file_path = filesystem.resource_path(
-        package="snowfall.vendor.distribusion.conftest",
-        resource="fixtures/{file_name}".format(
-            file_name=file_name,
-        ),
-    )
-
-    with open(file_path) as json_file:
-        return json_util.loads(json_file.read())

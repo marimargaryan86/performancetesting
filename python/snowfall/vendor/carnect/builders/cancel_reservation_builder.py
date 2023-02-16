@@ -1,7 +1,11 @@
 from __future__ import annotations
 
 from snowfall.vendor.carnect import config
-from snowfall.vendor.carnect.builders.common import PosBuilder
+from snowfall.vendor.carnect.builders.common import (
+    PersonNameTypeBuilder,
+    PosBuilder,
+    UniqueIdTypeBuilder,
+)
 from snowfall.vendor.carnect.models.service import (
     CancelInfoRqtype,
     PersonNameType,
@@ -28,38 +32,6 @@ class CancelInfoTypeBuilder(object):
         person_name = PersonNameTypeBuilder()
         self._builder.person_name = person_name.get()
         return person_name
-
-
-class UniqueIdTypeBuilder(object):
-    def __init__(self) -> None:
-        self._builder = UniqueIdType()
-
-    def get(self) -> UniqueIdType:
-        return self._builder
-
-    def unique_id(self, unique_id: str) -> UniqueIdTypeBuilder:
-        self._builder.id = unique_id
-        return self
-
-    def id_context(self, unique_id_context: str) -> UniqueIdTypeBuilder:
-        self._builder.id_context = unique_id_context
-        return self
-
-    def unique_id_type(self, unique_id_type: str) -> UniqueIdTypeBuilder:
-        self._builder.type = unique_id_type
-        return self
-
-
-class PersonNameTypeBuilder(object):
-    def __init__(self) -> None:
-        self._builder = PersonNameType()
-
-    def get(self) -> PersonNameType:
-        return self._builder
-
-    def surname(self, surname: str) -> PersonNameTypeBuilder:
-        self._builder.surname = surname
-        return self
 
 
 class CancelReservationRqBuilder(object):

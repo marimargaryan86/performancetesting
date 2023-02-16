@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from snowfall.vendor.carnect import config
 from snowfall.vendor.carnect.builders.common import BaseBuilderRq, PosBuilder
 from snowfall.vendor.carnect.models.service import (
     UniqueIdType,
@@ -9,19 +10,20 @@ from snowfall.vendor.carnect.models.service import (
 
 
 class VehRateRuleRqBuilder(BaseBuilderRq):
-    def __init__(self) -> None:
+    def __init__(self, conf: config.Config) -> None:
         self._rq = VehRateRuleRq()
         self._pos = PosBuilder()
+        self._pos.set_credentials(conf)
         self._rq.pos = self._pos.get()
+        self._rq.target = (
+            VehRateRuleRqTarget.TEST if conf.is_test else VehRateRuleRqTarget.PRODUCTION
+        )
 
     def build(self) -> VehRateRuleRq:
         return self._rq
 
     def echo_token(self, echo_token: str) -> None:
         self._rq.echo_token = echo_token
-
-    def target(self, target: VehRateRuleRqTarget) -> None:
-        self._rq.target = target
 
     def pos(self) -> PosBuilder:
         return self._pos
