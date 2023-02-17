@@ -50,6 +50,7 @@ pymongo==4.3.3
 pyshp==2.3.1
 pytest-httpx==0.21.3
 pytest==7.2.1
+pytest-asyncio==0.20.3
 python-dateutil==2.8.2
 redis[hiredis]==4.3.5
 rfc3339-validator==0.1.4

@@ -8,6 +8,10 @@ class Account(Base):
 
     id = Column(Integer, primary_key=True)
     email = Column(String, unique=True, nullable=False)
+    password = Column(String)
     firstname = Column(String, unique=True, nullable=False)
     lastname = Column(String, unique=True, nullable=False)
     active = Column(Boolean)
+    mobile = Column(String)
+    created = Column(Integer)
+    modified = Column(Integer)

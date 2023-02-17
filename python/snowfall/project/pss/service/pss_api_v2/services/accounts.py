@@ -1,4 +1,4 @@
-from typing import Sequence
+from typing import Optional, Sequence
 
 from fastapi import Depends
 
@@ -15,3 +15,6 @@ class AccountsService(object):
 
     async def get_all(self) -> Sequence[Account]:
         return await self._repository.list_all()
+
+    async def get_account_by_email(self, email: str) -> Optional[Account]:
+        return await self._repository.get_one_by_filter([Account.email == email])

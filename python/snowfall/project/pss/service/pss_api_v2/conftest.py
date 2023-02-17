@@ -1,5 +1,6 @@
 from typing import AsyncGenerator, Type
 
+import bcrypt
 import pytest
 from async_factory_boy.factory.sqlalchemy import AsyncSQLAlchemyFactory
 from factory import Faker, Sequence
@@ -84,7 +85,14 @@ def account_factory(db_session: AsyncSession) -> Type[AsyncSQLAlchemyFactory]:
         firstname = Faker("last_name")
         lastname = Faker("first_name")
         email = Faker("email")
+        password = bcrypt.hashpw(
+            b"test_password",
+            bcrypt.gensalt(),
+        ).decode()
         active = True
+        mobile = Faker("phone_number")
+        created = None
+        modified = None
 
     return AccountFactory
 

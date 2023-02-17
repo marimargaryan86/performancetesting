@@ -1,7 +1,7 @@
 from typing import Any, Callable, Generic, Sequence, TypeVar
 
 from fastapi import Depends
-from sqlalchemy import select
+from sqlalchemy import ColumnElement, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from snowfall.project.pss.service.pss_api_v2.db.db import get_db
@@ -29,6 +29,14 @@ class Repository(Generic[REPOSITORY_MODEL]):
         statement = select(self._type)
         res = await self._db.execute(statement)
         return res.scalars().all()
+
+    async def get_one_by_filter(
+        self,
+        filter_criteria: Sequence[ColumnElement[bool]],
+    ) -> REPOSITORY_MODEL | None:
+        statement = select(self._type).filter(*filter_criteria)
+        res = await self._db.execute(statement)
+        return res.scalars().first()
 
     @property
     def _type(self) -> Any:
