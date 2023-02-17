@@ -6,6 +6,7 @@ import "google/protobuf/timestamp.proto";
 import "snowfall/stdlib/v1alpha/amqp.proto";
 import "snowfall/stdlib/v1alpha/datetime.proto";
 import "snowfall/stdlib/v1alpha/models.proto";
+import "snowfall/stdlib/v1alpha/options.proto";
 
 service TripSearchService {
   rpc EnqueueTripSearch(EnqueueTripSearchRequest) returns (EnqueueTripSearchResponse) {}
@@ -74,13 +75,13 @@ message ListTripsResponse {
 }
 
 message TripSearch {
-  string id = 1; // read only
-  google.protobuf.Timestamp expires_at = 2; // read only
+  string id = 1 [(snowfall.stdlib.v1alpha.read_only) = true];
+  google.protobuf.Timestamp expires_at = 2 [(snowfall.stdlib.v1alpha.read_only) = true];
   repeated snowfall.stdlib.v1alpha.Point origins = 3;
   repeated snowfall.stdlib.v1alpha.Point destinations = 4;
   snowfall.stdlib.v1alpha.DateTime departure_after = 5;
-  repeated string trip_ids = 6; // read only
-  snowfall.stdlib.v1alpha.Trackable.Status status = 7; // read only
+  repeated string trip_ids = 6 [(snowfall.stdlib.v1alpha.read_only) = true];
+  snowfall.stdlib.v1alpha.Trackable.Status status = 7 [(snowfall.stdlib.v1alpha.read_only) = true];
   optional uint32 maximum_connections = 8;
   repeated snowfall.stdlib.v1alpha.Schedule.Type allowed_segment_types = 9;
   google.protobuf.Timestamp created_at = 10;

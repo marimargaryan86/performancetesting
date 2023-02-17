@@ -1,5 +1,5 @@
 import contextlib
-from typing import AsyncIterable, Callable, Iterator
+from typing import Callable, Iterator
 
 from google.protobuf.message import Message
 from grpc import aio
@@ -11,7 +11,6 @@ from snowfall.stdlib.transport.grpc import interceptor
 
 _SPAN_CLIENT_OP = "grpc"
 _SPAN_SERVER_OP = "grpc.server"
-_IterMsg = AsyncIterable[Message]
 
 
 class TracingClientInterceptor(aio.UnaryUnaryClientInterceptor):

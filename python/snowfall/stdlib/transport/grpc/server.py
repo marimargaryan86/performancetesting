@@ -8,7 +8,7 @@ import grpc
 from grpc_reflection.v1alpha import reflection
 from structlog import get_logger
 
-from snowfall.stdlib.transport.grpc import handler, metrics, tracing
+from snowfall.stdlib.transport.grpc import handler, metrics, options, tracing
 from snowfall.stdlib.transport.grpc.service import HealthService, Service
 
 
@@ -39,6 +39,7 @@ def create_server(
             tracing.TracingServerInterceptor(),
             metrics.MetricsServerInterceptor(),
             handler.ErrorHandlerServerInterceptor(),
+            options.OptionsInterceptor(),
         ],
     )
     names = {reflection.SERVICE_NAME}

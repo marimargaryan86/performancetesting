@@ -44,17 +44,17 @@ def test_id_normalizer() -> None:
 
 
 def test_id_normalizer_nested() -> None:
-    expected = testing_pb2.NestedFoobar(foobars=[testing_pb2.Foobar(id="foobar")])
+    expected = testing_pb2.RepeatedFoobar(foobars=[testing_pb2.Foobar(id="foobar")])
     normalized = normalizers.normalize(
-        testing_pb2.NestedFoobar.DESCRIPTOR,
+        testing_pb2.RepeatedFoobar.DESCRIPTOR,
         json_format.MessageToDict(expected, preserving_proto_field_name=True),
     )
 
     assert normalized == {"foobars": [{"_id": "foobar"}]}
 
-    actual: testing_pb2.NestedFoobar = json_format.ParseDict(
-        normalizers.denormalize(testing_pb2.NestedFoobar.DESCRIPTOR, normalized),
-        testing_pb2.NestedFoobar(),
+    actual: testing_pb2.RepeatedFoobar = json_format.ParseDict(
+        normalizers.denormalize(testing_pb2.RepeatedFoobar.DESCRIPTOR, normalized),
+        testing_pb2.RepeatedFoobar(),
     )
 
     assert expected == actual
