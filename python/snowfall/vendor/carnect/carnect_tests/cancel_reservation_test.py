@@ -10,7 +10,7 @@ from snowfall.vendor.carnect.config import Config
 
 
 @disable_by_default
-async def test_cancel_reservation_by_unique_id_and_surname(  # noqa: WPS118
+async def test_cancel_by_unique_id(
     carnect_client: CarnectClient,
     carnect_config: Config,
 ) -> None:
@@ -30,14 +30,15 @@ async def test_cancel_reservation_by_unique_id_and_surname(  # noqa: WPS118
 
 
 @disable_by_default
-async def test_cancel_reservation_by_unique_context_id(
+async def test_cancel_by_id_context(
     carnect_client: CarnectClient,
     carnect_config: Config,
 ) -> None:
     rq = CancelReservationRqBuilder(carnect_config)
     cancel_info_type = rq.get_cancel_info_type()
     unique_id = cancel_info_type.add_unique_id()
-    unique_id.id_context("MN0929384X0")
+    unique_id.id_context("TES650864613204")
+    cancel_info_type.get_person_name().surname("Test")
 
     rs_adapter = CancelReservationAdapter(
         await carnect_client.cancel_reservation(rq.build()),

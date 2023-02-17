@@ -9,7 +9,7 @@ from snowfall.vendor.carnect.models.service import (
 )
 
 
-class VehRateRuleRqBuilder(BaseBuilderRq):
+class VehRateRuleRqBuilder(BaseBuilderRq[VehRateRuleRq]):
     def __init__(self, conf: config.Config) -> None:
         self._rq = VehRateRuleRq()
         self._pos = PosBuilder()

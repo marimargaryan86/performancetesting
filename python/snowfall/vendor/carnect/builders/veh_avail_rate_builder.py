@@ -4,7 +4,7 @@ from datetime import datetime
 
 from pydantic.types import Decimal
 
-from snowfall.vendor.carnect.builders.common import PosBuilder
+from snowfall.vendor.carnect.builders.common import BaseBuilderRq, PosBuilder
 from snowfall.vendor.carnect.config import Config
 from snowfall.vendor.carnect.models.service import (
     ArrayOfVehicleAvailRqcoreTypeVehPref,
@@ -74,7 +74,7 @@ class VehicleRentalCoreBuilder(object):  # noqa: WPS214
         return self
 
 
-class VehAvailRateRqBuilder(object):  # noqa: WPS214
+class VehAvailRateRqBuilder(BaseBuilderRq[VehAvailRateRq]):  # noqa: WPS214
     def __init__(self, config: Config) -> None:
         self._rq = VehAvailRateRq()
         self._rq.version = Decimal("1.0")

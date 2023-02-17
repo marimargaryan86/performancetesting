@@ -1,14 +1,21 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import Generic, TypeVar
 
 from snowfall.vendor.carnect import config
 from snowfall.vendor.carnect.models.service import (
+    AddressType,
     ArrayOfSourceType,
+    CountryNameType,
     PersonNameType,
     SourceType,
+    StateProvType,
     UniqueIdType,
 )
+
+T = TypeVar("T")  # noqa: WPS111
+A = TypeVar("A", bound=AddressType)  # noqa: WPS111
 
 
 class PosSourceBuilder(object):
@@ -88,7 +95,37 @@ class PersonNameTypeBuilder(object):
         return self
 
 
-class BaseBuilderRq(ABC):
+class AddressInfoBuilder(Generic[A]):  # noqa: WPS214
+    def __init__(self, address: A) -> None:
+        self._address = address
+
+    def get(self) -> A:
+        return self._address
+
+    def street_nmbr(self, street_nmbr: str) -> None:
+        self._address.street_nmbr = AddressType.StreetNmbr(value=street_nmbr)
+
+    def add_address_line(self, address_line: str) -> None:
+        self._address.address_line.append(address_line)
+
+    def city_name(self, city_name: str) -> None:
+        self._address.city_name = city_name
+
+    def postal_code(self, postal_code: str) -> None:
+        self._address.postal_code = postal_code
+
+    def state_code(self, state_code: str) -> None:
+        self._address.state_prov = StateProvType(state_code=state_code)
+
+    def country_code(self, country_code: str) -> None:
+        self._address.country_name = CountryNameType(code=country_code)
+
+
+class BaseBuilderRq(ABC, Generic[T]):
     @abstractmethod
     def pos(self) -> PosBuilder:
         """Return POS builder."""
+
+    @abstractmethod
+    def build(self) -> T:
+        """Return built object."""

@@ -1,9 +1,9 @@
 from snowfall.vendor.carnect import config
-from snowfall.vendor.carnect.builders.common import PosBuilder
+from snowfall.vendor.carnect.builders.common import BaseBuilderRq, PosBuilder
 from snowfall.vendor.carnect.models.service import VehLocDetailRq, VehLocDetailRqTarget
 
 
-class LocationDetailsRqBuilder(object):
+class LocationDetailsRqBuilder(BaseBuilderRq[VehLocDetailRq]):
     def __init__(self, conf: config.Config) -> None:
         self._rq = VehLocDetailRq()
         self._pos = PosBuilder()

@@ -11,9 +11,7 @@ async def test_retrieve_reservation(
     carnect_config: Config,
 ) -> None:
     rq = VehRetResRqBuilder(carnect_config)
-
-    unique_id = rq.unique_id()
-    unique_id.unique_id("CN123456789012")
-
+    rq.unique_id().id_context("TES650864613204")
+    rq.person_name().surname("Test")
     rs_adapter = VehRetResAdapter(await carnect_client.retrieve_reservation(rq.build()))
     assert rs_adapter.is_success(), rs_adapter.get_error()

@@ -35,7 +35,7 @@ class VehLocSearchCriterionBuilder(object):
         self._criterion.ranking = ranking
 
 
-class LocationSearchRqBuilder(BaseBuilderRq):
+class LocationSearchRqBuilder(BaseBuilderRq[VehLocationSearchRq]):
     def __init__(self, conf: config.Config) -> None:
         self._rq = VehLocationSearchRq()
         self._pos = PosBuilder()

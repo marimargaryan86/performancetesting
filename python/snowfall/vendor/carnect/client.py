@@ -2,6 +2,7 @@ from typing import Any
 
 import httpx
 
+from snowfall.vendor.carnect.builders.reservation_builder import ReservationBuilder
 from snowfall.vendor.carnect.config import Config
 from snowfall.vendor.carnect.models.service import (  # noqa: WPS235
     PingRq,
@@ -23,6 +24,9 @@ from snowfall.vendor.carnect.models.service import (  # noqa: WPS235
     ServiceSoapGetVehRateRule,
     ServiceSoapGetVehRateRuleInput,
     ServiceSoapGetVehRateRuleOutput,
+    ServiceSoapGetVehReservation,
+    ServiceSoapGetVehReservationInput,
+    ServiceSoapGetVehReservationOutput,
     ServiceSoapGetVehRetReservation,
     ServiceSoapGetVehRetReservationInput,
     ServiceSoapGetVehRetReservationOutput,
@@ -61,6 +65,7 @@ class CarnectClient(object):  # noqa: WPS214
             ServiceSoapGetVehCancelReservation,
         )
         self._veh_ret_res_client = self._create_client(ServiceSoapGetVehRetReservation)
+        self._reservation_client = self._create_client(ServiceSoapGetVehReservation)
 
     async def ping(self, rq: PingRq) -> ServiceSoapGetPingOutput.Body:
         rs = await self._ping_client.send(
@@ -137,6 +142,26 @@ class CarnectClient(object):  # noqa: WPS214
                 body=ServiceSoapGetVehRetReservationInput.Body(veh_ret_res_rq=rq),
             ),
             headers=self._get_headers(ServiceSoapGetVehRetReservation.soap_action),
+        )
+
+    async def reservation(
+        self,
+        rq_builder: ReservationBuilder,
+    ) -> ServiceSoapGetVehReservationOutput:
+        if self._config.is_test:
+            # Test env requirements:
+            # http://doc.carnect.com/ota2007/getting_started.html#test-reservations
+            rq_builder.primary_driver().surname("Test")
+            rq_builder.primary_driver().given_name("Test")
+            rq_builder.primary_driver().email("testcheck@carnect.com")
+
+        return await self._reservation_client.send(
+            rq_object=ServiceSoapGetVehReservationInput(
+                body=ServiceSoapGetVehReservationInput.Body(
+                    veh_res_rq=rq_builder.build(),
+                ),
+            ),
+            headers=self._get_headers(ServiceSoapGetVehReservation.soap_action),
         )
 
     def _get_headers(self, soap_action: str) -> dict[str, str]:
