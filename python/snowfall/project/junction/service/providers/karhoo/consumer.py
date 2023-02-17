@@ -6,6 +6,7 @@ from snowfall.project.junction.service.offers.v1alpha import amqp_pb2 as offers_
 from snowfall.project.junction.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
+from snowfall.project.junction.service.providers.karhoo import cache
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.redis import types as redis_types
@@ -20,12 +21,14 @@ class TripOfferSearchConsumer(object):
         self,
         consumer_obj: consumer.Consumer[offers_amqp_pb2.TripOfferSearchTask],
         karhoo_client: client.KarhooClient,
+        offers_cache: cache.OfferCache,
         producer_obj: producer.Producer,
         redis: redis_types.Client[bytes],
         ttl: datetime.timedelta,
     ):
         self._consumer = consumer_obj
         self._client = karhoo_client
+        self._offers_cache = offers_cache
         self._producer = producer_obj
         self._redis = redis
         self._ttl = ttl
@@ -115,7 +118,14 @@ class TripOfferSearchConsumer(object):
                 expires_at=protobuf.datetime_to_protobuf(expires_at),
                 offers=[
                     offer_models_pb2.Offer(
-                        id=string.uuid(),
+                        id=await self._offers_cache.store(
+                            cache.OfferDetails(
+                                quote=quote_obj,
+                                expires_at=expires_at,
+                                price=str(quote_obj.price.high),
+                                currency=currency,
+                            ),
+                        ),
                         segment_details=[
                             offer_models_pb2.OfferSegmentDetails(
                                 id=string.uuid(),
@@ -127,8 +137,8 @@ class TripOfferSearchConsumer(object):
                             ),
                         ],
                         price=money.from_string(
-                            str(quote_obj.price.high),
-                            currency,
+                            string_amount=str(quote_obj.price.high),
+                            currency=currency,
                         ).protobuf(),
                     ),
                 ],

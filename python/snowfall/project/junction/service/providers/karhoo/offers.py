@@ -4,7 +4,7 @@ import random
 import httpx
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.service.providers.karhoo import config, consumer
+from snowfall.project.junction.service.providers.karhoo import cache, config, consumer
 from snowfall.stdlib import service
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
@@ -65,6 +65,9 @@ async def offers(  # noqa: WPS210
                 prefix=app.name,
             ),
             ttl=app.settings.ttl,
+            offers_cache=cache.OfferCache(
+                client=redis.Client(redis_connection, prefix=app.name),
+            ),
         )
 
         await trip_offer_search_consumer.consume()
