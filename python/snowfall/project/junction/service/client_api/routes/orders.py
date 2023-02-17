@@ -8,7 +8,7 @@ from starlette import endpoints, requests, responses, status
 from snowfall.project.junction.adapter import offers as offers_adapter
 from snowfall.project.junction.adapter import orders as orders_adapter
 from snowfall.project.junction.adapter import price_quotes as price_quotes_adapter
-from snowfall.project.junction.service.client_api import resources
+from snowfall.project.junction.service.client_api import resources, validators
 from snowfall.project.junction.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
@@ -95,6 +95,7 @@ class Order(endpoints.HTTPEndpoint):
 
 
 class Orders(endpoints.HTTPEndpoint):
+    @validators.order_request_validator
     async def post(  # noqa: WPS217
         self,
         request: requests.Request,
@@ -113,6 +114,9 @@ class Orders(endpoints.HTTPEndpoint):
             journey_id=journey.id,
             passengers=_create_passengers(body["passengers"]),
             options=_create_trip_options(offer, price_quote),
+            destination_residence_details=_create_destination_residence_details(
+                body.get("destinationResidenceDetails", None),
+            ),
         )
 
         return await messages.create_response(
@@ -171,6 +175,9 @@ class OrdersByJourney(endpoints.HTTPEndpoint):
             journey_id=request.path_params["journeyId"],
             passengers=_create_passengers(body["passengers"]),
             options=_create_trip_options(offer, price_quote),
+            destination_residence_details=_create_destination_residence_details(
+                body.get("destinationResidenceAddress", None),
+            ),
         )
         # todo: Expire (delete) the offer the order was placed for.
 
@@ -273,6 +280,32 @@ def _create_traveler_doc(
         nationality=document["nationality"],
         exp_date=date_to_protobuf(
             datetime.date.fromisoformat(document["documentExpirationDate"]),
+        ),
+    )
+
+
+def _create_destination_residence_details(
+    destination_residence_details: Mapping[str, Any],
+) -> order_models_pb2.DestinationResidenceDetails | None:
+    if not destination_residence_details:
+        return None
+
+    residence_address = destination_residence_details.get("residenceAddress")
+
+    return order_models_pb2.DestinationResidenceDetails(
+        residence_address=(
+            postal_address_pb2.PostalAddress(
+                address_lines=residence_address["addressLines"],
+                postal_code=residence_address["postalCode"],
+                locality=residence_address["city"],
+                region_code=residence_address["countryCode"],
+            )
+            if residence_address
+            else None
+        ),
+        residence_country_code=destination_residence_details.get(
+            "residenceCountryCode",
+            None,
         ),
     )
 

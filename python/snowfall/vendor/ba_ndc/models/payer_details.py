@@ -9,11 +9,17 @@ from snowfall.vendor.ba_ndc.models.response_common_passenger_schemas import Cont
 class Address(BaseSchema):
     """Address schema."""
 
-    street1: str = pydantic.Field(description="Street 1")
-    street2: str | None = pydantic.Field(description="Street 2")
+    address_lines: list[str] = pydantic.Field(description="Address lines")
     city: str = pydantic.Field(description="City name")
     zip_code: str = pydantic.Field(description="Zip code", alias="zip")
     country_code: str = pydantic.Field(description="Country code")
+
+
+class DestinationResidenceDetails(BaseSchema):
+    residence_address: Address | None = pydantic.Field(description="Residence address")
+    residence_country_code: str | None = pydantic.Field(
+        description="Residence country code",
+    )
 
 
 class ContactDetailed(Contact):

@@ -17,6 +17,7 @@ class OrderProducer(object):
                     booking=booking,
                     contact_details=journey.contact_details,
                     passengers=order.passengers,
+                    destination_residence_details=order.destination_residence_details,
                     metadata=amqp_pb2.OrderMetadata(
                         journey_id=order.journey_id,
                         order_id=order.id,

@@ -30,6 +30,7 @@ class Client(abc.ABC):
         journey_id: str,
         passengers: Sequence[models_pb2.Passenger],
         options: Sequence[models_pb2.TripOption],
+        destination_residence_details: models_pb2.DestinationResidenceDetails | None,
     ) -> models_pb2.Order:
         """Create a new order resource."""
 
@@ -140,6 +141,7 @@ class DictClient(Client):
         journey_id: str,
         passengers: Sequence[models_pb2.Passenger],
         options: Sequence[models_pb2.TripOption],
+        destination_residence_details: models_pb2.DestinationResidenceDetails | None,
     ) -> models_pb2.Order:
         if journey_id not in self._journeys:
             raise errors.NotFoundError()
@@ -150,6 +152,7 @@ class DictClient(Client):
             journey_id=journey_id,
             bookings=self._generate_bookings(order_id, options),
             passengers=passengers,
+            destination_residence_details=destination_residence_details,
         )
         self._journeys[journey_id].orders.append(order)
 
@@ -422,12 +425,14 @@ class GrpcClient(Client):
         journey_id: str,
         passengers: Sequence[models_pb2.Passenger],
         options: Sequence[models_pb2.TripOption],
+        destination_residence_details: models_pb2.DestinationResidenceDetails | None,
     ) -> models_pb2.Order:
         response = await errors.handle_grpc_errors(
             self._orders.PlaceOrder(
                 orders_pb2.PlaceOrderRequest(
                     journey_id=journey_id,
                     passengers=passengers,
+                    destination_residence_details=destination_residence_details,
                     options=[
                         orders_pb2.PlaceOrderRequest.Option(
                             trip_option=option,

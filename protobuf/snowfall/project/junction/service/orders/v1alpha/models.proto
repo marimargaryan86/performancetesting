@@ -26,6 +26,7 @@ message Order {
   repeated Passenger passengers = 4;
   google.protobuf.Timestamp created_at = 5;
   google.protobuf.Timestamp updated_at = 6;
+  DestinationResidenceDetails destination_residence_details = 7;
   // reseller id
 }
 
@@ -113,4 +114,9 @@ message TripOptionDetails {
   string booking_id = 4;
   snowfall.project.junction.service.offers.v1alpha.OfferSegment segment = 1;
   snowfall.stdlib.v1alpha.CabinClass cabin_class = 2;
+}
+
+message DestinationResidenceDetails {
+  snowfall.stdlib.v1alpha.PostalAddress residence_address = 1;
+  string residence_country_code = 2;
 }

@@ -103,6 +103,8 @@ message PriceQuote {
     REQUIRED_EXPIRATION_DATE = 3;
     REQUIRED_ISSUING_COUNTRY = 4;
     REQUIRED_PASSPORT_NUMBER = 5;
+    REQUIRED_RESIDENCE_COUNTRY_CODE = 6;
+    REQUIRED_RESIDENCE_ADDRESS = 7;
   }
   repeated Required required_documents = 5;
   repeated Penalty penalties = 6;

@@ -53,6 +53,7 @@ message PlaceOrderRequest {
     }
   }
   repeated Option options = 3;
+  DestinationResidenceDetails destination_residence_details = 4;
 }
 
 message PlaceOrderResponse {

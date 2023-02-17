@@ -6206,7 +6206,9 @@
                         "nationality",
                         "expiration-date",
                         "issuing-country",
-                        "passport-number"
+                        "passport-number",
+                        "residence-country-code",
+                        "residence-address"
                       ]
                     },
                     "readOnly": true

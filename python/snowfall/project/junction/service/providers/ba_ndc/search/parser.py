@@ -1,6 +1,8 @@
 import itertools
 from typing import List, Sequence
 
+import more_itertools
+
 from snowfall.project.junction.provider import airports
 from snowfall.project.junction.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
@@ -220,6 +222,34 @@ class OfferParser(object):
             <= 1
         )
 
+    def get_flight_flags(
+        self,
+        trips: Sequence[response_common_offer_schemas.Trip],
+        offers_adapter: OffersResponseAdapter,
+    ) -> tuple[bool, bool]:
+        international_flight = False
+        return_flight_to_usa = False
+        origin_segment = offers_adapter.get_segment_by_id(
+            more_itertools.first(more_itertools.first(trips).segment_ids),
+        )
+        destination_segment = offers_adapter.get_segment_by_id(
+            more_itertools.last(more_itertools.last(trips).segment_ids),
+        )
+
+        if not origin_segment or not destination_segment:
+            return international_flight, return_flight_to_usa
+
+        if origin_segment.origin.code != destination_segment.destination.code:
+            international_flight = True
+
+            destination_airport = self._airport_repository.get_by_iata(
+                destination_segment.destination.code,
+            )
+
+            return_flight_to_usa = destination_airport.iata_country_code == "US"
+
+        return international_flight, return_flight_to_usa
+
     def _segment_to_proto(
         self,
         segment: response_common_offer_schemas.Segment | None,
@@ -297,6 +327,10 @@ class OfferParser(object):
                 offer.price.total_amount,
                 money.Currency(offer.price.currency),
             )
+            flight_flags = self.get_flight_flags(
+                offer.trips,
+                offers_adapter,
+            )
             pb_offers.append(
                 offer_models_pb2.Offer(
                     id=await self._offer_cache.store(
@@ -319,6 +353,8 @@ class OfferParser(object):
                                 offer.trips,
                                 offers_adapter,
                             ),
+                            international_flight=flight_flags[0],
+                            return_flight_to_usa=flight_flags[1],
                         ),
                         expires_at=offers_adapter.get_expires_at(),
                     ),

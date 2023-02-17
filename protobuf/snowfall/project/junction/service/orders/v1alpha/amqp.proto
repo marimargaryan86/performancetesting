@@ -9,6 +9,7 @@ message PlaceOrderTask {
   ContactDetails contact_details = 2;
   repeated Passenger passengers = 3;
   OrderMetadata metadata = 4;
+  DestinationResidenceDetails destination_residence_details = 5;
 }
 
 message OrderMetadata {

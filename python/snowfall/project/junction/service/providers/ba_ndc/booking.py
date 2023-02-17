@@ -18,6 +18,7 @@ from snowfall.vendor.ba_ndc import client, errors
 from snowfall.vendor.ba_ndc.adapters.order_view_adapter import OrderViewAdapter
 from snowfall.vendor.ba_ndc.builders.order_request import OrderRequestBuilder
 from snowfall.vendor.ba_ndc.models import (
+    payer_details,
     request_order_schemas,
     response_common_passenger_schemas,
 )
@@ -36,6 +37,33 @@ def _get_last_travel_date(
         ).date()
         for segment in segments
     )
+
+
+def _get_destination_residence_details(
+    international_flight: bool,
+    return_flight_to_usa: bool,
+    destination_det: models_pb2.DestinationResidenceDetails,
+) -> payer_details.DestinationResidenceDetails | None:
+    if destination_det is not None:
+        drd = payer_details.DestinationResidenceDetails(
+            residence_address=None,
+            residence_country_code=None,
+        )
+
+        if international_flight and destination_det.residence_country_code is not None:
+            drd.residence_country_code = destination_det.residence_country_code
+
+        if return_flight_to_usa and destination_det.residence_address is not None:
+            drd.residence_address = payer_details.Address(
+                address_lines=list(
+                    destination_det.residence_address.address_lines,
+                ),
+                city=destination_det.residence_address.locality,
+                zip_code=destination_det.residence_address.postal_code,
+                country_code=destination_det.residence_address.region_code,
+            )
+
+        return drd
 
 
 class BookingHandler(object):
@@ -150,6 +178,14 @@ class BookingHandler(object):
                         else []
                     ),
                 ),
+            )
+
+            order_request.destination_residence_details = (
+                _get_destination_residence_details(
+                    details.international_flight,
+                    details.return_flight_to_usa,
+                    task.destination_residence_details,
+                )
             )
 
         adapter = OrderViewAdapter(

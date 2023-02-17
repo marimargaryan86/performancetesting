@@ -11,6 +11,7 @@ from snowfall.vendor.ba_ndc.adapters.offers_response_adapter import (
 )
 from snowfall.vendor.ba_ndc.builders import offer_request, order_request
 from snowfall.vendor.ba_ndc.models import (
+    payer_details,
     request_add_seat_schemas,
     request_name_correction_schemas,
     request_offer_search_schemas,
@@ -29,14 +30,14 @@ disable_by_default = pytest.mark.skipif(
 
 @disable_by_default
 async def test_get_offers(ba_ndc_client: client.BaNdcClient) -> None:
-    offer_searches_rs = await call_get_offers(ba_ndc_client)
+    offer_searches_rs = await call_get_offers(ba_ndc_client, "LHR", "MAN")
     assert offer_searches_rs is not None
     assert offer_searches_rs.get_offers()
 
 
 @disable_by_default
 async def test_get_offer(ba_ndc_client: client.BaNdcClient) -> None:
-    offer_searches_rs = await call_get_offers(ba_ndc_client)
+    offer_searches_rs = await call_get_offers(ba_ndc_client, "LHR", "MAN")
     offer = random.choice(offer_searches_rs.get_offers())  # nosec
     offer_search_rs = await ba_ndc_client.get_offer(offer.identifier)
 
@@ -45,8 +46,39 @@ async def test_get_offer(ba_ndc_client: client.BaNdcClient) -> None:
 
 
 @disable_by_default
-async def test_create_order(ba_ndc_client: client.BaNdcClient) -> None:
-    order_rs = await generate_order(ba_ndc_client)
+async def test_create_domestic_order(ba_ndc_client: client.BaNdcClient) -> None:
+    order_rs = await generate_order(ba_ndc_client, "LHR", "MAN")
+    assert order_rs is not None
+    assert order_rs.order is not None
+
+    await call_cancel_order(ba_ndc_client, order_rs.identifier)
+
+
+@disable_by_default
+async def test_create_international_order(ba_ndc_client: client.BaNdcClient) -> None:
+    order_rs = await generate_order(
+        ba_ndc_client,
+        "LHR",
+        "SYD",
+        set_passport_info=True,
+        set_residence_country_code=True,
+    )
+    assert order_rs is not None
+    assert order_rs.order is not None
+
+    await call_cancel_order(ba_ndc_client, order_rs.identifier)
+
+
+@disable_by_default
+async def test_create_order_to_usa(ba_ndc_client: client.BaNdcClient) -> None:
+    order_rs = await generate_order(
+        ba_ndc_client,
+        "LHR",
+        "JFK",
+        set_passport_info=True,
+        set_residence_country_code=True,
+        set_residence_address=True,
+    )
     assert order_rs is not None
     assert order_rs.order is not None
 
@@ -55,7 +87,7 @@ async def test_create_order(ba_ndc_client: client.BaNdcClient) -> None:
 
 @disable_by_default
 async def test_get_order(ba_ndc_client: client.BaNdcClient) -> None:
-    order_rs = await generate_order(ba_ndc_client)
+    order_rs = await generate_order(ba_ndc_client, "LHR", "MAN")
     assert order_rs is not None
     assert order_rs.order is not None
 
@@ -77,7 +109,7 @@ async def test_get_order_with_invalid_order(ba_ndc_client: client.BaNdcClient) -
 
 @disable_by_default
 async def test_cancel_order(ba_ndc_client: client.BaNdcClient) -> None:
-    order_rs = await generate_order(ba_ndc_client)
+    order_rs = await generate_order(ba_ndc_client, "LHR", "MAN")
     assert order_rs is not None
     assert order_rs.order is not None
 
@@ -86,7 +118,7 @@ async def test_cancel_order(ba_ndc_client: client.BaNdcClient) -> None:
 
 @disable_by_default
 async def test_passenger_name_correction(ba_ndc_client: client.BaNdcClient) -> None:
-    order_rs = await generate_order(ba_ndc_client)
+    order_rs = await generate_order(ba_ndc_client, "LHR", "MAN")
     assert order_rs is not None
     assert order_rs.order is not None
     assert order_rs.passengers is not None
@@ -119,7 +151,7 @@ async def test_passenger_name_correction(ba_ndc_client: client.BaNdcClient) -> N
 
 @disable_by_default
 async def test_update_order(ba_ndc_client: client.BaNdcClient) -> None:
-    order_rs = await generate_order(ba_ndc_client)
+    order_rs = await generate_order(ba_ndc_client, "LHR", "MAN")
     assert order_rs is not None
     assert order_rs.order is not None
 
@@ -156,7 +188,7 @@ async def test_update_order(ba_ndc_client: client.BaNdcClient) -> None:
 
 @disable_by_default
 async def test_get_services_by_offer(ba_ndc_client: client.BaNdcClient) -> None:
-    offer_searches_rs = await call_get_offers(ba_ndc_client)
+    offer_searches_rs = await call_get_offers(ba_ndc_client, "LHR", "MAN")
     assert offer_searches_rs is not None
     assert offer_searches_rs.get_offers()
 
@@ -168,7 +200,7 @@ async def test_get_services_by_offer(ba_ndc_client: client.BaNdcClient) -> None:
 
 @disable_by_default
 async def test_get_services_by_order(ba_ndc_client: client.BaNdcClient) -> None:
-    order_rs = await generate_order(ba_ndc_client)
+    order_rs = await generate_order(ba_ndc_client, "LHR", "MAN")
     assert order_rs is not None
     assert order_rs.order is not None
 
@@ -181,7 +213,7 @@ async def test_get_services_by_order(ba_ndc_client: client.BaNdcClient) -> None:
 
 @disable_by_default
 async def test_get_seats_by_offer(ba_ndc_client: client.BaNdcClient) -> None:
-    offer_searches_rs = await call_get_offers(ba_ndc_client)
+    offer_searches_rs = await call_get_offers(ba_ndc_client, "LHR", "MAN")
     assert offer_searches_rs is not None
     assert offer_searches_rs.get_offers()
 
@@ -194,7 +226,7 @@ async def test_get_seats_by_offer(ba_ndc_client: client.BaNdcClient) -> None:
 
 @disable_by_default
 async def test_get_seats_by_order(ba_ndc_client: client.BaNdcClient) -> None:
-    order_rs = await generate_order(ba_ndc_client)
+    order_rs = await generate_order(ba_ndc_client, "LHR", "MAN")
     assert order_rs is not None
     assert order_rs.order is not None
 
@@ -207,7 +239,7 @@ async def test_get_seats_by_order(ba_ndc_client: client.BaNdcClient) -> None:
 
 @disable_by_default
 async def test_add_seat(ba_ndc_client: client.BaNdcClient) -> None:
-    order_rs = await generate_order(ba_ndc_client)
+    order_rs = await generate_order(ba_ndc_client, "LHR", "MAN")
     assert order_rs is not None
     assert order_rs.order is not None
 
@@ -242,7 +274,7 @@ async def test_add_seat(ba_ndc_client: client.BaNdcClient) -> None:
 
 @disable_by_default
 async def test_reshop(ba_ndc_client: client.BaNdcClient) -> None:
-    order_rs = await generate_order(ba_ndc_client)
+    order_rs = await generate_order(ba_ndc_client, "LHR", "MAN")
     assert order_rs is not None
     assert order_rs.origin_destinations
 
@@ -268,13 +300,15 @@ async def test_reshop(ba_ndc_client: client.BaNdcClient) -> None:
 
 async def call_get_offers(
     ba_ndc_client: client.BaNdcClient,
+    origin: str,
+    destination: str,
 ) -> OffersResponseAdapter:
     offers_request_builder = offer_request.OffersRequestBuilder()
     offers_request_builder.add_passenger(passenger_enums.PassengerTypeEnum.adult)
     offers_request_builder.add_trip(
         request_offer_search_schemas.Trip(
-            origin="LHR",
-            destination="MAN",
+            origin=origin,
+            destination=destination,
             date=datetime.datetime.now(datetime.timezone.utc)
             + datetime.timedelta(
                 days=45,
@@ -288,8 +322,13 @@ async def call_get_offers(
 
 async def generate_order(
     ba_ndc_client: client.BaNdcClient,
+    origin: str,
+    destination: str,
+    set_passport_info: bool = False,
+    set_residence_address: bool = False,
+    set_residence_country_code: bool = False,
 ) -> response_order_schemas.OrderResponse:
-    offer_searches_rs = await call_get_offers(ba_ndc_client)
+    offer_searches_rs = await call_get_offers(ba_ndc_client, origin, destination)
     offer = random.choice(offer_searches_rs.get_offers())  # nosec
     offer_search_rs = await ba_ndc_client.get_offer(offer.identifier)
 
@@ -315,8 +354,50 @@ async def generate_order(
                     number="15141234567",
                 ),
             ),
+            identity_documents=(
+                [
+                    request_order_schemas.IdentityDocument(
+                        document_number="9823445678",
+                        document_type="PT",
+                        birth_date=datetime.date.fromisoformat("1991-01-01"),
+                        nationality="GBR",
+                        issuing_country="FRA",
+                        expiration_date=datetime.date.fromisoformat("2022-05-06"),
+                    ),
+                ]
+                if set_passport_info
+                else []
+            ),
         ),
     )
+    if set_residence_address:
+        order_request_builder.destination_residence_details = (
+            payer_details.DestinationResidenceDetails(
+                residence_address=payer_details.Address(
+                    address_lines=[
+                        "Beeches Apartment",
+                        "200 Lampton Road",
+                    ],
+                    city="NYK",
+                    zip_code="TW345RT",
+                    country_code="USA",
+                ),
+                residence_country_code=None,
+            )
+        )
+
+    if set_residence_country_code:
+        if order_request_builder.destination_residence_details is None:
+            order_request_builder.destination_residence_details = (
+                payer_details.DestinationResidenceDetails(
+                    residence_address=None,
+                    residence_country_code="NOR",
+                )
+            )
+        else:
+            order_request_builder.destination_residence_details.residence_country_code = (
+                "NOR"
+            )
 
     return await ba_ndc_client.create_order(order_request_builder.build())
 

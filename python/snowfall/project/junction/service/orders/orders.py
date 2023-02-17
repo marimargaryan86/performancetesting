@@ -82,6 +82,7 @@ class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
         journey_id: str,
         passengers: Sequence[models_pb2.Passenger],
         options: Sequence[models_pb2.TripOption],
+        destination_residence_details: models_pb2.DestinationResidenceDetails | None,
     ) -> models_pb2.Order:
         order_id = string.uuid()
         order = models_pb2.Order(
@@ -89,6 +90,7 @@ class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
             journey_id=journey_id,
             passengers=passengers,
             bookings=self._generate_bookings(order_id, options),
+            destination_residence_details=destination_residence_details,
         )
         update = await self._execute(
             self._collection.update_one,

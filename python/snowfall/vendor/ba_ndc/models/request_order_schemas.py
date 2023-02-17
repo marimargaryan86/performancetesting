@@ -5,7 +5,10 @@ import uuid
 import pydantic
 
 from snowfall.vendor.ba_ndc.models.base_schema import BaseSchema
-from snowfall.vendor.ba_ndc.models.payer_details import Contact
+from snowfall.vendor.ba_ndc.models.payer_details import (
+    Contact,
+    DestinationResidenceDetails,
+)
 from snowfall.vendor.ba_ndc.models.payment_type_schemas import (
     CashPayment,
     CreditCardPayment,
@@ -75,6 +78,9 @@ class CreateOrderRequest(BaseSchema):
     payment: CreditCardPayment | CashPayment | VoucherPayment | None = pydantic.Field(
         description="Order payment",
         discriminator="payment_type",
+    )
+    destination_residence_details: DestinationResidenceDetails | None = pydantic.Field(
+        description="Residence details for passengers traveling to USA",
     )
 
 
