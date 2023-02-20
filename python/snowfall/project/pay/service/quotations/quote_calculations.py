@@ -5,6 +5,7 @@ from snowfall.project.pay.service.companies.v1alpha import models_pb2 as company
 from snowfall.project.pay.service.quotations.v1alpha import (
     models_pb2 as quotation_models,
 )
+from snowfall.stdlib import string
 from snowfall.stdlib.format.protobuf import datetime_to_protobuf
 from snowfall.stdlib.money import Currency, Money, total
 
@@ -33,6 +34,8 @@ class Quote(object):
         self,
     ) -> quotation_models.Quotation:
         return quotation_models.Quotation(
+            id=string.uuid(),
+            status=quotation_models.Quotation.Status.STATUS_QUOTED,
             beneficiary_amount=self._quotation_amounts["initial_amount"].protobuf(),
             exchange_rate=self._rate,
             converted_beneficiary_amount=self._quotation_amounts[

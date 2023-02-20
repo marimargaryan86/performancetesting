@@ -7,6 +7,7 @@ from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Transac
 from snowfall.stdlib import money, string
 from snowfall.stdlib.integration.starlette import messages, models, request_helpers
 from snowfall.vendor.payment.client import PaymentClient
+from snowfall.vendor.payment.errors import PaymentError
 from snowfall.vendor.payment.models import conversion
 
 
@@ -29,14 +30,28 @@ class Transactions(endpoints.HTTPEndpoint):
             )
             conversion_id = ""
             if not are_currencies_same:
-                cc_conversion = payment_client.create_conversion(
-                    conversion.ConversionRequest(
-                        buy_currency=quot.converted_beneficiary_amount.currency_code,
-                        sell_currency=quot.beneficiary_amount.currency_code,
-                        amount=money.from_protobuf(quot.beneficiary_amount).amount,
-                        reason=transaction_id,
-                    ),
-                )
+                try:
+                    cc_conversion = payment_client.create_conversion(
+                        conversion.ConversionRequest(
+                            buy_currency=quot.converted_beneficiary_amount.currency_code,
+                            sell_currency=quot.beneficiary_amount.currency_code,
+                            amount=money.from_protobuf(quot.beneficiary_amount).amount,
+                            reason=transaction_id,
+                        ),
+                    )
+                except PaymentError as exc:
+                    return models.JsonApiResponse(
+                        models.Body(
+                            errors=[
+                                models.Error(
+                                    status=str(exc.status),
+                                    code=exc.code,
+                                    detail=exc.message,
+                                ),
+                            ],
+                        ),
+                        status_code=exc.status,
+                    )
                 inserted_conversion = await conversion_repository.create(
                     cc_conversion,
                 )

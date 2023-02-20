@@ -1,4 +1,4 @@
-from typing import Sequence
+from typing import Optional, Sequence
 
 import currencycloud
 import lagom
@@ -37,10 +37,11 @@ def create_dependencies(  # noqa: WPS211
     companies_repository: CompanyRepository,
     transactions_repository: TransactionRepository,
     conversions_repository: ConversionRepository,
+    payment_client: Optional[client.PaymentClient] = None,
 ) -> lagom.Container:
     container = lagom.Container()
     container[currencycloud.Client] = cc_client
-    container[client.PaymentClient] = client.PaymentClient(cc_client)
+    container[client.PaymentClient] = payment_client or client.PaymentClient(cc_client)
     container[currencies.Client] = currencies_client  # type: ignore[type-abstract]
     container[authentication.Client] = authentication_client  # type: ignore[type-abstract]
     container[quotations.QuotationsRepository] = quotations_repository

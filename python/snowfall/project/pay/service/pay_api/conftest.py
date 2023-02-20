@@ -1,9 +1,11 @@
 import datetime
 import pathlib
 from typing import AsyncIterator, Mapping, Optional, Sequence
+from unittest import mock
 
 import currencycloud
 import httpx
+import mongomock_motor
 import pytest
 from fakeredis import aioredis as fakeredis
 from motor import motor_asyncio
@@ -11,6 +13,7 @@ from starlette import applications
 from starlette.middleware import Middleware
 
 from snowfall.project.adapter import authentication
+from snowfall.project.adapter import authentication as auth
 from snowfall.project.junction.adapter import errors
 from snowfall.project.pay.adapter import currencies
 from snowfall.project.pay.service.pay_api import bootstrap
@@ -25,10 +28,13 @@ from snowfall.project.pay.service.quotations import quotations
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.vendor.payment.client import PaymentClient
+from snowfall.vendor.payment.errors import PaymentError
 
 
 def _create_app(  # noqa: WPS211
     cc_client: currencycloud.Client,
+    payment_client: PaymentClient,
     currencies_client: currencies.Client,
     authentication_client: authentication.Client,
     quotations_repository: quotations.QuotationsRepository,
@@ -52,6 +58,7 @@ def _create_app(  # noqa: WPS211
                 companies_repository,
                 transaction_repository,
                 conversion_repository,
+                payment_client=payment_client,
             ),
         ),
     )
@@ -95,11 +102,43 @@ def cc_env() -> str:
 
 
 @pytest.fixture()
+def mongo_client() -> motor_asyncio.AsyncIOMotorClient:
+    return mongomock_motor.AsyncMongoMockClient()
+
+
+@pytest.fixture()
 def quotations_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> quotations.QuotationsRepository:
     return quotations.QuotationsRepository(
         collection=mongo_client.test.quotations,
+    )
+
+
+@pytest.fixture()
+def companies_repository(
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
+) -> CompanyRepository:
+    return CompanyRepository(
+        collection=mongo_client.test.companies,
+    )
+
+
+@pytest.fixture()
+def transactions_repository(
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
+) -> TransactionRepository:
+    return TransactionRepository(
+        collection=mongo_client.test.transactions,
+    )
+
+
+@pytest.fixture()
+def conversions_repository(
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
+) -> ConversionRepository:
+    return ConversionRepository(
+        collection=mongo_client.test.conversions,
     )
 
 
@@ -113,10 +152,32 @@ def cc_client(cc_login: str, cc_api_key: str, cc_env: str) -> currencycloud.Clie
 
 
 @pytest.fixture()
+def payment_client() -> mock.Mock:
+    payment_client = mock.Mock()
+    message = "Conversion of GBP equivalent 0.89 is less than your lower limit of 1.00"
+    payment_client.create_conversion = mock.Mock(
+        side_effect=PaymentError(message=message),
+    )
+    return payment_client
+
+
+@pytest.fixture()
+def currencies_client() -> mock.Mock:
+    return mock.Mock()
+
+
+@pytest.fixture()
+def authentication_client() -> auth.DictClient:
+    return auth.DictClient(
+        private_key_content="private_key",
+    )
+
+
+# TODO: need to use our authentication mechanism to generate jwt token and include it
+# TODO: into the headers, also create fixture for middlewares and use it
+@pytest.fixture()
 def headers() -> dict[str, str]:
-    return {
-        "Accept": "application/vnd.api+json",
-    }
+    return {"Content-Type": "application/vnd.api+json", "Authorization": "Bearer token"}
 
 
 @pytest.fixture()
@@ -129,9 +190,11 @@ def app(  # noqa: WPS211
     redis_repository: UserSessionRepository,
     transactions_repository: TransactionRepository,
     conversions_repository: ConversionRepository,
+    payment_client: PaymentClient,
 ) -> applications.Starlette:
     return _create_app(
         cc_client=cc_client,
+        payment_client=payment_client,
         currencies_client=currencies_client,
         authentication_client=authentication_client,
         quotations_repository=quotations_repository,
@@ -144,7 +207,7 @@ def app(  # noqa: WPS211
 
 
 @pytest.fixture()
-async def http_client(
+async def client(
     app: applications.Starlette,
     headers: Mapping[str, str],
 ) -> AsyncIterator[httpx.AsyncClient]:
