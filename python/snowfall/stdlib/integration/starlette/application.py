@@ -6,7 +6,7 @@ from typing import Any, Awaitable, Callable, Mapping, Optional, Sequence, cast
 import uvicorn
 from asgiref.typing import ASGIApplication
 from starlette import applications, exceptions, requests, responses, routing, status
-from starlette.middleware import Middleware
+from starlette.middleware import Middleware, errors
 
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import handlers, middlewares
@@ -39,7 +39,10 @@ def create_starlette_app(
             Middleware(
                 middlewares.ValidationMiddleware,
                 validator=validation.Validator(str(openapi_path)),
-                excluded_status_codes={http.HTTPStatus.METHOD_NOT_ALLOWED},
+                excluded_status_codes={
+                    http.HTTPStatus.METHOD_NOT_ALLOWED,
+                    http.HTTPStatus.INTERNAL_SERVER_ERROR,
+                },
                 validate_response=validate_response,
             ),
         )
@@ -52,6 +55,10 @@ def create_starlette_app(
         middleware=[
             *stack,
             *(custom_middlewares or []),
+            Middleware(
+                errors.ServerErrorMiddleware,
+                handler=handlers.server_error_handler,
+            ),
         ],
         exception_handlers={
             status.HTTP_500_INTERNAL_SERVER_ERROR: handlers.server_error_handler,
