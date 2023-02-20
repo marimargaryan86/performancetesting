@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package snowfall.stdlib.v1alpha;
+
+message GetSeatMapTask {
+  string offer_option_id = 1;
+}
+
+message SeatMapResult {}
