@@ -271,6 +271,10 @@ class SaveATrainAdapter(object):  # noqa: WPS214
             BookingError,
             SaveATrainAdapterError,
         ) as error:
+            self._logger.exception(
+                "Booking failed",
+                reason=repr(error),
+            )
             new_booking.MergeFrom(
                 order_models_pb2.Booking(
                     status=order_models_pb2.Booking.STATUS_ERROR,

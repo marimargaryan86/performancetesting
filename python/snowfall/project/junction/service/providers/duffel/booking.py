@@ -38,9 +38,14 @@ class BookingHandler(object):
 
         try:
             booking_result: Order = await self._make_booking(task=task, details=details)
-        except errors.ServiceError:
-            self._logger.exception()
+        except errors.ServiceError as error:
+            self._logger.exception(
+                "Booking failed",
+                reason=repr(error),
+            )
+
             new_booking.status = models_pb2.Booking.STATUS_ERROR
+            new_booking.raw_data = repr(error)
 
             return new_booking
 

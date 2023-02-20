@@ -74,6 +74,7 @@ class BookingHandler(object):
                 await self._log_exception(error)
 
             new_booking.status = models_pb2.Booking.STATUS_ERROR
+            new_booking.raw_data = repr(error)
 
             return new_booking
 
