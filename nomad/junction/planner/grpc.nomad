@@ -38,8 +38,8 @@ job "planner-grpc" {
     max_parallel      = 1
     auto_revert       = true
     auto_promote      = true
-    healthy_deadline  = "15m"
-    progress_deadline = "17m"
+    healthy_deadline  = "25m"
+    progress_deadline = "30m"
     canary            = 1
   }
 
