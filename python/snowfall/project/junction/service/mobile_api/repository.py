@@ -301,6 +301,7 @@ class OrdersRepository(
     _proto = models_pb2.MobileOrder
     _indexes = [
         pymongo.IndexModel("userId", background=True),
+        pymongo.IndexModel("created_at", background=True),
     ]
 
     async def get_user_orders(

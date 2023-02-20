@@ -1,5 +1,6 @@
 import contextlib
 import csv
+import datetime
 import io
 import random
 from typing import Any, Mapping, Sequence
@@ -7,6 +8,7 @@ from typing import Any, Mapping, Sequence
 import aiosmtplib
 import httpx
 import json_api_doc
+from dateutil import relativedelta
 from motor import motor_asyncio
 from pydantic import AnyUrl
 
@@ -55,25 +57,32 @@ async def orders_report(app: service.Application[Settings]) -> None:
     )
 
 
-async def _generate_report(
+async def _generate_report(  # noqa: WPS210
     orders_repository: motor_asyncio.AsyncIOMotorCollection,
     junction_client: client.JunctionClient,
 ) -> Sequence[Mapping[Any, Any]]:
-    with contextlib.suppress(httpx.HTTPStatusError):
-        junction_orders = [
-            json_api_doc.deserialize(
-                await junction_client.get_order_by_id(
-                    order["_id"],
-                    include=[
-                        "journey",
-                        "bookings",
-                        "bookings.details",
-                    ],
+    junction_orders = []
+    mobile_orders = orders_repository.find(
+        {
+            "created_at": {
+                "$gt": datetime.datetime.now() - relativedelta.relativedelta(months=1),
+            },
+        },
+    )
+    async for mobile_order in mobile_orders:
+        with contextlib.suppress(httpx.HTTPStatusError):
+            junction_orders.append(
+                json_api_doc.deserialize(
+                    await junction_client.get_order_by_id(
+                        mobile_order["_id"],
+                        include=[
+                            "journey",
+                            "bookings",
+                            "bookings.details",
+                        ],
+                    ),
                 ),
             )
-            async for order in orders_repository.find()
-        ]
-
     ret = []
     for order in junction_orders:
         bookings = order["bookings"]
