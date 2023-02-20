@@ -146,6 +146,24 @@ mypy_plugin = true
 [regex-lint]
 config = "@vendor/regexes.json"
 
+[shellcheck]
+version = "v0.9.0"
+known_versions = [
+    "v0.9.0|macos_arm64 |7d3730694707605d6e60cec4efcb79a0632d61babc035aa16cda1b897536acf5|4204804",
+    "v0.9.0|macos_x86_64|7d3730694707605d6e60cec4efcb79a0632d61babc035aa16cda1b897536acf5|4204804",
+    "v0.9.0|linux_arm64 |179c579ef3481317d130adebede74a34dbbc2df961a70916dd4039ebf0735fae|3110236",
+    "v0.9.0|linux_x86_64|700324c6dd0ebea0117591c6cc9d7350d9c7c5c287acbad7630fa17b1d4d9e2f|2351560",
+]
+
+[shfmt]
+version = "v3.6.0"
+known_versions = [
+    "v3.6.0|macos_arm64 |633f242246ee0a866c5f5df25cbf61b6af0d5e143555aca32950059cf13d91e0|3065202",
+    "v3.6.0|macos_x86_64|b8c9c025b498e2816b62f0b717f6032e9ab49e725a45b8205f52f66318f17185|3047552",
+    "v3.6.0|linux_arm64 |fb1cf0af3dbe9aac7d98e38e3c7426765208ecfe23cb2da51037bb234776fd70|2818048",
+    "v3.6.0|linux_x86_64|5741a02a641de7e56b8da170e71a97e58050d66a3cf485fb268d6a5a8bb74afb|2850816",
+]
+
 [source]
 root_patterns = [
     "/bash",
