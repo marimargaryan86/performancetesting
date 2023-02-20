@@ -18,6 +18,7 @@ from snowfall.vendor.carnect.models.service import (
 TIMEOUT = 50
 RENT_PERIOD_DAYS = 2
 PICKUP_DATE_IN_DAYS = 30
+DRIVER_AGE = 40
 NOON_HOURS = 12
 API_BASE_URL = "https://ota2007a.micronnexus-staging.com/service.asmx"
 HASH = "1nK9DFF9"
@@ -54,8 +55,10 @@ async def offers(
 ) -> List[VehicleVendorAvailabilityType]:
     rq = VehAvailRateRqBuilder(carnect_config)
 
+    rq.version("large")
     rq.rate_query_type(RateQueryType.LIVE)
     rq.rate_query_parameter_type("4")
+    rq.add_driver_age(DRIVER_AGE)
     rental_core = rq.get_rental_core()
     pickup_datetime = datetime.datetime.combine(
         datetime.datetime.now().date() + datetime.timedelta(days=PICKUP_DATE_IN_DAYS),

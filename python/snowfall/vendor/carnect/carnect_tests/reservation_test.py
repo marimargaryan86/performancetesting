@@ -13,6 +13,7 @@ from snowfall.vendor.carnect.builders.reservation_builder import (
     ReservationBuilder,
 )
 from snowfall.vendor.carnect.carnect_tests.carnect_test import disable_by_default
+from snowfall.vendor.carnect.carnect_tests.conftest import DRIVER_AGE
 from snowfall.vendor.carnect.client import CarnectClient
 from snowfall.vendor.carnect.config import Config
 from snowfall.vendor.carnect.models.service import (
@@ -79,7 +80,10 @@ def _init_test_driver(driver: CustomerPrimaryBuilder) -> None:  # noqa: WPS213
     driver.surname("Test")
     driver.given_name("Test")
     driver.email("testcheck@carnect.com")
-    driver.birth_date(datetime.date(year=1999, month=11, day=15))
+    age = datetime.timedelta(days=365 * DRIVER_AGE + 150)
+    driver.birth_date(
+        datetime.datetime.now().date() - age,
+    )
     driver.gender(CustomerTypeGender.MALE)
     driver.language("EN")
     driver.add_phone("5141234567")
