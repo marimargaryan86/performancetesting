@@ -21,5 +21,15 @@ class AccountResponseSchema(BaseSchema):
 class AccountDetailedResponseSchema(AccountResponseSchema):
     mobile: str
     active: bool
+    token: str
     created: Optional[int]
     modified: Optional[int]
+
+
+class AdminAccountDetailedResponseSchema(AccountDetailedResponseSchema):
+    admin: bool
+    staff: bool
+    support: bool
+    flirtboard: bool
+    stadler: bool
+    operator: bool

@@ -91,8 +91,15 @@ def account_factory(db_session: AsyncSession) -> Type[AsyncSQLAlchemyFactory]:
         ).decode()
         active = True
         mobile = Faker("phone_number")
+        token = Faker("md5")
         created = None
         modified = None
+        admin = False
+        staff = False
+        support = False
+        flirtboard = False
+        stadler = False
+        operator = False
 
     return AccountFactory
 

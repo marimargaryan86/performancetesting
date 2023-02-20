@@ -11,7 +11,11 @@ from snowfall.stdlib.integration.starlette import application
 
 def _factory() -> Callable[[], applications.Starlette]:
     def decorator() -> applications.Starlette:
-        fastapi_app = FastAPI()
+        fastapi_app = FastAPI(
+            title="PSS API",
+            description="The new api for PSS",
+            version="V2.0.0",
+        )
         fastapi_app.include_router(api_router.router)
         return fastapi_app
 

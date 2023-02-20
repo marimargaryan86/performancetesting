@@ -18,3 +18,16 @@ class AccountsService(object):
 
     async def get_account_by_email(self, email: str) -> Optional[Account]:
         return await self._repository.get_one_by_filter([Account.email == email])
+
+
+def has_admin_permissions(account: Account) -> bool:
+    return all(
+        [
+            account.staff,
+            account.admin,
+            account.support,
+            account.flirtboard,
+            account.stadler,
+            account.operator,
+        ],
+    )
