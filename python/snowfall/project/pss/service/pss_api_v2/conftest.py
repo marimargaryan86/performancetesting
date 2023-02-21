@@ -1,4 +1,4 @@
-from typing import AsyncGenerator, Type
+from typing import AsyncGenerator, Type, cast
 
 import bcrypt
 import pytest
@@ -6,16 +6,21 @@ from async_factory_boy.factory.sqlalchemy import AsyncSQLAlchemyFactory
 from factory import Faker, Sequence
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from pydantic.networks import AnyUrl, EmailStr
 from sqlalchemy import exc
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from starlette import applications
 
 from snowfall.project.pss.service.pss_api_v2.db.db import Base, InternalDBError, get_db
-from snowfall.project.pss.service.pss_api_v2.db.models.accounts import Account
+from snowfall.project.pss.service.pss_api_v2.db.models.accounts import (
+    Account,
+    AccountForgottenPassword,
+)
 from snowfall.project.pss.service.pss_api_v2.db.models.countries import Country
 from snowfall.project.pss.service.pss_api_v2.routes.api_router import (
     router as api_router,
 )
+from snowfall.project.pss.service.pss_api_v2.settings import Settings, get_settings
 
 SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite://"
 
@@ -48,6 +53,17 @@ def fast_api_app() -> applications.Starlette:
     return app
 
 
+def mock_settings() -> Settings:
+    return Settings(
+        mysql_dsn=cast(AnyUrl, "https://testmysqldsn.com"),
+        pss_v1_dsn=cast(AnyUrl, "https://testpssv1dsn.com"),
+        smtp_dsn=cast(AnyUrl, "https://testsmtpdsn.com"),
+        smtp_sender=cast(EmailStr, "test@test.com"),
+        smtp_starttls=False,
+        web_dsn=cast(AnyUrl, "https://test.com"),
+    )
+
+
 @pytest.fixture(scope="function")
 async def client(
     fast_api_app: FastAPI,
@@ -70,6 +86,7 @@ async def client(
                     await session.close()
 
     fast_api_app.dependency_overrides[get_db] = _get_test_db
+    fast_api_app.dependency_overrides[get_settings] = mock_settings
     with TestClient(fast_api_app) as client:
         yield client
 
@@ -117,3 +134,19 @@ def country_factory(db_session: AsyncSession) -> Type[AsyncSQLAlchemyFactory]:
         label = Sequence(lambda index: "country_label{index}".format(index=index))
 
     return CountryFactory
+
+
+@pytest.fixture(scope="function")
+def account_forgotten_password_factory(
+    db_session: AsyncSession,
+) -> Type[AsyncSQLAlchemyFactory]:
+    class AccountForgottenPasswordFactory(AsyncSQLAlchemyFactory):
+        class Meta:
+            model = AccountForgottenPassword
+            sqlalchemy_session = db_session
+            sqlalchemy_session_persistence = "commit"
+
+        account_id = Sequence(lambda index: index)
+        token = Faker("md5")
+
+    return AccountForgottenPasswordFactory

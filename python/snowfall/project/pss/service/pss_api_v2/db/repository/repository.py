@@ -1,15 +1,16 @@
-from typing import Any, Callable, Generic, Sequence, TypeVar
+from typing import Any, Callable, Dict, Generic, Sequence, TypeVar, Union
 
 from fastapi import Depends
-from sqlalchemy import ColumnElement, select
+from sqlalchemy import ColumnElement, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql._typing import _DMLColumnArgument  # noqa:WPS436,WPS450
 
 from snowfall.project.pss.service.pss_api_v2.db.db import get_db
 
 REPOSITORY_MODEL = TypeVar("REPOSITORY_MODEL")
 
 
-class Repository(Generic[REPOSITORY_MODEL]):
+class Repository(Generic[REPOSITORY_MODEL]):  # noqa:WPS214
     def __init__(self, db: AsyncSession):
         self._db = db
 
@@ -37,6 +38,29 @@ class Repository(Generic[REPOSITORY_MODEL]):
         statement = select(self._type).filter(*filter_criteria)
         res = await self._db.execute(statement)
         return res.scalars().first()
+
+    async def get_all_by_filter(
+        self,
+        filter_criteria: Sequence[ColumnElement[bool]],
+    ) -> Sequence[REPOSITORY_MODEL]:
+        statement = select(self._type).filter(*filter_criteria)
+        res = await self._db.execute(statement)
+        return res.scalars().all()
+
+    async def update_by_filter(
+        self,
+        filter_criteria: Sequence[ColumnElement[bool]],
+        values_to_update: Union[  # noqa:WPS320,SF20
+            Dict[_DMLColumnArgument, Any],  # noqa:SF20
+            Sequence[Any],
+        ],
+    ) -> None:
+        statement = update(self._type).values(values_to_update).where(*filter_criteria)
+        await self._db.execute(statement)
+
+    async def insert(self, to_insert: REPOSITORY_MODEL) -> None:
+        self._db.add(to_insert)
+        await self._db.commit()
 
     @property
     def _type(self) -> Any:

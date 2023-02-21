@@ -10,6 +10,7 @@ from snowfall.project.pss.service.pss_api_v2.responses import ErrorMessage
 from snowfall.project.pss.service.pss_api_v2.schemas import openapi_responses
 from snowfall.project.pss.service.pss_api_v2.schemas.accounts import (
     AccountDetailedResponseSchema,
+    AccountForgotPasswordSchema,
     AccountLoginSchema,
     AccountResponseSchema,
 )
@@ -55,3 +56,27 @@ async def account_login(
         )
 
     return account
+
+
+@router.post(
+    "/forgotpassword",
+    response_model=None,
+    responses=openapi_responses.forgot_password_responses,
+)
+async def forgot_password(
+    account_forgot_password_data: AccountForgotPasswordSchema,
+    account_service: AccountsService = Depends(AccountsService),
+) -> None | ErrorMessage:
+    account = await account_service.get_account_by_email(
+        account_forgot_password_data.email,
+    )
+
+    if account is None:
+        return ErrorMessage(
+            status_code=status.HTTP_404_NOT_FOUND,
+            message=messages.ACCOUNT_NOT_FOUND,
+        )
+
+    await account_service.handle_forgotten_password(account)
+
+    return None

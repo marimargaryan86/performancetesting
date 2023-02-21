@@ -18,6 +18,7 @@
 //     "aiomysql==0.1.1",
 //     "aiosmtplib==2.0.1",
 //     "aiosqlite==0.18.0",
+//     "alchemy-mock==0.4.3",
 //     "allure-python-commons==2.12.0",
 //     "asgiref==3.6.0",
 //     "async_factory_boy==1.0.0",
@@ -377,6 +378,28 @@
           ],
           "requires_python": ">=3.7",
           "version": "0.18"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "e076b11cdef76638f4de70d50f0d8cb851d69c41346d984371f757c8fb4a0efa",
+              "url": "https://files.pythonhosted.org/packages/16/e4/65807a46797083ec0b9971c7ed0459bd5b3b006d2c15d0d1737fc4364d22/alchemy_mock-0.4.3-py2.py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "7914c3f56aa7dd793d31a5ea3816972ff57de6e3c82651febfaab135e8f39d7a",
+              "url": "https://files.pythonhosted.org/packages/b6/26/41bd026d187020e2a16dbc9875b3f56b98c4d9732c6942f44e210535158b/alchemy-mock-0.4.3.tar.gz"
+            }
+          ],
+          "project_name": "alchemy-mock",
+          "requires_dists": [
+            "setuptools",
+            "six",
+            "sqlalchemy"
+          ],
+          "requires_python": null,
+          "version": "0.4.3"
         },
         {
           "artifacts": [
@@ -4316,6 +4339,7 @@
     "aiomysql==0.1.1",
     "aiosmtplib==2.0.1",
     "aiosqlite==0.18.0",
+    "alchemy-mock==0.4.3",
     "allure-python-commons==2.12.0",
     "asgiref==3.6.0",
     "async_factory_boy==1.0.0",
