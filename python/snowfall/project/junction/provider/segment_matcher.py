@@ -5,6 +5,7 @@ import datetime
 import zoneinfo
 from typing import Sequence
 
+import more_itertools
 import structlog
 
 from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
@@ -20,16 +21,20 @@ class Requirement(object):
     arrival_tz: zoneinfo.ZoneInfo
 
     @classmethod
-    def from_leg(cls, leg: models_pb2.Leg) -> Requirement:
-        origin_tz = zoneinfo.ZoneInfo(leg.origin.time_zone)
-        destination_tz = zoneinfo.ZoneInfo(leg.destination.time_zone)
+    def from_segment(cls, segment: models_pb2.Segment) -> Requirement:
+        first_leg = more_itertools.first(segment.legs)
+        last_leg = more_itertools.last(segment.legs)
+        origin_tz = zoneinfo.ZoneInfo(first_leg.origin.time_zone)
+        destination_tz = zoneinfo.ZoneInfo(last_leg.destination.time_zone)
 
         return cls(
-            departure_at=protobuf.protobuf_to_datetime(leg.departure_at).astimezone(
+            departure_at=protobuf.protobuf_to_datetime(
+                first_leg.departure_at,
+            ).astimezone(
                 origin_tz,
             ),
             departure_tz=origin_tz,
-            arrival_at=protobuf.protobuf_to_datetime(leg.arrival_at).astimezone(
+            arrival_at=protobuf.protobuf_to_datetime(last_leg.arrival_at).astimezone(
                 destination_tz,
             ),
             arrival_tz=destination_tz,
@@ -59,19 +64,15 @@ class SegmentMatcher(object):
         return True
 
     def _get_requirements(self) -> Sequence[Requirement]:
-        return [
-            Requirement.from_leg(leg)
-            for segment in self._segments
-            for leg in segment.legs
-        ]
+        return [Requirement.from_segment(segment) for segment in self._segments]
 
     def _segment_in_requirements(
         self,
         segment: offers_pb2.OfferSegment,
         requirement: Requirement,
     ) -> bool:
-        first_leg = segment.legs[0]
-        last_leg = segment.legs[-1]
+        first_leg = more_itertools.first(segment.legs)
+        last_leg = more_itertools.last(segment.legs)
 
         departure_at = protobuf.protobuf_to_datetime(first_leg.departure_at).astimezone(
             zoneinfo.ZoneInfo(first_leg.origin.time_zone),
