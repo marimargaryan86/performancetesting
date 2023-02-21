@@ -31,7 +31,7 @@ async def test_adapter(
         async for offer_group in search_adapter.gather_search_results(search_task)
     ]
 
-    offers = [offer for group in offer_groups for offer in group.offers]
+    offers = offer_groups[0].offers
     assert [offer.brand_name for offer in offers] == [
         "Economy Light",
         "Economy Essential",
@@ -55,27 +55,25 @@ async def test_offer_with_stop(
     )
 
     offer_response = OfferRequestResponse.parse_obj(json)
-    ba15_offer = next(
-        offer
-        for offer in offer_response.response_data.offers
-        if all(
-            segment.marketing_carrier_flight_number == "0015"
-            for offer_slice in offer.slices
-            for segment in offer_slice.segments
-        )
-    )
-    search_task = search_task_from_offer(ba15_offer)
+    offer = offer_response.response_data.offers[0]
+    search_task = search_task_from_offer(offer)
     offer_groups = [
         offer_group
         async for offer_group in search_adapter.gather_search_results(search_task)
     ]
 
     assert all(
-        segment.vehicle.number == "0015"
+        offer_group.segments[0].legs[0].origin.name  # noqa: WPS219
+        == "Heathrow Airport"
         for offer_group in offer_groups
-        for segment in offer_group.segments
     )
-    assert len(offer_groups[0].segments[0].legs) == 2
+    assert all(
+        offer_group.segments[-1].legs[-1].destination.name  # noqa: WPS219
+        == "Sydney Airport"
+        for offer_group in offer_groups
+    )
+
+    assert len(offer_groups[0].segments) == 2
 
 
 async def test_airline_validator(  # noqa: WPS210
@@ -111,7 +109,7 @@ async def test_airline_validator(  # noqa: WPS210
         async for offer_group in search_adapter_no_ba.gather_search_results(search_task)
     ]
 
-    assert not offer_groups
+    assert len(offer_groups) == 24
 
     offer_groups = [
         offer_group
@@ -119,7 +117,8 @@ async def test_airline_validator(  # noqa: WPS210
             search_task,
         )
     ]
-    assert offer_groups
+
+    assert len(offer_groups) == 7
 
     vs23_offer = next(
         offer
@@ -137,7 +136,7 @@ async def test_airline_validator(  # noqa: WPS210
         async for offer_group in search_adapter_no_ba.gather_search_results(search_task)
     ]
 
-    assert offer_groups
+    assert len(offer_groups) == 24
 
     offer_groups = [
         offer_group
@@ -146,4 +145,4 @@ async def test_airline_validator(  # noqa: WPS210
         )
     ]
 
-    assert not offer_groups
+    assert len(offer_groups) == 7

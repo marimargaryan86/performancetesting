@@ -11,9 +11,6 @@ from snowfall.project.junction.service.providers.distribusion import cache, stat
 from snowfall.project.junction.service.providers.distribusion.search.adapter import (
     DistribusionSearchAdapter,
 )
-from snowfall.project.junction.service.providers.distribusion.search.validator import (
-    ConnectionValidator,
-)
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.vendor.distribusion import client
 from snowfall.vendor.distribusion.httpx_logger import with_logging
@@ -63,7 +60,6 @@ def distribusion_search_adapter(
 ) -> DistribusionSearchAdapter:
     return DistribusionSearchAdapter(
         distribusion_client=distribusion_client,
-        connection_validator=ConnectionValidator(),
         offers_cache=offer_cache,
         ttl=datetime.timedelta(minutes=10),
     )

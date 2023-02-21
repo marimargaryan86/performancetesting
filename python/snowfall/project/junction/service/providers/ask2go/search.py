@@ -6,7 +6,6 @@ from collections.abc import AsyncIterator
 
 import structlog
 
-from snowfall.project.junction.service.providers.ask2go import models, validator
 from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
@@ -40,13 +39,11 @@ class Adapter(object):
     def __init__(
         self,
         ask2go_client: client.Ask2GoClient,
-        offer_validator: validator.OfferValidator,
         poll_retries_limit: int = 10,
         wait_time_between_polling: float = 2,
     ):
         self._client = ask2go_client
         self._poll_retries_limit = poll_retries_limit
-        self._validator = offer_validator
         self._wait_time_between_polling = wait_time_between_polling
         self._logger = structlog.get_logger(__name__)
 
@@ -55,9 +52,8 @@ class Adapter(object):
         search_task: amqp_pb2.SearchCriteriaTask,
     ) -> AsyncIterator[offers.Offer]:
         identifiers = await self._make_search(search_task)
-        requirements = models.requirements_from_segments(search_task.segments)
 
-        async for offer in self._gather_offers(identifiers, requirements):
+        async for offer in self._gather_offers(identifiers):
             yield offer
 
     async def _make_search(
@@ -93,13 +89,11 @@ class Adapter(object):
     async def _gather_offers(
         self,
         identifiers: search.CreateSearchResponse,
-        requirements: models.Requirements,
     ) -> AsyncIterator[offers.Offer]:
         async for result_page in self._yield_pages(identifiers=identifiers):
             for offer in result_page.flight:
-                if offer.id and self._validator.matches(offer, requirements):
-                    offer.search_id = identifiers.id
-                    yield offer
+                offer.search_id = identifiers.id
+                yield offer
 
     async def _yield_pages(
         self,

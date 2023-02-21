@@ -23,7 +23,6 @@ from snowfall.project.junction.service.providers.ask2go import (
     pricing,
     search,
     transformer,
-    validator,
 )
 from snowfall.stdlib import h3
 from snowfall.stdlib.persistence import filesystem
@@ -130,18 +129,11 @@ def mongo_client() -> motor_asyncio.AsyncIOMotorClient:
 
 
 @pytest.fixture
-def offer_validator() -> validator.OfferValidator:
-    return validator.OfferValidator()
-
-
-@pytest.fixture
 def search_adapter(
     ask2go_client: client.Ask2GoClient,
-    offer_validator: validator.OfferValidator,
 ) -> search.Adapter:
     return search.Adapter(
         ask2go_client=ask2go_client,
-        offer_validator=offer_validator,
         poll_retries_limit=1,
         wait_time_between_polling=0,
     )

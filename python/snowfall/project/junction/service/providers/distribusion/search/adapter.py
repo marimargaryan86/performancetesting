@@ -2,17 +2,13 @@ import datetime
 import zoneinfo
 from typing import AsyncIterator, Collection, List, Optional, Sequence
 
-import more_itertools
 import structlog
 
 from snowfall.project.junction.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
 from snowfall.project.junction.service.providers.distribusion import cache
-from snowfall.project.junction.service.providers.distribusion.search import (
-    amenities,
-    validator,
-)
+from snowfall.project.junction.service.providers.distribusion.search import amenities
 from snowfall.project.junction.service.providers.distribusion.v1alpha import amqp_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
@@ -179,13 +175,11 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
         self,
         distribusion_client: client.DistribusionClient,
         offers_cache: cache.OffersCache,
-        connection_validator: validator.ConnectionValidator,
         ttl: datetime.timedelta,
     ) -> None:
         self._client = distribusion_client
         self._offers_cache = offers_cache
         self._ttl = ttl
-        self._validator = connection_validator
         self._logger = structlog.get_logger(__name__)
 
     async def gather_search_results(
@@ -218,7 +212,6 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
         search_task: amqp_pb2.SearchCriteriaTask,
         connection_list: Sequence[connections.Connection],
     ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
-        requirements = validator.requirements_from_segments(search_task.segments)
         expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
         carriers = MarketingCarrierAdapters()
 
@@ -235,14 +228,9 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
                 departure_time=connection.departure_time,
                 arrival_time=connection.arrival_time,
             )
-            if (  # noqa: WPS337
-                self._validator.matches(connection, requirements)
-                and not connection.booked_out
-                and connection.marketing_carrier is not None
-            ):
+            if not connection.booked_out and connection.marketing_carrier is not None:
                 offer_group = await self._parse_connection(
                     connection,
-                    search_task.segments,
                     carriers.get_adapter(connection.marketing_carrier),
                     expires_at,
                 )
@@ -252,12 +240,11 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
     async def _parse_connection(
         self,
         connection: connections.Connection,
-        search_segments: Sequence[models_pb2.Segment],
         carrier: MarketingCarrierAdapter,
         expires_at: datetime.datetime,
     ) -> offer_models_pb2.OfferGroup:
         offers = list[offer_models_pb2.Offer]()
-        segments = self._parse_segments(connection, search_segments, carrier)
+        segments = self._parse_segments(connection, carrier)
         passenger_types = carrier.passenger_types()
 
         for fare in connection.fares or []:
@@ -314,15 +301,13 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
     def _parse_segments(
         self,
         connection: connections.Connection,
-        search_segments: Sequence[models_pb2.Segment],
         carrier: MarketingCarrierAdapter,
     ) -> Sequence[offer_models_pb2.OfferSegment]:
         segments = list[offer_models_pb2.OfferSegment]()
 
-        for offer_segment, search_segment in zip(connection.segments, search_segments):
+        for offer_segment in connection.segments:
             leg = self._parse_leg(
                 offer_segment,
-                more_itertools.first(search_segment.legs),
             )
             operator = (
                 offer_segment.operating_carrier.code
@@ -332,7 +317,6 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
             segments.append(
                 offer_models_pb2.OfferSegment(
                     id=string.uuid(),
-                    segment_id=search_segment.id,
                     legs=[leg],
                     vehicle=self._parse_vehicle(offer_segment),
                     operator=operator or carrier.get_code(),
@@ -362,7 +346,6 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
     def _parse_leg(
         self,
         offer_segment: connections.Segment,
-        search_leg: models_pb2.Leg,
     ) -> offer_models_pb2.OfferSegmentLeg:
         origin = offer_segment.departure_station
         destination = offer_segment.arrival_station
@@ -370,29 +353,17 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
         arrival_time = offer_segment.arrival_time or ""
 
         return offer_models_pb2.OfferSegmentLeg(
-            id=search_leg.id,
-            origin=self._parse_point(origin, search_leg.origin),
-            destination=self._parse_point(destination, search_leg.destination),
+            id=string.uuid(),
+            origin=self._parse_point(origin),
+            destination=self._parse_point(destination),
             departure_at=protobuf.datetime_to_protobuf(
                 datetime.datetime.fromisoformat(departure_time).replace(
-                    tzinfo=zoneinfo.ZoneInfo(
-                        (
-                            origin.time_zone
-                            if origin.time_zone
-                            else search_leg.origin.time_zone
-                        ),
-                    ),
+                    tzinfo=zoneinfo.ZoneInfo(origin.time_zone),
                 ),
             ),
             arrival_at=protobuf.datetime_to_protobuf(
                 datetime.datetime.fromisoformat(arrival_time).replace(
-                    tzinfo=zoneinfo.ZoneInfo(
-                        (
-                            destination.time_zone
-                            if destination.time_zone
-                            else search_leg.destination.time_zone
-                        ),
-                    ),
+                    tzinfo=zoneinfo.ZoneInfo(destination.time_zone),
                 ),
             ),
         )
@@ -400,16 +371,15 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
     def _parse_point(
         self,
         station: connections.Station,
-        search_point: models_pb2.Point,
     ) -> models_pb2.Point:
         return models_pb2.Point(
             ref=station.code,
             name=station.name or "",
             coordinates=models_pb2.Coordinates(
-                latitude=station.latitude or search_point.coordinates.latitude,
-                longitude=station.longitude or search_point.coordinates.longitude,
+                latitude=station.latitude,
+                longitude=station.longitude,
             ),
-            time_zone=station.time_zone or search_point.time_zone,
+            time_zone=station.time_zone,
         )
 
     def _parse_amenities(

@@ -7,9 +7,9 @@ from typing import Sequence
 
 import structlog
 
+from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2
-from snowfall.vendor.distribusion.models import connections
 
 
 @dataclasses.dataclass(frozen=True)
@@ -36,68 +36,67 @@ class Requirement(object):
         )
 
 
-Requirements = Sequence[Requirement]
-
-
-def requirements_from_segments(segments: Sequence[models_pb2.Segment]) -> Requirements:
-    return [Requirement.from_leg(leg) for segment in segments for leg in segment.legs]
-
-
-class ConnectionValidator(object):
-    def __init__(self) -> None:
+class SegmentMatcher(object):
+    def __init__(self, segments: Sequence[models_pb2.Segment]) -> None:
+        self._segments = segments
         self._logger = structlog.get_logger(__name__)
 
-    def matches(
-        self,
-        connection: connections.Connection,
-        requirements: Requirements,
-    ) -> bool:
-        if not connection.segments:
+    def offer_group_matches(self, offer_group: offers_pb2.OfferGroup) -> bool:
+        requirements = self._get_requirements()
+
+        if len(self._segments) != len(offer_group.segments):
             return False
 
-        if len(requirements) != len(connection.segments):
-            return False  # make sure all requirements are matched
-
-        for segment_index, segment in enumerate(connection.segments):
-            requirement = requirements[segment_index]
+        for segment_index, segment in enumerate(offer_group.segments):
+            try:
+                requirement = requirements[segment_index]
+            except IndexError:
+                return False
 
             if not self._segment_in_requirements(segment, requirement):
                 return False
 
         return True
 
+    def _get_requirements(self) -> Sequence[Requirement]:
+        return [
+            Requirement.from_leg(leg)
+            for segment in self._segments
+            for leg in segment.legs
+        ]
+
     def _segment_in_requirements(
         self,
-        segment: connections.Segment,
+        segment: offers_pb2.OfferSegment,
         requirement: Requirement,
     ) -> bool:
-        if not segment.departure_time or not segment.arrival_time:
-            return False
+        first_leg = segment.legs[0]
+        last_leg = segment.legs[-1]
 
-        departure_at = datetime.datetime.fromisoformat(segment.departure_time).replace(
-            tzinfo=requirement.departure_tz,
+        departure_at = protobuf.protobuf_to_datetime(first_leg.departure_at).astimezone(
+            zoneinfo.ZoneInfo(first_leg.origin.time_zone),
         )
 
         if departure_at != requirement.departure_at:
             self._logger.debug(
                 "Departure times do not match",
-                origin=segment.departure_station.code,
-                destination=segment.arrival_station.code,
+                origin=first_leg.origin.name,
+                destination=first_leg.destination.name,
                 requirement_departure_at=requirement.departure_at.isoformat(),
                 offer_departure_at=departure_at.isoformat(),
             )
 
             return False
 
-        arrival_at = datetime.datetime.fromisoformat(segment.arrival_time).replace(
-            tzinfo=requirement.arrival_tz,
+        arrival_at = protobuf.protobuf_to_datetime(last_leg.arrival_at).astimezone(
+            zoneinfo.ZoneInfo(last_leg.destination.time_zone),
         )
 
         if arrival_at != requirement.arrival_at:
             self._logger.debug(
                 "Arrival times do not match",
-                origin=segment.departure_station.code,
-                destination=segment.arrival_station.code,
+                origin=last_leg.origin.name,
+                destination=last_leg.destination.name,
                 requirement_arrival_at=requirement.arrival_at.isoformat(),
                 offer_arrival_at=arrival_at.isoformat(),
             )

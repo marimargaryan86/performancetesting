@@ -1,9 +1,10 @@
-from typing import AsyncIterator, Callable, Generic, TypeVar
+from typing import AsyncIterator, Callable, Generic, Sequence, TypeVar
 
 from google.protobuf import message
 
 from snowfall.project.junction.provider import status
 from snowfall.project.junction.provider.repository import OfferGroupRepository
+from snowfall.project.junction.provider.segment_matcher import SegmentMatcher
 from snowfall.project.junction.service.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
 from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.stdlib.persistence.redis import types as redis_types
@@ -12,6 +13,7 @@ from snowfall.stdlib.transport.amqp import producer as amqp_producer
 from snowfall.stdlib.transport.amqp import trackable
 from snowfall.stdlib.transport.amqp import types as amqp_types
 from snowfall.stdlib.v1alpha import amqp_pb2 as stdlib_amqp_pb2
+from snowfall.stdlib.v1alpha import models_pb2
 
 _Proto = TypeVar("_Proto", bound=message.Message)
 TripOfferSearchMessages = (
@@ -107,6 +109,14 @@ def create_trip_offer_search_consumer(
     )
 
 
+def set_segment_ids(
+    search_segments: Sequence[models_pb2.Segment],
+    offer: offers_pb2.OfferGroup,
+) -> None:
+    for segment_index, segment in enumerate(offer.segments):
+        segment.segment_id = search_segments[segment_index].id
+
+
 class SearchCriteriaConsumer(Generic[_Proto]):
     def __init__(
         self,
@@ -126,14 +136,24 @@ class SearchCriteriaConsumer(Generic[_Proto]):
         amqp_message: amqp_types.Message[_Proto],
     ) -> None:
         # todo: shared protobuf, or type intersection support in Python
-        if not hasattr(amqp_message.body, "offer_search_id"):  # noqa: WPS421
+        if not hasattr(  # noqa: WPS421, WPS337
+            amqp_message.body,
+            "segments",
+        ) or not hasattr(  # noqa: WPS421
+            amqp_message.body,
+            "offer_search_id",
+        ):
             raise TypeError
 
+        segment_matcher = SegmentMatcher(amqp_message.body.segments)
+
         async for cached_offer_group in self._offer_group_repository.find(amqp_message):
-            await self._producer.publish(
-                msg=offers_amqp_pb2.TripOfferSearchResult(
-                    offer_search_id=amqp_message.body.offer_search_id,
-                    offer=cached_offer_group,
-                ),
-                routing_key="offers.result.trip",
-            )
+            if segment_matcher.offer_group_matches(cached_offer_group):
+                set_segment_ids(amqp_message.body.segments, cached_offer_group)
+                await self._producer.publish(
+                    msg=offers_amqp_pb2.TripOfferSearchResult(
+                        offer_search_id=amqp_message.body.offer_search_id,
+                        offer=cached_offer_group,
+                    ),
+                    routing_key="offers.result.trip",
+                )

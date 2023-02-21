@@ -119,7 +119,6 @@ class OfferTransformer(object):  # noqa: WPS214
                 segment,
                 self._segment_to_proto(
                     segment=segment,
-                    search_segment=search_task.segments[segment_index],
                 ),
             )
             for segment_index, segment in enumerate(
@@ -345,7 +344,6 @@ class OfferTransformer(object):  # noqa: WPS214
     def _segment_to_proto(
         self,
         segment: offers.TripSegment,
-        search_segment: models_pb2.Segment,
     ) -> offers_pb2.OfferSegment:
         origin = self._airports.get_by_iata(segment.origin.airport_code)
         destination = self._airports.get_by_iata(segment.destination.airport_code)
@@ -353,10 +351,9 @@ class OfferTransformer(object):  # noqa: WPS214
         # todo: does not handle multi-leg flights?
         return offers_pb2.OfferSegment(
             id=string.uuid(),
-            segment_id=search_segment.id,
             legs=[
                 offers_pb2.OfferSegmentLeg(
-                    id=leg.id,
+                    id=string.uuid(),
                     origin=models_pb2.Point(
                         ref=origin.identifier,
                         name=origin.airport_name or "",
@@ -385,8 +382,7 @@ class OfferTransformer(object):  # noqa: WPS214
                             tzinfo=destination.timezone,
                         ),
                     ),
-                )
-                for leg in search_segment.legs
+                ),
             ],
             vehicle=offers_pb2.Vehicle(
                 equipment=segment.aircraft.equipment,

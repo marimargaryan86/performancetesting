@@ -9,10 +9,7 @@ from snowfall.project.junction.service.providers.distribusion import cache
 from snowfall.project.junction.service.providers.distribusion.config import (
     SearchesSettings,
 )
-from snowfall.project.junction.service.providers.distribusion.search import (
-    adapter,
-    validator,
-)
+from snowfall.project.junction.service.providers.distribusion.search import adapter
 from snowfall.project.junction.service.providers.distribusion.v1alpha import amqp_pb2
 from snowfall.stdlib import service
 from snowfall.stdlib.persistence.redis import types as redis
@@ -71,7 +68,6 @@ async def searches(app: service.Application[SearchesSettings]) -> None:  # noqa:
                 offer_group_cache_key_func=adapter.offer_group_cache_key,
                 offer_group_generator=adapter.DistribusionSearchAdapter(
                     distribusion_client=distribusion_client,
-                    connection_validator=validator.ConnectionValidator(),
                     offers_cache=cache.OffersCache(
                         client=redis.Client(redis_connection, prefix=app.name),
                     ),

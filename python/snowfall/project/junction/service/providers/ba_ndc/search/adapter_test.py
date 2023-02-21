@@ -38,7 +38,7 @@ async def test_adapter(
             async for offer_group in search_adapter.gather_search_results(search_task)
         ]
 
-        assert len(offer_groups) == 1
+        assert len(offer_groups) == 15
         assert len(offer_groups[0].offers) == 4
         assert offer_groups[0].offers[0].brand_name == "BASIC"
         assert offer_groups[0].offers[2].brand_name == "PLUS SELECT"

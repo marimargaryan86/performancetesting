@@ -7,7 +7,6 @@ from snowfall.project.junction.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
 from snowfall.project.junction.service.providers.duffel import cache, enums
-from snowfall.project.junction.service.providers.duffel.v1alpha import amqp_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2
@@ -26,7 +25,6 @@ class OfferParser(object):  # noqa: WPS214
 
     async def parse_offer_group(
         self,
-        search_task: amqp_pb2.SearchCriteriaTask,
         offers: Sequence[Offer],
     ) -> offer_models_pb2.OfferGroup | None:
         if not offers:
@@ -36,7 +34,6 @@ class OfferParser(object):  # noqa: WPS214
         offer_segments = [
             self._segment_to_proto(
                 segment=segment,
-                search_segment=search_task.segments[segment_index],
             )
             for segment_index, segment in enumerate(
                 itertools.chain(
@@ -68,16 +65,14 @@ class OfferParser(object):  # noqa: WPS214
     def _segment_to_proto(
         self,
         segment: OfferSliceSegment,
-        search_segment: models_pb2.Segment,
     ) -> offer_models_pb2.OfferSegment:
         offer_legs = segment_to_legs(segment)
 
         return offer_models_pb2.OfferSegment(
             id=string.uuid(),
-            segment_id=search_segment.id,
             legs=[
                 offer_models_pb2.OfferSegmentLeg(
-                    id=search_leg.id,
+                    id=string.uuid(),
                     origin=models_pb2.Point(
                         ref=offer_leg.origin.iata_code or "",
                         name=offer_leg.origin.name,
@@ -107,7 +102,7 @@ class OfferParser(object):  # noqa: WPS214
                         ),
                     ),
                 )
-                for offer_leg, search_leg in zip(offer_legs, search_segment.legs)
+                for offer_leg in offer_legs
             ],
             vehicle=offer_models_pb2.Vehicle(
                 equipment=segment.aircraft.identifier if segment.aircraft else "",

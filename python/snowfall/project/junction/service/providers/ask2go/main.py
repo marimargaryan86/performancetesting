@@ -29,7 +29,6 @@ from snowfall.project.junction.service.providers.ask2go import (
     pricing,
     search,
     transformer,
-    validator,
 )
 from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
 from snowfall.stdlib import h3, service
@@ -219,7 +218,6 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                 offer_group_generator=a2g_offers.offer_group_generator(
                     a2g_adapter=search.Adapter(
                         ask2go_client=ask2go_client,
-                        offer_validator=validator.OfferValidator(),
                         poll_retries_limit=app.settings.poll_retries_limit,
                         wait_time_between_polling=app.settings.wait_time_between_polling,
                     ),

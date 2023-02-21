@@ -11,7 +11,6 @@ from snowfall.project.junction.service.providers.duffel import cache
 from snowfall.project.junction.service.providers.duffel.search.parser import OfferParser
 from snowfall.project.junction.service.providers.duffel.search.validator import (
     AirlineValidator,
-    OfferValidator,
     Validators,
 )
 from snowfall.project.junction.service.providers.duffel.v1alpha import amqp_pb2
@@ -106,14 +105,12 @@ class DuffelSearchAdapter(object):
 
         if res.offers:
             validator = Validators(
-                OfferValidator.from_segments(search_task.segments),
                 self._airline_validator,
             )
             grouped_offers = OfferGrouper.group_offers(res.offers, validator.matches)
 
             for offers in grouped_offers.values():
                 offer_group = await self._offer_parser.parse_offer_group(
-                    search_task,
                     offers,
                 )
 

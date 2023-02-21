@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import AsyncIterator, Callable, List, Mapping
+from typing import AsyncIterator, List, Mapping
 
 import structlog
 
@@ -8,7 +8,7 @@ from snowfall.project.junction.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
 from snowfall.project.junction.service.providers.ba_ndc import cache
-from snowfall.project.junction.service.providers.ba_ndc.search import parser, validator
+from snowfall.project.junction.service.providers.ba_ndc.search import parser
 from snowfall.project.junction.service.providers.ba_ndc.v1alpha import amqp_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
@@ -94,13 +94,11 @@ class OfferGrouper(object):
     def group_offers(
         cls,
         offers_adapter: OffersResponseAdapter,
-        offer_validator: Callable[[response_offer_search_schemas.Offer], bool],
     ) -> Mapping[str, List[response_offer_search_schemas.Offer]]:
         offer_groups = defaultdict[str, list[response_offer_search_schemas.Offer]](list)
 
         for offer in offers_adapter.get_offers() or []:
-            if offer_validator(offer):
-                offer_groups[cls._offer_key(offer, offers_adapter)].append(offer)
+            offer_groups[cls._offer_key(offer, offers_adapter)].append(offer)
 
         return offer_groups
 
@@ -161,18 +159,10 @@ class BaNdcSearchAdapter(object):
         )
 
         if res.get_offers():
-            offer_validator = validator.OfferValidator.from_segments(
-                search_task.segments,
-                res.segments,
-            )
-            grouped_offers = OfferGrouper.group_offers(
-                res,
-                offer_validator.matches,
-            )
+            grouped_offers = OfferGrouper.group_offers(res)
 
             for offers in grouped_offers.values():
                 offer_group = await self._offer_parser.parse_offer_group(
-                    search_task,
                     offers,
                     res,
                 )

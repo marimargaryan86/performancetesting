@@ -4,7 +4,6 @@ import datetime
 from typing import AsyncIterator, Optional, Sequence
 
 import httpx
-import more_itertools
 import phonenumbers
 import pycountry
 import structlog
@@ -32,8 +31,6 @@ from snowfall.vendor.save_a_train import client, enums, exceptions
 from snowfall.vendor.save_a_train.models import (
     booking,
     request,
-    search,
-    search_result_details,
     search_result_selection,
 )
 
@@ -125,137 +122,119 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                 raise_http_error_with_text(http_error)
             raise http_error
 
-        requirement = models.SearchResultRequirement(
-            departure_datetime=protobuf.protobuf_to_datetime(
-                search_task.criteria.departure_datetime,
-            ),
-            arrival_datetime=protobuf.protobuf_to_datetime(
-                search_task.criteria.arrival_datetime,
-            ),
-        )
         for search_result in search_response.search_results:
-            if self._search_result_matches_requirements(search_result, requirement):
-                try:
-                    search_details = await self._client.get_search_result_details(
-                        request.SearchResultRequest(
-                            search_id=search_response.identifier,
-                            search_result_id=search_result.identifier,
-                        ),
-                    )
-                except exceptions.SATValidationError:
-                    continue
-                except httpx.HTTPStatusError:
-                    continue
-
-                if not self._search_details_transfers_matches_segments(  # noqa: WPS337
-                    search_details.transfers,
-                    search_task.segments,
-                ):
-                    continue
-
-                expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
-                offer_segment_id = string.uuid()
-
-                yield offer_models_pb2.OfferGroup(
-                    id=string.uuid(),
-                    expires_at=protobuf.datetime_to_protobuf(expires_at),
-                    offers=[
-                        offer_models_pb2.Offer(
-                            id=await self._offers_cache.store(
-                                cache.OfferDetails(
-                                    search_id=search_response.identifier,
-                                    search_result_id=search_result.identifier,
-                                    transfer_id=transfer.identifier,
-                                    fare_id=transfer_fare.identifier,
-                                    price=transfer_fare.price,
-                                    currency="EUR",
-                                ),
-                                expires_at=expires_at,
-                            ),
-                            segment_details=[
-                                offer_models_pb2.OfferSegmentDetails(
-                                    id=string.uuid(),
-                                    offer_segment_id=offer_segment_id,
-                                    cabin_class=models_pb2.CabinClass(
-                                        type=await self._cabin_mapping.resolve_cabin_class(
-                                            fare_brand=transfer_fare.name,
-                                            operator=_resolve_train_operator(
-                                                train_category=transfer_change.train.category,
-                                                train_number=transfer_change.train.number,
-                                            ),
-                                        ),
-                                        marketing_name=transfer_fare.name.replace(
-                                            "_",
-                                            " ",
-                                        ).capitalize(),
-                                    ),
-                                ),
-                            ],
-                            price=money.from_string(
-                                string_amount=transfer_fare.price,
-                                currency=money.Currency("EUR"),
-                            ).protobuf(),
-                            brand_name=transfer_fare.name.replace(
-                                "_",
-                                " ",
-                            ).capitalize(),
-                        )
-                        for transfer in search_details.transfers
-                        for transfer_fare, transfer_change in zip(
-                            transfer.fares,
-                            transfer.changes,
-                        )
-                    ],
-                    segments=[
-                        offer_models_pb2.OfferSegment(
-                            id=offer_segment_id,
-                            segment_id=search_task.segments[0].id,
-                            vehicle=offer_models_pb2.Vehicle(
-                                number=transfer_change.train.number or "",
-                            ),
-                            vendor=transfer_change.train.category or "",
-                            type=models_pb2.Schedule.TYPE_RAIL,
-                            legs=[
-                                offer_models_pb2.OfferSegmentLeg(
-                                    id=more_itertools.first(
-                                        more_itertools.first(search_task.segments).legs,
-                                    ).id,
-                                    origin=models_pb2.Point(
-                                        ref=origin.identifier,
-                                        name=str(origin.name),
-                                        coordinates=models_pb2.Coordinates(
-                                            latitude=origin.latitude,
-                                            longitude=origin.longitude,
-                                        ),
-                                        time_zone=origin.timezone.key,
-                                    ),
-                                    destination=models_pb2.Point(
-                                        ref=destination.identifier,
-                                        name=str(destination.name),
-                                        coordinates=models_pb2.Coordinates(
-                                            latitude=destination.latitude,
-                                            longitude=destination.longitude,
-                                        ),
-                                        time_zone=destination.timezone.key,
-                                    ),
-                                    departure_at=protobuf.datetime_to_protobuf(
-                                        search_result.departure_datetime.replace(
-                                            tzinfo=origin.timezone,
-                                        ),
-                                    ),
-                                    arrival_at=protobuf.datetime_to_protobuf(
-                                        search_result.arrival_datetime.replace(
-                                            tzinfo=destination.timezone,
-                                        ),
-                                    ),
-                                ),
-                            ],
-                        )
-                        for transfer in search_details.transfers
-                        for transfer_change in transfer.changes
-                        if transfer_change.transport_type == "train"
-                    ],
+            try:
+                search_details = await self._client.get_search_result_details(
+                    request.SearchResultRequest(
+                        search_id=search_response.identifier,
+                        search_result_id=search_result.identifier,
+                    ),
                 )
+            except exceptions.SATValidationError:
+                continue
+            except httpx.HTTPStatusError:
+                continue
+
+            expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
+            offer_segment_id = string.uuid()
+
+            yield offer_models_pb2.OfferGroup(
+                id=string.uuid(),
+                expires_at=protobuf.datetime_to_protobuf(expires_at),
+                offers=[
+                    offer_models_pb2.Offer(
+                        id=await self._offers_cache.store(
+                            cache.OfferDetails(
+                                search_id=search_response.identifier,
+                                search_result_id=search_result.identifier,
+                                transfer_id=transfer.identifier,
+                                fare_id=transfer_fare.identifier,
+                                price=transfer_fare.price,
+                                currency="EUR",
+                            ),
+                            expires_at=expires_at,
+                        ),
+                        segment_details=[
+                            offer_models_pb2.OfferSegmentDetails(
+                                id=string.uuid(),
+                                offer_segment_id=offer_segment_id,
+                                cabin_class=models_pb2.CabinClass(
+                                    type=await self._cabin_mapping.resolve_cabin_class(
+                                        fare_brand=transfer_fare.name,
+                                        operator=_resolve_train_operator(
+                                            train_category=transfer_change.train.category,
+                                            train_number=transfer_change.train.number,
+                                        ),
+                                    ),
+                                    marketing_name=transfer_fare.name.replace(
+                                        "_",
+                                        " ",
+                                    ).capitalize(),
+                                ),
+                            ),
+                        ],
+                        price=money.from_string(
+                            string_amount=transfer_fare.price,
+                            currency=money.Currency("EUR"),
+                        ).protobuf(),
+                        brand_name=transfer_fare.name.replace(
+                            "_",
+                            " ",
+                        ).capitalize(),
+                    )
+                    for transfer in search_details.transfers
+                    for transfer_fare, transfer_change in zip(
+                        transfer.fares,
+                        transfer.changes,
+                    )
+                ],
+                segments=[
+                    offer_models_pb2.OfferSegment(
+                        id=offer_segment_id,
+                        vehicle=offer_models_pb2.Vehicle(
+                            number=transfer_change.train.number or "",
+                        ),
+                        vendor=transfer_change.train.category or "",
+                        type=models_pb2.Schedule.TYPE_RAIL,
+                        legs=[
+                            offer_models_pb2.OfferSegmentLeg(
+                                id=string.uuid(),
+                                origin=models_pb2.Point(
+                                    ref=origin.identifier,
+                                    name=str(origin.name),
+                                    coordinates=models_pb2.Coordinates(
+                                        latitude=origin.latitude,
+                                        longitude=origin.longitude,
+                                    ),
+                                    time_zone=origin.timezone.key,
+                                ),
+                                destination=models_pb2.Point(
+                                    ref=destination.identifier,
+                                    name=str(destination.name),
+                                    coordinates=models_pb2.Coordinates(
+                                        latitude=destination.latitude,
+                                        longitude=destination.longitude,
+                                    ),
+                                    time_zone=destination.timezone.key,
+                                ),
+                                departure_at=protobuf.datetime_to_protobuf(
+                                    search_result.departure_datetime.replace(
+                                        tzinfo=origin.timezone,
+                                    ),
+                                ),
+                                arrival_at=protobuf.datetime_to_protobuf(
+                                    search_result.arrival_datetime.replace(
+                                        tzinfo=destination.timezone,
+                                    ),
+                                ),
+                            ),
+                        ],
+                    )
+                    for transfer in search_details.transfers
+                    for transfer_change in transfer.changes
+                    if transfer_change.transport_type == "train"
+                ],
+            )
 
     async def create_booking(
         self,
@@ -402,43 +381,6 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                 )
 
         return response.search_identifier, seat_preference_code
-
-    def _search_details_transfers_matches_segments(
-        self,
-        transfers: Sequence[search_result_details.SearchResultTransfer],
-        segments: Sequence[models_pb2.Segment],
-    ) -> bool:
-        return len(transfers) == len(segments)
-
-    def _search_result_matches_requirements(
-        self,
-        search_result: search.SearchResult,
-        requirement: models.SearchResultRequirement,
-    ) -> bool:
-        departure_at = search_result.departure_datetime.replace(
-            tzinfo=requirement.departure_datetime.tzinfo,
-        )
-
-        if abs((departure_at - requirement.departure_datetime).seconds // 60) > 10:
-            self._logger.info(
-                "Departure times do not match",
-                requirement_departure_datetime=requirement.departure_datetime.isoformat(),
-                offer_departure_datetime=departure_at.isoformat(),
-            )
-            return False
-
-        arrival_datetime = search_result.arrival_datetime.replace(
-            tzinfo=requirement.arrival_datetime.tzinfo,
-        )
-        if abs((arrival_datetime - requirement.arrival_datetime).seconds // 60) > 10:
-            self._logger.info(
-                "Arrival times do not match",
-                requirement_arrival_datetime=requirement.arrival_datetime.isoformat(),
-                offer_arrival_datetime=arrival_datetime.isoformat(),
-            )
-            return False
-
-        return True
 
     async def _make_booking(
         self,

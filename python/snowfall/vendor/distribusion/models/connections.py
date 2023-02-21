@@ -31,11 +31,11 @@ class Station(DistribusionBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
     code: str
     description: str | None
-    latitude: float | None
-    longitude: float | None
+    latitude: float
+    longitude: float
     name: str | None
     street_and_number: str | None
-    time_zone: str | None
+    time_zone: str
     zip_code: str | None
     area: Any | None
     city: City | None

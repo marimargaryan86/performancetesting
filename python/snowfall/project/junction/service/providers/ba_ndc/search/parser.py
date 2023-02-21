@@ -8,7 +8,6 @@ from snowfall.project.junction.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
 from snowfall.project.junction.service.providers.ba_ndc import cache, enums
-from snowfall.project.junction.service.providers.ba_ndc.v1alpha import amqp_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2
@@ -161,7 +160,6 @@ class OfferParser(object):
 
     async def parse_offer_group(
         self,
-        search_task: amqp_pb2.SearchCriteriaTask,
         offers: Sequence[response_offer_search_schemas.Offer],
         offers_adapter: OffersResponseAdapter,
     ) -> offer_models_pb2.OfferGroup | None:
@@ -172,7 +170,6 @@ class OfferParser(object):
         offer_segments = [
             self._segment_to_proto(
                 segment=offers_adapter.get_segment_by_id(segment),
-                search_segment=search_task.segments[segment_index],
             )
             for segment_index, segment in enumerate(
                 itertools.chain(
@@ -250,43 +247,56 @@ class OfferParser(object):
 
         return international_flight, return_flight_to_usa
 
+    def _segment_legs_to_proto(
+        self,
+        offer_legs: Sequence[response_common_offer_schemas.Segment],
+    ) -> Sequence[offer_models_pb2.OfferSegmentLeg]:
+        legs = []
+
+        for offer_leg in offer_legs:
+            origin = self._airport_repository.get_by_iata(offer_leg.origin.code)
+            destination = self._airport_repository.get_by_iata(
+                offer_leg.destination.code,
+            )
+
+            legs.append(
+                offer_models_pb2.OfferSegmentLeg(
+                    id=string.uuid(),
+                    origin=models_pb2.Point(
+                        ref=offer_leg.origin.code or "",
+                        name=offer_leg.origin.name or "",
+                        coordinates=self._get_coordinates(offer_leg.origin.code),
+                        time_zone=origin.timezone.key,
+                    ),
+                    destination=models_pb2.Point(
+                        ref=offer_leg.destination.code or "",
+                        name=offer_leg.destination.name or "",
+                        coordinates=self._get_coordinates(
+                            offer_leg.destination.code,
+                        ),
+                        time_zone=destination.timezone.key,
+                    ),
+                    departure_at=protobuf.datetime_to_protobuf(
+                        offer_leg.departure_date_time,
+                    ),
+                    arrival_at=protobuf.datetime_to_protobuf(
+                        offer_leg.arrival_date_time,
+                    ),
+                ),
+            )
+
+        return legs
+
     def _segment_to_proto(
         self,
         segment: response_common_offer_schemas.Segment | None,
-        search_segment: models_pb2.Segment,
     ) -> offer_models_pb2.OfferSegment | None:
         if segment:
             offer_legs = segment_to_legs(segment)
 
             return offer_models_pb2.OfferSegment(
                 id=string.uuid(),
-                segment_id=search_segment.id,
-                legs=[
-                    offer_models_pb2.OfferSegmentLeg(
-                        id=search_leg.id,
-                        origin=models_pb2.Point(
-                            ref=offer_leg.origin.code or "",
-                            name=offer_leg.origin.name or "",
-                            coordinates=self._get_coordinates(offer_leg.origin.code),
-                            time_zone=search_leg.origin.time_zone,
-                        ),
-                        destination=models_pb2.Point(
-                            ref=offer_leg.destination.code or "",
-                            name=offer_leg.destination.name or "",
-                            coordinates=self._get_coordinates(
-                                offer_leg.destination.code,
-                            ),
-                            time_zone=search_leg.destination.time_zone,
-                        ),
-                        departure_at=protobuf.datetime_to_protobuf(
-                            offer_leg.departure_date_time,
-                        ),
-                        arrival_at=protobuf.datetime_to_protobuf(
-                            offer_leg.arrival_date_time,
-                        ),
-                    )
-                    for offer_leg, search_leg in zip(offer_legs, search_segment.legs)
-                ],
+                legs=self._segment_legs_to_proto(offer_legs),
                 vehicle=offer_models_pb2.Vehicle(
                     equipment=segment.equipment.code if segment.equipment else "",
                     number=segment.marketing_carrier.flight_number or "",

@@ -89,33 +89,33 @@ async def test_search_result_data(  # noqa: WPS218
             )
         ]
 
-    assert len(offer_groups) == 1
+    assert len(offer_groups) == 10
 
-    for offer_group in offer_groups:
-        segment = offer_group.segments[0]
-        _assert_offer(offer_group.offers[0], segment.id)
-        assert segment.segment_id == "segment_id"
-        assert segment.operator == "SK"
-        assert segment.vendor == "SK"
-        assert segment.terminal == "5"
-        assert segment.vehicle.equipment == "32N"
-        assert segment.vehicle.number == "527"
-        assert segment.type == models_pb2.Schedule.TYPE_AIR
-        leg = segment.legs[0]
-        assert leg.id == "leg_id"
-        assert leg.origin.ref == "ARN"
-        assert leg.origin.name == "Stockholm-Arlanda Airport"
-        assert leg.origin.time_zone == "Europe/Stockholm"
-        assert math.isclose(leg.origin.coordinates.latitude, 59.650831)
-        assert math.isclose(leg.origin.coordinates.longitude, 17.92119)
-        assert leg.destination.ref == "LHR"
-        assert leg.destination.name == "Heathrow Airport"
-        assert leg.destination.time_zone == "Europe/London"
-        assert math.isclose(leg.destination.coordinates.latitude, 51.470311)
-        assert math.isclose(leg.destination.coordinates.longitude, -0.458118)
-        expected_leg = _ARN_LHR.segments[0].legs[0]
-        assert leg.departure_at == expected_leg.departure_at
-        assert leg.arrival_at == expected_leg.arrival_at
+    offer_group = offer_groups[0]
+
+    segment = offer_group.segments[0]
+    _assert_offer(offer_group.offers[0], segment.id)
+    assert segment.segment_id == ""
+    assert segment.operator == "SK"
+    assert segment.vendor == "SK"
+    assert segment.terminal == "5"
+    assert segment.vehicle.equipment == "32N"
+    assert segment.vehicle.number == "527"
+    assert segment.type == models_pb2.Schedule.TYPE_AIR
+    leg = segment.legs[0]
+    assert leg.origin.ref == "ARN"
+    assert leg.origin.name == "Stockholm-Arlanda Airport"
+    assert leg.origin.time_zone == "Europe/Stockholm"
+    assert math.isclose(leg.origin.coordinates.latitude, 59.650831)
+    assert math.isclose(leg.origin.coordinates.longitude, 17.92119)
+    assert leg.destination.ref == "LHR"
+    assert leg.destination.name == "Heathrow Airport"
+    assert leg.destination.time_zone == "Europe/London"
+    assert math.isclose(leg.destination.coordinates.latitude, 51.470311)
+    assert math.isclose(leg.destination.coordinates.longitude, -0.458118)
+    expected_leg = _ARN_LHR.segments[0].legs[0]
+    assert leg.departure_at == expected_leg.departure_at
+    assert leg.arrival_at == expected_leg.arrival_at
 
 
 def _assert_offer(  # noqa: WPS218
