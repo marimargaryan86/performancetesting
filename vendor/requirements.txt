@@ -25,6 +25,7 @@ grpcio-health-checking==1.51.1
 grpcio-reflection==1.51.1
 grpcio-status==1.51.1
 grpcio==1.51.1
+hvac==1.0.2
 h3[numpy]==3.7.6
 httpx[http2]==0.23.3
 iso4217==1.11.20220401

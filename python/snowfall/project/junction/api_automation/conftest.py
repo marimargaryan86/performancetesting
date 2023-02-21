@@ -1,10 +1,10 @@
 import datetime
 import json
-import logging
 import os
 from typing import Any, Callable, Iterator, Mapping, Sequence
 
 import httpx
+import hvac
 import pytest
 
 from snowfall.project.junction.api_automation.test_functions.mobile_client import (
@@ -15,11 +15,10 @@ from snowfall.vendor.bound.client import Bound
 from snowfall.vendor.junction.client import JunctionClient
 from snowfall.vendor.pay.client import PayAuthentication, PayClient
 
-logging.basicConfig()
-logging.getLogger().setLevel(logging.INFO)
-
 ALLURE_ENVIRONMENT_PROPERTIES_FILE = "environment.properties"
 ALLUREDIR_OPTION = "--alluredir"
+HTTPS_PREFIX = "https://"
+HTTP_PREFIX = "http://"
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -27,8 +26,14 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption("--ORIGIN", action="store", help="origin id")
     parser.addoption("--DESTINATION", action="store", help="destination id")
     parser.addoption("--DEPARTURE_AFTER", action="store", help="departure after")
-    parser.addoption("--PROTOCOL", action="store", help="protocol e.g. http or https")
     parser.addoption("--HOST", action="store", help="prod dev or any other host")
+
+
+def pytest_configure(config: pytest.Config) -> None:
+    config.addinivalue_line(
+        "markers",
+        "integration: integration test that requires environment",
+    )
 
 
 @pytest.fixture(scope="package")
@@ -39,7 +44,6 @@ def _local_config(
     json_file_name = os.path.expanduser("~/{0}.json".format(config_file_name))
     if not os.path.exists(json_file_name):
         return {}
-    logging.debug("Reading of local config from {0}.json ...", config_file_name)
     with open(json_file_name) as json_file:
         config = json.load(json_file)
         malformed_keys = [
@@ -167,10 +171,15 @@ def junction_client(
     api_token: str,
     host: str,
 ) -> JunctionClient:
+    api_url = "{0}{1}".format(
+        HTTPS_PREFIX,
+        get_variable_value(host, api_token, "junction_api_host"),
+    )
+    junction_api_token = get_variable_value(host, api_token, "junction_api_token")
     client_timeout = 20
     return JunctionClient(
-        api_url="https://{0}".format(host),
-        token=api_token,
+        api_url=api_url,
+        token=junction_api_token,
         client=httpx.AsyncClient(timeout=client_timeout),
     )
 
@@ -180,10 +189,16 @@ def mobile_client(
     api_token: str,
     host: str,
 ) -> MobileApiClient:
+    api_url = "{0}{1}".format(
+        HTTPS_PREFIX,
+        get_variable_value(host, api_token, "mobile_api_host"),
+    )
+    mobile_token = get_variable_value(host, api_token, "mobile_api_token")
     client_timeout = 20
+
     return MobileApiClient(
-        api_url="https://{0}".format(host),
-        token=api_token,
+        api_url=api_url,
+        token=mobile_token,
         client=httpx.AsyncClient(timeout=client_timeout),
     )
 
@@ -194,8 +209,13 @@ def pay_client(
     host: str,
 ) -> PayClient:
     client_timeout = 20
-    email, password = api_token.split(":")
-    base_url = "https://api.pay.junction.dev"
+
+    email = get_variable_value(host, api_token, "pay_api_test_email")
+    password = get_variable_value(host, api_token, "pay_api_test_password")
+    base_url = "{0}{1}".format(
+        HTTPS_PREFIX,
+        get_variable_value(host, api_token, "pay_api_host"),
+    )
 
     auth = PayAuthentication(
         base_url=base_url,
@@ -216,26 +236,66 @@ def pay_client(
     )
 
 
+def get_variable_value(
+    host: str,
+    api_token: str,
+    variable_name: str,
+) -> str:
+    client = hvac.Client(url=host, token=api_token)
+    is_authenticated = client.is_authenticated()
+    returned_data = {}
+    if is_authenticated:
+        returned_data = get_variable_from_server(client, "development")
+        if not returned_data:
+            returned_data = get_variable_from_server(client, "production")
+
+    return str(returned_data["data"]["data"][variable_name])
+
+
+def get_variable_from_server(
+    client: hvac.Client,
+    environment: str,
+) -> dict[str, Any]:
+    query = "kv/data/{e}/{s}".format(e=environment, s="api-automation")
+    try:
+        returned_data = client.read(query)
+    except hvac.exceptions.Forbidden:
+        returned_data = {}
+    return returned_data
+
+
 @pytest.fixture(scope="function")
 def api_layer_client(
+    host: str,
     api_token: str,
 ) -> APILayer:
+    base_url = "{0}{1}".format(
+        HTTPS_PREFIX,
+        get_variable_value(host, api_token, "apilayer_pay_api_host"),
+    )
+    api_key = get_variable_value(host, api_token, "apilayer_pay_api_token")
     client_timeout = 20.0
     return APILayer(
-        base_url="https://api.apilayer.com",
-        api_key=api_token,
+        base_url=base_url,
+        api_key=api_key,
         timeout=client_timeout,
     )
 
 
 @pytest.fixture(scope="function")
 def bound_client(
+    host: str,
     api_token: str,
 ) -> Bound:
-    email, password = api_token.split(";")
+    base_url = "{0}{1}".format(
+        HTTPS_PREFIX,
+        get_variable_value(host, api_token, "bound_pay_api_host"),
+    )
+    email = get_variable_value(host, api_token, "bound_pay_api_email")
+    password = get_variable_value(host, api_token, "bound_pay_api_password")
     client_timeout = 20.0
     return Bound(
-        base_url="https://sandbox-api.bound.co/api",
+        base_url=base_url,
         email=email,
         password=password,
         timeout=client_timeout,

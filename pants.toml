@@ -123,6 +123,7 @@ lockfile = "vendor/lock/pytest.txt"
 xdist_enabled = true
 extra_requirements = [
     "allure-pytest",
+    "hvac",
     "pytest-asyncio",
     "pytest-cov",
     "pytest-icdiff",

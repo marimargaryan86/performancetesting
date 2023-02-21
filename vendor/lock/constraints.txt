@@ -40,6 +40,7 @@
 //     "grpcio==1.51.1",
 //     "h3[numpy]==3.7.6",
 //     "httpx[http2]==0.23.3",
+//     "hvac==1.0.2",
 //     "iso4217==1.11.20220401",
 //     "isodate==0.6.1",
 //     "jinja2==3.1.2",
@@ -1790,6 +1791,27 @@
           "artifacts": [
             {
               "algorithm": "sha256",
+              "hash": "e8256343de2576b18bc8d49f09a04c728f2a8f3a866825bb413aa4f9ebab1fea",
+              "url": "https://files.pythonhosted.org/packages/8d/43/6532046afa7b20c352d2a8b68de1d1fd350104024edfb00bf486801712af/hvac-1.0.2-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "e4028c5c0ecc7b7fcf6a54d290f99240e5abcdb9ffe442d1c14f061310d4c61c",
+              "url": "https://files.pythonhosted.org/packages/e0/3e/7ac399273f58ed0e0861954b23f17e9687e47ee3fcd1be0bc4fc0d86a481/hvac-1.0.2.tar.gz"
+            }
+          ],
+          "project_name": "hvac",
+          "requires_dists": [
+            "pyhcl<0.5.0,>=0.4.4",
+            "requests<3.0.0,>=2.27.1"
+          ],
+          "requires_python": "<4.0.0,>=3.6.2",
+          "version": "1.0.2"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
               "hash": "0ec6bafd80d8ad2195c4f03aacba3a8265e57bc4cff261e802bf39970ed02a15",
               "url": "https://files.pythonhosted.org/packages/d7/de/85a784bcc4a3779d1753a7ec2dee5de90e18c7bcf402e71b51fcf150b129/hyperframe-6.0.1-py3-none-any.whl"
             },
@@ -2761,6 +2783,19 @@
           ],
           "requires_python": ">=3.7",
           "version": "1.10.4"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "2d9b9dcdf1023d812bfed561ba72c99104c5b3f52e558d595130a44ce081b003",
+              "url": "https://files.pythonhosted.org/packages/91/b0/dd4f1d01b77be3b66d9f550ed958b68fa553764be1d27c7d604906c06b42/pyhcl-0.4.4.tar.gz"
+            }
+          ],
+          "project_name": "pyhcl",
+          "requires_dists": [],
+          "requires_python": null,
+          "version": "0.4.4"
         },
         {
           "artifacts": [
@@ -4303,6 +4338,7 @@
     "grpcio==1.51.1",
     "h3[numpy]==3.7.6",
     "httpx[http2]==0.23.3",
+    "hvac==1.0.2",
     "iso4217==1.11.20220401",
     "isodate==0.6.1",
     "jinja2==3.1.2",

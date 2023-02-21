@@ -7,9 +7,7 @@ from snowfall.project.junction.api_automation.test_functions.helpers_api import 
     is_valid_uuid,
     return_randomized_token,
 )
-from snowfall.project.junction.api_automation.test_functions.pay_client import (
-    PayApiClient,
-)
+from snowfall.vendor.pay.client import PayClient
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -17,7 +15,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_create_quote(  # noqa: WPS218
-    pay_client: PayApiClient,
+    pay_client: PayClient,
 ) -> None:
     response_payer = await pay_client.create_company(
         company="test-company-{0}".format(return_randomized_token()),
