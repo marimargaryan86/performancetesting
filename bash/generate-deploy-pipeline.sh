@@ -47,6 +47,7 @@ for DIR in "${1}"/*; do
 	docker_image=""
 	service_version="latest"
 	image_file="${DIR}/image.txt"
+	has_changed_image=0
 
 	if ! [ -f "${image_file}" ] && grep -q 'variable "docker_image" {' "${DIR}"/*.nomad; then
 		echo >&2 "skip: \"${image_file}\" is missing"
@@ -88,7 +89,7 @@ for DIR in "${1}"/*; do
 	fi
 
 	if [ -z "${templates+x}" ]; then
-		echo >&2 "skip: \"${DIR}\" has no Nomad templates"
+		echo >&2 "skip: \"${DIR}\" has no Nomad template(s)"
 		continue
 	fi
 

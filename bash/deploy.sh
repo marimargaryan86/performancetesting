@@ -17,25 +17,47 @@ for ((idx = 3; idx < ${#ARGS[@]}; ++idx)); do
 
 	echo "Deploying '${TEMPLATE_FILE%.*}' of '${SERVICE_NAME}'..."
 
-	nomad plan "${ADDITIONAL_ARGS[@]}" "${TEMPLATE_FILE}" | tee /dev/stderr | grep 'Job Modify Index:' | awk -F': ' '{ print $2 }' >check-index
+	nomad plan "${ADDITIONAL_ARGS[@]}" "${TEMPLATE_FILE}" | grep 'Job Modify Index:' | awk -F': ' '{ print $2 }' >check-index
 	if [ $? -eq 255 ]; then exit 1; else true; fi
 
-	if ! nomad run "${ADDITIONAL_ARGS[@]}" -check-index="$(cat check-index)" -detach "${TEMPLATE_FILE}" | tee /dev/stderr | grep 'Evaluation ID:' | awk -F': ' '{ print $2 }' >eval-id; then
+	CHECK_INDEX=$(cat check-index)
+	echo "Check Index: ${CHECK_INDEX}"
+
+	if ! nomad run "${ADDITIONAL_ARGS[@]}" -check-index="${CHECK_INDEX}" -detach "${TEMPLATE_FILE}" | grep 'Evaluation ID:' | awk -F': ' '{ print $2 }' >eval-id; then
 		exit 1
 	else
 		true
 	fi
 
-	if [ "$(cat eval-id)" = "" ] || nomad eval status -monitor "$(cat eval-id)" >/dev/null 2>&1; then
+	EVALUATION_ID=$(cat eval-id)
+	echo "Evaluation ID: ${EVALUATION_ID}"
+
+	if [ "${EVALUATION_ID}" = "" ]; then
+		echo "WARN: No Evaluation ID found, skipping."
+		continue
+	fi
+
+	if nomad eval status -monitor "${EVALUATION_ID}" >/dev/null 2>&1; then
 		continue
 	else
 		true
 	fi
 
-	DEPLOYMENT_ID=$(nomad eval status -json "$(cat eval-id)" | jq -r ".DeploymentID")
-	ALLOC_IDS=$(nomad deployment status -json "${DEPLOYMENT_ID}" | jq -r ".TaskGroups[].PlacedCanaries | add")
-
+	DEPLOYMENT_ID=$(nomad eval status -json "${EVALUATION_ID}" | jq -r ".DeploymentID")
 	echo "Deployment ID: ${DEPLOYMENT_ID}"
+
+	if [ "${DEPLOYMENT_ID}" = "" ]; then
+		echo "WARN: No Deployment ID found, skipping."
+		continue
+	fi
+
+	ALLOC_IDS=$(nomad deployment status -json "${DEPLOYMENT_ID}" | jq -r ".TaskGroups[].PlacedCanaries | add")
+	echo "Allocation IDs: ${ALLOC_IDS}"
+
+	if [ "${ALLOC_IDS}" = "" ]; then
+		echo "WARN: No Allocation IDs found, skipping."
+		continue
+	fi
 
 	while IFS= read -r ALLOC_ID; do
 		echo "-- Allocation ${ALLOC_ID} --"
