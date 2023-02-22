@@ -29,7 +29,7 @@ variable "count" {
   type = number
 }
 
-job "pss-api-v2" {
+job "pss-api-v2-http" {
 
   datacenters = ["${var.datacenter}"]
   type        = "service"

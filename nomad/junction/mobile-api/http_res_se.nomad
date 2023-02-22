@@ -34,7 +34,7 @@ variable "count" {
   type = number
 }
 
-job "res-se-mobile-api-http" {
+job "mobile-api-http-res-se" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 
@@ -47,7 +47,7 @@ job "res-se-mobile-api-http" {
     progress_deadline = "2m"
   }
 
-  group "http" {
+  group "http-res-se" {
     count = "${var.count}"
 
     restart {
@@ -116,7 +116,7 @@ job "res-se-mobile-api-http" {
       }
     }
 
-    task "http" {
+    task "http-res-se" {
       driver = "docker"
 
       resources {

@@ -2,12 +2,12 @@ variable "datacenter" {
   type = string
 }
 
-job "prometheus" {
+job "prometheus-prometheus" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
   namespace   = "monitoring"
 
-  group "monitoring" {
+  group "prometheus" {
     count = 1
 
     network {

@@ -26,7 +26,7 @@ variable "count" {
   type = number
 }
 
-job "rates" {
+job "currencies-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 
@@ -42,7 +42,15 @@ job "rates" {
   group "grpc" {
     count = "${var.count}"
 
+    restart {
+      attempts = 3
+      delay    = "15s"
+      interval = "10m"
+      mode     = "delay"
+    }
+
     network {
+      mode = "bridge"
       port "grpc" {}
     }
 
@@ -53,9 +61,13 @@ job "rates" {
     }
 
     service {
-      name = "rates-${var.environment}"
+      name = "currencies-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
+
+      connect {
+        sidecar_service {}
+      }
 
       check {
         type     = "grpc"
@@ -68,16 +80,18 @@ job "rates" {
       driver = "docker"
 
       vault {
-        policies = ["rates-${var.environment}"]
+        policies = ["currencies-${var.environment}"]
       }
 
       template {
         data        = <<EOH
 MONGO_DSN={{range $index, $service := service (printf "mongodb-%s" (env "NOMAD_NAMESPACE"))}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
-{{ with secret "kv/data/${var.environment}/rates" }}
-BOUND_EMAIL={{ .Data.data.bound_email }}
-BOUND_BASE_URL={{ .Data.data.bound_base_url }}
-BOUND_PASSWORD={{ .Data.data.bound_password }}
+{{ with secret "kv/data/${var.environment}/currencies" }}
+PASSWORD={{ .Data.data.password }}
+BASE_URL={{ .Data.data.base_url }}
+EMAIL={{ .Data.data.email }}
+API_LAYER_API_KEY={{ .Data.data.api_layer_api_key }}
+API_LAYER_BASE_URL={{ .Data.data.api_layer_base_url }}
 {{ end }}
 EOH
         destination = "services.env"
@@ -101,11 +115,10 @@ EOH
 
       env {
         ENV_NAME     = "${var.environment}"
-        GRPC_PORT    = "${NOMAD_PORT_grpc}"
         GRPC_ADDRESS = "0.0.0.0"
-        SENTRY_DSN   = "https://0ab9747b3f7042d9882a664f0e31f229@sentry.snowfall.se/46"
+        GRPC_PORT    = "${NOMAD_PORT_grpc}"
+        SENTRY_DSN   = "https://862dba8da99649d28747c88ad44699e8@sentry.snowfall.se/35"
       }
     }
   }
 }
-

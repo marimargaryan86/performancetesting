@@ -1,7 +1,7 @@
 # bullseye-slim
 ARG REGISTRY
 FROM ${REGISTRY}debian@sha256:9b42b2e7eddd84eaddb67b45567cdc0e03ec826bf252352f300147cfb8ce5a6d
-ENV PYENV_ROOT=/root/.pyenv PATH=/usr/local/go/bin:/root/.pyenv/bin:$PATH
+ENV PYENV_ROOT=/root/.pyenv PATH=/usr/local/go/bin:/root/.pyenv/bin:/root/.pyenv/shims:$PATH
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     ca-certificates \

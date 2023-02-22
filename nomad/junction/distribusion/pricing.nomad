@@ -39,7 +39,7 @@ job "distribusion-pricing" {
     progress_deadline = "2m"
   }
 
-  group "orders" {
+  group "pricing" {
     count = "${var.count}"
 
     restart {

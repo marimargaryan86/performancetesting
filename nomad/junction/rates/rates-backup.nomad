@@ -22,7 +22,7 @@ variable "datacenter" {
   type = string
 }
 
-job "rates-backup" {
+job "rates-rates-backup" {
   datacenters = ["${var.datacenter}"]
   type        = "batch"
 
@@ -31,7 +31,7 @@ job "rates-backup" {
     prohibit_overlap = true
   }
 
-  group "cron" {
+  group "rates-backup" {
     count = 1
 
     restart {
@@ -41,7 +41,7 @@ job "rates-backup" {
       mode     = "delay"
     }
 
-    task "backup_cron" {
+    task "rates-backup" {
       driver = "docker"
 
       vault {

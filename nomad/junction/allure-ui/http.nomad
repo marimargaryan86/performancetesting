@@ -18,7 +18,7 @@ variable "allure_api_URL" {
   type = string
 }
 
-job "allure-ui" {
+job "allure-ui-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

@@ -7,7 +7,7 @@ variable "datacenter" {
 }
 
 
-job "vector-loki" {
+job "vector-vector-loki" {
   datacenters = ["${var.datacenter}"]
   namespace   = "monitoring"
   type        = "system"
@@ -17,7 +17,7 @@ job "vector-loki" {
     progress_deadline = "10m"
     auto_revert       = true
   }
-  group "vector" {
+  group "vector-loki" {
     count = 1
     restart {
       attempts = 3
@@ -34,7 +34,7 @@ job "vector-loki" {
       size   = 500
       sticky = true
     }
-    task "vector" {
+    task "vector-loki" {
       driver = "docker"
       config {
         image = "timberio/vector:0.26.0-alpine"

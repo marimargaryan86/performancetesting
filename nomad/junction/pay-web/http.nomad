@@ -34,7 +34,7 @@ variable "count" {
   type = number
 }
 
-job "pay-web" {
+job "pay-web-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 
