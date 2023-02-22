@@ -1,6 +1,5 @@
 python_sources(dependencies=[":cities"])
 python_image(
-    namespace="python.snowfall.project.junction.service.places",
     name="main",
     entry_point="main.py",
 )

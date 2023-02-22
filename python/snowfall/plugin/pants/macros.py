@@ -1,5 +1,4 @@
 def python_image(  # type: ignore[no-untyped-def]
-    namespace: str,
     name: str,
     **kwargs,
 ) -> None:
@@ -32,7 +31,9 @@ def python_image(  # type: ignore[no-untyped-def]
             'ENV PYTHONHASHSEED "random"',
             "ENV PYTHONUNBUFFERED 1",
             "COPY {namespace}/{name}.pex /bin/{name}".format(
-                namespace=namespace,
+                namespace=".".join(
+                    build_file_dir().parts,  # type: ignore[name-defined]  # noqa: F821
+                ),
                 name=name,
             ),
             'ARG VERSION "dev"',

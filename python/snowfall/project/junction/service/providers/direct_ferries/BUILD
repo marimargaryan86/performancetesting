@@ -18,7 +18,6 @@ resource(
     ),
 )
 python_image(
-    namespace="python.snowfall.project.junction.service.providers.direct_ferries",
     name="main",
     entry_point="main.py",
 )

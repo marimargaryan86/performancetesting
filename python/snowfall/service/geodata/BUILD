@@ -1,6 +1,5 @@
 python_sources(dependencies=[":borders"])
 python_image(
-    namespace="python.snowfall.service.geodata",
     name="main",
     entry_point="main.py",
 )

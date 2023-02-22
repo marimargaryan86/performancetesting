@@ -10,7 +10,6 @@ resource(
     ),
 )
 python_image(
-    namespace="python.snowfall.project.junction.service.providers.duffel",
     name="main",
     entry_point="main.py",
 )
