@@ -1,7 +1,9 @@
+import datetime
 import hashlib
 from typing import Optional, Sequence
 from uuid import uuid4
 
+import bcrypt
 from fastapi import Depends
 
 from snowfall.project.pss.service.pss_api_v2.db.models.accounts import (
@@ -12,7 +14,21 @@ from snowfall.project.pss.service.pss_api_v2.db.repository.repository import Rep
 from snowfall.project.pss.service.pss_api_v2.services.emails import SMTPEmailService
 
 
+class AccountForgottenPasswordTokenAlreadyUsedError(Exception):
+    """Raised when an AccountForgottenPassword Token has already been used."""
+
+
+class AccountForgottenPasswordTokenExpiredError(Exception):
+    """Raised when an AccountForgottenPassword Token has expired."""
+
+
+class AccountForgottenPasswordNotFoundError(Exception):
+    """Raised when an AccountForgottenPassword cannot be found."""
+
+
 class AccountsService(object):
+    _token_expiry_length_seconds = 3600
+
     def __init__(
         self,
         account_repository: Repository[Account] = Depends(Repository.factory(Account)),
@@ -53,6 +69,42 @@ class AccountsService(object):
         await self._email_service.send_forgotten_password_email(
             token=token,
             recipient=str(account.email),
+        )
+
+    async def reset_password(self, token: str, password: str) -> None:
+        account_forgotten_password = (
+            await self._account_forgotten_password_repository.get_one_by_filter(
+                filter_criteria=[AccountForgottenPassword.token == token],
+            )
+        )
+
+        if account_forgotten_password is None:
+            raise AccountForgottenPasswordNotFoundError(
+                "Token: {0} does not exist".format(token),
+            )
+
+        if account_forgotten_password.used:
+            raise AccountForgottenPasswordTokenAlreadyUsedError(
+                "Token: {0} already used".format(account_forgotten_password.token),
+            )
+
+        now = datetime.datetime.utcnow()
+        time_delta = now - account_forgotten_password.created
+        if time_delta.seconds > self._token_expiry_length_seconds:
+            raise AccountForgottenPasswordTokenExpiredError(
+                "Token: {0} has expired".format(account_forgotten_password.token),
+            )
+
+        await self._account_repository.update_by_filter(
+            filter_criteria=[Account.id == account_forgotten_password.account_id],
+            values_to_update={
+                "password": bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode(),
+            },
+        )
+
+        await self._account_forgotten_password_repository.update_by_filter(
+            filter_criteria=[AccountForgottenPassword.token == token],
+            values_to_update={"used": True},
         )
 
 

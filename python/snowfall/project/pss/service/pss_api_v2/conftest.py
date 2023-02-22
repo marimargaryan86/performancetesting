@@ -7,11 +7,10 @@ from factory import Faker, Sequence
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from pydantic.networks import AnyUrl, EmailStr
-from sqlalchemy import exc
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from starlette import applications
 
-from snowfall.project.pss.service.pss_api_v2.db.db import Base, InternalDBError, get_db
+from snowfall.project.pss.service.pss_api_v2.db.db import Base, get_db
 from snowfall.project.pss.service.pss_api_v2.db.models.accounts import (
     Account,
     AccountForgottenPassword,
@@ -36,12 +35,10 @@ SessionTesting = async_sessionmaker(
 
 
 @pytest.fixture(scope="function")
-async def db_session() -> AsyncGenerator[AsyncSession, None]:
+async def db_session() -> AsyncGenerator[async_sessionmaker[AsyncSession], None]:
     async with engine.begin() as create_conn:
         await create_conn.run_sync(Base.metadata.create_all)
-    session = SessionTesting()
-    yield session  # use the session in tests.
-    await session.close()
+    yield SessionTesting
     async with engine.begin() as drop_conn:
         await drop_conn.run_sync(Base.metadata.drop_all)
 
@@ -67,7 +64,7 @@ def mock_settings() -> Settings:
 @pytest.fixture(scope="function")
 async def client(
     fast_api_app: FastAPI,
-    db_session: AsyncSession,
+    db_session: async_sessionmaker[AsyncSession],
 ) -> AsyncGenerator[TestClient, None]:
     """Create a new FastAPI TestClient.
 
@@ -75,15 +72,8 @@ async def client(
     injected into routes.
     """
 
-    async def _get_test_db() -> AsyncGenerator[AsyncSession, None]:
-        async with db_session as session:
-            async with session.begin():
-                try:
-                    yield session
-                except exc.SQLAlchemyError as ex:
-                    raise InternalDBError from ex
-                finally:
-                    await session.close()
+    async def _get_test_db() -> AsyncGenerator[async_sessionmaker[AsyncSession], None]:
+        yield db_session
 
     fast_api_app.dependency_overrides[get_db] = _get_test_db
     fast_api_app.dependency_overrides[get_settings] = mock_settings
@@ -92,11 +82,13 @@ async def client(
 
 
 @pytest.fixture(scope="function")
-def account_factory(db_session: AsyncSession) -> Type[AsyncSQLAlchemyFactory]:
+def account_factory(
+    db_session: async_sessionmaker[AsyncSession],
+) -> Type[AsyncSQLAlchemyFactory]:
     class AccountFactory(AsyncSQLAlchemyFactory):
         class Meta:
             model = Account
-            sqlalchemy_session = db_session
+            sqlalchemy_session = db_session()
             sqlalchemy_session_persistence = "commit"
 
         firstname = Faker("last_name")
@@ -122,11 +114,13 @@ def account_factory(db_session: AsyncSession) -> Type[AsyncSQLAlchemyFactory]:
 
 
 @pytest.fixture(scope="function")
-def country_factory(db_session: AsyncSession) -> Type[AsyncSQLAlchemyFactory]:
+def country_factory(
+    db_session: async_sessionmaker[AsyncSession],
+) -> Type[AsyncSQLAlchemyFactory]:
     class CountryFactory(AsyncSQLAlchemyFactory):
         class Meta:
             model = Country
-            sqlalchemy_session = db_session
+            sqlalchemy_session = db_session()
             sqlalchemy_session_persistence = "commit"
 
         code = Sequence(lambda index: "AM_{index}".format(index=index))
@@ -138,12 +132,12 @@ def country_factory(db_session: AsyncSession) -> Type[AsyncSQLAlchemyFactory]:
 
 @pytest.fixture(scope="function")
 def account_forgotten_password_factory(
-    db_session: AsyncSession,
+    db_session: async_sessionmaker[AsyncSession],
 ) -> Type[AsyncSQLAlchemyFactory]:
     class AccountForgottenPasswordFactory(AsyncSQLAlchemyFactory):
         class Meta:
             model = AccountForgottenPassword
-            sqlalchemy_session = db_session
+            sqlalchemy_session = db_session()
             sqlalchemy_session_persistence = "commit"
 
         account_id = Sequence(lambda index: index)

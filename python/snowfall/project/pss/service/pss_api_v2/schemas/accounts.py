@@ -15,6 +15,11 @@ class AccountForgotPasswordSchema(BaseSchema):
     email: EmailStr
 
 
+class AccountResetPasswordSchema(BaseSchema):
+    token: str
+    password: str
+
+
 class AccountResponseSchema(BaseSchema):
     id_: int = Field(alias="id")
     email: str

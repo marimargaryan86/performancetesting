@@ -5,7 +5,7 @@ from fastapi import status
 from fastapi.testclient import TestClient
 
 from snowfall.project.pss.service.pss_api_v2 import messages
-from snowfall.project.pss.service.pss_api_v2.schemas.errors import FAIL
+from snowfall.project.pss.service.pss_api_v2.schemas.responses import FAIL
 
 
 async def test_admin_can_not_login_if_not_existed_account_provided(
@@ -74,5 +74,5 @@ async def test_admin_can_login(
     response = client.post("/admin/login", json=payload)
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json()["email"] == admin_account.email
-    assert response.json()["active"] is True
+    assert response.json()["data"]["email"] == admin_account.email
+    assert response.json()["data"]["active"] is True

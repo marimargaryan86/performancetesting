@@ -1,6 +1,9 @@
+import datetime
 from unittest.mock import ANY, create_autospec
 
+import bcrypt
 import freezegun
+import pytest
 from alchemy_mock.comparison import ExpressionMatcher
 
 from snowfall.project.pss.service.pss_api_v2.db.models.accounts import (
@@ -8,7 +11,12 @@ from snowfall.project.pss.service.pss_api_v2.db.models.accounts import (
     AccountForgottenPassword,
 )
 from snowfall.project.pss.service.pss_api_v2.db.repository.repository import Repository
-from snowfall.project.pss.service.pss_api_v2.services.accounts import AccountsService
+from snowfall.project.pss.service.pss_api_v2.services.accounts import (
+    AccountForgottenPasswordNotFoundError,
+    AccountForgottenPasswordTokenAlreadyUsedError,
+    AccountForgottenPasswordTokenExpiredError,
+    AccountsService,
+)
 from snowfall.project.pss.service.pss_api_v2.services.emails import SMTPEmailService
 
 
@@ -69,3 +77,152 @@ async def test_that_forgotten_password_with_existing_email_tracks_attempt_and_in
         token=ANY,
         recipient="test@email.com",
     )
+
+
+async def test_that_reset_password_with_unused_token_updates_account_and_sets_token_to_used() -> None:  # noqa: B950
+    raw_password = "a-password"  # nosec
+    token = "a-token"  # nosec
+    account_repository_mock = create_autospec(Repository, spec_set=True, instance=True)
+    account_forgotten_password = AccountForgottenPassword(
+        token=token,
+        account_id=1,
+        created=datetime.datetime.utcnow(),
+    )
+    account_forgotten_password_repository_mock = create_autospec(
+        Repository,
+        spec_set=True,
+        instance=True,
+    )
+    account_forgotten_password_repository_mock.get_one_by_filter.return_value = (
+        account_forgotten_password
+    )
+    email_service_mock = create_autospec(SMTPEmailService, spec_set=True, instance=True)
+
+    accounts_service = AccountsService(
+        account_repository_mock,
+        account_forgotten_password_repository_mock,
+        email_service_mock,
+    )
+
+    await accounts_service.reset_password(token=token, password=raw_password)
+
+    assert (
+        ExpressionMatcher([AccountForgottenPassword.token == token])
+        == account_forgotten_password_repository_mock.get_one_by_filter.mock_calls[0][
+            2
+        ]["filter_criteria"]
+    )
+
+    account_forgotten_password_repository_mock.update_by_filter.assert_called_once_with(
+        filter_criteria=[ANY],
+        values_to_update={"used": True},
+    )
+    assert (
+        ExpressionMatcher([AccountForgottenPassword.token == token])
+        == account_forgotten_password_repository_mock.update_by_filter.mock_calls[0][2][
+            "filter_criteria"
+        ]
+    )
+
+    account_update_call = account_repository_mock.update_by_filter.mock_calls[0][2]
+    filter_criteria = account_update_call["filter_criteria"]
+    password_update_value: str = account_update_call["values_to_update"]["password"]
+    assert ExpressionMatcher([Account.id == 1]) == filter_criteria
+    assert bcrypt.checkpw(raw_password.encode(), password_update_value.encode())
+
+
+async def test_that_reset_password_with_used_token_raises_exception() -> None:
+    token = "a-token"  # nosec
+    account_repository_mock = create_autospec(Repository, spec_set=True, instance=True)
+    account_forgotten_password = AccountForgottenPassword(
+        token=token,
+        account_id=1,
+        used=True,
+    )
+    account_forgotten_password_repository_mock = create_autospec(
+        Repository,
+        spec_set=True,
+        instance=True,
+    )
+    account_forgotten_password_repository_mock.get_one_by_filter.return_value = (
+        account_forgotten_password
+    )
+
+    email_service_mock = create_autospec(SMTPEmailService, spec_set=True, instance=True)
+
+    accounts_service = AccountsService(
+        account_repository_mock,
+        account_forgotten_password_repository_mock,
+        email_service_mock,
+    )
+
+    with pytest.raises(AccountForgottenPasswordTokenAlreadyUsedError):
+        await accounts_service.reset_password(  # nosec
+            token=token,
+            password="wont-be-used",
+        )
+
+    account_repository_mock.update_by_filter.assert_not_called()
+    account_forgotten_password_repository_mock.update_by_filter.assert_not_called()
+
+
+async def test_that_reset_password_with_no_matching_token_raises_exception() -> None:
+    account_repository_mock = create_autospec(Repository, spec_set=True, instance=True)
+    account_forgotten_password_repository_mock = create_autospec(
+        Repository,
+        spec_set=True,
+        instance=True,
+    )
+    account_forgotten_password_repository_mock.get_one_by_filter.return_value = None
+    email_service_mock = create_autospec(SMTPEmailService, spec_set=True, instance=True)
+
+    accounts_service = AccountsService(
+        account_repository_mock,
+        account_forgotten_password_repository_mock,
+        email_service_mock,
+    )
+
+    with pytest.raises(AccountForgottenPasswordNotFoundError):
+        await accounts_service.reset_password(  # nosec
+            token="a-token",
+            password="wont-be-used",
+        )
+
+    account_repository_mock.update_by_filter.assert_not_called()
+    account_forgotten_password_repository_mock.update_by_filter.assert_not_called()
+
+
+@freezegun.freeze_time("2023-01-01 01:00:01")
+async def test_that_reset_password_with_expired_token_raises_exception() -> None:
+    token = "a-token"  # nosec
+    account_repository_mock = create_autospec(Repository, spec_set=True, instance=True)
+    account_forgotten_password = AccountForgottenPassword(
+        token=token,
+        account_id=1,
+        used=False,
+        created=datetime.datetime.strptime("2023-01-01 00:00:00", "%Y-%m-%d %H:%M:%S"),
+    )
+    account_forgotten_password_repository_mock = create_autospec(
+        Repository,
+        spec_set=True,
+        instance=True,
+    )
+    account_forgotten_password_repository_mock.get_one_by_filter.return_value = (
+        account_forgotten_password
+    )
+    email_service_mock = create_autospec(SMTPEmailService, spec_set=True, instance=True)
+
+    accounts_service = AccountsService(
+        account_repository_mock,
+        account_forgotten_password_repository_mock,
+        email_service_mock,
+    )
+
+    with pytest.raises(AccountForgottenPasswordTokenExpiredError):
+        await accounts_service.reset_password(  # nosec
+            token="a-token",
+            password="wont-be-used",
+        )
+
+    account_repository_mock.update_by_filter.assert_not_called()
+    account_forgotten_password_repository_mock.update_by_filter.assert_not_called()

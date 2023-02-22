@@ -1,17 +1,21 @@
+import datetime
 from typing import Type, cast
 from unittest.mock import create_autospec
 
+import bcrypt
+import freezegun
 from async_factory_boy.factory.sqlalchemy import AsyncSQLAlchemyFactory
 from fastapi import FastAPI, status
 from fastapi.testclient import TestClient
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from snowfall.project.pss.service.pss_api_v2 import messages
 from snowfall.project.pss.service.pss_api_v2.db.models.accounts import (
+    Account,
     AccountForgottenPassword,
 )
-from snowfall.project.pss.service.pss_api_v2.schemas.errors import FAIL
+from snowfall.project.pss.service.pss_api_v2.schemas.responses import FAIL
 from snowfall.project.pss.service.pss_api_v2.services.emails import SMTPEmailService
 
 
@@ -23,7 +27,8 @@ async def test_can_get_accounts(
     response = client.get("/accounts")
 
     assert response.status_code == status.HTTP_200_OK
-    assert account.email == response.json()[0]["email"]
+    assert response.json()["status"] == "success"
+    assert account.email == response.json()["data"][0]["email"]
 
 
 async def test_can_not_login_if_not_existed_account_provided(
@@ -72,15 +77,15 @@ async def test_can_login_account(
     response = client.post("/accounts/login", json=payload)
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json()["email"] == account.email
-    assert response.json()["active"] is True
+    assert response.json()["data"]["email"] == account.email
+    assert response.json()["data"]["active"] is True
 
 
 async def test_can_initiate_forgot_password_if_account_exists(
     client: TestClient,
     account_factory: Type[AsyncSQLAlchemyFactory],
     account_forgotten_password_factory: Type[AsyncSQLAlchemyFactory],
-    db_session: AsyncSession,
+    db_session: async_sessionmaker[AsyncSession],
 ) -> None:
     mock_smtp_email_service = create_autospec(SMTPEmailService, spec_set=True)
     cast(FastAPI, client.app).dependency_overrides[
@@ -98,18 +103,17 @@ async def test_can_initiate_forgot_password_if_account_exists(
 
     assert response.status_code == status.HTTP_200_OK
 
-    async with db_session as session:
-        async with session.begin():
-            statement = select(AccountForgottenPassword).filter(
-                AccountForgottenPassword.used == False,  # noqa:E712
-            )
-            res = await session.execute(statement)
-            latest_account_forgotten_password = res.scalars().first()
-            statement = select(AccountForgottenPassword).filter(
-                AccountForgottenPassword.used == True,  # noqa:E712
-            )
-            res = await session.execute(statement)
-            used_account_forgotten_password_count = len(res.scalars().all())
+    async with db_session() as session:
+        statement = select(AccountForgottenPassword).filter(
+            AccountForgottenPassword.used == False,  # noqa:E712
+        )
+        res = await session.execute(statement)
+        latest_account_forgotten_password = res.scalars().first()
+        statement = select(AccountForgottenPassword).filter(
+            AccountForgottenPassword.used == True,  # noqa:E712
+        )
+        res = await session.execute(statement)
+        used_account_forgotten_password_count = len(res.scalars().all())
 
     assert latest_account_forgotten_password
 
@@ -125,7 +129,7 @@ async def test_cant_initiate_forgot_password_if_account_doesnt_exist(
     client: TestClient,
     account_factory: Type[AsyncSQLAlchemyFactory],
     account_forgotten_password_factory: Type[AsyncSQLAlchemyFactory],
-    db_session: AsyncSession,
+    db_session: async_sessionmaker[AsyncSession],
 ) -> None:
     mock_smtp_email_service = create_autospec(SMTPEmailService, spec_set=True)
     cast(FastAPI, client.app).dependency_overrides[
@@ -142,12 +146,106 @@ async def test_cant_initiate_forgot_password_if_account_doesnt_exist(
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    async with db_session as session:
-        async with session.begin():
-            statement = select(AccountForgottenPassword)
-            res = await session.execute(statement)
-            forgotten_passwords_count = len(res.scalars().all())
+    async with db_session() as session:
+        statement = select(AccountForgottenPassword)
+        res = await session.execute(statement)
+        forgotten_passwords_count = len(res.scalars().all())
 
     mock_smtp_email_service().send_forgotten_password_email.assert_not_called()
 
     assert forgotten_passwords_count == 2
+
+
+async def test_can_reset_password_if_token_unused_and_not_expired(
+    client: TestClient,
+    account_factory: Type[AsyncSQLAlchemyFactory],
+    account_forgotten_password_factory: Type[AsyncSQLAlchemyFactory],
+    db_session: async_sessionmaker[AsyncSession],
+) -> None:
+    account = await account_factory.create()
+    account_forgotten_password = await account_forgotten_password_factory.create(
+        account_id=account.id,
+    )
+
+    raw_password = "test-password"  # nosec
+    payload = {
+        "token": account_forgotten_password.token,
+        "password": raw_password,
+    }  # nosec
+    response = client.post("/accounts/resetpassword", json=payload)
+
+    assert response.status_code == status.HTTP_200_OK
+
+    async with db_session() as session:
+        statement = select(Account).filter(Account.id == account.id)
+        res = await session.execute(statement)
+        updated_account = res.scalars().first()
+        assert updated_account
+        statement = select(AccountForgottenPassword).filter(
+            AccountForgottenPassword.token == account_forgotten_password.token,
+        )
+        res = await session.execute(statement)
+        updated_account_forgotten_password = res.scalars().first()
+        assert updated_account_forgotten_password
+
+    assert bcrypt.checkpw(raw_password.encode(), updated_account.password.encode())
+    assert updated_account_forgotten_password.used
+
+
+async def test_cant_reset_password_if_token_doesnt_exist(
+    client: TestClient,
+) -> None:
+    payload = {
+        "token": "fake-token",
+        "password": "not-used",
+    }  # nosec
+
+    response = client.post("/accounts/resetpassword", json=payload)
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.json()["message"] == (
+        messages.ACCOUNT_FORGOTTEN_PASSWORD_TOKEN_NOT_FOUND
+    )
+
+
+async def test_cant_reset_password_if_token_already_used(
+    client: TestClient,
+    account_forgotten_password_factory: Type[AsyncSQLAlchemyFactory],
+) -> None:
+    token = "test-token"  # nosec
+    await account_forgotten_password_factory.create(token=token, used=True)  # nosec
+    payload = {
+        "token": token,
+        "password": "not-used",
+    }  # nosec
+
+    response = client.post("/accounts/resetpassword", json=payload)
+
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+    assert response.json()["message"] == (
+        messages.ACCOUNT_FORGOTTEN_PASSWORD_TOKEN_ALREADY_USED
+    )
+
+
+@freezegun.freeze_time("2023-01-01 01:01:00")
+async def test_cant_reset_password_if_token_expired(
+    client: TestClient,
+    account_forgotten_password_factory: Type[AsyncSQLAlchemyFactory],
+) -> None:
+    token = "test-token"  # nosec
+    await account_forgotten_password_factory.create(
+        token=token,
+        used=False,
+        created=datetime.datetime.strptime("2023-01-01 00:00:00", "%Y-%m-%d %H:%M:%S"),
+    )
+    payload = {
+        "token": token,
+        "password": "not-used",
+    }  # nosec
+
+    response = client.post("/accounts/resetpassword", json=payload)
+
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+    assert response.json()["message"] == (
+        messages.ACCOUNT_FORGOTTEN_PASSWORD_TOKEN_EXPIRED
+    )
