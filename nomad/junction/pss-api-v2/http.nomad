@@ -77,9 +77,12 @@ job "pss-api-v2" {
         env         = true
         change_mode = "restart"
         data        = <<EOH
+SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
 {{ with secret "kv/data/${var.environment}/pss-api-v2" }}
 MYSQL_DSN={{ .Data.data.mysql_dsn }}
 PSS_V1_DSN={{ .Data.data.pss_v1_dsn }}
+WEB_DSN={{ .Data.data.web_dsn }}
+SMTP_SENDER={{ .Data.data.smtp_sender }}
 {{ end }}
 EOH
       }
