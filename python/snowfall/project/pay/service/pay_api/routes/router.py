@@ -6,6 +6,7 @@ from snowfall.project.pay.service.pay_api.routes import (
     authentication,
     balances,
     companies,
+    contact_persons,
     currencies,
     quotations,
     rates,
@@ -70,5 +71,10 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             companies.StoreCompany,
             name="Company",
             methods=["PATCH"],
+        ),
+        integration.route(
+            "/contact-persons",
+            contact_persons.ContactPersons,
+            name="ContactPerson",
         ),
     ]

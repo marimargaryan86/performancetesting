@@ -6,6 +6,7 @@ from pydantic import AnyUrl
 
 from snowfall.project.adapter import authentication
 from snowfall.project.pay.adapter import currencies
+from snowfall.project.pay.service.accounts import accounts
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.repositories import (
     CompanyRepository,
@@ -37,6 +38,7 @@ def create_dependencies(  # noqa: WPS211
     companies_repository: CompanyRepository,
     transactions_repository: TransactionRepository,
     conversions_repository: ConversionRepository,
+    contact_persons_repository: accounts.ContactPersonsRepository,
     payment_client: Optional[client.PaymentClient] = None,
 ) -> lagom.Container:
     container = lagom.Container()
@@ -49,4 +51,5 @@ def create_dependencies(  # noqa: WPS211
     container[UserSessionRepository] = redis_client
     container[TransactionRepository] = transactions_repository
     container[ConversionRepository] = conversions_repository
+    container[accounts.ContactPersonsRepository] = contact_persons_repository
     return container

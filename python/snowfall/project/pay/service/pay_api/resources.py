@@ -4,6 +4,7 @@ from typing import ClassVar
 
 from starlette import requests
 
+from snowfall.project.pay.service.accounts.v1alpha import models_pb2 as account_models
 from snowfall.project.pay.service.companies.v1alpha import models_pb2
 from snowfall.project.pay.service.quotations.v1alpha import (
     models_pb2 as quotation_models,
@@ -104,6 +105,34 @@ class Transaction(models.Resource):
                     "data": {
                         "id": transaction.quotation_id,
                         "type": "quotations",
+                    },
+                },
+            },
+        )
+
+
+class ContactPersonResource(models.Resource):
+    api_type: ClassVar[str] = "contact-persons"
+
+    @classmethod
+    def from_proto(
+        cls,
+        contact_person: account_models.ContactPerson,
+    ) -> ContactPersonResource:
+        return cls(
+            id=contact_person.id,
+            type=ContactPersonResource.api_type,
+            attributes={
+                "firstName": contact_person.first_name,
+                "lastName": contact_person.last_name,
+                "emailAddress": contact_person.email,
+                "phoneNumber": contact_person.phone_number.e164_number,
+            },
+            relationships={
+                "company": {
+                    "data": {
+                        "id": contact_person.company_id,
+                        "type": "companies",
                     },
                 },
             },

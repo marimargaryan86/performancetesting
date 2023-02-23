@@ -16,6 +16,7 @@ from snowfall.project.adapter import authentication
 from snowfall.project.adapter import authentication as auth
 from snowfall.project.junction.adapter import errors
 from snowfall.project.pay.adapter import currencies
+from snowfall.project.pay.service.accounts import accounts
 from snowfall.project.pay.service.pay_api import bootstrap
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.repositories import (
@@ -42,6 +43,7 @@ def _create_app(  # noqa: WPS211
     redis_repository: UserSessionRepository,
     transaction_repository: TransactionRepository,
     conversion_repository: ConversionRepository,
+    contact_persons_repository: accounts.ContactPersonsRepository,
     openapi_path: pathlib.Path,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
@@ -58,6 +60,7 @@ def _create_app(  # noqa: WPS211
                 companies_repository,
                 transaction_repository,
                 conversion_repository,
+                contact_persons_repository,
                 payment_client=payment_client,
             ),
         ),
@@ -112,6 +115,15 @@ def quotations_repository(
 ) -> quotations.QuotationsRepository:
     return quotations.QuotationsRepository(
         collection=mongo_client.test.quotations,
+    )
+
+
+@pytest.fixture()
+def contact_persons_repository(
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
+) -> accounts.ContactPersonsRepository:
+    return accounts.ContactPersonsRepository(
+        collection=mongo_client.test.contactpersons,
     )
 
 
@@ -191,6 +203,7 @@ def app(  # noqa: WPS211
     transactions_repository: TransactionRepository,
     conversions_repository: ConversionRepository,
     payment_client: PaymentClient,
+    contact_persons_repository: accounts.ContactPersonsRepository,
 ) -> applications.Starlette:
     return _create_app(
         cc_client=cc_client,
@@ -202,6 +215,7 @@ def app(  # noqa: WPS211
         companies_repository=companies_repository,
         transaction_repository=transactions_repository,
         conversion_repository=conversions_repository,
+        contact_persons_repository=contact_persons_repository,
         openapi_path=filesystem.resource_path("junction.pay_api", "openapi.json"),
     )
 
