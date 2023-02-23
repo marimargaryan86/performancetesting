@@ -102,6 +102,7 @@ EOH
         KEEP_HISTORY_LATEST            = "25"
         HTTP_ADDRESS                   = "0.0.0.0"
         ALLURE_DOCKER_SERVICE_API_PORT = "${NOMAD_PORT_http}"
+        ACCESS_TOKEN_EXPIRES_IN_MINS   = "60"
       }
     }
   }
