@@ -31,7 +31,7 @@ async def order(
                 ],
             ),
         ],
-        destination_residence_details=None,
+        residence_address=None,
     )
 
 

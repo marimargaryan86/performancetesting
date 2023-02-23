@@ -172,6 +172,7 @@ async def test_update_order(ba_ndc_client: client.BaNdcClient) -> None:
                         nationality="GBR",
                         issuing_country="GBR",
                         expiration_date=datetime.date.fromisoformat("2027-07-08"),
+                        residence_country_code=None,
                     ),
                 ],
             ),
@@ -331,6 +332,7 @@ async def generate_order(
     offer_searches_rs = await call_get_offers(ba_ndc_client, origin, destination)
     offer = random.choice(offer_searches_rs.get_offers())  # nosec
     offer_search_rs = await ba_ndc_client.get_offer(offer.identifier)
+    residence_country_code = "NOR" if set_residence_country_code else None
 
     assert offer_search_rs is not None
     assert offer_search_rs.offer is not None
@@ -363,6 +365,7 @@ async def generate_order(
                         nationality="GBR",
                         issuing_country="FRA",
                         expiration_date=datetime.date.fromisoformat("2022-05-06"),
+                        residence_country_code=residence_country_code,
                     ),
                 ]
                 if set_passport_info
@@ -371,33 +374,15 @@ async def generate_order(
         ),
     )
     if set_residence_address:
-        order_request_builder.destination_residence_details = (
-            payer_details.DestinationResidenceDetails(
-                residence_address=payer_details.Address(
-                    address_lines=[
-                        "Beeches Apartment",
-                        "200 Lampton Road",
-                    ],
-                    city="NYK",
-                    zip_code="TW345RT",
-                    country_code="USA",
-                ),
-                residence_country_code=None,
-            )
+        order_request_builder.residence_address = payer_details.Address(
+            address_lines=[
+                "Beeches Apartment",
+                "200 Lampton Road",
+            ],
+            city="NYK",
+            zip_code="TW345RT",
+            country_code="USA",
         )
-
-    if set_residence_country_code:
-        if order_request_builder.destination_residence_details is None:
-            order_request_builder.destination_residence_details = (
-                payer_details.DestinationResidenceDetails(
-                    residence_address=None,
-                    residence_country_code="NOR",
-                )
-            )
-        else:
-            order_request_builder.destination_residence_details.residence_country_code = (
-                "NOR"
-            )
 
     return await ba_ndc_client.create_order(order_request_builder.build())
 

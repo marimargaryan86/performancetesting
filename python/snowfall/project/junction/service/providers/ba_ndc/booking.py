@@ -3,6 +3,7 @@ import itertools
 
 import more_itertools
 import phonenumbers
+import pycountry
 import structlog
 
 from snowfall.project.junction.service.orders.v1alpha import amqp_pb2, models_pb2
@@ -14,6 +15,7 @@ from snowfall.project.junction.service.providers.ba_ndc import (
 )
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.v1alpha import postal_address_pb2
 from snowfall.vendor.ba_ndc import client, errors
 from snowfall.vendor.ba_ndc.adapters.order_view_adapter import OrderViewAdapter
 from snowfall.vendor.ba_ndc.builders.order_request import OrderRequestBuilder
@@ -22,6 +24,20 @@ from snowfall.vendor.ba_ndc.models import (
     request_order_schemas,
     response_common_passenger_schemas,
 )
+
+_PASSPORT_DOCUMENT_TYPE = "PT"
+
+
+def _format_country(
+    country_code: str,
+) -> str:
+    if country_code:
+        country_obj = pycountry.countries.get(alpha_2=country_code)
+
+        if country_obj:
+            return country_obj.alpha_3
+
+    return ""
 
 
 def _get_last_travel_date(
@@ -39,31 +55,47 @@ def _get_last_travel_date(
     )
 
 
-def _get_destination_residence_details(
-    international_flight: bool,
+def _get_residence_address(
     return_flight_to_usa: bool,
-    destination_det: models_pb2.DestinationResidenceDetails,
-) -> payer_details.DestinationResidenceDetails | None:
-    if destination_det is not None:
-        drd = payer_details.DestinationResidenceDetails(
-            residence_address=None,
-            residence_country_code=None,
+    residence_address: postal_address_pb2.PostalAddress | None,
+) -> payer_details.Address | None:
+    if residence_address is not None and return_flight_to_usa:
+        return payer_details.Address(
+            address_lines=list(residence_address.address_lines),
+            city=residence_address.locality,
+            zip_code=residence_address.postal_code,
+            country_code=_format_country(residence_address.region_code),
         )
 
-        if international_flight and destination_det.residence_country_code is not None:
-            drd.residence_country_code = destination_det.residence_country_code
+    return None
 
-        if return_flight_to_usa and destination_det.residence_address is not None:
-            drd.residence_address = payer_details.Address(
-                address_lines=list(
-                    destination_det.residence_address.address_lines,
-                ),
-                city=destination_det.residence_address.locality,
-                zip_code=destination_det.residence_address.postal_code,
-                country_code=destination_det.residence_address.region_code,
-            )
 
-        return drd
+def _get_passport_document(
+    passenger: models_pb2.Passenger,
+    is_doc_required: bool,
+) -> request_order_schemas.IdentityDocument | None:
+    is_passport = (
+        passenger.doc_details.document_type == models_pb2.DocumentDetails.TYPE_PASSPORT
+    )
+
+    if is_passport and is_doc_required:
+        return request_order_schemas.IdentityDocument(
+            document_number=passenger.doc_details.document_number,
+            document_type=_PASSPORT_DOCUMENT_TYPE,
+            birth_date=protobuf.protobuf_to_date(passenger.date_of_birth),
+            nationality=_format_country(passenger.doc_details.nationality),
+            issuing_country=_format_country(passenger.doc_details.issue_county),
+            expiration_date=protobuf.protobuf_to_date(
+                passenger.doc_details.exp_date,
+            ),
+            residence_country_code=(
+                _format_country(passenger.doc_details.residence_country_code)
+                if passenger.doc_details.residence_country_code
+                else None
+            ),
+        )
+
+    return None
 
 
 class BookingHandler(object):
@@ -138,20 +170,7 @@ class BookingHandler(object):
         order_request = OrderRequestBuilder(details.offer_id)
 
         for index, passenger in enumerate(task.passengers):
-            passport_document: request_order_schemas.IdentityDocument | None = None
-            doc_details = passenger.doc_details
-
-            if doc_details.document_type == 1 and details.doc_required:
-                passport_document = request_order_schemas.IdentityDocument(
-                    document_number=passenger.doc_details.document_number,
-                    document_type="PT",
-                    birth_date=protobuf.protobuf_to_date(passenger.date_of_birth),
-                    nationality=passenger.doc_details.nationality,
-                    issuing_country=passenger.doc_details.issue_county,
-                    expiration_date=protobuf.protobuf_to_date(
-                        passenger.doc_details.exp_date,
-                    ),
-                )
+            passport_document = _get_passport_document(passenger, details.doc_required)
 
             order_request.add_passenger(
                 request_order_schemas.PassengerExtended(
@@ -185,12 +204,9 @@ class BookingHandler(object):
                 ),
             )
 
-            order_request.destination_residence_details = (
-                _get_destination_residence_details(
-                    details.international_flight,
-                    details.return_flight_to_usa,
-                    task.destination_residence_details,
-                )
+            order_request.residence_address = _get_residence_address(
+                details.return_flight_to_usa,
+                task.residence_address,
             )
 
         adapter = OrderViewAdapter(

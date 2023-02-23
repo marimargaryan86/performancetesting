@@ -15,13 +15,6 @@ class Address(BaseSchema):
     country_code: str = pydantic.Field(description="Country code")
 
 
-class DestinationResidenceDetails(BaseSchema):
-    residence_address: Address | None = pydantic.Field(description="Residence address")
-    residence_country_code: str | None = pydantic.Field(
-        description="Residence country code",
-    )
-
-
 class ContactDetailed(Contact):
     """Contact schema."""
 

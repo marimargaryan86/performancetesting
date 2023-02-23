@@ -3,6 +3,7 @@ syntax = "proto3";
 package snowfall.project.junction.service.orders.v1alpha;
 
 import "snowfall/project/junction/service/orders/v1alpha/models.proto";
+import "snowfall/stdlib/v1alpha/postal_address.proto";
 
 service OrderService {
   rpc CreateJourney(CreateJourneyRequest) returns (CreateJourneyResponse) {}
@@ -53,7 +54,7 @@ message PlaceOrderRequest {
     }
   }
   repeated Option options = 3;
-  DestinationResidenceDetails destination_residence_details = 4;
+  snowfall.stdlib.v1alpha.PostalAddress residence_address = 4;
 }
 
 message PlaceOrderResponse {

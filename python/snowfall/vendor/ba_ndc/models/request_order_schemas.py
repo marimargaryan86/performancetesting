@@ -5,10 +5,7 @@ import uuid
 import pydantic
 
 from snowfall.vendor.ba_ndc.models.base_schema import BaseSchema
-from snowfall.vendor.ba_ndc.models.payer_details import (
-    Contact,
-    DestinationResidenceDetails,
-)
+from snowfall.vendor.ba_ndc.models.payer_details import Address, Contact
 from snowfall.vendor.ba_ndc.models.payment_type_schemas import (
     CashPayment,
     CreditCardPayment,
@@ -25,6 +22,9 @@ class IdentityDocument(BaseSchema):
     issuing_country: str = pydantic.Field(description="Document issuing country")
     expiration_date: datetime.date = pydantic.Field(
         description="Document expiration date",
+    )
+    residence_country_code: str | None = pydantic.Field(
+        description="Residence country code",
     )
 
 
@@ -79,7 +79,7 @@ class CreateOrderRequest(BaseSchema):
         description="Order payment",
         discriminator="payment_type",
     )
-    destination_residence_details: DestinationResidenceDetails | None = pydantic.Field(
+    residence_address: Address | None = pydantic.Field(
         description="Residence details for passengers traveling to USA",
     )
 

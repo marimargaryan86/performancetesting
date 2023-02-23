@@ -11,6 +11,7 @@ from snowfall.project.junction.service.orders.v1alpha import (
     orders_pb2_grpc,
 )
 from snowfall.stdlib import sequence, string
+from snowfall.stdlib.v1alpha import postal_address_pb2
 
 _MOCK_PRICE_UNITS = 13
 _MOCK_PRICE_NANOS = 370000000
@@ -30,7 +31,7 @@ class Client(abc.ABC):
         journey_id: str,
         passengers: Sequence[models_pb2.Passenger],
         options: Sequence[models_pb2.TripOption],
-        destination_residence_details: models_pb2.DestinationResidenceDetails | None,
+        residence_address: postal_address_pb2.PostalAddress | None,
     ) -> models_pb2.Order:
         """Create a new order resource."""
 
@@ -141,7 +142,7 @@ class DictClient(Client):
         journey_id: str,
         passengers: Sequence[models_pb2.Passenger],
         options: Sequence[models_pb2.TripOption],
-        destination_residence_details: models_pb2.DestinationResidenceDetails | None,
+        residence_address: postal_address_pb2.PostalAddress | None,
     ) -> models_pb2.Order:
         if journey_id not in self._journeys:
             raise errors.NotFoundError()
@@ -152,7 +153,7 @@ class DictClient(Client):
             journey_id=journey_id,
             bookings=self._generate_bookings(order_id, options),
             passengers=passengers,
-            destination_residence_details=destination_residence_details,
+            residence_address=residence_address,
         )
         self._journeys[journey_id].orders.append(order)
 
@@ -425,14 +426,14 @@ class GrpcClient(Client):
         journey_id: str,
         passengers: Sequence[models_pb2.Passenger],
         options: Sequence[models_pb2.TripOption],
-        destination_residence_details: models_pb2.DestinationResidenceDetails | None,
+        residence_address: postal_address_pb2.PostalAddress | None,
     ) -> models_pb2.Order:
         response = await errors.handle_grpc_errors(
             self._orders.PlaceOrder(
                 orders_pb2.PlaceOrderRequest(
                     journey_id=journey_id,
                     passengers=passengers,
-                    destination_residence_details=destination_residence_details,
+                    residence_address=residence_address,
                     options=[
                         orders_pb2.PlaceOrderRequest.Option(
                             trip_option=option,

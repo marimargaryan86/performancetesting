@@ -3,13 +3,14 @@ syntax = "proto3";
 package snowfall.project.junction.service.orders.v1alpha;
 
 import "snowfall/project/junction/service/orders/v1alpha/models.proto";
+import "snowfall/stdlib/v1alpha/postal_address.proto";
 
 message PlaceOrderTask {
   Booking booking = 1;
   ContactDetails contact_details = 2;
   repeated Passenger passengers = 3;
   OrderMetadata metadata = 4;
-  DestinationResidenceDetails destination_residence_details = 5;
+  snowfall.stdlib.v1alpha.PostalAddress residence_address = 5;
 }
 
 message OrderMetadata {

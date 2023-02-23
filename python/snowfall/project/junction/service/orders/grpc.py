@@ -93,7 +93,7 @@ class OrderService(
             journey_id=request.journey_id,
             passengers=request.passengers,
             options=[option.trip_option for option in request.options],
-            destination_residence_details=request.destination_residence_details,
+            residence_address=request.residence_address,
         )
 
         await self._publisher.publish(

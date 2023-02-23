@@ -41,7 +41,6 @@ class PriceQuoteTransformer(object):
 
         if duffel_offer.passenger_identity_documents_required:
             required.append(offers_pb2.PriceQuote.Required.REQUIRED_PASSPORT_NUMBER)
-            required.append(offers_pb2.PriceQuote.Required.REQUIRED_DATE_OF_BIRTH)
             required.append(offers_pb2.PriceQuote.Required.REQUIRED_NATIONALITY)
             required.append(offers_pb2.PriceQuote.Required.REQUIRED_ISSUING_COUNTRY)
             required.append(offers_pb2.PriceQuote.Required.REQUIRED_EXPIRATION_DATE)

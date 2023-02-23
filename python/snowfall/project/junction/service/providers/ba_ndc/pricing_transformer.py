@@ -46,7 +46,6 @@ def _to_document_requirement(
     if offer_details.doc_required:
         required_docs.extend(
             [
-                offers_pb2.PriceQuote.Required.REQUIRED_DATE_OF_BIRTH,
                 offers_pb2.PriceQuote.Required.REQUIRED_NATIONALITY,
                 offers_pb2.PriceQuote.Required.REQUIRED_EXPIRATION_DATE,
                 offers_pb2.PriceQuote.Required.REQUIRED_ISSUING_COUNTRY,

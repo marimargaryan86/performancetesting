@@ -114,8 +114,8 @@ class Orders(endpoints.HTTPEndpoint):
             journey_id=journey.id,
             passengers=_create_passengers(body["passengers"]),
             options=_create_trip_options(offer, price_quote),
-            destination_residence_details=_create_destination_residence_details(
-                body.get("destinationResidenceDetails", None),
+            residence_address=_create_residence_address(
+                body.get("residenceAddress", None),
             ),
         )
 
@@ -175,8 +175,8 @@ class OrdersByJourney(endpoints.HTTPEndpoint):
             journey_id=request.path_params["journeyId"],
             passengers=_create_passengers(body["passengers"]),
             options=_create_trip_options(offer, price_quote),
-            destination_residence_details=_create_destination_residence_details(
-                body.get("destinationResidenceAddress", None),
+            residence_address=_create_residence_address(
+                body.get("residenceAddress", None),
             ),
         )
         # todo: Expire (delete) the offer the order was placed for.
@@ -281,32 +281,21 @@ def _create_traveler_doc(
         exp_date=date_to_protobuf(
             datetime.date.fromisoformat(document["documentExpirationDate"]),
         ),
+        residence_country_code=document.get("residenceCountryCode"),
     )
 
 
-def _create_destination_residence_details(
-    destination_residence_details: Mapping[str, Any],
-) -> order_models_pb2.DestinationResidenceDetails | None:
-    if not destination_residence_details:
+def _create_residence_address(
+    residence_address: Mapping[str, Any],
+) -> postal_address_pb2.PostalAddress | None:
+    if not residence_address:
         return None
 
-    residence_address = destination_residence_details.get("residenceAddress")
-
-    return order_models_pb2.DestinationResidenceDetails(
-        residence_address=(
-            postal_address_pb2.PostalAddress(
-                address_lines=residence_address["addressLines"],
-                postal_code=residence_address["postalCode"],
-                locality=residence_address["city"],
-                region_code=residence_address["countryCode"],
-            )
-            if residence_address
-            else None
-        ),
-        residence_country_code=destination_residence_details.get(
-            "residenceCountryCode",
-            None,
-        ),
+    return postal_address_pb2.PostalAddress(
+        address_lines=residence_address["addressLines"],
+        postal_code=residence_address["postalCode"],
+        locality=residence_address["city"],
+        region_code=residence_address["countryCode"],
     )
 
 

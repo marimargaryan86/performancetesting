@@ -152,36 +152,19 @@ def _validate_order_request(
     body: Mapping[str, Any],
     price_quote: offer_models_pb2.PriceQuoteContainer,
 ) -> list[models.Error]:
-    destination_residence_details = body.get("destinationResidenceDetails", None)
-
-    validation_errors = [
-        _generate_mandatory_attribute_error_model(
-            "destinationResidenceDetails",
-            price_quote.id,
-        )
-        for quote in price_quote.quotes
-        if any(
-            req_doc
-            in {
-                offer_models_pb2.PriceQuote.Required.REQUIRED_RESIDENCE_ADDRESS,
-                offer_models_pb2.PriceQuote.Required.REQUIRED_RESIDENCE_COUNTRY_CODE,
-            }
-            for req_doc in quote.required_documents
-        )
-        and destination_residence_details is None
-    ]
+    validation_errors: list[models.Error] = []
 
     for quote in price_quote.quotes:
         validation_errors = [
             *validation_errors,
             *_validate_residence_address(
                 quote.required_documents,
-                destination_residence_details,
+                body.get("residenceAddress", None),
                 quote.id,
             ),
-            *_validate_residence_country_code(
+            *_validate_passport_information(
                 quote.required_documents,
-                destination_residence_details,
+                body.get("passengers", None),
                 quote.id,
             ),
         ]
@@ -191,15 +174,21 @@ def _validate_order_request(
 
 def _validate_residence_address(
     required_fields: Sequence[Any],
-    destination_residence_details: Mapping[str, Any],
+    residence_address: Mapping[str, Any],
     quote_id: str,
 ) -> list[models.Error]:
     validation_errors: list[models.Error] = []
     req_code = offer_models_pb2.PriceQuote.Required.REQUIRED_RESIDENCE_ADDRESS
 
-    if req_code in required_fields and destination_residence_details is not None:
-        residence_address = destination_residence_details.get("residenceAddress")
+    if not residence_address and req_code in required_fields:
+        return [
+            _generate_mandatory_attribute_error_model(
+                "residenceAddress",
+                quote_id,
+            ),
+        ]
 
+    if req_code in required_fields:
         residence_address_attributes = [
             "addressLines",
             "postalCode",
@@ -211,7 +200,7 @@ def _validate_residence_address(
             if not residence_address or not residence_address.get(attr):
                 validation_errors.append(
                     _generate_mandatory_attribute_error_model(
-                        "destinationResidenceDetails.residenceAddress.{0}".format(
+                        "residenceAddress.{0}".format(
                             attr,
                         ),
                         quote_id,
@@ -221,24 +210,58 @@ def _validate_residence_address(
     return validation_errors
 
 
-def _validate_residence_country_code(
+def _validate_passport_information(  # noqa: WPS210
     required_fields: Sequence[Any],
-    destination_residence_details: Mapping[str, Any],
+    passengers: Sequence[Any],
     quote_id: str,
 ) -> list[models.Error]:
     validation_errors: list[models.Error] = []
-    req_code = offer_models_pb2.PriceQuote.Required.REQUIRED_RESIDENCE_COUNTRY_CODE
+    passport_attributes: list[tuple[int, str]] = [
+        (
+            offer_models_pb2.PriceQuote.Required.REQUIRED_DATE_OF_BIRTH,
+            "dateOfBirth",
+        ),
+        (
+            offer_models_pb2.PriceQuote.Required.REQUIRED_NATIONALITY,
+            "nationality",
+        ),
+        (
+            offer_models_pb2.PriceQuote.Required.REQUIRED_EXPIRATION_DATE,
+            "documentExpirationDate",
+        ),
+        (
+            offer_models_pb2.PriceQuote.Required.REQUIRED_ISSUING_COUNTRY,
+            "documentIssueCountry",
+        ),
+        (
+            offer_models_pb2.PriceQuote.Required.REQUIRED_PASSPORT_NUMBER,
+            "documentNumber",
+        ),
+        (
+            offer_models_pb2.PriceQuote.Required.REQUIRED_PASSPORT_NUMBER,
+            "documentType",
+        ),
+        (
+            offer_models_pb2.PriceQuote.Required.REQUIRED_RESIDENCE_COUNTRY_CODE,
+            "residenceCountryCode",
+        ),
+    ]
 
-    if req_code in required_fields and destination_residence_details is not None:
-        res_country_code = destination_residence_details.get("residenceCountryCode")
+    for index, passenger in enumerate(passengers):
+        doc = passenger.get("travelerDocument")
+        for attribute in passport_attributes:
+            doc_attribute_is_not_present = doc is None or doc.get(attribute[1]) is None
 
-        if res_country_code is None:
-            validation_errors.append(
-                _generate_mandatory_attribute_error_model(
-                    "destinationResidenceDetails.residenceCountryCode",
-                    quote_id,
-                ),
-            )
+            if attribute[0] in required_fields and doc_attribute_is_not_present:
+                validation_errors.append(
+                    _generate_mandatory_attribute_error_model(
+                        "passengers[{0}].travelerDocument.{1}".format(
+                            index,
+                            attribute[1],
+                        ),
+                        quote_id,
+                    ),
+                )
 
     return validation_errors
 

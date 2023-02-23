@@ -12,6 +12,7 @@ from snowfall.project.junction.service.orders.v1alpha import models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
+from snowfall.stdlib.v1alpha import postal_address_pb2
 
 
 class JourneyRepository(
@@ -82,7 +83,7 @@ class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
         journey_id: str,
         passengers: Sequence[models_pb2.Passenger],
         options: Sequence[models_pb2.TripOption],
-        destination_residence_details: models_pb2.DestinationResidenceDetails | None,
+        residence_address: postal_address_pb2.PostalAddress | None,
     ) -> models_pb2.Order:
         order_id = string.uuid()
         order = models_pb2.Order(
@@ -90,7 +91,7 @@ class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
             journey_id=journey_id,
             passengers=passengers,
             bookings=self._generate_bookings(order_id, options),
-            destination_residence_details=destination_residence_details,
+            residence_address=residence_address,
         )
         update = await self._execute(
             self._collection.update_one,
