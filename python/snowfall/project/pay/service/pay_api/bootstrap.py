@@ -14,7 +14,7 @@ from snowfall.project.pay.service.pay_api.repositories import (
 )
 from snowfall.project.pay.service.quotations import quotations
 from snowfall.stdlib.integration.starlette import application
-from snowfall.vendor.payment import client
+from snowfall.vendor.currency_cloud import client
 
 
 class Settings(application.Settings):

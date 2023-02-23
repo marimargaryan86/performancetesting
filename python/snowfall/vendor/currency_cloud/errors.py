@@ -1,4 +1,4 @@
-class PaymentError(Exception):
+class CurrencyCloudError(Exception):
     """Payment client specific exception."""
 
     def __init__(

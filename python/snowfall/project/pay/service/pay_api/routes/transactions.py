@@ -6,9 +6,9 @@ from snowfall.project.pay.service.quotations import quotations
 from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Transaction
 from snowfall.stdlib import money, string
 from snowfall.stdlib.integration.starlette import messages, models, request_helpers
-from snowfall.vendor.payment.client import PaymentClient
-from snowfall.vendor.payment.errors import PaymentError
-from snowfall.vendor.payment.models import conversion
+from snowfall.vendor.currency_cloud.client import PaymentClient
+from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
+from snowfall.vendor.currency_cloud.models import conversion
 
 
 class Transactions(endpoints.HTTPEndpoint):
@@ -39,7 +39,7 @@ class Transactions(endpoints.HTTPEndpoint):
                             reason=transaction_id,
                         ),
                     )
-                except PaymentError as exc:
+                except CurrencyCloudError as exc:
                     return models.JsonApiResponse(
                         models.Body(
                             errors=[

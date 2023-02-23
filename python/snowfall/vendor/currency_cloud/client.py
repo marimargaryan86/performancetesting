@@ -1,8 +1,16 @@
 import currencycloud
 
-from snowfall.vendor.payment.errors import PaymentError
-from snowfall.vendor.payment.models.contact import ContactRequest, ContactResponse
-from snowfall.vendor.payment.models.conversion import (
+from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
+from snowfall.vendor.currency_cloud.models.account import (
+    AccountRequest,
+    AccountResponse,
+)
+from snowfall.vendor.currency_cloud.models.contact import (
+    ContactRequest,
+    ContactResponse,
+    exclude_characters,
+)
+from snowfall.vendor.currency_cloud.models.conversion import (
     ConversionRequest,
     ConversionResponse,
 )
@@ -24,7 +32,7 @@ class PaymentClient(object):
             )
         except currencycloud.errors.api.ApiError as exc:
             error = exc.messages[0]
-            raise PaymentError(
+            raise CurrencyCloudError(
                 error.message,
             ) from exc
 
@@ -34,6 +42,7 @@ class PaymentClient(object):
         self,
         contact_request: ContactRequest,
     ) -> ContactResponse:
+        exclude_characters(contact_request)
         try:
             contact = self._cc_client.contacts.create(
                 **contact_request.dict(
@@ -42,8 +51,26 @@ class PaymentClient(object):
             )
         except currencycloud.errors.api.ApiError as exc:
             error = exc.messages[0]
-            raise PaymentError(
+            raise CurrencyCloudError(
                 error.message,
             ) from exc
 
         return ContactResponse(**contact._attributes)  # noqa: WPS437
+
+    def create_account(
+        self,
+        account_request: AccountRequest,
+    ) -> AccountResponse:
+        try:
+            account = self._cc_client.accounts.create(
+                **account_request.dict(
+                    exclude=None,
+                ),
+            )
+        except currencycloud.errors.api.ApiError as exc:
+            error = exc.messages[0]
+            raise CurrencyCloudError(
+                error.message,
+            ) from exc
+
+        return AccountResponse(**account._attributes)  # noqa: WPS437

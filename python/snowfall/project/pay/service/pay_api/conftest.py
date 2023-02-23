@@ -28,8 +28,8 @@ from snowfall.project.pay.service.quotations import quotations
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.vendor.payment.client import PaymentClient
-from snowfall.vendor.payment.errors import PaymentError
+from snowfall.vendor.currency_cloud.client import PaymentClient
+from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
 
 
 def _create_app(  # noqa: WPS211
@@ -156,7 +156,7 @@ def payment_client() -> mock.Mock:
     payment_client = mock.Mock()
     message = "Conversion of GBP equivalent 0.89 is less than your lower limit of 1.00"
     payment_client.create_conversion = mock.Mock(
-        side_effect=PaymentError(message=message),
+        side_effect=CurrencyCloudError(message=message),
     )
     return payment_client
 

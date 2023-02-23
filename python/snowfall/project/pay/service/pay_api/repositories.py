@@ -6,7 +6,7 @@ from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Transac
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.mongo import mixins, repository
-from snowfall.vendor.payment.models.conversion import ConversionResponse
+from snowfall.vendor.currency_cloud.models.conversion import ConversionResponse
 
 
 class CompanyRepository(

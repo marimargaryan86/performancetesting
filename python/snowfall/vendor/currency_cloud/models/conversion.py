@@ -2,7 +2,7 @@ import datetime
 
 import pydantic
 
-from snowfall.vendor.payment.models.base import CamelCaseBaseModel
+from snowfall.vendor.currency_cloud.models.base import CamelCaseBaseModel
 
 
 class ConversionRequest(CamelCaseBaseModel):
