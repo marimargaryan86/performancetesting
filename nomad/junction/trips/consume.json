@@ -1,0 +1,12 @@
+{
+  "development": {
+    "variables": {
+      "count": 5
+    }
+  },
+  "production": {
+    "variables": {
+      "count": 5
+    }
+  }
+}

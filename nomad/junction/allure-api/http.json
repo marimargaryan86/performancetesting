@@ -1,0 +1,11 @@
+{
+  "development": {
+    "variables": {
+      "traefik_entrypoints": "websecure",
+      "traefik_host_URL": "allureapi.junction.dev"
+    }
+  },
+  "production": {
+    "deploy": false
+  }
+}

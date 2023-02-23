@@ -43,7 +43,7 @@ for ((idx = 3; idx < ${#ARGS[@]}; ++idx)); do
 		true
 	fi
 
-	DEPLOYMENT_ID=$(nomad eval status -json "${EVALUATION_ID}" | jq -r ".DeploymentID")
+	DEPLOYMENT_ID=$(nomad eval status -json "${EVALUATION_ID}" | jq -e -r ".DeploymentID")
 	echo "Deployment ID: ${DEPLOYMENT_ID}"
 
 	if [ "${DEPLOYMENT_ID}" = "" ]; then
@@ -51,17 +51,17 @@ for ((idx = 3; idx < ${#ARGS[@]}; ++idx)); do
 		continue
 	fi
 
-	ALLOC_IDS=$(nomad deployment status -json "${DEPLOYMENT_ID}" | jq -r ".TaskGroups[].PlacedCanaries | add")
+	ALLOC_IDS=$(nomad deployment status -json "${DEPLOYMENT_ID}" | jq -e -r ".TaskGroups[].PlacedCanaries | if . == null then [] else . end | add")
 	echo "Allocation IDs: ${ALLOC_IDS}"
 
-	if [ "${ALLOC_IDS}" = "" ]; then
+	if [ "${ALLOC_IDS}" = "" ] || [ "${ALLOC_IDS}" = "null" ]; then
 		echo "WARN: No Allocation IDs found, skipping."
 		continue
 	fi
 
 	while IFS= read -r ALLOC_ID; do
 		echo "-- Allocation ${ALLOC_ID} --"
-		JOBS=$(nomad alloc status -json "${ALLOC_ID}" | jq -r ".TaskStates | keys[]")
+		JOBS=$(nomad alloc status -json "${ALLOC_ID}" | jq -e -r ".TaskStates | keys[]")
 		while IFS= read -r JOB; do
 			echo "stdout of '${JOB}':"
 			nomad alloc logs -tail "${ALLOC_ID}" "${JOB}"

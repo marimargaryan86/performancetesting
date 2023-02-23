@@ -1,0 +1,14 @@
+{
+  "development": {
+    "variables": {
+      "count": 1,
+      "s3_bucket": "junction-schedules-export"
+    }
+  },
+  "production": {
+    "variables": {
+      "count": 1,
+      "s3_bucket": "prod-junction-schedules-export"
+    }
+  }
+}

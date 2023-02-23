@@ -1,3 +1,0 @@
-traefik_host_URL ="api.pay.junction.travel"
-traefik_entrypoints="web"
-count = 2

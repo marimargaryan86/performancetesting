@@ -1,0 +1,14 @@
+{
+  "development": {
+    "variables": {
+      "traefik_host_URL": "thumbor.junction.dev",
+      "traefik_entrypoints": "websecure"
+    }
+  },
+  "production": {
+    "variables": {
+      "traefik_host_URL": "thumbor.junction.travel",
+      "traefik_entrypoints": "web"
+    }
+  }
+}

@@ -38,22 +38,21 @@ if [ -f "dist/deliverables.json" ]; then
 	done
 fi
 
-for i in "repo/${1}/"**/*.nomad; do
+for i in "repo/${1}/"**/*.{nomad,vars}; do
 	rm "${i}"
 done
 
 for i in nomad/**/*.nomad; do
 	filename=$(basename "${i}")
+	config="$(dirname "${i}")/${filename%.*}.json"
 	service_name=$(basename "$(dirname "${i}")" | sed s/_/-/g)
 	repo_path="repo/${1}/${service_name}"
 	mkdir -p "${repo_path}"
 	cp "${i}" "${repo_path}/${filename}"
-done
-for i in nomad/**/*.vars."${1}"; do
-	filename=$(basename "${i%.*}")
-	service_name=$(basename "$(dirname "${i}")" | sed s/_/-/g)
-	repo_path="repo/${1}/${service_name}"
-	cp "${i}" "${repo_path}/${filename}"
+
+	if [ -f "${config}" ]; then
+		jq -r ".${1}.variables|to_entries|map(\"\\(.key)=\\(.value|tostring)\")|.[]" "${config}" >"${repo_path}/${filename%.*}.vars"
+	fi
 done
 
 cp ".gitlab/deploy.gitlab-ci.yml" "repo/.gitlab-ci.yml"

@@ -1,0 +1,12 @@
+{
+  "development": {
+    "variables": {
+      "base_url_URL": "https://api.junction.dev",
+      "traefik_entrypoints": "websecure",
+      "traefik_host_URL": "dogfood.junction.dev"
+    }
+  },
+  "production": {
+    "deploy": false
+  }
+}

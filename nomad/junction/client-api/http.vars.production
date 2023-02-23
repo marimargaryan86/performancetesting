@@ -1,3 +1,0 @@
-traaefik_host_URL ="api.junction.travel"
-traefik_entrypoints="web"
-count = 4

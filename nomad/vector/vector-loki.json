@@ -1,0 +1,12 @@
+{
+  "development": {
+    "variables": {
+      "loki_endpoint": "http://172.31.46.153:3100"
+    }
+  },
+  "production": {
+    "variables": {
+      "loki_endpoint": "http://172.31.46.153:3100"
+    }
+  }
+}

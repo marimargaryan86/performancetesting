@@ -4,7 +4,7 @@ set -eu
 shopt -s globstar
 shopt -s nullglob
 
-environment=${1}
+ENVIRONMENT=${1}
 SENTRY_PROJECTS=$(sentry-cli projects list | awk -F '|' '{if (NR>3){print $2$3}}' | sed 's/^ *//;s/ *$//')
 
 for f in nomad/**/*.nomad; do
@@ -20,12 +20,15 @@ for f in nomad/**/*.nomad; do
 		exit 1
 	fi
 
-	VARS_FILE="${f%.*}.vars.${environment}"
-	ADDITIONAL_ARGS=()
-	if [ -f "$VARS_FILE" ]; then
-		ADDITIONAL_ARGS=("-var-file=${VARS_FILE}")
+	FILENAME=$(basename "${f}")
+	CONFIG="$(dirname "${f}")/${FILENAME%.*}.json"
+	VARIABLES=()
+
+	if [ -f "${CONFIG}" ]; then
+		mapfile -t VARIABLES < <(jq -r ".${ENVIRONMENT}.variables|to_entries|map(\"-var=\\(.key)=\\(.value|tostring)\")|.[]" "${CONFIG}")
 	fi
-	nomad validate "${ADDITIONAL_ARGS[@]}" "${f}" >/dev/null
+
+	nomad validate "${VARIABLES[@]}" "${f}" >/dev/null
 	if [[ $(nomad fmt -check -write=false "${f}") ]]; then
 		exit 1
 	fi

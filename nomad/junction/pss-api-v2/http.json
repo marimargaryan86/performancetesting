@@ -1,0 +1,16 @@
+{
+  "development": {
+    "variables": {
+      "count": 1,
+      "traefik_entrypoints": "websecure",
+      "traefik_host_URL": "pssapi2.junction.dev"
+    }
+  },
+  "production": {
+    "variables": {
+      "count": 2,
+      "traefik_entrypoints": "web",
+      "traefik_host_URL": "pssapi2.junction.travel"
+    }
+  }
+}

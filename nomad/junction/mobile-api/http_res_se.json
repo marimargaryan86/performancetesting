@@ -1,0 +1,16 @@
+{
+  "development": {
+    "variables": {
+      "count": 3,
+      "traefik_entrypoints": "websecure",
+      "traefik_host_URL": "res-se-mobile-api.junction.dev"
+    }
+  },
+  "production": {
+    "variables": {
+      "count": 3,
+      "traefik_entrypoints": "web",
+      "traefik_host_URL": "res-se-mobile-api.junction.travel"
+    }
+  }
+}
