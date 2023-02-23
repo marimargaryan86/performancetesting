@@ -83,9 +83,30 @@ class Command(Generic[_Settings]):
 @dataclasses.dataclass(frozen=True)
 class Entrypoint(object):
     name: str
+    _group: click.Group = dataclasses.field(init=False)
     sentry_settings: SentrySettings = SentrySettings()
 
-    def enter_with_commands(  # noqa: WPS213, WPS211
+    def __post_init__(self) -> None:
+        object.__setattr__(  # noqa: WPS609
+            self,
+            "_group",
+            click.Group(name=self.name, callback=_group),
+        )
+        _add_parameters_from_settings(self._group, _GlobalSettings)
+
+    def add_command(self, cmd: Command[_Settings]) -> None:
+        command = click.Command(name=cmd.name, callback=_command(cmd))
+        _add_parameters_from_settings(command, cmd.settings_class)
+        self._group.add_command(command)
+
+    def enter(self) -> None:
+        self._group(
+            obj={
+                "entrypoint": self,
+            },
+        )
+
+    def enter_with_commands(  # noqa: WPS211
         self,
         _cmd0: Command[_Settings0],
         _cmd1: Optional[Command[_Settings1]] = None,
@@ -94,44 +115,20 @@ class Entrypoint(object):
         _cmd4: Optional[Command[_Settings4]] = None,
         _cmd5: Optional[Command[_Settings5]] = None,
     ) -> None:
-        group = click.Group(name=self.name, callback=_group)
+        def wrapper(cmd: Command[_Settings] | None) -> None:
+            if not cmd:
+                return
 
-        _add_parameters_from_settings(group, _GlobalSettings)
+            self.add_command(cmd)
 
-        command = click.Command(name=_cmd0.name, callback=_command(_cmd0))
-        _add_parameters_from_settings(command, _cmd0.settings_class)
-        group.add_command(command)  # noqa: WPS204
+        wrapper(_cmd0)
+        wrapper(_cmd1)
+        wrapper(_cmd2)
+        wrapper(_cmd3)
+        wrapper(_cmd4)
+        wrapper(_cmd5)
 
-        if _cmd1:
-            command = click.Command(name=_cmd1.name, callback=_command(_cmd1))
-            _add_parameters_from_settings(command, _cmd1.settings_class)
-            group.add_command(command)
-
-        if _cmd2:
-            command = click.Command(name=_cmd2.name, callback=_command(_cmd2))
-            _add_parameters_from_settings(command, _cmd2.settings_class)
-            group.add_command(command)
-
-        if _cmd3:
-            command = click.Command(name=_cmd3.name, callback=_command(_cmd3))
-            _add_parameters_from_settings(command, _cmd3.settings_class)
-            group.add_command(command)
-
-        if _cmd4:
-            command = click.Command(name=_cmd4.name, callback=_command(_cmd4))
-            _add_parameters_from_settings(command, _cmd4.settings_class)
-            group.add_command(command)
-
-        if _cmd5:
-            command = click.Command(name=_cmd5.name, callback=_command(_cmd5))
-            _add_parameters_from_settings(command, _cmd5.settings_class)
-            group.add_command(command)
-
-        group(
-            obj={
-                "entrypoint": self,
-            },
-        )
+        self.enter()
 
 
 def _get_type(type_: type) -> type:
