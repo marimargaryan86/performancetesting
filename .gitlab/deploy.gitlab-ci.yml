@@ -6,7 +6,7 @@ stages:
   stage: generate
   script:
     - mkdir dist
-    - ./${ENVIRONMENT_NAME}/generate-deploy-pipeline.sh "${ENVIRONMENT_NAME}" "${DATACENTER}" > "dist/${ENVIRONMENT_NAME}.yml"
+    - ./${ENVIRONMENT_NAME}/generate-deploy-pipeline.sh "${ENVIRONMENT_NAME}" "${NOMAD_ADDR}" "${DATACENTER}" > "dist/${ENVIRONMENT_NAME}.yml"
   needs: []
   artifacts:
     paths:
@@ -18,11 +18,23 @@ generate-dev:
   extends: .generate
   variables:
     DATACENTER: junction-dev-dc1
+    NOMAD_ADDR: "${NOMAD_DEVELOPMENT_ADDR}"
     ENVIRONMENT_NAME: development
   rules:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
       changes:
         - development/**/*
+
+generate-prod:
+  extends: .generate
+  variables:
+    DATACENTER: junction-prod-dc1
+    NOMAD_ADDR: "${NOMAD_PRODUCTION_ADDR}"
+    ENVIRONMENT_NAME: production
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      changes:
+        - production/**/*
 
 deploy-dev:
   stage: deploy
@@ -37,3 +49,17 @@ deploy-dev:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
       changes:
         - development/**/*
+
+deploy-prod:
+  stage: deploy
+  needs:
+    - job: generate-prod
+      artifacts: true
+  trigger:
+    include:
+      - artifact: dist/production.yml
+        job: generate-prod
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      changes:
+        - production/**/*

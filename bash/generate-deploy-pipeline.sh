@@ -27,7 +27,8 @@ make-uninterruptible:
     action: start
   variables:
     NOMAD_NAMESPACE: "\${CI_ENVIRONMENT_TIER}"
-    NOMAD_VAR_datacenter: "${2}"
+    NOMAD_ADDR: "${2}"
+    NOMAD_VAR_datacenter: "${3}"
     NOMAD_VAR_environment: "\${CI_ENVIRONMENT_TIER}"
     NOMAD_VAR_registry_address: "\${CI_REGISTRY}"
     NOMAD_VAR_registry_password: "\${NOMAD_REGISTRY_PASSWORD}"
