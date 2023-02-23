@@ -592,12 +592,13 @@ func main() {
 
 	for fileCount, feedFileName := range feedFiles {
 		if filepath.Ext(feedFileName.Name()) != ".zip" {
-			continue // Skip annoying local files like .DS_Store
+			// Skip annoying local files like .DS_Store
+			log.Printf("\nSKIP: %v (%d of %d)\n", feedFileName.Name(), fileCount+1, totalFiles)
+			continue
 		}
 
 		func() {
-			mesg := fmt.Sprintf("\nProcessing: %v (%d of %d)\n", feedFileName.Name(), fileCount+1, totalFiles)
-			log.Println(mesg)
+			log.Printf("\nProcessing: %v (%d of %d)\n", feedFileName.Name(), fileCount+1, totalFiles)
 
 			serviceDateCache = make(map[string][]time.Time)
 
