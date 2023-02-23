@@ -253,3 +253,68 @@ class PayClient(object):
 
         response.raise_for_status()
         return response.json()
+
+    async def create_contact_persons(  # noqa: WPS211
+        self,
+        first_name: str,
+        last_name: str,
+        email_address: str,
+        phone_number: str,
+        company_id: str,
+    ) -> dict[str, Any]:
+        payload = {
+            _DATA_KEY: {
+                _TYPE_KEY: "contact-persons",
+                _ATTRIBUTES_KEY: {
+                    "firstName": first_name,
+                    "lastName": last_name,
+                    "emailAddress": email_address,
+                    "phoneNumber": phone_number,
+                },
+                _RELATIONSHIPS_KEY: {
+                    "company": {
+                        _DATA_KEY: {_ID_KEY: company_id, _TYPE_KEY: "companies"},
+                    },
+                },
+            },
+        }
+
+        response = await self._http_client.post(
+            "{0}/contact-persons".format(self._base_url),
+            headers=self._http_client.headers,
+            json=payload,
+        )
+
+        response.raise_for_status()
+        return response.json()
+
+    async def create_accounts(
+        self,
+        name: str,
+        contact_person_id: str,
+    ) -> dict[str, Any]:
+        payload = {
+            _DATA_KEY: {
+                _TYPE_KEY: "accounts",
+                _ATTRIBUTES_KEY: {
+                    "name": name,
+                },
+                _RELATIONSHIPS_KEY: {
+                    "contactPerson": {
+                        _DATA_KEY: {
+                            _ID_KEY: contact_person_id,
+                            _TYPE_KEY: "contact-persons",
+                        },
+                    },
+                },
+            },
+        }
+
+        response = await self._http_client.post(
+            "{0}/accounts".format(self._base_url),
+            headers=self._http_client.headers,
+            json=payload,
+        )
+
+        response.raise_for_status()
+        return response.json()
