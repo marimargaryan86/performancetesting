@@ -51,7 +51,7 @@ async def test_get_leg_types(
     response = await junction_client.legs().get_legs_types()
     logging.info("get_legs_types: %s", json.dumps(response, indent=4))
     leg_types = {leg_type["id"] for leg_type in response["data"]}
-    assert leg_types == {"unspecified", "ferry", "air", "rail"}
+    assert leg_types == {"unspecified", "ferry", "air", "rail", "bus", "taxi"}
 
 
 @pytest.mark.integration

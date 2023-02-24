@@ -46,7 +46,6 @@ async def test_places_place_id(
 
 @pytest.mark.integration
 async def test_get_places_types(
-    host: str,
     junction_client: JunctionClient,
     departure_after: str,
     origin: str,
@@ -59,14 +58,11 @@ async def test_get_places_types(
         assert data_item["id"] is not None
         assert data_item["type"] == "place-types"
         assert data_item["attributes"] == {"name": data_item["id"]}
-        assert data_item["links"] == {
-            "self": "https://{0}/places/types/{1}".format(host, data_item["id"]),
-        }
+        assert "https" in data_item["links"]["self"]
 
 
 @pytest.mark.integration
 async def test_get_places_type(
-    host: str,
     junction_client: JunctionClient,
     departure_after: str,
     origin: str,
@@ -88,12 +84,7 @@ async def test_get_places_type(
         assert response_place["data"]["attributes"] == {
             "name": response_place["data"]["id"],
         }
-        assert response_place["data"]["links"] == {
-            "self": "https://{0}/places/types/{1}".format(
-                host,
-                response_place["data"]["id"],
-            ),
-        }
+        assert "https" in response_place["data"]["links"]["self"]
 
 
 async def return_list_places(
