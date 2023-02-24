@@ -27,11 +27,8 @@ from snowfall.project.junction.service.providers.save_a_train import (
     cache,
     consumer,
     criteria,
+    train_stations,
 )
-from snowfall.project.junction.service.providers.save_a_train import (
-    offers as sat_offers,
-)
-from snowfall.project.junction.service.providers.save_a_train import train_stations
 from snowfall.project.junction.service.providers.save_a_train.v1alpha import amqp_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import h3, service
@@ -40,6 +37,7 @@ from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer, trackable, types
 from snowfall.stdlib.transport.grpc import client as grpc_client
 from snowfall.vendor.save_a_train import client
+from snowfall.vendor.save_a_train.models import request as request_models
 
 _OFFERS = "offers"
 
@@ -155,8 +153,29 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
         )
 
         # TODO: do we need to call get_token on the save_a_train_client?
-
-        search_consumer = offers.SearchCriteriaConsumer[amqp_pb2.SearchCriteriaTask](
+        sat_adapter = adapter.SaveATrainAdapter(
+            save_a_train_client=save_a_train_client,
+            train_station_repository=train_stations.TrainStationRepository(
+                train_stations=await _load_train_stations(),
+            ),
+            provider_cabin_class_mapping=cabin_classes.CabinMappingRepository(
+                mongo.sat.provider_cabin_mapping,
+            ),
+            offers_cache=cache.OffersCache(
+                client=redis.Client(redis_connection, prefix=app.name),
+            ),
+            ttl=app.settings.ttl,
+            notifier=notifications.LogNotifier(),
+            notifications_producer=producer.Producer(
+                amqp_connection,
+                types.Exchange("notifications"),
+            ),
+        )
+        search_consumer = offers.SearchCriteriaConsumer[
+            amqp_pb2.SearchCriteriaTask,
+            request_models.CreateSearchRequest,
+        ](
+            search_criteria_generator_func=sat_adapter.search_criteria_generator,
             consumer=amqp_consumer.Consumer(
                 connection=amqp_connection,
                 queue_name="{0}_searches".format(app.name),
@@ -181,25 +200,8 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                     redis=redis_connection,
                     prefix=app.name,
                 ),
-                offer_group_cache_key_func=sat_offers.offer_group_cache_key,
-                offer_group_generator=adapter.SaveATrainAdapter(
-                    save_a_train_client=save_a_train_client,
-                    train_station_repository=train_stations.TrainStationRepository(
-                        train_stations=await _load_train_stations(),
-                    ),
-                    provider_cabin_class_mapping=cabin_classes.CabinMappingRepository(
-                        mongo.sat.provider_cabin_mapping,
-                    ),
-                    offers_cache=cache.OffersCache(
-                        client=redis.Client(redis_connection, prefix=app.name),
-                    ),
-                    ttl=app.settings.ttl,
-                    notifier=notifications.LogNotifier(),
-                    notifications_producer=producer.Producer(
-                        amqp_connection,
-                        types.Exchange("notifications"),
-                    ),
-                ).gather_search_results,
+                offer_group_cache_key_func=sat_adapter.generate_cache_key,
+                offer_group_generator=sat_adapter.gather_search_results,
             ),
         )
 

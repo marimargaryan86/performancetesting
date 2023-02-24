@@ -3,7 +3,10 @@ from typing import AsyncIterator, Callable, Generic, Sequence, TypeVar
 from google.protobuf import message
 
 from snowfall.project.junction.provider import status
-from snowfall.project.junction.provider.repository import OfferGroupRepository
+from snowfall.project.junction.provider.repository import (
+    OfferCacheLockError,
+    OfferGroupRepository,
+)
 from snowfall.project.junction.provider.segment_matcher import SegmentMatcher
 from snowfall.project.junction.service.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
 from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
@@ -16,6 +19,7 @@ from snowfall.stdlib.v1alpha import amqp_pb2 as stdlib_amqp_pb2
 from snowfall.stdlib.v1alpha import models_pb2
 
 _Proto = TypeVar("_Proto", bound=message.Message)
+_CriteriaType = TypeVar("_CriteriaType")
 TripOfferSearchMessages = (
     offers_amqp_pb2.TripOfferSearchTask | stdlib_amqp_pb2.Trackable
 )
@@ -117,16 +121,18 @@ def set_segment_ids(
         segment.segment_id = search_segments[segment_index].id
 
 
-class SearchCriteriaConsumer(Generic[_Proto]):
+class SearchCriteriaConsumer(Generic[_Proto, _CriteriaType]):
     def __init__(
         self,
         consumer: amqp_consumer.Consumer[_Proto],
         producer: amqp_producer.Producer,
-        offer_group_repository: OfferGroupRepository,
+        offer_group_repository: OfferGroupRepository[_CriteriaType],
+        search_criteria_generator_func: Callable[[_Proto], _CriteriaType],
     ):
         self._consumer = consumer
         self._producer = producer
         self._offer_group_repository = offer_group_repository
+        self._search_criteria_generator_func = search_criteria_generator_func
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -146,14 +152,19 @@ class SearchCriteriaConsumer(Generic[_Proto]):
             raise TypeError
 
         segment_matcher = SegmentMatcher(amqp_message.body.segments)
+        search_criteria = self._search_criteria_generator_func(amqp_message.body)
+        try:
+            offer_groups = self._offer_group_repository.find(search_criteria)
+        except OfferCacheLockError:
+            return await amqp_message.nack(requeue=True)
 
-        async for cached_offer_group in self._offer_group_repository.find(amqp_message):
-            if segment_matcher.offer_group_matches(cached_offer_group):
-                set_segment_ids(amqp_message.body.segments, cached_offer_group)
+        async for offer_group in offer_groups:
+            if segment_matcher.offer_group_matches(offer_group):
+                set_segment_ids(amqp_message.body.segments, offer_group)
                 await self._producer.publish(
                     msg=offers_amqp_pb2.TripOfferSearchResult(
                         offer_search_id=amqp_message.body.offer_search_id,
-                        offer=cached_offer_group,
+                        offer=offer_group,
                     ),
                     routing_key="offers.result.trip",
                 )

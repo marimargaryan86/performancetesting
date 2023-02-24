@@ -17,17 +17,18 @@ from snowfall.project.junction.service.providers.direct_ferries import (
 from snowfall.project.junction.service.providers.direct_ferries import (
     consumer as df_consumer,
 )
-from snowfall.project.junction.service.providers.direct_ferries import criteria
 from snowfall.project.junction.service.providers.direct_ferries import (
-    offers as df_offers,
+    criteria,
+    port,
+    route,
 )
-from snowfall.project.junction.service.providers.direct_ferries import port, route
 from snowfall.project.junction.service.providers.direct_ferries.v1alpha import amqp_pb2
 from snowfall.stdlib import h3, service
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.direct_ferries import client
 from snowfall.vendor.direct_ferries.clients import auth, base
+from snowfall.vendor.direct_ferries.models import request
 
 _OFFERS = "offers"
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -99,8 +100,19 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
         )
 
         redis_client = redis.Client(redis_connection, prefix=app.name)
-
-        await offers.SearchCriteriaConsumer[amqp_pb2.SearchCriteriaTask](
+        ferry_adapter = adapter.DfAdapter(
+            df_client=df_client,
+            ports=port.PortRepository(port.load_ports()),
+            offers_cache=cache.OffersCache(
+                client=redis_client,
+            ),
+            ttl=app.settings.ttl,
+        )
+        await offers.SearchCriteriaConsumer[
+            amqp_pb2.SearchCriteriaTask,
+            request.QuoteRequest,
+        ](
+            search_criteria_generator_func=ferry_adapter.search_criteria_generator,
             consumer=consumer.Consumer(
                 connection=amqp_connection,
                 binds=[(types.Exchange("direct_ferries"), "offers.search.trip")],
@@ -115,15 +127,8 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                     redis=redis_connection,
                     prefix=app.name,
                 ),
-                offer_group_cache_key_func=df_offers.offer_group_cache_key,
-                offer_group_generator=adapter.DfAdapter(
-                    df_client=df_client,
-                    ports=port.PortRepository(port.load_ports()),
-                    offers_cache=cache.OffersCache(
-                        client=redis_client,
-                    ),
-                    ttl=app.settings.ttl,
-                ).gather_search_results,
+                offer_group_cache_key_func=ferry_adapter.generate_cache_key,
+                offer_group_generator=ferry_adapter.gather_search_results,
             ),
         ).consume()
 

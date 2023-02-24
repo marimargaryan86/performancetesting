@@ -9,7 +9,6 @@ from dateutil import relativedelta
 from snowfall.project.junction.provider import airports, cabin_classes
 from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.project.junction.service.providers.ask2go import cache, models
-from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2, money_pb2
@@ -37,11 +36,10 @@ class OfferTransformer(object):  # noqa: WPS214
 
     async def to_offer_groups(
         self,
-        search_task: amqp_pb2.SearchCriteriaTask,
         provider_offers: AsyncIterator[offers.Offer],
     ) -> AsyncIterator[offers_pb2.OfferGroup]:
         async for offer in provider_offers:
-            yield await self._to_offer_group(search_task, offer)
+            yield await self._to_offer_group(offer)
 
     async def to_price_quote(
         self,
@@ -109,7 +107,6 @@ class OfferTransformer(object):  # noqa: WPS214
 
     async def _to_offer_group(
         self,
-        search_task: amqp_pb2.SearchCriteriaTask,
         offer: offers.Offer,
     ) -> offers_pb2.OfferGroup:
         expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl

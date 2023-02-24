@@ -48,10 +48,10 @@ class Leg(LegBase):
     accommodation_message: Optional[str]
     departure_port_name: Optional[str]
     departure_port_id: Optional[int]
-    departure_port_code: Optional[str]
+    departure_port_code: str
     arrival_port_name: Optional[str]
     arrival_port_id: Optional[int]
-    arrival_port_code: Optional[str]
+    arrival_port_code: str
     arrival_date_time: Optional[datetime.datetime]
     duration_minutes: Optional[int]
     is_accommodation_compulsory: Optional[bool]

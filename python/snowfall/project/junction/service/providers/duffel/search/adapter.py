@@ -27,19 +27,6 @@ from snowfall.vendor.duffel.models.offer import Offer
 from snowfall.vendor.duffel.models.offer_slice import OfferSliceSegment
 
 
-def offer_group_cache_key(task: amqp_pb2.SearchCriteriaTask) -> str:
-    return string.to_uuid(
-        b"\x00".decode().join(
-            [
-                *[segment.id for segment in task.segments],
-                *[str(age) for age in task.criteria.passenger_ages],
-                task.criteria.origin_iata,
-                task.criteria.destination_iata,
-            ],
-        ),
-    )
-
-
 class OfferGrouper(object):
     @classmethod
     def group_offers(
@@ -95,29 +82,7 @@ class DuffelSearchAdapter(object):
             disabled_airlines=disabled_airlines,
         )
 
-    async def gather_search_results(
-        self,
-        search_task: amqp_pb2.SearchCriteriaTask,
-    ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
-        res = await self._client.create_offer_request(
-            self._build_search_request(search_task),
-        )
-
-        if res.offers:
-            validator = Validators(
-                self._airline_validator,
-            )
-            grouped_offers = OfferGrouper.group_offers(res.offers, validator.matches)
-
-            for offers in grouped_offers.values():
-                offer_group = await self._offer_parser.parse_offer_group(
-                    offers,
-                )
-
-                if offer_group:
-                    yield offer_group
-
-    def _build_search_request(
+    def search_criteria_generator(
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
     ) -> OfferRequestData:
@@ -152,3 +117,45 @@ class DuffelSearchAdapter(object):
             )
 
         return offer_request_builder.build()
+
+    def generate_cache_key(self, search_criteria: OfferRequestData) -> str:
+        return string.to_uuid(
+            b"\x00".decode().join(
+                [
+                    *[
+                        str(passenger.age)
+                        for passenger in search_criteria.offer_data.passengers
+                    ],
+                    *[
+                        "{origin}-{destination}-{departure_date}".format(
+                            origin=offer_slice.origin,
+                            destination=offer_slice.destination,
+                            departure_date=offer_slice.departure_date,
+                        )
+                        for offer_slice in search_criteria.offer_data.slices
+                    ],
+                ],
+            ),
+        )
+
+    async def gather_search_results(
+        self,
+        search_criteria: OfferRequestData,
+    ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
+        res = await self._client.create_offer_request(
+            search_criteria,
+        )
+
+        if res.offers:
+            validator = Validators(
+                self._airline_validator,
+            )
+            grouped_offers = OfferGrouper.group_offers(res.offers, validator.matches)
+
+            for offers in grouped_offers.values():
+                offer_group = await self._offer_parser.parse_offer_group(
+                    offers,
+                )
+
+                if offer_group:
+                    yield offer_group

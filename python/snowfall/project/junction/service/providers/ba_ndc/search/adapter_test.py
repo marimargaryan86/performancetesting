@@ -35,7 +35,9 @@ async def test_adapter(
     if search_task:
         offer_groups = [
             offer_group
-            async for offer_group in search_adapter.gather_search_results(search_task)
+            async for offer_group in search_adapter.gather_search_results(
+                search_adapter.search_criteria_generator(search_task),
+            )
         ]
 
         assert len(offer_groups) == 15

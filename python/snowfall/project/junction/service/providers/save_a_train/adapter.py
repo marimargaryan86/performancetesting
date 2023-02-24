@@ -72,15 +72,46 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         self._notifications_producer = notifications_producer
         self._logger = structlog.get_logger(__name__)
 
-    async def gather_search_results(  # noqa: C901,WPS210,WPS231
+    def search_criteria_generator(
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
-    ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
+    ) -> request.CreateSearchRequest:
         origin = self._train_stations.get_by_id(
             search_task.criteria.origin_id,
         )
         destination = self._train_stations.get_by_id(
             search_task.criteria.destination_id,
+        )
+        return request.CreateSearchRequest(
+            origin_id=origin.identifier,
+            destination_id=destination.identifier,
+            passengers_ages=list(search_task.criteria.passengers_ages),
+            departure_datetime=protobuf.protobuf_to_datetime(
+                search_task.criteria.departure_datetime,
+            ),
+        )
+
+    def generate_cache_key(self, search_criteria: request.CreateSearchRequest) -> str:
+        return string.to_uuid(
+            b"\x00".decode().join(
+                [
+                    search_criteria.origin_id,
+                    str(search_criteria.destination_id),
+                    str(search_criteria.departure_datetime),
+                    *[str(age) for age in search_criteria.passengers_ages],
+                ],
+            ),
+        )
+
+    async def gather_search_results(  # noqa: C901,WPS210,WPS231
+        self,
+        search_criteria: request.CreateSearchRequest,
+    ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
+        origin = self._train_stations.get_by_id(
+            search_criteria.origin_id,
+        )
+        destination = self._train_stations.get_by_id(
+            search_criteria.destination_id,
         )
 
         try:
@@ -89,10 +120,8 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                     origin_id=origin.identifier,
                     destination_id=destination.identifier,
                     trip_type=enums.TripType.one_way,
-                    number_of_passengers=len(search_task.criteria.passengers_ages),
-                    departure_date=protobuf.protobuf_to_date(
-                        search_task.criteria.departure_datetime,
-                    ),
+                    number_of_passengers=len(search_criteria.passengers_ages),
+                    departure_date=search_criteria.departure_datetime.date(),
                 ),
             )
         except httpx.TimeoutException as timeout_error:
@@ -105,16 +134,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                 raise http_status_error
 
         try:
-            search_response = await self._client.create_search(
-                request.CreateSearchRequest(
-                    origin_id=origin.identifier,
-                    destination_id=destination.identifier,
-                    passengers_ages=list(search_task.criteria.passengers_ages),
-                    departure_datetime=protobuf.protobuf_to_datetime(
-                        search_task.criteria.departure_datetime,
-                    ),
-                ),
-            )
+            search_response = await self._client.create_search(search_criteria)
         except exceptions.SATValidationError as search_error:
             raise NoResultsError(search_error) from search_error
         except httpx.HTTPStatusError as http_error:

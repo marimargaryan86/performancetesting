@@ -1,13 +1,12 @@
 import datetime
 import types as std_types
-from typing import AsyncIterable, AsyncIterator, Callable, Type, TypeVar
+from typing import AsyncIterable, AsyncIterator, Callable, Generic, Type, TypeVar
 
 from google.protobuf import message
 
 from snowfall.project.junction.service.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
 from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.stdlib.persistence.redis import types as redis_types
-from snowfall.stdlib.transport.amqp import types as amqp_types
 from snowfall.stdlib.v1alpha import amqp_pb2 as stdlib_amqp_pb2
 
 _Proto = TypeVar("_Proto", bound=message.Message)
@@ -18,10 +17,19 @@ TripOfferSearchCriteriaGenerator = Callable[
     [offers_amqp_pb2.TripOfferSearchTask],
     list[_Proto],
 ]
+_CriteriaType = TypeVar("_CriteriaType")
+OfferGroupGenerator = Callable[
+    [_CriteriaType],
+    AsyncIterator[offers_pb2.OfferGroup],
+]
 
 
 class NoCacheExistsError(Exception):
     """Thrown when the cache for an offer search hasn't been created yet."""
+
+
+class OfferCacheLockError(Exception):
+    """Thrown when the offer cache lock is not acquired."""
 
 
 class OfferGroupCache(object):
@@ -90,12 +98,12 @@ class OfferGroupCache(object):
         )
 
 
-class OfferGroupRepository(object):
+class OfferGroupRepository(Generic[_CriteriaType]):
     def __init__(
         self,
-        offer_group_cache_key_func: Callable[[_Proto], str],
+        offer_group_cache_key_func: Callable[[_CriteriaType], str],
         redis: redis_types.Client[bytes],
-        offer_group_generator: Callable[[_Proto], AsyncIterator[offers_pb2.OfferGroup]],
+        offer_group_generator: OfferGroupGenerator[_CriteriaType],
     ) -> None:
         self._offer_group_cache_key_func = offer_group_cache_key_func
         self._redis = redis
@@ -103,26 +111,24 @@ class OfferGroupRepository(object):
 
     async def find(
         self,
-        amqp_message: amqp_types.Message[_Proto],
+        search_criteria: _CriteriaType,
     ) -> AsyncIterator[offers_pb2.OfferGroup]:
         offer_cache = OfferGroupCache(
-            self._offer_group_cache_key_func(amqp_message.body),
+            self._offer_group_cache_key_func(search_criteria),
             self._redis,
         )
 
         async with offer_cache as has_lock:
             if has_lock:
-                async for cached_offer_group in self._search_offers(  # noqa: WPS352
-                    amqp_message.body,
-                    offer_cache,
-                ):
+                search_offers = self._search_offers(search_criteria, offer_cache)
+                async for cached_offer_group in search_offers:
                     yield cached_offer_group
             else:
-                await amqp_message.nack(requeue=True)
+                raise OfferCacheLockError
 
     async def _search_offers(
         self,
-        search_task: _Proto,
+        search_criteria: _CriteriaType,
         offer_cache: OfferGroupCache,
     ) -> AsyncIterable[offers_pb2.OfferGroup]:
         try:
@@ -130,6 +136,6 @@ class OfferGroupRepository(object):
                 yield cached_offer_group
 
         except NoCacheExistsError:
-            async for offer_result in self._offer_group_generator(search_task):
+            async for offer_result in self._offer_group_generator(search_criteria):
                 await offer_cache.put(offer_result)
                 yield offer_result

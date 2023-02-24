@@ -9,7 +9,6 @@ from snowfall.project.junction.provider import airports, offers, repository
 from snowfall.project.junction.service.providers.ba_ndc import cache, config
 from snowfall.project.junction.service.providers.ba_ndc.search.adapter import (
     BaNdcSearchAdapter,
-    offer_group_cache_key,
 )
 from snowfall.project.junction.service.providers.ba_ndc.v1alpha.amqp_pb2 import (
     SearchCriteriaTask,
@@ -20,6 +19,7 @@ from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, producer, trackable, types
 from snowfall.vendor.ba_ndc import client
+from snowfall.vendor.ba_ndc.models import request_offer_search_schemas
 
 
 async def searches(  # noqa: WPS210
@@ -56,7 +56,18 @@ async def searches(  # noqa: WPS210
                 ).load("airports.json"),
             ),
         )
-        search_consumer = offers.SearchCriteriaConsumer[SearchCriteriaTask](
+        ba_ndc_adapter = BaNdcSearchAdapter(
+            ba_ndc_client=ba_ndc_client,
+            airport_repository=airport_repository,
+            offers_cache=cache.OfferCache(
+                client=redis.Client[bytes](redis_connection, prefix=app.name),
+            ),
+        )
+        search_consumer = offers.SearchCriteriaConsumer[
+            SearchCriteriaTask,
+            request_offer_search_schemas.OfferSearchRequest,
+        ](
+            search_criteria_generator_func=ba_ndc_adapter.search_criteria_generator,
             consumer=consumer.Consumer(
                 connection=amqp_connection,
                 queue_name="{0}_searches".format(app.name),
@@ -81,14 +92,8 @@ async def searches(  # noqa: WPS210
                     redis=redis_connection,
                     prefix=app.name,
                 ),
-                offer_group_cache_key_func=offer_group_cache_key,
-                offer_group_generator=BaNdcSearchAdapter(
-                    ba_ndc_client=ba_ndc_client,
-                    airport_repository=airport_repository,
-                    offers_cache=cache.OfferCache(
-                        client=redis.Client[bytes](redis_connection, prefix=app.name),
-                    ),
-                ).gather_search_results,
+                offer_group_cache_key_func=ba_ndc_adapter.generate_cache_key,
+                offer_group_generator=ba_ndc_adapter.gather_search_results,
             ),
         )
 

@@ -26,9 +26,12 @@ async def test_adapter(
 
     offer_response = OfferRequestResponse.parse_obj(json)
     search_task = search_task_from_offer(offer_response.response_data.offers[0])
+
     offer_groups = [
         offer_group
-        async for offer_group in search_adapter.gather_search_results(search_task)
+        async for offer_group in search_adapter.gather_search_results(
+            search_adapter.search_criteria_generator(search_task),
+        )
     ]
 
     offers = offer_groups[0].offers
@@ -57,9 +60,12 @@ async def test_offer_with_stop(
     offer_response = OfferRequestResponse.parse_obj(json)
     offer = offer_response.response_data.offers[0]
     search_task = search_task_from_offer(offer)
+
     offer_groups = [
         offer_group
-        async for offer_group in search_adapter.gather_search_results(search_task)
+        async for offer_group in search_adapter.gather_search_results(
+            search_adapter.search_criteria_generator(search_task),
+        )
     ]
 
     assert all(
@@ -104,9 +110,12 @@ async def test_airline_validator(  # noqa: WPS210
     )
 
     search_task = search_task_from_offer(ba15_offer)
+
     offer_groups = [
         offer_group
-        async for offer_group in search_adapter_no_ba.gather_search_results(search_task)
+        async for offer_group in search_adapter_no_ba.gather_search_results(
+            search_adapter_no_ba.search_criteria_generator(search_task),
+        )
     ]
 
     assert len(offer_groups) == 24
@@ -114,7 +123,7 @@ async def test_airline_validator(  # noqa: WPS210
     offer_groups = [
         offer_group
         async for offer_group in search_adapter_ba_only.gather_search_results(
-            search_task,
+            search_adapter_ba_only.search_criteria_generator(search_task),
         )
     ]
 
@@ -131,9 +140,12 @@ async def test_airline_validator(  # noqa: WPS210
     )
 
     search_task = search_task_from_offer(vs23_offer)
+
     offer_groups = [
         offer_group
-        async for offer_group in search_adapter_no_ba.gather_search_results(search_task)
+        async for offer_group in search_adapter_no_ba.gather_search_results(
+            search_adapter_no_ba.search_criteria_generator(search_task),
+        )
     ]
 
     assert len(offer_groups) == 24
@@ -141,7 +153,7 @@ async def test_airline_validator(  # noqa: WPS210
     offer_groups = [
         offer_group
         async for offer_group in search_adapter_ba_only.gather_search_results(
-            search_task,
+            search_adapter_ba_only.search_criteria_generator(search_task),
         )
     ]
 

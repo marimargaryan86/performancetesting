@@ -84,8 +84,9 @@ async def test_search_result_data(  # noqa: WPS218
         offer_groups = [
             group
             async for group in offer_transformer.to_offer_groups(
-                _ARN_LHR,
-                search_adapter.gather_search_results(_ARN_LHR),
+                search_adapter.gather_search_results(
+                    search_adapter.search_criteria_generator(_ARN_LHR),
+                ),
             )
         ]
 

@@ -2,7 +2,6 @@ import datetime
 import json
 from typing import AsyncIterator
 
-import more_itertools
 import structlog
 
 from snowfall.project.junction.service.offers.v1alpha import (
@@ -45,12 +44,10 @@ class DfAdapter(object):
         self._ttl = ttl
         self._logger = structlog.get_logger(__name__)
 
-    async def gather_search_results(  # noqa: WPS210
+    def search_criteria_generator(
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
-    ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
-        origin = self._ports.get_by_id(search_task.criteria.origin_id)
-        destination = self._ports.get_by_id(search_task.criteria.destination_id)
+    ) -> request.QuoteRequest:
         departure_dt = protobuf.protobuf_to_datetime(
             search_task.criteria.departure_datetime,
         ).astimezone(datetime.timezone.utc)
@@ -92,9 +89,44 @@ class DfAdapter(object):
                 ),
             ],
         )
+
+        return request.QuoteRequest(quote=quote_base)
+
+    def generate_cache_key(self, search_criteria: request.QuoteRequest) -> str:
+        return string.to_uuid(
+            b"\x00".decode().join(
+                [
+                    str(search_criteria.quote.partner_code),
+                    str(search_criteria.quote.is_different_outbound_return),
+                    str(search_criteria.quote.return_alternative_routes),
+                    str(search_criteria.quote.is_open_ticket),
+                    *[
+                        "{is_return_leg}-{route_id}-{departure_date_time}".format(
+                            is_return_leg=leg.is_return_leg,
+                            route_id=leg.route_id,
+                            departure_date_time=str(leg.departure_date_time),
+                        )
+                        for leg in search_criteria.quote.legs
+                    ],
+                    *[
+                        "{age_to}-{age_from}".format(
+                            age_to=passenger.age_range.age_to,
+                            age_from=passenger.age_range.age_from,
+                        )
+                        for leg in search_criteria.quote.legs
+                        for passenger in leg.passengers
+                    ],
+                ],
+            ),
+        )
+
+    async def gather_search_results(  # noqa: WPS210
+        self,
+        search_criteria: request.QuoteRequest,
+    ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
         try:
             quotes = await self._client.quotes.get_quotes(
-                request=request.QuoteRequest(quote=quote_base),
+                request=search_criteria,
             )
         except errors.DFError:
             self._logger.exception("Failed to get quotes")
@@ -107,6 +139,9 @@ class DfAdapter(object):
             leg_obj = quote_obj.legs[0]
             offer_segment_id = string.uuid()
             currency = money.Currency(quote_obj.selected_currency)
+
+            origin = self._ports.get_by_id(quote_obj.legs[0].departure_port_code)
+            destination = self._ports.get_by_id(quote_obj.legs[-1].arrival_port_code)
 
             yield offer_models_pb2.OfferGroup(
                 id=string.uuid(),
@@ -138,14 +173,11 @@ class DfAdapter(object):
                 segments=[
                     offer_models_pb2.OfferSegment(
                         id=offer_segment_id,
-                        segment_id=search_task.segments[0].id,
                         vendor=leg_obj.operator.name if leg_obj.operator else "",
                         type=models_pb2.Schedule.TYPE_FERRY,
                         legs=[
                             offer_models_pb2.OfferSegmentLeg(
-                                id=more_itertools.first(
-                                    more_itertools.first(search_task.segments).legs,
-                                ).id,
+                                id=string.uuid(),
                                 origin=models_pb2.Point(
                                     ref=origin.identifier,
                                     name=str(origin.identifier),

@@ -15,6 +15,7 @@ from snowfall.stdlib import service
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, producer, trackable, types
 from snowfall.vendor.distribusion import client
+from snowfall.vendor.distribusion.models.criterias import FindConnectionsCriteria
 
 
 async def searches(app: service.Application[SearchesSettings]) -> None:  # noqa: WPS210
@@ -40,7 +41,18 @@ async def searches(app: service.Application[SearchesSettings]) -> None:  # noqa:
             retailer_partner_number=app.settings.retailer_partner_number,
             http_client=http_client,
         )
-        search_consumer = offers.SearchCriteriaConsumer[amqp_pb2.SearchCriteriaTask](
+        distribusion_adapter = adapter.DistribusionSearchAdapter(
+            distribusion_client=distribusion_client,
+            offers_cache=cache.OffersCache(
+                client=redis.Client(redis_connection, prefix=app.name),
+            ),
+            ttl=app.settings.ttl,
+        )
+        search_consumer = offers.SearchCriteriaConsumer[
+            amqp_pb2.SearchCriteriaTask,
+            FindConnectionsCriteria,
+        ](
+            search_criteria_generator_func=distribusion_adapter.search_criteria_generator,
             consumer=consumer.Consumer(
                 connection=amqp_connection,
                 queue_name="{0}_searches".format(app.name),
@@ -65,14 +77,8 @@ async def searches(app: service.Application[SearchesSettings]) -> None:  # noqa:
                     redis=redis_connection,
                     prefix=app.name,
                 ),
-                offer_group_cache_key_func=adapter.offer_group_cache_key,
-                offer_group_generator=adapter.DistribusionSearchAdapter(
-                    distribusion_client=distribusion_client,
-                    offers_cache=cache.OffersCache(
-                        client=redis.Client(redis_connection, prefix=app.name),
-                    ),
-                    ttl=app.settings.ttl,
-                ).gather_search_results,
+                offer_group_cache_key_func=distribusion_adapter.generate_cache_key,
+                offer_group_generator=distribusion_adapter.gather_search_results,
             ),
         )
 

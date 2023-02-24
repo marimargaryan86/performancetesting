@@ -38,6 +38,7 @@ from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer, trackable, types
 from snowfall.vendor.ask2go import client
+from snowfall.vendor.ask2go.models import search as search_models
 
 _OFFERS = "offers"
 
@@ -188,8 +189,16 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
             api_booking_base_url=app.settings.api_booking_base_url,
             http_client=http_client,
         )
-
-        await offers.SearchCriteriaConsumer[amqp_pb2.SearchCriteriaTask](
+        search_adapter = search.Adapter(
+            ask2go_client=ask2go_client,
+            poll_retries_limit=app.settings.poll_retries_limit,
+            wait_time_between_polling=app.settings.wait_time_between_polling,
+        )
+        await offers.SearchCriteriaConsumer[
+            amqp_pb2.SearchCriteriaTask,
+            search_models.CreateSearchCriteria,
+        ](
+            search_criteria_generator_func=search_adapter.search_criteria_generator,
             consumer=amqp_consumer.Consumer(
                 connection=amqp_connection,
                 queue_name="{0}_searches".format(app.name),
@@ -214,13 +223,9 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                     redis=redis_connection,
                     prefix=app.name,
                 ),
-                offer_group_cache_key_func=a2g_offers.offer_group_cache_key,
+                offer_group_cache_key_func=search_adapter.generate_cache_key,
                 offer_group_generator=a2g_offers.offer_group_generator(
-                    a2g_adapter=search.Adapter(
-                        ask2go_client=ask2go_client,
-                        poll_retries_limit=app.settings.poll_retries_limit,
-                        wait_time_between_polling=app.settings.wait_time_between_polling,
-                    ),
+                    a2g_adapter=search_adapter,
                     a2g_transformer=transformer.OfferTransformer(
                         airport_repository=airports.AirportRepository(
                             airports_data=cast(

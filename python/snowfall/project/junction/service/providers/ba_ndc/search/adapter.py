@@ -25,70 +25,6 @@ from snowfall.vendor.ba_ndc.models import (
 from snowfall.vendor.ba_ndc.models.util import offer_enums, passenger_enums
 
 
-def offer_group_cache_key(task: amqp_pb2.SearchCriteriaTask) -> str:
-    return string.to_uuid(
-        b"\x00".decode().join(
-            [
-                *[segment.id for segment in task.segments],
-                str(task.criteria.adults),
-                str(task.criteria.children),
-                str(task.criteria.infants),
-                task.criteria.origin_iata,
-                task.criteria.destination_iata,
-            ],
-        ),
-    )
-
-
-def build_search_request(
-    search_task: amqp_pb2.SearchCriteriaTask,
-) -> request_offer_search_schemas.OfferSearchRequest:
-    offer_request_builder = OffersRequestBuilder()
-    outbound_date = protobuf.protobuf_to_datetime(
-        search_task.criteria.outbound_departure,
-    )
-
-    for _ in range(search_task.criteria.adults):
-        offer_request_builder.add_passenger(passenger_enums.PassengerTypeEnum.adult)
-
-    for _ in range(search_task.criteria.children):
-        offer_request_builder.add_passenger(passenger_enums.PassengerTypeEnum.child)
-
-    for _ in range(search_task.criteria.infants):
-        offer_request_builder.add_passenger(
-            passenger_enums.PassengerTypeEnum.infant,
-        )
-
-    if search_task.criteria.cabin_class:
-        offer_request_builder.set_cabin(
-            offer_enums.CabinTypeEnum(search_task.criteria.cabin_class),
-        )
-
-    offer_request_builder.add_trip(
-        request_offer_search_schemas.Trip(
-            destination=search_task.criteria.destination_iata,
-            origin=search_task.criteria.origin_iata,
-            date=outbound_date.date(),
-            time=outbound_date.time(),
-        ),
-    )
-
-    if search_task.criteria.HasField("inbound_departure"):
-        inbound_date = protobuf.protobuf_to_datetime(
-            search_task.criteria.inbound_departure,
-        )
-        offer_request_builder.add_trip(
-            request_offer_search_schemas.Trip(
-                destination=search_task.criteria.origin_iata,
-                origin=search_task.criteria.destination_iata,
-                date=inbound_date.date(),
-                time=inbound_date.time(),
-            ),
-        )
-
-    return offer_request_builder.build()
-
-
 class OfferGrouper(object):
     @classmethod
     def group_offers(
@@ -150,13 +86,86 @@ class BaNdcSearchAdapter(object):
         )
         self._logger = structlog.get_logger(__name__)
 
-    async def gather_search_results(
+    def search_criteria_generator(
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
-    ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
-        res = await self._client.get_offers(
-            build_search_request(search_task),
+    ) -> request_offer_search_schemas.OfferSearchRequest:
+        offer_request_builder = OffersRequestBuilder()
+        outbound_date = protobuf.protobuf_to_datetime(
+            search_task.criteria.outbound_departure,
         )
+
+        for _ in range(search_task.criteria.adults):
+            offer_request_builder.add_passenger(passenger_enums.PassengerTypeEnum.adult)
+
+        for _ in range(search_task.criteria.children):
+            offer_request_builder.add_passenger(passenger_enums.PassengerTypeEnum.child)
+
+        for _ in range(search_task.criteria.infants):
+            offer_request_builder.add_passenger(
+                passenger_enums.PassengerTypeEnum.infant,
+            )
+
+        if search_task.criteria.cabin_class:
+            offer_request_builder.set_cabin(
+                offer_enums.CabinTypeEnum(search_task.criteria.cabin_class),
+            )
+
+        offer_request_builder.add_trip(
+            request_offer_search_schemas.Trip(
+                destination=search_task.criteria.destination_iata,
+                origin=search_task.criteria.origin_iata,
+                date=outbound_date.date(),
+                time=outbound_date.time(),
+            ),
+        )
+
+        if search_task.criteria.HasField("inbound_departure"):
+            inbound_date = protobuf.protobuf_to_datetime(
+                search_task.criteria.inbound_departure,
+            )
+            offer_request_builder.add_trip(
+                request_offer_search_schemas.Trip(
+                    destination=search_task.criteria.origin_iata,
+                    origin=search_task.criteria.destination_iata,
+                    date=inbound_date.date(),
+                    time=inbound_date.time(),
+                ),
+            )
+
+        return offer_request_builder.build()
+
+    def generate_cache_key(
+        self,
+        search_criteria: request_offer_search_schemas.OfferSearchRequest,
+    ) -> str:
+        return string.to_uuid(
+            b"\x00".decode().join(
+                [
+                    search_criteria.cabin_type.name,
+                    str(search_criteria.fare_preferences),
+                    *[
+                        "{origin}-{destination}-{date}-{time}".format(
+                            origin=trip.origin,
+                            destination=trip.destination,
+                            date=trip.date,
+                            time=trip.time,
+                        )
+                        for trip in search_criteria.trips
+                    ],
+                    *[
+                        passenger.passenger_type.name
+                        for passenger in search_criteria.passengers
+                    ],
+                ],
+            ),
+        )
+
+    async def gather_search_results(
+        self,
+        search_criteria: request_offer_search_schemas.OfferSearchRequest,
+    ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
+        res = await self._client.get_offers(search_criteria)
 
         if res.get_offers():
             grouped_offers = OfferGrouper.group_offers(res)

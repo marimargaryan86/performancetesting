@@ -182,11 +182,11 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
         self._ttl = ttl
         self._logger = structlog.get_logger(__name__)
 
-    async def gather_search_results(
+    def search_criteria_generator(
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
-    ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
-        criteria = FindConnectionsCriteria(
+    ) -> FindConnectionsCriteria:
+        return FindConnectionsCriteria(
             locale=search_task.criteria.locale or _DEFAULT_LOCALE,
             departure_stations=list(search_task.criteria.origin_ids),
             arrival_stations=list(search_task.criteria.destination_ids),
@@ -203,13 +203,37 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
             pax=len(search_task.criteria.passengers_age),
             currency=search_task.criteria.currency or _DEFAULT_CURRENCY,
         )
-        connection_list = await self._client.find_connections(criteria)
-        async for fare_group in self._parse_connections(search_task, connection_list):
+
+    def generate_cache_key(self, search_criteria: FindConnectionsCriteria) -> str:
+        return string.to_uuid(
+            b"\x00".decode().join(
+                [
+                    str(search_criteria.pax),
+                    str(search_criteria.currency),
+                    str(search_criteria.locale),
+                    *search_criteria.departure_stations,
+                    *search_criteria.arrival_stations,
+                    str(search_criteria.departure_date),
+                    str(search_criteria.return_date),
+                ],
+            ),
+        )
+
+    async def gather_search_results(
+        self,
+        search_criteria: FindConnectionsCriteria,
+    ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
+        connection_list = await self._client.find_connections(search_criteria)
+        fare_groups = self._parse_connections(
+            search_criteria,
+            connection_list,
+        )
+        async for fare_group in fare_groups:
             yield fare_group
 
     async def _parse_connections(
         self,
-        search_task: amqp_pb2.SearchCriteriaTask,
+        search_criteria: FindConnectionsCriteria,
         connection_list: Sequence[connections.Connection],
     ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
         expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
@@ -217,8 +241,8 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
 
         self._logger.info(
             "Connections",
-            origins=search_task.criteria.origin_ids,
-            destinations=search_task.criteria.destination_ids,
+            origins=search_criteria.departure_stations,
+            destinations=search_criteria.arrival_stations,
             count=len(connection_list),
         )
 

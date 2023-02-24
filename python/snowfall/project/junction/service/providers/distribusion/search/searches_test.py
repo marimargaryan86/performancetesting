@@ -77,8 +77,9 @@ _DEBERCBS_FRPARPGB = amqp_pb2.SearchCriteriaTask(
 async def test_search(
     distribusion_search_adapter: DistribusionSearchAdapter,
 ) -> None:
-    search_task = _DEBERCBS_FRPARPGB
-    search_results = distribusion_search_adapter.gather_search_results(search_task)
+    search_results = distribusion_search_adapter.gather_search_results(
+        distribusion_search_adapter.search_criteria_generator(_DEBERCBS_FRPARPGB),
+    )
     count = 0
 
     async for offer in search_results:

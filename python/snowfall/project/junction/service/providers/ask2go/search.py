@@ -49,17 +49,17 @@ class Adapter(object):
 
     async def gather_search_results(
         self,
-        search_task: amqp_pb2.SearchCriteriaTask,
+        search_criteria: search.CreateSearchCriteria,
     ) -> AsyncIterator[offers.Offer]:
-        identifiers = await self._make_search(search_task)
+        identifiers = await self._client.create_search(criteria=search_criteria)
 
         async for offer in self._gather_offers(identifiers):
             yield offer
 
-    async def _make_search(
+    def search_criteria_generator(
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
-    ) -> search.CreateSearchResponse:
+    ) -> search.CreateSearchCriteria:
         outbound_date = protobuf.protobuf_to_datetime(
             search_task.criteria.outbound_departure,
         )
@@ -84,7 +84,25 @@ class Adapter(object):
                 inbound_date.time(),
             )
 
-        return await self._client.create_search(criteria=search_criteria)
+        return search_criteria
+
+    def generate_cache_key(self, search_criteria: search.CreateSearchCriteria) -> str:
+        return string.to_uuid(
+            b"\x00".decode().join(
+                [
+                    search_criteria.cabin_class.name,
+                    str(search_criteria.adults),
+                    str(search_criteria.children),
+                    str(search_criteria.infants),
+                    str(search_criteria.inbound_date),
+                    str(search_criteria.outbound_date),
+                    str(search_criteria.origin_iata),
+                    str(search_criteria.destination_iata),
+                    str(search_criteria.inbound_departure_window),
+                    str(search_criteria.outbound_departure_window),
+                ],
+            ),
+        )
 
     async def _gather_offers(
         self,

@@ -15,6 +15,7 @@ from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer, trackable, types
 from snowfall.vendor.duffel import client
+from snowfall.vendor.duffel.builders.offer_request import OfferRequestData
 
 _OFFERS = "offers"
 
@@ -44,8 +45,20 @@ async def searches(app: service.Application[SearchesSettings]) -> None:  # noqa:
             version=app.settings.api_version,
             http_client=http_client,
         )
-
-        search_consumer = offers.SearchCriteriaConsumer[amqp_pb2.SearchCriteriaTask](
+        duffle_adapter = adapter.DuffelSearchAdapter(
+            duffel_client=duffel_client,
+            offers_cache=cache.OfferCache(
+                client=redis.Client[bytes](redis_connection, prefix=app.name),
+            ),
+            ttl=app.settings.ttl,
+            enabled_airlines=app.settings.enabled_airlines,
+            disabled_airlines=app.settings.disabled_airlines,
+        )
+        search_consumer = offers.SearchCriteriaConsumer[
+            amqp_pb2.SearchCriteriaTask,
+            OfferRequestData,
+        ](
+            search_criteria_generator_func=duffle_adapter.search_criteria_generator,
             consumer=amqp_consumer.Consumer(
                 connection=amqp_connection,
                 queue_name="{0}_searches".format(app.name),
@@ -70,16 +83,8 @@ async def searches(app: service.Application[SearchesSettings]) -> None:  # noqa:
                     redis=redis_connection,
                     prefix=app.name,
                 ),
-                offer_group_cache_key_func=adapter.offer_group_cache_key,
-                offer_group_generator=adapter.DuffelSearchAdapter(
-                    duffel_client=duffel_client,
-                    offers_cache=cache.OfferCache(
-                        client=redis.Client[bytes](redis_connection, prefix=app.name),
-                    ),
-                    ttl=app.settings.ttl,
-                    enabled_airlines=app.settings.enabled_airlines,
-                    disabled_airlines=app.settings.disabled_airlines,
-                ).gather_search_results,
+                offer_group_cache_key_func=duffle_adapter.generate_cache_key,
+                offer_group_generator=duffle_adapter.gather_search_results,
             ),
         )
 
