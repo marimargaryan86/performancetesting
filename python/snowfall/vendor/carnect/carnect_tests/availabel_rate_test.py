@@ -1,6 +1,6 @@
 import datetime
 
-from snowfall.vendor.carnect.adapters import veh_avail_rate_adapter
+from snowfall.vendor.carnect.adapters.veh_avail_rate_adapter import VehAvailRateAdapter
 from snowfall.vendor.carnect.builders import veh_avail_rate_builder
 from snowfall.vendor.carnect.carnect_tests.carnect_test import disable_by_default
 from snowfall.vendor.carnect.client import CarnectClient
@@ -26,7 +26,7 @@ async def test_avail_rate(
     rental_core.add_pick_up_location("LHR", "2")
     rental_core.return_location("LHR", "2")
 
-    rs_adapter = veh_avail_rate_adapter.VehAvailRateAdapter(
+    rs_adapter = VehAvailRateAdapter(
         await carnect_client.get_avail_rate(rq.build()),
     )
     assert rs_adapter.is_success(), rs_adapter.get_error()

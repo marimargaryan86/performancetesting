@@ -28,3 +28,7 @@ async def test_rate_rule(
         await carnect_client.veh_rate_rules(rule_rq.build()),
     )
     assert rule_adapter.is_success(), rule_adapter.get_error()
+
+    assert rule_adapter.priced_equipments()[
+        0
+    ].equipment_type(), rule_adapter.priced_equipments()[0].description()

@@ -5,6 +5,7 @@ from snowfall.vendor.carnect.adapters.cancel_reservation_adapter import (
     CancelReservationAdapter,
 )
 from snowfall.vendor.carnect.adapters.reservation_adapter import ReservationAdapter
+from snowfall.vendor.carnect.adapters.veh_rate_rule_adapter import VehRateRuleAdapter
 from snowfall.vendor.carnect.builders.cancel_reservation_builder import (
     CancelReservationRqBuilder,
 )
@@ -12,6 +13,7 @@ from snowfall.vendor.carnect.builders.reservation_builder import (
     CustomerPrimaryBuilder,
     ReservationBuilder,
 )
+from snowfall.vendor.carnect.builders.veh_rate_rule_builder import VehRateRuleRqBuilder
 from snowfall.vendor.carnect.carnect_tests.carnect_test import disable_by_default
 from snowfall.vendor.carnect.carnect_tests.conftest import DRIVER_AGE
 from snowfall.vendor.carnect.client import CarnectClient
@@ -30,7 +32,20 @@ async def test_reservation(  # noqa: WPS210
 ) -> None:
     offer_id_context = _get_test_offer_id_context(offers)
     assert offer_id_context is not None
+
+    rule_request = _rate_rule(carnect_config, offer_id_context)
+    rule_adapter = VehRateRuleAdapter(
+        await carnect_client.veh_rate_rules(rule_request.build()),
+    )
+
+    assert rule_adapter.priced_equipments()[
+        1
+    ].equipment_type(), rule_adapter.priced_equipments()[1].description()
+
+    equipment_type = rule_adapter.priced_equipments()[1].equipment_type() or ""
+
     res_rq = ReservationBuilder(config=carnect_config)
+    res_rq.add_equip_pref(equipment_type)
     res_rq.veh_pref_code(offer_id_context)
     _init_test_driver(res_rq.primary_driver())
 
@@ -59,6 +74,15 @@ def _build_cancel_rq(
     cancel_info.add_unique_id().id_context(id_context)
     cancel_info.get_person_name().surname(surname)
     return cancel_rq
+
+
+def _rate_rule(
+    carnect_config: Config,
+    offer_id: str,
+) -> VehRateRuleRqBuilder:
+    rule_rq = VehRateRuleRqBuilder(carnect_config)
+    rule_rq.reference(offer_id)
+    return rule_rq
 
 
 def _get_test_offer_id_context(
