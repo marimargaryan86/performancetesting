@@ -2,6 +2,7 @@ from typing import Any, Optional, Sequence
 
 import httpx
 
+from snowfall.stdlib import string
 from snowfall.vendor.ask2go import errors, parsers
 from snowfall.vendor.ask2go.models import (
     booking,
@@ -260,7 +261,22 @@ class Ask2GoClient(object):  # noqa: WPS214
         itinerary_id: str,
         brand_id: Optional[str] = None,
     ) -> seat_map.SeatMapResponse:
-        return seat_map.SeatMapResponse()
+        transaction_id = string.uuid()
+
+        response = await self._make_request(
+            "GET",
+            self._api_base_url.copy_with(
+                path="/api/seatmap/{search_id}/{itinerary_id}".format(
+                    search_id=search_id,
+                    itinerary_id=itinerary_id,
+                ),
+                params={
+                    "transactionId": transaction_id,
+                    **({"brandId": brand_id} if brand_id else {}),
+                },
+            ),
+        )
+        return seat_map.SeatMapResponse(**response.json())
 
     async def _make_request(
         self,

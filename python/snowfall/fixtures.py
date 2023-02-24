@@ -21,6 +21,7 @@ from snowfall.stdlib.v1alpha import (
     models_pb2,
     phone_number_pb2,
     postal_address_pb2,
+    seat_maps_pb2,
 )
 
 LATITUDE_RANGE = (-90, 90)
@@ -559,3 +560,15 @@ def generate_point(identifier: str) -> models_pb2.Point:
         coordinates=models_pb2.Coordinates(),
         time_zone="Europe/Stockholm",
     )
+
+
+def get_seat_maps() -> Sequence[seat_maps_pb2.SeatMapResult]:
+    return [
+        seat_maps_pb2.SeatMapResult(
+            segments=[
+                seat_maps_pb2.SeatMapSegment(
+                    segment_id="e719b289-982c-42f0-99a2-63fa70f8f8c0",
+                ),
+            ],
+        ),
+    ]

@@ -20,6 +20,7 @@ from snowfall.project.junction.adapter import (
     places,
     price_quotes,
     schedules,
+    seat_maps,
     segments,
     trip_searches,
     trips,
@@ -81,6 +82,11 @@ def places_client() -> places.Client:
 @pytest.fixture
 def passenger_name_records_client() -> passenger_name_records.Client:
     return passenger_name_records.DictClient(fixtures.get_passenger_name_records())
+
+
+@pytest.fixture
+def seat_maps_client() -> seat_maps.Client:
+    return seat_maps.DictClient(fixtures.get_seat_maps())
 
 
 @pytest.fixture
