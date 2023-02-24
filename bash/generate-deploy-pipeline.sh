@@ -6,6 +6,7 @@ shopt -s nullglob
 cat <<EOF
 stages:
   - deploy
+  - verify
 
 make-uninterruptible:
   stage: deploy
@@ -38,6 +39,8 @@ make-uninterruptible:
     - docker
 EOF
 # editorconfig-checker-enable
+
+services=()
 
 for DIR in "${1}"/*; do
 	if ! [ -d "${DIR}" ]; then
@@ -95,6 +98,7 @@ for DIR in "${1}"/*; do
 	fi
 
 	echo >&2 "generate: ${service_name}@${service_version}"
+	services+=("${service_name}")
 
 	# editorconfig-checker-disable
 	cat <<EOF
@@ -111,4 +115,26 @@ ${service_name}:
     version: ${service_version}
 EOF
 	# editorconfig-checker-enable
+done
+
+if [ ${#services[@]} -eq 0 ]; then
+	exit 0
+fi
+
+# editorconfig-checker-disable
+cat <<EOF
+
+verify:
+  stage: verify
+  interruptible: false
+  script:
+   - exit 0
+  tags:
+   - shell
+  needs:
+EOF
+# editorconfig-checker-enable
+
+for service in "${services[@]}"; do
+	echo "  - ${service}"
 done
