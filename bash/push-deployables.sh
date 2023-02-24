@@ -38,7 +38,7 @@ if [ -f "dist/deliverables.json" ]; then
 	done
 fi
 
-for i in "repo/${1}/"**/*.{nomad,vars}; do
+for i in repo/{development,production}/**/*.{nomad,vars}; do
 	rm "${i}"
 done
 
@@ -46,20 +46,35 @@ for i in nomad/**/*.nomad; do
 	filename=$(basename "${i}")
 	config="$(dirname "${i}")/${filename%.*}.json"
 	service_name=$(basename "$(dirname "${i}")" | sed s/_/-/g)
-	repo_path="repo/${1}/${service_name}"
-	mkdir -p "${repo_path}"
-	cp "${i}" "${repo_path}/${filename}"
+	development_path="repo/development/${service_name}"
+	production_path="repo/production/${service_name}"
+	mkdir -p "${development_path}"
+	mkdir -p "${production_path}"
+	cp "${i}" "${development_path}/${filename}"
 
 	if [ -f "${config}" ]; then
-		jq -r ".${1}.variables|to_entries|map(\"\\(.key)=\\(.value|tostring)\")|.[]" "${config}" >"${repo_path}/${filename%.*}.vars"
+		if [ "$(jq -r ".development.deploy" "${config}")" = "false" ]; then
+			touch "${development_path}/.skip_deploy"
+		else
+			rm -f "${development_path}/.skip_deploy"
+			jq -r ".development.variables|to_entries|map(\"\\(.key)=\\(.value|tostring)\")|.[]" "${config}" >"${development_path}/${filename%.*}.vars"
+		fi
+
+		if [ "$(jq -r ".production.deploy" "${config}")" = "false" ]; then
+			touch "${production_path}/.skip_deploy"
+		else
+			rm -f "${production_path}/.skip_deploy"
+			jq -r ".production.variables|to_entries|map(\"\\(.key)=\\(.value|tostring)\")|.[]" "${config}" >"${production_path}/${filename%.*}.vars"
+		fi
 	fi
 done
 
 cp ".gitlab/deploy.gitlab-ci.yml" "repo/.gitlab-ci.yml"
-cp "bash/deploy.sh" "repo/${1}/deploy.sh"
-cp "bash/generate-deploy-pipeline.sh" "repo/${1}/generate-deploy-pipeline.sh"
-chmod +x "repo/${1}/deploy.sh"
-chmod +x "repo/${1}/generate-deploy-pipeline.sh"
+cp "bash/deploy.sh" "repo/development/deploy.sh"
+cp "bash/generate-deploy-pipeline.sh" "repo/development/generate-deploy-pipeline.sh"
+chmod +x "repo/development/deploy.sh"
+chmod +x "repo/development/generate-deploy-pipeline.sh"
+
 cd repo
 git add --all .
 

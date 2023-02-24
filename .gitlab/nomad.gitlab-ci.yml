@@ -36,7 +36,7 @@ nomad:deploy:
     - git config --global user.email "${NOMAD_GIT_EMAIL}"
     - git config --global user.name "${NOMAD_GIT_NAME}"
   script:
-    - ./bash/push-deployables.sh development
+    - ./bash/push-deployables.sh
   variables:
     DOCKER_HOST: tcp://dockerdaemon:2375/
     DOCKER_DRIVER: overlay2

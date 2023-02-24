@@ -51,7 +51,13 @@ for DIR in "${1}"/*; do
 	docker_image=""
 	service_version="latest"
 	image_file="${DIR}/image.txt"
+	skip_deploy="${DIR}/.skip_deploy"
 	has_changed_image=0
+
+	if [ -f "${skip_deploy}" ]; then
+		echo >&2 "skip: \"${skip_deploy}\" exists"
+		continue
+	fi
 
 	if ! [ -f "${image_file}" ] && grep -q 'variable "docker_image" {' "${DIR}"/*.nomad; then
 		echo >&2 "skip: \"${image_file}\" is missing"
