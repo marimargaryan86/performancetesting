@@ -2,6 +2,7 @@ import datetime
 import types as std_types
 from typing import AsyncIterable, AsyncIterator, Callable, Generic, Type, TypeVar
 
+import prometheus_client
 from google.protobuf import message
 
 from snowfall.project.junction.service.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
@@ -99,6 +100,12 @@ class OfferGroupCache(object):
 
 
 class OfferGroupRepository(Generic[_CriteriaType]):
+    _counter_requests = prometheus_client.Counter(
+        "provider_offers",
+        "The total ratio of cache hits.",
+        labelnames=("cached",),
+    )
+
     def __init__(
         self,
         offer_group_cache_key_func: Callable[[_CriteriaType], str],
@@ -133,9 +140,17 @@ class OfferGroupRepository(Generic[_CriteriaType]):
     ) -> AsyncIterable[offers_pb2.OfferGroup]:
         try:
             async for cached_offer_group in offer_cache.to_iterable():
+                self._counter_requests.labels(
+                    cached=True,
+                ).inc()
+
                 yield cached_offer_group
 
         except NoCacheExistsError:
             async for offer_result in self._offer_group_generator(search_criteria):
                 await offer_cache.put(offer_result)
+                self._counter_requests.labels(
+                    cached=False,
+                ).inc()
+
                 yield offer_result
