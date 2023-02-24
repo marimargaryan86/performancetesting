@@ -72,6 +72,14 @@ class _SearchSettings(service.Settings):
     mongo_dsn: Sequence[pydantic.AnyUrl]
 
 
+class _SeatMapsSettings(service.Settings):
+    api_base_url: pydantic.AnyUrl
+    api_booking_base_url: pydantic.AnyUrl
+    redis_dsn: Sequence[pydantic.AnyUrl]
+    amqp_dsn: pydantic.AnyUrl
+    http_timeout: float = 60.0
+
+
 async def _offers(app: service.Application[_OffersSettings]) -> None:
     async with contextlib.AsyncExitStack() as stack:
         redis_conn: aioredis.Redis[str] = await stack.enter_async_context(
@@ -322,6 +330,39 @@ async def _price_quotes(app: service.Application[_SearchSettings]) -> None:
         ).consume()
 
 
+async def _seat_maps(app: service.Application[_SeatMapsSettings]) -> None:
+    async with contextlib.AsyncExitStack() as stack:
+        redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
+            aioredis.from_url(
+                random.choice(app.settings.redis_dsn),  # nosec
+                decode_responses=False,
+            ).client(),
+        )
+        http_client = await stack.enter_async_context(
+            httpx_metrics.with_metrics(
+                httpx.AsyncClient(
+                    http2=True,
+                    timeout=app.settings.http_timeout,
+                ),
+            ),
+        )
+        ask2go_client = client.Ask2GoClient(
+            api_base_url=app.settings.api_base_url,
+            api_booking_base_url=app.settings.api_booking_base_url,
+            http_client=http_client,
+        )
+        await consumer.SeatMapRpcServer(
+            address=app.settings.amqp_dsn,
+            exchange=types.Exchange("seat_maps"),
+            queue_name="{0}_seat_maps".format(app.name),
+            routing_key="seat.maps",
+            ask2go_client=ask2go_client,
+            offer_cache=cache.OfferCache(
+                client=redis.Client[bytes](redis_connection, prefix=app.name),
+            ),
+        ).consume()
+
+
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(name="ask2go")
 
@@ -345,5 +386,10 @@ if __name__ == "__main__":
             name="pricing",
             callback=_price_quotes,
             settings_class=_SearchSettings,
+        ),
+        service.Command(
+            name="seat_maps",
+            callback=_seat_maps,
+            settings_class=_SeatMapsSettings,
         ),
     )

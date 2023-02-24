@@ -8,6 +8,7 @@ from snowfall.vendor.ask2go.models import (
     common,
     price,
     search,
+    seat_map,
     validate_offer_criteria,
     validated_offer,
 )
@@ -252,6 +253,14 @@ class Ask2GoClient(object):  # noqa: WPS214
             return None
 
         return validated_offer.ValidatedOfferResponse(**response.json())
+
+    async def get_seat_map(
+        self,
+        search_id: str,
+        itinerary_id: str,
+        brand_id: Optional[str] = None,
+    ) -> seat_map.SeatMapResponse:
+        return seat_map.SeatMapResponse()
 
     async def _make_request(
         self,
