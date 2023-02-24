@@ -1,8 +1,20 @@
+import itertools
 import sys
 from os import path
 from typing import Mapping, Sequence
 
 import hcl2
+import pydantic
+
+
+class _Configuration(pydantic.BaseModel):
+    class _Environment(pydantic.BaseModel):  # noqa: WPS431
+        deploy: bool = True
+        variables: Mapping[str, str | bool | int | float] = {}
+
+    development: _Environment
+    production: _Environment
+
 
 _Mapping = Sequence[Mapping[str, Mapping[str, "_Mapping"]]]
 
@@ -108,6 +120,74 @@ def _validate_tasks(
     return errors
 
 
+def _expected_variables(variables: _Mapping) -> frozenset[str]:
+    return frozenset(
+        (
+            variable_name
+            for variable_name in itertools.chain(
+                *[nomad_var.keys() for nomad_var in variables],
+            )
+            if variable_name
+            not in {
+                "datacenter",
+                "docker_image",
+                "environment",
+                "registry_address",
+                "registry_password",
+                "registry_username",
+            }
+        ),
+    )
+
+
+def _load_config_file(
+    template_path: str,
+) -> _Configuration | None:
+    config_path = "{0}.json".format(path.splitext(template_path)[0])
+
+    try:
+        return _Configuration.parse_file(config_path)
+    except FileNotFoundError:
+        return None
+    except pydantic.ValidationError as err:
+        _log_error(
+            "{0}: {1}".format(
+                config_path,
+                str(err),
+            ),
+        )
+        return None
+
+
+def _validate_variables(
+    template_path: str,
+    variables: _Mapping,
+) -> bool:
+    config_data = _load_config_file(template_path)
+
+    if not config_data:
+        return True
+
+    errors = False
+
+    for environment, env_data in config_data:
+        if not env_data.deploy:
+            continue
+
+        for nomad_var in _expected_variables(variables):
+            if nomad_var not in env_data.variables.keys():
+                errors = True
+                _log_error(
+                    '{0}: variable "{1}" is not configured in environment "{2}"'.format(
+                        template_path,
+                        nomad_var,
+                        environment,
+                    ),
+                )
+
+    return errors
+
+
 def _log_error(msg: str) -> None:
     print(msg, file=sys.stderr)  # noqa: WPS421
 
@@ -132,6 +212,9 @@ def _main() -> bool:
             parsed = hcl2.load(template_file)
 
             if _validate_jobs(template_path, filename, parsed.get("job", [])):
+                errors = True
+
+            if _validate_variables(template_path, parsed.get("variable", [])):
                 errors = True
 
     return errors
