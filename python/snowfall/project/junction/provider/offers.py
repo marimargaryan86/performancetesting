@@ -1,3 +1,4 @@
+import datetime
 from typing import AsyncIterator, Callable, Generic, Sequence, TypeVar
 
 from google.protobuf import message
@@ -28,6 +29,7 @@ TripOfferSearchCriteriaGenerator = Callable[
     list[_Proto],
 ]
 OfferGroupGenerator = Callable[[_Proto], AsyncIterator[offers_pb2.OfferGroup]]
+_DEFAULT_ALLOWED_WINDOW_TD = datetime.timedelta(minutes=0)
 
 
 class TripOfferSearchConsumer(Generic[_Proto]):
@@ -122,17 +124,19 @@ def set_segment_ids(
 
 
 class SearchCriteriaConsumer(Generic[_Proto, _CriteriaType]):
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
         consumer: amqp_consumer.Consumer[_Proto],
         producer: amqp_producer.Producer,
         offer_group_repository: OfferGroupRepository[_CriteriaType],
         search_criteria_generator_func: Callable[[_Proto], _CriteriaType],
+        allowed_window_td: datetime.timedelta = _DEFAULT_ALLOWED_WINDOW_TD,
     ):
         self._consumer = consumer
         self._producer = producer
         self._offer_group_repository = offer_group_repository
         self._search_criteria_generator_func = search_criteria_generator_func
+        self._allowed_window_td = allowed_window_td
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -151,7 +155,10 @@ class SearchCriteriaConsumer(Generic[_Proto, _CriteriaType]):
         ):
             raise TypeError
 
-        segment_matcher = SegmentMatcher(amqp_message.body.segments)
+        segment_matcher = SegmentMatcher(
+            segments=amqp_message.body.segments,
+            allowed_window_td=self._allowed_window_td,
+        )
         search_criteria = self._search_criteria_generator_func(amqp_message.body)
         try:
             offer_groups = self._offer_group_repository.find(search_criteria)

@@ -42,9 +42,14 @@ class Requirement(object):
 
 
 class SegmentMatcher(object):
-    def __init__(self, segments: Sequence[models_pb2.Segment]) -> None:
+    def __init__(
+        self,
+        segments: Sequence[models_pb2.Segment],
+        allowed_window_td: datetime.timedelta,
+    ) -> None:
         self._segments = segments
         self._logger = structlog.get_logger(__name__)
+        self._allowed_window_td = allowed_window_td
 
     def offer_group_matches(self, offer_group: offers_pb2.OfferGroup) -> bool:
         requirements = self._get_requirements()
@@ -78,7 +83,7 @@ class SegmentMatcher(object):
             zoneinfo.ZoneInfo(first_leg.origin.time_zone),
         )
 
-        if departure_at != requirement.departure_at:
+        if abs(departure_at - requirement.departure_at) > self._allowed_window_td:
             self._logger.debug(
                 "Departure times do not match",
                 origin=first_leg.origin.name,
@@ -93,7 +98,7 @@ class SegmentMatcher(object):
             zoneinfo.ZoneInfo(last_leg.destination.time_zone),
         )
 
-        if arrival_at != requirement.arrival_at:
+        if abs(arrival_at - requirement.arrival_at) > self._allowed_window_td:
             self._logger.debug(
                 "Arrival times do not match",
                 origin=last_leg.origin.name,

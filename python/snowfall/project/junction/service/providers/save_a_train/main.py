@@ -70,6 +70,7 @@ class _SearchSettings(_SatConfig, service.Settings):
     redis_dsn: Sequence[pydantic.AnyUrl]
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
     mongo_dsn: tuple[pydantic.AnyUrl]
+    allowed_window_td: datetime.timedelta = datetime.timedelta(minutes=10)
 
 
 class _OrdersSettings(_SatConfig, service.Settings):
@@ -203,6 +204,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                 offer_group_cache_key_func=sat_adapter.generate_cache_key,
                 offer_group_generator=sat_adapter.gather_search_results,
             ),
+            allowed_window_td=app.settings.allowed_window_td,
         )
 
         await search_consumer.consume()
