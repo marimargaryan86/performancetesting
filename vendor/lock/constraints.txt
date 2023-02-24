@@ -51,9 +51,11 @@
 //     "mongomock-motor==0.0.17",
 //     "more-itertools==9.0.0",
 //     "motor==3.1.1",
+//     "numpy==1.24.2",
 //     "openapi-core==0.16.5",
 //     "openapi-schema-validator==0.4.3",
 //     "orjson==3.8.5",
+//     "pandas==1.5.3",
 //     "phonenumbers==8.13.5",
 //     "prometheus-async[aiohttp]==22.2.0",
 //     "prometheus-client==0.16.0",
@@ -2568,6 +2570,53 @@
           "artifacts": [
             {
               "algorithm": "sha256",
+              "hash": "5f2b952406a1588ad4cad5b3f55f520e82e902388a6d5a4a91baa8d38d23c7f6",
+              "url": "https://files.pythonhosted.org/packages/56/73/3351beeb807dca69fcc3c4966bcccc51552bd01549a9b13c04ab00a43f21/pandas-1.5.3-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "c39a8da13cede5adcd3be1182883aea1c925476f4e84b2807a46e2775306305d",
+              "url": "https://files.pythonhosted.org/packages/53/c9/d2f910dace7ef849b626980d0fd033b9cded36568949c8d560c9630ad2e0/pandas-1.5.3-cp311-cp311-macosx_10_9_x86_64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "e474390e60ed609cec869b0da796ad94f420bb057d86784191eefc62b65819ae",
+              "url": "https://files.pythonhosted.org/packages/63/8d/c2bd356b9d4baf1c5cf8d7e251fb4540e87083072c905430da48c2bb31eb/pandas-1.5.3-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "74a3fd7e5a7ec052f183273dc7b0acd3a863edf7520f5d3a1765c04ffdb3b0b1",
+              "url": "https://files.pythonhosted.org/packages/74/ee/146cab1ff6d575b54ace8a6a5994048380dc94879b0125b25e62edcb9e52/pandas-1.5.3.tar.gz"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "f76d097d12c82a535fda9dfe5e8dd4127952b45fea9b0276cb30cca5ea313fbc",
+              "url": "https://files.pythonhosted.org/packages/b0/be/1843b9aff84b98899663e7cad9f45513dfdd11d69cb5bd85c648aaf6a8d4/pandas-1.5.3-cp311-cp311-macosx_11_0_arm64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "6973549c01ca91ec96199e940495219c887ea815b2083722821f1d7abfa2b4dc",
+              "url": "https://files.pythonhosted.org/packages/e2/24/a26af514113fd5eca2d8fe41ba4f22f70dfe6afefde4a6beb6a203570935/pandas-1.5.3-cp311-cp311-macosx_10_9_universal2.whl"
+            }
+          ],
+          "project_name": "pandas",
+          "requires_dists": [
+            "hypothesis>=5.5.3; extra == \"test\"",
+            "numpy>=1.20.3; python_version < \"3.10\"",
+            "numpy>=1.21.0; python_version >= \"3.10\"",
+            "numpy>=1.23.2; python_version >= \"3.11\"",
+            "pytest-xdist>=1.31; extra == \"test\"",
+            "pytest>=6.0; extra == \"test\"",
+            "python-dateutil>=2.8.1",
+            "pytz>=2020.1"
+          ],
+          "requires_python": ">=3.8",
+          "version": "1.5.3"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
               "hash": "9ff82852bcb65d139813e2a5197627a94966245c897796760a3a2a8eb66f020b",
               "url": "https://files.pythonhosted.org/packages/89/a1/82ce536be577ba09d4dcee45db58423a180873ad38a2d014d26ab7b7cb8a/parse-1.19.0.tar.gz"
             }
@@ -3110,21 +3159,16 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "41e12e0318bebc859fcc4d97d4db8d20ad21721a6aa5047dd59f090391cb549a",
-              "url": "https://files.pythonhosted.org/packages/64/62/f19d1e9023aacb47241de3ab5a5d5fedf32c78a71a9e365bb2153378c141/python_dotenv-0.21.1-py3-none-any.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "1c93de8f636cde3ce377292818d0e440b6e45a82f215c3744979151fa8151c49",
-              "url": "https://files.pythonhosted.org/packages/f5/d7/d548e0d5a68b328a8d69af833a861be415a17cb15ce3d8f0cd850073d2e1/python-dotenv-0.21.1.tar.gz"
+              "hash": "f5971a9226b701070a4bf2c38c89e5a3f0d64de8debda981d1db98583009122a",
+              "url": "https://files.pythonhosted.org/packages/44/2f/62ea1c8b593f4e093cc1a7768f0d46112107e790c3e478532329e434f00b/python_dotenv-1.0.0-py3-none-any.whl"
             }
           ],
           "project_name": "python-dotenv",
           "requires_dists": [
             "click>=5.0; extra == \"cli\""
           ],
-          "requires_python": ">=3.7",
-          "version": "0.21.1"
+          "requires_python": ">=3.8",
+          "version": "1"
         },
         {
           "artifacts": [
@@ -3145,6 +3189,24 @@
           ],
           "requires_python": ">=3.7.0",
           "version": "4.3"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "78f4f37d8198e0627c5f1143240bb0206b8691d8d7ac6d78fee88b78733f8c4a",
+              "url": "https://files.pythonhosted.org/packages/2e/09/fbd3c46dce130958ee8e0090f910f1fe39e502cc5ba0aadca1e8a2b932e5/pytz-2022.7.1-py2.py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "01a0681c4b9684a28304615eba55d1ab31ae00bf68ec157ec3708a8182dbbcd0",
+              "url": "https://files.pythonhosted.org/packages/03/3e/dc5c793b62c60d0ca0b7e58f1fdd84d5aaa9f8df23e7589b39cc9ce20a03/pytz-2022.7.1.tar.gz"
+            }
+          ],
+          "project_name": "pytz",
+          "requires_dists": [],
+          "requires_python": null,
+          "version": "2022.7.1"
         },
         {
           "artifacts": [
@@ -3772,19 +3834,19 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "e32b969b9226caf59e63630cac690eb6802a3e17e20a8a949c3c2b80e16af85d",
-              "url": "https://files.pythonhosted.org/packages/bc/83/9d219e2b1493ca695e78bd3179ae73a54e460c5cdbe5eb3ae4b3c097728e/types_docutils-0.19.1.5-py3-none-any.whl"
+              "hash": "b7e182f371cbe20828a8750ffb150219968452445946f66f33778b08e81c7d89",
+              "url": "https://files.pythonhosted.org/packages/5f/29/6202635f76fc30ccae4363ea18ae0fb91e2f2dbf1226794e4977734282f9/types_docutils-0.19.1.6-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "b8b489c2a0d1dd3e65bbd8b41e05f6bf1307553515dcda30197d63d1b576a5ee",
-              "url": "https://files.pythonhosted.org/packages/53/38/9e589884439235fb8cfaf093615f752ee7506c7ab770496ab65cebff5192/types-docutils-0.19.1.5.tar.gz"
+              "hash": "a334a703a8688910d0869464f1f6f8bd330d75843bdab4f893547bfb29417a01",
+              "url": "https://files.pythonhosted.org/packages/6b/8a/46c0b39106daaba6c8be75131d8d4f13e71768852fd7756d80bc5ff53ed8/types-docutils-0.19.1.6.tar.gz"
             }
           ],
           "project_name": "types-docutils",
           "requires_dists": [],
           "requires_python": null,
-          "version": "0.19.1.5"
+          "version": "0.19.1.6"
         },
         {
           "artifacts": [
@@ -4415,9 +4477,11 @@
     "mongomock-motor==0.0.17",
     "more-itertools==9.0.0",
     "motor==3.1.1",
+    "numpy==1.24.2",
     "openapi-core==0.16.5",
     "openapi-schema-validator==0.4.3",
     "orjson==3.8.5",
+    "pandas==1.5.3",
     "phonenumbers==8.13.5",
     "prometheus-async[aiohttp]==22.2.0",
     "prometheus-client==0.16.0",

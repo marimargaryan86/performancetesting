@@ -38,10 +38,12 @@ lagom==2.2.0
 mongomock-motor==0.0.17
 more-itertools==9.0.0
 motor==3.1.1
+numpy==1.24.2
 openapi-core==0.16.5
 openapi-schema-validator==0.4.3
 orjson==3.8.5
 phonenumbers==8.13.5
+pandas==1.5.3
 prometheus-async[aiohttp]==22.2.0
 prometheus-client==0.16.0
 protobuf==4.21.12

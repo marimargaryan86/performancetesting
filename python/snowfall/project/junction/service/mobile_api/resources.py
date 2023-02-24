@@ -119,6 +119,12 @@ class PlaceResource(models.Resource):
         cls,
         place: models_pb2.Place,
     ) -> PlaceResource:
+        name = place.name
+        if place.country_code == "SE":
+            name = "{name} ({local_name})".format(
+                name=place.name,
+                local_name=place.local_name,
+            )
         return cls(
             id=place.id,
             type="places",
@@ -128,7 +134,7 @@ class PlaceResource(models.Resource):
                 "iataCode": None,
                 "latitude": place.coordinates.latitude,
                 "longitude": place.coordinates.longitude,
-                "name": place.name,
+                "name": name,
                 "timeZone": place.time_zone,
                 "population": place.population,
             },

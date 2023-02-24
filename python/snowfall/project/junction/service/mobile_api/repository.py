@@ -5,6 +5,7 @@ from typing import Any, Mapping, Optional, Sequence
 
 import bcrypt
 import pymongo
+import unidecode
 
 from snowfall.project.junction.service.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
@@ -73,6 +74,7 @@ class PlacesRepository(
     _indexes = [
         pymongo.IndexModel("name", background=True),
         pymongo.IndexModel("no_accent_name", background=True),
+        pymongo.IndexModel("no_accent_local_name", background=True),
         pymongo.IndexModel("country_name", background=True),
         pymongo.IndexModel("iata_code", background=True),
         pymongo.IndexModel("population", background=True),
@@ -87,14 +89,14 @@ class PlacesRepository(
         search_key: str,
     ) -> resultset.ResultSet[models_pb2.Place]:
         search_keys = [key.strip() for key in search_key.split(",")]
-        name_regex = re.compile(search_keys[0], re.IGNORECASE)
+        name_regex = re.compile(unidecode.unidecode(search_keys[0]), re.IGNORECASE)
         if len(search_keys) == 2:
             country_regex = re.compile(search_keys[1], re.IGNORECASE)
             query = {
                 "$and": [
                     {
                         "$or": [
-                            {"name": name_regex},
+                            {"no_accent_local_name": name_regex},
                             {"no_accent_name": name_regex},
                         ],
                     },
@@ -106,7 +108,7 @@ class PlacesRepository(
         else:
             query = {
                 "$or": [
-                    {"name": name_regex},
+                    {"no_accent_local_name": name_regex},
                     {"no_accent_name": name_regex},
                     {"country_name": name_regex},
                 ],
