@@ -17,6 +17,7 @@ from snowfall.project.junction.provider import (
     notifications,
     offers,
     repository,
+    service,
 )
 from snowfall.project.junction.service.providers.ask2go import (
     booking,
@@ -31,7 +32,7 @@ from snowfall.project.junction.service.providers.ask2go import (
     transformer,
 )
 from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
-from snowfall.stdlib import h3, service
+from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation import httpx_metrics
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
@@ -39,13 +40,6 @@ from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer, trackable, types
 from snowfall.vendor.ask2go import client
 from snowfall.vendor.ask2go.models import search as search_models
-
-_OFFERS = "offers"
-
-
-class _OffersSettings(service.Settings):
-    amqp_dsn: pydantic.AnyUrl
-    redis_dsn: pydantic.AnyUrl
 
 
 class _OrdersSettings(service.Settings):
@@ -80,38 +74,23 @@ class _SeatMapsSettings(service.Settings):
     http_timeout: float = 60.0
 
 
-async def _offers(app: service.Application[_OffersSettings]) -> None:
-    async with contextlib.AsyncExitStack() as stack:
-        redis_conn: aioredis.Redis[str] = await stack.enter_async_context(
-            aioredis.from_url(
-                app.settings.redis_dsn,
-                decode_responses=True,
-            ).client(),
-        )
-        connection = await stack.enter_async_context(
-            types.Connection(app.settings.amqp_dsn),
-        )
-
-        trip_search_consumer = offers.create_trip_offer_search_consumer(
-            amqp_connection=connection,
-            redis_client=redis.Client(redis_conn, prefix=app.name),
-            criteria_generator=criteria.CriteriaGenerator(
-                h3_mapping=h3.H3MappingRepository[airports.Airport](
-                    mapping=airports.AirportRepository(
-                        airports_data=cast(
-                            list[dict[str, Any]],
-                            filesystem.PkgLoader(
-                                "snowfall.project.junction.service.providers.ask2go.main",
-                            ).load("airports.json"),
-                        ),
-                    ).all_(),
-                    resolution=7,
+async def _offers(
+    app: service.Application[service.OffersSettings],
+    stack: contextlib.AsyncExitStack,
+) -> service.OffersFactoryReturn[amqp_pb2.SearchCriteriaTask]:
+    return criteria.CriteriaGenerator(
+        h3_mapping=h3.H3MappingRepository[airports.Airport](
+            mapping=airports.AirportRepository(
+                airports_data=cast(
+                    list[dict[str, Any]],
+                    filesystem.PkgLoader(
+                        "snowfall.project.junction.service.providers.ask2go.main",
+                    ).load("airports.json"),
                 ),
-            ).from_search_task,
-            internal_exchange_name=app.name,
-        )
-
-        await trip_search_consumer.consume()
+            ).all_(),
+            resolution=7,
+        ),
+    ).from_search_task
 
 
 async def _orders(app: service.Application[_OrdersSettings]) -> None:
@@ -224,7 +203,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
             ),
             producer=producer.Producer(
                 connection=amqp_connection,
-                exchange=types.Exchange(_OFFERS),
+                exchange=types.Exchange("offers"),
             ),
             offer_group_repository=repository.OfferGroupRepository(
                 redis=redis.Client(
@@ -366,12 +345,8 @@ async def _seat_maps(app: service.Application[_SeatMapsSettings]) -> None:
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(name="ask2go")
 
+    entrypoint.enable_offers(service.OffersSettings, _offers)
     entrypoint.enter_with_commands(
-        service.Command(
-            name=_OFFERS,
-            callback=_offers,
-            settings_class=_OffersSettings,
-        ),
         service.Command(
             name="orders",
             callback=_orders,

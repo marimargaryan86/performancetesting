@@ -21,6 +21,7 @@ from snowfall.project.junction.provider import (
     notifications,
     offers,
     repository,
+    service,
 )
 from snowfall.project.junction.service.providers.save_a_train import (
     adapter,
@@ -31,15 +32,13 @@ from snowfall.project.junction.service.providers.save_a_train import (
 )
 from snowfall.project.junction.service.providers.save_a_train.v1alpha import amqp_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
-from snowfall.stdlib import h3, service
+from snowfall.stdlib import h3
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer, trackable, types
 from snowfall.stdlib.transport.grpc import client as grpc_client
 from snowfall.vendor.save_a_train import client
 from snowfall.vendor.save_a_train.models import request as request_models
-
-_OFFERS = "offers"
 
 
 class _SatConfig(pydantic.BaseModel):
@@ -59,7 +58,7 @@ class _DumpStationsSettings(_SatConfig, service.Settings):
     output_file: str = pydantic.Field(hidden=True, argument=True)
 
 
-class _OffersSettings(service.Settings):
+class _PriceQuoteSettings(service.Settings):
     amqp_dsn: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
@@ -93,31 +92,16 @@ class _NotificationsSettings(_SatConfig, service.Settings):
     mongo_dsn: tuple[pydantic.AnyUrl]
 
 
-async def _offers(app: service.Application[_OffersSettings]) -> None:
-    async with contextlib.AsyncExitStack() as stack:
-        redis_conn: aioredis.Redis[str] = await stack.enter_async_context(
-            aioredis.from_url(
-                random.choice(app.settings.redis_dsn),  # nosec
-                decode_responses=True,
-            ).client(),
-        )
-        connection = await stack.enter_async_context(
-            types.Connection(app.settings.amqp_dsn),
-        )
-
-        trip_search_consumer = offers.create_trip_offer_search_consumer(
-            amqp_connection=connection,
-            redis_client=redis.Client(redis_conn, prefix=app.name),
-            criteria_generator=criteria.CriteriaGenerator(
-                h3_mapping=h3.H3MappingRepository[train_stations.TrainStation](
-                    mapping=await _load_train_stations(),
-                    resolution=8,
-                ),
-            ).from_search_task,
-            internal_exchange_name=app.name,
-        )
-
-        await trip_search_consumer.consume()
+async def _offers(
+    app: service.Application[service.OffersSettings],
+    stack: contextlib.AsyncExitStack,
+) -> service.OffersFactoryReturn[amqp_pb2.SearchCriteriaTask]:
+    return criteria.CriteriaGenerator(
+        h3_mapping=h3.H3MappingRepository[train_stations.TrainStation](
+            mapping=await _load_train_stations(),
+            resolution=8,
+        ),
+    ).from_search_task
 
 
 async def _searches(app: service.Application[_SearchSettings]) -> None:
@@ -194,7 +178,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
             ),
             producer=producer.Producer(
                 connection=amqp_connection,
-                exchange=types.Exchange(_OFFERS),
+                exchange=types.Exchange("offers"),
             ),
             offer_group_repository=repository.OfferGroupRepository(
                 redis=redis.Client(
@@ -288,7 +272,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
         await orders_consumer.consume()
 
 
-async def _price_quotes(app: service.Application[_OffersSettings]) -> None:
+async def _price_quotes(app: service.Application[_PriceQuoteSettings]) -> None:
     async with contextlib.AsyncExitStack() as stack:
         redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
             aioredis.from_url(
@@ -472,16 +456,12 @@ async def _load_train_stations() -> list[train_stations.TrainStation]:
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(name="save_a_train")
 
+    entrypoint.enable_offers(service.OffersSettings, _offers)
     entrypoint.enter_with_commands(
         service.Command(
             name="dump-stations",
             callback=_dump_stations,
             settings_class=_DumpStationsSettings,
-        ),
-        service.Command(
-            name=_OFFERS,
-            callback=_offers,
-            settings_class=_OffersSettings,
         ),
         service.Command(
             name="searches",
@@ -501,6 +481,6 @@ if __name__ == "__main__":
         service.Command(
             name="pricing",
             callback=_price_quotes,
-            settings_class=_OffersSettings,
+            settings_class=_PriceQuoteSettings,
         ),
     )
