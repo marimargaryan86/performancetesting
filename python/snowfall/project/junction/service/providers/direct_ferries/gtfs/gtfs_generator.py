@@ -87,7 +87,7 @@ class GTFSGenerator(object):
 
     def compress_files(self) -> None:
         with zipfile.ZipFile(
-            "{0}/df_schedules.zip".format(_OUTPUT_PATH),
+            "{0}/directferries.zip".format(_OUTPUT_PATH),
             "w",
         ) as zip_f:
             for file_name in CompressFileList.file_list():

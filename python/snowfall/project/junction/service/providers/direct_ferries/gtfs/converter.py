@@ -166,8 +166,8 @@ class DFDataConverter(object):  # noqa: WPS214
                         arrival_time=arrival_td,
                         stop_id=timetable_response.route.port_to.code,
                         stop_sequence=2,
-                        pickup_type=gtfs_enums.PickupType.regularly_scheduled_pickup,
-                        drop_off_type=gtfs_enums.DropOffType.no_drop_off_available,
+                        pickup_type=gtfs_enums.PickupType.no_pickup_available,
+                        drop_off_type=gtfs_enums.DropOffType.regularly_scheduled_drop_off,
                     )
 
     def convert_calendar_dates(self) -> Generator[gtfs_models.CalendarDate, None, None]:
