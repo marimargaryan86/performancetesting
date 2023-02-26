@@ -82,7 +82,7 @@ There are a few [Pants][pants] commands that you will be using for linting, test
 
 A helpful command to run all the things that will be checked in the pipeline that can be added as an alias is:
 ```shell
-./pants tailor --check update-build-files --check && ./pants fmt lint --changed-since=main && ./pants --changed-since=main --changed-dependees=transitive check test
+./pants tailor --check update-build-files --check && ./pants fix lint --changed-since=main && ./pants --changed-since=main --changed-dependees=transitive check test
 ```
 
 ## Development

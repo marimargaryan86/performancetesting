@@ -87,13 +87,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "cd455b0000615c60e286208ba540271af9fe531fa6a87cc590a7298785ab2882",
-              "url": "https://files.pythonhosted.org/packages/d0/7c/e6942be5f2c03a9de68a6c782373dcec7dc1d10664dd20652bfb7307f905/GitPython-3.1.30-py3-none-any.whl"
+              "hash": "f04893614f6aa713a60cbbe1e6a97403ef633103cdd0ef5eb6efe0deb98dbe8d",
+              "url": "https://files.pythonhosted.org/packages/9e/8a/d1e02cc111d65b0346f70abb83c51f8593e7134bf694a4a56d1a470caaf7/GitPython-3.1.31-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "769c2d83e13f5d938b7688479da374c4e3d49f71549aaf462b646db9602ea6f8",
-              "url": "https://files.pythonhosted.org/packages/ef/8d/50658d134d89e080bb33eb8e2f75d17563b5a9dfb75383ea1a78e1df6fff/GitPython-3.1.30.tar.gz"
+              "hash": "8ce3bcf69adfdf7c7d503e78fd3b1c492af782d58893b650adb2ac8912ddd573",
+              "url": "https://files.pythonhosted.org/packages/5f/11/2b0f60686dbda49028cec8c66bd18a5e82c96d92eef4bc34961e35bb3762/GitPython-3.1.31.tar.gz"
             }
           ],
           "project_name": "gitpython",
@@ -102,7 +102,7 @@
             "typing-extensions>=3.7.4.3; python_version < \"3.8\""
           ],
           "requires_python": ">=3.7",
-          "version": "3.1.30"
+          "version": "3.1.31"
         },
         {
           "artifacts": [
@@ -158,7 +158,7 @@
           "project_name": "pyyaml",
           "requires_dists": [],
           "requires_python": ">=3.6",
-          "version": "6"
+          "version": "6.0"
         },
         {
           "artifacts": [
@@ -240,7 +240,7 @@
           "project_name": "smmap",
           "requires_dists": [],
           "requires_python": ">=3.6",
-          "version": "5"
+          "version": "5.0.0"
         },
         {
           "artifacts": [
@@ -260,7 +260,7 @@
             "pbr!=2.1.0,>=2.0.0"
           ],
           "requires_python": ">=3.8",
-          "version": "5"
+          "version": "5.0.0"
         },
         {
           "artifacts": [
@@ -285,7 +285,7 @@
     }
   ],
   "path_mappings": {},
-  "pex_version": "2.1.108",
+  "pex_version": "2.1.111",
   "pip_version": "20.3.4-patched",
   "prefer_older_binary": false,
   "requirements": [

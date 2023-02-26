@@ -1,5 +1,5 @@
 [GLOBAL]
-pants_version = "2.14.1"
+pants_version = "2.15.0"
 build_file_prelude_globs = ["python/snowfall/plugin/pants/macros.py"]
 unmatched_build_file_globs = "error"
 backend_packages = [
@@ -8,9 +8,9 @@ backend_packages = [
     "pants.backend.codegen.protobuf.python",
     "pants.backend.docker",
     "pants.backend.docker.lint.hadolint",
-    "pants.backend.experimental.python.lint.autoflake",
     "pants.backend.project_info",
     "pants.backend.python",
+    "pants.backend.python.lint.autoflake",
     "pants.backend.python.lint.bandit",
     "pants.backend.python.lint.black",
     "pants.backend.python.lint.docformatter",

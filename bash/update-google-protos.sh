@@ -24,4 +24,4 @@ xit
 eof
 done
 
-"${root_dir}/pants" fmt "${base_path}"
+"${root_dir}/pants" fix "${base_path}"

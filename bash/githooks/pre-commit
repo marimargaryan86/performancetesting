@@ -29,4 +29,4 @@ echo "* Typechecking"
 
 echo "* Checking linters, and formatters"
 ./pants --changed-since="${MERGE_BASE}" lint ||
-    die "If there were formatting errors, run \`./pants --changed-since=$(git rev-parse --symbolic "${MERGE_BASE}") fmt\`"
+    die "If there were formatting errors, run \`./pants --changed-since=$(git rev-parse --symbolic "${MERGE_BASE}") fix\`"

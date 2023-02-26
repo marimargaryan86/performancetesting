@@ -50,14 +50,14 @@
             "setuptools; extra == \"plugins\""
           ],
           "requires_python": ">=3.8.0",
-          "version": "5.12"
+          "version": "5.12.0"
         }
       ],
       "platform_tag": null
     }
   ],
   "path_mappings": {},
-  "pex_version": "2.1.108",
+  "pex_version": "2.1.111",
   "pip_version": "20.3.4-patched",
   "prefer_older_binary": false,
   "requirements": [
