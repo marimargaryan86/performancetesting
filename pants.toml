@@ -8,6 +8,7 @@ backend_packages = [
     "pants.backend.codegen.protobuf.python",
     "pants.backend.docker",
     "pants.backend.docker.lint.hadolint",
+    "pants.backend.experimental.python.lint.add_trailing_comma",
     "pants.backend.project_info",
     "pants.backend.python",
     "pants.backend.python.lint.autoflake",
@@ -21,6 +22,10 @@ backend_packages = [
     "pants.backend.shell.lint.shellcheck",
     "pants.backend.shell.lint.shfmt",
 ]
+
+[add-trailing-comma]
+version = "add-trailing-comma==2.4.0"
+lockfile = "vendor/lock/add-trailing-comma.txt"
 
 [anonymous-telemetry]
 enabled = false
