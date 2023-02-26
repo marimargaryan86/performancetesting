@@ -3,6 +3,7 @@ ARG REGISTRY
 FROM ${REGISTRY}python@sha256:66e41d125c90d679ad69b264ac7b78a3bd27e7510b63ba5987ad42678bbefc32
 ENV PATH=/usr/local/go/bin:$PATH
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
     ca-certificates \
     curl \
     git \
