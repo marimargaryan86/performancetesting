@@ -34,4 +34,4 @@ for f in nomad/**/*.nomad; do
 	fi
 done
 
-./pants run python/snowfall/script/validate_nomad_files.py -- nomad/**/*.nomad
+pants run python/snowfall/script/validate_nomad_files.py -- nomad/**/*.nomad

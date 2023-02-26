@@ -1,33 +1,20 @@
-# bullseye-slim
+# python:3.11.2-slim-bullseye
 ARG REGISTRY
-FROM ${REGISTRY}debian@sha256:9b42b2e7eddd84eaddb67b45567cdc0e03ec826bf252352f300147cfb8ce5a6d
-ENV PYENV_ROOT=/root/.pyenv PATH=/usr/local/go/bin:/root/.pyenv/bin:/root/.pyenv/shims:$PATH
+FROM ${REGISTRY}python@sha256:66e41d125c90d679ad69b264ac7b78a3bd27e7510b63ba5987ad42678bbefc32
+ENV PATH=/usr/local/go/bin:$PATH
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
     ca-certificates \
     curl \
-    gettext-base \
     git \
     gnupg \
     jq \
-    libbz2-dev \
-    libffi-dev \
-    liblzma-dev \
-    libncursesw5-dev \
-    libreadline-dev \
-    libsqlite3-dev \
-    libssl-dev \
-    libxml2-dev \
-    libxmlsec1-dev \
-    llvm \
     lsb-release \
-    make \
+    python3-distutils \
     ssh \
-    tk-dev \
     unzip \
     wget \
     xz-utils \
-    zlib1g-dev \
+&& curl -fsSL https://static.pantsbuild.org/setup/pantsup.sh | bash /dev/stdin --bin-dir /usr/local/bin --version 0.5.2 \
 && curl -fsSL https://github.com/Tufin/oasdiff/releases/download/v1.3.1/oasdiff_1.3.1_linux_amd64.deb > /tmp/oasdiff.deb \
 && curl -fsSL https://sentry.io/get-cli/ | SENTRY_CLI_VERSION=2.12.0 bash \
 && curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg \
@@ -40,9 +27,5 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     docker-ce-cli \
     nomad=1.4.4-1 \
     /tmp/oasdiff.deb \
-&& curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash \
-&& pyenv install 3.11.2 \
-&& pyenv install 3.9.16 \
-&& rm -rf /var/lib/apt/lists/* /tmp/oasdiff.deb \
-&& pyenv global 3.11.2 3.9.16
+&& rm -rf /var/lib/apt/lists/* /tmp/oasdiff.deb
 COPY --from=golang:1.18.3 /usr/local/go/ /usr/local/go/

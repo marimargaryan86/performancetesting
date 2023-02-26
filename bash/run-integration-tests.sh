@@ -2,8 +2,6 @@
 set -eu
 shopt -s nullglob
 
-root_dir="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
-pants_bin="${root_dir}/pants"
 ALLURE_SERVER="https://allureapi.junction.dev/allure-docker-service"
 TEST_E2E_ALLURE_DIR="/allure-integration-report/"
 TESTS_DIR="${1}"
@@ -36,7 +34,7 @@ until [[ "$STR" != *"$SUB"* ]]; do
 done
 
 echo "Executing tests"
-"${pants_bin}" test --force --output=none python/snowfall/project/junction/api_automation/"${TESTS_DIR}" \
+pants test --force --output=none python/snowfall/project/junction/api_automation/"${TESTS_DIR}" \
 	--pytest-args='-m integration' \
 	-- \
 	--API-TOKEN="${TEST_E2E_TOKEN}" \

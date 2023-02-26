@@ -10,7 +10,7 @@ internal: true
 
 ```
 # junction $
-./pants test test.py \
+pants test test.py \
 --pytest-args='-m integration' \
 -- \
 --API-TOKEN=token \
@@ -22,7 +22,7 @@ internal: true
 Example command (substitute token)
 ```
 # junction $
-./pants --force --output=all test python/snowfall/project/junction/api_automation/trip_test.py \
+pants --force --output=all test python/snowfall/project/junction/api_automation/trip_test.py \
 --pytest-args='-m integration' \
 -- \
 --API-TOKEN=token \

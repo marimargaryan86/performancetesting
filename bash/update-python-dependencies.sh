@@ -36,7 +36,7 @@ done <"${requirements_tmp}"
 if [ "${has_changes}" -eq "1" ]; then
 	(
 		cd "${ROOT_DIR}"
-		./pants generate-lockfiles --resolve=python-default
+		pants generate-lockfiles --resolve=python-default
 	)
 fi
 

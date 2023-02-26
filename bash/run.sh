@@ -24,4 +24,4 @@ if [ -n "${ENV_FILE+x}" ]; then
 	done <"${DIR}/.env.dist"
 fi
 
-env -S "${ENV_STR}" ./pants run "${1}:main" -- "${@:2}"
+env -S "${ENV_STR}" pants run "${1}:main" -- "${@:2}"

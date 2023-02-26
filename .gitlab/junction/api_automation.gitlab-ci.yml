@@ -1,8 +1,7 @@
 integration:api_automation-tests:
+  extends: .pants
   stage: test
   allow_failure: true
-  interruptible: true
-  image: "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"
   variables:
     TEST_E2E_DEPARTURE_AFTER: "${DEPARTURE_AFTER}"
     TEST_E2E_ORIGIN: "${ORIGIN}"
@@ -12,22 +11,11 @@ integration:api_automation-tests:
     ALLURE_PROJECT_ID: "${ALLURE_PROJECT_ID}"
     PROJECT_NAME: "${PROJECT_NAME}"
     PROJECT_DIR: "${PROJECT_DIR}"
-  before_script:
-    - eval "$(pyenv init -)"
-    - ./pants --version
   script:
-    - chmod +x "bash/run-integration-tests.sh"
-    - chmod +x "bash/send-allure-reports.sh"
     - TEST_E2E_TOKEN=$(eval "echo \$${API_TOKEN}")
     - ./bash/run-integration-tests.sh $PROJECT_DIR $TEST_E2E_HOSTNAME $TEST_E2E_TOKEN $ALLURE_PROJECT_ID
   after_script:
+    - !reference [.pants, after_script]
     - ./bash/send-allure-reports.sh $ALLURE_PROJECT_ID
-  cache:
-    key: "pants-setup"
-    paths:
-      - .cache/
-    when: always
-  tags:
-    - docker
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $PROJECT_NAME == "api_automation"'

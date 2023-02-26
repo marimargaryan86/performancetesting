@@ -16,11 +16,15 @@ brew install pyenv
 ```shell
 export PATH="$(pyenv root)/shims:$PATH"
 ```
-3. Install [Docker Desktop][docker-desktop].
+3. Install [Pants][pants].
+```shell
+brew install pantsbuild/tap/pants
+```
+4. Install [Docker Desktop][docker-desktop].
 ```shell
 brew install --cask docker
 ```
-4. If you are on a Mac with an arm64 processor, make sure you have Rosetta installed.
+5. If you are on a Mac with an arm64 processor, make sure you have Rosetta installed.
 ```shell
 softwareupdate --install-rosetta
 ```
@@ -32,23 +36,20 @@ softwareupdate --install-rosetta
 git clone git@git.snowfall.se:junction/junction.git
 cd junction
 ```
-2. Install the correct Python interpreter using `pyenv`. Sadly Pants does not support Python 3.11 yet, so we need to install a second interpreter for that.
+2. Install the correct Python interpreter using `pyenv`.
 ```shell
 pyenv install 3.11
-pyenv install 3.9
 ```
 
 ### Set up your IDE (Optional)
 
-_(**Note** You may need to run `pyenv shell 3.9` as Pants does not run in Python 3.11 as of February 2023)_
-
 1. Export the virtual environment using Pants.
 ```shell
-./pants export ::
+pants export ::
 ```
 2. Export generated code using Pants.
 ```shell
-./pants export-codegen ::
+pants export-codegen ::
 ```
 
 #### PyCharm
@@ -70,20 +71,23 @@ _(**Note** You may need to run `pyenv shell 3.9` as Pants does not run in Python
 
 ## Testing
 
-There are a few [Pants][pants] commands that you will be using for linting, testing and type-checking.
+There are a few [Pants][pants] goals that you will be using for linting, testing and type-checking.
 
 ```shell
-./pants lint ::
-./pants test ::
-./pants check ::
-./pants tailor --check
-./pants update-build-files --check
+pants lint ::
+pants test ::
+pants check ::
+pants tailor --check
+pants update-build-files --check
 ```
 
-A helpful command to run all the things that will be checked in the pipeline that can be added as an alias is:
+To run these goals on only changed files, one can either append the necessary flags (e.g. `--changed-since=main --changed-dependees=transitive`), or use the CLI alias `all-changed` (e.g. `pants all-changed lint`).
+
+A helpful command to run exactly the same checks as the pipeline follows. This could easily be added as an alias to your shell.
 ```shell
-./pants tailor --check update-build-files --check && ./pants fix lint --changed-since=main && ./pants --changed-since=main --changed-dependees=transitive check test
+pants tailor --check update-build-files --check && pants fix lint --changed-since=main && pants --changed-since=main --changed-dependees=transitive check test
 ```
+
 
 ## Development
 
@@ -105,23 +109,23 @@ or check [the written summary][uncle-bob-summary].
 
 ### Working With Dependencies
 
-#### Adding Dependencies
+#### Adding A Python Dependency
 
 1. Add the dependency and its version to `vendor/requirements.txt`.
-2. Run `./pants --no-pantsd generate-lockfiles --resolve=python-default`.
+2. Run `pants generate-lockfiles --resolve=python-default`.
 3. If the dependency's requirement name and the module name is different, or if
     the requirement exposes additional modules, the dependency and its modules
     needs to be added to `module_mapping` in `vendor/BUILD`.
 
-#### Updating Dependencies
+#### Updating A Python Dependency
 
 1. Update the dependency's version in `vendor/requirements.txt`.
-2. Run `./pants --no-pantsd generate-lockfiles --resolve=python-default`.
+2. Run `pants generate-lockfiles --resolve=python-default`.
 
-#### Removing Dependencies
+#### Removing A Python Dependency
 
 1. Remove the dependency from `vendor/requirements.txt`.
-2. Run `./pants --no-pantsd generate-lockfiles --resolve=python-default`
+2. Run `pants generate-lockfiles --resolve=python-default`
 3. If the dependency has been added to `module_mapping` in `vendor/BUILD`, make
     sure to remove it.
 

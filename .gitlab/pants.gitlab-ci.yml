@@ -10,6 +10,7 @@ pants:setup:
   rules:
     - if: '$CI_MERGE_REQUEST_IID || $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
     - if: $E2E == "true"  # Needed to run the planner-test.gitlab-ci.yml tests
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $PROJECT_NAME == "api_automation"'
   tags:
     - shell
 
@@ -17,19 +18,19 @@ pants:setup:
   image: "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"
   interruptible: true
   before_script:
-    - eval "$(pyenv init -)"
-    - ./pants --version
+    - pants --version
   after_script:
-    - ./bash/nuke-if-too-big.sh .cache 384
+    - ./bash/nuke-if-too-big.sh .cache 512
   variables:
     GIT_DEPTH: 0
     GIT_STRATEGY: clone
     PANTS_CONFIG_FILES: ./pants.ci.toml
     PANTS_DOCKER_DEFAULT_REPOSITORY: "${CI_PROJECT_PATH}/service/{directory}"
     PANTS_DOCKER_REGISTRIES: "{'${CI_REGISTRY}': {'address': '${CI_REGISTRY}', 'default': True}}"
-    PANTS_SETUP_CACHE: .cache
+    PANTS_SETUP_CACHE: "${CI_PROJECT_DIR}/.cache"
+    SCIE_BASE: "${CI_PROJECT_DIR}/.cache"
   cache:
-    key: "pants-setup-3.9.16"
+    key: "python-3.11.2-scie-0.5.2-pants-2.15.0"
     paths:
       - .cache/
     when: always

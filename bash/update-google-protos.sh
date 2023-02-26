@@ -24,4 +24,4 @@ xit
 eof
 done
 
-"${root_dir}/pants" fix "${base_path}"
+pants fix "${base_path}"
