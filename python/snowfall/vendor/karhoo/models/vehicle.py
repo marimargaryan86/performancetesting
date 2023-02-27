@@ -41,6 +41,7 @@ class Vehicle(KarhooBaseModel):
             "hybrid",
             "wheelchair",
             "child-seat",
+            "taxi",
             "executive",
             "luxury",
         ]

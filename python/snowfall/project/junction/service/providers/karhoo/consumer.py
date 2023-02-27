@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 from typing import AsyncIterator
 
@@ -11,11 +12,11 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.redis import types as redis_types
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.v1alpha import models_pb2
-from snowfall.vendor.karhoo import client
+from snowfall.vendor.karhoo import client, errors
 from snowfall.vendor.karhoo.models import location, quotes
 
 
-class TripOfferSearchConsumer(object):
+class TripOfferSearchConsumer(object):  # noqa: WPS214
     def __init__(  # noqa: WPS211
         self,
         consumer_obj: consumer.Consumer[offers_amqp_pb2.TripOfferSearchTask],
@@ -24,6 +25,8 @@ class TripOfferSearchConsumer(object):
         producer_obj: producer.Producer,
         redis: redis_types.Client[bytes],
         ttl: datetime.timedelta,
+        polling_wait_time_in_seconds: int,
+        polling_retries_attempts: int,
     ):
         self._consumer = consumer_obj
         self._client = karhoo_client
@@ -31,6 +34,8 @@ class TripOfferSearchConsumer(object):
         self._producer = producer_obj
         self._redis = redis
         self._ttl = ttl
+        self._polling_wait_time = polling_wait_time_in_seconds
+        self._polling_retries_attempts = polling_retries_attempts
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -96,13 +101,34 @@ class TripOfferSearchConsumer(object):
     ) -> quotes.RequestQuotesResponse:
         return await self._client.list_quotes(ident=quote_id)
 
+    async def _poll_quote_list(
+        self,
+        quote_id: str,
+    ) -> quotes.RequestQuotesResponse:
+        for _ in range(self._polling_retries_attempts):
+            quote_list = await self._retrieve_quote_list(quote_id)
+
+            if quote_list.status == "COMPLETED":
+                return quote_list
+
+            await asyncio.sleep(self._polling_wait_time)
+
+        raise errors.ServiceError(
+            "Unable to get quote {0} details, after {1} attempts {2}s apart".format(
+                quote_id,
+                self._polling_retries_attempts,
+                self._polling_wait_time,
+            ),
+        )
+
     async def _handle_quote_to_offer_group(
         self,
         quote_id: str,
         leg: models_pb2.Leg,
         segment: models_pb2.Segment,
     ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
-        quote_list = await self._retrieve_quote_list(quote_id)
+        quote_list = await self._poll_quote_list(quote_id)
+
         expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
 
         for quote_obj in quote_list.quotes:

@@ -68,6 +68,8 @@ async def offers(  # noqa: WPS210
             offers_cache=cache.OffersCache(
                 client=redis.Client(redis_connection, prefix=app.name),
             ),
+            polling_wait_time_in_seconds=app.settings.polling_wait_time_seconds,
+            polling_retries_attempts=app.settings.polling_retries_attempts,
         )
 
         await trip_offer_search_consumer.consume()
