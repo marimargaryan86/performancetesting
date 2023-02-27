@@ -1,5 +1,4 @@
 import datetime
-import uuid
 from typing import AsyncIterator
 
 from snowfall.project.junction.service.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
@@ -21,7 +20,7 @@ class TripOfferSearchConsumer(object):
         self,
         consumer_obj: consumer.Consumer[offers_amqp_pb2.TripOfferSearchTask],
         karhoo_client: client.KarhooClient,
-        offers_cache: cache.OfferCache,
+        offers_cache: cache.OffersCache,
         producer_obj: producer.Producer,
         redis: redis_types.Client[bytes],
         ttl: datetime.timedelta,
@@ -93,13 +92,13 @@ class TripOfferSearchConsumer(object):
 
     async def _retrieve_quote_list(
         self,
-        quote_id: uuid.UUID,
+        quote_id: str,
     ) -> quotes.RequestQuotesResponse:
         return await self._client.list_quotes(ident=quote_id)
 
     async def _handle_quote_to_offer_group(
         self,
-        quote_id: uuid.UUID,
+        quote_id: str,
         leg: models_pb2.Leg,
         segment: models_pb2.Segment,
     ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
@@ -120,7 +119,7 @@ class TripOfferSearchConsumer(object):
                     offer_models_pb2.Offer(
                         id=await self._offers_cache.store(
                             cache.OfferDetails(
-                                quote=quote_obj,
+                                quote_id=quote_obj.id,
                                 expires_at=expires_at,
                                 price=str(quote_obj.price.high),
                                 currency=currency,

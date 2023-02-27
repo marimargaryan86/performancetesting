@@ -65,7 +65,7 @@ async def offers(  # noqa: WPS210
                 prefix=app.name,
             ),
             ttl=app.settings.ttl,
-            offers_cache=cache.OfferCache(
+            offers_cache=cache.OffersCache(
                 client=redis.Client(redis_connection, prefix=app.name),
             ),
         )

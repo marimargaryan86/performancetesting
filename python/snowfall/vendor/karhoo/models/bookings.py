@@ -1,5 +1,3 @@
-import datetime
-import uuid
 from typing import Literal
 
 from snowfall.vendor.karhoo.models.base import KarhooBaseModel
@@ -76,7 +74,7 @@ class BookingQuote(KarhooBaseModel):
 
 
 class BookingFleet(KarhooBaseModel):
-    fleet_id: uuid.UUID | None
+    fleet_id: str | None
     name: str | None
     logo_url: str | None
     description: str | None
@@ -86,7 +84,7 @@ class BookingFleet(KarhooBaseModel):
 
 
 class BookingResponse(KarhooBaseModel):
-    id: uuid.UUID  # noqa: A003
+    id: str  # noqa: A003
     passengers: Passengers
     partner_traveller_id: str | None
     status: Literal[
@@ -125,5 +123,5 @@ class BookingResponse(KarhooBaseModel):
     cancelled_by: CancelledBy | None
     follow_code: str | None
     meta: dict[str, str] | None
-    train_time: datetime.datetime | None
+    train_time: str | None
     service_level_agreements: ServiceLevelAgreements | None

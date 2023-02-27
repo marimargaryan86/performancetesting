@@ -41,7 +41,7 @@ async def price_quotes(
                 binds=[(amqp_types.Exchange("prices"), "offers.pricing")],
             ),
             producer_obj=producer_obj,
-            offer_cache=cache.OfferCache(
+            offer_cache=cache.OffersCache(
                 client=redis.Client(redis_connection, prefix=app.name),
             ),
             ttl=app.settings.ttl,
@@ -53,7 +53,7 @@ class PriceQuoteConsumer(object):
         self,
         consumer_obj: amqp_consumer.Consumer[offers_amqp_pb2.TripPriceQuoteTask],
         producer_obj: producer.Producer,
-        offer_cache: cache.OfferCache,
+        offer_cache: cache.OffersCache,
         ttl: datetime.timedelta,
     ):
         self._cache = offer_cache

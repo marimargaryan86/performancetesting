@@ -1,4 +1,3 @@
-import uuid
 from typing import Literal
 
 from snowfall.vendor.karhoo.models import price, vehicle
@@ -25,7 +24,7 @@ class ServiceLevelAgreements(KarhooBaseModel):
 
 
 class Fleet(KarhooBaseModel):
-    id: uuid.UUID  # noqa: A003
+    id: str  # noqa: A003
     name: str
     description: str | None
     rating: Rating | None
@@ -45,7 +44,7 @@ class Fleet(KarhooBaseModel):
 
 
 class Quote(KarhooBaseModel):
-    id: uuid.UUID  # noqa: A003
+    id: str  # noqa: A003
     price: price.Price
     pick_up_type: Literal["DEFAULT", "MEET_AND_GREET", "CURB_SIDE", "STAND_BY"] | None
     quote_type: Literal["FIXED", "METERED", "ESTIMATED"]
@@ -60,7 +59,7 @@ class Availability(KarhooBaseModel):
 
 
 class RequestQuotesResponse(KarhooBaseModel):
-    id: uuid.UUID  # noqa: A003
+    id: str  # noqa: A003
     availability: Availability
     quotes: list[Quote]
     status: Literal["PROGRESSING", "COMPLETED"]

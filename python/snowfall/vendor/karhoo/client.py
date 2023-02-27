@@ -1,5 +1,4 @@
 import datetime
-import uuid
 
 import httpx
 
@@ -33,7 +32,7 @@ class KarhooClient(client.HttpClient):  # noqa: WPS214
         )
         return quotes.RequestQuotesResponse(**response.json())
 
-    async def list_quotes(self, ident: uuid.UUID) -> quotes.RequestQuotesResponse:
+    async def list_quotes(self, ident: str) -> quotes.RequestQuotesResponse:
         response = await self._make_request(
             client.RequestOptions(
                 method="GET",
@@ -61,7 +60,7 @@ class KarhooClient(client.HttpClient):  # noqa: WPS214
 
     async def get_booking_details(
         self,
-        ident: uuid.UUID,
+        ident: str,
     ) -> bookings.BookingResponse:
         response = await self._make_request(
             client.RequestOptions(
@@ -75,7 +74,7 @@ class KarhooClient(client.HttpClient):  # noqa: WPS214
 
     async def cancel_booking(
         self,
-        ident: uuid.UUID,
+        ident: str,
         reason: bookings.CANCELLATION_REASON,
         explanation: str | None,
     ) -> None:
@@ -93,7 +92,7 @@ class KarhooClient(client.HttpClient):  # noqa: WPS214
 
     async def get_position_of_trip(
         self,
-        ident: uuid.UUID,
+        ident: str,
     ) -> location.TripPositionResponse:
         response = await self._make_request(
             client.RequestOptions(
@@ -105,7 +104,7 @@ class KarhooClient(client.HttpClient):  # noqa: WPS214
 
         return location.TripPositionResponse(**response.json())
 
-    async def get_final_fare(self, trip_id: uuid.UUID) -> fares.FinalFare:
+    async def get_final_fare(self, trip_id: str) -> fares.FinalFare:
         response = await self._make_request(
             client.RequestOptions(
                 method="GET",

@@ -1,5 +1,3 @@
-import uuid
-
 import pytest
 import pytest_httpx
 
@@ -37,7 +35,7 @@ async def test_request_quotes(
         departure_at=None,
     )
 
-    assert quotes.id == uuid.UUID("00000000-0000-0000-0000-000000000000")
+    assert quotes.id == "00000000-0000-0000-0000-000000000000"
 
 
 async def test_list_quotes(
@@ -56,10 +54,10 @@ async def test_list_quotes(
     )
 
     quotes = await karhoo_client.list_quotes(
-        uuid.UUID("00000000-0000-0000-0000-000000000000"),
+        "00000000-0000-0000-0000-000000000000",
     )
 
-    assert quotes.id == uuid.UUID("00000000-0000-0000-0000-000000000000")
+    assert quotes.id == "00000000-0000-0000-0000-000000000000"
 
 
 async def test_list_quotes_not_found(
@@ -77,7 +75,7 @@ async def test_list_quotes_not_found(
 
     with pytest.raises(errors.HttpStatusError) as exc:
         await karhoo_client.list_quotes(
-            uuid.UUID("00000000-0000-0000-0000-000000000000"),
+            "00000000-0000-0000-0000-000000000000",
         )
 
     assert (
@@ -235,7 +233,7 @@ async def test_book_trip(
         ),
     )
 
-    assert booking.id == uuid.UUID("00000000-0000-0000-0000-000000000000")
+    assert booking.id == "00000000-0000-0000-0000-000000000000"
 
 
 async def test_get_booking_details(
@@ -362,10 +360,10 @@ async def test_get_booking_details(
     )
 
     booking = await karhoo_client.get_booking_details(
-        uuid.UUID("00000000-0000-0000-0000-000000000000"),
+        "00000000-0000-0000-0000-000000000000",
     )
 
-    assert booking.id == uuid.UUID("00000000-0000-0000-0000-000000000000")
+    assert booking.id == "00000000-0000-0000-0000-000000000000"
 
 
 async def test_cancel_booking_not_found(
@@ -383,7 +381,7 @@ async def test_cancel_booking_not_found(
 
     with pytest.raises(errors.HttpStatusError) as exc:
         await karhoo_client.cancel_booking(
-            ident=uuid.UUID("00000000-0000-0000-0000-000000000000"),
+            ident="00000000-0000-0000-0000-000000000000",
             reason="ETA_TOO_LONG",
             explanation="The car was too dirty",
         )
@@ -413,7 +411,7 @@ async def test_get_position_of_trip(
     )
 
     response = await karhoo_client.get_position_of_trip(
-        uuid.UUID("00000000-0000-0000-0000-000000000000"),
+        "00000000-0000-0000-0000-000000000000",
     )
 
     assert response.origin_eta == 10
@@ -435,7 +433,7 @@ async def test_get_final_fare(
     )
 
     response = await karhoo_client.get_final_fare(
-        uuid.UUID("00000000-0000-0000-0000-000000000000"),
+        "00000000-0000-0000-0000-000000000000",
     )
 
     assert response.state == "PENDING"

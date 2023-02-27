@@ -1,4 +1,9 @@
-from snowfall.project.junction.service.providers.karhoo import config, offers, pricing
+from snowfall.project.junction.service.providers.karhoo import (
+    config,
+    offers,
+    orders,
+    pricing,
+)
 from snowfall.stdlib import service
 
 if __name__ == "__main__":
@@ -12,6 +17,11 @@ if __name__ == "__main__":
         service.Command(
             name="pricing",
             callback=pricing.price_quotes,
+            settings_class=config.OrderSettings,
+        ),
+        service.Command(
+            name="orders",
+            callback=orders.orders,
             settings_class=config.OrderSettings,
         ),
     )
