@@ -1,3 +1,4 @@
+import copy
 import datetime
 import itertools
 from dataclasses import dataclass
@@ -93,7 +94,7 @@ class SegmentGrouper(object):
             destinations=frozenset(
                 destination.identifier for destination in destinations
             ),
-            segments=segments,
+            segments=copy.deepcopy(segments),
         )
 
 

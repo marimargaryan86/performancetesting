@@ -137,6 +137,60 @@ def test_trips_are_broken_into_sub_trips(
 
 
 @pytest.mark.parametrize(
+    "trips, expected_segments_count",
+    [
+        (_generate_trips([[models_pb2.Schedule.TYPE_RAIL]]), []),
+        (
+            _generate_trips(
+                [
+                    [
+                        models_pb2.Schedule.TYPE_AIR,
+                        models_pb2.Schedule.TYPE_RAIL,
+                        models_pb2.Schedule.TYPE_AIR,
+                        models_pb2.Schedule.TYPE_RAIL,
+                        models_pb2.Schedule.TYPE_AIR,
+                        models_pb2.Schedule.TYPE_AIR,
+                        models_pb2.Schedule.TYPE_AIR,
+                        models_pb2.Schedule.TYPE_RAIL,
+                    ],
+                ],
+            ),
+            [1, 1, 3],
+        ),
+        (
+            _generate_trips(
+                [
+                    [
+                        models_pb2.Schedule.TYPE_AIR,
+                        models_pb2.Schedule.TYPE_AIR,
+                        models_pb2.Schedule.TYPE_RAIL,
+                        models_pb2.Schedule.TYPE_AIR,
+                    ],
+                    [
+                        models_pb2.Schedule.TYPE_AIR,
+                        models_pb2.Schedule.TYPE_AIR,
+                    ],
+                ],
+            ),
+            [2, 1, 2],
+        ),
+    ],
+)
+def test_sub_trips_segments_count(
+    grouper: segment_grouper.SegmentGrouper,
+    trips: Iterable[models_pb2.Trip],
+    expected_segments_count: Sequence[int],
+) -> None:
+    sub_trips = grouper.trips_to_sub_trips(
+        trips=trips,
+        type_filter=models_pb2.Schedule.TYPE_AIR,
+    )
+
+    for sub_trip_index, sub_trip in enumerate(list(sub_trips)):
+        assert len(sub_trip.segments) == expected_segments_count[sub_trip_index]
+
+
+@pytest.mark.parametrize(
     "sub_trips, expected",
     [
         (
