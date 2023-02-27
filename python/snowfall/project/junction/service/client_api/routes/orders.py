@@ -117,6 +117,7 @@ class Orders(endpoints.HTTPEndpoint):
             residence_address=_create_residence_address(
                 body.get("residenceAddress", None),
             ),
+            auth_token=request.scope.get("security", {"jwt": ""})["jwt"],
         )
 
         return await messages.create_response(
@@ -178,6 +179,7 @@ class OrdersByJourney(endpoints.HTTPEndpoint):
             residence_address=_create_residence_address(
                 body.get("residenceAddress", None),
             ),
+            auth_token=request.scope.get("security", {"jwt": ""})["jwt"],
         )
         # todo: Expire (delete) the offer the order was placed for.
 

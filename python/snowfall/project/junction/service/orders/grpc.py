@@ -8,7 +8,7 @@ from snowfall.project.junction.service.orders.orders import (
     OrderRepository,
 )
 from snowfall.project.junction.service.orders.v1alpha import orders_pb2, orders_pb2_grpc
-from snowfall.stdlib.transport.grpc import service
+from snowfall.stdlib.transport.grpc import metadata, service
 
 
 class OrderService(
@@ -84,6 +84,8 @@ class OrderService(
         request: orders_pb2.PlaceOrderRequest,
         context: aio.ServicerContext,
     ) -> orders_pb2.PlaceOrderResponse:
+        await metadata.get_auth_token(context)
+
         journey = await self._journeys.find_by_id(request.journey_id)
 
         if journey is None:

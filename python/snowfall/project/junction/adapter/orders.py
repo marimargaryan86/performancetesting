@@ -4,6 +4,8 @@ import abc
 from collections.abc import Iterator
 from typing import Optional, Sequence
 
+from grpc import aio
+
 from snowfall.project.junction.adapter import errors
 from snowfall.project.junction.service.orders.v1alpha import (
     models_pb2,
@@ -26,11 +28,12 @@ class Client(abc.ABC):
         """Create a new journey resource."""
 
     @abc.abstractmethod
-    async def place_order(
+    async def place_order(  # noqa: WPS211
         self,
         journey_id: str,
         passengers: Sequence[models_pb2.Passenger],
         options: Sequence[models_pb2.TripOption],
+        auth_token: str,
         residence_address: postal_address_pb2.PostalAddress | None,
     ) -> models_pb2.Order:
         """Create a new order resource."""
@@ -137,11 +140,12 @@ class DictClient(Client):
 
         return journey
 
-    async def place_order(
+    async def place_order(  # noqa: WPS211
         self,
         journey_id: str,
         passengers: Sequence[models_pb2.Passenger],
         options: Sequence[models_pb2.TripOption],
+        auth_token: str,
         residence_address: postal_address_pb2.PostalAddress | None,
     ) -> models_pb2.Order:
         if journey_id not in self._journeys:
@@ -421,11 +425,12 @@ class GrpcClient(Client):
 
         return response.journey
 
-    async def place_order(
+    async def place_order(  # noqa: WPS211
         self,
         journey_id: str,
         passengers: Sequence[models_pb2.Passenger],
         options: Sequence[models_pb2.TripOption],
+        auth_token: str,
         residence_address: postal_address_pb2.PostalAddress | None,
     ) -> models_pb2.Order:
         response = await errors.handle_grpc_errors(
@@ -442,6 +447,7 @@ class GrpcClient(Client):
                     ],
                 ),
                 timeout=self._timeout,
+                metadata=aio.Metadata(("authentication", auth_token)),
             ),
         )
 
