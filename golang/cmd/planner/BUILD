@@ -1,5 +1,4 @@
-docker_image(
-    name="docker",
-    dependencies=["golang:source_files"],
-    image_tags=["{build_args.VERSION}"],
+go_package()
+go_image(
+    name="bin",
 )

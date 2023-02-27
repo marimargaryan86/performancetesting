@@ -4,6 +4,8 @@ package snowfall.stdlib.v1alpha;
 
 import "google/protobuf/descriptor.proto";
 
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha";
+
 extend google.protobuf.FieldOptions {
   optional bool read_only = 50000;
   optional bool write_only = 50001;

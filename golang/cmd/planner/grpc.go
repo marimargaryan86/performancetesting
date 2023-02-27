@@ -6,7 +6,7 @@ import (
 	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"
 	"git.snowfall.se/junction/junction/golang/raptor"
 	"github.com/google/uuid"
-	"github.com/uber/h3-go"
+	"github.com/uber/h3-go/v3"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"strings"

@@ -4,6 +4,8 @@ package snowfall.project.junction.service.schedules.v1alpha;
 
 import "snowfall/stdlib/v1alpha/models.proto";
 
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/schedules/v1alpha";
+
 service ScheduleService {
   rpc GetSchedule(GetScheduleRequest) returns (GetScheduleResponse) {}
   rpc ListSchedules(ListSchedulesRequest) returns (ListSchedulesResponse) {}

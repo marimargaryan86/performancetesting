@@ -18,7 +18,6 @@ include:
   - local: .gitlab/nomad.gitlab-ci.yml
   - local: .gitlab/pants.gitlab-ci.yml
   - local: .gitlab/junction/planner.gitlab-ci.yml
-  - local: golang/.gitlab-ci.yml
   - local: openapi/.gitlab-ci.yml
   - local: protobuf/.gitlab-ci.yml
 

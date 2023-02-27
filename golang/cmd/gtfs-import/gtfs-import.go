@@ -109,6 +109,9 @@ type mongoLocation struct {
 
 var bsonRegistry *bsoncodec.Registry
 
+//go:embed datasets.json
+var datasetsFile []byte
+
 //go:embed routes-whitelist.json
 var routesWhitelistFile []byte
 

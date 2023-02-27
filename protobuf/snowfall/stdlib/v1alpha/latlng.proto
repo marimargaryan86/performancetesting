@@ -14,11 +14,14 @@
 //
 // Modifications by Snowfall Ltd:
 // - changed package to `snowfall.stdlib.v1alpha`
+// - changed option `go_package` to `"git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"`
 // - formatted with `buf format`
 
 syntax = "proto3";
 
 package snowfall.stdlib.v1alpha;
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha";
 
 // An object that represents a latitude/longitude pair. This is expressed as a
 // pair of doubles to represent degrees latitude and degrees longitude. Unless

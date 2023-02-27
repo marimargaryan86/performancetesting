@@ -4,6 +4,8 @@ package snowfall.project.pay.service.transactions.v1alpha;
 
 import "google/protobuf/timestamp.proto";
 
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/transactions/v1alpha";
+
 message Transaction {
   string id = 1;
   string external_reference_id = 2;

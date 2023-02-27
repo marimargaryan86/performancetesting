@@ -5,6 +5,8 @@ package snowfall.service.geodata.v1;
 import "snowfall/stdlib/v1alpha/datetime.proto";
 import "snowfall/stdlib/v1alpha/latlng.proto";
 
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/service/geocoding/v1alpha";
+
 service GeocodingService {
   rpc CountryCodeLookup(CountryCodeLookupRequest) returns (CountryCodeLookupResponse) {}
   rpc TimeZoneLookup(TimeZoneLookupRequest) returns (TimeZoneLookupResponse) {}

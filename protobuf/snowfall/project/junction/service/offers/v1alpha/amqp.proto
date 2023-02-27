@@ -4,6 +4,8 @@ package snowfall.project.junction.service.offers.v1alpha;
 
 import "snowfall/project/junction/service/offers/v1alpha/models.proto";
 
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/offers/v1alpha";
+
 message TripOfferSearchTask {
   string offer_search_id = 1;
   TripOfferSearch search = 2;

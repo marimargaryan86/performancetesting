@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package snowfall.stdlib.v1alpha;
 
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha";
+
 message Trackable {
   enum Status {
     STATUS_UNSPECIFIED = 0;

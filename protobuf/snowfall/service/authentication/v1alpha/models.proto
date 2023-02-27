@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package snowfall.service.authentication.v1alpha;
 
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/service/authentication/v1alpha";
+
 message User {
   string id = 1;
   string email = 2;

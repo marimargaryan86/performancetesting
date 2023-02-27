@@ -4,6 +4,8 @@ package snowfall.project.junction.service.trips.v1alpha;
 
 import "snowfall/project/junction/service/trips/v1alpha/trips.proto";
 
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/trips/v1alpha";
+
 message TripSearchTask {
   TripSearch trip_search = 1;
 }

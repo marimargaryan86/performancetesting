@@ -1,4 +1,1 @@
-files(
-    name="source_files",
-    sources=["**/*.go", "go.mod", "go.sum"],
-)
+go_mod()

@@ -4,7 +4,7 @@ import (
 	"git.snowfall.se/junction/junction/golang/legacy"
 	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/planner/v1alpha"
 	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"
-	"github.com/uber/h3-go"
+	"github.com/uber/h3-go/v3"
 	"math"
 	"sort"
 	"strconv"

@@ -8,6 +8,8 @@ import "snowfall/stdlib/v1alpha/datetime.proto";
 import "snowfall/stdlib/v1alpha/models.proto";
 import "snowfall/stdlib/v1alpha/options.proto";
 
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/trips/v1alpha";
+
 service TripSearchService {
   rpc EnqueueTripSearch(EnqueueTripSearchRequest) returns (EnqueueTripSearchResponse) {}
   rpc GetTripSearchDetails(GetTripSearchDetailsRequest) returns (GetTripSearchDetailsResponse) {}

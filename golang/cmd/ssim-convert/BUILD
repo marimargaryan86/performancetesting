@@ -1,21 +1,6 @@
-file(
-    name="airlines",
-    source="airlines.json",
-)
-
-file(
-    name="airports",
-    source="airports.json",
-)
-
-docker_image(
-    name="docker",
-    dependencies=["golang:source_files", ":airlines", ":airports"],
-    image_tags=["{build_args.VERSION}"],
-)
-
-resources(name="datasets", sources=["airlines.json", "airports.json"])
-python_tests(
-    dependencies=[":datasets"],
-    name="tests",
+resource(name="airlines", source="airlines.json")
+resource(name="airports", source="airports.json")
+go_package(dependencies=[":airlines", ":airports"])
+go_image(
+    name="bin",
 )

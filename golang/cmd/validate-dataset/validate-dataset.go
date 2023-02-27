@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/schollz/progressbar/v3"
 	"github.com/spf13/cobra"
-	"github.com/uber/h3-go"
+	"github.com/uber/h3-go/v3"
 	"google.golang.org/protobuf/proto"
 	"io"
 	"log"

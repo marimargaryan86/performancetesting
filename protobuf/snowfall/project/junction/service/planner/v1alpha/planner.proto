@@ -6,6 +6,8 @@ import "snowfall/stdlib/v1alpha/datetime.proto";
 import "snowfall/stdlib/v1alpha/latlng.proto";
 import "snowfall/stdlib/v1alpha/models.proto";
 
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/planner/v1alpha";
+
 service PlannerService {
   rpc SearchJourney(SearchJourneyRequest) returns (SearchJourneyResponse) {}
 }

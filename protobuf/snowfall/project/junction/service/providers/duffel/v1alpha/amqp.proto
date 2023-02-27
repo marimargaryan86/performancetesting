@@ -5,6 +5,8 @@ package snowfall.project.junction.service.providers.duffel.v1alpha;
 import "snowfall/stdlib/v1alpha/datetime.proto";
 import "snowfall/stdlib/v1alpha/models.proto";
 
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/providers/duffel/v1alpha";
+
 message SearchCriteriaTask {
   string offer_search_id = 1;
   repeated snowfall.stdlib.v1alpha.Segment segments = 2;

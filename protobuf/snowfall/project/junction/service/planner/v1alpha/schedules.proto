@@ -4,6 +4,8 @@ package snowfall.project.junction.service.planner.v1alpha;
 
 import "snowfall/stdlib/v1alpha/models.proto";
 
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/planner/v1alpha";
+
 message Route {
   uint64 sequence = 1; // index of the route in the routes.bin
   repeated uint64 schedules = 2;

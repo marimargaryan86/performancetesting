@@ -7,7 +7,7 @@ import (
 	"git.snowfall.se/junction/junction/golang/raptor"
 	"github.com/getsentry/sentry-go"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/uber/h3-go"
+	"github.com/uber/h3-go/v3"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"

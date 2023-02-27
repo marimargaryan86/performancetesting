@@ -4,6 +4,8 @@ package snowfall.project.pay.service.payers.v1alpha;
 
 import "snowfall/project/pay/service/payers/v1alpha/models.proto";
 
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/payers/v1alpha";
+
 service PayersService {
   rpc CreatePayer(CreatePayerRequest) returns (CreatePayerResponse) {}
   rpc GetPayer(GetPayerRequest) returns (GetPayerResponse) {}

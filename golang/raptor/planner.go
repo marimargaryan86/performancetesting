@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
-	"github.com/uber/h3-go"
+	"github.com/uber/h3-go/v3"
 	"runtime"
 	"sort"
 	"time"

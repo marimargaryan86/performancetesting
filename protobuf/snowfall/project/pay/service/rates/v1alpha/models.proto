@@ -4,6 +4,8 @@ package snowfall.project.pay.service.rates.v1alpha;
 
 import "google/protobuf/timestamp.proto";
 
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/rates/v1alpha";
+
 message Rate {
   string id = 1;
   string buy_currency = 2;

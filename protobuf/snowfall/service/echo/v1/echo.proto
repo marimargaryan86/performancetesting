@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package snowfall.service.echo.v1;
 
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/service/echo/v1alpha";
+
 service EchoService {
   rpc Echo(EchoRequest) returns (EchoResponse) {}
 }

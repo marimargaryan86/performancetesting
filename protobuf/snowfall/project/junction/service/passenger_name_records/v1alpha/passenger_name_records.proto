@@ -4,6 +4,8 @@ package snowfall.project.junction.service.passenger_name_records.v1alpha;
 
 import "google/protobuf/timestamp.proto";
 
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/passenger_name_records/v1alpha";
+
 service PassengerNameRecordService {
   rpc CreatePassengerNameRecord(CreatePassengerNameRecordRequest) returns (CreatePassengerNameRecordResponse) {}
 }

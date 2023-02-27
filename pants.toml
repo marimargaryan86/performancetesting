@@ -8,6 +8,8 @@ backend_packages = [
     "pants.backend.codegen.protobuf.python",
     "pants.backend.docker",
     "pants.backend.docker.lint.hadolint",
+    "pants.backend.experimental.codegen.protobuf.go",
+    "pants.backend.experimental.go",
     "pants.backend.experimental.python.lint.add_trailing_comma",
     "pants.backend.project_info",
     "pants.backend.python",
@@ -92,6 +94,9 @@ source_plugins = [
     "python/snowfall/plugin/flake8/imports.py",
     "python/snowfall/plugin/flake8/typing.py",
 ]
+
+[golang]
+minimum_expected_version = "1.18"
 
 [isort]
 version = "isort==5.12.0"

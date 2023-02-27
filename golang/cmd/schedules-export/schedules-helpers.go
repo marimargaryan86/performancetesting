@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	v1alpha "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"
-	"github.com/uber/h3-go"
+	"github.com/uber/h3-go/v3"
 )
 
 func check(err error) {

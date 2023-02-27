@@ -4,6 +4,8 @@ package snowfall.stdlib.v1alpha;
 
 import "google/protobuf/timestamp.proto";
 
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha";
+
 message Coordinates {
   double latitude = 1;
   double longitude = 2;

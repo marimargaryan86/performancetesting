@@ -14,6 +14,7 @@
 //
 // Modifications by Snowfall Ltd:
 // - changed package to `snowfall.stdlib.v1alpha`
+// - changed option `go_package` to `"git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"`
 // - formatted with `buf format`
 
 syntax = "proto3";
@@ -21,6 +22,8 @@ syntax = "proto3";
 package snowfall.stdlib.v1alpha;
 
 import "google/protobuf/duration.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha";
 
 // Represents civil time (or occasionally physical time).
 //

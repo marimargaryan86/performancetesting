@@ -4,6 +4,8 @@ package snowfall.stdlib.v1alpha;
 
 import "snowfall/stdlib/v1alpha/money.proto";
 
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha";
+
 message GetSeatMapTask {
   string offer_option_id = 1;
 }

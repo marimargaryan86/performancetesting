@@ -4,6 +4,8 @@ package snowfall.service.authentication.v1alpha;
 
 import "snowfall/service/authentication/v1alpha/models.proto";
 
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/service/authentication/v1alpha";
+
 service AuthenticationService {
   rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse);
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);

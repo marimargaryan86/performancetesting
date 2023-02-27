@@ -15,8 +15,9 @@ require (
 	github.com/schollz/progressbar/v3 v3.12.2
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.14.0
-	github.com/uber/h3-go v3.0.1+incompatible
+	github.com/uber/h3-go/v3 v3.7.1
 	github.com/xanzy/go-gitlab v0.77.0
+	go.mongodb.org/mongo-driver v1.11.1
 	go.uber.org/zap v1.24.0
 	golang.org/x/text v0.5.0
 	google.golang.org/grpc v1.51.0
@@ -57,7 +58,6 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.4.1 // indirect
 	github.com/willf/bitset v1.1.11 // indirect
-	go.mongodb.org/mongo-driver v1.11.1 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/net v0.4.0 // indirect

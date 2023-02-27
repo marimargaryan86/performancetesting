@@ -25,7 +25,7 @@ import (
 	"git.snowfall.se/junction/junction/golang/protoio"
 	"github.com/google/uuid"
 	"github.com/schollz/progressbar/v3"
-	"github.com/uber/h3-go"
+	"github.com/uber/h3-go/v3"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
