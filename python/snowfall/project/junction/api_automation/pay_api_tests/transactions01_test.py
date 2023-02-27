@@ -2,6 +2,7 @@ import json
 import logging
 import sys
 
+import httpx
 import pytest
 from dateutil import parser
 
@@ -21,63 +22,106 @@ se = logging.StreamHandler(sys.stderr)
 se.setFormatter(formatter)
 logger.addHandler(se)
 logger.setLevel(logging.DEBUG)
+EXIT_MSG = "Exiting ; check your logs"
 
 
 @pytest.mark.integration
-async def test_create_transactions(  # noqa: WPS218, WPS210
+async def test_create_transactions(  # noqa: WPS210, WPS213, WPS218, C901
     pay_client: PayClient,
 ) -> None:
-    response_payer = await pay_client.create_company(
-        company="test-company-{0}".format(return_randomized_token()),
-        address_lines=["Radhuset", "Våksalagatan 2", "United Spaces", "Sweden"],
-        country_code="SE",
-        postal_code="75320",
-        city="Uppsala",
-        buffer_rate=float(0),
-        sales_rate=float(0),
-    )
+    try:
+        response_payer = await pay_client.create_company(
+            company="test-company-{0}".format(return_randomized_token()),
+            address_lines=["Radhuset", "Våksalagatan 2", "United Spaces", "Sweden"],
+            country_code="SE",
+            postal_code="75320",
+            city="Uppsala",
+            buffer_rate=float(0),
+            sales_rate=float(0),
+        )
+    except httpx.HTTPStatusError as err:
+        logger.info("response_payer err: %s", err.response.headers)
+        logger.info("response_payer body: %s", err.response.json())
+        sys.exit(EXIT_MSG)
 
-    response_beneficiary = await pay_client.create_company(
-        company="test-company-{0}".format(return_randomized_token()),
-        address_lines=["Radhuset", "Våksalagatan 2", "United Spaces", "Sweden"],
-        country_code="SE",
-        postal_code="75320",
-        city="Uppsala",
-        buffer_rate=float(0),
-        sales_rate=float(0),
-    )
+    try:
+        response_beneficiary = await pay_client.create_company(
+            company="test-company-{0}".format(return_randomized_token()),
+            address_lines=["Radhuset", "Våksalagatan 2", "United Spaces", "Sweden"],
+            country_code="SE",
+            postal_code="75320",
+            city="Uppsala",
+            buffer_rate=float(0),
+            sales_rate=float(0),
+        )
+    except httpx.HTTPStatusError as err1:
+        logger.info("response_beneficiary err:: %s", err1.response.headers)
+        logger.info("response_beneficiary body: %s", err1.response.json())
+        sys.exit(EXIT_MSG)
 
-    response_create_quote = await pay_client.create_quote(
-        amount=1000,
-        payer_id=response_payer["data"]["id"],
-        beneficiary_id=response_beneficiary["data"]["id"],
-        from_currency="USD",
-        to_currency="EUR",
-    )
+    try:
+        response_create_quote = await pay_client.create_quote(
+            amount=1000,
+            payer_id=response_payer["data"]["id"],
+            beneficiary_id=response_beneficiary["data"]["id"],
+            from_currency="USD",
+            to_currency="EUR",
+        )
+    except httpx.HTTPStatusError as err2:
+        logger.info(
+            "response_create_quote err:: %s",
+            err2.response.headers,
+        )
+        logger.info("response_create_quote body: %s", err2.response.json())
+        sys.exit(EXIT_MSG)
+
     logger.info("create_quote: %s", json.dumps(response_create_quote, indent=4))
 
     external_reference = string.uuid()
+    logger.info("external_reference: %s", external_reference)
     parent_external_reference = string.uuid()
-    response = await pay_client.create_transactions(
-        external_reference=external_reference,
-        parent_external_reference=parent_external_reference,
-        quotation_id=response_create_quote["data"]["id"],
+    logger.info("parent_external_reference: %s", parent_external_reference)
+    logger.info("quotation_id: %s", response_create_quote["data"]["id"])
+
+    try:
+        response_create_transactions = await pay_client.create_transactions(
+            external_reference=external_reference,
+            parent_external_reference=parent_external_reference,
+            quotation_id=response_create_quote["data"]["id"],
+        )
+
+    except httpx.HTTPStatusError as err3:
+        logger.info("response err:: %s", err3.response.headers)
+        logger.info("response_create_transactions body: %s", err3.response.json())
+        sys.exit(EXIT_MSG)
+
+    logger.info(
+        "create_transactions: %s",
+        json.dumps(response_create_transactions, indent=4),
     )
-    logger.info("create_transactions: %s", json.dumps(response, indent=4))
 
-    quotation = response["data"]["relationships"]["quotation"]["data"]
+    quotation = response_create_transactions["data"]["relationships"]["quotation"][
+        "data"
+    ]
 
     assert (
-        is_valid_uuid(response["data"]["id"]) is True
+        is_valid_uuid(response_create_transactions["data"]["id"]) is True
     ), "transactions uuid must be in valid format"
-    assert response["data"]["type"] == "transactions"
-    assert response["data"]["attributes"]["externalReference"] == external_reference
+    assert response_create_transactions["data"]["type"] == "transactions"
     assert (
-        response["data"]["attributes"]["parentExternalReference"]
+        response_create_transactions["data"]["attributes"]["externalReference"]
+        == external_reference
+    )
+    assert (
+        response_create_transactions["data"]["attributes"]["parentExternalReference"]
         == parent_external_reference
     )
     try:
-        is_valid_date = bool(parser.parse(response["data"]["attributes"]["createdAt"]))
+        is_valid_date = bool(
+            parser.parse(
+                response_create_transactions["data"]["attributes"]["createdAt"],
+            ),
+        )
     except parser.ParserError:
         is_valid_date = False
     assert is_valid_date
