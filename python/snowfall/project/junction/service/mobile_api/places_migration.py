@@ -76,7 +76,7 @@ async def _save_enrich_data(
         # fmt: on
 
         population: Union[str, int] | None = "".join(
-            char for char in osm_place.get("population", "") if char.isdigit()
+            char for char in osm_place.get("population") or "" if char.isdigit()
         )
         population = int(population) if population else 0
         await repo.insert(
