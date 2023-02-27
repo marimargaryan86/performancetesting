@@ -68,7 +68,7 @@ pants:package:
     DOCKER_TLS_CERTDIR: ""
     PANTS_PUBLISH_OUTPUT: dist/deliverables.json
   services:
-    - name: docker:dind
+    - name: "docker@sha256:ed6220b0de0f309f0844cf8cf1a6b861e981fb7f5c28bec6acc97abc910bd0a8"
       alias: dockerdaemon
   resource_group: package # needed due to Docker images disappearing :(
   artifacts:

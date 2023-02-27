@@ -20,8 +20,7 @@ def go_image(  # type: ignore[no-untyped-def]
         dependencies=[":{name}".format(name=name)],
         image_tags=["{build_args.VERSION}"],
         instructions=[
-            "ARG REGISTRY",
-            "FROM ${{REGISTRY}}gcr.io/distroless/base@sha256:{hash} AS runtime".format(
+            "FROM gcr.io/distroless/base@sha256:{hash} AS runtime".format(
                 hash=tag_sha,
             ),
             "COPY {namespace}/{name} /bin/{name}".format(
