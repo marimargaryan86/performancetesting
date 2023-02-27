@@ -51,6 +51,7 @@ for i in nomad/**/*.nomad; do
 	config="$(dirname "${i}")/${filename%.*}.json"
 	service_name=$(basename "$(dirname "${i}")" | sed s/_/-/g)
 
+	mkdir -p "repo/development/${service_name}"
 	cp "${i}" "repo/development/${service_name}/${filename}"
 
 	for environment in {development,production}; do
