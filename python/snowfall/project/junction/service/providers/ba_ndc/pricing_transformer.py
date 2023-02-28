@@ -43,19 +43,15 @@ def _to_document_requirement(
 ) -> List[offers_pb2.PriceQuote.Required.ValueType]:
     required_docs: List[offers_pb2.PriceQuote.Required.ValueType] = []
 
-    if offer_details.doc_required:
+    if offer_details.international_flight:
         required_docs.extend(
             [
                 offers_pb2.PriceQuote.Required.REQUIRED_NATIONALITY,
                 offers_pb2.PriceQuote.Required.REQUIRED_EXPIRATION_DATE,
                 offers_pb2.PriceQuote.Required.REQUIRED_ISSUING_COUNTRY,
                 offers_pb2.PriceQuote.Required.REQUIRED_PASSPORT_NUMBER,
+                offers_pb2.PriceQuote.Required.REQUIRED_RESIDENCE_COUNTRY_CODE,
             ],
-        )
-
-    if offer_details.international_flight:
-        required_docs.append(
-            offers_pb2.PriceQuote.Required.REQUIRED_RESIDENCE_COUNTRY_CODE,
         )
 
     if offer_details.return_flight_to_usa:

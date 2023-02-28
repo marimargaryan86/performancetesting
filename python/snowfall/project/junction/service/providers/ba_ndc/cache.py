@@ -27,7 +27,6 @@ class OfferDetails(RedisRecord):
     offer_id: uuid.UUID
     passengers: List[OfferDetailsPassenger]
     price: Price
-    doc_required: bool = False
     international_flight: bool = False
     return_flight_to_usa: bool = False
     expires_at: datetime.datetime

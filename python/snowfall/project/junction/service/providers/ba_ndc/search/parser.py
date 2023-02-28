@@ -64,9 +64,11 @@ def _parse_segment_details(  # noqa: WPS210
     offers_adapter: OffersResponseAdapter,
 ) -> List[offer_models_pb2.OfferSegmentDetails]:
     segment_details = []
+    segment_index = 0
 
     for trip in trips:
-        for _ba_ndc_segment, offer_segment in zip(trip.segment_ids, offer_segments):
+        for _ in trip.segment_ids:
+            offer_segment = offer_segments[segment_index]
             bag_allowances: list[response_priced_offer_schemas.BagAllowance] = []
 
             for bag_ref in trip.baggage_allowance_refs:
@@ -85,6 +87,8 @@ def _parse_segment_details(  # noqa: WPS210
                     baggage_allowances=_parse_baggage_allowance(bag_allowances),
                 ),
             )
+            segment_index += 1
+
     return segment_details
 
 
@@ -194,7 +198,7 @@ class OfferParser(object):
             segments=offer_segm,
         )
 
-    def check_if_domestic_flight(
+    def check_if_international_flight(
         self,
         trips: Sequence[response_common_offer_schemas.Trip],
         offers_adapter: OffersResponseAdapter,
@@ -216,36 +220,30 @@ class OfferParser(object):
                     for iata in iata_code_set
                 },
             )
-            <= 1
+            > 1
         )
 
-    def get_flight_flags(
+    def check_if_flight_to_usa(
         self,
         trips: Sequence[response_common_offer_schemas.Trip],
         offers_adapter: OffersResponseAdapter,
-    ) -> tuple[bool, bool]:
-        international_flight = False
-        return_flight_to_usa = False
-        origin_segment = offers_adapter.get_segment_by_id(
-            more_itertools.first(more_itertools.first(trips).segment_ids),
-        )
-        destination_segment = offers_adapter.get_segment_by_id(
-            more_itertools.last(more_itertools.last(trips).segment_ids),
-        )
+    ) -> bool:
+        airport_codes = set()
 
-        if not origin_segment or not destination_segment:
-            return international_flight, return_flight_to_usa
-
-        if origin_segment.origin.code != destination_segment.destination.code:
-            international_flight = True
-
-            destination_airport = self._airport_repository.get_by_iata(
-                destination_segment.destination.code,
+        for trip in trips:
+            last_segment = offers_adapter.get_segment_by_id(
+                more_itertools.last(trip.segment_ids),
             )
 
-            return_flight_to_usa = destination_airport.iata_country_code == "US"
+            if last_segment:
+                airport_codes.add(last_segment.destination.code)
 
-        return international_flight, return_flight_to_usa
+        country_codes = (
+            self._airport_repository.get_by_iata(airport_code).iata_country_code
+            for airport_code in airport_codes
+        )
+
+        return "US" in country_codes
 
     def _segment_legs_to_proto(
         self,
@@ -277,10 +275,14 @@ class OfferParser(object):
                         time_zone=destination.timezone.key,
                     ),
                     departure_at=protobuf.datetime_to_protobuf(
-                        offer_leg.departure_date_time,
+                        offer_leg.departure_date_time.replace(
+                            tzinfo=origin.timezone,
+                        ),
                     ),
                     arrival_at=protobuf.datetime_to_protobuf(
-                        offer_leg.arrival_date_time,
+                        offer_leg.arrival_date_time.replace(
+                            tzinfo=destination.timezone,
+                        ),
                     ),
                 ),
             )
@@ -337,10 +339,6 @@ class OfferParser(object):
                 offer.price.total_amount,
                 money.Currency(offer.price.currency),
             )
-            flight_flags = self.get_flight_flags(
-                offer.trips,
-                offers_adapter,
-            )
             pb_offers.append(
                 offer_models_pb2.Offer(
                     id=await self._offer_cache.store(
@@ -359,12 +357,14 @@ class OfferParser(object):
                             ],
                             expires_at=offers_adapter.get_expires_at(),
                             penalties=get_penalties(offer.trips, offers_adapter),
-                            doc_required=not self.check_if_domestic_flight(
+                            international_flight=self.check_if_international_flight(
                                 offer.trips,
                                 offers_adapter,
                             ),
-                            international_flight=flight_flags[0],
-                            return_flight_to_usa=flight_flags[1],
+                            return_flight_to_usa=self.check_if_flight_to_usa(
+                                offer.trips,
+                                offers_adapter,
+                            ),
                         ),
                         expires_at=offers_adapter.get_expires_at(),
                     ),

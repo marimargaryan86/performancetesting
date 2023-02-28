@@ -72,13 +72,13 @@ def _get_residence_address(
 
 def _get_passport_document(
     passenger: models_pb2.Passenger,
-    is_doc_required: bool,
+    is_international_flight: bool,
 ) -> request_order_schemas.IdentityDocument | None:
     is_passport = (
         passenger.doc_details.document_type == models_pb2.DocumentDetails.TYPE_PASSPORT
     )
 
-    if is_passport and is_doc_required:
+    if is_passport and is_international_flight:
         return request_order_schemas.IdentityDocument(
             document_number=passenger.doc_details.document_number,
             document_type=_PASSPORT_DOCUMENT_TYPE,
@@ -170,7 +170,10 @@ class BookingHandler(object):
         order_request = OrderRequestBuilder(details.offer_id)
 
         for index, passenger in enumerate(task.passengers):
-            passport_document = _get_passport_document(passenger, details.doc_required)
+            passport_document = _get_passport_document(
+                passenger,
+                details.international_flight,
+            )
 
             order_request.add_passenger(
                 request_order_schemas.PassengerExtended(
@@ -198,7 +201,7 @@ class BookingHandler(object):
                     ),
                     identity_documents=(
                         [passport_document]
-                        if passport_document and details.doc_required
+                        if passport_document and details.international_flight
                         else []
                     ),
                 ),
