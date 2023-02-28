@@ -17,13 +17,14 @@ for ((idx = 3; idx < ${#ARGS[@]}; ++idx)); do
 
 	echo "Deploying '${TEMPLATE_FILE%.*}' of '${SERVICE_NAME}'..."
 
-	PLAN_OUTPUT=$(nomad plan "${ADDITIONAL_ARGS[@]}" "${TEMPLATE_FILE}")
-	if [ $? -eq 255 ]; then
+	if PLAN_OUTPUT=$(nomad plan "${ADDITIONAL_ARGS[@]}" "${TEMPLATE_FILE}"); then
+		true # can't do ! negation above if we want to check the exact status code
+	elif [ $? -eq 255 ]; then
 		echo "${PLAN_OUTPUT}"
 		exit 1
 	fi
 
-	CHECK_INDEX=$(grep "Job Modify Index:" "${PLAN_OUTPUT}" | awk -F": " '{ print $2 }')
+	CHECK_INDEX=$(echo "${PLAN_OUTPUT}" | grep "Job Modify Index:" | awk -F": " '{ print $2 }')
 	echo "Check Index: ${CHECK_INDEX}"
 
 	if ! RUN_OUTPUT=$(nomad run "${ADDITIONAL_ARGS[@]}" -check-index="${CHECK_INDEX}" -detach "${TEMPLATE_FILE}"); then
@@ -31,7 +32,7 @@ for ((idx = 3; idx < ${#ARGS[@]}; ++idx)); do
 		exit 1
 	fi
 
-	EVALUATION_ID=$(grep "Evaluation ID:" "${RUN_OUTPUT}" | awk -F": " '{ print $2 }')
+	EVALUATION_ID=$(echo "${RUN_OUTPUT}" | grep "Evaluation ID:" | awk -F": " '{ print $2 }')
 	echo "Evaluation ID: ${EVALUATION_ID}"
 
 	if [ "${EVALUATION_ID}" = "" ]; then
