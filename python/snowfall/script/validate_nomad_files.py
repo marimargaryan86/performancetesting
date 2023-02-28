@@ -166,7 +166,7 @@ def _validate_variables(
     config_data = _load_config_file(template_path)
 
     if not config_data:
-        return True
+        return False
 
     errors = False
 
