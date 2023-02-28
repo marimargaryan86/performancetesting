@@ -1,8 +1,10 @@
 import json
 import logging
 import sys
+from typing import Any, Dict, Mapping
 
 import httpx
+import pymongo
 import pytest
 from dateutil import parser
 
@@ -28,6 +30,7 @@ EXIT_MSG = "Exiting ; check your logs"
 @pytest.mark.integration
 async def test_create_transactions(  # noqa: WPS210, WPS213, WPS218, C901
     pay_client: PayClient,
+    get_mongo_config: Mapping[str, Any],
 ) -> None:
     try:
         response_payer = await pay_client.create_company(
@@ -64,8 +67,8 @@ async def test_create_transactions(  # noqa: WPS210, WPS213, WPS218, C901
             amount=1000,
             payer_id=response_payer["data"]["id"],
             beneficiary_id=response_beneficiary["data"]["id"],
-            from_currency="USD",
-            to_currency="EUR",
+            from_currency="EUR",
+            to_currency="SEK",
         )
     except httpx.HTTPStatusError as err2:
         logger.info(
@@ -127,3 +130,28 @@ async def test_create_transactions(  # noqa: WPS210, WPS213, WPS218, C901
     assert is_valid_date
     assert quotation["id"] == response_create_quote["data"]["id"]
     assert quotation["type"] == "quotations"
+
+    mongo_client: pymongo.mongo_client.MongoClient[Dict[str, Any]] = (
+        pymongo.MongoClient(
+            "mongodb://{0}:{1}@{2}:{3}/".format(
+                get_mongo_config["mongodb_dev_user"],
+                get_mongo_config["mongodb_dev_password"],
+                get_mongo_config["mongodb_dev_server"],
+                get_mongo_config["mongodb_dev_port"],
+            ),
+        )
+    )
+    db = mongo_client["transactions"]
+    collection_transactions = db.get_collection("transactions")
+    transactions_item = collection_transactions.find_one(
+        {"external_reference_id": external_reference},
+    )
+    logger.info("transactions_item: %s", transactions_item)
+
+    collection_conversions = db.get_collection("conversions")
+    conversion_item = collection_conversions.find_one(
+        transactions_item["conversion_id"],  # type: ignore[index]
+    )
+    logger.info("transactions_item: %s", transactions_item)
+
+    assert is_valid_uuid(conversion_item["_id"])  # type: ignore[index]

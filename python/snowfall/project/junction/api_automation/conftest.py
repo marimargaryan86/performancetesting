@@ -236,6 +236,24 @@ def pay_client(
     )
 
 
+@pytest.fixture(scope="function")
+def get_mongo_config(
+    api_token: str,
+    host: str,
+) -> dict[str, Any]:
+    mdb_user = get_variable_value(host, api_token, "mongodb_dev_user")
+    mdb_password = get_variable_value(host, api_token, "mongodb_dev_password")
+    mdb_server = get_variable_value(host, api_token, "mongodb_dev_server")
+    mdb_port = get_variable_value(host, api_token, "mongodb_dev_port")
+
+    return {
+        "mongodb_dev_user": mdb_user,
+        "mongodb_dev_password": mdb_password,
+        "mongodb_dev_server": mdb_server,
+        "mongodb_dev_port": mdb_port,
+    }
+
+
 def get_variable_value(
     host: str,
     api_token: str,
