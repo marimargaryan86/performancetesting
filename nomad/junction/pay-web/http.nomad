@@ -43,8 +43,8 @@ job "pay-web-http" {
     auto_revert       = true
     auto_promote      = true
     canary            = 1
-    healthy_deadline  = "30s"
-    progress_deadline = "1m"
+    healthy_deadline  = "60s"
+    progress_deadline = "2m"
   }
 
   group "http" {
