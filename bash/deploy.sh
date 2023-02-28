@@ -17,19 +17,15 @@ for ((idx = 3; idx < ${#ARGS[@]}; ++idx)); do
 
 	echo "Deploying '${TEMPLATE_FILE%.*}' of '${SERVICE_NAME}'..."
 
-	nomad plan "${ADDITIONAL_ARGS[@]}" "${TEMPLATE_FILE}" | grep 'Job Modify Index:' | awk -F': ' '{ print $2 }' >check-index
-	if [ $? -eq 255 ]; then exit 1; else true; fi
+	PLAN_OUTPUT=$(nomad plan "${ADDITIONAL_ARGS[@]}" "${TEMPLATE_FILE}")
+	if [ $? -eq 255 ]; then exit 1; fi
 
-	CHECK_INDEX=$(cat check-index)
+	CHECK_INDEX=$(grep "Job Modify Index:" "${PLAN_OUTPUT}" | awk -F": " '{ print $2 }')
 	echo "Check Index: ${CHECK_INDEX}"
 
-	if ! nomad run "${ADDITIONAL_ARGS[@]}" -check-index="${CHECK_INDEX}" -detach "${TEMPLATE_FILE}" | grep 'Evaluation ID:' | awk -F': ' '{ print $2 }' >eval-id; then
-		exit 1
-	else
-		true
-	fi
+	if ! RUN_OUTPUT=$(nomad run "${ADDITIONAL_ARGS[@]}" -check-index="${CHECK_INDEX}" -detach "${TEMPLATE_FILE}"); then exit 1; fi
 
-	EVALUATION_ID=$(cat eval-id)
+	EVALUATION_ID=$(grep "Evaluation ID:" "${RUN_OUTPUT}" | awk -F": " '{ print $2 }')
 	echo "Evaluation ID: ${EVALUATION_ID}"
 
 	if [ "${EVALUATION_ID}" = "" ]; then
@@ -39,8 +35,6 @@ for ((idx = 3; idx < ${#ARGS[@]}; ++idx)); do
 
 	if nomad eval status -monitor "${EVALUATION_ID}" >/dev/null 2>&1; then
 		continue
-	else
-		true
 	fi
 
 	DEPLOYMENT_ID=$(nomad eval status -json "${EVALUATION_ID}" | jq -e -r ".DeploymentID")

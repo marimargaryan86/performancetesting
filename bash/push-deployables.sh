@@ -62,7 +62,7 @@ for i in nomad/**/*.nomad; do
 			if [ "$(jq -r ".${environment}.deploy" "${config}")" = "false" ]; then
 				touch "${template_path}/.skip_deploy"
 			else
-				jq -r ".${environment}.variables|to_entries|map(\"\\(.key)=\\(.value|tostring)\")|.[]" "${config}" >"${template_path}/${filename%.*}.vars"
+				jq -r ".${environment}.variables|to_entries|map(\"\\(.key)=\\\"\\(.value|tostring)\\\"\")|.[]" "${config}" >"${template_path}/${filename%.*}.vars"
 			fi
 		fi
 	done
