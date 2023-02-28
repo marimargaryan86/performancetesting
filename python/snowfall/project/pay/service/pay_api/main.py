@@ -96,6 +96,9 @@ def _factory(
                     contact_persons_repository=accounts.ContactPersonsRepository(
                         mongo.contactpersons.contactpersons,
                     ),
+                    accounts_repository=accounts.AccountsRepository(
+                        mongo.accounts.accounts,
+                    ),
                 ),
             ),
             openapi_path=filesystem.resource_path("junction.pay_api", "openapi.json"),

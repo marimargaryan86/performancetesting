@@ -16,3 +16,18 @@ class ContactPersonsRepository(
     repository.ProtoRepository[models_pb2.ContactPerson],
 ):
     _proto = models_pb2.ContactPerson
+
+    async def update_reference(
+        self,
+        contact_person: models_pb2.ContactPerson,
+        external_reference: str,
+    ) -> models_pb2.ContactPerson:
+        return await self._execute(
+            self._collection.update_one,
+            filter={"_id": contact_person.id},
+            update={
+                "$set": {
+                    "external_reference": external_reference,
+                },
+            },
+        )

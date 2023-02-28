@@ -1,8 +1,11 @@
 import pytest
 
+from snowfall.project.pay.service.accounts.accounts import ContactPersonsRepository
+from snowfall.project.pay.service.accounts.v1alpha.models_pb2 import ContactPerson
 from snowfall.project.pay.service.quotations.quotations import QuotationsRepository
 from snowfall.project.pay.service.quotations.v1alpha.models_pb2 import Quotation
 from snowfall.stdlib import money, string
+from snowfall.stdlib.v1alpha import phone_number_pb2
 
 
 @pytest.fixture()
@@ -17,3 +20,20 @@ async def quote_is_less_than_the_limit(
         beneficiary_amount=gbp.protobuf(),
     )
     return await quotations_repository.insert(quote)
+
+
+@pytest.fixture()
+async def contact_person_with_bad_company_id(
+    contact_persons_repository: ContactPersonsRepository,
+) -> ContactPerson:
+    contact_person = ContactPerson(
+        id=string.uuid(),
+        first_name="John",
+        last_name="Doe",
+        email="example@email.com",
+        phone_number=phone_number_pb2.PhoneNumber(
+            e164_number="+385996666666",
+        ),
+        company_id="bad_company_id",
+    )
+    return await contact_persons_repository.insert(contact_person)

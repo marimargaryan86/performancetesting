@@ -21,4 +21,5 @@ message ContactPerson {
   snowfall.stdlib.v1alpha.PhoneNumber phone_number = 5;
   string company_id = 6;
   google.protobuf.Timestamp created_at = 7;
+  string external_reference = 8;
 }

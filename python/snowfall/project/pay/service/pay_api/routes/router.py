@@ -2,7 +2,8 @@ import lagom
 from lagom.integrations import starlette
 from starlette import routing
 
-from snowfall.project.pay.service.pay_api.routes import (
+from snowfall.project.pay.service.pay_api.routes import (  # noqa: WPS235
+    accounts,
     authentication,
     balances,
     companies,
@@ -76,5 +77,10 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             "/contact-persons",
             contact_persons.ContactPersons,
             name="ContactPerson",
+        ),
+        integration.route(
+            "/accounts",
+            accounts.Accounts,
+            name="Account",
         ),
     ]

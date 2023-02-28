@@ -44,6 +44,7 @@ def _create_app(  # noqa: WPS211
     transaction_repository: TransactionRepository,
     conversion_repository: ConversionRepository,
     contact_persons_repository: accounts.ContactPersonsRepository,
+    accounts_repository: accounts.AccountsRepository,
     openapi_path: pathlib.Path,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
@@ -61,6 +62,7 @@ def _create_app(  # noqa: WPS211
                 transaction_repository,
                 conversion_repository,
                 contact_persons_repository,
+                accounts_repository=accounts_repository,
                 payment_client=payment_client,
             ),
         ),
@@ -124,6 +126,15 @@ def contact_persons_repository(
 ) -> accounts.ContactPersonsRepository:
     return accounts.ContactPersonsRepository(
         collection=mongo_client.test.contactpersons,
+    )
+
+
+@pytest.fixture()
+def accounts_repository(
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
+) -> accounts.AccountsRepository:
+    return accounts.AccountsRepository(
+        collection=mongo_client.test.accounts,
     )
 
 
@@ -204,6 +215,7 @@ def app(  # noqa: WPS211
     conversions_repository: ConversionRepository,
     payment_client: PaymentClient,
     contact_persons_repository: accounts.ContactPersonsRepository,
+    accounts_repository: accounts.AccountsRepository,
 ) -> applications.Starlette:
     return _create_app(
         cc_client=cc_client,
@@ -216,6 +228,7 @@ def app(  # noqa: WPS211
         transaction_repository=transactions_repository,
         conversion_repository=conversions_repository,
         contact_persons_repository=contact_persons_repository,
+        accounts_repository=accounts_repository,
         openapi_path=filesystem.resource_path("junction.pay_api", "openapi.json"),
     )
 

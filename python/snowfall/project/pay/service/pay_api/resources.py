@@ -137,3 +137,30 @@ class ContactPersonResource(models.Resource):
                 },
             },
         )
+
+
+class AccountResource(models.Resource):
+    api_type: ClassVar[str] = "accounts"
+
+    @classmethod
+    def from_proto(
+        cls,
+        account: account_models.Account,
+        name: str,
+        contact_person_id: str,
+    ) -> AccountResource:
+        return cls(
+            id=account.id,
+            type=AccountResource.api_type,
+            attributes={
+                "name": name,
+            },
+            relationships={
+                "contactPerson": {
+                    "data": {
+                        "id": contact_person_id,
+                        "type": "contact-persons",
+                    },
+                },
+            },
+        )

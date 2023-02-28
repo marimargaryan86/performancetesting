@@ -39,6 +39,7 @@ def create_dependencies(  # noqa: WPS211
     transactions_repository: TransactionRepository,
     conversions_repository: ConversionRepository,
     contact_persons_repository: accounts.ContactPersonsRepository,
+    accounts_repository: accounts.AccountsRepository,
     payment_client: Optional[client.PaymentClient] = None,
 ) -> lagom.Container:
     container = lagom.Container()
@@ -52,4 +53,5 @@ def create_dependencies(  # noqa: WPS211
     container[TransactionRepository] = transactions_repository
     container[ConversionRepository] = conversions_repository
     container[accounts.ContactPersonsRepository] = contact_persons_repository
+    container[accounts.AccountsRepository] = accounts_repository
     return container

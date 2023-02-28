@@ -8,14 +8,14 @@ class Account(CamelCaseBaseModel):
     legal_entity_type: str = "company"
     street: str
     city: str
-    state_or_province: str
     country: str
     postal_code: str
+    state_or_province: str
     spread_table: str = "flat_0.00"
     api_trading: bool = True
     online_trading: bool = False
     phone_trading: bool = True
-    terms_and_conditions_accepted: bool = True
+    terms_and_conditions_accepted: bool | None = True
 
 
 class AccountRequest(Account):
