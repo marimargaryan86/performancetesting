@@ -124,4 +124,9 @@ def get_admin_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             contact_persons.ContactPersons,
             name="ContactPerson",
         ),
+        integration.route(
+            "/accounts",
+            accounts.Accounts,
+            name="Account",
+        ),
     ]

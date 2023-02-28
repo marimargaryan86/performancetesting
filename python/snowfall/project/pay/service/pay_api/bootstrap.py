@@ -29,11 +29,12 @@ class Settings(application.Settings):
     redis_dsn: Sequence[AnyUrl]
 
 
-def create_admin_dependencies(
+def create_admin_dependencies(  # noqa: WPS211
     cc_client: currencycloud.Client,
     authentication_client: authentication.Client,
     companies_repository: CompanyRepository,
     contact_persons_repository: accounts.ContactPersonsRepository,
+    accounts_repository: accounts.AccountsRepository,
     payment_client: Optional[client.PaymentClient] = None,
 ) -> lagom.Container:
     container = lagom.Container()
@@ -42,6 +43,7 @@ def create_admin_dependencies(
     container[authentication.Client] = authentication_client  # type: ignore[type-abstract]
     container[CompanyRepository] = companies_repository
     container[accounts.ContactPersonsRepository] = contact_persons_repository
+    container[accounts.AccountsRepository] = accounts_repository
     return container
 
 

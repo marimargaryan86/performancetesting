@@ -164,6 +164,9 @@ def _admin_factory(
                     contact_persons_repository=accounts.ContactPersonsRepository(
                         mongo.contactpersons.contactpersons,
                     ),
+                    accounts_repository=accounts.AccountsRepository(
+                        mongo.accounts.accounts,
+                    ),
                 ),
             ),
             openapi_path=filesystem.resource_path(
