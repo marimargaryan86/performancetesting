@@ -18,12 +18,18 @@ for ((idx = 3; idx < ${#ARGS[@]}; ++idx)); do
 	echo "Deploying '${TEMPLATE_FILE%.*}' of '${SERVICE_NAME}'..."
 
 	PLAN_OUTPUT=$(nomad plan "${ADDITIONAL_ARGS[@]}" "${TEMPLATE_FILE}")
-	if [ $? -eq 255 ]; then exit 1; fi
+	if [ $? -eq 255 ]; then
+		echo "${PLAN_OUTPUT}"
+		exit 1
+	fi
 
 	CHECK_INDEX=$(grep "Job Modify Index:" "${PLAN_OUTPUT}" | awk -F": " '{ print $2 }')
 	echo "Check Index: ${CHECK_INDEX}"
 
-	if ! RUN_OUTPUT=$(nomad run "${ADDITIONAL_ARGS[@]}" -check-index="${CHECK_INDEX}" -detach "${TEMPLATE_FILE}"); then exit 1; fi
+	if ! RUN_OUTPUT=$(nomad run "${ADDITIONAL_ARGS[@]}" -check-index="${CHECK_INDEX}" -detach "${TEMPLATE_FILE}"); then
+		echo "${RUN_OUTPUT}"
+		exit 1
+	fi
 
 	EVALUATION_ID=$(grep "Evaluation ID:" "${RUN_OUTPUT}" | awk -F": " '{ print $2 }')
 	echo "Evaluation ID: ${EVALUATION_ID}"
