@@ -37,6 +37,11 @@ def _factory(
         mongo = motor_asyncio.AsyncIOMotorClient(
             random.choice(app.settings.mongo_dsn),  # nosec
         )
+        cc_client = currencycloud.Client(
+            app.settings.cc_login,
+            app.settings.cc_api_key,
+            app.settings.cc_env,
+        )
         redis_client = redis.Client[str](
             aioredis.from_url(
                 random.choice(app.settings.redis_dsn),  # nosec
@@ -44,16 +49,12 @@ def _factory(
             ).client(),
             prefix=app.name,
         )
-        orders_channel = create_channel(
-            random.choice(app.settings.currencies_address),  # nosec
-        )
+
         authentication_channel = create_channel(
             app.settings.authentication_address,
         )
-        cc_client = currencycloud.Client(
-            app.settings.cc_login,
-            app.settings.cc_api_key,
-            app.settings.cc_env,
+        orders_channel = create_channel(
+            random.choice(app.settings.currencies_address),  # nosec
         )
         quotations_repo = QuotationsRepository(mongo.quotations.quotations)
         asgi_app = application.create_starlette_app(
@@ -122,9 +123,85 @@ def _factory(
     return decorator
 
 
+def _admin_factory(
+    app: service.Application[bootstrap.Settings],
+) -> Callable[[], applications.Starlette]:
+    def decorator() -> applications.Starlette:
+        mongo = motor_asyncio.AsyncIOMotorClient(
+            random.choice(app.settings.mongo_dsn),  # nosec
+        )
+        cc_client = currencycloud.Client(
+            app.settings.cc_login,
+            app.settings.cc_api_key,
+            app.settings.cc_env,
+        )
+        authentication_channel = create_channel(
+            app.settings.authentication_address,
+        )
+        asgi_app = application.create_starlette_app(
+            custom_middlewares=[
+                Middleware(
+                    authentication.AuthenticationMiddleware,
+                    backend=authenticator.Authenticator(
+                        public_key_content=base64.b64decode(
+                            app.settings.jwt_public_key.encode(),
+                        ).decode(),
+                    ),
+                    on_error=handlers.auth_error_handler,
+                ),
+            ],
+            routes=router.get_admin_routes(
+                bootstrap.create_admin_dependencies(
+                    cc_client=cc_client,
+                    authentication_client=auth.GrpcClient(
+                        auth.auth_pb2_grpc.AuthenticationServiceStub(
+                            authentication_channel,
+                        ),
+                    ),
+                    companies_repository=CompanyRepository(
+                        mongo.companies.companies,
+                    ),
+                    contact_persons_repository=accounts.ContactPersonsRepository(
+                        mongo.contactpersons.contactpersons,
+                    ),
+                ),
+            ),
+            openapi_path=filesystem.resource_path(
+                "junction.pay_admin_api",
+                "openapi.json",
+            ),
+        )
+
+        asgi_app.add_exception_handler(
+            errors.CursorError,
+            handlers.cursor_error_handler,
+        )
+        asgi_app.add_exception_handler(
+            errors.NotFoundError,
+            handlers.not_found_error_handler,
+        )
+        asgi_app.add_exception_handler(
+            errors.ServiceUnavailableError,
+            handlers.service_unavailable_error_handler,
+        )
+
+        return asgi_app
+
+    return decorator
+
+
 def _serve(app: service.Application[bootstrap.Settings]) -> None:
     application.serve(
         factory=_factory(app),
+        host=str(app.settings.http_address),
+        port=app.settings.http_port,
+        allowed_proxy_ips=app.settings.forwarded_allowed_ips,
+    )
+
+
+def _admin_serve(app: service.Application[bootstrap.Settings]) -> None:
+    application.serve(
+        factory=_admin_factory(app),
         host=str(app.settings.http_address),
         port=app.settings.http_port,
         allowed_proxy_ips=app.settings.forwarded_allowed_ips,
@@ -138,6 +215,11 @@ if __name__ == "__main__":
         service.Command(
             name="http",
             callback=_serve,
+            settings_class=bootstrap.Settings,
+        ),
+        service.Command(
+            name="admin-http",
+            callback=_admin_serve,
             settings_class=bootstrap.Settings,
         ),
     )

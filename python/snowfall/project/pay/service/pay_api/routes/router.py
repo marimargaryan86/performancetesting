@@ -84,3 +84,44 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             name="Account",
         ),
     ]
+
+
+def get_admin_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
+    integration = starlette.StarletteIntegration(dependencies)
+
+    return [
+        integration.route(
+            "/users/tokens",
+            authentication.Authenticate,
+            name="Authenticate",
+            methods=["POST"],
+        ),
+        integration.route(
+            "/users",
+            authentication.CreateUser,
+            name="Authenticate",
+            methods=["POST"],
+        ),
+        integration.route(
+            "/users/me",
+            authentication.ChangePassword,
+            name="Authenticate",
+            methods=["PATCH"],
+        ),
+        integration.route(
+            "/companies",
+            companies.StoreCompany,
+            name="Company",
+        ),
+        integration.route(
+            "/companies/{companyId}",
+            companies.StoreCompany,
+            name="Company",
+            methods=["PATCH"],
+        ),
+        integration.route(
+            "/contact-persons",
+            contact_persons.ContactPersons,
+            name="ContactPerson",
+        ),
+    ]
