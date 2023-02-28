@@ -64,6 +64,8 @@ type stopsWriterJob struct {
 type routesWriterJob struct {
 	cache             routeCacheType
 	cacheSequenceList []uint64
+	departures        []uint32
+	schedulesCache    schedulesCache
 }
 type schedulesWriterJob struct {
 	cache             schedulesCache
@@ -164,6 +166,7 @@ type routesExporterType struct {
 	routeStopSequence uint64
 	cacheSequenceList []uint64
 	offset            uint64
+	departures        []uint32
 }
 
 func (self *routesExporterType) addNewSchedule(job *routesJob) {
@@ -174,6 +177,13 @@ func (self *routesExporterType) addNewSchedule(job *routesJob) {
 	routeId := self.cacheSequenceList[index]
 	thisRoute := self.cache[routeId]
 	thisRoute.Schedules = append(thisRoute.Schedules, job.newSchedule)
+}
+
+func (self *routesExporterType) addDeparture(sequence uint64, d uint32) {
+	if uint64(len(self.departures)) != sequence {
+		panic("Incorrect sequence number.")
+	}
+	self.departures = append(self.departures, d)
 }
 
 func (self *routesExporterType) add(job *routesJob) uint64 {
@@ -223,6 +233,8 @@ func (self *routesExporterType) flush() {
 	routesChan <- &routesWriterJob{
 		cache:             self.cache,
 		cacheSequenceList: self.cacheSequenceList,
+		departures:        self.departures,
+		schedulesCache:    schedulesExporter.cache,
 	}
 	// Offset keeps track of where we need to index in the list with job.ToRoute.
 	self.offset += uint64(len(self.cacheSequenceList))
@@ -275,6 +287,7 @@ var routesExporter = routesExporterType{
 	sequence:          0,
 	routeStopSequence: 0,
 	cacheSequenceList: make([]uint64, 0, 262144),
+	departures:        make([]uint32, 0, 262144),
 }
 var schedulesExporter = schedulesExporterType{
 	cache:             schedulesCache{},
@@ -327,6 +340,12 @@ func routesWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *routesWriter
 
 			for _, key := range job.cacheSequenceList {
 				value := job.cache[key]
+
+				sort.Slice(value.Schedules, func(i, j int) bool {
+					return job.departures[job.schedulesCache[value.Schedules[i]].ScheduleStops[0]] <
+						job.departures[job.schedulesCache[value.Schedules[j]].ScheduleStops[0]]
+				})
+
 				stopProto := plannerv1alpha.Route{
 					Sequence:   value.Sequence,
 					Schedules:  value.Schedules,
@@ -402,6 +421,9 @@ func scheduleStopsWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *plann
 			if job == nil {
 				break
 			}
+
+			routesExporter.addDeparture(job.Sequence, job.DepartureAt)
+
 			err := protoWriter.Write(job)
 			if err != nil {
 				panic(err)
