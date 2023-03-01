@@ -1,0 +1,14 @@
+button.primary,
+.button.primary {
+  color: var(--color-generic-white);
+  background-color: var(--color-primary-500);
+  border: var(--color-primary-500) 1px solid;
+  outline: 0;
+  cursor: pointer;
+}
+
+button.large,
+.button.large {
+  padding: 16px;
+  border-radius: 6px;
+}
