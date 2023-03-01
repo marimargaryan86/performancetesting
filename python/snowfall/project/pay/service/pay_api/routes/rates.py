@@ -2,7 +2,7 @@ import lagom
 from starlette import endpoints, requests, responses
 
 from snowfall.project.pay.adapter import currencies
-from snowfall.stdlib import string
+from snowfall.stdlib import money, string
 from snowfall.stdlib.integration.starlette import request_helpers
 
 _DATA_KEY = "data"
@@ -18,8 +18,8 @@ class Rates(endpoints.HTTPEndpoint):
         body = await request_helpers.flatten_request(request)
 
         conversion = await client.convert(
-            body["fromCurrency"],
-            body["toCurrency"],
+            money.Currency(body["fromCurrency"]),
+            money.Currency(body["toCurrency"]),
             _CONVERSION_AMOUNT,
         )
 
