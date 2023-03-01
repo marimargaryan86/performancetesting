@@ -20,6 +20,7 @@ include:
   - local: .gitlab/junction/planner.gitlab-ci.yml
   - local: openapi/.gitlab-ci.yml
   - local: protobuf/.gitlab-ci.yml
+  - local: svelte/.gitlab-ci.yml
 
 
 make-uninterruptible:

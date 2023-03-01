@@ -1,18 +1,13 @@
-FROM node:19-bullseye-slim
-
+FROM node:19-bullseye-slim AS build
 WORKDIR /app
-RUN chown -R node:node /app
-
-COPY --chown=node:node package.json yarn.lock svelte.config.js vite.config.ts ./
-
-USER node
-
+COPY package.json yarn.lock svelte.config.js vite.config.ts ./
 RUN yarn install && yarn cache clean
+COPY . .
+RUN yarn run build
+COPY package.json build/package.json
 
-COPY --chown=node:node . .
-
-RUN yarn run lint && yarn run build
-
+FROM node:19-bullseye-slim AS runtime
+WORKDIR /app
+COPY --from=build /app/build /app
 EXPOSE 3000
-
-CMD ["node", "/app/build/index.js"]
+CMD ["node", "/app/index.js"]

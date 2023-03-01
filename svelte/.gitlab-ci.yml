@@ -1,0 +1,29 @@
+.svelte:lint:
+  stage: test
+  image: node:19-bullseye-slim
+  interruptible: true
+  before_script:
+    - cd "${PROJECT_PATH}"
+    - echo 'yarn-offline-mirror ".yarn-cache/"' >> .yarnrc
+    - echo 'yarn-offline-mirror-pruning true' >> .yarnrc
+    - yarn install
+  script:
+    - yarn run lint
+  cache:
+    paths:
+      - "${PROJECT_PATH}/.yarn-cache/"
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+      changes:
+        - "${PROJECT_PATH}/**/*"
+  tags:
+    - docker
+
+svelte:lint-hub-web:
+  extends: .svelte:lint
+  cache:
+    key:
+      files:
+        - "svelte/hub-web/yarn.lock"
+  variables:
+    PROJECT_PATH: svelte/hub-web

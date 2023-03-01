@@ -1,0 +1,17 @@
+{
+  "development": {
+    "variables": {
+      "count": 1,
+      "traefik_entrypoints": "websecure",
+      "traefik_host_URL": "hub.junction.dev"
+    }
+  },
+  "production": {
+    "deploy": false,
+    "variables": {
+      "count": 2,
+      "traefik_entrypoints": "web",
+      "traefik_host_URL": "hub.junction.travel"
+    }
+  }
+}
