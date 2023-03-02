@@ -462,6 +462,60 @@
       }
     },
     "/contact-persons": {
+      "get": {
+        "summary": "List Contact persons",
+        "tags": [
+          "contact-persons"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          },
+          {
+            "$ref": "#/components/parameters/company"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "items": {
+                            "$ref": "#/components/schemas/ContactPerson"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "operationId": "get-contact-persons",
+        "description": "Get contact persons"
+      },
       "post": {
         "summary": "Create Contact person",
         "tags": [
@@ -521,9 +575,44 @@
   },
   "components": {
     "parameters": {
+      "page-cursor": {
+        "name": "page[cursor]",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "default": "",
+          "example": "1"
+        },
+        "description": "Pagination cursor that defines your place in the list."
+      },
+      "page-limit": {
+        "name": "page[limit]",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20,
+          "example": 20
+        },
+        "description": "A limit on the number of objects to be returned, between 1 and 100."
+      },
       "companyId": {
         "name": "companyId",
         "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
+        },
+        "description": "Company id"
+      },
+      "company": {
+        "name": "company",
+        "in": "query",
         "required": true,
         "schema": {
           "type": "string",
@@ -937,6 +1026,30 @@
         "required": [
           "id",
           "type"
+        ]
+      },
+      "NextLink": {
+        "title": "Next Link",
+        "type": "object",
+        "properties": {
+          "links": {
+            "type": "object",
+            "required": [
+              "next"
+            ],
+            "properties": {
+              "next": {
+                "type": "string",
+                "format": "uri",
+                "example": "https://example.com/resource/?page%5Bcursor%5D=MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D&page%5Blimit%5D=20",
+                "readOnly": true
+              }
+            },
+            "readOnly": true
+          }
+        },
+        "required": [
+          "links"
         ]
       },
       "Error": {
