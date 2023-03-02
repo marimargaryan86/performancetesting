@@ -3,8 +3,16 @@ set -eu
 
 FROM_ENV="${1}"
 TO_ENV="${2}"
+SERVICES=("$@")
+ARGS=()
 
-rsync -arv --include="*/" --include="*.nomad" --include="*.sh" --include="image.txt" --exclude="*" "${FROM_ENV}/" "${TO_ENV}/"
+for ((idx = 2; idx < ${#SERVICES[@]}; ++idx)); do
+	ARGS+=("--include=${SERVICES[idx]}/")
+done
+
+rsync -arv --include="*.sh" --exclude="*" "${FROM_ENV}/" "${TO_ENV}/"
+rsync -arv "${ARGS[@]}" --include="*.nomad" --include="image.txt" --exclude="*" "${FROM_ENV}/" "${TO_ENV}/"
+
 git add --all .
 
 if [ -n "$(git status --porcelain)" ]; then

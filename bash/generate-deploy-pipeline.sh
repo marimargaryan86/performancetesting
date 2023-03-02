@@ -152,8 +152,10 @@ if [ "$(basename "${1}")" == "development" ]; then
 promote-to-production:
   stage: promote
   interruptible: false
+  before_script:
+    - git checkout "\${CI_DEFAULT_BRANCH}"
   script:
-    - ./promote-environment.sh development production
+    - ./promote-environment.sh development production ${services[@]}
   tags:
     - shell
   needs:
