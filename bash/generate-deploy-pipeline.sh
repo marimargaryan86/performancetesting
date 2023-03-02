@@ -161,7 +161,6 @@ promote-to-production:
     - chmod 644 ~/.ssh/known_hosts
     - git config --global user.email "\${NOMAD_GIT_EMAIL}"
     - git config --global user.name "\${NOMAD_GIT_NAME}"
-    - git checkout "\${CI_DEFAULT_BRANCH}"
   script:
     - ./promote-environment.sh development production ${services[@]}
   tags:
