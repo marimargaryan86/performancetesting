@@ -11,22 +11,18 @@ from snowfall.project.pss.service.pss_api_v2.db.models.accounts import (
     AccountForgottenPassword,
 )
 from snowfall.project.pss.service.pss_api_v2.db.repository.repository import Repository
+from snowfall.project.pss.service.pss_api_v2.exceptions import (
+    AccountEmailAlreadyUsedError,
+    AccountForgottenPasswordNotFoundError,
+    AccountForgottenPasswordTokenAlreadyUsedError,
+    AccountForgottenPasswordTokenExpiredError,
+    KnownAccountNotFoundError,
+)
+from snowfall.project.pss.service.pss_api_v2.schemas.accounts import AccountUpdateSchema
 from snowfall.project.pss.service.pss_api_v2.services.emails import SMTPEmailService
 
 
-class AccountForgottenPasswordTokenAlreadyUsedError(Exception):
-    """Raised when an AccountForgottenPassword Token has already been used."""
-
-
-class AccountForgottenPasswordTokenExpiredError(Exception):
-    """Raised when an AccountForgottenPassword Token has expired."""
-
-
-class AccountForgottenPasswordNotFoundError(Exception):
-    """Raised when an AccountForgottenPassword cannot be found."""
-
-
-class AccountsService(object):
+class AccountsService(object):  # noqa:WPS214
     _token_expiry_length_seconds = 3600
 
     def __init__(
@@ -46,9 +42,13 @@ class AccountsService(object):
     async def get_all(self) -> Sequence[Account]:
         return await self._account_repository.list_all()
 
-    async def get_account_by_email(self, email: str) -> Optional[Account]:
+    async def get_account_by_field(
+        self,
+        field_name: str,
+        field_value: int | str,
+    ) -> Optional[Account]:
         return await self._account_repository.get_one_by_filter(
-            [Account.email == email],
+            [getattr(Account, field_name) == field_value],
         )
 
     async def handle_forgotten_password(self, account: Account) -> None:
@@ -70,6 +70,33 @@ class AccountsService(object):
             token=token,
             recipient=str(account.email),
         )
+
+    async def update_account(
+        self,
+        account_data: AccountUpdateSchema,
+        current_account: Account,
+    ) -> Account:
+        if account_data.email:
+            await self._update_email(
+                account_id=int(current_account.id),
+                email=account_data.email,
+            )
+
+        if account_data.password:
+            await self._update_password(
+                account_id=int(current_account.id),
+                password=account_data.password,
+            )
+
+        account = await self.get_account_by_field(
+            "id",
+            int(current_account.id),
+        )
+
+        if not account:
+            raise KnownAccountNotFoundError("Account does not exist")
+
+        return account
 
     async def reset_password(self, token: str, password: str) -> None:
         account_forgotten_password = (
@@ -105,6 +132,33 @@ class AccountsService(object):
         await self._account_forgotten_password_repository.update_by_filter(
             filter_criteria=[AccountForgottenPassword.token == token],
             values_to_update={"used": True},
+        )
+
+    async def _update_email(self, account_id: int, email: str) -> None:
+        account = await self.get_account_by_field(
+            field_name="email",
+            field_value=email,
+        )
+
+        if account:
+            if account.id == account_id:
+                return
+
+            raise AccountEmailAlreadyUsedError(
+                "Email: {0} already used".format(email),
+            )
+
+        await self._account_repository.update_by_filter(
+            filter_criteria=[Account.id == account_id],
+            values_to_update={"email": email},
+        )
+
+    async def _update_password(self, account_id: int, password: str) -> None:
+        await self._account_repository.update_by_filter(
+            filter_criteria=[Account.id == account_id],
+            values_to_update={
+                "password": bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode(),
+            },
         )
 
 

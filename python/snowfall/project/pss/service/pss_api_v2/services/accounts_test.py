@@ -1,22 +1,21 @@
 import datetime
+from unittest import TestCase
 from unittest.mock import ANY, create_autospec
 
 import bcrypt
 import freezegun
 import pytest
 from alchemy_mock.comparison import ExpressionMatcher
+from pydantic import EmailStr
 
+from snowfall.project.pss.service.pss_api_v2 import exceptions
 from snowfall.project.pss.service.pss_api_v2.db.models.accounts import (
     Account,
     AccountForgottenPassword,
 )
 from snowfall.project.pss.service.pss_api_v2.db.repository.repository import Repository
-from snowfall.project.pss.service.pss_api_v2.services.accounts import (
-    AccountForgottenPasswordNotFoundError,
-    AccountForgottenPasswordTokenAlreadyUsedError,
-    AccountForgottenPasswordTokenExpiredError,
-    AccountsService,
-)
+from snowfall.project.pss.service.pss_api_v2.schemas.accounts import AccountUpdateSchema
+from snowfall.project.pss.service.pss_api_v2.services.accounts import AccountsService
 from snowfall.project.pss.service.pss_api_v2.services.emails import SMTPEmailService
 
 
@@ -27,6 +26,91 @@ async def test_that_get_all_accounts_returns_results_from_database() -> None:
     accounts_service = AccountsService(repository_mock)
     returned_accounts = await accounts_service.get_all()
     assert returned_accounts == accounts
+
+
+class UpdateAccountTestCase(TestCase):
+    def setUp(self) -> None:
+        self.new_email = "updated@test.com"
+        self.new_password = "new_test_password"  # nosec
+
+        self.account_repository_mock = create_autospec(
+            Repository,
+            spec_set=True,
+            instance=True,
+        )
+
+        self.account_forgotten_password_repository_mock = create_autospec(
+            Repository,
+            spec_set=True,
+            instance=True,
+        )
+
+        self.email_service_mock = create_autospec(
+            SMTPEmailService,
+            spec_set=True,
+            instance=True,
+        )
+
+        self.accounts_service = AccountsService(
+            self.account_repository_mock,
+            self.account_forgotten_password_repository_mock,
+            self.email_service_mock,
+        )
+
+    async def test_update_account_should_update_email(self) -> None:
+        mocked_updated_account = Account(email=self.new_email)
+
+        self.account_repository_mock.get_one_by_filter.side_effect = [
+            None,
+            mocked_updated_account,
+        ]
+
+        updated_account = await self.accounts_service.update_account(
+            AccountUpdateSchema(email=EmailStr(self.new_email)),
+            Account(firstname="test", email="test@email.com", id=1),
+        )
+
+        assert updated_account == mocked_updated_account
+        self.account_repository_mock.update_by_filter.assert_called_once_with(
+            filter_criteria=[ANY],
+            values_to_update={"email": self.new_email},
+        )
+        assert (
+            ExpressionMatcher([Account.id == 1])
+            == self.account_repository_mock.update_by_filter.mock_calls[0][2][
+                "filter_criteria"
+            ]
+        )
+
+    async def test_update_account_should_update_password(self) -> None:
+        mocked_updated_account = Account(password=self.new_password)
+
+        self.account_repository_mock.get_one_by_filter.return_value = (
+            mocked_updated_account
+        )
+
+        updated_account = await self.accounts_service.update_account(
+            AccountUpdateSchema(password=self.new_password),
+            Account(firstname="test", email="test@email.com", id=1),
+        )
+
+        assert updated_account == mocked_updated_account
+        assert (
+            ExpressionMatcher([Account.id == 1])
+            == self.account_repository_mock.update_by_filter.mock_calls[0][2][
+                "filter_criteria"
+            ]
+        )
+
+    async def test_update_email_raises_exception_if_email_already_exists(self) -> None:
+        with pytest.raises(exceptions.AccountEmailAlreadyUsedError):
+            await self.accounts_service.update_account(
+                AccountUpdateSchema(email=EmailStr("test@email.com")),
+                Account(firstname="test", email="test@email.com", id=1),
+            )
+
+        self.account_repository_mock.update_by_filter.assert_not_called()
+        self.account_repository_mock.update_by_filter.assert_not_called()
 
 
 @freezegun.freeze_time("2023-01-01 00:00:00")
@@ -156,7 +240,7 @@ async def test_that_reset_password_with_used_token_raises_exception() -> None:
         email_service_mock,
     )
 
-    with pytest.raises(AccountForgottenPasswordTokenAlreadyUsedError):
+    with pytest.raises(exceptions.AccountForgottenPasswordTokenAlreadyUsedError):
         await accounts_service.reset_password(  # nosec
             token=token,
             password="wont-be-used",
@@ -182,7 +266,7 @@ async def test_that_reset_password_with_no_matching_token_raises_exception() -> 
         email_service_mock,
     )
 
-    with pytest.raises(AccountForgottenPasswordNotFoundError):
+    with pytest.raises(exceptions.AccountForgottenPasswordNotFoundError):
         await accounts_service.reset_password(  # nosec
             token="a-token",
             password="wont-be-used",
@@ -218,7 +302,7 @@ async def test_that_reset_password_with_expired_token_raises_exception() -> None
         email_service_mock,
     )
 
-    with pytest.raises(AccountForgottenPasswordTokenExpiredError):
+    with pytest.raises(exceptions.AccountForgottenPasswordTokenExpiredError):
         await accounts_service.reset_password(  # nosec
             token="a-token",
             password="wont-be-used",

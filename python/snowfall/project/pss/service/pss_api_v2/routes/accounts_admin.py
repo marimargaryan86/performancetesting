@@ -28,7 +28,7 @@ async def admin_login(
     account_data: AccountLoginSchema,
     account_service: AccountsService = Depends(AccountsService),
 ) -> SuccessResponse | ErrorResponse:
-    account = await account_service.get_account_by_email(account_data.email)
+    account = await account_service.get_account_by_field("email", account_data.email)
 
     if account is None:
         return ErrorResponse(

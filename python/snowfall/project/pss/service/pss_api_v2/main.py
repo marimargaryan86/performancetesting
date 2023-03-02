@@ -3,6 +3,7 @@ from typing import Callable
 from fastapi import FastAPI
 from starlette import applications
 
+from snowfall.project.pss.service.pss_api_v2.exception_handlers import add_handlers
 from snowfall.project.pss.service.pss_api_v2.routes import api_router
 from snowfall.project.pss.service.pss_api_v2.settings import Settings
 from snowfall.stdlib import service
@@ -17,6 +18,7 @@ def _factory() -> Callable[[], applications.Starlette]:
             version="V2.0.0",
         )
         fastapi_app.include_router(api_router.router)
+        add_handlers(fastapi_app)
         return fastapi_app
 
     return decorator

@@ -11,6 +11,11 @@ class AccountLoginSchema(BaseSchema):
     password: str
 
 
+class AccountUpdateSchema(BaseSchema):
+    email: Optional[EmailStr]
+    password: Optional[str]
+
+
 class AccountForgotPasswordSchema(BaseSchema):
     email: EmailStr
 

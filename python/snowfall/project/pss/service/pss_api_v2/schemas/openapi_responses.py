@@ -9,6 +9,10 @@ login_responses: Dict[int | str, Dict[str, Any]] = {
     404: {"model": ErrorResponseSchema},
 }
 
+unauthorized_response: Dict[int | str, Dict[str, Any]] = {
+    401: {"model": ErrorResponseSchema},
+}
+
 forgot_password_responses: Dict[int | str, Dict[str, Any]] = {
     404: {"model": ErrorResponseSchema},
 }

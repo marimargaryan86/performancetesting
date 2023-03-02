@@ -31,6 +31,72 @@ async def test_can_get_accounts(
     assert account.email == response.json()["data"][0]["email"]
 
 
+async def test_can_not_get_current_account_if_not_authenticated(
+    client: TestClient,
+    account_factory: Type[AsyncSQLAlchemyFactory],
+) -> None:
+    await account_factory.create()
+    response = client.get("/accounts/me", headers={"x-auth-token": "non_existed_token"})
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+async def test_can_get_current_account(
+    client: TestClient,
+    account_factory: Type[AsyncSQLAlchemyFactory],
+) -> None:
+    account = await account_factory.create()
+    response = client.get("/accounts/me", headers={"x-auth-token": account.token})
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["data"]["email"] == account.email
+
+
+async def test_should_fail_on_email_update_if_email_is_already_taken(
+    client: TestClient,
+    account_factory: Type[AsyncSQLAlchemyFactory],
+) -> None:
+    existing_account = await account_factory.create()
+    new_account = await account_factory.create()
+    response = client.post(
+        "/accounts/update",
+        headers={"x-auth-token": new_account.token},
+        json={"email": existing_account.email},
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.json()["message"] == messages.ACCOUNT_EMAIL_ALREADY_EXISTS
+
+
+async def test_can_update_email(
+    client: TestClient,
+    account_factory: Type[AsyncSQLAlchemyFactory],
+) -> None:
+    account = await account_factory.create()
+    response = client.post(
+        "/accounts/update",
+        headers={"x-auth-token": account.token},
+        json={"email": "updated_test@email.com"},
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["data"]["email"] == "updated_test@email.com"
+
+
+async def test_can_update_password(
+    client: TestClient,
+    account_factory: Type[AsyncSQLAlchemyFactory],
+) -> None:
+    account = await account_factory.create()
+    response = client.post(
+        "/accounts/update",
+        headers={"x-auth-token": account.token},
+        json={"password": "updated_password"},
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+
+
 async def test_can_not_login_if_not_existed_account_provided(
     client: TestClient,
 ) -> None:

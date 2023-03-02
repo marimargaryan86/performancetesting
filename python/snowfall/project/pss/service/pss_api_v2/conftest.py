@@ -16,6 +16,7 @@ from snowfall.project.pss.service.pss_api_v2.db.models.accounts import (
     AccountForgottenPassword,
 )
 from snowfall.project.pss.service.pss_api_v2.db.models.countries import Country
+from snowfall.project.pss.service.pss_api_v2.exception_handlers import add_handlers
 from snowfall.project.pss.service.pss_api_v2.routes.api_router import (
     router as api_router,
 )
@@ -47,6 +48,7 @@ async def db_session() -> AsyncGenerator[async_sessionmaker[AsyncSession], None]
 def fast_api_app() -> applications.Starlette:
     app = FastAPI()
     app.include_router(api_router)
+    add_handlers(app)
     return app
 
 
