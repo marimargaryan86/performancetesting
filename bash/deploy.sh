@@ -15,7 +15,7 @@ for ((idx = 3; idx < ${#ARGS[@]}; ++idx)); do
 		ADDITIONAL_ARGS=("-var-file=${VARS_FILE}")
 	fi
 
-	echo "Deploying '${TEMPLATE_FILE%.*}' of '${SERVICE_NAME}'..."
+	echo "Deploying '${TEMPLATE_FILE%.*}' of '${SERVICE_NAME}' to nomad address '${NOMAD_ADDR}'..."
 
 	if PLAN_OUTPUT=$(nomad plan "${ADDITIONAL_ARGS[@]}" "${TEMPLATE_FILE}"); then
 		true # can't do ! negation above if we want to check the exact status code
