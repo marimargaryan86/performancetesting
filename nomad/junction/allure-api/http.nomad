@@ -90,7 +90,7 @@ EOH
         ports = ["http"]
 
         volumes = [
-          "/allure-efs:/app"
+          "/allure-efs/projects:/app/projects"
         ]
 
       }
