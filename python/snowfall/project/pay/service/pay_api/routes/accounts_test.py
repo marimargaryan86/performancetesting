@@ -7,7 +7,7 @@ from snowfall.project.pay.service.accounts.v1alpha.models_pb2 import ContactPers
 class TestAccounts(object):
     async def test_missing_contact_person(
         self,
-        client: httpx.AsyncClient,
+        admin_client: httpx.AsyncClient,
     ) -> None:
         request = {
             "data": {
@@ -23,14 +23,14 @@ class TestAccounts(object):
                 },
             },
         }
-        response = await client.post("/accounts", json=request)
+        response = await admin_client.post("/accounts", json=request)
         error = response.json()["errors"][0]
         assert error["detail"] == "Contact person does not exists"
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     async def test_contact_person_with_bad_company_id(
         self,
-        client: httpx.AsyncClient,
+        admin_client: httpx.AsyncClient,
         contact_person_with_bad_company_id: ContactPerson,
     ) -> None:
         request = {
@@ -47,7 +47,7 @@ class TestAccounts(object):
                 },
             },
         }
-        response = await client.post("/accounts", json=request)
+        response = await admin_client.post("/accounts", json=request)
         error = response.json()["errors"][0]
         assert error["detail"] == "Contact person missing company"
         assert response.status_code == status.HTTP_400_BAD_REQUEST

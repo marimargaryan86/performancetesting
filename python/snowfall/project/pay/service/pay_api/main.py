@@ -50,9 +50,6 @@ def _factory(
             prefix=app.name,
         )
 
-        authentication_channel = create_channel(
-            app.settings.authentication_address,
-        )
         orders_channel = create_channel(
             random.choice(app.settings.currencies_address),  # nosec
         )
@@ -75,30 +72,16 @@ def _factory(
                     currencies_client=currencies.GrpcClient(
                         currencies_pb2_grpc.CurrencyServiceStub(orders_channel),
                     ),
-                    authentication_client=auth.GrpcClient(
-                        auth.auth_pb2_grpc.AuthenticationServiceStub(
-                            authentication_channel,
-                        ),
-                    ),
                     quotations_repository=quotations_repo,
                     redis_client=UserSessionRepository(
                         redis_client=redis_client,
                         cache_ttl=datetime.timedelta(minutes=15),
-                    ),
-                    companies_repository=CompanyRepository(
-                        mongo.companies.companies,
                     ),
                     transactions_repository=TransactionRepository(
                         mongo.transactions.transactions,
                     ),
                     conversions_repository=ConversionRepository(
                         mongo.conversions.conversions,
-                    ),
-                    contact_persons_repository=accounts.ContactPersonsRepository(
-                        mongo.contactpersons.contactpersons,
-                    ),
-                    accounts_repository=accounts.AccountsRepository(
-                        mongo.accounts.accounts,
                     ),
                 ),
             ),
@@ -124,7 +107,7 @@ def _factory(
 
 
 def _admin_factory(
-    app: service.Application[bootstrap.Settings],
+    app: service.Application[bootstrap.AdminSettings],
 ) -> Callable[[], applications.Starlette]:
     def decorator() -> applications.Starlette:
         mongo = motor_asyncio.AsyncIOMotorClient(
@@ -202,7 +185,7 @@ def _serve(app: service.Application[bootstrap.Settings]) -> None:
     )
 
 
-def _admin_serve(app: service.Application[bootstrap.Settings]) -> None:
+def _admin_serve(app: service.Application[bootstrap.AdminSettings]) -> None:
     application.serve(
         factory=_admin_factory(app),
         host=str(app.settings.http_address),
@@ -223,6 +206,6 @@ if __name__ == "__main__":
         service.Command(
             name="admin-http",
             callback=_admin_serve,
-            settings_class=bootstrap.Settings,
+            settings_class=bootstrap.AdminSettings,
         ),
     )

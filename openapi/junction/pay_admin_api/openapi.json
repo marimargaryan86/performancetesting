@@ -698,7 +698,7 @@
           "relationships": {
             "type": "object",
             "required": [
-              "company"
+              "contactPerson"
             ],
             "properties": {
               "contactPerson": {

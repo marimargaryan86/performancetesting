@@ -37,14 +37,10 @@ def _create_app(  # noqa: WPS211
     cc_client: currencycloud.Client,
     payment_client: PaymentClient,
     currencies_client: currencies.Client,
-    authentication_client: authentication.Client,
     quotations_repository: quotations.QuotationsRepository,
-    companies_repository: CompanyRepository,
     redis_repository: UserSessionRepository,
     transaction_repository: TransactionRepository,
     conversion_repository: ConversionRepository,
-    contact_persons_repository: accounts.ContactPersonsRepository,
-    accounts_repository: accounts.AccountsRepository,
     openapi_path: pathlib.Path,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
@@ -55,12 +51,38 @@ def _create_app(  # noqa: WPS211
             bootstrap.create_dependencies(
                 cc_client,
                 currencies_client,
-                authentication_client,
                 quotations_repository,
                 redis_repository,
-                companies_repository,
                 transaction_repository,
                 conversion_repository,
+                payment_client=payment_client,
+            ),
+        ),
+    )
+    app.add_exception_handler(errors.CursorError, handlers.cursor_error_handler)
+    app.add_exception_handler(errors.NotFoundError, handlers.not_found_error_handler)
+
+    return app
+
+
+def _create_admin_app(  # noqa: WPS211
+    cc_client: currencycloud.Client,
+    payment_client: PaymentClient,
+    authentication_client: authentication.Client,
+    companies_repository: CompanyRepository,
+    contact_persons_repository: accounts.ContactPersonsRepository,
+    accounts_repository: accounts.AccountsRepository,
+    openapi_path: pathlib.Path,
+    custom_middlewares: Optional[Sequence[Middleware]] = None,
+) -> applications.Starlette:
+    app = application.create_starlette_app(
+        custom_middlewares=custom_middlewares,
+        openapi_path=openapi_path,
+        routes=router.get_admin_routes(
+            bootstrap.create_admin_dependencies(
+                cc_client,
+                authentication_client,
+                companies_repository,
                 contact_persons_repository,
                 accounts_repository=accounts_repository,
                 payment_client=payment_client,
@@ -207,29 +229,41 @@ def headers() -> dict[str, str]:
 def app(  # noqa: WPS211
     cc_client: currencycloud.Client,
     currencies_client: currencies.Client,
-    authentication_client: authentication.Client,
     quotations_repository: quotations.QuotationsRepository,
-    companies_repository: CompanyRepository,
     redis_repository: UserSessionRepository,
     transactions_repository: TransactionRepository,
     conversions_repository: ConversionRepository,
     payment_client: PaymentClient,
-    contact_persons_repository: accounts.ContactPersonsRepository,
-    accounts_repository: accounts.AccountsRepository,
 ) -> applications.Starlette:
     return _create_app(
         cc_client=cc_client,
         payment_client=payment_client,
         currencies_client=currencies_client,
-        authentication_client=authentication_client,
         quotations_repository=quotations_repository,
         redis_repository=redis_repository,
-        companies_repository=companies_repository,
         transaction_repository=transactions_repository,
         conversion_repository=conversions_repository,
+        openapi_path=filesystem.resource_path("junction.pay_api", "openapi.json"),
+    )
+
+
+@pytest.fixture()
+def admin_app(  # noqa: WPS211
+    cc_client: currencycloud.Client,
+    authentication_client: authentication.Client,
+    companies_repository: CompanyRepository,
+    payment_client: PaymentClient,
+    contact_persons_repository: accounts.ContactPersonsRepository,
+    accounts_repository: accounts.AccountsRepository,
+) -> applications.Starlette:
+    return _create_admin_app(
+        cc_client=cc_client,
+        payment_client=payment_client,
+        authentication_client=authentication_client,
+        companies_repository=companies_repository,
         contact_persons_repository=contact_persons_repository,
         accounts_repository=accounts_repository,
-        openapi_path=filesystem.resource_path("junction.pay_api", "openapi.json"),
+        openapi_path=filesystem.resource_path("junction.pay_admin_api", "openapi.json"),
     )
 
 
@@ -239,6 +273,20 @@ async def client(
     headers: Mapping[str, str],
 ) -> AsyncIterator[httpx.AsyncClient]:
     async with httpx.AsyncClient(app=app, base_url="https://example.com") as client:
+        client.headers.update(dict(headers))
+
+        yield client
+
+
+@pytest.fixture()
+async def admin_client(
+    admin_app: applications.Starlette,
+    headers: Mapping[str, str],
+) -> AsyncIterator[httpx.AsyncClient]:
+    async with httpx.AsyncClient(
+        app=admin_app,
+        base_url="https://example.com",
+    ) as client:
         client.headers.update(dict(headers))
 
         yield client
