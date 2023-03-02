@@ -37,6 +37,7 @@ nomad:deploy:
     DOCKER_HOST: tcp://dockerdaemon:2375/
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
+  retry: 2
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never

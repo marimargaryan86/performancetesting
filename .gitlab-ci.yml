@@ -47,6 +47,7 @@ allow-breaking-changes:
     - IS_BREAKING=$(docker run --rm "${CI_REGISTRY_IMAGE}/service/snowman:latest" parse "${CI_MERGE_REQUEST_TITLE}" 2>&1 | grep Breaking | cut -d ' ' -f2)
     - if [ "${IS_BREAKING}" == "true" ]; then echo "BREAKING=1" > variables.env; else echo "BREAKING=0" > variables.env; fi
   needs: []
+  retry: 2
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
