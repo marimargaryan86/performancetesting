@@ -1,4 +1,5 @@
 <script lang="ts" context="module">
+  import md5 from "md5";
   import Chevron from "assets/icons/chevron.svelte";
   import JunctionLogoDetailed from "assets/icons/junction-logo-detailed.svelte";
   import LogoutIcon from "assets/icons/logout-icon.svelte";
@@ -9,6 +10,9 @@
     document.cookie = "session-token=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/; secure=true;";
     await invalidateAll();
   }
+
+  const email = "j.smith@tbctravel.com".trim().toLowerCase();
+  const avatar = `https://www.gravatar.com/avatar/${md5(email)}`;
 </script>
 
 <input type="checkbox" id="main-nav-bar-expanded" checked />
@@ -31,9 +35,10 @@
   </button>
 
   <section class="account">
-    <div class="avatar" />
+    <img src={avatar} alt="" class="avatar" />
+
     <strong class="name typography body-medium bold">John Smith</strong>
-    <span class="email typography label-small">j.smith@tbctravel.com</span>
+    <span class="email typography label-small">{email}</span>
   </section>
 </nav>
 
@@ -169,8 +174,15 @@
     grid-column: 1;
     width: 40px;
     height: 40px;
-    background-color: var(--color-neutral-100);
+    object-fit: cover;
+    object-position: center;
     border-radius: 50%;
+    transition: margin-left 300ms ease;
+  }
+
+  .account > .name,
+  .account > .email {
+    transition: opacity 300ms ease;
   }
 
   .account > .name {
@@ -181,5 +193,14 @@
   .account > .email {
     grid-row: 2;
     grid-column: 2;
+  }
+
+  #main-nav-bar-expanded:not(:checked) + nav .account .avatar {
+    margin-left: -6px;
+  }
+
+  #main-nav-bar-expanded:not(:checked) + nav .account .email,
+  #main-nav-bar-expanded:not(:checked) + nav .account .name {
+    opacity: 0;
   }
 </style>
