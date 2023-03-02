@@ -15,7 +15,9 @@
   <main>
     <MainNavBar />
 
-    <slot />
+    <div class="wrapper">
+      <slot />
+    </div>
   </main>
 {:else}
   <LoginPage />
@@ -26,5 +28,11 @@
     display: grid;
     grid-template-columns: max-content 1fr;
     height: 100vh;
+  }
+
+  .wrapper {
+    padding: 24px 16px;
+    overflow-y: auto;
+    background-image: linear-gradient(330.51deg, #a3c9c2 0%, #e4f6ea 78.22%);
   }
 </style>
