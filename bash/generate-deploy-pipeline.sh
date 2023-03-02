@@ -153,6 +153,14 @@ promote-to-production:
   stage: promote
   interruptible: false
   before_script:
+    - mkdir -p ~/.ssh/
+    - mv "\${NOMAD_SSH_KEY}" ~/.ssh/id_ed25519
+    - mv "\${NOMAD_SSH_KNOWN_HOSTS}" ~/.ssh/known_hosts
+    - chmod 700 ~/.ssh/
+    - chmod 600 ~/.ssh/id_ed25519
+    - chmod 644 ~/.ssh/known_hosts
+    - git config --global user.email "\${NOMAD_GIT_EMAIL}"
+    - git config --global user.name "\${NOMAD_GIT_NAME}"
     - git checkout "\${CI_DEFAULT_BRANCH}"
   script:
     - ./promote-environment.sh development production ${services[@]}
