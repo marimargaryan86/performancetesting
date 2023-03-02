@@ -138,9 +138,10 @@ func serve(cmd *cobra.Command, args []string) error {
 	}
 
 	mr := merge_request.MergeRequestPlugin{
-		Client:  client,
-		Logger:  sugar.Named("merge_request"),
-		Snowman: snowman,
+		Client:              client,
+		Logger:              sugar.Named("merge_request"),
+		Snowman:             snowman,
+		ConfigCacheDuration: time.Minute * 10,
 	}
 
 	manageMemberships(client, sugar.Named("cron"), snowman, viper.GetString("snowman_hook_url"), viper.GetString("gitlab_webhook_secret"))

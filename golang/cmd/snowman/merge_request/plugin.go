@@ -1,59 +1,28 @@
 package merge_request
 
 import (
-	"fmt"
+	"git.snowfall.se/junction/junction/golang/cmd/snowman/common"
 	"github.com/xanzy/go-gitlab"
 	"go.uber.org/zap"
 	"sync"
 	"time"
 )
 
+type configCacheItem struct {
+	value     common.Configuration
+	fetchedAt time.Time
+}
+
 type MergeRequestPlugin struct {
-	Client  *gitlab.Client
-	Logger  *zap.SugaredLogger
-	mu      sync.Mutex
-	Snowman *gitlab.User
+	Client              *gitlab.Client
+	Logger              *zap.SugaredLogger
+	mu                  sync.Mutex
+	Snowman             *gitlab.User
+	configCache         map[int]configCacheItem
+	ConfigCacheDuration time.Duration
 }
 
 type invokable func() error
-
-func (plugin *MergeRequestPlugin) Test(mrId int) {
-	mr, _, err := plugin.Client.MergeRequests.GetMergeRequestChanges(
-		406,
-		mrId,
-		&gitlab.GetMergeRequestChangesOptions{},
-	)
-
-	if err != nil {
-		plugin.Logger.Fatal(err)
-	}
-
-	fmt.Println(mrId)
-
-	wrapper := &mergeRequest{
-		cache:   &cache{},
-		client:  plugin.Client,
-		logger:  plugin.Logger,
-		object:  mr,
-		snowman: plugin.Snowman,
-	}
-
-	fmt.Println(wrapper.expectedReviewers())
-
-	state, err := wrapper.approvalState()
-
-	if err != nil {
-		plugin.Logger.Fatal(err)
-	}
-
-	for _, rule := range state.Rules {
-		for _, approved := range rule.ApprovedBy {
-			fmt.Println(approved)
-		}
-	}
-
-	fmt.Println(wrapper.object.References)
-}
 
 func (plugin *MergeRequestPlugin) OnEvent(event interface{}) {
 	plugin.mu.Lock()
@@ -105,12 +74,28 @@ func (plugin *MergeRequestPlugin) OnEvent(event interface{}) {
 	}
 
 	logger := plugin.Logger.With("project", mr.ProjectID, "IID", mr.IID)
+	val, found := plugin.configCache[mr.ProjectID]
+
+	var config common.Configuration
+
+	if !found || time.Now().Sub(val.fetchedAt) > plugin.ConfigCacheDuration {
+		config, err = common.LoadConfiguration(plugin.Client, mr.ProjectID)
+
+		if err != nil {
+			logger.Error(err)
+			return
+		}
+	} else {
+		config = val.value
+	}
+
 	wrapper := &mergeRequest{
-		cache:   &cache{},
-		client:  plugin.Client,
-		logger:  logger,
-		object:  mr,
-		snowman: plugin.Snowman,
+		cache:         &cache{},
+		configuration: config,
+		client:        plugin.Client,
+		logger:        logger,
+		object:        mr,
+		snowman:       plugin.Snowman,
 	}
 
 	for _, i := range []invokable{

@@ -2,6 +2,7 @@ package merge_request
 
 import (
 	"fmt"
+	"git.snowfall.se/junction/junction/golang/cmd/snowman/common"
 	"github.com/xanzy/go-gitlab"
 	"go.uber.org/zap"
 	"strings"
@@ -14,12 +15,13 @@ type cache struct {
 }
 
 type mergeRequest struct {
-	cache      *cache
-	client     *gitlab.Client
-	hasChanged bool
-	logger     *zap.SugaredLogger
-	object     *gitlab.MergeRequest
-	snowman    *gitlab.User
+	cache         *cache
+	client        *gitlab.Client
+	configuration common.Configuration
+	hasChanged    bool
+	logger        *zap.SugaredLogger
+	object        *gitlab.MergeRequest
+	snowman       *gitlab.User
 }
 
 func (mr *mergeRequest) approvalState() (*gitlab.MergeRequestApprovalState, error) {
