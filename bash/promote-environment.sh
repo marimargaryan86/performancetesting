@@ -10,9 +10,13 @@ for ((idx = 2; idx < ${#SERVICES[@]}; ++idx)); do
 	ARGS+=("--include=${SERVICES[idx]}/")
 done
 
-rsync -arv --include="*.sh" --exclude="*" "${FROM_ENV}/" "${TO_ENV}/"
-rsync -arv "${ARGS[@]}" --include="*.nomad" --include="image.txt" --exclude="*" "${FROM_ENV}/" "${TO_ENV}/"
+rm -rf repo
+git clone git@git.snowfall.se:junction/nomad.git repo
 
+rsync -arv --include="*.sh" --exclude="*" "${FROM_ENV}/" "repo/${TO_ENV}/"
+rsync -arv "${ARGS[@]}" --include="*.nomad" --include="image.txt" --exclude="*" "${FROM_ENV}/" "repo/${TO_ENV}/"
+
+cd repo
 git add --all .
 
 if [ -n "$(git status --porcelain)" ]; then
