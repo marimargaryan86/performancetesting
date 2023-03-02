@@ -7,6 +7,7 @@ cat <<EOF
 stages:
   - deploy
   - verify
+  - promote
 
 make-uninterruptible:
   stage: deploy
@@ -133,9 +134,9 @@ verify:
   stage: verify
   interruptible: false
   script:
-   - exit 0
+    - exit 0
   tags:
-   - shell
+    - shell
   needs:
 EOF
 # editorconfig-checker-enable
@@ -143,3 +144,20 @@ EOF
 for service in "${services[@]}"; do
 	echo "  - ${service}"
 done
+
+if [ "$(basename "${1}")" == "development" ]; then
+	# editorconfig-checker-disable
+	cat <<EOF
+
+promote-to-production:
+  stage: promote
+  interruptible: false
+  script:
+    - ./promote-environment.sh development production
+  tags:
+    - shell
+  needs:
+    - verify
+EOF
+# editorconfig-checker-enable
+fi

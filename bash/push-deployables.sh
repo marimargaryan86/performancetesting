@@ -70,9 +70,11 @@ done
 
 cp ".gitlab/deploy.gitlab-ci.yml" "repo/.gitlab-ci.yml"
 cp "bash/deploy.sh" "repo/development/deploy.sh"
+cp "bash/promote-environment.sh" "repo/promote-environment.sh"
 cp "bash/generate-deploy-pipeline.sh" "repo/development/generate-deploy-pipeline.sh"
 chmod +x "repo/development/deploy.sh"
 chmod +x "repo/development/generate-deploy-pipeline.sh"
+chmod +x "repo/promote-environment.sh"
 
 cd repo
 git add --all .
