@@ -21,8 +21,8 @@ class OfferSettings(service.Settings, KarhooConfig):
     amqp_dsn: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
     ttl: datetime.timedelta = datetime.timedelta(minutes=_DEFAULT_TTL_IN_MINUTES)
-    polling_wait_time_seconds: int
-    polling_retries_attempts: int
+    polling_wait_time_seconds: int = 10
+    polling_retries_attempts: int = 4
 
 
 class OrderSettings(service.Settings, KarhooConfig):

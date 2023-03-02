@@ -1,13 +1,13 @@
 {
-  "development": {
-    "variables": {
-      "count": 2
+    "development": {
+        "variables": {
+            "count": 1
+        }
+    },
+    "production": {
+        "deploy": false,
+        "variables": {
+            "count": 2
+        }
     }
-  },
-  "production": {
-    "deploy": false,
-    "variables": {
-      "count": 2
-    }
-  }
 }

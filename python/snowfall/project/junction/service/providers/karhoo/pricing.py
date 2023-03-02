@@ -17,7 +17,7 @@ from snowfall.stdlib.transport.amqp import types as amqp_types
 
 
 async def price_quotes(
-    app: service.Application[config.OrderSettings],
+    app: service.Application[config.OfferSettings],
 ) -> None:
     async with contextlib.AsyncExitStack() as stack:
         redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(

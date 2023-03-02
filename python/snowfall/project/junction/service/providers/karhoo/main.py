@@ -17,7 +17,7 @@ if __name__ == "__main__":
         service.Command(
             name="pricing",
             callback=pricing.price_quotes,
-            settings_class=config.OrderSettings,
+            settings_class=config.OfferSettings,
         ),
         service.Command(
             name="orders",
