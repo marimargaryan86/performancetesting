@@ -7,10 +7,6 @@
     }
   },
   "production": {
-    "variables": {
-      "count": 2,
-      "traefik_entrypoints": "web",
-      "traefik_host_URL": "pssapi2.junction.travel"
-    }
+    "deploy": false
   }
 }
