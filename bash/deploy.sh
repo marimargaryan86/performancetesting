@@ -15,7 +15,7 @@ for ((idx = 3; idx < ${#ARGS[@]}; ++idx)); do
 		ADDITIONAL_ARGS=("-var-file=${VARS_FILE}")
 	fi
 
-	echo "Deploying '${TEMPLATE_FILE%.*}' of '${SERVICE_NAME}' to nomad address '${NOMAD_ADDR}'..."
+	echo "Deploying '${TEMPLATE_FILE%.*}' of '${SERVICE_NAME}' to '${NOMAD_ADDR}'..."
 
 	if PLAN_OUTPUT=$(nomad plan "${ADDITIONAL_ARGS[@]}" "${TEMPLATE_FILE}"); then
 		true # can't do ! negation above if we want to check the exact status code
@@ -51,6 +51,8 @@ for ((idx = 3; idx < ${#ARGS[@]}; ++idx)); do
 		echo "WARN: No Deployment ID found, skipping."
 		continue
 	fi
+
+	nomad deployment status "${DEPLOYMENT_ID}"
 
 	ALLOC_IDS=$(nomad deployment status -json "${DEPLOYMENT_ID}" | jq -e -r ".TaskGroups[].PlacedCanaries | if . == null then [] else . end | add")
 	echo "Allocation IDs: ${ALLOC_IDS}"
