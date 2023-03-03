@@ -13,7 +13,7 @@ from snowfall.project.junction.api_automation.test_functions.helpers_api import 
     return_randomized_token,
 )
 from snowfall.stdlib import string
-from snowfall.vendor.pay.client import PayClient
+from snowfall.vendor.pay.client import PayAdminClient, PayClient
 
 logger = logging.getLogger()
 formatter = logging.Formatter(
@@ -30,10 +30,11 @@ EXIT_MSG = "Exiting ; check your logs"
 @pytest.mark.integration
 async def test_create_transactions(  # noqa: WPS210, WPS213, WPS218, C901
     pay_client: PayClient,
+    pay_admin_client: PayAdminClient,
     get_mongo_config: Mapping[str, Any],
 ) -> None:
     try:
-        response_payer = await pay_client.create_company(
+        response_payer = await pay_admin_client.create_company(
             company="test-company-{0}".format(return_randomized_token()),
             address_lines=["Radhuset", "Våksalagatan 2", "United Spaces", "Sweden"],
             country_code="SE",
@@ -48,7 +49,7 @@ async def test_create_transactions(  # noqa: WPS210, WPS213, WPS218, C901
         sys.exit(EXIT_MSG)
 
     try:
-        response_beneficiary = await pay_client.create_company(
+        response_beneficiary = await pay_admin_client.create_company(
             company="test-company-{0}".format(return_randomized_token()),
             address_lines=["Radhuset", "Våksalagatan 2", "United Spaces", "Sweden"],
             country_code="SE",

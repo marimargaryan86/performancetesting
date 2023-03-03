@@ -7,7 +7,7 @@ from snowfall.project.junction.api_automation.test_functions.helpers_api import 
     is_valid_uuid,
     return_randomized_token,
 )
-from snowfall.vendor.pay.client import PayClient
+from snowfall.vendor.pay.client import PayAdminClient
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -15,7 +15,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_update_company(  # noqa: WPS210, WPS218
-    pay_client: PayClient,
+    pay_admin_client: PayAdminClient,
 ) -> None:
     company = "test-company-{0}".format(return_randomized_token())
     address_lines = ["Radhuset", "Våksalagatan 2", "United Spaces", "Sweden"]
@@ -25,7 +25,7 @@ async def test_update_company(  # noqa: WPS210, WPS218
     buffer_rate = float(0)
     sales_rate = float(0)
 
-    response_create = await pay_client.create_company(
+    response_create = await pay_admin_client.create_company(
         company,
         address_lines,
         country_code,
@@ -50,7 +50,7 @@ async def test_update_company(  # noqa: WPS210, WPS218
     update_buffer_rate = float(1)
     update_sales_rate = float(1)
 
-    response = await pay_client.update_company(
+    response = await pay_admin_client.update_company(
         response_create["data"]["id"],
         update_company,
         update_address_lines,

@@ -13,7 +13,7 @@ from snowfall.project.junction.api_automation.test_functions.mobile_client impor
 from snowfall.vendor.apilayer.client import APILayer
 from snowfall.vendor.bound.client import Bound
 from snowfall.vendor.junction.client import JunctionClient
-from snowfall.vendor.pay.client import PayAuthentication, PayClient
+from snowfall.vendor.pay.client import PayAdminClient, PayAuthentication, PayClient
 
 ALLURE_ENVIRONMENT_PROPERTIES_FILE = "environment.properties"
 ALLUREDIR_OPTION = "--alluredir"
@@ -204,7 +204,40 @@ def mobile_client(
 
 
 @pytest.fixture(scope="function")
-def pay_client(
+def pay_admin_client(
+    api_token: str,
+    host: str,
+) -> PayAdminClient:
+    client_timeout = 20
+
+    email = get_variable_value(host, api_token, "pay_api_test_email")
+    password = get_variable_value(host, api_token, "pay_api_test_password")
+
+    base_url_admin_api = "{0}{1}".format(
+        HTTPS_PREFIX,
+        get_variable_value(host, api_token, "pay_admin_api_host"),
+    )
+
+    auth = PayAuthentication(
+        base_url=base_url_admin_api,
+        headers=httpx.Headers({"Content-Type": "application/vnd.api+json"}),
+        email=email,
+        password=password,
+    )
+
+    return PayAdminClient(
+        base_url=base_url_admin_api,
+        auth=auth,
+        client=httpx.AsyncClient(
+            base_url=base_url_admin_api,
+            timeout=client_timeout,
+            auth=auth,
+        ),
+    )
+
+
+@pytest.fixture(scope="function")
+def pay_client(  # noqa: WPS210
     api_token: str,
     host: str,
 ) -> PayClient:
@@ -212,13 +245,17 @@ def pay_client(
 
     email = get_variable_value(host, api_token, "pay_api_test_email")
     password = get_variable_value(host, api_token, "pay_api_test_password")
+    base_url_admin_api = "{0}{1}".format(
+        HTTPS_PREFIX,
+        get_variable_value(host, api_token, "pay_admin_api_host"),
+    )
     base_url = "{0}{1}".format(
         HTTPS_PREFIX,
         get_variable_value(host, api_token, "pay_api_host"),
     )
 
     auth = PayAuthentication(
-        base_url=base_url,
+        base_url=base_url_admin_api,
         headers=httpx.Headers({"Content-Type": "application/vnd.api+json"}),
         email=email,
         password=password,
@@ -229,7 +266,6 @@ def pay_client(
         auth=auth,
         client=httpx.AsyncClient(
             base_url=base_url,
-            verify=False,
             timeout=client_timeout,
             auth=auth,
         ),

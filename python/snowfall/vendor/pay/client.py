@@ -107,42 +107,6 @@ class PayClient(object):
             auth=auth,
         )
 
-    async def create_company(  # noqa: WPS211
-        self,
-        company: str,
-        address_lines: Sequence[str],
-        country_code: str,
-        postal_code: str,
-        city: str,
-        buffer_rate: float,
-        sales_rate: float,
-    ) -> dict[str, Any]:
-        payload = {
-            _DATA_KEY: {
-                _TYPE_KEY: "companies",
-                _ATTRIBUTES_KEY: {
-                    "name": company,
-                    "address": {
-                        "addressLines": address_lines,
-                        "countryCode": country_code,
-                        "postalCode": postal_code,
-                        "city": city,
-                    },
-                    "bufferRate": buffer_rate,
-                    "salesRate": sales_rate,
-                },
-            },
-        }
-
-        response = await self._http_client.post(
-            "{0}/companies".format(self._base_url),
-            headers=self._http_client.headers,
-            json=payload,
-        )
-
-        response.raise_for_status()
-        return response.json()
-
     async def create_quote(  # noqa: WPS211
         self,
         amount: int,
@@ -210,6 +174,58 @@ class PayClient(object):
 
         response = await self._http_client.post(
             "{0}/transactions".format(self._base_url),
+            headers=self._http_client.headers,
+            json=payload,
+        )
+
+        response.raise_for_status()
+        return response.json()
+
+
+class PayAdminClient(object):
+    def __init__(
+        self,
+        base_url: str,
+        auth: PayAuthentication,
+        client: Optional[httpx.AsyncClient] = None,
+    ):
+        self._base_url = base_url
+        self._http_client = client or httpx.AsyncClient(
+            base_url=base_url,
+            verify=False,
+            http2=True,
+            auth=auth,
+        )
+
+    async def create_company(  # noqa: WPS211
+        self,
+        company: str,
+        address_lines: Sequence[str],
+        country_code: str,
+        postal_code: str,
+        city: str,
+        buffer_rate: float,
+        sales_rate: float,
+    ) -> dict[str, Any]:
+        payload = {
+            _DATA_KEY: {
+                _TYPE_KEY: "companies",
+                _ATTRIBUTES_KEY: {
+                    "name": company,
+                    "address": {
+                        "addressLines": address_lines,
+                        "countryCode": country_code,
+                        "postalCode": postal_code,
+                        "city": city,
+                    },
+                    "bufferRate": buffer_rate,
+                    "salesRate": sales_rate,
+                },
+            },
+        }
+
+        response = await self._http_client.post(
+            "{0}/companies".format(self._base_url),
             headers=self._http_client.headers,
             json=payload,
         )
