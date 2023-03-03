@@ -7,3 +7,9 @@ html {
 *::after {
   box-sizing: inherit;
 }
+
+.ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

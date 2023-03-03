@@ -11,9 +11,14 @@
       "session-token=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/; secure=true; samesite=none;";
     await invalidateAll();
   }
+</script>
 
-  const email = "j.smith@tbctravel.com".trim().toLowerCase();
-  const avatar = `https://www.gravatar.com/avatar/${md5(email)}`;
+<script lang="ts">
+  import type { UserModel } from "models/user";
+
+  export let user: UserModel;
+
+  $: avatar = `https://www.gravatar.com/avatar/${md5(user.email.trim().toLowerCase())}?d=identicon`;
 </script>
 
 <input type="checkbox" id="main-nav-bar-expanded" checked />
@@ -38,8 +43,8 @@
   <section class="account">
     <img src={avatar} alt="" class="avatar" />
 
-    <strong class="name typography body-medium bold">John Smith</strong>
-    <span class="email typography label-small">{email}</span>
+    <strong class="name typography body-medium bold ellipsis">John Smith</strong>
+    <span class="email typography label-small ellipsis">{user.email}</span>
   </section>
 </nav>
 

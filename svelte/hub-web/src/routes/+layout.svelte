@@ -11,9 +11,9 @@
   export let data: LayoutData;
 </script>
 
-{#if data.loggedIn}
+{#if data.user}
   <main>
-    <MainNavBar />
+    <MainNavBar user={data.user} />
 
     <div class="wrapper">
       <slot />

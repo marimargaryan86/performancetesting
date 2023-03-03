@@ -15,6 +15,7 @@ const config = {
       utils: "src/utils",
       integration: "src/integration",
       "integration-instances": "src/integration-instances.ts",
+      models: "src/models",
     },
   },
 };
