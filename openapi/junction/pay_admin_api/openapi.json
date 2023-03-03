@@ -405,6 +405,63 @@
       }
     },
     "/accounts": {
+      "get": {
+        "summary": "List accounts",
+        "description": "Get all accounts",
+        "tags": [
+          "accounts"
+        ],
+        "operationId": "get-accounts",
+        "responses": {
+          "200": {
+            "description": "List accounts",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "required": [
+                        "data"
+                      ],
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "minItems": 0,
+                          "uniqueItems": true,
+                          "items": {
+                            "$ref": "#/components/schemas/Account"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sort"
+          },
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
+      },
       "post": {
         "summary": "Create account",
         "tags": [
@@ -620,6 +677,17 @@
           "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
         },
         "description": "Company id"
+      },
+      "sort": {
+        "name": "sort",
+        "in": "query",
+        "style": "form",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "example": "id"
+        },
+        "description": "Sorting"
       }
     },
     "schemas": {
