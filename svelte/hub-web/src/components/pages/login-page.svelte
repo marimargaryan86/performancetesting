@@ -6,6 +6,7 @@
   import JunctionLogo from "assets/icons/junction-logo.svelte";
   import LockIcon from "assets/icons/lock-icon.svelte";
   import TextField from "components/ui/text-field.svelte";
+  import integrationInstances from "integration-instances";
 
   let pending = false;
   let data = {
@@ -25,19 +26,17 @@
     pending = true;
     errors = {};
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const token = await integrationInstances.auth.createToken(data);
 
-    pending = false;
+      document.cookie = `session-token=${token}; path=/; secure=true; samesite=none;`;
 
-    if (data.email === "asd@asd.asd" && data.password === "asd") {
-      document.cookie = "session-token=abc; path=/; secure=true;";
       await invalidateAll();
-
-      return;
+    } catch (error) {
+      errors.password = "Invalid credentials";
+    } finally {
+      pending = false;
     }
-
-    errors.email = "Invalid email address";
-    errors.password = "Invalid credentials";
   }
 
   function createClearErrorFunc(key: keyof typeof errors): () => void {

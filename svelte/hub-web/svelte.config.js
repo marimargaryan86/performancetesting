@@ -13,6 +13,8 @@ const config = {
       components: "src/components",
       assets: "src/assets",
       utils: "src/utils",
+      integration: "src/integration",
+      "integration-instances": "src/integration-instances.ts",
     },
   },
 };
