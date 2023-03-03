@@ -3,7 +3,8 @@
     "variables": {
       "count": 1,
       "traefik_entrypoints": "websecure",
-      "traefik_host_URL": "hub.junction.dev"
+      "traefik_host_URL": "hub.junction.dev",
+      "pay_admin_api_base_url": "https://adminapi.pay.junction.dev"
     }
   },
   "production": {
@@ -11,7 +12,8 @@
     "variables": {
       "count": 2,
       "traefik_entrypoints": "web",
-      "traefik_host_URL": "hub.junction.travel"
+      "traefik_host_URL": "hub.junction.travel",
+      "pay_admin_api_base_url": "https://adminapi.pay.junction.travel"
     }
   }
 }

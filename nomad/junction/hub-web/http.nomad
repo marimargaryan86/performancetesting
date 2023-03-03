@@ -34,6 +34,10 @@ variable "count" {
   type = number
 }
 
+variable "pay_admin_api_base_url" {
+  type = string
+}
+
 job "hub-web-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -105,8 +109,9 @@ job "hub-web-http" {
       }
 
       env {
-        ENV_NAME = "${var.environment}"
-        PORT     = "${NOMAD_PORT_http}"
+        ENV_NAME                      = "${var.environment}"
+        PORT                          = "${NOMAD_PORT_http}"
+        PUBLIC_PAY_ADMIN_API_BASE_URL = "${var.pay_admin_api_base_url}"
       }
     }
   }
