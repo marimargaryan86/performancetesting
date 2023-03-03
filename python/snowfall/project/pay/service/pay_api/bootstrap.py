@@ -63,6 +63,7 @@ def create_dependencies(  # noqa: WPS211
     redis_client: UserSessionRepository,
     transactions_repository: TransactionRepository,
     conversions_repository: ConversionRepository,
+    companies_repository: CompanyRepository,
     payment_client: Optional[client.PaymentClient] = None,
 ) -> lagom.Container:
     container = lagom.Container()
@@ -73,4 +74,5 @@ def create_dependencies(  # noqa: WPS211
     container[UserSessionRepository] = redis_client
     container[TransactionRepository] = transactions_repository
     container[ConversionRepository] = conversions_repository
+    container[CompanyRepository] = companies_repository
     return container

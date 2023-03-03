@@ -83,6 +83,9 @@ def _factory(
                     conversions_repository=ConversionRepository(
                         mongo.conversions.conversions,
                     ),
+                    companies_repository=CompanyRepository(
+                        mongo.companies.companies,
+                    ),
                 ),
             ),
             openapi_path=filesystem.resource_path("junction.pay_api", "openapi.json"),

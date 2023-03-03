@@ -41,6 +41,7 @@ def _create_app(  # noqa: WPS211
     redis_repository: UserSessionRepository,
     transaction_repository: TransactionRepository,
     conversion_repository: ConversionRepository,
+    companies_repository: CompanyRepository,
     openapi_path: pathlib.Path,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
@@ -55,6 +56,7 @@ def _create_app(  # noqa: WPS211
                 redis_repository,
                 transaction_repository,
                 conversion_repository,
+                companies_repository,
                 payment_client=payment_client,
             ),
         ),
@@ -234,6 +236,7 @@ def app(  # noqa: WPS211
     transactions_repository: TransactionRepository,
     conversions_repository: ConversionRepository,
     payment_client: PaymentClient,
+    companies_repository: CompanyRepository,
 ) -> applications.Starlette:
     return _create_app(
         cc_client=cc_client,
@@ -243,6 +246,7 @@ def app(  # noqa: WPS211
         redis_repository=redis_repository,
         transaction_repository=transactions_repository,
         conversion_repository=conversions_repository,
+        companies_repository=companies_repository,
         openapi_path=filesystem.resource_path("junction.pay_api", "openapi.json"),
     )
 
