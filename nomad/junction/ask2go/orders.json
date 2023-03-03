@@ -1,12 +1,12 @@
 {
   "development": {
     "variables": {
-      "count": 5
+      "count": 2
     }
   },
   "production": {
     "variables": {
-      "count": 5
+      "count": 2
     }
   }
 }

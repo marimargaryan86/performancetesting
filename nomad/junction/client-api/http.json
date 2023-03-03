@@ -1,14 +1,14 @@
 {
   "development": {
     "variables": {
-      "count": 3,
+      "count": 2,
       "traefik_entrypoints": "websecure",
       "traaefik_host_URL": "api.junction.dev"
     }
   },
   "production": {
     "variables": {
-      "count": 4,
+      "count": 2,
       "traefik_entrypoints": "web",
       "traaefik_host_URL": "api.junction.travel"
     }

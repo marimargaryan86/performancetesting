@@ -6,7 +6,7 @@
   },
   "production": {
     "variables": {
-      "count": 3
+      "count": 2
     }
   }
 }
