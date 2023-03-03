@@ -75,7 +75,6 @@ class AuthenticationService(
 
         payload = {
             "email": user.email,
-            "password": user.password,
             "id": user.id,
         }
         token = self._jwt_encoder.encode(payload)
