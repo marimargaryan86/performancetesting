@@ -6,8 +6,10 @@ import (
 	"net/http"
 )
 
+type ScopesConfiguration map[string][]string
+
 type CommitsConfiguration struct {
-	Scopes map[string][]string `yaml:"scopes"`
+	Scopes ScopesConfiguration `yaml:"scopes"`
 	Types  []string            `yaml:"types"`
 }
 

@@ -244,6 +244,28 @@ func (mr *mergeRequest) setLabel(label string) error {
 	return nil
 }
 
+func (mr *mergeRequest) setTitle(title string) error {
+	logger := mr.logger.With("title", title)
+
+	object, _, err := mr.client.MergeRequests.UpdateMergeRequest(
+		mr.object.ProjectID,
+		mr.object.IID,
+		&gitlab.UpdateMergeRequestOptions{
+			Title: &title,
+		},
+	)
+
+	if err != nil {
+		return err
+	}
+
+	mr.object = object
+	mr.hasChanged = true
+	logger.Info("Title changed.")
+
+	return nil
+}
+
 func (mr *mergeRequest) approve() error {
 	_, _, err := mr.client.MergeRequestApprovals.ApproveMergeRequest(
 		mr.object.ProjectID,

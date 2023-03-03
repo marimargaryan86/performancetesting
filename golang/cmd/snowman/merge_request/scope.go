@@ -17,17 +17,27 @@ func (mr *mergeRequest) validateScope() error {
 		return nil
 	}
 
-	scopeLabel := fmt.Sprintf("scope::%s", title.Scope)
+	changedPaths := make([]string, 0, len(mr.object.Changes))
 
-	if title.Scope == "" {
+	for _, change := range mr.object.Changes {
+		changedPaths = append(changedPaths, change.OldPath)
+		changedPaths = append(changedPaths, change.NewPath)
+	}
+
+	bestScope := determineBestScope(mr.configuration.Commits.Scopes, common.Unique(changedPaths))
+
+	if title.Scope == "" && bestScope == "" {
 		for _, l := range mr.object.Labels {
-			if strings.HasPrefix(l, scopeLabel) {
+			if strings.HasPrefix(l, "scope::") {
 				return mr.removeLabel(l)
 			}
 		}
-
-		mr.logger.Debug("Label not present, skipping.")
 		return nil
+	}
+
+	if bestScope != "" && bestScope != title.Scope {
+		title.Scope = bestScope
+		mr.setTitle(title.String())
 	}
 
 	projectLabels, err := mr.projectLabels()
@@ -36,6 +46,7 @@ func (mr *mergeRequest) validateScope() error {
 		return err
 	}
 
+	scopeLabel := fmt.Sprintf("scope::%s", title.Scope)
 	found := false
 
 	for _, l := range projectLabels {
@@ -50,4 +61,33 @@ func (mr *mergeRequest) validateScope() error {
 	}
 
 	return mr.setLabel(scopeLabel)
+}
+
+func determineBestScope(scopes common.ScopesConfiguration, changedFiles []string) string {
+	bestDepth := 0
+	bestScope := ""
+	depthConflict := false
+
+	for scope, paths := range scopes {
+		for _, path := range paths {
+			for _, file := range changedFiles {
+				if strings.HasPrefix(file, path) {
+					depth := strings.Count(path, "/")
+					if bestDepth < depth {
+						bestDepth = depth
+						bestScope = scope
+						depthConflict = false
+					} else if bestDepth == depth {
+						depthConflict = true
+					}
+				}
+			}
+		}
+	}
+
+	if depthConflict {
+		return ""
+	}
+
+	return bestScope
 }

@@ -2,6 +2,7 @@ package common
 
 import (
 	"errors"
+	"fmt"
 	"github.com/xanzy/go-gitlab"
 	"regexp"
 	"strings"
@@ -20,6 +21,28 @@ type CommitTitle struct {
 	Scope       string
 	Title       string
 	Type        string
+}
+
+func (ct CommitTitle) String() string {
+	var b strings.Builder
+
+	if ct.IsDraft {
+		b.WriteString("Draft: ")
+	}
+
+	b.WriteString(ct.Type)
+
+	if ct.Scope != "" {
+		b.WriteString(fmt.Sprintf("(%s)", ct.Scope))
+	}
+
+	if ct.IsBreaking {
+		b.WriteString("!")
+	}
+
+	b.WriteString(fmt.Sprintf(": %s", ct.Description))
+
+	return b.String()
 }
 
 func ParseCommitTitle(message string) (CommitTitle, error) {

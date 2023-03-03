@@ -20,3 +20,18 @@ func TestParseCommitTitle(t *testing.T) {
 		}
 	}
 }
+
+func TestCommitTitleString(t *testing.T) {
+	for _, message := range []string{
+		"feat: allow provided config object to extend other configs",
+		"feat!: send an email to the customer when a product is shipped",
+		"feat(api)!: send an email to the customer when a product is shipped",
+		"chore!: drop support for Node 6",
+		"Draft: docs: correct spelling of CHANGELOG",
+		"Draft: feat(lang): add Polish language",
+	} {
+		if commitTitle, _ := ParseCommitTitle(message); commitTitle.String() != message {
+			t.Errorf(`string of ParseCommitTitle("%s") was incorrect, got: %s, want: %s.`, message, commitTitle.String(), message)
+		}
+	}
+}
