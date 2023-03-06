@@ -120,7 +120,7 @@ class PlaceResource(models.Resource):
         place: models_pb2.Place,
     ) -> PlaceResource:
         name = place.name
-        if place.country_code == "SE":
+        if place.country_code == "SE" and place.local_name:
             name = "{name} ({local_name})".format(
                 name=place.name,
                 local_name=place.local_name,
