@@ -6,6 +6,7 @@ from snowfall.project.junction.service.providers.duffel import cache, notificati
 from snowfall.project.junction.service.providers.duffel.enums import gender_from_proto
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.v1alpha import models_pb2 as std_models_pb2
 from snowfall.vendor.duffel import client, errors
 from snowfall.vendor.duffel.builders.order_request import (
     IdentityDocument,
@@ -93,14 +94,15 @@ class BookingHandler(object):
         for index, passenger in enumerate(task.passengers):
             document: IdentityDocument | None = None
 
-            document = IdentityDocument(
-                unique_identifier=passenger.doc_details.document_number,
-                document_type="passport",
-                issuing_country_code=passenger.doc_details.issue_county,
-                expires_on=protobuf.protobuf_to_date(
-                    passenger.doc_details.exp_date,
-                ),
-            )
+            if details.doc_required and self._has_valid_document(passenger):
+                document = IdentityDocument(
+                    unique_identifier=passenger.doc_details.document_number,
+                    document_type="passport",
+                    issuing_country_code=passenger.doc_details.issue_county,
+                    expires_on=protobuf.protobuf_to_date(
+                        passenger.doc_details.exp_date,
+                    ),
+                )
 
             order_request.add_passenger(
                 OrderPassenger(
@@ -115,7 +117,7 @@ class BookingHandler(object):
                     family_name=passenger.last_name,
                     email=task.contact_details.email,
                     born_on=protobuf.protobuf_to_date(passenger.date_of_birth),
-                    identity_documents=[document] if details.doc_required else None,
+                    identity_documents=[document] if document is not None else None,
                 ),
             )
 
@@ -130,3 +132,12 @@ class BookingHandler(object):
             self._logger.exception()
 
         return order_response
+
+    def _has_valid_document(self, passenger: models_pb2.Passenger) -> bool:
+        if passenger.doc_details.document_number == "":
+            return False
+
+        return self._is_valid_date(passenger.doc_details.exp_date)
+
+    def _is_valid_date(self, date: std_models_pb2.Date) -> bool:
+        return date.year > 0 and date.month > 0 and date.day > 0
