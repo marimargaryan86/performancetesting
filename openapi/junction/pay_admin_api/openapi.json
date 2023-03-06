@@ -402,6 +402,37 @@
             }
           }
         }
+      },
+      "get": {
+        "summary": "Get Company details",
+        "description": "Get Company details",
+        "tags": [
+          "companies"
+        ],
+        "operationId": "get-companies-id",
+        "responses": {
+          "200": {
+            "description": "Company details are fetched",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Company"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
       }
     },
     "/accounts": {

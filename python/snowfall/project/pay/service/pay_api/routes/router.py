@@ -78,7 +78,7 @@ def get_admin_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             "/companies/{companyId}",
             companies.StoreCompany,
             name="Company",
-            methods=["PATCH"],
+            methods=["PATCH", "GET"],
         ),
         integration.route(
             "/contact-persons",

@@ -103,3 +103,38 @@ class StoreCompany(endpoints.HTTPEndpoint):
             ),
             request=request,
         )
+
+    async def get(
+        self,
+        request: requests.Request,
+        company_repository: CompanyRepository = lagom.injectable,
+    ) -> models.JsonApiResponse:
+        company_id = request.path_params["companyId"]
+
+        company = await company_repository.find_by_id(company_id)
+        if not company:
+            return models.JsonApiResponse(
+                body=messages.models.Body(
+                    errors=[
+                        messages.models.Error(
+                            status=str(status.HTTP_404_NOT_FOUND),
+                            code="not_found",
+                            detail="Entity not found",
+                            source=messages.models.ErrorSource(
+                                parameter="companyId",
+                                pointer="companies/{0}".format(company_id),
+                            ),
+                        ),
+                    ],
+                ),
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
+
+        return await messages.create_response(
+            body=messages.models.Body(
+                data=resources.Company.from_proto(
+                    company=company,
+                ),
+            ),
+            request=request,
+        )
