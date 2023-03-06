@@ -28,10 +28,15 @@ async def test_that_get_all_accounts_returns_results_from_database() -> None:
     assert returned_accounts == accounts
 
 
-class UpdateAccountTestCase(TestCase):
+class UpdateAccountTestCase(TestCase):  # noqa:WPS230
     def setUp(self) -> None:
         self.new_email = "updated@test.com"
         self.new_password = "new_test_password"  # nosec
+        self.payload = {
+            "firstname": "test_name",
+            "lastname": "test_surname",
+            "mobile": "111222333",
+        }
 
         self.account_repository_mock = create_autospec(
             Repository,
@@ -111,6 +116,34 @@ class UpdateAccountTestCase(TestCase):
 
         self.account_repository_mock.update_by_filter.assert_not_called()
         self.account_repository_mock.update_by_filter.assert_not_called()
+
+    async def test_update_account_should_update_the_rest(self) -> None:
+        mocked_updated_account = Account(**self.payload)
+
+        self.account_repository_mock.get_one_by_filter.return_value = (
+            mocked_updated_account
+        )
+
+        updated_account = await self.accounts_service.update_account(
+            AccountUpdateSchema(
+                firstname=self.payload["firstname"],
+                lastname=self.payload["lastname"],
+                mobile=self.payload["mobile"],
+            ),
+            Account(firstname="test", email="test@email.com", id=1),
+        )
+
+        assert updated_account == mocked_updated_account
+        self.account_repository_mock.update_by_filter.assert_called_once_with(
+            filter_criteria=[ANY],
+            values_to_update=self.payload,
+        )
+        assert (
+            ExpressionMatcher([Account.id == 1])
+            == self.account_repository_mock.update_by_filter.mock_calls[0][2][
+                "filter_criteria"
+            ]
+        )
 
 
 @freezegun.freeze_time("2023-01-01 00:00:00")

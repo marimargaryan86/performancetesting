@@ -97,6 +97,29 @@ async def test_can_update_password(
     assert response.status_code == status.HTTP_200_OK
 
 
+async def test_can_update_account(
+    client: TestClient,
+    account_factory: Type[AsyncSQLAlchemyFactory],
+) -> None:
+    account = await account_factory.create()
+    payload = {
+        "firstname": "test_firstname",
+        "lastname": "test_surname",
+        "mobile": "+44019020030",
+    }
+
+    response = client.post(
+        "/accounts/update",
+        headers={"x-auth-token": account.token},
+        json=payload,
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["data"]["firstname"] == payload["firstname"]
+    assert response.json()["data"]["lastname"] == payload["lastname"]
+    assert response.json()["data"]["mobile"] == payload["mobile"]
+
+
 async def test_can_not_login_if_not_existed_account_provided(
     client: TestClient,
 ) -> None:

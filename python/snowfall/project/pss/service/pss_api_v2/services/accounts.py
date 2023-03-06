@@ -1,6 +1,6 @@
 import datetime
 import hashlib
-from typing import Optional, Sequence
+from typing import Any, Dict, Optional, Sequence
 from uuid import uuid4
 
 import bcrypt
@@ -86,6 +86,17 @@ class AccountsService(object):  # noqa:WPS214
             await self._update_password(
                 account_id=int(current_account.id),
                 password=account_data.password,
+            )
+
+        filtered_account_data: Dict[Any, Any] = account_data.dict(
+            exclude_unset=True,
+            exclude={"email", "password"},
+        )
+
+        if filtered_account_data:
+            await self._account_repository.update_by_filter(
+                filter_criteria=[Account.id == current_account.id],
+                values_to_update=filtered_account_data,
             )
 
         account = await self.get_account_by_field(

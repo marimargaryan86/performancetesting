@@ -14,6 +14,9 @@ class AccountLoginSchema(BaseSchema):
 class AccountUpdateSchema(BaseSchema):
     email: Optional[EmailStr]
     password: Optional[str]
+    firstname: Optional[str]
+    lastname: Optional[str]
+    mobile: Optional[str]
 
 
 class AccountForgotPasswordSchema(BaseSchema):
