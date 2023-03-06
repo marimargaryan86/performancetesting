@@ -1,5 +1,5 @@
 from snowfall.project.pay.service.accounts.v1alpha import models_pb2
-from snowfall.stdlib.persistence.mongo import mixins, repository
+from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 
 class AccountsRepository(
@@ -16,6 +16,7 @@ class ContactPersonsRepository(
     repository.ProtoRepository[models_pb2.ContactPerson],
 ):
     _proto = models_pb2.ContactPerson
+    _default_page_size = 20
 
     async def update_reference(
         self,
@@ -31,3 +32,20 @@ class ContactPersonsRepository(
                 },
             },
         )
+
+    async def find_by_company_id(
+        self,
+        company_id: str,
+        cursor: str | None,
+        limit: int | None,
+    ) -> resultset.ResultSet[models_pb2.ContactPerson]:
+        contact_persons = await self._find_with_cursor(
+            cur=cursor or "",
+            filter_={
+                "company_id": company_id,
+            },
+        )
+
+        contact_persons.limit(limit or self._default_page_size)
+
+        return contact_persons

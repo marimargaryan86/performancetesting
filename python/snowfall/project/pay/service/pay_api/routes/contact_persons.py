@@ -6,7 +6,12 @@ from snowfall.project.pay.service.accounts.v1alpha import models_pb2
 from snowfall.project.pay.service.pay_api import resources
 from snowfall.project.pay.service.pay_api.repositories import CompanyRepository
 from snowfall.stdlib import string
-from snowfall.stdlib.integration.starlette import messages, models, request_helpers
+from snowfall.stdlib.integration.starlette import (
+    messages,
+    models,
+    pagination_helpers,
+    request_helpers,
+)
 from snowfall.stdlib.v1alpha import phone_number_pb2
 
 
@@ -59,4 +64,36 @@ class ContactPersons(endpoints.HTTPEndpoint):
             ),
             request=request,
             status_code=status.HTTP_201_CREATED,
+        )
+
+    async def get(
+        self,
+        request: requests.Request,
+        contact_person_repository: accounts.ContactPersonsRepository = lagom.injectable,
+    ) -> responses.Response:
+        pagination = pagination_helpers.get_pagination(request)
+
+        contact_persons = await contact_person_repository.find_by_company_id(
+            request.query_params["company"],
+            pagination.cursor,
+            pagination.limit,
+        )
+
+        url = "{0}?company={1}".format(
+            request.url_for("ContactPerson"),
+            request.query_params["company"],
+        )
+        return await messages.create_response(
+            body=models.Body(
+                data=[
+                    resources.ContactPersonResource.from_proto(contact_person)
+                    async for contact_person in contact_persons
+                ],
+                links=pagination_helpers.get_next_url(
+                    url,
+                    await contact_persons.cursor(),
+                    pagination,
+                ),
+            ),
+            request=request,
         )
