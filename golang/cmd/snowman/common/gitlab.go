@@ -3,6 +3,8 @@ package common
 import (
 	"errors"
 	"fmt"
+	"git.snowfall.se/junction/junction/golang/stdlib/sliceutil"
+	"git.snowfall.se/junction/junction/golang/stdlib/strutil"
 	"github.com/xanzy/go-gitlab"
 	"regexp"
 	"strings"
@@ -103,9 +105,9 @@ func LikelyFileOwners(client *gitlab.Client, projectId int, path string, branch 
 
 	BlameLoop:
 		for _, b := range blame {
-			authorName := normalize(b.Commit.AuthorName)
+			authorName := strutil.Normalize(b.Commit.AuthorName)
 			for _, u := range users {
-				if normalize(u.Name) == authorName {
+				if strutil.Normalize(u.Name) == authorName {
 					owners = append(owners, u.ID)
 					continue BlameLoop
 				}
@@ -166,14 +168,14 @@ func RecentContributors(client *gitlab.Client, projectId int) ([]int, error) {
 	}
 
 	for _, c := range commits {
-		authorName := normalize(c.AuthorName)
+		authorName := strutil.Normalize(c.AuthorName)
 
 		for _, u := range allUsers {
-			if normalize(u.Name) == authorName {
+			if strutil.Normalize(u.Name) == authorName {
 				contributors = append(contributors, u.ID)
 			}
 		}
 	}
 
-	return Unique(contributors), nil
+	return sliceutil.Unique(contributors), nil
 }

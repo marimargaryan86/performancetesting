@@ -1,4 +1,4 @@
-package common
+package strutil
 
 import (
 	"github.com/jyggen/confusables"
@@ -11,7 +11,7 @@ import (
 
 var normalizer = transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
 
-func normalize(input string) string {
+func Normalize(input string) string {
 	output, _, _ := transform.String(normalizer, input)
 
 	return confusables.Skeleton(strings.ToLower(output))

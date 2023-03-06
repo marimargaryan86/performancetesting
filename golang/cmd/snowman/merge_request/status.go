@@ -1,7 +1,7 @@
 package merge_request
 
 import (
-	"git.snowfall.se/junction/junction/golang/cmd/snowman/common"
+	"git.snowfall.se/junction/junction/golang/stdlib/sliceutil"
 	"strings"
 )
 
@@ -43,7 +43,7 @@ func (mr *mergeRequest) expectedStatusLabel() (string, error) {
 		}
 	}
 
-	approvers = common.Unique(approvers)
+	approvers = sliceutil.Unique(approvers)
 	reviewers, err := mr.expectedReviewers()
 
 	if err != nil {

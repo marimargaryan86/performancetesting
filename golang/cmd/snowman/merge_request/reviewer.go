@@ -3,6 +3,7 @@ package merge_request
 import (
 	"errors"
 	"git.snowfall.se/junction/junction/golang/cmd/snowman/common"
+	"git.snowfall.se/junction/junction/golang/stdlib/sliceutil"
 	"github.com/xanzy/go-gitlab"
 	"math/rand"
 )
@@ -16,7 +17,7 @@ func (mr *mergeRequest) setReviewers() error {
 		return err
 	}
 
-	if common.Equal(current, expected) {
+	if sliceutil.Equal(current, expected) {
 		logger.Debug("Reviewers already correct, skipping.")
 		return nil
 	}
@@ -73,7 +74,7 @@ func (mr *mergeRequest) appendCodeOwners(expected []int, err error) ([]int, erro
 	}
 
 	if len(expected) > 0 && len(indecisive) == 0 {
-		return common.Unique(expected), nil
+		return sliceutil.Unique(expected), nil
 	}
 
 	for len(indecisive) > 0 {
@@ -83,7 +84,7 @@ func (mr *mergeRequest) appendCodeOwners(expected []int, err error) ([]int, erro
 	IndecisiveLoop:
 		for _, reviewers := range indecisive {
 			for _, reviewer := range reviewers {
-				if common.In(expected, reviewer.ID) {
+				if sliceutil.In(expected, reviewer.ID) {
 					continue IndecisiveLoop
 				}
 			}
@@ -91,7 +92,7 @@ func (mr *mergeRequest) appendCodeOwners(expected []int, err error) ([]int, erro
 			anyAdded := false
 
 			for _, reviewer := range reviewers {
-				if common.In(current, reviewer.ID) {
+				if sliceutil.In(current, reviewer.ID) {
 					expected = append(expected, reviewer.ID)
 					anyAdded = true
 				}
@@ -106,7 +107,7 @@ func (mr *mergeRequest) appendCodeOwners(expected []int, err error) ([]int, erro
 			}
 		}
 
-		reviewer := common.MostCommon(eligible)
+		reviewer := sliceutil.MostCommon(eligible)
 
 		if reviewer != 0 {
 			expected = append(expected, reviewer)
@@ -116,7 +117,7 @@ func (mr *mergeRequest) appendCodeOwners(expected []int, err error) ([]int, erro
 	}
 
 	if len(expected) > 0 {
-		return common.Unique(expected), nil
+		return sliceutil.Unique(expected), nil
 	}
 
 	return []int{}, errors.New("unable to decide on a reviewer")
@@ -149,7 +150,7 @@ func (mr *mergeRequest) expectedReviewers() ([]int, error) {
 		}
 	}
 
-	reviewer := common.MostCommon(eligible)
+	reviewer := sliceutil.MostCommon(eligible)
 
 	if reviewer != 0 {
 		return mr.appendCodeOwners([]int{reviewer}, nil)

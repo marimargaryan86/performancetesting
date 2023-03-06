@@ -2,7 +2,7 @@ package merge_request
 
 import (
 	"fmt"
-	"git.snowfall.se/junction/junction/golang/cmd/snowman/common"
+	"git.snowfall.se/junction/junction/golang/stdlib/sliceutil"
 	"github.com/xanzy/go-gitlab"
 	"net/http"
 	"strings"
@@ -38,7 +38,7 @@ func (mr *mergeRequest) merge() error {
 		return mr.approve()
 	}
 
-	for _, name := range common.Unique(names) {
+	for _, name := range sliceutil.Unique(names) {
 		commitMessage += "Reviewed-by: " + name + "\n"
 	}
 

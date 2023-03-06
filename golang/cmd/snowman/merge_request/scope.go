@@ -3,6 +3,7 @@ package merge_request
 import (
 	"fmt"
 	"git.snowfall.se/junction/junction/golang/cmd/snowman/common"
+	"git.snowfall.se/junction/junction/golang/stdlib/sliceutil"
 	"strings"
 )
 
@@ -24,7 +25,7 @@ func (mr *mergeRequest) validateScope() error {
 		changedPaths = append(changedPaths, change.NewPath)
 	}
 
-	bestScope := determineBestScope(mr.configuration.Commits.Scopes, common.Unique(changedPaths))
+	bestScope := determineBestScope(mr.configuration.Commits.Scopes, sliceutil.Unique(changedPaths))
 
 	if title.Scope == "" && bestScope == "" {
 		for _, l := range mr.object.Labels {

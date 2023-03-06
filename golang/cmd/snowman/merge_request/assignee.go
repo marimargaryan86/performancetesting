@@ -1,7 +1,7 @@
 package merge_request
 
 import (
-	"git.snowfall.se/junction/junction/golang/cmd/snowman/common"
+	"git.snowfall.se/junction/junction/golang/stdlib/sliceutil"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -14,7 +14,7 @@ func (mr *mergeRequest) setAssignees() error {
 		return err
 	}
 
-	if common.Equal(current, expected) {
+	if sliceutil.Equal(current, expected) {
 		logger.Debug("Assignees already correct, skipping.")
 		return nil
 	}
@@ -86,11 +86,11 @@ func (mr *mergeRequest) expectedAssignees() ([]int, error) {
 		missingOwners := make([]int, 0)
 
 		for _, reviewer := range reviewers {
-			if common.In(approvers, reviewer) {
+			if sliceutil.In(approvers, reviewer) {
 				continue
 			}
 
-			if common.In(owners, reviewer) {
+			if sliceutil.In(owners, reviewer) {
 				missingOwners = append(missingOwners, reviewer)
 			} else {
 				missingApprovers = append(missingApprovers, reviewer)

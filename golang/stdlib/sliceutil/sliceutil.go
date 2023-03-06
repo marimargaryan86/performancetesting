@@ -1,6 +1,6 @@
-package common
+package sliceutil
 
-func Equal[T int](a []T, b []T) bool {
+func Equal[T comparable](a []T, b []T) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -12,7 +12,7 @@ func Equal[T int](a []T, b []T) bool {
 	return true
 }
 
-func In[T int](a []T, b T) bool {
+func In[T comparable](a []T, b T) bool {
 	for _, v := range a {
 		if v == b {
 			return true
@@ -21,7 +21,7 @@ func In[T int](a []T, b T) bool {
 	return false
 }
 
-func MostCommon[T int](arr []T) T {
+func MostCommon[T comparable](arr []T) T {
 	m := map[T]int{}
 	var maxCnt int
 	var freq T
@@ -36,7 +36,7 @@ func MostCommon[T int](arr []T) T {
 	return freq
 }
 
-func Unique[T int | string](slice []T) []T {
+func Unique[T comparable](slice []T) []T {
 	keys := make(map[T]bool)
 	list := make([]T, 0)
 	for _, entry := range slice {
