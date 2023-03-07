@@ -83,7 +83,11 @@ func (plugin *MergeRequestPlugin) OnEvent(event interface{}) {
 
 		if err != nil {
 			logger.Error(err)
-			return
+		} else {
+			plugin.configCache[mr.ProjectID] = configCacheItem{
+				value:     config,
+				fetchedAt: time.Now(),
+			}
 		}
 	} else {
 		config = val.value

@@ -17,30 +17,29 @@ type Configuration struct {
 	Commits CommitsConfiguration `yaml:"commits"`
 }
 
-var defaultConfiguration = Configuration{
-	Commits: CommitsConfiguration{
-		Scopes: map[string][]string{},
-		Types: []string{
-			"build",
-			"chore",
-			"ci",
-			"docs",
-			"feat",
-			"fix",
-			"perf",
-			"refactor",
-			"revert",
-			"style",
-			"test",
-		},
-	},
-}
-
 func LoadConfiguration(client *gitlab.Client, pid int) (Configuration, error) {
+	config := Configuration{
+		Commits: CommitsConfiguration{
+			Scopes: map[string][]string{},
+			Types: []string{
+				"build",
+				"chore",
+				"ci",
+				"docs",
+				"feat",
+				"fix",
+				"perf",
+				"refactor",
+				"revert",
+				"style",
+				"test",
+			},
+		},
+	}
 	p, _, err := client.Projects.GetProject(pid, &gitlab.GetProjectOptions{})
 
 	if err != nil {
-		return defaultConfiguration, err
+		return config, err
 	}
 
 	file, resp, err := client.RepositoryFiles.GetRawFile(p.ID, ".snowman.yml", &gitlab.GetRawFileOptions{
@@ -48,17 +47,15 @@ func LoadConfiguration(client *gitlab.Client, pid int) (Configuration, error) {
 	})
 
 	if resp.StatusCode == http.StatusNotFound {
-		return defaultConfiguration, nil
+		return config, nil
 	}
 
 	if err != nil {
-		return defaultConfiguration, err
+		return config, err
 	}
 
-	config := defaultConfiguration
-
-	if err = yaml.UnmarshalStrict(file, &config); err != nil {
-		return defaultConfiguration, err
+	if err = yaml.Unmarshal(file, &config); err != nil {
+		return config, err
 	}
 
 	return config, nil
