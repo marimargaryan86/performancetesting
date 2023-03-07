@@ -48,8 +48,8 @@ async def test_get_offer_quote_by_id(
             session_token=return_randomized_token(),
         )
 
-    logging.info("create_offer_quote: %s", json.dumps(response_post, indent=4))
-    assert is_valid_uuid(response_post["data"]["id"]) is True
+        logging.info("create_offer_quote: %s", json.dumps(response_post, indent=4))
+        assert is_valid_uuid(response_post["data"]["id"]) is True
 
     await calculate_time_and_get_price_quote_response(
         junction_client,

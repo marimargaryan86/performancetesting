@@ -35,6 +35,7 @@ async def test_get_offer_group_details_by_offer_group_id(
         trips_search_id,
     )
 
+    assert trips_search_id is not None, "no data"
     assert offer_searches_id is not None, "offer_searches_id should not be empty"
     assert offer_group_ids is not None, "offer_group_ids should not be empty"
 

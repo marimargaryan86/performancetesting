@@ -35,6 +35,7 @@ async def test_trip_e2e_basic(
     logging.info("get_trips_by_trip_search_id response: %s", json.dumps(r2, indent=4))
 
     trip_id = r2["data"][0]["id"]
+    assert trip_id, "No trip was found"
     assert is_valid_uuid(trip_id, 5) is True, "trip_id uuid must be in uuid v5 format"
 
 
@@ -75,6 +76,7 @@ async def test_get_trips_by_trip_search_id(
         destination,
         origin,
     )
+    assert trip_search_id is not None, "No trip search was found"
     assert is_valid_uuid(trip_search_id) is True, "trip_search_id uuid in v4 format"
 
     time.sleep(5)
@@ -83,6 +85,7 @@ async def test_get_trips_by_trip_search_id(
     logging.info("get_trips_by_trip_search_id response: %s", json.dumps(r2, indent=4))
 
     trip_id = r2["data"][0]["id"]
+    assert trip_id is not None, "No trip was found"
     assert is_valid_uuid(trip_id, 5) is True, "trip_id uuid must be in uuid v5 format"
 
 
@@ -135,6 +138,7 @@ async def test_get_legs_by_trip_id(
     r2 = await junction_client.trips().get_trips_by_trip_search_id(trip_search_id)
     logging.info("get_trips_by_trip_search_id response: %s", json.dumps(r2, indent=4))
 
+    assert r2, "no data"
     trip_id = r2["data"][0]["id"]
     logging.info("trip_id: %s", trip_id)
     assert is_valid_uuid(trip_id, 5) is True, "trip_id uuid must be in uuid v5 format"

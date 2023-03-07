@@ -28,4 +28,5 @@ async def test_get_leg_by_id(
 
     for leg in legs:
         leg_data = await junction_client.legs().get_leg_by_id(leg["id"])
+        assert leg_data, "no data found"
         assert "operator" in leg_data["data"]["attributes"]

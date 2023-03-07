@@ -46,6 +46,7 @@ async def test_get_segment_by_id(
     r3 = await junction_client.segments().get_segment_by_id(segment_id)
     logging.info("get_segment_by_id: %s", json.dumps(r3, indent=4))
 
+    assert r3, "no data"
     assert r3["data"]["id"] == segment_id, "segment_id should match"
 
 
@@ -75,6 +76,7 @@ async def test_get_legs_by_segment_id(
         segment_id,
     )
     logging.info("get_legs_by_segment_id: %s", json.dumps(r1, indent=4))
+    assert is_valid_uuid is not None, "no data"
     assert (
         is_valid_uuid(r1["data"][0]["id"], 5) is True
     ), "trip_search_id uuid in v4 format"

@@ -402,8 +402,15 @@ async def return_trip_offer_search_id(
         passengers_dates_of_birth=[datetime.date(year=year, month=month, day=day)],
     )
     logging.info("create_offer_search: %s", json.dumps(r3, indent=4))
-
-    return r3["data"]["id"]
+    offer_search_id = r3["data"]["id"]
+    for _ in range(3):
+        await asyncio.sleep(1000)
+        resp = await junction_client.get_offer_search(offers_search_id=offer_search_id)
+        if resp["data"]["attributes"] == "completed":
+            break
+    else:
+        raise RuntimeError("Offer search status check was timed out!")
+    return offer_search_id
 
 
 async def return_trip_search_id_from_trip_id(

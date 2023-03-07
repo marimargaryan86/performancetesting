@@ -51,5 +51,5 @@ async def test_create_offer_quote(
             session_token=return_randomized_token(),
         )
 
-    logging.info("create_offer_quote: %s", json.dumps(response_post, indent=4))
-    assert is_valid_uuid(response_post["data"]["id"]) is True
+        logging.info("create_offer_quote: %s", json.dumps(response_post, indent=4))
+        assert is_valid_uuid(response_post["data"]["id"]) is True

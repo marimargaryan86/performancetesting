@@ -38,6 +38,7 @@ async def test_get_leg_by_id(
     logging.info("get_leg_by_id: %s", json.dumps(r4, indent=4))
 
     leg_id = r4["data"]["id"]
+    assert leg_id, "no data"
     assert leg_id == relationships["legs"]["data"][0]["id"], "leg_id should match"
 
 
@@ -75,7 +76,7 @@ async def return_leg_types(junction_client: JunctionClient) -> list[str]:
     leg_types = []
     for idx, _ in enumerate(r0["data"]):
         leg_types.append(r0["data"][idx]["id"])
-    logging.info("leg_types: %s", leg_types)
+        logging.info("leg_types: %s", leg_types)
     return leg_types
 
 
