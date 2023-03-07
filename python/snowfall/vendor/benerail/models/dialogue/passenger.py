@@ -3,7 +3,7 @@ from typing import Literal
 
 import pydantic
 
-from snowfall.vendor.benerail import enums
+from snowfall.vendor.benerail.enums import Gender
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
 from snowfall.vendor.benerail.models.link import Supplier
 
@@ -49,7 +49,7 @@ class PassengerRequest(BenerailBaseModel):
     date_of_birth: datetime.date | None
     cards: list[PassengerRequestCards] | None
     corporate_contracts: list[PassengerRequestCorporateContracts] | None
-    gender: enums.Gender | None
+    gender: Gender | None
     details: PassengerDetail | None
 
 
@@ -59,6 +59,6 @@ class Passenger(BenerailBaseModel):
     date_of_birth: datetime.date | None
     cards: list[PassengerCards] | None
     corporate_contracts: list[PassengerCorporateContracts] | None
-    gender: enums.Gender | None
+    gender: Gender | None
     details: PassengerDetail | None
     passenger_status: Literal["created", "in use", "immutable"] | None

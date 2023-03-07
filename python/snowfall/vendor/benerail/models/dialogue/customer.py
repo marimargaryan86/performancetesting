@@ -3,7 +3,7 @@ from typing import Literal
 import pydantic
 
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
-from snowfall.vendor.benerail.models.booking import ConfirmationEmail
+from snowfall.vendor.benerail.models.bookings.booking import ConfirmationEmail
 from snowfall.vendor.benerail.models.link import LinkToRcode
 
 

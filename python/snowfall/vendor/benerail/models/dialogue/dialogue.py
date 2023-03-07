@@ -4,7 +4,8 @@ from typing import Literal
 import pydantic
 
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
-from snowfall.vendor.benerail.models.link import ResourceLink, TrainType
+from snowfall.vendor.benerail.models.bookings.train import TrainType
+from snowfall.vendor.benerail.models.link import ResourceLink
 
 
 class DialogueIdTripFiltersParams(BenerailBaseModel):

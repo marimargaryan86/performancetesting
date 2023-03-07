@@ -15,6 +15,11 @@ class LinkToRcode(BenerailBaseModel):
     link_to_rcode_value: str | None = pydantic.Field(..., alias="value")
 
 
+class RcodeLink(BenerailBaseModel):
+    href: str | None
+    rcode_link_value: str | None = pydantic.Field(..., alias="value")
+
+
 class Link(BenerailBaseModel):
     href: str | None
     title: str | None
@@ -27,16 +32,15 @@ class Link(BenerailBaseModel):
     ] | None = pydantic.Field(..., alias="type")
 
 
-class TrainType1(BenerailBaseModel):
-    href: str | None
-    train_type_value: str | None = pydantic.Field(..., alias="value")
-
-
-class TrainType(BenerailBaseModel):
-    train_type: str | None
-    preference_type: Literal["REQUIRED", "UNACCEPTABLE"] | None
-
-
 class Supplier(BenerailBaseModel):
     href: str | None
     supplier_value: str | None = pydantic.Field(..., alias="value")
+
+
+class LinkToBinary(BenerailBaseModel):
+    href: str | None
+    title: str | None
+    link_format: Literal["application/pdf", "image/png"] | None = pydantic.Field(
+        ...,
+        alias="format",
+    )
