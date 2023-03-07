@@ -1,3 +1,5 @@
+from typing import Sequence
+
 import currencycloud
 
 from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
@@ -5,6 +7,7 @@ from snowfall.vendor.currency_cloud.models.account import (
     AccountRequest,
     AccountResponse,
 )
+from snowfall.vendor.currency_cloud.models.balance import BalanceResponse
 from snowfall.vendor.currency_cloud.models.contact import (
     ContactRequest,
     ContactResponse,
@@ -74,3 +77,21 @@ class PaymentClient(object):
             ) from exc
 
         return AccountResponse(**account._attributes)  # noqa: WPS437
+
+    def get_balances(self, contact_id: str) -> Sequence[BalanceResponse]:
+        try:
+            balances = self._cc_client.balances.find(
+                on_behalf_of=contact_id,
+                order="amount",
+                order_asc_desc="asc",
+            )
+        except currencycloud.errors.api.ApiError as exc:
+            error = exc.messages[0]
+            raise CurrencyCloudError(
+                error.message,
+            ) from exc
+
+        return [
+            BalanceResponse(**balance._attributes)  # noqa: WPS437
+            for balance in balances
+        ]
