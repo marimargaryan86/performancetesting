@@ -1,17 +1,19 @@
 import asyncio
+import datetime
 import os
-from datetime import datetime
-from typing import Any, Sequence
+from typing import Any, Generator, Sequence
 
 import pydantic
+import structlog
+import tenacity
 
 from snowfall.vendor.direct_ferries import client, errors
 from snowfall.vendor.direct_ferries.models import operator, route, timetable
 
-_LAST_MONTH_OF_YEAR = 12
-_LAST_DAY_OF_YEAR = 31
-_CURRENT_DATE = datetime.now().date()
-_DURATION = 300
+_CURRENT_DATETIME = datetime.datetime.now()
+_REQUEST_DATE_INTERVAL_DAYS = 30
+_REQUEST_DATE_INTERVAL = datetime.timedelta(days=_REQUEST_DATE_INTERVAL_DAYS)
+_DAYS_IN_YEAR = 365
 _CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
@@ -22,10 +24,11 @@ class Schedule(pydantic.BaseModel):
 
 
 class TimetableRepository(object):
-    _requests_per_second = 40
+    _requests_per_second = 50
 
     def __init__(self, df_client: client.DfClient) -> None:
         self._df_client = df_client
+        self._logger = structlog.get_logger(__name__)
 
     async def get_timetables(self) -> Sequence[timetable.TimetableResponse]:
         operators = (
@@ -72,30 +75,30 @@ class TimetableRepository(object):
             [
                 [
                     self._df_client.timetables.get_timetables,
-                    [
-                        route,
-                        _CURRENT_DATE,
-                        _CURRENT_DATE.replace(
-                            month=_LAST_MONTH_OF_YEAR,
-                            day=_LAST_DAY_OF_YEAR,
-                        ),
-                    ],
+                    [route, start_date, end_date],
                 ]
                 for route in routes
+                for start_date, end_date in _chunk_datetime_interval(
+                    _CURRENT_DATETIME,
+                    _CURRENT_DATETIME + datetime.timedelta(days=_DAYS_IN_YEAR),
+                    _REQUEST_DATE_INTERVAL,
+                )
             ],
         )
 
-    async def _request_by_chunks(  # noqa: WPS210
+    async def _request_by_chunks(
         self,
         requests: Sequence[Sequence[Any]],
     ) -> Sequence[Any]:
         response_data = []
-        failed = []
 
         for index in range(0, len(requests), self._requests_per_second):
             responses = await asyncio.gather(
                 *[
-                    request_details[0](*request_details[1])
+                    tenacity.retry(  # type: ignore[misc]
+                        retry=tenacity.retry_if_exception_type(errors.DFServiceError),
+                        stop=tenacity.stop_after_attempt(3),
+                    )(request_details[0])(*request_details[1])
                     for request_details in requests[
                         index : index + self._requests_per_second
                     ]
@@ -103,15 +106,28 @@ class TimetableRepository(object):
                 return_exceptions=True,
             )
 
-            for current_index, response in enumerate(responses):
-                if isinstance(response, errors.DFServiceError):
-                    failed.append(requests[index + current_index])
+            for response in responses:
+                if isinstance(response, tenacity.RetryError):
+                    self._logger.error(
+                        "Request failed",
+                        exception=response,
+                    )
                 else:
                     response_data.append(response)
 
             await asyncio.sleep(1)
 
-        if failed:
-            response_data.extend(await self._request_by_chunks(failed))
-
         return response_data
+
+
+def _chunk_datetime_interval(
+    start_dt: datetime.datetime,
+    end_dt: datetime.datetime,
+    chunk_size: datetime.timedelta,
+) -> Generator[tuple[datetime.datetime, datetime.datetime], None, None]:
+    current = start_dt
+
+    while current < end_dt:
+        chunk_end_date = min(current + chunk_size, end_dt)
+        yield current, chunk_end_date - datetime.timedelta(seconds=1)
+        current = chunk_end_date

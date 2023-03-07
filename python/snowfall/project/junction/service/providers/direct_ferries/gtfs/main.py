@@ -54,7 +54,7 @@ async def _create_gtfs(app: service.Application[DFSetting]) -> None:
         timetable_responses=timetable_responses,
     )
 
-    await GTFSGenerator().generate_feed(converter)
+    await GTFSGenerator(app.settings.output_path).generate_feed(converter)
 
 
 if __name__ == "__main__":

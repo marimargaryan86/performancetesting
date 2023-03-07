@@ -11,9 +11,9 @@ resource(
 resource(
     name="ports",
     source=http_source(
-        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/df-ports-3908230be39c7d907203859b41ef40516509951bb3fb28d24fbcc82bf45adbcc.json",
-        len=95804,
-        sha256="3908230be39c7d907203859b41ef40516509951bb3fb28d24fbcc82bf45adbcc",
+        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/df-ports-864b8ea4b32d91b1009a3e1ed7a1789ce31b13e643ce94d2fa3a7e3576c406f9.json",
+        len=95798,
+        sha256="864b8ea4b32d91b1009a3e1ed7a1789ce31b13e643ce94d2fa3a7e3576c406f9",
         filename="ports.json",
     ),
 )

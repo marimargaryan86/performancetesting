@@ -50,7 +50,10 @@ def _models_to_csv(
     models: Generator[pydantic.BaseModel, None, None],
 ) -> str:
     with open(file_name, _WRITE_MODE) as file_obj:
-        first = next(models)
+        try:
+            first = next(models)
+        except StopIteration:
+            return file_name
 
         writer = csv.DictWriter(
             file_obj,
@@ -65,6 +68,9 @@ def _models_to_csv(
 
 
 class GTFSGenerator(object):
+    def __init__(self, output_dir: str) -> None:
+        self._output_dir = output_dir
+
     async def generate_feed(
         self,
         converter: gtfs_converter.DFDataConverter,
@@ -87,7 +93,7 @@ class GTFSGenerator(object):
 
     def compress_files(self) -> None:
         with zipfile.ZipFile(
-            "{0}/directferries.zip".format(_OUTPUT_PATH),
+            "{0}/directferries.zip".format(self._output_dir),
             "w",
         ) as zip_f:
             for file_name in CompressFileList.file_list():

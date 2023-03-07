@@ -13,8 +13,8 @@ class TimetableClient(abc.ABC):
     async def get_timetables(
         self,
         route: Route,
-        date_from: datetime.date,
-        date_to: datetime.date,
+        date_from: datetime.datetime,
+        date_to: datetime.datetime,
     ) -> timetable.TimetableResponse:
         """Get timetables of the given route."""
 
@@ -23,8 +23,8 @@ class TimetableHttpClient(base.BaseClient, TimetableClient):
     async def get_timetables(
         self,
         route: Route,
-        date_from: datetime.date,
-        date_to: datetime.date,
+        date_from: datetime.datetime,
+        date_to: datetime.datetime,
     ) -> timetable.TimetableResponse:
         response_data = (
             await self._make_request(

@@ -12,5 +12,5 @@ class DFSetting(service.Settings):
     timeout: int
     always_run: bool = False
     mongo_dsn: tuple[pydantic.AnyUrl]
-    output_path: str
+    output_path: str = "dist/import/gtfs-feed/direct-ferries"
     redis_dsn: tuple[pydantic.AnyUrl]

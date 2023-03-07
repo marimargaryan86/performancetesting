@@ -53,13 +53,25 @@ class BaseClient(object):
                 headers=await self._default_headers(),
             )
         except httpx.HTTPError as raw_exc:
-            raise errors.DFServiceError(inspect.getdoc(raw_exc)) from raw_exc
+            query = (
+                str(request_details.query_params)
+                if request_details.query_params
+                else ""
+            )
+
+            req_url = "{0}/{1}".format(request_details.url.rstrip("/"), query)
+
+            raise errors.DFServiceError(
+                inspect.getdoc(raw_exc) or "",
+                req_url,
+            ) from raw_exc
 
         try:
             response.raise_for_status()
         except httpx.HTTPError as exc:
             raise errors.DFServiceError(
                 errors.get_response_error_message(response),
+                str(response.request.url),
             ) from exc
 
         return response

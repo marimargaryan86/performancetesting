@@ -12,6 +12,15 @@ class DFError(Exception):
 class DFServiceError(DFError):
     """Raised when the DF service is unhealthy."""
 
+    def __init__(self, message: str, service_url: str) -> None:
+        self._service_url = service_url
+
+        super().__init__(message)
+
+    @property
+    def service_url(self) -> str:
+        return self._service_url
+
 
 class DFTimeoutError(httpx.TimeoutException):
     """Raised when the DF service return Timeout exception."""
