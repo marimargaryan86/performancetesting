@@ -100,3 +100,11 @@ rules:
     then:
       - field: "put"
         function: undefined
+  json-api-no-required-parameters:
+    description: "Required query parameters are not allowed, either make this a `POST` endpoint or make the required parameter part of the path."
+    given: $.components.parameters[?(@.in=="query")]
+    severity: error
+    then:
+      - field: "required"
+        function: falsy
+

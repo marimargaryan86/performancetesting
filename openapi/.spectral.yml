@@ -35,4 +35,8 @@ overrides:
       - "junction/pay_api/openapi.json#/components/parameters/currencyId"
     rules:
       no-numeric-ids: info
+  - files:
+      - "junction/pay_admin_api/openapi.json#/components/parameters/company"
+    rules:
+      json-api-no-required-parameters: info
 
