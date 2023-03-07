@@ -1,0 +1,52 @@
+commits:
+  scopes:
+    golang:
+      - "golang"
+    junction/base:
+      - "python/snowfall/project/pss"
+    junction/extensions:
+      - "openapi/junction/mobile_api"
+      - "protobuf/snowfall/project/junction/service/mobile_api"
+      - "python/snowfall/project/junction/api_automation/mobile_api_tests"
+      - "python/snowfall/project/junction/service/mobile_api"
+    junction/go:
+      - ".gitlab/junction"
+      - "openapi/junction/admin_api"
+      - "openapi/junction/client_api"
+      - "protobuf/snowfall/project/junction"
+      - "python/snowfall/project/junction"
+      - "svelte/junction-admin"
+    junction/hub:
+      - "svelte/hub-web"
+    junction/pay:
+      - "openapi/junction/pay_admin_api"
+      - "openapi/junction/pay_api"
+      - "protobuf/snowfall/project/pay"
+      - "python/snowfall/project/junction/api_automation/pay_api_tests"
+      - "python/snowfall/project/pay"
+    python:
+      - "python"
+    python/stdlib:
+      - "python/snowfall/stdlib"
+    snowman:
+      - "golang/cmd/snowman"
+    vendor/ask2go:
+      - "python/snowfall/vendor/ask2go"
+    vendor/ba-ndc:
+      - "python/snowfall/vendor/ba_ndc"
+    vendor/benerail:
+      - "python/snowfall/vendor/benerail"
+    vendor/bound:
+      - "python/snowfall/vendor/bound"
+    vendor/carnect:
+      - "python/snowfall/vendor/carnect"
+    vendor/direct-ferries:
+      - "python/snowfall/vendor/direct-ferries"
+    vendor/distribusion:
+      - "python/snowfall/vendor/distribusion"
+    vendor/duffel:
+      - "python/snowfall/vendor/duffel"
+    vendor/karhoo:
+      - "python/snowfall/vendor/karhoo"
+    vendor/save-a-train:
+      - "python/snowfall/vendor/save-a-train"
