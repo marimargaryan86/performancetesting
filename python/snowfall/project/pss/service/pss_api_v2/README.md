@@ -64,3 +64,21 @@ You can then make requests to the URL output in the logs:
 {"event":"Application startup complete.","source":"application","logger":"uvicorn.error","level":"info","timestamp":"2023-01-30T17:07:42.534997Z"}
 {"event":"Uvicorn running on http://127.0.0.1:8005 (Press CTRL+C to quit)","source":"application","logger":"uvicorn.error","level":"info","timestamp":"2023-01-30T17:07:42.535219Z"}
 ```
+
+## Functionality not to be implemented
+
+Because PSS is an amalgamation of lots of projects, Ragusa doesn't need all of
+the current functionality which could potentially lead to less re-write work.
+
+High level over-arching things include:
+
+* Not worrying about `loyalty`
+* Not worrying about `mailchimp` usage
+* Not worrying about `psp`
+
+### /transactions
+
+`Addons` are mentioned a lot in `POST` `/transactions`, for now, they are to be
+ignored as not used by Ragusa from our understanding.
+
+We are not using `affiliate_id`s.

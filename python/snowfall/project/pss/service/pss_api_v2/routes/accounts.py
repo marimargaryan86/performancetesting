@@ -84,7 +84,7 @@ async def update_account(
 @router.post(
     "/login",
     response_model=ResponseSchema[AccountDetailedResponseSchema],
-    responses=openapi_responses.login_responses,
+    responses=openapi_responses.forbidden_not_found_responses,
 )
 async def account_login(
     account_data: AccountLoginSchema,
@@ -119,7 +119,7 @@ async def account_login(
 @router.post(
     "/forgotpassword",
     response_model=ResponseSchema,
-    responses=openapi_responses.forgot_password_responses,
+    responses=openapi_responses.not_found_response,
 )
 async def forgot_password(
     account_forgot_password_data: AccountForgotPasswordSchema,
@@ -144,7 +144,7 @@ async def forgot_password(
 @router.post(
     "/resetpassword",
     response_model=ResponseSchema,
-    responses=openapi_responses.reset_password_responses,
+    responses=openapi_responses.forbidden_not_found_responses,
 )
 async def reset_password(
     account_reset_password_data: AccountResetPasswordSchema,

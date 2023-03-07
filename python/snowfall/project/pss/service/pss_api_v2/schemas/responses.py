@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 from pydantic.generics import GenericModel
 
@@ -18,3 +18,4 @@ class ResponseSchema(GenericModel, Generic[TYPE_VAR]):
 class ErrorResponseSchema(BaseModel):
     status: str = FAIL
     message: str
+    data: Any = None  # noqa:WPS110

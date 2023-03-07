@@ -14,8 +14,8 @@ class SuccessResponse(JSONResponse):
 
 
 class ErrorResponse(JSONResponse):
-    def __init__(self, status_code: int, message: str):
+    def __init__(self, status_code: int, message: str, error_data: Any = None):
         super().__init__(
             status_code=status_code,
-            content={"status": FAIL, "message": message},
+            content={"status": FAIL, "message": message, "data": error_data},
         )

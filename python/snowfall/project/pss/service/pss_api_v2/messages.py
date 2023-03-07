@@ -7,3 +7,10 @@ ACCOUNT_PASSWORD_DONT_MATCH = "ERR_ACCOUNT_PASSWORD_DONT_MATCH"  # nosec
 ACCOUNT_FORGOTTEN_PASSWORD_TOKEN_NOT_FOUND = "ERR_TOKEN_NOT_FOUND"  # nosec
 ACCOUNT_FORGOTTEN_PASSWORD_TOKEN_ALREADY_USED = "ERR_TOKEN_USED"  # nosec
 ACCOUNT_FORGOTTEN_PASSWORD_TOKEN_EXPIRED = "ERR_TOKEN_EXPIRED"  # nosec
+TRANSACTION_REQUESTS_FROM_CLIENT_NOT_ALLOWED = (
+    "Requests for this client are not allowed."
+)
+TRANSACTION_DUPLICATE_SEAT_NOT_ALLOWED = (
+    "Passengers with the same seat_id in a direction are not allowed."
+)
+TRANSACTION_INVALID = "The provided transaction was invalid, see `data` for reasons."
