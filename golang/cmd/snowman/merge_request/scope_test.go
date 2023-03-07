@@ -21,7 +21,7 @@ func TestDetermineBestScope(t *testing.T) {
 		{[]string{"foobar/sub/folder/foobar.py"}, "foobar/sub"},
 		{[]string{"foobar/foobar.py", "bazqux/other/sub/folder/bazqux.py"}, "bazqux/sub"},
 		{[]string{"foobar/foobar.py", "bazqux/bazqux.py"}, ""},
-		{[]string{"foobar/foobar.py", "snowfall/snowfall.py"}, "foobar"},
+		{[]string{"foobar/foobar.py", "foobar/foobar2.py", "snowfall/snowfall.py"}, "foobar"},
 	} {
 		if scope := determineBestScope(scopes, table.files); scope != table.expected {
 			t.Errorf(`determineBestScope(%v, %v) returned the wrong scope, got: "%s", wanted: "%s".`, scopes, table.files, scope, table.expected)

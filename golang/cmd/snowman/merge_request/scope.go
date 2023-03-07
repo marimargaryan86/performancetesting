@@ -78,7 +78,7 @@ func determineBestScope(scopes common.ScopesConfiguration, changedFiles []string
 						bestDepth = depth
 						bestScope = scope
 						depthConflict = false
-					} else if bestDepth == depth {
+					} else if bestDepth == depth && bestScope != scope {
 						depthConflict = true
 					}
 				}

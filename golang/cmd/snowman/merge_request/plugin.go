@@ -32,41 +32,14 @@ func NewPlugin(client *gitlab.Client, logger *zap.SugaredLogger, snowman *gitlab
 	}
 }
 
-type invokable func() error
-
-func (plugin *MergeRequestPlugin) OnEvent(event interface{}) {
-	plugin.mu.Lock()
-
-	defer plugin.mu.Unlock()
-
-	var projectId int
-	var mrId int
-
-	switch e := event.(type) {
-	case *gitlab.MergeEvent:
-		projectId = e.Project.ID
-		mrId = e.ObjectAttributes.IID
-	case *gitlab.MergeCommentEvent:
-		projectId = e.ProjectID
-		mrId = e.MergeRequest.IID
-	case *gitlab.PipelineEvent:
-		if e.MergeRequest.IID == 0 {
-			return
-		}
-
-		projectId = e.Project.ID
-		mrId = e.MergeRequest.IID
-	default:
-		return
-	}
-
+func (plugin *MergeRequestPlugin) onEvent(pid int, iid int) {
 	var mr *gitlab.MergeRequest
 	var err error
 
 	for {
 		mr, _, err = plugin.client.MergeRequests.GetMergeRequestChanges(
-			projectId,
-			mrId,
+			pid,
+			iid,
 			&gitlab.GetMergeRequestChangesOptions{},
 		)
 
@@ -129,4 +102,35 @@ func (plugin *MergeRequestPlugin) OnEvent(event interface{}) {
 			return // No need to run further since the changes will have triggered another event.
 		}
 	}
+}
+
+type invokable func() error
+
+func (plugin *MergeRequestPlugin) OnEvent(event interface{}) {
+	plugin.mu.Lock()
+
+	defer plugin.mu.Unlock()
+
+	var projectId int
+	var mrId int
+
+	switch e := event.(type) {
+	case *gitlab.MergeEvent:
+		projectId = e.Project.ID
+		mrId = e.ObjectAttributes.IID
+	case *gitlab.MergeCommentEvent:
+		projectId = e.ProjectID
+		mrId = e.MergeRequest.IID
+	case *gitlab.PipelineEvent:
+		if e.MergeRequest.IID == 0 {
+			return
+		}
+
+		projectId = e.Project.ID
+		mrId = e.MergeRequest.IID
+	default:
+		return
+	}
+
+	plugin.onEvent(projectId, mrId)
 }

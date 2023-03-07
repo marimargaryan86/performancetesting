@@ -65,7 +65,7 @@ func (hook webhook) parse(r *http.Request) (interface{}, error) {
 
 	eventType := gitlab.EventType(event)
 
-	hook.Logger.With("type", eventType).Info("Event received.")
+	hook.Logger.With("type", eventType).Debug("Event received.")
 
 	payload, err := ioutil.ReadAll(r.Body)
 
