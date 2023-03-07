@@ -80,7 +80,7 @@ job "ba-ndc-searches" {
       driver = "docker"
 
       vault {
-        policies = ["ba-ndc-${var.environment}"]
+        policies = ["ndc-ba-${var.environment}"]
       }
 
       template {
