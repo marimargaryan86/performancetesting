@@ -107,4 +107,13 @@ rules:
     then:
       - field: "required"
         function: falsy
+  json-api-query-parameter-names:
+    description: "Query parameters should be either `sort`, `include`, `page[limit]`, `page[cursor]` or match `filter[.+]`."
+    message: "`{{value}}` is an invalid query parameter name, it should be one of `sort`, `include`, `page[limit]`, `page[cursor]` or match `filter[.+]`."
+    given: $.components.parameters[?(@.in=="query")].name
+    severity: error
+    then:
+      function: pattern
+      functionOptions:
+        match: "^include|sort|page\\[(limit|cursor)\\]|filter\[[a-z]([A-Za-z]|\\.[a-z][A-Za-z])+\\]$"
 
