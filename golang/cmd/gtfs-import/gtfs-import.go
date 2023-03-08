@@ -10,6 +10,8 @@ The DB-format files are used to load the MongoDB collections.
 Requires command line parameters for:
 	1) Path to the ZIP files
 	2) Directory for the output files
+	3) (Optional) number of days into the future to include data
+		(helpful to create smaller test datasets).
 
 Creates a temporary directory for the .TXT files, destroyed on exit
 */
@@ -218,12 +220,14 @@ func closeFile(f io.Closer) {
 
 var serviceDateCache map[string][]time.Time
 
-func serviceDates(serviceId string, calendarDates []*gtfs.CalendarDate, calendars []*gtfs.Calendar, timeZone *time.Location) []time.Time {
+func serviceDates(serviceId string, calendarDates []*gtfs.CalendarDate, calendars []*gtfs.Calendar, timeZone *time.Location, cutoff time.Time) []time.Time {
 	if v, ok := serviceDateCache[serviceId]; ok {
 		return v
 	}
 
 	now := time.Now()
+	// No point including today's data, as it won't be relevant by the time it's deployed.
+	now = now.AddDate(0, 0, 1)
 	now = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, timeZone)
 	result := make(map[time.Time]struct{}, 0)
 
@@ -257,7 +261,7 @@ func serviceDates(serviceId string, calendarDates []*gtfs.CalendarDate, calendar
 				timeZone,
 			)
 
-			if current.Before(now) || !weekdays[current.Weekday()] {
+			if current.Before(now) || !weekdays[current.Weekday()] || current.After(cutoff) {
 				continue
 			}
 
@@ -555,6 +559,14 @@ func main() {
 	check(os.MkdirAll(inputDir, 0755))
 	outputDir := os.Args[2]
 	check(os.MkdirAll(outputDir, 0755))
+	now := time.Now()
+	now = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
+	cutoffDate := now.AddDate(2, 0, 0) // 2 years by default.
+	if len(os.Args) >= 4 {
+		days, err := strconv.Atoi(os.Args[3])
+		check(err)
+		cutoffDate = now.AddDate(0, 0, days)
+	}
 	programStartTime := time.Now()
 
 	var fileWriterWg sync.WaitGroup
@@ -746,7 +758,7 @@ func main() {
 							db.Where("service_id = ?", trip.ServiceId).Find(&calendars)
 						}
 
-						for _, serviceDate := range serviceDates(trip.ServiceId, calendarDates, calendars, agency.Timezone) {
+						for _, serviceDate := range serviceDates(trip.ServiceId, calendarDates, calendars, agency.Timezone, cutoffDate) {
 							legs := make([]*v1alpha.Leg, 0, len(stopTimes))
 							scheduleId := uuid.NewSHA1(fileNamespace, []byte(strings.Join([]string{
 								trip.Id,
