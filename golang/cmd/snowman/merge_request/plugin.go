@@ -13,10 +13,16 @@ type configCacheItem struct {
 	fetchedAt time.Time
 }
 
+type timerKey struct {
+	projectId      int
+	mergeRequestId int
+}
+
 type MergeRequestPlugin struct {
 	client              *gitlab.Client
 	logger              *zap.SugaredLogger
 	mu                  sync.Mutex
+	timers              map[timerKey]*time.Timer
 	snowman             *gitlab.User
 	configCache         map[int]configCacheItem
 	configCacheDuration time.Duration
@@ -32,7 +38,9 @@ func NewPlugin(client *gitlab.Client, logger *zap.SugaredLogger, snowman *gitlab
 	}
 }
 
-func (plugin *MergeRequestPlugin) onEvent(pid int, iid int) {
+const debounceTime = 10 * time.Second
+
+func (plugin *MergeRequestPlugin) onTimer(pid int, iid int) {
 	var mr *gitlab.MergeRequest
 	var err error
 
@@ -132,5 +140,16 @@ func (plugin *MergeRequestPlugin) OnEvent(event interface{}) {
 		return
 	}
 
-	plugin.onEvent(projectId, mrId)
+	key := timerKey{
+		projectId:      projectId,
+		mergeRequestId: mrId,
+	}
+
+	if t, ok := plugin.timers[key]; !ok {
+		plugin.timers[key] = time.AfterFunc(debounceTime, func() {
+			plugin.onTimer(projectId, mrId)
+		})
+	} else {
+		t.Reset(debounceTime)
+	}
 }
