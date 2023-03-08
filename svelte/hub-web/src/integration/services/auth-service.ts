@@ -1,8 +1,8 @@
 import ResponseError from "integration/response-error";
 import type { CreateAuthTokenResponse } from "integration/schemas/auth";
-import BaseService from "./base-service";
+import JsonApiService from "./json-api-service";
 
-export default class AuthService extends BaseService {
+export default class AuthService extends JsonApiService {
   async createToken(data: { email: string; password: string }): Promise<string> {
     const result = await this.post("/users/tokens", {
       data: {

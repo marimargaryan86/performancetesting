@@ -1,6 +1,4 @@
-type ResourceURL = `/${string}`;
-
-export default abstract class BaseService {
+export default abstract class JsonApiService {
   private readonly baseUrl: string;
   private readonly headers = { "Content-Type": "application/vnd.api+json" };
 
@@ -12,7 +10,7 @@ export default abstract class BaseService {
     return new URL(resource, this.baseUrl);
   }
 
-  protected get(resource: ResourceURL, init?: RequestInit): Promise<Response> {
+  protected get(resource: string, init?: RequestInit): Promise<Response> {
     return fetch(this.getUrl(resource), {
       ...init,
       method: "GET",
@@ -20,7 +18,7 @@ export default abstract class BaseService {
     });
   }
 
-  protected post(resource: ResourceURL, data: unknown, init?: RequestInit): Promise<Response> {
+  protected post(resource: string, data: unknown, init?: RequestInit): Promise<Response> {
     return fetch(this.getUrl(resource), {
       ...init,
       body: JSON.stringify(data),
@@ -29,7 +27,7 @@ export default abstract class BaseService {
     });
   }
 
-  protected patch(resource: ResourceURL, data: unknown, init?: RequestInit): Promise<Response> {
+  protected patch(resource: string, data: unknown, init?: RequestInit): Promise<Response> {
     return fetch(this.getUrl(resource), {
       ...init,
       body: JSON.stringify(data),
@@ -38,7 +36,7 @@ export default abstract class BaseService {
     });
   }
 
-  protected put(resource: ResourceURL, data: unknown, init?: RequestInit): Promise<Response> {
+  protected put(resource: string, data: unknown, init?: RequestInit): Promise<Response> {
     return fetch(this.getUrl(resource), {
       ...init,
       body: JSON.stringify(data),
@@ -47,7 +45,7 @@ export default abstract class BaseService {
     });
   }
 
-  protected delete(resource: ResourceURL, init?: RequestInit): Promise<Response> {
+  protected delete(resource: string, init?: RequestInit): Promise<Response> {
     return fetch(this.getUrl(resource), {
       ...init,
       method: "DELETE",
