@@ -32,6 +32,7 @@ func NewPlugin(client *gitlab.Client, logger *zap.SugaredLogger, snowman *gitlab
 	return &MergeRequestPlugin{
 		client:              client,
 		logger:              logger.Named("merge_request"),
+		timers:              make(map[timerKey]*time.Timer, 0),
 		snowman:             snowman,
 		configCache:         make(map[int]configCacheItem, 0),
 		configCacheDuration: time.Minute * 10,
