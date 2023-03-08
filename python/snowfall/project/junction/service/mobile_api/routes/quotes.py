@@ -51,17 +51,19 @@ class OfferQuote(endpoints.HTTPEndpoint):
         )
         attributes = offer_quote_response[_DATA_KEY][_ATTRIBUTES_KEY]
         if cached_rate and attributes["status"] == "completed":
-            new_money = money.from_string(
-                attributes["price"]["amount"],
-                money.Currency(
-                    attributes["price"]["currency"],
-                ),
-            ).convert(
-                money.Currency(cached_rate.currency),
-                decimal.Decimal(cached_rate.rate),
-            )
-            attributes["price"]["amount"] = str(
-                new_money,
-            )
-            attributes["price"]["currency"] = cached_rate.currency
+            attributes_price_currency = attributes["price"]["currency"]
+            if cached_rate.currency != attributes_price_currency:
+                new_money = money.from_string(
+                    attributes["price"]["amount"],
+                    money.Currency(
+                        attributes_price_currency,
+                    ),
+                ).convert(
+                    money.Currency(cached_rate.currency),
+                    decimal.Decimal(cached_rate.rate),
+                )
+                attributes["price"]["amount"] = str(
+                    new_money,
+                )
+                attributes["price"]["currency"] = cached_rate.currency
         return models.JsonApiResponse(models.Body(data=offer_quote_response["data"]))

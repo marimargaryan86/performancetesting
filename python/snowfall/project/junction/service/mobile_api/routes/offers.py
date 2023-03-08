@@ -127,15 +127,21 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
         if cached_rate:
             for include in offers_response.get("included", []):
                 if include["type"] == "offer-options":
-                    new_money = money.from_string(
-                        include["attributes"]["price"]["amount"],
-                        money.Currency(include["attributes"]["price"]["currency"]),
-                    ).convert(
-                        money.Currency(cached_rate.currency),
-                        decimal.Decimal(cached_rate.rate),
-                    )
-                    include["attributes"]["price"]["amount"] = str(new_money)
-                    include["attributes"]["price"]["currency"] = cached_rate.currency
+                    include_attributes_price_currency = include["attributes"]["price"][
+                        "currency"
+                    ]
+                    if cached_rate.currency != include_attributes_price_currency:
+                        new_money = money.from_string(
+                            include["attributes"]["price"]["amount"],
+                            money.Currency(include_attributes_price_currency),
+                        ).convert(
+                            money.Currency(cached_rate.currency),
+                            decimal.Decimal(cached_rate.rate),
+                        )
+                        include["attributes"]["price"]["amount"] = str(new_money)
+                        include["attributes"]["price"][
+                            "currency"
+                        ] = cached_rate.currency
         response_body = models.Body(
             data=offers_response["data"],
             links={

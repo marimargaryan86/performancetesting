@@ -312,13 +312,17 @@ def _convert_junction_order_currency(
     order_response = copy.deepcopy(order_response)
     for include in order_response.get("included", []):
         if include["type"] == "trip-bookings":
-            new_money = money.from_string(
-                include["attributes"]["totalPrice"]["amount"],
-                money.Currency(include["attributes"]["totalPrice"]["currency"]),
-            ).convert(
-                money.Currency(mobile_order.currency),
-                decimal.Decimal(mobile_order.rate),
-            )
-            include["attributes"]["totalPrice"]["amount"] = str(new_money)
-            include["attributes"]["totalPrice"]["currency"] = mobile_order.currency
+            include_attributes_totalprice_currency = include["attributes"][
+                "totalPrice"
+            ]["currency"]
+            if include_attributes_totalprice_currency != mobile_order.currency:
+                new_money = money.from_string(
+                    include["attributes"]["totalPrice"]["amount"],
+                    money.Currency(include_attributes_totalprice_currency),
+                ).convert(
+                    money.Currency(mobile_order.currency),
+                    decimal.Decimal(mobile_order.rate),
+                )
+                include["attributes"]["totalPrice"]["amount"] = str(new_money)
+                include["attributes"]["totalPrice"]["currency"] = mobile_order.currency
     return dict(order_response)
