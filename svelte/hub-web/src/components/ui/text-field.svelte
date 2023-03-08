@@ -19,9 +19,7 @@
 
   const dispatch = createEventDispatcher<{ input: InputEvent }>();
 
-  $: displayValue = value === undefined ? "" : value;
-
-  function onInput(ev: InputEvent): void {
+  function updateValue(ev: InputEvent): void {
     if (type === "number") {
       value = parseInt(ev.currentTarget.value, 10) as TValue;
     } else {
@@ -44,9 +42,9 @@
       {id}
       class="typography label-large"
       {type}
-      value={displayValue}
+      value={value === undefined ? "" : value}
       {placeholder}
-      on:input={onInput}
+      on:input={updateValue}
     />
 
     <slot name="icon-after" />
