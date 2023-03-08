@@ -16,6 +16,7 @@ const config = {
       integration: "src/integration",
       "integration-instances": "src/integration-instances.ts",
       models: "src/models",
+      config: "src/config",
     },
   },
 };
