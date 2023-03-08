@@ -60,9 +60,18 @@ class Transactions(endpoints.HTTPEndpoint):
                 Transaction(
                     id=transaction_id,
                     external_reference_id=body["externalReference"],
-                    quotation_id=body["quotation"],
                     parent_external_id=body["parentExternalReference"],
                     conversion_id=conversion_id,
+                    beneficiary_amount=quot.beneficiary_amount,
+                    exchange_rate=quot.exchange_rate,
+                    converted_beneficiary_amount=quot.converted_beneficiary_amount,
+                    buffer_rate=quot.buffer_rate,
+                    buffer_amount=quot.buffer_amount,
+                    sales_rate=quot.sales_rate,
+                    sales_amount=quot.sales_amount,
+                    offer_amount=quot.offer_amount,
+                    payer_id=quot.payer_id,
+                    beneficiary_id=quot.beneficiary_id,
                 ),
             )
 

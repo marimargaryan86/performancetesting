@@ -15,6 +15,7 @@ from snowfall.project.pay.service.transactions.v1alpha import (
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
+from snowfall.stdlib.v1alpha import money_pb2
 
 
 class QuoteResource(models.Resource):
@@ -84,6 +85,20 @@ class Company(models.Resource):
         )
 
 
+class Money(models.BaseModel):
+    currency: str
+    amount: int
+
+    @classmethod
+    def from_proto(cls, price: money_pb2.Money) -> Money:
+        money_price = money.from_protobuf(price)
+
+        return cls(
+            currency=money_price.currency.code,
+            amount=money_price.amount,
+        )
+
+
 class Transaction(models.Resource):
     api_type: ClassVar[str] = "transactions"
 
@@ -99,12 +114,36 @@ class Transaction(models.Resource):
                 "externalReference": transaction.external_reference_id,
                 "parentExternalReference": transaction.parent_external_id,
                 "createdAt": protobuf.protobuf_to_datetime(transaction.created_at),
+                "beneficiaryAmount": Money.from_proto(
+                    transaction.beneficiary_amount,
+                ),
+                "offerAmount": Money.from_proto(transaction.offer_amount),
+                "convertedBeneficiaryAmount": Money.from_proto(
+                    transaction.converted_beneficiary_amount,
+                ),
+                "bufferAmount": Money.from_proto(transaction.buffer_amount),
+                "salesAmount": Money.from_proto(transaction.sales_amount),
+                "exchangeRate": round(transaction.exchange_rate, 3),
+                "bufferRate": round(transaction.buffer_rate, 3),
+                "salesRate": round(transaction.sales_rate, 3),
             },
             relationships={
-                "quotation": {
+                "conversion": {
                     "data": {
-                        "id": transaction.quotation_id,
-                        "type": "quotations",
+                        "id": transaction.conversion_id,
+                        "type": "conversions",
+                    },
+                },
+                "payer": {
+                    "data": {
+                        "id": transaction.payer_id,
+                        "type": "companies",
+                    },
+                },
+                "beneficiary": {
+                    "data": {
+                        "id": transaction.beneficiary_id,
+                        "type": "companies",
                     },
                 },
             },

@@ -737,6 +737,26 @@
         ],
         "description": "Currency details."
       },
+      "Money": {
+        "title": "Money",
+        "description": "Amount and currency.",
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "format": "currency",
+            "example": "EUR"
+          },
+          "amount": {
+            "type": "integer",
+            "example": 1337
+          }
+        },
+        "required": [
+          "currency",
+          "amount"
+        ]
+      },
       "Transaction": {
         "title": "Transaction",
         "type": "object",
@@ -762,7 +782,15 @@
             "required": [
               "externalReference",
               "parentExternalReference",
-              "createdAt"
+              "createdAt",
+              "beneficiaryAmount",
+              "offerAmount",
+              "convertedBeneficiaryAmount",
+              "bufferAmount",
+              "salesAmount",
+              "exchangeRate",
+              "bufferRate",
+              "salesRate"
             ],
             "properties": {
               "externalReference": {
@@ -779,6 +807,64 @@
                 "type": "string",
                 "example": "2023-01-20T17:04:14+00:00",
                 "format": "date-time",
+                "readOnly": true
+              },
+              "beneficiaryAmount": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Money"
+                  }
+                ],
+                "readOnly": true
+              },
+              "offerAmount": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Money"
+                  }
+                ],
+                "readOnly": true
+              },
+              "convertedBeneficiaryAmount": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Money"
+                  }
+                ],
+                "readOnly": true
+              },
+              "bufferAmount": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Money"
+                  }
+                ],
+                "readOnly": true
+              },
+              "salesAmount": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Money"
+                  }
+                ],
+                "readOnly": true
+              },
+              "exchangeRate": {
+                "type": "number",
+                "format": "float",
+                "example": 1.02,
+                "readOnly": true
+              },
+              "bufferRate": {
+                "type": "number",
+                "format": "float",
+                "example": 1.02,
+                "readOnly": true
+              },
+              "salesRate": {
+                "type": "number",
+                "format": "float",
+                "example": 1.02,
                 "readOnly": true
               }
             }
@@ -797,7 +883,44 @@
                   "data": {
                     "$ref": "#/components/schemas/QuotationIdentifier"
                   }
-                }
+                },
+                "writeOnly": true
+              },
+              "conversion": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/ConversionIdentifier"
+                  }
+                },
+                "readOnly": true
+              },
+              "payer": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/CompanyIdentifier"
+                  }
+                },
+                "readOnly": true
+              },
+              "beneficiary": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/CompanyIdentifier"
+                  }
+                },
+                "readOnly": true
               }
             }
           }
@@ -865,6 +988,28 @@
               "quotations"
             ],
             "example": "quotations"
+          }
+        }
+      },
+      "ConversionIdentifier": {
+        "title": "Conversion Identifier",
+        "type": "object",
+        "required": [
+          "id",
+          "type"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "conversions"
+            ],
+            "example": "conversions"
           }
         }
       },
