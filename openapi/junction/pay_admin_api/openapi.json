@@ -41,6 +41,12 @@
       ]
     },
     {
+      "name": "Conversions",
+      "tags": [
+        "conversions"
+      ]
+    },
+    {
       "name": "Internal",
       "tags": [
         "internal"
@@ -67,6 +73,11 @@
       "name": "contact-persons",
       "description": "Contact persons",
       "x-displayName": "Contact persons"
+    },
+    {
+      "name": "conversions",
+      "description": "Conversions",
+      "x-displayName": "Conversions"
     },
     {
       "name": "internal",
@@ -435,6 +446,44 @@
         }
       }
     },
+    "/conversions/{conversionId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/conversionId"
+        }
+      ],
+      "get": {
+        "summary": "Get conversion details",
+        "description": "Get conversion details",
+        "tags": [
+          "conversions"
+        ],
+        "operationId": "get-conversions-id",
+        "responses": {
+          "200": {
+            "description": "Conversion is fetched",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Conversion"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
     "/accounts": {
       "get": {
         "summary": "List accounts",
@@ -697,6 +746,17 @@
           "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
         },
         "description": "Company id"
+      },
+      "conversionId": {
+        "name": "conversionId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
+        },
+        "description": "Conversion id"
       },
       "company": {
         "name": "company",
@@ -1016,6 +1076,42 @@
           "city": {
             "type": "string",
             "example": "London"
+          }
+        }
+      },
+      "Conversion": {
+        "title": "Conversion Details",
+        "type": "object",
+        "required": [
+          "attributes"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "conversions"
+            ],
+            "example": "conversions"
+          },
+          "attributes": {
+            "properties": {
+              "settledAt": {
+                "type": "string",
+                "example": "2023-03-06T14:30:00+00:00",
+                "format": "date-time"
+              },
+              "rate": {
+                "type": "number",
+                "format": "float",
+                "example": 1.02
+              }
+            }
           }
         }
       },
