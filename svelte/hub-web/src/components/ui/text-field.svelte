@@ -15,7 +15,7 @@
   export let value: TValue | undefined = undefined;
   export let label: string | undefined = undefined;
   export let placeholder: string | undefined = undefined;
-  export let error: string | undefined = undefined;
+  export let error: string | boolean = false;
 
   const dispatch = createEventDispatcher<{ input: InputEvent }>();
 
@@ -50,7 +50,7 @@
     <slot name="icon-after" />
   </div>
 
-  {#if error}
+  {#if typeof error === "string"}
     <span class="typography label-small error-message" transition:slide={{ duration: 200 }}
       >{error}</span
     >

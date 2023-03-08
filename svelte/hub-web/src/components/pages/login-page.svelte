@@ -14,8 +14,8 @@
     password: "",
   };
   let errors: Partial<{
-    email: string;
-    password: string;
+    email: string | boolean;
+    password: string | boolean;
   }> = {};
 
   async function login(): Promise<void> {
@@ -33,7 +33,8 @@
 
       await invalidateAll();
     } catch (error) {
-      errors.password = "Invalid credentials";
+      errors.email = true;
+      errors.password = " Email/Username & Password not recognised. Please correct and try again";
     } finally {
       pending = false;
     }
