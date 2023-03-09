@@ -1,12 +1,19 @@
+from datetime import datetime, timedelta
+
 import pytest
 
 from snowfall.project.pay.service.accounts.accounts import ContactPersonsRepository
 from snowfall.project.pay.service.accounts.v1alpha.models_pb2 import ContactPerson
 from snowfall.project.pay.service.companies.v1alpha.models_pb2 import Company
-from snowfall.project.pay.service.pay_api.repositories import CompanyRepository
+from snowfall.project.pay.service.conversions.v1alpha.models_pb2 import Conversion
+from snowfall.project.pay.service.pay_api.repositories import (
+    CompanyRepository,
+    ConversionRepository,
+)
 from snowfall.project.pay.service.quotations.quotations import QuotationsRepository
 from snowfall.project.pay.service.quotations.v1alpha.models_pb2 import Quotation
 from snowfall.stdlib import money, string
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import phone_number_pb2, postal_address_pb2
 
 
@@ -59,3 +66,28 @@ async def valid_company(
     )
 
     return await companies_repository.insert(company)
+
+
+@pytest.fixture()
+async def valid_conversion(
+    conversions_repository: ConversionRepository,
+) -> Conversion:
+    usd = money.Money(100, money.Currency("USD"))
+    gbp = money.Money(100, money.Currency("GBP"))
+
+    conversion = Conversion(
+        id="ed7b9b96-6c5a-4a6b-adee-2af14564e42b",
+        external_id="f8144974-530f-477f-bbe1-c2eaedddec88",
+        settlement_date=protobuf.datetime_to_protobuf(
+            datetime.now() - timedelta(hours=1),
+        ),
+        conversion_date=protobuf.datetime_to_protobuf(
+            datetime.now() - timedelta(hours=2),
+        ),
+        buy_amount=usd.protobuf(),
+        sell_amount=gbp.protobuf(),
+        fixed_side="buy",
+        core_rate=1,
+    )
+
+    return await conversions_repository.insert(conversion)

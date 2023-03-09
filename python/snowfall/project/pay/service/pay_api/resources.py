@@ -6,6 +6,7 @@ from starlette import requests
 
 from snowfall.project.pay.service.accounts.v1alpha import models_pb2 as account_models
 from snowfall.project.pay.service.companies.v1alpha import models_pb2
+from snowfall.project.pay.service.conversions.v1alpha.models_pb2 import Conversion
 from snowfall.project.pay.service.quotations.v1alpha import (
     models_pb2 as quotation_models,
 )
@@ -201,5 +202,25 @@ class AccountResource(models.Resource):
                         "type": "contact-persons",
                     },
                 },
+            },
+        )
+
+
+class ConversionResource(models.Resource):
+    api_type: ClassVar[str] = "conversions"
+
+    @classmethod
+    def from_proto(
+        cls,
+        conversion: Conversion,
+    ) -> ConversionResource:
+        return cls(
+            id=conversion.id,
+            type=ConversionResource.api_type,
+            attributes={
+                "settledAt": protobuf.protobuf_to_datetime(
+                    conversion.settlement_date,
+                ),
+                "rate": round(conversion.core_rate, 3),
             },
         )

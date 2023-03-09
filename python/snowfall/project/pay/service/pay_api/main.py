@@ -153,6 +153,9 @@ def _admin_factory(
                     accounts_repository=accounts.AccountsRepository(
                         mongo.accounts.accounts,
                     ),
+                    conversions_repository=ConversionRepository(
+                        mongo.conversions.conversions,
+                    ),
                 ),
             ),
             openapi_path=filesystem.resource_path(

@@ -8,6 +8,7 @@ from snowfall.project.pay.service.pay_api.routes import (  # noqa: WPS235
     balances,
     companies,
     contact_persons,
+    conversions,
     currencies,
     quotations,
     rates,
@@ -89,5 +90,10 @@ def get_admin_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             "/accounts",
             accounts.Accounts,
             name="Account",
+        ),
+        integration.route(
+            "/conversions/{conversionId}",
+            conversions.Conversions,
+            name="Conversion",
         ),
     ]

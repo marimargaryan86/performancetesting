@@ -74,6 +74,7 @@ def _create_admin_app(  # noqa: WPS211
     companies_repository: CompanyRepository,
     contact_persons_repository: accounts.ContactPersonsRepository,
     accounts_repository: accounts.AccountsRepository,
+    conversions_repository: ConversionRepository,
     openapi_path: pathlib.Path,
     custom_middlewares: Optional[Sequence[Middleware]] = None,
 ) -> applications.Starlette:
@@ -87,6 +88,7 @@ def _create_admin_app(  # noqa: WPS211
                 companies_repository,
                 contact_persons_repository,
                 accounts_repository=accounts_repository,
+                conversions_repository=conversions_repository,
                 payment_client=payment_client,
             ),
         ),
@@ -259,6 +261,7 @@ def admin_app(  # noqa: WPS211
     payment_client: PaymentClient,
     contact_persons_repository: accounts.ContactPersonsRepository,
     accounts_repository: accounts.AccountsRepository,
+    conversions_repository: ConversionRepository,
 ) -> applications.Starlette:
     return _create_admin_app(
         cc_client=cc_client,
@@ -267,6 +270,7 @@ def admin_app(  # noqa: WPS211
         companies_repository=companies_repository,
         contact_persons_repository=contact_persons_repository,
         accounts_repository=accounts_repository,
+        conversions_repository=conversions_repository,
         openapi_path=filesystem.resource_path("junction.pay_admin_api", "openapi.json"),
     )
 
