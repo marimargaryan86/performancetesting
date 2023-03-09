@@ -331,7 +331,7 @@ func routesWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *routesWriter
 		defer wg.Done()
 
 		w := bufio.NewWriter(writer)
-		protoWriter := protoio.NewProtoWriter(w)
+		protoWriter := protoio.NewProtoWriter[*plannerv1alpha.Route](w)
 
 		for job := range ch {
 			if job == nil {
@@ -366,7 +366,7 @@ func routeStopsWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *plannerv
 	go func() {
 		defer wg.Done()
 		w := bufio.NewWriter(writer)
-		protoWriter := protoio.NewProtoWriter(w)
+		protoWriter := protoio.NewProtoWriter[*plannerv1alpha.RouteStop](w)
 
 		for job := range ch {
 			if job == nil {
@@ -390,7 +390,7 @@ func schedulesWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *schedules
 	go func() {
 		defer wg.Done()
 		w := bufio.NewWriter(writer)
-		protoWriter := protoio.NewProtoWriter(w)
+		protoWriter := protoio.NewProtoWriter[*plannerv1alpha.Schedule](w)
 
 		for job := range ch {
 			if job == nil {
@@ -415,7 +415,7 @@ func scheduleStopsWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *plann
 	go func() {
 		defer wg.Done()
 		w := bufio.NewWriter(writer)
-		protoWriter := protoio.NewProtoWriter(w)
+		protoWriter := protoio.NewProtoWriter[*plannerv1alpha.ScheduleStop](w)
 
 		for job := range ch {
 			if job == nil {
@@ -452,7 +452,7 @@ func stopsWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *stopsWriterJo
 		defer wg.Done()
 
 		w := bufio.NewWriter(writer)
-		protoWriter := protoio.NewProtoWriter(w)
+		protoWriter := protoio.NewProtoWriter[*plannerv1alpha.Stop](w)
 
 		for job := range ch {
 			if job == nil {
@@ -663,7 +663,7 @@ func main() {
 	bar := progressbar.DefaultBytes(stat.Size(), "Exporting")
 
 	barReader := progressbar.NewReader(f, bar)
-	protoReader := protoio.NewProtoReader(bufio.NewReader(&barReader))
+	protoReader := protoio.NewProtoReader[*v1alpha.Schedule](bufio.NewReader(&barReader))
 
 	sequence := uint64(0)
 	lastSource := ""

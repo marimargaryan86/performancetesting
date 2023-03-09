@@ -369,7 +369,7 @@ func discardEncodingKeyword(br *bufio.Reader) {
 
 func getScheduleProtoWriter(schedulesBinFile *os.File, wg *sync.WaitGroup) chan *v1alpha.Schedule {
 	bufScheduleWriter := bufio.NewWriter(schedulesBinFile)
-	writer := protoio.NewProtoWriter(bufScheduleWriter)
+	writer := protoio.NewProtoWriter[*v1alpha.Schedule](bufScheduleWriter)
 	scheduleProtoChannel := make(chan *v1alpha.Schedule)
 
 	go func() {
@@ -591,7 +591,7 @@ func main() {
 	check(err)
 	defer closeFile(locationBinFile)
 	bufLocationWriter := bufio.NewWriter(locationBinFile)
-	locationWriter := protoio.NewProtoWriter(bufLocationWriter)
+	locationWriter := protoio.NewProtoWriter[*v1alphaLocations.Location](bufLocationWriter)
 
 	feedFiles, err := os.ReadDir(inputDir)
 	check(err)

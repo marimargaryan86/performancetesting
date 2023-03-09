@@ -11,118 +11,62 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"reflect"
 )
 
 // Load loads a protobuf-based data structure from disk into memory.
-func Load(logger *zap.SugaredLogger, from string) ([]*planner.Route, []*planner.RouteStop, []*planner.Stop, []*planner.Transfer, []*planner.Schedule, []*planner.ScheduleStop, error) {
-	var routes []*planner.Route
-	var routeStops []*planner.RouteStop
-	var stops []*planner.Stop
-	var transfers []*planner.Transfer
-	var schedules []*planner.Schedule
-	var scheduleStops []*planner.ScheduleStop
-
-	messages, err := load(filepath.Join(from, "routes.bin"), reflect.TypeOf(planner.Route{}))
+func Load(logger *zap.SugaredLogger, from string) (routes []*planner.Route, routeStops []*planner.RouteStop, stops []*planner.Stop, transfers []*planner.Transfer, schedules []*planner.Schedule, scheduleStops []*planner.ScheduleStop, err error) {
+	routes, err = load[planner.Route](filepath.Join(from, "routes.bin"), logger)
 	if err != nil {
-		return routes, routeStops, stops, transfers, schedules, scheduleStops, err
+		return
 	}
 
-	routes = make([]*planner.Route, len(messages))
-
-	for i := 0; i < len(messages); i++ {
-		routes[i] = messages[i].(*planner.Route)
-	}
-
-	logger.Infow("file loaded", "file", "routes.bin")
-
-	messages, err = load(filepath.Join(from, "route_stops.bin"), reflect.TypeOf(planner.RouteStop{}))
-
+	routeStops, err = load[planner.RouteStop](filepath.Join(from, "route_stops.bin"), logger)
 	if err != nil {
-		return routes, routeStops, stops, transfers, schedules, scheduleStops, err
+		return
 	}
 
-	routeStops = make([]*planner.RouteStop, len(messages))
-
-	for i := 0; i < len(messages); i++ {
-		routeStops[i] = messages[i].(*planner.RouteStop)
-	}
-
-	logger.Infow("file loaded", "file", "route_stops.bin")
-
-	messages, err = load(filepath.Join(from, "stops.bin"), reflect.TypeOf(planner.Stop{}))
-
+	stops, err = load[planner.Stop](filepath.Join(from, "stops.bin"), logger)
 	if err != nil {
-		return routes, routeStops, stops, transfers, schedules, scheduleStops, err
+		return
 	}
 
-	stops = make([]*planner.Stop, len(messages))
-
-	for i := 0; i < len(messages); i++ {
-		stops[i] = messages[i].(*planner.Stop)
-	}
-
-	logger.Infow("file loaded", "file", "stops.bin")
-
-	messages, err = load(filepath.Join(from, "transfers.bin"), reflect.TypeOf(planner.Transfer{}))
-
+	transfers, err = load[planner.Transfer](filepath.Join(from, "transfers.bin"), logger)
 	if err != nil {
-		return routes, routeStops, stops, transfers, schedules, scheduleStops, err
+		return
 	}
 
-	transfers = make([]*planner.Transfer, len(messages))
-
-	for i := 0; i < len(messages); i++ {
-		transfers[i] = messages[i].(*planner.Transfer)
-	}
-
-	logger.Infow("file loaded", "file", "transfers.bin")
-
-	messages, err = load(filepath.Join(from, "schedules.bin"), reflect.TypeOf(planner.Schedule{}))
-
+	schedules, err = load[planner.Schedule](filepath.Join(from, "schedules.bin"), logger)
 	if err != nil {
-		return routes, routeStops, stops, transfers, schedules, scheduleStops, err
+		return
 	}
 
-	schedules = make([]*planner.Schedule, len(messages))
-
-	for i := 0; i < len(messages); i++ {
-		schedules[i] = messages[i].(*planner.Schedule)
-	}
-
-	logger.Infow("file loaded", "file", "schedules.bin")
-
-	messages, err = load(filepath.Join(from, "schedule_stops.bin"), reflect.TypeOf(planner.ScheduleStop{}))
-
+	scheduleStops, err = load[planner.ScheduleStop](filepath.Join(from, "schedule_stops.bin"), logger)
 	if err != nil {
-		return routes, routeStops, stops, transfers, schedules, scheduleStops, err
+		return
 	}
 
-	scheduleStops = make([]*planner.ScheduleStop, len(messages))
-
-	for i := 0; i < len(messages); i++ {
-		scheduleStops[i] = messages[i].(*planner.ScheduleStop)
-	}
-
-	logger.Infow("file loaded", "file", "schedule_stops.bin")
-
-	return routes, routeStops, stops, transfers, schedules, scheduleStops, nil
+	return
 }
 
-func load(filepath string, t reflect.Type) (messages []proto.Message, err error) {
-	f, err := os.Open(filepath)
+type protoMessage[T any] interface {
+	*T
+	proto.Message
+}
+
+func load[T any, U protoMessage[T]](path string, logger *zap.SugaredLogger) (messages []U, err error) {
+	f, err := os.Open(path)
 	if err != nil {
 		return messages, fmt.Errorf("unable to open file: %w", err)
 	}
 
 	defer f.Close()
 
-	pr := protoio.NewProtoReader(bufio.NewReader(f))
-	messages = make([]proto.Message, 0)
+	pr := protoio.NewProtoReader[U](bufio.NewReader(f))
+	messages = make([]U, 0)
 
 	for {
-		message := reflect.New(t).Interface().(proto.Message)
-		err = pr.ReadNext(message)
+		message := new(T)
+		err = pr.ReadNext(U(message))
 
 		if errors.Is(err, io.EOF) {
 			break
@@ -134,6 +78,8 @@ func load(filepath string, t reflect.Type) (messages []proto.Message, err error)
 
 		messages = append(messages, message)
 	}
+
+	logger.Infow("file loaded", "file", filepath.Base(path))
 
 	return messages, nil
 }

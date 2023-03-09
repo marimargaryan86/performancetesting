@@ -145,7 +145,7 @@ func loadProtoFile[T any, T2 interface {
 		fmt.Sprintf("Loading %s", filename),
 	))
 
-	pr := protoio.NewProtoReader(io.Reader(&progress))
+	pr := protoio.NewProtoReader[T2](io.Reader(&progress))
 
 	for {
 		message := new(T)

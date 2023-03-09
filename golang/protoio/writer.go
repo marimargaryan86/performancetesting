@@ -7,18 +7,18 @@ import (
 	"io"
 )
 
-type ProtoWriter struct {
+type ProtoWriter[T proto.Message] struct {
 	w          io.Writer
 	FileLength uint64
 }
 
-func NewProtoWriter(w io.Writer) *ProtoWriter {
-	return &ProtoWriter{
+func NewProtoWriter[T proto.Message](w io.Writer) *ProtoWriter[T] {
+	return &ProtoWriter[T]{
 		w: w,
 	}
 }
 
-func (pw *ProtoWriter) Write(message proto.Message) error {
+func (pw *ProtoWriter[T]) Write(message T) error {
 	wire, err := proto.Marshal(message)
 
 	if err != nil {

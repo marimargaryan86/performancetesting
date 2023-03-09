@@ -8,17 +8,17 @@ import (
 	"io"
 )
 
-type ProtoReader struct {
+type ProtoReader[T proto.Message] struct {
 	r io.Reader
 }
 
-func NewProtoReader(r io.Reader) *ProtoReader {
-	return &ProtoReader{
+func NewProtoReader[T proto.Message](r io.Reader) *ProtoReader[T] {
+	return &ProtoReader[T]{
 		r: r,
 	}
 }
 
-func (pr *ProtoReader) ReadNext(message proto.Message) error {
+func (pr *ProtoReader[T]) ReadNext(message T) error {
 	length, err := pr.NextMessageLength()
 
 	if err != nil {
@@ -40,7 +40,7 @@ func (pr *ProtoReader) ReadNext(message proto.Message) error {
 	return nil
 }
 
-func (pr *ProtoReader) NextMessageLength() (int64, error) {
+func (pr *ProtoReader[T]) NextMessageLength() (int64, error) {
 	var length uint32
 
 	lengthBytes := make([]byte, 4)
