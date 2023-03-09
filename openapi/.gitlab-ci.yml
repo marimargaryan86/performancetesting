@@ -40,7 +40,7 @@ openapi:test:
     entrypoint: [""]
   interruptible: true
   script:
-    - for f in openapi/**/*.json; do spectral lint --ruleset "openapi/.spectral.yml" --fail-severity warn "$f"; done
+    - for f in openapi/**/*.json; do spectral lint --ruleset "openapi/.spectral.yml" --fail-severity warn --display-only-failures "$f"; done
   needs: []
   rules:
     - if: '$CI_MERGE_REQUEST_IID'
