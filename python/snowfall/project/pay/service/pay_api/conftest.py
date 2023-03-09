@@ -27,7 +27,7 @@ from snowfall.project.pay.service.pay_api.repositories import (
 from snowfall.project.pay.service.pay_api.routes import router
 from snowfall.project.pay.service.quotations import quotations
 from snowfall.stdlib.integration.starlette import application, handlers
-from snowfall.stdlib.persistence import filesystem
+from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.vendor.currency_cloud.client import PaymentClient
 from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
@@ -61,7 +61,7 @@ def _create_app(  # noqa: WPS211
             ),
         ),
     )
-    app.add_exception_handler(errors.CursorError, handlers.cursor_error_handler)
+    app.add_exception_handler(cursor.CursorError, handlers.cursor_error_handler)
     app.add_exception_handler(errors.NotFoundError, handlers.not_found_error_handler)
 
     return app
@@ -93,7 +93,7 @@ def _create_admin_app(  # noqa: WPS211
             ),
         ),
     )
-    app.add_exception_handler(errors.CursorError, handlers.cursor_error_handler)
+    app.add_exception_handler(cursor.CursorError, handlers.cursor_error_handler)
     app.add_exception_handler(errors.NotFoundError, handlers.not_found_error_handler)
 
     return app

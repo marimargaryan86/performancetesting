@@ -25,7 +25,7 @@ from snowfall.project.pay.service.pay_api.routes import router
 from snowfall.project.pay.service.quotations.quotations import QuotationsRepository
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application, handlers
-from snowfall.stdlib.persistence import filesystem
+from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.grpc.client import create_channel
 
@@ -92,7 +92,7 @@ def _factory(
         )
 
         asgi_app.add_exception_handler(
-            errors.CursorError,
+            cursor.CursorError,
             handlers.cursor_error_handler,
         )
         asgi_app.add_exception_handler(
@@ -165,7 +165,7 @@ def _admin_factory(
         )
 
         asgi_app.add_exception_handler(
-            errors.CursorError,
+            cursor.CursorError,
             handlers.cursor_error_handler,
         )
         asgi_app.add_exception_handler(
