@@ -530,6 +530,7 @@
               }
             },
             "required": [
+              "id",
               "type",
               "attributes"
             ]
@@ -629,6 +630,7 @@
               }
             },
             "required": [
+              "id",
               "type",
               "attributes"
             ]
@@ -762,6 +764,8 @@
         "type": "object",
         "description": "Transaction data",
         "required": [
+          "id",
+          "type",
           "attributes"
         ],
         "properties": {

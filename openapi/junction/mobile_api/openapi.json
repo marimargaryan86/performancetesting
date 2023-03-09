@@ -3007,7 +3007,7 @@
                 }
               }
             },
-            "required": ["type", "attributes"]
+            "required": ["id", "type", "attributes"]
           }
         },
         "required": ["data"]
@@ -3118,7 +3118,8 @@
           }
         },
         "required": [
-          "id"
+          "id",
+          "type"
         ]
       },
       "LegIdentifier": {
@@ -6587,6 +6588,7 @@
           }
         },
         "required": [
+          "id",
           "type",
           "attributes"
         ]

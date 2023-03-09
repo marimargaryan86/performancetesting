@@ -1,4 +1,5 @@
 functions:
+  - ensureArrayContains
   - ensureRefs
   - ensureRequiredResourceFields
 aliases:
@@ -25,7 +26,6 @@ rules:
           - relationships
           - links
           - meta
-
   json-api-resource-required-fields:
     message: "{{error}}"
     severity: error
@@ -36,7 +36,16 @@ rules:
         required:
           - id
           - type
-
+  json-api-resource-ensure-required:
+    message: "{{error}}"
+    severity: error
+    given: "$..properties.id.type^^^.required"
+    then:
+      function: ensureArrayContains
+      functionOptions:
+        required:
+          - id
+          - type
   json-api-resource-refs:
     description: Resource objects must be references.
     severity: error

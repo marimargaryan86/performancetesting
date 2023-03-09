@@ -787,6 +787,8 @@
         "type": "object",
         "description": "User information",
         "required": [
+          "id",
+          "type",
           "attributes"
         ],
         "properties": {
@@ -828,6 +830,8 @@
         "title": "Authentication",
         "type": "object",
         "required": [
+          "id",
+          "type",
           "attributes"
         ],
         "properties": {
@@ -875,6 +879,8 @@
       "ChangePassword": {
         "title": "ChangePassword",
         "required": [
+          "id",
+          "type",
           "attributes"
         ],
         "properties": {
@@ -964,6 +970,7 @@
           }
         },
         "required": [
+          "id",
           "type",
           "attributes",
           "relationships"
@@ -1044,6 +1051,7 @@
           }
         },
         "required": [
+          "id",
           "type",
           "attributes",
           "relationships"
@@ -1083,6 +1091,8 @@
         "title": "Conversion Details",
         "type": "object",
         "required": [
+          "id",
+          "type",
           "attributes"
         ],
         "properties": {
@@ -1119,6 +1129,8 @@
         "title": "Company Details",
         "type": "object",
         "required": [
+          "id",
+          "type",
           "attributes"
         ],
         "properties": {
