@@ -52,6 +52,7 @@ class CreateUser(endpoints.HTTPEndpoint):
         payload = {
             _DATA_KEY: {
                 "id": user.id,
+                "type": "users",
                 "attributes": {
                     "email": user.email,
                 },
@@ -109,6 +110,8 @@ class Authenticate(endpoints.HTTPEndpoint):
 
         payload = {
             _DATA_KEY: {
+                "id": auth_token,
+                "type": "user-tokens",
                 "attributes": {
                     "token": auth_token,
                 },
@@ -169,6 +172,7 @@ class ChangePassword(endpoints.HTTPEndpoint):
         payload = {
             _DATA_KEY: {
                 "id": user.id,
+                "type": "users",
                 "attributes": {
                     "email": user.email,
                 },
