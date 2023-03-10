@@ -11,6 +11,11 @@ commits:
       - "python/snowfall/project/junction/service/mobile_api"
     junction/go:
       - ".gitlab/junction"
+      - "golang/cmd/gtfs-import"
+      - "golang/cmd/planner"
+      - "golang/cmd/schedules-export"
+      - "golang/cmd/ssim-convert"
+      - "golang/cmd/validate-dataset"
       - "openapi/junction/admin_api"
       - "openapi/junction/client_api"
       - "protobuf/snowfall/project/junction"

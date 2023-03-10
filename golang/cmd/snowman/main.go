@@ -12,31 +12,31 @@ import (
 	"github.com/spf13/viper"
 	"github.com/xanzy/go-gitlab"
 	"go.uber.org/zap"
-	"math/rand"
 	"net/http"
 	"os"
 	"time"
 )
 
-var gitlabBaseUrl string
-var gitlabToken string
-var gitlabWebhookSecret string
-var httpPort int
-var snowmanHookUrl string
 var parseCmd = &cobra.Command{
 	Use:   "parse",
 	Short: "Parse the title of a commit message",
 	RunE:  parse,
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
 }
 var serveCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "Listen to incoming web hooks from GitLab",
 	RunE:  serve,
-	Args:  cobra.ExactArgs(0),
+	Args:  cobra.MatchAll(cobra.ExactArgs(0), cobra.OnlyValidArgs),
 }
 
 func init() {
+	var gitlabBaseUrl string
+	var gitlabToken string
+	var gitlabWebhookSecret string
+	var httpPort int
+	var snowmanHookUrl string
+
 	service.Root().AddCommand(parseCmd)
 	service.Root().AddCommand(serveCmd)
 
@@ -92,8 +92,6 @@ func parse(cmd *cobra.Command, args []string) error {
 }
 
 func serve(cmd *cobra.Command, args []string) error {
-	rand.Seed(time.Now().UnixNano())
-
 	logger, _ := zap.NewProduction()
 
 	defer func() {

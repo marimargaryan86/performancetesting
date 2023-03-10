@@ -107,7 +107,7 @@ job "planner-grpc" {
         image = var.docker_image
         ports = ["grpc"]
         args = [
-          "grpc",
+          "serve",
         ]
 
         auth {
