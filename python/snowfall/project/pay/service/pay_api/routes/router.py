@@ -21,11 +21,6 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
 
     return [
         integration.route(
-            "/balances",
-            balances.Balances,
-            name="Balances",
-        ),
-        integration.route(
             "/currencies/{currencyId}",
             currencies.Currencies,
             name="Currencies",
@@ -95,5 +90,10 @@ def get_admin_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             "/conversions/{conversionId}",
             conversions.Conversions,
             name="Conversion",
+        ),
+        integration.route(
+            "/accounts/{accountId}/balances",
+            balances.Balances,
+            name="Balances",
         ),
     ]

@@ -17,6 +17,7 @@ from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
 from snowfall.stdlib.v1alpha import money_pb2
+from snowfall.vendor.currency_cloud.models import balance as balance_models
 
 
 class QuoteResource(models.Resource):
@@ -179,6 +180,40 @@ class ContactPersonResource(models.Resource):
         )
 
 
+class BalanceResource(models.Resource):
+    api_type: ClassVar[str] = "balances"
+
+    @classmethod
+    def from_model(
+        cls,
+        balance: balance_models.BalanceResponse,
+    ) -> BalanceResource:
+        return cls(
+            id=balance.identifier,
+            type=BalanceResource.api_type,
+            attributes={
+                "amount": money.from_string(
+                    balance.amount,
+                    money.Currency(balance.currency),
+                ).amount,
+            },
+            relationships={
+                "account": {
+                    "data": {
+                        "id": balance.account_id,
+                        "type": "accounts",
+                    },
+                },
+                "currency": {
+                    "data": {
+                        "id": balance.currency,
+                        "type": "currencies",
+                    },
+                },
+            },
+        )
+
+
 class AccountResource(models.Resource):
     api_type: ClassVar[str] = "accounts"
 
@@ -187,7 +222,6 @@ class AccountResource(models.Resource):
         cls,
         account: account_models.Account,
         name: str,
-        contact_person_id: str,
     ) -> AccountResource:
         return cls(
             id=account.id,
@@ -198,7 +232,7 @@ class AccountResource(models.Resource):
             relationships={
                 "contactPerson": {
                     "data": {
-                        "id": contact_person_id,
+                        "id": account.contact_id,
                         "type": "contact-persons",
                     },
                 },

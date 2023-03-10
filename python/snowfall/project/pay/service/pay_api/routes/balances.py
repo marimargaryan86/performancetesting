@@ -1,51 +1,40 @@
-import currencycloud
 import lagom
-from starlette import endpoints, requests, responses
+from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.project.pay.service.pay_api import pagination_helpers
-from snowfall.stdlib import money
+from snowfall.project.pay.service.accounts import accounts
+from snowfall.project.pay.service.pay_api import resources
+from snowfall.stdlib.integration.starlette import messages, models
+from snowfall.vendor.currency_cloud.client import PaymentClient
 
 
 class Balances(endpoints.HTTPEndpoint):
-    async def get(  # noqa: WPS210
+    async def get(
         self,
         request: requests.Request,
-        client: currencycloud.Client = lagom.injectable,
+        accounts_repository: accounts.AccountsRepository = lagom.injectable,
+        contact_person_repository: accounts.ContactPersonsRepository = lagom.injectable,
+        payment_client: PaymentClient = lagom.injectable,
     ) -> responses.Response:
-        mapped_params = pagination_helpers.map_query_params(
-            dict(request.query_params),
-            pagination_helpers.PAGINATION_PARAMS_MAPPING,
-        )
-        balances = client.balances.find(**mapped_params)
-
-        response = []
-
-        next_url = pagination_helpers.get_next_link(
-            request.url_for("Balances"),
-            balances.pagination,
+        account = await accounts_repository.find_by_id(
+            request.path_params["accountId"],
         )
 
-        for balance in balances:
-            price = money.from_string(
-                balance.amount,
-                money.Currency(balance.currency),
-            )
-            response.append(
-                {
-                    "id": balance.id,
-                    "type": "balances",
-                    "attributes": {
-                        "amount": price.amount,
-                    },
-                    "relationships": {
-                        "currency": {
-                            "data": {
-                                "type": "currencies",
-                                "id": balance.currency,
-                            },
-                        },
-                    },
-                },
-            )
+        if not account:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
-        return responses.JSONResponse({"data": response, "links": next_url})
+        contact = await contact_person_repository.find_by_id(account.contact_id)
+
+        if not contact:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+        balances = payment_client.get_balances(contact.external_reference)
+
+        return await messages.create_response(
+            body=models.Body(
+                data=[
+                    resources.BalanceResource.from_model(balance)
+                    for balance in balances
+                ],
+            ),
+            request=request,
+        )

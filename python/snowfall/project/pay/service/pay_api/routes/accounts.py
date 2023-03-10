@@ -91,6 +91,7 @@ class Accounts(endpoints.HTTPEndpoint):
                 id=string.uuid(),
                 external_reference=cc_account.identifier,
                 company_id=company.id,
+                contact_id=contact_person.id,
             ),
         )
         try:
@@ -112,7 +113,6 @@ class Accounts(endpoints.HTTPEndpoint):
                 data=resources.AccountResource.from_proto(
                     account=account,
                     name=body["name"],
-                    contact_person_id=body["contactPerson"],
                 ),
             ),
             request=request,
