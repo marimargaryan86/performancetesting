@@ -17,12 +17,6 @@
   "x-internal": true,
   "x-tagGroups": [
     {
-      "name": "Balances",
-      "tags": [
-        "balances"
-      ]
-    },
-    {
       "name": "Currencies",
       "tags": [
         "currencies"
@@ -54,11 +48,6 @@
     }
   ],
   "tags": [
-    {
-      "name": "balances",
-      "description": "Account balances in difference currencies",
-      "x-displayName": "Balances"
-    },
     {
       "name": "currencies",
       "description": "Available currencies",
@@ -138,66 +127,6 @@
         "operationId": "get-health",
         "description": "Check the application health.",
         "x-internal": true,
-        "security": []
-      }
-    },
-    "/balances": {
-      "get": {
-        "summary": "List Balances",
-        "tags": [
-          "balances"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/page-cursor"
-          },
-          {
-            "$ref": "#/components/parameters/page-limit"
-          },
-          {
-            "$ref": "#/components/parameters/sort"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "uniqueItems": true,
-                          "minItems": 0,
-                          "items": {
-                            "$ref": "#/components/schemas/Balance"
-                          }
-                        }
-                      },
-                      "required": [
-                        "data"
-                      ]
-                    },
-                    {
-                      "$ref": "#/components/schemas/NextLink"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        },
-        "operationId": "get-balances",
-        "description": "Get account balances",
         "security": []
       }
     },
@@ -416,40 +345,6 @@
   },
   "components": {
     "parameters": {
-      "page-cursor": {
-        "name": "page[cursor]",
-        "in": "query",
-        "required": false,
-        "schema": {
-          "type": "string",
-          "default": "1",
-          "example": "1"
-        },
-        "description": "Pagination cursor that defines your place in the list."
-      },
-      "page-limit": {
-        "name": "page[limit]",
-        "in": "query",
-        "required": false,
-        "schema": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 100,
-          "default": 20,
-          "example": 20
-        },
-        "description": "A limit on the number of objects to be returned, between 1 and 100."
-      },
-      "sort": {
-        "name": "order",
-        "in": "query",
-        "required": false,
-        "schema": {
-          "type": "string",
-          "example": "created"
-        },
-        "description": "Field name what should be used to order"
-      },
       "currencyId": {
         "name": "currencyId",
         "in": "path",
@@ -637,67 +532,6 @@
           }
         ],
         "description": "Quote schema."
-      },
-      "Balance": {
-        "title": "Balance",
-        "allOf": [
-          {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-                "format": "uuid",
-                "readOnly": true
-              },
-              "type": {
-                "type": "string",
-                "example": "balances",
-                "enum": [
-                  "balances"
-                ]
-              },
-              "attributes": {
-                "type": "object",
-                "properties": {
-                  "amount": {
-                    "type": "integer",
-                    "example": 1000
-                  }
-                },
-                "required": [
-                  "amount"
-                ]
-              },
-              "relationships": {
-                "type": "object",
-                "required": [
-                  "currency"
-                ],
-                "properties": {
-                  "currency": {
-                    "type": "object",
-                    "required": [
-                      "data"
-                    ],
-                    "properties": {
-                      "data": {
-                        "$ref": "#/components/schemas/CurrencyIdentifier"
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "required": [
-              "id",
-              "type",
-              "attributes",
-              "relationships"
-            ]
-          }
-        ],
-        "description": "Account Balances."
       },
       "Currency": {
         "title": "Currency",
@@ -1016,30 +850,6 @@
             "example": "conversions"
           }
         }
-      },
-      "NextLink": {
-        "title": "Next Link",
-        "type": "object",
-        "properties": {
-          "links": {
-            "type": "object",
-            "required": [
-              "next"
-            ],
-            "properties": {
-              "next": {
-                "type": "string",
-                "format": "uri",
-                "example": "https://example.com/resource/?page%5Bcursor%5D=MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D&page%5Blimit%5D=20",
-                "readOnly": true
-              }
-            },
-            "readOnly": true
-          }
-        },
-        "required": [
-          "links"
-        ]
       },
       "Error": {
         "title": "Error",

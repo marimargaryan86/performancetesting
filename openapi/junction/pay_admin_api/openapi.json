@@ -29,6 +29,12 @@
       ]
     },
     {
+      "name": "Balances",
+      "tags": [
+        "balances"
+      ]
+    },
+    {
       "name": "Contact Persons",
       "tags": [
         "contact-persons"
@@ -63,6 +69,11 @@
       "name": "authentication",
       "description": "Authentication",
       "x-displayName": "Authentication"
+    },
+    {
+      "name": "balances",
+      "description": "Account balances in different currencies",
+      "x-displayName": "Balances"
     },
     {
       "name": "companies",
@@ -484,6 +495,58 @@
         }
       }
     },
+    "/accounts/{accountId}/balances": {
+      "get": {
+        "summary": "List Balances",
+        "tags": [
+          "balances"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accountId"
+          },
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "minItems": 0,
+                      "items": {
+                        "$ref": "#/components/schemas/Balance"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-accounts-id-balances",
+        "description": "Get account balances"
+      }
+    },
     "/accounts": {
       "get": {
         "summary": "List accounts",
@@ -746,6 +809,17 @@
           "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
         },
         "description": "Company id"
+      },
+      "accountId": {
+        "name": "accountId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
+        },
+        "description": "Account id"
       },
       "conversionId": {
         "name": "conversionId",
@@ -1169,6 +1243,96 @@
           }
         }
       },
+      "Balance": {
+        "title": "Balance",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "example": "balances",
+            "enum": [
+              "balances"
+            ]
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "integer",
+                "example": 1000
+              }
+            },
+            "required": [
+              "amount"
+            ]
+          },
+          "relationships": {
+            "type": "object",
+            "required": [
+              "currency",
+              "account"
+            ],
+            "properties": {
+              "account": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/AccountIdentifier"
+                  }
+                }
+              },
+              "currency": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/CurrencyIdentifier"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes",
+          "relationships"
+        ],
+        "description": "Account Balances."
+      },
+      "CurrencyIdentifier": {
+        "title": "Currency Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "USD"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "currencies"
+            ],
+            "example": "currencies"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
       "CompanyCreatable": {
         "title": "Company (Creatable)",
         "allOf": [
@@ -1205,6 +1369,28 @@
               "companies"
             ],
             "example": "companies"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "AccountIdentifier": {
+        "title": "Account Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "accounts"
+            ],
+            "example": "accounts"
           }
         },
         "required": [
