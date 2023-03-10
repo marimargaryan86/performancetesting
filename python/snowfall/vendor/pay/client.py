@@ -245,6 +245,18 @@ class PayAdminClient(object):
         response.raise_for_status()
         return response.json()
 
+    async def get_conversion_details(
+        self,
+        conversion_id: str,
+    ) -> dict[str, Any]:
+        response = await self._http_client.get(
+            "{0}/conversions/{1}".format(self._base_url, conversion_id),
+            headers=self._http_client.headers,
+        )
+
+        response.raise_for_status()
+        return response.json()
+
     async def update_company(  # noqa: WPS211
         self,
         company_id: str,

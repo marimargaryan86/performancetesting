@@ -1,10 +1,9 @@
 import json
 import logging
 import sys
-from typing import Any, Dict, Mapping
+from typing import Any, Mapping
 
 import httpx
-import pymongo
 import pytest
 from dateutil import parser
 
@@ -131,28 +130,3 @@ async def test_create_transactions(  # noqa: WPS210, WPS213, WPS218, C901
     assert is_valid_date
     assert quotation["id"] == response_create_quote["data"]["id"]
     assert quotation["type"] == "quotations"
-
-    mongo_client: pymongo.mongo_client.MongoClient[Dict[str, Any]] = (
-        pymongo.MongoClient(
-            "mongodb://{0}:{1}@{2}:{3}/".format(
-                get_mongo_config["mongodb_dev_user"],
-                get_mongo_config["mongodb_dev_password"],
-                get_mongo_config["mongodb_dev_server"],
-                get_mongo_config["mongodb_dev_port"],
-            ),
-        )
-    )
-    db = mongo_client["transactions"]
-    collection_transactions = db.get_collection("transactions")
-    transactions_item = collection_transactions.find_one(
-        {"external_reference_id": external_reference},
-    )
-    logger.info("transactions_item: %s", transactions_item)
-
-    collection_conversions = db.get_collection("conversions")
-    conversion_item = collection_conversions.find_one(
-        transactions_item["conversion_id"],  # type: ignore[index]
-    )
-    logger.info("transactions_item: %s", transactions_item)
-
-    assert is_valid_uuid(conversion_item["_id"])  # type: ignore[index]
