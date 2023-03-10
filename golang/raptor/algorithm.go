@@ -4,7 +4,7 @@ import (
 	"git.snowfall.se/junction/junction/golang/legacy"
 	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/planner/v1alpha"
 	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"
-	"github.com/uber/h3-go/v3"
+	"github.com/uber/h3-go/v4"
 	"math"
 	"sort"
 	"strconv"
@@ -29,7 +29,7 @@ type raptor struct {
 	rounds         []map[uint64]uint32              // a map of round number to a map of Stop.Sequence to unix timestamps (basically a round number to that rounds `best`)
 	trips          *sync.Map                        // a map of route.Sequence to index of route.Schedules
 	kindList       []models.Schedule_Type           // list of schedule types to search for
-	stopsMap       map[h3.H3Index][]*planner.Stop
+	stopsMap       map[h3.Cell][]*planner.Stop
 	maxConnections int
 	workerCount    int
 }
@@ -62,7 +62,7 @@ func newRaptor(
 	destinations []*planner.Stop,
 	departureAt time.Time,
 	kindList []models.Schedule_Type,
-	stopsMap map[h3.H3Index][]*planner.Stop,
+	stopsMap map[h3.Cell][]*planner.Stop,
 	maxConnections int,
 	workerCount int,
 ) *raptor {
@@ -350,8 +350,8 @@ func (r *raptor) scanTransfers() {
 		fromStop := r.data.StopBySequence(p)
 		departure, _ := r.rounds[r.round][fromStop.Sequence]
 		idInt, _ := strconv.ParseUint(fromStop.Id, 10, 0)
-		hex := h3.H3Index(idInt)
-		neighbours := h3.KRing(hex, 2)
+		hex := h3.Cell(idInt)
+		neighbours := h3.GridDisk(hex, 2)
 
 		for _, n := range neighbours {
 			toStops, ok := r.stopsMap[n]

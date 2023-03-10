@@ -11,7 +11,7 @@ const mergeRequestTemplate = "# Merge Request\n\n## What does this MR do?\n\n## 
 const suggestionCommitMessage = "fix: apply review suggestions"
 
 func verifyApprovalRules(client *gitlab.Client, logger *zap.SugaredLogger, p *gitlab.Project, snowman *gitlab.User) {
-	rules, _, err := client.Projects.GetProjectApprovalRules(p.ID)
+	rules, _, err := client.Projects.GetProjectApprovalRules(p.ID, &gitlab.GetProjectApprovalRulesListsOptions{})
 
 	if err != nil {
 		logger.Error(err)

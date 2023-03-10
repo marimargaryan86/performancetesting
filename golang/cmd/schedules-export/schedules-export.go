@@ -25,7 +25,7 @@ import (
 	"git.snowfall.se/junction/junction/golang/protoio"
 	"github.com/google/uuid"
 	"github.com/schollz/progressbar/v3"
-	"github.com/uber/h3-go/v3"
+	"github.com/uber/h3-go/v4"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -315,9 +315,9 @@ func coordIdBuilder(job *routesJob) strings.Builder {
 
 	for _, stop := range job.stops {
 		idBuilder.WriteString(
-			strconv.FormatUint(uint64(h3.FromGeo(h3.GeoCoord{ // XXXXX Change here!
-				Longitude: stop.Point.Coordinates.Longitude,
-				Latitude:  stop.Point.Coordinates.Latitude,
+			strconv.FormatUint(uint64(h3.LatLngToCell(h3.LatLng{ // XXXXX Change here!
+				Lng: stop.Point.Coordinates.Longitude,
+				Lat: stop.Point.Coordinates.Latitude,
 			}, 9)), 10),
 		)
 	}

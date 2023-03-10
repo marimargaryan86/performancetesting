@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
-	"github.com/uber/h3-go/v3"
+	"github.com/uber/h3-go/v4"
 	"runtime"
 	"sort"
 	"time"
@@ -45,12 +45,12 @@ var executionTimes = promauto.NewHistogram(prometheus.HistogramOpts{
 type Planner struct {
 	data     *legacy.Repository
 	logger   *zap.SugaredLogger
-	stopsMap map[h3.H3Index][]*planner.Stop
+	stopsMap map[h3.Cell][]*planner.Stop
 }
 
 func NewPlanner(
 	data *legacy.Repository,
-	stopsMap map[h3.H3Index][]*planner.Stop,
+	stopsMap map[h3.Cell][]*planner.Stop,
 	logger *zap.SugaredLogger,
 ) *Planner {
 	return &Planner{

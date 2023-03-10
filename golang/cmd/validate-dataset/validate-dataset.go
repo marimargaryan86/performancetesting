@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/schollz/progressbar/v3"
 	"github.com/spf13/cobra"
-	"github.com/uber/h3-go/v3"
+	"github.com/uber/h3-go/v4"
 	"google.golang.org/protobuf/proto"
 	"io"
 	"log"
@@ -453,14 +453,14 @@ func validateDataIntegrity(d dataset, sm map[string]schedule) []error {
 			}
 
 			for i, l := range js.Legs {
-				originIndex := h3.FromGeo(h3.GeoCoord{
-					Latitude:  l.Origin.Coordinates.Coordinates[1],
-					Longitude: l.Origin.Coordinates.Coordinates[0],
+				originIndex := h3.LatLngToCell(h3.LatLng{
+					Lat: l.Origin.Coordinates.Coordinates[1],
+					Lng: l.Origin.Coordinates.Coordinates[0],
 				}, 9)
 
-				destinationIndex := h3.FromGeo(h3.GeoCoord{
-					Latitude:  l.Destination.Coordinates.Coordinates[1],
-					Longitude: l.Destination.Coordinates.Coordinates[0],
+				destinationIndex := h3.LatLngToCell(h3.LatLng{
+					Lat: l.Destination.Coordinates.Coordinates[1],
+					Lng: l.Destination.Coordinates.Coordinates[0],
 				}, 9)
 
 				originId, err := strconv.Atoi(d.stops[legs[i][0].Stop].Id)

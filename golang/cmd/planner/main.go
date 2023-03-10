@@ -11,7 +11,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/uber/h3-go/v3"
+	"github.com/uber/h3-go/v4"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -112,11 +112,11 @@ func serve(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	stopsMap := make(map[h3.H3Index][]*planner.Stop, len(stops))
+	stopsMap := make(map[h3.Cell][]*planner.Stop, len(stops))
 
 	for _, stop := range stops {
 		intIndex, _ := strconv.Atoi(stop.Id)
-		index := h3.H3Index(intIndex)
+		index := h3.Cell(intIndex)
 
 		if _, ok := stopsMap[index]; !ok {
 			stopsMap[index] = make([]*planner.Stop, 0)

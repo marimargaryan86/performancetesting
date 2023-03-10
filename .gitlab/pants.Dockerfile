@@ -29,4 +29,4 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     nomad=1.4.4-1 \
     /tmp/oasdiff.deb \
 && rm -rf /var/lib/apt/lists/* /tmp/oasdiff.deb
-COPY --from=golang:1.18.3 /usr/local/go/ /usr/local/go/
+COPY --from=golang:1.19.7 /usr/local/go/ /usr/local/go/

@@ -6,7 +6,7 @@ import (
 	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"
 	"git.snowfall.se/junction/junction/golang/raptor"
 	"github.com/google/uuid"
-	"github.com/uber/h3-go/v3"
+	"github.com/uber/h3-go/v4"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"strings"
@@ -16,7 +16,7 @@ import (
 type PlannerServiceServer struct {
 	planner.UnimplementedPlannerServiceServer
 	Planner *raptor.Planner
-	Stops   map[h3.H3Index][]*planner.Stop
+	Stops   map[h3.Cell][]*planner.Stop
 }
 
 func difference[T comparable](a, b []T) []T {
@@ -38,9 +38,9 @@ func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *plan
 	destinations := make([]*planner.Stop, 0, len(req.Destinations))
 
 	for _, origin := range req.Origins {
-		h3index := h3.FromGeo(h3.GeoCoord{
-			Latitude:  origin.Latitude,
-			Longitude: origin.Longitude,
+		h3index := h3.LatLngToCell(h3.LatLng{
+			Lat: origin.Latitude,
+			Lng: origin.Longitude,
 		}, 9)
 
 		if v, ok := ps.Stops[h3index]; ok {
@@ -49,9 +49,9 @@ func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *plan
 	}
 
 	for _, destination := range req.Destinations {
-		h3index := h3.FromGeo(h3.GeoCoord{
-			Latitude:  destination.Latitude,
-			Longitude: destination.Longitude,
+		h3index := h3.LatLngToCell(h3.LatLng{
+			Lat: destination.Latitude,
+			Lng: destination.Longitude,
 		}, 9)
 
 		if v, ok := ps.Stops[h3index]; ok {

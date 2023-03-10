@@ -97,7 +97,7 @@ source_plugins = [
 ]
 
 [golang]
-minimum_expected_version = "1.18"
+minimum_expected_version = "1.19"
 
 [isort]
 version = "isort==5.12.0"

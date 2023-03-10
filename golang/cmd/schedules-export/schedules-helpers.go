@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	v1alpha "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"
-	"github.com/uber/h3-go/v3"
+	"github.com/uber/h3-go/v4"
 )
 
 func check(err error) {
@@ -68,9 +68,9 @@ func maxU32(a uint32, b uint32) uint32 {
 }
 
 func getGeoIdentifier(coords *v1alpha.Coordinates) uint64 {
-	return uint64(h3.FromGeo(h3.GeoCoord{
-		Longitude: coords.Longitude,
-		Latitude:  coords.Latitude,
+	return uint64(h3.LatLngToCell(h3.LatLng{
+		Lng: coords.Longitude,
+		Lat: coords.Latitude,
 	}, 9))
 }
 
