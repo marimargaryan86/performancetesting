@@ -233,6 +233,18 @@ class PayAdminClient(object):
         response.raise_for_status()
         return response.json()
 
+    async def get_company_details(
+        self,
+        company_id: str,
+    ) -> dict[str, Any]:
+        response = await self._http_client.get(
+            "{0}/companies/{1}".format(self._base_url, company_id),
+            headers=self._http_client.headers,
+        )
+
+        response.raise_for_status()
+        return response.json()
+
     async def update_company(  # noqa: WPS211
         self,
         company_id: str,
