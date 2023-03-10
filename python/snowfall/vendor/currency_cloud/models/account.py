@@ -1,3 +1,5 @@
+from typing import Optional
+
 import pydantic
 
 from snowfall.vendor.currency_cloud.models.base import CamelCaseBaseModel
@@ -9,8 +11,8 @@ class Account(CamelCaseBaseModel):
     street: str
     city: str
     country: str
-    postal_code: str
-    state_or_province: str
+    postal_code: Optional[str]
+    state_or_province: Optional[str]
     spread_table: str = "flat_0.00"
     api_trading: bool = True
     online_trading: bool = False
@@ -24,3 +26,4 @@ class AccountRequest(Account):
 
 class AccountResponse(Account):
     identifier: str = pydantic.Field(..., alias="id")
+    status: str

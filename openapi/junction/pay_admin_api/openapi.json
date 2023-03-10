@@ -591,11 +591,14 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "parameters": [
           {
-            "$ref": "#/components/parameters/sort"
+            "$ref": "#/components/parameters/sortAccount"
           },
           {
             "$ref": "#/components/parameters/page-cursor"
@@ -782,7 +785,7 @@
         "schema": {
           "type": "string",
           "default": "",
-          "example": "1"
+          "example": "MTogIjEiIDI6ICJkODVhZGRmNGEzNjFmOTc0IiAzOiAiNGY2M2UwNTAwODNlODQzYSI"
         },
         "description": "Pagination cursor that defines your place in the list."
       },
@@ -843,16 +846,19 @@
         },
         "description": "Company id"
       },
-      "sort": {
+      "sortAccount": {
         "name": "sort",
         "in": "query",
         "style": "form",
         "required": false,
         "schema": {
           "type": "string",
-          "example": "id"
+          "example": "name",
+          "enum": [
+            "name"
+          ]
         },
-        "description": "Sorting"
+        "description": "Sorting based on field"
       }
     },
     "schemas": {
@@ -1016,18 +1022,37 @@
                 "example": "account",
                 "minLength": 1,
                 "maxLength": 150
+              },
+              "status": {
+                "type": "string",
+                "example": "status",
+                "readOnly": true
               }
             },
             "required": [
-              "name"
+              "name",
+              "status"
             ]
           },
           "relationships": {
             "type": "object",
             "required": [
+              "company",
               "contactPerson"
             ],
             "properties": {
+              "company": {
+                "type": "object",
+                "readOnly": true,
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/CompanyIdentifier"
+                  }
+                }
+              },
               "contactPerson": {
                 "type": "object",
                 "required": [

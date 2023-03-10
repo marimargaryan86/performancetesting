@@ -25,6 +25,9 @@ class Authenticator(jwt.JWTDecoder):
             decoded = self.decode_token(jwt_token)
         except jwt.jwt.exceptions.ExpiredSignatureError as err:
             raise authentication.AuthenticationError(str(err)) from err
+        except jwt.jwt.exceptions.DecodeError as err:
+            # TODO: does not handle the exception proeprly (like not showing the err msg)
+            raise authentication.AuthenticationError("Invalid JWT token") from err
 
         client_id: str = decoded["user_info"]["id"]
 

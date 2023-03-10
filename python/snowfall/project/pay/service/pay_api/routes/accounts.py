@@ -1,5 +1,5 @@
 import lagom
-from starlette import endpoints, requests, responses, status
+from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.pay.service.accounts import accounts
 from snowfall.project.pay.service.accounts.v1alpha import models_pb2 as account_models
@@ -7,14 +7,73 @@ from snowfall.project.pay.service.companies.v1alpha import models_pb2 as company
 from snowfall.project.pay.service.pay_api import resources
 from snowfall.project.pay.service.pay_api.repositories import CompanyRepository
 from snowfall.stdlib import string
-from snowfall.stdlib.integration.starlette import messages, models, request_helpers
+from snowfall.stdlib.integration.starlette import (
+    messages,
+    models,
+    pagination_helpers,
+    request_helpers,
+)
 from snowfall.vendor.currency_cloud.client import PaymentClient
 from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
 from snowfall.vendor.currency_cloud.models import account as cc_account_models
 from snowfall.vendor.currency_cloud.models import contact as cc_contact_models
+from snowfall.vendor.currency_cloud.pagination import Pagination
 
 
 class Accounts(endpoints.HTTPEndpoint):
+    async def get(  # noqa: WPS210
+        self,
+        request: requests.Request,
+        accounts_repository: accounts.AccountsRepository = lagom.injectable,
+        payment_client: PaymentClient = lagom.injectable,
+    ) -> responses.Response:
+        pagination = pagination_helpers.get_pagination(request)
+        sort_by = request.query_params.get("sort")
+        cc_pagination = Pagination(
+            pagination.cursor,
+            pagination.limit,
+            "account_name" if sort_by and sort_by == "name" else "",
+            request.url_for("Account"),
+        )
+
+        try:
+            cc_accounts = payment_client.get_all_accounts(cc_pagination)
+        except CurrencyCloudError as exc:
+            return self._generate_error(exc)
+
+        payload_accounts = []
+        for account in cc_accounts:
+            db_account = await accounts_repository.find_by_id(
+                account.identifier,
+                "external_reference",
+            )
+
+            if not db_account:
+                raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+            payload_accounts.append(
+                {
+                    "account_id": account.identifier,
+                    "name": account.account_name,
+                    "status": account.status,
+                    "company_id": db_account.company_id,
+                    "contact_person_id": db_account.contact_id,
+                },
+            )
+
+        return await messages.create_response(
+            body=messages.models.Body(
+                data=[
+                    resources.AccountResource.from_proto(
+                        **account,  # noqa: WPS441
+                    )
+                    for account in payload_accounts
+                ],
+                links=cc_pagination.next_url,
+            ),
+            request=request,
+        )
+
     async def post(  # noqa: WPS211, C901, WPS212, WPS217, WPS210
         self,
         request: requests.Request,
@@ -111,8 +170,11 @@ class Accounts(endpoints.HTTPEndpoint):
         return await messages.create_response(
             body=models.Body(
                 data=resources.AccountResource.from_proto(
-                    account=account,
+                    account_id=account.id,
                     name=body["name"],
+                    status=cc_account.status,
+                    company_id=company.id,
+                    contact_person_id=account.contact_id,
                 ),
             ),
             request=request,

@@ -31,6 +31,7 @@ from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.vendor.currency_cloud.client import PaymentClient
 from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
+from snowfall.vendor.currency_cloud.pagination import Pagination
 
 
 def _create_app(  # noqa: WPS211
@@ -201,12 +202,22 @@ def cc_client(cc_login: str, cc_api_key: str, cc_env: str) -> currencycloud.Clie
 
 
 @pytest.fixture()
-def payment_client() -> mock.Mock:
+def payment_client(
+    accounts_list_from_cc: Sequence[mock.Mock],
+) -> mock.Mock:
     payment_client = mock.Mock()
     message = "Conversion of GBP equivalent 0.89 is less than your lower limit of 1.00"
     payment_client.create_conversion = mock.Mock(
         side_effect=CurrencyCloudError(message=message),
     )
+
+    def _get_all_accounts(  # noqa: WPS430
+        pagination: Pagination,
+    ) -> Sequence[mock.Mock]:
+        pagination._next_url["next"] = "http://localhost:8006/accounts"  # noqa: WPS437
+        return accounts_list_from_cc
+
+    payment_client.get_all_accounts = _get_all_accounts
     return payment_client
 
 

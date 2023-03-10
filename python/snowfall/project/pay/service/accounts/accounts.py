@@ -8,6 +8,7 @@ class AccountsRepository(
     repository.ProtoRepository[models_pb2.Account],
 ):
     _proto = models_pb2.Account
+    _default_page_size = 20
 
 
 class ContactPersonsRepository(

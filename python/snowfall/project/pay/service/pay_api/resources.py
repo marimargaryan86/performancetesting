@@ -218,21 +218,31 @@ class AccountResource(models.Resource):
     api_type: ClassVar[str] = "accounts"
 
     @classmethod
-    def from_proto(
+    def from_proto(  # noqa: WPS211
         cls,
-        account: account_models.Account,
+        account_id: str,
         name: str,
+        status: str,
+        company_id: str,
+        contact_person_id: str,
     ) -> AccountResource:
         return cls(
-            id=account.id,
+            id=account_id,
             type=AccountResource.api_type,
             attributes={
                 "name": name,
+                "status": status,
             },
             relationships={
+                "company": {
+                    "data": {
+                        "id": company_id,
+                        "type": "companies",
+                    },
+                },
                 "contactPerson": {
                     "data": {
-                        "id": account.contact_id,
+                        "id": contact_person_id,
                         "type": "contact-persons",
                     },
                 },

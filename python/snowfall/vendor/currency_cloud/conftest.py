@@ -54,6 +54,7 @@ def account_response() -> account.AccountResponse:
         city="London",
         state_or_province="London",
         country="UK",
+        status="enabled",
         postal_code="4325",
         spread_table="flat_0.00",
         api_trading=True,
