@@ -398,12 +398,7 @@ def save_properties_to_allure_file(
     origins: Sequence[str],
     destinations: Sequence[str],
     departures_after: Sequence[str],
-    host: str,
 ) -> None:
-    add_allure_environment_property(
-        "host",
-        host,
-    )
     add_allure_environment_property(
         "origin",
         origins[0],
