@@ -5,10 +5,15 @@ import type { UserModel } from "models/user";
 
 export function load(event: ServerLoadEvent): { user?: UserModel } {
   const token = event.cookies.get("session-token");
-  const user: UserJwtSchema | undefined = token ? jwtDecode(token) : undefined;
 
-  if (user) {
-    return { user: { email: user.user_info.email, id: user.user_info.id } };
+  try {
+    const user: UserJwtSchema | undefined = token ? jwtDecode(token) : undefined;
+
+    if (user) {
+      return { user: { email: user.user_info.email, id: user.user_info.id } };
+    }
+  } catch {
+    //
   }
 
   return {};
