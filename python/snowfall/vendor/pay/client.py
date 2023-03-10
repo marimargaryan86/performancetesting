@@ -96,7 +96,7 @@ class PayClient(object):
     def __init__(
         self,
         base_url: str,
-        auth: PayAuthentication,
+        auth: httpx.Auth,
         client: Optional[httpx.AsyncClient] = None,
     ):
         self._base_url = base_url
@@ -186,7 +186,7 @@ class PayAdminClient(object):
     def __init__(
         self,
         base_url: str,
-        auth: PayAuthentication,
+        auth: httpx.Auth,
         client: Optional[httpx.AsyncClient] = None,
     ):
         self._base_url = base_url
