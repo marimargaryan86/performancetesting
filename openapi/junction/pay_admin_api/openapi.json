@@ -844,8 +844,7 @@
           },
           "id": {
             "type": "string",
-            "format": "uuid",
-            "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
             "readOnly": true
           },
           "attributes": {
