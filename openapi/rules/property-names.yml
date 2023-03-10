@@ -1,12 +1,28 @@
 rules:
-  parameter-names:
+  query-parameter-names:
     severity: warn
-    message: "Invalid property name: {{value}} (expected: lowerCamelCase)"
-    given: "$.paths.*.*.parameters.*.name"
+    message: "Invalid query parameter name: {{value}} (expected: lowerCamelCase)"
+    given: $.paths.*.*.parameters[?(@.in=="query")].name
     then:
       function: pattern
       functionOptions:
         match: "^[a-z][A-Za-z]+(?:\\[[a-z]([A-Za-z]|\\.[a-z][A-Za-z])+\\])*$"
+  path-parameter-names:
+    severity: warn
+    message: "Invalid path parameter name: {{value}} (expected: lowerCamelCase)"
+    given: $.paths.*.*.parameters[?(@.in=="path")].name
+    then:
+      function: pattern
+      functionOptions:
+        match: "^[a-z][A-Za-z]+$"
+  header-parameter-names:
+    severity: warn
+    message: "Invalid header name: {{value}} (expected: Upper-Kebab-Case)"
+    given: $.paths.*.*.parameters[?(@.in=="header")].name
+    then:
+      function: pattern
+      functionOptions:
+        match: "^[A-Z][A-Za-z]+(?:-[A-Z][A-Za-z]+)*$"
   property-names:
     severity: warn
     message: "Invalid property name: {{property}} (expected: lowerCamelCase)"
