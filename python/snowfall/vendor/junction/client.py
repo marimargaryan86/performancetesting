@@ -52,6 +52,8 @@ order_includes = Literal[
 
 class LegType(enum.Enum):
     air = "air"
+    bus = "bus"
+    ferry = "ferry"
     rail = "rail"
 
 
