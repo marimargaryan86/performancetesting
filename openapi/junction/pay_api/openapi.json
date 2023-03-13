@@ -130,6 +130,55 @@
         "security": []
       }
     },
+    "/currencies": {
+      "get": {
+        "summary": "List all currencies",
+        "operationId": "get-currencies",
+        "description": "Listing all available currencies",
+        "tags": [
+          "currencies"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          },
+          {
+            "$ref": "#/components/parameters/sortCurrencies"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "minItems": 0,
+                      "items": {
+                        "$ref": "#/components/schemas/Currency"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
     "/currencies/{currencyId}": {
       "parameters": [
         {
@@ -345,6 +394,43 @@
   },
   "components": {
     "parameters": {
+      "page-cursor": {
+        "name": "page[cursor]",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "default": "1",
+          "example": "1"
+        },
+        "description": "Pagination cursor that defines your place in the list."
+      },
+      "page-limit": {
+        "name": "page[limit]",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20,
+          "example": 20
+        },
+        "description": "A limit on the number of objects to be returned, between 1 and 100."
+      },
+      "sortCurrencies": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "example": "id",
+          "enum": [
+            "id"
+          ]
+        },
+        "description": "Field name what should be used to sort"
+      },
       "currencyId": {
         "name": "currencyId",
         "in": "path",
@@ -557,10 +643,17 @@
                   "name": {
                     "type": "string",
                     "example": "US Dollar"
+                  },
+                  "minorUnits": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "The relationship between the minor unit and the currency itself.",
+                    "example": 2
                   }
                 },
                 "required": [
-                  "name"
+                  "name",
+                  "minorUnits"
                 ]
               }
             },
