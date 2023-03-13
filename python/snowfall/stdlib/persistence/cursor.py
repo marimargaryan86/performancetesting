@@ -69,7 +69,7 @@ def _sign_cursor(cursor: Cursor) -> str:
 def _parse(encoded: str) -> Cursor:
     try:
         raw = base64.urlsafe_b64decode(encoded.encode()).decode()
-    except binascii.Error as err:
+    except (binascii.Error, UnicodeDecodeError) as err:
         raise CursorError("Invalid payload.") from err
 
     cursor = Cursor()

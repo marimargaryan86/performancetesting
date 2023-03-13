@@ -17,6 +17,11 @@ def test_invalid_base64_string() -> None:
         cursor.unmarshal("foobar")
 
 
+def test_invalid_base64_string_decode() -> None:
+    with pytest.raises(cursor.CursorError):
+        cursor.unmarshal("MTogIjDM6IC==")
+
+
 def test_invalid_protobuf_string() -> None:
     with pytest.raises(cursor.CursorError):
         cursor.unmarshal(base64.urlsafe_b64encode(b"foobar").decode())
