@@ -15,6 +15,7 @@ message TripOfferSearchTask {
 message TripOfferSearchResult {
   string offer_search_id = 1;
   OfferGroup offer = 2;
+  string provider_company_id = 3;
 }
 
 message TripPriceQuoteTask {
