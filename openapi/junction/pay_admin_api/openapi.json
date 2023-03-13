@@ -57,6 +57,12 @@
       "tags": [
         "internal"
       ]
+    },
+    {
+      "name": "Transactions",
+      "tags": [
+        "transactions"
+      ]
     }
   ],
   "tags": [
@@ -94,6 +100,11 @@
       "name": "internal",
       "description": "Endpoints not for public use.",
       "x-displayName": "Internal"
+    },
+    {
+      "name": "transactions",
+      "description": "Account transactions",
+      "x-displayName": "Transactions"
     }
   ],
   "paths": {
@@ -774,6 +785,62 @@
           }
         }
       }
+    },
+    "/transactions": {
+      "get": {
+        "summary": "List Transactions",
+        "tags": [
+          "transactions"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "items": {
+                            "$ref": "#/components/schemas/Transaction"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "operationId": "get-transactions",
+        "description": "Get transactions"
+      }
     }
   },
   "components": {
@@ -1379,6 +1446,197 @@
           }
         ]
       },
+      "Money": {
+        "title": "Money",
+        "description": "Amount and currency.",
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "format": "currency",
+            "example": "EUR"
+          },
+          "amount": {
+            "type": "integer",
+            "example": 1337
+          }
+        },
+        "required": [
+          "currency",
+          "amount"
+        ]
+      },
+      "Transaction": {
+        "title": "Transaction",
+        "type": "object",
+        "description": "Transaction data",
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "transactions"
+            ],
+            "example": "transactions"
+          },
+          "attributes": {
+            "required": [
+              "externalReference",
+              "parentExternalReference",
+              "createdAt",
+              "beneficiaryAmount",
+              "offerAmount",
+              "convertedBeneficiaryAmount",
+              "bufferAmount",
+              "salesAmount",
+              "exchangeRate",
+              "bufferRate",
+              "salesRate"
+            ],
+            "properties": {
+              "externalReference": {
+                "type": "string",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "format": "uuid"
+              },
+              "parentExternalReference": {
+                "type": "string",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "format": "uuid"
+              },
+              "createdAt": {
+                "type": "string",
+                "example": "2023-01-20T17:04:14+00:00",
+                "format": "date-time",
+                "readOnly": true
+              },
+              "beneficiaryAmount": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Money"
+                  }
+                ],
+                "readOnly": true
+              },
+              "offerAmount": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Money"
+                  }
+                ],
+                "readOnly": true
+              },
+              "convertedBeneficiaryAmount": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Money"
+                  }
+                ],
+                "readOnly": true
+              },
+              "bufferAmount": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Money"
+                  }
+                ],
+                "readOnly": true
+              },
+              "salesAmount": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Money"
+                  }
+                ],
+                "readOnly": true
+              },
+              "exchangeRate": {
+                "type": "number",
+                "format": "float",
+                "example": 1.02,
+                "readOnly": true
+              },
+              "bufferRate": {
+                "type": "number",
+                "format": "float",
+                "example": 1.02,
+                "readOnly": true
+              },
+              "salesRate": {
+                "type": "number",
+                "format": "float",
+                "example": 1.02,
+                "readOnly": true
+              }
+            }
+          },
+          "relationships": {
+            "required": [
+              "quotation"
+            ],
+            "properties": {
+              "quotation": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/QuotationIdentifier"
+                  }
+                },
+                "writeOnly": true
+              },
+              "conversion": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/ConversionIdentifier"
+                  }
+                },
+                "readOnly": true
+              },
+              "payer": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/CompanyIdentifier"
+                  }
+                },
+                "readOnly": true
+              },
+              "beneficiary": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/CompanyIdentifier"
+                  }
+                },
+                "readOnly": true
+              }
+            }
+          }
+        }
+      },
       "CompanyIdentifier": {
         "title": "Company Identifier",
         "type": "object",
@@ -1444,6 +1702,50 @@
           "id",
           "type"
         ]
+      },
+      "QuotationIdentifier": {
+        "title": "Quotation Identifier",
+        "type": "object",
+        "required": [
+          "id",
+          "type"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "quotations"
+            ],
+            "example": "quotations"
+          }
+        }
+      },
+      "ConversionIdentifier": {
+        "title": "Conversion Identifier",
+        "type": "object",
+        "required": [
+          "id",
+          "type"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "conversions"
+            ],
+            "example": "conversions"
+          }
+        }
       },
       "NextLink": {
         "title": "Next Link",
