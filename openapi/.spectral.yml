@@ -13,7 +13,7 @@ overrides:
   - files:
       - "junction/client_api/openapi.json#/paths/~1offers~1quotes/post/requestBody/content"
     rules:
-      oas3-valid-schema-example: info
+      oas3-valid-schema-example: off
   - files:
       - "junction/mobile_api/openapi.json#/paths/~1places"
       - "junction/mobile_api/openapi.json#/paths/~1users~1me~1preferences"
@@ -31,14 +31,10 @@ overrides:
   - files:
       - "junction/pay_api/openapi.json#/components/parameters/currencyId"
     rules:
-      no-numeric-ids: info
+      no-numeric-ids: off
   - files:
       - "junction/pay_admin_api/openapi.json#/components/parameters/company"
     rules:
       json-api-no-required-parameters: info
-      json-api-query-parameter-names: info
-  - files:
-      - "junction/pay_api/openapi.json#/components/parameters/sort"
-    rules:
       json-api-query-parameter-names: info
 
