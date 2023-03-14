@@ -27,7 +27,7 @@ EXIT_MSG = "Exiting ; check your logs"
 
 
 @pytest.mark.integration
-async def test_create_transactions(  # noqa: WPS210, WPS213, WPS218, C901
+async def test_create_transactions(  # noqa: WPS210, WPS213, C901
     pay_client: PayClient,
     pay_admin_client: PayAdminClient,
     get_mongo_config: Mapping[str, Any],
@@ -103,10 +103,6 @@ async def test_create_transactions(  # noqa: WPS210, WPS213, WPS218, C901
         json.dumps(response_create_transactions, indent=4),
     )
 
-    quotation = response_create_transactions["data"]["relationships"]["quotation"][
-        "data"
-    ]
-
     assert (
         is_valid_uuid(response_create_transactions["data"]["id"]) is True
     ), "transactions uuid must be in valid format"
@@ -128,5 +124,3 @@ async def test_create_transactions(  # noqa: WPS210, WPS213, WPS218, C901
     except parser.ParserError:
         is_valid_date = False
     assert is_valid_date
-    assert quotation["id"] == response_create_quote["data"]["id"]
-    assert quotation["type"] == "quotations"

@@ -290,6 +290,17 @@ class PayAdminClient(object):  # noqa: WPS214
         response.raise_for_status()
         return response.json()
 
+    async def get_transactions(
+        self,
+    ) -> dict[str, Any]:
+        response = await self._http_client.get(
+            "{0}/transactions".format(self._base_url),
+            headers=self._http_client.headers,
+        )
+
+        response.raise_for_status()
+        return response.json()
+
     async def update_company(  # noqa: WPS211
         self,
         company_id: str,
