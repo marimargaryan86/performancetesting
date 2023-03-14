@@ -26,7 +26,10 @@ async def _create_gtfs(app: service.Application[DFSetting]) -> None:
 
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
-            httpx.AsyncClient(http2=True, timeout=app.settings.timeout),
+            httpx.AsyncClient(
+                http2=True,
+                timeout=int(app.settings.api_timeout.total_seconds()),
+            ),
         )
 
         timetable_repository = TimetableRepository(
@@ -43,7 +46,7 @@ async def _create_gtfs(app: service.Application[DFSetting]) -> None:
                     partner_code=app.settings.partner_code,
                     client_id=app.settings.client_id,
                     client_secret=app.settings.client_secret,
-                    timeout=app.settings.timeout,
+                    timeout=int(app.settings.api_timeout.total_seconds()),
                 ),
             ),
         )

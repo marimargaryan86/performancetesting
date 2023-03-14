@@ -43,7 +43,7 @@ class _SearchSettings(service.Settings):
     partner_code: str
     client_id: str
     client_secret: str
-    api_timeout: int = 40
+    api_timeout: datetime.timedelta = datetime.timedelta(seconds=40)
 
 
 class _OffersSettings(service.Settings):
@@ -60,7 +60,7 @@ class _OrdersSettings(service.Settings):
     partner_code: str
     client_id: str
     client_secret: str
-    api_timeout: int = 40
+    api_timeout: datetime.timedelta = datetime.timedelta(seconds=40)
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
 
 
@@ -68,7 +68,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
             httpx.AsyncClient(
-                timeout=app.settings.api_timeout,
+                timeout=int(app.settings.api_timeout.total_seconds()),
             ),
         )
         amqp_connection = await stack.enter_async_context(
@@ -95,7 +95,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
                 partner_code=app.settings.partner_code,
                 client_id=app.settings.client_id,
                 client_secret=app.settings.client_secret,
-                timeout=app.settings.api_timeout,
+                timeout=int(app.settings.api_timeout.total_seconds()),
             ),
         )
 
@@ -165,7 +165,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
             httpx.AsyncClient(
-                timeout=app.settings.api_timeout,
+                timeout=int(app.settings.api_timeout.total_seconds()),
             ),
         )
         amqp_conn = await stack.enter_async_context(
@@ -191,7 +191,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
                 partner_code=app.settings.partner_code,
                 client_id=app.settings.client_id,
                 client_secret=app.settings.client_secret,
-                timeout=app.settings.api_timeout,
+                timeout=int(app.settings.api_timeout.total_seconds()),
             ),
         )
         offers_cache = cache.OffersCache(

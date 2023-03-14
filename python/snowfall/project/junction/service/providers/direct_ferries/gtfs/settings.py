@@ -1,3 +1,5 @@
+import datetime
+
 import pydantic
 
 from snowfall.stdlib import service
@@ -9,8 +11,5 @@ class DFSetting(service.Settings):
     partner_code: str
     client_id: str
     client_secret: str
-    timeout: int
-    always_run: bool = False
-    mongo_dsn: tuple[pydantic.AnyUrl]
+    api_timeout: datetime.timedelta = datetime.timedelta(minutes=2)
     output_path: str = "dist/import/gtfs-feed/direct-ferries"
-    redis_dsn: tuple[pydantic.AnyUrl]
