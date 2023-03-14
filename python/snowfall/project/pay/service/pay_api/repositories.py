@@ -5,7 +5,7 @@ from snowfall.project.pay.service.conversions.v1alpha.models_pb2 import Conversi
 from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Transaction
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.persistence.mongo import mixins, repository
+from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 from snowfall.vendor.currency_cloud.models.conversion import ConversionResponse
 
 
@@ -44,6 +44,15 @@ class TransactionRepository(
     repository.ProtoRepository[Transaction],
 ):
     _proto = Transaction
+    _default_page_size = 20
+
+    async def find(
+        self,
+        cursor: str | None,
+    ) -> resultset.ResultSet[Transaction]:
+        return await self._find_with_cursor(
+            cur=cursor or "",
+        )
 
 
 class ConversionRepository(

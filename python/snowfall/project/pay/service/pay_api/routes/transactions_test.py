@@ -1,3 +1,5 @@
+from typing import Sequence
+
 import httpx
 from starlette import status
 
@@ -36,3 +38,13 @@ class TestTransactions(object):
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert error["status"] == "400" and error["code"] == "bad_request"
+
+    async def test_get_all_transactions_success(
+        self,
+        admin_client: httpx.AsyncClient,
+        transaction_ids: Sequence[str],
+    ) -> None:
+        response = await admin_client.get("/transactions")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.json()["data"]) == len(transaction_ids)

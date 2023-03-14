@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import pathlib
 from typing import AsyncIterator, Mapping, Sequence
@@ -26,6 +27,8 @@ from snowfall.project.pay.service.pay_api.repositories import (
 )
 from snowfall.project.pay.service.pay_api.routes import router
 from snowfall.project.pay.service.quotations import quotations
+from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Transaction
+from snowfall.stdlib import money, string
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.stdlib.persistence.redis import types as redis
@@ -34,13 +37,21 @@ from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
 from snowfall.vendor.currency_cloud.pagination import Pagination
 
 
+@pytest.fixture
+def transaction_ids() -> Sequence[str]:
+    return [
+        "e719b289-982c-42f0-99a2-63fa70f8f8c0",
+        "c36649e6-71f1-4dfa-aa5a-01c0ede6e538",
+    ]
+
+
 def _create_app(  # noqa: WPS211
     cc_client: currencycloud.Client,
     payment_client: PaymentClient,
     currencies_client: currencies.Client,
     quotations_repository: quotations.QuotationsRepository,
     redis_repository: UserSessionRepository,
-    transaction_repository: TransactionRepository,
+    transactions_repository: TransactionRepository,
     conversion_repository: ConversionRepository,
     companies_repository: CompanyRepository,
     openapi_path: pathlib.Path,
@@ -55,7 +66,7 @@ def _create_app(  # noqa: WPS211
                 currencies_client,
                 quotations_repository,
                 redis_repository,
-                transaction_repository,
+                transactions_repository,
                 conversion_repository,
                 companies_repository,
                 payment_client=payment_client,
@@ -76,6 +87,7 @@ def _create_admin_app(  # noqa: WPS211
     contact_persons_repository: accounts.ContactPersonsRepository,
     accounts_repository: accounts.AccountsRepository,
     conversions_repository: ConversionRepository,
+    transactions_repository: TransactionRepository,
     openapi_path: pathlib.Path,
     custom_middlewares: Sequence[Middleware] | None = None,
 ) -> applications.Starlette:
@@ -90,6 +102,7 @@ def _create_admin_app(  # noqa: WPS211
                 contact_persons_repository,
                 accounts_repository=accounts_repository,
                 conversions_repository=conversions_repository,
+                transactions_repository=transactions_repository,
                 payment_client=payment_client,
             ),
         ),
@@ -174,13 +187,43 @@ def companies_repository(
     )
 
 
+def get_transaction(transaction_id: str) -> Transaction:
+    money_usd = money.from_string("1000", money.Currency("USD")).protobuf()
+
+    return Transaction(
+        id=transaction_id,
+        external_reference_id=string.uuid(),
+        parent_external_id=string.uuid(),
+        conversion_id=string.uuid(),
+        beneficiary_amount=money_usd,
+        exchange_rate=float(1),
+        converted_beneficiary_amount=money_usd,
+        buffer_rate=float(1),
+        buffer_amount=money_usd,
+        sales_rate=float(1),
+        sales_amount=money_usd,
+        offer_amount=money_usd,
+        payer_id=string.uuid(),
+        beneficiary_id=string.uuid(),
+    )
+
+
 @pytest.fixture()
-def transactions_repository(
+async def transactions_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
+    transaction_ids: Sequence[str],
 ) -> TransactionRepository:
-    return TransactionRepository(
+    repository = TransactionRepository(
         collection=mongo_client.test.transactions,
     )
+    await asyncio.gather(
+        *[
+            repository.insert(get_transaction(transaction_id))
+            for transaction_id in transaction_ids
+        ],
+    )
+
+    return repository
 
 
 @pytest.fixture()
@@ -257,7 +300,7 @@ def app(  # noqa: WPS211
         currencies_client=currencies_client,
         quotations_repository=quotations_repository,
         redis_repository=redis_repository,
-        transaction_repository=transactions_repository,
+        transactions_repository=transactions_repository,
         conversion_repository=conversions_repository,
         companies_repository=companies_repository,
         openapi_path=filesystem.resource_path("junction.pay_api", "openapi.json"),
@@ -273,6 +316,7 @@ def admin_app(  # noqa: WPS211
     contact_persons_repository: accounts.ContactPersonsRepository,
     accounts_repository: accounts.AccountsRepository,
     conversions_repository: ConversionRepository,
+    transactions_repository: TransactionRepository,
 ) -> applications.Starlette:
     return _create_admin_app(
         cc_client=cc_client,
@@ -282,6 +326,7 @@ def admin_app(  # noqa: WPS211
         contact_persons_repository=contact_persons_repository,
         accounts_repository=accounts_repository,
         conversions_repository=conversions_repository,
+        transactions_repository=transactions_repository,
         openapi_path=filesystem.resource_path("junction.pay_admin_api", "openapi.json"),
     )
 

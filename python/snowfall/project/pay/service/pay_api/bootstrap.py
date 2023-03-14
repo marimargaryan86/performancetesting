@@ -45,6 +45,7 @@ def create_admin_dependencies(  # noqa: WPS211
     contact_persons_repository: accounts.ContactPersonsRepository,
     accounts_repository: accounts.AccountsRepository,
     conversions_repository: ConversionRepository,
+    transactions_repository: TransactionRepository,
     payment_client: client.PaymentClient | None = None,
 ) -> lagom.Container:
     container = lagom.Container()
@@ -55,6 +56,7 @@ def create_admin_dependencies(  # noqa: WPS211
     container[accounts.ContactPersonsRepository] = contact_persons_repository
     container[accounts.AccountsRepository] = accounts_repository
     container[ConversionRepository] = conversions_repository
+    container[TransactionRepository] = transactions_repository
     return container
 
 

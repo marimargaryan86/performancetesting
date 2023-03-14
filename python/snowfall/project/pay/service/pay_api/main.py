@@ -156,6 +156,9 @@ def _admin_factory(
                     conversions_repository=ConversionRepository(
                         mongo.conversions.conversions,
                     ),
+                    transactions_repository=TransactionRepository(
+                        mongo.transactions.transactions,
+                    ),
                 ),
             ),
             openapi_path=filesystem.resource_path(

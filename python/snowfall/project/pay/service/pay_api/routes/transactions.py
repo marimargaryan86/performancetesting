@@ -5,13 +5,20 @@ from snowfall.project.pay.service.pay_api import repositories, resources
 from snowfall.project.pay.service.quotations import quotations
 from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Transaction
 from snowfall.stdlib import money, string
-from snowfall.stdlib.integration.starlette import messages, models, request_helpers
+from snowfall.stdlib.integration.starlette import (
+    messages,
+    models,
+    pagination_helpers,
+    request_helpers,
+)
 from snowfall.vendor.currency_cloud.client import PaymentClient
 from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
 from snowfall.vendor.currency_cloud.models import conversion
 
 
 class Transactions(endpoints.HTTPEndpoint):
+    _default_page_size = 20
+
     async def post(  # noqa: WPS210, WPS211
         self,
         request: requests.Request,
@@ -98,4 +105,32 @@ class Transactions(endpoints.HTTPEndpoint):
                 ],
             ),
             status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    async def get(
+        self,
+        request: requests.Request,
+        transaction_repository: repositories.TransactionRepository = lagom.injectable,
+    ) -> models.JsonApiResponse:
+        pagination = pagination_helpers.get_pagination(request)
+
+        transactions = await transaction_repository.find(
+            cursor=pagination.cursor,
+        )
+
+        transactions.limit(pagination.limit or self._default_page_size)
+
+        return await messages.create_response(
+            body=models.Body(
+                data=[
+                    resources.Transaction.from_proto(transaction)
+                    async for transaction in transactions
+                ],
+                links=pagination_helpers.get_next_url(
+                    request.url_for("Transactions"),
+                    await transactions.cursor(),
+                    pagination,
+                ),
+            ),
+            request=request,
         )
