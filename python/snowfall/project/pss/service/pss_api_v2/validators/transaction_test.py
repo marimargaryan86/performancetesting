@@ -84,7 +84,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
         spec_set=True,
         instance=True,
     )
-    _transaction_validator = TransactionValidator(
+    _validator = TransactionValidator(
         _transaction_statuses_repository_mock,
         _customers_repository_mock,
         _accounts_repository_mock,
@@ -102,7 +102,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
         self._transaction_statuses_repository_mock.get_one_by_filter.return_value = (
             TransactionStatus(id=1)
         )
-        reasons = await self._transaction_validator._validate_transaction_status_id(  # noqa:437
+        reasons = await self._validator._validate_transaction_status_id(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -113,7 +113,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
         to_validate = deepcopy(self._schema)
         to_validate.transaction_status_id = 1
         self._transaction_statuses_repository_mock.get_one_by_filter.return_value = None
-        reasons = await self._transaction_validator._validate_transaction_status_id(  # noqa:437
+        reasons = await self._validator._validate_transaction_status_id(  # noqa: WPS437
             to_validate,
         )
         assert (
@@ -123,7 +123,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
 
     async def test_that_none_transaction_status_id_validates(self) -> None:
         to_validate = deepcopy(self._schema)
-        reasons = await self._transaction_validator._validate_transaction_status_id(  # noqa:437
+        reasons = await self._validator._validate_transaction_status_id(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -132,7 +132,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
         to_validate = deepcopy(self._schema)
         to_validate.customer_id = 1
         self._customers_repository_mock.get_one_by_filter.return_value = Customer(id=1)
-        reasons = await self._transaction_validator._validate_customer_id(  # noqa:437
+        reasons = await self._validator._validate_customer_id(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -143,14 +143,14 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
         to_validate = deepcopy(self._schema)
         to_validate.customer_id = 1
         self._customers_repository_mock.get_one_by_filter.return_value = None
-        reasons = await self._transaction_validator._validate_customer_id(  # noqa:437
+        reasons = await self._validator._validate_customer_id(  # noqa: WPS437
             to_validate,
         )
         assert reasons[0] == "No entry in customers for customer_id: 1"
 
     async def test_that_none_customer_id_validates(self) -> None:
         to_validate = deepcopy(self._schema)
-        reasons = await self._transaction_validator._validate_customer_id(  # noqa:437
+        reasons = await self._validator._validate_customer_id(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -159,7 +159,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
         to_validate = deepcopy(self._schema)
         to_validate.account_id = 1
         self._accounts_repository_mock.get_one_by_filter.return_value = Account(id=1)
-        reasons = await self._transaction_validator._validate_account_id(  # noqa:437
+        reasons = await self._validator._validate_account_id(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -170,14 +170,14 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
         to_validate = deepcopy(self._schema)
         to_validate.account_id = 1
         self._accounts_repository_mock.get_one_by_filter.return_value = None
-        reasons = await self._transaction_validator._validate_account_id(  # noqa:437
+        reasons = await self._validator._validate_account_id(  # noqa: WPS437
             to_validate,
         )
         assert reasons[0] == "No entry in accounts for account_id: 1"
 
     async def test_that_none_account_id_validates(self) -> None:
         to_validate = deepcopy(self._schema)
-        reasons = await self._transaction_validator._validate_account_id(  # noqa:437
+        reasons = await self._validator._validate_account_id(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -186,7 +186,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
         to_validate = deepcopy(self._schema)
         to_validate.booking_id = 1
         self._bookings_repository_mock.get_one_by_filter.return_value = Booking(id=1)
-        reasons = await self._transaction_validator._validate_booking_id(  # noqa:437
+        reasons = await self._validator._validate_booking_id(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -197,14 +197,14 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
         to_validate = deepcopy(self._schema)
         to_validate.booking_id = 1
         self._bookings_repository_mock.get_one_by_filter.return_value = None
-        reasons = await self._transaction_validator._validate_booking_id(  # noqa:437
+        reasons = await self._validator._validate_booking_id(  # noqa: WPS437
             to_validate,
         )
         assert reasons[0] == "No entry in bookings for booking_id: 1"
 
     async def test_that_none_booking_id_validates(self) -> None:
         to_validate = deepcopy(self._schema)
-        reasons = await self._transaction_validator._validate_booking_id(  # noqa:437
+        reasons = await self._validator._validate_booking_id(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -215,7 +215,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
         self._agreements_repository_mock.get_one_by_filter.return_value = Agreement(
             agreementnumber=1,
         )
-        reasons = await self._transaction_validator._validate_agreement_id(  # noqa:437
+        reasons = await self._validator._validate_agreement_id(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -226,14 +226,14 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
         to_validate = deepcopy(self._schema)
         to_validate.agreement_id = 1
         self._agreements_repository_mock.get_one_by_filter.return_value = None
-        reasons = await self._transaction_validator._validate_agreement_id(  # noqa:437
+        reasons = await self._validator._validate_agreement_id(  # noqa: WPS437
             to_validate,
         )
         assert reasons[0] == "No entry in agreements for agreement_id: 1"
 
     async def test_that_none_agreement_id_validates(self) -> None:
         to_validate = deepcopy(self._schema)
-        reasons = await self._transaction_validator._validate_agreement_id(  # noqa:437
+        reasons = await self._validator._validate_agreement_id(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -248,7 +248,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
         self._schedules_repository_mock.get_one_by_filter.return_value = Schedule(
             id=1,
         )
-        reasons = await self._transaction_validator._validate_outbound(  # noqa:437
+        reasons = await self._validator._validate_outbound(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -263,7 +263,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
             schedule_id=1,
         )
         self._schedules_repository_mock.get_one_by_filter.return_value = None
-        reasons = await self._transaction_validator._validate_outbound(  # noqa:437
+        reasons = await self._validator._validate_outbound(  # noqa: WPS437
             to_validate,
         )
         assert reasons[0] == "No entry in schedules for outbound.schedule_id: 1"
@@ -271,7 +271,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
     async def test_that_none_outbound_schedule_id_validates(self) -> None:
         to_validate = deepcopy(self._schema)
         to_validate.outbound = TransactionDirectionSchema(destination_id=0, origin_id=0)
-        reasons = await self._transaction_validator._validate_outbound(  # noqa:437
+        reasons = await self._validator._validate_outbound(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -286,7 +286,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
         self._schedules_repository_mock.get_one_by_filter.return_value = Schedule(
             id=1,
         )
-        reasons = await self._transaction_validator._validate_inbound(  # noqa:437
+        reasons = await self._validator._validate_inbound(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -301,7 +301,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
             schedule_id=1,
         )
         self._schedules_repository_mock.get_one_by_filter.return_value = None
-        reasons = await self._transaction_validator._validate_inbound(  # noqa:437
+        reasons = await self._validator._validate_inbound(  # noqa: WPS437
             to_validate,
         )
         assert reasons[0] == "No entry in schedules for inbound.schedule_id: 1"
@@ -309,7 +309,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
     async def test_that_none_inbound_schedule_id_validates(self) -> None:
         to_validate = deepcopy(self._schema)
         to_validate.inbound = TransactionDirectionSchema(destination_id=0, origin_id=0)
-        reasons = await self._transaction_validator._validate_inbound(  # noqa:437
+        reasons = await self._validator._validate_inbound(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -324,7 +324,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
         self._products_repository_mock.get_one_by_filter.return_value = Product(
             id=1,
         )
-        reasons = await self._transaction_validator._validate_outbound(  # noqa:437
+        reasons = await self._validator._validate_outbound(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -339,7 +339,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
             product_id=1,
         )
         self._products_repository_mock.get_one_by_filter.return_value = None
-        reasons = await self._transaction_validator._validate_outbound(  # noqa:437
+        reasons = await self._validator._validate_outbound(  # noqa: WPS437
             to_validate,
         )
         assert reasons[0] == "No entry in products for outbound.product_id: 1"
@@ -347,7 +347,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
     async def test_that_none_outbound_products_id_validates(self) -> None:
         to_validate = deepcopy(self._schema)
         to_validate.outbound = TransactionDirectionSchema(destination_id=0, origin_id=0)
-        reasons = await self._transaction_validator._validate_outbound(  # noqa:437
+        reasons = await self._validator._validate_outbound(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -362,7 +362,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
         self._products_repository_mock.get_one_by_filter.return_value = Product(
             id=1,
         )
-        reasons = await self._transaction_validator._validate_inbound(  # noqa:437
+        reasons = await self._validator._validate_inbound(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -377,7 +377,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
             product_id=1,
         )
         self._products_repository_mock.get_one_by_filter.return_value = None
-        reasons = await self._transaction_validator._validate_inbound(  # noqa:437
+        reasons = await self._validator._validate_inbound(  # noqa: WPS437
             to_validate,
         )
         assert reasons[0] == "No entry in products for inbound.product_id: 1"
@@ -385,7 +385,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
     async def test_that_none_inbound_products_id_validates(self) -> None:
         to_validate = deepcopy(self._schema)
         to_validate.inbound = TransactionDirectionSchema(destination_id=0, origin_id=0)
-        reasons = await self._transaction_validator._validate_inbound(  # noqa:437
+        reasons = await self._validator._validate_inbound(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -409,7 +409,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
                 id=1,
             )
         )
-        reasons = await self._transaction_validator._validate_outbound(  # noqa:437
+        reasons = await self._validator._validate_outbound(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -429,7 +429,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
             ],
         )
         self._passenger_types_repository_mock.get_one_by_filter.return_value = None
-        reasons = await self._transaction_validator._validate_outbound(  # noqa:437
+        reasons = await self._validator._validate_outbound(  # noqa: WPS437
             to_validate,
         )
         assert (
@@ -451,7 +451,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
                 ),
             ],
         )
-        reasons = await self._transaction_validator._validate_outbound(  # noqa:437
+        reasons = await self._validator._validate_outbound(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -475,7 +475,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
                 id=1,
             )
         )
-        reasons = await self._transaction_validator._validate_inbound(  # noqa:437
+        reasons = await self._validator._validate_inbound(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -495,7 +495,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
             ],
         )
         self._passenger_types_repository_mock.get_one_by_filter.return_value = None
-        reasons = await self._transaction_validator._validate_inbound(  # noqa:437
+        reasons = await self._validator._validate_inbound(  # noqa: WPS437
             to_validate,
         )
         assert (
@@ -517,7 +517,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
                 ),
             ],
         )
-        reasons = await self._transaction_validator._validate_inbound(  # noqa:437
+        reasons = await self._validator._validate_inbound(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -539,7 +539,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
         self._seat_types_repository_mock.get_one_by_filter.return_value = SeatType(
             id=1,
         )
-        reasons = await self._transaction_validator._validate_outbound(  # noqa:437
+        reasons = await self._validator._validate_outbound(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -559,7 +559,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
             ],
         )
         self._seat_types_repository_mock.get_one_by_filter.return_value = None
-        reasons = await self._transaction_validator._validate_outbound(  # noqa:437
+        reasons = await self._validator._validate_outbound(  # noqa: WPS437
             to_validate,
         )
         assert (
@@ -580,7 +580,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
                 ),
             ],
         )
-        reasons = await self._transaction_validator._validate_outbound(  # noqa:437
+        reasons = await self._validator._validate_outbound(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -602,7 +602,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
         self._seat_types_repository_mock.get_one_by_filter.return_value = SeatType(
             id=1,
         )
-        reasons = await self._transaction_validator._validate_inbound(  # noqa:437
+        reasons = await self._validator._validate_inbound(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -622,7 +622,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
             ],
         )
         self._seat_types_repository_mock.get_one_by_filter.return_value = None
-        reasons = await self._transaction_validator._validate_inbound(  # noqa:437
+        reasons = await self._validator._validate_inbound(  # noqa: WPS437
             to_validate,
         )
         assert (
@@ -643,7 +643,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
                 ),
             ],
         )
-        reasons = await self._transaction_validator._validate_inbound(  # noqa:437
+        reasons = await self._validator._validate_inbound(  # noqa: WPS437
             to_validate,
         )
         assert not reasons
@@ -702,7 +702,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
         self._seat_types_repository_mock.get_one_by_filter.return_value = SeatType(
             id=1,
         )
-        is_valid, reasons = await self._transaction_validator.is_valid(to_validate)
+        is_valid, reasons = await self._validator.is_valid(to_validate)
         assert is_valid
         assert not reasons
 
@@ -750,7 +750,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
         self._products_repository_mock.get_one_by_filter.return_value = None
         self._passenger_types_repository_mock.get_one_by_filter.return_value = None
         self._seat_types_repository_mock.get_one_by_filter.return_value = None
-        is_valid, reasons = await self._transaction_validator.is_valid(to_validate)
+        is_valid, reasons = await self._validator.is_valid(to_validate)
         assert not is_valid
         assert (
             "No entry in transaction_statuses for transaction_status_id: 1" in reasons
