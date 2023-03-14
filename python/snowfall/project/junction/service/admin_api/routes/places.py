@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Mapping
 
 import lagom
 from starlette import endpoints, requests, responses, status
@@ -22,7 +22,7 @@ _place_id_key = "placeId"
 
 def _update_place_from_payload(
     place: models_pb2.Place,
-    payload: dict[str, Any],  # noqa: SF20
+    payload: Mapping[str, Any],
     validation_result: places_validator.ValidationResult,
 ) -> models_pb2.Place:
     return models_pb2.Place(

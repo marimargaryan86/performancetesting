@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, Generic, Sequence, TypeVar, Union
+from typing import Any, Callable, Generic, Sequence, TypeVar
 
 from fastapi import Depends
 from sqlalchemy import ColumnElement, select, update
@@ -53,10 +53,7 @@ class Repository(Generic[REPOSITORY_MODEL]):  # noqa:WPS214
     async def update_by_filter(
         self,
         filter_criteria: Sequence[ColumnElement[bool]],
-        values_to_update: Union[  # noqa:WPS320,SF20
-            Dict[_DMLColumnArgument, Any],  # noqa:SF20
-            Sequence[Any],
-        ],
+        values_to_update: dict[_DMLColumnArgument, Any] | Sequence[Any],  # noqa: SF20
     ) -> None:
         async with self._db().begin() as transaction:
             statement = (

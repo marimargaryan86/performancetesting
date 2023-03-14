@@ -373,13 +373,12 @@ def _validate_trips(
         ),
     )
 
-    return _check_trip_conflicts(trips_list, validation_errors)
+    return trips_list, [*validation_errors, *_check_trip_conflicts(trips_list)]
 
 
-def _check_trip_conflicts(
-    trips_list: list[models_pb2.Trip],  # noqa: SF20
-    validation_errors: list[models.Error],  # noqa: SF20
-) -> tuple[list[models_pb2.Trip], list[models.Error]]:
+def _check_trip_conflicts(trips_list: Sequence[models_pb2.Trip]) -> list[models.Error]:
+    validation_errors = []
+
     for trip_a, trip_b in itertools.pairwise(trips_list):
         trip_a_arrival = trip_a.segments[-1].legs[-1].arrival_at.seconds  # noqa: WPS219
         trip_b_departure = (
@@ -399,7 +398,7 @@ def _check_trip_conflicts(
                 ),
             )
 
-    return trips_list, validation_errors
+    return validation_errors
 
 
 def price_quote_request_validator(  # noqa: WPS320

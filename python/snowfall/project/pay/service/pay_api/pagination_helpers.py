@@ -1,5 +1,5 @@
 import types
-from typing import Dict
+from typing import Mapping
 
 import currencycloud
 from furl import furl
@@ -17,9 +17,9 @@ PAGINATION_PARAMS_MAPPING = types.MappingProxyType(
 
 
 def map_query_params(
-    query_params: Dict[str, str],  # noqa: SF20
+    query_params: Mapping[str, str],
     params_mapping: types.MappingProxyType[str, str],
-) -> Dict[str, str]:
+) -> dict[str, str]:
     mapped_params = {}
 
     for parameter in query_params.keys():

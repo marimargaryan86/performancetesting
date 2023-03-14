@@ -1,5 +1,5 @@
 import copy
-from typing import Any, List, Mapping, Sequence, Set
+from typing import Any, Collection, List, Mapping, Sequence
 
 
 def flatten_list(content: Any) -> List[Any]:
@@ -33,8 +33,8 @@ def flatten_object(content: Any) -> Mapping[str, Any]:
 
 def _resolve(  # noqa: C901,WPS210,WPS231
     data: Any,
-    included: Any,
-    resolved: Set[Any],  # noqa: SF20
+    included: Mapping[tuple[Any, Any], Any],
+    resolved: Collection[tuple[Any, Any]],
     deep: bool = True,
 ) -> Any:
     if not isinstance(data, dict):
@@ -49,7 +49,7 @@ def _resolve(  # noqa: C901,WPS210,WPS231
         resolved_item = resolved_item.copy()
 
         if type_id not in resolved:
-            data = _resolve(resolved_item, included, resolved | {type_id})
+            data = _resolve(resolved_item, included, {*resolved, type_id})
 
         if meta is not None:
             data = data.copy()

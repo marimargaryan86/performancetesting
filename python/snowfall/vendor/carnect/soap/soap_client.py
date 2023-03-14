@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import datetime
 import os
 import re
@@ -138,7 +139,7 @@ class AsyncSoapTransport(object):
         self,
         url: str,
         rq_content: str | bytes | None,
-        headers: Mapping[str, Any] | None,
+        headers: Mapping[str, str] | None,
     ) -> bytes:
         if self._soap_logger is not None:
             self._soap_logger.log("RQ", rq_content, headers)
@@ -192,7 +193,7 @@ class AsyncSoapClient(object):
     async def send(
         self,
         rq_object: Any,
-        headers: Dict[Any, Any] | None = None,  # noqa: SF20
+        headers: Mapping[str, str] | None = None,
     ) -> Any:
         rq_content = self.prepare_payload(rq_object)
         headers = self.prepare_headers(headers or {})
@@ -203,14 +204,14 @@ class AsyncSoapClient(object):
         )
         return self.parser.from_bytes(response, self.config.output)
 
-    def prepare_headers(self, headers: Dict[Any, Any]) -> Dict[Any, Any]:  # noqa: SF20
+    def prepare_headers(self, headers: Mapping[str, str]) -> dict[str, str]:
         """Prepare request headers according to the service configuration.
 
         Don't mutate input headers dictionary.
 
         :raises ClientValueError: If the service transport type is unsupported.
         """
-        res_headers = headers.copy()
+        res_headers = dict(copy.copy(headers))
         if self.config.transport == TransportTypes.soap:
             res_headers["content-type"] = "text/xml"
             if self.config.soap_action:
