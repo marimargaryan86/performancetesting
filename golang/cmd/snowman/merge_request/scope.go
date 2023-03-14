@@ -65,23 +65,54 @@ func (mr *mergeRequest) validateScope() error {
 }
 
 func determineBestScope(scopes common.ScopesConfiguration, changedFiles []string) string {
-	bestDepth := 0
+	var possibleScopes []string
+	hasMatchedScopes := false
+
+	for _, file := range changedFiles {
+		matchedScopes := make([]string, 0, len(scopes))
+
+		for scope, paths := range scopes {
+			for _, path := range paths {
+				if strings.HasPrefix(file, path) {
+					matchedScopes = append(matchedScopes, scope)
+					break
+				}
+			}
+		}
+
+		if len(matchedScopes) == 0 {
+			continue
+		}
+
+		if hasMatchedScopes {
+			newPossibleScopes := make([]string, 0, len(scopes))
+			for _, scope := range matchedScopes {
+				if sliceutil.In(possibleScopes, scope) {
+					newPossibleScopes = append(newPossibleScopes, scope)
+				}
+			}
+
+			possibleScopes = newPossibleScopes
+		} else {
+			hasMatchedScopes = true
+			possibleScopes = make([]string, len(matchedScopes))
+			copy(possibleScopes, matchedScopes)
+		}
+	}
+
+	bestDepth := -1
 	bestScope := ""
 	depthConflict := false
 
-	for scope, paths := range scopes {
-		for _, path := range paths {
-			for _, file := range changedFiles {
-				if strings.HasPrefix(file, path) {
-					depth := strings.Count(path, "/")
-					if bestDepth < depth {
-						bestDepth = depth
-						bestScope = scope
-						depthConflict = false
-					} else if bestDepth == depth && bestScope != scope {
-						depthConflict = true
-					}
-				}
+	for _, scope := range possibleScopes {
+		for _, path := range scopes[scope] {
+			depth := strings.Count(path, "/")
+			if bestDepth < depth {
+				bestDepth = depth
+				bestScope = scope
+				depthConflict = false
+			} else if bestDepth == depth && bestScope != scope {
+				depthConflict = true
 			}
 		}
 	}
