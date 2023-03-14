@@ -176,9 +176,11 @@ class Places(endpoints.HTTPEndpoint):
             ),
             request=request,
             headers={
-                "Location": request.url_for(
-                    "Place",
-                    placeId=place.location.id,
+                "Location": str(
+                    request.url_for(
+                        "Place",
+                        placeId=place.location.id,
+                    ),
                 ),
             },
             status_code=status.HTTP_201_CREATED,

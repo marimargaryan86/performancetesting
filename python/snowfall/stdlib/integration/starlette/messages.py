@@ -1,5 +1,5 @@
 import dataclasses
-from typing import Any, Mapping
+from typing import Mapping
 
 from starlette import background as starlette_background
 from starlette import requests
@@ -18,7 +18,7 @@ async def create_response(
     body: models.Body,
     request: requests.Request,
     status_code: int = 200,
-    headers: Mapping[str, Any] | None = None,
+    headers: Mapping[str, str] | None = None,
     background: starlette_background.BackgroundTask | None = None,
 ) -> models.JsonApiResponse:
     included = await includes.resolve_includes(body, request)

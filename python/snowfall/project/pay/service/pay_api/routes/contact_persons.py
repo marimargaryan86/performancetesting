@@ -79,10 +79,6 @@ class ContactPersons(endpoints.HTTPEndpoint):
             pagination.limit,
         )
 
-        url = "{0}?company={1}".format(
-            request.url_for("ContactPerson"),
-            request.query_params["company"],
-        )
         return await messages.create_response(
             body=models.Body(
                 data=[
@@ -90,7 +86,9 @@ class ContactPersons(endpoints.HTTPEndpoint):
                     async for contact_person in contact_persons
                 ],
                 links=pagination_helpers.get_next_url(
-                    url,
+                    request.url_for("ContactPerson").include_query_params(
+                        company=request.query_params["company"],
+                    ),
                     await contact_persons.cursor(),
                     pagination,
                 ),

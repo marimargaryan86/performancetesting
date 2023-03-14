@@ -1,6 +1,7 @@
 import operator
 
 import pytest
+from starlette import datastructures
 
 from snowfall.stdlib.integration.starlette import pagination_helpers
 
@@ -36,6 +37,10 @@ def test_get_next_url(
 ) -> None:
     pagination = pagination_helpers.Pagination(limit=limit)
     assert operator.eq(
-        pagination_helpers.get_next_url(url, next_page_token, pagination)["next"],
+        pagination_helpers.get_next_url(
+            datastructures.URL(url),
+            next_page_token,
+            pagination,
+        )["next"],
         expected,
     )

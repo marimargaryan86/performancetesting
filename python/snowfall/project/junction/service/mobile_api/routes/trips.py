@@ -60,9 +60,11 @@ class TripSearchesTrips(endpoints.HTTPEndpoint):
                 # TODO: make a function inside pagination_helpers for that
                 "next": re.sub(
                     r"^.+\?",
-                    request.url_for(
-                        "TripSearchesTrips",
-                        tripSearchId=request.path_params["tripSearchId"],
+                    str(
+                        request.url_for(
+                            "TripSearchesTrips",
+                            tripSearchId=request.path_params["tripSearchId"],
+                        ),
                     )
                     + str("?"),
                     trip_search["links"]["next"],

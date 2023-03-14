@@ -28,7 +28,7 @@ class ResourceIdentifier(BaseModel):
 class Resource(ResourceIdentifier):
     attributes: Optional[AnyMapping] = None
     relationships: Optional[AnyMapping] = None
-    links: Optional[AnyMapping] = None
+    links: Optional[Mapping[str, str]] = None
     meta: Optional[AnyMapping] = None
 
 

@@ -6,7 +6,15 @@ import re
 from typing import TYPE_CHECKING, Any, Awaitable, Callable, Sequence, TypeVar
 
 import httpx
-from starlette import endpoints, exceptions, requests, responses, routing, status
+from starlette import (
+    datastructures,
+    endpoints,
+    exceptions,
+    requests,
+    responses,
+    routing,
+    status,
+)
 
 from snowfall.stdlib import sequence, string
 from snowfall.stdlib.format import protobuf
@@ -108,7 +116,7 @@ class ListAndViewEnum(object):
     def __init__(
         self,
         enum: enum_type_wrapper._EnumTypeWrapper[_EnumValue],  # noqa: WPS437
-        resource_factory: Callable[[Any, str], models.Resource],
+        resource_factory: Callable[[Any, datastructures.URL], models.Resource],
         path: str,
     ) -> None:
         self._enum = enum

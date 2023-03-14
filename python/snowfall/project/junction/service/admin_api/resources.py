@@ -70,9 +70,11 @@ class LocationResource(models.Resource):
                 },
             },
             links={
-                _SELF_HREF: request.url_for(
-                    "Location",
-                    locationId=location.id,
+                _SELF_HREF: str(
+                    request.url_for(
+                        "Location",
+                        locationId=location.id,
+                    ),
                 ),
             },
         )
@@ -122,9 +124,11 @@ class PlaceResource(models.Resource):
                 },
             },
             links={
-                _SELF_HREF: request.url_for(
-                    "Place",
-                    placeId=place.location.id,
+                _SELF_HREF: str(
+                    request.url_for(
+                        "Place",
+                        placeId=place.location.id,
+                    ),
                 ),
             },
         )

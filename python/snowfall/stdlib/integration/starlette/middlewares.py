@@ -4,9 +4,9 @@ import sentry_sdk
 import structlog
 from openapi_core.exceptions import OpenAPIError
 from openapi_core.templating.paths.exceptions import PathNotFound
-from openapi_core.unmarshalling.schemas.exceptions import InvalidSchemaValue
-from openapi_core.validation.exceptions import InvalidSecurity
+from openapi_core.templating.security import exceptions as security_exceptions
 from openapi_core.validation.request import protocols as request_protocols
+from openapi_core.validation.schemas import exceptions as validation_exceptions
 from starlette import applications, exceptions, requests, responses, status, types
 from starlette.middleware import base
 
@@ -138,15 +138,21 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
                 openapi_request,
                 openapi_response,
             )
-        except InvalidSchemaValue as err:
-            return await self._handle_response_schema_error(resolved_request, err)
+        except OpenAPIError as err:
+            if isinstance(err.__cause__, validation_exceptions.InvalidSchemaValue):
+                return await self._handle_response_schema_error(
+                    resolved_request,
+                    err.__cause__,
+                )
+
+            raise
 
         return resolved_response
 
     async def _handle_response_schema_error(
         self,
         request: requests.Request,
-        exc: InvalidSchemaValue,
+        exc: validation_exceptions.InvalidSchemaValue,
     ) -> responses.Response:
         with stdout.context_binding(
             errors=[
@@ -173,16 +179,18 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
                 exceptions.HTTPException(status_code=status.HTTP_404_NOT_FOUND),
             )
 
-        if isinstance(err, InvalidSchemaValue):
-            return await handlers.validation_error_handler(request, err)
-
-        if isinstance(err, InvalidSecurity):
-            return await handlers.server_error_handler(
-                request,
-                exceptions.HTTPException(status_code=status.HTTP_401_UNAUTHORIZED),
-            )
-
-        return await handlers.server_error_handler(
-            request,
-            exceptions.HTTPException(status_code=status.HTTP_400_BAD_REQUEST),
-        )
+        match err.__cause__:
+            case security_exceptions.SecurityNotFound():
+                return await handlers.server_error_handler(
+                    request,
+                    exceptions.HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                    ),
+                )
+            case validation_exceptions.InvalidSchemaValue():
+                return await handlers.validation_error_handler(request, err.__cause__)
+            case _:
+                return await handlers.server_error_handler(
+                    request,
+                    exceptions.HTTPException(status_code=status.HTTP_400_BAD_REQUEST),
+                )

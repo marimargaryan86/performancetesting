@@ -29,6 +29,7 @@ backend_packages = [
 [add-trailing-comma]
 version = "add-trailing-comma==2.4.0"
 lockfile = "vendor/lock/add-trailing-comma.txt"
+interpreter_constraints = ["CPython==3.11.*"]
 
 [anonymous-telemetry]
 enabled = false
@@ -36,6 +37,7 @@ enabled = false
 [autoflake]
 version = "autoflake==2.0.1"
 lockfile = "vendor/lock/autoflake.txt"
+interpreter_constraints = ["CPython==3.11.*"]
 args = ["--remove-all-unused-imports", "--remove-unused-variables"]
 
 [bandit]

@@ -3,22 +3,13 @@ from typing import Optional, cast
 
 import jsonschema
 import openapi_core
-import openapi_schema_validator
 import orjson
-from openapi_core.deserializing.media_types.factories import (
-    MediaTypeDeserializersFactory,
-)
-from openapi_core.unmarshalling.schemas import enums
-from openapi_core.unmarshalling.schemas.exceptions import InvalidSchemaValue
-from openapi_core.unmarshalling.schemas.factories import SchemaUnmarshallersFactory
+from openapi_core.unmarshalling.request import datatypes as request_datatypes
+from openapi_core.unmarshalling.response import datatypes as response_datatypes
 from openapi_core.validation.request import protocols as request_protocols
-from openapi_core.validation.request.datatypes import (
-    RequestParameters,
-    RequestValidationResult,
-)
-from openapi_core.validation.request.validators import RequestValidator
+from openapi_core.validation.request.datatypes import RequestParameters
 from openapi_core.validation.response import protocols as response_protocols
-from openapi_core.validation.response.validators import ResponseValidator
+from openapi_core.validation.schemas import exceptions as validation_exceptions
 from starlette import requests, responses
 from werkzeug.datastructures import Headers
 
@@ -84,13 +75,13 @@ async def response_to_openapi(
 
 
 def invalid_schema_value_to_errors(
-    exc: InvalidSchemaValue,
+    exc: validation_exceptions.InvalidSchemaValue,
     status_code: int,
 ) -> list[models.Error]:
     return [
         models.Error(
             status=str(status_code),
-            code=error.validator,
+            code=str(error.validator),
             detail=error.message,
             source=models.ErrorSource(
                 pointer="/{0}".format(
@@ -108,55 +99,39 @@ class Validator(object):
         spec_path: str,
     ):
         with open(spec_path) as spec_file:
-            self._spec = openapi_core.Spec.create(
+            self._spec = openapi_core.Spec.from_dict(
                 orjson.loads(spec_file.read()),
-                url="file://{0}".format(spec_path),
+                spec_url="file://{0}".format(spec_path),
             )
 
-        deserializer = {"application/vnd.api+json": orjson.loads}
-
-        self._request_validator = RequestValidator(
-            schema_unmarshallers_factory=SchemaUnmarshallersFactory(
-                schema_validator_class=openapi_schema_validator.OAS30Validator,
-                custom_formatters=formatters.custom_formatters(),
-                context=enums.UnmarshalContext.REQUEST,
-            ),
-            media_type_deserializers_factory=MediaTypeDeserializersFactory(
-                custom_deserializers=deserializer,
-            ),
-        )
-        self._response_validator = ResponseValidator(
-            schema_unmarshallers_factory=SchemaUnmarshallersFactory(
-                schema_validator_class=openapi_schema_validator.OAS30Validator,
-                custom_formatters=formatters.custom_formatters(),
-                context=enums.UnmarshalContext.RESPONSE,
-            ),
-            media_type_deserializers_factory=MediaTypeDeserializersFactory(
-                custom_deserializers=deserializer,
-            ),
-        )
+        self._format_unmarshallers = formatters.format_unmarshallers()
+        self._format_validators = formatters.format_validators()
+        self._media_type_deserializers = {
+            "application/vnd.api+json": orjson.loads,
+        }
 
     async def validate_request(
         self,
         request: request_protocols.Request,
-    ) -> RequestValidationResult:
-        validation_result = self._request_validator.validate(
-            spec=self._spec,
+    ) -> request_datatypes.RequestUnmarshalResult:
+        return openapi_core.unmarshal_request(
             request=request,
+            spec=self._spec,
+            extra_media_type_deserializers=self._media_type_deserializers,
+            extra_format_validators=self._format_validators,
+            extra_format_unmarshallers=self._format_unmarshallers,
         )
-
-        validation_result.raise_for_errors()
-
-        return validation_result
 
     async def validate_response(
         self,
         request: request_protocols.Request,
         response: response_protocols.Response,
-    ) -> None:
-        validation_result = self._response_validator.validate(
-            spec=self._spec,
+    ) -> response_datatypes.ResponseUnmarshalResult:
+        return openapi_core.unmarshal_response(
             request=request,
             response=response,
+            spec=self._spec,
+            extra_media_type_deserializers=self._media_type_deserializers,
+            extra_format_validators=self._format_validators,
+            extra_format_unmarshallers=self._format_unmarshallers,
         )
-        validation_result.raise_for_errors()

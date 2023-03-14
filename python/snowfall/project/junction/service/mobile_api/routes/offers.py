@@ -146,9 +146,11 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
             links={
                 "next": re.sub(
                     r"^.+\?",
-                    request.url_for(
-                        "OffersByOfferSearch",
-                        offerSearchId=request.path_params["offerSearchId"],
+                    str(
+                        request.url_for(
+                            "OffersByOfferSearch",
+                            offerSearchId=request.path_params["offerSearchId"],
+                        ),
                     )
                     + str("?"),
                     offers_response["links"]["next"],

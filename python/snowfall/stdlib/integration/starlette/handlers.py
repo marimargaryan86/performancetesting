@@ -1,6 +1,6 @@
 import http
 
-from openapi_core.unmarshalling.schemas.exceptions import InvalidSchemaValue
+from openapi_core.validation.schemas import exceptions as validation_exceptions
 from starlette import exceptions, requests, responses, status
 
 from snowfall.stdlib.integration.starlette import models, validation
@@ -99,7 +99,7 @@ async def server_error_handler(
 
 async def validation_error_handler(
     request: requests.Request,
-    exc: InvalidSchemaValue,
+    exc: validation_exceptions.InvalidSchemaValue,
 ) -> responses.Response:
     return models.JsonApiResponse(
         models.Body(

@@ -5,7 +5,7 @@ import zoneinfo
 from typing import Any, ClassVar, Iterable, Optional, Sequence
 
 import pydantic
-from starlette import requests
+from starlette import datastructures, requests
 
 from snowfall.project.junction.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
@@ -71,9 +71,11 @@ class OfferResource(models.Resource):
                 },
             },
             links={
-                _SELF_HREF: request.url_for(
-                    "ViewOffer",
-                    offerId=offer.id,
+                _SELF_HREF: str(
+                    request.url_for(
+                        "ViewOffer",
+                        offerId=offer.id,
+                    ),
                 ),
             },
         )
@@ -115,9 +117,11 @@ class OfferGroupResource(models.Resource):
                 },
             },
             links={
-                _SELF_HREF: request.url_for(
-                    "ViewOfferGroup",
-                    offerGroupId=group.id,
+                _SELF_HREF: str(
+                    request.url_for(
+                        "ViewOfferGroup",
+                        offerGroupId=group.id,
+                    ),
                 ),
             },
         )
@@ -185,9 +189,11 @@ class TripOfferGroupDetailsResource(models.Resource):
                 },
             },
             links={
-                _SELF_HREF: request.url_for(
-                    "ViewOfferGroupDetails",
-                    offerGroupDetailsId=segment.id,
+                _SELF_HREF: str(
+                    request.url_for(
+                        "ViewOfferGroupDetails",
+                        offerGroupDetailsId=segment.id,
+                    ),
                 ),
             },
         )
@@ -307,9 +313,11 @@ class OfferOptionResource(models.Resource):
                 },
             },
             links={
-                _SELF_HREF: request.url_for(
-                    "ViewOfferOption",
-                    offerOptionId=option.id,
+                _SELF_HREF: str(
+                    request.url_for(
+                        "ViewOfferOption",
+                        offerOptionId=option.id,
+                    ),
                 ),
             },
         )
@@ -414,9 +422,11 @@ class TripOfferOptionDetailsResource(models.Resource):
                 },
             },
             links={
-                _SELF_HREF: request.url_for(
-                    "ViewOfferOptionDetails",
-                    offerOptionDetailsId=details.id,
+                _SELF_HREF: str(
+                    request.url_for(
+                        "ViewOfferOptionDetails",
+                        offerOptionDetailsId=details.id,
+                    ),
                 ),
             },
         )
@@ -514,9 +524,11 @@ class PriceQuoteResource(models.Resource):
                 },
             },
             links={
-                _SELF_HREF: request.url_for(
-                    "ViewPriceQuote",
-                    offerPriceQuoteId=price_quote.id,
+                _SELF_HREF: str(
+                    request.url_for(
+                        "ViewPriceQuote",
+                        offerPriceQuoteId=price_quote.id,
+                    ),
                 ),
             },
         )
@@ -561,9 +573,11 @@ class JourneyResource(models.Resource):
                 },
             },
             links={
-                _SELF_HREF: request.url_for(
-                    "ViewJourney",
-                    journeyId=journey.id,
+                _SELF_HREF: str(
+                    request.url_for(
+                        "ViewJourney",
+                        journeyId=journey.id,
+                    ),
                 ),
             },
         )
@@ -619,9 +633,11 @@ class OrderResource(models.Resource):
                 },
             },
             links={
-                _SELF_HREF: request.url_for(
-                    "ViewOrder",
-                    orderId=order.id,
+                _SELF_HREF: str(
+                    request.url_for(
+                        "ViewOrder",
+                        orderId=order.id,
+                    ),
                 ),
             },
         )
@@ -677,9 +693,11 @@ class TripBookingResource(models.Resource):
                 },
             },
             links={
-                _SELF_HREF: request.url_for(
-                    "ViewBooking",
-                    bookingId=booking.id,
+                _SELF_HREF: str(
+                    request.url_for(
+                        "ViewBooking",
+                        bookingId=booking.id,
+                    ),
                 ),
             },
         )
@@ -736,9 +754,11 @@ class TripBookingDetailsResource(models.Resource):
                 },
             },
             links={
-                _SELF_HREF: request.url_for(
-                    "ViewBookingDetails",
-                    bookingDetailsId=details.id,
+                _SELF_HREF: str(
+                    request.url_for(
+                        "ViewBookingDetails",
+                        bookingDetailsId=details.id,
+                    ),
                 ),
             },
         )
@@ -780,9 +800,11 @@ class PlaceResource(models.Resource):
                 },
             },
             links={
-                _SELF_HREF: request.url_for(
-                    "ViewPlace",
-                    placeId=place.location.id,
+                _SELF_HREF: str(
+                    request.url_for(
+                        "ViewPlace",
+                        placeId=place.location.id,
+                    ),
                 ),
             },
         )
@@ -795,7 +817,7 @@ class PlaceTypeResource(models.Resource):
     def from_proto(
         cls,
         place_type: place_models_pb2.Location.Type.V,
-        self_link: str,
+        self_link: datastructures.URL,
     ) -> PlaceTypeResource:
         place_type_id = protobuf.enum_value_to_slug(
             enum_descriptor=place_models_pb2.Location.Type.DESCRIPTOR,
@@ -808,7 +830,7 @@ class PlaceTypeResource(models.Resource):
                 "name": place_type_id,
             },
             links={
-                _SELF_HREF: self_link,
+                _SELF_HREF: str(self_link),
             },
         )
 
@@ -820,7 +842,7 @@ class PassengerGenderResource(models.Resource):
     def from_proto(
         cls,
         passenger_gender: order_models_pb2.Passenger.Gender.V,
-        self_link: str,
+        self_link: datastructures.URL,
     ) -> PassengerGenderResource:
         passenger_gender_id = protobuf.enum_value_to_slug(
             enum_descriptor=order_models_pb2.Passenger.Gender.DESCRIPTOR,
@@ -833,7 +855,7 @@ class PassengerGenderResource(models.Resource):
                 "name": passenger_gender_id,
             },
             links={
-                _SELF_HREF: self_link,
+                _SELF_HREF: str(self_link),
             },
         )
 
@@ -845,7 +867,7 @@ class CabinClassResource(models.Resource):
     def from_proto(
         cls,
         cabin_class: models_pb2.CabinClass.Type.V,
-        self_link: str,
+        self_link: datastructures.URL,
     ) -> CabinClassResource:
         cabin_class_id = protobuf.enum_value_to_slug(
             enum_descriptor=models_pb2.CabinClass.Type.DESCRIPTOR,
@@ -858,7 +880,7 @@ class CabinClassResource(models.Resource):
                 "name": cabin_class_id,
             },
             links={
-                _SELF_HREF: self_link,
+                _SELF_HREF: str(self_link),
             },
         )
 
@@ -870,7 +892,7 @@ class PassengerTitleResource(models.Resource):
     def from_proto(
         cls,
         passenger_title: order_models_pb2.Passenger.Title.V,
-        self_link: str,
+        self_link: datastructures.URL,
     ) -> PassengerTitleResource:
         passenger_title_id = protobuf.enum_value_to_slug(
             enum_descriptor=order_models_pb2.Passenger.Title.DESCRIPTOR,
@@ -883,7 +905,7 @@ class PassengerTitleResource(models.Resource):
                 "name": passenger_title_id,
             },
             links={
-                _SELF_HREF: self_link,
+                _SELF_HREF: str(self_link),
             },
         )
 
@@ -917,9 +939,11 @@ class SegmentResource(models.Resource):
                 },
             },
             links={
-                _SELF_HREF: request.url_for(
-                    "ViewSegment",
-                    segmentId=segment.id,
+                _SELF_HREF: str(
+                    request.url_for(
+                        "ViewSegment",
+                        segmentId=segment.id,
+                    ),
                 ),
             },
         )
@@ -959,9 +983,11 @@ class LegResource(models.Resource):
                 },
             },
             links={
-                _SELF_HREF: request.url_for(
-                    "ViewLeg",
-                    legId=leg.id,
+                _SELF_HREF: str(
+                    request.url_for(
+                        "ViewLeg",
+                        legId=leg.id,
+                    ),
                 ),
             },
         )
@@ -974,7 +1000,7 @@ class LegTypeResource(models.Resource):
     def from_proto(
         cls,
         schedule_type: models_pb2.Schedule.Type.ValueType,
-        self_link: str,
+        self_link: datastructures.URL,
     ) -> LegTypeResource:
         schedule_type_id = protobuf.enum_value_to_slug(
             enum_descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
@@ -987,7 +1013,7 @@ class LegTypeResource(models.Resource):
                 "name": schedule_type_id,
             },
             links={
-                _SELF_HREF: self_link,
+                _SELF_HREF: str(self_link),
             },
         )
 
@@ -1017,9 +1043,11 @@ class TripResource(models.Resource):
                 },
             },
             links={
-                _SELF_HREF: request.url_for(
-                    "ViewTrip",
-                    tripId=trip.id,
+                _SELF_HREF: str(
+                    request.url_for(
+                        "ViewTrip",
+                        tripId=trip.id,
+                    ),
                 ),
             },
         )
@@ -1064,9 +1092,11 @@ class TripSearchResource(models.Resource):
                 },
             },
             links={
-                _SELF_HREF: request.url_for(
-                    "ViewTripSearch",
-                    tripSearchId=trip_search.id,
+                _SELF_HREF: str(
+                    request.url_for(
+                        "ViewTripSearch",
+                        tripSearchId=trip_search.id,
+                    ),
                 ),
             },
         )
@@ -1098,9 +1128,11 @@ class TripOfferSearchResource(models.Resource):
                 },
             },
             links={
-                _SELF_HREF: request.url_for(
-                    "ViewOfferSearch",
-                    offerSearchId=offer_search.id,
+                _SELF_HREF: str(
+                    request.url_for(
+                        "ViewOfferSearch",
+                        offerSearchId=offer_search.id,
+                    ),
                 ),
             },
         )

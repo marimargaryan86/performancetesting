@@ -95,7 +95,7 @@ class TimetableRepository(object):
         for index in range(0, len(requests), self._requests_per_second):
             responses = await asyncio.gather(
                 *[
-                    tenacity.retry(  # type: ignore[misc]
+                    tenacity.retry(
                         retry=tenacity.retry_if_exception_type(errors.DFServiceError),
                         stop=tenacity.stop_after_attempt(3),
                     )(request_details[0])(*request_details[1])

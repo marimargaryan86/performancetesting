@@ -1,8 +1,7 @@
 import dataclasses
 from typing import Optional
 
-from furl import furl
-from starlette import requests
+from starlette import datastructures, requests
 
 PAGE_CURSOR_KEY = "page[cursor]"
 PAGE_LIMIT_KEY = "page[limit]"
@@ -28,12 +27,15 @@ def get_pagination(request: requests.Request) -> Pagination:
 
 
 def get_next_url(
-    url: str,
+    url: datastructures.URL,
     next_page_token: str,
     pagination: Pagination,
 ) -> dict[str, str]:
-    next_url = furl(url)
-    next_url.args[PAGE_CURSOR_KEY] = next_page_token
-    next_url.args[PAGE_LIMIT_KEY] = pagination.limit
+    next_url = url.include_query_params(
+        **{
+            PAGE_CURSOR_KEY: next_page_token,
+            PAGE_LIMIT_KEY: pagination.limit,
+        },
+    )
 
-    return {"next": next_url.url}
+    return {"next": str(next_url)}
