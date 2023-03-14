@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, AsyncGenerator, Mapping, Optional, Sequence
+from typing import Any, AsyncGenerator, Mapping, Sequence
 
 import httpx
 
@@ -97,7 +97,7 @@ class PayClient(object):
         self,
         base_url: str,
         auth: httpx.Auth,
-        client: Optional[httpx.AsyncClient] = None,
+        client: httpx.AsyncClient | None = None,
     ):
         self._base_url = base_url
         self._http_client = client or httpx.AsyncClient(
@@ -187,7 +187,7 @@ class PayAdminClient(object):
         self,
         base_url: str,
         auth: httpx.Auth,
-        client: Optional[httpx.AsyncClient] = None,
+        client: httpx.AsyncClient | None = None,
     ):
         self._base_url = base_url
         self._http_client = client or httpx.AsyncClient(

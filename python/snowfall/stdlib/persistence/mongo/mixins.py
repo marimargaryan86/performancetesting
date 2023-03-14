@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Generic, Optional, Sequence, TypeVar
+from typing import Generic, Sequence, TypeVar
 
 import pymongo
 
@@ -14,7 +14,7 @@ Record = TypeVar("Record")
 class AllMixin(Generic[Record]):
     async def all_(
         self: repository.RepositoryProtocol[Record],
-        cursor: Optional[str] = None,
+        cursor: str | None = None,
     ) -> resultset.ResultSet[Record]:
         return await self._find_with_cursor(cur=cursor or "")
 
@@ -44,7 +44,7 @@ class FindByIdMixin(Generic[Record]):
         self: repository.RepositoryProtocol[Record],
         document_id: str,
         selector: str = "_id",
-    ) -> Optional[Record]:
+    ) -> Record | None:
         return await self._execute(
             self._collection.find_one,
             {

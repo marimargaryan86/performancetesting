@@ -1,4 +1,4 @@
-from typing import Sequence, Type
+from typing import Sequence
 from unittest import mock
 
 import grpc
@@ -104,7 +104,7 @@ class TestGrpcClient(object):
     async def test_error_responses(
         self,
         error: grpc.aio.AioRpcError,
-        expected: Type[Exception],
+        expected: type[Exception],
     ) -> None:
         stub = mock.create_autospec(grpc_pb2_grpc.OfferServiceStub)
         stub.GetOffer = mock.AsyncMock(side_effect=error)

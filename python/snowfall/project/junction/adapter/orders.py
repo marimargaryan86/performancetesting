@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc
 from collections.abc import Iterator
-from typing import Optional, Sequence
+from typing import Sequence
 
 from grpc import aio
 
@@ -60,9 +60,9 @@ class Client(abc.ABC):
     @abc.abstractmethod
     async def find_journeys(
         self,
-        identifiers: Optional[Sequence[str]] = None,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        identifiers: Sequence[str] | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> orders_pb2.ListJourneysResponse:
         """Fetch all journey resources."""
 
@@ -70,8 +70,8 @@ class Client(abc.ABC):
     async def find_orders(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> orders_pb2.ListOrdersResponse:
         """Fetch order resources by identifiers."""
 
@@ -79,8 +79,8 @@ class Client(abc.ABC):
     async def find_orders_by_journey_id(
         self,
         journey_id: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> orders_pb2.ListOrdersResponse:
         """Fetch all order resources related to a journey."""
 
@@ -88,8 +88,8 @@ class Client(abc.ABC):
     async def find_bookings(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> orders_pb2.ListBookingsResponse:
         """Fetch booking resources by identifiers."""
 
@@ -97,8 +97,8 @@ class Client(abc.ABC):
     async def find_bookings_by_order_id(
         self,
         order_id: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> orders_pb2.ListBookingsResponse:
         """Fetch all booking resources related to an order."""
 
@@ -106,8 +106,8 @@ class Client(abc.ABC):
     async def find_booking_details(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> orders_pb2.ListBookingDetailsResponse:
         """Fetch booking details resources by identifiers."""
 
@@ -115,8 +115,8 @@ class Client(abc.ABC):
     async def find_booking_details_by_booking_id(
         self,
         booking_id: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> orders_pb2.ListBookingDetailsResponse:
         """Fetch all booking details resources related to a booking."""
 
@@ -199,9 +199,9 @@ class DictClient(Client):
 
     async def find_journeys(
         self,
-        identifiers: Optional[Sequence[str]] = None,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        identifiers: Sequence[str] | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> orders_pb2.ListJourneysResponse:
         if identifiers:
             journeys = [
@@ -226,8 +226,8 @@ class DictClient(Client):
     async def find_orders(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> orders_pb2.ListOrdersResponse:
         orders = [order for order in self._iterate_orders() if order.id in identifiers]
 
@@ -245,8 +245,8 @@ class DictClient(Client):
     async def find_orders_by_journey_id(
         self,
         journey_id: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> orders_pb2.ListOrdersResponse:
         try:
             orders = list(self._journeys[journey_id].orders)
@@ -267,8 +267,8 @@ class DictClient(Client):
     async def find_bookings(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> orders_pb2.ListBookingsResponse:
         bookings = [
             booking
@@ -291,8 +291,8 @@ class DictClient(Client):
     async def find_bookings_by_order_id(
         self,
         order_id: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> orders_pb2.ListBookingsResponse:
         bookings = [
             booking
@@ -315,8 +315,8 @@ class DictClient(Client):
     async def find_booking_details(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> orders_pb2.ListBookingDetailsResponse:
         details = [
             detail
@@ -339,8 +339,8 @@ class DictClient(Client):
     async def find_booking_details_by_booking_id(
         self,
         booking_id: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> orders_pb2.ListBookingDetailsResponse:
         details = [
             detail
@@ -498,9 +498,9 @@ class GrpcClient(Client):
 
     async def find_journeys(
         self,
-        identifiers: Optional[Sequence[str]] = None,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        identifiers: Sequence[str] | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> orders_pb2.ListJourneysResponse:
         request = orders_pb2.ListJourneysRequest(
             ids=identifiers,
@@ -517,8 +517,8 @@ class GrpcClient(Client):
     async def find_orders(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> orders_pb2.ListOrdersResponse:
         request = orders_pb2.ListOrdersRequest(
             ids=orders_pb2.ListOfIds(ids=identifiers),
@@ -535,8 +535,8 @@ class GrpcClient(Client):
     async def find_orders_by_journey_id(
         self,
         journey_id: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> orders_pb2.ListOrdersResponse:
         request = orders_pb2.ListOrdersRequest(
             journey_id=journey_id,
@@ -553,8 +553,8 @@ class GrpcClient(Client):
     async def find_bookings(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> orders_pb2.ListBookingsResponse:
         request = orders_pb2.ListBookingsRequest(
             ids=orders_pb2.ListOfIds(ids=identifiers),
@@ -571,8 +571,8 @@ class GrpcClient(Client):
     async def find_bookings_by_order_id(
         self,
         order_id: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> orders_pb2.ListBookingsResponse:
         request = orders_pb2.ListBookingsRequest(
             order_id=order_id,
@@ -589,8 +589,8 @@ class GrpcClient(Client):
     async def find_booking_details(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> orders_pb2.ListBookingDetailsResponse:
         request = orders_pb2.ListBookingDetailsRequest(
             ids=orders_pb2.ListOfIds(ids=identifiers),
@@ -607,8 +607,8 @@ class GrpcClient(Client):
     async def find_booking_details_by_booking_id(
         self,
         booking_id: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> orders_pb2.ListBookingDetailsResponse:
         request = orders_pb2.ListBookingDetailsRequest(
             booking_id=booking_id,

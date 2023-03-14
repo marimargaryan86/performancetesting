@@ -1,4 +1,4 @@
-from typing import Mapping, Optional, Tuple
+from typing import Mapping
 
 from starlette import authentication, requests
 
@@ -12,7 +12,7 @@ class Authenticator(jwt.JWTDecoder):
     async def authenticate(
         self,
         conn: requests.HTTPConnection,
-    ) -> Optional[Tuple[authentication.AuthCredentials, authentication.BaseUser]]:
+    ) -> tuple[authentication.AuthCredentials, authentication.BaseUser] | None:
         jwt_token = conn.scope["security"].get("jwt")
 
         if not jwt_token:

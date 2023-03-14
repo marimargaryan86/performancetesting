@@ -14,7 +14,7 @@ SECRET_WORDS: Tuple[str, ...] = (
 class LogFilter(object):
     def __init__(
         self,
-        secret_words: Tuple[str, ...] | None = SECRET_WORDS,
+        secret_words: tuple[str, ...] | None = SECRET_WORDS,
         filtered_word: str = FILTERED_WORD,
     ):
         self._search_re: re.Pattern[str] | None = None

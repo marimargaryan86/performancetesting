@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional, Sequence
+from typing import Sequence
 
 from pymongo import IndexModel
 
@@ -38,7 +38,7 @@ class LegRepository(repository.ProtoRepository[models_pb2.Leg]):
             id_key="_id",
         )
 
-    async def find_by_id(self, document_id: str) -> Optional[models_pb2.Leg]:
+    async def find_by_id(self, document_id: str) -> models_pb2.Leg | None:
         legs = await self._find_nested(
             path="$legs",
             filter_={

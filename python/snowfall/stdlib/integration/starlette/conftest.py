@@ -1,5 +1,5 @@
 import pathlib
-from typing import AsyncIterator, Optional, Sequence
+from typing import AsyncIterator, Sequence
 
 import httpx
 import pytest
@@ -11,7 +11,7 @@ from snowfall.stdlib.integration.starlette import application
 
 def _create_app(
     openapi_path: pathlib.Path,
-    custom_middlewares: Optional[Sequence[Middleware]] = None,
+    custom_middlewares: Sequence[Middleware] | None = None,
     validate_response: bool = True,
 ) -> applications.Starlette:
     return application.create_starlette_app(

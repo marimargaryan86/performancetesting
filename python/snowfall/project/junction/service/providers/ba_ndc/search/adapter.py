@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import AsyncIterator, List, Mapping
+from typing import AsyncIterator, Mapping
 
 import structlog
 
@@ -30,7 +30,7 @@ class OfferGrouper(object):
     def group_offers(
         cls,
         offers_adapter: OffersResponseAdapter,
-    ) -> Mapping[str, List[response_offer_search_schemas.Offer]]:
+    ) -> Mapping[str, list[response_offer_search_schemas.Offer]]:
         offer_groups = defaultdict[str, list[response_offer_search_schemas.Offer]](list)
 
         for offer in offers_adapter.get_offers() or []:

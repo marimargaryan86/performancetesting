@@ -1,5 +1,3 @@
-from typing import Optional
-
 import lagom
 import stripe
 from starlette import endpoints, exceptions, requests, responses, status
@@ -103,7 +101,7 @@ class Payment(endpoints.HTTPEndpoint):
     async def patch(
         self,
         request: requests.Request,
-        voucher: Optional[models_pb2.Voucher],
+        voucher: models_pb2.Voucher | None,
         vouchers_repository: repository.VouchersRepository = lagom.injectable,
     ) -> responses.Response:
         if voucher:

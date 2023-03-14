@@ -63,6 +63,18 @@ from typing import Callable
 def list_in_bin_op_in_sequence(input: Sequence[list[str] | str]) -> list:
     return []
 """
+_FAILING_UNION = """
+from typing import Optional, Union
+
+def union(input: Union[str, float]) -> Union[str, float]:
+    return input
+"""
+_FAILING_OPTIONAL = """
+from typing import Optional, Union
+
+def union(input: Optional[str]) -> Optional[str]:
+    return input
+"""
 
 
 @pytest.mark.parametrize(
@@ -79,6 +91,8 @@ def list_in_bin_op_in_sequence(input: Sequence[list[str] | str]) -> list:
         (_PASSING_CORRECT_SEQUENCE, 0),
         (_FAILING_LIST_IN_BINOP, 1),
         (_FAILING_LIST_IN_BINOP_IN_SEQUENCE, 1),
+        (_FAILING_UNION, 2),
+        (_FAILING_OPTIONAL, 2),
     ],
 )
 def test_typing(code: str, expected: int) -> None:

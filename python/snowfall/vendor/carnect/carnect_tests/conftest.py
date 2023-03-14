@@ -1,5 +1,4 @@
 import datetime
-from typing import List
 
 import httpx
 import pytest
@@ -52,7 +51,7 @@ def carnect_client(
 async def offers(
     carnect_client: CarnectClient,
     carnect_config: Config,
-) -> List[VehicleVendorAvailabilityType]:
+) -> list[VehicleVendorAvailabilityType]:
     rq = VehAvailRateRqBuilder(carnect_config)
 
     rq.version("large")

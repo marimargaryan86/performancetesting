@@ -1,4 +1,4 @@
-from typing import Optional, Sequence, Tuple
+from typing import Sequence
 
 from fastapi import Depends
 
@@ -66,7 +66,7 @@ class TransactionValidator(Validator[TransactionPostSchema]):  # noqa:WPS214
     async def is_valid(  # noqa:WPS217
         self,
         to_validate: TransactionPostSchema,
-    ) -> Tuple[bool, list[str]]:
+    ) -> tuple[bool, list[str]]:
         reasons = [
             *await self._validate_transaction_status_id(to_validate),
             *await self._validate_customer_id(to_validate),
@@ -178,7 +178,7 @@ class TransactionValidator(Validator[TransactionPostSchema]):  # noqa:WPS214
     async def _validate_schedule_id(
         self,
         direction: str,
-        schedule_id: Optional[int],
+        schedule_id: int | None,
     ) -> list[str]:
         if schedule_id is not None:
             entry = await self._schedules_repository.get_one_by_filter(
@@ -199,7 +199,7 @@ class TransactionValidator(Validator[TransactionPostSchema]):  # noqa:WPS214
     async def _validate_product_id(
         self,
         direction: str,
-        product_id: Optional[int],
+        product_id: int | None,
     ) -> list[str]:
         if product_id is not None:
             entry = await self._products_repository.get_one_by_filter(
@@ -221,7 +221,7 @@ class TransactionValidator(Validator[TransactionPostSchema]):  # noqa:WPS214
         self,
         direction: str,
         idx: int,
-        passenger_type_id: Optional[PassengerTypeEnum],
+        passenger_type_id: PassengerTypeEnum | None,
     ) -> list[str]:
         if passenger_type_id is not None:
             entry = await self._passenger_types_repository.get_one_by_filter(
@@ -245,7 +245,7 @@ class TransactionValidator(Validator[TransactionPostSchema]):  # noqa:WPS214
         self,
         direction: str,
         idx: int,
-        seat_type_id: Optional[int],
+        seat_type_id: int | None,
     ) -> list[str]:
         if seat_type_id is not None:
             entry = await self._seat_types_repository.get_one_by_filter(

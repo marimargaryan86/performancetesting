@@ -1,5 +1,4 @@
 import uuid
-from typing import List
 
 from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.project.junction.service.providers.duffel import cache
@@ -36,7 +35,7 @@ class PriceQuoteTransformer(object):
     def _to_document_requirement(
         self,
         duffel_offer: Offer,
-    ) -> List[offers_pb2.PriceQuote.Required.ValueType]:
+    ) -> list[offers_pb2.PriceQuote.Required.ValueType]:
         required = list[offers_pb2.PriceQuote.Required.ValueType]()
 
         if duffel_offer.passenger_identity_documents_required:
@@ -70,7 +69,7 @@ class PriceQuoteTransformer(object):
     def _to_penalties(
         self,
         duffel_offer: Offer,
-    ) -> List[offers_pb2.Penalty]:
+    ) -> list[offers_pb2.Penalty]:
         penalties = list[offers_pb2.Penalty]()
 
         penalties.append(

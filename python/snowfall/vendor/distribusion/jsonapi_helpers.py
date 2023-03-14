@@ -1,8 +1,8 @@
 import copy
-from typing import Any, Collection, List, Mapping, Sequence
+from typing import Any, Collection, Mapping, Sequence
 
 
-def flatten_list(content: Any) -> List[Any]:
+def flatten_list(content: Any) -> list[Any]:
     result = []
 
     if content and "data" in content:

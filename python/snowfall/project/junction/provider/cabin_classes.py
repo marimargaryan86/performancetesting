@@ -1,5 +1,3 @@
-from typing import Optional
-
 import structlog
 from pymongo import IndexModel
 
@@ -58,7 +56,7 @@ class CabinMappingRepository(
         self,
         fare_brand: str,
         operator: str,
-    ) -> Optional[models_pb2.CabinClassMapping]:
+    ) -> models_pb2.CabinClassMapping | None:
         mapping = await self._execute(
             query=self._collection.find_one,
             filter={

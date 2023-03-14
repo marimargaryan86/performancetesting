@@ -241,7 +241,7 @@ def _transform(
     return cast(AnyValue, maybe_dict)
 
 
-def _class_fqn(type_: Type[object]) -> str:
+def _class_fqn(type_: type[object]) -> str:
     return ".".join([type_.__module__, type_.__name__])
 
 
@@ -274,7 +274,7 @@ def _protobuf_to_types_map(model: descriptor.Descriptor) -> _TypesMap:
 
 
 @functools.cache
-def _pydantic_to_types_map(model: Type[pydantic.BaseModel]) -> _TypesMap:
+def _pydantic_to_types_map(model: type[pydantic.BaseModel]) -> _TypesMap:
     queue = collections.deque([model])
     types_map: dict[str, dict[str, str]] = {}
 

@@ -1,5 +1,5 @@
 import dataclasses
-from typing import Any, Dict, Mapping, Optional, Sequence
+from typing import Any, Dict, Mapping, Sequence
 
 from snowfall.vendor.junction import models
 from snowfall.vendor.junction.client import (  # noqa: WPS450,WPS235
@@ -68,7 +68,7 @@ class MobileApiClient(JunctionClient):  # noqa: WPS214
         quote_id: str,
         passengers: Sequence[models.Passenger],
         contact_details: models.ContactDetails,
-        include: Optional[Sequence[order_includes]] = None,
+        include: Sequence[order_includes] | None = None,
     ) -> dict[str, Any]:
         raise RuntimeError(
             "This client cannot create orders without payments. "
@@ -82,8 +82,8 @@ class MobileApiClient(JunctionClient):  # noqa: WPS214
         passengers: Sequence[models.Passenger],
         contact_details: models.ContactDetails,
         payment_id: str,
-        voucher_id: Optional[str] = None,
-        include: Optional[Sequence[order_includes]] = None,
+        voucher_id: str | None = None,
+        include: Sequence[order_includes] | None = None,
     ) -> dict[str, Any]:
         body: Dict[str, Dict[str, Any]]
         body = {
@@ -178,20 +178,20 @@ class MobileApiClient(JunctionClient):  # noqa: WPS214
             payload=body,
         )
 
-    async def add_user_group_member(  # noqa: WPS234, WPS211
+    async def add_user_group_member(  # noqa: WPS211
         self,
         group_id: str,
-        email: Optional[str] = None,
-        first_name: Optional[str] = None,
-        last_name: Optional[str] = None,
-        phone: Optional[str] = None,
-        gender: Optional[str] = None,
-        title: Optional[str] = None,
-        country_code: Optional[str] = None,
-        date_of_birth: Optional[str] = None,
-        loyalty_programs: Optional[Sequence[Mapping[str, Any]]] = None,
-        old_password: Optional[str] = None,
-        new_password: Optional[str] = None,
+        email: str | None = None,
+        first_name: str | None = None,
+        last_name: str | None = None,
+        phone: str | None = None,
+        gender: str | None = None,
+        title: str | None = None,
+        country_code: str | None = None,
+        date_of_birth: str | None = None,
+        loyalty_programs: Sequence[Mapping[str, Any]] | None = None,
+        old_password: str | None = None,
+        new_password: str | None = None,
     ) -> dict[str, Any]:
         attributes = {
             "firstName": first_name,
@@ -219,20 +219,20 @@ class MobileApiClient(JunctionClient):  # noqa: WPS214
             payload=body,
         )
 
-    async def update_user_group_member(  # noqa: WPS234, WPS211
+    async def update_user_group_member(  # noqa: WPS211
         self,
         member_id: str,
-        email: Optional[str] = None,
-        first_name: Optional[str] = None,
-        last_name: Optional[str] = None,
-        phone: Optional[str] = None,
-        gender: Optional[str] = None,
-        title: Optional[str] = None,
-        country_code: Optional[str] = None,
-        date_of_birth: Optional[str] = None,
-        loyalty_programs: Optional[Sequence[Mapping[str, Any]]] = None,
-        old_password: Optional[str] = None,
-        new_password: Optional[str] = None,
+        email: str | None = None,
+        first_name: str | None = None,
+        last_name: str | None = None,
+        phone: str | None = None,
+        gender: str | None = None,
+        title: str | None = None,
+        country_code: str | None = None,
+        date_of_birth: str | None = None,
+        loyalty_programs: Sequence[Mapping[str, Any]] | None = None,
+        old_password: str | None = None,
+        new_password: str | None = None,
     ) -> dict[str, Any]:
         attributes = {
             "firstName": first_name,
@@ -282,8 +282,8 @@ class MobileApiClient(JunctionClient):  # noqa: WPS214
 
     async def list_user_groups(
         self,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
@@ -405,19 +405,19 @@ class MobileApiClient(JunctionClient):  # noqa: WPS214
             payload=body,
         )
 
-    async def update_user(  # noqa: WPS211,WPS234
+    async def update_user(  # noqa: WPS211
         self,
-        email: Optional[str] = None,
-        first_name: Optional[str] = None,
-        last_name: Optional[str] = None,
-        phone: Optional[str] = None,
-        gender: Optional[str] = None,
-        title: Optional[str] = None,
-        country_code: Optional[str] = None,
-        date_of_birth: Optional[str] = None,
-        loyalty_programs: Optional[Sequence[Mapping[str, Any]]] = None,
-        old_password: Optional[str] = None,
-        new_password: Optional[str] = None,
+        email: str | None = None,
+        first_name: str | None = None,
+        last_name: str | None = None,
+        phone: str | None = None,
+        gender: str | None = None,
+        title: str | None = None,
+        country_code: str | None = None,
+        date_of_birth: str | None = None,
+        loyalty_programs: Sequence[Mapping[str, Any]] | None = None,
+        old_password: str | None = None,
+        new_password: str | None = None,
     ) -> dict[str, Any]:
         attributes = {
             "firstName": first_name,

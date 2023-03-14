@@ -1,5 +1,5 @@
 import copy
-from typing import Mapping, Optional
+from typing import Mapping
 from unittest import mock
 
 import httpx
@@ -210,7 +210,7 @@ class TestUsers(object):
     async def _post_sessions(
         self,
         http_client: httpx.AsyncClient,
-        password: Optional[str],
+        password: str | None,
         user: models_pb2.User,
     ) -> httpx.Response:
         return await http_client.post(
@@ -229,7 +229,7 @@ class TestUsers(object):
     async def _patch_user(
         self,
         http_client: httpx.AsyncClient,
-        email: Optional[str],
+        email: str | None,
         user: conftest.ExistingUser,
         headers: Mapping[str, str],
     ) -> httpx.Response:

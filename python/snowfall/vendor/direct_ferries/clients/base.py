@@ -1,6 +1,6 @@
 import dataclasses
 import inspect
-from typing import Dict, Optional
+from typing import Optional
 
 import httpx
 
@@ -76,17 +76,17 @@ class BaseClient(object):
 
         return response
 
-    async def _auth_headers(self) -> Dict[str, str]:
+    async def _auth_headers(self) -> dict[str, str]:
         return {
             "Authorization": "Bearer {0}".format(await self._auth_client.get_token()),
         }
 
-    async def _default_headers(self) -> Dict[str, str]:
+    async def _default_headers(self) -> dict[str, str]:
         return {
             "content-type": "application/json",
             **await self._auth_headers(),
         }
 
     @property
-    def _request_params(self) -> Dict[str, str]:
+    def _request_params(self) -> dict[str, str]:
         return {"culture": "en-GB"}

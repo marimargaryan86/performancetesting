@@ -1,7 +1,7 @@
 import http
 import ipaddress
 import pathlib
-from typing import Any, Awaitable, Callable, Mapping, Optional, Sequence, cast
+from typing import Any, Awaitable, Callable, Mapping, Sequence, cast
 
 import uvicorn
 from asgiref.typing import ASGIApplication
@@ -29,7 +29,7 @@ class Settings(service.Settings):
 def create_starlette_app(
     routes: Sequence[routing.BaseRoute],
     openapi_path: pathlib.Path | None,
-    custom_middlewares: Optional[Sequence[Middleware]] = None,
+    custom_middlewares: Sequence[Middleware] | None = None,
     validate_response: bool = True,
 ) -> applications.Starlette:
     stack = [Middleware(middlewares.RequestIdMiddleware)]

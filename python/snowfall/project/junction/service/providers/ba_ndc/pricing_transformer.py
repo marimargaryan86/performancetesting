@@ -15,7 +15,7 @@ def _to_money(amount: str, currency: str) -> money_pb2.Money | None:
     return None
 
 
-def _to_penalties(penalties: Sequence[cache.OfferPenalty]) -> List[offers_pb2.Penalty]:
+def _to_penalties(penalties: Sequence[cache.OfferPenalty]) -> list[offers_pb2.Penalty]:
     res = list[offers_pb2.Penalty]()
 
     if penalties:
@@ -40,7 +40,7 @@ def _to_penalties(penalties: Sequence[cache.OfferPenalty]) -> List[offers_pb2.Pe
 
 def _to_document_requirement(
     offer_details: cache.OfferDetails,
-) -> List[offers_pb2.PriceQuote.Required.ValueType]:
+) -> list[offers_pb2.PriceQuote.Required.ValueType]:
     required_docs: List[offers_pb2.PriceQuote.Required.ValueType] = []
 
     if offer_details.international_flight:

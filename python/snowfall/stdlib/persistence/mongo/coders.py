@@ -1,6 +1,6 @@
 import abc
 import contextlib
-from typing import Any, Generic, Mapping, Type, TypeVar, cast
+from typing import Any, Generic, Mapping, TypeVar, cast
 
 import orjson
 import pydantic
@@ -32,7 +32,7 @@ class NoopCoder(BaseCoder[Mapping[str, Any]]):
 
 
 class ProtoCoder(Generic[Proto], BaseCoder[Proto]):
-    def __init__(self, proto: Type[Proto]):
+    def __init__(self, proto: type[Proto]):
         self._proto = proto
 
     def decode(self, as_dict: Mapping[str, Any]) -> Proto:
@@ -64,7 +64,7 @@ class ProtoCoder(Generic[Proto], BaseCoder[Proto]):
 
 
 class PydanticCoder(Generic[Model], BaseCoder[Model]):
-    def __init__(self, model: Type[Model]):
+    def __init__(self, model: type[Model]):
         self._model = model
 
     def decode(self, as_dict: Mapping[str, Any]) -> Model:

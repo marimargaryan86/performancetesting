@@ -1,5 +1,3 @@
-from typing import Type
-
 from async_factory_boy.factory.sqlalchemy import AsyncSQLAlchemyFactory
 from fastapi import status
 from fastapi.testclient import TestClient
@@ -7,7 +5,7 @@ from fastapi.testclient import TestClient
 
 async def test_can_get_all_countries(
     client: TestClient,
-    country_factory: Type[AsyncSQLAlchemyFactory],
+    country_factory: type[AsyncSQLAlchemyFactory],
 ) -> None:
     countries = await country_factory.create_batch(10)
     response = client.get("/countries")

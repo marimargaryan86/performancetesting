@@ -57,7 +57,7 @@ async def dump(proto: message.Message, pointer: binary.AsyncBufferedIOBase) -> N
 
 async def load(
     pointer: binary.AsyncBufferedIOBase,
-    proto: Type[_Proto],
+    proto: type[_Proto],
 ) -> AsyncIterator[_Proto]:
     while True:
         packed = await pointer.read(4)

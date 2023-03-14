@@ -1,6 +1,6 @@
 import datetime
 import zoneinfo
-from typing import Any, Callable, Optional, Sequence
+from typing import Any, Callable, Sequence
 
 import phonenumbers
 import pycountry
@@ -9,7 +9,7 @@ from pydantic import typing, validator
 from snowfall.stdlib.format.gtfs import constants
 
 
-def normalize_currency(currency: Optional[str]) -> Optional[str]:
+def normalize_currency(currency: str | None) -> str | None:
     if currency is None:
         return None
 
@@ -21,7 +21,7 @@ def normalize_currency(currency: Optional[str]) -> Optional[str]:
     return currency
 
 
-def normalize_date(date: Optional[str]) -> Optional[datetime.date]:
+def normalize_date(date: str | None) -> datetime.date | None:
     if date is None:
         return None
 
@@ -32,7 +32,7 @@ def normalize_date(date: Optional[str]) -> Optional[datetime.date]:
         return datetime.date.fromisoformat(date)
 
 
-def normalize_language_code(code: Optional[str]) -> Optional[str]:
+def normalize_language_code(code: str | None) -> str | None:
     if code is None:
         return None
 
@@ -55,7 +55,7 @@ def normalize_language_code(code: Optional[str]) -> Optional[str]:
     return code
 
 
-def normalize_phone_number(phone: Optional[str]) -> Optional[str]:
+def normalize_phone_number(phone: str | None) -> str | None:
     if phone is None:
         return None
 
@@ -71,8 +71,8 @@ def normalize_phone_number(phone: Optional[str]) -> Optional[str]:
 
 
 def normalize_time(
-    time: Optional[str | float | datetime.timedelta],
-) -> Optional[float | datetime.timedelta]:
+    time: str | float | datetime.timedelta | None,
+) -> float | datetime.timedelta | None:
     if time is None:
         return None
 
@@ -95,7 +95,7 @@ def normalize_time(
     )
 
 
-def normalize_time_zone(tz: Optional[str]) -> Optional[str]:
+def normalize_time_zone(tz: str | None) -> str | None:
     if tz is None:
         return None
 
@@ -109,6 +109,6 @@ def normalize_time_zone(tz: Optional[str]) -> Optional[str]:
 
 def normalizer(
     properties: Sequence[str],
-    func: Callable[[Optional[str]], Any],
+    func: Callable[[str | None], Any],
 ) -> "typing.AnyClassMethod":
     return validator(*properties, pre=True, allow_reuse=True)(func)

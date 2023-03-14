@@ -1,5 +1,5 @@
 import pathlib
-from typing import AsyncIterator, Mapping, Optional, Sequence
+from typing import AsyncIterator, Mapping, Sequence
 
 import httpx
 import pytest
@@ -16,7 +16,7 @@ def _create_app(
     locations_client: locations.Client,
     places_client: places.Client,
     openapi_path: pathlib.Path,
-    custom_middlewares: Optional[Sequence[Middleware]] = None,
+    custom_middlewares: Sequence[Middleware] | None = None,
 ) -> applications.Starlette:
     app = application.create_starlette_app(
         routes=router.get_routes(

@@ -1,6 +1,6 @@
 import datetime
 import pathlib
-from typing import AsyncIterator, Mapping, Optional, Sequence
+from typing import AsyncIterator, Mapping, Sequence
 from unittest import mock
 
 import currencycloud
@@ -44,7 +44,7 @@ def _create_app(  # noqa: WPS211
     conversion_repository: ConversionRepository,
     companies_repository: CompanyRepository,
     openapi_path: pathlib.Path,
-    custom_middlewares: Optional[Sequence[Middleware]] = None,
+    custom_middlewares: Sequence[Middleware] | None = None,
 ) -> applications.Starlette:
     app = application.create_starlette_app(
         custom_middlewares=custom_middlewares,
@@ -77,7 +77,7 @@ def _create_admin_app(  # noqa: WPS211
     accounts_repository: accounts.AccountsRepository,
     conversions_repository: ConversionRepository,
     openapi_path: pathlib.Path,
-    custom_middlewares: Optional[Sequence[Middleware]] = None,
+    custom_middlewares: Sequence[Middleware] | None = None,
 ) -> applications.Starlette:
     app = application.create_starlette_app(
         custom_middlewares=custom_middlewares,

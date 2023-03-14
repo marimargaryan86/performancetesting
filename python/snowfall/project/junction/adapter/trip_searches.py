@@ -3,7 +3,7 @@ from __future__ import annotations
 import abc
 import dataclasses
 import datetime
-from typing import Optional, Sequence
+from typing import Sequence
 
 from snowfall.project.junction.adapter import errors
 from snowfall.project.junction.service.trips.v1alpha import trips_pb2, trips_pb2_grpc
@@ -37,8 +37,8 @@ class Client(abc.ABC):
     async def list_trips_by_trip_search(
         self,
         identifier: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> trips_pb2.ListTripsResponse:
         """List trips by trip search."""
 
@@ -80,8 +80,8 @@ class DictClient(Client):
     async def list_trips_by_trip_search(
         self,
         identifier: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> trips_pb2.ListTripsResponse:
         try:
             return trips_pb2.ListTripsResponse(
@@ -158,8 +158,8 @@ class GrpcClient(Client):
     async def list_trips_by_trip_search(
         self,
         identifier: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> trips_pb2.ListTripsResponse:
         trip_search = await self.get(identifier)
 

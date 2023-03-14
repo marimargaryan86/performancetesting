@@ -26,7 +26,7 @@ class ServerInterceptor(abc.ABC, aio.ServerInterceptor):
         self,
         continuation: Continuation,
         handler_call_details: HandlerCallDetails,
-    ) -> Optional[RpcMethodHandler]:
+    ) -> RpcMethodHandler | None:
         method_handler = await continuation(handler_call_details)
 
         if not method_handler or not method_handler.unary_unary:

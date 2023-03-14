@@ -5,7 +5,7 @@ import datetime
 import pathlib
 import re
 from functools import partial
-from typing import Any, AsyncIterator, Mapping, Optional, Sequence, TypedDict
+from typing import Any, AsyncIterator, Mapping, Sequence, TypedDict
 from unittest import mock
 
 import aiosmtplib
@@ -149,7 +149,7 @@ def mongo_test_db() -> mongomock_motor.AsyncMongoMockDatabase:
 def _create_app(
     dependencies: lagom.Container,
     openapi_path: pathlib.Path,
-    custom_middlewares: Optional[Sequence[Middleware]] = None,
+    custom_middlewares: Sequence[Middleware] | None = None,
 ) -> applications.Starlette:
     asgi_app = application.create_starlette_app(
         custom_middlewares=custom_middlewares,

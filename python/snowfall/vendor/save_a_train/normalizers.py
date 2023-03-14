@@ -1,13 +1,13 @@
 import datetime
-from typing import Any, Callable, Optional, Sequence, TypeVar
+from typing import Any, Callable, Sequence, TypeVar
 
 from dateutil.parser import parse as date_parser
 from pydantic import typing, validator
 
 
 def normalize_time(
-    time: Optional[int | float | str],
-) -> Optional[float | datetime.timedelta]:
+    time: int | float | str | None,
+) -> float | datetime.timedelta | None:
     if time is None:
         return None
 
@@ -36,6 +36,6 @@ def normalize_nullable_fields(field_value: _Input | None) -> _Input | None:
 
 def normalizer(
     properties: Sequence[str],
-    func: Callable[[Optional[str]], Any],
+    func: Callable[[str | None], Any],
 ) -> "typing.AnyClassMethod":
     return validator(*properties, pre=True, allow_reuse=True)(func)

@@ -2,7 +2,6 @@ import asyncio
 import random
 import string
 import types
-from typing import Optional, Type
 
 from motor import core
 
@@ -26,9 +25,9 @@ class TemporaryDatabase(object):
 
     async def __aexit__(
         self,
-        exctype: Optional[Type[BaseException]],
-        excinst: Optional[BaseException],
-        exctb: Optional[types.TracebackType],
+        exctype: type[BaseException] | None,
+        excinst: BaseException | None,
+        exctb: types.TracebackType | None,
     ) -> None:
         try:
             await self._mongo.drop_database(self._db_name)

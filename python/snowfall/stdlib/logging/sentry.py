@@ -1,5 +1,5 @@
 from importlib import import_module, util
-from typing import Any, Optional, Sequence
+from typing import Any, Sequence
 
 import sentry_sdk
 import structlog
@@ -24,8 +24,8 @@ def sentry_trace_processor(
 
 
 def configure_sentry(
-    additional_integrations: Optional[Integrations] = None,
-    tag_keys: Optional[Sequence[str]] = None,
+    additional_integrations: Integrations | None = None,
+    tag_keys: Sequence[str] | None = None,
     **kwargs: Any,
 ) -> None:
     integrations: Integrations = [

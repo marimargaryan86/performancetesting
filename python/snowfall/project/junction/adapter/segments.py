@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import abc
-from typing import Optional, Sequence
+from typing import Sequence
 
 from snowfall.project.junction.adapter import errors
 from snowfall.project.junction.service.trips.v1alpha import trips_pb2, trips_pb2_grpc
@@ -14,8 +14,8 @@ class Client(abc.ABC):
     async def find(
         self,
         identifiers: Sequence[str] | None = None,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> trips_pb2.ListSegmentsResponse:
         """Fetch all segment resources."""
 
@@ -31,8 +31,8 @@ class DictClient(Client):
     async def find(
         self,
         identifiers: Sequence[str] | None = None,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> trips_pb2.ListSegmentsResponse:
         all_segments = list(self._segments.values())
 
@@ -67,8 +67,8 @@ class GrpcClient(Client):
     async def find(
         self,
         identifiers: Sequence[str] | None = None,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> trips_pb2.ListSegmentsResponse:
         # todo: handle INVALID_ARGUMENT
         request = trips_pb2.ListSegmentsRequest(

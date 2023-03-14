@@ -1,5 +1,3 @@
-from typing import Optional
-
 import jwt
 from cryptography.hazmat.primitives import serialization
 from starlette import authentication, requests
@@ -17,7 +15,7 @@ class AuthenticationBackend(authentication.AuthenticationBackend):
     async def authenticate(
         self,
         conn: requests.HTTPConnection,
-    ) -> Optional[tuple[authentication.AuthCredentials, authentication.SimpleUser]]:
+    ) -> tuple[authentication.AuthCredentials, authentication.SimpleUser] | None:
         otp = conn.scope["security"].get("otp")
         if otp:
             return self._otp_authenticate(otp)
@@ -29,7 +27,7 @@ class AuthenticationBackend(authentication.AuthenticationBackend):
     def _otp_authenticate(
         self,
         otp: str,
-    ) -> Optional[tuple[authentication.AuthCredentials, authentication.SimpleUser]]:
+    ) -> tuple[authentication.AuthCredentials, authentication.SimpleUser] | None:
         return authentication.AuthCredentials(
             ["otp_authenticated"],
         ), authentication.SimpleUser(otp)
@@ -37,7 +35,7 @@ class AuthenticationBackend(authentication.AuthenticationBackend):
     def _jwt_authenticate(
         self,
         jwt_token: str,
-    ) -> Optional[tuple[authentication.AuthCredentials, authentication.SimpleUser]]:
+    ) -> tuple[authentication.AuthCredentials, authentication.SimpleUser] | None:
         if not jwt_token:
             return None
 

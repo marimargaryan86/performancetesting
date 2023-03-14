@@ -2,7 +2,7 @@ import contextlib
 import contextvars
 import logging
 import sys
-from typing import Any, Iterator, Optional, Sequence, Type
+from typing import Any, Iterator, Sequence
 
 import orjson
 import structlog
@@ -11,9 +11,9 @@ from snowfall.stdlib.logging import processors
 
 
 def configure_logger(
-    level: Optional[str | int] = None,
-    additional_processors: Optional[Sequence[processors.Processor]] = None,
-    wrapper_class: Optional[Type[structlog.types.BindableLogger]] = None,
+    level: str | int | None = None,
+    additional_processors: Sequence[processors.Processor] | None = None,
+    wrapper_class: type[structlog.types.BindableLogger] | None = None,
 ) -> None:
     if not level:
         level = logging.INFO
@@ -53,7 +53,7 @@ class LogContext(object):
         self._keys.clear()
 
 
-def get_context_value(key: str) -> Optional[str]:
+def get_context_value(key: str) -> str | None:
     context: contextvars.Context = contextvars.copy_context()
     structlog_key = "{prefix}{key}".format(
         prefix=structlog.contextvars.STRUCTLOG_KEY_PREFIX,

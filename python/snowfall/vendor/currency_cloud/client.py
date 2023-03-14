@@ -1,4 +1,4 @@
-from typing import Any, Callable, Mapping, Sequence, Tuple
+from typing import Any, Callable, Mapping, Sequence
 
 import currencycloud
 
@@ -21,7 +21,7 @@ from snowfall.vendor.currency_cloud.models.conversion import (
 
 
 def error_handler(func: Callable[..., Any]) -> Callable[..., Any]:
-    def decorator(self: Any, *args: Tuple[Any], **kwargs: Mapping[str, str]) -> Any:
+    def decorator(self: Any, *args: tuple[Any], **kwargs: Mapping[str, str]) -> Any:
         try:
             return func(
                 self,

@@ -5,7 +5,7 @@ import datetime
 import os
 import re
 from dataclasses import dataclass, field
-from typing import Any, Dict, Mapping, NamedTuple, Tuple, Type
+from typing import Any, Dict, Mapping, NamedTuple, Type
 
 import httpx
 import structlog
@@ -65,7 +65,7 @@ class Singleton(type):
 class SoapLogger(object):
     def __init__(
         self,
-        secret_words: Tuple[str, ...] | None = None,
+        secret_words: tuple[str, ...] | None = None,
         export_files: bool | None = False,
         export_dir: str | None = None,
     ) -> None:

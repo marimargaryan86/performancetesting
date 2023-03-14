@@ -1,4 +1,4 @@
-from typing import Awaitable, Callable, Container, Optional, cast
+from typing import Awaitable, Callable, Container, cast
 
 import sentry_sdk
 import structlog
@@ -88,7 +88,7 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
         self,
         app: applications.Starlette,
         validator: validation.Validator,
-        excluded_status_codes: Optional[Container[int]] = None,
+        excluded_status_codes: Container[int] | None = None,
         validate_response: bool = True,
     ):
         super().__init__(app)

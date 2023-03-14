@@ -1,6 +1,6 @@
 import datetime
 import hashlib
-from typing import Any, Dict, Optional, Sequence
+from typing import Any, Dict, Sequence
 from uuid import uuid4
 
 import bcrypt
@@ -46,7 +46,7 @@ class AccountsService(object):  # noqa:WPS214
         self,
         field_name: str,
         field_value: int | str,
-    ) -> Optional[Account]:
+    ) -> Account | None:
         return await self._account_repository.get_one_by_filter(
             [getattr(Account, field_name) == field_value],
         )

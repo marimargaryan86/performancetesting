@@ -1,5 +1,3 @@
-from typing import Optional
-
 import jwt
 from cryptography.hazmat.primitives import serialization
 from starlette import authentication, requests
@@ -17,7 +15,7 @@ class JWTAuthenticationBackend(authentication.AuthenticationBackend):
     async def authenticate(
         self,
         conn: requests.HTTPConnection,
-    ) -> Optional[tuple[authentication.AuthCredentials, authentication.SimpleUser]]:
+    ) -> tuple[authentication.AuthCredentials, authentication.SimpleUser] | None:
         jwt_token = conn.scope["security"].get("jwt")
 
         if not jwt_token:

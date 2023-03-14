@@ -1,6 +1,6 @@
 import pathlib
 from base64 import b64decode, b64encode
-from typing import AsyncIterator, Mapping, Optional, Sequence
+from typing import AsyncIterator, Mapping, Sequence
 
 import httpx
 import jwt as jwtlib
@@ -63,7 +63,7 @@ def _create_app(  # noqa: WPS211
     segments_client: segments.Client,
     schedules_client: schedules.Client,
     openapi_path: pathlib.Path,
-    custom_middlewares: Optional[Sequence[Middleware]] = None,
+    custom_middlewares: Sequence[Middleware] | None = None,
 ) -> applications.Starlette:
     app = application.create_starlette_app(
         routes=router.get_routes(

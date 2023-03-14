@@ -1,5 +1,3 @@
-from typing import Type
-
 from async_factory_boy.factory.sqlalchemy import AsyncSQLAlchemyFactory
 from fastapi import status
 from fastapi.testclient import TestClient
@@ -21,7 +19,7 @@ async def test_admin_can_not_login_if_not_existed_account_provided(
 
 async def test_admin_can_not_login_if_account_is_not_active(
     client: TestClient,
-    account_factory: Type[AsyncSQLAlchemyFactory],
+    account_factory: type[AsyncSQLAlchemyFactory],
 ) -> None:
     admin_account = await account_factory.create(active=False)
     payload = {"email": admin_account.email, "password": "test_password"}
@@ -34,7 +32,7 @@ async def test_admin_can_not_login_if_account_is_not_active(
 
 async def test_admin_can_not_login_if_wrong_password_provided(
     client: TestClient,
-    account_factory: Type[AsyncSQLAlchemyFactory],
+    account_factory: type[AsyncSQLAlchemyFactory],
 ) -> None:
     admin_account = await account_factory.create()
     payload = {"email": admin_account.email, "password": "wrong_password"}
@@ -47,7 +45,7 @@ async def test_admin_can_not_login_if_wrong_password_provided(
 
 async def test_admin_can_not_login_if_has_no_permissions(
     client: TestClient,
-    account_factory: Type[AsyncSQLAlchemyFactory],
+    account_factory: type[AsyncSQLAlchemyFactory],
 ) -> None:
     admin_account = await account_factory.create()
     payload = {"email": admin_account.email, "password": "test_password"}
@@ -60,7 +58,7 @@ async def test_admin_can_not_login_if_has_no_permissions(
 
 async def test_admin_can_login(
     client: TestClient,
-    account_factory: Type[AsyncSQLAlchemyFactory],
+    account_factory: type[AsyncSQLAlchemyFactory],
 ) -> None:
     admin_account = await account_factory.create(
         admin=True,

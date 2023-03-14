@@ -109,11 +109,11 @@ class Entrypoint(object):
     def enter_with_commands(  # noqa: WPS211
         self,
         _cmd0: Command[_Settings0],
-        _cmd1: Optional[Command[_Settings1]] = None,
-        _cmd2: Optional[Command[_Settings2]] = None,
-        _cmd3: Optional[Command[_Settings3]] = None,
-        _cmd4: Optional[Command[_Settings4]] = None,
-        _cmd5: Optional[Command[_Settings5]] = None,
+        _cmd1: Command[_Settings1] | None = None,
+        _cmd2: Command[_Settings2] | None = None,
+        _cmd3: Command[_Settings3] | None = None,
+        _cmd4: Command[_Settings4] | None = None,
+        _cmd5: Command[_Settings5] | None = None,
     ) -> None:
         def wrapper(cmd: Command[_Settings] | None) -> None:
             if not cmd:
@@ -213,7 +213,7 @@ def _create_parameter_from_model(
 
 def _add_parameters_from_settings(
     command: click.Command,
-    settings: Type[Settings],
+    settings: type[Settings],
 ) -> None:
     args: list[pydantic.fields.ModelField] = list(settings.__fields__.values())
     types = get_type_hints(settings)

@@ -1,5 +1,3 @@
-from typing import Optional
-
 import pymongo
 
 from snowfall.service.authentication.v1alpha import models_pb2
@@ -36,7 +34,7 @@ class UsersRepository(
     async def find_user_by_id(
         self,
         document_id: str,
-    ) -> Optional[models_pb2.User]:
+    ) -> models_pb2.User | None:
         return await self._execute(
             query=self._collection.find_one,
             filter=self._get_filter_by_id(document_id),
@@ -46,7 +44,7 @@ class UsersRepository(
     async def find_user_by_email(
         self,
         email: str,
-    ) -> Optional[models_pb2.User]:
+    ) -> models_pb2.User | None:
         return await self._execute(
             query=self._collection.find_one,
             filter=self._get_filter_by_email(email),

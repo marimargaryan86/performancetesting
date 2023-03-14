@@ -1,15 +1,13 @@
 import abc
 import datetime
 import functools
-from typing import (  # noqa: WPS235
+from typing import (
     Any,
     Awaitable,
     Callable,
     Generic,
     Mapping,
-    Optional,
     Protocol,
-    Type,
     TypeVar,
     overload,
 )
@@ -73,7 +71,7 @@ class RepositoryProtocol(Protocol[Record]):
     async def _find_with_cursor(
         self,
         cur: str,
-        filter_: Optional[Mapping[str, Any]] = None,
+        filter_: Mapping[str, Any] | None = None,
     ) -> resultset.ResultSet[Record]:
         """Use for find queries with a filter."""
 
@@ -183,8 +181,8 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
     async def _find_nested(
         self,
         path: str,
-        filter_: Optional[Mapping[str, Any]] = None,
-        cur: Optional[str] = None,
+        filter_: Mapping[str, Any] | None = None,
+        cur: str | None = None,
         id_key: str = "_id",
     ) -> resultset.ResultSet[Record]:
         aggregate = []
@@ -252,7 +250,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
     async def _find_with_cursor(
         self,
         cur: str,
-        filter_: Optional[Mapping[str, Any]] = None,
+        filter_: Mapping[str, Any] | None = None,
     ) -> resultset.ResultSet[Record]:
         filter_pre_cursor = dict(filter_ or {})
         cursor_filter = filter_pre_cursor.copy()
@@ -298,7 +296,7 @@ class ProtoRepository(_AbstractRepository[Proto]):
 
     @property
     @abc.abstractmethod
-    def _proto(self) -> Type[Proto]:
+    def _proto(self) -> type[Proto]:
         raise NotImplementedError()
 
 
@@ -309,5 +307,5 @@ class PydanticRepository(_AbstractRepository[Model]):
 
     @property
     @abc.abstractmethod
-    def _model(self) -> Type[Model]:
+    def _model(self) -> type[Model]:
         raise NotImplementedError()

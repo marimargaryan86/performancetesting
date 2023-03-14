@@ -1,5 +1,3 @@
-from typing import Optional
-
 import grpc
 
 from snowfall.service.authentication import repository
@@ -48,7 +46,7 @@ class AuthenticationService(
         self,
         request: auth_pb2.AuthenticateRequest,
         context: grpc.aio.ServicerContext,
-    ) -> Optional[auth_pb2.AuthenticateResponse]:
+    ) -> auth_pb2.AuthenticateResponse | None:
         if request.email:
             email = request.email.lower()
 
@@ -85,7 +83,7 @@ class AuthenticationService(
         self,
         request: auth_pb2.CreateUserRequest,
         context: grpc.aio.ServicerContext,
-    ) -> Optional[auth_pb2.CreateUserResponse]:
+    ) -> auth_pb2.CreateUserResponse | None:
         email = request.email.lower()
         email_error = validate_email(email)
         if email_error:
@@ -151,7 +149,7 @@ class AuthenticationService(
         self,
         request: auth_pb2.ChangePasswordRequest,
         context: grpc.ServicerContext,
-    ) -> Optional[auth_pb2.ChangePasswordResponse]:
+    ) -> auth_pb2.ChangePasswordResponse | None:
         error = validate_password(request.password)
         if error:
             return await rich_status.abort_with_rich_status(

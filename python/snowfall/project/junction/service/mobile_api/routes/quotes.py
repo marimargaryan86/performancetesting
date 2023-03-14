@@ -1,5 +1,4 @@
 import decimal
-from typing import Optional
 
 import lagom
 from starlette import endpoints, requests, responses, status
@@ -42,7 +41,7 @@ class OfferQuote(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        cached_rate: Optional[CachedRate],
+        cached_rate: CachedRate | None,
         junction_client: client.JunctionClient = lagom.injectable,
         offers_rates_repository: repository.OffersRatesRepository = lagom.injectable,
     ) -> responses.Response:

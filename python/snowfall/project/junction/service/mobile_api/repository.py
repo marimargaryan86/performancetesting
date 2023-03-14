@@ -1,7 +1,7 @@
 import copy
 import datetime
 import re
-from typing import Any, Mapping, Optional, Sequence
+from typing import Any, Mapping, Sequence
 
 import bcrypt
 import pymongo
@@ -56,12 +56,12 @@ class OtpRepository(RedisRepository):
 
 
 class OffersRatesRepository(RedisRepository):
-    async def get(self, identifier: str) -> Optional[str]:
+    async def get(self, identifier: str) -> str | None:
         return await self._redis.get(identifier)
 
 
 class EnumsValuesRepository(RedisRepository):
-    async def get(self, identifier: str) -> Optional[str]:
+    async def get(self, identifier: str) -> str | None:
         return await self._redis.get(identifier)
 
 
@@ -156,10 +156,10 @@ class UsersRepository(
             upsert=False,
         )
 
-    async def find_user_by_email(self, email: str) -> Optional[models_pb2.User]:
+    async def find_user_by_email(self, email: str) -> models_pb2.User | None:
         return await self._execute(self._collection.find_one, {_EMAIL_KEY: email})
 
-    async def find_user_hide_password(self, user_id: str) -> Optional[models_pb2.User]:
+    async def find_user_hide_password(self, user_id: str) -> models_pb2.User | None:
         return await self._execute(
             self._collection.find_one,
             {_ID_KEY: user_id},
@@ -221,7 +221,7 @@ class StripeUsersRepository(
         super().__init__(*args, **kwargs)
         self.create_stripe_customers = create_stripe_customers
 
-    async def get(self, user_id: str) -> Optional[models_pb2.StripeUser]:
+    async def get(self, user_id: str) -> models_pb2.StripeUser | None:
         return await self._execute(
             self._collection.find_one,
             filter={"internal_user_id": user_id},
@@ -235,9 +235,9 @@ class LoyaltyProgramsRepository(
 
     async def find(
         self,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
-        search_key: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+        search_key: str | None = None,
     ) -> resultset.ResultSet[models_pb2.LoyaltyProgram]:
         query = {}
         if search_key:
@@ -331,7 +331,7 @@ class VouchersRepository(
     async def find_voucher(
         self,
         voucher_code: str,
-    ) -> Optional[models_pb2.Voucher]:
+    ) -> models_pb2.Voucher | None:
         voucher = await self._execute(
             self._collection.find_one,
             {
@@ -355,7 +355,7 @@ class VouchersRepository(
     async def find_valid_voucher(
         self,
         voucher_code: str,
-    ) -> Optional[models_pb2.Voucher]:
+    ) -> models_pb2.Voucher | None:
         voucher = await self._execute(
             self._collection.find_one,
             {

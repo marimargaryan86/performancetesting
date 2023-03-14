@@ -3,7 +3,6 @@ from __future__ import annotations
 import asyncio
 import types as std_types
 import zoneinfo
-from typing import Type
 
 import more_itertools
 import structlog
@@ -33,7 +32,7 @@ class _TripSearchContext(object):
 
     async def __aexit__(
         self,
-        exc_type: Type[BaseException] | None,
+        exc_type: type[BaseException] | None,
         exc_value: BaseException | None,
         traceback: std_types.TracebackType | None,
     ) -> bool:

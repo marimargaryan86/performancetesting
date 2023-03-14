@@ -1,4 +1,4 @@
-from typing import Dict, Mapping, Optional
+from typing import Mapping
 
 import currencycloud
 from furl import furl
@@ -7,14 +7,14 @@ from furl import furl
 class Pagination(object):
     def __init__(
         self,
-        cursor: Optional[str],
-        limit: Optional[int],
-        sort: Optional[str],
+        cursor: str | None,
+        limit: int | None,
+        sort: str | None,
         url: str,
     ):
-        self._cursor: Optional[str] = cursor
-        self._limit: Optional[int] = limit
-        self._sort: Optional[str] = sort
+        self._cursor = cursor
+        self._limit = limit
+        self._sort = sort
         self._pagination_params = {
             "order": self._sort,
             "page": self._cursor,
@@ -24,7 +24,7 @@ class Pagination(object):
         self._next_url: dict[str, str] = {}
 
     @property
-    def pagination_params(self) -> Dict[str, str | int]:
+    def pagination_params(self) -> dict[str, str | int]:
         return {
             pag_k: pag_v for pag_k, pag_v in self._pagination_params.items() if pag_v
         }

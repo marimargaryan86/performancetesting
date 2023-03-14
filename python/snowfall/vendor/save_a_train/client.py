@@ -2,7 +2,6 @@ import asyncio
 import json
 import types
 from datetime import date, timedelta
-from typing import Dict, Optional
 
 import httpx
 import structlog
@@ -303,7 +302,7 @@ def _get_passenger_type_by_age(age: int) -> str:
 
 def _generate_passenger_type_attributes(
     date_of_birth: date,
-) -> Dict[str, str | int]:
+) -> dict[str, str | int]:
     age = date_to_age(date_of_birth)
     return {
         "type": _get_passenger_type_by_age(age),
@@ -327,7 +326,7 @@ class SATClient(object):  # noqa: WPS214
         email: str,
         password: str,
         password_search: str,
-        token: Optional[str],
+        token: str | None,
         api_url: str,
         api_search_url: str,
         api_search_timeout: int,
@@ -674,7 +673,7 @@ class SATClient(object):  # noqa: WPS214
         return TicketInfo(**response_data)
 
     @property
-    def _auth_headers(self) -> Dict[str, str]:
+    def _auth_headers(self) -> dict[str, str]:
         """Generate auth header for API requests."""
         return {
             "X-Agent-Email": self._email,

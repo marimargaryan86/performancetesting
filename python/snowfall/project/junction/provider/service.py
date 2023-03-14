@@ -1,6 +1,6 @@
 import contextlib
 import dataclasses
-from typing import Awaitable, Callable, Type, TypeVar
+from typing import Awaitable, Callable, TypeVar
 
 import pydantic
 from google.protobuf import message
@@ -62,7 +62,7 @@ def _offers_command(
 class Entrypoint(service.Entrypoint):
     def enable_offers(
         self,
-        settings: Type[_OffersSettings],
+        settings: type[_OffersSettings],
         factory: OffersFactory[_OffersSettings, _Proto],
     ) -> None:
         self.add_command(

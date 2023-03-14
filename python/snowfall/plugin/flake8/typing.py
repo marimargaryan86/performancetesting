@@ -1,34 +1,54 @@
 import ast
+import contextlib
+import types
+from typing import Mapping
 
 from snowfall.plugin.flake8 import plugin
 
 PLUGIN_NAME = "snowfall-typing"
 PLUGIN_VERSION = "1.0.0"
 
-BANNED_ARG_TYPES = frozenset(
-    (
-        "collections.abc.MutableMapping",
-        "collections.abc.MutableSequence",
-        "collections.abc.MutableSet",
-        "dict",
-        "list",
-        "set",
-        "typing.Dict",
-        "typing.List",
-        "typing.MutableMapping",
-        "typing.MutableSequence",
-        "typing.MutableSet",
-        "typing.Set",
-        "typing.Union",
-    ),
+BANNED_ARG_TYPES = types.MappingProxyType(
+    {
+        "typing.Optional": "| None",
+        "typing.Tuple": "tuple",
+        "typing.Type": "type",
+        "typing.Union": "|",
+    },
 )
 
-BANNED_RETURN_TYPES: frozenset[str] = frozenset(
-    ("typing.Union",),
+MUTABLE_ARG_TYPES = types.MappingProxyType(
+    {
+        "collections.abc.MutableMapping": "typing.Mapping",
+        "collections.abc.MutableSequence": "typing.Sequence",
+        "collections.abc.MutableSet": "frozenset",
+        "dict": "typing.Mapping",
+        "list": "typing.Sequence",
+        "set": "frozenset",
+        "typing.Dict": "typing.Mapping",
+        "typing.List": "typing.Sequence",
+        "typing.MutableMapping": "typing.Mapping",
+        "typing.MutableSequence": "typing.Sequence",
+        "typing.MutableSet": "frozenset",
+        "typing.Set": "frozenset",
+    },
 )
 
-SF20 = "SF20 Found forbidden argument type: {0}"
-SF21 = "SF21 Found forbidden return type: {0}"
+BANNED_RETURN_TYPES = types.MappingProxyType(
+    {
+        "typing.Dict": "dict",
+        "typing.List": "list",
+        "typing.Optional": "| None",
+        "typing.Set": "set",
+        "typing.Tuple": "tuple",
+        "typing.Type": "type",
+        "typing.Union": "|",
+    },
+)
+
+SF20 = 'SF20 Found mutable argument type: {0} (use "{1}" instead)'
+SF21 = 'SF21 Found forbidden return type: {0} (use "{1}" instead)'
+SF22 = 'SF22 Found forbidden argument type: {0} (use "{1}" instead)'
 
 
 class Visitor(plugin.Visitor):
@@ -48,7 +68,8 @@ class Visitor(plugin.Visitor):
             if not arg or not arg.annotation:
                 continue
 
-            self._no_forbidden_type_hints(arg.annotation, BANNED_ARG_TYPES, SF20)
+            self._no_forbidden_type_hints(arg.annotation, MUTABLE_ARG_TYPES, SF20)
+            self._no_forbidden_type_hints(arg.annotation, BANNED_ARG_TYPES, SF22)
 
         if not node.returns or isinstance(node.returns, ast.Constant):
             return
@@ -58,14 +79,18 @@ class Visitor(plugin.Visitor):
     def _no_forbidden_type_hints(
         self,
         node: ast.AST,
-        banned: frozenset[str],
+        banned: Mapping[str, str],
         error_msg: str,
     ) -> None:
         fullname = self._get_fullname(node)
 
-        if fullname in banned:
+        with contextlib.suppress(KeyError):
             self.errors.append(
-                plugin.Error(node.lineno, node.col_offset, error_msg.format(fullname)),
+                plugin.Error(
+                    node.lineno,
+                    node.col_offset,
+                    error_msg.format(fullname, banned[fullname]),
+                ),
             )
 
         if isinstance(node, ast.BinOp):
@@ -88,7 +113,7 @@ class Visitor(plugin.Visitor):
     def _handle_tuple(
         self,
         node: ast.Tuple,
-        banned: frozenset[str],
+        banned: Mapping[str, str],
         error_msg: str,
     ) -> None:
         for elt in node.elts:

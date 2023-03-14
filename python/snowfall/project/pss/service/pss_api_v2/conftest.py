@@ -1,4 +1,4 @@
-from typing import AsyncGenerator, Type, cast
+from typing import AsyncGenerator, cast
 
 import bcrypt
 import pytest
@@ -86,7 +86,7 @@ async def client(
 @pytest.fixture(scope="function")
 def account_factory(
     db_session: async_sessionmaker[AsyncSession],
-) -> Type[AsyncSQLAlchemyFactory]:
+) -> type[AsyncSQLAlchemyFactory]:
     class AccountFactory(AsyncSQLAlchemyFactory):
         class Meta:
             model = Account
@@ -118,7 +118,7 @@ def account_factory(
 @pytest.fixture(scope="function")
 def country_factory(
     db_session: async_sessionmaker[AsyncSession],
-) -> Type[AsyncSQLAlchemyFactory]:
+) -> type[AsyncSQLAlchemyFactory]:
     class CountryFactory(AsyncSQLAlchemyFactory):
         class Meta:
             model = Country
@@ -135,7 +135,7 @@ def country_factory(
 @pytest.fixture(scope="function")
 def account_forgotten_password_factory(
     db_session: async_sessionmaker[AsyncSession],
-) -> Type[AsyncSQLAlchemyFactory]:
+) -> type[AsyncSQLAlchemyFactory]:
     class AccountForgottenPasswordFactory(AsyncSQLAlchemyFactory):
         class Meta:
             model = AccountForgottenPassword

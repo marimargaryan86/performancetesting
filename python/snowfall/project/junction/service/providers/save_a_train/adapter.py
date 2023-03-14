@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import AsyncIterator, Optional, Sequence
+from typing import AsyncIterator, Sequence
 
 import httpx
 import phonenumbers
@@ -382,7 +382,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
     def _extract_search_id_and_seat_preference_code(
         self,
         response: search_result_selection.SearchResultSelectionResponse,
-    ) -> tuple[str, Optional[str]]:
+    ) -> tuple[str, str | None]:
         seat_preference_code = None
 
         seat_preference = response.outbound_selected_result.seat_preference
@@ -407,7 +407,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         contact_details: order_models_pb2.ContactDetails,
         passengers: Sequence[order_models_pb2.Passenger],
         search_id: str,
-        seat_code: Optional[str],
+        seat_code: str | None,
     ) -> booking.BookingResult:
         title_map = {  # TODO: map unspecified to something else?
             order_models_pb2.Passenger.Title.TITLE_UNSPECIFIED: enums.PassengerTitle.mr,

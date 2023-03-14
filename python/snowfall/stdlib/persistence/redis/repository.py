@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc
 import datetime
-from typing import Generic, Optional, Type, TypeVar
+from typing import Generic, TypeVar
 
 import pydantic
 
@@ -27,7 +27,7 @@ class PydanticRepository(Generic[Record]):
     async def store(
         self,
         record: Record,
-        expires_at: Optional[datetime.datetime] = None,
+        expires_at: datetime.datetime | None = None,
     ) -> str:
         """Store a redis record into the cache and returns a key to access it."""
         key = string.uuid()
@@ -39,7 +39,7 @@ class PydanticRepository(Generic[Record]):
 
         return key
 
-    async def fetch(self, key: str) -> Optional[Record]:
+    async def fetch(self, key: str) -> Record | None:
         record_json = await self._redis.get(key)
 
         if not record_json:
@@ -49,5 +49,5 @@ class PydanticRepository(Generic[Record]):
 
     @property
     @abc.abstractmethod
-    def _record_type(self) -> Type[Record]:
+    def _record_type(self) -> type[Record]:
         raise NotImplementedError()

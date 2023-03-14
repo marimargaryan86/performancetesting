@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import abc
-from typing import Optional, Sequence
+from typing import Sequence
 
 from snowfall.project.junction.adapter import errors
 from snowfall.project.junction.service.schedules.v1alpha import (
@@ -20,8 +20,8 @@ class Client(abc.ABC):
     async def find_by_ids(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> schedules_pb2.ListSchedulesResponse:
         """Find schedules by IDs."""
 
@@ -39,8 +39,8 @@ class DictClient(Client):
     async def find_by_ids(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> schedules_pb2.ListSchedulesResponse:
         return schedules_pb2.ListSchedulesResponse(
             schedules=list(self._schedules.values()),
@@ -69,8 +69,8 @@ class GrpcClient(Client):
     async def find_by_ids(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> schedules_pb2.ListSchedulesResponse:
         request = schedules_pb2.ListSchedulesRequest(
             ids=list(identifiers),

@@ -1,7 +1,7 @@
 import datetime
 import itertools
 import zoneinfo
-from typing import List, Sequence
+from typing import Sequence
 
 from snowfall.project.junction.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
@@ -163,7 +163,7 @@ class OfferParser(object):  # noqa: WPS214
         self,
         slices: Sequence[OfferSlice],
         offer_segments: Sequence[offer_models_pb2.OfferSegment],
-    ) -> List[offer_models_pb2.OfferSegmentDetails]:
+    ) -> list[offer_models_pb2.OfferSegmentDetails]:
         duffel_segments = [
             segment for offer_slice in slices for segment in offer_slice.segments
         ]
@@ -197,7 +197,7 @@ class OfferParser(object):  # noqa: WPS214
     def _parse_baggage_allowance(
         self,
         offer_segment: OfferSliceSegment,
-    ) -> List[offer_models_pb2.BaggageAllowance]:
+    ) -> list[offer_models_pb2.BaggageAllowance]:
         return [
             offer_models_pb2.BaggageAllowance(
                 free=self._free_checked_baggage(offer_segment) > 0,

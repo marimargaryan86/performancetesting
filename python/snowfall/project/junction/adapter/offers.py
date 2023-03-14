@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc
 from collections.abc import Iterator
-from typing import Optional, Sequence
+from typing import Sequence
 
 from snowfall.project.junction.adapter import errors
 from snowfall.project.junction.service.offers.v1alpha import (
@@ -23,9 +23,9 @@ class Client(abc.ABC):  # noqa: WPS214
     async def find_offers_by_offer_search(
         self,
         identifier: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
-        cabin_classes: Optional[Sequence[common_pb2.CabinClass.Type.ValueType]] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+        cabin_classes: Sequence[common_pb2.CabinClass.Type.ValueType] | None = None,
     ) -> grpc_pb2.ListOffersResponse:
         """Get offer results for an offer search."""
 
@@ -33,8 +33,8 @@ class Client(abc.ABC):  # noqa: WPS214
     async def find_by_ids(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> grpc_pb2.ListOffersResponse:
         """Return offers by offer ids."""
 
@@ -46,8 +46,8 @@ class Client(abc.ABC):  # noqa: WPS214
     async def find_groups_by_ids(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> grpc_pb2.ListOfferGroupsResponse:
         """Return offer groups by ids."""
 
@@ -59,8 +59,8 @@ class Client(abc.ABC):  # noqa: WPS214
     async def find_group_details_by_ids(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> grpc_pb2.ListOfferGroupDetailsResponse:
         """Return offer group details by ids."""
 
@@ -72,8 +72,8 @@ class Client(abc.ABC):  # noqa: WPS214
     async def find_options_by_ids(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> grpc_pb2.ListOfferOptionsResponse:
         """Return offers by ids."""
 
@@ -88,8 +88,8 @@ class Client(abc.ABC):  # noqa: WPS214
     async def find_option_details_by_ids(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> grpc_pb2.ListOfferOptionDetailsResponse:
         """Return offer details by ids."""
 
@@ -114,9 +114,9 @@ class DictClient(Client):  # noqa: WPS214
     async def find_offers_by_offer_search(
         self,
         identifier: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
-        cabin_classes: Optional[Sequence[common_pb2.CabinClass.Type.ValueType]] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+        cabin_classes: Sequence[common_pb2.CabinClass.Type.ValueType] | None = None,
     ) -> grpc_pb2.ListOffersResponse:
         offers = [
             offer
@@ -145,8 +145,8 @@ class DictClient(Client):  # noqa: WPS214
     async def find_by_ids(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> grpc_pb2.ListOffersResponse:
         page = sequence.paginate(
             sequence=[
@@ -173,8 +173,8 @@ class DictClient(Client):  # noqa: WPS214
     async def find_groups_by_ids(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> grpc_pb2.ListOfferGroupsResponse:
         page = sequence.paginate(
             sequence=list(self._iterate_groups()),
@@ -198,8 +198,8 @@ class DictClient(Client):  # noqa: WPS214
     async def find_group_details_by_ids(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> grpc_pb2.ListOfferGroupDetailsResponse:
         page = sequence.paginate(
             sequence=[
@@ -224,8 +224,8 @@ class DictClient(Client):  # noqa: WPS214
     async def find_options_by_ids(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> grpc_pb2.ListOfferOptionsResponse:
         page = sequence.paginate(
             sequence=list(self._iterate_options()),
@@ -252,8 +252,8 @@ class DictClient(Client):  # noqa: WPS214
     async def find_option_details_by_ids(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> grpc_pb2.ListOfferOptionDetailsResponse:
         page = sequence.paginate(
             sequence=[
@@ -310,9 +310,9 @@ class GrpcClient(Client):  # noqa: WPS214
     async def find_offers_by_offer_search(
         self,
         identifier: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
-        cabin_classes: Optional[Sequence[common_pb2.CabinClass.Type.ValueType]] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+        cabin_classes: Sequence[common_pb2.CabinClass.Type.ValueType] | None = None,
     ) -> grpc_pb2.ListOffersResponse:
         request = grpc_pb2.ListOffersRequest(
             page_token=cursor or "",
@@ -329,8 +329,8 @@ class GrpcClient(Client):  # noqa: WPS214
     async def find_by_ids(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> grpc_pb2.ListOffersResponse:
         request = grpc_pb2.ListOffersRequest(
             page_token=cursor or "",
@@ -355,8 +355,8 @@ class GrpcClient(Client):  # noqa: WPS214
     async def find_groups_by_ids(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> grpc_pb2.ListOfferGroupsResponse:
         request = grpc_pb2.ListOfferGroupsRequest(
             page_token=cursor or "",
@@ -381,8 +381,8 @@ class GrpcClient(Client):  # noqa: WPS214
     async def find_group_details_by_ids(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> grpc_pb2.ListOfferGroupDetailsResponse:
         request = grpc_pb2.ListOfferGroupDetailsRequest(
             page_token=cursor or "",
@@ -407,8 +407,8 @@ class GrpcClient(Client):  # noqa: WPS214
     async def find_options_by_ids(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> grpc_pb2.ListOfferOptionsResponse:
         request = grpc_pb2.ListOfferOptionsRequest(
             page_token=cursor or "",
@@ -439,8 +439,8 @@ class GrpcClient(Client):  # noqa: WPS214
     async def find_option_details_by_ids(
         self,
         identifiers: Sequence[str],
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> grpc_pb2.ListOfferOptionDetailsResponse:
         request = grpc_pb2.ListOfferOptionDetailsRequest(
             page_token=cursor or "",

@@ -1,7 +1,6 @@
 import contextlib
 import random
 import uuid
-from typing import List
 
 import structlog
 from redis import asyncio as aioredis
@@ -100,7 +99,7 @@ class PriceQuoteConsumer(object):
     def _create_penalties(
         self,
         offer_details: cache.OfferDetails,
-    ) -> List[offers_pb2.Penalty]:
+    ) -> list[offers_pb2.Penalty]:
         res = None
 
         if offer_details.fully_refundable or offer_details.non_refundable:

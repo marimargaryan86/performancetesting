@@ -1,6 +1,6 @@
 import dataclasses
 from collections.abc import Sequence
-from typing import Generic, Optional, TypeVar, cast
+from typing import Generic, TypeVar, cast
 
 from snowfall.stdlib.persistence import cursor as std_cursor
 
@@ -24,8 +24,8 @@ def ensure(maybe_list: Sequence[_NotList] | _NotList) -> Sequence[_NotList]:
 
 def paginate(
     sequence: Sequence[_Resource],
-    cursor: Optional[str] = None,
-    limit: Optional[int] = None,
+    cursor: str | None = None,
+    limit: int | None = None,
 ) -> Page[_Resource]:
     start_index = 0
 

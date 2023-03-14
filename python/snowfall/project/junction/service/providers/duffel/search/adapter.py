@@ -1,6 +1,6 @@
 import datetime
 from collections import defaultdict
-from typing import AbstractSet, AsyncIterator, Callable, List, Mapping, Sequence
+from typing import AbstractSet, AsyncIterator, Callable, Mapping, Sequence
 
 import structlog
 
@@ -33,7 +33,7 @@ class OfferGrouper(object):
         cls,
         offers: Sequence[Offer],
         validator: Callable[[Offer], bool],
-    ) -> Mapping[str, List[Offer]]:
+    ) -> Mapping[str, list[Offer]]:
         offer_groups = defaultdict[str, list[Offer]](list)
 
         for offer in offers or []:

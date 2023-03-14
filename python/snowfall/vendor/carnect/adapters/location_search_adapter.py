@@ -1,5 +1,3 @@
-from typing import List
-
 from snowfall.vendor.carnect.adapters.common import (
     BaseAdapter,
     get_error_text,
@@ -32,7 +30,7 @@ class LocationSearchAdapter(BaseAdapter):
     def get_warning(self) -> str | None:
         return get_warning_text(self._rs.warnings) if self._rs else None
 
-    def locations(self) -> List[VehicleMatchedLocationType]:
+    def locations(self) -> list[VehicleMatchedLocationType]:
         if self._rs and self._rs.veh_matched_locs:
             return self._rs.veh_matched_locs.veh_matched_loc
 

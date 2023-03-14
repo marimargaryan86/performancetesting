@@ -1,4 +1,4 @@
-from typing import Any, Optional, Sequence
+from typing import Any, Sequence
 
 import httpx
 
@@ -161,7 +161,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         search_id: str,
         transaction_id: str,
         offer_id: str,
-        brand_id: Optional[str] = None,
+        brand_id: str | None = None,
     ) -> price.OfferPriceResponse:
         response = await self._make_request(
             "PUT",
@@ -183,8 +183,8 @@ class Ask2GoClient(object):  # noqa: WPS214
         self,
         search_id: str,
         offer_id: str,
-        transaction_id: Optional[str] = None,
-        brand_id: Optional[str] = None,
+        transaction_id: str | None = None,
+        brand_id: str | None = None,
     ) -> price.AsyncOfferPriceResponse:
         response = await self._make_request(
             "PUT",
@@ -259,7 +259,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         self,
         search_id: str,
         itinerary_id: str,
-        brand_id: Optional[str] = None,
+        brand_id: str | None = None,
     ) -> seat_map.SeatMapResponse:
         transaction_id = string.uuid()
 
@@ -282,7 +282,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         self,
         method: str,
         url: httpx.URL,
-        payload: Optional[Any] = None,
+        payload: Any | None = None,
     ) -> httpx.Response:
         try:
             response = await self._http_client.request(

@@ -1,5 +1,4 @@
 import http
-from typing import Optional
 
 from openapi_core.unmarshalling.schemas.exceptions import InvalidSchemaValue
 from starlette import exceptions, requests, responses, status
@@ -9,7 +8,7 @@ from snowfall.stdlib.integration.starlette import models, validation
 
 def error_response_from_status(
     status_code: int,
-    description: Optional[str] = None,
+    description: str | None = None,
 ) -> responses.Response:
     status_code_obj = http.HTTPStatus(status_code)
 

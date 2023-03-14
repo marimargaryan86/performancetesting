@@ -1,5 +1,5 @@
 import itertools
-from typing import List, Sequence
+from typing import Sequence
 
 import more_itertools
 
@@ -39,7 +39,7 @@ def _parse_cabin_class(
 
 def _parse_baggage_allowance(
     bag_allowances: Sequence[response_priced_offer_schemas.BagAllowance],
-) -> List[offer_models_pb2.BaggageAllowance]:
+) -> list[offer_models_pb2.BaggageAllowance]:
     return [
         offer_models_pb2.BaggageAllowance(
             free=free_checked_baggage(bag_allowances) > 0,
@@ -62,7 +62,7 @@ def _parse_segment_details(  # noqa: WPS210
     trips: Sequence[response_common_offer_schemas.Trip],
     offer_segments: Sequence[offer_models_pb2.OfferSegment],
     offers_adapter: OffersResponseAdapter,
-) -> List[offer_models_pb2.OfferSegmentDetails]:
+) -> list[offer_models_pb2.OfferSegmentDetails]:
     segment_details = []
     segment_index = 0
 
@@ -126,7 +126,7 @@ def segment_to_legs(
 def get_penalties(
     trips: Sequence[response_common_offer_schemas.Trip],
     offers_adapter: OffersResponseAdapter,
-) -> List[cache.OfferPenalty]:
+) -> list[cache.OfferPenalty]:
     penalties = []
     penalty_ids = [
         penalty_id for trip in trips for penalty_id in trip.penalty_ids or []

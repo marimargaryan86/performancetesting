@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Any, Generic, MutableMapping, Optional, TypeVar
+from typing import Any, Generic, MutableMapping, TypeVar
 
 from aio_pika import Message, abc, connect
 from google.protobuf import message
@@ -23,7 +23,7 @@ class RpcClient(Generic[_Proto]):
         address: str,
         producer_exchange: types.Exchange,
         routing_key: str,
-        timeout: Optional[int] = 5,
+        timeout: int | None = 5,
     ):
         self._address = address
         self._producer_exchange = producer_exchange

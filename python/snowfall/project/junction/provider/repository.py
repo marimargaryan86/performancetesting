@@ -1,6 +1,6 @@
 import datetime
 import types as std_types
-from typing import AsyncIterable, AsyncIterator, Callable, Generic, Type, TypeVar
+from typing import AsyncIterable, AsyncIterator, Callable, Generic, TypeVar
 
 import prometheus_client
 from google.protobuf import message
@@ -56,7 +56,7 @@ class OfferGroupCache(object):
 
     async def __aexit__(
         self,
-        exc_type: Type[BaseException] | None,
+        exc_type: type[BaseException] | None,
         exc_value: BaseException | None,
         traceback: std_types.TracebackType | None,
     ) -> bool:

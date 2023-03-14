@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Optional, Sequence
+from typing import Any, Sequence
 
 import more_itertools
 import unidecode
@@ -68,7 +68,7 @@ def parse_search_request(criteria: search.CreateSearchCriteria) -> dict[str, Any
 
 
 def _parse_traveler_document(
-    traveler_document: Optional[common.TravelerDocument],
+    traveler_document: common.TravelerDocument | None,
 ) -> dict[str, Any]:
     return (
         {

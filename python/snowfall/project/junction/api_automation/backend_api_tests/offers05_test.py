@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Any, Sequence, Tuple
+from typing import Any, Sequence
 
 import pytest
 
@@ -48,7 +48,7 @@ async def test_get_offer_groups_by_offer_group_id(
 
 
 async def return_flat_responses_get_offer_groups_by_offer_group_id(
-    clean_offer_id_and_offer_group_ids: Sequence[Tuple[Any, ...]],
+    clean_offer_id_and_offer_group_ids: Sequence[tuple[Any, ...]],
     junction_client: JunctionClient,
 ) -> Sequence[dict[str, Any]]:
     responses = []
@@ -64,7 +64,7 @@ async def return_flat_responses_get_offer_groups_by_offer_group_id(
 
 
 async def responses_get_offer_groups_by_offer_group_id(
-    clean_offer_id_and_offer_group_id: Tuple[Any, ...],
+    clean_offer_id_and_offer_group_id: tuple[Any, ...],
     junction_client: JunctionClient,
 ) -> Sequence[dict[str, Any]]:
     responses = []
@@ -88,7 +88,7 @@ async def return_nonempty_offer_ids_and_offer_group_ids(
     departure_after: str,
     destination: str,
     origin: str,
-) -> Sequence[Tuple[Any, ...]]:
+) -> Sequence[tuple[Any, ...]]:
     offer_id_and_offer_group_ids = await return_offer_searches_id_and_offer_group_ids(
         junction_client,
         await return_trip_offer_search_ids(
@@ -110,7 +110,7 @@ async def return_nonempty_offer_ids_and_offer_group_ids(
 
 
 async def clean_empty_items(
-    offer_id_and_offer_group_ids: Sequence[Tuple[Any, ...]],
+    offer_id_and_offer_group_ids: Sequence[tuple[Any, ...]],
 ) -> list[tuple[Any, ...]]:
     nonempty_offer_id_and_offer_group_ids = []
     for idx, _ in enumerate(offer_id_and_offer_group_ids):

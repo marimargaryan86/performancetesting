@@ -1,5 +1,5 @@
 import datetime
-from typing import Type, cast
+from typing import cast
 from unittest.mock import create_autospec
 
 import bcrypt
@@ -21,7 +21,7 @@ from snowfall.project.pss.service.pss_api_v2.services.emails import SMTPEmailSer
 
 async def test_can_get_accounts(
     client: TestClient,
-    account_factory: Type[AsyncSQLAlchemyFactory],
+    account_factory: type[AsyncSQLAlchemyFactory],
 ) -> None:
     account = await account_factory.create()
     response = client.get("/accounts")
@@ -33,7 +33,7 @@ async def test_can_get_accounts(
 
 async def test_can_not_get_current_account_if_not_authenticated(
     client: TestClient,
-    account_factory: Type[AsyncSQLAlchemyFactory],
+    account_factory: type[AsyncSQLAlchemyFactory],
 ) -> None:
     await account_factory.create()
     response = client.get("/accounts/me", headers={"x-auth-token": "non_existed_token"})
@@ -43,7 +43,7 @@ async def test_can_not_get_current_account_if_not_authenticated(
 
 async def test_can_get_current_account(
     client: TestClient,
-    account_factory: Type[AsyncSQLAlchemyFactory],
+    account_factory: type[AsyncSQLAlchemyFactory],
 ) -> None:
     account = await account_factory.create()
     response = client.get("/accounts/me", headers={"x-auth-token": account.token})
@@ -54,7 +54,7 @@ async def test_can_get_current_account(
 
 async def test_should_fail_on_email_update_if_email_is_already_taken(
     client: TestClient,
-    account_factory: Type[AsyncSQLAlchemyFactory],
+    account_factory: type[AsyncSQLAlchemyFactory],
 ) -> None:
     existing_account = await account_factory.create()
     new_account = await account_factory.create()
@@ -70,7 +70,7 @@ async def test_should_fail_on_email_update_if_email_is_already_taken(
 
 async def test_can_update_email(
     client: TestClient,
-    account_factory: Type[AsyncSQLAlchemyFactory],
+    account_factory: type[AsyncSQLAlchemyFactory],
 ) -> None:
     account = await account_factory.create()
     response = client.post(
@@ -85,7 +85,7 @@ async def test_can_update_email(
 
 async def test_can_update_password(
     client: TestClient,
-    account_factory: Type[AsyncSQLAlchemyFactory],
+    account_factory: type[AsyncSQLAlchemyFactory],
 ) -> None:
     account = await account_factory.create()
     response = client.post(
@@ -99,7 +99,7 @@ async def test_can_update_password(
 
 async def test_can_update_account(
     client: TestClient,
-    account_factory: Type[AsyncSQLAlchemyFactory],
+    account_factory: type[AsyncSQLAlchemyFactory],
 ) -> None:
     account = await account_factory.create()
     payload = {
@@ -133,7 +133,7 @@ async def test_can_not_login_if_not_existed_account_provided(
 
 async def test_can_not_login_if_account_is_not_active(
     client: TestClient,
-    account_factory: Type[AsyncSQLAlchemyFactory],
+    account_factory: type[AsyncSQLAlchemyFactory],
 ) -> None:
     account = await account_factory.create(active=False)
     payload = {"email": account.email, "password": "test_password"}
@@ -146,7 +146,7 @@ async def test_can_not_login_if_account_is_not_active(
 
 async def test_can_not_login_if_wrong_password_provided(
     client: TestClient,
-    account_factory: Type[AsyncSQLAlchemyFactory],
+    account_factory: type[AsyncSQLAlchemyFactory],
 ) -> None:
     account = await account_factory.create()
     payload = {"email": account.email, "password": "wrong_password"}
@@ -159,7 +159,7 @@ async def test_can_not_login_if_wrong_password_provided(
 
 async def test_can_login_account(
     client: TestClient,
-    account_factory: Type[AsyncSQLAlchemyFactory],
+    account_factory: type[AsyncSQLAlchemyFactory],
 ) -> None:
     account = await account_factory.create()
     payload = {"email": account.email, "password": "test_password"}
@@ -172,8 +172,8 @@ async def test_can_login_account(
 
 async def test_can_initiate_forgot_password_if_account_exists(
     client: TestClient,
-    account_factory: Type[AsyncSQLAlchemyFactory],
-    account_forgotten_password_factory: Type[AsyncSQLAlchemyFactory],
+    account_factory: type[AsyncSQLAlchemyFactory],
+    account_forgotten_password_factory: type[AsyncSQLAlchemyFactory],
     db_session: async_sessionmaker[AsyncSession],
 ) -> None:
     mock_smtp_email_service = create_autospec(SMTPEmailService, spec_set=True)
@@ -216,8 +216,8 @@ async def test_can_initiate_forgot_password_if_account_exists(
 
 async def test_cant_initiate_forgot_password_if_account_doesnt_exist(
     client: TestClient,
-    account_factory: Type[AsyncSQLAlchemyFactory],
-    account_forgotten_password_factory: Type[AsyncSQLAlchemyFactory],
+    account_factory: type[AsyncSQLAlchemyFactory],
+    account_forgotten_password_factory: type[AsyncSQLAlchemyFactory],
     db_session: async_sessionmaker[AsyncSession],
 ) -> None:
     mock_smtp_email_service = create_autospec(SMTPEmailService, spec_set=True)
@@ -247,8 +247,8 @@ async def test_cant_initiate_forgot_password_if_account_doesnt_exist(
 
 async def test_can_reset_password_if_token_unused_and_not_expired(
     client: TestClient,
-    account_factory: Type[AsyncSQLAlchemyFactory],
-    account_forgotten_password_factory: Type[AsyncSQLAlchemyFactory],
+    account_factory: type[AsyncSQLAlchemyFactory],
+    account_forgotten_password_factory: type[AsyncSQLAlchemyFactory],
     db_session: async_sessionmaker[AsyncSession],
 ) -> None:
     account = await account_factory.create()
@@ -299,7 +299,7 @@ async def test_cant_reset_password_if_token_doesnt_exist(
 
 async def test_cant_reset_password_if_token_already_used(
     client: TestClient,
-    account_forgotten_password_factory: Type[AsyncSQLAlchemyFactory],
+    account_forgotten_password_factory: type[AsyncSQLAlchemyFactory],
 ) -> None:
     token = "test-token"  # nosec
     await account_forgotten_password_factory.create(token=token, used=True)  # nosec
@@ -319,7 +319,7 @@ async def test_cant_reset_password_if_token_already_used(
 @freezegun.freeze_time("2023-01-01 01:01:00")
 async def test_cant_reset_password_if_token_expired(
     client: TestClient,
-    account_forgotten_password_factory: Type[AsyncSQLAlchemyFactory],
+    account_forgotten_password_factory: type[AsyncSQLAlchemyFactory],
 ) -> None:
     token = "test-token"  # nosec
     await account_forgotten_password_factory.create(

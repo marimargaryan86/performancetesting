@@ -1,5 +1,3 @@
-from typing import List
-
 from snowfall.vendor.carnect.adapters.common import (
     BaseAdapter,
     get_error_text,
@@ -30,7 +28,7 @@ class VehAvailRateAdapter(BaseAdapter):
     def get_warning(self) -> str | None:
         return get_warning_text(self._rs.warnings) if self._rs else None
 
-    def available(self) -> List[VehicleVendorAvailabilityType]:
+    def available(self) -> list[VehicleVendorAvailabilityType]:
         if (  # noqa: WPS337
             self._rs
             and self._rs.veh_avail_rscore

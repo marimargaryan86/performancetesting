@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any, Optional, Sequence
+from typing import Any, Sequence
 
 import pymongo
 
@@ -112,7 +112,7 @@ class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
     async def find_by_id(
         self,
         document_id: str,
-    ) -> Optional[models_pb2.Order]:
+    ) -> models_pb2.Order | None:
         options = await self._find_nested(
             path="$orders",
             filter_={
@@ -213,7 +213,7 @@ class BookingRepository(repository.ProtoRepository[models_pb2.Booking]):
     async def find_by_id(
         self,
         document_id: str,
-    ) -> Optional[models_pb2.Booking]:
+    ) -> models_pb2.Booking | None:
         bookings = await self._find_nested(
             path="$orders.bookings",
             filter_={
@@ -305,7 +305,7 @@ class BookingDetailsRepository(
     async def find_by_id(
         self,
         document_id: str,
-    ) -> Optional[models_pb2.TripOptionDetails]:
+    ) -> models_pb2.TripOptionDetails | None:
         options = await self._find_nested(
             path="$orders.bookings.trip_option.details",
             filter_={

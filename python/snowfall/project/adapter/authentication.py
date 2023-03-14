@@ -1,5 +1,4 @@
 import abc
-from typing import Optional
 
 import grpc
 
@@ -145,9 +144,9 @@ class DictClient(Client):
 
     def _get_user(
         self,
-        uuid: Optional[str],
-        email: Optional[str],
-    ) -> Optional[models_pb2.User]:
+        uuid: str | None,
+        email: str | None,
+    ) -> models_pb2.User | None:
         user = None
         if uuid:
             user = self.id2user.get(uuid)

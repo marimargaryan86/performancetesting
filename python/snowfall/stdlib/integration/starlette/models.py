@@ -66,8 +66,8 @@ class JsonApiResponse(responses.Response):
         self,
         body: Body,
         status_code: int = 200,
-        headers: Optional[Mapping[str, Any]] = None,
-        background: Optional[starlette_background.BackgroundTask] = None,
+        headers: Mapping[str, Any] | None = None,
+        background: starlette_background.BackgroundTask | None = None,
     ) -> None:
         super().__init__(
             content=body,

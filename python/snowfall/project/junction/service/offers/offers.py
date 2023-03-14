@@ -1,6 +1,6 @@
 import copy
 import datetime
-from typing import Optional, Sequence
+from typing import Sequence
 
 import pymongo
 from google.protobuf import timestamp_pb2
@@ -74,7 +74,7 @@ class TripOfferGroupDetailsRepository(
             filter_=filter_,
         )
 
-    async def find_by_id(self, document_id: str) -> Optional[models_pb2.OfferSegment]:
+    async def find_by_id(self, document_id: str) -> models_pb2.OfferSegment | None:
         details = await self._find_nested(
             path="$segments",
             filter_={
@@ -117,7 +117,7 @@ class OfferOptionsRepository(
             filter_=filter_,
         )
 
-    async def find_by_id(self, document_id: str) -> Optional[models_pb2.Offer]:
+    async def find_by_id(self, document_id: str) -> models_pb2.Offer | None:
         options = await self._find_nested(
             path="$offers",
             filter_={
@@ -166,7 +166,7 @@ class OfferOptionDetailsRepository(
     async def find_by_id(
         self,
         document_id: str,
-    ) -> Optional[models_pb2.OfferSegmentDetails]:
+    ) -> models_pb2.OfferSegmentDetails | None:
         details = await self._find_nested(
             path="$offers.segment_details",
             filter_={

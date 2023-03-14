@@ -1,5 +1,5 @@
 import inspect
-from typing import Any, List, Mapping, Optional
+from typing import Any, Mapping
 
 import httpx
 from pydantic import ValidationError
@@ -74,7 +74,7 @@ class DuffelClient(object):  # noqa: WPS214
     async def get_seat_map(
         self,
         offer_id: str,
-    ) -> List[Seats]:
+    ) -> list[Seats]:
         response = await self._make_request(
             "GET",
             "air/seat_maps",
@@ -141,8 +141,8 @@ class DuffelClient(object):  # noqa: WPS214
         self,
         method: str,
         path: str,
-        query_params: Optional[Mapping[str, Any]] = None,
-        payload: Optional[Any] = None,
+        query_params: Mapping[str, Any] | None = None,
+        payload: Any | None = None,
     ) -> httpx.Response:
         try:
             response = await self._http_client.request(

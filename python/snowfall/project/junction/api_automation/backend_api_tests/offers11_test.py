@@ -1,7 +1,7 @@
 import json
 import logging
 import time
-from typing import Any, Sequence, Tuple
+from typing import Any, Sequence
 
 import pytest
 
@@ -80,7 +80,7 @@ async def return_offer_id_and_offer_group_ids(
     destination: str,
     junction_client: JunctionClient,
     origin: str,
-) -> Sequence[Tuple[Any, ...]]:
+) -> Sequence[tuple[Any, ...]]:
     trip_offer_search_ids = await return_trip_offer_search_ids(
         junction_client,
         departure_after,

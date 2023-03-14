@@ -4,7 +4,7 @@ import dataclasses
 import datetime
 import types
 import zoneinfo
-from typing import Optional, Sequence
+from typing import Sequence
 
 from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.project.junction.service.orders.v1alpha import models_pb2 as orders_models
@@ -28,7 +28,7 @@ _APPLICABILITY_TYPE_MAPPING = types.MappingProxyType(
 
 
 def penalty_type_to_proto(
-    penalty_type: Optional[str],
+    penalty_type: str | None,
 ) -> offers_pb2.Penalty.Type.V:
     if penalty_type is None:
         return offers_pb2.Penalty.Type.TYPE_UNSPECIFIED
@@ -40,7 +40,7 @@ def penalty_type_to_proto(
 
 
 def applicability_type_to_proto(
-    applicability_type: Optional[str],
+    applicability_type: str | None,
 ) -> offers_pb2.Penalty.Applicability.V:
     if applicability_type is None:
         return offers_pb2.Penalty.Applicability.APPLICABILITY_UNSPECIFIED
@@ -61,7 +61,7 @@ def gender_from_proto(gender: orders_models.Passenger.Gender.V) -> common.Gender
 
 def document_type_from_proto(
     document_type: orders_models.DocumentDetails.Type.ValueType,
-) -> Optional[common.DocumentType]:
+) -> common.DocumentType | None:
     if document_type == orders_models.DocumentDetails.Type.TYPE_PASSPORT:
         return common.DocumentType.passport
 
@@ -69,8 +69,8 @@ def document_type_from_proto(
 
 
 def traveler_document_from_proto(
-    traveler_document: Optional[orders_models.DocumentDetails],
-) -> Optional[common.TravelerDocument]:
+    traveler_document: orders_models.DocumentDetails | None,
+) -> common.TravelerDocument | None:
     if not traveler_document:
         return None
 

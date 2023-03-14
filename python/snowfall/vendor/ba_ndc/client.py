@@ -1,5 +1,5 @@
 import inspect
-from typing import Any, Mapping, Optional
+from typing import Any, Mapping
 from uuid import UUID
 
 import httpx
@@ -229,8 +229,8 @@ class BaNdcClient(object):  # noqa: WPS214
         self,
         method: str,
         path: str,
-        query_params: Optional[Mapping[str, Any]] = None,
-        payload: Optional[Any] = None,
+        query_params: Mapping[str, Any] | None = None,
+        payload: Any | None = None,
     ) -> httpx.Response:
         try:
             response = await self._http_client.request(

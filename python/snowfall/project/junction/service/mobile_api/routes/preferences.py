@@ -1,5 +1,5 @@
 import copy
-from typing import Any, Mapping, Optional
+from typing import Any, Mapping
 
 import lagom
 from starlette import endpoints, requests, responses, status
@@ -60,7 +60,7 @@ class Preferences(endpoints.HTTPEndpoint):
 
 def sync_template(
     defaults: Any,
-    stored: Optional[Mapping[str, Any]],
+    stored: Mapping[str, Any] | None,
 ) -> Any:
     if stored:
         for preference in stored["preferences"]:  # noqa: WPS426

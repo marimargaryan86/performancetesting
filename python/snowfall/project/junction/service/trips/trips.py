@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional, Sequence
+from typing import Sequence
 
 import pymongo
 from google.protobuf import timestamp_pb2
@@ -42,7 +42,7 @@ class SegmentRepository(repository.ProtoRepository[models_pb2.SegmentReference])
     async def find_by_id(
         self,
         document_id: str,
-    ) -> Optional[models_pb2.SegmentReference]:
+    ) -> models_pb2.SegmentReference | None:
         segments = await self._find_nested(
             path="$segments",
             filter_={

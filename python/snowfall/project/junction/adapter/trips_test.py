@@ -1,4 +1,3 @@
-from typing import Type
 from unittest import mock
 
 import grpc
@@ -52,7 +51,7 @@ class TestGrpcClient(object):
     async def test_error_responses(
         self,
         error: grpc.aio.AioRpcError,
-        expected: Type[Exception],
+        expected: type[Exception],
     ) -> None:
         stub = mock.create_autospec(trips_pb2_grpc.TripServiceStub)
         stub.GetTrip = mock.AsyncMock(side_effect=error)

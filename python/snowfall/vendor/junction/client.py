@@ -1,7 +1,7 @@
 import dataclasses
 import datetime
 import enum
-from typing import Any, Literal, Mapping, Optional, Sequence, cast
+from typing import Any, Literal, Mapping, Sequence, cast
 
 import httpx
 
@@ -62,7 +62,7 @@ class _BaseClient(object):
         self,
         api_url: str,
         token: str,
-        client: Optional[httpx.AsyncClient] = None,
+        client: httpx.AsyncClient | None = None,
     ) -> None:
         self._api_url = api_url
         self._client = client or httpx.AsyncClient(http2=True)
@@ -89,8 +89,8 @@ class _BaseClient(object):
         self,
         method: str,
         url: str,
-        query_parameters: Optional[Mapping[str, Any]] = None,
-        payload: Optional[Mapping[str, Any]] = None,
+        query_parameters: Mapping[str, Any] | None = None,
+        payload: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
         response = await self._client.request(
             method=method,
@@ -126,8 +126,8 @@ class LegsClient(_BaseClient):
     async def get_legs_by_segment_id(
         self,
         segment_id: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
@@ -151,8 +151,8 @@ class LegsClient(_BaseClient):
 class PlacesClient(_BaseClient):
     async def list_places(
         self,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
@@ -168,8 +168,8 @@ class PlacesClient(_BaseClient):
 
     async def get_places_types(
         self,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
@@ -197,8 +197,8 @@ class SegmentsClient(_BaseClient):
     async def get_segments_by_trip(
         self,
         trip_id: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
@@ -209,8 +209,8 @@ class SegmentsClient(_BaseClient):
     async def get_segments_by_trip_search(
         self,
         trip_search_id: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
@@ -268,9 +268,9 @@ class TripsClient(_BaseClient):
     async def get_trips_by_trip_search_id(
         self,
         trips_search_id: str,
-        include: Optional[Sequence[trip_includes]] = None,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        include: Sequence[trip_includes] | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         query_parameters = cast(
             dict[str, int | str | Sequence[trip_includes]],
@@ -334,8 +334,8 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
 
     async def get_passenger_genders(
         self,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
@@ -351,8 +351,8 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
 
     async def get_passenger_titles(
         self,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
@@ -405,10 +405,10 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
     async def get_offers_by_offer_search_id(  # noqa: WPS211
         self,
         offers_search_id: str,
-        cabin_class: Optional[Sequence[str]],
-        include: Optional[Sequence[offer_includes]] = None,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        cabin_class: Sequence[str] | None,
+        include: Sequence[offer_includes] | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         query_parameters = cast(
             dict[str, int | str | Sequence[str]],
@@ -427,7 +427,7 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
     async def get_offer_search(
         self,
         offers_search_id: str,
-        include: Optional[Sequence[offer_search_includes]] = None,
+        include: Sequence[offer_search_includes] | None = None,
     ) -> dict[str, Any]:
         query_parameters = {}
         if include:
@@ -486,8 +486,8 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
     async def get_offer_groups_by_offer_id(
         self,
         offer_id: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
@@ -498,8 +498,8 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
     async def get_offer_group_details_by_offer_group_id(
         self,
         offer_group_id: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
@@ -510,8 +510,8 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
     async def get_offer_options_by_offer_group_id(
         self,
         offer_group_id: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
@@ -522,8 +522,8 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
     async def get_offer_option_details_by_offer_option_id(
         self,
         offer_option_id: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
@@ -577,8 +577,8 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
 
     async def get_journeys(
         self,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
@@ -595,8 +595,8 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
     async def get_orders_by_journey_id(
         self,
         identifier: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
@@ -654,7 +654,7 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
         quote_id: str,
         passengers: Sequence[models.Passenger],
         contact_details: models.ContactDetails,
-        include: Optional[Sequence[order_includes]] = None,
+        include: Sequence[order_includes] | None = None,
     ) -> dict[str, Any]:
         body = {
             _DATA_KEY: {
@@ -695,7 +695,7 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
     async def get_order_by_id(
         self,
         identifier: str,
-        include: Optional[Sequence[order_includes]] = None,
+        include: Sequence[order_includes] | None = None,
     ) -> dict[str, Any]:
         query_parameters: dict[str, str] = {}
         if include:
@@ -709,8 +709,8 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
     async def get_bookings_by_order_id(
         self,
         identifier: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
@@ -727,8 +727,8 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
     async def get_booking_details_by_booking_id(
         self,
         identifier: str,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
@@ -753,8 +753,8 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
 
     async def make_order_request(
         self,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
@@ -773,8 +773,8 @@ class JunctionClient(_BaseClient):  # noqa: WPS214
 
 
 def _make_pagination(
-    limit: Optional[int],
-    cursor: Optional[str],
+    limit: int | None,
+    cursor: str | None,
 ) -> dict[str, int | str]:
     return {
         key: pagination_value

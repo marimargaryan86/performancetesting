@@ -2,7 +2,6 @@ import datetime
 import decimal
 import json
 import re
-from typing import Optional
 
 import lagom
 from starlette import endpoints, requests, responses, status
@@ -103,7 +102,7 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
     async def get(  # noqa: WPS210
         self,
         request: requests.Request,
-        cached_rate: Optional[CachedRate],
+        cached_rate: CachedRate | None,
         junction_client: client.JunctionClient = lagom.injectable,
         offers_rates_repository: repository.OffersRatesRepository = lagom.injectable,
     ) -> responses.Response:

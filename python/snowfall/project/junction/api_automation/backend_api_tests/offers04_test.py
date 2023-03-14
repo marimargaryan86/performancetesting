@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Any, Sequence, Tuple
+from typing import Any, Sequence
 
 import pytest
 
@@ -45,7 +45,7 @@ async def test_get_offer_search(
 
 
 async def extract_offer_ids(
-    offer_id_and_offer_group_ids: Sequence[Tuple[Any, ...]],
+    offer_id_and_offer_group_ids: Sequence[tuple[Any, ...]],
 ) -> Sequence[str]:
     offer_ids = []
     for idx, _ in enumerate(offer_id_and_offer_group_ids):

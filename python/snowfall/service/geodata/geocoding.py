@@ -60,7 +60,7 @@ class ReverseGeocoder(object):
         self,
         latitude: float,
         longitude: float,
-    ) -> Optional[str]:
+    ) -> str | None:
         for shape_record in self._records:
             shape = geometry.shape(shape_record.shape)
 
@@ -85,7 +85,7 @@ class ReverseGeocoder(object):
         self,
         latitude: float,
         longitude: float,
-    ) -> Optional[str]:
+    ) -> str | None:
         async with geocoders.Photon(
             adapter_factory=adapters.AioHTTPAdapter,
             user_agent=self._user_agent,
@@ -109,7 +109,7 @@ class ReverseGeocoder(object):
         self,
         latitude: float,
         longitude: float,
-    ) -> Optional[str]:
+    ) -> str | None:
         async with geocoders.Nominatim(
             adapter_factory=adapters.AioHTTPAdapter,
             user_agent=self._user_agent,

@@ -1,6 +1,6 @@
 import copy
 import decimal
-from typing import Any, Mapping, Optional, Tuple
+from typing import Any, Mapping
 
 import httpx
 import lagom
@@ -148,8 +148,8 @@ class Orders(endpoints.HTTPEndpoint):
     async def post(  # noqa: WPS211, WPS210, WPS217, C901
         self,
         request: requests.Request,
-        voucher: Optional[models_pb2.Voucher],
-        cached_rate: Optional[CachedRate],
+        voucher: models_pb2.Voucher | None,
+        cached_rate: CachedRate | None,
         offers_rates_repository: repository.OffersRatesRepository = lagom.injectable,
         orders_repository: repository.OrdersRepository = lagom.injectable,
         junction_client: client.JunctionClient = lagom.injectable,
@@ -272,10 +272,10 @@ class Orders(endpoints.HTTPEndpoint):
 async def check_payment_amount_and_state(
     payment_intent_id: str,
     quote: str,
-    voucher: Optional[models_pb2.Voucher],
+    voucher: models_pb2.Voucher | None,
     junction_client: client.JunctionClient,
-    cached_rate: Optional[CachedRate],
-) -> Tuple[bool, bool]:
+    cached_rate: CachedRate | None,
+) -> tuple[bool, bool]:
     pi = stripe.PaymentIntent.retrieve(payment_intent_id)
 
     quote_response = await junction_client.get_offer_quote_by_id(

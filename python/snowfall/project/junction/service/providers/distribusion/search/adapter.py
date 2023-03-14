@@ -1,6 +1,6 @@
 import datetime
 import zoneinfo
-from typing import AsyncIterator, Collection, List, Optional, Sequence
+from typing import AsyncIterator, Collection, Sequence
 
 import structlog
 
@@ -60,7 +60,7 @@ class MarketingCarrierAdapter(object):  # noqa: WPS214
     def get_code(self) -> str:
         return self._marketing_carrier.code or ""
 
-    def get_fare_class(self, fare_class_code: str) -> Optional[connections.FareClass]:
+    def get_fare_class(self, fare_class_code: str) -> connections.FareClass | None:
         return self._get_fare_classes().get(fare_class_code)
 
     def get_fare_feature_codes(
@@ -116,7 +116,7 @@ class MarketingCarrierAdapter(object):  # noqa: WPS214
     def get_fare_rules(
         self,
         fare: connections.FaresRelFareClassPrice | None,
-    ) -> List[cache.FareRule] | None:
+    ) -> list[cache.FareRule] | None:
         fare_features = self._get_fare_features(fare)
 
         if fare_features:
@@ -353,7 +353,7 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
     def _parse_vehicle(
         self,
         offer_segment: connections.Segment,
-    ) -> Optional[offer_models_pb2.Vehicle]:
+    ) -> offer_models_pb2.Vehicle | None:
         if not offer_segment.vehicle:
             return None
 

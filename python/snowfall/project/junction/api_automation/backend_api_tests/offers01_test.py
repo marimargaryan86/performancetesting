@@ -3,7 +3,7 @@ import datetime
 import json
 import logging
 import time
-from typing import Any, Mapping, Sequence, Tuple
+from typing import Any, Mapping, Sequence
 
 import pytest
 
@@ -45,7 +45,7 @@ async def test_trip_offers_e2e_basic(
 
 async def return_offer_options_ids_from_offer_searches(
     junction_client: JunctionClient,
-    offer_id_and_offer_group_ids: Sequence[Tuple[Any, ...]],
+    offer_id_and_offer_group_ids: Sequence[tuple[Any, ...]],
 ) -> Sequence[str]:
     offer_options_ids = []
     for idx, _ in enumerate(offer_id_and_offer_group_ids):
@@ -63,7 +63,7 @@ async def return_offer_options_ids_from_offer_searches(
 
 async def return_offer_ids_and_offer_options_ids(
     client: JunctionClient,
-    offer_id_and_offer_group_ids: Sequence[Tuple[Any, ...]],
+    offer_id_and_offer_group_ids: Sequence[tuple[Any, ...]],
 ) -> Sequence[list[str]]:
     list_of_offer_ids_and_offer_options_ids = []
     for idx, _ in enumerate(offer_id_and_offer_group_ids):
@@ -83,7 +83,7 @@ async def return_offer_ids_and_offer_options_ids(
 async def return_offer_searches_id_and_offer_group_ids(
     junction_client: JunctionClient,
     trip_offer_search_ids: Sequence[str],
-) -> Sequence[Tuple[Any, ...]]:
+) -> Sequence[tuple[Any, ...]]:
     tasks = []
     for trip_offer_search_id in trip_offer_search_ids:
         tasks.append(
@@ -146,7 +146,7 @@ async def return_offer_options_details_ids(
 async def return_offer_group_ids_and_offer_searches_id(
     junction_client: JunctionClient,
     trip_offer_search_id: str,
-) -> Tuple[str, Sequence[str]]:
+) -> tuple[str, Sequence[str]]:
     (offer_id, offer_group_ids) = await return_offer_search_id_and_offer_group_ids(
         junction_client,
         trip_offer_search_id,
@@ -191,7 +191,7 @@ async def return_offer_id(
 async def return_offer_search_id_and_offer_group_ids(
     junction_client: JunctionClient,
     trips_search_id: str,
-) -> Tuple[str, Sequence[str]]:
+) -> tuple[str, Sequence[str]]:
     response = await junction_client.get_offers_by_offer_search_id(
         trips_search_id,
         cabin_class=["economy"],

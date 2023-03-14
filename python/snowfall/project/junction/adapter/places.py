@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import abc
-from typing import Optional, Sequence
+from typing import Sequence
 
 from snowfall.project.junction.adapter import errors
 from snowfall.project.junction.service.places.v1alpha import (
@@ -32,8 +32,8 @@ class Client(abc.ABC):
     @abc.abstractmethod
     async def find(
         self,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> places_pb2.ListPlacesResponse:
         """Fetch all place resources."""
 
@@ -69,8 +69,8 @@ class DictClient(Client):
 
     async def find(
         self,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> places_pb2.ListPlacesResponse:
         page = sequence.paginate(
             sequence=list(self._places.values()),
@@ -132,8 +132,8 @@ class GrpcClient(Client):
 
     async def find(
         self,
-        limit: Optional[int] = None,
-        cursor: Optional[str] = None,
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> places_pb2.ListPlacesResponse:
         # todo: handle INVALID_ARGUMENT
         request = places_pb2.ListPlacesRequest(

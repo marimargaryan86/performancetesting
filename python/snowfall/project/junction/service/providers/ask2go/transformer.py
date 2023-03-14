@@ -2,7 +2,7 @@ import datetime
 import itertools
 from collections.abc import AsyncIterator
 from contextlib import suppress
-from typing import Mapping, Optional, Sequence, Tuple
+from typing import Mapping, Sequence, Tuple
 
 from dateutil import relativedelta
 
@@ -247,7 +247,7 @@ class OfferTransformer(object):  # noqa: WPS214
 
     async def _get_segment_details(  # noqa: WPS210
         self,
-        fare_brand: Optional[str],
+        fare_brand: str | None,
         grouped_trips_segments: Sequence[_GroupedOfferSegment],
         trips: Sequence[offers.Trip],
     ) -> Sequence[offers_pb2.OfferSegmentDetails]:
@@ -302,7 +302,7 @@ class OfferTransformer(object):  # noqa: WPS214
 
     def _transform_amenities_to_protos(
         self,
-        amenities: Optional[offers.SegmentAmenities],
+        amenities: offers.SegmentAmenities | None,
     ) -> offers_pb2.SegmentAmenities:
         return offers_pb2.SegmentAmenities(
             beverage=self._get_amenity_option_proto(
@@ -324,7 +324,7 @@ class OfferTransformer(object):  # noqa: WPS214
 
     def _get_amenity_option_proto(
         self,
-        amenity: Optional[offers.SegmentAmenity],
+        amenity: offers.SegmentAmenity | None,
     ) -> offers_pb2.SegmentAmenity:
         if amenity is None:
             availability = offers_pb2.SegmentAmenity.Type.TYPE_UNSPECIFIED
@@ -404,7 +404,7 @@ class OfferTransformer(object):  # noqa: WPS214
     def _get_penalty_price(
         self,
         information: price.PenaltyInformation,
-    ) -> Optional[money_pb2.Money]:
+    ) -> money_pb2.Money | None:
         return (
             money.from_string(
                 information.amount,
