@@ -17,11 +17,11 @@ async def _cabin_classes_resolver(
     cabin_classes: list[resources.CabinClassResource] = []
 
     for identifier in identifiers:
-        with contextlib.suppress(KeyError):
+        with contextlib.suppress(ValueError):
             cabin_classes.append(
                 resources.CabinClassResource.from_proto(
-                    protobuf.slug_to_enum_value(  # type: ignore[arg-type]
-                        models_pb2.CabinClass.Type.DESCRIPTOR,
+                    protobuf.slug_to_enum_value(
+                        models_pb2.CabinClass.Type,
                         identifier,
                     ),
                     request.url_for("ViewCabinClasses", enumId=identifier),
@@ -72,11 +72,11 @@ async def _leg_types_resolver(
     leg_types: list[resources.LegTypeResource] = []
 
     for identifier in identifiers:
-        with contextlib.suppress(KeyError):
+        with contextlib.suppress(ValueError):
             leg_types.append(
                 resources.LegTypeResource.from_proto(
-                    protobuf.slug_to_enum_value(  # type: ignore[arg-type]
-                        models_pb2.Schedule.Type.DESCRIPTOR,
+                    protobuf.slug_to_enum_value(
+                        models_pb2.Schedule.Type,
                         identifier,
                     ),
                     request.url_for("ViewLegsTypes", enumId=identifier),

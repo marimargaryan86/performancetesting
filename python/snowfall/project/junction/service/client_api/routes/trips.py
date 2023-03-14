@@ -1,6 +1,5 @@
 import asyncio
 import datetime
-from typing import cast
 
 import lagom
 from dateutil import parser
@@ -132,16 +131,13 @@ class TripSearches(endpoints.HTTPEndpoint):
 
         try:
             allowed_segment_types = [
-                cast(
-                    models_pb2.Schedule.Type.ValueType,
-                    protobuf.slug_to_enum_value(
-                        enum_descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
-                        name=leg_type,
-                    ),
+                protobuf.slug_to_enum_value(
+                    enum=models_pb2.Schedule.Type,
+                    name=leg_type,
                 )
                 for leg_type in body.get("allowedSegmentTypes", [])
             ]
-        except KeyError as key_err:
+        except ValueError as key_err:
             raise exceptions.HTTPException(
                 status.HTTP_422_UNPROCESSABLE_ENTITY,
             ) from key_err

@@ -1,5 +1,5 @@
 import datetime
-from typing import Sequence, cast
+from typing import Sequence
 
 import lagom
 from starlette import endpoints, requests, responses, status
@@ -433,20 +433,17 @@ def _get_cabin_class_filter(
         [],
     )
 
-    cabin_class_enums = []
+    cabin_class_enums: list[common_pb2.CabinClass.Type.ValueType] = []
 
     for cabin_class_id in cabin_classes_raw:
         try:
             cabin_class_enums.append(
                 protobuf.slug_to_enum_value(
-                    common_pb2.CabinClass.Type.DESCRIPTOR,
+                    common_pb2.CabinClass.Type,
                     cabin_class_id,
                 ),
             )
-        except KeyError:
+        except ValueError:
             cabin_class_enums.append(common_pb2.CabinClass.TYPE_UNSPECIFIED)
 
-    return [
-        cast(common_pb2.CabinClass.Type.ValueType, cabin_class_enum)
-        for cabin_class_enum in cabin_class_enums
-    ]
+    return cabin_class_enums

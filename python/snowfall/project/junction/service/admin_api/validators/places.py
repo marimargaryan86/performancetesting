@@ -96,11 +96,11 @@ def _validate_types(
         try:
             place_types.add(
                 protobuf.slug_to_enum_value(
-                    models_pb2.Location.Type.DESCRIPTOR,
+                    models_pb2.Location.Type,
                     place_type,
                 ),
             )
-        except KeyError:
+        except ValueError:
             errors.add(
                 models.Error(
                     status=str(status.HTTP_404_NOT_FOUND),

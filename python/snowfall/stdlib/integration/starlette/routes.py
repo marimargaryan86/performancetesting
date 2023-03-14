@@ -1,15 +1,19 @@
+from __future__ import annotations
+
 import functools
 import os
 import re
-from typing import Any, Awaitable, Callable, Sequence
+from typing import TYPE_CHECKING, Any, Awaitable, Callable, Sequence, TypeVar
 
 import httpx
-from google.protobuf import descriptor
 from starlette import endpoints, exceptions, requests, responses, routing, status
 
 from snowfall.stdlib import sequence, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import messages, models, pagination_helpers
+
+if TYPE_CHECKING:
+    from google.protobuf.internal import enum_type_wrapper
 
 
 def to_route(
@@ -97,14 +101,17 @@ class Health(endpoints.HTTPEndpoint):
         )
 
 
+_EnumValue = TypeVar("_EnumValue", bound=int)
+
+
 class ListAndViewEnum(object):
     def __init__(
         self,
-        enum_descriptor: descriptor.EnumDescriptor,
+        enum: enum_type_wrapper._EnumTypeWrapper[_EnumValue],  # noqa: WPS437
         resource_factory: Callable[[Any, str], models.Resource],
         path: str,
     ) -> None:
-        self._enum_descriptor = enum_descriptor
+        self._enum = enum
         self._path = path.lstrip("/").rstrip("/")
         self._resource_factory = resource_factory
         self._list_route_name = string.to_upper_camel(
@@ -132,7 +139,7 @@ class ListAndViewEnum(object):
 
     def _to_id(self, leg_type: int) -> str:
         return protobuf.enum_value_to_slug(
-            enum_descriptor=self._enum_descriptor,
+            enum_descriptor=self._enum.DESCRIPTOR,
             enum_value=leg_type,
         )
 
@@ -143,7 +150,7 @@ class ListAndViewEnum(object):
         pagination = pagination_helpers.get_pagination(request)
         sequence_page = sequence.paginate(
             sequence=sorted(
-                (enum_value.number for enum_value in self._enum_descriptor.values),
+                (enum_value.number for enum_value in self._enum.DESCRIPTOR.values),
                 key=self._to_id,
             ),
             cursor=pagination.cursor,
@@ -177,10 +184,10 @@ class ListAndViewEnum(object):
     ) -> responses.Response:
         try:
             enum_value = protobuf.slug_to_enum_value(
-                self._enum_descriptor,
+                self._enum,
                 request.path_params["enumId"],
             )
-        except KeyError as err:
+        except ValueError as err:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from err
 
         return await messages.create_response(

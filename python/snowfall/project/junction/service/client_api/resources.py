@@ -973,7 +973,7 @@ class LegTypeResource(models.Resource):
     @classmethod
     def from_proto(
         cls,
-        schedule_type: models_pb2.Schedule.Type.V,
+        schedule_type: models_pb2.Schedule.Type.ValueType,
         self_link: str,
     ) -> LegTypeResource:
         schedule_type_id = protobuf.enum_value_to_slug(

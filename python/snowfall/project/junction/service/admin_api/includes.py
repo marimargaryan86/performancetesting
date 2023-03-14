@@ -34,11 +34,11 @@ async def _place_types_resolver(
     place_types: list[resources.PlaceTypeResource] = []
 
     for identifier in identifiers:
-        with contextlib.suppress(KeyError):
+        with contextlib.suppress(ValueError):
             place_types.append(
                 resources.PlaceTypeResource.from_proto(
-                    protobuf.slug_to_enum_value(  # type: ignore[arg-type]
-                        models_pb2.Location.Type.DESCRIPTOR,
+                    protobuf.slug_to_enum_value(
+                        models_pb2.Location.Type,
                         identifier,
                     ),
                     request,

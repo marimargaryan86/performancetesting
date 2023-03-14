@@ -26,7 +26,7 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
 
     return [
         *routes.ListAndViewEnum(
-            enum_descriptor=places_pb2.Location.Type.DESCRIPTOR,
+            enum=places_pb2.Location.Type,
             resource_factory=resources.PlaceTypeResource.from_proto,
             path="/places/types",
         ).to_routes(),
@@ -41,7 +41,7 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             name="ViewPlace",
         ),
         *routes.ListAndViewEnum(
-            enum_descriptor=models_pb2.Schedule.Type.DESCRIPTOR,
+            enum=models_pb2.Schedule.Type,
             resource_factory=resources.LegTypeResource.from_proto,
             path="/legs/types",
         ).to_routes(),
@@ -207,17 +207,17 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             name="ViewBookingDetails",
         ),
         *routes.ListAndViewEnum(
-            enum_descriptor=orders_pb2.Passenger.Gender.DESCRIPTOR,
+            enum=orders_pb2.Passenger.Gender,
             resource_factory=resources.PassengerGenderResource.from_proto,
             path="/passengers/genders",
         ).to_routes(),
         *routes.ListAndViewEnum(
-            enum_descriptor=orders_pb2.Passenger.Title.DESCRIPTOR,
+            enum=orders_pb2.Passenger.Title,
             resource_factory=resources.PassengerTitleResource.from_proto,
             path="/passengers/titles",
         ).to_routes(),
         *routes.ListAndViewEnum(
-            enum_descriptor=models_pb2.CabinClass.Type.DESCRIPTOR,
+            enum=models_pb2.CabinClass.Type,
             resource_factory=resources.CabinClassResource.from_proto,
             path="/cabin-classes",
         ).to_routes(),

@@ -341,15 +341,9 @@ class VouchersRepository(
         if not voucher:
             return None
         if protobuf.protobuf_to_date(voucher.expires_at) < datetime.date.today():
-            valid_status = protobuf.slug_to_enum_value(
-                enum_descriptor=models_pb2.Voucher.Status.DESCRIPTOR,
-                name="valid",
-            )
+            valid_status = models_pb2.Voucher.Status.STATUS_VALID
             if voucher.status == valid_status:
-                voucher.status = protobuf.slug_to_enum_value(
-                    enum_descriptor=models_pb2.Voucher.Status.DESCRIPTOR,
-                    name="expired",
-                )
+                voucher.status = models_pb2.Voucher.Status.STATUS_EXPIRED
         return voucher
 
     async def find_valid_voucher(
@@ -360,10 +354,7 @@ class VouchersRepository(
             self._collection.find_one,
             {
                 "code": voucher_code,
-                "status": protobuf.slug_to_enum_value(
-                    enum_descriptor=models_pb2.Voucher.Status.DESCRIPTOR,
-                    name="valid",
-                ),
+                "status": models_pb2.Voucher.Status.STATUS_VALID,
             },
         )
         if not voucher:
@@ -382,10 +373,7 @@ class VouchersRepository(
             {"code": voucher_code},
             {
                 "$set": {
-                    "status": protobuf.slug_to_enum_value(
-                        enum_descriptor=models_pb2.Voucher.Status.DESCRIPTOR,
-                        name="used",
-                    ),
+                    "status": models_pb2.Voucher.Status.STATUS_USED,
                     "payment_intent_id": payment_intent_id,
                     "updated_at": datetime.datetime.utcnow(),
                 },
@@ -402,10 +390,7 @@ class VouchersRepository(
             {"payment_intent_id": payment_intent_id},
             {
                 "$set": {
-                    "status": protobuf.slug_to_enum_value(
-                        enum_descriptor=models_pb2.Voucher.Status.DESCRIPTOR,
-                        name="valid",
-                    ),
+                    "status": models_pb2.Voucher.Status.STATUS_VALID,
                     "payment_intent_id": "",
                     "updated_at": datetime.datetime.utcnow(),
                 },

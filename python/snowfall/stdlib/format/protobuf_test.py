@@ -80,7 +80,7 @@ def test_enum_value_to_slug() -> None:
 def test_slug_to_enum_value() -> None:
     assert (
         protobuf.slug_to_enum_value(
-            models_pb2.Schedule.Type.DESCRIPTOR,
+            models_pb2.Schedule.Type,
             "air",
         )
         == models_pb2.Schedule.TYPE_AIR
@@ -88,18 +88,24 @@ def test_slug_to_enum_value() -> None:
 
     assert (
         protobuf.slug_to_enum_value(
-            places_models_pb2.Location.Type.DESCRIPTOR,
+            places_models_pb2.Location.Type,
             "railway-station",
         )
         == places_models_pb2.Location.TYPE_RAILWAY_STATION
     )
     assert (
         protobuf.slug_to_enum_value(
-            testing_pb2.PascalCaseEnum.PascalCase.DESCRIPTOR,
+            testing_pb2.PascalCaseEnum.PascalCase,
             "unspecified",
         )
         == 0
     )
+
+    with pytest.raises(ValueError):
+        protobuf.slug_to_enum_value(
+            testing_pb2.PascalCaseEnum.PascalCase,
+            "foobar",
+        )
 
 
 @pytest.mark.parametrize(

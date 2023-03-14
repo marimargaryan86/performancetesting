@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import datetime
 import struct
 import zoneinfo
-from typing import AsyncIterator, Generic, Optional, Type, TypeVar, cast
+from typing import TYPE_CHECKING, AsyncIterator, Generic, Optional, Type, TypeVar, cast
 
 from aiofiles.threadpool import binary
 from dateutil import tz
@@ -16,6 +18,10 @@ from google.protobuf import (
 
 from snowfall.stdlib import string
 from snowfall.stdlib.v1alpha import datetime_pb2, models_pb2
+
+if TYPE_CHECKING:
+    from google.protobuf.internal import enum_type_wrapper
+
 
 _Proto = TypeVar("_Proto", bound=message.Message)
 
@@ -172,13 +178,16 @@ def enum_value_to_slug(
     return name.lower().replace("_", "-")
 
 
+_EnumValue = TypeVar("_EnumValue", bound=int)
+
+
 def slug_to_enum_value(
-    enum_descriptor: descriptor.EnumDescriptor,
+    enum: enum_type_wrapper._EnumTypeWrapper[_EnumValue],  # noqa: WPS437
     name: str,
-) -> int:
+) -> _EnumValue:  # noqa: WPS437
     enum_name = "{0}_{1}".format(
-        string.to_snake(enum_descriptor.name).upper(),
+        string.to_snake(enum.DESCRIPTOR.name).upper(),
         name.replace("-", "_").upper(),
     )
 
-    return enum_descriptor.values_by_name[enum_name].number
+    return enum.Value(enum_name)
