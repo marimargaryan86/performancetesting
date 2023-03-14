@@ -43,3 +43,4 @@ The following ports are configured in local environments by default:
 | 50060 | currencies             | gRPC Server       |
 | 50061 | payers                 | gRPC Server       |
 | 50062 | authentication         | gRPC Server       |
+| 50063 | checkin                | gRPC Server       |

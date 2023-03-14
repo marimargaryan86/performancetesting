@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package snowfall.project.junction.plus.service.checkin.v1alpha;
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/plus/service/checkin/v1alpha";
+
+service CheckinService {}
