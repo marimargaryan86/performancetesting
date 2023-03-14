@@ -1,4 +1,4 @@
-from typing import Any, Callable, Generic, Sequence, TypeVar
+from typing import Any, Callable, Generic, Mapping, Sequence, TypeVar
 
 from fastapi import Depends
 from sqlalchemy import ColumnElement, select, update
@@ -53,12 +53,11 @@ class Repository(Generic[REPOSITORY_MODEL]):  # noqa:WPS214
     async def update_by_filter(
         self,
         filter_criteria: Sequence[ColumnElement[bool]],
-        values_to_update: dict[_DMLColumnArgument, Any] | Sequence[Any],  # noqa: SF20
+        values_to_update: Mapping[_DMLColumnArgument, Any] | Sequence[Any],
     ) -> None:
         async with self._db().begin() as transaction:
-            statement = (
-                update(self._type).values(values_to_update).where(*filter_criteria)
-            )
+            statement = update(self._type).values(dict(values_to_update))
+            statement = statement.where(*filter_criteria)
             await transaction.session.execute(statement)
 
     async def insert(self, to_insert: REPOSITORY_MODEL) -> None:
