@@ -182,7 +182,7 @@ class PayClient(object):
         return response.json()
 
 
-class PayAdminClient(object):
+class PayAdminClient(object):  # noqa: WPS214
     def __init__(
         self,
         base_url: str,
@@ -228,6 +228,39 @@ class PayAdminClient(object):
             "{0}/companies".format(self._base_url),
             headers=self._http_client.headers,
             json=payload,
+        )
+
+        response.raise_for_status()
+        return response.json()
+
+    async def get_accounts(
+        self,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort: str | None = None,
+    ) -> dict[str, Any]:
+        response = await self._http_client.get(
+            "{0}/accounts".format(self._base_url),
+            headers=self._http_client.headers,
+            params=(
+                {"sort": sort, **_make_pagination(limit, cursor)}
+                if sort
+                else _make_pagination(limit, cursor)
+            ),
+        )
+        response.raise_for_status()
+        return response.json()
+
+    async def get_balances(
+        self,
+        account_id: str,
+        limit: int | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        response = await self._http_client.get(
+            "{0}/accounts/{1}/balances".format(self._base_url, account_id),
+            headers=self._http_client.headers,
+            params=_make_pagination(limit, cursor),
         )
 
         response.raise_for_status()
@@ -358,3 +391,14 @@ class PayAdminClient(object):
 
         response.raise_for_status()
         return response.json()
+
+
+def _make_pagination(
+    limit: int | None,
+    cursor: str | None,
+) -> dict[str, int | str]:
+    return {
+        key: pagination_value
+        for key, pagination_value in ((_LIMIT_KEY, limit), (_CURSOR_KEY, cursor))
+        if pagination_value
+    }

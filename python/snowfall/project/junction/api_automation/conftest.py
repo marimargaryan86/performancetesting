@@ -1,12 +1,17 @@
 import datetime
 import json
+import logging
 import os
+import sys
 from typing import Any, Callable, Iterator, Mapping, Sequence
 
 import httpx
 import hvac
 import pytest
 
+from snowfall.project.junction.api_automation.test_functions.helpers_api import (
+    return_randomized_token,
+)
 from snowfall.project.junction.api_automation.test_functions.mobile_client import (
     MobileApiClient,
 )
@@ -17,8 +22,11 @@ from snowfall.vendor.pay.client import PayAdminClient, PayAuthentication, PayCli
 
 ALLURE_ENVIRONMENT_PROPERTIES_FILE = "environment.properties"
 ALLUREDIR_OPTION = "--alluredir"
+EXIT_MSG = "Exiting ; check your logs"
 HTTPS_PREFIX = "https://"
 HTTP_PREFIX = "http://"
+
+logger = logging.getLogger()
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -234,6 +242,91 @@ def pay_admin_client(
             auth=auth,
         ),
     )
+
+
+@pytest.fixture(scope="function")
+async def pay_create_company(
+    pay_admin_client: PayAdminClient,
+) -> dict[str, Any]:
+    try:
+        response_company = await pay_admin_client.create_company(
+            company="test-company-{0}".format(return_randomized_token()),
+            address_lines=["Radhuset", "Våksalagatan 2", "United Spaces", "Sweden"],
+            country_code="SE",
+            postal_code="75320",
+            city="Uppsala",
+            buffer_rate=float(0),
+            sales_rate=float(0),
+        )
+    except httpx.HTTPStatusError as err:
+        logger.info("response_company err: %s", err.response.headers)
+        logger.info("response_company body: %s", err.response.json())
+        sys.exit(EXIT_MSG)
+    logger.info("create_company: %s", json.dumps(response_company, indent=4))
+    return response_company
+
+
+@pytest.fixture(scope="function")
+async def pay_create_contact_persons(
+    pay_admin_client: PayAdminClient,
+    pay_create_company: Mapping[str, Any],
+) -> dict[str, Any]:
+    try:
+        response_create_contact_person = await pay_admin_client.create_contact_persons(
+            first_name="J",
+            last_name="N",
+            email_address="jerzy.n{0}@snowfalltravel.com".format(
+                return_randomized_token(),
+            ),
+            phone_number="+48123456789",
+            company_id=pay_create_company["data"]["id"],
+        )
+    except httpx.HTTPStatusError as err:
+        logger.info("response_create_contact_person err: %s", err.response.headers)
+        logger.info("response_create_contact_person body: %s", err.response.json())
+        sys.exit(EXIT_MSG)
+    logger.info(
+        "create_contact_persons: %s",
+        json.dumps(response_create_contact_person, indent=4),
+    )
+    return response_create_contact_person
+
+
+@pytest.fixture(scope="function")
+async def pay_get_accounts(
+    pay_admin_client: PayAdminClient,
+    pay_create_account: Mapping[str, Any],
+) -> dict[str, Any]:
+    try:
+        response_get_accounts = await pay_admin_client.get_accounts()
+    except httpx.HTTPStatusError as err:
+        logger.info("response_get_accounts err: %s", err.response.headers)
+        logger.info("response_get_accounts body: %s", err.response.json())
+        sys.exit(EXIT_MSG)
+    logger.info("get_accounts: %s", json.dumps(response_get_accounts, indent=4))
+    return response_get_accounts
+
+
+@pytest.fixture(scope="function")
+async def pay_create_account(
+    pay_admin_client: PayAdminClient,
+    pay_create_contact_persons: Mapping[str, Any],
+) -> dict[str, Any]:
+    name = "test account {0}".format(return_randomized_token())
+    try:
+        response_create_account = await pay_admin_client.create_accounts(
+            name,
+            pay_create_contact_persons["data"]["id"],
+        )
+    except httpx.HTTPStatusError as err:
+        logger.info("response_create_account: %s", err.response.headers)
+        logger.info("response_create_account body: %s", err.response.json())
+        sys.exit(EXIT_MSG)
+    logger.info(
+        "response_create_account: %s",
+        json.dumps(response_create_account, indent=4),
+    )
+    return response_create_account
 
 
 @pytest.fixture(scope="function")
