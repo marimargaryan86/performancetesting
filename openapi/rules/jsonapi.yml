@@ -125,4 +125,49 @@ rules:
       function: pattern
       functionOptions:
         match: "^include|sort|page\\[(limit|cursor)\\]|filter\[[a-z]([A-Za-z]|\\.[a-z][A-Za-z])+\\]$"
+  json-api-ensure-sort-default:
+    description: "`sort` query parameters should have a default value."
+    given: $.components.parameters[?(@.in=="query" && @.name=="sort")]
+    severity: error
+    then:
+      - field: schema.default
+        function: truthy
+  json-api-ensure-sort-array:
+    description: "`sort` query parameters should be of type `array`."
+    given: $.components.parameters[?(@.in=="query" && @.name=="sort")]
+    severity: error
+    then:
+      - field: schema.type
+        function: enumeration
+        functionOptions:
+          values:
+            - array
+  json-api-ensure-sort-enum:
+    description: "`sort` query parameters should specify an `enum` of possible values for its `items`."
+    given: $.components.parameters[?(@.in=="query" && @.name=="sort")]
+    severity: error
+    then:
+      - field: schema.items.enum
+        function: truthy
+  json-api-ensure-sort-style:
+    description: "`sort` query parameters should have `form: style`."
+    given: $.components.parameters[?(@.in=="query" && @.name=="sort")]
+    severity: error
+    then:
+      - field: style
+        function: truthy
+      - field: style
+        function: enumeration
+        functionOptions:
+          values:
+            - form
+  json-api-ensure-sort-explode:
+    description: "`sort` query parameters should have `explode: false`."
+    given: $.components.parameters[?(@.in=="query" && @.name=="sort")]
+    severity: error
+    then:
+      - field: explode
+        function: defined
+      - field: explode
+        function: falsy
 

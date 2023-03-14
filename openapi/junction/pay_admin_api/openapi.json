@@ -917,11 +917,20 @@
         "name": "sort",
         "in": "query",
         "style": "form",
+        "explode": false,
         "required": false,
         "schema": {
-          "type": "string",
-          "example": "name",
-          "enum": [
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "name"
+            ]
+          },
+          "example": [
+            "name"
+          ],
+          "default": [
             "name"
           ]
         },

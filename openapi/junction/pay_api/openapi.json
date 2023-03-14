@@ -421,11 +421,21 @@
       "sortCurrencies": {
         "name": "sort",
         "in": "query",
+        "style": "form",
+        "explode": false,
         "required": false,
         "schema": {
-          "type": "string",
-          "example": "id",
-          "enum": [
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "id"
+            ]
+          },
+          "example": [
+            "id"
+          ],
+          "default": [
             "id"
           ]
         },
