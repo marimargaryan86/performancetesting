@@ -19,6 +19,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	plannerv1alpha "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/planner/v1alpha"
 	v1alpha "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"
@@ -660,7 +661,22 @@ func main() {
 	check(err)
 	fmt.Println("All input files open, output files created")
 
-	bar := progressbar.DefaultBytes(stat.Size(), "Exporting")
+	//bar := progressbar.DefaultBytes(stat.Size(), "Exporting")
+	bar := progressbar.NewOptions64(stat.Size(),
+		// Options for DefaultBytes with Throttle changed to limit logging on Gitlab.
+		progressbar.OptionSetDescription("Exporting"),
+		progressbar.OptionSetWriter(os.Stderr),
+		progressbar.OptionShowBytes(true),
+		progressbar.OptionSetWidth(10),
+		progressbar.OptionThrottle(60*time.Second),
+		progressbar.OptionShowCount(),
+		progressbar.OptionOnCompletion(func() {
+			fmt.Fprint(os.Stderr, "\n")
+		}),
+		progressbar.OptionSpinnerType(14),
+		progressbar.OptionFullWidth(),
+		progressbar.OptionSetRenderBlankState(true),
+	)
 
 	barReader := progressbar.NewReader(f, bar)
 	protoReader := protoio.NewProtoReader[*v1alpha.Schedule](bufio.NewReader(&barReader))
