@@ -34,7 +34,6 @@ from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.vendor.currency_cloud.client import PaymentClient
 from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
-from snowfall.vendor.currency_cloud.pagination import Pagination
 
 
 @pytest.fixture
@@ -255,10 +254,12 @@ def payment_client(
     )
 
     def _get_all_accounts(  # noqa: WPS430
-        pagination: Pagination,
+        page_index: int,
     ) -> Sequence[mock.Mock]:
-        pagination._next_url["next"] = "http://localhost:8006/accounts"  # noqa: WPS437
-        return accounts_list_from_cc
+        if page_index == 1:
+            return accounts_list_from_cc
+
+        return []
 
     payment_client.get_all_accounts = _get_all_accounts
     return payment_client

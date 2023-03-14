@@ -1,5 +1,5 @@
 import lagom
-from starlette import endpoints, exceptions, requests, responses, status
+from starlette import endpoints, requests, responses, status
 
 from snowfall.project.pay.service.accounts import accounts
 from snowfall.project.pay.service.accounts.v1alpha import models_pb2 as account_models
@@ -17,10 +17,12 @@ from snowfall.vendor.currency_cloud.client import PaymentClient
 from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
 from snowfall.vendor.currency_cloud.models import account as cc_account_models
 from snowfall.vendor.currency_cloud.models import contact as cc_contact_models
-from snowfall.vendor.currency_cloud.pagination import Pagination
+from snowfall.vendor.currency_cloud.models.account import AccountResponse
 
 
 class Accounts(endpoints.HTTPEndpoint):
+    _default_page_size = 20
+
     async def get(  # noqa: WPS210
         self,
         request: requests.Request,
@@ -28,34 +30,28 @@ class Accounts(endpoints.HTTPEndpoint):
         payment_client: PaymentClient = lagom.injectable,
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
-        sort_by = request.query_params.get("sort")
-        cc_pagination = Pagination(
-            pagination.cursor,
-            pagination.limit,
-            "account_name" if sort_by and sort_by == "name" else "",
-            request.url_for("Account"),
+        db_accounts = await accounts_repository.find(
+            cursor=pagination.cursor,
         )
+        db_accounts.limit(pagination.limit or self._default_page_size)
 
         try:
-            cc_accounts = payment_client.get_all_accounts(cc_pagination)
+            all_cc_accounts = self._get_all_cc_accounts(payment_client)
         except CurrencyCloudError as exc:
             return self._generate_error(exc)
 
+        all_cc_accounts_by_id = {
+            cc_account.identifier: cc_account for cc_account in all_cc_accounts
+        }
+
         payload_accounts = []
-        for account in cc_accounts:
-            db_account = await accounts_repository.find_by_id(
-                account.identifier,
-                "external_reference",
-            )
-
-            if not db_account:
-                raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
-
+        async for db_account in db_accounts:
+            cc_account = all_cc_accounts_by_id[db_account.external_reference]
             payload_accounts.append(
                 {
-                    "account_id": account.identifier,
-                    "name": account.account_name,
-                    "status": account.status,
+                    "identifier": db_account.id,
+                    "name": cc_account.account_name,
+                    "status": cc_account.status,
                     "company_id": db_account.company_id,
                     "contact_person_id": db_account.contact_id,
                 },
@@ -64,12 +60,16 @@ class Accounts(endpoints.HTTPEndpoint):
         return await messages.create_response(
             body=messages.models.Body(
                 data=[
-                    resources.AccountResource.from_proto(
-                        **account,  # noqa: WPS441
+                    resources.AccountResource.from_values(
+                        **account,
                     )
                     for account in payload_accounts
                 ],
-                links=cc_pagination.next_url,
+                links=pagination_helpers.get_next_url(
+                    request.url_for("Account"),
+                    await db_accounts.cursor(),
+                    pagination,
+                ),
             ),
             request=request,
         )
@@ -169,8 +169,8 @@ class Accounts(endpoints.HTTPEndpoint):
 
         return await messages.create_response(
             body=models.Body(
-                data=resources.AccountResource.from_proto(
-                    account_id=account.id,
+                data=resources.AccountResource.from_values(
+                    identifier=account.id,
                     name=body["name"],
                     status=cc_account.status,
                     company_id=company.id,
@@ -227,3 +227,21 @@ class Accounts(endpoints.HTTPEndpoint):
             ),
             status_code=exc.status,
         )
+
+    def _get_all_cc_accounts(
+        self,
+        payment_client: PaymentClient,
+    ) -> list[AccountResponse]:
+        page_index = 1
+        all_cc_accounts = []
+
+        while True:
+            cc_accounts = payment_client.get_all_accounts(page_index=page_index)
+            page_index += 1
+
+            if cc_accounts:
+                all_cc_accounts.extend(cc_accounts)
+            else:
+                break
+
+        return all_cc_accounts

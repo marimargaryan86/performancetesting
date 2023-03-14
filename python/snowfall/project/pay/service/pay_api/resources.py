@@ -218,16 +218,16 @@ class AccountResource(models.Resource):
     api_type: ClassVar[str] = "accounts"
 
     @classmethod
-    def from_proto(  # noqa: WPS211
+    def from_values(  # noqa: WPS211
         cls,
-        account_id: str,
+        identifier: str,
         name: str,
         status: str,
         company_id: str,
         contact_person_id: str,
     ) -> AccountResource:
         return cls(
-            id=account_id,
+            id=identifier,
             type=AccountResource.api_type,
             attributes={
                 "name": name,

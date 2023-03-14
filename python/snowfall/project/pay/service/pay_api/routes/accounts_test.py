@@ -68,9 +68,7 @@ class TestAccounts(object):
         payload = response.json()["data"]
         assert len(payload) == len(accounts_list_from_cc)
 
-        for index, account in enumerate(accounts_list_from_cc):
-            payload_item = payload[index]
+        for payload_item in payload:
             assert payload_item["id"]
-            assert payload_item["attributes"]["name"] == account.account_name
             assert payload_item["attributes"]["status"] == "enabled"
             assert payload_item["relationships"]["company"]["data"]["id"] != "unknown"

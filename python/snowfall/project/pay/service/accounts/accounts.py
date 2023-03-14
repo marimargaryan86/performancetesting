@@ -8,7 +8,14 @@ class AccountsRepository(
     repository.ProtoRepository[models_pb2.Account],
 ):
     _proto = models_pb2.Account
-    _default_page_size = 20
+
+    async def find(
+        self,
+        cursor: str | None,
+    ) -> resultset.ResultSet[models_pb2.Account]:
+        return await self._find_with_cursor(
+            cur=cursor or "",
+        )
 
 
 class ContactPersonsRepository(

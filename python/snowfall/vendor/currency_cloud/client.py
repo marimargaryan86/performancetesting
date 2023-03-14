@@ -2,7 +2,6 @@ from typing import Any, Callable, Mapping, Sequence
 
 import currencycloud
 
-from snowfall.vendor.currency_cloud import pagination as cc_pagination
 from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
 from snowfall.vendor.currency_cloud.models.account import (
     AccountRequest,
@@ -94,10 +93,10 @@ class PaymentClient(object):
     @error_handler
     def get_all_accounts(
         self,
-        pagination: cc_pagination.Pagination,
+        page_index: int,
     ) -> list[AccountResponse]:
-        accounts = self._cc_client.accounts.find(**pagination.pagination_params)
-        pagination.next_url = accounts.pagination
+        accounts = self._cc_client.accounts.find(page=page_index)
+
         return [
             AccountResponse(**account._attributes)  # noqa: WPS437
             for account in accounts
