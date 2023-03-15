@@ -10,6 +10,7 @@ import pydantic
 from snowfall.project.junction.service.providers.direct_ferries.gtfs import (
     converter as gtfs_converter,
 )
+from snowfall.stdlib.format.gtfs import models as gtfs_models
 
 _WRITE_MODE = "w"
 _CLASS_PROPERTIES = "properties"
@@ -48,20 +49,15 @@ class RouteMapping(pydantic.BaseModel):
 def _models_to_csv(
     file_name: str,
     models: Generator[pydantic.BaseModel, None, None],
+    model_class: type[pydantic.BaseModel],
 ) -> str:
     with open(file_name, _WRITE_MODE) as file_obj:
-        try:
-            first = next(models)
-        except StopIteration:
-            return file_name
-
         writer = csv.DictWriter(
             file_obj,
-            fieldnames=first.schema()[_CLASS_PROPERTIES].keys(),
+            fieldnames=model_class.schema()[_CLASS_PROPERTIES].keys(),
         )
 
         writer.writeheader()
-        writer.writerow(orjson.loads(first.json()))
         writer.writerows(orjson.loads(data_item.json()) for data_item in models)
 
     return file_name
@@ -75,18 +71,40 @@ class GTFSGenerator(object):
         self,
         converter: gtfs_converter.DFDataConverter,
     ) -> None:
-        _models_to_csv(CompressFileList.agency.value, converter.convert_agency())
-        _models_to_csv(CompressFileList.feed_info.value, converter.convert_feed_info())
-        _models_to_csv(CompressFileList.stops.value, converter.convert_stops())
-        _models_to_csv(CompressFileList.routes.value, converter.convert_routes())
-        _models_to_csv(CompressFileList.trips.value, converter.convert_trips())
+        _models_to_csv(
+            CompressFileList.agency.value,
+            converter.convert_agency(),
+            gtfs_models.Agency,
+        )
+        _models_to_csv(
+            CompressFileList.feed_info.value,
+            converter.convert_feed_info(),
+            gtfs_models.FeedInfo,
+        )
+        _models_to_csv(
+            CompressFileList.stops.value,
+            converter.convert_stops(),
+            gtfs_models.Stop,
+        )
+        _models_to_csv(
+            CompressFileList.routes.value,
+            converter.convert_routes(),
+            gtfs_models.Route,
+        )
+        _models_to_csv(
+            CompressFileList.trips.value,
+            converter.convert_trips(),
+            gtfs_models.Trip,
+        )
         _models_to_csv(
             CompressFileList.stop_times.value,
             converter.convert_stop_times(),
+            gtfs_models.StopTime,
         )
         _models_to_csv(
             CompressFileList.calendar_dates.value,
             converter.convert_calendar_dates(),
+            gtfs_models.CalendarDate,
         )
 
         self.compress_files()
