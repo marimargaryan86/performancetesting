@@ -142,6 +142,7 @@ JUNCTION_API_TOKEN={{ .Data.data.junction_api_token }}
 JWT_TOKEN_VERSION={{ .Data.data.jwt_token_version }}
 JWT_PRIVATE_KEY={{ .Data.data.jwt_private_key }}
 JWT_PUBLIC_KEY={{ .Data.data.jwt_public_key }}
+VALIDATE_RESPONSES_AGAINST_SPEC={{ .Data.data.validate_responses_against_spec }}
 {{ end }}
 {{ with secret "kv/data/${var.environment}/res-se-mobile-api" }}
 CLIENT_NAME={{ .Data.data.client_name }}

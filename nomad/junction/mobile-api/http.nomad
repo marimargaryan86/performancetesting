@@ -144,6 +144,7 @@ STRIPE_API_KEY={{ .Data.data.stripe_api_key }}
 CLIENT_NAME={{ .Data.data.client_name }}
 SUPPORT_EMAIL={{ .Data.data.support_email }}
 CREATE_STRIPE_CUSTOMERS={{ .Data.data.create_stripe_customers }}
+VALIDATE_RESPONSES_AGAINST_SPEC={{ .Data.data.validate_responses_against_spec }}
 {{ end }}
 EOH
       }

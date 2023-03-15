@@ -150,6 +150,7 @@ PLACES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_places-${var.environment
 SCHEDULES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_schedules-${var.environment}"))}}
 TRIPS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_trips-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/client-api" }}
+VALIDATE_RESPONSES_AGAINST_SPEC={{ .Data.data.validate_responses_against_spec }}
 JWT_PUBLIC_KEY={{ .Data.data.jwt_public_key }}
 {{ end }}
 EOH
