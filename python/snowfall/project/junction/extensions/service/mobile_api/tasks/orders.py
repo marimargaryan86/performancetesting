@@ -1,0 +1,171 @@
+import asyncio
+import datetime
+from typing import Any, Mapping, Sequence
+
+import aiofiles
+import json_api_doc
+from jinja2 import Template
+
+from snowfall.project.junction.extensions.service.mobile_api import (
+    payments,
+    repository,
+    resources,
+    smtp,
+)
+from snowfall.stdlib.persistence import filesystem
+from snowfall.vendor.junction import client
+
+_ORDER_STATUS_POLLING_TIMEOUT = 180
+_ORDER_STATUS_POLLING_INTERVAL = 10
+_ATTRIBUTES_ACCESSOR = "attributes"
+_SUCCESS_STATUSES = frozenset(
+    (
+        resources.OrderStatus.confirmed.value,
+        resources.OrderStatus.not_ticketed.value,
+    ),
+)
+
+
+async def _handle_new_order_results(
+    payment_intent_id: str,
+    order: Mapping[str, Any],
+    smtp_client: smtp.EmailClient,
+    vouchers_repository: repository.VouchersRepository,
+) -> bool:
+    booking_statuses = {booking["status"]["id"] for booking in order["bookings"]}
+    if booking_statuses and not booking_statuses.difference(_SUCCESS_STATUSES):
+        await payments.capture(payment_intent_id)
+        await send_booking_confirmation(order, smtp_client)
+        return True
+
+    if resources.OrderStatus.pending.value not in booking_statuses:
+        await payments.cancel(payment_intent_id)
+        await vouchers_repository.revert_voucher(payment_intent_id)
+        return True
+
+    return False
+
+
+async def poll_order_status(
+    junction_client: client.JunctionClient,
+    order_id: str,
+    payment_intent_id: str,
+    smtp_client: smtp.EmailClient,
+    vouchers_repository: repository.VouchersRepository,
+) -> bool:
+    time_spent = 0
+    while time_spent <= _ORDER_STATUS_POLLING_TIMEOUT:
+        order = json_api_doc.deserialize(
+            await junction_client.get_order_by_id(
+                identifier=order_id,
+                include=["journey", "bookings.details"],
+            ),
+        )
+        payment_processed = await _handle_new_order_results(
+            payment_intent_id,
+            order,
+            smtp_client,
+            vouchers_repository,
+        )
+        if payment_processed:
+            return True
+
+        await asyncio.sleep(_ORDER_STATUS_POLLING_INTERVAL)
+        time_spent += _ORDER_STATUS_POLLING_INTERVAL
+
+    await payments.cancel(payment_intent_id)
+    await vouchers_repository.revert_voucher(payment_intent_id)
+    return False
+
+
+async def send_booking_confirmation(  # noqa: WPS210
+    order: Mapping[str, Any],
+    smtp_client: smtp.EmailClient,
+    forward_to_support: bool = True,
+    forward_email: str | None = None,
+) -> None:
+    details: Sequence[Mapping[str, Any]] = [
+        detail for booking in order["bookings"] for detail in booking["details"]
+    ]
+    details = order_details_by_date(details)
+    record_locators = [booking["externalReference"] for booking in order["bookings"]]
+    operator_booking_references = [
+        reference
+        for booking in order["bookings"]
+        for reference in booking["operatorBookingReferences"]
+    ]
+    async with aiofiles.open(
+        filesystem.resource_path(
+            "snowfall.project.junction.extensions.service.mobile_api.html_templates",
+            "booking_template.html",
+        ),
+    ) as template_file:
+        template = Template(await template_file.read())
+    body = template.render(
+        details=details,
+        reference=order["journey"]["reference"],
+        company_name=smtp_client.client_name,
+        support_email=smtp_client.support_email,
+        passengers=order["passengers"],
+        record_locators=record_locators,
+        operator_booking_references=operator_booking_references,
+    )
+    await smtp_client.send_email_html_template(
+        forward_email or order["journey"]["contactDetails"]["email"],
+        "{company_name}. Itinerary details for Booking {reference}".format(
+            company_name=smtp_client.client_name,
+            reference=order["journey"]["reference"],
+        ),
+        body,
+    )
+    if forward_to_support:
+        await smtp_client.send_email_html_template(
+            smtp_client.support_email,
+            "{company_name}. Itinerary details for Booking {reference}".format(
+                company_name=smtp_client.client_name,
+                reference=order["journey"]["reference"],
+            ),
+            body,
+        )
+
+
+async def email_booking_details(
+    order: Mapping[str, Any],
+    smtp_client: smtp.EmailClient,
+    forward_email: str,
+) -> None:
+    order = json_api_doc.deserialize(order)
+    await send_booking_confirmation(
+        order,
+        smtp_client,
+        forward_to_support=False,
+        forward_email=forward_email,
+    )
+
+
+def order_details_by_date(
+    details: Sequence[Mapping[str, Any]],
+) -> Sequence[Mapping[str, Any]]:
+    ordered_details = [
+        {
+            "origin": leg["origin"],
+            "destination": leg["destination"],
+            "departureAt": datetime.datetime.fromisoformat(leg["departureAt"]).strftime(
+                "%A %d %b %Y %H:%M",
+            ),
+            "arrivalAt": datetime.datetime.fromisoformat(leg["arrivalAt"]).strftime(
+                "%A %d %b %Y %H:%M",
+            ),
+            "ref": segment["vendor"] + segment["routeIdentifiers"]["vendor"],
+            "legType": segment["legType"]["id"],
+        }
+        for segment in details
+        for leg in segment["legs"]
+    ]
+    ordered_details.sort(
+        key=lambda leg: datetime.datetime.strptime(
+            leg["departureAt"],
+            "%A %d %b %Y %H:%M",
+        ),
+    )
+    return ordered_details

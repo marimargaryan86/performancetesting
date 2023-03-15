@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+package snowfall.project.junction.extensions.service.mobile_api.v1alpha;
+
+import "google/protobuf/timestamp.proto";
+import "snowfall/stdlib/v1alpha/models.proto";
+import "snowfall/stdlib/v1alpha/money.proto";
+import "snowfall/stdlib/v1alpha/phone_number.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/extensions/service/mobile_api/v1alpha";
+
+message User {
+  string id = 1;
+  string email = 2;
+  string password = 3;
+  snowfall.stdlib.v1alpha.PhoneNumber phone = 4;
+  string first_name = 5;
+  string last_name = 6;
+  string gender = 7;
+  string title = 8;
+  string country_code = 9;
+  snowfall.stdlib.v1alpha.Date date_of_birth = 10;
+  repeated LoyaltyProgramUserProfile loyalty_programs = 11;
+  google.protobuf.Timestamp created_at = 12;
+  google.protobuf.Timestamp updated_at = 13;
+}
+
+message LoyaltyProgramUserProfile {
+  string program = 1;
+  string number = 2;
+}
+
+message Place {
+  string id = 1;
+  string name = 2;
+  snowfall.stdlib.v1alpha.Coordinates coordinates = 3;
+  string time_zone = 4;
+  string country_code = 5;
+  string country_name = 6;
+  google.protobuf.Timestamp updated_at = 7;
+  string source_ref = 8;
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+  }
+  repeated Type types = 9;
+  int32 population = 10;
+  string no_accent_name = 11;
+  string local_name = 12;
+  string no_accent_local_name = 13;
+}
+
+message StripeUser {
+  string id = 1;
+  string internal_user_id = 2;
+  google.protobuf.Timestamp created_at = 3;
+}
+
+message LoyaltyProgram {
+  string id = 1;
+  string iata = 2;
+  string airline = 3;
+  string name = 4;
+}
+
+message MobileOrder {
+  string id = 1;
+  string payment_intent_id = 2;
+  string user_id = 3;
+  string voucher_code = 5;
+  google.protobuf.Timestamp created_at = 4;
+  float rate = 6;
+  string currency = 7;
+}
+
+message Voucher {
+  string id = 1;
+  string code = 2;
+  snowfall.stdlib.v1alpha.Date expires_at = 3;
+  oneof discount {
+    //  TODO: add Percentage
+    snowfall.stdlib.v1alpha.Money price = 4;
+  }
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_USED = 1;
+    STATUS_VALID = 2;
+    STATUS_EXPIRED = 3;
+  }
+  Status status = 5;
+  string payment_intent_id = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}
+
+message NotificationToken {
+  string id = 1;
+  string user_id = 2;
+  string notification_token = 3;
+  string device_token = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+message UserGroup {
+  string id = 1;
+  string user_id = 2;
+  string name = 3;
+  repeated User members = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}

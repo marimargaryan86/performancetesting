@@ -6,10 +6,11 @@ commits:
       - "python/snowfall/project/pss"
     junction/extensions:
       - "openapi/junction/mobile_api"
-      - "protobuf/snowfall/project/junction/service/mobile_api"
+      - "protobuf/snowfall/project/junction/extensions"
       - "python/snowfall/project/junction/api_automation/mobile_api_tests"
-      - "python/snowfall/project/junction/service/mobile_api"
+      - "python/snowfall/project/junction/extensions"
     junction/plus:
+      - "protobuf/snowfall/project/junction/plus"
       - "python/snowfall/project/junction/plus"
     junction/go:
       - ".gitlab/junction"
