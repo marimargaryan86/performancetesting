@@ -142,7 +142,7 @@ def _factory(
                 ),
             ],
             openapi_path=filesystem.resource_path(
-                "junction/mobile_api",
+                "junction.mobile_api",
                 "openapi.json",
             ),
             validate_response=app.settings.validate_responses_against_spec,
