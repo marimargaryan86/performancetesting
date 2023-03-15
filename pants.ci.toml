@@ -1,12 +1,10 @@
 [GLOBAL]
 colors = true
-pantsd = false
-cache_content_behavior = "validate"
+cache_content_behavior = "defer"
 remote_cache_read = true
-remote_cache_read_timeout_millis = 10000
+remote_cache_read_timeout_millis = 15000
 remote_cache_write = true
 remote_store_address = "grpc://10.0.135.64:9092"
-remote_instance_name = "main"
 
 [coverage-py]
 report = ["console", "xml"]
