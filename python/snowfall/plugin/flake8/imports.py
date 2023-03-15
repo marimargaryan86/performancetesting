@@ -64,5 +64,7 @@ class Plugin(plugin.Plugin):
         visitor = self.visitor(module)
         visitor.visit(self._tree)
 
-        for line, col, msg in visitor.errors:  # noqa: WPS526
-            yield line, col, msg, type(self)
+        yield from (
+            (line, column, message, type(self))
+            for line, column, message in visitor.errors
+        )
