@@ -1,4 +1,4 @@
-import pydantic
+from pydantic import Field
 
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
 from snowfall.vendor.benerail.models.dialogue.customer import BookerResponse
@@ -6,44 +6,63 @@ from snowfall.vendor.benerail.models.dialogue.dialogue import Dialogue
 from snowfall.vendor.benerail.models.dialogue.passenger import Passenger
 from snowfall.vendor.benerail.models.dialogue.trip import TripFilter
 from snowfall.vendor.benerail.models.link import Link, ResourceLink
-from snowfall.vendor.benerail.models.metadata import MetaData
+from snowfall.vendor.benerail.models.metadata import Metadata
 from snowfall.vendor.benerail.models.trip_offers.trip_offers import TripOfferFilter
 
 
 class GetBookerResponse(BenerailBaseModel):
-    metadata: MetaData | None
-    response_result: BookerResponse | None = pydantic.Field(..., alias="result")
-    links: list[Link] | None
+    metadata: Metadata | None = None
+    response_result: BookerResponse | None = Field(None, alias="result")
+    links: list[Link] | None = Field(
+        None,
+        example=[
+            {
+                "href": "https://api.example.com/dialogues/10001/passengers/50001",
+                "title": "John Massis - 1995-12-17",
+                "rel": "self",
+                "type": "GET",
+            },
+            {
+                "href": "https://api.example.com/dialogues/10001/passengers",
+                "title": "Passengers dialogue 10001",
+                "rel": "collection",
+                "type": "GET",
+            },
+            {
+                "href": "https://api.example.com/dialogues/10001/passengers/50001",
+                "title": "John Massis - 1995-12-17",
+                "rel": "self",
+                "type": "DELETE",
+            },
+        ],
+    )
 
 
 class GetDialoguesResponse(BenerailBaseModel):
-    metadata: MetaData | None
-    response_result: list[ResourceLink] | None = pydantic.Field(..., alias="result")
-    links: list[Link] | None
+    metadata: Metadata | None = None
+    response_result: list[ResourceLink] | None = Field(None, alias="result")
+    links: list[Link] | None = None
 
 
 class GetDialogueResponse(BenerailBaseModel):
-    metadata: MetaData | None
-    response_result: Dialogue | None = pydantic.Field(..., alias="result")
-    links: list[Link] | None
+    metadata: Metadata | None = None
+    response_result: Dialogue | None = Field(None, alias="result")
+    links: list[Link] | None = None
 
 
 class GetPassengerResponse(BenerailBaseModel):
-    metadata: MetaData | None
-    response_result: Passenger | None = pydantic.Field(..., alias="result")
-    links: list[Link] | None
+    metadata: Metadata | None = None
+    response_result: Passenger | None = Field(None, alias="result")
+    links: list[Link] | None = None
 
 
 class GetTripFilterResponse(BenerailBaseModel):
-    metadata: MetaData | None
-    response_result: TripFilter | None = pydantic.Field(..., alias="result")
-    links: list[Link] | None
+    metadata: Metadata | None = None
+    response_result: TripFilter | None = Field(None, alias="result")
+    links: list[Link] | None = None
 
 
 class GetTripOfferFilterResponse(BenerailBaseModel):
-    metadata: MetaData | None
-    response_result: TripOfferFilter | None = pydantic.Field(
-        ...,
-        alias="result",
-    )
-    links: list[Link] | None
+    metadata: Metadata | None = None
+    response_result: TripOfferFilter | None = Field(None, alias="result")
+    links: list[Link] | None = None

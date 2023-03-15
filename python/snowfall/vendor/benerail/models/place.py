@@ -1,23 +1,49 @@
-import pydantic
+from pydantic import AnyUrl, ConstrainedStr, Field
 
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
 
 
 class AddressDetail(BenerailBaseModel):
-    country_name: str | None
-    post_code: str | None
-    street: str | None
-    house_number: str | None
+    country_name: str | None = Field(
+        None,
+        description="Country of the address.",
+        example="The Netherlands",
+    )
+    post_code: str | None = Field(
+        None,
+        description="Postal code of the address.",
+        example="2265CA",
+    )
+    street: str | None = Field(
+        None,
+        description="Street name of the address.",
+        example="Oude Trambaan",
+    )
+    house_number: str | None = Field(
+        None,
+        example="7",
+    )
 
 
-class Address(BenerailBaseModel):
-    address_name: str
-    country_name: str | None
-    post_code: str | None
-    street: str | None
-    house_number: str | None
+class Address(AddressDetail):
+    address_name: str = Field(
+        ...,
+        description="Name or description of address for use in passenger information.",
+        example="Oude Trambaan 7, 2265CA Leidschendam, Nederland",
+    )
+
+
+class PlaceURN(BenerailBaseModel):
+    __root__: ConstrainedStr = Field(
+        ...,
+        example="urn:bnds:tstatn_id:NLASC",
+        regex="^urn:[a-z]*:tstatn_id:[A-Z_]*$",
+    )
 
 
 class Place(BenerailBaseModel):
-    href: str | None
-    place_value: str | None = pydantic.Field(..., alias="value")
+    href: AnyUrl | None = Field(
+        None,
+        example="https://api.example.com/places/urn:bnds:tstatn_id:NLASC",
+    )
+    place_value: PlaceURN | None = Field(None, alias="value")

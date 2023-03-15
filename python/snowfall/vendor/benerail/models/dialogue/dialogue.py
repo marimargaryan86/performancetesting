@@ -1,56 +1,63 @@
-import datetime
-from typing import Literal
-
-import pydantic
+from pydantic import Field
 
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
 from snowfall.vendor.benerail.models.bookings.train import TrainType
-from snowfall.vendor.benerail.models.link import ResourceLink
+from snowfall.vendor.benerail.models.link import ResourceLink, ZonedDateTime
+from snowfall.vendor.benerail.models.place import PlaceURN
+from snowfall.vendor.benerail.models.trip_offers.enums import RequestedOfferParts
 
 
 class DialogueIdTripFiltersParams(BenerailBaseModel):
-    transfer_limit: int | None
-    bike_transport: bool | None
+    transfer_limit: float | None = Field(None, example=3)
+    bike_transport: bool | None = None
 
 
-class DialogueIdTripFiltersBody(BenerailBaseModel):
-    origin: str
-    destination: str
-    via: list[str] | None
-    train_types: list[TrainType] | None
-    departure_date_time: datetime.datetime | None
-    body_params: DialogueIdTripFiltersParams | None = pydantic.Field(
-        ...,
-        alias="params",
-    )
+class DialogueIdTripfiltersBody(BenerailBaseModel):
+    origin: PlaceURN
+    destination: PlaceURN
+    via: list[PlaceURN] | None = None
+    train_types: list[TrainType] | None = None
+    departure_date_time: ZonedDateTime
+    body_params: DialogueIdTripFiltersParams | None = Field(None, alias="params")
 
 
 class DialogueIdTripOfferFiltersReturnTripParams(BenerailBaseModel):
-    inward_date_time: datetime.datetime | None
-    outward_offer_id: str | None
+    inward_date_time: str | None = Field(
+        None,
+        example="2021-08-04T10:20+01:00",
+    )
+    outward_offer_id: str | None = None
 
 
-class DialogueIdTripOfferFiltersBody(BenerailBaseModel):
-    trip_filter_id: str | None
-    passengers: list[str] | None
-    return_trip_params: DialogueIdTripOfferFiltersReturnTripParams | None
-    market_segment: str | None
-    requested_offer_parts: Literal[
-        "admission-and-reservation",
-        "reservation-only",
-        "admission-only",
-    ] | None
+class DialogueIdTripofferfiltersBody(BenerailBaseModel):
+    trip_filter_id: str | None = None
+    passengers: list[str] | None = Field(None, description="array of passengerId's.")
+    return_trip_params: DialogueIdTripOfferFiltersReturnTripParams | None = None
+    market_segment: str | None = None
+    requested_offer_parts: RequestedOfferParts | None = None
 
 
 class Dialogue(BenerailBaseModel):
-    identifier: str | None = pydantic.Field(..., alias="id")
-    external_id: str | None
-    created_by: str | None
-    created_at: datetime.datetime | None
-    modified_at: datetime.datetime | None
-    expires_at: datetime.datetime | None
-    passengers: list[ResourceLink] | None
-    trip_filters: list[ResourceLink] | None
-    trip_offer_filters: list[ResourceLink] | None
-    booking: ResourceLink | None
-    booker: ResourceLink | None
+    identifier: str | None = Field(None, description="id of the dialogue", alias="id")
+    external_id: str | None = Field(
+        None,
+        description="For consumer use. Field will not be evaluated.",
+    )
+    created_by: str | None = None
+    created_at: str | None = Field(
+        None,
+        description="ISO-8601 timestamp showing date time and timezone",
+    )
+    modified_at: str | None = Field(
+        None,
+        description="ISO-8601 timestamp showing date time and timezone",
+    )
+    expires_at: str | None = Field(
+        None,
+        description="ISO-8601 timestamp showing date time and timezone",
+    )
+    passengers: list[ResourceLink] | None = None
+    trip_filters: list[ResourceLink] | None = None
+    trip_offer_filters: list[ResourceLink] | None = None
+    booking: ResourceLink | None = None
+    booker: ResourceLink | None = None

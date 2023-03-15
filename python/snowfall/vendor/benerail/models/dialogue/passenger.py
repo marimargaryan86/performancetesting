@@ -1,64 +1,117 @@
-import datetime
-from typing import Literal
+from datetime import date
 
-import pydantic
+from pydantic import AnyUrl, ConstrainedStr, Field
 
-from snowfall.vendor.benerail.enums import Gender
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
+from snowfall.vendor.benerail.models.dialogue.enums import Gender, PassengerStatus
 from snowfall.vendor.benerail.models.link import Supplier
+from snowfall.vendor.benerail.models.regex import NumberRegex, URNRegex
+
+_FCE_LENGTH = 20
+
+_CONTRACT_NR_LENGTH = 12
+
+
+class ReductionCardURN(BenerailBaseModel):
+    __root__: ConstrainedStr = Field(
+        ...,
+        example="urn:bnds:reduction_card:FF",
+        regex="^urn:[a-z]*:(ftp_card_types|reduction_card):[A-Z_0-9]*$",
+    )
 
 
 class ReductionCard(BenerailBaseModel):
-    href: str | None
-    card_value: str | None = pydantic.Field(..., alias="value")
+    href: AnyUrl | None = Field(
+        None,
+        example="https://api.example.com/places/urn:bnds:reduction_card:RAP",
+    )
+    card_value: ReductionCardURN | None = Field(None, alias="value")
 
 
 class PassengerRequestCards(BenerailBaseModel):
-    card_type: str = pydantic.Field(..., alias="type")
-    number: str | None
+    card_type: ReductionCardURN = Field(..., alias="type")
+    number: str | None = Field(
+        None,
+        description="individual card number",
+        example="125548-95687",
+    )
 
 
 class PassengerCards(BenerailBaseModel):
-    card_type: ReductionCard | None = pydantic.Field(..., alias="type")
-    number: str | None
+    passenger_cards_type: ReductionCard | None = Field(None, alias="type")
+    number: str | None = Field(
+        None,
+        description="individual card number",
+        example="125548-95687",
+    )
 
 
 class PassengerRequestCorporateContracts(BenerailBaseModel):
-    contract_nr: str
-    supplier: str
-    fce: str | None
+    contract_nr: NumberRegex = Field(
+        ...,
+        example="04-0608",
+        max_length=_CONTRACT_NR_LENGTH,
+    )
+    supplier: URNRegex = Field(..., example="urn:itti:supplier:ICE")
+    fce: ConstrainedStr | None = Field(None, example="C0058U2", max_length=_FCE_LENGTH)
 
 
 class PassengerCorporateContracts(BenerailBaseModel):
-    contract_number: str | None
-    supplier: Supplier | None
-    fce: str | None
+    contract_nr: str | None = None
+    supplier: Supplier | None = None
+    fce: str | None = None
 
 
 class PassengerDetail(BenerailBaseModel):
-    preferred_language: str | None
-    title: str | None
-    first_name: str | None
-    last_name: str | None
-    email: str | None
-    phone_number: str | None
+    preferred_language: str | None = Field(
+        None,
+        description="Languages spoken by the traveler (ISO Language code)",
+        example="EN",
+    )
+    title: str | None = Field(None, description="(Formal) title", example="Mr.")
+    first_name: str | None = Field(None, example="John")
+    last_name: str | None = Field(None, example="Massis")
+    email: str | None = Field(None, example="john.massis@example.com")
+    phone_number: str | None = Field(
+        None,
+        description="Preferably a mobile phone number",
+    )
 
 
 class PassengerRequest(BenerailBaseModel):
-    external_reference: str | None
-    date_of_birth: datetime.date | None
-    cards: list[PassengerRequestCards] | None
-    corporate_contracts: list[PassengerRequestCorporateContracts] | None
-    gender: Gender | None
-    details: PassengerDetail | None
+    external_reference: str | None = Field(
+        None,
+        description="For consumer use. Field will not be evaluated.",
+        example="PA123456",
+    )
+    date_of_birth: date | None = Field(
+        None,
+        description="Use ISO-6801 standard. Date only no time.",
+        example="1999-08-11",
+    )
+    cards: list[PassengerRequestCards] | None = None
+    corporate_contracts: list[PassengerRequestCorporateContracts] | None = None
+    gender: Gender | None = None
+    details: PassengerDetail | None = None
 
 
 class Passenger(BenerailBaseModel):
-    identifier: str | None = pydantic.Field(..., alias="id")
-    external_reference: str | None
-    date_of_birth: datetime.date | None
-    cards: list[PassengerCards] | None
-    corporate_contracts: list[PassengerCorporateContracts] | None
-    gender: Gender | None
-    details: PassengerDetail | None
-    passenger_status: Literal["created", "in use", "immutable"] | None
+    identifier: str | None = Field(None, alias="id")
+    external_reference: str | None = Field(
+        None,
+        description="For consumer use. Field will not be evaluated.",
+        example="PA123456",
+    )
+    date_of_birth: date | None = Field(
+        None,
+        description="Use ISO-6801 standard. Date only no time.",
+        example="1999-08-11",
+    )
+    cards: list[PassengerCards] | None = Field(
+        None,
+        description="reduction or loyalty cards owned by the passenger",
+    )
+    corporate_contracts: list[PassengerCorporateContracts] | None = None
+    gender: Gender | None = None
+    details: PassengerDetail | None = None
+    passenger_status: PassengerStatus | None = None

@@ -1,9 +1,7 @@
-import datetime
-from typing import Literal
-
-import pydantic
+from pydantic import Field
 
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
+from snowfall.vendor.benerail.models.bookings.enums import Direction, LegType
 from snowfall.vendor.benerail.models.bookings.payment import Price
 from snowfall.vendor.benerail.models.bookings.ticket import (
     Document,
@@ -21,82 +19,101 @@ from snowfall.vendor.benerail.models.products.product import ComfortClass
 
 
 class Fulfillment(BenerailBaseModel):
-    identifier: str | None = pydantic.Field(..., alias="id")
-    control_number: str | None
-    control_number_type: str | None
-    title: str | None
-    fulfillment_state: TicketFulfillmentState | None
-    booking_state: TicketBookingState | None
-    provisional_aftersales_state: RcodeLink | None
-    aftersales_state: RcodeLink | None
-    stock_control_number: str | None
-    price: Price | None
-    issue_language: str | None
-    documents: list[Document] | None
+    identifier: str | None = Field(None, alias="id")
+    control_number: str | None = None
+    control_number_type: str | None = None
+    title: str | None = None
+    fulfillment_state: TicketFulfillmentState | None = None
+    booking_state: TicketBookingState | None = None
+    provisional_aftersales_state: RcodeLink | None = None
+    aftersales_state: RcodeLink | None = None
+    stock_control_number: str | None = None
+    price: Price | None = None
+    issue_language: str | None = None
+    documents: list[Document] | None = None
 
 
 class Booking(BenerailBaseModel):
-    identifier: str | None = pydantic.Field(..., alias="id")
-    dialogue_id: str | None
-    dnr: str | None
-    orders: list[ResourceLink] | None
-    fulfillments: list[ResourceLink] | None
+    identifier: str | None = Field(None, alias="id")
+    dialogue_id: str | None = None
+    dnr: str | None = None
+    orders: list[ResourceLink] | None = None
+    fulfillments: list[ResourceLink] | None = None
 
 
 class ConfirmationEmail(BenerailBaseModel):
-    email_tos: list[str] | None
-    email_ccs: list[str] | None
-    email_bccs: list[str] | None
-    language: str | None
+    email_tos: list[str] | None = None
+    email_ccs: list[str] | None = None
+    email_bccs: list[str] | None = None
+    language: str | None = Field(None, description="ISO Language code", example="EN")
 
 
 class BookedTripLeg(BenerailBaseModel):
-    identifier: str | None = pydantic.Field(..., alias="id")
-    booked_offer_trip_id: str | None
-    leg_type: Literal["TIMED", "TRANSFER"] | None
-    duration: str | None
-    origin: Place | None
-    destination: Place | None
-    departure_at: datetime.datetime | None
-    arrival_at: datetime.datetime | None
+    identifier: str | None = Field(None, alias="id")
+    booked_offer_trip_id: str | None = None
+    leg_type: LegType | None = None
+    duration: str | None = Field(
+        None,
+        description="Overall duration of the trip",
+        example="PT20M",
+    )
+    origin: Place | None = None
+    destination: Place | None = None
+    departure_at: str | None = Field(
+        None,
+        description="ISO-8601 timestamp showing date time and timezone of departure",
+        example="2021-09-29T13:20:34.143+02:00",
+    )
+    arrival_at: str | None = Field(
+        None,
+        description="ISO-8601 timestamp showing date time and timezone of arrival",
+        example="2021-09-29T13:20:34.143+02:00",
+    )
 
 
 class BookedTrip(BenerailBaseModel):
-    identifier: str | None = pydantic.Field(..., alias="id")
-    booked_offer_id: str | None
-    duration: str | None
-    origin: Place | None
-    destination: Place | None
-    departure_at: datetime.datetime | None
-    arrival_at: datetime.datetime | None
-    direction: Literal[
-        "single-travel",
-        "outward-travel",
-        "return-travel",
-        "roundtrip-travel",
-    ] | None
-    hafas_reference: str | None
+    identifier: str | None = Field(None, alias="id")
+    booked_offer_id: str | None = None
+    duration: str | None = Field(
+        None,
+        description="Overall duration of the trip",
+        example="PT20M",
+    )
+    origin: Place | None = None
+    destination: Place | None = None
+    departure_at: str | None = Field(
+        None,
+        description="ISO-8601 timestamp showing date time and timezone of departure",
+        example="2021-09-29T13:20:34.143+02:00",
+    )
+    arrival_at: str | None = Field(
+        None,
+        description="ISO-8601 timestamp showing date time and timezone of arrival",
+        example="2021-09-29T13:20:34.143+02:00",
+    )
+    direction: Direction | None = None
+    hafas_reference: str | None = None
 
 
 class BookedOfferPartCommon(BenerailBaseModel):
-    origin: Place | None
-    destination: Place | None
-    price: Price | None
-    flexibility: Flexibility | None
-    comfort_class: ComfortClass | None
-    product: ResourceLink | None
-    passengers: list[ResourceLink] | None
-    trip_leg_sequence: int | None
+    origin: Place | None = None
+    destination: Place | None = None
+    price: Price | None = None
+    flexibility: Flexibility | None = None
+    comfort_class: ComfortClass | None = None
+    product: ResourceLink | None = None
+    passengers: list[ResourceLink] | None = None
+    trip_leg_sequence: int | None = None
 
 
 class BookedOfferPart(BenerailBaseModel):
-    identifier: str | None = pydantic.Field(..., alias="id")
-    booked_offer_id: str | None
-    offer_part_common: BookedOfferPartCommon | None
-    offer_part_specific: Reservation | Admission | None
+    identifier: str | None = Field(None, alias="id")
+    booked_offer_id: str | None = None
+    offer_part_common: BookedOfferPartCommon | None = None
+    offer_part_specific: Reservation | Admission | None = None
 
 
 class BookingInformation(BenerailBaseModel):
-    identifier: str | None = pydantic.Field(..., alias="id")
-    booked_offer_id: str | None
-    provisional_balance: int | None
+    identifier: str | None = Field(None, alias="id")
+    booked_offer_id: str | None = None
+    provisional_balance: float | None = None

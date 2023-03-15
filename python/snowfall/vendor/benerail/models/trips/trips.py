@@ -1,6 +1,4 @@
-import datetime
-
-import pydantic
+from pydantic import Field
 
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
 from snowfall.vendor.benerail.models.bookings.train import TrainType
@@ -9,42 +7,68 @@ from snowfall.vendor.benerail.models.place import Place
 
 
 class TripCo2Info(BenerailBaseModel):
-    co2_amount: int | None
-    eco_checker_url: str | None
+    co2_amount: float | None = Field(None, description="Kilogram of CO2")
+    eco_checker_url: str | None = Field(
+        None,
+        description="URL",
+        example="http://demo.hafas.de/bin/pub/bene/eco/query.exe/...",
+    )
 
 
 class TransferLeg(BenerailBaseModel):
-    transfer_leg_type: str = pydantic.Field(..., alias="type")
-    seq_id: int
+    transfer_leg_type: str = Field(..., description="transferLeg", alias="type")
+    seq_id: float
     origin: Place
     destination: Place
-    duration: str
+    duration: str = Field(..., description="ISO-8601 period.", example="PT11M")
 
 
 class TimedLeg(BenerailBaseModel):
-    timed_leg_type: str = pydantic.Field(..., alias="type")
-    seq_id: int
+    timed_leg_type: str = Field(..., description="TimedLeg", alias="type")
+    seq_d: float
     origin: Place
     destination: Place
-    departure_at: datetime.datetime
-    arrival_at: datetime.datetime
-    duration: str
-    train_type: TrainType | None
-    train_numbers: list[str] | None
+    departure_at: str = Field(
+        ...,
+        description="ISO-8601 timestamp showing date time and timezone",
+    )
+    arrival_at: str = Field(
+        ...,
+        description="ISO-8601 timestamp showing date time and timezone",
+    )
+    duration: str = Field(..., description="ISO-8601 period.", example="PT25M")
+    train_type: TrainType | None = None
+    train_numbers: list[str] | None = None
 
 
 class Trip(BenerailBaseModel):
-    identifier: str | None = pydantic.Field(..., alias="id")
-    duration: str | None
+    identifier: str | None = Field(None, alias="id")
+    duration: str | None = Field(
+        None,
+        description="Overall duration of the trip",
+        example="PT20M",
+    )
     origin: Place
     destination: Place
-    departure_at: datetime.datetime
-    arrival_at: datetime.datetime
-    number_of_transfers: int | None
-    co2_info: TripCo2Info | None
-    trip_legs: list[TimedLeg | TransferLeg] | None
+    departure_at: str = Field(
+        ...,
+        description="ISO-8601 timestamp showing date time and timezone of departure",
+        example="2021-09-29T13:20:34.143+02:00",
+    )
+    arrival_at: str = Field(
+        ...,
+        description="ISO-8601 timestamp showing date time and timezone of arrival",
+        example="2021-09-29T13:20:34.143+02:00",
+    )
+    number_of_transfers: float | None = Field(
+        None,
+        description="Number of interchanges",
+        example=1,
+    )
+    co2_info: TripCo2Info | None = None
+    trip_legs: list[TimedLeg | TransferLeg] | None = None
 
 
 class TripCollection(BenerailBaseModel):
-    identifier: str | None = pydantic.Field(..., alias="id")
-    trips: list[ResourceLink] | None
+    identifier: str | None = Field(None, alias="id")
+    trips: list[ResourceLink] | None = None

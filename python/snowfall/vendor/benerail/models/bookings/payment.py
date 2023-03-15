@@ -1,40 +1,61 @@
-from typing import Any
+from pydantic import AnyUrl, ConstrainedStr, Field
 
-import pydantic
-
-from snowfall.vendor.benerail.enums import PaymentStates
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
+from snowfall.vendor.benerail.models.bookings.enums import PaymentStates
+from snowfall.vendor.benerail.models.regex import UrlRegex
+
+
+class FormOfPaymentURN(BenerailBaseModel):
+    __root__: ConstrainedStr = Field(
+        ...,
+        example="urn:itti:form_of_payment:AC",
+        regex="^urn:[a-z]*:form_of_payment:[A-Z]*$",
+    )
 
 
 class Price(BenerailBaseModel):
-    amount: float | None
-    currency: str | None
+    amount: float | None = Field(
+        None,
+        description="the number of decimals show the accuracy",
+    )
+    currency: str | None = Field(None, example="EUR")
 
 
-class PaymentsIdBody(BenerailBaseModel):
-    payment_method: str
-    amount: Price | None
+class PaymentIdBody(BenerailBaseModel):
+    payment_method: FormOfPaymentURN
+    amount: Price | None = None
 
 
 class OrderIdPaymentsBody(BenerailBaseModel):
-    payment_method: str
-    amount: Price | None
-    additional_info: dict[Any, str] | None
-    payment_webhook: str | None
+    payment_method: FormOfPaymentURN
+    amount: Price | None = None
+    additional_info: dict[str, str] | None = None
+    payment_webhook: UrlRegex | None = Field(
+        None,
+        example="https://www.benecustomer.com/payment-webhook/12345",
+    )
 
 
 class FormOfPayment(BenerailBaseModel):
-    href: str | None
-    form_of_payment_value: str | None = pydantic.Field(..., alias="value")
+    href: AnyUrl | None = Field(
+        None,
+        example="https://api.example.com/places/urn:itti:form_of_payment:AC",
+    )
+    payment_value: ConstrainedStr | None = Field(
+        None,
+        example="urn:itti:form_of_payment:AC",
+        alias="value",
+        regex="^urn:[a-z]*:form_of_payment:[A-Z]*$",
+    )
 
 
 class Payment(BenerailBaseModel):
-    identifier: str | None = pydantic.Field(..., alias="id")
-    booking_id: str | None
-    order_id: str | None
-    payment_method: FormOfPayment | None
-    payment_date: str | None
-    payment_webhook: str | None
-    payment_amount: Price | None
-    result_balance: int | None
-    state: PaymentStates | None
+    identifier: str | None = Field(None, alias="id")
+    booking_id: str | None = None
+    order_id: str | None = None
+    payment_method: FormOfPayment | None = None
+    payment_date: str | None = None
+    payment_webhook: UrlRegex | None = None
+    payment_amount: Price | None = None
+    result_balance: float | None = None
+    state: PaymentStates | None = None

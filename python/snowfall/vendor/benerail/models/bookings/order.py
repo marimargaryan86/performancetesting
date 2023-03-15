@@ -1,19 +1,19 @@
-import pydantic
+from pydantic import Field
 
-from snowfall.vendor.benerail.enums import OrderStates
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
 from snowfall.vendor.benerail.models.link import ResourceLink
+from snowfall.vendor.benerail.models.products.enums import OrderStates
 
 
 class Order(BenerailBaseModel):
-    identifier: str | None = pydantic.Field(..., alias="id")
-    booking_id: str | None
-    payment_initiated: bool | None
-    state: OrderStates | None
-    selected_offers: list[ResourceLink] | None
-    booked_offers: list[ResourceLink] | None
-    payments: list[ResourceLink] | None
+    identifier: str | None = Field(None, alias="id")
+    booking_id: str | None = None
+    payment_initiated: bool | None = None
+    state: OrderStates | None = None
+    selected_offers: list[ResourceLink] | None = None
+    booked_offers: list[ResourceLink] | None = None
+    payments: list[ResourceLink] | None = None
 
 
 class OrderIdBody(BenerailBaseModel):
-    state: OrderStates | None
+    state: OrderStates
