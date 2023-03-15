@@ -169,7 +169,7 @@ _type_mapping = {
 }
 
 
-def gtfs_type_to_schedule_type(gtfs_type: int) -> "models_pb2.Schedule.Type.V":
+def gtfs_type_to_schedule_type(gtfs_type: int) -> models_pb2.Schedule.Type.ValueType:
     try:
         return _type_mapping[gtfs_type]
     except KeyError:

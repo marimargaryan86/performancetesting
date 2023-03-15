@@ -29,7 +29,7 @@ _APPLICABILITY_TYPE_MAPPING = types.MappingProxyType(
 
 def penalty_type_to_proto(
     penalty_type: str | None,
-) -> offers_pb2.Penalty.Type.V:
+) -> offers_pb2.Penalty.Type.ValueType:
     if penalty_type is None:
         return offers_pb2.Penalty.Type.TYPE_UNSPECIFIED
 
@@ -41,7 +41,7 @@ def penalty_type_to_proto(
 
 def applicability_type_to_proto(
     applicability_type: str | None,
-) -> offers_pb2.Penalty.Applicability.V:
+) -> offers_pb2.Penalty.Applicability.ValueType:
     if applicability_type is None:
         return offers_pb2.Penalty.Applicability.APPLICABILITY_UNSPECIFIED
 
@@ -51,7 +51,9 @@ def applicability_type_to_proto(
         return offers_pb2.Penalty.Applicability.APPLICABILITY_UNSPECIFIED
 
 
-def gender_from_proto(gender: orders_models.Passenger.Gender.V) -> common.Gender:
+def gender_from_proto(
+    gender: orders_models.Passenger.Gender.ValueType,
+) -> common.Gender:
     if gender == orders_models.Passenger.GENDER_MALE:
         return common.Gender.male
     elif gender == orders_models.Passenger.GENDER_FEMALE:

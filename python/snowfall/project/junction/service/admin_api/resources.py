@@ -18,7 +18,7 @@ class PlaceTypeResource(models.Resource):
     @classmethod
     def from_proto(
         cls,
-        place_type: models_pb2.Location.Type.V,
+        place_type: models_pb2.Location.Type.ValueType,
         request: requests.Request,
     ) -> PlaceTypeResource:
         place_type_id = protobuf.enum_value_to_slug(

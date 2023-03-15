@@ -816,7 +816,7 @@ class PlaceTypeResource(models.Resource):
     @classmethod
     def from_proto(
         cls,
-        place_type: place_models_pb2.Location.Type.V,
+        place_type: place_models_pb2.Location.Type.ValueType,
         self_link: datastructures.URL,
     ) -> PlaceTypeResource:
         place_type_id = protobuf.enum_value_to_slug(
@@ -841,7 +841,7 @@ class PassengerGenderResource(models.Resource):
     @classmethod
     def from_proto(
         cls,
-        passenger_gender: order_models_pb2.Passenger.Gender.V,
+        passenger_gender: order_models_pb2.Passenger.Gender.ValueType,
         self_link: datastructures.URL,
     ) -> PassengerGenderResource:
         passenger_gender_id = protobuf.enum_value_to_slug(
@@ -866,7 +866,7 @@ class CabinClassResource(models.Resource):
     @classmethod
     def from_proto(
         cls,
-        cabin_class: models_pb2.CabinClass.Type.V,
+        cabin_class: models_pb2.CabinClass.Type.ValueType,
         self_link: datastructures.URL,
     ) -> CabinClassResource:
         cabin_class_id = protobuf.enum_value_to_slug(
@@ -891,7 +891,7 @@ class PassengerTitleResource(models.Resource):
     @classmethod
     def from_proto(
         cls,
-        passenger_title: order_models_pb2.Passenger.Title.V,
+        passenger_title: order_models_pb2.Passenger.Title.ValueType,
         self_link: datastructures.URL,
     ) -> PassengerTitleResource:
         passenger_title_id = protobuf.enum_value_to_slug(
