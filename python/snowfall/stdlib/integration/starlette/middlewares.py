@@ -83,6 +83,24 @@ class RequestIdMiddleware(base.BaseHTTPMiddleware):
         return response
 
 
+class SecurityHeadersMiddleware(base.BaseHTTPMiddleware):
+    async def dispatch(
+        self,
+        request: requests.Request,
+        call_next: Callable[[requests.Request], Awaitable[responses.Response]],
+    ) -> responses.Response:
+        response = await call_next(request)
+        response.headers.update(
+            {
+                "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'",
+                "X-Content-Type-Options": "nosniff",
+                "X-Frame-Options": "DENY",
+            },
+        )
+
+        return response
+
+
 class ValidationMiddleware(base.BaseHTTPMiddleware):
     def __init__(
         self,

@@ -31,8 +31,12 @@ def create_starlette_app(
     openapi_path: pathlib.Path | None,
     custom_middlewares: Sequence[Middleware] | None = None,
     validate_response: bool = True,
+    security_headers: bool = True,
 ) -> applications.Starlette:
     stack = [Middleware(middlewares.RequestIdMiddleware)]
+
+    if security_headers:
+        stack.append(Middleware(middlewares.SecurityHeadersMiddleware))
 
     if openapi_path:
         stack.append(
@@ -82,6 +86,7 @@ def serve(
         access_log=False,
         log_config=None,
         proxy_headers=True,
+        server_header=False,
         ws="none",
         forwarded_allow_ips=",".join(
             [

@@ -59,6 +59,7 @@ def _factory(
         return application.create_starlette_app(
             routes=_routes(app),
             openapi_path=None,
+            security_headers=False,
         )
 
     return decorator
