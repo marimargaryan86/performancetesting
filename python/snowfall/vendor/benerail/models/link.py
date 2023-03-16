@@ -59,13 +59,3 @@ class LinkToBinary(BenerailBaseModel):
     href: AnyUrl | None = Field(None, description="callable url")
     title: str | None = Field(None, description="Info on referred value")
     link_format: Format | None = Field(None, alias="format")
-
-
-class ZonedDateTime(BenerailBaseModel):
-    __root__: ConstrainedStr = Field(
-        ...,
-        example="2022-11-16T11:38+01:00",
-        regex="^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12]["
-        + "0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):?([0-5][0-9])?([+-](?:2[0-3]|["
-        + "01][0-9]):[0-5][0-9])$",
-    )

@@ -1,8 +1,9 @@
 from pydantic import Field
 
+from snowfall.vendor.benerail.models import types
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
 from snowfall.vendor.benerail.models.bookings.train import TrainType1
-from snowfall.vendor.benerail.models.link import ResourceLink, ZonedDateTime
+from snowfall.vendor.benerail.models.link import ResourceLink
 from snowfall.vendor.benerail.models.place import Place
 from snowfall.vendor.benerail.models.trip_offers.enums import RequestedOfferParts
 from snowfall.vendor.benerail.models.trip_offers.offer import BookableStatus, Message
@@ -26,7 +27,7 @@ class TripOffer(BenerailBaseModel):
     identifier: str | None = Field(None, alias="id")
     origin: Place
     destination: Place
-    departure_at: ZonedDateTime
+    departure_at: types.ZonedDatetimeStr
     duration: str | None = Field(
         None,
         description="Overall duration of the trip",

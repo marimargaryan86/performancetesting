@@ -1,3 +1,5 @@
+from typing import Sequence
+
 from pydantic import Field
 
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
@@ -42,6 +44,15 @@ class GetDialoguesResponse(BenerailBaseModel):
     metadata: Metadata | None = None
     response_result: list[ResourceLink] | None = Field(None, alias="result")
     links: list[Link] | None = None
+
+    def get_dialogue_ids(self) -> Sequence[str]:
+        if not self.response_result:
+            return []
+
+        return [
+            url.href.path.split("/")[-1]  # type: ignore[union-attr]
+            for url in self.response_result
+        ]
 
 
 class GetDialogueResponse(BenerailBaseModel):

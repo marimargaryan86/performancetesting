@@ -1,9 +1,9 @@
 from pydantic import Field
 
+from snowfall.vendor.benerail.models import types
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
 from snowfall.vendor.benerail.models.bookings.train import TrainType
-from snowfall.vendor.benerail.models.link import ResourceLink, ZonedDateTime
-from snowfall.vendor.benerail.models.place import PlaceURN
+from snowfall.vendor.benerail.models.link import ResourceLink
 from snowfall.vendor.benerail.models.trip_offers.enums import RequestedOfferParts
 
 
@@ -13,11 +13,11 @@ class DialogueIdTripFiltersParams(BenerailBaseModel):
 
 
 class DialogueIdTripfiltersBody(BenerailBaseModel):
-    origin: PlaceURN
-    destination: PlaceURN
-    via: list[PlaceURN] | None = None
+    origin: types.PlaceUrnStr
+    destination: types.PlaceUrnStr
+    via: list[types.PlaceUrnStr] | None = None
     train_types: list[TrainType] | None = None
-    departure_date_time: ZonedDateTime
+    departure_date_time: types.ZonedDatetimeStr
     body_params: DialogueIdTripFiltersParams | None = Field(None, alias="params")
 
 

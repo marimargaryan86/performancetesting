@@ -1,5 +1,6 @@
-from pydantic import AnyUrl, ConstrainedStr, Field
+from pydantic import AnyUrl, Field
 
+from snowfall.vendor.benerail.models import types
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
 
 
@@ -33,17 +34,12 @@ class Address(AddressDetail):
     )
 
 
-class PlaceURN(BenerailBaseModel):
-    __root__: ConstrainedStr = Field(
-        ...,
-        example="urn:bnds:tstatn_id:NLASC",
-        regex="^urn:[a-z]*:tstatn_id:[A-Z_]*$",
-    )
-
-
 class Place(BenerailBaseModel):
     href: AnyUrl | None = Field(
         None,
         example="https://api.example.com/places/urn:bnds:tstatn_id:NLASC",
     )
-    place_value: PlaceURN | None = Field(None, alias="value")
+    place_value: types.PlaceUrnStr | None = Field(
+        None,
+        alias="value",
+    )
