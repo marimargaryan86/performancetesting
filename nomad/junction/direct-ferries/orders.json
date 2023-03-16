@@ -1,0 +1,13 @@
+{
+    "development": {
+        "variables": {
+            "count": 1
+        }
+    },
+    "production": {
+        "deploy": false,
+        "variables": {
+            "count": 2
+        }
+    }
+}
