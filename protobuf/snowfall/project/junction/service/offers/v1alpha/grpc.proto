@@ -10,6 +10,7 @@ option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/
 service OfferSearchService {
   rpc EnqueueOfferSearch(EnqueueOfferSearchRequest) returns (EnqueueOfferSearchResponse) {}
   rpc GetOfferSearch(GetOfferSearchRequest) returns (GetOfferSearchResponse) {}
+  rpc ListOfferSearches(ListOfferSearchesRequest) returns (ListOfferSearchesResponse) {}
 }
 
 service OfferService {
@@ -44,6 +45,14 @@ message GetOfferSearchRequest {
 
 message GetOfferSearchResponse {
   OfferSearch search = 1;
+}
+
+message ListOfferSearchesRequest {
+  repeated string ids = 1;
+}
+
+message ListOfferSearchesResponse {
+  repeated OfferSearch offer_searches = 1;
 }
 
 message GetOfferRequest {

@@ -54,7 +54,7 @@ async def test_trip_and_segments_repository(
         datetime.timedelta(days=1),
     )
 
-    await trips_repo.add_from_journey_search(search_journey_response)
+    await trips_repo.add_multiple_if_missing(search_journey_response.trips)
 
     for trip_id in ("trip_1", "trip_2"):
         trip = await trips_repo.find_by_id(trip_id)

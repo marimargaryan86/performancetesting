@@ -26,6 +26,10 @@ class Client(abc.ABC):
     async def get(self, identifier: str) -> models_pb2.OfferSearch:
         """Get an offer search."""
 
+    @abc.abstractmethod
+    async def find_by_ids(self, ids: Sequence[str]) -> Sequence[models_pb2.OfferSearch]:
+        """Get multiple offer searches."""
+
 
 class DictClient(Client):
     def __init__(self, offer_searches: Sequence[models_pb2.OfferSearch]) -> None:
@@ -54,6 +58,13 @@ class DictClient(Client):
             return self._searches[identifier]
         except KeyError as err:
             raise errors.NotFoundError() from err
+
+    async def find_by_ids(self, ids: Sequence[str]) -> Sequence[models_pb2.OfferSearch]:
+        return [
+            self._searches[identifier]
+            for identifier in ids
+            if identifier in self._searches
+        ]
 
 
 class GrpcClient(Client):
@@ -89,3 +100,13 @@ class GrpcClient(Client):
         )
 
         return response.search
+
+    async def find_by_ids(self, ids: Sequence[str]) -> Sequence[models_pb2.OfferSearch]:
+        response = await errors.handle_grpc_errors(
+            self._offer_searches.ListOfferSearches(
+                grpc_pb2.ListOfferSearchesRequest(ids=ids),
+                timeout=self._timeout,
+            ),
+        )
+
+        return response.offer_searches

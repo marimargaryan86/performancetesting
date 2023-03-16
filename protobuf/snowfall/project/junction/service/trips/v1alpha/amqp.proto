@@ -9,3 +9,7 @@ option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/
 message TripSearchTask {
   TripSearch trip_search = 1;
 }
+
+message TripCandidateSearchTask {
+  TripCandidateSearch trip_candidate_search = 1;
+}

@@ -64,11 +64,11 @@ class TripRepository(
 ):
     _proto = models_pb2.TripReference
 
-    async def add_from_journey_search(
+    async def add_multiple_if_missing(
         self,
-        response: planner_pb2.SearchJourneyResponse,
+        trips: Sequence[models_pb2.TripReference],
     ) -> None:
-        trips_ids = set({trip.id for trip in response.trips})
+        trips_ids = set({trip.id for trip in trips})
         existing_trips = await self._execute(
             self._collection.find,
             filter={
@@ -89,9 +89,7 @@ class TripRepository(
             await self._execute(
                 self._collection.insert_many,
                 documents=[
-                    self._coder.encode(trip)
-                    for trip in response.trips
-                    if trip.id in missing_ids
+                    self._coder.encode(trip) for trip in trips if trip.id in missing_ids
                 ],
             )
 
@@ -178,3 +176,55 @@ class TripSearchRepository(  # noqa: WPS215
         new_trip_search.expires_at.CopyFrom(expires_at)
 
         return await super().insert(new_trip_search)
+
+
+class TripCandidateSearchRepository(  # noqa: WPS215
+    mixins.FindByIdMixin[trips_pb2.TripCandidateSearch],
+    mixins.InsertMixin[trips_pb2.TripCandidateSearch],
+    mixins.StatusMixin[trips_pb2.TripCandidateSearch],
+    mixins.repository.ProtoRepository[trips_pb2.TripCandidateSearch],
+):
+    _proto = trips_pb2.TripCandidateSearch
+    _indexes = [pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True)]
+
+    def __init__(
+        self,
+        collection: motor_asyncio.AsyncIOMotorCollection,
+        ttl: datetime.timedelta,
+    ) -> None:
+        super().__init__(collection)
+
+        self._ttl = ttl
+
+    async def create(
+        self,
+        trip_candidate_search: trips_pb2.TripCandidateSearch,
+    ) -> trips_pb2.TripCandidateSearch:
+        new_trip_candidate_search = trips_pb2.TripCandidateSearch()
+        expires_at = timestamp_pb2.Timestamp()
+        expires_at.FromDatetime(
+            datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
+        )
+
+        new_trip_candidate_search.CopyFrom(trip_candidate_search)
+        new_trip_candidate_search.id = string.uuid()
+        new_trip_candidate_search.expires_at.CopyFrom(expires_at)
+
+        return await self.insert(new_trip_candidate_search)
+
+    async def add_offer_search_ids(
+        self,
+        trip_candidate_search_id: str,
+        offer_search_ids: Sequence[str],
+    ) -> bool:
+        update = await self._execute(
+            self._collection.update_one,
+            {"_id": trip_candidate_search_id},
+            {
+                "$set": {
+                    "offer_search_ids": list(offer_search_ids),
+                },
+            },
+        )
+
+        return bool(update.acknowledged)

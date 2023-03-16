@@ -1,5 +1,8 @@
+from typing import Sequence
+
 from grpc import StatusCode, aio
 
+from snowfall.project.junction.adapter import offer_searches, offers
 from snowfall.project.junction.service.trips import trips
 from snowfall.project.junction.service.trips.v1alpha import (
     amqp_pb2,
@@ -8,6 +11,7 @@ from snowfall.project.junction.service.trips.v1alpha import (
 )
 from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.transport.grpc import service
+from snowfall.stdlib.v1alpha import amqp_pb2 as std_amqp_pb2
 
 
 class TripService(service.Service, trips_pb2_grpc.TripServiceServicer):
@@ -133,3 +137,138 @@ class TripSearchService(service.Service, trips_pb2_grpc.TripSearchServiceService
             await context.abort(StatusCode.NOT_FOUND)
 
         return trips_pb2.GetTripSearchDetailsResponse(trip_search=trip_search)
+
+
+class TripCandidateSearchService(
+    service.Service,
+    trips_pb2_grpc.TripCandidateSearchServiceServicer,
+):
+    _final_statuses = {
+        std_amqp_pb2.Trackable.Status.STATUS_COMPLETED,
+        std_amqp_pb2.Trackable.Status.STATUS_FAILED,
+    }
+
+    def __init__(
+        self,
+        repository: trips.TripCandidateSearchRepository,
+        producer_obj: producer.Producer,
+        offer_search_adapter: offer_searches.Client,
+    ):
+        self._repository = repository
+        self._offer_search_adapter = offer_search_adapter
+        self._producer = producer_obj
+
+    def get_name(self) -> str:
+        return trips_pb2.DESCRIPTOR.services_by_name[
+            "TripCandidateSearchService"
+        ].full_name
+
+    def register(self, server: aio.Server) -> None:
+        trips_pb2_grpc.add_TripCandidateSearchServiceServicer_to_server(self, server)
+
+    async def EnqueueTripCandidateSearch(  # type: ignore[override] # noqa: N802
+        self,
+        request: trips_pb2.EnqueueTripCandidateSearchRequest,
+        context: aio.ServicerContext,
+    ) -> trips_pb2.EnqueueTripCandidateSearchResponse:
+        trip_candidate_search = await self._repository.create(
+            request.trip_candidate_search,
+        )
+
+        await self._producer.publish(
+            amqp_pb2.TripCandidateSearchTask(
+                trip_candidate_search=trip_candidate_search,
+            ),
+            "trip_candidates.search",
+        )
+
+        return trips_pb2.EnqueueTripCandidateSearchResponse(
+            trip_candidate_search=trip_candidate_search,
+        )
+
+    async def GetTripCandidateSearchDetails(  # type: ignore[override] # noqa: N802
+        self,
+        request: trips_pb2.GetTripCandidateSearchDetailsRequest,
+        context: aio.ServicerContext,
+    ) -> trips_pb2.GetTripCandidateSearchDetailsResponse:
+        trip_candidate_search = await self._repository.find_by_id(request.id)
+
+        if not trip_candidate_search:
+            await context.abort(StatusCode.NOT_FOUND)
+
+        offer_search_objectes = await self._offer_search_adapter.find_by_ids(
+            ids=trip_candidate_search.offer_search_ids,  # type: ignore[union-attr]
+        )
+
+        trip_candidate_search.status = self._status_from_statuses(  # type: ignore[union-attr]
+            statuses=[
+                offer_search_object.status
+                for offer_search_object in offer_search_objectes
+            ],
+        )
+
+        return trips_pb2.GetTripCandidateSearchDetailsResponse(
+            trip_candidate_search=trip_candidate_search,
+        )
+
+    def _status_from_statuses(
+        self,
+        statuses: Sequence[std_amqp_pb2.Trackable.Status.ValueType],
+    ) -> std_amqp_pb2.Trackable.Status.ValueType:
+        statuses_set = set(statuses)
+
+        if all(status in self._final_statuses for status in statuses):
+            if std_amqp_pb2.Trackable.Status.STATUS_COMPLETED in statuses_set:
+                return std_amqp_pb2.Trackable.Status.STATUS_COMPLETED
+
+            return std_amqp_pb2.Trackable.Status.STATUS_FAILED
+
+        if std_amqp_pb2.Trackable.Status.STATUS_PROCESSING in statuses_set:
+            return std_amqp_pb2.Trackable.Status.STATUS_PROCESSING
+
+        return std_amqp_pb2.Trackable.Status.STATUS_PENDING
+
+
+class TripCandidateService(
+    service.Service,
+    trips_pb2_grpc.TripCandidateServiceServicer,
+):
+    def __init__(
+        self,
+        offers_adapter: offers.GrpcClient,
+        repository: trips.TripCandidateSearchRepository,
+        default_page_size: int,
+    ):
+        self._offers_adapter = offers_adapter
+        self._repository = repository
+        self._default_page_size = default_page_size
+
+    def get_name(self) -> str:
+        return trips_pb2.DESCRIPTOR.services_by_name["TripCandidateService"].full_name
+
+    def register(self, server: aio.Server) -> None:
+        trips_pb2_grpc.add_TripCandidateServiceServicer_to_server(self, server)
+
+    async def ListTripCandidates(  # type: ignore[override] # noqa: N802
+        self,
+        request: trips_pb2.ListTripCandidatesRequest,
+        context: aio.ServicerContext,
+    ) -> trips_pb2.ListTripCandidatesResponse:
+        trip_candidate_search = await self._repository.find_by_id(
+            request.trip_candidate_search_id,
+        )
+
+        if not trip_candidate_search:
+            await context.abort(StatusCode.NOT_FOUND)
+
+        offer_aggregates = await self._offers_adapter.find_offers_by_offer_searches(
+            identifiers=trip_candidate_search.offer_search_ids,  # type: ignore[union-attr]
+            limit=request.page_size,
+            cursor=request.page_token,
+            cabin_classes=request.cabin_class_types,
+        )
+
+        return trips_pb2.ListTripCandidatesResponse(
+            offers=offer_aggregates.offers,
+            next_page_token=offer_aggregates.next_page_token,
+        )

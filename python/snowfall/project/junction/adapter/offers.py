@@ -314,9 +314,25 @@ class GrpcClient(Client):  # noqa: WPS214
         cursor: str | None = None,
         cabin_classes: Sequence[common_pb2.CabinClass.Type.ValueType] | None = None,
     ) -> grpc_pb2.ListOffersResponse:
+        return await self.find_offers_by_offer_searches(
+            identifiers=[identifier],
+            limit=limit,
+            cursor=cursor,
+            cabin_classes=cabin_classes,
+        )
+
+    async def find_offers_by_offer_searches(
+        self,
+        identifiers: Sequence[str],
+        limit: int | None = None,
+        cursor: str | None = None,
+        cabin_classes: Sequence[common_pb2.CabinClass.Type.ValueType] | None = None,
+    ) -> grpc_pb2.ListOffersResponse:
         request = grpc_pb2.ListOffersRequest(
             page_token=cursor or "",
-            offer_search_id=identifier,
+            offer_search_ids=grpc_pb2.ListOfIds(
+                ids=list(identifiers),
+            ),
             cabin_class_types=cabin_classes,
         )
         if limit is not None:

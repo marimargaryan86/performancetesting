@@ -295,3 +295,22 @@ class OfferSearchRepository(  # noqa: WPS215
         offer_search.expires_at.CopyFrom(expires_at)
 
         return await self.insert(offer_search)
+
+    async def find(
+        self,
+        ids: Sequence[str],
+    ) -> resultset.ResultSet[models_pb2.OfferSearch]:
+        filter_ = (
+            {
+                repository.mongo_id_key: {
+                    "$in": ids,
+                },
+            }
+            if ids
+            else {}
+        )
+
+        return await self._find_with_cursor(
+            cur="",
+            filter_=filter_,
+        )

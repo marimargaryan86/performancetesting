@@ -3,6 +3,7 @@ syntax = "proto3";
 package snowfall.project.junction.service.trips.v1alpha;
 
 import "google/protobuf/timestamp.proto";
+import "snowfall/project/junction/service/offers/v1alpha/models.proto";
 import "snowfall/stdlib/v1alpha/amqp.proto";
 import "snowfall/stdlib/v1alpha/datetime.proto";
 import "snowfall/stdlib/v1alpha/models.proto";
@@ -88,4 +89,60 @@ message TripSearch {
   repeated snowfall.stdlib.v1alpha.Schedule.Type allowed_segment_types = 9;
   google.protobuf.Timestamp created_at = 10;
   google.protobuf.Timestamp updated_at = 11;
+}
+
+service TripCandidateSearchService {
+  rpc EnqueueTripCandidateSearch(EnqueueTripCandidateSearchRequest) returns (EnqueueTripCandidateSearchResponse) {}
+  rpc GetTripCandidateSearchDetails(GetTripCandidateSearchDetailsRequest) returns (GetTripCandidateSearchDetailsResponse) {}
+}
+
+message EnqueueTripCandidateSearchRequest {
+  TripCandidateSearch trip_candidate_search = 1;
+}
+
+message EnqueueTripCandidateSearchResponse {
+  TripCandidateSearch trip_candidate_search = 1;
+}
+
+message GetTripCandidateSearchDetailsRequest {
+  string id = 1;
+}
+
+message GetTripCandidateSearchDetailsResponse {
+  TripCandidateSearch trip_candidate_search = 1;
+}
+
+message TripCandidateSearchCriteria {
+  repeated snowfall.stdlib.v1alpha.Coordinates origins = 1;
+  repeated snowfall.stdlib.v1alpha.Coordinates destinations = 2;
+  snowfall.stdlib.v1alpha.DateTime departure_after = 3;
+  optional uint32 maximum_connections = 4;
+}
+
+message TripCandidateSearch {
+  string id = 1 [(snowfall.stdlib.v1alpha.read_only) = true];
+  google.protobuf.Timestamp expires_at = 2 [(snowfall.stdlib.v1alpha.read_only) = true];
+  snowfall.stdlib.v1alpha.Trackable.Status status = 3 [(snowfall.stdlib.v1alpha.read_only) = true];
+  repeated TripCandidateSearchCriteria criteria = 4;
+  repeated snowfall.project.junction.service.offers.v1alpha.Passenger passengers = 5;
+  repeated snowfall.stdlib.v1alpha.Schedule.Type allowed_segment_types = 6;
+  repeated string offer_search_ids = 7 [(snowfall.stdlib.v1alpha.read_only) = true];
+}
+
+service TripCandidateService {
+  rpc ListTripCandidates(ListTripCandidatesRequest) returns (ListTripCandidatesResponse) {}
+}
+
+message ListTripCandidatesRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  oneof payload {
+    string trip_candidate_search_id = 3;
+  }
+  repeated snowfall.stdlib.v1alpha.CabinClass.Type cabin_class_types = 4;
+}
+
+message ListTripCandidatesResponse {
+  string next_page_token = 1;
+  repeated snowfall.project.junction.service.offers.v1alpha.OfferAggregate offers = 2;
 }

@@ -50,6 +50,20 @@ class OfferSearchService(service.Service, grpc_pb2_grpc.OfferSearchServiceServic
 
         return grpc_pb2.GetOfferSearchResponse(search=offer_search)
 
+    async def ListOfferSearches(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.ListOfferSearchesRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.ListOfferSearchesResponse:
+        searches = [
+            offer_search
+            async for offer_search in await self._offers_searches.find(
+                list(request.ids),
+            )
+        ]
+
+        return grpc_pb2.ListOfferSearchesResponse(offer_searches=searches)
+
 
 class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):  # noqa: WPS214
     def __init__(  # noqa: WPS211

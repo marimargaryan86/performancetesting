@@ -10,6 +10,7 @@ from snowfall.project.junction.service.places.v1alpha import (
     places_pb2_grpc,
 )
 from snowfall.stdlib import sequence
+from snowfall.stdlib.v1alpha import latlng_pb2
 
 
 class Client(abc.ABC):
@@ -25,6 +26,13 @@ class Client(abc.ABC):
         cursor: str | None = None,
     ) -> places_pb2.ListLocationsResponse:
         """Fetch all location resources."""
+
+    @abc.abstractmethod
+    async def get_nearby_locations(
+        self,
+        coordinates: latlng_pb2.LatLng,
+    ) -> models_pb2.Location:
+        """Fetch all nearby locations."""
 
 
 class DictClient(Client):
@@ -60,6 +68,12 @@ class DictClient(Client):
             locations=page.sequence,
             next_page_token=page.cursor,
         )
+
+    async def get_nearby_locations(
+        self,
+        coordinates: latlng_pb2.LatLng,
+    ) -> models_pb2.Location:
+        return models_pb2.Location()
 
 
 class GrpcClient(Client):
@@ -98,3 +112,16 @@ class GrpcClient(Client):
         return await errors.handle_grpc_errors(
             self._locations.ListLocations(request, timeout=self._timeout),
         )
+
+    async def get_nearby_locations(
+        self,
+        coordinates: latlng_pb2.LatLng,
+    ) -> models_pb2.Location:
+        response = await errors.handle_grpc_errors(
+            self._locations.ListNearbyLocations(
+                request=places_pb2.ListNearbyLocationsRequest(coordinates=coordinates),
+                timeout=self._timeout,
+            ),
+        )
+
+        return response.locations
