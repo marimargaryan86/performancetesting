@@ -29,9 +29,7 @@ for f in nomad/**/*.nomad; do
 	fi
 
 	nomad validate "${VARIABLES[@]}" "${f}" >/dev/null
-	if [[ $(nomad fmt -check -write=false "${f}") ]]; then
-		exit 1
-	fi
+	nomad fmt -check -write=false "${f}"
 done
 
 pants run python/snowfall/script/validate_nomad_files.py -- nomad/**/*.nomad
