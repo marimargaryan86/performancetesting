@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import dataclasses
 import inspect
+import json
 import pathlib
 from collections.abc import Sequence
 from typing import (  # noqa: WPS235
@@ -27,6 +28,7 @@ import structlog
 from prometheus_async.aio import web
 from pydantic.error_wrappers import ErrorWrapper
 
+from snowfall.stdlib import types
 from snowfall.stdlib.logging import sentry, stdout
 
 
@@ -51,6 +53,7 @@ class SentrySettings(object):
 
 
 class _GlobalSettings(Settings):
+    debug_info: bool = False
     env_name: str = pydantic.Field(default="local", hidden=True)
     log_level: str = "INFO"
     prometheus_port: int | None = None
@@ -176,38 +179,55 @@ def _validate_option(
     return decorator
 
 
+def _get_parameter_default(
+    arg: pydantic.fields.ModelField,
+) -> types.Primitive | list[types.Primitive] | None:
+    if arg.default == pydantic.fields.UndefinedType or arg.default is None:
+        return None
+
+    if isinstance(arg.default, (list, set, tuple)):
+        return [
+            default if isinstance(default, (bool, float, int, str)) else str(default)
+            for default in arg.default
+        ]
+
+    if isinstance(arg.default, (bool, float, int, str)):
+        return arg.default
+
+    return str(arg.default)
+
+
 def _create_parameter_from_model(
     arg: pydantic.fields.ModelField,
-    types: Mapping[str, type],
+    arg_types: Mapping[str, type],
 ) -> click.Parameter:
-    arg_type = get_origin(types[arg.name]) or types[arg.name]
+    arg_type = get_origin(arg_types[arg.name]) or arg_types[arg.name]
+    is_multi = arg_type in {Sequence, list, set, tuple}
 
     if arg.field_info.extra.get("argument", False):
         return click.Argument(
             [arg.name],
             callback=_validate_option(arg),
-            default=(
-                None if arg.default == pydantic.fields.UndefinedType else arg.default
-            ),
+            default=_get_parameter_default(arg),
             envvar=arg.name.upper(),
-            nargs=-1 if arg_type in {Sequence, list, set, tuple} else 1,
+            nargs=-1 if is_multi else 1,
             required=bool(arg.required),
-            type=_get_type(next(iter(get_args(types[arg.name])), arg_type)),
+            type=_get_type(next(iter(get_args(arg_types[arg.name])), arg_type)),
         )
 
     return click.Option(
         ["--{0}".format(arg.name.replace("_", "-"))],
         callback=_validate_option(arg),
-        default=(None if arg.default == pydantic.fields.UndefinedType else arg.default),
+        default=_get_parameter_default(arg),
         envvar=arg.name.upper(),
         help=arg.field_info.description,
         hidden=bool(arg.field_info.extra.get("hidden", False)),
         is_flag=arg_type == bool,
-        multiple=arg_type in {Sequence, list, set, tuple},
+        multiple=is_multi,
         required=arg.required,
         show_default=True,
         show_envvar=True,
-        type=_get_type(next(iter(get_args(types[arg.name])), arg_type)),
+        type=_get_type(next(iter(get_args(arg_types[arg.name])), arg_type)),
     )
 
 
@@ -216,15 +236,19 @@ def _add_parameters_from_settings(
     settings: type[Settings],
 ) -> None:
     args: list[pydantic.fields.ModelField] = list(settings.__fields__.values())
-    types = get_type_hints(settings)
+    arg_types = get_type_hints(settings)
 
     for arg in args:
-        command.params.append(_create_parameter_from_model(arg, types))
+        command.params.append(_create_parameter_from_model(arg, arg_types))
 
 
 @click.pass_context
 def _group(ctx: click.Context, **kwargs: Any) -> None:
     ctx.ensure_object(dict)
+
+    if kwargs["debug_info"]:
+        click.echo(json.dumps(ctx.to_info_dict()))
+        ctx.exit()
 
     ctx.obj["global_settings"] = _GlobalSettings.construct(
         **{kwarg_key: kwarg_value for kwarg_key, kwarg_value in kwargs.items()},
