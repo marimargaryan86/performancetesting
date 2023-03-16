@@ -1,112 +1,10 @@
-.typography.display-large {
-  font-weight: 400;
-  font-size: 57px;
-  font-family: Raleway, Arial, Helvetica, sans-serif;
-  font-style: normal;
-  line-height: 64px;
-}
-
-.typography.display-medium {
-  font-weight: 400;
-  font-size: 45px;
-  font-family: Raleway, Arial, Helvetica, sans-serif;
-  font-style: normal;
-  line-height: 52px;
-}
-
-.typography.display-small {
-  font-weight: 400;
-  font-size: 36px;
-  font-family: Raleway, Arial, Helvetica, sans-serif;
-  font-style: normal;
-  line-height: 44px;
-}
-
-.typography.headline-large {
-  font-weight: 400;
-  font-size: 32px;
-  font-family: Raleway, Arial, Helvetica, sans-serif;
-  font-style: normal;
-  line-height: 40px;
-}
-
-.typography.headline-medium {
-  font-weight: 400;
-  font-size: 28px;
-  font-family: Raleway, Arial, Helvetica, sans-serif;
-  font-style: normal;
-  line-height: 36px;
-}
-
-.typography.headline-small {
-  font-weight: 400;
-  font-size: 24px;
-  font-family: Raleway, Arial, Helvetica, sans-serif;
-  font-style: normal;
-  line-height: 32px;
-}
-
-.typography.headline-capitalized {
-  font-weight: 400;
-  font-size: 16px;
-  font-family: Raleway, Arial, Helvetica, sans-serif;
-  font-style: normal;
-  line-height: 32px;
-  text-transform: uppercase;
-}
-
-.typography.title-large {
-  font-weight: 400;
-  font-size: 28px;
-  font-family: Inter, Arial, Helvetica, sans-serif;
-  font-style: normal;
-  line-height: 36px;
-}
-
-.typography.title-medium {
-  font-weight: 400;
-  font-size: 16px;
-  font-family: Inter, Arial, Helvetica, sans-serif;
-  font-style: normal;
-  line-height: 24px;
-  letter-spacing: 0.15px;
-}
-
-.typography.title-small {
-  font-weight: 400;
-  font-size: 16px;
-  font-family: Inter, Arial, Helvetica, sans-serif;
-  font-style: normal;
-  line-height: 20px;
-  letter-spacing: 0.1px;
-}
-
-.typography.title-capitalized {
-  font-weight: 400;
-  font-size: 8px;
-  font-family: Inter, Arial, Helvetica, sans-serif;
-  font-style: normal;
-  line-height: 16px;
-  letter-spacing: 0.1px;
-  text-transform: uppercase;
-}
-
-.typography.label-large {
+.typography.body-medium {
   font-weight: 400;
   font-size: 14px;
   font-family: Inter, Arial, Helvetica, sans-serif;
   font-style: normal;
   line-height: 20px;
-  letter-spacing: 0.1px;
-}
-
-.typography.label-medium {
-  font-weight: 400;
-  font-size: 12px;
-  font-family: Inter, Arial, Helvetica, sans-serif;
-  font-style: normal;
-  line-height: 16px;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.25px;
 }
 
 .typography.label-small {
@@ -118,37 +16,6 @@
   letter-spacing: 0.5px;
 }
 
-.typography.body-large {
-  font-weight: 400;
-  font-size: 16px;
-  font-family: Inter, Arial, Helvetica, sans-serif;
-  font-style: normal;
-  line-height: 24px;
-  letter-spacing: 0.5px;
-}
-
-.typography.body-medium {
-  font-weight: 400;
-  font-size: 14px;
-  font-family: Inter, Arial, Helvetica, sans-serif;
-  font-style: normal;
-  line-height: 20px;
-  letter-spacing: 0.25px;
-}
-
-.typography.body-small {
-  font-weight: 400;
-  font-size: 12px;
-  font-family: Inter, Arial, Helvetica, sans-serif;
-  font-style: normal;
-  line-height: 16px;
-  letter-spacing: 0.4px;
-}
-
 .typography.bold {
-  font-weight: 700;
-}
-
-.typography.italic {
-  font-style: italic;
+  font-weight: 600;
 }

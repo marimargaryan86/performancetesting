@@ -1,38 +1,38 @@
 <script lang="ts">
   import "assets/css/reset.css";
-  import "assets/css/variables.css";
+  import "assets/css/colors.css";
+  import "assets/css/effects.css";
   import "assets/css/common.css";
+  import "assets/css/layout.css";
   import "assets/css/typography.css";
-  import "assets/css/button.css";
-  import LoginPage from "components/pages/login-page.svelte";
   import type { LayoutData } from "./$types";
-  import MainNavBar from "components/partials/main-nav-bar/main-nav-bar.svelte";
+  import Login from "./login.svelte";
+  import MainMenu from "components/partials/main-menu/main-menu.svelte";
 
   export let data: LayoutData;
 </script>
 
 {#if data.user}
-  <main>
-    <MainNavBar user={data.user} />
+  <div class="workspace">
+    <MainMenu user={data.user} />
 
-    <div class="wrapper">
+    <main>
       <slot />
-    </div>
-  </main>
+    </main>
+  </div>
 {:else}
-  <LoginPage />
+  <Login />
 {/if}
 
 <style>
-  main {
+  .workspace {
     display: grid;
     grid-template-columns: max-content 1fr;
-    height: 100vh;
   }
 
-  .wrapper {
-    padding: 24px 16px;
+  main {
+    padding: 16px 16px 0;
     overflow-y: auto;
-    background-image: linear-gradient(330.51deg, #a3c9c2 0%, #e4f6ea 78.22%);
+    background-image: linear-gradient(284.73deg, #9dc6bf 0%, #eaf8ec 100%);
   }
 </style>

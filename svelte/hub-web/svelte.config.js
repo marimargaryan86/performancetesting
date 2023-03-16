@@ -12,11 +12,13 @@ const config = {
     alias: {
       components: "src/components",
       assets: "src/assets",
-      utils: "src/utils",
       integration: "src/integration",
       "integration-instances": "src/integration-instances.ts",
       models: "src/models",
       config: "src/config",
+      utils: "src/utils",
+      formatting: "src/formatting",
+      directives: "src/directives",
     },
   },
 };

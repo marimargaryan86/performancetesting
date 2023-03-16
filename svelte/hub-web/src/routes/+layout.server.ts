@@ -10,7 +10,7 @@ export function load(event: ServerLoadEvent): { user?: UserModel } {
     const user: UserJwtSchema | undefined = token ? jwtDecode(token) : undefined;
 
     if (user) {
-      return { user: { email: user.user_info.email, id: user.user_info.id } };
+      return { user: { email: user.user_info.email, id: user.user_info.id, name: "John Smith" } };
     }
   } catch {
     //

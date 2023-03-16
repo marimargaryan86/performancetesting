@@ -1,102 +1,143 @@
-<script lang="ts" context="module">
-  type InputEvent = Event & { currentTarget: EventTarget & HTMLInputElement };
-</script>
-
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { slide } from "svelte/transition";
-  import { getRandomId } from "utils/common";
+  import { getRandomId } from "utils/random";
 
-  type TType = $$Generic<"text" | "password" | "email" | "phone" | "number">;
+  type InputEvent = Event & { currentTarget: EventTarget & HTMLInputElement };
+  type TType = $$Generic<"text" | "password" | "email" | "number">;
   type TValue = TType extends "number" ? number : string;
 
-  export let id: string = getRandomId("text-field-");
-  export let type: TType | undefined = undefined;
-  export let value: TValue | undefined = undefined;
+  export let id = getRandomId("text-field");
   export let label: string | undefined = undefined;
   export let placeholder: string | undefined = undefined;
+  export let type: TType = "text" as TType;
+  export let value: TValue | undefined = undefined;
   export let error: string | boolean = false;
 
-  const dispatch = createEventDispatcher<{ input: InputEvent }>();
+  const dispatch = createEventDispatcher<{ input: HTMLInputElement }>();
 
-  function updateValue(ev: InputEvent): void {
+  function onInput(event: InputEvent): void {
     if (type === "number") {
-      value = parseInt(ev.currentTarget.value, 10) as TValue;
-    } else {
-      value = ev.currentTarget.value as TValue;
+      value = Number(event.currentTarget.value) as TValue;
     }
 
-    dispatch("input");
+    value = event.currentTarget.value as TValue;
+
+    dispatch("input", event.currentTarget);
   }
+
+  $: displayValue = value ?? "";
 </script>
 
 <div class="text-field" class:error>
   {#if label}
-    <label class="typography label-medium" for={id}>{label}</label>
+    <label for={id}>{label}</label>
   {/if}
 
-  <div class="wrapper">
+  <div
+    class="wrapper"
+    class:icon-before={$$slots["icon-before"]}
+    class:icon-after={$$slots["icon-after"]}
+  >
     <slot name="icon-before" />
 
-    <input
-      {id}
-      class="typography label-large"
-      {type}
-      value={value === undefined ? "" : value}
-      {placeholder}
-      on:input={updateValue}
-    />
+    <input {id} {type} value={displayValue} on:input={onInput} {placeholder} />
 
     <slot name="icon-after" />
   </div>
 
   {#if typeof error === "string"}
-    <span class="typography label-small error-message" transition:slide={{ duration: 200 }}
-      >{error}</span
-    >
+    <span class="error-message" transition:slide|local={{ duration: 300 }}>{error}</span>
   {/if}
 </div>
 
 <style>
   .text-field {
+    --height: 52px;
+    --icon-padding: 12px;
+    --font-size: 14px;
+
     display: inline-flex;
     flex-flow: column;
     gap: 4px;
-    border-radius: 6px;
   }
 
   label {
     color: var(--color-neutral-900);
+    font-weight: 400;
+    font-size: 12px;
+    font-family: Poppins, Arial, Helvetica, sans-serif;
+    font-style: normal;
+    line-height: 16px;
+    letter-spacing: 0.5px;
   }
 
   .wrapper {
-    display: grid;
-    grid-template-columns: max-content 1fr max-content;
-    gap: 8px;
+    position: relative;
+    display: flex;
     align-items: center;
-    padding: 18px 12px;
-    border: var(--color-neutral-200) 1px solid;
-    border-radius: inherit;
+    height: var(--height);
+    background: var(--color-generic-white);
+    border: 1px solid var(--color-neutral-200);
+    border-radius: 8px;
     box-shadow: var(--shadow-xsmall);
-    transition: border 200ms ease;
   }
 
-  .error > .wrapper {
-    border-color: var(--color-destructive-300);
+  .wrapper > :global(svg) {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+  }
+
+  .wrapper > :global(svg:first-child) {
+    left: var(--icon-padding);
+  }
+
+  .wrapper > :global(svg:last-child) {
+    right: var(--icon-padding);
   }
 
   input {
+    display: block;
+    grid-column: 2;
+    width: 100%;
+    height: 100%;
+    padding: 0 var(--icon-padding);
     color: var(--color-neutral-900);
+    font-weight: 400;
+    font-size: var(--font-size);
+    font-family: Poppins, Arial, Helvetica, sans-serif;
+    font-style: normal;
+    letter-spacing: 0.1px;
     background-color: transparent;
     border: 0;
+    border-radius: inherit;
     outline: 0;
   }
 
   input::placeholder {
-    color: var(--color-neutral-600);
+    color: var(--color-neutral-400);
+  }
+
+  .wrapper.icon-before > input {
+    padding-left: calc(var(--icon-padding) + 28px);
+  }
+
+  .wrapper.icon-after > input {
+    padding-right: calc(var(--icon-padding) + 28px);
+  }
+
+  .error > .wrapper {
+    border-color: #fe4e4e;
   }
 
   .error-message {
-    color: var(--color-destructive-500);
+    color: #fe4e4e;
+    font-weight: 400;
+    font-size: 10px;
+    font-family: Poppins, Arial, Helvetica, sans-serif;
+    font-style: normal;
+    line-height: 16px;
   }
 </style>

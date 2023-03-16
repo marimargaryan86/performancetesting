@@ -1,0 +1,15 @@
+:root {
+  --color-neutral-50: #f0f2f5;
+  --color-neutral-100: #e4e6e9;
+  --color-neutral-200: #e5e5e5;
+  --color-neutral-400: #a3a3a3;
+  --color-neutral-500: #b3b5b9;
+  --color-neutral-600: #8c8e92;
+  --color-neutral-700: #66686b;
+  --color-neutral-800: #363938;
+  --color-neutral-900: #171717;
+  --color-primary-500: #4bb69c;
+  --color-generic-black: #000000;
+  --color-generic-white: #ffffff;
+  --color-destructive-500: #ef4444;
+}
