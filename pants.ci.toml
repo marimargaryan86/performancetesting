@@ -1,5 +1,6 @@
 [GLOBAL]
 colors = true
+pantsd = false
 cache_content_behavior = "defer"
 remote_cache_read = true
 remote_cache_read_timeout_millis = 15000
