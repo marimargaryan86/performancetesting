@@ -556,6 +556,66 @@
         },
         "operationId": "get-accounts-id-balances",
         "description": "Get account balances"
+      },
+      "post": {
+        "summary": "Add balance in account",
+        "description": "Activate zero balance in account for given currency",
+        "tags": [
+          "balances"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accountId"
+          }
+        ],
+        "operationId": "post-accounts-id-balances",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Balance"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Balance"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
       }
     },
     "/accounts": {
@@ -1363,6 +1423,7 @@
           },
           "attributes": {
             "type": "object",
+            "readOnly": true,
             "properties": {
               "amount": {
                 "type": "integer",
@@ -1382,6 +1443,7 @@
             "properties": {
               "account": {
                 "type": "object",
+                "readOnly": true,
                 "required": [
                   "data"
                 ],
