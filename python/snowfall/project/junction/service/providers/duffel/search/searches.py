@@ -58,6 +58,7 @@ async def searches(app: service.Application[SearchesSettings]) -> None:  # noqa:
             amqp_pb2.SearchCriteriaTask,
             OfferRequestData,
         ](
+            provider_company_id=app.settings.provider_company_id,
             search_criteria_generator_func=duffle_adapter.search_criteria_generator,
             consumer=amqp_consumer.Consumer(
                 connection=amqp_connection,

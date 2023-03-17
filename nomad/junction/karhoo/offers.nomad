@@ -26,6 +26,10 @@ variable "count" {
   type = number
 }
 
+variable "provider_company_id" {
+  type = string
+}
+
 job "karhoo-offers" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -90,7 +94,6 @@ REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis:
 API_BASE_URL={{ .Data.data.api_base_url }}
 API_KEY={{ .Data.data.api_key }}
 {{ end }}
-
 EOH
         destination = "services.env"
         env         = true
@@ -112,9 +115,10 @@ EOH
       }
 
       env {
-        ENV_NAME        = "${var.environment}"
-        SENTRY_DSN      = "https://9678cf4943334528befbe1a14d653f3e@sentry.snowfall.se/63"
-        PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
+        ENV_NAME            = "${var.environment}"
+        SENTRY_DSN          = "https://9678cf4943334528befbe1a14d653f3e@sentry.snowfall.se/63"
+        PROMETHEUS_PORT     = "${NOMAD_PORT_prometheus}"
+        PROVIDER_COMPANY_ID = "${var.provider_company_id}"
       }
     }
   }

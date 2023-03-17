@@ -50,6 +50,7 @@ class _SearchSettings(service.Settings):
     client_id: str
     client_secret: str
     api_timeout: datetime.timedelta = datetime.timedelta(seconds=40)
+    provider_company_id: str
 
 
 class _OffersSettings(service.Settings):
@@ -128,6 +129,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
             amqp_pb2.SearchCriteriaTask,
             request.QuoteRequest,
         ](
+            provider_company_id=app.settings.provider_company_id,
             search_criteria_generator_func=ferry_adapter.search_criteria_generator,
             consumer=consumer.Consumer(
                 connection=amqp_connection,

@@ -26,6 +26,10 @@ variable "count" {
   type = number
 }
 
+variable "provider_company_id" {
+  type = string
+}
+
 job "duffel-pricing" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -112,9 +116,10 @@ EOH
       }
 
       env {
-        ENV_NAME        = "${var.environment}"
-        PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
-        SENTRY_DSN      = "https://c957bacb77d741509281e8b0a3b79e25@sentry.snowfall.se/57"
+        ENV_NAME            = "${var.environment}"
+        PROMETHEUS_PORT     = "${NOMAD_PORT_prometheus}"
+        SENTRY_DSN          = "https://c957bacb77d741509281e8b0a3b79e25@sentry.snowfall.se/57"
+        PROVIDER_COMPANY_ID = "${var.provider_company_id}"
       }
     }
   }

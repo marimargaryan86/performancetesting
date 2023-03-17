@@ -52,6 +52,7 @@ async def searches(app: service.Application[SearchesSettings]) -> None:  # noqa:
             amqp_pb2.SearchCriteriaTask,
             FindConnectionsCriteria,
         ](
+            provider_company_id=app.settings.provider_company_id,
             search_criteria_generator_func=distribusion_adapter.search_criteria_generator,
             consumer=consumer.Consumer(
                 connection=amqp_connection,

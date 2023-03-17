@@ -26,6 +26,10 @@ variable "count" {
   type = number
 }
 
+variable "provider_company_id" {
+  type = string
+}
+
 job "karhoo-pricing" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -112,9 +116,10 @@ EOH
       }
 
       env {
-        ENV_NAME        = "${var.environment}"
-        PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
-        SENTRY_DSN      = "https://9678cf4943334528befbe1a14d653f3e@sentry.snowfall.se/63"
+        ENV_NAME            = "${var.environment}"
+        PROMETHEUS_PORT     = "${NOMAD_PORT_prometheus}"
+        SENTRY_DSN          = "https://9678cf4943334528befbe1a14d653f3e@sentry.snowfall.se/63"
+        PROVIDER_COMPANY_ID = "${var.provider_company_id}"
       }
     }
   }

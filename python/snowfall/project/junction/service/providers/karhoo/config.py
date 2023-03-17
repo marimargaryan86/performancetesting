@@ -23,6 +23,7 @@ class OfferSettings(service.Settings, KarhooConfig):
     ttl: datetime.timedelta = datetime.timedelta(minutes=_DEFAULT_TTL_IN_MINUTES)
     polling_wait_time_seconds: int = 10
     polling_retries_attempts: int = 4
+    provider_company_id: str
 
 
 class OrderSettings(service.Settings, KarhooConfig):

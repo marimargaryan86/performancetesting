@@ -70,6 +70,7 @@ class _SearchSettings(_SatConfig, service.Settings):
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
     mongo_dsn: tuple[pydantic.AnyUrl]
     allowed_window_td: datetime.timedelta = datetime.timedelta(minutes=10)
+    provider_company_id: str
 
 
 class _OrdersSettings(_SatConfig, service.Settings):
@@ -160,6 +161,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
             amqp_pb2.SearchCriteriaTask,
             request_models.CreateSearchRequest,
         ](
+            provider_company_id=app.settings.provider_company_id,
             search_criteria_generator_func=sat_adapter.search_criteria_generator,
             consumer=amqp_consumer.Consumer(
                 connection=amqp_connection,

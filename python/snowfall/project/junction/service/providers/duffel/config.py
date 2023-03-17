@@ -21,3 +21,4 @@ class SearchesSettings(DuffelConfig, service.Settings):
     ttl: datetime.timedelta = datetime.timedelta(minutes=_DEFAULT_TTL_IN_MINUTES)
     enabled_airlines: set[str] = set()
     disabled_airlines: set[str] = set()
+    provider_company_id: str

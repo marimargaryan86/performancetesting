@@ -26,6 +26,10 @@ variable "count" {
   type = number
 }
 
+variable "provider_company_id" {
+  type = string
+}
+
 job "distribusion-searches" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -113,9 +117,10 @@ EOH
       }
 
       env {
-        ENV_NAME        = "${var.environment}"
-        SENTRY_DSN      = "https://81042716a3fa4b4fb9dc654b0fc5fd58@sentry.snowfall.se/56"
-        PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
+        ENV_NAME            = "${var.environment}"
+        SENTRY_DSN          = "https://81042716a3fa4b4fb9dc654b0fc5fd58@sentry.snowfall.se/56"
+        PROMETHEUS_PORT     = "${NOMAD_PORT_prometheus}"
+        PROVIDER_COMPANY_ID = "${var.provider_company_id}"
       }
     }
   }

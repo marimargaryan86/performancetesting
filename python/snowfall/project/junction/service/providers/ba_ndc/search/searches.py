@@ -67,6 +67,7 @@ async def searches(  # noqa: WPS210
             SearchCriteriaTask,
             request_offer_search_schemas.OfferSearchRequest,
         ](
+            provider_company_id=app.settings.provider_company_id,
             search_criteria_generator_func=ba_ndc_adapter.search_criteria_generator,
             consumer=consumer.Consumer(
                 connection=amqp_connection,

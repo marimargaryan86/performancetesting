@@ -64,6 +64,7 @@ class _SearchSettings(service.Settings):
     poll_retries_limit: int = 10
     wait_time_between_polling: float = 1
     mongo_dsn: Sequence[pydantic.AnyUrl]
+    provider_company_id: str
 
 
 class _SeatMapsSettings(service.Settings):
@@ -185,6 +186,7 @@ async def _searches(app: service.Application[_SearchSettings]) -> None:
             amqp_pb2.SearchCriteriaTask,
             search_models.CreateSearchCriteria,
         ](
+            provider_company_id=app.settings.provider_company_id,
             search_criteria_generator_func=search_adapter.search_criteria_generator,
             consumer=amqp_consumer.Consumer(
                 connection=amqp_connection,

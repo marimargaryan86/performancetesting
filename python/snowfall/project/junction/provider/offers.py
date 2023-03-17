@@ -130,12 +130,14 @@ class SearchCriteriaConsumer(Generic[_Proto, _CriteriaType]):
         producer: amqp_producer.Producer,
         offer_group_repository: OfferGroupRepository[_CriteriaType],
         search_criteria_generator_func: Callable[[_Proto], _CriteriaType],
+        provider_company_id: str,
         allowed_window_td: datetime.timedelta = _DEFAULT_ALLOWED_WINDOW_TD,
     ):
         self._consumer = consumer
         self._producer = producer
         self._offer_group_repository = offer_group_repository
         self._search_criteria_generator_func = search_criteria_generator_func
+        self._provider_company_id = provider_company_id
         self._allowed_window_td = allowed_window_td
 
     async def consume(self) -> None:
@@ -172,6 +174,7 @@ class SearchCriteriaConsumer(Generic[_Proto, _CriteriaType]):
                     msg=offers_amqp_pb2.TripOfferSearchResult(
                         offer_search_id=amqp_message.body.offer_search_id,
                         offer=offer_group,
+                        provider_company_id=self._provider_company_id,
                     ),
                     routing_key="offers.result.trip",
                 )

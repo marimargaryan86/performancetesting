@@ -16,3 +16,4 @@ class BaNdcConfig(pydantic.BaseModel):
 class SearchesSettings(BaNdcConfig, service.Settings):
     amqp_dsn: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
+    provider_company_id: str
