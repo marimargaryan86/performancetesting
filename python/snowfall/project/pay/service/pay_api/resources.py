@@ -19,6 +19,8 @@ from snowfall.stdlib.integration.starlette import models
 from snowfall.stdlib.v1alpha import money_pb2
 from snowfall.vendor.currency_cloud.models import balance as balance_models
 
+_SELF_HREF = "self"
+
 
 class QuoteResource(models.Resource):
     api_type: ClassVar[str] = "quotes"
@@ -266,5 +268,32 @@ class ConversionResource(models.Resource):
                     conversion.settlement_date,
                 ),
                 "rate": round(conversion.core_rate, 3),
+            },
+        )
+
+
+class CurrenciesResource(models.Resource):
+    api_type: ClassVar[str] = "currencies"
+
+    @classmethod
+    def from_model(
+        cls,
+        currency: money.Currency,
+        request: requests.Request,
+    ) -> CurrenciesResource:
+        return cls(
+            id=currency.code,
+            type=CurrenciesResource.api_type,
+            attributes={
+                "name": currency.currency_name,
+                "minorUnits": currency.exponent or 0,
+            },
+            links={
+                _SELF_HREF: str(
+                    request.url_for(
+                        "Currencies",
+                        currencyId=currency.code,
+                    ),
+                ),
             },
         )

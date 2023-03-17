@@ -19,6 +19,7 @@ from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.repositories import (
     CompanyRepository,
     ConversionRepository,
+    CurrencyRepository,
     TransactionRepository,
 )
 from snowfall.project.pay.service.pay_api.routes import router
@@ -85,6 +86,9 @@ def _factory(
                     ),
                     companies_repository=CompanyRepository(
                         mongo.companies.companies,
+                    ),
+                    currencies_repository=CurrencyRepository(
+                        app.settings.currencies,
                     ),
                 ),
             ),

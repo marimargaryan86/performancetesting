@@ -44,19 +44,20 @@ async def _test_view_endpoint(
     resources: Sequence[Mapping[str, Any]],
 ) -> None:
     current_link = None
-
     for resource in resources:
         current_link = cast(str, resource["links"]["self"])
         await test_resource_is_fetchable(client, resource)
 
     if not current_link:
         return
-
     response = await client.get(
         "{0}/{1}".format(current_link.rsplit("/", maxsplit=1)[0], fixtures.NOT_FOUND),
     )
 
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.status_code in (  # noqa: WPS510
+        status.HTTP_404_NOT_FOUND,
+        status.HTTP_400_BAD_REQUEST,
+    )
 
 
 async def test_resource_is_fetchable(

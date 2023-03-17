@@ -11,9 +11,11 @@ from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.repositories import (
     CompanyRepository,
     ConversionRepository,
+    CurrencyRepository,
     TransactionRepository,
 )
 from snowfall.project.pay.service.quotations import quotations
+from snowfall.stdlib import money
 from snowfall.stdlib.integration.starlette import application
 from snowfall.vendor.currency_cloud import client
 
@@ -27,6 +29,7 @@ class Settings(application.Settings):
     jwt_public_key: str
     mongo_dsn: Sequence[AnyUrl]
     redis_dsn: Sequence[AnyUrl]
+    currencies: Sequence[money.Currency]
 
 
 class AdminSettings(application.Settings):
@@ -68,6 +71,7 @@ def create_dependencies(  # noqa: WPS211
     transactions_repository: TransactionRepository,
     conversions_repository: ConversionRepository,
     companies_repository: CompanyRepository,
+    currencies_repository: CurrencyRepository,
     payment_client: client.PaymentClient | None = None,
 ) -> lagom.Container:
     container = lagom.Container()
@@ -79,4 +83,5 @@ def create_dependencies(  # noqa: WPS211
     container[TransactionRepository] = transactions_repository
     container[ConversionRepository] = conversions_repository
     container[CompanyRepository] = companies_repository
+    container[CurrencyRepository] = currencies_repository
     return container

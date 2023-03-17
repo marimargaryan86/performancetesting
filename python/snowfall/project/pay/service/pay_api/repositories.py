@@ -1,3 +1,5 @@
+from typing import Sequence
+
 import pymongo
 
 from snowfall.project.pay.service.companies.v1alpha import models_pb2
@@ -94,3 +96,17 @@ class ConversionRepository(
         )
 
         return await self.insert(conversion)
+
+
+class CurrencyRepository(object):
+    def __init__(self, available_currencies: Sequence[money.Currency]):
+        self._currencies = available_currencies
+
+    def find(self) -> Sequence[money.Currency]:
+        return self._currencies
+
+    def find_by_id(self, currency_id: str) -> money.Currency | None:
+        for currency in self._currencies:
+            if currency.code == currency_id:
+                return currency
+        return None

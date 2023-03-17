@@ -400,7 +400,6 @@
         "required": false,
         "schema": {
           "type": "string",
-          "default": "1",
           "example": "1"
         },
         "description": "Pagination cursor that defines your place in the list."
@@ -672,6 +671,9 @@
               "type",
               "attributes"
             ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
           }
         ],
         "description": "Currency details."
@@ -951,6 +953,22 @@
               "conversions"
             ],
             "example": "conversions"
+          }
+        }
+      },
+      "SelfLink": {
+        "title": "Self Link",
+        "type": "object",
+        "properties": {
+          "links": {
+            "type": "object",
+            "properties": {
+              "self": {
+                "type": "string",
+                "format": "uri",
+                "example": "https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+              }
+            }
           }
         }
       },

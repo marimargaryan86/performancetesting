@@ -21,6 +21,11 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
 
     return [
         integration.route(
+            "/currencies",
+            currencies.ListCurrencies,
+            name="Currencies",
+        ),
+        integration.route(
             "/currencies/{currencyId}",
             currencies.Currencies,
             name="Currencies",

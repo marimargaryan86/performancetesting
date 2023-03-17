@@ -23,6 +23,7 @@ from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.repositories import (
     CompanyRepository,
     ConversionRepository,
+    CurrencyRepository,
     TransactionRepository,
 )
 from snowfall.project.pay.service.pay_api.routes import router
@@ -53,6 +54,7 @@ def _create_app(  # noqa: WPS211
     transactions_repository: TransactionRepository,
     conversion_repository: ConversionRepository,
     companies_repository: CompanyRepository,
+    currencies_repository: CurrencyRepository,
     openapi_path: pathlib.Path,
     custom_middlewares: Sequence[Middleware] | None = None,
 ) -> applications.Starlette:
@@ -68,6 +70,7 @@ def _create_app(  # noqa: WPS211
                 transactions_repository,
                 conversion_repository,
                 companies_repository,
+                currencies_repository,
                 payment_client=payment_client,
             ),
         ),
@@ -235,6 +238,23 @@ def conversions_repository(
 
 
 @pytest.fixture()
+def currencies_repository(
+    available_currencies: Sequence[money.Currency],
+) -> CurrencyRepository:
+    return CurrencyRepository(available_currencies)
+
+
+@pytest.fixture
+def available_currencies() -> Sequence[money.Currency]:
+    return [
+        money.Currency("USD"),
+        money.Currency("GBP"),
+        money.Currency("AMD"),
+        money.Currency("SEK"),
+    ]
+
+
+@pytest.fixture()
 def cc_client(cc_login: str, cc_api_key: str, cc_env: str) -> currencycloud.Client:
     return currencycloud.Client(
         cc_login,
@@ -294,6 +314,7 @@ def app(  # noqa: WPS211
     conversions_repository: ConversionRepository,
     payment_client: PaymentClient,
     companies_repository: CompanyRepository,
+    currencies_repository: CurrencyRepository,
 ) -> applications.Starlette:
     return _create_app(
         cc_client=cc_client,
@@ -304,6 +325,7 @@ def app(  # noqa: WPS211
         transactions_repository=transactions_repository,
         conversion_repository=conversions_repository,
         companies_repository=companies_repository,
+        currencies_repository=currencies_repository,
         openapi_path=filesystem.resource_path("junction.pay_api", "openapi.json"),
     )
 
