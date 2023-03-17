@@ -58,7 +58,6 @@
     display: flex;
     flex-flow: column;
     gap: 16px;
-    height: calc(100% - 48px);
   }
 
   .filters {

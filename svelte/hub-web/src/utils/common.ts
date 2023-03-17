@@ -9,9 +9,9 @@ export function getInitials(name: string): string {
     return `${parts[0]?.[0]?.toUpperCase()}${parts[1]?.[0]?.toUpperCase()}`;
   }
 
-  let result = "";
+  let result = parts[0]?.[0] as string;
 
-  for (const char of Array.from(parts[0] ?? [])) {
+  for (const char of parts[0]?.substring(1) ?? "") {
     if (isUpperCase(char)) {
       result += char;
     }
@@ -21,7 +21,7 @@ export function getInitials(name: string): string {
     }
   }
 
-  return result.length ? result : (parts[0]?.[0]?.toUpperCase() as string);
+  return result.toUpperCase();
 }
 
 export function getHexColor(value: string): string {

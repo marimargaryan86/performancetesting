@@ -30,8 +30,8 @@
   import CopyIcon from "components/icons/copy-icon.svelte";
   import EntityAvatar from "components/ui/entity-avatar.svelte";
   import SortButton from "components/ui/sort-button.svelte";
-  import StatusBadge from "components/ui/status-badge.svelte";
-  import { amountAndCode } from "formatting/currency";
+  import TransactionStatusBadge from "components/ui/transaction-status-badge.svelte";
+  import { formatAmountAndCode } from "formatting/currency";
   import { yymmdd } from "formatting/date-time";
   import type { DirectionY } from "models/spatial";
   import type { TransactionModel, TransactionStatus } from "models/transaction";
@@ -57,7 +57,7 @@
   <title>Transactions · Activity · Pay · Junction Hub</title>
 </svelte:head>
 
-<table>
+<table class="table-1">
   <thead>
     <tr>
       <th>
@@ -158,20 +158,20 @@
           <EntityAvatar name={transaction.payer} />
           <span>{transaction.payer}</span>
         </td>
-        <td>{amountAndCode(transaction.theyOwe)}</td>
+        <td>{formatAmountAndCode(transaction.theyOwe)}</td>
         <td class="with-avatar">
           <EntityAvatar name={transaction.beneficiery} />
           <span>{transaction.beneficiery}</span>
         </td>
-        <td>{amountAndCode(transaction.weOwe)}</td>
-        <td>{amountAndCode(transaction.profit)}</td>
+        <td>{formatAmountAndCode(transaction.weOwe)}</td>
+        <td>{formatAmountAndCode(transaction.profit)}</td>
         <td>
           <button class="copy" on:click={createCopyFunc(transaction.reference)}>
             <span class="ellipsis">{transaction.reference}</span>
             <CopyIcon color="var(--color-primary-500)" />
           </button>
         </td>
-        <td><StatusBadge value={transaction.status} /></td>
+        <td><TransactionStatusBadge value={transaction.status} /></td>
       </tr>
     {/each}
   </tbody>
@@ -183,78 +183,13 @@
     white-space: nowrap;
   }
 
-  thead {
-    position: sticky;
-    top: 0;
-    left: 0;
-    width: 100%;
-  }
-
-  th {
-    padding: 14px 8px 0;
-    text-align: left;
-    background-color: var(--color-generic-white);
-  }
-
-  th > :global(.sort-button) {
-    width: 100%;
-  }
-
-  th::after {
-    display: block;
-    margin: 14px -8px 0;
-    border-bottom: var(--color-neutral-200) 1px solid;
-    content: "";
-  }
-
-  th:first-child::after {
-    margin-left: -8px;
-  }
-
-  th:last-child::after {
-    margin-right: -8px;
-  }
-
-  tbody {
-    color: var(--color-neutral-800);
-    font-weight: 400;
-    font-size: 12px;
-    font-family: Poppins, Arial, Helvetica, sans-serif;
-    font-style: normal;
-    line-height: 16px;
-  }
-
   .ellipsis {
     max-width: 80px;
-  }
-
-  td {
-    padding: 12px 8px;
   }
 
   td > :global(.status-badge) {
     width: 100%;
     vertical-align: middle;
-  }
-
-  tr > *:first-child {
-    padding-left: 16px;
-  }
-
-  tr > *:last-child {
-    padding-right: 16px;
-  }
-
-  td:first-child {
-    border-radius: 8px 0 0 8px;
-  }
-
-  td:last-child {
-    border-radius: 0 8px 8px 0;
-  }
-
-  tr:nth-child(even) > td {
-    background-color: rgb(0 0 0 / 0.03);
   }
 
   .with-avatar {

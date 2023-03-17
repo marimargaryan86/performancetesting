@@ -1,6 +1,6 @@
 <script lang="ts">
   import ChevronIcon from "components/icons/chevron-icon.svelte";
-  import CloseIcon from "components/icons/close-icon.svelte";
+  import RemoveIcon from "components/icons/remove-icon.svelte";
   import { clickOutside } from "directives/click-outside";
   import { scale } from "svelte/transition";
   import { getRandomId } from "utils/random";
@@ -46,7 +46,7 @@
 
     {#if value?.length && !expanded}
       <button type="button" on:click|stopPropagation={clearValue} class="clear">
-        <CloseIcon color="var(--color-neutral-800)" />
+        <RemoveIcon color="var(--color-neutral-800)" />
       </button>
     {:else}
       <ChevronIcon direction={expanded ? "up" : "down"} color="var(--color-neutral-900)" />

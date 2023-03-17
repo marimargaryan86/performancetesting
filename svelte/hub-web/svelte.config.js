@@ -19,6 +19,7 @@ const config = {
       utils: "src/utils",
       formatting: "src/formatting",
       directives: "src/directives",
+      mock: "src/mock",
     },
   },
 };

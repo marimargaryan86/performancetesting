@@ -1,22 +1,23 @@
 <script lang="ts">
   export let type: "button" | "reset" | "submit" = "button";
-  export let style: "fill" | "text" | "outline" = "fill";
+  export let variant: "fill" | "text" | "outline" = "fill";
   export let size: "small" | "medium" | "large" = "large";
-  export let color: "primary" | "secondary" = "primary";
+  export let color: "primary" | "secondary" | "positive-gradient" = "primary";
   export let disabled = false;
 </script>
 
 <button
   {type}
   on:click
-  class:fill={style === "fill"}
-  class:text={style === "text"}
-  class:outline={style === "outline"}
+  class:fill={variant === "fill"}
+  class:text={variant === "text"}
+  class:outline={variant === "outline"}
   class:small={size === "small"}
   class:medium={size === "medium"}
   class:large={size === "large"}
   class:primary={color === "primary"}
   class:secondary={color === "secondary"}
+  class:positive-gradient={color === "positive-gradient"}
   {disabled}
 >
   <slot />
@@ -35,8 +36,15 @@
     transition: opacity 150ms ease;
   }
 
-  .fill {
-    border: 1px solid transparent;
+  button:disabled {
+    cursor: not-allowed;
+    opacity: 0.2;
+  }
+
+  .medium {
+    padding: 12px;
+    font-weight: 500;
+    line-height: 16px;
   }
 
   .large {
@@ -46,13 +54,22 @@
     line-height: 24px;
   }
 
-  .primary {
+  .fill.primary {
     color: var(--color-generic-white);
     background-color: var(--color-primary-500);
   }
 
-  .primary:disabled {
-    cursor: not-allowed;
-    opacity: 0.2;
+  .outline.primary {
+    color: var(--color-primary-600);
+    border: var(--color-primary-600) 1px solid;
+  }
+
+  .positive-gradient {
+    color: var(--color-generic-white);
+    background-image: var(--color-positive-gradient);
+  }
+
+  .outline {
+    background-color: transparent;
   }
 </style>

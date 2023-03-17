@@ -1,17 +1,15 @@
 <script lang="ts">
-  import { formatTransactionStatus } from "formatting/transaction";
-  import type { TransactionStatus } from "models/transaction";
-
-  export let value: TransactionStatus;
+  export let value: string;
+  export let variant: number;
 </script>
 
 <span
   class="status-badge"
-  class:paid={value === "paid"}
-  class:cancelled={value === "cancelled"}
-  class:pending={value === "pending"}
+  class:ok={variant === 0}
+  class:warn={variant === 1}
+  class:error={variant === 2}
 >
-  {formatTransactionStatus(value)}
+  {value}
 </span>
 
 <style>
@@ -31,7 +29,7 @@
     border-radius: 8px;
   }
 
-  .paid {
+  .ok {
     background-image: radial-gradient(
       157.78% 1163.56% at -3.9% -43.33%,
       #4ccaab 0%,
@@ -41,11 +39,11 @@
     );
   }
 
-  .cancelled {
+  .error {
     background-image: linear-gradient(121.87deg, #ff7777 -10.54%, #a2416b 98.97%);
   }
 
-  .pending {
+  .warn {
     background-image: linear-gradient(
       131.08deg,
       #f5dd00 -60.91%,

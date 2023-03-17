@@ -8,8 +8,17 @@
   --color-neutral-700: #66686b;
   --color-neutral-800: #363938;
   --color-neutral-900: #171717;
+  --color-primary-100: #edf8f5;
   --color-primary-500: #4bb69c;
+  --color-primary-600: #41a089;
   --color-generic-black: #000000;
   --color-generic-white: #ffffff;
   --color-destructive-500: #ef4444;
+  --color-positive-gradient: radial-gradient(
+    157.78% 1163.56% at -3.9% -43.33%,
+    #4ccaab 0%,
+    #2c9e83 34.38%,
+    #3f8574 68.75%,
+    #21735f 100%
+  );
 }

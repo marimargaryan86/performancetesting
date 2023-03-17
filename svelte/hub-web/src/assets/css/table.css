@@ -1,0 +1,64 @@
+table.table-1 > thead {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+table.table-1 th {
+  padding: 14px 8px 0;
+  text-align: left;
+  background-color: var(--color-generic-white);
+}
+
+table.table-1 th > :global(.sort-button) {
+  width: 100%;
+}
+
+table.table-1 th::after {
+  display: block;
+  margin: 14px -8px 0;
+  border-bottom: var(--color-neutral-200) 1px solid;
+  content: "";
+}
+
+table.table-1 th:first-child::after {
+  margin-left: -8px;
+}
+
+table.table-1 th:last-child::after {
+  margin-right: -8px;
+}
+
+table.table-1 > tbody {
+  color: var(--color-neutral-800);
+  font-weight: 400;
+  font-size: 12px;
+  font-family: Poppins, Arial, Helvetica, sans-serif;
+  font-style: normal;
+  line-height: 16px;
+}
+
+table.table-1 td {
+  padding: 12px 8px;
+}
+
+table.table-1 tr > *:first-child {
+  padding-left: 16px;
+}
+
+table.table-1 tr > *:last-child {
+  padding-right: 16px;
+}
+
+table.table-1 td:first-child {
+  border-radius: 8px 0 0 8px;
+}
+
+table.table-1 td:last-child {
+  border-radius: 0 8px 8px 0;
+}
+
+table.table-1 tr:nth-child(even) > td {
+  background-color: rgb(0 0 0 / 0.03);
+}

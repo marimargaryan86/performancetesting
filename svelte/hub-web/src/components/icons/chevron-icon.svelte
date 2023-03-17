@@ -12,11 +12,11 @@
 <script lang="ts">
   export let color = "var(--color-generic-black)";
   export let direction: Direction = "right";
+  export let size = "16px";
 </script>
 
 <svg
-  width="16"
-  height="16"
+  style:--size={size}
   viewBox="0 0 16 16"
   fill="none"
   xmlns="http://www.w3.org/2000/svg"
@@ -34,6 +34,8 @@
 
 <style>
   .chevron-icon {
+    width: var(--size);
+    height: var(--size);
     transform: rotateZ(var(--rotation));
     transition: transform 150ms ease;
   }

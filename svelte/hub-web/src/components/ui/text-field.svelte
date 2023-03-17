@@ -14,6 +14,8 @@
   export let value: TValue | undefined = undefined;
   export let error: string | boolean = false;
 
+  let inputRef: HTMLInputElement;
+
   const dispatch = createEventDispatcher<{ input: HTMLInputElement }>();
 
   function onInput(event: InputEvent): void {
@@ -24,6 +26,10 @@
     value = event.currentTarget.value as TValue;
 
     dispatch("input", event.currentTarget);
+  }
+
+  export function focus(): void {
+    inputRef.focus();
   }
 
   $: displayValue = value ?? "";
@@ -41,7 +47,7 @@
   >
     <slot name="icon-before" />
 
-    <input {id} {type} value={displayValue} on:input={onInput} {placeholder} />
+    <input {id} {type} value={displayValue} on:input={onInput} {placeholder} bind:this={inputRef} />
 
     <slot name="icon-after" />
   </div>
