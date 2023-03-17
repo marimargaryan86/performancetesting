@@ -13,3 +13,13 @@ class ZonedDatetimeStr(pydantic.ConstrainedStr):
             "01][0-9]):[0-5][0-9])$",
         ],
     )
+
+
+class Longitude(pydantic.ConstrainedFloat):
+    ge = -180.0
+    le = 180.0
+
+
+class Latitude(pydantic.ConstrainedFloat):
+    ge = -90.0
+    le = 90.0
