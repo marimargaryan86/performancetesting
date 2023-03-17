@@ -13,6 +13,7 @@ async def test_list_and_view_endpoints(
     client: httpx.AsyncClient,
     url: str,
     expected_ids: Sequence[str],
+    invalid_id: str = fixtures.NOT_FOUND,
 ) -> None:
     url = "{0}?page[limit]=1".format(url)
     resources: list[dict[str, Any]] = []
@@ -36,12 +37,13 @@ async def test_list_and_view_endpoints(
 
     assert set(expected_ids) == {resource["id"] for resource in resources}
 
-    await _test_view_endpoint(client, resources)
+    await _test_view_endpoint(client, resources, invalid_id)
 
 
 async def _test_view_endpoint(
     client: httpx.AsyncClient,
     resources: Sequence[Mapping[str, Any]],
+    invalid_id: str = fixtures.NOT_FOUND,
 ) -> None:
     current_link = None
     for resource in resources:
@@ -51,13 +53,10 @@ async def _test_view_endpoint(
     if not current_link:
         return
     response = await client.get(
-        "{0}/{1}".format(current_link.rsplit("/", maxsplit=1)[0], fixtures.NOT_FOUND),
+        "{0}/{1}".format(current_link.rsplit("/", maxsplit=1)[0], invalid_id),
     )
 
-    assert response.status_code in (  # noqa: WPS510
-        status.HTTP_404_NOT_FOUND,
-        status.HTTP_400_BAD_REQUEST,
-    )
+    assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 async def test_resource_is_fetchable(

@@ -16,4 +16,5 @@ class TestCurrencies(object):
             client=client,
             url="/currencies",
             expected_ids=[currency.code for currency in available_currencies],
+            invalid_id="XAU",
         )
