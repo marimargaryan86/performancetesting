@@ -3,6 +3,7 @@ from starlette import endpoints, requests, status
 
 from snowfall.project.pay.service.pay_api import repositories, resources
 from snowfall.project.pay.service.quotations import quotations
+from snowfall.project.pay.service.quotations.v1alpha.models_pb2 import Quotation
 from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Transaction
 from snowfall.stdlib import money, string
 from snowfall.stdlib.integration.starlette import (
@@ -19,7 +20,7 @@ from snowfall.vendor.currency_cloud.models import conversion
 class Transactions(endpoints.HTTPEndpoint):
     _default_page_size = 20
 
-    async def post(  # noqa: WPS210, WPS211
+    async def post(  # noqa: WPS210, WPS211, WPS217
         self,
         request: requests.Request,
         payment_client: PaymentClient = lagom.injectable,
@@ -29,7 +30,7 @@ class Transactions(endpoints.HTTPEndpoint):
     ) -> models.JsonApiResponse:
         body = await request_helpers.flatten_request(request)
         quot = await quotation_repository.find_by_id(body["quotation"])
-        if quot:
+        if quot and quot.status == Quotation.Status.STATUS_QUOTED:
             transaction_id = string.uuid()
             are_currencies_same = (
                 quot.converted_beneficiary_amount.currency_code
@@ -81,7 +82,10 @@ class Transactions(endpoints.HTTPEndpoint):
                     beneficiary_id=quot.beneficiary_id,
                 ),
             )
-
+            await quotation_repository.update_status(
+                quot.id,
+                Quotation.Status.STATUS_CONFIRMED,
+            )
             return await messages.create_response(
                 body=messages.models.Body(
                     data=resources.Transaction.from_proto(

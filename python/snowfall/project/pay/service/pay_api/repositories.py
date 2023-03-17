@@ -45,6 +45,9 @@ class TransactionRepository(
 ):
     _proto = Transaction
     _default_page_size = 20
+    _indexes = [
+        pymongo.IndexModel("external_reference_id", background=True, unique=True),
+    ]
 
     async def find(
         self,

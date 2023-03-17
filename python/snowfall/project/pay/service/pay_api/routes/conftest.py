@@ -29,6 +29,22 @@ async def quote_is_less_than_the_limit(
         id=string.uuid(),
         converted_beneficiary_amount=usd.protobuf(),
         beneficiary_amount=gbp.protobuf(),
+        status=Quotation.Status.STATUS_QUOTED,
+    )
+    return await quotations_repository.insert(quote)
+
+
+@pytest.fixture()
+async def booked_quote(
+    quotations_repository: QuotationsRepository,
+) -> Quotation:
+    usd = money.Money(1, money.Currency("USD"))
+    gbp = money.Money(1, money.Currency("GBP"))
+    quote = Quotation(
+        id=string.uuid(),
+        converted_beneficiary_amount=usd.protobuf(),
+        beneficiary_amount=gbp.protobuf(),
+        status=Quotation.Status.STATUS_CONFIRMED,
     )
     return await quotations_repository.insert(quote)
 

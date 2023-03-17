@@ -12,3 +12,18 @@ class QuotationsRepository(
     _proto = models_pb2.Quotation
 
     _indexes = [pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True)]
+
+    async def update_status(
+        self,
+        quotation_id: str,
+        status: int,
+    ) -> models_pb2.Quotation:
+        return await self._execute(
+            self._collection.update_one,
+            filter={"_id": quotation_id},
+            update={
+                "$set": {
+                    "status": status,
+                },
+            },
+        )
