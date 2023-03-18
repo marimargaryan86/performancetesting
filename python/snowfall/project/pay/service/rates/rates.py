@@ -48,28 +48,6 @@ class RatesRepository(  # noqa: WPS215
         )
 
 
-class MonitoredRatesRepository(  # noqa: WPS215
-    mixins.AllMixin[models_pb2.MonitoredRate],
-    mixins.FindByIdMixin[models_pb2.MonitoredRate],
-    mixins.InsertMixin[models_pb2.MonitoredRate],
-    repository.ProtoRepository[models_pb2.MonitoredRate],
-):
-    _proto = models_pb2.MonitoredRate
-
-    async def find_enabled_rates(self) -> resultset.ResultSet[models_pb2.MonitoredRate]:
-        return await self._find_with_cursor(
-            "",
-            filter_={"enabled": True},
-        )
-
-    async def update_fetched_date(self) -> None:
-        await self._execute(
-            self._collection.update_many,
-            {"enabled": True},
-            {"$set": {"fetched_at": datetime.datetime.now()}},
-        )
-
-
 class BackUpRatesRepository(
     mixins.AllMixin[models_pb2.BackUpRate],
     mixins.InsertManyMixin[models_pb2.BackUpRate],

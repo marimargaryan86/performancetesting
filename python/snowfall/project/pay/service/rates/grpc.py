@@ -9,10 +9,8 @@ class RatesService(service.Service, rates_pb2_grpc.RatesServiceServicer):
     def __init__(
         self,
         rates_repository: rates.RatesRepository,
-        monitored_rates: rates.MonitoredRatesRepository,
     ):
         self._rates = rates_repository
-        self._monitored_rates = monitored_rates
 
     def get_name(self) -> str:
         return rates_pb2.DESCRIPTOR.services_by_name["RatesService"].full_name
@@ -30,14 +28,3 @@ class RatesService(service.Service, rates_pb2_grpc.RatesServiceServicer):
         )
 
         return rates_pb2.InsertResponse(rates=inserted_rates)
-
-    async def Monitor(  # type: ignore[override] # noqa: N802
-        self,
-        request: rates_pb2.MonitorRequest,
-        context: grpc.aio.ServicerContext,
-    ) -> rates_pb2.MonitorResponse:
-        monitored_rate = await self._monitored_rates.insert(
-            request.monitored_rate,
-        )
-
-        return rates_pb2.MonitorResponse(monitored_rate=monitored_rate)

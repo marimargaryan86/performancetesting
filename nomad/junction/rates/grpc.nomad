@@ -75,9 +75,6 @@ job "rates-grpc" {
         data        = <<EOH
 MONGO_DSN={{range $index, $service := service (printf "mongodb-%s" (env "NOMAD_NAMESPACE"))}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 {{ with secret "kv/data/${var.environment}/rates" }}
-BOUND_EMAIL={{ .Data.data.bound_email }}
-BOUND_BASE_URL={{ .Data.data.bound_base_url }}
-BOUND_PASSWORD={{ .Data.data.bound_password }}
 {{ end }}
 EOH
         destination = "services.env"

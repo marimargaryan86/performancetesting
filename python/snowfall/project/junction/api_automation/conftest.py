@@ -16,7 +16,6 @@ from snowfall.project.junction.api_automation.test_functions.mobile_client impor
     MobileApiClient,
 )
 from snowfall.vendor.apilayer.client import APILayer
-from snowfall.vendor.bound.client import Bound
 from snowfall.vendor.junction.client import JunctionClient
 from snowfall.vendor.pay.client import PayAdminClient, PayAuthentication, PayClient
 
@@ -425,26 +424,6 @@ def api_layer_client(
     return APILayer(
         base_url=base_url,
         api_key=api_key,
-        timeout=client_timeout,
-    )
-
-
-@pytest.fixture(scope="function")
-def bound_client(
-    host: str,
-    api_token: str,
-) -> Bound:
-    base_url = "{0}{1}".format(
-        HTTPS_PREFIX,
-        get_variable_value(host, api_token, "bound_pay_api_host"),
-    )
-    email = get_variable_value(host, api_token, "bound_pay_api_email")
-    password = get_variable_value(host, api_token, "bound_pay_api_password")
-    client_timeout = 20.0
-    return Bound(
-        base_url=base_url,
-        email=email,
-        password=password,
         timeout=client_timeout,
     )
 
