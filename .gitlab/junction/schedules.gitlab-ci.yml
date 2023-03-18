@@ -4,7 +4,7 @@ stages:
 services:
   - name: docker:dind
     alias: dockerdaemon
-image: 'git.snowfall.se:4567/junction/junction/pants:main'
+image: "git.snowfall.se:4567/junction/junction/pants:main"
 variables:
   ARTIFACT_COMPRESSION_LEVEL: fastest
   CACHE_COMPRESSION_LEVEL: fastest
@@ -44,9 +44,22 @@ feeds:
   tags:
     - autoscaler-XL
 
+directferries:
+  stage: download
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - data-input/
+  script:
+    - docker login git.snowfall.se:4567 -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}"
+    - docker pull git.snowfall.se:4567/junction/junction/service/gtfs:latest
+    - docker run -u "${UID}" --rm -v "$(pwd)/:/data" -e CLIENT_ID="${DF_CLIENT_ID}" -e CLIENT_SECRET="${DF_CLIENT_SECRET}" git.snowfall.se:4567/junction/junction/service/direct_ferries:latest export --api-url 'https://sandbox-api.test.directferriesconnect.com' --affiliate-api-url 'https://tf-test-affiliate-api-sandbox.auth.eu-west-1.amazoncognito.com' --partner-code 'F5152' --output-path /data/data-input/
+  tags:
+    - autoscaler-XL
+
 import:
   stage: export
-  needs: ["oag", "feeds"]
+  needs: ["directferries", "oag", "feeds"]
   timeout: 6h
   script:
   - docker login git.snowfall.se:4567 -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}"
