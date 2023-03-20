@@ -376,6 +376,60 @@
             }
           }
         }
+      },
+      "get": {
+        "summary": "List Companies",
+        "tags": [
+          "companies"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "items": {
+                            "$ref": "#/components/schemas/CompanyCreatable"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "operationId": "get-companies",
+        "description": "Get companies"
       }
     },
     "/companies/{companyId}": {
