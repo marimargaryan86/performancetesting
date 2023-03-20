@@ -218,7 +218,7 @@ class RcodeTypeClient(base.BenerailBaseClient):
         return rcodes_response.TypesResponse(**response.json())
 
 
-class Place(base.BenerailBaseClient):
+class PlaceClient(base.BenerailBaseClient):
     async def get_places(
         self,
     ) -> rcodes_response.PlacesResponse:

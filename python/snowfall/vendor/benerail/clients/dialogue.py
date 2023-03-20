@@ -135,7 +135,7 @@ class TripOfferFilterClient(base.BenerailBaseClient):
                     dialogue_prefix=_BASE_PATH,
                     dialogue_id=dialogue_id,
                 ),
-                headers={**self._auth_headers},
+                headers=self._auth_headers,
             ),
         )
 

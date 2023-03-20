@@ -1,10 +1,16 @@
 import httpx
 
 from snowfall.vendor.benerail.clients import dialogue as dialog_client
-from snowfall.vendor.benerail.clients import rcode
+from snowfall.vendor.benerail.clients import (
+    price_calendar,
+    products,
+    rcode,
+    trip_offers,
+    trips,
+)
 
 
-class BenerailClient(object):
+class BenerailClient(object):  # noqa: WPS214
     def __init__(
         self,
         subscription_key: str,
@@ -39,7 +45,37 @@ class BenerailClient(object):
             http_client,
         )
 
-        self._place_client = rcode.Place(
+        self._place_client = rcode.PlaceClient(
+            subscription_key,
+            base_url,
+            http_client,
+        )
+
+        self._price_calendar_client = price_calendar.PriceCalendarClient(
+            subscription_key,
+            base_url,
+            http_client,
+        )
+
+        self._products_client = products.ProductsClient(
+            subscription_key,
+            base_url,
+            http_client,
+        )
+
+        self._trips_client = trips.TripsClient(
+            subscription_key,
+            base_url,
+            http_client,
+        )
+
+        self._trip_offers_client = trip_offers.TripOffersClient(
+            subscription_key,
+            base_url,
+            http_client,
+        )
+
+        self._offers_client = trip_offers.OffersClient(
             subscription_key,
             base_url,
             http_client,
@@ -66,5 +102,25 @@ class BenerailClient(object):
         return self._rcode_type_client
 
     @property
-    def place(self) -> rcode.Place:
+    def place(self) -> rcode.PlaceClient:
         return self._place_client
+
+    @property
+    def price_calendar_client(self) -> price_calendar.PriceCalendarClient:
+        return self._price_calendar_client
+
+    @property
+    def products_client(self) -> products.ProductsClient:
+        return self._products_client
+
+    @property
+    def trips_client(self) -> trips.TripsClient:
+        return self._trips_client
+
+    @property
+    def trip_offers_client(self) -> trip_offers.TripOffersClient:
+        return self._trip_offers_client
+
+    @property
+    def offers_client(self) -> trip_offers.OffersClient:
+        return self._offers_client
