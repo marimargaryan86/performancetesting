@@ -1,12 +1,16 @@
 {
   "development": {
     "variables": {
-      "count": 2
+      "count": 2,
+      "payer_company_id": "25a2ea74-0a5d-4991-9ce0-4996be2bcceb",
+      "payer_currency_code": "SEK"
     }
   },
   "production": {
     "variables": {
-      "count": 2
+      "count": 2,
+      "payer_company_id": "6b2a715b-985a-4fa2-8898-01f5bef44325",
+      "payer_currency_code": "SEK"
     }
   }
 }

@@ -44,12 +44,16 @@ class _ImportSettings(service.Settings):
     default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
     mongo_dsn: Sequence[pydantic.AnyUrl]
     redis_dsn: Sequence[pydantic.AnyUrl]
+    payer_company_id: str
+    payer_currency_code: str
 
 
 class _GatherPriceQuoteSettings(service.Settings):
     amqp_dsn: pydantic.AnyUrl
     default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
     mongo_dsn: Sequence[pydantic.AnyUrl]
+    payer_company_id: str
+    payer_currency_code: str
 
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:

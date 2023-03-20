@@ -26,6 +26,14 @@ variable "count" {
   type = number
 }
 
+variable "payer_company_id" {
+  type = string
+}
+
+variable "payer_currency_code" {
+  type = string
+}
+
 job "offers-import" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -106,9 +114,11 @@ EOH
       }
 
       env {
-        ENV_NAME        = "${var.environment}"
-        SENTRY_DSN      = "https://7c600c1c458d403e8047091398239f20@sentry.snowfall.se/27"
-        PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
+        ENV_NAME            = "${var.environment}"
+        SENTRY_DSN          = "https://7c600c1c458d403e8047091398239f20@sentry.snowfall.se/27"
+        PROMETHEUS_PORT     = "${NOMAD_PORT_prometheus}"
+        PAYER_COMPANY_ID    = "${var.payer_company_id}"
+        PAYER_CURRENCY_CODE = "${var.payer_currency_code}"
       }
     }
   }
