@@ -387,7 +387,9 @@ def get_variable_value(
     api_token: str,
     variable_name: str,
 ) -> str:
-    client = hvac.Client(url=host, token=api_token)
+    vusername, vpassword = api_token.split("+")
+    client = hvac.Client(url=host)
+    client.auth.userpass.login(username=vusername, password=vpassword)
     is_authenticated = client.is_authenticated()
     returned_data = {}
     if is_authenticated:
