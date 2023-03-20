@@ -3,7 +3,7 @@ from typing import Callable
 
 from starlette import applications
 
-from snowfall.project.junction.adapter import errors, locations, places
+from snowfall.project.junction.go.adapter import errors, locations, places
 from snowfall.project.junction.service.admin_api import bootstrap, router
 from snowfall.project.junction.service.places.v1alpha import places_pb2_grpc
 from snowfall.stdlib import service

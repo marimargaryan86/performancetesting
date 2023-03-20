@@ -2,7 +2,7 @@ from typing import Sequence
 
 import lagom
 
-from snowfall.project.junction.adapter import (  # noqa: WPS235
+from snowfall.project.junction.go.adapter import (  # noqa: WPS235
     legs,
     locations,
     offer_searches,

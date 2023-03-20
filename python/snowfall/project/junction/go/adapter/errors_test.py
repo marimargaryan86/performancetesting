@@ -4,7 +4,7 @@ import grpc
 import pytest
 from grpc_status import rpc_status
 
-from snowfall.project.junction.adapter import errors
+from snowfall.project.junction.go.adapter import errors
 from snowfall.stdlib.transport.grpc import rich_status
 
 

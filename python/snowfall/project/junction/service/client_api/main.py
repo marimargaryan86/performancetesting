@@ -5,7 +5,7 @@ from typing import Callable
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
-from snowfall.project.junction.adapter import (
+from snowfall.project.junction.go.adapter import (
     errors,
     legs,
     locations,

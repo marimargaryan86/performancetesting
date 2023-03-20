@@ -10,7 +10,7 @@ from motor import core, motor_asyncio
 from redis import asyncio as aioredis
 
 from snowfall import fixtures
-from snowfall.project.junction.adapter import (
+from snowfall.project.junction.go.adapter import (
     legs,
     locations,
     offer_searches,

@@ -5,7 +5,7 @@ from typing import Sequence
 import pydantic
 from motor import motor_asyncio
 
-from snowfall.project.junction.adapter import passenger_name_records
+from snowfall.project.junction.go.adapter import passenger_name_records
 from snowfall.project.junction.service.orders import importer, orders
 from snowfall.project.junction.service.orders.amqp import OrderProducer
 from snowfall.project.junction.service.orders.grpc import OrderService

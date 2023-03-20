@@ -7,7 +7,7 @@ from typing import Mapping, Sequence
 import structlog
 import timezonefinder
 
-from snowfall.project.junction.adapter import legs, offer_searches
+from snowfall.project.junction.go.adapter import legs, offer_searches
 from snowfall.project.junction.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )

@@ -3,7 +3,13 @@ from typing import Sequence
 
 from starlette import requests
 
-from snowfall.project.junction.adapter import legs, offers, orders, schedules, segments
+from snowfall.project.junction.go.adapter import (
+    legs,
+    offers,
+    orders,
+    schedules,
+    segments,
+)
 from snowfall.project.junction.service.client_api import resources
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import includes

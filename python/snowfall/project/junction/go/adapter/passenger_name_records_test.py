@@ -1,6 +1,6 @@
 from unittest import mock
 
-from snowfall.project.junction.adapter import (
+from snowfall.project.junction.go.adapter import (
     passenger_name_records as passenger_name_records_adapter,
 )
 from snowfall.project.junction.service.passenger_name_records.v1alpha import (

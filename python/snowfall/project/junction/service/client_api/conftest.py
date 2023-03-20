@@ -10,7 +10,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
-from snowfall.project.junction.adapter import (
+from snowfall.project.junction.go.adapter import (
     errors,
     legs,
     locations,

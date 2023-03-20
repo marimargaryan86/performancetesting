@@ -7,7 +7,7 @@ import pytest
 from starlette import status
 
 from snowfall import fixtures
-from snowfall.project.junction.adapter import trip_searches
+from snowfall.project.junction.go.adapter import trip_searches
 
 
 class TestTrips(object):

@@ -4,7 +4,7 @@ from typing import Hashable, Mapping
 
 import asyncstdlib
 
-from snowfall.project.junction.adapter import errors
+from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay.adapter import currencies
 from snowfall.stdlib.money import Currency
 

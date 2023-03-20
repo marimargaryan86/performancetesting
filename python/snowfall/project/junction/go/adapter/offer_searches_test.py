@@ -1,7 +1,7 @@
 import pytest
 
 from snowfall import fixtures
-from snowfall.project.junction.adapter import errors, offer_searches
+from snowfall.project.junction.go.adapter import errors, offer_searches
 from snowfall.project.junction.service.offers.v1alpha import models_pb2
 
 

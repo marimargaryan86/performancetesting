@@ -1,7 +1,7 @@
 import lagom
 from starlette import endpoints, requests, responses, status
 
-from snowfall.project.adapter import authentication
+from snowfall.adapter import authentication
 from snowfall.stdlib.integration.starlette import models, request_helpers
 
 _DATA_KEY = "data"

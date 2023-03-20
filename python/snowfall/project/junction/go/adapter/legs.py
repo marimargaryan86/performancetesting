@@ -3,7 +3,7 @@ from __future__ import annotations
 import abc
 from typing import Sequence
 
-from snowfall.project.junction.adapter import errors
+from snowfall.project.junction.go.adapter import errors
 from snowfall.project.junction.service.schedules.v1alpha import (
     schedules_pb2,
     schedules_pb2_grpc,

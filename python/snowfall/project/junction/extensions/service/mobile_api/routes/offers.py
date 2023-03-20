@@ -6,7 +6,6 @@ import re
 import lagom
 from starlette import endpoints, requests, responses, status
 
-from snowfall.project.junction.adapter import errors
 from snowfall.project.junction.extensions.service.mobile_api import (
     currencies,
     repository,
@@ -15,6 +14,7 @@ from snowfall.project.junction.extensions.service.mobile_api import (
 from snowfall.project.junction.extensions.service.mobile_api.models.cached_rate import (
     CachedRate,
 )
+from snowfall.project.junction.go.adapter import errors
 from snowfall.stdlib import money
 from snowfall.stdlib.integration.starlette import (
     models,

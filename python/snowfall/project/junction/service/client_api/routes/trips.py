@@ -5,7 +5,7 @@ import lagom
 from dateutil import parser
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.project.junction.adapter import (
+from snowfall.project.junction.go.adapter import (
     errors,
     locations,
     places,

@@ -4,7 +4,7 @@ import currencycloud
 import lagom
 from pydantic import AnyUrl
 
-from snowfall.project.adapter import authentication
+from snowfall.adapter import authentication
 from snowfall.project.pay.adapter import currencies
 from snowfall.project.pay.service.accounts import accounts
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository

@@ -13,9 +13,9 @@ from motor import motor_asyncio
 from starlette import applications
 from starlette.middleware import Middleware
 
-from snowfall.project.adapter import authentication
-from snowfall.project.adapter import authentication as auth
-from snowfall.project.junction.adapter import errors
+from snowfall.adapter import authentication
+from snowfall.adapter import authentication as auth
+from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay.adapter import currencies
 from snowfall.project.pay.service.accounts import accounts
 from snowfall.project.pay.service.pay_api import bootstrap

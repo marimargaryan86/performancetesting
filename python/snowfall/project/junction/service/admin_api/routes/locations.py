@@ -1,7 +1,7 @@
 import lagom
 from starlette import endpoints, requests, responses
 
-from snowfall.project.junction.adapter import locations
+from snowfall.project.junction.go.adapter import locations
 from snowfall.project.junction.service.admin_api import resources
 from snowfall.stdlib.integration.starlette import models, pagination_helpers
 

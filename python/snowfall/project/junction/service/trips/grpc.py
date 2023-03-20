@@ -2,7 +2,7 @@ from typing import Sequence
 
 from grpc import StatusCode, aio
 
-from snowfall.project.junction.adapter import offer_searches, offers
+from snowfall.project.junction.go.adapter import offer_searches, offers
 from snowfall.project.junction.service.trips import trips
 from snowfall.project.junction.service.trips.v1alpha import (
     amqp_pb2,

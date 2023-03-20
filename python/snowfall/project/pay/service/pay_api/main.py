@@ -9,8 +9,8 @@ from redis import asyncio as aioredis
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
-from snowfall.project.adapter import authentication as auth
-from snowfall.project.junction.adapter import errors
+from snowfall.adapter import authentication as auth
+from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay.adapter import currencies
 from snowfall.project.pay.service.accounts import accounts
 from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc

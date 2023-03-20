@@ -6,7 +6,7 @@ import pytest
 from starlette import applications
 from starlette.middleware import Middleware
 
-from snowfall.project.junction.adapter import errors, locations, places
+from snowfall.project.junction.go.adapter import errors, locations, places
 from snowfall.project.junction.service.admin_api import bootstrap, router
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import cursor, filesystem

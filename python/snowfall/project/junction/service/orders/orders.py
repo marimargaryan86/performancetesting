@@ -5,7 +5,7 @@ from typing import Any, Sequence
 
 import pymongo
 
-from snowfall.project.junction.adapter import (
+from snowfall.project.junction.go.adapter import (
     passenger_name_records as passenger_name_records_adapter,
 )
 from snowfall.project.junction.service.orders.v1alpha import models_pb2

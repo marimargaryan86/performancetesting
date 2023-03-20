@@ -1,7 +1,7 @@
 import pytest
 
 from snowfall import fixtures
-from snowfall.project.junction.adapter import errors, trip_searches
+from snowfall.project.junction.go.adapter import errors, trip_searches
 
 
 async def test_trip_search_can_be_saved(

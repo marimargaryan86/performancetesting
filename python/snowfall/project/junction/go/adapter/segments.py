@@ -3,7 +3,7 @@ from __future__ import annotations
 import abc
 from typing import Sequence
 
-from snowfall.project.junction.adapter import errors
+from snowfall.project.junction.go.adapter import errors
 from snowfall.project.junction.service.trips.v1alpha import trips_pb2, trips_pb2_grpc
 from snowfall.stdlib import sequence
 from snowfall.stdlib.v1alpha import models_pb2

@@ -6,7 +6,7 @@ from typing import Sequence
 
 from grpc import aio
 
-from snowfall.project.junction.adapter import errors
+from snowfall.project.junction.go.adapter import errors
 from snowfall.project.junction.service.orders.v1alpha import (
     models_pb2,
     orders_pb2,

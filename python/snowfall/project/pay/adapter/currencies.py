@@ -3,7 +3,7 @@ from __future__ import annotations
 import abc
 from typing import Mapping
 
-from snowfall.project.junction.adapter import errors
+from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay.service.currencies.v1alpha import (
     currencies_pb2,
     currencies_pb2_grpc,

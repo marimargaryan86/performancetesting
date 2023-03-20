@@ -4,7 +4,7 @@ import grpc
 import pytest
 
 from snowfall import fixtures
-from snowfall.project.junction.adapter import errors, locations
+from snowfall.project.junction.go.adapter import errors, locations
 from snowfall.project.junction.service.places.v1alpha import (
     models_pb2,
     places_pb2,

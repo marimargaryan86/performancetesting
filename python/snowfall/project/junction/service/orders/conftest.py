@@ -2,7 +2,7 @@ import mongomock_motor
 import pytest
 from motor import motor_asyncio
 
-from snowfall.project.junction.adapter import passenger_name_records
+from snowfall.project.junction.go.adapter import passenger_name_records
 from snowfall.project.junction.service.orders import orders
 
 

@@ -1,7 +1,7 @@
 import lagom
 from starlette import endpoints, requests, responses
 
-from snowfall.project.junction.adapter import schedules, segments
+from snowfall.project.junction.go.adapter import schedules, segments
 from snowfall.project.junction.service.client_api import resources
 from snowfall.stdlib.integration.starlette import messages, models
 

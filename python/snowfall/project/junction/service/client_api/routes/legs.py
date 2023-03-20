@@ -1,10 +1,10 @@
 import lagom
 from starlette import endpoints, requests, responses, status
 
-from snowfall.project.junction.adapter import legs as legs_adapter
-from snowfall.project.junction.adapter import segments as segments_adapter
-from snowfall.project.junction.adapter import trip_searches as trip_searches_adapter
-from snowfall.project.junction.adapter import trips as trips_adapter
+from snowfall.project.junction.go.adapter import legs as legs_adapter
+from snowfall.project.junction.go.adapter import segments as segments_adapter
+from snowfall.project.junction.go.adapter import trip_searches as trip_searches_adapter
+from snowfall.project.junction.go.adapter import trips as trips_adapter
 from snowfall.project.junction.service.client_api import resources
 from snowfall.stdlib.integration.starlette import messages, models, pagination_helpers
 from snowfall.stdlib.v1alpha import models_pb2

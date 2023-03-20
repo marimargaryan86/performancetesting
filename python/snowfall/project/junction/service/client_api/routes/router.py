@@ -2,7 +2,7 @@ import lagom
 from lagom.integrations import starlette
 from starlette import routing
 
-from snowfall.project.junction.adapter import places as places_adapter
+from snowfall.project.junction.go.adapter import places as places_adapter
 from snowfall.project.junction.service.client_api import resources
 from snowfall.project.junction.service.client_api.routes import (
     legs,

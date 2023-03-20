@@ -6,7 +6,7 @@ from typing import Sequence
 from motor import motor_asyncio
 from pydantic import AnyUrl
 
-from snowfall.project.junction.adapter import legs, offer_searches, offers
+from snowfall.project.junction.go.adapter import legs, offer_searches, offers
 from snowfall.project.junction.service.offers.v1alpha import (
     grpc_pb2_grpc as offers_grpc_pb2_grpc,
 )
