@@ -9,6 +9,7 @@ from snowfall.vendor.benerail.models.bookings.booking import (
 )
 from snowfall.vendor.benerail.models.bookings.offer import (
     BookedOffer,
+    RefundOffer,
     SelectedOffer,
     SelectedOfferPart,
 )
@@ -69,4 +70,10 @@ class GetPaymentResourceResponse(BenerailBaseModel):
 class GetFulfillmentResponse(BenerailBaseModel):
     metadata: Metadata | None = None
     response_result: Fulfillment | None = Field(None, alias="result")
+    links: list[Link] | None = None
+
+
+class GetRefundOfferResponse(BenerailBaseModel):
+    metadata: Metadata | None = None
+    response_result: RefundOffer | None = Field(None, alias="result")
     links: list[Link] | None = None

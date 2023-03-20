@@ -1,5 +1,6 @@
 import httpx
 
+from snowfall.vendor.benerail.clients import bookings as booking_client
 from snowfall.vendor.benerail.clients import dialogue as dialog_client
 from snowfall.vendor.benerail.clients import (
     price_calendar,
@@ -28,6 +29,30 @@ class BenerailClient(object):  # noqa: WPS214
             http_client,
         )
         self._trip_offer_filter_client = dialog_client.TripOfferFilterClient(
+            subscription_key,
+            base_url,
+            http_client,
+        )
+
+        self._bookings_client = booking_client.BookingsClient(
+            subscription_key,
+            base_url,
+            http_client,
+        )
+
+        self._orders_client = booking_client.OrdersClient(
+            subscription_key,
+            base_url,
+            http_client,
+        )
+
+        self._selected_offers_client = booking_client.SelectedOffersClient(
+            subscription_key,
+            base_url,
+            http_client,
+        )
+
+        self._payments_client = booking_client.PaymentsClient(
             subscription_key,
             base_url,
             http_client,
@@ -92,6 +117,21 @@ class BenerailClient(object):  # noqa: WPS214
     @property
     def trip_offer_filter_client(self) -> dialog_client.TripOfferFilterClient:
         return self._trip_offer_filter_client
+
+    def bookings_client(self) -> booking_client.BookingsClient:
+        return self._bookings_client
+
+    @property
+    def orders_client(self) -> booking_client.OrdersClient:
+        return self._orders_client
+
+    @property
+    def selected_offers_client(self) -> booking_client.SelectedOffersClient:
+        return self._selected_offers_client
+
+    @property
+    def payments_client(self) -> booking_client.PaymentsClient:
+        return self._payments_client
 
     @property
     def rcode_client(self) -> rcode.RcodeClient:

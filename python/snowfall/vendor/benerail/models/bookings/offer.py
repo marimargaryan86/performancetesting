@@ -41,3 +41,17 @@ class SelectedOfferPartIdBody(BenerailBaseModel):
 
 class SelectedOffersBody(BenerailBaseModel):
     offer_id: str
+
+
+class RefundOfferPart(BenerailBaseModel):
+    identifier: str | None = Field(None, alias="id")
+    fulfillment: str | None = None
+    original_price: Price | None = None
+    proposed_carrier_fee: Price | None = None
+    refunded_amount: Price | None = None
+
+
+class RefundOffer(BenerailBaseModel):
+    identifier: str | None = Field(None, alias="id")
+    state: str | None = None
+    refund_offer_parts: list[RefundOfferPart] | None = None

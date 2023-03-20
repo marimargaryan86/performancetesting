@@ -24,6 +24,7 @@ class Price(BenerailBaseModel):
 class PaymentIdBody(BenerailBaseModel):
     payment_method: FormOfPaymentURN
     amount: Price | None = None
+    state: PaymentStates | None = None
 
 
 class OrderIdPaymentsBody(BenerailBaseModel):

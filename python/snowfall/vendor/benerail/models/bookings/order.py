@@ -12,8 +12,12 @@ class Order(BenerailBaseModel):
     state: OrderStates | None = None
     selected_offers: list[ResourceLink] | None = None
     booked_offers: list[ResourceLink] | None = None
-    payments: list[ResourceLink] | None = None
+    payment: list[ResourceLink] | None = None
 
 
 class OrderIdBody(BenerailBaseModel):
     state: OrderStates
+
+
+class OrderIdRefundOffersBody(BenerailBaseModel):
+    fulfillment_ids: list[str]
