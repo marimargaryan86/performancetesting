@@ -222,7 +222,6 @@
       "post": {
         "summary": "Create user",
         "description": "Create user by provided email and password",
-        "security": [],
         "tags": [
           "authentication"
         ],
@@ -248,6 +247,9 @@
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
             "$ref": "#/components/responses/Forbidden"
