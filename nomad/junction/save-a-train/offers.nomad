@@ -126,9 +126,10 @@ EOH
       }
 
       env {
-        ENV_NAME        = "${var.environment}"
-        SENTRY_DSN      = "https://f01c7c8bf4d04a709a65b4be8b11ba69@sentry.snowfall.se/36"
-        PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
+        ENV_NAME            = "${var.environment}"
+        SENTRY_DSN          = "https://f01c7c8bf4d04a709a65b4be8b11ba69@sentry.snowfall.se/36"
+        PROMETHEUS_PORT     = "${NOMAD_PORT_prometheus}"
+        PROVIDER_COMPANY_ID = "${var.provider_company_id}"
       }
     }
   }
