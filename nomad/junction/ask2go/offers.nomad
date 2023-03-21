@@ -2,6 +2,10 @@ variable "docker_image" {
   type = string
 }
 
+variable "provider_company_id" {
+  type = string
+}
+
 variable "registry_address" {
   type = string
 }
@@ -85,10 +89,13 @@ job "ask2go-offers" {
       template {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
+MONGO_DSN={{range $index, $service := service (printf "mongodb-%s" (env "NOMAD_NAMESPACE"))}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 {{ with secret "kv/data/${var.environment}/ask2go" }}
 API_BASE_URL={{ .Data.data.api_base_url }}
 API_BOOKING_BASE_URL={{ .Data.data.api_booking_base_url }}
+POLL_RETRIES_LIMIT={{ .Data.data.poll_retries_limit }}
+WAIT_TIME_BETWEEN_POLLING={{ .Data.data.wait_time_between_polling }}
 {{ end }}
 EOH
         destination = "services.env"

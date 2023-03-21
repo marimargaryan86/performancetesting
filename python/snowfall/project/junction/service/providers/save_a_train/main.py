@@ -16,13 +16,9 @@ from aio_pika import abc
 from motor import motor_asyncio
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import (
-    cabin_classes,
-    notifications,
-    offers,
-    repository,
-    service,
-)
+from snowfall.project.junction.provider import cabin_classes, notifications
+from snowfall.project.junction.provider import offers_v2 as offers
+from snowfall.project.junction.provider import service
 from snowfall.project.junction.service.providers.save_a_train import (
     adapter,
     cache,
@@ -35,10 +31,10 @@ from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import h3
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
-from snowfall.stdlib.transport.amqp import producer, trackable, types
+from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.stdlib.transport.grpc import client as grpc_client
 from snowfall.vendor.save_a_train import client
-from snowfall.vendor.save_a_train.models import request as request_models
+from snowfall.vendor.save_a_train.models import request
 
 
 class _SatConfig(pydantic.BaseModel):
@@ -58,19 +54,16 @@ class _DumpStationsSettings(_SatConfig, service.Settings):
     output_file: str = pydantic.Field(hidden=True, argument=True)
 
 
+class _OffersSettings(_SatConfig, service.OffersSettings):
+    ttl: datetime.timedelta = datetime.timedelta(minutes=45)
+    mongo_dsn: tuple[pydantic.AnyUrl]
+    allowed_window_td: datetime.timedelta = datetime.timedelta(minutes=10)
+
+
 class _PriceQuoteSettings(service.Settings):
     amqp_dsn: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
-
-
-class _SearchSettings(_SatConfig, service.Settings):
-    amqp_dsn: pydantic.AnyUrl
-    redis_dsn: Sequence[pydantic.AnyUrl]
-    ttl: datetime.timedelta = datetime.timedelta(minutes=45)
-    mongo_dsn: tuple[pydantic.AnyUrl]
-    allowed_window_td: datetime.timedelta = datetime.timedelta(minutes=10)
-    provider_company_id: str
 
 
 class _OrdersSettings(_SatConfig, service.Settings):
@@ -93,107 +86,71 @@ class _NotificationsSettings(_SatConfig, service.Settings):
     mongo_dsn: tuple[pydantic.AnyUrl]
 
 
+_Impl = offers.OfferSearchImplementation[
+    amqp_pb2.SearchCriteriaTask,
+    request.CreateSearchRequest,
+]
+
+
 async def _offers(
-    app: service.Application[service.OffersSettings],
+    app: service.Application[_OffersSettings],
+    amqp_conn: types.Connection,
+    redis_conn: aioredis.Redis[bytes],
     stack: contextlib.AsyncExitStack,
-) -> service.OffersFactoryReturn[amqp_pb2.SearchCriteriaTask]:
-    return criteria.CriteriaGenerator(
-        h3_mapping=h3.H3MappingRepository[train_stations.TrainStation](
-            mapping=await _load_train_stations(),
-            resolution=8,
-        ),
-    ).from_search_task
-
-
-async def _searches(app: service.Application[_SearchSettings]) -> None:
+) -> _Impl:
+    stations = await _load_train_stations()
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
-    async with contextlib.AsyncExitStack() as stack:
-        http_client = await stack.enter_async_context(
-            httpx.AsyncClient(
-                http2=True,
-                timeout=app.settings.api_timeout,
-            ),
-        )
-        amqp_connection = await stack.enter_async_context(
-            types.Connection(app.settings.amqp_dsn),
-        )
-        redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
-            aioredis.from_url(
-                random.choice(app.settings.redis_dsn),  # nosec
-                decode_responses=False,
-            ).client(),
-        )
+    http_client = await stack.enter_async_context(
+        httpx.AsyncClient(
+            http2=True,
+            timeout=app.settings.api_timeout,
+        ),
+    )
+    save_a_train_client = client.SATClient(
+        email=app.settings.api_email,
+        password=app.settings.api_password,
+        password_search=app.settings.api_search_password,
+        token=app.settings.api_booking_token,
+        api_url=app.settings.api_base_url,
+        api_search_url=app.settings.api_search_base_url,
+        api_search_timeout=app.settings.api_search_timeout,
+        api_search_requests_limit=app.settings.api_search_requests_limit,
+        client=http_client,
+    )
 
-        save_a_train_client = client.SATClient(
-            email=app.settings.api_email,
-            password=app.settings.api_password,
-            password_search=app.settings.api_search_password,
-            token=app.settings.api_booking_token,
-            api_url=app.settings.api_base_url,
-            api_search_url=app.settings.api_search_base_url,
-            api_search_timeout=app.settings.api_search_timeout,
-            api_search_requests_limit=app.settings.api_search_requests_limit,
-            client=http_client,
-        )
+    # TODO: do we need to call get_token on the save_a_train_client?
+    sat_adapter = adapter.SaveATrainAdapter(
+        save_a_train_client=save_a_train_client,
+        train_station_repository=train_stations.TrainStationRepository(
+            train_stations=stations,
+        ),
+        provider_cabin_class_mapping=cabin_classes.CabinMappingRepository(
+            mongo.sat.provider_cabin_mapping,
+        ),
+        offers_cache=cache.OffersCache(
+            client=redis.Client(redis_conn, prefix=app.name),
+        ),
+        ttl=app.settings.ttl,
+        notifier=notifications.LogNotifier(),
+        notifications_producer=producer.Producer(
+            amqp_conn,
+            types.Exchange("notifications"),
+        ),
+    )
 
-        # TODO: do we need to call get_token on the save_a_train_client?
-        sat_adapter = adapter.SaveATrainAdapter(
-            save_a_train_client=save_a_train_client,
-            train_station_repository=train_stations.TrainStationRepository(
-                train_stations=await _load_train_stations(),
+    return offers.OfferSearchImplementation(
+        search_criteria_task_generator=criteria.CriteriaGenerator(
+            h3_mapping=h3.H3MappingRepository[train_stations.TrainStation](
+                mapping=stations,
+                resolution=8,
             ),
-            provider_cabin_class_mapping=cabin_classes.CabinMappingRepository(
-                mongo.sat.provider_cabin_mapping,
-            ),
-            offers_cache=cache.OffersCache(
-                client=redis.Client(redis_connection, prefix=app.name),
-            ),
-            ttl=app.settings.ttl,
-            notifier=notifications.LogNotifier(),
-            notifications_producer=producer.Producer(
-                amqp_connection,
-                types.Exchange("notifications"),
-            ),
-        )
-        search_consumer = offers.SearchCriteriaConsumer[
-            amqp_pb2.SearchCriteriaTask,
-            request_models.CreateSearchRequest,
-        ](
-            provider_company_id=app.settings.provider_company_id,
-            search_criteria_generator_func=sat_adapter.search_criteria_generator,
-            consumer=amqp_consumer.Consumer(
-                connection=amqp_connection,
-                queue_name="{0}_searches".format(app.name),
-                binds=[(types.Exchange("save_a_train"), "offers.search.trip")],
-                middleware_stack=[
-                    trackable.ReportingMiddleware(
-                        status_reporter=trackable.StatusReporter(
-                            producer=producer.Producer(
-                                connection=amqp_connection,
-                                exchange=types.Exchange("save_a_train"),
-                            ),
-                        ),
-                    ).execute,
-                ],
-            ),
-            producer=producer.Producer(
-                connection=amqp_connection,
-                exchange=types.Exchange("offers"),
-            ),
-            offer_group_repository=repository.OfferGroupRepository(
-                redis=redis.Client(
-                    redis=redis_connection,
-                    prefix=app.name,
-                ),
-                offer_group_cache_key_func=sat_adapter.generate_cache_key,
-                offer_group_generator=sat_adapter.gather_search_results,
-            ),
-            allowed_window_td=app.settings.allowed_window_td,
-        )
-
-        await search_consumer.consume()
+        ).from_search,
+        search_criteria_generator=sat_adapter.search_criteria_generator,
+        offer_group_cache_key_generator=sat_adapter.generate_cache_key,
+        offer_group_generator=sat_adapter.gather_search_results,
+    )
 
 
 async def _orders(app: service.Application[_OrdersSettings]) -> None:
@@ -458,17 +415,12 @@ async def _load_train_stations() -> list[train_stations.TrainStation]:
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(name="save_a_train")
 
-    entrypoint.enable_offers(service.OffersSettings, _offers)
+    entrypoint.enable_offers(_OffersSettings, _offers)
     entrypoint.enter_with_commands(
         service.Command(
             name="dump-stations",
             callback=_dump_stations,
             settings_class=_DumpStationsSettings,
-        ),
-        service.Command(
-            name="searches",
-            callback=_searches,
-            settings_class=_SearchSettings,
         ),
         service.Command(
             name="orders",

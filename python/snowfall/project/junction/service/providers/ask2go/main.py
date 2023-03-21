@@ -11,14 +11,9 @@ import pydantic
 from motor import motor_asyncio
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import (
-    airports,
-    cabin_classes,
-    notifications,
-    offers,
-    repository,
-    service,
-)
+from snowfall.project.junction.provider import airports, cabin_classes, notifications
+from snowfall.project.junction.provider import offers_v2 as offers
+from snowfall.project.junction.provider import service
 from snowfall.project.junction.service.providers.ask2go import (
     booking,
     cache,
@@ -37,7 +32,7 @@ from snowfall.stdlib.instrumentation import httpx_metrics
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
-from snowfall.stdlib.transport.amqp import producer, trackable, types
+from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.vendor.ask2go import client
 from snowfall.vendor.ask2go.models import search as search_models
 
@@ -54,17 +49,24 @@ class _OrdersSettings(service.Settings):
     override_double_booking_check: bool = False
 
 
-class _SearchSettings(service.Settings):
+class _OffersSettings(service.OffersSettings):
+    api_base_url: pydantic.AnyUrl
+    api_booking_base_url: pydantic.AnyUrl
+    ttl: datetime.timedelta = datetime.timedelta(minutes=45)
+    http_timeout: float = 20.0
+    poll_retries_limit: int = 10
+    wait_time_between_polling: float = 1
+    mongo_dsn: Sequence[pydantic.AnyUrl]
+
+
+class _PriceQuotesSettings(service.Settings):
     amqp_dsn: pydantic.AnyUrl
     api_base_url: pydantic.AnyUrl
     api_booking_base_url: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
     http_timeout: float = 20.0
-    poll_retries_limit: int = 10
-    wait_time_between_polling: float = 1
     mongo_dsn: Sequence[pydantic.AnyUrl]
-    provider_company_id: str
 
 
 class _SeatMapsSettings(service.Settings):
@@ -75,23 +77,79 @@ class _SeatMapsSettings(service.Settings):
     http_timeout: float = 60.0
 
 
+_Impl = offers.OfferSearchImplementation[
+    amqp_pb2.SearchCriteriaTask,
+    search_models.CreateSearchCriteria,
+]
+
+
 async def _offers(
-    app: service.Application[service.OffersSettings],
+    app: service.Application[_OffersSettings],
+    amqp_conn: types.Connection,
+    redis_conn: aioredis.Redis[bytes],
     stack: contextlib.AsyncExitStack,
-) -> service.OffersFactoryReturn[amqp_pb2.SearchCriteriaTask]:
-    return criteria.CriteriaGenerator(
-        h3_mapping=h3.H3MappingRepository[airports.Airport](
-            mapping=airports.AirportRepository(
-                airports_data=cast(
-                    list[dict[str, Any]],
-                    filesystem.PkgLoader(
-                        "snowfall.project.junction.service.providers.ask2go.main",
-                    ).load("airports.json"),
-                ),
-            ).all_(),
-            resolution=7,
+) -> _Impl:
+    http_client = await stack.enter_async_context(
+        httpx_metrics.with_metrics(
+            httpx.AsyncClient(
+                http2=True,
+                timeout=app.settings.http_timeout,
+            ),
         ),
-    ).from_search_task
+    )
+    ask2go_client = client.Ask2GoClient(
+        api_base_url=app.settings.api_base_url,
+        api_booking_base_url=app.settings.api_booking_base_url,
+        http_client=http_client,
+    )
+    search_adapter = search.Adapter(
+        ask2go_client=ask2go_client,
+        poll_retries_limit=app.settings.poll_retries_limit,
+    )
+    airport_repo = airports.AirportRepository(
+        airports_data=cast(
+            list[dict[str, Any]],
+            filesystem.PkgLoader(
+                "snowfall.project.junction.service.providers.ask2go.main",
+            ).load("airports.json"),
+        ),
+    )
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        random.choice(app.settings.mongo_dsn),  # nosec
+    )
+
+    return offers.OfferSearchImplementation(
+        search_criteria_task_generator=criteria.CriteriaGenerator(
+            h3_mapping=h3.H3MappingRepository[airports.Airport](
+                mapping=airport_repo.all_(),
+                resolution=7,
+            ),
+        ).from_search,
+        search_criteria_generator=search_adapter.search_criteria_generator,
+        offer_group_cache_key_generator=search_adapter.generate_cache_key,
+        offer_group_generator=a2g_offers.offer_group_generator(
+            a2g_adapter=search_adapter,
+            a2g_transformer=transformer.OfferTransformer(
+                airport_repository=airport_repo,
+                cabin_mapping_repository=cabin_classes.CabinMappingRepository(
+                    mongo.ask2go.provider_cabin_mapping,
+                ),
+                offer_cache=cache.OfferCache(
+                    client=redis.Client[bytes](
+                        redis_conn,
+                        prefix=app.name,
+                    ),
+                ),
+                price_cache=cache.PriceQuoteCache(
+                    client=redis.Client[bytes](
+                        redis_conn,
+                        prefix=app.name,
+                    ),
+                ),
+                offer_ttl=app.settings.ttl,
+            ),
+        ),
+    )
 
 
 async def _orders(app: service.Application[_OrdersSettings]) -> None:
@@ -150,103 +208,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
         ).consume()
 
 
-async def _searches(app: service.Application[_SearchSettings]) -> None:
-    mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
-    )
-    async with contextlib.AsyncExitStack() as stack:
-        http_client = await stack.enter_async_context(
-            httpx_metrics.with_metrics(
-                httpx.AsyncClient(
-                    http2=True,
-                    timeout=app.settings.http_timeout,
-                ),
-            ),
-        )
-        redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
-            aioredis.from_url(
-                random.choice(app.settings.redis_dsn),  # nosec
-                decode_responses=False,
-            ).client(),
-        )
-        amqp_connection = await stack.enter_async_context(
-            types.Connection(app.settings.amqp_dsn),
-        )
-        ask2go_client = client.Ask2GoClient(
-            api_base_url=app.settings.api_base_url,
-            api_booking_base_url=app.settings.api_booking_base_url,
-            http_client=http_client,
-        )
-        search_adapter = search.Adapter(
-            ask2go_client=ask2go_client,
-            poll_retries_limit=app.settings.poll_retries_limit,
-            wait_time_between_polling=app.settings.wait_time_between_polling,
-        )
-        await offers.SearchCriteriaConsumer[
-            amqp_pb2.SearchCriteriaTask,
-            search_models.CreateSearchCriteria,
-        ](
-            provider_company_id=app.settings.provider_company_id,
-            search_criteria_generator_func=search_adapter.search_criteria_generator,
-            consumer=amqp_consumer.Consumer(
-                connection=amqp_connection,
-                queue_name="{0}_searches".format(app.name),
-                binds=[(types.Exchange("ask2go"), "offers.search.trip")],
-                middleware_stack=[
-                    trackable.ReportingMiddleware(
-                        status_reporter=trackable.StatusReporter(
-                            producer=producer.Producer(
-                                connection=amqp_connection,
-                                exchange=types.Exchange("ask2go"),
-                            ),
-                        ),
-                    ).execute,
-                ],
-            ),
-            producer=producer.Producer(
-                connection=amqp_connection,
-                exchange=types.Exchange("offers"),
-            ),
-            offer_group_repository=repository.OfferGroupRepository(
-                redis=redis.Client(
-                    redis=redis_connection,
-                    prefix=app.name,
-                ),
-                offer_group_cache_key_func=search_adapter.generate_cache_key,
-                offer_group_generator=a2g_offers.offer_group_generator(
-                    a2g_adapter=search_adapter,
-                    a2g_transformer=transformer.OfferTransformer(
-                        airport_repository=airports.AirportRepository(
-                            airports_data=cast(
-                                list[dict[str, Any]],
-                                filesystem.PkgLoader(
-                                    "snowfall.project.junction.service.providers.ask2go.main",
-                                ).load("airports.json"),
-                            ),
-                        ),
-                        cabin_mapping_repository=cabin_classes.CabinMappingRepository(
-                            mongo.ask2go.provider_cabin_mapping,
-                        ),
-                        offer_cache=cache.OfferCache(
-                            client=redis.Client[bytes](
-                                redis_connection,
-                                prefix=app.name,
-                            ),
-                        ),
-                        price_cache=cache.PriceQuoteCache(
-                            client=redis.Client[bytes](
-                                redis_connection,
-                                prefix=app.name,
-                            ),
-                        ),
-                        offer_ttl=app.settings.ttl,
-                    ),
-                ),
-            ),
-        ).consume()
-
-
-async def _price_quotes(app: service.Application[_SearchSettings]) -> None:
+async def _price_quotes(app: service.Application[_PriceQuotesSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
@@ -347,7 +309,7 @@ async def _seat_maps(app: service.Application[_SeatMapsSettings]) -> None:
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(name="ask2go")
 
-    entrypoint.enable_offers(service.OffersSettings, _offers)
+    entrypoint.enable_offers(_OffersSettings, _offers)
     entrypoint.enter_with_commands(
         service.Command(
             name="orders",
@@ -355,14 +317,9 @@ if __name__ == "__main__":
             settings_class=_OrdersSettings,
         ),
         service.Command(
-            name="searches",
-            callback=_searches,
-            settings_class=_SearchSettings,
-        ),
-        service.Command(
             name="pricing",
             callback=_price_quotes,
-            settings_class=_SearchSettings,
+            settings_class=_PriceQuotesSettings,
         ),
         service.Command(
             name="seat_maps",

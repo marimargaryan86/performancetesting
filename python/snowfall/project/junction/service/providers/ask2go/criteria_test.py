@@ -431,7 +431,7 @@ def test_criteria_with_expected_pairs_are_generated(
     search_task: amqp_pb2.TripOfferSearchTask,
     expected: Sequence[Mapping[str, Any]],
 ) -> None:
-    search_tasks = list(criteria_generator.from_search_task(search_task=search_task))
+    search_tasks = list(criteria_generator.from_search(search=search_task.search))
     search_task_pairs = [
         {
             "origin": search_task.criteria.origin_iata,
@@ -484,7 +484,7 @@ def test_criteria_with_expected_passengers_are_generated(
     search_task: amqp_pb2.TripOfferSearchTask,
     expected: Mapping[str, int],
 ) -> None:
-    search_tasks = list(criteria_generator.from_search_task(search_task=search_task))
+    search_tasks = list(criteria_generator.from_search(search=search_task.search))
     first_search_task = more_itertools.first(search_tasks, None)
     assert first_search_task
     assert first_search_task.criteria.adults == expected["adults"]

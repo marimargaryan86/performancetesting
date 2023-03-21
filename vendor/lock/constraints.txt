@@ -18,6 +18,7 @@
 //     "aiomysql==0.1.1",
 //     "aiosmtplib==2.0.1",
 //     "aiosqlite==0.18.0",
+//     "aiostream==0.4.5",
 //     "alchemy-mock==0.4.3",
 //     "allure-python-commons==2.13.0",
 //     "asgiref==3.6.0",
@@ -371,6 +372,26 @@
           ],
           "requires_python": ">=3.7",
           "version": "0.18.0"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "25b7c2d9c83570d78c0ef5a20e949b7d0b8ea3b0b0a4f22c49d3f721105a6057",
+              "url": "https://files.pythonhosted.org/packages/4a/29/d94dc724b543d0ff16e177a3ce4eaa6253afb6350aa7ba372a8fe7e01f20/aiostream-0.4.5-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "3ecbf87085230fbcd9605c32ca20c4fb41af02c71d076eab246ea22e35947d88",
+              "url": "https://files.pythonhosted.org/packages/9f/92/e10c6232f2e2e21a24ae9e6534292bd2d808ae43b719298f5599a2a38e4b/aiostream-0.4.5.tar.gz"
+            }
+          ],
+          "project_name": "aiostream",
+          "requires_dists": [
+            "async-exit-stack; python_version < \"3.7\""
+          ],
+          "requires_python": null,
+          "version": "0.4.5"
         },
         {
           "artifacts": [
@@ -4473,6 +4494,7 @@
     "aiomysql==0.1.1",
     "aiosmtplib==2.0.1",
     "aiosqlite==0.18.0",
+    "aiostream==0.4.5",
     "alchemy-mock==0.4.3",
     "allure-python-commons==2.13.0",
     "asgiref==3.6.0",

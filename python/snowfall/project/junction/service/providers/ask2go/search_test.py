@@ -16,7 +16,6 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2
 
 _ARN_LHR = amqp_pb2.SearchCriteriaTask(
-    offer_search_id="FOO",
     segments=[
         models_pb2.Segment(
             id="segment_id",

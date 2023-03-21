@@ -2,6 +2,10 @@ variable "docker_image" {
   type = string
 }
 
+variable "provider_company_id" {
+  type = string
+}
+
 variable "registry_address" {
   type = string
 }
@@ -91,7 +95,16 @@ job "save-a-train-offers" {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 GEODATA_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_geodata-${var.environment}"))}}
+MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
+{{ with secret "kv/data/${var.environment}/save-a-train" }}
+API_EMAIL={{ .Data.data.api_email }}
+API_PASSWORD={{ .Data.data.api_password }}
+API_SEARCH_PASSWORD={{ .Data.data.api_search_password }}
+API_BOOKING_TOKEN={{ .Data.data.api_booking_token }}
+API_BASE_URL={{ .Data.data.api_base_url }}
+API_SEARCH_BASE_URL={{ .Data.data.api_search_base_url }}
+{{ end }}
 EOH
         destination = "services.env"
         env         = true

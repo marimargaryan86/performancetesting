@@ -19,6 +19,7 @@ TripOfferSearchCriteriaGenerator = Callable[
     list[_Proto],
 ]
 _CriteriaType = TypeVar("_CriteriaType")
+CacheKeyGenerator = Callable[[_CriteriaType], str]
 OfferGroupGenerator = Callable[
     [_CriteriaType],
     AsyncIterator[offers_pb2.OfferGroup],
@@ -34,8 +35,8 @@ class OfferCacheLockError(Exception):
 
 
 class OfferGroupCache(object):
-    _blocking_timeout = datetime.timedelta(seconds=10)  # todo: tweak to what we want
-    _lock_timeout = datetime.timedelta(minutes=5)  # todo: tweak to what we want
+    _blocking_timeout = datetime.timedelta(seconds=10)
+    _lock_timeout = datetime.timedelta(seconds=30)  # noqa: WPS432
 
     def __init__(
         self,
@@ -108,7 +109,7 @@ class OfferGroupRepository(Generic[_CriteriaType]):
 
     def __init__(
         self,
-        offer_group_cache_key_func: Callable[[_CriteriaType], str],
+        offer_group_cache_key_func: CacheKeyGenerator[_CriteriaType],
         redis: redis_types.Client[bytes],
         offer_group_generator: OfferGroupGenerator[_CriteriaType],
     ) -> None:

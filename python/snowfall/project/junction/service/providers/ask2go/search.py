@@ -64,7 +64,7 @@ class Adapter(object):
             search_task.criteria.outbound_departure,
         )
         search_criteria = search.CreateSearchCriteria(
-            transaction_id=uuid.UUID(string.to_uuid(search_task.session_token)),
+            transaction_id=None,
             origin_iata=search_task.criteria.origin_iata,
             destination_iata=search_task.criteria.destination_iata,
             outbound_date=outbound_date.date(),
@@ -83,6 +83,10 @@ class Adapter(object):
             search_criteria.inbound_departure_window = time_to_window(
                 inbound_date.time(),
             )
+
+        search_criteria.transaction_id = uuid.UUID(
+            self.generate_cache_key(search_criteria),
+        )
 
         return search_criteria
 

@@ -4,6 +4,7 @@ aiofiles==23.1.0
 aiomysql==0.1.1
 aiosmtplib==2.0.1
 aiosqlite==0.18.0
+aiostream==0.4.5
 alchemy-mock==0.4.3
 allure-python-commons==2.13.0
 asgiref==3.6.0
