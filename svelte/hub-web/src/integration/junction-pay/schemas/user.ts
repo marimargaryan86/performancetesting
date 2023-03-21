@@ -1,8 +1,6 @@
 export interface UserJwtSchema {
   user_info: {
-    email: string;
-    password: string;
     id: string;
+    email: string;
   };
-  exp: number;
 }

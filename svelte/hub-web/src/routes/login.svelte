@@ -22,7 +22,7 @@
     pending = true;
 
     try {
-      const token = await integrationInstances.auth.createToken(data);
+      const token = await integrationInstances.junctionPay.auth.createToken(data);
       const expiresAt = new Date();
       expiresAt.setFullYear(expiresAt.getFullYear() + 1);
 

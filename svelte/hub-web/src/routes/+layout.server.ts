@@ -1,5 +1,5 @@
 import type { ServerLoadEvent } from "@sveltejs/kit";
-import type { UserJwtSchema } from "integration/schemas/user";
+import type { UserJwtSchema } from "integration/junction-pay/schemas/user";
 import jwtDecode from "jwt-decode";
 import type { UserModel } from "models/user";
 
