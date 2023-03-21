@@ -86,3 +86,16 @@ export:
   - docker run -u "${UID}" --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/schedules-export:latest --input-dir=/data/data-import/ --output-dir=/data/data-export/
   tags:
     - autoscaler-XL
+
+validate:
+  stage: export
+  needs: ["import", "export"]
+  timeout: 6h
+  script:
+  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" amazon/aws-cli s3 cp s3://junction-schedules-export/PipelineData/data-import.tar.gz /data/data-import.tar.gz --no-progress
+  - tar -xzf data-import.tar.gz
+  - docker login git.snowfall.se:4567 -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}"
+  - docker pull git.snowfall.se:4567/junction/junction/service/validate-dataset:latest
+  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/validate-dataset:latest /data/data-export/ /data/data-import/schedules.bson /data/data-import/locations.bson
+  tags:
+    - autoscaler-XL
