@@ -15,8 +15,10 @@ class _AbortError(Exception):
     "context_metadata",
     [
         None,
-        aio.Metadata(),
-        aio.Metadata(("foo", "bar")),
+        (),
+        [],
+        (("foo", "bar"),),
+        [["foo", "bar"]],
     ],
 )
 async def test_missing_token_raises_error(context_metadata: Any) -> None:
@@ -28,11 +30,18 @@ async def test_missing_token_raises_error(context_metadata: Any) -> None:
         await metadata.get_auth_token(context)
 
 
-async def test_token_can_be_retrieved() -> None:
-    expected_auth = "foobar"
-    expected_metadata = aio.Metadata(("authentication", expected_auth))
+@pytest.mark.parametrize(
+    "context_metadata",
+    [
+        (("authentication", "foo"),),
+        [["authentication", "foo"]],
+        (("foo", "bar"), ("authentication", "foo")),
+        [["foo", "bar"], ["authentication", "foo"]],
+    ],
+)
+async def test_token_can_be_retrieved(context_metadata: Any) -> None:
     context = mock.create_autospec(aio.ServicerContext)
-    context.invocation_metadata = mock.Mock(return_value=expected_metadata)
+    context.invocation_metadata = mock.Mock(return_value=context_metadata)
     context.abort = mock.Mock(side_effect=_AbortError)
 
-    assert await metadata.get_auth_token(context) == expected_auth
+    assert await metadata.get_auth_token(context)

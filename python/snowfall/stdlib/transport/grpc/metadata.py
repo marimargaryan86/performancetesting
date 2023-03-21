@@ -7,17 +7,18 @@ from snowfall.stdlib.transport.grpc import rich_status
 
 
 async def get_auth_token(context: aio.ServicerContext) -> str | NoReturn:
+    # This does not actually return a Metadata class, but instead a tuple of tuples.
+    # See https://github.com/grpc/grpc/issues/26498
     metadata = context.invocation_metadata()
 
     if not metadata:
         await _abort(context)
 
-    auth_token = metadata.get("authentication")
+    for metadata_key, metadata_value in metadata:
+        if metadata_key == "authentication":
+            return metadata_value
 
-    if not auth_token:
-        await _abort(context)
-
-    return auth_token
+    await _abort(context)
 
 
 async def _abort(context: aio.ServicerContext) -> NoReturn:
