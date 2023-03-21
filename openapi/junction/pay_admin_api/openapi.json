@@ -1482,8 +1482,7 @@
             "readOnly": true,
             "properties": {
               "amount": {
-                "type": "integer",
-                "example": 1000
+                "$ref": "#/components/schemas/MoneyAmount"
               }
             },
             "required": [
@@ -1573,6 +1572,13 @@
           }
         ]
       },
+      "MoneyAmount": {
+        "title": "Money amount",
+        "type": "integer",
+        "example": 1337,
+        "minimum": 0,
+        "description": "A positive integer representing an amount of currency defined in the currency's smallest unit. This means that for currencies that have minor units, like EUR, 1 euro would be represented as 100, indicating 100 cents."
+      },
       "Money": {
         "title": "Money",
         "description": "Amount and currency.",
@@ -1584,8 +1590,7 @@
             "example": "EUR"
           },
           "amount": {
-            "type": "integer",
-            "example": 1337
+            "$ref": "#/components/schemas/MoneyAmount"
           }
         },
         "required": [
