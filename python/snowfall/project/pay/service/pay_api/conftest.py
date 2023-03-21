@@ -181,7 +181,7 @@ def accounts_repository(
 
 
 @pytest.fixture()
-def companies_repository(
+async def companies_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> CompanyRepository:
     return CompanyRepository(

@@ -71,6 +71,7 @@ class Company(models.Resource):
     def from_proto(
         cls,
         company: models_pb2.Company,
+        request: requests.Request,
     ) -> Company:
         return cls(
             id=company.id,
@@ -85,6 +86,14 @@ class Company(models.Resource):
                 },
                 "bufferRate": round(company.buffer_rate, 3),
                 "salesRate": round(company.sales_rate, 3),
+            },
+            links={
+                _SELF_HREF: str(
+                    request.url_for(
+                        "Company",
+                        companyId=company.id,
+                    ),
+                ),
             },
         )
 

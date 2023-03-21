@@ -72,12 +72,12 @@ def get_admin_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
         ),
         integration.route(
             "/companies",
-            companies.StoreCompany,
-            name="Company",
+            companies.AdminCompanies,
+            name="Companies",
         ),
         integration.route(
             "/companies/{companyId}",
-            companies.StoreCompany,
+            companies.AdminCompany,
             name="Company",
             methods=["PATCH", "GET"],
         ),

@@ -67,26 +67,6 @@ async def contact_person_with_bad_company_id(
 
 
 @pytest.fixture()
-async def valid_company(
-    companies_repository: CompanyRepository,
-) -> Company:
-    company = Company(
-        id="ed7b9b96-6c5a-4a6b-adee-2af14564e42b",
-        name="Company",
-        address=postal_address_pb2.PostalAddress(
-            address_lines=["Street name 7"],
-            region_code="GB",
-            postal_code="12345",
-            locality="London",
-        ),
-        buffer_rate=4,
-        sales_rate=5,
-    )
-
-    return await companies_repository.insert(company)
-
-
-@pytest.fixture()
 async def valid_conversion(
     conversions_repository: ConversionRepository,
 ) -> Conversion:
@@ -161,10 +141,37 @@ async def accounts_based_on_cc_accounts(
                 accounts.models_pb2.Account(
                     id=string.uuid(),
                     external_reference=account.identifier,
-                    company_id=string.uuid(),
                     contact_id=string.uuid(),
+                    company_id=string.uuid(),
                 ),
             ),
         )
 
     return proto_accounts
+
+
+@pytest.fixture()
+async def companies(
+    companies_repository: CompanyRepository,
+) -> Sequence[Company]:
+    companies = []
+
+    for _ in range(2):
+        companies.append(
+            await companies_repository.insert(
+                Company(
+                    id=string.uuid(),
+                    name="name {id}".format(id=string.uuid()),
+                    address=postal_address_pb2.PostalAddress(
+                        address_lines=["Street name 7"],
+                        region_code="GB",
+                        postal_code="12345",
+                        locality="London",
+                    ),
+                    buffer_rate=float(1),
+                    sales_rate=float(1),
+                ),
+            ),
+        )
+
+    return companies

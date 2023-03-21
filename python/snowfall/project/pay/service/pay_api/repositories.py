@@ -25,7 +25,6 @@ class CompanyRepository(
         self,
         document: models_pb2.Company,
     ) -> models_pb2.Company:
-        document.id = string.uuid()
         return await super().insert(document)
 
     async def update(
@@ -40,6 +39,14 @@ class CompanyRepository(
             self._collection.replace_one,
             filter={"_id": document_id},
             replacement=replacement,
+        )
+
+    async def find(
+        self,
+        cursor: str | None,
+    ) -> resultset.ResultSet[models_pb2.Company]:
+        return await self._find_with_cursor(
+            cur=cursor or "",
         )
 
 

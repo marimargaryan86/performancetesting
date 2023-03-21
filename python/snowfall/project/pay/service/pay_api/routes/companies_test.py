@@ -1,17 +1,19 @@
+from typing import Sequence
+
 import httpx
-from starlette import status
 
 from snowfall.project.pay.service.companies.v1alpha.models_pb2 import Company
+from snowfall.stdlib.integration.starlette import testing
 
 
 class TestCompanies(object):
-    async def test_get_company_details_success(
+    async def test_get_all_companies(
         self,
         admin_client: httpx.AsyncClient,
-        valid_company: Company,
+        companies: Sequence[Company],
     ) -> None:
-        response = await admin_client.get(
-            "/companies/{company_id}".format(company_id=valid_company.id),
+        await testing.test_list_and_view_endpoints(
+            client=admin_client,
+            url="/companies",
+            expected_ids=[company.id for company in companies],
         )
-
-        assert response.status_code == status.HTTP_200_OK
