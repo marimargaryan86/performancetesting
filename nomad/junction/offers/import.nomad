@@ -34,6 +34,10 @@ variable "payer_currency_code" {
   type = string
 }
 
+variable "use_pay_for_currency_conversions" {
+  type = bool
+}
+
 job "offers-import" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -114,11 +118,12 @@ EOH
       }
 
       env {
-        ENV_NAME            = "${var.environment}"
-        SENTRY_DSN          = "https://7c600c1c458d403e8047091398239f20@sentry.snowfall.se/27"
-        PROMETHEUS_PORT     = "${NOMAD_PORT_prometheus}"
-        PAYER_COMPANY_ID    = "${var.payer_company_id}"
-        PAYER_CURRENCY_CODE = "${var.payer_currency_code}"
+        ENV_NAME                         = "${var.environment}"
+        SENTRY_DSN                       = "https://7c600c1c458d403e8047091398239f20@sentry.snowfall.se/27"
+        PROMETHEUS_PORT                  = "${NOMAD_PORT_prometheus}"
+        PAYER_COMPANY_ID                 = "${var.payer_company_id}"
+        PAYER_CURRENCY_CODE              = "${var.payer_currency_code}"
+        USE_PAY_FOR_CURRENCY_CONVERSIONS = "${var.use_pay_for_currency_conversions}"
       }
     }
   }
