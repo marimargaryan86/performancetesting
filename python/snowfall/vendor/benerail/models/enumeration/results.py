@@ -106,10 +106,7 @@ class PlaceResult(BenerailBaseModel):
     )
     geo_coordinate: GeoPosition | None = None
     address: Address | None = None
-    place: Station | PointOfInterest | None = Field(
-        None,
-        discriminator="placeType",
-    )
+    place: Station | PointOfInterest | None = Field(None, discriminator="place_type")
     field_links: LinksUnderscoreType | None = Field(None, alias="_links")
 
 

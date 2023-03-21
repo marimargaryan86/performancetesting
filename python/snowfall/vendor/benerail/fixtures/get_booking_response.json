@@ -1,0 +1,35 @@
+{
+  "metadata": {
+    "apiVersion": "1.0.0",
+    "buildVersion": "MR58.0",
+    "environment": "dev_c01",
+    "respondedAt": "string",
+    "resourceType": "string",
+    "resourceEtag": "string"
+  },
+  "result": {
+    "id": "00000000-0000-0000-0000-000000000000",
+    "dialogueId": "string",
+    "dnr": "string",
+    "orders": [
+      {
+        "href": "http://example.com",
+        "title": "string",
+        "summary": {
+          "totalPrice": {
+            "amount": 29.35,
+            "currency": "EUR"
+          },
+          "state": "created"
+        }
+      }
+    ],
+    "fulfillments": [
+      {
+        "href": "http://example.com",
+        "title": "string"
+      }
+    ]
+  },
+  "links": null
+}

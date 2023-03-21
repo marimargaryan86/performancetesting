@@ -118,6 +118,7 @@ class BenerailClient(object):  # noqa: WPS214
     def trip_offer_filter_client(self) -> dialog_client.TripOfferFilterClient:
         return self._trip_offer_filter_client
 
+    @property
     def bookings_client(self) -> booking_client.BookingsClient:
         return self._bookings_client
 

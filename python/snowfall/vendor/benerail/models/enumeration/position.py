@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import Field
 
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
@@ -10,7 +12,7 @@ class Address(BenerailBaseModel):
 
 
 class PointOfInterest(BenerailBaseModel):
-    place_type: str | None = Field(None, description="poi")
+    place_type: Literal["poi"] | None = Field(None, description="poi")
 
 
 class GeoPosition(BenerailBaseModel):
@@ -19,7 +21,7 @@ class GeoPosition(BenerailBaseModel):
 
 
 class Station(BenerailBaseModel):
-    place_type: str | None = Field(None, description="station")
+    place_type: Literal["station"] | None = Field(None, description="station")
     country: str | None = Field(None, example="FI")
     zone_id: str | None = Field(None, example="Europe/Paris")
     codes: dict[str, str] | None = Field(
