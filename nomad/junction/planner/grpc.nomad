@@ -26,10 +26,6 @@ variable "count" {
   type = number
 }
 
-variable "s3_bucket" {
-  type = string
-}
-
 job "planner-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -115,61 +111,18 @@ job "planner-grpc" {
           password       = var.registry_password
           server_address = var.registry_address
         }
+        volumes = [
+          "/planner-efs/${var.environment}:/local/data"
+        ]
       }
 
-      artifact {
-        source = "s3::https://s3-eu-west-2.amazonaws.com/${var.s3_bucket}/route_stops.bin"
-        options {
-          aws_access_key_id     = "AKIA6JO5TGEWEV7G2IHA"
-          aws_access_key_secret = "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"
-        }
-      }
 
-      artifact {
-        source = "s3::https://s3-eu-west-2.amazonaws.com/${var.s3_bucket}/routes.bin"
-        options {
-          aws_access_key_id     = "AKIA6JO5TGEWEV7G2IHA"
-          aws_access_key_secret = "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"
-        }
-      }
-
-      artifact {
-        source = "s3::https://s3-eu-west-2.amazonaws.com/${var.s3_bucket}/stops.bin"
-        options {
-          aws_access_key_id     = "AKIA6JO5TGEWEV7G2IHA"
-          aws_access_key_secret = "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"
-        }
-      }
-
-      artifact {
-        source = "s3::https://s3-eu-west-2.amazonaws.com/${var.s3_bucket}/transfers.bin"
-        options {
-          aws_access_key_id     = "AKIA6JO5TGEWEV7G2IHA"
-          aws_access_key_secret = "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"
-        }
-      }
-
-      artifact {
-        source = "s3::https://s3-eu-west-2.amazonaws.com/${var.s3_bucket}/schedule_stops.bin"
-        options {
-          aws_access_key_id     = "AKIA6JO5TGEWEV7G2IHA"
-          aws_access_key_secret = "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"
-        }
-      }
-
-      artifact {
-        source = "s3::https://s3-eu-west-2.amazonaws.com/${var.s3_bucket}/schedules.bin"
-        options {
-          aws_access_key_id     = "AKIA6JO5TGEWEV7G2IHA"
-          aws_access_key_secret = "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"
-        }
-      }
 
       env {
         ENV_NAME        = "${var.environment}"
         GRPC_ADDRESS    = "0.0.0.0"
         GRPC_PORT       = "${NOMAD_PORT_grpc}"
-        PROTO_DIR       = "${NOMAD_TASK_DIR}"
+        PROTO_DIR       = "/local/data"
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
         SENTRY_DSN      = "https://43837909119c4ce186975c300c4efe6e@sentry.snowfall.se/23"
       }

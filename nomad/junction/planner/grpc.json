@@ -1,14 +1,12 @@
 {
   "development": {
     "variables": {
-      "count": 1,
-      "s3_bucket": "junction-schedules-export"
+      "count": 1
     }
   },
   "production": {
     "variables": {
-      "count": 1,
-      "s3_bucket": "prod-junction-schedules-export"
+      "count": 1
     }
   }
 }
