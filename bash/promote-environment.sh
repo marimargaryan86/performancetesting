@@ -14,7 +14,7 @@ rm -rf repo
 git clone git@git.snowfall.se:junction/nomad.git repo
 
 rsync -arv --include="*.sh" --exclude="*" "${FROM_ENV}/" "repo/${TO_ENV}/"
-rsync -arv "${ARGS[@]}" --include="*.nomad" --include="image.txt" --exclude="*" "${FROM_ENV}/" "repo/${TO_ENV}/"
+rsync -arv "${ARGS[@]}" --include="*.nomad" --delete --include="image.txt" --exclude="*" "${FROM_ENV}/" "repo/${TO_ENV}/"
 
 cd repo
 git add --all .
