@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
-from typing import Any, Literal
+from typing import Any, AsyncIterable, Iterable, Literal
 
 import httpx
 
@@ -22,6 +22,7 @@ class RequestOptions(object):
     path: str
     query: dict[str, str] | None = None
     payload: Any | None = None
+    raw_content: str | bytes | Iterable[bytes] | AsyncIterable[bytes] | None = None
     headers: dict[str, str] | None = None
 
 
@@ -37,6 +38,7 @@ class HttpClient(object):
                 url=self._base_url.copy_with(path=options.path, params=options.query),
                 headers=options.headers,
                 json=options.payload,
+                content=options.raw_content,
             )
         except httpx.TimeoutException as timeout_exc:
             raise errors.TimeOutError.from_error(timeout_exc) from timeout_exc
