@@ -42,8 +42,10 @@ curl -s -o /dev/null \
 #check allure is not busy with processing UI queries and generating report in loop in case
 echo "Generating report"
 echo "Pipeline job url: $CI_JOB_URL"
-STR=$(curl -s -X GET "${ALLURE_SERVER}/generate-report?project_id=${ALLURE_PROJECT_ID}&execution_name=gitlab&execution_from=${CI_JOB_URL}&execution_type=gitlab" \
-	-H "accept: */*" -b cookiesFile | jq -r .meta_data.message)
+GENERATE_REPORT=$(curl -s -X GET "${ALLURE_SERVER}/generate-report?project_id=${ALLURE_PROJECT_ID}&execution_name=gitlab&execution_from=${CI_JOB_URL}&execution_type=gitlab" \
+	-H "accept: */*" -b cookiesFile)
+STR=$(echo "${GENERATE_REPORT}" | jq -r .meta_data.message)
+JOB_LINK=$(echo "${GENERATE_REPORT}" | jq -r .data.report_url)
 SUB="Processing files for project_id"
 counter=1
 amount=11
@@ -53,11 +55,21 @@ until [[ "$STR" != *"$SUB"* ]]; do
 	fi
 	echo "Allure is busy. Waiting in a loop: $counter / $amount ..."
 	sleep 30
-	STR=$(curl -s -X GET "${ALLURE_SERVER}/generate-report?project_id=${ALLURE_PROJECT_ID}&execution_name=gitlab&execution_from=${CI_JOB_URL}&execution_type=gitlab" \
-		-H "accept: */*" -b cookiesFile | jq -r .meta_data.message)
+	GENERATE_REPORT=$(curl -s -X GET "${ALLURE_SERVER}/generate-report?project_id=${ALLURE_PROJECT_ID}&execution_name=gitlab&execution_from=${CI_JOB_URL}&execution_type=gitlab" \
+		-H "accept: */*" -b cookiesFile)
+	STR=$(echo "${GENERATE_REPORT}" | jq -r .meta_data.message)
+	JOB_LINK=$(echo "${GENERATE_REPORT}" | jq -r .data.report_url)
 	((counter = counter + 1))
 done
 
-echo "-----------------------------------------------------------------------------"
-echo "Reports published to: https://allureui.junction.dev/allure-docker-service-ui/"
-echo "-----------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "Report URL: $JOB_LINK"
+echo "Report URL is available after login with user/password to:"
+echo "https://allureui.junction.dev/allure-docker-service-ui/"
+echo "-------------------------------------------------------------------------"
+
+# Sending slack notification
+curl -X POST -H 'Content-type: application/json; charset=utf-8' \
+	-H "Authorization: Bearer ${SLACK_NOTIFICATION_TOKEN}" \
+	-d "{\"username\": \"CI Notification Bot for Allure Report\", \"channel\": \"${SLACK_NOTIFICATION_CHANNEL}\", \"text\": \"Login to allure (channel description) to analyze results: $JOB_LINK\"}" \
+	https://slack.com/api/chat.postMessage
