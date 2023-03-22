@@ -19,12 +19,12 @@ class Repository(Generic[REPOSITORY_MODEL]):  # noqa:WPS214
         cls,
         repository_model: REPOSITORY_MODEL,
     ) -> Callable[[async_sessionmaker[AsyncSession]], "Repository[REPOSITORY_MODEL]"]:
-        def constructor(
+        def wrapper(
             db: async_sessionmaker[AsyncSession] = Depends(get_db),
         ) -> "Repository[REPOSITORY_MODEL]":
             return cls[repository_model](db)  # type: ignore[index]
 
-        return constructor
+        return wrapper
 
     async def list_all(self) -> Sequence[REPOSITORY_MODEL]:
         async with self._db() as session:

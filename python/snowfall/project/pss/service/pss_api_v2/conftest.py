@@ -74,10 +74,10 @@ async def client(
     injected into routes.
     """
 
-    async def _get_test_db() -> AsyncGenerator[async_sessionmaker[AsyncSession], None]:
+    async def wrapper() -> AsyncGenerator[async_sessionmaker[AsyncSession], None]:
         yield db_session
 
-    fast_api_app.dependency_overrides[get_db] = _get_test_db
+    fast_api_app.dependency_overrides[get_db] = wrapper
     fast_api_app.dependency_overrides[get_settings] = mock_settings
     with TestClient(fast_api_app) as client:
         yield client
@@ -88,7 +88,7 @@ def account_factory(
     db_session: async_sessionmaker[AsyncSession],
 ) -> type[AsyncSQLAlchemyFactory]:
     class AccountFactory(AsyncSQLAlchemyFactory):
-        class Meta:
+        class Meta(object):
             model = Account
             sqlalchemy_session = db_session()
             sqlalchemy_session_persistence = "commit"
@@ -120,7 +120,7 @@ def country_factory(
     db_session: async_sessionmaker[AsyncSession],
 ) -> type[AsyncSQLAlchemyFactory]:
     class CountryFactory(AsyncSQLAlchemyFactory):
-        class Meta:
+        class Meta(object):
             model = Country
             sqlalchemy_session = db_session()
             sqlalchemy_session_persistence = "commit"
@@ -137,7 +137,7 @@ def account_forgotten_password_factory(
     db_session: async_sessionmaker[AsyncSession],
 ) -> type[AsyncSQLAlchemyFactory]:
     class AccountForgottenPasswordFactory(AsyncSQLAlchemyFactory):
-        class Meta:
+        class Meta(object):
             model = AccountForgottenPassword
             sqlalchemy_session = db_session()
             sqlalchemy_session_persistence = "commit"

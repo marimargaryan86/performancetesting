@@ -1,6 +1,6 @@
 def go_image(  # type: ignore[no-untyped-def]
     name: str,
-    **kwargs,
+    **kwargs,  # noqa: ANN003
 ) -> None:
     go_binary(  # type: ignore[name-defined]  # noqa: F821
         name=name,
@@ -40,7 +40,7 @@ def go_image(  # type: ignore[no-untyped-def]
 
 def python_image(  # type: ignore[no-untyped-def]
     name: str,
-    **kwargs,
+    **kwargs,  # noqa: ANN003
 ) -> None:
     pex_binary(  # type: ignore[name-defined]  # noqa: F821
         name=name,
