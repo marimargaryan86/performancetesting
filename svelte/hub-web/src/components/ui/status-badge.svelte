@@ -19,6 +19,7 @@
     justify-content: center;
     padding: 6px 12px;
     color: var(--color-generic-white);
+    color: var(--color-neutral-900);
     font-weight: 600;
     font-size: 8px;
     font-family: Poppins, Arial, Helvetica, sans-serif;
@@ -30,25 +31,14 @@
   }
 
   .ok {
-    background-image: radial-gradient(
-      157.78% 1163.56% at -3.9% -43.33%,
-      #4ccaab 0%,
-      #2c9e83 34.38%,
-      #3f8574 68.75%,
-      #21735f 100%
-    );
+    border-color: var(--color-success-500);
   }
 
   .error {
-    background-image: linear-gradient(121.87deg, #ff7777 -10.54%, #a2416b 98.97%);
+    border-color: var(--color-error-500);
   }
 
   .warn {
-    background-image: linear-gradient(
-      131.08deg,
-      #f5dd00 -60.91%,
-      #44dafb 143.29%,
-      rgb(125 248 76 / 0.9245) 143.31%
-    );
+    border-color: var(--color-warning-500);
   }
 </style>

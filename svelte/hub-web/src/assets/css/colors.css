@@ -14,6 +14,9 @@
   --color-generic-black: #000000;
   --color-generic-white: #ffffff;
   --color-destructive-500: #ef4444;
+  --color-success-500: #7bc12a;
+  --color-error-500: #ff4245;
+  --color-warning-500: #ffc60c;
   --color-positive-gradient: radial-gradient(
     157.78% 1163.56% at -3.9% -43.33%,
     #4ccaab 0%,

@@ -100,7 +100,7 @@
     justify-content: center;
     width: 100%;
     height: 100vh;
-    background-color: rgb(237 248 245 / 0.5);
+    background-color: rgb(140 142 146 / 0.5);
   }
 
   .dialogue {
@@ -169,9 +169,11 @@
     font-style: normal;
     line-height: 20px;
     letter-spacing: 0.1px;
-    border: var(--color-neutral-200) 1px solid;
+    background-color: var(--color-generic-white);
+    border: var(--color-neutral-200) 2px solid;
     border-radius: 8px;
     cursor: pointer;
+    user-select: none;
   }
 
   .balance > :global(.currency-flag) {

@@ -46,6 +46,7 @@
 
 <style>
   .main-menu {
+    z-index: 50;
     display: flex;
     flex-flow: column;
     gap: 16px;
@@ -53,9 +54,8 @@
     height: 100vh;
     padding: 12px;
     overflow: hidden auto;
-    background-image: url("/images/main-menu-bg.png");
-    background-position: bottom center;
-    background-size: cover;
+    background-color: var(--color-generic-white);
+    box-shadow: 0 0 10px rgb(0 0 0 / 0.1);
     transition: width var(--transition-time) ease, padding var(--transition-time) ease;
   }
 

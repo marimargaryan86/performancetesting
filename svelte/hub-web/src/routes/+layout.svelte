@@ -34,6 +34,6 @@
   main {
     padding: 16px 16px 0;
     overflow-y: auto;
-    background-image: linear-gradient(284.73deg, #9dc6bf 0%, #eaf8ec 100%);
+    background-image: linear-gradient(155.07deg, #ffffff 10.38%, #e4f4f0 102.81%);
   }
 </style>

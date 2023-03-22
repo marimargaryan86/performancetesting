@@ -1,6 +1,6 @@
 .layout.main-content {
   width: 100%;
-  max-width: 1160px;
+  max-width: 1440px;
   height: 100%;
   margin: 0 auto;
   padding: 16px 24px 24px;
@@ -67,10 +67,4 @@
 
 .layout.tab.active::after {
   width: 16px;
-}
-
-@media screen and (max-width: 1439px) {
-  .layout.main-content {
-    max-width: 500px;
-  }
 }
