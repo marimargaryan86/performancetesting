@@ -52,7 +52,7 @@ directferries:
       - data-input/
   script:
     - docker login git.snowfall.se:4567 -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}"
-    - docker pull git.snowfall.se:4567/junction/junction/service/gtfs:latest
+    - docker pull git.snowfall.se:4567/junction/junction/service/direct_ferries:latest
     - docker run -u "${UID}" --rm -v "$(pwd)/:/data" -e CLIENT_ID="${DF_CLIENT_ID}" -e CLIENT_SECRET="${DF_CLIENT_SECRET}" git.snowfall.se:4567/junction/junction/service/direct_ferries:latest export --api-url 'https://sandbox-api.test.directferriesconnect.com' --affiliate-api-url 'https://tf-test-affiliate-api-sandbox.auth.eu-west-1.amazoncognito.com' --partner-code 'F5152' --output-path /data/data-input/
   tags:
     - autoscaler-XL
