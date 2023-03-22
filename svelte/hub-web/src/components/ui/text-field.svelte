@@ -59,9 +59,9 @@
 
 <style>
   .text-field {
-    --height: 52px;
-    --icon-padding: 12px;
-    --font-size: 14px;
+    --x-height: var(--height, 52px);
+    --x-icon-padding: var(--icon-padding, 12px);
+    --x-font-size: var(--font-size, 14px);
 
     display: inline-flex;
     flex-flow: column;
@@ -82,7 +82,7 @@
     position: relative;
     display: flex;
     align-items: center;
-    height: var(--height);
+    height: var(--x-height);
     background: var(--color-generic-white);
     border: 1px solid var(--color-neutral-200);
     border-radius: 8px;
@@ -97,11 +97,11 @@
   }
 
   .wrapper > :global(svg:first-child) {
-    left: var(--icon-padding);
+    left: var(--x-icon-padding);
   }
 
   .wrapper > :global(svg:last-child) {
-    right: var(--icon-padding);
+    right: var(--x-icon-padding);
   }
 
   input {
@@ -109,10 +109,10 @@
     grid-column: 2;
     width: 100%;
     height: 100%;
-    padding: 0 var(--icon-padding);
+    padding: 0 var(--x-icon-padding);
     color: var(--color-neutral-900);
     font-weight: 400;
-    font-size: var(--font-size);
+    font-size: var(--x-font-size);
     font-family: Poppins, Arial, Helvetica, sans-serif;
     font-style: normal;
     letter-spacing: 0.1px;
@@ -127,11 +127,11 @@
   }
 
   .wrapper.icon-before > input {
-    padding-left: calc(var(--icon-padding) + 28px);
+    padding-left: calc(var(--x-icon-padding) + 28px);
   }
 
   .wrapper.icon-after > input {
-    padding-right: calc(var(--icon-padding) + 28px);
+    padding-right: calc(var(--x-icon-padding) + 28px);
   }
 
   .error > .wrapper {

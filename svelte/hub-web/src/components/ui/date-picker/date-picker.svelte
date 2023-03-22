@@ -75,9 +75,9 @@
 
 <style>
   .date-picker {
-    --height: 52px;
-    --font-size: 14px;
-    --icon-padding: 12px;
+    --x-height: var(--height, 52px);
+    --x-font-size: var(--font-size, 14px);
+    --x-icon-padding: var(--icon-padding, 12px);
 
     position: relative;
     display: inline-block;
@@ -88,11 +88,11 @@
     gap: 8px;
     align-items: center;
     justify-content: space-between;
-    height: var(--height);
-    padding: var(--icon-padding);
+    height: var(--x-height);
+    padding: var(--x-icon-padding);
     color: var(--color-neutral-900);
     font-weight: 400;
-    font-size: var(--font-size);
+    font-size: var(--x-font-size);
     font-family: Poppins, Arial, Helvetica, sans-serif;
     font-style: normal;
     letter-spacing: 0.1px;
