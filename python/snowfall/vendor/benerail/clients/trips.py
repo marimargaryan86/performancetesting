@@ -17,7 +17,7 @@ class TripsClient(base.BenerailBaseClient):
                     prefix=_BASE_PATH,
                     trip_collection_id=trip_collection_id,
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -34,7 +34,7 @@ class TripsClient(base.BenerailBaseClient):
                     prefix=_BASE_PATH,
                     trip_id=trip_id,
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 

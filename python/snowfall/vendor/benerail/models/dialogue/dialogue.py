@@ -35,6 +35,7 @@ class DialogueIdTripofferfiltersBody(BenerailBaseModel):
     return_trip_params: DialogueIdTripOfferFiltersReturnTripParams | None = None
     market_segment: str | None = None
     requested_offer_parts: RequestedOfferParts | None = None
+    etag: str | None = None
 
 
 class Dialogue(BenerailBaseModel):

@@ -25,7 +25,7 @@ class ProductsClient(base.BenerailBaseClient):
                     "sales-date": str(sales_date),
                     "travel-date": str(travel_date),
                 },
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 

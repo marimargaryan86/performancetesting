@@ -59,6 +59,7 @@ class GetDialogueResponse(BenerailBaseModel):
     metadata: Metadata | None = None
     response_result: Dialogue | None = Field(None, alias="result")
     links: list[Link] | None = None
+    etag: str | None = None
 
 
 class GetPassengerResponse(BenerailBaseModel):

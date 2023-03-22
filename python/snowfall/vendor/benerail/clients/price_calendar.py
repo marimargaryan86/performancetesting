@@ -25,7 +25,7 @@ class PriceCalendarClient(base.BenerailBaseClient):
                     "from-date": from_date,
                     "period": period,
                 },
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 

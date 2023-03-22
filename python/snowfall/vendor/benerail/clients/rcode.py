@@ -20,7 +20,7 @@ class RcodeClient(base.BenerailBaseClient):
                     rcode_prefix=_BASE_RCODE_PATH,
                     url_token=url_token,
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -37,7 +37,7 @@ class RcodeClient(base.BenerailBaseClient):
                     rcode_prefix=_BASE_RCODE_PATH,
                     urn=urn,
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -56,7 +56,7 @@ class RcodeClient(base.BenerailBaseClient):
                     type_id=type_id,
                     code_id=code_id,
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -75,7 +75,7 @@ class RcodeClient(base.BenerailBaseClient):
                     type_id=type_id,
                     code_id=code_id,
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -96,7 +96,7 @@ class RcodeClient(base.BenerailBaseClient):
                     rcode_type=rcode_type,
                     code=code,
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -109,7 +109,7 @@ class RcodeClient(base.BenerailBaseClient):
             client.RequestOptions(
                 method="GET",
                 path=_BASE_RCODE_AUTHORIZATION_PATH,
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -126,7 +126,7 @@ class RcodeClient(base.BenerailBaseClient):
                     rcode_prefix=_BASE_RCODE_AUTHORIZATION_PATH,
                     group_id=group_id,
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -145,7 +145,7 @@ class RcodeTypeClient(base.BenerailBaseClient):
                     rcode_prefix=_BASE_RCODE_TYPE_PATH,
                     rcode_type=rcode_type,
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -162,7 +162,7 @@ class RcodeTypeClient(base.BenerailBaseClient):
                     rcode_prefix=_BASE_RCODE_TYPE_PATH,
                     rcode_type=rcode_type,
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -181,7 +181,7 @@ class RcodeTypeClient(base.BenerailBaseClient):
                     rcode_type=rcode_type,
                     attribute=attribute_type,
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -198,7 +198,7 @@ class RcodeTypeClient(base.BenerailBaseClient):
                     rcode_prefix=_BASE_RCODE_TYPE_PATH,
                     rcode_type=rcode_type,
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -211,7 +211,7 @@ class RcodeTypeClient(base.BenerailBaseClient):
             client.RequestOptions(
                 method="GET",
                 path=_BASE_RCODE_TYPE_PATH,
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -226,7 +226,7 @@ class PlaceClient(base.BenerailBaseClient):
             client.RequestOptions(
                 method="GET",
                 path=_BASE_PLACE_PATH,
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -243,7 +243,7 @@ class PlaceClient(base.BenerailBaseClient):
                     rcode_prefix=_BASE_PLACE_PATH,
                     urn=urn,
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -264,7 +264,7 @@ class PlaceClient(base.BenerailBaseClient):
                     place_type=place_type,
                     value_str=value_str,
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 

@@ -23,3 +23,9 @@ class BenerailBaseClient(client.HttpClient):
                 subscription_key=self._subscription_key,
             ),
         }
+
+    def _get_headers(self, etag: str | None = None) -> dict[str, str]:
+        if etag:
+            return {**self._auth_headers, "If-Match": etag}
+
+        return self._auth_headers

@@ -18,17 +18,31 @@ class BenerailClient(object):  # noqa: WPS214
         base_url: str,
         http_client: httpx.AsyncClient,
     ):
-        self._dialogue = dialog_client.DialogueClient(
+        self._dialogues_client = dialog_client.DialoguesClient(
             subscription_key,
             base_url,
             http_client,
         )
-        self._trip_filter = dialog_client.TripFilterClient(
+
+        self._trip_filters_client = dialog_client.TripFiltersClient(
             subscription_key,
             base_url,
             http_client,
         )
-        self._trip_offer_filter_client = dialog_client.TripOfferFilterClient(
+
+        self._trip_offer_filters_client = dialog_client.TripOfferFiltersClient(
+            subscription_key,
+            base_url,
+            http_client,
+        )
+
+        self._passengers_client = dialog_client.PassengersClient(
+            subscription_key,
+            base_url,
+            http_client,
+        )
+
+        self._bookers_client = dialog_client.BookersClient(
             subscription_key,
             base_url,
             http_client,
@@ -107,16 +121,24 @@ class BenerailClient(object):  # noqa: WPS214
         )
 
     @property
-    def dialogue(self) -> dialog_client.DialogueClient:
-        return self._dialogue
+    def dialogue(self) -> dialog_client.DialoguesClient:
+        return self._dialogues_client
 
     @property
-    def trip_filter(self) -> dialog_client.TripFilterClient:
-        return self._trip_filter
+    def trip_filter(self) -> dialog_client.TripFiltersClient:
+        return self._trip_filters_client
 
     @property
-    def trip_offer_filter_client(self) -> dialog_client.TripOfferFilterClient:
-        return self._trip_offer_filter_client
+    def trip_offer_filter_client(self) -> dialog_client.TripOfferFiltersClient:
+        return self._trip_offer_filters_client
+
+    @property
+    def passengers_client(self) -> dialog_client.PassengersClient:
+        return self._passengers_client
+
+    @property
+    def bookers_client(self) -> dialog_client.BookersClient:
+        return self._bookers_client
 
     @property
     def bookings_client(self) -> booking_client.BookingsClient:

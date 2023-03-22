@@ -10,6 +10,24 @@ _BASE_PATH = "/bookings/bookings"
 
 
 class BookingsClient(base.BenerailBaseClient):  # noqa: WPS214
+    async def create_booking(
+        self,
+        dialogue_id: str,
+        etag: str,
+    ) -> booking_response.GetBookingResponse:
+        response = await self._make_request(
+            client.RequestOptions(
+                method="POST",
+                path="{dialogue_prefix}/{dialogue_id}/booking".format(
+                    dialogue_prefix=_BASE_PATH,
+                    dialogue_id=dialogue_id,
+                ),
+                headers=self._get_headers(etag),
+            ),
+        )
+
+        return booking_response.GetBookingResponse(**response.json())
+
     async def get_booking(
         self,
         booking_id: str,
@@ -21,7 +39,7 @@ class BookingsClient(base.BenerailBaseClient):  # noqa: WPS214
                     base_path=_BASE_PATH,
                     booking_id=booking_id,
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -39,7 +57,7 @@ class BookingsClient(base.BenerailBaseClient):  # noqa: WPS214
                     base_path=_BASE_PATH,
                     booking_id=booking_id,
                 ),
-                headers={**self._auth_headers, "If-Match": etag},
+                headers=self._get_headers(etag),
             ),
         )
 
@@ -68,7 +86,7 @@ class BookingsClient(base.BenerailBaseClient):  # noqa: WPS214
                         "/products/{tariff_ref}".format(tariff_ref=tariff_ref),
                     ],
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -95,7 +113,7 @@ class BookingsClient(base.BenerailBaseClient):  # noqa: WPS214
                         ),
                     ],
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
         return booking_response.GetBookedOfferResponse(**response.json())
@@ -125,7 +143,7 @@ class BookingsClient(base.BenerailBaseClient):  # noqa: WPS214
                         ),
                     ],
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
         return booking_response.GetBookedOfferPartResponse(**response.json())
@@ -155,7 +173,7 @@ class BookingsClient(base.BenerailBaseClient):  # noqa: WPS214
                         ),
                     ],
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
         return booking_response.GetBookedTripResponse(**response.json())
@@ -179,7 +197,7 @@ class BookingsClient(base.BenerailBaseClient):  # noqa: WPS214
                         ),
                     ],
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -208,7 +226,7 @@ class BookingsClient(base.BenerailBaseClient):  # noqa: WPS214
                         ),
                     ],
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -233,7 +251,7 @@ class OrdersClient(base.BenerailBaseClient):
                         "/orders/{order_id}".format(order_id=order_id),
                     ],
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -257,7 +275,7 @@ class OrdersClient(base.BenerailBaseClient):
                         "/orders/{order_id}".format(order_id=order_id),
                     ],
                 ),
-                headers={**self._auth_headers, "If-Match": etag},
+                headers=self._get_headers(etag),
             ),
         )
 
@@ -282,7 +300,7 @@ class OrdersClient(base.BenerailBaseClient):
                         "/orders/{order_id}".format(order_id=order_id),
                     ],
                 ),
-                headers={**self._auth_headers, "If-Match": etag},
+                headers=self._get_headers(etag),
                 payload=body.dict(by_alias=True, exclude_unset=True),
             ),
         )
@@ -309,7 +327,7 @@ class OrdersClient(base.BenerailBaseClient):
                         "/selected-offers",
                     ],
                 ),
-                headers={**self._auth_headers, "If-Match": etag},
+                headers=self._get_headers(etag),
                 payload=body.dict(by_alias=True, exclude_unset=True),
             ),
         )
@@ -338,7 +356,7 @@ class OrdersClient(base.BenerailBaseClient):
                         ),
                     ],
                 ),
-                headers={**self._auth_headers, "If-Match": etag},
+                headers=self._get_headers(etag),
             ),
         )
 
@@ -364,7 +382,7 @@ class OrdersClient(base.BenerailBaseClient):
                         "/refund-offers",
                     ],
                 ),
-                headers={**self._auth_headers, "If-Match": etag},
+                headers=self._get_headers(etag),
                 payload=body.dict(by_alias=True, exclude_unset=True),
             ),
         )
@@ -393,7 +411,7 @@ class OrdersClient(base.BenerailBaseClient):
                         ),
                     ],
                 ),
-                headers={**self._auth_headers, "If-Match": etag},
+                headers=self._get_headers(etag),
             ),
         )
 
@@ -422,7 +440,7 @@ class SelectedOffersClient(base.BenerailBaseClient):
                         ),
                     ],
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
         return booking_response.GetSelectedOfferResponse(**response.json())
@@ -452,7 +470,7 @@ class SelectedOffersClient(base.BenerailBaseClient):
                         ),
                     ],
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
         return booking_response.GetSelectedOfferPartResponse(**response.json())
@@ -484,7 +502,7 @@ class SelectedOffersClient(base.BenerailBaseClient):
                         ),
                     ],
                 ),
-                headers={**self._auth_headers, "If-Match": etag},
+                headers=self._get_headers(etag),
                 payload=body.dict(by_alias=True, exclude_unset=True),
             ),
         )
@@ -511,7 +529,7 @@ class PaymentsClient(base.BenerailBaseClient):
                         "/orders/{order_id}/payments".format(order_id=order_id),
                     ],
                 ),
-                headers={**self._auth_headers, "If-Match": etag},
+                headers=self._get_headers(etag),
                 payload=body.dict(by_alias=True, exclude_unset=True),
             ),
         )
@@ -537,7 +555,7 @@ class PaymentsClient(base.BenerailBaseClient):
                         "/payments/{payment_id}".format(payment_id=payment_id),
                     ],
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -564,7 +582,7 @@ class PaymentsClient(base.BenerailBaseClient):
                         "/payments/{payment_id}".format(payment_id=payment_id),
                     ],
                 ),
-                headers={**self._auth_headers, "If-Match": etag},
+                headers=self._get_headers(etag),
                 payload=body.dict(by_alias=True, exclude_unset=True),
             ),
         )

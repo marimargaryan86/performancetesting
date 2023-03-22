@@ -21,7 +21,7 @@ class TripOffersClient(base.BenerailBaseClient):
                         trip_offer_collection_id=trip_offer_collection_id,
                     )
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -48,7 +48,7 @@ class TripOffersClient(base.BenerailBaseClient):
                         ),
                     ],
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -65,7 +65,7 @@ class TripOffersClient(base.BenerailBaseClient):
                     prefix=_TRIP_OFFERS_BASE_PATH,
                     trip_offer_id=trip_offer_id,
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -84,7 +84,7 @@ class OffersClient(base.BenerailBaseClient):
                     prefix=_OFFERS_BASE_PATH,
                     offer_id=offer_id,
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
@@ -109,7 +109,7 @@ class OffersClient(base.BenerailBaseClient):
                         ),
                     ],
                 ),
-                headers=self._auth_headers,
+                headers=self._get_headers(),
             ),
         )
 
