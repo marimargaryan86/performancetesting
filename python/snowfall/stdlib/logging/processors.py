@@ -49,7 +49,6 @@ def get_all_processors(common_processors: Sequence[Processor]) -> list[Processor
 
 def _get_before_processors() -> list[Processor]:
     return [
-        structlog.threadlocal.merge_threadlocal,
         structlog.contextvars.merge_contextvars,
         sentry.sentry_trace_processor,
         default_source_processor,
