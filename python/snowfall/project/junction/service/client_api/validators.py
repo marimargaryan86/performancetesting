@@ -277,7 +277,7 @@ def _generate_mandatory_attribute_error_model(
             error_message,
             quote_id,
         ),
-        source=models.ErrorSource(
+        source=models.ErrorSourcePointer(
             pointer="/data/relationships/quote/data/id",
         ),
     )
@@ -326,7 +326,7 @@ def _validate_trips(
                     status=str(status.HTTP_404_NOT_FOUND),
                     code="not_found",
                     detail="'{0}' was not found".format(trip_id),
-                    source=models.ErrorSource(
+                    source=models.ErrorSourcePointer(
                         pointer="/data/relationships/trips/data/{0}/id".format(
                             trip_idx,
                         ),
@@ -357,7 +357,7 @@ def _validate_trips(
                     status=str(status.HTTP_404_NOT_FOUND),
                     code="not_found",
                     detail="'{0}' was not found".format(trip_id),
-                    source=models.ErrorSource(
+                    source=models.ErrorSourcePointer(
                         pointer="/data/relationships/trips/data/{0}/id".format(
                             trip_idx,
                         ),
@@ -394,7 +394,9 @@ def _check_trip_conflicts(trips_list: Sequence[models_pb2.Trip]) -> list[models.
                         trip_a.id,
                         trip_b.id,
                     ),
-                    source=models.ErrorSource(pointer="/data/relationships/trips"),
+                    source=models.ErrorSourcePointer(
+                        pointer="/data/relationships/trips",
+                    ),
                 ),
             )
 
@@ -440,7 +442,7 @@ def price_quote_request_validator(  # noqa: WPS320
                             detail="'{0}' was not found or has expired".format(
                                 body["offer"],
                             ),
-                            source=models.ErrorSource(
+                            source=models.ErrorSourcePointer(
                                 pointer="/data/relationships/offer/data/id",
                             ),
                         ),
@@ -471,7 +473,7 @@ def _validate_options(
             status=str(status.HTTP_422_UNPROCESSABLE_ENTITY),
             code="invalid",
             detail="'{0}' is not a valid option for this offer".format(option_id),
-            source=models.ErrorSource(
+            source=models.ErrorSourcePointer(
                 pointer="/data/relationships/options/data/{0}/id".format(idx),
             ),
         )

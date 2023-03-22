@@ -37,10 +37,19 @@ ResourceType = (
 )
 
 
-class ErrorSource(BaseModel, frozen=True):
-    header: Optional[str]
-    parameter: Optional[str]
-    pointer: Optional[str]
+class ErrorSourceHeader(BaseModel, frozen=True):
+    header: str
+
+
+class ErrorSourceParameter(BaseModel, frozen=True):
+    parameter: str
+
+
+class ErrorSourcePointer(BaseModel, frozen=True):
+    pointer: str
+
+
+ErrorSource = ErrorSourceHeader | ErrorSourceParameter | ErrorSourcePointer
 
 
 class Error(BaseModel, frozen=True):

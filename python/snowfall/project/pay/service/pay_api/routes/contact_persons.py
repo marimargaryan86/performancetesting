@@ -34,7 +34,7 @@ class ContactPersons(endpoints.HTTPEndpoint):
                             status=str(status.HTTP_404_NOT_FOUND),
                             code="not_found",
                             detail="Company does not exists",
-                            source=messages.models.ErrorSource(
+                            source=messages.models.ErrorSourcePointer(
                                 pointer="/data/relationships/company/data/id",
                             ),
                         ),

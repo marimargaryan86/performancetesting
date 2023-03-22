@@ -24,7 +24,7 @@ class CreateUser(endpoints.HTTPEndpoint):
                             status=str(status.HTTP_400_BAD_REQUEST),
                             code="bad_request",
                             detail=str(err),
-                            source=models.ErrorSource(
+                            source=models.ErrorSourcePointer(
                                 pointer="/data/attributes",
                             ),
                         ),
@@ -40,7 +40,7 @@ class CreateUser(endpoints.HTTPEndpoint):
                             status=str(status.HTTP_403_FORBIDDEN),
                             code="forbidden",
                             detail=str(err),
-                            source=models.ErrorSource(
+                            source=models.ErrorSourcePointer(
                                 pointer="/data/id",
                             ),
                         ),
@@ -83,7 +83,7 @@ class Authenticate(endpoints.HTTPEndpoint):
                             status=str(status.HTTP_404_NOT_FOUND),
                             code="not_found",
                             detail=str(err),
-                            source=models.ErrorSource(
+                            source=models.ErrorSourcePointer(
                                 pointer="/data/attributes/email",
                             ),
                         ),
@@ -99,7 +99,7 @@ class Authenticate(endpoints.HTTPEndpoint):
                             status=str(status.HTTP_400_BAD_REQUEST),
                             code="bad_request",
                             detail=str(err),
-                            source=models.ErrorSource(
+                            source=models.ErrorSourcePointer(
                                 pointer="/data/attributes",
                             ),
                         ),
@@ -144,7 +144,7 @@ class ChangePassword(endpoints.HTTPEndpoint):
                             status=str(status.HTTP_400_BAD_REQUEST),
                             code="bad_request",
                             detail=str(err),
-                            source=models.ErrorSource(
+                            source=models.ErrorSourcePointer(
                                 pointer="/data/attributes",
                             ),
                         ),
@@ -160,7 +160,7 @@ class ChangePassword(endpoints.HTTPEndpoint):
                             status=str(status.HTTP_404_NOT_FOUND),
                             code="not_found",
                             detail=str(err),
-                            source=models.ErrorSource(
+                            source=models.ErrorSourcePointer(
                                 pointer="/data/attributes/email",
                             ),
                         ),

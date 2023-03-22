@@ -75,7 +75,7 @@ def _find_missing_locations(
                     status=str(status.HTTP_404_NOT_FOUND),
                     code="not_found",
                     detail="'{0}' was not found".format(location),
-                    source=models.ErrorSource(
+                    source=models.ErrorSourcePointer(
                         pointer="/data/relationships/locations/data/{0}".format(
                             idx,
                         ),
@@ -106,7 +106,7 @@ def _validate_types(
                     status=str(status.HTTP_404_NOT_FOUND),
                     code="not_found",
                     detail="'{0}' was not found".format(place_type),
-                    source=models.ErrorSource(
+                    source=models.ErrorSourcePointer(
                         pointer="/data/relationships/types/data/{0}".format(idx),
                     ),
                 ),

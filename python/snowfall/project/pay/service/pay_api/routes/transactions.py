@@ -102,7 +102,7 @@ class Transactions(endpoints.HTTPEndpoint):
                         status=str(status.HTTP_404_NOT_FOUND),
                         code="not_found",
                         detail="Quotation not valid",
-                        source=messages.models.ErrorSource(
+                        source=messages.models.ErrorSourcePointer(
                             pointer="/data/relationships/quotation/data/id",
                         ),
                     ),

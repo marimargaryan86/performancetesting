@@ -180,7 +180,7 @@ class Orders(endpoints.HTTPEndpoint):
                             detail=(
                                 "Payment's amount or currency doesn't match with order"
                             ),
-                            source=stdlib_models.ErrorSource(
+                            source=stdlib_models.ErrorSourcePointer(
                                 pointer="/data/relationships/payment",
                             ),
                         ),
@@ -196,7 +196,7 @@ class Orders(endpoints.HTTPEndpoint):
                             status=str(status.HTTP_400_BAD_REQUEST),
                             code="invalid_payment_state",
                             detail="Payment Intent is not confirmed",
-                            source=stdlib_models.ErrorSource(
+                            source=stdlib_models.ErrorSourcePointer(
                                 pointer="/data/relationships/payment",
                             ),
                         ),

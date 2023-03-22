@@ -63,7 +63,7 @@ async def cursor_error_handler(
                     status=str(int(status_code_obj)),
                     title=status_code_obj.phrase,
                     detail="Invalid cursor",
-                    source=models.ErrorSource(
+                    source=models.ErrorSourceParameter(
                         parameter="page[cursor]",
                     ),
                 ),

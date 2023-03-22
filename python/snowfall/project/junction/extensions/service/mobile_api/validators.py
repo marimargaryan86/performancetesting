@@ -41,7 +41,7 @@ def voucher_validator(
                                 status=str(status.HTTP_400_BAD_REQUEST),
                                 code="invalid_voucher",
                                 detail="Invalid voucher",
-                                source=models.ErrorSource(
+                                source=models.ErrorSourcePointer(
                                     pointer="/data/relationships/voucher",
                                 ),
                             ),

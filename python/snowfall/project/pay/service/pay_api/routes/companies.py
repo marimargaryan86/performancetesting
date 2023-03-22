@@ -45,23 +45,9 @@ class AdminCompany(endpoints.HTTPEndpoint):
         body = await request_helpers.flatten_request(request)
 
         company = await company_repository.find_by_id(company_id)
+
         if not company:
-            return models.JsonApiResponse(
-                body=messages.models.Body(
-                    errors=[
-                        messages.models.Error(
-                            status=str(status.HTTP_404_NOT_FOUND),
-                            code="not_found",
-                            detail="Entity not found",
-                            source=messages.models.ErrorSource(
-                                parameter="companyId",
-                                pointer="companies/{0}".format(company_id),
-                            ),
-                        ),
-                    ],
-                ),
-                status_code=status.HTTP_404_NOT_FOUND,
-            )
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
         company = _update_company_from_payload(company, body)
 

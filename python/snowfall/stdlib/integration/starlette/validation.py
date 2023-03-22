@@ -83,7 +83,7 @@ def invalid_schema_value_to_errors(
             status=str(status_code),
             code=str(error.validator),
             detail=error.message,
-            source=models.ErrorSource(
+            source=models.ErrorSourcePointer(
                 pointer="/{0}".format(
                     "/".join([str(path) for path in error.absolute_path]),
                 ),

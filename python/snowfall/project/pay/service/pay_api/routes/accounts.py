@@ -96,7 +96,7 @@ class Accounts(endpoints.HTTPEndpoint):
                             status=str(status.HTTP_404_NOT_FOUND),
                             code="not_found",
                             detail="Contact person does not exists",
-                            source=messages.models.ErrorSource(
+                            source=messages.models.ErrorSourcePointer(
                                 pointer="/data/relationships/contactPerson/data/id",
                             ),
                         ),
@@ -112,7 +112,7 @@ class Accounts(endpoints.HTTPEndpoint):
                             status=str(status.HTTP_400_BAD_REQUEST),
                             code="bad_request",
                             detail="Contact already in use for another account",
-                            source=messages.models.ErrorSource(
+                            source=messages.models.ErrorSourcePointer(
                                 pointer="/data/relationships/contactPerson/data/id",
                             ),
                         ),
@@ -131,7 +131,7 @@ class Accounts(endpoints.HTTPEndpoint):
                             status=str(status.HTTP_400_BAD_REQUEST),
                             code="bad_request",
                             detail="Contact person missing company",
-                            source=messages.models.ErrorSource(
+                            source=messages.models.ErrorSourcePointer(
                                 pointer="/data/relationships/contactPerson/data/id",
                             ),
                         ),

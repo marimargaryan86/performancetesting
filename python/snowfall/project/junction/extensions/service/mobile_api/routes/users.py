@@ -71,7 +71,7 @@ class Users(endpoints.HTTPEndpoint):
                             status=str(status.HTTP_400_BAD_REQUEST),
                             code="duplicated_email",
                             detail="User email already exists",
-                            source=models.ErrorSource(
+                            source=models.ErrorSourcePointer(
                                 pointer="/data/attributes/email",
                             ),
                         ),
@@ -172,7 +172,7 @@ class UserLoggedIn(endpoints.HTTPEndpoint):
                                 detail=(
                                     "To change password you must provide existing one"
                                 ),
-                                source=models.ErrorSource(
+                                source=models.ErrorSourcePointer(
                                     pointer="/data/attributes/oldPassword",
                                 ),
                             ),
