@@ -15,16 +15,18 @@ from snowfall.stdlib.integration.starlette import (
 from snowfall.stdlib.v1alpha import phone_number_pb2
 
 
-class ContactPersons(endpoints.HTTPEndpoint):
+class Contacts(endpoints.HTTPEndpoint):
     async def post(
         self,
         request: requests.Request,
-        contact_person_repository: accounts.ContactPersonsRepository = lagom.injectable,
+        contacts_repository: accounts.ContactsRepository = lagom.injectable,
         companies_repository: CompanyRepository = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
 
-        company = await companies_repository.find_by_id(body["company"])
+        company = await companies_repository.find_by_id(
+            request.path_params["companyId"],
+        )
 
         if not company:
             return models.JsonApiResponse(
@@ -43,8 +45,8 @@ class ContactPersons(endpoints.HTTPEndpoint):
                 status_code=status.HTTP_404_NOT_FOUND,
             )
 
-        contact_person = await contact_person_repository.insert(
-            models_pb2.ContactPerson(
+        contact = await contacts_repository.insert(
+            models_pb2.Contact(
                 id=string.uuid(),
                 first_name=body["firstName"],
                 last_name=body["lastName"],
@@ -58,8 +60,8 @@ class ContactPersons(endpoints.HTTPEndpoint):
 
         return await messages.create_response(
             body=models.Body(
-                data=resources.ContactPersonResource.from_proto(
-                    contact_person=contact_person,
+                data=resources.ContactResource.from_proto(
+                    contact=contact,
                 ),
             ),
             request=request,
@@ -69,12 +71,12 @@ class ContactPersons(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        contact_person_repository: accounts.ContactPersonsRepository = lagom.injectable,
+        contact_repository: accounts.ContactsRepository = lagom.injectable,
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
 
-        contact_persons = await contact_person_repository.find_by_company_id(
-            request.query_params["company"],
+        contacts = await contact_repository.find_by_company_id(
+            request.path_params["companyId"],
             pagination.cursor,
             pagination.limit,
         )
@@ -82,14 +84,14 @@ class ContactPersons(endpoints.HTTPEndpoint):
         return await messages.create_response(
             body=models.Body(
                 data=[
-                    resources.ContactPersonResource.from_proto(contact_person)
-                    async for contact_person in contact_persons
+                    resources.ContactResource.from_proto(contact)
+                    async for contact in contacts
                 ],
                 links=pagination_helpers.get_next_url(
-                    request.url_for("ContactPerson").include_query_params(
+                    request.url_for("Contact").include_query_params(
                         company=request.query_params["company"],
                     ),
-                    await contact_persons.cursor(),
+                    await contacts.cursor(),
                     pagination,
                 ),
             ),

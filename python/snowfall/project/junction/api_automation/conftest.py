@@ -266,12 +266,12 @@ async def pay_create_company(
 
 
 @pytest.fixture(scope="function")
-async def pay_create_contact_persons(
+async def pay_create_contact(
     pay_admin_client: PayAdminClient,
     pay_create_company: Mapping[str, Any],
 ) -> dict[str, Any]:
     try:
-        response_create_contact_person = await pay_admin_client.create_contact_persons(
+        response_create_contact = await pay_admin_client.create_contacts(
             first_name="J",
             last_name="N",
             email_address="jerzy.n{0}@snowfalltravel.com".format(
@@ -281,14 +281,14 @@ async def pay_create_contact_persons(
             company_id=pay_create_company["data"]["id"],
         )
     except httpx.HTTPStatusError as err:
-        logger.info("response_create_contact_person err: %s", err.response.headers)
-        logger.info("response_create_contact_person body: %s", err.response.json())
+        logger.info("response_create_contact err: %s", err.response.headers)
+        logger.info("response_create_contact body: %s", err.response.json())
         sys.exit(EXIT_MSG)
     logger.info(
-        "create_contact_persons: %s",
-        json.dumps(response_create_contact_person, indent=4),
+        "create_contacts: %s",
+        json.dumps(response_create_contact, indent=4),
     )
-    return response_create_contact_person
+    return response_create_contact
 
 
 @pytest.fixture(scope="function")
@@ -309,13 +309,13 @@ async def pay_get_accounts(
 @pytest.fixture(scope="function")
 async def pay_create_account(
     pay_admin_client: PayAdminClient,
-    pay_create_contact_persons: Mapping[str, Any],
+    pay_create_contacts: Mapping[str, Any],
 ) -> dict[str, Any]:
     name = "test account {0}".format(return_randomized_token())
     try:
         response_create_account = await pay_admin_client.create_accounts(
             name,
-            pay_create_contact_persons["data"]["id"],
+            pay_create_contacts["data"]["id"],
         )
     except httpx.HTTPStatusError as err:
         logger.info("response_create_account: %s", err.response.headers)

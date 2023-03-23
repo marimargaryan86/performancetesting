@@ -53,7 +53,7 @@ class Accounts(endpoints.HTTPEndpoint):
                     "name": cc_account.account_name,
                     "status": cc_account.status,
                     "company_id": db_account.company_id,
-                    "contact_person_id": db_account.contact_id,
+                    "contact_id": db_account.contact_id,
                 },
             )
 
@@ -78,33 +78,33 @@ class Accounts(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         accounts_repository: accounts.AccountsRepository = lagom.injectable,
-        contact_person_repository: accounts.ContactPersonsRepository = lagom.injectable,
+        contact_repository: accounts.ContactsRepository = lagom.injectable,
         companies_repository: CompanyRepository = lagom.injectable,
         payment_client: PaymentClient = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
 
-        contact_person = await contact_person_repository.find_by_id(
-            body["contactPerson"],
+        contact = await contact_repository.find_by_id(
+            body["contact"],
         )
 
-        if not contact_person:
+        if not contact:
             return models.JsonApiResponse(
                 body=messages.models.Body(
                     errors=[
                         messages.models.Error(
                             status=str(status.HTTP_404_NOT_FOUND),
                             code="not_found",
-                            detail="Contact person does not exists",
+                            detail="Contact does not exists",
                             source=messages.models.ErrorSourcePointer(
-                                pointer="/data/relationships/contactPerson/data/id",
+                                pointer="/data/relationships/contact/data/id",
                             ),
                         ),
                     ],
                 ),
                 status_code=status.HTTP_404_NOT_FOUND,
             )
-        if contact_person.external_reference:
+        if contact.external_reference:
             return models.JsonApiResponse(
                 body=messages.models.Body(
                     errors=[
@@ -113,7 +113,7 @@ class Accounts(endpoints.HTTPEndpoint):
                             code="bad_request",
                             detail="Contact already in use for another account",
                             source=messages.models.ErrorSourcePointer(
-                                pointer="/data/relationships/contactPerson/data/id",
+                                pointer="/data/relationships/contact/data/id",
                             ),
                         ),
                     ],
@@ -121,7 +121,7 @@ class Accounts(endpoints.HTTPEndpoint):
                 status_code=status.HTTP_400_BAD_REQUEST,
             )
 
-        company = await companies_repository.find_by_id(contact_person.company_id)
+        company = await companies_repository.find_by_id(contact.company_id)
 
         if not company:
             return models.JsonApiResponse(
@@ -130,9 +130,9 @@ class Accounts(endpoints.HTTPEndpoint):
                         messages.models.Error(
                             status=str(status.HTTP_400_BAD_REQUEST),
                             code="bad_request",
-                            detail="Contact person missing company",
+                            detail="Contact missing company",
                             source=messages.models.ErrorSourcePointer(
-                                pointer="/data/relationships/contactPerson/data/id",
+                                pointer="/data/relationships/contact/data/id",
                             ),
                         ),
                     ],
@@ -150,20 +150,20 @@ class Accounts(endpoints.HTTPEndpoint):
                 id=string.uuid(),
                 external_reference=cc_account.identifier,
                 company_id=company.id,
-                contact_id=contact_person.id,
+                contact_id=contact.id,
             ),
         )
         try:
-            cc_contact = self._create_cc_contact_person(
+            cc_contact = self._create_cc_contact(
                 account.external_reference,
-                contact_person,
+                contact,
                 payment_client,
             )
         except CurrencyCloudError as exc:
             return self._generate_error(exc)
 
-        await contact_person_repository.update_reference(
-            contact_person,
+        await contact_repository.update_reference(
+            contact,
             cc_contact.identifier,
         )
 
@@ -174,7 +174,7 @@ class Accounts(endpoints.HTTPEndpoint):
                     name=body["name"],
                     status=cc_account.status,
                     company_id=company.id,
-                    contact_person_id=account.contact_id,
+                    contact_id=account.contact_id,
                 ),
             ),
             request=request,
@@ -198,19 +198,19 @@ class Accounts(endpoints.HTTPEndpoint):
             ),
         )
 
-    def _create_cc_contact_person(
+    def _create_cc_contact(
         self,
         account_id: str,
-        contact_person: account_models.ContactPerson,
+        contact: account_models.Contact,
         payment_client: PaymentClient,
     ) -> cc_contact_models.ContactResponse:
         return payment_client.create_contact(
             cc_contact_models.ContactRequest(
                 account_id=account_id,
-                first_name=contact_person.first_name,
-                last_name=contact_person.last_name,
-                email_address=contact_person.email,
-                phone_number=contact_person.phone_number.e164_number,
+                first_name=contact.first_name,
+                last_name=contact.last_name,
+                email_address=contact.email,
+                phone_number=contact.phone_number.e164_number,
             ),
         )
 

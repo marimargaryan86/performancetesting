@@ -4,14 +4,11 @@ from unittest import mock
 import httpx
 from starlette import status
 
-from snowfall.project.pay.service.accounts.v1alpha.models_pb2 import (
-    Account,
-    ContactPerson,
-)
+from snowfall.project.pay.service.accounts.v1alpha.models_pb2 import Account, Contact
 
 
 class TestAccounts(object):
-    async def test_missing_contact_person(
+    async def test_missing_contact(
         self,
         admin_client: httpx.AsyncClient,
     ) -> None:
@@ -20,10 +17,10 @@ class TestAccounts(object):
                 "type": "accounts",
                 "attributes": {"name": "account"},
                 "relationships": {
-                    "contactPerson": {
+                    "contact": {
                         "data": {
                             "id": "04f83af5-10bb-4a0f-1881-03e1e660f0f5",
-                            "type": "contact-persons",
+                            "type": "contacts",
                         },
                     },
                 },
@@ -31,23 +28,23 @@ class TestAccounts(object):
         }
         response = await admin_client.post("/accounts", json=request)
         error = response.json()["errors"][0]
-        assert error["detail"] == "Contact person does not exists"
+        assert error["detail"] == "Contact does not exists"
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    async def test_contact_person_with_bad_company_id(
+    async def test_contact_with_bad_company_id(
         self,
         admin_client: httpx.AsyncClient,
-        contact_person_with_bad_company_id: ContactPerson,
+        contact_with_bad_company_id: Contact,
     ) -> None:
         request = {
             "data": {
                 "type": "accounts",
                 "attributes": {"name": "account"},
                 "relationships": {
-                    "contactPerson": {
+                    "contact": {
                         "data": {
-                            "id": contact_person_with_bad_company_id.id,
-                            "type": "contact-persons",
+                            "id": contact_with_bad_company_id.id,
+                            "type": "contacts",
                         },
                     },
                 },
@@ -55,7 +52,7 @@ class TestAccounts(object):
         }
         response = await admin_client.post("/accounts", json=request)
         error = response.json()["errors"][0]
-        assert error["detail"] == "Contact person missing company"
+        assert error["detail"] == "Contact missing company"
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     async def test_list_accounts(

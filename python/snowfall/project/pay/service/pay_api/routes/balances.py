@@ -12,7 +12,7 @@ class Balances(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         accounts_repository: accounts.AccountsRepository = lagom.injectable,
-        contact_person_repository: accounts.ContactPersonsRepository = lagom.injectable,
+        contact_repository: accounts.ContactsRepository = lagom.injectable,
         payment_client: PaymentClient = lagom.injectable,
     ) -> responses.Response:
         account = await accounts_repository.find_by_id(
@@ -22,7 +22,7 @@ class Balances(endpoints.HTTPEndpoint):
         if not account:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
-        contact = await contact_person_repository.find_by_id(account.contact_id)
+        contact = await contact_repository.find_by_id(account.contact_id)
 
         if not contact:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)

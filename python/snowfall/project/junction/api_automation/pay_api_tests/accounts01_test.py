@@ -36,8 +36,5 @@ async def test_get_accounts(  # noqa: WPS218
     assert isinstance(first_entry["attributes"]["status"], str)
     assert is_valid_uuid(first_entry["relationships"]["company"]["data"]["id"])
     assert first_entry["relationships"]["company"]["data"]["type"] == "companies"
-    assert is_valid_uuid(first_entry["relationships"]["contactPerson"]["data"]["id"])
-    assert (
-        first_entry["relationships"]["contactPerson"]["data"]["type"]
-        == "contact-persons"
-    )
+    assert is_valid_uuid(first_entry["relationships"]["contact"]["data"]["id"])
+    assert first_entry["relationships"]["contact"]["data"]["type"] == "contacts"

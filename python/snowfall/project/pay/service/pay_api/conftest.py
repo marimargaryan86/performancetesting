@@ -86,7 +86,7 @@ def _create_admin_app(  # noqa: WPS211
     payment_client: PaymentClient,
     authentication_client: authentication.Client,
     companies_repository: CompanyRepository,
-    contact_persons_repository: accounts.ContactPersonsRepository,
+    contacts_repository: accounts.ContactsRepository,
     accounts_repository: accounts.AccountsRepository,
     conversions_repository: ConversionRepository,
     transactions_repository: TransactionRepository,
@@ -101,7 +101,7 @@ def _create_admin_app(  # noqa: WPS211
                 cc_client,
                 authentication_client,
                 companies_repository,
-                contact_persons_repository,
+                contacts_repository,
                 accounts_repository=accounts_repository,
                 conversions_repository=conversions_repository,
                 transactions_repository=transactions_repository,
@@ -163,11 +163,11 @@ def quotations_repository(
 
 
 @pytest.fixture()
-def contact_persons_repository(
+def contacts_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
-) -> accounts.ContactPersonsRepository:
-    return accounts.ContactPersonsRepository(
-        collection=mongo_client.test.contactpersons,
+) -> accounts.ContactsRepository:
+    return accounts.ContactsRepository(
+        collection=mongo_client.test.contacts,
     )
 
 
@@ -336,7 +336,7 @@ def admin_app(  # noqa: WPS211
     authentication_client: authentication.Client,
     companies_repository: CompanyRepository,
     payment_client: PaymentClient,
-    contact_persons_repository: accounts.ContactPersonsRepository,
+    contacts_repository: accounts.ContactsRepository,
     accounts_repository: accounts.AccountsRepository,
     conversions_repository: ConversionRepository,
     transactions_repository: TransactionRepository,
@@ -346,7 +346,7 @@ def admin_app(  # noqa: WPS211
         payment_client=payment_client,
         authentication_client=authentication_client,
         companies_repository=companies_repository,
-        contact_persons_repository=contact_persons_repository,
+        contacts_repository=contacts_repository,
         accounts_repository=accounts_repository,
         conversions_repository=conversions_repository,
         transactions_repository=transactions_repository,

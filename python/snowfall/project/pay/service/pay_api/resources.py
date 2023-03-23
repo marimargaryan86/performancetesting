@@ -163,27 +163,27 @@ class Transaction(models.Resource):
         )
 
 
-class ContactPersonResource(models.Resource):
-    api_type: ClassVar[str] = "contact-persons"
+class ContactResource(models.Resource):
+    api_type: ClassVar[str] = "contacts"
 
     @classmethod
     def from_proto(
         cls,
-        contact_person: account_models.ContactPerson,
-    ) -> ContactPersonResource:
+        contact: account_models.Contact,
+    ) -> ContactResource:
         return cls(
-            id=contact_person.id,
-            type=ContactPersonResource.api_type,
+            id=contact.id,
+            type=ContactResource.api_type,
             attributes={
-                "firstName": contact_person.first_name,
-                "lastName": contact_person.last_name,
-                "emailAddress": contact_person.email,
-                "phoneNumber": contact_person.phone_number.e164_number,
+                "firstName": contact.first_name,
+                "lastName": contact.last_name,
+                "emailAddress": contact.email,
+                "phoneNumber": contact.phone_number.e164_number,
             },
             relationships={
                 "company": {
                     "data": {
-                        "id": contact_person.company_id,
+                        "id": contact.company_id,
                         "type": "companies",
                     },
                 },
@@ -235,7 +235,7 @@ class AccountResource(models.Resource):
         name: str,
         status: str,
         company_id: str,
-        contact_person_id: str,
+        contact_id: str,
     ) -> AccountResource:
         return cls(
             id=identifier,
@@ -251,10 +251,10 @@ class AccountResource(models.Resource):
                         "type": "companies",
                     },
                 },
-                "contactPerson": {
+                "contact": {
                     "data": {
-                        "id": contact_person_id,
-                        "type": "contact-persons",
+                        "id": contact_id,
+                        "type": "contacts",
                     },
                 },
             },

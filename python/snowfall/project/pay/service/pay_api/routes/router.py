@@ -7,7 +7,7 @@ from snowfall.project.pay.service.pay_api.routes import (  # noqa: WPS235
     authentication,
     balances,
     companies,
-    contact_persons,
+    contacts,
     conversions,
     currencies,
     quotations,
@@ -82,9 +82,9 @@ def get_admin_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             methods=["PATCH", "GET"],
         ),
         integration.route(
-            "/contact-persons",
-            contact_persons.ContactPersons,
-            name="ContactPerson",
+            "/companies/{companyId}/contacts",
+            contacts.Contacts,
+            name="Contact",
         ),
         integration.route(
             "/accounts",

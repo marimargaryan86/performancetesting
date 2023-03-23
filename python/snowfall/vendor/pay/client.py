@@ -338,7 +338,7 @@ class PayAdminClient(object):  # noqa: WPS214
         response.raise_for_status()
         return response.json()
 
-    async def create_contact_persons(  # noqa: WPS211
+    async def create_contacts(  # noqa: WPS211
         self,
         first_name: str,
         last_name: str,
@@ -375,7 +375,7 @@ class PayAdminClient(object):  # noqa: WPS214
     async def create_accounts(
         self,
         name: str,
-        contact_person_id: str,
+        contact_id: str,
     ) -> dict[str, Any]:
         payload = {
             _DATA_KEY: {
@@ -384,10 +384,10 @@ class PayAdminClient(object):  # noqa: WPS214
                     "name": name,
                 },
                 _RELATIONSHIPS_KEY: {
-                    "contactPerson": {
+                    "contact": {
                         _DATA_KEY: {
-                            _ID_KEY: contact_person_id,
-                            _TYPE_KEY: "contact-persons",
+                            _ID_KEY: contact_id,
+                            _TYPE_KEY: "contacts",
                         },
                     },
                 },

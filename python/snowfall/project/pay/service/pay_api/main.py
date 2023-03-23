@@ -151,8 +151,8 @@ def _admin_factory(
                     companies_repository=CompanyRepository(
                         mongo.companies.companies,
                     ),
-                    contact_persons_repository=accounts.ContactPersonsRepository(
-                        mongo.contactpersons.contactpersons,
+                    contacts_repository=accounts.ContactsRepository(
+                        mongo.contacts.contacts,
                     ),
                     accounts_repository=accounts.AccountsRepository(
                         mongo.accounts.accounts,

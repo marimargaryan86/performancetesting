@@ -11,6 +11,7 @@ class ContactRequest(CamelCaseBaseModel):
     last_name: str
     email_address: str
     phone_number: str
+    status: str = "enabled"
 
 
 class ContactResponse(CamelCaseBaseModel):

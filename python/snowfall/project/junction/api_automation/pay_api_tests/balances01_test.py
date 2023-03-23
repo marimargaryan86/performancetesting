@@ -44,6 +44,6 @@ async def test_get_balances(  # noqa: WPS218
     assert isinstance(first_entry["attributes"]["amount"], int)
     assert is_valid_uuid(first_entry["relationships"]["account"]["data"]["id"])
     assert first_entry["relationships"]["company"]["data"]["type"] == "accounts"
-    assert is_valid_uuid(first_entry["relationships"]["contactPerson"]["data"]["id"])
+    assert is_valid_uuid(first_entry["relationships"]["contact"]["data"]["id"])
     assert isinstance(first_entry["relationships"]["currency"]["data"]["id"], str)
     assert first_entry["relationships"]["currency"]["data"]["type"] == "currencies"

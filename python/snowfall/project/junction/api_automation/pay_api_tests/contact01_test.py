@@ -24,7 +24,7 @@ EXIT_MSG = "Exiting ; check your logs"
 
 
 @pytest.mark.integration
-async def test_create_contact_persons(  # noqa: WPS210, WPS218
+async def test_create_contacts(  # noqa: WPS210, WPS218
     pay_admin_client: PayAdminClient,
 ) -> None:
     company = "test-company-{0}".format(return_randomized_token())
@@ -58,7 +58,7 @@ async def test_create_contact_persons(  # noqa: WPS210, WPS218
     phone_number = "+48123456789"
 
     try:
-        response_create_contact_person = await pay_admin_client.create_contact_persons(
+        response_create_contact = await pay_admin_client.create_contacts(
             first_name=first_name,
             last_name=last_name,
             email_address=email_address,
@@ -66,32 +66,24 @@ async def test_create_contact_persons(  # noqa: WPS210, WPS218
             company_id=response_company["data"]["id"],
         )
     except httpx.HTTPStatusError as err1:
-        logger.info("response_create_contact_person err: %s", err1.response.headers)
-        logger.info("response_create_contact_person body: %s", err1.response.json())
+        logger.info("response_create_contact err: %s", err1.response.headers)
+        logger.info("response_create_contact body: %s", err1.response.json())
         sys.exit(EXIT_MSG)
 
     logger.info(
-        "create_contact_persons: %s",
-        json.dumps(response_create_contact_person, indent=4),
+        "create_contacts: %s",
+        json.dumps(response_create_contact, indent=4),
     )
 
-    assert is_valid_uuid(response_create_contact_person["data"]["id"])
-    assert response_create_contact_person["data"]["type"] == "contact-persons"
+    assert is_valid_uuid(response_create_contact["data"]["id"])
+    assert response_create_contact["data"]["type"] == "contact-persons"
+    assert response_create_contact["data"]["attributes"]["firstName"] == first_name
+    assert response_create_contact["data"]["attributes"]["lastName"] == last_name
     assert (
-        response_create_contact_person["data"]["attributes"]["firstName"] == first_name
+        response_create_contact["data"]["attributes"]["emailAddress"] == email_address
     )
-    assert response_create_contact_person["data"]["attributes"]["lastName"] == last_name
-    assert (
-        response_create_contact_person["data"]["attributes"]["emailAddress"]
-        == email_address
-    )
-    assert (
-        response_create_contact_person["data"]["attributes"]["phoneNumber"]
-        == phone_number
-    )
-    company_data = response_create_contact_person["data"]["relationships"]["company"][
-        "data"
-    ]
+    assert response_create_contact["data"]["attributes"]["phoneNumber"] == phone_number
+    company_data = response_create_contact["data"]["relationships"]["company"]["data"]
     assert is_valid_uuid(company_data["id"])
     assert company_data["id"] == response_company["data"]["id"]
     assert company_data["type"] == "companies"

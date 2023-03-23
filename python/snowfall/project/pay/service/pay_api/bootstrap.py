@@ -45,7 +45,7 @@ def create_admin_dependencies(  # noqa: WPS211
     cc_client: currencycloud.Client,
     authentication_client: authentication.Client,
     companies_repository: CompanyRepository,
-    contact_persons_repository: accounts.ContactPersonsRepository,
+    contacts_repository: accounts.ContactsRepository,
     accounts_repository: accounts.AccountsRepository,
     conversions_repository: ConversionRepository,
     transactions_repository: TransactionRepository,
@@ -56,7 +56,7 @@ def create_admin_dependencies(  # noqa: WPS211
     container[client.PaymentClient] = payment_client or client.PaymentClient(cc_client)
     container[authentication.Client] = authentication_client  # type: ignore[type-abstract]
     container[CompanyRepository] = companies_repository
-    container[accounts.ContactPersonsRepository] = contact_persons_repository
+    container[accounts.ContactsRepository] = contacts_repository
     container[accounts.AccountsRepository] = accounts_repository
     container[ConversionRepository] = conversions_repository
     container[TransactionRepository] = transactions_repository

@@ -35,9 +35,9 @@
       ]
     },
     {
-      "name": "Contact Persons",
+      "name": "Contacts",
       "tags": [
-        "contact-persons"
+        "contacts"
       ]
     },
     {
@@ -87,9 +87,9 @@
       "x-displayName": "Companies"
     },
     {
-      "name": "contact-persons",
-      "description": "Contact persons",
-      "x-displayName": "Contact persons"
+      "name": "contacts",
+      "description": "Contacts",
+      "x-displayName": "Contacts"
     },
     {
       "name": "conversions",
@@ -791,11 +791,11 @@
         }
       }
     },
-    "/contact-persons": {
+    "/companies/{companyId}/contacts": {
       "get": {
-        "summary": "List Contact persons",
+        "summary": "List Contacts",
         "tags": [
-          "contact-persons"
+          "contacts"
         ],
         "parameters": [
           {
@@ -805,7 +805,7 @@
             "$ref": "#/components/parameters/page-limit"
           },
           {
-            "$ref": "#/components/parameters/company"
+            "$ref": "#/components/parameters/companyId"
           }
         ],
         "responses": {
@@ -823,7 +823,7 @@
                           "uniqueItems": true,
                           "minItems": 0,
                           "items": {
-                            "$ref": "#/components/schemas/ContactPerson"
+                            "$ref": "#/components/schemas/Contact"
                           }
                         }
                       },
@@ -843,25 +843,30 @@
             "$ref": "#/components/responses/Unauthorized"
           }
         },
-        "operationId": "get-contact-persons",
-        "description": "Get contact persons"
+        "operationId": "get-companies-id-contacts",
+        "description": "Get contacts"
       },
       "post": {
-        "summary": "Create Contact person",
+        "summary": "Create Contact",
         "tags": [
-          "contact-persons"
+          "contacts"
         ],
-        "operationId": "post-contact-persons",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          }
+        ],
+        "operationId": "post-companies-id-contacts",
         "responses": {
           "201": {
-            "description": "Contact person created",
+            "description": "Contact created",
             "content": {
               "application/vnd.api+json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/ContactPerson"
+                      "$ref": "#/components/schemas/Contact"
                     }
                   },
                   "required": [
@@ -881,7 +886,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "description": "Used to create contact person",
+        "description": "Used to create contact",
         "requestBody": {
           "required": true,
           "content": {
@@ -890,7 +895,7 @@
                 "type": "object",
                 "properties": {
                   "data": {
-                    "$ref": "#/components/schemas/ContactPerson"
+                    "$ref": "#/components/schemas/Contact"
                   }
                 },
                 "required": [
@@ -1017,17 +1022,6 @@
           "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
         },
         "description": "Conversion id"
-      },
-      "company": {
-        "name": "company",
-        "in": "query",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "format": "uuid",
-          "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
-        },
-        "description": "Company id"
       },
       "sortAccount": {
         "name": "sort",
@@ -1230,7 +1224,7 @@
             "type": "object",
             "required": [
               "company",
-              "contactPerson"
+              "contact"
             ],
             "properties": {
               "company": {
@@ -1245,14 +1239,14 @@
                   }
                 }
               },
-              "contactPerson": {
+              "contact": {
                 "type": "object",
                 "required": [
                   "data"
                 ],
                 "properties": {
                   "data": {
-                    "$ref": "#/components/schemas/ContactPersonIdentifier"
+                    "$ref": "#/components/schemas/ContactIdentifier"
                   }
                 }
               }
@@ -1267,8 +1261,8 @@
         ],
         "description": "Account schema."
       },
-      "ContactPerson": {
-        "title": "Contact Person",
+      "Contact": {
+        "title": "Contact",
         "type": "object",
         "properties": {
           "id": {
@@ -1279,9 +1273,9 @@
           },
           "type": {
             "type": "string",
-            "example": "contact-persons",
+            "example": "contacts",
             "enum": [
-              "contact-persons"
+              "contacts"
             ]
           },
           "attributes": {
@@ -1328,6 +1322,7 @@
             "properties": {
               "company": {
                 "type": "object",
+                "readOnly": true,
                 "required": [
                   "data"
                 ],
@@ -1346,7 +1341,7 @@
           "attributes",
           "relationships"
         ],
-        "description": "Contact Person schema."
+        "description": "Contact schema."
       },
       "AddressDetails": {
         "title": "Address Details",
@@ -1813,8 +1808,8 @@
           "type"
         ]
       },
-      "ContactPersonIdentifier": {
-        "title": "Contact Person Identifier",
+      "ContactIdentifier": {
+        "title": "Contact Identifier",
         "type": "object",
         "properties": {
           "id": {
@@ -1825,9 +1820,9 @@
           "type": {
             "type": "string",
             "enum": [
-              "contact-persons"
+              "contacts"
             ],
-            "example": "contact-persons"
+            "example": "contacts"
           }
         },
         "required": [

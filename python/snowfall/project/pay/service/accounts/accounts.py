@@ -18,22 +18,22 @@ class AccountsRepository(
         )
 
 
-class ContactPersonsRepository(
-    mixins.InsertMixin[models_pb2.ContactPerson],
-    mixins.FindByIdMixin[models_pb2.ContactPerson],
-    repository.ProtoRepository[models_pb2.ContactPerson],
+class ContactsRepository(
+    mixins.InsertMixin[models_pb2.Contact],
+    mixins.FindByIdMixin[models_pb2.Contact],
+    repository.ProtoRepository[models_pb2.Contact],
 ):
-    _proto = models_pb2.ContactPerson
+    _proto = models_pb2.Contact
     _default_page_size = 20
 
     async def update_reference(
         self,
-        contact_person: models_pb2.ContactPerson,
+        contact: models_pb2.Contact,
         external_reference: str,
-    ) -> models_pb2.ContactPerson:
+    ) -> models_pb2.Contact:
         return await self._execute(
             self._collection.update_one,
-            filter={"_id": contact_person.id},
+            filter={"_id": contact.id},
             update={
                 "$set": {
                     "external_reference": external_reference,
@@ -46,14 +46,14 @@ class ContactPersonsRepository(
         company_id: str,
         cursor: str | None,
         limit: int | None,
-    ) -> resultset.ResultSet[models_pb2.ContactPerson]:
-        contact_persons = await self._find_with_cursor(
+    ) -> resultset.ResultSet[models_pb2.Contact]:
+        contacts = await self._find_with_cursor(
             cur=cursor or "",
             filter_={
                 "company_id": company_id,
             },
         )
 
-        contact_persons.limit(limit or self._default_page_size)
+        contacts.limit(limit or self._default_page_size)
 
-        return contact_persons
+        return contacts
