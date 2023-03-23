@@ -1,13 +1,13 @@
 import asyncio
 
 from snowfall.project.junction.service.offers.v1alpha import amqp_pb2, models_pb2
-from snowfall.stdlib.transport.amqp import protocol
+from snowfall.stdlib.transport.amqp import protocol, trackable
 
 
 class OfferSearchProducer(object):
     def __init__(
         self,
-        producer: protocol.Producer,
+        producer: trackable.TrackableProducer,
         routing_key: str,
     ):
         self._producer = producer
@@ -19,12 +19,13 @@ class OfferSearchProducer(object):
     ) -> None:
         await asyncio.gather(
             self._producer.publish(
-                amqp_pb2.TripOfferSearchTask(
+                msg=amqp_pb2.TripOfferSearchTask(
                     offer_search_id=offer_search.id,
                     search=offer_search.trip,
                     session_token=offer_search.session_token,
                 ),
-                self._routing_key,
+                routing_key=self._routing_key,
+                trackable_id=offer_search.id,
             ),
         )
 
@@ -45,12 +46,12 @@ class PriceQuoteProducer(object):
         await asyncio.gather(
             *[
                 self._producer.publish(
-                    amqp_pb2.TripPriceQuoteTask(
+                    msg=amqp_pb2.TripPriceQuoteTask(
                         price_quote_container_id=price_quote_container.id,
                         option_id=option_id,
                         session_token=price_quote_container.session_token,
                     ),
-                    self._routing_key,
+                    routing_key=self._routing_key,
                 )
                 for option_id in price_quote_container.option_ids
             ],
