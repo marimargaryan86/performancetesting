@@ -25,7 +25,12 @@ class BenerailBaseClient(client.HttpClient):
         }
 
     def _get_headers(self, etag: str | None = None) -> dict[str, str]:
-        if etag:
-            return {**self._auth_headers, "If-Match": etag}
+        headers = {
+            **self._auth_headers,
+            "Content-Type": "application/json",
+        }
 
-        return self._auth_headers
+        if etag:
+            headers["If-Match"] = etag
+
+        return headers

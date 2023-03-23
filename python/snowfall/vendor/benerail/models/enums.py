@@ -6,6 +6,7 @@ class RequestType(Enum):
     get = "GET"
     put = "PUT"
     delete = "DELETE"
+    patch = "PATCH"
 
 
 class Format(Enum):

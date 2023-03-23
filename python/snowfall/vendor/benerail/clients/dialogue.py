@@ -231,7 +231,7 @@ class PassengersClient(base.BenerailBaseClient):
                     dialogue_prefix=_BASE_PATH,
                     dialogue_id=dialogue_id,
                 ),
-                payload=body.dict(by_alias=True, exclude_unset=True),
+                raw_content=body.json(by_alias=True, exclude_unset=True),
                 headers=self._get_headers(etag),
             ),
         )
@@ -245,7 +245,7 @@ class PassengersClient(base.BenerailBaseClient):
     ) -> dialogue_response.GetPassengerResponse:
         response = await self._make_request(
             client.RequestOptions(
-                method="POST",
+                method="GET",
                 path=(
                     "{dialogue_prefix}/{dialogue_id}/passengers/{passenger_id}".format(
                         dialogue_prefix=_BASE_PATH,
