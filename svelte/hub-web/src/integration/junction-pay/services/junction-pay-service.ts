@@ -8,6 +8,13 @@ export default abstract class JunctionPayService {
     this.baseUrl = baseUrl;
   }
 
+  protected getHeadersWithAuth(token: string): Record<string, string> {
+    return {
+      ...this.headers,
+      Authorization: `Bearer ${token}`,
+    };
+  }
+
   protected getResourceUrl(resource: string, queryParams?: Record<string, unknown>): URL {
     const url = new URL(resource, this.baseUrl);
 

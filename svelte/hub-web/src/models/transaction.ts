@@ -1,4 +1,5 @@
-import type { CurrencyAmount } from "./currency";
+import type { CompanyModel } from "./company";
+import type { MoneyModel } from "./money";
 
 export const transactionStatus = ["paid", "pending", "cancelled"] as const;
 
@@ -24,11 +25,11 @@ export interface TransactionModel {
   id: string;
   parentId: string;
   createdAt: Date;
-  payer: string;
-  theyOwe: CurrencyAmount;
-  beneficiery: string;
-  weOwe: CurrencyAmount;
-  profit: CurrencyAmount;
+  payer: CompanyModel;
+  offerAmount: MoneyModel;
+  beneficiary: CompanyModel;
+  beneficiaryAmount: MoneyModel;
+  profit: MoneyModel;
   reference: string;
   status: TransactionStatus;
 }
@@ -37,8 +38,8 @@ export interface BalanceTransactionModel {
   createdAt: Date;
   action: string;
   reason: string;
-  debit: CurrencyAmount;
-  credit: CurrencyAmount;
-  balance: CurrencyAmount;
+  debit: MoneyModel;
+  credit: MoneyModel;
+  balance: MoneyModel;
   status: BalanceTransactionStatus;
 }

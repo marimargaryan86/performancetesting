@@ -20,6 +20,8 @@ const config = {
       formatting: "src/formatting",
       directives: "src/directives",
       mock: "src/mock",
+      filters: "src/filters",
+      sorting: "src/sorting",
     },
   },
 };

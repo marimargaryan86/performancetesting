@@ -11,15 +11,15 @@
       action: "FX Conversion",
       reason: "BA Payment",
       balance: {
-        code: "USD",
+        currency: "USD",
         amount: Math.random() * 13000,
       },
       credit: {
-        code: "USD",
+        currency: "USD",
         amount: Math.random() * 13000,
       },
       debit: {
-        code: "USD",
+        currency: "USD",
         amount: Math.random() * 13000,
       },
       status: ["completed", "deleted", "pending"][
@@ -62,9 +62,9 @@
     </ul>
 
     <div class="balance">
-      <CurrencyFlag code={data.balance.code} />
+      <CurrencyFlag code={data.balance.currency} />
       <span>{formatAmount(data.balance)}</span>
-      <strong>{data.balance.code.toUpperCase()}</strong>
+      <strong>{data.balance.currency.toUpperCase()}</strong>
     </div>
   </div>
 

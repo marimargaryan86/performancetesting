@@ -1,11 +1,11 @@
 import { error } from "@sveltejs/kit";
 import { mockBalances } from "mock/currency";
-import type { CurrencyAmount } from "models/currency";
+import type { MoneyModel } from "models/money";
 import type { PageServerLoadEvent } from "./$types";
 
-export function load(event: PageServerLoadEvent): { balance: CurrencyAmount } {
+export function load(event: PageServerLoadEvent): { balance: MoneyModel } {
   const balance = mockBalances.find(
-    (item) => item.code.toLowerCase() === event.params.currencyCode.toLowerCase(),
+    (item) => item.currency.toLowerCase() === event.params.currencyCode.toLowerCase(),
   );
 
   if (!balance) {

@@ -30,7 +30,7 @@ export function load(event: LayoutServerLoadEvent): {
   breadCrumbs: BreadCrumb[];
   account: AccountModel;
 } {
-  const account = mockAccounts.find((item) => item.id === event.params.accountId);
+  const account = mockAccounts[0];
 
   if (!account) {
     throw error(404, "Not Found");

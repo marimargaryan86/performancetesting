@@ -5,7 +5,7 @@
   import SearchIcon from "components/icons/search-icon.svelte";
   import TextField from "components/ui/text-field.svelte";
   import { formatAmount } from "formatting/currency";
-  import type { CurrencyAmount } from "models/currency";
+  import type { MoneyModel } from "models/money";
   import type { PageData } from "./$types";
   import AddBalanceDialogue from "./add-balance-dialogue.svelte";
 
@@ -15,14 +15,14 @@
   let dialogue: AddBalanceDialogue;
 
   $: balances = data.balances.filter((item) =>
-    item.code.toLowerCase().includes(searchQuery.toLowerCase()),
+    item.currency.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   function openDialogue(): void {
     dialogue.open();
   }
 
-  function addBalances(event: CustomEvent<CurrencyAmount[]>): void {
+  function addBalances(event: CustomEvent<MoneyModel[]>): void {
     balances = [...event.detail, ...balances];
   }
 </script>
@@ -47,12 +47,12 @@
 <ul class="balances">
   {#each balances as balance}
     <li class="balance">
-      <a href="/pay/accounts/{data.account.id}/{balance.code.toLowerCase()}">
-        <CurrencyFlag code={balance.code} />
+      <a href="/pay/accounts/{data.account.id}/{balance.currency.toLowerCase()}">
+        <CurrencyFlag code={balance.currency} />
 
         <span>
           <strong>{formatAmount(balance)}</strong>
-          <span>{balance.code}</span>
+          <span>{balance.currency}</span>
         </span>
 
         <ChevronIcon color="var(--color-neutral-700)" size="20px" />

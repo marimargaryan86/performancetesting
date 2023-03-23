@@ -3,7 +3,8 @@ export function isUpperCase(value: string): boolean {
 }
 
 export function getInitials(name: string): string {
-  const parts = name.split(" ").filter((part) => part.trim().length);
+  const alpha = name.replace(/[^A-z]/g, "");
+  const parts = alpha.split(" ").filter((part) => part.trim().length);
 
   if (parts.length > 1) {
     return `${parts[0]?.[0]?.toUpperCase()}${parts[1]?.[0]?.toUpperCase()}`;

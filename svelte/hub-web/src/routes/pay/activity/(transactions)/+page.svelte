@@ -1,50 +1,32 @@
-<script lang="ts" context="module">
-  function getMockTransactions(count: number): TransactionModel[] {
-    return [...Array(count)].map(() => ({
-      id: "abc123xyzmeepmeep",
-      parentId: "abc123xyzmeepmeep",
-      createdAt: new Date(),
-      payer: ["ABC Travel", "ACME Agency", "Best OTA"][Math.floor(Math.random() * 3)] as string,
-      theyOwe: {
-        code: "USD",
-        amount: Math.random() * 13000,
-      },
-      beneficiery: ["Air France", "Lufthansa", "Hilton", "British Airways"][
-        Math.floor(Math.random() * 4)
-      ] as string,
-      weOwe: {
-        code: "USD",
-        amount: Math.random() * 13000,
-      },
-      profit: {
-        code: "USD",
-        amount: Math.random() * 13000,
-      },
-      reference: "ABC123XYZMEEPMEEP",
-      status: ["paid", "cancelled", "pending"][Math.floor(Math.random() * 3)] as TransactionStatus,
-    }));
-  }
-</script>
-
 <script lang="ts">
   import CopyIcon from "components/icons/copy-icon.svelte";
   import EntityAvatar from "components/ui/entity-avatar.svelte";
   import SortButton from "components/ui/sort-button.svelte";
   import TransactionStatusBadge from "components/ui/transaction-status-badge.svelte";
+  import { filterTransactions } from "filters/transaction";
   import { formatAmountAndCode } from "formatting/currency";
   import { yymmdd } from "formatting/date-time";
   import type { DirectionY } from "models/spatial";
-  import type { TransactionModel, TransactionStatus } from "models/transaction";
+  import type { TransactionModel } from "models/transaction";
+  import { sortTransactions } from "sorting/transactions";
   import type { PageData } from "./$types";
 
   export let data: PageData;
 
-  const { searchQuery } = data;
+  const { searchQuery, status, dateRange } = data;
 
   let sortBy: keyof TransactionModel = "id";
   let sortDirection: DirectionY = "down";
+  let transactions: TransactionModel[] = [];
 
-  $: transactions = getMockTransactions($searchQuery.length * 5 + 5);
+  $: transactions = sortTransactions(
+    filterTransactions(data.transactions, {
+      query: $searchQuery,
+      status: $status,
+      dateRange: $dateRange,
+    }),
+    { by: sortBy, direction: sortDirection },
+  );
 
   function createCopyFunc(value: string): () => void {
     return () => {
@@ -89,7 +71,7 @@
       </th>
       <th>
         <SortButton
-          value="theyOwe"
+          value="offerAmount"
           bind:direction={sortDirection}
           bind:group={sortBy}
           label="Owed to us"
@@ -97,7 +79,7 @@
       </th>
       <th>
         <SortButton
-          value="beneficiery"
+          value="beneficiary"
           bind:direction={sortDirection}
           bind:group={sortBy}
           label="Beneficiary"
@@ -105,7 +87,7 @@
       </th>
       <th>
         <SortButton
-          value="weOwe"
+          value="beneficiaryAmount"
           bind:direction={sortDirection}
           bind:group={sortBy}
           label="What we owe"
@@ -154,16 +136,20 @@
           </button>
         </td>
         <td>{yymmdd(transaction.createdAt)}</td>
-        <td class="with-avatar">
-          <EntityAvatar name={transaction.payer} />
-          <span>{transaction.payer}</span>
+        <td>
+          <div class="company">
+            <EntityAvatar name={transaction.payer.name} />
+            <span title={transaction.payer.name}>{transaction.payer.name}</span>
+          </div>
         </td>
-        <td>{formatAmountAndCode(transaction.theyOwe)}</td>
-        <td class="with-avatar">
-          <EntityAvatar name={transaction.beneficiery} />
-          <span>{transaction.beneficiery}</span>
+        <td>{formatAmountAndCode(transaction.offerAmount)}</td>
+        <td>
+          <div class="company">
+            <EntityAvatar name={transaction.beneficiary.name} />
+            <span title={transaction.beneficiary.name}>{transaction.beneficiary.name}</span>
+          </div>
         </td>
-        <td>{formatAmountAndCode(transaction.weOwe)}</td>
+        <td>{formatAmountAndCode(transaction.beneficiaryAmount)}</td>
         <td>{formatAmountAndCode(transaction.profit)}</td>
         <td>
           <button class="copy" on:click={createCopyFunc(transaction.reference)}>
@@ -192,16 +178,22 @@
     vertical-align: middle;
   }
 
-  .with-avatar {
+  .company {
     display: flex;
     gap: 8px;
     align-items: center;
+    max-width: 140px;
+  }
+
+  .company > span {
+    display: block;
+    overflow: hidden;
     font-weight: 600;
+    text-overflow: ellipsis;
   }
 
   .copy {
     display: flex;
-    gap: 0;
     align-items: center;
     max-width: 80px;
     font-weight: inherit;
@@ -220,7 +212,7 @@
     display: none;
   }
 
-  .with-avatar > :global(.entity-avatar) {
+  .company > :global(.entity-avatar) {
     flex-shrink: 0;
   }
 </style>

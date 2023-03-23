@@ -1,16 +1,16 @@
-import type { CurrencyAmount } from "models/currency";
+import type { MoneyModel } from "models/money";
 
-const mockBalances: CurrencyAmount[] = [
+const mockBalances: MoneyModel[] = [
   {
-    code: "EUR",
+    currency: "EUR",
     amount: 12875.24,
   },
   {
-    code: "GBP",
+    currency: "GBP",
     amount: 11832.12,
   },
   {
-    code: "USD",
+    currency: "USD",
     amount: 9857.29,
   },
 ];

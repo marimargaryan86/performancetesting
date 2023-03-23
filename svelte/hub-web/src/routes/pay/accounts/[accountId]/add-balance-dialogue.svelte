@@ -5,12 +5,12 @@
   import Button from "components/ui/button.svelte";
   import TextField from "components/ui/text-field.svelte";
   import { portal } from "directives/portal";
-  import type { CurrencyAmount } from "models/currency";
+  import type { MoneyModel } from "models/money";
   import { createEventDispatcher } from "svelte";
   import { fade, fly } from "svelte/transition";
   import { getRandomId } from "utils/random";
 
-  export let balances: CurrencyAmount[];
+  export let balances: MoneyModel[];
 
   export function close(): void {
     visible = false;
@@ -26,15 +26,15 @@
     inputRef.focus();
   }
 
-  let value: CurrencyAmount[] = [];
+  let value: MoneyModel[] = [];
   let searchQuery = "";
   let visible = false;
   let inputRef: TextField<"text">;
 
-  const dispatch = createEventDispatcher<{ addbalances: CurrencyAmount[] }>();
+  const dispatch = createEventDispatcher<{ addbalances: MoneyModel[] }>();
 
   $: filteredBalances = balances.filter((item) =>
-    item.code.toLowerCase().includes(searchQuery.toLowerCase()),
+    item.currency.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   function addBalances(): void {
@@ -74,8 +74,8 @@
             <input type="checkbox" value={balance} bind:group={value} {id} />
 
             <label for={id} class="balance">
-              <CurrencyFlag code={balance.code} />
-              <span>{balance.code}</span>
+              <CurrencyFlag code={balance.currency} />
+              <span>{balance.currency}</span>
             </label>
           </li>
         {/each}

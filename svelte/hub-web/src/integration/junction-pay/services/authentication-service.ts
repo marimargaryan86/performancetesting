@@ -1,4 +1,4 @@
-import type { CreateAuthTokenResponse } from "../schemas/auth";
+import type { CreateAuthTokenResponseSchema } from "../schemas/auth";
 import JunctionPayService from "./junction-pay-service";
 
 export default class AuthenticationService extends JunctionPayService {
@@ -21,6 +21,6 @@ export default class AuthenticationService extends JunctionPayService {
       throw new Error(`Junction Pay error: ${resp.status}`);
     }
 
-    return ((await resp.json()) as CreateAuthTokenResponse).data.attributes.token;
+    return ((await resp.json()) as CreateAuthTokenResponseSchema).data.attributes.token;
   }
 }
