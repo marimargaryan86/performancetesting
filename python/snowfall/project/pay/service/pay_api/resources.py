@@ -73,6 +73,19 @@ class Company(models.Resource):
         company: models_pb2.Company,
         request: requests.Request,
     ) -> Company:
+        relationships = (
+            {
+                "account": {
+                    "data": {
+                        "id": company.account_id,
+                        "type": "accounts",
+                    },
+                },
+            }
+            if company.account_id
+            else {}
+        )
+
         return cls(
             id=company.id,
             type=Company.api_type,
@@ -87,6 +100,7 @@ class Company(models.Resource):
                 "bufferRate": round(company.buffer_rate, 3),
                 "salesRate": round(company.sales_rate, 3),
             },
+            relationships=relationships,
             links={
                 _SELF_HREF: str(
                     request.url_for(

@@ -12,4 +12,5 @@ message Company {
   snowfall.stdlib.v1alpha.PostalAddress address = 3;
   float buffer_rate = 4;
   float sales_rate = 5;
+  string account_id = 6;
 }

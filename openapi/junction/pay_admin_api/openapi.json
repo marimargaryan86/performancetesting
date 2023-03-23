@@ -1452,6 +1452,23 @@
                 "example": 5.6
               }
             }
+          },
+          "relationships": {
+            "type": "object",
+            "properties": {
+              "account": {
+                "type": "object",
+                "readOnly": true,
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/AccountIdentifier"
+                  }
+                }
+              }
+            }
           }
         }
       },

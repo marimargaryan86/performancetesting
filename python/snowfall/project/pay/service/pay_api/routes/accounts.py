@@ -167,6 +167,9 @@ class Accounts(endpoints.HTTPEndpoint):
             cc_contact.identifier,
         )
 
+        company.account_id = account.id
+        await companies_repository.update(company.id, company)
+
         return await messages.create_response(
             body=models.Body(
                 data=resources.AccountResource.from_values(
