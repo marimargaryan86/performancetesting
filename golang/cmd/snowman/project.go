@@ -46,6 +46,94 @@ func verifyApprovalRules(client *gitlab.Client, logger *zap.SugaredLogger, p *gi
 	logger.Info("Approval rule created.")
 }
 
+type label struct {
+	name        string
+	color       string
+	description string
+}
+
+var labels = []label{
+	{
+		name:        "status::abandoned",
+		color:       "#000000",
+		description: "Item was started but then it was decided it was not worth the effort and/or not possible to do.",
+	},
+	{
+		name:        "status::accepted",
+		color:       "#009800",
+		description: "An item has been reviewed and accepted to be merged.",
+	},
+	{
+		name:        "status::blocked",
+		color:       "#E11D21",
+		description: "Item cannot progress as there is some form of impediment.",
+	},
+	{
+		name:        "status::in progress",
+		color:       "#CCCCCC",
+		description: "An item is picked up by someone and is being worked on (but isn't ready for review).",
+	},
+	{
+		name:        "status::review needed",
+		color:       "#FBCA04",
+		description: "An item is ready to be reviewed and / or ready for QA.",
+	},
+	{
+		name:        "status::revision needed",
+		color:       "#FF6600",
+		description: "An item is reviewed and the reviewer deems that additional changes are required.",
+	},
+}
+
+func verifyLabels(client *gitlab.Client, logger *zap.SugaredLogger, p *gitlab.Project) {
+	currentLabels, _, err := client.Labels.ListLabels(p.ID, &gitlab.ListLabelsOptions{
+		IncludeAncestorGroups: func() *bool { b := true; return &b }(),
+	})
+
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+
+	for _, l := range labels {
+		lLogger := logger.With("label", l.name)
+		found := false
+
+		for _, l2 := range currentLabels {
+			if l.name == l2.Name {
+				found = true
+
+				if l.color != l2.Color || l.description != l2.Description {
+					_, _, err = client.Labels.UpdateLabel(p.ID, &gitlab.UpdateLabelOptions{
+						Color:       &l.color,
+						Description: &l.description,
+					})
+
+					if err != nil {
+						lLogger.Error(err)
+					} else {
+						lLogger.Info("Label updated.")
+					}
+				}
+			}
+		}
+
+		if !found {
+			_, _, err = client.Labels.CreateLabel(p.ID, &gitlab.CreateLabelOptions{
+				Name:        &l.name,
+				Color:       &l.color,
+				Description: &l.description,
+			})
+
+			if err != nil {
+				lLogger.Error(err)
+			} else {
+				lLogger.Info("Label created.")
+			}
+		}
+	}
+}
+
 func verifyProjectSettings(client *gitlab.Client, logger *zap.SugaredLogger, p *gitlab.Project) {
 	empty := gitlab.EditProjectOptions{}
 	changed := gitlab.EditProjectOptions{}
@@ -139,6 +227,7 @@ func manageMemberships(client *gitlab.Client, logger *zap.SugaredLogger, snowman
 
 		verifyProjectSettings(client, pLogger, p)
 		verifyApprovalRules(client, pLogger, p, snowman)
+		verifyLabels(client, pLogger, p)
 
 		var foundHook *gitlab.ProjectHook
 
@@ -152,7 +241,7 @@ func manageMemberships(client *gitlab.Client, logger *zap.SugaredLogger, snowman
 
 		if foundHook == nil {
 			enabled := func() *bool { b := true; return &b }()
-			_, _, err := client.Projects.AddProjectHook(p.ID, &gitlab.AddProjectHookOptions{
+			_, _, err = client.Projects.AddProjectHook(p.ID, &gitlab.AddProjectHookOptions{
 				ConfidentialIssuesEvents: enabled,
 				ConfidentialNoteEvents:   enabled,
 				DeploymentEvents:         enabled,
