@@ -80,7 +80,7 @@
   .content {
     height: calc(100vh - 224px);
     margin: 0 -16px -16px;
-    padding: 0 8px;
+    padding: 0 8px 8px;
     overflow: auto;
     background-color: var(--color-generic-white);
     border-radius: 0 0 8px 8px;

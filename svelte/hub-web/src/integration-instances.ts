@@ -14,5 +14,6 @@ export default {
       config.PUBLIC_PAY_ADMIN_API_BASE_URL,
       junctionPayCompanyService,
     ),
+    conversions: new junctionPay.ConversionService(config.PUBLIC_PAY_ADMIN_API_BASE_URL),
   },
 };
