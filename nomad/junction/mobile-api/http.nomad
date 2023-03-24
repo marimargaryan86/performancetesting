@@ -137,14 +137,9 @@ REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis:
 SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
 {{ with secret "kv/data/${var.environment}/mobile-api" }}
 JUNCTION_API_TOKEN={{ .Data.data.junction_api_token }}
-JWT_TOKEN_VERSION={{ .Data.data.jwt_token_version }}
 JWT_PRIVATE_KEY={{ .Data.data.jwt_private_key }}
 JWT_PUBLIC_KEY={{ .Data.data.jwt_public_key }}
 STRIPE_API_KEY={{ .Data.data.stripe_api_key }}
-CLIENT_NAME={{ .Data.data.client_name }}
-SUPPORT_EMAIL={{ .Data.data.support_email }}
-CREATE_STRIPE_CUSTOMERS={{ .Data.data.create_stripe_customers }}
-VALIDATE_RESPONSES_AGAINST_SPEC={{ .Data.data.validate_responses_against_spec }}
 {{ end }}
 EOH
       }
@@ -173,6 +168,9 @@ EOH
         PROMETHEUS_PORT                 = "${NOMAD_PORT_prometheus}"
         MONGO_DB                        = "mobile-api"
         VALIDATE_RESPONSES_AGAINST_SPEC = false
+        CLIENT_NAME                     = "superApp"
+        CREATE_STRIPE_CUSTOMERS         = true
+        SUPPORT_EMAIL                   = "support@diplomattravel.gr"
       }
     }
   }

@@ -139,16 +139,11 @@ REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis:
 SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
 {{ with secret "kv/data/${var.environment}/mobile-api" }}
 JUNCTION_API_TOKEN={{ .Data.data.junction_api_token }}
-JWT_TOKEN_VERSION={{ .Data.data.jwt_token_version }}
 JWT_PRIVATE_KEY={{ .Data.data.jwt_private_key }}
 JWT_PUBLIC_KEY={{ .Data.data.jwt_public_key }}
-VALIDATE_RESPONSES_AGAINST_SPEC={{ .Data.data.validate_responses_against_spec }}
 {{ end }}
 {{ with secret "kv/data/${var.environment}/res-se-mobile-api" }}
-CLIENT_NAME={{ .Data.data.client_name }}
 STRIPE_API_KEY={{ .Data.data.stripe_api_key }}
-CREATE_STRIPE_CUSTOMERS={{ .Data.data.create_stripe_customers }}
-SUPPORT_EMAIL={{ .Data.data.support_email }}
 {{ end }}
 EOH
       }
@@ -177,6 +172,9 @@ EOH
         PROMETHEUS_PORT                 = "${NOMAD_PORT_prometheus}"
         MONGO_DB                        = "res-se-mobile-api"
         VALIDATE_RESPONSES_AGAINST_SPEC = false
+        CLIENT_NAME                     = "Res"
+        CREATE_STRIPE_CUSTOMERS         = false
+        SUPPORT_EMAIL                   = "res@snowfalltravel.com"
       }
     }
   }
