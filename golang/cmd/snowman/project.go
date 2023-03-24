@@ -115,6 +115,7 @@ func verifyLabels(client *gitlab.Client, logger *zap.SugaredLogger, p *gitlab.Pr
 
 				if l.color != l2.Color || l.description != l2.Description {
 					_, _, err := client.Labels.UpdateLabel(p.ID, &gitlab.UpdateLabelOptions{
+						Name:        &l.name,
 						Color:       &l.color,
 						Description: &l.description,
 					})
