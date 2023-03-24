@@ -309,13 +309,13 @@ async def pay_get_accounts(
 @pytest.fixture(scope="function")
 async def pay_create_account(
     pay_admin_client: PayAdminClient,
-    pay_create_contacts: Mapping[str, Any],
+    pay_create_contact: Mapping[str, Any],
 ) -> dict[str, Any]:
     name = "test account {0}".format(return_randomized_token())
     try:
         response_create_account = await pay_admin_client.create_accounts(
             name,
-            pay_create_contacts["data"]["id"],
+            pay_create_contact["data"]["id"],
         )
     except httpx.HTTPStatusError as err:
         logger.info("response_create_account: %s", err.response.headers)

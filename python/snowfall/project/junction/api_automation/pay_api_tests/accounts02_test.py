@@ -20,13 +20,13 @@ EXIT_MSG = "Exiting ; check your logs"
 @pytest.mark.integration
 async def test_create_account(  # noqa: WPS218
     pay_admin_client: PayAdminClient,
-    pay_create_contact_persons: Mapping[str, Any],
+    pay_create_contact: Mapping[str, Any],
 ) -> None:
     name = "test account {0}".format(return_randomized_token())
     try:
         response_create_account = await pay_admin_client.create_accounts(
             name,
-            pay_create_contact_persons["data"]["id"],
+            pay_create_contact["data"]["id"],
         )
     except httpx.HTTPStatusError as err:
         logger.info("response_create_account: %s", err.response.headers)
