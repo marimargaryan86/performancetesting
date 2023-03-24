@@ -39,6 +39,7 @@ class AdminSettings(application.Settings):
     authentication_address: str
     jwt_public_key: str
     mongo_dsn: Sequence[AnyUrl]
+    currencies: Sequence[money.Currency]
 
 
 def create_admin_dependencies(  # noqa: WPS211
@@ -49,6 +50,7 @@ def create_admin_dependencies(  # noqa: WPS211
     accounts_repository: accounts.AccountsRepository,
     conversions_repository: ConversionRepository,
     transactions_repository: TransactionRepository,
+    currencies_repository: CurrencyRepository,
     payment_client: client.PaymentClient | None = None,
 ) -> lagom.Container:
     container = lagom.Container()
@@ -60,6 +62,7 @@ def create_admin_dependencies(  # noqa: WPS211
     container[accounts.AccountsRepository] = accounts_repository
     container[ConversionRepository] = conversions_repository
     container[TransactionRepository] = transactions_repository
+    container[CurrencyRepository] = currencies_repository
     return container
 
 

@@ -668,9 +668,11 @@
         },
         "operationId": "get-accounts-id-balances",
         "description": "Get account balances"
-      },
+      }
+    },
+    "/accounts/{accountId}/relationships/currencies": {
       "post": {
-        "summary": "Add balance in account",
+        "summary": "Add currency in account",
         "description": "Activate zero balance in account for given currency",
         "tags": [
           "balances"
@@ -680,7 +682,7 @@
             "$ref": "#/components/parameters/accountId"
           }
         ],
-        "operationId": "post-accounts-id-balances",
+        "operationId": "post-accounts-id-relationships-currencies",
         "requestBody": {
           "required": true,
           "content": {

@@ -5,7 +5,7 @@ from unittest import mock
 import pytest
 
 from snowfall.project.pay.service.accounts import accounts
-from snowfall.project.pay.service.accounts.v1alpha.models_pb2 import Contact
+from snowfall.project.pay.service.accounts.v1alpha.models_pb2 import Account, Contact
 from snowfall.project.pay.service.companies.v1alpha.models_pb2 import Company
 from snowfall.project.pay.service.conversions.v1alpha.models_pb2 import Conversion
 from snowfall.project.pay.service.pay_api.repositories import (
@@ -17,6 +17,7 @@ from snowfall.project.pay.service.quotations.v1alpha.models_pb2 import Quotation
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import phone_number_pb2, postal_address_pb2
+from snowfall.vendor.currency_cloud.models.balance import BalanceResponse
 
 
 @pytest.fixture()
@@ -195,3 +196,45 @@ async def companies(
         )
 
     return companies
+
+
+@pytest.fixture()
+def balance() -> BalanceResponse:
+    return BalanceResponse(
+        amount="10",
+        currency="USD",
+        identifier=string.uuid(),
+        account_id=string.uuid(),
+    )
+
+
+@pytest.fixture()
+async def account(
+    accounts_repository: accounts.AccountsRepository,
+    balance: BalanceResponse,
+) -> Account:
+    account = Account(
+        id=balance.account_id,
+        external_reference=string.uuid(),
+        company_id=string.uuid(),
+        contact_id=string.uuid(),
+    )
+    return await accounts_repository.insert(
+        account,
+    )
+
+
+@pytest.fixture()
+async def contact(
+    account: Account,
+    contacts_repository: accounts.ContactsRepository,
+) -> Contact:
+    contact_person = Contact(
+        id=account.contact_id,
+        first_name="FirstName",
+        last_name="LastName",
+        email="example@example.com",
+        company_id=account.company_id,
+        external_reference=string.uuid(),
+    )
+    return await contacts_repository.insert(contact_person)

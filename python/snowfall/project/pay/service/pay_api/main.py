@@ -163,6 +163,9 @@ def _admin_factory(
                     transactions_repository=TransactionRepository(
                         mongo.transactions.transactions,
                     ),
+                    currencies_repository=CurrencyRepository(
+                        app.settings.currencies,
+                    ),
                 ),
             ),
             openapi_path=filesystem.resource_path(

@@ -7,7 +7,10 @@ from snowfall.vendor.currency_cloud.models.account import (
     AccountRequest,
     AccountResponse,
 )
-from snowfall.vendor.currency_cloud.models.balance import BalanceResponse
+from snowfall.vendor.currency_cloud.models.balance import (
+    BalanceRequest,
+    BalanceResponse,
+)
 from snowfall.vendor.currency_cloud.models.contact import (
     ContactRequest,
     ContactResponse,
@@ -101,3 +104,13 @@ class PaymentClient(object):
             AccountResponse(**account._attributes)  # noqa: WPS437
             for account in accounts
         ]
+
+    @error_handler
+    def add_currency_into_account(
+        self,
+        balance_request: BalanceRequest,
+    ) -> BalanceResponse:
+        balance = self._cc_client.balances.for_currency(
+            **balance_request.dict(exclude=None),
+        )
+        return BalanceResponse(**balance._attributes)  # noqa: WPS437

@@ -35,6 +35,7 @@ from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.vendor.currency_cloud.client import PaymentClient
 from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
+from snowfall.vendor.currency_cloud.models.balance import BalanceResponse
 
 
 @pytest.fixture
@@ -90,6 +91,7 @@ def _create_admin_app(  # noqa: WPS211
     accounts_repository: accounts.AccountsRepository,
     conversions_repository: ConversionRepository,
     transactions_repository: TransactionRepository,
+    currencies_repository: CurrencyRepository,
     openapi_path: pathlib.Path,
     custom_middlewares: Sequence[Middleware] | None = None,
 ) -> applications.Starlette:
@@ -105,6 +107,7 @@ def _create_admin_app(  # noqa: WPS211
                 accounts_repository=accounts_repository,
                 conversions_repository=conversions_repository,
                 transactions_repository=transactions_repository,
+                currencies_repository=currencies_repository,
                 payment_client=payment_client,
             ),
         ),
@@ -266,6 +269,7 @@ def cc_client(cc_login: str, cc_api_key: str, cc_env: str) -> currencycloud.Clie
 @pytest.fixture()
 def payment_client(
     accounts_list_from_cc: Sequence[mock.Mock],
+    balance: BalanceResponse,
 ) -> mock.Mock:
     payment_client = mock.Mock()
     message = "Conversion of GBP equivalent 0.89 is less than your lower limit of 1.00"
@@ -282,6 +286,8 @@ def payment_client(
         return []
 
     payment_client.get_all_accounts = _get_all_accounts
+
+    payment_client.add_currency_into_account = mock.Mock(return_value=balance)
     return payment_client
 
 
@@ -340,6 +346,7 @@ def admin_app(  # noqa: WPS211
     accounts_repository: accounts.AccountsRepository,
     conversions_repository: ConversionRepository,
     transactions_repository: TransactionRepository,
+    currencies_repository: CurrencyRepository,
 ) -> applications.Starlette:
     return _create_admin_app(
         cc_client=cc_client,
@@ -350,6 +357,7 @@ def admin_app(  # noqa: WPS211
         accounts_repository=accounts_repository,
         conversions_repository=conversions_repository,
         transactions_repository=transactions_repository,
+        currencies_repository=currencies_repository,
         openapi_path=filesystem.resource_path("junction.pay_admin_api", "openapi.json"),
     )
 

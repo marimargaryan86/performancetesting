@@ -12,7 +12,7 @@ class CurrencyCloudError(Exception):
         self.status = status
         self.code = code
 
-    def __repr__(self) -> str:
+    def __str__(self) -> str:
         return "<{0}({1}), {2}>".format(
             self.__class__.__name__,
             self.message,

@@ -15,7 +15,7 @@ class Account(CamelCaseBaseModel):
     state_or_province: Optional[str]
     spread_table: str = "flat_0.00"
     api_trading: bool = True
-    online_trading: bool = False
+    online_trading: bool = True
     phone_trading: bool = True
     terms_and_conditions_accepted: bool | None = True
 
