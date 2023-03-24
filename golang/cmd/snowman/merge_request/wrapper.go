@@ -108,34 +108,18 @@ func (mr *mergeRequest) discussions() ([]*gitlab.Discussion, error) {
 }
 
 func (mr *mergeRequest) projectLabels() ([]*gitlab.Label, error) {
-	all := make([]*gitlab.Label, 0)
-	opts := &gitlab.ListLabelsOptions{
-		ListOptions: gitlab.ListOptions{
-			PerPage: 100,
-			Page:    1,
-		},
+	labels := make([]*gitlab.Label, 0)
+	ch, g := common.Paginate(func(options gitlab.ListOptions) ([]*gitlab.Label, *gitlab.Response, error) {
+		return mr.client.Labels.ListLabels(mr.object.ProjectID, &gitlab.ListLabelsOptions{
+			ListOptions: options,
+		})
+	})
+
+	for l := range ch {
+		labels = append(labels, l)
 	}
 
-	for {
-		labels, resp, err := mr.client.Labels.ListLabels(
-			mr.object.ProjectID,
-			opts,
-		)
-
-		if err != nil {
-			return all, nil
-		}
-
-		all = append(all, labels...)
-
-		if resp.NextPage == 0 {
-			break
-		}
-
-		opts.ListOptions.Page = resp.NextPage
-	}
-
-	return all, nil
+	return labels, g.Wait()
 }
 
 func (mr *mergeRequest) reportIssue(issue string, body string) error {

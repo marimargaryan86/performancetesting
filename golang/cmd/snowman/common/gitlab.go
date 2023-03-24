@@ -128,30 +128,19 @@ func LikelyFileOwners(client *gitlab.Client, projectId int, path string, branch 
 func RecentContributors(client *gitlab.Client, projectId int) ([]int, error) {
 	contributors := make([]int, 0)
 	allUsers := make([]*gitlab.User, 0)
-	opts := &gitlab.ListUsersOptions{
-		ListOptions: gitlab.ListOptions{
-			PerPage: 100,
-			Page:    1,
-		},
-		Active: func() *bool { b := true; return &b }(),
+	ch, g := Paginate(func(options gitlab.ListOptions) ([]*gitlab.User, *gitlab.Response, error) {
+		return client.Users.ListUsers(&gitlab.ListUsersOptions{
+			ListOptions: options,
+			Active:      func() *bool { b := true; return &b }(),
+		})
+	})
+
+	for u := range ch {
+		allUsers = append(allUsers, u)
 	}
 
-	for {
-		users, resp, err := client.Users.ListUsers(opts)
-
-		if err != nil {
-			return contributors, err
-		}
-
-		for _, u := range users {
-			allUsers = append(allUsers, u)
-		}
-
-		if resp.NextPage == 0 {
-			break
-		}
-
-		opts.ListOptions.Page = resp.NextPage
+	if err := g.Wait(); err != nil {
+		return contributors, err
 	}
 
 	commits, _, err := client.Commits.ListCommits(
