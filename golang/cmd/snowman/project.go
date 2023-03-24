@@ -1,6 +1,7 @@
 package main
 
 import (
+	"git.snowfall.se/junction/junction/golang/cmd/snowman/common"
 	"github.com/xanzy/go-gitlab"
 	"go.uber.org/zap"
 	"strings"
@@ -86,11 +87,20 @@ var labels = []label{
 }
 
 func verifyLabels(client *gitlab.Client, logger *zap.SugaredLogger, p *gitlab.Project) {
-	currentLabels, _, err := client.Labels.ListLabels(p.ID, &gitlab.ListLabelsOptions{
-		IncludeAncestorGroups: func() *bool { b := true; return &b }(),
+	currentLabels := make([]*gitlab.Label, 0)
+	ch, g := common.Paginate(func(options gitlab.ListOptions) ([]*gitlab.Label, *gitlab.Response, error) {
+		return client.Labels.ListLabels(p.ID, &gitlab.ListLabelsOptions{
+			ListOptions:           options,
+			IncludeAncestorGroups: func() *bool { b := true; return &b }(),
+			Search:                func() *string { s := "status::"; return &s }(),
+		})
 	})
 
-	if err != nil {
+	for l := range ch {
+		currentLabels = append(currentLabels, l)
+	}
+
+	if err := g.Wait(); err != nil {
 		logger.Error(err)
 		return
 	}
@@ -104,7 +114,7 @@ func verifyLabels(client *gitlab.Client, logger *zap.SugaredLogger, p *gitlab.Pr
 				found = true
 
 				if l.color != l2.Color || l.description != l2.Description {
-					_, _, err = client.Labels.UpdateLabel(p.ID, &gitlab.UpdateLabelOptions{
+					_, _, err := client.Labels.UpdateLabel(p.ID, &gitlab.UpdateLabelOptions{
 						Color:       &l.color,
 						Description: &l.description,
 					})
@@ -115,11 +125,13 @@ func verifyLabels(client *gitlab.Client, logger *zap.SugaredLogger, p *gitlab.Pr
 						lLogger.Info("Label updated.")
 					}
 				}
+
+				break
 			}
 		}
 
 		if !found {
-			_, _, err = client.Labels.CreateLabel(p.ID, &gitlab.CreateLabelOptions{
+			_, _, err := client.Labels.CreateLabel(p.ID, &gitlab.CreateLabelOptions{
 				Name:        &l.name,
 				Color:       &l.color,
 				Description: &l.description,

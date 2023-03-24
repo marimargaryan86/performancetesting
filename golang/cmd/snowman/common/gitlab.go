@@ -6,6 +6,7 @@ import (
 	"git.snowfall.se/junction/junction/golang/stdlib/sliceutil"
 	"git.snowfall.se/junction/junction/golang/stdlib/strutil"
 	"github.com/xanzy/go-gitlab"
+	"golang.org/x/sync/errgroup"
 	"regexp"
 	"strings"
 )
@@ -178,4 +179,45 @@ func RecentContributors(client *gitlab.Client, projectId int) ([]int, error) {
 	}
 
 	return sliceutil.Unique(contributors), nil
+}
+
+func Paginate[T any](reqFunc func(options gitlab.ListOptions) ([]T, *gitlab.Response, error)) (chan T, *errgroup.Group) {
+	ch := make(chan T)
+	g := new(errgroup.Group)
+
+	g.Go(func() error {
+		return paginate(ch, reqFunc)
+	})
+
+	return ch, g
+}
+
+func paginate[T any](ch chan T, request func(options gitlab.ListOptions) ([]T, *gitlab.Response, error)) error {
+	page := 0
+
+	var items []T
+	var res *gitlab.Response
+	var err error
+
+	for {
+		items, res, err = request(gitlab.ListOptions{Page: page})
+
+		if err != nil {
+			break
+		}
+
+		for _, item := range items {
+			ch <- item
+		}
+
+		if res.CurrentPage == res.TotalPages {
+			break
+		}
+
+		page++
+	}
+
+	close(ch)
+
+	return err
 }
