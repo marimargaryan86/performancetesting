@@ -481,6 +481,7 @@ async def get_trip_id(
     r2 = await junction_client.trips().get_trips_by_trip_search_id(trip_search_id)
     logging.info("get_trips_by_trip_search_id: %s", json.dumps(r2, indent=4))
 
+    assert r2["data"], "No trips were found"
     trip_id = r2["data"][0]["id"]
     logging.info("trip_id: %s", trip_id)
     assert is_valid_uuid(trip_id, 5) is True, "trip_id uuid must be in uuid v5 format"

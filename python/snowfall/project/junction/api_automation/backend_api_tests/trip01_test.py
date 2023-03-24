@@ -34,6 +34,7 @@ async def test_trip_e2e_basic(
     r2 = await junction_client.trips().get_trips_by_trip_search_id(trip_search_id)
     logging.info("get_trips_by_trip_search_id response: %s", json.dumps(r2, indent=4))
 
+    assert r2["data"], "No trips were found"
     trip_id = r2["data"][0]["id"]
     assert trip_id, "No trip was found"
     assert is_valid_uuid(trip_id, 5) is True, "trip_id uuid must be in uuid v5 format"
@@ -84,6 +85,7 @@ async def test_get_trips_by_trip_search_id(
     r2 = await junction_client.trips().get_trips_by_trip_search_id(trip_search_id)
     logging.info("get_trips_by_trip_search_id response: %s", json.dumps(r2, indent=4))
 
+    assert r2["data"], "No trips were found"
     trip_id = r2["data"][0]["id"]
     assert trip_id is not None, "No trip was found"
     assert is_valid_uuid(trip_id, 5) is True, "trip_id uuid must be in uuid v5 format"
@@ -109,6 +111,7 @@ async def test_get_trip_by_id(
     r2 = await junction_client.trips().get_trips_by_trip_search_id(trip_search_id)
     logging.info("get_trips_by_trip_search_id response: %s", json.dumps(r2, indent=4))
 
+    assert r2["data"], "No trips were found"
     trip_id = r2["data"][0]["id"]
     logging.info("trip_id: %s", trip_id)
     assert is_valid_uuid(trip_id, 5) is True, "trip_id uuid must be in uuid v5 format"
@@ -138,8 +141,9 @@ async def test_get_legs_by_trip_id(
     r2 = await junction_client.trips().get_trips_by_trip_search_id(trip_search_id)
     logging.info("get_trips_by_trip_search_id response: %s", json.dumps(r2, indent=4))
 
-    assert r2, "no data"
+    assert r2["data"], "No trips were found"
     trip_id = r2["data"][0]["id"]
+
     logging.info("trip_id: %s", trip_id)
     assert is_valid_uuid(trip_id, 5) is True, "trip_id uuid must be in uuid v5 format"
 
@@ -171,7 +175,7 @@ async def test_get_legs_by_trip_search_id(
 
 
 @pytest.mark.integration
-async def test_list_segments_by_trip(
+async def test_list_segments_by_trip(  # noqa: WPS218
     host: str,
     junction_client: JunctionClient,
     departure_after: str,
@@ -190,7 +194,7 @@ async def test_list_segments_by_trip(
     r2 = await junction_client.trips().get_trips_by_trip_search_id(trip_search_id)
 
     logging.info("get_trips_by_trip_search_id response: %s", json.dumps(r2, indent=4))
-
+    assert r2["data"], "No trips were found"
     r3 = (
         await junction_client.segments().get_segments_by_trip(
             r2["data"][0]["id"],
@@ -203,9 +207,9 @@ async def test_list_segments_by_trip(
     logging.info("data_input: %s", data_input)
     for idx, _ in enumerate(data_input):
         assert data_input[idx]["id"] is not None
-        assert data_input[idx]["type"] == "segments"
         assert bool(data_input[idx]["attributes"]) is False
         assert data_input[idx]["relationships"]["legs"]["data"] is not None
+        assert data_input[idx]["type"] == "segments"
         assert data_input[idx]["links"] == {
             "self": "https://{0}/segments/{1}".format(
                 host,

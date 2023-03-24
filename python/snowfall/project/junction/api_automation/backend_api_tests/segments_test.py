@@ -88,6 +88,8 @@ async def return_segment_id_from_trip_search_id(
 ) -> str:
     r2 = await junction_client.trips().get_trips_by_trip_search_id(trip_search_id)
     logging.info("get_trips_by_trip_search_id response: %s", json.dumps(r2, indent=4))
+
+    assert r2["data"], "No trips were found"
     relationships = r2["data"][0]["relationships"]
 
     return relationships["segments"]["data"][0]["id"]
