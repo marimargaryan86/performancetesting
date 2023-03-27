@@ -675,7 +675,7 @@
         "summary": "Add currency in account",
         "description": "Activate zero balance in account for given currency",
         "tags": [
-          "balances"
+          "accounts"
         ],
         "parameters": [
           {
