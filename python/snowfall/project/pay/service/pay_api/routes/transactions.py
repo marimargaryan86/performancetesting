@@ -33,17 +33,17 @@ class Transactions(endpoints.HTTPEndpoint):
         if quot and quot.status == Quotation.Status.STATUS_QUOTED:
             transaction_id = string.uuid()
             are_currencies_same = (
-                quot.converted_beneficiary_amount.currency_code
-                == quot.beneficiary_amount.currency_code
+                quot.amounts.base_converted.currency_code
+                == quot.amounts.beneficiary.currency_code
             )
             conversion_id = ""
             if not are_currencies_same:
                 try:
                     cc_conversion = payment_client.create_conversion(
                         conversion.ConversionRequest(
-                            buy_currency=quot.converted_beneficiary_amount.currency_code,
-                            sell_currency=quot.beneficiary_amount.currency_code,
-                            amount=money.from_protobuf(quot.beneficiary_amount).amount,
+                            buy_currency=quot.amounts.base_converted.currency_code,
+                            sell_currency=quot.amounts.beneficiary.currency_code,
+                            amount=money.from_protobuf(quot.amounts.beneficiary).amount,
                             reason=transaction_id,
                         ),
                     )
@@ -70,14 +70,8 @@ class Transactions(endpoints.HTTPEndpoint):
                     external_reference_id=body["externalReference"],
                     parent_external_id=body["parentExternalReference"],
                     conversion_id=conversion_id,
-                    beneficiary_amount=quot.beneficiary_amount,
-                    exchange_rate=quot.exchange_rate,
-                    converted_beneficiary_amount=quot.converted_beneficiary_amount,
-                    buffer_rate=quot.buffer_rate,
-                    buffer_amount=quot.buffer_amount,
-                    sales_rate=quot.sales_rate,
-                    sales_amount=quot.sales_amount,
-                    offer_amount=quot.offer_amount,
+                    amounts=quot.amounts,
+                    rates=quot.rates,
                     payer_id=quot.payer_id,
                     beneficiary_id=quot.beneficiary_id,
                 ),

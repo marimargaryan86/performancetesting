@@ -28,6 +28,10 @@ from snowfall.project.pay.service.pay_api.repositories import (
 )
 from snowfall.project.pay.service.pay_api.routes import router
 from snowfall.project.pay.service.quotations import quotations
+from snowfall.project.pay.service.quotations.v1alpha.models_pb2 import (
+    QuotationAmounts,
+    QuotationRates,
+)
 from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Transaction
 from snowfall.stdlib import money, string
 from snowfall.stdlib.integration.starlette import application, handlers
@@ -200,14 +204,20 @@ def get_transaction(transaction_id: str) -> Transaction:
         external_reference_id=string.uuid(),
         parent_external_id=string.uuid(),
         conversion_id=string.uuid(),
-        beneficiary_amount=money_usd,
-        exchange_rate=float(1),
-        converted_beneficiary_amount=money_usd,
-        buffer_rate=float(1),
-        buffer_amount=money_usd,
-        sales_rate=float(1),
-        sales_amount=money_usd,
-        offer_amount=money_usd,
+        amounts=QuotationAmounts(
+            beneficiary=money_usd,
+            base_converted=money_usd,
+            fx_margin=money_usd,
+            fx_provider_margin=money_usd,
+            sales_margin=money_usd,
+            quotation=money_usd,
+        ),
+        rates=QuotationRates(
+            fx_quote=float(1),
+            fx_buffer=float(1),
+            fx_markup=float(1),
+            sales_markup=float(1),
+        ),
         payer_id=string.uuid(),
         beneficiary_id=string.uuid(),
     )

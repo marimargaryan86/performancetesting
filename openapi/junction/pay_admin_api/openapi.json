@@ -1499,12 +1499,17 @@
               "address": {
                 "$ref": "#/components/schemas/AddressDetails"
               },
-              "bufferRate": {
+              "fxMarkup": {
                 "type": "number",
                 "format": "float",
                 "example": 5.6
               },
-              "salesRate": {
+              "fxProviderMarkup": {
+                "type": "number",
+                "format": "float",
+                "example": 5.6
+              },
+              "salesMarkup": {
                 "type": "number",
                 "format": "float",
                 "example": 5.6
@@ -1634,8 +1639,9 @@
                 "required": [
                   "name",
                   "address",
-                  "bufferRate",
-                  "salesRate"
+                  "fxMarkup",
+                  "fxProviderMarkup",
+                  "salesMarkup"
                 ]
               }
             }
@@ -1696,20 +1702,15 @@
               "externalReference",
               "parentExternalReference",
               "createdAt",
-              "beneficiaryAmount",
-              "offerAmount",
-              "convertedBeneficiaryAmount",
-              "bufferAmount",
-              "salesAmount",
-              "exchangeRate",
-              "bufferRate",
-              "salesRate"
+              "amounts",
+              "rates"
             ],
             "properties": {
               "externalReference": {
                 "type": "string",
                 "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-                "format": "uuid"
+                "format": "uuid",
+                "description": "The UUID related to a specific transaction in our integrating partners DB"
               },
               "parentExternalReference": {
                 "type": "string",
@@ -1722,62 +1723,112 @@
                 "format": "date-time",
                 "readOnly": true
               },
-              "beneficiaryAmount": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Money"
-                  }
+              "amounts": {
+                "type": "object",
+                "required": [
+                  "beneficiary",
+                  "quotation",
+                  "baseConverted",
+                  "salesMargin",
+                  "fxMargin",
+                  "fxProviderMargin"
                 ],
-                "readOnly": true
-              },
-              "offerAmount": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Money"
+                "properties": {
+                  "beneficiary": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Money"
+                      }
+                    ],
+                    "readOnly": true,
+                    "description": "This is how much Junction PAY will need to pay out"
+                  },
+                  "quotation": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Money"
+                      }
+                    ],
+                    "readOnly": true,
+                    "description": "The amount that Junction PAY will be owed"
+                  },
+                  "baseConverted": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Money"
+                      }
+                    ],
+                    "readOnly": true,
+                    "description": "The amount Junction PAY will need to collect in the payers currency to cover what Junction PAY owes to a beneficiary"
+                  },
+                  "salesMargin": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Money"
+                      }
+                    ],
+                    "readOnly": true,
+                    "description": "The monetary value of the sales markup for a specific transaction"
+                  },
+                  "fxMargin": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Money"
+                      }
+                    ],
+                    "readOnly": true,
+                    "description": "The monetary value of the fx markup for a specific transaction for Junction PAY"
+                  },
+                  "fxProviderMargin": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Money"
+                      }
+                    ],
+                    "readOnly": true,
+                    "description": "The monetary value of the provider markup for a specific transaction"
                   }
-                ],
+                },
                 "readOnly": true
               },
-              "convertedBeneficiaryAmount": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Money"
+              "rates": {
+                "type": "object",
+                "required": [
+                  "fxQuote",
+                  "fxBuffer",
+                  "salesMarkup",
+                  "fxMarkup"
+                ],
+                "properties": {
+                  "fxQuote": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 1.02,
+                    "readOnly": true,
+                    "description": "The FX rate Junction PAY provided during the quotation call"
+                  },
+                  "fxBuffer": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 1.02,
+                    "readOnly": true,
+                    "description": "The amount  the exchnage rate can move between quotation and transaction before Junction PAY loose money on the trade"
+                  },
+                  "salesMarkup": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 1.02,
+                    "readOnly": true,
+                    "description": "The percentage Junction PAY adds as a sales fee"
+                  },
+                  "fxMarkup": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 1.02,
+                    "readOnly": true,
+                    "description": "The percentage Junction PAY adds to foreign exchange"
                   }
-                ],
-                "readOnly": true
-              },
-              "bufferAmount": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Money"
-                  }
-                ],
-                "readOnly": true
-              },
-              "salesAmount": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Money"
-                  }
-                ],
-                "readOnly": true
-              },
-              "exchangeRate": {
-                "type": "number",
-                "format": "float",
-                "example": 1.02,
-                "readOnly": true
-              },
-              "bufferRate": {
-                "type": "number",
-                "format": "float",
-                "example": 1.02,
-                "readOnly": true
-              },
-              "salesRate": {
-                "type": "number",
-                "format": "float",
-                "example": 1.02,
+                },
                 "readOnly": true
               }
             }
@@ -1809,7 +1860,8 @@
                     "$ref": "#/components/schemas/ConversionIdentifier"
                   }
                 },
-                "readOnly": true
+                "readOnly": true,
+                "description": "The ID that links and FX transaction in the provider system to Junction PAYs transcation history"
               },
               "payer": {
                 "type": "object",
@@ -1821,7 +1873,8 @@
                     "$ref": "#/components/schemas/CompanyIdentifier"
                   }
                 },
-                "readOnly": true
+                "readOnly": true,
+                "description": "The ID used to determine who will owe Junction PAY a monetary value"
               },
               "beneficiary": {
                 "type": "object",
@@ -1833,7 +1886,8 @@
                     "$ref": "#/components/schemas/CompanyIdentifier"
                   }
                 },
-                "readOnly": true
+                "readOnly": true,
+                "description": "The ID used to determine who Junction PAY owes a monetary value to"
               }
             }
           }

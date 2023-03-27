@@ -10,7 +10,8 @@ message Company {
   string id = 1;
   string name = 2;
   snowfall.stdlib.v1alpha.PostalAddress address = 3;
-  float buffer_rate = 4;
-  float sales_rate = 5;
-  string account_id = 6;
+  float fx_markup = 4;
+  float fx_provider_markup = 5;
+  float sales_markup = 6;
+  string account_id = 7;
 }

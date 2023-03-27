@@ -3,7 +3,7 @@ syntax = "proto3";
 package snowfall.project.pay.service.transactions.v1alpha;
 
 import "google/protobuf/timestamp.proto";
-import "snowfall/stdlib/v1alpha/money.proto";
+import "snowfall/project/pay/service/quotations/v1alpha/models.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/transactions/v1alpha";
 
@@ -13,14 +13,8 @@ message Transaction {
   string parent_external_id = 3;
   google.protobuf.Timestamp created_at = 4;
   string conversion_id = 5;
-  snowfall.stdlib.v1alpha.Money beneficiary_amount = 6;
-  float exchange_rate = 7;
-  snowfall.stdlib.v1alpha.Money converted_beneficiary_amount = 8;
-  float buffer_rate = 9;
-  snowfall.stdlib.v1alpha.Money buffer_amount = 10;
-  float sales_rate = 11;
-  snowfall.stdlib.v1alpha.Money sales_amount = 12;
-  snowfall.stdlib.v1alpha.Money offer_amount = 13;
-  string payer_id = 14;
-  string beneficiary_id = 15;
+  snowfall.project.pay.service.quotations.v1alpha.QuotationAmounts amounts = 6;
+  snowfall.project.pay.service.quotations.v1alpha.QuotationRates rates = 7;
+  string payer_id = 8;
+  string beneficiary_id = 9;
 }

@@ -30,8 +30,9 @@ def _update_company_from_payload(
             postal_code=address.get("postalCode", company.address.postal_code),
             locality=address.get("city", company.address.locality),
         ),
-        buffer_rate=payload.get("bufferRate", company.buffer_rate),
-        sales_rate=payload.get("salesRate", company.sales_rate),
+        fx_markup=payload.get("fxMarkup", company.fx_markup),
+        fx_provider_markup=payload.get("fxProviderMarkup", company.fx_provider_markup),
+        sales_markup=payload.get("fxProviderMarkup", company.sales_markup),
     )
 
 
@@ -108,8 +109,9 @@ class AdminCompanies(endpoints.HTTPEndpoint):
                     locality=address["city"],
                     revision=0,
                 ),
-                buffer_rate=float(body["bufferRate"]),
-                sales_rate=float(body["salesRate"]),
+                fx_markup=float(body["fxMarkup"]),
+                fx_provider_markup=float(body["fxProviderMarkup"]),
+                sales_markup=float(body["salesMarkup"]),
             ),
         )
 

@@ -34,17 +34,19 @@ class QuoteResource(models.Resource):
         return cls(
             id=quotation.id,
             type=QuoteResource.api_type,
-            attributes={"amount": money.from_protobuf(quotation.offer_amount).amount},
+            attributes={
+                "amount": money.from_protobuf(quotation.amounts.quotation).amount,
+            },
             relationships={
                 "fromCurrency": {
                     "data": {
-                        "id": quotation.beneficiary_amount.currency_code,
+                        "id": quotation.amounts.beneficiary.currency_code,
                         "type": "currencies",
                     },
                 },
                 "toCurrency": {
                     "data": {
-                        "id": quotation.offer_amount.currency_code,
+                        "id": quotation.amounts.quotation.currency_code,
                         "type": "currencies",
                     },
                 },
@@ -97,8 +99,9 @@ class Company(models.Resource):
                     "postalCode": company.address.postal_code,
                     "city": company.address.locality,
                 },
-                "bufferRate": round(company.buffer_rate, 3),
-                "salesRate": round(company.sales_rate, 3),
+                "fxMarkup": round(company.fx_markup, 3),
+                "fxProviderMarkup": round(company.fx_provider_markup, 3),
+                "salesMarkup": round(company.sales_markup, 3),
             },
             relationships=relationships,
             links={
@@ -141,18 +144,28 @@ class Transaction(models.Resource):
                 "externalReference": transaction.external_reference_id,
                 "parentExternalReference": transaction.parent_external_id,
                 "createdAt": protobuf.protobuf_to_datetime(transaction.created_at),
-                "beneficiaryAmount": Money.from_proto(
-                    transaction.beneficiary_amount,
-                ),
-                "offerAmount": Money.from_proto(transaction.offer_amount),
-                "convertedBeneficiaryAmount": Money.from_proto(
-                    transaction.converted_beneficiary_amount,
-                ),
-                "bufferAmount": Money.from_proto(transaction.buffer_amount),
-                "salesAmount": Money.from_proto(transaction.sales_amount),
-                "exchangeRate": round(transaction.exchange_rate, 3),
-                "bufferRate": round(transaction.buffer_rate, 3),
-                "salesRate": round(transaction.sales_rate, 3),
+                "amounts": {
+                    "beneficiary": Money.from_proto(
+                        transaction.amounts.beneficiary,
+                    ),
+                    "quotation": Money.from_proto(transaction.amounts.quotation),
+                    "baseConverted": Money.from_proto(
+                        transaction.amounts.base_converted,
+                    ),
+                    "salesMargin": Money.from_proto(transaction.amounts.sales_margin),
+                    "fxMargin": Money.from_proto(
+                        transaction.amounts.fx_margin,
+                    ),
+                    "fxProviderMargin": Money.from_proto(
+                        transaction.amounts.fx_provider_margin,
+                    ),
+                },
+                "rates": {
+                    "fxQuote": round(transaction.rates.fx_quote, 3),
+                    "fxBuffer": round(transaction.rates.fx_buffer, 3),
+                    "salesMarkup": round(transaction.rates.sales_markup, 3),
+                    "fxMarkup": round(transaction.rates.fx_markup, 3),
+                },
             },
             relationships={
                 "conversion": {

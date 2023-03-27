@@ -13,7 +13,10 @@ from snowfall.project.pay.service.pay_api.repositories import (
     ConversionRepository,
 )
 from snowfall.project.pay.service.quotations.quotations import QuotationsRepository
-from snowfall.project.pay.service.quotations.v1alpha.models_pb2 import Quotation
+from snowfall.project.pay.service.quotations.v1alpha.models_pb2 import (
+    Quotation,
+    QuotationAmounts,
+)
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import phone_number_pb2, postal_address_pb2
@@ -28,8 +31,10 @@ async def quote_is_less_than_the_limit(
     gbp = money.Money(1, money.Currency("GBP"))
     quote = Quotation(
         id=string.uuid(),
-        converted_beneficiary_amount=usd.protobuf(),
-        beneficiary_amount=gbp.protobuf(),
+        amounts=QuotationAmounts(
+            beneficiary=gbp.protobuf(),
+            base_converted=usd.protobuf(),
+        ),
         status=Quotation.Status.STATUS_QUOTED,
     )
     return await quotations_repository.insert(quote)
@@ -43,8 +48,10 @@ async def booked_quote(
     gbp = money.Money(1, money.Currency("GBP"))
     quote = Quotation(
         id=string.uuid(),
-        converted_beneficiary_amount=usd.protobuf(),
-        beneficiary_amount=gbp.protobuf(),
+        amounts=QuotationAmounts(
+            beneficiary=gbp.protobuf(),
+            base_converted=usd.protobuf(),
+        ),
         status=Quotation.Status.STATUS_CONFIRMED,
     )
     return await quotations_repository.insert(quote)
@@ -80,8 +87,9 @@ async def valid_company(
             postal_code="12345",
             locality="London",
         ),
-        buffer_rate=4,
-        sales_rate=5,
+        fx_markup=float(1),
+        fx_provider_markup=float(1),
+        sales_markup=float(1),
     )
 
     return await companies_repository.insert(company)
@@ -189,8 +197,9 @@ async def companies(
                         postal_code="12345",
                         locality="London",
                     ),
-                    buffer_rate=float(1),
-                    sales_rate=float(1),
+                    fx_markup=float(1),
+                    fx_provider_markup=float(2),
+                    sales_markup=float(3),
                 ),
             ),
         )
