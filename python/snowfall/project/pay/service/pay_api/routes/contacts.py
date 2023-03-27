@@ -89,7 +89,7 @@ class Contacts(endpoints.HTTPEndpoint):
                 ],
                 links=pagination_helpers.get_next_url(
                     request.url_for("Contact").include_query_params(
-                        company=request.query_params["company"],
+                        company=request.path_params["companyId"],
                     ),
                     await contacts.cursor(),
                     pagination,
