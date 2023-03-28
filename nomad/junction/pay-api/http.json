@@ -3,14 +3,18 @@
     "variables": {
       "count": 1,
       "traefik_entrypoints": "websecure",
-      "traefik_host_URL": "api.pay.junction.dev"
+      "traefik_host_URL": "api.pay.junction.dev",
+      "traefik_headers_accesscontrolalloworiginlist": "*",
+      "traefik_headers_accessControlAllowHeaders": "*"
     }
   },
   "production": {
     "variables": {
       "count": 2,
       "traefik_entrypoints": "web",
-      "traefik_host_URL": "api.pay.junction.travel"
+      "traefik_host_URL": "api.pay.junction.travel",
+      "traefik_headers_accesscontrolalloworiginlist": "https://api.pay.junction.travel",
+      "traefik_headers_accessControlAllowHeaders": "*"
     }
   }
 }

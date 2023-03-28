@@ -30,6 +30,14 @@ variable "traefik_host_URL" {
   type = string
 }
 
+variable "traefik_headers_accesscontrolalloworiginlist" {
+  type = string
+}
+
+variable "traefik_headers_accessControlAllowHeaders" {
+  type = string
+}
+
 variable "count" {
   type = number
 }
@@ -76,8 +84,12 @@ job "pay-api-http" {
         "http",
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
+        "traefik.http.middlewares.pay-api-${var.environment}-cors-headers.headers.accesscontrolalloworiginlist=${var.traefik_headers_accesscontrolalloworiginlist}",
+        "traefik.http.middlewares.pay-api-${var.environment}-cors-headers.headers.accessControlAllowHeaders=${var.traefik_headers_accessControlAllowHeaders}",
+        "traefik.http.middlewares.pay-api-${var.environment}-cors-headers.headers.addvaryheader=true",
         "traefik.http.routers.pay-api-${var.environment}.entrypoints=${var.traefik_entrypoints}",
         "traefik.http.routers.pay-api-${var.environment}.rule=Host(`${var.traefik_host_URL}`)",
+        "traefik.http.routers.pay-api-${var.environment}.middlewares=pay-api-${var.environment}-cors-headers",
       ]
 
       connect {
