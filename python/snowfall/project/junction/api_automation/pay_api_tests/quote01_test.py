@@ -24,8 +24,9 @@ async def test_create_quote(  # noqa: WPS218
         country_code="SE",
         postal_code="75320",
         city="Uppsala",
-        buffer_rate=float(0),
-        sales_rate=float(0),
+        fx_markup=float(0),
+        fx_provider_markup=float(0),
+        sales_markup=float(0),
     )
 
     response_beneficiary = await pay_admin_client.create_company(
@@ -34,8 +35,9 @@ async def test_create_quote(  # noqa: WPS218
         country_code="SE",
         postal_code="75320",
         city="Uppsala",
-        buffer_rate=float(0),
-        sales_rate=float(0),
+        fx_markup=float(0),
+        fx_provider_markup=float(0),
+        sales_markup=float(0),
     )
 
     response_create_quote = await pay_client.create_quote(

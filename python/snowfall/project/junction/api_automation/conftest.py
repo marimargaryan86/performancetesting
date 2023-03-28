@@ -254,8 +254,9 @@ async def pay_create_company(
             country_code="SE",
             postal_code="75320",
             city="Uppsala",
-            buffer_rate=float(0),
-            sales_rate=float(0),
+            fx_markup=float(0),
+            fx_provider_markup=float(0),
+            sales_markup=float(0),
         )
     except httpx.HTTPStatusError as err:
         logger.info("response_company err: %s", err.response.headers)

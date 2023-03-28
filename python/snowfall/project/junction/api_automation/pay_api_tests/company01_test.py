@@ -30,8 +30,9 @@ async def test_create_company(  # noqa: WPS210, WPS218
     country_code = "SE"
     postal_code = "75320"
     city = "Uppsala"
-    buffer_rate = float(0)
-    sales_rate = float(0)
+    fx_markup = float(0)
+    fx_provider_markup = float(0)
+    sales_markup = float(0)
 
     response = await pay_admin_client.create_company(
         company,
@@ -39,8 +40,9 @@ async def test_create_company(  # noqa: WPS210, WPS218
         country_code,
         postal_code,
         city,
-        buffer_rate,
-        sales_rate,
+        fx_markup,
+        fx_provider_markup,
+        sales_markup,
     )
 
     logging.info("create_company: %s", json.dumps(response, indent=4))
@@ -54,5 +56,6 @@ async def test_create_company(  # noqa: WPS210, WPS218
     assert response["data"]["attributes"]["address"]["countryCode"] == country_code
     assert response["data"]["attributes"]["address"]["postalCode"] == postal_code
     assert response["data"]["attributes"]["address"]["city"] == city
-    assert response["data"]["attributes"]["bufferRate"] == buffer_rate
-    assert response["data"]["attributes"]["salesRate"] == sales_rate
+    assert response["data"]["attributes"]["fxMarkup"] == fx_markup
+    assert response["data"]["attributes"]["fxProviderMarkup"] == fx_provider_markup
+    assert response["data"]["attributes"]["salesMarkup"] == sales_markup

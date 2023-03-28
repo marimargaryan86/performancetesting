@@ -32,8 +32,9 @@ async def test_create_contacts(  # noqa: WPS210, WPS218
     country_code = "SE"
     postal_code = "75320"
     city = "Uppsala"
-    buffer_rate = float(0)
-    sales_rate = float(0)
+    fx_markup = float(0)
+    fx_provider_markup = float(0)
+    sales_markup = float(0)
 
     try:
         response_company = await pay_admin_client.create_company(
@@ -42,8 +43,9 @@ async def test_create_contacts(  # noqa: WPS210, WPS218
             country_code,
             postal_code,
             city,
-            buffer_rate,
-            sales_rate,
+            fx_markup,
+            fx_provider_markup,
+            sales_markup,
         )
     except httpx.HTTPStatusError as err:
         logger.info("response_company err: %s", err.response.headers)

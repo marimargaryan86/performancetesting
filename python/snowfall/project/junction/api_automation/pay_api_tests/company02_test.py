@@ -22,8 +22,9 @@ async def test_update_company(  # noqa: WPS210, WPS218
     country_code = "SE"
     postal_code = "75320"
     city = "Uppsala"
-    buffer_rate = float(0)
-    sales_rate = float(0)
+    fx_markup = float(0)
+    fx_provider_markup = float(0)
+    sales_markup = float(0)
 
     response_create = await pay_admin_client.create_company(
         company,
@@ -31,8 +32,9 @@ async def test_update_company(  # noqa: WPS210, WPS218
         country_code,
         postal_code,
         city,
-        buffer_rate,
-        sales_rate,
+        fx_markup,
+        fx_provider_markup,
+        sales_markup,
     )
 
     logging.info("create_company: %s", json.dumps(response_create, indent=4))

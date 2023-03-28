@@ -40,8 +40,9 @@ async def test_get_conversion_details(  # noqa: WPS210, WPS213, C901
             country_code="SE",
             postal_code="75320",
             city="Uppsala",
-            buffer_rate=float(0),
-            sales_rate=float(0),
+            fx_markup=float(0),
+            fx_provider_markup=float(0),
+            sales_markup=float(0),
         )
     except httpx.HTTPStatusError as err:
         logger.info("response_payer err: %s", err.response.headers)
@@ -55,8 +56,9 @@ async def test_get_conversion_details(  # noqa: WPS210, WPS213, C901
             country_code="SE",
             postal_code="75320",
             city="Uppsala",
-            buffer_rate=float(0),
-            sales_rate=float(0),
+            fx_markup=float(0),
+            fx_provider_markup=float(0),
+            sales_markup=float(0),
         )
     except httpx.HTTPStatusError as err1:
         logger.info("response_beneficiary err:: %s", err1.response.headers)
