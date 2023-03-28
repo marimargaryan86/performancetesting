@@ -1,4 +1,4 @@
-from typing import Sequence
+from typing import Any, Mapping, Sequence
 
 import pymongo
 
@@ -44,9 +44,11 @@ class CompanyRepository(
     async def find(
         self,
         cursor: str | None,
+        filter_: Mapping[str, Any] | None = None,
     ) -> resultset.ResultSet[models_pb2.Company]:
         return await self._find_with_cursor(
             cur=cursor or "",
+            filter_=filter_,
         )
 
 

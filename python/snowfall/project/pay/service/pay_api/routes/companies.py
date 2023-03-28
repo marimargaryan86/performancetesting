@@ -156,3 +156,39 @@ class AdminCompanies(endpoints.HTTPEndpoint):
             ),
             request=request,
         )
+
+
+class AdminAccountlessCompanies(endpoints.HTTPEndpoint):
+    _default_page_size = 20
+
+    async def get(
+        self,
+        request: requests.Request,
+        company_repository: CompanyRepository = lagom.injectable,
+    ) -> models.JsonApiResponse:
+        pagination = pagination_helpers.get_pagination(request)
+
+        companies = await company_repository.find(
+            cursor=pagination.cursor,
+            filter_={"account_id": ""},
+        )
+
+        companies.limit(pagination.limit or self._default_page_size)
+
+        return await messages.create_response(
+            body=models.Body(
+                data=[
+                    resources.Company.from_proto(
+                        company=company,
+                        request=request,
+                    )
+                    async for company in companies
+                ],
+                links=pagination_helpers.get_next_url(
+                    request.url_for("AccountlessCompanies"),
+                    await companies.cursor(),
+                    pagination,
+                ),
+            ),
+            request=request,
+        )

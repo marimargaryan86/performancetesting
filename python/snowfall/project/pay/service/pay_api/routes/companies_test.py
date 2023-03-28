@@ -17,3 +17,16 @@ class TestCompanies(object):
             url="/companies",
             expected_ids=[company.id for company in companies],
         )
+
+    async def test_get_all_accountless_companies(
+        self,
+        admin_client: httpx.AsyncClient,
+        companies: Sequence[Company],
+    ) -> None:
+        await testing.test_list_and_view_endpoints(
+            client=admin_client,
+            url="/companies/accountless",
+            expected_ids=[
+                company.id for company in companies if company.account_id == ""
+            ],
+        )

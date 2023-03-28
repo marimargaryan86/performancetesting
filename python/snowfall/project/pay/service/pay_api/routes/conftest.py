@@ -185,7 +185,7 @@ async def companies(
 ) -> Sequence[Company]:
     companies = []
 
-    for _ in range(2):
+    for loop_index in range(5):
         companies.append(
             await companies_repository.insert(
                 Company(
@@ -200,6 +200,7 @@ async def companies(
                     fx_markup=float(1),
                     fx_provider_markup=float(2),
                     sales_markup=float(3),
+                    account_id=string.uuid() if loop_index % 2 == 0 else "",
                 ),
             ),
         )
