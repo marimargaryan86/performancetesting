@@ -61,5 +61,5 @@ async def test_get_company(  # noqa: WPS210, WPS218
     assert response["data"]["attributes"]["address"]["postalCode"] == postal_code
     assert response["data"]["attributes"]["address"]["city"] == city
     assert response["data"]["attributes"]["fxMarkup"] == fx_markup
-    assert response["data"]["attributes"]["fxProvider_markup"] == fx_provider_markup
+    assert response["data"]["attributes"]["fxProviderMarkup"] == fx_provider_markup
     assert response["data"]["attributes"]["salesMarkup"] == sales_markup

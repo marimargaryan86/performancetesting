@@ -332,8 +332,9 @@ class PayAdminClient(object):  # noqa: WPS214
         country_code: str,
         postal_code: str,
         city: str,
-        buffer_rate: float,
-        sales_rate: float,
+        fx_markup: float,
+        fx_provider_markup: float,
+        sales_markup: float,
     ) -> dict[str, Any]:
         payload = {
             _DATA_KEY: {
@@ -346,8 +347,9 @@ class PayAdminClient(object):  # noqa: WPS214
                         "postalCode": postal_code,
                         "city": city,
                     },
-                    "bufferRate": buffer_rate,
-                    "salesRate": sales_rate,
+                    "fxMarkup": fx_markup,
+                    "fxProviderMarkup": fx_provider_markup,
+                    "salesMarkup": sales_markup,
                 },
             },
         }
