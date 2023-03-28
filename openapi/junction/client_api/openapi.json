@@ -1208,7 +1208,7 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/TripCandidatesSearch"
+                      "$ref": "#/components/schemas/TripCandidateSearch"
                     }
                   },
                   "required": [
@@ -1237,7 +1237,7 @@
                 "type": "object",
                 "properties": {
                   "data": {
-                    "$ref": "#/components/schemas/TripCandidatesSearch"
+                    "$ref": "#/components/schemas/TripCandidateSearch"
                   }
                 },
                 "required": [
@@ -1250,14 +1250,14 @@
       },
       "parameters": [
         {
-            "$ref": "#/components/parameters/sessionToken"
-          }
+          "$ref": "#/components/parameters/sessionToken"
+        }
       ]
     },
-    "/trip-candidates/searches/{tripCandidatesSearchId}": {
+    "/trip-candidates/searches/{tripCandidateSearchId}": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/tripCandidatesSearchId"
+          "$ref": "#/components/parameters/tripCandidateSearchId"
         }
       ],
       "get": {
@@ -1274,7 +1274,7 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/TripCandidatesSearch"
+                      "$ref": "#/components/schemas/TripCandidateSearch"
                     }
                   },
                   "required": [
@@ -1300,10 +1300,10 @@
         ]
       }
     },
-    "/trip-candidates/searches/{tripCandidatesSearchId}/offers": {
+    "/trip-candidates/searches/{tripCandidateSearchId}/offers": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/tripCandidatesSearchId"
+          "$ref": "#/components/parameters/tripCandidateSearchId"
         },
         {
           "$ref": "#/components/parameters/offerInclude"
@@ -3160,11 +3160,11 @@
               }
             }
           },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         },
         "description": "Get a Price Quote for an Offer.",
@@ -4893,7 +4893,7 @@
         "title": "Trip Search",
         "description": "Context for which Trips can be found."
       },
-      "TripCandidatesSearch": {
+      "TripCandidateSearch": {
         "allOf": [
           {
             "type": "object",
@@ -4907,9 +4907,9 @@
               "type": {
                 "type": "string",
                 "enum": [
-                  "trip-candidates-searches"
+                  "trip-candidate-searches"
                 ],
-                "example": "trip-candidates-searches"
+                "example": "trip-candidate-searches"
               },
               "attributes": {
                 "type": "object",
@@ -4942,7 +4942,7 @@
                     "type": "array",
                     "uniqueItems": true,
                     "items": {
-                      "$ref": "#/components/schemas/TripCandidatesSearchCriteria"
+                      "$ref": "#/components/schemas/TripCandidateSearchCriteria"
                     }
                   },
                   "passengers": {
@@ -4978,8 +4978,7 @@
             "required": [
               "id",
               "type",
-              "attributes",
-              "relationships"
+              "attributes"
             ]
           },
           {
@@ -4987,9 +4986,10 @@
           }
         ],
         "title": "Trip Candidates Search",
-        "description": "Context for which Trip Candidates can be found."
+        "description": "Context for which Trip Candidates can be found.",
+        "x-examples": {}
       },
-      "TripCandidatesSearchCriteria": {
+      "TripCandidateSearchCriteria": {
         "allOf": [
           {
             "type": "object",
@@ -7347,8 +7347,8 @@
         },
         "description": "Trip Search identifier"
       },
-      "tripCandidatesSearchId": {
-        "name": "tripCandidatesSearchId",
+      "tripCandidateSearchId": {
+        "name": "tripCandidateSearchId",
         "in": "path",
         "required": true,
         "schema": {

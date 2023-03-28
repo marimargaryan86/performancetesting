@@ -22,6 +22,8 @@ from snowfall.project.junction.go.adapter import (
     schedules,
     seat_maps,
     segments,
+    trip_candidate_searches,
+    trip_candidates,
     trip_searches,
     trips,
 )
@@ -110,6 +112,16 @@ def trip_searches_client() -> trip_searches.Client:
 
 
 @pytest.fixture
+def trip_candidate_searches_client() -> trip_candidate_searches.Client:
+    return trip_candidate_searches.DictClient()
+
+
+@pytest.fixture
+def trip_candidates_client() -> trip_candidates.Client:
+    return trip_candidates.DictClient()
+
+
+@pytest.fixture
 def offers_client() -> offers.Client:
     return offers.DictClient(fixtures.OFFER_SEARCHES[0], fixtures.get_offers())
 
@@ -175,6 +187,15 @@ async def trip_search_request(
         ],
         departure_after=datetime.datetime.now(datetime.timezone.utc),
         maximum_connections=None,
+        allowed_segment_types=[],
+    )
+
+
+@pytest.fixture
+async def trip_candidate_search_request() -> trip_candidate_searches.TripCandidateSearchRequest:
+    return trip_candidate_searches.TripCandidateSearchRequest(
+        criteria=[],
+        passengers=[],
         allowed_segment_types=[],
     )
 

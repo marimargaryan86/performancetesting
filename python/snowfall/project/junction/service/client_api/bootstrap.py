@@ -12,6 +12,8 @@ from snowfall.project.junction.go.adapter import (  # noqa: WPS235
     price_quotes,
     schedules,
     segments,
+    trip_candidate_searches,
+    trip_candidates,
     trip_searches,
     trips,
 )
@@ -37,6 +39,8 @@ def create_dependencies(  # noqa: WPS211
     price_quotes_client: price_quotes.Client,
     trip_searches_client: trip_searches.Client,
     trips_client: trips.Client,
+    trip_candidate_searches_client: trip_candidate_searches.Client,
+    trip_candidates_client: trip_candidates.Client,
     orders_client: orders.Client,
     offers_client: offers.Client,
     offer_searches_client: offer_searches.Client,
@@ -50,6 +54,12 @@ def create_dependencies(  # noqa: WPS211
     container[price_quotes.Client] = price_quotes_client  # type: ignore[type-abstract]
     container[trip_searches.Client] = trip_searches_client  # type: ignore[type-abstract]
     container[trips.Client] = trips_client  # type: ignore[type-abstract]
+    container[
+        trip_candidate_searches.Client  # type: ignore[type-abstract]
+    ] = trip_candidate_searches_client
+    container[
+        trip_candidates.Client  # type: ignore[type-abstract]
+    ] = trip_candidates_client
     container[orders.Client] = orders_client  # type: ignore[type-abstract]
     container[offers.Client] = offers_client  # type: ignore[type-abstract]
     container[offer_searches.Client] = offer_searches_client  # type: ignore[type-abstract]

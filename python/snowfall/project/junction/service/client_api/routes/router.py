@@ -93,6 +93,17 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             trips.TripsByTripSearch,
             name="ViewTripsByTripSearch",
         ),
+        integration.route("/trip-candidates/searches", trips.TripCandidateSearches),
+        integration.route(
+            "/trip-candidates/searches/{tripCandidateSearchId}",
+            trips.TripCandidateSearch,
+            name="ViewTripCandidateSearch",
+        ),
+        integration.route(
+            "/trip-candidates/searches/{tripCandidateSearchId}/offers",
+            trips.TripCandidatesByTripCandidateSearch,
+            name="ViewTripCandidatesByTripCandidateSearch",
+        ),
         integration.route("/offers/searches", offers.OfferSearches),
         integration.route(
             "/offers/searches/{offerSearchId}",

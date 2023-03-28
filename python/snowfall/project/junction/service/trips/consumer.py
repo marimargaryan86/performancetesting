@@ -149,8 +149,10 @@ class TripCandidateSearchConsumer(object):
 
         try:
             reference_groups = await self._trip_orchestrator.get_trip_reference_groups(
-                criteria=body.trip_candidate_search.criteria,
-                allowed_segment_types=body.trip_candidate_search.allowed_segment_types,
+                criteria=list(body.trip_candidate_search.criteria),
+                allowed_segment_types=list(
+                    body.trip_candidate_search.allowed_segment_types,
+                ),
             )
         except orchestrator.CantFulfillFullTripError:
             await self._trip_candidate_search_repository.mark_as_failed(

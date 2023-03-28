@@ -113,10 +113,12 @@ message GetTripCandidateSearchDetailsResponse {
 }
 
 message TripCandidateSearchCriteria {
-  repeated snowfall.stdlib.v1alpha.Coordinates origins = 1;
-  repeated snowfall.stdlib.v1alpha.Coordinates destinations = 2;
-  snowfall.stdlib.v1alpha.DateTime departure_after = 3;
-  optional uint32 maximum_connections = 4;
+  snowfall.stdlib.v1alpha.Coordinates origin = 1;
+  snowfall.stdlib.v1alpha.Coordinates destination = 2;
+  repeated snowfall.stdlib.v1alpha.Coordinates origins = 3;
+  repeated snowfall.stdlib.v1alpha.Coordinates destinations = 4;
+  snowfall.stdlib.v1alpha.DateTime departure_after = 5;
+  optional uint32 maximum_connections = 6;
 }
 
 message TripCandidateSearch {

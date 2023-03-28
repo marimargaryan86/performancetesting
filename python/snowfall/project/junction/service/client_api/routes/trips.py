@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+from typing import Mapping, Sequence
 
 import lagom
 from dateutil import parser
@@ -10,10 +11,16 @@ from snowfall.project.junction.go.adapter import (
     locations,
     places,
     schedules,
+    trip_candidate_searches,
+    trip_candidates,
     trip_searches,
     trips,
 )
 from snowfall.project.junction.service.client_api import resources
+from snowfall.project.junction.service.offers.v1alpha import (
+    models_pb2 as offer_models_pb2,
+)
+from snowfall.project.junction.service.trips.v1alpha import trips_pb2
 from snowfall.stdlib import sequence
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import (
@@ -22,7 +29,7 @@ from snowfall.stdlib.integration.starlette import (
     pagination_helpers,
     request_helpers,
 )
-from snowfall.stdlib.v1alpha import models_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
 
 
 class Trip(endpoints.HTTPEndpoint):
@@ -229,6 +236,186 @@ class TripsByTripSearch(endpoints.HTTPEndpoint):
                     request.url_for(
                         "ViewTripsByTripSearch",
                         tripSearchId=request.path_params["tripSearchId"],
+                    ),
+                    response.next_page_token,
+                    pagination,
+                ),
+            ),
+            request=request,
+        )
+
+
+async def _get_nearby_locations(
+    locations_client: locations.Client,
+    coordinate_pairs: Sequence[tuple[float, float]],
+) -> Mapping[tuple[float, float], Sequence[models_pb2.Coordinates]]:
+    nearby_locations = await asyncio.gather(
+        *[
+            locations_client.get_nearby_locations(
+                coordinates=latlng_pb2.LatLng(
+                    latitude=pair[0],
+                    longitude=pair[1],
+                ),
+            )
+            for pair in coordinate_pairs
+        ],
+    )
+
+    return {
+        coordinate_pairs[index]: [
+            models_pb2.Coordinates(
+                latitude=location_object.coordinates.latitude,
+                longitude=location_object.coordinates.longitude,
+            )
+            for location_object in location_objects
+        ]
+        for index, location_objects in enumerate(nearby_locations)
+    }
+
+
+class TripCandidateSearches(endpoints.HTTPEndpoint):
+    async def post(
+        self,
+        request: requests.Request,
+        client: trip_candidate_searches.Client = lagom.injectable,
+        locations_client: locations.Client = lagom.injectable,
+    ) -> responses.Response:
+        body = await request_helpers.flatten_request(request)
+
+        try:
+            allowed_segment_types = [
+                protobuf.slug_to_enum_value(
+                    enum=models_pb2.Schedule.Type,
+                    name=leg_type,
+                )
+                for leg_type in body.get("allowedSegmentTypes", [])
+            ]
+        except KeyError as key_err:
+            raise exceptions.HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY,
+            ) from key_err
+
+        coordinate_pairs = []
+
+        for single_criteria in body["criteria"]:
+            coordinate_pairs.append(
+                (
+                    single_criteria["origin"]["latitude"],
+                    single_criteria["origin"]["longitude"],
+                ),
+            )
+            coordinate_pairs.append(
+                (
+                    single_criteria["destination"]["latitude"],
+                    single_criteria["destination"]["longitude"],
+                ),
+            )
+
+        locations_per_search = await _get_nearby_locations(
+            locations_client=locations_client,
+            coordinate_pairs=coordinate_pairs,
+        )
+
+        return await messages.create_response(
+            body=models.Body(
+                data=resources.TripCandidateSearchResource.from_proto(
+                    trip_candidate_search=await client.create(
+                        trip_candidate_searches.TripCandidateSearchRequest(
+                            passengers=[
+                                offer_models_pb2.Passenger(
+                                    date_of_birth=protobuf.date_to_protobuf(
+                                        datetime.date.fromisoformat(pax["dateOfBirth"]),
+                                    ),
+                                )
+                                for pax in body["passengers"]
+                            ],
+                            criteria=[
+                                trips_pb2.TripCandidateSearchCriteria(
+                                    origin=models_pb2.Coordinates(
+                                        **criteria["origin"],
+                                    ),
+                                    destination=models_pb2.Coordinates(
+                                        **criteria["destination"],
+                                    ),
+                                    origins=locations_per_search[
+                                        (
+                                            criteria["origin"]["latitude"],
+                                            criteria["origin"]["longitude"],
+                                        )
+                                    ],
+                                    destinations=locations_per_search[
+                                        (
+                                            criteria["destination"]["latitude"],
+                                            criteria["destination"]["longitude"],
+                                        )
+                                    ],
+                                    departure_after=protobuf.datetime_to_protobuf_datetime(
+                                        parser.isoparse(criteria["departureAfter"]),
+                                    ),
+                                    maximum_connections=criteria["maximumConnections"],
+                                )
+                                for criteria in body["criteria"]
+                            ],
+                            allowed_segment_types=allowed_segment_types,
+                        ),
+                    ),
+                    request=request,
+                ),
+            ),
+            request=request,
+            status_code=status.HTTP_201_CREATED,
+        )
+
+
+class TripCandidateSearch(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        client: trip_candidate_searches.Client = lagom.injectable,
+    ) -> responses.Response:
+        trip_candidate_search = await client.get(
+            request.path_params["tripCandidateSearchId"],
+        )
+
+        return await messages.create_response(
+            body=models.Body(
+                data=resources.TripCandidateSearchResource.from_proto(
+                    trip_candidate_search,
+                    request,
+                ),
+            ),
+            request=request,
+        )
+
+
+class TripCandidatesByTripCandidateSearch(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        client: trip_candidates.Client = lagom.injectable,
+    ) -> responses.Response:
+        pagination = pagination_helpers.get_pagination(request)
+        response = await client.list_trip_candidates_by_trip_candidate_search(
+            request.path_params["tripCandidateSearchId"],
+            cursor=pagination.cursor,
+            limit=pagination.limit,
+        )
+
+        return await messages.create_response(
+            body=models.Body(
+                data=[
+                    resources.OfferResource.from_proto(
+                        offer=offer,
+                        request=request,
+                    )
+                    for offer in response.offers
+                ],
+                links=pagination_helpers.get_next_url(
+                    request.url_for(
+                        "ViewTripCandidatesByTripCandidateSearch",
+                        tripCandidateSearchId=request.path_params[
+                            "tripCandidateSearchId"
+                        ],
                     ),
                     response.next_page_token,
                     pagination,

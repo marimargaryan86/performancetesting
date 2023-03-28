@@ -1165,3 +1165,60 @@ class TripOfferSearchResource(models.Resource):
             }
 
         return attributes
+
+
+class TripCandidateSearchResource(models.Resource):
+    api_type: ClassVar[str] = "trip-candidate-searches"
+
+    @classmethod
+    def from_proto(
+        cls,
+        trip_candidate_search: trips_pb2.TripCandidateSearch,
+        request: requests.Request,
+    ) -> TripCandidateSearchResource:
+        return cls(
+            id=trip_candidate_search.id,
+            type=cls.api_type,
+            attributes={
+                "passengers": [
+                    {
+                        "dateOfBirth": protobuf.protobuf_to_date(
+                            passenger.date_of_birth,
+                        ),
+                    }
+                    for passenger in trip_candidate_search.passengers
+                ],
+                "criteria": [
+                    {
+                        "origin": {
+                            "latitude": criteria.origin.latitude,
+                            "longitude": criteria.origin.longitude,
+                        },
+                        "destination": {
+                            "latitude": criteria.destination.latitude,
+                            "longitude": criteria.destination.longitude,
+                        },
+                        "departureAfter": protobuf.protobuf_to_datetime(
+                            criteria.departure_after,
+                        ),
+                        "maximumConnections": criteria.maximum_connections,
+                    }
+                    for criteria in trip_candidate_search.criteria
+                ],
+                "expiresAt": protobuf.protobuf_to_datetime(
+                    trip_candidate_search.expires_at,
+                ),
+                "status": protobuf.enum_value_to_slug(
+                    amqp_pb2.Trackable.Status.DESCRIPTOR,
+                    trip_candidate_search.status,
+                ),
+            },
+            links={
+                _SELF_HREF: str(
+                    request.url_for(
+                        "ViewTripCandidateSearch",
+                        tripCandidateSearchId=trip_candidate_search.id,
+                    ),
+                ),
+            },
+        )

@@ -16,6 +16,8 @@ from snowfall.project.junction.go.adapter import (
     price_quotes,
     schedules,
     segments,
+    trip_candidate_searches,
+    trip_candidates,
     trip_searches,
     trips,
 )
@@ -79,6 +81,16 @@ def _factory(
                     ),
                     trips_client=trips.GrpcClient(
                         trips_pb2_grpc.TripServiceStub(trips_channel),
+                    ),
+                    trip_candidate_searches_client=trip_candidate_searches.GrpcClient(
+                        trip_candidate_searches=trips_pb2_grpc.TripCandidateSearchServiceStub(
+                            trips_channel,
+                        ),
+                    ),
+                    trip_candidates_client=trip_candidates.GrpcClient(
+                        trip_candidates=trips_pb2_grpc.TripCandidateServiceStub(
+                            trips_channel,
+                        ),
                     ),
                     offers_client=offers.GrpcClient(
                         offers=grpc_pb2_grpc.OfferServiceStub(offers_channel),
