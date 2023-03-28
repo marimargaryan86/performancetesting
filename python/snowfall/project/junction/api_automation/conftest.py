@@ -227,7 +227,6 @@ def pay_admin_client(
 
     auth = PayAuthentication(
         base_url=base_url_admin_api,
-        headers=httpx.Headers({"Content-Type": "application/vnd.api+json"}),
         email=email,
         password=password,
     )
@@ -347,12 +346,10 @@ async def pay_create_account(
 
 
 @pytest.fixture(scope="function")
-def pay_client(  # noqa: WPS210
+def pay_client(
     api_token: str,
     host: str,
 ) -> PayClient:
-    client_timeout = 20
-
     email = get_variable_value(host, api_token, "pay_api_test_email")
     password = get_variable_value(host, api_token, "pay_api_test_password")
     base_url_admin_api = "{0}{1}".format(
@@ -366,7 +363,6 @@ def pay_client(  # noqa: WPS210
 
     auth = PayAuthentication(
         base_url=base_url_admin_api,
-        headers=httpx.Headers({"Content-Type": "application/vnd.api+json"}),
         email=email,
         password=password,
     )
@@ -374,11 +370,6 @@ def pay_client(  # noqa: WPS210
     return PayClient(
         base_url=base_url,
         auth=auth,
-        client=httpx.AsyncClient(
-            base_url=base_url,
-            timeout=client_timeout,
-            auth=auth,
-        ),
     )
 
 

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import time
 from typing import Any, AsyncGenerator, Mapping, Sequence
 
 import httpx
+import jwt
 
 _DATA_KEY = "data"
 _ID_KEY = "id"
@@ -18,6 +20,12 @@ _METHOD_PATCH = "PATCH"
 _METHOD_DELETE = "DELETE"
 _EMAIL_KEY = "email"
 _PASSWORD_KEY = "password"  # nosec
+_REQUEST_HEADERS = dict(
+    {
+        "Content-Type": "application/vnd.api+json",
+        "Accept": "application/vnd.api+json",
+    },
+)
 
 
 class PayTokenAuth(httpx.Auth):
@@ -47,49 +55,61 @@ class PayAuthentication(httpx.Auth):
     def __init__(
         self,
         base_url: str,
-        headers: httpx.Headers,
         email: str,
         password: str,
     ):
         self._base_url = base_url
-        self._headers = headers
         self._email = email
         self._password = password
+        self._token = ""  # nosec
+        self._http_client = httpx.AsyncClient(
+            headers={
+                "Content-Type": "application/vnd.api+json",
+                "Accept": "application/vnd.api+json",
+            },
+            base_url=base_url,
+            http2=True,
+        )
 
     async def async_auth_flow(
         self,
         request: httpx.Request,
     ) -> AsyncGenerator[httpx.Request, httpx.Response]:
-        response = await self.create_authentication_token()
-        request.headers["Authorization"] = "Bearer {0}".format(
-            response[_DATA_KEY][_ATTRIBUTES_KEY]["token"],
-        )
-        request.headers.update(self._headers)
+        if not self._is_token_valid():
+            self._token = await self._create_authentication_token()
+
+        request.headers.update({"Authorization": "Bearer {0}".format(self._token)})
         yield request
 
-    async def create_authentication_token(
+    def _is_token_valid(self) -> bool:
+        if self._token:
+            decoded = jwt.decode(self._token, options={"verify_signature": False})
+
+            return int(time.time()) < decoded["exp"]
+        return False
+
+    async def _create_authentication_token(
         self,
-    ) -> dict[str, Any]:
+    ) -> str:
         payload = {
-            _DATA_KEY: {
-                _TYPE_KEY: "user-tokens",
-                _ATTRIBUTES_KEY: {
+            "data": {
+                "type": "user-tokens",
+                "attributes": {
                     "email": self._email,
                     "password": self._password,
                 },
             },
         }
 
-        client = httpx.AsyncClient(http2=True)
-        response = await client.request(
-            method=_METHOD_POST,
-            url="{0}/users/tokens".format(self._base_url),
-            headers=self._headers,
+        response = await self._http_client.post(
+            url="/users/tokens",
             json=payload,
         )
+
         response.raise_for_status()
 
-        return response.json()
+        response_data = response.json()
+        return response_data["data"]["attributes"]["token"]
 
 
 class PayClient(object):
@@ -99,8 +119,12 @@ class PayClient(object):
         auth: httpx.Auth,
         client: httpx.AsyncClient | None = None,
     ):
-        self._base_url = base_url
+        self._base_url = httpx.URL(base_url)
         self._http_client = client or httpx.AsyncClient(
+            headers={
+                "Content-Type": "application/vnd.api+json",
+                "Accept": "application/vnd.api+json",
+            },
             base_url=base_url,
             http2=True,
             auth=auth,
@@ -141,8 +165,7 @@ class PayClient(object):
         }
 
         response = await self._http_client.post(
-            "{0}/quotes".format(self._base_url),
-            headers=self._http_client.headers,
+            url="/quotes",
             json=payload,
         )
 
