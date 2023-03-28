@@ -136,25 +136,40 @@ async def test_get_transactions(  # noqa: WPS210, WPS213, WPS218, C901
     except parser.ParserError:
         is_valid_date = False
     assert is_valid_date
-    assert isinstance(first_item["attributes"]["beneficiaryAmount"]["currency"], str)
-    assert isinstance(first_item["attributes"]["beneficiaryAmount"]["amount"], int)
-    assert isinstance(first_item["attributes"]["offerAmount"]["currency"], str)
-    assert isinstance(first_item["attributes"]["offerAmount"]["amount"], int)
     assert isinstance(
-        first_item["attributes"]["convertedBeneficiaryAmount"]["currency"],
+        first_item["attributes"]["amounts"]["beneficiary"]["currency"],
+        str,
+    )
+    assert isinstance(first_item["attributes"]["amounts"]["beneficiary"]["amount"], int)
+    assert isinstance(first_item["attributes"]["amounts"]["quotation"]["currency"], str)
+    assert isinstance(first_item["attributes"]["amounts"]["quotation"]["amount"], int)
+    assert isinstance(
+        first_item["attributes"]["amounts"]["baseConverted"]["currency"],
         str,
     )
     assert isinstance(
-        first_item["attributes"]["convertedBeneficiaryAmount"]["amount"],
+        first_item["attributes"]["amounts"]["baseConverted"]["amount"],
         int,
     )
-    assert isinstance(first_item["attributes"]["bufferAmount"]["currency"], str)
-    assert isinstance(first_item["attributes"]["bufferAmount"]["amount"], int)
-    assert isinstance(first_item["attributes"]["salesAmount"]["currency"], str)
-    assert isinstance(first_item["attributes"]["salesAmount"]["amount"], int)
-    assert isinstance(first_item["attributes"]["exchangeRate"], float)
-    assert isinstance(first_item["attributes"]["bufferRate"], float)
-    assert isinstance(first_item["attributes"]["salesRate"], float)
+    assert isinstance(
+        first_item["attributes"]["amounts"]["salesMargin"]["currency"],
+        str,
+    )
+    assert isinstance(first_item["attributes"]["amounts"]["salesMargin"]["amount"], int)
+    assert isinstance(first_item["attributes"]["amounts"]["fxMargin"]["currency"], str)
+    assert isinstance(first_item["attributes"]["amounts"]["fxMargin"]["amount"], int)
+    assert isinstance(
+        first_item["attributes"]["amounts"]["fxProviderMargin"]["currency"],
+        str,
+    )
+    assert isinstance(
+        first_item["attributes"]["amounts"]["fxProviderMargin"]["amount"],
+        int,
+    )
+    assert isinstance(first_item["attributes"]["rates"]["fxQuote"], float)
+    assert isinstance(first_item["attributes"]["rates"]["fxBuffer"], float)
+    assert isinstance(first_item["attributes"]["rates"]["salesMarkup"], float)
+    assert isinstance(first_item["attributes"]["rates"]["fxMarkup"], float)
     assert is_valid_uuid(first_item["relationships"]["conversion"]["data"]["id"])
     assert first_item["relationships"]["conversion"]["data"]["type"] == "conversions"
     assert is_valid_uuid(first_item["relationships"]["payer"]["data"]["id"])
