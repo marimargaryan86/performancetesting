@@ -70,6 +70,6 @@ async def test_get_currencies(
     logger.info("expected_currencies_list: %s", expected_currencies_list)
     logger.info("actual_currencies_list: %s", actual_currencies_list)
 
-    assert not (
-        set(expected_currencies_list) - set(actual_currencies_list)
+    assert set(expected_currencies_list) == set(
+        actual_currencies_list,
     ), "Expected currencies list lenght does not match"

@@ -78,7 +78,7 @@ async def test_create_contacts(  # noqa: WPS210, WPS218
     )
 
     assert is_valid_uuid(response_create_contact["data"]["id"])
-    assert response_create_contact["data"]["type"] == "contact-persons"
+    assert response_create_contact["data"]["type"] == "contacts"
     assert response_create_contact["data"]["attributes"]["firstName"] == first_name
     assert response_create_contact["data"]["attributes"]["lastName"] == last_name
     assert (
