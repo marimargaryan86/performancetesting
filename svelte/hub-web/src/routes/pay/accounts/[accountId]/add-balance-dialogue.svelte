@@ -5,12 +5,16 @@
   import Button from "components/ui/button.svelte";
   import TextField from "components/ui/text-field.svelte";
   import { portal } from "directives/portal";
-  import type { MoneyModel } from "models/money";
-  import { createEventDispatcher } from "svelte";
+  import integrationInstances from "integration-instances";
+  import type { CurrencyModel, MoneyModel } from "models/money";
+  import { createEventDispatcher, onMount } from "svelte";
   import { fade, fly } from "svelte/transition";
-  import { getRandomId } from "utils/random";
 
-  export let balances: MoneyModel[];
+  export let token: string | undefined;
+  export let accountId: string;
+  export let exclude: MoneyModel[];
+
+  let balances: CurrencyModel[] = [];
 
   export function close(): void {
     visible = false;
@@ -26,21 +30,45 @@
     inputRef.focus();
   }
 
-  let value: MoneyModel[] = [];
+  let value: CurrencyModel[] = [];
   let searchQuery = "";
   let visible = false;
   let inputRef: TextField<"text">;
 
   const dispatch = createEventDispatcher<{ addbalances: MoneyModel[] }>();
 
-  $: filteredBalances = balances.filter((item) =>
-    item.currency.toLowerCase().includes(searchQuery.toLowerCase()),
+  $: filteredBalances = balances.filter(
+    (balance) =>
+      balance.code.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      !exclude.find((money) => money.currency === balance.code),
   );
 
-  function addBalances(): void {
-    dispatch("addbalances", value);
+  async function addBalances(): Promise<void> {
+    if (!token) {
+      close();
+
+      return;
+    }
+
+    const nextBalances = await Promise.all(
+      value.map((item) =>
+        integrationInstances.junctionPay.balances.addBalance(token as string, accountId, item.code),
+      ),
+    );
+
+    dispatch("addbalances", nextBalances);
     close();
   }
+
+  onMount(() => {
+    (async (): Promise<void> => {
+      if (!token) {
+        return;
+      }
+
+      balances = await integrationInstances.junctionPay.currencies.listCurrencies(token);
+    })();
+  });
 </script>
 
 {#if visible}
@@ -69,13 +97,13 @@
 
       <ul class="balances">
         {#each filteredBalances as balance}
-          {@const id = getRandomId("balance")}
+          {@const id = `balance-${balance.code}`}
           <li>
             <input type="checkbox" value={balance} bind:group={value} {id} />
 
             <label for={id} class="balance">
-              <CurrencyFlag code={balance.currency} />
-              <span>{balance.currency}</span>
+              <CurrencyFlag code={balance.code} />
+              <span>{balance.code}</span>
             </label>
           </li>
         {/each}

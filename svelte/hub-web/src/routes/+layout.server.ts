@@ -3,14 +3,17 @@ import type { UserJwtSchema } from "integration/junction-pay/schemas/user";
 import jwtDecode from "jwt-decode";
 import type { UserModel } from "models/user";
 
-export function load(event: ServerLoadEvent): { user?: UserModel } {
+export function load(event: ServerLoadEvent): { user?: UserModel; token?: string } {
   const token = event.cookies.get("session-token");
 
   try {
     const user: UserJwtSchema | undefined = token ? jwtDecode(token) : undefined;
 
     if (user) {
-      return { user: { email: user.user_info.email, id: user.user_info.id, name: "John Smith" } };
+      return {
+        user: { email: user.user_info.email, id: user.user_info.id, name: "John Smith" },
+        token,
+      };
     }
   } catch {
     //

@@ -14,16 +14,16 @@
   let searchQuery = "";
   let dialogue: AddBalanceDialogue;
 
-  $: balances = data.balances.filter((item) =>
-    item.currency.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  $: balances = data.balances
+    .filter((item) => item.currency.toLowerCase().includes(searchQuery.toLowerCase()))
+    .sort((a, b) => 0 - (a.currency < b.currency ? 1 : -1));
 
   function openDialogue(): void {
     dialogue.open();
   }
 
   function addBalances(event: CustomEvent<MoneyModel[]>): void {
-    balances = [...event.detail, ...balances];
+    data.balances = [...event.detail, ...data.balances];
   }
 </script>
 
@@ -31,7 +31,13 @@
   <title>Balances · {data.account.name} · Accounts · Pay · Junction Hub</title>
 </svelte:head>
 
-<AddBalanceDialogue {balances} on:addbalances={addBalances} bind:this={dialogue} />
+<AddBalanceDialogue
+  exclude={balances}
+  accountId={data.account.id}
+  token={data.token}
+  on:addbalances={addBalances}
+  bind:this={dialogue}
+/>
 
 <div class="header">
   <TextField placeholder="Find a balance" bind:value={searchQuery}>
@@ -58,6 +64,8 @@
         <ChevronIcon color="var(--color-neutral-700)" size="20px" />
       </a>
     </li>
+  {:else}
+    <li class="empty">No balances found</li>
   {/each}
 </ul>
 
@@ -146,5 +154,10 @@
     font-weight: 500;
     font-size: 10px;
     letter-spacing: 2px;
+  }
+
+  .empty {
+    font-size: 16px;
+    font-family: "Red Hat Display", Arial, Helvetica, sans-serif;
   }
 </style>

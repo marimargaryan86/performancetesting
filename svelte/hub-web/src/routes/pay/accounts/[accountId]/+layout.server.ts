@@ -38,6 +38,6 @@ export function load(event: LayoutServerLoadEvent): {
 
   return {
     breadCrumbs: getBreadCrumbs(event),
-    account,
+    account: { ...account, id: event.params.accountId },
   };
 }
