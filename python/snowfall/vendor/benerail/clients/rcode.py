@@ -1,11 +1,19 @@
+from typing import Any, Mapping, Sequence
+from urllib import parse as parse_url
+
 from snowfall.stdlib.transport.http import client
 from snowfall.vendor.benerail.clients import base
+from snowfall.vendor.benerail.models import metadata
+from snowfall.vendor.benerail.models.enumeration import rcode_types
 from snowfall.vendor.benerail.models.enumeration import response as rcodes_response
+from snowfall.vendor.benerail.models.enumeration import results
 
 _BASE_RCODE_PATH = "/rcode/rcode"
 _BASE_RCODE_TYPE_PATH = "/rcode/rcode-types"
 _BASE_RCODE_AUTHORIZATION_PATH = "/rcode/authorization-groups"
 _BASE_PLACE_PATH = "/rcode/places"
+_LATITUDE = "latitude"
+_LONGITUDE = "longitude"
 
 
 class RcodeClient(base.BenerailBaseClient):
@@ -218,19 +226,55 @@ class RcodeTypeClient(base.BenerailBaseClient):
         return rcodes_response.TypesResponse(**response.json())
 
 
+def _is_valid_place(place: Mapping[str, Any]) -> bool:
+    return all(field in place["geoCoordinate"] for field in (_LATITUDE, _LONGITUDE))
+
+
 class PlaceClient(base.BenerailBaseClient):
     async def get_places(
         self,
+        page: int | str = 0,
     ) -> rcodes_response.PlacesResponse:
         response = await self._make_request(
             client.RequestOptions(
                 method="GET",
                 path=_BASE_PLACE_PATH,
                 headers=self._get_headers(),
+                query={"page": str(page)},
+            ),
+        )
+        response_data = response.json()
+
+        return rcodes_response.PlacesResponse(
+            metadata=metadata.Metadata(**response_data["metadata"]),
+            response_result=results.PlacesResult(
+                places=[
+                    results.PlaceResult(**place_data)
+                    for place_data in response_data["result"]["places"]
+                    if _is_valid_place(place_data)
+                ],
+                field_links=rcode_types.LinksUnderscoreType(
+                    **response_data["result"]["_links"],
+                ),
             ),
         )
 
-        return rcodes_response.PlacesResponse(**response.json())
+    async def get_all_places(self) -> Sequence[rcodes_response.PlacesResponse]:
+        page = 0
+        response = await self.get_places(page)
+        responses = [response]
+
+        while response.response_result.field_links.next_page:  # type: ignore[union-attr]
+            next_page = parse_url.parse_qs(  # type: ignore[index]
+                parse_url.urlparse(
+                    response.response_result.field_links.next_page,  # type: ignore[union-attr]
+                ).query,
+            ).get("page")[0]
+
+            response = await self.get_places(next_page)
+            responses.append(response)
+
+        return responses
 
     async def get_place(
         self,
