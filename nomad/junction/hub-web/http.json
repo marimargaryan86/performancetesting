@@ -4,6 +4,7 @@
       "count": 1,
       "traefik_entrypoints": "websecure",
       "traefik_host_URL": "hub.junction.dev",
+      "api_pay_base_url": "https://api.pay.junction.dev",
       "pay_admin_api_base_url": "https://adminapi.pay.junction.dev"
     }
   },
@@ -13,6 +14,7 @@
       "count": 2,
       "traefik_entrypoints": "web",
       "traefik_host_URL": "hub.junction.travel",
+      "api_pay_base_url": "https://api.pay.junction.travel",
       "pay_admin_api_base_url": "https://adminapi.pay.junction.travel"
     }
   }
