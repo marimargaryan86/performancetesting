@@ -21,20 +21,22 @@ export const balanceTransactionStatusMapping: Record<BalanceTransactionStatus, s
   pending: "Pending",
 };
 
-export interface TransactionModel {
+export type TransactionModel = {
   id: string;
   parentId: string;
   createdAt: Date;
   payer: CompanyModel;
-  offerAmount: MoneyModel;
+  amounts: {
+    beneficiary: MoneyModel;
+    quotation: MoneyModel;
+    salesMargin: MoneyModel;
+  };
   beneficiary: CompanyModel;
-  beneficiaryAmount: MoneyModel;
-  profit: MoneyModel;
   reference: string;
   status: TransactionStatus;
-}
+};
 
-export interface BalanceTransactionModel {
+export type BalanceTransactionModel = {
   createdAt: Date;
   action: string;
   reason: string;
@@ -42,4 +44,4 @@ export interface BalanceTransactionModel {
   credit: MoneyModel;
   balance: MoneyModel;
   status: BalanceTransactionStatus;
-}
+};

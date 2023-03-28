@@ -4,8 +4,9 @@ import JunctionPayService from "./junction-pay-service";
 
 export default class CurrencyService extends JunctionPayService {
   async listCurrencies(token: string): Promise<CurrencyModel[]> {
-    const resp = await fetch(this.getResourceUrl("/currencies", { "page[limit]": 100 }), {
-      headers: this.getHeadersWithAuth(token),
+    const resp = await this.makeRequest("/currencies", {
+      queryParams: { "page[limit]": 100 },
+      token,
     });
 
     if (resp.status !== 200) {

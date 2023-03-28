@@ -13,14 +13,20 @@ export interface TransactionSchema extends TransactionIdentifierSchema {
     externalReference: string;
     parentExternalReference: string;
     createdAt: string;
-    beneficiaryAmount: MoneySchema;
-    offerAmount: MoneySchema;
-    convertedBeneficiaryAmount: MoneySchema;
-    bufferAmount: MoneySchema;
-    salesAmount: MoneySchema;
-    exchangeRate: number;
-    bufferRate: number;
-    salesRate: number;
+    amounts: {
+      beneficiary: MoneySchema;
+      quotation: MoneySchema;
+      baseConverted: MoneySchema;
+      salesMargin: MoneySchema;
+      fxMargin: MoneySchema;
+      fxProviderMargin: MoneySchema;
+    };
+    rates: {
+      fxQuote: number;
+      fxBuffer: number;
+      salesMarkup: number;
+      fxMarkup: number;
+    };
   };
   relationships: {
     conversion: RelationshipSchema<ConversionIdentifierSchema>;

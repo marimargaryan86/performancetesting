@@ -14,9 +14,7 @@ export default class TransactionService extends JunctionPayService {
   }
 
   async listTransactions(token: string): Promise<TransactionModel[]> {
-    const resp = await fetch(this.getResourceUrl("/transactions"), {
-      headers: this.getHeadersWithAuth(token),
-    });
+    const resp = await this.makeRequest("/transactions", { token });
 
     if (resp.status !== 200) {
       throw new Error(`Junction Pay error: ${resp.status}`);

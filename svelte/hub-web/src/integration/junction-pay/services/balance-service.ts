@@ -4,9 +4,7 @@ import JunctionPayService from "./junction-pay-service";
 
 export default class BalanceService extends JunctionPayService {
   async listBalances(token: string, accountId: string): Promise<MoneyModel[]> {
-    const resp = await fetch(this.getResourceUrl(`/accounts/${accountId}/balances`), {
-      headers: this.getHeadersWithAuth(token),
-    });
+    const resp = await this.makeRequest(`/accounts/${accountId}/balances`, { token });
 
     if (resp.status === 404) {
       return [];
@@ -25,26 +23,23 @@ export default class BalanceService extends JunctionPayService {
   }
 
   async addBalance(token: string, accountId: string, currencyCode: string): Promise<MoneyModel> {
-    const resp = await fetch(
-      this.getResourceUrl(`/accounts/${accountId}/relationships/currencies`),
-      {
-        method: "POST",
-        headers: this.getHeadersWithAuth(token),
-        body: JSON.stringify({
-          data: {
-            type: "balances",
-            relationships: {
-              currency: {
-                data: {
-                  id: currencyCode,
-                  type: "currencies",
-                },
+    const resp = await this.makeRequest(`/accounts/${accountId}/relationships/currencies`, {
+      method: "POST",
+      data: {
+        data: {
+          type: "balances",
+          relationships: {
+            currency: {
+              data: {
+                id: currencyCode,
+                type: "currencies",
               },
             },
           },
-        }),
+        },
       },
-    );
+      token,
+    });
 
     if (resp.status !== 201) {
       throw new Error(`Junction Pay error: ${resp.status}`);

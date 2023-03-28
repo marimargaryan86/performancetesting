@@ -1,21 +1,19 @@
-import config from "config/public-config";
+import { env } from "$env/dynamic/public";
 import junctionPay from "integration/junction-pay/services";
 
-const junctionPayCompanyService = new junctionPay.CompanyService(
-  config.PUBLIC_PAY_ADMIN_API_BASE_URL,
-);
+const junctionPayCompanyService = new junctionPay.CompanyService(env.PUBLIC_PAY_ADMIN_API_BASE_URL);
 
 export default {
   junctionPay: {
-    auth: new junctionPay.AuthenticationService(config.PUBLIC_PAY_ADMIN_API_BASE_URL),
-    accounts: new junctionPay.AccountService(config.PUBLIC_PAY_ADMIN_API_BASE_URL),
+    auth: new junctionPay.AuthenticationService(env.PUBLIC_PAY_ADMIN_API_BASE_URL),
+    accounts: new junctionPay.AccountService(env.PUBLIC_PAY_ADMIN_API_BASE_URL),
     companyService: junctionPayCompanyService,
     transactions: new junctionPay.TransactionService(
-      config.PUBLIC_PAY_ADMIN_API_BASE_URL,
+      env.PUBLIC_PAY_ADMIN_API_BASE_URL,
       junctionPayCompanyService,
     ),
-    conversions: new junctionPay.ConversionService(config.PUBLIC_PAY_ADMIN_API_BASE_URL),
-    balances: new junctionPay.BalanceService(config.PUBLIC_PAY_ADMIN_API_BASE_URL),
-    currencies: new junctionPay.CurrencyService(config.PUBLIC_PAY_API_BASE_URL),
+    conversions: new junctionPay.ConversionService(env.PUBLIC_PAY_ADMIN_API_BASE_URL),
+    balances: new junctionPay.BalanceService(env.PUBLIC_PAY_ADMIN_API_BASE_URL),
+    currencies: new junctionPay.CurrencyService(env.PUBLIC_PAY_API_BASE_URL),
   },
 };

@@ -1,5 +1,5 @@
-export interface ConversionModel {
+export type ConversionModel = {
   id: string;
   settledAt: Date;
   rate: number;
-}
+};

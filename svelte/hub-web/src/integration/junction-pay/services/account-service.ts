@@ -4,9 +4,7 @@ import JunctionPayService from "./junction-pay-service";
 
 export default class AccountService extends JunctionPayService {
   async listAccounts(token: string): Promise<AccountModel[]> {
-    const resp = await fetch(this.getResourceUrl("/accounts"), {
-      headers: this.getHeadersWithAuth(token),
-    });
+    const resp = await this.makeRequest("/accounts", { token });
 
     if (resp.status !== 200) {
       throw new Error(`Junction Pay error: ${resp.status}`);

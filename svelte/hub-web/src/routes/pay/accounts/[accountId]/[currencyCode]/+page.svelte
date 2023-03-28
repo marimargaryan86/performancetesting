@@ -43,6 +43,7 @@
   import type { DirectionY } from "models/spatial";
   import type { PageData } from "./$types";
   import BalanceTransactionStatusBadge from "components/ui/balance-transaction-status-badge.svelte";
+  import type { FlattenedObject } from "utils/common";
 
   export let data: PageData;
 
@@ -50,7 +51,7 @@
   let dateRange: DateRange | undefined = undefined;
   let status: BalanceTransactionStatus[] = [];
   let sortDirection: DirectionY = "down";
-  let sortBy: keyof BalanceTransactionModel = "createdAt";
+  let sortBy: FlattenedObject<BalanceTransactionModel> = "createdAt";
 
   $: transactions = getMockTransactions(5 + searchQuery.length * 5);
 </script>

@@ -28,12 +28,14 @@ export function parseTransaction(
     createdAt: new Date(attributes.createdAt),
     parentId: attributes.parentExternalReference,
     payer,
-    beneficiaryAmount: attributes.beneficiaryAmount,
-    profit: attributes.salesAmount,
+    amounts: {
+      beneficiary: attributes.amounts.beneficiary,
+      quotation: attributes.amounts.quotation,
+      salesMargin: attributes.amounts.salesMargin,
+    },
     reference: attributes.externalReference,
     /* eslint-disable no-warning-comments */
     // TODO: Use real status.
     status: transactionStatus[Math.floor(Math.random() * 3)] as TransactionStatus,
-    offerAmount: attributes.offerAmount,
   };
 }

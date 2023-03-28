@@ -4,9 +4,7 @@ import JunctionPayService from "./junction-pay-service";
 
 export default class ConversionService extends JunctionPayService {
   async listConversions(token: string): Promise<ConversionModel[]> {
-    const resp = await fetch(this.getResourceUrl("/conversions"), {
-      headers: this.getHeadersWithAuth(token),
-    });
+    const resp = await this.makeRequest("/conversions", { token });
 
     if (resp.status !== 200) {
       return [

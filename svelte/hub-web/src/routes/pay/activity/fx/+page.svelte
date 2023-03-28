@@ -3,12 +3,13 @@
   import { yymmdd } from "formatting/date-time";
   import type { ConversionModel } from "models/conversion";
   import type { DirectionY } from "models/spatial";
+  import type { FlattenedObject } from "utils/common";
   import type { PageData } from "./$types";
 
   export let data: PageData;
 
   let sortDirection: DirectionY = "down";
-  let sortBy: keyof ConversionModel = "id";
+  let sortBy: FlattenedObject<ConversionModel> = "id";
 </script>
 
 <svelte:head>

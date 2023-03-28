@@ -1,10 +1,11 @@
 import type { DirectionY } from "models/spatial";
 import type { TransactionModel } from "models/transaction";
+import type { FlattenedObject } from "utils/common";
 
 /* eslint-disable max-lines-per-function */
 export function sortTransactions(
   transactions: TransactionModel[],
-  options: { by: keyof TransactionModel; direction: DirectionY },
+  options: { by: FlattenedObject<TransactionModel>; direction: DirectionY },
 ): TransactionModel[] {
   /* eslint-disable complexity */
   const nextTransactions = [...transactions];
@@ -19,14 +20,14 @@ export function sortTransactions(
         return 0 - (a.createdAt < b.createdAt ? 1 : -1);
       case "payer":
         return 0 - (a.payer.name < b.payer.name ? 1 : -1);
-      case "offerAmount":
-        return 0 - (a.offerAmount.amount < b.offerAmount.amount ? 1 : -1);
+      case "amounts.quotation":
+        return 0 - (a.amounts.quotation.amount < b.amounts.quotation.amount ? 1 : -1);
       case "beneficiary":
         return 0 - (a.beneficiary.name < b.beneficiary.name ? 1 : -1);
-      case "beneficiaryAmount":
-        return 0 - (a.beneficiaryAmount.amount < b.beneficiaryAmount.amount ? 1 : -1);
-      case "profit":
-        return 0 - (a.profit.amount < b.profit.amount ? 1 : -1);
+      case "amounts.beneficiary":
+        return 0 - (a.amounts.beneficiary.amount < b.amounts.beneficiary.amount ? 1 : -1);
+      case "amounts.salesMargin":
+        return 0 - (a.amounts.salesMargin.amount < b.amounts.salesMargin.amount ? 1 : -1);
       case "reference":
         return 0 - (a.reference < b.reference ? 1 : -1);
       case "status":

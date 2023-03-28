@@ -9,13 +9,14 @@
   import type { DirectionY } from "models/spatial";
   import type { TransactionModel } from "models/transaction";
   import { sortTransactions } from "sorting/transactions";
+  import type { FlattenedObject } from "utils/common";
   import type { PageData } from "./$types";
 
   export let data: PageData;
 
   const { searchQuery, status, dateRange } = data;
 
-  let sortBy: keyof TransactionModel = "id";
+  let sortBy: FlattenedObject<TransactionModel> = "id";
   let sortDirection: DirectionY = "down";
   let transactions: TransactionModel[] = [];
 
@@ -71,7 +72,7 @@
       </th>
       <th>
         <SortButton
-          value="offerAmount"
+          value="amounts.quotation"
           bind:direction={sortDirection}
           bind:group={sortBy}
           label="Owed to us"
@@ -87,7 +88,7 @@
       </th>
       <th>
         <SortButton
-          value="beneficiaryAmount"
+          value="amounts.beneficiary"
           bind:direction={sortDirection}
           bind:group={sortBy}
           label="What we owe"
@@ -95,7 +96,7 @@
       </th>
       <th>
         <SortButton
-          value="profit"
+          value="amounts.salesMargin"
           bind:direction={sortDirection}
           bind:group={sortBy}
           label="Sales profit"
@@ -142,15 +143,15 @@
             <span title={transaction.payer.name}>{transaction.payer.name}</span>
           </div>
         </td>
-        <td>{formatAmountAndCode(transaction.offerAmount)}</td>
+        <td>{formatAmountAndCode(transaction.amounts.quotation)}</td>
         <td>
           <div class="company">
             <EntityAvatar name={transaction.beneficiary.name} />
             <span title={transaction.beneficiary.name}>{transaction.beneficiary.name}</span>
           </div>
         </td>
-        <td>{formatAmountAndCode(transaction.beneficiaryAmount)}</td>
-        <td>{formatAmountAndCode(transaction.profit)}</td>
+        <td>{formatAmountAndCode(transaction.amounts.beneficiary)}</td>
+        <td>{formatAmountAndCode(transaction.amounts.salesMargin)}</td>
         <td>
           <button class="copy" on:click={createCopyFunc(transaction.reference)}>
             <span class="ellipsis">{transaction.reference}</span>

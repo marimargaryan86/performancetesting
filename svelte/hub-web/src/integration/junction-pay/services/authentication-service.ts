@@ -3,9 +3,9 @@ import JunctionPayService from "./junction-pay-service";
 
 export default class AuthenticationService extends JunctionPayService {
   async createToken(data: { email: string; password: string }): Promise<string> {
-    const resp = await fetch(this.getResourceUrl("/users/tokens"), {
+    const resp = await this.makeRequest("/users/tokens", {
       method: "POST",
-      body: JSON.stringify({
+      data: {
         data: {
           type: "user-tokens",
           attributes: {
@@ -13,8 +13,7 @@ export default class AuthenticationService extends JunctionPayService {
             password: data.password,
           },
         },
-      }),
-      headers: this.headers,
+      },
     });
 
     if (resp.status !== 200) {

@@ -36,3 +36,9 @@ export function getHexColor(value: string): string {
 
   return `#${hex.substring(0, 6)}`;
 }
+
+export type FlattenedObject<T extends Record<string, unknown>, TKey = keyof T> = TKey extends string
+  ? T[TKey] extends Record<string, unknown>
+    ? `${TKey}.${FlattenedObject<T[TKey]>}`
+    : TKey
+  : never;
