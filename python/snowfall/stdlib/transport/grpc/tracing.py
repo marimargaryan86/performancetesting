@@ -50,10 +50,7 @@ class TracingServerInterceptor(interceptor.ServerInterceptor):
         context: aio.ServicerContext,
     ) -> Iterator[tracing.Span]:
         transaction = tracing.Transaction.continue_from_headers(
-            {
-                metadata_key: metadata_value
-                for metadata_key, metadata_value in context.invocation_metadata()
-            },
+            dict(context.invocation_metadata()),
             op=_SPAN_SERVER_OP,
             name=name,
             description=name,

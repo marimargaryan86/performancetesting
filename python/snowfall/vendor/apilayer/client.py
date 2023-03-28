@@ -12,7 +12,6 @@ class APILayer(object):
         self._base_url = base_url
         self._api_key = api_key
         self._http_client = httpx.AsyncClient(
-            verify=False,
             timeout=timeout,
             headers={"apikey": self._api_key},
         )

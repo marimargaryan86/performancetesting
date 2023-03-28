@@ -1,5 +1,5 @@
 [GLOBAL]
-pants_version = "2.15.0"
+pants_version = "2.16.0a1"
 level = "warn"
 pantsd_max_memory_usage = "8GiB"
 build_file_prelude_globs = ["python/snowfall/plugin/pants/macros.py"]
@@ -28,33 +28,29 @@ backend_packages = [
 ]
 
 [add-trailing-comma]
-version = "add-trailing-comma==2.4.0"
-lockfile = "vendor/lock/add-trailing-comma.txt"
+requirements = ["add-trailing-comma"]
+install_from_resolve = "python-default"
 interpreter_constraints = ["CPython==3.11.*"]
 
 [anonymous-telemetry]
 enabled = false
 
 [autoflake]
-version = "autoflake==2.0.1"
-lockfile = "vendor/lock/autoflake.txt"
+requirements = ["autoflake"]
+install_from_resolve = "python-default"
 interpreter_constraints = ["CPython==3.11.*"]
 args = ["--remove-all-unused-imports", "--remove-unused-variables"]
 
 [bandit]
-version = "bandit==1.7.4"
+requirements = ["bandit"]
 config = "vendor/pyproject.toml"
 args = ["--silent"]
-lockfile = "vendor/lock/bandit.txt"
-extra_requirements = [
-    "setuptools",
-    "toml",
-]
+install_from_resolve = "python-default"
 
 [black]
-version = "black==23.1.0"
+requirements = ["black"]
 config = "vendor/pyproject.toml"
-lockfile = "vendor/lock/black.txt"
+install_from_resolve = "python-default"
 interpreter_constraints = ["CPython==3.11.*"]
 
 [buf]
@@ -70,16 +66,14 @@ config = "vendor/pyproject.toml"
 report = ["console", "html"]
 
 [docformatter]
-version = "docformatter==1.5.1"
-lockfile = "vendor/lock/docformatter.txt"
+requirements = ["docformatter"]
+install_from_resolve = "python-default"
 args = ["--wrap-summaries", "87", "--wrap-descriptions", "80"]
 interpreter_constraints = ["CPython==3.11.*"]
 
 [flake8]
-version = "flake8==4.0.1"
-config = "vendor/setup.cfg"
-lockfile = "vendor/lock/flake8.txt"
-extra_requirements = [
+requirements = [
+    "flake8",
     "flake8-annotations",
     "flake8-builtins",
     "flake8-executable",
@@ -93,6 +87,8 @@ extra_requirements = [
     "setuptools",
     "wemake-python-styleguide",
 ]
+config = "vendor/setup.cfg"
+install_from_resolve = "python-default"
 source_plugins = [
     "python/snowfall/plugin/flake8/immutability.py",
     "python/snowfall/plugin/flake8/imports.py",
@@ -103,22 +99,21 @@ source_plugins = [
 minimum_expected_version = "1.19"
 
 [isort]
-version = "isort==5.12.0"
+requirements = ["isort"]
 config = "vendor/setup.cfg"
-lockfile = "vendor/lock/isort.txt"
+install_from_resolve = "python-default"
 interpreter_constraints = ["CPython==3.11.*"]
 
 [mypy]
-version = "mypy==1.0.0"
+requirements = ["mypy", "pydantic"]
 config = "vendor/setup.cfg"
-lockfile = "vendor/lock/mypy.txt"
+install_from_resolve = "python-default"
 interpreter_constraints = ["CPython==3.11.*"]
-extra_requirements = ["pydantic"]
 
 [mypy-protobuf]
-version = "mypy-protobuf==3.4.0"
-lockfile = "vendor/lock/mypy-protobuf.txt"
-extra_requirements = ["protobuf>=4.21.8"]
+requirements = ["mypy-protobuf", "protobuf"]
+install_from_resolve = "python-default"
+interpreter_constraints = ["CPython==3.11.*"]
 
 [protoc]
 version = "21.12"
@@ -131,26 +126,26 @@ known_versions = [
 ]
 
 [pytest]
-version = "pytest==7.2.1"
-config = "vendor/pyproject.toml"
-lockfile = "vendor/lock/pytest.txt"
-xdist_enabled = true
-extra_requirements = [
+requirements = [
     "allure-pytest",
     "hvac",
+    "pygments",
+    "pytest",
     "pytest-asyncio",
     "pytest-cov",
     "pytest-icdiff",
     "pytest-socket",
     "pytest-xdist",
-    "pygments",
 ]
+config = "vendor/pyproject.toml"
+install_from_resolve = "python-default"
+xdist_enabled = true
 
 [python]
 interpreter_constraints = ["CPython==3.11.*"]
 enable_resolves = true
 tailor_pex_binary_targets = false
-resolves = {python-default = "vendor/lock/constraints.txt"}
+resolves = {python-default = "vendor/constraints.txt"}
 
 [python-infer]
 unowned_dependency_behavior = "error"

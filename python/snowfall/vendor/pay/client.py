@@ -80,7 +80,7 @@ class PayAuthentication(httpx.Auth):
             },
         }
 
-        client = httpx.AsyncClient(verify=False, http2=True)
+        client = httpx.AsyncClient(http2=True)
         response = await client.request(
             method=_METHOD_POST,
             url="{0}/users/tokens".format(self._base_url),
@@ -102,7 +102,6 @@ class PayClient(object):
         self._base_url = base_url
         self._http_client = client or httpx.AsyncClient(
             base_url=base_url,
-            verify=False,
             http2=True,
             auth=auth,
         )
@@ -213,7 +212,6 @@ class PayAdminClient(object):  # noqa: WPS214
         self._base_url = base_url
         self._http_client = client or httpx.AsyncClient(
             base_url=base_url,
-            verify=False,
             http2=True,
             auth=auth,
         )

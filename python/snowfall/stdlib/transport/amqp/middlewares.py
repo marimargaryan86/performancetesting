@@ -101,10 +101,7 @@ async def with_sentry_context(
     next_func: protocol.ConsumerFunc[_Proto],
 ) -> None:
     transaction = tracing.Transaction.continue_from_headers(
-        {
-            metadata_key: metadata_value
-            for metadata_key, metadata_value in msg.headers.items()
-        },
+        msg.headers,
         op="amqp.message",
         name="{0}/{1}/{2}".format(msg.exchange, msg.queue, msg.routing_key),
         description="{0}/{1}/{2}".format(msg.exchange, msg.queue, msg.routing_key),

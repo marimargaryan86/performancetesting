@@ -32,7 +32,7 @@ class Producer(protocol.Producer):
         self._exchange = exchange
         self._logger = get_logger(__name__)
 
-    async def publish(  # noqa: WPS210
+    async def publish(
         self,
         msg: message.Message,
         routing_key: str,
@@ -49,10 +49,7 @@ class Producer(protocol.Producer):
                     durable=True,
                 )
 
-                span_headers = {
-                    header_key: header_value
-                    for header_key, header_value in span.iter_headers()
-                }
+                span_headers = dict(span.iter_headers())
                 headers = headers or {}
 
                 await exchange.publish(

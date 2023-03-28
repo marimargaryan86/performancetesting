@@ -72,7 +72,7 @@ async def test_booking_can_be_placed(
     httpx_mock: pytest_httpx.HTTPXMock,
     save_a_train_adapter: adapter.SaveATrainAdapter,
 ) -> None:
-    save_a_train_adapter._notifications_producer.publish = (  # type: ignore[assignment] # noqa: WPS437, B950
+    save_a_train_adapter._notifications_producer.publish = (  # type: ignore[method-assign] # noqa: WPS437, B950
         mock.AsyncMock()
     )
 

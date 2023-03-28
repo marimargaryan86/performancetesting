@@ -250,9 +250,7 @@ def _group(ctx: click.Context, **kwargs: Any) -> None:
         click.echo(json.dumps(ctx.to_info_dict()))
         ctx.exit()
 
-    ctx.obj["global_settings"] = _GlobalSettings.construct(
-        **{kwarg_key: kwarg_value for kwarg_key, kwarg_value in kwargs.items()},
-    )
+    ctx.obj["global_settings"] = _GlobalSettings.construct(**kwargs)
 
 
 def _configure(
@@ -286,11 +284,11 @@ def _configure(
         )
 
 
-def _command(  # noqa: WPS210
+def _command(
     command: Command[_Settings],
 ) -> Callable[[click.Context], None]:
     @click.pass_context
-    def decorator(ctx: click.Context, **kwargs: Any) -> None:  # noqa: WPS210
+    def decorator(ctx: click.Context, **kwargs: Any) -> None:
         ctx.ensure_object(dict)
 
         entrypoint: Entrypoint = ctx.obj["entrypoint"]
@@ -298,9 +296,7 @@ def _command(  # noqa: WPS210
         application = Application(
             environment=global_settings.env_name,
             name=entrypoint.name,
-            settings=command.settings_class.construct(
-                **{kwarg_key: kwarg_value for kwarg_key, kwarg_value in kwargs.items()},
-            ),
+            settings=command.settings_class.construct(**kwargs),
             user_agent="{name}/{version} (+https://snowfalltravel.com/)".format(
                 name=entrypoint.name,
                 version=global_settings.version,

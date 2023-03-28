@@ -63,7 +63,7 @@ editorconfig:validate:
   image: "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"
   interruptible: true
   script:
-    - editorconfig-checker -disable-max-line-length -exclude "^vendor/lock/|^pants$|yarn.lock$"
+    - editorconfig-checker -disable-max-line-length -exclude "constraints.txt$|yarn.lock$"
   needs:
     - "pants:setup"
   rules:
