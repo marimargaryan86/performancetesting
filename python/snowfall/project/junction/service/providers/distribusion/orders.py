@@ -71,6 +71,7 @@ async def orders(app: service.Application[config.OrdersSettings]) -> None:
                     sender=app.settings.smtp_sender,
                     recipient=app.settings.smtp_recipient,
                 ),
+                send_customer_email=app.settings.send_customer_email,
             ),
             offer_cache=cache.OffersCache(
                 client=redis.Client(redis_connection, prefix=app.name),

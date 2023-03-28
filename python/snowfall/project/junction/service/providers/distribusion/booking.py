@@ -26,10 +26,12 @@ class BookingHandler(object):
         self,
         distribusion_client: client.DistribusionClient,
         notifier: notifications.Notifier,
+        send_customer_email: bool = True,
     ):
         self._client = distribusion_client
         self._logger = structlog.get_logger(__name__)
         self._notifier = notifier
+        self._send_customer_email = send_customer_email
 
     async def book(
         self,
@@ -39,7 +41,11 @@ class BookingHandler(object):
         new_booking = task.booking
 
         try:
-            booking_result = await self._make_booking(task=task, details=details)
+            booking_result = await self._make_booking(
+                task=task,
+                details=details,
+                send_customer_email=self._send_customer_email,
+            )
         except errors.ServiceError as error:
             self._logger.exception(
                 "Booking failed",
@@ -91,6 +97,7 @@ class BookingHandler(object):
         self,
         task: amqp_pb2.PlaceOrderTask,
         details: cache.OfferDetails,
+        send_customer_email: bool = True,
     ) -> model_orders.OrderResponse:
         first_trip_details = task.booking.trip_option.details[0]
         last_trip_details = task.booking.trip_option.details[-1]
@@ -153,7 +160,7 @@ class BookingHandler(object):
                 locale="en",
                 pax=len(task.passengers),
                 terms_accepted=True,
-                send_customer_email=False,
+                send_customer_email=send_customer_email,
                 fare_class=details.fare_class,
                 passengers=[
                     criterias.Passenger(

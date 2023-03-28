@@ -21,6 +21,7 @@ class OrdersSettings(DistribusionConfig, service.Settings):
     smtp_dsn: pydantic.AnyUrl
     smtp_sender: pydantic.EmailStr
     smtp_recipient: pydantic.EmailStr
+    send_customer_email: bool = True
 
 
 class SearchesSettings(DistribusionConfig, service.Settings):
