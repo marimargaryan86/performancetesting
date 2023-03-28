@@ -16,13 +16,6 @@ from snowfall.stdlib import string
 from snowfall.vendor.pay.client import PayAdminClient, PayClient
 
 logger = logging.getLogger()
-formatter = logging.Formatter(
-    "[%(asctime)s] %(levelname)s [%(filename)s.%(funcName)s:%(lineno)d] %(message)s",
-    datefmt="%a, %d %b %Y %H:%M:%S",
-)
-se = logging.StreamHandler(sys.stderr)
-se.setFormatter(formatter)
-logger.addHandler(se)
 logger.setLevel(logging.DEBUG)
 EXIT_MSG = "Exiting ; check your logs"
 
@@ -68,6 +61,7 @@ async def test_get_conversion_details(  # noqa: WPS210, WPS213, C901
     try:
         response_create_quote = await pay_client.create_quote(
             amount=1000,
+            external_reference=string.uuid(),
             payer_id=response_payer["data"]["id"],
             beneficiary_id=response_beneficiary["data"]["id"],
             from_currency="EUR",

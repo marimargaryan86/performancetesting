@@ -60,7 +60,7 @@ async def test_create_contacts(  # noqa: WPS210, WPS218
     phone_number = "+48123456789"
 
     try:
-        response_create_contact = await pay_admin_client.create_contacts(
+        response_create_contact = await pay_admin_client.create_contact(
             first_name=first_name,
             last_name=last_name,
             email_address=email_address,

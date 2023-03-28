@@ -44,5 +44,3 @@ async def test_create_account(  # noqa: WPS218
     relationships = response_create_account["data"]["relationships"]
     assert is_valid_uuid(relationships["company"]["data"]["id"])
     assert relationships["company"]["data"]["type"] == "companies"
-    assert is_valid_uuid(relationships["contactPerson"]["data"]["id"])
-    assert relationships["contactPerson"]["data"]["type"] == "contact-persons"

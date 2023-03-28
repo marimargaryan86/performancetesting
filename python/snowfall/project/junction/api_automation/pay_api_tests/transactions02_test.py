@@ -67,6 +67,7 @@ async def test_get_transactions(  # noqa: WPS210, WPS213, WPS218, C901
     try:
         response_create_quote = await pay_client.create_quote(
             amount=1000,
+            external_reference=string.uuid(),
             payer_id=response_payer["data"]["id"],
             beneficiary_id=response_beneficiary["data"]["id"],
             from_currency="EUR",

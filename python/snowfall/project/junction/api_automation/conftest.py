@@ -272,7 +272,7 @@ async def pay_create_contact(
     pay_create_company: Mapping[str, Any],
 ) -> dict[str, Any]:
     try:
-        response_create_contact = await pay_admin_client.create_contacts(
+        response_create_contact = await pay_admin_client.create_contact(
             first_name="J",
             last_name="N",
             email_address="jerzy.n{0}@snowfalltravel.com".format(
@@ -290,6 +290,23 @@ async def pay_create_contact(
         json.dumps(response_create_contact, indent=4),
     )
     return response_create_contact
+
+
+@pytest.fixture(scope="function")
+async def pay_list_all_currencies(
+    pay_client: PayClient,
+) -> dict[str, Any]:
+    try:
+        response_list_all_currencies = await pay_client.list_all_currencies()
+    except httpx.HTTPStatusError as err:
+        logger.info("response_list_all_currencies err: %s", err.response.headers)
+        logger.info("response_list_all_currencies body: %s", err.response.json())
+        sys.exit(EXIT_MSG)
+    logger.info(
+        "list_all_currencies: %s",
+        json.dumps(response_list_all_currencies, indent=4),
+    )
+    return response_list_all_currencies
 
 
 @pytest.fixture(scope="function")

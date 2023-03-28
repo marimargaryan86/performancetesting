@@ -7,6 +7,7 @@ from snowfall.project.junction.api_automation.test_functions.helpers_api import 
     is_valid_uuid,
     return_randomized_token,
 )
+from snowfall.stdlib import string
 from snowfall.vendor.pay.client import PayAdminClient, PayClient
 
 logging.basicConfig()
@@ -42,6 +43,7 @@ async def test_create_quote(  # noqa: WPS218
 
     response_create_quote = await pay_client.create_quote(
         amount=1000,
+        external_reference=string.uuid(),
         payer_id=response_payer["data"]["id"],
         beneficiary_id=response_beneficiary["data"]["id"],
         from_currency="USD",

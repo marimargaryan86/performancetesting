@@ -110,6 +110,7 @@ class PayClient(object):
     async def create_quote(  # noqa: WPS211
         self,
         amount: int,
+        external_reference: str,
         payer_id: str,
         beneficiary_id: str,
         from_currency: str,
@@ -120,6 +121,7 @@ class PayClient(object):
                 _TYPE_KEY: "quotes",
                 _ATTRIBUTES_KEY: {
                     "amount": amount,
+                    "externalReference": external_reference,
                 },
                 "relationships": {
                     "fromCurrency": {
@@ -176,6 +178,25 @@ class PayClient(object):
             "{0}/transactions".format(self._base_url),
             headers=self._http_client.headers,
             json=payload,
+        )
+
+        response.raise_for_status()
+        return response.json()
+
+    async def list_all_currencies(
+        self,
+        limit: int | None = None,
+        cursor: str | None = None,
+        sort: str | None = None,
+    ) -> dict[str, Any]:
+        response = await self._http_client.get(
+            "{0}/currencies".format(self._base_url),
+            headers=self._http_client.headers,
+            params=(
+                {"sort": sort, **_make_pagination(limit, cursor)}
+                if sort
+                else _make_pagination(limit, cursor)
+            ),
         )
 
         response.raise_for_status()
@@ -340,7 +361,38 @@ class PayAdminClient(object):  # noqa: WPS214
         response.raise_for_status()
         return response.json()
 
-    async def create_contacts(  # noqa: WPS211
+    async def add_currency(
+        self,
+        account_id: str,
+        currency_id: str,
+    ) -> dict[str, Any]:
+        payload = {
+            _DATA_KEY: {
+                _TYPE_KEY: "balances",
+                _RELATIONSHIPS_KEY: {
+                    "currency": {
+                        _DATA_KEY: {
+                            "id": currency_id,
+                            _TYPE_KEY: "currencies",
+                        },
+                    },
+                },
+            },
+        }
+
+        response = await self._http_client.post(
+            "{0}/accounts/{1}/relationships/currencies".format(
+                self._base_url,
+                account_id,
+            ),
+            headers=self._http_client.headers,
+            json=payload,
+        )
+
+        response.raise_for_status()
+        return response.json()
+
+    async def create_contact(  # noqa: WPS211
         self,
         first_name: str,
         last_name: str,
@@ -350,23 +402,19 @@ class PayAdminClient(object):  # noqa: WPS214
     ) -> dict[str, Any]:
         payload = {
             _DATA_KEY: {
-                _TYPE_KEY: "contact-persons",
+                _TYPE_KEY: "contacts",
                 _ATTRIBUTES_KEY: {
                     "firstName": first_name,
                     "lastName": last_name,
                     "emailAddress": email_address,
                     "phoneNumber": phone_number,
                 },
-                _RELATIONSHIPS_KEY: {
-                    "company": {
-                        _DATA_KEY: {_ID_KEY: company_id, _TYPE_KEY: "companies"},
-                    },
-                },
+                _RELATIONSHIPS_KEY: {},
             },
         }
 
         response = await self._http_client.post(
-            "{0}/contact-persons".format(self._base_url),
+            "{0}/companies/{1}/contacts".format(self._base_url, company_id),
             headers=self._http_client.headers,
             json=payload,
         )
