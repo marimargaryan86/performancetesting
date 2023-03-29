@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import logging
+import sys
 import time
 from typing import Any, AsyncGenerator, Mapping, Sequence
+from urllib.parse import parse_qs, urlencode, urlparse
 
 import httpx
 import jwt
@@ -112,7 +115,7 @@ class PayAuthentication(httpx.Auth):
         return response_data["data"]["attributes"]["token"]
 
 
-class PayClient(object):
+class PayBase(object):
     def __init__(
         self,
         base_url: str,
@@ -130,6 +133,8 @@ class PayClient(object):
             auth=auth,
         )
 
+
+class PayClient(PayBase):
     async def create_quote(  # noqa: WPS211
         self,
         amount: int,
@@ -198,7 +203,6 @@ class PayClient(object):
 
         response = await self._http_client.post(
             "{0}/transactions".format(self._base_url),
-            headers=self._http_client.headers,
             json=payload,
         )
 
@@ -213,7 +217,6 @@ class PayClient(object):
     ) -> dict[str, Any]:
         response = await self._http_client.get(
             "{0}/currencies".format(self._base_url),
-            headers=self._http_client.headers,
             params=(
                 {"sort": sort, **_make_pagination(limit, cursor)}
                 if sort
@@ -225,20 +228,7 @@ class PayClient(object):
         return response.json()
 
 
-class PayAdminClient(object):  # noqa: WPS214
-    def __init__(
-        self,
-        base_url: str,
-        auth: httpx.Auth,
-        client: httpx.AsyncClient | None = None,
-    ):
-        self._base_url = base_url
-        self._http_client = client or httpx.AsyncClient(
-            base_url=base_url,
-            http2=True,
-            auth=auth,
-        )
-
+class PayAdminClient(PayBase):  # noqa: WPS214
     async def create_company(  # noqa: WPS211
         self,
         company: str,
@@ -270,7 +260,6 @@ class PayAdminClient(object):  # noqa: WPS214
 
         response = await self._http_client.post(
             "{0}/companies".format(self._base_url),
-            headers=self._http_client.headers,
             json=payload,
         )
 
@@ -285,7 +274,6 @@ class PayAdminClient(object):  # noqa: WPS214
     ) -> dict[str, Any]:
         response = await self._http_client.get(
             "{0}/accounts".format(self._base_url),
-            headers=self._http_client.headers,
             params=(
                 {"sort": sort, **_make_pagination(limit, cursor)}
                 if sort
@@ -303,7 +291,6 @@ class PayAdminClient(object):  # noqa: WPS214
     ) -> dict[str, Any]:
         response = await self._http_client.get(
             "{0}/accounts/{1}/balances".format(self._base_url, account_id),
-            headers=self._http_client.headers,
             params=_make_pagination(limit, cursor),
         )
 
@@ -316,7 +303,6 @@ class PayAdminClient(object):  # noqa: WPS214
     ) -> dict[str, Any]:
         response = await self._http_client.get(
             "{0}/companies/{1}".format(self._base_url, company_id),
-            headers=self._http_client.headers,
         )
 
         response.raise_for_status()
@@ -328,7 +314,6 @@ class PayAdminClient(object):  # noqa: WPS214
     ) -> dict[str, Any]:
         response = await self._http_client.get(
             "{0}/conversions/{1}".format(self._base_url, conversion_id),
-            headers=self._http_client.headers,
         )
 
         response.raise_for_status()
@@ -339,7 +324,6 @@ class PayAdminClient(object):  # noqa: WPS214
     ) -> dict[str, Any]:
         response = await self._http_client.get(
             "{0}/transactions".format(self._base_url),
-            headers=self._http_client.headers,
         )
 
         response.raise_for_status()
@@ -377,8 +361,37 @@ class PayAdminClient(object):  # noqa: WPS214
 
         response = await self._http_client.patch(
             "{0}/companies/{1}".format(self._base_url, company_id),
-            headers=self._http_client.headers,
             json=payload,
+        )
+
+        response.raise_for_status()
+        return response.json()
+
+    async def list_companies(
+        self,
+        limit: int,
+        cursor: str,
+    ) -> dict[str, Any]:
+        query_params = urlencode(_make_pagination(limit, cursor))
+        response = await self._http_client.get(
+            "/companies?{0}".format(query_params) if query_params else "/companies",
+        )
+
+        response.raise_for_status()
+        return response.json()
+
+    async def list_accountless_companies(
+        self,
+        limit: int,
+        cursor: str,
+    ) -> dict[str, Any]:
+        query_params = urlencode(_make_pagination(limit, cursor))
+        response = await self._http_client.get(
+            (
+                "/companies/accountless?{0}".format(query_params)
+                if query_params
+                else "/companies/accountless"
+            ),
         )
 
         response.raise_for_status()
@@ -408,7 +421,6 @@ class PayAdminClient(object):  # noqa: WPS214
                 self._base_url,
                 account_id,
             ),
-            headers=self._http_client.headers,
             json=payload,
         )
 
@@ -438,7 +450,6 @@ class PayAdminClient(object):  # noqa: WPS214
 
         response = await self._http_client.post(
             "{0}/companies/{1}/contacts".format(self._base_url, company_id),
-            headers=self._http_client.headers,
             json=payload,
         )
 
@@ -469,7 +480,6 @@ class PayAdminClient(object):  # noqa: WPS214
 
         response = await self._http_client.post(
             "{0}/accounts".format(self._base_url),
-            headers=self._http_client.headers,
             json=payload,
         )
 
@@ -486,3 +496,31 @@ def _make_pagination(
         for key, pagination_value in ((_LIMIT_KEY, limit), (_CURSOR_KEY, cursor))
         if pagination_value
     }
+
+
+async def get_all_resources(  # noqa: WPS210
+    client_method: Any,
+    limit: int,
+    cursor: str,
+    logger: logging.Logger,
+) -> list[dict[str, Any]]:
+    resources: list[dict[str, Any]] = []
+    while True:
+        try:
+            body = await client_method(limit, cursor)
+        except httpx.HTTPStatusError as err:
+            logger.info("response headers: %s", err.response.headers)
+            logger.info("response body: %s", err.response.json())
+            sys.exit("{0} method - is failed".format(client_method.__name__))
+
+        if not body[_DATA_KEY]:
+            break
+
+        resources.extend(body[_DATA_KEY])
+        url = body["links"]["next"]
+        parse_url = urlparse(url)
+        parse_data = parse_qs(parse_url.query)
+        limit = int(parse_data[_LIMIT_KEY][0])
+        cursor = parse_data[_CURSOR_KEY][0]
+
+    return resources

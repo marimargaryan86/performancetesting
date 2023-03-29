@@ -215,8 +215,6 @@ def pay_admin_client(
     api_token: str,
     host: str,
 ) -> PayAdminClient:
-    client_timeout = 20
-
     email = get_variable_value(host, api_token, "pay_api_test_email")
     password = get_variable_value(host, api_token, "pay_api_test_password")
 
@@ -234,16 +232,10 @@ def pay_admin_client(
     return PayAdminClient(
         base_url=base_url_admin_api,
         auth=auth,
-        client=httpx.AsyncClient(
-            base_url=base_url_admin_api,
-            timeout=client_timeout,
-            auth=auth,
-        ),
     )
 
 
-@pytest.fixture(scope="function")
-async def pay_create_company(
+async def create_company(
     pay_admin_client: PayAdminClient,
 ) -> dict[str, Any]:
     try:
@@ -263,6 +255,13 @@ async def pay_create_company(
         sys.exit(EXIT_MSG)
     logger.info("create_company: %s", json.dumps(response_company, indent=4))
     return response_company
+
+
+@pytest.fixture(scope="function")
+async def pay_create_company(
+    pay_admin_client: PayAdminClient,
+) -> dict[str, Any]:
+    return await create_company(pay_admin_client)
 
 
 @pytest.fixture(scope="function")
