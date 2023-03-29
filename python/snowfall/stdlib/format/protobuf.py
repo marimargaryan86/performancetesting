@@ -172,7 +172,7 @@ def enum_value_to_slug(
     enum_value: int,
 ) -> str:
     name = enum_descriptor.values_by_number[enum_value].name.removeprefix(
-        "{0}_".format(enum_descriptor.name.upper()),
+        "{0}_".format(string.to_snake(enum_descriptor.name).upper()),
     )
 
     return name.lower().replace("_", "-")

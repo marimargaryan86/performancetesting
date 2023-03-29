@@ -22,5 +22,6 @@ message RepeatedFoobar {
 message PascalCaseEnum {
   enum PascalCase {
     PASCAL_CASE_UNSPECIFIED = 0;
+    PASCAL_CASE_MULTI_WORD = 1;
   }
 }

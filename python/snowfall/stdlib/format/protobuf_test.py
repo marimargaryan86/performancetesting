@@ -7,9 +7,6 @@ from aiofiles import tempfile
 from dateutil import tz
 from google.protobuf import duration_pb2, timestamp_pb2
 
-from snowfall.project.junction.service.places.v1alpha import (
-    models_pb2 as places_models_pb2,
-)
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import datetime_pb2, models_pb2, testing_pb2
 
@@ -62,43 +59,36 @@ async def test_dump_load() -> None:
 def test_enum_value_to_slug() -> None:
     assert (
         protobuf.enum_value_to_slug(
-            models_pb2.Schedule.Type.DESCRIPTOR,
-            models_pb2.Schedule.TYPE_AIR,
+            testing_pb2.PascalCaseEnum.PascalCase.DESCRIPTOR,
+            testing_pb2.PascalCaseEnum.PascalCase.PASCAL_CASE_UNSPECIFIED,
         )
-        == "air"
+        == "unspecified"
     )
 
     assert (
         protobuf.enum_value_to_slug(
-            places_models_pb2.Location.Type.DESCRIPTOR,
-            places_models_pb2.Location.TYPE_RAILWAY_STATION,
+            testing_pb2.PascalCaseEnum.PascalCase.DESCRIPTOR,
+            testing_pb2.PascalCaseEnum.PascalCase.PASCAL_CASE_MULTI_WORD,
         )
-        == "railway-station"
+        == "multi-word"
     )
 
 
 def test_slug_to_enum_value() -> None:
     assert (
         protobuf.slug_to_enum_value(
-            models_pb2.Schedule.Type,
-            "air",
+            testing_pb2.PascalCaseEnum.PascalCase,
+            "unspecified",
         )
-        == models_pb2.Schedule.TYPE_AIR
+        == testing_pb2.PascalCaseEnum.PascalCase.PASCAL_CASE_UNSPECIFIED
     )
 
     assert (
         protobuf.slug_to_enum_value(
-            places_models_pb2.Location.Type,
-            "railway-station",
-        )
-        == places_models_pb2.Location.TYPE_RAILWAY_STATION
-    )
-    assert (
-        protobuf.slug_to_enum_value(
             testing_pb2.PascalCaseEnum.PascalCase,
-            "unspecified",
+            "multi-word",
         )
-        == 0
+        == testing_pb2.PascalCaseEnum.PascalCase.PASCAL_CASE_MULTI_WORD
     )
 
     with pytest.raises(ValueError):

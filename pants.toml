@@ -13,6 +13,7 @@ backend_packages = [
     "pants.backend.experimental.codegen.protobuf.go",
     "pants.backend.experimental.go",
     "pants.backend.experimental.python.lint.add_trailing_comma",
+    "pants.backend.experimental.visibility",
     "pants.backend.project_info",
     "pants.backend.python",
     "pants.backend.python.lint.autoflake",
@@ -57,7 +58,7 @@ interpreter_constraints = ["CPython==3.11.*"]
 lint_args = ["--config", "'version: v1\nlint:\n  use:\n    - DEFAULT\n    - UNARY_RPC\n    - PACKAGE_NO_IMPORT_CYCLE\n'"]
 
 [cli.alias]
-all-changed = "--changed-since=main --changed-dependees=transitive"
+all-changed = "--changed-since=main --changed-dependents=transitive"
 
 [coverage-py]
 global_report = true

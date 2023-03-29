@@ -25,7 +25,7 @@ fi
 MERGE_BASE="$(git_merge_base)"
 
 echo "* Typechecking"
-pants --changed-since="${MERGE_BASE}" --changed-dependees=transitive check
+pants --changed-since="${MERGE_BASE}" --changed-dependents=transitive check
 
 echo "* Checking linters, and formatters"
 pants --changed-since="${MERGE_BASE}" lint ||

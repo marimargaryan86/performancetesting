@@ -32,5 +32,5 @@ if [ "${ENFORCE_FULL_LINTING}" -eq "1" ] || [ "${CHANGED_SINCE}" == "" ]; then
 	pants lint check test :: --pytest-args="--disable-socket --allow-unix-socket"
 else
 	pants --changed-since="${CHANGED_SINCE}" lint
-	pants --changed-since="${CHANGED_SINCE}" --changed-dependees=transitive check test --pytest-args="--disable-socket --allow-unix-socket"
+	pants --changed-since="${CHANGED_SINCE}" --changed-dependents=transitive check test --pytest-args="--disable-socket --allow-unix-socket"
 fi

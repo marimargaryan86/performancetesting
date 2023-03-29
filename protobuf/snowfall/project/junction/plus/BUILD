@@ -1,0 +1,10 @@
+__dependents_rules__(
+    (
+        "*",
+        (
+            "protobuf/snowfall/project/junction/plus/**",
+            "python/snowfall/project/junction/plus/**",
+        ),
+        "!*",
+    )
+)

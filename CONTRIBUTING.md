@@ -85,7 +85,7 @@ To run these goals on only changed files, one can either append the necessary fl
 
 A helpful command to run exactly the same checks as the pipeline follows. This could easily be added as an alias to your shell.
 ```shell
-pants tailor --check update-build-files --check && pants fix lint --changed-since=main && pants --changed-since=main --changed-dependees=transitive check test
+pants tailor --check update-build-files --check && pants fix lint --changed-since=main && pants --changed-since=main --changed-dependents=transitive check test
 ```
 
 
