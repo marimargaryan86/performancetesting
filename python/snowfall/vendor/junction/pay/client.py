@@ -1,6 +1,6 @@
 from typing import Any
 
-import httpx
+from snowfall.vendor.junction.client import BaseClient
 
 _TYPE_KEY = "type"
 _ATTRIBUTES_KEY = "attributes"
@@ -8,26 +8,7 @@ _LIMIT_KEY = "page[limit]"
 _CURSOR_KEY = "page[cursor]"
 
 
-class PayBase(object):
-    def __init__(
-        self,
-        base_url: str,
-        auth: httpx.Auth,
-        client: httpx.AsyncClient | None = None,
-    ):
-        self._base_url = httpx.URL(base_url)
-        self._http_client = client or httpx.AsyncClient(
-            headers={
-                "Content-Type": "application/vnd.api+json",
-                "Accept": "application/vnd.api+json",
-            },
-            base_url=base_url,
-            http2=True,
-            auth=auth,
-        )
-
-
-class Client(PayBase):
+class Client(BaseClient):
     async def create_quote(  # noqa: WPS211
         self,
         amount: int,
@@ -62,7 +43,7 @@ class Client(PayBase):
             },
         }
 
-        response = await self._http_client.post(
+        response = await self._client.post(
             url="/quotes",
             json=payload,
         )
@@ -94,8 +75,8 @@ class Client(PayBase):
             },
         }
 
-        response = await self._http_client.post(
-            "{0}/transactions".format(self._base_url),
+        response = await self._client.post(
+            url="/transactions",
             json=payload,
         )
 
@@ -108,16 +89,16 @@ class Client(PayBase):
         cursor: str | None = None,
         sort: str | None = None,
     ) -> dict[str, Any]:
-        response = await self._http_client.get(
-            "{0}/currencies".format(self._base_url),
-            params=(await _make_pagination_with_sorting(cursor, limit, sort)),
+        response = await self._client.get(
+            url="/currencies",
+            params=_make_pagination_with_sorting(cursor, limit, sort),
         )
 
         response.raise_for_status()
         return response.json()
 
 
-async def _make_pagination_with_sorting(
+def _make_pagination_with_sorting(
     cursor: str | None = None,
     limit: int | None = None,
     sort: str | None = None,

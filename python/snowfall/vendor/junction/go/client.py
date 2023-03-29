@@ -5,6 +5,8 @@ from typing import Any, Literal, Mapping, Sequence, cast
 
 import httpx
 
+from snowfall.stdlib.transport.http import auth
+from snowfall.vendor.junction import client as base_client
 from snowfall.vendor.junction.go import models
 
 _DATA_KEY = "data"
@@ -57,7 +59,7 @@ class LegType(enum.Enum):
     rail = "rail"
 
 
-class _BaseClient(object):
+class _BaseClient(base_client.BaseClient):
     def __init__(
         self,
         api_url: str,
@@ -65,18 +67,12 @@ class _BaseClient(object):
         client: httpx.AsyncClient | None = None,
     ) -> None:
         self._api_url = api_url
-        self._client = client or httpx.AsyncClient(http2=True)
-        self._client.base_url = httpx.URL(api_url)
         self._token = token
 
-        self._client.headers.update(
-            httpx.Headers(
-                {
-                    "Accept": "application/vnd.api+json",
-                    "Authorization": "Bearer {0}".format(token),
-                    "Content-Type": "application/vnd.api+json",
-                },
-            ),
+        super().__init__(
+            base_url=api_url,
+            auth=auth.TokenAuth(token),
+            client=client,
         )
 
     def __repr__(self) -> str:

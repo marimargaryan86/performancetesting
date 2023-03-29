@@ -1,16 +1,11 @@
-from typing import Any, AsyncGenerator, Mapping
+from typing import AsyncGenerator
 
 import httpx
 
 
 class TokenAuth(httpx.Auth):
-    def __init__(
-        self,
-        token: str,
-        headers: Mapping[str, Any],
-    ):
+    def __init__(self, token: str):
         self._token = token
-        self._headers = headers
 
     async def async_auth_flow(
         self,
