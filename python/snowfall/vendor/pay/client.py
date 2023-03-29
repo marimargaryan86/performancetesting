@@ -217,11 +217,7 @@ class PayClient(PayBase):
     ) -> dict[str, Any]:
         response = await self._http_client.get(
             "{0}/currencies".format(self._base_url),
-            params=(
-                {"sort": sort, **_make_pagination(limit, cursor)}
-                if sort
-                else _make_pagination(limit, cursor)
-            ),
+            params=(await _make_pagination_with_sorting(cursor, limit, sort)),
         )
 
         response.raise_for_status()
@@ -274,11 +270,7 @@ class PayAdminClient(PayBase):  # noqa: WPS214
     ) -> dict[str, Any]:
         response = await self._http_client.get(
             "{0}/accounts".format(self._base_url),
-            params=(
-                {"sort": sort, **_make_pagination(limit, cursor)}
-                if sort
-                else _make_pagination(limit, cursor)
-            ),
+            params=(await _make_pagination_with_sorting(cursor, limit, sort)),
         )
         response.raise_for_status()
         return response.json()
@@ -456,6 +448,20 @@ class PayAdminClient(PayBase):  # noqa: WPS214
         response.raise_for_status()
         return response.json()
 
+    async def list_contacts(
+        self,
+        company_id: str,
+        limit: int | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        response = await self._http_client.get(
+            "/companies/{0}/contacts".format(company_id),
+            params=_make_pagination(limit, cursor),
+        )
+
+        response.raise_for_status()
+        return response.json()
+
     async def create_accounts(
         self,
         name: str,
@@ -485,6 +491,18 @@ class PayAdminClient(PayBase):  # noqa: WPS214
 
         response.raise_for_status()
         return response.json()
+
+
+async def _make_pagination_with_sorting(
+    cursor: str | None = None,
+    limit: int | None = None,
+    sort: str | None = None,
+) -> dict[str, Any]:
+    return (
+        {"sort": sort, **_make_pagination(limit, cursor)}
+        if sort
+        else _make_pagination(limit, cursor)
+    )
 
 
 def _make_pagination(
