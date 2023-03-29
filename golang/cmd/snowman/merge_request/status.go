@@ -29,6 +29,10 @@ func (mr *mergeRequest) expectedStatusLabel() (string, error) {
 		return statusRevisionNeeded, nil
 	}
 
+	if mr.object.HasConflicts || mr.object.MergeError != "" || mr.object.MergeStatus != "can_be_merged" {
+		return statusBlocked, nil
+	}
+
 	approvalState, err := mr.approvalState()
 
 	if err != nil {
@@ -59,10 +63,6 @@ ReviewersLoop:
 		}
 
 		return statusReviewNeeded, nil
-	}
-
-	if mr.object.HasConflicts || mr.object.MergeError != "" || mr.object.MergeStatus != "can_be_merged" {
-		return statusBlocked, nil
 	}
 
 	return statusAccepted, nil
