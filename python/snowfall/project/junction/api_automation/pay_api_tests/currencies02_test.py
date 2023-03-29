@@ -9,7 +9,9 @@ import pytest
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
     is_valid_uuid,
 )
-from snowfall.vendor.pay.client import PayAdminClient
+from snowfall.project.junction.api_automation.test_functions.pay_admin_client import (
+    PayAdminClient,
+)
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)

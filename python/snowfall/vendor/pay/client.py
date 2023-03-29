@@ -1,34 +1,15 @@
 from __future__ import annotations
 
-import logging
-import sys
 import time
-from typing import Any, AsyncGenerator, Mapping, Sequence
-from urllib.parse import parse_qs, urlencode, urlparse
+from typing import Any, AsyncGenerator, Mapping
 
 import httpx
 import jwt
 
-_DATA_KEY = "data"
-_ID_KEY = "id"
 _TYPE_KEY = "type"
-_RELATIONSHIPS_KEY = "relationships"
 _ATTRIBUTES_KEY = "attributes"
-_PASSENGERS_KEY = "passengers"
 _LIMIT_KEY = "page[limit]"
 _CURSOR_KEY = "page[cursor]"
-_METHOD_GET = "GET"
-_METHOD_POST = "POST"
-_METHOD_PATCH = "PATCH"
-_METHOD_DELETE = "DELETE"
-_EMAIL_KEY = "email"
-_PASSWORD_KEY = "password"  # nosec
-_REQUEST_HEADERS = dict(
-    {
-        "Content-Type": "application/vnd.api+json",
-        "Accept": "application/vnd.api+json",
-    },
-)
 
 
 class PayTokenAuth(httpx.Auth):
@@ -145,7 +126,7 @@ class PayClient(PayBase):
         to_currency: str,
     ) -> dict[str, Any]:
         payload = {
-            _DATA_KEY: {
+            "data": {
                 _TYPE_KEY: "quotes",
                 _ATTRIBUTES_KEY: {
                     "amount": amount,
@@ -184,7 +165,7 @@ class PayClient(PayBase):
         quotation_id: str,
     ) -> dict[str, Any]:
         payload = {
-            _DATA_KEY: {
+            "data": {
                 _TYPE_KEY: "transactions",
                 _ATTRIBUTES_KEY: {
                     "externalReference": external_reference,
@@ -224,275 +205,6 @@ class PayClient(PayBase):
         return response.json()
 
 
-class PayAdminClient(PayBase):  # noqa: WPS214
-    async def create_company(  # noqa: WPS211
-        self,
-        company: str,
-        address_lines: Sequence[str],
-        country_code: str,
-        postal_code: str,
-        city: str,
-        fx_markup: float,
-        fx_provider_markup: float,
-        sales_markup: float,
-    ) -> dict[str, Any]:
-        payload = {
-            _DATA_KEY: {
-                _TYPE_KEY: "companies",
-                _ATTRIBUTES_KEY: {
-                    "name": company,
-                    "address": {
-                        "addressLines": address_lines,
-                        "countryCode": country_code,
-                        "postalCode": postal_code,
-                        "city": city,
-                    },
-                    "fxMarkup": fx_markup,
-                    "fxProviderMarkup": fx_provider_markup,
-                    "salesMarkup": sales_markup,
-                },
-            },
-        }
-
-        response = await self._http_client.post(
-            "{0}/companies".format(self._base_url),
-            json=payload,
-        )
-
-        response.raise_for_status()
-        return response.json()
-
-    async def get_accounts(
-        self,
-        limit: int | None = None,
-        cursor: str | None = None,
-        sort: str | None = None,
-    ) -> dict[str, Any]:
-        response = await self._http_client.get(
-            "{0}/accounts".format(self._base_url),
-            params=(await _make_pagination_with_sorting(cursor, limit, sort)),
-        )
-        response.raise_for_status()
-        return response.json()
-
-    async def get_balances(
-        self,
-        account_id: str,
-        limit: int | None = None,
-        cursor: str | None = None,
-    ) -> dict[str, Any]:
-        response = await self._http_client.get(
-            "{0}/accounts/{1}/balances".format(self._base_url, account_id),
-            params=_make_pagination(limit, cursor),
-        )
-
-        response.raise_for_status()
-        return response.json()
-
-    async def get_company_details(
-        self,
-        company_id: str,
-    ) -> dict[str, Any]:
-        response = await self._http_client.get(
-            "{0}/companies/{1}".format(self._base_url, company_id),
-        )
-
-        response.raise_for_status()
-        return response.json()
-
-    async def get_conversion_details(
-        self,
-        conversion_id: str,
-    ) -> dict[str, Any]:
-        response = await self._http_client.get(
-            "{0}/conversions/{1}".format(self._base_url, conversion_id),
-        )
-
-        response.raise_for_status()
-        return response.json()
-
-    async def get_transactions(
-        self,
-    ) -> dict[str, Any]:
-        response = await self._http_client.get(
-            "{0}/transactions".format(self._base_url),
-        )
-
-        response.raise_for_status()
-        return response.json()
-
-    async def update_company(  # noqa: WPS211
-        self,
-        company_id: str,
-        company: str,
-        address_lines: Sequence[str],
-        country_code: str,
-        postal_code: str,
-        city: str,
-        fx_markup: float,
-        fx_provider_markup: float,
-        sales_markup: float,
-    ) -> dict[str, Any]:
-        payload = {
-            _DATA_KEY: {
-                _TYPE_KEY: "companies",
-                _ATTRIBUTES_KEY: {
-                    "name": company,
-                    "address": {
-                        "addressLines": address_lines,
-                        "countryCode": country_code,
-                        "postalCode": postal_code,
-                        "city": city,
-                    },
-                    "fxMarkup": fx_markup,
-                    "fxProviderMarkup": fx_provider_markup,
-                    "salesMarkup": sales_markup,
-                },
-            },
-        }
-
-        response = await self._http_client.patch(
-            "{0}/companies/{1}".format(self._base_url, company_id),
-            json=payload,
-        )
-
-        response.raise_for_status()
-        return response.json()
-
-    async def list_companies(
-        self,
-        limit: int,
-        cursor: str,
-    ) -> dict[str, Any]:
-        query_params = urlencode(_make_pagination(limit, cursor))
-        response = await self._http_client.get(
-            "/companies?{0}".format(query_params) if query_params else "/companies",
-        )
-
-        response.raise_for_status()
-        return response.json()
-
-    async def list_accountless_companies(
-        self,
-        limit: int,
-        cursor: str,
-    ) -> dict[str, Any]:
-        query_params = urlencode(_make_pagination(limit, cursor))
-        response = await self._http_client.get(
-            (
-                "/companies/accountless?{0}".format(query_params)
-                if query_params
-                else "/companies/accountless"
-            ),
-        )
-
-        response.raise_for_status()
-        return response.json()
-
-    async def add_currency(
-        self,
-        account_id: str,
-        currency_id: str,
-    ) -> dict[str, Any]:
-        payload = {
-            _DATA_KEY: {
-                _TYPE_KEY: "balances",
-                _RELATIONSHIPS_KEY: {
-                    "currency": {
-                        _DATA_KEY: {
-                            "id": currency_id,
-                            _TYPE_KEY: "currencies",
-                        },
-                    },
-                },
-            },
-        }
-
-        response = await self._http_client.post(
-            "{0}/accounts/{1}/relationships/currencies".format(
-                self._base_url,
-                account_id,
-            ),
-            json=payload,
-        )
-
-        response.raise_for_status()
-        return response.json()
-
-    async def create_contact(  # noqa: WPS211
-        self,
-        first_name: str,
-        last_name: str,
-        email_address: str,
-        phone_number: str,
-        company_id: str,
-    ) -> dict[str, Any]:
-        payload = {
-            _DATA_KEY: {
-                _TYPE_KEY: "contacts",
-                _ATTRIBUTES_KEY: {
-                    "firstName": first_name,
-                    "lastName": last_name,
-                    "emailAddress": email_address,
-                    "phoneNumber": phone_number,
-                },
-                _RELATIONSHIPS_KEY: {},
-            },
-        }
-
-        response = await self._http_client.post(
-            "{0}/companies/{1}/contacts".format(self._base_url, company_id),
-            json=payload,
-        )
-
-        response.raise_for_status()
-        return response.json()
-
-    async def list_contacts(
-        self,
-        company_id: str,
-        limit: int | None = None,
-        cursor: str | None = None,
-    ) -> dict[str, Any]:
-        response = await self._http_client.get(
-            "/companies/{0}/contacts".format(company_id),
-            params=_make_pagination(limit, cursor),
-        )
-
-        response.raise_for_status()
-        return response.json()
-
-    async def create_accounts(
-        self,
-        name: str,
-        contact_id: str,
-    ) -> dict[str, Any]:
-        payload = {
-            _DATA_KEY: {
-                _TYPE_KEY: "accounts",
-                _ATTRIBUTES_KEY: {
-                    "name": name,
-                },
-                _RELATIONSHIPS_KEY: {
-                    "contact": {
-                        _DATA_KEY: {
-                            _ID_KEY: contact_id,
-                            _TYPE_KEY: "contacts",
-                        },
-                    },
-                },
-            },
-        }
-
-        response = await self._http_client.post(
-            "{0}/accounts".format(self._base_url),
-            json=payload,
-        )
-
-        response.raise_for_status()
-        return response.json()
-
-
 async def _make_pagination_with_sorting(
     cursor: str | None = None,
     limit: int | None = None,
@@ -514,31 +226,3 @@ def _make_pagination(
         for key, pagination_value in ((_LIMIT_KEY, limit), (_CURSOR_KEY, cursor))
         if pagination_value
     }
-
-
-async def get_all_resources(  # noqa: WPS210
-    client_method: Any,
-    limit: int,
-    cursor: str,
-    logger: logging.Logger,
-) -> list[dict[str, Any]]:
-    resources: list[dict[str, Any]] = []
-    while True:
-        try:
-            body = await client_method(limit, cursor)
-        except httpx.HTTPStatusError as err:
-            logger.info("response headers: %s", err.response.headers)
-            logger.info("response body: %s", err.response.json())
-            sys.exit("{0} method - is failed".format(client_method.__name__))
-
-        if not body[_DATA_KEY]:
-            break
-
-        resources.extend(body[_DATA_KEY])
-        url = body["links"]["next"]
-        parse_url = urlparse(url)
-        parse_data = parse_qs(parse_url.query)
-        limit = int(parse_data[_LIMIT_KEY][0])
-        cursor = parse_data[_CURSOR_KEY][0]
-
-    return resources

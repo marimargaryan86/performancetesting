@@ -7,8 +7,11 @@ from snowfall.project.junction.api_automation.conftest import create_company
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
     is_valid_uuid,
 )
+from snowfall.project.junction.api_automation.test_functions.pay_admin_client import (
+    PayAdminClient,
+    get_all_resources,
+)
 from snowfall.stdlib.format import jsonapi
-from snowfall.vendor.pay.client import PayAdminClient, get_all_resources
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)

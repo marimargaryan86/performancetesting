@@ -15,9 +15,12 @@ from snowfall.project.junction.api_automation.test_functions.helpers_api import 
 from snowfall.project.junction.api_automation.test_functions.mobile_client import (
     MobileApiClient,
 )
+from snowfall.project.junction.api_automation.test_functions.pay_admin_client import (
+    PayAdminClient,
+)
 from snowfall.vendor.apilayer.client import APILayer
 from snowfall.vendor.junction.client import JunctionClient
-from snowfall.vendor.pay.client import PayAdminClient, PayAuthentication, PayClient
+from snowfall.vendor.pay.client import PayAuthentication, PayClient
 
 ALLURE_ENVIRONMENT_PROPERTIES_FILE = "environment.properties"
 ALLUREDIR_OPTION = "--alluredir"
