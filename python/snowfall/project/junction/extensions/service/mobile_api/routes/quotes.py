@@ -12,7 +12,7 @@ from snowfall.project.junction.extensions.service.mobile_api.models.cached_rate 
 )
 from snowfall.stdlib import money
 from snowfall.stdlib.integration.starlette import models, request_helpers
-from snowfall.vendor.junction import client
+from snowfall.vendor.junction.go import client
 
 _DATA_KEY = "data"
 _ID_KEY = "id"
@@ -25,7 +25,7 @@ class OfferQuotes(endpoints.HTTPEndpoint):
     async def post(
         self,
         request: requests.Request,
-        junction_client: client.JunctionClient = lagom.injectable,
+        junction_client: client.Client = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
         offer_quote = await junction_client.create_offer_quote(
@@ -47,7 +47,7 @@ class OfferQuote(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         cached_rate: CachedRate | None,
-        junction_client: client.JunctionClient = lagom.injectable,
+        junction_client: client.Client = lagom.injectable,
         offers_rates_repository: repository.OffersRatesRepository = lagom.injectable,
     ) -> responses.Response:
         offer_quote_response = await junction_client.get_offer_quote_by_id(

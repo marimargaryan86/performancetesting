@@ -11,7 +11,7 @@ from snowfall.project.junction.api_automation.test_functions.helpers_api import 
 from snowfall.project.junction.api_automation.test_functions.mobile_client import (
     MobileApiClient,
 )
-from snowfall.vendor.junction.client import LegType
+from snowfall.vendor.junction.go.client import LegType
 
 
 @pytest.mark.integration

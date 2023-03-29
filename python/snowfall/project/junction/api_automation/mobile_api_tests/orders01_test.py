@@ -13,7 +13,7 @@ from snowfall.project.junction.api_automation.test_functions.helpers_api import 
 from snowfall.project.junction.api_automation.test_functions.mobile_client import (
     MobileApiClient,
 )
-from snowfall.vendor.junction import models
+from snowfall.vendor.junction.go import models
 
 
 @pytest.mark.integration

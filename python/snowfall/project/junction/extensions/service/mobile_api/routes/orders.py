@@ -22,8 +22,8 @@ from snowfall.project.junction.extensions.service.mobile_api.v1alpha import mode
 from snowfall.stdlib import money
 from snowfall.stdlib.integration.starlette import models as stdlib_models
 from snowfall.stdlib.integration.starlette import request_helpers
-from snowfall.vendor.junction import client
-from snowfall.vendor.junction import models as vendor_models
+from snowfall.vendor.junction.go import client
+from snowfall.vendor.junction.go import models as vendor_models
 
 _ID = "_id"
 _MIN_CHARGE = 500
@@ -34,7 +34,7 @@ class MessageOrder(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         orders_repository: repository.OrdersRepository = lagom.injectable,
-        junction_client: client.JunctionClient = lagom.injectable,
+        junction_client: client.Client = lagom.injectable,
         smtp_client: smtp.EmailClient = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
@@ -60,7 +60,7 @@ class Order(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         orders_repository: repository.OrdersRepository = lagom.injectable,
-        junction_client: client.JunctionClient = lagom.injectable,
+        junction_client: client.Client = lagom.injectable,
     ) -> responses.Response:
         mobile_order = await orders_repository.find_by_id(
             request.path_params["orderId"],
@@ -110,7 +110,7 @@ class Orders(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         orders_repository: repository.OrdersRepository = lagom.injectable,
-        junction_client: client.JunctionClient = lagom.injectable,
+        junction_client: client.Client = lagom.injectable,
     ) -> responses.Response:
         # TODO: create pagination for this one (!581)
         user_mobile_orders = await orders_repository.get_user_orders(
@@ -154,7 +154,7 @@ class Orders(endpoints.HTTPEndpoint):
         cached_rate: CachedRate | None,
         offers_rates_repository: repository.OffersRatesRepository = lagom.injectable,
         orders_repository: repository.OrdersRepository = lagom.injectable,
-        junction_client: client.JunctionClient = lagom.injectable,
+        junction_client: client.Client = lagom.injectable,
         smtp_client: smtp.EmailClient = lagom.injectable,
         vouchers_repository: repository.VouchersRepository = lagom.injectable,
     ) -> responses.Response:
@@ -275,7 +275,7 @@ async def check_payment_amount_and_state(
     payment_intent_id: str,
     quote: str,
     voucher: models_pb2.Voucher | None,
-    junction_client: client.JunctionClient,
+    junction_client: client.Client,
     cached_rate: CachedRate | None,
 ) -> tuple[bool, bool]:
     pi = stripe.PaymentIntent.retrieve(payment_intent_id)

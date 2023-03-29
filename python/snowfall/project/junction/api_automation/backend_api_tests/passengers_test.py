@@ -3,7 +3,7 @@ import logging
 
 import pytest
 
-from snowfall.vendor.junction.client import JunctionClient
+from snowfall.vendor.junction.go.client import Client
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -11,7 +11,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_get_passenger_genders(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,
@@ -28,7 +28,7 @@ async def test_get_passenger_genders(
 
 @pytest.mark.integration
 async def test_get_passenger_gender(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,
@@ -54,7 +54,7 @@ async def test_get_passenger_gender(
 
 @pytest.mark.integration
 async def test_get_passenger_titles(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,
@@ -72,7 +72,7 @@ async def test_get_passenger_titles(
 @pytest.mark.integration
 async def test_get_passenger_title(
     host: str,
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,

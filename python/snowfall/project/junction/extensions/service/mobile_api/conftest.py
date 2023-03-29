@@ -42,7 +42,7 @@ from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.v1alpha import phone_number_pb2
-from snowfall.vendor.junction import client
+from snowfall.vendor.junction.go import client
 
 _FIXTURES_PATH = "python/snowfall/project/junction/extensions/service/mobile_api/fixtures/{path}"  # noqa: B950
 _RESPONSE_FIXTURES_PATH = "python/snowfall/project/junction/extensions/service/mobile_api/fixtures/junction_responses/{path}"  # noqa: B950
@@ -337,8 +337,8 @@ def headers() -> dict[str, str]:
 
 
 @pytest.fixture()
-def junction_client() -> client.JunctionClient:
-    return client.JunctionClient(  # nosec
+def junction_client() -> client.Client:
+    return client.Client(  # nosec
         api_url=junction_api_address,
         token="",
     )
@@ -370,7 +370,7 @@ def app(  # noqa: WPS211
     enums_values_repository: repository.EnumsValuesRepository,
     smtp_client: smtp.EmailClient,
     orders_repository: repository.OrdersRepository,
-    junction_client: client.JunctionClient,
+    junction_client: client.Client,
     jwt_gen: jwt_generator.JwtGenerator,
     stripe_users_repository: repository.StripeUsersRepository,
     loyalty_programs_repository: repository.LoyaltyProgramsRepository,

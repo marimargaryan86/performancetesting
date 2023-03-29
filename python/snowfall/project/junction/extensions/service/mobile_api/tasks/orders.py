@@ -13,7 +13,7 @@ from snowfall.project.junction.extensions.service.mobile_api import (
     smtp,
 )
 from snowfall.stdlib.persistence import filesystem
-from snowfall.vendor.junction import client
+from snowfall.vendor.junction.go import client
 
 _ORDER_STATUS_POLLING_TIMEOUT = 180
 _ORDER_STATUS_POLLING_INTERVAL = 10
@@ -47,7 +47,7 @@ async def _handle_new_order_results(
 
 
 async def poll_order_status(
-    junction_client: client.JunctionClient,
+    junction_client: client.Client,
     order_id: str,
     payment_intent_id: str,
     smtp_client: smtp.EmailClient,

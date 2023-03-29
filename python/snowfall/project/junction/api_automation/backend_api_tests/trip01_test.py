@@ -8,7 +8,7 @@ import pytest
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
     is_valid_uuid,
 )
-from snowfall.vendor.junction.client import JunctionClient, LegType
+from snowfall.vendor.junction.go.client import Client, LegType
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -16,7 +16,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_trip_e2e_basic(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,
@@ -42,7 +42,7 @@ async def test_trip_e2e_basic(
 
 @pytest.mark.integration
 async def test_get_trip_search_by_id(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,
@@ -66,7 +66,7 @@ async def test_get_trip_search_by_id(
 
 @pytest.mark.integration
 async def test_get_trips_by_trip_search_id(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,
@@ -93,7 +93,7 @@ async def test_get_trips_by_trip_search_id(
 
 @pytest.mark.integration
 async def test_get_trip_by_id(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,
@@ -123,7 +123,7 @@ async def test_get_trip_by_id(
 
 @pytest.mark.integration
 async def test_get_legs_by_trip_id(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,
@@ -154,7 +154,7 @@ async def test_get_legs_by_trip_id(
 
 @pytest.mark.integration
 async def test_get_legs_by_trip_search_id(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,
@@ -177,7 +177,7 @@ async def test_get_legs_by_trip_search_id(
 @pytest.mark.integration
 async def test_list_segments_by_trip(  # noqa: WPS218
     host: str,
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,
@@ -220,7 +220,7 @@ async def test_list_segments_by_trip(  # noqa: WPS218
 
 @pytest.mark.integration
 async def test_get_segments_by_trip_search_id(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,
@@ -243,7 +243,7 @@ async def test_get_segments_by_trip_search_id(
 
 
 async def return_trip_search_id(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     destination: str,
     origin: str,

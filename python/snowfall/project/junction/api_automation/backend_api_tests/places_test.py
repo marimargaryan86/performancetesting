@@ -7,7 +7,7 @@ import pytest
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
     is_valid_uuid,
 )
-from snowfall.vendor.junction.client import JunctionClient
+from snowfall.vendor.junction.go.client import Client
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -15,7 +15,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_places(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,
@@ -26,7 +26,7 @@ async def test_places(
 
 @pytest.mark.integration
 async def test_places_place_id(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,
@@ -46,7 +46,7 @@ async def test_places_place_id(
 
 @pytest.mark.integration
 async def test_get_places_types(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,
@@ -63,7 +63,7 @@ async def test_get_places_types(
 
 @pytest.mark.integration
 async def test_get_places_type(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,
@@ -88,7 +88,7 @@ async def test_get_places_type(
 
 
 async def return_list_places(
-    junction_client: JunctionClient,
+    junction_client: Client,
 ) -> dict[str, Any]:
     r1 = await junction_client.places().list_places()
     logging.info("list_places %s", json.dumps(r1, indent=4))

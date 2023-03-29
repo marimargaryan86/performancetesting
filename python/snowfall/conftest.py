@@ -35,7 +35,7 @@ from snowfall.stdlib import h3
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.mongo import repository
 from snowfall.stdlib.v1alpha import models_pb2
-from snowfall.vendor.junction import client
+from snowfall.vendor.junction.go import client
 
 pytest.register_assert_rewrite("snowfall.stdlib.integration.starlette.testing")
 pytest.register_assert_rewrite("snowfall.stdlib.testing.asserts")
@@ -149,8 +149,8 @@ def offer_search() -> offer_models_pb2.OfferSearch:
 
 
 @pytest.fixture
-def junction_client() -> client.JunctionClient:
-    return client.JunctionClient("", "")
+def junction_client() -> client.Client:
+    return client.Client("", "")
 
 
 @pytest.fixture

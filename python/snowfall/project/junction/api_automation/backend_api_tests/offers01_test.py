@@ -10,7 +10,7 @@ import pytest
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
     is_valid_uuid,
 )
-from snowfall.vendor.junction.client import JunctionClient, LegType
+from snowfall.vendor.junction.go.client import Client, LegType
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -18,7 +18,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_trip_offers_e2e_basic(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,
@@ -44,7 +44,7 @@ async def test_trip_offers_e2e_basic(
 
 
 async def return_offer_options_ids_from_offer_searches(
-    junction_client: JunctionClient,
+    junction_client: Client,
     offer_id_and_offer_group_ids: Sequence[tuple[Any, ...]],
 ) -> Sequence[str]:
     offer_options_ids = []
@@ -62,7 +62,7 @@ async def return_offer_options_ids_from_offer_searches(
 
 
 async def return_offer_ids_and_offer_options_ids(
-    client: JunctionClient,
+    client: Client,
     offer_id_and_offer_group_ids: Sequence[tuple[Any, ...]],
 ) -> Sequence[list[str]]:
     list_of_offer_ids_and_offer_options_ids = []
@@ -81,7 +81,7 @@ async def return_offer_ids_and_offer_options_ids(
 
 
 async def return_offer_searches_id_and_offer_group_ids(
-    junction_client: JunctionClient,
+    junction_client: Client,
     trip_offer_search_ids: Sequence[str],
 ) -> Sequence[tuple[Any, ...]]:
     tasks = []
@@ -103,7 +103,7 @@ async def return_offer_searches_id_and_offer_group_ids(
 
 
 async def return_offer_ids(
-    junction_client: JunctionClient,
+    junction_client: Client,
     trip_offer_search_ids: Sequence[str],
 ) -> Sequence[str]:
     tasks = []
@@ -125,7 +125,7 @@ async def return_offer_ids(
 
 
 async def return_offer_options_details_ids(
-    junction_client: JunctionClient,
+    junction_client: Client,
     offer_options_ids: Sequence[str],
 ) -> Sequence[str]:
     offer_options_details_ids = []
@@ -144,7 +144,7 @@ async def return_offer_options_details_ids(
 
 
 async def return_offer_group_ids_and_offer_searches_id(
-    junction_client: JunctionClient,
+    junction_client: Client,
     trip_offer_search_id: str,
 ) -> tuple[str, Sequence[str]]:
     (offer_id, offer_group_ids) = await return_offer_search_id_and_offer_group_ids(
@@ -162,7 +162,7 @@ async def return_offer_group_ids_and_offer_searches_id(
 
 
 async def return_offer_id(
-    junction_client: JunctionClient,
+    junction_client: Client,
     trips_search_id: str,
 ) -> str:
     attempts = 5
@@ -189,7 +189,7 @@ async def return_offer_id(
 
 
 async def return_offer_search_id_and_offer_group_ids(
-    junction_client: JunctionClient,
+    junction_client: Client,
     trips_search_id: str,
 ) -> tuple[str, Sequence[str]]:
     response = await junction_client.get_offers_by_offer_search_id(
@@ -223,7 +223,7 @@ async def return_offer_group_ids_from_response(
 
 
 async def return_trip_offer_search_ids(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     destination: str,
     origin: str,
@@ -253,7 +253,7 @@ async def return_trip_offer_search_ids(
 
 
 async def return_final_trip_offer_search_ids(
-    client: JunctionClient,
+    client: Client,
     trip_offer_search_ids: Sequence[str],
 ) -> Sequence[str]:
     tasks = []
@@ -304,7 +304,7 @@ async def filter_sequence_for_ending_string(
 
 
 async def return_offer_searches_ids_final_values(
-    client: JunctionClient,
+    client: Client,
     trip_offer_search_id: str,
 ) -> Sequence[str]:
     response = {}
@@ -329,7 +329,7 @@ async def return_offer_searches_ids_final_values(
 
 
 async def return_trip_search_id(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     destination: str,
     origin: str,
@@ -352,7 +352,7 @@ async def return_trip_search_id(
 
 
 async def return_offer_group_details(
-    junction_client: JunctionClient,
+    junction_client: Client,
     offer_group_ids: Sequence[str],
 ) -> list[str]:
     offer_group_details_ids = []
@@ -374,7 +374,7 @@ async def return_offer_group_details(
 
 
 async def return_offer_options_ids(
-    junction_client: JunctionClient,
+    junction_client: Client,
     offer_group_ids: Sequence[str],
 ) -> list[str]:
     offer_options_ids = []
@@ -391,7 +391,7 @@ async def return_offer_options_ids(
 
 
 async def return_trip_offer_search_id(
-    junction_client: JunctionClient,
+    junction_client: Client,
     trip_ids: Sequence[str],
     year: int,
     month: int,
@@ -414,7 +414,7 @@ async def return_trip_offer_search_id(
 
 
 async def return_trip_search_id_from_trip_id(
-    junction_client: JunctionClient,
+    junction_client: Client,
     trip_id: str,
     year: int,
     month: int,
@@ -434,7 +434,7 @@ async def return_trip_search_id_from_trip_id(
 
 
 async def get_trip_ids(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     destination: str,
     origin: str,
@@ -462,7 +462,7 @@ async def get_trip_ids(
 
 
 async def get_trip_id(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     destination: str,
     origin: str,
@@ -490,7 +490,7 @@ async def get_trip_id(
 
 
 async def return_trip_search_final_response(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     destination: str,
     origin: str,

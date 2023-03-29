@@ -14,7 +14,7 @@ from snowfall.project.junction.api_automation.test_functions.helpers_api import 
     is_valid_uuid,
     return_randomized_token,
 )
-from snowfall.vendor.junction.client import JunctionClient
+from snowfall.vendor.junction.go.client import Client
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -22,7 +22,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_get_offer_quote_by_id(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,
@@ -58,7 +58,7 @@ async def test_get_offer_quote_by_id(
 
 
 async def calculate_time_and_get_price_quote_response(
-    junction_client: JunctionClient,
+    junction_client: Client,
     trip_offer_price_quote_id: str,
 ) -> None:
     st = time.time()
@@ -78,7 +78,7 @@ async def calculate_time_and_get_price_quote_response(
 async def return_offer_id_and_offer_group_ids(
     departure_after: str,
     destination: str,
-    junction_client: JunctionClient,
+    junction_client: Client,
     origin: str,
 ) -> Sequence[tuple[Any, ...]]:
     trip_offer_search_ids = await return_trip_offer_search_ids(
@@ -95,7 +95,7 @@ async def return_offer_id_and_offer_group_ids(
 
 
 async def return_get_price_offer_quote_final_values(
-    junction_client: JunctionClient,
+    junction_client: Client,
     trip_offer_price_quote_id: str,
 ) -> Sequence[str]:
     response = {}

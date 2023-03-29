@@ -12,7 +12,7 @@ from snowfall.project.junction.api_automation.test_functions.helpers_api import 
     is_valid_uuid,
     return_randomized_token,
 )
-from snowfall.vendor.junction.client import JunctionClient
+from snowfall.vendor.junction.go.client import Client
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -20,7 +20,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_create_offer_quote(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,

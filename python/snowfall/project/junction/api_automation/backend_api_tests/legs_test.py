@@ -11,7 +11,7 @@ from snowfall.project.junction.api_automation.backend_api_tests.segments_test im
 from snowfall.project.junction.api_automation.backend_api_tests.trip01_test import (
     return_trip_search_id,
 )
-from snowfall.vendor.junction.client import JunctionClient
+from snowfall.vendor.junction.go.client import Client
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -19,7 +19,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_get_leg_by_id(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,
@@ -44,7 +44,7 @@ async def test_get_leg_by_id(
 
 @pytest.mark.integration
 async def test_get_leg_types(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,
@@ -57,7 +57,7 @@ async def test_get_leg_types(
 
 @pytest.mark.integration
 async def test_get_leg_type_by_id(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,
@@ -70,7 +70,7 @@ async def test_get_leg_type_by_id(
         assert r1["data"]["id"] in leg_types
 
 
-async def return_leg_types(junction_client: JunctionClient) -> list[str]:
+async def return_leg_types(junction_client: Client) -> list[str]:
     r0 = await junction_client.legs().get_legs_types()
     logging.info("get_legs_types: %s", json.dumps(r0, indent=4))
     leg_types = []
@@ -81,7 +81,7 @@ async def return_leg_types(junction_client: JunctionClient) -> list[str]:
 
 
 async def return_get_segment_by_id_response(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     destination: str,
     origin: str,

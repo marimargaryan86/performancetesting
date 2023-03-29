@@ -7,7 +7,7 @@ import pytest
 from snowfall.project.junction.api_automation.backend_api_tests.bookings01_test import (
     return_some_order_ids,
 )
-from snowfall.vendor.junction.client import JunctionClient
+from snowfall.vendor.junction.go.client import Client
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -15,7 +15,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_get_booking_by_booking_id(
-    junction_client: JunctionClient,
+    junction_client: Client,
 ) -> None:
     order_ids = await return_some_order_ids(junction_client)
     assert order_ids, "No orders"
@@ -37,7 +37,7 @@ async def test_get_booking_by_booking_id(
 
 
 async def return_booking_ids_by_order_ids(
-    junction_client: JunctionClient,
+    junction_client: Client,
     order_ids: Sequence[str],
 ) -> Sequence[str]:
     booking_ids = []

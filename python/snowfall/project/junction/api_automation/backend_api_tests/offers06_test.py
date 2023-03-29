@@ -7,7 +7,7 @@ from snowfall.project.junction.api_automation.backend_api_tests.offers01_test im
     return_offer_group_ids_and_offer_searches_id,
     return_trip_search_id,
 )
-from snowfall.vendor.junction.client import JunctionClient
+from snowfall.vendor.junction.go.client import Client
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -15,7 +15,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_get_offer_group_details(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,
@@ -34,7 +34,7 @@ async def test_get_offer_group_details(
 
 
 async def return_offer_group_details_ids(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     destination: str,
     origin: str,

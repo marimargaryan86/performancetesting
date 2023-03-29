@@ -1,8 +1,8 @@
 import dataclasses
 from typing import Any, Dict, Mapping, Sequence
 
-from snowfall.vendor.junction import models
-from snowfall.vendor.junction.client import (  # noqa: WPS450,WPS235
+from snowfall.vendor.junction.go import models
+from snowfall.vendor.junction.go.client import (  # noqa: WPS450,WPS235
     _ATTRIBUTES_KEY,
     _DATA_KEY,
     _EMAIL_KEY,
@@ -15,13 +15,13 @@ from snowfall.vendor.junction.client import (  # noqa: WPS450,WPS235
     _PASSWORD_KEY,
     _RELATIONSHIPS_KEY,
     _TYPE_KEY,
-    JunctionClient,
+    Client,
     _make_pagination,
     order_includes,
 )
 
 
-class MobileApiClient(JunctionClient):  # noqa: WPS214
+class MobileApiClient(Client):  # noqa: WPS214
     async def create_payment(self, currency: str, amount: str) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_POST,

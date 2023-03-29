@@ -7,7 +7,7 @@ from urllib.parse import parse_qs, urlencode, urlparse
 
 import httpx
 
-from snowfall.vendor.pay import client
+from snowfall.vendor.junction.pay import client
 
 _DATA_KEY = "data"
 _ID_KEY = "id"

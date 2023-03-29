@@ -4,7 +4,7 @@ from typing import Sequence
 
 import pytest
 
-from snowfall.vendor.junction.client import JunctionClient
+from snowfall.vendor.junction.go.client import Client
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -12,7 +12,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_get_order_by_journey(
-    junction_client: JunctionClient,
+    junction_client: Client,
 ) -> None:
     journey_ids = await return_some_journey_ids(junction_client)
     assert journey_ids, "No journeys"
@@ -27,7 +27,7 @@ async def test_get_order_by_journey(
     assert was_any_order, "No orders ever found"
 
 
-async def return_some_journey_ids(junction_client: JunctionClient) -> Sequence[str]:
+async def return_some_journey_ids(junction_client: Client) -> Sequence[str]:
     r0 = await junction_client.get_journeys(limit=5)
     logging.info("get_order_by_journey: %s", json.dumps(r0, indent=4))
     journey_ids = []

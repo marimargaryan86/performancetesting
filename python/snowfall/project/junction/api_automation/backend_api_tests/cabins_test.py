@@ -3,7 +3,7 @@ import logging
 
 import pytest
 
-from snowfall.vendor.junction.client import JunctionClient
+from snowfall.vendor.junction.go.client import Client
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -11,7 +11,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_list_cabin_classes(
-    junction_client: JunctionClient,
+    junction_client: Client,
 ) -> None:
     response = await junction_client.list_cabin_classes()
     logging.info("list_cabin_classes: %s", json.dumps(response, indent=4))
@@ -21,7 +21,7 @@ async def test_list_cabin_classes(
 
 @pytest.mark.integration
 async def test_get_cabin_class(
-    junction_client: JunctionClient,
+    junction_client: Client,
 ) -> None:
     cabin_classes_ids = await return_cabin_classes_ids(junction_client)
 
@@ -32,7 +32,7 @@ async def test_get_cabin_class(
 
 
 async def return_cabin_classes_ids(
-    junction_client: JunctionClient,
+    junction_client: Client,
 ) -> list[str]:
     r0 = await junction_client.list_cabin_classes()
     logging.info("list_cabin_classes: %s", json.dumps(r0, indent=4))

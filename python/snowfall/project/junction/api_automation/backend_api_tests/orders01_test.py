@@ -10,8 +10,8 @@ from snowfall.project.junction.api_automation.backend_api_tests.offers01_test im
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
     is_valid_uuid,
 )
-from snowfall.vendor.junction import models
-from snowfall.vendor.junction.client import JunctionClient
+from snowfall.vendor.junction.go import models
+from snowfall.vendor.junction.go.client import Client
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -19,7 +19,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_get_orders_status(
-    junction_client: JunctionClient,
+    junction_client: Client,
     origin: str,
     departure_after: str,
     destination: str,
@@ -62,7 +62,7 @@ async def test_get_orders_status(
 
 
 async def get_orders_id(
-    junction_client: JunctionClient,
+    junction_client: Client,
     offer_id: str,
     option_ids: Sequence[str],
     passengers: Sequence[models.Passenger],
@@ -79,7 +79,7 @@ async def get_orders_id(
 
 
 async def return_options_by_order_groups(
-    junction_client: JunctionClient,
+    junction_client: Client,
     order_group_ids: Sequence[str],
 ) -> Sequence[str]:
     option_ids = []

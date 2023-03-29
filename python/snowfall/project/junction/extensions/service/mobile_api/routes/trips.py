@@ -9,14 +9,14 @@ from snowfall.stdlib.integration.starlette import (
     pagination_helpers,
     request_helpers,
 )
-from snowfall.vendor.junction import client
+from snowfall.vendor.junction.go import client
 
 
 class TripSearches(endpoints.HTTPEndpoint):
     async def post(
         self,
         request: requests.Request,
-        junction_client: client.JunctionClient = lagom.injectable,
+        junction_client: client.Client = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
 
@@ -42,7 +42,7 @@ class TripSearchesTrips(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        junction_client: client.JunctionClient = lagom.injectable,
+        junction_client: client.Client = lagom.injectable,
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
         trip_search = await junction_client.trips().get_trips_by_trip_search_id(

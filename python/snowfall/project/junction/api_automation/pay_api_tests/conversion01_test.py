@@ -16,7 +16,7 @@ from snowfall.project.junction.api_automation.test_functions.pay_admin_client im
     PayAdminClient,
 )
 from snowfall.stdlib import string
-from snowfall.vendor.pay.client import PayClient
+from snowfall.vendor.junction.pay.client import Client
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -25,7 +25,7 @@ EXIT_MSG = "Exiting ; check your logs"
 
 @pytest.mark.integration
 async def test_get_conversion_details(  # noqa: WPS210, WPS213, C901
-    pay_client: PayClient,
+    pay_client: Client,
     pay_admin_client: PayAdminClient,
     get_mongo_config: Mapping[str, Any],
 ) -> None:

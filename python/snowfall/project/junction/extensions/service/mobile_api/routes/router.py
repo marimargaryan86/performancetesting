@@ -18,7 +18,7 @@ from snowfall.project.junction.extensions.service.mobile_api.routes import (  # 
     users,
     vouchers,
 )
-from snowfall.vendor.junction import client
+from snowfall.vendor.junction.go import client
 
 
 def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
@@ -106,17 +106,17 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             name="PushNotificationToken",
         ),
         enums.CacheAndListEnum(
-            dependencies[client.JunctionClient].list_cabin_classes,
+            dependencies[client.Client].list_cabin_classes,
             dependencies[repository.EnumsValuesRepository],
             "/cabin-classes",
         ).to_route(),
         enums.CacheAndListEnum(
-            dependencies[client.JunctionClient].get_passenger_genders,
+            dependencies[client.Client].get_passenger_genders,
             dependencies[repository.EnumsValuesRepository],
             "/passengers/genders",
         ).to_route(),
         enums.CacheAndListEnum(
-            dependencies[client.JunctionClient].get_passenger_titles,
+            dependencies[client.Client].get_passenger_titles,
             dependencies[repository.EnumsValuesRepository],
             "/passengers/titles",
         ).to_route(),

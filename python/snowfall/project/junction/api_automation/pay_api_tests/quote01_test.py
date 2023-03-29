@@ -11,7 +11,7 @@ from snowfall.project.junction.api_automation.test_functions.pay_admin_client im
     PayAdminClient,
 )
 from snowfall.stdlib import string
-from snowfall.vendor.pay.client import PayClient
+from snowfall.vendor.junction.pay.client import Client
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -20,7 +20,7 @@ logging.getLogger().setLevel(logging.INFO)
 @pytest.mark.integration
 async def test_create_quote(  # noqa: WPS218
     pay_admin_client: PayAdminClient,
-    pay_client: PayClient,
+    pay_client: Client,
 ) -> None:
     response_payer = await pay_admin_client.create_company(
         company="test-company-{0}".format(return_randomized_token()),

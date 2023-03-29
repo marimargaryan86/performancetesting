@@ -21,7 +21,7 @@ from snowfall.stdlib.integration.starlette import (
     pagination_helpers,
     request_helpers,
 )
-from snowfall.vendor.junction import client
+from snowfall.vendor.junction.go import client
 
 _DATA_KEY = "data"
 _ID_KEY = "id"
@@ -34,7 +34,7 @@ class OfferSearches(endpoints.HTTPEndpoint):
     async def post(
         self,
         request: requests.Request,
-        junction_client: client.JunctionClient = lagom.injectable,
+        junction_client: client.Client = lagom.injectable,
         offers_rates_repository: repository.OffersRatesRepository = lagom.injectable,
         currencies_client: currencies.CurrencyClient = lagom.injectable,
     ) -> responses.Response:
@@ -84,7 +84,7 @@ class OfferSearch(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        junction_client: client.JunctionClient = lagom.injectable,
+        junction_client: client.Client = lagom.injectable,
     ) -> responses.Response:
         offer_search = await junction_client.get_offer_search(
             offers_search_id=request.path_params["offerSearchId"],
@@ -105,7 +105,7 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         cached_rate: CachedRate | None,
-        junction_client: client.JunctionClient = lagom.injectable,
+        junction_client: client.Client = lagom.injectable,
         offers_rates_repository: repository.OffersRatesRepository = lagom.injectable,
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)

@@ -19,8 +19,9 @@ from snowfall.project.junction.api_automation.test_functions.pay_admin_client im
     PayAdminClient,
 )
 from snowfall.vendor.apilayer.client import APILayer
-from snowfall.vendor.junction.client import JunctionClient
-from snowfall.vendor.pay.client import PayAuthentication, PayClient
+from snowfall.vendor.junction.auth import UserAuth
+from snowfall.vendor.junction.go.client import Client as GoClient
+from snowfall.vendor.junction.pay.client import Client as PayClient
 
 ALLURE_ENVIRONMENT_PROPERTIES_FILE = "environment.properties"
 ALLUREDIR_OPTION = "--alluredir"
@@ -180,14 +181,14 @@ def pytest_collection_modifyitems(
 def junction_client(
     api_token: str,
     host: str,
-) -> JunctionClient:
+) -> GoClient:
     api_url = "{0}{1}".format(
         HTTPS_PREFIX,
         get_variable_value(host, api_token, "junction_api_host"),
     )
     junction_api_token = get_variable_value(host, api_token, "junction_api_token")
     client_timeout = 20
-    return JunctionClient(
+    return GoClient(
         api_url=api_url,
         token=junction_api_token,
         client=httpx.AsyncClient(timeout=client_timeout),
@@ -226,7 +227,7 @@ def pay_admin_client(
         get_variable_value(host, api_token, "pay_admin_api_host"),
     )
 
-    auth = PayAuthentication(
+    auth = UserAuth(
         base_url=base_url_admin_api,
         email=email,
         password=password,
@@ -363,7 +364,7 @@ def pay_client(
         get_variable_value(host, api_token, "pay_api_host"),
     )
 
-    auth = PayAuthentication(
+    auth = UserAuth(
         base_url=base_url_admin_api,
         email=email,
         password=password,

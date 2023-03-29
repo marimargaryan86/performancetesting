@@ -11,7 +11,7 @@ from snowfall.project.junction.extensions.service.mobile_api import (
     smtp,
 )
 from snowfall.stdlib.integration.starlette import application
-from snowfall.vendor.junction import client
+from snowfall.vendor.junction.go import client
 
 
 class Settings(application.Settings):
@@ -44,7 +44,7 @@ class Settings(application.Settings):
 def create_dependencies(  # noqa: WPS211
     currencies_client: currencies.CurrencyClient,
     orders_repository: repository.OrdersRepository,
-    junction_client: client.JunctionClient,
+    junction_client: client.Client,
     places_repository: repository.PlacesRepository,
     users_repository: repository.UsersRepository,
     otp_repository: repository.OtpRepository,
@@ -62,7 +62,7 @@ def create_dependencies(  # noqa: WPS211
     container = lagom.Container()
     container[currencies.CurrencyClient] = currencies_client
     container[repository.OrdersRepository] = orders_repository
-    container[client.JunctionClient] = junction_client
+    container[client.Client] = junction_client
     container[repository.PlacesRepository] = places_repository
     container[repository.UsersRepository] = users_repository
     container[repository.OtpRepository] = otp_repository

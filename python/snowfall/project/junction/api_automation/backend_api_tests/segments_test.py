@@ -10,7 +10,7 @@ from snowfall.project.junction.api_automation.backend_api_tests.trip01_test impo
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
     is_valid_uuid,
 )
-from snowfall.vendor.junction.client import JunctionClient
+from snowfall.vendor.junction.go.client import Client
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -18,7 +18,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_get_segment_by_id(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,
@@ -52,7 +52,7 @@ async def test_get_segment_by_id(
 
 @pytest.mark.integration
 async def test_get_legs_by_segment_id(
-    junction_client: JunctionClient,
+    junction_client: Client,
     departure_after: str,
     origin: str,
     destination: str,
@@ -83,7 +83,7 @@ async def test_get_legs_by_segment_id(
 
 
 async def return_segment_id_from_trip_search_id(
-    junction_client: JunctionClient,
+    junction_client: Client,
     trip_search_id: str,
 ) -> str:
     r2 = await junction_client.trips().get_trips_by_trip_search_id(trip_search_id)

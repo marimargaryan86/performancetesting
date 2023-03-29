@@ -16,7 +16,7 @@ from snowfall.project.junction.extensions.service.mobile_api import smtp
 from snowfall.project.junction.extensions.service.mobile_api.tasks import orders
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application
-from snowfall.vendor.junction import client
+from snowfall.vendor.junction.go import client
 
 
 class Settings(application.Settings):
@@ -31,7 +31,7 @@ async def orders_report(app: service.Application[Settings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         app.settings.mongo_dsn,  # nosec
     )[app.name]
-    junction_client = client.JunctionClient(
+    junction_client = client.Client(
         api_url=random.choice(app.settings.junction_api_address),  # nosec
         token=app.settings.junction_api_token,
     )
@@ -59,7 +59,7 @@ async def orders_report(app: service.Application[Settings]) -> None:
 
 async def _generate_report(  # noqa: WPS210
     orders_repository: motor_asyncio.AsyncIOMotorCollection,
-    junction_client: client.JunctionClient,
+    junction_client: client.Client,
 ) -> Sequence[Mapping[Any, Any]]:
     junction_orders = []
     mobile_orders = orders_repository.find(

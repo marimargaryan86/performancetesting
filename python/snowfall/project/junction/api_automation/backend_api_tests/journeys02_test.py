@@ -4,14 +4,14 @@ from typing import Sequence
 
 import pytest
 
-from snowfall.vendor.junction.client import JunctionClient
+from snowfall.vendor.junction.go.client import Client
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 
 
 @pytest.mark.integration
-async def test_get_journey_by_id(junction_client: JunctionClient) -> None:
+async def test_get_journey_by_id(junction_client: Client) -> None:
     journey_ids = await return_journey_ids(junction_client)
 
     for journey_id in journey_ids:
@@ -20,7 +20,7 @@ async def test_get_journey_by_id(junction_client: JunctionClient) -> None:
         assert r1
 
 
-async def return_journey_ids(junction_client: JunctionClient) -> Sequence[str]:
+async def return_journey_ids(junction_client: Client) -> Sequence[str]:
     r0 = await junction_client.get_journeys()
     logging.info("get_journeys: %s", json.dumps(r0, indent=4))
     journey_ids = []

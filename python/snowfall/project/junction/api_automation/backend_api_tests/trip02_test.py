@@ -11,7 +11,7 @@ import allure
 import pytest
 from dateutil.parser import parse as datetime_parse
 
-from snowfall.vendor.junction.client import JunctionClient, LegType
+from snowfall.vendor.junction.go.client import Client, LegType
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -19,7 +19,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 @pytest.mark.integration
 async def test_trip_windows_planner(
-    client: JunctionClient,
+    client: Client,
     departure_after: str,
     origin: str,
     destination: str,
@@ -58,7 +58,7 @@ async def test_trip_windows_planner(
 
 
 async def save_mct_to_csv(
-    client: JunctionClient,
+    client: Client,
     trip_ids: Sequence[str],
     file_name: str,
 ) -> None:
@@ -172,7 +172,7 @@ async def calculate_updated_arrival(
 
 
 async def get_trip_ids_with_minimum_segments(
-    client: JunctionClient,
+    client: Client,
     departure_after: str,
     destination: str,
     origin: str,
@@ -200,7 +200,7 @@ async def get_trip_ids_with_minimum_segments(
 
 
 async def return_trip_search_final_response(
-    client: JunctionClient,
+    client: Client,
     departure_after: str,
     destination: str,
     origin: str,

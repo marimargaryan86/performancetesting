@@ -9,12 +9,12 @@ from snowfall.project.junction.api_automation.backend_api_tests.bookings02_test 
     return_booking_ids_by_order_ids,
 )
 from snowfall.project.junction.api_automation.test_functions.helpers_api import with_log
-from snowfall.vendor.junction.client import JunctionClient
+from snowfall.vendor.junction.go.client import Client
 
 
 @pytest.mark.integration
 async def test_booking_details_by_booking_details_id(
-    junction_client: JunctionClient,
+    junction_client: Client,
 ) -> None:
     detail_ids = await return_some_details_ids(junction_client)
     assert detail_ids, "No details"
@@ -29,7 +29,7 @@ async def test_booking_details_by_booking_details_id(
 
 
 async def return_some_details_ids(  # noqa: WPS210
-    junction_client: JunctionClient,
+    junction_client: Client,
 ) -> Sequence[str]:
     order_ids = await return_some_order_ids(junction_client)
     assert order_ids, "No orders"

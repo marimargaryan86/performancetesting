@@ -5,7 +5,7 @@ from typing import Any, Literal, Mapping, Sequence, cast
 
 import httpx
 
-from snowfall.vendor.junction import models
+from snowfall.vendor.junction.go import models
 
 _DATA_KEY = "data"
 _ID_KEY = "id"
@@ -285,7 +285,7 @@ class TripsClient(_BaseClient):
         )
 
 
-class JunctionClient(_BaseClient):  # noqa: WPS214
+class Client(_BaseClient):  # noqa: WPS214
     def legs(self) -> LegsClient:
         return LegsClient(
             api_url=self._api_url,
