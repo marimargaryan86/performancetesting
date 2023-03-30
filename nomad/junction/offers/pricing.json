@@ -4,6 +4,8 @@
       "count": 2,
       "payer_company_id": "25a2ea74-0a5d-4991-9ce0-4996be2bcceb",
       "payer_currency_code": "SEK",
+      "api_pay_base_url": "https://api.pay.junction.dev",
+      "pay_admin_api_base_url": "https://adminapi.pay.junction.dev",
       "use_pay_for_currency_conversions": true
     }
   },
@@ -12,6 +14,8 @@
       "count": 2,
       "payer_company_id": "6b2a715b-985a-4fa2-8898-01f5bef44325",
       "payer_currency_code": "SEK",
+      "api_pay_base_url": "https://api.pay.junction.travel",
+      "pay_admin_api_base_url": "https://adminapi.pay.junction.travel",
       "use_pay_for_currency_conversions": false
     }
   }

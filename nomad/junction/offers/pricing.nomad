@@ -38,6 +38,15 @@ variable "use_pay_for_currency_conversions" {
   type = bool
 }
 
+variable "pay_admin_api_base_url" {
+  type = string
+}
+
+variable "api_pay_base_url" {
+  type = string
+}
+
+
 job "offers-pricing" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -125,6 +134,8 @@ EOH
         PAYER_COMPANY_ID                 = "${var.payer_company_id}"
         PAYER_CURRENCY_CODE              = "${var.payer_currency_code}"
         USE_PAY_FOR_CURRENCY_CONVERSIONS = "${var.use_pay_for_currency_conversions}"
+        PUBLIC_PAY_ADMIN_API_DSN         = "${var.pay_admin_api_base_url}"
+        PUBLIC_PAY_API_DSN               = "${var.api_pay_base_url}"
       }
     }
   }
