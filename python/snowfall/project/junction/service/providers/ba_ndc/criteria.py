@@ -5,7 +5,6 @@ from typing import Iterator, Sequence
 import more_itertools
 
 from snowfall.project.junction.provider import airports
-from snowfall.project.junction.service.offers.v1alpha import amqp_pb2
 from snowfall.project.junction.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
@@ -29,16 +28,16 @@ class CriteriaGenerator(object):
     ):
         self._grouper = segment_grouper.SegmentGrouper(h3_mapping)
 
-    def from_search_task(
+    def from_search(
         self,
-        search_task: amqp_pb2.TripOfferSearchTask,
+        search: offer_models_pb2.TripOfferSearch,
     ) -> list[provider_amqp_pb2.SearchCriteriaTask]:
         number_of_types = get_num_of_passenger_types(
-            passengers=search_task.search.passengers,
-            date=_get_last_travel_date(search_task),
+            passengers=search.passengers,
+            date=_get_last_travel_date(search),
         )
         sub_trips = self._grouper.trips_to_sub_trips(
-            trips=search_task.search.trips,
+            trips=search.trips,
             type_filter=models_pb2.Schedule.TYPE_AIR,
         )
         tasks: list[provider_amqp_pb2.SearchCriteriaTask] = []
@@ -46,7 +45,6 @@ class CriteriaGenerator(object):
         for trip_criteria in segment_grouper.generate_trip_criteria(sub_trips):
             tasks.extend(
                 _generate_search_criteria(
-                    search_task=search_task,
                     trip_criteria=trip_criteria,
                     number_of_types=number_of_types,
                 ),
@@ -56,9 +54,9 @@ class CriteriaGenerator(object):
 
 
 def _get_last_travel_date(
-    search_task: amqp_pb2.TripOfferSearchTask,
+    search: offer_models_pb2.TripOfferSearch,
 ) -> datetime.date:
-    segments = itertools.chain(*[tr.segments for tr in search_task.search.trips])
+    segments = itertools.chain(*[tr.segments for tr in search.trips])
 
     return max(
         protobuf.protobuf_to_datetime(
@@ -69,13 +67,11 @@ def _get_last_travel_date(
 
 
 def _generate_search_criteria(
-    search_task: amqp_pb2.TripOfferSearchTask,
     trip_criteria: segment_grouper.TripCriteria,
     number_of_types: tuple[int, int, int],
 ) -> Iterator[provider_amqp_pb2.SearchCriteriaTask]:
     for origin, destination in trip_criteria.get_combinations():
         task = provider_amqp_pb2.SearchCriteriaTask(
-            offer_search_id=search_task.offer_search_id,
             segments=trip_criteria.outbound.segments,
             criteria=provider_amqp_pb2.Criteria(
                 origin_iata=origin,
@@ -87,7 +83,6 @@ def _generate_search_criteria(
                 children=number_of_types[1],
                 infants=number_of_types[2],
             ),
-            session_token=search_task.session_token,
         )
 
         if trip_criteria.inbound:

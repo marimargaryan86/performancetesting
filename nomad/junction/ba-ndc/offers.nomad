@@ -26,6 +26,10 @@ variable "count" {
   type = number
 }
 
+variable "provider_company_id" {
+  type = string
+}
+
 job "ba-ndc-offers" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -85,6 +89,7 @@ job "ba-ndc-offers" {
       template {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
+MONGO_DSN={{range $index, $service := service (printf "mongodb-%s" (env "NOMAD_NAMESPACE"))}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 {{ with secret "kv/data/${var.environment}/ndc-ba" }}
 API_BASE_URL={{ .Data.data.api_base_url }}
@@ -111,9 +116,10 @@ EOH
       }
 
       env {
-        ENV_NAME        = "${var.environment}"
-        PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
-        SENTRY_DSN      = "https://5e8ffcd08b434ebf955ecd889fe82947@sentry.snowfall.se/58"
+        ENV_NAME            = "${var.environment}"
+        PROMETHEUS_PORT     = "${NOMAD_PORT_prometheus}"
+        SENTRY_DSN          = "https://5e8ffcd08b434ebf955ecd889fe82947@sentry.snowfall.se/58"
+        PROVIDER_COMPANY_ID = "${var.provider_company_id}"
       }
     }
   }

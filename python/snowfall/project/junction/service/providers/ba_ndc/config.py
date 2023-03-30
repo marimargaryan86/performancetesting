@@ -2,7 +2,7 @@ from typing import Sequence
 
 import pydantic
 
-from snowfall.stdlib import service
+from snowfall.project.junction.provider import service
 
 _DEFAULT_TTL_IN_MINUTES = 45
 
@@ -13,7 +13,12 @@ class BaNdcConfig(pydantic.BaseModel):
     http_timeout: int = 30
 
 
-class SearchesSettings(BaNdcConfig, service.Settings):
+class OffersSettings(service.OffersSettings, BaNdcConfig):
+    amqp_dsn: pydantic.AnyUrl
+    provider_company_id: str
+    redis_dsn: pydantic.AnyUrl
+
+
+class PricingSettings(BaNdcConfig, service.Settings):
     amqp_dsn: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
-    provider_company_id: str

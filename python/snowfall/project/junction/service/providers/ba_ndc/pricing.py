@@ -7,9 +7,9 @@ from redis import asyncio as aioredis
 from snowfall.project.junction.service.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
 from snowfall.project.junction.service.providers.ba_ndc import (
     cache,
+    config,
     pricing_transformer,
 )
-from snowfall.project.junction.service.providers.ba_ndc.config import SearchesSettings
 from snowfall.stdlib import service
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
@@ -18,7 +18,7 @@ from snowfall.stdlib.transport.amqp import types as amqp_types
 
 
 async def price_quotes(
-    app: service.Application[SearchesSettings],
+    app: service.Application[config.PricingSettings],
 ) -> None:
     async with contextlib.AsyncExitStack() as stack:
         redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
