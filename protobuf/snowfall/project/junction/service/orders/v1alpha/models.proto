@@ -55,6 +55,7 @@ message Booking {
   string raw_data = 8; // json
   google.protobuf.Timestamp created_at = 9;
   google.protobuf.Timestamp updated_at = 10;
+  string transaction_id = 11;
 }
 
 message TripBooking {
