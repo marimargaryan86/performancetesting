@@ -23,6 +23,7 @@ from snowfall.project.junction.extensions.service.mobile_api import (
     middleware,
     orders_report,
     places_migration,
+    plus_client,
     repository,
     smtp,
 )
@@ -48,6 +49,9 @@ def _factory(
         junction_client = client.Client(
             api_url=random.choice(app.settings.junction_api_address),  # nosec
             token=app.settings.junction_api_token,
+        )
+        plus_http_client = plus_client.PlusClient(
+            api_url=random.choice(app.settings.plus_api_address),  # nosec
         )
         redis_client = redis.Client[str](
             aioredis.from_url(
@@ -126,6 +130,7 @@ def _factory(
                         mongo["user_groups"],
                     ),
                     junction_client=junction_client,
+                    plus_http_client=plus_http_client,
                     jwt_gen=jwt_gen,
                 ),
             ),

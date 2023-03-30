@@ -70,6 +70,8 @@ message MobileOrder {
   google.protobuf.Timestamp created_at = 4;
   float rate = 6;
   string currency = 7;
+  string spnr = 8;
+  string mobile_number = 9;
 }
 
 message Voucher {

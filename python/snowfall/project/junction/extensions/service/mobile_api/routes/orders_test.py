@@ -31,6 +31,9 @@ class TestOrders(object):
         httpx_mock.add_response(
             **conftest.load_response_fixture("GET_OFFERS_QUOTES_{ID}.json"),
         )
+        httpx_mock.add_response(
+            **conftest.load_response_fixture("POST_REGISTER.json"),
+        )
 
         payments.cancel = mock.AsyncMock()
         payments.capture = mock.AsyncMock()

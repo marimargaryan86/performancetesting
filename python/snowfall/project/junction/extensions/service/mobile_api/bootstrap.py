@@ -7,6 +7,7 @@ from pydantic import AnyUrl
 from snowfall.project.junction.extensions.service.mobile_api import (
     currencies,
     jwt_generator,
+    plus_client,
     repository,
     smtp,
 )
@@ -18,6 +19,7 @@ class Settings(application.Settings):
     currencies_address: Sequence[str]
     junction_api_address: Sequence[str]
     junction_api_token: str
+    plus_api_address: Sequence[str]
     redis_dsn: Sequence[AnyUrl]
     places_cache_ttl: datetime.timedelta = datetime.timedelta(hours=1)
     otp_cache_ttl: datetime.timedelta = datetime.timedelta(minutes=2)
@@ -45,6 +47,7 @@ def create_dependencies(  # noqa: WPS211
     currencies_client: currencies.CurrencyClient,
     orders_repository: repository.OrdersRepository,
     junction_client: client.Client,
+    plus_http_client: plus_client.PlusClient,
     places_repository: repository.PlacesRepository,
     users_repository: repository.UsersRepository,
     otp_repository: repository.OtpRepository,
@@ -63,6 +66,7 @@ def create_dependencies(  # noqa: WPS211
     container[currencies.CurrencyClient] = currencies_client
     container[repository.OrdersRepository] = orders_repository
     container[client.Client] = junction_client
+    container[plus_client.PlusClient] = plus_http_client
     container[repository.PlacesRepository] = places_repository
     container[repository.UsersRepository] = users_repository
     container[repository.OtpRepository] = otp_repository

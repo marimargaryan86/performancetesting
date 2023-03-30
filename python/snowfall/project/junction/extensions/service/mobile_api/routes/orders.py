@@ -10,6 +10,7 @@ from starlette.background import BackgroundTask
 
 from snowfall.project.junction.extensions.service.mobile_api import (
     payments,
+    plus_client,
     repository,
     smtp,
     validators,
@@ -155,6 +156,7 @@ class Orders(endpoints.HTTPEndpoint):
         offers_rates_repository: repository.OffersRatesRepository = lagom.injectable,
         orders_repository: repository.OrdersRepository = lagom.injectable,
         junction_client: client.Client = lagom.injectable,
+        plus_http_client: plus_client.PlusClient = lagom.injectable,
         smtp_client: smtp.EmailClient = lagom.injectable,
         vouchers_repository: repository.VouchersRepository = lagom.injectable,
     ) -> responses.Response:
@@ -204,7 +206,7 @@ class Orders(endpoints.HTTPEndpoint):
                 ),
                 status_code=status.HTTP_400_BAD_REQUEST,
             )
-
+        contact_details = body["contactDetails"]
         try:
             junction_order = await junction_client.create_order(
                 body["quote"],
@@ -213,13 +215,13 @@ class Orders(endpoints.HTTPEndpoint):
                     for pax in body["passengers"]
                 ],
                 vendor_models.ContactDetails(
-                    email=body["contactDetails"]["email"],
+                    email=contact_details["email"],
                     address=vendor_models.Address(
                         **vendor_models.dict_factory_to_snake(
-                            body["contactDetails"]["address"],
+                            contact_details["address"],
                         ),
                     ),
-                    phone_number=body["contactDetails"]["phoneNumber"],
+                    phone_number=contact_details["phoneNumber"],
                 ),
                 include=["journey"],
             )
@@ -230,6 +232,7 @@ class Orders(endpoints.HTTPEndpoint):
             id=junction_order["data"]["id"],
             payment_intent_id=payment,
             user_id=request.user.username,
+            mobile_number=contact_details["phoneNumber"],
         )
         if cached_rate:
             mobile_order.rate = cached_rate.rate
@@ -244,9 +247,9 @@ class Orders(endpoints.HTTPEndpoint):
         stripe.PaymentIntent.modify(
             payment,
             metadata={"order_id": mobile_order.id, "spnr": spnr},
-            receipt_email=body["contactDetails"]["email"],
+            receipt_email=contact_details["email"],
         )
-
+        mobile_order.spnr = spnr
         await orders_repository.insert(mobile_order)
 
         task = BackgroundTask(
@@ -257,7 +260,9 @@ class Orders(endpoints.HTTPEndpoint):
             smtp_client,
             vouchers_repository,
         )
-
+        await plus_http_client.register_order(
+            mobile_order.id,
+        )
         junction_order["data"]["relationships"]["payment"] = {
             "data": {
                 "id": mobile_order.payment_intent_id,

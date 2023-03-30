@@ -1,0 +1,373 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Junction Plus POC API",
+    "version": "1.0.0",
+    "description": "This API follows the [JSON:API][jsonapi] specification.\n\n[jsonapi]: https://jsonapi.org/",
+    "contact": {
+      "name": "Snowfall",
+      "url": "https://www.snowfalltravel.com",
+      "email": "info@snowfalltravel.com"
+    },
+    "license": {
+      "name": "Junction",
+      "url": "https://www.snowfalltravel.com"
+    }
+  },
+  "x-internal": true,
+  "x-tagGroups": [
+    {
+      "name": "Internal",
+      "tags": [
+        "internal"
+      ]
+    },
+    {
+      "name": "Whatsapp",
+      "tags": [
+        "whatsapp"
+      ]
+    }
+  ],
+  "tags": [
+    {
+      "name": "internal",
+      "description": "Endpoints not for public use.",
+      "x-displayName": "Internal"
+    },
+    {
+      "name": "whatsapp",
+      "description": "Endpoints for communication with the whatsapp chatbot.",
+      "x-displayName": "Whatsapp"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "security": [],
+        "summary": "Health",
+        "tags": [
+          "internal"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "description": "",
+                  "type": "object",
+                  "x-examples": {
+                    "example-1": {
+                      "meta": {
+                        "status": "ok"
+                      }
+                    }
+                  },
+                  "properties": {
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "status"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "description": "Health status",
+                          "enum": [
+                            "pass",
+                            "fail",
+                            "warn"
+                          ],
+                          "example": "pass"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "meta"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-health",
+        "description": "Check the application health.",
+        "x-internal": true
+      }
+    },
+    "/whatsapp": {
+      "post": {
+        "security": [],
+        "summary": "Create user group",
+        "tags": [
+          "whatsapp"
+        ],
+        "operationId": "post-whatsapp",
+        "description": "Used from the whatsapp.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "body": {
+                    "type": "string",
+                    "example": "body"
+                  },
+                  "from": {
+                    "type": "string",
+                    "example": "from"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "security": [],
+        "summary": "Register order",
+        "tags": [
+          "whatsapp"
+        ],
+        "operationId": "post-register",
+        "description": "Used to register an order for plus.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/WhatsappRegistration"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/journey-delays": {
+      "post": {
+        "security": [],
+        "summary": "Create fake delay",
+        "tags": [
+          "whatsapp"
+        ],
+        "operationId": "post-journey-delays",
+        "description": "Used to create a fake delay for a given flight number.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/DelayCreation"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {},
+    "schemas": {
+      "WhatsappRegistration": {
+        "title": "Whatsapp Registration",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "whatsapp-registrations"
+            ],
+            "example": "whatsapp-registrations"
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+            }
+          },
+          "relationships": {
+            "type": "object",
+            "properties": {
+              "orders": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                      "$ref": "#/components/schemas/OrderIdentifier"
+                  }
+                }
+              }
+            },
+            "required": [
+              "orders"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes",
+          "relationships"
+        ]
+      },
+      "DelayCreation": {
+        "title": "Delay Creation",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "journey-delays"
+            ],
+            "example": "journey-delays"
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "flightNumber": {
+                "type": "string",
+                "example": "A3116"
+              },
+              "delayMinutes": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 120,
+                "example": 30
+              }
+            },
+            "required": [
+              "flightNumber",
+              "delayMinutes"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ]
+      },
+      "OrderIdentifier": {
+        "title": "Order Identifier",
+        "description": "",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "orders"
+            ],
+            "example": "orders"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      }
+    },
+    "responses": {},
+    "securitySchemes": {
+      "jwt": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+
+  },
+    "security": [
+    {
+      "jwt": []
+    }
+  ]
+}

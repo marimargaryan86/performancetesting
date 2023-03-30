@@ -5,6 +5,6 @@ __dependents_rules__(
             "protobuf/snowfall/project/junction/extensions/**",
             "python/snowfall/project/junction/extensions/**",
         ),
-        "!*",
+        "?*",
     )
 )

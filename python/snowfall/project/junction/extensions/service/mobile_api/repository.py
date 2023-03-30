@@ -309,10 +309,11 @@ class OrdersRepository(
     async def get_user_orders(
         self,
         user_id: str,
+        selector: str = "user_id",
     ) -> resultset.ResultSet[models_pb2.MobileOrder]:
         orders = await self._execute(
             self._collection.find,
-            {"user_id": user_id},
+            {selector: user_id},
         )
         orders.sort(("created_at", -1))
         return orders

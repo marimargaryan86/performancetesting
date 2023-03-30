@@ -31,6 +31,7 @@ from snowfall.project.junction.extensions.service.mobile_api import (
 from snowfall.project.junction.extensions.service.mobile_api import (
     jwt_generator,
     middleware,
+    plus_client,
     repository,
     smtp,
 )
@@ -67,6 +68,7 @@ jwt_public_key_bytes = jwt_private_key.public_key().public_bytes(
 )
 jwt_public_key = base64.b64encode(jwt_public_key_bytes).decode()
 junction_api_address = "https://api.junction.dev"
+plus_api_address = "https://plus.junction.dev"
 
 
 @pytest.fixture
@@ -344,6 +346,13 @@ def junction_client() -> client.Client:
     )
 
 
+@pytest.fixture()
+def plus_http_client() -> plus_client.PlusClient:
+    return plus_client.PlusClient(
+        api_url=plus_api_address,
+    )
+
+
 @pytest.fixture
 def non_mocked_hosts() -> list[str]:
     return ["example.com"]
@@ -371,6 +380,7 @@ def app(  # noqa: WPS211
     smtp_client: smtp.EmailClient,
     orders_repository: repository.OrdersRepository,
     junction_client: client.Client,
+    plus_http_client: plus_client.PlusClient,
     jwt_gen: jwt_generator.JwtGenerator,
     stripe_users_repository: repository.StripeUsersRepository,
     loyalty_programs_repository: repository.LoyaltyProgramsRepository,
@@ -384,6 +394,7 @@ def app(  # noqa: WPS211
             mobile_currencies_client,
             orders_repository,
             junction_client,
+            plus_http_client,
             places_repository,
             users_repository,
             otp_repository,

@@ -1,0 +1,6 @@
+{
+    "url": "\/register",
+    "method": "POST",
+    "status_code": 200,
+    "json": {}
+}
