@@ -4533,7 +4533,8 @@
                 "type": "object",
                 "required": [
                   "totalPrice",
-                  "operatorBookingReferences"
+                  "operatorBookingReferences",
+                  "externalReference"
                 ],
                 "properties": {
                   "totalPrice": {
@@ -4548,6 +4549,10 @@
                       "type": "string",
                       "example": "HDZEMS"
                     }
+                  },
+                  "externalReference": {
+                    "type": "string",
+                    "example": "HDZEMS"
                   }
                 }
               },

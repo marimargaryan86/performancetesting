@@ -87,7 +87,8 @@
           },
           "operatorBookingReferences": [
             "HDZEMS"
-          ]
+          ],
+          "externalReference": "HDZEMS"
         },
         "relationships": {
           "order": {
