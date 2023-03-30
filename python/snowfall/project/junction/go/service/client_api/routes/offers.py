@@ -5,7 +5,7 @@ import lagom
 from starlette import endpoints, requests, responses, status
 
 from snowfall.project.junction.go.adapter import offer_searches, offers, price_quotes
-from snowfall.project.junction.service.client_api import resources, validators
+from snowfall.project.junction.go.service.client_api import resources, validators
 from snowfall.project.junction.service.offers.v1alpha import models_pb2
 from snowfall.stdlib import sequence, string
 from snowfall.stdlib.format import protobuf

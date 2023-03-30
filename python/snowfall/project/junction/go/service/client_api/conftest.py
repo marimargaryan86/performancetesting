@@ -26,8 +26,8 @@ from snowfall.project.junction.go.adapter import (
     trip_searches,
     trips,
 )
-from snowfall.project.junction.service.client_api import bootstrap, jwt
-from snowfall.project.junction.service.client_api.routes import router
+from snowfall.project.junction.go.service.client_api import bootstrap, jwt
+from snowfall.project.junction.go.service.client_api.routes import router
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import cursor, filesystem
 

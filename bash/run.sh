@@ -4,7 +4,7 @@
 #   defined in .env or .env.dist where the service resides.
 #
 # EXAMPLE USAGE:
-#   bash bash/run.sh python/snowfall/project/junction/service/client_api/main.py http
+#   bash bash/run.sh python/snowfall/project/junction/go/service/client_api/main.py http
 set -eu
 
 DIR=$(dirname "${1}")

@@ -10,7 +10,7 @@ from snowfall.project.junction.go.adapter import (
     schedules,
     segments,
 )
-from snowfall.project.junction.service.client_api import resources
+from snowfall.project.junction.go.service.client_api import resources
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import includes
 from snowfall.stdlib.v1alpha import models_pb2

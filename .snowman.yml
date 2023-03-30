@@ -9,9 +9,6 @@ commits:
       - "protobuf/snowfall/project/junction/extensions"
       - "python/snowfall/project/junction/api_automation/mobile_api_tests"
       - "python/snowfall/project/junction/extensions"
-    junction/plus:
-      - "protobuf/snowfall/project/junction/plus"
-      - "python/snowfall/project/junction/plus"
     junction/go:
       - ".gitlab/junction"
       - "golang/cmd/gtfs-import"
@@ -23,6 +20,7 @@ commits:
       - "openapi/junction/client_api"
       - "protobuf/snowfall/project/junction"
       - "python/snowfall/project/junction"
+      - "python/snowfall/project/junction/go"
       - "svelte/junction-admin"
     junction/hub:
       - "svelte/hub-web"
@@ -32,6 +30,9 @@ commits:
       - "protobuf/snowfall/project/pay"
       - "python/snowfall/project/junction/api_automation/pay_api_tests"
       - "python/snowfall/project/pay"
+    junction/plus:
+      - "protobuf/snowfall/project/junction/plus"
+      - "python/snowfall/project/junction/plus"
     python:
       - "python"
     python/stdlib:

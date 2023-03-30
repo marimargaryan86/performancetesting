@@ -17,7 +17,7 @@ from snowfall.project.junction.go.adapter import (  # noqa: WPS235
     trip_searches,
     trips,
 )
-from snowfall.project.junction.service.client_api import includes
+from snowfall.project.junction.go.service.client_api import includes
 from snowfall.stdlib.integration.starlette import application
 
 

@@ -1,7 +1,7 @@
 from starlette import responses
 
 from snowfall.project.junction.go.adapter import places
-from snowfall.project.junction.service.client_api import resources
+from snowfall.project.junction.go.service.client_api import resources
 from snowfall.stdlib.integration.starlette import messages, models, pagination_helpers
 
 

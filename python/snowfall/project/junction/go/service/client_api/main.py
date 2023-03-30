@@ -21,8 +21,8 @@ from snowfall.project.junction.go.adapter import (
     trip_searches,
     trips,
 )
-from snowfall.project.junction.service.client_api import bootstrap, jwt
-from snowfall.project.junction.service.client_api.routes import router
+from snowfall.project.junction.go.service.client_api import bootstrap, jwt
+from snowfall.project.junction.go.service.client_api.routes import router
 from snowfall.project.junction.service.offers.v1alpha import grpc_pb2_grpc
 from snowfall.project.junction.service.orders.v1alpha import orders_pb2_grpc
 from snowfall.project.junction.service.places.v1alpha import places_pb2_grpc
