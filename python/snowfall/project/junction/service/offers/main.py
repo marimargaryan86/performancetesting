@@ -47,6 +47,8 @@ class _ImportSettings(service.Settings):
     payer_company_id: str
     payer_currency_code: str
     use_pay_for_currency_conversions: bool = False
+    pay_admin_username: str
+    pay_admin_password: str
 
 
 class _GatherPriceQuoteSettings(service.Settings):
@@ -56,6 +58,8 @@ class _GatherPriceQuoteSettings(service.Settings):
     payer_company_id: str
     payer_currency_code: str
     use_pay_for_currency_conversions: bool = False
+    pay_admin_username: str
+    pay_admin_password: str
 
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:

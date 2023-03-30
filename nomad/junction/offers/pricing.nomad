@@ -86,10 +86,18 @@ job "offers-pricing" {
     task "pricing" {
       driver = "docker"
 
+      vault {
+        policies = ["offers-${var.environment}"]
+      }
+
       template {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
+{{ with secret "kv/data/${var.environment}/offers" }}
+PAY_ADMIN_USERNAME={{ .Data.data.pay_admin_username }}
+PAY_ADMIN_PASSWORD={{ .Data.data.pay_admin_password }}
+{{ end }}
 EOH
         destination = "services.env"
         env         = true
