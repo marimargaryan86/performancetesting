@@ -38,7 +38,7 @@ async def test_add_currency(  # noqa: WPS218
         json.dumps(response_add_currency, indent=4),
     )
 
-    assert is_valid_uuid(response_add_currency["data"])
+    assert is_valid_uuid(response_add_currency["data"]["id"])
     assert response_add_currency["data"]["type"] == "balances"
     assert response_add_currency["data"]["attributes"]["amount"] == 0
     relationships = response_add_currency["data"]["relationships"]
