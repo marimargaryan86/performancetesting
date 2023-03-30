@@ -43,13 +43,13 @@ async def test_list_contacts(  # noqa: WPS210, WPS218
         json.dumps(rlc, indent=4),
     )
 
-    assert is_valid_uuid(rlc["data"]["id"])
-    assert rlc["data"]["id"] == contact_id
-    assert rlc["data"]["type"] == "contacts"
-    assert rlc["data"]["attributes"]["firstName"] == first_name
-    assert rlc["data"]["attributes"]["lastName"] == last_name
-    assert rlc["data"]["attributes"]["emailAddress"] == email_address
-    assert rlc["data"]["attributes"]["phoneNumber"] == phone_number
-    relationships = rlc["data"]["relationships"]
+    assert is_valid_uuid(rlc["data"][0]["id"])
+    assert rlc["data"][0]["id"] == contact_id
+    assert rlc["data"][0]["type"] == "contacts"
+    assert rlc["data"][0]["attributes"]["firstName"] == first_name
+    assert rlc["data"][0]["attributes"]["lastName"] == last_name
+    assert rlc["data"][0]["attributes"]["emailAddress"] == email_address
+    assert rlc["data"][0]["attributes"]["phoneNumber"] == phone_number
+    relationships = rlc["data"][0]["relationships"]
     assert is_valid_uuid(relationships["company"]["data"]["id"])
     assert relationships["company"]["data"]["type"] == "companies"
