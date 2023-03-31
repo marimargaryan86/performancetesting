@@ -4,26 +4,22 @@ from typing import AsyncGenerator
 import httpx
 import jwt
 
+from snowfall.stdlib.format import jsonapi
+from snowfall.vendor.junction import client as base_client
 
-class UserAuth(httpx.Auth):
+
+class UserAuth(base_client.BaseClient, httpx.Auth):
     def __init__(
         self,
         base_url: str,
         email: str,
         password: str,
+        client: httpx.AsyncClient | None = None,
     ):
-        self._base_url = base_url
         self._email = email
         self._password = password
         self._token = ""  # nosec
-        self._http_client = httpx.AsyncClient(
-            headers={
-                "Content-Type": "application/vnd.api+json",
-                "Accept": "application/vnd.api+json",
-            },
-            base_url=base_url,
-            http2=True,
-        )
+        super().__init__(base_url=base_url, client=client)
 
     async def async_auth_flow(
         self,
@@ -55,12 +51,12 @@ class UserAuth(httpx.Auth):
             },
         }
 
-        response = await self._http_client.post(
+        response = await self._client.post(
             url="/users/tokens",
             json=payload,
         )
 
         response.raise_for_status()
 
-        response_data = response.json()
-        return response_data["data"]["attributes"]["token"]
+        response_data = jsonapi.flatten_resource(response.json()["data"])
+        return response_data["token"]
