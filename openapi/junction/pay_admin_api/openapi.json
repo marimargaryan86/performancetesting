@@ -35,6 +35,12 @@
       ]
     },
     {
+      "name": "Beneficiaries",
+      "tags": [
+        "beneficiaries"
+      ]
+    },
+    {
       "name": "Contacts",
       "tags": [
         "contacts"
@@ -80,6 +86,11 @@
       "name": "balances",
       "description": "Account balances in different currencies",
       "x-displayName": "Balances"
+    },
+    {
+      "name": "beneficiaries",
+      "description": "Beneficiaries",
+      "x-displayName": "Beneficiaries"
     },
     {
       "name": "companies",
@@ -849,6 +860,63 @@
         }
       }
     },
+    "/beneficiaries": {
+      "post": {
+        "summary": "Create beneficiary",
+        "tags": [
+          "beneficiaries"
+        ],
+        "operationId": "post-beneficiaries",
+        "description": "Create beneficiary",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Beneficiary"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Beneficiary created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Beneficiary"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
     "/companies/{companyId}/contacts": {
       "get": {
         "summary": "List Contacts",
@@ -1319,6 +1387,114 @@
         ],
         "description": "Account schema."
       },
+      "Beneficiary": {
+        "title": "Beneficiary",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "example": "beneficiaries",
+            "enum": [
+              "beneficiaries"
+            ]
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "firstName": {
+                "type": "string",
+                "example": "FirstName",
+                "minLength": 1,
+                "maxLength": 150
+              },
+              "lastName": {
+                "type": "string",
+                "example": "lastName",
+                "minLength": 1,
+                "maxLength": 150
+              },
+              "bankAccountHolderName": {
+                "type": "string",
+                "example": "bankAccountHolderName",
+                "minLength": 1,
+                "maxLength": 150
+              },
+              "email": {
+                "type": "string",
+                "example": "example@email.com",
+                "format": "email",
+                "maxLength": 255
+              },
+              "accountNumber": {
+                "type": "string",
+                "description": "Bank account number",
+                "example": "00997950423807",
+                "pattern": "^\\d{1,17}$"
+              },
+              "beneficiaryAddress": {
+                "$ref": "#/components/schemas/AddressDetails"
+              },
+              "bankDetails": {
+                "$ref": "#/components/schemas/BankDetails"
+              }
+            },
+            "required": [
+              "firstName",
+              "lastName",
+              "bankAccountHolderName",
+              "email",
+              "accountNumber",
+              "beneficiaryAddress",
+              "bankDetails"
+            ]
+          },
+          "relationships": {
+            "type": "object",
+            "required": [
+              "currency",
+              "account"
+            ],
+            "properties": {
+              "currency": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/CurrencyIdentifier"
+                  }
+                }
+              },
+              "account": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/AccountIdentifier"
+                  }
+                }
+
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes",
+          "relationships"
+        ],
+        "description": "Beneficiary schema."
+      },
       "Contact": {
         "title": "Contact",
         "type": "object",
@@ -1374,13 +1550,13 @@
           },
           "relationships": {
             "type": "object",
+            "readOnly": true,
             "required": [
               "company"
             ],
             "properties": {
               "company": {
                 "type": "object",
-                "readOnly": true,
                 "required": [
                   "data"
                 ],
@@ -1418,15 +1594,77 @@
           "countryCode": {
             "type": "string",
             "format": "country",
-            "example": "GB"
+            "example": "GB",
+            "pattern": "^.{2,3}"
           },
           "postalCode": {
             "type": "string",
-            "example": "12345"
+            "example": "12345",
+            "pattern": "^.{1,255}"
           },
           "city": {
             "type": "string",
-            "example": "London"
+            "example": "London",
+            "pattern": "^.{1,255}"
+          },
+          "state": {
+            "type": "string",
+            "example": "California",
+            "pattern": "^.{1,255}"
+          }
+        }
+      },
+      "BankDetails": {
+        "title": "Bank Details",
+        "type": "object",
+        "required": [
+          "name",
+          "address",
+          "accountType",
+          "paymentTypes"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "BankName",
+            "minLength": 1,
+            "maxLength": 150
+          },
+          "bicSwift": {
+            "type": "string",
+            "description": "BIC/SWIFT code",
+            "example": "AAAABBCC123"
+          },
+          "aba": {
+            "type": "string",
+            "description": "AN ABA (American Bankers Association)",
+            "pattern": "^[0-9A-Z]{9}$",
+            "example": "123456789"
+          },
+          "iban": {
+            "type": "string",
+            "description": "IBAN code",
+            "example": "GB06 BARC 1231 4512 7782 32"
+          },
+          "accountType": {
+            "type": "string",
+            "enum": [
+              "checking",
+              "saving"
+            ],
+            "example": "saving"
+          },
+          "paymentTypes": {
+            "type": "string",
+            "example":"regular",
+            "enum": [
+              "priority",
+              "regular"
+            ],
+            "description": "'priority' (SWIFT) or 'regular' (local)"
+          },
+          "address": {
+            "$ref": "#/components/schemas/AddressDetails"
           }
         }
       },
@@ -1518,10 +1756,10 @@
           },
           "relationships": {
             "type": "object",
+            "readOnly": true,
             "properties": {
               "account": {
                 "type": "object",
-                "readOnly": true,
                 "required": [
                   "data"
                 ],
