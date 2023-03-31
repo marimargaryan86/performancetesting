@@ -21,6 +21,7 @@ from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.transport.http import auth
 from snowfall.vendor.junction.go import client
 
 
@@ -29,8 +30,8 @@ def _factory(
 ) -> Callable[[], applications.Starlette]:
     def decorator() -> applications.Starlette:
         junction_client = client.Client(
-            api_url=random.choice(app.settings.junction_api_address),  # nosec
-            token=app.settings.junction_api_token,
+            base_url=random.choice(app.settings.junction_api_address),  # nosec
+            auth=auth.TokenAuth(app.settings.junction_api_token),
         )
         fs_client = flight_stats_client.FlightStatusClient(
             api_url=random.choice(app.settings.flight_stats_api_address),  # nosec

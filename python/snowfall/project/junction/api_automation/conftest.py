@@ -18,6 +18,7 @@ from snowfall.project.junction.api_automation.test_functions.mobile_client impor
 from snowfall.project.junction.api_automation.test_functions.pay_admin_client import (
     PayAdminClient,
 )
+from snowfall.stdlib.transport.http import auth
 from snowfall.vendor.apilayer.client import APILayer
 from snowfall.vendor.junction.auth import UserAuth
 from snowfall.vendor.junction.go.client import Client as GoClient
@@ -189,9 +190,9 @@ def junction_client(
     junction_api_token = get_variable_value(host, api_token, "junction_api_token")
     client_timeout = 20
     return GoClient(
-        api_url=api_url,
-        token=junction_api_token,
-        client=httpx.AsyncClient(timeout=client_timeout),
+        base_url=api_url,
+        auth=auth.TokenAuth(junction_api_token),
+        client=httpx.AsyncClient(http2=True, timeout=client_timeout),
     )
 
 
@@ -208,8 +209,8 @@ def mobile_client(
     client_timeout = 20
 
     return MobileApiClient(
-        api_url=api_url,
-        token=mobile_token,
+        base_url=api_url,
+        auth=auth.TokenAuth(mobile_token),
         client=httpx.AsyncClient(timeout=client_timeout),
     )
 

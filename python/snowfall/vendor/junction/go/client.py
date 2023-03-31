@@ -3,9 +3,6 @@ import datetime
 import enum
 from typing import Any, Literal, Mapping, Sequence, cast
 
-import httpx
-
-from snowfall.stdlib.transport.http import auth
 from snowfall.vendor.junction import client as base_client
 from snowfall.vendor.junction.go import models
 
@@ -60,25 +57,10 @@ class LegType(enum.Enum):
 
 
 class _BaseClient(base_client.BaseClient):
-    def __init__(
-        self,
-        api_url: str,
-        token: str,
-        client: httpx.AsyncClient | None = None,
-    ) -> None:
-        self._api_url = api_url
-        self._token = token
-
-        super().__init__(
-            base_url=api_url,
-            auth=auth.TokenAuth(token),
-            client=client,
-        )
-
     def __repr__(self) -> str:
         return "{cls}({url}".format(
             cls=self.__class__.__name__,
-            url=self._api_url,
+            url=self._base_url,
         )
 
     async def _make_request(
@@ -283,32 +265,16 @@ class TripsClient(_BaseClient):
 
 class Client(_BaseClient):  # noqa: WPS214
     def legs(self) -> LegsClient:
-        return LegsClient(
-            api_url=self._api_url,
-            token=self._token,
-            client=self._client,
-        )
+        return LegsClient(base_url=str(self._base_url), client=self._client)
 
     def places(self) -> PlacesClient:
-        return PlacesClient(
-            api_url=self._api_url,
-            token=self._token,
-            client=self._client,
-        )
+        return PlacesClient(base_url=str(self._base_url), client=self._client)
 
     def segments(self) -> SegmentsClient:
-        return SegmentsClient(
-            api_url=self._api_url,
-            token=self._token,
-            client=self._client,
-        )
+        return SegmentsClient(base_url=str(self._base_url), client=self._client)
 
     def trips(self) -> TripsClient:
-        return TripsClient(
-            api_url=self._api_url,
-            token=self._token,
-            client=self._client,
-        )
+        return TripsClient(base_url=str(self._base_url), client=self._client)
 
     async def health(self) -> dict[str, Any]:
         return await self._make_request(

@@ -35,6 +35,7 @@ from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.grpc.client import create_channel
+from snowfall.stdlib.transport.http import auth
 from snowfall.vendor.junction.go import client
 
 
@@ -47,8 +48,8 @@ def _factory(
         )
         stripe.api_key = app.settings.stripe_api_key
         junction_client = client.Client(
-            api_url=random.choice(app.settings.junction_api_address),  # nosec
-            token=app.settings.junction_api_token,
+            base_url=random.choice(app.settings.junction_api_address),  # nosec
+            auth=auth.TokenAuth(app.settings.junction_api_token),
         )
         plus_http_client = plus_client.PlusClient(
             api_url=random.choice(app.settings.plus_api_address),  # nosec

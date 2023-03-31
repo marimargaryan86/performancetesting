@@ -150,7 +150,7 @@ def offer_search() -> offer_models_pb2.OfferSearch:
 
 @pytest.fixture
 def junction_client() -> client.Client:
-    return client.Client("", "")
+    return client.Client("")
 
 
 @pytest.fixture

@@ -340,10 +340,7 @@ def headers() -> dict[str, str]:
 
 @pytest.fixture()
 def junction_client() -> client.Client:
-    return client.Client(  # nosec
-        api_url=junction_api_address,
-        token="",
-    )
+    return client.Client(base_url=junction_api_address)
 
 
 @pytest.fixture()

@@ -16,6 +16,7 @@ from snowfall.project.junction.extensions.service.mobile_api import smtp
 from snowfall.project.junction.extensions.service.mobile_api.tasks import orders
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application
+from snowfall.stdlib.transport.http import auth
 from snowfall.vendor.junction.go import client
 
 
@@ -32,8 +33,8 @@ async def orders_report(app: service.Application[Settings]) -> None:
         app.settings.mongo_dsn,  # nosec
     )[app.name]
     junction_client = client.Client(
-        api_url=random.choice(app.settings.junction_api_address),  # nosec
-        token=app.settings.junction_api_token,
+        base_url=random.choice(app.settings.junction_api_address),  # nosec
+        auth=auth.TokenAuth(app.settings.junction_api_token),
     )
     smtp_cl = smtp.EmailClient(
         aiosmtplib.SMTP(
