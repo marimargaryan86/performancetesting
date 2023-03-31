@@ -1,5 +1,6 @@
 import copy
 import decimal
+from types import MappingProxyType
 from typing import Any, Mapping
 
 import httpx
@@ -26,8 +27,13 @@ from snowfall.stdlib.integration.starlette import request_helpers
 from snowfall.vendor.junction.go import client
 from snowfall.vendor.junction.go import models as vendor_models
 
+MIN_CHARGE = MappingProxyType(
+    {
+        "EUR": 50,
+        "SEK": 500,
+    },
+)
 _ID = "_id"
-_MIN_CHARGE = 500
 
 
 class MessageOrder(endpoints.HTTPEndpoint):
@@ -307,7 +313,7 @@ async def check_payment_amount_and_state(
     if voucher:
         quote_amount -= money.from_protobuf(voucher.price).amount
     return (
-        pi["amount"] == max(quote_amount, _MIN_CHARGE),
+        pi["amount"] == max(quote_amount, MIN_CHARGE[pi["currency"].upper()]),
         pi["status"] == "requires_capture",
     )
 

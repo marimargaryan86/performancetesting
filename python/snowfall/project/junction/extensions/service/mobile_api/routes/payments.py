@@ -6,6 +6,7 @@ from snowfall.project.junction.extensions.service.mobile_api import (
     repository,
     validators,
 )
+from snowfall.project.junction.extensions.service.mobile_api.routes import orders
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib import money
 from snowfall.stdlib.integration.starlette import models, request_helpers
@@ -17,7 +18,6 @@ _name_key = "name"
 _stripe_customer_id_key = "stripe_customer_id"
 _password_key = str("password")
 _stripe_version = "2020-08-27"
-_MIN_CHARGE = 500
 
 
 async def get_or_create_stripe_customer(
@@ -117,6 +117,9 @@ class Payment(endpoints.HTTPEndpoint):
 
             stripe.PaymentIntent.modify(
                 request.path_params["paymentIntentId"],
-                amount=max(new_amount, _MIN_CHARGE),
+                amount=max(
+                    new_amount,
+                    orders.MIN_CHARGE[payment_intent["currency"].upper()],
+                ),
             )
         return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
