@@ -206,6 +206,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                     for transfer_fare, transfer_change in zip(
                         transfer.fares,
                         transfer.changes,
+                        strict=True,
                     )
                 ],
                 segments=[

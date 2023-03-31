@@ -159,12 +159,12 @@ def _validate_order_request(
             *validation_errors,
             *_validate_residence_address(
                 quote.required_documents,
-                body.get("residenceAddress", None),
+                body.get("residenceAddress", {}),
                 quote.id,
             ),
             *_validate_passport_information(
                 quote.required_documents,
-                body.get("passengers", None),
+                body.get("passengers", []),
                 quote.id,
             ),
         ]

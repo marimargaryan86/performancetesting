@@ -147,7 +147,9 @@ class UpdateAccountTestCase(TestCase):  # noqa:WPS230
 
 
 @freezegun.freeze_time("2023-01-01 00:00:00")
-async def test_that_forgotten_password_with_existing_email_tracks_attempt_and_invokes_email_sending() -> None:  # noqa: B950
+async def test_that_forgotten_password_with_existing_email_tracks_attempt_and_invokes_email_sending() -> (  # noqa: B950
+    None
+):
     account = Account(firstname="FakeName", email="test@email.com", id=1)
     account_repository_mock = create_autospec(Repository, spec_set=True, instance=True)
 
@@ -196,7 +198,9 @@ async def test_that_forgotten_password_with_existing_email_tracks_attempt_and_in
     )
 
 
-async def test_that_reset_password_with_unused_token_updates_account_and_sets_token_to_used() -> None:  # noqa: B950
+async def test_that_reset_password_with_unused_token_updates_account_and_sets_token_to_used() -> (  # noqa: B950
+    None
+):
     raw_password = "a-password"  # nosec
     token = "a-token"  # nosec
     account_repository_mock = create_autospec(Repository, spec_set=True, instance=True)

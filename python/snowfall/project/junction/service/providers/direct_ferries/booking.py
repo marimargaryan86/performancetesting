@@ -67,7 +67,7 @@ def _fill_pax_details(
         if len(leg_obj.passengers) != len(task.passengers):
             raise PassengerCountNotMatchingError
 
-        pax_pairs = zip(leg_obj.passengers, task.passengers)
+        pax_pairs = zip(leg_obj.passengers, task.passengers, strict=True)
 
         for quote_passenger, order_passenger in pax_pairs:
             quote_passenger.first_name = order_passenger.first_name

@@ -115,7 +115,7 @@ class Orders(endpoints.HTTPEndpoint):
             passengers=_create_passengers(body["passengers"]),
             options=_create_trip_options(offer, price_quote),
             residence_address=_create_residence_address(
-                body.get("residenceAddress", None),
+                body.get("residenceAddress", {}),
             ),
             auth_token=request.scope.get("security", {"jwt": ""})["jwt"],
         )
@@ -177,7 +177,7 @@ class OrdersByJourney(endpoints.HTTPEndpoint):
             passengers=_create_passengers(body["passengers"]),
             options=_create_trip_options(offer, price_quote),
             residence_address=_create_residence_address(
-                body.get("residenceAddress", None),
+                body.get("residenceAddress", {}),
             ),
             auth_token=request.scope.get("security", {"jwt": ""})["jwt"],
         )

@@ -420,6 +420,7 @@ def get_journeys() -> list[order_models_pb2.Journey]:
             ORDERS,
             BOOKINGS,
             BOOKING_DETAILS,
+            strict=True,
         )
     ]
 

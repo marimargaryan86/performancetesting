@@ -169,8 +169,9 @@ class OfferParser(object):  # noqa: WPS214
         ]
 
         segment_details = []
+        segment_pairs = zip(duffel_segments, offer_segments, strict=True)
 
-        for duffel_segment, offer_segment in zip(duffel_segments, offer_segments):
+        for duffel_segment, offer_segment in segment_pairs:
             segment_details.append(
                 offer_models_pb2.OfferSegmentDetails(
                     id=string.uuid(),

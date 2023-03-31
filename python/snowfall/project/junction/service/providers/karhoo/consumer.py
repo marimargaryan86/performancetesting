@@ -64,12 +64,12 @@ class TripOfferSearchConsumer(object):  # noqa: WPS214
 
                 if leg.type != models_pb2.Schedule.TYPE_TAXI:
                     continue
-                quote = await self._request_quote(leg)
-                async for offer_group in self._handle_quote_to_offer_group(  # noqa: WPS352
-                    quote_id=quote.id,
+                offer_group_iterator = self._handle_quote_to_offer_group(
+                    quote_id=(await self._request_quote(leg)).id,
                     leg=leg,
                     segment=segment,
-                ):
+                )
+                async for offer_group in offer_group_iterator:
                     yield offer_group
 
     async def _request_quote(

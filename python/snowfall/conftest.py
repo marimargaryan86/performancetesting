@@ -192,7 +192,9 @@ async def trip_search_request(
 
 
 @pytest.fixture
-async def trip_candidate_search_request() -> trip_candidate_searches.TripCandidateSearchRequest:
+async def trip_candidate_search_request() -> (
+    trip_candidate_searches.TripCandidateSearchRequest
+):
     return trip_candidate_searches.TripCandidateSearchRequest(
         criteria=[],
         passengers=[],

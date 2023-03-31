@@ -15,7 +15,9 @@ from snowfall.project.pss.service.pss_api_v2.services.transactions import (
 )
 
 
-async def test_that_handle_post_transaction_throws_exception_when_multiple_passengers_in_same_seat_in_outbound() -> None:  # noqa:B950
+async def test_that_handle_post_transaction_throws_exception_when_multiple_passengers_in_same_seat_in_outbound() -> (  # noqa: B950
+    None
+):
     transaction_with_multiple_passengers_in_outbound_seat = TransactionPostSchema(
         directions={"outbound"},
         channel="desktop",
@@ -46,7 +48,9 @@ async def test_that_handle_post_transaction_throws_exception_when_multiple_passe
         )
 
 
-async def test_that_handle_post_transaction_throws_exception_when_multiple_passengers_in_same_seat_in_inbound() -> None:  # noqa:B950
+async def test_that_handle_post_transaction_throws_exception_when_multiple_passengers_in_same_seat_in_inbound() -> (  # noqa: B950
+    None
+):
     transaction_with_multiple_passengers_in_inbound_seat = TransactionPostSchema(
         directions={"inbound"},
         channel="desktop",

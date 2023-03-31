@@ -19,7 +19,6 @@ python_requirements(
         "python-dateutil": ["dateutil"],
         "python-hcl2": ["hcl2"],
         "python-rapidjson": ["rapidjson"],
-        "rfc3339-validator": ["rfc3339_validator"],
         "setuptools": ["easy_install", "pkg_resources", "setuptools"],
         "currency-cloud": ["currencycloud"],
         "allure-python-commons": ["allure"],
