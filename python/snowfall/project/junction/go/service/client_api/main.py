@@ -5,6 +5,7 @@ from typing import Callable
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
+from snowfall.adapter import authentication as auth
 from snowfall.project.junction.go.adapter import (
     errors,
     legs,
@@ -53,10 +54,18 @@ def _factory(
         schedules_channel = create_channel(
             random.choice(app.settings.schedules_address),  # nosec
         )
+        authentication_channel = create_channel(
+            random.choice(app.settings.authentication_address),  # nosec
+        )
 
         asgi_app = application.create_starlette_app(
             routes=router.get_routes(
                 bootstrap.create_dependencies(
+                    authentication_client=auth.GrpcClient(
+                        auth.auth_pb2_grpc.AuthenticationServiceStub(
+                            authentication_channel,
+                        ),
+                    ),
                     legs_client=legs.GrpcClient(
                         schedules=schedules_pb2_grpc.ScheduleServiceStub(
                             schedules_channel,

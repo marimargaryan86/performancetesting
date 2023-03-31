@@ -10,6 +10,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
+from snowfall.adapter import authentication as auth
 from snowfall.project.junction.go.adapter import (
     errors,
     legs,
@@ -28,10 +29,11 @@ from snowfall.project.junction.go.adapter import (
 )
 from snowfall.project.junction.go.service.client_api import bootstrap, jwt
 from snowfall.project.junction.go.service.client_api.routes import router
+from snowfall.service.authentication.v1alpha import models_pb2 as auth_models_pb2
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import cursor, filesystem
 
-jwt_token_version = "1"  # nosec
+jwt_token_version = "1.0.0"  # nosec
 jwt_payload = {"version": jwt_token_version, "client_id": "test"}
 public_exponent = 65537
 key_size = 2048
@@ -52,7 +54,32 @@ jwt_public_key_bytes = jwt_private_key.public_key().public_bytes(
 jwt_public_key = b64encode(jwt_public_key_bytes).decode()
 
 
+@pytest.fixture()
+def authentication_client() -> auth.Client:
+    return auth.DictClient(
+        private_key_content=b64encode(
+            jwt_private_key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.PKCS8,
+                encryption_algorithm=serialization.NoEncryption(),
+            ),
+        ).decode(),
+        jwt_token_version=jwt_token_version,
+    )
+
+
+@pytest.fixture()
+async def user(
+    authentication_client: auth.Client,
+) -> auth_models_pb2.User:
+    return await authentication_client.create_user(
+        email="example@example.com",
+        password="myPassword",  # nosec
+    )
+
+
 def _create_app(  # noqa: WPS211
+    authentication_client: auth.Client,
     legs_client: legs.Client,
     locations_client: locations.Client,
     places_client: places.Client,
@@ -72,6 +99,7 @@ def _create_app(  # noqa: WPS211
     app = application.create_starlette_app(
         routes=router.get_routes(
             bootstrap.create_dependencies(
+                authentication_client=authentication_client,
                 legs_client=legs_client,
                 locations_client=locations_client,
                 places_client=places_client,
@@ -106,6 +134,7 @@ def headers() -> dict[str, str]:
 
 @pytest.fixture()
 def app(  # noqa: WPS211
+    authentication_client: auth.DictClient,
     legs_client: legs.Client,
     locations_client: locations.Client,
     places_client: places.Client,
@@ -121,6 +150,7 @@ def app(  # noqa: WPS211
     schedules_client: schedules.Client,
 ) -> applications.Starlette:
     return _create_app(
+        authentication_client=authentication_client,
         custom_middlewares=[
             Middleware(
                 authentication.AuthenticationMiddleware,

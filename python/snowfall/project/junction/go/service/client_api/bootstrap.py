@@ -2,6 +2,7 @@ from typing import Sequence
 
 import lagom
 
+from snowfall.adapter import authentication
 from snowfall.project.junction.go.adapter import (  # noqa: WPS235
     legs,
     locations,
@@ -29,10 +30,12 @@ class Settings(application.Settings):
     orders_address: Sequence[str]
     trips_address: Sequence[str]
     schedules_address: Sequence[str]
+    authentication_address: Sequence[str]
     validate_responses_against_spec: bool = True
 
 
 def create_dependencies(  # noqa: WPS211
+    authentication_client: authentication.Client,
     legs_client: legs.Client,
     locations_client: locations.Client,
     places_client: places.Client,
@@ -48,6 +51,7 @@ def create_dependencies(  # noqa: WPS211
     schedules_client: schedules.Client,
 ) -> lagom.Container:
     container = lagom.Container()
+    container[authentication.Client] = authentication_client  # type: ignore[type-abstract]
     container[legs.Client] = legs_client  # type: ignore[type-abstract]
     container[locations.Client] = locations_client  # type: ignore[type-abstract]
     container[places.Client] = places_client  # type: ignore[type-abstract]

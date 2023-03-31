@@ -124,11 +124,12 @@ EOH
       }
 
       env {
-        ENV_NAME        = "${var.environment}"
-        GRPC_ADDRESS    = "0.0.0.0"
-        GRPC_PORT       = "${NOMAD_PORT_grpc}"
-        PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
-        SENTRY_DSN      = "https://e2ada9cd07e84150b39bfd606d7c4634@sentry.snowfall.se/53"
+        ENV_NAME          = "${var.environment}"
+        GRPC_ADDRESS      = "0.0.0.0"
+        GRPC_PORT         = "${NOMAD_PORT_grpc}"
+        PROMETHEUS_PORT   = "${NOMAD_PORT_prometheus}"
+        SENTRY_DSN        = "https://e2ada9cd07e84150b39bfd606d7c4634@sentry.snowfall.se/53"
+        JWT_TOKEN_VERSION = "1.0.0"
       }
     }
   }

@@ -26,10 +26,12 @@ class AuthenticationService(
         users: repository.UsersRepository,
         default_page_size: int,
         private_key_content: str,
+        jwt_token_version: str,
     ):
         self._default_page_size: int = default_page_size
         self._users: repository.UsersRepository = users
         self._jwt_encoder: JWTEncoder = JWTEncoder(
+            jwt_token_version=jwt_token_version,
             private_key_content=private_key_content,
         )
 

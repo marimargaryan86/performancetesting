@@ -5,6 +5,7 @@ from starlette import routing
 from snowfall.project.junction.go.adapter import places as places_adapter
 from snowfall.project.junction.go.service.client_api import resources
 from snowfall.project.junction.go.service.client_api.routes import (
+    authentication,
     legs,
     offers,
     orders,
@@ -232,4 +233,10 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             resource_factory=resources.CabinClassResource.from_proto,
             path="/cabin-classes",
         ).to_routes(),
+        integration.route(
+            "/users/tokens",
+            authentication.Authenticate,
+            name="Authenticate",
+            methods=["POST"],
+        ),
     ]

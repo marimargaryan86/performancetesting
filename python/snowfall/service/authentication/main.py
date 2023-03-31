@@ -16,6 +16,7 @@ class _GrpcSettings(service.Settings):
     default_page_size: int = 100
     jwt_private_key: str
     jwt_public_key: str
+    jwt_token_version: str
     mongo_dsn: Sequence[pydantic.AnyUrl]
 
 
@@ -32,6 +33,7 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
                 ),
                 default_page_size=app.settings.default_page_size,
                 private_key_content=app.settings.jwt_private_key,
+                jwt_token_version=app.settings.jwt_token_version,
             ),
         ],
     )

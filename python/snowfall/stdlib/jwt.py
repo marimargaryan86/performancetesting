@@ -11,10 +11,12 @@ class JWTEncoder(object):
 
     def __init__(
         self,
+        jwt_token_version: str,
         private_key_content: str = "",
         token_expiration: int = 3600,
         algorithm: str = "RS256",
     ):
+        self._jwt_token_version = jwt_token_version
         self._private_key_content = private_key_content
         self._token_expiration = token_expiration
         self._algorithm = algorithm
@@ -26,7 +28,9 @@ class JWTEncoder(object):
         """Generate JWT token."""
         jwt_info = {
             "user_info": payload,
+            "client_id": "client_id",  # TODO: make me dynamic or move to metadata obj
             "exp": datetime.utcnow() + timedelta(seconds=self._token_expiration),
+            "version": self._jwt_token_version,
         }
 
         b64_private_key = b64decode(self._private_key_content.encode()).decode()

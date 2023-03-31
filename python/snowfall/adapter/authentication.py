@@ -61,10 +61,14 @@ class DictClient(Client):
     def __init__(
         self,
         private_key_content: str,
+        jwt_token_version: str,
     ):
         self.email2user: dict[str, models_pb2.User] = {}
         self.id2user: dict[str, models_pb2.User] = {}
-        self._jwt_encoder = JWTEncoder(private_key_content=private_key_content)
+        self._jwt_encoder = JWTEncoder(
+            private_key_content=private_key_content,
+            jwt_token_version=jwt_token_version,
+        )
 
     async def authenticate(
         self,

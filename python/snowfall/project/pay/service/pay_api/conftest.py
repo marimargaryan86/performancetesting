@@ -310,6 +310,7 @@ def currencies_client() -> mock.Mock:
 def authentication_client() -> auth.DictClient:
     return auth.DictClient(
         private_key_content="private_key",
+        jwt_token_version="1.0.0",  # nosec
     )
 
 
