@@ -3,7 +3,7 @@ from typing import Sequence
 import lagom
 
 from snowfall.project.junction.go.adapter import locations, places
-from snowfall.project.junction.service.admin_api import includes
+from snowfall.project.junction.go.service.admin_api import includes
 from snowfall.stdlib.integration.starlette import application
 
 

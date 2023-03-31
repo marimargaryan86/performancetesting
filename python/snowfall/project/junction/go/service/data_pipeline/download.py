@@ -16,12 +16,12 @@ from typing import Any, Awaitable, Callable, Iterable, TypeAlias
 
 import httpx
 
-from snowfall.project.junction.service.data_pipeline.distribusion_plugin import (
+from snowfall.project.junction.go.service.data_pipeline.distribusion_plugin import (
     distribusion_plugin,
 )
-from snowfall.project.junction.service.data_pipeline.obb_plugin import obb_plugin
-from snowfall.project.junction.service.data_pipeline.sbb_plugin import sbb_plugin
-from snowfall.project.junction.service.data_pipeline.types import Dataset
+from snowfall.project.junction.go.service.data_pipeline.obb_plugin import obb_plugin
+from snowfall.project.junction.go.service.data_pipeline.sbb_plugin import sbb_plugin
+from snowfall.project.junction.go.service.data_pipeline.types import Dataset
 from snowfall.stdlib import service
 
 _PluginResult = Iterable[dict[str, Any]]

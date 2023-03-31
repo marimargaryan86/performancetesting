@@ -4,8 +4,8 @@ import lagom
 from starlette import endpoints, requests, responses, status
 
 from snowfall.project.junction.go.adapter import locations, places
-from snowfall.project.junction.service.admin_api import resources
-from snowfall.project.junction.service.admin_api.validators import (
+from snowfall.project.junction.go.service.admin_api import resources
+from snowfall.project.junction.go.service.admin_api.validators import (
     places as places_validator,
 )
 from snowfall.project.junction.service.places.v1alpha import models_pb2

@@ -5,7 +5,7 @@ import lagom
 from lagom.integrations import starlette
 from starlette import applications, routing, staticfiles, templating
 
-from snowfall.project.junction.service.dogfood_ui import routes
+from snowfall.project.junction.go.service.dogfood_ui import routes
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application
 from snowfall.stdlib.integration.starlette import routes as stdlib_routes

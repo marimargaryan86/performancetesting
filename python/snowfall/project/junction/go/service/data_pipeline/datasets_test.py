@@ -3,7 +3,7 @@ from pathlib import Path
 
 from pydantic import parse_obj_as
 
-from snowfall.project.junction.service.data_pipeline.download import Dataset
+from snowfall.project.junction.go.service.data_pipeline.download import Dataset
 
 DATASETS_PATH = Path(__file__).with_name("datasets.json")
 

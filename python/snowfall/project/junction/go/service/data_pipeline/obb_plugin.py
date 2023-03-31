@@ -9,7 +9,7 @@ from typing import Any, Iterator
 
 from httpx import AsyncClient
 
-from snowfall.project.junction.service.data_pipeline.types import Dataset
+from snowfall.project.junction.go.service.data_pipeline.types import Dataset
 
 
 async def _get_auth(sess: AsyncClient) -> str:

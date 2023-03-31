@@ -2,7 +2,7 @@ import lagom
 from lagom.integrations import starlette
 from starlette import routing
 
-from snowfall.project.junction.service.admin_api.routes import locations, places
+from snowfall.project.junction.go.service.admin_api.routes import locations, places
 
 
 def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
