@@ -23,7 +23,7 @@ API_BASE_URL = "https://ota2007a.micronnexus-staging.com/service.asmx"
 HASH = "1nK9DFF9"
 
 
-@pytest.fixture
+@pytest.fixture()
 def carnect_config() -> Config:
     return Config(
         timeout=TIMEOUT,
@@ -34,12 +34,12 @@ def carnect_config() -> Config:
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def http_client() -> httpx.AsyncClient:
     return httpx.AsyncClient(timeout=TIMEOUT)
 
 
-@pytest.fixture
+@pytest.fixture()
 def carnect_client(
     http_client: httpx.AsyncClient,
     carnect_config: Config,
@@ -47,7 +47,7 @@ def carnect_client(
     return CarnectClient(http_client=http_client, config=carnect_config)
 
 
-@pytest.fixture
+@pytest.fixture()
 async def offers(
     carnect_client: CarnectClient,
     carnect_config: Config,

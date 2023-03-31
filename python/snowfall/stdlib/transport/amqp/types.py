@@ -100,7 +100,7 @@ class Message(Generic[_Proto]):  # noqa: WPS214
         if self.processed:
             return
 
-        # todo: make sure we don't requeue forever?
+        # TODO: make sure we don't requeue forever?
         await self._message.nack(requeue=requeue)
         self.status = MessageStatus.requeued if requeue else MessageStatus.nacked
 

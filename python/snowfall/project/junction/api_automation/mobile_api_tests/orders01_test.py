@@ -16,7 +16,7 @@ from snowfall.project.junction.api_automation.test_functions.mobile_client impor
 from snowfall.vendor.junction.go import models
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_get_orders_status(  # noqa: WPS210
     mobile_client: MobileApiClient,
     origin: str,

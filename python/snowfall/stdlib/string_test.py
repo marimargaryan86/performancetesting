@@ -12,7 +12,7 @@ def test_random() -> None:
 
 
 @pytest.mark.parametrize(
-    "snake_case,expected",
+    ("snake_case", "expected"),
     [
         ("", ""),
         ("test", "test"),
@@ -31,7 +31,7 @@ def test_to_lower_camel(
 
 
 @pytest.mark.parametrize(
-    "snake_case,expected",
+    ("snake_case", "expected"),
     [
         ("", ""),
         ("test", "Test"),
@@ -50,7 +50,7 @@ def test_to_upper_camel(
 
 
 @pytest.mark.parametrize(
-    "camel_case,expected",
+    ("camel_case", "expected"),
     [
         ("", ""),
         ("test", "test"),

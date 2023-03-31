@@ -147,7 +147,7 @@ class SearchCriteriaConsumer(Generic[_Proto, _CriteriaType]):
         self,
         amqp_message: amqp_types.Message[_Proto],
     ) -> None:
-        # todo: shared protobuf, or type intersection support in Python
+        # TODO: shared protobuf, or type intersection support in Python
         if not hasattr(  # noqa: WPS421, WPS337
             amqp_message.body,
             "segments",

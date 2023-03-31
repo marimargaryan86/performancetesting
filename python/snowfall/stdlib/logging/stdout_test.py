@@ -24,7 +24,7 @@ class TestStructlog(object):
 
     @freezegun.freeze_time("2021-12-21 12:12:12.121212")
     @pytest.mark.parametrize(
-        "field,expected",
+        ("field", "expected"),
         [
             ("event", "test"),
             ("level", "info"),
@@ -136,7 +136,7 @@ class TestStructlog(object):
 
 class TestStandardLogger(object):
     @pytest.mark.parametrize(
-        "level, below",
+        ("level", "below"),
         [
             (logging.INFO, logging.DEBUG),
             (logging.WARN, logging.INFO),
@@ -159,7 +159,7 @@ class TestStandardLogger(object):
 
     @freezegun.freeze_time("2021-12-21 12:12:12.121212")
     @pytest.mark.parametrize(
-        "field,expected",
+        ("field", "expected"),
         [
             ("event", "test"),
             ("level", "info"),

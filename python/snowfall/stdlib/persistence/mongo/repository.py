@@ -144,7 +144,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
         *args: Any,
         **kwargs: Any,
     ) -> Any:
-        # todo: can't run this in __init__, but this isn't pretty...
+        # TODO: can't run this in __init__, but this isn't pretty...
         if not self._has_created_indexes:
             await self._create_indexes()
 

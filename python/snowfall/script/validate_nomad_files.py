@@ -76,7 +76,7 @@ def _validate_groups(
                     ),
                 )
 
-            # todo: validate services?
+            # TODO: validate services?
             has_errors = _validate_tasks(
                 template_path,
                 filename,

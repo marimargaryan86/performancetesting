@@ -143,7 +143,7 @@ def _assert_offer(  # noqa: WPS218
 
 
 @pytest.mark.parametrize(
-    "departure_time, expected",
+    ("departure_time", "expected"),
     [
         (
             datetime.time(hour=3, minute=45),

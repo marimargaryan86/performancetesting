@@ -35,13 +35,13 @@ def load_json_fixture(
         return json.load(file_handle)
 
 
-@pytest.fixture
+@pytest.fixture()
 async def http_client() -> AsyncIterator[httpx.AsyncClient]:
     async with httpx.AsyncClient() as http_client:
         yield http_client
 
 
-@pytest.fixture
+@pytest.fixture()
 def save_a_train_client(http_client: httpx.AsyncClient) -> client.SATClient:
     return client.SATClient(  # nosec
         email="test@snowfall.com",
@@ -56,19 +56,19 @@ def save_a_train_client(http_client: httpx.AsyncClient) -> client.SATClient:
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def train_station_repository() -> train_stations.TrainStationRepository:
     return train_stations.TrainStationRepository(
         train_stations=[],
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def provider_cabin_class_mapping() -> cabin_classes.CabinMappingRepository:
     return cabin_classes.CabinMappingRepository(collection=[])
 
 
-@pytest.fixture
+@pytest.fixture()
 def save_a_train_adapter(
     save_a_train_client: client.SATClient,
     train_station_repository: train_stations.TrainStationRepository,

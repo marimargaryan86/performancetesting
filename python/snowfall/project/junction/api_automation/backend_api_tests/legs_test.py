@@ -1,6 +1,6 @@
+import asyncio
 import json
 import logging
-import time
 from typing import Any
 
 import pytest
@@ -17,7 +17,7 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_get_leg_by_id(
     junction_client: Client,
     departure_after: str,
@@ -42,7 +42,7 @@ async def test_get_leg_by_id(
     assert leg_id == relationships["legs"]["data"][0]["id"], "leg_id should match"
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_get_leg_types(
     junction_client: Client,
     departure_after: str,
@@ -55,7 +55,7 @@ async def test_get_leg_types(
     assert leg_types == {"unspecified", "ferry", "air", "rail", "bus", "taxi"}
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_get_leg_type_by_id(
     junction_client: Client,
     departure_after: str,
@@ -92,7 +92,7 @@ async def return_get_segment_by_id_response(
         destination,
         origin,
     )
-    time.sleep(5)
+    await asyncio.sleep(5)
     r3 = await junction_client.segments().get_segment_by_id(
         await return_segment_id_from_trip_search_id(
             junction_client,

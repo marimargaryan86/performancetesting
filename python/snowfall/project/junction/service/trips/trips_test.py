@@ -12,7 +12,7 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2
 
 
-@pytest.fixture
+@pytest.fixture()
 def search_journey_response() -> planner_pb2.SearchJourneyResponse:
     return planner_pb2.SearchJourneyResponse(
         trips=[
@@ -64,7 +64,7 @@ async def test_trip_and_segments_repository(
     returned_trips = await trips_repo.find(["trip_1"], cursor="")
 
     assert (await anext(returned_trips)).id == "trip_1"
-    # @todo: test segments repository
+    # TODO: test segments repository
 
 
 async def _insert_trip_search(

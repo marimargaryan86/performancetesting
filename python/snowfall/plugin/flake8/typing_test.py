@@ -78,7 +78,7 @@ def union(input: Optional[str]) -> Optional[str]:
 
 
 @pytest.mark.parametrize(
-    "code,expected",
+    ("code", "expected"),
     [
         (_FAILING_LIST, 1),
         (_FAILING_LIST_TYPE, 1),

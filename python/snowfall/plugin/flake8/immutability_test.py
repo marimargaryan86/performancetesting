@@ -36,7 +36,7 @@ class Frozen:
 
 
 @pytest.mark.parametrize(
-    "code,expected",
+    ("code", "expected"),
     [
         (_FAILING_DATACLASS_NO_CALL, 1),
         (_FAILING_DATACLASS_NO_KWARG, 1),

@@ -1,7 +1,7 @@
+import asyncio
 import datetime
 import json
 import logging
-import time
 from typing import Sequence
 
 import pytest
@@ -18,7 +18,7 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_trip_offer_search_id(
     mobile_client: MobileApiClient,
     trip_ids: Sequence[str],
@@ -35,7 +35,7 @@ async def test_trip_offer_search_id(
     assert r3["data"]["id"]
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_trip_offer_search_offers(
     mobile_client: MobileApiClient,
     trip_ids: Sequence[str],
@@ -64,7 +64,7 @@ async def return_trip_offer_search_ids(
         destination,
         origin,
     )
-    time.sleep(10)
+    await asyncio.sleep(10)
 
     trip_offer_search_ids = []
     for trip_id in trip_ids:

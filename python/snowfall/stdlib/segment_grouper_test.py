@@ -20,7 +20,7 @@ class _IncrementalTime(object):
         return current
 
 
-@pytest.fixture
+@pytest.fixture()
 def h3_mapping() -> h3.H3MappingRepository[h3.MappedValue]:
     stub = mock.create_autospec(h3.H3MappingRepository)
     mocked_value = h3.CoordinatesItem(
@@ -34,14 +34,14 @@ def h3_mapping() -> h3.H3MappingRepository[h3.MappedValue]:
     return stub
 
 
-@pytest.fixture
+@pytest.fixture()
 def grouper(
     h3_mapping: h3.H3MappingRepository[h3.MappedValue],
 ) -> segment_grouper.SegmentGrouper:
     return segment_grouper.SegmentGrouper(h3_mapping)
 
 
-@pytest.fixture
+@pytest.fixture()
 def roundtrip() -> list[segment_grouper.SubTrip]:
     return [
         segment_grouper.SubTrip(
@@ -79,7 +79,7 @@ def _generate_trips(
 
 
 @pytest.mark.parametrize(
-    "trips, expected",
+    ("trips", "expected"),
     [
         (_generate_trips([[models_pb2.Schedule.TYPE_RAIL]]), 0),
         (
@@ -137,7 +137,7 @@ def test_trips_are_broken_into_sub_trips(
 
 
 @pytest.mark.parametrize(
-    "trips, expected_segments_count",
+    ("trips", "expected_segments_count"),
     [
         (_generate_trips([[models_pb2.Schedule.TYPE_RAIL]]), []),
         (
@@ -191,7 +191,7 @@ def test_sub_trips_segments_count(
 
 
 @pytest.mark.parametrize(
-    "sub_trips, expected",
+    ("sub_trips", "expected"),
     [
         (
             [

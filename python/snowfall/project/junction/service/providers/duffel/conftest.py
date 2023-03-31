@@ -26,12 +26,12 @@ _TTL_MINUTES = 15
 _PASSENGER_AGE = 30
 
 
-@pytest.fixture
+@pytest.fixture()
 def http_client() -> httpx.AsyncClient:
     return httpx.AsyncClient(timeout=_TIMEOUT)
 
 
-@pytest.fixture
+@pytest.fixture()
 def duffel_client(http_client: httpx.AsyncClient) -> client.DuffelClient:
     return client.DuffelClient(
         api_base_url=API_BASE_URL,
@@ -41,7 +41,7 @@ def duffel_client(http_client: httpx.AsyncClient) -> client.DuffelClient:
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def search_adapter(
     duffel_client: client.DuffelClient,
     redis_client: aioredis.Redis[bytes],
@@ -55,7 +55,7 @@ def search_adapter(
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def search_adapter_no_ba(
     duffel_client: client.DuffelClient,
     redis_client: aioredis.Redis[bytes],
@@ -70,7 +70,7 @@ def search_adapter_no_ba(
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def search_adapter_ba_only(
     duffel_client: client.DuffelClient,
     redis_client: aioredis.Redis[bytes],

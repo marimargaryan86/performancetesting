@@ -112,5 +112,5 @@ class SeatTypeEnum(enum.Enum):
     smoking = "smoking"
     # W - Window seat
     window = "window"
-    # TODO remove todo
+    # TODO: remove todo
     todo = "todo"

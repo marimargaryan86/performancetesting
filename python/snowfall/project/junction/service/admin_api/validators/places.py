@@ -21,7 +21,7 @@ async def validate_relationships(
     payload: Mapping[str, Any],
 ) -> ValidationResult:
     place_types, place_errors = _validate_types(payload)
-    # @todo: this should perhaps be done in the places service?
+    # TODO: this should perhaps be done in the places service?
     location_ids, location_errors = await _validate_locations(
         locations_client,
         payload,

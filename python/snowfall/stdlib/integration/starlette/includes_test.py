@@ -112,7 +112,8 @@ def _create_request(include_paths: Sequence[str] | None = None) -> requests.Requ
     )
 
 
-async def test_no_includes(_setup: None) -> None:
+@pytest.mark.usefixtures("_setup")
+async def test_no_includes() -> None:
     included = await includes.resolve_includes(
         models.Body(data=_test_data["foo"]),
         _create_request(),
@@ -121,7 +122,8 @@ async def test_no_includes(_setup: None) -> None:
     assert not included
 
 
-async def test_one_level_includes(_setup: None) -> None:
+@pytest.mark.usefixtures("_setup")
+async def test_one_level_includes() -> None:
     included = await includes.resolve_includes(
         models.Body(data=_test_data["foo"][0]),
         _create_request(["bars", "foo"]),
@@ -137,7 +139,8 @@ async def test_one_level_includes(_setup: None) -> None:
     assert composite_ids == expected
 
 
-async def test_two_level_includes(_setup: None) -> None:
+@pytest.mark.usefixtures("_setup")
+async def test_two_level_includes() -> None:
     included = await includes.resolve_includes(
         models.Body(data=_test_data["foo"][0]),
         _create_request(["bars", "foo", "foo.bars", "foo.foo"]),
@@ -155,7 +158,8 @@ async def test_two_level_includes(_setup: None) -> None:
     assert composite_ids == expected
 
 
-async def test_leaf_includes(_setup: None) -> None:
+@pytest.mark.usefixtures("_setup")
+async def test_leaf_includes() -> None:
     included = await includes.resolve_includes(
         models.Body(data=_test_data["foo"][0]),
         _create_request(["foo.bars", "foo.foo.bars"]),

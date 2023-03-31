@@ -87,12 +87,12 @@ class MagicMocker(object):
         )
 
 
-@pytest.fixture
+@pytest.fixture()
 def assert_all_responses_were_requested() -> bool:
     return False
 
 
-@pytest.fixture
+@pytest.fixture()
 async def airport_repository() -> airports.AirportRepository:
     loader = filesystem.PkgLoader(__name__)
 
@@ -101,12 +101,12 @@ async def airport_repository() -> airports.AirportRepository:
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def magic_mocker(httpx_mock: pytest_httpx.HTTPXMock) -> MagicMocker:
     return MagicMocker(httpx_mock)
 
 
-@pytest.fixture
+@pytest.fixture()
 async def http_client(magic_mocker: MagicMocker) -> AsyncIterator[httpx.AsyncClient]:
     async with httpx.AsyncClient(
         event_hooks={"request": [magic_mocker.magic_loader]},
@@ -114,7 +114,7 @@ async def http_client(magic_mocker: MagicMocker) -> AsyncIterator[httpx.AsyncCli
         yield http_client
 
 
-@pytest.fixture
+@pytest.fixture()
 def ask2go_client(http_client: httpx.AsyncClient) -> client.Ask2GoClient:
     return client.Ask2GoClient(
         api_base_url="https://test_url",
@@ -123,12 +123,12 @@ def ask2go_client(http_client: httpx.AsyncClient) -> client.Ask2GoClient:
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def mongo_client() -> motor_asyncio.AsyncIOMotorClient:
     return mongomock_motor.AsyncMongoMockClient()
 
 
-@pytest.fixture
+@pytest.fixture()
 def search_adapter(
     ask2go_client: client.Ask2GoClient,
 ) -> search.Adapter:
@@ -139,7 +139,7 @@ def search_adapter(
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def pricing_adapter(
     ask2go_client: client.Ask2GoClient,
 ) -> pricing.Adapter:
@@ -150,7 +150,7 @@ def pricing_adapter(
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def offer_transformer(
     airport_repository: airports.AirportRepository,
     provider_cabin_class_mapping: cabin_classes.CabinMappingRepository,
@@ -169,7 +169,7 @@ def offer_transformer(
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def h3_mapping_repository(
     airport_repository: airports.AirportRepository,
 ) -> h3.H3MappingRepository[airports.Airport]:
@@ -179,14 +179,14 @@ def h3_mapping_repository(
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def criteria_generator(
     h3_mapping_repository: h3.H3MappingRepository[airports.Airport],
 ) -> criteria.CriteriaGenerator:
     return criteria.CriteriaGenerator(h3_mapping=h3_mapping_repository)
 
 
-@pytest.fixture
+@pytest.fixture()
 def booking_handler(ask2go_client: client.Ask2GoClient) -> booking.BookingHandler:
     return booking.BookingHandler(
         ask2go_client=ask2go_client,
@@ -195,7 +195,7 @@ def booking_handler(ask2go_client: client.Ask2GoClient) -> booking.BookingHandle
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def provider_cabin_class_mapping(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> cabin_classes.CabinMappingRepository:

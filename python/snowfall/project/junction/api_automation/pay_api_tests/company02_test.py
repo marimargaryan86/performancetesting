@@ -15,7 +15,7 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_update_company(  # noqa: WPS210, WPS218
     pay_admin_client: PayAdminClient,
 ) -> None:

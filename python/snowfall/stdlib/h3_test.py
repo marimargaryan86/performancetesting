@@ -7,7 +7,7 @@ from snowfall.stdlib.v1alpha import models_pb2
 
 
 @pytest.mark.parametrize(
-    "coordinates, radius, expected_station_ids",
+    ("coordinates", "radius", "expected_station_ids"),
     [
         (
             models_pb2.Coordinates(

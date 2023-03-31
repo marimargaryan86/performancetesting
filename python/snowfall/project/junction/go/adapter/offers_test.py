@@ -50,7 +50,7 @@ class TestDictClient(object):
         assert offers_page.offers[0].id == fixtures.OFFERS[0]
 
     @pytest.mark.parametrize(
-        "types, expected",
+        ("types", "expected"),
         [
             (
                 [],
@@ -81,7 +81,7 @@ class TestDictClient(object):
 
 class TestGrpcClient(object):
     @pytest.mark.parametrize(
-        "error, expected",
+        ("error", "expected"),
         [
             (
                 grpc.aio.AioRpcError(

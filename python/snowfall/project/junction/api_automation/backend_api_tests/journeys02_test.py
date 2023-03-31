@@ -10,7 +10,7 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_get_journey_by_id(junction_client: Client) -> None:
     journey_ids = await return_journey_ids(junction_client)
 

@@ -11,7 +11,7 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_get_leg_by_id(
     junction_client: Client,
     departure_after: str,

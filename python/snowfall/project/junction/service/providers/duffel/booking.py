@@ -124,7 +124,7 @@ class BookingHandler(object):
         order_response = await self._client.order_request(order_request.build())
 
         try:
-            # todo: this should be handled in a separate service
+            # TODO: this should be handled in a separate service
             await self._notifier.send(
                 notifications.BookingNotification(task.metadata, order_response),
             )

@@ -181,7 +181,7 @@ class OrdersByJourney(endpoints.HTTPEndpoint):
             ),
             auth_token=request.scope.get("security", {"jwt": ""})["jwt"],
         )
-        # todo: Expire (delete) the offer the order was placed for.
+        # TODO: Expire (delete) the offer the order was placed for.
 
         return await messages.create_response(
             body=models.Body(

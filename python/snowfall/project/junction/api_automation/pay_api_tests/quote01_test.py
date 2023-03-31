@@ -17,7 +17,7 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_create_quote(  # noqa: WPS218
     pay_admin_client: PayAdminClient,
     pay_client: Client,

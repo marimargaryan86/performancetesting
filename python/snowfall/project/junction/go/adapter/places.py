@@ -135,7 +135,7 @@ class GrpcClient(Client):
         limit: int | None = None,
         cursor: str | None = None,
     ) -> places_pb2.ListPlacesResponse:
-        # todo: handle INVALID_ARGUMENT
+        # TODO: handle INVALID_ARGUMENT
         request = places_pb2.ListPlacesRequest(
             page_token=cursor or "",
         )

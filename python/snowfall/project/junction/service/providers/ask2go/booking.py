@@ -162,7 +162,7 @@ class BookingHandler(object):
                     gender=models.gender_from_proto(passenger.gender),
                     type=criteria.get_passenger_type(
                         protobuf.protobuf_to_date(passenger.date_of_birth),
-                        datetime.date.today(),  # todo: date of travel
+                        datetime.date.today(),  # TODO: date of travel
                     ),
                     birth_date=protobuf.protobuf_to_date(passenger.date_of_birth),
                     traveler_document=models.traveler_document_from_proto(
@@ -197,7 +197,7 @@ class BookingHandler(object):
         self._validate_booking_is_done(booking_result)
 
         try:
-            # todo: this should be handled in a separate service
+            # TODO: this should be handled in a separate service
             await self._notifier.send(
                 notifications.BookingNotification(metadata, booking_result),
             )

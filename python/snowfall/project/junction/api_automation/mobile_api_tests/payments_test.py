@@ -6,13 +6,13 @@ from snowfall.project.junction.api_automation.test_functions.mobile_client impor
 )
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_create_payment(mobile_client: MobileApiClient) -> None:
     resp = await with_log(mobile_client.create_payment)(currency="EUR", amount="3.14")
     assert "id" in resp["data"]
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_update_payment(mobile_client: MobileApiClient) -> None:
     resp = await with_log(mobile_client.create_payment)(currency="EUR", amount="3.14")
     payment_id = resp["data"]["id"]

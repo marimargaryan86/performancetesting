@@ -35,7 +35,7 @@ SessionTesting = async_sessionmaker(
 )
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 async def db_session() -> AsyncGenerator[async_sessionmaker[AsyncSession], None]:
     async with engine.begin() as create_conn:
         await create_conn.run_sync(Base.metadata.create_all)
@@ -44,7 +44,7 @@ async def db_session() -> AsyncGenerator[async_sessionmaker[AsyncSession], None]
         await drop_conn.run_sync(Base.metadata.drop_all)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def fast_api_app() -> applications.Starlette:
     app = FastAPI()
     app.include_router(api_router)
@@ -63,7 +63,7 @@ def mock_settings() -> Settings:
     )
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 async def client(
     fast_api_app: FastAPI,
     db_session: async_sessionmaker[AsyncSession],
@@ -83,7 +83,7 @@ async def client(
         yield client
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def account_factory(
     db_session: async_sessionmaker[AsyncSession],
 ) -> type[AsyncSQLAlchemyFactory]:
@@ -115,7 +115,7 @@ def account_factory(
     return AccountFactory
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def country_factory(
     db_session: async_sessionmaker[AsyncSession],
 ) -> type[AsyncSQLAlchemyFactory]:
@@ -132,7 +132,7 @@ def country_factory(
     return CountryFactory
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def account_forgotten_password_factory(
     db_session: async_sessionmaker[AsyncSession],
 ) -> type[AsyncSQLAlchemyFactory]:

@@ -13,7 +13,7 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_places(
     junction_client: Client,
     departure_after: str,
@@ -24,7 +24,7 @@ async def test_places(
     assert is_valid_uuid(r1["data"][0]["id"], 5) is True, "no place returned!"
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_places_place_id(
     junction_client: Client,
     departure_after: str,
@@ -44,7 +44,7 @@ async def test_places_place_id(
     logging.info("get_place_by_id: %s", json.dumps(r2, indent=4))
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_get_places_types(
     junction_client: Client,
     departure_after: str,
@@ -61,7 +61,7 @@ async def test_get_places_types(
         assert "https" in data_item["links"]["self"]
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_get_places_type(
     junction_client: Client,
     departure_after: str,

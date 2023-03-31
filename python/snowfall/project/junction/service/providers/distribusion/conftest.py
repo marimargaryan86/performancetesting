@@ -24,12 +24,12 @@ disable_by_default = pytest.mark.skipif(
 )
 
 
-@pytest.fixture
+@pytest.fixture()
 def http_client() -> httpx.AsyncClient:
     return with_logging(httpx.AsyncClient(timeout=TIMEOUT))
 
 
-@pytest.fixture
+@pytest.fixture()
 def distribusion_client(http_client: httpx.AsyncClient) -> client.DistribusionClient:
     return client.DistribusionClient(
         api_base_url=API_BASE_URL,
@@ -39,21 +39,21 @@ def distribusion_client(http_client: httpx.AsyncClient) -> client.DistribusionCl
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 async def station_repository() -> stations.StationRepository:
     return stations.StationRepository(
         stations=await stations.load_stations(),
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def offer_cache(redis_client: aioredis.Redis[bytes]) -> cache.OffersCache:
     return cache.OffersCache(
         client=redis.Client(redis_client),
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def distribusion_search_adapter(
     distribusion_client: client.DistribusionClient,
     offer_cache: cache.OffersCache,

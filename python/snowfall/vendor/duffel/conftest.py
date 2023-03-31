@@ -12,12 +12,12 @@ TIMEOUT = 50.0
 API_BASE_URL = "https://api.duffel.com"
 
 
-@pytest.fixture
+@pytest.fixture()
 def http_client() -> httpx.AsyncClient:
     return with_logging(httpx.AsyncClient(timeout=TIMEOUT))
 
 
-@pytest.fixture
+@pytest.fixture()
 def duffel_client(http_client: httpx.AsyncClient) -> client.DuffelClient:
     return client.DuffelClient(
         api_base_url=API_BASE_URL,

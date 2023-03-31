@@ -6,17 +6,17 @@ from snowfall.project.junction.go.adapter import passenger_name_records
 from snowfall.project.junction.service.orders import orders
 
 
-@pytest.fixture
+@pytest.fixture()
 def mongo_client() -> motor_asyncio.AsyncIOMotorClient:
     return mongomock_motor.AsyncMongoMockClient()
 
 
-@pytest.fixture
+@pytest.fixture()
 def pnr_client() -> passenger_name_records.Client:
     return passenger_name_records.DictClient([])
 
 
-@pytest.fixture
+@pytest.fixture()
 def journey_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
     pnr_client: passenger_name_records.Client,
@@ -27,7 +27,7 @@ def journey_repository(
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def order_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> orders.OrderRepository:
@@ -36,7 +36,7 @@ def order_repository(
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def booking_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> orders.BookingRepository:
@@ -45,7 +45,7 @@ def booking_repository(
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def booking_details_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> orders.BookingDetailsRepository:

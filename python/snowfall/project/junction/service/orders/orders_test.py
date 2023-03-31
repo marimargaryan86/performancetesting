@@ -5,7 +5,7 @@ from snowfall.project.junction.service.orders import orders
 from snowfall.project.junction.service.orders.v1alpha import models_pb2
 
 
-@pytest.fixture
+@pytest.fixture()
 async def order(
     journey_repository: orders.JourneyRepository,
     order_repository: orders.OrderRepository,

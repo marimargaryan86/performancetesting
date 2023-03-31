@@ -14,7 +14,7 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_get_offer_option_detail_rules(  # noqa: WPS210
     junction_client: Client,
     departure_after: str,

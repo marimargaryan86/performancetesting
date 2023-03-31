@@ -55,7 +55,7 @@ def _get_before_processors() -> list[Processor]:
         filtering_processor,
         structlog.stdlib.add_logger_name,
         structlog.stdlib.add_log_level,
-        # todo: Add prometheus_level_processor,
+        # TODO: Add prometheus_level_processor,
         structlog.processors.TimeStamper(fmt="iso"),
     ]
 

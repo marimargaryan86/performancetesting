@@ -25,7 +25,7 @@ logger.setLevel(logging.DEBUG)
 EXIT_MSG = "Exiting ; check your logs"
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_create_contacts(  # noqa: WPS210, WPS218
     pay_admin_client: PayAdminClient,
 ) -> None:

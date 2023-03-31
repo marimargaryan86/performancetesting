@@ -88,7 +88,7 @@ class Proxy(object):
                 scheme="https" if request.url.is_secure else "http",
                 host=request.url.hostname,
                 port=request.url.port,
-                # todo: take prefix into consideration
+                # TODO: take prefix into consideration
             ),
         ).encode()
 

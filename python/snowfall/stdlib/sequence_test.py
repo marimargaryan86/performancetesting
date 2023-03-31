@@ -8,7 +8,7 @@ _LIMIT = 2
 
 
 @pytest.mark.parametrize(
-    "input_data,expected",
+    ("input_data", "expected"),
     [
         (["foobar"], ["foobar"]),
         (("foobar",), ("foobar",)),

@@ -11,7 +11,7 @@ from snowfall.project.junction.api_automation.test_functions.mobile_client impor
 )
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_places_place_id(
     mobile_client: MobileApiClient,
 ) -> None:

@@ -11,7 +11,7 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_list_cabin_classes(
     protocol: str,
     host: str,
@@ -29,7 +29,7 @@ async def test_list_cabin_classes(
     assert set(cabin_classes) == expected_classes
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_get_cabin_class(
     mobile_client: MobileApiClient,
 ) -> None:

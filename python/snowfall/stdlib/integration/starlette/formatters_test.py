@@ -8,7 +8,7 @@ from openapi_core.unmarshalling.schemas import (
 from snowfall.stdlib.integration.starlette import formatters
 
 
-@pytest.fixture
+@pytest.fixture()
 def formats_unmarshaller() -> unmarshallers.FormatsUnmarshaller:
     return unmarshallers.FormatsUnmarshaller(
         format_unmarshallers=oas30_format_unmarshallers,
@@ -17,8 +17,8 @@ def formats_unmarshaller() -> unmarshallers.FormatsUnmarshaller:
 
 
 @pytest.mark.parametrize(
-    "schema_format,input_value",
-    (
+    ("schema_format", "input_value"),
+    [
         ("country", "GB"),
         ("currency", "SEK"),
         ("date-time", "2022-07-12T22:06:59Z"),
@@ -26,7 +26,7 @@ def formats_unmarshaller() -> unmarshallers.FormatsUnmarshaller:
         ("phone", "+46737425447"),
         ("uri", "https://example.com"),
         ("uuid", "1a5f9d4e-d8d5-4230-a1af-888a52ea98e8"),
-    ),
+    ],
 )
 def test_valid_formats(
     formats_unmarshaller: unmarshallers.FormatsUnmarshaller,
@@ -37,8 +37,8 @@ def test_valid_formats(
 
 
 @pytest.mark.parametrize(
-    "schema_format,input_value",
-    (
+    ("schema_format", "input_value"),
+    [
         ("country", "UK"),
         ("currency", "XYZ"),
         ("date-time", "2022-07-12T22:06:59"),
@@ -47,7 +47,7 @@ def test_valid_formats(
         ("phone", "0046737425447"),
         ("uri", "example.com"),
         ("uuid", "foobar"),
-    ),
+    ],
 )
 def test_invalid_formats(
     formats_unmarshaller: unmarshallers.FormatsUnmarshaller,

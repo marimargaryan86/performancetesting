@@ -1,3 +1,5 @@
+import pytest
+
 from snowfall.vendor.currency_cloud.client import PaymentClient
 from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
 from snowfall.vendor.currency_cloud.models import account, contact
@@ -46,25 +48,19 @@ def test_permission_error_contact_write(
     payment_client_permission_contact_issue: PaymentClient,
     contact_request: contact.ContactRequest,
 ) -> None:
-    try:
+    with pytest.raises(
+        CurrencyCloudError,
+        match="You do not have permission 'contact_write' to perform this operation",
+    ):
         payment_client_permission_contact_issue.create_contact(contact_request)
-    except CurrencyCloudError as exc:
-        assert (
-            exc.message
-            == "You do not have permission 'contact_write' to perform this operation"
-        )
-        assert exc.status == 400
 
 
 def test_permission_error_account_write(
     payment_client_permission_account_issue: PaymentClient,
     account_request: account.AccountRequest,
 ) -> None:
-    try:
+    with pytest.raises(
+        CurrencyCloudError,
+        match="You do not have permission 'account_write' to perform this operation",
+    ):
         payment_client_permission_account_issue.create_account(account_request)
-    except CurrencyCloudError as exc:
-        assert (
-            exc.message
-            == "You do not have permission 'account_write' to perform this operation"
-        )
-        assert exc.status == 400

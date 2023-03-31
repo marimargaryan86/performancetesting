@@ -10,7 +10,7 @@ def _transform(dict_value: str) -> str:
 
 
 @pytest.mark.parametrize(
-    "input_dict,path,expected",
+    ("input_dict", "path", "expected"),
     [
         ({"foo": "bar"}, "foo", {"foo": "BAR"}),
         ({"foo": {"bar": "baz"}}, "foo.bar", {"foo": {"bar": "BAZ"}}),

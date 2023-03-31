@@ -39,15 +39,19 @@
 //     "fakeredis==2.10.2",
 //     "fastapi==0.95.0",
 //     "flake8-annotations==2.9.1",
+//     "flake8-async==22.11.14",
 //     "flake8-builtins==2.1.0",
+//     "flake8-deprecated==2.0.1",
 //     "flake8-executable==2.1.3",
 //     "flake8-if-expr==1.0.4",
 //     "flake8-logging-format==0.9.0",
 //     "flake8-noqa==1.3.1",
 //     "flake8-pie==0.16.0",
 //     "flake8-print==5.0.0",
+//     "flake8-pytest-style==1.7.2",
 //     "flake8-simplify==0.20.0",
 //     "flake8-tidy-imports==4.8.0",
+//     "flake8-todos==0.2.1",
 //     "flake8==4.0.1",
 //     "freezegun==1.2.2",
 //     "furl==2.1.3",
@@ -1529,6 +1533,26 @@
           "artifacts": [
             {
               "algorithm": "sha256",
+              "hash": "317cf0f882a2f4a09c2250c451acff8358d7faec8a0aa54521b6e69336fe9d0b",
+              "url": "https://files.pythonhosted.org/packages/1c/8b/8f9fc10b788e3d2bf851fd6fed6752fd8828bec95cdde1269182b24d4cb5/flake8_async-22.11.14-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "b4db2d55883653b47d4bfd946fdf506e8958bb4ca35974790b8c3e620fc1abff",
+              "url": "https://files.pythonhosted.org/packages/02/1c/7e8aac702377707a99cb00a246053e3c3e2d03150fb4551976432914a321/flake8-async-22.11.14.tar.gz"
+            }
+          ],
+          "project_name": "flake8-async",
+          "requires_dists": [
+            "flake8"
+          ],
+          "requires_python": ">=3.7",
+          "version": "22.11.14"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
               "hash": "61b617f4f7cdaa0e2b1e6bf7b68afb2b619a227bb3e3ae00dd36c213bd17900a",
               "url": "https://files.pythonhosted.org/packages/14/d6/f9849f7cc947c5d74662d7b03e1e5e459e92f9663441d3ec471956007b22/flake8_bandit-3.0.0-py2.py3-none-any.whl"
             },
@@ -1676,6 +1700,27 @@
           ],
           "requires_python": ">=3.7",
           "version": "4.1.2"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "8c61d2cb8d487118b6c20392b25f08ba1ec49c759e4ea562c7a60172912bc7ee",
+              "url": "https://files.pythonhosted.org/packages/96/e4/e6ed68b979a07d00bd4613307fa326cba8f7baac9707fb60e0ac30dd6579/flake8_deprecated-2.0.1-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "c7659a530aa76c3ad8be0c1e8331ed56d882ef8bfba074501a545bb3352b0c23",
+              "url": "https://files.pythonhosted.org/packages/cc/70/28810547672156812dfb4007ce4ca89fe5a3336112429adf694e17ee6488/flake8-deprecated-2.0.1.tar.gz"
+            }
+          ],
+          "project_name": "flake8-deprecated",
+          "requires_dists": [
+            "flake8",
+            "pytest; extra == \"test\""
+          ],
+          "requires_python": ">=3.7",
+          "version": "2.0.1"
         },
         {
           "artifacts": [
@@ -1927,6 +1972,26 @@
           "artifacts": [
             {
               "algorithm": "sha256",
+              "hash": "f5d2aa3219163a052dd92226589d45fab8ea027a3269922f0c4029f548ea5cd1",
+              "url": "https://files.pythonhosted.org/packages/93/15/5913a4648be760cac5e7e7b135cce1be836a2e7cea564915f1a62ec19b3a/flake8_pytest_style-1.7.2-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "b924197c99b951315949920b0e5547f34900b1844348432e67a44ab191582109",
+              "url": "https://files.pythonhosted.org/packages/c0/6b/12c40bbb136b0423485f5b4ac5939fb984ddbe85f38e6ed484472a89692d/flake8_pytest_style-1.7.2.tar.gz"
+            }
+          ],
+          "project_name": "flake8-pytest-style",
+          "requires_dists": [
+            "flake8-plugin-utils<2.0.0,>=1.3.2"
+          ],
+          "requires_python": "<4.0.0,>=3.7.2",
+          "version": "1.7.2"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
               "hash": "6e26892b632dacba517bf27219c459a8396dcfac0f5e8204904c5a4ba9b480e1",
               "url": "https://files.pythonhosted.org/packages/88/89/7c5a8e671c17ae49e4b89b06d9d2db5608eea7c66b04d70d27390da9ddb9/flake8-quotes-3.3.2.tar.gz"
             }
@@ -2022,6 +2087,29 @@
           ],
           "requires_python": ">=3.7",
           "version": "4.8.0"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "3f8d42e40bac021bfb9162e155662419271e6616491ed2e16c318e04e74228b7",
+              "url": "https://files.pythonhosted.org/packages/37/2d/82b2d0af411b615442fc3b59bdc69507858702c9a03d4fb2ddbcf5b17867/flake8_todos-0.2.1-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "bdeeaed293497c5f16c4504805f3dbc84bf54d52f6ad4c06867c869c8bc38e3e",
+              "url": "https://files.pythonhosted.org/packages/13/12/e7874ace9db7d465f9d026358cc81ae1c1f7691968a59237ef98940ca12f/flake8-todos-0.2.1.tar.gz"
+            }
+          ],
+          "project_name": "flake8-todos",
+          "requires_dists": [
+            "flake8",
+            "isort[pyproject]; extra == \"dev\"",
+            "pycodestyle",
+            "pytest; extra == \"dev\""
+          ],
+          "requires_python": ">=3.8",
+          "version": "0.2.1"
         },
         {
           "artifacts": [
@@ -6117,15 +6205,19 @@
     "fakeredis==2.10.2",
     "fastapi==0.95.0",
     "flake8-annotations==2.9.1",
+    "flake8-async==22.11.14",
     "flake8-builtins==2.1.0",
+    "flake8-deprecated==2.0.1",
     "flake8-executable==2.1.3",
     "flake8-if-expr==1.0.4",
     "flake8-logging-format==0.9.0",
     "flake8-noqa==1.3.1",
     "flake8-pie==0.16.0",
     "flake8-print==5.0.0",
+    "flake8-pytest-style==1.7.2",
     "flake8-simplify==0.20.0",
     "flake8-tidy-imports==4.8.0",
+    "flake8-todos==0.2.1",
     "flake8==4.0.1",
     "freezegun==1.2.2",
     "furl==2.1.3",

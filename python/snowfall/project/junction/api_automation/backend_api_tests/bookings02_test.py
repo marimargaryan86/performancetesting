@@ -9,7 +9,7 @@ from snowfall.project.junction.api_automation.test_functions.helpers_api import 
 from snowfall.vendor.junction.go.client import Client
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_list_booking_details_by_booking_id(
     junction_client: Client,
 ) -> None:

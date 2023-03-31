@@ -18,7 +18,7 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_create_offer_quote(
     junction_client: Client,
     departure_after: str,

@@ -7,7 +7,7 @@ from snowfall.stdlib import time
 
 
 @pytest.mark.parametrize(
-    "current,date_of_birth,age",
+    ("current", "date_of_birth", "age"),
     [
         (datetime.date(2022, 10, 25), datetime.date(1990, 10, 25), 32),
         (datetime.date(2022, 9, 25), datetime.date(1990, 10, 25), 31),

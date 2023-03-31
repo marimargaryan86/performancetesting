@@ -76,7 +76,7 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             trips.TripSegments,
             name="ListTripSegments",
         ),
-        # todo: add GET /trips/{tripId}/prices
+        # TODO: add GET /trips/{tripId}/prices
         integration.route(
             "/trips/searches/{tripSearchId}",
             trips.TripSearch,
@@ -87,7 +87,7 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             legs.LegsByTripSearchId,
             name="ListLegsByTripSearchId",
         ),
-        # todo: add GET /trips/searches/{tripSearchId}/segments
+        # TODO: add GET /trips/searches/{tripSearchId}/segments
         integration.route(
             "/trips/searches/{tripSearchId}/trips",
             trips.TripsByTripSearch,
@@ -115,7 +115,7 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             offers.OffersByOfferSearch,
             name="ViewOffersByOfferSearch",
         ),
-        # todo: add GET /offers/searches/{offerSearchId}/related
+        # TODO: add GET /offers/searches/{offerSearchId}/related
         integration.route(
             "/offers/quotes",
             offers.PriceQuotes,

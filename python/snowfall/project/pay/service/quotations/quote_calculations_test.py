@@ -5,7 +5,7 @@ from snowfall.project.pay.service.quotations.quote_calculations import Quote
 from snowfall.stdlib import money
 
 
-@pytest.fixture
+@pytest.fixture()
 def company() -> company_models.Company:
     return company_models.Company(
         name="Snowfall",

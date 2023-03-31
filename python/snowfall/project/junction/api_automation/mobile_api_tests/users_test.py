@@ -6,7 +6,7 @@ from snowfall.project.junction.api_automation.test_functions.mobile_client impor
 )
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_create_users(mobile_client: MobileApiClient) -> None:
     resp = await mobile_client.create_users(  # nosec
         first_name="John",
@@ -20,7 +20,7 @@ async def test_create_users(mobile_client: MobileApiClient) -> None:
     assert user_id
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_create_users_session(mobile_client: MobileApiClient) -> None:
     resp = await mobile_client.create_users_session(  # nosec
         password="Snowfall",
@@ -31,7 +31,7 @@ async def test_create_users_session(mobile_client: MobileApiClient) -> None:
     assert user_session_id
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_create_verification_code(mobile_client: MobileApiClient) -> None:
     resp = await mobile_client.create_verification_code(
         email="arega_y@snowfalltravel.com",
@@ -41,7 +41,7 @@ async def test_create_verification_code(mobile_client: MobileApiClient) -> None:
     assert verification_code
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_verification_code_status(mobile_client: MobileApiClient) -> None:
     resp = await with_log(mobile_client.get_verification_code)(
         email="arega_y@snowfalltravel.com",
@@ -52,7 +52,7 @@ async def test_verification_code_status(mobile_client: MobileApiClient) -> None:
     assert verification_code
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_update_password(mobile_client: MobileApiClient) -> None:
     user_id = "???"
     resp = await mobile_client.update_password(  # nosec
@@ -63,7 +63,7 @@ async def test_update_password(mobile_client: MobileApiClient) -> None:
     assert resp["data"]["id"] == user_id
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_update_user(mobile_client: MobileApiClient) -> None:
     user_id = "???"
     resp = await mobile_client.update_user(

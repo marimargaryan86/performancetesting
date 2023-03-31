@@ -13,7 +13,7 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_get_offer_group_details_by_offer_group_id(
     junction_client: Client,
     departure_after: str,

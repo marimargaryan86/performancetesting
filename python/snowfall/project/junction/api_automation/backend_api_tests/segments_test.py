@@ -1,6 +1,6 @@
+import asyncio
 import json
 import logging
-import time
 
 import pytest
 
@@ -16,7 +16,7 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_get_segment_by_id(
     junction_client: Client,
     departure_after: str,
@@ -31,7 +31,7 @@ async def test_get_segment_by_id(
     )
     assert is_valid_uuid(trip_search_id) is True, "trip_search_id uuid in v4 format"
 
-    time.sleep(5)
+    await asyncio.sleep(5)
 
     segment_id = await return_segment_id_from_trip_search_id(
         junction_client,
@@ -50,7 +50,7 @@ async def test_get_segment_by_id(
     assert r3["data"]["id"] == segment_id, "segment_id should match"
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_get_legs_by_segment_id(
     junction_client: Client,
     departure_after: str,
@@ -65,7 +65,7 @@ async def test_get_legs_by_segment_id(
     )
     assert is_valid_uuid(trip_search_id) is True, "trip_search_id uuid in v4 format"
 
-    time.sleep(5)
+    await asyncio.sleep(5)
 
     segment_id = await return_segment_id_from_trip_search_id(
         junction_client,

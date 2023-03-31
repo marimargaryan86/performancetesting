@@ -42,7 +42,7 @@ from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
 from snowfall.vendor.currency_cloud.models.balance import BalanceResponse
 
 
-@pytest.fixture
+@pytest.fixture()
 def transaction_ids() -> Sequence[str]:
     return [
         "e719b289-982c-42f0-99a2-63fa70f8f8c0",
@@ -122,7 +122,7 @@ def _create_admin_app(  # noqa: WPS211
     return app
 
 
-@pytest.fixture
+@pytest.fixture()
 def redis_client(redis_client: fakeredis.FakeRedis) -> redis.Client[str]:
     return redis.Client(
         redis_client,
@@ -130,7 +130,7 @@ def redis_client(redis_client: fakeredis.FakeRedis) -> redis.Client[str]:
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 async def redis_repository(
     redis_client: redis.Client[str],
 ) -> UserSessionRepository:
@@ -257,7 +257,7 @@ def currencies_repository(
     return CurrencyRepository(available_currencies)
 
 
-@pytest.fixture
+@pytest.fixture()
 def available_currencies() -> Sequence[money.Currency]:
     return [
         money.Currency("USD"),

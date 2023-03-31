@@ -180,7 +180,7 @@ class BookingHandler(object):
         order_response = await self._poll_booking(order_create_response)
 
         try:
-            # todo: this should be handled in a separate service
+            # TODO: this should be handled in a separate service
             await self._notifier.send(
                 notifications.BookingNotification(task.metadata, order_response),
             )

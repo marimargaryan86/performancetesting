@@ -5,17 +5,21 @@ def normalize_duration(duration: str) -> datetime.timedelta:
     parts = duration.split(".")
     parts_len = len(parts)
 
-    if parts_len == 1:
-        days = 0
-    elif parts_len == 2:
-        days = int(parts[0])
-    else:
-        raise ValueError("{0} day part is not valid".format(duration))
+    if parts_len < 1 or parts_len > 2:
+        raise ValueError("{0} is not a valid duration".format(duration))
+
+    days = 0
+
+    if parts_len == 2:
+        try:
+            days = int(parts[0])
+        except ValueError as err:
+            raise ValueError("{0} is not a valid duration".format(duration)) from err
 
     time_parts = parts[-1].split(":")
 
     if len(time_parts) != 3:
-        raise ValueError("{0} time part is not valid".format(duration))
+        raise ValueError("{0} is not a valid duration".format(duration))
 
     return datetime.timedelta(
         days=days,

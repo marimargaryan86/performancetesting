@@ -6,7 +6,7 @@ from snowfall.stdlib import money
 
 
 @pytest.mark.parametrize(
-    "amount,currency,string_value",
+    ("amount", "currency", "string_value"),
     [
         (1550, "USD", "15.50"),
         (1337, "SEK", "13.37"),
@@ -26,7 +26,7 @@ def test_to_and_from_string(amount: int, currency: str, string_value: str) -> No
 
 
 @pytest.mark.parametrize(
-    "amount,currency,string_value,separator",
+    ("amount", "currency", "string_value", "separator"),
     [
         (450, "EUR", "4.5", "."),
         (-450, "EUR", "-4.5", "."),
@@ -51,7 +51,7 @@ def test_from_string(
 
 
 @pytest.mark.parametrize(
-    "amount,currency,units,nanos",
+    ("amount", "currency", "units", "nanos"),
     [
         (1550, "USD", 15, 500000000),
         (1337, "SEK", 13, 370000000),
@@ -77,7 +77,7 @@ def test_to_and_from_protobuf(
 
 
 @pytest.mark.parametrize(
-    "amount,amount2,expected",
+    ("amount", "amount2", "expected"),
     [
         (175, 175, 350),
         (175, -175, 0),
@@ -101,7 +101,7 @@ def test_add_with_different_currencies() -> None:
 
 
 @pytest.mark.parametrize(
-    "amount,from_currency,to_currency,rate,expected",
+    ("amount", "from_currency", "to_currency", "rate", "expected"),
     [
         ("12.99", "USD", "JPY", decimal.Decimal(148.978), "1935"),
         ("12.99", "USD", "GBP", decimal.Decimal(0.88417), "11.49"),

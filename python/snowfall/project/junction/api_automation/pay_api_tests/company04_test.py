@@ -18,7 +18,7 @@ logger.setLevel(logging.DEBUG)
 EXIT_MSG = "Exiting ; check your logs"
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_list_companies(
     pay_admin_client: PayAdminClient,
 ) -> None:

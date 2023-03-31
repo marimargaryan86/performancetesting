@@ -58,7 +58,7 @@ class StatusHandler(trackable.AnySizeStatusHandler):
         self,
         msg: trackable_pb2.Trackable,
     ) -> None:
-        await asyncio.sleep(2)  # @todo: solve race condition properly
+        await asyncio.sleep(2)  # TODO: solve race condition properly
         search = await self._repository.mark_as_completed(msg.id)
         created_at = protobuf.protobuf_to_datetime(search.created_at)
         updated_at = protobuf.protobuf_to_datetime(search.updated_at)

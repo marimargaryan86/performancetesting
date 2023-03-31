@@ -7,8 +7,8 @@ from snowfall.stdlib.integration.starlette import pagination_helpers
 
 
 @pytest.mark.parametrize(
-    "url, next_page_token, limit, expected",
-    (
+    ("url", "next_page_token", "limit", "expected"),
+    [
         (
             "http://localhost:8000/trips/searches/53df9a43-1052-46e6-a9d5-83f7768a4377/trips",
             "token",
@@ -27,7 +27,7 @@ from snowfall.stdlib.integration.starlette import pagination_helpers
             10,
             "http://localhost:8000/trips/searches/53df9a43-1052-46e6-a9d5-83f7768a4377/trips?page%5Bcursor%5D=&page%5Blimit%5D=10",
         ),
-    ),
+    ],
 )
 def test_get_next_url(
     url: str,

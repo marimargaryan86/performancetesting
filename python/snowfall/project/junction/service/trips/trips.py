@@ -142,7 +142,7 @@ class TripSearchRepository(  # noqa: WPS215
         new_trip_search.CopyFrom(trip_search)
         new_trip_search.ClearField("trip_ids")
         new_trip_search.trip_ids.extend([trip.id for trip in response.trips])
-        # todo: can't assume this once journey planner call isn't blocking
+        # TODO: can't assume this once journey planner call isn't blocking
         new_trip_search.status = amqp_pb2.Trackable.STATUS_COMPLETED
 
         update = await self._execute(

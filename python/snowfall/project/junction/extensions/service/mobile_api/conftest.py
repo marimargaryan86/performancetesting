@@ -71,7 +71,7 @@ junction_api_address = "https://api.junction.dev"
 plus_api_address = "https://plus.junction.dev"
 
 
-@pytest.fixture
+@pytest.fixture()
 def new_user() -> models_pb2.User:
     return models_pb2.User(  # nosec
         id=string.uuid(),
@@ -89,7 +89,7 @@ ExistingUser = TypedDict(
 )
 
 
-@pytest.fixture
+@pytest.fixture()
 def existing_user() -> ExistingUser:
     user = models_pb2.User(  # nosec
         id=string.uuid(),
@@ -108,12 +108,12 @@ class VerificationCode(object):
     code: str
 
 
-@pytest.fixture
+@pytest.fixture()
 def new_user_verification_code(new_user: models_pb2.User) -> VerificationCode:
     return VerificationCode(new_user.email, "1277")
 
 
-@pytest.fixture
+@pytest.fixture()
 def existing_user_verification_code(existing_user: ExistingUser) -> VerificationCode:
     return VerificationCode(existing_user["model"].email, "1337")
 
@@ -142,12 +142,12 @@ def load_response_fixture(path: str) -> Response:
     return response_dict
 
 
-@pytest.fixture
+@pytest.fixture()
 def places_fixture() -> Sequence[dict[str, Any]]:
     return load_json_fixture("places.json")
 
 
-@pytest.fixture
+@pytest.fixture()
 def mongo_test_db() -> mongomock_motor.AsyncMongoMockDatabase:
     return mongomock_motor.AsyncMongoMockClient()["tests"]
 
@@ -172,7 +172,7 @@ def _create_app(
     return asgi_app
 
 
-@pytest.fixture
+@pytest.fixture()
 def redis_client(decoding_redis_client: fakeredis.FakeRedis) -> redis.Client[str]:
     return redis.Client(
         decoding_redis_client,
@@ -180,14 +180,14 @@ def redis_client(decoding_redis_client: fakeredis.FakeRedis) -> redis.Client[str
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def smtp_client() -> smtp.EmailClient:
     smtp_client = smtp.EmailClient(aiosmtplib.SMTP(), "client", "support@example.com")
     smtp_client.send_email_html_template = mock.AsyncMock()  # type: ignore[method-assign]
     return smtp_client
 
 
-@pytest.fixture
+@pytest.fixture()
 def notification_tokens_repository(
     mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
 ) -> repository.NotificationTokensRepository:
@@ -196,7 +196,7 @@ def notification_tokens_repository(
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def preferences_repository(
     mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
 ) -> repository.PreferencesRepository:
@@ -205,7 +205,7 @@ def preferences_repository(
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def vouchers_repository(
     mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
 ) -> repository.VouchersRepository:
@@ -214,7 +214,7 @@ def vouchers_repository(
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def loyalty_programs_repository(
     mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
 ) -> repository.LoyaltyProgramsRepository:
@@ -223,7 +223,7 @@ def loyalty_programs_repository(
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def orders_repository(
     mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
 ) -> repository.OrdersRepository:
@@ -232,7 +232,7 @@ def orders_repository(
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def user_groups_repository(
     mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
 ) -> repository.UserGroupsRepository:
@@ -241,7 +241,7 @@ def user_groups_repository(
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def stripe_users_repository(
     mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
 ) -> repository.StripeUsersRepository:
@@ -251,7 +251,7 @@ def stripe_users_repository(
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 async def users_repository(
     mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
     existing_user: ExistingUser,
@@ -265,7 +265,7 @@ async def users_repository(
     return users_repo
 
 
-@pytest.fixture
+@pytest.fixture()
 async def otp_repository(
     redis_client: redis.Client[str],
     new_user_verification_code: VerificationCode,
@@ -283,7 +283,7 @@ async def otp_repository(
     return otp_repo
 
 
-@pytest.fixture
+@pytest.fixture()
 async def offers_rates_repository(
     redis_client: redis.Client[str],
     new_user_verification_code: VerificationCode,
@@ -295,7 +295,7 @@ async def offers_rates_repository(
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 async def enums_values_repository(
     redis_client: redis.Client[str],
 ) -> repository.EnumsValuesRepository:
@@ -304,7 +304,7 @@ async def enums_values_repository(
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 async def places_repository(
     mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
     places_fixture: Sequence[Mapping[str, Any]],
@@ -316,7 +316,7 @@ async def places_repository(
     return places_repo
 
 
-@pytest.fixture
+@pytest.fixture()
 def jwt_gen() -> jwt_generator.JwtGenerator:
     return jwt_generator.JwtGenerator(
         base64.b64encode(
@@ -350,12 +350,12 @@ def plus_http_client() -> plus_client.PlusClient:
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def non_mocked_hosts() -> list[str]:
     return ["example.com"]
 
 
-@pytest.fixture
+@pytest.fixture()
 def mobile_currencies_client(
     currencies_client: currencies.Client,
 ) -> mobile_currencies.CurrencyClient:

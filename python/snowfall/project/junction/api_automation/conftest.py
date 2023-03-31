@@ -49,7 +49,7 @@ def pytest_configure(config: pytest.Config) -> None:
 
 
 @pytest.fixture(scope="package")
-def _local_config(
+def local_config(
     request: pytest.FixtureRequest,
 ) -> Mapping[str, str]:
     config_file_name = request.path.parent.name
@@ -70,10 +70,10 @@ def _local_config(
 
 @pytest.fixture(scope="package")
 def api_token(
-    _local_config: Mapping[str, str],
+    local_config: Mapping[str, str],
     request: pytest.FixtureRequest,
 ) -> str:
-    return request.config.getoption("API_TOKEN") or _local_config.get("API_TOKEN") or ""
+    return request.config.getoption("API_TOKEN") or local_config.get("API_TOKEN") or ""
 
 
 @pytest.fixture(scope="package", autouse=True)
@@ -97,32 +97,30 @@ def departures_after(request: pytest.FixtureRequest) -> Sequence[str]:
 
 @pytest.fixture(scope="package", autouse=True)
 def origin(
-    _local_config: Mapping[str, str],
+    local_config: Mapping[str, str],
     request: pytest.FixtureRequest,
 ) -> str:
-    origin = request.config.getoption("ORIGIN") or _local_config.get("ORIGIN") or ""
+    origin = request.config.getoption("ORIGIN") or local_config.get("ORIGIN") or ""
     origin_table = origin.split(",")
     return origin_table[0]
 
 
 @pytest.fixture(scope="package", autouse=True)
 def origins(
-    _local_config: Mapping[str, str],
+    local_config: Mapping[str, str],
     request: pytest.FixtureRequest,
 ) -> Sequence[str]:
-    origins = request.config.getoption("ORIGIN") or _local_config.get("ORIGIN") or ""
+    origins = request.config.getoption("ORIGIN") or local_config.get("ORIGIN") or ""
     return origins.split(",")
 
 
 @pytest.fixture(scope="package", autouse=True)
 def destination(
-    _local_config: Mapping[str, str],
+    local_config: Mapping[str, str],
     request: pytest.FixtureRequest,
 ) -> str:
     destination = (
-        request.config.getoption("DESTINATION")
-        or _local_config.get("DESTINATION")
-        or ""
+        request.config.getoption("DESTINATION") or local_config.get("DESTINATION") or ""
     )
     destination_table = destination.split(",")
     return destination_table[0]
@@ -130,12 +128,12 @@ def destination(
 
 @pytest.fixture(scope="package", autouse=True)
 def destinations(
-    _local_config: Mapping[str, str],
+    local_config: Mapping[str, str],
     request: pytest.FixtureRequest,
 ) -> Sequence[str]:
     destinations = (
         request.config.getoption("DESTINATION")
-        or _local_config.get(
+        or local_config.get(
             "DESTINATION",
         )
         or ""
@@ -146,17 +144,17 @@ def destinations(
 @pytest.fixture(scope="package")
 def protocol(
     request: pytest.FixtureRequest,
-    _local_config: Mapping[str, str],
+    local_config: Mapping[str, str],
 ) -> str:
-    return request.config.getoption("PROTOCOL") or _local_config.get("PROTOCOL") or ""
+    return request.config.getoption("PROTOCOL") or local_config.get("PROTOCOL") or ""
 
 
 @pytest.fixture(scope="package", autouse=True)
 def host(
     request: pytest.FixtureRequest,
-    _local_config: Mapping[str, str],
+    local_config: Mapping[str, str],
 ) -> str:
-    return request.config.getoption("HOST") or _local_config.get("HOST") or ""
+    return request.config.getoption("HOST") or local_config.get("HOST") or ""
 
 
 @pytest.fixture(scope="package")
@@ -178,7 +176,7 @@ def pytest_collection_modifyitems(
                 ii.add_marker(skip_me)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def junction_client(
     api_token: str,
     host: str,
@@ -196,7 +194,7 @@ def junction_client(
     )
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def mobile_client(
     api_token: str,
     host: str,
@@ -215,7 +213,7 @@ def mobile_client(
     )
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def pay_admin_client(
     api_token: str,
     host: str,
@@ -262,14 +260,14 @@ async def create_company(
     return response_company
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 async def pay_create_company(
     pay_admin_client: PayAdminClient,
 ) -> dict[str, Any]:
     return await create_company(pay_admin_client)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 async def pay_create_contact(
     pay_admin_client: PayAdminClient,
     pay_create_company: Mapping[str, Any],
@@ -295,7 +293,7 @@ async def pay_create_contact(
     return response_create_contact
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 async def pay_list_all_currencies(
     pay_client: PayClient,
 ) -> dict[str, Any]:
@@ -312,7 +310,7 @@ async def pay_list_all_currencies(
     return response_list_all_currencies
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 async def pay_get_accounts(
     pay_admin_client: PayAdminClient,
     pay_create_account: Mapping[str, Any],
@@ -327,7 +325,7 @@ async def pay_get_accounts(
     return response_get_accounts
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 async def pay_create_account(
     pay_admin_client: PayAdminClient,
     pay_create_contact: Mapping[str, Any],
@@ -349,7 +347,7 @@ async def pay_create_account(
     return response_create_account
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def pay_client(
     api_token: str,
     host: str,
@@ -377,7 +375,7 @@ def pay_client(
     )
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def get_mongo_config(
     api_token: str,
     host: str,
@@ -425,7 +423,7 @@ def get_variable_from_server(
     return returned_data
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def api_layer_client(
     host: str,
     api_token: str,
@@ -480,7 +478,7 @@ def add_allure_environment_property(
 
 
 @pytest.fixture(autouse=True)
-def save_properties_to_allure_file(
+def _save_properties_to_allure_file(
     add_allure_environment_property: Callable[[str, Any], None],
     origins: Sequence[str],
     destinations: Sequence[str],

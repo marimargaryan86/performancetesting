@@ -6,7 +6,7 @@ from snowfall.stdlib.integration.starlette import request_helpers
 
 
 @pytest.mark.parametrize(
-    "request_data, expected",
+    ("request_data", "expected"),
     [
         (
             {

@@ -50,7 +50,7 @@ def test_booking_notification_subject() -> None:
 
 @freezegun.freeze_time(_FREEZE_DATE)
 @pytest.mark.parametrize(
-    "body_field, expected",
+    ("body_field", "expected"),
     [
         ("journey id", _METADATA.journey_id),
         ("order id", _METADATA.order_id),

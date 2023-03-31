@@ -24,13 +24,13 @@ def load_json_fixture(
         return json.load(file_handle)
 
 
-@pytest.fixture
+@pytest.fixture()
 async def http_client() -> AsyncIterator[httpx.AsyncClient]:
     async with httpx.AsyncClient() as http_client:
         yield http_client
 
 
-@pytest.fixture
+@pytest.fixture()
 def karhoo_client(http_client: httpx.AsyncClient) -> client.KarhooClient:
     return client.KarhooClient(  # nosec
         api_key="key",
@@ -39,7 +39,7 @@ def karhoo_client(http_client: httpx.AsyncClient) -> client.KarhooClient:
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def karhoo_booking_handler(
     karhoo_client: client.KarhooClient,
 ) -> booking.BookingHandler:

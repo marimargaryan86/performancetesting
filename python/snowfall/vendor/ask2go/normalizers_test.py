@@ -6,7 +6,7 @@ from snowfall.vendor.ask2go import normalizers
 
 
 @pytest.mark.parametrize(
-    "duration,expected",
+    ("duration", "expected"),
     [
         ("12:00:00", datetime.timedelta(hours=12)),
         ("25:12:00", datetime.timedelta(hours=25, minutes=12)),
@@ -37,5 +37,5 @@ def test_normalize_duration(duration: str, expected: datetime.timedelta) -> None
     ],
 )
 def test_invalid_duration(duration: str) -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="is not a valid duration"):
         normalizers.normalize_duration(duration)

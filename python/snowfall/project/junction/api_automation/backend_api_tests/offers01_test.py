@@ -16,7 +16,7 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_trip_offers_e2e_basic(
     junction_client: Client,
     departure_after: str,

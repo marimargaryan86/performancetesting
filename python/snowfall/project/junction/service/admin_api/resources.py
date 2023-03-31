@@ -31,7 +31,7 @@ class PlaceTypeResource(models.Resource):
             attributes={
                 "name": place_type_id,
             },
-            # @todo: self link
+            # TODO: self link
         )
 
 

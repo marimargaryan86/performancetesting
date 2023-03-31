@@ -9,7 +9,7 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_get_passenger_genders(
     junction_client: Client,
     departure_after: str,
@@ -26,7 +26,7 @@ async def test_get_passenger_genders(
         assert "https" in data_item["links"]["self"]
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_get_passenger_gender(
     junction_client: Client,
     departure_after: str,
@@ -52,7 +52,7 @@ async def test_get_passenger_gender(
         assert "https" in response_gender["data"]["links"]["self"]
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_get_passenger_titles(
     junction_client: Client,
     departure_after: str,
@@ -69,7 +69,7 @@ async def test_get_passenger_titles(
         assert "https" in data_item["links"]["self"]
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_get_passenger_title(
     host: str,
     junction_client: Client,

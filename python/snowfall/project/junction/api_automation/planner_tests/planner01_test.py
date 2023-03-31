@@ -17,7 +17,7 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_trip_windows_planner_many_origins(
     junction_client: Client,
     departures_after: Sequence[str],

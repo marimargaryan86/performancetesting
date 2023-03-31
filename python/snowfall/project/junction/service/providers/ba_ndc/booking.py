@@ -217,7 +217,7 @@ class BookingHandler(object):
         )
 
         try:
-            # todo: this should be handled in a separate service
+            # TODO: this should be handled in a separate service
             await self._notifier.send(
                 notifications.BookingNotification(task.metadata, adapter),
             )

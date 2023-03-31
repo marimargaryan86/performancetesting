@@ -87,11 +87,11 @@ class BookingHandler(object):
                     )
                     for passenger_details in task.passengers
                 ],
-                # TODO this should not be hardcoded forever
+                # TODO: this should not be hardcoded forever
                 luggage=passenger.Luggage(
                     total=len(task.passengers),
                 ),
-                # TODO currently ignoring these fields
+                # TODO: currently ignoring these fields
                 meta=None,
                 partner_trip_id=None,
                 flight_number=None,

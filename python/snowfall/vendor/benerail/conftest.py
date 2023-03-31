@@ -11,13 +11,13 @@ from snowfall.vendor.benerail import client
 API_BASE_URL = "https://test_url"
 
 
-@pytest.fixture
+@pytest.fixture()
 async def httpx_client() -> AsyncIterator[httpx.AsyncClient]:
     async with httpx.AsyncClient() as http_client:
         yield http_client
 
 
-@pytest.fixture
+@pytest.fixture()
 def benerail_client(httpx_client: httpx.AsyncClient) -> client.BenerailClient:
     return client.BenerailClient(
         subscription_key="xxxx",

@@ -9,7 +9,7 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_list_cabin_classes(
     junction_client: Client,
 ) -> None:
@@ -19,7 +19,7 @@ async def test_list_cabin_classes(
     assert classes == {"unspecified", "economy", "premium", "business", "first"}
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_get_cabin_class(
     junction_client: Client,
 ) -> None:

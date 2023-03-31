@@ -6,12 +6,12 @@ from snowfall.project.junction.provider import cabin_classes
 from snowfall.stdlib.v1alpha import models_pb2
 
 
-@pytest.fixture
+@pytest.fixture()
 def mongo_client() -> motor_asyncio.AsyncIOMotorClient:
     return mongomock_motor.AsyncMongoMockClient()
 
 
-@pytest.fixture
+@pytest.fixture()
 def cabin_class_repo(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> cabin_classes.CabinMappingRepository:

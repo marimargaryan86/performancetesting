@@ -19,7 +19,7 @@ logger.setLevel(logging.DEBUG)
 EXIT_MSG = "Exiting ; check your logs"
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_create_account(  # noqa: WPS218
     pay_admin_client: PayAdminClient,
     pay_create_contact: Mapping[str, Any],

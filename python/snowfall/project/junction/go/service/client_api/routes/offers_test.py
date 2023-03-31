@@ -370,7 +370,7 @@ class TestOfferSearches(object):
         assert response.json()["data"]
 
     @pytest.mark.parametrize(
-        "cabin_classes, expected",
+        ("cabin_classes", "expected"),
         [
             (["economy"], 2),
             (["economy", "first"], 2),

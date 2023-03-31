@@ -23,7 +23,7 @@ logger.addHandler(se)
 logger.setLevel(logging.DEBUG)
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_create_company(  # noqa: WPS210, WPS218
     pay_admin_client: PayAdminClient,
 ) -> None:

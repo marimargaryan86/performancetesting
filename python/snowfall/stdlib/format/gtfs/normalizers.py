@@ -1,3 +1,4 @@
+import contextlib
 import datetime
 import zoneinfo
 from typing import Any, Callable, Sequence
@@ -25,11 +26,14 @@ def normalize_date(date: str | None) -> datetime.date | None:
     if date is None:
         return None
 
-    try:
+    with contextlib.suppress(ValueError):
         return datetime.datetime.strptime(date, "%Y%m%d").date()
-    except ValueError:
+
+    try:
         # A JSON-serialized model will contain ISO.
         return datetime.date.fromisoformat(date)
+    except ValueError as err:
+        raise ValueError("{value} is not a valid date".format(value=date)) from err
 
 
 def normalize_language_code(code: str | None) -> str | None:

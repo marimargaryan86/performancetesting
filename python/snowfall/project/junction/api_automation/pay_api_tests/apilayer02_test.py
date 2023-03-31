@@ -9,7 +9,7 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 
 
-@pytest.mark.integration
+@pytest.mark.integration()
 async def test_get_rate(
     api_layer_client: APILayer,
 ) -> None:

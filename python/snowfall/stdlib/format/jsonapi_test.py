@@ -6,7 +6,7 @@ from snowfall.stdlib.format import jsonapi
 
 
 @pytest.mark.parametrize(
-    "resource, expected",
+    ("resource", "expected"),
     [
         (
             {

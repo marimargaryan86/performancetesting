@@ -46,7 +46,7 @@ class TestDictClient(object):
 
 class TestGrpcClient(object):
     @pytest.mark.parametrize(
-        "error, expected",
+        ("error", "expected"),
         [
             (
                 grpc.aio.AioRpcError(

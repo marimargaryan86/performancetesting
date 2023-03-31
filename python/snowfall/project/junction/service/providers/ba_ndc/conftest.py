@@ -26,12 +26,12 @@ _TIMEOUT = 50.0
 API_BASE_URL = "https://ndc.junction.travel"
 
 
-@pytest.fixture
+@pytest.fixture()
 def http_client() -> httpx.AsyncClient:
     return httpx.AsyncClient(timeout=_TIMEOUT)
 
 
-@pytest.fixture
+@pytest.fixture()
 def ba_ndc_client(http_client: httpx.AsyncClient) -> client.BaNdcClient:
     return client.BaNdcClient(
         api_base_url=API_BASE_URL,
@@ -40,7 +40,7 @@ def ba_ndc_client(http_client: httpx.AsyncClient) -> client.BaNdcClient:
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 async def airport_repository() -> airports.AirportRepository:
     loader = filesystem.PkgLoader(__name__)
 
@@ -49,7 +49,7 @@ async def airport_repository() -> airports.AirportRepository:
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def search_adapter(
     ba_ndc_client: client.BaNdcClient,
     airport_repository: airports.AirportRepository,

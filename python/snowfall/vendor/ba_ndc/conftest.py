@@ -8,12 +8,12 @@ TIMEOUT = 50.0
 API_BASE_URL = "https://ndc.junction.travel"
 
 
-@pytest.fixture
+@pytest.fixture()
 def http_client() -> httpx.AsyncClient:
     return with_logging(httpx.AsyncClient(timeout=TIMEOUT))
 
 
-@pytest.fixture
+@pytest.fixture()
 def ba_ndc_client(http_client: httpx.AsyncClient) -> client.BaNdcClient:
     return client.BaNdcClient(
         api_base_url=API_BASE_URL,

@@ -338,7 +338,7 @@ _ROUNDTRIP_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
 
 
 @pytest.mark.parametrize(
-    "search_task, expected",
+    ("search_task", "expected"),
     [
         (
             _SEARCH_TASK,
@@ -450,7 +450,7 @@ def test_criteria_with_expected_pairs_are_generated(
 
 
 @pytest.mark.parametrize(
-    "search_task, expected",
+    ("search_task", "expected"),
     [
         (
             _SEARCH_TASK,

@@ -35,7 +35,7 @@ class LocationsService(service.Service, places_pb2_grpc.LocationsServiceServicer
         if not location:
             await context.abort(StatusCode.NOT_FOUND)
 
-        if location and not location.types:  # @todo: not needed with NoReturn above.
+        if location and not location.types:  # TODO: not needed with NoReturn above.
             location.types.append(models_pb2.Location.TYPE_UNSPECIFIED)
 
         return places_pb2.GetLocationResponse(location=location)

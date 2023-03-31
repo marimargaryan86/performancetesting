@@ -11,7 +11,7 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import latlng_pb2
 
 _MIN_POPULATION = 20000
-_MAX_DISTANCE = 50000  # todo: differentiate between airports and train stations
+_MAX_DISTANCE = 50000  # TODO: differentiate between airports and train stations
 _NAMESPACE = uuid.UUID("105eba69-b787-48ba-9159-6078e0b76e46")
 
 
@@ -28,7 +28,7 @@ async def parse_csv(
                 longitude=float(row["longitude"]),
                 max_distance_meters=_MAX_DISTANCE,
             )
-            # todo: only locations in the same country
+            # TODO: only locations in the same country
         ]
 
         if not location_ids:

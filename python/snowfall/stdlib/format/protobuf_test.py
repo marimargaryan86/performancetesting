@@ -91,7 +91,7 @@ def test_slug_to_enum_value() -> None:
         == testing_pb2.PascalCaseEnum.PascalCase.PASCAL_CASE_MULTI_WORD
     )
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="has no value defined for name"):
         protobuf.slug_to_enum_value(
             testing_pb2.PascalCaseEnum.PascalCase,
             "foobar",
@@ -99,7 +99,7 @@ def test_slug_to_enum_value() -> None:
 
 
 @pytest.mark.parametrize(
-    "date, expected",
+    ("date", "expected"),
     [
         (
             datetime.date(year=1984, month=2, day=3),
@@ -112,7 +112,7 @@ def test_date_to_protobuf(date: datetime.date, expected: models_pb2.Date) -> Non
 
 
 @pytest.mark.parametrize(
-    "proto, expected",
+    ("proto", "expected"),
     [
         (
             datetime_pb2.DateTime(
@@ -141,7 +141,7 @@ def test_protobuf_to_date(
 
 
 @pytest.mark.parametrize(
-    "proto, expected",
+    ("proto", "expected"),
     [
         (
             timestamp_pb2.Timestamp(seconds=0),
@@ -201,7 +201,7 @@ def test_protobuf_to_datetime(
 
 
 @pytest.mark.parametrize(
-    "timestamp, expected",
+    ("timestamp", "expected"),
     [
         (
             datetime.datetime(
@@ -226,7 +226,7 @@ def test_datetime_to_protobuf(
 
 
 @pytest.mark.parametrize(
-    "timestamp, expected",
+    ("timestamp", "expected"),
     [
         (
             datetime.datetime(

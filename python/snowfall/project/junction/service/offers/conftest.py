@@ -11,12 +11,12 @@ from snowfall.project.junction.service.offers import aggregator, offers
 from snowfall.stdlib.persistence.redis import types as redis
 
 
-@pytest.fixture
+@pytest.fixture()
 def mongo_client() -> motor_asyncio.AsyncIOMotorClient:
     return mongomock_motor.AsyncMongoMockClient()
 
 
-@pytest.fixture
+@pytest.fixture()
 def offer_bucket_repository(
     decoding_redis_client: aioredis.Redis[str],
 ) -> aggregator.OfferBucketRepository:
@@ -28,21 +28,21 @@ def offer_bucket_repository(
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def trip_offer_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> offers.TripOfferRepository:
     return offers.TripOfferRepository(collection=mongo_client.test.trip_offers)
 
 
-@pytest.fixture
+@pytest.fixture()
 def offer_options_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> offers.OfferOptionsRepository:
     return offers.OfferOptionsRepository(collection=mongo_client.test.trip_offers)
 
 
-@pytest.fixture
+@pytest.fixture()
 def offer_searches_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> offers.OfferSearchRepository:
@@ -52,21 +52,21 @@ def offer_searches_repository(
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def offer_aggregate_collection(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> motor_asyncio.AsyncIOMotorCollection:
     return mongo_client.test.offer_aggregates
 
 
-@pytest.fixture
+@pytest.fixture()
 def offer_aggregate_repository(
     offer_aggregate_collection: motor_asyncio.AsyncIOMotorCollection,
 ) -> offers.OfferAggregateMappingRepository:
     return offers.OfferAggregateMappingRepository(collection=offer_aggregate_collection)
 
 
-@pytest.fixture
+@pytest.fixture()
 def offer_aggregator(
     offer_searches_repository: offers.OfferSearchRepository,
     offer_bucket_repository: aggregator.OfferBucketRepository,
