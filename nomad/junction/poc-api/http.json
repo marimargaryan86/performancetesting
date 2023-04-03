@@ -1,0 +1,12 @@
+{
+    "development": {
+        "variables": {
+            "count": 1,
+            "traefik_entrypoints": "websecure",
+            "traaefik_host_URL": "plus.api.junction.dev"
+        }
+    },
+    "production": {
+        "deploy": false
+    }
+}
