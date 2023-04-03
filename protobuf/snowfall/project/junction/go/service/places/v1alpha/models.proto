@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package snowfall.project.junction.go.service.places.v1alpha;
+
+import "google/protobuf/timestamp.proto";
+import "snowfall/stdlib/v1alpha/latlng.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/places/v1alpha";
+
+message ListOfIds {
+  repeated string ids = 1;
+}
+
+message Location {
+  string id = 1;
+  string name = 2;
+  snowfall.stdlib.v1alpha.LatLng coordinates = 3;
+  string time_zone = 4;
+  string country_code = 5;
+  google.protobuf.Timestamp updated_at = 6;
+  string source_ref = 7;
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+    TYPE_CITY = 1;
+    TYPE_RAILWAY_STATION = 2;
+    TYPE_AIRPORT = 3;
+    TYPE_BUS_STATION = 4;
+    TYPE_FERRY_PORT = 5;
+  }
+  repeated Type types = 8;
+}
+
+message Place {
+  Location location = 1;
+  repeated string merged_ids = 2;
+}

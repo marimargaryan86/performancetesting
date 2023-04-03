@@ -9,10 +9,10 @@ from snowfall.project.junction.go.adapter import offers as offers_adapter
 from snowfall.project.junction.go.adapter import orders as orders_adapter
 from snowfall.project.junction.go.adapter import price_quotes as price_quotes_adapter
 from snowfall.project.junction.go.service.client_api import resources, validators
-from snowfall.project.junction.service.offers.v1alpha import (
+from snowfall.project.junction.go.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
-from snowfall.project.junction.service.orders.v1alpha import (
+from snowfall.project.junction.go.service.orders.v1alpha import (
     models_pb2 as order_models_pb2,
 )
 from snowfall.stdlib.format.protobuf import date_to_protobuf, slug_to_enum_value

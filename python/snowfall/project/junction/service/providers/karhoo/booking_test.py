@@ -2,7 +2,7 @@ import datetime
 
 import pytest_httpx
 
-from snowfall.project.junction.service.orders.v1alpha import amqp_pb2, models_pb2
+from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2, models_pb2
 from snowfall.project.junction.service.providers.karhoo import booking, cache, conftest
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf

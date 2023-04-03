@@ -6,7 +6,7 @@ import phonenumbers
 import pycountry
 import structlog
 
-from snowfall.project.junction.service.orders.v1alpha import amqp_pb2, models_pb2
+from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2, models_pb2
 from snowfall.project.junction.service.providers.ba_ndc import (
     cache,
     criteria,

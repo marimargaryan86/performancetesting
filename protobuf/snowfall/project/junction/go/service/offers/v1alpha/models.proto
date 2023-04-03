@@ -1,0 +1,189 @@
+syntax = "proto3";
+
+package snowfall.project.junction.go.service.offers.v1alpha;
+
+import "google/protobuf/timestamp.proto";
+import "snowfall/stdlib/v1alpha/amqp.proto";
+import "snowfall/stdlib/v1alpha/models.proto";
+import "snowfall/stdlib/v1alpha/money.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/offers/v1alpha";
+
+message OfferSearch {
+  string id = 1;
+  google.protobuf.Timestamp expires_at = 2;
+  oneof search {
+    TripOfferSearch trip = 3;
+  }
+  string session_token = 4;
+  snowfall.stdlib.v1alpha.Trackable.Status status = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+message TripOfferSearch {
+  repeated snowfall.stdlib.v1alpha.Trip trips = 1;
+  repeated Passenger passengers = 2;
+  LoyaltyCard loyalty_card = 3;
+}
+
+message Passenger {
+  snowfall.stdlib.v1alpha.Date date_of_birth = 1;
+}
+
+message LoyaltyCard {
+  string airline_iata = 1;
+  string number = 2;
+  string first_name = 3;
+  string last_name = 4;
+}
+
+message OfferAggregateMapping {
+  string id = 1;
+  string offer_search_id = 2;
+  google.protobuf.Timestamp expires_at = 4;
+  repeated string offer_result_ids = 3;
+}
+
+message OfferAggregate {
+  string id = 1;
+  google.protobuf.Timestamp expires_at = 3;
+  repeated OfferGroup groups = 2;
+}
+
+message ApplicableTo {
+  optional snowfall.stdlib.v1alpha.Date date_of_birth_before = 1;
+  optional snowfall.stdlib.v1alpha.Date date_of_birth_after = 2;
+}
+
+message Penalty {
+  ApplicableTo applicable_to = 1;
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+    TYPE_EXCHANGE = 1;
+    TYPE_REFUND = 2;
+  }
+  Type penalty_type = 2;
+  optional bool changeable = 3;
+  bool refundable = 4;
+  enum Applicability {
+    APPLICABILITY_UNSPECIFIED = 0;
+    APPLICABILITY_BEFORE = 1;
+    APPLICABILITY_AFTER = 2;
+  }
+  Applicability applicability = 5;
+  optional snowfall.stdlib.v1alpha.Money price = 6;
+}
+
+message OfferGroup {
+  string id = 1;
+  google.protobuf.Timestamp expires_at = 3;
+  // provider info?
+  // min/max prices?
+  repeated Offer offers = 4;
+  repeated OfferSegment segments = 5;
+}
+
+message Offer {
+  string id = 1;
+  repeated OfferSegmentDetails segment_details = 2;
+  snowfall.stdlib.v1alpha.Money price = 3;
+  string brand_name = 4;
+  repeated BaggageAllowance baggage_allowances = 5;
+  // isRefundable
+}
+
+message PriceQuote {
+  string id = 1;
+  string option_id = 2;
+  google.protobuf.Timestamp expires_at = 3;
+  snowfall.stdlib.v1alpha.Money price = 4;
+  enum Required {
+    REQUIRED_UNSPECIFIED = 0;
+    REQUIRED_DATE_OF_BIRTH = 1;
+    REQUIRED_NATIONALITY = 2;
+    REQUIRED_EXPIRATION_DATE = 3;
+    REQUIRED_ISSUING_COUNTRY = 4;
+    REQUIRED_PASSPORT_NUMBER = 5;
+    REQUIRED_RESIDENCE_COUNTRY_CODE = 6;
+    REQUIRED_RESIDENCE_ADDRESS = 7;
+  }
+  repeated Required required_documents = 5;
+  repeated Penalty penalties = 6;
+  repeated FareRule rules = 7;
+}
+
+message PriceQuoteContainer {
+  string id = 1;
+  google.protobuf.Timestamp expires_at = 2;
+  repeated PriceQuote quotes = 3;
+  string offer_id = 4;
+  repeated string option_ids = 5;
+  string session_token = 6;
+}
+
+message FareRule {
+  string title = 1;
+  string body = 2;
+}
+
+message BaggageAllowance {
+  bool free = 1;
+  ApplicableTo applicable_to = 2;
+}
+
+message SegmentAmenity {
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+    TYPE_UNAVAILABLE = 1;
+    TYPE_AVAILABLE = 2;
+    TYPE_INCLUDED = 3;
+  }
+  Type availability = 1;
+}
+
+message SegmentAmenities {
+  SegmentAmenity beverage = 1;
+  SegmentAmenity entertainment = 2;
+  SegmentAmenity food = 3;
+  SegmentAmenity power = 4;
+  SegmentAmenity wifi = 5;
+}
+
+message OfferSegmentDetails {
+  string id = 1;
+  string offer_segment_id = 3;
+  snowfall.stdlib.v1alpha.CabinClass cabin_class = 2;
+  repeated BaggageAllowance baggage_allowances = 5;
+  SegmentAmenities amenities = 6;
+  // meal
+}
+
+message OfferSegment {
+  string id = 1;
+  string segment_id = 7;
+  repeated OfferSegmentLeg legs = 2;
+  // todo: this needs to be broken down, since operator and vendor will have different numbers
+  Vehicle vehicle = 3;
+  string operator = 4;
+  string vendor = 5;
+  string terminal = 6;
+  snowfall.stdlib.v1alpha.Schedule.Type type = 8;
+  uint32 trip_sequence = 9;
+  uint32 segment_sequence = 10;
+  // direction?
+  // docsRequired?
+}
+
+message Vehicle {
+  string number = 1;
+  string equipment = 2;
+}
+
+message OfferSegmentLeg {
+  string id = 1;
+  snowfall.stdlib.v1alpha.Point origin = 2;
+  snowfall.stdlib.v1alpha.Point destination = 3;
+  google.protobuf.Timestamp departure_at = 4;
+  google.protobuf.Timestamp arrival_at = 5;
+}

@@ -1,0 +1,134 @@
+syntax = "proto3";
+
+package snowfall.project.junction.go.service.orders.v1alpha;
+
+import "snowfall/project/junction/go/service/orders/v1alpha/models.proto";
+import "snowfall/stdlib/v1alpha/postal_address.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/orders/v1alpha";
+
+service OrderService {
+  rpc CreateJourney(CreateJourneyRequest) returns (CreateJourneyResponse) {}
+  rpc GetJourney(GetJourneyRequest) returns (GetJourneyResponse) {}
+  rpc ListJourneys(ListJourneysRequest) returns (ListJourneysResponse) {}
+  rpc PlaceOrder(PlaceOrderRequest) returns (PlaceOrderResponse) {}
+  rpc GetOrder(GetOrderRequest) returns (GetOrderResponse) {}
+  rpc ListOrders(ListOrdersRequest) returns (ListOrdersResponse) {}
+  rpc GetBooking(GetBookingRequest) returns (GetBookingResponse) {}
+  rpc ListBookings(ListBookingsRequest) returns (ListBookingsResponse) {}
+  rpc GetBookingDetails(GetBookingDetailsRequest) returns (GetBookingDetailsResponse) {}
+  rpc ListBookingDetails(ListBookingDetailsRequest) returns (ListBookingDetailsResponse) {}
+}
+
+message CreateJourneyRequest {
+  ContactDetails contact_details = 1;
+}
+
+message CreateJourneyResponse {
+  Journey journey = 1;
+}
+
+message GetJourneyRequest {
+  string id = 1;
+}
+
+message GetJourneyResponse {
+  Journey journey = 1;
+}
+
+message ListJourneysRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  repeated string ids = 3;
+}
+
+message ListJourneysResponse {
+  repeated Journey journeys = 1;
+  string next_page_token = 2;
+}
+
+message PlaceOrderRequest {
+  string journey_id = 1;
+  repeated Passenger passengers = 2;
+  message Option {
+    oneof option {
+      TripOption trip_option = 1;
+    }
+  }
+  repeated Option options = 3;
+  snowfall.stdlib.v1alpha.PostalAddress residence_address = 4;
+}
+
+message PlaceOrderResponse {
+  Order order = 1;
+}
+
+message GetOrderRequest {
+  string id = 1;
+}
+
+message GetOrderResponse {
+  Order order = 1;
+}
+
+message ListOrdersRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  oneof payload {
+    string journey_id = 3;
+    ListOfIds ids = 4;
+  }
+}
+
+message ListOrdersResponse {
+  repeated Order orders = 1;
+  string next_page_token = 2;
+}
+
+message GetBookingRequest {
+  string id = 1;
+}
+
+message GetBookingResponse {
+  Booking booking = 1;
+}
+
+message ListBookingsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  oneof payload {
+    string order_id = 3;
+    ListOfIds ids = 4;
+  }
+}
+
+message ListBookingsResponse {
+  repeated Booking bookings = 1;
+  string next_page_token = 2;
+}
+
+message GetBookingDetailsRequest {
+  string id = 1;
+}
+
+message GetBookingDetailsResponse {
+  TripOptionDetails details = 1;
+}
+
+message ListBookingDetailsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  oneof payload {
+    string booking_id = 3;
+    ListOfIds ids = 4;
+  }
+}
+
+message ListBookingDetailsResponse {
+  repeated TripOptionDetails details = 1;
+  string next_page_token = 2;
+}
+
+message ListOfIds {
+  repeated string ids = 1;
+}

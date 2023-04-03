@@ -4,10 +4,10 @@ import datetime
 from typing import Sequence
 
 from snowfall.project.junction.go.adapter import errors
-from snowfall.project.junction.service.offers.v1alpha import (
+from snowfall.project.junction.go.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
-from snowfall.project.junction.service.trips.v1alpha import trips_pb2, trips_pb2_grpc
+from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2, trips_pb2_grpc
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2

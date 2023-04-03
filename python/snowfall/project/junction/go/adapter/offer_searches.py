@@ -5,7 +5,7 @@ import datetime
 from typing import Sequence
 
 from snowfall.project.junction.go.adapter import errors
-from snowfall.project.junction.service.offers.v1alpha import (
+from snowfall.project.junction.go.service.offers.v1alpha import (
     grpc_pb2,
     grpc_pb2_grpc,
     models_pb2,

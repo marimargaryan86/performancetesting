@@ -2,7 +2,9 @@ import itertools
 
 import more_itertools
 
-from snowfall.project.junction.service.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
+from snowfall.project.junction.go.service.offers.v1alpha import (
+    amqp_pb2 as offers_amqp_pb2,
+)
 from snowfall.project.junction.service.providers.direct_ferries import port, route
 from snowfall.project.junction.service.providers.direct_ferries.v1alpha import amqp_pb2
 from snowfall.stdlib import h3, time

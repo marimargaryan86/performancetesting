@@ -8,7 +8,7 @@ from snowfall.project.junction.go.service.admin_api import resources
 from snowfall.project.junction.go.service.admin_api.validators import (
     places as places_validator,
 )
-from snowfall.project.junction.service.places.v1alpha import models_pb2
+from snowfall.project.junction.go.service.places.v1alpha import models_pb2
 from snowfall.stdlib.integration.starlette import (
     messages,
     models,

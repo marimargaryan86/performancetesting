@@ -3,10 +3,10 @@ from typing import AsyncIterator, Mapping
 
 import structlog
 
-from snowfall.project.junction.provider import airports
-from snowfall.project.junction.service.offers.v1alpha import (
+from snowfall.project.junction.go.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
+from snowfall.project.junction.provider import airports
 from snowfall.project.junction.service.providers.ba_ndc import cache
 from snowfall.project.junction.service.providers.ba_ndc.search import parser
 from snowfall.project.junction.service.providers.ba_ndc.v1alpha import amqp_pb2

@@ -1,7 +1,7 @@
 from typing import Sequence
 
 from snowfall.project.junction.go.adapter import offers as offers_adapter
-from snowfall.project.junction.service.offers.v1alpha import models_pb2
+from snowfall.project.junction.go.service.offers.v1alpha import models_pb2
 
 
 class MissingOffersError(Exception):

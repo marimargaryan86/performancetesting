@@ -5,8 +5,10 @@ import zoneinfo
 import structlog
 from dateutil.relativedelta import relativedelta
 
-from snowfall.project.junction.service.offers.v1alpha.models_pb2 import OfferSegmentLeg
-from snowfall.project.junction.service.orders.v1alpha import amqp_pb2, models_pb2
+from snowfall.project.junction.go.service.offers.v1alpha.models_pb2 import (
+    OfferSegmentLeg,
+)
+from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2, models_pb2
 from snowfall.project.junction.service.providers.distribusion import (
     cache,
     notifications,

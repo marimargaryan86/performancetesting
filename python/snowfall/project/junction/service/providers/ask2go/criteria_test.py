@@ -1,13 +1,12 @@
-import base64
 import datetime
 from typing import Any, Mapping, Sequence
 
 import freezegun
 import more_itertools
 import pytest
-from google.protobuf import timestamp_pb2
+from google.protobuf import json_format, timestamp_pb2
 
-from snowfall.project.junction.service.offers.v1alpha import amqp_pb2, models_pb2
+from snowfall.project.junction.go.service.offers.v1alpha import amqp_pb2, models_pb2
 from snowfall.project.junction.service.providers.ask2go import criteria
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2 as common_models_pb2
@@ -82,33 +81,116 @@ _SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
     ),
 )
 
-# SK - 2022-11-11 - ARN -> BER - 18:15:00 -> 19:50:00 - 1 ADULT
-_SEARCH_TASK2_ENCODED = """
-Clh0eXBlLmdvb2dsZWFwaXMuY29tL3Nub3dmYWxsLnByb2plY3QuanVuY3Rpb24uc2VydmljZS5vZmZlcnMudjFh
-bHBoYS5UcmlwT2ZmZXJTZWFyY2hUYXNrEvUCCiRmZGFiODEwOS00YmMxLTQ2NTYtODI4MS03Y2EyNjYyZmI4YzIS
-qgIKnAIKJDAzNjdmMmM0LWRmMWQtNThiNi1hZTFjLTk3Mjg1MDgzY2ZiZBLzAQokMWIzNWZhZDYtY2RlZC01YWZl
-LThjNDYtNjdmMWY3MWE4MThlEsoBCiRmOTAyZDZjOC02MWIyLTUyNGEtOTgyZS05OWZhZjQ3MjNlNjQSRgoDQVJO
-EhlTdG9ja2hvbG0tQXJsYW5kYSBBaXJwb3J0GhIJihwibk7TTUAR+WabG9PrMUAiEEV1cm9wZS9TdG9ja2hvbG0a
-RAoDQkVSEhpCZXJsaW4gQnJhbmRlbmJ1cmcgQWlycG9ydBoSCVIOZhNgLkpAEb0bCwqDAitAIg1FdXJvcGUvQmVy
-bGluIgYIlIa6mwYqBgjYsrqbBjABOgJTSxIJCgcIxg8QChgZGiAwMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzI1Njc4
-OTAxMg==
-"""
-_SEARCH_TASK2 = protobuf.AnySerializer[amqp_pb2.TripOfferSearchTask].deserialize(
-    base64.b64decode(_SEARCH_TASK2_ENCODED),
+_SEARCH_TASK2 = json_format.ParseDict(
+    {
+        "offerSearchId": "fdab8109-4bc1-4656-8281-7ca2662fb8c2",
+        "search": {
+            "trips": [
+                {
+                    "id": "0367f2c4-df1d-58b6-ae1c-97285083cfbd",
+                    "segments": [
+                        {
+                            "id": "1b35fad6-cded-5afe-8c46-67f1f71a818e",
+                            "legs": [
+                                {
+                                    "id": "f902d6c8-61b2-524a-982e-99faf4723e64",
+                                    "origin": {
+                                        "ref": "ARN",
+                                        "name": "Stockholm-Arlanda Airport",
+                                        "coordinates": {
+                                            "latitude": 59.650831,
+                                            "longitude": 17.92119,
+                                        },
+                                        "timeZone": "Europe/Stockholm",
+                                    },
+                                    "destination": {
+                                        "ref": "BER",
+                                        "name": "Berlin Brandenburg Airport",
+                                        "coordinates": {
+                                            "latitude": 52.362307,
+                                            "longitude": 13.504906,
+                                        },
+                                        "timeZone": "Europe/Berlin",
+                                    },
+                                    "departureAt": "2022-11-11T17:15:00Z",
+                                    "arrivalAt": "2022-11-11T18:50:00Z",
+                                    "type": "TYPE_AIR",
+                                    "agencyName": "SK",
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
+            "passengers": [
+                {
+                    "dateOfBirth": {
+                        "year": 1990,
+                        "month": 10,
+                        "day": 25,
+                    },
+                },
+            ],
+        },
+        "sessionToken": "02345678901234567890123256789012",
+    },
+    amqp_pb2.TripOfferSearchTask(),
 )
 
-# BA - 2023-02-20 - LHR -> SIN -> SYD - 21:35:00 -> 06:55:00 - 1 ADULT
-_SEARCH_TASK3_ENCODED = """
-Clh0eXBlLmdvb2dsZWFwaXMuY29tL3Nub3dmYWxsLnByb2plY3QuanVuY3Rpb24uc2VydmljZS5vZmZlcnMudjFh
-bHBoYS5UcmlwT2ZmZXJTZWFyY2hUYXNrEuACCiRhOTUwMWU2Mi05Zjc5LTQ4OTItYWE5ZC01OGQyMjI4OWUzYTkS
-lQIKhwIKJDYwN2FmMGNiLWY2NDItNTg4Yi05ZTYyLTNhZTdiNmUyMjdlMBLeAQokNzQ2ZjA1YTYtM2MzOS01ZTU4
-LWE1OTAtODNkYmIzMDIzNjQ1ErUBCiQwNjcwYTc4ZC0zMjM4LTUzMjktYTJmNC1mZDMyNmQwY2IwODISOgoDTEhS
-EhBIZWF0aHJvdyBBaXJwb3J0GhIJe/mdJjO8SUARFF/tKM5R3b8iDUV1cm9wZS9Mb25kb24aOwoDU1lEEg5TeWRu
-ZXkgQWlycG9ydBoSCVZinpW0+EDAEaeyKOyi5WJAIhBBdXN0cmFsaWEvU3lkbmV5IgYIhM/PnwYqBgiUw9SfBjAB
-OgJCQRIJCgcIxg8QChgZGiAwMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzI1Njc4OTAxMg==
-"""
-_SEARCH_TASK3 = protobuf.AnySerializer[amqp_pb2.TripOfferSearchTask].deserialize(
-    base64.b64decode(_SEARCH_TASK3_ENCODED),
+_SEARCH_TASK3 = json_format.ParseDict(
+    {
+        "offerSearchId": "a9501e62-9f79-4892-aa9d-58d22289e3a9",
+        "search": {
+            "trips": [
+                {
+                    "id": "607af0cb-f642-588b-9e62-3ae7b6e227e0",
+                    "segments": [
+                        {
+                            "id": "746f05a6-3c39-5e58-a590-83dbb3023645",
+                            "legs": [
+                                {
+                                    "id": "0670a78d-3238-5329-a2f4-fd326d0cb082",
+                                    "origin": {
+                                        "ref": "LHR",
+                                        "name": "Heathrow Airport",
+                                        "coordinates": {
+                                            "latitude": 51.470311,
+                                            "longitude": -0.458118,
+                                        },
+                                        "timeZone": "Europe/London",
+                                    },
+                                    "destination": {
+                                        "ref": "SYD",
+                                        "name": "Sydney Airport",
+                                        "coordinates": {
+                                            "latitude": -33.943011,
+                                            "longitude": 151.176138,
+                                        },
+                                        "timeZone": "Australia/Sydney",
+                                    },
+                                    "departureAt": "2023-02-20T21:35:00Z",
+                                    "arrivalAt": "2023-02-21T19:55:00Z",
+                                    "type": "TYPE_AIR",
+                                    "agencyName": "BA",
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
+            "passengers": [
+                {
+                    "dateOfBirth": {
+                        "year": 1990,
+                        "month": 10,
+                        "day": 25,
+                    },
+                },
+            ],
+        },
+        "sessionToken": "02345678901234567890123256789012",
+    },
+    amqp_pb2.TripOfferSearchTask(),
 )
 
 _MULTIMODAL_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(

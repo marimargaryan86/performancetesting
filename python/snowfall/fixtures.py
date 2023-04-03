@@ -4,14 +4,14 @@ import types
 import zoneinfo
 from typing import Sequence
 
-from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
-from snowfall.project.junction.service.orders.v1alpha import (
+from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
+from snowfall.project.junction.go.service.orders.v1alpha import (
     models_pb2 as order_models_pb2,
 )
-from snowfall.project.junction.service.passenger_name_records.v1alpha import (
+from snowfall.project.junction.go.service.passenger_name_records.v1alpha import (
     passenger_name_records_pb2,
 )
-from snowfall.project.junction.service.places.v1alpha import (
+from snowfall.project.junction.go.service.places.v1alpha import (
     models_pb2 as place_models_pb2,
 )
 from snowfall.stdlib import h3, money, string

@@ -6,7 +6,7 @@ import httpx
 import structlog
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.service.orders.v1alpha import amqp_pb2
+from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2
 from snowfall.project.junction.service.providers.distribusion import (
     cache,
     config,

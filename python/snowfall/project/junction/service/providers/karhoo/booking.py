@@ -2,8 +2,8 @@ import datetime
 
 import structlog
 
+from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2, models_pb2
 from snowfall.project.junction.provider import notifications as base_notifications
-from snowfall.project.junction.service.orders.v1alpha import amqp_pb2, models_pb2
 from snowfall.project.junction.service.providers.karhoo import cache, notifications
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf

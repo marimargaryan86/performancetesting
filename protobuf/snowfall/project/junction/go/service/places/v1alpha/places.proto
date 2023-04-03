@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package snowfall.project.junction.go.service.places.v1alpha;
+
+import "snowfall/project/junction/go/service/places/v1alpha/models.proto";
+import "snowfall/stdlib/v1alpha/latlng.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/places/v1alpha";
+
+service LocationsService {
+  rpc GetLocation(GetLocationRequest) returns (GetLocationResponse) {}
+  rpc ListLocations(ListLocationsRequest) returns (ListLocationsResponse) {}
+  rpc ListNearbyLocations(ListNearbyLocationsRequest) returns (ListNearbyLocationsResponse) {}
+}
+
+message GetLocationRequest {
+  string id = 1;
+}
+
+message GetLocationResponse {
+  Location location = 1;
+}
+
+message ListLocationsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  oneof filter {
+    ListOfIds ids = 3;
+  }
+}
+
+message ListLocationsResponse {
+  repeated Location locations = 1;
+  string next_page_token = 2;
+}
+
+message ListNearbyLocationsRequest {
+  snowfall.stdlib.v1alpha.LatLng coordinates = 1;
+}
+
+message ListNearbyLocationsResponse {
+  repeated Location locations = 1;
+}
+
+service PlacesService {
+  rpc GetPlace(GetPlaceRequest) returns (GetPlaceResponse) {}
+  rpc ListPlaces(ListPlacesRequest) returns (ListPlacesResponse) {}
+  rpc CreatePlace(CreatePlaceRequest) returns (CreatePlaceResponse) {}
+  rpc DeletePlace(DeletePlaceRequest) returns (DeletePlaceResponse) {}
+  rpc UpdatePlace(UpdatePlaceRequest) returns (UpdatePlaceResponse) {}
+}
+
+message CreatePlaceRequest {
+  Place place = 1;
+}
+
+message CreatePlaceResponse {
+  Place place = 1;
+}
+
+message DeletePlaceRequest {
+  string id = 1;
+}
+
+message DeletePlaceResponse {}
+
+message UpdatePlaceRequest {
+  Place place = 1;
+}
+
+message UpdatePlaceResponse {
+  Place place = 1;
+}
+
+message GetPlaceRequest {
+  string id = 1;
+}
+
+message GetPlaceResponse {
+  Place place = 1;
+}
+
+message ListPlacesRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+message ListPlacesResponse {
+  repeated Place places = 1;
+  string next_page_token = 2;
+}

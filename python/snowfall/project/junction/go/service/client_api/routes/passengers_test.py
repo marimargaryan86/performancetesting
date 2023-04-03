@@ -1,6 +1,6 @@
 import httpx
 
-from snowfall.project.junction.service.orders.v1alpha import models_pb2
+from snowfall.project.junction.go.service.orders.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import testing
 

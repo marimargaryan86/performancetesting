@@ -5,7 +5,7 @@ from unittest import mock
 import freezegun
 import pytest
 
-from snowfall.project.junction.service.orders.v1alpha import amqp_pb2
+from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2
 from snowfall.project.junction.service.providers.ask2go import notifications
 from snowfall.vendor.ask2go.models import booking as a2g_booking
 from snowfall.vendor.ask2go.models import offers

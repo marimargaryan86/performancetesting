@@ -1,6 +1,8 @@
 import types
 
-from snowfall.project.junction.service.orders.v1alpha import models_pb2 as orders_models
+from snowfall.project.junction.go.service.orders.v1alpha import (
+    models_pb2 as orders_models,
+)
 from snowfall.stdlib.v1alpha import models_pb2
 from snowfall.vendor.ba_ndc.models.util import offer_enums, passenger_enums
 

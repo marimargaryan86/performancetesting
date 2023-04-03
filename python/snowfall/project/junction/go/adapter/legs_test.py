@@ -5,7 +5,7 @@ import pytest
 
 from snowfall import fixtures
 from snowfall.project.junction.go.adapter import errors, legs
-from snowfall.project.junction.service.schedules.v1alpha import (
+from snowfall.project.junction.go.service.schedules.v1alpha import (
     schedules_pb2,
     schedules_pb2_grpc,
 )

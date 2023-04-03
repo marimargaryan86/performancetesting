@@ -5,8 +5,10 @@ import random
 import structlog
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.service.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
-from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
+from snowfall.project.junction.go.service.offers.v1alpha import (
+    amqp_pb2 as offers_amqp_pb2,
+)
+from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.project.junction.service.providers.karhoo import cache, config
 from snowfall.stdlib import money, service, string
 from snowfall.stdlib.format import protobuf

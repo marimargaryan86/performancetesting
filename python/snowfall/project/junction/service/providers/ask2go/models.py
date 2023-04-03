@@ -6,8 +6,10 @@ import types
 import zoneinfo
 from typing import Sequence
 
-from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
-from snowfall.project.junction.service.orders.v1alpha import models_pb2 as orders_models
+from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
+from snowfall.project.junction.go.service.orders.v1alpha import (
+    models_pb2 as orders_models,
+)
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2
 from snowfall.vendor.ask2go.models import common

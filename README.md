@@ -30,7 +30,7 @@ dependencies.route(
 This tells `starlette` to forward the request to the `places.Places` class specified in the `python/snowfall/project/junction/go/service/client_api/routes/places.py`.
 The `places.Places` also receives an adapter `Client` object as an argument that is injected using `lagom`.
 The `Client` is an abstract class is defined in `python/snowfall/project/junction/adapter/places.py`.
-The `GrpcClient` implementation defines communication with the `python/snowfall/project/junction/service/places` service using the `grpc` protocol.
+The `GrpcClient` implementation defines communication with the `python/snowfall/project/junction/go/service/places` service using the `grpc` protocol.
 The `places grpc` service then reads the places from the `mongo` collection and returns them to the adapter `Client` which returns the data to the endpoint which in turn forwards it to the user.
 
 

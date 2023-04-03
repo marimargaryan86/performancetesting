@@ -3,14 +3,16 @@ from typing import AsyncIterator, Callable, Generic, Sequence, TypeVar
 
 from google.protobuf import message
 
+from snowfall.project.junction.go.service.offers.v1alpha import (
+    amqp_pb2 as offers_amqp_pb2,
+)
+from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.project.junction.provider import status
 from snowfall.project.junction.provider.repository import (
     OfferCacheLockError,
     OfferGroupRepository,
 )
 from snowfall.project.junction.provider.segment_matcher import SegmentMatcher
-from snowfall.project.junction.service.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
-from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.stdlib.persistence.redis import types as redis_types
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer as amqp_producer

@@ -21,7 +21,7 @@ def _routes(app: service.Application[_Settings]) -> list[routing.BaseRoute]:
     container = lagom.Container()
     container[templating.Jinja2Templates] = templating.Jinja2Templates(
         filesystem.package_path(
-            "snowfall.project.junction.service.dogfood_ui.templates",
+            "snowfall.project.junction.go.service.dogfood_ui.templates",
         ),
     )
 
@@ -33,7 +33,7 @@ def _routes(app: service.Application[_Settings]) -> list[routing.BaseRoute]:
             "/static",
             staticfiles.StaticFiles(
                 directory=filesystem.package_path(
-                    "snowfall.project.junction.service.dogfood_ui.static",
+                    "snowfall.project.junction.go.service.dogfood_ui.static",
                 ),
             ),
         ),

@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package snowfall.project.junction.go.service.planner.v1alpha;
+
+import "snowfall/stdlib/v1alpha/datetime.proto";
+import "snowfall/stdlib/v1alpha/latlng.proto";
+import "snowfall/stdlib/v1alpha/models.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/planner/v1alpha";
+
+service PlannerService {
+  rpc SearchJourney(SearchJourneyRequest) returns (SearchJourneyResponse) {}
+}
+
+message SearchJourneyRequest {
+  repeated snowfall.stdlib.v1alpha.LatLng origins = 1;
+  repeated snowfall.stdlib.v1alpha.LatLng destinations = 2;
+  snowfall.stdlib.v1alpha.DateTime departure_after = 3;
+  optional uint32 maximum_connections = 4;
+  repeated snowfall.stdlib.v1alpha.Schedule.Type allowed_segment_types = 5;
+}
+
+message SearchJourneyResponse {
+  repeated snowfall.stdlib.v1alpha.TripReference trips = 1;
+}

@@ -4,7 +4,7 @@ import more_itertools
 import pytest_httpx
 from structlog import testing
 
-from snowfall.project.junction.service.orders.v1alpha import amqp_pb2, models_pb2
+from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2, models_pb2
 from snowfall.project.junction.service.providers.ask2go import booking, cache, conftest
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf

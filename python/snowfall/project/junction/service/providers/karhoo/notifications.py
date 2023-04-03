@@ -1,7 +1,7 @@
 import datetime
 
+from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2
 from snowfall.project.junction.provider import notifications
-from snowfall.project.junction.service.orders.v1alpha import amqp_pb2
 from snowfall.vendor.karhoo.models import bookings
 
 

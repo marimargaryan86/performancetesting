@@ -8,8 +8,8 @@ import prometheus_client
 import pycountry
 import structlog
 
+from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2, models_pb2
 from snowfall.project.junction.provider import notifications as base_notifications
-from snowfall.project.junction.service.orders.v1alpha import amqp_pb2, models_pb2
 from snowfall.project.junction.service.providers.ask2go import (
     cache,
     criteria,

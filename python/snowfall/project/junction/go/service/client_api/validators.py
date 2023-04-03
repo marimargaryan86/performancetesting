@@ -9,7 +9,7 @@ from snowfall.project.junction.go.adapter import offers as offers_adapter
 from snowfall.project.junction.go.adapter import orders as orders_adapter
 from snowfall.project.junction.go.adapter import price_quotes as price_quotes_adapter
 from snowfall.project.junction.go.adapter import trips
-from snowfall.project.junction.service.offers.v1alpha import (
+from snowfall.project.junction.go.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
 from snowfall.stdlib.integration.starlette import models, request_helpers

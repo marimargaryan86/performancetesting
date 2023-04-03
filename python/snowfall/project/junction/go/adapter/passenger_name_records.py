@@ -4,7 +4,7 @@ import abc
 from typing import Sequence
 
 from snowfall.project.junction.go.adapter import errors
-from snowfall.project.junction.service.passenger_name_records.v1alpha import (
+from snowfall.project.junction.go.service.passenger_name_records.v1alpha import (
     passenger_name_records_pb2,
     passenger_name_records_pb2_grpc,
 )

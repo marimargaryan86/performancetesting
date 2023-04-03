@@ -3,7 +3,9 @@ from typing import Collection, Sequence
 
 import more_itertools
 
-from snowfall.project.junction.service.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
+from snowfall.project.junction.go.service.offers.v1alpha import (
+    amqp_pb2 as offers_amqp_pb2,
+)
 from snowfall.project.junction.service.providers.distribusion import stations
 from snowfall.project.junction.service.providers.distribusion.v1alpha import amqp_pb2
 from snowfall.stdlib import h3

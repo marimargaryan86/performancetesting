@@ -4,8 +4,8 @@ from collections.abc import AsyncIterator
 
 import pydantic
 
-from snowfall.project.junction.service.offers.v1alpha import amqp_pb2
-from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
+from snowfall.project.junction.go.service.offers.v1alpha import amqp_pb2
+from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.stdlib import money, service, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.amqp import consumer, producer, types

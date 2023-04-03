@@ -4,7 +4,7 @@ from typing import Any, Mapping, Sequence
 from starlette import status
 
 from snowfall.project.junction.go.adapter import locations
-from snowfall.project.junction.service.places.v1alpha import models_pb2, places_pb2
+from snowfall.project.junction.go.service.places.v1alpha import models_pb2, places_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
 

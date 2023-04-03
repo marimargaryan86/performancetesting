@@ -2,8 +2,10 @@ import datetime
 
 import phonenumbers
 
-from snowfall.project.junction.service.orders.v1alpha import amqp_pb2 as order_amqp_pb2
-from snowfall.project.junction.service.orders.v1alpha import (
+from snowfall.project.junction.go.service.orders.v1alpha import (
+    amqp_pb2 as order_amqp_pb2,
+)
+from snowfall.project.junction.go.service.orders.v1alpha import (
     models_pb2 as order_models_pb2,
 )
 from snowfall.project.junction.service.providers.direct_ferries import cache

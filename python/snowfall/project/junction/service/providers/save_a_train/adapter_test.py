@@ -3,7 +3,7 @@ from unittest import mock
 
 import pytest_httpx
 
-from snowfall.project.junction.service.orders.v1alpha import amqp_pb2, models_pb2
+from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2, models_pb2
 from snowfall.project.junction.service.providers.save_a_train import (
     adapter,
     cache,

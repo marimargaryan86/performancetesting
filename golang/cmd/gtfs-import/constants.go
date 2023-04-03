@@ -1,14 +1,14 @@
 package main
 
 import (
-	places "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/places/v1alpha"
+	places "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/places/v1alpha"
 	v1alpha "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"
 )
 
 /*
 These are in:
 golang/protobuf/snowfall/stdlib/v1alpha/ package stdlibv1alpha
-golang/protobuf/snowfall/project/junction/service/places/v1alpha/  package placesv1alpha
+golang/protobuf/snowfall/project/junction/go/service/places/v1alpha/  package placesv1alpha
 
 and models.pb.go is the module mostly used here
 */

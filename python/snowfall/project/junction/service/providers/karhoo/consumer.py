@@ -2,8 +2,10 @@ import asyncio
 import datetime
 from typing import AsyncIterator
 
-from snowfall.project.junction.service.offers.v1alpha import amqp_pb2 as offers_amqp_pb2
-from snowfall.project.junction.service.offers.v1alpha import (
+from snowfall.project.junction.go.service.offers.v1alpha import (
+    amqp_pb2 as offers_amqp_pb2,
+)
+from snowfall.project.junction.go.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
 from snowfall.project.junction.service.providers.karhoo import cache

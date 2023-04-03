@@ -4,8 +4,8 @@ from typing import Iterator, Sequence
 
 import more_itertools
 
+from snowfall.project.junction.go.service.offers.v1alpha import amqp_pb2
 from snowfall.project.junction.provider import airports
-from snowfall.project.junction.service.offers.v1alpha import amqp_pb2
 from snowfall.project.junction.service.providers.duffel.v1alpha import (
     amqp_pb2 as provider_amqp_pb2,
 )

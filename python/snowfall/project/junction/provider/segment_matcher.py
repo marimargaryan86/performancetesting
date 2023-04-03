@@ -8,7 +8,7 @@ from typing import Sequence
 import more_itertools
 import structlog
 
-from snowfall.project.junction.service.offers.v1alpha import models_pb2 as offers_pb2
+from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2
 
