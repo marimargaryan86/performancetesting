@@ -70,6 +70,7 @@ async def offers(  # noqa: WPS210
             ),
             polling_wait_time_in_seconds=app.settings.polling_wait_time_seconds,
             polling_retries_attempts=app.settings.polling_retries_attempts,
+            provider_company_id=app.settings.provider_company_id,
         )
 
         await trip_offer_search_consumer.consume()

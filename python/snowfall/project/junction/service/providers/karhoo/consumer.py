@@ -27,6 +27,7 @@ class TripOfferSearchConsumer(object):  # noqa: WPS214
         ttl: datetime.timedelta,
         polling_wait_time_in_seconds: int,
         polling_retries_attempts: int,
+        provider_company_id: str,
     ):
         self._consumer = consumer_obj
         self._client = karhoo_client
@@ -36,6 +37,7 @@ class TripOfferSearchConsumer(object):  # noqa: WPS214
         self._ttl = ttl
         self._polling_wait_time = polling_wait_time_in_seconds
         self._polling_retries_attempts = polling_retries_attempts
+        self._provider_company_id = provider_company_id
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -50,6 +52,7 @@ class TripOfferSearchConsumer(object):  # noqa: WPS214
                 msg=offers_amqp_pb2.TripOfferSearchResult(
                     offer_search_id=offer_group.id,
                     offer=offer_group,
+                    provider_company_id=self._provider_company_id,
                 ),
                 routing_key="offers.result.trip",
             )
