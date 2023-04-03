@@ -103,6 +103,10 @@ job "client-api-http" {
               local_bind_port  = 8020
               destination_name = "trips-${var.environment}"
             }
+            upstreams {
+              local_bind_port  = 8010
+              destination_name = "authentication-${var.environment}"
+            }
           }
         }
       }
@@ -149,6 +153,7 @@ ORDERS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_orders-${var.environment
 PLACES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_places-${var.environment}"))}}
 SCHEDULES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_schedules-${var.environment}"))}}
 TRIPS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_trips-${var.environment}"))}}
+AUTHENTICATION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_authentication-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/client-api" }}
 JWT_PUBLIC_KEY={{ .Data.data.jwt_public_key }}
 {{ end }}
