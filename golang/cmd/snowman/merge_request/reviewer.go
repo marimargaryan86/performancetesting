@@ -144,7 +144,7 @@ func (mr *mergeRequest) expectedReviewers() ([]int, error) {
 		}
 
 		for _, o := range owners {
-			if o != mr.object.Author.ID {
+			if o != mr.object.Author.ID && !sliceutil.In(mr.configuration.Reviewers.Blacklist, o) {
 				eligible = append(eligible, o)
 			}
 		}
@@ -163,10 +163,19 @@ func (mr *mergeRequest) expectedReviewers() ([]int, error) {
 	}
 
 	reviewer = mr.object.Author.ID
+	eligible = make([]int, 0)
 
-	for len(contributors) > 1 && reviewer == mr.object.Author.ID {
-		randomIndex := rand.Intn(len(contributors))
-		reviewer = contributors[randomIndex]
+	for _, contributor := range contributors {
+		if contributor == mr.object.Author.ID || sliceutil.In(mr.configuration.Reviewers.Blacklist, contributor) {
+			continue
+		}
+
+		eligible = append(eligible, contributor)
+	}
+
+	if len(eligible) > 0 {
+		randomIndex := rand.Intn(len(eligible))
+		reviewer = eligible[randomIndex]
 	}
 
 	return mr.appendCodeOwners([]int{reviewer}, nil)

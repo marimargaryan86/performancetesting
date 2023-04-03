@@ -13,8 +13,13 @@ type CommitsConfiguration struct {
 	Types  []string            `yaml:"types"`
 }
 
+type ReviewersConfiguration struct {
+	Blacklist []int `yaml:"blacklist"`
+}
+
 type Configuration struct {
-	Commits CommitsConfiguration `yaml:"commits"`
+	Commits   CommitsConfiguration   `yaml:"commits"`
+	Reviewers ReviewersConfiguration `yaml:"reviewers"`
 }
 
 func defaultConfiguration() Configuration {
