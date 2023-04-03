@@ -1,3 +1,6 @@
+import dataclasses
+from typing import Any, Mapping
+
 from grpc import StatusCode, aio
 
 from snowfall.project.junction.service.orders.amqp import OrderProducer
@@ -8,7 +11,47 @@ from snowfall.project.junction.service.orders.orders import (
     OrderRepository,
 )
 from snowfall.project.junction.service.orders.v1alpha import orders_pb2, orders_pb2_grpc
-from snowfall.stdlib.transport.grpc import metadata, service
+from snowfall.stdlib.transport.grpc import metadata, rich_status, service
+
+
+@dataclasses.dataclass(frozen=True)
+class AuthToken(object):
+    version: str
+    client_id: str
+
+
+async def parse_auth_token(
+    token: Mapping[str, Any],
+    context: aio.ServicerContext,
+) -> AuthToken:
+    required_fields = {field.name for field in dataclasses.fields(AuthToken)}
+    missing_fields = required_fields.difference(token.keys())
+    if missing_fields:
+        await rich_status.abort_with_rich_status(
+            context,
+            rich_status.build_rich_status(
+                code=StatusCode.UNAUTHENTICATED,
+                error=rich_status.error_details_pb2.BadRequest(
+                    field_violations=[
+                        rich_status.error_details_pb2.BadRequest.FieldViolation(
+                            field=missing_field,
+                            description="{} missing from auth token.".format(
+                                missing_field,
+                            ),
+                        )
+                        for missing_field in missing_fields
+                    ],
+                ),
+                description="Auth token is missing fields.",
+            ),
+        )
+    return AuthToken(
+        **{
+            key: token_value
+            for key, token_value in token.items()
+            if key in required_fields
+        },
+    )
 
 
 class OrderService(
@@ -42,9 +85,14 @@ class OrderService(
         request: orders_pb2.CreateJourneyRequest,
         context: aio.ServicerContext,
     ) -> orders_pb2.CreateJourneyResponse:
+        auth_token = await parse_auth_token(
+            await metadata.get_auth_token(context),
+            context,
+        )
         return orders_pb2.CreateJourneyResponse(
             journey=await self._journeys.create(
                 contact_details=request.contact_details,
+                reseller_id=auth_token.client_id,
             ),
         )
 
@@ -84,8 +132,6 @@ class OrderService(
         request: orders_pb2.PlaceOrderRequest,
         context: aio.ServicerContext,
     ) -> orders_pb2.PlaceOrderResponse:
-        await metadata.get_auth_token(context)
-
         journey = await self._journeys.find_by_id(request.journey_id)
 
         if journey is None:

@@ -33,11 +33,13 @@ class JourneyRepository(
     async def create(
         self,
         contact_details: models_pb2.ContactDetails,
+        reseller_id: str,
     ) -> models_pb2.Journey:
         journey = models_pb2.Journey(
             id=string.uuid(),
             passenger_name_record=(await self._passenger_name_records.create()).id,
             contact_details=contact_details,
+            reseller_id=reseller_id,
         )
 
         insert = await self._execute(

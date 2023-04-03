@@ -18,7 +18,7 @@ message Journey {
   ContactDetails contact_details = 4;
   google.protobuf.Timestamp created_at = 5;
   google.protobuf.Timestamp updated_at = 6;
-  // reseller id
+  string reseller_id = 7;
 }
 
 message Order {
@@ -29,7 +29,6 @@ message Order {
   google.protobuf.Timestamp created_at = 5;
   google.protobuf.Timestamp updated_at = 6;
   snowfall.stdlib.v1alpha.PostalAddress residence_address = 7;
-  // reseller id
 }
 
 message Booking {

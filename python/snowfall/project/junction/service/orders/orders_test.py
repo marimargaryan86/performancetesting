@@ -12,6 +12,7 @@ async def order(
 ) -> models_pb2.Order:
     journey = await journey_repository.create(
         contact_details=models_pb2.ContactDetails(),
+        reseller_id="",
     )
     return await order_repository.create_from_options(
         journey_id=journey.id,

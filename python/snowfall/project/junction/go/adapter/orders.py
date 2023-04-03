@@ -24,16 +24,16 @@ class Client(abc.ABC):
     async def create_journey(
         self,
         contact_details: models_pb2.ContactDetails,
+        auth_token: str,
     ) -> models_pb2.Journey:
         """Create a new journey resource."""
 
     @abc.abstractmethod
-    async def place_order(  # noqa: WPS211
+    async def place_order(
         self,
         journey_id: str,
         passengers: Sequence[models_pb2.Passenger],
         options: Sequence[models_pb2.TripOption],
-        auth_token: str,
         residence_address: postal_address_pb2.PostalAddress | None,
     ) -> models_pb2.Order:
         """Create a new order resource."""
@@ -130,6 +130,7 @@ class DictClient(Client):
     async def create_journey(
         self,
         contact_details: models_pb2.ContactDetails,
+        auth_token: str,
     ) -> models_pb2.Journey:
         journey = models_pb2.Journey(
             id=string.uuid(),
@@ -140,12 +141,11 @@ class DictClient(Client):
 
         return journey
 
-    async def place_order(  # noqa: WPS211
+    async def place_order(
         self,
         journey_id: str,
         passengers: Sequence[models_pb2.Passenger],
         options: Sequence[models_pb2.TripOption],
-        auth_token: str,
         residence_address: postal_address_pb2.PostalAddress | None,
     ) -> models_pb2.Order:
         if journey_id not in self._journeys:
@@ -415,22 +415,23 @@ class GrpcClient(Client):
     async def create_journey(
         self,
         contact_details: models_pb2.ContactDetails,
+        auth_token: str,
     ) -> models_pb2.Journey:
         response = await errors.handle_grpc_errors(
             self._orders.CreateJourney(
                 orders_pb2.CreateJourneyRequest(contact_details=contact_details),
                 timeout=self._timeout,
+                metadata=aio.Metadata(("authentication", auth_token)),
             ),
         )
 
         return response.journey
 
-    async def place_order(  # noqa: WPS211
+    async def place_order(
         self,
         journey_id: str,
         passengers: Sequence[models_pb2.Passenger],
         options: Sequence[models_pb2.TripOption],
-        auth_token: str,
         residence_address: postal_address_pb2.PostalAddress | None,
     ) -> models_pb2.Order:
         response = await errors.handle_grpc_errors(
@@ -447,7 +448,6 @@ class GrpcClient(Client):
                     ],
                 ),
                 timeout=self._timeout,
-                metadata=aio.Metadata(("authentication", auth_token)),
             ),
         )
 
