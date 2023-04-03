@@ -49,22 +49,25 @@ async def price_quotes(
             transformer=pricing_transformer.PriceQuoteTransformer(
                 offer_cache=offer_cache,
             ),
+            provider_company_id=app.settings.provider_company_id,
         ).consume()
 
 
 class PriceQuoteConsumer(object):
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
         consumer_obj: amqp_consumer.Consumer[offers_amqp_pb2.TripPriceQuoteTask],
         producer_obj: producer.Producer,
         transformer: pricing_transformer.PriceQuoteTransformer,
         offer_cache: cache.OfferCache,
+        provider_company_id: str,
     ):
         self._cache = offer_cache
         self._consumer = consumer_obj
         self._logger = structlog.get_logger(__name__)
         self._producer = producer_obj
         self._transformer = transformer
+        self._provider_company_id = provider_company_id
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -86,6 +89,7 @@ class PriceQuoteConsumer(object):
                     offer_details=offer_details,
                     option_id=amqp_message.body.option_id,
                 ),
+                provider_company_id=self._provider_company_id,
             ),
             routing_key="offers.result.price",
         )

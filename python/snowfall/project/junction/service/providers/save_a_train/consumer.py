@@ -71,6 +71,7 @@ class PriceQuoteConsumer(object):
         offer_cache: cache.OffersCache,
         price_cache: cache.PriceQuoteCache,
         price_ttl: datetime.timedelta,
+        provider_company_id: str,
     ):
         self._offer_cache = offer_cache
         self._price_cache = price_cache
@@ -78,6 +79,7 @@ class PriceQuoteConsumer(object):
         self._consumer = consumer_obj
         self._logger = structlog.get_logger(__name__)
         self._producer = producer_obj
+        self._provider_company_id = provider_company_id
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -114,6 +116,7 @@ class PriceQuoteConsumer(object):
                         money.Currency(offer_details.currency),
                     ).protobuf(),
                 ),
+                provider_company_id=self._provider_company_id,
             ),
             routing_key="offers.result.price",
         )

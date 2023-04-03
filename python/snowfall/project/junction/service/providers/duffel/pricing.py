@@ -68,6 +68,7 @@ async def price_quotes(  # noqa: WPS210
                 offer_cache=offer_cache,
             ),
             adapter=pricing_adapter.PricingAdapter(duffel_client=duffel_client),
+            provider_company_id=app.settings.provider_company_id,
         ).consume()
 
 
@@ -79,6 +80,7 @@ class PriceQuoteConsumer(object):
         transformer: pricing_transformer.PriceQuoteTransformer,
         adapter: pricing_adapter.PricingAdapter,
         offer_cache: cache.OfferCache,
+        provider_company_id: str,
     ):
         self._pricing = pricing_adapter
         self._cache = offer_cache
@@ -87,6 +89,7 @@ class PriceQuoteConsumer(object):
         self._producer = producer_obj
         self._adapter = adapter
         self._transformer = transformer
+        self._provider_company_id = provider_company_id
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -108,6 +111,7 @@ class PriceQuoteConsumer(object):
                     offer=await self._adapter.get_price_quote(offer_details),
                     option_id=amqp_message.body.option_id,
                 ),
+                provider_company_id=self._provider_company_id,
             ),
             routing_key="offers.result.price",
         )

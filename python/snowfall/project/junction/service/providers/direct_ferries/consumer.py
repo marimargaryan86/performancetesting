@@ -20,18 +20,20 @@ TripSearchMessages = offers_amqp_pb2.TripOfferSearchTask | trackable_pb2.Trackab
 
 
 class PriceQuoteConsumer(object):
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
         consumer_obj: consumer.Consumer[offers_amqp_pb2.TripPriceQuoteTask],
         producer_obj: producer.Producer,
         offer_cache: cache.OffersCache,
         price_ttl: datetime.timedelta,
+        provider_company_id: str,
     ):
         self._offer_cache = offer_cache
         self._ttl = price_ttl
         self._consumer = consumer_obj
         self._logger = structlog.get_logger(__name__)
         self._producer = producer_obj
+        self._provider_company_id = provider_company_id
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -74,6 +76,7 @@ class PriceQuoteConsumer(object):
                     ],
                     rules=rules,
                 ),
+                provider_company_id=self._provider_company_id,
             ),
             routing_key="offers.result.price",
         )

@@ -25,6 +25,10 @@ class OffersSettings(service.Settings):
     provider_company_id: str
 
 
+class PriceQuoteSettings(service.Settings):
+    provider_company_id: str
+
+
 _SearchCriteriaTask = TypeVar("_SearchCriteriaTask", bound=message.Message)
 _SearchCriteria = TypeVar("_SearchCriteria", bound=object)
 _OffersSettings = TypeVar("_OffersSettings", bound=OffersSettings)

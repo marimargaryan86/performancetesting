@@ -60,7 +60,7 @@ class _OffersSettings(_SatConfig, service.OffersSettings):
     allowed_window_td: datetime.timedelta = datetime.timedelta(minutes=10)
 
 
-class _PriceQuoteSettings(service.Settings):
+class _PriceQuoteSettings(service.PriceQuoteSettings):
     amqp_dsn: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
@@ -260,6 +260,7 @@ async def _price_quotes(app: service.Application[_PriceQuoteSettings]) -> None:
                 client=redis.Client(redis_connection, prefix=app.name),
             ),
             price_ttl=app.settings.ttl,
+            provider_company_id=app.settings.provider_company_id,
         ).consume()
 
 

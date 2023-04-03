@@ -10,6 +10,7 @@ import pydantic
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import offers, repository
+from snowfall.project.junction.provider.service import OffersSettings
 from snowfall.project.junction.service.providers.direct_ferries import (
     adapter,
     booking,
@@ -53,9 +54,7 @@ class _SearchSettings(service.Settings):
     provider_company_id: str
 
 
-class _OffersSettings(service.Settings):
-    amqp_dsn: pydantic.AnyUrl
-    redis_dsn: Sequence[pydantic.AnyUrl]
+class _OffersSettings(OffersSettings):
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
 
 
@@ -261,6 +260,7 @@ async def _price_quotes(app: service.Application[_OffersSettings]) -> None:
                 client=redis.Client(redis_connection, prefix=app.name),
             ),
             price_ttl=app.settings.ttl,
+            provider_company_id=app.settings.provider_company_id,
         ).consume()
 
 

@@ -22,3 +22,4 @@ class OffersSettings(service.OffersSettings, BaNdcConfig):
 class PricingSettings(BaNdcConfig, service.Settings):
     amqp_dsn: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
+    provider_company_id: str

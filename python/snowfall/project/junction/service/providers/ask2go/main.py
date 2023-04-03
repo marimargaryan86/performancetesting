@@ -59,7 +59,7 @@ class _OffersSettings(service.OffersSettings):
     mongo_dsn: Sequence[pydantic.AnyUrl]
 
 
-class _PriceQuotesSettings(service.Settings):
+class _PriceQuotesSettings(service.PriceQuoteSettings):
     amqp_dsn: pydantic.AnyUrl
     api_base_url: pydantic.AnyUrl
     api_booking_base_url: pydantic.AnyUrl
@@ -270,6 +270,7 @@ async def _price_quotes(app: service.Application[_PriceQuotesSettings]) -> None:
                 offer_ttl=app.settings.ttl,
             ),
             pricing_adapter=pricing.Adapter(ask2go_client=ask2go_client),
+            provider_company_id=app.settings.provider_company_id,
         ).consume()
 
 

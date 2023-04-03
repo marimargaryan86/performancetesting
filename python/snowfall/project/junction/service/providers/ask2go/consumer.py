@@ -32,6 +32,7 @@ class PriceQuoteConsumer(object):
         pricing_adapter: pricing.Adapter,
         offer_transformer: transformer.OfferTransformer,
         offer_cache: cache.OfferCache,
+        provider_company_id: str,
     ):
         self._pricing = pricing_adapter
         self._transformer = offer_transformer
@@ -39,6 +40,7 @@ class PriceQuoteConsumer(object):
         self._consumer = consumer_obj
         self._logger = structlog.get_logger(__name__)
         self._producer = producer_obj
+        self._provider_company_id = provider_company_id
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -63,6 +65,7 @@ class PriceQuoteConsumer(object):
                     ),
                     option_id=amqp_message.body.option_id,
                 ),
+                provider_company_id=self._provider_company_id,
             ),
             routing_key="offers.result.price",
         )
