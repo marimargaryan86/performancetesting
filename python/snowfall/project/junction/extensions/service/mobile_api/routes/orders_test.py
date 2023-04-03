@@ -87,6 +87,7 @@ class TestOrders(object):
                                     "documentIssueCountry": "GB",
                                     "documentExpirationDate": "2025-02-03",
                                     "nationality": "GB",
+                                    "residenceCountryCode": "NL",
                                 },
                             },
                         ],

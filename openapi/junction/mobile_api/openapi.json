@@ -6248,6 +6248,14 @@
             "minLength": 2,
             "maxLength": 2,
             "pattern": "^[A-Z]{2}$"
+          },
+          "residenceCountryCode": {
+            "type": "string",
+            "description": "2 letter country code",
+            "example": "NL",
+            "minLength": 2,
+            "maxLength": 2,
+            "pattern": "^[A-Z]{2}$"
           }
         }
       },

@@ -26,6 +26,7 @@ class TravelerDocument(object):
     document_issue_country: str
     document_expiration_date: str
     nationality: str
+    residence_country_code: Optional[str] = None
 
 
 @dataclasses.dataclass(frozen=True)
