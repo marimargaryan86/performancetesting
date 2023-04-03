@@ -11,6 +11,7 @@ from snowfall.project.junction.go.service.offers import (
     aggregator,
     importer,
     offers,
+    pay_quotes,
     price_quotes,
 )
 from snowfall.project.junction.go.service.offers.amqp import (
@@ -26,6 +27,8 @@ from snowfall.stdlib import service
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, producer, trackable, types
 from snowfall.stdlib.transport.grpc import server
+from snowfall.vendor.junction.auth import UserAuth
+from snowfall.vendor.junction.pay.client import Client as PayClient
 
 _TRIP_OFFER_SEARCH_ROUTING_KEY = "offers.search.trip"
 
@@ -49,6 +52,8 @@ class _ImportSettings(service.Settings):
     use_pay_for_currency_conversions: bool = False
     pay_admin_username: str
     pay_admin_password: str
+    public_pay_api_dsn: pydantic.AnyUrl
+    public_pay_admin_api_dsn: pydantic.AnyUrl
 
 
 class _GatherPriceQuoteSettings(service.Settings):
@@ -60,6 +65,8 @@ class _GatherPriceQuoteSettings(service.Settings):
     use_pay_for_currency_conversions: bool = False
     pay_admin_username: str
     pay_admin_password: str
+    public_pay_api_dsn: pydantic.AnyUrl
+    public_pay_admin_api_dsn: pydantic.AnyUrl
 
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
@@ -178,6 +185,26 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
                         mongo.offers.offer_searches,
                         app.settings.default_ttl,
                     ),
+                ),
+                offer_searches=offers.OfferSearchRepository(
+                    mongo.offers.offer_searches,
+                    app.settings.default_ttl,
+                ),
+                pay_quote_fetcher=pay_quotes.PayQuoteFetcher(
+                    use_pay_for_currency_conversions=(
+                        app.settings.use_pay_for_currency_conversions
+                    ),
+                    pay_client=PayClient(
+                        app.settings.public_pay_api_dsn,
+                        UserAuth(
+                            app.settings.public_pay_admin_api_dsn,
+                            app.settings.pay_admin_username,
+                            app.settings.pay_admin_password,
+                        ),
+                        None,
+                    ),
+                    payer_id=app.settings.payer_company_id,
+                    payer_currency=app.settings.payer_currency_code,
                 ),
             )
             await offer_importer.consume()

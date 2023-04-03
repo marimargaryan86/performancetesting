@@ -7,7 +7,12 @@ import prometheus_client
 import structlog
 from pymongo import errors
 
-from snowfall.project.junction.go.service.offers import aggregator, offers, price_quotes
+from snowfall.project.junction.go.service.offers import (
+    aggregator,
+    offers,
+    pay_quotes,
+    price_quotes,
+)
 from snowfall.project.junction.go.service.offers.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.instrumentation import prometheus
@@ -21,12 +26,15 @@ ExpectedMessages = Union[
     trackable_pb2.Trackable,
 ]
 
-
 _histogram_search_time = prometheus_client.Histogram(
     "offers_search_time_seconds",
     "Time needed to complete offer searches (in seconds).",
     buckets=prometheus.BUCKETS,
 )
+
+
+class SkippedOfferError(Exception):
+    """Raised when an offer is skipped."""
 
 
 class StatusHandler(trackable.AnySizeStatusHandler):
@@ -86,6 +94,8 @@ class OfferImporter(object):
         offer_aggregator: aggregator.OfferAggregator,
         redis: types.Client[str],
         status_handler: StatusHandler,
+        offer_searches: offers.OfferSearchRepository,
+        pay_quote_fetcher: pay_quotes.PayQuoteFetcher,
     ):
         self._consumer = consumer_obj
         self._offers = trip_offers
@@ -93,6 +103,8 @@ class OfferImporter(object):
         self._logger = structlog.get_logger(__name__)
         self._redis = redis
         self._status_handler = status_handler
+        self._searches = offer_searches
+        self._pay_quote_fetcher = pay_quote_fetcher
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -112,6 +124,16 @@ class OfferImporter(object):
         message: amqp_pb2.TripOfferSearchResult,
     ) -> None:
         redis_lock = "results:{0}".format(message.offer_search_id)
+
+        offer_search = await self._searches.find_by_id(message.offer_search_id)
+
+        if not offer_search:
+            raise SkippedOfferError()
+
+        message = await self._pay_quote_fetcher.convert_amounts_and_replace_ids(
+            message=message,
+            session_token=offer_search.session_token,
+        )
 
         async with self._redis.lock(redis_lock, timeout=10):
             try:
