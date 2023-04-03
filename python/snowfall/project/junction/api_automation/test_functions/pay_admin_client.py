@@ -230,7 +230,6 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
                     "emailAddress": email_address,
                     "phoneNumber": phone_number,
                 },
-                _RELATIONSHIPS_KEY: {},
             },
         }
 
