@@ -22,6 +22,7 @@ type mergeRequest struct {
 	logger        *zap.SugaredLogger
 	object        *gitlab.MergeRequest
 	snowman       *gitlab.User
+	breaking      bool
 }
 
 func (mr *mergeRequest) approvalState() (*gitlab.MergeRequestApprovalState, error) {

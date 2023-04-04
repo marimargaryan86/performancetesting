@@ -63,3 +63,6 @@ reviewers:
   blacklist:
     - 8
     - 22
+  breaking:
+    - 8
+    - 22

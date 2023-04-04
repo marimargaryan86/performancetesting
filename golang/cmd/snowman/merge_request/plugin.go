@@ -94,6 +94,12 @@ func (plugin *MergeRequestPlugin) onTimer(pid int, iid int) {
 		snowman:       plugin.snowman,
 	}
 
+	title, err := common.ParseCommitTitle(wrapper.object.Title)
+
+	if err == nil {
+		wrapper.breaking = title.IsBreaking
+	}
+
 	for _, i := range []invokable{
 		wrapper.validateTitle,
 		wrapper.validateScope,

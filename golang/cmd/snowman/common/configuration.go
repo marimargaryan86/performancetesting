@@ -15,6 +15,7 @@ type CommitsConfiguration struct {
 
 type ReviewersConfiguration struct {
 	Blacklist []int `yaml:"blacklist"`
+	Breaking  []int `yaml:"breaking"`
 }
 
 type Configuration struct {

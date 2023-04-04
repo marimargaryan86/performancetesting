@@ -50,11 +50,19 @@ func (mr *mergeRequest) currentReviewers() []int {
 	return current
 }
 
-func (mr *mergeRequest) appendCodeOwners(expected []int, err error) ([]int, error) {
-	if err != nil {
-		return expected, err
+func (mr *mergeRequest) appendBreakingChangeOwners(expected []int) ([]int, error) {
+	if !mr.breaking {
+		return expected, nil
 	}
 
+	for _, reviewer := range mr.configuration.Reviewers.Breaking {
+		expected = append(expected, reviewer)
+	}
+
+	return expected, nil
+}
+
+func (mr *mergeRequest) appendCodeOwners(expected []int) ([]int, error) {
 	current := mr.currentReviewers()
 	indecisive := make([][]*gitlab.BasicUser, 0)
 	state, err := mr.approvalState()
@@ -123,11 +131,9 @@ func (mr *mergeRequest) appendCodeOwners(expected []int, err error) ([]int, erro
 	return []int{}, errors.New("unable to decide on a reviewer")
 }
 
-func (mr *mergeRequest) expectedReviewers() ([]int, error) {
-	current := mr.currentReviewers()
-
-	if len(current) > 0 {
-		return mr.appendCodeOwners(current, nil)
+func (mr *mergeRequest) appendFileOwners(expected []int) ([]int, error) {
+	if len(expected) > 0 {
+		return expected, nil
 	}
 
 	eligible := make([]int, 0)
@@ -140,7 +146,7 @@ func (mr *mergeRequest) expectedReviewers() ([]int, error) {
 		owners, err := common.LikelyFileOwners(mr.client, mr.object.ProjectID, c.OldPath, mr.object.TargetBranch)
 
 		if err != nil {
-			return mr.appendCodeOwners([]int{}, err)
+			return []int{}, err
 		}
 
 		for _, o := range owners {
@@ -153,13 +159,13 @@ func (mr *mergeRequest) expectedReviewers() ([]int, error) {
 	reviewer := sliceutil.MostCommon(eligible)
 
 	if reviewer != 0 {
-		return mr.appendCodeOwners([]int{reviewer}, nil)
+		return []int{reviewer}, nil
 	}
 
 	contributors, err := common.RecentContributors(mr.client, mr.object.ProjectID)
 
 	if err != nil {
-		return mr.appendCodeOwners([]int{}, err)
+		return []int{}, err
 	}
 
 	reviewer = mr.object.Author.ID
@@ -178,5 +184,25 @@ func (mr *mergeRequest) expectedReviewers() ([]int, error) {
 		reviewer = eligible[randomIndex]
 	}
 
-	return mr.appendCodeOwners([]int{reviewer}, nil)
+	return []int{reviewer}, nil
+}
+
+func (mr *mergeRequest) expectedReviewers() ([]int, error) {
+	var err error
+
+	reviewers := mr.currentReviewers()
+
+	for _, callback := range []func([]int) ([]int, error){
+		mr.appendFileOwners,
+		mr.appendCodeOwners,
+		mr.appendBreakingChangeOwners,
+	} {
+		reviewers, err = callback(reviewers)
+
+		if err != nil {
+			return sliceutil.Unique(reviewers), err
+		}
+	}
+
+	return sliceutil.Unique(reviewers), nil
 }
