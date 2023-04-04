@@ -32,49 +32,33 @@ def order_details_by_date(
         {
             "origin": leg["origin"],
             "destination": leg["destination"],
-            "departureAt": (
-                format_dt(
-                    datetime.datetime.fromisoformat(
-                        leg["departureAt"],
-                    )
-                    + datetime.timedelta(
-                        minutes=delay_obj[
-                            segment[_VENDOR] + segment[_ROUTE_IDENTIFIERS][_VENDOR]
-                        ],
-                    ),
-                )
-                if segment[_VENDOR] + segment[_ROUTE_IDENTIFIERS][_VENDOR] in delay_obj
-                else format_dt_str(leg["departureAt"])
-            ),
-            "arrivalAt": (
-                format_dt(
-                    datetime.datetime.fromisoformat(
-                        leg["arrivalAt"],
-                    )
-                    + datetime.timedelta(
-                        minutes=delay_obj[
-                            segment["vendor"] + segment["routeIdentifiers"]["vendor"]
-                        ],
-                    ),
-                )
-                if segment["vendor"] + segment["routeIdentifiers"]["vendor"]
-                in delay_obj
-                else format_dt_str(leg["arrivalAt"])
-            ),
+            "departureAt": leg["departureAt"],
+            "arrivalAt": leg["arrivalAt"],
             "ref": {
                 "carrier": segment["vendor"],
                 "flight": segment["routeIdentifiers"]["vendor"],
             },
             "legType": segment["legType"]["id"],
+            "durationSeconds": (
+                datetime.datetime.fromisoformat(
+                    leg["arrivalAt"],
+                )
+                - datetime.datetime.fromisoformat(
+                    leg["departureAt"],
+                )
+            ).seconds,
+            "delayMinutes": (
+                delay_obj[segment["vendor"] + segment["routeIdentifiers"]["vendor"]]
+                if segment["vendor"] + segment["routeIdentifiers"]["vendor"]
+                in delay_obj
+                else 0
+            ),
         }
         for segment in details
         for leg in segment["legs"]
     ]
     ordered_details.sort(
-        key=lambda leg: datetime.datetime.strptime(
-            leg["departureAt"],
-            "%A %d %b %Y %H:%M",
-        ),
+        key=lambda leg: datetime.datetime.fromisoformat(leg["departureAt"]),
     )
     return ordered_details
 
@@ -96,35 +80,82 @@ async def build_travel_essential(  # noqa: WPS210
         delay_obj,
     )
     signature = journey_signature(order)
+    total_seconds = sum(detail["durationSeconds"] for detail in details)
     tem = (
         "Here are the details of your upcoming trip\n"
         + "From {0} to {1}\n".format(signature["origin"], signature["destination"])
         + "Booking reference: {0}\n".format(signature["reference"])
-        + "Duration: {0}\n".format("")
+        + "Duration: {0}h{1}m\n".format(
+            seconds_to_hours_and_minutes(total_seconds)["hours"],
+            seconds_to_hours_and_minutes(total_seconds)["minutes"],
+        )
     )
     if len(details) > 1:
-        tem += "Non Stop\n"  # noqa: WPS336
-    else:
         tem += "Stops: {0}\n".format(len(details))
+    else:
+        tem += "Non Stop\n"  # noqa: WPS336
 
     for detail in details:
-        await get_flight_status(detail, fs_client)
+        fs = await get_flight_status(detail, fs_client)
+        delay_minutes = detail["delayMinutes"]
+        departure_terminal = "[terminal], [gate]\n" if fs else ""
+        arrival_terminal = "[terminal]\n" if fs else ""
         leg_tem = (
             "----------------------\n"
             + "Departure from: {0}\n".format(detail["origin"]["name"])
-            + "[terminal], [gate]\n"
-            + "Departure time: {0}\n".format(detail["departureAt"])
-            + "Delayed: by +[minutes], [updated date and time]\n"
+            + departure_terminal
+            + "Departure time: {0}\n".format(format_dt_str(detail["departureAt"]))
+            + (
+                "Delayed: by +{0}m, {1}\n".format(  # noqa: WPS509
+                    delay_minutes,
+                    format_dt(
+                        datetime.datetime.fromisoformat(
+                            detail["departureAt"],
+                        )
+                        + datetime.timedelta(
+                            minutes=delay_minutes,
+                        ),
+                    ),
+                )
+                if delay_minutes
+                else ""
+            )
             + "Arrival to: {0}\n".format(detail["destination"]["name"])
-            + "[terminal]\n"
-            + "Arrival time: {0}\n".format(detail["arrivalAt"])
-            + "Duration: [hours, mins]\n"
-            + "Mode of transport: [air/rail]\n"
+            + arrival_terminal
+            + "Arrival time: {0}\n".format(format_dt_str(detail["arrivalAt"]))
+            + (
+                "Delayed: by +{0}m, {1}\n".format(  # noqa: WPS509
+                    delay_minutes,
+                    format_dt(
+                        datetime.datetime.fromisoformat(
+                            detail["arrivalAt"],
+                        )
+                        + datetime.timedelta(
+                            minutes=delay_minutes,
+                        ),
+                    ),
+                )
+                if delay_minutes
+                else ""
+            )
+            + "Duration: {0}h{1}m\n".format(
+                seconds_to_hours_and_minutes(detail["durationSeconds"])["hours"],
+                seconds_to_hours_and_minutes(detail["durationSeconds"])["minutes"],
+            )
+            + "Mode of transport: {0}\n".format(detail["legType"])
             + "Airline: [Operator]\n"
-            + "Flight number: [flight number]\n"
+            + "Flight number: {0}\n".format(
+                detail["ref"]["carrier"] + detail["ref"]["flight"],
+            )
         )
         tem += leg_tem
     return tem
+
+
+def seconds_to_hours_and_minutes(seconds: int) -> Mapping[str, int]:
+    (hours, remaining) = divmod(seconds, 3600)  # noqa: WPS432
+    (minutes, _) = divmod(remaining, 60)
+    return {"hours": hours, "minutes": minutes}
 
 
 async def get_flight_status(
@@ -133,7 +164,7 @@ async def get_flight_status(
 ) -> str:
     try:
         status = await fs_client.get_flight_status(
-            datetime.datetime.strptime(detail["departureAt"], "%A %d %b %Y %H:%M"),
+            datetime.datetime.fromisoformat(detail["departureAt"]),
             detail["ref"]["carrier"],
             detail["ref"]["flight"],
         )
