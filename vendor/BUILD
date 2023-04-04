@@ -28,5 +28,6 @@ python_requirements(
         "openapi-core": {"dependencies": ["#setuptools", "#rfc3339-validator"]},
         "protobuf": {"dependencies": ["#types-protobuf"]},
         "SQLAlchemy": {"dependencies": ["#aiomysql", "#aiosqlite"]},
+        "starlette": {"dependencies": ["#python-multipart"]},
     },
 )
