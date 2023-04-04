@@ -65,7 +65,7 @@ class WebhookDelay(endpoints.HTTPEndpoint):
             body.get("delayMinutes", 0),
         )
         if not delay_webhook:
-            raise exceptions.HTTPException(status.HTTP_502_BAD_GATEWAY)
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
         for order_id in delay_webhook.get("orders", []):
             order = json_api_doc.deserialize(
                 await junction_client.get_order_by_id(

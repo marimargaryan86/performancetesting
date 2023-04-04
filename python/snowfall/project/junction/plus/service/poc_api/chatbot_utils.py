@@ -353,7 +353,7 @@ async def send_delay(
             )
             + "\nNew estimated departure time: {0}".format(format_dt(new_departure))
         ),
-        receiver=order["journey"]["contactDetails"]["phoneNumber"],
+        receiver="".join(order["journey"]["contactDetails"]["phoneNumber"].split()),
     )
 
 
