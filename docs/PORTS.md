@@ -31,6 +31,7 @@ The following ports are configured in local environments by default:
 | 8004  | dogfood-ui             | HTTP Server       |
 | 8005  | pss/api                | HTTP Server       |
 | 8006  | pay-admin-api          | HTTP Server       |
+| 8007  | data-api               | HTTP Server       |
 | 50051 | echo                   | gRPC Server       |
 | 50052 | places                 | gRPC Server       |
 | 50053 | planner                | gRPC Server       |

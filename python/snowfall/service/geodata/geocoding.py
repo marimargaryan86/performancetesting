@@ -10,8 +10,12 @@ from shapely import geometry
 _LookupFunc = Callable[[float, float], Awaitable[Optional[str]]]
 
 
-class ReverseGeocoder(object):
-    def __init__(self, shp_file: shapefile.Reader, user_agent: str):
+class Geocoder(object):
+    def __init__(
+        self,
+        shp_file: shapefile.Reader,
+        user_agent: str,
+    ):
         self._records = shp_file.shapeRecords()
         self._tz_finder = timezonefinder.TimezoneFinder()
         self._user_agent = user_agent

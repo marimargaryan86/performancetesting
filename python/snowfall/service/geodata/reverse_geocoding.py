@@ -1,0 +1,90 @@
+import dataclasses
+from typing import Sequence
+
+from mypy_boto3_location import client  # pants: no-infer-dep
+from typing_extensions import NotRequired, TypedDict  # pants: no-infer-dep
+
+from snowfall.service.geodata.v1 import models_pb2
+from snowfall.stdlib.v1alpha import datetime_pb2, latlng_pb2
+
+LocationSearchParams = TypedDict(
+    "LocationSearchParams",
+    {
+        "IndexName": str,
+        "Text": str,
+        "BiasPosition": NotRequired[Sequence[float]],
+        "FilterBBox": NotRequired[Sequence[float]],
+        "FilterCountries": NotRequired[Sequence[str]],
+        "Language": NotRequired[str],
+        "MaxResults": NotRequired[int],
+    },
+)
+
+
+@dataclasses.dataclass(frozen=True)
+class Coordinates(object):
+    lat: float
+    long: float
+
+
+class ReverseGeocoder(object):
+    def __init__(
+        self,
+        aws_location_client: client.LocationServiceClient,
+    ):
+        self._aws_location_client = aws_location_client
+
+    def get_locations(  # noqa: WPS211
+        self,
+        text: str,
+        limit: int,
+        filter_countries: Sequence[str],
+        language: str,
+        bias_pos: Coordinates | None = None,
+    ) -> Sequence[models_pb2.Location]:
+        search_params = LocationSearchParams(
+            IndexName="junction2",
+            Text=text,
+        )
+        if limit:
+            search_params["MaxResults"] = limit
+        if bias_pos is not None:
+            search_params["BiasPosition"] = [
+                bias_pos.long,
+                bias_pos.lat,
+            ]
+        if filter_countries:
+            search_params["FilterCountries"] = filter_countries
+        if language:
+            search_params["Language"] = language
+
+        search_results = self._aws_location_client.search_place_index_for_text(
+            **search_params,
+        )["Results"]
+
+        coordinates = []
+        for search_result in search_results:
+            place = search_result["Place"]
+            coordinates.append(
+                models_pb2.Location(
+                    id=search_result["PlaceId"],
+                    name=place["Label"],
+                    address_number=place.get("AddressNumber", ""),
+                    country=place["Country"],
+                    coordinates=latlng_pb2.LatLng(
+                        longitude=place["Geometry"]["Point"][0],
+                        latitude=place["Geometry"]["Point"][1],
+                    ),
+                    time_zone=datetime_pb2.TimeZone(id=place["TimeZone"]["Name"]),
+                    interpolated=place.get("Interpolated", False),
+                    municipality=place.get("Municipality", ""),
+                    neighborhood=place.get("Neighborhood", ""),
+                    postal_code=place.get("PostalCode", ""),
+                    region=place.get("Region", ""),
+                    street=place.get("Street", ""),
+                    subregion=place.get("SubRegion", ""),
+                    unit_number=place.get("UnitNumber", ""),
+                    unit_type=place.get("UnitType", ""),
+                ),
+            )
+        return coordinates

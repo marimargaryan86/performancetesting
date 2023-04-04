@@ -2,11 +2,12 @@ import ipaddress
 import random
 from collections.abc import Sequence
 
+import boto3
 import shapefile
 from pydantic import AnyUrl
 from redis import asyncio as aioredis
 
-from snowfall.service.geodata import geocoding
+from snowfall.service.geodata import geocoding, reverse_geocoding
 from snowfall.service.geodata.grpc import GeocodingService
 from snowfall.stdlib import service
 from snowfall.stdlib.persistence import filesystem
@@ -37,7 +38,13 @@ async def _main(app: service.Application[_Settings]) -> None:
             [
                 GeocodingService(
                     redis.Client(redis_conn),
-                    geocoder=geocoding.ReverseGeocoder(shp_file, app.user_agent),
+                    geocoder=geocoding.Geocoder(
+                        shp_file,
+                        app.user_agent,
+                    ),
+                    reverse_geocoder=reverse_geocoding.ReverseGeocoder(
+                        boto3.client("location"),
+                    ),
                 ),
             ],
         )

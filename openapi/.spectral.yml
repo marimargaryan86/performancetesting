@@ -15,6 +15,10 @@ overrides:
     rules:
       oas3-valid-schema-example: off
   - files:
+      - "junction/data_api/openapi.json#/paths/~1locations"
+    rules:
+      ensure-pagination: info
+  - files:
       - "junction/mobile_api/openapi.json#/paths/~1places"
       - "junction/mobile_api/openapi.json#/paths/~1users~1me~1preferences"
       - "junction/mobile_api/openapi.json#/paths/~1users~1groups~1{groupId}~1members"

@@ -1,22 +1,34 @@
 from grpc import aio
 
-from snowfall.service.geodata import geocoding
+from snowfall.service.geodata import geocoding, reverse_geocoding
 from snowfall.service.geodata.v1 import geocoding_pb2, geocoding_pb2_grpc
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.grpc import service
 from snowfall.stdlib.v1alpha import datetime_pb2
 
 
-class GeocodingService(service.Service, geocoding_pb2_grpc.GeocodingServiceServicer):
-    def __init__(self, cache: redis.Client[str], geocoder: geocoding.ReverseGeocoder):
+class GeocodingService(
+    service.Service,
+    geocoding_pb2_grpc.GeocodingServiceServicer,
+):
+    def __init__(
+        self,
+        cache: redis.Client[str],
+        geocoder: geocoding.Geocoder,
+        reverse_geocoder: reverse_geocoding.ReverseGeocoder,
+    ):
         self._cache = cache
         self._geocoder = geocoder
+        self._reverse_geocoder = reverse_geocoder
 
     def get_name(self) -> str:
         return geocoding_pb2.DESCRIPTOR.services_by_name["GeocodingService"].full_name
 
     def register(self, server: aio.Server) -> None:
-        geocoding_pb2_grpc.add_GeocodingServiceServicer_to_server(self, server)
+        geocoding_pb2_grpc.add_GeocodingServiceServicer_to_server(
+            self,
+            server,
+        )
 
     async def CountryCodeLookup(  # type: ignore[override] # noqa: N802
         self,
@@ -68,6 +80,30 @@ class GeocodingService(service.Service, geocoding_pb2_grpc.GeocodingServiceServi
             time_zone=datetime_pb2.TimeZone(
                 id=time_zone,
             ),
+        )
+
+    async def LocationLookup(  # type: ignore[override] # noqa: N802
+        self,
+        request: geocoding_pb2.LocationLookupRequest,
+        context: aio.ServicerContext,
+    ) -> geocoding_pb2.LocationLookupResponse:
+        locations = self._reverse_geocoder.get_locations(
+            request.text,
+            request.limit,
+            request.countries,
+            request.language,
+            (
+                reverse_geocoding.Coordinates(
+                    request.bias_position.latitude,
+                    request.bias_position.longitude,
+                )
+                if request.HasField("bias_position")
+                else None
+            ),
+        )
+
+        return geocoding_pb2.LocationLookupResponse(
+            locations=locations,
         )
 
 
