@@ -53,39 +53,27 @@ rules:
     resolved: false
     then:
       function: ensureRefs
-  json-api-no-type:
-    description: Field named `type` is not allowed in `attributes`.
-    given: $..attributes..properties
-    severity: error
-    then:
-      - field: "type"
-        function: undefined
   json-api-no-nested-id:
     description: Identifiers are not allowed in `attributes`, they should be relationships.
     given: $..attributes..properties[?(@property.match(/(^id$|Id$|Identifier$)/))]~
     severity: error
     then:
       function: undefined
-  json-api-no-nested-relationships:
-    description: Field named `relationships` is not allowed in `attributes`.
+  json-api-no-nested-unique-fields:
+    description: Field named `attributes` is not allowed in `attributes`.
+    message: "Field named `{{property}}` is not allowed in `attributes`."
     given: $..attributes..properties
     severity: error
     then:
-      - field: "relationships"
+      - field: "attributes"
         function: undefined
-  json-api-no-nested-links:
-    description: Field named `links` is not allowed in `attributes`.
-    given: $..attributes..properties
-    severity: error
-    then:
+      - field: "data"
+        function: undefined
       - field: "links"
         function: undefined
-  json-api-no-nested-data:
-    description: Field named `data` is not allowed in `attributes`.
-    given: $..attributes..properties
-    severity: error
-    then:
-      - field: "data"
+      - field: "relationships"
+        function: undefined
+      - field: "type"
         function: undefined
   json-api-no-relationships-type:
     description: Field named `type` is not allowed in `relationships`.
