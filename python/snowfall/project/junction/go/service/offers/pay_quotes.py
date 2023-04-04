@@ -5,8 +5,9 @@ from snowfall.project.junction.go.service.offers.pay_quotes_models import (
 )
 from snowfall.project.junction.go.service.offers.v1alpha.amqp_pb2 import (
     TripOfferSearchResult,
+    TripPriceQuoteResult,
 )
-from snowfall.stdlib import money
+from snowfall.stdlib import money, string
 from snowfall.stdlib.v1alpha.money_pb2 import Money
 from snowfall.vendor.junction.pay.client import Client as PayClient
 
@@ -22,7 +23,7 @@ class PayQuotes(object):
     ):
         self._pay_client = pay_client
 
-    async def convert_amounts_and_replace_ids(
+    async def get_offer_search_quotes(
         self,
         search_result: TripOfferSearchResult,
         session_token: str,
@@ -45,10 +46,43 @@ class PayQuotes(object):
                     nanos=0,
                 ),
             )
-            offer.id = str(uuid.uuid5(uuid.UUID(offer.id), session_token))
-        search_result.offer.id = str(
-            uuid.uuid5(uuid.UUID(search_result.offer.id), session_token),
+            offer.id = string.to_uuid(session_token, uuid.UUID(offer.id))
+        search_result.offer.id = string.to_uuid(
+            session_token,
+            uuid.UUID(search_result.offer.id),
         )
+        return search_result
+
+    async def get_price_quote_quotes(
+        self,
+        search_result: TripPriceQuoteResult,
+        session_token: str,
+        payer_id: str,
+        to_currency: str,
+    ) -> TripPriceQuoteResult:
+        price_quote_money = money.from_protobuf(search_result.price_quote.price)
+
+        quote = await self._get_quote(
+            amount=price_quote_money.amount,
+            payer_id=payer_id,
+            beneficiary_id=search_result.provider_company_id,
+            from_currency=price_quote_money.currency.code,
+            to_currency=to_currency,
+        )
+
+        search_result.price_quote.price.CopyFrom(
+            Money(
+                currency_code=quote.data.relationships.to_currency.data.id,  # noqa:WPS219
+                units=quote.data.attributes.amount,
+                nanos=0,
+            ),
+        )
+
+        search_result.price_quote.id = string.to_uuid(
+            session_token,
+            uuid.UUID(search_result.price_quote.id),
+        )
+
         return search_result
 
     async def _get_quote(  # noqa: WPS211
@@ -83,17 +117,30 @@ class PayQuoteFetcher(object):
         self._payer_id = payer_id
         self._payer_currency = payer_currency
 
-    async def convert_amounts_and_replace_ids(
+    async def handle_offer_search_result(
         self,
         message: TripOfferSearchResult,
         session_token: str,
     ) -> TripOfferSearchResult:
         if self._use_pay_for_currency_conversions:
-            message = await self._pay_quotes.convert_amounts_and_replace_ids(
+            message = await self._pay_quotes.get_offer_search_quotes(
                 message,
                 session_token,
                 self._payer_id,
                 self._payer_currency,
             )
+        return message
 
+    async def handle_price_quote_result(
+        self,
+        message: TripPriceQuoteResult,
+        session_token: str,
+    ) -> TripPriceQuoteResult:
+        if self._use_pay_for_currency_conversions:
+            message = await self._pay_quotes.get_price_quote_quotes(
+                message,
+                session_token,
+                self._payer_id,
+                self._payer_currency,
+            )
         return message

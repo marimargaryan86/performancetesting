@@ -227,6 +227,26 @@ async def _gather_price_quotes(
             price_quotes_repository=price_quotes.PriceQuoteRepository(
                 collection=mongo.offers.price_quotes,
             ),
+            price_quotes_container_repository=price_quotes.PriceQuoteContainerRepository(
+                mongo.offers.price_quotes,
+                app.settings.default_ttl,
+            ),
+            pay_quote_fetcher=pay_quotes.PayQuoteFetcher(
+                use_pay_for_currency_conversions=(
+                    app.settings.use_pay_for_currency_conversions
+                ),
+                pay_client=PayClient(
+                    app.settings.public_pay_api_dsn,
+                    UserAuth(
+                        app.settings.public_pay_admin_api_dsn,
+                        app.settings.pay_admin_username,
+                        app.settings.pay_admin_password,
+                    ),
+                    None,
+                ),
+                payer_id=app.settings.payer_company_id,
+                payer_currency=app.settings.payer_currency_code,
+            ),
         )
         await price_quote_importer.consume()
 

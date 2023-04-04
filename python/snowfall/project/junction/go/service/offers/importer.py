@@ -37,6 +37,10 @@ class SkippedOfferError(Exception):
     """Raised when an offer is skipped."""
 
 
+class SkippedPriceQuoteError(Exception):
+    """Raised when price quote is skipped."""
+
+
 class StatusHandler(trackable.AnySizeStatusHandler):
     def __init__(
         self,
@@ -130,7 +134,7 @@ class OfferImporter(object):
         if not offer_search:
             raise SkippedOfferError()
 
-        message = await self._pay_quote_fetcher.convert_amounts_and_replace_ids(
+        message = await self._pay_quote_fetcher.handle_offer_search_result(
             message=message,
             session_token=offer_search.session_token,
         )
@@ -154,9 +158,13 @@ class PriceQuoteImporter(object):
         self,
         consumer_obj: consumer.Consumer[amqp_pb2.TripPriceQuoteResult],
         price_quotes_repository: price_quotes.PriceQuoteRepository,
+        price_quotes_container_repository: price_quotes.PriceQuoteContainerRepository,
+        pay_quote_fetcher: pay_quotes.PayQuoteFetcher,
     ):
         self._consumer = consumer_obj
         self._quotes = price_quotes_repository
+        self._price_quotes_container_repository = price_quotes_container_repository
+        self._pay_quote_fetcher = pay_quote_fetcher
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -165,7 +173,19 @@ class PriceQuoteImporter(object):
         self,
         message: amqp_types.Message[amqp_pb2.TripPriceQuoteResult],
     ) -> None:
+        price_quotes_search = await self._price_quotes_container_repository.find_by_id(
+            message.body.price_quote_container_id,
+        )
+
+        if not price_quotes_search:
+            raise SkippedPriceQuoteError()
+
+        price_quote_message = await self._pay_quote_fetcher.handle_price_quote_result(
+            message=message.body,
+            session_token=price_quotes_search.session_token,
+        )
+
         await self._quotes.add_to_container(
-            price_quote_container_id=message.body.price_quote_container_id,
-            price_quote=message.body.price_quote,
+            price_quote_container_id=price_quote_message.price_quote_container_id,
+            price_quote=price_quote_message.price_quote,
         )
