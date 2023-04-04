@@ -726,10 +726,7 @@ function load_offers(id, tripId) {
   fetch("/offers/searches/" + id)
     .then((res) => res.json())
     .then((response) => {
-      if (
-        response.data.attributes.status == "completed" ||
-        response.data.attributes.status == "failed"
-      ) {
+      if (response.data.attributes.status == "completed") {
         fetch("/offers/searches/" + id + "/offers")
           .then((res) => res.json())
           .then((offersResponse) => {
@@ -740,6 +737,9 @@ function load_offers(id, tripId) {
               response.data.attributes.status
             );
           });
+      } else if (response.data.attributes.status == "failed") {
+        const status = document.getElementById("offers-" + tripId);
+        status.innerHTML = '<i class="fas fa-exclamation-circle"></i> System Failure';
       } else {
         setTimeout(() => {
           load_offers(id, tripId);
