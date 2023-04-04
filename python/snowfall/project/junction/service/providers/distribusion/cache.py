@@ -27,6 +27,7 @@ class OfferDetails(RedisRecord):
     passenger_types: list[PassengerType]
     fully_refundable: bool | None
     non_refundable: bool | None
+    changeable: bool | None
     fare_rules: list[FareRule] | None
 
 

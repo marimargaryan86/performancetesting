@@ -106,25 +106,33 @@ class PriceQuoteConsumer(object):
         self,
         offer_details: cache.OfferDetails,
     ) -> list[offers_pb2.Penalty]:
-        res = None
+        res = []
 
-        if offer_details.fully_refundable or offer_details.non_refundable:
-            res = []
-            if offer_details.fully_refundable:
-                res.append(
-                    offers_pb2.Penalty(
-                        penalty_type=offers_pb2.Penalty.Type.TYPE_REFUND,
-                        refundable=True,
-                        applicability=offers_pb2.Penalty.Applicability.APPLICABILITY_BEFORE,
-                    ),
-                )
-            if offer_details.non_refundable:
-                res.append(
-                    offers_pb2.Penalty(
-                        penalty_type=offers_pb2.Penalty.Type.TYPE_REFUND,
-                        refundable=False,
-                        applicability=offers_pb2.Penalty.Applicability.APPLICABILITY_BEFORE,
-                    ),
-                )
+        if offer_details.fully_refundable:
+            res.append(
+                offers_pb2.Penalty(
+                    penalty_type=offers_pb2.Penalty.Type.TYPE_REFUND,
+                    refundable=True,
+                    applicability=offers_pb2.Penalty.Applicability.APPLICABILITY_BEFORE,
+                ),
+            )
+
+        if offer_details.non_refundable:
+            res.append(
+                offers_pb2.Penalty(
+                    penalty_type=offers_pb2.Penalty.Type.TYPE_REFUND,
+                    refundable=False,
+                    applicability=offers_pb2.Penalty.Applicability.APPLICABILITY_BEFORE,
+                ),
+            )
+
+        if offer_details.changeable:
+            res.append(
+                offers_pb2.Penalty(
+                    penalty_type=offers_pb2.Penalty.Type.TYPE_EXCHANGE,
+                    changeable=True,
+                    applicability=offers_pb2.Penalty.Applicability.APPLICABILITY_BEFORE,
+                ),
+            )
 
         return res

@@ -105,6 +105,24 @@ class MarketingCarrierAdapter(object):  # noqa: WPS214
 
         return self._passenger_types
 
+    def is_fully_refundable(
+        self,
+        fare: connections.FaresRelFareClassPrice | None,
+    ) -> bool:
+        return self.has_any_fare_feature(fare, ["REFU", "PREF"])
+
+    def is_non_refundable(
+        self,
+        fare: connections.FaresRelFareClassPrice | None,
+    ) -> bool:
+        return self.has_any_fare_feature(fare, ["NREF"])
+
+    def is_changeable(
+        self,
+        fare: connections.FaresRelFareClassPrice | None,
+    ) -> bool:
+        return self.has_any_fare_feature(fare, ["AMEN"])
+
     def has_any_fare_feature(
         self,
         fare: connections.FaresRelFareClassPrice | None,
@@ -297,11 +315,9 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
                                 else ""
                             ),
                             passenger_types=passenger_types,
-                            fully_refundable=carrier.has_any_fare_feature(
-                                fare,
-                                ["REFU", "PREF"],
-                            ),
-                            non_refundable=carrier.has_any_fare_feature(fare, ["NREF"]),
+                            fully_refundable=carrier.is_fully_refundable(fare),
+                            non_refundable=carrier.is_non_refundable(fare),
+                            changeable=carrier.is_changeable(fare),
                             fare_rules=carrier.get_fare_rules(fare),
                         ),
                         expires_at=expires_at,
