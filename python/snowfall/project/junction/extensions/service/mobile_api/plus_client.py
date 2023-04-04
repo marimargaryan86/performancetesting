@@ -9,7 +9,6 @@ class PlusClient(object):
         api_url: str,
         client: httpx.AsyncClient | None = None,
     ) -> None:
-        self._api_url = api_url
         self._client = client or httpx.AsyncClient(http2=True)
         self._client.base_url = httpx.URL(api_url)
 
@@ -25,6 +24,7 @@ class PlusClient(object):
     async def register_order(self, mobile_order_id: str) -> dict[str, Any]:
         body = {
             "data": {
+                "attributes": {},
                 "relationships": {
                     "orders": {"data": {"id": mobile_order_id, "type": "orders"}},
                 },
