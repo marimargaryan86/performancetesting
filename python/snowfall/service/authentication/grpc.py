@@ -57,13 +57,7 @@ class AuthenticationService(
         elif request.id:
             user = await self._users.find_user_by_id(request.id)
 
-        if not user:
-            return await context.abort(
-                grpc.StatusCode.NOT_FOUND,
-                details="User is not found",
-            )
-
-        if not match_passwords(request.password, user.password):
+        if not user or not match_passwords(request.password, user.password):
             return await rich_status.abort_with_rich_status(
                 context,
                 rich_status.build_bad_request(

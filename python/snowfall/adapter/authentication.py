@@ -78,15 +78,11 @@ class DictClient(Client):
     ) -> str:
         user = self._get_user(uuid, email)
 
-        if not user:
-            raise NotFoundError("User is not registered")
-
-        if not match_passwords(password, user.password):
+        if not user or not match_passwords(password, user.password):
             raise InvalidArgumentError("Password is not correct")
 
         payload = {
             "email": user.email,
-            "password": user.password,
             "id": user.id,
         }
         return self._jwt_encoder.encode(payload)
@@ -185,9 +181,6 @@ class GrpcClient(Client):
                 timeout=self._timeout,
             )
         except grpc.aio.AioRpcError as exc:
-            if exc.code() == grpc.StatusCode.NOT_FOUND:
-                raise NotFoundError(exc.details()) from exc
-
             if exc.code() == grpc.StatusCode.INVALID_ARGUMENT:
                 raise InvalidArgumentError(exc.details()) from exc
 
