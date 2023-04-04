@@ -92,12 +92,20 @@ job "geodata-grpc" {
     task "grpc" {
       driver = "docker"
 
+      vault {
+        policies = ["geodata-${var.environment}"]
+      }
+
       template {
         destination = "services.env"
         env         = true
         change_mode = "restart"
         data        = <<EOH
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
+{{ with secret "kv/data/${var.environment}/geodata" }}
+AWS_ACCESS_KEY_ID={{ .Data.data.aws_access_key_id }}
+AWS_SECRET_ACCESS_KEY={{ .Data.data.aws_secret_access_key }}
+{{ end }}
 EOH
       }
 
@@ -116,11 +124,12 @@ EOH
       }
 
       env {
-        ENV_NAME        = "${var.environment}"
-        GRPC_ADDRESS    = "0.0.0.0"
-        GRPC_PORT       = "${NOMAD_PORT_grpc}"
-        SENTRY_DSN      = "https://dd680235569f43ce97b7e91d839900a0@sentry.snowfall.se/31"
-        PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
+        ENV_NAME           = "${var.environment}"
+        GRPC_ADDRESS       = "0.0.0.0"
+        GRPC_PORT          = "${NOMAD_PORT_grpc}"
+        SENTRY_DSN         = "https://dd680235569f43ce97b7e91d839900a0@sentry.snowfall.se/31"
+        PROMETHEUS_PORT    = "${NOMAD_PORT_prometheus}"
+        AWS_DEFAULT_REGION = "eu-west-2"
       }
     }
   }
