@@ -26,7 +26,7 @@ variable "traefik_entrypoints" {
   type = string
 }
 
-variable "traaefik_host_URL" {
+variable "traefik_host_URL" {
   type = string
 }
 
@@ -75,9 +75,8 @@ job "poc-api-http" {
       tags = [
         "http",
         "traefik.enable=true",
-        "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.plus-api-${var.environment}.entrypoints=${var.traefik_entrypoints}",
-        "traefik.http.routers.plus-api-${var.environment}.rule=Host(`${var.traaefik_host_URL}`)",
+        "traefik.http.routers.poc-api-${var.environment}.entrypoints=${var.traefik_entrypoints}",
+        "traefik.http.routers.poc-api-${var.environment}.rule=Host(`${var.traefik_host_URL}`)",
       ]
 
       check {
@@ -150,7 +149,7 @@ EOH
         PROMETHEUS_PORT                 = "${NOMAD_PORT_prometheus}"
         VALIDATE_RESPONSES_AGAINST_SPEC = false
         MONGO_DB                        = "mobile-api"
-        TWILIO_SENDER                   = "+14155238886"
+        TWILIO_SENDER                   = "+15674831787"
         FLIGHT_STATS_APP_ID             = "4fb1a656"
         SENTRY_DSN                      = "https://edddac6f53a345bfa2b49ac386a69e9b@sentry.snowfall.se/80"
         JUNCTION_API_ADDRESS            = "https://api.junction.dev"
