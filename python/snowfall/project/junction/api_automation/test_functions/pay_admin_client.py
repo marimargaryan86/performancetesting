@@ -285,6 +285,28 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         response.raise_for_status()
         return response.json()
 
+    async def create_user(
+        self,
+        email: str,
+        password: str,
+    ) -> dict[str, Any]:
+        payload = {
+            _DATA_KEY: {
+                _TYPE_KEY: "users",
+                _ATTRIBUTES_KEY: {
+                    "email": email,
+                    "password": password,
+                },
+            },
+        }
+        response = await self._client.post(
+            "/users",
+            json=payload,
+        )
+
+        response.raise_for_status()
+        return response.json()
+
 
 async def get_all_resources(  # noqa: WPS210
     client_method: Any,
