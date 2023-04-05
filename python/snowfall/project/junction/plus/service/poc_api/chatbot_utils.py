@@ -6,6 +6,7 @@ import httpx
 import json_api_doc
 
 from snowfall.project.junction.plus.service.poc_api import (
+    airlines,
     flight_stats_client,
     repository,
     twilio,
@@ -143,7 +144,9 @@ async def build_travel_essential(  # noqa: WPS210
                 seconds_to_hours_and_minutes(detail["durationSeconds"])["minutes"],
             )
             + "Mode of transport: {0}\n".format(detail["legType"])
-            + "Airline: [Operator]\n"
+            + "Airline: {0}\n".format(
+                airlines.airlines_mapping.get(detail["ref"]["carrier"], "N/A"),
+            )
             + "Flight number: {0}\n".format(
                 detail["ref"]["carrier"] + detail["ref"]["flight"],
             )
