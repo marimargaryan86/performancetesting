@@ -238,7 +238,7 @@ async def _price_quotes(app: service.Application[_OffersSettings]) -> None:
     async with contextlib.AsyncExitStack() as stack:
         redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
             aioredis.from_url(
-                random.choice(app.settings.redis_dsn),  # nosec
+                app.settings.redis_dsn,
                 decode_responses=False,
             ).client(),
         )
