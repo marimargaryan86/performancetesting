@@ -157,7 +157,7 @@ async def _offers(app: service.Application[_OffersSettings]) -> None:
         )
         redis_conn = await stack.enter_async_context(
             aioredis.from_url(
-                random.choice(app.settings.redis_dsn),  # nosec
+                app.settings.redis_dsn,
                 decode_responses=True,
             ).client(),
         )
