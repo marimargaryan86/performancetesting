@@ -3,8 +3,8 @@ from typing import Callable
 
 from starlette import applications
 
-from snowfall.project.junction.service.data_api import bootstrap
-from snowfall.project.junction.service.data_api.routes import router
+from snowfall.project.junction.go.service.data_api import bootstrap
+from snowfall.project.junction.go.service.data_api.routes import router
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application
