@@ -30,7 +30,7 @@ from snowfall.vendor.junction.pay.client import Client as PayClient
 
 _QUOTE_MOCK_RESPONSE = MappingProxyType(
     {
-        "id": "an-id",
+        "id": "a-quotation-id",
         "data": {
             "type": "quotes",
             "attributes": {
@@ -72,7 +72,7 @@ async def test_that_pay_quotes_invoked_and_response_returned() -> None:
     pay_quotes = PayQuotes(pay_client=mock_pay_client)
     mock_resp = _QUOTE_MOCK_RESPONSE
     expected_resp = PayQuoteResponse(
-        id="an-id",
+        id="a-quotation-id",
         data=PayQuoteData(
             type="quotes",
             attributes=PayQuoteAttributes(
@@ -225,6 +225,7 @@ async def test_that_price_in_trip_price_quote_result_replaced_with_conversion() 
         "session-token",
         uuid.UUID("009fd15a-c7f0-11ed-afa1-0242ac120002"),
     )
+    assert modified_result.price_quote.pay_quote_id == "a-quotation-id"
 
     mock_pay_client.create_quote.assert_called_once_with(
         amount=50000,

@@ -111,6 +111,7 @@ message PriceQuote {
   repeated Required required_documents = 5;
   repeated Penalty penalties = 6;
   repeated FareRule rules = 7;
+  string pay_quote_id = 8;
 }
 
 message PriceQuoteContainer {
