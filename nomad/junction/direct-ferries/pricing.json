@@ -1,13 +1,15 @@
 {
     "development": {
         "variables": {
-            "count": 1
+            "count": 1,
+            "provider_company_id": "3270a409-43b5-4be6-aebd-c3adc6ebfd0f"
         }
     },
     "production": {
         "deploy": false,
         "variables": {
-            "count": 2
+            "count": 2,
+            "provider_company_id": "551f8e9a-be94-473b-b5aa-cf3b53ce6664"
         }
     }
 }
