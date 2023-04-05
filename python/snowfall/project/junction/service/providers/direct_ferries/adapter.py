@@ -201,6 +201,11 @@ class DfAdapter(object):
                                         tzinfo=origin.timezone,
                                     ),
                                 ),
+                                arrival_at=protobuf.datetime_to_protobuf(
+                                    leg_obj.arrival_date_time.replace(
+                                        tzinfo=destination.timezone,
+                                    ),
+                                ),
                             ),
                         ],
                     ),

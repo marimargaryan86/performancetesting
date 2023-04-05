@@ -52,7 +52,7 @@ class Leg(LegBase):
     arrival_port_name: Optional[str]
     arrival_port_id: Optional[int]
     arrival_port_code: str
-    arrival_date_time: Optional[datetime.datetime]
+    arrival_date_time: datetime.datetime
     duration_minutes: Optional[int]
     is_accommodation_compulsory: Optional[bool]
     latest_check_in_minutes: Optional[int]
