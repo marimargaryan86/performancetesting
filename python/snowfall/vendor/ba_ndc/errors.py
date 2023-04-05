@@ -1,4 +1,6 @@
+import contextlib
 import http
+import json
 
 import httpx
 
@@ -13,5 +15,12 @@ class ServiceError(BaNdcError):
 
 def get_response_error_message(response: httpx.Response) -> str:
     status = http.HTTPStatus(response.status_code)
-    response_json = response.json()
-    return "{0}: {1}".format(status.value, response_json.get("detail"))
+    description = None
+
+    with contextlib.suppress(json.decoder.JSONDecodeError, AttributeError):
+        response_json = response.json()
+
+        if response_json:
+            description = response_json.get("detail")
+
+    return "{0}: {1}".format(status.value, description or status.description)
