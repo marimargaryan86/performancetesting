@@ -1,3 +1,4 @@
+import asyncio
 from typing import Awaitable, Callable, Optional
 
 import shapefile
@@ -60,12 +61,13 @@ class Geocoder(object):
 
         raise RuntimeError("Unable to find country for coordinates.")
 
-    async def _offline_country_lookup(
+    async def _offline_country_lookup(  # noqa: WPS231
         self,
         latitude: float,
         longitude: float,
     ) -> str | None:
-        for shape_record in self._records:
+        # Iterate over copy of list, as we modify on found country.
+        for ind, shape_record in enumerate(self._records[:]):
             shape = geometry.shape(shape_record.shape)
 
             if geometry.Point(longitude, latitude).within(shape):
@@ -76,7 +78,18 @@ class Geocoder(object):
                 if not country:
                     raise ValueError("Unknown country code")
 
+                # When a sequence of requests come in, the same result is usually found
+                # for several requests in a row. Therefore, move the found record to
+                # the front so it is checked first in subsequent requests.
+                if ind > 0:
+                    self._records.remove(shape_record)
+                    self._records.insert(0, shape_record)
+
                 return country.alpha_2
+
+            # Ensure we yield back to event loop frequently.
+            if ind % 10 == 9:
+                await asyncio.sleep(0)
 
         return None
 
