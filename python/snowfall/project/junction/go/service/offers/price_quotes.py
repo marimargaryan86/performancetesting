@@ -47,7 +47,10 @@ class PriceQuoteContainerRepository(
         return await self.insert(price_quote)
 
 
-class PriceQuoteRepository(repository.ProtoRepository[models_pb2.PriceQuote]):
+class PriceQuoteRepository(
+    repository.ProtoRepository[models_pb2.PriceQuote],
+    mixins.FindByIdMixin[models_pb2.PriceQuote],
+):
     _proto = models_pb2.PriceQuote
     _indexes = [
         pymongo.IndexModel("quotes._id", background=True),

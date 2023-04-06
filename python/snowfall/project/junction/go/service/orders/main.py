@@ -6,15 +6,21 @@ import pydantic
 from motor import motor_asyncio
 
 from snowfall.project.junction.go.adapter import passenger_name_records
+from snowfall.project.junction.go.service.offers import price_quotes
 from snowfall.project.junction.go.service.orders import importer, orders
 from snowfall.project.junction.go.service.orders.amqp import OrderProducer
 from snowfall.project.junction.go.service.orders.grpc import OrderService
+from snowfall.project.junction.go.service.orders.pay_transactions import (
+    PayTransactionCreator,
+)
 from snowfall.project.junction.go.service.passenger_name_records.v1alpha import (
     passenger_name_records_pb2_grpc,
 )
 from snowfall.stdlib import service
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.grpc import client, server
+from snowfall.vendor.junction.auth import UserAuth
+from snowfall.vendor.junction.pay.client import Client as PayClient
 
 
 class _GrpcSettings(service.Settings):
@@ -30,6 +36,11 @@ class _ImportSettings(service.Settings):
     amqp_dsn: pydantic.AnyUrl
     mongo_dsn: Sequence[pydantic.AnyUrl]
     passenger_name_records_address: Sequence[str]
+    use_pay_to_create_transaction: bool = False
+    pay_admin_username: str
+    pay_admin_password: str
+    public_pay_api_dsn: pydantic.AnyUrl
+    public_pay_admin_api_dsn: pydantic.AnyUrl
 
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
@@ -93,6 +104,21 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
             ),
             booking_repository=orders.BookingRepository(
                 mongo.orders.journeys,
+            ),
+            price_quote_repository=price_quotes.PriceQuoteRepository(
+                collection=mongo.offers.price_quotes,
+            ),
+            pay_transaction_creator=PayTransactionCreator(
+                app.settings.use_pay_to_create_transaction,
+                pay_client=PayClient(
+                    app.settings.public_pay_api_dsn,
+                    UserAuth(
+                        app.settings.public_pay_admin_api_dsn,
+                        app.settings.pay_admin_username,
+                        app.settings.pay_admin_password,
+                    ),
+                    None,
+                ),
             ),
         )
         await booking_importer.consume()
