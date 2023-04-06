@@ -3,7 +3,6 @@ from __future__ import annotations
 import asyncio
 import dataclasses
 import inspect
-import json
 import pathlib
 from collections.abc import Sequence
 from typing import (  # noqa: WPS235
@@ -12,6 +11,7 @@ from typing import (  # noqa: WPS235
     Callable,
     Generic,
     Mapping,
+    NewType,
     Optional,
     Type,
     TypeVar,
@@ -23,6 +23,7 @@ from typing import (  # noqa: WPS235
 )
 
 import click
+import orjson
 import pydantic
 import structlog
 from prometheus_async.aio import web
@@ -134,7 +135,15 @@ class Entrypoint(object):
         self.enter()
 
 
-def _get_type(type_: type) -> type:
+JSON = NewType("JSON", str)
+
+
+def _get_type(arg_types: Mapping[str, type], name: str, type_: type) -> type:
+    if type_ == dict:
+        return JSON
+
+    type_ = next(iter(get_args(arg_types[name])), type_)
+
     if type_ == bool:
         return type_
 
@@ -147,6 +156,46 @@ def _get_type(type_: type) -> type:
     return str
 
 
+def _parse_json(
+    ctx: click.Context,
+    param_def: click.Parameter,
+    param_value: str,
+) -> dict[types.Primitive, types.Primitive]:
+    try:
+        return orjson.loads(param_value)
+    except orjson.JSONDecodeError as err:
+        raise click.BadParameter(
+            message=err.msg,
+            ctx=ctx,
+            param=param_def,
+        ) from err
+
+
+def _parse_pydantic_result(
+    ctx: click.Context,
+    param_def: click.Parameter,
+    response: tuple[Any | None, Sequence[Any] | Any | None],
+) -> Any:
+    if response[1]:
+        if isinstance(response[1], list):
+            raise click.BadParameter(
+                message=str(cast(ErrorWrapper, response[1][0][0]).exc),
+                ctx=ctx,
+                param=param_def,
+            )
+
+        raise click.BadParameter(
+            message=str(cast(ErrorWrapper, response[1]).exc),
+            ctx=ctx,
+            param=param_def,
+        )
+
+    if isinstance(response[0], pathlib.Path):
+        return response[0].expanduser()
+
+    return response[0]
+
+
 def _validate_option(
     field: pydantic.fields.ModelField,
 ) -> Callable[[click.Context, click.Parameter, Any], Any]:
@@ -155,26 +204,12 @@ def _validate_option(
         param_def: click.Parameter,
         param_value: Any,
     ) -> Any:
+        if param_def.type.name == "JSON":
+            param_value = _parse_json(ctx, param_def, param_value)
+
         response = field.validate(param_value, {}, loc="")
 
-        if response[1]:
-            if isinstance(response[1], list):
-                raise click.BadParameter(
-                    message=str(cast(ErrorWrapper, response[1][0][0]).exc),
-                    ctx=ctx,
-                    param=param_def,
-                )
-
-            raise click.BadParameter(
-                message=str(cast(ErrorWrapper, response[1]).exc),
-                ctx=ctx,
-                param=param_def,
-            )
-
-        if isinstance(response[0], pathlib.Path):
-            return response[0].expanduser()
-
-        return response[0]
+        return _parse_pydantic_result(ctx, param_def, response)
 
     return decorator
 
@@ -184,6 +219,9 @@ def _get_parameter_default(
 ) -> types.Primitive | list[types.Primitive] | None:
     if arg.default == pydantic.fields.UndefinedType or arg.default is None:
         return None
+
+    if isinstance(arg.default, dict):
+        return orjson.dumps(arg.default).decode()
 
     if isinstance(arg.default, (list, set, tuple)):
         return [
@@ -212,7 +250,7 @@ def _create_parameter_from_model(
             envvar=arg.name.upper(),
             nargs=-1 if is_multi else 1,
             required=bool(arg.required),
-            type=_get_type(next(iter(get_args(arg_types[arg.name])), arg_type)),
+            type=_get_type(arg_types, arg.name, arg_type),
         )
 
     return click.Option(
@@ -227,7 +265,7 @@ def _create_parameter_from_model(
         required=arg.required,
         show_default=True,
         show_envvar=True,
-        type=_get_type(next(iter(get_args(arg_types[arg.name])), arg_type)),
+        type=_get_type(arg_types, arg.name, arg_type),
     )
 
 
@@ -247,7 +285,7 @@ def _group(ctx: click.Context, **kwargs: Any) -> None:
     ctx.ensure_object(dict)
 
     if kwargs["debug_info"]:
-        click.echo(json.dumps(ctx.to_info_dict()))
+        click.echo(orjson.dumps(ctx.to_info_dict()).decode())
         ctx.exit()
 
     ctx.obj["global_settings"] = _GlobalSettings.construct(**kwargs)
