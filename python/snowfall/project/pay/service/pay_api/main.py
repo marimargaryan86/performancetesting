@@ -1,4 +1,3 @@
-import base64
 import datetime
 import random
 from typing import Callable
@@ -60,9 +59,7 @@ def _factory(
                 Middleware(
                     authentication.AuthenticationMiddleware,
                     backend=authenticator.Authenticator(
-                        public_key_content=base64.b64decode(
-                            app.settings.jwt_public_key.encode(),
-                        ).decode(),
+                        public_key_content=app.settings.jwt_public_key,
                     ),
                     on_error=handlers.auth_error_handler,
                 ),
@@ -133,9 +130,7 @@ def _admin_factory(
                 Middleware(
                     authentication.AuthenticationMiddleware,
                     backend=authenticator.Authenticator(
-                        public_key_content=base64.b64decode(
-                            app.settings.jwt_public_key.encode(),
-                        ).decode(),
+                        public_key_content=app.settings.jwt_public_key,
                     ),
                     on_error=handlers.auth_error_handler,
                 ),

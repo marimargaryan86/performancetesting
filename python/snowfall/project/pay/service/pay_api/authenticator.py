@@ -1,5 +1,3 @@
-from typing import Mapping
-
 from starlette import authentication, requests
 
 from snowfall.stdlib.format import jwt
@@ -7,7 +5,7 @@ from snowfall.stdlib.format import jwt
 
 class Authenticator(jwt.Decoder):
     def __init__(self, public_key_content: str):
-        super().__init__(public_key_content, "RS256")
+        super().__init__(public_key_content, ["RS256"])
 
     async def authenticate(
         self,
@@ -22,7 +20,7 @@ class Authenticator(jwt.Decoder):
             )
 
         try:
-            decoded = self.decode_token(jwt_token)
+            decoded = self.decode(jwt_token)
         except jwt.jwt.exceptions.ExpiredSignatureError as err:
             raise authentication.AuthenticationError(str(err)) from err
         except jwt.jwt.exceptions.DecodeError as err:
@@ -34,6 +32,3 @@ class Authenticator(jwt.Decoder):
         return authentication.AuthCredentials(
             ["authenticated"],
         ), authentication.SimpleUser(client_id)
-
-    def decode_token(self, jwt_token: str) -> Mapping[str, Mapping[str, str]]:
-        return self.decode(jwt_token)
