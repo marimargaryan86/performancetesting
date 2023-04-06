@@ -92,6 +92,10 @@ job "geodata-grpc" {
     task "grpc" {
       driver = "docker"
 
+      resources {
+        memory = 500
+      }
+
       vault {
         policies = ["geodata-${var.environment}"]
       }
