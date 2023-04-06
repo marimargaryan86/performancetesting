@@ -11,9 +11,13 @@ message Conversion {
   string id = 1;
   string external_id = 2;
   google.protobuf.Timestamp settlement_date = 3;
-  google.protobuf.Timestamp conversion_date = 4;
+  google.protobuf.Timestamp execution_date = 4;
   snowfall.stdlib.v1alpha.Money buy_amount = 5;
   snowfall.stdlib.v1alpha.Money sell_amount = 6;
-  string fixed_side = 7;
-  float core_rate = 8;
+  float executed_rate = 7;
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_EXECUTED = 1;
+  }
+  Status status = 8;
 }

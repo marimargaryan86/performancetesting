@@ -23,5 +23,4 @@ class ConversionResponse(CamelCaseBaseModel):
     buy_currency: str
     sell_currency: str
     client_sell_amount: str
-    fixed_side: str
     core_rate: float

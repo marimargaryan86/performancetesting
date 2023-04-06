@@ -89,7 +89,7 @@ class ConversionRepository(
             settlement_date=protobuf.datetime_to_protobuf(
                 cc_conversion.settlement_date,
             ),
-            conversion_date=protobuf.datetime_to_protobuf(
+            execution_date=protobuf.datetime_to_protobuf(
                 cc_conversion.conversion_date,
             ),
             buy_amount=money.from_string(
@@ -100,8 +100,8 @@ class ConversionRepository(
                 cc_conversion.client_sell_amount,
                 money.Currency(cc_conversion.sell_currency),
             ).protobuf(),
-            fixed_side=cc_conversion.fixed_side,
-            core_rate=cc_conversion.core_rate,
+            executed_rate=cc_conversion.core_rate,
+            status=Conversion.Status.STATUS_EXECUTED,
         )
 
         return await self.insert(conversion)

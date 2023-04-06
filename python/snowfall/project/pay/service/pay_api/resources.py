@@ -303,7 +303,7 @@ class ConversionResource(models.Resource):
                 "settledAt": protobuf.protobuf_to_datetime(
                     conversion.settlement_date,
                 ),
-                "rate": round(conversion.core_rate, 3),
+                "rate": round(conversion.executed_rate, 3),
             },
         )
 

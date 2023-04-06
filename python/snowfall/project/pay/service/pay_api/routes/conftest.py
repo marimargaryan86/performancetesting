@@ -108,13 +108,12 @@ async def valid_conversion(
         settlement_date=protobuf.datetime_to_protobuf(
             datetime.now() - timedelta(hours=1),
         ),
-        conversion_date=protobuf.datetime_to_protobuf(
+        execution_date=protobuf.datetime_to_protobuf(
             datetime.now() - timedelta(hours=2),
         ),
         buy_amount=usd.protobuf(),
         sell_amount=gbp.protobuf(),
-        fixed_side="buy",
-        core_rate=1,
+        executed_rate=1,
     )
 
     return await conversions_repository.insert(conversion)
