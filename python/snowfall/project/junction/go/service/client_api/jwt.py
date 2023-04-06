@@ -1,3 +1,5 @@
+from typing import Any
+
 import jwt
 from cryptography.hazmat.primitives import serialization
 from starlette import authentication, requests
@@ -33,19 +35,25 @@ class JWTAuthenticationBackend(authentication.AuthenticationBackend):
         except jwt.exceptions.PyJWTError as err:
             raise authentication.AuthenticationError("Invalid jwt token.") from err
 
+        if "client_id" in payload:
+            return payload["client_id"]  # noqa: WPS529
+
         if payload.get("version") != self._token_version:
             raise authentication.AuthenticationError(
                 "Wrong version of jwt token. Refresh your token.",
             )
 
-        if "client_id" not in payload:
+        metadata = payload["user_info"]["metadata"]
+        client_id = metadata.get("client_id")
+
+        if not metadata.get("default_currency") and not client_id:
             raise authentication.AuthenticationError(
                 "Wrong version of jwt token. Refresh your token.",
             )
 
-        return payload["client_id"]
+        return client_id
 
-    def _get_payload_from_jwt_token(self, jwt_token: str) -> dict[str, str]:
+    def _get_payload_from_jwt_token(self, jwt_token: str) -> dict[str, Any]:
         key = serialization.load_pem_public_key(self._public_key.encode())
 
         return jwt.decode(

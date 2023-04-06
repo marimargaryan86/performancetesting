@@ -1,6 +1,6 @@
 from base64 import b64decode
 from datetime import datetime, timedelta
-from typing import Mapping
+from typing import Any, Mapping
 
 import jwt
 from cryptography.hazmat.primitives import serialization
@@ -23,12 +23,11 @@ class JWTEncoder(object):
 
     def encode(
         self,
-        payload: Mapping[str, str],
+        payload: Mapping[str, Any],
     ) -> str:
         """Generate JWT token."""
         jwt_info = {
             "user_info": payload,
-            "client_id": "client_id",  # TODO: make me dynamic or move to metadata obj
             "exp": datetime.utcnow() + timedelta(seconds=self._token_expiration),
             "version": self._jwt_token_version,
         }

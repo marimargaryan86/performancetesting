@@ -33,8 +33,18 @@ from snowfall.service.authentication.v1alpha import models_pb2 as auth_models_pb
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import cursor, filesystem
 
-jwt_token_version = "1.0.0"  # nosec
-jwt_payload = {"version": jwt_token_version, "client_id": "test"}
+jwt_token_version = "2.0.0"  # nosec
+jwt_payload = {
+    "version": jwt_token_version,
+    "user_info": {
+        "id": "d85ac9ee-55f1-4273-8cc8-5e9c9f326b84",
+        "email": "example@example.com",
+        "metadata": {
+            "client_id": "d85ac9ee-55f1-4273-8cc8-5e9c9f326b84",
+            "default_currency": "USD",
+        },
+    },
+}
 public_exponent = 65537
 key_size = 2048
 jwt_private_key = rsa.generate_private_key(
