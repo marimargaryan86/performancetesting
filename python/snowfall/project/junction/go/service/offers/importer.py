@@ -51,6 +51,11 @@ class StatusHandler(trackable.AnySizeStatusHandler):
 
         self._repository = repository
 
+    async def on_message(self, msg: trackable_pb2.Trackable) -> None:
+        if msg.event == msg.Event.EVENT_NACKED:
+            msg.event = msg.Event.EVENT_ACKED
+        await super().on_message(msg)
+
     async def _get_status_and_expiry_by_id(
         self,
         trackable_id: str,
