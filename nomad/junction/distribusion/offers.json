@@ -1,13 +1,17 @@
 {
   "development": {
     "variables": {
-      "count": 1
+      "count": 1,
+      "api_base_url": "https://api.demo.distribusion.com",
+      "retailer_partner_number": "431926"
     }
   },
   "production": {
     "deploy": false,
     "variables": {
-      "count": 2
+      "count": 2,
+      "api_base_url": "https://api.demo.distribusion.com",
+      "retailer_partner_number": "431926"
     }
   }
 }

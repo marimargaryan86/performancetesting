@@ -1,12 +1,16 @@
 {
   "development": {
     "variables": {
-      "count": 1
+      "count": 1,
+      "api_base_url": "https://apibook.saveatrain.com/api",
+      "api_search_base_url": "https://apisearch.saveatrain.com/search"
     }
   },
   "production": {
     "variables": {
-      "count": 1
+      "count": 1,
+      "api_base_url": "https://apibook.saveatrain.com/api",
+      "api_search_base_url": "https://apisearch.saveatrain.com/search"
     }
   }
 }

@@ -30,6 +30,22 @@ variable "provider_company_id" {
   type = string
 }
 
+variable "api_url" {
+  type = string
+}
+
+variable "client_id" {
+  type = string
+}
+
+variable "partner_code" {
+  type = string
+}
+
+variable "affiliate_api_url" {
+  type = string
+}
+
 job "direct-ferries-pricing" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -91,10 +107,6 @@ job "direct-ferries-pricing" {
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 {{ with secret "kv/data/${var.environment}/direct-ferries" }}
-API_URL={{ .Data.data.api_url }}
-AFFILIATE_API_URL={{ .Data.data.affiliate_api_url }}
-PARTNER_CODE={{ .Data.data.partner_code }}
-CLIENT_ID={{ .Data.data.client_id }}
 CLIENT_SECRET={{ .Data.data.client_secret }}
 {{ end }}
 EOH
@@ -122,6 +134,10 @@ EOH
         SENTRY_DSN          = "https://8375ccf16be441df8c8a5c04743d3f96@sentry.snowfall.se/59"
         PROMETHEUS_PORT     = "${NOMAD_PORT_prometheus}"
         PROVIDER_COMPANY_ID = "${var.provider_company_id}"
+        PARTNER_CODE        = "${var.partner_code}"
+        CLIENT_ID           = "${var.client_id}"
+        AFFILIATE_API_URL   = "${var.affiliate_api_url}"
+        API_URL             = "${var.api_url}"
       }
     }
   }

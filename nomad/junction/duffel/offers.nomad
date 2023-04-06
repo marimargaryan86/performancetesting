@@ -26,6 +26,10 @@ variable "count" {
   type = number
 }
 
+variable "api_base_url" {
+  type = string
+}
+
 job "duffel-offers" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -87,7 +91,6 @@ job "duffel-offers" {
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 {{ with secret "kv/data/${var.environment}/duffel" }}
-API_BASE_URL={{ .Data.data.api_base_url }}
 API_KEY={{ .Data.data.api_key }}
 {{ end }}
 EOH
@@ -113,6 +116,7 @@ EOH
       env {
         ENV_NAME        = "${var.environment}"
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
+        API_BASE_URL    = "${var.api_base_url}"
         SENTRY_DSN      = "https://c957bacb77d741509281e8b0a3b79e25@sentry.snowfall.se/57"
       }
     }

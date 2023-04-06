@@ -3,14 +3,16 @@
     "variables": {
       "count": 2,
       "traefik_entrypoints": "websecure",
-      "traaefik_host_URL": "api.junction.dev"
+      "traaefik_host_URL": "api.junction.dev",
+      "validate_responses_against_spec": "true"
     }
   },
   "production": {
     "variables": {
       "count": 2,
       "traefik_entrypoints": "web",
-      "traaefik_host_URL": "api.junction.travel"
+      "traaefik_host_URL": "api.junction.travel",
+      "validate_responses_against_spec": "false"
     }
   }
 }

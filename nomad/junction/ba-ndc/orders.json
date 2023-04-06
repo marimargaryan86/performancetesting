@@ -1,13 +1,15 @@
 {
     "development": {
         "variables": {
-            "count": 5
+            "count": 5,
+            "api_base_url": "https://ndc.junction.dev"
         }
     },
     "production": {
         "deploy": false,
         "variables": {
-            "count": 5
+            "count": 5,
+            "api_base_url": "https://ndc.junction.travel"
         }
     }
 }

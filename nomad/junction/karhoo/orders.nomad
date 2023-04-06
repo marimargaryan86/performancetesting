@@ -26,6 +26,10 @@ variable "count" {
   type = number
 }
 
+variable "api_base_url" {
+  type = string
+}
+
 job "karhoo-orders" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -88,7 +92,6 @@ AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
 {{ with secret "kv/data/${var.environment}/karhoo" }}
-API_BASE_URL={{ .Data.data.api_base_url }}
 API_KEY={{ .Data.data.api_key }}
 {{ end }}
 
@@ -118,6 +121,7 @@ EOH
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
         SMTP_SENDER     = "noreply@junction.travel"
         SMTP_RECIPIENT  = "recipient@snowfalltravel.com"
+        API_BASE_URL    = "${var.api_base_url}"
       }
     }
   }

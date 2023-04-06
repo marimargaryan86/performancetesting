@@ -1,13 +1,15 @@
 {
     "development": {
         "variables": {
-            "count": 1
+            "count": 1,
+            "api_base_url": "https://rest.sandbox.karhoo.com/"
         }
     },
     "production": {
         "deploy": false,
         "variables": {
-            "count": 2
+            "count": 2,
+            "api_base_url": ""
         }
     }
 }

@@ -91,10 +91,6 @@ job "save-a-train-pricing" {
     task "pricing" {
       driver = "docker"
 
-      vault {
-        policies = ["save-a-train-${var.environment}"]
-      }
-
       template {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}

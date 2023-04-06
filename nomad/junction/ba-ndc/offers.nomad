@@ -26,6 +26,10 @@ variable "count" {
   type = number
 }
 
+variable "api_base_url" {
+  type = string
+}
+
 variable "provider_company_id" {
   type = string
 }
@@ -92,7 +96,6 @@ AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://
 MONGO_DSN={{range $index, $service := service (printf "mongodb-%s" (env "NOMAD_NAMESPACE"))}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 {{ with secret "kv/data/${var.environment}/ndc-ba" }}
-API_BASE_URL={{ .Data.data.api_base_url }}
 API_KEY={{ .Data.data.api_key }}
 {{ end }}
 EOH
@@ -118,6 +121,7 @@ EOH
       env {
         ENV_NAME            = "${var.environment}"
         PROMETHEUS_PORT     = "${NOMAD_PORT_prometheus}"
+        API_BASE_URL        = "${var.api_base_url}"
         SENTRY_DSN          = "https://5e8ffcd08b434ebf955ecd889fe82947@sentry.snowfall.se/58"
         PROVIDER_COMPANY_ID = "${var.provider_company_id}"
       }

@@ -81,7 +81,6 @@ job "allure-api-http" {
 {{ with secret "kv/data/${var.environment}/allure" }}
 SECURITY_USER={{ .Data.data.security_user }}
 SECURITY_PASS={{ .Data.data.security_pass }}
-SECURITY_ENABLED={{ .Data.data.security_enabled }}
 {{ end }}
 EOH
       }
@@ -101,6 +100,7 @@ EOH
         KEEP_HISTORY                   = "1"
         KEEP_HISTORY_LATEST            = "25"
         HTTP_ADDRESS                   = "0.0.0.0"
+        SECURITY_ENABLED               = "1"
         ALLURE_DOCKER_SERVICE_API_PORT = "${NOMAD_PORT_http}"
         ACCESS_TOKEN_EXPIRES_IN_MINS   = "60"
       }

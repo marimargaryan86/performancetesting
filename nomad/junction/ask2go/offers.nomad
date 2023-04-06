@@ -30,6 +30,14 @@ variable "count" {
   type = number
 }
 
+variable "api_base_url" {
+  type = string
+}
+
+variable "api_booking_base_url" {
+  type = string
+}
+
 job "ask2go-offers" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -82,21 +90,12 @@ job "ask2go-offers" {
     }
     task "offers" {
       driver = "docker"
-      vault {
-        policies = ["ask2go-${var.environment}"]
-      }
 
       template {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 MONGO_DSN={{range $index, $service := service (printf "mongodb-%s" (env "NOMAD_NAMESPACE"))}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
-{{ with secret "kv/data/${var.environment}/ask2go" }}
-API_BASE_URL={{ .Data.data.api_base_url }}
-API_BOOKING_BASE_URL={{ .Data.data.api_booking_base_url }}
-POLL_RETRIES_LIMIT={{ .Data.data.poll_retries_limit }}
-WAIT_TIME_BETWEEN_POLLING={{ .Data.data.wait_time_between_polling }}
-{{ end }}
 EOH
         destination = "services.env"
         env         = true
@@ -118,10 +117,14 @@ EOH
       }
 
       env {
-        ENV_NAME            = "${var.environment}"
-        SENTRY_DSN          = "https://c299617e39d446ccb1053a04d9ac12b8@sentry.snowfall.se/34"
-        PROMETHEUS_PORT     = "${NOMAD_PORT_prometheus}"
-        PROVIDER_COMPANY_ID = "${var.provider_company_id}"
+        ENV_NAME                  = "${var.environment}"
+        SENTRY_DSN                = "https://c299617e39d446ccb1053a04d9ac12b8@sentry.snowfall.se/34"
+        PROMETHEUS_PORT           = "${NOMAD_PORT_prometheus}"
+        PROVIDER_COMPANY_ID       = "${var.provider_company_id}"
+        POLL_RETRIES_LIMIT        = "60"
+        WAIT_TIME_BETWEEN_POLLING = "2"
+        API_BASE_URL              = "${var.api_base_url}"
+        API_BOOKING_BASE_URL      = "${var.api_booking_base_url}"
       }
     }
   }

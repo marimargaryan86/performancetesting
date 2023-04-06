@@ -30,6 +30,10 @@ variable "provider_company_id" {
   type = string
 }
 
+variable "api_base_url" {
+  type = string
+}
+
 job "karhoo-offers" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -91,7 +95,6 @@ job "karhoo-offers" {
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 {{ with secret "kv/data/${var.environment}/karhoo" }}
-API_BASE_URL={{ .Data.data.api_base_url }}
 API_KEY={{ .Data.data.api_key }}
 {{ end }}
 EOH
@@ -119,6 +122,7 @@ EOH
         SENTRY_DSN          = "https://9678cf4943334528befbe1a14d653f3e@sentry.snowfall.se/63"
         PROMETHEUS_PORT     = "${NOMAD_PORT_prometheus}"
         PROVIDER_COMPANY_ID = "${var.provider_company_id}"
+        API_BASE_URL        = "${var.api_base_url}"
       }
     }
   }

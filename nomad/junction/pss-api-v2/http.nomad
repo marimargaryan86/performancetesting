@@ -24,6 +24,9 @@ variable "docker_image" {
   type = string
 }
 
+variable "pss_v1_dsn" {
+  type = string
+}
 
 variable "count" {
   type = number
@@ -80,9 +83,6 @@ job "pss-api-v2-http" {
 SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
 {{ with secret "kv/data/${var.environment}/pss-api-v2" }}
 MYSQL_DSN={{ .Data.data.mysql_dsn }}
-PSS_V1_DSN={{ .Data.data.pss_v1_dsn }}
-WEB_DSN={{ .Data.data.web_dsn }}
-SMTP_SENDER={{ .Data.data.smtp_sender }}
 {{ end }}
 EOH
       }
@@ -109,7 +109,9 @@ EOH
         HTTP_ADDRESS = "0.0.0.0"
         HTTP_PORT    = "${NOMAD_PORT_http}"
         SENTRY_DSN   = "https://c674550aaa124dd9b5f02bf6c49b1983@sentry.snowfall.se/60"
-
+        SMTP_SENDER  = "no-reply@snowfall.se"
+        WEB_DSN      = "https://web.spex.snowfalltravel.com/"
+        PSS_V1_DSN   = "${var.pss_v1_dsn}"
       }
     }
   }

@@ -3,7 +3,8 @@
     "variables": {
       "count": 1,
       "traefik_entrypoints": "websecure",
-      "traefik_host_URL": "pssapi2.junction.dev"
+      "traefik_host_URL": "pssapi2.junction.dev",
+      "pss_v1_dsn": "https://tardis.junction.dev"
     }
   },
   "production": {

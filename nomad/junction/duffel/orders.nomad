@@ -26,6 +26,10 @@ variable "count" {
   type = number
 }
 
+variable "api_base_url" {
+  type = string
+}
+
 job "duffel-orders" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -89,7 +93,6 @@ AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
 {{ with secret "kv/data/${var.environment}/duffel" }}
-API_BASE_URL={{ .Data.data.api_base_url }}
 API_KEY={{ .Data.data.api_key }}
 {{ end }}
 EOH
@@ -117,6 +120,7 @@ EOH
         SMTP_SENDER     = "sender@snowfalltravel.com"
         SMTP_RECIPIENT  = "recipient@snowfalltravel.com"
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
+        API_BASE_URL    = "${var.api_base_url}"
         SENTRY_DSN      = "https://c957bacb77d741509281e8b0a3b79e25@sentry.snowfall.se/57"
       }
     }
