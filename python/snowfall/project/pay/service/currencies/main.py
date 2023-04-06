@@ -27,6 +27,7 @@ async def _main(app: service.Application[_Settings]) -> None:
     api_layer_client = APILayer(
         app.settings.api_layer_base_url,
         app.settings.api_layer_api_key,
+        timeout=1.0,
     )
     grpc_server = server.create_server(
         app.settings.grpc_address,

@@ -30,5 +30,6 @@ python_requirements(
         "pyjwt": {"dependencies": ["#cryptography"]},
         "SQLAlchemy": {"dependencies": ["#aiomysql", "#aiosqlite"]},
         "starlette": {"dependencies": ["#python-multipart"]},
+        "fakeredis": {"dependencies": ["#lupa"]},
     },
 )

@@ -96,30 +96,31 @@ class Quotations(endpoints.HTTPEndpoint):
         redis_client: UserSessionRepository,
         currency_client: currencies.Client,
     ) -> float:
-        currency_pair = "{0}{1}".format(from_currency.code, to_currency.code)
-
-        rate = None
-
         if session_token:
-            rate = await redis_client.get_rate(session_token, currency_pair)
+            currency_pair = "{0}{1}".format(from_currency.code, to_currency.code)
+            cache_key = "{0}:{1}".format(session_token, currency_pair)
+            async with await redis_client.lock(cache_key):
+                rate = await redis_client.get_rate(session_token, currency_pair)
 
-        if not rate:
-            if from_currency == to_currency:
-                rate = 1.0
-            else:
-                response = await currency_client.convert(
-                    from_currency,
-                    to_currency,
-                    amount,
-                )
-                rate = response.rate
-
-            if session_token:
-                await redis_client.store(
-                    session_token,
-                    currency_pair,
-                    rate,
-                )
+                if not rate:
+                    rate = await self._get_live_rate(
+                        from_currency,
+                        to_currency,
+                        amount,
+                        currency_client,
+                    )
+                    await redis_client.store(
+                        session_token,
+                        currency_pair,
+                        rate,
+                    )
+        else:
+            rate = await self._get_live_rate(
+                from_currency,
+                to_currency,
+                amount,
+                currency_client,
+            )
 
         return rate
 
@@ -178,3 +179,22 @@ class Quotations(endpoints.HTTPEndpoint):
                 ),
             )
         return errors
+
+    async def _get_live_rate(
+        self,
+        from_currency: Currency,
+        to_currency: Currency,
+        amount: int,
+        currency_client: currencies.Client,
+    ) -> float:
+        if from_currency == to_currency:
+            rate = 1.0
+        else:
+            response = await currency_client.convert(
+                from_currency,
+                to_currency,
+                amount,
+            )
+            rate = response.rate
+
+        return rate
