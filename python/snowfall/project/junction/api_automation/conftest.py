@@ -29,6 +29,39 @@ ALLUREDIR_OPTION = "--alluredir"
 EXIT_MSG = "Exiting ; check your logs"
 HTTPS_PREFIX = "https://"
 HTTP_PREFIX = "http://"
+expected_currencies_list = [
+    "AUD",
+    "BHD",
+    "BGN",
+    "CAD",
+    "CNY",
+    "CZK",
+    "DKK",
+    "EUR",
+    "HKD",
+    "HUF",
+    "ILS",
+    "JPY",
+    "KES",
+    "KWD",
+    "NZD",
+    "NOK",
+    "OMR",
+    "PLN",
+    "QAR",
+    "RON",
+    "SAR",
+    "SGD",
+    "ZAR",
+    "SEK",
+    "CHF",
+    "THB",
+    "TRY",
+    "UGX",
+    "GBP",
+    "AED",
+    "USD",
+]
 
 logger = logging.getLogger()
 
