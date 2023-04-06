@@ -66,16 +66,7 @@ jwt_public_key = b64encode(jwt_public_key_bytes).decode()
 
 @pytest.fixture()
 def authentication_client() -> auth.Client:
-    return auth.DictClient(
-        private_key_content=b64encode(
-            jwt_private_key.private_bytes(
-                encoding=serialization.Encoding.PEM,
-                format=serialization.PrivateFormat.PKCS8,
-                encryption_algorithm=serialization.NoEncryption(),
-            ),
-        ).decode(),
-        jwt_token_version=jwt_token_version,
-    )
+    return auth.DictClient()
 
 
 @pytest.fixture()

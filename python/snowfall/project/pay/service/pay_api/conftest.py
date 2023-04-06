@@ -308,10 +308,7 @@ def currencies_client() -> mock.Mock:
 
 @pytest.fixture()
 def authentication_client() -> auth.DictClient:
-    return auth.DictClient(
-        private_key_content="private_key",
-        jwt_token_version="1.0.0",  # nosec
-    )
+    return auth.DictClient()
 
 
 # TODO: need to use our authentication mechanism to generate jwt token and include it

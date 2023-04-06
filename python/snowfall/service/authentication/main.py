@@ -1,12 +1,14 @@
+import datetime
 import ipaddress
 from typing import Sequence
 
 import pydantic
 from motor import motor_asyncio
 
-from snowfall.service.authentication import repository
+from snowfall.service.authentication import auth, repository
 from snowfall.service.authentication.grpc import AuthenticationService
 from snowfall.stdlib import service
+from snowfall.stdlib.format import jwt
 from snowfall.stdlib.transport.grpc import server
 
 
@@ -16,7 +18,6 @@ class _GrpcSettings(service.Settings):
     default_page_size: int = 100
     jwt_private_key: str
     jwt_public_key: str
-    jwt_token_version: str
     mongo_dsn: Sequence[pydantic.AnyUrl]
 
 
@@ -31,9 +32,13 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
                 repository.UsersRepository(
                     collection=mongo.authentication.users,
                 ),
-                default_page_size=app.settings.default_page_size,
-                private_key_content=app.settings.jwt_private_key,
-                jwt_token_version=app.settings.jwt_token_version,
+                auth.JWTFactory(
+                    ttl=datetime.timedelta(hours=1),
+                ),
+                jwt_encoder=jwt.Encoder(
+                    private_key=app.settings.jwt_private_key,
+                    algorithm="RS256",
+                ),
             ),
         ],
     )

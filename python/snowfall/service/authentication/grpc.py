@@ -1,6 +1,6 @@
 import grpc
 
-from snowfall.service.authentication import repository
+from snowfall.service.authentication import auth, repository
 from snowfall.service.authentication.v1alpha import authentication_pb2 as auth_pb2
 from snowfall.service.authentication.v1alpha import (
     authentication_pb2_grpc as auth_pb2_grpc,
@@ -12,7 +12,7 @@ from snowfall.service.authentication.validators import (
     validate_email,
     validate_password,
 )
-from snowfall.stdlib.jwt import JWTEncoder
+from snowfall.stdlib.format import jwt
 from snowfall.stdlib.string import uuid
 from snowfall.stdlib.transport.grpc import rich_status, service
 
@@ -24,16 +24,12 @@ class AuthenticationService(
     def __init__(
         self,
         users: repository.UsersRepository,
-        default_page_size: int,
-        private_key_content: str,
-        jwt_token_version: str,
+        jwt_factory: auth.JWTFactory,
+        jwt_encoder: jwt.Encoder,
     ):
-        self._default_page_size: int = default_page_size
-        self._users: repository.UsersRepository = users
-        self._jwt_encoder: JWTEncoder = JWTEncoder(
-            jwt_token_version=jwt_token_version,
-            private_key_content=private_key_content,
-        )
+        self._users = users
+        self._jwt_factory = jwt_factory
+        self._jwt_encoder = jwt_encoder
 
     def get_name(self) -> str:
         return auth_pb2.DESCRIPTOR.services_by_name["AuthenticationService"].full_name
@@ -67,14 +63,11 @@ class AuthenticationService(
                 ),
             )
 
-        payload = {
-            "email": user.email,
-            "id": user.id,
-            "metadata": dict(user.metadata),
-        }
-        token = self._jwt_encoder.encode(payload)
+        payload = self._jwt_factory.from_user(user=user)
 
-        return auth_pb2.AuthenticateResponse(auth_token=token)
+        return auth_pb2.AuthenticateResponse(
+            auth_token=self._jwt_encoder.encode(payload),
+        )
 
     async def CreateUser(  # type: ignore[override] # noqa: N802,WPS217
         self,
@@ -175,7 +168,7 @@ class AuthenticationService(
         )
 
         if updated_result.matched_count >= 1:
-            # Need to reconsider matched_cout > 1 case
+            # Need to reconsider matched_count > 1 case
             user.password = hashed_password
             context.set_code(grpc.StatusCode.OK)
             return auth_pb2.ChangePasswordResponse(

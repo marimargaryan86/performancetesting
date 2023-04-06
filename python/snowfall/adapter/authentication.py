@@ -1,7 +1,9 @@
 import abc
+import datetime
 
 import grpc
 
+from snowfall.service.authentication import auth
 from snowfall.service.authentication.v1alpha import authentication_pb2 as auth_pb2
 from snowfall.service.authentication.v1alpha import (
     authentication_pb2_grpc as auth_pb2_grpc,
@@ -14,7 +16,7 @@ from snowfall.service.authentication.validators import (
     validate_password,
 )
 from snowfall.stdlib import string
-from snowfall.stdlib.jwt import JWTEncoder
+from snowfall.stdlib.format import jwt
 
 
 class NotFoundError(Exception):
@@ -58,16 +60,12 @@ class Client(abc.ABC):
 
 
 class DictClient(Client):
-    def __init__(
-        self,
-        private_key_content: str,
-        jwt_token_version: str,
-    ):
+    def __init__(self) -> None:
         self.email2user: dict[str, models_pb2.User] = {}
         self.id2user: dict[str, models_pb2.User] = {}
-        self._jwt_encoder = JWTEncoder(
-            private_key_content=private_key_content,
-            jwt_token_version=jwt_token_version,
+        self._encoder = jwt.Encoder()
+        self._jwt_factory = auth.JWTFactory(
+            ttl=datetime.timedelta(hours=1),
         )
 
     async def authenticate(
@@ -81,11 +79,7 @@ class DictClient(Client):
         if not user or not match_passwords(password, user.password):
             raise InvalidArgumentError("Password is not correct")
 
-        payload = {
-            "email": user.email,
-            "id": user.id,
-        }
-        return self._jwt_encoder.encode(payload)
+        return self._encoder.encode(self._jwt_factory.from_user(user))
 
     async def create_user(  # noqa: WPS210
         self,

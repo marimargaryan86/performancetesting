@@ -2,10 +2,10 @@ from typing import Mapping
 
 from starlette import authentication, requests
 
-from snowfall.stdlib import jwt
+from snowfall.stdlib.format import jwt
 
 
-class Authenticator(jwt.JWTDecoder):
+class Authenticator(jwt.Decoder):
     def __init__(self, public_key_content: str):
         super().__init__(public_key_content, "RS256")
 
