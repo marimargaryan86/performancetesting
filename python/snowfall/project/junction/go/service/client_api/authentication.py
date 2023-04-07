@@ -1,18 +1,17 @@
-from typing import Any
-
-import jwt
-from cryptography.hazmat.primitives import serialization
+import jwt as jwtlib
 from starlette import authentication, requests
+
+from snowfall.stdlib.format import jwt
 
 
 class JWTAuthenticationBackend(authentication.AuthenticationBackend):
     def __init__(
         self,
-        public_key: str,
-        token_version: str,
+        decoder: jwt.Decoder,
+        jwt_version: str,
     ) -> None:
-        self._public_key = public_key
-        self._token_version = token_version
+        self._decoder = decoder
+        self._jwt_version = jwt_version
 
     async def authenticate(
         self,
@@ -31,14 +30,14 @@ class JWTAuthenticationBackend(authentication.AuthenticationBackend):
 
     def _get_client_id_from_jwt_token(self, jwt_token: str) -> str:
         try:
-            payload = self._get_payload_from_jwt_token(jwt_token)
-        except jwt.exceptions.PyJWTError as err:
+            payload = self._decoder.decode(jwt_token)
+        except jwtlib.exceptions.PyJWTError as err:
             raise authentication.AuthenticationError("Invalid jwt token.") from err
 
         if "client_id" in payload:
             return payload["client_id"]  # noqa: WPS529
 
-        if payload.get("version") != self._token_version:
+        if payload.get("version", "0.0.0") < self._jwt_version:
             raise authentication.AuthenticationError(
                 "Wrong version of jwt token. Refresh your token.",
             )
@@ -52,12 +51,3 @@ class JWTAuthenticationBackend(authentication.AuthenticationBackend):
             )
 
         return client_id
-
-    def _get_payload_from_jwt_token(self, jwt_token: str) -> dict[str, Any]:
-        key = serialization.load_pem_public_key(self._public_key.encode())
-
-        return jwt.decode(
-            jwt=jwt_token,
-            key=key,  # type: ignore[arg-type]
-            algorithms=["RS256"],
-        )

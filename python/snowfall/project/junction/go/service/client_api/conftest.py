@@ -1,16 +1,13 @@
+import datetime
 import pathlib
-from base64 import b64decode, b64encode
 from typing import AsyncIterator, Mapping, Sequence
 
 import httpx
-import jwt as jwtlib
 import pytest
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import rsa
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
-from snowfall.adapter import authentication as auth
+from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.go.adapter import (
     errors,
     legs,
@@ -27,60 +24,40 @@ from snowfall.project.junction.go.adapter import (
     trip_searches,
     trips,
 )
-from snowfall.project.junction.go.service.client_api import bootstrap, jwt
+from snowfall.project.junction.go.service.client_api import (
+    authentication as authentication_backends,
+)
+from snowfall.project.junction.go.service.client_api import bootstrap
 from snowfall.project.junction.go.service.client_api.routes import router
+from snowfall.service.authentication import auth
 from snowfall.service.authentication.v1alpha import models_pb2 as auth_models_pb2
+from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import cursor, filesystem
 
-jwt_token_version = "2.0.0"  # nosec
-jwt_payload = {
-    "version": jwt_token_version,
-    "user_info": {
-        "id": "d85ac9ee-55f1-4273-8cc8-5e9c9f326b84",
-        "email": "example@example.com",
-        "metadata": {
-            "client_id": "d85ac9ee-55f1-4273-8cc8-5e9c9f326b84",
-            "default_currency": "USD",
-        },
-    },
-}
-public_exponent = 65537
-key_size = 2048
-jwt_private_key = rsa.generate_private_key(
-    public_exponent=public_exponent,
-    key_size=key_size,
-)
-
-jwt_token = jwtlib.encode(
-    payload=jwt_payload,
-    key=jwt_private_key,  # type: ignore[arg-type]
-    algorithm="RS256",
-)
-jwt_public_key_bytes = jwt_private_key.public_key().public_bytes(
-    encoding=serialization.Encoding.PEM,
-    format=serialization.PublicFormat.SubjectPublicKeyInfo,
-)
-jwt_public_key = b64encode(jwt_public_key_bytes).decode()
-
 
 @pytest.fixture()
-def authentication_client() -> auth.Client:
-    return auth.DictClient()
+def authentication_client() -> auth_adapter.Client:
+    return auth_adapter.DictClient()
 
 
 @pytest.fixture()
 async def user(
-    authentication_client: auth.Client,
+    authentication_client: auth_adapter.Client,
 ) -> auth_models_pb2.User:
-    return await authentication_client.create_user(
+    user = await authentication_client.create_user(
         email="example@example.com",
         password="myPassword",  # nosec
     )
 
+    user.metadata["client_id"] = "foo"
+    user.metadata["default_currency"] = "bar"
+
+    return user
+
 
 def _create_app(  # noqa: WPS211
-    authentication_client: auth.Client,
+    authentication_client: auth_adapter.Client,
     legs_client: legs.Client,
     locations_client: locations.Client,
     places_client: places.Client,
@@ -126,7 +103,14 @@ def _create_app(  # noqa: WPS211
 
 
 @pytest.fixture()
-def headers() -> dict[str, str]:
+def jwt_token(user: auth_models_pb2.User) -> str:
+    return jwt.Encoder().encode(
+        auth.JWTFactory(ttl=datetime.timedelta(hours=1)).from_user(user),
+    )
+
+
+@pytest.fixture()
+def headers(jwt_token: str) -> dict[str, str]:
     return {
         "Accept": "application/vnd.api+json",
         "Authorization": "Bearer {0}".format(jwt_token),
@@ -135,7 +119,7 @@ def headers() -> dict[str, str]:
 
 @pytest.fixture()
 def app(  # noqa: WPS211
-    authentication_client: auth.DictClient,
+    authentication_client: auth_adapter.DictClient,
     legs_client: legs.Client,
     locations_client: locations.Client,
     places_client: places.Client,
@@ -155,9 +139,9 @@ def app(  # noqa: WPS211
         custom_middlewares=[
             Middleware(
                 authentication.AuthenticationMiddleware,
-                backend=jwt.JWTAuthenticationBackend(
-                    public_key=b64decode(jwt_public_key).decode(),
-                    token_version=jwt_token_version,
+                backend=authentication_backends.JWTAuthenticationBackend(
+                    jwt.Decoder(),
+                    jwt_version="1.0.0",
                 ),
                 on_error=handlers.auth_error_handler,
             ),

@@ -1,4 +1,3 @@
-import base64
 import random
 from typing import Callable
 
@@ -22,7 +21,10 @@ from snowfall.project.junction.go.adapter import (
     trip_searches,
     trips,
 )
-from snowfall.project.junction.go.service.client_api import bootstrap, jwt
+from snowfall.project.junction.go.service.client_api import (
+    authentication as authentication_backends,
+)
+from snowfall.project.junction.go.service.client_api import bootstrap
 from snowfall.project.junction.go.service.client_api.routes import router
 from snowfall.project.junction.go.service.offers.v1alpha import grpc_pb2_grpc
 from snowfall.project.junction.go.service.orders.v1alpha import orders_pb2_grpc
@@ -30,6 +32,7 @@ from snowfall.project.junction.go.service.places.v1alpha import places_pb2_grpc
 from snowfall.project.junction.go.service.schedules.v1alpha import schedules_pb2_grpc
 from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2_grpc
 from snowfall.stdlib import service
+from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.stdlib.transport.grpc.client import create_channel
@@ -125,11 +128,12 @@ def _factory(
             custom_middlewares=[
                 Middleware(
                     authentication.AuthenticationMiddleware,
-                    backend=jwt.JWTAuthenticationBackend(
-                        token_version=app.settings.jwt_token_version,
-                        public_key=base64.b64decode(
-                            app.settings.jwt_public_key.encode(),
-                        ).decode(),
+                    backend=authentication_backends.JWTAuthenticationBackend(
+                        jwt_version=app.settings.jwt_token_version,
+                        decoder=jwt.Decoder(
+                            public_key=app.settings.jwt_public_key,
+                            algorithms=["RS256"],
+                        ),
                     ),
                     on_error=handlers.auth_error_handler,
                 ),
