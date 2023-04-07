@@ -27,13 +27,12 @@ async def test_get_offer_group_details_by_offer_group_id(
         origin,
     )
 
-    (
-        offer_searches_id,
-        offer_group_ids,
-    ) = await return_offer_group_ids_and_offer_searches_id(
+    r1 = await return_offer_group_ids_and_offer_searches_id(
         junction_client,
         trips_search_id,
     )
+    assert r1, "No offers for search"
+    offer_searches_id, offer_group_ids = r1
 
     assert trips_search_id is not None, "no data"
     assert offer_searches_id is not None, "offer_searches_id should not be empty"

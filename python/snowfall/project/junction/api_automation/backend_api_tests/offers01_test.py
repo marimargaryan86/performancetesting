@@ -95,6 +95,7 @@ async def return_offer_searches_id_and_offer_group_ids(
             ),
         )
     offer_id_and_offer_group_ids = await asyncio.gather(*tasks)
+    offer_id_and_offer_group_ids = list(filter(bool, offer_id_and_offer_group_ids))
     logging.info(
         "(offer_id, [offer_group_ids]): %s",
         json.dumps(offer_id_and_offer_group_ids, indent=4),
@@ -146,19 +147,14 @@ async def return_offer_options_details_ids(
 async def return_offer_group_ids_and_offer_searches_id(
     junction_client: Client,
     trip_offer_search_id: str,
-) -> tuple[str, Sequence[str]]:
-    (offer_id, offer_group_ids) = await return_offer_search_id_and_offer_group_ids(
+) -> tuple[str, Sequence[str]] | None:
+    r1 = await return_offer_search_id_and_offer_group_ids(
         junction_client,
         trip_offer_search_id,
     )
-    if not (offer_id == "None" or offer_group_ids == ["None"]):
-        logging.info(
-            "offer_id: %s, offer_group_ids: %s",
-            offer_id,
-            offer_group_ids,
-        )
-
-    return offer_id, offer_group_ids
+    if r1:
+        logging.info("offer_id: %s, offer_group_ids: %s", *r1)
+    return r1
 
 
 async def return_offer_id(
@@ -191,17 +187,16 @@ async def return_offer_id(
 async def return_offer_search_id_and_offer_group_ids(
     junction_client: Client,
     trips_search_id: str,
-) -> tuple[str, Sequence[str]]:
+) -> tuple[str, Sequence[str]] | None:
     response = await junction_client.get_offers_by_offer_search_id(
         trips_search_id,
         cabin_class=["economy"],
     )
     logging.info("get_offers_by_offer_search_id: %s", json.dumps(response, indent=4))
 
-    try:
-        offer_id = response["data"][0]["id"]
-    except IndexError:
-        return "None", ["None"]
+    offer_id = response["data"][0]["id"]
+    assert offer_id is not None, "Offer ID is None"
+
     logging.info("offer_searches_id: %s", offer_id)
 
     offer_group_ids = await return_offer_group_ids_from_response(response)

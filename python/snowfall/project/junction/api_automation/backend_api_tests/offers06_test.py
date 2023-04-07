@@ -45,13 +45,12 @@ async def return_offer_group_details_ids(
         destination,
         origin,
     )
-    (
-        offer_searches_id,
-        offer_group_ids,
-    ) = await return_offer_group_ids_and_offer_searches_id(
+    r1 = await return_offer_group_ids_and_offer_searches_id(
         junction_client,
         trips_search_id,
     )
+    assert r1, "No offer for the search"
+    _, offer_group_ids = r1
 
     return await return_offer_group_details(
         junction_client,

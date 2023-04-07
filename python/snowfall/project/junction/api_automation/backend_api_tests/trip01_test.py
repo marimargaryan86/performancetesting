@@ -207,7 +207,7 @@ async def test_list_segments_by_trip(  # noqa: WPS218
     logging.info("data_input: %s", data_input)
     for idx, _ in enumerate(data_input):
         assert data_input[idx]["id"] is not None
-        assert bool(data_input[idx]["attributes"]) is False
+        assert bool(data_input[idx]["attributes"]) is True
         assert data_input[idx]["relationships"]["legs"]["data"] is not None
         assert data_input[idx]["type"] == "segments"
         assert data_input[idx]["links"] == {

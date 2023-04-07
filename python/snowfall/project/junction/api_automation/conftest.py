@@ -110,13 +110,8 @@ def api_token(
 
 
 @pytest.fixture(scope="package", autouse=True)
-def departure_after(request: pytest.FixtureRequest) -> str:
-    tomorrow = datetime.date.today() + datetime.timedelta(days=1)
-    departures_table = request.config.getoption("DEPARTURE_AFTER") or tomorrow.strftime(
-        "%Y-%m-%dT00:00:00.000Z",
-    )
-    departures = departures_table.split(",")
-    return departures[0]
+def departure_after(departures_after: Sequence[str]) -> str:
+    return departures_after[0]
 
 
 @pytest.fixture(scope="package", autouse=True)
@@ -130,12 +125,9 @@ def departures_after(request: pytest.FixtureRequest) -> Sequence[str]:
 
 @pytest.fixture(scope="package", autouse=True)
 def origin(
-    local_config: Mapping[str, str],
-    request: pytest.FixtureRequest,
+    origins: Sequence[str],
 ) -> str:
-    origin = request.config.getoption("ORIGIN") or local_config.get("ORIGIN") or ""
-    origin_table = origin.split(",")
-    return origin_table[0]
+    return origins[0]
 
 
 @pytest.fixture(scope="package", autouse=True)
@@ -149,14 +141,9 @@ def origins(
 
 @pytest.fixture(scope="package", autouse=True)
 def destination(
-    local_config: Mapping[str, str],
-    request: pytest.FixtureRequest,
+    destinations: Sequence[str],
 ) -> str:
-    destination = (
-        request.config.getoption("DESTINATION") or local_config.get("DESTINATION") or ""
-    )
-    destination_table = destination.split(",")
-    return destination_table[0]
+    return destinations[0]
 
 
 @pytest.fixture(scope="package", autouse=True)
