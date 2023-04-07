@@ -29,10 +29,20 @@ async def test_quote(
         logger.info("response api_layer quote body: %s", err.response.json())
         pytest.exit(EXIT_MSG)
 
-    logging.info("quote: %s", response)
+    logger.info("quote: %s", response)
+
+    logger.info(
+        "exchange.Quote: %s",
+        exchange.Quote(
+            amount=int(amount * response.rate),
+            buy_currency=buy_currency,
+            sell_currency=sell_currency,
+            rate=response.rate,
+        ),
+    )
 
     assert response == exchange.Quote(
-        amount=int(amount),
+        amount=int(amount * response.rate),
         buy_currency=buy_currency,
         sell_currency=sell_currency,
         rate=response.rate,

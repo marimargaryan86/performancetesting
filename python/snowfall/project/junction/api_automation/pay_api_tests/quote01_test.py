@@ -1,8 +1,10 @@
 import json
 import logging
+import random
 
 import pytest
 
+from snowfall.project.junction.api_automation.conftest import expected_currencies_list
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
     is_valid_uuid,
     return_randomized_token,
@@ -18,10 +20,12 @@ logging.getLogger().setLevel(logging.INFO)
 
 
 @pytest.mark.integration()
-async def test_create_quote(  # noqa: WPS218
+async def test_create_quote(  # noqa: WPS210, WPS218
     pay_admin_client: PayAdminClient,
     pay_client: Client,
 ) -> None:
+    from_currency, to_currency = random.sample(expected_currencies_list, 2)
+
     response_payer = await pay_admin_client.create_company(
         company="test-company-{0}".format(return_randomized_token()),
         address_lines=["Radhuset", "Våksalagatan 2", "United Spaces", "Sweden"],
@@ -49,8 +53,8 @@ async def test_create_quote(  # noqa: WPS218
         external_reference=string.uuid(),
         payer_id=response_payer["data"]["id"],
         beneficiary_id=response_beneficiary["data"]["id"],
-        from_currency="USD",
-        to_currency="EUR",
+        from_currency=from_currency,
+        to_currency=to_currency,
     )
     logging.info("quote: %s", json.dumps(response_create_quote, indent=4))
 
@@ -61,8 +65,8 @@ async def test_create_quote(  # noqa: WPS218
     ), "quotes uuid must be in valid format"
     assert response_create_quote["data"]["type"] == "quotes"
     assert isinstance(response_create_quote["data"]["attributes"]["amount"], int)
-    assert relationships["fromCurrency"]["data"]["id"] == "USD"
-    assert relationships["toCurrency"]["data"]["id"] == "EUR"
+    assert relationships["fromCurrency"]["data"]["id"] == from_currency
+    assert relationships["toCurrency"]["data"]["id"] == to_currency
     assert relationships["payer"]["data"]["id"] == response_payer["data"]["id"]
     assert (
         relationships["beneficiary"]["data"]["id"] == response_beneficiary["data"]["id"]
