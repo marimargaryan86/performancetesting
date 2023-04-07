@@ -98,7 +98,7 @@ class Quotations(endpoints.HTTPEndpoint):
     ) -> float:
         if session_token:
             currency_pair = "{0}{1}".format(from_currency.code, to_currency.code)
-            cache_key = "{0}:{1}".format(session_token, currency_pair)
+            cache_key = "locks:{0}:{1}".format(session_token, currency_pair)
             async with await redis_client.lock(cache_key):
                 rate = await redis_client.get_rate(session_token, currency_pair)
 
