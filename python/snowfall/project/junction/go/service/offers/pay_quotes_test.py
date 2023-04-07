@@ -12,8 +12,8 @@ from snowfall.project.junction.go.service.offers.pay_quotes_models import (
     PayQuoteCompanyData,
     PayQuoteCurrency,
     PayQuoteCurrencyData,
-    PayQuoteData,
     PayQuoteRelationships,
+    PayQuoteResponseData,
 )
 from snowfall.project.junction.go.service.offers.v1alpha.amqp_pb2 import (
     TripOfferSearchResult,
@@ -30,8 +30,8 @@ from snowfall.vendor.junction.pay.client import Client as PayClient
 
 _QUOTE_MOCK_RESPONSE = MappingProxyType(
     {
-        "id": "a-quotation-id",
         "data": {
+            "id": "a-quotation-id",
             "type": "quotes",
             "attributes": {
                 "amount": 1500,
@@ -72,8 +72,8 @@ async def test_that_pay_quotes_invoked_and_response_returned() -> None:
     pay_quotes = PayQuotes(pay_client=mock_pay_client)
     mock_resp = _QUOTE_MOCK_RESPONSE
     expected_resp = PayQuoteResponse(
-        id="a-quotation-id",
-        data=PayQuoteData(
+        data=PayQuoteResponseData(
+            id="a-quotation-id",
             type="quotes",
             attributes=PayQuoteAttributes(
                 amount=1500,

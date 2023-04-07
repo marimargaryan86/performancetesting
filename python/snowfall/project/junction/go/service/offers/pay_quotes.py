@@ -70,7 +70,7 @@ class PayQuotes(object):
             to_currency=to_currency,
         )
 
-        search_result.price_quote.pay_quote_id = quote.id
+        search_result.price_quote.pay_quote_id = quote.data.id
 
         search_result.price_quote.price.CopyFrom(
             Money(

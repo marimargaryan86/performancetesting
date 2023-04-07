@@ -45,10 +45,13 @@ class PayQuoteData(PayBaseModel):
     relationships: PayQuoteRelationships
 
 
+class PayQuoteResponseData(PayQuoteData):
+    id: str  # noqa:A003
+
+
 class PayQuoteRequest(PayBaseModel):
     data: PayQuoteData  # noqa:WPS110
 
 
 class PayQuoteResponse(PayBaseModel):
-    id: str  # noqa:A003
-    data: PayQuoteData  # noqa:WPS110
+    data: PayQuoteResponseData  # noqa:WPS110
