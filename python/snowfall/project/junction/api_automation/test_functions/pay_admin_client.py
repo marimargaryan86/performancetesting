@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import logging
 import sys
-from typing import Any, Sequence
-from urllib.parse import parse_qs, urlencode, urlparse
+from typing import Any, Awaitable, Callable, Sequence
+from urllib.parse import parse_qs, urlparse
 
 import httpx
 
-from snowfall.vendor.junction.client import BaseClient
+from snowfall.vendor.junction.client import BaseClient, make_pagination_params
 
 _DATA_KEY = "data"
 _ID_KEY = "id"
@@ -49,7 +49,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         }
 
         response = await self._client.post(
-            "{0}/companies".format(self._base_url),
+            "/companies",
             json=payload,
         )
 
@@ -63,8 +63,8 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         sort: str | None = None,
     ) -> dict[str, Any]:
         response = await self._client.get(
-            "{0}/accounts".format(self._base_url),
-            params=_make_pagination_with_sorting(cursor, limit, sort),
+            "accounts",
+            params=make_pagination_params(limit, cursor, sort),
         )
         response.raise_for_status()
         return response.json()
@@ -76,8 +76,8 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         cursor: str | None = None,
     ) -> dict[str, Any]:
         response = await self._client.get(
-            "{0}/accounts/{1}/balances".format(self._base_url, account_id),
-            params=_make_pagination(limit, cursor),
+            "/accounts/{0}/balances".format(account_id),
+            params=make_pagination_params(limit, cursor),
         )
 
         response.raise_for_status()
@@ -88,7 +88,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         company_id: str,
     ) -> dict[str, Any]:
         response = await self._client.get(
-            "{0}/companies/{1}".format(self._base_url, company_id),
+            "/companies/{0}".format(company_id),
         )
 
         response.raise_for_status()
@@ -99,7 +99,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         conversion_id: str,
     ) -> dict[str, Any]:
         response = await self._client.get(
-            "{0}/conversions/{1}".format(self._base_url, conversion_id),
+            "/conversions/{0}".format(conversion_id),
         )
 
         response.raise_for_status()
@@ -109,7 +109,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         self,
     ) -> dict[str, Any]:
         response = await self._client.get(
-            "{0}/transactions".format(self._base_url),
+            "/transactions",
         )
 
         response.raise_for_status()
@@ -146,7 +146,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         }
 
         response = await self._client.patch(
-            "{0}/companies/{1}".format(self._base_url, company_id),
+            "/companies/{0}".format(company_id),
             json=payload,
         )
 
@@ -158,9 +158,9 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         limit: int,
         cursor: str,
     ) -> dict[str, Any]:
-        query_params = urlencode(_make_pagination(limit, cursor))
         response = await self._client.get(
-            "/companies?{0}".format(query_params) if query_params else "/companies",
+            "/companies",
+            params=make_pagination_params(limit, cursor),
         )
 
         response.raise_for_status()
@@ -171,13 +171,9 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         limit: int,
         cursor: str,
     ) -> dict[str, Any]:
-        query_params = urlencode(_make_pagination(limit, cursor))
         response = await self._client.get(
-            (
-                "/companies/accountless?{0}".format(query_params)
-                if query_params
-                else "/companies/accountless"
-            ),
+            "/companies/accountless",
+            params=make_pagination_params(limit, cursor),
         )
 
         response.raise_for_status()
@@ -203,8 +199,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         }
 
         response = await self._client.post(
-            "{0}/accounts/{1}/relationships/currencies".format(
-                self._base_url,
+            "/accounts/{0}/relationships/currencies".format(
                 account_id,
             ),
             json=payload,
@@ -234,7 +229,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         }
 
         response = await self._client.post(
-            "{0}/companies/{1}/contacts".format(self._base_url, company_id),
+            "/companies/{0}/contacts".format(company_id),
             json=payload,
         )
 
@@ -249,7 +244,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
     ) -> dict[str, Any]:
         response = await self._client.get(
             "/companies/{0}/contacts".format(company_id),
-            params=_make_pagination(limit, cursor),
+            params=make_pagination_params(limit, cursor),
         )
 
         response.raise_for_status()
@@ -278,7 +273,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         }
 
         response = await self._client.post(
-            "{0}/accounts".format(self._base_url),
+            "/accounts",
             json=payload,
         )
 
@@ -309,7 +304,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
 
 
 async def get_all_resources(  # noqa: WPS210
-    client_method: Any,
+    client_method: Callable[[int, str], Awaitable[Any]],
     limit: int,
     cursor: str,
     logger: logging.Logger,
@@ -334,26 +329,3 @@ async def get_all_resources(  # noqa: WPS210
         cursor = parse_data[_CURSOR_KEY][0]
 
     return resources
-
-
-def _make_pagination_with_sorting(
-    cursor: str | None = None,
-    limit: int | None = None,
-    sort: str | None = None,
-) -> dict[str, Any]:
-    return (
-        {"sort": sort, **_make_pagination(limit, cursor)}
-        if sort
-        else _make_pagination(limit, cursor)
-    )
-
-
-def _make_pagination(
-    limit: int | None,
-    cursor: str | None,
-) -> dict[str, int | str]:
-    return {
-        key: pagination_value
-        for key, pagination_value in ((_LIMIT_KEY, limit), (_CURSOR_KEY, cursor))
-        if pagination_value
-    }

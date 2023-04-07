@@ -1,11 +1,9 @@
 from typing import Any
 
-from snowfall.vendor.junction.client import BaseClient
+from snowfall.vendor.junction.client import BaseClient, make_pagination_params
 
 _TYPE_KEY = "type"
 _ATTRIBUTES_KEY = "attributes"
-_LIMIT_KEY = "page[limit]"
-_CURSOR_KEY = "page[cursor]"
 
 
 class Client(BaseClient):
@@ -91,31 +89,8 @@ class Client(BaseClient):
     ) -> dict[str, Any]:
         response = await self._client.get(
             url="/currencies",
-            params=_make_pagination_with_sorting(cursor, limit, sort),
+            params=make_pagination_params(limit, cursor, sort),
         )
 
         response.raise_for_status()
         return response.json()
-
-
-def _make_pagination_with_sorting(
-    cursor: str | None = None,
-    limit: int | None = None,
-    sort: str | None = None,
-) -> dict[str, Any]:
-    return (
-        {"sort": sort, **_make_pagination(limit, cursor)}
-        if sort
-        else _make_pagination(limit, cursor)
-    )
-
-
-def _make_pagination(
-    limit: int | None,
-    cursor: str | None,
-) -> dict[str, int | str]:
-    return {
-        key: pagination_value
-        for key, pagination_value in ((_LIMIT_KEY, limit), (_CURSOR_KEY, cursor))
-        if pagination_value
-    }

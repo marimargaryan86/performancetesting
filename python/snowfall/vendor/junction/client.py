@@ -22,3 +22,18 @@ class BaseClient(object):
 
         if auth:
             self._client.auth = auth
+
+
+def make_pagination_params(
+    limit: int | None,
+    cursor: str | None,
+    sort: str | None = None,
+) -> dict[str, int | str]:
+    pagination_params: dict[str, int | str] = {}
+    if limit:
+        pagination_params["page[limit]"] = limit
+    if cursor:
+        pagination_params["page[cursor]"] = cursor
+    if sort:
+        pagination_params["sort"] = sort
+    return pagination_params

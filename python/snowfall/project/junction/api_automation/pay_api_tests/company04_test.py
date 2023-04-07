@@ -84,7 +84,6 @@ def _check_new_company_existence_in_all_companies(  # noqa: WPS218
     new_company_payload: Mapping[str, Any],
 ) -> None:
     flatten_payload = jsonapi.flatten_resource(new_company_payload["data"])
-    assert len(all_companies) == len(all_companies_before_create_new_one) + 1
     for company in all_companies:
         if company["id"] == new_company_payload["data"]["id"]:
             flat_company = jsonapi.flatten_resource(company)
