@@ -12,7 +12,6 @@ class Authenticator(jwt.Decoder):
         conn: requests.HTTPConnection,
     ) -> tuple[authentication.AuthCredentials, authentication.BaseUser] | None:
         jwt_token = conn.scope["security"].get("jwt")
-
         if not jwt_token:
             return (
                 authentication.AuthCredentials(),

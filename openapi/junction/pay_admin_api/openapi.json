@@ -1407,18 +1407,6 @@
           "attributes": {
             "type": "object",
             "properties": {
-              "firstName": {
-                "type": "string",
-                "example": "FirstName",
-                "minLength": 1,
-                "maxLength": 150
-              },
-              "lastName": {
-                "type": "string",
-                "example": "lastName",
-                "minLength": 1,
-                "maxLength": 150
-              },
               "bankAccountHolderName": {
                 "type": "string",
                 "example": "bankAccountHolderName",
@@ -1435,18 +1423,27 @@
                 "type": "string",
                 "description": "Bank account number",
                 "example": "00997950423807",
-                "pattern": "^\\d{1,17}$"
+                "nullable": true
               },
               "beneficiaryAddress": {
-                "$ref": "#/components/schemas/AddressDetails"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/AddressDetails"
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "addressLines",
+                      "countryCode"
+                    ]
+                  }
+                ]
               },
               "bankDetails": {
                 "$ref": "#/components/schemas/BankDetails"
               }
             },
             "required": [
-              "firstName",
-              "lastName",
               "bankAccountHolderName",
               "email",
               "accountNumber",
@@ -1594,23 +1591,20 @@
           "countryCode": {
             "type": "string",
             "format": "country",
-            "example": "GB",
-            "pattern": "^.{2,3}"
+            "example": "GB"
           },
           "postalCode": {
             "type": "string",
-            "example": "12345",
-            "pattern": "^.{1,255}"
+            "example": "12345"
           },
           "city": {
             "type": "string",
-            "example": "London",
-            "pattern": "^.{1,255}"
+            "example": "London"
           },
           "state": {
             "type": "string",
             "example": "California",
-            "pattern": "^.{1,255}"
+            "nullable": true
           }
         }
       },
@@ -1633,26 +1627,28 @@
           "bicSwift": {
             "type": "string",
             "description": "BIC/SWIFT code",
-            "example": "AAAABBCC123"
+            "example": "AAAABBCC123",
+            "nullable": true
           },
           "aba": {
             "type": "string",
             "description": "AN ABA (American Bankers Association)",
-            "pattern": "^[0-9A-Z]{9}$",
-            "example": "123456789"
+            "example": "123456789",
+            "nullable": true
           },
           "iban": {
             "type": "string",
             "description": "IBAN code",
-            "example": "GB06 BARC 1231 4512 7782 32"
+            "example": "GB06 BARC 1231 4512 7782 32",
+            "nullable": true
           },
           "accountType": {
             "type": "string",
             "enum": [
               "checking",
-              "saving"
+              "savings"
             ],
-            "example": "saving"
+            "example": "savings"
           },
           "paymentTypes": {
             "type": "string",
@@ -1664,7 +1660,18 @@
             "description": "'priority' (SWIFT) or 'regular' (local)"
           },
           "address": {
-            "$ref": "#/components/schemas/AddressDetails"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AddressDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "addressLines",
+                  "countryCode"
+                ]
+              }
+            ]
           }
         }
       },

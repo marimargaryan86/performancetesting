@@ -11,6 +11,12 @@ from snowfall.vendor.currency_cloud.models.balance import (
     BalanceRequest,
     BalanceResponse,
 )
+from snowfall.vendor.currency_cloud.models.beneficiary import (
+    BeneficiaryRequest,
+    BeneficiaryResponse,
+    BeneficiaryValidateRequest,
+    BeneficiaryValidateResponse,
+)
 from snowfall.vendor.currency_cloud.models.contact import (
     ContactRequest,
     ContactResponse,
@@ -31,15 +37,16 @@ def error_handler(func: Callable[..., Any]) -> Callable[..., Any]:
                 **kwargs,
             )
         except currencycloud.errors.api.ApiError as exc:
-            error = exc.messages[0]
+            errors = [message.message for message in exc.messages]
             raise CurrencyCloudError(
-                error.message,
+                errors,
+                status=exc.status_code,
             ) from exc
 
     return decorator
 
 
-class PaymentClient(object):
+class PaymentClient(object):  # noqa: WPS214
     def __init__(self, cc_client: currencycloud.Client):
         self._cc_client = cc_client
 
@@ -114,3 +121,26 @@ class PaymentClient(object):
             **balance_request.dict(exclude=None),
         )
         return BalanceResponse(**balance._attributes)  # noqa: WPS437
+
+    @error_handler
+    def validate_beneficiary(
+        self,
+        beneficiary: BeneficiaryValidateRequest,
+    ) -> BeneficiaryValidateResponse:
+        validated_beneficiary = self._cc_client.beneficiaries.validate(
+            **beneficiary.dict(exclude=None),
+        )
+        return BeneficiaryValidateResponse(
+            **validated_beneficiary._attributes,  # noqa: WPS437
+        )
+
+    @error_handler
+    def create_beneficiary(
+        self,
+        beneficiary: BeneficiaryRequest,
+    ) -> BeneficiaryResponse:
+        created_beneficiary = self._cc_client.beneficiaries.create(
+            **beneficiary.dict(exclude=None),
+        )
+
+        return BeneficiaryResponse(**created_beneficiary._attributes)  # noqa: WPS437

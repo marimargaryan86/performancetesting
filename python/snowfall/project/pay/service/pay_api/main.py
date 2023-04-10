@@ -16,6 +16,7 @@ from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
 from snowfall.project.pay.service.pay_api import authenticator, bootstrap
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.repositories import (
+    BeneficiaryRepository,
     CompanyRepository,
     ConversionRepository,
     CurrencyRepository,
@@ -160,6 +161,9 @@ def _admin_factory(
                     ),
                     currencies_repository=CurrencyRepository(
                         app.settings.currencies,
+                    ),
+                    beneficiaries_repository=BeneficiaryRepository(
+                        mongo.beneficiaries.beneficiaries,
                     ),
                 ),
             ),

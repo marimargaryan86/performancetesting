@@ -9,6 +9,7 @@ from snowfall.project.pay.adapter import currencies
 from snowfall.project.pay.service.accounts import accounts
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.repositories import (
+    BeneficiaryRepository,
     CompanyRepository,
     ConversionRepository,
     CurrencyRepository,
@@ -51,6 +52,7 @@ def create_admin_dependencies(  # noqa: WPS211
     conversions_repository: ConversionRepository,
     transactions_repository: TransactionRepository,
     currencies_repository: CurrencyRepository,
+    beneficiaries_repository: BeneficiaryRepository,
     payment_client: client.PaymentClient | None = None,
 ) -> lagom.Container:
     container = lagom.Container()
@@ -63,6 +65,7 @@ def create_admin_dependencies(  # noqa: WPS211
     container[ConversionRepository] = conversions_repository
     container[TransactionRepository] = transactions_repository
     container[CurrencyRepository] = currencies_repository
+    container[BeneficiaryRepository] = beneficiaries_repository
     return container
 
 

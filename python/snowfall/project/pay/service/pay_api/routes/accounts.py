@@ -224,8 +224,9 @@ class Accounts(endpoints.HTTPEndpoint):
                     models.Error(
                         status=str(exc.status),
                         code=exc.code,
-                        detail=exc.message,
-                    ),
+                        detail=message,
+                    )
+                    for message in exc.messages
                 ],
             ),
             status_code=exc.status,

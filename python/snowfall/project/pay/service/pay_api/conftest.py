@@ -1,4 +1,5 @@
 import asyncio
+import base64
 import datetime
 import pathlib
 from typing import AsyncIterator, Mapping, Sequence
@@ -8,19 +9,21 @@ import currencycloud
 import httpx
 import mongomock_motor
 import pytest
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
 from fakeredis import aioredis as fakeredis
 from motor import motor_asyncio
 from starlette import applications
-from starlette.middleware import Middleware
+from starlette.middleware import Middleware, authentication
 
-from snowfall.adapter import authentication
 from snowfall.adapter import authentication as auth
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay.adapter import currencies
 from snowfall.project.pay.service.accounts import accounts
-from snowfall.project.pay.service.pay_api import bootstrap
+from snowfall.project.pay.service.pay_api import authenticator, bootstrap
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.repositories import (
+    BeneficiaryRepository,
     CompanyRepository,
     ConversionRepository,
     CurrencyRepository,
@@ -33,13 +36,17 @@ from snowfall.project.pay.service.quotations.v1alpha.models_pb2 import (
     QuotationRates,
 )
 from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Transaction
+from snowfall.service.authentication.auth import JWTFactory
+from snowfall.service.authentication.v1alpha.models_pb2 import User
 from snowfall.stdlib import money, string
+from snowfall.stdlib.format.jwt import Encoder
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.vendor.currency_cloud.client import PaymentClient
 from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
 from snowfall.vendor.currency_cloud.models.balance import BalanceResponse
+from snowfall.vendor.currency_cloud.models.beneficiary import BeneficiaryResponse
 
 
 @pytest.fixture()
@@ -47,6 +54,48 @@ def transaction_ids() -> Sequence[str]:
     return [
         "e719b289-982c-42f0-99a2-63fa70f8f8c0",
         "c36649e6-71f1-4dfa-aa5a-01c0ede6e538",
+    ]
+
+
+@pytest.fixture()
+def rsa_private_key() -> rsa.RSAPrivateKey:
+    public_exponent = 65537
+    key_size = 2048
+    return rsa.generate_private_key(
+        public_exponent=public_exponent,
+        key_size=key_size,
+    )
+
+
+@pytest.fixture()
+def private_key(rsa_private_key: rsa.RSAPrivateKey) -> str:
+    encrypted_pem_private_key = rsa_private_key.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.TraditionalOpenSSL,
+        encryption_algorithm=serialization.NoEncryption(),
+    )
+    return encrypted_pem_private_key.decode()
+
+
+@pytest.fixture()
+def public_key(rsa_private_key: rsa.RSAPrivateKey) -> str:
+    pem_public_key = rsa_private_key.public_key().public_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo,
+    )
+    return pem_public_key.decode()
+
+
+@pytest.fixture()
+def custom_middlewares(public_key: str) -> Sequence[Middleware]:
+    return [
+        Middleware(
+            authentication.AuthenticationMiddleware,
+            backend=authenticator.Authenticator(
+                public_key_content=base64.b64encode(public_key.encode()).decode(),
+            ),
+            on_error=handlers.auth_error_handler,
+        ),
     ]
 
 
@@ -89,13 +138,14 @@ def _create_app(  # noqa: WPS211
 def _create_admin_app(  # noqa: WPS211
     cc_client: currencycloud.Client,
     payment_client: PaymentClient,
-    authentication_client: authentication.Client,
+    authentication_client: auth.Client,
     companies_repository: CompanyRepository,
     contacts_repository: accounts.ContactsRepository,
     accounts_repository: accounts.AccountsRepository,
     conversions_repository: ConversionRepository,
     transactions_repository: TransactionRepository,
     currencies_repository: CurrencyRepository,
+    beneficiaries_repository: BeneficiaryRepository,
     openapi_path: pathlib.Path,
     custom_middlewares: Sequence[Middleware] | None = None,
 ) -> applications.Starlette:
@@ -112,6 +162,7 @@ def _create_admin_app(  # noqa: WPS211
                 conversions_repository=conversions_repository,
                 transactions_repository=transactions_repository,
                 currencies_repository=currencies_repository,
+                beneficiaries_repository=beneficiaries_repository,
                 payment_client=payment_client,
             ),
         ),
@@ -258,6 +309,13 @@ def currencies_repository(
 
 
 @pytest.fixture()
+def beneficiaries_repository(
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
+) -> BeneficiaryRepository:
+    return BeneficiaryRepository(collection=mongo_client.test.beneficiaries)
+
+
+@pytest.fixture()
 def available_currencies() -> Sequence[money.Currency]:
     return [
         money.Currency("USD"),
@@ -277,14 +335,42 @@ def cc_client(cc_login: str, cc_api_key: str, cc_env: str) -> currencycloud.Clie
 
 
 @pytest.fixture()
+def beneficiary_response() -> BeneficiaryResponse:
+    return BeneficiaryResponse(
+        bank_country="GB",
+        currency="SEK",
+        beneficiary_company_name="Company",
+        beneficiary_address=["Street name 7"],
+        beneficiary_country="GB",
+        account_number=None,
+        bic_swift="AAAABBCC123",
+        iban="GB06BARC12314512778232",
+        bank_address=["Street name 7"],
+        bank_name="BankName",
+        bank_account_type="savings",
+        beneficiary_city="London",
+        beneficiary_postcode="12345",
+        beneficiary_state_or_province="California",
+        payment_types=["priority", "regular"],
+        beneficiary_entity_type="company",
+        name="Company",
+        bank_account_holder_name="bankAccountHolderName",
+        email="example@email.com",
+        aba=None,
+        identifier="e82060fe-894f-43e0-9b96-3ffaf6117431",
+    )
+
+
+@pytest.fixture()
 def payment_client(
     accounts_list_from_cc: Sequence[mock.Mock],
     balance: BalanceResponse,
+    beneficiary_response: BeneficiaryResponse,
 ) -> mock.Mock:
     payment_client = mock.Mock()
     message = "Conversion of GBP equivalent 0.89 is less than your lower limit of 1.00"
     payment_client.create_conversion = mock.Mock(
-        side_effect=CurrencyCloudError(message=message),
+        side_effect=CurrencyCloudError(messages=[message]),
     )
 
     def _get_all_accounts(  # noqa: WPS430
@@ -298,6 +384,11 @@ def payment_client(
     payment_client.get_all_accounts = _get_all_accounts
 
     payment_client.add_currency_into_account = mock.Mock(return_value=balance)
+
+    payment_client.validate_beneficiary = mock.Mock()
+
+    payment_client.create_beneficiary = mock.Mock(return_value=beneficiary_response)
+
     return payment_client
 
 
@@ -311,11 +402,30 @@ def authentication_client() -> auth.DictClient:
     return auth.DictClient()
 
 
+@pytest.fixture()
+def jwt_token(private_key: str) -> str:
+    jwt_encoder = Encoder(
+        private_key=base64.b64encode(private_key.encode()).decode(),
+        algorithm="RS256",
+    )
+    jwt_factory = JWTFactory(
+        ttl=datetime.timedelta(hours=1),
+    )
+    user = User(email="example@example.com", id=string.uuid())
+
+    return jwt_encoder.encode(
+        jwt_factory.from_user(user),
+    )
+
+
 # TODO: need to use our authentication mechanism to generate jwt token and include it
 # TODO: into the headers, also create fixture for middlewares and use it
 @pytest.fixture()
-def headers() -> dict[str, str]:
-    return {"Content-Type": "application/vnd.api+json", "Authorization": "Bearer token"}
+def headers(jwt_token: str) -> dict[str, str]:
+    return {
+        "Content-Type": "application/vnd.api+json",
+        "Authorization": "Bearer {0}".format(jwt_token),
+    }
 
 
 @pytest.fixture()
@@ -347,7 +457,7 @@ def app(  # noqa: WPS211
 @pytest.fixture()
 def admin_app(  # noqa: WPS211
     cc_client: currencycloud.Client,
-    authentication_client: authentication.Client,
+    authentication_client: auth.Client,
     companies_repository: CompanyRepository,
     payment_client: PaymentClient,
     contacts_repository: accounts.ContactsRepository,
@@ -355,6 +465,8 @@ def admin_app(  # noqa: WPS211
     conversions_repository: ConversionRepository,
     transactions_repository: TransactionRepository,
     currencies_repository: CurrencyRepository,
+    beneficiaries_repository: BeneficiaryRepository,
+    custom_middlewares: Sequence[Middleware],
 ) -> applications.Starlette:
     return _create_admin_app(
         cc_client=cc_client,
@@ -366,6 +478,8 @@ def admin_app(  # noqa: WPS211
         conversions_repository=conversions_repository,
         transactions_repository=transactions_repository,
         currencies_repository=currencies_repository,
+        beneficiaries_repository=beneficiaries_repository,
+        custom_middlewares=custom_middlewares,
         openapi_path=filesystem.resource_path("junction.pay_admin_api", "openapi.json"),
     )
 

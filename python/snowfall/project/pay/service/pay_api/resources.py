@@ -5,6 +5,9 @@ from typing import ClassVar
 from starlette import requests
 
 from snowfall.project.pay.service.accounts.v1alpha import models_pb2 as account_models
+from snowfall.project.pay.service.beneficiaries.v1alpha import (
+    models_pb2 as beneficiary_models,
+)
 from snowfall.project.pay.service.companies.v1alpha import models_pb2
 from snowfall.project.pay.service.conversions.v1alpha.models_pb2 import Conversion
 from snowfall.project.pay.service.quotations.v1alpha import (
@@ -18,6 +21,7 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
 from snowfall.stdlib.v1alpha import money_pb2
 from snowfall.vendor.currency_cloud.models import balance as balance_models
+from snowfall.vendor.currency_cloud.models import beneficiary as beneficiary_cc_models
 
 _SELF_HREF = "self"
 
@@ -331,5 +335,60 @@ class CurrenciesResource(models.Resource):
                         currencyId=currency.code,
                     ),
                 ),
+            },
+        )
+
+
+class BeneficiariesResource(models.Resource):
+    api_type: ClassVar[str] = "beneficiaries"
+
+    @classmethod
+    def from_models(
+        cls,
+        beneficiary: beneficiary_models.Beneficiary,
+        cc_beneficiary: beneficiary_cc_models.BeneficiaryResponse,
+    ) -> BeneficiariesResource:
+        return cls(
+            id=beneficiary.id,
+            type=BeneficiariesResource.api_type,
+            attributes={
+                "bankAccountHolderName": cc_beneficiary.bank_account_holder_name,
+                "email": cc_beneficiary.email,
+                "accountNumber": cc_beneficiary.account_number,
+                "beneficiaryAddress": {
+                    "addressLines": cc_beneficiary.beneficiary_address,
+                    "countryCode": cc_beneficiary.beneficiary_country,
+                    "postalCode": cc_beneficiary.beneficiary_postcode,
+                    "city": cc_beneficiary.beneficiary_city,
+                    "state": cc_beneficiary.beneficiary_state_or_province,
+                },
+                "bankDetails": {
+                    "name": cc_beneficiary.bank_name,
+                    "bicSwift": cc_beneficiary.bic_swift,
+                    "aba": cc_beneficiary.aba,
+                    "iban": cc_beneficiary.iban,
+                    "accountType": cc_beneficiary.bank_account_type,
+                    "paymentTypes": (
+                        cc_beneficiary.payment_types and cc_beneficiary.payment_types[0]
+                    ),
+                    "address": {
+                        "addressLines": cc_beneficiary.bank_address,
+                        "countryCode": cc_beneficiary.bank_country,
+                    },
+                },
+            },
+            relationships={
+                "account": {
+                    "data": {
+                        "id": beneficiary.account_id,
+                        "type": "accounts",
+                    },
+                },
+                "currency": {
+                    "data": {
+                        "id": cc_beneficiary.currency,
+                        "type": "currencies",
+                    },
+                },
             },
         )

@@ -2,6 +2,7 @@ from typing import Any, Mapping, Sequence
 
 import pymongo
 
+from snowfall.project.pay.service.beneficiaries.v1alpha.models_pb2 import Beneficiary
 from snowfall.project.pay.service.companies.v1alpha import models_pb2
 from snowfall.project.pay.service.conversions.v1alpha.models_pb2 import Conversion
 from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Transaction
@@ -119,3 +120,11 @@ class CurrencyRepository(object):
             if currency.code == currency_id:
                 return currency
         return None
+
+
+class BeneficiaryRepository(
+    mixins.FindByIdMixin[Beneficiary],
+    mixins.InsertMixin[Beneficiary],
+    repository.ProtoRepository[Beneficiary],
+):
+    _proto = Beneficiary

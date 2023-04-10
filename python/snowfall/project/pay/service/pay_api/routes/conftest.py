@@ -234,6 +234,27 @@ async def account(
 
 
 @pytest.fixture()
+async def company(
+    companies_repository: CompanyRepository,
+    account: Account,
+) -> Company:
+    fx_markup = 1.2
+    fx_provider_markup = 2.2
+    sales_markup = 2.3
+    company = Company(
+        id=account.company_id,
+        name="test_company",
+        fx_markup=fx_markup,
+        fx_provider_markup=fx_provider_markup,
+        sales_markup=sales_markup,
+        account_id=account.id,
+    )
+    return await companies_repository.insert(
+        company,
+    )
+
+
+@pytest.fixture()
 async def contact(
     account: Account,
     contacts_repository: accounts.ContactsRepository,
