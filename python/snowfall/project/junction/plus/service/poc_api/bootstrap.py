@@ -5,6 +5,7 @@ from pydantic import AnyUrl
 
 from snowfall.project.junction.plus.service.poc_api import (
     flight_stats_client,
+    icoupon,
     repository,
     twilio,
 )
@@ -19,6 +20,9 @@ class Settings(application.Settings):
     flight_stats_api_address: Sequence[str]
     flight_stats_app_id: str
     flight_stats_app_key: str
+    icoupon_api_address: Sequence[str]
+    icoupon_client_id: str
+    icoupon_client_secret: str
     redis_dsn: Sequence[AnyUrl]
     mongo_dsn: Sequence[AnyUrl]
     mongo_db: str
@@ -32,6 +36,7 @@ def create_dependencies(  # noqa: WPS211
     junction_client: client.Client,
     redis_client: redis.Client[str],
     fs_client: flight_stats_client.FlightStatusClient,
+    icoupon_client: icoupon.ICouponClient,
     twilio_client: twilio.TwilioClient,
     orders_repository: repository.OrdersRepository,
     subscriptions_repository: repository.SubscriptionsRepository,
@@ -41,6 +46,7 @@ def create_dependencies(  # noqa: WPS211
     container[client.Client] = junction_client
     container[redis.Client[str]] = redis_client
     container[flight_stats_client.FlightStatusClient] = fs_client
+    container[icoupon.ICouponClient] = icoupon_client
     container[twilio.TwilioClient] = twilio_client
     container[repository.OrdersRepository] = orders_repository
     container[repository.SubscriptionsRepository] = subscriptions_repository

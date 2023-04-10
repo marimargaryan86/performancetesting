@@ -13,6 +13,7 @@ from snowfall.project.junction.extensions.service.mobile_api import (
 from snowfall.project.junction.plus.service.poc_api import (
     bootstrap,
     flight_stats_client,
+    icoupon,
     repository,
     twilio,
 )
@@ -38,6 +39,11 @@ def _factory(
             app_id=app.settings.flight_stats_app_id,
             app_key=app.settings.flight_stats_app_key,
         )
+        icoupon_client = icoupon.ICouponClient(
+            api_url=random.choice(app.settings.icoupon_api_address),  # nosec
+            client_id=app.settings.icoupon_client_id,
+            client_secret=app.settings.icoupon_client_secret,
+        )
         mongo = motor_asyncio.AsyncIOMotorClient(
             app.settings.mongo_dsn,  # nosec
         )[app.settings.mongo_db]
@@ -55,6 +61,7 @@ def _factory(
                     junction_client=junction_client,
                     redis_client=redis_client,
                     fs_client=fs_client,
+                    icoupon_client=icoupon_client,
                     twilio_client=twilio.TwilioClient(
                         sid=app.settings.twilio_sid,
                         token=app.settings.twilio_token,

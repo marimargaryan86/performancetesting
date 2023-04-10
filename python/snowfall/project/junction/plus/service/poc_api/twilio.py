@@ -12,3 +12,11 @@ class TwilioClient(object):
             body=body,
             to="whatsapp:{0}".format(receiver),
         )
+
+    def send_qr(self, receiver: str, body: str, media_url: str) -> None:
+        self._client.messages.create(  # type: ignore[no-untyped-call]
+            from_="whatsapp:{0}".format(self._sender),
+            body=body,
+            media_url=media_url,
+            to="whatsapp:{0}".format(receiver),
+        )

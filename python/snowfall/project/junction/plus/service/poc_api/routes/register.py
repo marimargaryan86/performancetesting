@@ -4,6 +4,7 @@ from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.junction.plus.service.poc_api import (
     chatbot_utils,
+    icoupon,
     repository,
     twilio,
 )
@@ -52,11 +53,12 @@ class WhatsappRegister(endpoints.HTTPEndpoint):
 
 
 class WebhookDelay(endpoints.HTTPEndpoint):
-    async def post(
+    async def post(  # noqa: WPS211, WPS217, WPS210
         self,
         request: requests.Request,
         delay_webhook_repository: repository.DelayWebhookRepository = lagom.injectable,
         twilio_client: twilio.TwilioClient = lagom.injectable,
+        icoupon_client: icoupon.ICouponClient = lagom.injectable,
         junction_client: client.Client = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
@@ -66,19 +68,27 @@ class WebhookDelay(endpoints.HTTPEndpoint):
         )
         if not delay_webhook:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
-        for order_id in delay_webhook.get("orders", []):
-            order = json_api_doc.deserialize(
-                await junction_client.get_order_by_id(
-                    identifier=order_id,
-                    include=["journey", "bookings.details"],
-                ),
-            )
-            await chatbot_utils.send_delay(
-                order,
-                delay_webhook,
-                body.get("delayMinutes", 0),
-                twilio_client,
-            )
+        delayed_orders = delay_webhook.get("orders")
+        if delayed_orders:
+            barcodes = await icoupon_client.create_campaign(len(delayed_orders))
+            for idx, order_id in enumerate(delayed_orders):
+                order = json_api_doc.deserialize(
+                    await junction_client.get_order_by_id(
+                        identifier=order_id,
+                        include=["journey", "bookings.details"],
+                    ),
+                )
+                await chatbot_utils.send_delay(
+                    order,
+                    delay_webhook,
+                    body.get("delayMinutes", 0),
+                    twilio_client,
+                )
+                await chatbot_utils.send_qr(
+                    order,
+                    twilio_client,
+                    barcodes[idx],
+                )
         return responses.Response(
             status_code=status.HTTP_200_OK,
         )

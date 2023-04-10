@@ -360,6 +360,19 @@ async def send_delay(
     )
 
 
+async def send_qr(
+    order: Mapping[str, Any],
+    twilio_client: twilio.TwilioClient,
+    barcode: Mapping[str, Any],
+) -> None:
+    # TODO: change to upload and send the actual barcode and not a static one
+    twilio_client.send_qr(
+        receiver="".join(order["journey"]["contactDetails"]["phoneNumber"].split()),
+        body="Please feel free to use this 20 EUR coupon.",
+        media_url="https://poc-barcodes.s3.eu-west-2.amazonaws.com/qr_1.png",
+    )
+
+
 def format_dt(dt: datetime.datetime) -> str:
     return dt.strftime(
         "%A %d %b %Y %H:%M",
