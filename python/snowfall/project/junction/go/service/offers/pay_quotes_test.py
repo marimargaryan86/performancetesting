@@ -159,7 +159,7 @@ async def test_that_all_amounts_in_trip_offer_search_result_replaced_with_conver
     )
 
     for offer in modified_result.offer.offers:
-        assert offer.price.units == 1500
+        assert offer.price.units == 15
         assert offer.price.currency_code == "SEK"
         assert offer.id == string.to_uuid(
             "session-token",

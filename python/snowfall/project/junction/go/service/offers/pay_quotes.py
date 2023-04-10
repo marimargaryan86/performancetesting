@@ -39,13 +39,13 @@ class PayQuotes(object):
                 from_currency=offer_money.currency.code,
                 to_currency=to_currency,
             )
-            offer.price.CopyFrom(
-                Money(
-                    currency_code=quote.data.relationships.to_currency.data.id,  # noqa:WPS219
-                    units=quote.data.attributes.amount,
-                    nanos=0,
-                ),
+
+            converted_money = money.Money(
+                amount=quote.data.attributes.amount,
+                currency=money.Currency(to_currency),
             )
+
+            offer.price.CopyFrom(converted_money.protobuf())
             offer.id = string.to_uuid(session_token, uuid.UUID(offer.id))
         search_result.offer.id = string.to_uuid(
             session_token,
