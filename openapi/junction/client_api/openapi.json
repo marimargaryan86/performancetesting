@@ -5105,42 +5105,33 @@
         "x-examples": {}
       },
       "TripCandidateSearchCriteria": {
-        "allOf": [
-          {
-            "type": "object",
-            "properties": {
-              "attributes": {
-                "type": "object",
-                "required": [
-                  "origin",
-                  "destination",
-                  "departureAfter"
-                ],
-                "properties": {
-                  "origin": {
-                    "$ref": "#/components/schemas/Coordinates"
-                  },
-                  "destination": {
-                    "$ref": "#/components/schemas/Coordinates"
-                  },
-                  "departureAfter": {
-                    "type": "string",
-                    "format": "date-time",
-                    "example": "2019-08-24T14:15:22Z"
-                  },
-                  "maximumConnections": {
-                    "type": "integer",
-                    "format": "int32",
-                    "example": 2,
-                    "minimum": 0
-                  }
-                }
-              }
-            }
-          }
-        ],
+        "type": "object",
         "title": "Trip Candidates Search Criteria",
-        "description": "Criteria to use in a Trip Candidates Search"
+        "description": "Criteria to use in a Trip Candidates Search",
+        "properties": {
+          "origin": {
+            "$ref": "#/components/schemas/Coordinates"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/Coordinates"
+          },
+          "departureAfter": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-08-24T14:15:22Z"
+          },
+          "maximumConnections": {
+            "type": "integer",
+            "format": "int32",
+            "example": 2,
+            "minimum": 0
+          }
+        },
+        "required": [
+          "origin",
+          "destination",
+          "departureAfter"
+        ]
       },
       "Coordinates": {
         "title": "Coordinates",

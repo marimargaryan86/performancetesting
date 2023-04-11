@@ -12,6 +12,7 @@ from snowfall.stdlib.transport.grpc import service
 
 _MAX_DISTANCE_AIRPORT = 50000
 _MAX_DISTANCE_RAIL_STATION = 10000
+_MAX_DISTANCE_PORT = 10000
 
 
 class LocationsService(service.Service, places_pb2_grpc.LocationsServiceServicer):
@@ -86,6 +87,10 @@ class LocationsService(service.Service, places_pb2_grpc.LocationsServiceServicer
                         places.PlaceTypeDistancePair(
                             max_distance_meters=_MAX_DISTANCE_RAIL_STATION,
                             location_type=models_pb2.Location.Type.TYPE_RAILWAY_STATION,
+                        ),
+                        places.PlaceTypeDistancePair(
+                            max_distance_meters=_MAX_DISTANCE_PORT,
+                            location_type=models_pb2.Location.Type.TYPE_FERRY_PORT,
                         ),
                     ],
                 ),

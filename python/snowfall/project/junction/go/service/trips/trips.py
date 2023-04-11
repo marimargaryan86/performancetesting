@@ -209,6 +209,7 @@ class TripCandidateSearchRepository(  # noqa: WPS215
         new_trip_candidate_search.CopyFrom(trip_candidate_search)
         new_trip_candidate_search.id = string.uuid()
         new_trip_candidate_search.expires_at.CopyFrom(expires_at)
+        new_trip_candidate_search.status = amqp_pb2.Trackable.STATUS_PENDING
 
         return await self.insert(new_trip_candidate_search)
 

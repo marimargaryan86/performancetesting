@@ -168,6 +168,7 @@ class TripOrchestrator(object):
                             ),
                         ),
                         allowed_segment_types=allowed_segment_types,
+                        maximum_connections=criteria_obj.maximum_connections,
                     ),
                 ),
             )
