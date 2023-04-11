@@ -5,6 +5,7 @@ import phonenumbers
 from snowfall.project.junction.go.service.orders.v1alpha import (
     amqp_pb2 as order_amqp_pb2,
 )
+from snowfall.project.junction.go.service.orders.v1alpha import models_pb2
 from snowfall.project.junction.go.service.orders.v1alpha import (
     models_pb2 as order_models_pb2,
 )
@@ -12,7 +13,7 @@ from snowfall.project.junction.service.providers.direct_ferries import cache
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.vendor.direct_ferries import client
-from snowfall.vendor.direct_ferries.models import quote
+from snowfall.vendor.direct_ferries.models import passenger, quote
 
 
 class PassengerCountNotMatchingError(Exception):
@@ -79,6 +80,27 @@ def _fill_pax_details(
                 country_code=str(number.country_code),
                 national_number=str(number.national_number),
             )
-            quote_passenger.nationality = order_passenger.doc_details.nationality
+
+            if order_passenger.HasField("doc_details"):
+                _fill_doc_details(quote_passenger, order_passenger.doc_details)
 
     return quote_obj
+
+
+def _fill_doc_details(
+    quote_passenger: passenger.Passenger,
+    doc_details: models_pb2.DocumentDetails,
+) -> None:
+    if doc_details.nationality:
+        quote_passenger.nationality = doc_details.nationality
+
+    if doc_details.HasField("exp_date"):
+        quote_passenger.passport_expiry_date = protobuf.protobuf_to_date(
+            doc_details.exp_date,
+        ).isoformat()
+
+    if doc_details.document_number:
+        quote_passenger.passport_number = doc_details.document_number
+
+    if doc_details.issue_county:
+        quote_passenger.passport_place_of_issue = doc_details.issue_county

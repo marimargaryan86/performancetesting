@@ -3,8 +3,8 @@ from typing import Optional
 
 import pydantic
 
-from snowfall.vendor.ask2go.models import base
 from snowfall.vendor.direct_ferries import enums, normalizers
+from snowfall.vendor.direct_ferries.models import base
 
 
 class AgeRange(pydantic.BaseModel):
@@ -37,6 +37,7 @@ class PassengerBase(base.CamelCaseBaseModel):
     telephone: Optional[str] = None
     nationality: Optional[str] = None
     passport_number: Optional[str] = None
+    passport_place_of_issue: Optional[str] = None
     date_of_birth: Optional[datetime.date] = None
 
     _normalize_date_of_birth = pydantic.validator(

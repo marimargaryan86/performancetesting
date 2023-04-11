@@ -8,16 +8,18 @@ import "snowfall/stdlib/v1alpha/models.proto";
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/providers/direct_ferries/v1alpha";
 
 message SearchCriteriaTask {
-  string offer_search_id = 1;
+  reserved 1, 4;
+  reserved "offer_search_id", "session_token";
   repeated snowfall.stdlib.v1alpha.Segment segments = 2;
   Criteria criteria = 3;
-  string session_token = 4;
 }
 
 message Criteria {
   string origin_id = 1;
   string destination_id = 2;
-  string route_id = 3;
-  snowfall.stdlib.v1alpha.DateTime departure_datetime = 4;
-  repeated uint32 passengers_ages = 5;
+  string outbound_route_id = 3;
+  optional string inbound_route_id = 4;
+  snowfall.stdlib.v1alpha.DateTime outbound_departure_datetime = 5;
+  optional snowfall.stdlib.v1alpha.DateTime inbound_departure_datetime = 6;
+  repeated uint32 passengers_ages = 7;
 }

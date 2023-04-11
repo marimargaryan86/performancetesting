@@ -48,46 +48,57 @@ class DfAdapter(object):
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
     ) -> request.QuoteRequest:
-        departure_dt = protobuf.protobuf_to_datetime(
-            search_task.criteria.departure_datetime,
-        ).astimezone(datetime.timezone.utc)
+        passengers = [
+            passenger.PassengerBase(
+                age_range=passenger.AgeRange.parse_raw(
+                    json.dumps(
+                        {
+                            "from": pax_age,
+                            "to": pax_age,
+                        },
+                    ),
+                ),
+                is_wheelchair_user=False,
+                is_lead_passenger=pax_num == 0,
+            )
+            for pax_num, pax_age in enumerate(
+                search_task.criteria.passengers_ages,
+            )
+        ]
+
+        legs: list[leg.LegBase] = [
+            leg.LegBase(
+                is_return_leg=False,
+                route_id=search_task.criteria.outbound_route_id,
+                departure_date_time=protobuf.protobuf_to_datetime(
+                    search_task.criteria.outbound_departure_datetime,
+                )
+                .astimezone(datetime.timezone.utc)  # noqa: WPS348
+                .replace(tzinfo=None),  # noqa: WPS348
+                passengers=passengers,
+            ),
+        ]
+
+        if search_task.criteria.HasField("inbound_departure_datetime"):
+            legs.append(
+                leg.LegBase(
+                    is_return_leg=True,
+                    route_id=search_task.criteria.inbound_route_id,
+                    departure_date_time=protobuf.protobuf_to_datetime(
+                        search_task.criteria.inbound_departure_datetime,
+                    )
+                    .astimezone(datetime.timezone.utc)  # noqa: WPS348
+                    .replace(tzinfo=None),  # noqa: WPS348
+                    passengers=passengers,
+                ),
+            )
 
         quote_base = quote.QuoteBase(
             selected_currency=_CURRENCY,
-            is_different_outbound_return=False,
+            is_different_outbound_return=True,
             return_alternative_routes=False,
             is_open_ticket=False,
-            legs=[
-                leg.LegBase(
-                    is_return_leg=False,
-                    route_id=search_task.criteria.route_id,
-                    departure_date_time=datetime.datetime(
-                        year=departure_dt.year,
-                        month=departure_dt.month,
-                        day=departure_dt.day,
-                        hour=departure_dt.hour,
-                        minute=departure_dt.minute,
-                        second=departure_dt.second,
-                    ),
-                    passengers=[
-                        passenger.PassengerBase(
-                            age_range=passenger.AgeRange.parse_raw(
-                                json.dumps(
-                                    {
-                                        "from": pax_age,
-                                        "to": pax_age,
-                                    },
-                                ),
-                            ),
-                            is_wheelchair_user=False,
-                            is_lead_passenger=pax_num == 0,
-                        )
-                        for pax_num, pax_age in enumerate(
-                            search_task.criteria.passengers_ages,
-                        )
-                    ],
-                ),
-            ],
+            legs=legs,
         )
 
         return request.QuoteRequest(quote=quote_base)
@@ -136,43 +147,17 @@ class DfAdapter(object):
         expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
 
         for quote_obj in quotes:
-            leg_obj = quote_obj.legs[0]
-            offer_segment_id = string.uuid()
             currency = money.Currency(quote_obj.selected_currency)
 
-            origin = self._ports.get_by_id(quote_obj.legs[0].departure_port_code)
-            destination = self._ports.get_by_id(quote_obj.legs[-1].arrival_port_code)
+            segments: list[offer_models_pb2.OfferSegment] = []
 
-            yield offer_models_pb2.OfferGroup(
-                id=string.uuid(),
-                expires_at=protobuf.datetime_to_protobuf(expires_at),
-                offers=[
-                    offer_models_pb2.Offer(
-                        id=await self._offers_cache.store(
-                            cache.OfferDetails(
-                                quote=quote_obj,
-                            ),
-                            expires_at=expires_at,
-                        ),
-                        segment_details=[
-                            offer_models_pb2.OfferSegmentDetails(
-                                id=string.uuid(),
-                                offer_segment_id=offer_segment_id,
-                                cabin_class=models_pb2.CabinClass(
-                                    type=models_pb2.CabinClass.TYPE_ECONOMY,
-                                    marketing_name="Economy",
-                                ),
-                            ),
-                        ],
-                        price=money.from_string(
-                            str(quote_obj.price.total_in_selected_currency),
-                            currency,
-                        ).protobuf(),
-                    ),
-                ],
-                segments=[
+            for leg_obj in quote_obj.legs:
+                origin = self._ports.get_by_id(leg_obj.departure_port_code)
+                destination = self._ports.get_by_id(leg_obj.arrival_port_code)
+
+                segments.append(
                     offer_models_pb2.OfferSegment(
-                        id=offer_segment_id,
+                        id=string.uuid(),
                         vendor=leg_obj.operator.name if leg_obj.operator else "",
                         type=models_pb2.Schedule.TYPE_FERRY,
                         legs=[
@@ -209,5 +194,35 @@ class DfAdapter(object):
                             ),
                         ],
                     ),
+                )
+
+            yield offer_models_pb2.OfferGroup(
+                id=string.uuid(),
+                expires_at=protobuf.datetime_to_protobuf(expires_at),
+                offers=[
+                    offer_models_pb2.Offer(
+                        id=await self._offers_cache.store(
+                            cache.OfferDetails(
+                                quote=quote_obj,
+                            ),
+                            expires_at=expires_at,
+                        ),
+                        segment_details=[
+                            offer_models_pb2.OfferSegmentDetails(
+                                id=string.uuid(),
+                                offer_segment_id=segment.id,
+                                cabin_class=models_pb2.CabinClass(
+                                    type=models_pb2.CabinClass.TYPE_ECONOMY,
+                                    marketing_name="Economy",
+                                ),
+                            )
+                            for segment in segments
+                        ],
+                        price=money.from_string(
+                            str(quote_obj.price.total_in_selected_currency),
+                            currency,
+                        ).protobuf(),
+                    ),
                 ],
+                segments=segments,
             )

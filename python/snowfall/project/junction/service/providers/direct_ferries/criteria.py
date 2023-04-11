@@ -1,13 +1,11 @@
-import itertools
-
-import more_itertools
+from typing import Iterator, Sequence
 
 from snowfall.project.junction.go.service.offers.v1alpha import (
-    amqp_pb2 as offers_amqp_pb2,
+    models_pb2 as offer_models_pb2,
 )
 from snowfall.project.junction.service.providers.direct_ferries import port, route
 from snowfall.project.junction.service.providers.direct_ferries.v1alpha import amqp_pb2
-from snowfall.stdlib import h3, time
+from snowfall.stdlib import h3, segment_grouper, time
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2
 
@@ -20,55 +18,67 @@ class CriteriaGenerator(object):
     ):
         self._port_mapping = h3_port_mapping
         self._routes = routes
+        self._grouper = segment_grouper.SegmentGrouper(h3_port_mapping)
 
-    def from_search_task(  # noqa: WPS210
+    def from_search_task(
         self,
-        search_task: offers_amqp_pb2.TripOfferSearchTask,
+        search: offer_models_pb2.TripOfferSearch,
     ) -> list[amqp_pb2.SearchCriteriaTask]:
-        segments = itertools.chain(*[tr.segments for tr in search_task.search.trips])
+        sub_trips = self._grouper.trips_to_sub_trips(
+            trips=search.trips,
+            type_filter=models_pb2.Schedule.TYPE_FERRY,
+        )
         tasks: list[amqp_pb2.SearchCriteriaTask] = []
 
-        for segment in segments:
-            first_leg = more_itertools.first(segment.legs)
-            last_leg = more_itertools.last(segment.legs)
-
-            if first_leg.type != models_pb2.Schedule.TYPE_FERRY:
-                continue
-
-            origins = self._port_mapping.find_mapped_values(
-                coordinates=first_leg.origin.coordinates,
-                neighbour_search_radius=1,
-            )
-            destinations = self._port_mapping.find_mapped_values(
-                coordinates=last_leg.destination.coordinates,
-                neighbour_search_radius=1,
-            )
+        for trip_criteria in segment_grouper.generate_trip_criteria(sub_trips):
             tasks.extend(
-                amqp_pb2.SearchCriteriaTask(
-                    offer_search_id=search_task.offer_search_id,
-                    segments=[segment],
-                    criteria=amqp_pb2.Criteria(
-                        origin_id=start.identifier,
-                        destination_id=end.identifier,
-                        route_id=self._routes.get_by_origin_destination(
-                            origin=start.identifier,
-                            destination=end.identifier,
-                        ).route_id,
-                        departure_datetime=protobuf.datetime_to_protobuf_datetime(
-                            protobuf.protobuf_to_datetime(
-                                first_leg.departure_at,
-                            ).astimezone(start.timezone),
-                        ),
-                        passengers_ages=[
-                            time.date_to_age(
-                                protobuf.protobuf_to_date(pax.date_of_birth),
-                            )
-                            for pax in search_task.search.passengers
-                        ],
-                    ),
-                    session_token=search_task.session_token,
-                )
-                for start, end in itertools.product(origins, destinations)
+                self._generate_search_criteria(
+                    trip_criteria=trip_criteria,
+                    passenger_ages=[
+                        time.date_to_age(
+                            protobuf.protobuf_to_date(pax.date_of_birth),
+                        )
+                        for pax in search.passengers
+                    ],
+                ),
             )
 
         return tasks
+
+    def _generate_search_criteria(
+        self,
+        trip_criteria: segment_grouper.TripCriteria,
+        passenger_ages: Sequence[int],
+    ) -> Iterator[amqp_pb2.SearchCriteriaTask]:
+        for origin, destination in trip_criteria.get_combinations():
+            task = amqp_pb2.SearchCriteriaTask(
+                segments=trip_criteria.outbound.segments,
+                criteria=amqp_pb2.Criteria(
+                    origin_id=origin,
+                    destination_id=destination,
+                    outbound_route_id=self._routes.get_by_origin_destination(
+                        origin=origin,
+                        destination=destination,
+                    ).route_id,
+                    outbound_departure_datetime=protobuf.datetime_to_protobuf_datetime(
+                        trip_criteria.outbound.departure,
+                    ),
+                    passengers_ages=passenger_ages,
+                ),
+            )
+
+            if trip_criteria.inbound:
+                task.segments.extend(
+                    trip_criteria.inbound.segments,
+                )
+                task.criteria.inbound_departure_datetime.CopyFrom(
+                    protobuf.datetime_to_protobuf_datetime(
+                        trip_criteria.inbound.departure,
+                    ),
+                )
+                task.criteria.inbound_route_id = self._routes.get_by_origin_destination(
+                    origin=destination,
+                    destination=origin,
+                ).route_id
+
+            yield task
