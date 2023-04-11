@@ -5,7 +5,8 @@ from unittest import mock
 
 import pytest
 
-from snowfall.stdlib import h3, segment_grouper
+from snowfall.project.junction.provider import segment_grouper
+from snowfall.stdlib import h3
 from snowfall.stdlib.v1alpha import models_pb2
 
 

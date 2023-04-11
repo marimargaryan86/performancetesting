@@ -5,11 +5,11 @@ from typing import Iterator, Sequence
 import more_itertools
 
 from snowfall.project.junction.go.service.offers.v1alpha import amqp_pb2
-from snowfall.project.junction.provider import airports
+from snowfall.project.junction.provider import airports, segment_grouper
 from snowfall.project.junction.service.providers.duffel.v1alpha import (
     amqp_pb2 as provider_amqp_pb2,
 )
-from snowfall.stdlib import h3, segment_grouper
+from snowfall.stdlib import h3
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import models_pb2
 
