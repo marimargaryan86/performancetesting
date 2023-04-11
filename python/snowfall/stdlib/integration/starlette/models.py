@@ -12,6 +12,7 @@ AnyMapping = Mapping[str, Any]
 
 class BaseModel(pydantic.BaseModel):
     class Config(object):
+        extra = pydantic.Extra.forbid
         json_encoders = {
             datetime.datetime: lambda datetime_object: datetime_object.isoformat(
                 timespec="seconds",
