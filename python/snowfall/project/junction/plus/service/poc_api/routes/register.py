@@ -6,6 +6,7 @@ from snowfall.project.junction.plus.service.poc_api import (
     chatbot_utils,
     icoupon,
     repository,
+    s3,
     twilio,
 )
 from snowfall.stdlib.integration.starlette import request_helpers
@@ -60,6 +61,7 @@ class WebhookDelay(endpoints.HTTPEndpoint):
         twilio_client: twilio.TwilioClient = lagom.injectable,
         icoupon_client: icoupon.ICouponClient = lagom.injectable,
         junction_client: client.Client = lagom.injectable,
+        s3_client: s3.S3Client = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
         delay_webhook = await delay_webhook_repository.add_delay(
@@ -88,6 +90,7 @@ class WebhookDelay(endpoints.HTTPEndpoint):
                     order,
                     twilio_client,
                     barcodes[idx],
+                    s3_client,
                 )
         return responses.Response(
             status_code=status.HTTP_200_OK,

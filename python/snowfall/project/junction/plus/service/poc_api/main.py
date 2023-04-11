@@ -15,6 +15,7 @@ from snowfall.project.junction.plus.service.poc_api import (
     flight_stats_client,
     icoupon,
     repository,
+    s3,
     twilio,
 )
 from snowfall.project.junction.plus.service.poc_api.routes import router
@@ -39,6 +40,10 @@ def _factory(
             app_id=app.settings.flight_stats_app_id,
             app_key=app.settings.flight_stats_app_key,
         )
+        s3_client = s3.S3Client(
+            app.settings.aws_access_key,
+            app.settings.aws_secret_key,
+        )
         icoupon_client = icoupon.ICouponClient(
             api_url=random.choice(app.settings.icoupon_api_address),  # nosec
             client_id=app.settings.icoupon_client_id,
@@ -62,6 +67,7 @@ def _factory(
                     redis_client=redis_client,
                     fs_client=fs_client,
                     icoupon_client=icoupon_client,
+                    s3_client=s3_client,
                     twilio_client=twilio.TwilioClient(
                         sid=app.settings.twilio_sid,
                         token=app.settings.twilio_token,

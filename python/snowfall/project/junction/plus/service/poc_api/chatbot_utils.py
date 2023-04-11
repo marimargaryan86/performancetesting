@@ -1,14 +1,17 @@
 import asyncio
 import datetime
+from io import BytesIO
 from typing import Any, Mapping, Sequence
 
 import httpx
 import json_api_doc
+import qrcode
 
 from snowfall.project.junction.plus.service.poc_api import (
     airlines,
     flight_stats_client,
     repository,
+    s3,
     twilio,
 )
 from snowfall.vendor.junction.go import client
@@ -364,13 +367,23 @@ async def send_qr(
     order: Mapping[str, Any],
     twilio_client: twilio.TwilioClient,
     barcode: Mapping[str, Any],
+    s3_client: s3.S3Client,
 ) -> None:
-    # TODO: change to upload and send the actual barcode and not a static one
+    code = barcode.get("barcode", "test")
+    qr = qrcode.make(code)
+    buffered = BytesIO()
+    qr.save(buffered)
+    qr_bytes = buffered.getvalue()
+    s3_client.put(qr_bytes, "poc-barcodes", "{0}.png".format(code))
     twilio_client.send_qr(
         receiver="".join(order["journey"]["contactDetails"]["phoneNumber"].split()),
         body="Please feel free to use this 20 EUR coupon.",
-        media_url="https://poc-barcodes.s3.eu-west-2.amazonaws.com/qr_1.png",
+        media_url="https://poc-barcodes.s3.eu-west-2.amazonaws.com/{0}.png".format(
+            code,
+        ),
     )
+    await asyncio.sleep(1)
+    s3_client.delete("poc-barcodes", "{0}.png".format(code))
 
 
 def format_dt(dt: datetime.datetime) -> str:

@@ -7,6 +7,7 @@ from snowfall.project.junction.plus.service.poc_api import (
     flight_stats_client,
     icoupon,
     repository,
+    s3,
     twilio,
 )
 from snowfall.stdlib.integration.starlette import application
@@ -23,6 +24,8 @@ class Settings(application.Settings):
     icoupon_api_address: Sequence[str]
     icoupon_client_id: str
     icoupon_client_secret: str
+    aws_access_key: str
+    aws_secret_key: str
     redis_dsn: Sequence[AnyUrl]
     mongo_dsn: Sequence[AnyUrl]
     mongo_db: str
@@ -38,6 +41,7 @@ def create_dependencies(  # noqa: WPS211
     fs_client: flight_stats_client.FlightStatusClient,
     icoupon_client: icoupon.ICouponClient,
     twilio_client: twilio.TwilioClient,
+    s3_client: s3.S3Client,
     orders_repository: repository.OrdersRepository,
     subscriptions_repository: repository.SubscriptionsRepository,
     delay_webhook_repository: repository.DelayWebhookRepository,
@@ -48,6 +52,7 @@ def create_dependencies(  # noqa: WPS211
     container[flight_stats_client.FlightStatusClient] = fs_client
     container[icoupon.ICouponClient] = icoupon_client
     container[twilio.TwilioClient] = twilio_client
+    container[s3.S3Client] = s3_client
     container[repository.OrdersRepository] = orders_repository
     container[repository.SubscriptionsRepository] = subscriptions_repository
     container[repository.DelayWebhookRepository] = delay_webhook_repository
