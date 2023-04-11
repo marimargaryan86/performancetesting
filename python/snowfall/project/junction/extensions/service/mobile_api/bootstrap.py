@@ -19,7 +19,8 @@ class Settings(application.Settings):
     currencies_address: Sequence[str]
     junction_api_address: Sequence[str]
     junction_api_token: str
-    plus_api_address: Sequence[str]
+    plus_api_address: Sequence[str] = [""]
+    plus_activated: bool = False
     redis_dsn: Sequence[AnyUrl]
     places_cache_ttl: datetime.timedelta = datetime.timedelta(hours=1)
     otp_cache_ttl: datetime.timedelta = datetime.timedelta(minutes=2)

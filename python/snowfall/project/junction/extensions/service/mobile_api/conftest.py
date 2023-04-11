@@ -347,6 +347,7 @@ def junction_client() -> client.Client:
 def plus_http_client() -> plus_client.PlusClient:
     return plus_client.PlusClient(
         api_url=plus_api_address,
+        activated=True,
     )
 
 

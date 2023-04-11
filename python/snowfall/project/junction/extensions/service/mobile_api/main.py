@@ -53,6 +53,7 @@ def _factory(
         )
         plus_http_client = plus_client.PlusClient(
             api_url=random.choice(app.settings.plus_api_address),  # nosec
+            activated=app.settings.plus_activated,
         )
         redis_client = redis.Client[str](
             aioredis.from_url(
