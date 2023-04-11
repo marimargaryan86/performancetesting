@@ -212,9 +212,9 @@ class DFDataConverter(object):  # noqa: WPS214
         departure_at_utc = schedule.departure_time.replace(
             tzinfo=tz.gettz(route.port_from.timezone),
         ).astimezone(datetime.timezone.utc)
-        arrival_at_utc = schedule.arrival_time.replace(
-            tzinfo=tz.gettz(route.port_to.timezone),
-        ).astimezone(datetime.timezone.utc)
+        arrival_at_utc = departure_at_utc + datetime.timedelta(
+            minutes=schedule.duration_in_minutes,
+        )
 
         if arrival_at_utc < departure_at_utc:
             self._logger.warning(
