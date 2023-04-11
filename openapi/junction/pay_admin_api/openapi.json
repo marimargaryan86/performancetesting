@@ -591,6 +591,61 @@
         "description": "Get accountless companies"
       }
     },
+    "/conversions": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ConversionInclude"
+        }
+      ],
+      "get": {
+        "summary": "List conversions details",
+        "description": "List FX conversions details",
+        "tags": [
+          "conversions"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ],
+        "operationId": "get-conversions",
+        "responses": {
+          "200": {
+            "description": "List Conversions ",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Conversion"
+                      }
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Transaction"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
     "/conversions/{conversionId}": {
       "parameters": [
         {
@@ -614,6 +669,12 @@
                   "properties": {
                     "data": {
                       "$ref": "#/components/schemas/Conversion"
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Transaction"
+                      }
                     }
                   }
                 }
@@ -1149,6 +1210,26 @@
         },
         "description": "Conversion id"
       },
+      "ConversionInclude": {
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "transactions"
+            ]
+          },
+          "example": [
+            "transactions"
+          ]
+        },
+        "description": "Customize which related resources to return",
+        "style": "form",
+        "explode": false
+      },
       "sortAccount": {
         "name": "sort",
         "in": "query",
@@ -1479,7 +1560,6 @@
                     "$ref": "#/components/schemas/AccountIdentifier"
                   }
                 }
-
               }
             }
           }
@@ -1652,7 +1732,7 @@
           },
           "paymentTypes": {
             "type": "string",
-            "example":"regular",
+            "example": "regular",
             "enum": [
               "priority",
               "regular"
@@ -1699,15 +1779,40 @@
           },
           "attributes": {
             "properties": {
+              "executedAt": {
+                "type": "string",
+                "example": "2023-03-06T14:30:00+00:00",
+                "format": "date-time"
+              },
               "settledAt": {
                 "type": "string",
                 "example": "2023-03-06T14:30:00+00:00",
                 "format": "date-time"
               },
-              "rate": {
+              "sellAmount": {
+                "$ref": "#/components/schemas/Money"
+              },
+              "buyAmount": {
+                "$ref": "#/components/schemas/Money"
+              },
+              "executionRate": {
                 "type": "number",
                 "format": "float",
                 "example": 1.02
+              },
+              "fxDelta": {
+                "type": "number",
+                "format": "float",
+                "description": "difference execution and quotation rates",
+                "example": 1.02
+              },
+              "fxStatus": {
+                "type": "string",
+                "enum": [
+                  "unspecified",
+                  "executed"
+                ],
+                "example": "executed"
               }
             }
           }
@@ -2057,7 +2162,7 @@
                     "format": "float",
                     "example": 1.02,
                     "readOnly": true,
-                    "description": "The amount  the exchnage rate can move between quotation and transaction before Junction PAY loose money on the trade"
+                    "description": "The amount  the exchange rate can move between quotation and transaction before Junction PAY loose money on the trade"
                   },
                   "salesMarkup": {
                     "type": "number",
