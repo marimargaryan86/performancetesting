@@ -307,6 +307,7 @@ def _configure(
 
     if global_settings.sentry_dsn:
         sentry.configure_sentry(
+            debug=True,
             dsn=global_settings.sentry_dsn,
             environment=global_settings.env_name,
             release="{name}@{version}".format(
