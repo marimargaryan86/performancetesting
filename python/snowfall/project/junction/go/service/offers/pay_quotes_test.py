@@ -219,7 +219,7 @@ async def test_that_price_in_trip_price_quote_result_replaced_with_conversion() 
         "SEK",
     )
 
-    assert modified_result.price_quote.price.units == 1500
+    assert modified_result.price_quote.price.units == 15
     assert modified_result.price_quote.price.currency_code == "SEK"
     assert modified_result.price_quote.id == string.to_uuid(
         "session-token",

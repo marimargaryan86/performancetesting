@@ -8,7 +8,6 @@ from snowfall.project.junction.go.service.offers.v1alpha.amqp_pb2 import (
     TripPriceQuoteResult,
 )
 from snowfall.stdlib import money, string
-from snowfall.stdlib.v1alpha.money_pb2 import Money
 from snowfall.vendor.junction.pay.client import Client as PayClient
 
 
@@ -72,14 +71,12 @@ class PayQuotes(object):
 
         search_result.price_quote.pay_quote_id = quote.data.id
 
-        search_result.price_quote.price.CopyFrom(
-            Money(
-                currency_code=quote.data.relationships.to_currency.data.id,  # noqa:WPS219
-                units=quote.data.attributes.amount,
-                nanos=0,
-            ),
+        converted_money = money.Money(
+            amount=quote.data.attributes.amount,
+            currency=money.Currency(to_currency),
         )
 
+        search_result.price_quote.price.CopyFrom(converted_money.protobuf())
         search_result.price_quote.id = string.to_uuid(
             session_token,
             uuid.UUID(search_result.price_quote.id),
