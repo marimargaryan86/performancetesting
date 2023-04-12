@@ -34,6 +34,14 @@ variable "count" {
   type = number
 }
 
+variable "plus_api_address" {
+  type = string
+}
+
+variable "plus_activated" {
+  type = bool
+}
+
 job "mobile-api-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -171,6 +179,8 @@ EOH
         CLIENT_NAME                     = "superApp"
         CREATE_STRIPE_CUSTOMERS         = true
         SUPPORT_EMAIL                   = "support@diplomattravel.gr"
+        PLUS_API_ADDRESS                = "${var.plus_api_address}"
+        PLUS_ACTIVATED                  = var.plus_activated
       }
     }
   }
