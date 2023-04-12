@@ -5,6 +5,7 @@ from typing import Sequence
 import pydantic
 from motor import motor_asyncio
 
+from snowfall.project.junction.go import pay_integration
 from snowfall.project.junction.go.adapter import passenger_name_records
 from snowfall.project.junction.go.service.offers import price_quotes
 from snowfall.project.junction.go.service.orders import importer, orders
@@ -32,15 +33,11 @@ class _GrpcSettings(service.Settings):
     passenger_name_records_address: Sequence[str]
 
 
-class _ImportSettings(service.Settings):
+class _ImportSettings(pay_integration.Settings, service.Settings):
     amqp_dsn: pydantic.AnyUrl
     mongo_dsn: Sequence[pydantic.AnyUrl]
     passenger_name_records_address: Sequence[str]
     use_pay_to_create_transaction: bool = False
-    pay_admin_username: str
-    pay_admin_password: str
-    public_pay_api_dsn: pydantic.AnyUrl
-    public_pay_admin_api_dsn: pydantic.AnyUrl
 
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:

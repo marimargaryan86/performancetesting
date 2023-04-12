@@ -7,6 +7,7 @@ import pydantic
 from motor import motor_asyncio
 from redis import asyncio as aioredis
 
+from snowfall.project.junction.go import pay_integration
 from snowfall.project.junction.go.service.offers import (
     aggregator,
     importer,
@@ -42,31 +43,27 @@ class _GrpcSettings(service.Settings):
     mongo_dsn: Sequence[pydantic.AnyUrl]
 
 
-class _ImportSettings(service.Settings):
+class _PaySettings(service.Settings):
+    payer_company_id: str
+    payer_currency_code: str
+    use_pay_for_currency_conversions: bool = False
+
+
+class _ImportSettings(pay_integration.Settings, _PaySettings, service.Settings):
     amqp_dsn: pydantic.AnyUrl
     default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
     mongo_dsn: Sequence[pydantic.AnyUrl]
     redis_dsn: Sequence[pydantic.AnyUrl]
-    payer_company_id: str
-    payer_currency_code: str
-    use_pay_for_currency_conversions: bool = False
-    pay_admin_username: str
-    pay_admin_password: str
-    public_pay_api_dsn: pydantic.AnyUrl
-    public_pay_admin_api_dsn: pydantic.AnyUrl
 
 
-class _GatherPriceQuoteSettings(service.Settings):
+class _GatherPriceQuoteSettings(
+    pay_integration.Settings,
+    _PaySettings,
+    service.Settings,
+):
     amqp_dsn: pydantic.AnyUrl
     default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
     mongo_dsn: Sequence[pydantic.AnyUrl]
-    payer_company_id: str
-    payer_currency_code: str
-    use_pay_for_currency_conversions: bool = False
-    pay_admin_username: str
-    pay_admin_password: str
-    public_pay_api_dsn: pydantic.AnyUrl
-    public_pay_admin_api_dsn: pydantic.AnyUrl
 
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
