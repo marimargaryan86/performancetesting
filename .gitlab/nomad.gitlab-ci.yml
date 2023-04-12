@@ -4,9 +4,9 @@ nomad:validate:
   script:
     - ./bash/lint-nomad.sh development
   rules:
-    - if: $CI_MERGE_REQUEST_IID
-      changes:
-        - "nomad/**/*"
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_MERGE_REQUEST_IID'
   variables:
     NOMAD_VAR_docker_image: "${CI_REGISTRY_IMAGE}"
     NOMAD_VAR_registry_address: "${CI_REGISTRY}"

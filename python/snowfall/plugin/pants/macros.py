@@ -1,3 +1,55 @@
+def nomad_template(  # type: ignore[no-untyped-def]
+    commands: list[str],  # noqa: SF20
+    service_entry_point: str,
+    **kwargs,  # noqa: ANN003
+) -> None:
+    kwargs.pop("name", None)
+    kwargs.pop("sources", None)
+
+    cmd = './bash/lint-configuration.sh {command} "{path}/{filename}.nomad" config.json'
+
+    for command_def in commands:
+        parts = command_def.split("#")
+
+        if len(parts) == 1:
+            command, filename = parts[0], parts[0]
+        else:
+            command, filename = parts[1], parts[0]
+
+        files(  # type: ignore[name-defined]  # noqa: F821
+            name="{filename}_files".format(filename=filename),
+            sources=[
+                "{filename}.json".format(filename=filename),
+                "{filename}.nomad".format(filename=filename),
+            ],
+            **kwargs,
+        )
+
+        adhoc_tool(  # type: ignore[name-defined]  # noqa: F821
+            name="{filename}_config_data".format(filename=filename),
+            runnable=service_entry_point,
+            args=["--debug-info", command],
+            stdout="config.json",
+            output_files=["config.json"],
+        )
+
+        experimental_test_shell_command(  # type: ignore[name-defined]  # noqa: F821
+            name="{filename}_config_test".format(filename=filename),
+            command=cmd.format(
+                command=command,
+                filename=filename,
+                path=build_file_dir(),  # type: ignore[name-defined]  # noqa: F821
+            ),
+            execution_dependencies=[
+                ":{filename}_files".format(filename=filename),
+                ":{filename}_config_data".format(filename=filename),
+                "bash/lint-configuration.sh",
+            ],
+            tools=["bash", "grep", "jq"],
+            workdir="/",
+        )
+
+
 def go_image(  # type: ignore[no-untyped-def]
     name: str,
     **kwargs,  # noqa: ANN003
@@ -39,11 +91,14 @@ def go_image(  # type: ignore[no-untyped-def]
 
 
 def python_image(  # type: ignore[no-untyped-def]
-    name: str,
     **kwargs,  # noqa: ANN003
 ) -> None:
+    try:
+        name = kwargs["name"]
+    except KeyError:
+        name = build_file_dir().name  # type: ignore[name-defined]  # noqa: F821
+
     pex_binary(  # type: ignore[name-defined]  # noqa: F821
-        name=name,
         **(
             {
                 "restartable": True,
