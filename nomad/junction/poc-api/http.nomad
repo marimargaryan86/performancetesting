@@ -123,6 +123,9 @@ JUNCTION_API_TOKEN={{ .Data.data.junction_api_token }}
 FLIGHT_STATS_APP_KEY={{ .Data.data.flight_stats_app_key }}
 TWILIO_TOKEN={{ .Data.data.twilio_token }}
 TWILIO_SID={{ .Data.data.twilio_sid }}
+ICOUPON_CLIENT_SECRET={{ .Data.data.icoupon_client_secret }}
+AWS_ACCESS_KEY={{ .Data.data.aws_access_key }}
+AWS_SECRET_KEY={{ .Data.data.aws_secret_key }}
 {{ end }}
 EOH
       }
@@ -154,6 +157,8 @@ EOH
         SENTRY_DSN                      = "https://edddac6f53a345bfa2b49ac386a69e9b@sentry.snowfall.se/80"
         JUNCTION_API_ADDRESS            = "https://api.junction.dev"
         FLIGHT_STATS_API_ADDRESS        = "https://api.flightstats.com/flex/flightstatus/rest/v2/json/flight/status/"
+        ICOUPON_CLIENT_ID               = "Snowfall"
+        ICOUPON_API_ADDRESS             = "https://ppd.icoupon.global/api"
       }
     }
   }
