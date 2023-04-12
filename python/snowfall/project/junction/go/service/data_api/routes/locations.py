@@ -9,7 +9,7 @@ from snowfall.stdlib.v1alpha import latlng_pb2
 _DEFAULT_LIMIT = 50
 
 
-class Coordinates(endpoints.HTTPEndpoint):
+class Locations(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
@@ -25,7 +25,7 @@ class Coordinates(endpoints.HTTPEndpoint):
                 latitude=float(bias_lat),
                 longitude=float(bias_long),
             )
-        coordinates_response = await geocoder.LocationLookup(
+        locations_response = await geocoder.LocationLookup(
             geocoding_pb2.LocationLookupRequest(
                 language=request.query_params.get("query[language]", "en"),
                 limit=int(
@@ -39,8 +39,8 @@ class Coordinates(endpoints.HTTPEndpoint):
         return models.JsonApiResponse(
             models.Body(
                 data=[
-                    resources.CoordinateResource.from_proto(coordinates)
-                    for coordinates in coordinates_response.coordinates
+                    resources.LocationResource.from_proto(location)
+                    for location in locations_response.locations
                 ],
             ),
         )

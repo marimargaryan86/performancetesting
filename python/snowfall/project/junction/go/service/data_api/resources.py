@@ -4,29 +4,29 @@ from snowfall.service.geodata.v1 import models_pb2
 from snowfall.stdlib.integration.starlette import models
 
 
-class CoordinateResource(models.Resource):
+class LocationResource(models.Resource):
     @classmethod
     def from_proto(
         cls,
-        coordinates: models_pb2.Location,
-    ) -> CoordinateResource:
+        location: models_pb2.Location,
+    ) -> LocationResource:
         return cls(
-            id=coordinates.id,
-            type="coordinates",
+            id=location.id,
+            type="locations",
             attributes={
-                "addressNumber": coordinates.address_number,
-                "street": coordinates.street,
-                "unitNumber": coordinates.unit_number,
-                "unitType": coordinates.unit_type,
-                "latitude": coordinates.coordinates.latitude,
-                "longitude": coordinates.coordinates.longitude,
-                "name": coordinates.name,
-                "neighborhood": coordinates.neighborhood,
-                "municipality": coordinates.municipality,
-                "subregion": coordinates.subregion,
-                "region": coordinates.region,
-                "country": coordinates.country,
-                "interpolated": coordinates.interpolated,
-                "timezone": {"name": coordinates.time_zone.id},
+                "addressNumber": location.address_number,
+                "street": location.street,
+                "unitNumber": location.unit_number,
+                "unitType": location.unit_type,
+                "latitude": location.coordinates.latitude,
+                "longitude": location.coordinates.longitude,
+                "name": location.name,
+                "neighborhood": location.neighborhood,
+                "municipality": location.municipality,
+                "subregion": location.subregion,
+                "region": location.region,
+                "country": location.country,
+                "interpolated": location.interpolated,
+                "timezone": {"name": location.time_zone.id},
             },
         )
