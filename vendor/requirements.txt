@@ -94,7 +94,7 @@ python-multipart==0.0.6
 qrcode==7.4.2
 redis[hiredis]==4.5.4
 rfc3339-validator==0.1.4
-sentry-sdk==1.19.0
+sentry-sdk==1.16.0
 setuptools==67.6.1
 Shapely==2.0.1
 SQLAlchemy[asyncio]==2.0.8

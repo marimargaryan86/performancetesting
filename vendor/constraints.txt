@@ -107,7 +107,7 @@
 //     "qrcode==7.4.2",
 //     "redis[hiredis]==4.5.4",
 //     "rfc3339-validator==0.1.4",
-//     "sentry-sdk==1.19.0",
+//     "sentry-sdk==1.16.0",
 //     "setuptools==67.6.1",
 //     "starlette==0.26.1",
 //     "stripe==5.4.0",
@@ -1629,13 +1629,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "cf43dddb7e2ba5425fe19fad68b10043307b61d9103d06566f1ab6034e38b8db",
-              "url": "https://files.pythonhosted.org/packages/9f/9b/2c3fa91b4750b8e78211d07788445667e8c24f4a19f38c2fc099e75f282a/botocore-1.29.109-py3-none-any.whl"
+              "hash": "baa6442df9b539c5c4e622bd22b47bc3594a0428f280587a359a9298e73a6e48",
+              "url": "https://files.pythonhosted.org/packages/6d/7f/ae630ed437609c95cbdcc5389f5d0daebec3f85d9ce355895b398433166f/botocore-1.29.111-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "2e449525f0ccedb31fdb962a77caac48b4c486c23515b84c5989a39a1823a024",
-              "url": "https://files.pythonhosted.org/packages/32/7b/7d139b04f4c9554e6fdd25ad22ed91376f3b6433cf329a78cf0a23f75211/botocore-1.29.109.tar.gz"
+              "hash": "c3a51d80ceac0945969f94894651c4728525c7cf2df7d7838063c3516f5ee9e3",
+              "url": "https://files.pythonhosted.org/packages/c8/ca/0ed2d8e1b2333d41d3757e906f6bc5ab8f2d5b62cb4edce7b4c2027c16cb/botocore-1.29.111.tar.gz"
             }
           ],
           "project_name": "botocore",
@@ -1646,19 +1646,19 @@
             "urllib3<1.27,>=1.25.4"
           ],
           "requires_python": ">=3.7",
-          "version": "1.29.109"
+          "version": "1.29.111"
         },
         {
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "e3181ee8493384ebf70f12d56a35341dfbaa7b34e3f241ed01c58df89ee8410b",
-              "url": "https://files.pythonhosted.org/packages/41/2b/2570cde4af442e04cef30cfdabe393abeef7069eadac5cd02598cde944a7/botocore_stubs-1.29.109-py3-none-any.whl"
+              "hash": "8f68c71ad0f349a19dabae9d2695c927553bfbd29cc7af2f22b50b0db117f394",
+              "url": "https://files.pythonhosted.org/packages/35/86/36974a90d51310f4b4f33ac2d88d3ff9a8c2cb686155fd4e73a872126dbf/botocore_stubs-1.29.111-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "5464cd79076d4f9d36c3163167c3d435fd73367168345f9637c4b8e88f5b54fe",
-              "url": "https://files.pythonhosted.org/packages/1b/3e/a516d7cb0b94d150c83183ba933e79270c28cf0f0cc8233520422e255ab5/botocore_stubs-1.29.109.tar.gz"
+              "hash": "adecd9c4ac936896ba23d205b0339c36889b6c0793bf846b3b4d1b1cb6f9b1bb",
+              "url": "https://files.pythonhosted.org/packages/ce/a1/eb3cb602e91f09f9e29e029c4b4594736229c7de53db97159727789d9feb/botocore_stubs-1.29.111.tar.gz"
             }
           ],
           "project_name": "botocore-stubs",
@@ -1667,7 +1667,7 @@
             "typing-extensions>=4.1.0; python_version < \"3.9\""
           ],
           "requires_python": "<4.0,>=3.7",
-          "version": "1.29.109"
+          "version": "1.29.111"
         },
         {
           "artifacts": [
@@ -5821,13 +5821,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "8dcffbbb963963567384d6eb49c76b8fb05753540715cbee5e5ca5bc8327ded4",
-              "url": "https://files.pythonhosted.org/packages/1a/08/6ed51745b4cb6c553b4ae59634cb162b25d02dd6d123f3d11ff1744a35d0/sentry_sdk-1.19.0-py2.py3-none-any.whl"
+              "hash": "633edefead34d976ff22e7edc367cdf57768e24bc714615ccae746d9d91795ae",
+              "url": "https://files.pythonhosted.org/packages/e4/03/4a3e03619eb41b4d9028d377869cc29a5a2095975ca9e8d9b64cb87e1450/sentry_sdk-1.16.0-py2.py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "6732b59a55051646587acce21f6a00b53d05df9282d54886ad88b59b4e9b82ad",
-              "url": "https://files.pythonhosted.org/packages/99/a6/0a9c83c274282ea341937f9e2d212a497caf579625a32b28f056332479f3/sentry-sdk-1.19.0.tar.gz"
+              "hash": "a900845bd78c263d49695d48ce78a4bce1030bbd917e0b6cc021fc000c901113",
+              "url": "https://files.pythonhosted.org/packages/f7/37/24df9417889d23334c4646c2015c602f5194101426d6381ebd2453940e7c/sentry-sdk-1.16.0.tar.gz"
             }
           ],
           "project_name": "sentry-sdk",
@@ -5847,7 +5847,6 @@
             "falcon>=1.4; extra == \"falcon\"",
             "fastapi>=0.79.0; extra == \"fastapi\"",
             "flask>=0.11; extra == \"flask\"",
-            "grpcio>=1.21.1; extra == \"grpcio\"",
             "httpx>=0.16.0; extra == \"httpx\"",
             "huey>=2; extra == \"huey\"",
             "opentelemetry-distro>=0.35b0; extra == \"opentelemetry\"",
@@ -5866,7 +5865,7 @@
             "urllib3>=1.26.9; python_version == \"3.5\""
           ],
           "requires_python": null,
-          "version": "1.19.0"
+          "version": "1.16.0"
         },
         {
           "artifacts": [
@@ -7279,7 +7278,7 @@
     "qrcode==7.4.2",
     "redis[hiredis]==4.5.4",
     "rfc3339-validator==0.1.4",
-    "sentry-sdk==1.19.0",
+    "sentry-sdk==1.16.0",
     "setuptools==67.6.1",
     "starlette==0.26.1",
     "stripe==5.4.0",
