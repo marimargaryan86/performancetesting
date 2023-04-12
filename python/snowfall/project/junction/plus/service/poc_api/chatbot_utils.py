@@ -359,7 +359,7 @@ async def send_delay(
             )
             + "\nNew estimated departure time: {0}".format(format_dt(new_departure))
         ),
-        receiver="".join(order["journey"]["contactDetails"]["phoneNumber"].split()),
+        receiver=order["journey"]["contactDetails"]["phoneNumber"],
     )
 
 
@@ -376,7 +376,7 @@ async def send_qr(
     qr_bytes = buffered.getvalue()
     s3_client.put(qr_bytes, "poc-barcodes", "{0}.png".format(code))
     twilio_client.send_qr(
-        receiver="".join(order["journey"]["contactDetails"]["phoneNumber"].split()),
+        receiver=order["journey"]["contactDetails"]["phoneNumber"],
         body="Please feel free to use this 20 EUR coupon.",
         media_url="https://poc-barcodes.s3.eu-west-2.amazonaws.com/{0}.png".format(
             code,

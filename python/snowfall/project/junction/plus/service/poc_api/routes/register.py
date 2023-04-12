@@ -27,7 +27,8 @@ class WhatsappRegister(endpoints.HTTPEndpoint):
         order = await orders_repository.find_by_id(body["orders"])
         if not order:
             raise exceptions.HTTPException(status.HTTP_502_BAD_GATEWAY)
-        subscription = await subscriptions_repository.find_by_id(order.mobile_number)
+        mobile_number = "".join(order.mobile_number.split())
+        subscription = await subscriptions_repository.find_by_id(mobile_number)
         # For now, we add manually the potential subscribers into this collection.
         # This needs to change after the demo and handle it automatically
         if subscription:
@@ -36,17 +37,17 @@ class WhatsappRegister(endpoints.HTTPEndpoint):
                     junction_client,
                     twilio_client,
                     body["orders"],
-                    order.mobile_number,
+                    mobile_number,
                     delay_webhook_repository,
                 )
             else:
                 await subscriptions_repository.update_first_order(
-                    order.mobile_number,
+                    mobile_number,
                     order.id,
                 )
                 await chatbot_utils.send_subscription(
                     twilio_client,
-                    order.mobile_number,
+                    mobile_number,
                 )
         return responses.Response(
             status_code=status.HTTP_200_OK,
