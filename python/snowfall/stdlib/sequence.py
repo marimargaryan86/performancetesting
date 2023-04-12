@@ -1,6 +1,6 @@
 import dataclasses
 from collections.abc import Sequence
-from typing import Generic, TypeVar, cast
+from typing import Generic, TypeGuard, TypeVar, cast
 
 from snowfall.stdlib.persistence import cursor as std_cursor
 
@@ -16,10 +16,14 @@ class Page(Generic[_Resource]):
 
 
 def ensure(maybe_list: Sequence[_NotList] | _NotList) -> Sequence[_NotList]:
-    if not isinstance(maybe_list, Sequence) or isinstance(maybe_list, (str, bytes)):
+    if not is_a(maybe_list):
         return [cast(_NotList, maybe_list)]
 
     return maybe_list
+
+
+def is_a(maybe_list: Sequence[_NotList] | _NotList) -> TypeGuard[Sequence[_NotList]]:
+    return isinstance(maybe_list, Sequence) and not isinstance(maybe_list, (str, bytes))
 
 
 def paginate(
