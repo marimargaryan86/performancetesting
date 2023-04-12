@@ -1,6 +1,6 @@
 [CI/CD]
 /.gitlab/ @jyggen
-/nomad/ @jyggen
+/nomad/ @vm
 /python/snowfall/plugin/ @jyggen
 /vendor/ @bolmis @jyggen
 .editorconfig @bolmis @jyggen

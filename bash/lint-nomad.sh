@@ -47,4 +47,6 @@ for f in "${NOMAD_FILES[@]}"; do
 	nomad fmt -check -write=false "${f}"
 done
 
-pants run python/snowfall/script/validate_nomad_files.py -- "${NOMAD_FILES[@]}"
+if ! [ ${#NOMAD_FILES[@]} -eq 0 ]; then
+	pants run python/snowfall/script/validate_nomad_files.py -- "${NOMAD_FILES[@]}"
+fi
