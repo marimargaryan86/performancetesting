@@ -3,6 +3,8 @@ import itertools
 import zoneinfo
 from typing import Sequence
 
+import more_itertools
+
 from snowfall.project.junction.go.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
@@ -121,6 +123,7 @@ class OfferParser(object):  # noqa: WPS214
         expires_at: datetime.datetime,
     ) -> Sequence[offer_models_pb2.Offer]:
         pb_offers = list[offer_models_pb2.Offer]()
+        last_travel_date = self._get_last_travel_date(offer_segments)
 
         for offer in offers:
             amount = money.from_string(
@@ -142,6 +145,7 @@ class OfferParser(object):  # noqa: WPS214
                                 for passenger in offer.passengers
                             ],
                             doc_required=offer.passenger_identity_documents_required,
+                            last_travel_date=last_travel_date,
                         ),
                         expires_at=expires_at,
                     ),
@@ -158,6 +162,16 @@ class OfferParser(object):  # noqa: WPS214
             )
 
         return pb_offers
+
+    def _get_last_travel_date(
+        self,
+        offer_segments: Sequence[offer_models_pb2.OfferSegment],
+    ) -> datetime.date:
+        last_segment = more_itertools.last(offer_segments)
+
+        return protobuf.protobuf_to_datetime(
+            more_itertools.last(last_segment.legs).departure_at,
+        ).date()
 
     def _parse_segment_details(
         self,

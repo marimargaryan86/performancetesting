@@ -40,6 +40,23 @@ async def test_request_offers(duffel_client: client.DuffelClient) -> None:
 
 
 @disable_by_default
+async def test_request_offers_with_infant(duffel_client: client.DuffelClient) -> None:
+    offer_request_create = OffersRequestBuilder()
+    offer_request_create.add_passenger(OfferRequestPassenger(age=30))
+    offer_request_create.add_passenger(OfferRequestPassenger(age=1))
+    offer_request_create.add_slice(
+        OfferRequestSlice(
+            origin="LHR",
+            destination="SYD",
+            departure_date=datetime.date.fromisoformat("2023-05-26"),
+        ),
+    )
+
+    offers = await duffel_client.create_offer_request(offer_request_create.build())
+    assert offers is not None
+
+
+@disable_by_default
 async def test_request_round_trip_offers(duffel_client: client.DuffelClient) -> None:
     offer_request_create = OffersRequestBuilder()
     offer_request_create.add_passenger(OfferRequestPassenger(pax_type="adult"))
@@ -110,6 +127,60 @@ async def test_order_create(duffel_client: client.DuffelClient) -> None:
                     expires_on=datetime.date.today() + datetime.timedelta(weeks=210),
                 ),
             ],
+        ),
+    )
+    order_request.add_payment(
+        OrderPayment(
+            payment_type="balance",
+            currency=offer.total_currency,
+            amount=offer.total_amount,
+        ),
+    )
+
+    order = await duffel_client.order_request(order_request.build())
+    assert order is not None
+
+
+@disable_by_default
+async def test_order_create_with_infant(duffel_client: client.DuffelClient) -> None:
+    offer_request_create = OffersRequestBuilder()
+    offer_request_create.add_passenger(OfferRequestPassenger(pax_type="adult"))
+    offer_request_create.add_passenger(OfferRequestPassenger(age=1))
+    offer_request_create.add_slice(
+        OfferRequestSlice(
+            destination="JFK",
+            origin="LHR",
+            departure_date=datetime.date.today() + datetime.timedelta(days=14),
+        ),
+    )
+    offers = await duffel_client.create_offer_request(offer_request_create.build())
+    offer = offers.offers[0]
+
+    order_request = OrderBuilder()
+    order_request.add_offer_id(offer.identifier)
+    order_request.add_passenger(
+        OrderPassenger(
+            title="mr",
+            phone_number="+442080160508",
+            passenger_id=offer.passengers[0].identifier,
+            infant_passenger_id=offer.passengers[1].identifier,
+            given_name="SNOWFALL",
+            gender="m",
+            family_name="TRAVEL",
+            email="conelia.corde@duffel.com",
+            born_on=datetime.date.today() - datetime.timedelta(weeks=1300),
+        ),
+    )
+    order_request.add_passenger(
+        OrderPassenger(
+            title="mr",
+            phone_number="+442080160508",
+            passenger_id=offer.passengers[1].identifier,
+            given_name="SNOWFALLKid",
+            gender="m",
+            family_name="TRAVEL",
+            email="conelia.corde@duffel.com",
+            born_on=datetime.date.today() - datetime.timedelta(weeks=52),
         ),
     )
     order_request.add_payment(

@@ -1,5 +1,6 @@
 import phonenumbers
 import structlog
+from dateutil.relativedelta import relativedelta
 
 from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2, models_pb2
 from snowfall.project.junction.service.providers.duffel import cache, notifications
@@ -20,6 +21,8 @@ from snowfall.vendor.duffel.models.order import Order
 class BookingHandler(object):
     _poll_retries_limit = 10
     _wait_time_between_polling = 15
+    _adult_years = 18
+    _infant_years = 2
 
     def __init__(
         self,
@@ -91,6 +94,12 @@ class BookingHandler(object):
             ),
         )
 
+        infant_id_list = [
+            details.passengers[index].identifier
+            for index, passenger in enumerate(task.passengers)
+            if self._is_infant(passenger, details)
+        ]
+
         for index, passenger in enumerate(task.passengers):
             document: IdentityDocument | None = None
 
@@ -104,22 +113,25 @@ class BookingHandler(object):
                     ),
                 )
 
-            order_request.add_passenger(
-                OrderPassenger(
-                    title=models_pb2.Passenger.Title.Name(passenger.title)[6:].lower(),
-                    phone_number="+{country_code}{national_number}".format(
-                        country_code=str(number.country_code),
-                        national_number=str(number.national_number),
-                    ),
-                    passenger_id=details.passengers[index].identifier,
-                    given_name=passenger.first_name,
-                    gender=gender_from_proto(passenger.gender),
-                    family_name=passenger.last_name,
-                    email=task.contact_details.email,
-                    born_on=protobuf.protobuf_to_date(passenger.date_of_birth),
-                    identity_documents=[document] if document is not None else None,
+            order_passenger = OrderPassenger(
+                title=models_pb2.Passenger.Title.Name(passenger.title)[6:].lower(),
+                phone_number="+{country_code}{national_number}".format(
+                    country_code=str(number.country_code),
+                    national_number=str(number.national_number),
                 ),
+                passenger_id=details.passengers[index].identifier,
+                given_name=passenger.first_name,
+                gender=gender_from_proto(passenger.gender),
+                family_name=passenger.last_name,
+                email=task.contact_details.email,
+                born_on=protobuf.protobuf_to_date(passenger.date_of_birth),
+                identity_documents=[document] if document is not None else None,
             )
+
+            if infant_id_list and self._is_adult(passenger, details):
+                order_passenger.infant_passenger_id = infant_id_list.pop(0)
+
+            order_request.add_passenger(order_passenger)
 
         order_response = await self._client.order_request(order_request.build())
 
@@ -132,6 +144,32 @@ class BookingHandler(object):
             self._logger.exception()
 
         return order_response
+
+    def _is_infant(
+        self,
+        passenger: models_pb2.Passenger,
+        details: cache.OfferDetails,
+    ) -> bool:
+        return (
+            relativedelta(
+                protobuf.protobuf_to_date(passenger.date_of_birth),
+                details.last_travel_date,
+            ).years
+            < self._infant_years
+        )
+
+    def _is_adult(
+        self,
+        passenger: models_pb2.Passenger,
+        details: cache.OfferDetails,
+    ) -> bool:
+        return (
+            relativedelta(
+                protobuf.protobuf_to_date(passenger.date_of_birth),
+                details.last_travel_date,
+            ).years
+            >= self._adult_years
+        )
 
     def _has_valid_document(self, passenger: models_pb2.Passenger) -> bool:
         if passenger.doc_details.document_number == "":

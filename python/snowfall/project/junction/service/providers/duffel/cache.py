@@ -1,3 +1,4 @@
+import datetime
 from typing import List, Type
 
 from snowfall.stdlib.persistence.redis.repository import (
@@ -17,6 +18,7 @@ class OfferDetails(RedisRecord):
     total_amount: str
     currency: str
     doc_required: bool = False
+    last_travel_date: datetime.date
 
 
 class OfferCache(RedisRepository[OfferDetails]):
