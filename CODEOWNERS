@@ -7,11 +7,9 @@
 .gitignore @bolmis @jyggen
 .gitlab-ci.yml @jyggen
 .python-version @jyggen
-buf.gen.yaml @jyggen
 buf.yaml @jyggen
 CONTRIBUTING.md @bolmis @jyggen
 docker-compose.yml @bolmis @jyggen
-pants @jyggen
 pants.ci.toml @jyggen
 pants.toml @jyggen
 README.md @bolmis @jyggen
