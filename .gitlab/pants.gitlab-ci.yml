@@ -31,7 +31,7 @@ pants:setup:
     PANTS_NAMED_CACHES_DIR: "${CI_PROJECT_DIR}/.cache/named"
     SCIE_BASE: "${CI_PROJECT_DIR}/.cache/scie"
   cache:
-    - key: "python-3.11.2-scie-0.5.4-pants-2.16.0a1-0"
+    - key: "python-3.11.2-scie-0.5.4-pants-2.16.0rc0-0"
       when: always
       paths:
         - "${SCIE_BASE}"
