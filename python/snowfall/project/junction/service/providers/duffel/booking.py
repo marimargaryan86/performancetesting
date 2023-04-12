@@ -152,8 +152,8 @@ class BookingHandler(object):
     ) -> bool:
         return (
             relativedelta(
-                protobuf.protobuf_to_date(passenger.date_of_birth),
                 details.last_travel_date,
+                protobuf.protobuf_to_date(passenger.date_of_birth),
             ).years
             < self._infant_years
         )
@@ -165,8 +165,8 @@ class BookingHandler(object):
     ) -> bool:
         return (
             relativedelta(
-                protobuf.protobuf_to_date(passenger.date_of_birth),
                 details.last_travel_date,
+                protobuf.protobuf_to_date(passenger.date_of_birth),
             ).years
             >= self._adult_years
         )
