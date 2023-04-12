@@ -260,6 +260,7 @@ class Penalty(models.BaseModel):
     penalty_type: str = pydantic.Field(alias="penaltyType")
     changeable: bool
     refundable: Optional[bool]
+    conditions_apply: Optional[bool] = pydantic.Field(alias="conditionsApply")
     applicability: str
     price: Optional[Price]
 
@@ -273,6 +274,7 @@ class Penalty(models.BaseModel):
             ),
             changeable=penalty.changeable,
             refundable=penalty.refundable,
+            conditionsApply=penalty.conditions_apply,
             applicability=protobuf.enum_value_to_slug(
                 enum_descriptor=offer_models_pb2.Penalty.Applicability.DESCRIPTOR,
                 enum_value=penalty.applicability,

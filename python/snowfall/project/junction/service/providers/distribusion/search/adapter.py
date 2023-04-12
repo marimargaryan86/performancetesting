@@ -123,6 +123,12 @@ class MarketingCarrierAdapter(object):  # noqa: WPS214
     ) -> bool:
         return self.has_any_fare_feature(fare, ["AMEN"])
 
+    def has_exchange_conditions(
+        self,
+        fare: connections.FaresRelFareClassPrice | None,
+    ) -> bool:
+        return self._has_any_fare_description(fare, ["AMEN"])
+
     def has_any_fare_feature(
         self,
         fare: connections.FaresRelFareClassPrice | None,
@@ -148,6 +154,20 @@ class MarketingCarrierAdapter(object):  # noqa: WPS214
             ]
 
         return None
+
+    def _has_any_fare_description(
+        self,
+        fare: connections.FaresRelFareClassPrice | None,
+        codes: Collection[str],
+    ) -> bool:
+        fare_features = self._get_fare_features(fare)
+
+        if fare_features and codes:
+            for feature in fare_features:
+                if feature.code and feature.code in codes and feature.description:
+                    return True
+
+        return False
 
     def _get_fare_features(
         self,
@@ -318,6 +338,9 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
                             fully_refundable=carrier.is_fully_refundable(fare),
                             non_refundable=carrier.is_non_refundable(fare),
                             changeable=carrier.is_changeable(fare),
+                            has_exchange_conditions=carrier.has_exchange_conditions(
+                                fare,
+                            ),
                             fare_rules=carrier.get_fare_rules(fare),
                         ),
                         expires_at=expires_at,

@@ -5632,6 +5632,11 @@
             "type": "boolean",
             "example": false
           },
+          "conditionsApply": {
+            "type": "boolean",
+            "example": false,
+            "description": "If True there are some restrictions to this penalty rule. Check the fare rules for conditions"
+          },
           "applicability": {
             "type": "string",
             "example": "before",

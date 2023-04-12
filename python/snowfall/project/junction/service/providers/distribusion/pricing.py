@@ -132,6 +132,7 @@ class PriceQuoteConsumer(object):
                     penalty_type=offers_pb2.Penalty.Type.TYPE_EXCHANGE,
                     changeable=True,
                     applicability=offers_pb2.Penalty.Applicability.APPLICABILITY_BEFORE,
+                    conditions_apply=offer_details.has_exchange_conditions or False,
                 ),
             )
 

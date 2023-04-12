@@ -73,6 +73,7 @@ message Penalty {
   }
   Applicability applicability = 5;
   optional snowfall.stdlib.v1alpha.Money price = 6;
+  optional bool conditions_apply = 7;
 }
 
 message OfferGroup {

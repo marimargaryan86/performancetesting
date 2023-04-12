@@ -28,6 +28,7 @@ class OfferDetails(RedisRecord):
     fully_refundable: bool | None
     non_refundable: bool | None
     changeable: bool | None
+    has_exchange_conditions: bool | None
     fare_rules: list[FareRule] | None
 
 
