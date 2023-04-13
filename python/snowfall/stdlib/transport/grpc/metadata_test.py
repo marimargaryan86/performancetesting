@@ -1,7 +1,8 @@
-from typing import Any
+from typing import Any, Callable
 from unittest import mock
 
 import pytest
+from google.protobuf import message
 from grpc import aio
 
 from snowfall.stdlib.transport.grpc import metadata
@@ -68,3 +69,38 @@ async def test_token_can_be_retrieved(context_metadata: Any) -> None:
 
     token = await metadata.get_auth_token(context)
     assert token["client_id"] == "John Doe"
+
+
+class TestInterceptor(object):
+    _interceptor = metadata.MetadataContextClientInterceptor()
+    _continuation = mock.AsyncMock(
+        Callable[[aio.ClientCallDetails, message.Message], aio.UnaryUnaryCall],
+    )
+    _request = mock.Mock(spec=message.Message)
+
+    async def test_interceptor_works_without_context(self) -> None:
+        client_call_details = mock.create_autospec(spec=aio.ClientCallDetails)
+        client_call_details.metadata = mock.create_autospec(spec=aio.Metadata)
+
+        await self._interceptor.intercept_unary_unary(
+            continuation=self._continuation,
+            client_call_details=client_call_details,
+            request=self._request,
+        )
+
+        client_call_details.metadata.add.assert_not_called()
+
+    async def test_interceptor_works_with_context(self) -> None:
+        client_call_details = mock.create_autospec(spec=aio.ClientCallDetails)
+        client_call_details.metadata = mock.create_autospec(spec=aio.Metadata)
+
+        mock_context = "foo"
+
+        with metadata.auth_context(mock_context):
+            await self._interceptor.intercept_unary_unary(
+                continuation=self._continuation,
+                client_call_details=client_call_details,
+                request=self._request,
+            )
+
+        client_call_details.metadata.add.assert_called_once_with(mock.ANY, mock_context)

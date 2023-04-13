@@ -1,10 +1,42 @@
-from typing import Any, NoReturn
+import contextlib
+import contextvars
+from typing import Any, Callable, Iterator, NoReturn
 
 import jwt
+from google.protobuf.message import Message
 from google.rpc import error_details_pb2
 from grpc import StatusCode, aio
 
 from snowfall.stdlib.transport.grpc import rich_status
+
+_AUTH_CONTEXT: contextvars.ContextVar[str] = contextvars.ContextVar("auth")
+_AUTH_METADATA_KEY = "authentication"
+
+
+class MetadataContextClientInterceptor(aio.UnaryUnaryClientInterceptor):
+    async def intercept_unary_unary(
+        self,
+        continuation: Callable[[aio.ClientCallDetails, Message], aio.UnaryUnaryCall],
+        client_call_details: aio.ClientCallDetails,
+        request: Message,
+    ) -> aio.UnaryUnaryCall | Message:
+        with contextlib.suppress(LookupError):
+            client_call_details.metadata.add(_AUTH_METADATA_KEY, _AUTH_CONTEXT.get())
+
+        return await continuation(
+            client_call_details,
+            request,
+        )
+
+
+@contextlib.contextmanager
+def auth_context(authentication: str) -> Iterator[None]:
+    token = _AUTH_CONTEXT.set(authentication)
+
+    try:
+        yield
+    finally:
+        _AUTH_CONTEXT.reset(token)
 
 
 async def get_auth_token(context: aio.ServicerContext) -> dict[str, Any]:
@@ -16,7 +48,7 @@ async def get_auth_token(context: aio.ServicerContext) -> dict[str, Any]:
         await _abort(context, "Authentication token not found")
 
     for metadata_key, metadata_value in metadata:
-        if metadata_key == "authentication":
+        if metadata_key == _AUTH_METADATA_KEY:
             try:
                 return jwt.decode(
                     metadata_value,
