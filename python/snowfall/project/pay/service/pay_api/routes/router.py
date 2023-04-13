@@ -104,6 +104,12 @@ def get_admin_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             name="Conversion",
         ),
         integration.route(
+            "/conversions",
+            conversions.ListConversions,
+            name="ListConversion",
+            methods=["GET"],
+        ),
+        integration.route(
             "/accounts/{accountId}/balances",
             balances.Balances,
             name="Balances",
@@ -119,6 +125,18 @@ def get_admin_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             "/transactions",
             transactions.Transactions,
             name="Transactions",
+            methods=["POST"],
+        ),
+        integration.route(
+            "/transactions/{transactionId}",
+            transactions.Transactions,
+            name="Transactions",
+            methods=["GET"],
+        ),
+        integration.route(
+            "/transactions",
+            transactions.ListTransactions,
+            name="ListTransactions",
         ),
         integration.route(
             "/beneficiaries",

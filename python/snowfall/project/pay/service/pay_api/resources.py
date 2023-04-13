@@ -140,6 +140,7 @@ class Transaction(models.Resource):
     def from_proto(
         cls,
         transaction: transaction_models.Transaction,
+        request: requests.Request,
     ) -> Transaction:
         return cls(
             id=transaction.id,
@@ -190,6 +191,14 @@ class Transaction(models.Resource):
                         "type": "companies",
                     },
                 },
+            },
+            links={
+                _SELF_HREF: str(
+                    request.url_for(
+                        "Transactions",
+                        transactionId=transaction.id,
+                    ),
+                ),
             },
         )
 
@@ -299,17 +308,48 @@ class ConversionResource(models.Resource):
     def from_proto(
         cls,
         conversion: Conversion,
+        fx_delta: float | None,
+        transaction_id: str | None,
+        request: requests.Request,
     ) -> ConversionResource:
-        return cls(
+        conversion_resource = cls(
             id=conversion.id,
             type=ConversionResource.api_type,
             attributes={
+                "executedAt": protobuf.protobuf_to_datetime(
+                    conversion.execution_date,
+                ),
                 "settledAt": protobuf.protobuf_to_datetime(
                     conversion.settlement_date,
                 ),
-                "rate": round(conversion.executed_rate, 3),
+                "sellAmount": Money.from_proto(conversion.sell_amount),
+                "buyAmount": Money.from_proto(conversion.buy_amount),
+                "executedRate": round(conversion.executed_rate, 3),
+                "fxDelta": fx_delta,
+                "fxStatus": protobuf.enum_value_to_slug(
+                    conversion.Status.DESCRIPTOR,
+                    conversion.status,
+                ),
+            },
+            links={
+                _SELF_HREF: str(
+                    request.url_for(
+                        "Conversion",
+                        conversionId=conversion.id,
+                    ),
+                ),
             },
         )
+        if transaction_id is not None:
+            conversion_resource.relationships = {
+                "transactions": {
+                    "data": models.ResourceIdentifier(
+                        id=transaction_id,
+                        type=Transaction.api_type,
+                    ),
+                },
+            }
+        return conversion_resource
 
 
 class CurrenciesResource(models.Resource):

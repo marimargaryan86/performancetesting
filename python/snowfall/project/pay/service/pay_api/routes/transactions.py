@@ -1,5 +1,5 @@
 import lagom
-from starlette import endpoints, requests, status
+from starlette import endpoints, exceptions, requests, status
 
 from snowfall.project.pay.service.pay_api import repositories, resources
 from snowfall.project.pay.service.quotations import quotations
@@ -18,8 +18,6 @@ from snowfall.vendor.currency_cloud.models import conversion
 
 
 class Transactions(endpoints.HTTPEndpoint):
-    _default_page_size = 20
-
     async def post(  # noqa: WPS210, WPS211, WPS217
         self,
         request: requests.Request,
@@ -85,6 +83,7 @@ class Transactions(endpoints.HTTPEndpoint):
                 body=messages.models.Body(
                     data=resources.Transaction.from_proto(
                         transaction=transaction,
+                        request=request,
                     ),
                 ),
                 request=request,
@@ -111,6 +110,28 @@ class Transactions(endpoints.HTTPEndpoint):
         request: requests.Request,
         transaction_repository: repositories.TransactionRepository = lagom.injectable,
     ) -> models.JsonApiResponse:
+        transaction_id = request.path_params["transactionId"]
+
+        transaction = await transaction_repository.find_by_id(transaction_id)
+        if transaction is None:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+        return await messages.create_response(
+            body=models.Body(
+                data=resources.Transaction.from_proto(transaction, request),
+            ),
+            request=request,
+        )
+
+
+class ListTransactions(endpoints.HTTPEndpoint):
+    _default_page_size = 20
+
+    async def get(
+        self,
+        request: requests.Request,
+        transaction_repository: repositories.TransactionRepository = lagom.injectable,
+    ) -> models.JsonApiResponse:
         pagination = pagination_helpers.get_pagination(request)
 
         transactions = await transaction_repository.find(
@@ -122,11 +143,11 @@ class Transactions(endpoints.HTTPEndpoint):
         return await messages.create_response(
             body=models.Body(
                 data=[
-                    resources.Transaction.from_proto(transaction)
+                    resources.Transaction.from_proto(transaction, request)
                     async for transaction in transactions
                 ],
                 links=pagination_helpers.get_next_url(
-                    request.url_for("Transactions"),
+                    request.url_for("ListTransactions"),
                     await transactions.cursor(),
                     pagination,
                 ),

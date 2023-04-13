@@ -7,6 +7,7 @@ from pydantic import AnyUrl
 from snowfall.adapter import authentication
 from snowfall.project.pay.adapter import currencies
 from snowfall.project.pay.service.accounts import accounts
+from snowfall.project.pay.service.pay_api import includes
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.repositories import (
     BeneficiaryRepository,
@@ -66,6 +67,9 @@ def create_admin_dependencies(  # noqa: WPS211
     container[TransactionRepository] = transactions_repository
     container[CurrencyRepository] = currencies_repository
     container[BeneficiaryRepository] = beneficiaries_repository
+
+    includes.register_resolvers(transactions_repository)
+
     return container
 
 

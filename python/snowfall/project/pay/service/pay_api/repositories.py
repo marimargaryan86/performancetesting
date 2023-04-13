@@ -107,6 +107,16 @@ class ConversionRepository(
 
         return await self.insert(conversion)
 
+    async def find(
+        self,
+        cursor: str | None,
+        filter_: Mapping[str, Any] | None = None,
+    ) -> resultset.ResultSet[Conversion]:
+        return await self._find_with_cursor(
+            cur=cursor or "",
+            filter_=filter_,
+        )
+
 
 class CurrencyRepository(object):
     def __init__(self, available_currencies: Sequence[money.Currency]):

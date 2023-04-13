@@ -650,6 +650,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/conversionId"
+        },
+        {
+          "$ref": "#/components/parameters/ConversionInclude"
         }
       ],
       "get": {
@@ -1094,6 +1097,50 @@
         }
       }
     },
+    "/transactions/{transactionId}": {
+      "get": {
+        "summary": "Get transaction",
+        "tags": [
+          "transactions"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/transactionId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Transaction"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-transactions-id",
+        "description": "Get transactions-id"
+      }
+    },
     "/transactions": {
       "get": {
         "summary": "List Transactions",
@@ -1198,6 +1245,17 @@
           "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
         },
         "description": "Account id"
+      },
+      "transactionId": {
+        "name": "transactionId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
+        },
+        "description": "Transaction id"
       },
       "conversionId": {
         "name": "conversionId",
@@ -1757,66 +1815,93 @@
       },
       "Conversion": {
         "title": "Conversion Details",
-        "type": "object",
-        "required": [
-          "id",
-          "type",
-          "attributes"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
-            "format": "uuid",
-            "readOnly": true
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "conversions"
+        "allOf": [
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "type",
+              "attributes"
             ],
-            "example": "conversions"
-          },
-          "attributes": {
             "properties": {
-              "executedAt": {
+              "id": {
                 "type": "string",
-                "example": "2023-03-06T14:30:00+00:00",
-                "format": "date-time"
+                "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+                "format": "uuid",
+                "readOnly": true
               },
-              "settledAt": {
-                "type": "string",
-                "example": "2023-03-06T14:30:00+00:00",
-                "format": "date-time"
-              },
-              "sellAmount": {
-                "$ref": "#/components/schemas/Money"
-              },
-              "buyAmount": {
-                "$ref": "#/components/schemas/Money"
-              },
-              "executionRate": {
-                "type": "number",
-                "format": "float",
-                "example": 1.02
-              },
-              "fxDelta": {
-                "type": "number",
-                "format": "float",
-                "description": "difference execution and quotation rates",
-                "example": 1.02
-              },
-              "fxStatus": {
+              "type": {
                 "type": "string",
                 "enum": [
-                  "unspecified",
-                  "executed"
+                  "conversions"
                 ],
-                "example": "executed"
+                "example": "conversions"
+              },
+              "attributes": {
+                "properties": {
+                  "executedAt": {
+                    "type": "string",
+                    "example": "2023-03-06T14:30:00+00:00",
+                    "format": "date-time"
+                  },
+                  "settledAt": {
+                    "type": "string",
+                    "example": "2023-03-06T14:30:00+00:00",
+                    "format": "date-time"
+                  },
+                  "sellAmount": {
+                    "$ref": "#/components/schemas/Money"
+                  },
+                  "buyAmount": {
+                    "$ref": "#/components/schemas/Money"
+                  },
+                  "executedRate": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 1.02
+                  },
+                  "fxDelta": {
+                    "type": "number",
+                    "format": "float",
+                    "nullable": true,
+                    "description": "difference execution and quotation rates",
+                    "example": 1.02
+                  },
+                  "fxStatus": {
+                    "type": "string",
+                    "enum": [
+                      "unspecified",
+                      "executed"
+                    ],
+                    "example": "executed"
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "transactions"
+                ],
+                "properties": {
+                  "transactions": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/TransactionIdentifier"
+                      }
+                    }
+                  }
+                }
               }
             }
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
           }
-        }
+        ]
       },
       "Company": {
         "title": "Company Details",
@@ -2026,222 +2111,229 @@
       },
       "Transaction": {
         "title": "Transaction",
-        "type": "object",
-        "description": "Transaction data",
-        "required": [
-          "id",
-          "type",
-          "attributes"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-            "format": "uuid",
-            "readOnly": true
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "transactions"
-            ],
-            "example": "transactions"
-          },
-          "attributes": {
+        "allOf": [
+          {
+            "type": "object",
+            "description": "Transaction data",
             "required": [
-              "externalReference",
-              "parentExternalReference",
-              "createdAt",
-              "amounts",
-              "rates"
+              "id",
+              "type",
+              "attributes"
             ],
             "properties": {
-              "externalReference": {
+              "id": {
                 "type": "string",
                 "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
                 "format": "uuid",
-                "description": "The UUID related to a specific transaction in our integrating partners DB"
-              },
-              "parentExternalReference": {
-                "type": "string",
-                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-                "format": "uuid"
-              },
-              "createdAt": {
-                "type": "string",
-                "example": "2023-01-20T17:04:14+00:00",
-                "format": "date-time",
                 "readOnly": true
               },
-              "amounts": {
-                "type": "object",
+              "type": {
+                "type": "string",
+                "enum": [
+                  "transactions"
+                ],
+                "example": "transactions"
+              },
+              "attributes": {
                 "required": [
-                  "beneficiary",
-                  "quotation",
-                  "baseConverted",
-                  "salesMargin",
-                  "fxMargin",
-                  "fxProviderMargin"
+                  "externalReference",
+                  "parentExternalReference",
+                  "createdAt",
+                  "amounts",
+                  "rates"
                 ],
                 "properties": {
-                  "beneficiary": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/Money"
-                      }
-                    ],
-                    "readOnly": true,
-                    "description": "This is how much Junction PAY will need to pay out"
+                  "externalReference": {
+                    "type": "string",
+                    "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                    "format": "uuid",
+                    "description": "The UUID related to a specific transaction in our integrating partners DB"
                   },
+                  "parentExternalReference": {
+                    "type": "string",
+                    "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                    "format": "uuid"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "example": "2023-01-20T17:04:14+00:00",
+                    "format": "date-time",
+                    "readOnly": true
+                  },
+                  "amounts": {
+                    "type": "object",
+                    "required": [
+                      "beneficiary",
+                      "quotation",
+                      "baseConverted",
+                      "salesMargin",
+                      "fxMargin",
+                      "fxProviderMargin"
+                    ],
+                    "properties": {
+                      "beneficiary": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/Money"
+                          }
+                        ],
+                        "readOnly": true,
+                        "description": "This is how much Junction PAY will need to pay out"
+                      },
+                      "quotation": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/Money"
+                          }
+                        ],
+                        "readOnly": true,
+                        "description": "The amount that Junction PAY will be owed"
+                      },
+                      "baseConverted": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/Money"
+                          }
+                        ],
+                        "readOnly": true,
+                        "description": "The amount Junction PAY will need to collect in the payers currency to cover what Junction PAY owes to a beneficiary"
+                      },
+                      "salesMargin": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/Money"
+                          }
+                        ],
+                        "readOnly": true,
+                        "description": "The monetary value of the sales markup for a specific transaction"
+                      },
+                      "fxMargin": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/Money"
+                          }
+                        ],
+                        "readOnly": true,
+                        "description": "The monetary value of the fx markup for a specific transaction for Junction PAY"
+                      },
+                      "fxProviderMargin": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/Money"
+                          }
+                        ],
+                        "readOnly": true,
+                        "description": "The monetary value of the provider markup for a specific transaction"
+                      }
+                    },
+                    "readOnly": true
+                  },
+                  "rates": {
+                    "type": "object",
+                    "required": [
+                      "fxQuote",
+                      "fxBuffer",
+                      "salesMarkup",
+                      "fxMarkup"
+                    ],
+                    "properties": {
+                      "fxQuote": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1.02,
+                        "readOnly": true,
+                        "description": "The FX rate Junction PAY provided during the quotation call"
+                      },
+                      "fxBuffer": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1.02,
+                        "readOnly": true,
+                        "description": "The amount  the exchange rate can move between quotation and transaction before Junction PAY loose money on the trade"
+                      },
+                      "salesMarkup": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1.02,
+                        "readOnly": true,
+                        "description": "The percentage Junction PAY adds as a sales fee"
+                      },
+                      "fxMarkup": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1.02,
+                        "readOnly": true,
+                        "description": "The percentage Junction PAY adds to foreign exchange"
+                      }
+                    },
+                    "readOnly": true
+                  }
+                }
+              },
+              "relationships": {
+                "required": [
+                  "quotation"
+                ],
+                "properties": {
                   "quotation": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/Money"
-                      }
+                    "type": "object",
+                    "required": [
+                      "data"
                     ],
-                    "readOnly": true,
-                    "description": "The amount that Junction PAY will be owed"
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/QuotationIdentifier"
+                      }
+                    },
+                    "writeOnly": true
                   },
-                  "baseConverted": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/Money"
-                      }
+                  "conversion": {
+                    "type": "object",
+                    "required": [
+                      "data"
                     ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/ConversionIdentifier"
+                      }
+                    },
                     "readOnly": true,
-                    "description": "The amount Junction PAY will need to collect in the payers currency to cover what Junction PAY owes to a beneficiary"
+                    "description": "The ID that links and FX transaction in the provider system to Junction PAYs transcation history"
                   },
-                  "salesMargin": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/Money"
-                      }
+                  "payer": {
+                    "type": "object",
+                    "required": [
+                      "data"
                     ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/CompanyIdentifier"
+                      }
+                    },
                     "readOnly": true,
-                    "description": "The monetary value of the sales markup for a specific transaction"
+                    "description": "The ID used to determine who will owe Junction PAY a monetary value"
                   },
-                  "fxMargin": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/Money"
-                      }
+                  "beneficiary": {
+                    "type": "object",
+                    "required": [
+                      "data"
                     ],
-                    "readOnly": true,
-                    "description": "The monetary value of the fx markup for a specific transaction for Junction PAY"
-                  },
-                  "fxProviderMargin": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/Money"
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/CompanyIdentifier"
                       }
-                    ],
+                    },
                     "readOnly": true,
-                    "description": "The monetary value of the provider markup for a specific transaction"
+                    "description": "The ID used to determine who Junction PAY owes a monetary value to"
                   }
-                },
-                "readOnly": true
-              },
-              "rates": {
-                "type": "object",
-                "required": [
-                  "fxQuote",
-                  "fxBuffer",
-                  "salesMarkup",
-                  "fxMarkup"
-                ],
-                "properties": {
-                  "fxQuote": {
-                    "type": "number",
-                    "format": "float",
-                    "example": 1.02,
-                    "readOnly": true,
-                    "description": "The FX rate Junction PAY provided during the quotation call"
-                  },
-                  "fxBuffer": {
-                    "type": "number",
-                    "format": "float",
-                    "example": 1.02,
-                    "readOnly": true,
-                    "description": "The amount  the exchange rate can move between quotation and transaction before Junction PAY loose money on the trade"
-                  },
-                  "salesMarkup": {
-                    "type": "number",
-                    "format": "float",
-                    "example": 1.02,
-                    "readOnly": true,
-                    "description": "The percentage Junction PAY adds as a sales fee"
-                  },
-                  "fxMarkup": {
-                    "type": "number",
-                    "format": "float",
-                    "example": 1.02,
-                    "readOnly": true,
-                    "description": "The percentage Junction PAY adds to foreign exchange"
-                  }
-                },
-                "readOnly": true
+                }
               }
             }
           },
-          "relationships": {
-            "required": [
-              "quotation"
-            ],
-            "properties": {
-              "quotation": {
-                "type": "object",
-                "required": [
-                  "data"
-                ],
-                "properties": {
-                  "data": {
-                    "$ref": "#/components/schemas/QuotationIdentifier"
-                  }
-                },
-                "writeOnly": true
-              },
-              "conversion": {
-                "type": "object",
-                "required": [
-                  "data"
-                ],
-                "properties": {
-                  "data": {
-                    "$ref": "#/components/schemas/ConversionIdentifier"
-                  }
-                },
-                "readOnly": true,
-                "description": "The ID that links and FX transaction in the provider system to Junction PAYs transcation history"
-              },
-              "payer": {
-                "type": "object",
-                "required": [
-                  "data"
-                ],
-                "properties": {
-                  "data": {
-                    "$ref": "#/components/schemas/CompanyIdentifier"
-                  }
-                },
-                "readOnly": true,
-                "description": "The ID used to determine who will owe Junction PAY a monetary value"
-              },
-              "beneficiary": {
-                "type": "object",
-                "required": [
-                  "data"
-                ],
-                "properties": {
-                  "data": {
-                    "$ref": "#/components/schemas/CompanyIdentifier"
-                  }
-                },
-                "readOnly": true,
-                "description": "The ID used to determine who Junction PAY owes a monetary value to"
-              }
-            }
+          {
+            "$ref": "#/components/schemas/SelfLink"
           }
-        }
+        ]
       },
       "CompanyIdentifier": {
         "title": "Company Identifier",
@@ -2280,6 +2372,28 @@
               "accounts"
             ],
             "example": "accounts"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "TransactionIdentifier": {
+        "title": "Transaction Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "transactions"
+            ],
+            "example": "transactions"
           }
         },
         "required": [
@@ -2352,6 +2466,30 @@
             "example": "conversions"
           }
         }
+      },
+      "SelfLink": {
+        "title": "Self Link",
+        "type": "object",
+        "properties": {
+          "links": {
+            "type": "object",
+            "required": [
+              "self"
+            ],
+            "properties": {
+              "self": {
+                "type": "string",
+                "format": "uri",
+                "example": "https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              }
+            },
+            "readOnly": true
+          }
+        },
+        "required": [
+          "links"
+        ]
       },
       "NextLink": {
         "title": "Next Link",
