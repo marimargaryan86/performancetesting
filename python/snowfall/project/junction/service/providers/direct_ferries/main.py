@@ -30,6 +30,7 @@ from snowfall.project.junction.service.providers.direct_ferries.gtfs import (
 )
 from snowfall.project.junction.service.providers.direct_ferries.v1alpha import amqp_pb2
 from snowfall.stdlib import h3
+from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.direct_ferries import client
@@ -76,6 +77,8 @@ async def _offers(
             timeout=int(app.settings.api_timeout.total_seconds()),
         ),
     )
+    logging.register(http_client)
+    metrics.register(http_client)
     ferry_adapter = adapter.DfAdapter(
         df_client=_create_client(
             http_client=http_client,
@@ -112,6 +115,8 @@ async def _orders(app: service.Application[config.OrdersSettings]) -> None:
                 timeout=int(app.settings.api_timeout.total_seconds()),
             ),
         )
+        logging.register(http_client)
+        metrics.register(http_client)
         amqp_conn = await stack.enter_async_context(
             types.Connection(app.settings.amqp_dsn),  # nosec
         )
@@ -189,6 +194,8 @@ async def _create_gtfs(app: service.Application[config.GtfsSetting]) -> None:
                 timeout=int(app.settings.api_timeout.total_seconds()),
             ),
         )
+        logging.register(http_client)
+        metrics.register(http_client)
         df_client = _create_client(
             http_client=http_client,
             setting=app.settings,
@@ -223,6 +230,8 @@ async def _static(app: service.Application[config.StaticSettings]) -> None:
                 timeout=int(app.settings.api_timeout.total_seconds()),
             ),
         )
+        logging.register(http_client)
+        metrics.register(http_client)
         df_client = _create_client(http_client, app.settings)
 
         if not app.settings.dump_routes and not app.settings.dump_ports:

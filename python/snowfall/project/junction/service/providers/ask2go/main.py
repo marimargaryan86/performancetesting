@@ -28,7 +28,7 @@ from snowfall.project.junction.service.providers.ask2go import (
 )
 from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
 from snowfall.stdlib import h3
-from snowfall.stdlib.instrumentation.httpx import metrics
+from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
@@ -90,13 +90,13 @@ async def _offers(
     stack: contextlib.AsyncExitStack,
 ) -> _Impl:
     http_client = await stack.enter_async_context(
-        metrics.register(
-            httpx.AsyncClient(
-                http2=True,
-                timeout=app.settings.http_timeout,
-            ),
+        httpx.AsyncClient(
+            http2=True,
+            timeout=app.settings.http_timeout,
         ),
     )
+    logging.register(http_client)
+    metrics.register(http_client)
     ask2go_client = client.Ask2GoClient(
         api_base_url=app.settings.api_base_url,
         api_booking_base_url=app.settings.api_booking_base_url,
@@ -155,13 +155,13 @@ async def _offers(
 async def _orders(app: service.Application[_OrdersSettings]) -> None:
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
-            metrics.register(
-                httpx.AsyncClient(
-                    http2=True,
-                    timeout=app.settings.http_timeout,
-                ),
+            httpx.AsyncClient(
+                http2=True,
+                timeout=app.settings.http_timeout,
             ),
         )
+        logging.register(http_client)
+        metrics.register(http_client)
         redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
             aioredis.from_url(
                 random.choice(app.settings.redis_dsn),  # nosec
@@ -214,13 +214,13 @@ async def _price_quotes(app: service.Application[_PriceQuotesSettings]) -> None:
     )
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
-            metrics.register(
-                httpx.AsyncClient(
-                    http2=True,
-                    timeout=app.settings.http_timeout,
-                ),
+            httpx.AsyncClient(
+                http2=True,
+                timeout=app.settings.http_timeout,
             ),
         )
+        logging.register(http_client)
+        metrics.register(http_client)
         redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
             aioredis.from_url(
                 random.choice(app.settings.redis_dsn),  # nosec
@@ -283,13 +283,13 @@ async def _seat_maps(app: service.Application[_SeatMapsSettings]) -> None:
             ).client(),
         )
         http_client = await stack.enter_async_context(
-            metrics.register(
-                httpx.AsyncClient(
-                    http2=True,
-                    timeout=app.settings.http_timeout,
-                ),
+            httpx.AsyncClient(
+                http2=True,
+                timeout=app.settings.http_timeout,
             ),
         )
+        logging.register(http_client)
+        metrics.register(http_client)
         ask2go_client = client.Ask2GoClient(
             api_base_url=app.settings.api_base_url,
             api_booking_base_url=app.settings.api_booking_base_url,

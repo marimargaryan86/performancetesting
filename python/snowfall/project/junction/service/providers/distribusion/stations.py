@@ -14,6 +14,7 @@ from snowfall.project.junction.service.providers.distribusion.config import (
     DistribusionConfig,
 )
 from snowfall.stdlib import h3, service
+from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.vendor.distribusion import client
 from snowfall.vendor.distribusion.models.stations import Station as VendorStation
 
@@ -46,6 +47,8 @@ async def dump_stations(app: service.Application[DumpStationsSettings]) -> None:
                 timeout=app.settings.api_timeout,
             ),
         )
+        logging.register(http_client)
+        metrics.register(http_client)
         distribusion_client = client.DistribusionClient(
             api_base_url=app.settings.api_base_url,
             api_key=app.settings.api_key,

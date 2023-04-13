@@ -15,7 +15,7 @@ from snowfall.project.junction.service.providers.duffel import (
 )
 from snowfall.project.junction.service.providers.duffel.config import SearchesSettings
 from snowfall.stdlib import service
-from snowfall.stdlib.instrumentation.httpx import metrics
+from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer
@@ -28,13 +28,13 @@ async def price_quotes(  # noqa: WPS210
 ) -> None:
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
-            metrics.register(
-                httpx.AsyncClient(
-                    http2=True,
-                    timeout=app.settings.http_timeout,
-                ),
+            httpx.AsyncClient(
+                http2=True,
+                timeout=app.settings.http_timeout,
             ),
         )
+        logging.register(http_client)
+        metrics.register(http_client)
         redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
             aioredis.from_url(
                 random.choice(app.settings.redis_dsn),  # nosec

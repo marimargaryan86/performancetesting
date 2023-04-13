@@ -12,6 +12,7 @@ from snowfall.project.junction.service.providers.distribusion.config import (
 from snowfall.project.junction.service.providers.distribusion.search import adapter
 from snowfall.project.junction.service.providers.distribusion.v1alpha import amqp_pb2
 from snowfall.stdlib import service
+from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, producer, trackable, types
 from snowfall.vendor.distribusion import client
@@ -26,6 +27,8 @@ async def searches(app: service.Application[SearchesSettings]) -> None:  # noqa:
                 timeout=app.settings.api_timeout,
             ),
         )
+        logging.register(http_client)
+        metrics.register(http_client)
         amqp_connection = await stack.enter_async_context(
             types.Connection(app.settings.amqp_dsn),
         )

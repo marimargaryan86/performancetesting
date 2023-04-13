@@ -13,7 +13,7 @@ from snowfall.project.junction.service.providers.ba_ndc import cache, config, cr
 from snowfall.project.junction.service.providers.ba_ndc.search import adapter
 from snowfall.project.junction.service.providers.ba_ndc.v1alpha import amqp_pb2
 from snowfall.stdlib import h3
-from snowfall.stdlib.instrumentation.httpx import metrics
+from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import types
@@ -41,13 +41,13 @@ async def offers_factory(
         ),
     )
     http_client = await stack.enter_async_context(
-        metrics.register(
-            httpx.AsyncClient(
-                http2=True,
-                timeout=app.settings.http_timeout,
-            ),
+        httpx.AsyncClient(
+            http2=True,
+            timeout=app.settings.http_timeout,
         ),
     )
+    logging.register(http_client)
+    metrics.register(http_client)
     ba_ndc_client = client.BaNdcClient(
         api_base_url=app.settings.api_base_url,
         api_key=app.settings.api_key,

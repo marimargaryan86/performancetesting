@@ -16,6 +16,7 @@ from snowfall.project.junction.service.providers.ba_ndc import (
 )
 from snowfall.project.junction.service.providers.ba_ndc.booking import BookingHandler
 from snowfall.stdlib import service
+from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.ba_ndc import client
@@ -39,6 +40,8 @@ async def orders(app: service.Application[OrdersSettings]) -> None:
                 timeout=app.settings.http_timeout,
             ),
         )
+        logging.register(http_client)
+        metrics.register(http_client)
         redis_connection = await stack.enter_async_context(
             aioredis.from_url(
                 random.choice(app.settings.redis_dsn),  # nosec

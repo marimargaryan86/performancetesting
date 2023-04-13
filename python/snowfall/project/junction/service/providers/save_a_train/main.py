@@ -29,6 +29,7 @@ from snowfall.project.junction.service.providers.save_a_train import (
 from snowfall.project.junction.service.providers.save_a_train.v1alpha import amqp_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import h3
+from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer, types
@@ -108,6 +109,8 @@ async def _offers(
             timeout=app.settings.api_timeout,
         ),
     )
+    logging.register(http_client)
+    metrics.register(http_client)
     save_a_train_client = client.SATClient(
         email=app.settings.api_email,
         password=app.settings.api_password,
@@ -164,6 +167,8 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
                 timeout=app.settings.api_timeout,
             ),
         )
+        logging.register(http_client)
+        metrics.register(http_client)
         amqp_connection = await stack.enter_async_context(
             types.Connection(app.settings.amqp_dsn),
         )
@@ -275,6 +280,8 @@ async def _notifications(app: service.Application[_NotificationsSettings]) -> No
                 timeout=app.settings.api_timeout,
             ),
         )
+        logging.register(http_client)
+        metrics.register(http_client)
         amqp_connection = await stack.enter_async_context(
             types.Connection(app.settings.amqp_dsn),
         )
@@ -376,6 +383,8 @@ async def _dump_stations(app: service.Application[_DumpStationsSettings]) -> Non
                 timeout=app.settings.api_timeout,
             ),
         )
+        logging.register(http_client)
+        metrics.register(http_client)
         save_a_train_client = client.SATClient(
             email=app.settings.api_email,
             password=app.settings.api_password,

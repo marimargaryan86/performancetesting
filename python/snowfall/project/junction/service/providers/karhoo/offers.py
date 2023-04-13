@@ -6,6 +6,7 @@ from redis import asyncio as aioredis
 
 from snowfall.project.junction.service.providers.karhoo import cache, config, consumer
 from snowfall.stdlib import service
+from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer as amqp_producer
@@ -23,6 +24,8 @@ async def offers(  # noqa: WPS210
                 timeout=app.settings.api_timeout.seconds,
             ),
         )
+        logging.register(http_client)
+        metrics.register(http_client)
         amqp_connection = await stack.enter_async_context(
             types.Connection(app.settings.amqp_dsn),
         )
