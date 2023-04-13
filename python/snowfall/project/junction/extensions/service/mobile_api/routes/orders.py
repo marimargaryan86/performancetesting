@@ -1,4 +1,3 @@
-import contextlib
 import copy
 import decimal
 from types import MappingProxyType
@@ -266,11 +265,8 @@ class Orders(endpoints.HTTPEndpoint):
             mobile_order.payment_intent_id,
             smtp_client,
             vouchers_repository,
+            plus_http_client,
         )
-        with contextlib.suppress(httpx.ConnectError):
-            await plus_http_client.register_order(
-                mobile_order.id,
-            )
         junction_order["data"]["relationships"]["payment"] = {
             "data": {
                 "id": mobile_order.payment_intent_id,

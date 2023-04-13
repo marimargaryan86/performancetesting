@@ -22,7 +22,7 @@ class PlusClient(object):
             ),
         )
 
-    async def register_order(self, mobile_order_id: str) -> dict[str, Any] | None:
+    async def register_order(self, mobile_order_id: str) -> None:
         body = {
             "data": {
                 "attributes": {},
@@ -32,7 +32,7 @@ class PlusClient(object):
                 "type": "whatsapp-registrations",
             },
         }
-        return await self._make_request(
+        await self._make_request(
             method="POST",
             url="/register",
             payload=body,
@@ -44,7 +44,7 @@ class PlusClient(object):
         url: str,
         query_parameters: Mapping[str, Any] | None = None,
         payload: Mapping[str, Any] | None = None,
-    ) -> dict[str, Any] | None:
+    ) -> None:
         if self._activated:
             response = await self._client.request(
                 method=method,
@@ -54,6 +54,3 @@ class PlusClient(object):
             )
 
             response.raise_for_status()
-
-            return response.json()
-        return None

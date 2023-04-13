@@ -8,6 +8,7 @@ from jinja2 import Template
 
 from snowfall.project.junction.extensions.service.mobile_api import (
     payments,
+    plus_client,
     repository,
     resources,
     smtp,
@@ -26,16 +27,19 @@ _SUCCESS_STATUSES = frozenset(
 )
 
 
-async def _handle_new_order_results(
+async def _handle_new_order_results(  # noqa: WPS211
     payment_intent_id: str,
     order: Mapping[str, Any],
     smtp_client: smtp.EmailClient,
     vouchers_repository: repository.VouchersRepository,
+    plus_http_client: plus_client.PlusClient,
+    order_id: str,
 ) -> bool:
     booking_statuses = {booking["status"]["id"] for booking in order["bookings"]}
     if booking_statuses and not booking_statuses.difference(_SUCCESS_STATUSES):
         await payments.capture(payment_intent_id)
         await send_booking_confirmation(order, smtp_client)
+        await plus_http_client.register_order(order_id)
         return True
 
     if resources.OrderStatus.pending.value not in booking_statuses:
@@ -46,12 +50,13 @@ async def _handle_new_order_results(
     return False
 
 
-async def poll_order_status(
+async def poll_order_status(  # noqa: WPS211
     junction_client: client.Client,
     order_id: str,
     payment_intent_id: str,
     smtp_client: smtp.EmailClient,
     vouchers_repository: repository.VouchersRepository,
+    plus_http_client: plus_client.PlusClient,
 ) -> bool:
     time_spent = 0
     while time_spent <= _ORDER_STATUS_POLLING_TIMEOUT:
@@ -66,6 +71,8 @@ async def poll_order_status(
             order,
             smtp_client,
             vouchers_repository,
+            plus_http_client,
+            order_id,
         )
         if payment_processed:
             return True
