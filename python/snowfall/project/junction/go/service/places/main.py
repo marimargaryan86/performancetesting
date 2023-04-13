@@ -1,5 +1,6 @@
 import asyncio
 import ipaddress
+import logging
 import random
 from typing import Sequence
 
@@ -16,6 +17,7 @@ from snowfall.project.junction.go.service.places.places import (
     LocationRepository,
     PlaceRepository,
 )
+from snowfall.project.junction.go.service.places.v1alpha.models_pb2 import Place
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import service
 from snowfall.stdlib.persistence import filesystem
@@ -34,6 +36,20 @@ class _GrpcSettings(service.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: Sequence[AnyUrl]
+
+
+async def create(
+    repo: PlaceRepository,
+    city: Place,
+    sem: asyncio.Semaphore,
+    count: int,
+) -> bool:
+    """Create, then release the semaphore."""
+    async with sem:
+        if count % 1000 == 0:
+            logging.info("Rows parsed: %s", count)
+
+        return await repo.create(city)
 
 
 async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
@@ -55,22 +71,13 @@ async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
         "cities.csv",
     )
 
-    async with aiofiles.open(csv_path) as csv_file:
-        resources = []
-
-        async for city in cities.parse_csv(locations_repository, csv_file):
-            resources.append(city)
-
-            if len(resources) == 10:
-                await asyncio.gather(
-                    *[places_repository.create(city) for city in resources],
-                )
-                resources = []
-
-        if not resources:
-            await asyncio.gather(
-                *[places_repository.create(resource) for resource in resources],
-            )
+    sem = asyncio.Semaphore(100)
+    count = 1
+    async with asyncio.TaskGroup() as tg:
+        async with aiofiles.open(csv_path) as csv_file:
+            async for city in cities.parse_csv(locations_repository, csv_file):
+                tg.create_task(create(places_repository, city, sem, count))  # type: ignore[unused-awaitable]  # noqa: B950
+                count += 1
 
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:

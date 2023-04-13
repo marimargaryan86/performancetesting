@@ -1,6 +1,9 @@
 import datetime
+import logging
+import math
+import os
 import uuid
-from typing import AsyncIterable
+from typing import AsyncIterable, Sequence
 
 from aiocsv import AsyncDictReader, protocols
 
@@ -11,8 +14,68 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import latlng_pb2
 
 _MIN_POPULATION = 20000
-_MAX_DISTANCE = 50000  # TODO: differentiate between airports and train stations
 _NAMESPACE = uuid.UUID("105eba69-b787-48ba-9159-6078e0b76e46")
+_MAX_DISTANCE_AIRPORT_M = int(
+    os.getenv("MAX_DISTANCE_AIRPORT_M", 50000),  # noqa: WPS432
+)
+_MAX_DISTANCE_RAIL_M = int(os.getenv("MAX_DISTANCE_RAIL_M", 10000))  # noqa: WPS432
+
+
+def calc_distance(  # noqa: WPS210
+    p1: tuple[float, float],
+    p2: tuple[float, float],
+) -> float:
+    """Return the great circle distance in meters between two points."""
+    lon1, lat1, lon2, lat2 = map(math.radians, (*p1, *p2))  # noqa: WPS221
+
+    dlon = math.sin((lon2 - lon1) / 2) ** 2
+    dlat = math.sin((lat2 - lat1) / 2) ** 2
+    hav = dlat + math.cos(lat1) * math.cos(lat2) * dlon  # noqa: WPS221
+    distance = 2 * math.asin(math.sqrt(hav))
+    radius_of_earth_in_metres = 6371000
+    return distance * radius_of_earth_in_metres
+
+
+def filter_location_by_type(
+    locations: Sequence[models_pb2.Location],
+    longitude: float,
+    latitude: float,
+) -> Sequence[str]:
+    """Return filtered location IDs based on location.
+
+    - Include railways only if < MAX_DISTANCE_RAIL_M from lat/lon
+    - Include all Airports as the Mongo search already filters on MAX_DISTANCE_AIRPORT_M
+
+    Assumes MAX_DISTANCE_AIRPORT_M >= MAX_DISTANCE_RAIL_M
+    """
+    valid_locations = []
+
+    unconditional = {
+        models_pb2.Location.Type.TYPE_AIRPORT,
+        models_pb2.Location.Type.TYPE_CITY,
+    }
+    distance = {
+        models_pb2.Location.Type.TYPE_RAILWAY_STATION,
+        models_pb2.Location.Type.TYPE_FERRY_PORT,
+        models_pb2.Location.Type.TYPE_BUS_STATION,
+    }
+
+    for location in locations:
+        if not unconditional.isdisjoint(location.types):  # noqa: WPS504
+            valid_locations.append(location.id)
+        elif not distance.isdisjoint(location.types):  # noqa: WPS504
+            loc = (location.coordinates.longitude, location.coordinates.latitude)
+            if calc_distance((longitude, latitude), loc) <= _MAX_DISTANCE_RAIL_M:
+                # It's close enough, add it.
+                valid_locations.append(location.id)
+        else:
+            logging.warning(
+                "Location %s has no known location types: %s",
+                location.name,
+                location.types,
+            )
+
+    return valid_locations
 
 
 async def parse_csv(
@@ -20,17 +83,22 @@ async def parse_csv(
     csv_file: protocols.WithAsyncRead,
 ) -> AsyncIterable[models_pb2.Place]:
     async for row in AsyncDictReader(csv_file):
-        location_ids = [
-            location.id
+        locations = [
+            location
             async for location in await locations_repository.find_within_area(
                 cursor="",
                 latitude=float(row["latitude"]),
                 longitude=float(row["longitude"]),
-                max_distance_meters=_MAX_DISTANCE,
+                max_distance_meters=_MAX_DISTANCE_AIRPORT_M,
             )
             # TODO: only locations in the same country
         ]
 
+        location_ids = filter_location_by_type(
+            locations=locations,
+            latitude=float(row["latitude"]),
+            longitude=float(row["longitude"]),
+        )
         if not location_ids:
             continue
 
