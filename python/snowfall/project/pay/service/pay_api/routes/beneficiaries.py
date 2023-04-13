@@ -67,8 +67,9 @@ class Beneficiaries(endpoints.HTTPEndpoint):
             company_name=company.name,
         )
 
-        try:
+        try:  # noqa: WPS229
             payment_client.validate_beneficiary(beneficiary_validate_request)
+            created_beneficiary = payment_client.create_beneficiary(beneficiary_request)
         except CurrencyCloudError as exc:
             if exc.status == status.HTTP_400_BAD_REQUEST:
                 return models.JsonApiResponse(
@@ -85,8 +86,6 @@ class Beneficiaries(endpoints.HTTPEndpoint):
                     status_code=exc.status,
                 )
             raise exc
-
-        created_beneficiary = payment_client.create_beneficiary(beneficiary_request)
 
         beneficiary = await beneficiaries_repository.insert(
             Beneficiary(
