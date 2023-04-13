@@ -44,8 +44,9 @@ def _print_debug_info(
     param_def: click.Parameter,
     param_value: Any,
 ) -> Any:
-    click.echo(orjson.dumps(ctx.to_info_dict()).decode())
-    ctx.exit()
+    if param_value is True:
+        click.echo(orjson.dumps(ctx.to_info_dict()).decode())
+        ctx.exit()
 
 
 @dataclasses.dataclass(frozen=True)
