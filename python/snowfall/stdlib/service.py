@@ -39,6 +39,15 @@ _Settings4 = TypeVar("_Settings4", bound=Settings)
 _Settings5 = TypeVar("_Settings5", bound=Settings)
 
 
+def _print_debug_info(
+    ctx: click.Context,
+    param_def: click.Parameter,
+    param_value: Any,
+) -> Any:
+    click.echo(orjson.dumps(ctx.to_info_dict()).decode())
+    ctx.exit()
+
+
 @dataclasses.dataclass(frozen=True)
 class SentrySettings(object):
     additional_integrations: Optional[sentry.Integrations] = None
@@ -46,7 +55,7 @@ class SentrySettings(object):
 
 
 class _GlobalSettings(Settings):
-    debug_info: bool = False
+    debug_info: bool = pydantic.Field(default=False, callback=_print_debug_info)
     env_name: str = pydantic.Field(default="local", hidden=True)
     log_level: str = "INFO"
     prometheus_port: int | None = None
@@ -138,11 +147,6 @@ def _add_parameters_from_settings(
 @click.pass_context
 def _group(ctx: click.Context, **kwargs: Any) -> None:
     ctx.ensure_object(dict)
-
-    if kwargs["debug_info"]:
-        click.echo(orjson.dumps(ctx.to_info_dict()).decode())
-        ctx.exit()
-
     ctx.obj["global_settings"] = _GlobalSettings.construct(**kwargs)
 
 

@@ -21,6 +21,7 @@ import pydantic
 from snowfall.stdlib import sequence, types
 
 JSON = NewType("JSON", str)
+_Callback = Callable[[click.Context, click.Parameter, Any], Any]
 
 
 def create_from_pydantic_model(
@@ -32,17 +33,36 @@ def create_from_pydantic_model(
     return [_create_from_pydantic_field(field, field_types) for field in fields]
 
 
+def _custom_callback(
+    field: pydantic.fields.ModelField,
+    callback: _Callback,
+) -> _Callback:
+    validator = _validate_option(field)
+
+    def decorator(
+        ctx: click.Context,
+        param_def: click.Parameter,
+        param_value: Any,
+    ) -> Any:
+        param_value = validator(ctx, param_def, param_value)
+
+        return callback(ctx, param_def, param_value)
+
+    return decorator
+
+
 def _create_from_pydantic_field(
     arg: pydantic.fields.ModelField,
     arg_types: Mapping[str, type],
 ) -> click.Parameter:
     arg_type = get_origin(arg_types[arg.name]) or arg_types[arg.name]
     is_multi = arg_type in {abc.Sequence, Sequence, list, set, tuple}
+    callback = arg.field_info.extra.get("callback")
 
     if arg.field_info.extra.get("argument", False):
         return click.Argument(
             [arg.name.replace("_", "-")],
-            callback=_validate_option(arg),
+            callback=callback if callback else _validate_option(arg),
             default=_get_parameter_default(arg),
             envvar=arg.name.upper(),
             nargs=-1 if is_multi else 1,
@@ -52,7 +72,7 @@ def _create_from_pydantic_field(
 
     return click.Option(
         ["--{0}".format(arg.name.replace("_", "-"))],
-        callback=_validate_option(arg),
+        callback=callback if callback else _validate_option(arg),
         default=_get_parameter_default(arg),
         envvar=arg.name.upper(),
         help=arg.field_info.description,
@@ -128,7 +148,7 @@ def _parse_pydantic_result(
 
 def _validate_option(
     field: pydantic.fields.ModelField,
-) -> Callable[[click.Context, click.Parameter, Any], Any]:
+) -> _Callback:
     def decorator(
         ctx: click.Context,
         param_def: click.Parameter,
