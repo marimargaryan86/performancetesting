@@ -4,7 +4,7 @@
       "count": 1,
       "traefik_entrypoints": "websecure",
       "traefik_host_URL": "superapp.junction.dev",
-      "plus_api_address": "plus.api.junction.dev",
+      "plus_api_address": "https://plus.api.junction.dev",
       "plus_activated": true
     }
   },
