@@ -28,7 +28,7 @@ from snowfall.project.junction.service.providers.ask2go import (
 )
 from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
 from snowfall.stdlib import h3
-from snowfall.stdlib.instrumentation import httpx_metrics
+from snowfall.stdlib.instrumentation.httpx import metrics
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
@@ -90,7 +90,7 @@ async def _offers(
     stack: contextlib.AsyncExitStack,
 ) -> _Impl:
     http_client = await stack.enter_async_context(
-        httpx_metrics.with_metrics(
+        metrics.register(
             httpx.AsyncClient(
                 http2=True,
                 timeout=app.settings.http_timeout,
@@ -155,7 +155,7 @@ async def _offers(
 async def _orders(app: service.Application[_OrdersSettings]) -> None:
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
-            httpx_metrics.with_metrics(
+            metrics.register(
                 httpx.AsyncClient(
                     http2=True,
                     timeout=app.settings.http_timeout,
@@ -214,7 +214,7 @@ async def _price_quotes(app: service.Application[_PriceQuotesSettings]) -> None:
     )
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
-            httpx_metrics.with_metrics(
+            metrics.register(
                 httpx.AsyncClient(
                     http2=True,
                     timeout=app.settings.http_timeout,
@@ -283,7 +283,7 @@ async def _seat_maps(app: service.Application[_SeatMapsSettings]) -> None:
             ).client(),
         )
         http_client = await stack.enter_async_context(
-            httpx_metrics.with_metrics(
+            metrics.register(
                 httpx.AsyncClient(
                     http2=True,
                     timeout=app.settings.http_timeout,

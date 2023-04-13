@@ -10,7 +10,7 @@ from snowfall.project.junction.service.providers.duffel.config import SearchesSe
 from snowfall.project.junction.service.providers.duffel.search import adapter
 from snowfall.project.junction.service.providers.duffel.v1alpha import amqp_pb2
 from snowfall.stdlib import service
-from snowfall.stdlib.instrumentation import httpx_metrics
+from snowfall.stdlib.instrumentation.httpx import metrics
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer, trackable, types
@@ -23,7 +23,7 @@ _OFFERS = "offers"
 async def searches(app: service.Application[SearchesSettings]) -> None:  # noqa: WPS210
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
-            httpx_metrics.with_metrics(
+            metrics.register(
                 httpx.AsyncClient(
                     http2=True,
                     timeout=app.settings.http_timeout,

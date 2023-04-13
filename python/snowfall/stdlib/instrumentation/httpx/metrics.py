@@ -1,14 +1,11 @@
-import inspect
-
 import httpx
 import prometheus_client
 
 from snowfall.stdlib.instrumentation import prometheus
+from snowfall.stdlib.instrumentation.httpx import _discovery  # noqa: WPS450
 
-_KNOWN_CLASS_NAMES = ("RequestMetricsHandler", "ResponseMetricsHandler", "AsyncClient")
 
-
-class RequestMetricsHandler(object):
+class _RequestHandler(object):
     _counter_requests = prometheus_client.Counter(
         "http_client_sent_requests_total",
         "Total number of requests sent.",
@@ -17,12 +14,12 @@ class RequestMetricsHandler(object):
 
     async def __call__(self, request: httpx.Request) -> None:
         self._counter_requests.labels(
-            client=_get_parent_class(),
-            method=_get_calling_method(),
+            client=_discovery.get_parent_class(),
+            method=_discovery.get_calling_method(),
         ).inc()
 
 
-class ResponseMetricsHandler(object):
+class _ResponseHandler(object):
     _counter_failed_requests = prometheus_client.Counter(
         "http_client_failed_requests_total",
         "Total number of failed requests.",
@@ -37,8 +34,8 @@ class ResponseMetricsHandler(object):
 
     async def __call__(self, response: httpx.Response) -> None:
         await response.aread()
-        method_name = _get_calling_method()
-        parent_class = _get_parent_class()
+        method_name = _discovery.get_calling_method()
+        parent_class = _discovery.get_parent_class()
 
         self._histogram_response_time.labels(
             client=parent_class,
@@ -53,36 +50,10 @@ class ResponseMetricsHandler(object):
             ).inc()
 
 
-def _get_calling_method() -> str:
-    client_methods = dir(httpx.AsyncClient)  # noqa: WPS421
-    stack = inspect.stack()
-
-    for level in stack:
-        if level.function not in client_methods and not level.function.startswith("_"):
-            return level.function
-
-    return "unknown"
-
-
-def _get_parent_class() -> str:
-    stack = inspect.stack()
-
-    for level in stack:
-        frame_locals = level.frame.f_locals.get("self")
-
-        if frame_locals:
-            class_name = frame_locals.__class__.__name__
-
-            if class_name not in _KNOWN_CLASS_NAMES:
-                return class_name
-
-    return "unknown"
-
-
-def with_metrics(client: httpx.AsyncClient) -> httpx.AsyncClient:
+def register(client: httpx.AsyncClient) -> httpx.AsyncClient:
     registered_hooks = client.event_hooks
-    registered_hooks["request"].append(RequestMetricsHandler())
-    registered_hooks["response"].append(ResponseMetricsHandler())
+    registered_hooks["request"].append(_RequestHandler())
+    registered_hooks["response"].append(_ResponseHandler())
     client.event_hooks = registered_hooks
 
     return client
