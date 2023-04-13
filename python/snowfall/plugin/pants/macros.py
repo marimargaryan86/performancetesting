@@ -1,12 +1,28 @@
-def nomad_template(  # type: ignore[no-untyped-def]
+def nomad_template(  # type: ignore[no-untyped-def]  # noqa: WPS210
     commands: list[str],  # noqa: SF20
     service_entry_point: str,
     **kwargs,  # noqa: ANN003
 ) -> None:
+    try:
+        name = kwargs["name"]
+    except KeyError:
+        name = build_file_dir().name  # type: ignore[name-defined]  # noqa: F821
+
     kwargs.pop("name", None)
     kwargs.pop("sources", None)
 
-    cmd = './bash/lint-configuration.sh {command} "{path}/{filename}.nomad" config.json'
+    cmd = './bash/lint-configuration.sh {command} "{path}/{filename}.nomad" "{config}"'
+    config_path = "{path}/debug_info.json".format(
+        path=build_file_dir(),  # type: ignore[name-defined]  # noqa: F821
+    )
+
+    adhoc_tool(  # type: ignore[name-defined]  # noqa: F821
+        name="{name}_debug_info".format(name=name),
+        runnable=service_entry_point,
+        args=["--debug-info"],
+        stdout=config_path,
+        output_files=[config_path],
+    )
 
     for command_def in commands:
         parts = command_def.split("#")
@@ -17,7 +33,7 @@ def nomad_template(  # type: ignore[no-untyped-def]
             command, filename = parts[1], parts[0]
 
         files(  # type: ignore[name-defined]  # noqa: F821
-            name="{filename}_files".format(filename=filename),
+            name="{name}_{filename}_files".format(name=name, filename=filename),
             sources=[
                 "{filename}.json".format(filename=filename),
                 "{filename}.nomad".format(filename=filename),
@@ -25,24 +41,17 @@ def nomad_template(  # type: ignore[no-untyped-def]
             **kwargs,
         )
 
-        adhoc_tool(  # type: ignore[name-defined]  # noqa: F821
-            name="{filename}_config_data".format(filename=filename),
-            runnable=service_entry_point,
-            args=["--debug-info", command],
-            stdout="config.json",
-            output_files=["config.json"],
-        )
-
         experimental_test_shell_command(  # type: ignore[name-defined]  # noqa: F821
-            name="{filename}_config_test".format(filename=filename),
+            name="{name}_{filename}_test".format(name=name, filename=filename),
             command=cmd.format(
                 command=command,
                 filename=filename,
                 path=build_file_dir(),  # type: ignore[name-defined]  # noqa: F821
+                config=config_path,
             ),
             execution_dependencies=[
-                ":{filename}_files".format(filename=filename),
-                ":{filename}_config_data".format(filename=filename),
+                ":{name}_{filename}_files".format(name=name, filename=filename),
+                ":{name}_debug_info".format(name=name),
                 "bash/lint-configuration.sh",
             ],
             tools=["bash", "grep", "jq"],
