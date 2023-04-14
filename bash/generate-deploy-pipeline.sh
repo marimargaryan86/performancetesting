@@ -47,12 +47,8 @@ for DIR in "${1}"/*; do
 		continue
 	fi
 
-	service_name=$(basename "${DIR}")
-	docker_image=""
-	service_version="latest"
 	image_file="${DIR}/image.txt"
 	skip_deploy="${DIR}/.skip_deploy"
-	has_changed_image=0
 
 	if [ -f "${skip_deploy}" ]; then
 		echo >&2 "skip: \"${skip_deploy}\" exists"
@@ -62,41 +58,30 @@ for DIR in "${1}"/*; do
 	if ! [ -f "${image_file}" ] && grep -q 'variable "docker_image" {' "${DIR}"/*.nomad; then
 		echo >&2 "skip: \"${image_file}\" is missing"
 		continue
-	elif [ -f "${image_file}" ]; then
+	fi
+
+	docker_image=""
+	service_name=$(basename "${DIR}")
+	service_version="latest"
+
+	if [ -f "${image_file}" ]; then
 		docker_image=$(cat "${image_file}")
 		service_name=$(basename "${docker_image%:*}" | sed s/_/-/g)
 		service_version="${docker_image##*:}"
+	fi
 
-		has_changed_image=1
-
-		if [ -n "${CI_COMMIT_BEFORE_SHA+x}" ] && [ "${CI_COMMIT_BEFORE_SHA}" != "0000000000000000000000000000000000000000" ]; then
-			if ! git diff --name-only -r "${CI_COMMIT_BEFORE_SHA}" "${CI_COMMIT_SHA}" | grep -q "^${image_file}"; then
-				has_changed_image=0
-			fi
+	if [ -n "${CI_COMMIT_BEFORE_SHA+x}" ] && [ "${CI_COMMIT_BEFORE_SHA}" != "0000000000000000000000000000000000000000" ]; then
+		if ! git diff --name-only -r "${CI_COMMIT_BEFORE_SHA}" "${CI_COMMIT_SHA}" | grep -q "^${DIR}\/"; then
+			echo >&2 "skip: no changed files in \"${DIR}\""
+			continue
 		fi
 	fi
 
-	has_changed_templates=0
 	templates=()
 
 	for TEMPLATE in "${DIR}"/*.nomad; do
-		if [ -n "${CI_COMMIT_BEFORE_SHA+x}" ] && [ "${CI_COMMIT_BEFORE_SHA}" != "0000000000000000000000000000000000000000" ]; then
-			if git diff --name-only -r "${CI_COMMIT_BEFORE_SHA}" "${CI_COMMIT_SHA}" | grep -q "^${TEMPLATE}"; then
-				has_changed_templates=1
-			fi
-		else
-			has_changed_templates=1
-		fi
-
-		if [ "${has_changed_image}" -eq "1" ] || [ "${has_changed_templates}" -eq "1" ]; then
-			templates+=("${TEMPLATE}")
-		fi
+		templates+=("${TEMPLATE}")
 	done
-
-	if [ "${has_changed_image}" -eq "0" ] && [ "${has_changed_templates}" -eq "0" ]; then
-		echo >&2 "skip: \"${DIR}\" has no changes"
-		continue
-	fi
 
 	if [ -z "${templates+x}" ]; then
 		echo >&2 "skip: \"${DIR}\" has no Nomad template(s)"
