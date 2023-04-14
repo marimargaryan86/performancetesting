@@ -10,6 +10,8 @@ class BeneficiaryValidate(CamelCaseBaseModel):
     beneficiary_address: list[str] | None = None
     beneficiary_country: str | None = None
     account_number: str | None = None
+    routing_code_type_1: str | None = None  # noqa: WPS114
+    routing_code_value_1: str | None = None  # noqa: WPS114
     bic_swift: str | None = None
     iban: str | None = None
     bank_address: list[str] | None = None
@@ -26,7 +28,6 @@ class Beneficiary(BeneficiaryValidate):
     name: str
     bank_account_holder_name: str
     email: str | None = None
-    aba: str | None = None
 
 
 class BeneficiaryValidateRequest(BeneficiaryValidate):

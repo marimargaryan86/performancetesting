@@ -405,7 +405,7 @@ class BeneficiariesResource(models.Resource):
                 "bankDetails": {
                     "name": cc_beneficiary.bank_name,
                     "bicSwift": cc_beneficiary.bic_swift,
-                    "aba": cc_beneficiary.aba,
+                    "aba": cc_beneficiary.routing_code_value_1,
                     "iban": cc_beneficiary.iban,
                     "accountType": cc_beneficiary.bank_account_type,
                     "paymentTypes": (
