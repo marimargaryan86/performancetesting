@@ -47,7 +47,7 @@ class PriceQuoteProducer(object):
         price_quote_container: models_pb2.PriceQuoteContainer,
     ) -> None:
         options = await self._offers_options_repository.find(
-            price_quote_container.option_ids,
+            list(price_quote_container.option_ids),
             "",
         )
         original_option_ids = [
