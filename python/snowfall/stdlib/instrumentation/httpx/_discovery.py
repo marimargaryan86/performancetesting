@@ -8,6 +8,7 @@ _KNOWN_CLASS_NAMES = ("AsyncClient",)
 def get_calling_method() -> str:
     client_methods = dir(httpx.AsyncClient)  # noqa: WPS421
     stack = inspect.stack()
+    stack.pop(0)
 
     for level in stack:
         if level.function not in client_methods and not level.function.startswith("_"):
