@@ -119,6 +119,9 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
                             connection=connection,
                             exchange=types.Exchange("prices"),
                         ),
+                        offers_options_repository=offers.OfferOptionsRepository(
+                            mongo.offers.trip_offers,
+                        ),
                         routing_key="offers.pricing",
                     ),
                 ),

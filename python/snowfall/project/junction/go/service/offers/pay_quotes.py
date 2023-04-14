@@ -45,6 +45,7 @@ class PayQuotes(object):
             )
 
             offer.price.CopyFrom(converted_money.protobuf())
+            offer.initial_offer_id = offer.id
             offer.id = string.to_uuid(session_token, uuid.UUID(offer.id))
         search_result.offer.id = string.to_uuid(
             session_token,
@@ -54,8 +55,8 @@ class PayQuotes(object):
 
     async def get_price_quote_quotes(
         self,
-        search_result: TripPriceQuoteResult,
         session_token: str,
+        search_result: TripPriceQuoteResult,
         payer_id: str,
         to_currency: str,
     ) -> TripPriceQuoteResult:
@@ -77,9 +78,10 @@ class PayQuotes(object):
         )
 
         search_result.price_quote.price.CopyFrom(converted_money.protobuf())
-        search_result.price_quote.id = string.to_uuid(
+
+        search_result.price_quote.option_id = string.to_uuid(
             session_token,
-            uuid.UUID(search_result.price_quote.id),
+            uuid.UUID(search_result.price_quote.option_id),
         )
 
         return search_result
@@ -137,8 +139,8 @@ class PayQuoteFetcher(object):
     ) -> TripPriceQuoteResult:
         if self._use_pay_for_currency_conversions:
             message = await self._pay_quotes.get_price_quote_quotes(
-                message,
                 session_token,
+                message,
                 self._payer_id,
                 self._payer_currency,
             )

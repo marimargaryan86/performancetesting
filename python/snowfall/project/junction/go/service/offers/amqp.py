@@ -1,5 +1,6 @@
 import asyncio
 
+from snowfall.project.junction.go.service.offers.offers import OfferOptionsRepository
 from snowfall.project.junction.go.service.offers.v1alpha import amqp_pb2, models_pb2
 from snowfall.stdlib.transport.amqp import protocol, trackable
 
@@ -35,14 +36,25 @@ class PriceQuoteProducer(object):
         self,
         producer: protocol.Producer,
         routing_key: str,
+        offers_options_repository: OfferOptionsRepository,
     ):
         self._producer = producer
         self._routing_key = routing_key
+        self._offers_options_repository = offers_options_repository
 
     async def publish(
         self,
         price_quote_container: models_pb2.PriceQuoteContainer,
     ) -> None:
+        options = await self._offers_options_repository.find(
+            price_quote_container.option_ids,
+            "",
+        )
+        original_option_ids = [
+            offer.initial_offer_id if offer.initial_offer_id else offer.id
+            async for offer in options
+        ]
+
         await asyncio.gather(
             *[
                 self._producer.publish(
@@ -53,6 +65,6 @@ class PriceQuoteProducer(object):
                     ),
                     routing_key=self._routing_key,
                 )
-                for option_id in price_quote_container.option_ids
+                for option_id in original_option_ids
             ],
         )

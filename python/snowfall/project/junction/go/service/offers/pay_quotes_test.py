@@ -124,7 +124,7 @@ async def test_that_pay_quotes_invoked_and_response_returned() -> None:
     )
 
 
-async def test_that_all_amounts_in_trip_offer_search_result_replaced_with_conversions() -> (  # noqa:WPS210,B950
+async def test_that_all_amounts_in_trip_offer_search_result_replaced_with_conversions() -> (  # noqa:WPS210,B950,WPS218
     None
 ):
     mock_pay_client = create_autospec(PayClient, spec_set=True, instance=True)
@@ -165,6 +165,7 @@ async def test_that_all_amounts_in_trip_offer_search_result_replaced_with_conver
             "session-token",
             uuid.UUID("009fd15a-c7f0-11ed-afa1-0242ac120002"),
         )
+        assert offer.initial_offer_id == "009fd15a-c7f0-11ed-afa1-0242ac120002"
 
     assert modified_result.offer.id == string.to_uuid(
         "session-token",
@@ -202,7 +203,7 @@ async def test_that_price_in_trip_price_quote_result_replaced_with_conversion() 
         option_id="an-id",
         price_quote=PriceQuote(
             id="009fd15a-c7f0-11ed-afa1-0242ac120002",
-            option_id="an-id",
+            option_id="487b5a88-a77c-4798-bedd-ec414a1f0e88",
             expires_at=None,
             price=Money(currency_code="EUR", units=500, nanos=0),
             required_documents=None,
@@ -213,19 +214,19 @@ async def test_that_price_in_trip_price_quote_result_replaced_with_conversion() 
     )
 
     modified_result = await pay_quotes.get_price_quote_quotes(
-        price_quote_result,
         "session-token",
+        price_quote_result,
         "payer-id",
         "SEK",
     )
 
     assert modified_result.price_quote.price.units == 15
     assert modified_result.price_quote.price.currency_code == "SEK"
-    assert modified_result.price_quote.id == string.to_uuid(
-        "session-token",
-        uuid.UUID("009fd15a-c7f0-11ed-afa1-0242ac120002"),
-    )
     assert modified_result.price_quote.pay_quote_id == "a-quotation-id"
+    assert modified_result.price_quote.option_id == string.to_uuid(
+        "session-token",
+        uuid.UUID("487b5a88-a77c-4798-bedd-ec414a1f0e88"),
+    )
 
     mock_pay_client.create_quote.assert_called_once_with(
         amount=50000,
