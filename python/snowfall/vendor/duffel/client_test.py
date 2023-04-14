@@ -75,7 +75,11 @@ async def test_error(
 ) -> None:
     offer_id = "off_0000AQRKj9nf2S3luPitBA"
     json_res = conftest.load_file_fixture("errors.json")
-    expected_title = "422: Can't book multiple offers from the same offer request"
+    expected_title = (
+        "422: Can't book multiple offers from the same offer request, Field"
+        " 'selected_offers' has offers included in a offer request"  # noqa: WPS326
+        " that has already been booked; please perform a new search"  # noqa: WPS326
+    )
 
     httpx_mock.add_response(
         url=_BASE_URL.format(
@@ -99,7 +103,10 @@ async def test_error_with_source_str(
 ) -> None:
     offer_id = "off_0000AQRKj9nf2S3luPitBA"
     json_res = conftest.load_file_fixture("order_create_error.json")
-    expected_title = "500: Internal Airline Error"
+    expected_title = (
+        "500: Internal Airline Error, The airline responded"
+        " with an internal_error error. Please contact us."  # noqa: WPS326
+    )
 
     httpx_mock.add_response(
         url=_BASE_URL.format(

@@ -27,8 +27,9 @@ def _get_response_error_message(response: httpx.Response) -> str:
         return "can't parse error"
 
     error_status = str(errors_response.meta.status if errors_response.meta else "")
-    error_message = errors_response.errors[0].title if errors_response.errors else ""
-    return "{0}: {1}".format(error_status, error_message)
+    error_title = errors_response.errors[0].title if errors_response.errors else ""
+    error_message = errors_response.errors[0].message if errors_response.errors else ""
+    return "{0}: {1}, {2}".format(error_status, error_title, error_message)
 
 
 class DuffelClient(object):  # noqa: WPS214
