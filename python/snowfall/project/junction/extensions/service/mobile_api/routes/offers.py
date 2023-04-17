@@ -88,7 +88,7 @@ class OfferSearch(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         offer_search = await junction_client.get_offer_search(
             offers_search_id=request.path_params["offerSearchId"],
-            include=request.scope["query_string"].get(
+            include=request.scope["parsed_query_string"].get(
                 "include",
                 [],
             ),
@@ -109,7 +109,7 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
         offers_rates_repository: repository.OffersRatesRepository = lagom.injectable,
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
-        query_string = request.scope["query_string"]
+        query_string = request.scope["parsed_query_string"]
 
         offers_response = await junction_client.get_offers_by_offer_search_id(
             offers_search_id=request.path_params["offerSearchId"],

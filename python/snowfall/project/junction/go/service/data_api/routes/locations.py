@@ -16,9 +16,11 @@ class Locations(endpoints.HTTPEndpoint):
         geocoder: geocoding_pb2_grpc.GeocodingServiceStub = lagom.injectable,
     ) -> responses.Response:
         bias_position = None
-        bias_position_str = request.query_params.get("query[biasPosition]")
-        if bias_position_str:
-            bias_long, bias_lat = bias_position_str.split(
+        query_string = request.scope["parsed_query_string"]
+        if query_string.get("query[biasPosition]"):
+            bias_long, bias_lat = query_string.get(
+                "query[biasPosition]",
+            ).split(
                 ",",
             )
             bias_position = latlng_pb2.LatLng(
@@ -27,12 +29,18 @@ class Locations(endpoints.HTTPEndpoint):
             )
         locations_response = await geocoder.LocationLookup(
             geocoding_pb2.LocationLookupRequest(
-                language=request.query_params.get("query[language]", "en"),
-                limit=int(
-                    request.query_params.get("page[limit]", _DEFAULT_LIMIT),
+                language=query_string.get(
+                    "query[language]",
+                    "en",
                 ),
-                text=request.query_params["query[text]"],
-                countries=request.query_params.get("query[countries]"),
+                limit=int(
+                    query_string.get(
+                        "page[limit]",
+                        _DEFAULT_LIMIT,
+                    ),
+                ),
+                text=query_string["query[text]"],
+                countries=query_string.get("query[countries]"),
                 bias_position=bias_position,
             ),
         )

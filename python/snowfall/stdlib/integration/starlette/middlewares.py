@@ -1,4 +1,5 @@
 from typing import Awaitable, Callable, Container, cast
+from urllib import parse as urllib_parse
 
 import sentry_sdk
 import structlog
@@ -128,7 +129,10 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
         except OpenAPIError as err:
             return await self._handle_validation_error(resolved_request, err)
 
-        resolved_request.scope["query_string"] = openapi_result.parameters.query
+        resolved_request.scope["query_string"] = urllib_parse.urlencode(
+            openapi_result.parameters.query,
+        )
+        resolved_request.scope["parsed_query_string"] = openapi_result.parameters.query
         resolved_request.scope["security"] = openapi_result.security
 
         return await self._dispatch(call_next, openapi_request, resolved_request)

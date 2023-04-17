@@ -163,7 +163,7 @@ async def resolve_includes(
     body: models.Body,
     request: requests.Request,
 ) -> list[models.Resource]:
-    wanted_includes = frozenset(request.scope["query_string"].get("include", []))
+    wanted_includes = frozenset(request.scope["parsed_query_string"].get("include", []))
     resolver = _IncludesResolver(wanted_includes)
 
     return list(

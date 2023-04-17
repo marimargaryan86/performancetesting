@@ -105,7 +105,7 @@ def _create_request(include_paths: Sequence[str] | None = None) -> requests.Requ
     return requests.Request(
         scope={
             "type": "http",
-            "query_string": {
+            "parsed_query_string": {
                 "include": include_paths or [],
             },
         },

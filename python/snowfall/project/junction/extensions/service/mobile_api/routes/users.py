@@ -136,7 +136,7 @@ class UserLoggedIn(endpoints.HTTPEndpoint):
         user_id = request.user.username
         user_deleted = await users_repository.delete(
             user_id,
-            request.query_params.get("password", ""),
+            request.scope["parsed_query_string"].get("password", ""),
         )
         if not user_deleted:
             return models.JsonApiResponse(

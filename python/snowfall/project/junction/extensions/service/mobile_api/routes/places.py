@@ -34,7 +34,7 @@ class Places(endpoints.HTTPEndpoint):
         request: requests.Request,
         places_repository: repository.PlacesRepository = lagom.injectable,
     ) -> responses.Response:
-        search_key = request.query_params.get(_SEARCH_KEY)
+        search_key = request.scope["parsed_query_string"].get(_SEARCH_KEY)
         if search_key is None:
             places = await places_repository.find()
         else:

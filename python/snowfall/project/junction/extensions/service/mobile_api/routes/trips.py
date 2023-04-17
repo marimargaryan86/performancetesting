@@ -47,7 +47,7 @@ class TripSearchesTrips(endpoints.HTTPEndpoint):
         pagination = pagination_helpers.get_pagination(request)
         trip_search = await junction_client.trips().get_trips_by_trip_search_id(
             trips_search_id=request.path_params["tripSearchId"],
-            include=request.scope["query_string"].get(
+            include=request.scope["parsed_query_string"].get(
                 "include",
                 [],
             ),

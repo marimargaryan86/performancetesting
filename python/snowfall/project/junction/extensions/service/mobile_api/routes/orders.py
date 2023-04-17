@@ -79,7 +79,7 @@ class Order(endpoints.HTTPEndpoint):
             raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
         order_response = await junction_client.get_order_by_id(
             identifier=mobile_order.id,
-            include=request.scope["query_string"].get(
+            include=request.scope["parsed_query_string"].get(
                 "include",
                 [],
             ),
@@ -127,7 +127,7 @@ class Orders(endpoints.HTTPEndpoint):
         async for mobile_order in user_mobile_orders:
             order_response = await junction_client.get_order_by_id(
                 identifier=mobile_order.id,
-                include=request.scope["query_string"].get(
+                include=request.scope["parsed_query_string"].get(
                     "include",
                     [],
                 ),

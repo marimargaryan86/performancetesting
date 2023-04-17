@@ -18,7 +18,7 @@ class Programs(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
 
-        search_key = request.query_params.get(_SEARCH_KEY)
+        search_key = request.scope["parsed_query_string"].get(_SEARCH_KEY)
         programs = await loyalty_programs_repository.find(
             cursor=pagination.cursor,
             limit=pagination.limit,
