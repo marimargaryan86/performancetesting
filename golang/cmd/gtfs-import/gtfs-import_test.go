@@ -15,13 +15,13 @@ type dataset struct {
 
 func TestRoutesWhitelist(t *testing.T) {
 	var datasets []dataset
-	var routesWhitelist map[string][]string
+	var routesWhitelist map[string]map[string][]string
 
 	if err := json.Unmarshal(routesWhitelistFile, &routesWhitelist); err != nil {
 		t.Fatal(err)
 	}
 
-	for datasetName, allowedSegmentTypes := range routesWhitelist {
+	for datasetName, allowedSegmentTypes := range routesWhitelist["types"] {
 		for _, segmentType := range allowedSegmentTypes {
 			if _, ok := whitelistTypeMapping[segmentType]; !ok {
 				t.Error(fmt.Errorf("%s contains an unsupported segment type: %s", datasetName, segmentType))

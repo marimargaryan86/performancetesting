@@ -1,17 +1,48 @@
 {
-    "directferries": ["ferry"],
-    "distribusion": ["bus"],
-    "gtfs.de": ["rail"],
-    "Intercites": ["rail"],
-    "NMBS_SNCB": ["rail"],
-    "openov": ["rail"],
-    "OBB": ["rail"],
-    "OVapi": ["rail"],
-    "PKP": ["rail"],
-    "Rejseplanen": ["rail"],
-    "renfe": ["rail"],
-    "SBB": ["rail"],
-    "ssim": ["air"],
-    "TER": ["rail"],
-    "TGV": ["rail"]
+    "directferries":{
+        "types": ["ferry"]
+    },
+    "distribusion":{
+        "types": ["bus"]
+    },
+    "gtfs.de":{
+        "types": ["rail"]
+    },
+    "Intercites":{
+        "types": ["rail"]
+    },
+    "NMBS_SNCB":{
+        "types": ["rail"]
+    },
+    "openov":{
+        "types": ["rail"]
+    },
+    "OBB":{
+        "types": ["rail"],
+        "operators": ["OEBB Personenverkehr AG Kundenservice", "City Air Terminal Betriebsgesellschaft m.b.H."]
+    },
+    "OVapi":{
+        "types": ["rail"]
+    },
+    "PKP":{
+        "types": ["rail"]
+    },
+    "Rejseplanen":{
+        "types": ["rail"]
+    },
+    "renfe":{
+        "types": ["rail"]
+    },
+    "SBB":{
+        "types": ["rail"]
+    },
+    "ssim":{
+        "types": ["air"]
+    },
+    "TER":{
+        "types": ["rail"]
+    },
+    "TGV":{
+        "types": ["rail"]
+    }
 }

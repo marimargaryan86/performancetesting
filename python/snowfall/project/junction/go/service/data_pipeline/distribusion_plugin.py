@@ -9,16 +9,13 @@ URL to download the data Returns a tuple of URLs and other stuff.
 Note it also does a ClientSession.head call on each code URL to check it is valid.
 """
 import os
+from pprint import pprint
 from typing import Any, Iterator
 
 from httpx import AsyncClient
 
 from snowfall.project.junction.go.service.data_pipeline.types import Dataset
 
-# Codes for carriers we want to download.
-# To view all available carriers, you need the API key, and can then make a request to:
-#  | dataset["url"] + "/retailers/v4/marketing_carriers"
-# With headers: {"api-key": api_key}
 CARRIER_CODES = ("MEGB",)
 
 
@@ -32,6 +29,15 @@ async def distribusion_plugin(
         raise RuntimeError("Missing DISTRIBUSION_API_KEY env var.") from exc
 
     headers = {"api-key": api_key}
+
+    # For debugging, log the available carriers.
+    resp = await sess.get(
+        dataset["url"] + "/retailers/v4/marketing_carriers",  # noqa: WPS336
+        headers=headers,
+    )
+    print("Distribusion: Available codes:")  # noqa: WPS421
+    pprint(resp.json()["data"])  # noqa: WPS421,T203
+
     url = (
         dataset["url"] + "/retailers/v4/marketing_carriers/{code}/gtfs"  # noqa: WPS336
     )

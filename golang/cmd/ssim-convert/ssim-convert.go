@@ -199,6 +199,7 @@ ResultParser:
 
 			if !airlinesToExport[v.AirlineDesignator] {
 				zipWriter = nil
+				fmt.Printf("SKIP carrier: \"%s\n\"", v.AirlineDesignator)
 				continue ResultParser
 			}
 			delete(airlinesToExport, v.AirlineDesignator)

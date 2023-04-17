@@ -600,7 +600,7 @@ func main() {
 		panic("ERROR No .ZIP files found in file source.")
 	}
 
-	var routesWhitelist map[string][]string
+	var routesWhitelist map[string]map[string][]string
 	if err := json.Unmarshal(routesWhitelistFile, &routesWhitelist); err != nil {
 		panic(err)
 	}
@@ -663,12 +663,20 @@ func main() {
 					panic(fmt.Sprintf("No whitelist found for %s", fileStem))
 				}
 			}
-			for _, typeName := range whitelist {
+			for _, typeName := range whitelist["types"] {
 				t, ok := whitelistTypeMapping[typeName]
 				if !ok {
 					panic(fmt.Sprintf("Unrecognised type in whitelist: %s", typeName))
 				}
 				validRouteTypes[t] = struct{}{}
+			}
+			var validAgencyNames map[string]bool // nil if no whitelist
+			if agencyIds, ok := whitelist["operators"]; ok {
+				validAgencyNames = make(map[string]bool)
+				for _, agencyName := range agencyIds {
+					// Boolean value indicates if we've seen the agency in the data.
+					validAgencyNames[agencyName] = false
+				}
 			}
 
 			now := time.Now()
@@ -705,6 +713,14 @@ func main() {
 					break
 				}
 				check(err)
+
+				if validAgencyNames != nil {
+					if _, ok := validAgencyNames[agency.Name]; !ok {
+						log.Printf("\n(%v) Skip operator \"%v\"\n", sourceRef, agency.Name)
+						continue
+					}
+					validAgencyNames[agency.Name] = true
+				}
 
 				routes := make([]*gtfs.Route, 0)
 				db.Where("agency_id = ?", agency.Id).Order("id ASC").Find(&routes)
@@ -807,6 +823,12 @@ func main() {
 							scheduleProtoWriterChan <- &newSchedule
 						}
 					}
+				}
+			}
+
+			for name, seen := range validAgencyNames {
+				if !seen {
+					panic(fmt.Sprintf("Unknown agency in whitelist: %v", name))
 				}
 			}
 
