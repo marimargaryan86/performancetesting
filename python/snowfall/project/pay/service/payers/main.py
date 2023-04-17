@@ -14,7 +14,7 @@ from snowfall.stdlib.transport.grpc import server
 class _GrpcSettings(service.Settings):
     default_page_size: int = 100
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
-    grpc_port: int = 50055
+    grpc_port: int = 50051
     mongo_dsn: Sequence[AnyUrl]
 
 

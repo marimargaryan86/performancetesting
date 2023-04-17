@@ -18,7 +18,7 @@ from snowfall.vendor.apilayer.client import APILayer
 
 class _GrpcSettings(service.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
-    grpc_port: int = 50062
+    grpc_port: int = 50051
     mongo_dsn: Sequence[AnyUrl]
 
 
