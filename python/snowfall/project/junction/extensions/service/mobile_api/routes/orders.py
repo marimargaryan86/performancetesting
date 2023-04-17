@@ -280,7 +280,7 @@ class Orders(endpoints.HTTPEndpoint):
         )
 
 
-async def check_payment_amount_and_state(
+async def check_payment_amount_and_state(  # noqa:WPS210
     payment_intent_id: str,
     quote: str,
     voucher: models_pb2.Voucher | None,
@@ -293,15 +293,16 @@ async def check_payment_amount_and_state(
         quote,
     )
     rate = decimal.Decimal(1)
-    if pi["currency"].upper() != "EUR":
+    quote_currency = money.Currency(
+        quote_response["data"]["attributes"]["price"]["currency"],
+    )
+    if pi["currency"].upper() != quote_currency.code:
         if not cached_rate:
             raise exceptions.HTTPException(status.HTTP_502_BAD_GATEWAY)
         rate = decimal.Decimal(cached_rate.rate)
     quote_money = money.from_string(
         quote_response["data"]["attributes"]["price"]["amount"],
-        money.Currency(
-            quote_response["data"]["attributes"]["price"]["currency"],
-        ),
+        quote_currency,
     ).convert(
         money.Currency(pi["currency"].upper()),
         rate,
