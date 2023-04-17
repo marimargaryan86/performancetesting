@@ -1,4 +1,6 @@
 import datetime
+import decimal
+import enum
 import os
 import random
 import uuid
@@ -28,6 +30,14 @@ disable_by_default = pytest.mark.skipif(
 )
 
 
+class PaymentMethod(enum.Enum):
+    """Dimension unit enum."""
+
+    cash = "cash"
+    credit_card = "credit card"
+    none = "none"
+
+
 @disable_by_default
 async def test_get_offers(ba_ndc_client: client.BaNdcClient) -> None:
     offer_searches_rs = await call_get_offers(ba_ndc_client, "LHR", "MAN")
@@ -47,7 +57,12 @@ async def test_get_offer(ba_ndc_client: client.BaNdcClient) -> None:
 
 @disable_by_default
 async def test_create_domestic_order(ba_ndc_client: client.BaNdcClient) -> None:
-    order_rs = await generate_order(ba_ndc_client, "LHR", "MAN")
+    order_rs = await generate_order(
+        ba_ndc_client,
+        "LHR",
+        "MAN",
+        payment_method=PaymentMethod.cash,
+    )
     assert order_rs is not None
     assert order_rs.order is not None
 
@@ -62,6 +77,7 @@ async def test_create_international_order(ba_ndc_client: client.BaNdcClient) -> 
         "SYD",
         set_passport_info=True,
         set_residence_country_code=True,
+        payment_method=PaymentMethod.cash,
     )
     assert order_rs is not None
     assert order_rs.order is not None
@@ -78,6 +94,7 @@ async def test_create_order_to_usa(ba_ndc_client: client.BaNdcClient) -> None:
         set_passport_info=True,
         set_residence_country_code=True,
         set_residence_address=True,
+        payment_method=PaymentMethod.cash,
     )
     assert order_rs is not None
     assert order_rs.order is not None
@@ -328,6 +345,7 @@ async def generate_order(
     set_passport_info: bool = False,
     set_residence_address: bool = False,
     set_residence_country_code: bool = False,
+    payment_method: PaymentMethod = PaymentMethod.none,
 ) -> response_order_schemas.OrderResponse:
     offer_searches_rs = await call_get_offers(ba_ndc_client, origin, destination)
     offer = random.choice(offer_searches_rs.get_offers())  # nosec
@@ -361,10 +379,10 @@ async def generate_order(
                     request_order_schemas.IdentityDocument(
                         document_number="9823445678",
                         document_type="PT",
-                        birth_date=datetime.date.fromisoformat("1991-01-01"),
+                        birth_date=datetime.date.fromisoformat("1970-01-01"),
                         nationality="GBR",
                         issuing_country="FRA",
-                        expiration_date=datetime.date.fromisoformat("2022-05-06"),
+                        expiration_date=datetime.date.fromisoformat("2030-05-06"),
                         residence_country_code=residence_country_code,
                     ),
                 ]
@@ -382,6 +400,13 @@ async def generate_order(
             city="NYK",
             zip_code="TW345RT",
             country_code="USA",
+        )
+
+    if payment_method == PaymentMethod.cash:
+        order_request_builder.set_cash_payment_info(
+            passenger_id="PA0",
+            currency_code=offer.price.currency,
+            amount=decimal.Decimal(offer.price.total_amount),
         )
 
     return await ba_ndc_client.create_order(order_request_builder.build())

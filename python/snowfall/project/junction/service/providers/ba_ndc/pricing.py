@@ -1,13 +1,13 @@
 import contextlib
 import random
 
-import structlog
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.go.service.offers.v1alpha import (
     amqp_pb2 as offers_amqp_pb2,
 )
 from snowfall.project.junction.service.providers.ba_ndc import (
+    ba_ndc_helpers,
     cache,
     config,
     pricing_transformer,
@@ -64,7 +64,7 @@ class PriceQuoteConsumer(object):
     ):
         self._cache = offer_cache
         self._consumer = consumer_obj
-        self._logger = structlog.get_logger(__name__)
+        self._logger = ba_ndc_helpers.get_logger(__name__)
         self._producer = producer_obj
         self._transformer = transformer
         self._provider_company_id = provider_company_id

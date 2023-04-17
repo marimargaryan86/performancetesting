@@ -5,11 +5,11 @@ from typing import Sequence
 import aiosmtplib
 import httpx
 import pydantic
-import structlog
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2
 from snowfall.project.junction.service.providers.ba_ndc import (
+    ba_ndc_helpers,
     cache,
     config,
     notifications,
@@ -20,8 +20,6 @@ from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.ba_ndc import client
-
-_PROVIDER_NAME = "BA_NDC"
 
 
 class OrdersSettings(config.BaNdcConfig, service.Settings):
@@ -99,7 +97,7 @@ class OrderConsumer(object):
         self._producer = producer_obj
         self._booking = booking_handler
         self._cache = offer_cache
-        self._logger = structlog.get_logger(__name__)
+        self._logger = ba_ndc_helpers.get_logger(__name__)
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -111,7 +109,7 @@ class OrderConsumer(object):
         offer_details = await self._cache.fetch(
             amqp_message.body.booking.trip_option.id,
         )
-        amqp_message.body.booking.provider_name = _PROVIDER_NAME
+        amqp_message.body.booking.provider_name = ba_ndc_helpers.PROVIDER_NAME
 
         if not offer_details:
             self._logger.warning(

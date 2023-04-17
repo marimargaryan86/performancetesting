@@ -1,17 +1,13 @@
 from collections import defaultdict
 from typing import AsyncIterator, Mapping
 
-import structlog
-
 from snowfall.project.junction.go.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
 from snowfall.project.junction.provider import airports
-from snowfall.project.junction.service.providers.ba_ndc import cache
+from snowfall.project.junction.service.providers.ba_ndc import ba_ndc_helpers, cache
 from snowfall.project.junction.service.providers.ba_ndc.search import parser
 from snowfall.project.junction.service.providers.ba_ndc.v1alpha import amqp_pb2
-from snowfall.stdlib import string
-from snowfall.stdlib.format import protobuf
 from snowfall.vendor.ba_ndc import client
 from snowfall.vendor.ba_ndc.adapters.offers_response_adapter import (
     OffersResponseAdapter,
@@ -84,14 +80,14 @@ class BaNdcSearchAdapter(object):
             offer_cache=offers_cache,
             airport_repository=airport_repository,
         )
-        self._logger = structlog.get_logger(__name__)
+        self._logger = ba_ndc_helpers.get_logger(__name__)
 
     def search_criteria_generator(
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
     ) -> request_offer_search_schemas.OfferSearchRequest:
         offer_request_builder = OffersRequestBuilder()
-        outbound_date = protobuf.protobuf_to_datetime(
+        outbound_date = ba_ndc_helpers.proto_to_date_time(
             search_task.criteria.outbound_departure,
         )
 
@@ -121,7 +117,7 @@ class BaNdcSearchAdapter(object):
         )
 
         if search_task.criteria.HasField("inbound_departure"):
-            inbound_date = protobuf.protobuf_to_datetime(
+            inbound_date = ba_ndc_helpers.proto_to_date_time(
                 search_task.criteria.inbound_departure,
             )
             offer_request_builder.add_trip(
@@ -139,7 +135,7 @@ class BaNdcSearchAdapter(object):
         self,
         search_criteria: request_offer_search_schemas.OfferSearchRequest,
     ) -> str:
-        return string.to_uuid(
+        return ba_ndc_helpers.str_to_uuid(
             b"\x00".decode().join(
                 [
                     search_criteria.cabin_type.name,

@@ -28,7 +28,7 @@ class PayerDetails(BaseSchema):
         ...,
         alias="type",
     )
-    contact: ContactDetailed = pydantic.Field(description="Contact information")
+    contact: ContactDetailed | None = pydantic.Field(description="Contact information")
 
 
 class PayerDetailsPassenger(PayerDetails):

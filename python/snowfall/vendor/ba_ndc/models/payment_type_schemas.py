@@ -1,4 +1,5 @@
 from abc import ABC
+from decimal import Decimal
 from typing import Literal
 
 import pydantic
@@ -45,7 +46,8 @@ class CashPayment(Payment):
         description="Cash payment type",
         alias="type",
     )
-    # TODO: Impl.
+    currency_code: str = pydantic.Field(description="Currency code")
+    amount: Decimal = pydantic.Field(description="Amount")
 
 
 class VoucherPayment(Payment):

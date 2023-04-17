@@ -1,20 +1,14 @@
-import datetime
-import itertools
-
 import more_itertools
-import phonenumbers
 import pycountry
-import structlog
 
 from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2, models_pb2
 from snowfall.project.junction.service.providers.ba_ndc import (
+    ba_ndc_helpers,
     cache,
     criteria,
     enums,
     notifications,
 )
-from snowfall.stdlib import money
-from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import postal_address_pb2
 from snowfall.vendor.ba_ndc import client, errors
 from snowfall.vendor.ba_ndc.adapters.order_view_adapter import OrderViewAdapter
@@ -38,21 +32,6 @@ def _format_country(
             return country_obj.alpha_3
 
     return ""
-
-
-def _get_last_travel_date(
-    task: amqp_pb2.PlaceOrderTask,
-) -> datetime.date:
-    segments = itertools.chain(
-        [tr.segment for tr in task.booking.trip_option.details],
-    )
-
-    return max(
-        protobuf.protobuf_to_datetime(
-            more_itertools.last(segment.legs).departure_at,
-        ).date()
-        for segment in segments
-    )
 
 
 def _get_residence_address(
@@ -82,14 +61,18 @@ def _get_passport_document(
         return request_order_schemas.IdentityDocument(
             document_number=passenger.doc_details.document_number,
             document_type=_PASSPORT_DOCUMENT_TYPE,
-            birth_date=protobuf.protobuf_to_date(passenger.date_of_birth),
+            birth_date=ba_ndc_helpers.proto_to_date(passenger.date_of_birth),
             nationality=_format_country(passenger.doc_details.nationality),
-            issuing_country=_format_country(passenger.doc_details.issue_county),
-            expiration_date=protobuf.protobuf_to_date(
+            issuing_country=_format_country(
+                passenger.doc_details.issue_county,
+            ),
+            expiration_date=ba_ndc_helpers.proto_to_date(
                 passenger.doc_details.exp_date,
             ),
             residence_country_code=(
-                _format_country(passenger.doc_details.residence_country_code)
+                _format_country(
+                    passenger.doc_details.residence_country_code,
+                )
                 if passenger.doc_details.residence_country_code
                 else None
             ),
@@ -108,7 +91,7 @@ class BookingHandler(object):
         notifier: notifications.Notifier,
     ):
         self._client = ba_ndc_client
-        self._logger = structlog.get_logger(__name__)
+        self._logger = ba_ndc_helpers.get_logger(__name__)
         self._notifier = notifier
 
     async def book(
@@ -138,22 +121,15 @@ class BookingHandler(object):
             new_booking.MergeFrom(
                 models_pb2.Booking(
                     status=models_pb2.Booking.STATUS_CONFIRMED,
-                    total_price=money.from_string(
-                        string_amount=str(
-                            booking_adapter.get_order().price.total_amount,
-                        ),
-                        currency=money.Currency(
-                            booking_adapter.get_order().price.currency,
-                        ),
-                    ).protobuf(),
+                    total_price=ba_ndc_helpers.parse_price(
+                        booking_adapter.get_order().price,
+                    ),
                     trip_result=models_pb2.TripBooking(
                         provider_booking_reference=str(
                             booking_adapter.get_booking_result().identifier,
                         ),
                         record_locator=booking_adapter.get_pnr(),
-                        created_at=protobuf.datetime_to_protobuf(
-                            datetime.datetime.now(tz=datetime.timezone.utc),
-                        ),
+                        created_at=ba_ndc_helpers.date_to_proto_now(),
                     ),
                     raw_data=booking_adapter.get_booking_result().json(),
                 ),
@@ -166,7 +142,9 @@ class BookingHandler(object):
         task: amqp_pb2.PlaceOrderTask,
         details: cache.OfferDetails,
     ) -> OrderViewAdapter:
-        number = phonenumbers.parse(task.contact_details.phone.e164_number)
+        number = ba_ndc_helpers.parse_phone_number(
+            task.contact_details.phone.e164_number,
+        )
         order_request = OrderRequestBuilder(details.offer_id)
 
         for index, passenger in enumerate(task.passengers):
@@ -179,8 +157,8 @@ class BookingHandler(object):
                 request_order_schemas.PassengerExtended(
                     identifier=details.passengers[index].identifier,
                     passenger_type=criteria.get_passenger_type_enum(
-                        protobuf.protobuf_to_date(passenger.date_of_birth),
-                        _get_last_travel_date(task),
+                        ba_ndc_helpers.proto_to_date(passenger.date_of_birth),
+                        ba_ndc_helpers.get_last_travel_date(task),
                     ),
                     first_name=passenger.first_name,
                     last_name=passenger.last_name,
@@ -188,7 +166,7 @@ class BookingHandler(object):
                         6:
                     ].upper(),
                     gender=enums.gender_from_proto(passenger.gender),
-                    birth_date=protobuf.protobuf_to_date(passenger.date_of_birth),
+                    birth_date=ba_ndc_helpers.proto_to_date(passenger.date_of_birth),
                     contact=response_common_passenger_schemas.Contact(
                         email=task.contact_details.email,
                         phone=response_common_passenger_schemas.Phone(
@@ -211,6 +189,12 @@ class BookingHandler(object):
                 details.return_flight_to_usa,
                 task.residence_address,
             )
+
+        order_request.set_cash_payment_info(
+            more_itertools.first(details.passengers).identifier,
+            details.price.currency,
+            ba_ndc_helpers.str_to_decimal(details.price.amount),
+        )
 
         adapter = OrderViewAdapter(
             await self._client.create_order(order_request.build()),
