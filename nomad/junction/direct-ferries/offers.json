@@ -6,7 +6,8 @@
             "affiliate_api_url": "https://tf-test-affiliate-api-sandbox.auth.eu-west-1.amazoncognito.com",
             "client_id": "3r2ha5jopuaphv9fctntqtraso",
             "partner_code": "F5152",
-            "provider_company_id": "3270a409-43b5-4be6-aebd-c3adc6ebfd0f"
+            "provider_company_id": "3270a409-43b5-4be6-aebd-c3adc6ebfd0f",
+            "api_timeout": "PT70S"
         }
     },
     "production": {

@@ -30,6 +30,10 @@ variable "api_url" {
   type = string
 }
 
+variable "api_timeout" {
+  type = string
+}
+
 variable "client_id" {
   type = string
 }
@@ -138,6 +142,7 @@ EOH
         AFFILIATE_API_URL   = "${var.affiliate_api_url}"
         API_URL             = "${var.api_url}"
         PROVIDER_COMPANY_ID = "${var.provider_company_id}"
+        API_TIMEOUT         = "${var.api_timeout}"
       }
     }
   }
