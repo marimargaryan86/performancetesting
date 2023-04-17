@@ -7,6 +7,7 @@ require (
 	github.com/bits-and-blooms/bloom v2.0.3+incompatible
 	github.com/catmullet/tz v0.1.0
 	github.com/getsentry/sentry-go v0.19.0
+	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8
 	github.com/google/uuid v1.3.0
 	github.com/jszwec/csvutil v1.8.0
 	github.com/jyggen/confusables v0.0.0-20210123020050-f1ff430ca6a3
@@ -19,6 +20,7 @@ require (
 	github.com/xanzy/go-gitlab v0.81.0
 	go.mongodb.org/mongo-driver v1.11.2
 	go.uber.org/zap v1.24.0
+	golang.org/x/sync v0.1.0
 	golang.org/x/text v0.8.0
 	google.golang.org/grpc v1.53.0
 	google.golang.org/protobuf v1.29.0
@@ -31,7 +33,6 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
-	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
