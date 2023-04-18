@@ -184,8 +184,12 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                                     type=await self._cabin_mapping.resolve_cabin_class(
                                         fare_brand=transfer_fare.name,
                                         operator=_resolve_train_operator(
-                                            train_category=transfer_change.train.category,
-                                            train_number=transfer_change.train.number,
+                                            train_category=transfer.changes[
+                                                0
+                                            ].train.category,
+                                            train_number=transfer.changes[
+                                                0
+                                            ].train.number,
                                         ),
                                     ),
                                     marketing_name=transfer_fare.name.replace(
@@ -205,11 +209,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                         ).capitalize(),
                     )
                     for transfer in search_details.transfers
-                    for transfer_fare, transfer_change in zip(
-                        transfer.fares,
-                        transfer.changes,
-                        strict=True,
-                    )
+                    for transfer_fare in transfer.fares
                 ],
                 segments=[
                     offer_models_pb2.OfferSegment(
