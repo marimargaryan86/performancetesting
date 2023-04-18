@@ -9,6 +9,7 @@ from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 class OrdersRepository(
     mixins.FindByIdMixin[mobile_models_pb2.MobileOrder],
+    mixins.InsertMixin[mobile_models_pb2.MobileOrder],
     repository.ProtoRepository[mobile_models_pb2.MobileOrder],
 ):
     _proto = mobile_models_pb2.MobileOrder

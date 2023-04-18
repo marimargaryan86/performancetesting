@@ -2,6 +2,9 @@ import json_api_doc
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
+from snowfall.project.junction.extensions.service.mobile_api.v1alpha import (
+    models_pb2 as mobile_models_pb2,
+)
 from snowfall.project.junction.plus.service.poc_api import (
     chatbot_utils,
     icoupon,
@@ -24,9 +27,19 @@ class WhatsappRegister(endpoints.HTTPEndpoint):
         twilio_client: twilio.TwilioClient = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
-        order = await orders_repository.find_by_id(body["orders"])
-        if not order:
-            raise exceptions.HTTPException(status.HTTP_502_BAD_GATEWAY)
+        response = json_api_doc.deserialize(
+            await junction_client.get_order_by_id(
+                identifier=body["orders"],
+                include=["journey", "bookings.details"],
+            ),
+        )
+        order = mobile_models_pb2.MobileOrder(
+            id=response["id"],
+            spnr=response["journey"]["reference"],
+            mobile_number=response["journey"]["contactDetails"]["phoneNumber"],
+        )
+        await orders_repository.insert(order)
+
         mobile_number = "".join(order.mobile_number.split())
         subscription = await subscriptions_repository.find_by_id(mobile_number)
         # For now, we add manually the potential subscribers into this collection.
