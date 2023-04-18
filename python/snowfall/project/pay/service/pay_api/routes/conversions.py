@@ -98,7 +98,7 @@ class ListConversions(endpoints.HTTPEndpoint):
                 ),
             )
         list_conversion_url = request.url_for("ListConversion")
-        includes = request.scope["query_string"].get("include")
+        includes = request.scope["parsed_query_string"].get("include")
         if includes is not None:
             list_conversion_url = list_conversion_url.include_query_params(
                 include=",".join(includes),

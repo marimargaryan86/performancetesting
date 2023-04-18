@@ -35,6 +35,13 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             "/transactions",
             transactions.Transactions,
             name="Transactions",
+            methods=["GET", "POST"],
+        ),
+        integration.route(
+            "/transactions/{transactionId}",
+            transactions.Transactions,
+            name="Transactions",
+            methods=["GET"],
         ),
         integration.route(
             "/rates",
