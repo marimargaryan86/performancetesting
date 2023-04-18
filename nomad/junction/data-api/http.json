@@ -3,14 +3,17 @@
     "variables": {
       "count": 1,
       "traefik_entrypoints": "websecure",
-      "traefik_host_URL": "data.junction.dev"
+      "traefik_host_URL": "data.junction.dev",
+      "data_api_host": "data.junction.dev"
     }
   },
   "production": {
+    "deploy": false,
     "variables": {
       "count": 2,
       "traefik_entrypoints": "web",
-      "traefik_host_URL": "data.junction.travel"
+      "traefik_host_URL": "data.junction.travel",
+      "data_api_host": ""
     }
   }
 }
