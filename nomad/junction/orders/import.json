@@ -4,7 +4,7 @@
       "count": 2,
       "api_pay_base_url": "https://api.pay.junction.dev",
       "pay_admin_api_base_url": "https://adminapi.pay.junction.dev",
-      "use_pay_to_create_transaction": false
+      "use_pay_to_create_transaction": true
     }
   },
   "production": {
