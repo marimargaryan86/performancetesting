@@ -1,0 +1,5 @@
+mongodata/
+.pants.d/
+.git/
+*.log
+.DS_Store/

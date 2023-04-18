@@ -1,0 +1,44 @@
+version: '3.7'
+
+# tests/schedule_tests/docker-compose.yml
+# run from project root as
+# `docker compose --file  tests/schedule_tests/docker-compose.yml up -d`
+# NOTE exposes Mongo on port:27027 so that it does not clash with any normal Mongo running
+# Run pants export-codegen :: before running this (or use `make build`)
+
+services:
+  e2e-mongo:
+    image: mongo
+    restart: always
+    ports:
+      - "27027:27017"
+    container_name: e2e-mongo
+    hostname: e2e-mongo
+
+  e2e-test:
+    build:
+      dockerfile: bash/tests/schedule_tests/DockerfileE2E
+      # context relative to the  dockerfile above, hence ../../.. to get back to project root
+      context: ../../..
+    volumes:
+      # To be changed for production use!
+      - ${HOME}/.aws/credentials:/root/.aws/credentials:ro
+      - ${PWD}:/junction
+      - feeds-volume:/feeds
+    environment:
+      - E2E_TEST_YML_FILE=${E2E_TEST_YML_FILE}
+      - E2E_DATA_ROOT=${E2E_DATA_ROOT:-/feeds}
+      - HTML_TEMPLATE=${HTML_TEMPLATE:-golang/cmd/planner-test-client/planner-test-report.html}
+      - MONGODB=${MONGODB}
+      - SLACK_URI=${SLACK_URI}
+      - RUN_DATE=${RUN_DATE}
+      - KG_RUN_TYPE=${KG_RUN_TYPE}
+    ports:
+      - "50050:50053"
+    depends_on:
+      - e2e-mongo
+    container_name: e2e-test
+    hostname: e2e-test
+
+volumes:
+  feeds-volume:
