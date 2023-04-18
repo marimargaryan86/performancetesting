@@ -3,7 +3,7 @@ from unittest import mock
 import grpc
 import pytest
 
-from snowfall import fixtures
+from snowfall.project.junction.go import fixtures
 from snowfall.project.junction.go.adapter import errors, schedules
 from snowfall.project.junction.go.service.schedules.v1alpha import (
     schedules_pb2,

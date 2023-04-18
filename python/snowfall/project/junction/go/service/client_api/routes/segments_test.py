@@ -1,7 +1,7 @@
 import httpx
 from starlette import status
 
-from snowfall import fixtures
+from snowfall.project.junction.go import fixtures
 
 
 class TestSegments(object):

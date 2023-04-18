@@ -1,6 +1,6 @@
 import httpx
 
-from snowfall import fixtures
+from snowfall.project.junction.go import fixtures
 from snowfall.stdlib.integration.starlette import testing
 
 

@@ -1,9 +1,45 @@
+import zoneinfo
 from typing import Collection
 
 import pytest
 
 from snowfall.stdlib import h3
 from snowfall.stdlib.v1alpha import models_pb2
+
+_H3_LOCATIONS = [
+    h3.CoordinatesItem(
+        identifier="SAT_IT_MA_XZWAD",
+        latitude=46.287961,
+        longitude=11.232652,
+        timezone=zoneinfo.ZoneInfo("Europe/Stockholm"),
+    ),
+    h3.CoordinatesItem(
+        identifier="SAT_DE_VO_XSTMO",
+        latitude=49.2556226,
+        longitude=6.8588948,
+        timezone=zoneinfo.ZoneInfo("Europe/Stockholm"),
+    ),
+    h3.CoordinatesItem(
+        identifier="SAT_FR_PA_WXNGQ",
+        latitude=48.861496,
+        longitude=2.33368,
+        timezone=zoneinfo.ZoneInfo("Europe/Stockholm"),
+    ),
+    h3.CoordinatesItem(
+        identifier="SAT_FR_RE_VDQTY",
+        latitude=48.103175,
+        longitude=-1.672335,
+        timezone=zoneinfo.ZoneInfo("Europe/Stockholm"),
+    ),
+]
+
+
+@pytest.fixture()
+def h3_mapping_repository() -> h3.H3MappingRepository[h3.CoordinatesItem]:
+    return h3.H3MappingRepository(
+        mapping=_H3_LOCATIONS,
+        resolution=8,
+    )
 
 
 @pytest.mark.parametrize(

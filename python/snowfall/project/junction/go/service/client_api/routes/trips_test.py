@@ -6,7 +6,7 @@ import httpx
 import pytest
 from starlette import status
 
-from snowfall import fixtures
+from snowfall.project.junction.go import fixtures
 from snowfall.project.junction.go.adapter import trip_searches
 
 

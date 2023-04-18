@@ -4,7 +4,7 @@ from unittest import mock
 import grpc
 import pytest
 
-from snowfall import fixtures
+from snowfall.project.junction.go import fixtures
 from snowfall.project.junction.go.adapter import errors, offers
 from snowfall.project.junction.go.service.offers.v1alpha import (
     grpc_pb2,

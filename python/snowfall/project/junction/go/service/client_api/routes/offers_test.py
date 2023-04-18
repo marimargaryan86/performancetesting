@@ -5,7 +5,7 @@ import orjson
 import pytest
 from starlette import status
 
-from snowfall import fixtures
+from snowfall.project.junction.go import fixtures
 from snowfall.stdlib.integration.starlette import testing
 
 

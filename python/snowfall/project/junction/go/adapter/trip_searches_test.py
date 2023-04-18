@@ -1,6 +1,6 @@
 import pytest
 
-from snowfall import fixtures
+from snowfall.project.junction.go import fixtures
 from snowfall.project.junction.go.adapter import errors, trip_searches
 
 
