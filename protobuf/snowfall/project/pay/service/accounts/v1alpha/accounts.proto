@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package snowfall.project.pay.service.accounts.v1alpha;
+
+import "snowfall/project/pay/service/accounts/v1alpha/models.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/accounts/v1alpha";
+
+service AccountsService {
+  rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse) {}
+  rpc GetAccount(GetAccountRequest) returns (GetAccountResponse) {}
+  rpc ListAccounts(ListAccountsRequest) returns (ListAccountsResponse) {}
+}
+
+message CreateAccountRequest {
+  Account account = 1;
+}
+
+message CreateAccountResponse {
+  Account account = 1;
+}
+
+message GetAccountRequest {
+  string id = 1;
+}
+
+message GetAccountResponse {
+  Account account = 1;
+}
+
+message ListAccountsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  repeated string ids = 3;
+}
+
+message ListAccountsResponse {
+  repeated Account accounts = 1;
+  string next_page_token = 2;
+}
