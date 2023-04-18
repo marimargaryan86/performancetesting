@@ -30,6 +30,14 @@ variable "traefik_host_URL" {
   type = string
 }
 
+variable "traefik_headers_accesscontrolalloworiginlist" {
+  type = string
+}
+
+variable "traefik_headers_accesscontrolallowheaders" {
+  type = string
+}
+
 variable "count" {
   type = number
 }
@@ -76,7 +84,12 @@ job "poc-api-http" {
         "http",
         "traefik.enable=true",
         "traefik.http.routers.poc-api-${var.environment}.entrypoints=${var.traefik_entrypoints}",
+        "traefik.http.middlewares.poc-api-${var.environment}-cors-headers.headers.accessControlAllowOriginList=${var.traefik_headers_accesscontrolalloworiginlist}",
+        "traefik.http.middlewares.poc-api-${var.environment}-cors-headers.headers.accessControlAllowHeaders=${var.traefik_headers_accesscontrolallowheaders}",
+        "traefik.http.middlewares.poc-api-${var.environment}-cors-headers.headers.addVaryHeader=true",
         "traefik.http.routers.poc-api-${var.environment}.rule=Host(`${var.traefik_host_URL}`)",
+        "traefik.http.routers.poc-api-${var.environment}.middlewares=poc-api-${var.environment}-cors-headers",
+
       ]
 
       check {
