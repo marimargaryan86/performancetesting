@@ -52,3 +52,9 @@ class BookingImporter(object):
                     "Failed to create a transaction in Pay for booking",
                     booking_id=message.body.id,
                 )
+        else:
+            self._logger.warning(
+                "Unable to find price_quote for booking",
+                booking_id=message.body.id,
+                price_quote_id=message.body.trip_option.price_quote_id,
+            )
