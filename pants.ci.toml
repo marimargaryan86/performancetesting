@@ -6,6 +6,7 @@ remote_cache_read = true
 remote_cache_read_timeout_millis = 15000
 remote_cache_write = true
 remote_store_address = "grpc://10.0.135.64:9092"
+remote_store_rpc_concurrency = 256
 
 [coverage-py]
 report = ["console", "xml"]

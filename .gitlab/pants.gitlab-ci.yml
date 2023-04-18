@@ -22,6 +22,10 @@ pants:setup:
   after_script:
     - ./bash/nuke-if-too-big.sh "${SCIE_BASE}" 512
     - ./bash/nuke-if-too-big.sh "${PANTS_NAMED_CACHES_DIR}" 2048
+  artifacts:
+    paths:
+      - .pants.d/pants.log
+    when: always
   variables:
     GIT_DEPTH: 0
     GIT_STRATEGY: clone
