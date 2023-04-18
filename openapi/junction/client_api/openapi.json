@@ -7058,13 +7058,6 @@
       "TravelerDocument": {
         "title": "TravelerDocument",
         "type": "object",
-        "required": [
-          "documentType",
-          "documentNumber",
-          "documentIssueCountry",
-          "documentExpirationDate",
-          "nationality"
-        ],
         "properties": {
           "documentType": {
             "type": "string",
