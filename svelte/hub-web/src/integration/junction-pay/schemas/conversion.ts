@@ -10,7 +10,6 @@ export interface ConversionSchema extends ConversionIdentifierSchema {
   };
 }
 
-export interface ListConversionsResponseSchema {
-  data: ConversionSchema[];
-  links: { next: string };
+export interface GetConversionDetailsResponseSchema {
+  data: ConversionSchema;
 }

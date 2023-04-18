@@ -8,7 +8,7 @@
   import { yymmdd } from "formatting/date-time";
   import type { DirectionY } from "models/spatial";
   import type { TransactionModel } from "models/transaction";
-  import { sortTransactions } from "sorting/transactions";
+  import { sortTransactions } from "sorting/transaction";
   import type { FlattenedObject } from "utils/common";
   import type { PageData } from "./$types";
 

@@ -68,8 +68,8 @@
     flex-flow: column;
     gap: 8px;
     height: calc(100vh - 196px);
-    margin: 0 -16px -24px;
-    padding: 0 16px 24px;
+    margin: 0 -24px -24px;
+    padding: 0 24px 24px;
     overflow: auto;
     font-weight: 600;
     font-size: 16px;

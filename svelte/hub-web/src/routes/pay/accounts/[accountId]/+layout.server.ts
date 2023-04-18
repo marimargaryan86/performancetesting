@@ -1,6 +1,6 @@
-import { error } from "@sveltejs/kit";
-import { mockAccounts } from "mock/account";
+import integrationInstances from "integration-instances";
 import type { AccountModel } from "models/account";
+import { getToken } from "utils/auth";
 import type { LayoutServerLoadEvent } from "./$types";
 
 interface BreadCrumb {
@@ -26,18 +26,15 @@ function getBreadCrumbs(event: LayoutServerLoadEvent): BreadCrumb[] {
   return breadCrumbs;
 }
 
-export function load(event: LayoutServerLoadEvent): {
+export async function load(event: LayoutServerLoadEvent): Promise<{
   breadCrumbs: BreadCrumb[];
   account: AccountModel;
-} {
-  const account = mockAccounts[0];
-
-  if (!account) {
-    throw error(404, "Not Found");
-  }
-
+}> {
   return {
     breadCrumbs: getBreadCrumbs(event),
-    account: { ...account, id: event.params.accountId },
+    account: await integrationInstances.junctionPay.accounts.getAccount(
+      getToken(event),
+      event.params.accountId,
+    ),
   };
 }

@@ -24,7 +24,7 @@
     try {
       const token = await integrationInstances.junctionPay.auth.createToken(data);
       const expiresAt = new Date();
-      expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+      expiresAt.setMinutes(expiresAt.getMinutes() + 20);
 
       document.cookie = `session-token=${token}; expires=${expiresAt}; path=/;`;
 

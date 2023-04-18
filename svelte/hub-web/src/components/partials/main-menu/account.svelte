@@ -13,8 +13,8 @@
   <img src="https://www.gravatar.com/avatar/{gravatarHash}?s=40&d=retro" alt="" />
 
   <div class="info">
-    <strong class="ellipsis typography body-medium bold">{user.name}</strong>
-    <span class="ellipsis typography label-small">{user.email}</span>
+    <strong class="ellipsis typography body-small bold">{user.name}</strong>
+    <span class="ellipsis typography body-small">{user.email}</span>
   </div>
 </div>
 
@@ -36,6 +36,14 @@
     width: calc(100% - 52px);
     color: var(--color-neutral-800);
     transition: opacity var(--transition-time) ease;
+  }
+
+  .info > strong {
+    color: var(--color-common-light-strong);
+  }
+
+  .info > span {
+    color: var(--color-common-light-medium);
   }
 
   .info > * {

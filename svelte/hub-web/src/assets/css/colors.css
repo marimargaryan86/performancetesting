@@ -24,4 +24,17 @@
     #3f8574 68.75%,
     #21735f 100%
   );
+
+  /* Common */
+  --color-common-light-soft: #788a86;
+  --color-common-light-medium: #5f716c;
+  --color-common-light-strong: #17372f;
+  --color-common-dark-strong: #ffffff;
+  --color-common-background-light-green: #e2f3ef;
+  --color-common-background-light-main: #ffffff;
+
+  /* Main */
+  --color-main-neutral-50: #f0f2f5;
+  --color-main-neutral-400: #bfc1c5;
+  --color-main-primary-500: #4bb69c;
 }

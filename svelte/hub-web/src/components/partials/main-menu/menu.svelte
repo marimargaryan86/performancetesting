@@ -11,7 +11,6 @@
   interface SubMenu {
     type: "sub-menu";
     label: string;
-    color: string;
     expanded: boolean;
     items: MenuItem[];
   }
@@ -41,7 +40,6 @@
     {
       type: "sub-menu",
       label: "Pay",
-      color: "#ff7d37",
       expanded: $page.url.pathname.startsWith("/pay"),
       items: [
         {
@@ -73,7 +71,6 @@
     {
       type: "sub-menu",
       label: "Go",
-      color: "#b881ff",
       expanded: $page.url.pathname.startsWith("/go"),
       items: [
         {
@@ -99,35 +96,50 @@
   {#each menuItems as item}
     <li>
       {#if item.type === "menu-item"}
+        {@const active = $page.url.pathname === item.url}
         <a
           href={item.url}
-          class:active={$page.url.pathname === item.url}
+          class="typography body-medium"
+          class:active
           title={expanded ? undefined : item.label}
         >
-          <svelte:component this={item.icon} color="var(--color-primary-500)" />
+          <svelte:component
+            this={item.icon}
+            color="var({active ? '--color-main-primary-500' : '--color-common-light-strong'})"
+          />
           <span>{item.label}</span>
         </a>
       {:else}
         <button
+          class="typography body-small"
           type="button"
-          on:click={createToggleFunc(item)}
           title={expanded ? undefined : item.label}
+          on:click={createToggleFunc(item)}
         >
-          <strong style:--dot-color={item.color} />
           <span>{item.label}</span>
-          <ChevronIcon color="var(--color-neutral-400)" direction={item.expanded ? "up" : "down"} />
+          <ChevronIcon
+            color="var(--color-main-neutral-400)"
+            direction={item.expanded ? "up" : "down"}
+          />
         </button>
 
         {#if item.expanded}
           <ul transition:slide|local={{ duration: 250 }}>
             {#each item.items as subItem}
+              {@const active = $page.url.pathname.startsWith(subItem.url)}
               <li>
                 <a
+                  class="typography body-medium"
                   href={subItem.url}
-                  class:active={$page.url.pathname.startsWith(subItem.url)}
+                  class:active
                   title={expanded ? undefined : subItem.label}
                 >
-                  <svelte:component this={subItem.icon} color="var(--color-primary-500)" />
+                  <svelte:component
+                    this={subItem.icon}
+                    color="var({active
+                      ? '--color-main-primary-500'
+                      : '--color-common-light-strong'})"
+                  />
                   <span>{subItem.label}</span>
                 </a>
               </li>
@@ -158,43 +170,19 @@
     width: 100%;
     padding: 10px 8px;
     overflow: hidden;
-    color: var(--color-neutral-900);
-    font-weight: 600;
-    font-size: 16px;
-    font-family: "Red Hat Display", Arial, Helvetica, sans-serif;
-    font-style: normal;
-    letter-spacing: 0.1px;
+    color: var(--color-common-light-medium);
     text-decoration: none;
     background-color: transparent;
     border: 0;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
   }
 
   button {
-    color: var(--color-neutral-600);
-    font-weight: 700;
-    font-size: 12px;
-    letter-spacing: 4px;
+    color: var(--color-common-light-soft);
     text-transform: uppercase;
   }
 
-  strong {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  strong::before {
-    display: block;
-    width: 8px;
-    height: 8px;
-    background-color: var(--dot-color);
-    border-radius: 50%;
-    content: "";
-  }
-
-  strong,
   a > :global(svg) {
     flex-shrink: 0;
     width: 20px;
@@ -208,12 +196,12 @@
     transition: opacity var(--transition-time) ease;
   }
 
-  .menu:not(.expanded) span {
+  .menu:not(.expanded) a > span {
     opacity: 0;
   }
 
   .active {
-    font-weight: 700;
-    background-color: rgb(0 0 0 / 0.08);
+    color: var(--color-common-light-strong);
+    background-color: var(--color-common-background-light-green);
   }
 </style>

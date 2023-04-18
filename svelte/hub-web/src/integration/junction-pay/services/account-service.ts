@@ -2,8 +2,14 @@ import type { AccountModel } from "models/account";
 import type { ListAccountsResponseSchema } from "../schemas/account";
 import JunctionPayService from "./junction-pay-service";
 
+let cache: AccountModel[] | undefined = undefined;
+
 export default class AccountService extends JunctionPayService {
   async listAccounts(token: string): Promise<AccountModel[]> {
+    if (cache) {
+      return cache;
+    }
+
     const resp = await this.makeRequest("/accounts", { token });
 
     if (resp.status !== 200) {
@@ -11,11 +17,28 @@ export default class AccountService extends JunctionPayService {
     }
 
     const data = (await resp.json()) as ListAccountsResponseSchema;
-
-    return data.data.map((item) => ({
+    const result = data.data.map((item) => ({
       headAccount: false,
       id: item.id,
       name: item.attributes.name,
+      companyId: item.relationships.company?.data.id,
+      contactPersonId: item.relationships.contactPerson?.data.id,
     }));
+    // Temporary solution until BE is optimized.
+    cache = [...result];
+    setTimeout(() => (cache = undefined), 60000);
+
+    return result;
+  }
+
+  async getAccount(token: string, accountId: string): Promise<AccountModel> {
+    const accounts = await this.listAccounts(token);
+    const account = accounts.find((item) => item.id === accountId);
+
+    if (!account) {
+      throw new Error("Junction Pay error: account not found");
+    }
+
+    return account;
   }
 }

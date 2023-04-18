@@ -13,8 +13,8 @@ export interface AccountSchema extends AccountIdentifierSchema {
     status: string;
   };
   relationships: {
-    company: RelationshipSchema<CompanyIdentifierSchema>;
-    contactPerson: RelationshipSchema<ContactPersonIdentifierSchema>;
+    company?: RelationshipSchema<CompanyIdentifierSchema>;
+    contactPerson?: RelationshipSchema<ContactPersonIdentifierSchema>;
   };
 }
 

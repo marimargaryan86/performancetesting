@@ -1,11 +1,13 @@
 <script lang="ts">
   import { invalidateAll } from "$app/navigation";
   import ChevronIcon from "components/icons/chevron-icon.svelte";
-  import JunctionLogo from "components/icons/junction-logo.svelte";
   import LogoutIcon from "components/icons/logout-icon.svelte";
   import type { UserModel } from "models/user";
   import Account from "./account.svelte";
   import Menu from "./menu.svelte";
+  import HubLogo from "components/icons/hub-logo.svelte";
+  import SettingsIcon from "components/icons/settings-icon.svelte";
+  import { page } from "$app/stores";
 
   export let user: UserModel;
 
@@ -25,19 +27,32 @@
 </script>
 
 <nav class="main-menu" class:expanded style:--transition-time="{transitionTimeMs}ms">
-  <JunctionLogo size={0.5} poweredBy snowfallTechnology text={expanded} />
+  <HubLogo showText={expanded} {transitionTimeMs} />
 
   <button class="toggle" on:click={toggle}>
-    <ChevronIcon color="var(--color-primary-500)" direction={expanded ? "left" : "right"} />
-    <span>Collapse</span>
+    <ChevronIcon color="var(--color-common-dark-strong)" direction={expanded ? "left" : "right"} />
   </button>
 
   <Menu {expanded} {transitionTimeMs} />
 
   <hr />
 
-  <button class="logout" on:click={logout} title={expanded ? undefined : "Logout"}>
-    <LogoutIcon color="var(--color-primary-500)" />
+  <a
+    class="settings typography body-medium"
+    title={expanded ? undefined : "Settings"}
+    href="/settings"
+    class:active={$page.url.pathname === "/settings"}
+  >
+    <SettingsIcon color="var(--color-common-light-strong)" variant="cog" />
+    <span>Settings</span>
+  </a>
+
+  <button
+    class="logout typography body-medium"
+    on:click={logout}
+    title={expanded ? undefined : "Logout"}
+  >
+    <LogoutIcon color="var(--color-common-light-strong)" />
     <span>Logout</span>
   </button>
 
@@ -50,47 +65,51 @@
     display: flex;
     flex-flow: column;
     gap: 16px;
-    width: 236px;
+    width: 240px;
     height: 100vh;
-    padding: 12px;
+    padding: 24px 16px;
     overflow: hidden auto;
-    background-color: var(--color-generic-white);
-    box-shadow: 0 0 10px rgb(0 0 0 / 0.1);
+    background-color: var(--color-common-background-light-main);
+    border-right: var(--color-main-neutral-50) 1px solid;
     transition: width var(--transition-time) ease, padding var(--transition-time) ease;
   }
 
   .main-menu:not(.expanded) {
-    width: 54px;
-    padding: 12px 8px;
+    width: 68px;
   }
 
-  .main-menu:not(.expanded) > :global(.junction-logo) {
+  .main-menu > :global(.hub-logo) {
+    flex-shrink: 0;
     align-self: center;
-    margin-top: 13px;
+    transition: margin var(--transition-time) ease;
+  }
+
+  .main-menu:not(.expanded) > :global(.hub-logo) {
+    margin-left: 130px;
   }
 
   .toggle {
     display: flex;
-    gap: 4px;
+    flex-shrink: 0;
     align-items: center;
     align-self: flex-end;
-    justify-content: flex-start;
-    padding: 2px 8px 2px 4px;
-    overflow: hidden;
-    color: var(--color-primary-500);
-    font-weight: 400;
-    font-size: 10px;
-    font-family: Poppins, Arial, Helvetica, sans-serif;
-    font-style: normal;
-    line-height: 24px;
-    letter-spacing: 0.15px;
-    background-color: transparent;
-    border: 1px solid var(--color-primary-500);
-    border-radius: 8px;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    margin: -8px -16px -8px 0;
+    padding: 0;
+    background-color: var(--color-main-primary-500);
+    border: 0;
+    border-radius: 50%;
     cursor: pointer;
+    opacity: 0;
+    transition: opacity 150ms ease;
   }
 
-  .toggle > span,
+  .main-menu:hover > .toggle {
+    opacity: 1;
+  }
+
   .logout > span {
     transition: opacity var(--transition-time) ease;
   }
@@ -99,16 +118,26 @@
     flex-shrink: 0;
     width: 16px;
     height: 16px;
+    margin-left: -2px;
+  }
+
+  .main-menu:not(.expanded) > .toggle > :global(svg) {
+    margin-left: 2px;
   }
 
   hr {
     flex-grow: 1;
-    margin: 0;
-    border: var(--color-neutral-700) 0 solid;
+    margin: 0 -16px;
+    border: var(--color-main-neutral-50) 0 solid;
     border-bottom-width: 1px;
   }
 
   .logout {
+    margin-top: -16px;
+  }
+
+  .logout,
+  .settings {
     display: flex;
     gap: 8px;
     align-items: center;
@@ -117,29 +146,26 @@
     width: 100%;
     padding: 10px 8px;
     overflow: hidden;
-    color: var(--color-neutral-800);
-    font-weight: 600;
-    font-size: 16px;
-    font-family: "Red Hat Display", Arial, Helvetica, sans-serif;
-    font-style: normal;
-    line-height: 20px;
-    letter-spacing: 0.1px;
+    color: var(--color-common-light-medium);
+    text-decoration: none;
     background-color: transparent;
     border: 0;
+    border-radius: 8px;
     cursor: pointer;
   }
 
-  .logout > :global(svg) {
+  .logout > :global(svg),
+  .settings > :global(svg) {
     flex-shrink: 0;
   }
 
-  .main-menu:not(.expanded) > .toggle {
-    width: 100%;
-    padding: 2px calc(50% - 8px);
+  .main-menu:not(.expanded) > .logout > span,
+  .main-menu:not(.expanded) > .settings > span {
+    opacity: 0;
   }
 
-  .main-menu:not(.expanded) > .toggle > span,
-  .main-menu:not(.expanded) > .logout > span {
-    opacity: 0;
+  .active {
+    color: var(--color-common-light-strong);
+    background-color: var(--color-common-background-light-green);
   }
 </style>

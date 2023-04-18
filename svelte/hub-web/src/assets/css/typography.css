@@ -4,7 +4,14 @@
   font-family: Inter, Arial, Helvetica, sans-serif;
   font-style: normal;
   line-height: 20px;
-  letter-spacing: 0.25px;
+}
+
+.typography.body-small {
+  font-weight: 400;
+  font-size: 12px;
+  font-family: Inter, Arial, Helvetica, sans-serif;
+  font-style: normal;
+  line-height: 16px;
 }
 
 .typography.label-small {
