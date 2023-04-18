@@ -12,6 +12,7 @@ from snowfall.project.junction.go.service.passenger_name_records.v1alpha import 
 from snowfall.project.junction.go.service.places.v1alpha import (
     models_pb2 as place_models_pb2,
 )
+from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import (
@@ -100,6 +101,7 @@ BOOKING_DETAILS = (
     "d184081a-92bd-4ec8-af9a-1faaa8dfbbeb",
 )
 PASSENGER_NAME_RECORDS = ("4567H3LG",)
+TRIP_SEARCHES = (string.uuid(),)
 
 
 def get_locations() -> list[place_models_pb2.Location]:
@@ -154,6 +156,10 @@ def generate_segment_reference(identifier: str) -> models_pb2.SegmentReference:
         schedule_id=get_schedules()[0].id,
         leg_ids=[leg.id for leg in get_legs()],
     )
+
+
+def get_trip_searches() -> list[trips_pb2.TripSearch]:
+    return [trips_pb2.TripSearch(id=trip_search_id) for trip_search_id in TRIP_SEARCHES]
 
 
 def get_trips() -> list[models_pb2.TripReference]:

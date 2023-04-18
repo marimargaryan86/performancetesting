@@ -114,6 +114,18 @@ class LegsByTripSearchId(endpoints.HTTPEndpoint):
         trips = await self._get_all_trips(request, trip_searches_client)
         segments = [segment for trip in trips for segment in trip.segments]
         leg_ids = [leg_id for segment in segments for leg_id in segment.leg_ids]
+
+        if not leg_ids:
+            return await messages.create_response(
+                body=models.Body(
+                    data=[],
+                    links={
+                        "next": str(request.url),
+                    },
+                ),
+                request=request,
+            )
+
         legs_page = await legs_client.find_by_ids(
             leg_ids,
             limit=pagination.limit,

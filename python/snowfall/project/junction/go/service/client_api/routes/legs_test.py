@@ -75,3 +75,13 @@ class TestLegs(object):
             "/trips/searches/{id}/legs".format(id=fixtures.TRIPS[0]),
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    async def test_legs_by_trip_search_with_no_trips(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        response = await client.get(
+            "/trips/searches/{id}/legs".format(id=fixtures.TRIP_SEARCHES[0]),
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert not response.json()["data"]

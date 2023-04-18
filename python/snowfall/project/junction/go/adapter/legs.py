@@ -44,6 +44,9 @@ class DictClient(Client):
         limit: int | None = None,
         cursor: str | None = None,
     ) -> schedules_pb2.ListLegsResponse:
+        if not identifiers:
+            raise ValueError("identifiers should not be empty")
+
         return schedules_pb2.ListLegsResponse(legs=list(self._legs.values()))
 
 
@@ -72,6 +75,9 @@ class GrpcClient(Client):
         limit: int | None = None,
         cursor: str | None = None,
     ) -> schedules_pb2.ListLegsResponse:
+        if not identifiers:
+            raise ValueError("identifiers should not be empty")
+
         request = schedules_pb2.ListLegsRequest(
             ids=list(identifiers),
             page_token=cursor or "",

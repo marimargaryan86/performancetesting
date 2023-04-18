@@ -44,9 +44,13 @@ class Client(abc.ABC):
 
 
 class DictClient(Client):
-    def __init__(self) -> None:
+    def __init__(self, searches: Sequence[trips_pb2.TripSearch] | None = None) -> None:
         self._searches: dict[str, trips_pb2.TripSearch] = {}
         self._trips_cache: dict[str, list[models_pb2.TripReference]] = {}
+
+        if searches:
+            self._searches = {search.id: search for search in searches}
+            self._trips_cache = {search.id: [] for search in searches}
 
     async def create(
         self,

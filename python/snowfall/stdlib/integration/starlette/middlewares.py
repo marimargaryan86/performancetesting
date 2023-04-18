@@ -131,7 +131,7 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
 
         resolved_request.scope["query_string"] = urllib_parse.urlencode(
             openapi_result.parameters.query,
-        )
+        ).encode()
         resolved_request.scope["parsed_query_string"] = openapi_result.parameters.query
         resolved_request.scope["security"] = openapi_result.security
 
