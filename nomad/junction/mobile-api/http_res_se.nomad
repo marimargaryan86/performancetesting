@@ -34,6 +34,14 @@ variable "count" {
   type = number
 }
 
+variable "plus_api_address" {
+  type = string
+}
+
+variable "plus_activated" {
+  type = bool
+}
+
 job "mobile-api-http-res-se" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -175,6 +183,8 @@ EOH
         CLIENT_NAME                     = "Res"
         CREATE_STRIPE_CUSTOMERS         = false
         SUPPORT_EMAIL                   = "res@snowfalltravel.com"
+        PLUS_API_ADDRESS                = "${var.plus_api_address}"
+        PLUS_ACTIVATED                  = var.plus_activated
       }
     }
   }

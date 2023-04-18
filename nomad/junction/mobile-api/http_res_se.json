@@ -3,14 +3,18 @@
     "variables": {
       "count": 2,
       "traefik_entrypoints": "websecure",
-      "traefik_host_URL": "res-se-mobile-api.junction.dev"
+      "traefik_host_URL": "res-se-mobile-api.junction.dev",
+      "plus_api_address": "https://plus.api.junction.dev",
+      "plus_activated": true
     }
   },
   "production": {
     "variables": {
       "count": 2,
       "traefik_entrypoints": "web",
-      "traefik_host_URL": "res-se-mobile-api.junction.travel"
+      "traefik_host_URL": "res-se-mobile-api.junction.travel",
+      "plus_api_address": "",
+      "plus_activated": false
     }
   }
 }
