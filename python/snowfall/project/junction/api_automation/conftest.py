@@ -305,7 +305,7 @@ async def pay_create_contact(
     except httpx.HTTPStatusError as err:
         logger.info("response_create_contact err: %s", err.response.headers)
         logger.info("response_create_contact body: %s", err.response.json())
-        sys.exit(EXIT_MSG)
+        pytest.fail(EXIT_MSG, pytrace=False)
     logger.info(
         "create_contacts: %s",
         json.dumps(response_create_contact, indent=4),
@@ -343,28 +343,6 @@ async def pay_get_accounts(
         sys.exit(EXIT_MSG)
     logger.info("get_accounts: %s", json.dumps(response_get_accounts, indent=4))
     return response_get_accounts
-
-
-@pytest.fixture()
-async def pay_create_account(
-    pay_admin_client: PayAdminClient,
-    pay_create_contact: Mapping[str, Any],
-) -> dict[str, Any]:
-    name = "test account {0}".format(return_randomized_token())
-    try:
-        response_create_account = await pay_admin_client.create_accounts(
-            name,
-            pay_create_contact["data"]["id"],
-        )
-    except httpx.HTTPStatusError as err:
-        logger.info("response_create_account: %s", err.response.headers)
-        logger.info("response_create_account body: %s", err.response.json())
-        sys.exit(EXIT_MSG)
-    logger.info(
-        "response_create_account: %s",
-        json.dumps(response_create_account, indent=4),
-    )
-    return response_create_account
 
 
 @pytest.fixture()

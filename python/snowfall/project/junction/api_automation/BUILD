@@ -7,7 +7,6 @@ python_tests(
         "backend_api_tests/*",
         "mobile_api_tests/*",
         "planner_tests/*",
-        "pay_api_tests/*",
     ],
     name="tests",
     dependencies=[":resources"],

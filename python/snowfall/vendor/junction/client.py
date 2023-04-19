@@ -1,3 +1,5 @@
+from typing import Sequence
+
 import httpx
 
 
@@ -28,6 +30,7 @@ def make_pagination_params(
     limit: int | None,
     cursor: str | None,
     sort: str | None = None,
+    include: Sequence[str] | None = None,
 ) -> dict[str, int | str]:
     pagination_params: dict[str, int | str] = {}
     if limit:
@@ -36,4 +39,6 @@ def make_pagination_params(
         pagination_params["page[cursor]"] = cursor
     if sort:
         pagination_params["sort"] = sort
+    if include:
+        pagination_params["include"] = ",".join(include)
     return pagination_params

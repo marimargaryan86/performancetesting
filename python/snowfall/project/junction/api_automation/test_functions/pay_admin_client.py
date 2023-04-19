@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import sys
-from typing import Any, Awaitable, Callable, Sequence
+from typing import Any, Awaitable, Callable, Literal, Sequence
 from urllib.parse import parse_qs, urlparse
 
 import httpx
@@ -16,6 +16,7 @@ _RELATIONSHIPS_KEY = "relationships"
 _ATTRIBUTES_KEY = "attributes"
 _LIMIT_KEY = "page[limit]"
 _CURSOR_KEY = "page[cursor]"
+conversion_includes = Literal["transactions"]
 
 
 class PayAdminClient(BaseClient):  # noqa: WPS214
@@ -247,6 +248,19 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
             params=make_pagination_params(limit, cursor),
         )
 
+        response.raise_for_status()
+        return response.json()
+
+    async def list_conversions_details(
+        self,
+        include: Sequence[conversion_includes] | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        response = await self._client.get(
+            "/conversions",
+            params=make_pagination_params(limit, cursor, include=include),
+        )
         response.raise_for_status()
         return response.json()
 
