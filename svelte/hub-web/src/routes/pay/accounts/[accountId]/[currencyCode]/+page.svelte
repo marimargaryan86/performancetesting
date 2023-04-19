@@ -114,7 +114,7 @@
           </th>
           <th>
             <SortButton
-              value="debit"
+              value="debit.amount"
               bind:direction={sortDirection}
               bind:group={sortBy}
               label="Debit"
@@ -122,7 +122,7 @@
           </th>
           <th>
             <SortButton
-              value="credit"
+              value="credit.amount"
               bind:direction={sortDirection}
               bind:group={sortBy}
               label="Credit"
@@ -130,7 +130,7 @@
           </th>
           <th>
             <SortButton
-              value="balance"
+              value="balance.amount"
               bind:direction={sortDirection}
               bind:group={sortBy}
               label="Balance"

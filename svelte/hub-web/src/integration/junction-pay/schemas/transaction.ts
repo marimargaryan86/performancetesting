@@ -33,6 +33,7 @@ export interface TransactionSchema extends TransactionIdentifierSchema {
     payer: RelationshipSchema<CompanyIdentifierSchema>;
     beneficiary: RelationshipSchema<CompanyIdentifierSchema>;
   };
+  links: { self: string };
 }
 
 export interface ListTransactionsResponseSchema {

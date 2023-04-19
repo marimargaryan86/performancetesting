@@ -25,13 +25,19 @@ export type TransactionModel = {
   id: string;
   parentId: string;
   createdAt: Date;
-  payer: CompanyModel;
+  payer?: CompanyModel;
   amounts: {
     beneficiary: MoneyModel;
     quotation: MoneyModel;
     salesMargin: MoneyModel;
   };
-  beneficiary: CompanyModel;
+  rates: {
+    fxQuote: number;
+    fxBuffer: number;
+    salesMarkup: number;
+    fxMarkup: number;
+  };
+  beneficiary?: CompanyModel;
   reference: string;
   status: TransactionStatus;
 };

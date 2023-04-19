@@ -13,11 +13,11 @@ export function filterConversions(
   const lcQuery = query.toLowerCase();
 
   return transactions.filter((item) => {
-    const settledAt = getZeroTimeDate(item.settledAt);
+    const executedAt = getZeroTimeDate(item.executedAt);
 
     return (
-      (!dateRange || (dateRange.from <= settledAt && settledAt <= dateRange.to)) &&
-      item.id.includes(lcQuery)
+      (!dateRange || (dateRange.from <= executedAt && executedAt <= dateRange.to)) &&
+      (!item.transaction || item.transaction.reference.includes(lcQuery))
     );
   });
 }

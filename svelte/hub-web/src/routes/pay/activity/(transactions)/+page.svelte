@@ -72,7 +72,7 @@
       </th>
       <th>
         <SortButton
-          value="amounts.quotation"
+          value="amounts.quotation.amount"
           bind:direction={sortDirection}
           bind:group={sortBy}
           label="Owed to us"
@@ -88,7 +88,7 @@
       </th>
       <th>
         <SortButton
-          value="amounts.beneficiary"
+          value="amounts.beneficiary.amount"
           bind:direction={sortDirection}
           bind:group={sortBy}
           label="What we owe"
@@ -96,7 +96,7 @@
       </th>
       <th>
         <SortButton
-          value="amounts.salesMargin"
+          value="amounts.salesMargin.amount"
           bind:direction={sortDirection}
           bind:group={sortBy}
           label="Sales profit"
@@ -139,15 +139,19 @@
         <td>{yymmdd(transaction.createdAt)}</td>
         <td>
           <div class="company">
-            <EntityAvatar name={transaction.payer.name} />
-            <span title={transaction.payer.name}>{transaction.payer.name}</span>
+            {#if transaction.payer}
+              <EntityAvatar name={transaction.payer.name} />
+              <span title={transaction.payer.name}>{transaction.payer.name}</span>
+            {/if}
           </div>
         </td>
         <td>{formatAmountAndCode(transaction.amounts.quotation)}</td>
         <td>
           <div class="company">
-            <EntityAvatar name={transaction.beneficiary.name} />
-            <span title={transaction.beneficiary.name}>{transaction.beneficiary.name}</span>
+            {#if transaction.beneficiary}
+              <EntityAvatar name={transaction.beneficiary.name} />
+              <span title={transaction.beneficiary.name}>{transaction.beneficiary.name}</span>
+            {/if}
           </div>
         </td>
         <td>{formatAmountAndCode(transaction.amounts.beneficiary)}</td>

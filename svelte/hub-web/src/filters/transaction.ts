@@ -13,17 +13,21 @@ export function filterTransactions(
   const { query, status, dateRange } = filters;
   const lcQuery = query.toLowerCase();
 
+  /* eslint-disable complexity */
   return transactions.filter((item) => {
     const createdAt = getZeroTimeDate(item.createdAt);
 
     return (
       (!dateRange || (dateRange.from <= createdAt && createdAt <= dateRange.to)) &&
       (!status?.length || status.includes(item.status)) &&
-      (item.beneficiary.name.toLowerCase().includes(lcQuery) ||
+      (!item.beneficiary ||
+        item.beneficiary?.name.toLowerCase().includes(lcQuery) ||
+        !item.payer ||
         item.payer.name.toLowerCase().includes(lcQuery) ||
         item.id.includes(lcQuery) ||
         item.reference.toLowerCase().includes(lcQuery) ||
         item.parentId.toLowerCase().includes(lcQuery))
     );
   });
+  /* eslint-enable complexity */
 }

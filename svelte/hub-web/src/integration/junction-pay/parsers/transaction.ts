@@ -8,19 +8,11 @@ import type { TransactionSchema } from "../schemas/transaction";
 
 export function parseTransaction(
   transaction: TransactionSchema,
-  companies: CompanyModel[],
+  companies: CompanyModel[] = [],
 ): TransactionModel {
   const { attributes, relationships } = transaction;
   const beneficiary = companies.find((item) => item.id === relationships.beneficiary.data.id);
   const payer = companies.find((item) => item.id === relationships.payer.data.id);
-
-  if (!beneficiary) {
-    throw new Error("Error parsing transaction: Beneficiary not found");
-  }
-
-  if (!payer) {
-    throw new Error("Error parsing transaction: Payer not found");
-  }
 
   return {
     id: transaction.id,
@@ -32,6 +24,12 @@ export function parseTransaction(
       beneficiary: attributes.amounts.beneficiary,
       quotation: attributes.amounts.quotation,
       salesMargin: attributes.amounts.salesMargin,
+    },
+    rates: {
+      fxBuffer: attributes.rates.fxBuffer,
+      fxMarkup: attributes.rates.fxMarkup,
+      fxQuote: attributes.rates.fxQuote,
+      salesMarkup: attributes.rates.salesMarkup,
     },
     reference: attributes.externalReference,
     /* eslint-disable no-warning-comments */

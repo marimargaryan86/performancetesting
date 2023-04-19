@@ -30,16 +30,83 @@
 
 <table class="table-1">
   <thead>
-    <th><SortButton value="id" bind:direction={sortDirection} bind:group={sortBy} label="ID" /></th>
     <th>
-      <SortButton value="rate" bind:direction={sortDirection} bind:group={sortBy} label="Rate" />
+      <SortButton
+        value="transaction.reference"
+        bind:direction={sortDirection}
+        bind:group={sortBy}
+        label="ID"
+      />
+    </th>
+    <th>
+      <SortButton
+        value="executedAt"
+        bind:direction={sortDirection}
+        bind:group={sortBy}
+        label="Executed"
+      />
     </th>
     <th>
       <SortButton
         value="settledAt"
         bind:direction={sortDirection}
         bind:group={sortBy}
-        label="Settlement Date"
+        label="Settlement"
+      />
+    </th><th>
+      <SortButton
+        value="sellAmount.currency"
+        bind:direction={sortDirection}
+        bind:group={sortBy}
+        label="From"
+      />
+    </th>
+    <th>
+      <SortButton
+        value="buyAmount.currency"
+        bind:direction={sortDirection}
+        bind:group={sortBy}
+        label="To"
+      />
+    </th>
+    <th>
+      <SortButton
+        value="transaction.rates.fxQuote"
+        bind:direction={sortDirection}
+        bind:group={sortBy}
+        label="Quote Rate"
+      />
+    </th>
+    <th>
+      <SortButton
+        value="executedRate"
+        bind:direction={sortDirection}
+        bind:group={sortBy}
+        label="Transaction Rate"
+      />
+    </th>
+    <th>
+      <SortButton
+        value="fxDelta"
+        bind:direction={sortDirection}
+        bind:group={sortBy}
+        label="FX Delta"
+      />
+    </th>
+    <th>
+      <SortButton
+        value="transaction.rates.fxBuffer"
+        bind:direction={sortDirection}
+        bind:group={sortBy}
+        label="FX Buffer"
+      />
+    </th>
+    <th>
+      <SortButton
+        value="fxStatus"
+        bind:direction={sortDirection}
+        bind:group={sortBy}
+        label="Status"
       />
     </th>
   </thead>
@@ -47,9 +114,16 @@
   <tbody>
     {#each conversions as conversion}
       <tr>
-        <td>{conversion.id}</td>
-        <td>{conversion.rate}</td>
+        <td>{conversion.transaction?.reference ?? ""}</td>
+        <td>{yymmdd(conversion.executedAt)}</td>
         <td>{yymmdd(conversion.settledAt)}</td>
+        <td>{conversion.sellAmount.currency}</td>
+        <td>{conversion.buyAmount.currency}</td>
+        <td>{conversion.transaction?.rates.fxQuote ?? ""}</td>
+        <td>{conversion.executedRate}</td>
+        <td>{conversion.fxDelta ?? ""}</td>
+        <td>{conversion.transaction?.rates.fxBuffer ?? ""}</td>
+        <td>{conversion.fxStatus}</td>
       </tr>
     {/each}
   </tbody>
