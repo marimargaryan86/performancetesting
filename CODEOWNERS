@@ -1,26 +1,26 @@
 [CI/CD]
 .gitlab-ci.yml @platform-engineers
 /.gitlab/ @platform-engineers
-/nomad/ @vm
+/nomad/ @sre
+buf.yaml @platform-engineers
+pants.ci.toml @platform-engineers
+pants.toml @platform-engineers
 
 [Documentation]
 *.md @platform-engineers
 
 [Platform]
+.python-version @platform-engineers
 /python/snowfall/plugin/ @platform-engineers
 /python/snowfall/stdlib/ @platform-engineers
 /vendor/ @platform-engineers
+docker-compose.yml @platform-engineers
 
 [Repository]
 .editorconfig @platform-engineers
 .gitignore @platform-engineers
-.python-version @platform-engineers
-buf.yaml @platform-engineers
 CODEOWNERS @platform-engineers
-docker-compose.yml @platform-engineers
-pants.ci.toml @platform-engineers
-pants.toml @platform-engineers
 
-[Specification]
-/openapi/ @platform-engineers
-/protobuf/ @platform-engineers
+[Specification][2]
+/openapi/ @backend-team-leads
+/protobuf/ @backend-team-leads
