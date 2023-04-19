@@ -21,6 +21,12 @@ class FareRule(RedisRecord):
 
 class OfferDetails(RedisRecord):
     expires_at: datetime.datetime
+    departure_station: str
+    arrival_station: str
+    departure_time: datetime.datetime
+    arrival_time: datetime.datetime
+    marketing_carrier: str
+    passengers_age: list[int]
     currency: str
     price: int
     fare_class: str

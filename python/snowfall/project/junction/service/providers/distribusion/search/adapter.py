@@ -87,13 +87,13 @@ class MarketingCarrierAdapter(object):  # noqa: WPS214
         return _DEFAULT_FARE_CLASS_NAME
 
     def passenger_types(self) -> list[cache.PassengerType]:
-        if self._passenger_types is not None:
+        if self._passenger_types:
             return self._passenger_types
 
         self._passenger_types = []
 
         for pax_type in self._marketing_carrier.passenger_types or []:
-            if pax_type.code and pax_type.min_age and pax_type.max_age:
+            if pax_type.code and pax_type.min_age >= 0 and pax_type.max_age:
                 self._passenger_types.append(
                     cache.PassengerType(
                         type_name=pax_type.name,
@@ -238,6 +238,7 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
                 if search_task.criteria.HasField("inbound_departure")
                 else None
             ),
+            pax_ages=list(search_task.criteria.passengers_age),
             pax=len(search_task.criteria.passengers_age),
             currency=search_task.criteria.currency or _DEFAULT_CURRENCY,
         )
@@ -292,6 +293,7 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
             )
             if not connection.booked_out and connection.marketing_carrier is not None:
                 offer_group = await self._parse_connection(
+                    search_criteria,
                     connection,
                     carriers.get_adapter(connection.marketing_carrier),
                     expires_at,
@@ -301,6 +303,7 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
 
     async def _parse_connection(
         self,
+        search_criteria: FindConnectionsCriteria,
         connection: connections.Connection,
         carrier: MarketingCarrierAdapter,
         expires_at: datetime.datetime,
@@ -327,6 +330,16 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
                     id=await self._offers_cache.store(
                         cache.OfferDetails(
                             expires_at=expires_at,
+                            departure_station=connection.departure_station.code,
+                            arrival_station=connection.arrival_station.code,
+                            departure_time=datetime.datetime.fromisoformat(
+                                connection.departure_time,
+                            ),
+                            arrival_time=datetime.datetime.fromisoformat(
+                                connection.arrival_time,
+                            ),
+                            marketing_carrier=carrier.get_code(),
+                            passengers_age=search_criteria.pax_ages,
                             price=fare.price,
                             currency=connection.currency,
                             fare_class=(

@@ -113,14 +113,14 @@ class Fare(DistribusionBaseModel):
 class Connection(DistribusionBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
     electronic_ticket_available: bool | None
-    arrival_time: str | None
+    arrival_time: str
     booked_out: bool | None
     cheapest_total_adult_price: int | None
     cheapest_fare_class_code: str | None
-    departure_time: str | None
+    departure_time: str
     duration: int | None
-    arrival_station: Station | None
-    departure_station: Station | None
+    arrival_station: Station
+    departure_station: Station
     fares: List[FaresRelFareClassPrice] | None
     marketing_carrier: MarketingCarrier | None
     segments: List[Segment]
@@ -130,7 +130,7 @@ class Connection(DistribusionBaseModel):
 class ConnectionVacancy(DistribusionBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
     total_price: int | None
-    vacant: bool | None
+    vacant: bool
     fees: Dict[str, Any] | None
     currency: str
 

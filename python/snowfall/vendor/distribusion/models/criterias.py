@@ -12,6 +12,7 @@ class FindConnectionsCriteria(DistribusionBaseModel):
     arrival_stations: list[str]
     departure_date: datetime.date
     return_date: datetime.date | None
+    pax_ages: list[int]
     pax: int
     currency: str
 

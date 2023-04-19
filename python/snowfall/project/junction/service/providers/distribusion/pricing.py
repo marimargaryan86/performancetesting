@@ -2,6 +2,7 @@ import contextlib
 import random
 import uuid
 
+import httpx
 import structlog
 from redis import asyncio as aioredis
 
@@ -9,25 +10,42 @@ from snowfall.project.junction.go.service.offers.v1alpha import (
     amqp_pb2 as offers_amqp_pb2,
 )
 from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
-from snowfall.project.junction.service.providers.distribusion import cache
-from snowfall.project.junction.service.providers.distribusion.config import (
-    SearchesSettings,
-)
-from snowfall.stdlib import money, service
-from snowfall.stdlib.format import protobuf
+from snowfall.project.junction.service.providers.distribusion import cache, config
+from snowfall.stdlib import format, money, service  # pants: no-infer-dep
+from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, producer, types
+from snowfall.vendor.distribusion import client
+from snowfall.vendor.distribusion.models.criterias import ConnectionVacancyCriteria
 
 
-async def price_quotes(
-    app: service.Application[SearchesSettings],
+class NoPricingError(Exception):
+    """Raised when a failed pricing result is received."""
+
+
+async def price_quotes(  # noqa: WPS210
+    app: service.Application[config.SearchesSettings],
 ) -> None:
     async with contextlib.AsyncExitStack() as stack:
+        http_client = await stack.enter_async_context(
+            httpx.AsyncClient(
+                http2=True,
+                timeout=app.settings.api_timeout,
+            ),
+        )
+        logging.register(http_client)
+        metrics.register(http_client)
         redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
             aioredis.from_url(
                 random.choice(app.settings.redis_dsn),  # nosec
                 decode_responses=False,
             ).client(),
+        )
+        distribusion_client = client.DistribusionClient(
+            api_base_url=app.settings.api_base_url,
+            api_key=app.settings.api_key,
+            retailer_partner_number=app.settings.retailer_partner_number,
+            http_client=http_client,
         )
         amqp_connection = await stack.enter_async_context(
             types.Connection(app.settings.amqp_dsn),
@@ -36,6 +54,7 @@ async def price_quotes(
             client=redis.Client[bytes](redis_connection, prefix=app.name),
         )
         await PriceQuoteConsumer(
+            distribusion_client=distribusion_client,
             consumer_obj=consumer.Consumer(
                 connection=amqp_connection,
                 queue_name="{0}_prices".format(app.name),
@@ -51,13 +70,15 @@ async def price_quotes(
 
 
 class PriceQuoteConsumer(object):
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
+        distribusion_client: client.DistribusionClient,
         consumer_obj: consumer.Consumer[offers_amqp_pb2.TripPriceQuoteTask],
         producer_obj: producer.Producer,
         offer_cache: cache.OffersCache,
         provider_company_id: str,
     ):
+        self._client = distribusion_client
         self._cache = offer_cache
         self._consumer = consumer_obj
         self._logger = structlog.get_logger(__name__)
@@ -76,6 +97,11 @@ class PriceQuoteConsumer(object):
         if not offer_details:
             return
 
+        vacancy = await self._vacancy(offer_details)
+
+        if not vacancy:
+            raise NoPricingError("Pricing did not succeed.")
+
         await self._producer.publish(
             offers_amqp_pb2.TripPriceQuoteResult(
                 price_quote_container_id=amqp_message.body.price_quote_container_id,
@@ -83,7 +109,9 @@ class PriceQuoteConsumer(object):
                 price_quote=offers_pb2.PriceQuote(
                     id=str(uuid.uuid4()),
                     option_id=amqp_message.body.option_id,
-                    expires_at=protobuf.datetime_to_protobuf(offer_details.expires_at),
+                    expires_at=format.protobuf.datetime_to_protobuf(
+                        offer_details.expires_at,
+                    ),
                     price=money.Money(
                         amount=offer_details.price,
                         currency=money.Currency(offer_details.currency),
@@ -137,3 +165,44 @@ class PriceQuoteConsumer(object):
             )
 
         return res
+
+    async def _vacancy(self, offer_details: cache.OfferDetails) -> bool:
+        count_pax_type = self._count_passenger_type(offer_details)
+        connection_vacancy_criteria = ConnectionVacancyCriteria(
+            marketing_carrier=offer_details.marketing_carrier,
+            departure_station=offer_details.departure_station,
+            arrival_station=offer_details.arrival_station,
+            departure_time=offer_details.departure_time,
+            arrival_time=offer_details.arrival_time,
+            fare_class=offer_details.fare_class,
+            pax=[],
+            passenger_type=[],
+            currency=offer_details.currency,
+        )
+
+        for key, item_value in count_pax_type.items():
+            connection_vacancy_criteria.passenger_type.append(key)
+            connection_vacancy_criteria.pax.append(item_value)
+
+        connections = await self._client.get_connection_vacancy(
+            connection_vacancy_criteria,
+        )
+
+        return connections.vacant
+
+    def _count_passenger_type(
+        self,
+        offer_details: cache.OfferDetails,
+    ) -> dict[str, int]:
+        types_count = {}
+        for age in offer_details.passengers_age:
+            for pax_type in offer_details.passenger_types:
+                if pax_type.min_age <= age <= pax_type.max_age:
+                    type_code = pax_type.type_code
+
+                    if type_code not in types_count:
+                        types_count[type_code] = 1  # noqa: WPS220
+                    else:
+                        types_count[type_code] += 1
+
+        return types_count
