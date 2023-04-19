@@ -407,6 +407,7 @@ def _create_trip_option(
     return order_models_pb2.TripOption(
         id=option.id,
         price_quote_id=price_quote.id,
+        pay_quote_id=price_quote.pay_quote_id,
         details=[
             order_models_pb2.TripOptionDetails(
                 segment=offer_segment,

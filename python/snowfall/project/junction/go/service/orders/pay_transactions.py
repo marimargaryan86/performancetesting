@@ -23,11 +23,10 @@ class PayTransactionCreator(object):
     async def create_transaction_and_set_id(
         self,
         booking: models_pb2.Booking,
-        pay_quotation_id: str,
     ) -> models_pb2.Booking:
         if self._use_pay_to_create_transaction:
             transaction = await self._create_transaction(
-                quotation_id=pay_quotation_id,
+                quotation_id=booking.trip_option.pay_quote_id,
                 external_reference=booking.order_id,
             )
             booking.transaction_id = transaction.data.id

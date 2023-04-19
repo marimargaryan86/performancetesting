@@ -7,7 +7,6 @@ from motor import motor_asyncio
 
 from snowfall.project.junction.go import pay_integration
 from snowfall.project.junction.go.adapter import passenger_name_records
-from snowfall.project.junction.go.service.offers import price_quotes
 from snowfall.project.junction.go.service.orders import importer, orders
 from snowfall.project.junction.go.service.orders.amqp import OrderProducer
 from snowfall.project.junction.go.service.orders.grpc import OrderService
@@ -101,9 +100,6 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
             ),
             booking_repository=orders.BookingRepository(
                 mongo.orders.journeys,
-            ),
-            price_quote_repository=price_quotes.PriceQuoteRepository(
-                collection=mongo.offers.price_quotes,
             ),
             pay_transaction_creator=PayTransactionCreator(
                 app.settings.use_pay_to_create_transaction,

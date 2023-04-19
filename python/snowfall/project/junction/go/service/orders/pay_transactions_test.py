@@ -8,7 +8,10 @@ from snowfall.project.junction.go.service.orders.pay_transactions import (
     PayTransactionCreationError,
     PayTransactionCreator,
 )
-from snowfall.project.junction.go.service.orders.v1alpha.models_pb2 import Booking
+from snowfall.project.junction.go.service.orders.v1alpha.models_pb2 import (
+    Booking,
+    TripOption,
+)
 from snowfall.stdlib import string
 from snowfall.vendor.junction.pay.client import Client as PayClient
 
@@ -91,7 +94,7 @@ async def test_that_transaction_created_and_id_set_in_booking() -> None:
     booking = Booking(
         id="an-id",
         order_id=EXTERNAL_REFERENCE,
-        trip_option=None,
+        trip_option=TripOption(pay_quote_id="a-pay-quotation-id"),
         status=Booking.Status.STATUS_PENDING,
         provider_name="a-provider",
         total_price=None,
@@ -102,7 +105,6 @@ async def test_that_transaction_created_and_id_set_in_booking() -> None:
     )
     updated_booking = await pay_transactions.create_transaction_and_set_id(
         booking=booking,
-        pay_quotation_id="a-pay-quotation-id",
     )
 
     assert updated_booking.transaction_id == "a-transaction-id"
@@ -127,7 +129,7 @@ async def test_that_exception_raised_if_error_creating_transaction_with_client()
     booking = Booking(
         id="an-id",
         order_id=EXTERNAL_REFERENCE,
-        trip_option=None,
+        trip_option=TripOption(pay_quote_id="pay-quote-id"),
         status=Booking.Status.STATUS_PENDING,
         provider_name="a-provider",
         total_price=None,
@@ -141,6 +143,5 @@ async def test_that_exception_raised_if_error_creating_transaction_with_client()
     ) as ex:
         await pay_transactions.create_transaction_and_set_id(
             booking=booking,
-            pay_quotation_id="an-id",
         )
         assert ex.value.__cause__ == expected_error

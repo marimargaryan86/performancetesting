@@ -108,6 +108,7 @@ message TripOption {
   string id = 1;
   string booking_id = 4;
   string price_quote_id = 5;
+  string pay_quote_id = 6;
   repeated TripOptionDetails details = 2;
   snowfall.stdlib.v1alpha.Money price = 3;
 }
