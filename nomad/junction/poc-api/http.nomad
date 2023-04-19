@@ -164,7 +164,7 @@ EOH
         HTTP_PORT                       = "${NOMAD_PORT_http}"
         PROMETHEUS_PORT                 = "${NOMAD_PORT_prometheus}"
         VALIDATE_RESPONSES_AGAINST_SPEC = false
-        MONGO_DB                        = "mobile-api"
+        MONGO_DB                        = "plus-poc"
         TWILIO_SENDER                   = "+15674831787"
         FLIGHT_STATS_APP_ID             = "4fb1a656"
         SENTRY_DSN                      = "https://edddac6f53a345bfa2b49ac386a69e9b@sentry.snowfall.se/80"
