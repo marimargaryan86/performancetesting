@@ -1,9 +1,12 @@
 <script lang="ts">
+  let className: string | undefined = undefined;
+
+  export { className as class };
   export let maxWidth: string | undefined = undefined;
   export let width: string | undefined = undefined;
 </script>
 
-<td style:--max-width={maxWidth} style:--width={width}><slot /></td>
+<td class={className} style:--max-width={maxWidth} style:--width={width}><slot /></td>
 
 <style>
   td {

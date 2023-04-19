@@ -1,5 +1,4 @@
 <script lang="ts">
-  import SortButton from "components/ui/sort-button.svelte";
   import { filterConversions } from "filters/conversion";
   import { yymmdd } from "formatting/date-time";
   import type { ConversionModel } from "models/conversion";
@@ -7,20 +6,27 @@
   import { sortConversions } from "sorting/conversion";
   import type { FlattenedObject } from "utils/common";
   import type { PageData } from "./$types";
+  import Table from "components/ui/table/table.svelte";
+  import THead from "components/ui/table/t-head.svelte";
+  import Header from "components/ui/table/header.svelte";
+  import TBody from "components/ui/table/t-body.svelte";
+  import TRow from "components/ui/table/t-row.svelte";
+  import TCol from "components/ui/table/t-col.svelte";
+  import ConversionStatusBadge from "components/ui/conversion-status-badge.svelte";
 
   export let data: PageData;
 
   const { searchQuery, dateRange } = data;
 
   let sortDirection: DirectionY = "down";
-  let sortBy: FlattenedObject<ConversionModel> = "id";
+  let sortGroup: FlattenedObject<ConversionModel> = "id";
 
   $: conversions = sortConversions(
     filterConversions(data.conversions, {
       query: $searchQuery,
       dateRange: $dateRange,
     }),
-    { by: sortBy, direction: sortDirection },
+    { by: sortGroup, direction: sortDirection },
   );
 </script>
 
@@ -28,109 +34,53 @@
   <title>FX · Activity · Pay · Junction Hub</title>
 </svelte:head>
 
-<table class="table-1">
-  <thead>
-    <th>
-      <SortButton
-        value="transaction.reference"
-        bind:direction={sortDirection}
-        bind:group={sortBy}
-        label="ID"
-      />
-    </th>
-    <th>
-      <SortButton
-        value="executedAt"
-        bind:direction={sortDirection}
-        bind:group={sortBy}
-        label="Executed"
-      />
-    </th>
-    <th>
-      <SortButton
-        value="settledAt"
-        bind:direction={sortDirection}
-        bind:group={sortBy}
-        label="Settlement"
-      />
-    </th><th>
-      <SortButton
-        value="sellAmount.currency"
-        bind:direction={sortDirection}
-        bind:group={sortBy}
-        label="From"
-      />
-    </th>
-    <th>
-      <SortButton
-        value="buyAmount.currency"
-        bind:direction={sortDirection}
-        bind:group={sortBy}
-        label="To"
-      />
-    </th>
-    <th>
-      <SortButton
-        value="transaction.rates.fxQuote"
-        bind:direction={sortDirection}
-        bind:group={sortBy}
-        label="Quote Rate"
-      />
-    </th>
-    <th>
-      <SortButton
-        value="executedRate"
-        bind:direction={sortDirection}
-        bind:group={sortBy}
-        label="Transaction Rate"
-      />
-    </th>
-    <th>
-      <SortButton
-        value="fxDelta"
-        bind:direction={sortDirection}
-        bind:group={sortBy}
-        label="FX Delta"
-      />
-    </th>
-    <th>
-      <SortButton
-        value="transaction.rates.fxBuffer"
-        bind:direction={sortDirection}
-        bind:group={sortBy}
-        label="FX Buffer"
-      />
-    </th>
-    <th>
-      <SortButton
-        value="fxStatus"
-        bind:direction={sortDirection}
-        bind:group={sortBy}
-        label="Status"
-      />
-    </th>
-  </thead>
+<Table class="fx-table">
+  <THead>
+    <Header>Parent ID</Header>
+    <Header>ID</Header>
+    <Header bind:sortGroup bind:sortDirection sortValue="executedAt">Executed</Header>
+    <Header bind:sortGroup bind:sortDirection sortValue="settledAt">Settlement</Header>
+    <Header bind:sortGroup bind:sortDirection sortValue="sellAmount.currency">From</Header>
+    <Header bind:sortGroup bind:sortDirection sortValue="buyAmount.currency">To</Header>
+    <Header bind:sortGroup bind:sortDirection sortValue="transaction.rates.fxQuote">
+      Quote Rate
+    </Header>
+    <Header bind:sortGroup bind:sortDirection sortValue="executedRate">Transaction Rate</Header>
+    <Header>FX Delta</Header>
+    <Header>FX Buffer</Header>
+    <Header bind:sortGroup bind:sortDirection sortValue="fxStatus">Status</Header>
+  </THead>
 
-  <tbody>
+  <TBody>
     {#each conversions as conversion}
-      <tr>
-        <td>{conversion.transaction?.reference ?? ""}</td>
-        <td>{yymmdd(conversion.executedAt)}</td>
-        <td>{yymmdd(conversion.settledAt)}</td>
-        <td>{conversion.sellAmount.currency}</td>
-        <td>{conversion.buyAmount.currency}</td>
-        <td>{conversion.transaction?.rates.fxQuote ?? ""}</td>
-        <td>{conversion.executedRate}</td>
-        <td>{conversion.fxDelta ?? ""}</td>
-        <td>{conversion.transaction?.rates.fxBuffer ?? ""}</td>
-        <td>{conversion.fxStatus}</td>
-      </tr>
+      <TRow>
+        <TCol maxWidth="96px">{conversion.transaction?.reference ?? ""}</TCol>
+        <TCol maxWidth="96px">{conversion.id}</TCol>
+        <TCol>{yymmdd(conversion.executedAt)}</TCol>
+        <TCol>{yymmdd(conversion.settledAt)}</TCol>
+        <TCol class="currency typography bold">{conversion.sellAmount.currency}</TCol>
+        <TCol class="currency typography bold">{conversion.buyAmount.currency}</TCol>
+        <TCol>{conversion.transaction?.rates.fxQuote ?? ""}</TCol>
+        <TCol>{conversion.executedRate}</TCol>
+        <TCol>{conversion.fxDelta ?? ""}</TCol>
+        <TCol>{conversion.transaction?.rates.fxBuffer ?? ""}</TCol>
+        <TCol width="124px"><ConversionStatusBadge value={conversion.fxStatus} /></TCol>
+      </TRow>
     {/each}
-  </tbody>
-</table>
+  </TBody>
+</Table>
 
 <style>
-  .table-1 {
+  :global(.table.fx-table) {
+    width: 100%;
+    height: 100%;
+  }
+
+  :global(.table.fx-table .currency) {
+    color: var(--color-main-neutral-600);
+  }
+
+  :global(.table.fx-table .status-badge) {
     width: 100%;
   }
 </style>
