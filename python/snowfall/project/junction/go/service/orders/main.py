@@ -1,7 +1,9 @@
+import contextlib
 import ipaddress
 import random
 from typing import Sequence
 
+import httpx
 import pydantic
 from motor import motor_asyncio
 
@@ -17,6 +19,7 @@ from snowfall.project.junction.go.service.passenger_name_records.v1alpha import 
     passenger_name_records_pb2_grpc,
 )
 from snowfall.stdlib import service
+from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.grpc import client, server
 from snowfall.vendor.junction.auth import UserAuth
@@ -91,7 +94,17 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
         random.choice(app.settings.mongo_dsn),  # nosec
     )
 
-    async with types.Connection(app.settings.amqp_dsn) as connection:
+    async with contextlib.AsyncExitStack() as stack:
+        http_client = await stack.enter_async_context(httpx.AsyncClient(http2=True))
+        connection = await stack.enter_async_context(
+            types.Connection(
+                app.settings.amqp_dsn,
+            ),
+        )
+
+        logging.register(http_client)
+        metrics.register(http_client)
+
         booking_importer = importer.BookingImporter(
             consumer_obj=consumer.Consumer(
                 connection=connection,
@@ -104,13 +117,13 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
             pay_transaction_creator=PayTransactionCreator(
                 app.settings.use_pay_to_create_transaction,
                 pay_client=PayClient(
-                    app.settings.public_pay_api_dsn,
-                    UserAuth(
+                    base_url=app.settings.public_pay_api_dsn,
+                    auth=UserAuth(
                         app.settings.public_pay_admin_api_dsn,
                         app.settings.pay_admin_username,
                         app.settings.pay_admin_password,
                     ),
-                    None,
+                    client=http_client,
                 ),
             ),
         )

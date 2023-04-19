@@ -1,8 +1,10 @@
+import contextlib
 import datetime
 import ipaddress
 import random
 from typing import Sequence
 
+import httpx
 import pydantic
 from motor import motor_asyncio
 from redis import asyncio as aioredis
@@ -25,6 +27,7 @@ from snowfall.project.junction.go.service.offers.grpc import (
     PriceQuoteService,
 )
 from snowfall.stdlib import service
+from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, producer, trackable, types
 from snowfall.stdlib.transport.grpc import server
@@ -137,77 +140,91 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
         random.choice(app.settings.mongo_dsn),  # nosec
     )
 
-    async with types.Connection(app.settings.amqp_dsn) as connection:
-        async with aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # nosec
-            decode_responses=True,
-        ).client() as redis_conn:
-            offer_importer = importer.OfferImporter(
-                consumer_obj=consumer.Consumer(
-                    connection=connection,
-                    queue_name="{0}_offers".format(app.name),
-                    binds=[
-                        (
-                            types.Exchange("offers"),
-                            trackable.to_tracking_key(_TRIP_OFFER_SEARCH_ROUTING_KEY),
-                        ),
-                        (types.Exchange("offers"), "offers.result.trip"),
-                    ],
-                ),
-                trip_offers=offers.TripOfferRepository(
-                    mongo.offers.trip_offers,
-                ),
-                offer_aggregator=aggregator.OfferAggregator(
-                    offer_aggregates=offers.OfferAggregateMappingRepository(
-                        mongo.offers.offer_aggregates,
-                    ),
-                    offer_buckets=aggregator.OfferBucketRepository(
-                        redis_client=redis.Client(
-                            redis=redis_conn,
-                            prefix=app.name,
+    async with contextlib.AsyncExitStack() as stack:
+        http_client = await stack.enter_async_context(httpx.AsyncClient(http2=True))
+        connection = await stack.enter_async_context(
+            types.Connection(
+                app.settings.amqp_dsn,
+            ),
+        )
+        redis_conn = await stack.enter_async_context(
+            aioredis.from_url(
+                random.choice(app.settings.redis_dsn),  # nosec
+                decode_responses=True,
+            ).client(),
+        )
+
+        logging.register(http_client)
+        metrics.register(http_client)
+
+        offer_importer = importer.OfferImporter(
+            consumer_obj=consumer.Consumer(
+                connection=connection,
+                queue_name="{0}_offers".format(app.name),
+                binds=[
+                    (
+                        types.Exchange("offers"),
+                        trackable.to_tracking_key(
+                            _TRIP_OFFER_SEARCH_ROUTING_KEY,
                         ),
                     ),
-                    offer_searches=offers.OfferSearchRepository(
-                        mongo.offers.offer_searches,
-                        app.settings.default_ttl,
-                    ),
+                    (types.Exchange("offers"), "offers.result.trip"),
+                ],
+            ),
+            trip_offers=offers.TripOfferRepository(
+                mongo.offers.trip_offers,
+            ),
+            offer_aggregator=aggregator.OfferAggregator(
+                offer_aggregates=offers.OfferAggregateMappingRepository(
+                    mongo.offers.offer_aggregates,
                 ),
-                redis=redis.Client(
-                    redis=redis_conn,
-                    prefix=app.name,
-                ),
-                status_handler=importer.StatusHandler(
-                    redis=redis.Client(
+                offer_buckets=aggregator.OfferBucketRepository(
+                    redis_client=redis.Client(
                         redis=redis_conn,
                         prefix=app.name,
-                    ),
-                    repository=offers.OfferSearchRepository(
-                        mongo.offers.offer_searches,
-                        app.settings.default_ttl,
                     ),
                 ),
                 offer_searches=offers.OfferSearchRepository(
                     mongo.offers.offer_searches,
                     app.settings.default_ttl,
                 ),
-                pay_quote_fetcher=pay_quotes.PayQuoteFetcher(
-                    use_pay_for_currency_conversions=(
-                        app.settings.use_pay_for_currency_conversions
-                    ),
-                    pay_client=PayClient(
-                        app.settings.public_pay_api_dsn,
-                        UserAuth(
-                            app.settings.public_pay_admin_api_dsn,
-                            app.settings.pay_admin_username,
-                            app.settings.pay_admin_password,
-                        ),
-                        None,
-                    ),
-                    payer_id=app.settings.payer_company_id,
-                    payer_currency=app.settings.payer_currency_code,
+            ),
+            redis=redis.Client(
+                redis=redis_conn,
+                prefix=app.name,
+            ),
+            status_handler=importer.StatusHandler(
+                redis=redis.Client(
+                    redis=redis_conn,
+                    prefix=app.name,
                 ),
-            )
-            await offer_importer.consume()
+                repository=offers.OfferSearchRepository(
+                    mongo.offers.offer_searches,
+                    app.settings.default_ttl,
+                ),
+            ),
+            offer_searches=offers.OfferSearchRepository(
+                mongo.offers.offer_searches,
+                app.settings.default_ttl,
+            ),
+            pay_quote_fetcher=pay_quotes.PayQuoteFetcher(
+                use_pay_for_currency_conversions=(
+                    app.settings.use_pay_for_currency_conversions
+                ),
+                pay_client=PayClient(
+                    base_url=app.settings.public_pay_api_dsn,
+                    auth=UserAuth(
+                        app.settings.public_pay_admin_api_dsn,
+                        app.settings.pay_admin_username,
+                        app.settings.pay_admin_password,
+                    ),
+                    client=http_client,
+                ),
+                payer_id=app.settings.payer_company_id,
+                payer_currency=app.settings.payer_currency_code,
+            ),
+        )
+        await offer_importer.consume()
 
 
 async def _gather_price_quotes(
@@ -217,7 +234,17 @@ async def _gather_price_quotes(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
 
-    async with types.Connection(app.settings.amqp_dsn) as connection:
+    async with contextlib.AsyncExitStack() as stack:
+        http_client = await stack.enter_async_context(httpx.AsyncClient(http2=True))
+        connection = await stack.enter_async_context(
+            types.Connection(
+                app.settings.amqp_dsn,
+            ),
+        )
+
+        logging.register(http_client)
+        metrics.register(http_client)
+
         price_quote_importer = importer.PriceQuoteImporter(
             consumer_obj=consumer.Consumer(
                 connection=connection,
@@ -236,13 +263,13 @@ async def _gather_price_quotes(
                     app.settings.use_pay_for_currency_conversions
                 ),
                 pay_client=PayClient(
-                    app.settings.public_pay_api_dsn,
-                    UserAuth(
+                    base_url=app.settings.public_pay_api_dsn,
+                    auth=UserAuth(
                         app.settings.public_pay_admin_api_dsn,
                         app.settings.pay_admin_username,
                         app.settings.pay_admin_password,
                     ),
-                    None,
+                    client=http_client,
                 ),
                 payer_id=app.settings.payer_company_id,
                 payer_currency=app.settings.payer_currency_code,
