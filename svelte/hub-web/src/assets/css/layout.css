@@ -21,15 +21,8 @@
 }
 
 .layout.page-header {
-  margin-bottom: 12px;
-  color: var(--color-neutral-800);
-  font-weight: 700;
-  font-size: 20px;
-  font-family: "Red Hat Display", Arial, Helvetica, sans-serif;
-  font-style: normal;
-  line-height: 36px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  padding: 26px 24px 34px;
+  color: var(--color-main-neutral-800);
 }
 
 .layout.tabs {
@@ -41,26 +34,20 @@
   display: flex;
   flex-flow: column;
   justify-content: space-between;
-  height: 28px;
-  color: var(--color-neutral-500);
-  font-weight: 600;
-  font-size: 12px;
-  font-family: "Red Hat Display", Arial, Helvetica, sans-serif;
-  font-style: normal;
-  line-height: 18px;
-  letter-spacing: 1px;
+  color: var(--color-main-neutral-600);
   text-decoration: none;
   transition: color 200ms ease;
 }
 
 .layout.tab.active {
-  color: var(--color-neutral-800);
+  color: var(--color-common-light-strong);
 }
 
 .layout.tab::after {
   display: block;
   width: 0;
-  border-bottom: var(--color-primary-500) 4px solid;
+  margin-top: 12px;
+  border-bottom: var(--color-main-primary-500) 4px solid;
   transition: width 200ms ease;
   content: "";
 }

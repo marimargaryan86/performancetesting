@@ -4,7 +4,7 @@
 </script>
 
 <span
-  class="status-badge"
+  class="status-badge typography body-small"
   class:ok={variant === 0}
   class:warn={variant === 1}
   class:error={variant === 2}
@@ -17,28 +17,28 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 6px 12px;
+    padding: 4px 8px;
     color: var(--color-generic-white);
     color: var(--color-neutral-900);
-    font-weight: 600;
-    font-size: 8px;
-    font-family: Poppins, Arial, Helvetica, sans-serif;
-    font-style: normal;
-    line-height: 12px;
-    letter-spacing: 0.15px;
     border: 1px solid #d8dadd;
-    border-radius: 8px;
+    border-radius: 4px;
   }
 
   .ok {
-    border-color: var(--color-success-500);
+    color: var(--color-semantic-success-600);
+    background-color: var(--color-semantic-success-50);
+    border-color: var(--color-semantic-success-200);
   }
 
   .error {
-    border-color: var(--color-error-500);
+    color: var(--color-semantic-error-600);
+    background-color: var(--color-semantic-error-100);
+    border-color: var(--color-semantic-error-200);
   }
 
   .warn {
-    border-color: var(--color-warning-500);
+    color: var(--color-semantic-warning-600);
+    background-color: var(--color-semantic-warning-50);
+    border-color: var(--color-semantic-warning-200);
   }
 </style>

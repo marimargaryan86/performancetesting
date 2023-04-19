@@ -1,22 +1,26 @@
 <script lang="ts">
-  import CopyIcon from "components/icons/copy-icon.svelte";
-  import EntityAvatar from "components/ui/entity-avatar.svelte";
-  import SortButton from "components/ui/sort-button.svelte";
-  import TransactionStatusBadge from "components/ui/transaction-status-badge.svelte";
-  import { filterTransactions } from "filters/transaction";
-  import { formatAmountAndCode } from "formatting/currency";
-  import { yymmdd } from "formatting/date-time";
-  import type { DirectionY } from "models/spatial";
-  import type { TransactionModel } from "models/transaction";
-  import { sortTransactions } from "sorting/transaction";
-  import type { FlattenedObject } from "utils/common";
+  import Header from "components/ui/table/header.svelte";
+  import TBody from "components/ui/table/t-body.svelte";
+  import THead from "components/ui/table/t-head.svelte";
+  import Table from "components/ui/table/table.svelte";
   import type { PageData } from "./$types";
+  import TRow from "components/ui/table/t-row.svelte";
+  import TCol from "components/ui/table/t-col.svelte";
+  import { yymmdd } from "formatting/date-time";
+  import EntityAvatar from "components/ui/entity-avatar.svelte";
+  import TransactionStatusBadge from "components/ui/transaction-status-badge.svelte";
+  import type { FlattenedObject } from "utils/common";
+  import type { TransactionModel } from "models/transaction";
+  import type { DirectionY } from "models/spatial";
+  import { sortTransactions } from "sorting/transaction";
+  import { filterTransactions } from "filters/transaction";
+  import { formatAmount } from "formatting/currency";
 
   export let data: PageData;
 
   const { searchQuery, status, dateRange } = data;
 
-  let sortBy: FlattenedObject<TransactionModel> = "id";
+  let sortGroup: FlattenedObject<TransactionModel> = "createdAt";
   let sortDirection: DirectionY = "down";
   let transactions: TransactionModel[] = [];
 
@@ -26,198 +30,122 @@
       status: $status,
       dateRange: $dateRange,
     }),
-    { by: sortBy, direction: sortDirection },
+    { by: sortGroup, direction: sortDirection },
   );
-
-  function createCopyFunc(value: string): () => void {
-    return () => {
-      navigator.clipboard.writeText(value);
-    };
-  }
 </script>
 
 <svelte:head>
   <title>Transactions · Activity · Pay · Junction Hub</title>
 </svelte:head>
 
-<table class="table-1">
-  <thead>
-    <tr>
-      <th>
-        <SortButton value="id" bind:direction={sortDirection} bind:group={sortBy} label="ID" />
-      </th>
-      <th>
-        <SortButton
-          value="parentId"
-          bind:direction={sortDirection}
-          bind:group={sortBy}
-          label="Parent ID"
-        />
-      </th>
-      <th>
-        <SortButton
-          value="createdAt"
-          bind:direction={sortDirection}
-          bind:group={sortBy}
-          label="Date created"
-        />
-      </th>
-      <th>
-        <SortButton
-          value="payer"
-          bind:direction={sortDirection}
-          bind:group={sortBy}
-          label="Payer"
-        />
-      </th>
-      <th>
-        <SortButton
-          value="amounts.quotation.amount"
-          bind:direction={sortDirection}
-          bind:group={sortBy}
-          label="Owed to us"
-        />
-      </th>
-      <th>
-        <SortButton
-          value="beneficiary"
-          bind:direction={sortDirection}
-          bind:group={sortBy}
-          label="Beneficiary"
-        />
-      </th>
-      <th>
-        <SortButton
-          value="amounts.beneficiary.amount"
-          bind:direction={sortDirection}
-          bind:group={sortBy}
-          label="What we owe"
-        />
-      </th>
-      <th>
-        <SortButton
-          value="amounts.salesMargin.amount"
-          bind:direction={sortDirection}
-          bind:group={sortBy}
-          label="Sales profit"
-        />
-      </th>
-      <th>
-        <SortButton
-          value="reference"
-          bind:direction={sortDirection}
-          bind:group={sortBy}
-          label="Reference"
-        />
-      </th>
-      <th>
-        <SortButton
-          value="status"
-          bind:direction={sortDirection}
-          bind:group={sortBy}
-          label="Status"
-        />
-      </th>
-    </tr>
-  </thead>
+<Table class="transactions-table">
+  <THead>
+    <Header>Parent ID</Header>
+    <Header>ID</Header>
+    <Header bind:sortGroup bind:sortDirection sortValue="createdAt">Created</Header>
+    <Header bind:sortGroup bind:sortDirection sortValue="payer.name">Payer</Header>
+    <Header bind:sortGroup bind:sortDirection sortValue="amounts.quotation.amount">
+      Owed to us
+    </Header>
+    <Header bind:sortGroup bind:sortDirection sortValue="beneficiary.name">Beneficiary</Header>
+    <Header bind:sortGroup bind:sortDirection sortValue="amounts.beneficiary.amount">
+      What we owe
+    </Header>
+    <Header bind:sortGroup bind:sortDirection sortValue="amounts.salesMargin.amount">
+      Sales Profit
+    </Header>
+    <Header>Reference</Header>
+    <Header bind:sortGroup bind:sortDirection sortValue="status">Status</Header>
+  </THead>
 
-  <tbody>
-    {#each transactions as transaction}
-      <tr>
-        <td>
-          <button class="copy" on:click={createCopyFunc(transaction.id)}>
-            <span class="ellipsis">{transaction.id}</span>
-            <CopyIcon color="var(--color-primary-500)" />
-          </button>
-        </td>
-        <td>
-          <button class="copy" on:click={createCopyFunc(transaction.parentId)}>
-            <span class="ellipsis">{transaction.parentId}</span>
-            <CopyIcon color="var(--color-primary-500)" />
-          </button>
-        </td>
-        <td>{yymmdd(transaction.createdAt)}</td>
-        <td>
-          <div class="company">
-            {#if transaction.payer}
-              <EntityAvatar name={transaction.payer.name} />
-              <span title={transaction.payer.name}>{transaction.payer.name}</span>
-            {/if}
+  <TBody>
+    {#each transactions as item}
+      <TRow>
+        <TCol maxWidth="96px">{item.parentId}</TCol>
+        <TCol maxWidth="96px">{item.id}</TCol>
+        <TCol>{yymmdd(item.createdAt)}</TCol>
+        <TCol maxWidth="160px">
+          {#if item.payer}
+            <div class="company">
+              <EntityAvatar name={item.payer.name} size="26px" />
+              <span>
+                {item.payer.name}
+              </span>
+            </div>
+          {/if}
+        </TCol>
+        <TCol>
+          <div class="money">
+            <span>{formatAmount(item.amounts.quotation)}</span>
+            <strong class="typography body-small">{item.amounts.quotation.currency}</strong>
           </div>
-        </td>
-        <td>{formatAmountAndCode(transaction.amounts.quotation)}</td>
-        <td>
-          <div class="company">
-            {#if transaction.beneficiary}
-              <EntityAvatar name={transaction.beneficiary.name} />
-              <span title={transaction.beneficiary.name}>{transaction.beneficiary.name}</span>
-            {/if}
+        </TCol>
+        <TCol maxWidth="160px">
+          {#if item.beneficiary}
+            <div class="company">
+              <EntityAvatar name={item.beneficiary.name} size="26px" />
+              <span>
+                {item.beneficiary.name}
+              </span>
+            </div>
+          {/if}
+        </TCol>
+        <TCol>
+          <div class="money">
+            <span>{formatAmount(item.amounts.beneficiary)}</span>
+            <strong class="typography body-small">{item.amounts.beneficiary.currency}</strong>
           </div>
-        </td>
-        <td>{formatAmountAndCode(transaction.amounts.beneficiary)}</td>
-        <td>{formatAmountAndCode(transaction.amounts.salesMargin)}</td>
-        <td>
-          <button class="copy" on:click={createCopyFunc(transaction.reference)}>
-            <span class="ellipsis">{transaction.reference}</span>
-            <CopyIcon color="var(--color-primary-500)" />
-          </button>
-        </td>
-        <td><TransactionStatusBadge value={transaction.status} /></td>
-      </tr>
+        </TCol>
+        <TCol>
+          <div class="money">
+            <span>{formatAmount(item.amounts.salesMargin)}</span>
+            <strong class="typography body-small">{item.amounts.salesMargin.currency}</strong>
+          </div>
+        </TCol>
+        <TCol maxWidth="96px">{item.reference}</TCol>
+        <TCol width="80px">
+          <TransactionStatusBadge value={item.status} />
+        </TCol>
+      </TRow>
     {/each}
-  </tbody>
-</table>
+  </TBody>
+</Table>
 
 <style>
-  table {
+  :global(.table.transactions-table) {
     width: 100%;
-    white-space: nowrap;
+    height: 100%;
   }
 
-  .ellipsis {
-    max-width: 80px;
-  }
-
-  td > :global(.status-badge) {
+  :global(.table.transactions-table .status-badge) {
     width: 100%;
-    vertical-align: middle;
   }
 
   .company {
     display: flex;
     gap: 8px;
     align-items: center;
-    max-width: 140px;
-  }
-
-  .company > span {
-    display: block;
-    overflow: hidden;
-    font-weight: 600;
-    text-overflow: ellipsis;
-  }
-
-  .copy {
-    display: flex;
-    align-items: center;
-    max-width: 80px;
-    font-weight: inherit;
-    font-size: inherit;
-    font-family: inherit;
-    background-color: transparent;
-    border: 0;
-    cursor: pointer;
-  }
-
-  .copy > :global(svg) {
-    flex-shrink: 0;
-  }
-
-  .copy:not(:hover) > :global(svg) {
-    display: none;
+    width: 100%;
   }
 
   .company > :global(.entity-avatar) {
     flex-shrink: 0;
+  }
+
+  .company > span {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .money {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .money > strong {
+    color: var(--color-main-neutral-600);
   }
 </style>

@@ -23,6 +23,26 @@
   letter-spacing: 0.5px;
 }
 
+.typography.headline-medium {
+  display: flex;
+  align-items: center;
+  font-size: 28px;
+  font-family: Raleway, Arial, Helvetica, sans-serif;
+  font-style: normal;
+  line-height: 36px;
+}
+
+.typography.headline-medium.bold {
+  font-weight: 700;
+}
+
+.typography.title-medium {
+  font-size: 18px;
+  font-family: Inter, Arial, Helvetica, sans-serif;
+  font-style: normal;
+  line-height: 24px;
+}
+
 .typography.bold {
   font-weight: 600;
 }

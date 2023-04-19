@@ -32,9 +32,29 @@
   --color-common-dark-strong: #ffffff;
   --color-common-background-light-green: #e2f3ef;
   --color-common-background-light-main: #ffffff;
+  --color-common-line-medium: #d7dbd8;
 
   /* Main */
   --color-main-neutral-50: #f0f2f5;
   --color-main-neutral-400: #bfc1c5;
+  --color-main-neutral-600: #8c8e92;
+  --color-main-neutral-700: #66686b;
+  --color-main-neutral-800: #363938;
+  --color-main-primary-50: #f6fbfa;
+  --color-main-primary-400: #6dc4af;
   --color-main-primary-500: #4bb69c;
+
+  /* Semantic */
+  --color-semantic-warning-50: #fefbf3;
+  --color-semantic-warning-200: #fee9a8;
+  --color-semantic-warning-600: #d68f1c;
+  --color-semantic-error-100: #ffe5d9;
+  --color-semantic-error-200: #ffc6b3;
+  --color-semantic-error-600: #db3041;
+  --color-semantic-success-50: #f6fcf5;
+  --color-semantic-success-200: #dff8aa;
+  --color-semantic-success-600: #60a51e;
+
+  /* Graidents */
+  --color-gradient-extensions-horizontal: linear-gradient(270deg, #d2ede6 0%, #edf8f5 100%);
 }

@@ -29,11 +29,14 @@
   .workspace {
     display: grid;
     grid-template-columns: max-content 1fr;
+    height: 100vh;
   }
 
   main {
-    padding: 16px 16px 0;
-    overflow-y: auto;
-    background-image: linear-gradient(155.07deg, #ffffff 10.38%, #e4f4f0 102.81%);
+    display: flex;
+    flex-flow: column;
+    height: 100vh;
+    overflow: auto;
+    background-color: #ffffff;
   }
 </style>

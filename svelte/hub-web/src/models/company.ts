@@ -1,4 +1,4 @@
-export interface CompanyModel {
+export type CompanyModel = {
   id: string;
   name: string;
-}
+};

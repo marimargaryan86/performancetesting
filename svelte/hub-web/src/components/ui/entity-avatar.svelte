@@ -11,13 +11,17 @@
 {#if imageUrl}
   <img src={imageUrl} alt="" title={name} class="entity-avatar" style:--size={size} />
 {:else}
-  <span class="entity-avatar" style:background-color={color} style:--size={size}>
+  <span
+    class="entity-avatar typography body-small bold"
+    style:background-color={color}
+    style:--size={size}
+  >
     {name ? getInitials(name) : "?"}
   </span>
 {/if}
 
 <style>
-  .entity-avatar {
+  span.entity-avatar {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -26,12 +30,8 @@
     object-fit: cover;
     object-position: center;
     color: var(--color-generic-white);
-    font-weight: 600;
     font-size: calc(var(--size) * 0.4);
-    font-family: "Red Hat Display", Arial, Helvetica, sans-serif;
-    font-style: normal;
-    line-height: 1;
-    letter-spacing: 0.1px;
+    text-shadow: 0 0 1px rgb(0 0 0 / 1), 0 0 2px rgb(0 0 0 / 1);
     border-radius: 50%;
     box-shadow: 0 4px 20px rgb(0 0 0 / 0.05);
     user-select: none;

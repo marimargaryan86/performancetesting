@@ -18,6 +18,7 @@
   $: displayValue = value?.length
     ? value.map((status) => format(status)).join(", ")
     : placeholder ?? "";
+  $: placeholderShowing = placeholder && !value?.length;
 
   function open(): void {
     expanded = true;
@@ -42,14 +43,14 @@
 
 <div class="status-picker" use:clickOutside={close}>
   <button class="header" on:click={toggle} type="button">
-    <span>{displayValue}</span>
+    <span class:placeholder={placeholderShowing}>{displayValue}</span>
 
     {#if value?.length && !expanded}
       <button type="button" on:click|stopPropagation={clearValue} class="clear">
-        <RemoveIcon color="var(--color-neutral-800)" />
+        <RemoveIcon color="var(--color-common-light-strong" />
       </button>
     {:else}
-      <ChevronIcon direction={expanded ? "up" : "down"} color="var(--color-neutral-900)" />
+      <ChevronIcon direction={expanded ? "up" : "down"} color="var(--color-common-light-strong)" />
     {/if}
   </button>
 
@@ -72,7 +73,7 @@
   .status-picker {
     --x-height: var(--height, 52px);
     --x-font-size: var(--font-size, 14px);
-    --x-icon-padding: var(--icon-padding, 12px);
+    --x-icon-padding: var(--icon-padding, 16px);
 
     position: relative;
     display: inline-block;
@@ -83,19 +84,25 @@
     gap: 8px;
     align-items: center;
     justify-content: space-between;
+    width: 100%;
     height: var(--x-height);
     padding: var(--x-icon-padding);
-    color: var(--color-neutral-900);
+    color: var(--color-common-light-strong);
     font-weight: 400;
     font-size: var(--x-font-size);
     font-family: Poppins, Arial, Helvetica, sans-serif;
     font-style: normal;
     letter-spacing: 0.1px;
-    background-color: var(--color-generic-white);
-    border: 1px solid var(--color-neutral-200);
+    background-color: var(--color-common-background-light-main);
+    border: 1px solid var(--color-common-line-medium);
     border-radius: 8px;
-    box-shadow: var(--shadow-xsmall);
     cursor: pointer;
+  }
+
+  .header > span {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .header > button,
@@ -122,6 +129,10 @@
     border-radius: 8px;
     box-shadow: 0 4px 6px rgb(17 24 39 / 0.05), 0 12px 16px rgb(17 24 39 / 0.1);
     transform-origin: top left;
+  }
+
+  .placeholder {
+    color: var(--color-common-light-soft);
   }
 
   li {

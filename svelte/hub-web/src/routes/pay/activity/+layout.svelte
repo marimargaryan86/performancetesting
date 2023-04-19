@@ -1,88 +1,118 @@
+<script lang="ts" context="module">
+  import Tabs, { type Tab } from "components/ui/tabs.svelte";
+
+  const tabs: Tab[] = [
+    { url: "/pay/activity", label: "Transactions", exact: true },
+    { url: "/pay/activity/fx", label: "FX", exact: true },
+  ];
+</script>
+
 <script lang="ts">
-  import { transactionStatus } from "models/transaction";
-  import { page } from "$app/stores";
+  import BreadCrumbs from "components/page/bread-crumbs.svelte";
+  import type { LayoutData } from "./$types";
   import SearchIcon from "components/icons/search-icon.svelte";
+  import FilterIcon from "components/icons/filter-icon.svelte";
+  import { slide } from "svelte/transition";
   import DatePicker from "components/ui/date-picker/date-picker.svelte";
   import StatusPicker from "components/ui/status-picker.svelte";
-  import TextField from "components/ui/text-field.svelte";
-  import type { LayoutData } from "./$types";
+  import { transactionStatus } from "models/transaction";
   import { formatTransactionStatus } from "formatting/transaction";
 
   export let data: LayoutData;
 
-  const tabs = [
-    { url: "/pay/activity", label: "Transactions" },
-    { url: "/pay/activity/fx", label: "FX" },
-  ];
+  let showFilters = false;
+  let { dateRange, status } = data;
 
-  const { searchQuery, dateRange, status } = data;
+  $: filtersActive = Boolean($dateRange || $status.length);
+
+  function toggleFilters(): void {
+    showFilters = !showFilters;
+  }
 </script>
 
-<div class="activity layout main-content">
-  <h1 class="layout page-header">Activity</h1>
+<BreadCrumbs items={data.breadCrumbs} />
 
-  <div class="layout content-box">
-    <ul class="layout tabs">
-      {#each tabs as tab}
-        <li>
-          <a href={tab.url} class="layout tab" class:active={$page.url.pathname === tab.url}>
-            {tab.label}
-          </a>
-        </li>
-      {/each}
-    </ul>
+<div class="header">
+  <h1 class="typography headline-medium bold">Activity</h1>
 
-    <div class="filters">
-      <TextField placeholder="Search" bind:value={$searchQuery}>
-        <SearchIcon slot="icon-before" color="var(--color-neutral-400)" />
-      </TextField>
-
-      <DatePicker range placeholder="Date range" bind:value={$dateRange} />
-
-      <StatusPicker
-        placeholder="Status"
-        statuses={transactionStatus}
-        bind:value={$status}
-        format={formatTransactionStatus}
-      />
-    </div>
-
-    <div class="content">
-      <slot />
-    </div>
+  <div class="actions">
+    <button><SearchIcon color="var(--color-main-primary-500)" /></button>
+    <button on:click={toggleFilters}>
+      <FilterIcon color="var(--color-main-primary-500)" active={filtersActive} />
+    </button>
   </div>
 </div>
 
+<div class="tabs">
+  {#if showFilters}
+    <ul class="filters" transition:slide|local={{ duration: 250 }}>
+      <li>
+        <DatePicker bind:value={$dateRange} range placeholder="Date Range" />
+      </li>
+      <li>
+        <StatusPicker
+          statuses={transactionStatus}
+          bind:value={$status}
+          format={formatTransactionStatus}
+          placeholder="Status"
+        />
+      </li>
+    </ul>
+  {/if}
+  <Tabs items={tabs} />
+</div>
+
+<div class="content">
+  <slot />
+</div>
+
 <style>
-  .content-box {
+  .header {
     display: flex;
-    flex-flow: column;
+    justify-content: space-between;
+    padding: 8px 24px 24px;
+  }
+
+  .actions {
+    display: flex;
     gap: 16px;
+    align-items: center;
+  }
+
+  .actions > button {
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+    cursor: pointer;
+  }
+
+  .tabs {
+    padding: 16px 24px 0;
+    background-color: var(--color-main-primary-50);
   }
 
   .filters {
     display: flex;
-    gap: 8px;
+    gap: 16px;
+    padding-bottom: 16px;
   }
 
-  .filters > :global(.text-field),
-  .filters > :global(.date-picker),
-  .filters > :global(.status-picker) {
-    --height: 40px;
-    --font-size: 12px;
-  }
-
-  .filters > :global(.text-field) {
+  .filters > li {
     width: 100%;
-    max-width: 240px;
+    max-width: 276px;
+  }
+
+  .filters :global(.date-picker),
+  .filters :global(.status-picker) {
+    --height: 40px;
+
+    width: 100%;
   }
 
   .content {
-    height: calc(100vh - 224px);
-    margin: 0 -16px -16px;
-    padding: 0 8px 8px;
+    flex-grow: 1;
+    padding: 24px;
     overflow: auto;
-    background-color: var(--color-generic-white);
-    border-radius: 0 0 8px 8px;
+    background-image: var(--color-gradient-extensions-horizontal);
   }
 </style>

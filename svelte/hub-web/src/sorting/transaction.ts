@@ -18,11 +18,11 @@ export function sortTransactions(
         return 0 - (a.parentId < b.parentId ? 1 : -1);
       case "createdAt":
         return 0 - (a.createdAt < b.createdAt ? 1 : -1);
-      case "payer":
+      case "payer.name":
         return 0 - ((a.payer?.name ?? 0) < (b.payer?.name ?? 0) ? 1 : -1);
       case "amounts.quotation.amount":
         return 0 - (a.amounts.quotation.amount < b.amounts.quotation.amount ? 1 : -1);
-      case "beneficiary":
+      case "beneficiary.name":
         return 0 - ((a.beneficiary?.name ?? 0) < (b.beneficiary?.name ?? 0) ? 1 : -1);
       case "amounts.beneficiary.amount":
         return 0 - (a.amounts.beneficiary.amount < b.amounts.beneficiary.amount ? 1 : -1);
