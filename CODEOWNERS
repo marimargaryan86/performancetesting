@@ -1,23 +1,26 @@
 [CI/CD]
-/.gitlab/ @jyggen
+.gitlab-ci.yml @platform-engineers
+/.gitlab/ @platform-engineers
 /nomad/ @vm
-/python/snowfall/plugin/ @jyggen
-/vendor/ @bolmis @jyggen
-.editorconfig @bolmis @jyggen
-.gitignore @bolmis @jyggen
-.gitlab-ci.yml @jyggen
-.python-version @jyggen
-buf.yaml @jyggen
-CONTRIBUTING.md @bolmis @jyggen
-docker-compose.yml @bolmis @jyggen
-pants.ci.toml @jyggen
-pants.toml @jyggen
-README.md @bolmis @jyggen
+
+[Documentation]
+*.md @platform-engineers
+
+[Platform]
+/python/snowfall/plugin/ @platform-engineers
+/python/snowfall/stdlib/ @platform-engineers
+/vendor/ @platform-engineers
+
+[Repository]
+.editorconfig @platform-engineers
+.gitignore @platform-engineers
+.python-version @platform-engineers
+buf.yaml @platform-engineers
+CODEOWNERS @platform-engineers
+docker-compose.yml @platform-engineers
+pants.ci.toml @platform-engineers
+pants.toml @platform-engineers
 
 [Specification]
-/docs/ @bolmis @jyggen
-/openapi/ @bolmis @jyggen
-/protobuf/ @bolmis @jyggen
-
-[Standard Library]
-/python/snowfall/stdlib/ @bolmis @jyggen
+/openapi/ @platform-engineers
+/protobuf/ @platform-engineers
