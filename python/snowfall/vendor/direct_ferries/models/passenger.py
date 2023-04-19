@@ -15,7 +15,7 @@ class AgeRange(pydantic.BaseModel):
 class RoutePassengerInfo(base.CamelCaseBaseModel):
     need_nationality: bool
     need_place_of_birth: bool
-    need_date_of_birth: bool
+    need_date_of_birth: bool = pydantic.Field(..., alias="needDateOfBith")
     need_passport: bool
     need_passport_start_date: bool
     need_passport_expiry_date: bool
@@ -64,3 +64,8 @@ class Passenger(PassengerBase):
     passport_expiry_date: Optional[str]
     city_code: Optional[str]
     extra_info: Optional[ExtraInfo]
+
+
+class RoutePassengerInfoExtended(base.CamelCaseBaseModel):
+    route_id: int
+    passenger_info: RoutePassengerInfo

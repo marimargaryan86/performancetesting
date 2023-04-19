@@ -180,6 +180,7 @@ async def _price_quotes(app: service.Application[config.PriceQuotesSettings]) ->
             ),
             price_ttl=app.settings.ttl,
             provider_company_id=app.settings.provider_company_id,
+            routes=route.RouteRepository(),
         ).consume()
 
 
@@ -255,10 +256,17 @@ async def _static(app: service.Application[config.StaticSettings]) -> None:
             await port.make_ports_from_routes(routes, output_path)
 
         if app.settings.dump_routes:
+            passenger_info_per_route = {
+                route_info.route_id: route_info
+                for route_info in await orchestrator.passenger_info_for_routes(
+                    df_client=df_client,
+                    routes=routes,
+                )
+            }
             output_path = (
                 str(app.settings.ports_path) if app.settings.ports_path else None
             )
-            await route.make_routes(routes, output_path)
+            await route.make_routes(routes, passenger_info_per_route, output_path)
 
 
 if __name__ == "__main__":

@@ -114,7 +114,7 @@ class DfAdapter(object):
                     *[
                         "{is_return_leg}-{route_id}-{departure_date_time}".format(
                             is_return_leg=leg.is_return_leg,
-                            route_id=leg.route_id,
+                            route_id=str(leg.route_id),
                             departure_date_time=str(leg.departure_date_time),
                         )
                         for leg in search_criteria.quote.legs

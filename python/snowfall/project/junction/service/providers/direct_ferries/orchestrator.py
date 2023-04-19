@@ -6,7 +6,7 @@ import structlog
 import tenacity
 
 from snowfall.vendor.direct_ferries import client, errors
-from snowfall.vendor.direct_ferries.models import operator, route, timetable
+from snowfall.vendor.direct_ferries.models import operator, passenger, route, timetable
 
 _logger = structlog.get_logger(__name__)
 _DAYS_IN_YEAR = 365
@@ -111,3 +111,26 @@ async def timetables_from_routes(
             )
         ],
     )
+
+
+async def passenger_info_for_routes(
+    df_client: client.DfClient,
+    routes: Sequence[route.Route],
+) -> list[passenger.RoutePassengerInfoExtended]:
+    responses = await _request_by_chunks(
+        [
+            [
+                df_client.routes.get_passenger_info_by_route_and_operator,
+                [route_obj.operator_details.identifier, route_obj.route_id],
+            ]
+            for route_obj in routes
+        ],
+    )
+
+    return [
+        passenger.RoutePassengerInfoExtended(
+            route_id=routes[idx].route_id,
+            passenger_info=response,
+        )
+        for idx, response in enumerate(responses)
+    ]

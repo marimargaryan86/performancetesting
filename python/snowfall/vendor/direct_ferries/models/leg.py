@@ -36,7 +36,7 @@ class Accommodation(base.CamelCaseBaseModel):
 
 class LegBase(base.CamelCaseBaseModel):
     is_return_leg: bool
-    route_id: str
+    route_id: int
     departure_date_time: datetime.datetime
     passengers: Sequence[passenger.PassengerBase]
 

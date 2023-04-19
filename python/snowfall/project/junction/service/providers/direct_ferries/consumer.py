@@ -9,7 +9,11 @@ from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as of
 from snowfall.project.junction.go.service.orders.v1alpha import (
     amqp_pb2 as orders_amqp_pb2,
 )
-from snowfall.project.junction.service.providers.direct_ferries import booking, cache
+from snowfall.project.junction.service.providers.direct_ferries import (
+    booking,
+    cache,
+    route,
+)
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.amqp import consumer, producer, types
@@ -27,6 +31,7 @@ class PriceQuoteConsumer(object):
         offer_cache: cache.OffersCache,
         price_ttl: datetime.timedelta,
         provider_company_id: str,
+        routes: route.RouteRepository,
     ):
         self._offer_cache = offer_cache
         self._ttl = price_ttl
@@ -34,6 +39,7 @@ class PriceQuoteConsumer(object):
         self._logger = structlog.get_logger(__name__)
         self._producer = producer_obj
         self._provider_company_id = provider_company_id
+        self._routes = routes
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -71,15 +77,52 @@ class PriceQuoteConsumer(object):
                         str(offer_details.quote.price.total_in_selected_currency),
                         money.Currency(offer_details.quote.selected_currency),
                     ).protobuf(),
-                    required_documents=[
-                        offers_pb2.PriceQuote.REQUIRED_NATIONALITY,
-                    ],
+                    required_documents=list(
+                        {
+                            req
+                            for leg in offer_details.quote.legs
+                            for req in self._get_required_docs(leg.route_id)
+                        },
+                    ),
                     rules=rules,
                 ),
                 provider_company_id=self._provider_company_id,
             ),
             routing_key="offers.result.price",
         )
+
+    def _get_required_docs(
+        self,
+        route_id: int,
+    ) -> list[offers_pb2.PriceQuote.Required.ValueType]:
+        requirements: list[offers_pb2.PriceQuote.Required.ValueType] = []
+        route_obj = self._routes.get_by_id(route_id)
+        passenger_info = route_obj.passenger_info
+
+        if not passenger_info:
+            return requirements
+
+        if passenger_info.need_passport:
+            requirements.append(
+                offers_pb2.PriceQuote.REQUIRED_PASSPORT_NUMBER,
+            )
+
+        if passenger_info.need_date_of_birth:
+            requirements.append(
+                offers_pb2.PriceQuote.REQUIRED_DATE_OF_BIRTH,
+            )
+
+        if passenger_info.need_nationality:
+            requirements.append(
+                offers_pb2.PriceQuote.REQUIRED_NATIONALITY,
+            )
+
+        if passenger_info.need_passport_expiry_date:
+            requirements.append(
+                offers_pb2.PriceQuote.REQUIRED_EXPIRATION_DATE,
+            )
+
+        return requirements
 
 
 class OrdersConsumer(object):

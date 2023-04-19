@@ -1,5 +1,4 @@
 import abc
-from typing import Sequence
 
 import httpx
 
@@ -15,6 +14,14 @@ class RouteClient(abc.ABC):
     @abc.abstractmethod
     async def get_routes_by_operator(self, operator_id: int) -> route.RouteResponse:
         """Get routes for a given operator."""
+
+    @abc.abstractmethod
+    async def get_passenger_info_by_route_and_operator(
+        self,
+        operator_id: int,
+        route_id: int,
+    ) -> passenger.RoutePassengerInfo:
+        """Get passenger requirements for a given route."""
 
 
 class RouteHttpClient(base.BaseClient, RouteClient):
@@ -97,7 +104,7 @@ class RouteHttpClient(base.BaseClient, RouteClient):
         self,
         operator_id: int,
         route_id: int,
-    ) -> Sequence[passenger.RoutePassengerInfo]:
+    ) -> passenger.RoutePassengerInfo:
         response_data = (
             await self._make_request(
                 request_details=base.RequestDetails(
@@ -115,7 +122,4 @@ class RouteHttpClient(base.BaseClient, RouteClient):
 
         route_passenger_info = response_data[_DATA_KEY]["routePassengerInfo"]
 
-        return [
-            passenger.RoutePassengerInfo(**passenger_information)
-            for passenger_information in route_passenger_info
-        ]
+        return passenger.RoutePassengerInfo(**route_passenger_info)
