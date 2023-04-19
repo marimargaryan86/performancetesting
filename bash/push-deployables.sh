@@ -42,7 +42,7 @@ for i in repo/development/**/*.nomad; do
 	rm "${i}"
 done
 
-for i in repo/{development,production}/**/*.{skip_deploy,vars}; do
+for i in repo/{development,production}/**/{.skip_deploy,*.vars}; do
 	rm "${i}"
 done
 
