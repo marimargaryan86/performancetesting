@@ -9,7 +9,6 @@
 
 <script lang="ts">
   import BreadCrumbs from "components/page/bread-crumbs.svelte";
-  import type { LayoutData } from "./$types";
   import SearchIcon from "components/icons/search-icon.svelte";
   import FilterIcon from "components/icons/filter-icon.svelte";
   import { slide } from "svelte/transition";
@@ -17,20 +16,44 @@
   import StatusPicker from "components/ui/status-picker.svelte";
   import { transactionStatus } from "models/transaction";
   import { formatTransactionStatus } from "formatting/transaction";
-
-  export let data: LayoutData;
+  import * as transactionFilters from "./(transactions)/+page.svelte";
+  import * as conversionFilters from "./fx/+page.svelte";
+  import { page } from "$app/stores";
+  import { conversionStatus } from "models/conversion";
+  import { formatConversionStatus } from "formatting/conversion";
 
   let showFilters = false;
-  let { dateRange, status } = data;
 
+  $: view =
+    $page.url.pathname === "/pay/activity" ? ("transactions" as const) : ("conversions" as const);
+  $: filters = view === "transactions" ? transactionFilters : conversionFilters;
+  $: dateRange = filters.dateRange;
+  $: status = filters.status;
   $: filtersActive = Boolean($dateRange || $status.length);
+  $: currTransactionStatus = transactionFilters.status;
+  $: currConversionStatus = conversionFilters.status;
+  $: breadCrumbs = [
+    {
+      url: "/pay/activity",
+      label: "Activity",
+    },
+    view === "transactions"
+      ? {
+          url: "/pay/activity",
+          label: "Transactions",
+        }
+      : {
+          url: "/pay/activity/fx",
+          label: "FX",
+        },
+  ];
 
   function toggleFilters(): void {
     showFilters = !showFilters;
   }
 </script>
 
-<BreadCrumbs items={data.breadCrumbs} />
+<BreadCrumbs items={breadCrumbs} />
 
 <div class="header">
   <h1 class="typography headline-medium bold">Activity</h1>
@@ -50,12 +73,21 @@
         <DatePicker bind:value={$dateRange} range placeholder="Date Range" />
       </li>
       <li>
-        <StatusPicker
-          statuses={transactionStatus}
-          bind:value={$status}
-          format={formatTransactionStatus}
-          placeholder="Status"
-        />
+        {#if view === "transactions"}
+          <StatusPicker
+            statuses={transactionStatus}
+            bind:value={$currTransactionStatus}
+            format={formatTransactionStatus}
+            placeholder="Status"
+          />
+        {:else}
+          <StatusPicker
+            statuses={conversionStatus}
+            bind:value={$currConversionStatus}
+            format={formatConversionStatus}
+            placeholder="Status"
+          />
+        {/if}
       </li>
     </ul>
   {/if}

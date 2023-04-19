@@ -1,3 +1,12 @@
+<script lang="ts" context="module">
+  import type { DateRange } from "models/date-time";
+  import type { TransactionModel, TransactionStatus } from "models/transaction";
+
+  export const dateRange = writable<DateRange | undefined>(undefined);
+  export const status = writable<TransactionStatus[]>([]);
+  export const searchQuery = writable("");
+</script>
+
 <script lang="ts">
   import Header from "components/ui/table/header.svelte";
   import TBody from "components/ui/table/t-body.svelte";
@@ -10,15 +19,14 @@
   import EntityAvatar from "components/ui/entity-avatar.svelte";
   import TransactionStatusBadge from "components/ui/transaction-status-badge.svelte";
   import type { FlattenedObject } from "utils/common";
-  import type { TransactionModel } from "models/transaction";
   import type { DirectionY } from "models/spatial";
   import { sortTransactions } from "sorting/transaction";
   import { filterTransactions } from "filters/transaction";
   import { formatAmount } from "formatting/currency";
+  import { writable } from "svelte/store";
+  import { onMount } from "svelte";
 
   export let data: PageData;
-
-  const { searchQuery, status, dateRange } = data;
 
   let sortGroup: FlattenedObject<TransactionModel> = "createdAt";
   let sortDirection: DirectionY = "down";
@@ -32,6 +40,12 @@
     }),
     { by: sortGroup, direction: sortDirection },
   );
+
+  onMount(() => {
+    $searchQuery = "";
+    $dateRange = undefined;
+    $status = [];
+  });
 </script>
 
 <svelte:head>

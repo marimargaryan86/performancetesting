@@ -101,7 +101,7 @@ module.exports = {
     "eol-last": ["error", "always"],
     "func-call-spacing": "error",
     "generator-star-spacing": ["error", "after"],
-    indent: ["error", 2, { SwitchCase: 1 }],
+    indent: ["error", 2, { SwitchCase: 1, offsetTernaryExpressions: true }],
     "newline-per-chained-call": "error",
     "no-multi-spaces": "error",
     "no-multiple-empty-lines": ["error", { max: 2 }],

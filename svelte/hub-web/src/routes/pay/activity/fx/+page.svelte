@@ -1,7 +1,16 @@
+<script lang="ts" context="module">
+  import type { ConversionStatus, ConversionModel } from "models/conversion";
+  import type { DateRange } from "models/date-time";
+  import { writable } from "svelte/store";
+
+  export const dateRange = writable<DateRange | undefined>(undefined);
+  export const status = writable<ConversionStatus[]>([]);
+  export const searchQuery = writable("");
+</script>
+
 <script lang="ts">
   import { filterConversions } from "filters/conversion";
   import { yymmdd } from "formatting/date-time";
-  import type { ConversionModel } from "models/conversion";
   import type { DirectionY } from "models/spatial";
   import { sortConversions } from "sorting/conversion";
   import type { FlattenedObject } from "utils/common";
@@ -13,10 +22,9 @@
   import TRow from "components/ui/table/t-row.svelte";
   import TCol from "components/ui/table/t-col.svelte";
   import ConversionStatusBadge from "components/ui/conversion-status-badge.svelte";
+  import { onMount } from "svelte";
 
   export let data: PageData;
-
-  const { searchQuery, dateRange } = data;
 
   let sortDirection: DirectionY = "down";
   let sortGroup: FlattenedObject<ConversionModel> = "id";
@@ -25,9 +33,16 @@
     filterConversions(data.conversions, {
       query: $searchQuery,
       dateRange: $dateRange,
+      status: $status,
     }),
     { by: sortGroup, direction: sortDirection },
   );
+
+  onMount(() => {
+    $searchQuery = "";
+    $dateRange = undefined;
+    $status = [];
+  });
 </script>
 
 <svelte:head>
