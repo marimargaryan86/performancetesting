@@ -109,7 +109,7 @@ class Orders(endpoints.HTTPEndpoint):
 
         journey = await orders_client.create_journey(
             contact_details=_create_contact_details(body["contactDetails"]),
-            auth_token=request.scope.get("security", {"jwt": ""})["jwt"],
+            reseller_id=request.user.username,
         )
         order = await orders_client.place_order(
             journey_id=journey.id,

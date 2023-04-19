@@ -4,8 +4,6 @@ import abc
 from collections.abc import Iterator
 from typing import Sequence
 
-from grpc import aio
-
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.junction.go.service.orders.v1alpha import (
     models_pb2,
@@ -24,7 +22,7 @@ class Client(abc.ABC):
     async def create_journey(
         self,
         contact_details: models_pb2.ContactDetails,
-        auth_token: str,
+        reseller_id: str,
     ) -> models_pb2.Journey:
         """Create a new journey resource."""
 
@@ -130,7 +128,7 @@ class DictClient(Client):
     async def create_journey(
         self,
         contact_details: models_pb2.ContactDetails,
-        auth_token: str,
+        reseller_id: str,
     ) -> models_pb2.Journey:
         journey = models_pb2.Journey(
             id=string.uuid(),
@@ -415,13 +413,15 @@ class GrpcClient(Client):
     async def create_journey(
         self,
         contact_details: models_pb2.ContactDetails,
-        auth_token: str,
+        reseller_id: str,
     ) -> models_pb2.Journey:
         response = await errors.handle_grpc_errors(
             self._orders.CreateJourney(
-                orders_pb2.CreateJourneyRequest(contact_details=contact_details),
+                orders_pb2.CreateJourneyRequest(
+                    contact_details=contact_details,
+                    reseller_id=reseller_id,
+                ),
                 timeout=self._timeout,
-                metadata=aio.Metadata(("authentication", auth_token)),
             ),
         )
 

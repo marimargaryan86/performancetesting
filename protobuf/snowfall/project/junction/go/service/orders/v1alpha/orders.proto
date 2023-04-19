@@ -22,6 +22,7 @@ service OrderService {
 
 message CreateJourneyRequest {
   ContactDetails contact_details = 1;
+  string reseller_id = 2;
 }
 
 message CreateJourneyResponse {
