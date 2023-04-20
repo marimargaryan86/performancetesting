@@ -2,7 +2,7 @@
   "development": {
     "variables": {
       "count": 2,
-      "payer_company_id": "25a2ea74-0a5d-4991-9ce0-4996be2bcceb",
+      "payer_company_id": "e084bf91-500b-4a10-8c79-a0694797d490",
       "payer_currency_code": "SEK",
       "api_pay_base_url": "https://api.pay.junction.dev",
       "pay_admin_api_base_url": "https://adminapi.pay.junction.dev",
