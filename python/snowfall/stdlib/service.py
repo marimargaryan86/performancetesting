@@ -175,7 +175,7 @@ def _group(ctx: click.Context, **kwargs: Any) -> None:
 def _configure(
     entrypoint: Entrypoint,
     global_settings: _GlobalSettings,
-) -> None:
+) -> structlog.BoundLogger:
     stdout.configure_logger(level=global_settings.log_level)
     logger = structlog.get_logger(__name__)
 
@@ -202,6 +202,49 @@ def _configure(
             dsn=global_settings.sentry_dsn,
         )
 
+    return logger
+
+
+async def _async_wrapper(
+    entrypoint: Entrypoint,
+    global_settings: _GlobalSettings,
+    application: Application[_Settings],
+    callback: AsyncCallback[_Settings],
+) -> None:
+    logger = _configure(entrypoint, global_settings)
+
+    async with AsyncApplication.from_application(application) as async_app:
+        tasks: list[Awaitable[None | web.MetricsHTTPServer]] = [
+            callback(async_app),
+        ]
+
+        if global_settings.prometheus_port:
+            tasks.append(
+                web.start_http_server(port=global_settings.prometheus_port),
+            )
+
+        try:
+            await asyncio.gather(*tasks)
+        except Exception:  # noqa: PIE786
+            logger.exception()
+
+
+def _sync_wrapper(
+    entrypoint: Entrypoint,
+    global_settings: _GlobalSettings,
+    application: Application[_Settings],
+    callback: SyncCallback[_Settings],
+) -> None:
+    logger = _configure(entrypoint, global_settings)
+
+    if global_settings.prometheus_port:
+        web.start_http_server_in_thread(port=global_settings.prometheus_port)
+
+    try:
+        callback(application)
+    except Exception:  # noqa: PIE786
+        logger.exception()
+
 
 def _command(
     command: Command[_Settings],
@@ -223,27 +266,21 @@ def _command(
             version=global_settings.version,
         )
 
-        _configure(entrypoint, global_settings)
-
-        if not inspect.iscoroutinefunction(command.callback):
-            if global_settings.prometheus_port:
-                web.start_http_server_in_thread(port=global_settings.prometheus_port)
-            cast(SyncCallback[_Settings], command.callback)(application)
-            return
-
-        async def wrapper() -> None:
-            async with AsyncApplication.from_application(application) as async_app:
-                tasks: list[Awaitable[None | web.MetricsHTTPServer]] = [
-                    cast(AsyncCallback[_Settings], command.callback)(async_app),
-                ]
-
-                if global_settings.prometheus_port:
-                    tasks.append(
-                        web.start_http_server(port=global_settings.prometheus_port),
-                    )
-
-                await asyncio.gather(*tasks)
-
-        asyncio.run(wrapper())
+        if inspect.iscoroutinefunction(command.callback):
+            asyncio.run(
+                _async_wrapper(
+                    entrypoint,
+                    global_settings,
+                    application,
+                    command.callback,
+                ),
+            )
+        else:
+            _sync_wrapper(
+                entrypoint,
+                global_settings,
+                application,
+                cast(SyncCallback[_Settings], command.callback),
+            )
 
     return decorator
