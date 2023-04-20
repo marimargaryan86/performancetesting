@@ -21,7 +21,6 @@ pants:setup:
     - pants --version
   after_script:
     - ./bash/nuke-if-too-big.sh "${SCIE_BASE}" 512
-    - ./bash/nuke-if-too-big.sh "${PANTS_NAMED_CACHES_DIR}" 2048
   artifacts:
     paths:
       - .pants.d/pants.log
@@ -32,20 +31,12 @@ pants:setup:
     PANTS_CONFIG_FILES: ./pants.ci.toml
     PANTS_DOCKER_DEFAULT_REPOSITORY: "${CI_PROJECT_PATH}/service/{directory}"
     PANTS_DOCKER_REGISTRIES: "{'${CI_REGISTRY}': {'address': '${CI_REGISTRY}', 'default': True}}"
-    PANTS_NAMED_CACHES_DIR: "${CI_PROJECT_DIR}/.cache/named"
     SCIE_BASE: "${CI_PROJECT_DIR}/.cache/scie"
   cache:
     - key: "python-3.11.3-go-1.19.7-scie-0.5.4-pants-2.16.0rc0-0"
       when: always
       paths:
         - "${SCIE_BASE}"
-    - key:
-        files:
-          - "golang/go.sum"
-          - "vendor/constraints.txt"
-      when: always
-      paths:
-        - "${PANTS_NAMED_CACHES_DIR}"
   needs:
     - "pants:setup"
   tags:

@@ -8,6 +8,10 @@ remote_cache_write = true
 remote_store_address = "grpc://10.0.135.64:9092"
 remote_store_rpc_concurrency = 256
 
+[anonymous-telemetry]
+enabled = true
+repo_id = "b578286c-4763-4a8e-ad9e-019c90b7b25d"
+
 [coverage-py]
 report = ["console", "xml"]
 
