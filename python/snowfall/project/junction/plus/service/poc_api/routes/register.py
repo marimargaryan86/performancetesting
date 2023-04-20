@@ -38,13 +38,13 @@ class WhatsappRegister(endpoints.HTTPEndpoint):
             spnr=response["journey"]["reference"],
             mobile_number=response["journey"]["contactDetails"]["phoneNumber"],
         )
-        await orders_repository.insert(order)
 
         mobile_number = "".join(order.mobile_number.split())
         subscription = await subscriptions_repository.find_by_id(mobile_number)
         # For now, we add manually the potential subscribers into this collection.
         # This needs to change after the demo and handle it automatically
         if subscription:
+            await orders_repository.insert(order)
             if "subscribed" in subscription and subscription["subscribed"]:
                 await chatbot_utils.register_booking_confirmation_agent(
                     junction_client,
