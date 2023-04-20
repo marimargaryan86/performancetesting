@@ -200,7 +200,7 @@ class OfferAggregator(object):
             raise SkippedOfferError()
 
         if offer_search.status == trackable_pb2.Trackable.STATUS_COMPLETED:
-            self._logger.error(
+            self._logger.warning(
                 "Offer arrived too late",
                 offer_search_id=offer_search.id,
                 offer_group_id=search_result.offer.id,
