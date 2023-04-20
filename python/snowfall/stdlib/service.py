@@ -1,17 +1,18 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import dataclasses
 import inspect
 from typing import (  # noqa: WPS235
     Any,
+    AsyncIterator,
     Awaitable,
     Callable,
     Generic,
     Optional,
     Type,
     TypeVar,
-    Union,
     cast,
 )
 
@@ -73,10 +74,30 @@ class Application(Generic[_Settings]):
     version: str
 
 
-Callback = Union[
-    Callable[[Application[_Settings]], None],
-    Callable[[Application[_Settings]], Awaitable[None]],
-]
+@dataclasses.dataclass(frozen=True)
+class AsyncApplication(Application[_Settings]):
+    stack: contextlib.AsyncExitStack
+
+    @classmethod
+    @contextlib.asynccontextmanager
+    async def from_application(
+        cls,
+        app: Application[_Settings],
+    ) -> AsyncIterator[AsyncApplication[_Settings]]:
+        async with contextlib.AsyncExitStack() as stack:
+            yield AsyncApplication(
+                stack=stack,
+                environment=app.environment,
+                name=app.name,
+                settings=app.settings,
+                user_agent=app.user_agent,
+                version=app.version,
+            )
+
+
+SyncCallback = Callable[[Application[_Settings]], None]
+AsyncCallback = Callable[[AsyncApplication[_Settings]], Awaitable[None]]
+Callback = SyncCallback[_Settings] | AsyncCallback[_Settings]
 
 
 @dataclasses.dataclass(frozen=True)
@@ -207,23 +228,21 @@ def _command(
         if not inspect.iscoroutinefunction(command.callback):
             if global_settings.prometheus_port:
                 web.start_http_server_in_thread(port=global_settings.prometheus_port)
-            command.callback(application)
+            cast(SyncCallback[_Settings], command.callback)(application)
             return
 
         async def wrapper() -> None:
-            tasks: list[Awaitable[None | web.MetricsHTTPServer]] = [
-                cast(
-                    Callable[[Application[_Settings]], Awaitable[None]],
-                    command.callback,
-                )(application),
-            ]
+            async with AsyncApplication.from_application(application) as async_app:
+                tasks: list[Awaitable[None | web.MetricsHTTPServer]] = [
+                    cast(AsyncCallback[_Settings], command.callback)(async_app),
+                ]
 
-            if global_settings.prometheus_port:
-                tasks.append(
-                    web.start_http_server(port=global_settings.prometheus_port),
-                )
+                if global_settings.prometheus_port:
+                    tasks.append(
+                        web.start_http_server(port=global_settings.prometheus_port),
+                    )
 
-            await asyncio.gather(*tasks)
+                await asyncio.gather(*tasks)
 
         asyncio.run(wrapper())
 
