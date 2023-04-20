@@ -51,7 +51,7 @@ job "pay-api-admin" {
     auto_revert       = true
     auto_promote      = true
     canary            = 1
-    healthy_deadline  = "30s"
+    healthy_deadline  = "60s"
     progress_deadline = "2m"
   }
 
