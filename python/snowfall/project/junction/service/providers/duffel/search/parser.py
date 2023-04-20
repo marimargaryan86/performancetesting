@@ -11,7 +11,7 @@ from snowfall.project.junction.go.service.offers.v1alpha import (
 from snowfall.project.junction.service.providers.duffel import cache, enums
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import models_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
 from snowfall.vendor.duffel.models.offer import Offer
 from snowfall.vendor.duffel.models.offer_slice import OfferSlice, OfferSliceSegment
 
@@ -78,7 +78,7 @@ class OfferParser(object):  # noqa: WPS214
                     origin=models_pb2.Point(
                         ref=offer_leg.origin.iata_code or "",
                         name=offer_leg.origin.name,
-                        coordinates=models_pb2.Coordinates(
+                        coordinates=latlng_pb2.LatLng(
                             latitude=offer_leg.origin.latitude,
                             longitude=offer_leg.origin.longitude,
                         ),
@@ -87,7 +87,7 @@ class OfferParser(object):  # noqa: WPS214
                     destination=models_pb2.Point(
                         ref=offer_leg.destination.iata_code or "",
                         name=offer_leg.destination.name or "",
-                        coordinates=models_pb2.Coordinates(
+                        coordinates=latlng_pb2.LatLng(
                             latitude=offer_leg.destination.latitude,
                             longitude=offer_leg.destination.longitude,
                         ),

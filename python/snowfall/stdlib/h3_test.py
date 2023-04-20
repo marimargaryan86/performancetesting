@@ -4,7 +4,7 @@ from typing import Collection
 import pytest
 
 from snowfall.stdlib import h3
-from snowfall.stdlib.v1alpha import models_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2
 
 _H3_LOCATIONS = [
     h3.CoordinatesItem(
@@ -46,7 +46,7 @@ def h3_mapping_repository() -> h3.H3MappingRepository[h3.CoordinatesItem]:
     ("coordinates", "radius", "expected_station_ids"),
     [
         (
-            models_pb2.Coordinates(
+            latlng_pb2.LatLng(
                 latitude=46.287961,
                 longitude=11.232652,
             ),
@@ -54,7 +54,7 @@ def h3_mapping_repository() -> h3.H3MappingRepository[h3.CoordinatesItem]:
             {"SAT_IT_MA_XZWAD"},
         ),
         (
-            models_pb2.Coordinates(
+            latlng_pb2.LatLng(
                 latitude=59.638408,
                 longitude=17.946854,
             ),
@@ -62,7 +62,7 @@ def h3_mapping_repository() -> h3.H3MappingRepository[h3.CoordinatesItem]:
             set(),
         ),
         (
-            models_pb2.Coordinates(
+            latlng_pb2.LatLng(
                 latitude=49.2556226,
                 longitude=6.8588948,
             ),
@@ -70,7 +70,7 @@ def h3_mapping_repository() -> h3.H3MappingRepository[h3.CoordinatesItem]:
             {"SAT_DE_VO_XSTMO"},
         ),
         (
-            models_pb2.Coordinates(
+            latlng_pb2.LatLng(
                 latitude=48.861496,
                 longitude=2.33368,
             ),
@@ -78,7 +78,7 @@ def h3_mapping_repository() -> h3.H3MappingRepository[h3.CoordinatesItem]:
             {"SAT_FR_PA_WXNGQ"},
         ),
         (
-            models_pb2.Coordinates(
+            latlng_pb2.LatLng(
                 latitude=48.103175,
                 longitude=-1.672335,
             ),
@@ -89,7 +89,7 @@ def h3_mapping_repository() -> h3.H3MappingRepository[h3.CoordinatesItem]:
 )
 def test_coordinates_to_id(
     h3_mapping_repository: h3.H3MappingRepository[h3.CoordinatesItem],
-    coordinates: models_pb2.Coordinates,
+    coordinates: latlng_pb2.LatLng,
     radius: int,
     expected_station_ids: Collection[str],
 ) -> None:

@@ -16,7 +16,7 @@ from snowfall.project.junction.extensions.service.mobile_api import (
 )
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib.persistence import filesystem
-from snowfall.stdlib.v1alpha import models_pb2 as stdlib_models_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2
 
 _SERVICE_NAME = "mobile-api"
 _ATTRIBUTES_KEY = "attributes"
@@ -87,7 +87,7 @@ async def _save_enrich_data(
                 id=place["id"],
                 name=attributes["name"],
                 no_accent_name=unidecode(attributes["name"]),
-                coordinates=stdlib_models_pb2.Coordinates(
+                coordinates=latlng_pb2.LatLng(
                     latitude=attributes["latitude"],
                     longitude=attributes["longitude"],
                 ),

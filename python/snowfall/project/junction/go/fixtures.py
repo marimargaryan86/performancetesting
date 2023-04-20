@@ -524,7 +524,7 @@ def generate_point(identifier: str) -> models_pb2.Point:
     return models_pb2.Point(
         ref=identifier,
         name="Point name",
-        coordinates=models_pb2.Coordinates(),
+        coordinates=latlng_pb2.LatLng(),
         time_zone="Europe/Stockholm",
     )
 

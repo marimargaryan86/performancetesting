@@ -9,6 +9,7 @@ from google.protobuf import json_format, timestamp_pb2
 from snowfall.project.junction.go.service.offers.v1alpha import amqp_pb2, models_pb2
 from snowfall.project.junction.service.providers.ask2go import criteria
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.v1alpha import latlng_pb2
 from snowfall.stdlib.v1alpha import models_pb2 as common_models_pb2
 
 
@@ -36,13 +37,13 @@ _SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
                             common_models_pb2.Leg(
                                 id="LEG1",
                                 origin=common_models_pb2.Point(
-                                    coordinates=common_models_pb2.Coordinates(
+                                    coordinates=latlng_pb2.LatLng(
                                         latitude=59.351209,
                                         longitude=-2.900537,
                                     ),
                                 ),
                                 destination=common_models_pb2.Point(
-                                    coordinates=common_models_pb2.Coordinates(
+                                    coordinates=latlng_pb2.LatLng(
                                         latitude=59.350376,
                                         longitude=-2.949954,
                                     ),
@@ -206,13 +207,13 @@ _MULTIMODAL_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
                             common_models_pb2.Leg(
                                 id="LEG1",
                                 origin=common_models_pb2.Point(
-                                    coordinates=common_models_pb2.Coordinates(
+                                    coordinates=latlng_pb2.LatLng(
                                         latitude=59.650831,
                                         longitude=17.92119,
                                     ),
                                 ),
                                 destination=common_models_pb2.Point(
-                                    coordinates=common_models_pb2.Coordinates(
+                                    coordinates=latlng_pb2.LatLng(
                                         latitude=57.667778,
                                         longitude=12.294444,
                                     ),
@@ -228,13 +229,13 @@ _MULTIMODAL_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
                             common_models_pb2.Leg(
                                 id="LEG2",
                                 origin=common_models_pb2.Point(
-                                    coordinates=common_models_pb2.Coordinates(
+                                    coordinates=latlng_pb2.LatLng(
                                         latitude=57.667778,
                                         longitude=12.294444,
                                     ),
                                 ),
                                 destination=common_models_pb2.Point(
-                                    coordinates=common_models_pb2.Coordinates(
+                                    coordinates=latlng_pb2.LatLng(
                                         latitude=51.470311,
                                         longitude=-0.458118,
                                     ),
@@ -250,13 +251,13 @@ _MULTIMODAL_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
                             common_models_pb2.Leg(
                                 id="LEG3",
                                 origin=common_models_pb2.Point(
-                                    coordinates=common_models_pb2.Coordinates(
+                                    coordinates=latlng_pb2.LatLng(
                                         latitude=51.470311,
                                         longitude=-0.458118,
                                     ),
                                 ),
                                 destination=common_models_pb2.Point(
-                                    coordinates=common_models_pb2.Coordinates(
+                                    coordinates=latlng_pb2.LatLng(
                                         latitude=33.9425,
                                         longitude=-118.408056,
                                     ),
@@ -294,13 +295,13 @@ _MULTISEGMENT_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
                             common_models_pb2.Leg(
                                 id="LEG1",
                                 origin=common_models_pb2.Point(
-                                    coordinates=common_models_pb2.Coordinates(
+                                    coordinates=latlng_pb2.LatLng(
                                         latitude=59.650831,
                                         longitude=17.92119,
                                     ),
                                 ),
                                 destination=common_models_pb2.Point(
-                                    coordinates=common_models_pb2.Coordinates(
+                                    coordinates=latlng_pb2.LatLng(
                                         latitude=57.667778,
                                         longitude=12.294444,
                                     ),
@@ -316,13 +317,13 @@ _MULTISEGMENT_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
                             common_models_pb2.Leg(
                                 id="LEG2",
                                 origin=common_models_pb2.Point(
-                                    coordinates=common_models_pb2.Coordinates(
+                                    coordinates=latlng_pb2.LatLng(
                                         latitude=57.667778,
                                         longitude=12.294444,
                                     ),
                                 ),
                                 destination=common_models_pb2.Point(
-                                    coordinates=common_models_pb2.Coordinates(
+                                    coordinates=latlng_pb2.LatLng(
                                         latitude=51.470311,
                                         longitude=-0.458118,
                                     ),
@@ -360,13 +361,13 @@ _ROUNDTRIP_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
                             common_models_pb2.Leg(
                                 id="LEG1",
                                 origin=common_models_pb2.Point(
-                                    coordinates=common_models_pb2.Coordinates(
+                                    coordinates=latlng_pb2.LatLng(
                                         latitude=59.650831,
                                         longitude=17.92119,
                                     ),
                                 ),
                                 destination=common_models_pb2.Point(
-                                    coordinates=common_models_pb2.Coordinates(
+                                    coordinates=latlng_pb2.LatLng(
                                         latitude=57.667778,
                                         longitude=12.294444,
                                     ),
@@ -387,13 +388,13 @@ _ROUNDTRIP_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
                             common_models_pb2.Leg(
                                 id="LEG2",
                                 origin=common_models_pb2.Point(
-                                    coordinates=common_models_pb2.Coordinates(
+                                    coordinates=latlng_pb2.LatLng(
                                         latitude=57.667778,
                                         longitude=12.294444,
                                     ),
                                 ),
                                 destination=common_models_pb2.Point(
-                                    coordinates=common_models_pb2.Coordinates(
+                                    coordinates=latlng_pb2.LatLng(
                                         latitude=59.650831,
                                         longitude=17.92119,
                                     ),

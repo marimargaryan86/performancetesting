@@ -16,7 +16,7 @@ from snowfall.project.junction.service.providers.duffel.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.v1alpha import models_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
 from snowfall.vendor.duffel import client
 from snowfall.vendor.duffel.models.offer import Offer
 
@@ -98,14 +98,14 @@ def search_task_from_offer(offer: Offer) -> amqp_pb2.SearchCriteriaTask:
                     models_pb2.Leg(
                         id=str(uuid.uuid4()),
                         origin=models_pb2.Point(
-                            coordinates=models_pb2.Coordinates(
+                            coordinates=latlng_pb2.LatLng(
                                 longitude=offer_leg.origin.longitude,
                                 latitude=offer_leg.origin.latitude,
                             ),
                             time_zone=offer_leg.origin.time_zone,
                         ),
                         destination=models_pb2.Point(
-                            coordinates=models_pb2.Coordinates(
+                            coordinates=latlng_pb2.LatLng(
                                 longitude=offer_leg.destination.longitude,
                                 latitude=offer_leg.destination.latitude,
                             ),

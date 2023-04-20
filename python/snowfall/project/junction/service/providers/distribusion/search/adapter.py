@@ -12,7 +12,7 @@ from snowfall.project.junction.service.providers.distribusion.search import amen
 from snowfall.project.junction.service.providers.distribusion.v1alpha import amqp_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import models_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
 from snowfall.vendor.distribusion import client
 from snowfall.vendor.distribusion.models import connections
 from snowfall.vendor.distribusion.models.criterias import FindConnectionsCriteria
@@ -451,7 +451,7 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
         return models_pb2.Point(
             ref=station.code,
             name=station.name or "",
-            coordinates=models_pb2.Coordinates(
+            coordinates=latlng_pb2.LatLng(
                 latitude=station.latitude,
                 longitude=station.longitude,
             ),

@@ -9,7 +9,7 @@ import pydantic
 from dateutil import parser
 from google.protobuf import descriptor, timestamp_pb2
 
-from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2
 
 AnyValue = TypeVar("AnyValue", bound=Any)
 
@@ -35,38 +35,6 @@ class Normalizer(abc.ABC):
     @abc.abstractmethod
     def supports(self, fqn: str) -> bool:
         """Return whether this normalizer supports normalizing a specific FQN."""
-
-
-class _CoordinatesNormalizer(Normalizer):
-    def denormalize(
-        self,
-        maybe_dict: AnyValue,
-    ) -> AnyValue:
-        return cast(
-            AnyValue,
-            {
-                _LAT_KEY: maybe_dict[_COORDINATES_KEY][1],
-                _LON_KEY: maybe_dict[_COORDINATES_KEY][0],
-            },
-        )
-
-    def supports(self, fqn: str) -> bool:
-        return fqn == models_pb2.Coordinates().DESCRIPTOR.full_name
-
-    def normalize(
-        self,
-        maybe_dict: AnyValue,
-    ) -> AnyValue:
-        return cast(
-            AnyValue,
-            {
-                "type": "Point",
-                _COORDINATES_KEY: [
-                    maybe_dict[_LON_KEY],
-                    maybe_dict[_LAT_KEY],
-                ],
-            },
-        )
 
 
 class _IdNormalizer(Normalizer):
@@ -151,7 +119,6 @@ class _NormalizerMode(IntEnum):
 
 _additional: list[Normalizer] = []
 _normalizers: list[Normalizer] = [
-    _CoordinatesNormalizer(),
     _IdNormalizer(),
     _LatLngNormalizer(),
     _TimestampNormalizer(),

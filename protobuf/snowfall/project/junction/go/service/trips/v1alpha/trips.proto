@@ -6,6 +6,7 @@ import "google/protobuf/timestamp.proto";
 import "snowfall/project/junction/go/service/offers/v1alpha/models.proto";
 import "snowfall/stdlib/v1alpha/amqp.proto";
 import "snowfall/stdlib/v1alpha/datetime.proto";
+import "snowfall/stdlib/v1alpha/latlng.proto";
 import "snowfall/stdlib/v1alpha/models.proto";
 import "snowfall/stdlib/v1alpha/options.proto";
 
@@ -113,10 +114,10 @@ message GetTripCandidateSearchDetailsResponse {
 }
 
 message TripCandidateSearchCriteria {
-  snowfall.stdlib.v1alpha.Coordinates origin = 1;
-  snowfall.stdlib.v1alpha.Coordinates destination = 2;
-  repeated snowfall.stdlib.v1alpha.Coordinates origins = 3;
-  repeated snowfall.stdlib.v1alpha.Coordinates destinations = 4;
+  snowfall.stdlib.v1alpha.LatLng origin = 1;
+  snowfall.stdlib.v1alpha.LatLng destination = 2;
+  repeated snowfall.stdlib.v1alpha.LatLng origins = 3;
+  repeated snowfall.stdlib.v1alpha.LatLng destinations = 4;
   snowfall.stdlib.v1alpha.DateTime departure_after = 5;
   optional uint32 maximum_connections = 6;
 }

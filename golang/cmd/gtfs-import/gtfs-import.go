@@ -430,7 +430,7 @@ func destinationId(destination *gtfs.Stop, stopTz map[string]string) *v1alpha.Po
 	return &v1alpha.Point{
 		Ref:  destination.Id,
 		Name: destination.Name,
-		Coordinates: &v1alpha.Coordinates{
+		Coordinates: &v1alpha.LatLng{
 			Latitude:  destination.Latitude,
 			Longitude: destination.Longitude,
 		},
@@ -442,7 +442,7 @@ func originId(origin *gtfs.Stop, stopTz map[string]string) *v1alpha.Point {
 	return &v1alpha.Point{
 		Ref:  origin.Id,
 		Name: origin.Name,
-		Coordinates: &v1alpha.Coordinates{
+		Coordinates: &v1alpha.LatLng{
 			Latitude:  origin.Latitude,
 			Longitude: origin.Longitude,
 		},

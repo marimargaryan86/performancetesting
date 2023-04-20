@@ -10,7 +10,7 @@ from snowfall.project.junction.provider import airports
 from snowfall.project.junction.service.providers.ba_ndc import cache, enums
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import models_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
 from snowfall.vendor.ba_ndc.adapters.offers_response_adapter import (
     OffersResponseAdapter,
 )
@@ -318,10 +318,10 @@ class OfferParser(object):
     def _get_coordinates(
         self,
         iata_airport_code: str,
-    ) -> models_pb2.Coordinates:
+    ) -> latlng_pb2.LatLng:
         airport = self._airport_repository.get_by_iata(iata_airport_code)
 
-        return models_pb2.Coordinates(
+        return latlng_pb2.LatLng(
             latitude=airport.latitude,
             longitude=airport.longitude,
         )

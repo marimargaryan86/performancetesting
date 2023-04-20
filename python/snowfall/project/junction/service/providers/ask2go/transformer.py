@@ -11,7 +11,7 @@ from snowfall.project.junction.provider import airports, cabin_classes
 from snowfall.project.junction.service.providers.ask2go import cache, models
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import models_pb2, money_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2, money_pb2
 from snowfall.vendor.ask2go.models import booking, offers, price
 
 _GroupedOfferSegment = Tuple[offers.TripSegment, offers_pb2.OfferSegment]
@@ -354,7 +354,7 @@ class OfferTransformer(object):  # noqa: WPS214
                     origin=models_pb2.Point(
                         ref=origin.identifier,
                         name=origin.airport_name or "",
-                        coordinates=models_pb2.Coordinates(
+                        coordinates=latlng_pb2.LatLng(
                             latitude=origin.latitude,
                             longitude=origin.longitude,
                         ),
@@ -363,7 +363,7 @@ class OfferTransformer(object):  # noqa: WPS214
                     destination=models_pb2.Point(
                         ref=destination.identifier,
                         name=destination.airport_name or "",
-                        coordinates=models_pb2.Coordinates(
+                        coordinates=latlng_pb2.LatLng(
                             latitude=destination.latitude,
                             longitude=destination.longitude,
                         ),

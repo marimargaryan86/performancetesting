@@ -6,7 +6,7 @@ from typing import Generic, Iterable, TypeVar
 
 from h3.api import numpy_int as h3
 
-from snowfall.stdlib.v1alpha import models_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2
 
 
 @dataclasses.dataclass(frozen=True)
@@ -41,7 +41,7 @@ class H3MappingRepository(Generic[MappedValue]):
 
     def find_mapped_values(
         self,
-        coordinates: models_pb2.Coordinates,
+        coordinates: latlng_pb2.LatLng,
         neighbour_search_radius: int = 0,
     ) -> set[MappedValue]:
         point_h3 = h3.geo_to_h3(

@@ -28,7 +28,7 @@ from snowfall.project.junction.service.providers.save_a_train.v1alpha import amq
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.amqp import producer
-from snowfall.stdlib.v1alpha import models_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
 from snowfall.vendor.save_a_train import client, enums, exceptions
 from snowfall.vendor.save_a_train.models import (
     booking,
@@ -225,7 +225,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                                 origin=models_pb2.Point(
                                     ref=origin.identifier,
                                     name=str(origin.name),
-                                    coordinates=models_pb2.Coordinates(
+                                    coordinates=latlng_pb2.LatLng(
                                         latitude=origin.latitude,
                                         longitude=origin.longitude,
                                     ),
@@ -234,7 +234,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                                 destination=models_pb2.Point(
                                     ref=destination.identifier,
                                     name=str(destination.name),
-                                    coordinates=models_pb2.Coordinates(
+                                    coordinates=latlng_pb2.LatLng(
                                         latitude=destination.latitude,
                                         longitude=destination.longitude,
                                     ),

@@ -13,7 +13,7 @@ from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.redis import types as redis_types
 from snowfall.stdlib.transport.amqp import consumer, producer, types
-from snowfall.stdlib.v1alpha import models_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
 from snowfall.vendor.karhoo import client, errors
 from snowfall.vendor.karhoo.models import location, quotes
 
@@ -184,7 +184,7 @@ class TripOfferSearchConsumer(object):  # noqa: WPS214
                                 origin=models_pb2.Point(
                                     ref=leg.origin.ref,
                                     name=leg.origin.name,
-                                    coordinates=models_pb2.Coordinates(
+                                    coordinates=latlng_pb2.LatLng(
                                         latitude=leg.origin.coordinates.latitude,
                                         longitude=leg.origin.coordinates.longitude,
                                     ),
@@ -193,7 +193,7 @@ class TripOfferSearchConsumer(object):  # noqa: WPS214
                                 destination=models_pb2.Point(
                                     ref=leg.destination.ref,
                                     name=leg.destination.name,
-                                    coordinates=models_pb2.Coordinates(
+                                    coordinates=latlng_pb2.LatLng(
                                         latitude=leg.destination.coordinates.latitude,
                                         longitude=leg.destination.coordinates.longitude,
                                     ),

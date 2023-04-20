@@ -11,7 +11,7 @@ func TestGetGeoIdentifier(t *testing.T) {
 	// Minimal test until I can find an independent source of
 	// lat/lon -> H3 values
 	// Use http://wolf-h3-viewer.glitch.me/ to get test values
-	h3 := getGeoIdentifier(&v1alpha.Coordinates{
+	h3 := getGeoIdentifier(&v1alpha.LatLng{
 		Latitude:  0.0,
 		Longitude: 0.0,
 	})
@@ -19,7 +19,7 @@ func TestGetGeoIdentifier(t *testing.T) {
 		t.Errorf("Wrong geoIdentifier")
 	}
 
-	h3 = getGeoIdentifier(&v1alpha.Coordinates{
+	h3 = getGeoIdentifier(&v1alpha.LatLng{
 		Latitude:  51.38201,
 		Longitude: -1.59814, // 9 Spaines, SN8 3LT
 	})

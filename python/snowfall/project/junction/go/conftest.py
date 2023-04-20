@@ -26,7 +26,7 @@ from snowfall.project.junction.go.adapter import (
 from snowfall.project.junction.go.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
-from snowfall.stdlib.v1alpha import models_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
 
 
 @pytest.fixture()
@@ -125,7 +125,7 @@ async def trip_search_request(
             models_pb2.Point(
                 ref=origin.location.id,
                 name=origin.location.name,
-                coordinates=models_pb2.Coordinates(
+                coordinates=latlng_pb2.LatLng(
                     latitude=origin.location.coordinates.latitude,
                     longitude=origin.location.coordinates.longitude,
                 ),
@@ -136,7 +136,7 @@ async def trip_search_request(
             models_pb2.Point(
                 ref=destination.location.id,
                 name=destination.location.name,
-                coordinates=models_pb2.Coordinates(
+                coordinates=latlng_pb2.LatLng(
                     latitude=destination.location.coordinates.latitude,
                     longitude=destination.location.coordinates.longitude,
                 ),

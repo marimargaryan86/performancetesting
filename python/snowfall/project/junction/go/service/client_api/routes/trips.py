@@ -175,7 +175,7 @@ class TripSearches(endpoints.HTTPEndpoint):
                                 models_pb2.Point(
                                     ref=origin.location.id,
                                     name=location.name,
-                                    coordinates=models_pb2.Coordinates(
+                                    coordinates=latlng_pb2.LatLng(
                                         latitude=location.coordinates.latitude,
                                         longitude=location.coordinates.longitude,
                                     ),
@@ -188,7 +188,7 @@ class TripSearches(endpoints.HTTPEndpoint):
                                 models_pb2.Point(
                                     ref=destination.location.id,
                                     name=location.name,
-                                    coordinates=models_pb2.Coordinates(
+                                    coordinates=latlng_pb2.LatLng(
                                         latitude=location.coordinates.latitude,
                                         longitude=location.coordinates.longitude,
                                     ),
@@ -248,7 +248,7 @@ class TripsByTripSearch(endpoints.HTTPEndpoint):
 async def _get_nearby_locations(
     locations_client: locations.Client,
     coordinate_pairs: Sequence[tuple[float, float]],
-) -> Mapping[tuple[float, float], Sequence[models_pb2.Coordinates]]:
+) -> Mapping[tuple[float, float], Sequence[latlng_pb2.LatLng]]:
     nearby_locations = await asyncio.gather(
         *[
             locations_client.get_nearby_locations(
@@ -263,7 +263,7 @@ async def _get_nearby_locations(
 
     return {
         coordinate_pairs[index]: [
-            models_pb2.Coordinates(
+            latlng_pb2.LatLng(
                 latitude=location_object.coordinates.latitude,
                 longitude=location_object.coordinates.longitude,
             )
@@ -331,10 +331,10 @@ class TripCandidateSearches(endpoints.HTTPEndpoint):
                             ],
                             criteria=[
                                 trips_pb2.TripCandidateSearchCriteria(
-                                    origin=models_pb2.Coordinates(
+                                    origin=latlng_pb2.LatLng(
                                         **criteria["origin"],
                                     ),
-                                    destination=models_pb2.Coordinates(
+                                    destination=latlng_pb2.LatLng(
                                         **criteria["destination"],
                                     ),
                                     origins=locations_per_search[

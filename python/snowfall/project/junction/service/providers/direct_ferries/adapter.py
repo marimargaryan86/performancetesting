@@ -11,7 +11,7 @@ from snowfall.project.junction.service.providers.direct_ferries import cache, po
 from snowfall.project.junction.service.providers.direct_ferries.v1alpha import amqp_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import models_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
 from snowfall.vendor.direct_ferries import client, errors
 from snowfall.vendor.direct_ferries.models import leg, passenger, quote, request
 
@@ -166,7 +166,7 @@ class DfAdapter(object):
                                 origin=models_pb2.Point(
                                     ref=origin.identifier,
                                     name=str(origin.identifier),
-                                    coordinates=models_pb2.Coordinates(
+                                    coordinates=latlng_pb2.LatLng(
                                         latitude=origin.latitude,
                                         longitude=origin.longitude,
                                     ),
@@ -175,7 +175,7 @@ class DfAdapter(object):
                                 destination=models_pb2.Point(
                                     ref=destination.identifier,
                                     name=str(destination.identifier),
-                                    coordinates=models_pb2.Coordinates(
+                                    coordinates=latlng_pb2.LatLng(
                                         latitude=destination.latitude,
                                         longitude=destination.longitude,
                                     ),

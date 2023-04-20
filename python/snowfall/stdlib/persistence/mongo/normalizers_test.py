@@ -3,27 +3,10 @@ import datetime
 from google.protobuf import json_format, timestamp_pb2
 
 from snowfall.stdlib.persistence.mongo import normalizers
-from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2, testing_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2, testing_pb2
 
 _LATITUDE = 59.85882
 _LONGITUDE = 17.63889
-
-
-def test_coordinates_normalizer() -> None:
-    expected = models_pb2.Coordinates(latitude=_LATITUDE, longitude=_LONGITUDE)
-    normalized = normalizers.normalize(
-        models_pb2.Coordinates.DESCRIPTOR,
-        json_format.MessageToDict(expected, preserving_proto_field_name=True),
-    )
-
-    assert normalized == {"type": "Point", "coordinates": [_LONGITUDE, _LATITUDE]}
-
-    actual: models_pb2.Coordinates = json_format.ParseDict(
-        normalizers.denormalize(models_pb2.Coordinates.DESCRIPTOR, normalized),
-        models_pb2.Coordinates(),
-    )
-
-    assert expected == actual
 
 
 def test_id_normalizer() -> None:
