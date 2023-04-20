@@ -1,24 +1,23 @@
-import lagom
-from starlette import endpoints, exceptions, requests, responses, status
+import dataclasses
+from typing import cast
+
+from starlette import exceptions, responses, status
 
 from snowfall.adapter import authentication
-from snowfall.stdlib.integration.starlette import request_helpers
+from snowfall.stdlib.integration.starlette import messages
 
 _DATA_KEY = "data"
 
 
-class Authenticate(endpoints.HTTPEndpoint):
-    async def post(
-        self,
-        request: requests.Request,
-        client: authentication.Client = lagom.injectable,
-    ) -> responses.Response:
-        body = await request_helpers.flatten_request(request)
+@dataclasses.dataclass(frozen=True)
+class Authenticate(object):
+    _client: authentication.Client
 
+    async def create(self, request: messages.Request) -> responses.Response:
         try:
-            auth_token = await client.authenticate(
-                body["password"],
-                email=body["email"],
+            auth_token = await self._client.authenticate(
+                cast(str, request.body["password"]),
+                email=cast(str, request.body["email"]),
             )
         except (
             authentication.NotFoundError,

@@ -4,13 +4,16 @@ from typing import Mapping
 from starlette import background as starlette_background
 from starlette import requests
 
+from snowfall.stdlib import types
 from snowfall.stdlib.integration.starlette import includes, models, pagination_helpers
 
 
 @dataclasses.dataclass(frozen=True)
 class Request(object):
+    body: types.PrimitiveMapping
     pagination: pagination_helpers.Pagination
     path_params: Mapping[str, str]
+    query_params: types.PrimitiveMapping
     starlette_request: requests.Request  # @deprecated
 
 

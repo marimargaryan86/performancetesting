@@ -2,7 +2,10 @@ import lagom
 from lagom.integrations import starlette
 from starlette import routing
 
+from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.go.adapter import places as places_adapter
+from snowfall.project.junction.go.adapter import schedules as schedules_adapter
+from snowfall.project.junction.go.adapter import segments as segments_adapter
 from snowfall.project.junction.go.service.client_api import resources
 from snowfall.project.junction.go.service.client_api.routes import (
     authentication,
@@ -21,8 +24,15 @@ from snowfall.stdlib.v1alpha import models_pb2
 
 def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
     integration = starlette.StarletteIntegration(dependencies)
+    auth_handler = authentication.Authenticate(
+        dependencies[auth_adapter.Client],  # type: ignore[type-abstract]
+    )
     place_handler = places.Places(
         dependencies[places_adapter.Client],  # type: ignore[type-abstract]
+    )
+    segment_handler = segments.Segments(
+        dependencies[schedules_adapter.Client],  # type: ignore[type-abstract]
+        dependencies[segments_adapter.Client],  # type: ignore[type-abstract]
     )
 
     return [
@@ -51,9 +61,9 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             legs.Leg,
             name="ViewLeg",
         ),
-        integration.route(
+        routes.to_route(
             "/segments/{segmentId}",
-            segments.Segment,
+            segment_handler.view,
             name="ViewSegment",
         ),
         integration.route(
@@ -233,9 +243,9 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             resource_factory=resources.CabinClassResource.from_proto,
             path="/cabin-classes",
         ).to_routes(),
-        integration.route(
+        routes.to_route(
             "/users/tokens",
-            authentication.Authenticate,
+            auth_handler.create,
             name="Authenticate",
             methods=["POST"],
         ),

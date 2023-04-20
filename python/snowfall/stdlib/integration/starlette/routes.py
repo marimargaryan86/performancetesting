@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import functools
+import json
 import os
 import re
 from typing import TYPE_CHECKING, Any, Awaitable, Callable, Sequence, TypeVar
@@ -16,12 +17,34 @@ from starlette import (
     status,
 )
 
-from snowfall.stdlib import sequence, string
+from snowfall.stdlib import sequence, string, types
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.integration.starlette import messages, models, pagination_helpers
+from snowfall.stdlib.integration.starlette import (
+    messages,
+    models,
+    pagination_helpers,
+    request_helpers,
+)
 
 if TYPE_CHECKING:
     from google.protobuf.internal import enum_type_wrapper
+
+
+async def _parse_request_body(
+    request: requests.Request,
+) -> types.PrimitiveMapping:
+    if request.method not in {"POST", "PATCH"}:
+        return {}
+
+    try:
+        body = await request.json()
+    except json.JSONDecodeError:
+        return {}
+
+    if "data" not in body:
+        return {}
+
+    return request_helpers.flatten_request_body(body)
 
 
 def to_route(
@@ -34,8 +57,10 @@ def to_route(
     async def wrapper(request: requests.Request) -> responses.Response:
         return await endpoint(
             messages.Request(
+                body=await _parse_request_body(request),
                 pagination=pagination_helpers.get_pagination(request),
                 path_params=request.path_params,
+                query_params=request.scope["parsed_query_string"],
                 starlette_request=request,
             ),
         )
