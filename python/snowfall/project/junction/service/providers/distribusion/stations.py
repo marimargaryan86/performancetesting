@@ -43,7 +43,6 @@ async def dump_stations(app: service.Application[DumpStationsSettings]) -> None:
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
             httpx.AsyncClient(
-                http2=True,
                 timeout=app.settings.api_timeout,
             ),
         )

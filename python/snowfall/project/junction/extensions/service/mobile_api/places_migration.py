@@ -25,7 +25,7 @@ _ATTRIBUTES_KEY = "attributes"
 async def migrate(settings: bootstrap.Settings) -> None:  # noqa: WPS210
     mongo = motor_asyncio.AsyncIOMotorClient(settings.mongo_dsn)
     places_repository = repository.PlacesRepository(mongo[settings.mongo_db]["places"])
-    http_client = httpx.AsyncClient(http2=True)
+    http_client = httpx.AsyncClient()
     auth_headers = {"Authorization": "Bearer {0}".format(settings.junction_api_token)}
     osm_data = pandas.read_csv(
         filesystem.resource_path(

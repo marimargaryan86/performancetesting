@@ -26,7 +26,6 @@ async def orders(
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
             httpx.AsyncClient(
-                http2=True,
                 timeout=app.settings.api_timeout.seconds,
             ),
         )

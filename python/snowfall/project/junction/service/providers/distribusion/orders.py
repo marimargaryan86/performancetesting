@@ -29,7 +29,6 @@ async def orders(app: service.Application[config.OrdersSettings]) -> None:
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
             httpx.AsyncClient(
-                http2=True,
                 timeout=app.settings.api_timeout,
             ),
         )

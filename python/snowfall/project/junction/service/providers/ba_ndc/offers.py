@@ -42,7 +42,6 @@ async def offers_factory(
     )
     http_client = await stack.enter_async_context(
         httpx.AsyncClient(
-            http2=True,
             timeout=app.settings.http_timeout,
         ),
     )

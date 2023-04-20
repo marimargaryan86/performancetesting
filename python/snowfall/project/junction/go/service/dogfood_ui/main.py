@@ -39,7 +39,6 @@ def _routes(app: service.Application[_Settings]) -> list[routing.BaseRoute]:
         ),
         stdlib_routes.Proxy(
             httpx.AsyncClient(
-                http2=True,
                 base_url=app.settings.base_url,
                 headers={
                     "Accept": "application/vnd.api+json",

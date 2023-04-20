@@ -210,7 +210,7 @@ def junction_client(
     return GoClient(
         base_url=api_url,
         auth=auth.TokenAuth(junction_api_token),
-        client=httpx.AsyncClient(http2=True, timeout=client_timeout),
+        client=httpx.AsyncClient(timeout=client_timeout),
     )
 
 

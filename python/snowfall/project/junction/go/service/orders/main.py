@@ -95,7 +95,7 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
     )
 
     async with contextlib.AsyncExitStack() as stack:
-        http_client = await stack.enter_async_context(httpx.AsyncClient(http2=True))
+        http_client = await stack.enter_async_context(httpx.AsyncClient())
         connection = await stack.enter_async_context(
             types.Connection(
                 app.settings.amqp_dsn,

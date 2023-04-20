@@ -24,7 +24,6 @@ async def searches(app: service.Application[SearchesSettings]) -> None:  # noqa:
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
             httpx.AsyncClient(
-                http2=True,
                 timeout=app.settings.http_timeout,
             ),
         )

@@ -105,7 +105,6 @@ async def _offers(
     )
     http_client = await stack.enter_async_context(
         httpx.AsyncClient(
-            http2=True,
             timeout=app.settings.api_timeout,
         ),
     )
@@ -163,7 +162,6 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
             httpx.AsyncClient(
-                http2=True,
                 timeout=app.settings.api_timeout,
             ),
         )
@@ -276,7 +274,6 @@ async def _notifications(app: service.Application[_NotificationsSettings]) -> No
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
             httpx.AsyncClient(
-                http2=True,
                 timeout=app.settings.api_timeout,
             ),
         )
@@ -379,7 +376,6 @@ async def _dump_stations(app: service.Application[_DumpStationsSettings]) -> Non
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
             httpx.AsyncClient(
-                http2=True,
                 timeout=app.settings.api_timeout,
             ),
         )

@@ -91,7 +91,6 @@ async def _offers(
 ) -> _Impl:
     http_client = await stack.enter_async_context(
         httpx.AsyncClient(
-            http2=True,
             timeout=app.settings.http_timeout,
         ),
     )
@@ -156,7 +155,6 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
             httpx.AsyncClient(
-                http2=True,
                 timeout=app.settings.http_timeout,
             ),
         )
@@ -215,7 +213,6 @@ async def _price_quotes(app: service.Application[_PriceQuotesSettings]) -> None:
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
             httpx.AsyncClient(
-                http2=True,
                 timeout=app.settings.http_timeout,
             ),
         )
@@ -284,7 +281,6 @@ async def _seat_maps(app: service.Application[_SeatMapsSettings]) -> None:
         )
         http_client = await stack.enter_async_context(
             httpx.AsyncClient(
-                http2=True,
                 timeout=app.settings.http_timeout,
             ),
         )

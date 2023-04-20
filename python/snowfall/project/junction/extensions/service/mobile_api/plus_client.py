@@ -10,7 +10,7 @@ class PlusClient(object):
         activated: bool,
         client: httpx.AsyncClient | None = None,
     ) -> None:
-        self._client = client or httpx.AsyncClient(http2=True)
+        self._client = client or httpx.AsyncClient()
         self._client.base_url = httpx.URL(api_url)
         self._activated = activated
         self._client.headers.update(

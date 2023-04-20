@@ -11,7 +11,7 @@ class BaseClient(object):
         client: httpx.AsyncClient | None = None,
     ):
         self._base_url = httpx.URL(base_url)
-        self._client = client or httpx.AsyncClient(http2=True)
+        self._client = client or httpx.AsyncClient()
         self._client.base_url = self._base_url
         self._client.headers.update(
             httpx.Headers(
