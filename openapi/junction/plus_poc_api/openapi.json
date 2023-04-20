@@ -197,6 +197,50 @@
         }
       }
     },
+    "/subscribers": {
+      "post": {
+        "security": [],
+        "summary": "Create subscriber for plus",
+        "tags": [
+          "whatsapp"
+        ],
+        "operationId": "post-subscribers",
+        "description": "Used to register a subscriber for plus.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Subscriber"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
     "/journey-delays": {
       "post": {
         "security": [],
@@ -242,6 +286,52 @@
   "components": {
     "parameters": {},
     "schemas": {
+      "Error": {
+        "title": "Error",
+        "type": "object",
+        "description": "JSON:API error",
+        "properties": {
+          "status": {
+            "type": "string",
+            "pattern": "^[45][0-9]{2}$",
+            "description": "The HTTP status code applicable to this problem, expressed as a string value.",
+            "example": "404"
+          },
+          "title": {
+            "type": "string",
+            "example": "Not Found",
+            "description": "A short, human-readable summary of the problem that SHOULD NOT change from occurrence to occurrence of the problem, except for purposes of localization."
+          },
+          "detail": {
+            "type": "string",
+            "description": "A human-readable explanation specific to this occurrence of the problem. Like `title``, this field’s value can be localized.",
+            "example": "Nothing matches the given URI"
+          },
+          "code": {
+            "type": "string",
+            "example": "required",
+            "description": "An application-specific error code, expressed as a string value."
+          },
+          "source": {
+            "type": "object",
+            "description": "An object containing references to the source of the error.",
+            "properties": {
+              "pointer": {
+                "type": "string",
+                "example": "/data/attributes/title",
+                "description": "A JSON Pointer to the associated entity in the request document."
+              }
+            },
+            "required": [
+              "pointer"
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "detail"
+        ]
+      },
       "WhatsappRegistration": {
         "title": "Whatsapp Registration",
         "type": "object",
@@ -288,6 +378,42 @@
           "type",
           "attributes",
           "relationships"
+        ]
+      },
+      "Subscriber": {
+        "title": "Whatsapp Subscribers Registration",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "whatsapp-registrations"
+            ],
+            "example": "whatsapp-registrations"
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "mobileNumber": {
+                "type": "string",
+                "format": "phone",
+                "example": "+00123456789"
+              },
+            },
+            "required": [
+              "mobileNumber"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes"
         ]
       },
       "DelayCreation": {
@@ -356,7 +482,31 @@
         ]
       }
     },
-    "responses": {},
+    "responses": {
+      "BadRequest": {
+        "description": "Bad Request",
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "errors": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "minItems": 1,
+                  "items": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              },
+              "required": [
+                "errors"
+              ]
+            }
+          }
+        }
+      }
+    },
     "securitySchemes": {
       "jwt": {
         "type": "http",

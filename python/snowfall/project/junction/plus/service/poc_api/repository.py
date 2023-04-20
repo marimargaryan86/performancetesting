@@ -29,6 +29,7 @@ class OrdersRepository(
 
 class SubscriptionsRepository(
     mixins.FindByIdMixin[Mapping[str, Any]],
+    mixins.InsertMixin[Mapping[str, Any]],
     repository.DefaultRepository,
 ):
     async def subscribe(

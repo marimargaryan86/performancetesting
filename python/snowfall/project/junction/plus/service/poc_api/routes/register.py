@@ -109,3 +109,17 @@ class WebhookDelay(endpoints.HTTPEndpoint):
         return responses.Response(
             status_code=status.HTTP_200_OK,
         )
+
+
+class WhatsappSubscriberRegister(endpoints.HTTPEndpoint):
+    async def post(
+        self,
+        request: requests.Request,
+        subscriptions_repository: repository.SubscriptionsRepository = lagom.injectable,
+    ) -> responses.Response:
+        body = await request_helpers.flatten_request(request)
+        number = body["mobileNumber"]
+        await subscriptions_repository.insert({"_id": number})
+        return responses.Response(
+            status_code=status.HTTP_200_OK,
+        )
