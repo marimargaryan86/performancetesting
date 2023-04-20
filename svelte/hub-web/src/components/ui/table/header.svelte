@@ -38,6 +38,7 @@
   th {
     position: sticky;
     top: 0;
+    z-index: 11;
     gap: 8px;
     padding: 16px 16px 0;
     white-space: nowrap;

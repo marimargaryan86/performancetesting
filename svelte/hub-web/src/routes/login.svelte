@@ -67,6 +67,7 @@
       <TextField
         label="Email"
         type="email"
+        name="email"
         bind:value={data.email}
         error={errors.email}
         placeholder="Enter your email"
@@ -78,6 +79,7 @@
       <TextField
         label="Password"
         type="password"
+        name="password"
         bind:value={data.password}
         error={errors.password}
         placeholder="Enter your password"

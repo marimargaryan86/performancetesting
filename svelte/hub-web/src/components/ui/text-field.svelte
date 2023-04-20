@@ -7,12 +7,16 @@
   type TType = $$Generic<"text" | "password" | "email" | "number">;
   type TValue = TType extends "number" ? number : string;
 
+  let className: string | undefined = undefined;
+
+  export { className as class };
   export let id = getRandomId("text-field");
   export let label: string | undefined = undefined;
   export let placeholder: string | undefined = undefined;
   export let type: TType = "text" as TType;
   export let value: TValue | undefined = undefined;
   export let error: string | boolean = false;
+  export let name: string | undefined = undefined;
 
   let inputRef: HTMLInputElement;
 
@@ -35,7 +39,7 @@
   $: displayValue = value ?? "";
 </script>
 
-<div class="text-field" class:error>
+<div class="text-field {className ? className : ''}" class:error>
   {#if label}
     <label for={id}>{label}</label>
   {/if}
@@ -47,7 +51,18 @@
   >
     <slot name="icon-before" />
 
-    <input {id} {type} value={displayValue} on:input={onInput} {placeholder} bind:this={inputRef} />
+    <input
+      {id}
+      {type}
+      {name}
+      on:focus
+      on:blur
+      value={displayValue}
+      on:input={onInput}
+      {placeholder}
+      bind:this={inputRef}
+      class="typography body-medium"
+    />
 
     <slot name="icon-after" />
   </div>
@@ -60,12 +75,17 @@
 <style>
   .text-field {
     --x-height: var(--height, 52px);
-    --x-icon-padding: var(--icon-padding, 12px);
+    --x-icon-padding: var(--icon-padding, 16px);
     --x-font-size: var(--font-size, 14px);
+    --x-border-color: var(--border-color, var(--color-common-line-medium));
 
     display: inline-flex;
     flex-flow: column;
     gap: 4px;
+  }
+
+  .text-field:focus-within {
+    --x-border-color: var(--color-common-line-strong);
   }
 
   label {
@@ -83,10 +103,10 @@
     display: flex;
     align-items: center;
     height: var(--x-height);
-    background: var(--color-generic-white);
-    border: 1px solid var(--color-neutral-200);
+    background: var(--color-common-background-light-main);
+    border: 1px solid var(--x-border-color);
     border-radius: 8px;
-    box-shadow: var(--shadow-xsmall);
+    transition: border 150ms ease;
   }
 
   .wrapper > :global(svg) {
@@ -98,10 +118,12 @@
 
   .wrapper > :global(svg:first-child) {
     left: var(--x-icon-padding);
+    transition: left 150ms ease;
   }
 
   .wrapper > :global(svg:last-child) {
     right: var(--x-icon-padding);
+    transition: right 150ms ease;
   }
 
   input {
@@ -110,20 +132,17 @@
     width: 100%;
     height: 100%;
     padding: 0 var(--x-icon-padding);
-    color: var(--color-neutral-900);
-    font-weight: 400;
-    font-size: var(--x-font-size);
-    font-family: Poppins, Arial, Helvetica, sans-serif;
-    font-style: normal;
-    letter-spacing: 0.1px;
+    color: var(--color-common-light-strong);
     background-color: transparent;
     border: 0;
     border-radius: inherit;
     outline: 0;
+    cursor: inherit;
+    transition: padding 150ms ease;
   }
 
   input::placeholder {
-    color: var(--color-neutral-400);
+    color: var(--color-common-light-soft);
   }
 
   .wrapper.icon-before > input {

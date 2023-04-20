@@ -33,6 +33,7 @@
   --color-common-background-light-green: #e2f3ef;
   --color-common-background-light-main: #ffffff;
   --color-common-line-medium: #d7dbd8;
+  --color-common-line-strong: #bcc2bd;
 
   /* Main */
   --color-main-neutral-50: #f0f2f5;
@@ -43,6 +44,7 @@
   --color-main-primary-50: #f6fbfa;
   --color-main-primary-400: #6dc4af;
   --color-main-primary-500: #4bb69c;
+  --color-main-primary-600: #41a089;
 
   /* Semantic */
   --color-semantic-warning-50: #fefbf3;

@@ -9,7 +9,6 @@
 
 <script lang="ts">
   import BreadCrumbs from "components/page/bread-crumbs.svelte";
-  import SearchIcon from "components/icons/search-icon.svelte";
   import FilterIcon from "components/icons/filter-icon.svelte";
   import { slide } from "svelte/transition";
   import DatePicker from "components/ui/date-picker/date-picker.svelte";
@@ -21,14 +20,14 @@
   import { page } from "$app/stores";
   import { conversionStatus } from "models/conversion";
   import { formatConversionStatus } from "formatting/conversion";
+  import SearchField from "components/ui/search-field.svelte";
 
   let showFilters = false;
 
   $: view =
     $page.url.pathname === "/pay/activity" ? ("transactions" as const) : ("conversions" as const);
   $: filters = view === "transactions" ? transactionFilters : conversionFilters;
-  $: dateRange = filters.dateRange;
-  $: status = filters.status;
+  $: ({ dateRange, status, searchQuery } = filters);
   $: filtersActive = Boolean($dateRange || $status.length);
   $: currTransactionStatus = transactionFilters.status;
   $: currConversionStatus = conversionFilters.status;
@@ -59,7 +58,8 @@
   <h1 class="typography headline-medium bold">Activity</h1>
 
   <div class="actions">
-    <button><SearchIcon color="var(--color-main-primary-500)" /></button>
+    <SearchField bind:value={$searchQuery} />
+
     <button on:click={toggleFilters}>
       <FilterIcon color="var(--color-main-primary-500)" active={filtersActive} />
     </button>
@@ -112,6 +112,7 @@
   }
 
   .actions > button {
+    height: 40px;
     padding: 0;
     background-color: transparent;
     border: 0;

@@ -75,8 +75,8 @@
   <TBody>
     {#each transactions as item}
       <TRow>
-        <TCol maxWidth="96px">{item.parentId}</TCol>
-        <TCol maxWidth="96px">{item.id}</TCol>
+        <TCol maxWidth="96px" copyable>{item.parentId}</TCol>
+        <TCol maxWidth="96px" copyable>{item.id}</TCol>
         <TCol>{yymmdd(item.createdAt)}</TCol>
         <TCol maxWidth="160px">
           {#if item.payer}
@@ -116,7 +116,7 @@
             <strong class="typography body-small">{item.amounts.salesMargin.currency}</strong>
           </div>
         </TCol>
-        <TCol maxWidth="96px">{item.reference}</TCol>
+        <TCol maxWidth="96px" copyable copyAlign="right">{item.reference}</TCol>
         <TCol width="80px">
           <TransactionStatusBadge value={item.status} />
         </TCol>

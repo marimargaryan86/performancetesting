@@ -69,8 +69,8 @@
   <TBody>
     {#each conversions as conversion}
       <TRow>
-        <TCol maxWidth="96px">{conversion.transaction?.reference ?? ""}</TCol>
-        <TCol maxWidth="96px">{conversion.id}</TCol>
+        <TCol maxWidth="96px" copyable>{conversion.transaction?.reference ?? ""}</TCol>
+        <TCol maxWidth="96px" copyable>{conversion.id}</TCol>
         <TCol>{yymmdd(conversion.executedAt)}</TCol>
         <TCol>{yymmdd(conversion.settledAt)}</TCol>
         <TCol class="currency typography bold">{conversion.sellAmount.currency}</TCol>
