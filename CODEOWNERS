@@ -1,26 +1,37 @@
-[CI/CD]
-.gitlab-ci.yml @platform-engineers
-/.gitlab/ @platform-engineers
+[CI/CD] @platform-engineers
+.gitlab-ci.yml
+/.gitlab/
+/buf.yaml
 /nomad/ @sre
-buf.yaml @platform-engineers
-pants.ci.toml @platform-engineers
-pants.toml @platform-engineers
+/openapi/.spectral.yaml
+/openapi/rules/
+/python/snowfall/plugin/
+/python/snowfall/script/
+/pants.ci.toml
+/pants.toml
 
-[Documentation]
-*.md @platform-engineers
+[Documentation] @platform-engineers
+*.md
 
-[Platform]
-.python-version @platform-engineers
-/python/snowfall/plugin/ @platform-engineers
-/python/snowfall/stdlib/ @platform-engineers
-/vendor/ @platform-engineers
-docker-compose.yml @platform-engineers
+[Platform] @platform-engineers
+/golang/cmd/snowman/
+/golang/go.mod
+/golang/go.sum
+/golang/stdlib/
+/python/snowfall/adapter/
+/python/snowfall/service/
+/python/snowfall/stdlib/
+/vendor/
 
-[Repository]
-.editorconfig @platform-engineers
-.gitignore @platform-engineers
-CODEOWNERS @platform-engineers
+[Repository] @platform-engineers
+.editorconfig
+.gitignore
+/.python-version
+/CODEOWNERS
+/docker-compose.yml
 
-[Specification][2]
-/openapi/ @backend-team-leads
-/protobuf/ @backend-team-leads
+[Specification][2] @backend-team-leads
+*.proto
+/openapi/**/*.json
+/protobuf/snowfall/service/ @platform-engineers
+/protobuf/snowfall/stdlib/ @platform-engineers

@@ -59,10 +59,3 @@ commits:
       - "python/snowfall/vendor/karhoo"
     vendor/save-a-train:
       - "python/snowfall/vendor/save-a-train"
-reviewers:
-  blacklist:
-    - 8
-    - 22
-  breaking:
-    - 8
-    - 22
