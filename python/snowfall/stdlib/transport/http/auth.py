@@ -1,4 +1,4 @@
-from typing import AsyncGenerator
+from typing import Generator
 
 import httpx
 
@@ -7,10 +7,10 @@ class TokenAuth(httpx.Auth):
     def __init__(self, token: str):
         self._token = token
 
-    async def async_auth_flow(
+    def auth_flow(
         self,
         request: httpx.Request,
-    ) -> AsyncGenerator[httpx.Request, httpx.Response]:
+    ) -> Generator[httpx.Request, httpx.Response, None]:
         request.headers.update(
             httpx.Headers(
                 {
