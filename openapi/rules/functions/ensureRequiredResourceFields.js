@@ -57,8 +57,12 @@ let ensureRequiredFields = (input, options, context) => {
     for (const required of options.required) {
         if (!resource.hasOwnProperty(required)) {
             errors.push({
-                message: `Required field ${required} is missing at ${context.path.join('.')}`,
+                message: `Required field ${required} is missing`,
             })
+        } else if (resource[required].hasOwnProperty("nullable")) {
+          errors.push({
+              message: `Required field ${required} should not be nullable`,
+          })
         }
     }
 

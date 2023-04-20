@@ -6,11 +6,14 @@ aliases:
   Resources:
     - $.paths..schema.properties.data
     - $.paths..schema.allOf[*].properties.data
+    - $.paths..schema.properties.data.oneOf[*]
   ResourceProperties:
     - "#Resources.properties"
     - "#Resources.allOf[*].properties"
   ResourceFields:
     - "#ResourceProperties[*]"
+  ResourceIdentifiers:
+    - "#ResourceProperties.relationships.properties[*].properties.data"
 rules:
   json-api-resource-allowed-fields:
     message: "Disallowed resource field found: {{property}}"
@@ -29,7 +32,9 @@ rules:
   json-api-resource-required-fields:
     message: "{{error}}"
     severity: error
-    given: "#Resources"
+    given:
+      - "#Resources"
+      - "#ResourceIdentifiers"
     then:
       function: ensureRequiredResourceFields
       functionOptions:

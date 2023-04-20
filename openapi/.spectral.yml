@@ -46,4 +46,10 @@ overrides:
     rules:
       json-api-no-required-parameters: info
       json-api-query-parameter-names: info
-
+  - files:
+      - "junction/admin_api/openapi.json#/components/schemas/LocationFetchable"
+      - "junction/admin_api/openapi.json#/components/schemas/PlaceCreatable"
+      - "junction/admin_api/openapi.json#/components/schemas/PlaceFetchable"
+      - "junction/admin_api/openapi.json#/components/schemas/PlaceUpdatable"
+    rules:
+      json-api-resource-required-fields: info
