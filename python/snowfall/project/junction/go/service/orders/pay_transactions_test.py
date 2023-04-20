@@ -10,12 +10,14 @@ from snowfall.project.junction.go.service.orders.pay_transactions import (
 )
 from snowfall.project.junction.go.service.orders.v1alpha.models_pb2 import (
     Booking,
+    TripBooking,
     TripOption,
 )
 from snowfall.stdlib import string
 from snowfall.vendor.junction.pay.client import Client as PayClient
 
 EXTERNAL_REFERENCE = string.uuid()
+PARENT_EXTERNAL_REFERENCE = "a-provider-reference"
 
 CREATE_TRANSACTION_RESPONSE = MappingProxyType(
     {
@@ -92,13 +94,13 @@ async def test_that_transaction_created_and_id_set_in_booking() -> None:
         pay_client=mock_pay_client,
     )
     booking = Booking(
-        id="an-id",
-        order_id=EXTERNAL_REFERENCE,
+        id=EXTERNAL_REFERENCE,
+        order_id="an-id",
         trip_option=TripOption(pay_quote_id="a-pay-quotation-id"),
         status=Booking.Status.STATUS_PENDING,
         provider_name="a-provider",
         total_price=None,
-        trip_result=None,
+        trip_result=TripBooking(provider_booking_reference=PARENT_EXTERNAL_REFERENCE),
         raw_data="raw data",
         created_at=None,
         updated_at=None,
@@ -111,7 +113,7 @@ async def test_that_transaction_created_and_id_set_in_booking() -> None:
 
     mock_pay_client.create_transactions.assert_called_once_with(
         external_reference=EXTERNAL_REFERENCE,
-        parent_external_reference=EXTERNAL_REFERENCE,
+        parent_external_reference=PARENT_EXTERNAL_REFERENCE,
         quotation_id="a-pay-quotation-id",
     )
 
@@ -127,8 +129,8 @@ async def test_that_exception_raised_if_error_creating_transaction_with_client()
         pay_client=mock_pay_client,
     )
     booking = Booking(
-        id="an-id",
-        order_id=EXTERNAL_REFERENCE,
+        id=EXTERNAL_REFERENCE,
+        order_id="an-id",
         trip_option=TripOption(pay_quote_id="pay-quote-id"),
         status=Booking.Status.STATUS_PENDING,
         provider_name="a-provider",
