@@ -62,57 +62,48 @@ func (mr *mergeRequest) appendBreakingChangeOwners(expected []int) ([]int, error
 	return expected, nil
 }
 
-func (mr *mergeRequest) appendCodeOwners(expected []int) ([]int, error) {
-	current := mr.currentReviewers()
-	indecisive := make([][]*gitlab.BasicUser, 0)
-	state, err := mr.approvalState()
+type codeOwnerRule struct {
+	EligibleApprovers []int
+	ApprovalsRequired int
+}
 
-	if err != nil {
-		return expected, err
-	}
+func decideOptimalCodeOwners(rules []*codeOwnerRule, current []int, blacklist []int) []int {
+	indecisive := make([][]int, 0)
+	expected := make([]int, len(current))
 
-	for _, r := range state.Rules {
-		if len(r.EligibleApprovers) == 1 {
-			if r.EligibleApprovers[0].ID != mr.snowman.ID {
-				expected = append(expected, r.EligibleApprovers[0].ID)
-			}
-		} else if len(r.EligibleApprovers) != 0 {
-			indecisive = append(indecisive, r.EligibleApprovers)
+	copy(expected, current)
+
+	for _, r := range rules {
+		eligible := sliceutil.Without(r.EligibleApprovers, blacklist...)
+
+		if len(eligible) <= r.ApprovalsRequired {
+			expected = append(expected, eligible...)
+		} else {
+			indecisive = append(indecisive, eligible)
 		}
 	}
 
 	if len(expected) > 0 && len(indecisive) == 0 {
-		return sliceutil.Unique(expected), nil
+		return sliceutil.Unique(expected)
 	}
 
 	for len(indecisive) > 0 {
 		eligible := make([]int, 0)
-		stillIndecisive := make([][]*gitlab.BasicUser, 0)
+		stillIndecisive := make([][]int, 0)
 
 	IndecisiveLoop:
 		for _, reviewers := range indecisive {
 			for _, reviewer := range reviewers {
-				if sliceutil.In(expected, reviewer.ID) {
+				if sliceutil.In(expected, reviewer) {
 					continue IndecisiveLoop
 				}
 			}
 
-			anyAdded := false
-
 			for _, reviewer := range reviewers {
-				if sliceutil.In(current, reviewer.ID) {
-					expected = append(expected, reviewer.ID)
-					anyAdded = true
-				}
+				eligible = append(eligible, reviewer)
 			}
 
-			if !anyAdded {
-				for _, reviewer := range reviewers {
-					eligible = append(eligible, reviewer.ID)
-				}
-
-				stillIndecisive = append(stillIndecisive, reviewers)
-			}
+			stillIndecisive = append(stillIndecisive, reviewers)
 		}
 
 		reviewer := sliceutil.MostCommon(eligible)
@@ -123,6 +114,29 @@ func (mr *mergeRequest) appendCodeOwners(expected []int) ([]int, error) {
 
 		indecisive = stillIndecisive
 	}
+
+	return sliceutil.Unique(expected)
+}
+
+func (mr *mergeRequest) appendCodeOwners(expected []int) ([]int, error) {
+	state, err := mr.approvalState()
+
+	if err != nil {
+		return expected, err
+	}
+
+	rules := sliceutil.Map(state.Rules, func(t *gitlab.MergeRequestApprovalRule) *codeOwnerRule {
+		return &codeOwnerRule{
+			EligibleApprovers: sliceutil.Map(t.EligibleApprovers, func(t *gitlab.BasicUser) int {
+				return t.ID
+			}),
+			ApprovalsRequired: t.ApprovalsRequired,
+		}
+	})
+
+	optimal := decideOptimalCodeOwners(rules, expected, []int{mr.snowman.ID})
+
+	expected = append(expected, optimal...)
 
 	if len(expected) > 0 {
 		return sliceutil.Unique(expected), nil
