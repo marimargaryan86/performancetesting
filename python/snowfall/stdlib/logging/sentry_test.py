@@ -1,8 +1,10 @@
-from typing import Any
+from typing import Any, Callable
 
 import pytest
 import structlog
+from sentry_sdk import Transport, envelope
 
+from snowfall.stdlib import types
 from snowfall.stdlib.logging import sentry, stdout
 
 SentryEvents = list[dict[str, Any]]
@@ -21,13 +23,28 @@ def fixture_breadcrumbs() -> SentryEvents:
     return breadcrumbs
 
 
+class _MockTransport(Transport):
+    def __init__(
+        self,
+        func: Callable[[Any], None],
+    ) -> None:
+        super().__init__()
+        self._func = func
+
+    def capture_envelope(self, event: envelope.Envelope) -> None:
+        self._func(event)
+
+    def capture_event(self, event: types.PrimitiveMapping) -> None:
+        self._func(event)
+
+
 @pytest.fixture(name="sentry_events")
 def fixture_sentry_events() -> SentryEvents:
     caught_events: SentryEvents = []
     sentry.configure_sentry(
         environment="test",
         release="test",
-        transport=caught_events.append,
+        transport=_MockTransport(caught_events.append),
     )
 
     return caught_events
