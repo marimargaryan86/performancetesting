@@ -1,7 +1,7 @@
 {
     "development": {
         "variables": {
-            "count": 5,
+            "count": 2,
             "api_base_url": "https://ndc.junction.dev"
         }
     },

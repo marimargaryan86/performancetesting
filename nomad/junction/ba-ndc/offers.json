@@ -2,7 +2,7 @@
     "development": {
         "variables": {
             "api_base_url": "https://ndc.junction.dev",
-            "count": 5,
+            "count": 2,
             "provider_company_id": "bd38cf96-c6e4-4a4e-88cd-fe0d397f009c"
         }
     },
