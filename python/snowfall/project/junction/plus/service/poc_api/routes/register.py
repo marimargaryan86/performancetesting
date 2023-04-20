@@ -100,7 +100,7 @@ class WebhookDelay(endpoints.HTTPEndpoint):
                     body.get("delayMinutes", 0),
                     twilio_client,
                 )
-                await chatbot_utils.parse_send_qr(
+                await chatbot_utils.send_qr(
                     order,
                     twilio_client,
                     barcodes[idx],

@@ -1,5 +1,4 @@
 import asyncio
-import base64
 import datetime
 from io import BytesIO
 from typing import Any, Mapping, Sequence
@@ -7,7 +6,6 @@ from typing import Any, Mapping, Sequence
 import httpx
 import json_api_doc
 import qrcode
-from requests_html import AsyncHTMLSession
 
 from snowfall.project.junction.plus.service.poc_api import (
     airlines,
@@ -372,42 +370,19 @@ async def send_qr(
     s3_client: s3.S3Client,
 ) -> None:
     code = barcode.get("barcode", "test")
-    qr = qrcode.make(code)
+    qr = qrcode.QRCode(
+        version=2,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=9,
+        border=0,
+    )
+    qr.add_data(code)
+    qr.make(fit=True)
+
+    img = qr.make_image().convert("RGB")
     buffered = BytesIO()
-    qr.save(buffered)
-    qr_bytes = buffered.getvalue()
-    s3_client.put(qr_bytes, "poc-barcodes", "{0}.png".format(code))
-    twilio_client.send_qr(
-        receiver=order["journey"]["contactDetails"]["phoneNumber"],
-        body="Please feel free to use this 20 EUR coupon.",
-        media_url="https://poc-barcodes.s3.eu-west-2.amazonaws.com/{0}.png".format(
-            code,
-        ),
-    )
-    await asyncio.sleep(1)
-    s3_client.delete("poc-barcodes", "{0}.png".format(code))
-
-
-async def parse_send_qr(
-    order: Mapping[str, Any],
-    twilio_client: twilio.TwilioClient,
-    barcode: Mapping[str, Any],
-    s3_client: s3.S3Client,
-) -> None:
-    code = barcode.get("barcode", "test")
-    session = AsyncHTMLSession()
-    response = await session.get(
-        "https://www.icouponworldwide.com/barcode/{0}".format(code),
-    )
-    await response.html.arender()
-    img = response.html.xpath(
-        "/html/body/app-root/div[3]/div/app-barcode/div/div[2]/div[1]/div/qrcode/img",
-    )
-    s3_client.put(
-        base64.b64decode(img[0].attrs["src"].split(",")[1]),
-        "poc-barcodes",
-        "{0}.png".format(code),
-    )
+    img.save(buffered, format="PNG")
+    s3_client.put(buffered.getvalue(), "poc-barcodes", "{0}.png".format(code))
     twilio_client.send_qr(
         receiver=order["journey"]["contactDetails"]["phoneNumber"],
         body="Please feel free to use this 20 EUR coupon.",
