@@ -279,20 +279,24 @@ def _create_traveler_doc(
     except KeyError:
         document_type = order_models_pb2.DocumentDetails.TYPE_UNSPECIFIED
 
-    try:
-        exp_date = date_to_protobuf(
-            datetime.date.fromisoformat(document["documentExpirationDate"]),
-        )
-    except KeyError:
-        exp_date = None
-
     return order_models_pb2.DocumentDetails(
         document_type=document_type,
         document_number=document.get("documentNumber"),
         issue_county=document.get("documentIssueCountry"),
         nationality=document.get("nationality"),
-        exp_date=exp_date,
+        exp_date=(
+            date_to_protobuf(
+                datetime.date.fromisoformat(document["documentExpirationDate"]),
+            )
+            if "documentExpirationDate" in document
+            else None
+        ),
         residence_country_code=document.get("residenceCountryCode"),
+        issue_date=(
+            date_to_protobuf(datetime.date.fromisoformat(document["documentIssueDate"]))
+            if "documentIssueDate" in document
+            else None
+        ),
     )
 
 

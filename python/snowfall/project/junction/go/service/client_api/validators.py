@@ -245,6 +245,10 @@ def _validate_passport_information(  # noqa: WPS210
             offer_models_pb2.PriceQuote.Required.REQUIRED_RESIDENCE_COUNTRY_CODE,
             "residenceCountryCode",
         ),
+        (
+            offer_models_pb2.PriceQuote.Required.REQUIRED_ISSUE_DATE,
+            "documentIssueDate",
+        ),
     ]
 
     for index, passenger in enumerate(passengers):

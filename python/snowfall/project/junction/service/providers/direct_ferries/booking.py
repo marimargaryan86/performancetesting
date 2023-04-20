@@ -104,3 +104,8 @@ def _fill_doc_details(
 
     if doc_details.issue_county:
         quote_passenger.passport_place_of_issue = doc_details.issue_county
+
+    if doc_details.HasField("issue_date"):
+        quote_passenger.passport_start_date = protobuf.protobuf_to_date(
+            doc_details.issue_date,
+        ).isoformat()

@@ -6319,7 +6319,8 @@
                         "issuing-country",
                         "passport-number",
                         "residence-country-code",
-                        "residence-address"
+                        "residence-address",
+                        "issue-date"
                       ]
                     },
                     "readOnly": true
@@ -7079,6 +7080,11 @@
             "pattern": "^[A-Z]{2}$"
           },
           "documentExpirationDate": {
+            "type": "string",
+            "example": "2025-02-03",
+            "format": "date"
+          },
+          "documentIssueDate": {
             "type": "string",
             "example": "2025-02-03",
             "format": "date"

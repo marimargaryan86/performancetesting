@@ -20,6 +20,13 @@ from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.v1alpha import amqp_pb2 as trackable_pb2
 
 _PROVIDER_NAME = "Direct Ferries"
+_INFO_ATTR_REQUIREMENT_MAP = (
+    ("need_passport", offers_pb2.PriceQuote.REQUIRED_PASSPORT_NUMBER),
+    ("need_date_of_birth", offers_pb2.PriceQuote.REQUIRED_DATE_OF_BIRTH),
+    ("need_nationality", offers_pb2.PriceQuote.REQUIRED_NATIONALITY),
+    ("need_passport_expiry_date", offers_pb2.PriceQuote.REQUIRED_EXPIRATION_DATE),
+    ("need_passport_start_date", offers_pb2.PriceQuote.REQUIRED_ISSUE_DATE),
+)
 TripSearchMessages = offers_amqp_pb2.TripOfferSearchTask | trackable_pb2.Trackable
 
 
@@ -95,34 +102,17 @@ class PriceQuoteConsumer(object):
         self,
         route_id: int,
     ) -> list[offers_pb2.PriceQuote.Required.ValueType]:
-        requirements: list[offers_pb2.PriceQuote.Required.ValueType] = []
         route_obj = self._routes.get_by_id(route_id)
         passenger_info = route_obj.passenger_info
 
         if not passenger_info:
-            return requirements
+            return []
 
-        if passenger_info.need_passport:
-            requirements.append(
-                offers_pb2.PriceQuote.REQUIRED_PASSPORT_NUMBER,
-            )
-
-        if passenger_info.need_date_of_birth:
-            requirements.append(
-                offers_pb2.PriceQuote.REQUIRED_DATE_OF_BIRTH,
-            )
-
-        if passenger_info.need_nationality:
-            requirements.append(
-                offers_pb2.PriceQuote.REQUIRED_NATIONALITY,
-            )
-
-        if passenger_info.need_passport_expiry_date:
-            requirements.append(
-                offers_pb2.PriceQuote.REQUIRED_EXPIRATION_DATE,
-            )
-
-        return requirements
+        return [
+            doc_requirement
+            for pax_info_attr_name, doc_requirement in _INFO_ATTR_REQUIREMENT_MAP
+            if getattr(passenger_info, pax_info_attr_name)
+        ]
 
 
 class OrdersConsumer(object):

@@ -4199,6 +4199,7 @@
                         "date-of-birth",
                         "nationality",
                         "expiration-date",
+                        "issue-date",
                         "issuing-country",
                         "passport-number"
                       ]
@@ -6216,13 +6217,6 @@
       "TravelerDocument": {
         "title": "TravelerDocument",
         "type": "object",
-        "required": [
-          "documentType",
-          "documentNumber",
-          "documentIssueCountry",
-          "documentExpirationDate",
-          "nationality"
-        ],
         "properties": {
           "documentType": {
             "type": "string",
@@ -6243,6 +6237,11 @@
             "pattern": "^[A-Z]{2}$"
           },
           "documentExpirationDate": {
+            "type": "string",
+            "example": "2025-02-03",
+            "format": "date"
+          },
+          "documentIssueDate": {
             "type": "string",
             "example": "2025-02-03",
             "format": "date"

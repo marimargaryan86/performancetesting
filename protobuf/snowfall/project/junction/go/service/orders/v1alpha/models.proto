@@ -102,6 +102,7 @@ message DocumentDetails {
   string nationality = 4;
   snowfall.stdlib.v1alpha.Date exp_date = 5;
   string residence_country_code = 6;
+  snowfall.stdlib.v1alpha.Date issue_date = 7;
 }
 
 message TripOption {
