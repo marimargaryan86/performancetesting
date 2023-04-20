@@ -1,3 +1,6 @@
+import datetime
+from typing import Mapping
+
 from snowfall.project.pay.service.accounts.v1alpha import models_pb2
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
@@ -15,6 +18,17 @@ class AccountsRepository(
     ) -> resultset.ResultSet[models_pb2.Account]:
         return await self._find_with_cursor(
             cur=cursor or "",
+        )
+
+    async def update(
+        self,
+        account_id: str,
+        new_values: Mapping[str, str | datetime.datetime],
+    ) -> models_pb2.Contact:
+        return await self._execute(
+            self._collection.update_one,
+            filter={"_id": account_id},
+            update={"$set": new_values},
         )
 
 

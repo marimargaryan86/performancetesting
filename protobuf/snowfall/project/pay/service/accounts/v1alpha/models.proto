@@ -12,6 +12,9 @@ message Account {
   string external_reference = 2;
   string company_id = 3;
   string contact_id = 4;
+  string name = 5;
+  string status = 6;
+  google.protobuf.Timestamp updated_at = 7;
 }
 
 message Contact {

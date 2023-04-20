@@ -1,3 +1,4 @@
+import datetime
 from typing import Optional
 
 import pydantic
@@ -26,4 +27,5 @@ class AccountRequest(Account):
 
 class AccountResponse(Account):
     identifier: str = pydantic.Field(..., alias="id")
+    updated_at: datetime.datetime
     status: str

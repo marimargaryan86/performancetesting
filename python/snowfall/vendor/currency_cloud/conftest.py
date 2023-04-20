@@ -1,3 +1,4 @@
+import datetime
 from typing import Any, Mapping
 from unittest import mock
 
@@ -61,6 +62,7 @@ def account_response() -> account.AccountResponse:
         online_trading=False,
         phone_trading=True,
         terms_and_conditions_accepted=True,
+        updated_at=datetime.datetime.now(tz=datetime.timezone.utc),
     )
 
 
