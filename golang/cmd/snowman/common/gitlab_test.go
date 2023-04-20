@@ -3,9 +3,9 @@ package common
 import "testing"
 
 func TestParseCommitTitle(t *testing.T) {
-	for _, table := range []struct {
-		input    string
-		expected bool
+	for _, tc := range []struct {
+		input string
+		want  bool
 	}{
 		{"foobar", false},
 		{"feat: allow provided config object to extend other configs", true},
@@ -15,14 +15,16 @@ func TestParseCommitTitle(t *testing.T) {
 		{"docs: correct spelling of CHANGELOG", true},
 		{"feat(lang): add Polish language", true},
 	} {
-		if _, v := ParseCommitTitle(table.input); (v == nil) != table.expected {
-			t.Errorf(`ParseCommitTitle("%s") was incorrect, got: %v, want: %v.`, table.input, v == nil, table.expected)
-		}
+		t.Run(tc.input, func(t *testing.T) {
+			if _, got := ParseCommitTitle(tc.input); (got == nil) != tc.want {
+				t.Errorf("got %v; want %v", got, tc.want)
+			}
+		})
 	}
 }
 
 func TestCommitTitleString(t *testing.T) {
-	for _, message := range []string{
+	for _, want := range []string{
 		"feat: allow provided config object to extend other configs",
 		"feat!: send an email to the customer when a product is shipped",
 		"feat(api)!: send an email to the customer when a product is shipped",
@@ -30,8 +32,10 @@ func TestCommitTitleString(t *testing.T) {
 		"Draft: docs: correct spelling of CHANGELOG",
 		"Draft: feat(lang): add Polish language",
 	} {
-		if commitTitle, _ := ParseCommitTitle(message); commitTitle.String() != message {
-			t.Errorf(`string of ParseCommitTitle("%s") was incorrect, got: %s, want: %s.`, message, commitTitle.String(), message)
-		}
+		t.Run(want, func(t *testing.T) {
+			if commitTitle, _ := ParseCommitTitle(want); commitTitle.String() != want {
+				t.Errorf("got %s; want %s", commitTitle.String(), want)
+			}
+		})
 	}
 }

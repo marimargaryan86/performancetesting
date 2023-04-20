@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 
 	v1alpha "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"
@@ -32,7 +33,7 @@ func TestGetGeoIdentifier(t *testing.T) {
 
 func TestMaxU32(t *testing.T) {
 	testCases := []struct {
-		a, b, result uint32
+		a, b, want uint32
 	}{
 		{1, 2, 2},
 		{11, 11, 11},
@@ -41,8 +42,11 @@ func TestMaxU32(t *testing.T) {
 		{0, 2, 2},
 	}
 	for _, tc := range testCases {
-		if maxU32(tc.a, tc.b) != tc.result {
-			t.Errorf("maxU32 (%v, %v) expcted %v got %v\n", tc.a, tc.b, tc.result, maxU32(tc.a, tc.b))
+		t.Run(fmt.Sprintf("max(%d, %d)", tc.a, tc.b), func(t *testing.T) {
+
+		})
+		if got := maxU32(tc.a, tc.b); got != tc.want {
+			t.Errorf("got %d; want %d", got, tc.want)
 		}
 	}
 }

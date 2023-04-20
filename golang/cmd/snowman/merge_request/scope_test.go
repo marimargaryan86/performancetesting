@@ -15,9 +15,9 @@ func TestDetermineBestScope(t *testing.T) {
 		"bazqux/sub":  []string{"bazqux/sub/folder", "bazqux/other/sub/folder"},
 	}
 
-	for _, table := range []struct {
-		files    []string
-		expected string
+	for _, tc := range []struct {
+		files []string
+		want  string
 	}{
 		{[]string{"foobar/foobar.py"}, "foobar"},
 		{[]string{"foobar/sub/folder/foobar.py"}, "foobar/sub"},
@@ -26,9 +26,9 @@ func TestDetermineBestScope(t *testing.T) {
 		{[]string{"foobar/foobar.py", "foobar/foobar2.py", "snowfall/snowfall.py"}, "foobar"},
 		{[]string{"foobar/sub/folder/foobar.py", "foobar/other/sub2/folder/foobar.py"}, "foobar"},
 	} {
-		t.Run(fmt.Sprintf("%+v", table.files), func(t *testing.T) {
-			if scope := determineBestScope(scopes, table.files); scope != table.expected {
-				t.Errorf(`got "%s"; want "%s"`, scope, table.expected)
+		t.Run(fmt.Sprintf("%+v", tc.files), func(t *testing.T) {
+			if got := determineBestScope(scopes, tc.files); got != tc.want {
+				t.Errorf("got %s; want %s", got, tc.want)
 			}
 		})
 	}

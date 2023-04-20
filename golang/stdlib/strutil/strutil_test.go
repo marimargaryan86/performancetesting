@@ -5,7 +5,7 @@ import (
 )
 
 func TestNormalize(t *testing.T) {
-	if v := Normalize("\u0440ython"); v != "\u0070ython" {
-		t.Errorf(`Normalize("\u0440ython") was incorrect, got: %s, want: "python".`, v)
+	if got := Normalize("\u0440ython"); got != "\u0070ython" {
+		t.Errorf("got %s; want %s", got, "\u0070ython")
 	}
 }
