@@ -185,7 +185,10 @@ async def get_flight_status(
 
 
 def home_message() -> str:
-    return "Available commands: \nTravel status"
+    return (
+        "Sorry I am unable to understand your request, please choose from then"
+        + " available commands below"
+    )
 
 
 def journey_signature(doc: Mapping[str, Any], idx: int = 0) -> Mapping[str, Any]:
