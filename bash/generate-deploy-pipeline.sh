@@ -21,7 +21,6 @@ make-uninterruptible:
 .deploy:
   stage: deploy
   image: git.snowfall.se:4567/junction/junction/pants:main
-  resource_group: deploy
   script:
     - ./\${CI_ENVIRONMENT_TIER}/deploy.sh "\${service}" "\${version}" "\${CI_ENVIRONMENT_TIER}" \${templates}
   environment:
@@ -96,6 +95,7 @@ for DIR in "${1}"/*; do
 
 ${service_name}:
   extends: .deploy
+  resource_group: ${service_name}
   environment:
     name: $(basename "${1}")/${service_name}
     deployment_tier: $(basename "${1}")
