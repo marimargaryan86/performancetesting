@@ -403,7 +403,7 @@
                 "type": "string",
                 "format": "phone",
                 "example": "+00123456789"
-              },
+              }
             },
             "required": [
               "mobileNumber"
