@@ -10,6 +10,7 @@
 //   ],
 //   "generated_with_requirements": [
 //     "Faker==18.3.4",
+//     "Pillow==9.5.0",
 //     "SQLAlchemy[asyncio]==2.0.8",
 //     "Shapely==2.0.1",
 //     "add-trailing-comma==2.4.0",
@@ -1623,13 +1624,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "c058baa1d374111ad2036e1f7d9fe715571b6d66d180a224208fc7fef9bc3c80",
-              "url": "https://files.pythonhosted.org/packages/af/e5/1139280462cafa19158d161a190b3110f9ea7dc05c8504d7d088c608b158/botocore-1.29.116-py3-none-any.whl"
+              "hash": "2e6f6c9be770ed5737de093cfe8d592be15f8763f7bf2906afba90f19836d72d",
+              "url": "https://files.pythonhosted.org/packages/c2/5c/c0b57757fb7e6560302548d458497d7bc187b7ae6d1febdcd35ba47c3242/botocore-1.29.117-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "907dec71437386867000912c2427845f482feef5327e7c659e3e81766aac3d34",
-              "url": "https://files.pythonhosted.org/packages/77/3a/87041c999716ba23cf2729ab06f24c6f95706b326fddb7d4a207833dc4e7/botocore-1.29.116.tar.gz"
+              "hash": "1fc4469e80daab657d1254518ee44a82e284320c8b24cbfbaaa60570afc33743",
+              "url": "https://files.pythonhosted.org/packages/43/55/c38f864475ab0464513ac6997bd20106d033b49af22d1edebe63c288c736/botocore-1.29.117.tar.gz"
             }
           ],
           "project_name": "botocore",
@@ -1640,19 +1641,19 @@
             "urllib3<1.27,>=1.25.4"
           ],
           "requires_python": ">=3.7",
-          "version": "1.29.116"
+          "version": "1.29.117"
         },
         {
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "d84b61ff792399fb21e91196d3f421e9a7156f2f64b8fa6685b4f07b0af285e4",
-              "url": "https://files.pythonhosted.org/packages/98/d7/672a1788e85c58d1ec38506a249f252dfd7998216a6d2d51b5183490601b/botocore_stubs-1.29.116-py3-none-any.whl"
+              "hash": "80e494f6d6dfe9f141900176c0857988f6c333030348b7590b4ec515a6971cf1",
+              "url": "https://files.pythonhosted.org/packages/20/bf/a882685d9a76f2ef88dd867b2780b3279a4fd8d0d4752fde2f056ca1090a/botocore_stubs-1.29.117-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "e3874f9973f87903085f278c0d86164a80aeed9ea650f87cee18bc08a344c9b8",
-              "url": "https://files.pythonhosted.org/packages/da/1e/f80b8287a89c694331cb65bb298b42a34ae6d0835a07867778bb0b753015/botocore_stubs-1.29.116.tar.gz"
+              "hash": "f4de553d1106624884ce198fe9d2ea030bfee7a78e395df827a8c79d04e9f33a",
+              "url": "https://files.pythonhosted.org/packages/16/d5/7b88b435b37aed05d34fa9a4e85f63745397ebc3b156554f9ae2c6645ae7/botocore_stubs-1.29.117.tar.gz"
             }
           ],
           "project_name": "botocore-stubs",
@@ -1661,7 +1662,7 @@
             "typing-extensions>=4.1.0; python_version < \"3.9\""
           ],
           "requires_python": "<4.0,>=3.7",
-          "version": "1.29.116"
+          "version": "1.29.117"
         },
         {
           "artifacts": [
@@ -4771,6 +4772,82 @@
           "artifacts": [
             {
               "algorithm": "sha256",
+              "hash": "c1170d6b195555644f0616fd6ed929dfcf6333b8675fcca044ae5ab110ded296",
+              "url": "https://files.pythonhosted.org/packages/1e/e4/de633d85be3b3c770c554a37a89e8273069bd19c34b15a419c2795600310/Pillow-9.5.0-cp311-cp311-musllinux_1_1_x86_64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "bf548479d336726d7a0eceb6e767e179fbde37833ae42794602631a070d630f1",
+              "url": "https://files.pythonhosted.org/packages/00/d5/4903f310765e0ff2b8e91ffe55031ac6af77d982f0156061e20a4d1a8b2d/Pillow-9.5.0.tar.gz"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "96e88745a55b88a7c64fa49bceff363a1a27d9a64e04019c2281049444a571e3",
+              "url": "https://files.pythonhosted.org/packages/17/66/20db69c0361902a2f6ee2086d3e83c70133e3fb4cb31470e59a8ed37184e/Pillow-9.5.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "cfcc2c53c06f2ccb8976fb5c71d448bdd0a07d26d8e07e321c103416444c7ad1",
+              "url": "https://files.pythonhosted.org/packages/3b/70/e9a45a2e9c58c23e023fcda5af9686f5b42c718cc9bc86194e0025cf0ec5/Pillow-9.5.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "8d935f924bbab8f0a9a28404422da8af4904e36d5c33fc6f677e4c4485515625",
+              "url": "https://files.pythonhosted.org/packages/3d/59/e6bd2c3715ace343d9739276ceed79657fe116923238d102cf731ab463dd/Pillow-9.5.0-cp311-cp311-manylinux_2_28_x86_64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "d9c206c29b46cfd343ea7cdfe1232443072bbb270d6a46f59c259460db76779a",
+              "url": "https://files.pythonhosted.org/packages/5c/a8/ff526cdec6b56eb20c992e7083f02c8065049ed1e62fbc159390d7a3dd5e/Pillow-9.5.0-cp311-cp311-manylinux_2_17_i686.manylinux2014_i686.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "a0f9bb6c80e6efcde93ffc51256d5cfb2155ff8f78292f074f60f9e70b942d99",
+              "url": "https://files.pythonhosted.org/packages/61/a5/ee306d6cc53c9a30c23ba2313b43b67fdf76c611ca5afd0cdd62922cbd3e/Pillow-9.5.0-cp311-cp311-manylinux_2_28_aarch64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "7ec6f6ce99dab90b52da21cf0dc519e21095e332ff3b399a357c187b1a5eee32",
+              "url": "https://files.pythonhosted.org/packages/78/a8/3c2d737d856eb9cd8c18e78f6fe0ed08a2805bded74cbb0455584859023b/Pillow-9.5.0-cp311-cp311-macosx_10_10_x86_64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "fed1e1cf6a42577953abbe8e6cf2fe2f566daebde7c34724ec8803c4c0cda579",
+              "url": "https://files.pythonhosted.org/packages/9a/6d/9beb596ba5a5e61081c843187bcdbb42a5c9a9ef552751b554894247da7a/Pillow-9.5.0-cp311-cp311-musllinux_1_1_aarch64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "560737e70cb9c6255d6dcba3de6578a9e2ec4b573659943a5e7e4af13f298f5c",
+              "url": "https://files.pythonhosted.org/packages/a9/15/310cde63cb15a091de889ded26281924cf9cfa5c000b36b06bd0c7f50261/Pillow-9.5.0-cp311-cp311-macosx_11_0_arm64.whl"
+            }
+          ],
+          "project_name": "pillow",
+          "requires_dists": [
+            "check-manifest; extra == \"tests\"",
+            "coverage; extra == \"tests\"",
+            "defusedxml; extra == \"tests\"",
+            "furo; extra == \"docs\"",
+            "markdown2; extra == \"tests\"",
+            "olefile; extra == \"docs\"",
+            "olefile; extra == \"tests\"",
+            "packaging; extra == \"tests\"",
+            "pyroma; extra == \"tests\"",
+            "pytest-cov; extra == \"tests\"",
+            "pytest-timeout; extra == \"tests\"",
+            "pytest; extra == \"tests\"",
+            "sphinx-copybutton; extra == \"docs\"",
+            "sphinx-inline-tabs; extra == \"docs\"",
+            "sphinx-removed-in; extra == \"docs\"",
+            "sphinx>=2.4; extra == \"docs\"",
+            "sphinxext-opengraph; extra == \"docs\""
+          ],
+          "requires_python": ">=3.7",
+          "version": "9.5.0"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
               "hash": "ebe11c0d7a805086e99506aa331612429a72ca7cd52a1f0d277dc4adc20cb10e",
               "url": "https://files.pythonhosted.org/packages/b2/f3/4fb5fae710fc9f22a42cd90dc0547da18ec83e2e139294ab94f04c449cf5/platformdirs-3.2.0-py3-none-any.whl"
             },
@@ -7177,6 +7254,7 @@
   "prefer_older_binary": false,
   "requirements": [
     "Faker==18.3.4",
+    "Pillow==9.5.0",
     "SQLAlchemy[asyncio]==2.0.8",
     "Shapely==2.0.1",
     "add-trailing-comma==2.4.0",
