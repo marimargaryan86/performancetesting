@@ -55,17 +55,17 @@
   }
 
   .fill.primary {
-    color: var(--color-generic-white);
-    background-color: var(--color-primary-500);
+    color: var(--color-common-dark-strong);
+    background-color: var(--color-main-primary-500);
   }
 
   .outline.primary {
-    color: var(--color-primary-600);
-    border: var(--color-primary-600) 1px solid;
+    color: var(--color-main-primary-600);
+    border: var(--color-main-primary-600) 1px solid;
   }
 
   .positive-gradient {
-    color: var(--color-generic-white);
+    color: var(--color-common-dark-strong);
     background-image: var(--color-positive-gradient);
   }
 

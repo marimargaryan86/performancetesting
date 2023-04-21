@@ -1,12 +1,13 @@
 <script lang="ts">
-  export let color = "var(--color-generic-black)";
+  export let color = "var(--color-common-light-strong)";
 </script>
 
-<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="10.0001" cy="10.2773" r="8.33333" stroke={color} stroke-width="1.5" />
   <path
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M10.5 3C11.0523 3 11.5 3.44772 11.5 4V9H16.5C17.0523 9 17.5 9.44772 17.5 10C17.5 10.5523 17.0523 11 16.5 11H11.5V16C11.5 16.5523 11.0523 17 10.5 17C9.94772 17 9.5 16.5523 9.5 16V11H4.5C3.94772 11 3.5 10.5523 3.5 10C3.5 9.44771 3.94772 9 4.5 9L9.5 9V4C9.5 3.44772 9.94772 3 10.5 3Z"
-    fill={color}
+    d="M12.5 10.2774L10 10.2774M10 10.2774L7.5 10.2774M10 10.2774L10 7.77734M10 10.2774L10 12.7773"
+    stroke={color}
+    stroke-width="1.5"
+    stroke-linecap="round"
   />
 </svg>

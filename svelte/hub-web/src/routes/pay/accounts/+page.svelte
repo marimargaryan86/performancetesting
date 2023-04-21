@@ -1,9 +1,8 @@
 <script lang="ts">
   import ChevronIcon from "components/icons/chevron-icon.svelte";
-  import SearchIcon from "components/icons/search-icon.svelte";
   import EntityAvatar from "components/ui/entity-avatar.svelte";
-  import TextField from "components/ui/text-field.svelte";
   import type { PageData } from "./$types";
+  import SearchField from "components/ui/search-field.svelte";
 
   export let data: PageData;
 
@@ -18,95 +17,109 @@
   <title>Accounts · Pay · Junction Hub</title>
 </svelte:head>
 
-<h1 class="layout page-header">Accounts</h1>
+<div class="header">
+  <h1 class="typography headline-medium bold">Accounts</h1>
 
-<div class="layout content-box">
-  <div class="header">
-    <TextField placeholder="Find an account" bind:value={searchQuery}>
-      <SearchIcon slot="icon-before" color="var(--color-neutral-400)" />
-    </TextField>
+  <SearchField bind:value={searchQuery} />
+</div>
+
+<div class="content">
+  <div class="wrapper">
+    <h2 class="typography title-medium bold">Main account</h2>
+
+    <a href="/pay/accounts/asd" class="account head-account">
+      <EntityAvatar name="Snowfall Travel Ltd" size="72px" />
+      <span class="account-name typography body-large bold">Snowfall Travel Ltd</span>
+      <ChevronIcon size="20px" color="var(--color-main-neutral-700)" />
+    </a>
+
+    <hr />
+
+    <h2 class="typography title-medium bold">Sub accounts</h2>
+
+    <ul class="accounts" data-sveltekit-preload-data="off">
+      {#each accounts as account}
+        <li>
+          <a href="/pay/accounts/{account.id}" class="account">
+            <EntityAvatar name={account.name} size="72px" />
+            <span class="account-name typography body-large">{account.name}</span>
+            <ChevronIcon size="20px" color="var(--color-main-neutral-700)" />
+          </a>
+        </li>
+      {/each}
+    </ul>
   </div>
-
-  <ul class="accounts">
-    {#each accounts as account}
-      <li class:head-account={account.headAccount} class="account">
-        <a href="/pay/accounts/{account.id}">
-          <EntityAvatar name={account.name} size="72px" />
-          <span class="ellipsis">{account.name}</span>
-          <ChevronIcon size="20px" color="var(--color-neutral-700)" />
-        </a>
-      </li>
-    {/each}
-  </ul>
 </div>
 
 <style>
-  .layout.content-box {
-    padding: 24px;
-  }
-
   .header {
-    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 32px 24px;
+    color: var(--color-main-neutral-800);
   }
 
-  .header > :global(.text-field) {
-    --height: 40px;
-    --font-size: 12px;
-
-    width: 100%;
-    max-width: 400px;
+  .content {
+    flex-grow: 1;
+    padding: 24px;
+    overflow: auto;
+    background-image: var(--color-gradient-extensions-horizontal);
   }
 
-  @media screen and (max-width: 1439px) {
-    .header > :global(.text-field) {
-      max-width: 255px;
-    }
+  .wrapper {
+    display: flex;
+    flex-flow: column;
+    gap: 32px;
+    height: 100%;
+    padding: 32px 40px;
+    color: var(--color-common-light-strong);
+    background-color: var(--color-common-background-light-main);
+    border-radius: 16px;
+  }
+
+  hr {
+    margin: 0;
+    border: 0;
+    border-bottom: var(--color-common-line-soft) 1px solid;
   }
 
   .accounts {
     display: flex;
     flex-flow: column;
     gap: 8px;
-    height: calc(100vh - 196px);
-    margin: 0 -24px -24px;
-    padding: 0 24px 24px;
     overflow: auto;
-    font-weight: 600;
-    font-size: 16px;
-    font-family: "Red Hat Display", Arial, Helvetica, sans-serif;
-    font-style: normal;
-    line-height: 20px;
-    letter-spacing: 0.1px;
   }
 
-  .account > a {
+  .account-name {
+    flex-grow: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .account {
     display: flex;
     gap: 32px;
     align-items: center;
     padding: 12px 16px;
-    color: var(--color-neutral-800);
+    color: var(--color-main-neutral-800);
     text-decoration: none;
-    background-color: var(--color-generic-white);
-    border: var(--color-neutral-500) 1px solid;
+    background-color: var(--color-common-dark-strong);
+    border: var(--color-main-neutral-100) 1px solid;
     border-radius: 8px;
   }
 
-  .account.head-account > a {
-    font-weight: 700;
-    background-color: var(--color-primary-100);
-    border-color: var(--color-primary-500);
+  .account.head-account {
+    border-color: var(--color-main-neutral-300);
   }
 
-  .account.head-account + .account {
-    margin-top: 24px;
+  .account :global(.entity-avatar) {
+    box-shadow: var(--shadow-3);
   }
 
   .account :global(.entity-avatar),
   .account :global(.chevron-icon) {
     flex-shrink: 0;
-  }
-
-  .account > a > span {
-    flex-grow: 1;
   }
 </style>

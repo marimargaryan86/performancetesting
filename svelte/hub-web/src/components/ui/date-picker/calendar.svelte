@@ -137,7 +137,7 @@
     display: grid;
     grid-template-columns: repeat(7, 40px);
     gap: 2px 0;
-    color: var(--color-neutral-900);
+    color: var(--color-main-neutral-900);
   }
 
   .cell {
@@ -170,15 +170,15 @@
 
   .prev-month,
   .next-month {
-    color: var(--color-neutral-400);
+    color: var(--color-main-neutral-400);
   }
 
   .today {
-    color: var(--color-destructive-500);
+    color: var(--color-semantic-error-600);
   }
 
   .in-range {
-    background-color: var(--color-neutral-50);
+    background-color: var(--color-main-neutral-50);
   }
 
   .date.start::after {
@@ -196,7 +196,7 @@
     display: block;
     width: 50%;
     height: 100%;
-    background-color: var(--color-neutral-50);
+    background-color: var(--color-main-neutral-50);
     content: "";
   }
 
@@ -213,11 +213,11 @@
   }
 
   .selected > span {
-    color: var(--color-generic-white);
-    background-color: var(--color-primary-500);
+    color: var(--color-common-dark-strong);
+    background-color: var(--color-main-primary-500);
   }
 
   .date:hover > span {
-    border-color: var(--color-neutral-200);
+    border-color: var(--color-main-neutral-200);
   }
 </style>

@@ -64,7 +64,7 @@
 
     {#if value && !expanded}
       <button type="button" on:click|stopPropagation={clearValue} class="clear">
-        <RemoveIcon color="var(--color-neutral-800)" />
+        <RemoveIcon color="var(--color-main-neutral-800)" />
       </button>
     {:else}
       <ChevronIcon direction={expanded ? "up" : "down"} color="var(--color-common-light-strong)" />

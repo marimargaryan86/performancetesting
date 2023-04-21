@@ -1,8 +1,6 @@
 <script lang="ts">
-  import CloseIcon from "components/icons/close-icon.svelte";
   import CurrencyFlag from "components/icons/currency-flag.svelte";
   import SearchIcon from "components/icons/search-icon.svelte";
-  import Button from "components/ui/button.svelte";
   import TextField from "components/ui/text-field.svelte";
   import { portal } from "directives/portal";
   import integrationInstances from "integration-instances";
@@ -78,13 +76,7 @@
     transition:fade|local={{ duration: 200 }}
   >
     <div class="dialogue" transition:fly|local={{ duration: 200, y: 24 }} on:introend={focusSearch}>
-      <div class="header">
-        <h1>Add Balances</h1>
-
-        <button on:click={close} class="close">
-          <CloseIcon color="var(--color-neutral-700)" />
-        </button>
-      </div>
+      <h1 class="typography headline-medium bold">Add Balances</h1>
 
       <TextField
         type="text"
@@ -92,10 +84,10 @@
         placeholder="Find a balance"
         bind:this={inputRef}
       >
-        <SearchIcon slot="icon-before" color="var(--color-neutral-400)" />
+        <SearchIcon slot="icon-before" color="var(--color-main-neutral-400)" />
       </TextField>
 
-      <ul class="balances">
+      <ul class="balances typography body-large bold">
         {#each filteredBalances as balance}
           {@const id = `balance-${balance.code}`}
           <li>
@@ -110,8 +102,8 @@
       </ul>
 
       <div class="actions">
-        <Button size="medium" variant="outline" on:click={close}>Cancel</Button>
-        <Button size="medium" color="positive-gradient" on:click={addBalances}>Add</Button>
+        <button on:click={close} class="typography body-large bold">Cancel</button>
+        <button on:click={addBalances} class="typography body-large bold">Add</button>
       </div>
     </div>
   </div>
@@ -134,45 +126,20 @@
   .dialogue {
     display: flex;
     flex-flow: column;
-    gap: 16px;
+    gap: 32px;
     width: 100%;
     max-width: 480px;
     margin: 16px;
-    padding: 16px 24px 24px;
-    color: var(--color-neutral-800);
-    background-color: rgb(255 255 255 / 0.6);
-    border: var(--color-neutral-200) 1px solid;
-    border-radius: 8px;
+    padding: 66px 48px 48px;
+    color: var(--color-main-neutral-800);
+    background-color: var(--color-common-background-light-main);
+    border-radius: 16px;
     box-shadow: 0 4px 20px rgb(0 0 0 / 0.1);
     backdrop-filter: blur(25px);
   }
 
-  .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-weight: 700;
-    font-size: 20px;
-    font-family: "Red Hat Display", Arial, Helvetica, sans-serif;
-    font-style: normal;
-    line-height: 36px;
-    letter-spacing: 1px;
-  }
-
-  .close {
-    padding: 0;
-    background-color: transparent;
-    border: 0;
-    cursor: pointer;
-  }
-
-  .close > :global(svg) {
-    vertical-align: top;
-  }
-
   .dialogue > :global(.text-field) {
     --height: 40px;
-    --font-size: 12px;
   }
 
   .balances {
@@ -191,14 +158,8 @@
     gap: 24px;
     align-items: center;
     padding: 16px;
-    font-weight: 700;
-    font-size: 16px;
-    font-family: "Red Hat Display", Arial, Helvetica, sans-serif;
-    font-style: normal;
-    line-height: 20px;
-    letter-spacing: 0.1px;
-    background-color: var(--color-generic-white);
-    border: var(--color-neutral-200) 2px solid;
+    background-color: var(--color-common-background-light-main);
+    border: var(--color-main-neutral-100) 1px solid;
     border-radius: 8px;
     cursor: pointer;
     user-select: none;
@@ -213,18 +174,27 @@
   }
 
   input:checked + .balance {
-    border-color: var(--color-primary-500);
-    box-shadow: 0 4px 20px rgb(0 0 0 / 0.1);
+    border-color: var(--color-main-primary-500);
+    box-shadow: var(--shadow-small);
   }
 
   .actions {
     display: flex;
     gap: 16px;
-    justify-content: flex-end;
   }
 
-  .actions > :global(button) {
-    width: 100%;
-    max-width: 154px;
+  .actions > button {
+    flex-grow: 1;
+    height: 48px;
+    color: var(--color-common-light-strong);
+    background-color: var(--color-common-background-light-main);
+    border: var(--color-main-primary-500) 1px solid;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .actions > button:last-child {
+    color: var(--color-common-dark-strong);
+    background-color: var(--color-main-primary-500);
   }
 </style>

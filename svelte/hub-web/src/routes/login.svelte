@@ -73,7 +73,7 @@
         placeholder="Enter your email"
         on:input={clearErrors}
       >
-        <EmailIcon slot="icon-before" color="var(--color-primary-500)" />
+        <EmailIcon slot="icon-before" color="var(--color-main-primary-500)" />
       </TextField>
 
       <TextField
@@ -85,7 +85,7 @@
         placeholder="Enter your password"
         on:input={clearErrors}
       >
-        <LockIcon slot="icon-before" color="var(--color-primary-500)" />
+        <LockIcon slot="icon-before" color="var(--color-main-primary-500)" />
       </TextField>
 
       <Button type="submit" disabled={loginDisabled}>Login</Button>
@@ -123,7 +123,7 @@
   main::before {
     z-index: -2;
     width: 100%;
-    background-color: var(--color-generic-white);
+    background-color: var(--color-common-dark-strong);
   }
 
   main::after {
@@ -144,7 +144,7 @@
     height: 100%;
     max-height: 563px;
     padding: 54px 44px;
-    color: var(--color-neutral-800);
+    color: var(--color-main-neutral-800);
     background: rgb(255 255 255 / 0.4);
     border-radius: 20px 0 0 20px;
     backdrop-filter: blur(12px);

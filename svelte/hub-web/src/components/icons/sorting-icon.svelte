@@ -7,8 +7,8 @@
   } = {};
   export let direction: DirectionY | undefined = undefined;
 
-  $: activeColor = color.active ?? "var(--color-generic-black)";
-  $: inactiveColor = color.inactive ?? "var(--color-neutral-400)";
+  $: activeColor = color.active ?? "var(--color-common-light-strong)";
+  $: inactiveColor = color.inactive ?? "var(--color-main-neutral-400)";
 </script>
 
 <svg width="14" height="14" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">

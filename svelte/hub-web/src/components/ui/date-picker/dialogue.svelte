@@ -60,11 +60,11 @@
 
     <div class="navigation">
       <button class="navigate" type="button" on:click={goToPrev}>
-        <ChevronIcon direction="left" color="var(--color-neutral-900)" />
+        <ChevronIcon direction="left" color="var(--color-main-neutral-900)" />
       </button>
 
       <button class="navigate" type="button" on:click={goToNext}>
-        <ChevronIcon direction="right" color="var(--color-neutral-900)" />
+        <ChevronIcon direction="right" color="var(--color-main-neutral-900)" />
       </button>
     </div>
   </div>
@@ -81,7 +81,7 @@
     margin-top: 4px;
     padding: 20px;
     background: #ffffff;
-    border: var(--color-neutral-200) 1px solid;
+    border: var(--color-main-neutral-200) 1px solid;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgb(17 24 39 / 0.05), 0 12px 16px rgb(17 24 39 / 0.1);
     transform-origin: top left;
@@ -94,7 +94,7 @@
     justify-content: space-between;
     margin-bottom: 20px;
     padding-bottom: 20px;
-    color: var(--color-neutral-900);
+    color: var(--color-main-neutral-900);
     font-weight: 600;
     font-size: 12px;
     font-family: "Red Hat Display", Arial, Helvetica, sans-serif;
@@ -102,7 +102,7 @@
     line-height: 18px;
     letter-spacing: 1px;
     white-space: nowrap;
-    border-bottom: var(--color-neutral-200) 1px solid;
+    border-bottom: var(--color-main-neutral-200) 1px solid;
   }
 
   .navigation {

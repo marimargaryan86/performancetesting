@@ -2,10 +2,7 @@
   import "assets/css/reset.css";
   import "assets/css/colors.css";
   import "assets/css/effects.css";
-  import "assets/css/common.css";
-  import "assets/css/layout.css";
   import "assets/css/typography.css";
-  import "assets/css/table.css";
   import type { LayoutData } from "./$types";
   import Login from "./login.svelte";
   import MainMenu from "components/partials/main-menu/main-menu.svelte";

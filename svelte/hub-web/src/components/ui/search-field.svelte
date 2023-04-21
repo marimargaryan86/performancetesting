@@ -48,10 +48,6 @@
     cursor: text;
   }
 
-  :global(.text-field.search-field input::placeholder) {
-    transition: opacity 200ms ease;
-  }
-
   :global(.text-field.search-field:not(.expanded) input::placeholder) {
     opacity: 0;
   }

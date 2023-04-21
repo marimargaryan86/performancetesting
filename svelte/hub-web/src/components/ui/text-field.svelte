@@ -89,7 +89,7 @@
   }
 
   label {
-    color: var(--color-neutral-900);
+    color: var(--color-main-neutral-900);
     font-weight: 400;
     font-size: 12px;
     font-family: Poppins, Arial, Helvetica, sans-serif;
@@ -143,6 +143,7 @@
 
   input::placeholder {
     color: var(--color-common-light-soft);
+    transition: opacity 150ms ease;
   }
 
   .wrapper.icon-before > input {

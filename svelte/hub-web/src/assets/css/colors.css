@@ -1,22 +1,4 @@
 :root {
-  --color-neutral-50: #f0f2f5;
-  --color-neutral-100: #e4e6e9;
-  --color-neutral-200: #e5e5e5;
-  --color-neutral-400: #a3a3a3;
-  --color-neutral-500: #b3b5b9;
-  --color-neutral-600: #8c8e92;
-  --color-neutral-700: #66686b;
-  --color-neutral-800: #363938;
-  --color-neutral-900: #171717;
-  --color-primary-100: #edf8f5;
-  --color-primary-500: #4bb69c;
-  --color-primary-600: #41a089;
-  --color-generic-black: #000000;
-  --color-generic-white: #ffffff;
-  --color-destructive-500: #ef4444;
-  --color-success-500: #7bc12a;
-  --color-error-500: #ff4245;
-  --color-warning-500: #ffc60c;
   --color-positive-gradient: radial-gradient(
     157.78% 1163.56% at -3.9% -43.33%,
     #4ccaab 0%,
@@ -32,15 +14,20 @@
   --color-common-dark-strong: #ffffff;
   --color-common-background-light-green: #e2f3ef;
   --color-common-background-light-main: #ffffff;
+  --color-common-line-soft: #e4e7e5;
   --color-common-line-medium: #d7dbd8;
   --color-common-line-strong: #bcc2bd;
 
   /* Main */
   --color-main-neutral-50: #f0f2f5;
+  --color-main-neutral-100: #e4e6e9;
+  --color-main-neutral-200: #d8dadd;
+  --color-main-neutral-300: #cbced1;
   --color-main-neutral-400: #bfc1c5;
   --color-main-neutral-600: #8c8e92;
   --color-main-neutral-700: #66686b;
   --color-main-neutral-800: #363938;
+  --color-main-neutral-900: #1a1b1c;
   --color-main-primary-50: #f6fbfa;
   --color-main-primary-400: #6dc4af;
   --color-main-primary-500: #4bb69c;
@@ -57,6 +44,6 @@
   --color-semantic-success-200: #dff8aa;
   --color-semantic-success-600: #60a51e;
 
-  /* Graidents */
+  /* Gradients */
   --color-gradient-extensions-horizontal: linear-gradient(270deg, #d2ede6 0%, #edf8f5 100%);
 }

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
 
-  export let color = "var(--color-generic-black)";
+  export let color = "var(--color-common-light-strong)";
   export let active = false;
 </script>
 

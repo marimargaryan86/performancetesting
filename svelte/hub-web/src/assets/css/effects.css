@@ -1,3 +1,4 @@
 :root {
-  --shadow-xsmall: 0px 1px 2px rgb(16 24 40 / 0.05);
+  --shadow-3: 0px 4px 20px rgb(0 0 0 / 0.05);
+  --shadow-small: 0px 0px 20px 4px rgb(0 0 0 / 0.04);
 }

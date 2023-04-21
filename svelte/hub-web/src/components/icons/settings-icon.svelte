@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let color = "var(--color-generic-black)";
+  export let color = "var(--color-common-light-strong)";
   export let variant: "cog" | "default" = "default";
 </script>
 

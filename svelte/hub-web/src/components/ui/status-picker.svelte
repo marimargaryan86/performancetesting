@@ -117,7 +117,7 @@
     z-index: 100;
     margin-top: 4px;
     padding: 8px;
-    color: var(--color-neutral-800);
+    color: var(--color-main-neutral-800);
     font-weight: 400;
     font-size: 10px;
     font-family: Poppins, Arial, Helvetica, sans-serif;
@@ -125,7 +125,7 @@
     line-height: 14px;
     white-space: nowrap;
     background: #ffffff;
-    border: var(--color-neutral-200) 1px solid;
+    border: var(--color-main-neutral-200) 1px solid;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgb(17 24 39 / 0.05), 0 12px 16px rgb(17 24 39 / 0.1);
     transform-origin: top left;
@@ -144,7 +144,7 @@
   }
 
   li:hover {
-    background-color: var(--color-neutral-50);
+    background-color: var(--color-main-neutral-50);
   }
 
   label {

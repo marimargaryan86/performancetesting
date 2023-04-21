@@ -5,7 +5,7 @@
   export let imageUrl: string | undefined = undefined;
   export let size = "34px";
 
-  $: color = name ? getHexColor(name) : "var(--color-generic-black)";
+  $: color = name ? getHexColor(name) : "var(--color-common-light-strong)";
 </script>
 
 {#if imageUrl}
@@ -29,7 +29,7 @@
     height: var(--size);
     object-fit: cover;
     object-position: center;
-    color: var(--color-generic-white);
+    color: var(--color-common-dark-strong);
     font-size: calc(var(--size) * 0.4);
     text-shadow: 0 0 1px rgb(0 0 0 / 1), 0 0 2px rgb(0 0 0 / 1);
     border-radius: 50%;

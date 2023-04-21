@@ -10,7 +10,7 @@
 </script>
 
 <script lang="ts">
-  export let color = "var(--color-generic-black)";
+  export let color = "var(--color-common-light-strong)";
   export let direction: Direction = "right";
   export let size = "16px";
   export let variant: "outlined" | "filled" = "outlined";

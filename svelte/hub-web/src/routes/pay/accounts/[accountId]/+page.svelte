@@ -2,12 +2,11 @@
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import CurrencyFlag from "components/icons/currency-flag.svelte";
   import PlusIcon from "components/icons/plus-icon.svelte";
-  import SearchIcon from "components/icons/search-icon.svelte";
-  import TextField from "components/ui/text-field.svelte";
   import { formatAmount } from "formatting/currency";
   import type { MoneyModel } from "models/money";
   import type { PageData } from "./$types";
   import AddBalanceDialogue from "./add-balance-dialogue.svelte";
+  import SearchField from "components/ui/search-field.svelte";
 
   export let data: PageData;
 
@@ -40,68 +39,67 @@
 />
 
 <div class="header">
-  <TextField placeholder="Find a balance" bind:value={searchQuery}>
-    <SearchIcon slot="icon-before" color="var(--color-neutral-400)" />
-  </TextField>
+  <h1 class="typography headline-medium bold">Balances</h1>
 
-  <button class="add-balance" on:click={openDialogue}>
-    <PlusIcon color="var(--color-neutral-50)" />
-    <span>Add</span>
-  </button>
+  <div class="actions">
+    <SearchField bind:value={searchQuery} />
+
+    <button class="add-balance typography body-medium bold" on:click={openDialogue}>
+      <span>Add Balance</span>
+      <PlusIcon color="var(--color-common-dark-strong)" />
+    </button>
+  </div>
 </div>
 
-<ul class="balances">
-  {#each balances as balance}
-    <li class="balance">
-      <a href="/pay/accounts/{data.account.id}/{balance.currency.toLowerCase()}">
-        <CurrencyFlag code={balance.currency} />
+<div class="content">
+  <ul class="balances">
+    {#each balances as balance}
+      <li>
+        <a href="#top" class="balance">
+          <CurrencyFlag code={balance.currency} />
 
-        <span>
-          <strong>{formatAmount(balance)}</strong>
-          <span>{balance.currency}</span>
-        </span>
+          <span>
+            <strong class="typography body-large bold">{formatAmount(balance)}</strong>
+            <span class="typography body-small">{balance.currency}</span>
+          </span>
 
-        <ChevronIcon color="var(--color-neutral-700)" size="20px" />
-      </a>
-    </li>
-  {:else}
-    <li class="empty">No balances found</li>
-  {/each}
-</ul>
+          <ChevronIcon color="var(--color-main-neutral-700)" size="20px" />
+        </a>
+      </li>
+    {:else}
+      <li class="typography body-large empty">No balances found</li>
+    {/each}
+  </ul>
+</div>
 
 <style>
   .header {
     display: flex;
-    gap: 16px;
     justify-content: space-between;
+    padding: 8px 24px 24px;
   }
 
-  .header > :global(.text-field) {
-    --height: 40px;
-    --font-size: 12px;
-
-    width: 400px;
+  .actions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
   }
 
-  @media screen and (max-width: 1439px) {
-    .header > :global(.text-field) {
-      max-width: 255px;
-    }
+  .content {
+    flex-grow: 1;
+    padding: 24px;
+    overflow: auto;
+    background-image: var(--color-gradient-extensions-horizontal);
   }
 
   .add-balance {
     display: flex;
     gap: 8px;
     align-items: center;
-    padding: 0 40px;
-    color: var(--color-neutral-50);
-    font-weight: 500;
-    font-size: 16px;
-    font-family: Poppins, Arial, Helvetica, sans-serif;
-    font-style: normal;
-    line-height: 24px;
-    text-decoration: none;
-    background-image: var(--color-positive-gradient);
+    height: 40px;
+    padding: 0 16px;
+    color: var(--color-common-dark-strong);
+    background-color: var(--color-main-primary-500);
     border: 0;
     border-radius: 8px;
     cursor: pointer;
@@ -111,53 +109,39 @@
     display: flex;
     flex-flow: column;
     gap: 8px;
-    height: calc(100vh - 228px);
-    margin: 24px -24px -24px;
-    padding: 0 24px 24px;
+    height: 100%;
+    padding: 32px 40px;
     overflow-y: auto;
+    background-color: var(--color-common-background-light-main);
+    border-radius: 16px;
   }
 
-  .balance > a {
+  .balance {
     display: flex;
     gap: 24px;
     align-items: center;
     height: 60px;
-    padding: 0 16px;
-    color: var(--color-neutral-800);
-    font-family: "Red Hat Display", Arial, Helvetica, sans-serif;
-    font-style: normal;
-    line-height: 24px;
+    padding: 16px;
     text-decoration: none;
-    background-color: var(--color-generic-white);
-    border: var(--color-neutral-200) 1px solid;
+    background-color: var(--color-common-dark-strong);
+    border: var(--color-main-neutral-100) 1px solid;
     border-radius: 8px;
   }
 
-  .balance > a > span {
+  .balance > span {
     display: flex;
     flex-grow: 1;
     gap: 8px;
     align-items: center;
+    color: var(--color-main-neutral-800);
   }
 
-  .balance > a > :global(.currency-flag),
-  .balance > a > :global(.chevron-icon) {
+  .balance > :global(.currency-flag),
+  .balance > :global(.chevron-icon) {
     flex-shrink: 0;
   }
 
-  .balance > a > span > strong {
-    font-weight: 700;
-    font-size: 20px;
-  }
-
-  .balance > a > span > span {
-    font-weight: 500;
-    font-size: 10px;
-    letter-spacing: 2px;
-  }
-
   .empty {
-    font-size: 16px;
-    font-family: "Red Hat Display", Arial, Helvetica, sans-serif;
+    color: var(--color-main-neutral-600);
   }
 </style>
