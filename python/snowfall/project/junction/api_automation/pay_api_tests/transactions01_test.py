@@ -88,14 +88,14 @@ async def test_create_transactions(  # noqa: WPS210, WPS213, C901
 
     external_reference = string.uuid()
     logger.info("external_reference: %s", external_reference)
-    parent_external_reference = string.uuid()
-    logger.info("parent_external_reference: %s", parent_external_reference)
+    invoice_reference = string.uuid()
+    logger.info("invoice_reference: %s", invoice_reference)
     logger.info("quotation_id: %s", response_create_quote["data"]["id"])
 
     try:
         response_create_transactions = await pay_client.create_transactions(
             external_reference=external_reference,
-            parent_external_reference=parent_external_reference,
+            invoice_reference=invoice_reference,
             quotation_id=response_create_quote["data"]["id"],
         )
 
@@ -118,8 +118,8 @@ async def test_create_transactions(  # noqa: WPS210, WPS213, C901
         == external_reference
     )
     assert (
-        response_create_transactions["data"]["attributes"]["parentExternalReference"]
-        == parent_external_reference
+        response_create_transactions["data"]["attributes"]["invoiceReference"]
+        == invoice_reference
     )
     try:
         is_valid_date = bool(

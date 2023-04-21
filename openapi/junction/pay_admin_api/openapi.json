@@ -2137,7 +2137,6 @@
               "attributes": {
                 "required": [
                   "externalReference",
-                  "parentExternalReference",
                   "createdAt",
                   "amounts",
                   "rates"
@@ -2149,10 +2148,9 @@
                     "format": "uuid",
                     "description": "The UUID related to a specific transaction in our integrating partners DB"
                   },
-                  "parentExternalReference": {
+                  "invoiceReference": {
                     "type": "string",
-                    "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-                    "format": "uuid"
+                    "example": "k1234567890123"
                   },
                   "createdAt": {
                     "type": "string",

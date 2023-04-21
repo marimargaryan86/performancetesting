@@ -147,7 +147,7 @@ class Transaction(models.Resource):
             type=Transaction.api_type,
             attributes={
                 "externalReference": transaction.external_reference_id,
-                "parentExternalReference": transaction.parent_external_id,
+                "invoiceReference": transaction.invoice_reference_id,
                 "createdAt": protobuf.protobuf_to_datetime(transaction.created_at),
                 "amounts": {
                     "beneficiary": Money.from_proto(

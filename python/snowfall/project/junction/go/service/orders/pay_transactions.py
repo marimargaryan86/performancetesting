@@ -28,7 +28,7 @@ class PayTransactionCreator(object):
             transaction = await self._create_transaction(
                 quotation_id=booking.trip_option.pay_quote_id,
                 external_reference=booking.id,
-                parent_external_reference=booking.trip_result.provider_booking_reference,
+                invoice_reference=booking.trip_result.provider_booking_reference,
             )
             booking.transaction_id = transaction.data.id
         return booking
@@ -37,12 +37,12 @@ class PayTransactionCreator(object):
         self,
         quotation_id: str,
         external_reference: str,
-        parent_external_reference: str,
+        invoice_reference: str,
     ) -> PayTransactionResponse:
         try:  # noqa:WPS229
             resp = await self._pay_client.create_transactions(
                 external_reference=external_reference,
-                parent_external_reference=parent_external_reference,
+                invoice_reference=invoice_reference,
                 quotation_id=quotation_id,
             )
             return PayTransactionResponse(**resp)

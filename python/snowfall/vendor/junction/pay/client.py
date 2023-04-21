@@ -52,7 +52,7 @@ class Client(BaseClient):
     async def create_transactions(
         self,
         external_reference: str,
-        parent_external_reference: str,
+        invoice_reference: str,
         quotation_id: str,
     ) -> dict[str, Any]:
         payload = {
@@ -60,7 +60,7 @@ class Client(BaseClient):
                 _TYPE_KEY: "transactions",
                 _ATTRIBUTES_KEY: {
                     "externalReference": external_reference,
-                    "parentExternalReference": parent_external_reference,
+                    "invoiceReference": invoice_reference,
                 },
                 "relationships": {
                     "quotation": {

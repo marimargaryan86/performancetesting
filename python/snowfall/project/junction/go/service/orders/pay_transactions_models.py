@@ -32,7 +32,7 @@ class PayTransactionRates(PayBaseModel):
 
 class PayTransactionAttributes(PayBaseModel):
     external_reference: str = Field(alias="externalReference")
-    parent_external_reference: str = Field(alias="parentExternalReference")
+    invoice_reference: str = Field(alias="invoiceReference")
     created_at: str = Field(alias="createdAt")
     amounts: PayTransactionAmounts
     rates: PayTransactionRates

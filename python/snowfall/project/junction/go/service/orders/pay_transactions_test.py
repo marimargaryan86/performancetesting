@@ -17,7 +17,7 @@ from snowfall.stdlib import string
 from snowfall.vendor.junction.pay.client import Client as PayClient
 
 EXTERNAL_REFERENCE = string.uuid()
-PARENT_EXTERNAL_REFERENCE = "a-provider-reference"
+INVOICE_REFERENCE = "a-provider-reference"
 
 CREATE_TRANSACTION_RESPONSE = MappingProxyType(
     {
@@ -26,7 +26,7 @@ CREATE_TRANSACTION_RESPONSE = MappingProxyType(
             "type": "transactions",
             "attributes": {
                 "externalReference": EXTERNAL_REFERENCE,
-                "parentExternalReference": EXTERNAL_REFERENCE,
+                "invoiceReference": EXTERNAL_REFERENCE,
                 "createdAt": "2023-04-05T14:52:25+00:00",
                 "amounts": {
                     "beneficiary": {
@@ -100,7 +100,7 @@ async def test_that_transaction_created_and_id_set_in_booking() -> None:
         status=Booking.Status.STATUS_PENDING,
         provider_name="a-provider",
         total_price=None,
-        trip_result=TripBooking(provider_booking_reference=PARENT_EXTERNAL_REFERENCE),
+        trip_result=TripBooking(provider_booking_reference=INVOICE_REFERENCE),
         raw_data="raw data",
         created_at=None,
         updated_at=None,
@@ -113,7 +113,7 @@ async def test_that_transaction_created_and_id_set_in_booking() -> None:
 
     mock_pay_client.create_transactions.assert_called_once_with(
         external_reference=EXTERNAL_REFERENCE,
-        parent_external_reference=PARENT_EXTERNAL_REFERENCE,
+        invoice_reference=INVOICE_REFERENCE,
         quotation_id="a-pay-quotation-id",
     )
 

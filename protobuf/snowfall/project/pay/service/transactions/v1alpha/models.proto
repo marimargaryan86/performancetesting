@@ -10,7 +10,7 @@ option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/
 message Transaction {
   string id = 1;
   string external_reference_id = 2;
-  string parent_external_id = 3;
+  string invoice_reference_id = 3;
   google.protobuf.Timestamp created_at = 4;
   string conversion_id = 5;
   snowfall.project.pay.service.quotations.v1alpha.QuotationAmounts amounts = 6;

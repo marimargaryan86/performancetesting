@@ -52,7 +52,7 @@ class TestTransactions(object):
                 "type": "transactions",
                 "attributes": {
                     "externalReference": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-                    "parentExternalReference": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                    "invoiceReference": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
                 },
                 "relationships": {
                     "quotation": {

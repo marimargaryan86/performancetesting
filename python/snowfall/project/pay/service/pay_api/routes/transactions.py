@@ -67,7 +67,7 @@ class Transactions(endpoints.HTTPEndpoint):
                 Transaction(
                     id=transaction_id,
                     external_reference_id=body["externalReference"],
-                    parent_external_id=body["parentExternalReference"],
+                    invoice_reference_id=body["invoiceReference"],
                     conversion_id=conversion_id,
                     amounts=quot.amounts,
                     rates=quot.rates,

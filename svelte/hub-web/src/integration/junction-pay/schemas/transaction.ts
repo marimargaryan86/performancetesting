@@ -11,7 +11,7 @@ export interface TransactionIdentifierSchema {
 export interface TransactionSchema extends TransactionIdentifierSchema {
   attributes: {
     externalReference: string;
-    parentExternalReference: string;
+    invoiceReference: string;
     createdAt: string;
     amounts: {
       beneficiary: MoneySchema;

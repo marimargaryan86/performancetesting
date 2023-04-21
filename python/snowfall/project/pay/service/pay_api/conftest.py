@@ -253,7 +253,7 @@ def get_transaction(transaction_id: str) -> Transaction:
     return Transaction(
         id=transaction_id,
         external_reference_id=string.uuid(),
-        parent_external_id=string.uuid(),
+        invoice_reference_id=string.uuid(),
         conversion_id=string.uuid(),
         amounts=QuotationAmounts(
             beneficiary=money_usd,

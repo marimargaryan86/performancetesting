@@ -18,7 +18,7 @@ export function parseTransaction(
     id: transaction.id,
     beneficiary,
     createdAt: new Date(attributes.createdAt),
-    parentId: attributes.parentExternalReference,
+    parentId: attributes.invoiceReference,
     payer,
     amounts: {
       beneficiary: attributes.amounts.beneficiary,
