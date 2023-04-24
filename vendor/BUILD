@@ -27,6 +27,7 @@ python_requirements(
         "mongomock-motor": {"dependencies": ["#setuptools"]},
         "openapi-core": {"dependencies": ["#setuptools", "#rfc3339-validator"]},
         "protobuf": {"dependencies": ["#types-protobuf"]},
+        "qrcode": {"dependencies": ["#Pillow"]},
         "pyjwt": {"dependencies": ["#cryptography"]},
         "SQLAlchemy": {"dependencies": ["#aiomysql", "#aiosqlite"]},
         "starlette": {"dependencies": ["#python-multipart"]},
