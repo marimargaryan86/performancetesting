@@ -5,6 +5,7 @@ import json
 from typing import Any, Mapping
 
 import httpx
+import structlog
 
 from snowfall.vendor.distribusion import errors, jsonapi_helpers
 from snowfall.vendor.distribusion.models import (
@@ -48,6 +49,7 @@ class DistribusionClient(object):  # noqa: WPS214
         self._retailer_partner_number = retailer_partner_number
         self._http_client = http_client
         self._http_client.base_url = self._api_base_url
+        self._logger = structlog.get_logger(__name__)
 
     async def get_marketing_carriers(self) -> list[marketing_carriers.MarketingCarrier]:
         response = await self._make_request(
@@ -134,22 +136,25 @@ class DistribusionClient(object):  # noqa: WPS214
         self,
         criteria: criterias.FindConnectionsCriteria,
     ) -> list[connections.Connection]:
+        query_params = {
+            "locale": criteria.locale,
+            "departure_stations[]": criteria.departure_stations,
+            "arrival_stations[]": criteria.arrival_stations,
+            "departure_date": criteria.departure_date.isoformat(),
+            **(
+                {"return_date": criteria.return_date.isoformat()}
+                if criteria.return_date
+                else {}
+            ),
+            "pax": criteria.pax,
+            "currency": criteria.currency,
+        }
+        self._logger.info("connections/find rq", **query_params)
+
         response = await self._make_request(
             "GET",
             "/connections/find",
-            query_params={
-                "locale": criteria.locale,
-                "departure_stations[]": criteria.departure_stations,
-                "arrival_stations[]": criteria.arrival_stations,
-                "departure_date": criteria.departure_date.isoformat(),
-                **(
-                    {"return_date": criteria.return_date.isoformat()}
-                    if criteria.return_date
-                    else {}
-                ),
-                "pax": criteria.pax,
-                "currency": criteria.currency,
-            },
+            query_params=query_params,
         )
 
         return [
