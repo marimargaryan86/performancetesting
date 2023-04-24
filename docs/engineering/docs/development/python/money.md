@@ -1,10 +1,5 @@
----
-internal: true
----
+# Money
 
-# Python
-
-## Money
 
 > If I had a dime for every time I’ve seen someone use FLOAT to store currency, I’d have $999.997634
 
@@ -75,3 +70,4 @@ print(a)  # "24.00"
 
 print(type(a.protobuf()))  # <class 'snowfall.stdlib.v1alpha.money_pb2.Money'>
 ```
+

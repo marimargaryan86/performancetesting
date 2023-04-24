@@ -1,7 +1,3 @@
----
-internal: false
----
-
 # Getting Started
 
 Before you search and book a trip through Junction you need to understand a few important key concepts.

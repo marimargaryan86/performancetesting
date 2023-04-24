@@ -1,7 +1,3 @@
----
-internal: true
----
-
 # Glossary
 
 | Term     | Definition                                                             |

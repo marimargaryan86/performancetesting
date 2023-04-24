@@ -55,7 +55,7 @@ openapi:publish:
     name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/node:18"
     entrypoint: [""]
   script:
-    - npx @stoplight/cli@6.0.1442 push --ci-token ${STOPLIGHT_TOKEN}
+    - npx @stoplight/cli@6.0.1442 push --ci-token ${STOPLIGHT_TOKEN} --directory openapi/
   needs: []
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'

@@ -11,7 +11,7 @@
 /pants.toml
 
 [Documentation] @platform-engineers
-*.md
+/docs/engineering/
 
 [Platform] @platform-engineers
 /golang/cmd/snowman/

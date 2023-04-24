@@ -1,7 +1,3 @@
----
-internal: true
----
-
 # Schedules Pipeline Whitelist
 
 In the schedules pipeline there are a few methods we use to include schedules for

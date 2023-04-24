@@ -1,7 +1,3 @@
----
-internal: true
----
-
 # ssim-convert.go
 
 There are two JSON files included using `//go:embed airports.json` and `//go:embed airlines.json`

@@ -1,0 +1,22 @@
+files(name="source_files", sources=["**/*", "!build/**/*", "!node_modules/**/*"])
+docker_image(
+    dependencies=[":source_files"],
+    instructions=[
+        "ARG REGISTRY",
+        (
+            "FROM ${REGISTRY}node@sha256:4e271ab266a4b76874c8e7c8aa431a8dbe636af19fa5e76403e3acbd9b8d3450"
+            " AS build"
+        ),
+        "WORKDIR /src",
+        "COPY docs/engineering/package.json docs/engineering/package-lock.json /src/",
+        "RUN npm install",
+        "COPY docs/engineering /src",
+        "RUN npm run build",
+        "ARG REGISTRY",
+        (
+            "FROM ${REGISTRY}nginx@sha256:f2fee5c7194cbbfb9d2711fa5de094c797a42a51aa42b0c8ee8ca31547c872b1"
+            " AS runtime"
+        ),
+        "COPY --from=build /src/build /usr/share/nginx/html",
+    ],
+)

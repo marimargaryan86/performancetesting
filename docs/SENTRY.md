@@ -1,7 +1,3 @@
----
-internal: true
----
-
 # Sentry
 
 ## Goal of Sentry

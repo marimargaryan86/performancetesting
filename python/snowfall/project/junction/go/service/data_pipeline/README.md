@@ -1,7 +1,3 @@
----
-internal: true
----
-
 # data_pipeline/download
 
 At:

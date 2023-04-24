@@ -1,7 +1,3 @@
----
-internal: true
----
-
 # GTFS
 
 ## Feeds

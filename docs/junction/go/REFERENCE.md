@@ -1,7 +1,3 @@
----
-internal: false
----
-
 # Reference
 
 ## OpenAPI String Formats

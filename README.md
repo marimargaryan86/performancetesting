@@ -1,7 +1,3 @@
----
-internal: true
----
-
 # Junction
 
 Junction is a mono-repository that uses [Pants][pants].

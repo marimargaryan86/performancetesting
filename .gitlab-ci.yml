@@ -14,7 +14,6 @@ variables:
     description: "Run the schedules pipeline e2e test? then set to 'true'"
 include:
   - local: .gitlab/junction/api_automation.gitlab-ci.yml
-  - local: .gitlab/markdown.gitlab-ci.yml
   - local: .gitlab/nomad.gitlab-ci.yml
   - local: .gitlab/pants.gitlab-ci.yml
   - local: .gitlab/junction/planner.gitlab-ci.yml

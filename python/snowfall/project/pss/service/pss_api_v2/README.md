@@ -1,7 +1,3 @@
----
-internal: true
----
-
 # PSS API V2
 
 This section of the `Junction` Monorepo is related to the migration of PSS API

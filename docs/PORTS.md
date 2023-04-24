@@ -1,7 +1,3 @@
----
-internal: true
----
-
 # Ports
 
 This file is mainly meant as a way to keep track on which services are running on

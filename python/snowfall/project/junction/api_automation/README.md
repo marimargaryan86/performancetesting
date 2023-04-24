@@ -1,7 +1,3 @@
----
-internal: true
----
-
 # Setup
 * See CONTRIBUTING.md for junction project setup with pants
 

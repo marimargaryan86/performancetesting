@@ -1,7 +1,3 @@
----
-internal: true
----
-
 # Junction Pay frontend
 
 ## Development
