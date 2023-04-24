@@ -1,0 +1,11 @@
+{
+  "development": {
+    "deploy": false
+  },
+  "production": {
+    "variables": {
+      "traefik_entrypoints": "web",
+      "traefik_host_URL": "engineering.snowfalltravel.com"
+    }
+  }
+}
