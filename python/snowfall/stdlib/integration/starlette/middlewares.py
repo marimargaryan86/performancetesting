@@ -12,7 +12,6 @@ from starlette import applications, exceptions, requests, responses, status, typ
 from starlette.middleware import base
 
 from snowfall.stdlib.integration.starlette import handlers, validation
-from snowfall.stdlib.logging import stdout
 
 
 class RequestWithBody(requests.Request):
@@ -112,6 +111,7 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
     ):
         super().__init__(app)
         self._logger = structlog.get_logger(__name__)
+        self._response_logger = structlog.get_logger(__name__)
         self._validator = validator
         self._excluded_status_codes = excluded_status_codes or []
         self._validate_response = validate_response
@@ -176,7 +176,14 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
         request: requests.Request,
         exc: validation_exceptions.InvalidSchemaValue,
     ) -> responses.Response:
-        with stdout.context_binding(
+        self._response_logger.info(
+            "Response body does not validate against schema",
+            body=exc.value,
+            source="transport",
+        )
+
+        self._logger.error(
+            "Response body does not validate against schema",
             errors=[
                 error.dict()
                 for error in validation.invalid_schema_value_to_errors(
@@ -184,9 +191,7 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
             ],
-            body=exc.value,
-        ):
-            self._logger.error("Response body does not validate against schema")
+        )
 
         return await handlers.server_error_handler(request, exc)
 
