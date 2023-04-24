@@ -8,7 +8,7 @@ from snowfall.vendor.currency_cloud.models.base import CamelCaseBaseModel
 class ConversionRequest(CamelCaseBaseModel):
     buy_currency: str
     sell_currency: str
-    amount: int
+    amount: str
     reason: str
     fixed_side: str = "buy"
     term_agreement: str = "true"

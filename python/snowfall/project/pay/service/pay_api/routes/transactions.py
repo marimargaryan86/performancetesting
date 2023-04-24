@@ -39,9 +39,11 @@ class Transactions(endpoints.HTTPEndpoint):
                 try:
                     cc_conversion = payment_client.create_conversion(
                         conversion.ConversionRequest(
-                            buy_currency=quot.amounts.base_converted.currency_code,
-                            sell_currency=quot.amounts.beneficiary.currency_code,
-                            amount=money.from_protobuf(quot.amounts.beneficiary).amount,
+                            buy_currency=quot.amounts.beneficiary.currency_code,
+                            sell_currency=quot.amounts.base_converted.currency_code,
+                            amount=str(
+                                money.from_protobuf(quot.amounts.beneficiary).amount,
+                            ),
                             reason=transaction_id,
                         ),
                     )
