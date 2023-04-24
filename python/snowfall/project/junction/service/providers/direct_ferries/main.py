@@ -194,7 +194,6 @@ async def _create_gtfs(app: service.Application[config.GtfsSetting]) -> None:
                 timeout=int(app.settings.api_timeout.total_seconds()),
             ),
         )
-        logging.register(http_client)
         metrics.register(http_client)
         df_client = _create_client(
             http_client=http_client,
