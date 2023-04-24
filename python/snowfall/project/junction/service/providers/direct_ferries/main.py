@@ -209,7 +209,7 @@ async def _create_gtfs(app: service.Application[config.GtfsSetting]) -> None:
                     df_client=df_client,
                     operators=(
                         await df_client.operators.get_operators()
-                    ).operator_data.operators[:15],
+                    ).operator_data.operators,
                 )
             ],
         )
