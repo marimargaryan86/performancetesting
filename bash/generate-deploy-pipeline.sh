@@ -90,6 +90,7 @@ for DIR in "${1}"/*; do
 		cat <<EOF
 
 ${service_name}:
+  stage: deploy
   resource_group: ${service_name}
   script:
     - echo "Skipped due to ${skip_deploy}."
