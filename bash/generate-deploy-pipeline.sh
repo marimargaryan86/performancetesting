@@ -39,6 +39,32 @@ make-uninterruptible:
 EOF
 # editorconfig-checker-enable
 
+if [ "$(basename "${1}")" == "development" ]; then
+	# editorconfig-checker-disable
+	cat <<EOF
+
+promote-to-production:
+  stage: promote
+  interruptible: false
+  before_script:
+    - mkdir -p ~/.ssh/
+    - mv "\${NOMAD_SSH_KEY}" ~/.ssh/id_ed25519
+    - mv "\${NOMAD_SSH_KNOWN_HOSTS}" ~/.ssh/known_hosts
+    - chmod 700 ~/.ssh/
+    - chmod 600 ~/.ssh/id_ed25519
+    - chmod 644 ~/.ssh/known_hosts
+    - git config --global user.email "\${NOMAD_GIT_EMAIL}"
+    - git config --global user.name "\${NOMAD_GIT_NAME}"
+  script:
+    - ./promote-environment.sh development production ${services[@]}
+  tags:
+    - shell
+  needs:
+    - verify
+EOF
+# editorconfig-checker-enable
+fi
+
 services=()
 
 for DIR in "${1}"/*; do
@@ -108,10 +134,6 @@ EOF
 	# editorconfig-checker-enable
 done
 
-if [ ${#services[@]} -eq 0 ]; then
-	exit 0
-fi
-
 # editorconfig-checker-disable
 cat <<EOF
 
@@ -122,36 +144,18 @@ verify:
     - exit 0
   tags:
     - shell
-  needs:
 EOF
 # editorconfig-checker-enable
+
+if [ ${#services[@]} -eq 0 ]; then
+	exit 0
+fi
+
+# editorconfig-checker-disable
+cat <<EOF
+  needs:
+EOF
 
 for service in "${services[@]}"; do
 	echo "  - ${service}"
 done
-
-if [ "$(basename "${1}")" == "development" ]; then
-	# editorconfig-checker-disable
-	cat <<EOF
-
-promote-to-production:
-  stage: promote
-  interruptible: false
-  before_script:
-    - mkdir -p ~/.ssh/
-    - mv "\${NOMAD_SSH_KEY}" ~/.ssh/id_ed25519
-    - mv "\${NOMAD_SSH_KNOWN_HOSTS}" ~/.ssh/known_hosts
-    - chmod 700 ~/.ssh/
-    - chmod 600 ~/.ssh/id_ed25519
-    - chmod 644 ~/.ssh/known_hosts
-    - git config --global user.email "\${NOMAD_GIT_EMAIL}"
-    - git config --global user.name "\${NOMAD_GIT_NAME}"
-  script:
-    - ./promote-environment.sh development production ${services[@]}
-  tags:
-    - shell
-  needs:
-    - verify
-EOF
-# editorconfig-checker-enable
-fi

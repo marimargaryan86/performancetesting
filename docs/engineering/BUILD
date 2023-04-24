@@ -1,6 +1,7 @@
 files(name="source_files", sources=["**/*", "!build/**/*", "!node_modules/**/*"])
 docker_image(
     dependencies=[":source_files"],
+    image_tags=["{build_args.VERSION}"],
     instructions=[
         "ARG REGISTRY",
         (
@@ -18,5 +19,9 @@ docker_image(
             " AS runtime"
         ),
         "COPY --from=build /src/build /usr/share/nginx/html",
+        'ARG VERSION "dev"',
+        "ENV VERSION $VERSION",
+        'LABEL vendor="Snowfall Limited"',
+        "LABEL com.snowfalltravel.version=$VERSION",
     ],
 )
