@@ -1,5 +1,3 @@
-import uuid
-
 from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.project.junction.service.providers.duffel import cache
 from snowfall.stdlib import money
@@ -17,11 +15,12 @@ class PriceQuoteTransformer(object):
 
     def to_price_quote(
         self,
+        price_quote_id: str,
         offer: Offer,
         option_id: str,
     ) -> offers_pb2.PriceQuote:
         return offers_pb2.PriceQuote(
-            id=str(uuid.uuid4()),
+            id=price_quote_id,
             option_id=option_id,
             expires_at=protobuf.datetime_to_protobuf(offer.expires_at),
             price=self._to_money(offer.total_amount, offer.total_currency),

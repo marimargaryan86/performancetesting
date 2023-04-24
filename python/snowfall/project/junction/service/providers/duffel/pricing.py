@@ -102,11 +102,14 @@ class PriceQuoteConsumer(object):
         if not offer_details:
             return
 
+        price_quote_id = await self._cache.store(offer_details)
+
         await self._producer.publish(
             offers_amqp_pb2.TripPriceQuoteResult(
                 price_quote_container_id=amqp_message.body.price_quote_container_id,
                 option_id=amqp_message.body.option_id,
                 price_quote=self._transformer.to_price_quote(
+                    price_quote_id=price_quote_id,
                     offer=await self._adapter.get_price_quote(offer_details),
                     option_id=amqp_message.body.option_id,
                 ),
