@@ -1,6 +1,7 @@
 stages:
   - download
   - export
+  - deploy
 services:
   - name: docker:dind
     alias: dockerdaemon
@@ -103,10 +104,10 @@ validate:
   tags:
     - autoscaler-XL
 
-cities:
-  stage: export
+import-to-dev:
+  stage: deploy
   needs: ["import"]
-  timeout: 6h
+  timeout: 12h
   retry: 2
   services:
   - name: docker:dind
@@ -115,15 +116,31 @@ cities:
   script:
   - docker run -u "${UID}" --rm -v "$(pwd)/:/data" -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" amazon/aws-cli s3 cp s3://junction-schedules-export/PipelineData/data-import.tar.gz /data/data-import.tar.gz --no-progress
   - tar -xzf data-import.tar.gz
-  - curl https://fastdl.mongodb.org/tools/db/mongodb-database-tools-debian11-x86_64-100.7.0.deb --output mongodb.deb
-  - apt update && apt install ./mongodb.deb dnsutils -y
+  - curl https://fastdl.mongodb.org/tools/db/mongodb-database-tools-debian11-x86_64-100.6.1.deb --output mongodb.deb
+  - curl https://pgp.mongodb.com/server-6.0.asc | apt-key add -
+  - echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+  - apt update && apt install ./mongodb.deb dnsutils mongodb-mongosh -y
   - mongorestore --db=places --collection=locations --stopOnError --numInsertionWorkersPerCollection=20 'mongodb://mongo:27017' data-import/locations.bson
   - export GEODATA_ADDR="$(dig +short grpc.geodata-development.service.consul @172.16.110.215 -p 8600):$(dig +short SRV grpc.geodata-development.service.consul @172.16.110.215 -p 8600 | awk '{print $3}')"
   - docker login git.snowfall.se:4567 -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}"
   - docker pull git.snowfall.se:4567/junction/junction/service/places:latest
   - docker run -u "${UID}" --network=host --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/places:latest generate-cities --geodata-address="${GEODATA_ADDR}" --mongo-dsn='mongodb://mongo:27017'
   - mongodump --db=places --collection=places --out="-" 'mongodb://mongo:27017' > data-import/places.bson
-  - tar -czf bson.tar.gz data-import/*.bson
-  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" amazon/aws-cli s3 cp /data/bson.tar.gz s3://junction-schedules-export/PipelineData/final/bson.tar.gz --no-progress
+  - |
+    mongosh "${DEV_MONGODSN}/places" --eval '
+      try {db.places_import.drop();} catch (e) {}
+      db.createCollection("places_import");
+      db.places_import.createIndex({"location.coordinates": "2dsphere"});
+      try {db.locations_import.drop();} catch (e) {}
+      db.createCollection("locations_import");
+      db.locations_import.createIndex({"coordinates": "2dsphere"});
+      db = db.getMongo().getDB("schedules");
+      try {db.schedules_import.drop();} catch (e) {}
+      db.createCollection("schedules_import");
+      db.schedules_import.createIndex({"legs._id": 1}, {unique: true});
+      db.schedules_import.createIndex({"updated_at": 1});'
+  - mongorestore --db=places --collection=places_import --stopOnError --numInsertionWorkersPerCollection=10 "${DEV_MONGODSN}" data-import/places.bson
+  - mongorestore --db=places --collection=locations_import --stopOnError --numInsertionWorkersPerCollection=10 "${DEV_MONGODSN}" data-import/locations.bson
+  - mongorestore --db=schedules --collection=schedules_import --stopOnError --numInsertionWorkersPerCollection=10 "${DEV_MONGODSN}" data-import/schedules.bson
   tags:
     - autoscaler-XL
