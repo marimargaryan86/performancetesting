@@ -1,4 +1,3 @@
-import uuid
 from typing import List, Sequence
 
 from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
@@ -71,11 +70,12 @@ class PriceQuoteTransformer(object):
 
     def to_price_quote(
         self,
+        price_quote_id: str,
         offer_details: cache.OfferDetails,
         option_id: str,
     ) -> offers_pb2.PriceQuote:
         return offers_pb2.PriceQuote(
-            id=str(uuid.uuid4()),
+            id=price_quote_id,
             option_id=option_id,
             expires_at=protobuf.datetime_to_protobuf(offer_details.expires_at),
             price=_to_money(offer_details.price.amount, offer_details.price.currency),

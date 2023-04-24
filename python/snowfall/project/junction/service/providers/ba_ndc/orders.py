@@ -106,7 +106,7 @@ class OrderConsumer(object):
         amqp_message: types.Message[amqp_pb2.PlaceOrderTask],
     ) -> None:
         offer_details = await self._cache.fetch(
-            amqp_message.body.booking.trip_option.id,
+            amqp_message.body.booking.trip_option.price_quote_id,
         )
         amqp_message.body.booking.provider_name = ba_ndc_helpers.PROVIDER_NAME
 
