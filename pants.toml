@@ -190,3 +190,8 @@ root_patterns = [
 
 [test]
 report_dir = "dist/test_results"
+
+[tailor]
+ignore_paths = [
+    "bash/tests/schedule_tests/**"
+]
