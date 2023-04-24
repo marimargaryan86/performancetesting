@@ -39,32 +39,6 @@ make-uninterruptible:
 EOF
 # editorconfig-checker-enable
 
-if [ "$(basename "${1}")" == "development" ]; then
-	# editorconfig-checker-disable
-	cat <<EOF
-
-promote-to-production:
-  stage: promote
-  interruptible: false
-  before_script:
-    - mkdir -p ~/.ssh/
-    - mv "\${NOMAD_SSH_KEY}" ~/.ssh/id_ed25519
-    - mv "\${NOMAD_SSH_KNOWN_HOSTS}" ~/.ssh/known_hosts
-    - chmod 700 ~/.ssh/
-    - chmod 600 ~/.ssh/id_ed25519
-    - chmod 644 ~/.ssh/known_hosts
-    - git config --global user.email "\${NOMAD_GIT_EMAIL}"
-    - git config --global user.name "\${NOMAD_GIT_NAME}"
-  script:
-    - ./promote-environment.sh development production ${services[@]}
-  tags:
-    - shell
-  needs:
-    - verify
-EOF
-# editorconfig-checker-enable
-fi
-
 services=()
 
 for DIR in "${1}"/*; do
@@ -74,11 +48,6 @@ for DIR in "${1}"/*; do
 
 	image_file="${DIR}/image.txt"
 	skip_deploy="${DIR}/.skip_deploy"
-
-	if [ -f "${skip_deploy}" ]; then
-		echo >&2 "skip: \"${skip_deploy}\" exists"
-		continue
-	fi
 
 	if ! [ -f "${image_file}" ] && grep -q 'variable "docker_image" {' "${DIR}"/*.nomad; then
 		echo >&2 "skip: \"${image_file}\" is missing"
@@ -116,8 +85,22 @@ for DIR in "${1}"/*; do
 	echo >&2 "generate: ${service_name}@${service_version}"
 	services+=("${service_name}")
 
-	# editorconfig-checker-disable
-	cat <<EOF
+	if [ -f "${skip_deploy}" ]; then
+		# editorconfig-checker-disable
+		cat <<EOF
+
+${service_name}:
+  resource_group: ${service_name}
+  script:
+    - echo "Skipped due to ${skip_deploy}."
+  needs: []
+  tags:
+    - shell
+EOF
+		# editorconfig-checker-enable
+	else
+		# editorconfig-checker-disable
+		cat <<EOF
 
 ${service_name}:
   extends: .deploy
@@ -131,8 +114,13 @@ ${service_name}:
     templates: ${templates[@]}
     version: ${service_version}
 EOF
-	# editorconfig-checker-enable
+		# editorconfig-checker-enable
+	fi
 done
+
+if [ ${#services[@]} -eq 0 ]; then
+	exit 0
+fi
 
 # editorconfig-checker-disable
 cat <<EOF
@@ -144,18 +132,36 @@ verify:
     - exit 0
   tags:
     - shell
-EOF
-# editorconfig-checker-enable
-
-if [ ${#services[@]} -eq 0 ]; then
-	exit 0
-fi
-
-# editorconfig-checker-disable
-cat <<EOF
   needs:
 EOF
+# editorconfig-checker-enable
 
 for service in "${services[@]}"; do
 	echo "  - ${service}"
 done
+
+if [ "$(basename "${1}")" == "development" ]; then
+	# editorconfig-checker-disable
+	cat <<EOF
+
+promote-to-production:
+  stage: promote
+  interruptible: false
+  before_script:
+    - mkdir -p ~/.ssh/
+    - mv "\${NOMAD_SSH_KEY}" ~/.ssh/id_ed25519
+    - mv "\${NOMAD_SSH_KNOWN_HOSTS}" ~/.ssh/known_hosts
+    - chmod 700 ~/.ssh/
+    - chmod 600 ~/.ssh/id_ed25519
+    - chmod 644 ~/.ssh/known_hosts
+    - git config --global user.email "\${NOMAD_GIT_EMAIL}"
+    - git config --global user.name "\${NOMAD_GIT_NAME}"
+  script:
+    - ./promote-environment.sh development production ${services[@]}
+  tags:
+    - shell
+  needs:
+    - verify
+EOF
+# editorconfig-checker-enable
+fi
