@@ -1,6 +1,6 @@
 import contextlib
+import datetime
 import random
-import uuid
 
 import httpx
 import structlog
@@ -65,6 +65,7 @@ async def price_quotes(  # noqa: WPS210
             ),
             offer_cache=offer_cache,
             provider_company_id=app.settings.provider_company_id,
+            ttl=app.settings.ttl,
         ).consume()
 
 
@@ -76,6 +77,7 @@ class PriceQuoteConsumer(object):
         producer_obj: producer.Producer,
         offer_cache: cache.OffersCache,
         provider_company_id: str,
+        ttl: datetime.timedelta,
     ):
         self._client = distribusion_client
         self._cache = offer_cache
@@ -83,6 +85,7 @@ class PriceQuoteConsumer(object):
         self._logger = structlog.get_logger(__name__)
         self._producer = producer_obj
         self._provider_company_id = provider_company_id
+        self._ttl = ttl
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -96,6 +99,10 @@ class PriceQuoteConsumer(object):
         if not offer_details:
             return
 
+        expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
+
+        price_quote_id = await self._cache.store(offer_details, expires_at)
+
         vacancy = await self._vacancy(offer_details)
 
         if not vacancy:
@@ -106,7 +113,7 @@ class PriceQuoteConsumer(object):
                 price_quote_container_id=amqp_message.body.price_quote_container_id,
                 option_id=amqp_message.body.option_id,
                 price_quote=offers_pb2.PriceQuote(
-                    id=str(uuid.uuid4()),
+                    id=price_quote_id,
                     option_id=amqp_message.body.option_id,
                     expires_at=format.protobuf.datetime_to_protobuf(
                         offer_details.expires_at,
