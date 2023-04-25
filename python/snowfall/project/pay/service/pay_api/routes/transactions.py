@@ -42,7 +42,7 @@ class Transactions(endpoints.HTTPEndpoint):
                             buy_currency=quot.amounts.beneficiary.currency_code,
                             sell_currency=quot.amounts.base_converted.currency_code,
                             amount=str(
-                                money.from_protobuf(quot.amounts.beneficiary).amount,
+                                money.from_protobuf(quot.amounts.beneficiary),
                             ),
                             reason=transaction_id,
                         ),
