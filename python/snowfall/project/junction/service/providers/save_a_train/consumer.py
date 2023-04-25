@@ -95,20 +95,14 @@ class PriceQuoteConsumer(object):
 
         expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
 
+        price_quote_id = await self._offer_cache.store(offer_details, expires_at)
+
         await self._producer.publish(
             offers_amqp_pb2.TripPriceQuoteResult(
                 price_quote_container_id=amqp_message.body.price_quote_container_id,
                 option_id=amqp_message.body.option_id,
                 price_quote=offers_pb2.PriceQuote(
-                    id=await self._price_cache.store(
-                        cache.PriceQuote(
-                            search_id=offer_details.search_id,
-                            search_result_id=offer_details.search_result_id,
-                            transfer_id=offer_details.transfer_id,
-                            fare_id=offer_details.fare_id,
-                        ),
-                        expires_at=expires_at,
-                    ),
+                    id=price_quote_id,
                     option_id=amqp_message.body.option_id,
                     expires_at=protobuf.datetime_to_protobuf(expires_at),
                     price=money.from_string(
@@ -143,7 +137,9 @@ class OrdersConsumer(object):
         self,
         message: types.Message[orders_amqp_pb2.PlaceOrderTask],
     ) -> None:
-        offer_details = await self._cache.fetch(message.body.booking.trip_option.id)
+        offer_details = await self._cache.fetch(
+            message.body.booking.trip_option.price_quote_id,
+        )
         message.body.booking.provider_name = _PROVIDER_NAME
 
         if not offer_details:
