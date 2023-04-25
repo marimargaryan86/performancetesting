@@ -1,4 +1,4 @@
 nomad_template(
-    ["offers", "orders", "pricing", "searches"],
+    ["offers", "orders", "pricing"],
     "python/snowfall/project/junction/service/providers/duffel/main.py",
 )

@@ -5,7 +5,7 @@ import pydantic
 
 from snowfall.stdlib import service
 
-_DEFAULT_TTL_IN_MINUTES = 45
+DEFAULT_TTL_IN_MINUTES = 45
 
 
 class DuffelConfig(pydantic.BaseModel):
@@ -15,10 +15,8 @@ class DuffelConfig(pydantic.BaseModel):
     http_timeout: int = 30
 
 
-class SearchesSettings(DuffelConfig, service.Settings):
+class PricingSettings(DuffelConfig, service.Settings):
     amqp_dsn: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
-    ttl: datetime.timedelta = datetime.timedelta(minutes=_DEFAULT_TTL_IN_MINUTES)
-    enabled_airlines: set[str] = set()
-    disabled_airlines: set[str] = set()
+    ttl: datetime.timedelta = datetime.timedelta(minutes=DEFAULT_TTL_IN_MINUTES)
     provider_company_id: str

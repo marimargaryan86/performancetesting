@@ -14,7 +14,7 @@ from snowfall.project.junction.service.providers.duffel import (
     pricing_adapter,
     pricing_transformer,
 )
-from snowfall.project.junction.service.providers.duffel.config import SearchesSettings
+from snowfall.project.junction.service.providers.duffel.config import PricingSettings
 from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
@@ -25,7 +25,7 @@ from snowfall.vendor.duffel import client
 
 
 async def price_quotes(  # noqa: WPS210
-    app: service.Application[SearchesSettings],
+    app: service.Application[PricingSettings],
 ) -> None:
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
