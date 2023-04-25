@@ -72,7 +72,7 @@ job "engineering-http" {
         "http",
         "traefik.enable=true",
         "traefik.http.middlewares.docs-engineering-vpn-only-${var.environment}.ipwhitelist.sourcerange=52.56.69.33",
-        "traefik.http.middlewares.docs-engineering-vpn-only-${var.environment}.ipwhitelist.ipstrategy.excludedips.172.16.0.0/16",
+        "traefik.http.middlewares.docs-engineering-vpn-only-${var.environment}.ipwhitelist.ipstrategy.excludedips=172.16.0.0/16",
         "traefik.http.routers.docs-engineering-${var.environment}.middlewares=docs-engineering-vpn-only-${var.environment}",
         "traefik.http.routers.docs-engineering-${var.environment}.entrypoints=${var.traefik_entrypoints}",
         "traefik.http.routers.docs-engineering-${var.environment}.rule=Host(`${var.traefik_host_URL}`)",
