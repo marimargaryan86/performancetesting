@@ -14,7 +14,7 @@ from snowfall.project.junction.service.providers.direct_ferries import (
     cache,
     route,
 )
-from snowfall.stdlib import money, string
+from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.v1alpha import amqp_pb2 as trackable_pb2
@@ -62,6 +62,8 @@ class PriceQuoteConsumer(object):
 
         expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
 
+        price_quote_id = await self._offer_cache.store(offer_details, expires_at)
+
         rules = []
 
         if offer_details.quote.ticket_conditions:
@@ -77,7 +79,7 @@ class PriceQuoteConsumer(object):
                 price_quote_container_id=amqp_message.body.price_quote_container_id,
                 option_id=amqp_message.body.option_id,
                 price_quote=offers_pb2.PriceQuote(
-                    id=string.uuid(),
+                    id=price_quote_id,
                     option_id=amqp_message.body.option_id,
                     expires_at=protobuf.datetime_to_protobuf(expires_at),
                     price=money.from_string(
@@ -136,7 +138,9 @@ class OrdersConsumer(object):
         self,
         message: types.Message[orders_amqp_pb2.PlaceOrderTask],
     ) -> None:
-        offer_details = await self._cache.fetch(message.body.booking.trip_option.id)
+        offer_details = await self._cache.fetch(
+            message.body.booking.trip_option.price_quote_id,
+        )
         message.body.booking.provider_name = _PROVIDER_NAME
 
         if not offer_details:
