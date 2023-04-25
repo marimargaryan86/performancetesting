@@ -138,8 +138,6 @@ class DistribusionClient(object):  # noqa: WPS214
     ) -> list[connections.Connection]:
         query_params = {
             "locale": criteria.locale,
-            "departure_stations[]": criteria.departure_stations,
-            "arrival_stations[]": criteria.arrival_stations,
             "departure_date": criteria.departure_date.isoformat(),
             **(
                 {"return_date": criteria.return_date.isoformat()}
@@ -149,6 +147,17 @@ class DistribusionClient(object):  # noqa: WPS214
             "pax": criteria.pax,
             "currency": criteria.currency,
         }
+
+        if criteria.departure_stations and len(criteria.departure_stations[0]) == 5:
+            query_params["departure_city"] = criteria.departure_stations[0]
+        else:
+            query_params["departure_stations[]"] = criteria.departure_stations
+
+        if criteria.arrival_stations and len(criteria.arrival_stations[0]) == 5:
+            query_params["arrival_city"] = criteria.arrival_stations[0]
+        else:
+            query_params["arrival_stations[]"] = criteria.arrival_stations
+
         self._logger.info("connections/find rq", **query_params)
 
         response = await self._make_request(

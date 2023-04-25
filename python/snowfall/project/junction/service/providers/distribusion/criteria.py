@@ -43,15 +43,15 @@ class CriteriaGenerator(object):
                 neighbour_search_radius=1,
             )
 
-            origin_groups = self._group_stations(origins)
-            dest_groups = self._group_stations(destinations)
+            origin_cities = self._station_into_city(origins)
+            dest_cities = self._station_into_city(destinations)
 
             tasks.extend(
                 amqp_pb2.SearchCriteriaTask(
                     segments=segments,
                     criteria=amqp_pb2.Criteria(
-                        origin_ids=[station.identifier for station in start],
-                        destination_ids=[station.identifier for station in end],
+                        origin_ids=[start],
+                        destination_ids=[end],
                         passengers_age=[
                             date_to_age(
                                 protobuf.protobuf_to_date(
@@ -63,11 +63,11 @@ class CriteriaGenerator(object):
                         outbound_departure=protobuf.date_to_protobuf(
                             protobuf.protobuf_to_datetime(
                                 first_leg.departure_at,
-                            ).astimezone(start[0].timezone),
+                            ).astimezone(next(iter(origins)).timezone),
                         ),
                     ),
                 )
-                for start, end in itertools.product(origin_groups, dest_groups)
+                for start, end in itertools.product(origin_cities, dest_cities)
             )
 
         return tasks
@@ -106,3 +106,10 @@ class CriteriaGenerator(object):
             count_per_group += 1
 
         return self._split_stations(station_list, count_per_group)
+
+    def _station_into_city(
+        self,
+        station_set: Collection[stations.Station],
+    ) -> Sequence[str]:
+        city_set = {station.identifier[:5] for station in station_set}
+        return list(city_set)
