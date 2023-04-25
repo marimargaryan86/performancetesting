@@ -18,6 +18,10 @@ variable "environment" {
   type = string
 }
 
+variable "provider_company_id" {
+  type = string
+}
+
 variable "datacenter" {
   type = string
 }
@@ -121,6 +125,7 @@ EOH
         ENV_NAME                = "${var.environment}"
         SENTRY_DSN              = "https://81042716a3fa4b4fb9dc654b0fc5fd58@sentry.snowfall.se/56"
         PROMETHEUS_PORT         = "${NOMAD_PORT_prometheus}"
+        PROVIDER_COMPANY_ID     = "${var.provider_company_id}"
         API_BASE_URL            = "${var.api_base_url}"
         RETAILER_PARTNER_NUMBER = "${var.retailer_partner_number}"
       }
