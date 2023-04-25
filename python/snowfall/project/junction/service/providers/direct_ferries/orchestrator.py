@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import time
 from typing import Any, AsyncGenerator, Generator, Sequence
 
 import structlog
@@ -13,13 +14,14 @@ _DAYS_IN_YEAR = 365
 _DEFAULT_REQUEST_DATE_INTERVAL_DAYS = 30
 
 
-async def _request_by_chunks(
+async def _request_by_chunks(  # noqa: WPS210
     requests: Sequence[Sequence[Any]],
-    requests_per_second: int = 50,
+    requests_per_second: int = 59,
 ) -> Sequence[Any]:
     response_data = []
 
     for index in range(0, len(requests), requests_per_second):
+        start_time = time.perf_counter()
         responses = await asyncio.gather(
             *[
                 tenacity.retry(
@@ -40,7 +42,10 @@ async def _request_by_chunks(
             else:
                 response_data.append(response)
 
-        await asyncio.sleep(1)
+        time_spent = time.perf_counter() - start_time
+
+        if time_spent < 1:
+            await asyncio.sleep(1 - time_spent)
 
     return response_data
 
