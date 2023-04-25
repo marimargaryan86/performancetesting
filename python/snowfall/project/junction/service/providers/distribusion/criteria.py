@@ -4,7 +4,7 @@ from typing import Collection, Sequence
 import more_itertools
 
 from snowfall.project.junction.go.service.offers.v1alpha import (
-    amqp_pb2 as offers_amqp_pb2,
+    models_pb2 as offer_models_pb2,
 )
 from snowfall.project.junction.service.providers.distribusion import stations
 from snowfall.project.junction.service.providers.distribusion.v1alpha import amqp_pb2
@@ -20,13 +20,13 @@ class CriteriaGenerator(object):
     def __init__(self, h3_mapping: h3.H3MappingRepository[stations.Station]):
         self._mapping = h3_mapping
 
-    def from_search_task(  # noqa: WPS210
+    def from_search(  # noqa: WPS210
         self,
-        search_task: offers_amqp_pb2.TripOfferSearchTask,
+        search: offer_models_pb2.TripOfferSearch,
     ) -> list[amqp_pb2.SearchCriteriaTask]:
         tasks: list[amqp_pb2.SearchCriteriaTask] = []
 
-        for trip in search_task.search.trips:
+        for trip in search.trips:
             segments = trip.segments
             first_leg = more_itertools.first(more_itertools.first(segments).legs)
             last_leg = more_itertools.last(more_itertools.last(segments).legs)
@@ -48,7 +48,6 @@ class CriteriaGenerator(object):
 
             tasks.extend(
                 amqp_pb2.SearchCriteriaTask(
-                    offer_search_id=search_task.offer_search_id,
                     segments=segments,
                     criteria=amqp_pb2.Criteria(
                         origin_ids=[station.identifier for station in start],
@@ -59,7 +58,7 @@ class CriteriaGenerator(object):
                                     passenger.date_of_birth,
                                 ),
                             )
-                            for passenger in search_task.search.passengers
+                            for passenger in search.passengers
                         ],
                         outbound_departure=protobuf.date_to_protobuf(
                             protobuf.protobuf_to_datetime(
@@ -67,7 +66,6 @@ class CriteriaGenerator(object):
                             ).astimezone(start[0].timezone),
                         ),
                     ),
-                    session_token=search_task.session_token,
                 )
                 for start, end in itertools.product(origin_groups, dest_groups)
             )

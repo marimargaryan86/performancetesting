@@ -15,6 +15,7 @@ from snowfall.stdlib.transport.amqp import types
 
 # Re-export some service types
 Application = service.Application
+AsyncApplication = service.AsyncApplication
 Command = service.Command
 Settings = service.Settings
 

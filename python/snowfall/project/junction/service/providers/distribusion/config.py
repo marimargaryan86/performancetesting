@@ -5,7 +5,7 @@ import pydantic
 
 from snowfall.stdlib import service
 
-_DEFAULT_TTL_IN_MINUTES = 45
+DEFAULT_TTL_IN_MINUTES = 45
 
 
 class DistribusionConfig(pydantic.BaseModel):
@@ -24,8 +24,8 @@ class OrdersSettings(DistribusionConfig, service.Settings):
     send_customer_email: bool = True
 
 
-class SearchesSettings(DistribusionConfig, service.Settings):
+class PricingSettings(DistribusionConfig, service.Settings):
     amqp_dsn: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
-    ttl: datetime.timedelta = datetime.timedelta(minutes=_DEFAULT_TTL_IN_MINUTES)
+    ttl: datetime.timedelta = datetime.timedelta(minutes=DEFAULT_TTL_IN_MINUTES)
     provider_company_id: str

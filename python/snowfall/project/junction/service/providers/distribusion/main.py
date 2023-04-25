@@ -1,3 +1,4 @@
+from snowfall.project.junction.provider import service
 from snowfall.project.junction.service.providers.distribusion import (
     config,
     offers,
@@ -5,12 +6,11 @@ from snowfall.project.junction.service.providers.distribusion import (
     pricing,
     stations,
 )
-from snowfall.project.junction.service.providers.distribusion.search import searches
-from snowfall.stdlib import service
 
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(name="distribusion")
 
+    entrypoint.enable_offers(offers.OffersSettings, offers.offers)
     entrypoint.enter_with_commands(
         service.Command(
             name="dump-stations",
@@ -18,19 +18,9 @@ if __name__ == "__main__":
             settings_class=stations.DumpStationsSettings,
         ),
         service.Command(
-            name="offers",
-            callback=offers.offers,
-            settings_class=offers.OffersSettings,
-        ),
-        service.Command(
-            name="searches",
-            callback=searches.searches,
-            settings_class=config.SearchesSettings,
-        ),
-        service.Command(
             name="pricing",
             callback=pricing.price_quotes,
-            settings_class=config.SearchesSettings,
+            settings_class=config.PricingSettings,
         ),
         service.Command(
             name="orders",
