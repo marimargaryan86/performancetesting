@@ -149,6 +149,12 @@ class SearchCriteriaConsumer(Generic[_Proto, _CriteriaType]):
         self,
         amqp_message: amqp_types.Message[_Proto],
     ) -> None:
+        try:
+            await self._publish_offers(amqp_message)
+        except OfferCacheLockError:
+            return await amqp_message.nack(requeue=True)
+
+    async def _publish_offers(self, amqp_message: amqp_types.Message[_Proto]) -> None:
         # TODO: shared protobuf, or type intersection support in Python
         if not hasattr(  # noqa: WPS421, WPS337
             amqp_message.body,
@@ -159,15 +165,12 @@ class SearchCriteriaConsumer(Generic[_Proto, _CriteriaType]):
         ):
             raise TypeError
 
+        search_criteria = self._search_criteria_generator_func(amqp_message.body)
+        offer_groups = self._offer_group_repository.find(search_criteria)
         segment_matcher = SegmentMatcher(
             segments=amqp_message.body.segments,
             allowed_window_td=self._allowed_window_td,
         )
-        search_criteria = self._search_criteria_generator_func(amqp_message.body)
-        try:
-            offer_groups = self._offer_group_repository.find(search_criteria)
-        except OfferCacheLockError:
-            return await amqp_message.nack(requeue=True)
 
         async for offer_group in offer_groups:
             if segment_matcher.offer_group_matches(offer_group):
