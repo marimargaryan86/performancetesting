@@ -5,8 +5,8 @@ import lagom
 from pydantic import AnyUrl
 
 from snowfall.adapter import authentication
-from snowfall.project.pay.adapter import currencies
-from snowfall.project.pay.service.accounts import accounts
+from snowfall.project.pay.adapter import accounts, currencies
+from snowfall.project.pay.service.accounts.repositories import ContactsRepository
 from snowfall.project.pay.service.pay_api import includes
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.repositories import (
@@ -39,6 +39,7 @@ class AdminSettings(application.Settings):
     cc_api_key: str
     cc_env: str
     authentication_address: str
+    accounts_address: str
     jwt_public_key: str
     mongo_dsn: Sequence[AnyUrl]
     currencies: Sequence[money.Currency]
@@ -48,12 +49,12 @@ def create_admin_dependencies(  # noqa: WPS211
     cc_client: currencycloud.Client,
     authentication_client: authentication.Client,
     companies_repository: CompanyRepository,
-    contacts_repository: accounts.ContactsRepository,
-    accounts_repository: accounts.AccountsRepository,
+    contacts_repository: ContactsRepository,
     conversions_repository: ConversionRepository,
     transactions_repository: TransactionRepository,
     currencies_repository: CurrencyRepository,
     beneficiaries_repository: BeneficiaryRepository,
+    accounts_client: accounts.GrpcClient,
     payment_client: client.PaymentClient | None = None,
 ) -> lagom.Container:
     container = lagom.Container()
@@ -61,12 +62,12 @@ def create_admin_dependencies(  # noqa: WPS211
     container[client.PaymentClient] = payment_client or client.PaymentClient(cc_client)
     container[authentication.Client] = authentication_client  # type: ignore[type-abstract]
     container[CompanyRepository] = companies_repository
-    container[accounts.ContactsRepository] = contacts_repository
-    container[accounts.AccountsRepository] = accounts_repository
+    container[ContactsRepository] = contacts_repository
     container[ConversionRepository] = conversions_repository
     container[TransactionRepository] = transactions_repository
     container[CurrencyRepository] = currencies_repository
     container[BeneficiaryRepository] = beneficiaries_repository
+    container[accounts.GrpcClient] = accounts_client
 
     includes.register_resolvers(transactions_repository)
 

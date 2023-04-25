@@ -10,8 +10,12 @@ from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import authentication as auth
 from snowfall.project.junction.go.adapter import errors
+from snowfall.project.pay.adapter import accounts as accounts_adapter
 from snowfall.project.pay.adapter import currencies
-from snowfall.project.pay.service.accounts import accounts
+from snowfall.project.pay.service.accounts import repositories
+from snowfall.project.pay.service.accounts.v1alpha.accounts_pb2_grpc import (
+    AccountsServiceStub,
+)
 from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
 from snowfall.project.pay.service.pay_api import authenticator, bootstrap
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
@@ -126,6 +130,9 @@ def _admin_factory(
         authentication_channel = create_channel(
             app.settings.authentication_address,
         )
+        accounts_channel = create_channel(
+            app.settings.accounts_address,
+        )
         asgi_app = application.create_starlette_app(
             custom_middlewares=[
                 Middleware(
@@ -147,11 +154,8 @@ def _admin_factory(
                     companies_repository=CompanyRepository(
                         mongo.companies.companies,
                     ),
-                    contacts_repository=accounts.ContactsRepository(
+                    contacts_repository=repositories.ContactsRepository(
                         mongo.contacts.contacts,
-                    ),
-                    accounts_repository=accounts.AccountsRepository(
-                        mongo.accounts.accounts,
                     ),
                     conversions_repository=ConversionRepository(
                         mongo.conversions.conversions,
@@ -164,6 +168,11 @@ def _admin_factory(
                     ),
                     beneficiaries_repository=BeneficiaryRepository(
                         mongo.beneficiaries.beneficiaries,
+                    ),
+                    accounts_client=accounts_adapter.GrpcClient(
+                        AccountsServiceStub(
+                            accounts_channel,
+                        ),
                     ),
                 ),
             ),

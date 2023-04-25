@@ -4,7 +4,8 @@ from unittest import mock
 
 import pytest
 
-from snowfall.project.pay.service.accounts import accounts
+from snowfall.project.pay.adapter import accounts
+from snowfall.project.pay.service.accounts.repositories import ContactsRepository
 from snowfall.project.pay.service.accounts.v1alpha.models_pb2 import Account, Contact
 from snowfall.project.pay.service.companies.v1alpha.models_pb2 import Company
 from snowfall.project.pay.service.conversions.v1alpha.models_pb2 import Conversion
@@ -62,7 +63,7 @@ async def booked_quote(
 
 @pytest.fixture()
 async def contact_with_bad_company_id(
-    contacts_repository: accounts.ContactsRepository,
+    contacts_repository: ContactsRepository,
 ) -> Contact:
     contact = Contact(
         id=string.uuid(),
@@ -172,18 +173,20 @@ def accounts_list_from_cc() -> list[mock.Mock]:
 
 @pytest.fixture()
 async def accounts_based_on_cc_accounts(
-    accounts_repository: accounts.AccountsRepository,
+    accounts_client: accounts.DictClient,
     accounts_list_from_cc: Sequence[mock.Mock],
-) -> list[accounts.models_pb2.Account]:
+) -> list[Account]:
     proto_accounts = []
     for account in accounts_list_from_cc:
         proto_accounts.append(
-            await accounts_repository.insert(
-                accounts.models_pb2.Account(
+            await accounts_client.create(
+                Account(
                     id=string.uuid(),
                     external_reference=account.identifier,
                     contact_id=string.uuid(),
                     company_id=string.uuid(),
+                    name="Snowfall",
+                    status="enabled",
                 ),
             ),
         )
@@ -232,17 +235,16 @@ def balance() -> BalanceResponse:
 
 @pytest.fixture()
 async def account(
-    accounts_repository: accounts.AccountsRepository,
+    accounts_client: accounts.DictClient,
     balance: BalanceResponse,
 ) -> Account:
-    account = Account(
-        id=balance.account_id,
-        external_reference=string.uuid(),
-        company_id=string.uuid(),
-        contact_id=string.uuid(),
-    )
-    return await accounts_repository.insert(
-        account,
+    return await accounts_client.create(
+        Account(
+            id=balance.account_id,
+            external_reference=string.uuid(),
+            company_id=string.uuid(),
+            contact_id=string.uuid(),
+        ),
     )
 
 
@@ -270,7 +272,7 @@ async def company(
 @pytest.fixture()
 async def contact(
     account: Account,
-    contacts_repository: accounts.ContactsRepository,
+    contacts_repository: ContactsRepository,
 ) -> Contact:
     contact_person = Contact(
         id=account.contact_id,

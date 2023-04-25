@@ -1,7 +1,8 @@
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.project.pay.service.accounts import accounts
+from snowfall.project.pay.adapter import accounts as accounts_adapter
+from snowfall.project.pay.service.accounts import repositories
 from snowfall.project.pay.service.pay_api import resources
 from snowfall.project.pay.service.pay_api.repositories import CurrencyRepository
 from snowfall.stdlib.integration.starlette import messages, models, request_helpers
@@ -13,11 +14,11 @@ class Balances(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        accounts_repository: accounts.AccountsRepository = lagom.injectable,
-        contact_repository: accounts.ContactsRepository = lagom.injectable,
+        accounts_client: accounts_adapter.GrpcClient = lagom.injectable,
+        contact_repository: repositories.ContactsRepository = lagom.injectable,
         payment_client: PaymentClient = lagom.injectable,
     ) -> responses.Response:
-        account = await accounts_repository.find_by_id(
+        account = await accounts_client.get(
             request.path_params["accountId"],
         )
 
@@ -44,15 +45,16 @@ class Balances(endpoints.HTTPEndpoint):
     async def post(  # noqa: WPS211
         self,
         request: requests.Request,
-        accounts_repository: accounts.AccountsRepository = lagom.injectable,
-        contacts_repository: accounts.ContactsRepository = lagom.injectable,
+        accounts_client: accounts_adapter.GrpcClient = lagom.injectable,
+        contacts_repository: repositories.ContactsRepository = lagom.injectable,
         currencies_repository: CurrencyRepository = lagom.injectable,
         payment_client: PaymentClient = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
-        account = await accounts_repository.find_by_id(
+        account = await accounts_client.get(
             request.path_params["accountId"],
         )
+
         if not account:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 

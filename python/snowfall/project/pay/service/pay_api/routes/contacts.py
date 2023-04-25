@@ -1,7 +1,7 @@
 import lagom
 from starlette import endpoints, requests, responses, status
 
-from snowfall.project.pay.service.accounts import accounts
+from snowfall.project.pay.service.accounts import repositories
 from snowfall.project.pay.service.accounts.v1alpha import models_pb2
 from snowfall.project.pay.service.pay_api import resources
 from snowfall.project.pay.service.pay_api.repositories import CompanyRepository
@@ -19,7 +19,7 @@ class Contacts(endpoints.HTTPEndpoint):
     async def post(
         self,
         request: requests.Request,
-        contacts_repository: accounts.ContactsRepository = lagom.injectable,
+        contacts_repository: repositories.ContactsRepository = lagom.injectable,
         companies_repository: CompanyRepository = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
@@ -71,7 +71,7 @@ class Contacts(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        contact_repository: accounts.ContactsRepository = lagom.injectable,
+        contact_repository: repositories.ContactsRepository = lagom.injectable,
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
 

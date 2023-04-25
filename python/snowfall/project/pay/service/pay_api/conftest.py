@@ -18,17 +18,11 @@ from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import authentication as auth
 from snowfall.project.junction.go.adapter import errors
-from snowfall.project.pay.adapter import currencies
-from snowfall.project.pay.service.accounts import accounts
+from snowfall.project.pay.adapter import accounts, currencies
+from snowfall.project.pay.service.accounts import repositories
 from snowfall.project.pay.service.pay_api import authenticator, bootstrap
+from snowfall.project.pay.service.pay_api import repositories as pay_repos
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
-from snowfall.project.pay.service.pay_api.repositories import (
-    BeneficiaryRepository,
-    CompanyRepository,
-    ConversionRepository,
-    CurrencyRepository,
-    TransactionRepository,
-)
 from snowfall.project.pay.service.pay_api.routes import router
 from snowfall.project.pay.service.quotations import quotations
 from snowfall.project.pay.service.quotations.v1alpha.models_pb2 import (
@@ -105,10 +99,10 @@ def _create_app(  # noqa: WPS211
     currencies_client: currencies.Client,
     quotations_repository: quotations.QuotationsRepository,
     redis_repository: UserSessionRepository,
-    transactions_repository: TransactionRepository,
-    conversion_repository: ConversionRepository,
-    companies_repository: CompanyRepository,
-    currencies_repository: CurrencyRepository,
+    transactions_repository: pay_repos.TransactionRepository,
+    conversion_repository: pay_repos.ConversionRepository,
+    companies_repository: pay_repos.CompanyRepository,
+    currencies_repository: pay_repos.CurrencyRepository,
     openapi_path: pathlib.Path,
     custom_middlewares: Sequence[Middleware] | None = None,
 ) -> applications.Starlette:
@@ -139,13 +133,13 @@ def _create_admin_app(  # noqa: WPS211
     cc_client: currencycloud.Client,
     payment_client: PaymentClient,
     authentication_client: auth.Client,
-    companies_repository: CompanyRepository,
-    contacts_repository: accounts.ContactsRepository,
-    accounts_repository: accounts.AccountsRepository,
-    conversions_repository: ConversionRepository,
-    transactions_repository: TransactionRepository,
-    currencies_repository: CurrencyRepository,
-    beneficiaries_repository: BeneficiaryRepository,
+    companies_repository: pay_repos.CompanyRepository,
+    contacts_repository: repositories.ContactsRepository,
+    accounts_client: accounts.GrpcClient,
+    conversions_repository: pay_repos.ConversionRepository,
+    transactions_repository: pay_repos.TransactionRepository,
+    currencies_repository: pay_repos.CurrencyRepository,
+    beneficiaries_repository: pay_repos.BeneficiaryRepository,
     openapi_path: pathlib.Path,
     custom_middlewares: Sequence[Middleware] | None = None,
 ) -> applications.Starlette:
@@ -158,11 +152,11 @@ def _create_admin_app(  # noqa: WPS211
                 authentication_client,
                 companies_repository,
                 contacts_repository,
-                accounts_repository=accounts_repository,
                 conversions_repository=conversions_repository,
                 transactions_repository=transactions_repository,
                 currencies_repository=currencies_repository,
                 beneficiaries_repository=beneficiaries_repository,
+                accounts_client=accounts_client,
                 payment_client=payment_client,
             ),
         ),
@@ -223,26 +217,22 @@ def quotations_repository(
 @pytest.fixture()
 def contacts_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
-) -> accounts.ContactsRepository:
-    return accounts.ContactsRepository(
+) -> repositories.ContactsRepository:
+    return repositories.ContactsRepository(
         collection=mongo_client.test.contacts,
     )
 
 
 @pytest.fixture()
-def accounts_repository(
-    mongo_client: motor_asyncio.AsyncIOMotorClient,
-) -> accounts.AccountsRepository:
-    return accounts.AccountsRepository(
-        collection=mongo_client.test.accounts,
-    )
+def accounts_client() -> accounts.DictClient:
+    return accounts.DictClient()
 
 
 @pytest.fixture()
 async def companies_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
-) -> CompanyRepository:
-    return CompanyRepository(
+) -> pay_repos.CompanyRepository:
+    return pay_repos.CompanyRepository(
         collection=mongo_client.test.companies,
     )
 
@@ -278,8 +268,8 @@ def get_transaction(transaction_id: str) -> Transaction:
 async def transactions_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
     transaction_ids: Sequence[str],
-) -> TransactionRepository:
-    repository = TransactionRepository(
+) -> pay_repos.TransactionRepository:
+    repository = pay_repos.TransactionRepository(
         collection=mongo_client.test.transactions,
     )
     await asyncio.gather(
@@ -295,8 +285,8 @@ async def transactions_repository(
 @pytest.fixture()
 def conversions_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
-) -> ConversionRepository:
-    return ConversionRepository(
+) -> pay_repos.ConversionRepository:
+    return pay_repos.ConversionRepository(
         collection=mongo_client.test.conversions,
     )
 
@@ -304,15 +294,15 @@ def conversions_repository(
 @pytest.fixture()
 def currencies_repository(
     available_currencies: Sequence[money.Currency],
-) -> CurrencyRepository:
-    return CurrencyRepository(available_currencies)
+) -> pay_repos.CurrencyRepository:
+    return pay_repos.CurrencyRepository(available_currencies)
 
 
 @pytest.fixture()
 def beneficiaries_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
-) -> BeneficiaryRepository:
-    return BeneficiaryRepository(collection=mongo_client.test.beneficiaries)
+) -> pay_repos.BeneficiaryRepository:
+    return pay_repos.BeneficiaryRepository(collection=mongo_client.test.beneficiaries)
 
 
 @pytest.fixture()
@@ -434,11 +424,11 @@ def app(  # noqa: WPS211
     currencies_client: currencies.Client,
     quotations_repository: quotations.QuotationsRepository,
     redis_repository: UserSessionRepository,
-    transactions_repository: TransactionRepository,
-    conversions_repository: ConversionRepository,
+    transactions_repository: pay_repos.TransactionRepository,
+    conversions_repository: pay_repos.ConversionRepository,
     payment_client: PaymentClient,
-    companies_repository: CompanyRepository,
-    currencies_repository: CurrencyRepository,
+    companies_repository: pay_repos.CompanyRepository,
+    currencies_repository: pay_repos.CurrencyRepository,
 ) -> applications.Starlette:
     return _create_app(
         cc_client=cc_client,
@@ -458,14 +448,14 @@ def app(  # noqa: WPS211
 def admin_app(  # noqa: WPS211
     cc_client: currencycloud.Client,
     authentication_client: auth.Client,
-    companies_repository: CompanyRepository,
+    companies_repository: pay_repos.CompanyRepository,
     payment_client: PaymentClient,
-    contacts_repository: accounts.ContactsRepository,
-    accounts_repository: accounts.AccountsRepository,
-    conversions_repository: ConversionRepository,
-    transactions_repository: TransactionRepository,
-    currencies_repository: CurrencyRepository,
-    beneficiaries_repository: BeneficiaryRepository,
+    contacts_repository: repositories.ContactsRepository,
+    accounts_client: accounts.GrpcClient,
+    conversions_repository: pay_repos.ConversionRepository,
+    transactions_repository: pay_repos.TransactionRepository,
+    currencies_repository: pay_repos.CurrencyRepository,
+    beneficiaries_repository: pay_repos.BeneficiaryRepository,
     custom_middlewares: Sequence[Middleware],
 ) -> applications.Starlette:
     return _create_admin_app(
@@ -474,7 +464,7 @@ def admin_app(  # noqa: WPS211
         authentication_client=authentication_client,
         companies_repository=companies_repository,
         contacts_repository=contacts_repository,
-        accounts_repository=accounts_repository,
+        accounts_client=accounts_client,
         conversions_repository=conversions_repository,
         transactions_repository=transactions_repository,
         currencies_repository=currencies_repository,

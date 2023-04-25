@@ -1495,6 +1495,7 @@
               "company": {
                 "type": "object",
                 "readOnly": true,
+                "nullable": true,
                 "required": [
                   "data"
                 ],
@@ -1506,6 +1507,7 @@
               },
               "contact": {
                 "type": "object",
+                "nullable": true,
                 "required": [
                   "data"
                 ],

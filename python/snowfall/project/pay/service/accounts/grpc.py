@@ -1,6 +1,6 @@
 import grpc
 
-from snowfall.project.pay.service.accounts.accounts import AccountsRepository
+from snowfall.project.pay.service.accounts.repositories import AccountsRepository
 from snowfall.project.pay.service.accounts.v1alpha import (
     accounts_pb2,
     accounts_pb2_grpc,

@@ -1,7 +1,8 @@
 import lagom
 from starlette import endpoints, requests, responses, status
 
-from snowfall.project.pay.service.accounts import accounts
+from snowfall.project.pay.adapter import accounts as accounts_adapter
+from snowfall.project.pay.service.accounts import repositories
 from snowfall.project.pay.service.accounts.v1alpha import models_pb2 as account_models
 from snowfall.project.pay.service.companies.v1alpha import models_pb2 as company_models
 from snowfall.project.pay.service.pay_api import resources
@@ -17,57 +18,30 @@ from snowfall.vendor.currency_cloud.client import PaymentClient
 from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
 from snowfall.vendor.currency_cloud.models import account as cc_account_models
 from snowfall.vendor.currency_cloud.models import contact as cc_contact_models
-from snowfall.vendor.currency_cloud.models.account import AccountResponse
 
 
 class Accounts(endpoints.HTTPEndpoint):
-    _default_page_size = 20
-
-    async def get(  # noqa: WPS210
+    async def get(
         self,
         request: requests.Request,
-        accounts_repository: accounts.AccountsRepository = lagom.injectable,
-        payment_client: PaymentClient = lagom.injectable,
+        accounts_client: accounts_adapter.GrpcClient = lagom.injectable,
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
-        db_accounts = await accounts_repository.find(
+        db_accounts = await accounts_client.find(
+            limit=pagination.limit,
             cursor=pagination.cursor,
         )
-        db_accounts.limit(pagination.limit or self._default_page_size)
-
-        try:
-            all_cc_accounts = self._get_all_cc_accounts(payment_client)
-        except CurrencyCloudError as exc:
-            return self._generate_error(exc)
-
-        all_cc_accounts_by_id = {
-            cc_account.identifier: cc_account for cc_account in all_cc_accounts
-        }
-
-        payload_accounts = []
-        async for db_account in db_accounts:
-            cc_account = all_cc_accounts_by_id[db_account.external_reference]
-            payload_accounts.append(
-                {
-                    "identifier": db_account.id,
-                    "name": cc_account.account_name,
-                    "status": cc_account.status,
-                    "company_id": db_account.company_id,
-                    "contact_id": db_account.contact_id,
-                },
-            )
-
         return await messages.create_response(
             body=messages.models.Body(
                 data=[
-                    resources.AccountResource.from_values(
-                        **account,
+                    resources.AccountResource.from_proto(
+                        account,
                     )
-                    for account in payload_accounts
+                    for account in db_accounts.accounts
                 ],
                 links=pagination_helpers.get_next_url(
                     request.url_for("Account"),
-                    await db_accounts.cursor(),
+                    db_accounts.next_page_token,
                     pagination,
                 ),
             ),
@@ -77,8 +51,8 @@ class Accounts(endpoints.HTTPEndpoint):
     async def post(  # noqa: WPS211, C901, WPS212, WPS217, WPS210
         self,
         request: requests.Request,
-        accounts_repository: accounts.AccountsRepository = lagom.injectable,
-        contact_repository: accounts.ContactsRepository = lagom.injectable,
+        accounts_client: accounts_adapter.GrpcClient = lagom.injectable,
+        contact_repository: repositories.ContactsRepository = lagom.injectable,
         companies_repository: CompanyRepository = lagom.injectable,
         payment_client: PaymentClient = lagom.injectable,
     ) -> responses.Response:
@@ -145,12 +119,14 @@ class Accounts(endpoints.HTTPEndpoint):
         except CurrencyCloudError as exception:
             return self._generate_error(exception)
 
-        account = await accounts_repository.insert(
+        account = await accounts_client.create(
             account_models.Account(
                 id=string.uuid(),
                 external_reference=cc_account.identifier,
                 company_id=company.id,
                 contact_id=contact.id,
+                name=cc_account.account_name,
+                status=cc_account.status,
             ),
         )
         try:
@@ -172,12 +148,8 @@ class Accounts(endpoints.HTTPEndpoint):
 
         return await messages.create_response(
             body=models.Body(
-                data=resources.AccountResource.from_values(
-                    identifier=account.id,
-                    name=body["name"],
-                    status=cc_account.status,
-                    company_id=company.id,
-                    contact_id=account.contact_id,
+                data=resources.AccountResource.from_proto(
+                    account,
                 ),
             ),
             request=request,
@@ -231,21 +203,3 @@ class Accounts(endpoints.HTTPEndpoint):
             ),
             status_code=exc.status,
         )
-
-    def _get_all_cc_accounts(
-        self,
-        payment_client: PaymentClient,
-    ) -> list[AccountResponse]:
-        page_index = 1
-        all_cc_accounts = []
-
-        while True:
-            cc_accounts = payment_client.get_all_accounts(page_index=page_index)
-            page_index += 1
-
-            if cc_accounts:
-                all_cc_accounts.extend(cc_accounts)
-            else:
-                break
-
-        return all_cc_accounts

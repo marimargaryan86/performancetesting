@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import ClassVar
+from typing import Any, ClassVar
 
 from starlette import requests
 
@@ -269,35 +269,36 @@ class AccountResource(models.Resource):
     api_type: ClassVar[str] = "accounts"
 
     @classmethod
-    def from_values(  # noqa: WPS211
+    def from_proto(
         cls,
-        identifier: str,
-        name: str,
-        status: str,
-        company_id: str,
-        contact_id: str,
+        account: account_models.Account,
     ) -> AccountResource:
+        relationships: dict[str, Any] = {
+            "company": None,
+            "contact": None,
+        }
+        if account.company_id:
+            relationships["company"] = {
+                "data": {
+                    "id": account.company_id,
+                    "type": "companies",
+                },
+            }
+        if account.contact_id:
+            relationships["contact"] = {
+                "data": {
+                    "id": account.contact_id,
+                    "type": "contacts",
+                },
+            }
         return cls(
-            id=identifier,
+            id=account.id,
             type=AccountResource.api_type,
             attributes={
-                "name": name,
-                "status": status,
+                "name": account.name,
+                "status": account.status,
             },
-            relationships={
-                "company": {
-                    "data": {
-                        "id": company_id,
-                        "type": "companies",
-                    },
-                },
-                "contact": {
-                    "data": {
-                        "id": contact_id,
-                        "type": "contacts",
-                    },
-                },
-            },
+            relationships=relationships,
         )
 
 

@@ -3,10 +3,8 @@ from typing import Any, Mapping, cast
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.project.pay.service.accounts.accounts import (
-    AccountsRepository,
-    models_pb2,
-)
+from snowfall.project.pay.adapter import accounts as accounts_adapter
+from snowfall.project.pay.service.accounts.repositories import models_pb2
 from snowfall.project.pay.service.beneficiaries.v1alpha.models_pb2 import Beneficiary
 from snowfall.project.pay.service.pay_api import resources
 from snowfall.project.pay.service.pay_api.repositories import (
@@ -32,13 +30,13 @@ class Beneficiaries(endpoints.HTTPEndpoint):
         payment_client: PaymentClient = lagom.injectable,
         beneficiaries_repository: BeneficiaryRepository = lagom.injectable,
         currencies_repository: CurrencyRepository = lagom.injectable,
-        accounts_repository: AccountsRepository = lagom.injectable,
+        accounts_client: accounts_adapter.GrpcClient = lagom.injectable,
         companies_repository: CompanyRepository = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
 
         currency = currencies_repository.find_by_id(body["currency"])
-        account = await accounts_repository.find_by_id(body["account"])
+        account = await accounts_client.get(body["account"])
 
         errors = self._validate(currency, account)
 
