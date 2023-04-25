@@ -76,6 +76,7 @@ class TripOfferSearcher(Generic[_SearchCriteriaTask, _SearchCriteria]):
             async for offer_group in offer_groups:
                 yield offer_group
 
+    @tenacity.retry(stop=tenacity.stop_after_attempt(3))
     async def _process_search_criterion_task(
         self,
         task: _SearchCriteriaTask,
@@ -90,9 +91,7 @@ class TripOfferSearcher(Generic[_SearchCriteriaTask, _SearchCriteria]):
             allowed_window_td=self._allowed_window_td,
         )
 
-        for attempt in tenacity.Retrying(stop=tenacity.stop_after_attempt(3)):
-            with attempt:
-                offer_groups = self._offer_group_repository.find(search_criteria)
+        offer_groups = self._offer_group_repository.find(search_criteria)
 
         async for offer_group in offer_groups:
             if segment_matcher.offer_group_matches(offer_group):
