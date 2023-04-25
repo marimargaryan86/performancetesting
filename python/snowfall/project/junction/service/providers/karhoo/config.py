@@ -5,7 +5,7 @@ import pydantic
 
 from snowfall.stdlib import service
 
-_DEFAULT_TTL_IN_MINUTES = 10
+_DEFAULT_TTL_IN_MINUTES = 45
 _DEFAULT_API_TIMEOUT_IN_SECONDS = 30
 
 

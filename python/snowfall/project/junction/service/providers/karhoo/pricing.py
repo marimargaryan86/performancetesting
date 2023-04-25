@@ -10,7 +10,7 @@ from snowfall.project.junction.go.service.offers.v1alpha import (
 )
 from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.project.junction.service.providers.karhoo import cache, config
-from snowfall.stdlib import money, service, string
+from snowfall.stdlib import money, service
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
@@ -81,12 +81,14 @@ class PriceQuoteConsumer(object):
 
         expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
 
+        price_quote_id = await self._cache.store(offer_details, expires_at)
+
         await self._producer.publish(
             offers_amqp_pb2.TripPriceQuoteResult(
                 price_quote_container_id=amqp_message.body.price_quote_container_id,
                 option_id=amqp_message.body.option_id,
                 price_quote=offers_pb2.PriceQuote(
-                    id=string.uuid(),
+                    id=price_quote_id,
                     option_id=amqp_message.body.option_id,
                     expires_at=protobuf.datetime_to_protobuf(expires_at),
                     price=money.from_string(
