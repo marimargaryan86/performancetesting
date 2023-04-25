@@ -1,4 +1,5 @@
 import contextlib
+import datetime
 import random
 
 import httpx
@@ -68,6 +69,7 @@ async def price_quotes(  # noqa: WPS210
             ),
             adapter=pricing_adapter.PricingAdapter(duffel_client=duffel_client),
             provider_company_id=app.settings.provider_company_id,
+            offer_ttl=app.settings.ttl,
         ).consume()
 
 
@@ -80,6 +82,7 @@ class PriceQuoteConsumer(object):
         adapter: pricing_adapter.PricingAdapter,
         offer_cache: cache.OfferCache,
         provider_company_id: str,
+        offer_ttl: datetime.timedelta,
     ):
         self._pricing = pricing_adapter
         self._cache = offer_cache
@@ -89,6 +92,7 @@ class PriceQuoteConsumer(object):
         self._adapter = adapter
         self._transformer = transformer
         self._provider_company_id = provider_company_id
+        self._ttl = offer_ttl
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -102,7 +106,10 @@ class PriceQuoteConsumer(object):
         if not offer_details:
             return
 
-        price_quote_id = await self._cache.store(offer_details)
+        price_quote_id = await self._cache.store(
+            record=offer_details,
+            expires_at=datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
+        )
 
         await self._producer.publish(
             offers_amqp_pb2.TripPriceQuoteResult(
