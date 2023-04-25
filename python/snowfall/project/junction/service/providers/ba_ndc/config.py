@@ -1,3 +1,4 @@
+import datetime
 from typing import Sequence
 
 import pydantic
@@ -23,3 +24,4 @@ class PricingSettings(BaNdcConfig, service.Settings):
     amqp_dsn: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
     provider_company_id: str
+    ttl: datetime.timedelta = datetime.timedelta(minutes=_DEFAULT_TTL_IN_MINUTES)

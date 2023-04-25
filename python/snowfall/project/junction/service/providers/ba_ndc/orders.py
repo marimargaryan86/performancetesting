@@ -108,6 +108,7 @@ class OrderConsumer(object):
         offer_details = await self._cache.fetch(
             amqp_message.body.booking.trip_option.price_quote_id,
         )
+
         amqp_message.body.booking.provider_name = ba_ndc_helpers.PROVIDER_NAME
 
         if not offer_details:

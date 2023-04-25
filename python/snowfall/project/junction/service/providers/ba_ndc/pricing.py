@@ -1,4 +1,5 @@
 import contextlib
+import datetime
 import random
 
 from redis import asyncio as aioredis
@@ -50,6 +51,7 @@ async def price_quotes(
                 offer_cache=offer_cache,
             ),
             provider_company_id=app.settings.provider_company_id,
+            ttl=app.settings.ttl,
         ).consume()
 
 
@@ -61,12 +63,14 @@ class PriceQuoteConsumer(object):
         transformer: pricing_transformer.PriceQuoteTransformer,
         offer_cache: cache.OfferCache,
         provider_company_id: str,
+        ttl: datetime.timedelta,
     ):
         self._cache = offer_cache
         self._consumer = consumer_obj
         self._logger = ba_ndc_helpers.get_logger(__name__)
         self._producer = producer_obj
         self._transformer = transformer
+        self._ttl = ttl
         self._provider_company_id = provider_company_id
 
     async def consume(self) -> None:
@@ -81,7 +85,9 @@ class PriceQuoteConsumer(object):
         if not offer_details:
             return
 
-        price_quote_id = await self._cache.store(offer_details)
+        expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
+
+        price_quote_id = await self._cache.store(offer_details, expires_at)
 
         await self._producer.publish(
             offers_amqp_pb2.TripPriceQuoteResult(
