@@ -92,6 +92,10 @@ job "engineering-http" {
           server_address = var.registry_address
         }
       }
+
+      env {
+        NGINX_PORT = "${NOMAD_PORT_http}"
+      }
     }
   }
 }
