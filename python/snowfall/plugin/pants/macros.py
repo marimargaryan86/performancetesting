@@ -1,6 +1,6 @@
-def nomad_template(  # type: ignore[no-untyped-def]  # noqa: WPS210
+def nomad_template(  # type: ignore[no-untyped-def]  # noqa: C901,WPS210
     commands: list[str],  # noqa: SF20
-    service_entry_point: str,
+    service_entry_point: str = "",
     **kwargs,  # noqa: ANN003
 ) -> None:
     try:
@@ -16,13 +16,14 @@ def nomad_template(  # type: ignore[no-untyped-def]  # noqa: WPS210
         path=build_file_dir(),  # type: ignore[name-defined]  # noqa: F821
     )
 
-    adhoc_tool(  # type: ignore[name-defined]  # noqa: F821
-        name="{name}_debug_info".format(name=name),
-        runnable=service_entry_point,
-        args=["--debug-info"],
-        stdout=config_path,
-        output_files=[config_path],
-    )
+    if service_entry_point:
+        adhoc_tool(  # type: ignore[name-defined]  # noqa: F821
+            name="{name}_debug_info".format(name=name),
+            runnable=service_entry_point,
+            args=["--debug-info"],
+            stdout=config_path,
+            output_files=[config_path],
+        )
 
     for command_def in commands:
         parts = command_def.split("#")
@@ -41,22 +42,23 @@ def nomad_template(  # type: ignore[no-untyped-def]  # noqa: WPS210
             **kwargs,
         )
 
-        experimental_test_shell_command(  # type: ignore[name-defined]  # noqa: F821
-            name="{name}_{filename}_test".format(name=name, filename=filename),
-            command=cmd.format(
-                command=command,
-                filename=filename,
-                path=build_file_dir(),  # type: ignore[name-defined]  # noqa: F821
-                config=config_path,
-            ),
-            execution_dependencies=[
-                ":{name}_{filename}_files".format(name=name, filename=filename),
-                ":{name}_debug_info".format(name=name),
-                "bash/lint-configuration.sh",
-            ],
-            tools=["bash", "grep", "jq"],
-            workdir="/",
-        )
+        if service_entry_point:
+            experimental_test_shell_command(  # type: ignore[name-defined]  # noqa: F821
+                name="{name}_{filename}_test".format(name=name, filename=filename),
+                command=cmd.format(
+                    command=command,
+                    filename=filename,
+                    path=build_file_dir(),  # type: ignore[name-defined]  # noqa: F821
+                    config=config_path,
+                ),
+                execution_dependencies=[
+                    ":{name}_{filename}_files".format(name=name, filename=filename),
+                    ":{name}_debug_info".format(name=name),
+                    "bash/lint-configuration.sh",
+                ],
+                tools=["bash", "grep", "jq"],
+                workdir="/",
+            )
 
 
 def go_image(  # type: ignore[no-untyped-def]

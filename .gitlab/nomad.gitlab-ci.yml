@@ -1,8 +1,8 @@
-nomad:validate:
+.nomad:validate:
   extends: .pants
   stage: test
   script:
-    - ./bash/lint-nomad.sh development
+    - ./bash/lint-nomad.sh "${NOMAD_VAR_environment}"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
@@ -14,6 +14,18 @@ nomad:validate:
     NOMAD_VAR_registry_username: "${CI_REGISTRY_USER}"
     NOMAD_VAR_environment: "development"
     NOMAD_VAR_datacenter: "junction-dev-dc1"
+
+nomad:validate:development:
+  extends: .nomad:validate
+  variables:
+    NOMAD_VAR_environment: "development"
+    NOMAD_VAR_datacenter: "junction-dev-dc1"
+
+nomad:validate:production:
+  extends: .nomad:validate
+  variables:
+    NOMAD_VAR_environment: "production"
+    NOMAD_VAR_datacenter: "junction-prod-dc1"
 
 nomad:deploy:
   stage: deploy

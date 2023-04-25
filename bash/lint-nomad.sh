@@ -38,6 +38,11 @@ for f in "${NOMAD_FILES[@]}"; do
 	FILENAME=$(basename "${f}")
 	CONFIG="$(dirname "${f}")/${FILENAME%.*}.json"
 	VARIABLES=()
+	SKIP_DEPLOY=$(jq ".${ENVIRONMENT} | if has(\"deploy\") then .deploy else true end" "${CONFIG}")
+
+	if [ "${SKIP_DEPLOY}" = "false" ]; then
+		continue
+	fi
 
 	if [ -f "${CONFIG}" ]; then
 		mapfile -t VARIABLES < <(jq -r ".${ENVIRONMENT}.variables|to_entries|map(\"-var=\\(.key)=\\(.value|tostring)\")|.[]" "${CONFIG}")
