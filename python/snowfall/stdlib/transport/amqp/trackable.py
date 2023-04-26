@@ -247,6 +247,7 @@ class TrackableProducer(protocol.Producer):
         return await self._producer.publish(
             msg=msg,
             routing_key=routing_key,
+            expiration=expiration,
             headers={
                 **headers,
                 TRACKABLE_ID: trackable_id,
