@@ -13,7 +13,7 @@ for v in "${REQUIRED_VARS[@]}"; do
 	fi
 done
 
-mapfile -t REQUIRED_VARS < <(jq -r ".command.commands.${1}.params[] | select( .required == true ) | .envvar" "${3}")
+mapfile -t REQUIRED_VARS < <(jq -r ".command.commands.\"${1}\".params[] | select( .required == true ) | .envvar" "${3}")
 
 for v in "${REQUIRED_VARS[@]}"; do
 	if ! grep -q "${v}" "${2}"; then
