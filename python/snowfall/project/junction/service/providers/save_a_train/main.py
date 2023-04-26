@@ -16,9 +16,12 @@ from aio_pika import abc
 from motor import motor_asyncio
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import cabin_classes, notifications
-from snowfall.project.junction.provider import offers_v2 as offers
-from snowfall.project.junction.provider import service
+from snowfall.project.junction.provider import (
+    cabin_classes,
+    notifications,
+    offers,
+    service,
+)
 from snowfall.project.junction.service.providers.save_a_train import (
     adapter,
     cache,

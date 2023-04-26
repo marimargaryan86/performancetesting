@@ -7,7 +7,7 @@ from typing import Any, cast
 import httpx
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import airports, offers_v2, service
+from snowfall.project.junction.provider import airports, offers, service
 from snowfall.project.junction.service.providers.duffel import cache, config, criteria
 from snowfall.project.junction.service.providers.duffel.search import adapter
 from snowfall.project.junction.service.providers.duffel.v1alpha import amqp_pb2
@@ -26,7 +26,7 @@ class OffersSettings(service.OffersSettings, config.DuffelConfig):
     disabled_airlines: set[str] = set()
 
 
-_Impl = offers_v2.OfferSearchImplementation[
+_Impl = offers.OfferSearchImplementation[
     amqp_pb2.SearchCriteriaTask,
     offer_request.OfferRequestData,
 ]
@@ -70,7 +70,7 @@ async def offers_factory(
         ),
     ).all_()
 
-    return offers_v2.OfferSearchImplementation(
+    return offers.OfferSearchImplementation(
         search_criteria_task_generator=criteria.CriteriaGenerator(
             h3_mapping=h3.H3MappingRepository[airports.Airport](
                 mapping=airport_mapping,

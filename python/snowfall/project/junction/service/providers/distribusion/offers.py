@@ -6,7 +6,7 @@ import datetime
 import httpx
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import offers_v2, service
+from snowfall.project.junction.provider import offers, service
 from snowfall.project.junction.service.providers.distribusion import (
     cache,
     config,
@@ -29,13 +29,13 @@ class OffersSettings(service.OffersSettings, config.DistribusionConfig):
     ttl: datetime.timedelta = datetime.timedelta(minutes=config.DEFAULT_TTL_IN_MINUTES)
 
 
-_Impl = offers_v2.OfferSearchImplementation[
+_Impl = offers.OfferSearchImplementation[
     amqp_pb2.SearchCriteriaTask,
     criterias.FindConnectionsCriteria,
 ]
 
 
-async def offers(
+async def offers_factory(
     app: service.Application[OffersSettings],
     amqp_connection: types.Connection,
     redis_connection: aioredis.Redis[bytes],
@@ -63,7 +63,7 @@ async def offers(
         ttl=app.settings.ttl,
     )
 
-    return offers_v2.OfferSearchImplementation(
+    return offers.OfferSearchImplementation(
         search_criteria_task_generator=criteria.CriteriaGenerator(
             h3_mapping=h3.H3MappingRepository[stations.Station](
                 mapping=await stations.load_stations(),

@@ -7,8 +7,7 @@ import random
 import httpx
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import offers_v2 as offers
-from snowfall.project.junction.provider import service
+from snowfall.project.junction.provider import offers, service
 from snowfall.project.junction.service.providers.direct_ferries import (
     adapter,
     booking,

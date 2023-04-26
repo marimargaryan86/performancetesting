@@ -10,7 +10,7 @@ from snowfall.project.junction.service.providers.distribusion import (
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(name="distribusion")
 
-    entrypoint.enable_offers(offers.OffersSettings, offers.offers)
+    entrypoint.enable_offers(offers.OffersSettings, offers.offers_factory)
     entrypoint.enter_with_commands(
         service.Command(
             name="dump-stations",

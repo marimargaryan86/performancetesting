@@ -6,9 +6,7 @@ from typing import Any, cast
 import httpx
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import airports
-from snowfall.project.junction.provider import offers_v2 as offers
-from snowfall.project.junction.provider import service
+from snowfall.project.junction.provider import airports, offers, service
 from snowfall.project.junction.service.providers.ba_ndc import cache, config, criteria
 from snowfall.project.junction.service.providers.ba_ndc.search import adapter
 from snowfall.project.junction.service.providers.ba_ndc.v1alpha import amqp_pb2
