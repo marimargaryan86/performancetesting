@@ -184,6 +184,42 @@ class OfferAggregator(object):
         self,
         search_result: amqp_pb2.TripOfferSearchResult,
     ) -> None:
+        offer_search = await self._get_offer_search(search_result)
+
+        _set_sequence_numbers(offer_search, search_result.offer)
+
+        buckets = _override_buckets(
+            search_result,
+            await self._buckets.get_offer_buckets(offer_search.id),
+        )
+
+        await self._buckets.add_offer(offer_search.id, search_result.offer)
+
+        segments = itertools.chain(*[trip.segments for trip in offer_search.trip.trips])
+
+        # check if all segments can be fulfilled by offers gotten so far
+        if any(segment.id not in buckets for segment in segments):
+            return
+
+        try:
+            expires_at = await self._buckets.get_bucket_list_expiry(offer_search)
+        except NoExpiryError:
+            self._logger.warning(
+                "Offer search has expired",
+                offer_search_id=offer_search.id,
+                provider_company_id=search_result.provider_company_id,
+            )
+
+            return
+
+        for aggregate in generate_offer_aggregates(buckets, expires_at):
+            aggregate.offer_search_id = offer_search.id
+            await self._aggregates.insert(aggregate)
+
+    async def _get_offer_search(
+        self,
+        search_result: amqp_pb2.TripOfferSearchResult,
+    ) -> models_pb2.OfferSearch:
         offer_search = await self._searches.find_by_id(search_result.offer_search_id)
 
         if not offer_search:
@@ -210,26 +246,7 @@ class OfferAggregator(object):
                 ).total_seconds(),
             )
 
-        _set_sequence_numbers(offer_search, search_result.offer)
-
-        buckets = _override_buckets(
-            search_result,
-            await self._buckets.get_offer_buckets(offer_search.id),
-        )
-
-        await self._buckets.add_offer(offer_search.id, search_result.offer)
-
-        segments = itertools.chain(*[trip.segments for trip in offer_search.trip.trips])
-
-        # check if all segments can be fulfilled by offers gotten so far
-        if any(segment.id not in buckets for segment in segments):
-            return
-
-        expires_at = await self._buckets.get_bucket_list_expiry(offer_search)
-
-        for aggregate in generate_offer_aggregates(buckets, expires_at):
-            aggregate.offer_search_id = offer_search.id
-            await self._aggregates.insert(aggregate)
+        return offer_search
 
 
 def _override_buckets(
