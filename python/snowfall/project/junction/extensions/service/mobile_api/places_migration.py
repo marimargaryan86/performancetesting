@@ -1,8 +1,6 @@
 import datetime
-import random
-from typing import Any, Mapping, Sequence, Union
+from collections.abc import AsyncIterable
 
-import httpx
 import numpy
 import pandas
 from google.protobuf import timestamp_pb2
@@ -15,6 +13,8 @@ from snowfall.project.junction.extensions.service.mobile_api import (
     repository,
 )
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
+from snowfall.project.junction.go.service.places.places import PlaceRepository
+from snowfall.project.junction.go.service.places.v1alpha.models_pb2 import Place
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.v1alpha import latlng_pb2
 
@@ -22,11 +22,9 @@ _SERVICE_NAME = "mobile-api"
 _ATTRIBUTES_KEY = "attributes"
 
 
-async def migrate(settings: bootstrap.Settings) -> None:  # noqa: WPS210
+async def migrate(settings: bootstrap.MigrateSettings) -> None:  # noqa: WPS210
     mongo = motor_asyncio.AsyncIOMotorClient(settings.mongo_dsn)
     places_repository = repository.PlacesRepository(mongo[settings.mongo_db]["places"])
-    http_client = httpx.AsyncClient()
-    auth_headers = {"Authorization": "Bearer {0}".format(settings.junction_api_token)}
     osm_data = pandas.read_csv(
         filesystem.resource_path(
             "snowfall.project.junction.extensions.service.mobile_api.main",
@@ -37,37 +35,33 @@ async def migrate(settings: bootstrap.Settings) -> None:  # noqa: WPS210
         encoding="utf8",
         on_bad_lines="skip",
     )
-    places_response = await http_client.get(
-        "{0}/places".format(random.choice(settings.junction_api_address)),  # nosec
-        headers=auth_headers,
-    )
-    places_response.raise_for_status()
-    json_response = places_response.json()
-    await _save_enrich_data(json_response["data"], places_repository, osm_data)
-    while len(json_response["data"]):
-        places_response = await http_client.get(
-            json_response["links"]["next"],
-            headers=auth_headers,
-        )
-        places_response.raise_for_status()
-        json_response = places_response.json()
-        await _save_enrich_data(json_response["data"], places_repository, osm_data)
+
+    go_repo = PlaceRepository(geocoding=None, collection=mongo.places.places)
+
+    ids_from_go = await go_repo.get_ids()
+    existing_ids = await places_repository.get_ids()
+    to_add = ids_from_go - existing_ids
+    to_remove = existing_ids - ids_from_go
+
+    places_to_add = await go_repo.get_by_ids(to_add)
+    await _save_enrich_data(places_to_add, places_repository, osm_data)
+    await places_repository.delete_ids(to_remove)
 
 
-async def _save_enrich_data(
-    places: Sequence[Mapping[str, Any]],
+async def _save_enrich_data(  # noqa: WPS210
+    places: AsyncIterable[Place],
     repo: repository.PlacesRepository,
     osm_data: pandas.DataFrame,
 ) -> None:
     updated = timestamp_pb2.Timestamp()
     updated.FromDatetime(datetime.datetime.now(tz=datetime.timezone.utc))
-    for place in places:
-        attributes = place[_ATTRIBUTES_KEY]
+    async for place in places:
+        loc = place.location
         # fmt: off
         osm_place = (
             osm_data[
-                (numpy.isclose(osm_data["lat"], attributes["latitude"]))
-                & (numpy.isclose(osm_data["long"], attributes["longitude"]))
+                (numpy.isclose(osm_data["lat"], loc.coordinates.latitude))
+                & (numpy.isclose(osm_data["long"], loc.coordinates.longitude))
             ].head(
                 1,
             ).replace(
@@ -78,32 +72,32 @@ async def _save_enrich_data(
         )
         # fmt: on
 
-        population: Union[str, int] | None = "".join(
+        population_str = "".join(
             char for char in osm_place.get("population") or "" if char.isdigit()
         )
-        population = int(population) if population else 0
+        population = int(population_str) if population_str else 0
         await repo.insert(
             models_pb2.Place(
-                id=place["id"],
-                name=attributes["name"],
-                no_accent_name=unidecode(attributes["name"]),
+                id=loc.id,
+                name=loc.name,
+                no_accent_name=unidecode(loc.name),
                 coordinates=latlng_pb2.LatLng(
-                    latitude=attributes["latitude"],
-                    longitude=attributes["longitude"],
+                    latitude=loc.coordinates.latitude,
+                    longitude=loc.coordinates.longitude,
                 ),
-                time_zone=attributes["timeZone"],
-                country_code=attributes["countryCode"],
-                country_name=countries.get(alpha_2=attributes["countryCode"]).name,
+                time_zone=loc.time_zone,
+                country_code=loc.country_code,
+                country_name=countries.get(alpha_2=loc.country_code).name,
                 updated_at=updated,
                 source_ref="junction",
                 types=[models_pb2.Place.Type.TYPE_UNSPECIFIED],
                 population=population,
                 local_name=(
-                    osm_place["local_name"] if attributes["countryCode"] == "SE" else ""
+                    osm_place["local_name"] if loc.country_code == "SE" else ""
                 ),
                 no_accent_local_name=(
                     unidecode(osm_place["local_name"])
-                    if attributes["countryCode"] == "SE"
+                    if loc.country_code == "SE"
                     else ""
                 ),
             ),

@@ -15,6 +15,11 @@ from snowfall.stdlib.integration.starlette import application
 from snowfall.vendor.junction.go import client
 
 
+class MigrateSettings(application.Settings):
+    mongo_db: str
+    mongo_dsn: Sequence[AnyUrl]
+
+
 class Settings(application.Settings):
     currencies_address: Sequence[str]
     junction_api_address: Sequence[str]

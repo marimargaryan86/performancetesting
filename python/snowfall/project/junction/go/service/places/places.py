@@ -1,7 +1,8 @@
 import asyncio
 import dataclasses
 import uuid
-from typing import Any, Sequence
+from collections.abc import Iterable, Sequence
+from typing import Any
 
 from pymongo import GEOSPHERE, IndexModel, results
 
@@ -154,7 +155,7 @@ class PlaceRepository(  # noqa: WPS215
 
     def __init__(
         self,
-        geocoding: geocoding_pb2_grpc.GeocodingServiceStub,
+        geocoding: geocoding_pb2_grpc.GeocodingServiceStub | None,
         *args: Any,
         **kwargs: Any,
     ) -> None:
@@ -163,6 +164,16 @@ class PlaceRepository(  # noqa: WPS215
         normalizers.register(_PlaceNormalizer())
 
         super().__init__(*args, **kwargs)
+
+    async def get_ids(self) -> frozenset[str]:
+        ids = await self._execute(self._collection.distinct, "_id")
+        return frozenset(str(_id) for _id in ids)
+
+    async def get_by_ids(
+        self,
+        ids: Iterable[str],
+    ) -> resultset.ResultSet[models_pb2.Place]:
+        return await self._find_with_cursor("", {"_id": {"$in": tuple(ids)}})
 
     async def find(
         self,
@@ -176,6 +187,9 @@ class PlaceRepository(  # noqa: WPS215
         self,
         resource: models_pb2.Place,
     ) -> bool:
+        if not self._geocoding:
+            raise RuntimeError("Can't create without geocoding service.")
+
         country_code, time_zone = await asyncio.gather(
             self._geocoding.CountryCodeLookup(
                 geocoding_pb2.CountryCodeLookupRequest(

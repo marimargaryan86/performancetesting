@@ -1,7 +1,8 @@
 import copy
 import datetime
 import re
-from typing import Any, Mapping, Sequence
+from collections.abc import Iterable, Mapping, Sequence
+from typing import Any
 
 import bcrypt
 import pymongo
@@ -118,6 +119,14 @@ class PlacesRepository(
         response.sort(("population", -1))
         response.limit(30)  # noqa: WPS432
         return response
+
+    async def get_ids(self) -> frozenset[str]:
+        ids = await self._execute(self._collection.distinct, "_id")
+        return frozenset(str(_id) for _id in ids)
+
+    async def delete_ids(self, ids: Iterable[str]) -> None:
+        filters = {"_id": {"$in": tuple(ids)}}
+        await self._execute(self._collection.delete_many, filters)
 
     async def find(self) -> resultset.ResultSet[models_pb2.Place]:
         response = await self._execute(self._collection.find, {})

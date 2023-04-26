@@ -175,7 +175,7 @@ def _serve(app: service.Application[bootstrap.Settings]) -> None:
     )
 
 
-async def _migrate(app: service.Application[bootstrap.Settings]) -> None:
+async def _migrate(app: service.Application[bootstrap.MigrateSettings]) -> None:
     await places_migration.migrate(app.settings)
 
 
@@ -195,7 +195,7 @@ if __name__ == "__main__":
         service.Command(
             name="migrate",
             callback=_migrate,
-            settings_class=bootstrap.Settings,
+            settings_class=bootstrap.MigrateSettings,
         ),
         service.Command(
             name="orders_report",
