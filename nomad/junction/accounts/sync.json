@@ -1,0 +1,8 @@
+{
+    "development": {
+        "variables": {}
+    },
+    "production": {
+        "variables": {}
+    }
+}

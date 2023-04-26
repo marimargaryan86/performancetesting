@@ -103,6 +103,10 @@ job "pay-api-admin" {
               local_bind_port  = 8030
               destination_name = "authentication-${var.environment}"
             }
+            upstreams {
+              local_bind_port  = 8040
+              destination_name = "accounts-grpc-${var.environment}"
+            }
           }
         }
       }
@@ -144,6 +148,7 @@ MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mong
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 CURRENCIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_currencies-${var.environment}"))}}
 AUTHENTICATION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_authentication-${var.environment}"))}}
+ACCOUNTS_ADDRES={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_accounts-grpc-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/pay-api" }}
 CC_LOGIN={{ .Data.data.cc_login }}
 CC_API_KEY={{ .Data.data.cc_api_key }}
