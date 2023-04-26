@@ -6,6 +6,7 @@ import {
 } from "models/transaction";
 import type { TransactionSchema } from "../schemas/transaction";
 
+/* eslint-disable max-lines-per-function */
 export function parseTransaction(
   transaction: TransactionSchema,
   companies: CompanyModel[] = [],
@@ -16,9 +17,9 @@ export function parseTransaction(
 
   return {
     id: transaction.id,
+    bookingId: attributes.externalReference,
     beneficiary,
     createdAt: new Date(attributes.createdAt),
-    parentId: attributes.invoiceReference,
     payer,
     amounts: {
       beneficiary: attributes.amounts.beneficiary,
@@ -31,9 +32,10 @@ export function parseTransaction(
       fxQuote: attributes.rates.fxQuote,
       salesMarkup: attributes.rates.salesMarkup,
     },
-    reference: attributes.externalReference,
+    reference: attributes.invoiceReference,
     /* eslint-disable no-warning-comments */
     // TODO: Use real status.
     status: transactionStatus[Math.floor(Math.random() * 3)] as TransactionStatus,
   };
 }
+/* eslint-enable max-lines-per-function */

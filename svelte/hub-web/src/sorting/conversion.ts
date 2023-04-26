@@ -14,10 +14,10 @@ export function sortConversions(
     switch (options.by) {
       case "transaction.reference":
         return 0 - ((a.transaction?.reference ?? 0) < (b.transaction?.reference ?? 0) ? 1 : -1);
-      case "executedAt":
-        return 0 - (a.executedAt < b.executedAt ? 1 : -1);
+      case "createdAt":
+        return 0 - (a.createdAt > b.createdAt ? 1 : -1);
       case "settledAt":
-        return 0 - (a.settledAt < b.settledAt ? 1 : -1);
+        return 0 - (a.settledAt > b.settledAt ? 1 : -1);
       case "sellAmount.currency":
         return 0 - ((a.sellAmount.currency ?? 0) < (b.sellAmount.currency ?? 0) ? 1 : -1);
       case "buyAmount.currency":

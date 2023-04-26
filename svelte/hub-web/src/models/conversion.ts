@@ -12,7 +12,7 @@ export const conversionStatusMapping: Record<ConversionStatus, string> = {
 
 export type ConversionModel = {
   id: string;
-  executedAt: Date;
+  createdAt: Date;
   settledAt: Date;
   sellAmount: MoneyModel;
   buyAmount: MoneyModel;

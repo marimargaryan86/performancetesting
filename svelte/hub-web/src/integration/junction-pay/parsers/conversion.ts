@@ -14,7 +14,7 @@ export function parseConversion(
   return {
     id: conversion.id,
     buyAmount: conversion.attributes.buyAmount,
-    executedAt: new Date(conversion.attributes.executedAt),
+    createdAt: new Date(conversion.attributes.createdAt),
     executedRate: conversion.attributes.executedRate,
     fxDelta: conversion.attributes.fxDelta,
     fxStatus: conversion.attributes.fxStatus,

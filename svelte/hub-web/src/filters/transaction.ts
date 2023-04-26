@@ -24,9 +24,8 @@ export function filterTransactions(
         item.beneficiary?.name.toLowerCase().includes(lcQuery) ||
         !item.payer ||
         item.payer.name.toLowerCase().includes(lcQuery) ||
-        item.id.includes(lcQuery) ||
-        item.reference.toLowerCase().includes(lcQuery) ||
-        item.parentId.toLowerCase().includes(lcQuery))
+        item.bookingId.includes(lcQuery) ||
+        item.reference.toLowerCase().includes(lcQuery))
     );
   });
   /* eslint-enable complexity */

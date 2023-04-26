@@ -23,7 +23,7 @@ export const balanceTransactionStatusMapping: Record<BalanceTransactionStatus, s
 
 export type TransactionModel = {
   id: string;
-  parentId: string;
+  bookingId: string;
   createdAt: Date;
   payer?: CompanyModel;
   amounts: {

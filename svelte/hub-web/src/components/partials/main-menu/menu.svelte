@@ -19,10 +19,7 @@
 <script lang="ts">
   import AccountsIcon from "components/icons/accounts-icon.svelte";
   import ActivityIcon from "components/icons/activity-icon.svelte";
-  import BeneficiaryIcon from "components/icons/beneficiary-icon.svelte";
   import DashboardIcon from "components/icons/dashboard-icon.svelte";
-  import PaymentIcon from "components/icons/payment-icon.svelte";
-  import SettingsIcon from "components/icons/settings-icon.svelte";
   import { page } from "$app/stores";
   import { slide } from "svelte/transition";
   import ChevronIcon from "components/icons/chevron-icon.svelte";
@@ -53,31 +50,6 @@
           url: "/pay/accounts",
           label: "Accounts",
           icon: AccountsIcon,
-        },
-        {
-          type: "menu-item",
-          url: "/pay/beneficiaries",
-          label: "Beneficiaries",
-          icon: BeneficiaryIcon,
-        },
-        {
-          type: "menu-item",
-          url: "/pay/payments",
-          label: "Payments",
-          icon: PaymentIcon,
-        },
-      ],
-    },
-    {
-      type: "sub-menu",
-      label: "Go",
-      expanded: $page.url.pathname.startsWith("/go"),
-      items: [
-        {
-          type: "menu-item",
-          url: "/go/cabin-mapping",
-          label: "Cabin mapping",
-          icon: SettingsIcon,
         },
       ],
     },

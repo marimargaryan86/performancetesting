@@ -14,10 +14,10 @@ export function filterConversions(
   const lcQuery = query.toLowerCase();
 
   return transactions.filter((item) => {
-    const executedAt = getZeroTimeDate(item.executedAt);
+    const createdAt = getZeroTimeDate(item.createdAt);
 
     return (
-      (!dateRange || (dateRange.from <= executedAt && executedAt <= dateRange.to)) &&
+      (!dateRange || (dateRange.from <= createdAt && createdAt <= dateRange.to)) &&
       (!status?.length || status.includes(item.fxStatus)) &&
       (!item.transaction || item.transaction.reference.includes(lcQuery))
     );

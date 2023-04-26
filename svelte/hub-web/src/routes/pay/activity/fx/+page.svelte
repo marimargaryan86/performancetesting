@@ -27,7 +27,7 @@
   export let data: PageData;
 
   let sortDirection: DirectionY = "down";
-  let sortGroup: FlattenedObject<ConversionModel> = "id";
+  let sortGroup: FlattenedObject<ConversionModel> = "createdAt";
 
   $: conversions = sortConversions(
     filterConversions(data.conversions, {
@@ -53,7 +53,7 @@
   <THead>
     <Header>Parent ID</Header>
     <Header>ID</Header>
-    <Header bind:sortGroup bind:sortDirection sortValue="executedAt">Executed</Header>
+    <Header bind:sortGroup bind:sortDirection sortValue="createdAt">Created</Header>
     <Header bind:sortGroup bind:sortDirection sortValue="settledAt">Settlement</Header>
     <Header bind:sortGroup bind:sortDirection sortValue="sellAmount.currency">From</Header>
     <Header bind:sortGroup bind:sortDirection sortValue="buyAmount.currency">To</Header>
@@ -71,7 +71,7 @@
       <TRow>
         <TCol maxWidth="96px" copyable>{conversion.transaction?.reference ?? ""}</TCol>
         <TCol maxWidth="96px" copyable>{conversion.id}</TCol>
-        <TCol>{yymmdd(conversion.executedAt)}</TCol>
+        <TCol>{yymmdd(conversion.createdAt)}</TCol>
         <TCol>{yymmdd(conversion.settledAt)}</TCol>
         <TCol class="currency typography bold">{conversion.sellAmount.currency}</TCol>
         <TCol class="currency typography bold">{conversion.buyAmount.currency}</TCol>

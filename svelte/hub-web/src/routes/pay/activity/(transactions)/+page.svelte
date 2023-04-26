@@ -54,7 +54,6 @@
 
 <Table class="transactions-table">
   <THead>
-    <Header>Parent ID</Header>
     <Header>ID</Header>
     <Header bind:sortGroup bind:sortDirection sortValue="createdAt">Created</Header>
     <Header bind:sortGroup bind:sortDirection sortValue="payer.name">Payer</Header>
@@ -75,8 +74,7 @@
   <TBody>
     {#each transactions as item}
       <TRow>
-        <TCol maxWidth="96px" copyable>{item.parentId}</TCol>
-        <TCol maxWidth="96px" copyable>{item.id}</TCol>
+        <TCol maxWidth="96px" copyable>{item.bookingId}</TCol>
         <TCol>{yymmdd(item.createdAt)}</TCol>
         <TCol maxWidth="160px">
           {#if item.payer}

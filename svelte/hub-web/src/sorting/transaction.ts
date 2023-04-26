@@ -13,11 +13,9 @@ export function sortTransactions(
   nextTransactions.sort((a, b) => {
     switch (options.by) {
       case "id":
-        return 0 - (a.id < b.id ? 1 : -1);
-      case "parentId":
-        return 0 - (a.parentId < b.parentId ? 1 : -1);
+        return 0 - (a.bookingId < b.bookingId ? 1 : -1);
       case "createdAt":
-        return 0 - (a.createdAt < b.createdAt ? 1 : -1);
+        return 0 - (a.createdAt > b.createdAt ? 1 : -1);
       case "payer.name":
         return 0 - ((a.payer?.name ?? 0) < (b.payer?.name ?? 0) ? 1 : -1);
       case "amounts.quotation.amount":

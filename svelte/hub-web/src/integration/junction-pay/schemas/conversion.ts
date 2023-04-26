@@ -13,7 +13,7 @@ export type ConversionStatus = (typeof conversionStatus)[number];
 
 export interface ConversionSchema extends ConversionIdentifierSchema {
   attributes: {
-    executedAt: string;
+    createdAt: string;
     settledAt: string;
     sellAmount: MoneySchema;
     buyAmount: MoneySchema;
