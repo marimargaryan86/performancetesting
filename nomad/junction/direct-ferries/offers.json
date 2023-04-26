@@ -1,5 +1,6 @@
 {
     "development": {
+        "deploy": false,
         "variables": {
             "count": 1,
             "api_url": "https://sandbox-api.test.directferriesconnect.com",
