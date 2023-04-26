@@ -1,10 +1,10 @@
 import json
 import logging
-import sys
 
 import httpx
 import pytest
 
+from snowfall.project.junction.api_automation.conftest import EXIT_MSG
 from snowfall.project.junction.api_automation.test_functions.pay_admin_client import (
     PayAdminClient,
 )
@@ -12,7 +12,6 @@ from snowfall.vendor.junction.pay.client import Client
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
-EXIT_MSG = "Exiting ; check your logs"
 
 
 @pytest.mark.integration()
@@ -28,7 +27,7 @@ async def test_get_currencies(
     except httpx.HTTPStatusError as err:
         logger.info("response_list_all_currencies err: %s", err.response.headers)
         logger.info("response_list_all_currencies body: %s", err.response.json())
-        sys.exit(EXIT_MSG)
+        pytest.fail(EXIT_MSG, pytrace=False)
     logger.info(
         "list_all_currencies: %s",
         json.dumps(response_list_all_currencies, indent=4),

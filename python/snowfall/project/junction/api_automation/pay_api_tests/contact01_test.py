@@ -1,10 +1,10 @@
 import json
 import logging
-import sys
 
 import httpx
 import pytest
 
+from snowfall.project.junction.api_automation.conftest import EXIT_MSG
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
     is_valid_uuid,
     return_randomized_token,
@@ -14,15 +14,7 @@ from snowfall.project.junction.api_automation.test_functions.pay_admin_client im
 )
 
 logger = logging.getLogger()
-formatter = logging.Formatter(
-    "[%(asctime)s] %(levelname)s [%(filename)s.%(funcName)s:%(lineno)d] %(message)s",
-    datefmt="%a, %d %b %Y %H:%M:%S",
-)
-se = logging.StreamHandler(sys.stderr)
-se.setFormatter(formatter)
-logger.addHandler(se)
 logger.setLevel(logging.DEBUG)
-EXIT_MSG = "Exiting ; check your logs"
 
 
 @pytest.mark.integration()
@@ -52,7 +44,7 @@ async def test_create_contacts(  # noqa: WPS210, WPS218
     except httpx.HTTPStatusError as err:
         logger.info("response_company err: %s", err.response.headers)
         logger.info("response_company body: %s", err.response.json())
-        sys.exit(EXIT_MSG)
+        pytest.fail(EXIT_MSG, pytrace=False)
 
     logging.info("create_company: %s", json.dumps(response_company, indent=4))
 
@@ -72,7 +64,7 @@ async def test_create_contacts(  # noqa: WPS210, WPS218
     except httpx.HTTPStatusError as err1:
         logger.info("response_create_contact err: %s", err1.response.headers)
         logger.info("response_create_contact body: %s", err1.response.json())
-        sys.exit(EXIT_MSG)
+        pytest.fail(EXIT_MSG, pytrace=False)
 
     logger.info(
         "create_contacts: %s",

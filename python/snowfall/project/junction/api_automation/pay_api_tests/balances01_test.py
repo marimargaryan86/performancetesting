@@ -6,6 +6,7 @@ from typing import Any, Mapping
 import httpx
 import pytest
 
+from snowfall.project.junction.api_automation.conftest import EXIT_MSG
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
     is_valid_uuid,
 )
@@ -15,7 +16,6 @@ from snowfall.project.junction.api_automation.test_functions.pay_admin_client im
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
-EXIT_MSG = "Exiting ; check your logs"
 
 
 @pytest.mark.integration()
@@ -38,7 +38,7 @@ async def test_get_balances(  # noqa: WPS210, WPS218
     except httpx.HTTPStatusError as err2:
         logger.info("response_add_currency err: %s", err2.response.headers)
         logger.info("response_add_currency body: %s", err2.response.json())
-        sys.exit(EXIT_MSG)
+        pytest.fail(EXIT_MSG, pytrace=False)
     logger.info(
         "response_add_currency: %s",
         json.dumps(response_add_currency, indent=4),

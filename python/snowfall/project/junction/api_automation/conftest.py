@@ -2,16 +2,12 @@ import datetime
 import json
 import logging
 import os
-import sys
 from typing import Any, Callable, Iterator, Mapping, Sequence
 
 import httpx
 import hvac
 import pytest
 
-from snowfall.project.junction.api_automation.test_functions.helpers_api import (
-    return_randomized_token,
-)
 from snowfall.project.junction.api_automation.test_functions.mobile_client import (
     MobileApiClient,
 )
@@ -22,7 +18,6 @@ from snowfall.stdlib.transport.http import auth
 from snowfall.vendor.apilayer.client import APILayer
 from snowfall.vendor.junction.auth import UserAuth
 from snowfall.vendor.junction.go.client import Client as GoClient
-from snowfall.vendor.junction.pay.client import Client as PayClient
 
 ALLURE_ENVIRONMENT_PROPERTIES_FILE = "environment.properties"
 ALLUREDIR_OPTION = "--alluredir"
@@ -254,121 +249,6 @@ def pay_admin_client(
 
     return PayAdminClient(
         base_url=base_url_admin_api,
-        auth=auth,
-    )
-
-
-async def create_company(
-    pay_admin_client: PayAdminClient,
-) -> dict[str, Any]:
-    try:
-        response_company = await pay_admin_client.create_company(
-            company="test-company-{0}".format(return_randomized_token()),
-            address_lines=["Radhuset", "Våksalagatan 2", "United Spaces", "Sweden"],
-            country_code="SE",
-            postal_code="75320",
-            city="Uppsala",
-            fx_markup=float(0),
-            fx_provider_markup=float(0),
-            sales_markup=float(0),
-        )
-    except httpx.HTTPStatusError as err:
-        logger.info("response_company err: %s", err.response.headers)
-        logger.info("response_company body: %s", err.response.json())
-        sys.exit(EXIT_MSG)
-    logger.info("create_company: %s", json.dumps(response_company, indent=4))
-    return response_company
-
-
-@pytest.fixture()
-async def pay_create_company(
-    pay_admin_client: PayAdminClient,
-) -> dict[str, Any]:
-    return await create_company(pay_admin_client)
-
-
-@pytest.fixture()
-async def pay_create_contact(
-    pay_admin_client: PayAdminClient,
-    pay_create_company: Mapping[str, Any],
-) -> dict[str, Any]:
-    try:
-        response_create_contact = await pay_admin_client.create_contact(
-            first_name="J",
-            last_name="N",
-            email_address="jerzy.n{0}@snowfalltravel.com".format(
-                return_randomized_token(),
-            ),
-            phone_number="+48123456789",
-            company_id=pay_create_company["data"]["id"],
-        )
-    except httpx.HTTPStatusError as err:
-        logger.info("response_create_contact err: %s", err.response.headers)
-        logger.info("response_create_contact body: %s", err.response.json())
-        pytest.fail(EXIT_MSG, pytrace=False)
-    logger.info(
-        "create_contacts: %s",
-        json.dumps(response_create_contact, indent=4),
-    )
-    return response_create_contact
-
-
-@pytest.fixture()
-async def pay_list_all_currencies(
-    pay_client: PayClient,
-) -> dict[str, Any]:
-    try:
-        response_list_all_currencies = await pay_client.list_all_currencies()
-    except httpx.HTTPStatusError as err:
-        logger.info("response_list_all_currencies err: %s", err.response.headers)
-        logger.info("response_list_all_currencies body: %s", err.response.json())
-        sys.exit(EXIT_MSG)
-    logger.info(
-        "list_all_currencies: %s",
-        json.dumps(response_list_all_currencies, indent=4),
-    )
-    return response_list_all_currencies
-
-
-@pytest.fixture()
-async def pay_get_accounts(
-    pay_admin_client: PayAdminClient,
-    pay_create_account: Mapping[str, Any],
-) -> dict[str, Any]:
-    try:
-        response_get_accounts = await pay_admin_client.get_accounts()
-    except httpx.HTTPStatusError as err:
-        logger.info("response_get_accounts err: %s", err.response.headers)
-        logger.info("response_get_accounts body: %s", err.response.json())
-        sys.exit(EXIT_MSG)
-    logger.info("get_accounts: %s", json.dumps(response_get_accounts, indent=4))
-    return response_get_accounts
-
-
-@pytest.fixture()
-def pay_client(
-    api_token: str,
-    host: str,
-) -> PayClient:
-    email = get_variable_value(host, api_token, "pay_api_test_email")
-    password = get_variable_value(host, api_token, "pay_api_test_password")
-    base_url_admin_api = "{0}{1}".format(
-        HTTPS_PREFIX,
-        get_variable_value(host, api_token, "pay_admin_api_host"),
-    )
-    base_url = "{0}{1}".format(
-        HTTPS_PREFIX,
-        get_variable_value(host, api_token, "pay_api_host"),
-    )
-
-    auth = UserAuth(
-        base_url=base_url_admin_api,
-        email=email,
-        password=password,
-    )
-
-    return PayClient(
-        base_url=base_url,
         auth=auth,
     )
 

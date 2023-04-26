@@ -28,7 +28,7 @@ async def test_get_rate(
     except httpx.HTTPStatusError as err:
         logger.info("response api_layer get_rates err: %s", err.response.headers)
         logger.info("response api_layer get_rates body: %s", err.response.json())
-        pytest.exit(EXIT_MSG)
+        pytest.fail(EXIT_MSG, pytrace=False)
 
     rate_splitted = str(response).split("rate=")
     rate_string = rate_splitted[1][:-2]

@@ -1,11 +1,11 @@
 import json
 import logging
-import sys
 from typing import Any, Mapping
 
 import httpx
 import pytest
 
+from snowfall.project.junction.api_automation.conftest import EXIT_MSG
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
     is_valid_uuid,
     return_randomized_token,
@@ -16,7 +16,6 @@ from snowfall.project.junction.api_automation.test_functions.pay_admin_client im
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
-EXIT_MSG = "Exiting ; check your logs"
 
 
 @pytest.mark.integration()
@@ -33,7 +32,7 @@ async def test_create_account(  # noqa: WPS218
     except httpx.HTTPStatusError as err:
         logger.info("response_create_account: %s", err.response.headers)
         logger.info("response_create_account body: %s", err.response.json())
-        sys.exit(EXIT_MSG)
+        pytest.fail(EXIT_MSG, pytrace=False)
     logger.info(
         "response_create_account: %s",
         json.dumps(response_create_account, indent=4),

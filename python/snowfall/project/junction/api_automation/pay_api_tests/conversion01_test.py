@@ -15,7 +15,6 @@ from snowfall.vendor.junction.pay.client import Client
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
-EXIT_MSG = "Exiting ; check your logs"
 
 
 @pytest.mark.integration()

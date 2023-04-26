@@ -1,6 +1,5 @@
 import json
 import logging
-import sys
 
 import pytest
 
@@ -13,13 +12,6 @@ from snowfall.project.junction.api_automation.test_functions.pay_admin_client im
 )
 
 logger = logging.getLogger()
-formatter = logging.Formatter(
-    "[%(asctime)s] %(levelname)s [%(filename)s.%(funcName)s:%(lineno)d] %(message)s",
-    datefmt="%a, %d %b %Y %H:%M:%S",
-)
-se = logging.StreamHandler(sys.stderr)
-se.setFormatter(formatter)
-logger.addHandler(se)
 logger.setLevel(logging.DEBUG)
 
 

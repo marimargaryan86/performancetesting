@@ -1,12 +1,12 @@
 import json
 import logging
-import sys
 from typing import Any, Mapping
 
 import httpx
 import pytest
 from dateutil import parser
 
+from snowfall.project.junction.api_automation.conftest import EXIT_MSG
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
     is_valid_uuid,
     return_randomized_token,
@@ -18,15 +18,7 @@ from snowfall.stdlib import string
 from snowfall.vendor.junction.pay.client import Client
 
 logger = logging.getLogger()
-formatter = logging.Formatter(
-    "[%(asctime)s] %(levelname)s [%(filename)s.%(funcName)s:%(lineno)d] %(message)s",
-    datefmt="%a, %d %b %Y %H:%M:%S",
-)
-se = logging.StreamHandler(sys.stderr)
-se.setFormatter(formatter)
-logger.addHandler(se)
 logger.setLevel(logging.DEBUG)
-EXIT_MSG = "Exiting ; check your logs"
 
 
 @pytest.mark.integration()
@@ -49,7 +41,7 @@ async def test_get_transactions(  # noqa: WPS210, WPS213, WPS218, C901
     except httpx.HTTPStatusError as err:
         logger.info("response_payer err: %s", err.response.headers)
         logger.info("response_payer body: %s", err.response.json())
-        sys.exit(EXIT_MSG)
+        pytest.fail(EXIT_MSG, pytrace=False)
 
     try:
         response_beneficiary = await pay_admin_client.create_company(
@@ -65,7 +57,7 @@ async def test_get_transactions(  # noqa: WPS210, WPS213, WPS218, C901
     except httpx.HTTPStatusError as err1:
         logger.info("response_beneficiary err:: %s", err1.response.headers)
         logger.info("response_beneficiary body: %s", err1.response.json())
-        sys.exit(EXIT_MSG)
+        pytest.fail(EXIT_MSG, pytrace=False)
 
     try:
         response_create_quote = await pay_client.create_quote(
@@ -82,7 +74,7 @@ async def test_get_transactions(  # noqa: WPS210, WPS213, WPS218, C901
             err2.response.headers,
         )
         logger.info("response_create_quote body: %s", err2.response.json())
-        sys.exit(EXIT_MSG)
+        pytest.fail(EXIT_MSG, pytrace=False)
 
     logger.info("create_quote: %s", json.dumps(response_create_quote, indent=4))
 
@@ -102,7 +94,7 @@ async def test_get_transactions(  # noqa: WPS210, WPS213, WPS218, C901
     except httpx.HTTPStatusError as err3:
         logger.info("response err:: %s", err3.response.headers)
         logger.info("response_create_transactions body: %s", err3.response.json())
-        sys.exit(EXIT_MSG)
+        pytest.fail(EXIT_MSG, pytrace=False)
 
     logger.info(
         "create_transactions: %s",
@@ -114,7 +106,7 @@ async def test_get_transactions(  # noqa: WPS210, WPS213, WPS218, C901
     except httpx.HTTPStatusError as err4:
         logger.info("response_get_transactions err:: %s", err4.response.headers)
         logger.info("response_get_transactions body: %s", err4.response.json())
-        sys.exit(EXIT_MSG)
+        pytest.fail(EXIT_MSG, pytrace=False)
 
     logger.info(
         "create_transactions: %s",

@@ -3,7 +3,9 @@ from typing import Any, Mapping, Sequence
 
 import pytest
 
-from snowfall.project.junction.api_automation.conftest import create_company
+from snowfall.project.junction.api_automation.pay_api_tests.conftest import (
+    create_company,
+)
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
     is_valid_uuid,
 )

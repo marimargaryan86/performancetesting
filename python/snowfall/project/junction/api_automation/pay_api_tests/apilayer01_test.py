@@ -27,7 +27,7 @@ async def test_quote(
     except httpx.HTTPStatusError as err:
         logger.info("response api_layer quote err: %s", err.response.headers)
         logger.info("response api_layer quote body: %s", err.response.json())
-        pytest.exit(EXIT_MSG)
+        pytest.fail(EXIT_MSG, pytrace=False)
 
     logger.info("quote: %s", response)
 
