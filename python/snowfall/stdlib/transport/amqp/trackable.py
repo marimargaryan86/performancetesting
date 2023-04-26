@@ -235,6 +235,7 @@ class TrackableProducer(protocol.Producer):
         self,
         msg: message.Message,
         routing_key: str,
+        expiration: datetime.timedelta | datetime.datetime | None = None,
         headers: Mapping[str, str] | None = None,
         trackable_id: str | None = None,
         trackable_routing_key: str | None = None,

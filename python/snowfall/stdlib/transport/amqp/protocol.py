@@ -1,3 +1,4 @@
+import datetime
 from typing import Awaitable, Callable, Mapping, Protocol, TypeVar
 
 from google.protobuf import message
@@ -22,6 +23,7 @@ class Producer(Protocol):
         self,
         msg: message.Message,
         routing_key: str,
+        expiration: datetime.timedelta | datetime.datetime | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> None:
         """Publish a message on the exchange."""

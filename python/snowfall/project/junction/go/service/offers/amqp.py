@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 
 from snowfall.project.junction.go.service.offers.offers import OfferOptionsRepository
 from snowfall.project.junction.go.service.offers.v1alpha import amqp_pb2, models_pb2
@@ -10,9 +11,11 @@ class OfferSearchProducer(object):
         self,
         producer: trackable.TrackableProducer,
         routing_key: str,
+        ttl: datetime.timedelta | None = None,
     ):
         self._producer = producer
         self._routing_key = routing_key
+        self._ttl = ttl
 
     async def publish(
         self,
@@ -26,6 +29,7 @@ class OfferSearchProducer(object):
                     session_token=offer_search.session_token,
                 ),
                 routing_key=self._routing_key,
+                expiration=self._ttl,
                 trackable_id=offer_search.id,
             ),
         )

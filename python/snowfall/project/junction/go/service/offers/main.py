@@ -91,6 +91,7 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
                             ),
                         ),
                         routing_key=_TRIP_OFFER_SEARCH_ROUTING_KEY,
+                        ttl=app.settings.default_ttl,
                     ),
                     default_page_size=app.settings.default_page_size,
                 ),

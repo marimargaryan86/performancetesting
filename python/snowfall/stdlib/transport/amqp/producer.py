@@ -36,6 +36,7 @@ class Producer(protocol.Producer):
         self,
         msg: message.Message,
         routing_key: str,
+        expiration: datetime.timedelta | datetime.datetime | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> None:
         with get_span(
@@ -64,6 +65,7 @@ class Producer(protocol.Producer):
                                 ).timestamp(),
                             ),
                         },
+                        expiration=expiration,
                         content_type="application/x-protobuf",
                     ),
                     routing_key=routing_key,
