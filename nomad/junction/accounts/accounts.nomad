@@ -66,6 +66,10 @@ job "accounts-grpc" {
       port = "grpc"
       tags = ["grpc"]
 
+      connect {
+        sidecar_service {}
+      }
+
       check {
         type     = "grpc"
         interval = "10s"
