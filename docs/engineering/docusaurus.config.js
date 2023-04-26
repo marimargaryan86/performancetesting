@@ -7,7 +7,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Snowfall Engineering',
-  tagline: 'Dinosaurs are cool',
+  tagline: 'engineering.snowfalltravel.com',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
@@ -55,12 +55,10 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
-      // Replace with your project's social card
-      image: 'img/docusaurus-social-card.jpg',
       navbar: {
         title: 'Snowfall Engineering',
         logo: {
-          alt: 'My Site Logo',
+          alt: 'Snowfall',
           src: 'img/logo.svg',
         },
         items: [
