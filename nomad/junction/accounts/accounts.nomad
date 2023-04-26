@@ -62,7 +62,7 @@ job "accounts-grpc" {
     }
 
     service {
-      name = "accounts-grpc-${var.environment}"
+      name = "accounts-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
 
@@ -74,7 +74,7 @@ job "accounts-grpc" {
     }
 
     service {
-      name = "accounts-grpc-${var.environment}"
+      name = "accounts-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 
