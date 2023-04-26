@@ -31,6 +31,10 @@ class AlreadyExistsError(Exception):
     """Raise when the resource already exists."""
 
 
+class UnhandledError(Exception):
+    """Raised when an unhandled error occurs."""
+
+
 class Client(abc.ABC):
     @abc.abstractmethod
     async def authenticate(
@@ -178,6 +182,8 @@ class GrpcClient(Client):
             if exc.code() == grpc.StatusCode.INVALID_ARGUMENT:
                 raise InvalidArgumentError(exc.details()) from exc
 
+            raise UnhandledError() from exc
+
         return response.auth_token
 
     async def create_user(
@@ -198,6 +204,8 @@ class GrpcClient(Client):
 
             if exc.code() == grpc.StatusCode.ALREADY_EXISTS:
                 raise AlreadyExistsError(exc.details()) from exc
+
+            raise UnhandledError() from exc
 
         return response.user
 
@@ -220,5 +228,7 @@ class GrpcClient(Client):
 
             if exc.code() == grpc.StatusCode.NOT_FOUND:
                 raise NotFoundError(exc.details()) from exc
+
+            raise UnhandledError() from exc
 
         return response.user
