@@ -65,11 +65,7 @@ class OfferGroupCache(object):
     ) -> bool:
         # only claim to have cached results if we were successful
         if not exc_type:
-            fallback_expiry = datetime.datetime.now(
-                tz=datetime.timezone.utc,
-            ) + datetime.timedelta(
-                hours=1,
-            )  # TODO: tweak to what we want
+            fallback_expiry = datetime.timedelta(days=1)
 
             await self._redis.put(self._seen_key, b"\x00")
             await redis_types.put_expires_at_if_less_than_current(
@@ -95,11 +91,7 @@ class OfferGroupCache(object):
         offer: offers_pb2.OfferGroup,
     ) -> None:
         await self._offers.add(offer.SerializeToString(deterministic=True))
-        await redis_types.put_expires_at_if_less_than_current(
-            self._redis,
-            self._offers,
-            offer.expires_at.ToDatetime(tzinfo=datetime.timezone.utc),
-        )
+        await self._redis.put_expires_at(self._offers, datetime.timedelta(days=1))
 
 
 class OfferGroupRepository(Generic[_CriteriaType]):

@@ -153,9 +153,15 @@ class Client(Generic[AnyStr]):  # noqa: WPS214
     async def put(self, name: str, raw_value: bytes | float | int | str) -> None:
         await self._redis.set(self._prefix + name, raw_value)
 
-    async def put_expires_at(self, name: object, expiry: datetime.datetime) -> None:
-        expires_in = expiry - datetime.datetime.now(tz=datetime.timezone.utc)
-        await self._redis.expire(self._prefix_name(name), expires_in)
+    async def put_expires_at(
+        self,
+        name: object,
+        expiry: datetime.datetime | datetime.timedelta,
+    ) -> None:
+        if isinstance(expiry, datetime.datetime):
+            expiry = expiry - datetime.datetime.now(tz=datetime.timezone.utc)
+
+        await self._redis.expire(self._prefix_name(name), expiry)
 
     async def get_expires_at(self, name: object) -> datetime.datetime | None:
         expiry = await self._redis.pttl(self._prefix_name(name))
@@ -178,8 +184,11 @@ class Client(Generic[AnyStr]):  # noqa: WPS214
 async def put_expires_at_if_less_than_current(
     redis_client: Client[AnyStr],
     name: object,
-    expiry: datetime.datetime,
+    expiry: datetime.datetime | datetime.timedelta,
 ) -> None:
+    if isinstance(expiry, datetime.timedelta):
+        expiry = datetime.datetime.now(tz=datetime.timezone.utc) + expiry
+
     expiry_at = await redis_client.get_expires_at(name)
 
     if expiry_at and expiry > expiry_at:
