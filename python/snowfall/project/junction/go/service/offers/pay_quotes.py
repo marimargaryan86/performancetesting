@@ -33,6 +33,7 @@ class PayQuotes(object):
             offer_money = money.from_protobuf(offer.price)
             quote = await self._get_quote(
                 amount=offer_money.amount,
+                session_token=session_token,
                 payer_id=payer_id,
                 beneficiary_id=search_result.provider_company_id,
                 from_currency=offer_money.currency.code,
@@ -64,6 +65,7 @@ class PayQuotes(object):
 
         quote = await self._get_quote(
             amount=price_quote_money.amount,
+            session_token=session_token,
             payer_id=payer_id,
             beneficiary_id=search_result.provider_company_id,
             from_currency=price_quote_money.currency.code,
@@ -89,6 +91,7 @@ class PayQuotes(object):
     async def _get_quote(  # noqa: WPS211
         self,
         amount: int,
+        session_token: str,
         payer_id: str,
         beneficiary_id: str,
         from_currency: str,
@@ -96,7 +99,7 @@ class PayQuotes(object):
     ) -> PayQuoteResponse:
         resp = await self._pay_client.create_quote(
             amount=amount,
-            external_reference="",
+            external_reference=session_token,
             payer_id=payer_id,
             beneficiary_id=beneficiary_id,
             from_currency=from_currency,

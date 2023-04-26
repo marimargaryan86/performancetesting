@@ -105,8 +105,9 @@ async def test_that_pay_quotes_invoked_and_response_returned() -> None:
 
     mock_pay_client.create_quote.return_value = mock_resp
 
-    quote = await pay_quotes._get_quote(  # noqa:WPS437
+    quote = await pay_quotes._get_quote(  # noqa: WPS437  # nosec
         amount=1000,
+        session_token="session-token",
         payer_id="payer-id",
         beneficiary_id="beneficiary-id",
         from_currency="EUR",
@@ -116,7 +117,7 @@ async def test_that_pay_quotes_invoked_and_response_returned() -> None:
     assert quote == expected_resp
     mock_pay_client.create_quote.assert_called_once_with(
         amount=1000,
-        external_reference="",
+        external_reference="session-token",
         payer_id="payer-id",
         beneficiary_id="beneficiary-id",
         from_currency="EUR",
@@ -174,7 +175,7 @@ async def test_that_all_amounts_in_trip_offer_search_result_replaced_with_conver
 
     mock_pay_client.create_quote.assert_any_call(
         amount=50000,
-        external_reference="",
+        external_reference="session-token",
         payer_id="payer-id",
         beneficiary_id="provider-id-1",
         from_currency="EUR",
@@ -182,7 +183,7 @@ async def test_that_all_amounts_in_trip_offer_search_result_replaced_with_conver
     )
     mock_pay_client.create_quote.assert_any_call(
         amount=10000,
-        external_reference="",
+        external_reference="session-token",
         payer_id="payer-id",
         beneficiary_id="provider-id-1",
         from_currency="EUR",
@@ -230,7 +231,7 @@ async def test_that_price_in_trip_price_quote_result_replaced_with_conversion() 
 
     mock_pay_client.create_quote.assert_called_once_with(
         amount=50000,
-        external_reference="",
+        external_reference="session-token",
         payer_id="payer-id",
         beneficiary_id="provider-id-1",
         from_currency="EUR",
