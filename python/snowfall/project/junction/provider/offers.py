@@ -2,7 +2,6 @@ import dataclasses
 import datetime
 from typing import AsyncIterator, Callable, Generic, Sequence, TypeVar
 
-import tenacity
 from aiostream import stream
 from google.protobuf import message
 
@@ -76,7 +75,6 @@ class TripOfferSearcher(Generic[_SearchCriteriaTask, _SearchCriteria]):
             async for offer_group in offer_groups:
                 yield offer_group
 
-    @tenacity.retry(stop=tenacity.stop_after_attempt(3))
     async def _process_search_criterion_task(
         self,
         task: _SearchCriteriaTask,
@@ -117,6 +115,15 @@ class TripOfferSearchConsumer(Generic[_SearchCriteriaTask, _SearchCriteria]):
         await self._consumer.consume(self._process_message)
 
     async def _process_message(
+        self,
+        amqp_message: amqp_types.Message[offers_amqp_pb2.TripOfferSearchTask],
+    ) -> None:
+        try:
+            await self._publish_trip_offer_search_results(amqp_message)
+        except repository.OfferCacheLockError:
+            await amqp_message.nack(requeue=True)
+
+    async def _publish_trip_offer_search_results(
         self,
         amqp_message: amqp_types.Message[offers_amqp_pb2.TripOfferSearchTask],
     ) -> None:
