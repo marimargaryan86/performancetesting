@@ -268,3 +268,18 @@ func (mr *mergeRequest) approve() error {
 
 	return nil
 }
+
+func (mr *mergeRequest) unapprove() error {
+	_, err := mr.client.MergeRequestApprovals.UnapproveMergeRequest(
+		mr.object.ProjectID,
+		mr.object.IID,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	mr.hasChanged = true
+
+	return nil
+}

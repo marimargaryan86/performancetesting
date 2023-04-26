@@ -9,19 +9,8 @@ import (
 )
 
 func (mr *mergeRequest) merge() error {
-	if mr.object.State != "opened" || mr.status() != statusAccepted {
-		mr.logger.Debug("Not in a mergeable state, skipping.")
-		return nil
-	}
-
-	commitMessage := mr.object.Title + "\n\n"
-	state, err := mr.approvalState()
-
-	if err != nil {
-		return err
-	}
-
 	names := make([]string, 0)
+	state, err := mr.approvalState()
 	hasSnowman := false
 
 	for _, rule := range state.Rules {
@@ -34,8 +23,25 @@ func (mr *mergeRequest) merge() error {
 		}
 	}
 
+	if mr.object.State != "opened" || mr.status() != statusAccepted {
+		mr.logger.Debug("Not in a mergeable state, skipping.")
+
+		if hasSnowman {
+			return mr.unapprove()
+		}
+		return nil
+	}
+
 	if !hasSnowman {
-		return mr.approve()
+		if err = mr.approve(); err != nil {
+			return err
+		}
+	}
+
+	commitMessage := mr.object.Title + "\n\n"
+
+	if err != nil {
+		return err
 	}
 
 	for _, name := range sliceutil.Unique(names) {
