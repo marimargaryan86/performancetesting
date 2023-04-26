@@ -2,9 +2,9 @@ python_sources(dependencies=[":routes", ":ports"])
 resource(
     name="routes",
     source=http_source(
-        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/df-routes-7e6a7901292ce33ac04608199c22b59201c70211d0d8ca79d3a116d73217accb.json",
-        len=316750,
-        sha256="7e6a7901292ce33ac04608199c22b59201c70211d0d8ca79d3a116d73217accb",
+        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/df-routes-e19416278999f2f0cdf7d063bb8287fe747dd2ffcea22aaa70e003210e2f8d54.json",
+        len=1418865,
+        sha256="e19416278999f2f0cdf7d063bb8287fe747dd2ffcea22aaa70e003210e2f8d54",
         filename="routes.json",
     ),
 )
