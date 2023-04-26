@@ -112,7 +112,7 @@ async def valid_conversion(
         settlement_date=protobuf.datetime_to_protobuf(
             datetime.now() - timedelta(hours=1),
         ),
-        execution_date=protobuf.datetime_to_protobuf(
+        created_at=protobuf.datetime_to_protobuf(
             datetime.now() - timedelta(hours=2),
         ),
         buy_amount=usd.protobuf(),

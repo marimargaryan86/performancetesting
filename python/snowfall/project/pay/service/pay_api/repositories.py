@@ -90,9 +90,6 @@ class ConversionRepository(
             settlement_date=protobuf.datetime_to_protobuf(
                 cc_conversion.settlement_date,
             ),
-            execution_date=protobuf.datetime_to_protobuf(
-                cc_conversion.conversion_date,
-            ),
             buy_amount=money.from_string(
                 cc_conversion.client_buy_amount,
                 money.Currency(cc_conversion.buy_currency),

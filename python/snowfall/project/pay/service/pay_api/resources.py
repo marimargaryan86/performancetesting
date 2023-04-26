@@ -317,8 +317,8 @@ class ConversionResource(models.Resource):
             id=conversion.id,
             type=ConversionResource.api_type,
             attributes={
-                "executedAt": protobuf.protobuf_to_datetime(
-                    conversion.execution_date,
+                "createdAt": protobuf.protobuf_to_datetime(
+                    conversion.created_at,
                 ),
                 "settledAt": protobuf.protobuf_to_datetime(
                     conversion.settlement_date,
