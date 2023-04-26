@@ -1,5 +1,5 @@
 import lagom
-from starlette import endpoints, requests, responses, status
+from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.pay.adapter import accounts as accounts_adapter
 from snowfall.project.pay.service.accounts import repositories
@@ -20,6 +20,28 @@ from snowfall.vendor.currency_cloud.models import account as cc_account_models
 from snowfall.vendor.currency_cloud.models import contact as cc_contact_models
 
 
+class Account(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        accounts_client: accounts_adapter.GrpcClient = lagom.injectable,
+    ) -> responses.Response:
+        account_id = request.path_params["accountId"]
+        account = await accounts_client.get(account_id)
+        if not account:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+        return await messages.create_response(
+            body=messages.models.Body(
+                data=resources.AccountResource.from_proto(
+                    account,
+                    request,
+                ),
+            ),
+            request=request,
+        )
+
+
 class Accounts(endpoints.HTTPEndpoint):
     async def get(
         self,
@@ -36,11 +58,12 @@ class Accounts(endpoints.HTTPEndpoint):
                 data=[
                     resources.AccountResource.from_proto(
                         account,
+                        request,
                     )
                     for account in db_accounts.accounts
                 ],
                 links=pagination_helpers.get_next_url(
-                    request.url_for("Account"),
+                    request.url_for("Accounts"),
                     db_accounts.next_page_token,
                     pagination,
                 ),
@@ -56,10 +79,28 @@ class Accounts(endpoints.HTTPEndpoint):
         companies_repository: CompanyRepository = lagom.injectable,
         payment_client: PaymentClient = lagom.injectable,
     ) -> responses.Response:
-        body = await request_helpers.flatten_request(request)
+        body = await request.json()
+        if body["data"]["relationships"]["contact"] is None:
+            return models.JsonApiResponse(
+                body=messages.models.Body(
+                    errors=[
+                        messages.models.Error(
+                            status=str(status.HTTP_400_BAD_REQUEST),
+                            code="bad_request",
+                            detail="Contact should not be null",
+                            source=messages.models.ErrorSourcePointer(
+                                pointer="/data/relationships/contact",
+                            ),
+                        ),
+                    ],
+                ),
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+
+        flatten_body = request_helpers.flatten_request_body(body)
 
         contact = await contact_repository.find_by_id(
-            body["contact"],
+            flatten_body["contact"],
         )
 
         if not contact:
@@ -115,7 +156,11 @@ class Accounts(endpoints.HTTPEndpoint):
             )
 
         try:
-            cc_account = self._create_cc_account(body["name"], company, payment_client)
+            cc_account = self._create_cc_account(
+                flatten_body["name"],
+                company,
+                payment_client,
+            )
         except CurrencyCloudError as exception:
             return self._generate_error(exception)
 
@@ -150,6 +195,7 @@ class Accounts(endpoints.HTTPEndpoint):
             body=models.Body(
                 data=resources.AccountResource.from_proto(
                     account,
+                    request,
                 ),
             ),
             request=request,

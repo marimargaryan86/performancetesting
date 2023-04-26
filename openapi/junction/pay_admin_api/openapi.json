@@ -807,6 +807,50 @@
         }
       }
     },
+    "/accounts/{accountId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/accountId"
+        }
+      ],
+      "get": {
+        "summary": "Get account",
+        "description": "Get account",
+        "tags": [
+          "accounts"
+        ],
+        "operationId": "get-accounts-id",
+        "responses": {
+          "200": {
+            "description": "Account is found",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Account"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
     "/accounts": {
       "get": {
         "summary": "List accounts",
@@ -1450,83 +1494,90 @@
       },
       "Account": {
         "title": "Account",
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
-            "format": "uuid",
-            "readOnly": true
-          },
-          "type": {
-            "type": "string",
-            "example": "accounts",
-            "enum": [
-              "accounts"
-            ]
-          },
-          "attributes": {
+        "description": "Account schema",
+        "allOf": [
+          {
             "type": "object",
             "properties": {
-              "name": {
+              "id": {
                 "type": "string",
-                "example": "account",
-                "minLength": 1,
-                "maxLength": 150
-              },
-              "status": {
-                "type": "string",
-                "example": "status",
+                "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
+                "format": "uuid",
                 "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "example": "accounts",
+                "enum": [
+                  "accounts"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "account",
+                    "minLength": 1,
+                    "maxLength": 150
+                  },
+                  "status": {
+                    "type": "string",
+                    "example": "status",
+                    "readOnly": true
+                  }
+                },
+                "required": [
+                  "name",
+                  "status"
+                ]
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "company",
+                  "contact"
+                ],
+                "properties": {
+                  "company": {
+                    "type": "object",
+                    "readOnly": true,
+                    "nullable": true,
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/CompanyIdentifier"
+                      }
+                    }
+                  },
+                  "contact": {
+                    "type": "object",
+                    "nullable": true,
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/ContactIdentifier"
+                      }
+                    }
+                  }
+                }
               }
             },
             "required": [
-              "name",
-              "status"
+              "id",
+              "type",
+              "attributes",
+              "relationships"
             ]
           },
-          "relationships": {
-            "type": "object",
-            "required": [
-              "company",
-              "contact"
-            ],
-            "properties": {
-              "company": {
-                "type": "object",
-                "readOnly": true,
-                "nullable": true,
-                "required": [
-                  "data"
-                ],
-                "properties": {
-                  "data": {
-                    "$ref": "#/components/schemas/CompanyIdentifier"
-                  }
-                }
-              },
-              "contact": {
-                "type": "object",
-                "nullable": true,
-                "required": [
-                  "data"
-                ],
-                "properties": {
-                  "data": {
-                    "$ref": "#/components/schemas/ContactIdentifier"
-                  }
-                }
-              }
-            }
+          {
+            "$ref": "#/components/schemas/SelfLink"
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "attributes",
-          "relationships"
-        ],
-        "description": "Account schema."
+        ]
       },
       "Beneficiary": {
         "title": "Beneficiary",

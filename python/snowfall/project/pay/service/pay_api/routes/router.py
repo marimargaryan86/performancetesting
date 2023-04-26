@@ -102,8 +102,14 @@ def get_admin_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
         integration.route(
             "/accounts",
             accounts.Accounts,
-            name="Account",
+            name="Accounts",
             methods=["POST", "GET"],
+        ),
+        integration.route(
+            "/accounts/{accountId}",
+            accounts.Account,
+            name="Account",
+            methods=["GET"],
         ),
         integration.route(
             "/conversions/{conversionId}",

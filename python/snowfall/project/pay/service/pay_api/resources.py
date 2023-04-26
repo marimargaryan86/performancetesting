@@ -272,6 +272,7 @@ class AccountResource(models.Resource):
     def from_proto(
         cls,
         account: account_models.Account,
+        request: requests.Request,
     ) -> AccountResource:
         relationships: dict[str, Any] = {
             "company": None,
@@ -299,6 +300,14 @@ class AccountResource(models.Resource):
                 "status": account.status,
             },
             relationships=relationships,
+            links={
+                _SELF_HREF: str(
+                    request.url_for(
+                        "Account",
+                        accountId=account.id,
+                    ),
+                ),
+            },
         )
 
 
