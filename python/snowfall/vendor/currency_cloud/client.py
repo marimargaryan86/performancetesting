@@ -26,6 +26,7 @@ from snowfall.vendor.currency_cloud.models.conversion import (
     ConversionRequest,
     ConversionResponse,
 )
+from snowfall.vendor.currency_cloud.models.rate import BasicRateResponse
 
 
 def error_handler(func: Callable[..., Any]) -> Callable[..., Any]:
@@ -144,3 +145,20 @@ class PaymentClient(object):  # noqa: WPS214
         )
 
         return BeneficiaryResponse(**created_beneficiary._attributes)  # noqa: WPS437
+
+    @error_handler
+    def get_basic_rates(self, currency_pairs: str) -> list[BasicRateResponse]:
+        basic_rates = self._cc_client.rates.find(currency_pair=currency_pairs)
+
+        rates = []
+
+        for rate in basic_rates.currencies:
+            rates.append(
+                BasicRateResponse(
+                    sell_currency=rate.currency_pair[:3],
+                    buy_currency=rate.currency_pair[3:],
+                    rate=rate.offer,
+                ),
+            )
+
+        return rates
