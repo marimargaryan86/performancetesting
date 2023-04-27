@@ -121,6 +121,11 @@ class Proxy(object):
             content=response.content.replace(their_base_url, our_base_url),
             status_code=response.status_code,
             media_type=response.headers["Content-Type"],
+            headers={
+                h_key: h_value
+                for h_key, h_value in response.headers.items()
+                if h_key.startswith("x")
+            },
         )
 
 

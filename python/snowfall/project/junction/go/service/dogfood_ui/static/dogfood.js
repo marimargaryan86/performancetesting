@@ -429,6 +429,11 @@ function inject_trips(tripSearchId, response) {
         trip.id +
         '"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></dd>';
       infoList.innerHTML +=
+        '<dt class="col-sm-2">Trace ID</dt><dd class="col-sm-10" id="trace-' +
+        trip.id +
+        '"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></dd>';
+
+      infoList.innerHTML +=
         '<dt class="col-sm-2">Offers</dt><dd class="col-sm-10" id="offers-' +
         trip.id +
         '"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></dd>';
@@ -804,7 +809,11 @@ function search_offers(tripId) {
         },
       }),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        const trace = document.getElementById("trace-" + tripId);
+        trace.innerHTML = response.headers.get("x-request-id") || "<em>n/a</em>";
+        return response.json()
+      })
       .then((data) => {
         const search = document.getElementById("offer-search-" + tripId);
         search.innerHTML = data.data.id;
