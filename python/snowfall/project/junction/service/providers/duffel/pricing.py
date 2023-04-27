@@ -106,6 +106,23 @@ class PriceQuoteConsumer(object):
         if not offer_details:
             return
 
+        last_travel_date = offer_details.last_travel_date
+        offer = await self._adapter.refresh_offer(offer_details)
+        offer_details = cache.OfferDetails(
+            offer_id=offer.identifier,
+            total_amount=offer.total_amount,
+            currency=offer.total_currency,
+            passengers=[
+                cache.OfferDetailsPassenger(
+                    identifier=passenger.identifier,
+                    passenger_type=passenger.passenger_type,
+                )
+                for passenger in offer.passengers
+            ],
+            doc_required=offer.passenger_identity_documents_required,
+            last_travel_date=last_travel_date,
+        )
+
         price_quote_id = await self._cache.store(
             record=offer_details,
             expires_at=datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
