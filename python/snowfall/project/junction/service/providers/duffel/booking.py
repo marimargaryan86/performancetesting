@@ -78,7 +78,7 @@ class BookingHandler(object):
 
         return new_booking
 
-    async def _make_booking(  # noqa: WPS210
+    async def _make_booking(  # noqa: WPS210, WPS231
         self,
         task: amqp_pb2.PlaceOrderTask,
         details: cache.OfferDetails,
@@ -94,8 +94,13 @@ class BookingHandler(object):
             ),
         )
 
+        sorted_passengers = sorted(
+            details.passengers,
+            key=lambda passenger_type: passenger_type.passenger_type or "adult",
+        )
+
         infant_id_list = [
-            details.passengers[index].identifier
+            sorted_passengers[index].identifier
             for index, passenger in enumerate(task.passengers)
             if self._is_infant(passenger, details)
         ]
@@ -119,7 +124,7 @@ class BookingHandler(object):
                     country_code=str(number.country_code),
                     national_number=str(number.national_number),
                 ),
-                passenger_id=details.passengers[index].identifier,
+                passenger_id=sorted_passengers[index].identifier,
                 given_name=passenger.first_name,
                 gender=gender_from_proto(passenger.gender),
                 family_name=passenger.last_name,
