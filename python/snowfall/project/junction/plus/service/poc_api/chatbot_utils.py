@@ -12,6 +12,7 @@ from snowfall.project.junction.plus.service.poc_api import (
     flight_stats_client,
     repository,
     s3,
+    travel_fusion,
     twilio,
 )
 from snowfall.vendor.junction.go import client
@@ -192,16 +193,20 @@ def home_message() -> str:
 
 
 def journey_signature(doc: Mapping[str, Any], idx: int = 0) -> Mapping[str, Any]:
-    origin_leg = doc["bookings"][0]["details"][0]["legs"][0]  # noqa: WPS221, WPS219
+    origin_details = doc["bookings"][0]["details"][0]
+    origin_leg = origin_details["legs"][0]
     dest_leg = doc["bookings"][-1]["details"][-1]["legs"][-1]  # noqa: WPS221, WPS219
     destination = dest_leg["destination"]
+    operator = origin_details["operator"]
     return {
         "idx": idx + 1,
         "reference": doc["journey"]["reference"],
         "origin": origin_leg["origin"]["name"],
         "destination": destination["name"],
         "departure_at": format_dt_str(origin_leg["departureAt"]),
+        "departure_at_iso": origin_leg["departureAt"],
         "arrival_at": format_dt_str(dest_leg["arrivalAt"]),
+        "operator": operator,
     }
 
 
@@ -247,7 +252,6 @@ async def register_booking_confirmation_agent(
         delay_webhook_repository,
     )
     if order:
-        reference = order["journey"]["reference"]
         signature = journey_signature(order)
         twilio_client.send_message(
             body=(
@@ -262,15 +266,7 @@ async def register_booking_confirmation_agent(
             ),
             receiver=mobile,
         )
-        if check_auto_checkin_availability():
-            twilio_client.send_message(
-                body=(
-                    "Automatic Checkin is available for your booking with "
-                    + "reference: {0}.".format(reference)
-                    + " If you want to proceed with automatic checkin, reply: CHECKIN"
-                ),
-                receiver=mobile,
-            )
+
     else:
         twilio_client.send_message(
             body="Something went wrong with order creation",
@@ -278,8 +274,43 @@ async def register_booking_confirmation_agent(
         )
 
 
-def check_auto_checkin_availability() -> bool:
-    return False
+async def auto_checkin(
+    order: Mapping[str, Any],
+    twilio_client: twilio.TwilioClient,
+    mobile: str,
+    tf_client: travel_fusion.TravelFusionClient,
+    s3_client: s3.S3Client,
+) -> None:
+    signature = journey_signature(order)
+    checkin_minutes = await tf_client.checkin_availability(
+        signature["operator"],
+        "LGW-ATH",  # hardcoded as it doesn't really change anything tf-side
+    )
+    if checkin_minutes:
+        checkin_from = datetime.datetime.fromisoformat(
+            signature["departure_at_iso"],
+        ).replace(tzinfo=None) - datetime.timedelta(minutes=checkin_minutes)
+        if datetime.datetime.now() > checkin_from:
+            twilio_client.send_message(
+                body="Here is your boarding pass",
+                receiver=mobile,
+            )
+            await send_boarding_pass(order, twilio_client, s3_client)
+        else:
+            twilio_client.send_message(
+                body=(
+                    "Checkin will be done automatically after {0}.".format(
+                        format_dt(checkin_from),
+                    )
+                    + "You will receive the boarding pass at that time."
+                ),
+                receiver=mobile,
+            )
+    else:
+        twilio_client.send_message(
+            body="Automatic checking is not available for your booking",
+            receiver=mobile,
+        )
 
 
 async def poll_order_status(
@@ -389,6 +420,27 @@ async def send_qr(
     twilio_client.send_qr(
         receiver=order["journey"]["contactDetails"]["phoneNumber"],
         body="Please feel free to use this 20 EUR coupon.",
+        media_url="https://poc-barcodes.s3.eu-west-2.amazonaws.com/{0}.png".format(
+            code,
+        ),
+    )
+    await asyncio.sleep(1)
+    s3_client.delete("poc-barcodes", "{0}.png".format(code))
+
+
+async def send_boarding_pass(
+    order: Mapping[str, Any],
+    twilio_client: twilio.TwilioClient,
+    s3_client: s3.S3Client,
+) -> None:
+    code = "boarding_pass"
+    img = travel_fusion.create_boarding_pass(order)
+    buffered = BytesIO()
+    img.save(buffered, format="PNG")
+    s3_client.put(buffered.getvalue(), "poc-barcodes", "{0}.png".format(code))
+    twilio_client.send_qr(
+        receiver=order["journey"]["contactDetails"]["phoneNumber"],
+        body="",
         media_url="https://poc-barcodes.s3.eu-west-2.amazonaws.com/{0}.png".format(
             code,
         ),

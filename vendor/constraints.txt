@@ -118,6 +118,7 @@
 //     "timezonefinder==6.2.0",
 //     "twilio-stubs==0.2.0",
 //     "twilio==7.17.0",
+//     "types-Pillow==9.5.0.2",
 //     "types-aiofiles==23.1.0.1",
 //     "types-certifi==2021.10.8.3",
 //     "types-freezegun==1.1.10",
@@ -128,10 +129,12 @@
 //     "types-setuptools==67.6.0.7",
 //     "types-stripe==3.5.2.9",
 //     "types-toml==0.10.8.6",
+//     "types-xmltodict==0.13.0.2",
 //     "unidecode==1.3.6",
 //     "uvicorn[standard]==0.21.1",
 //     "wemake-python-styleguide==0.17.0",
 //     "werkzeug==2.2.3",
+//     "xmltodict==0.13.0",
 //     "xsdata==22.12"
 //   ],
 //   "manylinux": "manylinux2014",
@@ -1624,13 +1627,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "2e6f6c9be770ed5737de093cfe8d592be15f8763f7bf2906afba90f19836d72d",
-              "url": "https://files.pythonhosted.org/packages/c2/5c/c0b57757fb7e6560302548d458497d7bc187b7ae6d1febdcd35ba47c3242/botocore-1.29.117-py3-none-any.whl"
+              "hash": "4030b2cde8c8c7b58c657c27e5e4ec0edb7a0cab84e31b0fe752dddee2735d68",
+              "url": "https://files.pythonhosted.org/packages/03/e5/b79c279f56b6785ce3716056c719d3a6ebe77e6fd468d088d2759d9616f9/botocore-1.29.121-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "1fc4469e80daab657d1254518ee44a82e284320c8b24cbfbaaa60570afc33743",
-              "url": "https://files.pythonhosted.org/packages/43/55/c38f864475ab0464513ac6997bd20106d033b49af22d1edebe63c288c736/botocore-1.29.117.tar.gz"
+              "hash": "955c1dd244b6286d9e17dc525d1459a2a74a1c4e519f35006c72f184fbce0760",
+              "url": "https://files.pythonhosted.org/packages/8c/d3/cac011be3a89b877d6c9cbf1ed4c36da0cc948877132fc0ec7a343b6a4dc/botocore-1.29.121.tar.gz"
             }
           ],
           "project_name": "botocore",
@@ -1641,19 +1644,19 @@
             "urllib3<1.27,>=1.25.4"
           ],
           "requires_python": ">=3.7",
-          "version": "1.29.117"
+          "version": "1.29.121"
         },
         {
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "80e494f6d6dfe9f141900176c0857988f6c333030348b7590b4ec515a6971cf1",
-              "url": "https://files.pythonhosted.org/packages/20/bf/a882685d9a76f2ef88dd867b2780b3279a4fd8d0d4752fde2f056ca1090a/botocore_stubs-1.29.117-py3-none-any.whl"
+              "hash": "f8c08cbfd414323d57b9b64dfe7c02de979f6ff7ccfc4c8141bad21d2041f52f",
+              "url": "https://files.pythonhosted.org/packages/ba/e8/b8be388ed21a5476db864d3e7bca25809deb14d8dfa26d950600ab192525/botocore_stubs-1.29.121-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "f4de553d1106624884ce198fe9d2ea030bfee7a78e395df827a8c79d04e9f33a",
-              "url": "https://files.pythonhosted.org/packages/16/d5/7b88b435b37aed05d34fa9a4e85f63745397ebc3b156554f9ae2c6645ae7/botocore_stubs-1.29.117.tar.gz"
+              "hash": "04386877efb140d3427bbd58b2900921235781b2747d610349f5e313aad7e11e",
+              "url": "https://files.pythonhosted.org/packages/ca/f8/97f5322e38e386a1d3c636ff65d4a176290f504fc0c4ad65d11ca3316fa3/botocore_stubs-1.29.121.tar.gz"
             }
           ],
           "project_name": "botocore-stubs",
@@ -1662,7 +1665,7 @@
             "typing-extensions>=4.1.0; python_version < \"3.9\""
           ],
           "requires_python": "<4.0,>=3.7",
-          "version": "1.29.117"
+          "version": "1.29.121"
         },
         {
           "artifacts": [
@@ -4848,30 +4851,30 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "ebe11c0d7a805086e99506aa331612429a72ca7cd52a1f0d277dc4adc20cb10e",
-              "url": "https://files.pythonhosted.org/packages/b2/f3/4fb5fae710fc9f22a42cd90dc0547da18ec83e2e139294ab94f04c449cf5/platformdirs-3.2.0-py3-none-any.whl"
+              "hash": "01437886022decaf285d8972f9526397bfae2ac55480ed372ed6d9eca048870a",
+              "url": "https://files.pythonhosted.org/packages/6c/fe/f6001fac1337528c14b353298d38748ee2387db0c262587ff4e7c68b5769/platformdirs-3.4.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "d5b638ca397f25f979350ff789db335903d7ea010ab28903f57b27e1b16c2b08",
-              "url": "https://files.pythonhosted.org/packages/15/04/3f882b46b454ab374ea75425c6f931e499150ec1385a73e55b3f45af615a/platformdirs-3.2.0.tar.gz"
+              "hash": "a5e1536e5ea4b1c238a1364da17ff2993d5bd28e15600c2c8224008aff6bbcad",
+              "url": "https://files.pythonhosted.org/packages/5e/ac/26d3d2a99b5fc84852229fc8470ae612595900f7f52c78468fd3f3a15a27/platformdirs-3.4.0.tar.gz"
             }
           ],
           "project_name": "platformdirs",
           "requires_dists": [
             "appdirs==1.4.4; extra == \"test\"",
             "covdefaults>=2.3; extra == \"test\"",
-            "furo>=2022.12.7; extra == \"docs\"",
+            "furo>=2023.3.27; extra == \"docs\"",
             "proselint>=0.13; extra == \"docs\"",
             "pytest-cov>=4; extra == \"test\"",
             "pytest-mock>=3.10; extra == \"test\"",
-            "pytest>=7.2.2; extra == \"test\"",
-            "sphinx-autodoc-typehints!=1.23.4,>=1.22; extra == \"docs\"",
+            "pytest>=7.3.1; extra == \"test\"",
+            "sphinx-autodoc-typehints!=1.23.4,>=1.23; extra == \"docs\"",
             "sphinx>=6.1.3; extra == \"docs\"",
             "typing-extensions>=4.5; python_version < \"3.8\""
           ],
           "requires_python": ">=3.7",
-          "version": "3.2.0"
+          "version": "3.4.0"
         },
         {
           "artifacts": [
@@ -5755,13 +5758,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "64299f4909223da747622c030b781c0d7811e359c37124b4bd368fb8c6518baa",
-              "url": "https://files.pythonhosted.org/packages/d2/f4/274d1dbe96b41cf4e0efb70cbced278ffd61b5c7bb70338b62af94ccb25b/requests-2.28.2-py3-none-any.whl"
+              "hash": "e8f3c9be120d3333921d213eef078af392fba3933ab7ed2d1cba3b56f2568c3b",
+              "url": "https://files.pythonhosted.org/packages/cf/e1/2aa539876d9ed0ddc95882451deb57cfd7aa8dbf0b8dbce68e045549ba56/requests-2.29.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "98b1b2782e3c6c4904938b84c0eb932721069dfdb9134313beff7c83c2df24bf",
-              "url": "https://files.pythonhosted.org/packages/9d/ee/391076f5937f0a8cdf5e53b701ffc91753e87b07d66bae4a09aa671897bf/requests-2.28.2.tar.gz"
+              "hash": "f2e34a75f4749019bb0e3effb66683630e4ffeaf75819fb51bebef1bf5aef059",
+              "url": "https://files.pythonhosted.org/packages/4c/d2/70fc708727b62d55bc24e43cc85f073039023212d482553d853c44e57bdb/requests-2.29.0.tar.gz"
             }
           ],
           "project_name": "requests",
@@ -5773,8 +5776,8 @@
             "idna<4,>=2.5",
             "urllib3<1.27,>=1.21.1"
           ],
-          "requires_python": "<4,>=3.7",
-          "version": "2.28.2"
+          "requires_python": ">=3.7",
+          "version": "2.29.0"
         },
         {
           "artifacts": [
@@ -6486,19 +6489,19 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "89d052f4c018ee0fc5d6ed8ae64c2e1f9f1078a2f9a29f5246a42af72f7f4e77",
-              "url": "https://files.pythonhosted.org/packages/c1/6c/31b5386b28ed8651f3d20e00dcda4cb44f9d1221bba18508f8247fb77b0c/types_awscrt-0.16.15-py3-none-any.whl"
+              "hash": "fe38c6fd71199a9f739b69a7c2f3a574585457c4f63730a62830628a7bffc5b0",
+              "url": "https://files.pythonhosted.org/packages/14/d9/2ef6d4ddb1a694702ba84e1bea51852266075a39ffc12449ae2a41f84032/types_awscrt-0.16.16-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "9f858e9b6237b58bc550d0fb5785758aba2b4e454a71edf81882b5908b37174c",
-              "url": "https://files.pythonhosted.org/packages/54/05/728d0d14888f2e5a1a5e17ddb2e2d9fc567544a13df37bfa951b0704b668/types_awscrt-0.16.15.tar.gz"
+              "hash": "40854d9d7ce055620d5d41e5adc84df11b879aedbd2cf20de84e73f084aa5797",
+              "url": "https://files.pythonhosted.org/packages/ed/29/bc831f914e62ae73cfe81bf037f08a64045ec52efa40ca6048182357bab0/types_awscrt-0.16.16.tar.gz"
             }
           ],
           "project_name": "types-awscrt",
           "requires_dists": [],
           "requires_python": "<4.0,>=3.7",
-          "version": "0.16.15"
+          "version": "0.16.16"
         },
         {
           "artifacts": [
@@ -6553,6 +6556,24 @@
           "requires_dists": [],
           "requires_python": null,
           "version": "4.17.0.7"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "58fdebd0ffa2353ecccdd622adde23bce89da5c0c8b96c34f2d1eca7b7e42d0e",
+              "url": "https://files.pythonhosted.org/packages/3a/30/62b599502672ab896ea080b36639ccf6876f6b042e3a4eb42c47b05b2e07/types_Pillow-9.5.0.2-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "b3f9f621f259566c19c1deca21901017c8b1e3e200ed2e49e0a2d83c0a5175db",
+              "url": "https://files.pythonhosted.org/packages/3f/f7/c8b25ad3ffa3982963e9f9e1565105bb3e83ba00680d27c94c7829a92820/types-Pillow-9.5.0.2.tar.gz"
+            }
+          ],
+          "project_name": "types-pillow",
+          "requires_dists": [],
+          "requires_python": null,
+          "version": "9.5.0.2"
         },
         {
           "artifacts": [
@@ -6704,6 +6725,24 @@
           "requires_dists": [],
           "requires_python": null,
           "version": "0.10.8.6"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "274eb87050e957be0328eace3371714468578f6fbe66341702741366c65f256a",
+              "url": "https://files.pythonhosted.org/packages/f1/2c/56530f4f1b9678e73b95f880901731a2480724a423e448043b8a24aab6b8/types_xmltodict-0.13.0.2-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "7a233e65aa828aac611250aa479f9e346a41a8029566ed90dac246c5888304df",
+              "url": "https://files.pythonhosted.org/packages/0e/3c/e478ade724ea201c6ad6203824fa5395b2302aaf0a2ed2348a247eb4ef6b/types-xmltodict-0.13.0.2.tar.gz"
+            }
+          ],
+          "project_name": "types-xmltodict",
+          "requires_dists": [],
+          "requires_python": null,
+          "version": "0.13.0.2"
         },
         {
           "artifacts": [
@@ -7127,6 +7166,24 @@
           "artifacts": [
             {
               "algorithm": "sha256",
+              "hash": "aa89e8fd76320154a40d19a0df04a4695fb9dc5ba977cbb68ab3e4eb225e7852",
+              "url": "https://files.pythonhosted.org/packages/94/db/fd0326e331726f07ff7f40675cd86aa804bfd2e5016c727fa761c934990e/xmltodict-0.13.0-py2.py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "341595a488e3e01a85a9d8911d8912fd922ede5fecc4dce437eb4b6c8d037e56",
+              "url": "https://files.pythonhosted.org/packages/39/0d/40df5be1e684bbaecdb9d1e0e40d5d482465de6b00cbb92b84ee5d243c7f/xmltodict-0.13.0.tar.gz"
+            }
+          ],
+          "project_name": "xmltodict",
+          "requires_dists": [],
+          "requires_python": ">=3.4",
+          "version": "0.13.0"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
               "hash": "981755b69148fe954c46f4f6eb12f441e915df403ba86b21165e444667970cc1",
               "url": "https://files.pythonhosted.org/packages/dd/97/e233dd078571fac9362e795fb73b0e4f9ec32c8a6f31eda984611c66dbde/xsdata-22.12-py3-none-any.whl"
             },
@@ -7166,73 +7223,73 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "6d88056a04860a98341a0cf53e950e3ac9f4e51d1b6f61a53b0609df342cc8b2",
-              "url": "https://files.pythonhosted.org/packages/7f/13/a4b6ffff8f3278c020d6b7c42fee53133f6165d347db94bdd9ae394ba4f8/yarl-1.8.2-cp311-cp311-musllinux_1_1_x86_64.whl"
+              "hash": "822b30a0f22e588b32d3120f6d41e4ed021806418b4c9f0bc3048b8c8cb3f92a",
+              "url": "https://files.pythonhosted.org/packages/d5/8b/5a30baa12464d55b308c684a4a953df6b2190f7733c92719f194fcd42421/yarl-1.9.2-cp311-cp311-musllinux_1_1_x86_64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "2a1fca9588f360036242f379bfea2b8b44cae2721859b1c56d033adfd5893634",
-              "url": "https://files.pythonhosted.org/packages/02/51/c33498373d2e0ff5d7f3e76038b7057003927d481405780d22f140906b24/yarl-1.8.2-cp311-cp311-macosx_10_9_universal2.whl"
+              "hash": "d4e2c6d555e77b37288eaf45b8f60f0737c9efa3452c6c44626a5455aeb250b9",
+              "url": "https://files.pythonhosted.org/packages/1d/78/a273c991086df02837676dc68ccf50d56b2fe624d75258d521c651a65d82/yarl-1.9.2-cp311-cp311-musllinux_1_1_i686.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "0978f29222e649c351b173da2b9b4665ad1feb8d1daa9d971eb90df08702668a",
-              "url": "https://files.pythonhosted.org/packages/20/23/9ed12660f860962f179bca719b1d8a895c572c5dbb75098d35d074d35703/yarl-1.8.2-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl"
+              "hash": "8ec53a0ea2a80c5cd1ab397925f94bff59222aa3cf9c6da938ce05c9ec20428d",
+              "url": "https://files.pythonhosted.org/packages/35/0f/a68344daf90536755f4a890dbbab65dc6ca58c4a0268cf79bd7c5ddc1468/yarl-1.9.2-cp311-cp311-manylinux_2_17_s390x.manylinux2014_s390x.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "4d04acba75c72e6eb90745447d69f84e6c9056390f7a9724605ca9c56b4afcc6",
-              "url": "https://files.pythonhosted.org/packages/52/e4/7bcabff7bc7b8421bef266bc955367f586d48667eb0a6ae812852feb51e8/yarl-1.8.2-cp311-cp311-musllinux_1_1_i686.whl"
+              "hash": "b8cc1863402472f16c600e3e93d542b7e7542a540f95c30afd472e8e549fc3f7",
+              "url": "https://files.pythonhosted.org/packages/3b/b2/34e45989fa5fcf406dd471c517697a5bf483fb1bcaebcf2bedd2b86e0cbb/yarl-1.9.2-cp311-cp311-musllinux_1_1_s390x.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "75c16b2a900b3536dfc7014905a128a2bea8fb01f9ee26d2d7d8db0a08e7cb2c",
-              "url": "https://files.pythonhosted.org/packages/5f/3c/59d045a4094f11dea659b69bfca8338803f6cb161da5b039d35cb415a84d/yarl-1.8.2-cp311-cp311-musllinux_1_1_s390x.whl"
+              "hash": "832b7e711027c114d79dffb92576acd1bd2decc467dec60e1cac96912602d0e6",
+              "url": "https://files.pythonhosted.org/packages/50/af/93f1b6d02e936d49e664a8eb4374877e5bacfef115c956939729ac9e2ca8/yarl-1.9.2-cp311-cp311-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "42430ff511571940d51e75cf42f1e4dbdded477e71c1b7a17f4da76c1da8ea76",
-              "url": "https://files.pythonhosted.org/packages/7c/9a/6f2039a5578f2af2d36f22173abf22c957970e908617b90e12552f7dfc9a/yarl-1.8.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+              "hash": "b25322201585c69abc7b0e89e72790469f7dad90d26754717f3310bfe30331c2",
+              "url": "https://files.pythonhosted.org/packages/53/87/f5588bdc6eba3ca4521bd37094563e8442ba2cff3d6b7e5a2cab48fdc96d/yarl-1.9.2-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "c15163b6125db87c8f53c98baa5e785782078fbd2dbeaa04c6141935eb6dab7a",
-              "url": "https://files.pythonhosted.org/packages/9b/d2/7813ebb6fe192e568c78ba56658f7a26caeceff6302a96808512f5ee40fd/yarl-1.8.2-cp311-cp311-musllinux_1_1_aarch64.whl"
+              "hash": "04ab9d4b9f587c06d801c2abfe9317b77cdf996c65a90d5e84ecc45010823571",
+              "url": "https://files.pythonhosted.org/packages/5f/3f/04b3c5e57844fb9c034b09c5cb6d2b43de5d64a093c30529fd233e16cf09/yarl-1.9.2.tar.gz"
             },
             {
               "algorithm": "sha256",
-              "hash": "3150078118f62371375e1e69b13b48288e44f6691c1069340081c3fd12c94d5b",
-              "url": "https://files.pythonhosted.org/packages/ba/85/f9e3350daa31161d1f4dfb10e195951df4ac22d8f201603cf894b37510c8/yarl-1.8.2-cp311-cp311-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl"
+              "hash": "783185c75c12a017cc345015ea359cc801c3b29a2966c2655cd12b233bf5a2be",
+              "url": "https://files.pythonhosted.org/packages/62/c8/b8e048ba98a0f41d46a22060a57f913b4f9ed9c4f6862de36b8137bb67e2/yarl-1.9.2-cp311-cp311-musllinux_1_1_ppc64le.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "388a45dc77198b2460eac0aca1efd6a7c09e976ee768b0d5109173e521a19daf",
-              "url": "https://files.pythonhosted.org/packages/c0/fd/2f7a640dc157cc2d111114106e3036a69ba3408460d38580f681377c122d/yarl-1.8.2-cp311-cp311-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl"
+              "hash": "646d663eb2232d7909e6601f1a9107e66f9791f290a1b3dc7057818fe44fc2b6",
+              "url": "https://files.pythonhosted.org/packages/84/c1/eaebee42cbcace2d5b5eb103cae668dec1c239f5c82b90da4b3b20f39419/yarl-1.9.2-cp311-cp311-macosx_10_9_universal2.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "49d43402c6e3013ad0978602bf6bf5328535c48d192304b91b97a3c6790b1562",
-              "url": "https://files.pythonhosted.org/packages/c4/1e/1b204050c601d5cd82b45d5c8f439cb6f744a2ce0c0a6f83be0ddf0dc7b2/yarl-1.8.2.tar.gz"
+              "hash": "a83503934c6273806aed765035716216cc9ab4e0364f7f066227e1aaea90b8d0",
+              "url": "https://files.pythonhosted.org/packages/b3/81/fb394392ec748d8fce66212b29dc2fd9b2fd8e30d56d818a6a866708e534/yarl-1.9.2-cp311-cp311-macosx_11_0_arm64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "e7fd20d6576c10306dea2d6a5765f46f0ac5d6f53436217913e952d19237efc4",
-              "url": "https://files.pythonhosted.org/packages/c6/1c/4a992306ad86a8ae5a1fb4745bd76c590e7bcdb01ce2203dfd38dc830dfe/yarl-1.8.2-cp311-cp311-musllinux_1_1_ppc64le.whl"
+              "hash": "22a94666751778629f1ec4280b08eb11815783c63f52092a5953faf73be24191",
+              "url": "https://files.pythonhosted.org/packages/b7/aa/8b53bceea5454d0b5602ffc81aaf3b80cc2e9b793fe1e054f690beb82429/yarl-1.9.2-cp311-cp311-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "f37db05c6051eff17bc832914fe46869f8849de5b92dc4a3466cd63095d23dfd",
-              "url": "https://files.pythonhosted.org/packages/ca/f3/2ef9870409b3ea57a5890e4e49b6bfd6e347a45fe92f6b2e9567abfefb59/yarl-1.8.2-cp311-cp311-macosx_10_9_x86_64.whl"
+              "hash": "95d2ecefbcf4e744ea952d073c6922e72ee650ffc79028eb1e320e732898d7e8",
+              "url": "https://files.pythonhosted.org/packages/de/3f/5a8fcff69c8628ce4dab00612981f4c0598fb9aabd90d01a1ebb037bb6f6/yarl-1.9.2-cp311-cp311-musllinux_1_1_aarch64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "2305517e332a862ef75be8fad3606ea10108662bc6fe08509d5ca99503ac2aee",
-              "url": "https://files.pythonhosted.org/packages/cb/82/91f74496b653ac9a6220ee499510377c03a4ff768c5bd945f6759b23ebb8/yarl-1.8.2-cp311-cp311-manylinux_2_17_s390x.manylinux2014_s390x.whl"
+              "hash": "159d81f22d7a43e6eabc36d7194cb53f2f15f498dbbfa8edc8a3239350f59fe7",
+              "url": "https://files.pythonhosted.org/packages/ee/8d/55467943a172b97c1b5d9569433c1a70f86f1f9b0f1c6574285f8ad02fc2/yarl-1.9.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "77e913b846a6b9c5f767b14dc1e759e5aff05502fe73079f6f4176359d832581",
-              "url": "https://files.pythonhosted.org/packages/e6/d3/5f5b39db2c8c09f6923418c9329a04fe6f68825f27d2cb9776871d75ddc3/yarl-1.8.2-cp311-cp311-macosx_11_0_arm64.whl"
+              "hash": "aff634b15beff8902d1f918012fc2a42e0dbae6f469fce134c8a0dc51ca423bb",
+              "url": "https://files.pythonhosted.org/packages/fe/7d/9d85f658b6f7c041ca3ba371d133040c4dc41eb922aef0a6ba917291d187/yarl-1.9.2-cp311-cp311-macosx_10_9_x86_64.whl"
             }
           ],
           "project_name": "yarl",
@@ -7242,14 +7299,14 @@
             "typing-extensions>=3.7.4; python_version < \"3.8\""
           ],
           "requires_python": ">=3.7",
-          "version": "1.8.2"
+          "version": "1.9.2"
         }
       ],
       "platform_tag": null
     }
   ],
   "path_mappings": {},
-  "pex_version": "2.1.130",
+  "pex_version": "2.1.134",
   "pip_version": "20.3.4-patched",
   "prefer_older_binary": false,
   "requirements": [
@@ -7362,6 +7419,7 @@
     "timezonefinder==6.2.0",
     "twilio-stubs==0.2.0",
     "twilio==7.17.0",
+    "types-Pillow==9.5.0.2",
     "types-aiofiles==23.1.0.1",
     "types-certifi==2021.10.8.3",
     "types-freezegun==1.1.10",
@@ -7372,10 +7430,12 @@
     "types-setuptools==67.6.0.7",
     "types-stripe==3.5.2.9",
     "types-toml==0.10.8.6",
+    "types-xmltodict==0.13.0.2",
     "unidecode==1.3.6",
     "uvicorn[standard]==0.21.1",
     "wemake-python-styleguide==0.17.0",
     "werkzeug==2.2.3",
+    "xmltodict==0.13.0",
     "xsdata==22.12"
   ],
   "requires_python": [

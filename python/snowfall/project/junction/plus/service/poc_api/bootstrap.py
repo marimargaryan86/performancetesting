@@ -8,6 +8,7 @@ from snowfall.project.junction.plus.service.poc_api import (
     icoupon,
     repository,
     s3,
+    travel_fusion,
     twilio,
 )
 from snowfall.stdlib.integration.starlette import application
@@ -32,6 +33,8 @@ class Settings(application.Settings):
     twilio_sid: str
     twilio_token: str
     twilio_sender: str
+    tf_api_address: Sequence[str]
+    tf_client_key: str
     validate_responses_against_spec: bool = True
 
 
@@ -42,6 +45,7 @@ def create_dependencies(  # noqa: WPS211
     icoupon_client: icoupon.ICouponClient,
     twilio_client: twilio.TwilioClient,
     s3_client: s3.S3Client,
+    tf_client: travel_fusion.TravelFusionClient,
     orders_repository: repository.OrdersRepository,
     subscriptions_repository: repository.SubscriptionsRepository,
     delay_webhook_repository: repository.DelayWebhookRepository,
@@ -52,6 +56,7 @@ def create_dependencies(  # noqa: WPS211
     container[flight_stats_client.FlightStatusClient] = fs_client
     container[icoupon.ICouponClient] = icoupon_client
     container[twilio.TwilioClient] = twilio_client
+    container[travel_fusion.TravelFusionClient] = tf_client
     container[s3.S3Client] = s3_client
     container[repository.OrdersRepository] = orders_repository
     container[repository.SubscriptionsRepository] = subscriptions_repository

@@ -16,6 +16,7 @@ from snowfall.project.junction.plus.service.poc_api import (
     icoupon,
     repository,
     s3,
+    travel_fusion,
     twilio,
 )
 from snowfall.project.junction.plus.service.poc_api.routes import router
@@ -49,6 +50,10 @@ def _factory(
             client_id=app.settings.icoupon_client_id,
             client_secret=app.settings.icoupon_client_secret,
         )
+        tf_client = travel_fusion.TravelFusionClient(
+            api_url=random.choice(app.settings.tf_api_address),  # nosec
+            client_key=app.settings.tf_client_key,
+        )
         mongo = motor_asyncio.AsyncIOMotorClient(
             app.settings.mongo_dsn,  # nosec
         )[app.settings.mongo_db]
@@ -68,6 +73,7 @@ def _factory(
                     fs_client=fs_client,
                     icoupon_client=icoupon_client,
                     s3_client=s3_client,
+                    tf_client=tf_client,
                     twilio_client=twilio.TwilioClient(
                         sid=app.settings.twilio_sid,
                         token=app.settings.twilio_token,

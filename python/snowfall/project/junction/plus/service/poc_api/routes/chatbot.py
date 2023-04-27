@@ -7,6 +7,8 @@ from snowfall.project.junction.plus.service.poc_api import (
     chatbot_utils,
     flight_stats_client,
     repository,
+    s3,
+    travel_fusion,
     twilio,
 )
 from snowfall.stdlib.persistence.redis import types as redis
@@ -24,13 +26,15 @@ class Whatsapp(endpoints.HTTPEndpoint):
         redis_client: redis.Client[str] = lagom.injectable,
         fs_client: flight_stats_client.FlightStatusClient = lagom.injectable,
         twilio_client: twilio.TwilioClient = lagom.injectable,
+        tf_client: travel_fusion.TravelFusionClient = lagom.injectable,
+        s3_client: s3.S3Client = lagom.injectable,
     ) -> responses.Response:
         msg = await request.form()
         message_body = str(msg["Body"])
         message_from = str(msg["From"])
         message_from_mobile = message_from.split(":")[1]
         twiml_response = MessagingResponse()
-        if message_body.isdigit():
+        if message_body.isdigit():  # noqa: WPS223
             travel_status_sessions = await redis_client.get(
                 "travel_status_sessions:{0}".format(message_from),
             )
@@ -94,6 +98,40 @@ class Whatsapp(endpoints.HTTPEndpoint):
                         delay_webhook_repository,
                         fs_client,
                     ),
+                )
+            else:
+                twiml_response.message(
+                    "No upcoming trips",
+                )
+        elif message_body.lower().startswith("checkin"):
+            mobile_orders = await orders_repository.get_user_orders(
+                message_from_mobile,
+                "mobile_number",
+            )
+            go_orders = [
+                json_api_doc.deserialize(
+                    await junction_client.get_order_by_id(
+                        identifier=mobile_order.id,
+                        include=["journey", "bookings.details"],
+                    ),
+                )
+                async for mobile_order in mobile_orders
+            ]
+            if len(go_orders) > 1:
+                twiml_response.message(
+                    "More than one trips to checkin",
+                )
+            elif len(go_orders) == 1:
+                await chatbot_utils.auto_checkin(
+                    go_orders[0],
+                    twilio_client,
+                    message_from.split(":")[1],
+                    tf_client,
+                    s3_client,
+                )
+                return responses.Response(
+                    status_code=status.HTTP_200_OK,
+                    media_type="application/xml",
                 )
             else:
                 twiml_response.message(
