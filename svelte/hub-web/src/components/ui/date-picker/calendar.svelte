@@ -110,9 +110,9 @@
   }
 </script>
 
-<div class="calendar">
+<div class="calendar typography body-small">
   {#each Object.values(weekDays) as weekDay}
-    <span class="cell week-day">{weekDay}</span>
+    <span class="cell typography body-medium bold">{weekDay}</span>
   {/each}
 
   {#each days as day, idx}
@@ -147,22 +147,9 @@
     height: 40px;
   }
 
-  .week-day {
-    font-weight: 400;
-    font-size: 10px;
-    font-family: Poppins, Arial, Helvetica, sans-serif;
-    font-style: normal;
-    line-height: 20px;
-  }
-
   .date {
     position: relative;
     padding: 0;
-    font-weight: 400;
-    font-size: 14px;
-    font-family: Inter, Arial, Helvetica, sans-serif;
-    font-style: normal;
-    line-height: 20px;
     background-color: transparent;
     border: 0;
     cursor: pointer;
@@ -170,15 +157,15 @@
 
   .prev-month,
   .next-month {
-    color: var(--color-main-neutral-400);
+    color: var(--color-main-neutral-500);
   }
 
   .today {
-    color: var(--color-semantic-error-600);
+    color: var(--color-semantic-error-500);
   }
 
   .in-range {
-    background-color: var(--color-main-neutral-50);
+    background-color: var(--color-main-primary-100);
   }
 
   .date.start::after {
@@ -196,7 +183,7 @@
     display: block;
     width: 50%;
     height: 100%;
-    background-color: var(--color-main-neutral-50);
+    background-color: var(--color-main-primary-100);
     content: "";
   }
 

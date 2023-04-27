@@ -53,9 +53,9 @@
 
 <div class="dialogue" transition:scale|local={{ duration: 150, start: 0.8 }}>
   <div class="header">
-    <div>
-      <span>{monthName(viewingMonth)}</span>
-      <span>{viewingMonth.getFullYear()}</span>
+    <div class="typography body-large bold">
+      {monthName(viewingMonth)}
+      {viewingMonth.getFullYear()}
     </div>
 
     <div class="navigation">
@@ -80,6 +80,7 @@
     z-index: 100;
     margin-top: 4px;
     padding: 20px;
+    color: var(--color-main-neutral-900);
     background: #ffffff;
     border: var(--color-main-neutral-200) 1px solid;
     border-radius: 8px;
@@ -94,13 +95,6 @@
     justify-content: space-between;
     margin-bottom: 20px;
     padding-bottom: 20px;
-    color: var(--color-main-neutral-900);
-    font-weight: 600;
-    font-size: 12px;
-    font-family: "Red Hat Display", Arial, Helvetica, sans-serif;
-    font-style: normal;
-    line-height: 18px;
-    letter-spacing: 1px;
     white-space: nowrap;
     border-bottom: var(--color-main-neutral-200) 1px solid;
   }

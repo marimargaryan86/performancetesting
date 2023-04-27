@@ -30,6 +30,7 @@
   --color-main-neutral-800: #363938;
   --color-main-neutral-900: #1a1b1c;
   --color-main-primary-50: #f6fbfa;
+  --color-main-primary-100: #d4eee7;
   --color-main-primary-200: #b2e0d4;
   --color-main-primary-400: #6dc4af;
   --color-main-primary-500: #4bb69c;
@@ -44,6 +45,7 @@
   --color-semantic-warning-600: #d68f1c;
   --color-semantic-error-100: #ffe5d9;
   --color-semantic-error-200: #ffc6b3;
+  --color-semantic-error-500: #ff4245;
   --color-semantic-error-600: #db3041;
   --color-semantic-success-50: #f6fcf5;
   --color-semantic-success-200: #dff8aa;
