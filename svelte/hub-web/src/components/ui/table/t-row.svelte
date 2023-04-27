@@ -1,4 +1,4 @@
-<tr><slot /></tr>
+<tr on:click><slot /></tr>
 
 <style>
   tr {

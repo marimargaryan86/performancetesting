@@ -1,14 +1,16 @@
 <script lang="ts">
   import type { ConversionStatus } from "models/conversion";
-  import StatusBadge from "./status-badge.svelte";
+  import StatusBadge, { type StatusBadgeVariant } from "./status-badge.svelte";
   import { formatConversionStatus } from "formatting/conversion";
 
   export let value: ConversionStatus;
 
-  $: variant = {
-    executed: 0,
-    unspecified: 1,
-  }[value];
+  const variants: Record<ConversionStatus, StatusBadgeVariant> = {
+    executed: "ok",
+    unspecified: "warn",
+  };
+
+  $: variant = variants[value];
 </script>
 
 <StatusBadge {variant} value={formatConversionStatus(value)} />

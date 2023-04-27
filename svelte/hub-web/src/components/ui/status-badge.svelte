@@ -1,13 +1,17 @@
+<script lang="ts" context="module">
+  export type StatusBadgeVariant = "ok" | "warn" | "error";
+</script>
+
 <script lang="ts">
   export let value: string;
-  export let variant: number;
+  export let variant: StatusBadgeVariant = "ok";
 </script>
 
 <span
   class="status-badge typography body-small"
-  class:ok={variant === 0}
-  class:warn={variant === 1}
-  class:error={variant === 2}
+  class:ok={variant === "ok"}
+  class:warn={variant === "warn"}
+  class:error={variant === "error"}
 >
   {value}
 </span>

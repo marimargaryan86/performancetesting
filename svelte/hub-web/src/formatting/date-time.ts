@@ -12,3 +12,10 @@ export function monthName(
 ): string {
   return date.toLocaleDateString("en-GB", { month: options });
 }
+
+export function formatDuration(timeSeconds: number): string {
+  const hours = Math.floor(timeSeconds / 3600);
+  const minutes = Math.floor((timeSeconds - hours * 3600) / 60);
+
+  return `${hours}h ${minutes}m`;
+}

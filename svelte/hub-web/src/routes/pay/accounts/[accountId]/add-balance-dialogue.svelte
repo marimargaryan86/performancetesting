@@ -1,6 +1,8 @@
 <script lang="ts">
   import CurrencyFlag from "components/icons/currency-flag.svelte";
+  import LoadingIcon from "components/icons/loading-icon.svelte";
   import SearchIcon from "components/icons/search-icon.svelte";
+  import Button from "components/ui/button.svelte";
   import TextField from "components/ui/text-field.svelte";
   import { portal } from "directives/portal";
   import integrationInstances from "integration-instances";
@@ -32,6 +34,7 @@
   let searchQuery = "";
   let visible = false;
   let inputRef: TextField<"text">;
+  let pending = false;
 
   const dispatch = createEventDispatcher<{ addbalances: MoneyModel[] }>();
 
@@ -42,17 +45,25 @@
   );
 
   async function addBalances(): Promise<void> {
+    if (pending) {
+      return;
+    }
+
     if (!token) {
       close();
 
       return;
     }
 
+    pending = true;
+
     const nextBalances = await Promise.all(
       value.map((item) =>
         integrationInstances.junctionPay.balances.addBalance(token as string, accountId, item.code),
       ),
     );
+
+    pending = false;
 
     dispatch("addbalances", nextBalances);
     close();
@@ -70,8 +81,11 @@
 </script>
 
 {#if visible}
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+
   <div
     class="add-balance-dialogue"
+    on:click|self={close}
     use:portal={document.body}
     transition:fade|local={{ duration: 200 }}
   >
@@ -102,8 +116,14 @@
       </ul>
 
       <div class="actions">
-        <button on:click={close} class="typography body-large bold">Cancel</button>
-        <button on:click={addBalances} class="typography body-large bold">Add</button>
+        <Button on:click={close} variant="outline" size="medium">Cancel</Button>
+        <Button on:click={addBalances} size="medium" disabled={!value.length}>
+          Add
+
+          {#if pending}
+            <LoadingIcon />
+          {/if}
+        </Button>
       </div>
     </div>
   </div>
@@ -114,13 +134,13 @@
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 1000;
+    z-index: var(--z-index-overlay);
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
     height: 100vh;
-    background-color: rgb(140 142 146 / 0.5);
+    background-color: rgb(0 0 0 / 0.5);
   }
 
   .dialogue {
@@ -135,7 +155,6 @@
     background-color: var(--color-common-background-light-main);
     border-radius: 16px;
     box-shadow: 0 4px 20px rgb(0 0 0 / 0.1);
-    backdrop-filter: blur(25px);
   }
 
   .dialogue > :global(.text-field) {
@@ -183,18 +202,8 @@
     gap: 16px;
   }
 
-  .actions > button {
+  .actions > :global(button) {
     flex-grow: 1;
     height: 48px;
-    color: var(--color-common-light-strong);
-    background-color: var(--color-common-background-light-main);
-    border: var(--color-main-primary-500) 1px solid;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-
-  .actions > button:last-child {
-    color: var(--color-common-dark-strong);
-    background-color: var(--color-main-primary-500);
   }
 </style>

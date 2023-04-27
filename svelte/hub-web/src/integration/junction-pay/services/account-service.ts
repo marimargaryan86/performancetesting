@@ -2,14 +2,8 @@ import type { AccountModel } from "models/account";
 import type { ListAccountsResponseSchema } from "../schemas/account";
 import JunctionPayService from "./junction-pay-service";
 
-let cache: AccountModel[] | undefined = undefined;
-
 export default class AccountService extends JunctionPayService {
   async listAccounts(token: string): Promise<AccountModel[]> {
-    if (cache) {
-      return cache;
-    }
-
     const resp = await this.makeRequest("/accounts", { token });
 
     if (resp.status !== 200) {
@@ -24,9 +18,6 @@ export default class AccountService extends JunctionPayService {
       companyId: item.relationships.company?.data.id,
       contactPersonId: item.relationships.contactPerson?.data.id,
     }));
-    // Temporary solution until BE is optimized.
-    cache = [...result];
-    setTimeout(() => (cache = undefined), 60000);
 
     return result;
   }

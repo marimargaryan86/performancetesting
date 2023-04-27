@@ -1,15 +1,17 @@
 <script lang="ts">
   import { formatTransactionStatus } from "formatting/transaction";
   import type { TransactionStatus } from "models/transaction";
-  import StatusBadge from "./status-badge.svelte";
+  import StatusBadge, { type StatusBadgeVariant } from "./status-badge.svelte";
 
   export let value: TransactionStatus;
 
-  $: variant = {
-    paid: 0,
-    pending: 1,
-    cancelled: 2,
-  }[value];
+  const variants: Record<TransactionStatus, StatusBadgeVariant> = {
+    paid: "ok",
+    pending: "warn",
+    cancelled: "error",
+  };
+
+  $: variant = variants[value];
 </script>
 
 <StatusBadge {variant} value={formatTransactionStatus(value)} />

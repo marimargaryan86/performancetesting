@@ -7,6 +7,7 @@
   import type { PageData } from "./$types";
   import AddBalanceDialogue from "./add-balance-dialogue.svelte";
   import SearchField from "components/ui/search-field.svelte";
+  import Button from "components/ui/button.svelte";
 
   export let data: PageData;
 
@@ -44,10 +45,10 @@
   <div class="actions">
     <SearchField bind:value={searchQuery} />
 
-    <button class="add-balance typography body-medium bold" on:click={openDialogue}>
-      <span>Add Balance</span>
-      <PlusIcon color="var(--color-common-dark-strong)" />
-    </button>
+    <Button size="small" on:click={openDialogue}>
+      Add Balance
+      <PlusIcon />
+    </Button>
   </div>
 </div>
 
@@ -90,19 +91,6 @@
     padding: 24px;
     overflow: auto;
     background-image: var(--color-gradient-extensions-horizontal);
-  }
-
-  .add-balance {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    height: 40px;
-    padding: 0 16px;
-    color: var(--color-common-dark-strong);
-    background-color: var(--color-main-primary-500);
-    border: 0;
-    border-radius: 8px;
-    cursor: pointer;
   }
 
   .balances {

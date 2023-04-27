@@ -30,7 +30,7 @@
       class="copy"
       class:right-aligned={copyAlign === "right"}
       bind:this={copyRef}
-      on:click={copy}
+      on:click|stopPropagation={copy}
     >
       {#if copied}
         Copied to clipboard

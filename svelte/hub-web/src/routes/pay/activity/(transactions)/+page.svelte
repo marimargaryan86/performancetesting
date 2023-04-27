@@ -25,12 +25,14 @@
   import { formatAmount } from "formatting/currency";
   import { writable } from "svelte/store";
   import { onMount } from "svelte";
+  import TransactionDetails from "./transaction-details/transaction-details.svelte";
 
   export let data: PageData;
 
   let sortGroup: FlattenedObject<TransactionModel> = "createdAt";
   let sortDirection: DirectionY = "down";
   let transactions: TransactionModel[] = [];
+  let selectedTransaction: TransactionModel | undefined = undefined;
 
   $: transactions = sortTransactions(
     filterTransactions(data.transactions, {
@@ -40,6 +42,12 @@
     }),
     { by: sortGroup, direction: sortDirection },
   );
+
+  function createShowDetailsFunc(id: string): () => void {
+    return () => {
+      selectedTransaction = transactions.find((item) => item.id === id);
+    };
+  }
 
   onMount(() => {
     $searchQuery = "";
@@ -51,6 +59,8 @@
 <svelte:head>
   <title>Transactions · Activity · Pay · Junction Hub</title>
 </svelte:head>
+
+<TransactionDetails bind:value={selectedTransaction} />
 
 <Table class="transactions-table">
   <THead>
@@ -73,7 +83,7 @@
 
   <TBody>
     {#each transactions as item}
-      <TRow>
+      <TRow on:click={createShowDetailsFunc(item.id)}>
         <TCol maxWidth="96px" copyable>{item.bookingId}</TCol>
         <TCol>{yymmdd(item.createdAt)}</TCol>
         <TCol maxWidth="160px">
@@ -131,6 +141,10 @@
 
   :global(.table.transactions-table .status-badge) {
     width: 100%;
+  }
+
+  :global(.table.transactions-table tbody tr) {
+    cursor: pointer;
   }
 
   .company {

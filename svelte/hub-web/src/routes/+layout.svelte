@@ -1,5 +1,6 @@
 <script lang="ts">
   import "assets/css/reset.css";
+  import "assets/css/common.css";
   import "assets/css/colors.css";
   import "assets/css/effects.css";
   import "assets/css/typography.css";

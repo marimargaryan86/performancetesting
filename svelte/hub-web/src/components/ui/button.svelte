@@ -1,75 +1,155 @@
 <script lang="ts">
   export let type: "button" | "reset" | "submit" = "button";
-  export let variant: "fill" | "text" | "outline" = "fill";
-  export let size: "small" | "medium" | "large" = "large";
-  export let color: "primary" | "secondary" | "positive-gradient" = "primary";
   export let disabled = false;
+  export let variant: "primary" | "outline" | "text" = "primary";
+  export let size: "large" | "medium" | "small" | "x-small" = "large";
 </script>
 
 <button
-  {type}
   on:click
-  class:fill={variant === "fill"}
-  class:text={variant === "text"}
-  class:outline={variant === "outline"}
-  class:small={size === "small"}
-  class:medium={size === "medium"}
-  class:large={size === "large"}
-  class:primary={color === "primary"}
-  class:secondary={color === "secondary"}
-  class:positive-gradient={color === "positive-gradient"}
+  {type}
   {disabled}
+  class="typography bold"
+  class:body-large={size === "large" || size === "medium"}
+  class:body-medium={size === "small" || size === "x-small"}
+  class:primary={variant === "primary"}
+  class:outline={variant === "outline"}
+  class:text={variant === "text"}
+  class:large={size === "large"}
+  class:medium={size === "medium"}
+  class:small={size === "small"}
+  class:x-small={size === "x-small"}
 >
   <slot />
 </button>
 
 <style>
   button {
-    padding: 0;
-    font-family: Poppins, Arial, Helvetica, sans-serif;
-    font-style: normal;
-    letter-spacing: 0.15px;
-    background-color: transparent;
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    color: var(--color);
+    background-color: var(--background-color);
     border: 0;
-    border-radius: 6px;
+    border-radius: 8px;
+    outline: 0;
+    box-shadow: 0 0 0 var(--border-width) var(--border-color) inset;
     cursor: pointer;
-    transition: opacity 150ms ease;
+    transition: padding 150ms ease, color 150ms ease, background-color 150ms ease, border 150ms ease,
+      box-shadow 150ms ease;
   }
 
-  button:disabled {
-    cursor: not-allowed;
-    opacity: 0.2;
+  .primary {
+    --color: var(--color-common-dark-strong);
+    --icon-color: var(--color-common-dark-strong);
+    --background-color: var(--color-main-primary-500);
+    --border-color: transparent;
+    --border-width: 0;
   }
 
-  .medium {
-    padding: 12px;
-    font-weight: 500;
-    line-height: 16px;
+  .primary:focus {
+    --border-color: var(--color-main-primary-800);
+    --border-width: 2px;
   }
 
-  .large {
-    padding: 16px;
-    font-weight: 600;
-    font-size: 16px;
-    line-height: 24px;
+  .primary:hover {
+    --background-color: var(--color-main-primary-700);
   }
 
-  .fill.primary {
-    color: var(--color-common-dark-strong);
-    background-color: var(--color-main-primary-500);
-  }
-
-  .outline.primary {
-    color: var(--color-main-primary-600);
-    border: var(--color-main-primary-600) 1px solid;
-  }
-
-  .positive-gradient {
-    color: var(--color-common-dark-strong);
-    background-image: var(--color-positive-gradient);
+  .primary:disabled {
+    --color: var(--color-main-neutral-400);
+    --background-color: var(--color-main-neutral-50);
+    --icon-color: var(--color-main-neutral-400);
   }
 
   .outline {
-    background-color: transparent;
+    --color: var(--color-common-light-strong);
+    --icon-color: var(--color-main-primary-500);
+    --background-color: transparent;
+    --border-color: var(--color-main-primary-400);
+    --border-width: 1px;
+  }
+
+  .outline:focus {
+    --border-color: var(--color-main-primary-500);
+    --border-width: 2px;
+    --background-color: var(--color-common-background-light-main);
+  }
+
+  .outline:hover {
+    --border-color: var(--color-main-primary-500);
+    --background-color: rgb(75 182 156 / 0.2);
+  }
+
+  .outline:disabled {
+    --color: var(--color-main-neutral-400);
+    --background-color: transparent;
+    --icon-color: var(--color-main-neutral-400);
+    --border-color: var(--color-main-neutral-100);
+  }
+
+  .text {
+    --color: var(--color-common-light-strong);
+    --icon-color: var(--color-main-primary-500);
+    --background-color: transparent;
+    --border-color: transparent;
+    --border-width: 0;
+  }
+
+  .text:focus {
+    --background-color: var(--color-main-primary-200);
+  }
+
+  .text:hover {
+    --background-color: rgb(75 182 156 / 0.2);
+  }
+
+  .text:disabled {
+    --color: var(--color-main-neutral-400);
+    --icon-color: var(--color-main-neutral-400);
+    --background-color: transparent;
+  }
+
+  .large {
+    --icon-size: 24px;
+
+    padding: 15px 24px;
+  }
+
+  .medium {
+    --icon-size: 20px;
+
+    padding: 11px 24px;
+  }
+
+  .small {
+    --icon-size: 20px;
+
+    padding: 10px 16px;
+  }
+
+  .x-small {
+    --icon-size: 20px;
+
+    padding: 6px 16px;
+  }
+
+  button > :global(svg) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--icon-size);
+    height: var(--icon-size);
+  }
+
+  button :global(*:not(svg)[stroke]) {
+    transition: stroke 150ms ease;
+    stroke: var(--icon-color);
+  }
+
+  button :global(*:not(svg)[fill]) {
+    transition: fill 150ms ease;
+    fill: var(--icon-color);
   }
 </style>

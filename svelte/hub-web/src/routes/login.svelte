@@ -2,6 +2,7 @@
   import { invalidateAll } from "$app/navigation";
   import EmailIcon from "components/icons/email-icon.svelte";
   import JunctionLogo from "components/icons/junction-logo.svelte";
+  import LoadingIcon from "components/icons/loading-icon.svelte";
   import LockIcon from "components/icons/lock-icon.svelte";
   import Button from "components/ui/button.svelte";
   import TextField from "components/ui/text-field.svelte";
@@ -26,7 +27,7 @@
 
       document.cookie = `session-token=${token}; path=/;`;
 
-      invalidateAll();
+      await invalidateAll();
     } catch {
       errors = {
         email: true,
@@ -86,7 +87,13 @@
         <LockIcon slot="icon-before" color="var(--color-main-primary-500)" />
       </TextField>
 
-      <Button type="submit" disabled={loginDisabled}>Login</Button>
+      <Button type="submit" disabled={loginDisabled}>
+        Login
+
+        {#if pending}
+          <LoadingIcon />
+        {/if}
+      </Button>
     </form>
   </section>
 </main>
