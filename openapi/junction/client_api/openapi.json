@@ -7025,11 +7025,23 @@
           },
           "title": {
             "type": "string",
-            "example": "mr"
+            "example": "mr",
+            "enum": [
+              "unspecified",
+              "mr",
+              "mrs",
+              "ms",
+              "miss"
+            ]
           },
           "gender": {
             "type": "string",
-            "example": "male"
+            "example": "male",
+            "enum": [
+              "unspecified",
+              "male",
+              "female"
+            ]
           },
           "dateOfBirth": {
             "type": "string",
