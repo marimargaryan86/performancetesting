@@ -23,10 +23,8 @@
 
     try {
       const token = await integrationInstances.junctionPay.auth.createToken(data);
-      const expiresAt = new Date();
-      expiresAt.setMinutes(expiresAt.getMinutes() + 20);
 
-      document.cookie = `session-token=${token}; expires=${expiresAt}; path=/;`;
+      document.cookie = `session-token=${token}; path=/;`;
 
       invalidateAll();
     } catch {

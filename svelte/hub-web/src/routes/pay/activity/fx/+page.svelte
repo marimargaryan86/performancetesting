@@ -51,7 +51,6 @@
 
 <Table class="fx-table">
   <THead>
-    <Header>Parent ID</Header>
     <Header>ID</Header>
     <Header bind:sortGroup bind:sortDirection sortValue="createdAt">Created</Header>
     <Header bind:sortGroup bind:sortDirection sortValue="settledAt">Settlement</Header>
@@ -69,8 +68,7 @@
   <TBody>
     {#each conversions as conversion}
       <TRow>
-        <TCol maxWidth="96px" copyable>{conversion.transaction?.reference ?? ""}</TCol>
-        <TCol maxWidth="96px" copyable>{conversion.id}</TCol>
+        <TCol maxWidth="96px" copyable>{conversion.transaction?.bookingId ?? ""}</TCol>
         <TCol>{yymmdd(conversion.createdAt)}</TCol>
         <TCol>{yymmdd(conversion.settledAt)}</TCol>
         <TCol class="currency typography bold">{conversion.sellAmount.currency}</TCol>

@@ -6,8 +6,31 @@
   import type { LayoutData } from "./$types";
   import Login from "./login.svelte";
   import MainMenu from "components/partials/main-menu/main-menu.svelte";
+  import { invalidateAll } from "$app/navigation";
+  import { browser } from "$app/environment";
 
   export let data: LayoutData;
+
+  let logoutTimer: number | undefined = undefined;
+
+  $: setLogoutTimer(data.sessionExpiresAt);
+
+  function setLogoutTimer(timeoutAt?: Date): void {
+    if (!(timeoutAt && browser)) {
+      return;
+    }
+
+    clearTimeout(logoutTimer);
+
+    logoutTimer = setTimeout(
+      () => {
+        document.cookie = `session-token=; max-age=0; path=/;`;
+        invalidateAll();
+      },
+      timeoutAt.getTime() - new Date().getTime(),
+      [],
+    );
+  }
 </script>
 
 {#if data.user}

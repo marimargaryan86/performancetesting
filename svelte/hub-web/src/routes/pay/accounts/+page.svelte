@@ -25,16 +25,6 @@
 
 <div class="content">
   <div class="wrapper">
-    <h2 class="typography title-medium bold">Main account</h2>
-
-    <a href="/pay/accounts/asd" class="account head-account">
-      <EntityAvatar name="Snowfall Travel Ltd" size="72px" />
-      <span class="account-name typography body-large bold">Snowfall Travel Ltd</span>
-      <ChevronIcon size="20px" color="var(--color-main-neutral-700)" />
-    </a>
-
-    <hr />
-
     <h2 class="typography title-medium bold">Sub accounts</h2>
 
     <ul class="accounts" data-sveltekit-preload-data="off">
@@ -78,12 +68,6 @@
     border-radius: 16px;
   }
 
-  hr {
-    margin: 0;
-    border: 0;
-    border-bottom: var(--color-common-line-soft) 1px solid;
-  }
-
   .accounts {
     display: flex;
     flex-flow: column;
@@ -108,10 +92,6 @@
     background-color: var(--color-common-dark-strong);
     border: var(--color-main-neutral-100) 1px solid;
     border-radius: 8px;
-  }
-
-  .account.head-account {
-    border-color: var(--color-main-neutral-300);
   }
 
   .account :global(.entity-avatar) {
