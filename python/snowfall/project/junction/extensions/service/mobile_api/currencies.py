@@ -44,7 +44,4 @@ class CurrencyClient(object):
             rate = self._fallback_rates.get(to_currency)
             if not rate:
                 raise err
-        if from_currency == "EUR" and to_currency == "SEK":
-            rate_markup = 5.4
-            rate = ((rate / 100) * rate_markup) + rate
         return rate
