@@ -26,7 +26,7 @@ func (mr *mergeRequest) merge() error {
 	if mr.object.State != "opened" || mr.status() != statusAccepted {
 		mr.logger.Debug("Not in a mergeable state, skipping.")
 
-		if hasSnowman {
+		if mr.status() != statusAccepted && hasSnowman {
 			return mr.unapprove()
 		}
 		return nil
