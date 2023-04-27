@@ -139,6 +139,7 @@ TWILIO_SID={{ .Data.data.twilio_sid }}
 ICOUPON_CLIENT_SECRET={{ .Data.data.icoupon_client_secret }}
 AWS_ACCESS_KEY={{ .Data.data.aws_access_key }}
 AWS_SECRET_KEY={{ .Data.data.aws_secret_key }}
+TF_CLIENT_KEY={{ .Data.data.tf_client_key }}
 {{ end }}
 EOH
       }
@@ -172,6 +173,7 @@ EOH
         FLIGHT_STATS_API_ADDRESS        = "https://api.flightstats.com/flex/flightstatus/rest/v2/json/flight/status/"
         ICOUPON_CLIENT_ID               = "Snowfall"
         ICOUPON_API_ADDRESS             = "https://ppd.icoupon.global/api"
+        TF_API_ADDRESS                  = "https://api.travelfusion.com"
       }
     }
   }
