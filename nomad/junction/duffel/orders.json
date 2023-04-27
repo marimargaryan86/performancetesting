@@ -2,14 +2,16 @@
     "development": {
         "variables": {
             "count": 1,
-            "api_base_url": "https://api.duffel.com"
+            "api_base_url": "https://api.duffel.com",
+            "http_timeout": 90
         }
     },
     "production": {
         "deploy": false,
         "variables": {
             "count": 2,
-            "api_base_url": "https://api.duffel.com"
+            "api_base_url": "https://api.duffel.com",
+            "http_timeout": 90
         }
     }
 }

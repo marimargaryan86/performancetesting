@@ -30,6 +30,10 @@ variable "api_base_url" {
   type = string
 }
 
+variable "http_timeout" {
+  type = string
+}
+
 job "duffel-orders" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -122,6 +126,7 @@ EOH
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
         API_BASE_URL    = "${var.api_base_url}"
         SENTRY_DSN      = "https://c957bacb77d741509281e8b0a3b79e25@sentry.snowfall.se/57"
+        HTTP_TIMEOUT    = "${var.http_timeout}"
       }
     }
   }
