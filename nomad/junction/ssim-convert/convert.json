@@ -1,0 +1,10 @@
+{
+    "development": {
+        "deploy": false,
+        "variables": {}
+    },
+    "production": {
+        "deploy": false,
+        "variables": {}
+    }
+}

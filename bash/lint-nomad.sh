@@ -5,7 +5,9 @@ set -o pipefail
 shopt -s globstar
 shopt -s nullglob
 
-ENVIRONMENT=${1}
+pants run python/snowfall/script/validate_nomad_build_files.py -- "nomad/"
+
+ENVIRONMENTS=("development" "production")
 SENTRY_PROJECTS=$(sentry-cli projects list | awk -F '|' '{if (NR>3){print $2$3}}' | sed 's/^ *//;s/ *$//')
 CHANGED_SINCE=""
 NOMAD_FILES=()
@@ -37,19 +39,22 @@ for f in "${NOMAD_FILES[@]}"; do
 
 	FILENAME=$(basename "${f}")
 	CONFIG="$(dirname "${f}")/${FILENAME%.*}.json"
-	VARIABLES=()
-	SKIP_DEPLOY=$(jq ".${ENVIRONMENT} | if has(\"deploy\") then .deploy else true end" "${CONFIG}")
 
-	if [ "${SKIP_DEPLOY}" = "false" ]; then
-		continue
-	fi
+	for e in "${ENVIRONMENTS[@]}"; do
+		VARIABLES=()
+		SKIP_DEPLOY=$(jq ".${e} | if has(\"deploy\") then .deploy else true end" "${CONFIG}")
 
-	if [ -f "${CONFIG}" ]; then
-		mapfile -t VARIABLES < <(jq -r ".${ENVIRONMENT}.variables|to_entries|map(\"-var=\\(.key)=\\(.value|tostring)\")|.[]" "${CONFIG}")
-	fi
+		if [ "${SKIP_DEPLOY}" = "false" ]; then
+			continue
+		fi
 
-	nomad validate "${VARIABLES[@]}" "${f}" >/dev/null
-	nomad fmt -check -write=false "${f}"
+		if [ -f "${CONFIG}" ]; then
+			mapfile -t VARIABLES < <(jq -r ".${e}.variables|to_entries|map(\"-var=\\(.key)=\\(.value|tostring)\")|.[]" "${CONFIG}")
+		fi
+
+		env nomad validate "${VARIABLES[@]}" "${f}" >/dev/null
+		env nomad fmt -check -write=false "${f}"
+	done
 done
 
 if ! [ ${#NOMAD_FILES[@]} -eq 0 ]; then

@@ -90,7 +90,7 @@ job "accounts-grpc" {
       }
     }
 
-    task "http" {
+    task "grpc" {
       driver = "docker"
 
       vault {
@@ -130,7 +130,7 @@ EOH
         FORWARDED_ALLOWED_IPS = "0.0.0.0"
         GRPC_ADDRESS          = "0.0.0.0"
         GRPC_PORT             = "${NOMAD_PORT_grpc}"
-        SENTRY_DSN            = "https://025704ebb5d24063b1153935db50ffd5@sentry.snowfall.se/42"
+        SENTRY_DSN            = "https://14777b869dcb4cecacb590784567ff31@sentry.snowfall.se/115"
         PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
       }
     }

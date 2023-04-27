@@ -1,1 +1,1 @@
-nomad_template(["http"])
+nomad_template(["http"], None)

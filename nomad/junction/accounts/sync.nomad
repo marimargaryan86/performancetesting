@@ -31,7 +31,7 @@ job "accounts-sync" {
     prohibit_overlap = true
   }
 
-  group "grpc" {
+  group "sync" {
     count = 1
 
     restart {
@@ -78,7 +78,7 @@ EOH
 
       env {
         ENV_NAME   = "${var.environment}"
-        SENTRY_DSN = "https://025704ebb5d24063b1153935db50ffd5@sentry.snowfall.se/42"
+        SENTRY_DSN = "https://14777b869dcb4cecacb590784567ff31@sentry.snowfall.se/115"
       }
     }
   }
