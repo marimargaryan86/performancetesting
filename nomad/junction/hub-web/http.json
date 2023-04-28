@@ -5,7 +5,8 @@
       "traefik_entrypoints": "websecure",
       "traefik_host_URL": "hub.junction.dev",
       "api_pay_base_url": "https://api.pay.junction.dev",
-      "pay_admin_api_base_url": "https://adminapi.pay.junction.dev"
+      "pay_admin_api_base_url": "https://adminapi.pay.junction.dev",
+      "client_api_base_url": "https://api.junction.dev"
     }
   },
   "production": {
@@ -14,7 +15,8 @@
       "traefik_entrypoints": "web",
       "traefik_host_URL": "hub.junction.travel",
       "api_pay_base_url": "https://api.pay.junction.travel",
-      "pay_admin_api_base_url": "https://adminapi.pay.junction.travel"
+      "pay_admin_api_base_url": "https://adminapi.pay.junction.travel",
+      "client_api_base_url": "https://api.junction.travel"
     }
   }
 }

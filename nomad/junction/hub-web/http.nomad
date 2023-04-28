@@ -37,7 +37,12 @@ variable "count" {
 variable "pay_admin_api_base_url" {
   type = string
 }
+
 variable "api_pay_base_url" {
+  type = string
+}
+
+variable "client_api_base_url" {
   type = string
 }
 
@@ -100,6 +105,21 @@ job "hub-web-http" {
     task "http" {
       driver = "docker"
 
+      vault {
+        policies = ["hub-web-${var.environment}"]
+      }
+
+      template {
+        destination = "services.env"
+        env         = true
+        change_mode = "restart"
+        data        = <<EOH
+{{ with secret "kv/data/${var.environment}/hub-web" }}
+CLIENT_API_KEY={{ .Data.data.client_api_key }}
+{{ end }}
+EOH
+      }
+
       config {
         image = var.docker_image
         ports = ["http"]
@@ -116,6 +136,7 @@ job "hub-web-http" {
         PORT                          = "${NOMAD_PORT_http}"
         PUBLIC_PAY_ADMIN_API_BASE_URL = "${var.pay_admin_api_base_url}"
         PUBLIC_PAY_API_BASE_URL       = "${var.api_pay_base_url}"
+        CLIENT_API_BASE_URL           = "${var.client_api_base_url}"
       }
     }
   }
