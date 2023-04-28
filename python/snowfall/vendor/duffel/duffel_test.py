@@ -247,6 +247,15 @@ async def test_offer_after_order_create(  # noqa: WPS210
     assert order2 is not None
 
 
+@disable_by_default
+async def test_brussels_airline_refresh_offer(
+    duffel_client: client.DuffelClient,
+) -> None:
+    offer = await duffel_client.get_single_offer("off_0000AV6qLwWut9cBOA4b0y")
+    refreshed_offer = await refresh_offer(duffel_client, offer)
+    assert refreshed_offer is not None
+
+
 async def refresh_offer(  # noqa: WPS210
     duffel_client: client.DuffelClient,
     offer: Offer,
@@ -296,7 +305,6 @@ async def refresh_offer(  # noqa: WPS210
 
 def get_offer_hash(offer: Offer) -> str:
     reduced_offer = {
-        "owner": offer.owner.iata_code,
         "slices": [
             {
                 "segments": [

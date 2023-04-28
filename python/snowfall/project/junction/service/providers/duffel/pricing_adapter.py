@@ -75,7 +75,6 @@ class PricingAdapter(object):
 
     def _get_offer_hash(self, offer: Offer) -> str:
         reduced_offer = {
-            "owner": offer.owner.iata_code,
             "slices": [
                 {
                     "segments": [
