@@ -5,7 +5,6 @@ import pathlib
 from typing import AsyncIterator, Mapping, Sequence
 from unittest import mock
 
-import currencycloud
 import httpx
 import mongomock_motor
 import pytest
@@ -37,7 +36,7 @@ from snowfall.stdlib.format.jwt import Encoder
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.vendor.currency_cloud.client import PaymentClient
+from snowfall.vendor.currency_cloud.client import CurrencyCloudConfig, PaymentClient
 from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
 from snowfall.vendor.currency_cloud.models.balance import BalanceResponse
 from snowfall.vendor.currency_cloud.models.beneficiary import BeneficiaryResponse
@@ -94,7 +93,7 @@ def custom_middlewares(public_key: str) -> Sequence[Middleware]:
 
 
 def _create_app(  # noqa: WPS211
-    cc_client: currencycloud.Client,
+    cc_config: CurrencyCloudConfig,
     payment_client: PaymentClient,
     currencies_client: currencies.Client,
     quotations_repository: quotations.QuotationsRepository,
@@ -111,7 +110,7 @@ def _create_app(  # noqa: WPS211
         openapi_path=openapi_path,
         routes=router.get_routes(
             bootstrap.create_dependencies(
-                cc_client,
+                cc_config,
                 currencies_client,
                 quotations_repository,
                 redis_repository,
@@ -130,7 +129,7 @@ def _create_app(  # noqa: WPS211
 
 
 def _create_admin_app(  # noqa: WPS211
-    cc_client: currencycloud.Client,
+    cc_config: CurrencyCloudConfig,
     payment_client: PaymentClient,
     authentication_client: auth.Client,
     companies_repository: pay_repos.CompanyRepository,
@@ -148,7 +147,7 @@ def _create_admin_app(  # noqa: WPS211
         openapi_path=openapi_path,
         routes=router.get_admin_routes(
             bootstrap.create_admin_dependencies(
-                cc_client,
+                cc_config,
                 authentication_client,
                 companies_repository,
                 contacts_repository,
@@ -316,12 +315,8 @@ def available_currencies() -> Sequence[money.Currency]:
 
 
 @pytest.fixture()
-def cc_client(cc_login: str, cc_api_key: str, cc_env: str) -> currencycloud.Client:
-    return currencycloud.Client(
-        cc_login,
-        cc_api_key,
-        cc_env,
-    )
+def cc_config(cc_login: str, cc_api_key: str, cc_env: str) -> CurrencyCloudConfig:
+    return CurrencyCloudConfig(cc_login, cc_api_key, cc_env)
 
 
 @pytest.fixture()
@@ -420,7 +415,7 @@ def headers(jwt_token: str) -> dict[str, str]:
 
 @pytest.fixture()
 def app(  # noqa: WPS211
-    cc_client: currencycloud.Client,
+    cc_config: CurrencyCloudConfig,
     currencies_client: currencies.Client,
     quotations_repository: quotations.QuotationsRepository,
     redis_repository: UserSessionRepository,
@@ -431,7 +426,7 @@ def app(  # noqa: WPS211
     currencies_repository: pay_repos.CurrencyRepository,
 ) -> applications.Starlette:
     return _create_app(
-        cc_client=cc_client,
+        cc_config=cc_config,
         payment_client=payment_client,
         currencies_client=currencies_client,
         quotations_repository=quotations_repository,
@@ -446,7 +441,7 @@ def app(  # noqa: WPS211
 
 @pytest.fixture()
 def admin_app(  # noqa: WPS211
-    cc_client: currencycloud.Client,
+    cc_config: CurrencyCloudConfig,
     authentication_client: auth.Client,
     companies_repository: pay_repos.CompanyRepository,
     payment_client: PaymentClient,
@@ -459,7 +454,7 @@ def admin_app(  # noqa: WPS211
     custom_middlewares: Sequence[Middleware],
 ) -> applications.Starlette:
     return _create_admin_app(
-        cc_client=cc_client,
+        cc_config=cc_config,
         payment_client=payment_client,
         authentication_client=authentication_client,
         companies_repository=companies_repository,

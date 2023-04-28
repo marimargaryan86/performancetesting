@@ -88,8 +88,9 @@ def payment_client_pass_case(
     cc_client.accounts.create = mock.Mock(
         return_value=resource_account,
     )
-
-    return PaymentClient(cc_client)
+    config = mock.Mock()
+    config.client = cc_client
+    return PaymentClient(config)
 
 
 @pytest.fixture()
@@ -146,7 +147,9 @@ def payment_client_permission_contact_issue(
             response,
         ),
     )
-    return PaymentClient(cc_client)
+    config = mock.Mock()
+    config.client = cc_client
+    return PaymentClient(config)
 
 
 @pytest.fixture()
@@ -167,4 +170,6 @@ def payment_client_permission_account_issue(
             response,
         ),
     )
-    return PaymentClient(cc_client)
+    config = mock.Mock()
+    config.client = cc_client
+    return PaymentClient(config)

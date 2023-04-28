@@ -47,9 +47,29 @@ def error_handler(func: Callable[..., Any]) -> Callable[..., Any]:
     return decorator
 
 
+class CurrencyCloudConfig(object):
+    def __init__(
+        self,
+        login: str,
+        api_key: str,
+        env: str,
+    ):
+        self._login = login
+        self._api_key = api_key
+        self._env = env
+
+    @property
+    def client(self) -> currencycloud.Client:
+        return currencycloud.Client(
+            self._login,
+            self._api_key,
+            self._env,
+        )
+
+
 class PaymentClient(object):  # noqa: WPS214
-    def __init__(self, cc_client: currencycloud.Client):
-        self._cc_client = cc_client
+    def __init__(self, cc_config: CurrencyCloudConfig):
+        self._client_config = cc_config
 
     @error_handler
     def create_conversion(
@@ -162,3 +182,7 @@ class PaymentClient(object):  # noqa: WPS214
             )
 
         return rates
+
+    @property
+    def _cc_client(self) -> currencycloud.Client:
+        return self._client_config.client

@@ -2,7 +2,6 @@ import datetime
 import random
 from typing import Callable
 
-import currencycloud
 from motor import motor_asyncio
 from redis import asyncio as aioredis
 from starlette import applications
@@ -33,6 +32,7 @@ from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.grpc.client import create_channel
+from snowfall.vendor.currency_cloud.client import CurrencyCloudConfig
 
 
 def _factory(
@@ -42,7 +42,7 @@ def _factory(
         mongo = motor_asyncio.AsyncIOMotorClient(
             random.choice(app.settings.mongo_dsn),  # nosec
         )
-        cc_client = currencycloud.Client(
+        cc_config = CurrencyCloudConfig(
             app.settings.cc_login,
             app.settings.cc_api_key,
             app.settings.cc_env,
@@ -71,7 +71,7 @@ def _factory(
             ],
             routes=router.get_routes(
                 bootstrap.create_dependencies(
-                    cc_client=cc_client,
+                    cc_config=cc_config,
                     currencies_client=currencies.GrpcClient(
                         currencies_pb2_grpc.CurrencyServiceStub(orders_channel),
                     ),
@@ -122,7 +122,7 @@ def _admin_factory(
         mongo = motor_asyncio.AsyncIOMotorClient(
             random.choice(app.settings.mongo_dsn),  # nosec
         )
-        cc_client = currencycloud.Client(
+        cc_config = CurrencyCloudConfig(
             app.settings.cc_login,
             app.settings.cc_api_key,
             app.settings.cc_env,
@@ -145,7 +145,7 @@ def _admin_factory(
             ],
             routes=router.get_admin_routes(
                 bootstrap.create_admin_dependencies(
-                    cc_client=cc_client,
+                    cc_config=cc_config,
                     authentication_client=auth.GrpcClient(
                         auth.auth_pb2_grpc.AuthenticationServiceStub(
                             authentication_channel,
