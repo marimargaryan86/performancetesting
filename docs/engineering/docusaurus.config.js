@@ -51,7 +51,10 @@ const config = {
       }),
     ],
   ],
-
+  themes: ['@docusaurus/theme-mermaid'],
+  markdown: {
+    mermaid: true,
+  },
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
@@ -79,6 +82,12 @@ const config = {
             sidebarId: 'projects',
             position: 'left',
             label: 'Projects',
+          },
+          {
+            type: 'docSidebar',
+            sidebarId: 'standard_library',
+            position: 'left',
+            label: 'Standard Library',
           },
         ],
       },
