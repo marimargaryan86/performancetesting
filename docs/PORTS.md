@@ -42,3 +42,4 @@ The following ports are configured in local environments by default:
 | 50062 | authentication         | gRPC Server       |
 | 50063 | checkin                | gRPC Server       |
 | 50064 | accounts               | gRPC Server       |
+| 50065 | gateway                | gRPC Server       |
