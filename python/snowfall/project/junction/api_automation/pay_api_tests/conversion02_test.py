@@ -43,7 +43,7 @@ async def test_list_conversions_details(  # noqa: WPS218
 
     assert is_valid_uuid(rlcd_first_item["id"])
     assert rlcd_first_item["type"] == "conversions"
-    parser.parse(rlcd_first_item["attributes"]["executedAt"])
+    parser.parse(rlcd_first_item["attributes"]["createdAt"])
     parser.parse(rlcd_first_item["attributes"]["settledAt"])
     assert isinstance(rlcd_first_item["attributes"]["sellAmount"]["currency"], str)
     assert isinstance(rlcd_first_item["attributes"]["sellAmount"]["amount"], int)

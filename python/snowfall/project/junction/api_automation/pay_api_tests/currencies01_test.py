@@ -74,4 +74,4 @@ async def test_get_currencies(
 
     assert set(expected_currencies_list) == set(
         actual_currencies_list,
-    ), "Expected currencies list lenght does not match"
+    ), "Expected currencies list length does not match"

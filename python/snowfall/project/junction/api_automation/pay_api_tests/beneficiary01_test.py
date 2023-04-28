@@ -6,6 +6,9 @@ import httpx
 import pytest
 
 from snowfall.project.junction.api_automation.conftest import EXIT_MSG
+from snowfall.project.junction.api_automation.pay_api_tests.conftest import (
+    PAY_TEST_ACCOUNT01,
+)
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
     is_valid_uuid,
 )
@@ -20,7 +23,6 @@ logger.setLevel(logging.DEBUG)
 @pytest.mark.integration()
 async def test_create_beneficiary_usd(
     pay_admin_client: PayAdminClient,
-    pay_create_account: Mapping[str, Any],
 ) -> None:
     try:
         response_create_beneficiary = await pay_admin_client.create_beneficiary(
@@ -46,7 +48,7 @@ async def test_create_beneficiary_usd(
             ],
             bank_country_code="US",
             currency_id="USD",
-            account_id=pay_create_account["data"]["id"],
+            account_id=PAY_TEST_ACCOUNT01,
             beneficiary_postal_code="12345",
             beneficiary_city="Uppsala",
             beneficiary_state="California",
@@ -77,7 +79,6 @@ async def test_create_beneficiary_usd(
 @pytest.mark.integration()
 async def test_create_beneficiary_eur(
     pay_admin_client: PayAdminClient,
-    pay_create_account: Mapping[str, Any],
 ) -> None:
     try:
         response_create_beneficiary = await pay_admin_client.create_beneficiary(
@@ -103,7 +104,7 @@ async def test_create_beneficiary_eur(
             ],
             bank_country_code="DE",
             currency_id="EUR",
-            account_id=pay_create_account["data"]["id"],
+            account_id=PAY_TEST_ACCOUNT01,
             beneficiary_postal_code="12345",
             beneficiary_city="Uppsala",
             bic_swift="BREXPLPWMBK",
@@ -133,7 +134,6 @@ async def test_create_beneficiary_eur(
 @pytest.mark.integration()
 async def test_create_beneficiary_gbp(
     pay_admin_client: PayAdminClient,
-    pay_create_account: Mapping[str, Any],
 ) -> None:
     try:
         response_create_beneficiary = await pay_admin_client.create_beneficiary(
@@ -159,7 +159,7 @@ async def test_create_beneficiary_gbp(
             ],
             bank_country_code="GB",
             currency_id="GBP",
-            account_id=pay_create_account["data"]["id"],
+            account_id=PAY_TEST_ACCOUNT01,
             beneficiary_postal_code="12345",
             beneficiary_city="Uppsala",
             bic_swift="BREXPLPWMBK",

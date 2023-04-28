@@ -22,6 +22,9 @@ from snowfall.vendor.junction.pay.client import Client as PayClient
 
 logger = logging.getLogger()
 
+PAY_TEST_ACCOUNT01 = "009822ce-70fe-4f6d-b2d6-1f807f9cc5c4"
+PAY_TEST_ACCOUNT02 = "00a986b5-5609-418c-bd63-e8f927fac6da"
+
 
 @pytest.fixture()
 async def pay_create_account(

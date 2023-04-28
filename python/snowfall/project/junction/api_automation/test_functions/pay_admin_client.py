@@ -98,9 +98,11 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
     async def get_conversion_details(
         self,
         conversion_id: str,
+        include: Sequence[conversion_includes] | None = None,
     ) -> dict[str, Any]:
         response = await self._client.get(
             "/conversions/{0}".format(conversion_id),
+            params=make_pagination_params(limit=None, cursor=None, include=include),
         )
 
         response.raise_for_status()

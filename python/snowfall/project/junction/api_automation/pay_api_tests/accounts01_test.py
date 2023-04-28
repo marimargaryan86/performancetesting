@@ -1,6 +1,5 @@
 import json
 import logging
-from typing import Any, Mapping
 
 import httpx
 import pytest
@@ -20,7 +19,6 @@ logger.setLevel(logging.DEBUG)
 @pytest.mark.integration()
 async def test_get_accounts(  # noqa: WPS218
     pay_admin_client: PayAdminClient,
-    pay_create_account: Mapping[str, Any],
 ) -> None:
     try:
         response_get_accounts = await pay_admin_client.get_accounts()

@@ -2,9 +2,13 @@ import json
 import logging
 import random
 
+import httpx
 import pytest
 
-from snowfall.project.junction.api_automation.conftest import expected_currencies_list
+from snowfall.project.junction.api_automation.conftest import (
+    EXIT_MSG,
+    expected_currencies_list,
+)
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
     is_valid_uuid,
     return_randomized_token,
@@ -15,8 +19,8 @@ from snowfall.project.junction.api_automation.test_functions.pay_admin_client im
 from snowfall.stdlib import string
 from snowfall.vendor.junction.pay.client import Client
 
-logging.basicConfig()
-logging.getLogger().setLevel(logging.INFO)
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
 
 
 @pytest.mark.integration()
@@ -26,27 +30,37 @@ async def test_create_quote(  # noqa: WPS210, WPS218
 ) -> None:
     from_currency, to_currency = random.sample(expected_currencies_list, 2)
 
-    response_payer = await pay_admin_client.create_company(
-        company="test-company-{0}".format(return_randomized_token()),
-        address_lines=["Radhuset", "Våksalagatan 2", "United Spaces", "Sweden"],
-        country_code="SE",
-        postal_code="75320",
-        city="Uppsala",
-        fx_markup=float(0),
-        fx_provider_markup=float(0),
-        sales_markup=float(0),
-    )
+    try:
+        response_payer = await pay_admin_client.create_company(
+            company="test-company-{0}".format(return_randomized_token()),
+            address_lines=["Radhuset", "Våksalagatan 2", "United Spaces", "Sweden"],
+            country_code="SE",
+            postal_code="75320",
+            city="Uppsala",
+            fx_markup=float(0),
+            fx_provider_markup=float(0),
+            sales_markup=float(0),
+        )
+    except httpx.HTTPStatusError as err:
+        logger.info("response_payer err: %s", err.response.headers)
+        logger.info("response_payer body: %s", err.response.json())
+        pytest.fail(EXIT_MSG, pytrace=False)
 
-    response_beneficiary = await pay_admin_client.create_company(
-        company="test-company-{0}".format(return_randomized_token()),
-        address_lines=["Radhuset", "Våksalagatan 2", "United Spaces", "Sweden"],
-        country_code="SE",
-        postal_code="75320",
-        city="Uppsala",
-        fx_markup=float(0),
-        fx_provider_markup=float(0),
-        sales_markup=float(0),
-    )
+    try:
+        response_beneficiary = await pay_admin_client.create_company(
+            company="test-company-{0}".format(return_randomized_token()),
+            address_lines=["Radhuset", "Våksalagatan 2", "United Spaces", "Sweden"],
+            country_code="SE",
+            postal_code="75320",
+            city="Uppsala",
+            fx_markup=float(0),
+            fx_provider_markup=float(0),
+            sales_markup=float(0),
+        )
+    except httpx.HTTPStatusError as err1:
+        logger.info("response_beneficiary err:: %s", err1.response.headers)
+        logger.info("response_beneficiary body: %s", err1.response.json())
+        pytest.fail(EXIT_MSG, pytrace=False)
 
     response_create_quote = await pay_client.create_quote(
         amount=1000,
