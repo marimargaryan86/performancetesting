@@ -68,7 +68,7 @@ type codeOwnerRule struct {
 }
 
 func decideOptimalCodeOwners(rules []*codeOwnerRule, current []int, blacklist []int) []int {
-	indecisive := make([][]int, 0)
+	indecisive := make([]codeOwnerRule, 0)
 	expected := make([]int, len(current))
 
 	copy(expected, current)
@@ -79,7 +79,10 @@ func decideOptimalCodeOwners(rules []*codeOwnerRule, current []int, blacklist []
 		if len(eligible) <= r.ApprovalsRequired {
 			expected = append(expected, eligible...)
 		} else {
-			indecisive = append(indecisive, eligible)
+			indecisive = append(indecisive, codeOwnerRule{
+				EligibleApprovers: eligible,
+				ApprovalsRequired: r.ApprovalsRequired,
+			})
 		}
 	}
 
@@ -89,21 +92,26 @@ func decideOptimalCodeOwners(rules []*codeOwnerRule, current []int, blacklist []
 
 	for len(indecisive) > 0 {
 		eligible := make([]int, 0)
-		stillIndecisive := make([][]int, 0)
+		stillIndecisive := make([]codeOwnerRule, 0)
 
-	IndecisiveLoop:
-		for _, reviewers := range indecisive {
-			for _, reviewer := range reviewers {
+		for _, r := range indecisive {
+			found := 0
+			ruleEligible := make([]int, 0)
+
+			for _, reviewer := range r.EligibleApprovers {
 				if sliceutil.In(expected, reviewer) {
-					continue IndecisiveLoop
+					found++
+				} else {
+					ruleEligible = append(ruleEligible, reviewer)
 				}
 			}
 
-			for _, reviewer := range reviewers {
-				eligible = append(eligible, reviewer)
+			if found >= r.ApprovalsRequired {
+				continue
 			}
 
-			stillIndecisive = append(stillIndecisive, reviewers)
+			eligible = append(eligible, ruleEligible...)
+			stillIndecisive = append(stillIndecisive, r)
 		}
 
 		reviewer := sliceutil.MostCommon(eligible)

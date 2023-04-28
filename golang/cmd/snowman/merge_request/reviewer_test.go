@@ -117,6 +117,17 @@ func TestDecideOptimalCodeOwners(t *testing.T) {
 			[]int{},
 			[]int{1, 2},
 		},
+		{
+			[]*codeOwnerRule{
+				{
+					[]int{1, 2, 3},
+					2,
+				},
+			},
+			[]int{1},
+			[]int{},
+			[]int{1, 2},
+		},
 	}
 
 	for _, tc := range testCases {
