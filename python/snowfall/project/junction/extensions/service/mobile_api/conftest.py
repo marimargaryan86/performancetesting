@@ -23,9 +23,6 @@ from starlette.middleware import Middleware, authentication
 
 from snowfall.project.junction.extensions.service.mobile_api import bootstrap
 from snowfall.project.junction.extensions.service.mobile_api import (
-    currencies as mobile_currencies,
-)
-from snowfall.project.junction.extensions.service.mobile_api import (
     handlers as mobile_handlers,
 )
 from snowfall.project.junction.extensions.service.mobile_api import (
@@ -37,7 +34,6 @@ from snowfall.project.junction.extensions.service.mobile_api import (
 )
 from snowfall.project.junction.extensions.service.mobile_api.routes import router
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
-from snowfall.project.pay.adapter import currencies
 from snowfall.stdlib import string
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import filesystem
@@ -284,18 +280,6 @@ async def otp_repository(
 
 
 @pytest.fixture()
-async def offers_rates_repository(
-    redis_client: redis.Client[str],
-    new_user_verification_code: VerificationCode,
-    existing_user_verification_code: VerificationCode,
-) -> repository.OffersRatesRepository:
-    return repository.OffersRatesRepository(
-        redis_client,
-        datetime.timedelta(minutes=20),  # noqa: WPS432
-    )
-
-
-@pytest.fixture()
 async def enums_values_repository(
     redis_client: redis.Client[str],
 ) -> repository.EnumsValuesRepository:
@@ -357,23 +341,10 @@ def non_mocked_hosts() -> list[str]:
 
 
 @pytest.fixture()
-def mobile_currencies_client(
-    currencies_client: currencies.Client,
-) -> mobile_currencies.CurrencyClient:
-    return mobile_currencies.CurrencyClient(
-        datetime.timedelta(minutes=10),
-        currencies_client,
-        fallback_rates={"SEK": 10.0},
-    )
-
-
-@pytest.fixture()
 def app(  # noqa: WPS211
-    mobile_currencies_client: mobile_currencies.CurrencyClient,
     places_repository: repository.PlacesRepository,
     users_repository: repository.UsersRepository,
     otp_repository: repository.OtpRepository,
-    offers_rates_repository: repository.OffersRatesRepository,
     enums_values_repository: repository.EnumsValuesRepository,
     smtp_client: smtp.EmailClient,
     orders_repository: repository.OrdersRepository,
@@ -389,14 +360,12 @@ def app(  # noqa: WPS211
 ) -> applications.Starlette:
     return _create_app(
         dependencies=bootstrap.create_dependencies(
-            mobile_currencies_client,
             orders_repository,
             junction_client,
             plus_http_client,
             places_repository,
             users_repository,
             otp_repository,
-            offers_rates_repository,
             enums_values_repository,
             smtp_client,
             jwt_gen,
