@@ -1,29 +1,8 @@
 <script lang="ts">
   import { yymmdd } from "formatting/date-time";
+  import type { OrderPassengerModel } from "models/order";
 
-  const passengers = [
-    {
-      firstName: "Jonathan",
-      lastName: "Smith",
-      email: "john.smith@example.com",
-      gender: "Male",
-      dateOfBirth: new Date(),
-    },
-    {
-      firstName: "Mary",
-      lastName: "Smith",
-      email: "mary.smith@example.com",
-      gender: "Female",
-      dateOfBirth: new Date(),
-    },
-    {
-      firstName: "Martin",
-      lastName: "Smith",
-      email: "martin.smith@example.com",
-      gender: "Male",
-      dateOfBirth: new Date(),
-    },
-  ];
+  export let passengers: OrderPassengerModel[];
 </script>
 
 <div class="passengers">
@@ -39,7 +18,6 @@
       <strong class="typography body-small bold">{passenger.lastName}</strong>
       <strong class="typography body-small bold">{passenger.gender}</strong>
       <strong class="typography body-small bold">{yymmdd(passenger.dateOfBirth)}</strong>
-      <strong class="typography body-small subtle email">{passenger.email}</strong>
     {/each}
   </div>
 </div>
@@ -62,11 +40,7 @@
     gap: 4px 8px;
   }
 
-  .email {
-    grid-column: 1 / -1;
-  }
-
-  .email:not(:last-child) {
+  strong {
     margin-bottom: 24px;
   }
 

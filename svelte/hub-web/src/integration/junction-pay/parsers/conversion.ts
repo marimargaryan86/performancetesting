@@ -16,7 +16,7 @@ export function parseConversion(
     buyAmount: conversion.attributes.buyAmount,
     createdAt: new Date(conversion.attributes.createdAt),
     executedRate: conversion.attributes.executedRate,
-    fxDelta: conversion.attributes.fxDelta,
+    fxDelta: conversion.attributes.fxDelta ?? undefined,
     fxStatus: conversion.attributes.fxStatus,
     sellAmount: conversion.attributes.sellAmount,
     settledAt: new Date(conversion.attributes.settledAt),

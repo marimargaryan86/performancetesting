@@ -40,7 +40,6 @@
 }
 
 .typography.headline-medium {
-  align-items: center;
   font-size: 28px;
   font-family: Raleway, Arial, Helvetica, sans-serif;
   font-style: normal;
@@ -48,11 +47,10 @@
 }
 
 .typography.headline-small {
-  align-items: center;
-  font-size: 28px;
+  font-size: 24px;
   font-family: Raleway, Arial, Helvetica, sans-serif;
   font-style: normal;
-  line-height: 36px;
+  line-height: 32px;
 }
 
 .typography.headline-medium.bold,

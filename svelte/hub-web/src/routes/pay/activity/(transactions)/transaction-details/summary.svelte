@@ -1,7 +1,22 @@
 <script lang="ts">
   import EntityAvatar from "components/ui/entity-avatar.svelte";
-  import StatusBadge from "components/ui/status-badge.svelte";
+  import StatusBadge, { type StatusBadgeVariant } from "components/ui/status-badge.svelte";
   import { yymmdd } from "formatting/date-time";
+  import type { BookingModel } from "models/booking";
+  import type { TransactionModel } from "models/transaction";
+  import { capitalize } from "utils/common";
+
+  export let booking: BookingModel;
+  export let transaction: TransactionModel;
+
+  const statusMapping: Record<string, StatusBadgeVariant> = {
+    error: "error",
+    "not-ticketed": "warn",
+  };
+  const labelMapping: Record<string, string> = {
+    error: "Error",
+    "not-ticketed": "Not ticketed",
+  };
 </script>
 
 <div class="summary">
@@ -10,26 +25,29 @@
   <div class="item">
     <strong class="typography body-small">Vendor</strong>
     <span class="typography body-medium company">
-      <EntityAvatar name="Air France" />
-      Air France
+      <EntityAvatar name={transaction.beneficiary?.name} />
+      {transaction.beneficiary?.name ?? "N/A"}
     </span>
   </div>
 
   <div class="item">
     <strong class="typography body-small">Status</strong>
     <span class="typography body-medium">
-      <StatusBadge value="Paid" />
+      <StatusBadge
+        value={labelMapping[booking.status] ?? capitalize(booking.status)}
+        variant={statusMapping[booking.status] ?? "ok"}
+      />
     </span>
   </div>
 
   <div class="item">
     <strong class="typography body-small">Reference</strong>
-    <span class="typography body-medium bold">HZEMS</span>
+    <span class="typography body-medium bold">{booking.externalReference ?? "N/A"}</span>
   </div>
 
   <div class="item">
     <strong class="typography body-small">Issued</strong>
-    <span class="typography body-medium bold">{yymmdd(new Date())}</span>
+    <span class="typography body-medium bold">{yymmdd(transaction.createdAt)}</span>
   </div>
 </div>
 

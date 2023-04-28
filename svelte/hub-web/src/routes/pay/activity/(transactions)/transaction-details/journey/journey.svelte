@@ -1,39 +1,36 @@
 <script lang="ts">
+  import type { BookingModel } from "models/booking";
   import Trip from "./trip.svelte";
 
-  const data = {
-    outbound: {
-      operator: "Air France",
-      class: "Economy",
-      departureAt: new Date(),
-      arrivalAt: new Date(),
-      duration: 7500,
-      origin: "London Heathrow",
-      destination: "Charles de Gaulle",
-      equipment: "Air France 319",
-    },
-    inbound: {
-      operator: "Air France",
-      class: "Premium Economy",
-      departureAt: new Date(),
-      arrivalAt: new Date(),
-      duration: 7500,
-      origin: "Charles de Gaulle",
-      destination: "London Heathrow",
-      equipment: "Air France 319",
-    },
-  };
+  export let booking: BookingModel;
+
+  $: outbound = booking.details?.legs[0];
+  $: inbound = booking.details?.legs[1];
 </script>
 
 <div class="journey">
   <h3 class="typography title-medium bold">Trip</h3>
 
   <div class="content">
-    <Trip data={data.outbound} direction="Departure" />
+    {#if outbound && booking.details}
+      <Trip
+        leg={outbound}
+        operator={booking.details.operator}
+        cabinClass={booking.details.cabinClass}
+        direction="Departure"
+      />
+    {/if}
 
-    <hr />
+    {#if inbound && booking.details}
+      <hr />
 
-    <Trip data={data.inbound} direction="Return" />
+      <Trip
+        leg={inbound}
+        operator={booking.details.operator}
+        cabinClass={booking.details.cabinClass}
+        direction="Return"
+      />
+    {/if}
   </div>
 </div>
 

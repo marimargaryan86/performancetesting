@@ -2,25 +2,21 @@
   import FlightIcon from "components/icons/flight-icon.svelte";
   import EntityAvatar from "components/ui/entity-avatar.svelte";
   import { formatDuration } from "formatting/date-time";
+  import type { LegModel } from "models/booking";
 
-  export let data: {
-    operator: string;
-    class: string;
-    departureAt: Date;
-    arrivalAt: Date;
-    duration: number;
-    origin: string;
-    destination: string;
-    equipment: string;
-  };
+  export let leg: LegModel;
+  export let operator: string | undefined;
+  export let cabinClass: string | undefined;
   export let direction: string;
+
+  $: duration = (leg.arrivalAt.getTime() - leg.departureAt.getTime()) / 1000;
 </script>
 
 <div class="trip">
   <span class="typography body-small departure">
     <FlightIcon color="var(--color-main-primary-900)" />
 
-    {direction} • {data.departureAt.toLocaleDateString("en-GB", {
+    {direction} • {leg.departureAt.toLocaleDateString("en-GB", {
       weekday: "long",
       day: "numeric",
       month: "long",
@@ -29,33 +25,35 @@
 
   <span class="info">
     <span class="typography body-medium operator">
-      <EntityAvatar name={data.operator} size="24px" />
-      {data.operator}
+      <EntityAvatar name={operator} size="24px" />
+      {operator}
     </span>
 
-    <span class="typography body-small class">{data.class}</span>
-    <span class="typography body-small duration">{formatDuration(data.duration)}</span>
+    <span class="typography body-small class">{cabinClass}</span>
+    <span class="typography body-small duration">{formatDuration(duration)}</span>
   </span>
 
   <div class="stops">
     <span class="point" />
-    <span class="typography body-medium bold">{data.origin}</span>
+    <span class="typography body-medium bold">{leg.origin.name}</span>
     <span class="typography body-medium time">
-      {data.departureAt.toLocaleTimeString("en-GB", {
+      {leg.departureAt.toLocaleTimeString("en-GB", {
         hour: "2-digit",
         minute: "2-digit",
+        timeZone: leg.origin.timeZone,
       })}
     </span>
 
     <span class="line" />
-    <span class="typography body-small equipment">{data.equipment}</span>
+    <span class="typography body-small equipment">{operator ?? "N/A"}</span>
 
     <span class="point" />
-    <span class="typography body-medium bold">{data.destination}</span>
+    <span class="typography body-medium bold">{leg.destination.name}</span>
     <span class="typography body-medium time">
-      {data.arrivalAt.toLocaleTimeString("en-GB", {
+      {leg.arrivalAt.toLocaleTimeString("en-GB", {
         hour: "2-digit",
         minute: "2-digit",
+        timeZone: leg.destination.timeZone,
       })}
     </span>
   </div>

@@ -17,7 +17,7 @@ export type ConversionModel = {
   sellAmount: MoneyModel;
   buyAmount: MoneyModel;
   executedRate: number;
-  fxDelta: number | null;
+  fxDelta?: number;
   fxStatus: ConversionStatus;
   transaction?: TransactionModel;
 };

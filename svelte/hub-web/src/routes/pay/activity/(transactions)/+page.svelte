@@ -60,7 +60,7 @@
   <title>Transactions · Activity · Pay · Junction Hub</title>
 </svelte:head>
 
-<TransactionDetails bind:value={selectedTransaction} />
+<TransactionDetails bind:transaction={selectedTransaction} />
 
 <Table class="transactions-table">
   <THead>

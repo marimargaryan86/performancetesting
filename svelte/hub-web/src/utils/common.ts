@@ -37,6 +37,10 @@ export function getHexColor(value: string): string {
   return `#${hex.substring(0, 6)}`;
 }
 
+export function capitalize(value: string): string {
+  return `${value[0]?.toUpperCase()}${value.substring(1)}`;
+}
+
 export type FlattenedObject_<
   T extends Record<string, unknown>,
   TKey = keyof T,

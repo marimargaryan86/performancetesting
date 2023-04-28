@@ -1,5 +1,8 @@
 <script lang="ts">
   import { formatAmountAndCode } from "formatting/currency";
+  import type { BookingModel } from "models/booking";
+
+  export let booking: BookingModel;
 </script>
 
 <div class="billing">
@@ -11,14 +14,14 @@
 
     <span class="typography body-small subtle">Fare</span>
     <span class="typography body-small bold right-align">
-      {formatAmountAndCode({ amount: 2100.8, currency: "USD" })}
+      {formatAmountAndCode(booking.price)}
     </span>
 
     <hr />
 
     <span class="typography body-large subtle">Total</span>
     <span class="typography body-large bold right-align">
-      {formatAmountAndCode({ amount: 2100.8, currency: "USD" })}
+      {formatAmountAndCode(booking.price)}
     </span>
   </div>
 </div>
