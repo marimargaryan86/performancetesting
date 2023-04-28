@@ -56,6 +56,11 @@ class OtpRepository(RedisRepository):
         return False
 
 
+class OffersRatesRepository(RedisRepository):
+    async def get(self, identifier: str) -> str | None:
+        return await self._redis.get(identifier)
+
+
 class EnumsValuesRepository(RedisRepository):
     async def get(self, identifier: str) -> str | None:
         return await self._redis.get(identifier)

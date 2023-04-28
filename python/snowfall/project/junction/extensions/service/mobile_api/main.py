@@ -13,6 +13,9 @@ from starlette.middleware import Middleware, authentication
 
 from snowfall.project.junction.extensions.service.mobile_api import bootstrap
 from snowfall.project.junction.extensions.service.mobile_api import (
+    currencies as mobile_currencies,
+)
+from snowfall.project.junction.extensions.service.mobile_api import (
     handlers as mobile_handlers,
 )
 from snowfall.project.junction.extensions.service.mobile_api import (
@@ -25,10 +28,13 @@ from snowfall.project.junction.extensions.service.mobile_api import (
     smtp,
 )
 from snowfall.project.junction.extensions.service.mobile_api.routes import router
+from snowfall.project.pay.adapter import currencies
+from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.transport.grpc.client import create_channel
 from snowfall.stdlib.transport.http import auth
 from snowfall.vendor.junction.go import client
 
@@ -37,6 +43,9 @@ def _factory(
     app: service.Application[bootstrap.Settings],
 ) -> Callable[[], applications.Starlette]:
     def decorator() -> applications.Starlette:
+        currencies_channel = create_channel(
+            random.choice(app.settings.currencies_address),  # nosec
+        )
         stripe.api_key = app.settings.stripe_api_key
         junction_client = client.Client(
             base_url=random.choice(app.settings.junction_api_address),  # nosec
@@ -75,6 +84,13 @@ def _factory(
         asgi_app = application.create_starlette_app(
             routes=router.get_routes(
                 bootstrap.create_dependencies(
+                    currencies_client=mobile_currencies.CurrencyClient(
+                        app.settings.currency_rate_cache_ttl,
+                        currencies.GrpcClient(
+                            currencies_pb2_grpc.CurrencyServiceStub(currencies_channel),
+                        ),
+                        fallback_rates={"SEK": app.settings.fallback_rate_sek},
+                    ),
                     places_repository=repository.PlacesRepository(
                         mongo["places"],
                     ),
@@ -84,6 +100,10 @@ def _factory(
                     otp_repository=repository.OtpRepository(
                         redis_client=redis_client,
                         cache_ttl=app.settings.otp_cache_ttl,
+                    ),
+                    offers_rates_repository=repository.OffersRatesRepository(
+                        redis_client=redis_client,
+                        cache_ttl=app.settings.offers_rates_cache_ttl,
                     ),
                     enums_values_repository=repository.EnumsValuesRepository(
                         redis_client=redis_client,
