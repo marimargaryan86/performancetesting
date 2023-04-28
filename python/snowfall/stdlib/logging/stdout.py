@@ -1,13 +1,39 @@
 import contextlib
 import contextvars
 import logging
-import sys
-from typing import Any, Iterator, Sequence
+from typing import Any, Iterator, Protocol, Sequence
 
-import orjson
 import structlog
 
 from snowfall.stdlib.logging import processors
+
+
+class Logger(Protocol):
+    def debug(self, event: str, *args: Any, **kw: Any) -> None:
+        """Log at **debug** level."""
+
+    def info(self, event: str, *args: Any, **kw: Any) -> None:  # noqa: WPS110
+        """Log at **info** level."""
+
+    def warning(self, event: str, *args: Any, **kw: Any) -> None:
+        """Log at **warn** level."""
+
+    def error(self, event: str, *args: Any, **kw: Any) -> None:
+        """Log at **error** level."""
+
+    def exception(self, event: str | None = None, *args: Any, **kw: Any) -> None:
+        """Log  at **error** level and ensure that `exc_info` is set."""
+
+    def critical(self, event: str, *args: Any, **kw: Any) -> None:
+        """Log at **critical** level."""
+
+
+def get_logger() -> Logger:
+    _, caller_name = structlog._frames._find_first_app_frame_and_name(  # noqa: WPS437
+        additional_ignores=["snowfall.stdlib.logging.stdout"],
+    )
+
+    return structlog.get_logger(caller_name)
 
 
 def configure_logger(
@@ -107,7 +133,7 @@ def _configure_standard_logger(
     level: str | int,
     common_processors: Sequence[processors.Processor],
 ) -> None:
-    log_handler = _get_log_handler(common_processors)
+    log_handler = processors.get_log_handler(common_processors)
     logging.basicConfig(
         format="%(message)s",  # noqa: WPS323
         level=level,
@@ -116,22 +142,3 @@ def _configure_standard_logger(
     root_logger = logging.getLogger()
     root_logger.handlers = [log_handler]
     root_logger.setLevel(level)
-
-
-def _dumps(*args: Any, **kwargs: Any) -> str:
-    return orjson.dumps(*args, **kwargs).decode()
-
-
-def _get_log_handler(
-    common_processors: Sequence[processors.Processor],
-) -> logging.Handler:
-    log_handler = logging.StreamHandler(sys.stdout)
-    formatter = structlog.stdlib.ProcessorFormatter(
-        processor=structlog.processors.JSONRenderer(
-            serializer=_dumps,
-        ),
-        foreign_pre_chain=common_processors,
-    )
-    log_handler.setFormatter(formatter)
-
-    return log_handler

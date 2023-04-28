@@ -19,7 +19,6 @@ from typing import (  # noqa: WPS235
 import click
 import orjson
 import pydantic
-import structlog
 from prometheus_async.aio import web
 
 from snowfall.stdlib.integration.click import parameters
@@ -175,9 +174,9 @@ def _group(ctx: click.Context, **kwargs: Any) -> None:
 def _configure(
     entrypoint: Entrypoint,
     global_settings: _GlobalSettings,
-) -> structlog.BoundLogger:
+) -> stdout.Logger:
     stdout.configure_logger(level=global_settings.log_level)
-    logger = structlog.get_logger(__name__)
+    logger = stdout.get_logger()
 
     logger.info(
         "Application bootstrapped.",

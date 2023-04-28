@@ -1,6 +1,8 @@
 import logging
+import sys
 from typing import Any, Callable, Sequence
 
+import orjson
 import structlog
 import structlog_sentry
 
@@ -67,3 +69,22 @@ def _get_after_processors() -> list[Processor]:
         structlog.processors.format_exc_info,
         structlog.processors.UnicodeDecoder(),
     ]
+
+
+def _dumps(*args: Any, **kwargs: Any) -> str:
+    return orjson.dumps(*args, **kwargs).decode()
+
+
+def get_log_handler(
+    common_processors: Sequence[Processor],
+) -> logging.Handler:
+    log_handler = logging.StreamHandler(sys.stdout)
+    formatter = structlog.stdlib.ProcessorFormatter(
+        processor=structlog.processors.JSONRenderer(
+            serializer=_dumps,
+        ),
+        foreign_pre_chain=common_processors,
+    )
+    log_handler.setFormatter(formatter)
+
+    return log_handler
