@@ -73,10 +73,12 @@ class GrpcClient(Client):
         self,
         account: models_pb2.Account,
     ) -> models_pb2.Account:
-        return await self._client.CreateAccount(
-            accounts_pb2.CreateAccountRequest(
-                account=account,
-            ),
+        return (
+            await self._client.CreateAccount(
+                accounts_pb2.CreateAccountRequest(
+                    account=account,
+                ),
+            )
         ).account
 
     async def get(self, account_id: str) -> models_pb2.Account | None:
