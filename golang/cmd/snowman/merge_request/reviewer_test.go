@@ -3,6 +3,7 @@ package merge_request
 import (
 	"fmt"
 	"git.snowfall.se/junction/junction/golang/stdlib/sliceutil"
+	"math/rand"
 	"strings"
 	"testing"
 )
@@ -131,8 +132,9 @@ func TestDecideOptimalCodeOwners(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
+		r := rand.New(rand.NewSource(1))
 		t.Run(tc.String(), func(t *testing.T) {
-			if got := decideOptimalCodeOwners(tc.rules, tc.current, tc.blacklist); !sliceutil.Equal(got, tc.want) {
+			if got := decideOptimalCodeOwners(r, tc.rules, tc.current, tc.blacklist); !sliceutil.Equal(got, tc.want) {
 				t.Errorf("got %v; want %v", got, tc.want)
 			}
 		})

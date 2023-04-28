@@ -67,7 +67,7 @@ type codeOwnerRule struct {
 	ApprovalsRequired int
 }
 
-func decideOptimalCodeOwners(rules []*codeOwnerRule, current []int, blacklist []int) []int {
+func decideOptimalCodeOwners(r *rand.Rand, rules []*codeOwnerRule, current []int, blacklist []int) []int {
 	indecisive := make([]codeOwnerRule, 0)
 	expected := make([]int, len(current))
 
@@ -114,6 +114,10 @@ func decideOptimalCodeOwners(rules []*codeOwnerRule, current []int, blacklist []
 			stillIndecisive = append(stillIndecisive, r)
 		}
 
+		r.Shuffle(len(eligible), func(i, j int) {
+			eligible[i], eligible[j] = eligible[j], eligible[i]
+		})
+
 		reviewer := sliceutil.MostCommon(eligible)
 
 		if reviewer != 0 {
@@ -142,7 +146,8 @@ func (mr *mergeRequest) appendCodeOwners(expected []int) ([]int, error) {
 		}
 	})
 
-	optimal := decideOptimalCodeOwners(rules, expected, []int{mr.snowman.ID})
+	r := rand.New(rand.NewSource(int64(mr.object.ID)))
+	optimal := decideOptimalCodeOwners(r, rules, expected, []int{mr.snowman.ID})
 
 	expected = append(expected, optimal...)
 
@@ -178,6 +183,11 @@ func (mr *mergeRequest) appendFileOwners(expected []int) ([]int, error) {
 		}
 	}
 
+	r := rand.New(rand.NewSource(int64(mr.object.ID)))
+	r.Shuffle(len(eligible), func(i, j int) {
+		eligible[i], eligible[j] = eligible[j], eligible[i]
+	})
+
 	reviewer := sliceutil.MostCommon(eligible)
 
 	if reviewer != 0 {
@@ -202,7 +212,7 @@ func (mr *mergeRequest) appendFileOwners(expected []int) ([]int, error) {
 	}
 
 	if len(eligible) > 0 {
-		randomIndex := rand.Intn(len(eligible))
+		randomIndex := r.Intn(len(eligible))
 		reviewer = eligible[randomIndex]
 	}
 
