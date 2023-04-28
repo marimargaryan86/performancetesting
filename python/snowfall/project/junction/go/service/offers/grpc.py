@@ -292,6 +292,7 @@ class PriceQuoteService(service.Service, grpc_pb2_grpc.PriceQuoteServiceServicer
             offer_id=request.offer_id,
             option_ids=list(request.option_ids),
             session_token=request.session_token,
+            pay_company_id=request.pay_company_id,
         )
         await self._publisher.publish(price_quote)
 

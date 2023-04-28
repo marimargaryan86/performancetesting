@@ -275,6 +275,9 @@ async def _gather_price_quotes(
                 payer_id=app.settings.payer_company_id,
                 payer_currency=app.settings.payer_currency_code,
             ),
+            offer_options_repository=offers.OfferOptionsRepository(
+                mongo.offers.trip_offers,
+            ),
         )
         await price_quote_importer.consume()
 

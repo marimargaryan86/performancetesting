@@ -184,17 +184,20 @@ class OfferOrchestrator(object):
     async def offer_searches_from_trip_groups(
         self,
         trip_groups: Sequence[TripGroup],
-        passengers: Sequence[offer_models_pb2.Passenger],
+        trip_candidate_search: trips_pb2.TripCandidateSearch,
     ) -> Sequence[offer_models_pb2.OfferSearch]:
         tasks = [
             self._offer_search_adapter.create(
-                offer_models_pb2.OfferSearch(
+                request=offer_models_pb2.OfferSearch(
                     id=string.uuid(),
+                    reseller_id=trip_candidate_search.reseller_id,
+                    currency_code=trip_candidate_search.currency_code,
+                    pay_company_id=trip_candidate_search.pay_company_id,
                     expires_at=protobuf.datetime_to_protobuf(
                         datetime.datetime.now() + datetime.timedelta(hours=2),
                     ),
                     trip=offer_models_pb2.TripOfferSearch(
-                        passengers=passengers,
+                        passengers=trip_candidate_search.passengers,
                         trips=trip_combination,
                     ),
                 ),

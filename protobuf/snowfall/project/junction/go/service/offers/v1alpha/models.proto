@@ -11,6 +11,9 @@ option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/
 
 message OfferSearch {
   string id = 1;
+  string reseller_id = 8;
+  string currency_code = 9;
+  string pay_company_id = 10;
   google.protobuf.Timestamp expires_at = 2;
   oneof search {
     TripOfferSearch trip = 3;
@@ -124,6 +127,7 @@ message PriceQuoteContainer {
   string offer_id = 4;
   repeated string option_ids = 5;
   string session_token = 6;
+  string pay_company_id = 7;
 }
 
 message FareRule {

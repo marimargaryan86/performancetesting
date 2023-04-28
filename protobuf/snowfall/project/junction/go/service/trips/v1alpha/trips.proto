@@ -130,6 +130,9 @@ message TripCandidateSearch {
   repeated snowfall.project.junction.go.service.offers.v1alpha.Passenger passengers = 5;
   repeated snowfall.stdlib.v1alpha.Schedule.Type allowed_segment_types = 6;
   repeated string offer_search_ids = 7 [(snowfall.stdlib.v1alpha.read_only) = true];
+  string reseller_id = 8;
+  string currency_code = 9;
+  string pay_company_id = 10;
 }
 
 service TripCandidateService {

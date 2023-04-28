@@ -33,6 +33,7 @@ class PriceQuoteContainerRepository(
         offer_id: str,
         option_ids: Sequence[str],
         session_token: str,
+        pay_company_id: str,
     ) -> models_pb2.PriceQuoteContainer:
         price_quote = models_pb2.PriceQuoteContainer(
             id=string.uuid(),
@@ -42,6 +43,7 @@ class PriceQuoteContainerRepository(
             offer_id=offer_id,
             option_ids=option_ids,
             session_token=session_token,
+            pay_company_id=pay_company_id,
         )
 
         return await self.insert(price_quote)

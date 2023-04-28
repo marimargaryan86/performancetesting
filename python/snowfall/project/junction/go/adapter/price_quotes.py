@@ -19,6 +19,7 @@ class Client(abc.ABC):
         offer_id: str,
         option_ids: Sequence[str],
         session_token: str,
+        pay_company_id: str,
     ) -> models_pb2.PriceQuoteContainer:
         """Create a price quote."""
 
@@ -38,6 +39,7 @@ class DictClient(Client):
         offer_id: str,
         option_ids: Sequence[str],
         session_token: str,
+        pay_company_id: str,
     ) -> models_pb2.PriceQuoteContainer:
         expires_at = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
             days=1,
@@ -82,6 +84,7 @@ class GrpcClient(Client):
         offer_id: str,
         option_ids: Sequence[str],
         session_token: str,
+        pay_company_id: str,
     ) -> models_pb2.PriceQuoteContainer:
         response = await errors.handle_grpc_errors(
             self._price_quotes.CreatePriceQuote(
@@ -89,6 +92,7 @@ class GrpcClient(Client):
                     offer_id=offer_id,
                     option_ids=option_ids,
                     session_token=session_token,
+                    pay_company_id=pay_company_id,
                 ),
                 timeout=self._timeout,
             ),

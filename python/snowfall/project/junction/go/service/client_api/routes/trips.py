@@ -1,6 +1,7 @@
 import asyncio
+import dataclasses
 import datetime
-from typing import Mapping, Sequence
+from typing import Any, Mapping, Sequence, cast
 
 import lagom
 from dateutil import parser
@@ -30,6 +31,9 @@ from snowfall.stdlib.integration.starlette import (
     request_helpers,
 )
 from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
+
+_Coordinates = Mapping[str, float]
+_Passengers = list[dict[str, str]]
 
 
 class Trip(endpoints.HTTPEndpoint):
@@ -245,59 +249,105 @@ class TripsByTripSearch(endpoints.HTTPEndpoint):
         )
 
 
-async def _get_nearby_locations(
-    locations_client: locations.Client,
-    coordinate_pairs: Sequence[tuple[float, float]],
-) -> Mapping[tuple[float, float], Sequence[latlng_pb2.LatLng]]:
-    nearby_locations = await asyncio.gather(
-        *[
-            locations_client.get_nearby_locations(
-                coordinates=latlng_pb2.LatLng(
-                    latitude=pair[0],
-                    longitude=pair[1],
+@dataclasses.dataclass(frozen=True)
+class TripCandidateSearches(object):
+    _trip_candidate_searches_client: trip_candidate_searches.Client
+    _locations_client: locations.Client
+    _reseller_currencies: Mapping[str, str]
+    _reseller_pay_companies: Mapping[str, str]
+
+    async def post(self, request: messages.Request) -> responses.Response:
+        return await messages.create_response(
+            body=models.Body(
+                data=resources.TripCandidateSearchResource.from_proto(
+                    trip_candidate_search=await self._trip_candidate_searches_client.create(
+                        trip_candidate_search=await self._create_trip_candidate_search(
+                            request,
+                        ),
+                    ),
+                    request=request.starlette_request,
                 ),
-            )
-            for pair in coordinate_pairs
-        ],
-    )
+            ),
+            request=request.starlette_request,
+            status_code=status.HTTP_201_CREATED,
+        )
 
-    return {
-        coordinate_pairs[index]: [
-            latlng_pb2.LatLng(
-                latitude=location_object.coordinates.latitude,
-                longitude=location_object.coordinates.longitude,
-            )
-            for location_object in location_objects
-        ]
-        for index, location_objects in enumerate(nearby_locations)
-    }
-
-
-class TripCandidateSearches(endpoints.HTTPEndpoint):
-    async def post(
+    async def _create_trip_candidate_search(
         self,
-        request: requests.Request,
-        client: trip_candidate_searches.Client = lagom.injectable,
-        locations_client: locations.Client = lagom.injectable,
-    ) -> responses.Response:
-        body = await request_helpers.flatten_request(request)
-
+        request: messages.Request,
+    ) -> trip_candidate_searches.TripCandidateSearchRequest:
         try:
             allowed_segment_types = [
                 protobuf.slug_to_enum_value(
                     enum=models_pb2.Schedule.Type,
                     name=leg_type,
                 )
-                for leg_type in body.get("allowedSegmentTypes", [])
+                for leg_type in cast(
+                    list[str],
+                    request.body.get("allowedSegmentTypes", []),
+                )
             ]
         except KeyError as key_err:
             raise exceptions.HTTPException(
                 status.HTTP_422_UNPROCESSABLE_ENTITY,
             ) from key_err
 
-        coordinate_pairs = []
+        reseller_id = request.starlette_request.user.username
+        criteria = cast(
+            list[dict[str, Any]],
+            request.body["criteria"],
+        )
+        locations_per_search = await self._get_nearby_locations(criteria)
 
-        for single_criteria in body["criteria"]:
+        return trip_candidate_searches.TripCandidateSearchRequest(
+            passengers=[
+                offer_models_pb2.Passenger(
+                    date_of_birth=protobuf.date_to_protobuf(
+                        datetime.date.fromisoformat(pax["dateOfBirth"]),
+                    ),
+                )
+                for pax in cast(_Passengers, request.body["passengers"])
+            ],
+            criteria=[
+                trips_pb2.TripCandidateSearchCriteria(
+                    origin=latlng_pb2.LatLng(
+                        **criteria["origin"],
+                    ),
+                    destination=latlng_pb2.LatLng(
+                        **criteria["destination"],
+                    ),
+                    origins=locations_per_search[
+                        (
+                            criteria["origin"]["latitude"],
+                            criteria["origin"]["longitude"],
+                        )
+                    ],
+                    destinations=locations_per_search[
+                        (
+                            criteria["destination"]["latitude"],
+                            criteria["destination"]["longitude"],
+                        )
+                    ],
+                    departure_after=protobuf.datetime_to_protobuf_datetime(
+                        parser.isoparse(criteria["departureAfter"]),
+                    ),
+                    maximum_connections=criteria["maximumConnections"],
+                )
+                for criteria in criteria
+            ],
+            allowed_segment_types=list(allowed_segment_types),
+            reseller_id=reseller_id,
+            currency_code=self._reseller_currencies.get(reseller_id),
+            pay_company_id=self._reseller_pay_companies.get(reseller_id),
+        )
+
+    async def _get_nearby_locations(
+        self,
+        criteria: Sequence[Mapping[str, _Coordinates]],
+    ) -> Mapping[tuple[float, float], Sequence[latlng_pb2.LatLng]]:
+        coordinate_pairs: list[tuple[float, float]] = []
+
+        for single_criteria in criteria:
             coordinate_pairs.append(
                 (
                     single_criteria["origin"]["latitude"],
@@ -311,60 +361,28 @@ class TripCandidateSearches(endpoints.HTTPEndpoint):
                 ),
             )
 
-        locations_per_search = await _get_nearby_locations(
-            locations_client=locations_client,
-            coordinate_pairs=coordinate_pairs,
+        nearby_locations = await asyncio.gather(
+            *[
+                self._locations_client.get_nearby_locations(
+                    coordinates=latlng_pb2.LatLng(
+                        latitude=pair[0],
+                        longitude=pair[1],
+                    ),
+                )
+                for pair in coordinate_pairs
+            ],
         )
 
-        return await messages.create_response(
-            body=models.Body(
-                data=resources.TripCandidateSearchResource.from_proto(
-                    trip_candidate_search=await client.create(
-                        trip_candidate_searches.TripCandidateSearchRequest(
-                            passengers=[
-                                offer_models_pb2.Passenger(
-                                    date_of_birth=protobuf.date_to_protobuf(
-                                        datetime.date.fromisoformat(pax["dateOfBirth"]),
-                                    ),
-                                )
-                                for pax in body["passengers"]
-                            ],
-                            criteria=[
-                                trips_pb2.TripCandidateSearchCriteria(
-                                    origin=latlng_pb2.LatLng(
-                                        **criteria["origin"],
-                                    ),
-                                    destination=latlng_pb2.LatLng(
-                                        **criteria["destination"],
-                                    ),
-                                    origins=locations_per_search[
-                                        (
-                                            criteria["origin"]["latitude"],
-                                            criteria["origin"]["longitude"],
-                                        )
-                                    ],
-                                    destinations=locations_per_search[
-                                        (
-                                            criteria["destination"]["latitude"],
-                                            criteria["destination"]["longitude"],
-                                        )
-                                    ],
-                                    departure_after=protobuf.datetime_to_protobuf_datetime(
-                                        parser.isoparse(criteria["departureAfter"]),
-                                    ),
-                                    maximum_connections=criteria["maximumConnections"],
-                                )
-                                for criteria in body["criteria"]
-                            ],
-                            allowed_segment_types=allowed_segment_types,
-                        ),
-                    ),
-                    request=request,
-                ),
-            ),
-            request=request,
-            status_code=status.HTTP_201_CREATED,
-        )
+        return {
+            coordinate_pairs[index]: [
+                latlng_pb2.LatLng(
+                    latitude=location_object.coordinates.latitude,
+                    longitude=location_object.coordinates.longitude,
+                )
+                for location_object in location_objects
+            ]
+            for index, location_objects in enumerate(nearby_locations)
+        }
 
 
 class TripCandidateSearch(endpoints.HTTPEndpoint):

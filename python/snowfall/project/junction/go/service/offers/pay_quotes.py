@@ -3,6 +3,7 @@ import uuid
 from snowfall.project.junction.go.service.offers.pay_quotes_models import (
     PayQuoteResponse,
 )
+from snowfall.project.junction.go.service.offers.v1alpha import models_pb2
 from snowfall.project.junction.go.service.offers.v1alpha.amqp_pb2 import (
     TripOfferSearchResult,
     TripPriceQuoteResult,
@@ -125,26 +126,35 @@ class PayQuoteFetcher(object):
         self,
         message: TripOfferSearchResult,
         session_token: str,
+        offer_search: models_pb2.OfferSearch,
     ) -> TripOfferSearchResult:
-        if self._use_pay_for_currency_conversions:
-            message = await self._pay_quotes.get_offer_search_quotes(
-                message,
-                session_token,
-                self._payer_id,
-                self._payer_currency,
-            )
-        return message
+        if not self._use_pay_for_currency_conversions:
+            return message
+
+        payer_company_id = offer_search.pay_company_id or self._payer_id
+        payer_currency = offer_search.currency_code or self._payer_currency
+
+        return await self._pay_quotes.get_offer_search_quotes(
+            message,
+            session_token,
+            payer_company_id,
+            payer_currency,
+        )
 
     async def handle_price_quote_result(
         self,
         message: TripPriceQuoteResult,
-        session_token: str,
+        price_quote_container: models_pb2.PriceQuoteContainer,
+        option: models_pb2.Offer,
     ) -> TripPriceQuoteResult:
-        if self._use_pay_for_currency_conversions:
-            message = await self._pay_quotes.get_price_quote_quotes(
-                session_token,
-                message,
-                self._payer_id,
-                self._payer_currency,
-            )
-        return message
+        if not self._use_pay_for_currency_conversions:
+            return message
+
+        payer_company_id = price_quote_container.pay_company_id or self._payer_id
+
+        return await self._pay_quotes.get_price_quote_quotes(
+            price_quote_container.session_token,
+            message,
+            payer_company_id,
+            option.price.currency_code,
+        )

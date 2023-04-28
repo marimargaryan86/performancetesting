@@ -91,6 +91,8 @@ def _create_app(  # noqa: WPS211
                 segments_client=segments_client,
                 schedules_client=schedules_client,
             ),
+            reseller_currencies={},
+            reseller_pay_companies={},
         ),
         custom_middlewares=custom_middlewares,
         openapi_path=openapi_path,

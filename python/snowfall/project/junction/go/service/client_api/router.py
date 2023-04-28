@@ -1,11 +1,20 @@
+from typing import Mapping
+
 import lagom
 from lagom.integrations import starlette
 from starlette import routing
 
 from snowfall.adapter import authentication as auth_adapter
+from snowfall.project.junction.go.adapter import legs as legs_adapter
+from snowfall.project.junction.go.adapter import (
+    offer_searches as offer_searches_adapter,
+)
+from snowfall.project.junction.go.adapter import offers as offers_adapter
 from snowfall.project.junction.go.adapter import places as places_adapter
+from snowfall.project.junction.go.adapter import price_quotes as price_quotes_adapter
 from snowfall.project.junction.go.adapter import schedules as schedules_adapter
 from snowfall.project.junction.go.adapter import segments as segments_adapter
+from snowfall.project.junction.go.adapter import trips as trips_adapter
 from snowfall.project.junction.go.service.client_api import resources
 from snowfall.project.junction.go.service.client_api.routes import (
     authentication,
@@ -22,7 +31,11 @@ from snowfall.stdlib.integration.starlette import routes
 from snowfall.stdlib.v1alpha import models_pb2
 
 
-def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
+def get_routes(  # noqa: WPS210
+    dependencies: lagom.Container,
+    reseller_currencies: Mapping[str, str],
+    reseller_pay_companies: Mapping[str, str],
+) -> list[routing.BaseRoute]:
     integration = starlette.StarletteIntegration(dependencies)
     auth_handler = authentication.Authenticate(
         dependencies[auth_adapter.Client],  # type: ignore[type-abstract]
@@ -33,6 +46,22 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
     segment_handler = segments.Segments(
         dependencies[schedules_adapter.Client],  # type: ignore[type-abstract]
         dependencies[segments_adapter.Client],  # type: ignore[type-abstract]
+    )
+    offer_searches_handler = offers.OfferSearches(
+        _legs_client=dependencies[legs_adapter.Client],  # type: ignore[type-abstract]
+        _trips_client=dependencies[trips_adapter.Client],  # type: ignore[type-abstract]
+        _offer_search_client=(
+            dependencies[offer_searches_adapter.Client]  # type: ignore[type-abstract]
+        ),
+        _reseller_currencies=reseller_currencies,
+        _reseller_pay_companies=reseller_pay_companies,
+    )
+    price_quotes_handler = offers.PriceQuotes(
+        _offers_client=dependencies[offers_adapter.Client],  # type: ignore[type-abstract]
+        _price_quotes_client=(
+            dependencies[price_quotes_adapter.Client]  # type: ignore[type-abstract]
+        ),
+        _reseller_pay_companies=reseller_pay_companies,
     )
 
     return [
@@ -115,7 +144,11 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             trips.TripCandidatesByTripCandidateSearch,
             name="ViewTripCandidatesByTripCandidateSearch",
         ),
-        integration.route("/offers/searches", offers.OfferSearches),
+        routes.to_route(
+            "/offers/searches",
+            offer_searches_handler.post,
+            methods=["POST"],
+        ),
         integration.route(
             "/offers/searches/{offerSearchId}",
             offers.OfferSearch,
@@ -127,10 +160,11 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             name="ViewOffersByOfferSearch",
         ),
         # TODO: add GET /offers/searches/{offerSearchId}/related
-        integration.route(
+        routes.to_route(
             "/offers/quotes",
-            offers.PriceQuotes,
+            price_quotes_handler.post,
             name="CreateOfferQuotes",
+            methods=["POST"],
         ),
         integration.route(
             "/offers/quotes/{offerPriceQuoteId}",

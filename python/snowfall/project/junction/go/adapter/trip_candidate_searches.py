@@ -18,6 +18,9 @@ class TripCandidateSearchRequest(object):
     criteria: Sequence[trips_pb2.TripCandidateSearchCriteria]
     passengers: Sequence[offer_models_pb2.Passenger]
     allowed_segment_types: Sequence[models_pb2.Schedule.Type.ValueType]
+    reseller_id: str
+    currency_code: str | None
+    pay_company_id: str | None
 
 
 class Client(abc.ABC):
@@ -81,10 +84,8 @@ class GrpcClient(Client):
         response = await errors.handle_grpc_errors(
             self._trip_candidate_searches.EnqueueTripCandidateSearch(
                 request=trips_pb2.EnqueueTripCandidateSearchRequest(
-                    trip_candidate_search=trips_pb2.TripCandidateSearch(
-                        passengers=trip_candidate_search.passengers,
-                        criteria=trip_candidate_search.criteria,
-                        allowed_segment_types=trip_candidate_search.allowed_segment_types,
+                    trip_candidate_search=_create_trip_candidate_search(
+                        trip_candidate_search=trip_candidate_search,
                     ),
                 ),
                 timeout=self._timeout,
@@ -107,3 +108,22 @@ class GrpcClient(Client):
         )
 
         return response.trip_candidate_search
+
+
+def _create_trip_candidate_search(
+    trip_candidate_search: TripCandidateSearchRequest,
+) -> trips_pb2.TripCandidateSearch:
+    search_proto = trips_pb2.TripCandidateSearch(
+        passengers=trip_candidate_search.passengers,
+        criteria=trip_candidate_search.criteria,
+        allowed_segment_types=trip_candidate_search.allowed_segment_types,
+        reseller_id=trip_candidate_search.reseller_id,
+    )
+
+    if trip_candidate_search.currency_code:
+        search_proto.currency_code = trip_candidate_search.currency_code
+
+    if trip_candidate_search.pay_company_id:
+        search_proto.pay_company_id = trip_candidate_search.pay_company_id
+
+    return search_proto

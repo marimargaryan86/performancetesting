@@ -157,4 +157,7 @@ async def trip_candidate_search_request() -> (
         criteria=[],
         passengers=[],
         allowed_segment_types=[],
+        reseller_id="foo",
+        currency_code=None,
+        pay_company_id=None,
     )

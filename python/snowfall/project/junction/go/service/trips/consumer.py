@@ -182,7 +182,7 @@ class TripCandidateSearchConsumer(object):
     ) -> None:
         offer_searches = await self._offer_orchestrator.offer_searches_from_trip_groups(
             trip_groups=trip_groups,
-            passengers=trip_candidate_search.passengers,
+            trip_candidate_search=trip_candidate_search,
         )
 
         await self._trip_candidate_search_repository.add_offer_search_ids(

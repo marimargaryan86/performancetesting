@@ -142,6 +142,7 @@ class OfferImporter(object):
         message = await self._pay_quote_fetcher.handle_offer_search_result(
             message=message,
             session_token=offer_search.session_token,
+            offer_search=offer_search,
         )
 
         async with self._redis.lock(redis_lock, timeout=10):
@@ -159,17 +160,19 @@ class OfferImporter(object):
 
 
 class PriceQuoteImporter(object):
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
         consumer_obj: consumer.Consumer[amqp_pb2.TripPriceQuoteResult],
         price_quotes_repository: price_quotes.PriceQuoteRepository,
         price_quotes_container_repository: price_quotes.PriceQuoteContainerRepository,
         pay_quote_fetcher: pay_quotes.PayQuoteFetcher,
+        offer_options_repository: offers.OfferOptionsRepository,
     ):
         self._consumer = consumer_obj
         self._quotes = price_quotes_repository
         self._price_quotes_container_repository = price_quotes_container_repository
         self._pay_quote_fetcher = pay_quote_fetcher
+        self._offer_options_repository = offer_options_repository
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -178,16 +181,22 @@ class PriceQuoteImporter(object):
         self,
         message: amqp_types.Message[amqp_pb2.TripPriceQuoteResult],
     ) -> None:
-        price_quotes_search = await self._price_quotes_container_repository.find_by_id(
-            message.body.price_quote_container_id,
+        price_quote_container = (
+            await self._price_quotes_container_repository.find_by_id(
+                message.body.price_quote_container_id,
+            )
+        )
+        offer_option = await self._offer_options_repository.find_by_id(
+            message.body.option_id,
         )
 
-        if not price_quotes_search:
+        if not price_quote_container or not offer_option:
             raise SkippedPriceQuoteError()
 
         price_quote_message = await self._pay_quote_fetcher.handle_price_quote_result(
             message=message.body,
-            session_token=price_quotes_search.session_token,
+            price_quote_container=price_quote_container,
+            option=offer_option,
         )
 
         await self._quotes.add_to_container(

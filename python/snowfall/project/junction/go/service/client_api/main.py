@@ -123,6 +123,8 @@ def _factory(
                         ),
                     ),
                 ),
+                reseller_currencies=app.settings.reseller_currencies,
+                reseller_pay_companies=app.settings.reseller_pay_companies,
             ),
             custom_middlewares=[
                 Middleware(

@@ -1,4 +1,4 @@
-from typing import Sequence
+from typing import Mapping, Sequence
 
 import lagom
 
@@ -32,6 +32,8 @@ class Settings(application.Settings):
     schedules_address: Sequence[str]
     authentication_address: Sequence[str]
     validate_responses_against_spec: bool = True
+    reseller_currencies: Mapping[str, str] = {}
+    reseller_pay_companies: Mapping[str, str] = {}
 
 
 def create_dependencies(  # noqa: WPS211
