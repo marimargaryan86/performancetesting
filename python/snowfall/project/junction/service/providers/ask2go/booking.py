@@ -81,7 +81,7 @@ class BookingHandler(object):
         new_booking.MergeFrom(
             models_pb2.Booking(
                 status=models_pb2.Booking.STATUS_NOT_TICKETED,
-                total_price=money.from_string(
+                provider_total_price=money.from_string(
                     string_amount=str(
                         booking_result.price_information["bookPrice"]["price"],
                     ),

@@ -57,7 +57,7 @@ class BookingHandler(object):
             new_booking.MergeFrom(
                 models_pb2.Booking(
                     status=models_pb2.Booking.STATUS_CONFIRMED,
-                    total_price=money.from_string(
+                    provider_total_price=money.from_string(
                         string_amount=str(
                             booking_result.total_amount,
                         ),

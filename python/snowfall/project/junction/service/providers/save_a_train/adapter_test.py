@@ -88,7 +88,7 @@ async def test_booking_can_be_placed(
             currency="EUR",
         ),
     )
-    total_price = money.from_protobuf(booking_proto.total_price)
+    total_price = money.from_protobuf(booking_proto.provider_total_price)
 
     assert total_price.currency.code == "EUR"
     assert str(total_price) == "4.50"

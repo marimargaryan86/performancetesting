@@ -121,7 +121,7 @@ class BookingHandler(object):
             new_booking.MergeFrom(
                 models_pb2.Booking(
                     status=models_pb2.Booking.STATUS_CONFIRMED,
-                    total_price=ba_ndc_helpers.parse_price(
+                    provider_total_price=ba_ndc_helpers.parse_price(
                         booking_adapter.get_order().price,
                     ),
                     trip_result=models_pb2.TripBooking(

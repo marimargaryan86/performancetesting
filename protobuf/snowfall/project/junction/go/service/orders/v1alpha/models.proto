@@ -55,6 +55,7 @@ message Booking {
   google.protobuf.Timestamp created_at = 9;
   google.protobuf.Timestamp updated_at = 10;
   string transaction_id = 11;
+  snowfall.stdlib.v1alpha.Money provider_total_price = 12;
 }
 
 message TripBooking {

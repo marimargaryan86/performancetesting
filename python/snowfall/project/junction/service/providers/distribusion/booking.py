@@ -68,7 +68,7 @@ class BookingHandler(object):
             new_booking.MergeFrom(
                 models_pb2.Booking(
                     status=booking_status,
-                    total_price=money.Money(
+                    provider_total_price=money.Money(
                         amount=booking_result.booking.total_price or 0,
                         currency=money.Currency(booking_result.currency),
                     ).protobuf(),

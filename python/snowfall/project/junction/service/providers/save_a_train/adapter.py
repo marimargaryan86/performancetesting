@@ -304,7 +304,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         new_booking.MergeFrom(
             order_models_pb2.Booking(
                 status=order_models_pb2.Booking.STATUS_CONFIRMED,
-                total_price=money.from_string(
+                provider_total_price=money.from_string(
                     string_amount=booking_responses.make_booking.total_price,
                     currency=money.Currency("EUR"),
                 ).protobuf(),
