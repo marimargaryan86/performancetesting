@@ -66,7 +66,14 @@ job "currencies-grpc" {
       tags = ["grpc"]
 
       connect {
-        sidecar_service {}
+        sidecar_service {
+          proxy {
+            upstreams {
+              local_bind_port  = 8020
+              destination_name = "rates-${var.environment}"
+            }
+          }
+        }
       }
 
       check {
@@ -86,6 +93,7 @@ job "currencies-grpc" {
       template {
         data        = <<EOH
 MONGO_DSN={{range $index, $service := service (printf "mongodb-%s" (env "NOMAD_NAMESPACE"))}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
+RATES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_rates-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/currencies" }}
 API_LAYER_API_KEY={{ .Data.data.api_layer_api_key }}
 {{ end }}

@@ -2,11 +2,10 @@ from __future__ import annotations
 
 import pathlib
 from collections import abc
-from typing import (  # noqa: WPS235
+from typing import (
     Any,
     Callable,
     Mapping,
-    NewType,
     Sequence,
     cast,
     get_args,
@@ -20,8 +19,31 @@ import pydantic
 
 from snowfall.stdlib import sequence, types
 
-JSON = NewType("JSON", str)
 _Callback = Callable[[click.Context, click.Parameter, Any], Any]
+
+
+class JSONParameterType(click.ParamType):
+    name = "json"
+
+    def convert(
+        self,
+        input_value: Any,
+        expected_param: click.Parameter | None,
+        ctx: click.Context | None,
+    ) -> Any:
+        input_value = input_value.strip()
+
+        try:
+            return orjson.loads(input_value)
+        except orjson.JSONDecodeError:
+            self.fail(
+                "{value!r} is not valid JSON.".format(value=input_value),
+                expected_param,
+                ctx,
+            )
+
+    def __repr__(self) -> str:
+        return "JSON"
 
 
 def create_from_pydantic_model(
@@ -86,9 +108,13 @@ def _create_from_pydantic_field(
     )
 
 
-def _get_type(arg_types: Mapping[str, type], name: str, type_: type) -> type:
+def _get_type(
+    arg_types: Mapping[str, type],
+    name: str,
+    type_: type,
+) -> type | click.ParamType:
     if type_ == dict:
-        return JSON
+        return JSONParameterType()
 
     type_ = next(iter(get_args(arg_types[name])), type_)
 
@@ -102,21 +128,6 @@ def _get_type(arg_types: Mapping[str, type], name: str, type_: type) -> type:
         return float
 
     return str
-
-
-def _parse_json(
-    ctx: click.Context,
-    param_def: click.Parameter,
-    param_value: str,
-) -> dict[types.Primitive, types.Primitive]:
-    try:
-        return orjson.loads(param_value)
-    except orjson.JSONDecodeError as err:
-        raise click.BadParameter(
-            message=err.msg,
-            ctx=ctx,
-            param=param_def,
-        ) from err
 
 
 def _parse_pydantic_result(
@@ -154,9 +165,6 @@ def _validate_option(
         param_def: click.Parameter,
         param_value: Any,
     ) -> Any:
-        if param_def.type.name == "JSON":
-            param_value = _parse_json(ctx, param_def, param_value)
-
         response = field.validate(param_value, {}, loc="")
 
         return _parse_pydantic_result(ctx, param_def, response)

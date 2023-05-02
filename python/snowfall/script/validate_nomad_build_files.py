@@ -5,7 +5,7 @@ from collections import defaultdict
 from collections.abc import Sequence
 from typing import BinaryIO
 
-_ENTRY_POINTS = ("main.py", "None")
+_ENTRY_POINTS = (":", "None")
 
 
 def _validate_service(

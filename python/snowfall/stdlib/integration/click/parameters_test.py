@@ -44,7 +44,7 @@ def test_create_from_pydantic_model() -> None:
                     default='{"foo":"bar"}',
                     envvar="DICT_STRING_STRING_OPTION_DEFAULT",
                     required=False,
-                    type=parameters.JSON,
+                    type=parameters.JSONParameterType(),
                 ),
                 click.Option(
                     ["--float-option"],
