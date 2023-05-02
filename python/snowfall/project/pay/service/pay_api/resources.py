@@ -404,7 +404,6 @@ class BeneficiariesResource(models.Resource):
             attributes={
                 "bankAccountHolderName": cc_beneficiary.bank_account_holder_name,
                 "email": cc_beneficiary.email,
-                "accountNumber": cc_beneficiary.account_number,
                 "beneficiaryAddress": {
                     "addressLines": cc_beneficiary.beneficiary_address,
                     "countryCode": cc_beneficiary.beneficiary_country,
@@ -413,10 +412,18 @@ class BeneficiariesResource(models.Resource):
                     "state": cc_beneficiary.beneficiary_state_or_province,
                 },
                 "bankDetails": {
+                    **(
+                        {
+                            "accountNumber": cc_beneficiary.account_number,
+                            "aba": cc_beneficiary.routing_code_value_1,
+                        }
+                        if cc_beneficiary.account_number
+                        else {
+                            "iban": cc_beneficiary.iban,
+                        }
+                    ),
                     "name": cc_beneficiary.bank_name,
                     "bicSwift": cc_beneficiary.bic_swift,
-                    "aba": cc_beneficiary.routing_code_value_1,
-                    "iban": cc_beneficiary.iban,
                     "accountType": cc_beneficiary.bank_account_type,
                     "paymentTypes": (
                         cc_beneficiary.payment_types and cc_beneficiary.payment_types[0]

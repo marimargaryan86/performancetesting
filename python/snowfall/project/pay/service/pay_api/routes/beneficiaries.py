@@ -149,7 +149,7 @@ def _get_beneficiary_validate_model(
         beneficiary_company_name=company_name,
         beneficiary_address=beneficiary_address["addressLines"],
         beneficiary_country=beneficiary_address["countryCode"],
-        account_number=payload["accountNumber"],
+        account_number=bank_details["accountNumber"],
         routing_code_type_1=payload["bankDetails"].get("aba") and "aba",
         routing_code_value_1=payload["bankDetails"].get("aba"),
         bic_swift=bank_details.get("bicSwift"),

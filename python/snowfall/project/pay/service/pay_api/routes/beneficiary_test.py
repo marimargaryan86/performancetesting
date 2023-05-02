@@ -27,7 +27,6 @@ class TestBeneficiary(object):
                 "attributes": {
                     "bankAccountHolderName": "bankAccountHolderName",
                     "email": "example@email.com",
-                    "accountNumber": "32847346",
                     "beneficiaryAddress": {
                         "addressLines": [
                             "Street name 7",
@@ -38,6 +37,7 @@ class TestBeneficiary(object):
                         "state": "California",
                     },
                     "bankDetails": {
+                        "accountNumber": "32847346",
                         "name": "BankName",
                         "bicSwift": "AAAABBCC123",
                         "iban": "GB06 BARC 1231 4512 7782 32",

@@ -1611,16 +1611,10 @@
                 "format": "email",
                 "maxLength": 255
               },
-              "accountNumber": {
-                "type": "string",
-                "description": "Bank account number",
-                "example": "00997950423807",
-                "nullable": true
-              },
               "beneficiaryAddress": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/AddressDetails"
+                    "$ref": "#/components/schemas/EnhancedAddressDetails"
                   },
                   {
                     "type": "object",
@@ -1632,13 +1626,26 @@
                 ]
               },
               "bankDetails": {
-                "$ref": "#/components/schemas/BankDetails"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/BankDetails"
+                  },
+                  {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/BankDetailsAba"
+                      },
+                      {
+                        "$ref": "#/components/schemas/BankDetailsIban"
+                      }
+                    ]
+                  }
+                ]
               }
             },
             "required": [
               "bankAccountHolderName",
               "email",
-              "accountNumber",
               "beneficiaryAddress",
               "bankDetails"
             ]
@@ -1765,6 +1772,34 @@
         ],
         "description": "Contact schema."
       },
+      "EnhancedAddressDetails": {
+        "title": "Enhanced Address Details",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AddressDetails"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "postalCode": {
+                "type": "string",
+                "example": "12345"
+              },
+              "city": {
+                "type": "string",
+                "example": "London",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "state": {
+                "type": "string",
+                "example": "California",
+                "nullable": true
+              }
+            }
+          }
+        ]
+      },
       "AddressDetails": {
         "title": "Address Details",
         "type": "object",
@@ -1773,7 +1808,9 @@
             "type": "array",
             "items": {
               "type": "string",
-              "example": "Street name 7"
+              "example": "Street name 7",
+              "minLength": 1,
+              "maxLength": 255
             },
             "example": [
               "Street name 7"
@@ -1783,20 +1820,8 @@
             "type": "string",
             "format": "country",
             "example": "GB"
-          },
-          "postalCode": {
-            "type": "string",
-            "example": "12345"
-          },
-          "city": {
-            "type": "string",
-            "example": "London"
-          },
-          "state": {
-            "type": "string",
-            "example": "California",
-            "nullable": true
           }
+
         }
       },
       "BankDetails": {
@@ -1817,20 +1842,9 @@
           },
           "bicSwift": {
             "type": "string",
+            "pattern": "^[0-9A-Z]{8}$|^[0-9A-Z]{11}$",
             "description": "BIC/SWIFT code",
             "example": "AAAABBCC123",
-            "nullable": true
-          },
-          "aba": {
-            "type": "string",
-            "description": "AN ABA (American Bankers Association)",
-            "example": "123456789",
-            "nullable": true
-          },
-          "iban": {
-            "type": "string",
-            "description": "IBAN code",
-            "example": "GB06 BARC 1231 4512 7782 32",
             "nullable": true
           },
           "accountType": {
@@ -1863,6 +1877,43 @@
                 ]
               }
             ]
+          }
+        }
+      },
+      "BankDetailsAba": {
+        "title": "Bank Details Aba",
+        "type": "object",
+        "required": [
+          "accountNumber",
+          "aba"
+        ],
+        "properties": {
+          "accountNumber": {
+            "type": "string",
+            "description": "Bank account number",
+            "example": "00997950423807",
+            "nullable": true
+          },
+          "aba": {
+            "type": "string",
+            "description": "AN ABA (American Bankers Association)",
+            "example": "123456789",
+            "nullable": true
+          }
+        }
+      },
+      "BankDetailsIban": {
+        "title": "Bank Details Iban",
+        "type": "object",
+        "required": [
+          "iban"
+        ],
+        "properties": {
+          "iban": {
+            "type": "string",
+            "description": "IBAN code",
+            "example": "GB06 BARC 1231 4512 7782 32",
+            "nullable": true
           }
         }
       },
@@ -1985,7 +2036,7 @@
                 "example": "Company"
               },
               "address": {
-                "$ref": "#/components/schemas/AddressDetails"
+                "$ref": "#/components/schemas/EnhancedAddressDetails"
               },
               "fxMarkup": {
                 "type": "number",
