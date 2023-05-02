@@ -18,7 +18,7 @@ from snowfall.vendor.duffel.builders.order_request import (
 from snowfall.vendor.duffel.models.order import Order
 
 
-class BookingHandler(object):
+class BookingHandler(object):  # noqa: WPS214
     _poll_retries_limit = 10
     _wait_time_between_polling = 15
     _adult_years = 18
@@ -28,12 +28,14 @@ class BookingHandler(object):
         self,
         duffel_client: client.DuffelClient,
         notifier: notifications.Notifier,
+        price_change_tolerance_percent: float,
     ):
         self._client = duffel_client
         self._logger = structlog.get_logger(__name__)
         self._notifier = notifier
+        self._price_change_tolerance_percent = price_change_tolerance_percent
 
-    async def book(
+    async def book(  # noqa: C901, WPS210
         self,
         task: amqp_pb2.PlaceOrderTask,
         details: cache.OfferDetails,
@@ -41,16 +43,56 @@ class BookingHandler(object):
         new_booking = task.booking
 
         try:
-            booking_result: Order = await self._make_booking(task=task, details=details)
-        except errors.ServiceError as error:
+            updated_details: cache.OfferDetails = await self._refresh_details(details)
+        except errors.ServiceError as offer_refresh_error:
             self._logger.exception(
                 "Booking failed",
-                reason=repr(error),
+                reason=repr(offer_refresh_error),
+            )
+            new_booking.status = models_pb2.Booking.STATUS_ERROR
+            new_booking.raw_data = repr(offer_refresh_error)
+            return new_booking
+
+        original_price = float(details.total_amount)
+        updated_price = float(updated_details.total_amount)
+        price_difference_percent = (
+            (updated_price - original_price) * 100 / original_price
+        )
+
+        if details.total_amount != updated_details.total_amount:
+            self._logger.warning(
+                "Price changed",
+                old_price=details.total_amount,
+                new_price=updated_details.total_amount,
+                offer_id=details.offer_id,
+            )
+
+        if abs(price_difference_percent) > self._price_change_tolerance_percent:
+            error_text = (
+                "Offer price changed from {original_price} to {updated_price}."
+                + "Price change exceeded {price_change_tolerance}%"
+            ).format(
+                updated_price=updated_price,
+                original_price=original_price,
+                price_change_tolerance=self._price_change_tolerance_percent,
+            )
+            new_booking.status = models_pb2.Booking.STATUS_ERROR
+            new_booking.raw_data = repr(errors.ServiceError(error_text))
+            return new_booking
+
+        try:
+            booking_result: Order = await self._make_booking(
+                task=task,
+                details=updated_details,
+            )
+        except errors.ServiceError as booking_error:
+            self._logger.exception(
+                "Booking failed",
+                reason=repr(booking_error),
             )
 
             new_booking.status = models_pb2.Booking.STATUS_ERROR
-            new_booking.raw_data = repr(error)
-
+            new_booking.raw_data = repr(booking_error)
             return new_booking
 
         if booking_result is not None:
@@ -58,8 +100,10 @@ class BookingHandler(object):
                 models_pb2.Booking(
                     status=models_pb2.Booking.STATUS_CONFIRMED,
                     provider_total_price=money.from_string(
-                        string_amount=str(
-                            booking_result.total_amount,
+                        string_amount=(
+                            booking_result.total_amount
+                            if price_difference_percent <= 0
+                            else details.total_amount
                         ),
                         currency=money.Currency(
                             booking_result.total_currency,
@@ -77,6 +121,28 @@ class BookingHandler(object):
             )
 
         return new_booking
+
+    async def _refresh_details(
+        self,
+        details: cache.OfferDetails,
+    ) -> cache.OfferDetails:
+        try:
+            offer = await self._client.get_single_offer(details.offer_id)
+        except errors.ServiceError as get_offer_ex:
+            self._logger.error(
+                "Could not get offer from Duffel",
+                exception=str(type(get_offer_ex).__name__),
+            )
+            raise
+
+        return cache.OfferDetails(
+            offer_id=details.offer_id,
+            passengers=details.passengers,
+            total_amount=offer.total_amount,
+            currency=offer.total_currency,
+            doc_required=details.doc_required,
+            last_travel_date=details.last_travel_date,
+        )
 
     async def _make_booking(  # noqa: WPS210, WPS231
         self,

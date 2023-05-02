@@ -30,6 +30,7 @@ class OrdersSettings(config.DuffelConfig, service.Settings):
     smtp_dsn: pydantic.AnyUrl
     smtp_sender: pydantic.EmailStr
     smtp_recipient: pydantic.EmailStr
+    price_change_tolerance_percent: float = 1.0
 
 
 async def orders(app: service.Application[OrdersSettings]) -> None:
@@ -80,6 +81,7 @@ async def orders(app: service.Application[OrdersSettings]) -> None:
                     sender=app.settings.smtp_sender,
                     recipient=app.settings.smtp_recipient,
                 ),
+                price_change_tolerance_percent=app.settings.price_change_tolerance_percent,
             ),
             offer_cache=cache.OfferCache(
                 client=redis.Client(redis_connection, prefix=app.name),
