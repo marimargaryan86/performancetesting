@@ -6,6 +6,7 @@ from starlette import routing
 
 from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.go.adapter import legs as legs_adapter
+from snowfall.project.junction.go.adapter import locations as locations_adapter
 from snowfall.project.junction.go.adapter import (
     offer_searches as offer_searches_adapter,
 )
@@ -14,6 +15,9 @@ from snowfall.project.junction.go.adapter import places as places_adapter
 from snowfall.project.junction.go.adapter import price_quotes as price_quotes_adapter
 from snowfall.project.junction.go.adapter import schedules as schedules_adapter
 from snowfall.project.junction.go.adapter import segments as segments_adapter
+from snowfall.project.junction.go.adapter import (
+    trip_candidate_searches as trip_candidate_searches_adapter,
+)
 from snowfall.project.junction.go.adapter import trips as trips_adapter
 from snowfall.project.junction.go.service.client_api import resources
 from snowfall.project.junction.go.service.client_api.routes import (
@@ -61,6 +65,14 @@ def get_routes(  # noqa: WPS210
         _price_quotes_client=(
             dependencies[price_quotes_adapter.Client]  # type: ignore[type-abstract]
         ),
+        _reseller_pay_companies=reseller_pay_companies,
+    )
+    trip_candidate_searches_handler = trips.TripCandidateSearches(
+        _trip_candidate_searches_client=dependencies[
+            trip_candidate_searches_adapter.Client  # type: ignore[type-abstract]
+        ],
+        _locations_client=dependencies[locations_adapter.Client],  # type: ignore[type-abstract]
+        _reseller_currencies=reseller_currencies,
         _reseller_pay_companies=reseller_pay_companies,
     )
 
@@ -133,7 +145,11 @@ def get_routes(  # noqa: WPS210
             trips.TripsByTripSearch,
             name="ViewTripsByTripSearch",
         ),
-        integration.route("/trip-candidates/searches", trips.TripCandidateSearches),
+        routes.to_route(
+            "/trip-candidates/searches",
+            trip_candidate_searches_handler.post,
+            methods=["POST"],
+        ),
         integration.route(
             "/trip-candidates/searches/{tripCandidateSearchId}",
             trips.TripCandidateSearch,
