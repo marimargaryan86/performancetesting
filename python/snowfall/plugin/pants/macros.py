@@ -39,6 +39,7 @@ def nomad_template(  # type: ignore[no-untyped-def]  # noqa: C901,WPS210
                 "{filename}.json".format(filename=filename),
                 "{filename}.nomad".format(filename=filename),
             ],
+            dependencies=[service_entry_point] if service_entry_point else [],
             **kwargs,
         )
 
