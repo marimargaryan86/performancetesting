@@ -18,6 +18,7 @@ class _GrpcSettings(service.Settings):
     default_page_size: int = 100
     jwt_private_key: str
     jwt_public_key: str
+    jwt_ttl: datetime.timedelta = datetime.timedelta(hours=1)
     mongo_dsn: Sequence[pydantic.AnyUrl]
 
 
@@ -33,7 +34,7 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
                     collection=mongo.authentication.users,
                 ),
                 auth.JWTFactory(
-                    ttl=datetime.timedelta(hours=1),
+                    ttl=app.settings.jwt_ttl,
                 ),
                 jwt_encoder=jwt.Encoder(
                     private_key=app.settings.jwt_private_key,
