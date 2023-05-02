@@ -1,6 +1,5 @@
 import ipaddress
 
-from currencycloud import Client
 from motor import motor_asyncio
 from pydantic import AnyUrl
 
@@ -11,7 +10,7 @@ from snowfall.project.pay.service.accounts.grpc import (
 )
 from snowfall.stdlib import service
 from snowfall.stdlib.transport.grpc import server
-from snowfall.vendor.currency_cloud.client import PaymentClient
+from snowfall.vendor.currency_cloud.client import CurrencyCloudConfig, PaymentClient
 
 
 class _GrpcSettings(service.Settings):
@@ -50,7 +49,11 @@ async def _sync_accounts_cron_run(
 ) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(app.settings.mongo_dsn)
     payment_client = PaymentClient(
-        Client(app.settings.cc_login, app.settings.cc_api_key, app.settings.cc_env),
+        CurrencyCloudConfig(
+            app.settings.cc_login,
+            app.settings.cc_api_key,
+            app.settings.cc_env,
+        ),
     )
     sync_account = cron_jobs.SyncAccounts(
         payment_client,
