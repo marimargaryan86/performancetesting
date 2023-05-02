@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package snowfall.project.junction.service.providers.distribusion.v1alpha;
 
+import "snowfall/stdlib/v1alpha/date.proto";
 import "snowfall/stdlib/v1alpha/models.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/providers/distribusion/v1alpha";

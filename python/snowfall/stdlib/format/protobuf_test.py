@@ -8,7 +8,7 @@ from dateutil import tz
 from google.protobuf import duration_pb2, timestamp_pb2
 
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import datetime_pb2, models_pb2, testing_pb2
+from snowfall.stdlib.v1alpha import date_pb2, datetime_pb2, testing_pb2
 
 _seconds = 1639696695
 
@@ -103,11 +103,11 @@ def test_slug_to_enum_value() -> None:
     [
         (
             datetime.date(year=1984, month=2, day=3),
-            models_pb2.Date(year=1984, month=2, day=3),
+            date_pb2.Date(year=1984, month=2, day=3),
         ),
     ],
 )
-def test_date_to_protobuf(date: datetime.date, expected: models_pb2.Date) -> None:
+def test_date_to_protobuf(date: datetime.date, expected: date_pb2.Date) -> None:
     assert protobuf.date_to_protobuf(date) == expected
 
 
@@ -128,13 +128,13 @@ def test_date_to_protobuf(date: datetime.date, expected: models_pb2.Date) -> Non
             datetime.date(year=1970, month=1, day=1),
         ),
         (
-            models_pb2.Date(year=1984, month=2, day=3),
+            date_pb2.Date(year=1984, month=2, day=3),
             datetime.date(year=1984, month=2, day=3),
         ),
     ],
 )
 def test_protobuf_to_date(
-    proto: models_pb2.Date | datetime_pb2.DateTime,
+    proto: date_pb2.Date | datetime_pb2.DateTime,
     expected: datetime.date,
 ) -> None:
     assert protobuf.protobuf_to_date(proto) == expected

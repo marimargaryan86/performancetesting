@@ -9,7 +9,7 @@ from google.protobuf import json_format, timestamp_pb2
 from snowfall.project.junction.go.service.offers.v1alpha import amqp_pb2, models_pb2
 from snowfall.project.junction.service.providers.ask2go import criteria
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import latlng_pb2
+from snowfall.stdlib.v1alpha import date_pb2, latlng_pb2
 from snowfall.stdlib.v1alpha import models_pb2 as common_models_pb2
 
 
@@ -58,21 +58,21 @@ _SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
         ],
         passengers=[
             models_pb2.Passenger(
-                date_of_birth=common_models_pb2.Date(
+                date_of_birth=date_pb2.Date(
                     year=2000,
                     month=1,
                     day=1,
                 ),
             ),
             models_pb2.Passenger(
-                date_of_birth=common_models_pb2.Date(
+                date_of_birth=date_pb2.Date(
                     year=2020,
                     month=1,
                     day=1,
                 ),
             ),
             models_pb2.Passenger(
-                date_of_birth=common_models_pb2.Date(
+                date_of_birth=date_pb2.Date(
                     year=2022,
                     month=1,
                     day=1,
@@ -272,7 +272,7 @@ _MULTIMODAL_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
         ],
         passengers=[
             models_pb2.Passenger(
-                date_of_birth=common_models_pb2.Date(
+                date_of_birth=date_pb2.Date(
                     year=2000,
                     month=1,
                     day=1,
@@ -338,7 +338,7 @@ _MULTISEGMENT_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
         ],
         passengers=[
             models_pb2.Passenger(
-                date_of_birth=common_models_pb2.Date(
+                date_of_birth=date_pb2.Date(
                     year=2000,
                     month=1,
                     day=1,
@@ -409,7 +409,7 @@ _ROUNDTRIP_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
         ],
         passengers=[
             models_pb2.Passenger(
-                date_of_birth=common_models_pb2.Date(
+                date_of_birth=date_pb2.Date(
                     year=2000,
                     month=1,
                     day=1,

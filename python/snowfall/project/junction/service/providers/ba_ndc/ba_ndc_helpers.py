@@ -11,7 +11,7 @@ from google.protobuf import timestamp_pb2
 from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import datetime_pb2, models_pb2, money_pb2
+from snowfall.stdlib.v1alpha import date_pb2, datetime_pb2, money_pb2
 from snowfall.vendor.ba_ndc.models import response_common_order_schemas
 
 PROVIDER_NAME = "BA_NDC"
@@ -48,7 +48,7 @@ def proto_to_date_time(date_time: datetime_pb2.DateTime) -> datetime.datetime:
     return protobuf.protobuf_to_datetime(date_time)
 
 
-def proto_to_date(date: models_pb2.Date) -> datetime.date:
+def proto_to_date(date: date_pb2.Date) -> datetime.date:
     return protobuf.protobuf_to_date(date)
 
 

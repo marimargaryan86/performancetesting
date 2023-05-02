@@ -17,7 +17,7 @@ from google.protobuf import (
 )
 
 from snowfall.stdlib import string
-from snowfall.stdlib.v1alpha import datetime_pb2, models_pb2
+from snowfall.stdlib.v1alpha import date_pb2, datetime_pb2
 
 if TYPE_CHECKING:
     from google.protobuf.internal import enum_type_wrapper
@@ -153,8 +153,8 @@ def protobuf_to_datetime(
     )
 
 
-def date_to_protobuf(date: datetime.date) -> models_pb2.Date:
-    return models_pb2.Date(
+def date_to_protobuf(date: datetime.date) -> date_pb2.Date:
+    return date_pb2.Date(
         year=date.year,
         month=date.month,
         day=date.day,
@@ -162,7 +162,7 @@ def date_to_protobuf(date: datetime.date) -> models_pb2.Date:
 
 
 def protobuf_to_date(
-    proto: models_pb2.Date | datetime_pb2.DateTime,
+    proto: date_pb2.Date | datetime_pb2.DateTime,
 ) -> datetime.date:
     return datetime.date(year=proto.year, month=proto.month, day=proto.day)
 

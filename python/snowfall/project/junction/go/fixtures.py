@@ -16,6 +16,7 @@ from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1alpha import (
+    date_pb2,
     latlng_pb2,
     models_pb2,
     phone_number_pb2,
@@ -413,7 +414,7 @@ def generate_journey(
                         last_name="Bar",
                         title=order_models_pb2.Passenger.TITLE_MR,
                         gender=order_models_pb2.Passenger.Gender.GENDER_MALE,
-                        date_of_birth=models_pb2.Date(
+                        date_of_birth=date_pb2.Date(
                             year=1987,
                             month=5,
                             day=24,

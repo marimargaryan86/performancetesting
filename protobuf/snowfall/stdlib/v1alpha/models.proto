@@ -13,12 +13,6 @@ message Cursor {
   string digest = 3;
 }
 
-message Date {
-  int32 year = 1;
-  int32 month = 2;
-  int32 day = 3;
-}
-
 message Point {
   string ref = 1;
   string name = 2;

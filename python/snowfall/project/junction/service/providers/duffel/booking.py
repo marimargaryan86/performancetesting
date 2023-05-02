@@ -7,7 +7,7 @@ from snowfall.project.junction.service.providers.duffel import cache, notificati
 from snowfall.project.junction.service.providers.duffel.enums import gender_from_proto
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import models_pb2 as std_models_pb2
+from snowfall.stdlib.v1alpha import date_pb2
 from snowfall.vendor.duffel import client, errors
 from snowfall.vendor.duffel.builders.order_request import (
     IdentityDocument,
@@ -182,5 +182,5 @@ class BookingHandler(object):
 
         return self._is_valid_date(passenger.doc_details.exp_date)
 
-    def _is_valid_date(self, date: std_models_pb2.Date) -> bool:
+    def _is_valid_date(self, date: date_pb2.Date) -> bool:
         return date.year > 0 and date.month > 0 and date.day > 0
