@@ -43,6 +43,7 @@ job "rates-grpc" {
     count = "${var.count}"
 
     network {
+      mode = "bridge"
       port "grpc" {}
     }
 
@@ -56,6 +57,10 @@ job "rates-grpc" {
       name = "rates-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
+
+      connect {
+        sidecar_service {}
+      }
 
       check {
         type     = "grpc"
