@@ -5139,26 +5139,21 @@
           {
             "type": "object",
             "properties": {
-              "attributes": {
-                "type": "object",
-                "required": [
-                  "latitude",
-                  "longitude"
-                ],
-                "properties": {
-                  "latitude": {
-                    "type": "number",
-                    "format": "float",
-                    "example": 59.858611
-                  },
-                  "longitude": {
-                    "type": "number",
-                    "format": "float",
-                    "example": 59.858611
-                  }
-                }
+              "latitude": {
+                "type": "number",
+                "format": "float",
+                "example": 59.858611
+              },
+              "longitude": {
+                "type": "number",
+                "format": "float",
+                "example": 59.858611
               }
-            }
+            },
+            "required": [
+              "latitude",
+              "longitude"
+            ]
           }
         ],
         "description": "A Coordinate represented via latitude and longitude"
