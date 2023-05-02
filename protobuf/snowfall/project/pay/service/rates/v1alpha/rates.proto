@@ -7,13 +7,14 @@ import "snowfall/project/pay/service/rates/v1alpha/models.proto";
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/rates/v1alpha";
 
 service RatesService {
-  rpc Insert(InsertRequest) returns (InsertResponse) {}
+  rpc Get(GetRequest) returns (GetResponse) {}
 }
 
-message InsertRequest {
-  repeated Rate rates = 1;
+message GetRequest {
+  string sell_currency = 1;
+  string buy_currency = 2;
 }
 
-message InsertResponse {
-  repeated Rate rates = 2;
+message GetResponse {
+  Rate rate = 1;
 }

@@ -3,42 +3,53 @@ import random
 from typing import Sequence
 
 from motor import motor_asyncio
-from pydantic import AnyUrl, HttpUrl
+from pydantic import AnyUrl
+from redis import asyncio as aioredis
 
+from snowfall.project.pay.service.rates import cache
 from snowfall.project.pay.service.rates.backup_rates_cron import UpdateBackUpRatesJob
 from snowfall.project.pay.service.rates.grpc import RatesService
-from snowfall.project.pay.service.rates.rates import (
-    BackUpRatesRepository,
-    RatesRepository,
-)
+from snowfall.project.pay.service.rates.rates import BackUpRatesRepository
 from snowfall.stdlib import service
+from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.grpc import server
-from snowfall.vendor.apilayer.client import APILayer
+from snowfall.vendor.currency_cloud.client import CurrencyCloudConfig, PaymentClient
 
 
 class _GrpcSettings(service.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: Sequence[AnyUrl]
+    redis_dsn: Sequence[AnyUrl]
 
 
 class _BackUpCronJobSettings(service.Settings):
     mongo_dsn: Sequence[AnyUrl]
-    api_layer_api_key: str
-    api_layer_base_url: HttpUrl
-    source_currencies: list[str]
+    redis_dsn: Sequence[AnyUrl]
+    cc_login: str
+    cc_api_key: str
+    cc_env: str
+    currencies: Sequence[str]
 
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
+    redis_client = redis.Client[str](
+        aioredis.from_url(
+            random.choice(app.settings.redis_dsn),  # nosec
+            decode_responses=True,
+        ).client(),
+        prefix=app.name,
+    )
     grpc_server = server.create_server(
         app.settings.grpc_address,
         app.settings.grpc_port,
         [
             RatesService(
-                RatesRepository(mongo.rates.rates),
+                BackUpRatesRepository(mongo.backup_rates.backup_rates),
+                cache.RateRepository(redis_client),
             ),
         ],
     )
@@ -54,15 +65,24 @@ async def _backup_rates_cron_run(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
 
-    api_layer_client = APILayer(
-        app.settings.api_layer_base_url,
-        app.settings.api_layer_api_key,
+    cc_config = CurrencyCloudConfig(
+        app.settings.cc_login,
+        app.settings.cc_api_key,
+        app.settings.cc_env,
+    )
+    redis_client = redis.Client[str](
+        aioredis.from_url(
+            random.choice(app.settings.redis_dsn),  # nosec
+            decode_responses=True,
+        ).client(),
+        prefix=app.name,
     )
 
     job = UpdateBackUpRatesJob(
-        app.settings.source_currencies,
         BackUpRatesRepository(mongo.backup_rates.backup_rates),
-        api_layer_client,
+        PaymentClient(cc_config),
+        app.settings.currencies,
+        cache.RateRepository(redis_client, 1),
     )
 
     await job.run()
