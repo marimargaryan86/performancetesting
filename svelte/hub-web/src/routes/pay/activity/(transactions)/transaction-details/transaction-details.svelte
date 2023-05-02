@@ -40,23 +40,29 @@
   export let transaction: TransactionModel | undefined;
 
   let bookingRequest: Promise<BookingModel | undefined> | undefined;
+  let bookingController = new AbortController();
 
   $: updateBooking(transaction);
 
   function updateBooking(nextTransaction?: TransactionModel): void {
-    if (!nextTransaction) {
-      bookingRequest = undefined;
+    bookingController.abort();
+    bookingController = new AbortController();
 
+    if (!nextTransaction) {
       return;
     }
 
-    bookingRequest = fetch(`/api/bookings/${nextTransaction.bookingId}`).then((resp) => {
-      if (resp.status !== 200) {
-        return undefined;
-      }
+    bookingRequest = fetch(`/api/bookings/${nextTransaction.bookingId}`, {
+      signal: bookingController.signal,
+    })
+      .then((resp) => {
+        if (resp.status !== 200) {
+          return undefined;
+        }
 
-      return resp.json().then((data) => parseBooking(data));
-    });
+        return resp.json().then((data) => parseBooking(data));
+      })
+      .catch(() => undefined);
   }
 
   function close(): void {
