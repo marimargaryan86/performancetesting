@@ -5,10 +5,12 @@ import type { PageServerLoadEvent } from "./$types";
 
 export async function load(
   event: PageServerLoadEvent,
-): Promise<{ transactions: TransactionModel[] }> {
-  const token = getToken(event);
+): Promise<{ transactions: TransactionModel[]; transactionsCursor?: string }> {
+  const [transactions, transactionsCursor] =
+    await integrationInstances.junctionPay.transactions.listTransactions(getToken(event));
 
   return {
-    transactions: await integrationInstances.junctionPay.transactions.listTransactions(token),
+    transactions,
+    transactionsCursor,
   };
 }

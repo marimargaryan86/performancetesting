@@ -23,6 +23,7 @@
   import TCol from "components/ui/table/t-col.svelte";
   import ConversionStatusBadge from "components/ui/conversion-status-badge.svelte";
   import { onMount } from "svelte";
+  import integrationInstances from "integration-instances";
 
   export let data: PageData;
 
@@ -38,6 +39,21 @@
     { by: sortGroup, direction: sortDirection },
   );
 
+  async function loadMore(): Promise<void> {
+    if (!data.conversionsCursor) {
+      return;
+    }
+
+    const [nextConversions, cursor] =
+      await integrationInstances.junctionPay.conversions.listConversions(
+        data.token as string,
+        data.conversionsCursor,
+      );
+
+    data.conversionsCursor = cursor;
+    data.conversions = [...data.conversions, ...nextConversions];
+  }
+
   onMount(() => {
     $searchQuery = "";
     $dateRange = undefined;
@@ -49,7 +65,7 @@
   <title>FX · Activity · Pay · Junction Hub</title>
 </svelte:head>
 
-<Table class="fx-table">
+<Table class="fx-table" {loadMore}>
   <THead>
     <Header>ID</Header>
     <Header bind:sortGroup bind:sortDirection sortValue="createdAt">Created</Header>

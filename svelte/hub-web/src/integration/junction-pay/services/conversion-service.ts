@@ -7,9 +7,12 @@ import JunctionPayService from "./junction-pay-service";
 import { parseConversion } from "../parsers/conversion";
 
 export default class ConversionService extends JunctionPayService {
-  async listConversions(token: string): Promise<ConversionModel[]> {
+  async listConversions(
+    token: string,
+    cursor?: string,
+  ): Promise<[data: ConversionModel[], cursor?: string]> {
     const resp = await this.makeRequest("/conversions", {
-      queryParams: { include: "transactions" },
+      queryParams: { include: "transactions", "page[cursor]": cursor },
       token,
     });
 
@@ -19,7 +22,10 @@ export default class ConversionService extends JunctionPayService {
 
     const data = (await resp.json()) as ListConversionDetailsResponseSchema;
 
-    return data.data.map((item) => parseConversion(item, data.included));
+    return [
+      data.data.map((item) => parseConversion(item, data.included)),
+      ConversionService.getCursor(data),
+    ];
   }
 
   async getConversionDetails(conversionId: string, token: string): Promise<ConversionModel> {

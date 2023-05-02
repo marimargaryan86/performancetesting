@@ -16,6 +16,7 @@ export interface AccountSchema extends AccountIdentifierSchema {
     company?: RelationshipSchema<CompanyIdentifierSchema>;
     contactPerson?: RelationshipSchema<ContactPersonIdentifierSchema>;
   };
+  links: { self: string };
 }
 
 export interface ListAccountsResponseSchema {
@@ -23,4 +24,8 @@ export interface ListAccountsResponseSchema {
   links: {
     next: string;
   };
+}
+
+export interface GetAccountResponseSchema {
+  data: AccountSchema;
 }

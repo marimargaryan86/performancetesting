@@ -5,6 +5,17 @@ export default abstract class JunctionPayService {
     this.baseUrl = baseUrl;
   }
 
+  protected static getCursor(data: {
+    data: unknown[];
+    links: { next: string };
+  }): string | undefined {
+    if (!data.data.length) {
+      return undefined;
+    }
+
+    return new URL(data.links.next).searchParams.get("page[cursor]") ?? undefined;
+  }
+
   protected makeRequest(
     resource: string,
     options: {
@@ -18,9 +29,11 @@ export default abstract class JunctionPayService {
     const url = new URL(resource, this.baseUrl);
 
     if (options.queryParams) {
-      Object.entries(options.queryParams).forEach(([key, val]) =>
-        url.searchParams.set(key, `${val}`),
-      );
+      Object.entries(options.queryParams).forEach(([key, val]) => {
+        if (val !== undefined) {
+          url.searchParams.set(key, `${val}`);
+        }
+      });
     }
 
     return fetch(

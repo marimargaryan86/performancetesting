@@ -3,6 +3,7 @@ import { parseTransaction } from "../parsers/transaction";
 import type { ListTransactionsResponseSchema } from "../schemas/transaction";
 import type CompanyService from "./company-service";
 import JunctionPayService from "./junction-pay-service";
+import type { CompanyModel } from "models/company";
 
 export default class TransactionService extends JunctionPayService {
   private readonly companyService: CompanyService;
@@ -13,14 +14,10 @@ export default class TransactionService extends JunctionPayService {
     this.companyService = companyService;
   }
 
-  async listTransactions(token: string): Promise<TransactionModel[]> {
-    const resp = await this.makeRequest("/transactions", { token });
-
-    if (resp.status !== 200) {
-      throw new Error(`Junction Pay error: ${resp.status}`);
-    }
-
-    const data = (await resp.json()) as ListTransactionsResponseSchema;
+  private getCompanies(
+    data: ListTransactionsResponseSchema,
+    token: string,
+  ): Promise<CompanyModel[]> {
     const companyIds = new Set(
       data.data.reduce<string[]>(
         (prev, curr) => [
@@ -34,8 +31,29 @@ export default class TransactionService extends JunctionPayService {
     const companyRequests = Array.from(companyIds).map((id) =>
       this.companyService.getCompanyDetails(token, id),
     );
-    const companies = await Promise.all(companyRequests);
 
-    return data.data.map((item) => parseTransaction(item, companies));
+    return Promise.all(companyRequests);
+  }
+
+  async listTransactions(
+    token: string,
+    cursor?: string,
+  ): Promise<[data: TransactionModel[], cursor?: string]> {
+    const resp = await this.makeRequest("/transactions", {
+      token,
+      queryParams: { "page[cursor]": cursor },
+    });
+
+    if (resp.status !== 200) {
+      throw new Error(`Junction Pay error: ${resp.status}`);
+    }
+
+    const data = (await resp.json()) as ListTransactionsResponseSchema;
+    const companies = await this.getCompanies(data, token);
+
+    return [
+      data.data.map((item) => parseTransaction(item, companies)),
+      TransactionService.getCursor(data),
+    ];
   }
 }

@@ -1,35 +1,36 @@
 import type { AccountModel } from "models/account";
-import type { ListAccountsResponseSchema } from "../schemas/account";
+import type { GetAccountResponseSchema, ListAccountsResponseSchema } from "../schemas/account";
 import JunctionPayService from "./junction-pay-service";
+import { parseAccount } from "../parsers/account";
 
 export default class AccountService extends JunctionPayService {
-  async listAccounts(token: string): Promise<AccountModel[]> {
-    const resp = await this.makeRequest("/accounts", { token });
+  async listAccounts(
+    token: string,
+    cursor?: string,
+  ): Promise<[data: AccountModel[], cursor?: string]> {
+    const resp = await this.makeRequest("/accounts", {
+      token,
+      queryParams: { "page[cursor]": cursor },
+    });
 
     if (resp.status !== 200) {
       throw new Error(`Junction Pay error: ${resp.status}`);
     }
 
     const data = (await resp.json()) as ListAccountsResponseSchema;
-    const result = data.data.map((item) => ({
-      headAccount: false,
-      id: item.id,
-      name: item.attributes.name,
-      companyId: item.relationships.company?.data.id,
-      contactPersonId: item.relationships.contactPerson?.data.id,
-    }));
 
-    return result;
+    return [data.data.map((item) => parseAccount(item)), AccountService.getCursor(data)];
   }
 
   async getAccount(token: string, accountId: string): Promise<AccountModel> {
-    const accounts = await this.listAccounts(token);
-    const account = accounts.find((item) => item.id === accountId);
+    const resp = await this.makeRequest(`/accounts/${accountId}`, { token });
 
-    if (!account) {
-      throw new Error("Junction Pay error: account not found");
+    if (resp.status !== 200) {
+      throw new Error(`Junction Pay error: ${resp.status}`);
     }
 
-    return account;
+    const data = (await resp.json()) as GetAccountResponseSchema;
+
+    return parseAccount(data.data);
   }
 }

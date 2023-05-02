@@ -5,10 +5,12 @@ import type { PageServerLoadEvent } from "./$types";
 
 export async function load(
   event: PageServerLoadEvent,
-): Promise<{ conversions: ConversionModel[] }> {
+): Promise<{ conversions: ConversionModel[]; conversionsCursor?: string }> {
+  const [conversions, conversionsCursor] =
+    await integrationInstances.junctionPay.conversions.listConversions(getToken(event));
+
   return {
-    conversions: await integrationInstances.junctionPay.conversions.listConversions(
-      getToken(event),
-    ),
+    conversions,
+    conversionsCursor,
   };
 }

@@ -35,4 +35,5 @@ export interface GetConversionDetailsResponseSchema {
 export interface ListConversionDetailsResponseSchema {
   data: ConversionSchema[];
   included: TransactionSchema[];
+  links: { next: string };
 }

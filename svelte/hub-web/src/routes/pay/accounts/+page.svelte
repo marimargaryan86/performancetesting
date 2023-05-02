@@ -3,6 +3,8 @@
   import EntityAvatar from "components/ui/entity-avatar.svelte";
   import type { PageData } from "./$types";
   import SearchField from "components/ui/search-field.svelte";
+  import integrationInstances from "integration-instances";
+  import { scrollLoad } from "directives/scroll-load";
 
   export let data: PageData;
 
@@ -11,6 +13,20 @@
   $: accounts = data.accounts.filter((account) =>
     account.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
+
+  async function loadMore(): Promise<void> {
+    if (!data.accountsCursor) {
+      return;
+    }
+
+    const [nextAccounts, cursor] = await integrationInstances.junctionPay.accounts.listAccounts(
+      data.token as string,
+      data.accountsCursor,
+    );
+
+    data.accountsCursor = cursor;
+    data.accounts = [...data.accounts, ...nextAccounts];
+  }
 </script>
 
 <svelte:head>
@@ -27,7 +43,7 @@
   <div class="wrapper">
     <h2 class="typography title-medium bold">Sub accounts</h2>
 
-    <ul class="accounts" data-sveltekit-preload-data="off">
+    <ul class="accounts" data-sveltekit-preload-data="off" use:scrollLoad={{ func: loadMore }}>
       {#each accounts as account}
         <li>
           <a href="/pay/accounts/{account.id}" class="account">

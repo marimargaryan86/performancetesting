@@ -26,12 +26,12 @@
   import { writable } from "svelte/store";
   import { onMount } from "svelte";
   import TransactionDetails from "./transaction-details/transaction-details.svelte";
+  import integrationInstances from "integration-instances";
 
   export let data: PageData;
 
   let sortGroup: FlattenedObject<TransactionModel> = "createdAt";
   let sortDirection: DirectionY = "down";
-  let transactions: TransactionModel[] = [];
   let selectedTransaction: TransactionModel | undefined = undefined;
 
   $: transactions = sortTransactions(
@@ -49,6 +49,21 @@
     };
   }
 
+  async function loadMore(): Promise<void> {
+    if (!data.transactionsCursor) {
+      return;
+    }
+
+    const [nextTransactions, cursor] =
+      await integrationInstances.junctionPay.transactions.listTransactions(
+        data.token as string,
+        data.transactionsCursor,
+      );
+
+    data.transactionsCursor = cursor;
+    data.transactions = [...data.transactions, ...nextTransactions];
+  }
+
   onMount(() => {
     $searchQuery = "";
     $dateRange = undefined;
@@ -62,7 +77,7 @@
 
 <TransactionDetails bind:transaction={selectedTransaction} />
 
-<Table class="transactions-table">
+<Table class="transactions-table" {loadMore}>
   <THead>
     <Header>ID</Header>
     <Header bind:sortGroup bind:sortDirection sortValue="createdAt">Created</Header>
