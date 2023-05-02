@@ -7,14 +7,13 @@
   import { portal } from "directives/portal";
   import integrationInstances from "integration-instances";
   import type { CurrencyModel, MoneyModel } from "models/money";
-  import { createEventDispatcher, onMount } from "svelte";
+  import { createEventDispatcher } from "svelte";
   import { fade, fly } from "svelte/transition";
 
   export let token: string | undefined;
   export let accountId: string;
   export let exclude: MoneyModel[];
-
-  let balances: CurrencyModel[] = [];
+  export let currencies: CurrencyModel[];
 
   export function close(): void {
     visible = false;
@@ -38,7 +37,7 @@
 
   const dispatch = createEventDispatcher<{ addbalances: MoneyModel[] }>();
 
-  $: filteredBalances = balances.filter(
+  $: filteredBalances = currencies.filter(
     (balance) =>
       balance.code.toLowerCase().includes(searchQuery.toLowerCase()) &&
       !exclude.find((money) => money.currency === balance.code),
@@ -68,16 +67,6 @@
     dispatch("addbalances", nextBalances);
     close();
   }
-
-  onMount(() => {
-    (async (): Promise<void> => {
-      if (!token) {
-        return;
-      }
-
-      balances = await integrationInstances.junctionPay.currencies.listCurrencies(token);
-    })();
-  });
 </script>
 
 {#if visible}

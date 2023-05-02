@@ -113,7 +113,7 @@
         </TCol>
         <TCol>
           <div class="money">
-            <span>{formatAmount(item.amounts.quotation)}</span>
+            <span>{formatAmount(item.amounts.quotation, data.currencies)}</span>
             <strong class="typography body-small">{item.amounts.quotation.currency}</strong>
           </div>
         </TCol>
@@ -129,13 +129,13 @@
         </TCol>
         <TCol>
           <div class="money">
-            <span>{formatAmount(item.amounts.beneficiary)}</span>
+            <span>{formatAmount(item.amounts.beneficiary, data.currencies)}</span>
             <strong class="typography body-small">{item.amounts.beneficiary.currency}</strong>
           </div>
         </TCol>
         <TCol>
           <div class="money">
-            <span>{formatAmount(item.amounts.salesMargin)}</span>
+            <span>{formatAmount(item.amounts.salesMargin, data.currencies)}</span>
             <strong class="typography body-small">{item.amounts.salesMargin.currency}</strong>
           </div>
         </TCol>

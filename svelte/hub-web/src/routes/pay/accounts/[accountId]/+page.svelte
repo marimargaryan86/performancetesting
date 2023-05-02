@@ -32,6 +32,7 @@
 </svelte:head>
 
 <AddBalanceDialogue
+  currencies={data.currencies}
   exclude={balances}
   accountId={data.account.id}
   token={data.token}
@@ -60,7 +61,9 @@
           <CurrencyFlag code={balance.currency} />
 
           <span>
-            <strong class="typography body-large bold">{formatAmount(balance)}</strong>
+            <strong class="typography body-large bold">
+              {formatAmount(balance, data.currencies)}
+            </strong>
             <span class="typography body-small">{balance.currency}</span>
           </span>
 
