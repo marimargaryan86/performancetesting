@@ -212,14 +212,19 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
                 use_pay_for_currency_conversions=(
                     app.settings.use_pay_for_currency_conversions
                 ),
-                pay_client=PayClient(
-                    base_url=app.settings.public_pay_api_dsn,
-                    auth=UserAuth(
-                        app.settings.public_pay_admin_api_dsn,
-                        app.settings.pay_admin_username,
-                        app.settings.pay_admin_password,
+                pay_quotes=pay_quotes.PayQuotes(
+                    pay_client=PayClient(
+                        base_url=app.settings.public_pay_api_dsn,
+                        auth=UserAuth(
+                            app.settings.public_pay_admin_api_dsn,
+                            app.settings.pay_admin_username,
+                            app.settings.pay_admin_password,
+                        ),
+                        client=http_client,
                     ),
-                    client=http_client,
+                    offer_options_repository=offers.OfferOptionsRepository(
+                        mongo.offers.trip_offers,
+                    ),
                 ),
                 payer_id=app.settings.payer_company_id,
                 payer_currency=app.settings.payer_currency_code,
@@ -263,20 +268,22 @@ async def _gather_price_quotes(
                 use_pay_for_currency_conversions=(
                     app.settings.use_pay_for_currency_conversions
                 ),
-                pay_client=PayClient(
-                    base_url=app.settings.public_pay_api_dsn,
-                    auth=UserAuth(
-                        app.settings.public_pay_admin_api_dsn,
-                        app.settings.pay_admin_username,
-                        app.settings.pay_admin_password,
+                pay_quotes=pay_quotes.PayQuotes(
+                    pay_client=PayClient(
+                        base_url=app.settings.public_pay_api_dsn,
+                        auth=UserAuth(
+                            app.settings.public_pay_admin_api_dsn,
+                            app.settings.pay_admin_username,
+                            app.settings.pay_admin_password,
+                        ),
+                        client=http_client,
                     ),
-                    client=http_client,
+                    offer_options_repository=offers.OfferOptionsRepository(
+                        mongo.offers.trip_offers,
+                    ),
                 ),
                 payer_id=app.settings.payer_company_id,
                 payer_currency=app.settings.payer_currency_code,
-            ),
-            offer_options_repository=offers.OfferOptionsRepository(
-                mongo.offers.trip_offers,
             ),
         )
         await price_quote_importer.consume()

@@ -1,5 +1,6 @@
 import uuid
 
+from snowfall.project.junction.go.service.offers import offers
 from snowfall.project.junction.go.service.offers.pay_quotes_models import (
     PayQuoteResponse,
 )
@@ -12,16 +13,18 @@ from snowfall.stdlib import money, string
 from snowfall.vendor.junction.pay.client import Client as PayClient
 
 
-class SkippedOfferError(Exception):
-    """Raised when an offer is skipped."""
+class SkippedConversionError(Exception):
+    """Raised when a conversion is skipped."""
 
 
 class PayQuotes(object):
     def __init__(
         self,
         pay_client: PayClient,
+        offer_options_repository: offers.OfferOptionsRepository,
     ):
         self._pay_client = pay_client
+        self._offer_options_repository = offer_options_repository
 
     async def get_offer_search_quotes(
         self,
@@ -60,32 +63,40 @@ class PayQuotes(object):
         session_token: str,
         search_result: TripPriceQuoteResult,
         payer_id: str,
-        to_currency: str,
     ) -> TripPriceQuoteResult:
         price_quote_money = money.from_protobuf(search_result.price_quote.price)
-
-        quote = await self._get_quote(
-            amount=price_quote_money.amount,
-            session_token=session_token,
-            payer_id=payer_id,
-            beneficiary_id=search_result.provider_company_id,
-            from_currency=price_quote_money.currency.code,
-            to_currency=to_currency,
-        )
-
-        search_result.price_quote.pay_quote_id = quote.data.id
-
-        converted_money = money.Money(
-            amount=quote.data.attributes.amount,
-            currency=money.Currency(to_currency),
-        )
-
-        search_result.price_quote.price.CopyFrom(converted_money.protobuf())
 
         search_result.price_quote.option_id = string.to_uuid(
             session_token,
             uuid.UUID(search_result.price_quote.option_id),
         )
+
+        offer_option = await self._offer_options_repository.find_by_id(
+            search_result.price_quote.option_id,
+        )
+
+        if not offer_option:
+            raise SkippedConversionError()
+
+        quote = (
+            await self._get_quote(
+                amount=price_quote_money.amount,
+                session_token=session_token,
+                payer_id=payer_id,
+                beneficiary_id=search_result.provider_company_id,
+                from_currency=price_quote_money.currency.code,
+                to_currency=offer_option.price.currency_code,
+            )
+        ).data
+
+        search_result.price_quote.pay_quote_id = quote.id
+
+        converted_money = money.Money(
+            amount=quote.attributes.amount,
+            currency=money.Currency(quote.relationships.to_currency.data.id),
+        )
+
+        search_result.price_quote.price.CopyFrom(converted_money.protobuf())
 
         return search_result
 
@@ -113,12 +124,12 @@ class PayQuoteFetcher(object):
     def __init__(
         self,
         use_pay_for_currency_conversions: bool,
-        pay_client: PayClient,
+        pay_quotes: PayQuotes,
         payer_id: str,
         payer_currency: str,
     ):
         self._use_pay_for_currency_conversions = use_pay_for_currency_conversions
-        self._pay_quotes = PayQuotes(pay_client)
+        self._pay_quotes = pay_quotes
         self._payer_id = payer_id
         self._payer_currency = payer_currency
 
@@ -145,7 +156,6 @@ class PayQuoteFetcher(object):
         self,
         message: TripPriceQuoteResult,
         price_quote_container: models_pb2.PriceQuoteContainer,
-        option: models_pb2.Offer,
     ) -> TripPriceQuoteResult:
         if not self._use_pay_for_currency_conversions:
             return message
@@ -156,5 +166,4 @@ class PayQuoteFetcher(object):
             price_quote_container.session_token,
             message,
             payer_company_id,
-            option.price.currency_code,
         )

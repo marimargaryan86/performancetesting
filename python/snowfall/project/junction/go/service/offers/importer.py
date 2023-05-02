@@ -160,19 +160,17 @@ class OfferImporter(object):
 
 
 class PriceQuoteImporter(object):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         consumer_obj: consumer.Consumer[amqp_pb2.TripPriceQuoteResult],
         price_quotes_repository: price_quotes.PriceQuoteRepository,
         price_quotes_container_repository: price_quotes.PriceQuoteContainerRepository,
         pay_quote_fetcher: pay_quotes.PayQuoteFetcher,
-        offer_options_repository: offers.OfferOptionsRepository,
     ):
         self._consumer = consumer_obj
         self._quotes = price_quotes_repository
         self._price_quotes_container_repository = price_quotes_container_repository
         self._pay_quote_fetcher = pay_quote_fetcher
-        self._offer_options_repository = offer_options_repository
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -186,17 +184,13 @@ class PriceQuoteImporter(object):
                 message.body.price_quote_container_id,
             )
         )
-        offer_option = await self._offer_options_repository.find_by_id(
-            message.body.option_id,
-        )
 
-        if not price_quote_container or not offer_option:
+        if not price_quote_container:
             raise SkippedPriceQuoteError()
 
         price_quote_message = await self._pay_quote_fetcher.handle_price_quote_result(
             message=message.body,
             price_quote_container=price_quote_container,
-            option=offer_option,
         )
 
         await self._quotes.add_to_container(

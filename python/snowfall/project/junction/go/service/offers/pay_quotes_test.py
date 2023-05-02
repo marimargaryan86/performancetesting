@@ -1,7 +1,10 @@
 import uuid
 from types import MappingProxyType
-from unittest.mock import create_autospec
+from unittest import mock
 
+import pytest
+
+from snowfall.project.junction.go.service.offers import offers
 from snowfall.project.junction.go.service.offers.pay_quotes import (
     PayQuoteResponse,
     PayQuotes,
@@ -15,17 +18,13 @@ from snowfall.project.junction.go.service.offers.pay_quotes_models import (
     PayQuoteRelationships,
     PayQuoteResponseData,
 )
+from snowfall.project.junction.go.service.offers.v1alpha import models_pb2
 from snowfall.project.junction.go.service.offers.v1alpha.amqp_pb2 import (
     TripOfferSearchResult,
     TripPriceQuoteResult,
 )
-from snowfall.project.junction.go.service.offers.v1alpha.models_pb2 import (
-    Offer,
-    OfferGroup,
-    PriceQuote,
-)
 from snowfall.stdlib import string
-from snowfall.stdlib.v1alpha.money_pb2 import Money
+from snowfall.stdlib.v1alpha import money_pb2
 from snowfall.vendor.junction.pay.client import Client as PayClient
 
 _QUOTE_MOCK_RESPONSE = MappingProxyType(
@@ -67,10 +66,29 @@ _QUOTE_MOCK_RESPONSE = MappingProxyType(
 )
 
 
-async def test_that_pay_quotes_invoked_and_response_returned() -> None:
-    mock_pay_client = create_autospec(PayClient, spec_set=True, instance=True)
-    pay_quotes = PayQuotes(pay_client=mock_pay_client)
-    mock_resp = _QUOTE_MOCK_RESPONSE
+@pytest.fixture()
+def mock_pay_client() -> mock.Mock:
+    mock_pay_client = mock.create_autospec(PayClient, spec_set=True, instance=True)
+    mock_pay_client.create_quote.return_value = _QUOTE_MOCK_RESPONSE
+
+    return mock_pay_client
+
+
+@pytest.fixture()
+def pay_quotes(
+    mock_pay_client: mock.Mock,
+    offer_options_repository: offers.OfferOptionsRepository,
+) -> PayQuotes:
+    return PayQuotes(
+        pay_client=mock_pay_client,
+        offer_options_repository=offer_options_repository,
+    )
+
+
+async def test_that_pay_quotes_invoked_and_response_returned(
+    mock_pay_client: mock.Mock,
+    pay_quotes: PayQuotes,
+) -> None:
     expected_resp = PayQuoteResponse(
         data=PayQuoteResponseData(
             id="a-quotation-id",
@@ -103,8 +121,6 @@ async def test_that_pay_quotes_invoked_and_response_returned() -> None:
         ),
     )
 
-    mock_pay_client.create_quote.return_value = mock_resp
-
     quote = await pay_quotes._get_quote(  # noqa: WPS437  # nosec
         amount=1000,
         session_token="session-token",
@@ -125,27 +141,22 @@ async def test_that_pay_quotes_invoked_and_response_returned() -> None:
     )
 
 
-async def test_that_all_amounts_in_trip_offer_search_result_replaced_with_conversions() -> (  # noqa:WPS210,B950,WPS218
-    None
-):
-    mock_pay_client = create_autospec(PayClient, spec_set=True, instance=True)
-    pay_quotes = PayQuotes(pay_client=mock_pay_client)
-    mock_resp = _QUOTE_MOCK_RESPONSE
-
-    mock_pay_client.create_quote.return_value = mock_resp
-
+async def test_that_all_amounts_in_trip_offer_search_result_replaced_with_conversions(  # noqa: B950,WPS218
+    mock_pay_client: mock.Mock,
+    pay_quotes: PayQuotes,
+) -> None:
     search_result = TripOfferSearchResult(
         offer_search_id="an-id",
-        offer=OfferGroup(
+        offer=models_pb2.OfferGroup(
             id="faa416e4-c7ef-11ed-afa1-0242ac120002",
             offers=[
-                Offer(
+                models_pb2.Offer(
                     id="009fd15a-c7f0-11ed-afa1-0242ac120002",
-                    price=Money(currency_code="EUR", units=500, nanos=0),
+                    price=money_pb2.Money(currency_code="EUR", units=500, nanos=0),
                 ),
-                Offer(
+                models_pb2.Offer(
                     id="009fd15a-c7f0-11ed-afa1-0242ac120002",
-                    price=Money(currency_code="EUR", units=100, nanos=0),
+                    price=money_pb2.Money(currency_code="EUR", units=100, nanos=0),
                 ),
             ],
         ),
@@ -192,42 +203,52 @@ async def test_that_all_amounts_in_trip_offer_search_result_replaced_with_conver
     assert mock_pay_client.create_quote.call_count == 2
 
 
-async def test_that_price_in_trip_price_quote_result_replaced_with_conversion() -> None:
-    mock_pay_client = create_autospec(PayClient, spec_set=True, instance=True)
-    pay_quotes = PayQuotes(pay_client=mock_pay_client)
-    mock_resp = _QUOTE_MOCK_RESPONSE
-
-    mock_pay_client.create_quote.return_value = mock_resp
-
+async def test_that_price_in_trip_price_quote_result_replaced_with_conversion(
+    mock_pay_client: mock.Mock,
+    pay_quotes: PayQuotes,
+    trip_offer_repository: offers.TripOfferRepository,
+) -> None:
     price_quote_result = TripPriceQuoteResult(
         price_quote_container_id="an-id",
         option_id="an-id",
-        price_quote=PriceQuote(
+        price_quote=models_pb2.PriceQuote(
             id="009fd15a-c7f0-11ed-afa1-0242ac120002",
             option_id="487b5a88-a77c-4798-bedd-ec414a1f0e88",
             expires_at=None,
-            price=Money(currency_code="EUR", units=500, nanos=0),
+            price=money_pb2.Money(currency_code="EUR", units=500, nanos=0),
             required_documents=None,
             penalties=None,
             rules=None,
         ),
         provider_company_id="provider-id-1",
     )
+    expected_uuid = string.to_uuid(
+        "session-token",
+        uuid.UUID("487b5a88-a77c-4798-bedd-ec414a1f0e88"),
+    )
+    await trip_offer_repository.insert(
+        models_pb2.OfferGroup(
+            offers=[
+                models_pb2.Offer(
+                    id=expected_uuid,
+                    price=money_pb2.Money(
+                        currency_code="SEK",
+                    ),
+                ),
+            ],
+        ),
+    )
 
     modified_result = await pay_quotes.get_price_quote_quotes(
         "session-token",
         price_quote_result,
         "payer-id",
-        "SEK",
     )
 
     assert modified_result.price_quote.price.units == 15
     assert modified_result.price_quote.price.currency_code == "SEK"
     assert modified_result.price_quote.pay_quote_id == "a-quotation-id"
-    assert modified_result.price_quote.option_id == string.to_uuid(
-        "session-token",
-        uuid.UUID("487b5a88-a77c-4798-bedd-ec414a1f0e88"),
-    )
+    assert modified_result.price_quote.option_id == expected_uuid
 
     mock_pay_client.create_quote.assert_called_once_with(
         amount=50000,
