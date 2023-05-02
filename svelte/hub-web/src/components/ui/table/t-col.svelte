@@ -49,6 +49,7 @@
     width: var(--width);
     max-width: var(--max-width);
     padding: 16px;
+    vertical-align: middle;
     border-bottom: var(--color-main-neutral-50) 1px solid;
   }
 

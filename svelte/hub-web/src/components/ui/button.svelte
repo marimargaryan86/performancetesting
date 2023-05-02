@@ -3,9 +3,13 @@
   export let disabled = false;
   export let variant: "primary" | "outline" | "text" = "primary";
   export let size: "large" | "medium" | "small" | "x-small" = "large";
+  export let href: string | undefined = undefined;
 </script>
 
-<button
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<svelte:element
+  this={href ? "a" : "button"}
+  {href}
   on:click
   {type}
   {disabled}
@@ -21,15 +25,17 @@
   class:x-small={size === "x-small"}
 >
   <slot />
-</button>
+</svelte:element>
 
 <style>
-  button {
+  button,
+  a {
     display: inline-flex;
     gap: 8px;
     align-items: center;
     justify-content: center;
     color: var(--color);
+    text-decoration: none;
     background-color: var(--background-color);
     border: 0;
     border-radius: 8px;
@@ -135,7 +141,8 @@
     padding: 6px 16px;
   }
 
-  button > :global(svg) {
+  button > :global(svg),
+  a > :global(svg) {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -143,12 +150,14 @@
     height: var(--icon-size);
   }
 
-  button :global(*:not(svg)[stroke]) {
+  button :global(*:not(svg)[stroke]),
+  a :global(*:not(svg)[stroke]) {
     transition: stroke 150ms ease;
     stroke: var(--icon-color);
   }
 
-  button :global(*:not(svg)[fill]) {
+  button :global(*:not(svg)[fill]),
+  a :global(*:not(svg)[fill]) {
     transition: fill 150ms ease;
     fill: var(--icon-color);
   }

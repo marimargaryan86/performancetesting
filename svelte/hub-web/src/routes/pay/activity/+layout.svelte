@@ -103,6 +103,7 @@
     display: flex;
     justify-content: space-between;
     padding: 8px 24px 24px;
+    color: var(--color-main-neutral-800);
   }
 
   .actions {

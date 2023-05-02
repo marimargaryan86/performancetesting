@@ -40,7 +40,7 @@
     top: 0;
     z-index: 11;
     gap: 8px;
-    padding: 16px 16px 0;
+    padding: 16px;
     white-space: nowrap;
     text-align: left;
     background-color: var(--color-main-primary-50);
@@ -51,8 +51,11 @@
   }
 
   th::after {
+    position: absolute;
+    bottom: 0;
+    left: 0;
     display: block;
-    margin: 16px -16px 0;
+    width: 100%;
     border-bottom: var(--color-main-neutral-50) 1px solid;
     content: "";
   }

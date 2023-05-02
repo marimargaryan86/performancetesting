@@ -15,5 +15,6 @@ export default {
     conversions: new junctionPay.ConversionService(env.PUBLIC_PAY_ADMIN_API_BASE_URL),
     balances: new junctionPay.BalanceService(env.PUBLIC_PAY_ADMIN_API_BASE_URL),
     currencies: new junctionPay.CurrencyService(env.PUBLIC_PAY_API_BASE_URL),
+    beneficiaries: new junctionPay.BeneficiaryService(env.PUBLIC_PAY_ADMIN_API_BASE_URL),
   },
 };

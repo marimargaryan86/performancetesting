@@ -3,8 +3,8 @@ export type MoneyModel = {
   currency: string;
 };
 
-export interface CurrencyModel {
+export type CurrencyModel = {
   name: string;
   code: string;
   minorUnits: number;
-}
+};

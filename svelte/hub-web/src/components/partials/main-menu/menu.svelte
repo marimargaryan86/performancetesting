@@ -23,6 +23,7 @@
   import { page } from "$app/stores";
   import { slide } from "svelte/transition";
   import ChevronIcon from "components/icons/chevron-icon.svelte";
+  import BeneficiaryIcon from "components/icons/beneficiary-icon.svelte";
 
   export let expanded: boolean;
   export let transitionTimeMs: number;
@@ -50,6 +51,12 @@
           url: "/pay/accounts",
           label: "Accounts",
           icon: AccountsIcon,
+        },
+        {
+          type: "menu-item",
+          url: "/pay/beneficiaries",
+          label: "Beneficiaries",
+          icon: BeneficiaryIcon,
         },
       ],
     },
