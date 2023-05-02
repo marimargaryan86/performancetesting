@@ -31,14 +31,20 @@ from snowfall.vendor.currency_cloud.models.balance import BalanceResponse
 async def quote_is_less_than_the_limit(
     quotations_repository: QuotationsRepository,
 ) -> Quotation:
-    usd = money.Money(0, money.Currency("USD"))
+    usd = money.Money(8, money.Currency("USD"))
     gbp = money.Money(1, money.Currency("GBP"))
     quote = Quotation(
         id=string.uuid(),
         amounts=QuotationAmounts(
             beneficiary=gbp.protobuf(),
             base_converted=usd.protobuf(),
+            quotation=usd.protobuf(),
+            sales_margin=usd.protobuf(),
+            fx_margin=usd.protobuf(),
+            fx_provider_margin=usd.protobuf(),
         ),
+        beneficiary_id=string.uuid(),
+        payer_id=string.uuid(),
         status=Quotation.Status.STATUS_QUOTED,
     )
     return await quotations_repository.insert(quote)
@@ -57,6 +63,29 @@ async def booked_quote(
             base_converted=usd.protobuf(),
         ),
         status=Quotation.Status.STATUS_CONFIRMED,
+    )
+    return await quotations_repository.insert(quote)
+
+
+@pytest.fixture()
+async def booked_quote_quoted(
+    quotations_repository: QuotationsRepository,
+) -> Quotation:
+    usd = money.Money(8, money.Currency("USD"))
+    gbp = money.Money(4, money.Currency("GBP"))
+    quote = Quotation(
+        id=string.uuid(),
+        amounts=QuotationAmounts(
+            beneficiary=gbp.protobuf(),
+            base_converted=usd.protobuf(),
+            quotation=usd.protobuf(),
+            sales_margin=usd.protobuf(),
+            fx_margin=usd.protobuf(),
+            fx_provider_margin=usd.protobuf(),
+        ),
+        beneficiary_id=string.uuid(),
+        payer_id=string.uuid(),
+        status=Quotation.Status.STATUS_QUOTED,
     )
     return await quotations_repository.insert(quote)
 

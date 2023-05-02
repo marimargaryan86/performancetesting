@@ -1,6 +1,8 @@
 import lagom
+import structlog
 from starlette import endpoints, exceptions, requests, status
 
+from snowfall.project.pay.service.conversions.v1alpha.models_pb2 import Conversion
 from snowfall.project.pay.service.pay_api import repositories, resources
 from snowfall.project.pay.service.quotations import quotations
 from snowfall.project.pay.service.quotations.v1alpha.models_pb2 import Quotation
@@ -18,7 +20,9 @@ from snowfall.vendor.currency_cloud.models import conversion
 
 
 class Transactions(endpoints.HTTPEndpoint):
-    async def post(  # noqa: WPS210, WPS211, WPS217
+    _logger = structlog.get_logger(__name__)
+
+    async def post(  # noqa: WPS210, WPS211, WPS217, WPS231
         self,
         request: requests.Request,
         payment_client: PaymentClient = lagom.injectable,
@@ -34,7 +38,6 @@ class Transactions(endpoints.HTTPEndpoint):
                 quot.amounts.base_converted.currency_code
                 == quot.amounts.beneficiary.currency_code
             )
-            conversion_id = ""
             if not are_currencies_same:
                 try:
                     cc_conversion = payment_client.create_conversion(
@@ -48,29 +51,26 @@ class Transactions(endpoints.HTTPEndpoint):
                         ),
                     )
                 except CurrencyCloudError as exc:
-                    return models.JsonApiResponse(
-                        models.Body(
-                            errors=[
-                                models.Error(
-                                    status=str(exc.status),
-                                    code=exc.code,
-                                    detail=message,
-                                )
-                                for message in exc.messages
-                            ],
+                    for message in exc.messages:
+                        self._logger.error(message)  # noqa: WPS220
+
+                    inserted_conversion = await conversion_repository.insert(
+                        Conversion(
+                            id=string.uuid(),
+                            buy_amount=quot.amounts.beneficiary,
+                            status=Conversion.Status.STATUS_FAILED,
                         ),
-                        status_code=exc.status,
                     )
-                inserted_conversion = await conversion_repository.create(
-                    cc_conversion,
-                )
-                conversion_id = inserted_conversion.id
+                else:
+                    inserted_conversion = await conversion_repository.create(
+                        cc_conversion,
+                    )
             transaction = await transaction_repository.insert(
                 Transaction(
                     id=transaction_id,
                     external_reference_id=body["externalReference"],
                     invoice_reference_id=body["invoiceReference"],
-                    conversion_id=conversion_id,
+                    conversion_id=inserted_conversion.id,
                     amounts=quot.amounts,
                     rates=quot.rates,
                     payer_id=quot.payer_id,

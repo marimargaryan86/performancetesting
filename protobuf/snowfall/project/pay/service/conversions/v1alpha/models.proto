@@ -18,6 +18,7 @@ message Conversion {
   enum Status {
     STATUS_UNSPECIFIED = 0;
     STATUS_EXECUTED = 1;
+    STATUS_FAILED = 2;
   }
   Status status = 8;
 }
