@@ -133,7 +133,7 @@ EOH
         GRPC_PORT       = "${NOMAD_PORT_grpc}"
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
         SENTRY_DSN      = "https://e2ada9cd07e84150b39bfd606d7c4634@sentry.snowfall.se/53"
-        PLUS_ACTIVATED  = var.jwt_ttl
+        JWT_TTL         = var.jwt_ttl
       }
     }
   }
