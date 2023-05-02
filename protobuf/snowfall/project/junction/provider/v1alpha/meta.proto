@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package snowfall.project.junction.provider.v1alpha;
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/provider/v1alpha";
+
+service MetaService {
+  rpc GetCapabilities(GetCapabilitiesRequest) returns (GetCapabilitiesResponse) {}
+  rpc GetIdentifier(GetIdentifierRequest) returns (GetIdentifierResponse) {}
+}
+
+message GetCapabilitiesRequest {}
+
+message GetCapabilitiesResponse {}
+
+message GetIdentifierRequest {}
+
+message GetIdentifierResponse {
+  string identifier = 1;
+}
