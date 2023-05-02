@@ -27,7 +27,7 @@ job "rates-rates-backup" {
   type        = "batch"
 
   periodic {
-    cron             = "@daily"
+    cron             = "* * * * *"
     prohibit_overlap = true
   }
 
