@@ -16,7 +16,7 @@
       "payer_currency_code": "SEK",
       "api_pay_base_url": "https://api.pay.junction.travel",
       "pay_admin_api_base_url": "https://adminapi.pay.junction.travel",
-      "use_pay_for_currency_conversions": false
+      "use_pay_for_currency_conversions": true
     }
   }
 }
