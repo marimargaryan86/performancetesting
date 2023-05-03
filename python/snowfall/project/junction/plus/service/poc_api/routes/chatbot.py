@@ -117,11 +117,37 @@ class Whatsapp(endpoints.HTTPEndpoint):
                 )
                 async for mobile_order in mobile_orders
             ]
-            if len(go_orders) > 1:
-                twiml_response.message(
-                    "More than one trips to checkin",
-                )
-            elif len(go_orders) == 1:
+            len_orders = len(go_orders)
+            if len_orders > 1:
+                try:
+                    checkin_option = int(message_body.lower().split(" ")[1])
+                except IndexError:
+                    twiml_response.message(
+                        "Multiple journeys are available. Please provide the journey "
+                        + "option number\n",
+                    )
+                except ValueError:
+                    twiml_response.message(
+                        "Invalid journey option number. Please try again",
+                    )
+                else:
+                    if checkin_option > len_orders:
+                        twiml_response.message(  # noqa: WPS220
+                            "Invalid journey option number. Please try again",
+                        )
+                    else:
+                        await chatbot_utils.auto_checkin(  # noqa: WPS220
+                            go_orders[checkin_option - 1],
+                            twilio_client,
+                            message_from.split(":")[1],
+                            tf_client,
+                            s3_client,
+                        )
+                        return responses.Response(  # noqa: WPS220
+                            status_code=status.HTTP_200_OK,
+                            media_type="application/xml",
+                        )
+            elif len_orders == 1:
                 await chatbot_utils.auto_checkin(
                     go_orders[0],
                     twilio_client,
