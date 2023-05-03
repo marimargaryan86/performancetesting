@@ -7,8 +7,8 @@ aiosmtplib==2.0.1
 aiosqlite==0.18.0
 aiostream==0.4.5
 alchemy-mock==0.4.3
-allure-pytest==2.13.1
-allure-python-commons==2.13.1
+allure-pytest==2.13.2
+allure-python-commons==2.13.2
 asgiref==3.6.0
 async-factory-boy==1.0.0
 asyncstdlib==3.10.6
@@ -66,7 +66,7 @@ mongomock-motor==0.0.18
 more-itertools==9.1.0
 motor==3.1.2
 mypy-protobuf==3.4.0
-mypy==1.1.1
+mypy==1.2.0
 numpy==1.24.2
 openapi-core==0.17.1
 openapi-schema-validator==0.4.4
@@ -88,7 +88,7 @@ pytest-httpx==0.21.3
 pytest-icdiff==0.6
 pytest-socket==0.6.0
 pytest-xdist==3.2.1
-pytest==7.2.2
+pytest==7.3.1
 python-dateutil==2.8.2
 python-hcl2==4.3.0
 python-multipart==0.0.6

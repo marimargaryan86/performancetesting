@@ -57,6 +57,13 @@ interpreter_constraints = ["CPython==3.11.*"]
 
 [buf]
 lint_args = ["--config", "'version: v1\nlint:\n  use:\n    - DEFAULT\n    - UNARY_RPC\n    - PACKAGE_NO_IMPORT_CYCLE\n'"]
+version = "v1.17.0"
+known_versions = [
+    "v1.17.0|linux_arm64 |7ae3d4bf6ff121172dd949bd4d25342e03a0b7f10cf8e8ccdc8f98a664b79794|15426236",
+    "v1.17.0|linux_x86_64|f79670efc64d0527e0b915a272aea8262b4864ad9298e8d1cf39b7b08517607c|17022175",
+    "v1.17.0|macos_arm64 |8b5d0285b11c14abd17fa8d76049e5ba90e8776784cc57aa0af77052ee335e99|17332365",
+    "v1.17.0|macos_x86_64|4a9a9af802630d7547dfbd79727c462ec7acd4978b91b922957438d4aec99ac9|17959744",
+]
 
 [cli.alias]
 all-changed = "--changed-since=main --changed-dependents=transitive"
@@ -122,13 +129,13 @@ install_from_resolve = "python-default"
 interpreter_constraints = ["CPython==3.11.*"]
 
 [protoc]
-version = "21.12"
+version = "22.3"
 url_platform_mapping = { linux_arm64 = "linux-aarch_64", linux_x86_64 = "linux-x86_64", macos_arm64 = "osx-aarch_64", macos_x86_64 = "osx-x86_64" }
 known_versions = [
-    "21.12|linux_arm64 |2dd17f75d66a682640b136e31848da9fb2eefe68d55303baf8b32617374f6711|1582596",
-    "21.12|linux_x86_64|3a4c1e5f2516c639d3079b1586e703fc7bcfa2136d58bda24d1d54f949c315e8|1585982",
-    "21.12|macos_arm64 |96839af0caed64352442fc8236f4bdf7c1cd6efcfaa98fa5db37307a73fc7c70|1364715",
-    "21.12|macos_x86_64|9448ff40278504a7ae5139bb70c962acc78c32d8fc54b4890a55c14c68b9d10a|1490613",
+    "22.3|linux_arm64 |c6068d9d151c39723bc7db920759b55737a770b0c2ec544dd0197d4078d7a956|2788488",
+    "22.3|linux_x86_64|0f8070d762eb8a2f5a13a47713a553f989f9d9b556e7e3ebfa2bd6464e2ecaeb|2827739",
+    "22.3|macos_arm64 |79cc15d1b528061ea0a818b0abcf3be1e0bdcb063a0cc999af27974cccdc5cce|1878576",
+    "22.3|macos_x86_64|d644a65064a97fa3ed033a4a2314ab35816abbd9aed052f9b1b3374d2deaaae4|1841496",
 ]
 
 [pytest]

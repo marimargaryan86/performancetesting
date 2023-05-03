@@ -1,6 +1,6 @@
 # python:3.11.3-slim-bullseye
 ARG REGISTRY
-FROM ${REGISTRY}python@sha256:cd6e574ff6ad2ac75184ad90e4e374842cfc36ae21bc2f773531ac65f6939991
+FROM ${REGISTRY}python@sha256:dcca7339f0426d2fdb33e8fbbe05cca4b39af30430602c8c894822cf81d618ab
 ENV PATH=/usr/local/go/bin:$PATH
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
@@ -15,9 +15,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     wget \
     xz-utils \
-&& curl -fsSL https://static.pantsbuild.org/setup/pantsup.sh | bash /dev/stdin --bin-dir /usr/local/bin --version 0.5.4 \
-&& curl -fsSL https://github.com/Tufin/oasdiff/releases/download/v1.3.22/oasdiff_1.3.22_linux_amd64.deb > /tmp/oasdiff.deb \
-&& curl -fsSL https://sentry.io/get-cli/ | SENTRY_CLI_VERSION=2.17.2 bash \
+&& curl -fsSL https://static.pantsbuild.org/setup/pantsup.sh | bash /dev/stdin --bin-dir /usr/local/bin --version 0.6.0 \
+&& curl -fsSL https://github.com/Tufin/oasdiff/releases/download/v1.4.2/oasdiff_1.4.2_linux_amd64.deb > /tmp/oasdiff.deb \
+&& curl -fsSL https://sentry.io/get-cli/ | SENTRY_CLI_VERSION=2.17.5 bash \
 && curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg \
 && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
 && curl -sfSL https://github.com/editorconfig-checker/editorconfig-checker/releases/download/2.7.0/ec-linux-amd64.tar.gz | tar xvz -C /usr/local bin/ec-linux-amd64 \
