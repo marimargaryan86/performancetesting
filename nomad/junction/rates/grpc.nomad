@@ -49,7 +49,7 @@ job "rates-grpc" {
 
     scaling {
       enabled = false
-      min     = 1
+      min     = 2
       max     = 20
     }
 
