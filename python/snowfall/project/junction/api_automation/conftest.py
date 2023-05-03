@@ -15,7 +15,6 @@ from snowfall.project.junction.api_automation.test_functions.pay_admin_client im
     PayAdminClient,
 )
 from snowfall.stdlib.transport.http import auth
-from snowfall.vendor.apilayer.client import APILayer
 from snowfall.vendor.junction.auth import UserAuth
 from snowfall.vendor.junction.go.client import Client as GoClient
 
@@ -299,24 +298,6 @@ def get_variable_from_server(
     except hvac.exceptions.Forbidden:
         returned_data = {}
     return returned_data
-
-
-@pytest.fixture()
-def api_layer_client(
-    host: str,
-    api_token: str,
-) -> APILayer:
-    base_url = "{0}{1}".format(
-        HTTPS_PREFIX,
-        get_variable_value(host, api_token, "apilayer_pay_api_host"),
-    )
-    api_key = get_variable_value(host, api_token, "apilayer_pay_api_token")
-    client_timeout = 20.0
-    return APILayer(
-        base_url=base_url,
-        api_key=api_key,
-        timeout=client_timeout,
-    )
 
 
 @pytest.fixture(scope="session", autouse=True)
