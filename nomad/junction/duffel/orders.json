@@ -7,7 +7,7 @@
         }
     },
     "production": {
-        "deploy": false,
+        "deploy": true,
         "variables": {
             "count": 2,
             "api_base_url": "https://api.duffel.com",
