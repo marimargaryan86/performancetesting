@@ -4034,12 +4034,6 @@
               "attributes": {
                 "type": "object",
                 "properties": {
-                  "currency": {
-                    "type": "string",
-                    "format": "currency",
-                    "example": "SEK",
-                    "writeOnly": true
-                  },
                   "expiresAt": {
                     "type": "string",
                     "format": "date-time",
