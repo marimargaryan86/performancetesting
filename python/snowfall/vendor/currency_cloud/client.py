@@ -1,6 +1,7 @@
 from typing import Any, Callable, Mapping, Sequence
 
 import currencycloud
+import structlog
 
 from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
 from snowfall.vendor.currency_cloud.models.account import (
@@ -28,6 +29,8 @@ from snowfall.vendor.currency_cloud.models.conversion import (
 )
 from snowfall.vendor.currency_cloud.models.rate import BasicRateResponse
 
+_logger = structlog.get_logger(__name__)
+
 
 def error_handler(func: Callable[..., Any]) -> Callable[..., Any]:
     def decorator(self: Any, *args: tuple[Any], **kwargs: Mapping[str, str]) -> Any:
@@ -38,7 +41,15 @@ def error_handler(func: Callable[..., Any]) -> Callable[..., Any]:
                 **kwargs,
             )
         except currencycloud.errors.api.ApiError as exc:
-            errors = [message.message for message in exc.messages]
+            errors = []
+            for message in exc.messages:
+                _logger.error(
+                    message.message,
+                    provider="Currency Cloud",
+                    method=func.__name__,
+                )
+                errors.append(message.message)
+
             raise CurrencyCloudError(
                 errors,
                 status=exc.status_code,

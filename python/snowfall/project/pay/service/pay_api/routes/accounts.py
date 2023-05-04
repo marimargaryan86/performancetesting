@@ -15,7 +15,6 @@ from snowfall.stdlib.integration.starlette import (
     request_helpers,
 )
 from snowfall.vendor.currency_cloud.client import PaymentClient
-from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
 from snowfall.vendor.currency_cloud.models import account as cc_account_models
 from snowfall.vendor.currency_cloud.models import contact as cc_contact_models
 
@@ -71,7 +70,7 @@ class Accounts(endpoints.HTTPEndpoint):
             request=request,
         )
 
-    async def post(  # noqa: WPS211, C901, WPS212, WPS217, WPS210
+    async def post(  # noqa: WPS211, WPS217, WPS210
         self,
         request: requests.Request,
         accounts_client: accounts_adapter.GrpcClient = lagom.injectable,
@@ -155,14 +154,11 @@ class Accounts(endpoints.HTTPEndpoint):
                 status_code=status.HTTP_400_BAD_REQUEST,
             )
 
-        try:
-            cc_account = self._create_cc_account(
-                flatten_body["name"],
-                company,
-                payment_client,
-            )
-        except CurrencyCloudError as exception:
-            return self._generate_error(exception)
+        cc_account = self._create_cc_account(
+            flatten_body["name"],
+            company,
+            payment_client,
+        )
 
         account = await accounts_client.create(
             account_models.Account(
@@ -174,14 +170,11 @@ class Accounts(endpoints.HTTPEndpoint):
                 status=cc_account.status,
             ),
         )
-        try:
-            cc_contact = self._create_cc_contact(
-                account.external_reference,
-                contact,
-                payment_client,
-            )
-        except CurrencyCloudError as exc:
-            return self._generate_error(exc)
+        cc_contact = self._create_cc_contact(
+            account.external_reference,
+            contact,
+            payment_client,
+        )
 
         await contact_repository.update_reference(
             contact,
@@ -233,19 +226,4 @@ class Accounts(endpoints.HTTPEndpoint):
                 email_address=contact.email,
                 phone_number=contact.phone_number.e164_number,
             ),
-        )
-
-    def _generate_error(self, exc: CurrencyCloudError) -> models.JsonApiResponse:
-        return models.JsonApiResponse(
-            models.Body(
-                errors=[
-                    models.Error(
-                        status=str(exc.status),
-                        code=exc.code,
-                        detail=message,
-                    )
-                    for message in exc.messages
-                ],
-            ),
-            status_code=exc.status,
         )

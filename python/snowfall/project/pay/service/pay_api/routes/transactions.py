@@ -1,5 +1,4 @@
 import lagom
-import structlog
 from starlette import endpoints, exceptions, requests, status
 
 from snowfall.project.pay.service.conversions.v1alpha.models_pb2 import Conversion
@@ -20,9 +19,7 @@ from snowfall.vendor.currency_cloud.models import conversion
 
 
 class Transactions(endpoints.HTTPEndpoint):
-    _logger = structlog.get_logger(__name__)
-
-    async def post(  # noqa: WPS210, WPS211, WPS217, WPS231
+    async def post(  # noqa: WPS210, WPS211, WPS217
         self,
         request: requests.Request,
         payment_client: PaymentClient = lagom.injectable,
@@ -50,10 +47,7 @@ class Transactions(endpoints.HTTPEndpoint):
                             reason=transaction_id,
                         ),
                     )
-                except CurrencyCloudError as exc:
-                    for message in exc.messages:
-                        self._logger.error(message)  # noqa: WPS220
-
+                except CurrencyCloudError:
                     inserted_conversion = await conversion_repository.insert(
                         Conversion(
                             id=string.uuid(),
