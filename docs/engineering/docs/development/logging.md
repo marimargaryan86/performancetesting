@@ -16,7 +16,7 @@ flowchart TD
     process continue
     with the unwanted
     state?"}
-    F -->|Yes| G[WARN]
+    F -->|Yes| G[WARNING]
     F -->|No| H{"Can the
     application continue
     with the unwanted

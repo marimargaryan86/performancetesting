@@ -2,6 +2,6 @@
 sidebar_position: 1
 ---
 
-# Index
+# Introduction
 
 _To be written._

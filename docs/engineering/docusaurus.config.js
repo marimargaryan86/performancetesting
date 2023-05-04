@@ -28,6 +28,42 @@ const config = {
 
   presets: [
     [
+      'redocusaurus',
+      {
+        // Plugin Options for loading OpenAPI files
+        specs: [
+          {
+            id: 'junction-extensions-mobile-api',
+            spec: 'openapi/junction/mobile_api/openapi.json',
+          },
+          {
+            id: 'junction-go-admin-api',
+            spec: 'openapi/junction/admin_api/openapi.json',
+          },
+          {
+            id: 'junction-go-data-api',
+            spec: 'openapi/junction/data_api/openapi.json',
+          },
+          {
+            id: 'junction-go-client-api',
+            spec: 'openapi/junction/client_api/openapi.json',
+          },
+          {
+            id: 'junction-pay-admin-api',
+            spec: 'openapi/junction/pay_admin_api/openapi.json',
+          },
+          {
+            id: 'junction-pay-pay-api',
+            spec: 'openapi/junction/pay_api/openapi.json',
+          },
+          {
+            id: 'junction-plus-poc-api',
+            spec: 'openapi/junction/plus_poc_api/openapi.json',
+          },
+        ],
+      },
+    ],
+    [
       'classic',
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
@@ -82,6 +118,12 @@ const config = {
             sidebarId: 'projects',
             position: 'left',
             label: 'Projects',
+          },
+          {
+            type: 'docSidebar',
+            sidebarId: 'specifications',
+            position: 'left',
+            label: 'Specifications',
           },
           {
             type: 'docSidebar',

@@ -2,14 +2,8 @@ files(
     name="source_files",
     sources=["**/*", "!build/**/*", "!node_modules/**/*", "!openapi/**/*"],
 )
-relocated_files(
-    name="relocated_api_spec",
-    files_targets=["//openapi/junction/client_api:client_api"],
-    src="openapi/junction/client_api",
-    dest="openapi",
-)
 docker_image(
-    dependencies=[":relocated_api_spec", ":source_files"],
+    dependencies=["//openapi/junction/client_api:client_api", ":source_files"],
     image_tags=["{build_args.VERSION}"],
     instructions=[
         "ARG REGISTRY",

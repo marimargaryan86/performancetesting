@@ -1,6 +1,18 @@
-files(name="source_files", sources=["**/*", "!build/**/*", "!node_modules/**/*"])
+files(
+    name="source_files",
+    sources=["**/*", "!build/**/*", "!node_modules/**/*", "!openapi/**/*"],
+)
 docker_image(
-    dependencies=[":source_files"],
+    dependencies=[
+        "//openapi/junction/admin_api:admin_api",
+        "//openapi/junction/client_api:client_api",
+        "//openapi/junction/data_api:data_api",
+        "//openapi/junction/mobile_api:mobile_api",
+        "//openapi/junction/pay_admin_api:pay_admin_api",
+        "//openapi/junction/pay_api:pay_api",
+        "//openapi/junction/plus_poc_api:plus_poc_api",
+        ":source_files",
+    ],
     image_tags=["{build_args.VERSION}"],
     instructions=[
         "ARG REGISTRY",

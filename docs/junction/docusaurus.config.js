@@ -33,15 +33,10 @@ const config = {
         // Plugin Options for loading OpenAPI files
         specs: [
           {
-            spec: 'openapi/openapi.json',
-            route: '/api/',
+            id: 'client-api',
+            spec: 'openapi/junction/client_api/openapi.json',
           },
         ],
-        // Theme Options for modifying how redoc renders them
-        theme: {
-          // Change with your site colors
-          primaryColor: '#1890ff',
-        },
       },
     ],
     [
@@ -76,15 +71,16 @@ const config = {
         items: [
           {
             type: 'docSidebar',
+            sidebarId: 'providers',
+            position: 'left',
+            label: 'Providers',
+          },
+          {
+            type: 'docSidebar',
             sidebarId: 'resellers',
             position: 'left',
             label: 'Resellers',
-          },
-          {
-          label: 'API',
-          position: 'left',
-          to: '/api',
-        }
+          }
         ],
       },
       footer: {
