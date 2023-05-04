@@ -133,8 +133,8 @@ def create_boarding_pass(  # noqa: WPS210, WPS213
     qr_y = 340
     img.paste(qr_img, (qr_x, qr_y))
     font_pkg = filesystem.resource_path(
-        package="snowfall.project.junction.plus.service",
-        resource="poc_api/arial.ttf",
+        package="snowfall.project.junction.plus.service.poc_api.travel_fusion",
+        resource="arial.ttf",
     )
     font_size = 20
     font = ImageFont.truetype(str(font_pkg.absolute()), font_size)
