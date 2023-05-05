@@ -664,7 +664,8 @@
                   },
                   "externalReference": {
                     "type": "string",
-                    "example": "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn"
+                    "example": "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn",
+                    "description": "A unique session token that ensures rates are locked for the given session"
                   }
                 },
                 "required": [
