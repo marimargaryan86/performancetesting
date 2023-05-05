@@ -1,6 +1,9 @@
+import asyncio
+from collections.abc import AsyncGenerator
 from typing import Any, Callable, Mapping, Sequence
 
 import currencycloud
+import httpx
 import structlog
 
 from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
@@ -76,6 +79,49 @@ class CurrencyCloudConfig(object):
             self._api_key,
             self._env,
         )
+
+
+class CurrencyCloudAuth(httpx.Auth):
+    requires_response_body = True
+
+    def __init__(
+        self,
+        base_url: str,
+        login_id: str,
+        api_key: str,
+    ):
+        self._base_url = base_url
+        self._login_id = login_id
+        self._api_key = api_key
+        self._token = ""  # nosec
+        self._async_lock = asyncio.Lock()
+
+    async def async_auth_flow(
+        self,
+        request: httpx.Request,
+    ) -> AsyncGenerator[httpx.Request, httpx.Response]:
+        request.headers["X-Auth-Token"] = self._token
+        response = yield request
+
+        if response.status_code == httpx.codes.UNAUTHORIZED:
+            login_response = await self._login()
+            self._update_tokens(login_response)
+            request.headers["X-Auth-Token"] = self._token
+            yield request
+
+    def _update_tokens(self, response: httpx.Response) -> None:
+        body = response.json()
+        self._token = body.get("auth_token")
+
+    async def _login(self) -> httpx.Response:
+        async with self._async_lock:
+            return httpx.post(
+                url="{0}/authenticate/api".format(self._base_url),
+                data={
+                    "login_id": self._login_id,
+                    "api_key": self._api_key,
+                },
+            )
 
 
 class PaymentClient(object):  # noqa: WPS214
