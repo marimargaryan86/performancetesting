@@ -161,8 +161,8 @@ AUTHENTICATION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_authentication-$
 {{ with secret "kv/data/${var.environment}/client-api" }}
 JWT_PUBLIC_KEY={{ .Data.data.jwt_public_key }}
 {{ end }}
-RESELLER_CURRENCIES = "{{keyOrDefault "${var.environment}/client-api/reseller-currencies" "{}"}}"
-RESELLER_PAY_COMPANIES = "{{keyOrDefault "${var.environment}/client-api/reseller-pay-companies" "{}"}}"
+RESELLER_CURRENCIES="{{keyOrDefault "${var.environment}/client-api/reseller-currencies" "{}"}}"
+RESELLER_PAY_COMPANIES="{{keyOrDefault "${var.environment}/client-api/reseller-pay-companies" "{}"}}"
 EOH
       }
 
