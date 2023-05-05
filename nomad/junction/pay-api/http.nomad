@@ -132,7 +132,7 @@ job "pay-api-http" {
       driver = "docker"
 
       vault {
-        policies = ["pay-api-${var.environment}"]
+        policies = ["currencycloud-${var.environment}", "pay-api-${var.environment}"]
       }
 
       template {
@@ -144,10 +144,12 @@ MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mong
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 CURRENCIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_currencies-${var.environment}"))}}
 AUTHENTICATION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_authentication-${var.environment}"))}}
-{{ with secret "kv/data/${var.environment}/pay-api" }}
+{{ with secret "kv/data/${var.environment}/currencycloud" }}
 CC_LOGIN={{ .Data.data.cc_login }}
 CC_API_KEY={{ .Data.data.cc_api_key }}
 CC_ENV={{ .Data.data.cc_env }}
+{{ end }}
+{{ with secret "kv/data/${var.environment}/pay-api" }}
 JWT_PUBLIC_KEY={{ .Data.data.jwt_public_key }}
 {{ end }}
 EOH
