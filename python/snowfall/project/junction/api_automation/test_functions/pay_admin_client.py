@@ -322,7 +322,6 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         self,
         bank_account_holder_name: str,
         email: str,
-        account_number: str,
         beneficiary_address_lines: Sequence[str],
         beneficiary_country_code: str,
         bank_name: str,
@@ -332,15 +331,13 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         bank_country_code: str,
         currency_id: str,
         account_id: str,
+        account_number: str | None = None,
         beneficiary_postal_code: str | None = None,
         beneficiary_city: str | None = None,
         beneficiary_state: str | None = None,
         bic_swift: str | None = None,
         aba: str | None = None,
         iban: str | None = None,
-        bank_postal_code: str | None = None,
-        bank_city: str | None = None,
-        bank_state: str | None = None,
     ) -> dict[str, Any]:
         payload = {
             _DATA_KEY: {
@@ -348,7 +345,6 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
                 _ATTRIBUTES_KEY: {
                     "bankAccountHolderName": bank_account_holder_name,
                     "email": email,
-                    "accountNumber": account_number,
                     "beneficiaryAddress": {
                         "addressLines": beneficiary_address_lines,
                         "countryCode": beneficiary_country_code,
@@ -358,17 +354,22 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
                     },
                     "bankDetails": {
                         "name": bank_name,
+                        **(
+                            {
+                                "accountNumber": account_number,
+                                "aba": aba,
+                            }
+                            if account_number
+                            else {
+                                "iban": iban,
+                            }
+                        ),
                         "bicSwift": bic_swift,
-                        "aba": aba,
-                        "iban": iban,
                         "accountType": account_type,
                         "paymentTypes": payment_types,
                         "address": {
                             "addressLines": bank_address_lines,
                             "countryCode": bank_country_code,
-                            "postalCode": bank_postal_code,
-                            "city": bank_city,
-                            "state": bank_state,
                         },
                     },
                 },

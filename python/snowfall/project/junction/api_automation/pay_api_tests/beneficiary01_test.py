@@ -54,9 +54,6 @@ async def test_create_beneficiary_usd(
             beneficiary_state="California",
             bic_swift="BREXPLPWMBK",
             aba="122228634",
-            bank_postal_code="90-959",
-            bank_city="Łódź",
-            bank_state="California",
         )
     except httpx.HTTPStatusError as err:
         logger.info("response_create_beneficiary err: %s", err.response.headers)
@@ -84,7 +81,6 @@ async def test_create_beneficiary_eur(
         response_create_beneficiary = await pay_admin_client.create_beneficiary(
             bank_account_holder_name="EUR test Account Holder",
             email="example@example.com",
-            account_number="32847346",
             beneficiary_address_lines=[
                 "Radhuset",
                 "Våksalagatan 2",
@@ -94,7 +90,7 @@ async def test_create_beneficiary_eur(
             beneficiary_country_code="DE",
             bank_name="mBank S.A.",
             account_type="checking",
-            payment_types="regular",
+            payment_types="priority",
             bank_address_lines=[
                 "mBank S.A.",
                 "Bankowość detaliczna",
@@ -109,8 +105,6 @@ async def test_create_beneficiary_eur(
             beneficiary_city="Uppsala",
             bic_swift="BREXPLPWMBK",
             iban="DE89370400440532013000",
-            bank_postal_code="90-959",
-            bank_city="Frankfurt",
         )
     except httpx.HTTPStatusError as err:
         logger.info("response_create_beneficiary err: %s", err.response.headers)
@@ -139,7 +133,6 @@ async def test_create_beneficiary_gbp(
         response_create_beneficiary = await pay_admin_client.create_beneficiary(
             bank_account_holder_name="GBP test Account Holder",
             email="example@example.com",
-            account_number="32847346",
             beneficiary_address_lines=[
                 "Radhuset",
                 "Våksalagatan 2",
@@ -164,8 +157,6 @@ async def test_create_beneficiary_gbp(
             beneficiary_city="Uppsala",
             bic_swift="BREXPLPWMBK",
             iban="GB89370400440532013000",
-            bank_postal_code="90-959",
-            bank_city="London",
         )
     except httpx.HTTPStatusError as err:
         logger.info("response_create_beneficiary err: %s", err.response.headers)
@@ -223,14 +214,14 @@ def execute_response_create_beneficiary_assertions(  # noqa: WPS218
     assert isinstance(rd["attributes"]["bankDetails"]["bicSwift"], str)
     if is_aba:
         assert isinstance(rd["attributes"]["bankDetails"]["aba"], str)
-        assert isinstance(rd["attributes"]["accountNumber"], str)
+        assert isinstance(rd["attributes"]["bankDetails"]["accountNumber"], str)
     else:
-        assert rd["attributes"]["bankDetails"]["aba"] is None
-        assert rd["attributes"]["accountNumber"] is None
+        assert rd["attributes"]["bankDetails"].get("aba") is None
+        assert rd["attributes"]["bankDetails"].get("accountNumber") is None
     if is_iban:
         assert isinstance(rd["attributes"]["bankDetails"]["iban"], str)
     else:
-        assert rd["attributes"]["bankDetails"]["iban"] is None
+        assert rd["attributes"]["bankDetails"].get("iban") is None
     assert isinstance(rd["attributes"]["bankDetails"]["accountType"], str)
     assert isinstance(
         rd["attributes"]["bankDetails"]["paymentTypes"],
@@ -253,14 +244,10 @@ def execute_response_create_beneficiary_assertions(  # noqa: WPS218
     assert rd["relationships"]["account"]["data"]["type"] == "accounts"
 
     assert isinstance(
-        rd["attributes"]["bankDetails"]["address"]["postalCode"],
-        str,
+        rd["attributes"]["bankDetails"]["address"]["addressLines"],
+        list,
     )
     assert isinstance(
-        rd["attributes"]["bankDetails"]["address"]["city"],
-        str,
-    )
-    assert isinstance(
-        rd["attributes"]["bankDetails"]["address"]["state"],
+        rd["attributes"]["bankDetails"]["address"]["countryCode"],
         str,
     )
