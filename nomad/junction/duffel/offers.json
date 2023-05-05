@@ -3,7 +3,8 @@
         "variables": {
             "count": 1,
             "provider_company_id": "50bebe1e-aa8a-47ac-bf34-503c877a68d6",
-            "api_base_url": "https://api.duffel.com"
+            "api_base_url": "https://api.duffel.com",
+            "disabled_airlines": "BA"
         }
     },
     "production": {
@@ -11,7 +12,8 @@
         "variables": {
             "count": 2,
             "provider_company_id": "a0f3a2aa-d9aa-4361-b952-b60086af92f5",
-            "api_base_url": "https://api.duffel.com"
+            "api_base_url": "https://api.duffel.com",
+            "disabled_airlines": ""
         }
     }
 }
