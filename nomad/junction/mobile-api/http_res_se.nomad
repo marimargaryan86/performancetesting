@@ -133,7 +133,7 @@ job "mobile-api-http-res-se" {
       }
 
       vault {
-        policies = ["mobile-api-${var.environment}", "res-se-mobile-api-${var.environment}"]
+        policies = ["res-se-mobile-api-${var.environment}"]
       }
       template {
         destination = "services.env"
@@ -145,13 +145,11 @@ JUNCTION_API_ADDRESS={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_client-api-
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
-{{ with secret "kv/data/${var.environment}/mobile-api" }}
+{{ with secret "kv/data/${var.environment}/res-se-mobile-api" }}
+STRIPE_API_KEY={{ .Data.data.stripe_api_key }}
 JUNCTION_API_TOKEN={{ .Data.data.junction_api_token }}
 JWT_PRIVATE_KEY={{ .Data.data.jwt_private_key }}
 JWT_PUBLIC_KEY={{ .Data.data.jwt_public_key }}
-{{ end }}
-{{ with secret "kv/data/${var.environment}/res-se-mobile-api" }}
-STRIPE_API_KEY={{ .Data.data.stripe_api_key }}
 {{ end }}
 EOH
       }
