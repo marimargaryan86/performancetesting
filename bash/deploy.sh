@@ -54,24 +54,24 @@ for ((idx = 3; idx < ${#ARGS[@]}; ++idx)); do
 
 	nomad deployment status "${DEPLOYMENT_ID}"
 
-	ALLOC_IDS=$(nomad deployment status -json "${DEPLOYMENT_ID}" | jq -e -r ".TaskGroups[].PlacedCanaries | if . == null then [] else . end | add")
-	echo "Allocation IDs: ${ALLOC_IDS}"
+	mapfile -t ALLOC_IDS < <(nomad deployment status -json "${DEPLOYMENT_ID}" | jq -e -r ".TaskGroups[].PlacedCanaries | if . == null then [] else . end | join(\"\\n\")")
+	echo "Allocation IDs: ${ALLOC_IDS[*]}"
 
-	if [ "${ALLOC_IDS}" = "" ] || [ "${ALLOC_IDS}" = "null" ]; then
+	if [ ${#ALLOC_IDS[@]} -eq 0 ]; then
 		echo "WARN: No Allocation IDs found, skipping."
 		continue
 	fi
 
-	while IFS= read -r ALLOC_ID; do
+	for ALLOC_ID in "${ALLOC_IDS[@]}"; do
 		echo "-- Allocation ${ALLOC_ID} --"
-		JOBS=$(nomad alloc status -json "${ALLOC_ID}" | jq -e -r ".TaskStates | keys[]")
-		while IFS= read -r JOB; do
+		mapfile -t JOBS < <(nomad alloc status -json "${ALLOC_ID}" | jq -e -r ".TaskStates | keys[]")
+		for JOB in "${JOBS[@]}"; do
 			echo "stdout of '${JOB}':"
 			nomad alloc logs -tail "${ALLOC_ID}" "${JOB}"
 			echo "stderr of '${JOB}':"
 			nomad alloc logs -stderr -tail "${ALLOC_ID}" "${JOB}"
-		done <<<"${JOBS}"
-	done <<<"${ALLOC_IDS}"
+		done
+	done
 
 	exit 1
 done
