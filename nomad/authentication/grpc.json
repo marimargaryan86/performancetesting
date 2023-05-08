@@ -2,13 +2,13 @@
   "development": {
     "variables": {
       "count": 1,
-      "jwt_ttl": "PT1H"
+      "jwt_ttl": "PT24H"
     }
   },
   "production": {
     "variables": {
       "count": 2,
-      "jwt_ttl": "PT24H"
+      "jwt_ttl": "PT1H"
     }
   }
 }
