@@ -9,6 +9,8 @@ from snowfall.stdlib import string
 from snowfall.vendor.currency_cloud.client import PaymentClient
 from snowfall.vendor.currency_cloud.models import account, contact
 
+_BASE_URL = "https://devapi.currencycloud.com/v2"
+
 
 @pytest.fixture()
 def contact_request() -> contact.ContactRequest:
@@ -90,7 +92,9 @@ def payment_client_pass_case(
     )
     config = mock.Mock()
     config.client = cc_client
-    return PaymentClient(config)
+
+    auth = mock.Mock()
+    return PaymentClient(config, _BASE_URL, auth)
 
 
 @pytest.fixture()
@@ -149,7 +153,9 @@ def payment_client_permission_contact_issue(
     )
     config = mock.Mock()
     config.client = cc_client
-    return PaymentClient(config)
+
+    auth = mock.Mock()
+    return PaymentClient(config, _BASE_URL, auth)
 
 
 @pytest.fixture()
@@ -172,4 +178,6 @@ def payment_client_permission_account_issue(
     )
     config = mock.Mock()
     config.client = cc_client
-    return PaymentClient(config)
+
+    auth = mock.Mock()
+    return PaymentClient(config, _BASE_URL, auth)

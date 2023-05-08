@@ -25,6 +25,7 @@ class Settings(application.Settings):
     cc_login: str
     cc_api_key: str
     cc_env: str
+    cc_address: str
     currencies_address: Sequence[str]
     authentication_address: str
     jwt_public_key: str
@@ -37,6 +38,7 @@ class AdminSettings(application.Settings):
     cc_login: str
     cc_api_key: str
     cc_env: str
+    cc_address: str
     authentication_address: str
     accounts_address: str
     jwt_public_key: str
@@ -45,7 +47,6 @@ class AdminSettings(application.Settings):
 
 
 def create_admin_dependencies(  # noqa: WPS211
-    cc_config: client.CurrencyCloudConfig,
     authentication_client: authentication.Client,
     companies_repository: CompanyRepository,
     contacts_repository: ContactsRepository,
@@ -54,10 +55,10 @@ def create_admin_dependencies(  # noqa: WPS211
     currencies_repository: CurrencyRepository,
     beneficiaries_repository: BeneficiaryRepository,
     accounts_client: accounts.GrpcClient,
-    payment_client: client.PaymentClient | None = None,
+    payment_client: client.PaymentClient,
 ) -> lagom.Container:
     container = lagom.Container()
-    container[client.PaymentClient] = payment_client or client.PaymentClient(cc_config)
+    container[client.PaymentClient] = payment_client
     container[authentication.Client] = authentication_client  # type: ignore[type-abstract]
     container[CompanyRepository] = companies_repository
     container[ContactsRepository] = contacts_repository
@@ -73,7 +74,6 @@ def create_admin_dependencies(  # noqa: WPS211
 
 
 def create_dependencies(  # noqa: WPS211
-    cc_config: client.CurrencyCloudConfig,
     currencies_client: currencies.Client,
     quotations_repository: quotations.QuotationsRepository,
     redis_client: UserSessionRepository,
@@ -81,10 +81,10 @@ def create_dependencies(  # noqa: WPS211
     conversions_repository: ConversionRepository,
     companies_repository: CompanyRepository,
     currencies_repository: CurrencyRepository,
-    payment_client: client.PaymentClient | None = None,
+    payment_client: client.PaymentClient,
 ) -> lagom.Container:
     container = lagom.Container()
-    container[client.PaymentClient] = payment_client or client.PaymentClient(cc_config)
+    container[client.PaymentClient] = payment_client
     container[currencies.Client] = currencies_client  # type: ignore[type-abstract]
     container[quotations.QuotationsRepository] = quotations_repository
     container[UserSessionRepository] = redis_client

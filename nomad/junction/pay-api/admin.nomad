@@ -42,6 +42,10 @@ variable "count" {
   type = number
 }
 
+variable "cc_address" {
+  type = string
+}
+
 job "pay-api-admin" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -182,6 +186,7 @@ EOH
         SENTRY_DSN            = "https://025704ebb5d24063b1153935db50ffd5@sentry.snowfall.se/42"
         PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
         CURRENCIES            = "AUD JPY SAR BHD KES SGD BGN KWD ZAR CAD SEK CNY CHF CZK NZD THB DKK NOK TRY EUR OMR UGX HKD GBP HUF PLN AED QAR USD RON ILS"
+        CC_ADDRESS            = var.cc_address
       }
     }
   }

@@ -1,8 +1,12 @@
 {
     "development": {
-        "variables": {}
+        "variables": {
+          "cc_address": "https://devapi.currencycloud.com/v2"
+        }
     },
     "production": {
-        "variables": {}
+        "variables": {
+          "cc_address": "https://devapi.currencycloud.com/v2"
+        }
     }
 }

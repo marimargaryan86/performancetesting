@@ -32,7 +32,11 @@ from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.grpc.client import create_channel
-from snowfall.vendor.currency_cloud.client import CurrencyCloudConfig
+from snowfall.vendor.currency_cloud.client import (
+    CurrencyCloudAuth,
+    CurrencyCloudConfig,
+    PaymentClient,
+)
 
 
 def _factory(
@@ -71,7 +75,15 @@ def _factory(
             ],
             routes=router.get_routes(
                 bootstrap.create_dependencies(
-                    cc_config=cc_config,
+                    payment_client=PaymentClient(
+                        cc_config=cc_config,
+                        base_url=app.settings.cc_address,
+                        auth=CurrencyCloudAuth(
+                            base_url=app.settings.cc_address,
+                            login_id=app.settings.cc_login,
+                            api_key=app.settings.cc_api_key,
+                        ),
+                    ),
                     currencies_client=currencies.GrpcClient(
                         currencies_pb2_grpc.CurrencyServiceStub(orders_channel),
                     ),
@@ -145,7 +157,15 @@ def _admin_factory(
             ],
             routes=router.get_admin_routes(
                 bootstrap.create_admin_dependencies(
-                    cc_config=cc_config,
+                    payment_client=PaymentClient(
+                        cc_config=cc_config,
+                        base_url=app.settings.cc_address,
+                        auth=CurrencyCloudAuth(
+                            base_url=app.settings.cc_address,
+                            login_id=app.settings.cc_login,
+                            api_key=app.settings.cc_api_key,
+                        ),
+                    ),
                     authentication_client=auth.GrpcClient(
                         auth.auth_pb2_grpc.AuthenticationServiceStub(
                             authentication_channel,

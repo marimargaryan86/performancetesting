@@ -110,7 +110,6 @@ def _create_app(  # noqa: WPS211
         openapi_path=openapi_path,
         routes=router.get_routes(
             bootstrap.create_dependencies(
-                cc_config,
                 currencies_client,
                 quotations_repository,
                 redis_repository,
@@ -147,7 +146,6 @@ def _create_admin_app(  # noqa: WPS211
         openapi_path=openapi_path,
         routes=router.get_admin_routes(
             bootstrap.create_admin_dependencies(
-                cc_config,
                 authentication_client,
                 companies_repository,
                 contacts_repository,

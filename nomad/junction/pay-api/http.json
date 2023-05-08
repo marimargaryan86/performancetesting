@@ -5,7 +5,8 @@
       "traefik_entrypoints": "websecure",
       "traefik_host_URL": "api.pay.junction.dev",
       "traefik_headers_accesscontrolalloworiginlist": "*",
-      "traefik_headers_accessControlAllowHeaders": "*"
+      "traefik_headers_accessControlAllowHeaders": "*",
+      "cc_address": "https://devapi.currencycloud.com/v2"
     }
   },
   "production": {
@@ -14,7 +15,8 @@
       "traefik_entrypoints": "web",
       "traefik_host_URL": "api.pay.junction.travel",
       "traefik_headers_accesscontrolalloworiginlist": "https://api.pay.junction.travel",
-      "traefik_headers_accessControlAllowHeaders": "*"
+      "traefik_headers_accessControlAllowHeaders": "*",
+      "cc_address": "https://devapi.currencycloud.com/v2"
     }
   }
 }

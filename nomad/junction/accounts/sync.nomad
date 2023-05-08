@@ -22,6 +22,10 @@ variable "datacenter" {
   type = string
 }
 
+variable "cc_address" {
+  type = string
+}
+
 job "accounts-sync" {
   datacenters = ["${var.datacenter}"]
   type        = "batch"
@@ -79,6 +83,7 @@ EOH
       env {
         ENV_NAME   = "${var.environment}"
         SENTRY_DSN = "https://14777b869dcb4cecacb590784567ff31@sentry.snowfall.se/115"
+        CC_ADDRESS = var.cc_address
       }
     }
   }

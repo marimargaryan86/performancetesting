@@ -10,7 +10,11 @@ from snowfall.project.pay.service.accounts.grpc import (
 )
 from snowfall.stdlib import service
 from snowfall.stdlib.transport.grpc import server
-from snowfall.vendor.currency_cloud.client import CurrencyCloudConfig, PaymentClient
+from snowfall.vendor.currency_cloud.client import (
+    CurrencyCloudAuth,
+    CurrencyCloudConfig,
+    PaymentClient,
+)
 
 
 class _GrpcSettings(service.Settings):
@@ -24,6 +28,7 @@ class _SyncSettings(service.Settings):
     cc_login: str
     cc_api_key: str
     cc_env: str
+    cc_address: str
 
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
@@ -49,10 +54,16 @@ async def _sync_accounts_cron_run(
 ) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(app.settings.mongo_dsn)
     payment_client = PaymentClient(
-        CurrencyCloudConfig(
+        cc_config=CurrencyCloudConfig(
             app.settings.cc_login,
             app.settings.cc_api_key,
             app.settings.cc_env,
+        ),
+        base_url=app.settings.cc_address,
+        auth=CurrencyCloudAuth(
+            base_url=app.settings.cc_address,
+            login_id=app.settings.cc_login,
+            api_key=app.settings.cc_api_key,
         ),
     )
     sync_account = cron_jobs.SyncAccounts(

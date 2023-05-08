@@ -125,8 +125,18 @@ class CurrencyCloudAuth(httpx.Auth):
 
 
 class PaymentClient(object):  # noqa: WPS214
-    def __init__(self, cc_config: CurrencyCloudConfig):
+    def __init__(
+        self,
+        cc_config: CurrencyCloudConfig,
+        base_url: str,
+        auth: CurrencyCloudAuth,
+    ):
         self._client_config = cc_config
+        self._base_url = httpx.URL(base_url)
+        self._client = httpx.AsyncClient(
+            base_url=self._base_url,
+            auth=auth,
+        )
 
     @error_handler
     def create_conversion(
