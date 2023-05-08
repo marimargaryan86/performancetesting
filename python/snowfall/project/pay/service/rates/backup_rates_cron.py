@@ -60,7 +60,7 @@ class UpdateBackUpRatesJob(object):
                         sell_currency=rate.sell_currency,
                         rate=rate.rate,
                     )
-                    for rate in self._cc_client.get_basic_rates(chunk)
+                    for rate in await self._cc_client.get_basic_rates(chunk)
                 ),
             )
         return rates

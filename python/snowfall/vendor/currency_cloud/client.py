@@ -102,7 +102,6 @@ class CurrencyCloudAuth(httpx.Auth):
     ) -> AsyncGenerator[httpx.Request, httpx.Response]:
         request.headers["X-Auth-Token"] = self._token
         response = yield request
-
         if response.status_code == httpx.codes.UNAUTHORIZED:
             login_response = await self._login()
             self._update_tokens(login_response)
@@ -233,22 +232,30 @@ class PaymentClient(object):  # noqa: WPS214
 
         return BeneficiaryResponse(**created_beneficiary._attributes)  # noqa: WPS437
 
-    @error_handler
-    def get_basic_rates(self, currency_pairs: str) -> list[BasicRateResponse]:
-        basic_rates = self._cc_client.rates.find(currency_pair=currency_pairs)
+    async def get_basic_rates(self, currency_pairs: str) -> list[BasicRateResponse]:
+        response = await self._client.get(
+            "/rates/find",
+            params={
+                "currency_pair": currency_pairs,
+            },
+        )
+        response.raise_for_status()
+        response_data = response.json()
 
-        rates = []
-
-        for rate in basic_rates.currencies:
-            rates.append(
-                BasicRateResponse(
-                    sell_currency=rate.currency_pair[:3],
-                    buy_currency=rate.currency_pair[3:],
-                    rate=rate.offer,
-                ),
+        if response_data["unavailable"]:
+            _logger.error(
+                "Unavailable currency pairs",
+                pairs=",".join(response_data["unavailable"]),
             )
 
-        return rates
+        return [
+            BasicRateResponse(
+                sell_currency=pair[:3],
+                buy_currency=pair[3:],
+                rate=rates[1],
+            )
+            for pair, rates in response_data["rates"].items()
+        ]
 
     @property
     def _cc_client(self) -> currencycloud.Client:
