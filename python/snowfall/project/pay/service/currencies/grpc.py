@@ -2,6 +2,7 @@ from decimal import Decimal
 
 import grpc
 
+from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay.adapter import rates
 from snowfall.project.pay.service.currencies.v1alpha import (
     currencies_pb2,
@@ -16,7 +17,7 @@ class CurrencyService(service.Service, currencies_pb2_grpc.CurrencyServiceServic
         self,
         rates_service: rates.GrpcClient,
     ):
-        self._rates_servie = rates_service
+        self._rates_service = rates_service
 
     def get_name(self) -> str:
         return currencies_pb2.DESCRIPTOR.services_by_name["CurrencyService"].full_name
@@ -29,10 +30,13 @@ class CurrencyService(service.Service, currencies_pb2_grpc.CurrencyServiceServic
         request: currencies_pb2.ConvertRequest,
         context: grpc.aio.ServicerContext,
     ) -> currencies_pb2.ConvertResponse:
-        quote = await self._rates_servie.get_rate(
-            Currency(request.from_currency),
-            Currency(request.to_currency),
-        )
+        try:
+            quote = await self._rates_service.get_rate(
+                Currency(request.from_currency),
+                Currency(request.to_currency),
+            )
+        except errors.NotFoundError:
+            await context.abort(grpc.StatusCode.NOT_FOUND)
 
         base_amount = Money(request.amount, Currency(request.from_currency))
         conversion = base_amount.convert(

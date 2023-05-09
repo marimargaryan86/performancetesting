@@ -3,6 +3,7 @@ from typing import cast
 import lagom
 from starlette import endpoints, requests, responses, status
 
+from snowfall.project.junction.go.adapter import errors as adapter_errors
 from snowfall.project.pay.adapter import currencies
 from snowfall.project.pay.service.companies.v1alpha import models_pb2 as company_models
 from snowfall.project.pay.service.pay_api import resources
@@ -57,14 +58,28 @@ class Quotations(endpoints.HTTPEndpoint):
         company = cast(company_models.Company, company)
         beneficiary_company = cast(company_models.Company, beneficiary_company)
 
-        rate = await self._get_rate(
-            from_currency,
-            to_currency,
-            body["amount"],
-            session_token,
-            redis_client,
-            client,
-        )
+        try:
+            rate = await self._get_rate(
+                from_currency,
+                to_currency,
+                body["amount"],
+                session_token,
+                redis_client,
+                client,
+            )
+        except adapter_errors.NotFoundError:
+            return models.JsonApiResponse(
+                models.Body(
+                    errors=[
+                        models.Error(
+                            status=str(status.HTTP_400_BAD_REQUEST),
+                            code="bad_request",
+                            detail="Given currency pair is not supported.",
+                        ),
+                    ],
+                ),
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
 
         quote = Quote(
             body["amount"],
