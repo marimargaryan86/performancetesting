@@ -123,8 +123,14 @@ class Whatsapp(endpoints.HTTPEndpoint):
                     checkin_option = int(message_body.lower().split(" ")[1])
                 except IndexError:
                     twiml_response.message(
-                        "Multiple journeys are available. Please provide the journey "
-                        + "option number\n",
+                        "Multiple journeys are available. Please type CHECKIN <space> "
+                        + "followed by  journey option number: \n"
+                        + "\n".join(
+                            [
+                                chatbot_utils.journey_signature_str(journey, idx)
+                                for idx, journey in enumerate(go_orders)
+                            ],
+                        ),
                     )
                 except ValueError:
                     twiml_response.message(
