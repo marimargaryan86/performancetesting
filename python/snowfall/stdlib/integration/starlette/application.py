@@ -26,12 +26,13 @@ class Settings(service.Settings):
     http_port: int = 80
 
 
-def create_starlette_app(
+def create_starlette_app(  # noqa: WPS211
     routes: Sequence[routing.BaseRoute],
     openapi_path: pathlib.Path | None,
     custom_middlewares: Sequence[Middleware] | None = None,
     validate_response: bool = True,
     security_headers: bool = True,
+    lifespan: Any = None,
 ) -> applications.Starlette:
     stack = [Middleware(middlewares.RequestIdMiddleware)]
 
@@ -68,6 +69,7 @@ def create_starlette_app(
             status.HTTP_500_INTERNAL_SERVER_ERROR: handlers.server_error_handler,
             exceptions.HTTPException: handlers.server_error_handler,
         },
+        lifespan=lifespan,
     )
 
 

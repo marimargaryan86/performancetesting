@@ -74,11 +74,13 @@ def to_route(
 
 
 class Proxy(object):
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
         client: httpx.AsyncClient,
+        prefix: str = "",
         allow: Sequence[tuple[str, re.Pattern[str]]] | None = None,
         deny: Sequence[tuple[str, re.Pattern[str]]] | None = None,
+        pop_headers: Sequence[str] | None = None,
     ) -> None:
         if not str(client.base_url):
             raise RuntimeError("A base URL must be set to use the proxy route")
@@ -89,6 +91,8 @@ class Proxy(object):
         self._allow = allow
         self._client = client
         self._deny = deny
+        self._prefix = prefix
+        self._pop_headers = pop_headers or ["host"]
 
     def to_route(self, prefix: str = "") -> routing.Route:
         return routing.Route(
@@ -97,14 +101,24 @@ class Proxy(object):
             methods=["POST", "GET", "PATCH", "DELETE"],
         )
 
+    def _clean_headers(self, request: requests.Request) -> dict[str, Any]:
+        headers = dict(request.headers)
+        for header in self._pop_headers:
+            headers.pop(header)
+        return headers
+
     async def _route(
         self,
         request: requests.Request,
     ) -> responses.Response:
         response = await self._client.request(
             method=request.method,
-            url="{0}?{1}".format(request.url.path, request.url.query),
+            url="{0}?{1}".format(
+                request.path_params["path"],
+                request.url.query,
+            ).rstrip("?"),
             content=await request.body(),
+            headers=self._clean_headers(request),
         )
 
         their_base_url = str(self._client.base_url).encode()
@@ -113,7 +127,7 @@ class Proxy(object):
                 scheme="https" if request.url.is_secure else "http",
                 host=request.url.hostname,
                 port=request.url.port,
-                # TODO: take prefix into consideration
+                path=self._prefix,
             ),
         ).encode()
 

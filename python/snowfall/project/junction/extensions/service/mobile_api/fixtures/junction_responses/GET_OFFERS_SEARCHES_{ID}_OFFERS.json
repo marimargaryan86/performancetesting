@@ -3,27 +3,30 @@
     "method": "GET",
     "status_code": 200,
     "json": {
-        "data": [
-          {
-            "id": "1714f7ae-547f-46d7-9b23-2330790342d3",
-            "type": "offers",
-            "attributes": {
-                "expiresAt": "2022-07-19T09:34:59+00:00"
-            },
-            "relationships": {
-                "groups": {
-                    "data": [
-                        {
-                            "id": "561abe09-914d-42a7-af77-b8e542933b62",
-                            "type": "offer-groups"
-                        }
-                    ]
-                }
-            }
+    "data": [
+      {
+        "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+        "type": "offers",
+        "attributes": {
+          "expiresAt": "2019-08-24T14:15:22Z"
+        },
+        "relationships": {
+          "groups": {
+            "data": [
+              {
+                "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "type": "offer-groups"
+              }
+            ]
           }
-        ],
+        },
         "links": {
-          "next": "https://api.junction.dev/offers/searches/47d8cebe-8225-4ea2-803b-700a9ea57ef5/offers?page%5Bcursor%5D=MTogImUyOTc5ZTZhLWZlNzQtNDliMS04ZTAwLTE3ZTEzZTZmNzVhZCIgMjogImZhNDhhNTcwOTZhOTBmYWMiIDM6ICJhZTY4ZDNjZjgzZWY3YWI1Ig%3D%3D&page%5Blimit%5D=20"
+          "self": "https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5"
         }
+      }
+    ],
+    "links": {
+      "next": "https://example.com/resource/?page%5Bcursor%5D=MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D&page%5Blimit%5D=20"
     }
+  }
 }

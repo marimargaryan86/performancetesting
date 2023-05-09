@@ -55,7 +55,7 @@ class MobileApiClient(Client):  # noqa: WPS214
                 },
             },
         }
-        response = await self._client.request(
+        response = await self.client.request(
             method=_METHOD_PATCH,
             url="/payments/{0}".format(payment_intent_id),
             json=body,

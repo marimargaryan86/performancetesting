@@ -18,11 +18,20 @@ from snowfall.project.junction.extensions.service.mobile_api.routes import (  # 
     users,
     vouchers,
 )
+from snowfall.stdlib.integration.starlette import routes as stdlib_routes
 from snowfall.vendor.junction.go import client
 
 
-def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
+def get_routes(
+    dependencies: lagom.Container,
+) -> list[routing.BaseRoute]:
     integration = starlette.StarletteIntegration(dependencies)
+
+    reverse_proxy_view = stdlib_routes.Proxy(
+        prefix="/trip-candidates/",
+        client=dependencies[client.Client].client,
+    ).to_route()
+
     return [
         integration.route("/places", places.Places, name="Places"),
         integration.route("/places/{placeId}", places.Place, name="ViewPlace"),
@@ -120,4 +129,5 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             dependencies[repository.EnumsValuesRepository],
             "/passengers/titles",
         ).to_route(),
+        reverse_proxy_view,
     ]

@@ -70,7 +70,7 @@ class _BaseClient(base_client.BaseClient):
         query_parameters: Mapping[str, Any] | None = None,
         payload: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
-        response = await self._client.request(
+        response = await self.client.request(
             method=method,
             url=url,
             params=query_parameters,
@@ -265,16 +265,16 @@ class TripsClient(_BaseClient):
 
 class Client(_BaseClient):  # noqa: WPS214
     def legs(self) -> LegsClient:
-        return LegsClient(base_url=str(self._base_url), client=self._client)
+        return LegsClient(base_url=str(self._base_url), client=self.client)
 
     def places(self) -> PlacesClient:
-        return PlacesClient(base_url=str(self._base_url), client=self._client)
+        return PlacesClient(base_url=str(self._base_url), client=self.client)
 
     def segments(self) -> SegmentsClient:
-        return SegmentsClient(base_url=str(self._base_url), client=self._client)
+        return SegmentsClient(base_url=str(self._base_url), client=self.client)
 
     def trips(self) -> TripsClient:
-        return TripsClient(base_url=str(self._base_url), client=self._client)
+        return TripsClient(base_url=str(self._base_url), client=self.client)
 
     async def health(self) -> dict[str, Any]:
         return await self._make_request(

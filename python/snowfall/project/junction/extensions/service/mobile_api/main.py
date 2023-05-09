@@ -1,5 +1,7 @@
 import base64
+import contextlib
 import random
+from collections.abc import AsyncGenerator
 from functools import partial
 from typing import Callable
 
@@ -31,6 +33,38 @@ from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.http import auth
 from snowfall.vendor.junction.go import client
+
+
+def replace_in_file(path: str, find: str, replace: str) -> None:
+    with open(path, "r") as file_r:
+        file_content = file_r.read()
+    file_content = file_content.replace(
+        find,
+        replace,
+    )
+    with open(path, "w") as file_w:
+        file_w.write(file_content)
+
+
+@contextlib.asynccontextmanager
+async def lifespan(app: applications.ASGIApp) -> AsyncGenerator[None, None]:
+    client_api_spec_path = str(
+        filesystem.resource_path(
+            "junction.client_api",
+            "openapi.json",
+        ),
+    )
+    replace_in_file(
+        client_api_spec_path,
+        '"$ref": "#/',
+        '"$ref": "./../client_api/openapi.json#/',
+    )
+    yield
+    replace_in_file(
+        client_api_spec_path,
+        '"$ref": "./../client_api/openapi.json#/',
+        '"$ref": "#/',
+    )
 
 
 def _factory(
@@ -73,6 +107,7 @@ def _factory(
         )
 
         asgi_app = application.create_starlette_app(
+            lifespan=lifespan,
             routes=router.get_routes(
                 bootstrap.create_dependencies(
                     places_repository=repository.PlacesRepository(

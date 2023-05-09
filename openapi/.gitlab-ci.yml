@@ -55,6 +55,7 @@ openapi:publish:
     name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/node:18"
     entrypoint: [""]
   script:
+    - find openapi/ -type f -name "*.json" -exec npx @apidevtools/swagger-cli@4.0.4 bundle \{\} -o \{\} -r \;
     - npx @stoplight/cli@6.0.1442 push --ci-token ${STOPLIGHT_TOKEN} --directory openapi/
   needs: []
   rules:

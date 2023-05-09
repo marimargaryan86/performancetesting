@@ -49,7 +49,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
             },
         }
 
-        response = await self._client.post(
+        response = await self.client.post(
             "/companies",
             json=payload,
         )
@@ -63,7 +63,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         cursor: str | None = None,
         sort: str | None = None,
     ) -> dict[str, Any]:
-        response = await self._client.get(
+        response = await self.client.get(
             "accounts",
             params=make_pagination_params(limit, cursor, sort),
         )
@@ -76,7 +76,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         limit: int | None = None,
         cursor: str | None = None,
     ) -> dict[str, Any]:
-        response = await self._client.get(
+        response = await self.client.get(
             "/accounts/{0}/balances".format(account_id),
             params=make_pagination_params(limit, cursor),
         )
@@ -88,7 +88,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         self,
         company_id: str,
     ) -> dict[str, Any]:
-        response = await self._client.get(
+        response = await self.client.get(
             "/companies/{0}".format(company_id),
         )
 
@@ -100,7 +100,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         conversion_id: str,
         include: Sequence[conversion_includes] | None = None,
     ) -> dict[str, Any]:
-        response = await self._client.get(
+        response = await self.client.get(
             "/conversions/{0}".format(conversion_id),
             params=make_pagination_params(limit=None, cursor=None, include=include),
         )
@@ -111,7 +111,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
     async def get_transactions(
         self,
     ) -> dict[str, Any]:
-        response = await self._client.get(
+        response = await self.client.get(
             "/transactions",
         )
 
@@ -148,7 +148,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
             },
         }
 
-        response = await self._client.patch(
+        response = await self.client.patch(
             "/companies/{0}".format(company_id),
             json=payload,
         )
@@ -161,7 +161,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         limit: int,
         cursor: str,
     ) -> dict[str, Any]:
-        response = await self._client.get(
+        response = await self.client.get(
             "/companies",
             params=make_pagination_params(limit, cursor),
         )
@@ -174,7 +174,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         limit: int,
         cursor: str,
     ) -> dict[str, Any]:
-        response = await self._client.get(
+        response = await self.client.get(
             "/companies/accountless",
             params=make_pagination_params(limit, cursor),
         )
@@ -201,7 +201,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
             },
         }
 
-        response = await self._client.post(
+        response = await self.client.post(
             "/accounts/{0}/relationships/currencies".format(
                 account_id,
             ),
@@ -231,7 +231,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
             },
         }
 
-        response = await self._client.post(
+        response = await self.client.post(
             "/companies/{0}/contacts".format(company_id),
             json=payload,
         )
@@ -245,7 +245,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         limit: int | None = None,
         cursor: str | None = None,
     ) -> dict[str, Any]:
-        response = await self._client.get(
+        response = await self.client.get(
             "/companies/{0}/contacts".format(company_id),
             params=make_pagination_params(limit, cursor),
         )
@@ -259,7 +259,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         limit: int | None = None,
         cursor: str | None = None,
     ) -> dict[str, Any]:
-        response = await self._client.get(
+        response = await self.client.get(
             "/conversions",
             params=make_pagination_params(limit, cursor, include=include),
         )
@@ -288,7 +288,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
             },
         }
 
-        response = await self._client.post(
+        response = await self.client.post(
             "/accounts",
             json=payload,
         )
@@ -310,7 +310,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
                 },
             },
         }
-        response = await self._client.post(
+        response = await self.client.post(
             "/users",
             json=payload,
         )
@@ -389,7 +389,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
                 },
             },
         }
-        response = await self._client.post(
+        response = await self.client.post(
             "/beneficiaries",
             json=payload,
         )

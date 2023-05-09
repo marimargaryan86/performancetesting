@@ -4,7 +4,12 @@ python_image(
     entry_point="main.py",
 )
 python_test_utils(
-    name="test_utils", dependencies=["openapi/junction/mobile_api", ":fixtures"]
+    name="test_utils",
+    dependencies=[
+        "openapi/junction/mobile_api",
+        "openapi/junction/client_api",
+        ":fixtures",
+    ],
 )
 files(
     name="fixtures",

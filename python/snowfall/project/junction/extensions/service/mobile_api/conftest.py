@@ -27,6 +27,7 @@ from snowfall.project.junction.extensions.service.mobile_api import (
 )
 from snowfall.project.junction.extensions.service.mobile_api import (
     jwt_generator,
+    main,
     middleware,
     plus_client,
     repository,
@@ -153,6 +154,17 @@ def _create_app(
     openapi_path: pathlib.Path,
     custom_middlewares: Sequence[Middleware] | None = None,
 ) -> applications.Starlette:
+    client_api_spec_path = str(
+        filesystem.resource_path(
+            "junction.client_api",
+            "openapi.json",
+        ),
+    )
+    main.replace_in_file(
+        client_api_spec_path,
+        '"$ref": "#/',
+        '"$ref": "./../client_api/openapi.json#/',
+    )
     asgi_app = application.create_starlette_app(
         custom_middlewares=custom_middlewares,
         openapi_path=openapi_path,

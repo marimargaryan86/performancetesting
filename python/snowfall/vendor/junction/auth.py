@@ -51,7 +51,7 @@ class UserAuth(base_client.BaseClient, httpx.Auth):
             },
         }
 
-        response = await self._client.post(
+        response = await self.client.post(
             url="/users/tokens",
             json=payload,
         )
