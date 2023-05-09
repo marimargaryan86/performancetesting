@@ -26,7 +26,7 @@ variable "traefik_entrypoints" {
   type = string
 }
 
-variable "traefik_host_URL" {
+variable "traefik_rule" {
   type = string
 }
 
@@ -72,7 +72,7 @@ job "junction-http" {
         "http",
         "traefik.enable=true",
         "traefik.http.routers.docs-junction-${var.environment}.entrypoints=${var.traefik_entrypoints}",
-        "traefik.http.routers.docs-junction-${var.environment}.rule=Host(`${var.traefik_host_URL}`)",
+        "traefik.http.routers.docs-junction-${var.environment}.rule=${var.traefik_rule}",
         "traefik.http.routers.docs-junction-${var.environment}.middlewares=docs-junction-auth",
         "traefik.http.middlewares.docs-junction-auth.basicauth.users=snowfall:$apr1$nVeL//e6$BP5DcRDvCLbuXfWca.jzc." // snowfall / N6z5fu&dTvp7j4rgK4V1uPrG
       ]

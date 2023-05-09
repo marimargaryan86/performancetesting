@@ -5,7 +5,7 @@
   "production": {
     "variables": {
       "traefik_entrypoints": "web",
-      "traefik_host_URL": "docs.junction.travel"
+      "traefik_rule": "(Host(`docs.junction.travel`) || Host(`developer.snowfalltravel.com`))"
     }
   }
 }
