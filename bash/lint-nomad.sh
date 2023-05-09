@@ -53,7 +53,10 @@ for f in "${NOMAD_FILES[@]}"; do
 		fi
 
 		env nomad validate "${VARIABLES[@]}" "${f}" >/dev/null
-		env nomad fmt -check -write=false "${f}"
+		if ! env nomad fmt -check -write=false "${f}" >/dev/null 2>&1; then
+			echo -e "\e[31mFile ${f} is not formatted correctly!\e[0m"
+			exit 1
+		fi
 	done
 done
 
