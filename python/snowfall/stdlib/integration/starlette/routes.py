@@ -92,7 +92,11 @@ class Proxy(object):
         self._client = client
         self._deny = deny
         self._prefix = prefix
-        self._pop_headers = pop_headers or ["host"]
+        self._pop_headers = [
+            "host",
+            *self._client.headers.keys(),
+            *(pop_headers or []),
+        ]
 
     def to_route(self, prefix: str = "") -> routing.Route:
         return routing.Route(
