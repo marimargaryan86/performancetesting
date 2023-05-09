@@ -112,6 +112,11 @@ class BookingHandler(object):  # noqa: WPS214
                     trip_result=models_pb2.TripBooking(
                         provider_booking_reference=booking_result.identifier,
                         record_locator=booking_result.booking_reference or "",
+                        operator_booking_references=(
+                            [booking_result.booking_reference]
+                            if booking_result.booking_reference
+                            else []
+                        ),
                         created_at=protobuf.datetime_to_protobuf(
                             booking_result.created_at,
                         ),
