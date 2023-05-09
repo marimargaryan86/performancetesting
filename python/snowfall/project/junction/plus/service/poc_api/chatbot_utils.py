@@ -262,7 +262,6 @@ async def register_booking_confirmation_agent(
                     signature["departure_at"],
                 )
                 + "\nBooking Reference: {0}".format(signature["reference"])
-                + "\nFor more info, reply TRAVEL STATUS"
             ),
             receiver=mobile,
         )
