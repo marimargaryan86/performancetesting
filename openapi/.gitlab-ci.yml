@@ -9,9 +9,13 @@ openapi:breaking:
     set -eu
     shopt -s globstar
     shopt -s nullglob
+    mkdir -p "/tmp/${CI_MERGE_REQUEST_DIFF_BASE_SHA}/openapi"
+    git archive "${CI_MERGE_REQUEST_DIFF_BASE_SHA}:openapi" | tar -x -C "/tmp/${CI_MERGE_REQUEST_DIFF_BASE_SHA}/openapi"
     for f in openapi/**/openapi.json; do
-      git show "${CI_MERGE_REQUEST_DIFF_BASE_SHA}:${f}" > old.json || continue
-      if ! oasdiff -format text -base old.json -revision "${f}" -check-breaking -fail-on-diff -include-checks request-body-enum-value-removed,response-mediatype-enum-value-removed; then
+      if [ ! -f "/tmp/${CI_MERGE_REQUEST_DIFF_BASE_SHA}/${f}" ]; then
+        continue
+      fi
+      if ! oasdiff -format text -base "/tmp/${CI_MERGE_REQUEST_DIFF_BASE_SHA}/${f}" -revision "${f}" -check-breaking -fail-on-diff -include-checks request-body-enum-value-removed,response-mediatype-enum-value-removed; then
         if [ "$BREAKING" -eq "1" ]; then
           exit 2
         else
