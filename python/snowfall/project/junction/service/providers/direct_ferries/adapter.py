@@ -165,7 +165,7 @@ class DfAdapter(object):
                                 id=string.uuid(),
                                 origin=models_pb2.Point(
                                     ref=origin.identifier,
-                                    name=str(origin.identifier),
+                                    name=str(origin.name or origin.identifier),
                                     coordinates=latlng_pb2.LatLng(
                                         latitude=origin.latitude,
                                         longitude=origin.longitude,
@@ -174,7 +174,9 @@ class DfAdapter(object):
                                 ),
                                 destination=models_pb2.Point(
                                     ref=destination.identifier,
-                                    name=str(destination.identifier),
+                                    name=str(
+                                        destination.name or destination.identifier,
+                                    ),
                                     coordinates=latlng_pb2.LatLng(
                                         latitude=destination.latitude,
                                         longitude=destination.longitude,
