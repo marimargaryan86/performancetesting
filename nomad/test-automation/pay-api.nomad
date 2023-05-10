@@ -15,8 +15,9 @@ job "test-automation-pay-api" {
   type        = "batch"
 
   periodic {
-    cron             = "0 8 * * *"
+    cron             = "0 8 * * 1-5"
     prohibit_overlap = true
+    time_zone        = "Europe/Warsaw"
   }
 
   group "pay-api" {
