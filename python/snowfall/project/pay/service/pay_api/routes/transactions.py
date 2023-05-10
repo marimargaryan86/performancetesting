@@ -37,7 +37,7 @@ class Transactions(endpoints.HTTPEndpoint):
             )
             if not are_currencies_same:
                 try:
-                    cc_conversion = payment_client.create_conversion(
+                    cc_conversion = await payment_client.create_conversion(
                         conversion.ConversionRequest(
                             buy_currency=quot.amounts.beneficiary.currency_code,
                             sell_currency=quot.amounts.base_converted.currency_code,

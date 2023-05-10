@@ -33,6 +33,8 @@ from snowfall.vendor.currency_cloud.models.conversion import (
 from snowfall.vendor.currency_cloud.models.rate import BasicRateResponse
 
 _logger = structlog.get_logger(__name__)
+_METHOD_GET = "GET"
+_METHOD_POST = "POST"
 
 
 def error_handler(func: Callable[..., Any]) -> Callable[..., Any]:
@@ -137,17 +139,17 @@ class PaymentClient(object):  # noqa: WPS214
             auth=auth,
         )
 
-    @error_handler
-    def create_conversion(
+    async def create_conversion(
         self,
         conversion_request: ConversionRequest,
     ) -> ConversionResponse:
-        conversion = self._cc_client.conversions.create(
-            **conversion_request.dict(
-                exclude_none=True,
+        return ConversionResponse(
+            **await self._make_request(
+                _METHOD_POST,
+                "/conversions/create",
+                conversion_request.dict(exclude_none=True),
             ),
         )
-        return ConversionResponse(**conversion._attributes)  # noqa: WPS437
 
     @error_handler
     def create_contact(
@@ -260,3 +262,21 @@ class PaymentClient(object):  # noqa: WPS214
     @property
     def _cc_client(self) -> currencycloud.Client:
         return self._client_config.client
+
+    async def _make_request(
+        self,
+        method: str,
+        url: str,
+        query_parameters: Mapping[str, Any] | None = None,
+        payload: Mapping[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        response = await self._client.request(
+            method=method,
+            url=url,
+            params=query_parameters,
+            data=payload,
+        )
+
+        response.raise_for_status()
+
+        return response.json()
