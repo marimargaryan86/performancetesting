@@ -52,6 +52,9 @@ class BookingHandler(object):
                             tzinfo=datetime.timezone.utc,
                         ),
                     ),
+                    operator_booking_references=[
+                        booking_response.operator_ref,
+                    ],
                 ),
                 raw_data="{{confirmBooking: {0}}}".format(booking_response.json()),
             ),
