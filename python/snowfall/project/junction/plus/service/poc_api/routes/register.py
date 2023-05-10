@@ -36,7 +36,10 @@ class WhatsappRegister(endpoints.HTTPEndpoint):
         order = mobile_models_pb2.MobileOrder(
             id=response["id"],
             spnr=response["journey"]["reference"],
-            mobile_number=response["journey"]["contactDetails"]["phoneNumber"],
+            mobile_number=response["journey"]["contactDetails"]["phoneNumber"].replace(
+                " ",
+                "",
+            ),
         )
 
         mobile_number = "".join(order.mobile_number.split())
