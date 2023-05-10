@@ -8,6 +8,7 @@ import type { JourneySchema } from "../schemas/journey";
 import type { CabinClassSchema, LegTypeSchema } from "../schemas/offer";
 import type { OrderSchema } from "../schemas/order";
 import { parseOrder } from "./order";
+import { parsePrice } from "./money";
 
 export function parseBookingDetails(
   bookingDetails: BookingDetailsSchema,
@@ -54,7 +55,7 @@ export function parseBooking(
     id: booking.id,
     externalReference: externalReference.length ? externalReference : undefined,
     operatorReferences: booking.attributes.operatorBookingReferences,
-    price: booking.attributes.totalPrice,
+    price: parsePrice(booking.attributes.totalPrice),
     status: booking.relationships.status.data.id,
     details: details ? parseBookingDetails(details, cabinClasses, legTypes) : undefined,
     order: order ? parseOrder(order, journeys) : undefined,
