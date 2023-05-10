@@ -201,15 +201,19 @@ class PaymentClient(object):  # noqa: WPS214
             for account in accounts
         ]
 
-    @error_handler
-    def add_currency_into_account(
+    async def add_currency_into_account(
         self,
         balance_request: BalanceRequest,
     ) -> BalanceResponse:
-        balance = self._cc_client.balances.for_currency(
-            **balance_request.dict(exclude=None),
+        return BalanceResponse(
+            **await self._make_request(
+                method=_METHOD_GET,
+                url="/balances/{0}".format(balance_request.currency),
+                query_parameters={
+                    "on_behalf_of": balance_request.on_behalf_of,
+                },
+            ),
         )
-        return BalanceResponse(**balance._attributes)  # noqa: WPS437
 
     @error_handler
     def validate_beneficiary(

@@ -79,7 +79,7 @@ class Balances(endpoints.HTTPEndpoint):
                 status_code=status.HTTP_404_NOT_FOUND,
             )
 
-        balance = payment_client.add_currency_into_account(
+        balance = await payment_client.add_currency_into_account(
             BalanceRequest(
                 currency=body["currency"],
                 on_behalf_of=contact.external_reference,
