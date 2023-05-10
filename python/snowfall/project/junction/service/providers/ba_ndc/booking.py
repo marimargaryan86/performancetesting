@@ -129,6 +129,11 @@ class BookingHandler(object):
                             booking_adapter.get_booking_result().identifier,
                         ),
                         record_locator=booking_adapter.get_pnr(),
+                        operator_booking_references=(
+                            [booking_adapter.get_pnr()]
+                            if booking_adapter.get_pnr()
+                            else []
+                        ),
                         created_at=ba_ndc_helpers.date_to_proto_now(),
                     ),
                     raw_data=booking_adapter.get_booking_result().json(),
