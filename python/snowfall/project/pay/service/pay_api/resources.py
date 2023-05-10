@@ -104,7 +104,7 @@ class Company(models.Resource):
                     "city": company.address.locality,
                 },
                 "fxMarkup": round(company.fx_markup, 3),
-                "fxProviderMarkup": round(company.fx_provider_markup, 3),
+                "processingMarkup": round(company.processing_markup, 3),
                 "salesMarkup": round(company.sales_markup, 3),
             },
             relationships=relationships,
@@ -161,8 +161,8 @@ class Transaction(models.Resource):
                     "fxMargin": Money.from_proto(
                         transaction.amounts.fx_margin,
                     ),
-                    "fxProviderMargin": Money.from_proto(
-                        transaction.amounts.fx_provider_margin,
+                    "processingMargin": Money.from_proto(
+                        transaction.amounts.processing_margin,
                     ),
                 },
                 "rates": {
@@ -170,6 +170,7 @@ class Transaction(models.Resource):
                     "fxBuffer": round(transaction.rates.fx_buffer, 3),
                     "salesMarkup": round(transaction.rates.sales_markup, 3),
                     "fxMarkup": round(transaction.rates.fx_markup, 3),
+                    "processingMarkup": round(transaction.rates.processing_markup, 3),
                 },
             },
             relationships={

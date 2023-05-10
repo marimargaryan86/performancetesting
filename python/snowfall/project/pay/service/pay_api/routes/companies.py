@@ -31,8 +31,8 @@ def _update_company_from_payload(
             locality=address.get("city", company.address.locality),
         ),
         fx_markup=payload.get("fxMarkup", company.fx_markup),
-        fx_provider_markup=payload.get("fxProviderMarkup", company.fx_provider_markup),
-        sales_markup=payload.get("fxProviderMarkup", company.sales_markup),
+        processing_markup=payload.get("processingMarkup", company.processing_markup),
+        sales_markup=payload.get("salesMarkup", company.sales_markup),
     )
 
 
@@ -110,7 +110,7 @@ class AdminCompanies(endpoints.HTTPEndpoint):
                     revision=0,
                 ),
                 fx_markup=float(body["fxMarkup"]),
-                fx_provider_markup=float(body["fxProviderMarkup"]),
+                processing_markup=float(body["processingMarkup"]),
                 sales_markup=float(body["salesMarkup"]),
             ),
         )

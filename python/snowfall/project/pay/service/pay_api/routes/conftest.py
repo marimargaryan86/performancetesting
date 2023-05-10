@@ -41,7 +41,7 @@ async def quote_is_less_than_the_limit(
             quotation=usd.protobuf(),
             sales_margin=usd.protobuf(),
             fx_margin=usd.protobuf(),
-            fx_provider_margin=usd.protobuf(),
+            processing_margin=usd.protobuf(),
         ),
         beneficiary_id=string.uuid(),
         payer_id=string.uuid(),
@@ -81,7 +81,7 @@ async def booked_quote_quoted(
             quotation=usd.protobuf(),
             sales_margin=usd.protobuf(),
             fx_margin=usd.protobuf(),
-            fx_provider_margin=usd.protobuf(),
+            processing_margin=usd.protobuf(),
         ),
         beneficiary_id=string.uuid(),
         payer_id=string.uuid(),
@@ -121,7 +121,7 @@ async def valid_company(
             locality="London",
         ),
         fx_markup=float(1),
-        fx_provider_markup=float(1),
+        processing_markup=float(1),
         sales_markup=float(1),
     )
 
@@ -242,7 +242,7 @@ async def companies(
                         locality="London",
                     ),
                     fx_markup=float(1),
-                    fx_provider_markup=float(2),
+                    processing_markup=float(2),
                     sales_markup=float(3),
                     account_id=string.uuid() if loop_index % 2 == 0 else "",
                 ),
@@ -283,13 +283,13 @@ async def company(
     account: Account,
 ) -> Company:
     fx_markup = 1.2
-    fx_provider_markup = 2.2
+    processing_markup = 2.2
     sales_markup = 2.3
     company = Company(
         id=account.company_id,
         name="test_company",
         fx_markup=fx_markup,
-        fx_provider_markup=fx_provider_markup,
+        processing_markup=processing_markup,
         sales_markup=sales_markup,
         account_id=account.id,
     )

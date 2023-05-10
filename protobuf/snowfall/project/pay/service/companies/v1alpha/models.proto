@@ -11,7 +11,7 @@ message Company {
   string name = 2;
   snowfall.stdlib.v1alpha.PostalAddress address = 3;
   float fx_markup = 4;
-  float fx_provider_markup = 5;
+  float processing_markup = 5;
   float sales_markup = 6;
   string account_id = 7;
 }

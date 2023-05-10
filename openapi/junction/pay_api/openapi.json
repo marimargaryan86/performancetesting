@@ -870,7 +870,7 @@
                       "baseConverted",
                       "salesMargin",
                       "fxMargin",
-                      "fxProviderMargin"
+                      "processingMargin"
                     ],
                     "properties": {
                       "beneficiary": {
@@ -918,7 +918,7 @@
                         "readOnly": true,
                         "description": "The monetary value of the fx markup for a specific transaction for Junction PAY"
                       },
-                      "fxProviderMargin": {
+                      "processingMargin": {
                         "allOf": [
                           {
                             "$ref": "#/components/schemas/Money"
@@ -936,7 +936,8 @@
                       "fxQuote",
                       "fxBuffer",
                       "salesMarkup",
-                      "fxMarkup"
+                      "fxMarkup",
+                      "processingMarkup"
                     ],
                     "properties": {
                       "fxQuote": {
@@ -966,6 +967,13 @@
                         "example": 1.02,
                         "readOnly": true,
                         "description": "The percentage Junction PAY adds to foreign exchange"
+                      },
+                      "processingMarkup": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1.02,
+                        "readOnly": true,
+                        "description": "The percentage incurred by the business"
                       }
                     },
                     "readOnly": true

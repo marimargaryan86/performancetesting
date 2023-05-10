@@ -13,7 +13,7 @@ message QuotationAmounts {
   snowfall.stdlib.v1alpha.Money sales_margin = 3;
   snowfall.stdlib.v1alpha.Money quotation = 4;
   snowfall.stdlib.v1alpha.Money fx_margin = 5;
-  snowfall.stdlib.v1alpha.Money fx_provider_margin = 6;
+  snowfall.stdlib.v1alpha.Money processing_margin = 6;
 }
 
 message QuotationRates {
@@ -21,6 +21,7 @@ message QuotationRates {
   float fx_buffer = 2;
   float fx_markup = 3;
   float sales_markup = 4;
+  float processing_markup = 5;
 }
 
 message Quotation {

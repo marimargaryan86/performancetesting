@@ -2043,7 +2043,7 @@
                 "format": "float",
                 "example": 5.6
               },
-              "fxProviderMarkup": {
+              "processingMarkup": {
                 "type": "number",
                 "format": "float",
                 "example": 5.6
@@ -2179,7 +2179,7 @@
                   "name",
                   "address",
                   "fxMarkup",
-                  "fxProviderMarkup",
+                  "processingMarkup",
                   "salesMarkup"
                 ]
               }
@@ -2270,7 +2270,7 @@
                       "baseConverted",
                       "salesMargin",
                       "fxMargin",
-                      "fxProviderMargin"
+                      "processingMargin"
                     ],
                     "properties": {
                       "beneficiary": {
@@ -2318,7 +2318,7 @@
                         "readOnly": true,
                         "description": "The monetary value of the fx markup for a specific transaction for Junction PAY"
                       },
-                      "fxProviderMargin": {
+                      "processingMargin": {
                         "allOf": [
                           {
                             "$ref": "#/components/schemas/Money"

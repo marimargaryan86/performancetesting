@@ -46,8 +46,8 @@ class Quote(object):
                 sales_margin=self._quotation_amounts["sales_margin"].protobuf(),
                 quotation=self._quotation_amounts["quotation"].protobuf(),
                 fx_margin=self._quotation_amounts["fx_margin"].protobuf(),
-                fx_provider_margin=self._quotation_amounts[
-                    "fx_provider_margin"
+                processing_margin=self._quotation_amounts[
+                    "processing_margin"
                 ].protobuf(),
             ),
             rates=QuotationRates(
@@ -55,6 +55,7 @@ class Quote(object):
                 fx_buffer=self._calculate_fx_buffer_rate(self._company.fx_markup),
                 fx_markup=self._company.fx_markup,
                 sales_markup=self._company.sales_markup,
+                processing_markup=self._company.processing_markup,
             ),
             expires_at=datetime_to_protobuf(self._calculate_expires_at()),
             payer_id=self._company.id,
@@ -80,15 +81,15 @@ class Quote(object):
 
         if self._from_currency == self._to_currency:
             fx_margin = Money(0, self._to_currency)
-            fx_provider_margin = Money(0, self._to_currency)
+            processing_margin = Money(0, self._to_currency)
         else:
             fx_margin = base_converted.convert(
                 self._to_currency,
                 Decimal(self._company.fx_markup / 100),
             )
-            fx_provider_margin = base_converted.convert(
+            processing_margin = base_converted.convert(
                 self._to_currency,
-                Decimal(self._company.fx_provider_markup / 100),
+                Decimal(self._company.processing_markup / 100),
             )
 
         return {
@@ -96,12 +97,12 @@ class Quote(object):
             "base_converted": base_converted,
             "sales_margin": sales_margin,
             "fx_margin": fx_margin,
-            "fx_provider_margin": fx_provider_margin,
+            "processing_margin": processing_margin,
             "quotation": total(
                 [
                     base_converted,
                     fx_margin,
-                    fx_provider_margin,
+                    processing_margin,
                     sales_margin,
                 ],
             ),

@@ -10,7 +10,7 @@ def company() -> company_models.Company:
     return company_models.Company(
         name="Snowfall",
         fx_markup=float(0.4),
-        fx_provider_markup=float(0.2),
+        processing_markup=float(0.2),
         sales_markup=float(1),
     )
 
@@ -40,7 +40,7 @@ async def test_calculation(
         "sales_margin": money.Money(1160, money.Currency("EUR")).amount,
         "base_converted": money.Money(116000, money.Currency("EUR")).amount,
         "fx_margin": money.Money(464, money.Currency("EUR")).amount,
-        "fx_provider_margin": money.Money(232, money.Currency("EUR")).amount,
+        "processing_margin": money.Money(232, money.Currency("EUR")).amount,
     }
 
     quote = Quote(
@@ -69,6 +69,6 @@ async def test_calculation(
         == expected_amounts["fx_margin"]
     )
     assert (
-        money.from_protobuf(quote.amounts.fx_provider_margin).amount
-        == expected_amounts["fx_provider_margin"]
+        money.from_protobuf(quote.amounts.processing_margin).amount
+        == expected_amounts["processing_margin"]
     )
