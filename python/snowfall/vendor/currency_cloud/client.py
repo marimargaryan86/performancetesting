@@ -106,15 +106,15 @@ class CurrencyCloudAuth(httpx.Auth):
         response = yield request
         if response.status_code == httpx.codes.UNAUTHORIZED:
             login_response = await self._login()
-            self._update_tokens(login_response)
+            if login_response.get("error_code") == "auth_failed":
+                raise CurrencyCloudError(
+                    [login_response["error_messages"]["username"][0]["message"]],
+                )
+            self._token = login_response["auth_token"]
             request.headers["X-Auth-Token"] = self._token
             yield request
 
-    def _update_tokens(self, response: httpx.Response) -> None:
-        body = response.json()
-        self._token = body.get("auth_token")
-
-    async def _login(self) -> httpx.Response:
+    async def _login(self) -> dict[str, Any]:
         async with self._async_lock:
             return httpx.post(
                 url="{0}/authenticate/api".format(self._base_url),
@@ -122,7 +122,7 @@ class CurrencyCloudAuth(httpx.Auth):
                     "login_id": self._login_id,
                     "api_key": self._api_key,
                 },
-            )
+            ).json()
 
 
 class PaymentClient(object):  # noqa: WPS214
@@ -151,30 +151,30 @@ class PaymentClient(object):  # noqa: WPS214
             ),
         )
 
-    @error_handler
-    def create_contact(
+    async def create_contact(
         self,
         contact_request: ContactRequest,
     ) -> ContactResponse:
         exclude_characters(contact_request)
-        contact = self._cc_client.contacts.create(
-            **contact_request.dict(
-                exclude=None,
+        return ContactResponse(
+            **await self._make_request(
+                _METHOD_POST,
+                "/contacts/create",
+                payload=contact_request.dict(exclude_none=True),
             ),
         )
-        return ContactResponse(**contact._attributes)  # noqa: WPS437
 
-    @error_handler
-    def create_account(
+    async def create_account(
         self,
         account_request: AccountRequest,
     ) -> AccountResponse:
-        account = self._cc_client.accounts.create(
-            **account_request.dict(
-                exclude=None,
+        return AccountResponse(
+            **await self._make_request(
+                _METHOD_POST,
+                "/accounts/create",
+                payload=account_request.dict(exclude_none=True),
             ),
         )
-        return AccountResponse(**account._attributes)  # noqa: WPS437
 
     @error_handler
     def get_balances(self, contact_id: str) -> Sequence[BalanceResponse]:
@@ -189,17 +189,19 @@ class PaymentClient(object):  # noqa: WPS214
             for balance in balances
         ]
 
-    @error_handler
-    def get_all_accounts(
+    async def get_all_accounts(
         self,
         page_index: int,
     ) -> list[AccountResponse]:
-        accounts = self._cc_client.accounts.find(page=page_index)
+        accounts = await self._make_request(
+            _METHOD_GET,
+            "/accounts/find",
+            query_parameters={
+                "page": page_index,
+            },
+        )
 
-        return [
-            AccountResponse(**account._attributes)  # noqa: WPS437
-            for account in accounts
-        ]
+        return [AccountResponse(**account) for account in accounts["accounts"]]
 
     async def add_currency_into_account(
         self,

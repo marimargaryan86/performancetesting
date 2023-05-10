@@ -21,7 +21,7 @@ class SyncAccounts(object):
     async def sync_accounts(
         self,
     ) -> None:
-        all_cc_accounts = self._get_all_cc_accounts()
+        all_cc_accounts = await self._get_all_cc_accounts()
         self._logger.info("Fetched accounts in CC", count=len(all_cc_accounts))
 
         for cc_account in all_cc_accounts:
@@ -51,11 +51,13 @@ class SyncAccounts(object):
 
         self._logger.info("Updated accounts")
 
-    def _get_all_cc_accounts(self) -> list[AccountResponse]:
+    async def _get_all_cc_accounts(self) -> list[AccountResponse]:
         all_cc_accounts = []
         page_index = 1
         while True:
-            cc_accounts = self._payment_client.get_all_accounts(page_index=page_index)
+            cc_accounts = await self._payment_client.get_all_accounts(
+                page_index=page_index,
+            )
             page_index += 1
 
             if not cc_accounts:

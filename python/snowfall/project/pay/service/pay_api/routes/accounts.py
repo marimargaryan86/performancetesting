@@ -154,7 +154,7 @@ class Accounts(endpoints.HTTPEndpoint):
                 status_code=status.HTTP_400_BAD_REQUEST,
             )
 
-        cc_account = self._create_cc_account(
+        cc_account = await self._create_cc_account(
             flatten_body["name"],
             company,
             payment_client,
@@ -170,7 +170,7 @@ class Accounts(endpoints.HTTPEndpoint):
                 status=cc_account.status,
             ),
         )
-        cc_contact = self._create_cc_contact(
+        cc_contact = await self._create_cc_contact(
             account.external_reference,
             contact,
             payment_client,
@@ -195,13 +195,13 @@ class Accounts(endpoints.HTTPEndpoint):
             status_code=status.HTTP_201_CREATED,
         )
 
-    def _create_cc_account(
+    async def _create_cc_account(
         self,
         name: str,
         company: company_models.Company,
         payment_client: PaymentClient,
     ) -> cc_account_models.AccountResponse:
-        return payment_client.create_account(
+        return await payment_client.create_account(
             cc_account_models.AccountRequest(
                 account_name=name,
                 street=", ".join(company.address.address_lines),
@@ -212,13 +212,13 @@ class Accounts(endpoints.HTTPEndpoint):
             ),
         )
 
-    def _create_cc_contact(
+    async def _create_cc_contact(
         self,
         account_id: str,
         contact: account_models.Contact,
         payment_client: PaymentClient,
     ) -> cc_contact_models.ContactResponse:
-        return payment_client.create_contact(
+        return await payment_client.create_contact(
             cc_contact_models.ContactRequest(
                 account_id=account_id,
                 first_name=contact.first_name,
