@@ -30,7 +30,7 @@ class Balances(endpoints.HTTPEndpoint):
         if not contact:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
-        balances = payment_client.get_balances(contact.external_reference)
+        balances = await payment_client.get_balances(contact.external_reference)
 
         return await messages.create_response(
             body=models.Body(

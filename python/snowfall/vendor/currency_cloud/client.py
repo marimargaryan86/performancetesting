@@ -176,18 +176,17 @@ class PaymentClient(object):  # noqa: WPS214
             ),
         )
 
-    @error_handler
-    def get_balances(self, contact_id: str) -> Sequence[BalanceResponse]:
-        balances = self._cc_client.balances.find(
-            on_behalf_of=contact_id,
-            order="amount",
-            order_asc_desc="asc",
+    async def get_balances(self, contact_id: str) -> Sequence[BalanceResponse]:
+        balances = await self._make_request(
+            method=_METHOD_GET,
+            url="/balances/find",
+            query_parameters={
+                "on_behalf_of": contact_id,
+                "order": "amount",
+                "order_asc_desc": "asc",
+            },
         )
-
-        return [
-            BalanceResponse(**balance._attributes)  # noqa: WPS437
-            for balance in balances
-        ]
+        return [BalanceResponse(**balance) for balance in balances["balances"]]
 
     async def get_all_accounts(
         self,
