@@ -17,6 +17,11 @@ from snowfall.project.junction.api_automation.test_functions.pay_admin_client im
     PayAdminClient,
 )
 from snowfall.stdlib import string
+from snowfall.vendor.currency_cloud.client import (
+    CurrencyCloudAuth,
+    CurrencyCloudConfig,
+    PaymentClient,
+)
 from snowfall.vendor.junction.auth import UserAuth
 from snowfall.vendor.junction.pay.client import Client as PayClient
 
@@ -235,6 +240,27 @@ def pay_client(
     return PayClient(
         base_url=base_url,
         auth=auth,
+    )
+
+
+@pytest.fixture()
+def payment_test_client(
+    api_token: str,
+    host: str,
+) -> PaymentClient:
+    login = get_variable_value(host, api_token, "pay_api_cc_login")
+    api_key = get_variable_value(host, api_token, "pay_api_cc_api_key")
+    env = get_variable_value(host, api_token, "pay_api_cc_env")
+
+    base_url = "{0}{1}".format(
+        HTTPS_PREFIX,
+        get_variable_value(host, api_token, "pay_api_cc_address"),
+    )
+
+    return PaymentClient(
+        cc_config=CurrencyCloudConfig(login, api_key, env),
+        base_url=base_url,
+        auth=CurrencyCloudAuth(base_url, login, api_key),
     )
 
 
