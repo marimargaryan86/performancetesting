@@ -43,6 +43,7 @@ class AdminSettings(application.Settings):
     accounts_address: str
     jwt_public_key: str
     mongo_dsn: Sequence[AnyUrl]
+    redis_dsn: Sequence[AnyUrl]
     currencies: Sequence[money.Currency]
 
 

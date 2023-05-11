@@ -164,6 +164,14 @@ class PaymentClient(object):  # noqa: WPS214
             ),
         )
 
+    async def get_house_account(self) -> AccountResponse:
+        return AccountResponse(
+            **await self._make_request(
+                _METHOD_GET,
+                "/accounts/current",
+            ),
+        )
+
     async def create_account(
         self,
         account_request: AccountRequest,

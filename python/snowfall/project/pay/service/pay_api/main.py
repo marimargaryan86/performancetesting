@@ -1,6 +1,7 @@
 import datetime
 import random
-from typing import Callable
+from collections.abc import AsyncGenerator
+from typing import Any, Callable
 
 from motor import motor_asyncio
 from redis import asyncio as aioredis
@@ -37,6 +38,20 @@ from snowfall.vendor.currency_cloud.client import (
     CurrencyCloudConfig,
     PaymentClient,
 )
+
+
+def _lifespan(
+    payment_client: PaymentClient,
+    redis_client: redis.Client[str],
+) -> Callable[[applications.Starlette], AsyncGenerator[Any, Any]]:
+    async def decorator(app: applications.Starlette) -> AsyncGenerator[Any, Any]:
+        redis_key = "HouseAccount"
+        account = await payment_client.get_house_account()
+        await redis_client.put(redis_key, account.json(exclude_none=True))
+        yield
+        await redis_client.delete(redis_key)
+
+    return decorator
 
 
 def _factory(
@@ -145,6 +160,22 @@ def _admin_factory(
         accounts_channel = create_channel(
             app.settings.accounts_address,
         )
+        payment_client = PaymentClient(
+            cc_config=cc_config,
+            base_url=app.settings.cc_address,
+            auth=CurrencyCloudAuth(
+                base_url=app.settings.cc_address,
+                login_id=app.settings.cc_login,
+                api_key=app.settings.cc_api_key,
+            ),
+        )
+        redis_client = redis.Client[str](
+            aioredis.from_url(
+                random.choice(app.settings.redis_dsn),  # nosec
+                decode_responses=True,
+            ).client(),
+            prefix=app.name,
+        )
         asgi_app = application.create_starlette_app(
             custom_middlewares=[
                 Middleware(
@@ -157,15 +188,7 @@ def _admin_factory(
             ],
             routes=router.get_admin_routes(
                 bootstrap.create_admin_dependencies(
-                    payment_client=PaymentClient(
-                        cc_config=cc_config,
-                        base_url=app.settings.cc_address,
-                        auth=CurrencyCloudAuth(
-                            base_url=app.settings.cc_address,
-                            login_id=app.settings.cc_login,
-                            api_key=app.settings.cc_api_key,
-                        ),
-                    ),
+                    payment_client=payment_client,
                     authentication_client=auth.GrpcClient(
                         auth.auth_pb2_grpc.AuthenticationServiceStub(
                             authentication_channel,
@@ -200,6 +223,7 @@ def _admin_factory(
                 "junction.pay_admin_api",
                 "openapi.json",
             ),
+            lifespan=_lifespan(payment_client, redis_client),
         )
 
         asgi_app.add_exception_handler(
