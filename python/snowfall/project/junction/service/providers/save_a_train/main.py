@@ -51,6 +51,7 @@ class _SatConfig(pydantic.BaseModel):
     api_search_requests_limit: int = 40
     api_search_password: str
     api_booking_token: str
+    provider_name: str = "save_a_train"
 
 
 class _DumpStationsSettings(_SatConfig, service.Settings):
@@ -62,6 +63,7 @@ class _OffersSettings(_SatConfig, service.OffersSettings):
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
     mongo_dsn: tuple[pydantic.AnyUrl]
     allowed_window_td: datetime.timedelta = datetime.timedelta(minutes=10)
+    reseller_providers: dict[str, list[str]] = {}
 
 
 class _PriceQuoteSettings(service.PriceQuoteSettings):

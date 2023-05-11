@@ -13,6 +13,7 @@ class DistribusionConfig(pydantic.BaseModel):
     api_key: str
     api_timeout: int = 500
     retailer_partner_number: str
+    provider_name: str = "distribusion"
 
 
 class OrdersSettings(DistribusionConfig, service.Settings):
@@ -22,6 +23,7 @@ class OrdersSettings(DistribusionConfig, service.Settings):
     smtp_sender: pydantic.EmailStr
     smtp_recipient: pydantic.EmailStr
     send_customer_email: bool = True
+    reseller_providers: dict[str, list[str]] = {}
 
 
 class PricingSettings(DistribusionConfig, service.Settings):

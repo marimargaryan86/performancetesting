@@ -24,6 +24,7 @@ class OffersSettings(service.OffersSettings, config.DuffelConfig):
     ttl: datetime.timedelta = datetime.timedelta(minutes=config.DEFAULT_TTL_IN_MINUTES)
     enabled_airlines: set[str] = set()
     disabled_airlines: set[str] = set()
+    reseller_providers: dict[str, list[str]] = {}
 
 
 _Impl = offers.OfferSearchImplementation[

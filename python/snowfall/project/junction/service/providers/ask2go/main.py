@@ -41,6 +41,10 @@ from snowfall.vendor.ask2go import client
 from snowfall.vendor.ask2go.models import search as search_models
 
 
+class _Ask2GoSettings(pydantic.BaseModel):
+    provider_name: str = "ask2go"
+
+
 class _OrdersSettings(service.Settings):
     amqp_dsn: pydantic.AnyUrl
     api_base_url: pydantic.AnyUrl
@@ -53,7 +57,7 @@ class _OrdersSettings(service.Settings):
     override_double_booking_check: bool = False
 
 
-class _OffersSettings(service.OffersSettings):
+class _OffersSettings(service.OffersSettings, _Ask2GoSettings):
     api_base_url: pydantic.AnyUrl
     api_booking_base_url: pydantic.AnyUrl
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
@@ -61,6 +65,7 @@ class _OffersSettings(service.OffersSettings):
     poll_retries_limit: int = 10
     wait_time_between_polling: float = 1
     mongo_dsn: Sequence[pydantic.AnyUrl]
+    reseller_providers: dict[str, list[str]] = {}
 
 
 class _PriceQuotesSettings(service.PriceQuoteSettings):

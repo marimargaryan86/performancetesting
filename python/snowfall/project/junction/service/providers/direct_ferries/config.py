@@ -19,10 +19,12 @@ class DfBaseSettings(service.Settings):
     api_timeout: datetime.timedelta = datetime.timedelta(
         seconds=_API_TIMEOUT_DEFAULT_SECONDS,
     )
+    provider_name: str = "direct_ferries"
 
 
 class OffersSettings(DfBaseSettings, service.OffersSettings):
     ttl: datetime.timedelta = datetime.timedelta(minutes=_OFFER_TTL_DEFAULT_MINUTES)
+    reseller_providers: dict[str, list[str]] = {}
 
 
 class StaticSettings(DfBaseSettings):

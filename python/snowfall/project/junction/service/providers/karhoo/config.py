@@ -15,6 +15,7 @@ class KarhooConfig(pydantic.BaseModel):
     api_timeout: datetime.timedelta = datetime.timedelta(
         seconds=_DEFAULT_API_TIMEOUT_IN_SECONDS,
     )
+    provider_name: str = "karhoo"
 
 
 class OfferSettings(service.Settings, KarhooConfig):
@@ -24,6 +25,7 @@ class OfferSettings(service.Settings, KarhooConfig):
     polling_wait_time_seconds: int = 10
     polling_retries_attempts: int = 4
     provider_company_id: str
+    reseller_providers: dict[str, list[str]] = {}
 
 
 class OrderSettings(service.Settings, KarhooConfig):
