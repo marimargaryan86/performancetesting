@@ -34,7 +34,6 @@ class Beneficiaries(endpoints.HTTPEndpoint):
         companies_repository: CompanyRepository = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
-
         currency = currencies_repository.find_by_id(body["currency"])
         account = await accounts_client.get(body["account"])
 
@@ -66,8 +65,10 @@ class Beneficiaries(endpoints.HTTPEndpoint):
         )
 
         try:  # noqa: WPS229
-            payment_client.validate_beneficiary(beneficiary_validate_request)
-            created_beneficiary = payment_client.create_beneficiary(beneficiary_request)
+            await payment_client.validate_beneficiary(beneficiary_validate_request)
+            created_beneficiary = await payment_client.create_beneficiary(
+                beneficiary_request,
+            )
         except CurrencyCloudError as exc:
             if exc.status == status.HTTP_400_BAD_REQUEST:
                 return models.JsonApiResponse(
@@ -76,7 +77,7 @@ class Beneficiaries(endpoints.HTTPEndpoint):
                             models.Error(
                                 status=str(exc.status),
                                 code=exc.code,
-                                detail=message,
+                                detail=str(message),
                             )
                             for message in exc.messages
                         ],

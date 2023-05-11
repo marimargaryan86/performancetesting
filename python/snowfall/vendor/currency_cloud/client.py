@@ -224,28 +224,29 @@ class PaymentClient(object):  # noqa: WPS214
             ),
         )
 
-    @error_handler
-    def validate_beneficiary(
+    async def validate_beneficiary(
         self,
         beneficiary: BeneficiaryValidateRequest,
     ) -> BeneficiaryValidateResponse:
-        validated_beneficiary = self._cc_client.beneficiaries.validate(
-            **beneficiary.dict(exclude=None),
-        )
         return BeneficiaryValidateResponse(
-            **validated_beneficiary._attributes,  # noqa: WPS437
+            **await self._make_request(
+                method=_METHOD_POST,
+                url="/beneficiaries/validate",
+                payload=beneficiary.dict(exclude_none=True),
+            ),
         )
 
-    @error_handler
-    def create_beneficiary(
+    async def create_beneficiary(
         self,
         beneficiary: BeneficiaryRequest,
     ) -> BeneficiaryResponse:
-        created_beneficiary = self._cc_client.beneficiaries.create(
-            **beneficiary.dict(exclude=None),
+        return BeneficiaryResponse(
+            **await self._make_request(
+                method=_METHOD_POST,
+                url="/beneficiaries/create",
+                payload=beneficiary.dict(exclude_none=True),
+            ),
         )
-
-        return BeneficiaryResponse(**created_beneficiary._attributes)  # noqa: WPS437
 
     async def get_basic_rates(self, currency_pairs: str) -> list[BasicRateResponse]:
         response = await self._client.get(
@@ -289,6 +290,16 @@ class PaymentClient(object):  # noqa: WPS214
             params=query_parameters,
             data=payload,
         )
+
+        if 400 <= response.status_code < 500:  # noqa: WPS432
+            errors = response.json()["error_messages"]
+            raise CurrencyCloudError(
+                [
+                    error_message
+                    for error_type in errors
+                    for error_message in errors[error_type]
+                ],
+            )
 
         response.raise_for_status()
 

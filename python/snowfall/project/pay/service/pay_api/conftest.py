@@ -369,9 +369,11 @@ def payment_client(
 
     payment_client.add_currency_into_account = mock.AsyncMock(return_value=balance)
 
-    payment_client.validate_beneficiary = mock.Mock()
+    payment_client.validate_beneficiary = mock.AsyncMock()
 
-    payment_client.create_beneficiary = mock.Mock(return_value=beneficiary_response)
+    payment_client.create_beneficiary = mock.AsyncMock(
+        return_value=beneficiary_response,
+    )
 
     return payment_client
 
