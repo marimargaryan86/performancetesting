@@ -113,6 +113,7 @@ REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis:
 {{ with secret "kv/data/${var.environment}/direct-ferries" }}
 CLIENT_SECRET={{ .Data.data.client_secret }}
 {{ end }}
+RESELLER_PROVIDERS={{keyOrDefault "${var.environment}/providers/reseller-providers" "{}" | toJSON }}
 EOH
         destination = "services.env"
         env         = true

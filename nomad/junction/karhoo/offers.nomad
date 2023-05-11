@@ -97,6 +97,7 @@ REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis:
 {{ with secret "kv/data/${var.environment}/karhoo" }}
 API_KEY={{ .Data.data.api_key }}
 {{ end }}
+RESELLER_PROVIDERS={{keyOrDefault "${var.environment}/providers/reseller-providers" "{}" | toJSON }}
 EOH
         destination = "services.env"
         env         = true

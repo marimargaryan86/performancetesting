@@ -114,6 +114,7 @@ API_PASSWORD={{ .Data.data.api_password }}
 API_SEARCH_PASSWORD={{ .Data.data.api_search_password }}
 API_BOOKING_TOKEN={{ .Data.data.api_booking_token }}
 {{ end }}
+RESELLER_PROVIDERS={{keyOrDefault "${var.environment}/providers/reseller-providers" "{}" | toJSON }}
 EOH
         destination = "services.env"
         env         = true
