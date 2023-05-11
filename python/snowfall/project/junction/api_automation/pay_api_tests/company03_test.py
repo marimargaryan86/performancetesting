@@ -27,7 +27,7 @@ async def test_get_company(  # noqa: WPS210, WPS218
     postal_code = "75320"
     city = "Uppsala"
     fx_markup = float(0)
-    fx_provider_markup = float(0)
+    processing_markup = float(0)
     sales_markup = float(0)
 
     try:
@@ -38,7 +38,7 @@ async def test_get_company(  # noqa: WPS210, WPS218
             postal_code,
             city,
             fx_markup,
-            fx_provider_markup,
+            processing_markup,
             sales_markup,
         )
     except httpx.HTTPStatusError as err:
@@ -62,5 +62,5 @@ async def test_get_company(  # noqa: WPS210, WPS218
     assert response["data"]["attributes"]["address"]["postalCode"] == postal_code
     assert response["data"]["attributes"]["address"]["city"] == city
     assert response["data"]["attributes"]["fxMarkup"] == fx_markup
-    assert response["data"]["attributes"]["fxProviderMarkup"] == fx_provider_markup
+    assert response["data"]["attributes"]["processingMarkup"] == processing_markup
     assert response["data"]["attributes"]["salesMarkup"] == sales_markup

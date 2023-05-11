@@ -62,7 +62,7 @@ async def pay_create_transaction(  # noqa: WPS210, WPS213, C901
             postal_code="75320",
             city="Uppsala",
             fx_markup=float0,
-            fx_provider_markup=float0,
+            processing_markup=float0,
             sales_markup=float0,
         )
     except httpx.HTTPStatusError as err:
@@ -78,7 +78,7 @@ async def pay_create_transaction(  # noqa: WPS210, WPS213, C901
             postal_code="75320",
             city="Uppsala",
             fx_markup=float0,
-            fx_provider_markup=float0,
+            processing_markup=float0,
             sales_markup=float0,
         )
     except httpx.HTTPStatusError as err1:
@@ -249,7 +249,7 @@ async def create_company(
             postal_code="75320",
             city="Uppsala",
             fx_markup=float(0),
-            fx_provider_markup=float(0),
+            processing_markup=float(0),
             sales_markup=float(0),
         )
     except httpx.HTTPStatusError as err:

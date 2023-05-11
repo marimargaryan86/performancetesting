@@ -25,7 +25,7 @@ async def test_update_company(  # noqa: WPS210, WPS218
     postal_code = "75320"
     city = "Uppsala"
     fx_markup = float(0)
-    fx_provider_markup = float(0)
+    processing_markup = float(0)
     sales_markup = float(0)
 
     response_create = await pay_admin_client.create_company(
@@ -35,7 +35,7 @@ async def test_update_company(  # noqa: WPS210, WPS218
         postal_code,
         city,
         fx_markup,
-        fx_provider_markup,
+        processing_markup,
         sales_markup,
     )
 
@@ -52,7 +52,7 @@ async def test_update_company(  # noqa: WPS210, WPS218
     update_postal_code = "updated_75320"
     update_city = "updated_Uppsala"
     updated_fx_markup = float(1)
-    updated_fx_provider_markup = float(1)
+    updated_processing_markup = float(1)
     updated_sales_markup = float(1)
 
     response = await pay_admin_client.update_company(
@@ -63,7 +63,7 @@ async def test_update_company(  # noqa: WPS210, WPS218
         update_postal_code,
         update_city,
         updated_fx_markup,
-        updated_fx_provider_markup,
+        updated_processing_markup,
         updated_sales_markup,
     )
 
@@ -84,6 +84,6 @@ async def test_update_company(  # noqa: WPS210, WPS218
     assert response["data"]["attributes"]["address"]["city"] == update_city
     assert response["data"]["attributes"]["fxMarkup"] == updated_fx_markup
     assert (
-        response["data"]["attributes"]["fxProviderMarkup"] == updated_fx_provider_markup
+        response["data"]["attributes"]["processingMarkup"] == updated_processing_markup
     )
     assert response["data"]["attributes"]["salesMarkup"] == updated_sales_markup

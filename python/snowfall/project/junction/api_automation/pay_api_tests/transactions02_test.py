@@ -78,17 +78,19 @@ async def test_get_transactions(  # noqa: WPS218
     assert isinstance(first_item["attributes"]["amounts"]["fxMargin"]["currency"], str)
     assert isinstance(first_item["attributes"]["amounts"]["fxMargin"]["amount"], int)
     assert isinstance(
-        first_item["attributes"]["amounts"]["fxProviderMargin"]["currency"],
+        first_item["attributes"]["amounts"]["processingMargin"]["currency"],
         str,
     )
     assert isinstance(
-        first_item["attributes"]["amounts"]["fxProviderMargin"]["amount"],
+        first_item["attributes"]["amounts"]["processingMargin"]["amount"],
         int,
     )
     assert isinstance(first_item["attributes"]["rates"]["fxQuote"], float)
     assert isinstance(first_item["attributes"]["rates"]["fxBuffer"], float)
     assert isinstance(first_item["attributes"]["rates"]["salesMarkup"], float)
     assert isinstance(first_item["attributes"]["rates"]["fxMarkup"], float)
+    assert isinstance(first_item["attributes"]["rates"]["processingMarkup"], float)
+
     assert is_valid_uuid(first_item["relationships"]["conversion"]["data"]["id"])
     assert first_item["relationships"]["conversion"]["data"]["type"] == "conversions"
     assert is_valid_uuid(first_item["relationships"]["payer"]["data"]["id"])

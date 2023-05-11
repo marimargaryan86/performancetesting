@@ -6,7 +6,6 @@ import httpx
 import pytest
 from dateutil import parser
 
-from snowfall.project.junction.api_automation.conftest import EXIT_MSG
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
     is_valid_uuid,
     return_randomized_token,
@@ -22,7 +21,7 @@ logger.setLevel(logging.DEBUG)
 
 
 @pytest.mark.integration()
-async def test_create_transactions(  # noqa: WPS210, WPS213, C901
+async def test_create_transactions(  # noqa: WPS210, WPS213, WPS218, C901
     pay_client: Client,
     pay_admin_client: PayAdminClient,
     get_mongo_config: Mapping[str, Any],
@@ -35,13 +34,13 @@ async def test_create_transactions(  # noqa: WPS210, WPS213, C901
             postal_code="75320",
             city="Uppsala",
             fx_markup=float(0),
-            fx_provider_markup=float(0),
+            processing_markup=float(0),
             sales_markup=float(0),
         )
     except httpx.HTTPStatusError as err:
         logger.info("response_payer err: %s", err.response.headers)
         logger.info("response_payer body: %s", err.response.json())
-        pytest.fail(EXIT_MSG, pytrace=False)
+        pytest.fail(err.response.json(), pytrace=False)
 
     try:
         response_beneficiary = await pay_admin_client.create_company(
@@ -51,13 +50,13 @@ async def test_create_transactions(  # noqa: WPS210, WPS213, C901
             postal_code="75320",
             city="Uppsala",
             fx_markup=float(0),
-            fx_provider_markup=float(0),
+            processing_markup=float(0),
             sales_markup=float(0),
         )
     except httpx.HTTPStatusError as err1:
         logger.info("response_beneficiary err:: %s", err1.response.headers)
         logger.info("response_beneficiary body: %s", err1.response.json())
-        pytest.fail(EXIT_MSG, pytrace=False)
+        pytest.fail(err1.response.json(), pytrace=False)
 
     try:
         response_create_quote = await pay_client.create_quote(
@@ -74,7 +73,7 @@ async def test_create_transactions(  # noqa: WPS210, WPS213, C901
             err2.response.headers,
         )
         logger.info("response_create_quote body: %s", err2.response.json())
-        pytest.fail(EXIT_MSG, pytrace=False)
+        pytest.fail(err2.response.json(), pytrace=False)
 
     logger.info("create_quote: %s", json.dumps(response_create_quote, indent=4))
 
@@ -94,31 +93,69 @@ async def test_create_transactions(  # noqa: WPS210, WPS213, C901
     except httpx.HTTPStatusError as err3:
         logger.info("response err:: %s", err3.response.headers)
         logger.info("response_create_transactions body: %s", err3.response.json())
-        pytest.fail(EXIT_MSG, pytrace=False)
+        pytest.fail(err3.response.json(), pytrace=False)
 
     logger.info(
         "create_transactions: %s",
         json.dumps(response_create_transactions, indent=4),
     )
 
+    rct_data = response_create_transactions["data"]
+
     assert (
-        is_valid_uuid(response_create_transactions["data"]["id"]) is True
+        is_valid_uuid(rct_data["id"]) is True
     ), "transactions uuid must be in valid format"
-    assert response_create_transactions["data"]["type"] == "transactions"
-    assert (
-        response_create_transactions["data"]["attributes"]["externalReference"]
-        == external_reference
-    )
-    assert (
-        response_create_transactions["data"]["attributes"]["invoiceReference"]
-        == invoice_reference
-    )
+    assert rct_data["type"] == "transactions"
+    assert rct_data["attributes"]["externalReference"] == external_reference
+    assert rct_data["attributes"]["invoiceReference"] == invoice_reference
     try:
         is_valid_date = bool(
             parser.parse(
-                response_create_transactions["data"]["attributes"]["createdAt"],
+                rct_data["attributes"]["createdAt"],
             ),
         )
     except parser.ParserError:
         is_valid_date = False
     assert is_valid_date
+    assert isinstance(
+        rct_data["attributes"]["amounts"]["beneficiary"]["currency"],
+        str,
+    )
+    assert isinstance(rct_data["attributes"]["amounts"]["beneficiary"]["amount"], int)
+    assert isinstance(rct_data["attributes"]["amounts"]["quotation"]["currency"], str)
+    assert isinstance(rct_data["attributes"]["amounts"]["quotation"]["amount"], int)
+    assert isinstance(
+        rct_data["attributes"]["amounts"]["baseConverted"]["currency"],
+        str,
+    )
+    assert isinstance(
+        rct_data["attributes"]["amounts"]["baseConverted"]["amount"],
+        int,
+    )
+    assert isinstance(
+        rct_data["attributes"]["amounts"]["salesMargin"]["currency"],
+        str,
+    )
+    assert isinstance(rct_data["attributes"]["amounts"]["salesMargin"]["amount"], int)
+    assert isinstance(rct_data["attributes"]["amounts"]["fxMargin"]["currency"], str)
+    assert isinstance(rct_data["attributes"]["amounts"]["fxMargin"]["amount"], int)
+    assert isinstance(
+        rct_data["attributes"]["amounts"]["processingMargin"]["currency"],
+        str,
+    )
+    assert isinstance(
+        rct_data["attributes"]["amounts"]["processingMargin"]["amount"],
+        int,
+    )
+    assert isinstance(rct_data["attributes"]["rates"]["fxQuote"], float)
+    assert isinstance(rct_data["attributes"]["rates"]["fxBuffer"], float)
+    assert isinstance(rct_data["attributes"]["rates"]["salesMarkup"], float)
+    assert isinstance(rct_data["attributes"]["rates"]["fxMarkup"], float)
+    assert isinstance(rct_data["attributes"]["rates"]["processingMarkup"], float)
+
+    assert is_valid_uuid(rct_data["relationships"]["conversion"]["data"]["id"])
+    assert rct_data["relationships"]["conversion"]["data"]["type"] == "conversions"
+    assert is_valid_uuid(rct_data["relationships"]["payer"]["data"]["id"])
+    assert rct_data["relationships"]["payer"]["data"]["type"] == "companies"
+    assert is_valid_uuid(rct_data["relationships"]["beneficiary"]["data"]["id"])
+    assert rct_data["relationships"]["beneficiary"]["data"]["type"] == "companies"

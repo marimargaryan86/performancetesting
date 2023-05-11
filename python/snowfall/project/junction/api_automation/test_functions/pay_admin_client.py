@@ -28,7 +28,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         postal_code: str,
         city: str,
         fx_markup: float,
-        fx_provider_markup: float,
+        processing_markup: float,
         sales_markup: float,
     ) -> dict[str, Any]:
         payload = {
@@ -43,7 +43,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
                         "city": city,
                     },
                     "fxMarkup": fx_markup,
-                    "fxProviderMarkup": fx_provider_markup,
+                    "processingMarkup": processing_markup,
                     "salesMarkup": sales_markup,
                 },
             },
@@ -138,7 +138,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         postal_code: str,
         city: str,
         fx_markup: float,
-        fx_provider_markup: float,
+        processing_markup: float,
         sales_markup: float,
     ) -> dict[str, Any]:
         payload = {
@@ -153,7 +153,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
                         "city": city,
                     },
                     "fxMarkup": fx_markup,
-                    "fxProviderMarkup": fx_provider_markup,
+                    "processingMarkup": processing_markup,
                     "salesMarkup": sales_markup,
                 },
             },

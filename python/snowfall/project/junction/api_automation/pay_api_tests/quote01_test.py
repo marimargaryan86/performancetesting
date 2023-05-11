@@ -38,7 +38,7 @@ async def test_create_quote(  # noqa: WPS210, WPS218
             postal_code="75320",
             city="Uppsala",
             fx_markup=float(0),
-            fx_provider_markup=float(0),
+            processing_markup=float(0),
             sales_markup=float(0),
         )
     except httpx.HTTPStatusError as err:
@@ -54,7 +54,7 @@ async def test_create_quote(  # noqa: WPS210, WPS218
             postal_code="75320",
             city="Uppsala",
             fx_markup=float(0),
-            fx_provider_markup=float(0),
+            processing_markup=float(0),
             sales_markup=float(0),
         )
     except httpx.HTTPStatusError as err1:
