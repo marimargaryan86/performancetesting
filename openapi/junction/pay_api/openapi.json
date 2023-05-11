@@ -889,7 +889,7 @@
                           }
                         ],
                         "readOnly": true,
-                        "description": "The amount that Junction PAY will be owed"
+                        "description": "The amount that Junction PAY will be owed."
                       },
                       "baseConverted": {
                         "allOf": [
