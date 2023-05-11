@@ -15,7 +15,6 @@ class KarhooConfig(pydantic.BaseModel):
     api_timeout: datetime.timedelta = datetime.timedelta(
         seconds=_DEFAULT_API_TIMEOUT_IN_SECONDS,
     )
-    provider_name: str = "karhoo"
 
 
 class OfferSettings(service.Settings, KarhooConfig):

@@ -51,7 +51,6 @@ class _SatConfig(pydantic.BaseModel):
     api_search_requests_limit: int = 40
     api_search_password: str
     api_booking_token: str
-    provider_name: str = "save_a_train"
 
 
 class _DumpStationsSettings(_SatConfig, service.Settings):

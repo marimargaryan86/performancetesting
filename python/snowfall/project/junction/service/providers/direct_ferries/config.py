@@ -19,7 +19,6 @@ class DfBaseSettings(service.Settings):
     api_timeout: datetime.timedelta = datetime.timedelta(
         seconds=_API_TIMEOUT_DEFAULT_SECONDS,
     )
-    provider_name: str = "direct_ferries"
 
 
 class OffersSettings(DfBaseSettings, service.OffersSettings):

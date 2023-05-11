@@ -27,6 +27,7 @@ _OFFERS = "offers"
 
 class OffersSettings(service.OffersSettings, config.DistribusionConfig):
     ttl: datetime.timedelta = datetime.timedelta(minutes=config.DEFAULT_TTL_IN_MINUTES)
+    reseller_providers: dict[str, list[str]] = {}
 
 
 _Impl = offers.OfferSearchImplementation[

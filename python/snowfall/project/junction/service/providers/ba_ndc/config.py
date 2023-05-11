@@ -12,7 +12,6 @@ class BaNdcConfig(pydantic.BaseModel):
     api_base_url: pydantic.AnyUrl
     api_key: str
     http_timeout: int = 30
-    provider_name: str = "ba_ndc"
 
 
 class OffersSettings(service.OffersSettings, BaNdcConfig):

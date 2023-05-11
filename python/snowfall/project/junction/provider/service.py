@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import contextlib
 import dataclasses
-from typing import TYPE_CHECKING, Awaitable, Callable, TypeVar
+from typing import TYPE_CHECKING, Awaitable, Callable, List, TypeVar
 
 import pydantic
 from google.protobuf import message
@@ -24,6 +24,7 @@ class OffersSettings(service.Settings):
     amqp_dsn: pydantic.AnyUrl
     redis_dsn: pydantic.AnyUrl
     provider_company_id: str
+    reseller_providers: dict[str, List[str]]
 
 
 class PriceQuoteSettings(service.Settings):
@@ -69,6 +70,8 @@ def _offers_command(
                 implementation=await factory(app, connection, redis_conn, stack),
                 app_name=app.name,
                 pay_company_id=app.settings.provider_company_id,
+                provider_name=app.name,
+                reseller_providers=app.settings.reseller_providers,
             )
 
             await trip_search_consumer.consume()

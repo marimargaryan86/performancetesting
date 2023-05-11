@@ -1,6 +1,6 @@
 import dataclasses
 import datetime
-from typing import AsyncIterator, Callable, Generic, Sequence, TypeVar
+from typing import AsyncIterator, Callable, Generic, Mapping, Sequence, TypeVar
 
 from aiostream import stream
 from google.protobuf import message
@@ -99,17 +99,21 @@ class TripOfferSearcher(Generic[_SearchCriteriaTask, _SearchCriteria]):
 
 
 class TripOfferSearchConsumer(Generic[_SearchCriteriaTask, _SearchCriteria]):
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
         consumer: amqp_consumer.Consumer[offers_amqp_pb2.TripOfferSearchTask],
         producer: amqp_producer.Producer,
         trip_offer_searcher: TripOfferSearcher[_SearchCriteriaTask, _SearchCriteria],
         pay_company_id: str,
+        provider_name: str,
+        reseller_providers: Mapping[str, Sequence[str]],
     ):
         self._consumer = consumer
         self._producer = producer
         self._trip_offer_searcher = trip_offer_searcher
         self._pay_company_id = pay_company_id
+        self._provider_name = provider_name
+        self._reseller_providers = reseller_providers
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -118,10 +122,16 @@ class TripOfferSearchConsumer(Generic[_SearchCriteriaTask, _SearchCriteria]):
         self,
         amqp_message: amqp_types.Message[offers_amqp_pb2.TripOfferSearchTask],
     ) -> None:
+        if self._provider_blocked_for_reseller(amqp_message.body.reseller_id):
+            return
+
         try:
             await self._publish_trip_offer_search_results(amqp_message)
         except repository.OfferCacheLockError:
             await amqp_message.nack(requeue=True)
+
+    def _provider_blocked_for_reseller(self, reseller_id: str) -> bool:
+        return self._provider_name not in self._reseller_providers.get(reseller_id, [])
 
     async def _publish_trip_offer_search_results(
         self,
@@ -142,12 +152,14 @@ class TripOfferSearchConsumer(Generic[_SearchCriteriaTask, _SearchCriteria]):
             )
 
 
-def create_trip_offer_search_consumer(
+def create_trip_offer_search_consumer(  # noqa:WPS211
     amqp_connection: amqp_types.Connection,
     redis_client: redis.Client[bytes],
     implementation: OfferSearchImplementation[_SearchCriteriaTask, _SearchCriteria],
     app_name: str,
     pay_company_id: str,
+    provider_name: str,
+    reseller_providers: Mapping[str, Sequence[str]],
 ) -> TripOfferSearchConsumer[_SearchCriteriaTask, _SearchCriteria]:
     producer = amqp_producer.Producer(
         connection=amqp_connection,
@@ -181,6 +193,8 @@ def create_trip_offer_search_consumer(
             ),
         ),
         pay_company_id=pay_company_id,
+        provider_name=provider_name,
+        reseller_providers=reseller_providers,
     )
 
 

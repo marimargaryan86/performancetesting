@@ -13,7 +13,6 @@ class DuffelConfig(pydantic.BaseModel):
     api_key: str
     api_version: str = "v1"
     http_timeout: int = 30
-    provider_name: str = "duffel"
 
 
 class PricingSettings(DuffelConfig, service.Settings):
