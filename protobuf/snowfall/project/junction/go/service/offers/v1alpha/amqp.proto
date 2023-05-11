@@ -10,6 +10,7 @@ message TripOfferSearchTask {
   string offer_search_id = 1;
   TripOfferSearch search = 2;
   string session_token = 3;
+  string reseller_id = 4;
 }
 
 message TripOfferSearchResult {

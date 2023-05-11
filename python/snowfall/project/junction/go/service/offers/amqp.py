@@ -27,6 +27,7 @@ class OfferSearchProducer(object):
                     offer_search_id=offer_search.id,
                     search=offer_search.trip,
                     session_token=offer_search.session_token,
+                    reseller_id=offer_search.reseller_id,
                 ),
                 routing_key=self._routing_key,
                 expiration=self._ttl,
