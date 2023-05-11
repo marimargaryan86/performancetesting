@@ -57,6 +57,17 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         response.raise_for_status()
         return response.json()
 
+    async def get_account(
+        self,
+        account_id: str,
+    ) -> dict[str, Any]:
+        response = await self.client.get(
+            "/accounts/{0}".format(account_id),
+        )
+
+        response.raise_for_status()
+        return response.json()
+
     async def get_accounts(
         self,
         limit: int | None = None,

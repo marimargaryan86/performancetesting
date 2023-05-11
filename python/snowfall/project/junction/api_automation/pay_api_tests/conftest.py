@@ -191,9 +191,23 @@ async def pay_get_accounts(
     except httpx.HTTPStatusError as err:
         logger.info("response_get_accounts err: %s", err.response.headers)
         logger.info("response_get_accounts body: %s", err.response.json())
-        pytest.fail(EXIT_MSG, pytrace=False)
+        pytest.fail(err.response.json(), pytrace=False)
     logger.info("get_accounts: %s", json.dumps(response_get_accounts, indent=4))
     return response_get_accounts
+
+
+@pytest.fixture()
+async def pay_list_accounts(
+    pay_admin_client: PayAdminClient,
+) -> dict[str, Any]:
+    try:
+        response_list_accounts = await pay_admin_client.get_accounts()
+    except httpx.HTTPStatusError as err:
+        logger.info("response_list_accounts err: %s", err.response.headers)
+        logger.info("response_list_accounts body: %s", err.response.json())
+        pytest.fail(err.response.json(), pytrace=False)
+    logger.info("list_accounts: %s", json.dumps(response_list_accounts, indent=4))
+    return response_list_accounts
 
 
 @pytest.fixture()
