@@ -108,7 +108,7 @@ def _check_new_company_existence_in_all_companies(  # noqa: WPS218
             assert flat_company["address"]["city"] == flatten_payload["address"]["city"]
             assert flat_company["fxMarkup"] == flatten_payload["fxMarkup"]
             assert (
-                flat_company["fxProviderMarkup"] == flatten_payload["fxProviderMarkup"]
+                flat_company["processingMarkup"] == flatten_payload["processingMarkup"]
             )
             assert flat_company["salesMarkup"] == flatten_payload["salesMarkup"]
             break
