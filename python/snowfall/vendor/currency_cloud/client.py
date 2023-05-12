@@ -125,6 +125,22 @@ class CurrencyCloudAuth(httpx.Auth):
             ).json()
 
 
+def encode_arrays(
+    payload: Mapping[str, Any] | None,
+) -> Mapping[str, Any] | None:
+    if payload is not None:
+        encoded_payload = {}
+
+        for key, _ in payload.items():
+            if isinstance(payload[key], list):
+                encoded_payload["{0}[]".format(key)] = payload[key]
+            else:
+                encoded_payload[key] = payload[key]
+
+        return encoded_payload
+    return None
+
+
 class PaymentClient(object):  # noqa: WPS214
     def __init__(
         self,
@@ -288,7 +304,7 @@ class PaymentClient(object):  # noqa: WPS214
             method=method,
             url=url,
             params=query_parameters,
-            data=payload,
+            data=encode_arrays(payload),
         )
 
         if 400 <= response.status_code < 500:  # noqa: WPS432
