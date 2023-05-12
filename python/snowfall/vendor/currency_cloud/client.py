@@ -200,7 +200,11 @@ class PaymentClient(object):  # noqa: WPS214
             ),
         )
 
-    async def get_balances(self, contact_id: str) -> Sequence[BalanceResponse]:
+    async def get_balances(
+        self,
+        contact_id: str,
+        per_page: int = 25,
+    ) -> Sequence[BalanceResponse]:
         balances = await self._make_request(
             method=_METHOD_GET,
             url="/balances/find",
@@ -208,6 +212,7 @@ class PaymentClient(object):  # noqa: WPS214
                 "on_behalf_of": contact_id,
                 "order": "amount",
                 "order_asc_desc": "asc",
+                "per_page": per_page,
             },
         )
         return [BalanceResponse(**balance) for balance in balances["balances"]]
