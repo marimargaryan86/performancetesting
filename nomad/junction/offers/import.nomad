@@ -114,6 +114,7 @@ REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis:
 PAY_ADMIN_USERNAME={{ .Data.data.pay_admin_username }}
 PAY_ADMIN_PASSWORD={{ .Data.data.pay_admin_password }}
 {{ end }}
+RESELLER_DISABLED_OPERATORS={{keyOrDefault "${var.environment}/providers/reseller-disabled-operators" "{}" | toJSON }}
 EOH
         destination = "services.env"
         env         = true
