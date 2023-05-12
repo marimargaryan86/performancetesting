@@ -147,6 +147,7 @@ class TripOfferSearchConsumer(Generic[_SearchCriteriaTask, _SearchCriteria]):
                     offer_search_id=amqp_message.body.offer_search_id,
                     offer=offer_group,
                     provider_company_id=self._pay_company_id,
+                    provider_name=self._provider_name,
                 ),
                 routing_key="offers.result.trip",
             )
