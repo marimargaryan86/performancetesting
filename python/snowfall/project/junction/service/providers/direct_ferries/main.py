@@ -267,7 +267,7 @@ async def _static(app: service.Application[config.StaticSettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="direct_ferries")
+    entrypoint = service.Entrypoint(name="direct-ferries")
 
     entrypoint.enable_offers(config.OffersSettings, _offers)
     entrypoint.enter_with_commands(

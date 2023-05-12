@@ -7,7 +7,7 @@ from snowfall.project.junction.service.providers.ba_ndc import (
 )
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="ba_ndc")
+    entrypoint = service.Entrypoint(name="ba-ndc")
 
     entrypoint.enable_offers(config.OffersSettings, offers.offers_factory)
     entrypoint.enter_with_commands(

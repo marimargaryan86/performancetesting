@@ -423,7 +423,7 @@ async def _load_train_stations() -> list[train_stations.TrainStation]:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="save_a_train")
+    entrypoint = service.Entrypoint(name="save-a-train")
 
     entrypoint.enable_offers(_OffersSettings, _offers)
     entrypoint.enter_with_commands(
