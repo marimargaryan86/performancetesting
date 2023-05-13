@@ -98,9 +98,9 @@ class Proxy(object):
             *(pop_headers or []),
         ]
 
-    def to_route(self, prefix: str = "") -> routing.Route:
+    def to_route(self) -> routing.Route:
         return routing.Route(
-            "/{0}".format(os.path.join(prefix, "{path:path}").lstrip("/")),
+            "/{0}".format(os.path.join(self._prefix, "{path:path}").lstrip("/")),
             endpoint=self._route,
             methods=["POST", "GET", "PATCH", "DELETE"],
         )

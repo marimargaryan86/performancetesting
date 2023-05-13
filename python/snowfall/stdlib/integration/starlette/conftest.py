@@ -10,7 +10,7 @@ from snowfall.stdlib.integration.starlette import application
 
 
 def _create_app(
-    openapi_path: pathlib.Path,
+    openapi_path: pathlib.Path | None,
     custom_middlewares: Sequence[Middleware] | None = None,
     validate_response: bool = True,
 ) -> applications.Starlette:
@@ -32,6 +32,11 @@ def test_app() -> applications.Starlette:
 
 
 @pytest.fixture()
+def test_app_without_spec() -> applications.Starlette:
+    return _create_app(openapi_path=None)
+
+
+@pytest.fixture()
 def test_app_without_response_validation() -> applications.Starlette:
     return _create_app(
         openapi_path=pathlib.Path(
@@ -49,6 +54,20 @@ async def test_client(
         base_url="https://example.com",
         transport=httpx.ASGITransport(
             app=test_app,  # type: ignore[arg-type]
+            raise_app_exceptions=False,
+        ),
+    ) as client:
+        yield client
+
+
+@pytest.fixture()
+async def test_client_without_spec(
+    test_app_without_spec: applications.Starlette,
+) -> AsyncIterator[httpx.AsyncClient]:
+    async with httpx.AsyncClient(
+        base_url="https://example.com",
+        transport=httpx.ASGITransport(
+            app=test_app_without_spec,  # type: ignore[arg-type]
             raise_app_exceptions=False,
         ),
     ) as client:
