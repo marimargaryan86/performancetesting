@@ -108,7 +108,7 @@ class Proxy(object):
     def _clean_headers(self, request: requests.Request) -> dict[str, Any]:
         headers = dict(request.headers)
         for header in self._pop_headers:
-            headers.pop(header)
+            headers.pop(header, None)
         return headers
 
     async def _route(
