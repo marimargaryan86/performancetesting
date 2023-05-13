@@ -1,22 +1,16 @@
 syntax = "proto3";
 
-package snowfall.stdlib.v1alpha;
+package snowfall.project.junction.go.v1alpha;
 
 import "google/protobuf/timestamp.proto";
 import "snowfall/stdlib/v1alpha/latlng.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha";
-
-message Cursor {
-  string id = 1;
-  string filter = 2;
-  string digest = 3;
-}
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1alpha";
 
 message Point {
   string ref = 1;
   string name = 2;
-  LatLng coordinates = 3;
+  snowfall.stdlib.v1alpha.LatLng coordinates = 3;
   string time_zone = 4;
 }
 

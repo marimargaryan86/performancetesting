@@ -8,8 +8,8 @@ from typing import AbstractSet, Sequence
 
 from google.protobuf import timestamp_pb2
 
+from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import models_pb2
 from snowfall.vendor.duffel.models.offer import Offer
 
 

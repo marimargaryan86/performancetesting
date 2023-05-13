@@ -8,6 +8,7 @@ from snowfall.project.junction.go.service.offers.v1alpha import (
 from snowfall.project.junction.go.service.orders.v1alpha import (
     amqp_pb2 as orders_amqp_pb2,
 )
+from snowfall.project.junction.go.v1alpha import seat_maps_pb2
 from snowfall.project.junction.service.providers.ask2go import (
     booking,
     cache,
@@ -17,7 +18,6 @@ from snowfall.project.junction.service.providers.ask2go import (
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.amqp import consumer, producer
 from snowfall.stdlib.transport.amqp import types as amqp_types
-from snowfall.stdlib.v1alpha import seat_maps_pb2
 from snowfall.vendor.ask2go import client
 from snowfall.vendor.ask2go.models import seat_map
 

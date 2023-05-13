@@ -3,12 +3,12 @@ from typing import Iterator, Sequence
 from snowfall.project.junction.go.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
+from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.project.junction.provider import segment_grouper
 from snowfall.project.junction.service.providers.direct_ferries import port, route
 from snowfall.project.junction.service.providers.direct_ferries.v1alpha import amqp_pb2
 from snowfall.stdlib import h3, time
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import models_pb2
 
 
 class CriteriaGenerator(object):

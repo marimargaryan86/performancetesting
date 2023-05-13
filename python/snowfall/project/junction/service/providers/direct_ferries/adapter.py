@@ -7,11 +7,12 @@ import structlog
 from snowfall.project.junction.go.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
+from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.project.junction.service.providers.direct_ferries import cache, port
 from snowfall.project.junction.service.providers.direct_ferries.v1alpha import amqp_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2
 from snowfall.vendor.direct_ferries import client, errors
 from snowfall.vendor.direct_ferries.models import leg, passenger, quote, request
 

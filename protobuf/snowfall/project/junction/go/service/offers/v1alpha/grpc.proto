@@ -3,7 +3,7 @@ syntax = "proto3";
 package snowfall.project.junction.go.service.offers.v1alpha;
 
 import "snowfall/project/junction/go/service/offers/v1alpha/models.proto";
-import "snowfall/stdlib/v1alpha/models.proto";
+import "snowfall/project/junction/go/v1alpha/models.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/offers/v1alpha";
 
@@ -71,7 +71,7 @@ message ListOffersRequest {
     ListOfIds offer_ids = 4;
     ListOfIds offer_search_ids = 6;
   }
-  repeated snowfall.stdlib.v1alpha.CabinClass.Type cabin_class_types = 5;
+  repeated snowfall.project.junction.go.v1alpha.CabinClass.Type cabin_class_types = 5;
 }
 
 message ListOfIds {

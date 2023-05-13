@@ -10,8 +10,8 @@ from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as of
 from snowfall.project.junction.go.service.orders.v1alpha import (
     models_pb2 as orders_models,
 )
+from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import models_pb2
 from snowfall.vendor.ask2go.models import common
 
 _PENALTY_TYPE_MAPPING = types.MappingProxyType(

@@ -2,7 +2,7 @@ package main
 
 import (
 	places "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/places/v1alpha"
-	v1alpha "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"
+	v1alpha "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1alpha"
 )
 
 /*

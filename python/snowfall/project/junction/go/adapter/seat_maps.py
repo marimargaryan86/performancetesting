@@ -4,8 +4,8 @@ import abc
 import asyncio
 from typing import Sequence
 
+from snowfall.project.junction.go.v1alpha import seat_maps_pb2
 from snowfall.stdlib.transport.amqp import rpc_client
-from snowfall.stdlib.v1alpha import seat_maps_pb2
 
 
 class Client(abc.ABC):

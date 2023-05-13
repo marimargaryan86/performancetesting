@@ -17,6 +17,7 @@ from snowfall.project.junction.go.service.orders.v1alpha import (
 from snowfall.project.junction.go.service.orders.v1alpha import (
     models_pb2 as order_models_pb2,
 )
+from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.project.junction.provider import cabin_classes
 from snowfall.project.junction.provider import notifications as base_notifications
 from snowfall.project.junction.service.providers.save_a_train import (
@@ -28,7 +29,7 @@ from snowfall.project.junction.service.providers.save_a_train.v1alpha import amq
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.amqp import producer
-from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2
 from snowfall.vendor.save_a_train import client, enums, exceptions
 from snowfall.vendor.save_a_train.models import (
     booking,

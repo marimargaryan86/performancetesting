@@ -10,13 +10,14 @@ import pytest
 from bson import json_util
 from redis import asyncio as aioredis
 
+from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.project.junction.service.providers.duffel import cache
 from snowfall.project.junction.service.providers.duffel.search import adapter, parser
 from snowfall.project.junction.service.providers.duffel.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2
 from snowfall.vendor.duffel import client
 from snowfall.vendor.duffel.models.offer import Offer
 

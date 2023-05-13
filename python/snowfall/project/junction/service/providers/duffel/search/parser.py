@@ -8,10 +8,11 @@ import more_itertools
 from snowfall.project.junction.go.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
+from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.project.junction.service.providers.duffel import cache, enums
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2
 from snowfall.vendor.duffel.models.offer import Offer
 from snowfall.vendor.duffel.models.offer_slice import OfferSlice, OfferSliceSegment
 

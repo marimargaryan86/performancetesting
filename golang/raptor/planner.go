@@ -3,7 +3,7 @@ package raptor
 import (
 	"git.snowfall.se/junction/junction/golang/legacy"
 	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/planner/v1alpha"
-	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"
+	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1alpha"
 	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"

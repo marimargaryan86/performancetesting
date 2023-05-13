@@ -1,8 +1,8 @@
 import httpx
 
+from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import testing
-from snowfall.stdlib.v1alpha import models_pb2
 
 
 class TestCabins(object):

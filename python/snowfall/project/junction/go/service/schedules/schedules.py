@@ -3,9 +3,9 @@ from typing import Sequence
 
 from pymongo import IndexModel
 
+from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
-from snowfall.stdlib.v1alpha import models_pb2
 
 LEGS_ID = "legs._id"
 

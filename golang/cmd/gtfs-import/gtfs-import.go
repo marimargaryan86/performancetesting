@@ -36,7 +36,8 @@ import (
 
 	"git.snowfall.se/junction/junction/golang/gtfs"
 	v1alphaLocations "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/places/v1alpha"
-	v1alpha "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"
+	v1alpha "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1alpha"
+	v1alphaStdlib "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"
 	"git.snowfall.se/junction/junction/golang/protoio"
 	"github.com/bits-and-blooms/bloom"
 	"github.com/catmullet/tz"
@@ -430,7 +431,7 @@ func destinationId(destination *gtfs.Stop, stopTz map[string]string) *v1alpha.Po
 	return &v1alpha.Point{
 		Ref:  destination.Id,
 		Name: destination.Name,
-		Coordinates: &v1alpha.LatLng{
+		Coordinates: &v1alphaStdlib.LatLng{
 			Latitude:  destination.Latitude,
 			Longitude: destination.Longitude,
 		},
@@ -442,7 +443,7 @@ func originId(origin *gtfs.Stop, stopTz map[string]string) *v1alpha.Point {
 	return &v1alpha.Point{
 		Ref:  origin.Id,
 		Name: origin.Name,
-		Coordinates: &v1alpha.LatLng{
+		Coordinates: &v1alphaStdlib.LatLng{
 			Latitude:  origin.Latitude,
 			Longitude: origin.Longitude,
 		},
@@ -846,7 +847,7 @@ func main() {
 				newLocation := v1alphaLocations.Location{
 					Id:   uuid.NewSHA1(fileNamespace, []byte(stop.Id)).String(),
 					Name: stop.Name,
-					Coordinates: &v1alpha.LatLng{
+					Coordinates: &v1alphaStdlib.LatLng{
 						Latitude:  stop.Latitude,
 						Longitude: stop.Longitude,
 					},

@@ -7,12 +7,13 @@ import structlog
 from snowfall.project.junction.go.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
+from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.project.junction.service.providers.distribusion import cache
 from snowfall.project.junction.service.providers.distribusion.search import amenities
 from snowfall.project.junction.service.providers.distribusion.v1alpha import amqp_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2
 from snowfall.vendor.distribusion import client
 from snowfall.vendor.distribusion.models import connections
 from snowfall.vendor.distribusion.models.criterias import FindConnectionsCriteria

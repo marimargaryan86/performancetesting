@@ -9,6 +9,7 @@ from snowfall.project.junction.go.service.offers.v1alpha import (
     amqp_pb2 as offers_amqp_pb2,
 )
 from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
+from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.project.junction.provider import repository
 from snowfall.project.junction.provider.segment_matcher import SegmentMatcher
 from snowfall.stdlib.persistence.redis import types as redis
@@ -16,7 +17,6 @@ from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer as amqp_producer
 from snowfall.stdlib.transport.amqp import trackable
 from snowfall.stdlib.transport.amqp import types as amqp_types
-from snowfall.stdlib.v1alpha import models_pb2
 
 _SearchCriteriaTask = TypeVar("_SearchCriteriaTask", bound=message.Message)
 _SearchCriteria = TypeVar("_SearchCriteria", bound=object)

@@ -3,7 +3,7 @@ from typing import Sequence
 
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2, trips_pb2_grpc
-from snowfall.stdlib.v1alpha import models_pb2
+from snowfall.project.junction.go.v1alpha import models_pb2
 
 
 class Client(abc.ABC):

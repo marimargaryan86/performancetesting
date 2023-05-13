@@ -7,7 +7,7 @@ from typing import Any
 import orjson
 from google.protobuf import text_format
 
-from snowfall.stdlib.v1alpha.models_pb2 import Cursor
+from snowfall.stdlib.v1alpha.cursor_pb2 import Cursor
 
 _DIGEST_KEY = b"df8870b0-49d2-4777-994b-fa380b564df0"
 _DIGEST_SIZE = 8  # It doesn't need to be super secure, just tamper-proofed enough.

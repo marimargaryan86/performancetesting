@@ -26,7 +26,8 @@ from snowfall.project.junction.go.adapter import (
 from snowfall.project.junction.go.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
-from snowfall.stdlib.v1alpha import latlng_pb2, models_pb2
+from snowfall.project.junction.go.v1alpha import models_pb2
+from snowfall.stdlib.v1alpha import latlng_pb2
 
 
 @pytest.fixture()

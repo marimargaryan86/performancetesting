@@ -4,8 +4,8 @@ package snowfall.project.junction.go.service.orders.v1alpha;
 
 import "google/protobuf/timestamp.proto";
 import "snowfall/project/junction/go/service/offers/v1alpha/models.proto";
+import "snowfall/project/junction/go/v1alpha/models.proto";
 import "snowfall/stdlib/v1alpha/date.proto";
-import "snowfall/stdlib/v1alpha/models.proto";
 import "snowfall/stdlib/v1alpha/money.proto";
 import "snowfall/stdlib/v1alpha/phone_number.proto";
 import "snowfall/stdlib/v1alpha/postal_address.proto";
@@ -120,5 +120,5 @@ message TripOptionDetails {
   string id = 3;
   string booking_id = 4;
   snowfall.project.junction.go.service.offers.v1alpha.OfferSegment segment = 1;
-  snowfall.stdlib.v1alpha.CabinClass cabin_class = 2;
+  snowfall.project.junction.go.v1alpha.CabinClass cabin_class = 2;
 }

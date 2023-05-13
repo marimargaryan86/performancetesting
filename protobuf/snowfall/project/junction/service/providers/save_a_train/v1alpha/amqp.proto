@@ -2,15 +2,15 @@ syntax = "proto3";
 
 package snowfall.project.junction.service.providers.save_a_train.v1alpha;
 
+import "snowfall/project/junction/go/v1alpha/models.proto";
 import "snowfall/stdlib/v1alpha/datetime.proto";
-import "snowfall/stdlib/v1alpha/models.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/providers/save_a_train/v1alpha";
 
 message SearchCriteriaTask {
   reserved 1, 4;
   reserved "offer_search_id", "session_token";
-  repeated snowfall.stdlib.v1alpha.Segment segments = 2;
+  repeated snowfall.project.junction.go.v1alpha.Segment segments = 2;
   Criteria criteria = 3;
 }
 
@@ -24,7 +24,7 @@ message Criteria {
 }
 
 message CabinClassMapping {
-  snowfall.stdlib.v1alpha.CabinClass.Type type = 1;
+  snowfall.project.junction.go.v1alpha.CabinClass.Type type = 1;
   string mapping = 2;
 }
 

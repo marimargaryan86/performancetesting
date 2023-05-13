@@ -1,8 +1,8 @@
 import structlog
 from pymongo import IndexModel
 
+from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.stdlib.persistence.mongo import mixins, repository
-from snowfall.stdlib.v1alpha import models_pb2
 
 
 class CabinMappingRepository(

@@ -9,7 +9,7 @@ from snowfall.project.junction.go.service.schedules.v1alpha import (
     schedules_pb2,
     schedules_pb2_grpc,
 )
-from snowfall.stdlib.v1alpha import models_pb2
+from snowfall.project.junction.go.v1alpha import models_pb2
 
 
 class TestDictClient(object):

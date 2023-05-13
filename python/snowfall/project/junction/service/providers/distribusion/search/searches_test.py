@@ -4,6 +4,7 @@ import zoneinfo
 from snowfall.project.junction.go.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
+from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.project.junction.service.providers.distribusion.conftest import (
     disable_by_default,
 )
@@ -12,7 +13,6 @@ from snowfall.project.junction.service.providers.distribusion.search.adapter imp
 )
 from snowfall.project.junction.service.providers.distribusion.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import models_pb2
 
 _DEFAULT_PASSENGER_AGE = 40
 _DEPARTURE_IN_DAYS = 11

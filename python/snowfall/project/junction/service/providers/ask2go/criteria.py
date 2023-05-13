@@ -8,13 +8,13 @@ import more_itertools
 from snowfall.project.junction.go.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
+from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.project.junction.provider import airports, segment_grouper
 from snowfall.project.junction.service.providers.ask2go.v1alpha import (
     amqp_pb2 as provider_amqp_pb2,
 )
 from snowfall.stdlib import h3
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import models_pb2
 from snowfall.vendor.ask2go import enums
 from snowfall.vendor.ask2go.models import common
 

@@ -22,7 +22,7 @@ import (
 	"time"
 
 	plannerv1alpha "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/planner/v1alpha"
-	v1alpha "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"
+	v1alpha "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1alpha"
 	"git.snowfall.se/junction/junction/golang/protoio"
 	"github.com/google/uuid"
 	"github.com/schollz/progressbar/v3"

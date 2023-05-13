@@ -3,7 +3,7 @@ import base64
 import pytest
 
 from snowfall.stdlib.persistence import cursor
-from snowfall.stdlib.v1alpha import models_pb2
+from snowfall.stdlib.v1alpha import cursor_pb2
 
 
 def test_valid_cursor() -> None:
@@ -28,7 +28,7 @@ def test_invalid_protobuf_string() -> None:
 
 
 def test_invalid_digest() -> None:
-    cursor_obj = models_pb2.Cursor(id="foobar", filter="foobar", digest="foobar")
+    cursor_obj = cursor_pb2.Cursor(id="foobar", filter="foobar", digest="foobar")
 
     with pytest.raises(cursor.CursorError):
         cursor.unmarshal(cursor.marshal(cursor_obj))

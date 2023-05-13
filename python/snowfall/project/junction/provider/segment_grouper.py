@@ -6,9 +6,9 @@ from typing import Iterable, Iterator, Optional, Sequence
 
 import more_itertools
 
+from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.stdlib import h3
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import models_pb2
 
 
 @dataclass(frozen=True)

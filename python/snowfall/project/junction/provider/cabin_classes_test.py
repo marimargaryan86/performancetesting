@@ -2,8 +2,8 @@ import mongomock_motor
 import pytest
 from motor import motor_asyncio
 
+from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.project.junction.provider import cabin_classes
-from snowfall.stdlib.v1alpha import models_pb2
 
 
 @pytest.fixture()
