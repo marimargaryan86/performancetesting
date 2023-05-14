@@ -114,7 +114,12 @@
           }
         },
         "operationId": "get-validation",
-        "x-internal": true
+        "x-internal": true,
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/default-boolean"
+          }
+        ]
       },
       "post": {
         "summary": "",
@@ -166,6 +171,19 @@
     }
   },
   "components": {
+    "parameters": {
+      "default-boolean": {
+        "name": "defaultBoolean",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "boolean",
+          "default": true,
+          "example": true
+        },
+        "description": "A limit on the number of objects to be returned, between 1 and 100."
+      }
+    },
     "responses": {
       "BadRequest": {
         "description": "Bad Request",
