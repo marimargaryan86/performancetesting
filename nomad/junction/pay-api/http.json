@@ -16,7 +16,7 @@
       "traefik_host_URL": "api.pay.junction.travel",
       "traefik_headers_accesscontrolalloworiginlist": "https://api.pay.junction.travel",
       "traefik_headers_accessControlAllowHeaders": "*",
-      "cc_address": "https://api.currencycloud.com/v2/"
+      "cc_address": "https://api.currencycloud.com/v2"
     }
   }
 }
