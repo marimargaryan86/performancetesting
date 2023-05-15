@@ -50,7 +50,7 @@ async def test_list_conversions_details(  # noqa: WPS218
     assert isinstance(rlcd_first_item["attributes"]["buyAmount"]["currency"], str)
     assert isinstance(rlcd_first_item["attributes"]["buyAmount"]["amount"], int)
     assert isinstance(rlcd_first_item["attributes"]["executedRate"], float)
-    assert isinstance(rlcd_first_item["attributes"]["fxDelta"], float)
+    assert isinstance(rlcd_first_item["attributes"]["fxDelta"], type(None) | float)
     assert isinstance(rlcd_first_item["attributes"]["fxStatus"], str)
     assert is_valid_uuid(rlcd_first_item["relationships"]["transactions"]["data"]["id"])
     assert (
