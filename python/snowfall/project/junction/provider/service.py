@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import contextlib
 import dataclasses
-from typing import TYPE_CHECKING, Awaitable, Callable, List, TypeVar
+from typing import TYPE_CHECKING, Awaitable, Callable, TypeVar
 
 import pydantic
 from google.protobuf import message
@@ -24,7 +24,7 @@ class OffersSettings(service.Settings):
     amqp_dsn: pydantic.AnyUrl
     redis_dsn: pydantic.AnyUrl
     provider_company_id: str
-    reseller_providers: dict[str, List[str]]
+    reseller_providers: dict[str, list[str]]
 
 
 class PriceQuoteSettings(service.Settings):

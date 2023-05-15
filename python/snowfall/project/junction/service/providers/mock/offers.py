@@ -1,119 +1,115 @@
+import dataclasses
 import datetime
-import itertools
 from collections.abc import AsyncIterator
+from typing import Sequence
 
-import pydantic
+import faker
+import more_itertools
+from google.protobuf import message
 
-from snowfall.project.junction.go.service.offers.v1alpha import amqp_pb2
 from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
-from snowfall.stdlib import money, service, string
+from snowfall.project.junction.go.v1alpha import models_pb2 as common_pb2
+from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.transport.amqp import consumer, producer, types
+
+BRAND_NAME = "BASIC"
+_TTL = datetime.timedelta(minutes=45)
 
 
-class OffersSettings(service.Settings):
-    amqp_dsn: pydantic.AnyUrl
+@dataclasses.dataclass(frozen=True)
+class Criteria(message.Message):
+    segments: Sequence[common_pb2.Segment]
+
+    def __str__(self) -> str:
+        return "segments={0}".format(str(self.segments))
 
 
-class OffersMockClient(object):
-    async def search(
-        self,
-        search: amqp_pb2.TripOfferSearchTask,
-    ) -> AsyncIterator[offers_pb2.OfferGroup]:
-        segments = itertools.chain(*[tr.segments for tr in search.search.trips])
+def criteria_task_generator(search: offers_pb2.TripOfferSearch) -> list[Criteria]:
+    return [criteria for trip in search.trips for criteria in _trip_to_criteria(trip)]
 
-        yield offers_pb2.OfferGroup(
+
+def criteria_generator(search: Criteria) -> Criteria:
+    return search
+
+
+def cache_key(search: Criteria) -> str:
+    return string.uuid()
+
+
+async def offer_group_generator(
+    search: Criteria,
+) -> AsyncIterator[offers_pb2.OfferGroup]:
+    fake = faker.Faker()
+    expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + _TTL
+    offer_segments = [
+        offers_pb2.OfferSegment(
             id=string.uuid(),
-            offers=[
-                offers_pb2.Offer(
-                    id="FOO",
-                    segment_details=[
-                        offers_pb2.OfferSegmentDetails(
-                            id=segment.id,
-                        )
-                        for segment in segments
-                    ],
-                    price=money.from_string(
-                        string_amount="13.37",
-                        currency=money.Currency("EUR"),
-                    ).protobuf(),
-                ),
-            ],
-            segments=[
-                offers_pb2.OfferSegment(
-                    id=segment.id,
-                    legs=[
-                        offers_pb2.OfferSegmentLeg(
-                            id=leg.id,
-                            origin=leg.origin,
-                            destination=leg.destination,
-                            departure_at=leg.departure_at,
-                            arrival_at=leg.arrival_at,
-                        ),
-                    ],
-                    vehicle=offers_pb2.Vehicle(
-                        number="123",
-                        equipment="B52",
-                    ),
-                    operator="SK",
-                    vendor="BA",
-                    terminal="5",
+            legs=[
+                offers_pb2.OfferSegmentLeg(
+                    id=string.uuid(),
+                    origin=leg.origin,
+                    destination=leg.destination,
+                    departure_at=leg.departure_at,
+                    arrival_at=leg.arrival_at,
                 )
-                for segment in segments
                 for leg in segment.legs
             ],
-            expires_at=protobuf.datetime_to_protobuf(
-                datetime.datetime.now(
-                    tz=datetime.timezone.utc,
-                )
-                + datetime.timedelta(minutes=15),
+            operator=fake.lexify(text="??").upper(),
+            vendor=fake.lexify(text="??").upper(),
+            vehicle=offers_pb2.Vehicle(
+                number=fake.numerify(text="%##"),
             ),
+            type=more_itertools.first(segment.legs).type,
         )
+        for segment in search.segments
+    ]
 
-
-class TripSearchConsumer(object):
-    def __init__(
-        self,
-        consumer_obj: consumer.Consumer[amqp_pb2.TripOfferSearchTask],
-        producer_obj: producer.Producer,
-        client: OffersMockClient,
-    ):
-        self._consumer = consumer_obj
-        self._producer = producer_obj
-        self._client = client
-
-    async def consume(self) -> None:
-        await self._consumer.consume(self._process_message)
-
-    async def _process_message(
-        self,
-        message: types.Message[amqp_pb2.TripOfferSearchTask],
-    ) -> None:
-        async for offer_result in self._client.search(message.body):
-            await self._producer.publish(
-                amqp_pb2.TripOfferSearchResult(
-                    offer_search_id=message.body.offer_search_id,
-                    offer=offer_result,
-                ),
-                routing_key="offers.result.trip",
-            )
-
-        await message.ack()
-
-
-async def offers(app: service.Application[OffersSettings]) -> None:
-    async with types.Connection(app.settings.amqp_dsn) as connection:
-        consumer_obj = TripSearchConsumer(
-            consumer_obj=consumer.Consumer(
-                connection=connection,
-                queue_name="{0}_offers".format(app.name),
-                binds=[(types.Exchange("offers"), "offers.search.trip")],
+    yield offers_pb2.OfferGroup(
+        id=string.uuid(),
+        expires_at=protobuf.datetime_to_protobuf(expires_at),
+        offers=[
+            offers_pb2.Offer(
+                id=string.uuid(),  # TODO: cache this so it can be reused in pricing
+                segment_details=[
+                    offers_pb2.OfferSegmentDetails(
+                        id=string.uuid(),
+                        offer_segment_id=offer_segment.id,
+                        cabin_class=common_pb2.CabinClass(
+                            type=common_pb2.CabinClass.TYPE_ECONOMY,
+                            marketing_name="Economy",
+                        ),
+                    )
+                    for offer_segment in offer_segments
+                ],
+                price=money.from_string(
+                    string_amount=fake.numerify(text="%#"),
+                    currency=money.Currency("EUR"),
+                ).protobuf(),
+                brand_name=BRAND_NAME,
             ),
-            producer_obj=producer.Producer(
-                connection=connection,
-                exchange=types.Exchange("offers"),
-            ),
-            client=OffersMockClient(),
-        )
+        ],
+        segments=offer_segments,
+    )
 
-        await consumer_obj.consume()
+
+def _trip_to_criteria(
+    trip: common_pb2.Trip,
+) -> list[Criteria]:
+    criteria: list[Criteria] = []
+    segments: list[common_pb2.Segment] = []
+    last_type = None
+
+    for segment in trip.segments:
+        first_leg = more_itertools.first(segment.legs)
+
+        if segments and first_leg.type != last_type:
+            criteria.append(Criteria(segments=segments))
+            segments.clear()
+
+        segments.append(segment)
+        last_type = first_leg.type
+
+    if segments:
+        criteria.append(Criteria(segments=segments))
+
+    return criteria

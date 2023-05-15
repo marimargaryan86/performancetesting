@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import dataclasses
 import datetime
 from typing import AsyncIterator, Callable, Generic, Mapping, Sequence, TypeVar
@@ -58,6 +60,23 @@ class TripOfferSearcher(Generic[_SearchCriteriaTask, _SearchCriteria]):
         self._offer_group_repository = offer_group_repository
         self._search_criteria_task_generator = task_generator
         self._search_criteria_generator = criteria_generator
+
+    @classmethod
+    def from_implementation(
+        cls,
+        implementation: OfferSearchImplementation[_SearchCriteriaTask, _SearchCriteria],
+        redis_client: redis.Client[bytes],
+    ) -> TripOfferSearcher[_SearchCriteriaTask, _SearchCriteria]:
+        return cls(
+            task_generator=implementation.search_criteria_task_generator,
+            criteria_generator=implementation.search_criteria_generator,
+            allowed_window_td=implementation.allowed_window_td,
+            offer_group_repository=repository.OfferGroupRepository(
+                offer_group_cache_key_func=implementation.offer_group_cache_key_generator,
+                redis=redis_client,
+                offer_group_generator=implementation.offer_group_generator,
+            ),
+        )
 
     async def search(
         self,
@@ -183,15 +202,9 @@ def create_trip_offer_search_consumer(  # noqa:WPS211
             ],
         ),
         producer=producer,
-        trip_offer_searcher=TripOfferSearcher(
-            task_generator=implementation.search_criteria_task_generator,
-            criteria_generator=implementation.search_criteria_generator,
-            allowed_window_td=implementation.allowed_window_td,
-            offer_group_repository=repository.OfferGroupRepository(
-                offer_group_cache_key_func=implementation.offer_group_cache_key_generator,
-                redis=redis_client,
-                offer_group_generator=implementation.offer_group_generator,
-            ),
+        trip_offer_searcher=TripOfferSearcher.from_implementation(
+            implementation=implementation,
+            redis_client=redis_client,
         ),
         pay_company_id=pay_company_id,
         provider_name=provider_name,
