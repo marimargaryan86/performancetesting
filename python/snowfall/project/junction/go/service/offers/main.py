@@ -35,8 +35,6 @@ from snowfall.vendor.junction.auth import UserAuth
 from snowfall.vendor.junction.pay.client import Client as PayClient
 
 _TRIP_OFFER_SEARCH_ROUTING_KEY = "offers.search.trip"
-_PROVIDERS_TO_DISABLED_OPERATORS = dict[str, list[str]]
-_RESELLERS_TO_PROVIDER_OPERATORS = dict[str, _PROVIDERS_TO_DISABLED_OPERATORS]
 
 
 class _GrpcSettings(service.Settings):
@@ -59,7 +57,7 @@ class _ImportSettings(pay_integration.Settings, _PaySettings, service.Settings):
     default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
     mongo_dsn: Sequence[pydantic.AnyUrl]
     redis_dsn: Sequence[pydantic.AnyUrl]
-    reseller_disabled_operators: _RESELLERS_TO_PROVIDER_OPERATORS = {}
+    reseller_disabled_operators: importer.RESELLERS_TO_PROVIDER_OPERATORS = {}
 
 
 class _GatherPriceQuoteSettings(
@@ -232,6 +230,7 @@ async def _import(app: service.Application[_ImportSettings]) -> None:
                 payer_id=app.settings.payer_company_id,
                 payer_currency=app.settings.payer_currency_code,
             ),
+            reseller_disabled_operators=app.settings.reseller_disabled_operators,
         )
         await offer_importer.consume()
 

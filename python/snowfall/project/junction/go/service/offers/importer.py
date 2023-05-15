@@ -1,7 +1,7 @@
 import asyncio
 import contextlib
 import datetime
-from typing import Union
+from typing import Sequence, Union
 
 import prometheus_client
 import structlog
@@ -14,6 +14,7 @@ from snowfall.project.junction.go.service.offers import (
     price_quotes,
 )
 from snowfall.project.junction.go.service.offers.v1alpha import amqp_pb2
+from snowfall.project.junction.go.service.offers.v1alpha.models_pb2 import OfferGroup
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.instrumentation import prometheus
 from snowfall.stdlib.persistence.redis import types
@@ -25,6 +26,8 @@ ExpectedMessages = Union[
     amqp_pb2.TripOfferSearchResult,
     trackable_pb2.Trackable,
 ]
+_PROVIDERS_TO_DISABLED_OPERATORS = dict[str, list[str]]
+RESELLERS_TO_PROVIDER_OPERATORS = dict[str, _PROVIDERS_TO_DISABLED_OPERATORS]
 
 _histogram_search_time = prometheus_client.Histogram(
     "offers_search_time_seconds",
@@ -105,6 +108,7 @@ class OfferImporter(object):
         status_handler: StatusHandler,
         offer_searches: offers.OfferSearchRepository,
         pay_quote_fetcher: pay_quotes.PayQuoteFetcher,
+        reseller_disabled_operators: RESELLERS_TO_PROVIDER_OPERATORS,
     ):
         self._consumer = consumer_obj
         self._offers = trip_offers
@@ -114,6 +118,7 @@ class OfferImporter(object):
         self._status_handler = status_handler
         self._searches = offer_searches
         self._pay_quote_fetcher = pay_quote_fetcher
+        self._reseller_disabled_operators = reseller_disabled_operators
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -139,6 +144,14 @@ class OfferImporter(object):
         if not offer_search:
             raise SkippedOfferError()
 
+        disabled_operators = self._reseller_disabled_operators.get(
+            offer_search.reseller_id,
+            {},
+        ).get(message.provider_name, [])
+
+        if self._contains_disabled_operator(disabled_operators, message.offer):
+            return
+
         message = await self._pay_quote_fetcher.handle_offer_search_result(
             message=message,
             session_token=offer_search.session_token,
@@ -157,6 +170,17 @@ class OfferImporter(object):
 
             with contextlib.suppress(errors.DuplicateKeyError):
                 await self._offers.insert(message.offer)
+
+    def _contains_disabled_operator(
+        self,
+        disabled_operators: Sequence[str],
+        offer: OfferGroup,
+    ) -> bool:
+        return any(
+            segment.vendor in disabled_operators
+            or segment.operator in disabled_operators
+            for segment in offer.segments
+        )
 
 
 class PriceQuoteImporter(object):
