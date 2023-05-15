@@ -61,6 +61,7 @@ jinja2==3.1.2
 json_api_doc==0.15.0
 jsonschema==4.17.3
 lagom==2.4.1
+locust==2.15.1
 lupa==1.14.1
 mongomock-motor==0.0.18
 more-itertools==9.1.0
