@@ -177,6 +177,7 @@ class PaymentClient(object):  # noqa: WPS214
             "/accounts/find",
             query_parameters={
                 "page": page_index,
+                "status": "enabled",
             },
         )
 
