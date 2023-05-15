@@ -2,6 +2,7 @@
   "required_matches": {
     "all_python_files": [
       "no_file_level_flake8_noqa",
+      "no_file_level_mypy",
       "no_pytest_mark_asyncio"
     ]
   },
@@ -15,6 +16,11 @@
     {
       "name": "no_file_level_flake8_noqa",
       "pattern": "# flake8: noqa",
+      "inverted": true
+    },
+    {
+      "name": "no_file_level_mypy",
+      "pattern": "# mypy: ",
       "inverted": true
     },
     {
