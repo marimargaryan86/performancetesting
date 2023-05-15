@@ -968,6 +968,50 @@
         }
       }
     },
+    "/beneficiaries/{beneficiaryId}": {
+      "get": {
+        "summary": "Get Beneficiary",
+        "tags": [
+          "beneficiaries"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/beneficiaryId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Beneficiary"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-beneficiaries-id",
+        "description": "Get beneficiary"
+      }
+    },
     "/beneficiaries": {
       "post": {
         "summary": "Create beneficiary",
@@ -1023,6 +1067,60 @@
             "$ref": "#/components/responses/NotFound"
           }
         }
+      },
+      "get": {
+        "summary": "List Beneficiaries",
+        "tags": [
+          "beneficiaries"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "items": {
+                            "$ref": "#/components/schemas/Beneficiary"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "operationId": "get-beneficiaries",
+        "description": "Get beneficiaries"
       }
     },
     "/companies/{companyId}/contacts": {
@@ -1278,6 +1376,17 @@
           "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
         },
         "description": "Company id"
+      },
+      "beneficiaryId": {
+        "name": "beneficiaryId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
+        },
+        "description": "Beneficiary id"
       },
       "accountId": {
         "name": "accountId",
@@ -1581,114 +1690,121 @@
       },
       "Beneficiary": {
         "title": "Beneficiary",
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
-            "format": "uuid",
-            "readOnly": true
-          },
-          "type": {
-            "type": "string",
-            "example": "beneficiaries",
-            "enum": [
-              "beneficiaries"
-            ]
-          },
-          "attributes": {
+        "allOf": [
+          {
             "type": "object",
             "properties": {
-              "bankAccountHolderName": {
+              "id": {
                 "type": "string",
-                "example": "bankAccountHolderName",
-                "minLength": 1,
-                "maxLength": 150
+                "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
+                "format": "uuid",
+                "readOnly": true
               },
-              "email": {
+              "type": {
                 "type": "string",
-                "example": "example@email.com",
-                "format": "email",
-                "maxLength": 255
-              },
-              "beneficiaryAddress": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/EnhancedAddressDetails"
-                  },
-                  {
-                    "type": "object",
-                    "required": [
-                      "addressLines",
-                      "countryCode"
-                    ]
-                  }
+                "example": "beneficiaries",
+                "enum": [
+                  "beneficiaries"
                 ]
               },
-              "bankDetails": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/BankDetails"
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "bankAccountHolderName": {
+                    "type": "string",
+                    "example": "bankAccountHolderName",
+                    "minLength": 1,
+                    "maxLength": 150
                   },
-                  {
-                    "oneOf": [
+                  "email": {
+                    "type": "string",
+                    "example": "example@email.com",
+                    "format": "email",
+                    "maxLength": 255
+                  },
+                  "beneficiaryAddress": {
+                    "allOf": [
                       {
-                        "$ref": "#/components/schemas/BankDetailsAba"
+                        "$ref": "#/components/schemas/EnhancedAddressDetails"
                       },
                       {
-                        "$ref": "#/components/schemas/BankDetailsIban"
+                        "type": "object",
+                        "required": [
+                          "addressLines",
+                          "countryCode"
+                        ]
+                      }
+                    ]
+                  },
+                  "bankDetails": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/BankDetails"
+                      },
+                      {
+                        "oneOf": [
+                          {
+                            "$ref": "#/components/schemas/BankDetailsAba"
+                          },
+                          {
+                            "$ref": "#/components/schemas/BankDetailsIban"
+                          }
+                        ]
                       }
                     ]
                   }
+                },
+                "required": [
+                  "bankAccountHolderName",
+                  "email",
+                  "beneficiaryAddress",
+                  "bankDetails"
                 ]
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "currency",
+                  "account"
+                ],
+                "properties": {
+                  "currency": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/CurrencyIdentifier"
+                      }
+                    }
+                  },
+                  "account": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/AccountIdentifier"
+                      }
+                    }
+                  }
+                }
               }
             },
             "required": [
-              "bankAccountHolderName",
-              "email",
-              "beneficiaryAddress",
-              "bankDetails"
-            ]
-          },
-          "relationships": {
-            "type": "object",
-            "required": [
-              "currency",
-              "account"
+              "id",
+              "type",
+              "attributes",
+              "relationships"
             ],
-            "properties": {
-              "currency": {
-                "type": "object",
-                "required": [
-                  "data"
-                ],
-                "properties": {
-                  "data": {
-                    "$ref": "#/components/schemas/CurrencyIdentifier"
-                  }
-                }
-              },
-              "account": {
-                "type": "object",
-                "required": [
-                  "data"
-                ],
-                "properties": {
-                  "data": {
-                    "$ref": "#/components/schemas/AccountIdentifier"
-                  }
-                }
-              }
-            }
+            "description": "Beneficiary schema."
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "attributes",
-          "relationships"
-        ],
-        "description": "Beneficiary schema."
+        ]
       },
       "Contact": {
         "title": "Contact",
@@ -1821,7 +1937,6 @@
             "format": "country",
             "example": "GB"
           }
-
         }
       },
       "BankDetails": {

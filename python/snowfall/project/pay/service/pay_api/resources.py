@@ -398,6 +398,7 @@ class BeneficiariesResource(models.Resource):
         cls,
         beneficiary: beneficiary_models.Beneficiary,
         cc_beneficiary: beneficiary_cc_models.BeneficiaryResponse,
+        request: requests.Request,
     ) -> BeneficiariesResource:
         return cls(
             id=beneficiary.id,
@@ -408,7 +409,7 @@ class BeneficiariesResource(models.Resource):
                 "beneficiaryAddress": {
                     "addressLines": cc_beneficiary.beneficiary_address,
                     "countryCode": cc_beneficiary.beneficiary_country,
-                    "postalCode": cc_beneficiary.beneficiary_postcode,
+                    "postalCode": cc_beneficiary.beneficiary_postcode or "",
                     "city": cc_beneficiary.beneficiary_city,
                     "state": cc_beneficiary.beneficiary_state_or_province,
                 },
@@ -448,5 +449,13 @@ class BeneficiariesResource(models.Resource):
                         "type": "currencies",
                     },
                 },
+            },
+            links={
+                _SELF_HREF: str(
+                    request.url_for(
+                        "Beneficiary",
+                        beneficiaryId=beneficiary.id,
+                    ),
+                ),
             },
         )

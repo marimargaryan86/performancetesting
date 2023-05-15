@@ -154,6 +154,11 @@ def get_admin_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
         integration.route(
             "/beneficiaries",
             beneficiaries.Beneficiaries,
-            name="Beneficiaires",
+            name="Beneficiaries",
+        ),
+        integration.route(
+            "/beneficiaries/{beneficiaryId}",
+            beneficiaries.Beneficiary,
+            name="Beneficiary",
         ),
     ]

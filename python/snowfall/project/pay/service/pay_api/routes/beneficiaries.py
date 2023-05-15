@@ -1,33 +1,113 @@
+import asyncio
 from typing import Any, Mapping, cast
 
 import lagom
+import structlog
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.pay.adapter import accounts as accounts_adapter
-from snowfall.project.pay.service.accounts.repositories import models_pb2
-from snowfall.project.pay.service.beneficiaries.v1alpha.models_pb2 import Beneficiary
+from snowfall.project.pay.service.accounts.v1alpha.models_pb2 import Account
+from snowfall.project.pay.service.beneficiaries.v1alpha.models_pb2 import (
+    Beneficiary as BeneficiaryModel,
+)
 from snowfall.project.pay.service.pay_api import resources
 from snowfall.project.pay.service.pay_api.repositories import (
     BeneficiaryRepository,
     CompanyRepository,
     CurrencyRepository,
 )
-from snowfall.stdlib import string
-from snowfall.stdlib.integration.starlette import messages, models, request_helpers
-from snowfall.stdlib.money import Currency
-from snowfall.vendor.currency_cloud.client import PaymentClient
-from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
-from snowfall.vendor.currency_cloud.models.beneficiary import (
-    BeneficiaryRequest,
-    BeneficiaryValidateRequest,
+from snowfall.stdlib import money, string
+from snowfall.stdlib.integration.starlette import (
+    messages,
+    models,
+    pagination_helpers,
+    request_helpers,
 )
+from snowfall.vendor.currency_cloud import client
+
+_logger = structlog.get_logger(__name__)
+
+
+class Beneficiary(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        payment_client: client.PaymentClient = lagom.injectable,
+        beneficiaries_repository: BeneficiaryRepository = lagom.injectable,
+    ) -> responses.Response:
+        beneficiary_id = request.path_params["beneficiaryId"]
+        beneficiary = await beneficiaries_repository.find_by_id(beneficiary_id)
+        if beneficiary is None:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        cc_beneficiary = await payment_client.get_beneficiary(
+            beneficiary_id=beneficiary.external_reference,
+        )
+        return await messages.create_response(
+            body=messages.models.Body(
+                data=resources.BeneficiariesResource.from_models(
+                    beneficiary=beneficiary,
+                    cc_beneficiary=cc_beneficiary,
+                    request=request,
+                ),
+            ),
+            request=request,
+        )
 
 
 class Beneficiaries(endpoints.HTTPEndpoint):
+    async def get(  # noqa: WPS210
+        self,
+        request: requests.Request,
+        payment_client: client.PaymentClient = lagom.injectable,
+        beneficiaries_repository: BeneficiaryRepository = lagom.injectable,
+    ) -> responses.Response:
+        pagination = pagination_helpers.get_pagination(request)
+        db_beneficiaries = await beneficiaries_repository.find(
+            cursor=pagination.cursor,
+            limit=pagination.limit,
+        )
+        beneficiaries = []
+        coroutines = []
+        async for db_beneficiary in db_beneficiaries:
+            beneficiaries.append(db_beneficiary)
+            coroutines.append(
+                payment_client.get_beneficiary(
+                    beneficiary_id=db_beneficiary.external_reference,
+                ),
+            )
+        gathers = await asyncio.gather(*coroutines, return_exceptions=True)
+        response_data = []
+        for beneficiary, gather in zip(beneficiaries, gathers, strict=True):
+            if isinstance(gather, client.CurrencyCloudError):
+                _logger.error(
+                    "Beneficiary not found",
+                    id=beneficiary.id,
+                )
+                continue
+            response_data.append(
+                resources.BeneficiariesResource.from_models(
+                    beneficiary,
+                    cc_beneficiary=gather,
+                    request=request,
+                ),
+            )
+
+        return await messages.create_response(
+            body=messages.models.Body(
+                data=response_data,
+                links=pagination_helpers.get_next_url(
+                    request.url_for("Beneficiaries"),
+                    await db_beneficiaries.cursor(),
+                    pagination,
+                ),
+            ),
+            request=request,
+        )
+
     async def post(  # noqa: WPS210, WPS211, WPS217
         self,
         request: requests.Request,
-        payment_client: PaymentClient = lagom.injectable,
+        payment_client: client.PaymentClient = lagom.injectable,
         beneficiaries_repository: BeneficiaryRepository = lagom.injectable,
         currencies_repository: CurrencyRepository = lagom.injectable,
         accounts_client: accounts_adapter.GrpcClient = lagom.injectable,
@@ -48,7 +128,7 @@ class Beneficiaries(endpoints.HTTPEndpoint):
                 status_code=status.HTTP_404_NOT_FOUND,
             )
 
-        account = cast(models_pb2.Account, account)
+        account = cast(Account, account)
 
         company = await companies_repository.find_by_id(account.company_id)
         if company is None:
@@ -69,7 +149,7 @@ class Beneficiaries(endpoints.HTTPEndpoint):
             created_beneficiary = await payment_client.create_beneficiary(
                 beneficiary_request,
             )
-        except CurrencyCloudError as exc:
+        except client.CurrencyCloudError as exc:
             if exc.status == status.HTTP_400_BAD_REQUEST:
                 return models.JsonApiResponse(
                     models.Body(
@@ -87,7 +167,7 @@ class Beneficiaries(endpoints.HTTPEndpoint):
             raise exc
 
         beneficiary = await beneficiaries_repository.insert(
-            Beneficiary(
+            BeneficiaryModel(
                 id=string.uuid(),
                 external_reference=created_beneficiary.identifier,
                 account_id=account.id,
@@ -100,6 +180,7 @@ class Beneficiaries(endpoints.HTTPEndpoint):
                 data=resources.BeneficiariesResource.from_models(
                     beneficiary,
                     created_beneficiary,
+                    request=request,
                 ),
             ),
             request=request,
@@ -108,8 +189,8 @@ class Beneficiaries(endpoints.HTTPEndpoint):
 
     def _validate(
         self,
-        currency: Currency | None,
-        account: models_pb2.Account | None,
+        currency: money.Currency | None,
+        account: Account | None,
     ) -> list[messages.models.Error]:
         errors = []
         if currency is None:
@@ -140,11 +221,11 @@ class Beneficiaries(endpoints.HTTPEndpoint):
 def _get_beneficiary_validate_model(
     payload: Mapping[str, Any],
     company_name: str,
-) -> BeneficiaryValidateRequest:
+) -> client.BeneficiaryValidateRequest:
     bank_details = payload["bankDetails"]
     beneficiary_address = payload["beneficiaryAddress"]
     bank_address = bank_details["address"]
-    return BeneficiaryValidateRequest(
+    return client.BeneficiaryValidateRequest(
         bank_country=bank_address["countryCode"],
         currency=payload["currency"],
         beneficiary_company_name=company_name,
@@ -167,10 +248,10 @@ def _get_beneficiary_validate_model(
 
 def _get_beneficiary_model(
     payload: Mapping[str, Any],
-    validated_beneficiary: BeneficiaryValidateRequest,
+    validated_beneficiary: client.BeneficiaryValidateRequest,
     company_name: str,
-) -> BeneficiaryRequest:
-    return BeneficiaryRequest(
+) -> client.BeneficiaryRequest:
+    return client.BeneficiaryRequest(
         **validated_beneficiary.dict(),
         name=company_name,
         bank_account_holder_name=payload["bankAccountHolderName"],

@@ -135,3 +135,17 @@ class BeneficiaryRepository(
     repository.ProtoRepository[Beneficiary],
 ):
     _proto = Beneficiary
+    _default_page_size = 20
+
+    async def find(
+        self,
+        cursor: str | None,
+        limit: int | None,
+        filter_: Mapping[str, Any] | None = None,
+    ) -> resultset.ResultSet[Beneficiary]:
+        beneficiaries = await self._find_with_cursor(
+            cur=cursor or "",
+            filter_=filter_,
+        )
+        beneficiaries.limit(limit or self._default_page_size)
+        return beneficiaries

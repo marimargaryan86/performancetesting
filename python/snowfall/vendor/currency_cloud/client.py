@@ -245,6 +245,29 @@ class PaymentClient(object):  # noqa: WPS214
             ),
         )
 
+    async def list_beneficiaries(
+        self,
+        page_index: int,
+    ) -> list[BeneficiaryResponse]:
+        beneficiaries = await self._make_request(
+            _METHOD_GET,
+            "/beneficiaries/find",
+            query_parameters={
+                "page": page_index,
+            },
+        )
+        return [
+            BeneficiaryResponse(**beneficiary)
+            for beneficiary in beneficiaries["beneficiaries"]
+        ]
+
+    async def get_beneficiary(self, beneficiary_id: str) -> BeneficiaryResponse:
+        beneficiary = await self._make_request(
+            _METHOD_GET,
+            "/beneficiaries/{0}".format(beneficiary_id),
+        )
+        return BeneficiaryResponse(**beneficiary)
+
     async def validate_beneficiary(
         self,
         beneficiary: BeneficiaryValidateRequest,

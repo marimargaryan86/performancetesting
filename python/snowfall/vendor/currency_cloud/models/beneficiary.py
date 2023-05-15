@@ -6,7 +6,7 @@ from snowfall.vendor.currency_cloud.models.base import CamelCaseBaseModel
 class BeneficiaryValidate(CamelCaseBaseModel):
     bank_country: str
     currency: str
-    beneficiary_company_name: str
+    beneficiary_company_name: str | None
     beneficiary_address: list[str] | None = None
     beneficiary_country: str | None = None
     account_number: str | None = None
@@ -21,7 +21,7 @@ class BeneficiaryValidate(CamelCaseBaseModel):
     beneficiary_postcode: str | None = None
     beneficiary_state_or_province: str | None = None
     payment_types: list[str] | None = None
-    beneficiary_entity_type: str = "company"
+    beneficiary_entity_type: str | None = "company"
 
 
 class Beneficiary(BeneficiaryValidate):
