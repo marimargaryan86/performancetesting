@@ -13,11 +13,7 @@ from snowfall.project.pay.service.rates.rates import BackUpRatesRepository
 from snowfall.stdlib import service
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.grpc import server
-from snowfall.vendor.currency_cloud.client import (
-    CurrencyCloudAuth,
-    CurrencyCloudConfig,
-    PaymentClient,
-)
+from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
 
 
 class _GrpcSettings(service.Settings):
@@ -69,12 +65,6 @@ async def _backup_rates_cron_run(
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
-
-    cc_config = CurrencyCloudConfig(
-        app.settings.cc_login,
-        app.settings.cc_api_key,
-        app.settings.cc_env,
-    )
     redis_client = redis.Client[str](
         aioredis.from_url(
             random.choice(app.settings.redis_dsn),  # nosec
@@ -86,7 +76,6 @@ async def _backup_rates_cron_run(
     job = UpdateBackUpRatesJob(
         BackUpRatesRepository(mongo.backup_rates.backup_rates),
         PaymentClient(
-            cc_config=cc_config,
             base_url=app.settings.cc_address,
             auth=CurrencyCloudAuth(
                 base_url=app.settings.cc_address,

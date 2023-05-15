@@ -33,11 +33,7 @@ from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.grpc.client import create_channel
-from snowfall.vendor.currency_cloud.client import (
-    CurrencyCloudAuth,
-    CurrencyCloudConfig,
-    PaymentClient,
-)
+from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
 
 
 def _lifespan(
@@ -60,11 +56,6 @@ def _factory(
     def decorator() -> applications.Starlette:
         mongo = motor_asyncio.AsyncIOMotorClient(
             random.choice(app.settings.mongo_dsn),  # nosec
-        )
-        cc_config = CurrencyCloudConfig(
-            app.settings.cc_login,
-            app.settings.cc_api_key,
-            app.settings.cc_env,
         )
         redis_client = redis.Client[str](
             aioredis.from_url(
@@ -91,7 +82,6 @@ def _factory(
             routes=router.get_routes(
                 bootstrap.create_dependencies(
                     payment_client=PaymentClient(
-                        cc_config=cc_config,
                         base_url=app.settings.cc_address,
                         auth=CurrencyCloudAuth(
                             base_url=app.settings.cc_address,
@@ -149,11 +139,6 @@ def _admin_factory(
         mongo = motor_asyncio.AsyncIOMotorClient(
             random.choice(app.settings.mongo_dsn),  # nosec
         )
-        cc_config = CurrencyCloudConfig(
-            app.settings.cc_login,
-            app.settings.cc_api_key,
-            app.settings.cc_env,
-        )
         authentication_channel = create_channel(
             app.settings.authentication_address,
         )
@@ -161,7 +146,6 @@ def _admin_factory(
             app.settings.accounts_address,
         )
         payment_client = PaymentClient(
-            cc_config=cc_config,
             base_url=app.settings.cc_address,
             auth=CurrencyCloudAuth(
                 base_url=app.settings.cc_address,

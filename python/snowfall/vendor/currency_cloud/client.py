@@ -1,8 +1,7 @@
 import asyncio
 from collections.abc import AsyncGenerator
-from typing import Any, Callable, Mapping, Sequence
+from typing import Any, Mapping, Sequence
 
-import currencycloud
 import httpx
 import structlog
 
@@ -35,52 +34,6 @@ from snowfall.vendor.currency_cloud.models.rate import BasicRateResponse
 _logger = structlog.get_logger(__name__)
 _METHOD_GET = "GET"
 _METHOD_POST = "POST"
-
-
-def error_handler(func: Callable[..., Any]) -> Callable[..., Any]:
-    def decorator(self: Any, *args: tuple[Any], **kwargs: Mapping[str, str]) -> Any:
-        try:
-            return func(
-                self,
-                *args,
-                **kwargs,
-            )
-        except currencycloud.errors.api.ApiError as exc:
-            errors = []
-            for message in exc.messages:
-                _logger.error(
-                    message.message,
-                    provider="Currency Cloud",
-                    method=func.__name__,
-                )
-                errors.append(message.message)
-
-            raise CurrencyCloudError(
-                errors,
-                status=exc.status_code,
-            ) from exc
-
-    return decorator
-
-
-class CurrencyCloudConfig(object):
-    def __init__(
-        self,
-        login: str,
-        api_key: str,
-        env: str,
-    ):
-        self._login = login
-        self._api_key = api_key
-        self._env = env
-
-    @property
-    def client(self) -> currencycloud.Client:
-        return currencycloud.Client(
-            self._login,
-            self._api_key,
-            self._env,
-        )
 
 
 class CurrencyCloudAuth(httpx.Auth):
@@ -144,11 +97,9 @@ def encode_arrays(
 class PaymentClient(object):  # noqa: WPS214
     def __init__(
         self,
-        cc_config: CurrencyCloudConfig,
         base_url: str,
         auth: CurrencyCloudAuth,
     ):
-        self._client_config = cc_config
         self._base_url = httpx.URL(base_url)
         self._client = httpx.AsyncClient(
             base_url=self._base_url,
@@ -316,10 +267,6 @@ class PaymentClient(object):  # noqa: WPS214
             )
             for pair, rates in response_data["rates"].items()
         ]
-
-    @property
-    def _cc_client(self) -> currencycloud.Client:
-        return self._client_config.client
 
     async def _make_request(
         self,
