@@ -28,7 +28,6 @@ def get_routes(
     integration = starlette.StarletteIntegration(dependencies)
 
     reverse_proxy_view = stdlib_routes.Proxy(
-        prefix="/trip-candidates/",
         client=dependencies[client.Client].client,
     ).to_route()
 
