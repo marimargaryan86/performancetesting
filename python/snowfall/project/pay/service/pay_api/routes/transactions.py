@@ -35,6 +35,7 @@ class Transactions(endpoints.HTTPEndpoint):
                 quot.amounts.base_converted.currency_code
                 == quot.amounts.beneficiary.currency_code
             )
+            conversion_id = ""
             if not are_currencies_same:
                 try:
                     cc_conversion = await payment_client.create_conversion(
@@ -59,12 +60,13 @@ class Transactions(endpoints.HTTPEndpoint):
                     inserted_conversion = await conversion_repository.create(
                         cc_conversion,
                     )
+                conversion_id = inserted_conversion.id
             transaction = await transaction_repository.insert(
                 Transaction(
                     id=transaction_id,
                     external_reference_id=body["externalReference"],
                     invoice_reference_id=body["invoiceReference"],
-                    conversion_id=inserted_conversion.id,
+                    conversion_id=conversion_id,
                     amounts=quot.amounts,
                     rates=quot.rates,
                     payer_id=quot.payer_id,

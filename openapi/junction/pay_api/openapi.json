@@ -815,10 +815,10 @@
       },
       "Transaction": {
         "title": "Transaction",
+        "description": "Transaction schema",
         "allOf": [
           {
             "type": "object",
-            "description": "Transaction data",
             "required": [
               "id",
               "type",
@@ -1002,6 +1002,7 @@
                     "required": [
                       "data"
                     ],
+                    "nullable": true,
                     "properties": {
                       "data": {
                         "$ref": "#/components/schemas/ConversionIdentifier"
@@ -1144,7 +1145,8 @@
                 "format": "uri",
                 "example": "https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5"
               }
-            }
+            },
+            "readOnly": true
           }
         }
       },

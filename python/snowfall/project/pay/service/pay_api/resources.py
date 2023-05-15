@@ -174,12 +174,16 @@ class Transaction(models.Resource):
                 },
             },
             relationships={
-                "conversion": {
-                    "data": {
-                        "id": transaction.conversion_id,
-                        "type": "conversions",
-                    },
-                },
+                "conversion": (
+                    {
+                        "data": {
+                            "id": transaction.conversion_id,
+                            "type": "conversions",
+                        },
+                    }
+                    if transaction.conversion_id
+                    else None
+                ),
                 "payer": {
                     "data": {
                         "id": transaction.payer_id,

@@ -2330,10 +2330,10 @@
       },
       "Transaction": {
         "title": "Transaction",
+        "description": "Transaction schema",
         "allOf": [
           {
             "type": "object",
-            "description": "Transaction data",
             "required": [
               "id",
               "type",
@@ -2509,6 +2509,7 @@
                     "required": [
                       "data"
                     ],
+                    "nullable": true,
                     "properties": {
                       "data": {
                         "$ref": "#/components/schemas/ConversionIdentifier"
