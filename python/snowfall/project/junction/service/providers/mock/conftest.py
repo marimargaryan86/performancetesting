@@ -5,6 +5,7 @@ import datetime
 from typing import AsyncIterator
 from unittest import mock
 
+import faker
 import more_itertools
 import pytest
 from redis import asyncio as aioredis
@@ -13,8 +14,13 @@ from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as of
 from snowfall.project.junction.go.v1alpha import models_pb2 as common_pb2
 from snowfall.project.junction.provider import offers as provider_offers
 from snowfall.project.junction.provider import service
-from snowfall.project.junction.service.providers.mock import main, offers
-from snowfall.stdlib import string
+from snowfall.project.junction.service.providers.mock import (
+    cache,
+    main,
+    offers,
+    pricing,
+)
+from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import types
@@ -59,12 +65,21 @@ def generate_offer_search(
 
 
 @pytest.fixture()
+def fake() -> faker.Faker:
+    return faker.Faker()
+
+
+@pytest.fixture()
 async def searcher(
     redis_client: aioredis.Redis[bytes],
 ) -> provider_offers.TripOfferSearcher[offers.Criteria, offers.Criteria]:
     wrapped_redis_client = redis.Client[bytes](redis_client, prefix="foo")
+    app = mock.create_autospec(service.Application)
+    app.name = "mock"
+    app.settings = mock.create_autospec(main._OffersSettings)  # noqa: WPS437
+    app.settings.ttl = datetime.timedelta(minutes=1)
     implementation = await main._offers_search(  # noqa: WPS437
-        app=mock.create_autospec(service.Application),
+        app=app,
         amqp_conn=mock.create_autospec(types.Connection),
         redis_conn=redis_client,
         stack=mock.create_autospec(contextlib.AsyncExitStack),
@@ -126,3 +141,51 @@ def offer_segment_details(
     offer_option: offers_pb2.Offer,
 ) -> offers_pb2.OfferSegmentDetails:
     return more_itertools.first(offer_option.segment_details)
+
+
+@pytest.fixture()
+def option_cache(redis_client: aioredis.Redis[bytes]) -> cache.OptionCache:
+    return cache.OptionCache(client=redis.Client(redis_client))
+
+
+@pytest.fixture()
+def price_quote_cache(redis_client: aioredis.Redis[bytes]) -> cache.PriceQuoteCache:
+    return cache.PriceQuoteCache(client=redis.Client(redis_client))
+
+
+@pytest.fixture()
+def quoter(
+    option_cache: cache.OptionCache,
+    price_quote_cache: cache.PriceQuoteCache,
+) -> pricing.Quoter:
+    return pricing.Quoter(
+        option_cache=option_cache,
+        price_quote_cache=price_quote_cache,
+        ttl=datetime.timedelta(minutes=1),
+    )
+
+
+@pytest.fixture()
+def price(fake: faker.Faker) -> money.Money:
+    return money.from_string(
+        string_amount=fake.numerify(text="%#"),
+        currency=money.Currency("EUR"),
+    )
+
+
+@pytest.fixture()
+async def option_id(option_cache: cache.OptionCache, price: money.Money) -> str:
+    return await option_cache.store(
+        cache.MockDetails(
+            amount=price.amount,
+            currency=price.currency.code,
+        ),
+    )
+
+
+@pytest.fixture()
+async def price_quote(
+    option_id: str,
+    quoter: pricing.Quoter,
+) -> offers_pb2.PriceQuote:
+    return await quoter.generate_quote(option_id)
