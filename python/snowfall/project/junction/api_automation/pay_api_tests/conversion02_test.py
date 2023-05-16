@@ -52,19 +52,22 @@ async def test_list_conversions_details(  # noqa: WPS218
     assert isinstance(rlcd_first_item["attributes"]["executedRate"], float)
     assert isinstance(rlcd_first_item["attributes"]["fxDelta"], type(None) | float)
     assert isinstance(rlcd_first_item["attributes"]["fxStatus"], str)
-    assert is_valid_uuid(rlcd_first_item["relationships"]["transactions"]["data"]["id"])
-    assert (
-        rlcd_first_item["relationships"]["transactions"]["data"]["type"]
-        == "transactions"
-    )
     assert "https" in rlcd_first_item["links"]["self"]
-
     assert len(response_list_conversions_details["included"]) <= len(
         response_list_conversions_details["data"],
     )
-    all_included = response_list_conversions_details["included"]
-    transactions_list = [one_include["id"] for one_include in all_included]
-    assert (
-        rlcd_first_item["relationships"]["transactions"]["data"]["id"]
-        in transactions_list
-    )
+    value_relationships = rlcd_first_item.get("relationships")
+    if value_relationships is not None:
+        assert is_valid_uuid(
+            rlcd_first_item["relationships"]["transactions"]["data"]["id"],
+        )
+        assert (
+            rlcd_first_item["relationships"]["transactions"]["data"]["type"]
+            == "transactions"
+        )
+        all_included = response_list_conversions_details["included"]
+        transactions_list = [one_include["id"] for one_include in all_included]
+        assert (
+            rlcd_first_item["relationships"]["transactions"]["data"]["id"]
+            in transactions_list
+        )

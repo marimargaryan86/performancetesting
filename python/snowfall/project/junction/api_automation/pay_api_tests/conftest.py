@@ -23,8 +23,8 @@ from snowfall.vendor.junction.pay.client import Client as PayClient
 
 logger = logging.getLogger()
 
-PAY_TEST_ACCOUNT01 = "009822ce-70fe-4f6d-b2d6-1f807f9cc5c4"
-PAY_TEST_ACCOUNT02 = "00a986b5-5609-418c-bd63-e8f927fac6da"
+PAY_TEST_ACCOUNT01 = "7e249624-535d-418a-8009-0908675136e1"
+PAY_TEST_ACCOUNT02 = "026b616f-8e6b-42e4-abc7-559ef58a4d69"
 
 
 @pytest.fixture()
