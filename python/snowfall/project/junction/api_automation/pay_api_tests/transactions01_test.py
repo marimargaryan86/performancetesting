@@ -1,6 +1,5 @@
 import json
 import logging
-from typing import Any, Mapping
 
 import httpx
 import pytest
@@ -21,10 +20,15 @@ logger.setLevel(logging.DEBUG)
 
 
 @pytest.mark.integration()
+@pytest.mark.parametrize(
+    ("from_currency", "to_currency"),
+    [("EUR", "SEK"), ("EUR", "EUR")],
+)
 async def test_create_transactions(  # noqa: WPS210, WPS213, WPS218, C901
     pay_client: Client,
     pay_admin_client: PayAdminClient,
-    get_mongo_config: Mapping[str, Any],
+    from_currency: str,
+    to_currency: str,
 ) -> None:
     try:
         response_payer = await pay_admin_client.create_company(
@@ -64,8 +68,8 @@ async def test_create_transactions(  # noqa: WPS210, WPS213, WPS218, C901
             external_reference=string.uuid(),
             payer_id=response_payer["data"]["id"],
             beneficiary_id=response_beneficiary["data"]["id"],
-            from_currency="EUR",
-            to_currency="SEK",
+            from_currency=from_currency,
+            to_currency=to_currency,
         )
     except httpx.HTTPStatusError as err2:
         logger.info(
@@ -152,9 +156,11 @@ async def test_create_transactions(  # noqa: WPS210, WPS213, WPS218, C901
     assert isinstance(rct_data["attributes"]["rates"]["salesMarkup"], float)
     assert isinstance(rct_data["attributes"]["rates"]["fxMarkup"], float)
     assert isinstance(rct_data["attributes"]["rates"]["processingMarkup"], float)
-
-    assert is_valid_uuid(rct_data["relationships"]["conversion"]["data"]["id"])
-    assert rct_data["relationships"]["conversion"]["data"]["type"] == "conversions"
+    if from_currency == to_currency:
+        assert rct_data["relationships"]["conversion"] is None
+    else:
+        assert is_valid_uuid(rct_data["relationships"]["conversion"]["data"]["id"])
+        assert rct_data["relationships"]["conversion"]["data"]["type"] == "conversions"
     assert is_valid_uuid(rct_data["relationships"]["payer"]["data"]["id"])
     assert rct_data["relationships"]["payer"]["data"]["type"] == "companies"
     assert is_valid_uuid(rct_data["relationships"]["beneficiary"]["data"]["id"])
