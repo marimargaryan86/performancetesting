@@ -73,9 +73,11 @@ def document_type_from_proto(
 
 
 def traveler_document_from_proto(
-    traveler_document: orders_models.DocumentDetails | None,
+    traveler_document: orders_models.DocumentDetails,
 ) -> common.TravelerDocument | None:
-    if not traveler_document:
+    try:
+        exp_date = protobuf.protobuf_to_date(traveler_document.exp_date)
+    except ValueError:
         return None
 
     document_type = document_type_from_proto(traveler_document.document_type)
@@ -85,7 +87,7 @@ def traveler_document_from_proto(
             document_type=document_type,
             document_number=traveler_document.document_number,
             document_issue_country=traveler_document.issue_county,
-            document_exp_date=protobuf.protobuf_to_date(traveler_document.exp_date),
+            document_exp_date=exp_date,
             nationality=traveler_document.nationality,
         )
         if document_type
