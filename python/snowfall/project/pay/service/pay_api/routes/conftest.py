@@ -23,7 +23,7 @@ from snowfall.project.pay.service.quotations.v1alpha.models_pb2 import (
 from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Transaction
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import phone_number_pb2, postal_address_pb2
+from snowfall.stdlib.v1 import phone_number_pb2, postal_address_pb2
 from snowfall.vendor.currency_cloud.models.balance import BalanceResponse
 
 

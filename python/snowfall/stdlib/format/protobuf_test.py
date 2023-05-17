@@ -8,7 +8,7 @@ from dateutil import tz
 from google.protobuf import duration_pb2, timestamp_pb2
 
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import date_pb2, datetime_pb2, testing_pb2
+from snowfall.stdlib.v1 import date_pb2, datetime_pb2, testing_pb2
 
 _seconds = 1639696695
 

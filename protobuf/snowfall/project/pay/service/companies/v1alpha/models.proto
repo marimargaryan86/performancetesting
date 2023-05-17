@@ -2,14 +2,14 @@ syntax = "proto3";
 
 package snowfall.project.pay.service.companies.v1alpha;
 
-import "snowfall/stdlib/v1alpha/postal_address.proto";
+import "snowfall/stdlib/v1/postal_address.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/companies/v1alpha";
 
 message Company {
   string id = 1;
   string name = 2;
-  snowfall.stdlib.v1alpha.PostalAddress address = 3;
+  snowfall.stdlib.v1.PostalAddress address = 3;
   float fx_markup = 4;
   float processing_markup = 5;
   float sales_markup = 6;

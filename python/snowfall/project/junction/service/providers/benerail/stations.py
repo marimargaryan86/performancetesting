@@ -12,7 +12,7 @@ from snowfall.service.geodata.v1 import geocoding_pb2, geocoding_pb2_grpc
 from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.transport.grpc import client as grpc_client
-from snowfall.stdlib.v1alpha import latlng_pb2
+from snowfall.stdlib.v1 import latlng_pb2
 from snowfall.vendor.benerail import client
 from snowfall.vendor.benerail.models.enumeration import response
 

@@ -17,7 +17,7 @@ from snowfall.project.junction.go.service.trips import orchestrator, trips
 from snowfall.project.junction.go.service.trips.v1alpha import amqp_pb2, trips_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.amqp import consumer, types
-from snowfall.stdlib.v1alpha import latlng_pb2
+from snowfall.stdlib.v1 import latlng_pb2
 
 
 class _TripSearchContext(object):

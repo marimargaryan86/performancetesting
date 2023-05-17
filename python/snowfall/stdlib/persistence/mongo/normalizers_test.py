@@ -3,7 +3,7 @@ import datetime
 from google.protobuf import json_format, timestamp_pb2
 
 from snowfall.stdlib.persistence.mongo import normalizers
-from snowfall.stdlib.v1alpha import latlng_pb2, testing_pb2
+from snowfall.stdlib.v1 import latlng_pb2, testing_pb2
 
 _LATITUDE = 59.85882
 _LONGITUDE = 17.63889

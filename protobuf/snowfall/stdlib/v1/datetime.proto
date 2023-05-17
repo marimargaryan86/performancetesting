@@ -13,17 +13,17 @@
 // limitations under the License.
 //
 // Modifications by Snowfall Ltd:
-// - changed package to `snowfall.stdlib.v1alpha`
-// - changed option `go_package` to `"git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"`
+// - changed package to `snowfall.stdlib.v1`
+// - changed option `go_package` to `"git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1"`
 // - formatted with `buf format`
 
 syntax = "proto3";
 
-package snowfall.stdlib.v1alpha;
+package snowfall.stdlib.v1;
 
 import "google/protobuf/duration.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1";
 
 // Represents civil time (or occasionally physical time).
 //

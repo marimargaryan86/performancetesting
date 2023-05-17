@@ -12,7 +12,7 @@ from snowfall.project.junction.provider import airports, cabin_classes
 from snowfall.project.junction.service.providers.ask2go import cache, models
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import latlng_pb2, money_pb2
+from snowfall.stdlib.v1 import latlng_pb2, money_pb2
 from snowfall.vendor.ask2go.models import booking, offers, price
 
 _GroupedOfferSegment = Tuple[offers.TripSegment, offers_pb2.OfferSegment]

@@ -13,15 +13,15 @@
 // limitations under the License.
 //
 // Modifications by Snowfall Ltd:
-// - changed package to `snowfall.stdlib.v1alpha`
-// - changed option `go_package` to `"git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"`
+// - changed package to `snowfall.stdlib.v1`
+// - changed option `go_package` to `"git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1"`
 // - formatted with `buf format`
 
 syntax = "proto3";
 
-package snowfall.stdlib.v1alpha;
+package snowfall.stdlib.v1;
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1";
 
 // Represents a whole or partial calendar date, such as a birthday. The time of
 // day and time zone are either specified elsewhere or are insignificant. The

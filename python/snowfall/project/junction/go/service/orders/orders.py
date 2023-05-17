@@ -12,7 +12,7 @@ from snowfall.project.junction.go.service.orders.v1alpha import models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
-from snowfall.stdlib.v1alpha import postal_address_pb2
+from snowfall.stdlib.v1 import postal_address_pb2
 
 
 class JourneyRepository(

@@ -3,7 +3,7 @@ import base64
 import pytest
 
 from snowfall.stdlib.persistence import cursor
-from snowfall.stdlib.v1alpha import cursor_pb2
+from snowfall.stdlib.v1 import cursor_pb2
 
 
 def test_valid_cursor() -> None:

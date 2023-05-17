@@ -3,8 +3,8 @@ syntax = "proto3";
 package snowfall.service.geodata.v1;
 
 import "snowfall/service/geodata/v1/models.proto";
-import "snowfall/stdlib/v1alpha/datetime.proto";
-import "snowfall/stdlib/v1alpha/latlng.proto";
+import "snowfall/stdlib/v1/datetime.proto";
+import "snowfall/stdlib/v1/latlng.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/service/geocoding/v1alpha";
 
@@ -15,7 +15,7 @@ service GeocodingService {
 }
 
 message CountryCodeLookupRequest {
-  snowfall.stdlib.v1alpha.LatLng coordinates = 1;
+  snowfall.stdlib.v1.LatLng coordinates = 1;
 }
 
 message CountryCodeLookupResponse {
@@ -23,16 +23,16 @@ message CountryCodeLookupResponse {
 }
 
 message TimeZoneLookupRequest {
-  snowfall.stdlib.v1alpha.LatLng coordinates = 1;
+  snowfall.stdlib.v1.LatLng coordinates = 1;
 }
 
 message TimeZoneLookupResponse {
-  snowfall.stdlib.v1alpha.TimeZone time_zone = 1;
+  snowfall.stdlib.v1.TimeZone time_zone = 1;
 }
 
 message LocationLookupRequest {
   string text = 1;
-  optional snowfall.stdlib.v1alpha.LatLng bias_position = 2;
+  optional snowfall.stdlib.v1.LatLng bias_position = 2;
   repeated string countries = 3;
   uint32 limit = 4;
   string language = 5;

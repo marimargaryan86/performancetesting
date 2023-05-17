@@ -5,7 +5,7 @@ from mypy_boto3_location import client  # pants: no-infer-dep
 from typing_extensions import NotRequired, TypedDict  # pants: no-infer-dep
 
 from snowfall.service.geodata.v1 import models_pb2
-from snowfall.stdlib.v1alpha import datetime_pb2, latlng_pb2
+from snowfall.stdlib.v1 import datetime_pb2, latlng_pb2
 
 LocationSearchParams = TypedDict(
     "LocationSearchParams",

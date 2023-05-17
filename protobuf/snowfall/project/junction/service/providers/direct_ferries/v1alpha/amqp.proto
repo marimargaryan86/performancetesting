@@ -3,7 +3,7 @@ syntax = "proto3";
 package snowfall.project.junction.service.providers.direct_ferries.v1alpha;
 
 import "snowfall/project/junction/go/v1alpha/models.proto";
-import "snowfall/stdlib/v1alpha/datetime.proto";
+import "snowfall/stdlib/v1/datetime.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/providers/direct_ferries/v1alpha";
 
@@ -19,7 +19,7 @@ message Criteria {
   string destination_id = 2;
   uint32 outbound_route_id = 3;
   optional uint32 inbound_route_id = 4;
-  snowfall.stdlib.v1alpha.DateTime outbound_departure_datetime = 5;
-  optional snowfall.stdlib.v1alpha.DateTime inbound_departure_datetime = 6;
+  snowfall.stdlib.v1.DateTime outbound_departure_datetime = 5;
+  optional snowfall.stdlib.v1.DateTime inbound_departure_datetime = 6;
   repeated uint32 passengers_ages = 7;
 }

@@ -31,7 +31,7 @@ from snowfall.stdlib.integration.starlette import (
     pagination_helpers,
     request_helpers,
 )
-from snowfall.stdlib.v1alpha import latlng_pb2
+from snowfall.stdlib.v1 import latlng_pb2
 
 _Coordinates = Mapping[str, float]
 _Passengers = list[dict[str, str]]

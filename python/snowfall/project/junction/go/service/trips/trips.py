@@ -10,7 +10,7 @@ from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2
 from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
-from snowfall.stdlib.v1alpha import amqp_pb2
+from snowfall.stdlib.v1 import amqp_pb2
 
 
 class SegmentRepository(repository.ProtoRepository[models_pb2.SegmentReference]):

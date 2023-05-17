@@ -6,7 +6,7 @@ from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2, models
 from snowfall.project.junction.service.providers.karhoo import booking, cache, conftest
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import phone_number_pb2, postal_address_pb2
+from snowfall.stdlib.v1 import phone_number_pb2, postal_address_pb2
 
 _ORDER_TASK = amqp_pb2.PlaceOrderTask(
     booking=models_pb2.Booking(),

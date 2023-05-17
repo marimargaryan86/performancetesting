@@ -2,7 +2,7 @@ from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as of
 from snowfall.project.junction.service.providers.duffel import cache
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import money_pb2
+from snowfall.stdlib.v1 import money_pb2
 from snowfall.vendor.duffel.models.offer import Offer, OfferCondition
 
 

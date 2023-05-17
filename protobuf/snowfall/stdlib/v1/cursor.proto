@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package snowfall.stdlib.v1;
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1";
+
+message Cursor {
+  string id = 1;
+  string filter = 2;
+  string digest = 3;
+}

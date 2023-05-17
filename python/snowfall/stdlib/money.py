@@ -8,7 +8,7 @@ from typing import Iterable
 
 import iso4217
 
-from snowfall.stdlib.v1alpha import money_pb2
+from snowfall.stdlib.v1 import money_pb2
 
 Currency = iso4217.Currency
 

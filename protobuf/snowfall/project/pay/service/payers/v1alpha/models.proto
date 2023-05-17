@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package snowfall.project.pay.service.payers.v1alpha;
 
-import "snowfall/stdlib/v1alpha/date.proto";
-import "snowfall/stdlib/v1alpha/postal_address.proto";
+import "snowfall/stdlib/v1/date.proto";
+import "snowfall/stdlib/v1/postal_address.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/payers/v1alpha";
 
@@ -18,11 +18,11 @@ message Payer {
 message CompanyTypePayer {
   string name = 1;
   string number = 2;
-  snowfall.stdlib.v1alpha.PostalAddress address = 3;
+  snowfall.stdlib.v1.PostalAddress address = 3;
 }
 
 message IndividualTypePayer {
   string name = 1;
-  snowfall.stdlib.v1alpha.Date date_of_birth = 2;
-  snowfall.stdlib.v1alpha.PostalAddress address = 3;
+  snowfall.stdlib.v1.Date date_of_birth = 2;
+  snowfall.stdlib.v1.PostalAddress address = 3;
 }

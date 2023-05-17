@@ -3,7 +3,7 @@ syntax = "proto3";
 package snowfall.project.pay.service.accounts.v1alpha;
 
 import "google/protobuf/timestamp.proto";
-import "snowfall/stdlib/v1alpha/phone_number.proto";
+import "snowfall/stdlib/v1/phone_number.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/accounts/v1alpha";
 
@@ -22,7 +22,7 @@ message Contact {
   string first_name = 2;
   string last_name = 3;
   string email = 4;
-  snowfall.stdlib.v1alpha.PhoneNumber phone_number = 5;
+  snowfall.stdlib.v1.PhoneNumber phone_number = 5;
   string company_id = 6;
   google.protobuf.Timestamp created_at = 7;
   string external_reference = 8;

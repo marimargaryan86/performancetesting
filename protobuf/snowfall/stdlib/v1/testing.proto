@@ -1,17 +1,17 @@
 syntax = "proto3";
 
-package snowfall.stdlib.v1alpha;
+package snowfall.stdlib.v1;
 
 import "google/protobuf/timestamp.proto";
-import "snowfall/stdlib/v1alpha/options.proto";
+import "snowfall/stdlib/v1/options.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1";
 
 message Foobar {
   string id = 1;
   google.protobuf.Timestamp updated_at = 2;
-  string read_only = 3 [(snowfall.stdlib.v1alpha.read_only) = true];
-  string write_only = 4 [(snowfall.stdlib.v1alpha.write_only) = true];
+  string read_only = 3 [(snowfall.stdlib.v1.read_only) = true];
+  string write_only = 4 [(snowfall.stdlib.v1.write_only) = true];
   Foobar nested_foobar = 5;
 }
 

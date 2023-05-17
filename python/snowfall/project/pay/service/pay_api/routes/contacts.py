@@ -12,7 +12,7 @@ from snowfall.stdlib.integration.starlette import (
     pagination_helpers,
     request_helpers,
 )
-from snowfall.stdlib.v1alpha import phone_number_pb2
+from snowfall.stdlib.v1 import phone_number_pb2
 
 
 class Contacts(endpoints.HTTPEndpoint):

@@ -3,7 +3,7 @@ syntax = "proto3";
 package snowfall.project.junction.service.providers.ask2go.v1alpha;
 
 import "snowfall/project/junction/go/v1alpha/models.proto";
-import "snowfall/stdlib/v1alpha/datetime.proto";
+import "snowfall/stdlib/v1/datetime.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/providers/ask2go/v1alpha";
 
@@ -17,8 +17,8 @@ message SearchCriteriaTask {
 message Criteria {
   string origin_iata = 1;
   string destination_iata = 2;
-  snowfall.stdlib.v1alpha.DateTime outbound_departure = 3;
-  optional snowfall.stdlib.v1alpha.DateTime inbound_departure = 4;
+  snowfall.stdlib.v1.DateTime outbound_departure = 3;
+  optional snowfall.stdlib.v1.DateTime inbound_departure = 4;
   string cabin_class = 5;
   uint32 adults = 6;
   uint32 children = 7;

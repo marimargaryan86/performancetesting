@@ -24,7 +24,7 @@ from snowfall.project.junction.go.service.offers.v1alpha.amqp_pb2 import (
     TripPriceQuoteResult,
 )
 from snowfall.stdlib import string
-from snowfall.stdlib.v1alpha import money_pb2
+from snowfall.stdlib.v1 import money_pb2
 from snowfall.vendor.junction.pay.client import Client as PayClient
 
 _QUOTE_MOCK_RESPONSE = MappingProxyType(

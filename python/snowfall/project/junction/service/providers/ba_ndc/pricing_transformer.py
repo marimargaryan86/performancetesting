@@ -4,7 +4,7 @@ from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as of
 from snowfall.project.junction.service.providers.ba_ndc import cache
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import money_pb2
+from snowfall.stdlib.v1 import money_pb2
 
 
 def _to_money(amount: str, currency: str) -> money_pb2.Money | None:

@@ -11,7 +11,7 @@ from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.redis import types as redis_types
 from snowfall.stdlib.transport.amqp import protocol, types
-from snowfall.stdlib.v1alpha import amqp_pb2
+from snowfall.stdlib.v1 import amqp_pb2
 
 _Proto = TypeVar("_Proto", bound=message.Message)
 _Record = TypeVar("_Record", covariant=True)

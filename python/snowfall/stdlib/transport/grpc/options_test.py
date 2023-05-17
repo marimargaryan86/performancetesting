@@ -1,5 +1,5 @@
 from snowfall.stdlib.transport.grpc import options
-from snowfall.stdlib.v1alpha import testing_pb2
+from snowfall.stdlib.v1 import testing_pb2
 
 
 def test_clear_message_with_option() -> None:

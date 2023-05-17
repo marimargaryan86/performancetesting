@@ -4,7 +4,7 @@ from snowfall.service.geodata import geocoding, reverse_geocoding
 from snowfall.service.geodata.v1 import geocoding_pb2, geocoding_pb2_grpc
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.grpc import service
-from snowfall.stdlib.v1alpha import datetime_pb2
+from snowfall.stdlib.v1 import datetime_pb2
 
 
 class GeocodingService(

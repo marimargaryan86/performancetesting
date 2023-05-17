@@ -17,7 +17,7 @@ from google.protobuf import (
 )
 
 from snowfall.stdlib import string
-from snowfall.stdlib.v1alpha import date_pb2, datetime_pb2
+from snowfall.stdlib.v1 import date_pb2, datetime_pb2
 
 if TYPE_CHECKING:
     from google.protobuf.internal import enum_type_wrapper

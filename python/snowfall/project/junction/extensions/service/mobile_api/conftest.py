@@ -39,7 +39,7 @@ from snowfall.stdlib import string
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.v1alpha import phone_number_pb2
+from snowfall.stdlib.v1 import phone_number_pb2
 from snowfall.vendor.junction.go import client
 
 _FIXTURES_PATH = "python/snowfall/project/junction/extensions/service/mobile_api/fixtures/{path}"  # noqa: B950

@@ -4,7 +4,7 @@ from typing import Collection
 import pytest
 
 from snowfall.stdlib import h3
-from snowfall.stdlib.v1alpha import latlng_pb2
+from snowfall.stdlib.v1 import latlng_pb2
 
 _H3_LOCATIONS = [
     h3.CoordinatesItem(

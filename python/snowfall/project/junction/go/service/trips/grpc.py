@@ -11,7 +11,7 @@ from snowfall.project.junction.go.service.trips.v1alpha import (
 )
 from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.transport.grpc import service
-from snowfall.stdlib.v1alpha import amqp_pb2 as std_amqp_pb2
+from snowfall.stdlib.v1 import amqp_pb2 as std_amqp_pb2
 
 
 class TripService(service.Service, trips_pb2_grpc.TripServiceServicer):

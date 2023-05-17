@@ -3,7 +3,7 @@ syntax = "proto3";
 package snowfall.project.junction.go.service.orders.v1alpha;
 
 import "snowfall/project/junction/go/service/orders/v1alpha/models.proto";
-import "snowfall/stdlib/v1alpha/postal_address.proto";
+import "snowfall/stdlib/v1/postal_address.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/orders/v1alpha";
 
@@ -12,7 +12,7 @@ message PlaceOrderTask {
   ContactDetails contact_details = 2;
   repeated Passenger passengers = 3;
   OrderMetadata metadata = 4;
-  snowfall.stdlib.v1alpha.PostalAddress residence_address = 5;
+  snowfall.stdlib.v1.PostalAddress residence_address = 5;
 }
 
 message OrderMetadata {

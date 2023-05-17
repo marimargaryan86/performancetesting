@@ -20,7 +20,7 @@ from snowfall.stdlib.instrumentation import prometheus
 from snowfall.stdlib.persistence.redis import types
 from snowfall.stdlib.transport.amqp import consumer, trackable
 from snowfall.stdlib.transport.amqp import types as amqp_types
-from snowfall.stdlib.v1alpha import amqp_pb2 as trackable_pb2
+from snowfall.stdlib.v1 import amqp_pb2 as trackable_pb2
 
 ExpectedMessages = Union[
     amqp_pb2.TripOfferSearchResult,

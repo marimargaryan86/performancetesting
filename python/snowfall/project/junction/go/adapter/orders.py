@@ -11,7 +11,7 @@ from snowfall.project.junction.go.service.orders.v1alpha import (
     orders_pb2_grpc,
 )
 from snowfall.stdlib import sequence, string
-from snowfall.stdlib.v1alpha import postal_address_pb2
+from snowfall.stdlib.v1 import postal_address_pb2
 
 _MOCK_PRICE_UNITS = 13
 _MOCK_PRICE_NANOS = 370000000

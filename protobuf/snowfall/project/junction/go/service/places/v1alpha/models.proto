@@ -3,7 +3,7 @@ syntax = "proto3";
 package snowfall.project.junction.go.service.places.v1alpha;
 
 import "google/protobuf/timestamp.proto";
-import "snowfall/stdlib/v1alpha/latlng.proto";
+import "snowfall/stdlib/v1/latlng.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/places/v1alpha";
 
@@ -14,7 +14,7 @@ message ListOfIds {
 message Location {
   string id = 1;
   string name = 2;
-  snowfall.stdlib.v1alpha.LatLng coordinates = 3;
+  snowfall.stdlib.v1.LatLng coordinates = 3;
   string time_zone = 4;
   string country_code = 5;
   google.protobuf.Timestamp updated_at = 6;

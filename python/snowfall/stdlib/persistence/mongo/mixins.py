@@ -6,7 +6,7 @@ from typing import Generic, Sequence, TypeVar
 import pymongo
 
 from snowfall.stdlib.persistence.mongo import repository, resultset
-from snowfall.stdlib.v1alpha import amqp_pb2
+from snowfall.stdlib.v1 import amqp_pb2
 
 Record = TypeVar("Record")
 

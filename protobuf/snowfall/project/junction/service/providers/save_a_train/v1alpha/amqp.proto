@@ -3,7 +3,7 @@ syntax = "proto3";
 package snowfall.project.junction.service.providers.save_a_train.v1alpha;
 
 import "snowfall/project/junction/go/v1alpha/models.proto";
-import "snowfall/stdlib/v1alpha/datetime.proto";
+import "snowfall/stdlib/v1/datetime.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/providers/save_a_train/v1alpha";
 
@@ -18,8 +18,8 @@ message Criteria {
   string origin_id = 1;
   string destination_id = 2;
   repeated uint32 passengers_ages = 3;
-  snowfall.stdlib.v1alpha.DateTime departure_datetime = 4;
-  snowfall.stdlib.v1alpha.DateTime arrival_datetime = 6;
+  snowfall.stdlib.v1.DateTime departure_datetime = 4;
+  snowfall.stdlib.v1.DateTime arrival_datetime = 6;
   string cabin_class = 5;
 }
 

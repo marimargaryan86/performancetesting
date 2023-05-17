@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"testing"
 
-	v1alpha "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"
+	v1 "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1"
 )
 
 func TestGetGeoIdentifier(t *testing.T) {
 	// Minimal test until I can find an independent source of
 	// lat/lon -> H3 values
 	// Use http://wolf-h3-viewer.glitch.me/ to get test values
-	h3 := getGeoIdentifier(&v1alpha.LatLng{
+	h3 := getGeoIdentifier(&v1.LatLng{
 		Latitude:  0.0,
 		Longitude: 0.0,
 	})
@@ -19,7 +19,7 @@ func TestGetGeoIdentifier(t *testing.T) {
 		t.Errorf("Wrong geoIdentifier")
 	}
 
-	h3 = getGeoIdentifier(&v1alpha.LatLng{
+	h3 = getGeoIdentifier(&v1.LatLng{
 		Latitude:  51.38201,
 		Longitude: -1.59814, // 9 Spaines, SN8 3LT
 	})

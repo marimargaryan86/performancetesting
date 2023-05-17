@@ -6,7 +6,7 @@ from typing import Generic, Iterable, TypeVar
 
 from h3.api import numpy_int as h3
 
-from snowfall.stdlib.v1alpha import latlng_pb2
+from snowfall.stdlib.v1 import latlng_pb2
 
 
 @dataclasses.dataclass(frozen=True)

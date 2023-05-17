@@ -19,7 +19,7 @@ from snowfall.project.pay.service.transactions.v1alpha import (
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
-from snowfall.stdlib.v1alpha import money_pb2
+from snowfall.stdlib.v1 import money_pb2
 from snowfall.vendor.currency_cloud.models import balance as balance_models
 from snowfall.vendor.currency_cloud.models import beneficiary as beneficiary_cc_models
 

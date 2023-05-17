@@ -29,7 +29,7 @@ from snowfall.project.junction.service.providers.save_a_train.v1alpha import amq
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.amqp import producer
-from snowfall.stdlib.v1alpha import latlng_pb2
+from snowfall.stdlib.v1 import latlng_pb2
 from snowfall.vendor.save_a_train import client, enums, exceptions
 from snowfall.vendor.save_a_train.models import (
     booking,

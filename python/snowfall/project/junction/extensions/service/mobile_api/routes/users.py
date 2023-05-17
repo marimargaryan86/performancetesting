@@ -24,7 +24,7 @@ from snowfall.project.junction.extensions.service.mobile_api.v1alpha.models_pb2 
 from snowfall.stdlib import string
 from snowfall.stdlib.integration.starlette import models, request_helpers
 from snowfall.stdlib.persistence import filesystem
-from snowfall.stdlib.v1alpha import phone_number_pb2
+from snowfall.stdlib.v1 import phone_number_pb2
 
 _id_key = "_id"
 _email_key = "email"

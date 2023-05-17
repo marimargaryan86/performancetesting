@@ -9,7 +9,7 @@ from snowfall.project.junction.service.providers.ba_ndc import (
     enums,
     notifications,
 )
-from snowfall.stdlib.v1alpha import postal_address_pb2
+from snowfall.stdlib.v1 import postal_address_pb2
 from snowfall.vendor.ba_ndc import client, errors
 from snowfall.vendor.ba_ndc.adapters.order_view_adapter import OrderViewAdapter
 from snowfall.vendor.ba_ndc.builders.order_request import OrderRequestBuilder

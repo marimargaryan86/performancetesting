@@ -10,7 +10,7 @@ from snowfall.project.junction.extensions.service.mobile_api.v1alpha import mode
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
-from snowfall.stdlib.v1alpha import money_pb2
+from snowfall.stdlib.v1 import money_pb2
 
 _RELATIONSHIPS_FIELD = "data"
 

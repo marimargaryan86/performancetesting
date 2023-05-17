@@ -10,7 +10,7 @@ from snowfall.project.junction.go.service.offers.v1alpha import models_pb2
 from snowfall.project.junction.go.v1alpha import models_pb2 as common_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
-from snowfall.stdlib.v1alpha import amqp_pb2
+from snowfall.stdlib.v1 import amqp_pb2
 
 _IN = "$in"
 _OFFER_SEARCH_ID = "offer_search_id"

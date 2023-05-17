@@ -3,10 +3,10 @@ syntax = "proto3";
 package snowfall.project.junction.extensions.service.mobile_api.v1alpha;
 
 import "google/protobuf/timestamp.proto";
-import "snowfall/stdlib/v1alpha/date.proto";
-import "snowfall/stdlib/v1alpha/latlng.proto";
-import "snowfall/stdlib/v1alpha/money.proto";
-import "snowfall/stdlib/v1alpha/phone_number.proto";
+import "snowfall/stdlib/v1/date.proto";
+import "snowfall/stdlib/v1/latlng.proto";
+import "snowfall/stdlib/v1/money.proto";
+import "snowfall/stdlib/v1/phone_number.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/extensions/service/mobile_api/v1alpha";
 
@@ -14,13 +14,13 @@ message User {
   string id = 1;
   string email = 2;
   string password = 3;
-  snowfall.stdlib.v1alpha.PhoneNumber phone = 4;
+  snowfall.stdlib.v1.PhoneNumber phone = 4;
   string first_name = 5;
   string last_name = 6;
   string gender = 7;
   string title = 8;
   string country_code = 9;
-  snowfall.stdlib.v1alpha.Date date_of_birth = 10;
+  snowfall.stdlib.v1.Date date_of_birth = 10;
   repeated LoyaltyProgramUserProfile loyalty_programs = 11;
   google.protobuf.Timestamp created_at = 12;
   google.protobuf.Timestamp updated_at = 13;
@@ -34,7 +34,7 @@ message LoyaltyProgramUserProfile {
 message Place {
   string id = 1;
   string name = 2;
-  snowfall.stdlib.v1alpha.LatLng coordinates = 3;
+  snowfall.stdlib.v1.LatLng coordinates = 3;
   string time_zone = 4;
   string country_code = 5;
   string country_name = 6;
@@ -78,10 +78,10 @@ message MobileOrder {
 message Voucher {
   string id = 1;
   string code = 2;
-  snowfall.stdlib.v1alpha.Date expires_at = 3;
+  snowfall.stdlib.v1.Date expires_at = 3;
   oneof discount {
     //  TODO: add Percentage
-    snowfall.stdlib.v1alpha.Money price = 4;
+    snowfall.stdlib.v1.Money price = 4;
   }
   enum Status {
     STATUS_UNSPECIFIED = 0;

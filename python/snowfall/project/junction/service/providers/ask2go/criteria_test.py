@@ -10,7 +10,7 @@ from snowfall.project.junction.go.service.offers.v1alpha import amqp_pb2, models
 from snowfall.project.junction.go.v1alpha import models_pb2 as common_models_pb2
 from snowfall.project.junction.service.providers.ask2go import criteria
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import date_pb2, latlng_pb2
+from snowfall.stdlib.v1 import date_pb2, latlng_pb2
 
 
 class _IncrementalTime(object):

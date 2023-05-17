@@ -13,7 +13,7 @@ from snowfall.stdlib.integration.starlette import (
     pagination_helpers,
     request_helpers,
 )
-from snowfall.stdlib.v1alpha import postal_address_pb2
+from snowfall.stdlib.v1 import postal_address_pb2
 
 
 def _update_company_from_payload(

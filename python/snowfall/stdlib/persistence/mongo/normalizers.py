@@ -9,7 +9,7 @@ import pydantic
 from dateutil import parser
 from google.protobuf import descriptor, timestamp_pb2
 
-from snowfall.stdlib.v1alpha import latlng_pb2
+from snowfall.stdlib.v1 import latlng_pb2
 
 AnyValue = TypeVar("AnyValue", bound=Any)
 

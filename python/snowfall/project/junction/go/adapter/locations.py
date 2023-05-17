@@ -10,7 +10,7 @@ from snowfall.project.junction.go.service.places.v1alpha import (
     places_pb2_grpc,
 )
 from snowfall.stdlib import sequence
-from snowfall.stdlib.v1alpha import latlng_pb2
+from snowfall.stdlib.v1 import latlng_pb2
 
 
 class Client(abc.ABC):

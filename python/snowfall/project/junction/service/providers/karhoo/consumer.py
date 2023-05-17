@@ -14,7 +14,7 @@ from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.redis import types as redis_types
 from snowfall.stdlib.transport.amqp import consumer, producer, types
-from snowfall.stdlib.v1alpha import latlng_pb2
+from snowfall.stdlib.v1 import latlng_pb2
 from snowfall.vendor.karhoo import client, errors
 from snowfall.vendor.karhoo.models import location, quotes
 

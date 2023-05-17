@@ -4,7 +4,7 @@ import (
 	"context"
 	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/planner/v1alpha"
 	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1alpha"
-	v1alphaStdlib "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1alpha"
+	v1Stdlib "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1"
 	"git.snowfall.se/junction/junction/golang/raptor"
 	"github.com/google/uuid"
 	"github.com/uber/h3-go/v4"
@@ -79,13 +79,13 @@ func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *plan
 		var originTz *time.Location
 
 		switch v := req.DepartureAfter.TimeOffset.(type) {
-		case *v1alphaStdlib.DateTime_TimeZone:
+		case *v1Stdlib.DateTime_TimeZone:
 			originTz, err = time.LoadLocation(v.TimeZone.Id)
 
 			if err != nil {
 				return &planner.SearchJourneyResponse{}, status.Errorf(codes.Internal, "unknown time zone")
 			}
-		case *v1alphaStdlib.DateTime_UtcOffset:
+		case *v1Stdlib.DateTime_UtcOffset:
 			originTz = time.FixedZone("custom", int(v.UtcOffset.Seconds))
 		default:
 			return &planner.SearchJourneyResponse{}, status.Errorf(codes.Internal, "unknown time zone")

@@ -3,14 +3,14 @@ syntax = "proto3";
 package snowfall.project.junction.go.v1alpha;
 
 import "google/protobuf/timestamp.proto";
-import "snowfall/stdlib/v1alpha/latlng.proto";
+import "snowfall/stdlib/v1/latlng.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1alpha";
 
 message Point {
   string ref = 1;
   string name = 2;
-  snowfall.stdlib.v1alpha.LatLng coordinates = 3;
+  snowfall.stdlib.v1.LatLng coordinates = 3;
   string time_zone = 4;
 }
 

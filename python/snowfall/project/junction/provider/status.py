@@ -2,7 +2,7 @@ import datetime
 
 from snowfall.stdlib.persistence.redis import types
 from snowfall.stdlib.transport.amqp import trackable
-from snowfall.stdlib.v1alpha import amqp_pb2
+from snowfall.stdlib.v1 import amqp_pb2
 
 _SUBTASK_TIMEOUT_MINUTES = 15
 

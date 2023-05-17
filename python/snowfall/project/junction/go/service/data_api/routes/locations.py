@@ -4,7 +4,7 @@ from starlette import endpoints, requests, responses
 from snowfall.project.junction.go.service.data_api import resources
 from snowfall.service.geodata.v1 import geocoding_pb2, geocoding_pb2_grpc
 from snowfall.stdlib.integration.starlette import models
-from snowfall.stdlib.v1alpha import latlng_pb2
+from snowfall.stdlib.v1 import latlng_pb2
 
 _DEFAULT_LIMIT = 50
 

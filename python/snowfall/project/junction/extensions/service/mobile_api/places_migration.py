@@ -16,7 +16,7 @@ from snowfall.project.junction.extensions.service.mobile_api.v1alpha import mode
 from snowfall.project.junction.go.service.places.places import PlaceRepository
 from snowfall.project.junction.go.service.places.v1alpha.models_pb2 import Place
 from snowfall.stdlib.persistence import filesystem
-from snowfall.stdlib.v1alpha import latlng_pb2
+from snowfall.stdlib.v1 import latlng_pb2
 
 _SERVICE_NAME = "mobile-api"
 _ATTRIBUTES_KEY = "attributes"

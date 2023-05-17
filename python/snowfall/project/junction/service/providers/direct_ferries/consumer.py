@@ -17,7 +17,7 @@ from snowfall.project.junction.service.providers.direct_ferries import (
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.amqp import consumer, producer, types
-from snowfall.stdlib.v1alpha import amqp_pb2 as trackable_pb2
+from snowfall.stdlib.v1 import amqp_pb2 as trackable_pb2
 
 _PROVIDER_NAME = "Direct Ferries"
 _INFO_ATTR_REQUIREMENT_MAP = (

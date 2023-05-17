@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package snowfall.service.geodata.v1;
 
-import "snowfall/stdlib/v1alpha/datetime.proto";
-import "snowfall/stdlib/v1alpha/latlng.proto";
+import "snowfall/stdlib/v1/datetime.proto";
+import "snowfall/stdlib/v1/latlng.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/service/geocoding/v1alpha";
 
@@ -20,7 +20,7 @@ message Location {
   string region = 10;
   string country = 11;
   bool interpolated = 12;
-  snowfall.stdlib.v1alpha.LatLng coordinates = 14;
-  snowfall.stdlib.v1alpha.TimeZone time_zone = 15;
+  snowfall.stdlib.v1.LatLng coordinates = 14;
+  snowfall.stdlib.v1.TimeZone time_zone = 15;
   string postal_code = 16;
 }

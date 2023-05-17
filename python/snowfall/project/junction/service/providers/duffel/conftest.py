@@ -17,7 +17,7 @@ from snowfall.project.junction.service.providers.duffel.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.v1alpha import latlng_pb2
+from snowfall.stdlib.v1 import latlng_pb2
 from snowfall.vendor.duffel import client
 from snowfall.vendor.duffel.models.offer import Offer
 

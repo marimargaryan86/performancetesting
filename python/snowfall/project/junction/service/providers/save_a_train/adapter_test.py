@@ -11,7 +11,7 @@ from snowfall.project.junction.service.providers.save_a_train import (
 )
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import phone_number_pb2, postal_address_pb2
+from snowfall.stdlib.v1 import phone_number_pb2, postal_address_pb2
 
 _ORDER_TASK = amqp_pb2.PlaceOrderTask(
     booking=models_pb2.Booking(),

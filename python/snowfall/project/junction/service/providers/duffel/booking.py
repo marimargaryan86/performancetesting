@@ -7,7 +7,7 @@ from snowfall.project.junction.service.providers.duffel import cache, notificati
 from snowfall.project.junction.service.providers.duffel.enums import gender_from_proto
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import date_pb2
+from snowfall.stdlib.v1 import date_pb2
 from snowfall.vendor.duffel import client, errors
 from snowfall.vendor.duffel.builders.order_request import (
     IdentityDocument,

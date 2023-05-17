@@ -4,7 +4,7 @@ from typing import Any, Mapping, Sequence
 import mongomock_motor
 
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
-from snowfall.stdlib.v1alpha import testing_pb2
+from snowfall.stdlib.v1 import testing_pb2
 
 
 class MockProtoRepository(

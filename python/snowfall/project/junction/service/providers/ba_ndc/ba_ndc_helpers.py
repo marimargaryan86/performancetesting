@@ -11,7 +11,7 @@ from google.protobuf import timestamp_pb2
 from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1alpha import date_pb2, datetime_pb2, money_pb2
+from snowfall.stdlib.v1 import date_pb2, datetime_pb2, money_pb2
 from snowfall.vendor.ba_ndc.models import response_common_order_schemas
 
 PROVIDER_NAME = "BA_NDC"

@@ -8,7 +8,7 @@ import aiofiles
 
 from snowfall.service.geodata.v1 import geocoding_pb2, geocoding_pb2_grpc
 from snowfall.stdlib import h3
-from snowfall.stdlib.v1alpha import latlng_pb2
+from snowfall.stdlib.v1 import latlng_pb2
 from snowfall.vendor.save_a_train.models.misc import VendorStationsResponse
 
 

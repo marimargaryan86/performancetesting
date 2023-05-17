@@ -3,7 +3,7 @@ syntax = "proto3";
 package snowfall.project.junction.go.service.places.v1alpha;
 
 import "snowfall/project/junction/go/service/places/v1alpha/models.proto";
-import "snowfall/stdlib/v1alpha/latlng.proto";
+import "snowfall/stdlib/v1/latlng.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/places/v1alpha";
 
@@ -35,7 +35,7 @@ message ListLocationsResponse {
 }
 
 message ListNearbyLocationsRequest {
-  snowfall.stdlib.v1alpha.LatLng coordinates = 1;
+  snowfall.stdlib.v1.LatLng coordinates = 1;
 }
 
 message ListNearbyLocationsResponse {
