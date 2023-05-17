@@ -6,7 +6,6 @@ from typing import AsyncIterator, Mapping, Sequence
 from unittest import mock
 
 import httpx
-import mongomock_motor
 import pytest
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -193,11 +192,6 @@ def cc_api_key() -> str:
 @pytest.fixture()
 def cc_env() -> str:
     return "demo"
-
-
-@pytest.fixture()
-def mongo_client() -> motor_asyncio.AsyncIOMotorClient:
-    return mongomock_motor.AsyncMongoMockClient()
 
 
 @pytest.fixture()

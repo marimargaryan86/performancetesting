@@ -3,17 +3,17 @@ from typing import Any, Mapping, Sequence, cast
 import httpx
 from starlette import status
 
-from snowfall import fixtures
 from snowfall.stdlib.integration.starlette import request_helpers
 
 _DATA_KEY = "data"
+_NOT_FOUND = "00000000-0000-0000-0000-000000000000"
 
 
 async def test_list_and_view_endpoints(
     client: httpx.AsyncClient,
     url: str,
     expected_ids: Sequence[str],
-    invalid_id: str = fixtures.NOT_FOUND,
+    invalid_id: str = _NOT_FOUND,
 ) -> None:
     url = "{0}?page[limit]=1".format(url)
     resources: list[dict[str, Any]] = []
@@ -43,7 +43,7 @@ async def test_list_and_view_endpoints(
 async def _test_view_endpoint(
     client: httpx.AsyncClient,
     resources: Sequence[Mapping[str, Any]],
-    invalid_id: str = fixtures.NOT_FOUND,
+    invalid_id: str = _NOT_FOUND,
 ) -> None:
     current_link = None
     for resource in resources:

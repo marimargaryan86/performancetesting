@@ -13,7 +13,6 @@ from typing import (
 )
 
 import pymongo
-from bson import codec_options
 from google.protobuf.message import Message
 from motor import core, motor_asyncio
 from pydantic import BaseModel
@@ -42,13 +41,16 @@ _AGGREGATE_CURSOR_CLASS = (
 def _configure_collection(
     collection: motor_asyncio.AsyncIOMotorCollection,
 ) -> core.AgnosticCollection:
-    return collection.database.get_collection(
-        name=collection.name,
-        codec_options=codec_options.CodecOptions(
-            tz_aware=True,
-            tzinfo=datetime.timezone.utc,
-        ),
-    )
+    try:
+        return collection.with_options(
+            codec_options=collection.codec_options.with_options(
+                tz_aware=True,
+                tzinfo=datetime.timezone.utc,
+            ),
+        )
+    except NotImplementedError:
+        # Mongomock does not handle custom tzinfo yet.
+        return collection
 
 
 class RepositoryProtocol(Protocol[Record]):

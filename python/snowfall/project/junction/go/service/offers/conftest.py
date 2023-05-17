@@ -2,18 +2,12 @@ from __future__ import annotations
 
 import datetime
 
-import mongomock_motor
 import pytest
 from motor import motor_asyncio
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.go.service.offers import aggregator, offers
 from snowfall.stdlib.persistence.redis import types as redis
-
-
-@pytest.fixture()
-def mongo_client() -> motor_asyncio.AsyncIOMotorClient:
-    return mongomock_motor.AsyncMongoMockClient()
 
 
 @pytest.fixture()

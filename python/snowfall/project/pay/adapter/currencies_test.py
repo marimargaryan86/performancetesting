@@ -1,6 +1,5 @@
 from unittest import mock
 
-from snowfall import fixtures
 from snowfall.project.pay.adapter import currencies
 from snowfall.project.pay.service.currencies.v1alpha import (
     currencies_pb2,
@@ -34,8 +33,8 @@ class TestGrpcClient(object):
         )
         client = currencies.GrpcClient(stub)
         conversion = await client.convert(
-            fixtures.CURRENCIES[0],
-            fixtures.CURRENCIES[1],
+            Currency("USD"),
+            Currency("EUR"),
             100,
         )
         assert conversion.amount == 95

@@ -38,7 +38,6 @@ class UsersRepository(
         return await self._execute(
             query=self._collection.find_one,
             filter=self._get_filter_by_id(document_id),
-            filter_pre_cursor={},
         )
 
     async def find_user_by_email(
@@ -48,7 +47,6 @@ class UsersRepository(
         return await self._execute(
             query=self._collection.find_one,
             filter=self._get_filter_by_email(email),
-            filter_pre_cursor={},
         )
 
     def _get_filter_by_email(

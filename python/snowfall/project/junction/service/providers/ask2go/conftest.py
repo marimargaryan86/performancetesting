@@ -8,7 +8,6 @@ from collections.abc import AsyncIterator
 from typing import Any, Iterator, cast
 
 import httpx
-import mongomock_motor
 import pytest
 import pytest_httpx
 import structlog
@@ -121,11 +120,6 @@ def ask2go_client(http_client: httpx.AsyncClient) -> client.Ask2GoClient:
         api_booking_base_url="https://test_url",
         http_client=http_client,
     )
-
-
-@pytest.fixture()
-def mongo_client() -> motor_asyncio.AsyncIOMotorClient:
-    return mongomock_motor.AsyncMongoMockClient()
 
 
 @pytest.fixture()

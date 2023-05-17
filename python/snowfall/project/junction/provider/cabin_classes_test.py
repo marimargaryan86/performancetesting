@@ -1,14 +1,8 @@
-import mongomock_motor
 import pytest
 from motor import motor_asyncio
 
 from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.project.junction.provider import cabin_classes
-
-
-@pytest.fixture()
-def mongo_client() -> motor_asyncio.AsyncIOMotorClient:
-    return mongomock_motor.AsyncMongoMockClient()
 
 
 @pytest.fixture()
