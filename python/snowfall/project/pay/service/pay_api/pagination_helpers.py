@@ -1,9 +1,6 @@
 import types
 from typing import Mapping
 
-import currencycloud
-from furl import furl
-
 PAGE_CURSOR_KEY = "page[cursor]"
 PAGE_LIMIT_KEY = "page[limit]"
 
@@ -29,14 +26,3 @@ def map_query_params(
             mapped_params[parameter] = query_params[parameter]
 
     return mapped_params
-
-
-def get_next_link(
-    url: str,
-    pagination: currencycloud.resources.pagination.Pagination,
-) -> dict[str, str]:
-    next_url = furl(url)
-    next_url.args[PAGE_CURSOR_KEY] = pagination.next_page
-    next_url.args[PAGE_LIMIT_KEY] = pagination.per_page
-
-    return {"next": next_url.url}

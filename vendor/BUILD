@@ -20,7 +20,6 @@ python_requirements(
         "python-hcl2": ["hcl2"],
         "python-rapidjson": ["rapidjson"],
         "setuptools": ["easy_install", "pkg_resources", "setuptools"],
-        "currency-cloud": ["currencycloud"],
         "allure-python-commons": ["allure"],
     },
     overrides={
