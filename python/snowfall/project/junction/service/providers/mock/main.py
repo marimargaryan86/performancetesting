@@ -4,6 +4,7 @@ import contextlib
 import datetime
 import ipaddress
 
+import pydantic
 from grpc import aio
 from redis import asyncio as aioredis
 
@@ -11,9 +12,9 @@ from snowfall.project.junction.provider import offers as provider_offers
 from snowfall.project.junction.provider import service
 from snowfall.project.junction.provider.v1alpha import meta_pb2, meta_pb2_grpc
 from snowfall.project.junction.service.providers.mock import (
+    bookings,
     cache,
     offers,
-    orders,
     pricing,
 )
 from snowfall.stdlib.persistence.redis import types as redis
@@ -31,8 +32,16 @@ class _OffersSettings(service.OffersSettings):
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
 
 
-class _PriceQuotesSettings(service.OffersSettings):
+class _PriceQuotesSettings(service.Settings):
+    amqp_dsn: pydantic.AnyUrl
+    redis_dsn: pydantic.AnyUrl
+    provider_company_id: str
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
+
+
+class _BookingsSettings(service.Settings):
+    amqp_dsn: pydantic.AnyUrl
+    redis_dsn: pydantic.AnyUrl
 
 
 class _MockService(grpc_service.Service, meta_pb2_grpc.MetaServiceServicer):
@@ -123,6 +132,35 @@ async def _price_quotes(app: service.AsyncApplication[_PriceQuotesSettings]) -> 
     ).consume()
 
 
+async def _bookings(app: service.AsyncApplication[_BookingsSettings]) -> None:
+    redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
+        aioredis.from_url(
+            app.settings.redis_dsn,
+            decode_responses=False,
+        ).client(),
+    )
+    amqp_connection = await app.stack.enter_async_context(
+        types.Connection(app.settings.amqp_dsn),
+    )
+
+    await bookings.Consumer(
+        consumer_obj=consumer.Consumer(
+            connection=amqp_connection,
+            queue_name="{0}_orders".format(app.name),
+            binds=[(types.Exchange("orders"), "orders.offers")],
+        ),
+        producer_obj=producer.Producer(
+            connection=amqp_connection,
+            exchange=types.Exchange("orders"),
+        ),
+        booker=bookings.Booker(
+            price_quote_cache=cache.PriceQuoteCache(
+                client=redis.Client(redis_connection, prefix=app.name),
+            ),
+        ),
+    ).consume()
+
+
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(name="mock")
 
@@ -135,8 +173,8 @@ if __name__ == "__main__":
         ),
         service.Command(
             name="orders",
-            callback=orders.orders,
-            settings_class=orders.OrdersSettings,
+            callback=_bookings,
+            settings_class=_BookingsSettings,
         ),
         service.Command(name="grpc", callback=_grpc, settings_class=_GrpcSettings),
     )

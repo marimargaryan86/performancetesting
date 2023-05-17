@@ -15,6 +15,7 @@ from snowfall.project.junction.go.v1alpha import models_pb2 as common_pb2
 from snowfall.project.junction.provider import offers as provider_offers
 from snowfall.project.junction.provider import service
 from snowfall.project.junction.service.providers.mock import (
+    bookings,
     cache,
     main,
     offers,
@@ -189,3 +190,12 @@ async def price_quote(
     quoter: pricing.Quoter,
 ) -> offers_pb2.PriceQuote:
     return await quoter.generate_quote(option_id)
+
+
+@pytest.fixture()
+def booker(
+    price_quote_cache: cache.PriceQuoteCache,
+) -> bookings.Booker:
+    return bookings.Booker(
+        price_quote_cache=price_quote_cache,
+    )

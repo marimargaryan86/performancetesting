@@ -10,6 +10,10 @@ class OptionNotFoundError(Exception):
     """Raised when an offer is not found in the cache."""
 
 
+class PriceQuoteNotFoundError(Exception):
+    """Raised when a price quote is not found in the cache."""
+
+
 class MockDetails(RedisRecord):
     amount: int
     currency: str
