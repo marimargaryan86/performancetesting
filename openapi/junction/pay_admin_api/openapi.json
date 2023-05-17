@@ -1010,6 +1010,67 @@
         },
         "operationId": "get-beneficiaries-id",
         "description": "Get beneficiary"
+      },
+
+      "patch": {
+        "summary": "Update Beneficiary",
+        "tags": [
+          "beneficiaries"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/beneficiaryId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Beneficiary"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Beneficiary"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "patch-beneficiaries-id",
+        "description": "Update beneficiary"
       }
     },
     "/beneficiaries": {

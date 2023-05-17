@@ -160,5 +160,6 @@ def get_admin_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             "/beneficiaries/{beneficiaryId}",
             beneficiaries.Beneficiary,
             name="Beneficiary",
+            methods=["GET", "PATCH"],
         ),
     ]

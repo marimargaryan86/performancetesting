@@ -220,6 +220,19 @@ class PaymentClient(object):  # noqa: WPS214
         )
         return BeneficiaryResponse(**beneficiary)
 
+    async def update_beneficiary(
+        self,
+        beneficiary_id: str,
+        new_beneficiary: BeneficiaryRequest,
+    ) -> BeneficiaryResponse:
+        return BeneficiaryResponse(
+            **await self._make_request(
+                method=_METHOD_POST,
+                url="/beneficiaries/{0}".format(beneficiary_id),
+                payload=new_beneficiary.dict(exclude_none=True),
+            ),
+        )
+
     async def validate_beneficiary(
         self,
         beneficiary: BeneficiaryValidateRequest,

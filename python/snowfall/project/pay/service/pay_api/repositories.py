@@ -149,3 +149,17 @@ class BeneficiaryRepository(
         )
         beneficiaries.limit(limit or self._default_page_size)
         return beneficiaries
+
+    async def update(
+        self,
+        document_id: str,
+        beneficiary: Beneficiary,
+    ) -> pymongo.results.UpdateResult:
+        replacement = self._coder.encode(beneficiary)
+        replacement.pop("_id")
+
+        return await self._execute(
+            self._collection.replace_one,
+            filter={"_id": document_id},
+            replacement=replacement,
+        )

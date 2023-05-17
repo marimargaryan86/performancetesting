@@ -53,6 +53,70 @@ class Beneficiary(endpoints.HTTPEndpoint):
             request=request,
         )
 
+    async def patch(  # noqa: WPS210, WPS211, WPS217
+        self,
+        request: requests.Request,
+        payment_client: client.PaymentClient = lagom.injectable,
+        beneficiaries_repository: BeneficiaryRepository = lagom.injectable,
+        currencies_repository: CurrencyRepository = lagom.injectable,
+        companies_repository: CompanyRepository = lagom.injectable,
+        accounts_client: accounts_adapter.GrpcClient = lagom.injectable,
+    ) -> responses.Response:
+        beneficiary_id = request.path_params["beneficiaryId"]
+        body = await request_helpers.flatten_request(request)
+        beneficiary = await beneficiaries_repository.find_by_id(beneficiary_id)
+        if beneficiary is None:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+        currency = currencies_repository.find_by_id(body["currency"])
+        account = await accounts_client.get(body["account"])
+
+        errors = _validate(currency, account)
+
+        if errors:
+            return await messages.create_response(
+                body=models.Body(
+                    errors=errors,
+                ),
+                request=request,
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
+
+        account = cast(Account, account)
+
+        company = await companies_repository.find_by_id(account.company_id)
+        if company is None:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+        beneficiary_validate_request = _get_beneficiary_validate_model(
+            body,
+            company_name=company.name,
+        )
+        beneficiary_request = _get_beneficiary_model(
+            body,
+            beneficiary_validate_request,
+            company_name=company.name,
+        )
+        cc_beneficiary = await payment_client.update_beneficiary(
+            beneficiary_id=beneficiary.external_reference,
+            new_beneficiary=beneficiary_request,
+        )
+
+        beneficiary.account_id = body["account"]
+        beneficiary.updated_by = request.user.username
+        await beneficiaries_repository.update(beneficiary.id, beneficiary)
+
+        return await messages.create_response(
+            body=messages.models.Body(
+                data=resources.BeneficiariesResource.from_models(
+                    beneficiary=beneficiary,
+                    cc_beneficiary=cc_beneficiary,
+                    request=request,
+                ),
+            ),
+            request=request,
+        )
+
 
 class Beneficiaries(endpoints.HTTPEndpoint):
     async def get(  # noqa: WPS210
@@ -117,7 +181,7 @@ class Beneficiaries(endpoints.HTTPEndpoint):
         currency = currencies_repository.find_by_id(body["currency"])
         account = await accounts_client.get(body["account"])
 
-        errors = self._validate(currency, account)
+        errors = _validate(currency, account)
 
         if errors:
             return await messages.create_response(
@@ -187,35 +251,35 @@ class Beneficiaries(endpoints.HTTPEndpoint):
             status_code=status.HTTP_201_CREATED,
         )
 
-    def _validate(
-        self,
-        currency: money.Currency | None,
-        account: Account | None,
-    ) -> list[messages.models.Error]:
-        errors = []
-        if currency is None:
-            errors.append(
-                messages.models.Error(
-                    status=str(status.HTTP_404_NOT_FOUND),
-                    code="not_found",
-                    detail="Currency is not supported",
-                    source=messages.models.ErrorSourcePointer(
-                        pointer="/data/relationships/currency/data/id",
-                    ),
+
+def _validate(
+    currency: money.Currency | None,
+    account: Account | None,
+) -> list[messages.models.Error]:
+    errors = []
+    if currency is None:
+        errors.append(
+            messages.models.Error(
+                status=str(status.HTTP_404_NOT_FOUND),
+                code="not_found",
+                detail="Currency is not supported",
+                source=messages.models.ErrorSourcePointer(
+                    pointer="/data/relationships/currency/data/id",
                 ),
-            )
-        if account is None:
-            errors.append(
-                messages.models.Error(
-                    status=str(status.HTTP_404_NOT_FOUND),
-                    code="not_found",
-                    detail="Account is not found",
-                    source=messages.models.ErrorSourcePointer(
-                        pointer="/data/relationships/account/data/id",
-                    ),
+            ),
+        )
+    if account is None:
+        errors.append(
+            messages.models.Error(
+                status=str(status.HTTP_404_NOT_FOUND),
+                code="not_found",
+                detail="Account is not found",
+                source=messages.models.ErrorSourcePointer(
+                    pointer="/data/relationships/account/data/id",
                 ),
-            )
-        return errors
+            ),
+        )
+    return errors
 
 
 def _get_beneficiary_validate_model(

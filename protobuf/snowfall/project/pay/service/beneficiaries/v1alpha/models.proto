@@ -9,4 +9,5 @@ message Beneficiary {
   string external_reference = 2;
   string account_id = 3;
   string created_by = 4;
+  string updated_by = 5;
 }
