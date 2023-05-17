@@ -6,11 +6,8 @@ from fakeredis import aioredis as fakeredis
 from motor import motor_asyncio
 from redis import asyncio as aioredis
 
-from snowfall.stdlib.logging import stdout
-
 pytest.register_assert_rewrite("snowfall.stdlib.integration.starlette.testing")
 pytest.register_assert_rewrite("snowfall.stdlib.testing.asserts")
-stdout.configure_logger()
 
 
 @pytest.fixture()
