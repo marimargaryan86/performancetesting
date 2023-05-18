@@ -72,6 +72,25 @@ class JourneyRepository(
             filter_=filter_,
         )
 
+    async def find_by_booking_id(
+        self,
+        ids: Sequence[str],
+    ) -> resultset.ResultSet[models_pb2.Journey]:
+        filter_ = (
+            {
+                "orders.bookings._id": {
+                    "$in": ids,
+                },
+            }
+            if ids
+            else {}
+        )
+
+        return await self._find_with_cursor(
+            cur="",
+            filter_=filter_,
+        )
+
 
 class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
     _proto = models_pb2.Order
@@ -356,4 +375,31 @@ class BookingDetailsRepository(
                     "$eq": booking_id,
                 },
             },
+        )
+
+
+class BookingsCancellationsRepository(
+    mixins.FindByIdMixin[models_pb2.BookingsCancellation],
+    mixins.InsertMixin[models_pb2.BookingsCancellation],
+    repository.ProtoRepository[models_pb2.BookingsCancellation],
+):
+    _proto = models_pb2.BookingsCancellation
+
+    async def find_by_booking_id(
+        self,
+        ids: Sequence[str],
+    ) -> resultset.ResultSet[models_pb2.BookingsCancellation]:
+        filter_ = (
+            {
+                "booking_cancellations.booking_id": {
+                    "$in": ids,
+                },
+            }
+            if ids
+            else {}
+        )
+
+        return await self._find_with_cursor(
+            cur="",
+            filter_=filter_,
         )

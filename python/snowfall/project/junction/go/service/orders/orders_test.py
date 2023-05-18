@@ -36,6 +36,22 @@ async def order(
     )
 
 
+@pytest.fixture()
+async def bookings_cancellation(
+    bookings_cancellation_repository: orders.BookingsCancellationsRepository,
+    order: models_pb2.Order,
+) -> models_pb2.BookingsCancellation:
+    return await bookings_cancellation_repository.insert(
+        models_pb2.BookingsCancellation(
+            booking_cancellations=[
+                models_pb2.BookingCancellation(booking_id=booking.id)
+                for booking in order.bookings
+            ],
+            status=models_pb2.BookingsCancellation.STATUS_PENDING,
+        ),
+    )
+
+
 class TestJourneys(object):
     async def test_journey_is_retrievable_by_id(
         self,
@@ -119,3 +135,18 @@ class TestBookingDetails(object):
         booking_id = more_itertools.first(order.bookings).id
         details = await booking_details_repository.find_by_booking_id(booking_id, "")
         assert len([detail async for detail in details]) == 2
+
+
+class TestBookingsCancellations(object):
+    async def test_cancellation_is_retrievable_by_id(
+        self,
+        bookings_cancellation_repository: orders.BookingsCancellationsRepository,
+        bookings_cancellation: models_pb2.BookingsCancellation,
+    ) -> None:
+        retrieved = await bookings_cancellation_repository.find_by_id(
+            bookings_cancellation.id,
+        )
+        assert retrieved
+        assert retrieved.id == bookings_cancellation.id
+        assert retrieved.status == bookings_cancellation.status
+        assert retrieved.created_at.seconds == bookings_cancellation.created_at.seconds

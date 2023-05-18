@@ -60,6 +60,25 @@ def build_bad_request(
     )
 
 
+def build_precondition_failure(
+    subject: str,
+    description: str,
+) -> status_pb2.Status:
+    return build_rich_status(
+        code=grpc.StatusCode.FAILED_PRECONDITION,
+        error=error_details_pb2.PreconditionFailure(
+            violations=[
+                error_details_pb2.PreconditionFailure.Violation(
+                    type="logical",
+                    subject=subject,
+                    description=description,
+                ),
+            ],
+        ),
+        description=description,
+    )
+
+
 async def abort_with_rich_status(
     context: grpc.aio.ServicerContext,
     status: status_pb2.Status,

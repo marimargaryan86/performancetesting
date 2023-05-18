@@ -50,6 +50,25 @@ def service_unavailable_error_handler(
     return error_response_from_status(status.HTTP_503_SERVICE_UNAVAILABLE)
 
 
+def unprocessable_entity_error_handler(
+    request: requests.Request,
+    exc: Exception,
+) -> responses.Response:
+    status_code_obj = http.HTTPStatus(status.HTTP_422_UNPROCESSABLE_ENTITY)
+    return models.JsonApiResponse(
+        models.Body(
+            errors=[
+                models.Error(
+                    status=str(int(status_code_obj)),
+                    title=status_code_obj.phrase,
+                    detail=str(exc),
+                ),
+            ],
+        ),
+        status_code=int(status_code_obj),
+    )
+
+
 async def cursor_error_handler(
     request: requests.Request,
     exc: Exception,

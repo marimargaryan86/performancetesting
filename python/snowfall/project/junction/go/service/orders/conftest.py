@@ -46,3 +46,12 @@ def booking_details_repository(
     return orders.BookingDetailsRepository(
         collection=mongo_client.test.journeys,
     )
+
+
+@pytest.fixture()
+def bookings_cancellation_repository(
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
+) -> orders.BookingsCancellationsRepository:
+    return orders.BookingsCancellationsRepository(
+        collection=mongo_client.test.order_cancellations,
+    )

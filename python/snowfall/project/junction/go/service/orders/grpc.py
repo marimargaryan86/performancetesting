@@ -4,8 +4,12 @@ from snowfall.project.junction.go.service.orders.amqp import OrderProducer
 from snowfall.project.junction.go.service.orders.orders import (
     BookingDetailsRepository,
     BookingRepository,
+    BookingsCancellationsRepository,
     JourneyRepository,
     OrderRepository,
+)
+from snowfall.project.junction.go.service.orders.orders_handlers import (
+    CreateBookingsCancellationHandler,
 )
 from snowfall.project.junction.go.service.orders.v1alpha import (
     orders_pb2,
@@ -24,6 +28,7 @@ class OrderService(
         orders: OrderRepository,
         bookings: BookingRepository,
         booking_details: BookingDetailsRepository,
+        cancellations: BookingsCancellationsRepository,
         publisher: OrderProducer,
         default_page_size: int,
     ):
@@ -32,6 +37,7 @@ class OrderService(
         self._orders = orders
         self._bookings = bookings
         self._booking_details = booking_details
+        self._cancellations = cancellations
         self._publisher = publisher
 
     def get_name(self) -> str:
@@ -226,4 +232,33 @@ class OrderService(
         return orders_pb2.ListBookingDetailsResponse(
             details=[detail async for detail in details_result],
             next_page_token=await details_result.cursor(),
+        )
+
+    async def CreateBookingsCancellation(  # type: ignore[override] # noqa: N802
+        self,
+        request: orders_pb2.CreateBookingsCancellationRequest,
+        context: aio.ServicerContext,
+    ) -> orders_pb2.CreateBookingsCancellationResponse:
+        create_cancellation_handler = CreateBookingsCancellationHandler(
+            request,
+            context,
+            self._journeys,
+            self._cancellations,
+        )
+        return await create_cancellation_handler.execute()
+
+    async def GetBookingsCancellation(  # type: ignore[override] # noqa: N802
+        self,
+        request: orders_pb2.GetBookingsCancellationRequest,
+        context: aio.ServicerContext,
+    ) -> orders_pb2.GetBookingsCancellationResponse:
+        cancellation = await self._cancellations.find_by_id(
+            document_id=request.id,
+        )
+
+        if cancellation is None or cancellation.reseller_id != request.reseller_id:
+            await context.abort(StatusCode.NOT_FOUND)
+
+        return orders_pb2.GetBookingsCancellationResponse(
+            cancellation=cancellation,
         )

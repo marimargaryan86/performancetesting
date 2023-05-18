@@ -18,6 +18,8 @@ service OrderService {
   rpc ListBookings(ListBookingsRequest) returns (ListBookingsResponse) {}
   rpc GetBookingDetails(GetBookingDetailsRequest) returns (GetBookingDetailsResponse) {}
   rpc ListBookingDetails(ListBookingDetailsRequest) returns (ListBookingDetailsResponse) {}
+  rpc CreateBookingsCancellation(CreateBookingsCancellationRequest) returns (CreateBookingsCancellationResponse) {}
+  rpc GetBookingsCancellation(GetBookingsCancellationRequest) returns (GetBookingsCancellationResponse) {}
 }
 
 message CreateJourneyRequest {
@@ -132,4 +134,21 @@ message ListBookingDetailsResponse {
 
 message ListOfIds {
   repeated string ids = 1;
+}
+
+message CreateBookingsCancellationRequest {
+  BookingsCancellation cancellation = 1;
+}
+
+message CreateBookingsCancellationResponse {
+  BookingsCancellation cancellation = 1;
+}
+
+message GetBookingsCancellationRequest {
+  string id = 1;
+  string reseller_id = 2;
+}
+
+message GetBookingsCancellationResponse {
+  BookingsCancellation cancellation = 1;
 }
