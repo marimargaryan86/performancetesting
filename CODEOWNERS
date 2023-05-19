@@ -14,7 +14,7 @@
 /docs/engineering/
 
 ^[Architecture]
-/docs/engineering/docs/projects
+/docs/engineering/docs/projects/
 
 [Platform] @platform-engineers
 /golang/cmd/snowman/
