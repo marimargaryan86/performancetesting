@@ -18,3 +18,19 @@ services:
     ports:
       - "1025:1025"
       - "8025:8025"
+  gubernator-1:
+    image: ghcr.io/mailgun/gubernator:latest
+    entrypoint: "/gubernator"
+    environment:
+      # The address GRPC requests will listen on
+      - GUBER_GRPC_ADDRESS=0.0.0.0:81
+      # The address HTTP requests will listen on
+      - GUBER_HTTP_ADDRESS=0.0.0.0:80
+      # The address that is advertised to other peers
+      - GUBER_ADVERTISE_ADDRESS=gubernator-1:81
+      # A comma separated list of known gubernator nodes
+      - GUBER_MEMBERLIST_KNOWN_NODES=gubernator-1
+      #- GUBER_DATA_CENTER=us-east-1
+    ports:
+      - "9081:81"
+      - "9080:80"
