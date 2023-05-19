@@ -11,11 +11,7 @@ import pytest
 from snowfall.project.junction.api_automation.test_functions.mobile_client import (
     MobileApiClient,
 )
-from snowfall.project.junction.api_automation.test_functions.pay_admin_client import (
-    PayAdminClient,
-)
 from snowfall.stdlib.transport.http import auth
-from snowfall.vendor.junction.auth import UserAuth
 from snowfall.vendor.junction.go.client import Client as GoClient
 
 ALLURE_ENVIRONMENT_PROPERTIES_FILE = "environment.properties"
@@ -23,39 +19,6 @@ ALLUREDIR_OPTION = "--alluredir"
 EXIT_MSG = "Exiting ; check your logs"
 HTTPS_PREFIX = "https://"
 HTTP_PREFIX = "http://"
-expected_currencies_list = [
-    "AUD",
-    "BHD",
-    "BGN",
-    "CAD",
-    "CNY",
-    "CZK",
-    "DKK",
-    "EUR",
-    "HKD",
-    "HUF",
-    "ILS",
-    "JPY",
-    "KES",
-    "KWD",
-    "NZD",
-    "NOK",
-    "OMR",
-    "PLN",
-    "QAR",
-    "RON",
-    "SAR",
-    "SGD",
-    "ZAR",
-    "SEK",
-    "CHF",
-    "THB",
-    "TRY",
-    "UGX",
-    "GBP",
-    "AED",
-    "USD",
-]
 
 logger = logging.getLogger()
 
@@ -224,31 +187,6 @@ def mobile_client(
         base_url=api_url,
         auth=auth.TokenAuth(mobile_token),
         client=httpx.AsyncClient(timeout=client_timeout),
-    )
-
-
-@pytest.fixture()
-def pay_admin_client(
-    api_token: str,
-    host: str,
-) -> PayAdminClient:
-    email = get_variable_value(host, api_token, "pay_api_test_email")
-    password = get_variable_value(host, api_token, "pay_api_test_password")
-
-    base_url_admin_api = "{0}{1}".format(
-        HTTPS_PREFIX,
-        get_variable_value(host, api_token, "pay_admin_api_host"),
-    )
-
-    auth = UserAuth(
-        base_url=base_url_admin_api,
-        email=email,
-        password=password,
-    )
-
-    return PayAdminClient(
-        base_url=base_url_admin_api,
-        auth=auth,
     )
 
 

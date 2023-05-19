@@ -5,8 +5,8 @@ import random
 import httpx
 import pytest
 
-from snowfall.project.junction.api_automation.conftest import (
-    EXIT_MSG,
+from snowfall.project.junction.api_automation.conftest import EXIT_MSG
+from snowfall.project.junction.api_automation.pay_api_tests.conftest import (
     expected_currencies_list,
 )
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (

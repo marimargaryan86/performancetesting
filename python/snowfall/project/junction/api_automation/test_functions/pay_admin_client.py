@@ -234,6 +234,16 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         response.raise_for_status()
         return response.json()
 
+    async def get_beneficiary(
+        self,
+        beneficiary_id: str,
+    ) -> dict[str, Any]:
+        response = await self.client.get(
+            "/beneficiaries/{0}".format(beneficiary_id),
+        )
+        response.raise_for_status()
+        return response.json()
+
     async def create_contact(  # noqa: WPS211
         self,
         first_name: str,

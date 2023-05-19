@@ -212,6 +212,20 @@ async def pay_list_accounts(
 
 
 @pytest.fixture()
+async def pay_list_beneficiaries(
+    pay_admin_client: PayAdminClient,
+) -> dict[str, Any]:
+    try:
+        response_list_beneficiaries = await pay_admin_client.list_beneficiaries()
+    except httpx.HTTPStatusError as err:
+        logger.info("response_list_beneficiaries err: %s", err.response.headers)
+        logger.info("response_list_beneficiaries body: %s", err.response.json())
+        pytest.fail(err.response.json(), pytrace=False)
+    logger.info("list_accounts: %s", json.dumps(response_list_beneficiaries, indent=4))
+    return response_list_beneficiaries
+
+
+@pytest.fixture()
 def pay_client(
     api_token: str,
     host: str,
@@ -278,3 +292,63 @@ async def create_company(
         pytest.fail(EXIT_MSG, pytrace=False)
     logger.info("create_company: %s", json.dumps(response_company, indent=4))
     return response_company
+
+
+expected_currencies_list = [
+    "AUD",
+    "BHD",
+    "BGN",
+    "CAD",
+    "CNY",
+    "CZK",
+    "DKK",
+    "EUR",
+    "HKD",
+    "HUF",
+    "ILS",
+    "JPY",
+    "KES",
+    "KWD",
+    "NZD",
+    "NOK",
+    "OMR",
+    "PLN",
+    "QAR",
+    "RON",
+    "SAR",
+    "SGD",
+    "ZAR",
+    "SEK",
+    "CHF",
+    "THB",
+    "TRY",
+    "UGX",
+    "GBP",
+    "AED",
+    "USD",
+]
+
+
+@pytest.fixture()
+def pay_admin_client(
+    api_token: str,
+    host: str,
+) -> PayAdminClient:
+    email = get_variable_value(host, api_token, "pay_api_test_email")
+    password = get_variable_value(host, api_token, "pay_api_test_password")
+
+    base_url_admin_api = "{0}{1}".format(
+        HTTPS_PREFIX,
+        get_variable_value(host, api_token, "pay_admin_api_host"),
+    )
+
+    auth = UserAuth(
+        base_url=base_url_admin_api,
+        email=email,
+        password=password,
+    )
+
+    return PayAdminClient(
+        base_url=base_url_admin_api,
+        auth=auth,
+    )

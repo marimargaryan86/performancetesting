@@ -23,7 +23,6 @@ logger.setLevel(logging.DEBUG)
 async def test_get_transactions(  # noqa: WPS218
     pay_client: Client,
     pay_admin_client: PayAdminClient,
-    get_mongo_config: Mapping[str, Any],
     pay_create_transaction: Mapping[str, Any],
 ) -> None:
     try:
