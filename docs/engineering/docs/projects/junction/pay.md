@@ -1,5 +1,82 @@
 # Junction Pay
 
+Junction pay System Flow Diagram
+
+```mermaid
+    flowchart LR
+
+        subgraph Client
+            A(Client)
+        end
+
+        subgraph Firewall
+            B(Firewall)
+            style Firewall fill:#ff595e
+        end
+
+        subgraph PayAPI
+            direction TB
+            C(Pay API)
+            E(Vault)
+            I(Mongodb)
+            C --> E
+            C --> I
+        end
+
+        subgraph AdminAPI
+            D(Admin API)
+        end
+
+        subgraph AuthenticationServices
+            F(Authentication Services)
+            G(MongoDB)
+            F --> G
+        end
+
+        subgraph Adapters
+            H(Adapters)
+        end
+
+        subgraph Microservices
+            direction LR
+                J(Rates Service)
+                K(Rates Repo)
+                L(Currencies Service)
+                M(CurrenciesRepo)
+                N(Redis Cache)
+                O(Accounts)
+                P(Accounts Repo)
+                Q(Payment Service)
+                R(Payment Repo)
+                O --> P
+                J --> K
+                J --> N
+                L --> N
+                L --> M
+                Q --> R
+        end
+
+        subgraph CurrencyCloud Client
+            S(CurrencyCloud Client)
+        end
+
+        subgraph Firewall Outbound
+            T(Firewall)
+        end
+
+        A --> B
+        B --> PayAPI
+        B --> AdminAPI
+        PayAPI --> Adapters
+        AdminAPI --> Adapters
+        Adapters --> AuthenticationServices
+        Adapters --> Microservices
+        PayAPI --> S
+        Microservices --> S
+        S --> T
+        T --> CurrencyCloud
+```
+
 Quotation API:
 
 This api will be consumed by clients to get the calculated amount based on currency pair. New amount will be calculated using the fx rates, Margins and Markups setup against the client's company.
