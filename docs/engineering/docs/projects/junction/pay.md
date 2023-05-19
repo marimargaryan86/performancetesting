@@ -11,20 +11,37 @@ Junction pay System Flow Diagram
 
         subgraph Firewall
             B(Firewall)
-            style Firewall fill:#ff595e
         end
 
         subgraph PayAPI
-            direction TB
+            direction LR
             C(Pay API)
             E(Vault)
-            I(Mongodb)
+            I(transaction repo)
+            U(quotation repo)
+            V(fx Conversion repo)
+            W(Company Repo)
             C --> E
             C --> I
+            C --> U
+            C --> V
+            C --> W
         end
 
         subgraph AdminAPI
+            direction LR
             D(Admin API)
+            X(Vault)
+            Y(transaction repo)
+            Z(quotation repo)
+            A1(fx Conversion repo)
+            B2(Company Repo)
+
+            D --> X
+            D --> Y
+            D --> Z
+            D --> A1
+            D --> B2
         end
 
         subgraph AuthenticationServices
@@ -67,15 +84,28 @@ Junction pay System Flow Diagram
         A --> B
         B --> PayAPI
         B --> AdminAPI
+        PayAPI --> S
         PayAPI --> Adapters
         AdminAPI --> Adapters
         Adapters --> AuthenticationServices
         Adapters --> Microservices
-        PayAPI --> S
         Microservices --> S
         S --> T
         T --> CurrencyCloud
+
+        AdminAPI --> S
 ```
+
+In this flow diagram
+
+* The Client (A) communicates to Pay and admin API via inbound Firewall (B).
+* The Pay API (C) retrieves secrets using the Vault (E) and will use quotation, transaction and fx conversion repos, this will be used by Go to create Quotations and Transactions.
+* The Admin API (D) retrieves secrets using the Vault (E) and will use quotation, transaction and fx conversion repos. admin api will be used by Hub to list down quotations, transactions, and fx conversions
+* The Adapters (H) mediate the communication between the Pay API, Admin API, Authentication Services, and the Microservices.
+* The Authentication Services (F) have a connection to the User Repository (G).
+* The Microservices include the Rates Service (J), Rates Repository (K), Currencies Service (L), Currencies Repository (M), Redis Cache (N), Accounts (O), Accounts Repository (P), Payment Service (Q), and Payment Repository (R).
+* The Microservices interacts with the CurrencyCloud Client (S).
+* The FirewallOutbound (T) represents the outbound traffic from the Firewall.
 
 Quotation API:
 
