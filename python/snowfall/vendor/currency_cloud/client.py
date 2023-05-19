@@ -29,6 +29,10 @@ from snowfall.vendor.currency_cloud.models.conversion import (
     ConversionRequest,
     ConversionResponse,
 )
+from snowfall.vendor.currency_cloud.models.payment import (
+    PaymentRequest,
+    PaymentResponse,
+)
 from snowfall.vendor.currency_cloud.models.rate import BasicRateResponse
 
 _logger = structlog.get_logger(__name__)
@@ -282,6 +286,35 @@ class PaymentClient(object):  # noqa: WPS214
             for pair, rates in response_data["rates"].items()
         ]
 
+    async def create_payment(self, payment_request: PaymentRequest) -> PaymentResponse:
+        return PaymentResponse(
+            **await self._make_request(
+                method=_METHOD_POST,
+                url="/payments/create",
+                payload=payment_request.dict(exclude_none=True),
+            ),
+        )
+
+    async def get_payment(self, payment_id: str) -> PaymentResponse:
+        return PaymentResponse(
+            **await self._make_request(
+                method=_METHOD_GET,
+                url="/payments/{0}".format(payment_id),
+            ),
+        )
+
+    async def validate_payment(
+        self,
+        payment_request: PaymentRequest,
+    ) -> bool:
+        return (
+            await self._make_request(
+                method=_METHOD_POST,
+                url="/payments/validate",
+                payload=payment_request.dict(exclude_none=True),
+            )
+        )["validation_result"] == "success"
+
     async def _make_request(
         self,
         method: str,
@@ -297,12 +330,12 @@ class PaymentClient(object):  # noqa: WPS214
         )
 
         if 400 <= response.status_code < 500:  # noqa: WPS432
-            errors = response.json()["error_messages"]
+            error_messages = response.json()["error_messages"]
             raise CurrencyCloudError(
                 [
-                    error_message
-                    for error_type in errors
-                    for error_message in errors[error_type]
+                    error_message["message"]
+                    for error_type, errors in error_messages.items()
+                    for error_message in errors
                 ],
             )
 
