@@ -1,15 +1,10 @@
-def nomad_template(  # type: ignore[no-untyped-def]  # noqa: C901,WPS210
+def nomad_template(  # noqa: WPS210
     commands: list[str],  # noqa: SF20
     service_entry_point: str = "",
-    **kwargs,  # noqa: ANN003
+    name: str = "",
 ) -> None:
-    try:
-        name = kwargs["name"]
-    except KeyError:
+    if not name:
         name = build_file_dir().name  # type: ignore[name-defined]  # noqa: F821
-
-    kwargs.pop("name", None)
-    kwargs.pop("sources", None)
 
     cmd = './bash/lint-configuration.sh {command} "{path}/{filename}.nomad" "{config}"'
     config_path = "{path}/debug_info.json".format(
@@ -33,13 +28,14 @@ def nomad_template(  # type: ignore[no-untyped-def]  # noqa: C901,WPS210
         else:
             command, filename = parts[1], parts[0]
 
-        files(  # type: ignore[name-defined]  # noqa: F821
-            name="{name}_{filename}_files".format(name=name, filename=filename),
-            sources=[
-                "{filename}.json".format(filename=filename),
-                "{filename}.nomad".format(filename=filename),
-            ],
-            **kwargs,
+        file(  # type: ignore[name-defined]  # noqa: F821
+            name="{name}_{filename}_config".format(name=name, filename=filename),
+            source="{filename}.json".format(filename=filename),
+        )
+
+        file(  # type: ignore[name-defined]  # noqa: F821
+            name="{name}_{filename}_nomad".format(name=name, filename=filename),
+            source="{filename}.nomad".format(filename=filename),
         )
 
         if service_entry_point:
@@ -52,7 +48,8 @@ def nomad_template(  # type: ignore[no-untyped-def]  # noqa: C901,WPS210
                     config=config_path,
                 ),
                 execution_dependencies=[
-                    ":{name}_{filename}_files".format(name=name, filename=filename),
+                    ":{name}_{filename}_config".format(name=name, filename=filename),
+                    ":{name}_{filename}_nomad".format(name=name, filename=filename),
                     ":{name}_debug_info".format(name=name),
                     "bash/lint-configuration.sh",
                 ],

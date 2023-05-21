@@ -8,6 +8,7 @@ CHANGED_SINCE=""
 ENFORCE_FULL_LINTING=0
 FULL_LINTING_REQUIRED=(
 	".gitlab/pants.Dockerfile"
+	"bash/lint-pant.sh"
 	"pants.ci.toml"
 	"pants.toml"
 	"vendor/"
