@@ -18,9 +18,14 @@ async def assert_awaitables(
 
 
 async def assert_iterable(
-    generator: AsyncIterable[_DataType],
+    generator: AsyncIterable[_DataType] | Iterable[_DataType],
     expected: Iterable[_DataType],
 ) -> None:
-    assert collections.Counter(expected) == collections.Counter(  # nosec
-        [gen_item async for gen_item in generator],
-    )
+    if isinstance(generator, AsyncIterable):
+        assert collections.Counter(expected) == collections.Counter(  # nosec
+            [gen_item async for gen_item in generator],
+        )
+    else:
+        assert collections.Counter(expected) == collections.Counter(  # nosec
+            list(generator),
+        )

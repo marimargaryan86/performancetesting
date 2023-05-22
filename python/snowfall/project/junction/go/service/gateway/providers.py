@@ -1,51 +1,114 @@
-import grpc
+from __future__ import annotations
 
-from snowfall.project.junction.provider.v1alpha import meta_pb2, meta_pb2_grpc
-from snowfall.stdlib.logging import stdout
+import asyncio
+import base64
+import dataclasses
+import itertools
+from collections.abc import Sequence
+from typing import Iterable, NamedTuple
+
 from snowfall.stdlib.transport.grpc import client
 
 
-class ProviderError(Exception):
+class IdentifierAddressTuple(NamedTuple):
+    identifier: str
+    address: str
+
+
+class Error(Exception):
     """Generic provider error."""
 
 
-class ProviderUnavailableError(ProviderError):
+class UnavailableError(Error):
     """Raised when a provider is unavailable."""
 
 
-class Provider(object):
-    def __init__(self, dsn: str):
-        self._dsn = dsn
-        self._capabilities = meta_pb2_grpc.MetaServiceStub(
-            client.create_channel(dsn),
-        )
-        self._logger = stdout.get_logger()
-        self._identifier = None
+class UnmarshalResult(NamedTuple):
+    provider_id: str
+    resource_id: str
 
-    async def update_identifier(self) -> str:
-        with stdout.context_binding(dsn=self._dsn):
-            try:
-                response = await self._capabilities.GetIdentifier(
-                    meta_pb2.GetIdentifierRequest(),
-                )
-            except grpc.aio.AioRpcError as exc:
-                if exc.code() == grpc.StatusCode.UNAVAILABLE:
-                    self._logger.error("Provider is unavailable")
 
-                    raise ProviderUnavailableError() from exc
+class Collection(object):
+    _lock: asyncio.Lock
+    _providers: dict[str, Provider]
 
-                self._logger.error("Unknown error")
+    def __init__(self, providers: Sequence[Provider]):
+        self._lock = asyncio.Lock()
+        self._providers = {provider.identifier: provider for provider in providers}
 
-                raise ProviderUnavailableError() from exc
-
-        self._identifier = response.identifier
-
-        return response.identifier
-
-    async def check_health(self) -> bool:
+    def find_by_id(self, identifier: str) -> Provider | None:
         try:
-            await self.update_identifier()
-        except ProviderUnavailableError:
-            return False
+            provider = self._providers[identifier]
+        except KeyError:
+            return None
 
-        return True
+        if not provider.is_healthy:
+            return None
+
+        return provider
+
+    @classmethod
+    async def from_identifier_address_tuples(
+        cls,
+        tuples: Sequence[IdentifierAddressTuple],
+    ) -> Collection:
+        return cls(
+            [
+                Provider(
+                    connection=Connection(address),
+                    identifier=identifier,
+                )
+                for identifier, address in tuples
+            ],
+        )
+
+    def all_(self) -> Iterable[Provider]:
+        yield from (
+            provider for provider in self._providers.values() if provider.is_healthy
+        )
+
+
+@dataclasses.dataclass(frozen=True)
+class Provider(object):
+    connection: Connection
+    identifier: str
+    name: str = ""
+    is_healthy: bool = False
+
+    def marshal_resource_id(self, resource_id: str) -> str:
+        raw = "\x00".join([self.identifier, resource_id])
+
+        while len(raw) % 3 != 0:
+            raw = "{0}\x00".format(raw)
+
+        return base64.urlsafe_b64encode(raw.encode()).decode()
+
+
+class Connection(object):
+    def __init__(self, dsn: str):
+        self._channel = client.create_channel(dsn)
+
+
+def unmarshal_resource_id(resource_id: str) -> UnmarshalResult:
+    raw = base64.urlsafe_b64decode(resource_id).decode()
+    provider_id, resource_id = raw.rstrip("\x00").split("\x00")
+
+    return UnmarshalResult(provider_id, resource_id)
+
+
+def unmarshal_resource_ids(resource_ids: Sequence[str]) -> dict[str, list[str]]:
+    unmarshal_results = [
+        unmarshal_resource_id(resource_id) for resource_id in resource_ids
+    ]
+
+    unmarshal_results.sort(key=lambda unmarshal_result: unmarshal_result.provider_id)
+
+    return {
+        group: [
+            unmarshal_result.resource_id for unmarshal_result in group_unmarshal_results
+        ]
+        for group, group_unmarshal_results in itertools.groupby(
+            unmarshal_results,
+            key=lambda unmarshal_result: unmarshal_result.provider_id,
+        )
+    }
