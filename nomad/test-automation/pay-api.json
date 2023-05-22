@@ -8,6 +8,10 @@
     "deploy": false,
       "variables": {
       }
+  },
+  "sandbox": {
+    "deploy": false,
+    "variables": {}
   }
 }
 

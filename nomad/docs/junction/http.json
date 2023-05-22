@@ -7,5 +7,8 @@
       "traefik_entrypoints": "web",
       "traefik_rule": "(Host(`docs.junction.travel`) || Host(`developer.snowfalltravel.com`))"
     }
+  },
+  "sandbox": {
+    "deploy": false
   }
 }

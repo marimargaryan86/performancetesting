@@ -8,5 +8,10 @@
     "variables": {
       "loki_endpoint": "http://172.31.46.153:3100"
     }
+  },
+  "sandbox": {
+    "variables": {
+      "loki_endpoint": "http://172.31.46.153:3100"
+    }
   }
 }
