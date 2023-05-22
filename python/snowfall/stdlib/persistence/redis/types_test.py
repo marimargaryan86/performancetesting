@@ -12,7 +12,7 @@ from snowfall.stdlib.testing import asserts
 
 
 class TestPrefixClient(object):
-    async def test_set_get_delete(self, redis_client: aioredis.Redis[str]) -> None:
+    async def test_set_get_delete(self, redis_client: aioredis.Redis[bytes]) -> None:
         await asyncio.gather(
             self._foo_client.put("foobar", "foobar"),
             self._bar_client.put("foobar", "bazqux"),
@@ -30,7 +30,7 @@ class TestPrefixClient(object):
             (self._bar_client.get("foobar"), None),
         )
 
-    async def test_wildcard_delete(self, redis_client: aioredis.Redis[str]) -> None:
+    async def test_wildcard_delete(self, redis_client: aioredis.Redis[bytes]) -> None:
         await asyncio.gather(
             self._foo_client.put("foo.bar", "foobar"),
             self._foo_client.put("foo.baz", "foobar"),
@@ -54,7 +54,7 @@ class TestPrefixClient(object):
             (self._bar_client.get("foo.baz"), None),
         )
 
-    async def test_hash(self, redis_client: aioredis.Redis[str]) -> None:
+    async def test_hash(self, redis_client: aioredis.Redis[bytes]) -> None:
         hash1 = self._foo_client.hash_("foobar")
         hash2 = self._bar_client.hash_("foobar")
 

@@ -56,7 +56,7 @@ jwt_private_key = rsa.generate_private_key(
 
 jwt_token = jwtlib.encode(
     payload=jwt_payload,
-    key=jwt_private_key,  # type: ignore[arg-type]
+    key=jwt_private_key,
     algorithm="RS256",
 )
 jwt_public_key_bytes = jwt_private_key.public_key().public_bytes(

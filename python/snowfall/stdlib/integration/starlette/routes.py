@@ -91,7 +91,7 @@ class Proxy(object):
         self._allow = allow
         self._client = client
         self._deny = deny
-        self._prefix = prefix
+        self._prefix = "/{0}".format(prefix.lstrip("/"))
         self._pop_headers = [
             "host",
             *self._client.headers.keys(),
@@ -100,7 +100,7 @@ class Proxy(object):
 
     def to_route(self) -> routing.Route:
         return routing.Route(
-            "/{0}".format(os.path.join(self._prefix, "{path:path}").lstrip("/")),
+            os.path.join(self._prefix, "{path:path}"),
             endpoint=self._route,
             methods=["POST", "GET", "PATCH", "DELETE"],
         )

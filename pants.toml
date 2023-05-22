@@ -1,5 +1,5 @@
 [GLOBAL]
-pants_version = "2.16.0rc2"
+pants_version = "2.16.0rc3"
 level = "warn"
 pantsd_max_memory_usage = "8GiB"
 build_file_prelude_globs = ["python/snowfall/plugin/pants/macros.py"]
@@ -108,6 +108,9 @@ source_plugins = [
     "python/snowfall/plugin/flake8/typing.py",
 ]
 
+[generate-lockfiles]
+diff = true
+
 [golang]
 minimum_expected_version = "1.19"
 
@@ -202,3 +205,6 @@ report_dir = "dist/test_results"
 ignore_paths = [
     "bash/tests/schedule_tests/**"
 ]
+
+[update-build-files]
+fmt = false

@@ -11,6 +11,24 @@ class TestHealth(object):
 
 
 class TestProxy(object):
+    async def test_proxy(
+        self,
+        test_app_without_spec: applications.Starlette,
+        test_client_without_spec: httpx.AsyncClient,
+        test_app: applications.Starlette,
+        test_client: httpx.AsyncClient,
+    ) -> None:
+        test_app.routes.append(
+            routing.Route("/health", routes.Health, name="Health"),
+        )
+
+        test_app_without_spec.routes.append(
+            routes.Proxy(test_client).to_route(),
+        )
+
+        response = await test_client_without_spec.get("/health")
+        assert response.status_code == status.HTTP_200_OK
+
     async def test_proxy_with_prefix(
         self,
         test_app_without_spec: applications.Starlette,
@@ -23,7 +41,7 @@ class TestProxy(object):
         )
 
         test_app_without_spec.routes.append(
-            routes.Proxy(test_client, prefix="prefix").to_route(),
+            routes.Proxy(test_client, prefix="/prefix").to_route(),
         )
 
         response = await test_client_without_spec.get("/prefix/health")

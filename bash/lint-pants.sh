@@ -2,7 +2,7 @@
 set -eu
 shopt -s nullglob
 
-pants tailor --check update-build-files --check --no-update-build-files-fmt ::
+pants tailor --check update-build-files --check ::
 
 CHANGED_SINCE=""
 ENFORCE_FULL_LINTING=0

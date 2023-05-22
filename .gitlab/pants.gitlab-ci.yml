@@ -33,7 +33,7 @@ pants:setup:
     PANTS_DOCKER_REGISTRIES: "{'${CI_REGISTRY}': {'address': '${CI_REGISTRY}', 'default': True}}"
     SCIE_BASE: "${CI_PROJECT_DIR}/.cache/scie"
   cache:
-    - key: "python-3.11.3-go-1.19.7-scie-0.6.0-pants-2.16.0rc2-0"
+    - key: "python-3.11.3-go-1.19.7-scie-0.6.0-pants-2.16.0rc3-0"
       when: always
       paths:
         - "${SCIE_BASE}"
