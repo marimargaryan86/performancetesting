@@ -92,7 +92,6 @@ Junction pay System Flow Diagram
         Microservices --> S
         S --> T
         T --> CurrencyCloud
-
         AdminAPI --> S
 ```
 
@@ -149,5 +148,46 @@ below sequence diagram demonstrate the flow and components involved.
             CurrencyCloud->>-BackgroundJob: Returns synced rates
             BackgroundJob->>+RedisCache: Cache synced rates
             RedisCache-->>-BackgroundJob: Confirms cached rates
+        end
+```
+
+Transaction API:
+
+```mermaid
+    sequenceDiagram
+        participant Client
+        participant PayAPI
+        participant QuotationRepo
+        participant TransactionRepo
+        participant CurrencyCloud
+        participant ConversionRepo
+        participant BackgroundJob
+
+        Client->>PayAPI: Initiate Transaction with Quotation ID and Booking Reference
+        PayAPI->>PayAPI: Check if Quotation is valid
+        alt Quotation is expired
+            PayAPI-->>Client: Error - Quotation expired
+        else Quotation is valid
+            PayAPI->>QuotationRepo: Copy Quotation data to TransactionRepo with Transaction Details
+            PayAPI-->>Client: Transaction UUID
+        end
+
+        PayAPI->>CurrencyCloud: Initiate FX Conversion (async)
+        CurrencyCloud-->>PayAPI: Conversion Request initiated
+
+        alt FX Conversion is successful
+            PayAPI->>ConversionRepo: Save FX Conversion with status "Initiated"
+        else FX Conversion failed
+            PayAPI->>ConversionRepo: Save Failed FX Conversion Request
+        end
+
+        BackgroundJob->>ConversionRepo: Read Failed Conversion Requests
+        loop for each failed request
+            BackgroundJob->>CurrencyCloud: Process Failed Conversion Request
+            alt FX Conversion is successful
+                BackgroundJob->>ConversionRepo: Update Conversion Status to "Successful"
+            else FX Conversion failed again
+                BackgroundJob->>ConversionRepo: Update Conversion Status to "Failed"
+            end
         end
 ```
