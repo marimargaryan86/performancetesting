@@ -14,5 +14,13 @@
       "api_base_url": "https://apibook.saveatrain.com/api",
       "api_search_base_url": "https://apisearch.saveatrain.com/search"
     }
+  },
+  "sandbox": {
+    "variables": {
+      "count": 1,
+      "provider_company_id": "87e7fda0-b672-487c-bf93-aac43cd02a79",
+      "api_base_url": "https://apibook.saveatrain.com/api",
+      "api_search_base_url": "https://apisearch.saveatrain.com/search"
+    }
   }
 }

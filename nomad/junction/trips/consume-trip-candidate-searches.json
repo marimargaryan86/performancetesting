@@ -8,5 +8,10 @@
     "variables": {
       "count": 2
     }
+  },
+  "sandbox": {
+    "variables": {
+      "count": 1
+    }
   }
 }

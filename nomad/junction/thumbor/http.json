@@ -10,5 +10,11 @@
       "traefik_host_URL": "thumbor.junction.travel",
       "traefik_entrypoints": "web"
     }
+  },
+  "sandbox": {
+    "variables": {
+      "traefik_host_URL": "thumbor.sandbox.junction.dev",
+      "traefik_entrypoints": "websecure"
+    }
   }
 }

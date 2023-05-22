@@ -1,12 +1,17 @@
 {
-    "development": {
-        "variables": {
-          "cc_address": "https://devapi.currencycloud.com/v2"
-        }
-    },
-    "production": {
-        "variables": {
-          "cc_address": "https://devapi.currencycloud.com/v2"
-        }
+  "development": {
+    "variables": {
+      "cc_address": "https://devapi.currencycloud.com/v2"
     }
+  },
+  "production": {
+    "variables": {
+      "cc_address": "https://devapi.currencycloud.com/v2"
+    }
+  },
+  "sandbox": {
+    "variables": {
+      "cc_address": "https://devapi.currencycloud.com/v2"
+    }
+  }
 }

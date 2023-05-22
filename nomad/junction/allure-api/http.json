@@ -7,5 +7,12 @@
   },
   "production": {
     "deploy": false
+  },
+  "sandbox": {
+    "deploy": false,
+    "variables": {
+      "traefik_entrypoints": "websecure",
+      "traefik_host_URL": "allureapi.sandbox.junction.dev"
+    }
   }
 }

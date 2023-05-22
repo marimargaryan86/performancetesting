@@ -8,5 +8,10 @@
     "variables": {
       "cc_address": "https://devapi.currencycloud.com/v2"
     }
+  },
+  "sandbox": {
+    "variables": {
+      "cc_address": "https://devapi.currencycloud.com/v2"
+    }
   }
 }

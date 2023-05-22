@@ -1,21 +1,30 @@
 {
-    "development": {
-        "variables": {
-            "count": 1,
-            "api_url": "https://sandbox-api.test.directferriesconnect.com",
-            "affiliate_api_url": "https://tf-test-affiliate-api-sandbox.auth.eu-west-1.amazoncognito.com",
-            "client_id": "3r2ha5jopuaphv9fctntqtraso",
-            "partner_code": "F5152"
-        }
-    },
-    "production": {
-        "deploy": false,
-        "variables": {
-            "count": 2,
-            "api_url": "",
-            "affiliate_api_url": "",
-            "client_id": "",
-            "partner_code": ""
-        }
+  "development": {
+    "variables": {
+      "count": 1,
+      "api_url": "https://sandbox-api.test.directferriesconnect.com",
+      "affiliate_api_url": "https://tf-test-affiliate-api-sandbox.auth.eu-west-1.amazoncognito.com",
+      "client_id": "3r2ha5jopuaphv9fctntqtraso",
+      "partner_code": "F5152"
     }
+  },
+  "production": {
+    "deploy": false,
+    "variables": {
+      "count": 2,
+      "api_url": "",
+      "affiliate_api_url": "",
+      "client_id": "",
+      "partner_code": ""
+    }
+  },
+  "sandbox": {
+    "variables": {
+      "count": 1,
+      "api_url": "https://sandbox-api.test.directferriesconnect.com",
+      "affiliate_api_url": "https://tf-test-affiliate-api-sandbox.auth.eu-west-1.amazoncognito.com",
+      "client_id": "3r2ha5jopuaphv9fctntqtraso",
+      "partner_code": "F5152"
+    }
+  }
 }

@@ -16,5 +16,14 @@
       "plus_api_address": "",
       "plus_activated": false
     }
+  },
+  "sandbox": {
+    "variables": {
+      "count": 1,
+      "traefik_entrypoints": "websecure",
+      "traefik_host_URL": "res-se-mobile-api.sandbox.junction.dev",
+      "plus_api_address": "https://plus.api.sandbox.junction.dev",
+      "plus_activated": true
+    }
   }
 }

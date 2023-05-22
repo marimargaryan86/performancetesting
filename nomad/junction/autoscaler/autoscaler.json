@@ -1,8 +1,12 @@
 {
-    "development": {
-        "variables": {}
-    },
-    "production": {
-        "variables": {}
-    }
+  "development": {
+    "variables": {}
+  },
+  "production": {
+    "variables": {}
+  },
+  "sandbox": {
+    "deploy": false,
+    "variables": {}
+  }
 }

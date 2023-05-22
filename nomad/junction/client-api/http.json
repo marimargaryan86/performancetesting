@@ -14,5 +14,13 @@
       "traaefik_host_URL": "api.junction.travel",
       "validate_responses_against_spec": "false"
     }
+  },
+  "sandbox": {
+    "variables": {
+      "count": 1,
+      "traefik_entrypoints": "websecure",
+      "traaefik_host_URL": "api.sandbox.junction.dev",
+      "validate_responses_against_spec": "true"
+    }
   }
 }

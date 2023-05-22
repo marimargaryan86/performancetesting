@@ -8,5 +8,13 @@
   },
   "production": {
     "deploy": false
+  },
+  "sandbox": {
+    "deploy": false,
+    "variables": {
+      "allure_api_URL": "https://allureapi.sandbox.junction.dev",
+      "traefik_entrypoints": "websecure",
+      "traefik_host_URL": "allureui.sandbox.junction.dev"
+    }
   }
 }

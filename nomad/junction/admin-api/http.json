@@ -12,5 +12,12 @@
       "traefik_entrypoints": "web",
       "traefik_host_URL": "api.admin.junction.travel"
     }
+  },
+  "sandbox": {
+    "variables": {
+      "count": 1,
+      "traefik_entrypoints": "websecure",
+      "traefik_host_URL": "api.admin.sandbox.junction.dev"
+    }
   }
 }

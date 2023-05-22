@@ -14,5 +14,13 @@
       "pay_admin_api_base_url": "https://adminapi.pay.junction.travel",
       "use_pay_to_create_transaction": false
     }
+  },
+  "sandbox": {
+    "variables": {
+      "count": 1,
+      "api_pay_base_url": "https://api.pay.sandbox.junction.dev",
+      "pay_admin_api_base_url": "https://adminapi.pay.sandbox.junction.dev",
+      "use_pay_to_create_transaction": true
+    }
   }
 }

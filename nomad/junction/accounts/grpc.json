@@ -1,12 +1,17 @@
 {
-    "development": {
-        "variables": {
-            "count": 1
-        }
-    },
-    "production": {
-        "variables": {
-            "count": 2
-        }
+  "development": {
+    "variables": {
+      "count": 1
     }
+  },
+  "production": {
+    "variables": {
+      "count": 2
+    }
+  },
+  "sandbox": {
+    "variables": {
+      "count": 1
+    }
+  }
 }

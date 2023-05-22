@@ -1,10 +1,14 @@
 {
-    "development": {
-        "deploy": false,
-        "variables": {}
-    },
-    "production": {
-        "deploy": false,
-        "variables": {}
-    }
+  "development": {
+    "deploy": false,
+    "variables": {}
+  },
+  "production": {
+    "deploy": false,
+    "variables": {}
+  },
+  "sandbox": {
+    "deploy": false,
+    "variables": {}
+  }
 }

@@ -1,15 +1,22 @@
 {
-    "development": {
-        "variables": {
-            "count": 2,
-            "api_base_url": "https://ndc.junction.dev"
-        }
-    },
-    "production": {
-        "deploy": false,
-        "variables": {
-            "count": 5,
-            "api_base_url": "https://ndc.junction.travel"
-        }
+  "development": {
+    "variables": {
+      "count": 2,
+      "api_base_url": "https://ndc.junction.dev"
     }
+  },
+  "production": {
+    "deploy": false,
+    "variables": {
+      "count": 5,
+      "api_base_url": "https://ndc.junction.travel"
+    }
+  },
+  "sandbox": {
+    "deploy": false,
+    "variables": {
+      "count": 1,
+      "api_base_url": "https://ndc.sandbox.junction.dev"
+    }
+  }
 }

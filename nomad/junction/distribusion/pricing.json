@@ -15,5 +15,13 @@
       "api_base_url": "https://api.demo.distribusion.com",
       "retailer_partner_number": "431926"
     }
+  },
+  "sandbox": {
+    "variables": {
+      "count": 1,
+      "provider_company_id": "3deca3bb-67ab-43f5-839c-3f82d4002f45",
+      "api_base_url": "https://api.demo.distribusion.com",
+      "retailer_partner_number": "431926"
+    }
   }
 }

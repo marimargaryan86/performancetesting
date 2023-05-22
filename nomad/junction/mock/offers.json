@@ -1,7 +1,7 @@
 {
   "development": {
     "variables": {
-      "count": 2,
+      "count": 1,
       "provider_company_id": "8eaaa801-d2b5-4365-89e7-54b928179776"
     }
   },
@@ -10,6 +10,12 @@
     "variables": {
       "count": 1,
       "provider_company_id": "???"
+    }
+  },
+  "sandbox": {
+    "variables": {
+      "count": 1,
+      "provider_company_id": "8eaaa801-d2b5-4365-89e7-54b928179776"
     }
   }
 }

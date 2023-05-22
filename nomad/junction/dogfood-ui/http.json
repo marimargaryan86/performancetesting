@@ -8,5 +8,12 @@
   },
   "production": {
     "deploy": false
+  },
+  "sandbox": {
+    "variables": {
+      "base_url_URL": "https://api.sandbox.junction.dev",
+      "traefik_entrypoints": "websecure",
+      "traefik_host_URL": "dogfood.sandbox.junction.dev"
+    }
   }
 }

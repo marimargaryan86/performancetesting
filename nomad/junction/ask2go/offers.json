@@ -14,5 +14,13 @@
       "api_base_url": "https://search.production.ask2go.com/",
       "api_booking_base_url": "https://book.production.ask2go.com/"
     }
+  },
+  "sandbox": {
+    "variables": {
+      "count": 1,
+      "provider_company_id": "ed48aa95-c449-4100-8ba8-722e882e5dde",
+      "api_base_url": "https://search.ask2go.com",
+      "api_booking_base_url": "https://booking.ask2go.com"
+    }
   }
 }

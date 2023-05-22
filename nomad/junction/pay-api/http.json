@@ -18,5 +18,15 @@
       "traefik_headers_accessControlAllowHeaders": "*",
       "cc_address": "https://api.currencycloud.com/v2"
     }
+  },
+  "sandbox": {
+    "variables": {
+      "count": 1,
+      "traefik_entrypoints": "websecure",
+      "traefik_host_URL": "api.pay.sandbox.junction.dev",
+      "traefik_headers_accesscontrolalloworiginlist": "*",
+      "traefik_headers_accessControlAllowHeaders": "*",
+      "cc_address": "https://devapi.currencycloud.com/v2"
+    }
   }
 }
