@@ -130,3 +130,38 @@ class TestSorting(object):
             assert subset == [document["_id"] async for document in documents]
             cursor = await documents.cursor()
             assert cursor != ""
+
+
+class TestNestedSorting(object):
+    @pytest.mark.parametrize(("sort", "expected"), _TEST_DATA)
+    async def test_expected_orders(
+        self,
+        nested_sorting_repository: conftest.NestedMockRepository,
+        sort: tuple[str, int] | None,
+        expected: Sequence[str],
+    ) -> None:
+        documents = await nested_sorting_repository.all_(sort=sort)
+        documents.limit(4)
+        resolved = [document["_id"] async for document in documents]
+        assert resolved == expected
+
+    @pytest.mark.parametrize(("sort", "expected"), _TEST_DATA)
+    @pytest.mark.parametrize(
+        "limit",
+        [1, 2, 3, 4],
+    )
+    async def test_pagination(
+        self,
+        nested_sorting_repository: conftest.NestedMockRepository,
+        sort: tuple[str, int] | None,
+        limit: int,
+        expected: Sequence[str],
+    ) -> None:
+        cursor = ""
+
+        for subset in more_itertools.chunked(expected, limit):
+            documents = await nested_sorting_repository.all_(cursor=cursor, sort=sort)
+            documents.limit(limit)
+            assert subset == [document["_id"] async for document in documents]
+            cursor = await documents.cursor()
+            assert cursor != ""

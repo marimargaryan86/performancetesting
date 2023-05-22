@@ -50,10 +50,11 @@ class UnindexedSortFieldError(Exception):
     """Raised when a sort field is not indexed."""
 
 
-def with_cursor_filters(
+def with_cursor_filters(  # noqa: C901
     cursor_obj: cursor_pb2.Cursor,
     filter_: Mapping[str, Any],
     sort: tuple[str, int] | None = None,
+    path: str | None = None,
 ) -> dict[str, Any]:
     cursor_filter = dict(filter_).copy()
 
@@ -63,7 +64,14 @@ def with_cursor_filters(
     if not sort:
         sort = (mongo_id_key, pymongo.ASCENDING)
 
-    if sort[0] != mongo_id_key:
+    if path:
+        clean_path = path.removeprefix("$")
+        sort = ("{0}.{1}".format(clean_path, sort[0]), sort[1])
+        prefixed_id = "{0}.{1}".format(clean_path, mongo_id_key)
+    else:
+        prefixed_id = mongo_id_key
+
+    if sort[0] != prefixed_id:
         if "$or" not in cursor_filter:
             cursor_filter["$or"] = []
 
@@ -76,18 +84,35 @@ def with_cursor_filters(
         cursor_filter["$or"].append(
             {
                 sort[0]: cursor_obj.sort_value,
-                mongo_id_key: {_DIRECTIONS[pymongo.ASCENDING]: cursor_obj.id},
+                prefixed_id: {_DIRECTIONS[pymongo.ASCENDING]: cursor_obj.id},
             },
         )
 
         return cursor_filter
 
-    if mongo_id_key not in cursor_filter:
-        cursor_filter[mongo_id_key] = {}
+    if prefixed_id not in cursor_filter:
+        cursor_filter[prefixed_id] = {}
 
-    cursor_filter[mongo_id_key][_DIRECTIONS[sort[1]]] = cursor_obj.id
+    cursor_filter[prefixed_id][_DIRECTIONS[sort[1]]] = cursor_obj.id
 
     return cursor_filter
+
+
+def create_sort(
+    sort: tuple[str, int] | None = None,
+) -> list[tuple[str, int]]:
+    sort_fields = []
+
+    if sort:
+        sort_fields.append(sort)
+
+    if not sort_fields or sort_fields[0][0] != mongo_id_key:
+        sort_fields = [
+            *sort_fields,
+            (mongo_id_key, pymongo.ASCENDING),
+        ]
+
+    return sort_fields
 
 
 def _configure_collection(
@@ -215,9 +240,18 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
         # _find_with_cursor sends a special kwarg pymongo don't like
         filter_pre_cursor = kwargs.pop("filter_pre_cursor", {})
         sort = kwargs.pop("sort", None)
+        path = kwargs.pop("path", None)
 
-        if sort and sort[0] not in self._valid_sort_fields:
-            raise UnindexedSortFieldError("Field {0} is unindexed.".format(sort[0]))
+        if sort:
+            index_field = sort[0]
+
+            if path:
+                index_field = "{0}.{1}".format(path, sort[0])
+
+            if index_field not in self._valid_sort_fields:
+                raise UnindexedSortFieldError(
+                    "Field {0} is unindexed.".format(index_field),
+                )
 
         return await self._parse_result(
             possible_cursor=query(*args, **kwargs),
@@ -244,6 +278,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
                 cur=possible_cursor,
                 coder=self._coder,
                 filter_=filter_,
+                sort=sort,
             )
 
         possible_document = await possible_cursor
@@ -258,7 +293,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
         path: str,
         filter_: Mapping[str, Any] | None = None,
         cur: str | None = None,
-        id_key: str = "_id",
+        sort: tuple[str, int] | None = None,
     ) -> resultset.ResultSet[Record]:
         aggregate = []
         filter_pre_cursor = dict(filter_ or {})
@@ -266,8 +301,10 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
 
         if cur:
             cursor_filter = with_cursor_filters(
-                cursor.unmarshal(cur, cursor_filter),
-                cursor_filter,
+                cursor_obj=cursor.unmarshal(cur, cursor_filter, sort),
+                filter_=cursor_filter,
+                sort=sort,
+                path=path,
             )
 
         if cursor_filter:
@@ -305,7 +342,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
                 },
                 {
                     "$group": {
-                        "_id": "${0}".format(id_key),
+                        "_id": "${0}".format(mongo_id_key),
                         "document": {
                             "$first": "$$ROOT",
                         },
@@ -316,6 +353,11 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
                         "newRoot": "$document",
                     },
                 },
+                {
+                    "$sort": {
+                        sort_field[0]: sort_field[1] for sort_field in create_sort(sort)
+                    },
+                },
             ),
         )
 
@@ -323,6 +365,8 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
             query=self._collection.aggregate,
             pipeline=aggregate,
             filter_pre_cursor=filter_pre_cursor,
+            sort=sort,
+            path=path.removeprefix("$"),
         )
 
     async def _find_with_cursor(

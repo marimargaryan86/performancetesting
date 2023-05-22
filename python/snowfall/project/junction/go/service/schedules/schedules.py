@@ -35,7 +35,6 @@ class LegRepository(repository.ProtoRepository[models_pb2.Leg]):
             path="$legs",
             filter_=filter_,
             cur=cursor,
-            id_key="_id",
         )
 
     async def find_by_id(self, document_id: str) -> models_pb2.Leg | None:
@@ -46,7 +45,6 @@ class LegRepository(repository.ProtoRepository[models_pb2.Leg]):
                     "$eq": document_id,
                 },
             },
-            id_key="_id",
         )
 
         try:

@@ -59,6 +59,27 @@ class MockRepository(
         )
 
 
+class NestedMockRepository(
+    mixins.InsertMixin[dict[str, Any]],
+    repository.DefaultRepository,
+):
+    _indexes = [
+        pymongo.IndexModel("nested._id"),
+        pymongo.IndexModel("nested.field"),
+    ]
+
+    async def all_(
+        self,
+        cursor: str | None = None,
+        sort: tuple[str, int] | None = None,
+    ) -> resultset.ResultSet[Mapping[str, Any]]:
+        return await self._find_nested(
+            path="$nested",
+            cur=cursor,
+            sort=sort,
+        )
+
+
 @pytest.fixture()
 def foobar_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
@@ -74,6 +95,13 @@ def mock_repository(
 
 
 @pytest.fixture()
+def nested_mock_repository(
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
+) -> NestedMockRepository:
+    return NestedMockRepository(mongo_client.test.test)
+
+
+@pytest.fixture()
 async def sorting_repository(
     mock_repository: MockRepository,
 ) -> MockRepository:
@@ -85,3 +113,29 @@ async def sorting_repository(
     )
 
     return mock_repository
+
+
+@pytest.fixture()
+async def nested_sorting_repository(
+    nested_mock_repository: NestedMockRepository,
+) -> NestedMockRepository:
+    await asyncio.gather(
+        nested_mock_repository.insert(
+            {
+                "nested": [
+                    {"_id": "2", "field": "A"},
+                    {"_id": "1", "field": "B"},
+                ],
+            },
+        ),
+        nested_mock_repository.insert(
+            {
+                "nested": [
+                    {"_id": "3", "field": "C"},
+                    {"_id": "4", "field": "A"},
+                ],
+            },
+        ),
+    )
+
+    return nested_mock_repository
