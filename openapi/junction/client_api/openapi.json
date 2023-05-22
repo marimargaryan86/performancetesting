@@ -3734,10 +3734,10 @@
         ]
       }
     },
-    "/orders/cancellations": {
+    "/bookings/cancellations": {
       "post": {
-        "summary": "Create Order Cancellation Request",
-        "operationId": "post-orders-cancellations",
+        "summary": "Create Bookings Cancellation",
+        "operationId": "post-bookings-cancellations",
         "responses": {
           "201": {
             "description": "Created",
@@ -3747,7 +3747,7 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/OrderCancellationRequest"
+                      "$ref": "#/components/schemas/BookingsCancellation"
                     },
                     "included": {
                       "type": "array",
@@ -3792,7 +3792,7 @@
             "$ref": "#/components/responses/UnprocessableEntity"
           }
         },
-        "description": "Create a cancellation request for an Order.",
+        "description": "Create a cancellation for multiple Bookings.",
         "tags": [
           "journeys"
         ],
@@ -3804,7 +3804,7 @@
                 "type": "object",
                 "properties": {
                   "data": {
-                    "$ref": "#/components/schemas/OrderCancellationRequestCreatable"
+                    "$ref": "#/components/schemas/BookingsCancellation"
                   }
                 },
                 "required": [
@@ -3816,17 +3816,17 @@
         }
       }
     },
-    "/orders/cancellations/{orderCancellationRequestId}": {
+    "/bookings/cancellations/{bookingsCancellationId}": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/orderCancellationRequestId"
+          "$ref": "#/components/parameters/bookingsCancellationId"
         },
         {
-          "$ref": "#/components/parameters/orderCancellationRequestInclude"
+          "$ref": "#/components/parameters/bookingsCancellationInclude"
         }
       ],
       "get": {
-        "summary": "Get Order Cancellation Request",
+        "summary": "Get Bookings Cancellation",
         "tags": [
           "journeys"
         ],
@@ -3839,7 +3839,7 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/OrderCancellationRequest"
+                      "$ref": "#/components/schemas/BookingsCancellation"
                     },
                     "included": {
                       "type": "array",
@@ -3881,8 +3881,8 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-orders-cancellations-id",
-        "description": "Used to lookup data for an Order Cancellation Request Identifier."
+        "operationId": "get-bookings-cancellations-id",
+        "description": "Used to lookup data for a Bookings Cancellation Identifier."
       }
     },
     "/bookings/{bookingId}": {
@@ -6713,116 +6713,6 @@
           "type"
         ]
       },
-      "OrderCancellationRequestCreatable": {
-        "title": "Order Cancellation Request (Creatable)",
-        "type": "object",
-        "properties": {
-          "id": {
-            "readOnly": true
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "order-cancellation-requests"
-            ],
-            "example": "order-cancellation-requests"
-          },
-          "relationships": {
-            "type": "object",
-            "required": [
-              "order"
-            ],
-            "properties": {
-              "order": {
-                "type": "object",
-                "required": [
-                  "data"
-                ],
-                "properties": {
-                  "data": {
-                    "$ref": "#/components/schemas/OrderIdentifier"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "required": [
-          "type",
-          "relationships"
-        ],
-        "description": "Cancellation request for an Order."
-      },
-      "OrderCancellationRequest": {
-        "title": "Order Cancellation Request",
-        "allOf": [
-          {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "format": "uuid",
-                "example": "d6cfe9e8-bbc9-485f-912f-7ba97ab2cf34",
-                "readOnly": true
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "order-cancellation-requests"
-                ],
-                "example": "order-cancellation-requests"
-              },
-              "attributes": {
-                "type": "object",
-                "required": [
-                  "status"
-                ],
-                "properties": {
-                  "status": {
-                    "type": "string",
-                    "enum": [
-                      "received",
-                      "in-progress",
-                      "cancelled-with-refund",
-                      "cancelled-without-refund"
-                    ],
-                    "example": "received"
-                  }
-                }
-              },
-              "relationships": {
-                "type": "object",
-                "required": [
-                  "order"
-                ],
-                "properties": {
-                  "order": {
-                    "type": "object",
-                    "required": [
-                      "data"
-                    ],
-                    "properties": {
-                      "data": {
-                        "$ref": "#/components/schemas/OrderIdentifier"
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "required": [
-              "id",
-              "type",
-              "attributes",
-              "relationships"
-            ]
-          },
-          {
-            "$ref": "#/components/schemas/SelfLink"
-          }
-        ],
-        "description": "Cancellation request for an Order."
-      },
       "OrderCreatable": {
         "title": "Order (Creatable)",
         "description": "Collection of multiple Orders (booked Offers) used when creating a Journey.",
@@ -7093,8 +6983,7 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-            "readOnly": true
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
           },
           "type": {
             "type": "string",
@@ -7243,6 +7132,84 @@
           "id",
           "type"
         ]
+      },
+      "BookingsCancellation": {
+        "title": "Bookings Cancellation",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "d6cfe9e8-bbc9-485f-912f-7ba97ab2cf34",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "bookings-cancellations"
+                ],
+                "example": "bookings-cancellations"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "status"
+                ],
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "unspecified",
+                      "pending",
+                      "processing",
+                      "completed"
+                    ],
+                    "example": "pending"
+                  }
+                },
+                "readOnly": true
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "bookings"
+                ],
+                "properties": {
+                  "bookings": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "oneOf": [
+                            {
+                              "$ref": "#/components/schemas/TripBookingIdentifier"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "description": "Cancellation for multiple Bookings."
       },
       "BookingStatusIdentifier": {
         "title": "Booking Status Identifier",
@@ -7979,17 +7946,6 @@
         },
         "description": "Order identifier"
       },
-      "orderCancellationRequestId": {
-        "name": "orderCancellationRequestId",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-          "format": "uuid"
-        },
-        "description": "Order Cancellation Request identifier"
-      },
       "orderInclude": {
         "name": "include",
         "in": "query",
@@ -8008,31 +7964,6 @@
           },
           "example": [
             "bookings"
-          ]
-        },
-        "description": "Customize which related resources to return.",
-        "style": "form",
-        "explode": false
-      },
-      "orderCancellationRequestInclude": {
-        "name": "include",
-        "in": "query",
-        "required": false,
-        "schema": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "orders",
-              "journey",
-              "orders.bookings",
-              "orders.bookings.details",
-              "orders.bookings.details.cabinClass",
-              "orders.bookings.details.legType"
-            ]
-          },
-          "example": [
-            "orders"
           ]
         },
         "description": "Customize which related resources to return.",
@@ -8745,6 +8676,42 @@
           ]
         },
         "description": "Customize which field(s) to sort the booking details by.",
+        "style": "form",
+        "explode": false
+      },
+      "bookingsCancellationId": {
+        "name": "bookingsCancellationId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+          "format": "uuid"
+        },
+        "description": "Bookings Cancellation identifier"
+      },
+      "bookingsCancellationInclude": {
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "bookings",
+              "bookings.order",
+              "bookings.order.journey",
+              "bookings.details",
+              "bookings.details.cabinClass",
+              "bookings.details.legType"
+            ]
+          },
+          "example": [
+            "bookings"
+          ]
+        },
+        "description": "Customize which related resources to return.",
         "style": "form",
         "explode": false
       }
