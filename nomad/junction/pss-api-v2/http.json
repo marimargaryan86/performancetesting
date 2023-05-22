@@ -11,6 +11,7 @@
     "deploy": false
   },
   "sandbox": {
+    "deploy": false,
     "variables": {
       "count": 1,
       "traefik_entrypoints": "websecure",

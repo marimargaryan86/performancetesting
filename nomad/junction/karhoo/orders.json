@@ -13,6 +13,7 @@
     }
   },
   "sandbox": {
+    "deploy": false,
     "variables": {
       "count": 1,
       "api_base_url": "https://rest.sandbox.karhoo.com/"

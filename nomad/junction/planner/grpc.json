@@ -1,17 +1,20 @@
 {
   "development": {
     "variables": {
-      "count": 1
+      "count": 1,
+      "memory_value": "75"
     }
   },
   "production": {
     "variables": {
-      "count": 1
+      "count": 1,
+      "memory_value": "75"
     }
   },
   "sandbox": {
     "variables": {
-      "count": 1
+      "count": 1,
+      "memory_value": "4"
     }
   }
 }

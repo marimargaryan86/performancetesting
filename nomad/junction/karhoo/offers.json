@@ -15,6 +15,7 @@
     }
   },
   "sandbox": {
+    "deploy": false,
     "variables": {
       "count": 1,
       "provider_company_id": "4e066f88-e28e-481a-b0b2-aff740df319c",

@@ -12,6 +12,7 @@
     }
   },
   "sandbox": {
+    "deploy": false,
     "variables": {
       "traefik_host_URL": "thumbor.sandbox.junction.dev",
       "traefik_entrypoints": "websecure"
