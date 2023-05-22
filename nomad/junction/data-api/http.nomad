@@ -122,9 +122,6 @@ job "data-api-http" {
         memory = 600
       }
 
-      vault {
-        policies = ["data-api-${var.environment}"]
-      }
       template {
         destination = "services.env"
         env         = true
