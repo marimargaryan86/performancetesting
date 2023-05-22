@@ -1,6 +1,12 @@
 import asyncio
+from typing import Sequence
 
-from snowfall.stdlib.persistence.mongo import conftest, resultset
+import more_itertools
+import pymongo
+import pytest
+
+from snowfall.stdlib.persistence import cursor as cursor_module
+from snowfall.stdlib.persistence.mongo import conftest, repository, resultset
 from snowfall.stdlib.v1 import testing_pb2
 
 
@@ -55,3 +61,72 @@ async def test_proto_repository(
 
     async for document in documents:
         assert document.updated_at.ToSeconds() > 0
+
+
+_TEST_DATA = (
+    (None, ["1", "2", "3", "4"]),
+    (("_id", pymongo.ASCENDING), ["1", "2", "3", "4"]),
+    (("_id", pymongo.DESCENDING), ["4", "3", "2", "1"]),
+    (("field", pymongo.ASCENDING), ["2", "4", "1", "3"]),
+    (("field", pymongo.DESCENDING), ["3", "1", "2", "4"]),
+)
+
+
+class TestSorting(object):
+    @pytest.mark.parametrize(("sort", "expected"), _TEST_DATA)
+    async def test_expected_orders(
+        self,
+        sorting_repository: conftest.MockRepository,
+        sort: tuple[str, int] | None,
+        expected: Sequence[str],
+    ) -> None:
+        documents = await sorting_repository.all_(sort=sort)
+        documents.limit(4)
+        resolved = [document["_id"] async for document in documents]
+        assert resolved == expected
+
+    async def test_unknown_field_raises_error(
+        self,
+        sorting_repository: conftest.MockRepository,
+    ) -> None:
+        with pytest.raises(repository.UnindexedSortFieldError):
+            await sorting_repository.all_(
+                sort=("unknown", pymongo.ASCENDING),
+            )
+
+    async def test_changed_sort_raises_error_during_pagination(
+        self,
+        sorting_repository: conftest.MockRepository,
+    ) -> None:
+        documents = await sorting_repository.all_(sort=("field", pymongo.ASCENDING))
+        documents.limit(2)
+        assert len([document async for document in documents]) == 2
+        cursor = await documents.cursor()
+        assert cursor != ""
+
+        with pytest.raises(cursor_module.CursorError):
+            await sorting_repository.all_(
+                cursor=cursor,
+                sort=("field", pymongo.DESCENDING),
+            )
+
+    @pytest.mark.parametrize(("sort", "expected"), _TEST_DATA)
+    @pytest.mark.parametrize(
+        "limit",
+        [1, 2, 3, 4],
+    )
+    async def test_pagination(
+        self,
+        sorting_repository: conftest.MockRepository,
+        sort: tuple[str, int] | None,
+        limit: int,
+        expected: Sequence[str],
+    ) -> None:
+        cursor = ""
+
+        for subset in more_itertools.chunked(expected, limit):
+            documents = await sorting_repository.all_(cursor=cursor, sort=sort)
+            documents.limit(limit)
+            assert subset == [document["_id"] async for document in documents]
+            cursor = await documents.cursor()
+            assert cursor != ""

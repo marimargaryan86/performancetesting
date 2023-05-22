@@ -17,17 +17,33 @@ class CursorError(ValueError):
     """Base error that all other errors extends."""
 
 
-def unmarshal(encoded: str, filter_: Any = None) -> Cursor:
+def unmarshal(
+    encoded: str,
+    filter_: Any = None,
+    sort: tuple[str, int] | None = None,
+) -> Cursor:
     cursor = _parse(encoded)
-    expected_digest = _sign_cursor(Cursor(id=cursor.id, filter=cursor.filter))
+    expected_digest = _sign_cursor(
+        Cursor(
+            id=cursor.id,
+            sort_value=cursor.sort_value,
+            filter=cursor.filter,
+            sort=cursor.sort,
+        ),
+    )
 
     if not hmac.compare_digest(cursor.digest, expected_digest):
         raise CursorError("Invalid digest.")
 
-    expected_hash = _hash_filter(cursor.id, filter_)
+    expected_filter_hash = _hash_parameters(cursor.id, filter_)
 
-    if not hmac.compare_digest(cursor.filter, expected_hash):
+    if not hmac.compare_digest(cursor.filter, expected_filter_hash):
         raise CursorError("Invalid filter.")
+
+    expected_sort_hash = _hash_parameters(cursor.id, sort)
+
+    if not hmac.compare_digest(cursor.sort, expected_sort_hash):
+        raise CursorError("Invalid sort.")
 
     return cursor
 
@@ -43,17 +59,27 @@ def marshal(cursor: Cursor) -> str:
     ).decode()
 
 
-def new(identifier: str, filter_: Any) -> Cursor:
-    cursor = Cursor(id=identifier, filter=_hash_filter(identifier, filter_))
+def new(
+    identifier: str,
+    filter_: Any,
+    sort: tuple[str, int] | None,
+    sort_value: str | None,
+) -> Cursor:
+    cursor = Cursor(
+        id=identifier,
+        sort_value=sort_value or "",
+        filter=_hash_parameters(identifier, filter_),
+        sort=_hash_parameters(identifier, sort),
+    )
     cursor.digest = _sign_cursor(cursor)
 
     return cursor
 
 
-def _hash_filter(identifier: str, filter_: Any) -> str:
+def _hash_parameters(identifier: str, digest_parameters: Any) -> str:
     digest = hashlib.blake2b(key=identifier.encode(), digest_size=_DIGEST_SIZE)
 
-    digest.update(orjson.dumps(filter_))
+    digest.update(orjson.dumps(digest_parameters))
 
     return digest.hexdigest()
 

@@ -1,6 +1,7 @@
 import abc
 import datetime
 import functools
+import types
 from typing import (
     Any,
     Awaitable,
@@ -19,6 +20,7 @@ from pydantic import BaseModel
 
 from snowfall.stdlib.persistence import cursor
 from snowfall.stdlib.persistence.mongo import coders, resultset
+from snowfall.stdlib.v1 import cursor_pb2
 
 _proto_id_key = "id"
 mongo_id_key = "_id"
@@ -36,6 +38,56 @@ _AGGREGATE_CURSOR_CLASS = (
     motor_asyncio.AsyncIOMotorCommandCursor,
     motor_asyncio.AsyncIOMotorLatentCommandCursor,
 )
+_DIRECTIONS = types.MappingProxyType(
+    {
+        pymongo.ASCENDING: "$gt",
+        pymongo.DESCENDING: "$lt",
+    },
+)
+
+
+class UnindexedSortFieldError(Exception):
+    """Raised when a sort field is not indexed."""
+
+
+def with_cursor_filters(
+    cursor_obj: cursor_pb2.Cursor,
+    filter_: Mapping[str, Any],
+    sort: tuple[str, int] | None = None,
+) -> dict[str, Any]:
+    cursor_filter = dict(filter_).copy()
+
+    if cursor_obj.id == "":
+        return cursor_filter
+
+    if not sort:
+        sort = (mongo_id_key, pymongo.ASCENDING)
+
+    if sort[0] != mongo_id_key:
+        if "$or" not in cursor_filter:
+            cursor_filter["$or"] = []
+
+        cursor_filter["$or"].append(
+            {
+                sort[0]: {_DIRECTIONS[sort[1]]: cursor_obj.sort_value},
+            },
+        )
+
+        cursor_filter["$or"].append(
+            {
+                sort[0]: cursor_obj.sort_value,
+                mongo_id_key: {_DIRECTIONS[pymongo.ASCENDING]: cursor_obj.id},
+            },
+        )
+
+        return cursor_filter
+
+    if mongo_id_key not in cursor_filter:
+        cursor_filter[mongo_id_key] = {}
+
+    cursor_filter[mongo_id_key][_DIRECTIONS[sort[1]]] = cursor_obj.id
+
+    return cursor_filter
 
 
 def _configure_collection(
@@ -74,6 +126,7 @@ class RepositoryProtocol(Protocol[Record]):
         self,
         cur: str,
         filter_: Mapping[str, Any] | None = None,
+        sort: tuple[str, int] | None = None,
     ) -> resultset.ResultSet[Record]:
         """Use for find queries with a filter."""
 
@@ -105,6 +158,10 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
         self._collection = _configure_collection(collection)
         self._has_created_indexes = False
         self._timeout = timeout.total_seconds() * _MILLISECONDS_MULTIPLIER
+        self._valid_sort_fields = [
+            index_key for index in self._indexes for index_key in index.document["key"]
+        ]
+        self._valid_sort_fields.append("_id")
 
     async def _create_indexes(self) -> None:
         self._has_created_indexes = True
@@ -157,20 +214,36 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
 
         # _find_with_cursor sends a special kwarg pymongo don't like
         filter_pre_cursor = kwargs.pop("filter_pre_cursor", {})
-        possible_cursor = query(*args, **kwargs)
+        sort = kwargs.pop("sort", None)
 
+        if sort and sort[0] not in self._valid_sort_fields:
+            raise UnindexedSortFieldError("Field {0} is unindexed.".format(sort[0]))
+
+        return await self._parse_result(
+            possible_cursor=query(*args, **kwargs),
+            filter_=filter_pre_cursor,
+            sort=sort,
+        )
+
+    async def _parse_result(
+        self,
+        possible_cursor: Any,
+        filter_: Mapping[str, Any],
+        sort: tuple[str, int] | None,
+    ) -> Any:
         if isinstance(possible_cursor, motor_asyncio.AsyncIOMotorCursor):
             return resultset.DocumentResultSet[Record](
                 cur=possible_cursor,
                 coder=self._coder,
-                filter_=filter_pre_cursor,
+                filter_=filter_,
+                sort=sort,
             )
 
         if isinstance(possible_cursor, _AGGREGATE_CURSOR_CLASS):
             return resultset.AggregationResultSet[Record](
                 cur=possible_cursor,
                 coder=self._coder,
-                filter_=filter_pre_cursor,
+                filter_=filter_,
             )
 
         possible_document = await possible_cursor
@@ -192,7 +265,10 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
         cursor_filter = filter_pre_cursor.copy()
 
         if cur:
-            cursor_filter = self._with_cursor_filters(cur, cursor_filter)
+            cursor_filter = with_cursor_filters(
+                cursor.unmarshal(cur, cursor_filter),
+                cursor_filter,
+            )
 
         if cursor_filter:
             aggregate.append(
@@ -253,36 +329,24 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
         self,
         cur: str,
         filter_: Mapping[str, Any] | None = None,
+        sort: tuple[str, int] | None = None,
     ) -> resultset.ResultSet[Record]:
         filter_pre_cursor = dict(filter_ or {})
         cursor_filter = filter_pre_cursor.copy()
 
         if cur:
-            cursor_filter = self._with_cursor_filters(cur, cursor_filter)
+            cursor_filter = with_cursor_filters(
+                cursor.unmarshal(cur, filter_pre_cursor, sort),
+                filter_pre_cursor,
+                sort,
+            )
 
         return await self._execute(
             query=self._collection.find,
             filter=cursor_filter,
             filter_pre_cursor=filter_pre_cursor,
+            sort=sort,
         )
-
-    def _with_cursor_filters(
-        self,
-        cur: str,
-        filter_: Mapping[str, Any],
-    ) -> dict[str, Any]:
-        cursor_filter = dict(filter_).copy()
-        cursor_obj = cursor.unmarshal(cur, filter_)
-
-        if cursor_obj.id == "":
-            return cursor_filter
-
-        if mongo_id_key not in filter_:
-            cursor_filter[mongo_id_key] = {}
-
-        cursor_filter[mongo_id_key]["$gt"] = cursor_obj.id
-
-        return cursor_filter
 
 
 class DefaultRepository(_AbstractRepository[Mapping[str, Any]]):

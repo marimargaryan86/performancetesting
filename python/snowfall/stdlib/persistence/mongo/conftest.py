@@ -1,5 +1,7 @@
+import asyncio
 from typing import Any, Mapping, Sequence
 
+import pymongo
 import pytest
 from motor import motor_asyncio
 
@@ -41,7 +43,7 @@ class MockRepository(
     mixins.InsertMixin[dict[str, Any]],
     repository.DefaultRepository,
 ):
-    """Used for tests with various mixins."""
+    _indexes = [pymongo.IndexModel("field")]
 
     async def find_subset(
         self,
@@ -69,3 +71,17 @@ def mock_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> MockRepository:
     return MockRepository(mongo_client.test.test)
+
+
+@pytest.fixture()
+async def sorting_repository(
+    mock_repository: MockRepository,
+) -> MockRepository:
+    await asyncio.gather(
+        mock_repository.insert({"_id": "2", "field": "A"}),
+        mock_repository.insert({"_id": "1", "field": "B"}),
+        mock_repository.insert({"_id": "3", "field": "C"}),
+        mock_repository.insert({"_id": "4", "field": "A"}),
+    )
+
+    return mock_repository

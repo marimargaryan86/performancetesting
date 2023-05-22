@@ -37,7 +37,7 @@ def paginate(
         start_index = int(std_cursor.unmarshal(cursor, None).id)
 
     end_index = start_index + (limit or _DEFAULT_PAGE_LIMIT)
-    cursor = std_cursor.marshal(std_cursor.new(str(end_index), None))
+    cursor = std_cursor.marshal(std_cursor.new(str(end_index), None, None, None))
 
     return Page(
         sequence=sequence[start_index:end_index],

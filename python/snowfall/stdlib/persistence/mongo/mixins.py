@@ -15,8 +15,9 @@ class AllMixin(Generic[Record]):
     async def all_(
         self: repository.RepositoryProtocol[Record],
         cursor: str | None = None,
+        sort: tuple[str, int] | None = None,
     ) -> resultset.ResultSet[Record]:
-        return await self._find_with_cursor(cur=cursor or "")
+        return await self._find_with_cursor(cur=cursor or "", sort=sort)
 
 
 class EstimatedCountMixin(Generic[Record]):

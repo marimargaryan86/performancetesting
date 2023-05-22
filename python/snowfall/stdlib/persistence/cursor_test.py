@@ -7,7 +7,7 @@ from snowfall.stdlib.v1 import cursor_pb2
 
 
 def test_valid_cursor() -> None:
-    cursor_obj = cursor.new("foobar", "foobar")
+    cursor_obj = cursor.new("foobar", "foobar", None, None)
 
     assert cursor_obj == cursor.unmarshal(cursor.marshal(cursor_obj), "foobar")
 
@@ -35,7 +35,7 @@ def test_invalid_digest() -> None:
 
 
 def test_invalid_filter() -> None:
-    cursor_obj = cursor.new("foobar", "foobar")
+    cursor_obj = cursor.new("foobar", "foobar", None, None)
 
     with pytest.raises(cursor.CursorError):
         cursor.unmarshal(cursor.marshal(cursor_obj), "bazqux")

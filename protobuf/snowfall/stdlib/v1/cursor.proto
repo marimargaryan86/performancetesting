@@ -6,6 +6,8 @@ option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/
 
 message Cursor {
   string id = 1;
+  string sort_value = 5;
   string filter = 2;
+  string sort = 4;
   string digest = 3;
 }

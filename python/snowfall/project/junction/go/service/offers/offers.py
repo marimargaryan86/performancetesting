@@ -9,6 +9,7 @@ from motor import motor_asyncio
 from snowfall.project.junction.go.service.offers.v1alpha import models_pb2
 from snowfall.project.junction.go.v1alpha import models_pb2 as common_pb2
 from snowfall.stdlib import string
+from snowfall.stdlib.persistence import cursor as cursor_module
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 from snowfall.stdlib.v1 import amqp_pb2
 
@@ -210,7 +211,10 @@ class OfferAggregateMappingRepository(
         cursor_filter = copy.deepcopy(dict(filter_pre_cursor))
 
         if cursor:
-            cursor_filter = self._with_cursor_filters(cursor, filter_pre_cursor)
+            cursor_filter = repository.with_cursor_filters(
+                cursor_module.unmarshal(cursor, filter_pre_cursor),
+                filter_pre_cursor,
+            )
 
         aggregate = [
             {
