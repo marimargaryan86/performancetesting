@@ -10,11 +10,9 @@
 /pants.ci.toml
 /pants.toml
 
-[Documentation] @platform-engineers
-/docs/engineering/
-
-^[Architecture]
-/docs/engineering/docs/projects/
+[Documentation]
+/docs/engineering/ @platform-engineers
+/docs/engineering/docs/projects/ @architects
 
 [Platform] @platform-engineers
 /golang/cmd/snowman/
