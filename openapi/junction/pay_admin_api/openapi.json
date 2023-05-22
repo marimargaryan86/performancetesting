@@ -65,6 +65,12 @@
       ]
     },
     {
+      "name": "Payment",
+      "tags": [
+        "Payment"
+      ]
+    },
+    {
       "name": "Transactions",
       "tags": [
         "transactions"
@@ -111,6 +117,11 @@
       "name": "internal",
       "description": "Endpoints not for public use.",
       "x-displayName": "Internal"
+    },
+    {
+      "name": "payments",
+      "description": "Payments",
+      "x-displayName": "Payments"
     },
     {
       "name": "transactions",
@@ -1011,7 +1022,6 @@
         "operationId": "get-beneficiaries-id",
         "description": "Get beneficiary"
       },
-
       "patch": {
         "summary": "Update Beneficiary",
         "tags": [
@@ -1182,6 +1192,158 @@
         },
         "operationId": "get-beneficiaries",
         "description": "Get beneficiaries"
+      }
+    },
+    "/payments": {
+      "post": {
+        "summary": "Create payment",
+        "description": "Create payment",
+        "tags": [
+          "payments"
+        ],
+        "operationId": "post-payments",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Payment"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Payment created successfully",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Payment"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      },
+      "get": {
+        "summary": "List payments",
+        "tags": [
+          "payments"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "items": {
+                            "$ref": "#/components/schemas/Payment"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "operationId": "get-payments",
+        "description": "Get payments"
+      }
+    },
+    "/payments/{paymentId}": {
+      "get": {
+        "summary": "Get Payment",
+        "tags": [
+          "payments"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/paymentId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Payment"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-payments-id",
+        "description": "Get payments"
       }
     },
     "/companies/{companyId}/contacts": {
@@ -1448,6 +1610,17 @@
           "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
         },
         "description": "Beneficiary id"
+      },
+      "paymentId": {
+        "name": "paymentId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
+        },
+        "description": "payment id"
       },
       "accountId": {
         "name": "accountId",
@@ -2658,6 +2831,28 @@
           "type"
         ]
       },
+      "BeneficiaryIdentifier": {
+        "title": "Beneficiary Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "beneficiaries"
+            ],
+            "example": "beneficiaries"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
       "TransactionIdentifier": {
         "title": "Transaction Identifier",
         "type": "object",
@@ -2745,6 +2940,100 @@
             "example": "conversions"
           }
         }
+      },
+      "Payment": {
+        "title": "Payment",
+        "allOf": [
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "type",
+              "relationships",
+              "attributes"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
+                "format": "uuid",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "example": "payments",
+                "enum": [
+                  "payments"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "reason",
+                  "reference"
+                ],
+                "properties": {
+                  "amount": {
+                    "$ref": "#/components/schemas/MoneyAmount"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "example": "This is a test payment",
+                    "description": "Reason of the payment"
+                  },
+                  "reference": {
+                    "type": "string",
+                    "example": "This is a test reference",
+                    "description": "Reference of the payment"
+                  },
+                  "paymentAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-03-06T14:30:00+00:00",
+                    "description": "when the payment will be paid"
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "beneficiary"
+                ],
+                "properties": {
+                  "beneficiary": {
+                    "type": "object",
+                    "description": "Beneficiary, where payment should be credited",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/BeneficiaryIdentifier"
+                      }
+                    }
+                  },
+                  "transactions": {
+                    "type": "object",
+                    "description": "transactions list for make payment to beneficiary",
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "minimum": 0,
+                        "items": {
+                          "$ref": "#/components/schemas/TransactionIdentifier"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ]
       },
       "SelfLink": {
         "title": "Self Link",
