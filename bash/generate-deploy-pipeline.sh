@@ -151,6 +151,7 @@ if [ "$(basename "${1}")" == "development" ]; then
 .promote:
   stage: promote 
   interruptible: false
+  resource_group: promote_env
   before_script:
     - mkdir -p ~/.ssh/
     - mv "\${NOMAD_SSH_KEY}" ~/.ssh/id_ed25519
