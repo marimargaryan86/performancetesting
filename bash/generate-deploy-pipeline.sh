@@ -145,8 +145,8 @@ if [ "$(basename "${1}")" == "development" ]; then
 	# editorconfig-checker-disable
 	cat <<EOF
 
-promote-to-production:
-  stage: promote
+.promote:
+  stage: promote 
   interruptible: false
   before_script:
     - mkdir -p ~/.ssh/
@@ -157,12 +157,21 @@ promote-to-production:
     - chmod 644 ~/.ssh/known_hosts
     - git config --global user.email "\${NOMAD_GIT_EMAIL}"
     - git config --global user.name "\${NOMAD_GIT_NAME}"
-  script:
-    - ./promote-environment.sh development production ${services[@]}
   tags:
     - shell
   needs:
     - verify
+
+promote-to-production:
+  extends: .promote
+  script:
+    - ./promote-environment.sh development production ${services[@]}
+
+promote-to-sandbox:
+  extends: .promote
+  script:
+    - ./promote-environment.sh development sandbox ${services[@]}
+
 EOF
 # editorconfig-checker-enable
 fi

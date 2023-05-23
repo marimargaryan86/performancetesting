@@ -2,19 +2,19 @@
   "development": {
     "variables": {
       "count": 1,
-      "memory_value": "75"
+      "memory_value": 76800
     }
   },
   "production": {
     "variables": {
       "count": 1,
-      "memory_value": "75"
+      "memory_value": 76800
     }
   },
   "sandbox": {
     "variables": {
       "count": 1,
-      "memory_value": "4"
+      "memory_value": 4100
     }
   }
 }

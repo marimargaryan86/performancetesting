@@ -36,6 +36,17 @@ generate-prod:
       changes:
         - production/**/*
 
+generate-sandbox:
+  extends: .generate
+  variables:
+    DATACENTER: junction-sandbox-dc1
+    NOMAD_ADDR: "${NOMAD_SANDBOX_ADDR}"
+    ENVIRONMENT_NAME: sandbox
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      changes:
+        - sandbox/**/*
+
 deploy-dev:
   stage: deploy
   needs:
@@ -63,3 +74,18 @@ deploy-prod:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
       changes:
         - production/**/*
+
+
+deploy-sandbox:
+  stage: deploy
+  needs:
+    - job: generate-sandbox
+      artifacts: true
+  trigger:
+    include:
+      - artifact: dist/sandbox.yml
+        job: generate-sandbox
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      changes:
+        - sandbox/**/*

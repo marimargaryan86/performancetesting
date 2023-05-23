@@ -8,7 +8,7 @@ shopt -s nullglob
 pants run python/snowfall/script/validate_nomad_build_files.py -- "nomad/"
 
 FAILURE=0
-ENVIRONMENTS=("development" "production")
+ENVIRONMENTS=("development" "production" "sandbox")
 SENTRY_PROJECTS=$(sentry-cli projects list | awk -F '|' '{if (NR>3){print $2$3}}' | sed 's/^ *//;s/ *$//')
 CHANGED_SINCE=""
 ENFORCE_FULL_LINTING=0

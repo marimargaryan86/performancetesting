@@ -42,7 +42,7 @@ for i in repo/development/**/*.nomad; do
 	rm "${i}"
 done
 
-for i in repo/{development,production}/**/{.skip_deploy,*.vars}; do
+for i in repo/{development,production,sandbox}/**/{.skip_deploy,*.vars}; do
 	rm "${i}"
 done
 
@@ -54,7 +54,7 @@ for i in nomad/**/*.nomad; do
 	mkdir -p "repo/development/${service_name}"
 	cp "${i}" "repo/development/${service_name}/${filename}"
 
-	for environment in {development,production}; do
+	for environment in {development,production,sandbox}; do
 		template_path="repo/${environment}/${service_name}"
 		mkdir -p "${template_path}"
 

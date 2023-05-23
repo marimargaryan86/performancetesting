@@ -25,6 +25,7 @@ variable "datacenter" {
 variable "count" {
   type = number
 }
+
 variable "memory_value" {
   type = number
 }
@@ -97,7 +98,7 @@ job "planner-grpc" {
       driver = "docker"
 
       resources {
-        memory     = "${var.memory_value}" * 75
+        memory     = var.memory_value // Value in MBs
         memory_max = 129 * 1024
       }
 

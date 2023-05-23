@@ -14,6 +14,7 @@ class _Configuration(pydantic.BaseModel):
 
     development: _Environment
     production: _Environment
+    sandbox: _Environment
 
 
 _Mapping = Sequence[Mapping[str, Mapping[str, "_Mapping"]]]
