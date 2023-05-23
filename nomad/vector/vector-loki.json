@@ -11,7 +11,7 @@
   },
   "sandbox": {
     "variables": {
-      "loki_endpoint": "http://172.31.46.153:3100"
+      "loki_endpoint": "http://13.53.74.59:3100"
     }
   }
 }
