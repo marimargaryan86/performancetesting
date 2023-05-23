@@ -2,6 +2,9 @@
 set -eu
 shopt -s nullglob
 
+DEPLOYMENT_TIER=$(basename "$1")
+[[ $DEPLOYMENT_TIER == "sandbox" ]] && DEPLOYMENT_TIER="staging"
+
 # editorconfig-checker-disable
 cat <<EOF
 stages:
@@ -108,7 +111,7 @@ ${service_name}:
   resource_group: ${service_name}
   environment:
     name: $(basename "${1}")/${service_name}
-    deployment_tier: $(basename "${1}")
+    deployment_tier: ${DEPLOYMENT_TIER}
   variables:
     NOMAD_VAR_docker_image: ${docker_image}
     service: ${service_name}
