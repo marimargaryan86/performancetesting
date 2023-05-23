@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 set -eu
 shopt -s nullglob
-DEPLOYMENT_ENVIRONMENT=$(basename "$1")
-DEPLOYMENT_TIER=${DEPLOYMENT_ENVIRONMENT}
-[[ $DEPLOYMENT_TIER == "sandbox" ]] && DEPLOYMENT_TIER="staging"
 
 # editorconfig-checker-disable
 cat <<EOF
@@ -25,14 +22,14 @@ make-uninterruptible:
   stage: deploy
   image: git.snowfall.se:4567/junction/junction/pants:main
   script:
-    - ./\${DEPLOYMENT_ENVIRONMENT}/deploy.sh "\${service}" "\${version}" "\${DEPLOYMENT_TIER}" \${templates}
+    - ./\${CI_ENVIRONMENT_TIER}/deploy.sh "\${service}" "\${version}" "\${CI_ENVIRONMENT_TIER}" \${templates}
   environment:
     action: start
   variables:
-    NOMAD_NAMESPACE: "\${DEPLOYMENT_ENVIRONMENT}"
+    NOMAD_NAMESPACE: "\${CI_ENVIRONMENT_TIER}"
     NOMAD_ADDR: "${2}"
     NOMAD_VAR_datacenter: "${3}"
-    NOMAD_VAR_environment: "\${DEPLOYMENT_ENVIRONMENT}"
+    NOMAD_VAR_environment: "\${CI_ENVIRONMENT_TIER}"
     NOMAD_VAR_registry_address: "\${CI_REGISTRY}"
     NOMAD_VAR_registry_password: "\${NOMAD_REGISTRY_PASSWORD}"
     NOMAD_VAR_registry_username: "\${NOMAD_REGISTRY_USERNAME}"
@@ -111,7 +108,7 @@ ${service_name}:
   resource_group: ${service_name}
   environment:
     name: $(basename "${1}")/${service_name}
-    deployment_tier: ${DEPLOYMENT_TIER}
+    deployment_tier: $(basename "${1}")
   variables:
     NOMAD_VAR_docker_image: ${docker_image}
     service: ${service_name}
@@ -151,7 +148,6 @@ if [ "$(basename "${1}")" == "development" ]; then
 .promote:
   stage: promote 
   interruptible: false
-  resource_group: promote_env
   before_script:
     - mkdir -p ~/.ssh/
     - mv "\${NOMAD_SSH_KEY}" ~/.ssh/id_ed25519
