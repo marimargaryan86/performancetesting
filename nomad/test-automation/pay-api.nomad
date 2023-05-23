@@ -61,7 +61,7 @@ EOH
           , "-F"
           , "variables[ALLURE_PROJECT_ID]=junction-pay-api-smoke"
           , "-F"
-          , "variables[SLACK_NOTIFICATION_CHANNEL]=look-at-me"
+          , "variables[SLACK_NOTIFICATION_CHANNEL]=junction-pay-dev"
           , "-F"
           , "variables[SLACK_NOTIFICATION_TOKEN]=${SLACK_NOTIFICATION_TOKEN}"
           , "-F"
