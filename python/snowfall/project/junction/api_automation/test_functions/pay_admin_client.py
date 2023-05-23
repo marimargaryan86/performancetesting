@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import logging
 import sys
 from typing import Any, Awaitable, Callable, Literal, Sequence
@@ -17,6 +18,9 @@ _ATTRIBUTES_KEY = "attributes"
 _LIMIT_KEY = "page[limit]"
 _CURSOR_KEY = "page[cursor]"
 conversion_includes = Literal["transactions"]
+
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
 
 
 class PayAdminClient(BaseClient):  # noqa: WPS214
@@ -48,6 +52,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
                 },
             },
         }
+        logger.info("payload %s", json.dumps(payload, indent=4))
 
         response = await self.client.post(
             "/companies",
@@ -158,6 +163,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
                 },
             },
         }
+        logger.info("payload %s", json.dumps(payload, indent=4))
 
         response = await self.client.patch(
             "/companies/{0}".format(company_id),
@@ -211,6 +217,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
                 },
             },
         }
+        logger.info("payload %s", json.dumps(payload, indent=4))
 
         response = await self.client.post(
             "/accounts/{0}/relationships/currencies".format(
@@ -263,6 +270,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
                 },
             },
         }
+        logger.info("payload %s", json.dumps(payload, indent=4))
 
         response = await self.client.post(
             "/companies/{0}/contacts".format(company_id),
@@ -343,6 +351,8 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
                 },
             },
         }
+        logger.info("payload %s", json.dumps(payload, indent=4))
+
         response = await self.client.post(
             "/users",
             json=payload,
@@ -422,8 +432,90 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
                 },
             },
         }
+        logger.info("payload %s", json.dumps(payload, indent=4))
         response = await self.client.post(
             "/beneficiaries",
+            json=payload,
+        )
+
+        response.raise_for_status()
+        return response.json()
+
+    async def update_beneficiary(  # noqa: WPS211
+        self,
+        beneficiary_id: str,
+        bank_account_holder_name: str,
+        email: str,
+        beneficiary_address_lines: Sequence[str],
+        beneficiary_country_code: str,
+        bank_name: str,
+        account_type: str,
+        payment_types: str,
+        bank_address_lines: Sequence[str],
+        bank_country_code: str,
+        currency_id: str,
+        account_id: str,
+        account_number: str | None = None,
+        beneficiary_postal_code: str | None = None,
+        beneficiary_city: str | None = None,
+        beneficiary_state: str | None = None,
+        bic_swift: str | None = None,
+        aba: str | None = None,
+        iban: str | None = None,
+    ) -> dict[str, Any]:
+        payload = {
+            _DATA_KEY: {
+                _TYPE_KEY: "beneficiaries",
+                _ATTRIBUTES_KEY: {
+                    "bankAccountHolderName": bank_account_holder_name,
+                    "email": email,
+                    "beneficiaryAddress": {
+                        "addressLines": beneficiary_address_lines,
+                        "countryCode": beneficiary_country_code,
+                        "postalCode": beneficiary_postal_code,
+                        "city": beneficiary_city,
+                        "state": beneficiary_state,
+                    },
+                    "bankDetails": {
+                        "name": bank_name,
+                        **(
+                            {
+                                "accountNumber": account_number,
+                                "aba": aba,
+                            }
+                            if account_number
+                            else {
+                                "iban": iban,
+                            }
+                        ),
+                        "bicSwift": bic_swift,
+                        "accountType": account_type,
+                        "paymentTypes": payment_types,
+                        "address": {
+                            "addressLines": bank_address_lines,
+                            "countryCode": bank_country_code,
+                        },
+                    },
+                },
+                _RELATIONSHIPS_KEY: {
+                    "currency": {
+                        _DATA_KEY: {
+                            "id": currency_id,
+                            "type": "currencies",
+                        },
+                    },
+                    "account": {
+                        _DATA_KEY: {
+                            "id": account_id,
+                            "type": "accounts",
+                        },
+                    },
+                },
+            },
+        }
+        logger.info("payload %s", json.dumps(payload, indent=4))
+        response = await self.client.patch(
+            "/beneficiaries/{0}".format(beneficiary_id),
             json=payload,
         )
 
@@ -435,15 +527,15 @@ async def get_all_resources(  # noqa: WPS210
     client_method: Callable[[int, str], Awaitable[Any]],
     limit: int,
     cursor: str,
-    logger: logging.Logger,
+    logger_resources: logging.Logger,
 ) -> list[dict[str, Any]]:
     resources: list[dict[str, Any]] = []
     while True:
         try:
             body = await client_method(limit, cursor)
         except httpx.HTTPStatusError as err:
-            logger.info("response headers: %s", err.response.headers)
-            logger.info("response body: %s", err.response.json())
+            logger_resources.info("response headers: %s", err.response.headers)
+            logger_resources.info("response body: %s", err.response.json())
             sys.exit("{0} method - is failed".format(client_method.__name__))
 
         if not body[_DATA_KEY]:

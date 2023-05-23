@@ -28,14 +28,14 @@ async def test_list_companies(
         pay_admin_client.list_companies,
         limit=100,
         cursor="",
-        logger=logger,
+        logger_resources=logger,
     )
 
     all_accountless_companies_before_create_new_one = await get_all_resources(
         pay_admin_client.list_accountless_companies,
         limit=100,
         cursor="",
-        logger=logger,
+        logger_resources=logger,
     )
     logger.info(
         "Companies number before create new one: %i",
@@ -52,14 +52,14 @@ async def test_list_companies(
         pay_admin_client.list_companies,
         limit=100,
         cursor="",
-        logger=logger,
+        logger_resources=logger,
     )
 
     all_accountless_companies = await get_all_resources(
         pay_admin_client.list_accountless_companies,
         limit=100,
         cursor="",
-        logger=logger,
+        logger_resources=logger,
     )
 
     logger.info("Companies number: %i", len(all_companies))
