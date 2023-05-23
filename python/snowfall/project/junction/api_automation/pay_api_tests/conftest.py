@@ -41,7 +41,7 @@ async def pay_create_account(
     except httpx.HTTPStatusError as err:
         logger.info("response_create_account: %s", err.response.headers)
         logger.info("response_create_account body: %s", err.response.json())
-        pytest.fail(EXIT_MSG, pytrace=False)  # noqa: WPS204
+        pytest.fail(err.response.json(), pytrace=False)
     logger.info(
         "response_create_account: %s",
         json.dumps(response_create_account, indent=4),
@@ -50,73 +50,22 @@ async def pay_create_account(
 
 
 @pytest.fixture()
-async def pay_create_transaction(  # noqa: WPS210, WPS213, C901
+async def pay_create_transaction_eur_sek(
     pay_client: PayClient,
     pay_admin_client: PayAdminClient,
+    pay_create_quote_eur_sek: Mapping[str, Any],
 ) -> dict[str, Any]:
-    float0 = float(0)
-    try:
-        response_payer = await pay_admin_client.create_company(
-            company="test-company-{0}".format(return_randomized_token()),
-            address_lines=["Radhuset", "Våksalagatan 2", "United Spaces", "Sweden"],
-            country_code="SE",
-            postal_code="75320",
-            city="Uppsala",
-            fx_markup=float0,
-            processing_markup=float0,
-            sales_markup=float0,
-        )
-    except httpx.HTTPStatusError as err:
-        logger.info("response_payer err: %s", err.response.headers)
-        logger.info("response_payer body: %s", err.response.json())
-        pytest.fail(EXIT_MSG, pytrace=False)
-
-    try:
-        response_beneficiary = await pay_admin_client.create_company(
-            company="test-company-{0}".format(return_randomized_token()),
-            address_lines=["Radhuset", "Våksalagatan 2", "United Spaces", "Sweden"],
-            country_code="SE",
-            postal_code="75320",
-            city="Uppsala",
-            fx_markup=float0,
-            processing_markup=float0,
-            sales_markup=float0,
-        )
-    except httpx.HTTPStatusError as err1:
-        logger.info("response_beneficiary err:: %s", err1.response.headers)
-        logger.info("response_beneficiary body: %s", err1.response.json())
-        pytest.fail(EXIT_MSG, pytrace=False)
-
-    try:
-        response_create_quote = await pay_client.create_quote(
-            amount=1000,
-            external_reference=string.uuid(),
-            payer_id=response_payer["data"]["id"],
-            beneficiary_id=response_beneficiary["data"]["id"],
-            from_currency="EUR",
-            to_currency="SEK",
-        )
-    except httpx.HTTPStatusError as err2:
-        logger.info(
-            "response_create_quote err: %s",
-            err2.response.headers,
-        )
-        logger.info("response_create_quote body: %s", err2.response.json())
-        pytest.fail(EXIT_MSG, pytrace=False)
-
-    logger.info("create_quote: %s", json.dumps(response_create_quote, indent=4))
-
     external_reference = string.uuid()
     logger.info(": %s", external_reference)
     invoice_reference = string.uuid()
     logger.info("invoice_reference: %s", invoice_reference)
-    logger.info("quotation_id: %s", response_create_quote["data"]["id"])
+    logger.info("quotation_id: %s", pay_create_quote_eur_sek["data"]["id"])
 
     try:
         response_create_transactions = await pay_client.create_transactions(
             external_reference=external_reference,
             invoice_reference=invoice_reference,
-            quotation_id=response_create_quote["data"]["id"],
+            quotation_id=pay_create_quote_eur_sek["data"]["id"],
         )
 
     except httpx.HTTPStatusError as err3:
@@ -275,6 +224,7 @@ def payment_test_client(
 async def create_company(
     pay_admin_client: PayAdminClient,
 ) -> dict[str, Any]:
+    float0 = float(0)
     try:
         response_company = await pay_admin_client.create_company(
             company="test-company-{0}".format(return_randomized_token()),
@@ -282,9 +232,9 @@ async def create_company(
             country_code="SE",
             postal_code="75320",
             city="Uppsala",
-            fx_markup=float(0),
-            processing_markup=float(0),
-            sales_markup=float(0),
+            fx_markup=float0,
+            processing_markup=float0,
+            sales_markup=float0,
         )
     except httpx.HTTPStatusError as err:
         logger.info("response_company err: %s", err.response.headers)
@@ -352,3 +302,75 @@ def pay_admin_client(
         base_url=base_url_admin_api,
         auth=auth,
     )
+
+
+@pytest.fixture()
+async def pay_create_company_beneficiary(
+    pay_admin_client: PayAdminClient,
+) -> dict[str, Any]:
+    float0 = float(0)
+    try:
+        response_beneficiary = await pay_admin_client.create_company(
+            company="test-company-{0}".format(return_randomized_token()),
+            address_lines=["Radhuset", "Våksalagatan 2", "United Spaces", "Sweden"],
+            country_code="SE",
+            postal_code="75320",
+            city="Uppsala",
+            fx_markup=float0,
+            processing_markup=float0,
+            sales_markup=float0,
+        )
+    except httpx.HTTPStatusError as err1:
+        logger.info("response_beneficiary err:: %s", err1.response.headers)
+        logger.info("response_beneficiary body: %s", err1.response.json())
+        pytest.fail(err1.response.json(), pytrace=False)
+    return response_beneficiary
+
+
+@pytest.fixture()
+async def pay_create_company_payer(
+    pay_admin_client: PayAdminClient,
+) -> dict[str, Any]:
+    float0 = float(0)
+    try:
+        response_payer = await pay_admin_client.create_company(
+            company="test-company-{0}".format(return_randomized_token()),
+            address_lines=["Radhuset", "Våksalagatan 2", "United Spaces", "Sweden"],
+            country_code="SE",
+            postal_code="75320",
+            city="Uppsala",
+            fx_markup=float0,
+            processing_markup=float0,
+            sales_markup=float0,
+        )
+    except httpx.HTTPStatusError as err:
+        logger.info("response_payer err: %s", err.response.headers)
+        logger.info("response_payer body: %s", err.response.json())
+        pytest.fail(err.response.json(), pytrace=False)
+    return response_payer
+
+
+@pytest.fixture()
+async def pay_create_quote_eur_sek(
+    pay_client: PayClient,
+    pay_create_company_payer: Mapping[str, Any],
+    pay_create_company_beneficiary: Mapping[str, Any],
+) -> dict[str, Any]:
+    try:
+        response_create_quote = await pay_client.create_quote(
+            amount=1000,
+            external_reference=string.uuid(),
+            payer_id=pay_create_company_payer["data"]["id"],
+            beneficiary_id=pay_create_company_beneficiary["data"]["id"],
+            from_currency="EUR",
+            to_currency="SEK",
+        )
+    except httpx.HTTPStatusError as err2:
+        logger.info(
+            "response_create_quote err: %s",
+            err2.response.headers,
+        )
+        logger.info("response_create_quote body: %s", err2.response.json())
+        pytest.fail(EXIT_MSG, pytrace=False)
+    logger.info("create_quote: %s", json.dumps(response_create_quote, indent=4))
+    return response_create_quote

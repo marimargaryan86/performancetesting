@@ -124,6 +124,17 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         response.raise_for_status()
         return response.json()
 
+    async def get_transaction(
+        self,
+        transaction_id: str,
+    ) -> dict[str, Any]:
+        response = await self.client.get(
+            "/transactions/{0}".format(transaction_id),
+        )
+
+        response.raise_for_status()
+        return response.json()
+
     async def get_transactions(
         self,
     ) -> dict[str, Any]:

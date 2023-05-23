@@ -23,7 +23,7 @@ logger.setLevel(logging.DEBUG)
 async def test_list_conversions_details(  # noqa: WPS218
     pay_client: Client,
     pay_admin_client: PayAdminClient,
-    pay_create_transaction: Mapping[str, Any],
+    pay_create_transaction_eur_sek: Mapping[str, Any],
 ) -> None:
     try:
         response_list_conversions_details = (

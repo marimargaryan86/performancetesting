@@ -22,9 +22,11 @@ logger.setLevel(logging.DEBUG)
 async def test_get_conversion_details(  # noqa: WPS218
     pay_client: Client,
     pay_admin_client: PayAdminClient,
-    pay_create_transaction: Mapping[str, Any],
+    pay_create_transaction_eur_sek: Mapping[str, Any],
 ) -> None:
-    conversion = pay_create_transaction["data"]["relationships"]["conversion"]["data"]
+    conversion = pay_create_transaction_eur_sek["data"]["relationships"]["conversion"][
+        "data"
+    ]
     try:
         rgcd = await pay_admin_client.get_conversion_details(
             conversion["id"],
@@ -53,8 +55,8 @@ async def test_get_conversion_details(  # noqa: WPS218
     assert is_valid_uuid(rgcd_data["relationships"]["transactions"]["data"]["id"])
     assert rgcd_data["relationships"]["transactions"]["data"]["type"] == "transactions"
     assert "https" in rgcd_data["links"]["self"]
-    assert rgcd["included"][0]["id"] == pay_create_transaction["data"]["id"]
+    assert rgcd["included"][0]["id"] == pay_create_transaction_eur_sek["data"]["id"]
 
     all_included = rgcd["included"]
     transactions_list = [one_include["id"] for one_include in all_included]
-    assert pay_create_transaction["data"]["id"] in transactions_list
+    assert pay_create_transaction_eur_sek["data"]["id"] in transactions_list
