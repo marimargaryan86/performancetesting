@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -eu
 shopt -s nullglob
-
-DEPLOYMENT_TIER=$(basename "$1")
+DEPLOYMENT_ENVIRONMENT=$(basename "$1")
+DEPLOYMENT_TIER=${DEPLOYMENT_ENVIRONMENT}
 [[ $DEPLOYMENT_TIER == "sandbox" ]] && DEPLOYMENT_TIER="staging"
 
 # editorconfig-checker-disable
@@ -25,14 +25,14 @@ make-uninterruptible:
   stage: deploy
   image: git.snowfall.se:4567/junction/junction/pants:main
   script:
-    - ./\${CI_ENVIRONMENT_TIER}/deploy.sh "\${service}" "\${version}" "\${CI_ENVIRONMENT_TIER}" \${templates}
+    - ./\${DEPLOYMENT_ENVIRONMENT}/deploy.sh "\${service}" "\${version}" "\${DEPLOYMENT_TIER}" \${templates}
   environment:
     action: start
   variables:
-    NOMAD_NAMESPACE: "\${CI_ENVIRONMENT_TIER}"
+    NOMAD_NAMESPACE: "\${DEPLOYMENT_ENVIRONMENT}"
     NOMAD_ADDR: "${2}"
     NOMAD_VAR_datacenter: "${3}"
-    NOMAD_VAR_environment: "\${CI_ENVIRONMENT_TIER}"
+    NOMAD_VAR_environment: "\${CDEPLOYMENT_ENVIRONMENT}"
     NOMAD_VAR_registry_address: "\${CI_REGISTRY}"
     NOMAD_VAR_registry_password: "\${NOMAD_REGISTRY_PASSWORD}"
     NOMAD_VAR_registry_username: "\${NOMAD_REGISTRY_USERNAME}"
