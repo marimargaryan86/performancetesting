@@ -90,6 +90,11 @@ job "duffel-offers" {
     }
     task "offers" {
       driver = "docker"
+
+      resources {
+        memory = 450 # Value in MB
+      }
+
       vault {
         policies = ["duffel-${var.environment}"]
       }
