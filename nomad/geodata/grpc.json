@@ -5,11 +5,13 @@
     }
   },
   "production": {
+    "deploy": true,
     "variables": {
       "count": 2
     }
   },
   "sandbox": {
+    "deploy": true,
     "variables": {
       "count": 1
     }
