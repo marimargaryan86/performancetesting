@@ -151,6 +151,7 @@ if [ "$(basename "${1}")" == "development" ]; then
 
 .promote:
   stage: promote 
+  resource_group: promote_env
   interruptible: false
   before_script:
     - mkdir -p ~/.ssh/
