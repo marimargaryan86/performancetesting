@@ -15,8 +15,7 @@ from snowfall.stdlib import format, money, service  # pants: no-infer-dep
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, producer, types
-from snowfall.vendor.distribusion import client
-from snowfall.vendor.distribusion.models.criterias import ConnectionVacancyCriteria
+from snowfall.vendor.distribusion import client, models  # pants: no-infer-dep
 
 
 class NoPricingError(Exception):
@@ -99,14 +98,15 @@ class PriceQuoteConsumer(object):
         if not offer_details:
             return
 
-        expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
+        connection_vacancy = await self._vacancy(offer_details)
 
-        price_quote_id = await self._cache.store(offer_details, expires_at)
-
-        vacancy = await self._vacancy(offer_details)
-
-        if not vacancy:
+        if not connection_vacancy.vacant:
             raise NoPricingError("Pricing did not succeed.")
+
+        offer_details.price = connection_vacancy.total_price or offer_details.price
+        offer_details.currency = connection_vacancy.currency
+        expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
+        price_quote_id = await self._cache.store(offer_details, expires_at)
 
         await self._producer.publish(
             offers_amqp_pb2.TripPriceQuoteResult(
@@ -172,9 +172,12 @@ class PriceQuoteConsumer(object):
 
         return res
 
-    async def _vacancy(self, offer_details: cache.OfferDetails) -> bool:
+    async def _vacancy(
+        self,
+        offer_details: cache.OfferDetails,
+    ) -> models.connections.ConnectionVacancy:
         count_pax_type = self._count_passenger_type(offer_details)
-        connection_vacancy_criteria = ConnectionVacancyCriteria(
+        connection_vacancy_criteria = models.criterias.ConnectionVacancyCriteria(
             marketing_carrier=offer_details.marketing_carrier,
             departure_station=offer_details.departure_station,
             arrival_station=offer_details.arrival_station,
@@ -190,11 +193,9 @@ class PriceQuoteConsumer(object):
             connection_vacancy_criteria.passenger_type.append(key)
             connection_vacancy_criteria.pax.append(item_value)
 
-        connections = await self._client.get_connection_vacancy(
+        return await self._client.get_connection_vacancy(
             connection_vacancy_criteria,
         )
-
-        return connections.vacant
 
     def _count_passenger_type(
         self,
