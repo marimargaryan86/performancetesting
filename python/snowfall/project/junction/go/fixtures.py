@@ -100,6 +100,7 @@ BOOKING_DETAILS = (
     "5a93b5ae-9590-4561-a664-fbaead485e96",
     "d184081a-92bd-4ec8-af9a-1faaa8dfbbeb",
 )
+BOOKINGS_CANCELLATION_REQUESTS = ("0a4f4726-df18-4d50-b7ae-17eec528265c",)
 PASSENGER_NAME_RECORDS = ("4567H3LG",)
 TRIP_SEARCHES = (string.uuid(),)
 
@@ -388,6 +389,19 @@ def get_journeys() -> list[order_models_pb2.Journey]:
             BOOKING_DETAILS,
             strict=True,
         )
+    ]
+
+
+def get_bookings_cancellations() -> list[order_models_pb2.BookingsCancellation]:
+    return [
+        order_models_pb2.BookingsCancellation(
+            id=BOOKINGS_CANCELLATION_REQUESTS[0],
+            booking_cancellations=[
+                order_models_pb2.BookingCancellation(booking_id=booking_id)
+                for booking_id in BOOKINGS
+            ],
+            status=order_models_pb2.BookingsCancellation.STATUS_PENDING,
+        ),
     ]
 
 

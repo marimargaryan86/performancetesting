@@ -161,6 +161,10 @@ def _factory(
             errors.ServiceUnavailableError,
             handlers.service_unavailable_error_handler,
         )
+        asgi_app.add_exception_handler(
+            errors.UnprocessableEntityError,
+            handlers.unprocessable_entity_error_handler,
+        )
 
         return asgi_app
 

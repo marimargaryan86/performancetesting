@@ -50,6 +50,24 @@ def _get_journey_request() -> dict[str, Any]:
     return journey_request
 
 
+def _get_bookings_cancellation_request() -> dict[str, Any]:
+    return {
+        "data": {
+            "type": "bookings-cancellations",
+            "relationships": {
+                "bookings": {
+                    "data": [
+                        {
+                            "id": fixtures.BOOKINGS[0],
+                            "type": "trip-bookings",
+                        },
+                    ],
+                },
+            },
+        },
+    }
+
+
 class TestJourneys(object):
     async def test_journeys_are_found(self, client: httpx.AsyncClient) -> None:
         await testing.test_list_and_view_endpoints(
@@ -101,6 +119,28 @@ class TestOrders(object):
         )
 
         assert response.status_code == status.HTTP_201_CREATED
+
+
+class TestBookingsCancellation(object):
+    async def test_bookings_can_be_cancelled(self, client: httpx.AsyncClient) -> None:
+        response = await client.post(
+            "/bookings/cancellations",
+            json=_get_bookings_cancellation_request(),
+            headers={"Content-Type": "application/vnd.api+json"},
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+
+    async def test_bookings_cancellation_retrieval(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        cancellation_id = fixtures.BOOKINGS_CANCELLATION_REQUESTS[0]
+        response = await client.get(
+            "/bookings/cancellations/{id}".format(id=cancellation_id),
+            headers={"Content-Type": "application/vnd.api+json"},
+        )
+        assert response.status_code == status.HTTP_200_OK
 
 
 class TestBookingsByOrder(object):

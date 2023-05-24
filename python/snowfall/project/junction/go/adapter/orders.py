@@ -37,6 +37,22 @@ class Client(abc.ABC):
         """Create a new order resource."""
 
     @abc.abstractmethod
+    async def get_bookings_cancellation(
+        self,
+        identifier: str,
+        reseller_id: str,
+    ) -> models_pb2.BookingsCancellation:
+        """Fetch bookings cancellation resource."""
+
+    @abc.abstractmethod
+    async def create_bookings_cancellation(
+        self,
+        booking_ids: Sequence[str],
+        reseller_id: str,
+    ) -> models_pb2.BookingsCancellation:
+        """Create a new bookings cancellation resource."""
+
+    @abc.abstractmethod
     async def get_journey(self, identifier: str) -> models_pb2.Journey:
         """Fetch a journey resource."""
 
@@ -120,9 +136,16 @@ class Client(abc.ABC):
 
 
 class DictClient(Client):
-    def __init__(self, journeys: Sequence[models_pb2.Journey]) -> None:
+    def __init__(
+        self,
+        journeys: Sequence[models_pb2.Journey],
+        booking_cancellations: Sequence[models_pb2.BookingsCancellation],
+    ) -> None:
         self._journeys: dict[str, models_pb2.Journey] = {
             journey.id: journey for journey in journeys
+        }
+        self._cancellations: dict[str, models_pb2.BookingsCancellation] = {
+            cancellation.id: cancellation for cancellation in booking_cancellations
         }
 
     async def create_journey(
@@ -169,6 +192,34 @@ class DictClient(Client):
             raise errors.NotFoundError()
 
         return self._journeys[identifier]
+
+    async def get_bookings_cancellation(
+        self,
+        identifier: str,
+        reseller_id: str,
+    ) -> models_pb2.BookingsCancellation:
+        if identifier not in self._cancellations:
+            raise errors.NotFoundError()
+
+        return self._cancellations[identifier]
+
+    async def create_bookings_cancellation(
+        self,
+        booking_ids: Sequence[str],
+        reseller_id: str,
+    ) -> models_pb2.BookingsCancellation:
+        request = models_pb2.BookingsCancellation(
+            id=string.uuid(),
+            booking_cancellations=[
+                models_pb2.BookingCancellation(booking_id=booking_id)
+                for booking_id in booking_ids
+            ],
+            reseller_id=reseller_id,
+            status=models_pb2.BookingsCancellation.STATUS_PENDING,
+        )
+        self._cancellations[request.id] = request
+
+        return request
 
     async def get_order(self, identifier: str) -> models_pb2.Order:
         for order in self._iterate_orders():
@@ -462,6 +513,46 @@ class GrpcClient(Client):
         )
 
         return response.journey
+
+    async def get_bookings_cancellation(
+        self,
+        identifier: str,
+        reseller_id: str,
+    ) -> models_pb2.BookingsCancellation:
+        response = await errors.handle_grpc_errors(
+            self._orders.GetBookingsCancellation(
+                orders_pb2.GetBookingsCancellationRequest(
+                    id=identifier,
+                    reseller_id=reseller_id,
+                ),
+                timeout=self._timeout,
+            ),
+        )
+
+        return response.cancellation
+
+    async def create_bookings_cancellation(
+        self,
+        booking_ids: Sequence[str],
+        reseller_id: str,
+    ) -> models_pb2.BookingsCancellation:
+        response = await errors.handle_grpc_errors(
+            self._orders.CreateBookingsCancellation(
+                orders_pb2.CreateBookingsCancellationRequest(
+                    cancellation=models_pb2.BookingsCancellation(
+                        id=string.uuid(),
+                        booking_cancellations=[
+                            models_pb2.BookingCancellation(booking_id=booking_id)
+                            for booking_id in booking_ids
+                        ],
+                        reseller_id=reseller_id,
+                    ),
+                ),
+                timeout=self._timeout,
+            ),
+        )
+
+        return response.cancellation
 
     async def get_order(self, identifier: str) -> models_pb2.Order:
         response = await errors.handle_grpc_errors(

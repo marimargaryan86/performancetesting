@@ -25,13 +25,15 @@ class UnhandledError(Exception):
     """Raised when an unhandled error occurs."""
 
 
+class UnprocessableEntityError(Exception):
+    """Raised when it is not possible to process the request due to rules failure."""
+
+
 async def handle_grpc_errors(grpc_request: Awaitable[Proto]) -> Proto:
     try:
         return await grpc_request
     except grpc.aio.AioRpcError as err:
-        for status in rich_status.iter_rich_statuses(err):
-            if isinstance(status, error_details_pb2.BadRequest):
-                _handle_bad_request(status, err)
+        _handle_grpc_exception(err)
 
         match err.code():
             case grpc.StatusCode.NOT_FOUND:
@@ -49,3 +51,15 @@ def _handle_bad_request(
     for violation in status.field_violations:
         if violation.field == "page_token":
             raise CursorError(violation.description) from err
+
+
+def _handle_unprocessable_entity(err: grpc.aio.AioRpcError) -> None:
+    raise UnprocessableEntityError(err.details()) from err
+
+
+def _handle_grpc_exception(err: grpc.aio.AioRpcError) -> None:
+    for status in rich_status.iter_rich_statuses(err):
+        if isinstance(status, error_details_pb2.BadRequest):
+            _handle_bad_request(status, err)
+        elif isinstance(status, error_details_pb2.PreconditionFailure):
+            _handle_unprocessable_entity(err)

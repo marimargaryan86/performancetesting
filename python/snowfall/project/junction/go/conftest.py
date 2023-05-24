@@ -102,7 +102,10 @@ def price_quotes_client() -> price_quotes.Client:
 
 @pytest.fixture()
 def orders_client() -> orders.Client:
-    return orders.DictClient(fixtures.get_journeys())
+    return orders.DictClient(
+        fixtures.get_journeys(),
+        fixtures.get_bookings_cancellations(),
+    )
 
 
 @pytest.fixture()

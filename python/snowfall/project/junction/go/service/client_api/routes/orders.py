@@ -427,3 +427,47 @@ def _create_trip_option(
         ],
         price=price_quote.price,
     )
+
+
+class BookingsCancellation(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        client: orders_adapter.Client = lagom.injectable,
+    ) -> responses.Response:
+        cancellation = await client.get_bookings_cancellation(
+            identifier=request.path_params["bookingsCancellationId"],
+            reseller_id=request.user.username,
+        )
+
+        return await messages.create_response(
+            body=models.Body(
+                data=resources.BookingsCancellationResource.from_proto(
+                    cancellation=cancellation,
+                    request=request,
+                ),
+            ),
+            request=request,
+        )
+
+    async def post(
+        self,
+        request: requests.Request,
+        client: orders_adapter.Client = lagom.injectable,
+    ) -> responses.Response:
+        body = await request_helpers.flatten_request(request)
+        cancellation = await client.create_bookings_cancellation(
+            booking_ids=body["bookings"],
+            reseller_id=request.user.username,
+        )
+
+        return await messages.create_response(
+            body=models.Body(
+                data=resources.BookingsCancellationResource.from_proto(
+                    cancellation=cancellation,
+                    request=request,
+                ),
+            ),
+            request=request,
+            status_code=status.HTTP_201_CREATED,
+        )
