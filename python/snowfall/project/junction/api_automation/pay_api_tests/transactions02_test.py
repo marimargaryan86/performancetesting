@@ -35,4 +35,5 @@ async def test_list_transactions(
         ),
     )
 
-    assert "https" in response_list_transactions["data"]["links"]["self"]
+    assert "https" in response_list_transactions["data"][0]["links"]["self"]
+    assert "https" in response_list_transactions["links"]["next"]

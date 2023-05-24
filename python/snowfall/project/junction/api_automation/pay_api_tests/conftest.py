@@ -6,7 +6,6 @@ import httpx
 import pytest
 
 from snowfall.project.junction.api_automation.conftest import (
-    EXIT_MSG,
     HTTPS_PREFIX,
     get_variable_value,
 )
@@ -41,7 +40,7 @@ async def pay_create_account(
     except httpx.HTTPStatusError as err:
         logger.info("response_create_account: %s", err.response.headers)
         logger.info("response_create_account body: %s", err.response.json())
-        pytest.fail(err.response.json(), pytrace=False)
+        pytest.fail(err.response.json(), pytrace=False)  # noqa: WPS204
     logger.info(
         "response_create_account: %s",
         json.dumps(response_create_account, indent=4),
@@ -68,10 +67,42 @@ async def pay_create_transaction_eur_sek(
             quotation_id=pay_create_quote_eur_sek["data"]["id"],
         )
 
-    except httpx.HTTPStatusError as err3:
-        logger.info("response err:: %s", err3.response.headers)
-        logger.info("response_create_transactions body: %s", err3.response.json())
-        pytest.fail(EXIT_MSG, pytrace=False)
+    except httpx.HTTPStatusError as err:
+        logger.info("response err: %s", err.response.headers)
+        logger.info("response_create_transactions body: %s", err.response.json())
+        pytest.fail(err.response.json(), pytrace=False)
+
+    logger.info(
+        "create_transactions: %s",
+        json.dumps(response_create_transactions, indent=4),
+    )
+
+    return response_create_transactions
+
+
+@pytest.fixture()
+async def pay_create_transaction_sek_eur(
+    pay_client: PayClient,
+    pay_admin_client: PayAdminClient,
+    pay_create_quote_sek_eur: Mapping[str, Any],
+) -> dict[str, Any]:
+    external_reference = string.uuid()
+    logger.info(": %s", external_reference)
+    invoice_reference = string.uuid()
+    logger.info("invoice_reference: %s", invoice_reference)
+    logger.info("quotation_id: %s", pay_create_quote_sek_eur["data"]["id"])
+
+    try:
+        response_create_transactions = await pay_client.create_transactions(
+            external_reference=external_reference,
+            invoice_reference=invoice_reference,
+            quotation_id=pay_create_quote_sek_eur["data"]["id"],
+        )
+
+    except httpx.HTTPStatusError as err:
+        logger.info("response err: %s", err.response.headers)
+        logger.info("response_create_transactions body: %s", err.response.json())
+        pytest.fail(err.response.json(), pytrace=False)
 
     logger.info(
         "create_transactions: %s",
@@ -106,7 +137,7 @@ async def pay_create_contact(
     except httpx.HTTPStatusError as err:
         logger.info("response_create_contact err: %s", err.response.headers)
         logger.info("response_create_contact body: %s", err.response.json())
-        pytest.fail(EXIT_MSG, pytrace=False)
+        pytest.fail(err.response.json(), pytrace=False)
     logger.info(
         "create_contacts: %s",
         json.dumps(response_create_contact, indent=4),
@@ -123,7 +154,7 @@ async def pay_list_all_currencies(
     except httpx.HTTPStatusError as err:
         logger.info("response_list_all_currencies err: %s", err.response.headers)
         logger.info("response_list_all_currencies body: %s", err.response.json())
-        pytest.fail(EXIT_MSG, pytrace=False)
+        pytest.fail(err.response.json(), pytrace=False)
     logger.info(
         "list_all_currencies: %s",
         json.dumps(response_list_all_currencies, indent=4),
@@ -172,6 +203,27 @@ async def pay_list_beneficiaries(
         pytest.fail(err.response.json(), pytrace=False)
     logger.info("list_accounts: %s", json.dumps(response_list_beneficiaries, indent=4))
     return response_list_beneficiaries
+
+
+@pytest.fixture()
+async def pay_list_payments(
+    pay_admin_client: PayAdminClient,
+) -> dict[str, Any]:
+    try:
+        response_list_payments = await pay_admin_client.list_payments()
+    except httpx.HTTPStatusError as err:
+        logger.info("response_list_payments err: %s", err.response.headers)
+        logger.info("response_list_payments body: %s", err.response.json())
+        pytest.fail(err.response.json(), pytrace=False)
+
+    logger.info(
+        "list_payments: %s",
+        json.dumps(
+            response_list_payments,
+            indent=4,
+        ),
+    )
+    return response_list_payments
 
 
 @pytest.fixture()
@@ -239,7 +291,7 @@ async def create_company(
     except httpx.HTTPStatusError as err:
         logger.info("response_company err: %s", err.response.headers)
         logger.info("response_company body: %s", err.response.json())
-        pytest.fail(EXIT_MSG, pytrace=False)
+        pytest.fail(err.response.json(), pytrace=False)
     logger.info("create_company: %s", json.dumps(response_company, indent=4))
     return response_company
 
@@ -320,10 +372,10 @@ async def pay_create_company_beneficiary(
             processing_markup=float0,
             sales_markup=float0,
         )
-    except httpx.HTTPStatusError as err1:
-        logger.info("response_beneficiary err:: %s", err1.response.headers)
-        logger.info("response_beneficiary body: %s", err1.response.json())
-        pytest.fail(err1.response.json(), pytrace=False)
+    except httpx.HTTPStatusError as err:
+        logger.info("response_beneficiary err: %s", err.response.headers)
+        logger.info("response_beneficiary body: %s", err.response.json())
+        pytest.fail(err.response.json(), pytrace=False)
     return response_beneficiary
 
 
@@ -365,12 +417,38 @@ async def pay_create_quote_eur_sek(
             from_currency="EUR",
             to_currency="SEK",
         )
-    except httpx.HTTPStatusError as err2:
+    except httpx.HTTPStatusError as err:
         logger.info(
             "response_create_quote err: %s",
-            err2.response.headers,
+            err.response.headers,
         )
-        logger.info("response_create_quote body: %s", err2.response.json())
-        pytest.fail(EXIT_MSG, pytrace=False)
+        logger.info("response_create_quote body: %s", err.response.json())
+        pytest.fail(err.response.json(), pytrace=False)
+    logger.info("create_quote: %s", json.dumps(response_create_quote, indent=4))
+    return response_create_quote
+
+
+@pytest.fixture()
+async def pay_create_quote_sek_eur(
+    pay_client: PayClient,
+    pay_create_company_payer: Mapping[str, Any],
+    pay_create_company_beneficiary: Mapping[str, Any],
+) -> dict[str, Any]:
+    try:
+        response_create_quote = await pay_client.create_quote(
+            amount=1000,
+            external_reference=string.uuid(),
+            payer_id=pay_create_company_payer["data"]["id"],
+            beneficiary_id=pay_create_company_beneficiary["data"]["id"],
+            from_currency="SEK",
+            to_currency="EUR",
+        )
+    except httpx.HTTPStatusError as err:
+        logger.info(
+            "response_create_quote err: %s",
+            err.response.headers,
+        )
+        logger.info("response_create_quote body: %s", err.response.json())
+        pytest.fail(err.response.json(), pytrace=False)
     logger.info("create_quote: %s", json.dumps(response_create_quote, indent=4))
     return response_create_quote
