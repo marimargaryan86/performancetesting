@@ -1,5 +1,7 @@
 import uuid
 
+import structlog
+
 from snowfall.project.junction.go.service.offers import offers
 from snowfall.project.junction.go.service.offers.pay_quotes_models import (
     PayQuoteResponse,
@@ -25,6 +27,7 @@ class PayQuotes(object):
     ):
         self._pay_client = pay_client
         self._offer_options_repository = offer_options_repository
+        self._logger = structlog.get_logger(__name__)
 
     async def get_offer_search_quotes(
         self,
@@ -76,6 +79,14 @@ class PayQuotes(object):
         )
 
         if not offer_option:
+            self._logger.warning(
+                "Offer option not found",
+                option_id=search_result.option_id,
+                price_quote_container_id=search_result.price_quote_container_id,
+                quote_id=search_result.price_quote.id,
+                quote_option_id=search_result.price_quote.option_id,
+            )
+
             raise SkippedConversionError()
 
         quote = (
