@@ -141,11 +141,10 @@ class BaNdcSearchAdapter(object):
                     search_criteria.cabin_type.name,
                     str(search_criteria.fare_preferences),
                     *[
-                        "{origin}-{destination}-{date}-{time}".format(
+                        "{origin}-{destination}-{date}".format(
                             origin=trip.origin,
                             destination=trip.destination,
                             date=trip.date,
-                            time=trip.time,
                         )
                         for trip in search_criteria.trips
                     ],
