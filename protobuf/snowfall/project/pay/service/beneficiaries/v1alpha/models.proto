@@ -10,4 +10,6 @@ message Beneficiary {
   string account_id = 3;
   string created_by = 4;
   string updated_by = 5;
+  string payment_type = 6;
+  string currency = 7;
 }

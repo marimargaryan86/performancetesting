@@ -230,12 +230,20 @@ class Beneficiaries(endpoints.HTTPEndpoint):
                 )
             raise exc
 
+        payment_type = (
+            ""
+            if created_beneficiary.payment_types is None
+            else created_beneficiary.payment_types[0]
+        )
+
         beneficiary = await beneficiaries_repository.insert(
             BeneficiaryModel(
                 id=string.uuid(),
                 external_reference=created_beneficiary.identifier,
                 account_id=account.id,
                 created_by=request.user.username,
+                payment_type=payment_type,
+                currency=created_beneficiary.currency,
             ),
         )
 
