@@ -33,9 +33,9 @@ docker_image(
         "COPY --from=build /src/build /usr/share/nginx/html",
         "# hadolint ignore=SC2016",
         (
-            "RUN mkdir -p /etc/nginx/templates/ && cp /etc/nginx/conf.d/default.conf"
-            " /etc/nginx/templates/default.conf.template && sed -i"
-            " 's/80/${NGINX_PORT}/g ' /etc/nginx/templates/default.conf.template"
+            'RUN mkdir -p /etc/nginx/templates/ && printf "server {listen'
+            " \\${NGINX_PORT};server_name localhost;port_in_redirect off;root"
+            ' /usr/share/nginx/html;}" > /etc/nginx/templates/default.conf.template'
         ),
         'ARG VERSION "dev"',
         "ENV VERSION $VERSION",
