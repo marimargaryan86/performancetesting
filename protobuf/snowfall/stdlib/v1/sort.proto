@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package snowfall.stdlib.v1;
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1";
+
+message Sort {
+  string field = 1;
+  enum Order {
+    ORDER_UNSPECIFIED = 0;
+    ORDER_ASCENDING = 1;
+    ORDER_DESCENDING = 2;
+  }
+  Order order = 2;
+}
