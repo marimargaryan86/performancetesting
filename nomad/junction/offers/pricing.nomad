@@ -56,7 +56,7 @@ job "offers-pricing" {
     auto_revert       = true
     auto_promote      = true
     canary            = 1
-    healthy_deadline  = "60s"
+    healthy_deadline  = "65s"
     progress_deadline = "2m"
   }
 
