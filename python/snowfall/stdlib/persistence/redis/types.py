@@ -54,6 +54,12 @@ class List(Generic[AnyStr]):
     def __str__(self) -> str:
         return self._name
 
+    async def length(self) -> int:
+        return await self._redis.llen(self._name)
+
+    async def pop(self, count: int = 1) -> list[AnyStr]:
+        return await self._redis.lpop(self._name, count)
+
     async def push(self, list_value: bytes | float | int | str) -> None:
         await self._redis.rpush(self._name, list_value)
 
@@ -82,6 +88,12 @@ class Set(Generic[AnyStr]):
     async def add(self, set_value: bytes | float | int | str) -> None:
         await self._redis.sadd(self._name, set_value)
 
+    async def has(self, set_value: bytes | float | int | str) -> bool:
+        return await self._redis.sismember(self._name, set_value)
+
+    async def remove(self, set_value: bytes | float | int | str) -> None:
+        await self._redis.srem(self._name, set_value)
+
     async def to_iterable(self) -> AsyncIterable[AnyStr]:
         cursor = 0
 
@@ -96,7 +108,7 @@ class Set(Generic[AnyStr]):
 
 
 class Client(Generic[AnyStr]):  # noqa: WPS214
-    def __init__(self, redis: Redis[AnyStr], prefix: str = ""):
+    def __init__(self, redis: Redis[AnyStr], prefix: str | None = None):
         self._prefix = "{0}:".format(prefix) if prefix else ""
         self._redis: Redis[AnyStr] = redis
 
@@ -154,8 +166,7 @@ class Client(Generic[AnyStr]):  # noqa: WPS214
         await self._redis.set(self._prefix + name, raw_value)
 
     async def put_expires_at(self, name: object, expiry: datetime.datetime) -> None:
-        expires_in = expiry - datetime.datetime.now(tz=datetime.timezone.utc)
-        await self._redis.expire(self._prefix_name(name), expires_in)
+        await self._redis.expireat(self._prefix_name(name), expiry)
 
     async def get_expires_at(self, name: object) -> datetime.datetime | None:
         expiry = await self._redis.pttl(self._prefix_name(name))

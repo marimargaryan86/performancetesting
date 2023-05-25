@@ -1,232 +1,229 @@
 from __future__ import annotations
 
-import asyncio
 import datetime
 
-import freezegun
 import pytest
 from redis import asyncio as aioredis
 
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.testing import asserts
 
+_PREFIX_PARAMETERS = (("prefix",), [(None,), ("foobar",)])
 
-class TestPrefixClient(object):
-    async def test_set_get_delete(self, redis_client: aioredis.Redis[bytes]) -> None:
-        await asyncio.gather(
-            self._foo_client.put("foobar", "foobar"),
-            self._bar_client.put("foobar", "bazqux"),
-        )
 
-        await asserts.assert_awaitables(
-            (self._foo_client.get("foobar"), b"foobar"),
-            (self._bar_client.get("foobar"), b"bazqux"),
-        )
+def _datetimes_are_equal_enough(
+    dt1: datetime.datetime | None,
+    dt2: datetime.datetime,
+) -> None:
+    assert dt1 is not None
+    # expirations will never be exact to the millisecond, so lets compare if they are
+    # at least <1s equal
+    assert abs((dt1 - dt2).total_seconds()) < 1
 
-        await self._bar_client.delete("foobar")
 
-        await asserts.assert_awaitables(
-            (self._foo_client.get("foobar"), b"foobar"),
-            (self._bar_client.get("foobar"), None),
-        )
+async def _test_expiration(client: redis.Client[bytes], key: object) -> None:
+    now = datetime.datetime.now(tz=datetime.UTC)
+    next_day = now + datetime.timedelta(days=1)
+    next_hour = now + datetime.timedelta(hours=1)
 
-    async def test_wildcard_delete(self, redis_client: aioredis.Redis[bytes]) -> None:
-        await asyncio.gather(
-            self._foo_client.put("foo.bar", "foobar"),
-            self._foo_client.put("foo.baz", "foobar"),
-            self._bar_client.put("foo.bar", "bazqux"),
-            self._bar_client.put("foo.baz", "bazqux"),
-        )
+    assert await client.get_expires_at(key) is None
 
-        await asserts.assert_awaitables(
-            (self._foo_client.get("foo.bar"), b"foobar"),
-            (self._foo_client.get("foo.baz"), b"foobar"),
-            (self._bar_client.get("foo.bar"), b"bazqux"),
-            (self._bar_client.get("foo.baz"), b"bazqux"),
-        )
+    await client.put_expires_at(key, next_day)
+    _datetimes_are_equal_enough(await client.get_expires_at(key), next_day)
 
-        await self._bar_client.delete("foo.*")
+    for set_val, get_val in ((next_hour, next_hour), (next_day, next_hour)):
+        await redis.put_expires_at_if_less_than_current(client, key, set_val)
+        _datetimes_are_equal_enough(await client.get_expires_at(key), get_val)
 
-        await asserts.assert_awaitables(
-            (self._foo_client.get("foo.bar"), b"foobar"),
-            (self._foo_client.get("foo.baz"), b"foobar"),
-            (self._bar_client.get("foo.bar"), None),
-            (self._bar_client.get("foo.baz"), None),
-        )
 
-    async def test_hash(self, redis_client: aioredis.Redis[bytes]) -> None:
-        hash1 = self._foo_client.hash_("foobar")
-        hash2 = self._bar_client.hash_("foobar")
+class TestHash(object):
+    @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
+    async def test_delete_get_length_put(
+        self,
+        prefix: str | None,
+        redis_client: aioredis.Redis[bytes],
+    ) -> None:
+        hash_ = redis.Client(redis_client, prefix=prefix).hash_("foobar")
 
-        await asyncio.gather(
-            hash1.put("foobar", "foobar"),
-            hash1.put("bazqux", "foobar"),
-            hash2.put("foobar", "bazqux"),
-            hash2.put("bazqux", "bazqux"),
-        )
+        await hash_.put("foo", "bar")
+        assert await hash_.length() == 1
+        assert await hash_.get("foo") == b"bar"
+        await hash_.delete("foo")
+        assert await hash_.length() == 0
 
-        await asserts.assert_awaitables(
-            (hash1.length(), 2),
-            (hash2.length(), 2),
-            (hash1.get("foobar"), b"foobar"),
-            (hash2.get("foobar"), b"bazqux"),
-            (
-                asserts.assert_iterable(
-                    hash1.to_iterable(),
-                    [
-                        (b"bazqux", b"foobar"),
-                        (b"foobar", b"foobar"),
-                    ],
-                ),
-                None,
-            ),
-            (
-                asserts.assert_iterable(
-                    hash2.to_iterable(),
-                    [
-                        (b"bazqux", b"bazqux"),
-                        (b"foobar", b"bazqux"),
-                    ],
-                ),
-                None,
-            ),
-        )
+    @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
+    async def test_expiration(
+        self,
+        prefix: str | None,
+        redis_client: aioredis.Redis[bytes],
+    ) -> None:
+        client = redis.Client(redis_client, prefix=prefix)
+        hash_ = client.hash_("foobar")
 
-        await asyncio.gather(
-            hash1.delete("foobar"),
-            hash2.delete("foobar"),
-            hash2.delete("bazqux"),
-        )
+        await hash_.put("foo", "bar")
 
-        await asserts.assert_awaitables(
-            (hash1.length(), 1),
-            (hash2.length(), 0),
-            (hash1.get("foobar"), None),
-            (hash1.get("bazqux"), b"foobar"),
-            (hash2.get("foobar"), None),
-            (hash2.get("bazqux"), None),
-        )
+        await _test_expiration(client, hash_)
 
-    async def test_list(self) -> None:
-        list1 = self._foo_client.list_("foobar")
-        list2 = self._bar_client.list_("foobar")
+    @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
+    async def test_increment(
+        self,
+        prefix: str | None,
+        redis_client: aioredis.Redis[bytes],
+    ) -> None:
+        hash_ = redis.Client(redis_client, prefix=prefix).hash_("foobar")
 
-        await asyncio.gather(
-            list1.push("foobar1"),
-            list1.push("bazqux1"),
-            list2.push("foobar2"),
-            list2.push("bazqux2"),
-        )
+        assert await hash_.increment("foo", 1) == 1
+        assert await hash_.increment("foo", 10) == 11
 
-        await asserts.assert_iterable(
-            list1.to_iterable(),
-            [
-                b"foobar1",
-                b"bazqux1",
-            ],
-        )
+    @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
+    async def test_to_iterable(
+        self,
+        prefix: str | None,
+        redis_client: aioredis.Redis[bytes],
+    ) -> None:
+        list_ = redis.Client(redis_client, prefix=prefix).list_("foobar")
 
-        await asserts.assert_iterable(
-            list2.to_iterable(),
-            [
-                b"foobar2",
-                b"bazqux2",
-            ],
-        )
+        await list_.push("foo")
+        await list_.push("bar")
+        await asserts.assert_iterable(list_.to_iterable(), [b"foo", b"bar"])
 
-    async def test_set(self) -> None:
-        set1 = self._foo_client.set_("foobar")
-        set2 = self._bar_client.set_("foobar")
 
-        await asyncio.gather(
-            set1.add("foo1"),
-            set1.add("baz1"),
-            set2.add("foo2"),
-            set2.add("baz2"),
-        )
+class TestList(object):
+    @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
+    async def test_length_pop_push(
+        self,
+        prefix: str | None,
+        redis_client: aioredis.Redis[bytes],
+    ) -> None:
+        list_ = redis.Client(redis_client, prefix=prefix).list_("foobar")
 
-        await asserts.assert_iterable(
-            set1.to_iterable(),
-            [
-                b"foo1",
-                b"baz1",
-            ],
-        )
+        await list_.push("foo")
+        assert await list_.length() == 1
+        await asserts.assert_iterable(await list_.pop(), [b"foo"])
+        assert await list_.length() == 0
 
-        await asserts.assert_iterable(
-            set2.to_iterable(),
-            [
-                b"foo2",
-                b"baz2",
-            ],
-        )
+    @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
+    async def test_expiration(
+        self,
+        prefix: str | None,
+        redis_client: aioredis.Redis[bytes],
+    ) -> None:
+        client = redis.Client(redis_client, prefix=prefix)
+        list_ = client.list_("foobar")
 
-    @freezegun.freeze_time("2021-12-21 12:12:12.121212")
-    async def test_expire_in_set(self) -> None:
-        set1 = self._foo_client.set_("foobar")
-        set2 = self._bar_client.set_("foobar")
+        await list_.push("foo")
 
-        await asyncio.gather(
-            set1.add("foo"),
-            set2.add("foo"),
-        )
+        await _test_expiration(client, list_)
 
-        expiry = datetime.datetime.now(
-            tz=datetime.timezone.utc,
-        ) + datetime.timedelta(seconds=30)
+    @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
+    async def test_to_iterable(
+        self,
+        prefix: str | None,
+        redis_client: aioredis.Redis[bytes],
+    ) -> None:
+        list_ = redis.Client(redis_client, prefix=prefix).list_("foobar")
 
-        await self._foo_client.put_expires_at(set1, expiry)
+        await list_.push("foo")
+        await list_.push("bar")
+        await asserts.assert_iterable(list_.to_iterable(), [b"foo", b"bar"])
 
-        await asserts.assert_awaitables(
-            (self._foo_client.get_expires_at(set1), expiry),
-            (self._bar_client.get_expires_at(set2), None),
-        )
 
-    @freezegun.freeze_time("2021-12-21 12:12:12.121212")
-    async def test_put_expires_at_client(self) -> None:
-        await asyncio.gather(
-            self._foo_client.put("foo", "bar"),
-            self._bar_client.put("foo", "bar"),
-        )
+class TestSet(object):
+    @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
+    async def test_add_has_remove(
+        self,
+        prefix: str | None,
+        redis_client: aioredis.Redis[bytes],
+    ) -> None:
+        set_ = redis.Client(redis_client, prefix=prefix).set_("foobar")
 
-        expiry = datetime.datetime.now(
-            tz=datetime.timezone.utc,
-        ) + datetime.timedelta(seconds=30)
+        await set_.add("foo")
+        assert await set_.has("foo")
+        await set_.remove("foo")
+        assert not await set_.has("foo")
 
-        await self._foo_client.put_expires_at("foo", expiry)
+    @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
+    async def test_expiration(
+        self,
+        prefix: str | None,
+        redis_client: aioredis.Redis[bytes],
+    ) -> None:
+        client = redis.Client(redis_client, prefix=prefix)
+        set_ = client.set_("foobar")
 
-        await asserts.assert_awaitables(
-            (self._foo_client.get_expires_at("foo"), expiry),
-            (self._bar_client.get_expires_at("foo"), None),
-        )
+        await set_.add("foo")
 
-    @freezegun.freeze_time("2021-12-21 12:12:12.121212")
-    async def test_put_expires_at_if_greater(self) -> None:
-        set1 = self._foo_client.set_("foobar")
-        set2 = self._bar_client.set_("foobar")
+        await _test_expiration(client, set_)
 
-        expiry = datetime.datetime.now(
-            tz=datetime.timezone.utc,
-        ) + datetime.timedelta(seconds=30)
-        less_expiry = expiry - datetime.timedelta(seconds=20)
+    @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
+    async def test_to_iterable(
+        self,
+        prefix: str | None,
+        redis_client: aioredis.Redis[bytes],
+    ) -> None:
+        set_ = redis.Client(redis_client, prefix=prefix).set_("foobar")
 
-        await asyncio.gather(
-            set1.add("foo"),
-            set2.add("foo"),
-            redis.put_expires_at_if_less_than_current(self._foo_client, set1, expiry),
-            redis.put_expires_at_if_less_than_current(
-                self._foo_client,
-                set1,
-                less_expiry,
-            ),
-        )
+        await set_.add("foo")
+        await set_.add("bar")
+        await asserts.assert_iterable(set_.to_iterable(), [b"foo", b"bar"])
+
+
+class TestClient(object):
+    @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
+    async def test_delete_get_put(
+        self,
+        prefix: str | None,
+        redis_client: aioredis.Redis[bytes],
+    ) -> None:
+        client = redis.Client(redis_client, prefix=prefix)
+
+        await client.put("foo", "bar")
+        assert await client.get("foo") == b"bar"
+        await client.delete("foo")
+        assert await client.get("foo") is None
+
+    @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
+    async def test_expiration(
+        self,
+        prefix: str | None,
+        redis_client: aioredis.Redis[bytes],
+    ) -> None:
+        client = redis.Client(redis_client, prefix=prefix)
+
+        await client.put("foo", "bar")
+        await _test_expiration(client, "foo")
+
+    @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
+    async def test_wildcard_delete(
+        self,
+        prefix: str | None,
+        redis_client: aioredis.Redis[bytes],
+    ) -> None:
+        client = redis.Client(redis_client, prefix=prefix)
+
+        await client.put("foo.bar", "foobar")
+        await client.put("foo.baz", "foobar")
 
         await asserts.assert_awaitables(
-            (self._foo_client.get_expires_at(set1), less_expiry),
-            (self._bar_client.get_expires_at(set2), None),
+            (client.get("foo.bar"), b"foobar"),
+            (client.get("foo.baz"), b"foobar"),
         )
 
-    @pytest.fixture(autouse=True)
-    def _setup(self, redis_client: aioredis.Redis[bytes]) -> None:
-        self._foo_client = redis.Client(redis_client, "foo")
-        self._bar_client = redis.Client(redis_client, "bar")
+        await client.delete("foo.*")
+
+        await asserts.assert_awaitables(
+            (client.get("foo.bar"), None),
+            (client.get("foo.baz"), None),
+        )
+
+    async def test_prefix(self, redis_client: aioredis.Redis[bytes]) -> None:
+        prefixless_client = redis.Client(redis_client)
+        foobar_client = redis.Client(redis_client, prefix="foobar")
+        bazqux_client = redis.Client(redis_client, prefix="bazqux")
+
+        await prefixless_client.put("foo", "prefixless")
+        await foobar_client.put("foo", "foobar")
+        await bazqux_client.put("foo", "bazqux")
+
+        assert await prefixless_client.get("foo") == b"prefixless"
+        assert await foobar_client.get("foo") == b"foobar"
