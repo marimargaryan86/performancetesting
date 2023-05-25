@@ -83,8 +83,8 @@ class PayQuotes(object):
                 "Offer option not found",
                 option_id=search_result.option_id,
                 price_quote_container_id=search_result.price_quote_container_id,
-                quote_id=search_result.price_quote.id,
                 quote_option_id=search_result.price_quote.option_id,
+                quote_id=search_result.price_quote.id,
             )
 
             raise SkippedConversionError()
