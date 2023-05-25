@@ -46,6 +46,7 @@ message Booking {
     STATUS_REJECTED = 3;
     STATUS_NOT_TICKETED = 4;
     STATUS_ERROR = 5;
+    STATUS_CANCELLED = 6;
   }
   Status status = 4;
   string provider_name = 5;

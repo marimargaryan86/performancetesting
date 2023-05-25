@@ -403,3 +403,41 @@ class BookingsCancellationsRepository(
             cur="",
             filter_=filter_,
         )
+
+    async def find_by_ticket_id(
+        self,
+        ticket_id: str,
+    ) -> models_pb2.BookingsCancellation | None:
+        filter_ = (
+            {
+                "booking_cancellations.ticket_id": {
+                    "$eq": ticket_id,
+                },
+            }
+            if ticket_id
+            else {}
+        )
+
+        cancellation = await self._find_with_cursor(
+            cur="",
+            filter_=filter_,
+        )
+
+        try:
+            return await cancellation.take()
+        except StopAsyncIteration:
+            return None
+
+    async def update(
+        self,
+        document: models_pb2.BookingsCancellation,
+    ) -> bool:
+        replacement = self._coder.encode(document)
+
+        update = await self._execute(
+            self._collection.replace_one,
+            filter={"_id": replacement["_id"]},
+            replacement=replacement,
+        )
+
+        return update.acknowledged

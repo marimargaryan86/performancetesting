@@ -1,8 +1,9 @@
 from typing import Sequence
 
-from grpc import aio
+from grpc import StatusCode, aio
 
 from snowfall.project.junction.go.service.orders.orders import (
+    BookingRepository,
     BookingsCancellationsRepository,
     JourneyRepository,
 )
@@ -147,3 +148,67 @@ class CreateBookingsCancellationHandler(object):  # noqa: WPS214
             for booking in order.bookings
             if booking.id in booking_ids
         ]
+
+
+class CancellationTicketCompletedHandler(object):
+    def __init__(
+        self,
+        request: orders_pb2.HandleCancellationTicketCompletedRequest,
+        context: aio.ServicerContext,
+        bookings: BookingRepository,
+        cancellations: BookingsCancellationsRepository,
+    ):
+        self._request = request
+        self._context = context
+        self._bookings = bookings
+        self._cancellations = cancellations
+
+    async def execute(self) -> orders_pb2.HandleCancellationTicketCompletedResponse:
+        cancellation = await self._cancellations.find_by_ticket_id(
+            ticket_id=self._request.ticket_id,
+        )
+
+        if cancellation is None:
+            await self._context.abort(StatusCode.NOT_FOUND)
+
+        await self._update_booking_cancellation_status(cancellation)  # type: ignore[arg-type]
+
+        await self._cancellations.update(document=cancellation)  # type: ignore[arg-type]
+
+        return orders_pb2.HandleCancellationTicketCompletedResponse(
+            cancellation=cancellation,
+        )
+
+    async def _update_booking_cancellation_status(
+        self,
+        cancellation: models_pb2.BookingsCancellation,
+    ) -> None:
+        for booking_cancellation in cancellation.booking_cancellations:
+            if booking_cancellation.ticket_id == self._request.ticket_id:
+                booking_cancellation.status = (
+                    models_pb2.BookingCancellation.STATUS_COMPLETED
+                )
+
+                booking = await self._bookings.find_by_id(
+                    document_id=booking_cancellation.booking_id,
+                )
+
+                booking.status = models_pb2.Booking.STATUS_CANCELLED  # type: ignore[union-attr]
+                await self._bookings.update(booking)  # type: ignore[arg-type]
+
+                break
+
+        self._update_overall_cancellation_status(cancellation)
+
+    def _update_overall_cancellation_status(
+        self,
+        cancellation: models_pb2.BookingsCancellation,
+    ) -> None:
+        all_tickets_completed = all(
+            booking_cancellation.status
+            == models_pb2.BookingCancellation.STATUS_COMPLETED
+            for booking_cancellation in cancellation.booking_cancellations
+        )
+
+        if all_tickets_completed:
+            cancellation.status = models_pb2.BookingsCancellation.STATUS_COMPLETED

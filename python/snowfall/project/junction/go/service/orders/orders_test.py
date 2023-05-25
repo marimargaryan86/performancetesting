@@ -41,10 +41,15 @@ async def bookings_cancellation(
     bookings_cancellation_repository: orders.BookingsCancellationsRepository,
     order: models_pb2.Order,
 ) -> models_pb2.BookingsCancellation:
+    ticket_ids = iter(["12345", "56789"])
     return await bookings_cancellation_repository.insert(
         models_pb2.BookingsCancellation(
             booking_cancellations=[
-                models_pb2.BookingCancellation(booking_id=booking.id)
+                models_pb2.BookingCancellation(
+                    booking_id=booking.id,
+                    ticket_id=next(ticket_ids),
+                    status=models_pb2.BookingCancellation.STATUS_PENDING,
+                )
                 for booking in order.bookings
             ],
             status=models_pb2.BookingsCancellation.STATUS_PENDING,
@@ -150,3 +155,46 @@ class TestBookingsCancellations(object):
         assert retrieved.id == bookings_cancellation.id
         assert retrieved.status == bookings_cancellation.status
         assert retrieved.created_at.seconds == bookings_cancellation.created_at.seconds
+
+    async def test_cancellation_is_retrievable_by_ticket_id(
+        self,
+        bookings_cancellation_repository: orders.BookingsCancellationsRepository,
+        bookings_cancellation: models_pb2.BookingsCancellation,
+    ) -> None:
+        ticket_id = more_itertools.first(
+            bookings_cancellation.booking_cancellations,
+        ).ticket_id
+
+        retrieved = await bookings_cancellation_repository.find_by_ticket_id(ticket_id)
+
+        assert retrieved
+        assert retrieved.id == bookings_cancellation.id
+        assert retrieved.status == bookings_cancellation.status
+        for retrieved_bc, expected_bc in list(  # noqa: WPS352
+            zip(
+                retrieved.booking_cancellations,
+                bookings_cancellation.booking_cancellations,
+                strict=True,
+            ),
+        ):
+            assert retrieved_bc == expected_bc
+
+    async def test_can_update_cancellation_status(
+        self,
+        bookings_cancellation_repository: orders.BookingsCancellationsRepository,
+        bookings_cancellation: models_pb2.BookingsCancellation,
+    ) -> None:
+        bookings_cancellation.status = models_pb2.BookingsCancellation.STATUS_COMPLETED
+
+        update_success = await bookings_cancellation_repository.update(
+            bookings_cancellation,
+        )
+
+        updated = await bookings_cancellation_repository.find_by_id(
+            bookings_cancellation.id,
+        )
+
+        assert update_success
+        assert updated
+        assert updated.id == bookings_cancellation.id
+        assert updated.status == bookings_cancellation.status

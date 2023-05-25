@@ -20,6 +20,7 @@ service OrderService {
   rpc ListBookingDetails(ListBookingDetailsRequest) returns (ListBookingDetailsResponse) {}
   rpc CreateBookingsCancellation(CreateBookingsCancellationRequest) returns (CreateBookingsCancellationResponse) {}
   rpc GetBookingsCancellation(GetBookingsCancellationRequest) returns (GetBookingsCancellationResponse) {}
+  rpc HandleCancellationTicketCompleted(HandleCancellationTicketCompletedRequest) returns (HandleCancellationTicketCompletedResponse) {}
 }
 
 message CreateJourneyRequest {
@@ -150,5 +151,13 @@ message GetBookingsCancellationRequest {
 }
 
 message GetBookingsCancellationResponse {
+  BookingsCancellation cancellation = 1;
+}
+
+message HandleCancellationTicketCompletedRequest {
+  string ticket_id = 1;
+}
+
+message HandleCancellationTicketCompletedResponse {
   BookingsCancellation cancellation = 1;
 }

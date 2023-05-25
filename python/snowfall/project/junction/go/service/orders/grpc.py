@@ -9,6 +9,7 @@ from snowfall.project.junction.go.service.orders.orders import (
     OrderRepository,
 )
 from snowfall.project.junction.go.service.orders.orders_handlers import (
+    CancellationTicketCompletedHandler,
     CreateBookingsCancellationHandler,
 )
 from snowfall.project.junction.go.service.orders.v1alpha import (
@@ -262,3 +263,17 @@ class OrderService(
         return orders_pb2.GetBookingsCancellationResponse(
             cancellation=cancellation,
         )
+
+    async def HandleCancellationTicketCompleted(  # type: ignore[override] # noqa: N802
+        self,
+        request: orders_pb2.HandleCancellationTicketCompletedRequest,
+        context: aio.ServicerContext,
+    ) -> orders_pb2.HandleCancellationTicketCompletedResponse:
+        ticket_completed_handler = CancellationTicketCompletedHandler(
+            request,
+            context,
+            self._bookings,
+            self._cancellations,
+        )
+
+        return await ticket_completed_handler.execute()
