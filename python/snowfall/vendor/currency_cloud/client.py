@@ -322,12 +322,16 @@ class PaymentClient(object):  # noqa: WPS214
         query_parameters: Mapping[str, Any] | None = None,
         payload: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
-        response = await self._client.request(
-            method=method,
-            url=url,
-            params=query_parameters,
-            data=encode_arrays(payload),
-        )
+        try:
+            response = await self._client.request(
+                method=method,
+                url=url,
+                params=query_parameters,
+                data=encode_arrays(payload),
+            )
+        except httpx.ReadTimeout as exc:
+            _logger.error("ReadTimeout", url=url, payload=payload)
+            raise CurrencyCloudError(messages=["{0}".format(exc)]) from exc
 
         if 400 <= response.status_code < 500:  # noqa: WPS432
             error_messages = response.json()["error_messages"]
