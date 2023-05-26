@@ -20,16 +20,12 @@ from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2
 from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1 import datetime_pb2, latlng_pb2
+from snowfall.stdlib.v1 import latlng_pb2
 
 _tz_finder = timezonefinder.TimezoneFinder()
 
 TripReferenceGroup = Sequence[models_pb2.TripReference]
 TripGroup = Sequence[models_pb2.Trip]
-
-
-def _sort_datetime_protos(proto: datetime_pb2.DateTime) -> datetime.datetime:
-    return protobuf.protobuf_to_datetime(proto)
 
 
 def _sort_keys(segment: models_pb2.Segment) -> tuple[int, int]:
