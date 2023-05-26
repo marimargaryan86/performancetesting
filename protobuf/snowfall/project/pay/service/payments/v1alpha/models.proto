@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package snowfall.project.pay.service.payments.v1alpha;
+
+import "google/protobuf/timestamp.proto";
+import "snowfall/stdlib/v1/date.proto";
+import "snowfall/stdlib/v1/money.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/payments/v1alpha";
+
+message Payment {
+  string id = 1;
+  string reference = 2;
+  string external_reference_id = 3;
+  snowfall.stdlib.v1.Money amount = 4;
+  repeated string transactions = 5;
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_PENDING = 1;
+    STATUS_RECEIVED_BY_PROVIDER = 2;
+    STATUS_COMPLETED = 3;
+    STATUS_FAILED = 4;
+  }
+  Status status = 6;
+  string reason = 7;
+  string beneficiary_id = 8;
+  string payment_type = 9;
+  snowfall.stdlib.v1.Date payment_due_date = 10;
+  string status_description = 11;
+  google.protobuf.Timestamp created_at = 12;
+  google.protobuf.Timestamp updated_at = 13;
+  google.protobuf.Timestamp estimated_arrival_at = 14;
+  string created_by = 15;
+}
