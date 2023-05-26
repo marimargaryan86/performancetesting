@@ -14,6 +14,7 @@ class FoobarRepository(
     mixins.InsertMixin[testing_pb2.Foobar],
     repository.ProtoRepository[testing_pb2.Foobar],
 ):
+    _nested_path = "foobars"
     _proto = testing_pb2.Foobar
 
     async def find(
@@ -31,8 +32,7 @@ class FoobarRepository(
             else {}
         )
 
-        return await self._find_nested(
-            path="$foobars",
+        return await self._find_with_cursor(
             cur=cursor,
             filter_=filter_,
         )
@@ -60,24 +60,15 @@ class MockRepository(
 
 
 class NestedMockRepository(
+    mixins.AllMixin[dict[str, Any]],
     mixins.InsertMixin[dict[str, Any]],
     repository.DefaultRepository,
 ):
+    _nested_path = "nested"
     _indexes = [
         pymongo.IndexModel("nested._id"),
         pymongo.IndexModel("nested.field"),
     ]
-
-    async def all_(
-        self,
-        cursor: str | None = None,
-        sort: tuple[str, int] | None = None,
-    ) -> resultset.ResultSet[Mapping[str, Any]]:
-        return await self._find_nested(
-            path="$nested",
-            cur=cursor,
-            sort=sort,
-        )
 
 
 @pytest.fixture()

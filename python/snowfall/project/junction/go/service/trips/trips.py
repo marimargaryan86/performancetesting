@@ -15,6 +15,7 @@ from snowfall.stdlib.v1 import amqp_pb2
 
 class SegmentRepository(repository.ProtoRepository[models_pb2.SegmentReference]):
     _proto = models_pb2.SegmentReference
+    _nested_path = "segments"
     _indexes = [
         pymongo.IndexModel("segments._id", background=True),
     ]
@@ -34,8 +35,7 @@ class SegmentRepository(repository.ProtoRepository[models_pb2.SegmentReference])
             else {}
         )
 
-        return await self._find_nested(
-            path="$segments",
+        return await self._find_with_cursor(
             filter_=filter_,
             cur=cursor,
         )
@@ -44,8 +44,7 @@ class SegmentRepository(repository.ProtoRepository[models_pb2.SegmentReference])
         self,
         document_id: str,
     ) -> models_pb2.SegmentReference | None:
-        segments = await self._find_nested(
-            path="$segments",
+        segments = await self._find_with_cursor(
             filter_={
                 "segments._id": {
                     "$eq": document_id,

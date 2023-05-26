@@ -94,6 +94,7 @@ class JourneyRepository(
 
 class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
     _proto = models_pb2.Order
+    _nested_path = "orders"
     _indexes = [
         pymongo.IndexModel("orders._id", background=True),
         pymongo.IndexModel("orders.journey_id", background=True),
@@ -134,8 +135,7 @@ class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
         self,
         document_id: str,
     ) -> models_pb2.Order | None:
-        options = await self._find_nested(
-            path="$orders",
+        options = await self._find_with_cursor(
             filter_={
                 "orders._id": {
                     "$eq": document_id,
@@ -163,8 +163,7 @@ class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
             else {}
         )
 
-        return await self._find_nested(
-            path="$orders",
+        return await self._find_with_cursor(
             cur=cursor,
             filter_=filter_,
         )
@@ -174,8 +173,7 @@ class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
         journey_id: str,
         cursor: str,
     ) -> resultset.ResultSet[models_pb2.Order]:
-        return await self._find_nested(
-            path="$orders",
+        return await self._find_with_cursor(
             cur=cursor,
             filter_={
                 "orders.journey_id": {
@@ -226,6 +224,7 @@ class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
 
 class BookingRepository(repository.ProtoRepository[models_pb2.Booking]):
     _proto = models_pb2.Booking
+    _nested_path = "orders.bookings"
     _indexes = [
         pymongo.IndexModel("orders.bookings._id", background=True),
         pymongo.IndexModel("orders.bookings.order_id", background=True),
@@ -235,8 +234,7 @@ class BookingRepository(repository.ProtoRepository[models_pb2.Booking]):
         self,
         document_id: str,
     ) -> models_pb2.Booking | None:
-        bookings = await self._find_nested(
-            path="$orders.bookings",
+        bookings = await self._find_with_cursor(
             filter_={
                 "orders.bookings._id": {
                     "$eq": document_id,
@@ -264,8 +262,7 @@ class BookingRepository(repository.ProtoRepository[models_pb2.Booking]):
             else {}
         )
 
-        return await self._find_nested(
-            path="$orders.bookings",
+        return await self._find_with_cursor(
             cur=cursor,
             filter_=filter_,
         )
@@ -275,8 +272,7 @@ class BookingRepository(repository.ProtoRepository[models_pb2.Booking]):
         order_id: str,
         cursor: str,
     ) -> resultset.ResultSet[models_pb2.Booking]:
-        return await self._find_nested(
-            path="$orders.bookings",
+        return await self._find_with_cursor(
             cur=cursor,
             filter_={
                 "orders.bookings.order_id": {
@@ -318,6 +314,7 @@ class BookingDetailsRepository(
     repository.ProtoRepository[models_pb2.TripOptionDetails],
 ):
     _proto = models_pb2.TripOptionDetails
+    _nested_path = "orders.bookings.trip_option.details"
     _indexes = [
         pymongo.IndexModel("orders.bookings.trip_option._id", background=True),
         pymongo.IndexModel("orders.bookings.trip_option.details._id", background=True),
@@ -327,8 +324,7 @@ class BookingDetailsRepository(
         self,
         document_id: str,
     ) -> models_pb2.TripOptionDetails | None:
-        options = await self._find_nested(
-            path="$orders.bookings.trip_option.details",
+        options = await self._find_with_cursor(
             filter_={
                 "orders.bookings.trip_option.details._id": {
                     "$eq": document_id,
@@ -356,8 +352,7 @@ class BookingDetailsRepository(
             else {}
         )
 
-        return await self._find_nested(
-            path="$orders.bookings.trip_option.details",
+        return await self._find_with_cursor(
             cur=cursor,
             filter_=filter_,
         )
@@ -367,8 +362,7 @@ class BookingDetailsRepository(
         booking_id: str,
         cursor: str,
     ) -> resultset.ResultSet[models_pb2.TripOptionDetails]:
-        return await self._find_nested(
-            path="$orders.bookings.trip_option.details",
+        return await self._find_with_cursor(
             cur=cursor,
             filter_={
                 "orders.bookings.trip_option.details.booking_id": {

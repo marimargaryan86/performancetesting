@@ -10,6 +10,7 @@ LEGS_ID = "legs._id"
 
 class LegRepository(repository.ProtoRepository[models_pb2.Leg]):
     _proto = models_pb2.Leg
+    _nested_path = "legs"
     _indexes: list[IndexModel] = [
         IndexModel(LEGS_ID, background=True, unique=True),
     ]
@@ -29,15 +30,13 @@ class LegRepository(repository.ProtoRepository[models_pb2.Leg]):
             else {}
         )
 
-        return await self._find_nested(
-            path="$legs",
+        return await self._find_with_cursor(
             filter_=filter_,
             cur=cursor,
         )
 
     async def find_by_id(self, document_id: str) -> models_pb2.Leg | None:
-        legs = await self._find_nested(
-            path="$legs",
+        legs = await self._find_with_cursor(
             filter_={
                 LEGS_ID: {
                     "$eq": document_id,

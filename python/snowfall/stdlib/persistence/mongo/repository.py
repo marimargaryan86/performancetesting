@@ -65,9 +65,8 @@ def with_cursor_filters(  # noqa: C901
         sort = (mongo_id_key, pymongo.ASCENDING)
 
     if path:
-        clean_path = path.removeprefix("$")
-        sort = ("{0}.{1}".format(clean_path, sort[0]), sort[1])
-        prefixed_id = "{0}.{1}".format(clean_path, mongo_id_key)
+        sort = ("{0}.{1}".format(path, sort[0]), sort[1])
+        prefixed_id = "{0}.{1}".format(path, mongo_id_key)
     else:
         prefixed_id = mongo_id_key
 
@@ -157,6 +156,7 @@ class RepositoryProtocol(Protocol[Record]):
 
 
 class _AbstractRepository(abc.ABC, Generic[Record]):
+    _nested_path: str | None = None
     _indexes: list[pymongo.IndexModel] = []
     _timeout_kwargs = {
         core.AgnosticCollection.aggregate: _MAX_TIME_MS_CAMEL,
@@ -187,6 +187,9 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
             index_key for index in self._indexes for index_key in index.document["key"]
         ]
         self._valid_sort_fields.append("_id")
+        self._root_path = "${0}".format((self._nested_path or "").removeprefix("$"))
+        self._nested_path_parts = self._root_path.split(".")
+        self._clean_path = self._root_path.removeprefix("$")
 
     async def _create_indexes(self) -> None:
         self._has_created_indexes = True
@@ -240,13 +243,12 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
         # _find_with_cursor sends a special kwarg pymongo don't like
         filter_pre_cursor = kwargs.pop("filter_pre_cursor", {})
         sort = kwargs.pop("sort", None)
-        path = kwargs.pop("path", None)
 
         if sort:
             index_field = sort[0]
 
-            if path:
-                index_field = "{0}.{1}".format(path, sort[0])
+            if self._clean_path:
+                index_field = "{0}.{1}".format(self._clean_path, sort[0])
 
             if index_field not in self._valid_sort_fields:
                 raise UnindexedSortFieldError(
@@ -288,9 +290,38 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
 
         return possible_document
 
+    async def _find_with_cursor(
+        self,
+        cur: str | None = None,
+        filter_: Mapping[str, Any] | None = None,
+        sort: tuple[str, int] | None = None,
+    ) -> resultset.ResultSet[Record]:
+        if self._nested_path:
+            return await self._find_nested(
+                cur=cur,
+                filter_=filter_,
+                sort=sort,
+            )
+
+        filter_pre_cursor = dict(filter_ or {})
+        cursor_filter = filter_pre_cursor.copy()
+
+        if cur:
+            cursor_filter = with_cursor_filters(
+                cursor.unmarshal(cur, filter_pre_cursor, sort),
+                filter_pre_cursor,
+                sort,
+            )
+
+        return await self._execute(
+            query=self._collection.find,
+            filter=cursor_filter,
+            filter_pre_cursor=filter_pre_cursor,
+            sort=sort,
+        )
+
     async def _find_nested(
         self,
-        path: str,
         filter_: Mapping[str, Any] | None = None,
         cur: str | None = None,
         sort: tuple[str, int] | None = None,
@@ -304,7 +335,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
                 cursor_obj=cursor.unmarshal(cur, cursor_filter, sort),
                 filter_=cursor_filter,
                 sort=sort,
-                path=path,
+                path=self._clean_path,
             )
 
         if cursor_filter:
@@ -316,7 +347,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
 
         path_parts = []
 
-        for path_part in path.split("."):
+        for path_part in self._nested_path_parts:
             path_parts.append(path_part)
             aggregate.append(
                 {
@@ -337,7 +368,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
             (
                 {
                     "$replaceRoot": {
-                        "newRoot": path,
+                        "newRoot": self._root_path,
                     },
                 },
                 {
@@ -364,30 +395,6 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
         return await self._execute(
             query=self._collection.aggregate,
             pipeline=aggregate,
-            filter_pre_cursor=filter_pre_cursor,
-            sort=sort,
-            path=path.removeprefix("$"),
-        )
-
-    async def _find_with_cursor(
-        self,
-        cur: str,
-        filter_: Mapping[str, Any] | None = None,
-        sort: tuple[str, int] | None = None,
-    ) -> resultset.ResultSet[Record]:
-        filter_pre_cursor = dict(filter_ or {})
-        cursor_filter = filter_pre_cursor.copy()
-
-        if cur:
-            cursor_filter = with_cursor_filters(
-                cursor.unmarshal(cur, filter_pre_cursor, sort),
-                filter_pre_cursor,
-                sort,
-            )
-
-        return await self._execute(
-            query=self._collection.find,
-            filter=cursor_filter,
             filter_pre_cursor=filter_pre_cursor,
             sort=sort,
         )

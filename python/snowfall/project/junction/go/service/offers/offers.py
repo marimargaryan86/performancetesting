@@ -52,6 +52,7 @@ class TripOfferGroupDetailsRepository(
     repository.ProtoRepository[models_pb2.OfferSegment],
 ):
     _proto = models_pb2.OfferSegment
+    _nested_path = "segments"
     _indexes = [pymongo.IndexModel("segments._id", background=True)]
 
     async def find(
@@ -69,15 +70,13 @@ class TripOfferGroupDetailsRepository(
             else {}
         )
 
-        return await self._find_nested(
-            path="$segments",
+        return await self._find_with_cursor(
             cur=cursor,
             filter_=filter_,
         )
 
     async def find_by_id(self, document_id: str) -> models_pb2.OfferSegment | None:
-        details = await self._find_nested(
-            path="$segments",
+        details = await self._find_with_cursor(
             filter_={
                 "segments._id": {
                     "$eq": document_id,
@@ -95,6 +94,7 @@ class OfferOptionsRepository(
     repository.ProtoRepository[models_pb2.Offer],
 ):
     _proto = models_pb2.Offer
+    _nested_path = "offers"
     _indexes = [pymongo.IndexModel("offers._id", background=True)]
 
     async def find(
@@ -112,15 +112,13 @@ class OfferOptionsRepository(
             else {}
         )
 
-        return await self._find_nested(
-            path="$offers",
+        return await self._find_with_cursor(
             cur=cursor,
             filter_=filter_,
         )
 
     async def find_by_id(self, document_id: str) -> models_pb2.Offer | None:
-        options = await self._find_nested(
-            path="$offers",
+        options = await self._find_with_cursor(
             filter_={
                 "offers._id": {
                     "$eq": document_id,
@@ -138,6 +136,7 @@ class OfferOptionDetailsRepository(
     repository.ProtoRepository[models_pb2.OfferSegmentDetails],
 ):
     _proto = models_pb2.OfferSegmentDetails
+    _nested_path = "offers.segment_details"
     _indexes = [
         pymongo.IndexModel("offers.segment_details._id", background=True),
         pymongo.IndexModel("offers.segment_details.cabin_class.type", background=True),
@@ -158,8 +157,7 @@ class OfferOptionDetailsRepository(
             else {}
         )
 
-        return await self._find_nested(
-            path="$offers.segment_details",
+        return await self._find_with_cursor(
             cur=cursor,
             filter_=filter_,
         )
@@ -168,8 +166,7 @@ class OfferOptionDetailsRepository(
         self,
         document_id: str,
     ) -> models_pb2.OfferSegmentDetails | None:
-        details = await self._find_nested(
-            path="$offers.segment_details",
+        details = await self._find_with_cursor(
             filter_={
                 "offers.segment_details._id": {
                     "$eq": document_id,
