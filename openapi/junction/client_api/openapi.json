@@ -868,6 +868,7 @@
         }
       ],
       "get": {
+        "x-sunset": "2023-09-01",
         "summary": "Get Leg",
         "tags": [
           "legs"
@@ -915,6 +916,7 @@
     "/legs/types": {
       "parameters": [],
       "get": {
+        "x-sunset": "2023-09-01",
         "summary": "List Leg Types",
         "tags": [
           "legs"
@@ -1018,6 +1020,7 @@
         }
       ],
       "get": {
+        "x-sunset": "2023-09-01",
         "summary": "Get Leg Type",
         "tags": [
           "legs"
@@ -1078,6 +1081,7 @@
         }
       ],
       "get": {
+        "x-sunset": "2023-09-01",
         "summary": "Get Segment",
         "tags": [
           "segments"
@@ -1135,6 +1139,7 @@
         }
       ],
       "get": {
+        "x-sunset": "2023-09-01",
         "summary": "List Legs by Segment",
         "tags": [
           "legs"
@@ -1422,6 +1427,7 @@
         }
       ],
       "get": {
+        "x-sunset": "2023-09-01",
         "summary": "Get Trip",
         "tags": [
           "trips"
@@ -1482,6 +1488,7 @@
         }
       ],
       "get": {
+        "x-sunset": "2023-09-01",
         "summary": "List Legs by Trip",
         "tags": [
           "legs"
@@ -1560,6 +1567,7 @@
         }
       ],
       "get": {
+        "x-sunset": "2023-09-01",
         "summary": "List Segments by Trip",
         "tags": [
           "segments"
@@ -1638,6 +1646,7 @@
         }
       ],
       "get": {
+        "x-sunset": "2023-09-01",
         "summary": "List Prices by Trip",
         "tags": [
           "draft"
@@ -1696,6 +1705,7 @@
     },
     "/trips/searches": {
       "post": {
+        "x-sunset": "2023-09-01",
         "summary": "Create Trip Search",
         "tags": [
           "trips"
@@ -1759,6 +1769,7 @@
         }
       ],
       "get": {
+        "x-sunset": "2023-09-01",
         "summary": "Get Trip Search",
         "tags": [
           "trips"
@@ -1803,6 +1814,7 @@
         }
       ],
       "get": {
+        "x-sunset": "2023-09-01",
         "summary": "List Legs by Trip Search",
         "tags": [
           "legs"
@@ -1883,6 +1895,7 @@
         }
       ],
       "get": {
+        "x-sunset": "2023-09-01",
         "summary": "List Segments by Trip Search",
         "tags": [
           "segments"
@@ -1966,6 +1979,7 @@
         }
       ],
       "get": {
+        "x-sunset": "2023-09-01",
         "summary": "List Trips by Trip Search",
         "tags": [
           "trips"
