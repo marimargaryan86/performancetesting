@@ -1,6 +1,6 @@
 # Junction Pay
 
-Junction pay System Flow Diagram
+## Junction pay System Flow Diagram
 
 ```mermaid
     flowchart LR
@@ -106,7 +106,7 @@ In this flow diagram
 * The Microservices interacts with the CurrencyCloud Client (S).
 * The FirewallOutbound (T) represents the outbound traffic from the Firewall.
 
-Quotation API:
+### Fetch Quotation API
 
 This api will be consumed by clients to get the calculated amount based on currency pair. New amount will be calculated using the fx rates, Margins and Markups setup against the client's company.
 below sequence diagram demonstrate the flow and components involved.
@@ -151,7 +151,7 @@ below sequence diagram demonstrate the flow and components involved.
         end
 ```
 
-Transaction API:
+### Create Transaction API
 
 ```mermaid
     sequenceDiagram
