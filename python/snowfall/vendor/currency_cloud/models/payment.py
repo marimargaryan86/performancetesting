@@ -13,7 +13,7 @@ class Payment(CamelCaseBaseModel):
     reference: str
     unique_request_id: str
     payment_type: str
-    payment_date: datetime.datetime | None = None
+    payment_date: datetime.date | None = None
 
 
 class PaymentRequest(Payment):
@@ -22,3 +22,4 @@ class PaymentRequest(Payment):
 
 class PaymentResponse(Payment):
     identifier: str = pydantic.Field(..., alias="id")
+    payment_date: datetime.date

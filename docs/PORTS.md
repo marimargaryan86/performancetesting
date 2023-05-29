@@ -44,3 +44,4 @@ The following ports are configured in local environments by default:
 | 50064 | accounts               | gRPC Server       |
 | 50065 | gateway                | gRPC Server       |
 | 50066 | mock                   | gRPC Server       |
+| 50067 | payments               | gRPC Server       |
