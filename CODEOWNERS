@@ -34,6 +34,6 @@
 [Specification][2] @backend-team-leads
 *.proto
 /openapi/**/*.json
-/protobuf/snowfall/project/junction/go/service/gateway/ @platform-engineers
-/protobuf/snowfall/service/ @platform-engineers
-/protobuf/snowfall/stdlib/ @platform-engineers
+/protobuf/snowfall/project/junction/go/service/gateway/**/*.proto @platform-engineers
+/protobuf/snowfall/service/**/*.proto @platform-engineers
+/protobuf/snowfall/stdlib/**/*.proto @platform-engineers
