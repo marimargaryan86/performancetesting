@@ -58,7 +58,7 @@ class List(Generic[AnyStr]):
         return await self._redis.llen(self._name)
 
     async def pop(self, count: int = 1) -> list[AnyStr]:
-        return await self._redis.lpop(self._name, count)
+        return await self._redis.lpop(self._name, count) or []
 
     async def push(self, list_value: bytes | float | int | str) -> None:
         await self._redis.rpush(self._name, list_value)

@@ -6,15 +6,16 @@ option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/
 
 service MetaService {
   rpc GetCapabilities(GetCapabilitiesRequest) returns (GetCapabilitiesResponse) {}
-  rpc GetIdentifier(GetIdentifierRequest) returns (GetIdentifierResponse) {}
+  rpc GetIdentity(GetIdentityRequest) returns (GetIdentityResponse) {}
 }
 
 message GetCapabilitiesRequest {}
 
 message GetCapabilitiesResponse {}
 
-message GetIdentifierRequest {}
+message GetIdentityRequest {}
 
-message GetIdentifierResponse {
-  string identifier = 1;
+message GetIdentityResponse {
+  string id = 1;
+  string name = 2;
 }

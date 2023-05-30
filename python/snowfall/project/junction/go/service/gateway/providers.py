@@ -7,6 +7,7 @@ import itertools
 from collections.abc import Sequence
 from typing import Iterable, NamedTuple
 
+from snowfall.project.junction.provider.v1alpha import offers_pb2_grpc
 from snowfall.stdlib.transport.grpc import client
 
 
@@ -73,7 +74,7 @@ class Provider(object):
     connection: Connection
     identifier: str
     name: str = ""
-    is_healthy: bool = False
+    is_healthy: bool = True
 
     def marshal_resource_id(self, resource_id: str) -> str:
         raw = "\x00".join([self.identifier, resource_id])
@@ -87,6 +88,11 @@ class Provider(object):
 class Connection(object):
     def __init__(self, dsn: str):
         self._channel = client.create_channel(dsn)
+        self._offers = offers_pb2_grpc.OfferServiceStub(self._channel)
+
+    @property
+    def offers(self) -> offers_pb2_grpc.OfferServiceStub:
+        return self._offers
 
 
 def unmarshal_resource_id(resource_id: str) -> UnmarshalResult:

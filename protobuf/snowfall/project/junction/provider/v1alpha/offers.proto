@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package snowfall.project.junction.provider.v1alpha;
+
+import "snowfall/project/junction/go/service/offers/v1alpha/amqp.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/provider/v1alpha";
+
+service OfferService {
+  rpc SearchOffers(SearchOffersRequest) returns (SearchOffersResponse) {}
+}
+
+message SearchOffersRequest {
+  oneof offer_search_task {
+    snowfall.project.junction.go.service.offers.v1alpha.TripOfferSearchTask trip_offer_search_task = 1;
+  }
+}
+
+message SearchOffersResponse {
+  oneof offer_search_results {
+    TripOfferSearchResults trip_offer_search_results = 1;
+  }
+}
+
+message TripOfferSearchResults {
+  repeated snowfall.project.junction.go.service.offers.v1alpha.TripOfferSearchResult results = 1;
+}

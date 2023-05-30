@@ -90,7 +90,7 @@ class TestHash(object):
 
 class TestList(object):
     @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
-    async def test_length_pop_push(
+    async def test_length_pop_push(  # noqa: WPS217
         self,
         prefix: str | None,
         redis_client: aioredis.Redis[bytes],
@@ -101,6 +101,7 @@ class TestList(object):
         assert await list_.length() == 1
         await asserts.assert_iterable(await list_.pop(), [b"foo"])
         assert await list_.length() == 0
+        await asserts.assert_iterable(await list_.pop(), [])
 
     @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
     async def test_expiration(

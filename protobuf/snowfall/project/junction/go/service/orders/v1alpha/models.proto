@@ -50,6 +50,7 @@ message Booking {
   }
   Status status = 4;
   string provider_name = 5;
+  string provider_id = 13;
   snowfall.stdlib.v1.Money total_price = 6;
   oneof result {
     TripBooking trip_result = 7;

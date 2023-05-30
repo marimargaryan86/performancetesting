@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package snowfall.project.junction.go.service.gateway.v1alpha;
+
+import "snowfall/project/junction/go/service/offers/v1alpha/amqp.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/gateway/v1alpha";
+
+service OfferService {
+  rpc EnqueueOfferSearch(EnqueueOfferSearchRequest) returns (EnqueueOfferSearchResponse) {}
+  rpc PopOfferSearchResults(PopOfferSearchResultsRequest) returns (PopOfferSearchResultsResponse) {}
+}
+
+message EnqueueOfferSearchRequest {
+  oneof offer_search_task {
+    snowfall.project.junction.go.service.offers.v1alpha.TripOfferSearchTask trip_offer_search_task = 1;
+  }
+}
+
+message EnqueueOfferSearchResponse {
+  string id = 1;
+}
+
+message PopOfferSearchResultsRequest {
+  string id = 1;
+}
+
+message PopOfferSearchResultsResponse {
+  bool is_in_progress = 1;
+  oneof offer_search_results {
+    TripOfferSearchResults trip_offer_search_results = 2;
+  }
+}
+
+message TripOfferSearchResults {
+  repeated snowfall.project.junction.go.service.offers.v1alpha.TripOfferSearchResult results = 1;
+}

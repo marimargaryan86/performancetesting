@@ -58,12 +58,12 @@ class _MockService(grpc_service.Service, meta_pb2_grpc.MetaServiceServicer):
     ) -> meta_pb2.GetCapabilitiesResponse:
         return meta_pb2.GetCapabilitiesResponse()
 
-    async def GetIdentifier(  # type: ignore[override] # noqa: N802
+    async def GetIdentity(  # type: ignore[override] # noqa: N802
         self,
-        request: meta_pb2.GetIdentifierRequest,
+        request: meta_pb2.GetIdentityRequest,
         context: aio.ServicerContext,
-    ) -> meta_pb2.GetIdentifierResponse:
-        return meta_pb2.GetIdentifierResponse(identifier="foo")
+    ) -> meta_pb2.GetIdentityResponse:
+        return meta_pb2.GetIdentityResponse(id="f9ce75d1-2025-4ab5-b5d7-69e4c14c053e")
 
 
 async def _grpc(app: service.Application[_GrpcSettings]) -> None:
