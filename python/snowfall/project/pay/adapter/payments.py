@@ -10,6 +10,7 @@ from snowfall.project.pay.service.payments.v1alpha import (
     payments_pb2_grpc,
 )
 from snowfall.stdlib import sequence, string
+from snowfall.stdlib.format import protobuf
 
 
 class Client(abc.ABC):
@@ -28,6 +29,15 @@ class Client(abc.ABC):
         cursor: str | None = None,
     ) -> payments_pb2.ListPaymentsResponse:
         """Fetch all payment resources."""
+
+    @abc.abstractmethod
+    async def update_state(
+        self,
+        payment_id: str,
+        status: str,
+        failure_message: str,
+    ) -> bool:
+        """Update a payment resource."""
 
 
 class DictClient(Client):
@@ -63,6 +73,23 @@ class DictClient(Client):
             payments=page.sequence,
             next_page_token=page.cursor,
         )
+
+    async def update_state(
+        self,
+        external_reference_id: str,
+        status: str,
+        failure_message: str,
+    ) -> bool:
+        for ind, val_pay in self._payments.items():
+            if val_pay.external_reference_id == external_reference_id:
+                val_pay.status = protobuf.slug_to_enum_value(
+                    models_pb2.Status,
+                    status,
+                )
+                val_pay.status_description = failure_message
+                self._payments[ind] = val_pay
+                return True
+        return False
 
 
 class GrpcClient(Client):
@@ -110,3 +137,21 @@ class GrpcClient(Client):
         return await errors.handle_grpc_errors(
             self._payments.ListPayments(request, timeout=self._timeout),
         )
+
+    async def update_state(
+        self,
+        external_reference_id: str,
+        status: str,
+        failure_message: str,
+    ) -> bool:
+        response = await self._payments.UpdatePaymentState(
+            payments_pb2.UpdatePaymentStateRequest(
+                external_reference_id=external_reference_id,
+                status=protobuf.slug_to_enum_value(
+                    models_pb2.Status,
+                    status,
+                ),
+                status_description=failure_message,
+            ),
+        )
+        return response.is_success

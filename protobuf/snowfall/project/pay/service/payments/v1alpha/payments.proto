@@ -10,6 +10,7 @@ service PaymentsService {
   rpc CreatePayment(CreatePaymentRequest) returns (CreatePaymentResponse) {}
   rpc GetPayment(GetPaymentRequest) returns (GetPaymentResponse) {}
   rpc ListPayments(ListPaymentsRequest) returns (ListPaymentsResponse) {}
+  rpc UpdatePaymentState(UpdatePaymentStateRequest) returns (UpdatePaymentStateResponse) {}
 }
 
 message CreatePaymentRequest {
@@ -36,4 +37,14 @@ message ListPaymentsRequest {
 message ListPaymentsResponse {
   repeated Payment payments = 1;
   string next_page_token = 2;
+}
+
+message UpdatePaymentStateRequest {
+  string external_reference_id = 1;
+  Status status = 2;
+  string status_description = 3;
+}
+
+message UpdatePaymentStateResponse {
+  bool is_success = 1;
 }

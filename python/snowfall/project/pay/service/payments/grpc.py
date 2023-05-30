@@ -59,7 +59,7 @@ class PaymentsService(service.Service, payments_pb2_grpc.PaymentsServiceServicer
         payment.MergeFrom(
             models_pb2.Payment(
                 id=string.uuid(),
-                status=models_pb2.Payment.Status.STATUS_PENDING,
+                status=models_pb2.Status.STATUS_PENDING,
                 external_reference_id=cc_payment.identifier,
                 created_at=protobuf.datetime_to_protobuf(
                     datetime.now(),
@@ -98,4 +98,19 @@ class PaymentsService(service.Service, payments_pb2_grpc.PaymentsServiceServicer
         return payments_pb2.ListPaymentsResponse(
             payments=[payment async for payment in payments],
             next_page_token=await payments.cursor(),
+        )
+
+    async def UpdatePaymentState(  # type: ignore[override] # noqa: N802
+        self,
+        request: payments_pb2.UpdatePaymentStateRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> payments_pb2.UpdatePaymentStateResponse:
+        is_updated = await self._payments_repository.update_state(
+            request.external_reference_id,
+            request.status,
+            request.status_description,
+        )
+
+        return payments_pb2.UpdatePaymentStateResponse(
+            is_success=is_updated,
         )

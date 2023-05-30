@@ -8,19 +8,20 @@ import "snowfall/stdlib/v1/money.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/payments/v1alpha";
 
+enum Status {
+  STATUS_UNSPECIFIED = 0;
+  STATUS_PENDING = 1;
+  STATUS_READY_TO_SEND = 2;
+  STATUS_COMPLETED = 3;
+  STATUS_FAILED = 4;
+}
+
 message Payment {
   string id = 1;
   string reference = 2;
   string external_reference_id = 3;
   snowfall.stdlib.v1.Money amount = 4;
   repeated string transactions = 5;
-  enum Status {
-    STATUS_UNSPECIFIED = 0;
-    STATUS_PENDING = 1;
-    STATUS_RECEIVED_BY_PROVIDER = 2;
-    STATUS_COMPLETED = 3;
-    STATUS_FAILED = 4;
-  }
   Status status = 6;
   string reason = 7;
   string beneficiary_id = 8;
