@@ -6,37 +6,6 @@ from snowfall.project.junction.go.service.orders.v1alpha import models_pb2
 
 
 @pytest.fixture()
-async def order(
-    journey_repository: orders.JourneyRepository,
-    order_repository: orders.OrderRepository,
-) -> models_pb2.Order:
-    journey = await journey_repository.create(
-        contact_details=models_pb2.ContactDetails(),
-        reseller_id="",
-    )
-    return await order_repository.create_from_options(
-        journey_id=journey.id,
-        passengers=[
-            models_pb2.Passenger(),
-        ],
-        options=[
-            models_pb2.TripOption(
-                details=[
-                    models_pb2.TripOptionDetails(),
-                    models_pb2.TripOptionDetails(),
-                ],
-            ),
-            models_pb2.TripOption(
-                details=[
-                    models_pb2.TripOptionDetails(),
-                ],
-            ),
-        ],
-        residence_address=None,
-    )
-
-
-@pytest.fixture()
 async def bookings_cancellation(
     bookings_cancellation_repository: orders.BookingsCancellationsRepository,
     order: models_pb2.Order,

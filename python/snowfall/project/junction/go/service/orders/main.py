@@ -15,6 +15,7 @@ from snowfall.project.junction.go.service.orders.grpc import OrderService
 from snowfall.project.junction.go.service.orders.pay_transactions import (
     PayTransactionCreator,
 )
+from snowfall.project.junction.go.service.orders.zendesk.client import ZendeskClient
 from snowfall.project.junction.go.service.passenger_name_records.v1alpha import (
     passenger_name_records_pb2_grpc,
 )
@@ -33,6 +34,8 @@ class _GrpcSettings(service.Settings):
     grpc_port: int = 50051
     mongo_dsn: Sequence[pydantic.AnyUrl]
     passenger_name_records_address: Sequence[str]
+    zendesk_base_url: pydantic.AnyUrl
+    zendesk_api_key: str
 
 
 class _ImportSettings(pay_integration.Settings, service.Settings):
@@ -55,7 +58,22 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
         ),
     )
 
-    async with types.Connection(app.settings.amqp_dsn) as connection:
+    async with contextlib.AsyncExitStack() as stack:
+        http_client = await stack.enter_async_context(httpx.AsyncClient())
+        logging.register(http_client)
+        metrics.register(http_client)
+
+        zendesk_client = ZendeskClient(
+            base_url=app.settings.zendesk_base_url,
+            api_key=app.settings.zendesk_api_key,
+            http_client=http_client,
+            env=app.environment,
+        )
+
+        amqp_connection = await stack.enter_async_context(
+            types.Connection(app.settings.amqp_dsn),
+        )
+
         grpc_server = server.create_server(
             app.settings.grpc_address,
             app.settings.grpc_port,
@@ -79,11 +97,12 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
                     ),
                     publisher=OrderProducer(
                         producer_obj=producer.Producer(
-                            connection=connection,
+                            connection=amqp_connection,
                             exchange=types.Exchange("orders"),
                         ),
                     ),
                     default_page_size=app.settings.default_page_size,
+                    zendesk_client=zendesk_client,
                 ),
             ],
         )

@@ -1,8 +1,14 @@
+from collections.abc import AsyncIterator
+
+import httpx
 import pytest
 from motor import motor_asyncio
 
 from snowfall.project.junction.go.adapter import passenger_name_records
 from snowfall.project.junction.go.service.orders import orders
+from snowfall.project.junction.go.service.orders.v1alpha import models_pb2
+from snowfall.project.junction.go.service.orders.zendesk.client import ZendeskClient
+from snowfall.stdlib import money
 
 
 @pytest.fixture()
@@ -54,4 +60,60 @@ def bookings_cancellation_repository(
 ) -> orders.BookingsCancellationsRepository:
     return orders.BookingsCancellationsRepository(
         collection=mongo_client.test.order_cancellations,
+    )
+
+
+@pytest.fixture()
+async def httpx_client() -> AsyncIterator[httpx.AsyncClient]:
+    async with httpx.AsyncClient() as http_client:
+        yield http_client
+
+
+@pytest.fixture()
+def zendesk_client(httpx_client: httpx.AsyncClient) -> ZendeskClient:
+    return ZendeskClient(
+        base_url="https://test.api.com",
+        api_key="somefakeapikey123",
+        http_client=httpx_client,
+        env="local",
+    )
+
+
+@pytest.fixture()
+async def order(
+    journey_repository: orders.JourneyRepository,
+    order_repository: orders.OrderRepository,
+) -> models_pb2.Order:
+    journey = await journey_repository.create(
+        contact_details=models_pb2.ContactDetails(),
+        reseller_id="",
+    )
+
+    return await order_repository.create_from_options(
+        journey_id=journey.id,
+        passengers=[
+            models_pb2.Passenger(),
+        ],
+        options=[
+            models_pb2.TripOption(
+                details=[
+                    models_pb2.TripOptionDetails(),
+                    models_pb2.TripOptionDetails(),
+                ],
+                price=money.from_string(
+                    string_amount="13.37",
+                    currency=money.Currency("GBP"),
+                ).protobuf(),
+            ),
+            models_pb2.TripOption(
+                details=[
+                    models_pb2.TripOptionDetails(),
+                ],
+                price=money.from_string(
+                    string_amount="133.37",
+                    currency=money.Currency("GBP"),
+                ).protobuf(),
+            ),
+        ],
+        residence_address=None,
     )

@@ -1,17 +1,20 @@
 {
   "development": {
     "variables": {
-      "count": 1
+      "count": 1,
+      "zendesk_base_url": "https://snowfalltesthelp.zendesk.com"
     }
   },
   "production": {
     "variables": {
-      "count": 2
+      "count": 2,
+      "zendesk_base_url": "https://snowfalltesthelp.zendesk.com"
     }
   },
   "sandbox": {
     "variables": {
-      "count": 1
+      "count": 1,
+      "zendesk_base_url": "https://snowfalltesthelp.zendesk.com"
     }
   }
 }

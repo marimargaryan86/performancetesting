@@ -8,26 +8,50 @@ from snowfall.project.junction.go.service.orders.orders import (
     JourneyRepository,
 )
 from snowfall.project.junction.go.service.orders.v1alpha import models_pb2, orders_pb2
+from snowfall.project.junction.go.service.orders.zendesk.client import ZendeskClient
 from snowfall.stdlib.transport.grpc import rich_status
+from snowfall.stdlib.transport.http.errors import HttpStatusError
 
 
 class CreateBookingsCancellationHandler(object):  # noqa: WPS214
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
         request: orders_pb2.CreateBookingsCancellationRequest,
         context: aio.ServicerContext,
         journeys: JourneyRepository,
         cancellations: BookingsCancellationsRepository,
+        zendesk_client: ZendeskClient,
     ):
         self._request = request
         self._context = context
         self._journeys = journeys
         self._cancellations = cancellations
+        self._zendesk_client = zendesk_client
 
-    async def execute(self) -> orders_pb2.CreateBookingsCancellationResponse:
+    async def execute(  # noqa: WPS210
+        self,
+    ) -> orders_pb2.CreateBookingsCancellationResponse:
         document = self._request.cancellation
 
-        await self._validate(document)
+        booking_ids = [
+            cancellation.booking_id for cancellation in document.booking_cancellations
+        ]
+        journeys = await self._get_journeys(booking_ids)
+        bookings_and_orders = await self._extract_bookings_and_orders(
+            journeys,
+            booking_ids,
+        )
+        bookings = [booking for booking, _ in bookings_and_orders.values()]
+
+        await self._validate(booking_ids, journeys, bookings)
+
+        for booking_cancellation in document.booking_cancellations:
+            booking, order = bookings_and_orders.get(  # type: ignore[misc]
+                booking_cancellation.booking_id,
+            )
+            ticket_id = await self._create_zendesk_support_ticket(booking, order)
+            booking_cancellation.ticket_id = ticket_id
+            booking_cancellation.status = models_pb2.BookingCancellation.STATUS_PENDING
 
         document.status = models_pb2.BookingsCancellation.STATUS_PENDING
         cancellation = await self._cancellations.insert(
@@ -38,16 +62,12 @@ class CreateBookingsCancellationHandler(object):  # noqa: WPS214
             cancellation=cancellation,
         )
 
-    async def _validate(  # noqa: WPS217
+    async def _validate(
         self,
-        document: models_pb2.BookingsCancellation,
+        booking_ids: Sequence[str],
+        journeys: Sequence[models_pb2.Journey],
+        bookings: Sequence[models_pb2.Booking],
     ) -> None:
-        booking_ids = [
-            cancellation.booking_id for cancellation in document.booking_cancellations
-        ]
-        journeys = await self._get_journeys(booking_ids)
-        bookings = await self._get_bookings(journeys, booking_ids)
-
         await self._validate_bookings_not_empty(booking_ids)
         await self._validate_bookings_belong_to_reseller(journeys)
         await self._validate_bookings_exist(bookings, booking_ids)
@@ -136,18 +156,47 @@ class CreateBookingsCancellationHandler(object):  # noqa: WPS214
         journeys_result = await self._journeys.find_by_booking_id(booking_ids)
         return [journey async for journey in journeys_result]
 
-    async def _get_bookings(
+    async def _extract_bookings_and_orders(
         self,
         journeys: Sequence[models_pb2.Journey],
         booking_ids: Sequence[str],
-    ) -> Sequence[models_pb2.Booking]:
+    ) -> dict[str, tuple[models_pb2.Booking, models_pb2.Order]]:
         orders = [order for journey in journeys for order in journey.orders]
-        return [
-            booking
+
+        return {
+            booking.id: (booking, order)
             for order in orders
             for booking in order.bookings
             if booking.id in booking_ids
-        ]
+        }
+
+    async def _create_zendesk_support_ticket(
+        self,
+        booking: models_pb2.Booking,
+        order: models_pb2.Order,
+    ) -> str:
+        try:
+            ticket_id = await self._zendesk_client.create_support_ticket(
+                payload=self._zendesk_client.create_cancel_request_payload(
+                    booking,
+                    order,
+                ),
+            )
+        except HttpStatusError as exc:
+            error_msg = (
+                "Zendesk support ticket creation failed with status code: {0}".format(
+                    exc.status,
+                )
+            )
+            await rich_status.abort_with_rich_status(
+                context=self._context,
+                status=rich_status.build_precondition_failure(
+                    subject="zendesk_client",
+                    description=error_msg,
+                ),
+            )
+
+        return str(ticket_id)
 
 
 class CancellationTicketCompletedHandler(object):
