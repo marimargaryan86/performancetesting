@@ -1,4 +1,3 @@
-import logging
 from typing import Any, Awaitable, Callable, Mapping, Sequence, TypeVar
 
 import lagom
@@ -92,12 +91,6 @@ def _validate_order_request(
 ) -> list[models.Error]:
     validation_errors: list[models.Error] = []
     for quote in price_quote.quotes:
-        logging.info(
-            "body: %s, required_documents: %s, quote_id: %s",
-            body.get("residenceAddress", {}),
-            quote.required_documents,
-            quote.id,
-        )
         validation_errors = [
             *validation_errors,
             *_validate_residence_address(
