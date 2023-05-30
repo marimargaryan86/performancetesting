@@ -52,3 +52,7 @@ overrides:
       - "junction/admin_api/openapi.json#/components/schemas/PlaceUpdatable"
     rules:
       json-api-resource-required-fields: info
+  - files:
+      - "junction/mobile_api/openapi.json#/components/schemas/PreferenceAttributes"
+    rules:
+      json-api-ensure-enum-naming: info

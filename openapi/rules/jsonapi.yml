@@ -163,4 +163,13 @@ rules:
         function: defined
       - field: explode
         function: falsy
+  json-api-ensure-enum-naming:
+    description: "response enum values must match `^[a-z-]+$`."
+    message: "`{{value}}` must match `^[a-z-]+$`."
+    given: $..responses.*.content..enum[*]
+    severity: error
+    then:
+      function: pattern
+      functionOptions:
+        match: "^[a-z-]+$"
 
