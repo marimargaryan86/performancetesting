@@ -21,6 +21,7 @@ class TripCandidateSearchRequest(object):
     reseller_id: str
     currency_code: str | None
     pay_company_id: str | None
+    session_token: str
 
 
 class Client(abc.ABC):
@@ -118,6 +119,7 @@ def _create_trip_candidate_search(
         criteria=trip_candidate_search.criteria,
         allowed_segment_types=trip_candidate_search.allowed_segment_types,
         reseller_id=trip_candidate_search.reseller_id,
+        session_token=trip_candidate_search.session_token,
     )
 
     if trip_candidate_search.currency_code:

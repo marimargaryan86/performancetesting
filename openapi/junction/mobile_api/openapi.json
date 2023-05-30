@@ -1026,7 +1026,7 @@
       "post": {
         "parameters": [
           {
-            "$ref": "./../client_api/openapi.json#/components/parameters/sessionToken"
+            "$ref": "#/components/parameters/sessionToken"
           }
         ],
         "summary": "Create Order",
@@ -1162,7 +1162,7 @@
       "post": {
         "parameters": [
           {
-            "$ref": "./../client_api/openapi.json#/components/parameters/sessionToken"
+            "$ref": "#/components/parameters/sessionToken"
           }
         ],
         "summary": "Create Offer Search",
@@ -1900,6 +1900,19 @@
   },
   "components": {
     "parameters": {
+      "sessionToken": {
+        "name": "Session-Token",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "example": "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn",
+          "minLength": 32,
+          "maxLength": 32,
+          "pattern": "^[A-Za-z\\d]{32}$"
+        },
+        "description": "Unique session token that follows the flow until order creation. Used for rate and offer caching."
+      },
       "paymentIntentId": {
         "name": "paymentIntentId",
         "in": "path",

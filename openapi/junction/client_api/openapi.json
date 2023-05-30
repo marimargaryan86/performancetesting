@@ -1263,12 +1263,7 @@
             }
           }
         }
-      },
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/sessionToken"
-        }
-      ]
+      }
     },
     "/trip-candidates/searches/{tripCandidateSearchId}": {
       "parameters": [
@@ -1308,12 +1303,7 @@
           }
         },
         "operationId": "get-trip-candidates-searches-id",
-        "description": "Used to lookup data for a Trip Candidates Search Identifier.",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/sessionToken"
-          }
-        ]
+        "description": "Used to lookup data for a Trip Candidates Search Identifier."
       }
     },
     "/trip-candidates/searches/{tripCandidateSearchId}/offers": {
@@ -1399,9 +1389,6 @@
         "operationId": "get-trip-candidates-searches-id-offers",
         "description": "Used to retrieve all Trip Candidates Offer results for an Trip Candidates Search.",
         "parameters": [
-          {
-            "$ref": "#/components/parameters/sessionToken"
-          },
           {
             "$ref": "#/components/parameters/offerSort"
           },
@@ -5200,6 +5187,14 @@
                   "passengers"
                 ],
                 "properties": {
+                  "sessionToken": {
+                    "type": "string",
+                    "example": "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn",
+                    "minLength": 32,
+                    "maxLength": 32,
+                    "pattern": "^[A-Za-z\\d]{32}$",
+                    "writeOnly": true
+                  },
                   "expiresAt": {
                     "type": "string",
                     "format": "date-time",
@@ -7687,19 +7682,6 @@
       }
     },
     "parameters": {
-      "sessionToken": {
-        "name": "Session-Token",
-        "in": "header",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "example": "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn",
-          "minLength": 32,
-          "maxLength": 32,
-          "pattern": "^[A-Za-z\\d]{32}$"
-        },
-        "description": "Unique session token that follows the flow until order creation. Used for rate and offer caching."
-      },
       "tripSearchId": {
         "name": "tripSearchId",
         "in": "path",

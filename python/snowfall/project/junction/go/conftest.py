@@ -157,11 +157,12 @@ async def trip_search_request(
 async def trip_candidate_search_request() -> (
     trip_candidate_searches.TripCandidateSearchRequest
 ):
-    return trip_candidate_searches.TripCandidateSearchRequest(
+    return trip_candidate_searches.TripCandidateSearchRequest(  # nosec
         criteria=[],
         passengers=[],
         allowed_segment_types=[],
         reseller_id="foo",
         currency_code=None,
         pay_company_id=None,
+        session_token="random",
     )

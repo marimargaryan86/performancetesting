@@ -133,6 +133,7 @@ message TripCandidateSearch {
   string reseller_id = 8;
   string currency_code = 9;
   string pay_company_id = 10;
+  string session_token = 11;
 }
 
 service TripCandidateService {

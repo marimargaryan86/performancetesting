@@ -55,7 +55,7 @@ class TripOrchestrator(object):
         self,
         criteria: Sequence[trips_pb2.TripCandidateSearchCriteria],
         allowed_segment_types: Sequence[models_pb2.Schedule.Type.ValueType],
-    ) -> Sequence[Sequence[models_pb2.TripReference]]:
+    ) -> list[list[models_pb2.TripReference]]:
         journey_search_responses = await self._get_journey_search_responses(
             criteria=criteria,
             allowed_segment_types=allowed_segment_types,
@@ -73,7 +73,7 @@ class TripOrchestrator(object):
     async def get_trip_groups_from_reference_groups(
         self,
         trip_reference_groups: Sequence[TripReferenceGroup],
-    ) -> Sequence[TripGroup]:
+    ) -> list[TripGroup]:
         trip_reference_map = {
             trip.id: trip
             async for trip in await self._trip_repository.find(
@@ -127,7 +127,7 @@ class TripOrchestrator(object):
         self,
         criteria: Sequence[trips_pb2.TripCandidateSearchCriteria],
         allowed_segment_types: Sequence[models_pb2.Schedule.Type.ValueType],
-    ) -> Sequence[planner_pb2.SearchJourneyResponse | Exception]:
+    ) -> list[planner_pb2.SearchJourneyResponse | Exception]:
         tasks = []
 
         for criteria_obj in criteria:
@@ -182,7 +182,7 @@ class OfferOrchestrator(object):
         self,
         trip_groups: Sequence[TripGroup],
         trip_candidate_search: trips_pb2.TripCandidateSearch,
-    ) -> Sequence[offer_models_pb2.OfferSearch]:
+    ) -> list[offer_models_pb2.OfferSearch]:
         tasks = [
             self._offer_search_adapter.create(
                 request=offer_models_pb2.OfferSearch(
@@ -197,6 +197,7 @@ class OfferOrchestrator(object):
                         passengers=trip_candidate_search.passengers,
                         trips=trip_combination,
                     ),
+                    session_token=trip_candidate_search.session_token,
                 ),
             )
             for trip_combination in itertools.product(*trip_groups)

@@ -23,7 +23,7 @@ from snowfall.project.junction.go.service.offers.v1alpha import (
 )
 from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2
 from snowfall.project.junction.go.v1alpha import models_pb2
-from snowfall.stdlib import sequence
+from snowfall.stdlib import sequence, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import (
     messages,
@@ -35,6 +35,7 @@ from snowfall.stdlib.v1 import latlng_pb2
 
 _Coordinates = Mapping[str, float]
 _Passengers = list[dict[str, str]]
+_SESSION_TOKEN_LENGTH = 32
 
 
 class Trip(endpoints.HTTPEndpoint):
@@ -340,6 +341,13 @@ class TripCandidateSearches(object):
             reseller_id=reseller_id,
             currency_code=self._reseller_currencies.get(reseller_id),
             pay_company_id=self._reseller_pay_companies.get(reseller_id),
+            session_token=cast(
+                str,
+                request.body.get(
+                    "sessionToken",
+                    string.random(_SESSION_TOKEN_LENGTH),
+                ),
+            ),
         )
 
     async def _get_nearby_locations(
