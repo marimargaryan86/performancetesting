@@ -26,6 +26,8 @@ from snowfall.stdlib.transport.grpc import service as grpc_service
 class _GrpcSettings(service.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
+    redis_dsn: pydantic.AnyUrl
+    ttl: datetime.timedelta = datetime.timedelta(minutes=45)
 
 
 class _OffersSettings(service.OffersSettings):
@@ -66,11 +68,36 @@ class _MockService(grpc_service.Service, meta_pb2_grpc.MetaServiceServicer):
         return meta_pb2.GetIdentityResponse(id="f9ce75d1-2025-4ab5-b5d7-69e4c14c053e")
 
 
-async def _grpc(app: service.Application[_GrpcSettings]) -> None:
+async def _grpc(app: service.AsyncApplication[_GrpcSettings]) -> None:
+    redis_connection = await app.stack.enter_async_context(
+        aioredis.from_url(
+            app.settings.redis_dsn,
+            decode_responses=False,
+        ).client(),
+    )
+    redis_client = redis.Client(redis_connection, prefix=app.name)
     server = grpc_server.create_server(
         app.settings.grpc_address,
         app.settings.grpc_port,
-        [_MockService()],
+        [
+            _MockService(),
+            provider_offers.OfferSearchService(
+                provider_offers.TripOfferSearcher.from_implementation(
+                    implementation=provider_offers.OfferSearchImplementation(
+                        search_criteria_task_generator=offers.criteria_task_generator,
+                        search_criteria_generator=offers.criteria_generator,
+                        offer_group_cache_key_generator=offers.cache_key,
+                        offer_group_generator=offers.offer_group_generator(
+                            generator=offers.Generator(
+                                option_cache=cache.OptionCache(client=redis_client),
+                                ttl=app.settings.ttl,
+                            ),
+                        ),
+                    ),
+                    redis_client=redis_client,
+                ),
+            ),
+        ],
     )
 
     async with server.serve() as running:

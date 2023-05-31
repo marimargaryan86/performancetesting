@@ -6,28 +6,36 @@ from typing import AsyncIterator, Callable, Generic, Mapping, Sequence, TypeVar
 
 from aiostream import stream
 from google.protobuf import message
+from grpc import aio
 
 from snowfall.project.junction.go.service.offers.v1alpha import (
     amqp_pb2 as offers_amqp_pb2,
 )
-from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
+from snowfall.project.junction.go.service.offers.v1alpha import (
+    models_pb2 as legacy_offers_pb2,
+)
 from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.project.junction.provider import repository
 from snowfall.project.junction.provider.segment_matcher import SegmentMatcher
+from snowfall.project.junction.provider.v1alpha import offers_pb2, offers_pb2_grpc
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer as amqp_producer
 from snowfall.stdlib.transport.amqp import trackable
 from snowfall.stdlib.transport.amqp import types as amqp_types
+from snowfall.stdlib.transport.grpc import service
 
 _SearchCriteriaTask = TypeVar("_SearchCriteriaTask", bound=message.Message)
 _SearchCriteria = TypeVar("_SearchCriteria", bound=object)
 TripOfferSearchCriteriaTaskGenerator = Callable[
-    [offers_pb2.TripOfferSearch],
+    [legacy_offers_pb2.TripOfferSearch],
     list[_SearchCriteriaTask],
 ]
 TripOfferSearchCriteriaGenerator = Callable[[_SearchCriteriaTask], _SearchCriteria]
-OfferGroupGenerator = Callable[[_SearchCriteria], AsyncIterator[offers_pb2.OfferGroup]]
+OfferGroupGenerator = Callable[
+    [_SearchCriteria],
+    AsyncIterator[legacy_offers_pb2.OfferGroup],
+]
 _DEFAULT_ALLOWED_WINDOW_TD = datetime.timedelta(minutes=0)
 
 
@@ -80,8 +88,8 @@ class TripOfferSearcher(Generic[_SearchCriteriaTask, _SearchCriteria]):
 
     async def search(
         self,
-        search: offers_pb2.TripOfferSearch,
-    ) -> AsyncIterator[offers_pb2.OfferGroup]:
+        search: legacy_offers_pb2.TripOfferSearch,
+    ) -> AsyncIterator[legacy_offers_pb2.OfferGroup]:
         search_criterion_tasks = self._search_criteria_task_generator(search)
         generators = stream.merge(
             *(
@@ -97,7 +105,7 @@ class TripOfferSearcher(Generic[_SearchCriteriaTask, _SearchCriteria]):
     async def _process_search_criterion_task(
         self,
         task: _SearchCriteriaTask,
-    ) -> AsyncIterator[offers_pb2.OfferGroup]:
+    ) -> AsyncIterator[legacy_offers_pb2.OfferGroup]:
         # TODO: shared protobuf, or type intersection support in Python
         if not hasattr(task, "segments"):  # noqa: WPS421
             raise TypeError
@@ -115,6 +123,44 @@ class TripOfferSearcher(Generic[_SearchCriteriaTask, _SearchCriteria]):
                 set_segment_ids(task.segments, offer_group)
 
                 yield offer_group
+
+
+class OfferSearchService(service.Service, offers_pb2_grpc.OfferServiceServicer):
+    def __init__(
+        self,
+        trip_offer_searcher: TripOfferSearcher[_SearchCriteriaTask, _SearchCriteria],
+    ):
+        self._trip_offer_searcher = trip_offer_searcher
+
+    def get_name(self) -> str:
+        return offers_pb2.DESCRIPTOR.services_by_name["OfferService"].full_name
+
+    def register(self, server: aio.Server) -> None:
+        offers_pb2_grpc.add_OfferServiceServicer_to_server(self, server)
+
+    async def SearchOffers(  # type: ignore[override] # noqa: N802
+        self,
+        request: offers_pb2.SearchOffersRequest,
+        context: aio.ServicerContext,
+    ) -> offers_pb2.SearchOffersResponse:
+        if request.WhichOneof("offer_search_task") != "trip_offer_search_task":
+            return offers_pb2.SearchOffersResponse()
+
+        return offers_pb2.SearchOffersResponse(
+            trip_offer_search_results=offers_pb2.TripOfferSearchResults(
+                results=[
+                    offers_amqp_pb2.TripOfferSearchResult(
+                        offer_search_id=request.trip_offer_search_task.offer_search_id,
+                        offer=offer_group,
+                        provider_company_id="",  # TODO: real value
+                        provider_name="",  # TODO: real value
+                    )
+                    async for offer_group in self._trip_offer_searcher.search(
+                        request.trip_offer_search_task.search,
+                    )
+                ],
+            ),
+        )
 
 
 class TripOfferSearchConsumer(Generic[_SearchCriteriaTask, _SearchCriteria]):
@@ -214,7 +260,7 @@ def create_trip_offer_search_consumer(  # noqa:WPS211
 
 def set_segment_ids(
     search_segments: Sequence[models_pb2.Segment],
-    offer: offers_pb2.OfferGroup,
+    offer: legacy_offers_pb2.OfferGroup,
 ) -> None:
     for segment_index, segment in enumerate(offer.segments):
         segment.segment_id = search_segments[segment_index].id
