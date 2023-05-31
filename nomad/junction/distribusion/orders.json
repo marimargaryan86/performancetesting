@@ -10,7 +10,7 @@
     "deploy": true,
     "variables": {
       "count": 2,
-      "api_base_url": "https://api.demo.distribusion.com",
+      "api_base_url": "https://api.distribusion.com",
       "retailer_partner_number": "431926"
     }
   },
