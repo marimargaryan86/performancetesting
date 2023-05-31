@@ -1,16 +1,34 @@
+import { ActionFailure, fail } from "@sveltejs/kit";
 import integrationInstances from "integration-instances";
+import integrationInstancesServer from "integration-instances-server";
+import type { BookingModel } from "models/booking";
+import type { PaginatedData } from "models/common";
 import type { TransactionModel } from "models/transaction";
 import { getToken } from "utils/auth";
-import type { PageServerLoadEvent } from "./$types";
 
-export async function load(
-  event: PageServerLoadEvent,
-): Promise<{ transactions: TransactionModel[]; transactionsCursor?: string }> {
-  const [transactions, transactionsCursor] =
-    await integrationInstances.junctionPay.transactions.listTransactions(getToken(event));
-
+export function load(event): { transactions: Promise<PaginatedData<TransactionModel>> } {
   return {
-    transactions,
-    transactionsCursor,
+    transactions: integrationInstances.junctionPay.transactions.listTransactions(getToken(event)),
   };
 }
+
+export const actions = {
+  async getBooking(event): Promise<{ booking: BookingModel | undefined } | ActionFailure> {
+    const formData = await event.request.formData();
+    const bookingId = formData.get("bookingId")?.toString();
+
+    if (!bookingId) {
+      return fail(404);
+    }
+
+    let booking: BookingModel | undefined = undefined;
+
+    try {
+      booking = await integrationInstancesServer.junctionClientApi.bookings.getBooking(bookingId);
+    } catch {
+      //
+    }
+
+    return { booking };
+  },
+};

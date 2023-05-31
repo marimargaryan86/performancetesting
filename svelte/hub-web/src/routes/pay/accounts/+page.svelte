@@ -1,31 +1,32 @@
 <script lang="ts">
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import EntityAvatar from "components/ui/entity-avatar.svelte";
-  import type { PageData } from "./$types";
   import SearchField from "components/ui/search-field.svelte";
   import integrationInstances from "integration-instances";
   import { scrollLoad } from "directives/scroll-load";
+  import routeConfig from "routeConfig";
 
-  export let data: PageData;
+  export let data;
 
   let searchQuery = "";
 
-  $: accounts = data.accounts.filter((account) =>
+  $: accounts = data.accounts.data.filter((account) =>
     account.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   async function loadMore(): Promise<void> {
-    if (!data.accountsCursor) {
+    if (!data.accounts.cursor) {
       return;
     }
 
-    const [nextAccounts, cursor] = await integrationInstances.junctionPay.accounts.listAccounts(
-      data.token as string,
-      data.accountsCursor,
-    );
+    const { data: nextAccounts, cursor } =
+      await integrationInstances.junctionPay.accounts.listAccounts(
+        data.user?.token as string,
+        data.accounts.cursor,
+      );
 
-    data.accountsCursor = cursor;
-    data.accounts = [...data.accounts, ...nextAccounts];
+    data.accounts.cursor = cursor;
+    data.accounts.data = [...data.accounts.data, ...nextAccounts];
   }
 </script>
 
@@ -46,7 +47,7 @@
     <ul class="accounts" data-sveltekit-preload-data="off" use:scrollLoad={{ func: loadMore }}>
       {#each accounts as account}
         <li>
-          <a href="/pay/accounts/{account.id}" class="account">
+          <a href={routeConfig.pay.accounts.account(account.id)} class="account">
             <EntityAvatar name={account.name} size="72px" />
             <span class="account-name typography body-large">{account.name}</span>
             <ChevronIcon size="20px" color="var(--color-main-neutral-700)" />

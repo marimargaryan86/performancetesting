@@ -5,7 +5,6 @@
   import THead from "components/ui/table/t-head.svelte";
   import TRow from "components/ui/table/t-row.svelte";
   import Table from "components/ui/table/table.svelte";
-  import type { PageData } from "./$types";
   import { capitalize, type FlattenedObject } from "utils/common";
   import type { DirectionY } from "models/spatial";
   import SearchField from "components/ui/search-field.svelte";
@@ -15,8 +14,9 @@
   import EditIcon from "components/icons/edit-icon.svelte";
   import RemoveIcon from "components/icons/remove-icon.svelte";
   import integrationInstances from "integration-instances";
+  import routeConfig from "routeConfig";
 
-  export let data: PageData;
+  export let data;
 
   let sortGroup: FlattenedObject<BeneficiaryModel> = "name";
   let sortDirection: DirectionY = "down";
@@ -47,7 +47,7 @@
   <div class="actions">
     <SearchField bind:value={searchQuery} />
 
-    <Button size="small" href="/pay/beneficiaries/add">
+    <Button size="small" href={routeConfig.pay.beneficiaries.addBeneficiary}>
       Add Beneficiary
       <PlusIcon />
     </Button>
@@ -78,7 +78,7 @@
           <TCol class="typography body-medium">{capitalize(item.type)}</TCol>
           <TCol width="172px">
             <div class="beneficiary-actions">
-              <a href="/pay/beneficiaries/{item.id}"><EditIcon /></a>
+              <a href={routeConfig.pay.beneficiaries.beneficiary(item.id)}><EditIcon /></a>
 
               <button on:click={createRemoveFunc(item.id)}>
                 <RemoveIcon variant="trash-can" />

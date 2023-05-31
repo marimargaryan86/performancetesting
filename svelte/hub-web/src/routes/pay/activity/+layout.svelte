@@ -2,8 +2,8 @@
   import Tabs, { type Tab } from "components/ui/tabs.svelte";
 
   const tabs: Tab[] = [
-    { url: "/pay/activity", label: "Transactions", exact: true },
-    { url: "/pay/activity/fx", label: "FX", exact: true },
+    { url: routeConfig.pay.activity.root, label: "Transactions", exact: true },
+    { url: routeConfig.pay.activity.conversions, label: "FX", exact: true },
   ];
 </script>
 
@@ -21,30 +21,35 @@
   import { conversionStatus } from "models/conversion";
   import { formatConversionStatus } from "formatting/conversion";
   import SearchField from "components/ui/search-field.svelte";
+  import routeConfig from "routeConfig";
 
   let showFilters = false;
 
   $: view =
-    $page.url.pathname === "/pay/activity" ? ("transactions" as const) : ("conversions" as const);
+    $page.url.pathname === routeConfig.pay.activity.root
+      ? ("transactions" as const)
+      : ("conversions" as const);
   $: filters = view === "transactions" ? transactionFilters : conversionFilters;
   $: ({ dateRange, status, searchQuery } = filters);
   $: filtersActive = Boolean($dateRange || $status.length);
   $: currTransactionStatus = transactionFilters.status;
   $: currConversionStatus = conversionFilters.status;
+  $: viewBreadCrumbs = {
+    transactions: {
+      url: routeConfig.pay.activity.root,
+      label: "Transactions",
+    },
+    conversions: {
+      url: routeConfig.pay.activity.conversions,
+      label: "FX",
+    },
+  }[view];
   $: breadCrumbs = [
     {
-      url: "/pay/activity",
+      url: routeConfig.pay.activity.root,
       label: "Activity",
     },
-    view === "transactions"
-      ? {
-          url: "/pay/activity",
-          label: "Transactions",
-        }
-      : {
-          url: "/pay/activity/fx",
-          label: "FX",
-        },
+    viewBreadCrumbs,
   ];
 
   function toggleFilters(): void {

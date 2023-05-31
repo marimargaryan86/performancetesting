@@ -1,3 +1,5 @@
+import { applyAction, deserialize } from "$app/forms";
+
 export function isUpperCase(value: string): boolean {
   return value.toUpperCase() === value;
 }
@@ -51,3 +53,16 @@ export type FlattenedObject_<
   : never;
 
 export type FlattenedObject<T extends Record<string, unknown>> = FlattenedObject_<Required<T>>;
+
+export async function callAction(action: string, data?: Record<string, unknown>): Promise<void> {
+  const body = new FormData();
+
+  if (data) {
+    Object.entries(data).forEach(([key, val]) => body.set(key, String(val)));
+  }
+
+  const resp = await fetch(action, { method: "POST", body });
+  const result = deserialize(await resp.text());
+
+  await applyAction(result);
+}

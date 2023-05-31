@@ -22,6 +22,7 @@ const config = {
       directives: "src/directives",
       filters: "src/filters",
       sorting: "src/sorting",
+      routeConfig: "src/route-config.ts",
     },
   },
 };

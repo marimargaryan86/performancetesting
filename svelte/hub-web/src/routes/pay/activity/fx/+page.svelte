@@ -14,7 +14,6 @@
   import type { DirectionY } from "models/spatial";
   import { sortConversions } from "sorting/conversion";
   import type { FlattenedObject } from "utils/common";
-  import type { PageData } from "./$types";
   import Table from "components/ui/table/table.svelte";
   import THead from "components/ui/table/t-head.svelte";
   import Header from "components/ui/table/header.svelte";
@@ -25,13 +24,13 @@
   import { onMount } from "svelte";
   import integrationInstances from "integration-instances";
 
-  export let data: PageData;
+  export let data;
 
   let sortDirection: DirectionY = "down";
   let sortGroup: FlattenedObject<ConversionModel> = "createdAt";
 
   $: conversions = sortConversions(
-    filterConversions(data.conversions, {
+    filterConversions(data.conversions.data, {
       query: $searchQuery,
       dateRange: $dateRange,
       status: $status,
@@ -40,18 +39,18 @@
   );
 
   async function loadMore(): Promise<void> {
-    if (!data.conversionsCursor) {
+    if (!data.conversions.cursor) {
       return;
     }
 
-    const [nextConversions, cursor] =
+    const { data: nextConversions, cursor } =
       await integrationInstances.junctionPay.conversions.listConversions(
-        data.token as string,
-        data.conversionsCursor,
+        data.user?.token as string,
+        data.conversions.cursor,
       );
 
-    data.conversionsCursor = cursor;
-    data.conversions = [...data.conversions, ...nextConversions];
+    data.conversions.cursor = cursor;
+    data.conversions.data = [...data.conversions.data, ...nextConversions];
   }
 
   onMount(() => {

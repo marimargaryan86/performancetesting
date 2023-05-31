@@ -1,48 +1,37 @@
 <script lang="ts">
-  import { invalidateAll } from "$app/navigation";
   import EmailIcon from "components/icons/email-icon.svelte";
   import JunctionLogo from "components/icons/junction-logo.svelte";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import LockIcon from "components/icons/lock-icon.svelte";
   import Button from "components/ui/button.svelte";
   import TextField from "components/ui/text-field.svelte";
-  import integrationInstances from "integration-instances";
+  import { callAction } from "utils/common";
+  import type { ActionData } from "./$types";
 
-  let data = {
-    email: "",
-    password: "",
-  };
-  let errors: Partial<Record<keyof typeof data, string | boolean>> = {};
+  export let form;
+
+  let data = { email: "", password: "" };
   let pending = false;
 
-  async function login(): Promise<void> {
-    if (pending) {
-      return;
-    }
+  function createClearErrorFunc(key: keyof Exclude<ActionData, null>): () => void {
+    return () => {
+      if (!form) {
+        return;
+      }
 
+      if (key === "password" && form.email === true) {
+        form = {};
+      } else {
+        form[key] = undefined;
+      }
+    };
+  }
+
+  async function submit(): Promise<void> {
     pending = true;
-
-    try {
-      const token = await integrationInstances.junctionPay.auth.createToken(data);
-
-      document.cookie = `session-token=${token}; path=/;`;
-
-      await invalidateAll();
-    } catch {
-      errors = {
-        email: true,
-        password: "Email/Username & Password not recognised. Please correct and try again.",
-      };
-    } finally {
-      pending = false;
-    }
+    await callAction("?/login", data);
+    pending = false;
   }
-
-  function clearErrors(): void {
-    errors = {};
-  }
-
-  $: loginDisabled = data.email.trim().length < 3 || data.password.length < 6;
 </script>
 
 <svelte:head>
@@ -62,15 +51,15 @@
   <section class="login">
     <JunctionLogo snowfallTechnology poweredBy />
 
-    <form on:submit|preventDefault={login} novalidate>
+    <form on:submit|preventDefault={submit}>
       <TextField
         label="Email"
         type="email"
         name="email"
         bind:value={data.email}
-        error={errors.email}
+        error={form?.email}
         placeholder="Enter your email"
-        on:input={clearErrors}
+        on:input={createClearErrorFunc("email")}
       >
         <EmailIcon slot="icon-before" color="var(--color-main-primary-500)" />
       </TextField>
@@ -80,14 +69,14 @@
         type="password"
         name="password"
         bind:value={data.password}
-        error={errors.password}
+        error={form?.password}
         placeholder="Enter your password"
-        on:input={clearErrors}
+        on:input={createClearErrorFunc("password")}
       >
         <LockIcon slot="icon-before" color="var(--color-main-primary-500)" />
       </TextField>
 
-      <Button type="submit" disabled={loginDisabled}>
+      <Button type="submit">
         Login
 
         {#if pending}

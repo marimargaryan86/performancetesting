@@ -4,6 +4,7 @@ import type { ListTransactionsResponseSchema } from "../schemas/transaction";
 import type CompanyService from "./company-service";
 import JunctionPayService from "./junction-pay-service";
 import type { CompanyModel } from "models/company";
+import type { PaginatedData } from "models/common";
 
 export default class TransactionService extends JunctionPayService {
   private readonly companyService: CompanyService;
@@ -35,10 +36,7 @@ export default class TransactionService extends JunctionPayService {
     return Promise.all(companyRequests);
   }
 
-  async listTransactions(
-    token: string,
-    cursor?: string,
-  ): Promise<[data: TransactionModel[], cursor?: string]> {
+  async listTransactions(token: string, cursor?: string): Promise<PaginatedData<TransactionModel>> {
     const resp = await this.makeRequest("/transactions", {
       token,
       queryParams: { "page[cursor]": cursor },
@@ -51,9 +49,9 @@ export default class TransactionService extends JunctionPayService {
     const data = (await resp.json()) as ListTransactionsResponseSchema;
     const companies = await this.getCompanies(data, token);
 
-    return [
-      data.data.map((item) => parseTransaction(item, companies)),
-      TransactionService.getCursor(data),
-    ];
+    return {
+      data: data.data.map((item) => parseTransaction(item, companies)),
+      cursor: TransactionService.getCursor(data),
+    };
   }
 }

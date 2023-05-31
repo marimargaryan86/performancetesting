@@ -4,12 +4,11 @@
   import PlusIcon from "components/icons/plus-icon.svelte";
   import { formatAmount } from "formatting/currency";
   import type { MoneyModel } from "models/money";
-  import type { PageData } from "./$types";
   import AddBalanceDialogue from "./add-balance-dialogue.svelte";
   import SearchField from "components/ui/search-field.svelte";
   import Button from "components/ui/button.svelte";
 
-  export let data: PageData;
+  export let data;
 
   let searchQuery = "";
   let dialogue: AddBalanceDialogue;
@@ -35,7 +34,7 @@
   currencies={data.currencies}
   exclude={balances}
   accountId={data.account.id}
-  token={data.token}
+  token={data.user?.token}
   on:addbalances={addBalances}
   bind:this={dialogue}
 />

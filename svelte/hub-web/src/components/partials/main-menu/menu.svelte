@@ -24,6 +24,7 @@
   import { slide } from "svelte/transition";
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import BeneficiaryIcon from "components/icons/beneficiary-icon.svelte";
+  import routeConfig from "routeConfig";
 
   export let expanded: boolean;
   export let transitionTimeMs: number;
@@ -31,30 +32,30 @@
   let menuItems: (MenuItem | SubMenu)[] = [
     {
       type: "menu-item",
-      url: "/",
+      url: routeConfig.home,
       label: "Dashboard",
       icon: DashboardIcon,
     },
     {
       type: "sub-menu",
       label: "Pay",
-      expanded: $page.url.pathname.startsWith("/pay"),
+      expanded: $page.url.pathname.startsWith(routeConfig.pay.root),
       items: [
         {
           type: "menu-item",
-          url: "/pay/activity",
+          url: routeConfig.pay.activity.root,
           label: "Activity",
           icon: ActivityIcon,
         },
         {
           type: "menu-item",
-          url: "/pay/accounts",
+          url: routeConfig.pay.accounts.root,
           label: "Accounts",
           icon: AccountsIcon,
         },
         {
           type: "menu-item",
-          url: "/pay/beneficiaries",
+          url: routeConfig.pay.beneficiaries.root,
           label: "Beneficiaries",
           icon: BeneficiaryIcon,
         },

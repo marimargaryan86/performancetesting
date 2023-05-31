@@ -1,9 +1,8 @@
 import { error } from "@sveltejs/kit";
 import integrationInstances from "integration-instances";
 import type { BeneficiaryModel } from "models/beneficiary";
-import type { PageServerLoadEvent } from "./$types";
 
-export function load(event: PageServerLoadEvent): { beneficiary?: BeneficiaryModel } {
+export function load(event): { beneficiary?: BeneficiaryModel } {
   if (event.params.slug === "add") {
     return {};
   }

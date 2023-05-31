@@ -12,13 +12,12 @@
   import TBody from "components/ui/table/t-body.svelte";
   import THead from "components/ui/table/t-head.svelte";
   import Table from "components/ui/table/table.svelte";
-  import type { PageData } from "./$types";
   import TRow from "components/ui/table/t-row.svelte";
   import TCol from "components/ui/table/t-col.svelte";
   import { yymmdd } from "formatting/date-time";
   import EntityAvatar from "components/ui/entity-avatar.svelte";
   import TransactionStatusBadge from "components/ui/transaction-status-badge.svelte";
-  import type { FlattenedObject } from "utils/common";
+  import { callAction, type FlattenedObject } from "utils/common";
   import type { DirectionY } from "models/spatial";
   import { sortTransactions } from "sorting/transaction";
   import { filterTransactions } from "filters/transaction";
@@ -27,15 +26,19 @@
   import { onMount } from "svelte";
   import TransactionDetails from "./transaction-details/transaction-details.svelte";
   import integrationInstances from "integration-instances";
+  import type { BookingModel } from "models/booking";
+  import routeConfig from "routeConfig";
 
-  export let data: PageData;
+  export let data;
+  export let form;
 
   let sortGroup: FlattenedObject<TransactionModel> = "createdAt";
   let sortDirection: DirectionY = "down";
   let selectedTransaction: TransactionModel | undefined = undefined;
+  let bookingRequest: Promise<BookingModel | undefined> | undefined = undefined;
 
   $: transactions = sortTransactions(
-    filterTransactions(data.transactions, {
+    filterTransactions(data.transactions.data, {
       query: $searchQuery,
       status: $status,
       dateRange: $dateRange,
@@ -43,25 +46,40 @@
     { by: sortGroup, direction: sortDirection },
   );
 
-  function createShowDetailsFunc(id: string): () => void {
+  function createShowDetailsFunc(transaction: TransactionModel): () => void {
     return () => {
-      selectedTransaction = transactions.find((item) => item.id === id);
+      selectedTransaction = transaction;
+
+      if (selectedTransaction) {
+        bookingRequest = getBooking(selectedTransaction.bookingId);
+      }
     };
   }
 
+  function deselectTransaction(): void {
+    selectedTransaction = undefined;
+    bookingRequest = undefined;
+  }
+
   async function loadMore(): Promise<void> {
-    if (!data.transactionsCursor) {
+    if (!data.transactions.cursor) {
       return;
     }
 
-    const [nextTransactions, cursor] =
+    const { data: nextTransactions, cursor } =
       await integrationInstances.junctionPay.transactions.listTransactions(
-        data.token as string,
-        data.transactionsCursor,
+        data.user?.token as string,
+        data.transactions.cursor,
       );
 
-    data.transactionsCursor = cursor;
-    data.transactions = [...data.transactions, ...nextTransactions];
+    data.transactions.cursor = cursor;
+    data.transactions.data = [...data.transactions.data, ...nextTransactions];
+  }
+
+  async function getBooking(bookingId: string): Promise<BookingModel | undefined> {
+    await callAction(routeConfig.pay.activity.actions.getBooking, { bookingId });
+
+    return form?.booking;
   }
 
   onMount(() => {
@@ -75,7 +93,13 @@
   <title>Transactions · Activity · Pay · Junction Hub</title>
 </svelte:head>
 
-<TransactionDetails bind:transaction={selectedTransaction} />
+{#if selectedTransaction}
+  <TransactionDetails
+    transaction={selectedTransaction}
+    {bookingRequest}
+    on:close={deselectTransaction}
+  />
+{/if}
 
 <Table class="transactions-table" {loadMore}>
   <THead>
@@ -98,7 +122,7 @@
 
   <TBody>
     {#each transactions as item}
-      <TRow on:click={createShowDetailsFunc(item.id)}>
+      <TRow on:click={createShowDetailsFunc(item)}>
         <TCol maxWidth="96px" copyable>{item.bookingId}</TCol>
         <TCol>{yymmdd(item.createdAt)}</TCol>
         <TCol maxWidth="160px">

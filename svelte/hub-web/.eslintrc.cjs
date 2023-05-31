@@ -19,7 +19,7 @@ module.exports = {
   },
   rules: {
     "@typescript-eslint/explicit-function-return-type": "error",
-    "max-lines-per-function": ["error", { max: 30, skipBlankLines: true }],
+    "max-lines-per-function": ["error", { max: 40, skipBlankLines: true }],
     "no-await-in-loop": "error",
     "no-constructor-return": "error",
     "no-duplicate-imports": "error",
@@ -102,7 +102,6 @@ module.exports = {
     "func-call-spacing": "error",
     "generator-star-spacing": ["error", "after"],
     indent: ["error", 2, { SwitchCase: 1, offsetTernaryExpressions: true }],
-    "newline-per-chained-call": "error",
     "no-multi-spaces": "error",
     "no-multiple-empty-lines": ["error", { max: 2 }],
     "no-tabs": "error",

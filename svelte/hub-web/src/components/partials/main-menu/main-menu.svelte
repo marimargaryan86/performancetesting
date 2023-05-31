@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { invalidateAll } from "$app/navigation";
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import LogoutIcon from "components/icons/logout-icon.svelte";
   import type { UserModel } from "models/user";
@@ -8,6 +7,8 @@
   import HubLogo from "components/icons/hub-logo.svelte";
   import SettingsIcon from "components/icons/settings-icon.svelte";
   import { page } from "$app/stores";
+  import routeConfig from "routeConfig";
+  import { callAction } from "utils/common";
 
   export let user: UserModel;
 
@@ -20,9 +21,7 @@
   }
 
   function logout(): void {
-    document.cookie = "session-token=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/;";
-
-    invalidateAll();
+    callAction(`${routeConfig.login}?/logout`);
   }
 </script>
 
@@ -40,8 +39,8 @@
   <a
     class="settings typography body-medium"
     title={expanded ? undefined : "Settings"}
-    href="/settings"
-    class:active={$page.url.pathname === "/settings"}
+    href={routeConfig.settings}
+    class:active={$page.url.pathname === routeConfig.settings}
   >
     <SettingsIcon color="var(--color-common-light-strong)" variant="cog" />
     <span>Settings</span>
@@ -49,8 +48,8 @@
 
   <button
     class="logout typography body-medium"
-    on:click={logout}
     title={expanded ? undefined : "Logout"}
+    on:click={logout}
   >
     <LogoutIcon color="var(--color-common-light-strong)" />
     <span>Logout</span>
