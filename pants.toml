@@ -56,7 +56,7 @@ install_from_resolve = "python-default"
 interpreter_constraints = ["CPython==3.11.*"]
 
 [buf]
-lint_args = ["--config", "'version: v1\nlint:\n  use:\n    - DEFAULT\n    - UNARY_RPC\n    - PACKAGE_NO_IMPORT_CYCLE\n'"]
+config = "protobuf/buf.yaml"
 version = "v1.17.0"
 known_versions = [
     "v1.17.0|linux_arm64 |7ae3d4bf6ff121172dd949bd4d25342e03a0b7f10cf8e8ccdc8f98a664b79794|15426236",

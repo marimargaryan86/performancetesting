@@ -1,5 +1,6 @@
 .protobuf:files: &files
   - "protobuf/**/*"
+  - "buf.work.yaml"
 
 .protobuf:buf:
   interruptible: true
