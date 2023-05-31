@@ -156,156 +156,153 @@ async def _offers(
     )
 
 
-async def _orders(app: service.Application[_OrdersSettings]) -> None:
-    async with contextlib.AsyncExitStack() as stack:
-        http_client = await stack.enter_async_context(
-            httpx.AsyncClient(
-                timeout=app.settings.http_timeout,
-            ),
-        )
-        logging.register(http_client)
-        metrics.register(http_client)
-        redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
-            aioredis.from_url(
-                random.choice(app.settings.redis_dsn),  # nosec
-                decode_responses=False,
-            ).client(),
-        )
-        amqp_connection = await stack.enter_async_context(
-            types.Connection(app.settings.amqp_dsn),
-        )
-        ask2go_client = client.Ask2GoClient(
-            api_base_url=app.settings.api_base_url,
-            api_booking_base_url=app.settings.api_booking_base_url,
-            http_client=http_client,
-        )
+async def _orders(app: service.AsyncApplication[_OrdersSettings]) -> None:
+    http_client = await app.stack.enter_async_context(
+        httpx.AsyncClient(
+            timeout=app.settings.http_timeout,
+        ),
+    )
+    logging.register(http_client)
+    metrics.register(http_client)
+    redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
+        aioredis.from_url(
+            random.choice(app.settings.redis_dsn),  # nosec
+            decode_responses=False,
+        ).client(),
+    )
+    amqp_connection = await app.stack.enter_async_context(
+        types.Connection(app.settings.amqp_dsn),
+    )
+    ask2go_client = client.Ask2GoClient(
+        api_base_url=app.settings.api_base_url,
+        api_booking_base_url=app.settings.api_booking_base_url,
+        http_client=http_client,
+    )
 
-        await consumer.OrderConsumer(
-            consumer_obj=amqp_consumer.Consumer(
-                connection=amqp_connection,
-                queue_name="{0}_orders".format(app.name),
-                binds=[(types.Exchange("orders"), "orders.offers")],
-            ),
-            producer_obj=producer.Producer(
-                connection=amqp_connection,
-                exchange=types.Exchange("orders"),
-            ),
-            booking_handler=booking.BookingHandler(
-                ask2go_client=ask2go_client,
-                notifier=notifications.SmtpNotifier(
-                    smtp_client=aiosmtplib.SMTP(
-                        hostname=app.settings.smtp_dsn.host,
-                        port=int(app.settings.smtp_dsn.port or 0) or None,
-                        username=app.settings.smtp_dsn.user,
-                        password=app.settings.smtp_dsn.password,
-                        start_tls=True,
-                    ),
-                    sender=app.settings.smtp_sender,
-                    recipient=app.settings.smtp_recipient,
+    await consumer.OrderConsumer(
+        consumer_obj=amqp_consumer.Consumer(
+            connection=amqp_connection,
+            queue_name="{0}_orders".format(app.name),
+            binds=[(types.Exchange("orders"), "orders.offers")],
+        ),
+        producer_obj=producer.Producer(
+            connection=amqp_connection,
+            exchange=types.Exchange("orders"),
+        ),
+        booking_handler=booking.BookingHandler(
+            ask2go_client=ask2go_client,
+            notifier=notifications.SmtpNotifier(
+                smtp_client=aiosmtplib.SMTP(
+                    hostname=app.settings.smtp_dsn.host,
+                    port=int(app.settings.smtp_dsn.port or 0) or None,
+                    username=app.settings.smtp_dsn.user,
+                    password=app.settings.smtp_dsn.password,
+                    start_tls=True,
                 ),
-                override_double_booking_check=app.settings.override_double_booking_check,
+                sender=app.settings.smtp_sender,
+                recipient=app.settings.smtp_recipient,
             ),
-            price_quote_cache=cache.PriceQuoteCache(
-                client=redis.Client(redis_connection, prefix=app.name),
-            ),
-        ).consume()
+            override_double_booking_check=app.settings.override_double_booking_check,
+        ),
+        price_quote_cache=cache.PriceQuoteCache(
+            client=redis.Client(redis_connection, prefix=app.name),
+        ),
+    ).consume()
 
 
-async def _price_quotes(app: service.Application[_PriceQuotesSettings]) -> None:
+async def _price_quotes(app: service.AsyncApplication[_PriceQuotesSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
-    async with contextlib.AsyncExitStack() as stack:
-        http_client = await stack.enter_async_context(
-            httpx.AsyncClient(
-                timeout=app.settings.http_timeout,
-            ),
-        )
-        logging.register(http_client)
-        metrics.register(http_client)
-        redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
-            aioredis.from_url(
-                random.choice(app.settings.redis_dsn),  # nosec
-                decode_responses=False,
-            ).client(),
-        )
-        amqp_connection = await stack.enter_async_context(
-            types.Connection(app.settings.amqp_dsn),
-        )
-        ask2go_client = client.Ask2GoClient(
-            api_base_url=app.settings.api_base_url,
-            api_booking_base_url=app.settings.api_booking_base_url,
-            http_client=http_client,
-        )
+    http_client = await app.stack.enter_async_context(
+        httpx.AsyncClient(
+            timeout=app.settings.http_timeout,
+        ),
+    )
+    logging.register(http_client)
+    metrics.register(http_client)
+    redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
+        aioredis.from_url(
+            random.choice(app.settings.redis_dsn),  # nosec
+            decode_responses=False,
+        ).client(),
+    )
+    amqp_connection = await app.stack.enter_async_context(
+        types.Connection(app.settings.amqp_dsn),
+    )
+    ask2go_client = client.Ask2GoClient(
+        api_base_url=app.settings.api_base_url,
+        api_booking_base_url=app.settings.api_booking_base_url,
+        http_client=http_client,
+    )
 
-        await consumer.PriceQuoteConsumer(
-            consumer_obj=amqp_consumer.Consumer(
-                connection=amqp_connection,
-                queue_name="{0}_prices".format(app.name),
-                binds=[(types.Exchange("prices"), "offers.pricing")],
-            ),
-            producer_obj=producer.Producer(
-                connection=amqp_connection,
-                exchange=types.Exchange("prices"),
-            ),
-            offer_cache=cache.OfferCache(
-                client=redis.Client(redis_connection, prefix=app.name),
-            ),
-            offer_transformer=transformer.OfferTransformer(
-                airport_repository=airports.AirportRepository(
-                    airports_data=cast(
-                        list[dict[str, Any]],
-                        filesystem.PkgLoader(
-                            "snowfall.project.junction.service.providers.ask2go.main",
-                        ).load("airports.json"),
-                    ),
+    await consumer.PriceQuoteConsumer(
+        consumer_obj=amqp_consumer.Consumer(
+            connection=amqp_connection,
+            queue_name="{0}_prices".format(app.name),
+            binds=[(types.Exchange("prices"), "offers.pricing")],
+        ),
+        producer_obj=producer.Producer(
+            connection=amqp_connection,
+            exchange=types.Exchange("prices"),
+        ),
+        offer_cache=cache.OfferCache(
+            client=redis.Client(redis_connection, prefix=app.name),
+        ),
+        offer_transformer=transformer.OfferTransformer(
+            airport_repository=airports.AirportRepository(
+                airports_data=cast(
+                    list[dict[str, Any]],
+                    filesystem.PkgLoader(
+                        "snowfall.project.junction.service.providers.ask2go.main",
+                    ).load("airports.json"),
                 ),
-                cabin_mapping_repository=cabin_classes.CabinMappingRepository(
-                    mongo.ask2go.provider_cabin_mapping,
-                ),
-                offer_cache=cache.OfferCache(
-                    client=redis.Client[bytes](redis_connection, prefix=app.name),
-                ),
-                price_cache=cache.PriceQuoteCache(
-                    client=redis.Client[bytes](redis_connection, prefix=app.name),
-                ),
-                offer_ttl=app.settings.ttl,
             ),
-            pricing_adapter=pricing.Adapter(ask2go_client=ask2go_client),
-            provider_company_id=app.settings.provider_company_id,
-        ).consume()
-
-
-async def _seat_maps(app: service.Application[_SeatMapsSettings]) -> None:
-    async with contextlib.AsyncExitStack() as stack:
-        redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
-            aioredis.from_url(
-                random.choice(app.settings.redis_dsn),  # nosec
-                decode_responses=False,
-            ).client(),
-        )
-        http_client = await stack.enter_async_context(
-            httpx.AsyncClient(
-                timeout=app.settings.http_timeout,
+            cabin_mapping_repository=cabin_classes.CabinMappingRepository(
+                mongo.ask2go.provider_cabin_mapping,
             ),
-        )
-        logging.register(http_client)
-        metrics.register(http_client)
-        ask2go_client = client.Ask2GoClient(
-            api_base_url=app.settings.api_base_url,
-            api_booking_base_url=app.settings.api_booking_base_url,
-            http_client=http_client,
-        )
-        await consumer.SeatMapRpcServer(
-            address=app.settings.amqp_dsn,
-            exchange=types.Exchange("seat_maps"),
-            queue_name="{0}_seat_maps".format(app.name),
-            routing_key="seat.maps",
-            ask2go_client=ask2go_client,
             offer_cache=cache.OfferCache(
                 client=redis.Client[bytes](redis_connection, prefix=app.name),
             ),
-        ).consume()
+            price_cache=cache.PriceQuoteCache(
+                client=redis.Client[bytes](redis_connection, prefix=app.name),
+            ),
+            offer_ttl=app.settings.ttl,
+        ),
+        pricing_adapter=pricing.Adapter(ask2go_client=ask2go_client),
+        provider_company_id=app.settings.provider_company_id,
+    ).consume()
+
+
+async def _seat_maps(app: service.AsyncApplication[_SeatMapsSettings]) -> None:
+    redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
+        aioredis.from_url(
+            random.choice(app.settings.redis_dsn),  # nosec
+            decode_responses=False,
+        ).client(),
+    )
+    http_client = await app.stack.enter_async_context(
+        httpx.AsyncClient(
+            timeout=app.settings.http_timeout,
+        ),
+    )
+    logging.register(http_client)
+    metrics.register(http_client)
+    ask2go_client = client.Ask2GoClient(
+        api_base_url=app.settings.api_base_url,
+        api_booking_base_url=app.settings.api_booking_base_url,
+        http_client=http_client,
+    )
+    await consumer.SeatMapRpcServer(
+        address=app.settings.amqp_dsn,
+        exchange=types.Exchange("seat_maps"),
+        queue_name="{0}_seat_maps".format(app.name),
+        routing_key="seat.maps",
+        ask2go_client=ask2go_client,
+        offer_cache=cache.OfferCache(
+            client=redis.Client[bytes](redis_connection, prefix=app.name),
+        ),
+    ).consume()
 
 
 if __name__ == "__main__":

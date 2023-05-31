@@ -1,4 +1,3 @@
-import contextlib
 import datetime
 import random
 
@@ -22,50 +21,49 @@ class NoPricingError(Exception):
     """Raised when a failed pricing result is received."""
 
 
-async def price_quotes(  # noqa: WPS210
-    app: service.Application[config.PricingSettings],
+async def price_quotes(
+    app: service.AsyncApplication[config.PricingSettings],
 ) -> None:
-    async with contextlib.AsyncExitStack() as stack:
-        http_client = await stack.enter_async_context(
-            httpx.AsyncClient(
-                timeout=app.settings.api_timeout,
-            ),
-        )
-        logging.register(http_client)
-        metrics.register(http_client)
-        redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
-            aioredis.from_url(
-                random.choice(app.settings.redis_dsn),  # nosec
-                decode_responses=False,
-            ).client(),
-        )
-        distribusion_client = client.DistribusionClient(
-            api_base_url=app.settings.api_base_url,
-            api_key=app.settings.api_key,
-            retailer_partner_number=app.settings.retailer_partner_number,
-            http_client=http_client,
-        )
-        amqp_connection = await stack.enter_async_context(
-            types.Connection(app.settings.amqp_dsn),
-        )
-        offer_cache = cache.OffersCache(
-            client=redis.Client[bytes](redis_connection, prefix=app.name),
-        )
-        await PriceQuoteConsumer(
-            distribusion_client=distribusion_client,
-            consumer_obj=consumer.Consumer(
-                connection=amqp_connection,
-                queue_name="{0}_prices".format(app.name),
-                binds=[(types.Exchange("prices"), "offers.pricing")],
-            ),
-            producer_obj=producer.Producer(
-                connection=amqp_connection,
-                exchange=types.Exchange("prices"),
-            ),
-            offer_cache=offer_cache,
-            provider_company_id=app.settings.provider_company_id,
-            ttl=app.settings.ttl,
-        ).consume()
+    http_client = await app.stack.enter_async_context(
+        httpx.AsyncClient(
+            timeout=app.settings.api_timeout,
+        ),
+    )
+    logging.register(http_client)
+    metrics.register(http_client)
+    redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
+        aioredis.from_url(
+            random.choice(app.settings.redis_dsn),  # nosec
+            decode_responses=False,
+        ).client(),
+    )
+    distribusion_client = client.DistribusionClient(
+        api_base_url=app.settings.api_base_url,
+        api_key=app.settings.api_key,
+        retailer_partner_number=app.settings.retailer_partner_number,
+        http_client=http_client,
+    )
+    amqp_connection = await app.stack.enter_async_context(
+        types.Connection(app.settings.amqp_dsn),
+    )
+    offer_cache = cache.OffersCache(
+        client=redis.Client[bytes](redis_connection, prefix=app.name),
+    )
+    await PriceQuoteConsumer(
+        distribusion_client=distribusion_client,
+        consumer_obj=consumer.Consumer(
+            connection=amqp_connection,
+            queue_name="{0}_prices".format(app.name),
+            binds=[(types.Exchange("prices"), "offers.pricing")],
+        ),
+        producer_obj=producer.Producer(
+            connection=amqp_connection,
+            exchange=types.Exchange("prices"),
+        ),
+        offer_cache=offer_cache,
+        provider_company_id=app.settings.provider_company_id,
+        ttl=app.settings.ttl,
+    ).consume()
 
 
 class PriceQuoteConsumer(object):

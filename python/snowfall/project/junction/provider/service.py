@@ -52,29 +52,28 @@ if TYPE_CHECKING:
 def _offers_command(
     factory: OffersFactory[_OffersSettings, _SearchCriteriaTask, _SearchCriteria],
 ) -> service.Callback[_OffersSettings]:
-    async def wrapper(app: service.Application[_OffersSettings]) -> None:
-        async with contextlib.AsyncExitStack() as stack:
-            redis_conn: aioredis.Redis[bytes] = await stack.enter_async_context(
-                aioredis.from_url(
-                    app.settings.redis_dsn,
-                    decode_responses=False,
-                ).client(),
-            )
-            connection = await stack.enter_async_context(
-                types.Connection(app.settings.amqp_dsn),
-            )
+    async def wrapper(app: service.AsyncApplication[_OffersSettings]) -> None:
+        redis_conn: aioredis.Redis[bytes] = await app.stack.enter_async_context(
+            aioredis.from_url(
+                app.settings.redis_dsn,
+                decode_responses=False,
+            ).client(),
+        )
+        connection = await app.stack.enter_async_context(
+            types.Connection(app.settings.amqp_dsn),
+        )
 
-            trip_search_consumer = offers.create_trip_offer_search_consumer(
-                amqp_connection=connection,
-                redis_client=redis.Client[bytes](redis_conn, prefix=app.name),
-                implementation=await factory(app, connection, redis_conn, stack),
-                app_name=app.name,
-                pay_company_id=app.settings.provider_company_id,
-                provider_name=app.name,
-                reseller_providers=app.settings.reseller_providers,
-            )
+        trip_search_consumer = offers.create_trip_offer_search_consumer(
+            amqp_connection=connection,
+            redis_client=redis.Client[bytes](redis_conn, prefix=app.name),
+            implementation=await factory(app, connection, redis_conn, app.stack),
+            app_name=app.name,
+            pay_company_id=app.settings.provider_company_id,
+            provider_name=app.name,
+            reseller_providers=app.settings.reseller_providers,
+        )
 
-            await trip_search_consumer.consume()
+        await trip_search_consumer.consume()
 
     return wrapper
 

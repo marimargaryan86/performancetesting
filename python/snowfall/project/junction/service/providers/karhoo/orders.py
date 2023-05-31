@@ -1,4 +1,3 @@
-import contextlib
 import random
 
 import aiosmtplib
@@ -21,64 +20,63 @@ _PROVIDER_NAME = "Karhoo"
 
 
 async def orders(
-    app: service.Application[config.OrderSettings],
+    app: service.AsyncApplication[config.OrderSettings],
 ) -> None:
-    async with contextlib.AsyncExitStack() as stack:
-        http_client = await stack.enter_async_context(
-            httpx.AsyncClient(
-                timeout=app.settings.api_timeout.seconds,
-            ),
-        )
-        logging.register(http_client)
-        metrics.register(http_client)
-        amqp_connection = await stack.enter_async_context(
-            types.Connection(app.settings.amqp_dsn),
-        )
+    http_client = await app.stack.enter_async_context(
+        httpx.AsyncClient(
+            timeout=app.settings.api_timeout.seconds,
+        ),
+    )
+    logging.register(http_client)
+    metrics.register(http_client)
+    amqp_connection = await app.stack.enter_async_context(
+        types.Connection(app.settings.amqp_dsn),
+    )
 
-        redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
-            aioredis.from_url(
-                random.choice(app.settings.redis_dsn),  # nosec
-                decode_responses=False,
-            ).client(),
-        )
+    redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
+        aioredis.from_url(
+            random.choice(app.settings.redis_dsn),  # nosec
+            decode_responses=False,
+        ).client(),
+    )
 
-        karhoo_client = client.KarhooClient(
-            base_url=app.settings.api_base_url,
-            api_key=app.settings.api_key,
-            http_client=http_client,
-        )
+    karhoo_client = client.KarhooClient(
+        base_url=app.settings.api_base_url,
+        api_key=app.settings.api_key,
+        http_client=http_client,
+    )
 
-        await OrderConsumer(
-            consumer_obj=amqp_consumer.Consumer(
-                connection=amqp_connection,
-                queue_name="{0}_orders".format(app.name),
-                binds=[(types.Exchange("orders"), "orders.offers")],
-            ),
-            producer_obj=amqp_producer.Producer(
-                connection=amqp_connection,
-                exchange=types.Exchange("orders"),
-            ),
-            booking_handler=booking.BookingHandler(
-                karhoo_client=karhoo_client,
-                notifier=notifications.SmtpNotifier(
-                    smtp_client=aiosmtplib.SMTP(
-                        hostname=app.settings.smtp_dsn.host,
-                        port=int(app.settings.smtp_dsn.port or 0) or None,
-                        username=app.settings.smtp_dsn.user,
-                        password=app.settings.smtp_dsn.password,
-                        start_tls=True,
-                    ),
-                    sender=app.settings.smtp_sender,
-                    recipient=app.settings.smtp_recipient,
+    await OrderConsumer(
+        consumer_obj=amqp_consumer.Consumer(
+            connection=amqp_connection,
+            queue_name="{0}_orders".format(app.name),
+            binds=[(types.Exchange("orders"), "orders.offers")],
+        ),
+        producer_obj=amqp_producer.Producer(
+            connection=amqp_connection,
+            exchange=types.Exchange("orders"),
+        ),
+        booking_handler=booking.BookingHandler(
+            karhoo_client=karhoo_client,
+            notifier=notifications.SmtpNotifier(
+                smtp_client=aiosmtplib.SMTP(
+                    hostname=app.settings.smtp_dsn.host,
+                    port=int(app.settings.smtp_dsn.port or 0) or None,
+                    username=app.settings.smtp_dsn.user,
+                    password=app.settings.smtp_dsn.password,
+                    start_tls=True,
                 ),
+                sender=app.settings.smtp_sender,
+                recipient=app.settings.smtp_recipient,
             ),
-            offer_cache=cache.OffersCache(
-                client=redis.Client(
-                    redis_connection,
-                    prefix=app.name,
-                ),
+        ),
+        offer_cache=cache.OffersCache(
+            client=redis.Client(
+                redis_connection,
+                prefix=app.name,
             ),
-        ).consume()
+        ),
+    ).consume()
 
 
 class OrderConsumer(object):

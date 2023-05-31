@@ -1,4 +1,3 @@
-import contextlib
 import dataclasses
 import json
 import pathlib
@@ -39,26 +38,25 @@ class StationRepository(object):
         return self._stations[station_id]
 
 
-async def dump_stations(app: service.Application[DumpStationsSettings]) -> None:
-    async with contextlib.AsyncExitStack() as stack:
-        http_client = await stack.enter_async_context(
-            httpx.AsyncClient(
-                timeout=app.settings.api_timeout,
-            ),
-        )
-        logging.register(http_client)
-        metrics.register(http_client)
-        distribusion_client = client.DistribusionClient(
-            api_base_url=app.settings.api_base_url,
-            api_key=app.settings.api_key,
-            retailer_partner_number=app.settings.retailer_partner_number,
-            http_client=http_client,
-        )
+async def dump_stations(app: service.AsyncApplication[DumpStationsSettings]) -> None:
+    http_client = await app.stack.enter_async_context(
+        httpx.AsyncClient(
+            timeout=app.settings.api_timeout,
+        ),
+    )
+    logging.register(http_client)
+    metrics.register(http_client)
+    distribusion_client = client.DistribusionClient(
+        api_base_url=app.settings.api_base_url,
+        api_key=app.settings.api_key,
+        retailer_partner_number=app.settings.retailer_partner_number,
+        http_client=http_client,
+    )
 
-        await _dump_stations(
-            await distribusion_client.get_stations(),
-            pathlib.Path(app.settings.output_file),
-        )
+    await _dump_stations(
+        await distribusion_client.get_stations(),
+        pathlib.Path(app.settings.output_file),
+    )
 
 
 async def _dump_stations(

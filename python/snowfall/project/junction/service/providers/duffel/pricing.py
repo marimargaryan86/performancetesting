@@ -1,4 +1,3 @@
-import contextlib
 import datetime
 import random
 
@@ -24,53 +23,52 @@ from snowfall.stdlib.transport.amqp import types as amqp_types
 from snowfall.vendor.duffel import client
 
 
-async def price_quotes(  # noqa: WPS210
-    app: service.Application[PricingSettings],
+async def price_quotes(
+    app: service.AsyncApplication[PricingSettings],
 ) -> None:
-    async with contextlib.AsyncExitStack() as stack:
-        http_client = await stack.enter_async_context(
-            httpx.AsyncClient(
-                timeout=app.settings.http_timeout,
-            ),
-        )
-        logging.register(http_client)
-        metrics.register(http_client)
-        redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
-            aioredis.from_url(
-                random.choice(app.settings.redis_dsn),  # nosec
-                decode_responses=False,
-            ).client(),
-        )
-        amqp_connection = await stack.enter_async_context(
-            amqp_types.Connection(app.settings.amqp_dsn),
-        )
-        duffel_client = client.DuffelClient(
-            api_base_url=app.settings.api_base_url,
-            api_key=app.settings.api_key,
-            version=app.settings.api_version,
-            http_client=http_client,
-        )
-        offer_cache = cache.OfferCache(
-            client=redis.Client[bytes](redis_connection, prefix=app.name),
-        )
-        await PriceQuoteConsumer(
-            consumer_obj=amqp_consumer.Consumer(
-                connection=amqp_connection,
-                queue_name="{0}_prices".format(app.name),
-                binds=[(amqp_types.Exchange("prices"), "offers.pricing")],
-            ),
-            producer_obj=producer.Producer(
-                connection=amqp_connection,
-                exchange=amqp_types.Exchange("prices"),
-            ),
+    http_client = await app.stack.enter_async_context(
+        httpx.AsyncClient(
+            timeout=app.settings.http_timeout,
+        ),
+    )
+    logging.register(http_client)
+    metrics.register(http_client)
+    redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
+        aioredis.from_url(
+            random.choice(app.settings.redis_dsn),  # nosec
+            decode_responses=False,
+        ).client(),
+    )
+    amqp_connection = await app.stack.enter_async_context(
+        amqp_types.Connection(app.settings.amqp_dsn),
+    )
+    duffel_client = client.DuffelClient(
+        api_base_url=app.settings.api_base_url,
+        api_key=app.settings.api_key,
+        version=app.settings.api_version,
+        http_client=http_client,
+    )
+    offer_cache = cache.OfferCache(
+        client=redis.Client[bytes](redis_connection, prefix=app.name),
+    )
+    await PriceQuoteConsumer(
+        consumer_obj=amqp_consumer.Consumer(
+            connection=amqp_connection,
+            queue_name="{0}_prices".format(app.name),
+            binds=[(amqp_types.Exchange("prices"), "offers.pricing")],
+        ),
+        producer_obj=producer.Producer(
+            connection=amqp_connection,
+            exchange=amqp_types.Exchange("prices"),
+        ),
+        offer_cache=offer_cache,
+        transformer=pricing_transformer.PriceQuoteTransformer(
             offer_cache=offer_cache,
-            transformer=pricing_transformer.PriceQuoteTransformer(
-                offer_cache=offer_cache,
-            ),
-            adapter=pricing_adapter.PricingAdapter(duffel_client=duffel_client),
-            provider_company_id=app.settings.provider_company_id,
-            offer_ttl=app.settings.ttl,
-        ).consume()
+        ),
+        adapter=pricing_adapter.PricingAdapter(duffel_client=duffel_client),
+        provider_company_id=app.settings.provider_company_id,
+        offer_ttl=app.settings.ttl,
+    ).consume()
 
 
 class PriceQuoteConsumer(object):

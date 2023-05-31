@@ -1,4 +1,3 @@
-import contextlib
 import random
 from typing import Sequence
 
@@ -30,58 +29,57 @@ class OrdersSettings(config.BaNdcConfig, service.Settings):
     smtp_recipient: pydantic.EmailStr
 
 
-async def orders(app: service.Application[OrdersSettings]) -> None:
-    async with contextlib.AsyncExitStack() as stack:
-        http_client = await stack.enter_async_context(
-            httpx.AsyncClient(
-                timeout=app.settings.http_timeout,
-            ),
-        )
-        logging.register(http_client)
-        metrics.register(http_client)
-        redis_connection = await stack.enter_async_context(
-            aioredis.from_url(
-                random.choice(app.settings.redis_dsn),  # nosec
-                decode_responses=False,
-            ).client(),
-        )
-        amqp_connection = await stack.enter_async_context(
-            types.Connection(app.settings.amqp_dsn),
-        )
-        ba_ndc_client = client.BaNdcClient(
-            api_base_url=app.settings.api_base_url,
-            api_key=app.settings.api_key,
-            http_client=http_client,
-        )
+async def orders(app: service.AsyncApplication[OrdersSettings]) -> None:
+    http_client = await app.stack.enter_async_context(
+        httpx.AsyncClient(
+            timeout=app.settings.http_timeout,
+        ),
+    )
+    logging.register(http_client)
+    metrics.register(http_client)
+    redis_connection = await app.stack.enter_async_context(
+        aioredis.from_url(
+            random.choice(app.settings.redis_dsn),  # nosec
+            decode_responses=False,
+        ).client(),
+    )
+    amqp_connection = await app.stack.enter_async_context(
+        types.Connection(app.settings.amqp_dsn),
+    )
+    ba_ndc_client = client.BaNdcClient(
+        api_base_url=app.settings.api_base_url,
+        api_key=app.settings.api_key,
+        http_client=http_client,
+    )
 
-        await OrderConsumer(
-            consumer_obj=consumer.Consumer(
-                connection=amqp_connection,
-                queue_name="{0}_orders".format(app.name),
-                binds=[(types.Exchange("orders"), "orders.offers")],
-            ),
-            producer_obj=producer.Producer(
-                connection=amqp_connection,
-                exchange=types.Exchange("orders"),
-            ),
-            booking_handler=BookingHandler(
-                ba_ndc_client=ba_ndc_client,
-                notifier=notifications.SmtpNotifier(
-                    smtp_client=aiosmtplib.SMTP(
-                        hostname=app.settings.smtp_dsn.host,
-                        port=int(app.settings.smtp_dsn.port or 0) or None,
-                        username=app.settings.smtp_dsn.user,
-                        password=app.settings.smtp_dsn.password,
-                        start_tls=True,
-                    ),
-                    sender=app.settings.smtp_sender,
-                    recipient=app.settings.smtp_recipient,
+    await OrderConsumer(
+        consumer_obj=consumer.Consumer(
+            connection=amqp_connection,
+            queue_name="{0}_orders".format(app.name),
+            binds=[(types.Exchange("orders"), "orders.offers")],
+        ),
+        producer_obj=producer.Producer(
+            connection=amqp_connection,
+            exchange=types.Exchange("orders"),
+        ),
+        booking_handler=BookingHandler(
+            ba_ndc_client=ba_ndc_client,
+            notifier=notifications.SmtpNotifier(
+                smtp_client=aiosmtplib.SMTP(
+                    hostname=app.settings.smtp_dsn.host,
+                    port=int(app.settings.smtp_dsn.port or 0) or None,
+                    username=app.settings.smtp_dsn.user,
+                    password=app.settings.smtp_dsn.password,
+                    start_tls=True,
                 ),
+                sender=app.settings.smtp_sender,
+                recipient=app.settings.smtp_recipient,
             ),
-            offer_cache=cache.OfferCache(
-                client=redis.Client(redis_connection, prefix=app.name),
-            ),
-        ).consume()
+        ),
+        offer_cache=cache.OfferCache(
+            client=redis.Client(redis_connection, prefix=app.name),
+        ),
+    ).consume()
 
 
 class OrderConsumer(object):

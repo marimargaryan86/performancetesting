@@ -107,110 +107,109 @@ async def _offers(
     )
 
 
-async def _orders(app: service.Application[config.OrdersSettings]) -> None:
-    async with contextlib.AsyncExitStack() as stack:
-        http_client = await stack.enter_async_context(
-            httpx.AsyncClient(
-                timeout=int(app.settings.api_timeout.total_seconds()),
+async def _orders(app: service.AsyncApplication[config.OrdersSettings]) -> None:
+    http_client = await app.stack.enter_async_context(
+        httpx.AsyncClient(
+            timeout=int(app.settings.api_timeout.total_seconds()),
+        ),
+    )
+    logging.register(http_client)
+    metrics.register(http_client)
+    amqp_conn = await app.stack.enter_async_context(
+        types.Connection(app.settings.amqp_dsn),  # nosec
+    )
+    redis_conn = await app.stack.enter_async_context(
+        aioredis.from_url(
+            random.choice(app.settings.redis_dsn),  # nosec
+            decode_responses=True,
+        ).client(),
+    )
+
+    offers_cache = cache.OffersCache(
+        client=redis.Client(redis_conn, prefix=app.name),
+    )
+
+    orders_consumer = df_consumer.OrdersConsumer(
+        consumer_obj=consumer.Consumer(
+            connection=amqp_conn,
+            queue_name="{0}_orders".format(app.name),
+            binds=[(types.Exchange("orders"), "orders.offers")],
+        ),
+        producer_obj=producer.Producer(
+            connection=amqp_conn,
+            exchange=types.Exchange("orders"),
+        ),
+        bookings=booking.BookingHandler(
+            df_client=_create_client(
+                http_client=http_client,
+                setting=app.settings,
             ),
-        )
-        logging.register(http_client)
-        metrics.register(http_client)
-        amqp_conn = await stack.enter_async_context(
-            types.Connection(app.settings.amqp_dsn),  # nosec
-        )
-        redis_conn = await stack.enter_async_context(
-            aioredis.from_url(
-                random.choice(app.settings.redis_dsn),  # nosec
-                decode_responses=True,
-            ).client(),
-        )
+        ),
+        offers_cache=offers_cache,
+    )
 
-        offers_cache = cache.OffersCache(
-            client=redis.Client(redis_conn, prefix=app.name),
-        )
-
-        orders_consumer = df_consumer.OrdersConsumer(
-            consumer_obj=consumer.Consumer(
-                connection=amqp_conn,
-                queue_name="{0}_orders".format(app.name),
-                binds=[(types.Exchange("orders"), "orders.offers")],
-            ),
-            producer_obj=producer.Producer(
-                connection=amqp_conn,
-                exchange=types.Exchange("orders"),
-            ),
-            bookings=booking.BookingHandler(
-                df_client=_create_client(
-                    http_client=http_client,
-                    setting=app.settings,
-                ),
-            ),
-            offers_cache=offers_cache,
-        )
-
-        await orders_consumer.consume()
+    await orders_consumer.consume()
 
 
-async def _price_quotes(app: service.Application[config.PriceQuotesSettings]) -> None:
-    async with contextlib.AsyncExitStack() as stack:
-        redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
-            aioredis.from_url(
-                app.settings.redis_dsn,
-                decode_responses=False,
-            ).client(),
-        )
-        amqp_connection = await stack.enter_async_context(
-            types.Connection(app.settings.amqp_dsn),
-        )
+async def _price_quotes(
+    app: service.AsyncApplication[config.PriceQuotesSettings],
+) -> None:
+    redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
+        aioredis.from_url(
+            app.settings.redis_dsn,
+            decode_responses=False,
+        ).client(),
+    )
+    amqp_connection = await app.stack.enter_async_context(
+        types.Connection(app.settings.amqp_dsn),
+    )
 
-        await df_consumer.PriceQuoteConsumer(
-            consumer_obj=consumer.Consumer(
-                connection=amqp_connection,
-                queue_name="{0}_prices".format(app.name),
-                binds=[(types.Exchange("prices"), "offers.pricing")],
-            ),
-            producer_obj=producer.Producer(
-                connection=amqp_connection,
-                exchange=types.Exchange("prices"),
-            ),
-            offer_cache=cache.OffersCache(
-                client=redis.Client(redis_connection, prefix=app.name),
-            ),
-            price_ttl=app.settings.ttl,
-            provider_company_id=app.settings.provider_company_id,
-            routes=route.RouteRepository(),
-        ).consume()
+    await df_consumer.PriceQuoteConsumer(
+        consumer_obj=consumer.Consumer(
+            connection=amqp_connection,
+            queue_name="{0}_prices".format(app.name),
+            binds=[(types.Exchange("prices"), "offers.pricing")],
+        ),
+        producer_obj=producer.Producer(
+            connection=amqp_connection,
+            exchange=types.Exchange("prices"),
+        ),
+        offer_cache=cache.OffersCache(
+            client=redis.Client(redis_connection, prefix=app.name),
+        ),
+        price_ttl=app.settings.ttl,
+        provider_company_id=app.settings.provider_company_id,
+        routes=route.RouteRepository(),
+    ).consume()
 
 
-async def _create_gtfs(app: service.Application[config.GtfsSetting]) -> None:
+async def _create_gtfs(app: service.AsyncApplication[config.GtfsSetting]) -> None:
     output_path = pathlib.Path(app.settings.output_path)
     output_path.mkdir(parents=True, exist_ok=True)
 
-    async with contextlib.AsyncExitStack() as stack:
-        http_client = await stack.enter_async_context(
-            httpx.AsyncClient(
-                timeout=int(app.settings.api_timeout.total_seconds()),
-            ),
-        )
-        metrics.register(http_client)
-        df_client = _create_client(
-            http_client=http_client,
-            setting=app.settings,
-        )
+    http_client = await app.stack.enter_async_context(
+        httpx.AsyncClient(
+            timeout=int(app.settings.api_timeout.total_seconds()),
+        ),
+    )
+    metrics.register(http_client)
+    df_client = _create_client(
+        http_client=http_client,
+        setting=app.settings,
+    )
 
-        timetable_responses = await orchestrator.timetables_from_routes(
-            df_client=df_client,
-            routes=[
-                route_obj
-                async for route_obj in orchestrator.routes_for_operators(
-                    df_client=df_client,
-                    operators=(
-                        await df_client.operators.get_operators()
-                    ).operator_data.operators,
-                )
-            ],
-        )
+    timetable_responses = await orchestrator.timetables_from_routes(
+        df_client=df_client,
+        routes=[
+            route_obj
+            async for route_obj in orchestrator.routes_for_operators(
+                df_client=df_client,
+                operators=(
+                    await df_client.operators.get_operators()
+                ).operator_data.operators,
+            )
+        ],
+    )
 
     converter_obj = converter.DFDataConverter(
         timetable_responses=timetable_responses,
@@ -221,49 +220,44 @@ async def _create_gtfs(app: service.Application[config.GtfsSetting]) -> None:
     )
 
 
-async def _static(app: service.Application[config.StaticSettings]) -> None:
-    async with contextlib.AsyncExitStack() as stack:
-        http_client = await stack.enter_async_context(
-            httpx.AsyncClient(
-                timeout=int(app.settings.api_timeout.total_seconds()),
-            ),
+async def _static(app: service.AsyncApplication[config.StaticSettings]) -> None:
+    http_client = await app.stack.enter_async_context(
+        httpx.AsyncClient(
+            timeout=int(app.settings.api_timeout.total_seconds()),
+        ),
+    )
+    logging.register(http_client)
+    metrics.register(http_client)
+    df_client = _create_client(http_client, app.settings)
+
+    if not app.settings.dump_routes and not app.settings.dump_ports:
+        return
+
+    routes = [
+        route_obj
+        async for route_obj in orchestrator.routes_for_operators(
+            df_client=df_client,
+            operators=(
+                await df_client.operators.get_operators()
+            ).operator_data.operators,
         )
-        logging.register(http_client)
-        metrics.register(http_client)
-        df_client = _create_client(http_client, app.settings)
+    ]
 
-        if not app.settings.dump_routes and not app.settings.dump_ports:
-            return
+    if app.settings.dump_ports:
+        output_path = str(app.settings.ports_path) if app.settings.ports_path else None
 
-        routes = [
-            route_obj
-            async for route_obj in orchestrator.routes_for_operators(
+        await port.make_ports_from_routes(routes, output_path)
+
+    if app.settings.dump_routes:
+        passenger_info_per_route = {
+            route_info.route_id: route_info
+            for route_info in await orchestrator.passenger_info_for_routes(
                 df_client=df_client,
-                operators=(
-                    await df_client.operators.get_operators()
-                ).operator_data.operators,
+                routes=routes,
             )
-        ]
-
-        if app.settings.dump_ports:
-            output_path = (
-                str(app.settings.ports_path) if app.settings.ports_path else None
-            )
-
-            await port.make_ports_from_routes(routes, output_path)
-
-        if app.settings.dump_routes:
-            passenger_info_per_route = {
-                route_info.route_id: route_info
-                for route_info in await orchestrator.passenger_info_for_routes(
-                    df_client=df_client,
-                    routes=routes,
-                )
-            }
-            output_path = (
-                str(app.settings.ports_path) if app.settings.ports_path else None
-            )
-            await route.make_routes(routes, passenger_info_per_route, output_path)
+        }
+        output_path = str(app.settings.ports_path) if app.settings.ports_path else None
+        await route.make_routes(routes, passenger_info_per_route, output_path)
 
 
 if __name__ == "__main__":

@@ -159,233 +159,149 @@ async def _offers(
     )
 
 
-async def _orders(app: service.Application[_OrdersSettings]) -> None:
+async def _orders(app: service.AsyncApplication[_OrdersSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
-    async with contextlib.AsyncExitStack() as stack:
-        http_client = await stack.enter_async_context(
-            httpx.AsyncClient(
-                timeout=app.settings.api_timeout,
-            ),
-        )
-        logging.register(http_client)
-        metrics.register(http_client)
-        amqp_connection = await stack.enter_async_context(
-            types.Connection(app.settings.amqp_dsn),
-        )
-        redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
-            aioredis.from_url(
-                random.choice(app.settings.redis_dsn),  # nosec
-                decode_responses=False,
-            ).client(),
-        )
-
-        save_a_train_client = client.SATClient(
-            email=app.settings.api_email,
-            password=app.settings.api_password,
-            password_search=app.settings.api_search_password,
-            token=app.settings.api_booking_token,
-            api_url=app.settings.api_base_url,
-            api_search_url=app.settings.api_search_base_url,
-            api_search_timeout=app.settings.api_search_timeout,
-            api_search_requests_limit=app.settings.api_search_requests_limit,
-            client=http_client,
-        )
-        # TODO: do we need to call get_token on the save_a_train_client?
-        offer_cache = cache.OffersCache(
-            client=redis.Client(redis_connection, prefix=app.name),
-        )
-        orders_consumer = consumer.OrdersConsumer(
-            consumer_obj=amqp_consumer.Consumer(
-                connection=amqp_connection,
-                queue_name="{0}_orders".format(app.name),
-                binds=[(types.Exchange("orders"), "orders.offers")],
-            ),
-            producer_obj=producer.Producer(
-                connection=amqp_connection,
-                exchange=types.Exchange("orders"),
-            ),
-            adapter=adapter.SaveATrainAdapter(
-                save_a_train_client=save_a_train_client,
-                train_station_repository=train_stations.TrainStationRepository(
-                    train_stations=await _load_train_stations(),
-                ),
-                provider_cabin_class_mapping=cabin_classes.CabinMappingRepository(
-                    mongo.sat.provider_cabin_mapping,
-                ),
-                offers_cache=offer_cache,
-                ttl=app.settings.ttl,
-                notifier=notifications.SmtpNotifier(
-                    smtp_client=aiosmtplib.SMTP(
-                        hostname=app.settings.smtp_dsn.host,
-                        port=int(app.settings.smtp_dsn.port or 0) or None,
-                        username=app.settings.smtp_dsn.user,
-                        password=app.settings.smtp_dsn.password,
-                        start_tls=True,
-                    ),
-                    sender=app.settings.smtp_sender,
-                    recipient=app.settings.smtp_recipient,
-                ),
-                notifications_producer=producer.Producer(
-                    amqp_connection,
-                    types.Exchange("notifications"),
-                ),
-            ),
-            offers_cache=offer_cache,
-        )
-
-        await orders_consumer.consume()
-
-
-async def _price_quotes(app: service.Application[_PriceQuoteSettings]) -> None:
-    async with contextlib.AsyncExitStack() as stack:
-        redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
-            aioredis.from_url(
-                random.choice(app.settings.redis_dsn),  # nosec
-                decode_responses=False,
-            ).client(),
-        )
-        amqp_connection = await stack.enter_async_context(
-            types.Connection(app.settings.amqp_dsn),
-        )
-
-        await consumer.PriceQuoteConsumer(
-            consumer_obj=amqp_consumer.Consumer(
-                connection=amqp_connection,
-                queue_name="{0}_prices".format(app.name),
-                binds=[(types.Exchange("prices"), "offers.pricing")],
-            ),
-            producer_obj=producer.Producer(
-                connection=amqp_connection,
-                exchange=types.Exchange("prices"),
-            ),
-            offer_cache=cache.OffersCache(
-                client=redis.Client(redis_connection, prefix=app.name),
-            ),
-            price_cache=cache.PriceQuoteCache(
-                client=redis.Client(redis_connection, prefix=app.name),
-            ),
-            price_ttl=app.settings.ttl,
-            provider_company_id=app.settings.provider_company_id,
-        ).consume()
-
-
-async def _notifications(app: service.Application[_NotificationsSettings]) -> None:
-    mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
+    http_client = await app.stack.enter_async_context(
+        httpx.AsyncClient(
+            timeout=app.settings.api_timeout,
+        ),
     )
-    async with contextlib.AsyncExitStack() as stack:
-        http_client = await stack.enter_async_context(
-            httpx.AsyncClient(
-                timeout=app.settings.api_timeout,
-            ),
-        )
-        logging.register(http_client)
-        metrics.register(http_client)
-        amqp_connection = await stack.enter_async_context(
-            types.Connection(app.settings.amqp_dsn),
-        )
-        redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
-            aioredis.from_url(
-                random.choice(app.settings.redis_dsn),  # nosec
-                decode_responses=False,
-            ).client(),
-        )
-        notifier = notifications.SmtpNotifier(
-            smtp_client=aiosmtplib.SMTP(
-                hostname=app.settings.smtp_dsn.host,
-                port=int(app.settings.smtp_dsn.port or 0) or None,
-                username=app.settings.smtp_dsn.user,
-                password=app.settings.smtp_dsn.password,
-                start_tls=True,
-            ),
-            sender=app.settings.smtp_sender,
-            recipient=app.settings.smtp_recipient,
-        )
-        sat_adapter = adapter.SaveATrainAdapter(
-            save_a_train_client=client.SATClient(
-                email=app.settings.api_email,
-                password=app.settings.api_password,
-                password_search=app.settings.api_search_password,
-                token=app.settings.api_booking_token,
-                api_url=app.settings.api_base_url,
-                api_search_url=app.settings.api_search_base_url,
-                api_search_timeout=app.settings.api_search_timeout,
-                api_search_requests_limit=app.settings.api_search_requests_limit,
-                client=http_client,
-            ),
+    logging.register(http_client)
+    metrics.register(http_client)
+    amqp_connection = await app.stack.enter_async_context(
+        types.Connection(app.settings.amqp_dsn),
+    )
+    redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
+        aioredis.from_url(
+            random.choice(app.settings.redis_dsn),  # nosec
+            decode_responses=False,
+        ).client(),
+    )
+
+    save_a_train_client = client.SATClient(
+        email=app.settings.api_email,
+        password=app.settings.api_password,
+        password_search=app.settings.api_search_password,
+        token=app.settings.api_booking_token,
+        api_url=app.settings.api_base_url,
+        api_search_url=app.settings.api_search_base_url,
+        api_search_timeout=app.settings.api_search_timeout,
+        api_search_requests_limit=app.settings.api_search_requests_limit,
+        client=http_client,
+    )
+    # TODO: do we need to call get_token on the save_a_train_client?
+    offer_cache = cache.OffersCache(
+        client=redis.Client(redis_connection, prefix=app.name),
+    )
+    orders_consumer = consumer.OrdersConsumer(
+        consumer_obj=amqp_consumer.Consumer(
+            connection=amqp_connection,
+            queue_name="{0}_orders".format(app.name),
+            binds=[(types.Exchange("orders"), "orders.offers")],
+        ),
+        producer_obj=producer.Producer(
+            connection=amqp_connection,
+            exchange=types.Exchange("orders"),
+        ),
+        adapter=adapter.SaveATrainAdapter(
+            save_a_train_client=save_a_train_client,
             train_station_repository=train_stations.TrainStationRepository(
                 train_stations=await _load_train_stations(),
-            ),
-            offers_cache=cache.OffersCache(
-                client=redis.Client(redis_connection, prefix=app.name),
-            ),
-            ttl=app.settings.ttl,
-            notifier=notifier,
-            notifications_producer=producer.Producer(
-                connection=amqp_connection,
-                exchange=types.Exchange("notifications"),
             ),
             provider_cabin_class_mapping=cabin_classes.CabinMappingRepository(
                 mongo.sat.provider_cabin_mapping,
             ),
-        )
-        notifications_consumer = consumer.NotificationsConsumer(
-            consumer_obj=amqp_consumer.Consumer(
-                connection=amqp_connection,
-                queue_name="notifications",
-                queue_arguments={
-                    "x-dead-letter-exchange": "notifications.retry",
-                    "x-dead-letter-routing-key": "notifications.retry",
-                },
-                binds=[(types.Exchange("notifications"), "notifications")],
+            offers_cache=offer_cache,
+            ttl=app.settings.ttl,
+            notifier=notifications.SmtpNotifier(
+                smtp_client=aiosmtplib.SMTP(
+                    hostname=app.settings.smtp_dsn.host,
+                    port=int(app.settings.smtp_dsn.port or 0) or None,
+                    username=app.settings.smtp_dsn.user,
+                    password=app.settings.smtp_dsn.password,
+                    start_tls=True,
+                ),
+                sender=app.settings.smtp_sender,
+                recipient=app.settings.smtp_recipient,
             ),
-            adapter=sat_adapter,
-            notifier=notifier,
-        )
-        channel = await stack.enter_async_context(
-            cast(
-                contextlib.AbstractAsyncContextManager[abc.AbstractChannel],
-                amqp_connection.channel(),
+            notifications_producer=producer.Producer(
+                amqp_connection,
+                types.Exchange("notifications"),
             ),
-        )
-        await channel.set_qos(
-            prefetch_count=((os.cpu_count() or 1) * 2) + 1,
-        )
+        ),
+        offers_cache=offer_cache,
+    )
 
-        queue = await channel.declare_queue(
-            name="notifications.retry",
-            durable=True,
-            arguments={
-                "x-message-ttl": 300000,
-                "x-dead-letter-exchange": "notifications",
-                "x-dead-letter-routing-key": "notifications",
-            },
-        )
-        exchange = types.Exchange("notifications.retry")
-
-        declared_exchange = await channel.declare_exchange(
-            name=exchange.name,
-            type=exchange.type_,
-            durable=True,
-        )
-
-        await queue.bind(declared_exchange, "notifications.retry")
-
-        await notifications_consumer.consume()
+    await orders_consumer.consume()
 
 
-async def _dump_stations(app: service.Application[_DumpStationsSettings]) -> None:
-    async with contextlib.AsyncExitStack() as stack:
-        http_client = await stack.enter_async_context(
-            httpx.AsyncClient(
-                timeout=app.settings.api_timeout,
-            ),
-        )
-        logging.register(http_client)
-        metrics.register(http_client)
-        save_a_train_client = client.SATClient(
+async def _price_quotes(app: service.AsyncApplication[_PriceQuoteSettings]) -> None:
+    redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
+        aioredis.from_url(
+            random.choice(app.settings.redis_dsn),  # nosec
+            decode_responses=False,
+        ).client(),
+    )
+    amqp_connection = await app.stack.enter_async_context(
+        types.Connection(app.settings.amqp_dsn),
+    )
+
+    await consumer.PriceQuoteConsumer(
+        consumer_obj=amqp_consumer.Consumer(
+            connection=amqp_connection,
+            queue_name="{0}_prices".format(app.name),
+            binds=[(types.Exchange("prices"), "offers.pricing")],
+        ),
+        producer_obj=producer.Producer(
+            connection=amqp_connection,
+            exchange=types.Exchange("prices"),
+        ),
+        offer_cache=cache.OffersCache(
+            client=redis.Client(redis_connection, prefix=app.name),
+        ),
+        price_cache=cache.PriceQuoteCache(
+            client=redis.Client(redis_connection, prefix=app.name),
+        ),
+        price_ttl=app.settings.ttl,
+        provider_company_id=app.settings.provider_company_id,
+    ).consume()
+
+
+async def _notifications(app: service.AsyncApplication[_NotificationsSettings]) -> None:
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        random.choice(app.settings.mongo_dsn),  # nosec
+    )
+    http_client = await app.stack.enter_async_context(
+        httpx.AsyncClient(
+            timeout=app.settings.api_timeout,
+        ),
+    )
+    logging.register(http_client)
+    metrics.register(http_client)
+    amqp_connection = await app.stack.enter_async_context(
+        types.Connection(app.settings.amqp_dsn),
+    )
+    redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
+        aioredis.from_url(
+            random.choice(app.settings.redis_dsn),  # nosec
+            decode_responses=False,
+        ).client(),
+    )
+    notifier = notifications.SmtpNotifier(
+        smtp_client=aiosmtplib.SMTP(
+            hostname=app.settings.smtp_dsn.host,
+            port=int(app.settings.smtp_dsn.port or 0) or None,
+            username=app.settings.smtp_dsn.user,
+            password=app.settings.smtp_dsn.password,
+            start_tls=True,
+        ),
+        sender=app.settings.smtp_sender,
+        recipient=app.settings.smtp_recipient,
+    )
+    sat_adapter = adapter.SaveATrainAdapter(
+        save_a_train_client=client.SATClient(
             email=app.settings.api_email,
             password=app.settings.api_password,
             password_search=app.settings.api_search_password,
@@ -395,18 +311,98 @@ async def _dump_stations(app: service.Application[_DumpStationsSettings]) -> Non
             api_search_timeout=app.settings.api_search_timeout,
             api_search_requests_limit=app.settings.api_search_requests_limit,
             client=http_client,
-        )
-        geocoder = geocoding_pb2_grpc.GeocodingServiceStub(
-            grpc_client.create_channel(
-                random.choice(app.settings.geodata_address),  # nosec
-            ),
-        )
+        ),
+        train_station_repository=train_stations.TrainStationRepository(
+            train_stations=await _load_train_stations(),
+        ),
+        offers_cache=cache.OffersCache(
+            client=redis.Client(redis_connection, prefix=app.name),
+        ),
+        ttl=app.settings.ttl,
+        notifier=notifier,
+        notifications_producer=producer.Producer(
+            connection=amqp_connection,
+            exchange=types.Exchange("notifications"),
+        ),
+        provider_cabin_class_mapping=cabin_classes.CabinMappingRepository(
+            mongo.sat.provider_cabin_mapping,
+        ),
+    )
+    notifications_consumer = consumer.NotificationsConsumer(
+        consumer_obj=amqp_consumer.Consumer(
+            connection=amqp_connection,
+            queue_name="notifications",
+            queue_arguments={
+                "x-dead-letter-exchange": "notifications.retry",
+                "x-dead-letter-routing-key": "notifications.retry",
+            },
+            binds=[(types.Exchange("notifications"), "notifications")],
+        ),
+        adapter=sat_adapter,
+        notifier=notifier,
+    )
+    channel = await app.stack.enter_async_context(
+        cast(
+            contextlib.AbstractAsyncContextManager[abc.AbstractChannel],
+            amqp_connection.channel(),
+        ),
+    )
+    await channel.set_qos(
+        prefetch_count=((os.cpu_count() or 1) * 2) + 1,
+    )
 
-        await train_stations.dump_sat_stations(
-            geocoder,
-            await save_a_train_client.get_vendor_stations(),
-            pathlib.Path(app.settings.output_file),
-        )
+    queue = await channel.declare_queue(
+        name="notifications.retry",
+        durable=True,
+        arguments={
+            "x-message-ttl": 300000,
+            "x-dead-letter-exchange": "notifications",
+            "x-dead-letter-routing-key": "notifications",
+        },
+    )
+    exchange = types.Exchange("notifications.retry")
+
+    declared_exchange = await channel.declare_exchange(
+        name=exchange.name,
+        type=exchange.type_,
+        durable=True,
+    )
+
+    await queue.bind(declared_exchange, "notifications.retry")
+
+    await notifications_consumer.consume()
+
+
+async def _dump_stations(app: service.AsyncApplication[_DumpStationsSettings]) -> None:
+    http_client = await app.stack.enter_async_context(
+        httpx.AsyncClient(
+            timeout=app.settings.api_timeout,
+        ),
+    )
+    logging.register(http_client)
+    metrics.register(http_client)
+    save_a_train_client = client.SATClient(
+        email=app.settings.api_email,
+        password=app.settings.api_password,
+        password_search=app.settings.api_search_password,
+        token=app.settings.api_booking_token,
+        api_url=app.settings.api_base_url,
+        api_search_url=app.settings.api_search_base_url,
+        api_search_timeout=app.settings.api_search_timeout,
+        api_search_requests_limit=app.settings.api_search_requests_limit,
+        client=http_client,
+    )
+    geocoder = geocoding_pb2_grpc.GeocodingServiceStub(
+        grpc_client.create_channel(
+            random.choice(app.settings.geodata_address),  # nosec
+        ),
+    )
+
+    await train_stations.dump_sat_stations(
+        geocoder,
+        await save_a_train_client.get_vendor_stations(),
+        pathlib.Path(app.settings.output_file),
+    )
 
 
 async def _load_train_stations() -> list[train_stations.TrainStation]:

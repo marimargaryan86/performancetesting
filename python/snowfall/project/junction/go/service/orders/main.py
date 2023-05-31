@@ -1,4 +1,3 @@
-import contextlib
 import ipaddress
 import random
 from typing import Sequence
@@ -45,7 +44,7 @@ class _ImportSettings(pay_integration.Settings, service.Settings):
     use_pay_to_create_transaction: bool = False
 
 
-async def _serve(app: service.Application[_GrpcSettings]) -> None:
+async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
@@ -58,98 +57,96 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
         ),
     )
 
-    async with contextlib.AsyncExitStack() as stack:
-        http_client = await stack.enter_async_context(httpx.AsyncClient())
-        logging.register(http_client)
-        metrics.register(http_client)
+    http_client = await app.stack.enter_async_context(httpx.AsyncClient())
+    logging.register(http_client)
+    metrics.register(http_client)
 
-        zendesk_client = ZendeskClient(
-            base_url=app.settings.zendesk_base_url,
-            api_key=app.settings.zendesk_api_key,
-            http_client=http_client,
-            env=app.environment,
-        )
+    zendesk_client = ZendeskClient(
+        base_url=app.settings.zendesk_base_url,
+        api_key=app.settings.zendesk_api_key,
+        http_client=http_client,
+        env=app.environment,
+    )
 
-        amqp_connection = await stack.enter_async_context(
-            types.Connection(app.settings.amqp_dsn),
-        )
+    amqp_connection = await app.stack.enter_async_context(
+        types.Connection(app.settings.amqp_dsn),
+    )
 
-        grpc_server = server.create_server(
-            app.settings.grpc_address,
-            app.settings.grpc_port,
-            [
-                OrderService(
-                    journeys=orders.JourneyRepository(
-                        collection=mongo.orders.journeys,
-                        passenger_name_records=passenger_name_records_client,
-                    ),
-                    orders=orders.OrderRepository(
-                        collection=mongo.orders.journeys,
-                    ),
-                    bookings=orders.BookingRepository(
-                        collection=mongo.orders.journeys,
-                    ),
-                    booking_details=orders.BookingDetailsRepository(
-                        collection=mongo.orders.journeys,
-                    ),
-                    cancellations=orders.BookingsCancellationsRepository(
-                        collection=mongo.orders.bookings_cancellations,
-                    ),
-                    publisher=OrderProducer(
-                        producer_obj=producer.Producer(
-                            connection=amqp_connection,
-                            exchange=types.Exchange("orders"),
-                        ),
-                    ),
-                    default_page_size=app.settings.default_page_size,
-                    zendesk_client=zendesk_client,
+    grpc_server = server.create_server(
+        app.settings.grpc_address,
+        app.settings.grpc_port,
+        [
+            OrderService(
+                journeys=orders.JourneyRepository(
+                    collection=mongo.orders.journeys,
+                    passenger_name_records=passenger_name_records_client,
                 ),
-            ],
-        )
+                orders=orders.OrderRepository(
+                    collection=mongo.orders.journeys,
+                ),
+                bookings=orders.BookingRepository(
+                    collection=mongo.orders.journeys,
+                ),
+                booking_details=orders.BookingDetailsRepository(
+                    collection=mongo.orders.journeys,
+                ),
+                cancellations=orders.BookingsCancellationsRepository(
+                    collection=mongo.orders.bookings_cancellations,
+                ),
+                publisher=OrderProducer(
+                    producer_obj=producer.Producer(
+                        connection=amqp_connection,
+                        exchange=types.Exchange("orders"),
+                    ),
+                ),
+                default_page_size=app.settings.default_page_size,
+                zendesk_client=zendesk_client,
+            ),
+        ],
+    )
 
-        async with grpc_server.serve() as running:
-            await running.wait_for_termination()
+    async with grpc_server.serve() as running:
+        await running.wait_for_termination()
 
 
-async def _import(app: service.Application[_ImportSettings]) -> None:
+async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
 
-    async with contextlib.AsyncExitStack() as stack:
-        http_client = await stack.enter_async_context(httpx.AsyncClient())
-        connection = await stack.enter_async_context(
-            types.Connection(
-                app.settings.amqp_dsn,
-            ),
-        )
+    http_client = await app.stack.enter_async_context(httpx.AsyncClient())
+    connection = await app.stack.enter_async_context(
+        types.Connection(
+            app.settings.amqp_dsn,
+        ),
+    )
 
-        logging.register(http_client)
-        metrics.register(http_client)
+    logging.register(http_client)
+    metrics.register(http_client)
 
-        booking_importer = importer.BookingImporter(
-            consumer_obj=consumer.Consumer(
-                connection=connection,
-                queue_name="{0}_orders".format(app.name),
-                binds=[(types.Exchange("orders"), "orders.result.offer")],
-            ),
-            booking_repository=orders.BookingRepository(
-                mongo.orders.journeys,
-            ),
-            pay_transaction_creator=PayTransactionCreator(
-                app.settings.use_pay_to_create_transaction,
-                pay_client=PayClient(
-                    base_url=app.settings.public_pay_api_dsn,
-                    auth=UserAuth(
-                        app.settings.public_pay_admin_api_dsn,
-                        app.settings.pay_admin_username,
-                        app.settings.pay_admin_password,
-                    ),
-                    client=http_client,
+    booking_importer = importer.BookingImporter(
+        consumer_obj=consumer.Consumer(
+            connection=connection,
+            queue_name="{0}_orders".format(app.name),
+            binds=[(types.Exchange("orders"), "orders.result.offer")],
+        ),
+        booking_repository=orders.BookingRepository(
+            mongo.orders.journeys,
+        ),
+        pay_transaction_creator=PayTransactionCreator(
+            app.settings.use_pay_to_create_transaction,
+            pay_client=PayClient(
+                base_url=app.settings.public_pay_api_dsn,
+                auth=UserAuth(
+                    app.settings.public_pay_admin_api_dsn,
+                    app.settings.pay_admin_username,
+                    app.settings.pay_admin_password,
                 ),
+                client=http_client,
             ),
-        )
-        await booking_importer.consume()
+        ),
+    )
+    await booking_importer.consume()
 
 
 if __name__ == "__main__":

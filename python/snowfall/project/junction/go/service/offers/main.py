@@ -1,4 +1,3 @@
-import contextlib
 import datetime
 import ipaddress
 import random
@@ -137,158 +136,156 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
             await running.wait_for_termination()
 
 
-async def _import(app: service.Application[_ImportSettings]) -> None:
+async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
 
-    async with contextlib.AsyncExitStack() as stack:
-        http_client = await stack.enter_async_context(httpx.AsyncClient())
-        connection = await stack.enter_async_context(
-            types.Connection(
-                app.settings.amqp_dsn,
-            ),
-        )
-        redis_conn = await stack.enter_async_context(
-            aioredis.from_url(
-                random.choice(app.settings.redis_dsn),  # nosec
-                decode_responses=True,
-            ).client(),
-        )
+    http_client = await app.stack.enter_async_context(httpx.AsyncClient())
+    connection = await app.stack.enter_async_context(
+        types.Connection(
+            app.settings.amqp_dsn,
+        ),
+    )
+    redis_conn = await app.stack.enter_async_context(
+        aioredis.from_url(
+            random.choice(app.settings.redis_dsn),  # nosec
+            decode_responses=True,
+        ).client(),
+    )
 
-        logging.register(http_client)
-        metrics.register(http_client)
+    logging.register(http_client)
+    metrics.register(http_client)
 
-        offer_importer = importer.OfferImporter(
-            consumer_obj=consumer.Consumer(
-                connection=connection,
-                queue_name="{0}_offers".format(app.name),
-                binds=[
-                    (
-                        types.Exchange("offers"),
-                        trackable.to_tracking_key(
-                            _TRIP_OFFER_SEARCH_ROUTING_KEY,
-                        ),
-                    ),
-                    (types.Exchange("offers"), "offers.result.trip"),
-                ],
-            ),
-            trip_offers=offers.TripOfferRepository(
-                mongo.offers.trip_offers,
-            ),
-            offer_aggregator=aggregator.OfferAggregator(
-                offer_aggregates=offers.OfferAggregateMappingRepository(
-                    mongo.offers.offer_aggregates,
-                ),
-                offer_buckets=aggregator.OfferBucketRepository(
-                    redis_client=redis.Client(
-                        redis=redis_conn,
-                        prefix=app.name,
+    offer_importer = importer.OfferImporter(
+        consumer_obj=consumer.Consumer(
+            connection=connection,
+            queue_name="{0}_offers".format(app.name),
+            binds=[
+                (
+                    types.Exchange("offers"),
+                    trackable.to_tracking_key(
+                        _TRIP_OFFER_SEARCH_ROUTING_KEY,
                     ),
                 ),
-                offer_searches=offers.OfferSearchRepository(
-                    mongo.offers.offer_searches,
-                    app.settings.default_ttl,
-                ),
+                (types.Exchange("offers"), "offers.result.trip"),
+            ],
+        ),
+        trip_offers=offers.TripOfferRepository(
+            mongo.offers.trip_offers,
+        ),
+        offer_aggregator=aggregator.OfferAggregator(
+            offer_aggregates=offers.OfferAggregateMappingRepository(
+                mongo.offers.offer_aggregates,
             ),
-            redis=redis.Client(
-                redis=redis_conn,
-                prefix=app.name,
-            ),
-            status_handler=importer.StatusHandler(
-                redis=redis.Client(
+            offer_buckets=aggregator.OfferBucketRepository(
+                redis_client=redis.Client(
                     redis=redis_conn,
                     prefix=app.name,
-                ),
-                repository=offers.OfferSearchRepository(
-                    mongo.offers.offer_searches,
-                    app.settings.default_ttl,
                 ),
             ),
             offer_searches=offers.OfferSearchRepository(
                 mongo.offers.offer_searches,
                 app.settings.default_ttl,
             ),
-            pay_quote_fetcher=pay_quotes.PayQuoteFetcher(
-                use_pay_for_currency_conversions=(
-                    app.settings.use_pay_for_currency_conversions
-                ),
-                pay_quotes=pay_quotes.PayQuotes(
-                    pay_client=PayClient(
-                        base_url=app.settings.public_pay_api_dsn,
-                        auth=UserAuth(
-                            app.settings.public_pay_admin_api_dsn,
-                            app.settings.pay_admin_username,
-                            app.settings.pay_admin_password,
-                        ),
-                        client=http_client,
-                    ),
-                    offer_options_repository=offers.OfferOptionsRepository(
-                        mongo.offers.trip_offers,
-                    ),
-                ),
-                payer_id=app.settings.payer_company_id,
-                payer_currency=app.settings.payer_currency_code,
+        ),
+        redis=redis.Client(
+            redis=redis_conn,
+            prefix=app.name,
+        ),
+        status_handler=importer.StatusHandler(
+            redis=redis.Client(
+                redis=redis_conn,
+                prefix=app.name,
             ),
-            reseller_disabled_operators=app.settings.reseller_disabled_operators,
-        )
-        await offer_importer.consume()
+            repository=offers.OfferSearchRepository(
+                mongo.offers.offer_searches,
+                app.settings.default_ttl,
+            ),
+        ),
+        offer_searches=offers.OfferSearchRepository(
+            mongo.offers.offer_searches,
+            app.settings.default_ttl,
+        ),
+        pay_quote_fetcher=pay_quotes.PayQuoteFetcher(
+            use_pay_for_currency_conversions=(
+                app.settings.use_pay_for_currency_conversions
+            ),
+            pay_quotes=pay_quotes.PayQuotes(
+                pay_client=PayClient(
+                    base_url=app.settings.public_pay_api_dsn,
+                    auth=UserAuth(
+                        app.settings.public_pay_admin_api_dsn,
+                        app.settings.pay_admin_username,
+                        app.settings.pay_admin_password,
+                    ),
+                    client=http_client,
+                ),
+                offer_options_repository=offers.OfferOptionsRepository(
+                    mongo.offers.trip_offers,
+                ),
+            ),
+            payer_id=app.settings.payer_company_id,
+            payer_currency=app.settings.payer_currency_code,
+        ),
+        reseller_disabled_operators=app.settings.reseller_disabled_operators,
+    )
+    await offer_importer.consume()
 
 
 async def _gather_price_quotes(
-    app: service.Application[_GatherPriceQuoteSettings],
+    app: service.AsyncApplication[_GatherPriceQuoteSettings],
 ) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
 
-    async with contextlib.AsyncExitStack() as stack:
-        http_client = await stack.enter_async_context(httpx.AsyncClient())
-        connection = await stack.enter_async_context(
-            types.Connection(
-                app.settings.amqp_dsn,
-            ),
-        )
+    http_client = await app.stack.enter_async_context(httpx.AsyncClient())
+    connection = await app.stack.enter_async_context(
+        types.Connection(
+            app.settings.amqp_dsn,
+        ),
+    )
 
-        logging.register(http_client)
-        metrics.register(http_client)
+    logging.register(http_client)
+    metrics.register(http_client)
 
-        price_quote_importer = importer.PriceQuoteImporter(
-            consumer_obj=consumer.Consumer(
-                connection=connection,
-                queue_name="{0}_prices".format(app.name),
-                binds=[(types.Exchange("prices"), "offers.result.price")],
+    price_quote_importer = importer.PriceQuoteImporter(
+        consumer_obj=consumer.Consumer(
+            connection=connection,
+            queue_name="{0}_prices".format(app.name),
+            binds=[(types.Exchange("prices"), "offers.result.price")],
+        ),
+        price_quotes_repository=price_quotes.PriceQuoteRepository(
+            collection=mongo.offers.price_quotes,
+        ),
+        price_quotes_container_repository=price_quotes.PriceQuoteContainerRepository(
+            mongo.offers.price_quotes,
+            app.settings.default_ttl,
+        ),
+        pay_quote_fetcher=pay_quotes.PayQuoteFetcher(
+            use_pay_for_currency_conversions=(
+                app.settings.use_pay_for_currency_conversions
             ),
-            price_quotes_repository=price_quotes.PriceQuoteRepository(
-                collection=mongo.offers.price_quotes,
-            ),
-            price_quotes_container_repository=price_quotes.PriceQuoteContainerRepository(
-                mongo.offers.price_quotes,
-                app.settings.default_ttl,
-            ),
-            pay_quote_fetcher=pay_quotes.PayQuoteFetcher(
-                use_pay_for_currency_conversions=(
-                    app.settings.use_pay_for_currency_conversions
-                ),
-                pay_quotes=pay_quotes.PayQuotes(
-                    pay_client=PayClient(
-                        base_url=app.settings.public_pay_api_dsn,
-                        auth=UserAuth(
-                            app.settings.public_pay_admin_api_dsn,
-                            app.settings.pay_admin_username,
-                            app.settings.pay_admin_password,
-                        ),
-                        client=http_client,
+            pay_quotes=pay_quotes.PayQuotes(
+                pay_client=PayClient(
+                    base_url=app.settings.public_pay_api_dsn,
+                    auth=UserAuth(
+                        app.settings.public_pay_admin_api_dsn,
+                        app.settings.pay_admin_username,
+                        app.settings.pay_admin_password,
                     ),
-                    offer_options_repository=offers.OfferOptionsRepository(
-                        mongo.offers.trip_offers,
-                    ),
+                    client=http_client,
                 ),
-                payer_id=app.settings.payer_company_id,
-                payer_currency=app.settings.payer_currency_code,
+                offer_options_repository=offers.OfferOptionsRepository(
+                    mongo.offers.trip_offers,
+                ),
             ),
-        )
-        await price_quote_importer.consume()
+            payer_id=app.settings.payer_company_id,
+            payer_currency=app.settings.payer_currency_code,
+        ),
+    )
+    await price_quote_importer.consume()
 
 
 if __name__ == "__main__":
