@@ -1,4 +1,7 @@
+import asyncio
+
 import more_itertools
+import pymongo
 import pytest
 
 from snowfall.project.junction.go.service.orders import orders
@@ -46,6 +49,80 @@ class TestJourneys(object):
 
         assert len(journeys) == 1
         assert more_itertools.first(journeys).id == order.journey_id
+
+    async def test_sorting_by_id(
+        self,
+        journey_repository: orders.JourneyRepository,
+    ) -> None:
+        await asyncio.gather(
+            journey_repository.create(
+                contact_details=models_pb2.ContactDetails(),
+                reseller_id="",
+            ),
+            journey_repository.create(
+                contact_details=models_pb2.ContactDetails(),
+                reseller_id="",
+            ),
+        )
+
+        asc_id_journeys = [
+            journey.id
+            async for journey in await journey_repository.find(
+                ids=[],
+                cursor="",
+                sort=("_id", pymongo.ASCENDING),
+            )
+        ]
+
+        desc_id_journeys = [
+            journey.id
+            async for journey in await journey_repository.find(
+                ids=[],
+                cursor="",
+                sort=("_id", pymongo.DESCENDING),
+            )
+        ]
+
+        assert len(asc_id_journeys) == 2
+        assert asc_id_journeys[0] == desc_id_journeys[1]
+        assert asc_id_journeys[1] == desc_id_journeys[0]
+
+    async def test_sorting_by_pnr(
+        self,
+        journey_repository: orders.JourneyRepository,
+    ) -> None:
+        await asyncio.gather(
+            journey_repository.create(
+                contact_details=models_pb2.ContactDetails(),
+                reseller_id="",
+            ),
+            journey_repository.create(
+                contact_details=models_pb2.ContactDetails(),
+                reseller_id="",
+            ),
+        )
+
+        asc_pnr_journeys = [
+            journey.passenger_name_record
+            async for journey in await journey_repository.find(
+                ids=[],
+                cursor="",
+                sort=("passenger_name_record", pymongo.ASCENDING),
+            )
+        ]
+
+        desc_pnr_journeys = [
+            journey.passenger_name_record
+            async for journey in await journey_repository.find(
+                ids=[],
+                cursor="",
+                sort=("passenger_name_record", pymongo.DESCENDING),
+            )
+        ]
+
+        assert len(asc_pnr_journeys) == 2
+        assert asc_pnr_journeys[0] == desc_pnr_journeys[1]
+        assert asc_pnr_journeys[1] == desc_pnr_journeys[0]
 
 
 class TestOrders(object):

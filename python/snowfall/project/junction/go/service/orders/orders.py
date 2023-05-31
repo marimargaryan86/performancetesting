@@ -20,6 +20,7 @@ class JourneyRepository(
     repository.ProtoRepository[models_pb2.Journey],
 ):
     _proto = models_pb2.Journey
+    _indexes = [pymongo.IndexModel("passenger_name_record", background=True)]
 
     def __init__(
         self,
@@ -56,6 +57,7 @@ class JourneyRepository(
         self,
         ids: Sequence[str],
         cursor: str,
+        sort: tuple[str, int] | None = None,
     ) -> resultset.ResultSet[models_pb2.Journey]:
         filter_ = (
             {
@@ -70,6 +72,7 @@ class JourneyRepository(
         return await self._find_with_cursor(
             cur=cursor,
             filter_=filter_,
+            sort=sort,
         )
 
     async def find_by_booking_id(

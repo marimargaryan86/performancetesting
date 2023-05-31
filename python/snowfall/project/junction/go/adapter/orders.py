@@ -11,7 +11,7 @@ from snowfall.project.junction.go.service.orders.v1alpha import (
     orders_pb2_grpc,
 )
 from snowfall.stdlib import sequence, string
-from snowfall.stdlib.v1 import postal_address_pb2
+from snowfall.stdlib.v1 import postal_address_pb2, sort_pb2
 
 _MOCK_PRICE_UNITS = 13
 _MOCK_PRICE_NANOS = 370000000
@@ -77,6 +77,7 @@ class Client(abc.ABC):
         identifiers: Sequence[str] | None = None,
         limit: int | None = None,
         cursor: str | None = None,
+        sort_by: sort_pb2.Sort | None = None,
     ) -> orders_pb2.ListJourneysResponse:
         """Fetch all journey resources."""
 
@@ -251,6 +252,7 @@ class DictClient(Client):
         identifiers: Sequence[str] | None = None,
         limit: int | None = None,
         cursor: str | None = None,
+        sort_by: sort_pb2.Sort | None = None,
     ) -> orders_pb2.ListJourneysResponse:
         if identifiers:
             journeys = [
@@ -592,10 +594,12 @@ class GrpcClient(Client):
         identifiers: Sequence[str] | None = None,
         limit: int | None = None,
         cursor: str | None = None,
+        sort_by: sort_pb2.Sort | None = None,
     ) -> orders_pb2.ListJourneysResponse:
         request = orders_pb2.ListJourneysRequest(
             ids=identifiers,
             page_token=cursor or "",
+            sort_by=sort_by,
         )
 
         if limit is not None:

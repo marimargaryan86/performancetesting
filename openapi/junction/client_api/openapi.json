@@ -8438,7 +8438,10 @@
         "schema": {
           "type": "string",
           "enum": [
-            "id"
+            "id",
+            "-id",
+            "reference",
+            "-reference"
           ],
           "example": "id",
           "default": "id"

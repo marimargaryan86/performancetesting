@@ -4,6 +4,7 @@ package snowfall.project.junction.go.service.orders.v1alpha;
 
 import "snowfall/project/junction/go/service/orders/v1alpha/models.proto";
 import "snowfall/stdlib/v1/postal_address.proto";
+import "snowfall/stdlib/v1/sort.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/orders/v1alpha";
 
@@ -44,6 +45,7 @@ message ListJourneysRequest {
   int32 page_size = 1;
   string page_token = 2;
   repeated string ids = 3;
+  snowfall.stdlib.v1.Sort sort_by = 4;
 }
 
 message ListJourneysResponse {

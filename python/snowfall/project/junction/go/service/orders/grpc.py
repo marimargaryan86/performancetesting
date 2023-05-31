@@ -17,13 +17,18 @@ from snowfall.project.junction.go.service.orders.v1alpha import (
     orders_pb2_grpc,
 )
 from snowfall.project.junction.go.service.orders.zendesk.client import ZendeskClient
-from snowfall.stdlib.transport.grpc import rich_status, service
+from snowfall.stdlib.transport.grpc import rich_status, service, sorting
 
 
 class OrderService(
     service.Service,
     orders_pb2_grpc.OrderServiceServicer,
 ):
+    _journey_sort = {
+        "id": "_id",
+        "passenger_name_record": "passenger_name_record",
+    }
+
     def __init__(
         self,
         journeys: JourneyRepository,
@@ -92,6 +97,7 @@ class OrderService(
         journeys_result = await self._journeys.find(
             ids=list(request.ids),
             cursor=request.page_token,
+            sort=sorting.get_sort(request.sort_by, self._journey_sort),
         )
 
         journeys_result.limit(

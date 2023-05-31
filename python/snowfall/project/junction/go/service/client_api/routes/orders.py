@@ -21,6 +21,7 @@ from snowfall.stdlib.integration.starlette import (
     models,
     pagination_helpers,
     request_helpers,
+    sorting,
 )
 from snowfall.stdlib.v1 import phone_number_pb2, postal_address_pb2
 
@@ -48,6 +49,11 @@ class Journey(endpoints.HTTPEndpoint):
 
 
 class Journeys(endpoints.HTTPEndpoint):
+    _sort = {
+        "id": "id",
+        "reference": "passenger_name_record",
+    }
+
     async def get(
         self,
         request: requests.Request,
@@ -57,6 +63,7 @@ class Journeys(endpoints.HTTPEndpoint):
         response = await client.find_journeys(
             limit=pagination.limit,
             cursor=pagination.cursor,
+            sort_by=sorting.get_sort(request, self._sort),
         )
 
         return await messages.create_response(
