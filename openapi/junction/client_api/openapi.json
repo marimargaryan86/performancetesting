@@ -7720,19 +7720,12 @@
         "in": "query",
         "required": false,
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "id"
-            ]
-          },
-          "default": [
+          "type": "string",
+          "enum": [
             "id"
           ],
-          "example": [
-            "id"
-          ]
+          "example": "id",
+          "default": "id"
         },
         "description": "Customize which field(s) to sort the places by.",
         "style": "form",
@@ -7753,19 +7746,12 @@
         "in": "query",
         "required": false,
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "id"
-            ]
-          },
-          "default": [
+          "type": "string",
+          "enum": [
             "id"
           ],
-          "example": [
-            "id"
-          ]
+          "example": "id",
+          "default": "id"
         },
         "description": "Customize which field(s) to sort the place types by.",
         "style": "form",
@@ -7786,19 +7772,12 @@
         "in": "query",
         "required": false,
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "id"
-            ]
-          },
-          "default": [
+          "type": "string",
+          "enum": [
             "id"
           ],
-          "example": [
-            "id"
-          ]
+          "example": "id",
+          "default": "id"
         },
         "description": "Customize which field(s) to sort the passenger genders by.",
         "style": "form",
@@ -7819,19 +7798,12 @@
         "in": "query",
         "required": false,
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "id"
-            ]
-          },
-          "default": [
+          "type": "string",
+          "enum": [
             "id"
           ],
-          "example": [
-            "id"
-          ]
+          "example": "id",
+          "default": "id"
         },
         "description": "Customize which field(s) to sort the passenger titles by.",
         "style": "form",
@@ -7875,19 +7847,12 @@
         "in": "query",
         "required": false,
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "id"
-            ]
-          },
-          "default": [
+          "type": "string",
+          "enum": [
             "id"
           ],
-          "example": [
-            "id"
-          ]
+          "example": "id",
+          "default": "id"
         },
         "description": "Customize which field(s) to sort the trips by.",
         "style": "form",
@@ -7971,19 +7936,12 @@
         "in": "query",
         "required": false,
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "id"
-            ]
-          },
-          "default": [
+          "type": "string",
+          "enum": [
             "id"
           ],
-          "example": [
-            "id"
-          ]
+          "example": "id",
+          "default": "id"
         },
         "description": "Customize which field(s) to sort the orders by.",
         "style": "form",
@@ -8050,19 +8008,12 @@
         "in": "query",
         "required": false,
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "id"
-            ]
-          },
-          "default": [
+          "type": "string",
+          "enum": [
             "id"
           ],
-          "example": [
-            "id"
-          ]
+          "example": "id",
+          "default": "id"
         },
         "description": "Customize which field(s) to sort the segments by.",
         "style": "form",
@@ -8104,19 +8055,12 @@
         "in": "query",
         "required": false,
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "id"
-            ]
-          },
-          "default": [
+          "type": "string",
+          "enum": [
             "id"
           ],
-          "example": [
-            "id"
-          ]
+          "example": "id",
+          "default": "id"
         },
         "description": "Customize which field(s) to sort the legs by.",
         "style": "form",
@@ -8137,19 +8081,12 @@
         "in": "query",
         "required": false,
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "id"
-            ]
-          },
-          "default": [
+          "type": "string",
+          "enum": [
             "id"
           ],
-          "example": [
-            "id"
-          ]
+          "example": "id",
+          "default": "id"
         },
         "description": "Customize which field(s) to sort the leg types by.",
         "style": "form",
@@ -8197,19 +8134,12 @@
         "in": "query",
         "required": false,
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "id"
-            ]
-          },
-          "default": [
+          "type": "string",
+          "enum": [
             "id"
           ],
-          "example": [
-            "id"
-          ]
+          "example": "id",
+          "default": "id"
         },
         "description": "Customize which field(s) to sort the offers by.",
         "style": "form",
@@ -8230,19 +8160,12 @@
         "in": "query",
         "required": false,
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "id"
-            ]
-          },
-          "default": [
+          "type": "string",
+          "enum": [
             "id"
           ],
-          "example": [
-            "id"
-          ]
+          "example": "id",
+          "default": "id"
         },
         "description": "Customize which field(s) to sort the cabin classes by.",
         "style": "form",
@@ -8284,19 +8207,12 @@
         "in": "query",
         "required": false,
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "id"
-            ]
-          },
-          "default": [
+          "type": "string",
+          "enum": [
             "id"
           ],
-          "example": [
-            "id"
-          ]
+          "example": "id",
+          "default": "id"
         },
         "description": "Customize which field(s) to sort the offer group details by.",
         "style": "form",
@@ -8340,19 +8256,12 @@
         "in": "query",
         "required": false,
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "id"
-            ]
-          },
-          "default": [
+          "type": "string",
+          "enum": [
             "id"
           ],
-          "example": [
-            "id"
-          ]
+          "example": "id",
+          "default": "id"
         },
         "description": "Customize which field(s) to sort the offer options by.",
         "style": "form",
@@ -8395,19 +8304,12 @@
         "in": "query",
         "required": false,
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "id"
-            ]
-          },
-          "default": [
+          "type": "string",
+          "enum": [
             "id"
           ],
-          "example": [
-            "id"
-          ]
+          "example": "id",
+          "default": "id"
         },
         "description": "Customize which field(s) to sort the offer option details by.",
         "style": "form",
@@ -8454,19 +8356,12 @@
         "in": "query",
         "required": false,
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "id"
-            ]
-          },
-          "default": [
+          "type": "string",
+          "enum": [
             "id"
           ],
-          "example": [
-            "id"
-          ]
+          "example": "id",
+          "default": "id"
         },
         "description": "Customize which field(s) to sort the offer groups by.",
         "style": "form",
@@ -8541,19 +8436,12 @@
         "in": "query",
         "required": false,
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "id"
-            ]
-          },
-          "default": [
+          "type": "string",
+          "enum": [
             "id"
           ],
-          "example": [
-            "id"
-          ]
+          "example": "id",
+          "default": "id"
         },
         "description": "Customize which field(s) to sort the journeys by.",
         "style": "form",
@@ -8599,19 +8487,12 @@
         "in": "query",
         "required": false,
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "id"
-            ]
-          },
-          "default": [
+          "type": "string",
+          "enum": [
             "id"
           ],
-          "example": [
-            "id"
-          ]
+          "example": "id",
+          "default": "id"
         },
         "description": "Customize which field(s) to sort the bookings by.",
         "style": "form",
@@ -8657,19 +8538,12 @@
         "in": "query",
         "required": false,
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "id"
-            ]
-          },
-          "default": [
+          "type": "string",
+          "enum": [
             "id"
           ],
-          "example": [
-            "id"
-          ]
+          "example": "id",
+          "default": "id"
         },
         "description": "Customize which field(s) to sort the booking details by.",
         "style": "form",

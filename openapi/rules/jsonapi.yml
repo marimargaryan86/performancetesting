@@ -125,8 +125,8 @@ rules:
     then:
       - field: schema.default
         function: truthy
-  json-api-ensure-sort-array:
-    description: "`sort` query parameters should be of type `array`."
+  json-api-ensure-sort-string:
+    description: "`sort` query parameters should be of type `string`."
     given: $.components.parameters[?(@.in=="query" && @.name=="sort")]
     severity: error
     then:
@@ -134,13 +134,13 @@ rules:
         function: enumeration
         functionOptions:
           values:
-            - array
+            - string
   json-api-ensure-sort-enum:
     description: "`sort` query parameters should specify an `enum` of possible values for its `items`."
     given: $.components.parameters[?(@.in=="query" && @.name=="sort")]
     severity: error
     then:
-      - field: schema.items.enum
+      - field: schema.enum
         function: truthy
   json-api-ensure-sort-style:
     description: "`sort` query parameters should have `form: style`."

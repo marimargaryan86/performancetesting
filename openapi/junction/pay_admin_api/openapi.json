@@ -1682,19 +1682,12 @@
         "explode": false,
         "required": false,
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "name"
-            ]
-          },
-          "example": [
-            "name"
+          "type": "string",
+          "enum": [
+            "id"
           ],
-          "default": [
-            "name"
-          ]
+          "example": "id",
+          "default": "id"
         },
         "description": "Sorting based on field"
       }

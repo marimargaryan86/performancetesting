@@ -522,19 +522,12 @@
         "explode": false,
         "required": false,
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "id"
-            ]
-          },
-          "example": [
+          "type": "string",
+          "enum": [
             "id"
           ],
-          "default": [
-            "id"
-          ]
+          "example": "id",
+          "default": "id"
         },
         "description": "Field name what should be used to sort"
       },
