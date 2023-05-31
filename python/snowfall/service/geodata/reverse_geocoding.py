@@ -1,11 +1,13 @@
-import dataclasses
-from typing import Sequence
+from __future__ import annotations
 
-from mypy_boto3_location import client  # pants: no-infer-dep
-from typing_extensions import NotRequired, TypedDict  # pants: no-infer-dep
+import dataclasses
+from typing import TYPE_CHECKING, NotRequired, Sequence, TypedDict
 
 from snowfall.service.geodata.v1 import models_pb2
 from snowfall.stdlib.v1 import datetime_pb2, latlng_pb2
+
+if TYPE_CHECKING:
+    from mypy_boto3_location import client
 
 LocationSearchParams = TypedDict(
     "LocationSearchParams",

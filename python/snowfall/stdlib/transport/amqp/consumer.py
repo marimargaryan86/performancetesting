@@ -6,7 +6,7 @@ from typing import Sequence, TypeVar, cast
 
 from aio_pika import abc
 from google.protobuf import message
-from pamqp.common import Arguments  # pants: no-infer-dep
+from pamqp import common
 from structlog import get_logger
 
 from snowfall.stdlib.transport.amqp import middlewares, protocol, types
@@ -29,7 +29,7 @@ class Consumer(protocol.Consumer[_Proto]):
         queue_name: str,
         binds: Sequence[tuple[types.Exchange, str]],
         middleware_stack: Sequence[protocol.ConsumerMiddleware[_Proto]] | None = None,
-        queue_arguments: Arguments | None = None,
+        queue_arguments: common.Arguments | None = None,
     ):
         self._binds = binds
         self._connection = connection

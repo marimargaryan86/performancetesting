@@ -23,13 +23,13 @@ python_requirements(
         "allure-python-commons": ["allure"],
     },
     overrides={
+        "fakeredis": {"dependencies": ["#lupa"]},
         "mongomock-motor": {"dependencies": ["#setuptools"]},
         "openapi-core": {"dependencies": ["#setuptools", "#rfc3339-validator"]},
         "protobuf": {"dependencies": ["#types-protobuf"]},
-        "qrcode": {"dependencies": ["#Pillow"]},
         "pyjwt": {"dependencies": ["#cryptography"]},
+        "qrcode": {"dependencies": ["#Pillow"]},
         "SQLAlchemy": {"dependencies": ["#aiomysql", "#aiosqlite"]},
         "starlette": {"dependencies": ["#python-multipart"]},
-        "fakeredis": {"dependencies": ["#lupa"]},
     },
 )

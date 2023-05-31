@@ -24,6 +24,11 @@
       "inverted": true
     },
     {
+      "name": "no_infer_dep_ignore",
+      "pattern": "# pants: no-infer-dep",
+      "inverted": true
+    },
+    {
       "name": "no_pytest_mark_asyncio",
       "pattern": "@pytest\\.mark\\.asyncio",
       "inverted": true

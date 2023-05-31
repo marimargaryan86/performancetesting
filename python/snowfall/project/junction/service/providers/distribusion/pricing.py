@@ -1,5 +1,4 @@
 import datetime
-import random
 
 import httpx
 import structlog
@@ -10,11 +9,13 @@ from snowfall.project.junction.go.service.offers.v1alpha import (
 )
 from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.project.junction.service.providers.distribusion import cache, config
-from snowfall.stdlib import format, money, service  # pants: no-infer-dep
+from snowfall.stdlib import money, service
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, producer, types
-from snowfall.vendor.distribusion import client, models  # pants: no-infer-dep
+from snowfall.vendor.distribusion import client
+from snowfall.vendor.distribusion.models import connections, criterias
 
 
 class NoPricingError(Exception):
@@ -33,7 +34,7 @@ async def price_quotes(
     metrics.register(http_client)
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # nosec
+            app.settings.redis_dsn[0],
             decode_responses=False,
         ).client(),
     )
@@ -113,7 +114,7 @@ class PriceQuoteConsumer(object):
                 price_quote=offers_pb2.PriceQuote(
                     id=price_quote_id,
                     option_id=amqp_message.body.option_id,
-                    expires_at=format.protobuf.datetime_to_protobuf(
+                    expires_at=protobuf.datetime_to_protobuf(
                         offer_details.expires_at,
                     ),
                     price=money.Money(
@@ -173,9 +174,9 @@ class PriceQuoteConsumer(object):
     async def _vacancy(
         self,
         offer_details: cache.OfferDetails,
-    ) -> models.connections.ConnectionVacancy:
+    ) -> connections.ConnectionVacancy:
         count_pax_type = self._count_passenger_type(offer_details)
-        connection_vacancy_criteria = models.criterias.ConnectionVacancyCriteria(
+        connection_vacancy_criteria = criterias.ConnectionVacancyCriteria(
             marketing_carrier=offer_details.marketing_carrier,
             departure_station=offer_details.departure_station,
             arrival_station=offer_details.arrival_station,

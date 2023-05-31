@@ -64,12 +64,14 @@ lupa==1.14.1
 mongomock-motor==0.0.19
 more-itertools==9.1.0
 motor==3.1.2
+mypy-boto3-location==1.26.143
 mypy-protobuf==3.4.0
 mypy==1.3.0
 numpy==1.24.3
 openapi-core==0.17.1
 openapi-schema-validator==0.4.4
 orjson==3.8.12
+pamqp==3.2.1
 pandas==1.5.3
 phonenumbers==8.13.11
 prometheus-async[aiohttp]==22.2.0
