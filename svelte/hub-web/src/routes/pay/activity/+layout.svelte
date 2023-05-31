@@ -3,7 +3,7 @@
 
   const tabs: Tab[] = [
     { url: routeConfig.pay.activity.root, label: "Transactions", exact: true },
-    { url: routeConfig.pay.activity.conversions, label: "FX", exact: true },
+    { url: routeConfig.pay.activity.conversions.root, label: "FX", exact: true },
   ];
 </script>
 
@@ -40,7 +40,7 @@
       label: "Transactions",
     },
     conversions: {
-      url: routeConfig.pay.activity.conversions,
+      url: routeConfig.pay.activity.conversions.root,
       label: "FX",
     },
   }[view];

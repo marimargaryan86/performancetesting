@@ -31,4 +31,19 @@ export const actions = {
 
     return { booking };
   },
+  async listTransactions(event): Promise<{ transactions: PaginatedData<TransactionModel> } | void> {
+    const formData = await event.request.formData();
+    const cursor = formData.get("cursor")?.toString();
+
+    if (!cursor) {
+      return;
+    }
+
+    return {
+      transactions: await integrationInstances.junctionPay.transactions.listTransactions(
+        getToken(event),
+        cursor,
+      ),
+    };
+  },
 };

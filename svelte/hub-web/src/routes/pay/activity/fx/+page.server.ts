@@ -10,3 +10,21 @@ export function load(event): {
     conversions: integrationInstances.junctionPay.conversions.listConversions(getToken(event)),
   };
 }
+
+export const actions = {
+  async listConversions(event): Promise<{ conversions: PaginatedData<ConversionModel> } | void> {
+    const formData = await event.request.formData();
+    const cursor = formData.get("cursor")?.toString();
+
+    if (!cursor) {
+      return;
+    }
+
+    return {
+      conversions: await integrationInstances.junctionPay.conversions.listConversions(
+        getToken(event),
+        cursor,
+      ),
+    };
+  },
+};

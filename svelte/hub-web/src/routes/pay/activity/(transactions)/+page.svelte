@@ -25,7 +25,6 @@
   import { writable } from "svelte/store";
   import { onMount } from "svelte";
   import TransactionDetails from "./transaction-details/transaction-details.svelte";
-  import integrationInstances from "integration-instances";
   import type { BookingModel } from "models/booking";
   import routeConfig from "routeConfig";
 
@@ -66,14 +65,16 @@
       return;
     }
 
-    const { data: nextTransactions, cursor } =
-      await integrationInstances.junctionPay.transactions.listTransactions(
-        data.user?.token as string,
-        data.transactions.cursor,
-      );
+    await callAction(routeConfig.pay.activity.actions.listTransactions, {
+      cursor: data.transactions.cursor,
+    });
 
-    data.transactions.cursor = cursor;
-    data.transactions.data = [...data.transactions.data, ...nextTransactions];
+    if (form?.transactions) {
+      data.transactions = {
+        cursor: form.transactions.cursor,
+        data: [...data.transactions.data, ...form.transactions.data],
+      };
+    }
   }
 
   async function getBooking(bookingId: string): Promise<BookingModel | undefined> {

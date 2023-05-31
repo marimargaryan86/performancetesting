@@ -6,14 +6,23 @@ export default {
     root: "/pay",
     activity: {
       root: "/pay/activity",
-      conversions: "/pay/activity/fx",
+      conversions: {
+        root: "/pay/activity/fx",
+        actions: {
+          listConversions: "/pay/activity/fx?/listConversions",
+        },
+      },
       actions: {
         getBooking: "/pay/activity?/getBooking",
+        listTransactions: "/pay/activity?/listTransactions",
       },
     },
     accounts: {
       root: "/pay/accounts",
       account: (id: string): string => `/pay/accounts/${id}`,
+      actions: {
+        listAccounts: "/pay/accounts?/listAccounts",
+      },
     },
     beneficiaries: {
       root: "/pay/beneficiaries",

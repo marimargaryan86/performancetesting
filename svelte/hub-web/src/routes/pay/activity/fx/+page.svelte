@@ -13,7 +13,7 @@
   import { yymmdd } from "formatting/date-time";
   import type { DirectionY } from "models/spatial";
   import { sortConversions } from "sorting/conversion";
-  import type { FlattenedObject } from "utils/common";
+  import { callAction, type FlattenedObject } from "utils/common";
   import Table from "components/ui/table/table.svelte";
   import THead from "components/ui/table/t-head.svelte";
   import Header from "components/ui/table/header.svelte";
@@ -22,8 +22,9 @@
   import TCol from "components/ui/table/t-col.svelte";
   import ConversionStatusBadge from "components/ui/conversion-status-badge.svelte";
   import { onMount } from "svelte";
-  import integrationInstances from "integration-instances";
+  import routeConfig from "routeConfig";
 
+  export let form;
   export let data;
 
   let sortDirection: DirectionY = "down";
@@ -43,14 +44,16 @@
       return;
     }
 
-    const { data: nextConversions, cursor } =
-      await integrationInstances.junctionPay.conversions.listConversions(
-        data.user?.token as string,
-        data.conversions.cursor,
-      );
+    await callAction(routeConfig.pay.activity.conversions.actions.listConversions, {
+      cursor: data.conversions.cursor,
+    });
 
-    data.conversions.cursor = cursor;
-    data.conversions.data = [...data.conversions.data, ...nextConversions];
+    if (form?.conversions) {
+      data.conversions = {
+        cursor: form.conversions.cursor,
+        data: [...data.conversions.data, ...form.conversions.data],
+      };
+    }
   }
 
   onMount(() => {

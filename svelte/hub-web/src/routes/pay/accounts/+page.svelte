@@ -2,10 +2,11 @@
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import EntityAvatar from "components/ui/entity-avatar.svelte";
   import SearchField from "components/ui/search-field.svelte";
-  import integrationInstances from "integration-instances";
   import { scrollLoad } from "directives/scroll-load";
   import routeConfig from "routeConfig";
+  import { callAction } from "utils/common";
 
+  export let form;
   export let data;
 
   let searchQuery = "";
@@ -19,14 +20,16 @@
       return;
     }
 
-    const { data: nextAccounts, cursor } =
-      await integrationInstances.junctionPay.accounts.listAccounts(
-        data.user?.token as string,
-        data.accounts.cursor,
-      );
+    await callAction(routeConfig.pay.accounts.actions.listAccounts, {
+      cursor: data.accounts.cursor,
+    });
 
-    data.accounts.cursor = cursor;
-    data.accounts.data = [...data.accounts.data, ...nextAccounts];
+    if (form?.accounts) {
+      data.accounts = {
+        cursor: form.accounts.cursor,
+        data: [...data.accounts.data, ...form.accounts.data],
+      };
+    }
   }
 </script>
 

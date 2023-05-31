@@ -8,3 +8,21 @@ export function load(event): { accounts: Promise<PaginatedData<AccountModel>> } 
     accounts: integrationInstances.junctionPay.accounts.listAccounts(getToken(event)),
   };
 }
+
+export const actions = {
+  async listAccounts(event): Promise<{ accounts: PaginatedData<AccountModel> } | void> {
+    const formData = await event.request.formData();
+    const cursor = formData.get("cursor")?.toString();
+
+    if (!cursor) {
+      return;
+    }
+
+    return {
+      accounts: await integrationInstances.junctionPay.accounts.listAccounts(
+        getToken(event),
+        cursor,
+      ),
+    };
+  },
+};

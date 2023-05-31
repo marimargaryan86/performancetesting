@@ -58,7 +58,11 @@ export async function callAction(action: string, data?: Record<string, unknown>)
   const body = new FormData();
 
   if (data) {
-    Object.entries(data).forEach(([key, val]) => body.set(key, String(val)));
+    Object.entries(data).forEach(([key, val]) => {
+      if (val !== undefined) {
+        body.set(key, String(val));
+      }
+    });
   }
 
   const resp = await fetch(action, { method: "POST", body });
