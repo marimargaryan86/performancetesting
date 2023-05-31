@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package snowfall.project.pay.service.transactions.v1alpha;
+
+import "snowfall/project/pay/service/transactions/v1alpha/models.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/transactions/v1alpha";
+
+service TransactionsService {
+  rpc ListTransactions(ListTransactionsRequest) returns (ListTransactionsResponse) {}
+}
+
+message ListTransactionsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+message ListTransactionsResponse {
+  string next_page_token = 1;
+  repeated Transaction transactions = 2;
+}
