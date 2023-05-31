@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import datetime
 from typing import TypeVar
 
 from google.protobuf import message
@@ -61,9 +62,15 @@ class Service(service.Service, offers_pb2_grpc.OfferServiceServicer):
 
 
 class Consumer(object):
-    def __init__(self, providers_list: providers.Collection, repository: Repository):
+    def __init__(
+        self,
+        providers_list: providers.Collection,
+        repository: Repository,
+        timeout: datetime.timedelta,
+    ):
         self._providers = providers_list
         self._repository = repository
+        self._timeout = timeout
 
     async def consume(self, msg: amqp.Message[amqp_pb2.TripOfferSearchTask]) -> None:
         match msg.body:
@@ -77,11 +84,7 @@ class Consumer(object):
         tasks = []
 
         for provider in self._providers.all_():
-            tasks.append(
-                provider.connection.offers.SearchOffers(
-                    providers_pb2.SearchOffersRequest(trip_offer_search_task=msg),
-                ),
-            )
+            tasks.append(_do_trip_offer_search(provider, msg, self._timeout))
 
         async with asyncio.TaskGroup() as tg:
             for task in asyncio.as_completed(tasks):
@@ -96,6 +99,20 @@ class Consumer(object):
                     )
 
         await self._repository.mark_as_done(msg.offer_search_id)
+
+
+async def _do_trip_offer_search(
+    provider: providers.Provider,
+    msg: amqp_pb2.TripOfferSearchTask,
+    timeout: datetime.timedelta,
+) -> providers_pb2.SearchOffersResponse:
+    try:
+        return await provider.connection.offers.SearchOffers(
+            providers_pb2.SearchOffersRequest(trip_offer_search_task=msg),
+            timeout=timeout.total_seconds(),
+        )
+    except aio.AioRpcError:
+        return providers_pb2.SearchOffersResponse()
 
 
 class Repository(object):

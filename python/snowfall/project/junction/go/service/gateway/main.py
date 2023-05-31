@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 import ipaddress
 
 import pydantic
@@ -17,6 +18,7 @@ class _ConsumeSettings(service.Settings):
     amqp_dsn: pydantic.AnyUrl
     providers: dict[str, str] = {}
     redis_dsn: pydantic.AnyUrl
+    search_timeout: datetime.timedelta = datetime.timedelta(seconds=30)
 
 
 class _ServeSettings(service.Settings):
@@ -50,6 +52,7 @@ async def _consume(app: service.AsyncApplication[_ConsumeSettings]) -> None:
             ),
             client=redis.Client(redis_conn),
         ),
+        timeout=app.settings.search_timeout,
     )
     amqp_consumer = consumer.Consumer[amqp_pb2.TripOfferSearchTask](
         connection=connection,
