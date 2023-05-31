@@ -7,7 +7,10 @@ import itertools
 from collections.abc import Sequence
 from typing import Iterable, NamedTuple
 
-from snowfall.project.junction.provider.v1alpha import offers_pb2_grpc
+from snowfall.project.junction.provider.v1alpha import (
+    bookings_pb2_grpc,
+    offers_pb2_grpc,
+)
 from snowfall.stdlib.transport.grpc import client
 
 
@@ -88,7 +91,12 @@ class Provider(object):
 class Connection(object):
     def __init__(self, dsn: str):
         self._channel = client.create_channel(dsn)
+        self._bookings = bookings_pb2_grpc.BookingServiceStub(self._channel)
         self._offers = offers_pb2_grpc.OfferServiceStub(self._channel)
+
+    @property
+    def bookings(self) -> bookings_pb2_grpc.BookingServiceStub:
+        return self._bookings
 
     @property
     def offers(self) -> offers_pb2_grpc.OfferServiceStub:

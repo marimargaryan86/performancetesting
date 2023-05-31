@@ -5,7 +5,7 @@ import ipaddress
 import pydantic
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.go.service.gateway import offers, providers
+from snowfall.project.junction.go.service.gateway import bookings, offers, providers
 from snowfall.project.junction.go.service.offers.v1alpha import amqp_pb2
 from snowfall.stdlib import service
 from snowfall.stdlib.persistence.redis import types as redis
@@ -23,6 +23,7 @@ class _ServeSettings(service.Settings):
     amqp_dsn: pydantic.AnyUrl
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
+    providers: dict[str, str] = {}
     redis_dsn: pydantic.AnyUrl
 
 
@@ -66,10 +67,20 @@ async def _serve(app: service.AsyncApplication[_ServeSettings]) -> None:
     redis_conn = await app.stack.enter_async_context(
         aioredis.from_url(app.settings.redis_dsn).client(),
     )
+    all_providers = await providers.Collection.from_identifier_address_tuples(
+        [
+            providers.IdentifierAddressTuple(*provider_tuple)
+            for provider_tuple in app.settings.providers.items()
+        ],
+    )
+
     server = grpc_server.create_server(
         app.settings.grpc_address,
         app.settings.grpc_port,
         [
+            bookings.Service(
+                providers_collection=all_providers,
+            ),
             offers.Service(
                 repository=offers.Repository(
                     producer=producer.Producer(

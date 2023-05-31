@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package snowfall.project.junction.go.service.gateway.v1alpha;
+
+import "snowfall/project/junction/provider/v1alpha/bookings.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/gateway/v1alpha";
+
+service BookingService {
+  rpc GetBookings(GetBookingsRequest) returns (GetBookingsResponse) {}
+}
+
+message GetBookingsRequest {
+  repeated string ids = 1;
+}
+
+message GetBookingsResponse {
+  repeated snowfall.project.junction.provider.v1alpha.Booking bookings = 1;
+}
