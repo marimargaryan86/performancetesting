@@ -31,8 +31,8 @@
 //     "bandit==1.7.5",
 //     "bcrypt==4.0.1",
 //     "black==23.3.0",
-//     "boto3-stubs[location]==1.26.137",
-//     "boto3==1.26.137",
+//     "boto3-stubs[location]==1.26.76",
+//     "boto3==1.26.76",
 //     "click==8.1.3",
 //     "cryptography==40.0.2",
 //     "docformatter==1.5.1",
@@ -56,6 +56,7 @@
 //     "flake8-todos==0.2.1",
 //     "flake8==4.0.1",
 //     "freezegun==1.2.2",
+//     "fsspec==2023.5.0",
 //     "furl==2.1.3",
 //     "geopy[aiohttp]==2.3.0",
 //     "googleapis-common-protos==1.59.0",
@@ -109,6 +110,7 @@
 //     "qrcode==7.4.2",
 //     "redis[hiredis]==4.5.5",
 //     "rfc3339-validator==0.1.4",
+//     "s3fs==2023.5.0",
 //     "sentry-sdk==1.23.1",
 //     "setuptools==67.8.0",
 //     "starlette==0.27.0",
@@ -196,6 +198,31 @@
           ],
           "requires_python": "<4.0,>=3.7",
           "version": "9.0.7"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "9a2a022d7b78ec9a2af0de589916d2721cddbf96264401b78d7a73c1a1435f3b",
+              "url": "https://files.pythonhosted.org/packages/91/01/d04cc1e4cc29fcafbca4ca746bf33e03dd5eb51c958738596be7d76a2022/aiobotocore-2.5.0-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "6a5b397cddd4f81026aa91a14c7dd2650727425740a5af8ba75127ff663faf67",
+              "url": "https://files.pythonhosted.org/packages/e4/d4/28b8c4c9443ffdd1a97b4b0bb970877697deee43e5956bc86028a2723c17/aiobotocore-2.5.0.tar.gz"
+            }
+          ],
+          "project_name": "aiobotocore",
+          "requires_dists": [
+            "aiohttp>=3.3.1",
+            "aioitertools>=0.5.1",
+            "awscli<1.27.77,>=1.27.76; extra == \"awscli\"",
+            "boto3<1.26.77,>=1.26.76; extra == \"boto3\"",
+            "botocore<1.29.77,>=1.29.76",
+            "wrapt>=1.10.10"
+          ],
+          "requires_python": ">=3.7",
+          "version": "2.5.0"
         },
         {
           "artifacts": [
@@ -336,6 +363,26 @@
           ],
           "requires_python": ">=3.6",
           "version": "3.8.4"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "04b95e3dab25b449def24d7df809411c10e62aab0cbe31a50ca4e68748c43394",
+              "url": "https://files.pythonhosted.org/packages/45/66/d1a9fd8e6ff88f2157cb145dd054defb0fd7fe2507fe5a01347e7c690eab/aioitertools-0.11.0-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "42c68b8dd3a69c2bf7f2233bf7df4bb58b557bca5252ac02ed5187bbc67d6831",
+              "url": "https://files.pythonhosted.org/packages/4a/e6/888e1d726f0846c84e14a0f2f57873819eff9278b394d632aed979c98fbd/aioitertools-0.11.0.tar.gz"
+            }
+          ],
+          "project_name": "aioitertools",
+          "requires_dists": [
+            "typing_extensions>=4.0; python_version < \"3.10\""
+          ],
+          "requires_python": ">=3.6",
+          "version": "0.11.0"
         },
         {
           "artifacts": [
@@ -929,43 +976,43 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "b6d729beec0462ac1ae4a83a0fb04a62061a9f1f406d3151b45345daa9d1a5bc",
-              "url": "https://files.pythonhosted.org/packages/20/8d/de46b65fccc863223d62ded9bd4b1e582036a2cb5658273644b9e7e4f582/boto3-1.26.137-py3-none-any.whl"
+              "hash": "b4c2969b7677762914394b8273cc1905dfe5b71f250741c1a575487ae357e729",
+              "url": "https://files.pythonhosted.org/packages/2c/95/a43050c34b38d38379a9fea1986492c9d70b7ee4522f80a0f09117443b55/boto3-1.26.76-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "cac699fc46b43c10ca12aa6ea087c0b979613c5e3570aea11d86891652cb581e",
-              "url": "https://files.pythonhosted.org/packages/57/e9/b2e32fbf241c9846d16f2d72b6071586d81ad718397b20b03a617438989c/boto3-1.26.137.tar.gz"
+              "hash": "30c7d967ed1c6b5a05643e42cae9d4d36c3f1cb6782637ddc7007a104cfd9027",
+              "url": "https://files.pythonhosted.org/packages/29/a8/3ffdf9744fd5d0330cd0303ff3bd52c1491934e5bd5fba2353d14641685f/boto3-1.26.76.tar.gz"
             }
           ],
           "project_name": "boto3",
           "requires_dists": [
-            "botocore<1.30.0,>=1.29.137",
+            "botocore<1.30.0,>=1.29.76",
             "botocore[crt]<2.0a0,>=1.21.0; extra == \"crt\"",
             "jmespath<2.0.0,>=0.7.1",
             "s3transfer<0.7.0,>=0.6.0"
           ],
           "requires_python": ">=3.7",
-          "version": "1.26.137"
+          "version": "1.26.76"
         },
         {
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "3861430e6e9eff98a1b2bdf215195358df8cd6204c60e81e4a0f856b8cc822c8",
-              "url": "https://files.pythonhosted.org/packages/c1/f4/2467f0d6590ea7e1123ce47ccca998e2d8e34f672a56a47eb7230b4cb855/boto3_stubs-1.26.137-py3-none-any.whl"
+              "hash": "1acf751d33a66dbf49cd6d64efaa5767f7a7b2d8b2f09a56bf38516c307ec3b0",
+              "url": "https://files.pythonhosted.org/packages/a0/76/d5432d2a18ac0bdc7f37fbaa8fe6726697f6129617e0403fdfff931e8423/boto3_stubs-1.26.76-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "341ba8eb33cb98efafc8701d21bce11d1b1ce6fdb3571f10d78459e8f10a3921",
-              "url": "https://files.pythonhosted.org/packages/2e/db/d6631cd60b6c9a12525b66a0fe340bd9453c829c7ceaa169732d942fe73b/boto3-stubs-1.26.137.tar.gz"
+              "hash": "160262a2b5bbb82c74df528085c74ab513e70875d894bde7b4a5cd1b7e765a2e",
+              "url": "https://files.pythonhosted.org/packages/06/56/99cee4a4f4833bcc1a1cb31ccbcda7c9e2ed22e36a299275ad7ba905e2c9/boto3-stubs-1.26.76.tar.gz"
             }
           ],
           "project_name": "boto3-stubs",
           "requires_dists": [
-            "boto3==1.26.137; extra == \"boto3\"",
+            "boto3==1.26.76; extra == \"boto3\"",
             "botocore-stubs",
-            "botocore==1.29.137; extra == \"boto3\"",
+            "botocore==1.29.76; extra == \"boto3\"",
             "mypy-boto3-accessanalyzer<1.27.0,>=1.26.0; extra == \"accessanalyzer\"",
             "mypy-boto3-accessanalyzer<1.27.0,>=1.26.0; extra == \"all\"",
             "mypy-boto3-account<1.27.0,>=1.26.0; extra == \"account\"",
@@ -1263,8 +1310,6 @@
             "mypy-boto3-inspector2<1.27.0,>=1.26.0; extra == \"inspector2\"",
             "mypy-boto3-inspector<1.27.0,>=1.26.0; extra == \"all\"",
             "mypy-boto3-inspector<1.27.0,>=1.26.0; extra == \"inspector\"",
-            "mypy-boto3-internetmonitor<1.27.0,>=1.26.0; extra == \"all\"",
-            "mypy-boto3-internetmonitor<1.27.0,>=1.26.0; extra == \"internetmonitor\"",
             "mypy-boto3-iot-data<1.27.0,>=1.26.0; extra == \"all\"",
             "mypy-boto3-iot-data<1.27.0,>=1.26.0; extra == \"iot-data\"",
             "mypy-boto3-iot-jobs-data<1.27.0,>=1.26.0; extra == \"all\"",
@@ -1299,8 +1344,6 @@
             "mypy-boto3-iottwinmaker<1.27.0,>=1.26.0; extra == \"iottwinmaker\"",
             "mypy-boto3-iotwireless<1.27.0,>=1.26.0; extra == \"all\"",
             "mypy-boto3-iotwireless<1.27.0,>=1.26.0; extra == \"iotwireless\"",
-            "mypy-boto3-ivs-realtime<1.27.0,>=1.26.0; extra == \"all\"",
-            "mypy-boto3-ivs-realtime<1.27.0,>=1.26.0; extra == \"ivs-realtime\"",
             "mypy-boto3-ivs<1.27.0,>=1.26.0; extra == \"all\"",
             "mypy-boto3-ivs<1.27.0,>=1.26.0; extra == \"ivs\"",
             "mypy-boto3-ivschat<1.27.0,>=1.26.0; extra == \"all\"",
@@ -1390,8 +1433,6 @@
             "mypy-boto3-mediapackage-vod<1.27.0,>=1.26.0; extra == \"mediapackage-vod\"",
             "mypy-boto3-mediapackage<1.27.0,>=1.26.0; extra == \"all\"",
             "mypy-boto3-mediapackage<1.27.0,>=1.26.0; extra == \"mediapackage\"",
-            "mypy-boto3-mediapackagev2<1.27.0,>=1.26.0; extra == \"all\"",
-            "mypy-boto3-mediapackagev2<1.27.0,>=1.26.0; extra == \"mediapackagev2\"",
             "mypy-boto3-mediastore-data<1.27.0,>=1.26.0; extra == \"all\"",
             "mypy-boto3-mediastore-data<1.27.0,>=1.26.0; extra == \"mediastore-data\"",
             "mypy-boto3-mediastore<1.27.0,>=1.26.0; extra == \"all\"",
@@ -1444,8 +1485,6 @@
             "mypy-boto3-opsworkscm<1.27.0,>=1.26.0; extra == \"opsworkscm\"",
             "mypy-boto3-organizations<1.27.0,>=1.26.0; extra == \"all\"",
             "mypy-boto3-organizations<1.27.0,>=1.26.0; extra == \"organizations\"",
-            "mypy-boto3-osis<1.27.0,>=1.26.0; extra == \"all\"",
-            "mypy-boto3-osis<1.27.0,>=1.26.0; extra == \"osis\"",
             "mypy-boto3-outposts<1.27.0,>=1.26.0; extra == \"all\"",
             "mypy-boto3-outposts<1.27.0,>=1.26.0; extra == \"outposts\"",
             "mypy-boto3-panorama<1.27.0,>=1.26.0; extra == \"all\"",
@@ -1637,8 +1676,6 @@
             "mypy-boto3-translate<1.27.0,>=1.26.0; extra == \"translate\"",
             "mypy-boto3-voice-id<1.27.0,>=1.26.0; extra == \"all\"",
             "mypy-boto3-voice-id<1.27.0,>=1.26.0; extra == \"voice-id\"",
-            "mypy-boto3-vpc-lattice<1.27.0,>=1.26.0; extra == \"all\"",
-            "mypy-boto3-vpc-lattice<1.27.0,>=1.26.0; extra == \"vpc-lattice\"",
             "mypy-boto3-waf-regional<1.27.0,>=1.26.0; extra == \"all\"",
             "mypy-boto3-waf-regional<1.27.0,>=1.26.0; extra == \"waf-regional\"",
             "mypy-boto3-waf<1.27.0,>=1.26.0; extra == \"all\"",
@@ -1664,22 +1701,22 @@
             "mypy-boto3-xray<1.27.0,>=1.26.0; extra == \"all\"",
             "mypy-boto3-xray<1.27.0,>=1.26.0; extra == \"xray\"",
             "types-s3transfer",
-            "typing-extensions>=4.1.0; python_version < \"3.9\""
+            "typing-extensions>=4.1.0"
           ],
           "requires_python": ">=3.7",
-          "version": "1.26.137"
+          "version": "1.26.76"
         },
         {
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "fcb424c750a78a9f86b5ee8319bfa20de8528a80aadcdd171910bcb8d45c3055",
-              "url": "https://files.pythonhosted.org/packages/bd/d8/030d5599824cff4de5c185f1225c5d2160c33eacb6c536bc77550b69f59c/botocore-1.29.143-py3-none-any.whl"
+              "hash": "70735b00cd529f152992231ca6757e458e5ec25db43767b3526e9a35b2f143b7",
+              "url": "https://files.pythonhosted.org/packages/87/93/e862d4b2ec9b0c8f7a6ee3141df138c00aa91de42839e55b68e3ebb53bf2/botocore-1.29.76-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "e5b8dd2fa750f0476667753dc018c2b14a542fec7e20edd3a7613b6d2df2c32a",
-              "url": "https://files.pythonhosted.org/packages/1a/a2/7b5752267ae7cd17f2688a65636ffa93ad7b410a383621a1f24ab305b7b9/botocore-1.29.143.tar.gz"
+              "hash": "c2f67b6b3f8acf2968eafca06526f07b9fb0d27bac4c68a635d51abb675134a7",
+              "url": "https://files.pythonhosted.org/packages/fb/4b/87b54878085654cd3a01175b849e273cbf049bc01a141e1b9b512d956a9a/botocore-1.29.76.tar.gz"
             }
           ],
           "project_name": "botocore",
@@ -1690,19 +1727,19 @@
             "urllib3<1.27,>=1.25.4"
           ],
           "requires_python": ">=3.7",
-          "version": "1.29.143"
+          "version": "1.29.76"
         },
         {
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "ba2e3d41bb55dbc298b46cabdf52175e37ce9686cb7c9ff0c24e7212452c4efb",
-              "url": "https://files.pythonhosted.org/packages/97/b7/78bf43afb019db45263836479bd24b791634ddab028ae71983957d4d100d/botocore_stubs-1.29.143-py3-none-any.whl"
+              "hash": "b9db32981b4deefb01784d9b196afeaca7df6f6f185d8ba7f96c02b1c3bc0d90",
+              "url": "https://files.pythonhosted.org/packages/73/2a/754aac9a726ff1e0c8ccb7970443d331b67289e9e21a936df2df9cf0948a/botocore_stubs-1.29.144-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "bc978b87ad3ef591389e8da2eda902958c90204c1e573be36232dfa7dd120f25",
-              "url": "https://files.pythonhosted.org/packages/db/1b/b23da084193f0829e53496de650053de909f958e0c411841be4fcf3a23eb/botocore_stubs-1.29.143.tar.gz"
+              "hash": "d456543af79fbdd23df76a2d7a7525cd672b4bb5b057d7e060bc117d9af71694",
+              "url": "https://files.pythonhosted.org/packages/28/59/84a1dd85554984858fdfaa3990dc418083b4a739198a2479db026f8cd9b7/botocore_stubs-1.29.144.tar.gz"
             }
           ],
           "project_name": "botocore-stubs",
@@ -1711,7 +1748,7 @@
             "typing-extensions>=4.1.0; python_version < \"3.9\""
           ],
           "requires_python": "<4.0,>=3.7",
-          "version": "1.29.143"
+          "version": "1.29.144"
         },
         {
           "artifacts": [
@@ -3125,6 +3162,69 @@
           "requires_dists": [],
           "requires_python": ">=3.7",
           "version": "1.3.3"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "51a4ad01a5bb66fcc58036e288c0d53d3975a0df2a5dc59a93b59bade0391f2a",
+              "url": "https://files.pythonhosted.org/packages/ec/4e/397b234a369df06ec782666fcdf9791d125ca6de48729814b381af8c6c03/fsspec-2023.5.0-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "b3b56e00fb93ea321bc9e5d9cf6f8522a0198b20eb24e02774d329e9c6fb84ce",
+              "url": "https://files.pythonhosted.org/packages/4e/5f/faee1c6261997e5b0782f48db9d01dc8ce7aa817d2016dd5cd64c60b1d86/fsspec-2023.5.0.tar.gz"
+            }
+          ],
+          "project_name": "fsspec",
+          "requires_dists": [
+            "adlfs; extra == \"abfs\"",
+            "adlfs; extra == \"adl\"",
+            "adlfs; extra == \"full\"",
+            "aiohttp!=4.0.0a0,!=4.0.0a1; extra == \"full\"",
+            "aiohttp!=4.0.0a0,!=4.0.0a1; extra == \"http\"",
+            "dask; extra == \"dask\"",
+            "dask; extra == \"full\"",
+            "distributed; extra == \"dask\"",
+            "distributed; extra == \"full\"",
+            "dropbox; extra == \"dropbox\"",
+            "dropbox; extra == \"full\"",
+            "dropboxdrivefs; extra == \"dropbox\"",
+            "dropboxdrivefs; extra == \"full\"",
+            "fusepy; extra == \"full\"",
+            "fusepy; extra == \"fuse\"",
+            "gcsfs; extra == \"full\"",
+            "gcsfs; extra == \"gcs\"",
+            "gcsfs; extra == \"gs\"",
+            "libarchive-c; extra == \"full\"",
+            "libarchive-c; extra == \"libarchive\"",
+            "ocifs; extra == \"full\"",
+            "ocifs; extra == \"oci\"",
+            "panel; extra == \"full\"",
+            "panel; extra == \"gui\"",
+            "paramiko; extra == \"full\"",
+            "paramiko; extra == \"sftp\"",
+            "paramiko; extra == \"ssh\"",
+            "pyarrow>=1; extra == \"arrow\"",
+            "pyarrow>=1; extra == \"full\"",
+            "pyarrow>=1; extra == \"hdfs\"",
+            "pygit2; extra == \"full\"",
+            "pygit2; extra == \"git\"",
+            "pytest-cov; extra == \"devel\"",
+            "pytest; extra == \"devel\"",
+            "requests; extra == \"dropbox\"",
+            "requests; extra == \"full\"",
+            "requests; extra == \"github\"",
+            "requests; extra == \"http\"",
+            "s3fs; extra == \"full\"",
+            "s3fs; extra == \"s3\"",
+            "smbprotocol; extra == \"full\"",
+            "smbprotocol; extra == \"smb\"",
+            "tqdm; extra == \"full\"",
+            "tqdm; extra == \"tqdm\""
+          ],
+          "requires_python": ">=3.8",
+          "version": "2023.5.0"
         },
         {
           "artifacts": [
@@ -6317,13 +6417,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "69cdf53799e63f38b95b9bf9c875f8c90e78dd62b2f00c13a911c7a3b9fa4704",
-              "url": "https://files.pythonhosted.org/packages/39/03/6de23bdd88f5ee7f8b03f94f6e88108f5d7ffe6d207e95cdb06d9aa4cd57/rich-13.3.5-py3-none-any.whl"
+              "hash": "d204aadb50b936bf6b1a695385429d192bc1fdaf3e8b907e8e26f4c4e4b5bf75",
+              "url": "https://files.pythonhosted.org/packages/ea/93/c68645c689d10a035010e3ae314b6b2855d040ce0d11fdfdfbb8be416581/rich-13.4.1-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "2d11b9b8dd03868f09b4fffadc84a6a8cda574e40dc90821bd845720ebb8e89c",
-              "url": "https://files.pythonhosted.org/packages/3d/0b/8dd34d20929c4b5e474db2e64426175469c2b7fea5ba71c6d4b3397a9729/rich-13.3.5.tar.gz"
+              "hash": "76f6b65ea7e5c5d924ba80e322231d7cb5b5981aa60bfc1e694f1bc097fe6fe1",
+              "url": "https://files.pythonhosted.org/packages/02/97/0046b5e3c6a5057b5817e5e6c51a776d410b953e6a9c67ae249dafdd2999/rich-13.4.1.tar.gz"
             }
           ],
           "project_name": "rich",
@@ -6334,7 +6434,7 @@
             "typing-extensions<5.0,>=4.0.0; python_version < \"3.9\""
           ],
           "requires_python": ">=3.7.0",
-          "version": "13.3.5"
+          "version": "13.4.1"
         },
         {
           "artifacts": [
@@ -6348,6 +6448,30 @@
           "requires_dists": [],
           "requires_python": null,
           "version": "0.0.4"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "0d82c4fa43d1214117f56b239c3e03c9a2886f41c31000c1c967ac6030d20362",
+              "url": "https://files.pythonhosted.org/packages/3a/04/c1ed8ae87a3ea12f7ccfe1376d7ae338f1bc1f03d1581b5db395776047d6/s3fs-2023.5.0-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "106b5d9a1000e6af413f918156ba4b96789ac832b7e08c99d186eb08164e6981",
+              "url": "https://files.pythonhosted.org/packages/17/44/513d90e312d31d3f6ff9d171a411a6fbcf9f51a04d8cb600ee2d3a220835/s3fs-2023.5.0.tar.gz"
+            }
+          ],
+          "project_name": "s3fs",
+          "requires_dists": [
+            "aiobotocore[awscli]~=2.5.0; extra == \"awscli\"",
+            "aiobotocore[boto3]~=2.5.0; extra == \"boto3\"",
+            "aiobotocore~=2.5.0",
+            "aiohttp!=4.0.0a0,!=4.0.0a1",
+            "fsspec==2023.5.0"
+          ],
+          "requires_python": ">=3.8",
+          "version": "2023.5.0"
         },
         {
           "artifacts": [
@@ -6983,19 +7107,19 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "a9c34dcb1c0040c626fc5a8b770edb98d4382c5a5ea326d595913878498fdc63",
-              "url": "https://files.pythonhosted.org/packages/cf/61/19642f0e50fc7aa0f04e923bbecb590e83411cd33d466783ef31235b81f4/types_awscrt-0.16.18-py3-none-any.whl"
+              "hash": "50fe7610aa40550a23d79d6167b2b8536281f038f42846eda0e520d6e3e01787",
+              "url": "https://files.pythonhosted.org/packages/4d/30/247bc9e7fa4ce376fc7405d3f91f730411330c009cd923ff442616820098/types_awscrt-0.16.19-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "537fb0d61f2c3d28c9c2cd7bab1cb57a7aa4fba22072391202ff4cd923b0d95e",
-              "url": "https://files.pythonhosted.org/packages/cc/e3/2e2722998b9f85096aa4e7a3545042988065867481d80107851c88c39004/types_awscrt-0.16.18.tar.gz"
+              "hash": "763d8d543f145d51cd16ea407d079608b126941d24525e16cb1de31d949ff563",
+              "url": "https://files.pythonhosted.org/packages/32/4d/c4d5693de88cbcc8c426040e027b07ca391a2598a8073d6eb0aeb7ed423f/types_awscrt-0.16.19.tar.gz"
             }
           ],
           "project_name": "types-awscrt",
           "requires_dists": [],
           "requires_python": "<4.0,>=3.7",
-          "version": "0.16.18"
+          "version": "0.16.19"
         },
         {
           "artifacts": [
@@ -7091,13 +7215,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "ad024b07a1f4bffbca44699543c71efd04733a6c22781fa9673a971e410a3086",
-              "url": "https://files.pythonhosted.org/packages/88/71/c0d92ea9c7c21b941306f97a3fcd85a6b57ff57f84d9ba16083cb2286664/types_pyOpenSSL-23.1.0.3-py3-none-any.whl"
+              "hash": "ba803a99440b0c2e9ab4e197084aeefc55bdfe8a580d367b2aa4210810a21240",
+              "url": "https://files.pythonhosted.org/packages/c4/6f/7f34f668703b0394d3ea233ab95d9bff69175c28ed7d49e2d710e36eaa2a/types_pyOpenSSL-23.2.0.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "e7211088eff3e20d359888dedecb0994f7181d5cce0f26354dd47ca0484dc8a6",
-              "url": "https://files.pythonhosted.org/packages/a5/f0/7c331aa7a58d421b41aaf69ca72a1633a7f3e724a8e3646a0b10357af16f/types-pyOpenSSL-23.1.0.3.tar.gz"
+              "hash": "43e307e8dfb3a7a8208a19874ca060305f460c529d4eaca8a2669ea89499f244",
+              "url": "https://files.pythonhosted.org/packages/ee/c4/4dcdd9569a4330e9d1cd77b39d97ab1ffc90f48fa4a3251c9e7d6e632352/types-pyOpenSSL-23.2.0.0.tar.gz"
             }
           ],
           "project_name": "types-pyopenssl",
@@ -7105,7 +7229,7 @@
             "cryptography>=35.0.0"
           ],
           "requires_python": null,
-          "version": "23.1.0.3"
+          "version": "23.2.0.0"
         },
         {
           "artifacts": [
@@ -7896,8 +8020,8 @@
     "bandit==1.7.5",
     "bcrypt==4.0.1",
     "black==23.3.0",
-    "boto3-stubs[location]==1.26.137",
-    "boto3==1.26.137",
+    "boto3-stubs[location]==1.26.76",
+    "boto3==1.26.76",
     "click==8.1.3",
     "cryptography==40.0.2",
     "docformatter==1.5.1",
@@ -7921,6 +8045,7 @@
     "flake8-todos==0.2.1",
     "flake8==4.0.1",
     "freezegun==1.2.2",
+    "fsspec==2023.5.0",
     "furl==2.1.3",
     "geopy[aiohttp]==2.3.0",
     "googleapis-common-protos==1.59.0",
@@ -7974,6 +8099,7 @@
     "qrcode==7.4.2",
     "redis[hiredis]==4.5.5",
     "rfc3339-validator==0.1.4",
+    "s3fs==2023.5.0",
     "sentry-sdk==1.23.1",
     "setuptools==67.8.0",
     "starlette==0.27.0",
