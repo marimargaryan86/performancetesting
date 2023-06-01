@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import contextlib
-import datetime
 from typing import Any, cast
 
 import httpx
@@ -19,14 +18,6 @@ from snowfall.stdlib.transport.amqp import types
 from snowfall.vendor.duffel import client
 from snowfall.vendor.duffel.builders import offer_request
 
-
-class OffersSettings(service.OffersSettings, config.DuffelConfig):
-    ttl: datetime.timedelta = datetime.timedelta(minutes=config.DEFAULT_TTL_IN_MINUTES)
-    enabled_airlines: set[str] = set()
-    disabled_airlines: set[str] = set()
-    reseller_providers: dict[str, list[str]] = {}
-
-
 _Impl = offers.OfferSearchImplementation[
     amqp_pb2.SearchCriteriaTask,
     offer_request.OfferRequestData,
@@ -34,7 +25,7 @@ _Impl = offers.OfferSearchImplementation[
 
 
 async def offers_factory(
-    app: service.Application[OffersSettings],
+    app: service.Application[config.Settings],
     amqp_connection: types.Connection,
     redis_connection: aioredis.Redis[bytes],
     stack: contextlib.AsyncExitStack,

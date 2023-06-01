@@ -3,7 +3,7 @@ from typing import Sequence
 
 import pydantic
 
-from snowfall.stdlib import service
+from snowfall.project.junction.provider import service
 
 DEFAULT_TTL_IN_MINUTES = 45
 
@@ -13,6 +13,12 @@ class DuffelConfig(pydantic.BaseModel):
     api_key: str
     api_version: str = "v1"
     http_timeout: int = 30
+
+
+class Settings(DuffelConfig, service.ProviderSettings):
+    ttl: datetime.timedelta = datetime.timedelta(minutes=DEFAULT_TTL_IN_MINUTES)
+    enabled_airlines: set[str] = set()
+    disabled_airlines: set[str] = set()
 
 
 class PricingSettings(DuffelConfig, service.Settings):

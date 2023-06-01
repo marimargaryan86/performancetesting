@@ -2,16 +2,18 @@ from __future__ import annotations
 
 import contextlib
 import dataclasses
-from typing import TYPE_CHECKING, Awaitable, Callable, TypeVar
+import ipaddress
+from typing import TYPE_CHECKING, Awaitable, Callable, Generic, Optional, TypeVar
 
 import pydantic
 from google.protobuf import message
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import offers
+from snowfall.project.junction.provider import meta, offers
 from snowfall.stdlib import service
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import types
+from snowfall.stdlib.transport.grpc import server as grpc_server
 
 # Re-export some service types
 Application = service.Application
@@ -20,10 +22,12 @@ Command = service.Command
 Settings = service.Settings
 
 
-class OffersSettings(service.Settings):
+class ProviderSettings(service.Settings):
     amqp_dsn: pydantic.AnyUrl
-    redis_dsn: pydantic.AnyUrl
+    grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
+    grpc_port: int = 50051
     provider_company_id: str
+    redis_dsn: pydantic.AnyUrl
     reseller_providers: dict[str, list[str]]
 
 
@@ -33,12 +37,14 @@ class PriceQuoteSettings(service.Settings):
 
 _SearchCriteriaTask = TypeVar("_SearchCriteriaTask", bound=message.Message)
 _SearchCriteria = TypeVar("_SearchCriteria", bound=object)
-_OffersSettings = TypeVar("_OffersSettings", bound=OffersSettings)
+
+_Settings = TypeVar("_Settings", bound=ProviderSettings)
 
 if TYPE_CHECKING:
+    MetaFactory = Callable[[], Awaitable[meta.MetaImplementation]]
     OffersFactory = Callable[
         [
-            service.Application[_OffersSettings],
+            service.Application[_Settings],
             types.Connection,
             aioredis.Redis[bytes],
             contextlib.AsyncExitStack,
@@ -48,11 +54,65 @@ if TYPE_CHECKING:
         ],
     ]
 
+    OptionalOF = Optional[
+        OffersFactory[_Settings, _SearchCriteriaTask, _SearchCriteria]
+    ]
+
+
+def _grpc_command(  # noqa: WPS210
+    meta_factory: MetaFactory,
+    offers_factory: OptionalOF[_Settings, _SearchCriteriaTask, _SearchCriteria] = None,
+) -> service.Callback[_Settings]:
+    async def wrapper(app: service.AsyncApplication[_Settings]) -> None:  # noqa: WPS210
+        meta_implementation = await meta_factory()
+        services: list[grpc_server.Service] = [
+            meta.MetaService(
+                provider_id=meta_implementation.identifier,
+                provider_name=meta_implementation.name,
+            ),
+        ]
+        redis_conn: aioredis.Redis[bytes] = await app.stack.enter_async_context(
+            aioredis.from_url(
+                app.settings.redis_dsn,
+                decode_responses=False,
+            ).client(),
+        )
+        connection = await app.stack.enter_async_context(
+            types.Connection(app.settings.amqp_dsn),
+        )
+
+        if offers_factory:
+            offers_implementation = await offers_factory(
+                app,
+                connection,
+                redis_conn,
+                app.stack,
+            )
+            services.append(
+                offers.OfferSearchService(
+                    offers.TripOfferSearcher.from_implementation(
+                        implementation=offers_implementation,
+                        redis_client=redis.Client[bytes](redis_conn, prefix=app.name),
+                    ),
+                ),
+            )
+
+        server = grpc_server.create_server(
+            app.settings.grpc_address,
+            app.settings.grpc_port,
+            services,
+        )
+
+        async with server.serve() as running:
+            await running.wait_for_termination()
+
+    return wrapper
+
 
 def _offers_command(
-    factory: OffersFactory[_OffersSettings, _SearchCriteriaTask, _SearchCriteria],
-) -> service.Callback[_OffersSettings]:
-    async def wrapper(app: service.AsyncApplication[_OffersSettings]) -> None:
+    factory: OffersFactory[_Settings, _SearchCriteriaTask, _SearchCriteria],
+) -> service.Callback[_Settings]:
+    async def wrapper(app: service.AsyncApplication[_Settings]) -> None:
         redis_conn: aioredis.Redis[bytes] = await app.stack.enter_async_context(
             aioredis.from_url(
                 app.settings.redis_dsn,
@@ -78,17 +138,35 @@ def _offers_command(
     return wrapper
 
 
-@dataclasses.dataclass(frozen=True)
-class Entrypoint(service.Entrypoint):
-    def enable_offers(
-        self,
-        settings: type[_OffersSettings],
-        factory: OffersFactory[_OffersSettings, _SearchCriteriaTask, _SearchCriteria],
-    ) -> None:
+@dataclasses.dataclass(frozen=True, kw_only=True)
+class Entrypoint(
+    Generic[_Settings, _SearchCriteriaTask, _SearchCriteria],
+    service.Entrypoint,
+):
+    settings_class: type[_Settings]
+    meta_factory: MetaFactory
+    offers_factory: OffersFactory[
+        _Settings,
+        _SearchCriteriaTask,
+        _SearchCriteria,
+    ] | None = None
+
+    def __post_init__(self) -> None:
+        super().__post_init__()
         self.add_command(
             service.Command(
-                name="offers",
-                callback=_offers_command(factory),
-                settings_class=settings,
+                name="grpc",
+                callback=_grpc_command(self.meta_factory, self.offers_factory),
+                settings_class=self.settings_class,
             ),
         )
+
+        # backwards compatibility
+        if self.offers_factory:
+            self.add_command(
+                service.Command(
+                    name="offers",
+                    callback=_offers_command(self.offers_factory),
+                    settings_class=self.settings_class,
+                ),
+            )

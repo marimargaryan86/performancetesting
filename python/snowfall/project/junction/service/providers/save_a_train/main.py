@@ -7,6 +7,7 @@ import os
 import pathlib
 import pkgutil
 import random
+import uuid
 from typing import Sequence, cast
 
 import aiosmtplib
@@ -18,6 +19,7 @@ from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import (
     cabin_classes,
+    meta,
     notifications,
     offers,
     service,
@@ -40,6 +42,9 @@ from snowfall.stdlib.transport.grpc import client as grpc_client
 from snowfall.vendor.save_a_train import client
 from snowfall.vendor.save_a_train.models import request
 
+_PROVIDER_ID = uuid.UUID("a5547dae-9c65-4746-8637-d0601865508e")
+_PROVIDER_NAME = "Save A Train"
+
 
 class _SatConfig(pydantic.BaseModel):
     api_base_url: pydantic.AnyUrl
@@ -58,11 +63,10 @@ class _DumpStationsSettings(_SatConfig, service.Settings):
     output_file: str = pydantic.Field(hidden=True, argument=True)
 
 
-class _OffersSettings(_SatConfig, service.OffersSettings):
+class _Settings(_SatConfig, service.ProviderSettings):
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
     mongo_dsn: tuple[pydantic.AnyUrl]
     allowed_window_td: datetime.timedelta = datetime.timedelta(minutes=10)
-    reseller_providers: dict[str, list[str]] = {}
 
 
 class _PriceQuoteSettings(service.PriceQuoteSettings):
@@ -97,8 +101,12 @@ _Impl = offers.OfferSearchImplementation[
 ]
 
 
-async def _offers(
-    app: service.Application[_OffersSettings],
+async def _meta_factory() -> meta.MetaImplementation:
+    return meta.MetaImplementation(identifier=_PROVIDER_ID, name=_PROVIDER_NAME)
+
+
+async def _offers_factory(
+    app: service.Application[_Settings],
     amqp_conn: types.Connection,
     redis_conn: aioredis.Redis[bytes],
     stack: contextlib.AsyncExitStack,
@@ -419,9 +427,13 @@ async def _load_train_stations() -> list[train_stations.TrainStation]:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="save-a-train")
+    entrypoint = service.Entrypoint(
+        name="save-a-train",
+        settings_class=_Settings,
+        meta_factory=_meta_factory,
+        offers_factory=_offers_factory,
+    )
 
-    entrypoint.enable_offers(_OffersSettings, _offers)
     entrypoint.enter_with_commands(
         service.Command(
             name="dump-stations",

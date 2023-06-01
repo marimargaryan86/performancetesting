@@ -3,11 +3,12 @@ from __future__ import annotations
 import contextlib
 import pathlib
 import random
+import uuid
 
 import httpx
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import offers, service
+from snowfall.project.junction.provider import meta, offers, service
 from snowfall.project.junction.service.providers.direct_ferries import (
     adapter,
     booking,
@@ -42,6 +43,13 @@ _Impl = offers.OfferSearchImplementation[
     request.QuoteRequest,
 ]
 
+_PROVIDER_ID = uuid.UUID("92ada881-f31c-471e-a8b0-01ed48a181d5")
+_PROVIDER_NAME = "Direct Ferries"
+
+
+async def _meta_factory() -> meta.MetaImplementation:
+    return meta.MetaImplementation(identifier=_PROVIDER_ID, name=_PROVIDER_NAME)
+
 
 def _create_client(
     http_client: httpx.AsyncClient,
@@ -66,7 +74,7 @@ def _create_client(
 
 
 async def _offers(
-    app: service.Application[config.OffersSettings],
+    app: service.Application[config.Settings],
     amqp_conn: types.Connection,
     redis_conn: aioredis.Redis[bytes],
     stack: contextlib.AsyncExitStack,
@@ -261,9 +269,13 @@ async def _static(app: service.AsyncApplication[config.StaticSettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="direct-ferries")
+    entrypoint = service.Entrypoint(
+        name="direct-ferries",
+        settings_class=config.Settings,
+        meta_factory=_meta_factory,
+        offers_factory=_offers,
+    )
 
-    entrypoint.enable_offers(config.OffersSettings, _offers)
     entrypoint.enter_with_commands(
         service.Command(
             name="orders",

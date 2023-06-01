@@ -3,7 +3,7 @@ from typing import Sequence
 
 import pydantic
 
-from snowfall.stdlib import service
+from snowfall.project.junction.provider import service
 
 DEFAULT_TTL_IN_MINUTES = 45
 
@@ -13,6 +13,10 @@ class DistribusionConfig(pydantic.BaseModel):
     api_key: str
     api_timeout: int = 500
     retailer_partner_number: str
+
+
+class Settings(service.ProviderSettings, DistribusionConfig):
+    ttl: datetime.timedelta = datetime.timedelta(minutes=DEFAULT_TTL_IN_MINUTES)
 
 
 class OrdersSettings(DistribusionConfig, service.Settings):

@@ -14,11 +14,10 @@ class BaNdcConfig(pydantic.BaseModel):
     http_timeout: int = 30
 
 
-class OffersSettings(service.OffersSettings, BaNdcConfig):
+class Settings(BaNdcConfig, service.ProviderSettings):
     amqp_dsn: pydantic.AnyUrl
     provider_company_id: str
     redis_dsn: pydantic.AnyUrl
-    reseller_providers: dict[str, list[str]] = {}
 
 
 class PricingSettings(BaNdcConfig, service.Settings):

@@ -3,6 +3,7 @@ from __future__ import annotations
 import contextlib
 import datetime
 import random
+import uuid
 from typing import Any, Sequence, cast
 
 import aiosmtplib
@@ -14,6 +15,7 @@ from redis import asyncio as aioredis
 from snowfall.project.junction.provider import (
     airports,
     cabin_classes,
+    meta,
     notifications,
     offers,
     service,
@@ -53,7 +55,7 @@ class _OrdersSettings(service.Settings):
     override_double_booking_check: bool = False
 
 
-class _OffersSettings(service.OffersSettings):
+class _Settings(service.ProviderSettings):
     api_base_url: pydantic.AnyUrl
     api_booking_base_url: pydantic.AnyUrl
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
@@ -61,7 +63,6 @@ class _OffersSettings(service.OffersSettings):
     poll_retries_limit: int = 10
     wait_time_between_polling: float = 1
     mongo_dsn: Sequence[pydantic.AnyUrl]
-    reseller_providers: dict[str, list[str]] = {}
 
 
 class _PriceQuotesSettings(service.PriceQuoteSettings):
@@ -88,8 +89,16 @@ _Impl = offers.OfferSearchImplementation[
 ]
 
 
+_PROVIDER_ID = uuid.UUID("4b7d12db-7735-4c67-9645-5fc82f7c4fe8")
+_PROVIDER_NAME = "Ask2Go"
+
+
+async def _meta_factory() -> meta.MetaImplementation:
+    return meta.MetaImplementation(identifier=_PROVIDER_ID, name=_PROVIDER_NAME)
+
+
 async def _offers(
-    app: service.Application[_OffersSettings],
+    app: service.Application[_Settings],
     amqp_conn: types.Connection,
     redis_conn: aioredis.Redis[bytes],
     stack: contextlib.AsyncExitStack,
@@ -306,9 +315,13 @@ async def _seat_maps(app: service.AsyncApplication[_SeatMapsSettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="ask2go")
+    entrypoint = service.Entrypoint(
+        name="ask2go",
+        settings_class=_Settings,
+        meta_factory=_meta_factory,
+        offers_factory=_offers,
+    )
 
-    entrypoint.enable_offers(_OffersSettings, _offers)
     entrypoint.enter_with_commands(
         service.Command(
             name="orders",

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import contextlib
-import datetime
 
 import httpx
 from redis import asyncio as aioredis
@@ -25,11 +24,6 @@ from snowfall.vendor.distribusion.models import criterias
 _OFFERS = "offers"
 
 
-class OffersSettings(service.OffersSettings, config.DistribusionConfig):
-    ttl: datetime.timedelta = datetime.timedelta(minutes=config.DEFAULT_TTL_IN_MINUTES)
-    reseller_providers: dict[str, list[str]] = {}
-
-
 _Impl = offers.OfferSearchImplementation[
     amqp_pb2.SearchCriteriaTask,
     criterias.FindConnectionsCriteria,
@@ -37,7 +31,7 @@ _Impl = offers.OfferSearchImplementation[
 
 
 async def offers_factory(
-    app: service.Application[OffersSettings],
+    app: service.Application[config.Settings],
     amqp_connection: types.Connection,
     redis_connection: aioredis.Redis[bytes],
     stack: contextlib.AsyncExitStack,

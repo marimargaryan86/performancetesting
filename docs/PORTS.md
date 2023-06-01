@@ -28,7 +28,7 @@ The following ports are configured in local environments by default:
 | 8005  | pss/api                | HTTP Server       |
 | 8006  | pay-admin-api          | HTTP Server       |
 | 8007  | data-api               | HTTP Server       |
-| 8008  | pay-webhooks           | HTTP Server       |
+| 8008  | webhooks               | HTTP Server       |
 | 50051 | echo                   | gRPC Server       |
 | 50052 | places                 | gRPC Server       |
 | 50053 | planner                | gRPC Server       |
@@ -46,3 +46,9 @@ The following ports are configured in local environments by default:
 | 50065 | gateway                | gRPC Server       |
 | 50066 | mock                   | gRPC Server       |
 | 50067 | payments               | gRPC Server       |
+| 50068 | ask2go                 | gRPC Server       |
+| 50069 | ba-ndc                 | gRPC Server       |
+| 50070 | direct_ferries         | gRPC Server       |
+| 50071 | distribusion           | gRPC Server       |
+| 50072 | duffel                 | gRPC Server       |
+| 50073 | save-a-train           | gRPC Server       |

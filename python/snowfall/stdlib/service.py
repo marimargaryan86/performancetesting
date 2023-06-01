@@ -106,7 +106,7 @@ class Command(Generic[_Settings]):
     settings_class: Type[_Settings]
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True, kw_only=True)
 class Entrypoint(object):
     name: str
     _group: click.Group = dataclasses.field(init=False)

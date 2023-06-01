@@ -1,4 +1,6 @@
-from snowfall.project.junction.provider import service
+import uuid
+
+from snowfall.project.junction.provider import meta, service
 from snowfall.project.junction.service.providers.distribusion import (
     config,
     offers,
@@ -7,10 +9,22 @@ from snowfall.project.junction.service.providers.distribusion import (
     stations,
 )
 
-if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="distribusion")
+_PROVIDER_ID = uuid.UUID("30bfba87-7077-4d96-beed-c5769cdc99c7")
+_PROVIDER_NAME = "Distribusion"
 
-    entrypoint.enable_offers(offers.OffersSettings, offers.offers_factory)
+
+async def _meta_factory() -> meta.MetaImplementation:
+    return meta.MetaImplementation(identifier=_PROVIDER_ID, name=_PROVIDER_NAME)
+
+
+if __name__ == "__main__":
+    entrypoint = service.Entrypoint(
+        name="distribusion",
+        settings_class=config.Settings,
+        meta_factory=_meta_factory,
+        offers_factory=offers.offers_factory,
+    )
+
     entrypoint.enter_with_commands(
         service.Command(
             name="dump-stations",

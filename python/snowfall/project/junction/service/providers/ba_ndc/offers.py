@@ -25,7 +25,7 @@ _Impl = offers.OfferSearchImplementation[
 
 
 async def offers_factory(
-    app: service.Application[config.OffersSettings],
+    app: service.Application[config.Settings],
     amqp_connection: types.Connection,
     redis_connection: aioredis.Redis[bytes],
     stack: contextlib.AsyncExitStack,

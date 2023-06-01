@@ -21,9 +21,8 @@ class DfBaseSettings(service.Settings):
     )
 
 
-class OffersSettings(DfBaseSettings, service.OffersSettings):
+class Settings(DfBaseSettings, service.ProviderSettings):
     ttl: datetime.timedelta = datetime.timedelta(minutes=_OFFER_TTL_DEFAULT_MINUTES)
-    reseller_providers: dict[str, list[str]] = {}
 
 
 class StaticSettings(DfBaseSettings):

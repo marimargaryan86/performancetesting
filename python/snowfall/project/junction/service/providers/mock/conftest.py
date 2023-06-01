@@ -77,9 +77,9 @@ async def searcher(
     wrapped_redis_client = redis.Client[bytes](redis_client, prefix="foo")
     app = mock.create_autospec(service.Application)
     app.name = "mock"
-    app.settings = mock.create_autospec(main._OffersSettings)  # noqa: WPS437
+    app.settings = mock.create_autospec(main._Settings)  # noqa: WPS437
     app.settings.ttl = datetime.timedelta(minutes=1)
-    implementation = await main._offers_search(  # noqa: WPS437
+    implementation = await main._offers_factory(  # noqa: WPS437
         app=app,
         amqp_conn=mock.create_autospec(types.Connection),
         redis_conn=redis_client,
