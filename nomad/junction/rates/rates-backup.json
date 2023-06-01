@@ -6,7 +6,7 @@
   },
   "production": {
     "variables": {
-      "cc_address": "https://devapi.currencycloud.com/v2"
+      "cc_address": "https://api.currencycloud.com/v2"
     }
   },
   "sandbox": {
