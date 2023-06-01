@@ -1,18 +1,11 @@
 # Schedules E2E Tests
 
 
-
-`tests/schedule_tests/README.md`
-
-
-
 ## related files
 
 Tests are run by `tests/schedule_tests/run_e2e_tests.sh`
 
 Which is run in the CI Pipeline by `.gitlab/planner-test.gitlab-ci.yml`
-
-
 
 ## Test Files
 
@@ -22,15 +15,9 @@ There are several types of  "test file", all are retrieved from an S3 bucket at 
 * A tar file with test data used by the Planner
 * And optionally the test YML file may name a "known-good" results file for a `-compare` run (see below)
 
-
-
 Each test YML file may be for a different test purpose (use the `name:` and `comment:` fields to describe the tests). Each YML file must identify a data TAR file, but many test YML files may use the same TAR file e.g. they are running different tests on the same dataset.
 
 The test runner `tests/schedule_tests/run_e2e_tests.sh` expects environment variable `E2E_TEST_YML_FILE`to be the full S3 path to a test YML file, including the S3 bucket, such as: `s3://junction-schedules-export/Test/test_data/quick_test.yml`
-
-
-
-
 
 This S3 directory has the static test data for the Schedules End to End tests. These comprise:
 
@@ -67,8 +54,6 @@ go run cmd/planner-test-client/planner-test-client.go -- -test-file=/junction/go
 
 ```
 
-
-
 I know a tar of zipped files will not save space! Just creating a single archive.
 
 Files:
@@ -81,7 +66,6 @@ Files:
 | ssim-a3.zip | Aegean|381 kb|
 | Ferry ??? | Xxxx ||
 | OUTPUT      | tests/schedule_tests/e2e_test_data.tar      | 3,121 kb |
-
 
 
 ## Environment Variables
@@ -112,7 +96,6 @@ Lookup 2-character Airline codes [iata](https://www.iata.org/en/publications/dir
 ## Docker Compose
 
 
-
 ### Why have we configured the Docker images this way?
 
 The Docker Compose file is `tests/schedule_tests/DockerfileE2E`. It creates two Containers
@@ -126,7 +109,6 @@ Now to run the tests, e2e-test needs:
 * Go (golang)
 * MongoDB database tools
 * Pants
-
 
 
 As I am developing on an M1 macBook, then we need everything installed to be ARM compatible
@@ -149,11 +131,7 @@ From a MacBook or PC terminal, we would simply run something like: `docker run -
 
 We could use `SSH` to run a remote command. To do this, we need to create a new Dockerfile to create a custom image starting with `FROM mongo` , add the ssh daemon and create a user to receive the SSH call. However the Mongo image does not have  `systemd` or any other system controller - so there is no way to start the SSH daemon when the container is instantiated! (Manually starting the Daemon allows this method to work well). So we could start from a basic Ubuntu, install Mongo and SSH, but adding Mongo Tools to `e2e-test` looks simpler.
 
-
-
 # Planner Tester 'Known Good' tests
-
-
 
 ## Intro
 
@@ -273,9 +251,6 @@ This is a much smaller `.txt` Text file, listing each test case and the comparis
 Samples of these reports are in `Google Drive` [here](https://drive.google.com/drive/folders/1qU0W-nf3czOfgZNu7qupSZs9WqZ-TMG6?usp=share_link) (sample HTML, PDF and TXT files)
 
 
-
-
-
 #### Test Program Exit Code
 
 The program `golang/cmd/planner-test-client/planner-test-client.go` exits with:
@@ -283,8 +258,6 @@ The program `golang/cmd/planner-test-client/planner-test-client.go` exits with:
 * 0 if all tests passed, or
 * A +ve number, being the number of tests that failed, or
 * A -ve number if there is a program failure
-
-
 
 The shell script `tests/schedule_tests/run_e2e_tests.sh` exits with the same codes.
 
@@ -394,7 +367,6 @@ test-data:
 ```
 
 
-
 ## Appendix B - Sample KG file
 
 A sample "Known Good" file "test 1-A.txt":
@@ -476,8 +448,6 @@ Summary:
 
 Can be seen in the repo at `tests/schedule_tests/results_2023-03-13T13:46:12.pdf`
 
-
-
 [sample report](file:///results_2023-03-13T13:46:12.pdf)
 
 ## Appendix E - History
@@ -488,8 +458,3 @@ Can be seen in the repo at `tests/schedule_tests/results_2023-03-13T13:46:12.pdf
 | 1.0     | 9/3/23  | Simon Hewitt | 1st release                              |
 | 1.1     | 13/3/23 | Simon Hewitt | Added 'instructions'                     |
 | 1.2     | 15/3/23 | Simon Hewitt | Merged two markdown files into readme.md |
-
-
-
-
-
