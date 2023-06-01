@@ -49,7 +49,7 @@ enumeration array.
 
 :::info
 
-Notice that we currently only support sorting on one field at a time.
+We currently only support sorting on one field at a time.
 
 :::
 
@@ -86,7 +86,7 @@ There is a helper function in our standard library for this,
 provide is a mapping between what the field in the OpenAPI specification and
 the field in the protocol buffer message is.
 
-In this case, the protocol buffer message for `Example` does use the same
+In this case, the protocol buffer message for `Example` doesn't use the same
 wording as the OpenAPI specification, the OpenAPI field `title` is mapped to
 the protocol buffer message field `name` of the `Example` message.
 
